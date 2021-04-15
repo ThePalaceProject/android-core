@@ -1,8 +1,28 @@
+import org.librarysimplified.gradle.RequiredAssetsTask
+
+// Fail the build if these assets aren't present
+//
+def requiredFiles = [:]
+requiredFiles["secrets.conf"] =
+  "9c211ae0d153c29b72baab3bfad9de6c5cecb6b39bcda8206d36a65aaca0db21"
+
 android {
   defaultConfig {
     versionName = project.version
     versionCode = calculateVersionCode(project)
     setProperty("archivesBaseName", "raybooks")
+  }
+  applicationVariants.all { variant ->
+    def finalizerTask =
+      tasks.create(name: "requiredFiles${variant.name.capitalize()}", type: RequiredAssetsTask) {
+        required = requiredFiles
+        apkFiles = variant.outputs.collect { out ->
+          out.outputFile
+        }
+      }
+    variant.assembleProvider.configure {
+      finalizedBy finalizerTask
+    }
   }
 }
 
