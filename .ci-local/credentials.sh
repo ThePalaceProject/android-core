@@ -46,7 +46,7 @@ cat ".ci/credentials/APK Signing/keystore.properties" >> "${HOME}/.gradle/gradle
 CREDENTIALS_PATH=$(realpath ".ci/credentials") ||
   fatal "could not resolve credentials path"
 
-SIMPLYE_CREDENTIALS="${CREDENTIALS_PATH}/SimplyE/Android"
+SIMPLYE_CREDENTIALS="${CREDENTIALS_PATH}/Certificates/SimplyE/Android"
 #OPENEBOOKS_CREDENTIALS="${CREDENTIALS_PATH}/OpenEbooks/Android"
 
 if [ ! -d "${SIMPLYE_CREDENTIALS}" ]
@@ -67,4 +67,4 @@ cat >> "${HOME}/.gradle/gradle.properties" <<EOF
 
 #org.librarysimplified.app.assets.openebooks=${OPENEBOOKS_CREDENTIALS}
 org.librarysimplified.app.assets.raybooks=${SIMPLYE_CREDENTIALS}
-#EOF
+EOF
