@@ -58,13 +58,13 @@ ext {
   //
   nyplDrmEnabled =
     project.findProperty('org.librarysimplified.drm.enabled') as Boolean
-  if (nyplDrmEnabled && !nyplNexusDepend) {
-    throw new GradleException(
-      """\
-      'org.librarysimplified.nexus.depend' is undefined!
-        ^ required by 'org.librarysimplified.drm.enabled'\
-      """.stripIndent())
-  }
+//  if (nyplDrmEnabled && !nyplNexusDepend) {
+//    throw new GradleException(
+//      """\
+//      'org.librarysimplified.nexus.depend' is undefined!
+//        ^ required by 'org.librarysimplified.drm.enabled'\
+//      """.stripIndent())
+//  }
 }
 
 subprojects { project ->
