@@ -59,7 +59,7 @@ fi
 #fi
 #
 cat >> "${HOME}/.gradle/gradle.properties" <<EOF
-#org.librarysimplified.drm.enabled=true
+org.librarysimplified.drm.enabled=true
 
 #org.librarysimplified.nexus.depend=true
 #org.librarysimplified.nexus.username=${NYPL_NEXUS_USER}
