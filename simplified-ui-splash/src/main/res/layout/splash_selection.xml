@@ -40,7 +40,8 @@
     android:layout_marginTop="16dp"
     android:text="@string/selectionAlternateButton"
     android:textSize="18sp"
-    android:textStyle="bold" />
+    android:textStyle="bold"
+    android:visibility="gone" />
 
   <TextView
     android:id="@+id/selectionAlternateTitle"
@@ -48,5 +49,6 @@
     android:layout_height="wrap_content"
     android:layout_marginTop="4dp"
     android:text="@string/selectionAlternateTitle"
-    android:textAppearance="@android:style/TextAppearance.Small" />
+    android:textAppearance="@android:style/TextAppearance.Small"
+    android:visibility="gone" />
 </LinearLayout>
