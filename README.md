@@ -1,22 +1,22 @@
 Library Simplified
 ===
 
-[![Build Status](https://img.shields.io/github/workflow/status/NYPL-Simplified/Simplified-Android-Core/Android%20CI%20(Authenticated)?style=flat-square)](https://github.com/NYPL-Simplified/Simplified-Android-Core/actions?query=workflow%3A%22Android+CI+%28Authenticated%29%22)
-[![Maven Central](https://img.shields.io/maven-central/v/org.librarysimplified/org.librarysimplified.main?style=flat-square)](https://repo1.maven.org/maven2/org/librarysimplified/)
-[![Maven Central (snapshot)](https://img.shields.io/nexus/s/https/oss.sonatype.org/org.librarysimplified/org.librarysimplified.main.svg?style=flat-square)](https://oss.sonatype.org/content/repositories/snapshots/org.librarysimplified/)
+[![Build Status](https://img.shields.io/github/workflow/status/lyrasis/simplye-Android-Core/Android%20CI%20(Authenticated)?style=flat-square)](https://github.com/lyrasis/simplye-Android-Core/actions?query=workflow%3A%22Android+CI+%28Authenticated%29%22)
+<!-- [![Maven Central](https://img.shields.io/maven-central/v/org.librarysimplified/org.librarysimplified.main?style=flat-square)](https://repo1.maven.org/maven2/org/librarysimplified/)
+[![Maven Central (snapshot)](https://img.shields.io/nexus/s/https/oss.sonatype.org/org.librarysimplified/org.librarysimplified.main.svg?style=flat-square)](https://oss.sonatype.org/content/repositories/snapshots/org.librarysimplified/) -->
 
-The NYPL's [Library Simplified](http://www.librarysimplified.org/) Android client.
+LYRASIS fork of the NYPL's [Library Simplified](http://www.librarysimplified.org/) Android client.
 
 ![simplified](./src/site/resources/simplified.jpg?raw=true)
 
 _Image by [Predrag Kezic](https://pixabay.com/users/PredragKezic-582203/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=581229) from [Pixabay](https://pixabay.com/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=581229)_
 
-|Build|Status|
+<!-- |Build|Status|
 |-----|------|
 |[Nightly, DRM, JDK 11](https://github.com/NYPL-Simplified/Simplified-Android-Core/actions?query=workflow%3A%22Android+CI+%28Daily+Authenticated%2C+JDK+11%29%22)|[![Build Status](https://img.shields.io/github/workflow/status/NYPL-Simplified/Simplified-Android-Core/Android%20CI%20(Daily%20Authenticated,%20JDK%2011)?style=flat-square)](https://github.com/NYPL-Simplified/Simplified-Android-Core/actions?query=workflow%3A%22Android+CI+%28Daily+Authenticated%2C+JDK+11%29%22)|
 |[Nightly, DRM-Free, JDK 11](https://github.com/NYPL-Simplified/Simplified-Android-Core/actions?query=workflow%3A%22Android+CI+%28Daily+DRM-Free%2C+JDK+11%29%22)|[![Build Status](https://img.shields.io/github/workflow/status/NYPL-Simplified/Simplified-Android-Core/Android%20CI%20(Daily%20DRM-Free,%20JDK%2011)?style=flat-square)](https://github.com/NYPL-Simplified/Simplified-Android-Core/actions?query=workflow%3A%22Android+CI+%28Daily+DRM-Free%2C+JDK+11%29%22)|
 |[Nightly, DRM-Free, JDK 15](https://github.com/NYPL-Simplified/Simplified-Android-Core/actions?query=workflow%3A%22Android+CI+%28Daily+DRM-Free%2C+JDK+15%29%22)|[![Build Status](https://img.shields.io/github/workflow/status/NYPL-Simplified/Simplified-Android-Core/Android%20CI%20(Daily%20DRM-Free,%20JDK%2015)?style=flat-square)](https://github.com/NYPL-Simplified/Simplified-Android-Core/actions?query=workflow%3A%22Android+CI+%28Daily+DRM-Free%2C+JDK+15%29%22)|
-|[Last Commit](https://github.com/NYPL-Simplified/Simplified-Android-Core/actions?query=workflow%3A%22Android+CI+%28Authenticated%29%22)|[![Build Status](https://img.shields.io/github/workflow/status/NYPL-Simplified/Simplified-Android-Core/Android%20CI%20(Authenticated)?style=flat-square)](https://github.com/NYPL-Simplified/Simplified-Android-Core/actions?query=workflow%3A%22Android+CI+%28Authenticated%29%22)|
+|[Last Commit](https://github.com/NYPL-Simplified/Simplified-Android-Core/actions?query=workflow%3A%22Android+CI+%28Authenticated%29%22)|[![Build Status](https://img.shields.io/github/workflow/status/NYPL-Simplified/Simplified-Android-Core/Android%20CI%20(Authenticated)?style=flat-square)](https://github.com/NYPL-Simplified/Simplified-Android-Core/actions?query=workflow%3A%22Android+CI+%28Authenticated%29%22)| -->
 
 ### What Is This?
 
@@ -25,7 +25,7 @@ amongst others, the NYPL's official [SimplyE](https://www.nypl.org/books-music-m
 application. The framework provides a base application with numerous configuration
 switches, and configurable _branding_. The expectation is that third parties will
 produce final builds of applications by defining _application frontends_ that specify
-dependencies on the framework, custom color schemes, and logos. 
+dependencies on the framework, custom color schemes, and logos.
 
 The repository contains a number of applications that are all built from the
 same core:
@@ -33,8 +33,10 @@ same core:
 |Application|Module|Description|
 |-----------|------|-----------|
 |Vanilla|[simplified-app-vanilla](simplified-app-vanilla)|DRM-free generic reading application|
-|SimplyE|[simplified-app-simplye](simplified-app-simplye)|The NYPL's official [SimplyE](https://www.nypl.org/books-music-movies/ebookcentral/simplye) application|
-|Open eBooks|[simplified-app-openebooks](simplified-app-openebooks)|The [Open eBooks](https://openebooks.net/) application|
+|RayBooks (temporary name)|[simplified-app-raybooks](simplified-app-raybooks)|The DRM-enabled application|
+<!-- |SimplyE|[simplified-app-simplye](simplified-app-simplye)|The NYPL's official [SimplyE](https://www.nypl.org/books-music-movies/ebookcentral/simplye) application|
+|Open eBooks|[simplified-app-openebooks](simplified-app-openebooks)|The [Open eBooks](https://openebooks.net/) application| -->
+
 
 ## Contents
 
@@ -72,9 +74,8 @@ $ ./gradlew clean ktlint assembleDebug test
 
 This will build all of the code and run the unit tests, but only the
 [Vanilla](simplified-app-vanilla) application will be built by default. In
-order to build the other applications such as [SimplyE](simplified-app-simplye),
-it's necessary to obtain the correct [credentials](#nexus-credentials) from the
-NYPL and [enable DRM](#enabling-drm).
+order to build the other applications such as [RayBooks](simplified-app-raybooks),
+it's necessary to <!--obtain the correct [credentials](#nexus-credentials) from LYRASIS and--> [enable DRM](#enabling-drm).
 
 #### The Longer Version
 
@@ -117,7 +118,7 @@ OpenJDK Runtime Environment (build 11.0.8+10)
 OpenJDK 64-Bit Server VM (build 11.0.8+10, mixed mode)
 ~~~
 
-#### Nexus Credentials
+<!-- #### Nexus Credentials
 
 Our application can use packages that are only available from our
 Nexus server. If you wish to use these packages, you need to obtain
@@ -135,7 +136,7 @@ Once you have your credentials, the following lines must be added to `$HOME/.gra
 org.librarysimplified.nexus.username=USERNAME
 org.librarysimplified.nexus.password=PASSWORD
 org.librarysimplified.nexus.depend=true
-~~~
+~~~ -->
 
 #### APK signing
 
@@ -162,10 +163,10 @@ $ ./gradlew clean assemble test
 #### Enabling DRM
 
 The application contains optional support for various DRM systems, and these
-must be enabled explicitly in order to build [SimplyE](simplified-app-simplye).
+must be enabled explicitly in order to build [RayBooks](simplified-app-raybooks).
 
-Firstly, make sure you have your [Nexus](#nexus-credentials) credentials
-correctly configured. Then, add the following property to your
+<!--Firstly, make sure you have your [Nexus](#nexus-credentials) credentials
+correctly configured. Then, -->Add the following property to your
 `$HOME/.gradle/gradle.properties` file:
 
 ```
@@ -179,14 +180,14 @@ provided various configuration files containing secrets that the DRM systems
 require, and will refuse to build the app if you've failed to do this. The
 build system can copy in the correct secrets for you if tell it the location
 of directories containing those secrets. For example, assuming that you have
-[SimplyE's](simplified-app-simplye) secrets in `/path/to/simplye/secrets` and
-[Open eBook's](simplified-app-openebooks) secrets in `/path/to/openebooks/secrets`,
+[RayBooks'](simplified-app-raybooks) secrets in `/path/to/raybooks/secrets`<!--and
+[Open eBook's](simplified-app-openebooks) secrets in `/path/to/openebooks/secrets` -->,
 you can add the following properties to your `$HOME/.gradle/gradle.properties` file
 and the build system will copy in the required secrets at build time:
 
+<!-- org.librarysimplified.app.assets.openebooks=/path/to/openebooks/secrets -->
 ```
-org.librarysimplified.app.assets.openebooks=/path/to/openebooks/secrets
-org.librarysimplified.app.assets.simplye=/path/to/simplye/secrets
+org.librarysimplified.app.assets.raybooks=/path/to/raybooks/secrets
 ```
 
 #### Adobe DRM Support
@@ -409,13 +410,13 @@ _The above table is generated with [ReadMe.java](src/misc/ReadMe.java)._
 
 ### Binaries
 
-Binaries for every commit are built and published in the [binaries](https://github.com/NYPL-Simplified/android-binaries)
+Binaries for every commit are built and published in the [binaries](https://github.com/lyrasis/simplye-android-binaries)
 repository. Note that these binaries are _not_ to be considered production ready and may have
 undergone little or no testing. Use at your own risk!
 
 ### Ktlint
 
-The codebase uses [ktlint](https://ktlint.github.io/) to enforce a consistent 
+The codebase uses [ktlint](https://ktlint.github.io/) to enforce a consistent
 code style. It's possible to ensure that any changes you've made to the code
 continue to pass `ktlint` checks by running the `ktlintFormat` task to reformat
 source code:
