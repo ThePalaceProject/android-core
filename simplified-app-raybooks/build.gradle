@@ -31,5 +31,8 @@ dependencies {
   implementation project(":simplified-accounts-source-nyplregistry")
   implementation project(":simplified-analytics-circulation")
   implementation project(":simplified-documents")
+  implementation libraries.nypl_drm_core
+  implementation libraries.nypl_findaway
+
   annotationProcessor libraries.google_autovalue_processor
 }
