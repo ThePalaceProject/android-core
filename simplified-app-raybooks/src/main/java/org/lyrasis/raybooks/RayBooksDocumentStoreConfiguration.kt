@@ -19,8 +19,14 @@ class RayBooksDocumentStoreConfiguration : DocumentConfigurationServiceType {
     null
 
   override val eula: DocumentConfiguration? =
-    null
+    DocumentConfiguration(
+      "eula.html",
+      URI.create("http://localhost/eula.html")
+    )
 
   override val licenses: DocumentConfiguration? =
-    null
+    DocumentConfiguration(
+      "software-licenses.html",
+      URI.create("http://localhost/software-licenses.html")
+    )
 }
