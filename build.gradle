@@ -65,6 +65,11 @@ ext {
 //        ^ required by 'org.librarysimplified.drm.enabled'\
 //      """.stripIndent())
 //  }
+
+  awsAccessKeyId =
+    project.property("org.lyrasis.aws.access_key_id")
+  awsSecretKey =
+    project.property("org.lyrasis.aws.secret_access_key")
 }
 
 subprojects { project ->
@@ -98,6 +103,30 @@ subprojects { project ->
           password nyplNexusPassword
         }
         url 'https://nexus.librarysimplified.org:8443/nexus/content/groups/external/'
+      }
+    }
+
+    maven {
+      name = "S3 Snapshots"
+      url = "s3://se-maven-repo/snapshots/"
+      credentials(AwsCredentials) {
+        accessKey = awsAccessKeyId
+        secretKey = awsSecretKey
+      }
+      mavenContent {
+        snapshotsOnly()
+      }
+    }
+
+    maven {
+      name = "S3 Releases"
+      url = "s3://se-maven-repo/releases/"
+      credentials(AwsCredentials) {
+        accessKey = awsAccessKeyId
+        secretKey = awsSecretKey
+      }
+      mavenContent {
+        releasesOnly()
       }
     }
 
