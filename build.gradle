@@ -30,41 +30,18 @@ plugins {
 }
 
 ext {
-  // Required for some dependencies only available from our private nexus
-  //
-  nyplNexusDepend =
-    project.findProperty('org.librarysimplified.nexus.depend') as Boolean
-  nyplNexusUsername =
-    project.findProperty('org.librarysimplified.nexus.username') ?: ''
-  nyplNexusPassword =
-    project.findProperty('org.librarysimplified.nexus.password') ?: ''
-
-  if (nyplNexusDepend && !nyplNexusUsername) {
-    throw new GradleException(
-      """\
-      'org.librarysimplified.nexus.username' is undefined!
-        ^ required by 'org.librarysimplified.nexus.depend'\
-      """.stripIndent())
-  }
-  if (nyplNexusDepend && !nyplNexusPassword) {
-    throw new GradleException(
-      """\
-      'org.librarysimplified.nexus.password' is undefined!
-        ^ required by 'org.librarysimplified.nexus.depend'\
-      """.stripIndent())
-  }
-
-  // Required by some projects to build with drm support
-  //
   nyplDrmEnabled =
     project.findProperty('org.librarysimplified.drm.enabled') as Boolean
-//  if (nyplDrmEnabled && !nyplNexusDepend) {
-//    throw new GradleException(
-//      """\
-//      'org.librarysimplified.nexus.depend' is undefined!
-//        ^ required by 'org.librarysimplified.drm.enabled'\
-//      """.stripIndent())
-//  }
+
+  if (nyplDrmEnabled) {
+    awsAccessKeyId =
+      project.property("org.lyrasis.aws.access_key_id")
+    awsSecretKey =
+      project.property("org.lyrasis.aws.secret_access_key")
+  } else {
+    awsAccessKeyId = ""
+    awsSecretKey = ""
+  }
 }
 
 subprojects { project ->
@@ -91,13 +68,29 @@ subprojects { project ->
     mavenCentral()
     google()
 
-    if (nyplNexusDepend) {
+    if (nyplDrmEnabled) {
       maven {
-        credentials {
-          username nyplNexusUsername
-          password nyplNexusPassword
+        name = "S3 Snapshots"
+        url = "s3://se-maven-repo/snapshots/"
+        credentials(AwsCredentials) {
+          accessKey = awsAccessKeyId
+          secretKey = awsSecretKey
         }
-        url 'https://nexus.librarysimplified.org:8443/nexus/content/groups/external/'
+        mavenContent {
+          snapshotsOnly()
+        }
+      }
+
+      maven {
+        name = "S3 Releases"
+        url = "s3://se-maven-repo/releases/"
+        credentials(AwsCredentials) {
+          accessKey = awsAccessKeyId
+          secretKey = awsSecretKey
+        }
+        mavenContent {
+          releasesOnly()
+        }
       }
     }
 

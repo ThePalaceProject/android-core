@@ -6,8 +6,8 @@ import org.librarysimplified.gradle.RequiredAssetsTask
 // Fail the build if these assets aren't present
 //
 def requiredFiles = [:]
-//requiredFiles["ReaderClientCert.sig"] =
-//  "280838a4cb5c2ca4a2c8cf14e93f8ff72dbc6046cf188b5e83cf830f5159ce1e"
+requiredFiles["ReaderClientCert.sig"] =
+  "29f5f58e8fa1694892f27c5bd825cbba4da0cfcc9d2367c5d8d89a0bae89e328"
 requiredFiles["secrets.conf"] =
   "9c211ae0d153c29b72baab3bfad9de6c5cecb6b39bcda8206d36a65aaca0db21"
 
@@ -36,15 +36,13 @@ dependencies {
   implementation project(":simplified-accounts-source-nyplregistry")
   implementation project(":simplified-analytics-circulation")
 //  implementation project(":simplified-crashlytics")
-  implementation project(":simplified-migration-from3master")
+//  implementation project(":simplified-migration-from3master")
 //  implementation libraries.firebase_analytics
 //  implementation libraries.firebase_crashlytics
   implementation libraries.nypl_drm_core
+  implementation libraries.nypl_drm_adobe
   implementation libraries.nypl_findaway
 //  implementation libraries.nypl_overdrive
 
-//  if (nyplNexusDepend) {
-//    implementation libraries.nypl_drm_adobe
-//  }
   annotationProcessor libraries.google_autovalue_processor
 }
