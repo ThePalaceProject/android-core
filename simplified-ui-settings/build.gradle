@@ -1,3 +1,9 @@
+android {
+  buildFeatures {
+    viewBinding = true
+  }
+}
+
 dependencies {
   api project(":simplified-ui-accounts")
   api project(":simplified-ui-errorpage")

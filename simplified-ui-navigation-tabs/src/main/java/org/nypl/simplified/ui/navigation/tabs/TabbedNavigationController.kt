@@ -42,9 +42,10 @@ import org.nypl.simplified.ui.catalog.saml20.CatalogSAML20FragmentParameters
 import org.nypl.simplified.ui.errorpage.ErrorPageFragment
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.profiles.ProfileTabFragment
+import org.nypl.simplified.ui.settings.SettingsFragmentMain
 import org.nypl.simplified.ui.settings.SettingsFragmentCustomOPDS
 import org.nypl.simplified.ui.settings.SettingsFragmentDebug
-import org.nypl.simplified.ui.settings.SettingsFragmentMain
+import org.nypl.simplified.ui.settings.SettingsFragmentDocumentViewer
 import org.nypl.simplified.ui.settings.SettingsNavigationControllerType
 import org.nypl.simplified.ui.theme.ThemeControl
 import org.nypl.simplified.viewer.api.Viewers
@@ -303,8 +304,11 @@ class TabbedNavigationController private constructor(
     }
   }
 
-  override fun openSettingsAbout() {
-    throw NotImplementedError()
+  override fun openSettingsAbout(title: String, url: String) {
+    this.navigator.addFragment(
+      fragment = SettingsFragmentDocumentViewer.create(title, url),
+      tab = R.id.tabSettings
+    )
   }
 
   override fun openSettingsAccounts() {
@@ -318,20 +322,32 @@ class TabbedNavigationController private constructor(
     )
   }
 
-  override fun openSettingsAcknowledgements() {
-    throw NotImplementedError()
+  override fun openSettingsAcknowledgements(title: String, url: String) {
+    this.navigator.addFragment(
+      fragment = SettingsFragmentDocumentViewer.create(title, url),
+      tab = R.id.tabSettings
+    )
   }
 
-  override fun openSettingsEULA() {
-    throw NotImplementedError()
+  override fun openSettingsEULA(title: String, url: String) {
+    this.navigator.addFragment(
+      fragment = SettingsFragmentDocumentViewer.create(title, url),
+      tab = R.id.tabSettings
+    )
   }
 
-  override fun openSettingsFaq() {
-    throw NotImplementedError()
+  override fun openSettingsFaq(title: String, url: String) {
+    this.navigator.addFragment(
+      fragment = SettingsFragmentDocumentViewer.create(title, url),
+      tab = R.id.tabSettings
+    )
   }
 
-  override fun openSettingsLicense() {
-    throw NotImplementedError()
+  override fun openSettingsLicense(title: String, url: String) {
+    this.navigator.addFragment(
+      fragment = SettingsFragmentDocumentViewer.create(title, url),
+      tab = R.id.tabSettings
+    )
   }
 
   override fun openSettingsVersion() {

@@ -9,7 +9,7 @@
     android:summary="@string/settingsAccountsSummary"
     android:title="@string/accounts" />
 
-  <PreferenceCategory android:title="@string/settingsDocumentation" app:isPreferenceVisible="false">
+  <PreferenceCategory android:title="@string/settingsDocumentation" >
     <Preference
       android:key="settingsAcknowledgements"
       android:summary="@string/settingsAcknowledgementsSummary"

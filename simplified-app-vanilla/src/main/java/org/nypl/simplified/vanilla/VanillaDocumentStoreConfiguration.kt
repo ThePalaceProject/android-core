@@ -23,4 +23,7 @@ class VanillaDocumentStoreConfiguration : DocumentConfigurationServiceType {
 
   override val licenses: DocumentConfiguration? =
     null
+
+  override val faq: DocumentConfiguration? =
+    null
 }
