@@ -699,7 +699,7 @@ class CatalogFragmentBookDetail : Fragment() {
         }
     }
 
-    if (bookStatus.returnable) {
+    if (shouldShowRevokeButton(book, bookStatus)) {
       this.buttons.addView(this.buttonCreator.createButtonSpace())
       this.buttons.addView(
         this.buttonCreator.createRevokeLoanButton {
@@ -725,6 +725,14 @@ class CatalogFragmentBookDetail : Fragment() {
     this.statusFailed.visibility = View.INVISIBLE
     this.statusIdleText.text =
       CatalogBookAvailabilityStrings.statusString(this.resources, bookStatus)
+  }
+
+  private fun shouldShowRevokeButton(book: Book, bookStatus: BookStatus.Loaned) = try {
+    val profile = this.profilesController.profileCurrent()
+    val account = profile.account(this.parameters.feedEntry.accountID)
+    bookStatus.returnable && account.bookDatabase.books().contains(book.id)
+  } catch (e: Exception) {
+    false
   }
 
   /**
