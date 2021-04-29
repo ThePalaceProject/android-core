@@ -1,7 +1,7 @@
 import org.librarysimplified.gradle.RequiredAssetsTask
 
-//apply plugin: 'com.google.gms.google-services'
-//apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
 
 // Fail the build if these assets aren't present
 //
@@ -35,10 +35,10 @@ dependencies {
   implementation project(":simplified-main")
   implementation project(":simplified-accounts-source-nyplregistry")
   implementation project(":simplified-analytics-circulation")
-//  implementation project(":simplified-crashlytics")
+  implementation project(":simplified-crashlytics")
 //  implementation project(":simplified-migration-from3master")
-//  implementation libraries.firebase_analytics
-//  implementation libraries.firebase_crashlytics
+  implementation libraries.firebase_analytics
+  implementation libraries.firebase_crashlytics
   implementation libraries.nypl_drm_core
   implementation libraries.nypl_drm_adobe
   implementation libraries.nypl_findaway
