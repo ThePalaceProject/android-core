@@ -16,7 +16,7 @@ class RayBooksBuildConfigurationService : BuildConfigurationServiceType {
   override val showHoldsTab: Boolean
     get() = true
   override val showBooksFromAllAccounts: Boolean
-    get() = true
+    get() = false
   override val vcsCommit: String
     get() = BuildConfig.GIT_COMMIT
   override val simplifiedVersion: String
