@@ -75,12 +75,15 @@ class SettingsFragmentMain : PreferenceFragmentCompat() {
   }
 
   private fun configureAcknowledgements(preference: Preference) {
-    preference.isEnabled = this.viewModel.documents.acknowledgements != null
-    preference.onPreferenceClickListener =
-      Preference.OnPreferenceClickListener {
-        this.findNavigationController().openSettingsAcknowledgements()
-        true
-      }
+    val doc = this.viewModel.documents.acknowledgements
+    preference.isEnabled = doc != null
+    if (doc != null) {
+      preference.onPreferenceClickListener =
+        Preference.OnPreferenceClickListener {
+          this.findNavigationController().openSettingsAcknowledgements(it.title.toString(), doc.readableURL.path)
+          true
+        }
+    }
   }
 
   private fun configureVersion(preference: Preference) {
@@ -117,30 +120,39 @@ class SettingsFragmentMain : PreferenceFragmentCompat() {
   }
 
   private fun configureLicense(preference: Preference) {
-    preference.isEnabled = this.viewModel.documents.licenses != null
-    preference.onPreferenceClickListener =
-      Preference.OnPreferenceClickListener {
-        this.findNavigationController().openSettingsLicense()
-        true
-      }
+    val doc = this.viewModel.documents.licenses
+    preference.isEnabled = doc != null
+    if (doc != null) {
+      preference.onPreferenceClickListener =
+        Preference.OnPreferenceClickListener {
+          this.findNavigationController().openSettingsLicense(it.title.toString(), doc.readableURL.path)
+          true
+        }
+    }
   }
 
   private fun configureFaq(preference: Preference) {
-    preference.isEnabled = false
-    preference.onPreferenceClickListener =
-      Preference.OnPreferenceClickListener {
-        this.findNavigationController().openSettingsFaq()
-        true
-      }
+    val doc = this.viewModel.documents.faq
+    preference.isEnabled = doc != null
+    if (doc != null) {
+      preference.onPreferenceClickListener =
+        Preference.OnPreferenceClickListener {
+          this.findNavigationController().openSettingsFaq(it.title.toString(), doc.readableURL.path)
+          true
+        }
+    }
   }
 
   private fun configureEULA(preference: Preference) {
-    preference.isEnabled = this.viewModel.documents.eula != null
-    preference.onPreferenceClickListener =
-      Preference.OnPreferenceClickListener {
-        this.findNavigationController().openSettingsEULA()
-        true
-      }
+    val doc = this.viewModel.documents.eula
+    preference.isEnabled = doc != null
+    if (doc != null) {
+      preference.onPreferenceClickListener =
+        Preference.OnPreferenceClickListener {
+          this.findNavigationController().openSettingsEULA(it.title.toString(), doc.readableURL.path)
+          true
+        }
+    }
   }
 
   private fun configureAccounts(preference: Preference) {
@@ -158,12 +170,15 @@ class SettingsFragmentMain : PreferenceFragmentCompat() {
   }
 
   private fun configureAbout(preference: Preference) {
-    preference.isEnabled = this.viewModel.documents.about != null
-    preference.onPreferenceClickListener =
-      Preference.OnPreferenceClickListener {
-        this.findNavigationController().openSettingsAbout()
-        true
-      }
+    val doc = this.viewModel.documents.about
+    preference.isEnabled = doc != null
+    if (doc != null) {
+      preference.onPreferenceClickListener =
+        Preference.OnPreferenceClickListener {
+          this.findNavigationController().openSettingsAbout(it.title.toString(), doc.readableURL.path)
+          true
+        }
+    }
   }
 
   private fun onTapToDebugSettings(preference: Preference) {

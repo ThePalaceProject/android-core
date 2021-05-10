@@ -15,7 +15,7 @@ interface SettingsNavigationControllerType :
    * The settings screen wants to open the "about" section.
    */
 
-  fun openSettingsAbout()
+  fun openSettingsAbout(title: String, url: String)
 
   /**
    * The settings screen wants to open the list of accounts.
@@ -27,25 +27,25 @@ interface SettingsNavigationControllerType :
    * The settings screen wants to open the "acknowledgements" section.
    */
 
-  fun openSettingsAcknowledgements()
+  fun openSettingsAcknowledgements(title: String, url: String)
 
   /**
    * The settings screen wants to open the "EULA" section.
    */
 
-  fun openSettingsEULA()
+  fun openSettingsEULA(title: String, url: String)
 
   /**
    * The settings screen wants to open the "FAQ" section.
    */
 
-  fun openSettingsFaq()
+  fun openSettingsFaq(title: String, url: String)
 
   /**
    * The settings screen wants to open the "license" section.
    */
 
-  fun openSettingsLicense()
+  fun openSettingsLicense(title: String, url: String)
 
   /**
    * The settings screen wants to open the version screen.

@@ -36,6 +36,12 @@ interface DocumentStoreType {
   val licenses: DocumentType?
 
   /**
+   * @return The application FAQ, if any.
+   */
+
+  val faq: DocumentType?
+
+  /**
    * Run updates for all of the documents.
    */
 

@@ -35,4 +35,10 @@ interface DocumentConfigurationServiceType {
    */
 
   val licenses: DocumentConfiguration?
+
+  /**
+   * @return The application FAQ, if any.
+   */
+
+  val faq: DocumentConfiguration?
 }

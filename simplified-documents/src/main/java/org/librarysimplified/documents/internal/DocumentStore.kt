@@ -18,7 +18,8 @@ internal class DocumentStore private constructor(
   override val acknowledgements: DocumentType?,
   override val eula: EULAType?,
   override val licenses: DocumentType?,
-  override val privacyPolicy: DocumentType?
+  override val privacyPolicy: DocumentType?,
+  override val faq: DocumentType?
 ) : DocumentStoreType {
 
   companion object {
@@ -72,12 +73,21 @@ internal class DocumentStore private constructor(
           config = configuration.privacyPolicy
         )
 
+      val faq =
+        this.documentForMaybe(
+          assetManager = assetManager,
+          http = http,
+          baseDirectory = baseDirectory,
+          config = configuration.faq
+        )
+
       return DocumentStore(
         about = about,
         acknowledgements = acknowledgements,
         eula = eula,
         licenses = licenses,
-        privacyPolicy = privacyPolicy
+        privacyPolicy = privacyPolicy,
+        faq = faq
       )
     }
 

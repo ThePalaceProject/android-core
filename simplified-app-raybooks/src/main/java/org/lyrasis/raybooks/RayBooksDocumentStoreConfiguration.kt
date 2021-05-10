@@ -29,4 +29,7 @@ class RayBooksDocumentStoreConfiguration : DocumentConfigurationServiceType {
       "software-licenses.html",
       URI.create("http://localhost/software-licenses.html")
     )
+
+  override val faq: DocumentConfiguration? =
+    null
 }

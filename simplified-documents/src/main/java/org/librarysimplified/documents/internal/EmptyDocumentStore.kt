@@ -18,6 +18,8 @@ internal object EmptyDocumentStore : DocumentStoreType {
     null
   override val licenses: DocumentType? =
     null
+  override val faq: DocumentType? =
+    null
 
   override fun update(executor: ListeningExecutorService): ListenableFuture<*> {
     return Futures.immediateFuture(Unit)
