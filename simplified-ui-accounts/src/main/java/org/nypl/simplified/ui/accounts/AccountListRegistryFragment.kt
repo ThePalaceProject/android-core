@@ -1,6 +1,10 @@
 package org.nypl.simplified.ui.accounts
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
+import android.location.LocationManager
 import android.os.Bundle
 import android.text.InputType
 import android.view.Menu
@@ -10,12 +14,13 @@ import android.view.MenuItem.OnActionExpandListener
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SearchView.OnQueryTextListener
+import androidx.core.view.isVisible
 import androidx.core.widget.ContentLoadingProgressBar
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.reactivex.disposables.CompositeDisposable
@@ -26,7 +31,8 @@ import org.nypl.simplified.accounts.api.AccountProviderDescription
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryEvent
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus
 import org.nypl.simplified.android.ktx.supportActionBar
-import org.nypl.simplified.navigation.api.NavigationControllers
+import org.nypl.simplified.listeners.api.FragmentListenerType
+import org.nypl.simplified.listeners.api.fragmentListeners
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.slf4j.LoggerFactory
@@ -39,13 +45,24 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
 
   private val logger = LoggerFactory.getLogger(AccountListRegistryFragment::class.java)
   private val subscriptions = CompositeDisposable()
-  private val viewModel: AccountListRegistryViewModel by viewModels()
+  private val listener: FragmentListenerType<AccountListRegistryEvent> by fragmentListeners()
+
+  private val requestLocationPermission = registerForActivityResult(
+    ActivityResultContracts.RequestPermission(),
+    ::getLocation
+  )
+  private val viewModel: AccountListRegistryViewModel by assistedViewModels {
+    val locationManager =
+      requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    AccountListRegistryViewModel(locationManager)
+  }
 
   private lateinit var accountList: RecyclerView
   private lateinit var accountListAdapter: FilterableAccountListAdapter
   private lateinit var imageLoader: ImageLoaderType
   private lateinit var progress: ContentLoadingProgressBar
   private lateinit var title: TextView
+  private lateinit var noLocation: TextView
   private var reload: MenuItem? = null
   private var errorDialog: AlertDialog? = null
 
@@ -69,6 +86,8 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
       view.findViewById(R.id.accountRegistryProgress)
     this.accountList =
       view.findViewById(R.id.accountRegistryList)
+    this.noLocation =
+      view.findViewById(R.id.accountRegistryNoLocation)
 
     this.accountListAdapter =
       FilterableAccountListAdapter(
@@ -80,7 +99,9 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
       setHasFixedSize(true)
       layoutManager = LinearLayoutManager(this.context)
       adapter = this@AccountListRegistryFragment.accountListAdapter
+      addItemDecoration(SpaceItemDecoration(RecyclerView.VERTICAL, requireContext()))
     }
+    requestLocationPermission.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
   }
 
   private fun onAccountClicked(account: AccountProviderDescription) {
@@ -105,9 +126,11 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
       .subscribe(this::onAccountEvent)
       .let { subscriptions.add(it) }
 
-    this.reconfigureViewForRegistryStatus(this.viewModel.accountRegistryStatus)
+    this.viewModel.displayNoLocationMessageEvents
+      .subscribe { this.noLocation.isVisible = it }
+      .let(this.subscriptions::add)
 
-    this.viewModel.refreshAccountRegistry()
+    this.reconfigureViewForRegistryStatus(this.viewModel.accountRegistryStatus)
   }
 
   private fun onAccountEvent(event: AccountEvent) {
@@ -119,7 +142,7 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
       }
 
       is AccountEventCreation.AccountEventCreationSucceeded -> {
-        this.findNavigationController().popBackStack()
+        this.listener.post(AccountListRegistryEvent.AccountCreated)
       }
 
       is AccountEventCreation.AccountEventCreationFailed -> {
@@ -275,13 +298,9 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
         taskSteps = accountEvent.taskResult.steps
       )
 
-    this.findNavigationController().openErrorPage(parameters)
+    this.listener.post(AccountListRegistryEvent.OpenErrorPage(parameters))
   }
 
-  private fun findNavigationController(): AccountNavigationControllerType {
-    return NavigationControllers.find(
-      activity = this.requireActivity(),
-      interfaceType = AccountNavigationControllerType::class.java
-    )
-  }
+  @SuppressLint("MissingPermission")
+  private fun getLocation(isPermissionGranted: Boolean) = viewModel.getLocation(isPermissionGranted)
 }
