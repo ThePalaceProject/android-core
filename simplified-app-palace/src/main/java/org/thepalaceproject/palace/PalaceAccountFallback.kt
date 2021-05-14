@@ -1,4 +1,4 @@
-package org.lyrasis.raybooks
+package org.thepalaceproject.palace
 
 import org.joda.time.DateTime
 import org.nypl.simplified.accounts.api.AccountProvider
@@ -11,7 +11,7 @@ import java.net.URI
  * The fallback account for SimplyE: The classics collection.
  */
 
-class RayBooksAccountFallback : AccountProviderFallbackType {
+class PalaceAccountFallback : AccountProviderFallbackType {
 
   override fun get(): AccountProviderType {
     return AccountProvider(

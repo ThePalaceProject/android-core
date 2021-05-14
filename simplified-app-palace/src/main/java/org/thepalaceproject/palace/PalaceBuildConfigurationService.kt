@@ -1,10 +1,10 @@
-package org.lyrasis.raybooks
+package org.thepalaceproject.palace
 
 import org.nypl.simplified.buildconfig.api.BuildConfigOAuthScheme
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.main.BuildConfig
 
-class RayBooksBuildConfigurationService : BuildConfigurationServiceType {
+class PalaceBuildConfigurationService : BuildConfigurationServiceType {
   override val allowAccountsAccess: Boolean
     get() = true
   override val allowAccountsRegistryAccess: Boolean
@@ -22,11 +22,12 @@ class RayBooksBuildConfigurationService : BuildConfigurationServiceType {
   override val simplifiedVersion: String
     get() = BuildConfig.SIMPLIFIED_VERSION
   override val supportErrorReportEmailAddress: String
+    // TODO: Change this to an org.thepalaceproject email
     get() = "ray.lee@lyrasis.org"
   override val supportErrorReportSubject: String
-    get() = "[raybooks-error]"
+    get() = "[palace-error]"
   override val oauthCallbackScheme: BuildConfigOAuthScheme
-    get() = BuildConfigOAuthScheme("raybooks-oauth")
+    get() = BuildConfigOAuthScheme("palace-oauth")
   override val allowExternalReaderLinks: Boolean
     get() = false
   override val showChangeAccountsUi: Boolean

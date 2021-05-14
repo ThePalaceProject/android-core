@@ -59,7 +59,7 @@ org.librarysimplified.drm.enabled=true
 org.lyrasis.aws.access_key_id=${CI_AWS_ACCESS_ID}
 org.lyrasis.aws.secret_access_key=${CI_AWS_SECRET_KEY}
 
-org.librarysimplified.app.assets.raybooks=${SIMPLYE_CREDENTIALS}
+org.librarysimplified.app.assets.palace=${SIMPLYE_CREDENTIALS}
 EOF
 
 #------------------------------------------------------------------------
