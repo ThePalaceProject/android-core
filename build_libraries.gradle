@@ -1,5 +1,3 @@
-// Special cases
-
 ext.kotlin_version = '1.4.20'
 ext.android_build_tools_version = '29.0.3'
 ext.android_compile_sdk_version = 29
@@ -58,7 +56,7 @@ ext.versions = [
   nypl_overdrive                : '1.0.3',
   nypl_pdf                      : '0.1.0',
   nypl_readium                  : '0.30.0',
-  nypl_readium2                 : '0.0.13',
+  nypl_readium2                 : '0.0.15',
   okhttp3                       : '4.8.1',
   pandora_bottom_navigator      : 'ec834b9',
   picasso                       : '2.71828',
