@@ -5,7 +5,7 @@ def projectNameSuffix = project.name.split("-").last()
 // Configure extra assets, if provided
 //
 def extraAssetsProperty =
-  "org.librarysimplified.app.assets.$projectNameSuffix"
+  "org.thepalaceproject.app.assets.$projectNameSuffix"
 def extraAssets =
   expandUserHome(project.findProperty(extraAssetsProperty))
 if (extraAssets != null && !file(extraAssets).exists()) {
@@ -20,11 +20,11 @@ if (extraAssets != null && !file(extraAssets).exists()) {
 def nyplKeyStore =
   file("$rootDir/release.jks")
 def nyplKeyAlias =
-  project.findProperty('org.librarysimplified.keyAlias')
+  project.findProperty('org.thepalaceproject.keyAlias')
 def nyplKeyPassword =
-  project.findProperty('org.librarysimplified.keyPassword')
+  project.findProperty('org.thepalaceproject.keyPassword')
 def nyplStorePassword =
-  project.findProperty('org.librarysimplified.storePassword')
+  project.findProperty('org.thepalaceproject.storePassword')
 
 /**
  * This task is run before a release build is assembled.
@@ -40,15 +40,15 @@ task preReleaseCheck(group: 'NYPL') {
     }
     if (!nyplKeyAlias) {
       throw new GradleException(
-        "'org.librarysimplified.keyAlias' must be defined to sign release builds")
+        "'org.thepalaceproject.keyAlias' must be defined to sign release builds")
     }
     if (!nyplKeyPassword) {
       throw new GradleException(
-        "'org.librarysimplified.keyPassword' must be defined to sign release builds")
+        "'org.thepalaceproject.keyPassword' must be defined to sign release builds")
     }
     if (!nyplStorePassword) {
       throw new GradleException(
-        "'org.librarysimplified.storePassword' must be defined to sign release builds")
+        "'org.thepalaceproject.storePassword' must be defined to sign release builds")
     }
   }
 }

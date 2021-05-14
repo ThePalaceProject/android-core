@@ -6,9 +6,9 @@ android {
   }
   sourceSets {
     main {
-      if (project.hasProperty('org.librarysimplified.app.assets.vanilla')) {
+      if (project.hasProperty('org.thepalaceproject.app.assets.vanilla')) {
         assets.srcDirs +=
-          project.getProperty('org.librarysimplified.app.assets.vanilla')
+          project.getProperty('org.thepalaceproject.app.assets.vanilla')
       }
     }
   }

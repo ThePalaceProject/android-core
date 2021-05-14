@@ -54,12 +54,12 @@ then
 fi
 
 cat >> "${HOME}/.gradle/gradle.properties" <<EOF
-org.librarysimplified.drm.enabled=true
+org.thepalaceproject.drm.enabled=true
 
-org.lyrasis.aws.access_key_id=${CI_AWS_ACCESS_ID}
-org.lyrasis.aws.secret_access_key=${CI_AWS_SECRET_KEY}
+org.thepalaceproject.aws.access_key_id=${CI_AWS_ACCESS_ID}
+org.thepalaceproject.aws.secret_access_key=${CI_AWS_SECRET_KEY}
 
-org.librarysimplified.app.assets.palace=${SIMPLYE_CREDENTIALS}
+org.thepalaceproject.app.assets.palace=${SIMPLYE_CREDENTIALS}
 EOF
 
 #------------------------------------------------------------------------

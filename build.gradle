@@ -32,13 +32,13 @@ plugins {
 
 ext {
   nyplDrmEnabled =
-    project.findProperty('org.librarysimplified.drm.enabled') as Boolean
+    project.findProperty('org.thepalaceproject.drm.enabled') as Boolean
 
   if (nyplDrmEnabled) {
     awsAccessKeyId =
-      project.property("org.lyrasis.aws.access_key_id")
+      project.property("org.thepalaceproject.aws.access_key_id")
     awsSecretKey =
-      project.property("org.lyrasis.aws.secret_access_key")
+      project.property("org.thepalaceproject.aws.secret_access_key")
   } else {
     awsAccessKeyId = ""
     awsSecretKey = ""
@@ -133,7 +133,7 @@ subprojects { project ->
   // Skip tasks for projects that require drm; unless drm is enabled
   //
   def nyplDrmRequired =
-    project.findProperty('org.librarysimplified.drm.required') as Boolean
+    project.findProperty('org.thepalaceproject.drm.required') as Boolean
   if (nyplDrmRequired) {
     project.tasks.all { task ->
       task.onlyIf { nyplDrmEnabled }
