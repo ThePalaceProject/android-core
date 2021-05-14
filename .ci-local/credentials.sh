@@ -15,13 +15,13 @@ info()
   echo "credentials-local.sh: info: $1" 1>&2
 }
 
-if [ -z "${LYRASIS_AWS_ACCESS_ID}" ]
+if [ -z "${CI_AWS_ACCESS_ID}" ]
 then
-  fatal "LYRASIS_AWS_ACCESS_ID is not defined"
+  fatal "CI_AWS_ACCESS_ID is not defined"
 fi
-if [ -z "${LYRASIS_AWS_SECRET_KEY}" ]
+if [ -z "${CI_AWS_SECRET_KEY}" ]
 then
-  fatal "LYRASIS_AWS_SECRET_KEY is not defined"
+  fatal "CI_AWS_SECRET_KEY is not defined"
 fi
 
 #------------------------------------------------------------------------
@@ -56,8 +56,8 @@ fi
 cat >> "${HOME}/.gradle/gradle.properties" <<EOF
 org.librarysimplified.drm.enabled=true
 
-org.lyrasis.aws.access_key_id=${LYRASIS_AWS_ACCESS_ID}
-org.lyrasis.aws.secret_access_key=${LYRASIS_AWS_SECRET_KEY}
+org.lyrasis.aws.access_key_id=${CI_AWS_ACCESS_ID}
+org.lyrasis.aws.secret_access_key=${CI_AWS_SECRET_KEY}
 
 org.librarysimplified.app.assets.raybooks=${SIMPLYE_CREDENTIALS}
 EOF
