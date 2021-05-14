@@ -1,10 +1,10 @@
-package org.lyrasis.raybooks
+package org.thepalaceproject.palace
 
 import org.librarysimplified.documents.DocumentConfiguration
 import org.librarysimplified.documents.DocumentConfigurationServiceType
 import java.net.URI
 
-class RayBooksDocumentStoreConfiguration : DocumentConfigurationServiceType {
+class PalaceDocumentStoreConfiguration : DocumentConfigurationServiceType {
 
   override val privacyPolicy: DocumentConfiguration? =
     null

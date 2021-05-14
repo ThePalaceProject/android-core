@@ -1,4 +1,4 @@
-package org.lyrasis.raybooks
+package org.thepalaceproject.palace
 
 import org.nypl.simplified.ui.branding.BrandingSplashServiceType
 

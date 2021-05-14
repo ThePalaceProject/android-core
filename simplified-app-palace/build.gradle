@@ -15,7 +15,7 @@ android {
   defaultConfig {
     versionName = project.version
     versionCode = calculateVersionCode(project)
-    setProperty("archivesBaseName", "raybooks")
+    setProperty("archivesBaseName", "palace")
   }
   applicationVariants.all { variant ->
     def finalizerTask =

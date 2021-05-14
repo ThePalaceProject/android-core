@@ -33,7 +33,7 @@ same core:
 |Application|Module|Description|
 |-----------|------|-----------|
 |Vanilla|[simplified-app-vanilla](simplified-app-vanilla)|DRM-free generic reading application|
-|RayBooks (temporary name)|[simplified-app-raybooks](simplified-app-raybooks)|The DRM-enabled application|
+|Palace|[simplified-app-palace](simplified-app-palace)|The DRM-enabled application|
 <!-- |SimplyE|[simplified-app-simplye](simplified-app-simplye)|The NYPL's official [SimplyE](https://www.nypl.org/books-music-movies/ebookcentral/simplye) application|
 |Open eBooks|[simplified-app-openebooks](simplified-app-openebooks)|The [Open eBooks](https://openebooks.net/) application| -->
 
@@ -74,7 +74,7 @@ $ ./gradlew clean ktlint assembleDebug test
 
 This will build all of the code and run the unit tests, but only the
 [Vanilla](simplified-app-vanilla) application will be built by default. In
-order to build the other applications such as [RayBooks](simplified-app-raybooks),
+order to build the other applications such as [Palace](simplified-app-palace),
 it's necessary to <!--obtain the correct [credentials](#s3-credentials) from LYRASIS and--> [enable DRM](#enabling-drm).
 
 #### The Longer Version
@@ -162,7 +162,7 @@ $ ./gradlew clean assemble test
 #### Enabling DRM
 
 The application contains optional support for various DRM systems, and these
-must be enabled explicitly in order to build [RayBooks](simplified-app-raybooks).
+must be enabled explicitly in order to build [Palace](simplified-app-palace).
 
 Firstly, make sure you have your [S3](#s3-credentials) credentials
 correctly configured. Then, add the following property to your
@@ -179,14 +179,14 @@ provided various configuration files containing secrets that the DRM systems
 require, and will refuse to build the app if you've failed to do this. The
 build system can copy in the correct secrets for you if tell it the location
 of directories containing those secrets. For example, assuming that you have
-[RayBooks'](simplified-app-raybooks) secrets in `/path/to/raybooks/secrets`<!--and
+[Palace's](simplified-app-palace) secrets in `/path/to/palace/secrets`<!--and
 [Open eBook's](simplified-app-openebooks) secrets in `/path/to/openebooks/secrets` -->,
 you can add the following properties to your `$HOME/.gradle/gradle.properties` file
 and the build system will copy in the required secrets at build time:
 
 <!-- org.librarysimplified.app.assets.openebooks=/path/to/openebooks/secrets -->
 ```
-org.librarysimplified.app.assets.raybooks=/path/to/raybooks/secrets
+org.librarysimplified.app.assets.palace=/path/to/palace/secrets
 ```
 
 #### Adobe DRM Support
