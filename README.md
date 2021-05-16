@@ -133,8 +133,8 @@ Once you have your credentials, the following lines must be added to `$HOME/.gra
 ~~~
 # Replace AWS_ACCESS_KEY_ID and AWS_SECRET_KEY appropriately.
 # Do NOT use quotes around either value.
-org.lyrasis.aws.access_key_id=AWS_ACCESS_KEY_ID
-org.lyrasis.aws.secret_access_key=AWS_SECRET_KEY
+org.thepalaceproject.aws.access_key_id=AWS_ACCESS_KEY_ID
+org.thepalaceproject.aws.secret_access_key=AWS_SECRET_KEY
 ~~~
 
 #### APK signing
@@ -146,9 +146,9 @@ a keystore to `release.jks` and set the following values correctly in
 ~~~
 # Replace KEYALIAS, KEYPASSWORD, and STOREPASSWORD appropriately.
 # Do NOT use quotes around values.
-org.librarysimplified.keyAlias=KEYALIAS
-org.librarysimplified.keyPassword=KEYPASSWORD
-org.librarysimplified.storePassword=STOREPASSWORD
+org.thepalaceproject.keyAlias=KEYALIAS
+org.thepalaceproject.keyPassword=KEYPASSWORD
+org.thepalaceproject.storePassword=STOREPASSWORD
 ~~~
 
 Note that APK files are only signed if the code is built in _release_ mode. In other words, you
@@ -169,7 +169,7 @@ correctly configured. Then, add the following property to your
 `$HOME/.gradle/gradle.properties` file:
 
 ```
-org.librarysimplified.drm.enabled=true
+org.thepalaceproject.drm.enabled=true
 ```
 
 This will instruct the build system that you want to build with DRM enabled.
@@ -186,7 +186,7 @@ and the build system will copy in the required secrets at build time:
 
 <!-- org.librarysimplified.app.assets.openebooks=/path/to/openebooks/secrets -->
 ```
-org.librarysimplified.app.assets.palace=/path/to/palace/secrets
+org.thepalaceproject.app.assets.palace=/path/to/palace/secrets
 ```
 
 #### Adobe DRM Support

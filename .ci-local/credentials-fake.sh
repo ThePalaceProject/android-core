@@ -40,7 +40,7 @@ keytool \
   -validity 2
 
 cat >> "${HOME}/.gradle/gradle.properties" <<EOF
-org.librarysimplified.keyAlias=FAKE
-org.librarysimplified.keyPassword=redherring
-org.librarysimplified.storePassword=redherring
+org.thepalaceproject.keyAlias=FAKE
+org.thepalaceproject.keyPassword=redherring
+org.thepalaceproject.storePassword=redherring
 EOF
