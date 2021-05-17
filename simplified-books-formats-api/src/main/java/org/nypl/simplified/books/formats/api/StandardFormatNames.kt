@@ -80,6 +80,13 @@ object StandardFormatNames {
     }
 
   /**
+   * The MIME type used for LCP licenses.
+   */
+
+  val lcpLicenseFiles =
+    this.mimeOf("application/vnd.readium.lcp.license.v1.0+json")
+
+  /**
    * The MIME type used for Adobe ACSM files.
    */
 

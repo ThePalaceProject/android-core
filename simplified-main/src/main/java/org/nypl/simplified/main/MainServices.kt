@@ -123,6 +123,7 @@ import org.nypl.simplified.viewer.epub.readium1.ReaderHTTPServerAAsync
 import org.nypl.simplified.viewer.epub.readium1.ReaderHTTPServerType
 import org.nypl.simplified.viewer.epub.readium1.ReaderReadiumEPUBLoader
 import org.nypl.simplified.viewer.epub.readium1.ReaderReadiumEPUBLoaderType
+import org.readium.r2.lcp.LcpService
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileNotFoundException
@@ -895,6 +896,13 @@ internal object MainServices {
         serviceConstructor = { MainOverdriveSecretService.createConditionally(context) }
       )
 
+    val lcpService =
+      addServiceOptionally(
+        message = strings.bootingGeneral("LCP service"),
+        interfaceType = LcpService::class.java,
+        serviceConstructor = { MainLCPService.createConditionally(context) }
+      )
+
     val bookFormatService =
       addService(
         message = strings.bootingGeneral("book format support"),
@@ -904,6 +912,7 @@ internal object MainServices {
             adobeDRM = adobeDRM,
             axisNowService = axisNowDRM,
             feedbooksSecretService = feedbooksSecretService,
+            lcpService = lcpService,
             overdriveSecretService = overdriveSecretService
           )
         }

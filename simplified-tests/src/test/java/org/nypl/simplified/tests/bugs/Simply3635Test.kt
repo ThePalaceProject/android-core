@@ -195,7 +195,8 @@ class Simply3635Test {
           supportsPDF = false,
           supportsAdobeDRM = false,
           supportsAudioBooks = null,
-          supportsAxisNow = false
+          supportsAxisNow = false,
+          supportsLCP = false,
         )
       )
 

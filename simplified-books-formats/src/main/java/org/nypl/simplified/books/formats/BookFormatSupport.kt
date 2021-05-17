@@ -41,6 +41,10 @@ class BookFormatSupport private constructor(
     if (this.parameters.supportsAxisNow) {
       types.add(StandardFormatNames.axisNow)
     }
+    if (this.parameters.supportsLCP) {
+      types.add(StandardFormatNames.lcpLicenseFiles)
+    }
+
     return types.toSet()
   }
 

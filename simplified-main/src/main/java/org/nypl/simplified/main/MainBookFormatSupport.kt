@@ -10,6 +10,7 @@ import org.nypl.simplified.books.formats.BookFormatSupportParameters
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.nypl.simplified.viewer.spi.ViewerProviderType
+import org.readium.r2.lcp.LcpService
 import org.slf4j.LoggerFactory
 import java.util.ServiceLoader
 
@@ -21,6 +22,7 @@ object MainBookFormatSupport {
   fun createBookFormatSupport(
     adobeDRM: AdobeAdeptExecutorType?,
     axisNowService: AxisNowServiceType?,
+    lcpService: LcpService?,
     feedbooksSecretService: AudioBookFeedbooksSecretServiceType?,
     overdriveSecretService: AudioBookOverdriveSecretServiceType?
   ): BookFormatSupportType {
@@ -33,7 +35,8 @@ object MainBookFormatSupport {
           supportsFindawayAudioBooks = this.isFindawaySupported(),
           supportsOverdriveAudioBooks = overdriveSecretService != null,
           supportsDPLAAudioBooks = feedbooksSecretService != null
-        )
+        ),
+        supportsLCP = lcpService != null
       )
 
     return BookFormatSupport.create(parameters)
