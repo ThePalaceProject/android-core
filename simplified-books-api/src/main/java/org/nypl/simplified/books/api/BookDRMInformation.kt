@@ -45,11 +45,11 @@ sealed class BookDRMInformation : Serializable {
   data class LCP(
 
     /**
-     * LCP currently has no associated information, so an unused `Unit` typed field is
+     * LCP currently has no associated information, so an unused `String` typed field is
      * added here to avoid having to refactor from an `object` to a `data class` later.
      */
 
-    private val unused: Unit = Unit
+    private val unused: String = "Poor and content is rich, and rich enough."
   ) : BookDRMInformation() {
     override val kind: BookDRMKind = BookDRMKind.LCP
   }

@@ -18,6 +18,7 @@ import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.opds.core.OPDSAcquisitionPath
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
+import org.readium.r2.lcp.LcpService
 import java.io.File
 import java.io.IOException
 import java.net.URI
@@ -37,6 +38,7 @@ interface BorrowContextType {
   val httpClient: LSHTTPClientType
   val services: ServiceDirectoryType
   val taskRecorder: TaskRecorderType
+  val lcpService: LcpService?
 
   /**
    * The current cache directory.

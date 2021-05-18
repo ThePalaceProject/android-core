@@ -37,6 +37,7 @@ import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.taskrecorder.api.TaskStepResolution.TaskStepFailed
 import org.nypl.simplified.taskrecorder.api.TaskStepResolution.TaskStepSucceeded
+import org.readium.r2.lcp.LcpService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -178,6 +179,7 @@ class BorrowTask private constructor(
         account = this.account,
         adobeExecutor = this.requirements.adobeExecutor,
         axisNowService = this.requirements.axisNowService,
+        lcpService = this.requirements.lcpService,
         audioBookManifestStrategies = this.requirements.audioBookManifestStrategies,
         bookDatabaseEntry = this.databaseEntry!!,
         bookInitial = book,
@@ -400,6 +402,7 @@ class BorrowTask private constructor(
     var currentOPDSAcquisitionPathElement: OPDSAcquisitionPathElement,
     override val adobeExecutor: AdobeAdeptExecutorType?,
     override val axisNowService: AxisNowServiceType?,
+    override val lcpService: LcpService?,
     override val services: ServiceDirectoryType,
     private val cacheDirectory: File,
     private val cancelled: AtomicBoolean

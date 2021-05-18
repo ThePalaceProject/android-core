@@ -85,19 +85,21 @@ dependencies {
   implementation libraries.junit
   implementation libraries.junit_jupiter_api
   implementation libraries.junit_jupiter_engine
-  implementation libraries.kotlin_stdlib
   implementation libraries.kotlin_reflect
+  implementation libraries.kotlin_stdlib
+  implementation libraries.koush_async
   implementation libraries.mockito_android
   implementation libraries.mockito_kotlin
   implementation libraries.nypl_drm_core
   implementation libraries.nypl_http_api
   implementation libraries.nypl_http_bearer_token
   implementation libraries.nypl_http_vanilla
-  implementation libraries.okhttp3_mockwebserver
-  implementation libraries.slf4j
   implementation libraries.nypl_readium
   implementation libraries.nypl_readium_js
-  implementation libraries.koush_async
+  implementation libraries.okhttp3_mockwebserver
+  implementation libraries.r2_lcp
+  implementation libraries.r2_shared
+  implementation libraries.slf4j
 
   testImplementation libraries.logback_classic
   testImplementation libraries.junit

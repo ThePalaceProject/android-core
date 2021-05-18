@@ -20,6 +20,7 @@ import org.nypl.simplified.opds.core.OPDSAcquisitionPath
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import org.nypl.simplified.tests.TestDirectories
+import org.readium.r2.lcp.LcpService
 import org.slf4j.Logger
 import java.io.File
 import java.io.IOException
@@ -50,6 +51,8 @@ class MockBorrowContext(
 
   override lateinit var audioBookManifestStrategies: AudioBookManifestStrategiesType
   override lateinit var services: ServiceDirectoryType
+
+  override val lcpService: LcpService? = null
 
   override var adobeExecutorTimeout: BorrowTimeoutConfiguration =
     BorrowTimeoutConfiguration(2L, TimeUnit.SECONDS)
