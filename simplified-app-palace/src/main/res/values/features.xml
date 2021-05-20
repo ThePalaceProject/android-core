@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-
-<!-- Build-time feature flags. -->
-<resources>
-  <!-- TODO: Change to Palace when the certificate is updated -->
-  <string name="featureAdobeDRMPackageOverride" translatable="false">Raybooks</string>
-</resources>
