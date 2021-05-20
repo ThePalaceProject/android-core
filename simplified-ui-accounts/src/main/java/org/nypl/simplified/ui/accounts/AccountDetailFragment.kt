@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -93,7 +92,9 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   private lateinit var bookmarkSync: ViewGroup
   private lateinit var bookmarkSyncCheck: SwitchCompat
   private lateinit var bookmarkSyncLabel: View
-  private lateinit var eulaCheckbox: CheckBox
+  private lateinit var accountEULA: TextView
+  private lateinit var accountPrivacyPolicy: ViewGroup
+  private lateinit var accountLicenses: ViewGroup
   private lateinit var imageLoader: ImageLoaderType
   private lateinit var loginProgress: ViewGroup
   private lateinit var loginButtonErrorDetails: Button
@@ -180,8 +181,8 @@ class AccountDetailFragment : Fragment(R.layout.account) {
       view.findViewById(R.id.accountLoginProgressText)
     this.loginButtonErrorDetails =
       view.findViewById(R.id.accountLoginButtonErrorDetails)
-    this.eulaCheckbox =
-      view.findViewById(R.id.accountEULACheckbox)
+    this.accountEULA =
+      view.findViewById(R.id.accountEULA)
     this.signUpButton =
       view.findViewById(R.id.accountCardCreatorSignUp)
     this.signUpLabel =
@@ -193,6 +194,11 @@ class AccountDetailFragment : Fragment(R.layout.account) {
       view.findViewById(R.id.accountCustomOPDS)
     this.accountCustomOPDSField =
       this.accountCustomOPDS.findViewById(R.id.accountCustomOPDSField)
+    this.accountPrivacyPolicy =
+      view.findViewById(R.id.accountPrivacyPolicy)
+    this.accountLicenses =
+      view.findViewById(R.id.accountLicenses)
+
 
     this.reportIssueGroup =
       view.findViewById(R.id.accountReportIssue)
@@ -216,19 +222,51 @@ class AccountDetailFragment : Fragment(R.layout.account) {
     }
 
     /*
-    * Only show a EULA checkbox if there's actually a EULA.
+    * Only show a EULA if there's actually a EULA.
     */
-
     val eula = this.viewModel.eula
     if (eula != null) {
-      this.eulaCheckbox.visibility = View.VISIBLE
-      this.eulaCheckbox.isChecked = eula.hasAgreed
-      this.eulaCheckbox.setOnCheckedChangeListener { _, checked ->
-        eula.hasAgreed = checked
-        this.setLoginButtonStatus(this.determineLoginIsSatisfied())
+      this.accountEULA.visibility = View.VISIBLE
+      this.accountEULA.setOnClickListener {
+        this.listener.post(
+          AccountDetailEvent.OpenDocViewer(
+            getString(R.string.accountEULA),
+            eula.readableURL
+          )
+        )
       }
     } else {
-      this.eulaCheckbox.visibility = View.GONE
+      this.accountEULA.visibility = View.GONE
+    }
+
+    val privacyPolicy = this.viewModel.privacyPolicy
+    if (privacyPolicy != null) {
+      this.accountPrivacyPolicy.visibility = View.VISIBLE
+      this.accountPrivacyPolicy.setOnClickListener {
+        this.listener.post(
+          AccountDetailEvent.OpenDocViewer(
+            getString(R.string.accountPrivacyPolicy),
+            privacyPolicy.readableURL
+          )
+        )
+      }
+    } else {
+      this.accountPrivacyPolicy.visibility = View.GONE
+    }
+
+    val licenses = this.viewModel.licenses
+    if (licenses != null) {
+      this.accountLicenses.visibility = View.VISIBLE
+      this.accountLicenses.setOnClickListener {
+        this.listener.post(
+          AccountDetailEvent.OpenDocViewer(
+            getString(R.string.accountLicenses),
+            licenses.readableURL
+          )
+        )
+      }
+    } else {
+      this.accountLicenses.visibility = View.GONE
     }
 
     this.hideCardCreatorForNonNYPL()
@@ -298,8 +336,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   }
 
   private fun determineEULAIsSatisfied(): Boolean {
-    val eula = this.viewModel.eula
-    return eula?.hasAgreed ?: true
+    return true
   }
 
   private fun shouldSignUpBeEnabled(): Boolean {
@@ -869,7 +906,6 @@ class AccountDetailFragment : Fragment(R.layout.account) {
     )
 
     this.authenticationViews.lock()
-    this.eulaCheckbox.isEnabled = false
 
     this.setLoginButtonStatus(AsLoginButtonDisabled)
     this.authenticationAlternativesHide()
@@ -882,7 +918,6 @@ class AccountDetailFragment : Fragment(R.layout.account) {
     )
 
     this.authenticationViews.unlock()
-    this.eulaCheckbox.isEnabled = true
 
     val loginSatisfied = this.determineLoginIsSatisfied()
     this.setLoginButtonStatus(loginSatisfied)
