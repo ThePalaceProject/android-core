@@ -46,7 +46,7 @@ cat ".ci/credentials/APK Signing/keystore.properties" >> "${HOME}/.gradle/gradle
 CREDENTIALS_PATH=$(realpath ".ci/credentials") ||
   fatal "could not resolve credentials path"
 
-SIMPLYE_CREDENTIALS="${CREDENTIALS_PATH}/Certificates/SimplyE/Android"
+SIMPLYE_CREDENTIALS="${CREDENTIALS_PATH}/Certificates/Palace/Android"
 
 if [ ! -d "${SIMPLYE_CREDENTIALS}" ]
 then
