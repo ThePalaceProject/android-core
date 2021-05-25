@@ -22,8 +22,7 @@ class PalaceBuildConfigurationService : BuildConfigurationServiceType {
   override val simplifiedVersion: String
     get() = BuildConfig.SIMPLIFIED_VERSION
   override val supportErrorReportEmailAddress: String
-    // TODO: Change this to an org.thepalaceproject email
-    get() = "ray.lee@lyrasis.org"
+    get() = "logs@thepalaceproject.org"
   override val supportErrorReportSubject: String
     get() = "[palace-error]"
   override val oauthCallbackScheme: BuildConfigOAuthScheme
