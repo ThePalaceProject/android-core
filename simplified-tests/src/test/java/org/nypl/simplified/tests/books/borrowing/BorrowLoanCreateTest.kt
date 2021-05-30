@@ -182,7 +182,7 @@ class BorrowLoanCreateTest {
       )
 
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null)
+      OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
 
     this.webServer = MockWebServer()
     this.webServer.start(20000)
@@ -327,7 +327,7 @@ class BorrowLoanCreateTest {
     this.context.currentURIField =
       this.webServer.url("/book.epub").toUri()
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null)
+      OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
 
     val response =
       MockResponse()
@@ -364,9 +364,9 @@ class BorrowLoanCreateTest {
     this.context.currentURIField =
       this.webServer.url("/book.epub").toUri()
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null)
+      OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
     this.context.currentRemainingOPDSPathElements =
-      listOf(OPDSAcquisitionPathElement(genericEPUBFiles, null))
+      listOf(OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap()))
 
     val feedText = """
 <entry xmlns="http://www.w3.org/2005/Atom" xmlns:opds="http://opds-spec.org/2010/catalog">
@@ -416,9 +416,9 @@ class BorrowLoanCreateTest {
     this.context.currentURIField =
       this.webServer.url("/book.epub").toUri()
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null)
+      OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
     this.context.currentRemainingOPDSPathElements =
-      listOf(OPDSAcquisitionPathElement(genericEPUBFiles, null))
+      listOf(OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap()))
 
     val feedText = """
 <entry xmlns="http://www.w3.org/2005/Atom" xmlns:opds="http://opds-spec.org/2010/catalog">
@@ -481,9 +481,9 @@ class BorrowLoanCreateTest {
     this.context.currentURIField =
       this.webServer.url("/book.epub").toUri()
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null)
+      OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
     this.context.currentRemainingOPDSPathElements =
-      listOf(OPDSAcquisitionPathElement(genericEPUBFiles, null))
+      listOf(OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap()))
 
     val feedText = """
 <entry xmlns="http://www.w3.org/2005/Atom" xmlns:opds="http://opds-spec.org/2010/catalog">
@@ -535,9 +535,9 @@ class BorrowLoanCreateTest {
     this.context.currentURIField =
       this.webServer.url("/book.epub").toUri()
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null)
+      OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
     this.context.currentRemainingOPDSPathElements =
-      listOf(OPDSAcquisitionPathElement(genericEPUBFiles, null))
+      listOf(OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap()))
 
     val feedText = """
 <entry xmlns="http://www.w3.org/2005/Atom" xmlns:opds="http://opds-spec.org/2010/catalog">
@@ -588,9 +588,9 @@ class BorrowLoanCreateTest {
     this.context.currentURIField =
       this.webServer.url("/book.epub").toUri()
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null)
+      OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
     this.context.currentRemainingOPDSPathElements =
-      listOf(OPDSAcquisitionPathElement(genericEPUBFiles, null))
+      listOf(OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap()))
 
     val feedText = """
 <entry xmlns="http://www.w3.org/2005/Atom" xmlns:opds="http://opds-spec.org/2010/catalog">
@@ -641,9 +641,9 @@ class BorrowLoanCreateTest {
     this.context.currentURIField =
       this.webServer.url("/book.epub").toUri()
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null)
+      OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
     this.context.currentRemainingOPDSPathElements =
-      listOf(OPDSAcquisitionPathElement(genericEPUBFiles, null))
+      listOf(OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap()))
 
     val response =
       MockResponse()

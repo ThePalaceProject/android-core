@@ -181,7 +181,7 @@ class BorrowCopyTest {
     val task = BorrowCopy.createSubtask()
 
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericPDFFiles, null)
+      OPDSAcquisitionPathElement(genericPDFFiles, null, emptyMap())
 
     try {
       task.execute(this.context)
@@ -209,7 +209,7 @@ class BorrowCopyTest {
     this.context.currentURIField =
       URI.create("content://com.example/c3e79fb4-6099-45ba-b9c5-a321096a2d02/book.pdf")
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericPDFFiles, null)
+      OPDSAcquisitionPathElement(genericPDFFiles, null, emptyMap())
 
     try {
       task.execute(this.context)
@@ -237,7 +237,7 @@ class BorrowCopyTest {
     this.context.currentURIField =
       URI.create("${BundledURIs.BUNDLED_CONTENT_SCHEME}://com.example/c3e79fb4-6099-45ba-b9c5-a321096a2d02/book.pdf")
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericPDFFiles, null)
+      OPDSAcquisitionPathElement(genericPDFFiles, null, emptyMap())
 
     try {
       task.execute(this.context)
@@ -267,7 +267,7 @@ class BorrowCopyTest {
     this.context.currentURIField =
       URI.create("content://com.example/c3e79fb4-6099-45ba-b9c5-a321096a2d02/book.pdf")
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericPDFFiles, null)
+      OPDSAcquisitionPathElement(genericPDFFiles, null, emptyMap())
 
     this.bookDatabaseEntry.writeOPDSEntry(
       BorrowTestFeeds.opdsContentURILoanedFeedEntryOfType(genericPDFFiles.fullType)
@@ -304,7 +304,7 @@ class BorrowCopyTest {
     this.context.currentURIField =
       URI.create("${BundledURIs.BUNDLED_CONTENT_SCHEME}://com.example/c3e79fb4-6099-45ba-b9c5-a321096a2d02/book.pdf")
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericPDFFiles, null)
+      OPDSAcquisitionPathElement(genericPDFFiles, null, emptyMap())
 
     this.bookDatabaseEntry.writeOPDSEntry(
       BorrowTestFeeds.opdsContentURILoanedFeedEntryOfType(genericPDFFiles.fullType)
@@ -341,7 +341,7 @@ class BorrowCopyTest {
     this.context.currentURIField =
       URI.create("content://com.example/c3e79fb4-6099-45ba-b9c5-a321096a2d02/book.epub")
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericEPUBFiles, null)
+      OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
 
     this.bookDatabaseEntry.formatHandlesField.clear()
     this.bookDatabaseEntry.formatHandlesField.add(this.epubHandle)
@@ -374,7 +374,7 @@ class BorrowCopyTest {
     this.context.currentURIField =
       URI.create("${BundledURIs.BUNDLED_CONTENT_SCHEME}://com.example/c3e79fb4-6099-45ba-b9c5-a321096a2d02/book.epub")
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericEPUBFiles, null)
+      OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
 
     this.bookDatabaseEntry.formatHandlesField.clear()
     this.bookDatabaseEntry.formatHandlesField.add(this.epubHandle)

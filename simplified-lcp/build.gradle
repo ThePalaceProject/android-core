@@ -1,0 +1,9 @@
+dependencies {
+  implementation libraries.kotlin_coroutines
+  implementation libraries.kotlin_reflect
+  implementation libraries.kotlin_stdlib
+  implementation libraries.nypl_drm_core
+  implementation libraries.r2_lcp
+  implementation libraries.r2_shared
+  implementation libraries.slf4j
+}

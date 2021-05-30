@@ -23,9 +23,13 @@ class OPDSAcquisitionPathsTest {
 
   private fun pathElementOf(
     mime: String,
-    uri: String? = null
+    uri: String? = null,
+    properties: Map<String, String> = emptyMap()
   ): OPDSAcquisitionPathElement {
-    return OPDSAcquisitionPathElement(this.mimeOf(mime), uri?.let { URI.create(it) })
+    return OPDSAcquisitionPathElement(
+      mimeType = this.mimeOf(mime),
+      target = uri?.let { URI.create(it) },
+      properties = properties)
   }
 
   @Test
@@ -40,7 +44,8 @@ class OPDSAcquisitionPathsTest {
         relation = OPDSAcquisition.Relation.ACQUISITION_GENERIC,
         uri = URI.create("http://www.example.com"),
         type = this.mimeOf("application/epub+zip"),
-        indirectAcquisitions = listOf()
+        indirectAcquisitions = listOf(),
+        properties = emptyMap()
       )
 
     val element0 =
@@ -63,9 +68,10 @@ class OPDSAcquisitionPathsTest {
         uri = URI.create("http://www.example.com"),
         type = this.mimeOf("application/vnd.adobe.adept+xml"),
         indirectAcquisitions = listOf(
-          OPDSIndirectAcquisition(this.mimeOf("application/epub+zip"), listOf()),
-          OPDSIndirectAcquisition(this.mimeOf("application/pdf"), listOf())
-        )
+          OPDSIndirectAcquisition(this.mimeOf("application/epub+zip"), listOf(), emptyMap()),
+          OPDSIndirectAcquisition(this.mimeOf("application/pdf"), listOf(), emptyMap())
+        ),
+        properties = emptyMap()
       )
 
     val element0 =
@@ -86,5 +92,37 @@ class OPDSAcquisitionPathsTest {
     assertEquals(path0, linearized[0])
     assertEquals(path1, linearized[1])
     assertEquals(2, linearized.size)
+  }
+
+  @Test
+  fun testAcquisitionPathProperties() {
+    val acquisition =
+      OPDSAcquisition(
+        relation = OPDSAcquisition.Relation.ACQUISITION_GENERIC,
+        uri = URI.create("http://cm.se-community-lcp-test.lyrtech.org/LCP/works/10/fulfill/31"),
+        type = this.mimeOf("application/vnd.readium.lcp.license.v1.0+json"),
+        indirectAcquisitions = listOf(
+          OPDSIndirectAcquisition(this.mimeOf("application/epub+zip"), listOf(), emptyMap()),
+        ),
+        properties = mapOf(
+          Pair("lcp:hashed_passphrase", "eb4961889d0c1329d8f31b1d73ed3ad60f2ef11b06692ac42968a5f076289707")
+        )
+      )
+
+    val element0 =
+      this.pathElementOf(mime = "application/vnd.readium.lcp.license.v1.0+json",
+        uri = "http://cm.se-community-lcp-test.lyrtech.org/LCP/works/10/fulfill/31",
+        properties = acquisition.properties)
+    val element01 =
+      this.pathElementOf("application/epub+zip")
+
+    val path0 =
+      OPDSAcquisitionPath(acquisition, listOf(element0, element01))
+
+    val linearized =
+      OPDSAcquisitionPaths.linearize(acquisition)
+
+    assertEquals(path0, linearized[0])
+    assertEquals(1, linearized.size)
   }
 }

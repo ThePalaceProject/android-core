@@ -252,7 +252,8 @@ class BookRevokeTaskAdobeDRMTest {
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
         URI.create("http://www.example.com/0.feed"),
         mimeOf("application/epub+zip"),
-        listOf()
+        listOf(),
+        emptyMap()
       )
 
     val opdsEntryBuilder =
@@ -367,7 +368,8 @@ class BookRevokeTaskAdobeDRMTest {
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
         URI.create("http://www.example.com/0.feed"),
         mimeOf("application/epub+zip"),
-        listOf()
+        listOf(),
+        emptyMap()
       )
 
     val opdsEntryBuilder =
@@ -483,7 +485,8 @@ class BookRevokeTaskAdobeDRMTest {
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
         URI.create("http://www.example.com/0.feed"),
         mimeOf("application/epub+zip"),
-        listOf()
+        listOf(),
+        emptyMap()
       )
 
     val opdsEntryBuilder =
@@ -639,7 +642,8 @@ class BookRevokeTaskAdobeDRMTest {
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
         URI.create("http://www.example.com/0.feed"),
         mimeOf("application/epub+zip"),
-        listOf()
+        listOf(),
+        emptyMap()
       )
 
     val opdsEntryBuilder =
@@ -786,7 +790,8 @@ class BookRevokeTaskAdobeDRMTest {
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
         URI.create("http://www.example.com/0.feed"),
         mimeOf("application/epub+zip"),
-        listOf()
+        listOf(),
+        emptyMap()
       )
 
     val opdsEntryBuilder =
@@ -934,7 +939,8 @@ class BookRevokeTaskAdobeDRMTest {
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
         URI.create("http://www.example.com/0.feed"),
         mimeOf("application/epub+zip"),
-        listOf()
+        listOf(),
+        emptyMap()
       )
 
     val opdsEntryBuilder =
@@ -1089,7 +1095,8 @@ class BookRevokeTaskAdobeDRMTest {
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
         URI.create("http://www.example.com/0.feed"),
         mimeOf("application/epub+zip"),
-        listOf()
+        listOf(),
+        emptyMap()
       )
 
     val opdsEntryBuilder =
@@ -1219,7 +1226,8 @@ class BookRevokeTaskAdobeDRMTest {
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
         URI.create("http://www.example.com/0.feed"),
         mimeOf("application/epub+zip"),
-        listOf()
+        listOf(),
+        emptyMap()
       )
 
     val opdsEntryBuilder =
@@ -1335,7 +1343,8 @@ class BookRevokeTaskAdobeDRMTest {
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
         URI.create("http://www.example.com/0.feed"),
         mimeOf("application/epub+zip"),
-        listOf()
+        listOf(),
+        emptyMap()
       )
 
     val opdsEntryBuilder =

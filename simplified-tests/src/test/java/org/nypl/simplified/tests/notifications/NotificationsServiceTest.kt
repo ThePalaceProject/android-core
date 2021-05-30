@@ -84,7 +84,8 @@ class NotificationsServiceTest {
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
         URI.create("http://www.example.com/0.feed"),
         MIMEParser.parseRaisingException("application/vnd.adobe.adept+xml"),
-        listOf()
+        listOf(),
+        mapOf()
       )
 
     val opdsEntryBuilder =

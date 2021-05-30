@@ -330,7 +330,8 @@ class Simply3635Test {
         OPDSAcquisition.Relation.ACQUISITION_OPEN_ACCESS,
         this.server.url("/book.epub").toUri(),
         StandardFormatNames.genericEPUBFiles,
-        listOf()
+        listOf(),
+        mapOf()
       )
 
     val bookEntry0 =

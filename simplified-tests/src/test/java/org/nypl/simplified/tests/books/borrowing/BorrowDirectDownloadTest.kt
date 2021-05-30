@@ -210,7 +210,7 @@ class BorrowDirectDownloadTest {
     val task = BorrowDirectDownload.createSubtask()
 
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericPDFFiles, null)
+      OPDSAcquisitionPathElement(genericPDFFiles, null, emptyMap())
 
     try {
       task.execute(this.context)
@@ -292,7 +292,7 @@ class BorrowDirectDownloadTest {
     this.context.currentURIField =
       this.webServer.url("/book.epub").toUri()
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericPDFFiles, null)
+      OPDSAcquisitionPathElement(genericPDFFiles, null, emptyMap())
 
     val response =
       MockResponse()
@@ -327,7 +327,7 @@ class BorrowDirectDownloadTest {
     this.context.currentURIField =
       this.webServer.url("/book.epub").toUri()
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericPDFFiles, null)
+      OPDSAcquisitionPathElement(genericPDFFiles, null, emptyMap())
 
     this.bookDatabaseEntry.writeOPDSEntry(
       BorrowTestFeeds.opdsLoanedFeedEntryOfType(this.webServer, genericPDFFiles.fullType)
@@ -370,7 +370,7 @@ class BorrowDirectDownloadTest {
     this.context.currentURIField =
       this.webServer.url("/book.epub").toUri()
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericEPUBFiles, null)
+      OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
 
     this.bookDatabaseEntry.formatHandlesField.clear()
     this.bookDatabaseEntry.formatHandlesField.add(this.epubHandle)
@@ -409,7 +409,7 @@ class BorrowDirectDownloadTest {
     this.context.currentURIField =
       this.webServer.url("/book.epub").toUri()
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericEPUBFiles, null)
+      OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
 
     this.bookDatabaseEntry.formatHandlesField.clear()
     this.bookDatabaseEntry.formatHandlesField.add(this.epubHandle)

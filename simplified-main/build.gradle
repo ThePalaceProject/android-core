@@ -39,6 +39,7 @@ dependencies {
   api project(":simplified-crashlytics-api")
   api project(":simplified-documents")
   api project(":simplified-files")
+  api project(":simplified-lcp")
   api project(":simplified-metrics")
   api project(":simplified-metrics-api")
   api project(":simplified-networkconnectivity")

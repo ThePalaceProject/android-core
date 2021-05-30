@@ -11,5 +11,6 @@ import java.net.URI
 
 data class OPDSAcquisitionPathElement(
   val mimeType: MIMEType,
-  val target: URI?
+  val target: URI?,
+  val properties: Map<String, String>
 )

@@ -73,7 +73,7 @@ object BookDRMInformationHandles {
       BookDRMKind.NONE ->
         BookDRMInformationHandleNone(directory, format)
       BookDRMKind.LCP ->
-        BookDRMInformationHandleLCP(directory, format)
+        BookDRMInformationHandleLCP(directory, format, onUpdate)
       BookDRMKind.ACS ->
         BookDRMInformationHandleACS(directory, format, onUpdate)
       BookDRMKind.AXIS ->

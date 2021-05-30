@@ -212,7 +212,7 @@ class BorrowSAMLDownloadTest {
     val task = BorrowSAMLDownload.createSubtask()
 
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericPDFFiles, null)
+      OPDSAcquisitionPathElement(genericPDFFiles, null, emptyMap())
 
     try {
       task.execute(this.context)
@@ -294,7 +294,7 @@ class BorrowSAMLDownloadTest {
     this.context.currentURIField =
       this.webServer.url("/book.epub").toUri()
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericPDFFiles, null)
+      OPDSAcquisitionPathElement(genericPDFFiles, null, emptyMap())
 
     val response =
       MockResponse()
@@ -329,7 +329,7 @@ class BorrowSAMLDownloadTest {
     this.context.currentURIField =
       this.webServer.url("/book.epub").toUri()
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericPDFFiles, null)
+      OPDSAcquisitionPathElement(genericPDFFiles, null, emptyMap())
 
     val response =
       MockResponse()
@@ -358,7 +358,7 @@ class BorrowSAMLDownloadTest {
     this.context.currentURIField =
       this.webServer.url("/book.epub").toUri()
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericPDFFiles, null)
+      OPDSAcquisitionPathElement(genericPDFFiles, null, emptyMap())
 
     this.bookDatabaseEntry.writeOPDSEntry(
       BorrowTestFeeds.opdsLoanedFeedEntryOfType(this.webServer, genericPDFFiles.fullType)
@@ -401,7 +401,7 @@ class BorrowSAMLDownloadTest {
     this.context.currentURIField =
       this.webServer.url("/book.epub").toUri()
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericEPUBFiles, null)
+      OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
 
     this.bookDatabaseEntry.formatHandlesField.clear()
     this.bookDatabaseEntry.formatHandlesField.add(this.epubHandle)
@@ -440,7 +440,7 @@ class BorrowSAMLDownloadTest {
     this.context.currentURIField =
       this.webServer.url("/book.epub").toUri()
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericEPUBFiles, null)
+      OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
 
     this.bookDatabaseEntry.formatHandlesField.clear()
     this.bookDatabaseEntry.formatHandlesField.add(this.epubHandle)

@@ -271,16 +271,19 @@ class BorrowACSMTest {
           OPDSAcquisition.Relation.ACQUISITION_GENERIC,
           this.webServer.url("/book.acsm").toUri(),
           adobeACSMFiles,
-          listOf()
+          listOf(),
+          emptyMap()
         ),
         listOf(
           OPDSAcquisitionPathElement(
             adobeACSMFiles,
-            this.webServer.url("/book.acsm").toUri()
+            this.webServer.url("/book.acsm").toUri(),
+            emptyMap()
           ),
           OPDSAcquisitionPathElement(
             genericEPUBFiles,
-            this.webServer.url("/book.epub").toUri()
+            this.webServer.url("/book.epub").toUri(),
+            emptyMap()
           )
         )
       )
@@ -289,12 +292,13 @@ class BorrowACSMTest {
       listOf(
         OPDSAcquisitionPathElement(
           genericEPUBFiles,
-          this.webServer.url("/book.epub").toUri()
+          this.webServer.url("/book.epub").toUri(),
+          emptyMap()
         )
       )
 
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(adobeACSMFiles, null)
+      OPDSAcquisitionPathElement(adobeACSMFiles, null, emptyMap())
   }
 
   private fun recordBookEvent(event: BookStatusEvent) {
@@ -659,11 +663,13 @@ class BorrowACSMTest {
         elements = listOf(
           OPDSAcquisitionPathElement(
             adobeACSMFiles,
-            this.webServer.url("/book.acsm").toUri()
+            this.webServer.url("/book.acsm").toUri(),
+            emptyMap()
           ),
           OPDSAcquisitionPathElement(
             MIMEType("text", "plain", mapOf()),
-            this.webServer.url("/book.epub").toUri()
+            this.webServer.url("/book.epub").toUri(),
+            emptyMap()
           )
         )
       )
@@ -671,7 +677,8 @@ class BorrowACSMTest {
       listOf(
         OPDSAcquisitionPathElement(
           MIMEType("text", "plain", mapOf()),
-          this.webServer.url("/book.epub").toUri()
+          this.webServer.url("/book.epub").toUri(),
+          emptyMap()
         )
       )
 

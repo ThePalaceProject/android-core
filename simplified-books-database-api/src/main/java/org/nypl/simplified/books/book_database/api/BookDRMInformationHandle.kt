@@ -60,6 +60,19 @@ sealed class BookDRMInformationHandle {
 
   abstract class LCPHandle : BookDRMInformationHandle() {
     abstract override val info: BookDRMInformation.LCP
+
+    /**
+     * Set the LCP hashed passphrase.
+     *
+     * @param passphrase The passphrase
+     *
+     * @throws IOException On I/O errors
+     */
+
+    @Throws(IOException::class)
+    abstract fun setHashedPassphrase(
+      passphrase: String
+    ): BookDRMInformation.LCP
   }
 
   /**

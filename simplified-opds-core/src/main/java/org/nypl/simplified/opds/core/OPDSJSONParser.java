@@ -11,6 +11,7 @@ import com.io7m.jfunctional.PartialFunctionType;
 import com.io7m.jfunctional.Unit;
 import com.io7m.jnull.NullCheck;
 
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.nypl.simplified.json.core.JSONParseException;
 import org.nypl.simplified.json.core.JSONParserUtilities;
@@ -22,7 +23,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import one.irradia.mime.api.MIMEType;
 import one.irradia.mime.vanilla.MIMEParser;
@@ -39,6 +43,7 @@ public final class OPDSJSONParser implements OPDSJSONParserType {
 
   public static final String INDIRECT_ACQUISITIONS_FIELD = "indirect_acquisitions";
   public static final String CONTENT_TYPE_FIELD = "content_type";
+  public static final String PROPERTIES_FIELD = "properties";
 
   private OPDSJSONParser() {
     // Nothing
@@ -91,10 +96,30 @@ public final class OPDSJSONParser implements OPDSJSONParserType {
         type = MIMEParser.Companion.parseRaisingException("application/epub+zip");
       }
 
-      return new OPDSAcquisition(relation, uri, type, indirects);
+      final Map<String, String> properties = parseProperties(o);
+      return new OPDSAcquisition(relation, uri, type, indirects, properties);
     } catch (final Exception e) {
       throw new OPDSParseException(e);
     }
+  }
+
+  @NotNull
+  private static Map<String, String> parseProperties(ObjectNode o) throws JSONParseException {
+    Map<String, String> properties;
+    if (o.has(PROPERTIES_FIELD)) {
+      final ObjectNode obj = JSONParserUtilities.getObject(o, PROPERTIES_FIELD);
+      final Iterator<Map.Entry<String, JsonNode>> fieldIter = obj.fields();
+      properties = new HashMap<>();
+      while (fieldIter.hasNext()) {
+        final Map.Entry<String, JsonNode> field = fieldIter.next();
+        final String fieldName = field.getKey();
+        final JsonNode fieldValue = field.getValue();
+        properties.put(fieldName, JSONParserUtilities.checkString(fieldValue));
+      }
+    } else {
+      properties = Collections.emptyMap();
+    }
+    return properties;
   }
 
   private static OPDSIndirectAcquisition parseIndirectAcquisition(
@@ -109,7 +134,10 @@ public final class OPDSJSONParser implements OPDSJSONParserType {
         MIMEParser.Companion.parseRaisingException(JSONParserUtilities.getString(obj, "type"));
       final ArrayNode indirects =
         JSONParserUtilities.getArray(obj, INDIRECT_ACQUISITIONS_FIELD);
-      return new OPDSIndirectAcquisition(type, parseIndirectAcquisitions(indirects));
+      final Map<String, String> properties =
+        parseProperties(obj);
+
+      return new OPDSIndirectAcquisition(type, parseIndirectAcquisitions(indirects), properties);
     } catch (final Exception e) {
       throw new OPDSParseException(e);
     }
