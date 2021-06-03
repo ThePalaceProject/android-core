@@ -11,7 +11,7 @@
   <string name="accountCreationFailed">Account creation failed</string>
   <string name="accountCreationFailedMessage">The account could not be created.</string>
   <string name="accountDelete">Delete</string>
-  <string name="accountEULAStatement">I agree to the terms of the End User License Agreement.</string>
+  <string name="accountEULAStatement">By signing in, you agree to the End User License Agreement.</string>
   <string name="accountLogin">Log in</string>
   <string name="accountWantChildCard">Want a card for your child?</string>
   <string name="accountCreateCard">Create Card</string>
@@ -46,4 +46,7 @@
   <string name="accountSearchHint">Search accounts&#8230;</string>
   <string name="accountMore">More options</string>
   <string name="accountReportFailed">Sorry, we weren\'t able to find a usable email app. Please send email to %1$s if you need to report an issue.</string>
+  <string name="accountPrivacyPolicy">Privacy Policy</string>
+  <string name="accountLicenses">Content Licenses</string>
+  <string name="accountEULA">End User License Agreement</string>
 </resources>

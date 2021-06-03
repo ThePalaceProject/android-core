@@ -52,6 +52,7 @@ import org.nypl.simplified.viewer.api.Viewers
 import org.nypl.simplified.viewer.spi.ViewerPreferences
 import org.slf4j.LoggerFactory
 import java.net.URI
+import java.net.URL
 
 internal class MainFragmentListenerDelegate(
   private val fragment: Fragment,
@@ -285,6 +286,10 @@ internal class MainFragmentListenerDelegate(
         this.openSAML20Login(event.account, event.authenticationDescription)
         state
       }
+      is AccountDetailEvent.OpenDocViewer -> {
+        this.openDocViewer(event.title, event.url)
+        state
+      }
     }
   }
 
@@ -479,6 +484,16 @@ internal class MainFragmentListenerDelegate(
           authenticationDescription = authenticationDescription
         )
       ),
+      tab = this.navigator.currentTab()
+    )
+  }
+
+  private fun openDocViewer(
+    title: String,
+    url: URL
+  ) {
+    this.navigator.addFragment(
+      fragment = SettingsFragmentDocumentViewer.create(title, url.toString()),
       tab = this.navigator.currentTab()
     )
   }

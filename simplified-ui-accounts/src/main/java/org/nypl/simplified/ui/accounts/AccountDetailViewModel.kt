@@ -6,7 +6,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import org.joda.time.DateTime
 import org.librarysimplified.documents.DocumentStoreType
+import org.librarysimplified.documents.DocumentType
 import org.librarysimplified.documents.EULAType
+import org.librarysimplified.documents.internal.SimpleDocument
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.accounts.api.AccountID
@@ -69,13 +71,19 @@ class AccountDetailViewModel(
   val buildConfig =
     services.requireService(BuildConfigurationServiceType::class.java)
 
-  val eula: EULAType? =
-    this.documents.eula
-
   val account =
     this.profilesController
       .profileCurrent()
       .account(this.accountId)
+
+  val eula: SimpleDocument? =
+    this.account.provider.eula?.let { SimpleDocument(it.toURL()) }
+
+  val privacyPolicy: DocumentType? =
+    this.account.provider.privacyPolicy?.let { SimpleDocument(it.toURL()) }
+
+  val licenses: DocumentType? =
+    this.account.provider.license?.let { SimpleDocument(it.toURL()) }
 
   /**
    * Logging in was explicitly requested. This is tracked in order to allow for optionally

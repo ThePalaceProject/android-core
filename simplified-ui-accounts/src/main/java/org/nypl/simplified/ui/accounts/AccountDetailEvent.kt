@@ -3,6 +3,7 @@ package org.nypl.simplified.ui.accounts
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
+import java.net.URL
 
 sealed class AccountDetailEvent {
 
@@ -27,5 +28,13 @@ sealed class AccountDetailEvent {
 
   data class OpenErrorPage(
     val parameters: ErrorPageParameters
+  ) : AccountDetailEvent()
+
+  /**
+   * Open the documentation viewer.
+   */
+  data class OpenDocViewer(
+    val title: String,
+    val url: URL
   ) : AccountDetailEvent()
 }
