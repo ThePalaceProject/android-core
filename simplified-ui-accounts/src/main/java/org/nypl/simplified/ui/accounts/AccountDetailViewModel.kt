@@ -76,7 +76,7 @@ class AccountDetailViewModel(
       .profileCurrent()
       .account(this.accountId)
 
-  val eula: SimpleDocument? =
+  val eula: DocumentType? =
     this.account.provider.eula?.let { SimpleDocument(it.toURL()) }
 
   val privacyPolicy: DocumentType? =
