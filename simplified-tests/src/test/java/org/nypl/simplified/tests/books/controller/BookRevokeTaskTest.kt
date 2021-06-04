@@ -17,6 +17,7 @@ import org.joda.time.Duration
 import org.joda.time.Instant
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Timeout
@@ -34,7 +35,6 @@ import org.nypl.simplified.books.api.BookEvent
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook
-import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandlePDF
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
 import org.nypl.simplified.books.book_database.api.BookDatabaseType
 import org.nypl.simplified.books.book_database.api.BookFormats
@@ -69,6 +69,7 @@ import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
 import org.nypl.simplified.taskrecorder.api.TaskResult
+import org.nypl.simplified.tests.mocking.MockBookDatabaseEntry
 import org.nypl.simplified.tests.mocking.MockCrashingFeedLoader
 import org.nypl.simplified.tests.mocking.MockRevokeStringResources
 import org.slf4j.Logger
@@ -175,7 +176,6 @@ class BookRevokeTaskTest {
     val feedLoader =
       FeedLoader.create(
         bookFormatSupport = this.bookFormatSupport,
-        bookRegistry = this.bookRegistry,
         bundledContent = this.bundledContent,
         contentResolver = this.contentResolver,
         exec = executorFeeds,
@@ -204,8 +204,6 @@ class BookRevokeTaskTest {
       Mockito.mock(ProfilesDatabaseType::class.java)
     val bookDatabase =
       Mockito.mock(BookDatabaseType::class.java)
-    val bookDatabaseEntry =
-      Mockito.mock(BookDatabaseEntryType::class.java)
     val bookId =
       BookID.create("a")
 
@@ -241,6 +239,9 @@ class BookRevokeTaskTest {
         formats = listOf()
       )
 
+    val bookDatabaseEntry =
+      MockBookDatabaseEntry(book)
+
     Mockito.`when`(account.id)
       .thenReturn(this.accountID)
     Mockito.`when`(profile.id)
@@ -257,8 +258,6 @@ class BookRevokeTaskTest {
       .thenReturn(bookDatabase)
     Mockito.`when`(bookDatabase.entry(bookId))
       .thenReturn(bookDatabaseEntry)
-    Mockito.`when`(bookDatabaseEntry.book)
-      .thenReturn(book)
 
     val task =
       BookRevokeTask(
@@ -276,10 +275,10 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    assertEquals(Option.none<BookStatus>(), this.bookRegistry.book(bookId))
+    val newStatus = this.bookRegistry.bookOrException(bookId).status
+    newStatus as BookStatus.Loaned.LoanedNotDownloaded
 
-    Mockito.verify(bookDatabaseEntry, Times(1)).delete()
-
+    assertTrue(bookDatabaseEntry.deleted)
     assertEquals(0, this.server.requestCount)
   }
 
@@ -556,7 +555,7 @@ class BookRevokeTaskTest {
         adobeDRM = null,
         bookID = bookId,
         bookRegistry = this.bookRegistry,
-        feedLoader = feedLoader,
+        feedLoader = this.feedLoader,
         revokeStrings = this.bookRevokeStrings
       )
 
@@ -680,7 +679,8 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    assertEquals(Option.none<BookStatus>(), this.bookRegistry.book(bookId))
+    val newStatus = this.bookRegistry.bookOrException(bookId).status
+    newStatus as BookStatus.Loaned.LoanedNotDownloaded
 
     Mockito.verify(bookDatabaseEntry, Times(1)).delete()
 
@@ -703,8 +703,6 @@ class BookRevokeTaskTest {
       Mockito.mock(ProfilesDatabaseType::class.java)
     val bookDatabase =
       Mockito.mock(BookDatabaseType::class.java)
-    val bookDatabaseEntry =
-      Mockito.mock(BookDatabaseEntryType::class.java)
     val bookId =
       BookID.create("a")
 
@@ -743,6 +741,9 @@ class BookRevokeTaskTest {
         formats = listOf()
       )
 
+    val bookDatabaseEntry =
+      MockBookDatabaseEntry(book)
+
     Mockito.`when`(account.id)
       .thenReturn(this.accountID)
     Mockito.`when`(profile.id)
@@ -759,8 +760,6 @@ class BookRevokeTaskTest {
       .thenReturn(bookDatabase)
     Mockito.`when`(bookDatabase.entry(bookId))
       .thenReturn(bookDatabaseEntry)
-    Mockito.`when`(bookDatabaseEntry.book)
-      .thenReturn(book)
 
     this.server.enqueue(
       MockResponse()
@@ -785,10 +784,10 @@ class BookRevokeTaskTest {
         <opds:indirectAcquisition type="application/epub+zip"/>
       </opds:indirectAcquisition>
       <opds:availability
-        status="ready"
+        status="available"
         since="2020-01-01T00:00:00Z"/>
       <opds:holds total="0"/>
-      <opds:copies available="0" total="1"/>
+      <opds:copies available="1" total="1"/>
     </link>
   </entry>
 </feed>
@@ -812,10 +811,10 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    assertEquals(Option.none<BookStatus>(), this.bookRegistry.book(bookId))
+    val newStatus = this.bookRegistry.bookOrException(bookId).status
+    newStatus as BookStatus.Loanable
 
-    Mockito.verify(bookDatabaseEntry, Times(1)).delete()
-
+    assertTrue(bookDatabaseEntry.deleted)
     assertEquals(1, this.server.requestCount)
   }
 
@@ -913,8 +912,6 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    assertEquals(Option.none<BookStatus>(), this.bookRegistry.book(bookId))
-
     Mockito.verify(bookDatabaseEntry, Times(1)).delete()
 
     assertEquals(0, this.server.requestCount)
@@ -936,8 +933,6 @@ class BookRevokeTaskTest {
       Mockito.mock(ProfilesDatabaseType::class.java)
     val bookDatabase =
       Mockito.mock(BookDatabaseType::class.java)
-    val bookDatabaseEntry =
-      Mockito.mock(BookDatabaseEntryType::class.java)
     val bookId =
       BookID.create("a")
 
@@ -978,6 +973,9 @@ class BookRevokeTaskTest {
         formats = listOf()
       )
 
+    val bookDatabaseEntry =
+      MockBookDatabaseEntry(book)
+
     Mockito.`when`(account.id)
       .thenReturn(this.accountID)
     Mockito.`when`(profile.id)
@@ -994,8 +992,6 @@ class BookRevokeTaskTest {
       .thenReturn(bookDatabase)
     Mockito.`when`(bookDatabase.entry(bookId))
       .thenReturn(bookDatabaseEntry)
-    Mockito.`when`(bookDatabaseEntry.book)
-      .thenReturn(book)
 
     this.server.enqueue(
       MockResponse()
@@ -1020,9 +1016,9 @@ class BookRevokeTaskTest {
         <opds:indirectAcquisition type="application/epub+zip"/>
       </opds:indirectAcquisition>
       <opds:availability
-        status="reserved"
+        status="unavailable"
         since="2000-01-01T00:00:00Z"/>
-      <opds:holds total="0"/>
+      <opds:holds total="2"/>
       <opds:copies available="0" total="1"/>
     </link>
   </entry>
@@ -1047,10 +1043,10 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    assertEquals(Option.none<BookStatus>(), this.bookRegistry.book(bookId))
+    val newStatus = this.bookRegistry.bookOrException(bookId).status
+    newStatus as BookStatus.Holdable
 
-    Mockito.verify(bookDatabaseEntry, Times(1)).delete()
-
+    assertTrue(bookDatabaseEntry.deleted)
     assertEquals(1, this.server.requestCount)
   }
 
@@ -1070,8 +1066,6 @@ class BookRevokeTaskTest {
       Mockito.mock(ProfilesDatabaseType::class.java)
     val bookDatabase =
       Mockito.mock(BookDatabaseType::class.java)
-    val bookDatabaseEntry =
-      Mockito.mock(BookDatabaseEntryType::class.java)
     val bookId =
       BookID.create("a")
 
@@ -1112,6 +1106,9 @@ class BookRevokeTaskTest {
         formats = listOf()
       )
 
+    val bookDatabaseEntry =
+      MockBookDatabaseEntry(book)
+
     Mockito.`when`(account.id)
       .thenReturn(this.accountID)
     Mockito.`when`(profile.id)
@@ -1128,8 +1125,6 @@ class BookRevokeTaskTest {
       .thenReturn(bookDatabase)
     Mockito.`when`(bookDatabase.entry(bookId))
       .thenReturn(bookDatabaseEntry)
-    Mockito.`when`(bookDatabaseEntry.book)
-      .thenReturn(book)
 
     val feedLoader =
       Mockito.mock(FeedLoaderType::class.java)
@@ -1174,10 +1169,10 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    assertEquals(Option.none<BookStatus>(), this.bookRegistry.book(bookId))
+    val newStatus = this.bookRegistry.bookOrException(bookId).status
+    newStatus as BookStatus.Holdable
 
-    Mockito.verify(bookDatabaseEntry, Times(1)).delete()
-
+    assertTrue(bookDatabaseEntry.deleted)
     assertEquals(0, this.server.requestCount)
   }
 
@@ -1198,8 +1193,6 @@ class BookRevokeTaskTest {
       Mockito.mock(ProfilesDatabaseType::class.java)
     val bookDatabase =
       Mockito.mock(BookDatabaseType::class.java)
-    val bookDatabaseEntry =
-      Mockito.mock(BookDatabaseEntryType::class.java)
     val bookId =
       BookID.create("a")
 
@@ -1239,6 +1232,9 @@ class BookRevokeTaskTest {
         formats = listOf()
       )
 
+    val bookDatabaseEntry =
+      MockBookDatabaseEntry(book)
+
     Mockito.`when`(account.id)
       .thenReturn(this.accountID)
     Mockito.`when`(profile.id)
@@ -1255,8 +1251,6 @@ class BookRevokeTaskTest {
       .thenReturn(bookDatabase)
     Mockito.`when`(bookDatabase.entry(bookId))
       .thenReturn(bookDatabaseEntry)
-    Mockito.`when`(bookDatabaseEntry.book)
-      .thenReturn(book)
 
     this.server.enqueue(
       MockResponse()
@@ -1301,7 +1295,7 @@ class BookRevokeTaskTest {
         adobeDRM = null,
         bookID = bookId,
         bookRegistry = this.bookRegistry,
-        feedLoader = feedLoader,
+        feedLoader = this.feedLoader,
         revokeStrings = this.bookRevokeStrings
       )
 
@@ -1309,10 +1303,10 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    assertEquals(Option.none<BookStatus>(), this.bookRegistry.book(bookId))
+    val newStatus = this.bookRegistry.bookOrException(bookId).status
+    newStatus as BookStatus.Loaned.LoanedNotDownloaded
 
-    Mockito.verify(bookDatabaseEntry, Times(1)).delete()
-
+    assertTrue(bookDatabaseEntry.deleted)
     assertEquals(1, this.server.requestCount)
   }
 
@@ -1333,8 +1327,6 @@ class BookRevokeTaskTest {
       Mockito.mock(ProfilesDatabaseType::class.java)
     val bookDatabase =
       Mockito.mock(BookDatabaseType::class.java)
-    val bookDatabaseEntry =
-      Mockito.mock(BookDatabaseEntryType::class.java)
     val bookId =
       BookID.create("a")
 
@@ -1374,6 +1366,9 @@ class BookRevokeTaskTest {
         formats = listOf()
       )
 
+    val bookDatabaseEntry =
+      MockBookDatabaseEntry(book)
+
     Mockito.`when`(account.id)
       .thenReturn(this.accountID)
     Mockito.`when`(profile.id)
@@ -1390,8 +1385,6 @@ class BookRevokeTaskTest {
       .thenReturn(bookDatabase)
     Mockito.`when`(bookDatabase.entry(bookId))
       .thenReturn(bookDatabaseEntry)
-    Mockito.`when`(bookDatabaseEntry.book)
-      .thenReturn(book)
 
     val feedLoader =
       Mockito.mock(FeedLoaderType::class.java)
@@ -1412,10 +1405,10 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    assertEquals(Option.none<BookStatus>(), this.bookRegistry.book(bookId))
+    val newStatus = this.bookRegistry.bookOrException(bookId).status
+    newStatus is BookStatus.Loanable
 
-    Mockito.verify(bookDatabaseEntry, Times(1)).delete()
-
+    assertTrue(bookDatabaseEntry.deleted)
     assertEquals(0, this.server.requestCount)
   }
 
@@ -1436,8 +1429,6 @@ class BookRevokeTaskTest {
       Mockito.mock(ProfilesDatabaseType::class.java)
     val bookDatabase =
       Mockito.mock(BookDatabaseType::class.java)
-    val bookDatabaseEntry =
-      Mockito.mock(BookDatabaseEntryType::class.java)
     val bookId =
       BookID.create("a")
 
@@ -1473,6 +1464,9 @@ class BookRevokeTaskTest {
         formats = listOf()
       )
 
+    val bookDatabaseEntry =
+      MockBookDatabaseEntry(book)
+
     Mockito.`when`(account.id)
       .thenReturn(this.accountID)
     Mockito.`when`(profile.id)
@@ -1489,8 +1483,6 @@ class BookRevokeTaskTest {
       .thenReturn(bookDatabase)
     Mockito.`when`(bookDatabase.entry(bookId))
       .thenReturn(bookDatabaseEntry)
-    Mockito.`when`(bookDatabaseEntry.book)
-      .thenReturn(book)
 
     this.server.enqueue(
       MockResponse()
@@ -1535,7 +1527,7 @@ class BookRevokeTaskTest {
         adobeDRM = null,
         bookID = bookId,
         bookRegistry = this.bookRegistry,
-        feedLoader = feedLoader,
+        feedLoader = this.feedLoader,
         revokeStrings = this.bookRevokeStrings
       )
 
@@ -1543,10 +1535,10 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    assertEquals(Option.none<BookStatus>(), this.bookRegistry.book(bookId))
+    val newStatus = this.bookRegistry.bookOrException(bookId).status
+    newStatus as BookStatus.Loaned.LoanedNotDownloaded
 
-    Mockito.verify(bookDatabaseEntry, Times(1)).delete()
-
+    assertTrue(bookDatabaseEntry.deleted)
     assertEquals(1, this.server.requestCount)
   }
 
@@ -2462,7 +2454,8 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    assertEquals(Option.none<BookStatus>(), this.bookRegistry.book(bookId))
+    val newStatus = this.bookRegistry.bookOrException(bookId).status
+    newStatus as BookStatus.Loaned.LoanedNotDownloaded
 
     Mockito.verify(bookDatabaseEntry, Times(1)).delete()
 
@@ -2485,10 +2478,6 @@ class BookRevokeTaskTest {
       Mockito.mock(ProfilesDatabaseType::class.java)
     val bookDatabase =
       Mockito.mock(BookDatabaseType::class.java)
-    val bookDatabaseEntry =
-      Mockito.mock(BookDatabaseEntryType::class.java)
-    val bookDatabaseFormatHandle =
-      Mockito.mock(BookDatabaseEntryFormatHandlePDF::class.java)
 
     val bookId =
       BookID.create("a")
@@ -2533,6 +2522,9 @@ class BookRevokeTaskTest {
         formats = listOf(bookFormat)
       )
 
+    val bookDatabaseEntry =
+      MockBookDatabaseEntry(book)
+
     Mockito.`when`(account.id)
       .thenReturn(this.accountID)
     Mockito.`when`(profile.id)
@@ -2549,10 +2541,6 @@ class BookRevokeTaskTest {
       .thenReturn(bookDatabase)
     Mockito.`when`(bookDatabase.entry(bookId))
       .thenReturn(bookDatabaseEntry)
-    Mockito.`when`(bookDatabaseEntry.book)
-      .thenReturn(book)
-    Mockito.`when`(bookDatabaseEntry.findPreferredFormatHandle())
-      .thenReturn(bookDatabaseFormatHandle)
 
     this.server.enqueue(
       MockResponse()
@@ -2593,10 +2581,10 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    assertEquals(Option.none<BookStatus>(), this.bookRegistry.book(bookId))
+    val newStatus = this.bookRegistry.bookOrException(bookId).status
+    newStatus as BookStatus.Loaned.LoanedNotDownloaded
 
-    Mockito.verify(bookDatabaseEntry, Times(1)).delete()
-
+    assertTrue(bookDatabaseEntry.deleted)
     assertEquals(1, this.server.requestCount)
   }
 

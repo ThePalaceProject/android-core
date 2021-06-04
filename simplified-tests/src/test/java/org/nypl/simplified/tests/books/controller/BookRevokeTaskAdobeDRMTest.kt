@@ -199,7 +199,6 @@ class BookRevokeTaskAdobeDRMTest {
 
     return FeedLoader.create(
       bookFormatSupport = this.bookFormatSupport,
-      bookRegistry = this.bookRegistry,
       bundledContent = this.bundledContent,
       contentResolver = this.contentResolver,
       exec = executorFeeds,
@@ -320,9 +319,10 @@ class BookRevokeTaskAdobeDRMTest {
 
     val result = task.call()
     TaskDumps.dump(logger, result)
-
     result as TaskResult.Success
-    Assertions.assertEquals(Option.none<BookStatus>(), this.bookRegistry.book(bookId))
+
+    val newStatus = this.bookRegistry.bookOrException(bookId).status
+    newStatus as BookStatus.Loaned.LoanedNotDownloaded
 
     Mockito.verify(bookDatabaseEntry, Times(1)).delete()
   }
@@ -435,9 +435,10 @@ class BookRevokeTaskAdobeDRMTest {
 
     val result = task.call()
     TaskDumps.dump(logger, result)
-
     result as TaskResult.Success
-    Assertions.assertEquals(Option.none<BookStatus>(), this.bookRegistry.book(bookId))
+
+    val newStatus = this.bookRegistry.bookOrException(bookId).status
+    newStatus as BookStatus.Loaned.LoanedNotDownloaded
 
     Mockito.verify(bookDatabaseEntry, Times(1)).delete()
   }
@@ -527,7 +528,8 @@ class BookRevokeTaskAdobeDRMTest {
                 AdobeUserID("2bb42d71-42aa-4eb7-b8af-366171adcae8")
               )
             ),
-            authenticationDescription = null
+            authenticationDescription = null,
+            annotationsURI = URI("https://www.example.com")
           )
         )
       )
@@ -593,9 +595,10 @@ class BookRevokeTaskAdobeDRMTest {
 
     val result = task.call()
     TaskDumps.dump(logger, result)
-
     result as TaskResult.Success
-    Assertions.assertEquals(Option.none<BookStatus>(), this.bookRegistry.book(bookId))
+
+    val newStatus = this.bookRegistry.bookOrException(bookId).status
+    newStatus as BookStatus.Loaned.LoanedNotDownloaded
 
     Mockito.verify(bookDatabaseEntry, Times(1)).delete()
     Mockito.verify(drmHandle, Times(1)).setAdobeRightsInformation(null)
@@ -683,7 +686,8 @@ class BookRevokeTaskAdobeDRMTest {
                 AdobeUserID("2bb42d71-42aa-4eb7-b8af-366171adcae8")
               )
             ),
-            authenticationDescription = null
+            authenticationDescription = null,
+            annotationsURI = URI("https://www.example.com")
           )
         )
       )
@@ -830,7 +834,8 @@ class BookRevokeTaskAdobeDRMTest {
                 AdobeUserID("2bb42d71-42aa-4eb7-b8af-366171adcae8")
               )
             ),
-            authenticationDescription = null
+            authenticationDescription = null,
+            annotationsURI = URI("https://www.example.com")
           )
         )
       )
@@ -978,7 +983,8 @@ class BookRevokeTaskAdobeDRMTest {
                 AdobeUserID("2bb42d71-42aa-4eb7-b8af-366171adcae8")
               )
             ),
-            authenticationDescription = null
+            authenticationDescription = null,
+            annotationsURI = URI("https://www.example.com")
           )
         )
       )
@@ -1130,7 +1136,8 @@ class BookRevokeTaskAdobeDRMTest {
               deviceManagerURI = null,
               postActivationCredentials = null
             ),
-            authenticationDescription = null
+            authenticationDescription = null,
+            annotationsURI = URI("https://www.example.com")
           )
         )
       )
@@ -1379,7 +1386,8 @@ class BookRevokeTaskAdobeDRMTest {
                 AdobeUserID("2bb42d71-42aa-4eb7-b8af-366171adcae8")
               )
             ),
-            authenticationDescription = null
+            authenticationDescription = null,
+            annotationsURI = URI("https://www.example.com")
           )
         )
       )
