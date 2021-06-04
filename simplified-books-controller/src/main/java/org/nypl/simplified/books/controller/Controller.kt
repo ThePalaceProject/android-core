@@ -479,6 +479,7 @@ class Controller private constructor(
         adeptExecutor = this.adobeDrm,
         account = account,
         bookRegistry = this.bookRegistry,
+        feedLoader = this.feedLoader,
         patronParsers = this.patronUserProfileParsers,
         http = this.lsHttp,
         logoutStrings = this.accountLogoutStringResources,
@@ -602,6 +603,7 @@ class Controller private constructor(
         bookRegistry = this.bookRegistry,
         booksController = this,
         feedParser = this.feedParser,
+        patronParsers = this.patronUserProfileParsers,
         http = this.lsHttp
       )
     )

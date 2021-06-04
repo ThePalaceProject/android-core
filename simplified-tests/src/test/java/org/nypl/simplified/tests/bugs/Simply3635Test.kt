@@ -210,7 +210,6 @@ class Simply3635Test {
         parser = this.opdsParser,
         searchParser = OPDSSearchParser.newParser(),
         transport = FeedHTTPTransport(this.http),
-        bookRegistry = this.bookRegistry,
         bundledContent = this.bundledContent
       )
 
@@ -278,8 +277,7 @@ class Simply3635Test {
         showTestingLibraries = false,
         hasSeenLibrarySelectionScreen = false,
         readerPreferences = ReaderPreferences.builder().build(),
-        mostRecentAccount = null,
-        useExperimentalR2 = false
+        mostRecentAccount = null
       )
 
     val profileDescription0 =

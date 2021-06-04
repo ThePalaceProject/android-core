@@ -11,7 +11,6 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.Subject
 import org.librarysimplified.services.api.Services
@@ -59,11 +58,14 @@ class AccountListRegistryViewModel(private val locationManager: LocationManager)
       this.profilesController.accountEvents()
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(this::onAccountEvent),
-      Observable.combineLatest(queries, locationUpdates) { query, _ -> createQuery(query) }
-        .switchMapCompletable(this::executeQuery)
-        .subscribeOn(Schedulers.io())
-        .onErrorComplete()
-        .subscribe()
+      /**
+       * Here we are hiding Library Finder functionality
+       */
+//      Observable.combineLatest(queries, locationUpdates) { query, _ -> createQuery(query) }
+//        .switchMapCompletable(this::executeQuery)
+//        .subscribeOn(Schedulers.io())
+//        .onErrorComplete()
+//        .subscribe()
     )
 
   private fun onAccountRegistryEvent(event: AccountProviderRegistryEvent) {
@@ -122,17 +124,20 @@ class AccountListRegistryViewModel(private val locationManager: LocationManager)
     this.profilesController.profileAccountCreate(id)
   }
 
+  /**
+   * Here we are hiding Library Finder functionality
+   */
   @RequiresPermission(value = Manifest.permission.ACCESS_COARSE_LOCATION)
   fun getLocation(hasPermission: Boolean) {
-    if (hasPermission) {
-      tryAndGetLocation()
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(displayNoLocationMessage::onNext)
-        .let(subscriptions::add)
-    } else {
-      displayNoLocationMessage.onNext(true)
-    }
+//    if (hasPermission) {
+//      tryAndGetLocation()
+//        .subscribeOn(Schedulers.io())
+//        .observeOn(AndroidSchedulers.mainThread())
+//        .subscribe(displayNoLocationMessage::onNext)
+//        .let(subscriptions::add)
+//    } else {
+//      displayNoLocationMessage.onNext(true)
+//    }
   }
 
   /**
