@@ -7,7 +7,7 @@ apply plugin: 'com.google.firebase.crashlytics'
 //
 def requiredFiles = [:]
 requiredFiles["ReaderClientCert.sig"] =
-  "29f5f58e8fa1694892f27c5bd825cbba4da0cfcc9d2367c5d8d89a0bae89e328"
+  "ac000b9942b782752bbf32918d34363d5da4e8df0b3fb617c923bcbad3996c6a"
 requiredFiles["secrets.conf"] =
   "9c211ae0d153c29b72baab3bfad9de6c5cecb6b39bcda8206d36a65aaca0db21"
 

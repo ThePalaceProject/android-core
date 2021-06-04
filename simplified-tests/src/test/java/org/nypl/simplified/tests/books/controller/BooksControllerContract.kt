@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Timeout
+import org.junit.jupiter.api.assertThrows
 import org.librarysimplified.http.api.LSHTTPClientConfiguration
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.vanilla.LSHTTPClients
@@ -35,8 +36,7 @@ import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
 import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatus
-import org.nypl.simplified.books.book_registry.BookStatusEvent.BookStatusEventChanged
-import org.nypl.simplified.books.book_registry.BookStatusEvent.BookStatusEventRemoved
+import org.nypl.simplified.books.book_registry.BookStatusEvent.BookStatusEventAdded
 import org.nypl.simplified.books.borrowing.BorrowSubtasks
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskDirectoryType
 import org.nypl.simplified.books.bundled.api.BundledContentResolverType
@@ -85,7 +85,6 @@ import java.io.InputStream
 import java.net.URI
 import java.util.ArrayList
 import java.util.Collections
-import java.util.NoSuchElementException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -140,7 +139,8 @@ abstract class BooksControllerContract {
       userName = AccountUsername("abcd"),
       password = AccountPassword("1234"),
       adobeCredentials = null,
-      authenticationDescription = null
+      authenticationDescription = null,
+      annotationsURI = URI("https://www.example.com")
     )
   }
 
@@ -166,7 +166,6 @@ abstract class BooksControllerContract {
     val feedLoader =
       FeedLoader.create(
         bookFormatSupport = this.bookFormatSupport,
-        bookRegistry = books,
         bundledContent = bundledContent,
         contentResolver = this.contentResolver,
         exec = feedExecutor,
@@ -297,6 +296,12 @@ abstract class BooksControllerContract {
 
     this.server.enqueue(
       MockResponse()
+        .setResponseCode(200)
+        .setBody(this.simpleUserProfile())
+    )
+
+    this.server.enqueue(
+      MockResponse()
         .setResponseCode(400)
         .setBody("")
     )
@@ -338,6 +343,12 @@ abstract class BooksControllerContract {
     this.profiles.setProfileCurrent(profile.id)
     val account = profile.accountsByProvider()[provider.id]!!
     account.setLoginState(AccountLoggedIn(correctCredentials()))
+
+    this.server.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+        .setBody(this.simpleUserProfile())
+    )
 
     this.server.enqueue(
       MockResponse()
@@ -463,6 +474,11 @@ abstract class BooksControllerContract {
     this.server.enqueue(
       MockResponse()
         .setResponseCode(200)
+        .setBody(this.simpleUserProfile())
+    )
+    this.server.enqueue(
+      MockResponse()
+        .setResponseCode(200)
         .setBody("Unlikely!")
     )
 
@@ -509,6 +525,12 @@ abstract class BooksControllerContract {
     this.server.enqueue(
       MockResponse()
         .setResponseCode(200)
+        .setBody(this.simpleUserProfile())
+    )
+
+    this.server.enqueue(
+      MockResponse()
+        .setResponseCode(200)
         .setBody(Buffer().readFrom(resource("testBooksSyncNewEntries.xml")))
     )
 
@@ -529,17 +551,17 @@ abstract class BooksControllerContract {
     )
 
     EventAssertions.isType(
-      BookStatusEventChanged::class.java,
+      BookStatusEventAdded::class.java,
       this.bookEvents,
       0
     )
     EventAssertions.isType(
-      BookStatusEventChanged::class.java,
+      BookStatusEventAdded::class.java,
       this.bookEvents,
       1
     )
     EventAssertions.isType(
-      BookStatusEventChanged::class.java,
+      BookStatusEventAdded::class.java,
       this.bookEvents,
       2
     )
@@ -579,6 +601,13 @@ abstract class BooksControllerContract {
     this.profiles.setProfileCurrent(profile.id)
     val account = profile.accountsByProvider()[provider.id]!!
     account.setLoginState(AccountLoggedIn(correctCredentials()))
+    val bookDatabase = account.bookDatabase
+
+    this.server.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+        .setBody(this.simpleUserProfile())
+    )
 
     /*
      * Populate the database by syncing against a feed that contains books.
@@ -602,7 +631,7 @@ abstract class BooksControllerContract {
       BookID.create("251cc5f69cd2a329bb6074b47a26062e59f5bb01d09d14626f41073f63690113")
     )
 
-    this.bookRegistry.bookEvents().subscribe({ this.bookEvents.add(it) })
+    this.bookRegistry.bookEvents().subscribe { this.bookEvents.add(it) }
 
     /*
      * Now run the sync again but this time with a feed that removes books.
@@ -611,43 +640,33 @@ abstract class BooksControllerContract {
     this.server.enqueue(
       MockResponse()
         .setResponseCode(200)
+        .setBody(this.simpleUserProfile())
+    )
+    this.server.enqueue(
+      MockResponse()
+        .setResponseCode(200)
         .setBody(Buffer().readFrom(resource("testBooksSyncRemoveEntries.xml")))
     )
 
     controller.booksSync(account.id).get()
-    Assertions.assertEquals(1L, this.bookRegistry.books().size.toLong())
 
-    EventAssertions.isType(
-      BookStatusEventChanged::class.java,
-      this.bookEvents,
-      0
-    )
-    EventAssertions.isType(
-      BookStatusEventRemoved::class.java,
-      this.bookEvents,
-      1
-    )
-    EventAssertions.isType(
-      BookStatusEventRemoved::class.java,
-      this.bookEvents,
-      2
+    Assertions.assertEquals(1, bookDatabase.books().size)
+
+    bookDatabase.entry(
+      BookID.create("39434e1c3ea5620fdcc2303c878da54cc421175eb09ce1a6709b54589eb8711f")
     )
 
     this.bookRegistry.bookOrException(
       BookID.create("39434e1c3ea5620fdcc2303c878da54cc421175eb09ce1a6709b54589eb8711f")
-    )
+    ).status as BookStatus.Loaned.LoanedNotDownloaded
 
-    checkBookIsNotInRegistry("f9a7536a61caa60f870b3fbe9d4304b2d59ea03c71cbaee82609e3779d1e6e0f")
-    checkBookIsNotInRegistry("251cc5f69cd2a329bb6074b47a26062e59f5bb01d09d14626f41073f63690113")
-  }
+    this.bookRegistry.bookOrException(
+      BookID.create("f9a7536a61caa60f870b3fbe9d4304b2d59ea03c71cbaee82609e3779d1e6e0f")
+    ).status as BookStatus.Loaned.LoanedNotDownloaded
 
-  private fun checkBookIsNotInRegistry(id: String) {
-    try {
-      this.bookRegistry.bookOrException(BookID.create(id))
-      Assertions.fail("Book should not exist!")
-    } catch (e: NoSuchElementException) {
-      // Correctly raised
-    }
+    this.bookRegistry.bookOrException(
+      BookID.create("251cc5f69cd2a329bb6074b47a26062e59f5bb01d09d14626f41073f63690113")
+    ).status as BookStatus.Loaned.LoanedNotDownloaded
   }
 
   /**
@@ -688,6 +707,12 @@ abstract class BooksControllerContract {
     this.server.enqueue(
       MockResponse()
         .setResponseCode(200)
+        .setBody(this.simpleUserProfile())
+    )
+
+    this.server.enqueue(
+      MockResponse()
+        .setResponseCode(200)
         .setBody(Buffer().readFrom(resource("testBooksDelete.xml")))
     )
 
@@ -702,37 +727,13 @@ abstract class BooksControllerContract {
       "Book must not have a saved EPUB file"
     )
 
-    /*
-     * Manually reach into the database and create a book in order to have something to delete.
-     */
+    val result = controller.bookDelete(account.id, bookId).get()
+    result as TaskResult.Success
 
-    run {
-      val databaseEntry = account.bookDatabase.entry(bookId)
+    val newStatus = this.bookRegistry.bookOrException(bookId).status
+    newStatus as BookStatus.Loaned.LoanedNotDownloaded
 
-      //      databaseEntry.writeEPUB(File.createTempFile("book", ".epub"));
-      //      this.bookRegistry.update(
-      //          BookWithStatus.create(
-      //              databaseEntry.book(), BookStatus.fromBook(databaseEntry.book())));
-    }
-
-    //    final OptionType<File> createdFile =
-    //        this.bookRegistry.bookOrException(bookId).book().file();
-    //    Assert.assertTrue(
-    //        "Book must have a saved EPUB file",
-    //        createdFile.isSome());
-    //
-    //    final File file = ((Some<File>) createdFile).get();
-    //    Assert.assertTrue("EPUB must exist", file.isFile());
-
-    this.bookRegistry.bookEvents().subscribe({ this.bookEvents.add(it) })
-    controller.bookDelete(account.id, bookId).get()
-
-    Assertions.assertTrue(
-      this.bookRegistry.book(bookId).isNone,
-      "Book must not have a saved EPUB file"
-    )
-
-    // Assert.assertFalse("EPUB must not exist", file.exists());
+    assertThrows<Exception> { account.bookDatabase.entry(bookId) }
   }
 
   /**
@@ -773,6 +774,12 @@ abstract class BooksControllerContract {
     this.server.enqueue(
       MockResponse()
         .setResponseCode(200)
+        .setBody(this.simpleUserProfile())
+    )
+
+    this.server.enqueue(
+      MockResponse()
+        .setResponseCode(200)
         .setBody(Buffer().readFrom(resource("testBooksSyncNewEntries.xml")))
     )
 
@@ -793,22 +800,6 @@ abstract class BooksControllerContract {
     return BooksControllerContract::class.java.getResourceAsStream(file)!!
   }
 
-  @Throws(IOException::class)
-  private fun resourceSize(file: String): Long {
-    var total = 0L
-    val buffer = ByteArray(8192)
-    resource(file).use { stream ->
-      while (true) {
-        val r = stream.read(buffer)
-        if (r <= 0) {
-          break
-        }
-        total += r.toLong()
-      }
-    }
-    return total
-  }
-
   @Throws(ProfileDatabaseException::class)
   private fun profilesDatabaseWithoutAnonymous(
     accountEvents: PublishSubject<AccountEvent>,
@@ -826,10 +817,9 @@ abstract class BooksControllerContract {
     )
   }
 
-  private fun onAccountResolution(
-    id: URI,
-    message: String
-  ) {
-    this.logger.debug("resolution: {}: {}", id, message)
+  private fun simpleUserProfile(): String {
+    return resource("/org/nypl/simplified/tests/patron/example-with-device.json")
+      .readBytes()
+      .decodeToString()
   }
 }

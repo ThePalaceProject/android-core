@@ -190,7 +190,8 @@ class BorrowACSMTest {
                 userID = AdobeUserID("19b25c06-8b39-4643-8813-5980bee45651")
               )
             ),
-            authenticationDescription = "Basic"
+            authenticationDescription = "Basic",
+            annotationsURI = URI("https://www.example.com")
           )
         )
       )
@@ -392,7 +393,8 @@ class BorrowACSMTest {
             userName = AccountUsername("user"),
             password = AccountPassword("password"),
             adobeCredentials = null,
-            authenticationDescription = "Basic"
+            authenticationDescription = "Basic",
+            annotationsURI = URI("https://www.example.com")
           )
         )
       )
@@ -436,7 +438,8 @@ class BorrowACSMTest {
               null,
               null
             ),
-            authenticationDescription = "Basic"
+            authenticationDescription = "Basic",
+            annotationsURI = URI("https://www.example.com")
           )
         )
       )

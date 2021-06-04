@@ -307,7 +307,8 @@ class BorrowTaskTest {
                 userID = AdobeUserID("19b25c06-8b39-4643-8813-5980bee45651")
               )
             ),
-            authenticationDescription = "Basic"
+            authenticationDescription = "Basic",
+            annotationsURI = URI("https://www.example.com")
           )
         )
       )
@@ -735,7 +736,6 @@ class BorrowTaskTest {
     val result = this.executeAssumingSuccess(task)
 
     this.verifyBookRegistryHasStatus(LoanedDownloaded::class.java)
-    assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)

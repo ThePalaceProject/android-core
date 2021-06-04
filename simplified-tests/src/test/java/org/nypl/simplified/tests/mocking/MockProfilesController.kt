@@ -49,14 +49,14 @@ class MockProfilesController(
     return FluentFuture.from(SettableFuture.create())
   }
 
-  private val profileList =
+  val profileList: List<MockProfile> =
     IntRange(1, profileCount)
       .toList()
       .map {
         MockProfile(ProfileID(UUID.randomUUID()), accountCount)
       }
 
-  private val profiles =
+  val profiles: SortedMap<ProfileID, MockProfile> =
     this.profileList.map { profile -> Pair(profile.id, profile) }
       .toMap()
       .toSortedMap()
@@ -86,7 +86,7 @@ class MockProfilesController(
     return this.profileEventSource
   }
 
-  override fun profileSelect(id: ProfileID): FluentFuture<Unit> {
+  override fun profileSelect(profileID: ProfileID): FluentFuture<Unit> {
     return FluentFuture.from(SettableFuture.create())
   }
 
@@ -135,8 +135,8 @@ class MockProfilesController(
 
   val profileAccountLogouts = mutableListOf<AccountID>()
 
-  override fun profileAccountLogout(account: AccountID): FluentFuture<TaskResult<Unit>> {
-    this.profileAccountLogouts.add(account)
+  override fun profileAccountLogout(accountID: AccountID): FluentFuture<TaskResult<Unit>> {
+    this.profileAccountLogouts.add(accountID)
     return FluentFuture.from(SettableFuture.create())
   }
 
@@ -144,7 +144,7 @@ class MockProfilesController(
     return FluentFuture.from(SettableFuture.create())
   }
 
-  override fun profileAccountForBook(id: BookID): AccountType {
+  override fun profileAccountForBook(bookID: BookID): AccountType {
     return TODO()
   }
 

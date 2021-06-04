@@ -118,17 +118,11 @@ import org.nypl.simplified.ui.theme.ThemeControl
 import org.nypl.simplified.ui.theme.ThemeServiceType
 import org.nypl.simplified.ui.theme.ThemeValue
 import org.nypl.simplified.ui.thread.api.UIThreadServiceType
-import org.nypl.simplified.viewer.epub.readium1.ReaderHTTPMimeMap
-import org.nypl.simplified.viewer.epub.readium1.ReaderHTTPServerAAsync
-import org.nypl.simplified.viewer.epub.readium1.ReaderHTTPServerType
-import org.nypl.simplified.viewer.epub.readium1.ReaderReadiumEPUBLoader
-import org.nypl.simplified.viewer.epub.readium1.ReaderReadiumEPUBLoaderType
 import org.readium.r2.lcp.LcpService
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
-import java.net.ServerSocket
 import java.util.ServiceLoader
 
 internal object MainServices {
@@ -281,35 +275,6 @@ internal object MainServices {
     }
   }
 
-  private fun createHTTPServer(assets: AssetManager): ReaderHTTPServerType {
-    val mime = ReaderHTTPMimeMap.newMap("application/octet-stream")
-    return ReaderHTTPServerAAsync.newServer(assets, mime, this.fetchUnusedHTTPPort())
-  }
-
-  private fun fetchUnusedHTTPPort(): Int {
-    // Fallback port
-    var port: Int? = 8080
-    try {
-      val socket = ServerSocket(0)
-      port = socket.localPort
-      socket.close()
-    } catch (e: IOException) {
-      // Ignore
-    }
-
-    this.logger.debug("HTTP server will run on port {}", port)
-    return port!!
-  }
-
-  private fun createEPUBLoader(
-    context: Context,
-    adobeConfiguration: AdobeConfigurationServiceType
-  ): ReaderReadiumEPUBLoaderType {
-    val execEPUB =
-      NamedThreadPools.namedThreadPool(1, "epub", 19)
-    return ReaderReadiumEPUBLoader.newLoader(context, adobeConfiguration, execEPUB)
-  }
-
   private fun loadDefaultAccountProvider(): AccountProviderType {
     val providers =
       ServiceLoader.load(AccountProviderFallbackType::class.java)
@@ -436,7 +401,6 @@ internal object MainServices {
 
     return FeedLoader.create(
       bookFormatSupport = bookFormatSupport,
-      bookRegistry = bookRegistry,
       bundledContent = bundledContent,
       contentResolver = contentResolver,
       exec = execCatalogFeeds,
@@ -747,18 +711,6 @@ internal object MainServices {
       message = strings.bootingGeneral("local image loader"),
       interfaceType = ImageLoaderType::class.java,
       serviceConstructor = { this.createLocalImageLoader(context) }
-    )
-
-    addService(
-      message = strings.bootingGeneral("reader http server"),
-      interfaceType = ReaderHTTPServerType::class.java,
-      serviceConstructor = { this.createHTTPServer(assets) }
-    )
-
-    addService(
-      message = strings.bootingGeneral("EPUB loader"),
-      interfaceType = ReaderReadiumEPUBLoaderType::class.java,
-      serviceConstructor = { this.createEPUBLoader(context, adobeConfiguration) }
     )
 
     addService(

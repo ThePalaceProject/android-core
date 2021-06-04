@@ -105,7 +105,8 @@ class BorrowLCP private constructor() : BorrowSubtaskType {
     if (loansURI == null) {
       context.taskRecorder.currentStepFailed(
         message = "No loans URI provided; unable to retrieve a passphrase.",
-        errorCode = "lcpMissingLoans")
+        errorCode = "lcpMissingLoans"
+      )
       throw BorrowSubtaskFailed()
     }
 
@@ -141,7 +142,7 @@ class BorrowLCP private constructor() : BorrowSubtaskType {
   private fun findPassphraseHandleError(
     context: BorrowContextType,
     status: LSHTTPResponseStatus.Responded.Error
-  ): String  {
+  ): String {
     val report = status.properties.problemReport
     if (report != null) {
       context.taskRecorder.addAttributes(report.toMap())
@@ -196,7 +197,8 @@ class BorrowLCP private constructor() : BorrowSubtaskType {
 
     context.taskRecorder.currentStepFailed(
       message = "No LCP hashed passphrase was provided.",
-      errorCode = "lcpMissingPassphrase")
+      errorCode = "lcpMissingPassphrase"
+    )
     throw BorrowSubtaskFailed()
   }
 
@@ -239,7 +241,8 @@ class BorrowLCP private constructor() : BorrowSubtaskType {
               expectedSize = 100,
               bytesPerSecond = null
             )
-          })
+          }
+        )
       }
 
     try {

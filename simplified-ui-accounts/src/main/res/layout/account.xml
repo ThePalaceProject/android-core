@@ -55,20 +55,25 @@
       android:layout_width="match_parent"
       android:layout_height="16dp" />
 
-    <CheckBox
-      android:id="@+id/accountEULACheckbox"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="16dp"
-      android:layout_marginEnd="16dp"
-      android:gravity="center"
-      android:text="@string/accountEULAStatement" />
-
-    <Space
-      android:layout_width="match_parent"
-      android:layout_height="16dp" />
-
     <include layout="@layout/auth" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider" />
+
+    <TextView
+        android:id="@+id/accountEULA"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:gravity="center"
+        android:linksClickable="true"
+        android:autoLink="all"
+        android:textColorLink="@color/simplified_material_blue_primary"
+        android:textColor="@color/simplified_material_blue_primary"
+        android:background="?attr/selectableItemBackground"
+        android:text="@string/accountEULAStatement" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
       android:id="@+id/accountLoginProgress"
@@ -288,6 +293,53 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+      <FrameLayout
+          android:id="@+id/accountPrivacyPolicy"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="?attr/selectableItemBackground"
+          android:visibility="visible">
+
+          <View
+              android:layout_width="match_parent"
+              android:layout_height="1dp"
+              android:background="?android:attr/listDivider"
+              android:layout_gravity="top" />
+
+          <TextView
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:padding="16dp"
+              android:text="@string/accountPrivacyPolicy"
+              app:layout_constraintEnd_toEndOf="parent"
+              app:layout_constraintStart_toStartOf="parent"
+              app:layout_constraintTop_toTopOf="parent" />
+
+      </FrameLayout>
+
+      <FrameLayout
+      android:id="@+id/accountLicenses"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:background="?attr/selectableItemBackground"
+      android:visibility="visible">
+
+          <View
+              android:layout_width="match_parent"
+              android:layout_height="1dp"
+              android:background="?android:attr/listDivider"
+              android:layout_gravity="top" />
+
+          <TextView
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:padding="16dp"
+              android:text="@string/accountLicenses"
+              app:layout_constraintEnd_toEndOf="parent"
+              app:layout_constraintStart_toStartOf="parent"
+              app:layout_constraintTop_toTopOf="parent" />
+      </FrameLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
       android:id="@+id/accountCustomOPDS"

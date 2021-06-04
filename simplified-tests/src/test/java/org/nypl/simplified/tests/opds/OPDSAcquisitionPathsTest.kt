@@ -29,7 +29,8 @@ class OPDSAcquisitionPathsTest {
     return OPDSAcquisitionPathElement(
       mimeType = this.mimeOf(mime),
       target = uri?.let { URI.create(it) },
-      properties = properties)
+      properties = properties
+    )
   }
 
   @Test
@@ -110,9 +111,11 @@ class OPDSAcquisitionPathsTest {
       )
 
     val element0 =
-      this.pathElementOf(mime = "application/vnd.readium.lcp.license.v1.0+json",
+      this.pathElementOf(
+        mime = "application/vnd.readium.lcp.license.v1.0+json",
         uri = "http://cm.se-community-lcp-test.lyrtech.org/LCP/works/10/fulfill/31",
-        properties = acquisition.properties)
+        properties = acquisition.properties
+      )
     val element01 =
       this.pathElementOf("application/epub+zip")
 
