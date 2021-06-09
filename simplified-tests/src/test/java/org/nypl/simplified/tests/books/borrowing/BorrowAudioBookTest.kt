@@ -234,7 +234,7 @@ class BorrowAudioBookTest {
     val task = BorrowAudioBook.createSubtask()
 
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericAudioBooks.first(), null)
+      OPDSAcquisitionPathElement(genericAudioBooks.first(), null, emptyMap())
 
     try {
       task.execute(this.context)
@@ -264,7 +264,7 @@ class BorrowAudioBookTest {
     this.context.currentURIField =
       URI.create("urn:whatever")
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericAudioBooks.first(), null)
+      OPDSAcquisitionPathElement(genericAudioBooks.first(), null, emptyMap())
 
     this.audioBookManifestStrategies.strategy.onExecute = {
       TaskResult.fail("Running", "Water system breakdown at sector 6", audioStrategyFailed)
@@ -298,7 +298,7 @@ class BorrowAudioBookTest {
     this.context.currentURIField =
       URI.create("urn:whatever")
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericAudioBooks.first(), null)
+      OPDSAcquisitionPathElement(genericAudioBooks.first(), null, emptyMap())
 
     this.audioBookManifestStrategies.strategy.onExecute = {
       val recorder = TaskRecorder.create()

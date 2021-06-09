@@ -45,11 +45,10 @@ sealed class BookDRMInformation : Serializable {
   data class LCP(
 
     /**
-     * LCP currently has no associated information, so an unused `Unit` typed field is
-     * added here to avoid having to refactor from an `object` to a `data class` later.
+     * The hashed LCP passphrase for the book.
      */
 
-    private val unused: Unit = Unit
+    val hashedPassphrase: String?
   ) : BookDRMInformation() {
     override val kind: BookDRMKind = BookDRMKind.LCP
   }

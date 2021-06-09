@@ -14,7 +14,7 @@ object OPDSAcquisitionPaths {
     source: OPDSAcquisition,
     indirect: OPDSIndirectAcquisition
   ) {
-    val newPathElement = OPDSAcquisitionPathElement(indirect.type, null)
+    val newPathElement = OPDSAcquisitionPathElement(indirect.type, null, indirect.properties)
     if (indirect.indirectAcquisitions.isEmpty()) {
       val pathElements = mutableListOf<OPDSAcquisitionPathElement>()
       pathElements.addAll(elementStack)
@@ -43,12 +43,12 @@ object OPDSAcquisitionPaths {
   ): List<OPDSAcquisitionPath> {
     val paths = mutableListOf<OPDSAcquisitionPath>()
     if (source.indirectAcquisitions.isEmpty()) {
-      paths.add(OPDSAcquisitionPath(source, listOf(OPDSAcquisitionPathElement(source.type, source.uri))))
+      paths.add(OPDSAcquisitionPath(source, listOf(OPDSAcquisitionPathElement(source.type, source.uri, source.properties))))
     } else {
       for (indirect in source.indirectAcquisitions) {
         paths.addAll(
           this.indirectPaths(source, indirect)
-            .map { path -> path.prefixWith(source.type, source.uri) }
+            .map { path -> path.prefixWith(source.type, source.uri, source.properties) }
         )
       }
     }

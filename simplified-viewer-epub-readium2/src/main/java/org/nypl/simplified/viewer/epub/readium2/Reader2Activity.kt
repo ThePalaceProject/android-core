@@ -46,6 +46,7 @@ import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.analytics.api.AnalyticsEvent
 import org.nypl.simplified.analytics.api.AnalyticsType
 import org.nypl.simplified.books.api.BookDRMInformation
+import org.nypl.simplified.lcp.LCPContentProtectionProvider
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.reader.bookmarks.api.ReaderBookmarkServiceType
 import org.nypl.simplified.ui.thread.api.UIThreadServiceType
@@ -193,6 +194,22 @@ class Reader2Activity : AppCompatActivity() {
   private fun startReader() {
     this.uiThread.checkIsUIThread()
 
+    val bookFile =
+      when (val drmInfo = this.parameters.drmInfo) {
+        is BookDRMInformation.ACS ->
+          AdobeAdeptFileAsset(
+            fileAsset = FileAsset(this.parameters.file),
+            adobeRightsFile = drmInfo.rights?.first
+          )
+        is BookDRMInformation.AXIS ->
+          AxisNowFileAsset(
+            fileAsset = FileAsset(this.parameters.file),
+            axisLicense = drmInfo.license,
+            axisUserKey = drmInfo.userKey
+          )
+        else -> FileAsset(this.parameters.file)
+      }
+
     /*
      * Instantiate any content protections that might be needed for DRM...
      */
@@ -200,6 +217,20 @@ class Reader2Activity : AppCompatActivity() {
     val contentProtections =
       this.contentProtectionProviders.mapNotNull { provider ->
         this.logger.debug("instantiating content protection provider {}", provider.javaClass.canonicalName)
+
+        /*
+         * XXX: It's unpleasant to have to special-case like this, but we don't control the
+         * org.nypl.drm.core.ContentProtectionProvider interface. When LCP is implemented upstream,
+         * all of those interfaces can be upgraded to properly support passing in credentials.
+         */
+
+        if (provider is LCPContentProtectionProvider) {
+          when (val drmInfo = this.parameters.drmInfo) {
+            is BookDRMInformation.LCP ->
+              provider.passphrase = drmInfo.hashedPassphrase
+          }
+        }
+
         provider.create(this)
       }
 
@@ -221,22 +252,6 @@ class Reader2Activity : AppCompatActivity() {
           .preferences()
           .readerPreferences
       )
-
-    val bookFile =
-      when (val drmInfo = this.parameters.drmInfo) {
-        is BookDRMInformation.ACS ->
-          AdobeAdeptFileAsset(
-            fileAsset = FileAsset(this.parameters.file),
-            adobeRightsFile = drmInfo.rights?.first
-          )
-        is BookDRMInformation.AXIS ->
-          AxisNowFileAsset(
-            fileAsset = FileAsset(this.parameters.file),
-            axisLicense = drmInfo.license,
-            axisUserKey = drmInfo.userKey
-          )
-        else -> FileAsset(this.parameters.file)
-      }
 
     val readerParameters =
       SR2ReaderParameters(

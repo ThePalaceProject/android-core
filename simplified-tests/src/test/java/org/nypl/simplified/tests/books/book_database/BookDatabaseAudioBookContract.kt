@@ -84,7 +84,8 @@ abstract class BookDatabaseAudioBookContract {
         ACQUISITION_BORROW,
         URI.create("http://example.com"),
         StandardFormatNames.genericAudioBooks.first(),
-        emptyList()
+        emptyList(),
+        emptyMap()
       )
     )
     return eb.build()

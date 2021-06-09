@@ -89,6 +89,7 @@ import org.nypl.simplified.tests.mocking.MockBookFormatSupport
 import org.nypl.simplified.tests.mocking.MockBorrowSubtaskDirectory
 import org.nypl.simplified.tests.mocking.MockBundledContentResolver
 import org.nypl.simplified.tests.mocking.MockContentResolver
+import org.nypl.simplified.tests.mocking.MockLCPService
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URI
@@ -129,6 +130,7 @@ class BorrowTaskTest {
   private lateinit var cacheDirectory: File
   private lateinit var contentResolver: ContentResolverType
   private lateinit var httpClient: LSHTTPClientType
+  private lateinit var lcpService: MockLCPService
   private lateinit var opdsEmptyFeedEntry: OPDSAcquisitionFeedEntry
   private lateinit var opdsOpenEPUBFeedEntry: OPDSAcquisitionFeedEntry
   private lateinit var profile: ProfileType
@@ -155,8 +157,8 @@ class BorrowTaskTest {
     return BorrowTask.createBorrowTask(
       requirements = BorrowRequirements(
         adobeExecutor = this.adobeExecutor,
-        axisNowService = this.axisNowService,
         audioBookManifestStrategies = this.audioBookManifestStrategies,
+        axisNowService = this.axisNowService,
         bookFormatSupport = this.bookFormatSupport,
         bookRegistry = this.bookRegistry,
         bundledContent = this.bundledContent,
@@ -164,6 +166,7 @@ class BorrowTaskTest {
         clock = { Instant.now() },
         contentResolver = this.contentResolver,
         httpClient = this.httpClient,
+        lcpService = this.lcpService,
         profiles = this.profiles,
         services = this.services,
         subtasks = this.subtasks,
@@ -322,6 +325,8 @@ class BorrowTaskTest {
       MockAdobeAdeptExecutor(this.adobeExecutorService, this.adobeConnector)
     this.axisNowService =
       MockAxisNowService()
+    this.lcpService =
+      MockLCPService()
   }
 
   @AfterEach

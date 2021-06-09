@@ -39,6 +39,8 @@ public final class OPDSFeedConstants {
   public static final String SIMPLIFIED_URI_TEXT;
   public static final URI AUTHENTICATION_DOCUMENT_RELATION_URI;
   public static final String AUTHENTICATION_DOCUMENT_RELATION_URI_TEXT;
+  public static final URI LCP_URI;
+  public static final String LCP_URI_TEXT;
 
   static {
     ATOM_URI = NullCheck.notNull(URI.create("http://www.w3.org/2005/Atom"));
@@ -116,6 +118,10 @@ public final class OPDSFeedConstants {
     ANNOTATION_URI_TEXT =
       NullCheck.notNull(OPDSFeedConstants.ANNOTATION_URI.toString());
 
+    LCP_URI =
+      NullCheck.notNull(URI.create("http://readium.org/lcp-specs/ns"));
+    LCP_URI_TEXT =
+      NullCheck.notNull(LCP_URI.toString());
   }
 
   private OPDSFeedConstants() {

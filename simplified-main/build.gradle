@@ -39,6 +39,7 @@ dependencies {
   api project(":simplified-crashlytics-api")
   api project(":simplified-documents")
   api project(":simplified-files")
+  api project(":simplified-lcp")
   api project(":simplified-metrics")
   api project(":simplified-metrics-api")
   api project(":simplified-networkconnectivity")
@@ -76,6 +77,7 @@ dependencies {
   api libraries.nypl_http_api
   api libraries.nypl_http_bearer_token
   api libraries.nypl_http_vanilla
+  api libraries.r2_lcp
   api libraries.rxandroid2
   api libraries.rxjava2
   api libraries.rxjava2extensions

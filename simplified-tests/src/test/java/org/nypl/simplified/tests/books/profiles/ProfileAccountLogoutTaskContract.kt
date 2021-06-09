@@ -110,7 +110,8 @@ abstract class ProfileAccountLogoutTaskContract {
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
         URI.create("http://www.example.com/0.feed"),
         MIMEParser.parseRaisingException("application/epub+zip"),
-        listOf()
+        listOf(),
+        mapOf()
       )
 
     val opdsEntry =

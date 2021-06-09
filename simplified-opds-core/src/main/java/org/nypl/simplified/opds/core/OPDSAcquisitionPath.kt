@@ -20,10 +20,11 @@ data class OPDSAcquisitionPath(
 
   fun prefixWith(
     mime: MIMEType,
-    target: URI?
+    target: URI?,
+    properties: Map<String, String>
   ): OPDSAcquisitionPath {
     val newElements = mutableListOf<OPDSAcquisitionPathElement>()
-    newElements.add(OPDSAcquisitionPathElement(mime, target))
+    newElements.add(OPDSAcquisitionPathElement(mime, target, properties))
     newElements.addAll(this.elements)
     return OPDSAcquisitionPath(this.source, newElements.toList())
   }

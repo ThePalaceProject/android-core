@@ -195,7 +195,8 @@ class Simply3635Test {
           supportsPDF = false,
           supportsAdobeDRM = false,
           supportsAudioBooks = null,
-          supportsAxisNow = false
+          supportsAxisNow = false,
+          supportsLCP = false,
         )
       )
 
@@ -327,7 +328,8 @@ class Simply3635Test {
         OPDSAcquisition.Relation.ACQUISITION_OPEN_ACCESS,
         this.server.url("/book.epub").toUri(),
         StandardFormatNames.genericEPUBFiles,
-        listOf()
+        listOf(),
+        mapOf()
       )
 
     val bookEntry0 =

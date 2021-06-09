@@ -80,11 +80,14 @@ android {
   packagingOptions {
     doNotStrip 'lib/**/*.so'
 
-    // Readium and the PDF reader both provide this shared library. This causes
-    // the build to fail with an error because Gradle doesn't know which to pick.
-    pickFirst 'lib/x86/libc++_shared.so'
-    pickFirst 'lib/arm64-v8a/libc++_shared.so'
-    pickFirst 'lib/armeabi-v7a/libc++_shared.so'
+    /*
+     * Various components (R2, the PDF library, LCP, etc) include this shared library.
+     */
+
+    pickFirst "lib/arm64-v8a/libc++_shared.so"
+    pickFirst "lib/armeabi-v7a/libc++_shared.so"
+    pickFirst "lib/x86/libc++_shared.so"
+    pickFirst "lib/x86_64/libc++_shared.so"
   }
   signingConfigs {
     release {

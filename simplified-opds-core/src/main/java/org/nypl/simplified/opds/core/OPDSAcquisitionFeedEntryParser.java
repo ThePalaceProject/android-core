@@ -21,7 +21,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -41,6 +43,7 @@ import static org.nypl.simplified.opds.core.OPDSFeedConstants.DUBLIN_CORE_TERMS_
 import static org.nypl.simplified.opds.core.OPDSFeedConstants.GROUP_REL_TEXT;
 import static org.nypl.simplified.opds.core.OPDSFeedConstants.IMAGE_URI_TEXT;
 import static org.nypl.simplified.opds.core.OPDSFeedConstants.ISSUES_REL_TEXT;
+import static org.nypl.simplified.opds.core.OPDSFeedConstants.LCP_URI;
 import static org.nypl.simplified.opds.core.OPDSFeedConstants.OPDS_URI;
 import static org.nypl.simplified.opds.core.OPDSFeedConstants.RELATED_REL_TEXT;
 import static org.nypl.simplified.opds.core.OPDSFeedConstants.REVOKE_URI_TEXT;
@@ -225,11 +228,13 @@ public final class OPDSAcquisitionFeedEntryParser implements OPDSAcquisitionFeed
     try {
       final String attributeText =
         acquisition.getAttribute("type");
+      final Map<String, String> extraProperties =
+        consumeExtraAcquisitionProperties(acquisition);
       final MIMEType type =
         MIMEParser.Companion.parseRaisingException(attributeText);
       final List<OPDSIndirectAcquisition> next_acquisitions =
         parseIndirectAcquisitions(acquisition);
-      return new OPDSIndirectAcquisition(type, next_acquisitions);
+      return new OPDSIndirectAcquisition(type, next_acquisitions, extraProperties);
     } catch (final Exception e) {
       throw new OPDSParseException(e);
     }
@@ -276,8 +281,11 @@ public final class OPDSAcquisitionFeedEntryParser implements OPDSAcquisitionFeed
             typeAttributeWithSupportedValue(link);
 
           if (typeOpt.isSome()) {
+            final Map<String, String> extraProperties =
+              consumeExtraAcquisitionProperties(link);
             final MIMEType type = ((Some<MIMEType>) typeOpt).get();
-            final OPDSAcquisition acquisition = new OPDSAcquisition(v, href, type, indirects);
+            final OPDSAcquisition acquisition =
+              new OPDSAcquisition(v, href, type, indirects, extraProperties);
             entry_builder.addAcquisition(acquisition);
 
             if (v == Relation.ACQUISITION_OPEN_ACCESS) {
@@ -292,6 +300,15 @@ public final class OPDSAcquisitionFeedEntryParser implements OPDSAcquisitionFeed
 
       tryConsumeDRMLicensorInformation(entry_builder, link);
     }
+  }
+
+  private static Map<String, String> consumeExtraAcquisitionProperties(Element link) {
+    final HashMap<String, String> properties = new HashMap<String, String>();
+
+    OPDSXML.getFirstChildElementTextWithNameOptional(link, LCP_URI, "hashed_passphrase")
+      .map_(x -> properties.put("lcp:hashed_passphrase", x));
+
+    return properties;
   }
 
   private void parseCategories(

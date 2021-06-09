@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -48,7 +49,18 @@ public final class OPDSJSONSerializer implements OPDSJSONSerializerType {
     node.put("type", a.getRelation().toString());
     node.put("uri", a.getUri().toString());
     node.put("content_type", a.getType().getFullType());
+    node.put("properties", serializeProperties(a.getProperties()));
     node.set("indirect_acquisitions", serializeIndirectAcquisitions(a.getIndirectAcquisitions()));
+    return node;
+  }
+
+  private ObjectNode serializeProperties(
+    final Map<String, String> properties) {
+    final ObjectMapper jom = new ObjectMapper();
+    final ObjectNode node = jom.createObjectNode();
+    for (final Map.Entry<String, String> entry : properties.entrySet()) {
+      node.put(entry.getKey(), entry.getValue());
+    }
     return node;
   }
 
@@ -79,6 +91,7 @@ public final class OPDSJSONSerializer implements OPDSJSONSerializerType {
     node.put("type", indirect.getType().getFullType());
     node.set("indirect_acquisitions",
       serializeIndirectAcquisitions(indirect.getIndirectAcquisitions()));
+    node.put("properties", serializeProperties(indirect.getProperties()));
     return node;
   }
 

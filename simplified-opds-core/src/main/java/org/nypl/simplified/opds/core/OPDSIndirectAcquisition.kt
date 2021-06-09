@@ -21,7 +21,14 @@ data class OPDSIndirectAcquisition(
    * Zero or more nested indirect acquisitions.
    */
 
-  val indirectAcquisitions: List<OPDSIndirectAcquisition>
+  val indirectAcquisitions: List<OPDSIndirectAcquisition>,
+
+  /**
+   * Extra properties associated with the acquisition.
+   */
+
+  val properties: Map<String, String>
+
 ) : Serializable {
 
   /**

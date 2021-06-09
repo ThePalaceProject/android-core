@@ -124,7 +124,8 @@ abstract class BookDatabasePDFContract {
         ACQUISITION_BORROW,
         URI.create("http://example.com"),
         StandardFormatNames.genericPDFFiles,
-        emptyList()
+        emptyList(),
+        emptyMap()
       )
     )
     return eb.build()

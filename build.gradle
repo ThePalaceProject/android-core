@@ -95,8 +95,13 @@ subprojects { project ->
 
   repositories {
     mavenLocal()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     mavenCentral()
     google()
+
+    /*
+     * S3 repositories for restricted DRM artifacts.
+     */
 
     if (nyplDrmEnabled) {
       maven {
@@ -124,7 +129,21 @@ subprojects { project ->
       }
     }
 
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    /*
+     * LCP repository.
+     */
+
+    ivy {
+      name = "LCP"
+      url = uri('https://liblcp.dita.digital')
+      patternLayout {
+        artifact ("/[organisation]/[module]/android/aar/test/[revision].[ext]")
+      }
+      metadataSources {
+        artifact()
+      }
+    }
+
     maven { url "http://maven.findawayworld.com/artifactory/libs-release/" }
     maven { url "https://jitpack.io" }
     jcenter()

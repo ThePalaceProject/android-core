@@ -218,12 +218,14 @@ class BorrowAxisNowTest {
           OPDSAcquisition.Relation.ACQUISITION_GENERIC,
           this.webServer.url("/book").toUri(),
           axisNow,
-          listOf()
+          listOf(),
+          emptyMap()
         ),
         listOf(
           OPDSAcquisitionPathElement(
             axisNow,
-            this.webServer.url("/book").toUri()
+            this.webServer.url("/book").toUri(),
+            emptyMap()
           )
         )
       )
@@ -232,7 +234,7 @@ class BorrowAxisNowTest {
       listOf()
 
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(axisNow, null)
+      OPDSAcquisitionPathElement(axisNow, null, emptyMap())
   }
 
   private fun recordBookEvent(event: BookStatusEvent) {

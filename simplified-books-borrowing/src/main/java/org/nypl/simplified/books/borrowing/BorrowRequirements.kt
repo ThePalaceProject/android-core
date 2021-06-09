@@ -12,6 +12,7 @@ import org.nypl.simplified.books.bundled.api.BundledContentResolverType
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
+import org.readium.r2.lcp.LcpService
 import java.io.File
 
 /**
@@ -20,8 +21,8 @@ import java.io.File
 
 data class BorrowRequirements(
   val adobeExecutor: AdobeAdeptExecutorType?,
-  val axisNowService: AxisNowServiceType?,
   val audioBookManifestStrategies: AudioBookManifestStrategiesType,
+  val axisNowService: AxisNowServiceType?,
   val bookFormatSupport: BookFormatSupportType,
   val bookRegistry: BookRegistryType,
   val bundledContent: BundledContentResolverType,
@@ -29,6 +30,7 @@ data class BorrowRequirements(
   val clock: () -> Instant,
   val contentResolver: ContentResolverType,
   val httpClient: LSHTTPClientType,
+  val lcpService: LcpService?,
   val profiles: ProfilesDatabaseType,
   val services: ServiceDirectoryType,
   val subtasks: BorrowSubtaskDirectoryType,
@@ -44,8 +46,8 @@ data class BorrowRequirements(
     ): BorrowRequirements {
       return BorrowRequirements(
         adobeExecutor = services.optionalService(AdobeAdeptExecutorType::class.java),
-        axisNowService = services.optionalService(AxisNowServiceType::class.java),
         audioBookManifestStrategies = services.requireService(AudioBookManifestStrategiesType::class.java),
+        axisNowService = services.optionalService(AxisNowServiceType::class.java),
         bookFormatSupport = services.requireService(BookFormatSupportType::class.java),
         bookRegistry = services.requireService(BookRegistryType::class.java),
         bundledContent = services.requireService(BundledContentResolverType::class.java),
@@ -53,6 +55,7 @@ data class BorrowRequirements(
         clock = clock,
         contentResolver = services.requireService(ContentResolverType::class.java),
         httpClient = services.requireService(LSHTTPClientType::class.java),
+        lcpService = services.optionalService(LcpService::class.java),
         profiles = services.requireService(ProfilesDatabaseType::class.java),
         services = services,
         subtasks = services.requireService(BorrowSubtaskDirectoryType::class.java),

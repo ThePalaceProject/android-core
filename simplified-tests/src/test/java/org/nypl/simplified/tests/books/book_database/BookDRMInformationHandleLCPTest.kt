@@ -13,6 +13,7 @@ import java.io.File
 
 class BookDRMInformationHandleLCPTest {
 
+  private var updates: Int = 0
   private lateinit var directory1: File
   private lateinit var directory0: File
 
@@ -20,12 +21,17 @@ class BookDRMInformationHandleLCPTest {
   fun testSetup() {
     this.directory0 = TestDirectories.temporaryDirectory()
     this.directory1 = TestDirectories.temporaryDirectory()
+    this.updates = 0
   }
 
   @AfterEach
   fun testTearDown() {
     DirectoryUtilities.directoryDelete(this.directory0)
     DirectoryUtilities.directoryDelete(this.directory1)
+  }
+
+  private fun countUpdateCalls() {
+    this.updates += 1
   }
 
   /**
@@ -39,7 +45,8 @@ class BookDRMInformationHandleLCPTest {
     val handle =
       BookDRMInformationHandleLCP(
         directory = this.directory0,
-        format = BOOK_FORMAT_EPUB
+        format = BOOK_FORMAT_EPUB,
+        onUpdate = this::countUpdateCalls
       )
     assertEquals("LCP", File(this.directory0, "epub-drm.txt").readText())
   }
@@ -55,8 +62,39 @@ class BookDRMInformationHandleLCPTest {
     val handle =
       BookDRMInformationHandleLCP(
         directory = this.directory0,
-        format = BOOK_FORMAT_PDF
+        format = BOOK_FORMAT_PDF,
+        onUpdate = this::countUpdateCalls
       )
     assertEquals("LCP", File(this.directory0, "pdf-drm.txt").readText())
+  }
+
+  /**
+   * Creating a handle from an empty directory yields an empty handle.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  fun testSetPassphrase() {
+    val handle0 =
+      BookDRMInformationHandleLCP(
+        directory = this.directory0,
+        format = BOOK_FORMAT_EPUB,
+        onUpdate = this::countUpdateCalls
+      )
+
+    handle0.setHashedPassphrase("VGhlIFNpeHRlZW4gTWVuIE9mIFRhaW4K")
+    assertEquals("VGhlIFNpeHRlZW4gTWVuIE9mIFRhaW4K", handle0.info.hashedPassphrase)
+    assertEquals(1, this.updates)
+
+    val handle1 =
+      BookDRMInformationHandleLCP(
+        directory = this.directory0,
+        format = BOOK_FORMAT_EPUB,
+        onUpdate = this::countUpdateCalls
+      )
+
+    assertEquals("VGhlIFNpeHRlZW4gTWVuIE9mIFRhaW4K", handle1.info.hashedPassphrase)
+    assertEquals(1, this.updates)
   }
 }
