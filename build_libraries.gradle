@@ -1,4 +1,4 @@
-ext.kotlin_version = '1.4.20'
+ext.kotlin_version = '1.4.31'
 ext.android_build_tools_version = '29.0.3'
 ext.android_compile_sdk_version = 29
 ext.android_target_sdk_version = 29
@@ -40,7 +40,7 @@ ext.versions = [
   joda_time                     : '2.9.9',
   junit                         : '4.12',
   junit_jupiter                 : '5.7.1',
-  kotlin_coroutines             : "1.3.7",
+  kotlin_coroutines             : '1.4.3',
   leak_canary                   : '2.1',
   logback_android               : '2.0.0',
   logback_classic               : '1.2.3',
@@ -62,8 +62,9 @@ ext.versions = [
   pandora_bottom_navigator      : 'ec834b9',
   picasso                       : '2.71828',
   r2_lcp                        : 'fa842f73ecb32422ebcd6836b7fafb7a4db3fd25',
-  r2_opds                       : '2.0.0-beta.2',
-  r2_shared                     : '2.0.0-beta.2',
+  r2_opds                       : 'a29b0936d0a6f2805d2d5dfe941063413ce98c56',
+  r2_shared                     : 'c11335b19d5754b4bb278d7d4b120755657a75fc',
+  r2_streamer                   : 'f92f8ce5b765d9cb1d7916a95215fb797230e146',
   readium_lcp                   : '1.0.0',
   retrofit2                     : '2.8.1',
   robolectric                   : '4.4',
@@ -117,8 +118,11 @@ ext.libraries = [
   junit_jupiter_api                        : "org.junit.jupiter:junit-jupiter-api:${versions.junit_jupiter}",
   junit_jupiter_engine                     : "org.junit.jupiter:junit-jupiter-engine:${versions.junit_jupiter}",
   kotlin_coroutines                        : "org.jetbrains.kotlinx:kotlinx-coroutines-core:${versions.kotlin_coroutines}",
+  kotlin_coroutines_android                : "org.jetbrains.kotlinx:kotlinx-coroutines-android:${versions.kotlin_coroutines}",
   kotlin_reflect                           : "org.jetbrains.kotlin:kotlin-reflect:${kotlin_version}",
   kotlin_stdlib                            : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlin_version}",
+  kotlin_stdlib_common                     : "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}",
+  kotlin_stdlib_jdk7                       : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${kotlin_version}",
   koush_async                              : "com.koushikdutta.async:androidasync:${versions.koush_async}",
   leak_canary                              : "com.squareup.leakcanary:leakcanary-android:${versions.leak_canary}",
   logback_android                          : "com.github.tony19:logback-android:${versions.logback_android}",
@@ -163,6 +167,7 @@ ext.libraries = [
   r2_lcp                                   : "com.github.readium:r2-lcp-kotlin:${versions.r2_lcp}",
   r2_opds                                  : "com.github.readium:r2-opds-kotlin:${versions.r2_opds}",
   r2_shared                                : "com.github.readium:r2-shared-kotlin:${versions.r2_shared}",
+  r2_streamer                              : "com.github.readium:r2-streamer-kotlin:${versions.r2_streamer}",
   readium_lcp                              : "readium:liblcp:${versions.readium_lcp}@aar",
   retrofit2                                : "com.squareup.retrofit2:retrofit:${versions.retrofit2}",
   retrofit2_moshi                          : "com.squareup.retrofit2:converter-moshi:${versions.retrofit2}",

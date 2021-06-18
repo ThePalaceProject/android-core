@@ -54,6 +54,30 @@ subprojects {
   configurations.all {
     resolutionStrategy.force libraries.slf4j
   }
+
+  /*
+   * Ensure consistent R2 module versions.
+   */
+
+  configurations.all {
+    resolutionStrategy.force libraries.r2_lcp
+    resolutionStrategy.force libraries.r2_opds
+    resolutionStrategy.force libraries.r2_shared
+    resolutionStrategy.force libraries.r2_streamer
+  }
+
+  /*
+   * Ensure consistent Kotlin versions.
+   */
+
+  configurations.all {
+    resolutionStrategy.force libraries.kotlin_coroutines
+    resolutionStrategy.force libraries.kotlin_coroutines_android
+    resolutionStrategy.force libraries.kotlin_reflect
+    resolutionStrategy.force libraries.kotlin_stdlib
+    resolutionStrategy.force libraries.kotlin_stdlib_common
+    resolutionStrategy.force libraries.kotlin_stdlib_jdk7
+  }
 }
 
 subprojects { project ->
