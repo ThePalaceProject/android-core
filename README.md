@@ -125,7 +125,7 @@ Maven repository on S3. If you wish to use these packages, you need to obtain
 S3 credentials and then tell Gradle to use them.
 
 S3 credentials can be obtained by emailing `Jonathan.Green@lyrasis.org`
-or by asking in the `#library-simplified` channel of
+or by asking in the `#palace-project-tech` channel of
 [lyrasis.slack.com](https://lyrasis.slack.com).
 
 Once you have your credentials, the following lines must be added to `$HOME/.gradle/gradle.properties`:
