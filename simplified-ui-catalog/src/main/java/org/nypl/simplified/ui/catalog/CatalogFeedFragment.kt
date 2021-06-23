@@ -255,7 +255,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
         true
       }
       android.R.id.home -> {
-        if (this.viewModel.isAccountCatalogRoot()) {
+        if (this.viewModel.isAccountCatalogRoot() || this.viewModel.showCurrentLibrary()) {
           this.openAccountPickerDialog()
           true
         } else {
@@ -467,7 +467,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
     }
 
     try {
-      if (this.viewModel.isAccountCatalogRoot()) {
+      if (this.viewModel.isAccountCatalogRoot() || this.viewModel.showCurrentLibrary()) {
         showAccountPickerAction()
       }
     } catch (e: Exception) {

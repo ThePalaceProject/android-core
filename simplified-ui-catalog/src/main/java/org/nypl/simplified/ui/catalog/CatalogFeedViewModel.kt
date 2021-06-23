@@ -613,6 +613,12 @@ class CatalogFeedViewModel(
     return account.feedIsRoot(parameters.feedURI)
   }
 
+  fun showCurrentLibrary(): Boolean {
+    val ownedByAccount = this.feedArguments.ownership is CatalogFeedOwnership.OwnedByAccount
+    val showAll = buildConfiguration.showBooksFromAllAccounts
+    return !showAll && ownedByAccount
+  }
+
   /**
    * Set synthesized birthdate based on if user is over 13
    */
