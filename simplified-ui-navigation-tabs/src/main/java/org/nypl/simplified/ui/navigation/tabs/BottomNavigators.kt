@@ -200,10 +200,14 @@ object BottomNavigators {
         pickDefaultAccount(profilesController, defaultProvider).id
       }
 
+    val ownership =
+      if (filterAccountId == null) CatalogFeedOwnership.CollectedFromAccounts
+      else CatalogFeedOwnership.OwnedByAccount(filterAccountId)
+
     return CatalogFeedFragment.create(
       CatalogFeedArguments.CatalogFeedArgumentsLocalBooks(
         filterAccount = filterAccountId,
-        ownership = CatalogFeedOwnership.CollectedFromAccounts,
+        ownership = ownership,
         searchTerms = null,
         selection = FeedBooksSelection.BOOKS_FEED_HOLDS,
         sortBy = FeedFacet.FeedFacetPseudo.Sorting.SortBy.SORT_BY_TITLE,
@@ -232,10 +236,14 @@ object BottomNavigators {
         pickDefaultAccount(profilesController, defaultProvider).id
       }
 
+    val ownership =
+      if (filterAccountId == null) CatalogFeedOwnership.CollectedFromAccounts
+      else CatalogFeedOwnership.OwnedByAccount(filterAccountId)
+
     return CatalogFeedFragment.create(
       CatalogFeedArguments.CatalogFeedArgumentsLocalBooks(
         filterAccount = filterAccountId,
-        ownership = CatalogFeedOwnership.CollectedFromAccounts,
+        ownership = ownership,
         searchTerms = null,
         selection = FeedBooksSelection.BOOKS_FEED_LOANED,
         sortBy = FeedFacet.FeedFacetPseudo.Sorting.SortBy.SORT_BY_TITLE,
