@@ -6,13 +6,19 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TableLayout
 import android.widget.TableRow
 import android.widget.TextView
+import android.widget.TextView.BufferType.EDITABLE
 import android.widget.Toast
+import android.widget.Toast.LENGTH_LONG
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import org.librarysimplified.services.api.Services
+import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryDebugging
+import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.adobe.extensions.AdobeDRMExtensions
 import org.nypl.simplified.android.ktx.supportActionBar
 import org.nypl.simplified.listeners.api.FragmentListenerType
@@ -28,10 +34,15 @@ import org.slf4j.LoggerFactory
 
 class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
 
-  private val logger = LoggerFactory.getLogger(SettingsDebugFragment::class.java)
+  private val LIBRARY_REGISTRY_DEBUG_PROPERTY =
+    "org.nypl.simplified.accounts.source.nyplregistry.baseServerOverride"
+  private val logger =
+    LoggerFactory.getLogger(SettingsDebugFragment::class.java)
+
   private val viewModel: SettingsDebugViewModel by viewModels()
   private val listener: FragmentListenerType<SettingsDebugEvent> by fragmentListeners()
 
+  private lateinit var accountRegistry: AccountProviderRegistryType
   private lateinit var adobeDRMActivationTable: TableLayout
   private lateinit var cacheButton: Button
   private lateinit var cardCreatorFakeLocation: SwitchCompat
@@ -42,6 +53,9 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
   private lateinit var failNextBoot: SwitchCompat
   private lateinit var forgetAnnouncementsButton: Button
   private lateinit var hasSeenLibrarySelection: SwitchCompat
+  private lateinit var libraryRegistryClear: Button
+  private lateinit var libraryRegistryEntry: EditText
+  private lateinit var libraryRegistrySet: Button
   private lateinit var sendAnalyticsButton: Button
   private lateinit var sendReportButton: Button
   private lateinit var showErrorButton: Button
@@ -84,6 +98,12 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
       view.findViewById(R.id.settingsVersionDevCustomOPDS)
     this.crashlyticsId =
       view.findViewById(R.id.settingsVersionCrashlyticsID)
+    this.libraryRegistryClear =
+      view.findViewById(R.id.libraryRegistryOverrideClear)
+    this.libraryRegistryEntry =
+      view.findViewById(R.id.libraryRegistryOverrideBase)
+    this.libraryRegistrySet =
+      view.findViewById(R.id.libraryRegistryOverrideSet)
 
     this.drmTable.addView(
       this.createDrmSupportRow("Adobe Acs", this.viewModel.adeptSupported)
@@ -110,6 +130,13 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
       this.viewModel.showOnlySupportedBooks
     this.crashlyticsId.text =
       this.viewModel.crashlyticsId
+  }
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+
+    this.accountRegistry =
+      Services.serviceDirectory().requireService(AccountProviderRegistryType::class.java)
   }
 
   override fun onStart() {
@@ -206,6 +233,42 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
 
     this.customOPDS.setOnClickListener {
       this.listener.post(SettingsDebugEvent.OpenCustomOPDS)
+    }
+
+    this.configureLibraryRegistryCustomUI()
+  }
+
+  /**
+   * Configure the UI for setting custom library registry servers.
+   */
+
+  private fun configureLibraryRegistryCustomUI() {
+    this.libraryRegistryClear.setOnClickListener {
+      AccountProviderRegistryDebugging.clearProperty(LIBRARY_REGISTRY_DEBUG_PROPERTY)
+      this.libraryRegistryEntry.setText("", EDITABLE)
+    }
+
+    this.libraryRegistrySet.setOnClickListener {
+      val target = this.libraryRegistryEntry.text.toString()
+      this.logger.debug("set custom library registry server: {}", target)
+
+      AccountProviderRegistryDebugging.setProperty(
+        name = LIBRARY_REGISTRY_DEBUG_PROPERTY,
+        value = target
+      )
+
+      this.accountRegistry.clear()
+
+      Toast.makeText(
+        this.requireContext(),
+        "Set custom library registry base: '$target' and cleared cache",
+        LENGTH_LONG
+      ).show()
+    }
+
+    val customServer = AccountProviderRegistryDebugging.property(LIBRARY_REGISTRY_DEBUG_PROPERTY)
+    if (customServer != null) {
+      this.libraryRegistryEntry.setText(customServer, EDITABLE)
     }
   }
 

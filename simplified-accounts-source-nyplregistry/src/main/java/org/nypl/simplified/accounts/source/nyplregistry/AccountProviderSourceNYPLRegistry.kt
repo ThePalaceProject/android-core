@@ -18,6 +18,7 @@ import org.nypl.simplified.accounts.api.AccountProviderResolutionListenerType
 import org.nypl.simplified.accounts.api.AccountProviderResolutionStringsType
 import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.api.AccountSearchQuery
+import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryDebugging
 import org.nypl.simplified.accounts.source.nyplregistry.AccountProviderSourceNYPLRegistryException.ServerConnectionFailure
 import org.nypl.simplified.accounts.source.nyplregistry.AccountProviderSourceNYPLRegistryException.ServerReturnedError
 import org.nypl.simplified.accounts.source.spi.AccountProviderSourceResolutionStrings
@@ -269,23 +270,44 @@ class AccountProviderSourceNYPLRegistry(
   }
 
   /**
+   * Decide which server URI to use based on debugging properties and whether or not to include
+   * testing libraries.
+   */
+
+  private fun decideRegistryURI(
+    includeTestingLibraries: Boolean
+  ): URI {
+    val debuggingBase =
+      AccountProviderRegistryDebugging.properties[
+        "org.nypl.simplified.accounts.source.nyplregistry.baseServerOverride"
+      ]
+    return if (debuggingBase != null) {
+      when (includeTestingLibraries) {
+        true -> URI.create("https://$debuggingBase/libraries/qa")
+        false -> URI.create("https://$debuggingBase/libraries")
+      }
+    } else {
+      when (includeTestingLibraries) {
+        true -> this.uriQA
+        false -> this.uriProduction
+      }
+    }
+  }
+
+  /**
    * Fetch a set of provider descriptions from the server.
    */
 
   private fun fetchServerResults(
     includeTestingLibraries: Boolean
   ): Map<URI, AccountProviderDescription> {
-    val results = if (includeTestingLibraries) {
-      this.logger.debug("fetching QA providers from ${this.uriQA}")
-      this.fetchAndParse(this.uriQA)
+    val targetURI = this.decideRegistryURI(includeTestingLibraries)
+    this.logger.debug("fetching QA providers from $targetURI")
+    val results =
+      this.fetchAndParse(targetURI)
         .providers
         .associateBy { it.id }
-    } else {
-      this.logger.debug("fetching providers from ${this.uriProduction}")
-      this.fetchAndParse(this.uriProduction)
-        .providers
-        .associateBy { it.id }
-    }
+
     this.logger.debug("categorizing ${results.size} providers")
     return results
   }

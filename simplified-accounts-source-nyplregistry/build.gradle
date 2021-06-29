@@ -1,5 +1,6 @@
 dependencies {
   api project(':simplified-accounts-api')
+  api project(':simplified-accounts-registry-api')
   api project(':simplified-accounts-source-spi')
 
   api libraries.io7m_jfunctional
