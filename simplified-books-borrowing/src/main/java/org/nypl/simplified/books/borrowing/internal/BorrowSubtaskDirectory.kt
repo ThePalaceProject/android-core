@@ -14,9 +14,10 @@ class BorrowSubtaskDirectory : BorrowSubtaskDirectoryType {
       BorrowAxisNow,
       BorrowBearerToken,
       BorrowCopy,
+      // BorrowSAMLDownload must precede BorrowDirectDownload in precedence.
+      BorrowSAMLDownload,
       BorrowDirectDownload,
       BorrowLCP,
-      BorrowLoanCreate,
-      BorrowSAMLDownload
+      BorrowLoanCreate
     )
 }

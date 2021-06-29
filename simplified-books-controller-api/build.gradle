@@ -4,6 +4,7 @@ dependencies {
   api project(":simplified-books-api")
   api project(":simplified-feeds-api")
 
+  implementation project(":simplified-books-borrowing")
   implementation libraries.kotlin_stdlib
   implementation libraries.kotlin_reflect
 

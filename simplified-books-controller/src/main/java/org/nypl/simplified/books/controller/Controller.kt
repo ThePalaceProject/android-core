@@ -33,6 +33,7 @@ import org.nypl.simplified.books.book_registry.BookWithStatus
 import org.nypl.simplified.books.borrowing.BorrowRequest
 import org.nypl.simplified.books.borrowing.BorrowRequirements
 import org.nypl.simplified.books.borrowing.BorrowTask
+import org.nypl.simplified.books.borrowing.SAMLDownloadContext
 import org.nypl.simplified.books.controller.api.BookRevokeStringResourcesType
 import org.nypl.simplified.books.controller.api.BooksControllerType
 import org.nypl.simplified.crashlytics.api.CrashlyticsServiceType
@@ -547,7 +548,8 @@ class Controller private constructor(
 
   override fun bookBorrow(
     accountID: AccountID,
-    entry: OPDSAcquisitionFeedEntry
+    entry: OPDSAcquisitionFeedEntry,
+    samlDownloadContext: SAMLDownloadContext?
   ): FluentFuture<TaskResult<*>> {
     return this.submitTask(
       Callable<TaskResult<*>> {
@@ -555,7 +557,8 @@ class Controller private constructor(
           BorrowRequest.Start(
             accountId = accountID,
             profileId = this.profileCurrent().id,
-            opdsAcquisitionFeedEntry = entry
+            opdsAcquisitionFeedEntry = entry,
+            samlDownloadContext = samlDownloadContext
           )
         BorrowTask.createBorrowTask(this.borrowRequirements, request)
           .execute()
