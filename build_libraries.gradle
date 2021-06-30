@@ -7,7 +7,7 @@ ext.android_min_sdk_version = 21
 // Dependency versions
 
 ext.versions = [
-  androidx_activity             : '1.1.0',
+  androidx_activity             : '1.2.3',
   androidx_appcompat            : '1.2.0',
   androidx_cardview             : '1.0.0',
   androidx_constraintlayout     : '1.1.3',
@@ -57,7 +57,7 @@ ext.versions = [
   nypl_overdrive                : '1.0.3',
   nypl_pdf                      : '0.1.0',
   nypl_readium                  : '0.30.0',
-  nypl_readium2                 : '0.0.19',
+  nypl_readium2                 : '0.0.20',
   okhttp3                       : '4.8.1',
   pandora_bottom_navigator      : 'ec834b9',
   picasso                       : '2.71828',

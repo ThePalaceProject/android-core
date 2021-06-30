@@ -223,7 +223,7 @@ internal class MainFragmentListenerDelegate(
     state: MainFragmentState
   ): MainFragmentState {
     return when (event) {
-      AccountListRegistryEvent.AccountCreated -> {
+      is AccountListRegistryEvent.AccountCreated -> {
         this.popBackStack()
         state
       }
@@ -516,6 +516,7 @@ internal class MainFragmentListenerDelegate(
   }
 
   private fun openCatalogAfterAuthentication() {
+    this.navigator.popBackStack()
     this.navigator.reset(R.id.tabCatalog, false)
   }
 

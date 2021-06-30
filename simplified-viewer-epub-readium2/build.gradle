@@ -1,4 +1,5 @@
 dependencies {
+  implementation project(":simplified-accessibility")
   implementation project(":simplified-analytics-api")
   implementation project(":simplified-feeds-api")
   implementation project(":simplified-lcp")
