@@ -2,8 +2,10 @@ package org.nypl.simplified.tests.books.borrowing
 
 import android.content.Context
 import io.reactivex.disposables.Disposable
+import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
+import okhttp3.mockwebserver.RecordedRequest
 import org.joda.time.Instant
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
@@ -32,6 +34,7 @@ import org.nypl.simplified.books.book_registry.BookStatus.FailedDownload
 import org.nypl.simplified.books.book_registry.BookStatus.Loaned
 import org.nypl.simplified.books.book_registry.BookStatus.Loaned.LoanedDownloaded
 import org.nypl.simplified.books.book_registry.BookStatusEvent
+import org.nypl.simplified.books.borrowing.SAMLDownloadContext
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.httpConnectionFailed
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.httpContentTypeIncompatible
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.httpRequestFailed
@@ -321,7 +324,8 @@ class BorrowSAMLDownloadTest {
   }
 
   /**
-   * An HTML MIME type pauses the download to wait for external authentication.
+   * An HTML MIME type pauses the download to wait for external authentication when no SAML download
+   * context is present.
    */
 
   @Test
@@ -350,7 +354,48 @@ class BorrowSAMLDownloadTest {
   }
 
   /**
-   * A file is downloaded.
+   * An HTML MIME type fails the download when a SAML download context is present that indicates the
+   * SAML authentication is complete for this download.
+   */
+
+  @Test
+  fun testMIMEHTMLFailsWhenSAMLAuthComplete() {
+    val task = BorrowSAMLDownload.createSubtask()
+
+    this.context.currentURIField =
+      this.webServer.url("/book.epub").toUri()
+    this.context.currentAcquisitionPathElement =
+      OPDSAcquisitionPathElement(genericPDFFiles, null, emptyMap())
+    this.context.samlDownloadContext = SAMLDownloadContext(
+      isSAMLAuthComplete = true,
+      downloadURI = this.context.currentURICheck(),
+      authCompleteDownloadURI = this.context.currentURICheck()
+    )
+
+    val response =
+      MockResponse()
+        .setResponseCode(200)
+        .setHeader("Content-Type", "text/html")
+
+    this.webServer.enqueue(response)
+
+    try {
+      task.execute(this.context)
+      Assertions.fail()
+    } catch (e: Exception) {
+      this.logger.error("exception: ", e)
+    }
+
+    assertEquals(httpContentTypeIncompatible, this.taskRecorder.finishFailure<Unit>().lastErrorCode)
+    assertEquals(0, this.bookDatabaseEntry.entryWrites)
+
+    assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(FailedDownload::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(0, this.bookStates.size)
+  }
+
+  /**
+   * A PDF file is downloaded.
    */
 
   @Test
@@ -393,7 +438,7 @@ class BorrowSAMLDownloadTest {
   }
 
   /**
-   * A file is downloaded.
+   * An EPUB file is downloaded.
    */
 
   @Test
@@ -417,6 +462,57 @@ class BorrowSAMLDownloadTest {
         .setBody("EPUB!")
 
     this.webServer.enqueue(response)
+
+    task.execute(this.context)
+
+    this.verifyBookRegistryHasStatus(LoanedDownloaded::class.java)
+    assertEquals("EPUB!", this.epubHandle.bookData)
+    assertEquals(0, this.bookDatabaseEntry.entryWrites)
+
+    assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(LoanedDownloaded::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(0, this.bookStates.size)
+  }
+
+  /**
+   * When a SAML authentication is complete, the file is downloaded from the authenticated URL in
+   * the SAML download context instead of the original URL.
+   */
+
+  @Test
+  fun testDownloadUsesAuthenticatedURL() {
+    val task = BorrowSAMLDownload.createSubtask()
+
+    this.context.currentURIField =
+      this.webServer.url("/original/book.epub").toUri()
+    this.context.currentAcquisitionPathElement =
+      OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
+    this.context.samlDownloadContext = SAMLDownloadContext(
+      isSAMLAuthComplete = true,
+      downloadURI = this.context.currentURICheck(),
+      authCompleteDownloadURI = this.webServer.url("/authenticated/book.epub").toUri()
+    )
+
+    this.bookDatabaseEntry.formatHandlesField.clear()
+    this.bookDatabaseEntry.formatHandlesField.add(this.epubHandle)
+    check(this.bookDatabaseEntry.formatHandlesField.size == 1)
+    check(BookStatus.fromBook(this.bookDatabaseEntry.book) is Loaned)
+
+    this.webServer.dispatcher = object : Dispatcher() {
+      override fun dispatch(request: RecordedRequest): MockResponse =
+        if (request.requestUrl!!.pathSegments.contains("authenticated")) {
+          MockResponse()
+            .setResponseCode(200)
+            .setHeader("Content-Type", "application/epub+zip")
+            .setBody("EPUB!")
+        } else {
+          MockResponse()
+            .setResponseCode(404)
+            .setBody("Wrong!")
+        }
+    }
 
     task.execute(this.context)
 
