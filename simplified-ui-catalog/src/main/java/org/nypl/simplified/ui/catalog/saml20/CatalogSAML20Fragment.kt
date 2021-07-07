@@ -66,7 +66,7 @@ class CatalogSAML20Fragment : Fragment(R.layout.book_saml20) {
     this.webView.webChromeClient = CatalogSAML20ChromeClient(this.progress)
     this.webView.webViewClient = this.viewModel.webViewClient
     this.webView.settings.javaScriptEnabled = true
-    this.webView.setDownloadListener { _, _, _, mime, _ -> this.viewModel.downloadStarted(mime) }
+    this.webView.setDownloadListener { url, _, _, mime, _ -> this.viewModel.downloadStarted(url, mime) }
 
     this.viewModel.webviewRequest.observe(this.viewLifecycleOwner) {
       this.webView.loadUrl(it.url, it.headers)

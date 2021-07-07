@@ -162,7 +162,7 @@ class BorrowTask private constructor(
     this.account = this.findAccount(profile, bookInitial)
     val book = this.createBookDatabaseEntry(bookInitial, start.opdsAcquisitionFeedEntry)
     val path = this.pickAcquisitionPath(book, start.opdsAcquisitionFeedEntry)
-    this.executeSubtasksForPath(book, path)
+    this.executeSubtasksForPath(book, path, start.samlDownloadContext)
     return this.taskRecorder.finishSuccess(Unit)
   }
 
@@ -172,7 +172,8 @@ class BorrowTask private constructor(
 
   private fun executeSubtasksForPath(
     book: Book,
-    path: OPDSAcquisitionPath
+    path: OPDSAcquisitionPath,
+    samlDownloadContext: SAMLDownloadContext?
   ) {
     val context =
       BorrowContext(
@@ -193,6 +194,7 @@ class BorrowTask private constructor(
         httpClient = this.requirements.httpClient,
         logger = this.logger,
         opdsAcquisitionPath = path,
+        samlDownloadContext = samlDownloadContext,
         services = this.requirements.services,
         taskRecorder = this.taskRecorder,
         temporaryDirectory = this.requirements.temporaryDirectory
@@ -395,6 +397,7 @@ class BorrowTask private constructor(
     override val httpClient: LSHTTPClientType,
     override val taskRecorder: TaskRecorderType,
     override val opdsAcquisitionPath: OPDSAcquisitionPath,
+    override val samlDownloadContext: SAMLDownloadContext? = null,
     bookInitial: Book,
     private val bookRegistry: BookRegistryType,
     private val logger: Logger,

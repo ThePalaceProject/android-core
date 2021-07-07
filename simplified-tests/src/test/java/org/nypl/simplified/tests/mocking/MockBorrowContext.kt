@@ -14,6 +14,7 @@ import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookWithStatus
 import org.nypl.simplified.books.borrowing.BorrowContextType
 import org.nypl.simplified.books.borrowing.BorrowTimeoutConfiguration
+import org.nypl.simplified.books.borrowing.SAMLDownloadContext
 import org.nypl.simplified.books.bundled.api.BundledContentResolverType
 import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.opds.core.OPDSAcquisitionPath
@@ -40,7 +41,8 @@ class MockBorrowContext(
   override var taskRecorder: TaskRecorderType,
   override var isCancelled: Boolean,
   override var bookDatabaseEntry: BookDatabaseEntryType,
-  bookInitial: Book
+  override var samlDownloadContext: SAMLDownloadContext? = null,
+  bookInitial: Book,
 ) : BorrowContextType {
 
   var cacheDirectory = TestDirectories.temporaryDirectory()

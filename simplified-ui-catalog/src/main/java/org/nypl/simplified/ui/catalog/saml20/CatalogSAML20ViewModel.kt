@@ -17,6 +17,7 @@ import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookWithStatus
+import org.nypl.simplified.books.borrowing.SAMLDownloadContext
 import org.nypl.simplified.books.controller.api.BooksControllerType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.listeners.api.FragmentListenerType
@@ -29,6 +30,7 @@ import org.nypl.simplified.webview.WebViewUtilities
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.net.URI
 import java.net.URLEncoder
 import java.util.concurrent.atomic.AtomicReference
 
@@ -60,6 +62,7 @@ class CatalogSAML20ViewModel(
     MutableLiveData()
 
   private data class DownloadInfo(
+    val url: String?,
     val mimeType: String?
   )
 
@@ -179,6 +182,7 @@ class CatalogSAML20ViewModel(
     private val eventSubject: PublishSubject<WebClientEvent>,
     private val bookRegistry: BookRegistryType,
     private val bookID: BookID,
+    private val downloadURI: URI,
     private val downloadInfo: AtomicReference<DownloadInfo>,
     private val account: AccountType,
     private val webViewDataDir: File
@@ -218,11 +222,13 @@ class CatalogSAML20ViewModel(
       if (url.startsWith(AccountSAML20.callbackURI)) {
         val parsed = Uri.parse(url)
 
-        val mimeType = parsed.getQueryParameter("mimeType")
+        val downloadURL = parsed.getQueryParameter(("url"))!!
+        val mimeType = parsed.getQueryParameter("mimeType")!!
 
         this.logger.debug("obtained download info")
         this.downloadInfo.set(
           DownloadInfo(
+            url = downloadURL,
             mimeType = mimeType
           )
         )
@@ -256,6 +262,11 @@ class CatalogSAML20ViewModel(
           this.booksController.bookBorrow(
             accountID = book.account,
             entry = book.entry,
+            samlDownloadContext = SAMLDownloadContext(
+              isSAMLAuthComplete = true,
+              downloadURI = this.downloadURI,
+              authCompleteDownloadURI = URI(downloadURL)
+            )
           )
         }
 
@@ -295,6 +306,7 @@ class CatalogSAML20ViewModel(
       booksController = this.booksController,
       bookRegistry = this.bookRegistry,
       bookID = this.parameters.bookID,
+      downloadURI = this.parameters.downloadURI,
       downloadInfo = this.downloadInfo,
       account = this.account,
       webViewDataDir = this.webViewDataDir
@@ -305,10 +317,13 @@ class CatalogSAML20ViewModel(
     val headers: Map<String, String>
   )
 
-  fun downloadStarted(mimeType: String) {
+  fun downloadStarted(downloadURL: String, mimeType: String) {
     val url = buildString {
       this.append(AccountSAML20.callbackURI)
       this.append("?")
+      this.append("url=")
+      this.append(URLEncoder.encode(downloadURL, "utf-8"))
+      this.append("&")
       this.append("mimeType=")
       this.append(URLEncoder.encode(mimeType, "utf-8"))
     }

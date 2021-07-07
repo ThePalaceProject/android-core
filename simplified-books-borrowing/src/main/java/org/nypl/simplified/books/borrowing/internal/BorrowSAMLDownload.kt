@@ -53,6 +53,25 @@ class BorrowSAMLDownload private constructor() : BorrowSubtaskType {
       bytesPerSecond = 0L
     )
 
+    val samlDownloadContext = context.samlDownloadContext
+
+    /*
+     * If we're resuming this download after a SAML login was completed, retrieve the download URL
+     * that resulted from the external authentication.
+     */
+
+    if (
+      samlDownloadContext != null &&
+      samlDownloadContext.isSAMLAuthComplete &&
+      samlDownloadContext.downloadURI == context.currentURI()
+    ) {
+      val actualDownloadURI = samlDownloadContext.authCompleteDownloadURI
+
+      if (actualDownloadURI != null) {
+        context.receivedNewURI(actualDownloadURI)
+      }
+    }
+
     val cookieStore = createAccountCookieStore(context.account)
 
     BorrowHTTP.download(
@@ -99,10 +118,21 @@ class BorrowSAMLDownload private constructor() : BorrowSubtaskType {
     context: BorrowContextType,
     result: DownloadFailedUnacceptableMIME
   ) {
+    val samlDownloadContext = context.samlDownloadContext
+    val isSAMLAuthComplete = samlDownloadContext != null && samlDownloadContext.isSAMLAuthComplete
+
     val status = result.responseStatus as LSHTTPResponseStatus.Responded.OK
     val receivedType = status.properties.contentType
 
-    if (MIMECompatibility.isCompatibleLax(receivedType, loginPageContentType)) {
+    /*
+     * If we haven't completed a SAML login, and the mime type of the response is that of a login
+     * page, pause this download to perform the external authentication. Otherwise, fail.
+     */
+
+    if (
+      !isSAMLAuthComplete &&
+      MIMECompatibility.isCompatibleLax(receivedType, loginPageContentType)
+    ) {
       context.bookDownloadIsWaitingForExternalAuthentication()
     } else {
       throw BorrowSubtaskFailed()

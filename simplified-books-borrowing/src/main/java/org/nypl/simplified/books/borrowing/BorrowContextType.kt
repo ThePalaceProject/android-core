@@ -217,4 +217,10 @@ interface BorrowContextType {
    */
 
   fun bookLoanFailed()
+
+  /**
+   * Information about the current SAML download, if one is in progress.
+   */
+
+  val samlDownloadContext: SAMLDownloadContext?
 }

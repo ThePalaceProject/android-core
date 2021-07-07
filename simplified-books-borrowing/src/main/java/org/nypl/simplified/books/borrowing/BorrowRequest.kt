@@ -29,12 +29,19 @@ sealed class BorrowRequest {
   abstract val profileId: ProfileID
 
   /**
+   * Information about the current SAML download, if one is in progress.
+   */
+
+  abstract val samlDownloadContext: SAMLDownloadContext?
+
+  /**
    * Start borrowing a book.
    */
 
   data class Start(
     override val accountId: AccountID,
     override val profileId: ProfileID,
-    override val opdsAcquisitionFeedEntry: OPDSAcquisitionFeedEntry
+    override val opdsAcquisitionFeedEntry: OPDSAcquisitionFeedEntry,
+    override val samlDownloadContext: SAMLDownloadContext? = null
   ) : BorrowRequest()
 }
