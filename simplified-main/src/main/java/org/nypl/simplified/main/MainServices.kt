@@ -37,6 +37,7 @@ import org.nypl.simplified.accounts.database.AccountBundledCredentialsEmpty
 import org.nypl.simplified.accounts.database.AccountsDatabases
 import org.nypl.simplified.accounts.json.AccountBundledCredentialsJSON
 import org.nypl.simplified.accounts.registry.AccountProviderRegistry
+import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryDebugging
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.accounts.source.spi.AccountProviderSourceResolutionStrings
 import org.nypl.simplified.adobe.extensions.AdobeConfigurationServiceType
@@ -644,6 +645,8 @@ internal object MainServices {
       message = strings.bootingGeneral("Crashlytics"),
       interfaceType = CrashlyticsServiceType::class.java
     )
+
+    AccountProviderRegistryDebugging.load(context.applicationContext)
 
     val lsHTTP =
       addService(

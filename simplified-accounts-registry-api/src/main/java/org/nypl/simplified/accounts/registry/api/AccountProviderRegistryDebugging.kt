@@ -1,6 +1,10 @@
 package org.nypl.simplified.accounts.registry.api
 
+import android.content.Context
+import android.content.Context.MODE_PRIVATE
+import android.content.SharedPreferences
 import net.jcip.annotations.ThreadSafe
+import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -11,11 +15,35 @@ import java.util.concurrent.ConcurrentHashMap
 @ThreadSafe
 object AccountProviderRegistryDebugging {
 
+  private val logger =
+    LoggerFactory.getLogger(AccountProviderRegistryDebugging::class.java)
+
+  private var preferences: SharedPreferences? = null
   private val propertiesNow: MutableMap<String, String> =
     ConcurrentHashMap()
 
   val properties: Map<String, String>
     get() = this.propertiesNow
+
+  /**
+   * Load any stored preferences from the disk.
+   */
+
+  fun load(context: Context) {
+    try {
+      val prefs = context.getSharedPreferences("AccountProviderRegistryDebugging", MODE_PRIVATE)
+      this.preferences = prefs
+
+      for (e in prefs.all) {
+        val value = e.value
+        if (value is String) {
+          this.setProperty(e.key, value)
+        }
+      }
+    } catch (e: Exception) {
+      this.logger.debug("failed to load debugging preferences: ", e)
+    }
+  }
 
   /**
    * @return The value of the property `name`
@@ -32,7 +60,15 @@ object AccountProviderRegistryDebugging {
     name: String,
     value: String
   ) {
-    this.propertiesNow.put(name, value)
+    try {
+      this.propertiesNow.put(name, value)
+      this.preferences
+        ?.edit()
+        ?.putString(name, value)
+        ?.apply()
+    } catch (e: Exception) {
+      this.logger.debug("failed to set debugging property: ", e)
+    }
   }
 
   /**
@@ -42,6 +78,14 @@ object AccountProviderRegistryDebugging {
   fun clearProperty(
     name: String
   ) {
-    this.propertiesNow.remove(name)
+    try {
+      this.propertiesNow.remove(name)
+      this.preferences
+        ?.edit()
+        ?.clear()
+        ?.apply()
+    } catch (e: Exception) {
+      this.logger.debug("failed to set debugging property: ", e)
+    }
   }
 }
