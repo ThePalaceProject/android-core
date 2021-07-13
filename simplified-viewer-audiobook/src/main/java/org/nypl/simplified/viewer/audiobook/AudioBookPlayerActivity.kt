@@ -18,6 +18,7 @@ import org.librarysimplified.audiobook.api.PlayerEvent.PlayerEventError
 import org.librarysimplified.audiobook.api.PlayerEvent.PlayerEventPlaybackRateChanged
 import org.librarysimplified.audiobook.api.PlayerEvent.PlayerEventWithSpineElement.PlayerEventChapterCompleted
 import org.librarysimplified.audiobook.api.PlayerEvent.PlayerEventWithSpineElement.PlayerEventChapterWaiting
+import org.librarysimplified.audiobook.api.PlayerEvent.PlayerEventWithSpineElement.PlayerEventCreateBookmark
 import org.librarysimplified.audiobook.api.PlayerEvent.PlayerEventWithSpineElement.PlayerEventPlaybackBuffering
 import org.librarysimplified.audiobook.api.PlayerEvent.PlayerEventWithSpineElement.PlayerEventPlaybackPaused
 import org.librarysimplified.audiobook.api.PlayerEvent.PlayerEventWithSpineElement.PlayerEventPlaybackProgressUpdate
@@ -105,8 +106,6 @@ class AudioBookPlayerActivity :
     }
   }
 
-  @Volatile
-  private var playerLastPosition: PlayerPosition? = null
   private lateinit var book: PlayerAudioBookType
   private lateinit var bookAuthor: String
   private lateinit var books: BooksControllerType
@@ -269,7 +268,6 @@ class AudioBookPlayerActivity :
      */
 
     if (this.playerInitialized) {
-      this.savePlayerPosition()
       this.cancelAllDownloads()
 
       try {
@@ -292,14 +290,18 @@ class AudioBookPlayerActivity :
     this.playerScheduledExecutor.shutdown()
   }
 
-  private fun savePlayerPosition() {
-    val position = this.playerLastPosition
-    if (position != null) {
-      try {
-        this.formatHandle.savePlayerPosition(position)
-      } catch (e: Exception) {
-        this.log.error("could not save player position: ", e)
-      }
+  private fun savePlayerPosition(event: PlayerEventCreateBookmark) {
+    try {
+      this.formatHandle.savePlayerPosition(
+        PlayerPosition(
+          title = event.spineElement.position.title,
+          part = event.spineElement.position.part,
+          chapter = event.spineElement.position.chapter,
+          offsetMilliseconds = event.offsetMilliseconds
+        )
+      )
+    } catch (e: Exception) {
+      this.log.error("could not save player position: ", e)
     }
   }
 
@@ -533,21 +535,16 @@ class AudioBookPlayerActivity :
 
   private fun onPlayerEvent(event: PlayerEvent) {
     return when (event) {
-      is PlayerEventPlaybackStarted ->
-        this.playerLastPosition =
-          event.spineElement.position.copy(offsetMilliseconds = event.offsetMilliseconds)
-      is PlayerEventPlaybackBuffering ->
-        this.playerLastPosition =
-          event.spineElement.position.copy(offsetMilliseconds = event.offsetMilliseconds)
-      is PlayerEventPlaybackProgressUpdate ->
-        this.playerLastPosition =
-          event.spineElement.position.copy(offsetMilliseconds = event.offsetMilliseconds)
-      is PlayerEventPlaybackPaused ->
-        this.playerLastPosition =
-          event.spineElement.position.copy(offsetMilliseconds = event.offsetMilliseconds)
-      is PlayerEventPlaybackStopped ->
-        this.playerLastPosition =
-          event.spineElement.position.copy(offsetMilliseconds = event.offsetMilliseconds)
+      is PlayerEventCreateBookmark -> {
+        this.savePlayerPosition(event)
+      }
+
+      is PlayerEventPlaybackStarted,
+      is PlayerEventPlaybackBuffering,
+      is PlayerEventPlaybackProgressUpdate,
+      is PlayerEventPlaybackPaused,
+      is PlayerEventPlaybackStopped -> {
+      }
 
       is PlayerEventChapterCompleted ->
         this.onPlayerChapterCompleted(event)
