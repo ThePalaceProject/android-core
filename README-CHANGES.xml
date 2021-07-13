@@ -1,182 +1,34 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<c:changelog project="LibrarySimplified" xmlns:c="urn:com.io7m.changelog:4.0">
+<c:changelog project="org.thepalaceproject.palace" xmlns:c="urn:com.io7m.changelog:4.0">
   <c:releases>
-    <c:release date="2021-03-26T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="6.6.3">
+    <c:release date="2021-07-13T22:45:05+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.0">
       <c:changes>
-        <c:change date="2021-01-14T00:00:00+00:00" summary="Implemented announcements">
-          <c:tickets>
-            <c:ticket id="SIMPLY-2936"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2021-01-14T00:00:00+00:00" summary="Improved behaviour of login fields for password managers"/>
-        <c:change date="2021-01-14T00:00:00+00:00" summary="Bookmark syncing support is now correctly remembered for all accounts">
-          <c:tickets>
-            <c:ticket id="SIMPLY-2403"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2021-01-22T00:00:00+00:00" summary="Fix a crash when viewing Related Books in My Books">
-          <c:tickets>
-            <c:ticket id="SIMPLY-3471"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2021-02-10T00:00:00+00:00" summary="Clear Readium caches more aggressively (thanks @ray-lee!)"/>
-        <c:change date="2021-02-19T00:00:00+00:00" summary="Correct a book download failure with SAML authentication (thanks @ray-lee!)">
-          <c:tickets>
-            <c:ticket id="SIMPLY-3490"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2021-02-19T00:00:00+00:00" summary="Correct a book download failure related to chunked downloads (thanks @ray-lee!)">
-          <c:tickets>
-            <c:ticket id="SIMPLY-3489"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2021-02-19T00:00:00+00:00" summary="Improve accessibility">
-          <c:tickets>
-            <c:ticket id="SIMPLY-1506"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2021-03-02T00:00:00+00:00" summary="Correct an issue related to multiple accounts and Adobe DRM (thanks @ray-lee!)">
-          <c:tickets>
-            <c:ticket id="SIMPLY-2979"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2021-03-04T00:00:00+00:00" summary="Enable ACS DRM for Readium 2">
-          <c:tickets>
-            <c:ticket id="SIMPLY-3138"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2021-03-04T00:00:00+00:00" summary="Add a neutral age gate for the Play Store">
-          <c:tickets>
-            <c:ticket id="SIMPLY-3493"/>
-          </c:tickets>
-        </c:change>
-      </c:changes>
-    </c:release>
-    <c:release date="2021-06-23T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="7.0.0">
-      <c:changes>
-        <c:change date="2021-03-26T00:00:00+00:00" summary="Standardize bookmarks across platforms">
-          <c:tickets>
-            <c:ticket id="SIMPLY-3605"/>
-            <c:ticket id="SIMPLY-3604"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2021-05-14T00:00:00+00:00" summary="Card Creator covers navigation">
-          <c:tickets>
-            <c:ticket id="SMA-123"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2021-05-14T00:00:00+00:00" summary="Newer Firebase builds crash on Galaxy Tab A">
-          <c:tickets>
-            <c:ticket id="SMA-176"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2021-04-01T00:00:00+00:00" summary="Fix DPLA audio book downloads">
-          <c:tickets>
-            <c:ticket id="SIMPLY-3666"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2021-04-14T00:00:00+00:00" summary="Eliminate some lifecycle-related crashes">
-          <c:tickets>
-            <c:ticket id="SIMPLY-3473"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2021-04-14T00:00:00+00:00" summary="Upgraded test suite to JUnit 5">
-          <c:tickets>
-            <c:ticket id="SIMPLY-3626"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2021-05-13T00:00:00+00:00" summary="Retrieve the annotations URI from the patron user profile">
-          <c:tickets>
-            <c:ticket id="SMA-35"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2021-05-13T00:00:00+00:00" summary="Fixed an age gate crash">
-          <c:tickets>
-            <c:ticket id="SMA-90"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2021-05-13T00:00:00+00:00" summary="Reader settings were not being correctly loaded after an app restart">
-          <c:tickets>
-            <c:ticket id="SMA-92"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2021-05-13T00:00:00+00:00" summary="Some books could not be opened in R2 due to a null pointer exception">
-          <c:tickets>
-            <c:ticket id="SMA-91"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2021-05-13T00:00:00+00:00" summary="Fixed R2 page turning on high-density device screens">
-          <c:tickets>
-            <c:ticket id="SMA-163"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2021-05-13T00:00:00+00:00" summary="Fixed R2 settings changes on high-density device screens">
-          <c:tickets>
-            <c:ticket id="SMA-165"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2021-05-13T00:00:00+00:00" summary="Fixed R2 brightness changes on high-density device screens">
-          <c:tickets>
-            <c:ticket id="SMA-164"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2021-05-13T00:00:00+00:00" summary="Fixed a TOC crash in the audio book player">
-          <c:tickets>
-            <c:ticket id="SMA-134"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2021-05-13T00:00:00+00:00" summary="Fixed missing titles in the R2 TOC">
-          <c:tickets>
-            <c:ticket id="SMA-174"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2021-05-14T00:00:00+00:00" summary="Fixed R2 settings icon">
-          <c:tickets>
-            <c:ticket id="SMA-166"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2021-05-28T00:00:00+00:00" summary="The bookmark syncing toggle now correctly turns on/off server-side syncing">
-          <c:tickets>
-            <c:ticket id="SMA-177"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2021-06-02T00:00:00+00:00" summary="Removed R1">
-          <c:tickets>
-            <c:ticket id="SMA-183"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2021-06-08T00:00:00+00:00" summary="Fix R2 pagination">
-          <c:tickets>
-            <c:ticket id="SMA-185"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2021-06-15T00:00:00+00:00" summary="Fix internal and external links in R2"/>
-        <c:change date="2021-06-16T00:00:00+00:00" summary="Fix an R2 lifecycle issue with the TOC">
-          <c:tickets>
-            <c:ticket id="SMA-194"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2021-06-16T00:00:00+00:00" summary="Improve R2 behaviour with regards to spaces in filenames inside EPUB files"/>
-      </c:changes>
-    </c:release>
-    <c:release date="2021-07-08T17:42:10+00:00" is-open="true" ticket-system="org.nypl.jira" version="7.0.1">
-      <c:changes>
-        <c:change date="2021-06-23T00:00:00+00:00" summary="Improve R2 accessibility">
+        <c:change date="2021-04-16T00:00:00+00:00" summary="Remove default library option on startup"/>
+        <c:change date="2021-04-29T00:00:00+00:00" summary="Add app documentation viewers"/>
+        <c:change date="2021-05-20T00:00:00+00:00" summary="Add account documentation viewers"/>
+        <c:change date="2021-06-09T00:00:00+00:00" summary="Add LCP support"/>
+        <c:change date="2021-06-24T00:00:00+00:00" summary="Display current library in the bookshelf action bar"/>
+        <c:change date="2021-06-29T00:00:00+00:00" summary="Add ability to specify a custom library registry"/>
+        <c:change date="2021-06-30T00:00:00+00:00" summary="Improve R2 accessibility">
           <c:tickets>
             <c:ticket id="SMA-197"/>
           </c:tickets>
         </c:change>
-        <c:change date="2021-07-08T00:00:00+00:00" summary="Support fixed-layout EPUB files in R2"/>
-        <c:change date="2021-07-08T00:00:00+00:00" summary="Support full TOC navigation and listings in R2">
+        <c:change date="2021-07-06T00:00:00+00:00" summary="Fix SAML download endless loop"/>
+        <c:change date="2021-07-07T00:00:00+00:00" summary="Persist custom library registry to shared preferences"/>
+        <c:change date="2021-07-08T00:00:00+00:00" summary="Set fallback library to DPLA"/>
+        <c:change date="2021-07-13T00:00:00+00:00" summary="Support fixed-layout EPUB files in R2"/>
+        <c:change date="2021-07-13T00:00:00+00:00" summary="Support full TOC navigation and listings in R2">
           <c:tickets>
             <c:ticket id="SMA-192"/>
           </c:tickets>
         </c:change>
-        <c:change date="2021-07-08T17:42:10+00:00" summary="Prevent rapid toggling of the bookmark syncing switch in account settings">
+        <c:change date="2021-07-13T00:00:00+00:00" summary="Prevent rapid toggling of the bookmark syncing switch in account settings">
           <c:tickets>
             <c:ticket id="SMA-186"/>
           </c:tickets>
         </c:change>
+        <c:change date="2021-07-13T22:45:05+00:00" summary="Fix audiobook player not retaining position after exiting app"/>
       </c:changes>
     </c:release>
   </c:releases>
