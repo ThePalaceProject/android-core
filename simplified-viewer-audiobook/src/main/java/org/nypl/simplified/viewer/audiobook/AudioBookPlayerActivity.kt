@@ -292,12 +292,14 @@ class AudioBookPlayerActivity :
 
   private fun savePlayerPosition(event: PlayerEventCreateBookmark) {
     try {
-      this.formatHandle.savePlayerPosition(PlayerPosition(
-        title = event.spineElement.position.title,
-        part = event.spineElement.position.part,
-        chapter = event.spineElement.position.chapter,
-        offsetMilliseconds = event.offsetMilliseconds
-      ))
+      this.formatHandle.savePlayerPosition(
+        PlayerPosition(
+          title = event.spineElement.position.title,
+          part = event.spineElement.position.part,
+          chapter = event.spineElement.position.chapter,
+          offsetMilliseconds = event.offsetMilliseconds
+        )
+      )
     } catch (e: Exception) {
       this.log.error("could not save player position: ", e)
     }
@@ -542,7 +544,6 @@ class AudioBookPlayerActivity :
       is PlayerEventPlaybackProgressUpdate,
       is PlayerEventPlaybackPaused,
       is PlayerEventPlaybackStopped -> {
-
       }
 
       is PlayerEventChapterCompleted ->
