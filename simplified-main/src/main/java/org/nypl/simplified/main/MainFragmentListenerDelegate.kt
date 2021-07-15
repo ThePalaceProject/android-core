@@ -346,6 +346,10 @@ internal class MainFragmentListenerDelegate(
         this.openSettingsLicense(event.title, event.url)
         state
       }
+      is SettingsMainEvent.OpenPrivacy -> {
+        this.openSettingsPrivacy(event.title, event.url)
+        state
+      }
     }
   }
 
@@ -421,6 +425,13 @@ internal class MainFragmentListenerDelegate(
   }
 
   private fun openSettingsLicense(title: String, url: String) {
+    this.navigator.addFragment(
+      fragment = SettingsFragmentDocumentViewer.create(title, url),
+      tab = R.id.tabSettings
+    )
+  }
+
+  private fun openSettingsPrivacy(title: String, url: String) {
     this.navigator.addFragment(
       fragment = SettingsFragmentDocumentViewer.create(title, url),
       tab = R.id.tabSettings

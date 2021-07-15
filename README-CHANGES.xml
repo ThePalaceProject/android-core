@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <c:changelog project="org.thepalaceproject.palace" xmlns:c="urn:com.io7m.changelog:4.0">
   <c:releases>
-    <c:release date="2021-07-13T22:45:05+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.0">
+    <c:release date="2021-07-15T21:00:39+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.0">
       <c:changes>
         <c:change date="2021-04-16T00:00:00+00:00" summary="Remove default library option on startup"/>
         <c:change date="2021-04-29T00:00:00+00:00" summary="Add app documentation viewers"/>
@@ -28,7 +28,9 @@
             <c:ticket id="SMA-186"/>
           </c:tickets>
         </c:change>
-        <c:change date="2021-07-13T22:45:05+00:00" summary="Fix audiobook player not retaining position after exiting app"/>
+        <c:change date="2021-07-13T00:00:00+00:00" summary="Fix audiobook player not retaining position after exiting app"/>
+        <c:change date="2021-07-15T00:00:00+00:00" summary="Configure legal document locations"/>
+        <c:change date="2021-07-15T21:00:39+00:00" summary="Add privacy policy to settings"/>
       </c:changes>
     </c:release>
   </c:releases>

@@ -29,6 +29,7 @@ class SettingsMainFragment : PreferenceFragmentCompat() {
   private lateinit var settingsEULA: Preference
   private lateinit var settingsFaq: Preference
   private lateinit var settingsLicense: Preference
+  private lateinit var settingsPrivacy: Preference
   private lateinit var settingsVersion: Preference
   private lateinit var settingsVersionCore: Preference
 
@@ -49,6 +50,7 @@ class SettingsMainFragment : PreferenceFragmentCompat() {
     this.settingsEULA = this.findPreference("settingsEULA")!!
     this.settingsFaq = this.findPreference("settingsFaq")!!
     this.settingsLicense = this.findPreference("settingsLicense")!!
+    this.settingsPrivacy = this.findPreference("settingsPrivacy")!!
     this.settingsVersion = this.findPreference("settingsVersion")!!
     this.settingsVersionCore = this.findPreference("settingsVersionCore")!!
 
@@ -60,6 +62,7 @@ class SettingsMainFragment : PreferenceFragmentCompat() {
     this.configureEULA(this.settingsEULA)
     this.configureFaq(this.settingsFaq)
     this.configureLicense(this.settingsLicense)
+    this.configurePrivacy(this.settingsPrivacy)
     this.configureVersion(this.settingsVersion)
     this.configureVersionCore(this.settingsVersionCore)
   }
@@ -78,14 +81,14 @@ class SettingsMainFragment : PreferenceFragmentCompat() {
 
   private fun configureAcknowledgements(preference: Preference) {
     val doc = this.viewModel.documents.acknowledgements
-    preference.isEnabled = doc != null
+    preference.isVisible = doc != null
     if (doc != null) {
       preference.onPreferenceClickListener =
         Preference.OnPreferenceClickListener {
           this.listener.post(
             SettingsMainEvent.OpenAcknowledgments(
               title = it.title.toString(),
-              url = doc.readableURL.path
+              url = doc.readableURL.toString()
             )
           )
           true
@@ -128,15 +131,14 @@ class SettingsMainFragment : PreferenceFragmentCompat() {
 
   private fun configureLicense(preference: Preference) {
     val doc = this.viewModel.documents.licenses
-    preference.isEnabled = doc != null
+    preference.isVisible = doc != null
     if (doc != null) {
-      preference.isEnabled = this.viewModel.documents.licenses != null
       preference.onPreferenceClickListener =
         Preference.OnPreferenceClickListener {
           this.listener.post(
             SettingsMainEvent.OpenLicense(
               title = it.title.toString(),
-              url = doc.readableURL.path
+              url = doc.readableURL.toString()
             )
           )
           true
@@ -146,14 +148,14 @@ class SettingsMainFragment : PreferenceFragmentCompat() {
 
   private fun configureFaq(preference: Preference) {
     val doc = this.viewModel.documents.faq
-    preference.isEnabled = doc != null
+    preference.isVisible = doc != null
     if (doc != null) {
       preference.onPreferenceClickListener =
         Preference.OnPreferenceClickListener {
           this.listener.post(
             SettingsMainEvent.OpenFAQ(
               title = it.title.toString(),
-              url = doc.readableURL.path
+              url = doc.readableURL.toString()
             )
           )
           true
@@ -163,14 +165,31 @@ class SettingsMainFragment : PreferenceFragmentCompat() {
 
   private fun configureEULA(preference: Preference) {
     val doc = this.viewModel.documents.eula
-    preference.isEnabled = doc != null
+    preference.isVisible = doc != null
     if (doc != null) {
       preference.onPreferenceClickListener =
         Preference.OnPreferenceClickListener {
           this.listener.post(
             SettingsMainEvent.OpenEULA(
               title = it.title.toString(),
-              url = doc.readableURL.path
+              url = doc.readableURL.toString()
+            )
+          )
+          true
+        }
+    }
+  }
+
+  private fun configurePrivacy(preference: Preference) {
+    val doc = this.viewModel.documents.privacyPolicy
+    preference.isVisible = doc != null
+    if (doc != null) {
+      preference.onPreferenceClickListener =
+        Preference.OnPreferenceClickListener {
+          this.listener.post(
+            SettingsMainEvent.OpenPrivacy(
+              title = it.title.toString(),
+              url = doc.readableURL.toString()
             )
           )
           true
@@ -194,14 +213,14 @@ class SettingsMainFragment : PreferenceFragmentCompat() {
 
   private fun configureAbout(preference: Preference) {
     val doc = this.viewModel.documents.about
-    preference.isEnabled = doc != null
+    preference.isVisible = doc != null
     if (doc != null) {
       preference.onPreferenceClickListener =
         Preference.OnPreferenceClickListener {
           this.listener.post(
             SettingsMainEvent.OpenAbout(
               title = it.title.toString(),
-              url = doc.readableURL.path
+              url = doc.readableURL.toString()
             )
           )
           true

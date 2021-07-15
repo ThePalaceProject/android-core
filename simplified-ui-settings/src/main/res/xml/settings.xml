@@ -34,6 +34,12 @@
       android:key="settingsLicense"
       android:summary="@string/settingsLicenseSummary"
       android:title="@string/settingsLicense" />
+      <Preference
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:key="settingsPrivacy"
+          android:summary="@string/settingsPrivacySummary"
+          android:title="@string/settingsPrivacy" />
   </PreferenceCategory>
 
   <PreferenceCategory android:title="@string/settingsInfo">

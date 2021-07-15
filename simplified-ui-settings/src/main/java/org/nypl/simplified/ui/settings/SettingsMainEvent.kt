@@ -58,4 +58,13 @@ sealed class SettingsMainEvent {
     val title: String,
     val url: String,
   ) : SettingsMainEvent()
+
+  /**
+   * The settings screen wants to open the "Privacy" screen.
+   */
+
+  data class OpenPrivacy(
+    val title: String,
+    val url: String,
+  ) : SettingsMainEvent()
 }
