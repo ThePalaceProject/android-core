@@ -110,7 +110,17 @@ internal class Profile internal constructor(
   @Throws(AccountsDatabaseException::class)
   override fun createAccount(accountProvider: AccountProviderType): AccountType {
     this.checkNotDeleted()
-    return this.accounts.createAccount(accountProvider)
+    return this.accounts.createAccount(accountProvider).also {
+      this.deleteDefaultAccount()
+    }
+  }
+
+  private fun deleteDefaultAccount(): AccountID? {
+    return try {
+      this.deleteAccountByProvider(this.owner!!.defaultAccountProvider.id)
+    } catch (e: AccountsDatabaseNonexistentException) {
+      null
+    }
   }
 
   @Throws(AccountsDatabaseException::class)
