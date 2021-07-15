@@ -25,7 +25,7 @@
   <string name="settingsDelete">Delete</string>
   <string name="settingsDetails">Details</string>
   <string name="settingsDocumentation">Documentation</string>
-  <string name="settingsEULA">End User License Agreement</string>
+  <string name="settingsEULA">User Agreement</string>
   <string name="settingsEULAStatement">I agree to the terms of the End User License Agreement.</string>
   <string name="settingsEULASummary" />
   <string name="settingsFaq">FAQ</string>
