@@ -239,6 +239,9 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
 
   companion object {
 
+    private val logger =
+      LoggerFactory.getLogger(DatabaseFormatHandleAudioBook::class.java)
+
     private fun loadInitial(
       objectMapper: ObjectMapper,
       fileManifest: File,
@@ -285,7 +288,8 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
       } catch (e: FileNotFoundException) {
         null
       } catch (e: Exception) {
-        throw IOException(e)
+        this.logger.debug("failed to parse position value: ", e)
+        null
       }
     }
 
