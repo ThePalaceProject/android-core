@@ -2,7 +2,7 @@ package org.nypl.simplified.webview
 
 import android.database.sqlite.SQLiteDatabase
 
-class WebViewCookieDatabaseV11 internal constructor(
+class WebViewCookieDatabaseV14 internal constructor(
   private val db: SQLiteDatabase
 ) : WebViewCookieDatabase(db) {
   override fun getAll(): List<WebViewCookieType> {
@@ -16,7 +16,8 @@ class WebViewCookieDatabaseV11 internal constructor(
       "expires_utc",
       "is_secure",
       "is_httponly",
-      "samesite"
+      "samesite",
+      "source_scheme"
     )
 
     this.db.query(
@@ -38,7 +39,8 @@ class WebViewCookieDatabaseV11 internal constructor(
             expiresUTC = cursor.getLong(4),
             isSecure = cursor.getInt(5),
             isHttpOnly = cursor.getInt(6),
-            sameSite = cursor.getInt(7)
+            sameSite = cursor.getInt(7),
+            sourceScheme = cursor.getInt(8),
           )
         )
       }
@@ -55,14 +57,21 @@ class WebViewCookieDatabaseV11 internal constructor(
     val expiresUTC: Long,
     val isSecure: Int,
     val isHttpOnly: Int,
-    val sameSite: Int
+    val sameSite: Int,
+    val sourceScheme: Int,
   ) : WebViewCookieType {
 
     override val sourceURL: String
       get() {
         val domain = this.hostKey.trimStart('.')
 
-        return (if (this.isSecure > 0) "https" else "http") + "://$domain"
+        val scheme = when (this.sourceScheme) {
+          1 -> "http"
+          2 -> "https"
+          else -> "http"
+        }
+
+        return "$scheme://$domain"
       }
 
     override fun toSetCookieString(): String {

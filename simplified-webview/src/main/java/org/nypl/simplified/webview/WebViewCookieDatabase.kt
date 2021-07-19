@@ -40,6 +40,8 @@ abstract class WebViewCookieDatabase(
       logger.debug("found cookie database version {}", version)
 
       return when (version) {
+        "14" -> WebViewCookieDatabaseV14(db)
+        "13" -> WebViewCookieDatabaseV13(db)
         "12" -> WebViewCookieDatabaseV12(db)
         "11" -> WebViewCookieDatabaseV11(db)
         "10" -> WebViewCookieDatabaseV10(db)

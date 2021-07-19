@@ -69,7 +69,11 @@ class WebViewCookieDatabaseV9 internal constructor(
       val pairs = mutableListOf<List<String>>()
 
       pairs.add(listOf(this.name, this.value))
-      pairs.add(listOf("Domain", this.hostKey))
+
+      if (this.hostKey.startsWith(".")) {
+        pairs.add(listOf("Domain", this.hostKey))
+      }
+
       pairs.add(listOf("Path", this.path))
 
       if (this.expiresUTC > 0) {
