@@ -156,6 +156,7 @@ class AccountListRegistryViewModel(private val locationManager: LocationManager)
     val availableAccountProviders =
       this.accountRegistry.accountProviderDescriptions()
         .values
+        // Palace hides the default account from end users.
         .filter { it.id != accountRegistry.defaultProvider.id }
         .toMutableList()
     availableAccountProviders.removeAll(usedAccountProviders)
