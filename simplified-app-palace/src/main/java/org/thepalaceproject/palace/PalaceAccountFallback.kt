@@ -23,7 +23,9 @@ class PalaceAccountFallback : AccountProviderFallbackType {
       catalogURI = URI.create("https://openbookshelf.dp.la/OB/groups/3"),
       displayName = "Digital Public Library of America",
       eula = null,
-      id = URI.create("urn:uuid:6b849570-070f-43b4-9dcc-7ebb4bca292e"),
+      // This id is intentionally different than the id for the "real" DPLA library retrieved from
+      // the registry, so that it doesn't prevent that library from being added.
+      id = URI.create("urn:uuid:e0c621fa-424c-49e6-a6bb-0601def66cf8"),
       idNumeric = -1,
       isProduction = true,
       license = null,

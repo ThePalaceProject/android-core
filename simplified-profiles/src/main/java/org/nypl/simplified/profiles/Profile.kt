@@ -110,7 +110,21 @@ internal class Profile internal constructor(
   @Throws(AccountsDatabaseException::class)
   override fun createAccount(accountProvider: AccountProviderType): AccountType {
     this.checkNotDeleted()
-    return this.accounts.createAccount(accountProvider)
+    return this.accounts.createAccount(accountProvider).also {
+      // When an account is added, automatically delete the default account (if present). This
+      // allows Palace to hide the default account from end users. This will not be necessary if
+      // the requirement for a profile to have an account, and the automatic adding of the default,
+      // is ever removed.
+      this.deleteDefaultAccount()
+    }
+  }
+
+  private fun deleteDefaultAccount(): AccountID? {
+    return try {
+      this.deleteAccountByProvider(this.owner!!.defaultAccountProvider.id)
+    } catch (e: AccountsDatabaseNonexistentException) {
+      null
+    }
   }
 
   @Throws(AccountsDatabaseException::class)
