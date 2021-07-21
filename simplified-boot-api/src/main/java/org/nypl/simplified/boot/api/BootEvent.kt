@@ -19,6 +19,15 @@ sealed class BootEvent {
   ) : BootEvent(), PresentableType
 
   /**
+   * Booting is in progress, and something in the boot process wants to publish a dialog box.
+   */
+
+  data class BootWantsDialog(
+    override val message: String,
+    override val attributes: Map<String, String> = mapOf()
+  ) : BootEvent(), PresentableType
+
+  /**
    * Booting has completed.
    */
 

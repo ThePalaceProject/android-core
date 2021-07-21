@@ -663,7 +663,14 @@ internal object MainServices {
       addServiceOptionally(
         message = strings.bootingGeneral("Adobe DRM"),
         interfaceType = AdobeAdeptExecutorType::class.java,
-        serviceConstructor = { AdobeDRMServices.newAdobeDRMOrNull(context, adobeConfiguration) }
+        serviceConstructor = {
+          this.createAdobeExecutor(
+            context = context,
+            adobeConfiguration = adobeConfiguration,
+            strings = strings,
+            onProgress = onProgress
+          )
+        }
       )
 
     val axisNowDRM =
@@ -1051,6 +1058,23 @@ internal object MainServices {
     this.logger.debug("boot completed")
     onProgress.invoke(BootEvent.BootCompleted(strings.bootCompleted))
     return finalServices
+  }
+
+  private fun createAdobeExecutor(
+    context: Context,
+    adobeConfiguration: AdobeConfigurationServiceType,
+    strings: MainServicesStrings,
+    onProgress: (BootEvent) -> Unit
+  ): AdobeAdeptExecutorType? {
+    return if (AdobeDRMServices.isIntendedToBePresent(context)) {
+      val executor = AdobeDRMServices.newAdobeDRMOrNull(context, adobeConfiguration)
+      if (executor == null) {
+        onProgress.invoke(BootEvent.BootWantsDialog(strings.bootAdobeDRMFailed))
+      }
+      executor
+    } else {
+      null
+    }
   }
 
   private fun createDocumentStore(
