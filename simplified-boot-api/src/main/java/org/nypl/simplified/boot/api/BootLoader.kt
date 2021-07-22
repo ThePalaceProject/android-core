@@ -43,7 +43,10 @@ class BootLoader<T>(
       }
     )
 
-  private val eventsActual = BehaviorSubject.create<BootEvent>()
+  private val eventsActual =
+    BehaviorSubject.create<BootEvent>()
+      .toSerialized()
+
   private val bootLock: Any = Any()
   private var boot: FluentFuture<T>? = null
 
