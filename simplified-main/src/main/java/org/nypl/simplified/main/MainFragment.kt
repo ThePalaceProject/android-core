@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import io.reactivex.disposables.CompositeDisposable
+import org.librarysimplified.services.api.Services
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.accounts.api.AccountEventDeletion
 import org.nypl.simplified.accounts.api.AccountEventUpdated
@@ -164,6 +165,15 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
      */
 
     this.supportActionBar?.show()
+
+    /*
+     * Show the Adobe DRM warning dialog if necessary,
+     */
+
+    MainAdobeWarnings.showWarningDialogIfNecessary(
+      this.requireActivity(),
+      Services.serviceDirectory()
+    )
   }
 
   private fun onAccountEvent(event: AccountEvent) {

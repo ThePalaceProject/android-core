@@ -7,7 +7,6 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
@@ -87,12 +86,6 @@ class BootFragment : Fragment(R.layout.splash_boot) {
       }
       is BootEvent.BootFailed -> {
         onBootFailed(event)
-      }
-      is BootEvent.BootWantsDialog -> {
-        AlertDialog.Builder(requireContext())
-          .setMessage(event.message)
-          .create()
-          .show()
       }
     }
   }

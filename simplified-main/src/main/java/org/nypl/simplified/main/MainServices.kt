@@ -666,9 +666,7 @@ internal object MainServices {
         serviceConstructor = {
           this.createAdobeExecutor(
             context = context,
-            adobeConfiguration = adobeConfiguration,
-            strings = strings,
-            onProgress = onProgress
+            adobeConfiguration = adobeConfiguration
           )
         }
       )
@@ -1062,16 +1060,10 @@ internal object MainServices {
 
   private fun createAdobeExecutor(
     context: Context,
-    adobeConfiguration: AdobeConfigurationServiceType,
-    strings: MainServicesStrings,
-    onProgress: (BootEvent) -> Unit
+    adobeConfiguration: AdobeConfigurationServiceType
   ): AdobeAdeptExecutorType? {
     return if (AdobeDRMServices.isIntendedToBePresent(context)) {
-      val executor = AdobeDRMServices.newAdobeDRMOrNull(context, adobeConfiguration)
-      if (executor == null) {
-        onProgress.invoke(BootEvent.BootWantsDialog(strings.bootAdobeDRMFailed))
-      }
-      executor
+      AdobeDRMServices.newAdobeDRMOrNull(context, adobeConfiguration)
     } else {
       null
     }
