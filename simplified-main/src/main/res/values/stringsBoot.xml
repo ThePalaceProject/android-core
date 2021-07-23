@@ -2,4 +2,5 @@
 
 <resources>
   <string name="bootFailedGeneric">We found a problem. Please check your connection or close and reopen the app to retry.</string>
+  <string name="bootAdobeDRMFailed">Something went wrong with the Adobe DRM system: Some books will be unavailable in this version of the application. Please try updating to the latest version of the application.</string>
 </resources>

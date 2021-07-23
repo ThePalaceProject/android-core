@@ -13,6 +13,9 @@ internal class MainServicesStrings(
   override val bootCompleted: String =
     "Startup completed!"
 
+  val bootAdobeDRMFailed: String =
+    resources.getString(R.string.bootAdobeDRMFailed)
+
   fun bootingGeneral(kind: String): String =
     "Initializing $kind..."
 }

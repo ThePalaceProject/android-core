@@ -77,7 +77,7 @@ class BootFragment : Fragment(R.layout.splash_boot) {
   }
 
   private fun onBootEvent(event: BootEvent) {
-    when (event) {
+    return when (event) {
       is BootEvent.BootInProgress -> {
         text.text = event.message
       }

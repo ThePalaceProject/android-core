@@ -18,6 +18,7 @@ import com.io7m.jnull.NullCheck;
 import com.io7m.junreachable.UnimplementedCodeException;
 import com.io7m.junreachable.UnreachableCodeException;
 
+import org.joda.time.Instant;
 import org.nypl.drm.core.AdobeAdeptConnectorFactory;
 import org.nypl.drm.core.AdobeAdeptConnectorFactoryType;
 import org.nypl.drm.core.AdobeAdeptConnectorParameters;
@@ -89,8 +90,7 @@ public final class AdobeDRMServices {
    * certificate across differently branded versions of the same application
    * (with different package IDs) during development.
    *
-   * @param context          Application context
-
+   * @param context Application context
    * @return A DRM content filter
    * @throws DRMException If DRM is unavailable or cannot be initialized.
    */
@@ -185,8 +185,7 @@ public final class AdobeDRMServices {
    * certificate across differently branded versions of the same application
    * (with different package IDs) during development.
    *
-   * @param context          Application context
-
+   * @param context Application context
    * @return A DRM implementation
    * @throws DRMException If DRM is unavailable or cannot be initialized.
    */
@@ -288,8 +287,7 @@ public final class AdobeDRMServices {
    * certificate across differently branded versions of the same application
    * (with different package IDs) during development.
    *
-   * @param context          Application context
-
+   * @param context Application context
    * @return A DRM implementation, if any are available
    */
 
@@ -314,8 +312,7 @@ public final class AdobeDRMServices {
    * certificate across differently branded versions of the same application
    * (with different package IDs) during development.
    *
-   * @param context          Application context
-
+   * @param context Application context
    * @return A DRM implementation, if any are available
    */
 
@@ -366,8 +363,24 @@ public final class AdobeDRMServices {
       final ObjectMapper jom = new ObjectMapper();
       final JsonNode json = jom.readTree(r);
       final ObjectNode o = JSONParserUtilities.checkObject(null, json);
-      final String appid = JSONParserUtilities.getString(o, "appid");
 
+      final Integer expiration = JSONParserUtilities.getIntegerOrNull(o, "expireson");
+      if (expiration != null) {
+        final Instant timeNow = Instant.now();
+        final Instant timeExpires = Instant.ofEpochSecond(expiration.longValue());
+        if (timeNow.isAfter(timeExpires)) {
+          final StringBuilder sb = new StringBuilder(256);
+          sb.append("The included Adobe certificate has expired.\n");
+          sb.append("  Expired: ");
+          sb.append(timeExpires);
+          sb.append(" (");
+          sb.append(expiration);
+          sb.append(")\n");
+          throw new DRMUnsupportedException(sb.toString());
+        }
+      }
+
+      final String appid = JSONParserUtilities.getString(o, "appid");
       if (appid.equals(package_name)) {
         return r;
       }
@@ -413,6 +426,22 @@ public final class AdobeDRMServices {
     } catch (final IOException e) {
       throw new DRMUnsupportedException(
         "ReaderClientCert.sig is unavailable", e);
+    }
+  }
+
+  /**
+   * Determine if Adobe DRM support was intended to be enabled.
+   *
+   * @param context The application context
+   * @return {@code true} if Adobe DRM was supposed to be present
+   */
+
+  public static boolean isIntendedToBePresent(Context context) {
+    try {
+      readCertificateBytes(context.getAssets());
+      return true;
+    } catch (Exception e) {
+      return false;
     }
   }
 }
