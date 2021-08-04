@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <c:changelog project="org.thepalaceproject.palace" xmlns:c="urn:com.io7m.changelog:4.0">
   <c:releases>
-    <c:release date="2021-07-27T18:01:45+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.0.0">
+    <c:release date="2021-07-27T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.0.0">
       <c:changes>
         <c:change date="2021-04-16T00:00:00+00:00" summary="Remove default library option on startup"/>
         <c:change date="2021-04-29T00:00:00+00:00" summary="Add app documentation viewers"/>
@@ -35,6 +35,9 @@
         <c:change date="2021-07-23T00:00:00+00:00" summary="Fix crash when Adobe certificate is expired"/>
         <c:change date="2021-07-23T00:00:00+00:00" summary="Update Adobe certificate"/>
       </c:changes>
+    </c:release>
+    <c:release date="2021-08-04T23:51:17+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.1">
+      <c:changes/>
     </c:release>
   </c:releases>
   <c:ticket-systems>
