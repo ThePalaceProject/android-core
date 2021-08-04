@@ -107,13 +107,6 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
     settingsItem.isVisible = viewModel.buildConfig.showSettingsTab
     settingsItem.isEnabled = viewModel.buildConfig.showSettingsTab
 
-    val profilesVisible =
-      viewModel.profilesController.profileAnonymousEnabled() == ANONYMOUS_PROFILE_DISABLED
-
-    val profilesItem = this.bottomView.menu.findItem(R.id.tabProfile)
-    profilesItem.isVisible = profilesVisible
-    profilesItem.isEnabled = profilesVisible
-
     this.navigator =
       TabbedNavigator.create(
         fragment = this,
