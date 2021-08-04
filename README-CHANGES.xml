@@ -36,8 +36,10 @@
         <c:change date="2021-07-23T00:00:00+00:00" summary="Update Adobe certificate"/>
       </c:changes>
     </c:release>
-    <c:release date="2021-08-04T23:51:17+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.1">
-      <c:changes/>
+    <c:release date="2021-08-04T23:53:40+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.1">
+      <c:changes>
+        <c:change date="2021-08-04T23:53:40+00:00" summary="Update icons"/>
+      </c:changes>
     </c:release>
   </c:releases>
   <c:ticket-systems>
