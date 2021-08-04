@@ -18,9 +18,8 @@ import org.nypl.simplified.feeds.api.FeedBooksSelection
 import org.nypl.simplified.feeds.api.FeedFacet
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.catalog.CatalogFeedArguments
-import org.nypl.simplified.ui.catalog.CatalogFeedOwnership
 import org.nypl.simplified.ui.catalog.CatalogFeedFragment
-import org.nypl.simplified.ui.profiles.ProfileTabFragment
+import org.nypl.simplified.ui.catalog.CatalogFeedOwnership
 import org.nypl.simplified.ui.settings.SettingsMainFragment
 import org.nypl.simplified.ui.theme.ThemeControl
 import org.slf4j.LoggerFactory
@@ -84,9 +83,6 @@ object BottomNavigators {
           },
           R.id.tabSettings to {
             createSettingsFragment(R.id.tabSettings)
-          },
-          R.id.tabProfile to {
-            ProfileTabFragment()
           }
         ),
         defaultTab = R.id.tabCatalog,
