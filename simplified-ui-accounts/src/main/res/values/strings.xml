@@ -49,4 +49,6 @@
   <string name="accountPrivacyPolicy">Privacy Policy</string>
   <string name="accountLicenses">Content Licenses</string>
   <string name="accountEULA">End User License Agreement</string>
+  <string name="accountMenuSearch">Search</string>
+  <string name="accountMenuRefresh">Reload</string>
 </resources>

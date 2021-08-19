@@ -19,7 +19,7 @@
     android:largeHeap="true"
     android:networkSecurityConfig="@xml/network_security_config"
     android:roundIcon="@mipmap/ic_launcher_round"
-    android:theme="@style/VanillaTheme_NoActionBar"
+    android:theme="@style/NeutralTheme_NoActionBar"
     tools:replace="android:allowBackup">
 
     <!-- Main entry point for the application. -->
@@ -58,20 +58,12 @@
       android:required="false" />
 
     <activity
-      android:name="org.nypl.simplified.viewer.epub.readium1.ReaderActivity"
-      android:exported="false" />
-
-    <activity
       android:name="org.nypl.simplified.viewer.epub.readium2.Reader2Activity"
       android:configChanges="orientation|keyboardHidden"
       android:exported="false"
       android:parentActivityName="org.nypl.simplified.main.MainActivity"
       android:screenOrientation="portrait"
-      android:theme="@style/VanillaTheme_NoActionBar" />
-
-    <activity
-      android:name="org.nypl.simplified.viewer.epub.readium1.toc.ReaderTOCActivity"
-      android:exported="false" />
+      android:theme="@style/NeutralTheme_NoActionBar" />
 
     <activity
       android:name="org.nypl.simplified.viewer.pdf.PdfReaderActivity"

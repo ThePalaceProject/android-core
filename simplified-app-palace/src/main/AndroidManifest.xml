@@ -15,7 +15,7 @@
     android:contentDescription="@string/app_name"
     android:icon="@mipmap/ic_launcher"
     android:label="@string/app_name"
-    android:theme="@style/PalaceTheme_NoActionBar"
+    android:theme="@style/NeutralTheme_NoActionBar"
     android:usesCleartextTraffic="true"
     tools:replace="android:allowBackup">
 
@@ -55,24 +55,12 @@
       android:required="false" />
 
     <activity
-      android:name="org.nypl.simplified.viewer.epub.readium1.ReaderActivity"
-      android:contentDescription="@string/app_name"
-      android:exported="false"
-      android:label="@string/app_name" />
-
-    <activity
-      android:name="org.nypl.simplified.viewer.epub.readium1.toc.ReaderTOCActivity"
-      android:contentDescription="@string/app_name"
-      android:exported="false"
-      android:label="@string/app_name" />
-
-    <activity
       android:name="org.nypl.simplified.viewer.epub.readium2.Reader2Activity"
       android:configChanges="orientation|keyboardHidden"
       android:exported="false"
       android:parentActivityName="org.nypl.simplified.main.MainActivity"
       android:screenOrientation="portrait"
-      android:theme="@style/PalaceTheme_NoActionBar" />
+      android:theme="@style/NeutralTheme_NoActionBar" />
 
     <activity
       android:name="org.nypl.simplified.viewer.pdf.PdfReaderActivity"

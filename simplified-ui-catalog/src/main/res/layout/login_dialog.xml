@@ -53,7 +53,7 @@
           android:layout_weight="1"
           android:inputType="textNoSuggestions"
           android:maxLines="1"
-          android:theme="@style/SimplifiedEditText" />
+          android:theme="@style/NeutralEditText" />
       </TableRow>
 
       <TableRow
@@ -75,7 +75,7 @@
           android:layout_weight="1"
           android:inputType="textPassword"
           android:maxLines="1"
-          android:theme="@style/SimplifiedEditText" />
+          android:theme="@style/NeutralEditText" />
       </TableRow>
     </TableLayout>
 

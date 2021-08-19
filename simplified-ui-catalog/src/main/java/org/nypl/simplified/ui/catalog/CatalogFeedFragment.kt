@@ -52,7 +52,6 @@ import org.nypl.simplified.ui.catalog.CatalogFeedState.CatalogFeedLoaded.Catalog
 import org.nypl.simplified.ui.catalog.CatalogFeedState.CatalogFeedLoaded.CatalogFeedWithoutGroups
 import org.nypl.simplified.ui.catalog.CatalogFeedState.CatalogFeedLoading
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
-import org.nypl.simplified.ui.theme.ThemeControl
 import org.slf4j.LoggerFactory
 
 /**
@@ -452,24 +451,36 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
   }
 
   private fun configureToolbarNavigation() {
-    fun showAccountPickerAction() {
-      // Configure the 'Home Action' in the Toolbar to show the account picker when tapped.
-      this.supportActionBar?.apply {
-        // Configure whether or not the user should be able to change accounts
-        if (configurationService.showChangeAccountsUi) {
-          setHomeAsUpIndicator(R.drawable.accounts)
-          setHomeActionContentDescription(R.string.catalogAccounts)
-          setDisplayHomeAsUpEnabled(true)
-        } else {
-          setDisplayHomeAsUpEnabled(false)
-        }
-      }
-    }
-
     try {
-      if (this.viewModel.isAccountCatalogRoot() || this.viewModel.showCurrentLibrary()) {
-        showAccountPickerAction()
+      val toolbar = this.supportActionBar ?: return
+
+      /*
+       * If we're not at the root of a feed, then display a back arrow in the toolbar.
+       */
+
+      if (!this.viewModel.isAccountCatalogRoot()) {
+        toolbar.setDisplayHomeAsUpEnabled(true)
+        toolbar.setHomeActionContentDescription(null)
+        return
       }
+
+      /*
+       * If we're at the root of a feed and the app is configured such that the user should
+       * be allowed to change accounts, then display the current account's logo in the toolbar.
+       */
+
+      if (configurationService.showChangeAccountsUi) {
+        toolbar.setHomeActionContentDescription(R.string.catalogAccounts)
+        toolbar.setLogo(this.configurationService.brandingAppIcon)
+        return
+      }
+
+      /*
+       * Otherwise, show nothing.
+       */
+
+      toolbar.setDisplayHomeAsUpEnabled(false)
+      toolbar.setLogo(null)
     } catch (e: Exception) {
       // Nothing to do
     }
@@ -477,8 +488,8 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
 
   private fun configureToolbarTitles() {
     this.supportActionBar?.let {
-      it.title = this.parameters.title
-      it.subtitle = this.viewModel.accountProvider?.displayName
+      it.title = this.viewModel.accountProvider?.displayName
+      it.subtitle = null
     }
   }
 
@@ -735,8 +746,8 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
 
     val colors =
       intArrayOf(
-        ContextCompat.getColor(activity, R.color.simplifiedColorBackground),
-        ThemeControl.resolveColorAttribute(activity.theme, R.attr.colorPrimary)
+        ContextCompat.getColor(activity, R.color.neutralColorBackground),
+        ContextCompat.getColor(activity, R.color.neutralColorPrimary)
       )
 
     return ColorStateList(states, colors)
