@@ -101,7 +101,6 @@ public abstract class ReaderPreferences {
      */
 
     public final ReaderPreferences build() {
-      this.setFontScale(Math.min(200.0, Math.max(50.0, fontScale())));
       this.setBrightness(Math.min(1.0, Math.max(0.0, brightness())));
       return autoBuild();
     }
