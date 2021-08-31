@@ -53,19 +53,15 @@ class NeutralToolbar(
     super.onLayout(changed, l, t, r, b)
     this.titleView.x = ((this.width - this.titleView.width) / 2).toFloat()
 
-    val ignored = when (this.iconKind) {
+    when (this.iconKind) {
       ICON_IS_NAVIGATION -> {
-        val iconWidth = this.dpToPixelsReal(24).toFloat()
         val iconHeight = this.dpToPixelsReal(24).toFloat()
         this.iconView.x = this.dpToPixelsReal(16).toFloat()
         this.iconView.y = (this.height / 2.0f) - (iconHeight / 2.0f)
-        this.iconView.layoutParams = LayoutParams(iconWidth.toInt(), iconHeight.toInt())
       }
-
       ICON_IS_LOGO -> {
         this.iconView.x = 0.0f
         this.iconView.y = 0.0f
-        this.iconView.layoutParams = LayoutParams(this.height, this.height)
       }
     }
   }
@@ -81,7 +77,11 @@ class NeutralToolbar(
     if (drawable != null) {
       this.iconKind = ICON_IS_NAVIGATION
       this.iconView.setImageResource(R.drawable.ic_baseline_arrow_back_24)
-      this.requestLayout()
+      val iconWidth = this.dpToPixelsReal(24).toFloat()
+      val iconHeight = this.dpToPixelsReal(24).toFloat()
+      this.iconView.x = this.dpToPixelsReal(16).toFloat()
+      this.iconView.y = (this.height / 2.0f) - (iconHeight / 2.0f)
+      this.iconView.layoutParams = LayoutParams(iconWidth.toInt(), iconHeight.toInt())
     } else {
       this.iconKind = ICON_IS_LOGO
       this.setLogo(this.iconLogoLast)
@@ -96,7 +96,7 @@ class NeutralToolbar(
     this.iconKind = ICON_IS_LOGO
     this.iconLogoLast = drawable
     this.iconView.setImageDrawable(drawable)
-    this.requestLayout()
+    this.iconView.layoutParams = LayoutParams(this.height, this.height)
   }
 
   override fun setSubtitle(subtitle: CharSequence?) {

@@ -18,6 +18,7 @@
     <item name="android:windowNoTitle">true</item>
     <item name="android:windowContentOverlay">@null</item>
     <item name="android:windowBackground">@drawable/neutral_blank</item>
+    <item name="android:fontFamily">@font/open_sans_regular</item>
   </style>
 
   <!--
@@ -25,6 +26,8 @@
   -->
 
   <style name="NeutralTheme_NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+    <item name="android:fontFamily">@font/open_sans_regular</item>
+
     <item name="colorPrimary">@color/neutralColorPrimary</item>
     <item name="colorPrimaryDark">@color/neutralColorPrimaryDark</item>
     <item name="colorAccent">@color/neutralColorPrimaryDark</item>
@@ -45,10 +48,12 @@
   </style>
 
   <!--
-  The default theme that has an action bar.
--->
+    The default theme that has an action bar.
+  -->
 
   <style name="NeutralTheme_ActionBar" parent="Theme.AppCompat.Light">
+    <item name="android:fontFamily">@font/open_sans_regular</item>
+
     <item name="colorPrimary">@color/neutralColorPrimary</item>
     <item name="colorPrimaryDark">@color/neutralColorPrimaryDark</item>
     <item name="colorAccent">@color/neutralColorPrimaryDark</item>
@@ -75,6 +80,8 @@
   <!-- Action Bar -->
 
   <style name="Neutral.ActionBar" parent="Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+    <item name="android:fontFamily">@font/open_sans_regular</item>
+
     <item name="android:background">#ffffff</item>
     <item name="android:displayOptions">homeAsUp|showTitle</item>
     <item name="titleTextAppearance">@style/Neutral.Toolbar.Title</item>
