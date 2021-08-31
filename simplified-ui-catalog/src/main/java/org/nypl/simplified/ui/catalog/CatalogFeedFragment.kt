@@ -51,6 +51,7 @@ import org.nypl.simplified.ui.catalog.CatalogFeedState.CatalogFeedLoaded.Catalog
 import org.nypl.simplified.ui.catalog.CatalogFeedState.CatalogFeedLoaded.CatalogFeedWithGroups
 import org.nypl.simplified.ui.catalog.CatalogFeedState.CatalogFeedLoaded.CatalogFeedWithoutGroups
 import org.nypl.simplified.ui.catalog.CatalogFeedState.CatalogFeedLoading
+import org.nypl.simplified.ui.neutrality.NeutralToolbar
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.slf4j.LoggerFactory
 
@@ -137,6 +138,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
   private lateinit var feedWithoutGroupsList: RecyclerView
   private lateinit var feedWithoutGroupsScrollListener: RecyclerView.OnScrollListener
   private lateinit var feedWithoutGroupsTabs: RadioGroup
+  private lateinit var toolbar: NeutralToolbar
 
   private var ageGateDialog: DialogFragment? = null
   private val feedWithGroupsData: MutableList<FeedGroup> = mutableListOf()
@@ -150,6 +152,9 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+
+    this.toolbar =
+      view.rootView.findViewWithTag(NeutralToolbar.neutralToolbarName)
 
     this.viewModel.stateLive.observe(this.viewLifecycleOwner, this::reconfigureUI)
 
@@ -252,14 +257,6 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
       R.id.catalogMenuActionReload -> {
         this.viewModel.syncAccounts()
         true
-      }
-      android.R.id.home -> {
-        if (this.viewModel.isAccountCatalogRoot() || this.viewModel.showCurrentLibrary()) {
-          this.openAccountPickerDialog()
-          true
-        } else {
-          super.onOptionsItemSelected(item)
-        }
       }
       else -> super.onOptionsItemSelected(item)
     }
@@ -452,15 +449,18 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
 
   private fun configureToolbarNavigation() {
     try {
-      val toolbar = this.supportActionBar ?: return
+      val actionBar = this.supportActionBar ?: return
 
       /*
        * If we're not at the root of a feed, then display a back arrow in the toolbar.
        */
 
       if (!this.viewModel.isAccountCatalogRoot()) {
-        toolbar.setDisplayHomeAsUpEnabled(true)
-        toolbar.setHomeActionContentDescription(null)
+        actionBar.setDisplayHomeAsUpEnabled(true)
+        actionBar.setHomeActionContentDescription(null)
+        this.toolbar.setLogoOnClickListener {
+          // Do nothing
+        }
         return
       }
 
@@ -469,9 +469,12 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
        * be allowed to change accounts, then display the current account's logo in the toolbar.
        */
 
-      if (configurationService.showChangeAccountsUi) {
-        toolbar.setHomeActionContentDescription(R.string.catalogAccounts)
-        toolbar.setLogo(this.configurationService.brandingAppIcon)
+      if (this.configurationService.showChangeAccountsUi) {
+        actionBar.setHomeActionContentDescription(R.string.catalogAccounts)
+        actionBar.setLogo(this.configurationService.brandingAppIcon)
+        this.toolbar.setLogoOnClickListener {
+          this.openAccountPickerDialog()
+        }
         return
       }
 
@@ -479,8 +482,12 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
        * Otherwise, show nothing.
        */
 
-      toolbar.setDisplayHomeAsUpEnabled(false)
-      toolbar.setLogo(null)
+      actionBar.setDisplayHomeAsUpEnabled(false)
+      actionBar.setLogo(null)
+
+      this.toolbar.setLogoOnClickListener {
+        // Do nothing
+      }
     } catch (e: Exception) {
       // Nothing to do
     }

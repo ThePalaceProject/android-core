@@ -20,6 +20,10 @@ class NeutralToolbar(
   defStyleAttr: Int
 ) : Toolbar(context, attrs, defStyleAttr) {
 
+  companion object {
+    const val neutralToolbarName = "NeutralToolbar"
+  }
+
   constructor(context: Context) : this(context, null)
   constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, androidx.appcompat.R.attr.toolbarStyle)
 
@@ -47,6 +51,7 @@ class NeutralToolbar(
     TextViewCompat.setTextAppearance(this.titleView, R.style.Neutral_Toolbar_Title)
     this.addView(this.titleView, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT))
     this.addView(this.iconView, LayoutParams(this.dpToPixelsIntegral(64), this.dpToPixelsIntegral(64)))
+    this.tag = neutralToolbarName
   }
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
@@ -104,5 +109,11 @@ class NeutralToolbar(
 
   override fun setTitle(title: CharSequence) {
     this.titleView.text = title
+  }
+
+  fun setLogoOnClickListener(listener: () -> Unit) {
+    this.iconView.setOnClickListener {
+      listener()
+    }
   }
 }
