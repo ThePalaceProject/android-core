@@ -9,8 +9,8 @@ import java.net.URI
 class PalaceBuildConfigurationService : BuildConfigurationServiceType {
   override val libraryRegistry: BuildConfigurationAccountsRegistryURIs
     get() = BuildConfigurationAccountsRegistryURIs(
-      registry = URI("https://libraryregistry.librarysimplified.org/libraries"),
-      registryQA = URI("https://libraryregistry.librarysimplified.org/libraries/qa")
+      registry = URI("https://registry.palaceproject.io/libraries"),
+      registryQA = URI("https://registry.palaceproject.io/libraries/qa")
     )
   override val allowAccountsAccess: Boolean
     get() = true
