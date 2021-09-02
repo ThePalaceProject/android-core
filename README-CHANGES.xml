@@ -36,9 +36,13 @@
         <c:change date="2021-07-23T00:00:00+00:00" summary="Update Adobe certificate"/>
       </c:changes>
     </c:release>
-    <c:release date="2021-08-04T23:53:40+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.1">
+    <c:release date="2021-09-02T16:59:44+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.1">
       <c:changes>
-        <c:change date="2021-08-04T23:53:40+00:00" summary="Update icons"/>
+        <c:change date="2021-08-04T00:00:00+00:00" summary="Update icons"/>
+        <c:change date="2021-09-02T00:00:00+00:00" summary="Fix large font size selection not being restored after restarting the app"/>
+        <c:change date="2021-09-02T00:00:00+00:00" summary="Lower max font size to 380%"/>
+        <c:change date="2021-09-02T00:00:00+00:00" summary="Disable increase/decrease font size buttons when max/min size is reached"/>
+        <c:change date="2021-09-02T16:59:44+00:00" summary="Use palaceproject.io library registry"/>
       </c:changes>
     </c:release>
   </c:releases>
