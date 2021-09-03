@@ -1,0 +1,13 @@
+{
+  "@version" : 20210605,
+  "displayName" : "",
+  "preferences" : {
+    "showTestingLibraries" : false,
+    "readerPreferences" : {
+      "font_scale" : 800.0,
+      "font_family" : "READER_FONT_SANS_SERIF",
+      "color_scheme" : "SCHEME_BLACK_ON_WHITE"
+    }
+  },
+  "attributes" : { }
+}

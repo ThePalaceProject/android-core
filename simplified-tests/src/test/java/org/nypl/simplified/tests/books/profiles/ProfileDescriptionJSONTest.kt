@@ -144,6 +144,29 @@ class ProfileDescriptionJSONTest {
     assertEquals("5310437f-db1a-492e-a09f-1ceaa43303dd", description.preferences.mostRecentAccount.uuid.toString())
   }
 
+  /**
+   * A large font scale value should not be constrained during deserialization.
+   */
+
+  @Test
+  fun testLargeFontScale() {
+    val mapper = ObjectMapper()
+    val mostRecentAccount = AccountID.generate()
+    val description =
+      ProfileDescriptionJSON.deserializeFromText(
+        mapper,
+        this.ofResource("profile-large-font-scale.json"),
+        mostRecentAccount
+      )
+
+    assertEquals("", description.displayName)
+    assertEquals(1.0, description.preferences.readerPreferences.brightness())
+    assertEquals(800.0, description.preferences.readerPreferences.fontScale())
+    assertEquals(ReaderFontSelection.READER_FONT_SANS_SERIF, description.preferences.readerPreferences.fontFamily())
+    assertEquals(ReaderColorScheme.SCHEME_BLACK_ON_WHITE, description.preferences.readerPreferences.colorScheme())
+    assertEquals(mostRecentAccount, description.preferences.mostRecentAccount)
+  }
+
   private fun ofResource(name: String): String {
     val bytes =
       ProfileDescriptionJSONTest::class.java.getResourceAsStream(
