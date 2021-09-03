@@ -5,13 +5,12 @@
   android:layout_height="match_parent"
   android:orientation="vertical">
 
-  <androidx.appcompat.widget.Toolbar
-    android:id="@+id/toolbar"
+  <org.nypl.simplified.ui.neutrality.NeutralToolbar
+    android:id="@+id/mainToolbar"
+    style="@style/Neutral.ActionBar"
     android:layout_width="match_parent"
     android:layout_height="?android:attr/actionBarSize"
-    android:background="?attr/colorPrimary"
-    android:theme="?attr/actionBarTheme"
-    app:subtitleTextColor="#ffffff" />
+    app:theme="@style/Neutral.Toolbar" />
 
   <FrameLayout
     android:id="@+id/fragmentHolder"

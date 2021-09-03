@@ -15,6 +15,7 @@ import android.view.View.TEXT_ALIGNMENT_TEXT_END
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
@@ -32,6 +33,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import org.librarysimplified.services.api.Services
+import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.android.ktx.supportActionBar
 import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
@@ -41,18 +43,22 @@ import org.nypl.simplified.feeds.api.FeedGroup
 import org.nypl.simplified.feeds.api.FeedSearch
 import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.fragmentListeners
+import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.accounts.AccountPickerDialogFragment
 import org.nypl.simplified.ui.catalog.CatalogFeedOwnership.CollectedFromAccounts
 import org.nypl.simplified.ui.catalog.CatalogFeedOwnership.OwnedByAccount
 import org.nypl.simplified.ui.catalog.CatalogFeedState.CatalogFeedAgeGate
 import org.nypl.simplified.ui.catalog.CatalogFeedState.CatalogFeedLoadFailed
+import org.nypl.simplified.ui.catalog.CatalogFeedState.CatalogFeedLoaded
 import org.nypl.simplified.ui.catalog.CatalogFeedState.CatalogFeedLoaded.CatalogFeedEmpty
 import org.nypl.simplified.ui.catalog.CatalogFeedState.CatalogFeedLoaded.CatalogFeedNavigation
 import org.nypl.simplified.ui.catalog.CatalogFeedState.CatalogFeedLoaded.CatalogFeedWithGroups
 import org.nypl.simplified.ui.catalog.CatalogFeedState.CatalogFeedLoaded.CatalogFeedWithoutGroups
 import org.nypl.simplified.ui.catalog.CatalogFeedState.CatalogFeedLoading
+import org.nypl.simplified.ui.images.ImageAccountIcons
+import org.nypl.simplified.ui.images.ImageLoaderType
+import org.nypl.simplified.ui.neutrality.NeutralToolbar
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
-import org.nypl.simplified.ui.theme.ThemeControl
 import org.slf4j.LoggerFactory
 
 /**
@@ -115,6 +121,10 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
     services.requireService(ScreenSizeInformationType::class.java)
   private val configurationService =
     services.requireService(BuildConfigurationServiceType::class.java)
+  private val profilesController =
+    services.requireService(ProfilesControllerType::class.java)
+  private val imageLoader =
+    services.requireService(ImageLoaderType::class.java)
 
   private lateinit var buttonCreator: CatalogButtons
   private lateinit var feedEmpty: ViewGroup
@@ -129,6 +139,9 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
   private lateinit var feedWithGroupsFacetsScroll: ViewGroup
   private lateinit var feedWithGroupsHeader: ViewGroup
   private lateinit var feedWithGroupsList: RecyclerView
+  private lateinit var feedWithGroupsLogoHeader: ViewGroup
+  private lateinit var feedWithGroupsLogoImage: ImageView
+  private lateinit var feedWithGroupsLogoText: TextView
   private lateinit var feedWithGroupsTabs: RadioGroup
   private lateinit var feedWithoutGroups: ViewGroup
   private lateinit var feedWithoutGroupsAdapter: CatalogPagedAdapter
@@ -136,8 +149,12 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
   private lateinit var feedWithoutGroupsFacetsScroll: ViewGroup
   private lateinit var feedWithoutGroupsHeader: ViewGroup
   private lateinit var feedWithoutGroupsList: RecyclerView
+  private lateinit var feedWithoutGroupsLogoHeader: ViewGroup
+  private lateinit var feedWithoutGroupsLogoImage: ImageView
+  private lateinit var feedWithoutGroupsLogoText: TextView
   private lateinit var feedWithoutGroupsScrollListener: RecyclerView.OnScrollListener
   private lateinit var feedWithoutGroupsTabs: RadioGroup
+  private lateinit var toolbar: NeutralToolbar
 
   private var ageGateDialog: DialogFragment? = null
   private val feedWithGroupsData: MutableList<FeedGroup> = mutableListOf()
@@ -151,6 +168,9 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+
+    this.toolbar =
+      view.rootView.findViewWithTag(NeutralToolbar.neutralToolbarName)
 
     this.viewModel.stateLive.observe(this.viewLifecycleOwner, this::reconfigureUI)
 
@@ -178,6 +198,20 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
       this.feedWithGroupsHeader.findViewById(R.id.feedHeaderFacets)
     this.feedWithGroupsTabs =
       this.feedWithGroupsHeader.findViewById(R.id.feedHeaderTabs)
+
+    this.feedWithGroupsLogoHeader =
+      this.feedWithGroups.findViewById(R.id.feedWithGroupsLogoHeader)
+    this.feedWithGroupsLogoImage =
+      this.feedWithGroupsLogoHeader.findViewById(R.id.feedLibraryLogo)
+    this.feedWithGroupsLogoText =
+      this.feedWithGroupsLogoHeader.findViewById(R.id.feedLibraryText)
+
+    this.feedWithoutGroupsLogoHeader =
+      this.feedWithoutGroups.findViewById(R.id.feedWithoutGroupsLogoHeader)
+    this.feedWithoutGroupsLogoImage =
+      this.feedWithoutGroupsLogoHeader.findViewById(R.id.feedLibraryLogo)
+    this.feedWithoutGroupsLogoText =
+      this.feedWithoutGroupsLogoHeader.findViewById(R.id.feedLibraryText)
 
     this.feedWithGroupsList = this.feedWithGroups.findViewById(R.id.feedWithGroupsList)
     this.feedWithGroupsList.setHasFixedSize(true)
@@ -254,14 +288,6 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
         this.viewModel.syncAccounts()
         true
       }
-      android.R.id.home -> {
-        if (this.viewModel.isAccountCatalogRoot() || this.viewModel.showCurrentLibrary()) {
-          this.openAccountPickerDialog()
-          true
-        } else {
-          super.onOptionsItemSelected(item)
-        }
-      }
       else -> super.onOptionsItemSelected(item)
     }
   }
@@ -327,6 +353,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
     this.feedWithGroups.visibility = View.INVISIBLE
     this.feedWithoutGroups.visibility = View.INVISIBLE
 
+    this.configureLogoHeader(feedState)
     this.configureToolbar()
   }
 
@@ -356,6 +383,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
     this.feedWithGroups.visibility = View.INVISIBLE
     this.feedWithoutGroups.visibility = View.INVISIBLE
 
+    this.configureLogoHeader(feedState)
     this.configureToolbar()
   }
 
@@ -371,7 +399,6 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
     this.feedWithoutGroups.visibility = View.VISIBLE
 
     this.configureToolbar()
-
     this.configureFacets(
       facetHeader = this.feedWithoutGroupsHeader,
       facetTabs = this.feedWithoutGroupsTabs,
@@ -379,6 +406,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
       facetLayout = this.feedWithoutGroupsFacets,
       facetsByGroup = feedState.facetsByGroup
     )
+    this.configureLogoHeader(feedState)
 
     this.feedWithoutGroupsAdapter =
       CatalogPagedAdapter(
@@ -407,7 +435,6 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
     this.feedWithoutGroups.visibility = View.INVISIBLE
 
     this.configureToolbar()
-
     this.configureFacets(
       facetHeader = this.feedWithGroupsHeader,
       facetTabs = this.feedWithGroupsTabs,
@@ -415,10 +442,79 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
       facetLayout = this.feedWithGroupsFacets,
       facetsByGroup = feedState.feed.facetsByGroup
     )
+    this.configureLogoHeader(feedState)
 
     this.feedWithGroupsData.clear()
     this.feedWithGroupsData.addAll(feedState.feed.feedGroupsInOrder)
     this.feedWithGroupsAdapter.notifyDataSetChanged()
+  }
+
+  private fun configureLogoHeader(feedState: CatalogFeedLoaded) {
+
+    fun loadImageAndText(
+      accountId: AccountID,
+      imageView: ImageView,
+      textView: TextView
+    ) {
+      try {
+        val account =
+          this.profilesController.profileCurrent()
+            .account(accountId)
+
+        ImageAccountIcons.loadAccountLogoIntoView(
+          loader = this.imageLoader.loader,
+          account = account.provider.toDescription(),
+          defaultIcon = org.nypl.simplified.ui.accounts.R.drawable.account_default,
+          iconView = imageView
+        )
+
+        textView.text = account.provider.displayName
+      } catch (e: Exception) {
+        this.logger.debug("error configuring header: ", e)
+      }
+    }
+
+    return when (feedState) {
+      is CatalogFeedEmpty,
+      is CatalogFeedNavigation ->
+        Unit
+
+      is CatalogFeedWithGroups ->
+        when (val ownership = feedState.arguments.ownership) {
+          CollectedFromAccounts -> {
+            this.feedWithGroupsLogoHeader.visibility = View.GONE
+            this.feedWithoutGroupsLogoHeader.visibility = View.GONE
+          }
+          is OwnedByAccount -> {
+            this.feedWithGroupsLogoHeader.visibility = View.VISIBLE
+            this.feedWithoutGroupsLogoHeader.visibility = View.GONE
+
+            loadImageAndText(
+              accountId = ownership.accountId,
+              imageView = this.feedWithGroupsLogoImage,
+              textView = this.feedWithGroupsLogoText
+            )
+          }
+        }
+
+      is CatalogFeedWithoutGroups ->
+        when (val ownership = feedState.arguments.ownership) {
+          CollectedFromAccounts -> {
+            this.feedWithGroupsLogoHeader.visibility = View.GONE
+            this.feedWithoutGroupsLogoHeader.visibility = View.GONE
+          }
+          is OwnedByAccount -> {
+            this.feedWithGroupsLogoHeader.visibility = View.GONE
+            this.feedWithoutGroupsLogoHeader.visibility = View.VISIBLE
+
+            loadImageAndText(
+              accountId = ownership.accountId,
+              imageView = this.feedWithoutGroupsLogoImage,
+              textView = this.feedWithoutGroupsLogoText
+            )
+          }
+        }
+    }
   }
 
   private fun onCatalogFeedLoadFailed(
@@ -452,23 +548,45 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
   }
 
   private fun configureToolbarNavigation() {
-    fun showAccountPickerAction() {
-      // Configure the 'Home Action' in the Toolbar to show the account picker when tapped.
-      this.supportActionBar?.apply {
-        // Configure whether or not the user should be able to change accounts
-        if (configurationService.showChangeAccountsUi) {
-          setHomeAsUpIndicator(R.drawable.accounts)
-          setHomeActionContentDescription(R.string.catalogAccounts)
-          setDisplayHomeAsUpEnabled(true)
-        } else {
-          setDisplayHomeAsUpEnabled(false)
-        }
-      }
-    }
-
     try {
-      if (this.viewModel.isAccountCatalogRoot() || this.viewModel.showCurrentLibrary()) {
-        showAccountPickerAction()
+      val actionBar = this.supportActionBar ?: return
+
+      /*
+       * If we're not at the root of a feed, then display a back arrow in the toolbar.
+       */
+
+      if (!this.viewModel.isAccountCatalogRoot()) {
+        actionBar.setDisplayHomeAsUpEnabled(true)
+        actionBar.setHomeActionContentDescription(null)
+        this.toolbar.setLogoOnClickListener {
+          // Do nothing
+        }
+        return
+      }
+
+      /*
+       * If we're at the root of a feed and the app is configured such that the user should
+       * be allowed to change accounts, then display the current account's logo in the toolbar.
+       */
+
+      if (this.configurationService.showChangeAccountsUi) {
+        actionBar.setHomeActionContentDescription(R.string.catalogAccounts)
+        actionBar.setLogo(this.configurationService.brandingAppIcon)
+        this.toolbar.setLogoOnClickListener {
+          this.openAccountPickerDialog()
+        }
+        return
+      }
+
+      /*
+       * Otherwise, show nothing.
+       */
+
+      actionBar.setDisplayHomeAsUpEnabled(false)
+      actionBar.setLogo(null)
+
+      this.toolbar.setLogoOnClickListener {
+        // Do nothing
       }
     } catch (e: Exception) {
       // Nothing to do
@@ -477,8 +595,8 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
 
   private fun configureToolbarTitles() {
     this.supportActionBar?.let {
-      it.title = this.parameters.title
-      it.subtitle = this.viewModel.accountProvider?.displayName
+      it.title = this.viewModel.accountProvider?.displayName
+      it.subtitle = null
     }
   }
 
@@ -735,8 +853,8 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
 
     val colors =
       intArrayOf(
-        ContextCompat.getColor(activity, R.color.simplifiedColorBackground),
-        ThemeControl.resolveColorAttribute(activity.theme, R.attr.colorPrimary)
+        ContextCompat.getColor(activity, R.color.neutralColorBackground),
+        ContextCompat.getColor(activity, R.color.neutralColorPrimary)
       )
 
     return ColorStateList(states, colors)

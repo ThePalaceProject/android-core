@@ -29,6 +29,7 @@ import org.nypl.simplified.feeds.api.FeedEntry.FeedEntryOPDS
 import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.fragmentListeners
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
+import org.nypl.simplified.ui.neutrality.NeutralToolbar
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import java.net.URI
 
@@ -104,6 +105,7 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
   private lateinit var statusInProgressText: TextView
   private lateinit var summary: TextView
   private lateinit var title: TextView
+  private lateinit var toolbar: NeutralToolbar
 
   private val dateFormatter =
     DateTimeFormatterBuilder()
@@ -142,6 +144,9 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+
+    this.toolbar =
+      view.rootView.findViewWithTag(NeutralToolbar.neutralToolbarName)
 
     this.viewModel.bookWithStatusLive.observe(this.viewLifecycleOwner, this::reconfigureUI)
 
@@ -220,10 +225,11 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
   }
 
   private fun configureToolbar() {
-    val feedTitle = this.parameters.feedArguments.title
-    this.supportActionBar?.apply {
-      title = feedTitle
-      subtitle = this@CatalogBookDetailFragment.viewModel.accountProvider?.displayName
+    val actionBar = this.supportActionBar ?: return
+    actionBar.setDisplayHomeAsUpEnabled(true)
+    actionBar.setHomeActionContentDescription(null)
+    this.toolbar.setLogoOnClickListener {
+      // Do nothing
     }
   }
 

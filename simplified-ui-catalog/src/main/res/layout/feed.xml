@@ -1,19 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent">
 
-  <include layout="@layout/feed_empty" />
+  <include
+    layout="@layout/feed_empty"
+    tools:visibility="visible" />
 
-  <include layout="@layout/feed_error" />
+  <include
+    layout="@layout/feed_error"
+    tools:visibility="visible" />
 
-  <include layout="@layout/feed_loading" />
+  <include
+    layout="@layout/feed_loading"
+    tools:visibility="visible" />
 
-  <include layout="@layout/feed_navigation" />
+  <include
+    layout="@layout/feed_navigation"
+    tools:visibility="visible" />
 
-  <include layout="@layout/feed_with_groups" />
+  <include
+    layout="@layout/feed_with_groups"
+    tools:visibility="visible" />
 
-  <include layout="@layout/feed_without_groups" />
+  <include
+    layout="@layout/feed_without_groups"
+    tools:visibility="visible" />
 
 </FrameLayout>

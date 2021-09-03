@@ -6,6 +6,7 @@ package org.nypl.simplified.buildconfig.api
 
 interface BuildConfigurationServiceType :
   BuildConfigurationAccountsType,
+  BuildConfigurationBrandingType,
   BuildConfigurationCatalogType,
   BuildConfigurationMetadataType,
   BuildConfigurationOAuthType,

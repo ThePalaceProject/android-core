@@ -64,7 +64,6 @@ dependencies {
   api project(":simplified-ui-branding")
   api project(":simplified-ui-errorpage")
   api project(":simplified-ui-splash")
-  api project(":simplified-ui-theme")
   api project(":simplified-webview")
 
   api libraries.nypl_audiobook_api

@@ -598,7 +598,7 @@ class CatalogFeedViewModel(
   fun isAccountCatalogRoot(): Boolean {
     val parameters = this.feedArguments
     if (parameters !is CatalogFeedArgumentsRemote) {
-      return false
+      return true
     }
 
     val ownership = this.feedArguments.ownership

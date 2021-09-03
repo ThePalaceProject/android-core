@@ -157,6 +157,8 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
      * Show the Toolbar
      */
 
+    this.supportActionBar?.setLogo(this.viewModel.buildConfig.brandingAppIcon)
+    this.supportActionBar?.setTitle(R.string.app_name)
     this.supportActionBar?.show()
 
     /*

@@ -10,7 +10,16 @@
   <application
     android:allowBackup="false"
     android:icon="@drawable/sandbox"
+    android:theme="@style/NeutralTheme_NoActionBar"
     android:label="SimplifiedSandbox">
+    <activity android:name=".TestActivity"
+      android:exported="true"
+      android:launchMode="singleTop">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity>
   </application>
 
 </manifest>

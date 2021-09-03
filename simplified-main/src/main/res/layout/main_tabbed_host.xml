@@ -21,7 +21,7 @@
     android:id="@+id/bottomNavigator"
     android:layout_width="match_parent"
     android:layout_height="64dp"
-    style="@style/Simplified.BottomNav"
+    style="@style/Neutral.BottomNav"
     android:background="?android:attr/windowBackground"
     app:menu="@menu/navigation_items" />
 </LinearLayout>

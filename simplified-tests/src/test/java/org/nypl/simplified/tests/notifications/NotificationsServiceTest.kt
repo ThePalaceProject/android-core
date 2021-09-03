@@ -208,7 +208,7 @@ class NotificationsServiceTest {
     override val titleReadyNotificationTitle: String
       get() = "notification title"
     override val smallIcon: Int
-      get() = R.drawable.simplified_button
+      get() = R.drawable.neutral_button
   }
 
   @Test

@@ -2,10 +2,10 @@ dependencies {
   api project(":simplified-buildconfig-api")
   api project(":simplified-ui-accounts")
   api project(":simplified-ui-catalog")
-  api project(':simplified-ui-listeners-api')
+  api project(":simplified-ui-neutrality")
   api project(":simplified-ui-profiles")
   api project(":simplified-ui-settings")
-  api project(":simplified-ui-theme")
+  api project(':simplified-ui-listeners-api')
 
   implementation project(":simplified-profiles-controller-api")
   implementation project(":simplified-viewer-api")

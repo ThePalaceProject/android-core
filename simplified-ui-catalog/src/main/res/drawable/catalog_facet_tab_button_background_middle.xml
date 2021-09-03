@@ -6,7 +6,7 @@
     <inset android:insetRight="-2dp">
       <shape android:shape="rectangle">
         <padding android:bottom="@dimen/catalogFacetTabPaddingBottom" android:left="@dimen/catalogFacetTabPaddingLeft" android:right="@dimen/catalogFacetTabPaddingRight" android:top="@dimen/catalogFacetTabPaddingTop" />
-        <solid android:color="?attr/simplifiedColorBackground" />
+        <solid android:color="#ffffff" />
         <stroke android:width="@dimen/catalogFacetTabStroke" android:color="?attr/colorPrimary" />
       </shape>
     </inset>

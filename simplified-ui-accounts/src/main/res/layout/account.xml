@@ -70,8 +70,8 @@
         android:gravity="center"
         android:linksClickable="true"
         android:autoLink="all"
-        android:textColorLink="@color/simplified_material_blue_primary"
-        android:textColor="@color/simplified_material_blue_primary"
+        android:textColorLink="?attr/colorPrimary"
+        android:textColor="?attr/colorPrimary"
         android:background="?attr/selectableItemBackground"
         android:text="@string/accountEULAStatement" />
 

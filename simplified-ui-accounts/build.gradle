@@ -11,7 +11,7 @@ dependencies {
   implementation project(":simplified-threads")
   implementation project(":simplified-ui-errorpage")
   implementation project(":simplified-ui-images")
-  implementation project(":simplified-ui-theme")
+  implementation project(":simplified-ui-neutrality")
   implementation project(":simplified-webview")
   implementation project(':simplified-ui-listeners-api')
 

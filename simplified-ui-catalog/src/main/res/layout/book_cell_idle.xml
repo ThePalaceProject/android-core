@@ -11,6 +11,7 @@
     android:id="@+id/bookCellIdleCover"
     android:layout_width="@dimen/catalogFeedCellImageWidth"
     android:layout_height="@dimen/catalogFeedCellHeight"
+    android:layout_marginStart="16dp"
     android:contentDescription="@null"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintStart_toStartOf="parent"

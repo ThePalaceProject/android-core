@@ -2,8 +2,8 @@ package org.nypl.simplified.ui.navigation.tabs
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.graphics.Color
 import androidx.annotation.IdRes
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomnavigation.LabelVisibilityMode
@@ -21,7 +21,6 @@ import org.nypl.simplified.ui.catalog.CatalogFeedArguments
 import org.nypl.simplified.ui.catalog.CatalogFeedFragment
 import org.nypl.simplified.ui.catalog.CatalogFeedOwnership
 import org.nypl.simplified.ui.settings.SettingsMainFragment
-import org.nypl.simplified.ui.theme.ThemeControl
 import org.slf4j.LoggerFactory
 
 object BottomNavigators {
@@ -164,8 +163,8 @@ object BottomNavigators {
 
     val colors =
       intArrayOf(
-        ThemeControl.resolveColorAttribute(context.theme, R.attr.colorPrimary),
-        Color.DKGRAY
+        ContextCompat.getColor(context, R.color.neutralColor),
+        ContextCompat.getColor(context, R.color.neutralColorShade)
       )
 
     return ColorStateList(states, colors)
