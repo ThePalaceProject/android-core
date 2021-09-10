@@ -45,9 +45,9 @@
         <c:change date="2021-09-02T00:00:00+00:00" summary="Use palaceproject.io library registry"/>
       </c:changes>
     </c:release>
-    <c:release date="2021-09-10T19:41:27+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.2">
+    <c:release date="2021-09-10T19:42:47+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.0.2">
       <c:changes>
-        <c:change date="2021-09-10T19:41:27+00:00" summary="Introduced a new color scheme for the application."/>
+        <c:change date="2021-09-10T00:00:00+00:00" summary="Introduced a new color scheme for the application."/>
       </c:changes>
     </c:release>
   </c:releases>
