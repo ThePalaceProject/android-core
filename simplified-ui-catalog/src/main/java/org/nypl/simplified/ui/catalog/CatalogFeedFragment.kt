@@ -559,7 +559,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
         actionBar.setDisplayHomeAsUpEnabled(true)
         actionBar.setHomeActionContentDescription(null)
         this.toolbar.setLogoOnClickListener {
-          // Do nothing
+          this.viewModel.goUpwards()
         }
         return
       }

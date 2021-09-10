@@ -8,6 +8,8 @@ import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 
 sealed class CatalogFeedEvent {
 
+  object GoUpwards : CatalogFeedEvent()
+
   data class OpenErrorPage(
     val parameters: ErrorPageParameters
   ) : CatalogFeedEvent()

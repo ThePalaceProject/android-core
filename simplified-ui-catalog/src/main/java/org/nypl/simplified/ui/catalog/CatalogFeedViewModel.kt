@@ -646,6 +646,10 @@ class CatalogFeedViewModel(
     )
   }
 
+  fun goUpwards() {
+    this.listener.post(CatalogFeedEvent.GoUpwards)
+  }
+
   fun showFeedErrorDetails(failure: FeedLoaderResult.FeedLoaderFailure) {
     this.listener.post(
       CatalogFeedEvent.OpenErrorPage(
