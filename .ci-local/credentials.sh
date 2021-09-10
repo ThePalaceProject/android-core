@@ -53,7 +53,7 @@ then
   fatal "${SIMPLYE_CREDENTIALS} does not exist, or is not a directory"
 fi
 
-cp "${CREDENTIALS_PATH}/PlayStore/play_store_api_key.json" "simplified-app-simplye/play_store_api_key.json" ||
+cp "${CREDENTIALS_PATH}/PlayStore/play_store_api_key.json" "simplified-app-palace/play_store_api_key.json" ||
   fatal "could not copy Play Store key"
 
 cat >> "${HOME}/.gradle/gradle.properties" <<EOF
