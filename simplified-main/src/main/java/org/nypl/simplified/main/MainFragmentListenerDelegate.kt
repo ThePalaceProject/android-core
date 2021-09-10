@@ -191,6 +191,10 @@ internal class MainFragmentListenerDelegate(
         this.openFeed(event.feedArguments)
         state
       }
+      CatalogFeedEvent.GoUpwards -> {
+        this.goUpwards()
+        state
+      }
     }
   }
 
@@ -457,6 +461,10 @@ internal class MainFragmentListenerDelegate(
       fragment = ErrorPageFragment.create(parameters),
       tab = this.navigator.currentTab()
     )
+  }
+
+  private fun goUpwards() {
+    this.navigator.popBackStack()
   }
 
   private fun openSettingsAccount(account: AccountID, showPleaseLogInTitle: Boolean) {
