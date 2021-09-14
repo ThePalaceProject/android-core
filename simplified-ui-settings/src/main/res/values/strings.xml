@@ -4,8 +4,8 @@
   <string name="settings">Settings</string>
   <string name="settingsAbout">About</string>
   <string name="settingsAboutSummary" />
-  <string name="settingsAccounts">Accounts</string>
-  <string name="settingsAccountsSummary">Add, remove, or configure accounts</string>
+  <string name="settingsAccounts">Libraries</string>
+  <string name="settingsAccountsSummary">Add, remove, or configure libraries</string>
   <string name="settingsAcknowledgements">Acknowledgements</string>
   <string name="settingsAcknowledgementsSummary" />
   <string name="settingsCommit">Commit</string>
