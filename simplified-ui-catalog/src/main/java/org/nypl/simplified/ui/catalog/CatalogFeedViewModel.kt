@@ -937,6 +937,15 @@ class CatalogFeedViewModel(
     this.borrowViewModel.tryRevokeMaybeAuthenticated(book)
   }
 
+  fun title(): String {
+    return when (val arguments = this.feedArguments) {
+      is CatalogFeedArgumentsLocalBooks ->
+        arguments.title
+      is CatalogFeedArgumentsRemote ->
+        this.resources.getString(R.string.feedTitleCatalog)
+    }
+  }
+
   private fun openLoginDialogIfNecessary(accountID: AccountID) {
     if (this.borrowViewModel.isLoginRequired(accountID)) {
       this.listener.post(

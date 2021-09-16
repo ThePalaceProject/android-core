@@ -543,12 +543,8 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
   }
 
   private fun configureToolbar() {
-    this.configureToolbarNavigation()
-    this.configureToolbarTitles()
-  }
-
-  private fun configureToolbarNavigation() {
     try {
+      this.toolbar.setTitle(this.viewModel.title())
       val actionBar = this.supportActionBar ?: return
 
       /*
@@ -590,13 +586,6 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
       }
     } catch (e: Exception) {
       // Nothing to do
-    }
-  }
-
-  private fun configureToolbarTitles() {
-    this.supportActionBar?.let {
-      it.title = this.viewModel.accountProvider?.displayName
-      it.subtitle = null
     }
   }
 
