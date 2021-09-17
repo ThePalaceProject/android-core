@@ -11,8 +11,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import io.reactivex.disposables.Disposable
 import org.joda.time.LocalDateTime
-import org.librarysimplified.r2.api.*
-import org.librarysimplified.r2.api.SR2Event.SR2BookmarkEvent.*
+import org.librarysimplified.r2.api.SR2Bookmark
+import org.librarysimplified.r2.api.SR2Command
+import org.librarysimplified.r2.api.SR2ControllerType
+import org.librarysimplified.r2.api.SR2Event
+import org.librarysimplified.r2.api.SR2Event.SR2BookmarkEvent.SR2BookmarkCreated
+import org.librarysimplified.r2.api.SR2Event.SR2BookmarkEvent.SR2BookmarkDeleted
+import org.librarysimplified.r2.api.SR2Event.SR2BookmarkEvent.SR2BookmarksLoaded
 import org.librarysimplified.r2.api.SR2Event.SR2CommandEvent.SR2CommandEventCompleted.SR2CommandExecutionFailed
 import org.librarysimplified.r2.api.SR2Event.SR2CommandEvent.SR2CommandEventCompleted.SR2CommandExecutionSucceeded
 import org.librarysimplified.r2.api.SR2Event.SR2CommandEvent.SR2CommandExecutionRunningLong
@@ -20,14 +25,22 @@ import org.librarysimplified.r2.api.SR2Event.SR2CommandEvent.SR2CommandExecution
 import org.librarysimplified.r2.api.SR2Event.SR2Error.SR2ChapterNonexistent
 import org.librarysimplified.r2.api.SR2Event.SR2Error.SR2WebViewInaccessible
 import org.librarysimplified.r2.api.SR2Event.SR2ExternalLinkSelected
+import org.librarysimplified.r2.api.SR2Locator
 import org.librarysimplified.r2.api.SR2ScrollingMode.SCROLLING_MODE_CONTINUOUS
 import org.librarysimplified.r2.api.SR2ScrollingMode.SCROLLING_MODE_PAGINATED
 import org.librarysimplified.r2.vanilla.SR2Controllers
-import org.librarysimplified.r2.views.*
+import org.librarysimplified.r2.views.SR2ControllerReference
+import org.librarysimplified.r2.views.SR2ReaderFragment
+import org.librarysimplified.r2.views.SR2ReaderFragmentFactory
+import org.librarysimplified.r2.views.SR2ReaderParameters
+import org.librarysimplified.r2.views.SR2ReaderViewEvent
 import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewBookEvent.SR2BookLoadingFailed
 import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewControllerEvent.SR2ControllerBecameAvailable
 import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewNavigationEvent.SR2ReaderViewNavigationClose
 import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewNavigationEvent.SR2ReaderViewNavigationOpenTOC
+import org.librarysimplified.r2.views.SR2ReaderViewModel
+import org.librarysimplified.r2.views.SR2ReaderViewModelFactory
+import org.librarysimplified.r2.views.SR2TOCFragment
 import org.librarysimplified.services.api.Services
 import org.nypl.drm.core.AdobeAdeptFileAsset
 import org.nypl.drm.core.AxisNowFileAsset
@@ -45,7 +58,7 @@ import org.readium.r2.shared.publication.asset.FileAsset
 import org.readium.r2.streamer.Streamer
 import org.readium.r2.streamer.parser.epub.EpubParser
 import org.slf4j.LoggerFactory
-import java.util.*
+import java.util.ServiceLoader
 import java.util.concurrent.ExecutionException
 
 /**
@@ -442,11 +455,11 @@ class Reader2Activity : AppCompatActivity() {
 
     this.logger.debug("TOC opening")
 
-		val currentTocFragment = this.tocFragment
-		this.tocFragment = this.readerFragmentFactory.instantiate(this.classLoader, SR2TOCFragment::class.java.name)
+    val currentTocFragment = this.tocFragment
+    this.tocFragment = this.readerFragmentFactory.instantiate(this.classLoader, SR2TOCFragment::class.java.name)
     this.supportFragmentManager.beginTransaction()
-			.remove(currentTocFragment)
-			.add(R.id.reader2FragmentHost, this.tocFragment)
+      .remove(currentTocFragment)
+      .add(R.id.reader2FragmentHost, this.tocFragment)
       .hide(this.readerFragment)
       .show(this.tocFragment)
       .commit()
