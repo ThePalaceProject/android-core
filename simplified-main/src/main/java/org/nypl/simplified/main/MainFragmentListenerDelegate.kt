@@ -228,7 +228,9 @@ internal class MainFragmentListenerDelegate(
   ): MainFragmentState {
     return when (event) {
       is AccountListRegistryEvent.AccountCreated -> {
+        this.setMostRecentAccount(event.accountID)
         this.popBackStack()
+        this.openCatalog()
         state
       }
       is AccountListRegistryEvent.OpenErrorPage -> {
@@ -236,6 +238,12 @@ internal class MainFragmentListenerDelegate(
         state
       }
     }
+  }
+
+  private fun setMostRecentAccount(accountID: AccountID) {
+    this.profilesController.profileUpdate { description ->
+      description.copy(preferences = description.preferences.copy(mostRecentAccount = accountID))
+    }.get()
   }
 
   private fun handleAccountListEvent(
@@ -265,7 +273,7 @@ internal class MainFragmentListenerDelegate(
     return when (event) {
       AccountDetailEvent.LoginSucceeded ->
         if (state is MainFragmentState.CatalogWaitingForLogin) {
-          this.openCatalogAfterAuthentication()
+          this.openCatalog()
           MainFragmentState.EmptyState
         } else {
           state
@@ -534,7 +542,7 @@ internal class MainFragmentListenerDelegate(
     )
   }
 
-  private fun openCatalogAfterAuthentication() {
+  private fun openCatalog() {
     this.navigator.popBackStack()
     this.navigator.reset(R.id.tabCatalog, false)
   }
