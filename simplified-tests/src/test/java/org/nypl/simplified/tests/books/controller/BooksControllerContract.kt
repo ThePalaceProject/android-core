@@ -67,6 +67,7 @@ import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.tests.EventAssertions
 import org.nypl.simplified.tests.ExtraAssertions.assertInstanceOf
 import org.nypl.simplified.tests.MutableServiceDirectory
+import org.nypl.simplified.tests.books.BookFormatsTesting
 import org.nypl.simplified.tests.books.idle_timer.InoperableIdleTimer
 import org.nypl.simplified.tests.mocking.FakeAccountCredentialStorage
 import org.nypl.simplified.tests.mocking.MockAccountCreationStringResources
@@ -76,6 +77,7 @@ import org.nypl.simplified.tests.mocking.MockAccountLogoutStringResources
 import org.nypl.simplified.tests.mocking.MockAccountProviderResolutionStrings
 import org.nypl.simplified.tests.mocking.MockAccountProviders
 import org.nypl.simplified.tests.mocking.MockAnalytics
+import org.nypl.simplified.tests.mocking.MockBookFormatSupport
 import org.nypl.simplified.tests.mocking.MockRevokeStringResources
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -98,7 +100,7 @@ abstract class BooksControllerContract {
   private lateinit var audioBookManifestStrategies: AudioBookManifestStrategiesType
   private lateinit var authDocumentParsers: AuthenticationDocumentParsersType
   private lateinit var bookEvents: MutableList<BookEvent>
-  private lateinit var bookFormatSupport: BookFormatSupportType
+  private lateinit var bookFormatSupport: MockBookFormatSupport
   private lateinit var bookRegistry: BookRegistryType
   private lateinit var borrowSubtasks: BorrowSubtaskDirectoryType
   private lateinit var cacheDirectory: File
@@ -214,7 +216,7 @@ abstract class BooksControllerContract {
     this.audioBookManifestStrategies = Mockito.mock(AudioBookManifestStrategiesType::class.java)
     this.authDocumentParsers = Mockito.mock(AuthenticationDocumentParsersType::class.java)
     this.bookEvents = Collections.synchronizedList(ArrayList())
-    this.bookFormatSupport = Mockito.mock(BookFormatSupportType::class.java)
+    this.bookFormatSupport = MockBookFormatSupport()
     this.bookRegistry = BookRegistry.create()
     this.borrowSubtasks = BorrowSubtasks.directory()
     this.cacheDirectory = File.createTempFile("book-borrow-tmp", "dir")
@@ -246,7 +248,7 @@ abstract class BooksControllerContract {
         )
 
     this.server = MockWebServer()
-    this.server.start()
+    this.server.start(port = 9000)
   }
 
   @AfterEach
@@ -574,9 +576,12 @@ abstract class BooksControllerContract {
    */
 
   @Test
-  @Timeout(value = 3L, unit = TimeUnit.SECONDS)
+  @Timeout(value = 10L, unit = TimeUnit.SECONDS)
   @Throws(Exception::class)
   fun testBooksSyncRemoveEntries() {
+    this.bookFormatSupport.onIsSupportedFinalContentType = { true }
+    this.bookFormatSupport.onIsSupportedPath = { true }
+
     val controller =
       createController(
         exec = this.executorBooks,
@@ -623,13 +628,13 @@ abstract class BooksControllerContract {
 
     this.bookRegistry.bookOrException(
       BookID.create("39434e1c3ea5620fdcc2303c878da54cc421175eb09ce1a6709b54589eb8711f")
-    )
+    ).status as BookStatus.Loaned.LoanedNotDownloaded
     this.bookRegistry.bookOrException(
       BookID.create("f9a7536a61caa60f870b3fbe9d4304b2d59ea03c71cbaee82609e3779d1e6e0f")
-    )
+    ).status as BookStatus.Loaned.LoanedNotDownloaded
     this.bookRegistry.bookOrException(
       BookID.create("251cc5f69cd2a329bb6074b47a26062e59f5bb01d09d14626f41073f63690113")
-    )
+    ).status as BookStatus.Loaned.LoanedNotDownloaded
 
     this.bookRegistry.bookEvents().subscribe { this.bookEvents.add(it) }
 
@@ -647,8 +652,30 @@ abstract class BooksControllerContract {
         .setResponseCode(200)
         .setBody(Buffer().readFrom(resource("testBooksSyncRemoveEntries.xml")))
     )
+    this.server.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+        .setBody(Buffer().readFrom(resource("testBook0.xml")))
+    )
+    this.server.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+        .setBody(Buffer().readFrom(resource("testBook1.xml")))
+    )
+    this.server.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+        .setBody(Buffer().readFrom(resource("testBook2.xml")))
+    )
 
     controller.booksSync(account.id).get()
+
+    /*
+     * Wait for all subtasks to complete.
+     */
+
+    this.executorBooks.shutdown()
+    this.executorBooks.awaitTermination(30L, TimeUnit.SECONDS)
 
     Assertions.assertEquals(1, bookDatabase.books().size)
 
@@ -662,11 +689,11 @@ abstract class BooksControllerContract {
 
     this.bookRegistry.bookOrException(
       BookID.create("f9a7536a61caa60f870b3fbe9d4304b2d59ea03c71cbaee82609e3779d1e6e0f")
-    ).status as BookStatus.Loaned.LoanedNotDownloaded
+    ).status as BookStatus.Loanable
 
     this.bookRegistry.bookOrException(
       BookID.create("251cc5f69cd2a329bb6074b47a26062e59f5bb01d09d14626f41073f63690113")
-    ).status as BookStatus.Loaned.LoanedNotDownloaded
+    ).status as BookStatus.Loanable
   }
 
   /**
@@ -806,14 +833,15 @@ abstract class BooksControllerContract {
     dirProfiles: File
   ): ProfilesDatabaseType {
     return ProfilesDatabases.openWithAnonymousProfileDisabled(
-      context(),
-      this.analytics,
-      accountEvents,
-      MockAccountProviders.fakeAccountProviders(),
-      AccountBundledCredentialsEmpty.getInstance(),
-      this.credentialsStore,
-      AccountsDatabases,
-      dirProfiles
+      context = context(),
+      analytics = this.analytics,
+      accountEvents = accountEvents,
+      accountProviders = MockAccountProviders.fakeAccountProviders(),
+      accountBundledCredentials = AccountBundledCredentialsEmpty.getInstance(),
+      accountCredentialsStore = this.credentialsStore,
+      accountsDatabases = AccountsDatabases,
+      bookFormatSupport = BookFormatsTesting.supportsEverything,
+      directory = dirProfiles
     )
   }
 

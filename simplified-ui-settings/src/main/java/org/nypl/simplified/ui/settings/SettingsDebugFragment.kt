@@ -62,6 +62,7 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
   private lateinit var showOnlySupportedBooks: SwitchCompat
   private lateinit var showTesting: SwitchCompat
   private lateinit var syncAccountsButton: Button
+  private lateinit var enableOpenEBooksQA: Button
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
@@ -104,6 +105,8 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
       view.findViewById(R.id.libraryRegistryOverrideBase)
     this.libraryRegistrySet =
       view.findViewById(R.id.libraryRegistryOverrideSet)
+    this.enableOpenEBooksQA =
+      view.findViewById(R.id.settingsVersionDevEnableOpenEBooksQA)
 
     this.drmTable.addView(
       this.createDrmSupportRow("Adobe Acs", this.viewModel.adeptSupported)
@@ -269,6 +272,14 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
     val customServer = AccountProviderRegistryDebugging.property(LIBRARY_REGISTRY_DEBUG_PROPERTY)
     if (customServer != null) {
       this.libraryRegistryEntry.setText(customServer, EDITABLE)
+    }
+
+    /*
+     * Configure the Open EBooks QA button.
+     */
+
+    this.enableOpenEBooksQA.setOnClickListener {
+      this.viewModel.openEbooksQAToggle()
     }
   }
 

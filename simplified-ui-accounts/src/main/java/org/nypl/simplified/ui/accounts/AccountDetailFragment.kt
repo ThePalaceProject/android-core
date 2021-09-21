@@ -99,7 +99,10 @@ class AccountDetailFragment : Fragment(R.layout.account) {
 
   private lateinit var accountCustomOPDS: ViewGroup
   private lateinit var accountCustomOPDSField: TextView
+  private lateinit var accountEULA: TextView
   private lateinit var accountIcon: ImageView
+  private lateinit var accountLicenses: ViewGroup
+  private lateinit var accountPrivacyPolicy: ViewGroup
   private lateinit var accountSubtitle: TextView
   private lateinit var accountTitle: TextView
   private lateinit var authentication: ViewGroup
@@ -109,9 +112,6 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   private lateinit var bookmarkSync: ViewGroup
   private lateinit var bookmarkSyncCheck: SwitchCompat
   private lateinit var bookmarkSyncLabel: View
-  private lateinit var accountEULA: TextView
-  private lateinit var accountPrivacyPolicy: ViewGroup
-  private lateinit var accountLicenses: ViewGroup
   private lateinit var bookmarkSyncProgress: ProgressBar
   private lateinit var loginButtonErrorDetails: Button
   private lateinit var loginProgress: ViewGroup
@@ -147,6 +147,8 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
+    this.accountEULA =
+      view.findViewById(R.id.accountEULA)
     this.accountTitle =
       view.findViewById(R.id.accountCellTitle)
     this.accountSubtitle =
@@ -186,8 +188,6 @@ class AccountDetailFragment : Fragment(R.layout.account) {
       view.findViewById(R.id.accountLoginProgressText)
     this.loginButtonErrorDetails =
       view.findViewById(R.id.accountLoginButtonErrorDetails)
-    this.accountEULA =
-      view.findViewById(R.id.accountEULA)
     this.signUpButton =
       view.findViewById(R.id.accountCardCreatorSignUp)
     this.signUpLabel =

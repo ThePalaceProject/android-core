@@ -36,6 +36,7 @@ import org.nypl.simplified.books.borrowing.BorrowTask
 import org.nypl.simplified.books.borrowing.SAMLDownloadContext
 import org.nypl.simplified.books.controller.api.BookRevokeStringResourcesType
 import org.nypl.simplified.books.controller.api.BooksControllerType
+import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.crashlytics.api.CrashlyticsServiceType
 import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedEntry
@@ -108,6 +109,8 @@ class Controller private constructor(
     this.services.requireService(AuthenticationDocumentParsersType::class.java)
   private val bookRegistry =
     this.services.requireService(BookRegistryType::class.java)
+  private val bookFormatSupport =
+    this.services.requireService(BookFormatSupportType::class.java)
   private val feedLoader =
     this.services.requireService(FeedLoaderType::class.java)
   private val feedParser =
@@ -219,7 +222,6 @@ class Controller private constructor(
       if (crash != null) {
         ControllerCrashlytics.configureCrashlytics(
           profile = profile,
-          accountProviders = accountProviders,
           crashlytics = crash
         )
       }
@@ -524,6 +526,7 @@ class Controller private constructor(
   ): FluentFuture<Feed.FeedWithoutGroups> {
     return this.submitTask(
       ProfileFeedTask(
+        bookFormatSupport = this.bookFormatSupport,
         bookRegistry = this.bookRegistry,
         profiles = this,
         request = request
@@ -608,6 +611,7 @@ class Controller private constructor(
         bookRegistry = this.bookRegistry,
         booksController = this,
         feedParser = this.feedParser,
+        feedLoader = this.feedLoader,
         patronParsers = this.patronUserProfileParsers,
         http = this.lsHttp
       )

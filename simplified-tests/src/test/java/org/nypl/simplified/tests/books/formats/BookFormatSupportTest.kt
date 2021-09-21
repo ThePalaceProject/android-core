@@ -19,6 +19,7 @@ class BookFormatSupportTest {
       BookFormatSupport.create(
         BookFormatSupportParameters(
           supportsPDF = false,
+          supportsLCP = false,
           supportsAdobeDRM = false,
           supportsAxisNow = false,
           supportsLCP = false,
@@ -39,6 +40,7 @@ class BookFormatSupportTest {
       BookFormatSupport.create(
         BookFormatSupportParameters(
           supportsPDF = true,
+          supportsLCP = false,
           supportsAdobeDRM = false,
           supportsAxisNow = false,
           supportsLCP = false,
@@ -49,6 +51,7 @@ class BookFormatSupportTest {
       BookFormatSupport.create(
         BookFormatSupportParameters(
           supportsPDF = false,
+          supportsLCP = false,
           supportsAdobeDRM = false,
           supportsAxisNow = false,
           supportsLCP = false,
@@ -82,6 +85,7 @@ class BookFormatSupportTest {
       BookFormatSupport.create(
         BookFormatSupportParameters(
           supportsPDF = false,
+          supportsLCP = false,
           supportsAdobeDRM = true,
           supportsAxisNow = false,
           supportsLCP = false,
@@ -92,6 +96,7 @@ class BookFormatSupportTest {
       BookFormatSupport.create(
         BookFormatSupportParameters(
           supportsPDF = false,
+          supportsLCP = false,
           supportsAdobeDRM = false,
           supportsAxisNow = false,
           supportsLCP = false,
@@ -127,6 +132,7 @@ class BookFormatSupportTest {
       BookFormatSupport.create(
         BookFormatSupportParameters(
           supportsPDF = false,
+          supportsLCP = false,
           supportsAdobeDRM = false,
           supportsAxisNow = true,
           supportsLCP = false,
@@ -137,6 +143,7 @@ class BookFormatSupportTest {
       BookFormatSupport.create(
         BookFormatSupportParameters(
           supportsPDF = false,
+          supportsLCP = false,
           supportsAdobeDRM = false,
           supportsAxisNow = false,
           supportsLCP = false,
@@ -171,6 +178,7 @@ class BookFormatSupportTest {
         BookFormatSupportParameters(
           supportsPDF = false,
           supportsAdobeDRM = false,
+          supportsLCP = false,
           supportsAxisNow = false,
           supportsLCP = false,
           supportsAudioBooks = BookFormatAudioSupportParameters(
@@ -232,6 +240,7 @@ class BookFormatSupportTest {
         BookFormatSupportParameters(
           supportsPDF = false,
           supportsAdobeDRM = false,
+          supportsLCP = false,
           supportsAxisNow = false,
           supportsLCP = false,
           supportsAudioBooks = null
