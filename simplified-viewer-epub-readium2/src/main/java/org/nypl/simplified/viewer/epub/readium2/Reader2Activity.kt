@@ -437,7 +437,13 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     this.uiThread.checkIsUIThread()
 
     this.logger.debug("TOC opening")
+
+    val currentTocFragment = this.tocFragment
+    this.tocFragment =
+      this.supportFragmentManager.fragmentFactory.instantiate(this.classLoader, SR2TOCFragment::class.java.name)
     this.supportFragmentManager.beginTransaction()
+      .remove(currentTocFragment)
+      .add(R.id.reader2FragmentHost, this.tocFragment)
       .hide(this.readerFragment)
       .show(this.tocFragment)
       .commit()
