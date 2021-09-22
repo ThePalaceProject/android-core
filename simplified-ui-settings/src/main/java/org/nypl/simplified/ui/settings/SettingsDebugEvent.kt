@@ -17,4 +17,10 @@ sealed class SettingsDebugEvent {
    */
 
   object OpenCustomOPDS : SettingsDebugEvent()
+
+  /*
+   * The debug screen wants to close.
+   */
+
+  object GoUpwards : SettingsDebugEvent()
 }
