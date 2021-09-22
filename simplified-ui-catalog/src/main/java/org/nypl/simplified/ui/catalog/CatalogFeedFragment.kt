@@ -546,6 +546,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
     try {
       this.toolbar.setTitle(this.viewModel.title())
       val actionBar = this.supportActionBar ?: return
+      actionBar.show()
 
       /*
        * If we're not at the root of a feed, then display a back arrow in the toolbar.
