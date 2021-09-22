@@ -10,11 +10,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.common.base.Preconditions
 import com.google.common.util.concurrent.FluentFuture
+import org.joda.time.DateTime
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
-import org.nypl.simplified.books.book_database.api.BookFormats.BookFormatDefinition.BOOK_FORMAT_AUDIO
-import org.nypl.simplified.books.book_database.api.BookFormats.BookFormatDefinition.BOOK_FORMAT_EPUB
-import org.nypl.simplified.books.book_database.api.BookFormats.BookFormatDefinition.BOOK_FORMAT_PDF
+import org.nypl.simplified.books.book_database.api.BookFormats.BookFormatDefinition.*
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookWithStatus
 import org.nypl.simplified.books.covers.BookCoverProviderType
@@ -277,9 +276,18 @@ class CatalogPagedViewHolder(
     this.setVisibilityIfNecessary(this.progress, View.GONE)
 
     this.idleButtons.removeAllViews()
+
+    val loanDuration = getLoanDuration(book)
+
     this.idleButtons.addView(
-      this.buttonCreator.createDownloadButton {
-        this.listener.borrowMaybeAuthenticated(book)
+      if (loanDuration.isNotEmpty()) {
+        this.buttonCreator.createDownloadButtonWithLoanDuration(loanDuration) {
+          this.listener.borrowMaybeAuthenticated(book)
+        }
+      } else {
+        this.buttonCreator.createDownloadButton {
+          this.listener.borrowMaybeAuthenticated(book)
+        }
       }
     )
     this.idleButtons.addView(this.buttonCreator.createButtonSizedSpace())
@@ -377,9 +385,16 @@ class CatalogPagedViewHolder(
     when (val format = book.findPreferredFormat()) {
       is BookFormat.BookFormatPDF,
       is BookFormat.BookFormatEPUB -> {
+        val loanDuration = getLoanDuration(book)
         this.idleButtons.addView(
-          this.buttonCreator.createReadButton {
-            this.listener.openViewer(book, format)
+          if (loanDuration.isNotEmpty()) {
+            this.buttonCreator.createReadButtonWithLoanDuration(loanDuration) {
+              this.listener.openViewer(book, format)
+            }
+          } else {
+            this.buttonCreator.createReadButton {
+              this.listener.openViewer(book, format)
+            }
           }
         )
       }
@@ -481,6 +496,26 @@ class CatalogPagedViewHolder(
     this.thumbnailLoading = this.thumbnailLoading?.let { loading ->
       loading.cancel(true)
       null
+    }
+  }
+
+  private fun getLoanDuration(book: Book): String {
+    val status = BookStatus.fromBook(book)
+    return if (status is BookStatus.Loaned.LoanedDownloaded ||
+      status is BookStatus.Loaned.LoanedNotDownloaded) {
+
+      val endDate = (status as? BookStatus.Loaned.LoanedDownloaded)?.loanExpiryDate
+        ?: (status as? BookStatus.Loaned.LoanedNotDownloaded)?.loanExpiryDate
+
+      if (endDate != null) {
+        CatalogBookAvailabilityStrings.intervalStringLoanDuration(this.context.resources,
+          DateTime.now(), endDate)
+      } else {
+        ""
+      }
+
+    } else {
+      ""
     }
   }
 }
