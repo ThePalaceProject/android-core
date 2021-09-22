@@ -154,14 +154,6 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
       .let { subscriptions.add(it) }
 
     /*
-     * Show the Toolbar
-     */
-
-    this.supportActionBar?.setLogo(this.viewModel.buildConfig.brandingAppIcon)
-    this.supportActionBar?.setTitle(R.string.app_name)
-    this.supportActionBar?.show()
-
-    /*
      * Show the Adobe DRM warning dialog if necessary,
      */
 
