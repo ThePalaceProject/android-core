@@ -219,6 +219,10 @@ internal class MainFragmentListenerDelegate(
         this.openFeed(event.feedArguments)
         state
       }
+      CatalogBookDetailEvent.GoUpwards -> {
+        this.goUpwards()
+        state
+      }
     }
   }
 

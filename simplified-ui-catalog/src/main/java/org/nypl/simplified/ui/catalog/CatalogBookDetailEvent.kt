@@ -7,6 +7,8 @@ import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 
 sealed class CatalogBookDetailEvent {
 
+  object GoUpwards : CatalogBookDetailEvent()
+
   data class OpenErrorPage(
     val parameters: ErrorPageParameters
   ) : CatalogBookDetailEvent()

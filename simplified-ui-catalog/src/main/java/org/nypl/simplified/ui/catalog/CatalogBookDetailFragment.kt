@@ -229,13 +229,20 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
     this.configureToolbar()
   }
 
+  override fun onStart() {
+    super.onStart()
+    this.configureToolbar()
+  }
+
   private fun configureToolbar() {
     val actionBar = this.supportActionBar ?: return
     actionBar.setDisplayHomeAsUpEnabled(true)
     actionBar.setHomeActionContentDescription(null)
+    actionBar.show()
     this.toolbar.setLogoOnClickListener {
-      // Do nothing
+      this.viewModel.goUpwards()
     }
+    return
   }
 
   private fun configureOPDSEntry(feedEntry: FeedEntryOPDS) {

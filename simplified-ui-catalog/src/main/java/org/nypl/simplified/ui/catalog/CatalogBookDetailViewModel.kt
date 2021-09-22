@@ -281,6 +281,10 @@ class CatalogBookDetailViewModel(
     )
   }
 
+  fun goUpwards() {
+    this.listener.post(CatalogBookDetailEvent.GoUpwards)
+  }
+
   fun showError(result: TaskResult.Failure<*>) {
     this.logger.debug("showing error: {}", this.bookWithStatus.book.id)
 
