@@ -845,9 +845,11 @@ abstract class BookDatabaseContract {
         listOf(
           OPDSIndirectAcquisition(
             mimeOf("application/epub+zip"),
-            listOf()
+            listOf(),
+            emptyMap()
           )
-        )
+        ),
+        emptyMap()
       )
     )
     return eb.build()
