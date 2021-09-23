@@ -13,7 +13,7 @@ import com.google.common.util.concurrent.FluentFuture
 import org.joda.time.DateTime
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
-import org.nypl.simplified.books.book_database.api.BookFormats.BookFormatDefinition.*
+import org.nypl.simplified.books.book_database.api.BookFormats
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookWithStatus
 import org.nypl.simplified.books.covers.BookCoverProviderType
@@ -123,11 +123,11 @@ class CatalogPagedViewHolder(
     this.errorTitle.text = item.feedEntry.title
 
     this.idleMeta.text = when (item.probableFormat) {
-      BOOK_FORMAT_EPUB ->
+      BookFormats.BookFormatDefinition.BOOK_FORMAT_EPUB ->
         context.getString(R.string.catalogBookFormatEPUB)
-      BOOK_FORMAT_AUDIO ->
+      BookFormats.BookFormatDefinition.BOOK_FORMAT_AUDIO ->
         context.getString(R.string.catalogBookFormatAudioBook)
-      BOOK_FORMAT_PDF ->
+      BookFormats.BookFormatDefinition.BOOK_FORMAT_PDF ->
         context.getString(R.string.catalogBookFormatPDF)
       null -> ""
     }
@@ -502,18 +502,23 @@ class CatalogPagedViewHolder(
   private fun getLoanDuration(book: Book): String {
     val status = BookStatus.fromBook(book)
     return if (status is BookStatus.Loaned.LoanedDownloaded ||
-      status is BookStatus.Loaned.LoanedNotDownloaded) {
+      status is BookStatus.Loaned.LoanedNotDownloaded
+    ) {
 
       val endDate = (status as? BookStatus.Loaned.LoanedDownloaded)?.loanExpiryDate
         ?: (status as? BookStatus.Loaned.LoanedNotDownloaded)?.loanExpiryDate
 
-      if (endDate != null) {
-        CatalogBookAvailabilityStrings.intervalStringLoanDuration(this.context.resources,
-          DateTime.now(), endDate)
+      if (
+        endDate != null
+      ) {
+        CatalogBookAvailabilityStrings.intervalStringLoanDuration(
+          this.context.resources,
+          DateTime.now(),
+          endDate
+        )
       } else {
         ""
       }
-
     } else {
       ""
     }

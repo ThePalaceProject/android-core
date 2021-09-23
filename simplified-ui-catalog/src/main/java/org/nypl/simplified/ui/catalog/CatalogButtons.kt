@@ -111,8 +111,10 @@ class CatalogButtons(
     val linearLayout = LinearLayout(this.context).apply {
       this.orientation = LinearLayout.VERTICAL
       this.gravity = Gravity.CENTER
-      this.layoutParams = ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.MATCH_PARENT).apply {
+      this.layoutParams = ViewGroup.MarginLayoutParams(
+        ViewGroup.LayoutParams.WRAP_CONTENT,
+        ViewGroup.LayoutParams.MATCH_PARENT
+      ).apply {
         this.marginEnd = screenSizeInformation.dpToPixels(16).toInt()
       }
       this.addView(imageView)
@@ -124,7 +126,8 @@ class CatalogButtons(
       this.gravity = Gravity.CENTER
       this.layoutParams = LinearLayout.LayoutParams(
         LinearLayout.LayoutParams.WRAP_CONTENT,
-        LinearLayout.LayoutParams.MATCH_PARENT)
+        LinearLayout.LayoutParams.MATCH_PARENT
+      )
       this.setOnClickListener {
         this.isEnabled = false
         onClick.invoke()
@@ -309,6 +312,7 @@ class CatalogButtons(
   fun wrapContentParameters(): LinearLayout.LayoutParams {
     return LinearLayout.LayoutParams(
       LinearLayout.LayoutParams.WRAP_CONTENT,
-      LinearLayout.LayoutParams.WRAP_CONTENT)
+      LinearLayout.LayoutParams.WRAP_CONTENT
+    )
   }
 }
