@@ -1200,9 +1200,11 @@ abstract class ProfilesDatabaseContract {
       )
 
     val pro0 = db0.currentProfileUnsafe()
-    val acc0 = pro0.mostRecentAccount()
 
-    val acc1p = MockAccountProviders.fakeProvider("urn:fake:1")
+    val acc0p = MockAccountProviders.fakeProvider("urn:fake:1")
+    val acc0 = pro0.createAccount(acc0p)
+
+    val acc1p = MockAccountProviders.fakeProvider("urn:fake:2")
     val acc1 = pro0.createAccount(acc1p)
 
     val pro0desc =
