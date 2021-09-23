@@ -14,6 +14,12 @@ sealed class AccountDetailEvent {
   object LoginSucceeded : AccountDetailEvent()
 
   /**
+   * The patron is tired of looking at the account details.
+   */
+
+  object GoUpwards : AccountDetailEvent()
+
+  /**
    * The patron wants to log in through SAML.
    */
 

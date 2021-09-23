@@ -1,6 +1,5 @@
 package org.nypl.simplified.ui.accounts
 
-import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -57,6 +56,7 @@ import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsLogoutButtonDi
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsLogoutButtonEnabled
 import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
+import org.nypl.simplified.ui.neutrality.NeutralToolbar
 import org.slf4j.LoggerFactory
 import java.net.URI
 
@@ -124,6 +124,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   private lateinit var settingsCardCreator: ConstraintLayout
   private lateinit var signUpButton: Button
   private lateinit var signUpLabel: TextView
+  private lateinit var toolbar: NeutralToolbar
 
   private val imageButtonLoadingTag = "IMAGE_BUTTON_LOADING"
   private val nyplCardCreatorScheme = "nypl.card-creator"
@@ -155,6 +156,8 @@ class AccountDetailFragment : Fragment(R.layout.account) {
       view.findViewById(R.id.accountCellSubtitle)
     this.accountIcon =
       view.findViewById(R.id.accountCellIcon)
+    this.toolbar =
+      view.rootView.findViewWithTag(NeutralToolbar.neutralToolbarName)
 
     this.authentication =
       view.findViewById(R.id.auth)
@@ -359,7 +362,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   override fun onStart() {
     super.onStart()
 
-    this.configureToolbar(requireActivity())
+    this.configureToolbar()
 
     /*
      * Configure the COPPA age gate switch. If the user changes their age, a log out
@@ -552,11 +555,15 @@ class AccountDetailFragment : Fragment(R.layout.account) {
     this.startActivity(i)
   }
 
-  private fun configureToolbar(activity: Activity) {
+  private fun configureToolbar() {
     val providerName = this.viewModel.account.provider.displayName
-    this.supportActionBar?.apply {
-      title = getString(R.string.accounts)
-      subtitle = providerName
+    val actionBar = this.supportActionBar ?: return
+    actionBar.show()
+    actionBar.setDisplayHomeAsUpEnabled(true)
+    actionBar.setHomeActionContentDescription(null)
+    actionBar.setTitle(providerName)
+    this.toolbar.setLogoOnClickListener {
+      this.listener.post(AccountDetailEvent.GoUpwards)
     }
   }
 
