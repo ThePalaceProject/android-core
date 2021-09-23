@@ -2,13 +2,17 @@ package org.nypl.simplified.ui.settings
 
 import android.os.Bundle
 import android.view.Gravity
+import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import org.librarysimplified.services.api.Services
 import org.nypl.simplified.android.ktx.supportActionBar
+import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.fragmentListeners
+import org.nypl.simplified.ui.neutrality.NeutralToolbar
 import org.slf4j.LoggerFactory
 
 /**
@@ -21,9 +25,14 @@ class SettingsMainFragment : PreferenceFragmentCompat() {
   private val viewModel: SettingsMainViewModel by viewModels()
   private val listener: FragmentListenerType<SettingsMainEvent> by fragmentListeners()
 
+  private val services =
+    Services.serviceDirectory()
+  private val configurationService =
+    services.requireService(BuildConfigurationServiceType::class.java)
+
   private lateinit var settingsAbout: Preference
-  private lateinit var settingsAcknowledgements: Preference
   private lateinit var settingsAccounts: Preference
+  private lateinit var settingsAcknowledgements: Preference
   private lateinit var settingsCommit: Preference
   private lateinit var settingsDebug: Preference
   private lateinit var settingsEULA: Preference
@@ -32,6 +41,7 @@ class SettingsMainFragment : PreferenceFragmentCompat() {
   private lateinit var settingsPrivacy: Preference
   private lateinit var settingsVersion: Preference
   private lateinit var settingsVersionCore: Preference
+  private lateinit var toolbar: NeutralToolbar
 
   private var toast: Toast? = null
   private var tapToDebugSettings = 7
@@ -73,9 +83,12 @@ class SettingsMainFragment : PreferenceFragmentCompat() {
   }
 
   private fun configureToolbar() {
-    this.supportActionBar?.apply {
-      title = getString(R.string.settings)
-      subtitle = null
+    val actionBar = this.supportActionBar ?: return
+    actionBar.setLogo(this.configurationService.brandingAppIcon)
+    actionBar.setHomeActionContentDescription(R.string.settings)
+    actionBar.setTitle(R.string.settings)
+    this.toolbar.setLogoOnClickListener {
+      // Do nothing.
     }
   }
 
@@ -94,6 +107,16 @@ class SettingsMainFragment : PreferenceFragmentCompat() {
           true
         }
     }
+  }
+
+  override fun onViewCreated(
+    view: View,
+    savedInstanceState: Bundle?
+  ) {
+    super.onViewCreated(view, savedInstanceState)
+
+    this.toolbar =
+      view.rootView.findViewWithTag(NeutralToolbar.neutralToolbarName)
   }
 
   private fun configureVersion(preference: Preference) {

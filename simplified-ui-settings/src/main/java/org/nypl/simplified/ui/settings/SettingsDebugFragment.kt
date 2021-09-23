@@ -1,6 +1,5 @@
 package org.nypl.simplified.ui.settings
 
-import android.app.Activity
 import android.app.AlertDialog
 import android.graphics.Color
 import android.os.Bundle
@@ -26,6 +25,7 @@ import org.nypl.simplified.listeners.api.fragmentListeners
 import org.nypl.simplified.taskrecorder.api.TaskStep
 import org.nypl.simplified.taskrecorder.api.TaskStepResolution
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
+import org.nypl.simplified.ui.neutrality.NeutralToolbar
 import org.slf4j.LoggerFactory
 
 /**
@@ -62,10 +62,13 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
   private lateinit var showOnlySupportedBooks: SwitchCompat
   private lateinit var showTesting: SwitchCompat
   private lateinit var syncAccountsButton: Button
+  private lateinit var toolbar: NeutralToolbar
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
+    this.toolbar =
+      view.rootView.findViewWithTag(NeutralToolbar.neutralToolbarName)
     this.crashButton =
       view.findViewById(R.id.settingsVersionDevCrash)
     this.cacheButton =
@@ -141,7 +144,7 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
 
   override fun onStart() {
     super.onStart()
-    this.configureToolbar(this.requireActivity())
+    this.configureToolbar()
 
     this.crashButton.setOnClickListener {
       throw OutOfMemoryError("Pretending to have run out of memory!")
@@ -272,10 +275,14 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
     }
   }
 
-  private fun configureToolbar(activity: Activity) {
-    this.supportActionBar?.apply {
-      title = getString(R.string.settingsVersion)
-      subtitle = null
+  private fun configureToolbar() {
+    val actionBar = this.supportActionBar ?: return
+    actionBar.show()
+    actionBar.setDisplayHomeAsUpEnabled(true)
+    actionBar.setHomeActionContentDescription(null)
+    actionBar.setTitle(R.string.settingsDebug)
+    this.toolbar.setLogoOnClickListener {
+      this.listener.post(SettingsDebugEvent.GoUpwards)
     }
   }
 
