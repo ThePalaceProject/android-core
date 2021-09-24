@@ -267,6 +267,10 @@ internal class MainFragmentListenerDelegate(
         this.openErrorPage(event.parameters)
         state
       }
+      AccountListEvent.GoUpwards -> {
+        this.goUpwards()
+        state
+      }
     }
   }
 
@@ -292,6 +296,10 @@ internal class MainFragmentListenerDelegate(
       }
       is AccountDetailEvent.OpenDocViewer -> {
         this.openDocViewer(event.title, event.url)
+        state
+      }
+      AccountDetailEvent.GoUpwards -> {
+        this.goUpwards()
         state
       }
     }
@@ -380,6 +388,10 @@ internal class MainFragmentListenerDelegate(
       }
       is SettingsDebugEvent.OpenErrorPage -> {
         this.openErrorPage(event.parameters)
+        state
+      }
+      SettingsDebugEvent.GoUpwards -> {
+        this.goUpwards()
         state
       }
     }

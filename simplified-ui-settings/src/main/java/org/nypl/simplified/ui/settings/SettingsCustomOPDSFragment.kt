@@ -1,6 +1,5 @@
 package org.nypl.simplified.ui.settings
 
-import android.app.Activity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -14,6 +13,9 @@ import androidx.fragment.app.viewModels
 import io.reactivex.disposables.CompositeDisposable
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.android.ktx.supportActionBar
+import org.nypl.simplified.listeners.api.FragmentListenerType
+import org.nypl.simplified.listeners.api.fragmentListeners
+import org.nypl.simplified.ui.neutrality.NeutralToolbar
 import org.slf4j.LoggerFactory
 import java.net.URI
 
@@ -26,15 +28,19 @@ class SettingsCustomOPDSFragment : Fragment(R.layout.settings_custom_opds) {
   private val logger = LoggerFactory.getLogger(SettingsCustomOPDSFragment::class.java)
   private val viewModel: SettingsCustomOPDSViewModel by viewModels()
   private val subscriptions: CompositeDisposable = CompositeDisposable()
+  private val listener: FragmentListenerType<SettingsDebugEvent> by fragmentListeners()
 
   private lateinit var create: Button
   private lateinit var feedURL: EditText
   private lateinit var progress: ProgressBar
   private lateinit var progressText: TextView
+  private lateinit var toolbar: NeutralToolbar
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
+    this.toolbar =
+      view.rootView.findViewWithTag(NeutralToolbar.neutralToolbarName)
     this.feedURL =
       view.findViewById(R.id.settingsCustomOPDSURL)
     this.create =
@@ -53,7 +59,7 @@ class SettingsCustomOPDSFragment : Fragment(R.layout.settings_custom_opds) {
 
   override fun onStart() {
     super.onStart()
-    this.configureToolbar(this.requireActivity())
+    this.configureToolbar()
 
     this.feedURL.addTextChangedListener(this.URITextWatcher())
 
@@ -71,10 +77,14 @@ class SettingsCustomOPDSFragment : Fragment(R.layout.settings_custom_opds) {
     subscriptions.clear()
   }
 
-  private fun configureToolbar(activity: Activity) {
-    this.supportActionBar?.apply {
-      title = getString(R.string.settingsCustomOPDS)
-      subtitle = null
+  private fun configureToolbar() {
+    val actionBar = this.supportActionBar ?: return
+    actionBar.show()
+    actionBar.setDisplayHomeAsUpEnabled(true)
+    actionBar.setHomeActionContentDescription(null)
+    actionBar.setTitle(R.string.settingsCustomOPDS)
+    this.toolbar.setLogoOnClickListener {
+      this.listener.post(SettingsDebugEvent.GoUpwards)
     }
   }
 

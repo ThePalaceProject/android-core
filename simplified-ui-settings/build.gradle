@@ -20,9 +20,10 @@ dependencies {
   implementation project(":simplified-reports")
   implementation project(":simplified-services-api")
   implementation project(":simplified-threads")
-  implementation project(":simplified-ui-images")
-  implementation project(':simplified-ui-listeners-api')
   implementation project(":simplified-ui-errorpage")
+  implementation project(":simplified-ui-images")
+  implementation project(":simplified-ui-neutrality")
+  implementation project(':simplified-ui-listeners-api')
 
   implementation libraries.rxjava2
   implementation libraries.rxjava2extensions

@@ -1,6 +1,5 @@
 package org.nypl.simplified.ui.accounts
 
-import android.app.Activity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
@@ -26,6 +25,7 @@ import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.fragmentListeners
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.images.ImageLoaderType
+import org.nypl.simplified.ui.neutrality.NeutralToolbar
 
 /**
  * A fragment that shows the set of accounts in the current profile.
@@ -60,6 +60,7 @@ class AccountListFragment : Fragment(R.layout.account_list) {
   private lateinit var accountList: RecyclerView
   private lateinit var accountListAdapter: AccountListAdapter
   private lateinit var imageLoader: ImageLoaderType
+  private lateinit var toolbar: NeutralToolbar
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -101,6 +102,8 @@ class AccountListFragment : Fragment(R.layout.account_list) {
 
     this.accountList =
       view.findViewById(R.id.accountList)
+    this.toolbar =
+      view.rootView.findViewWithTag(NeutralToolbar.neutralToolbarName)
 
     this.accountListAdapter =
       AccountListAdapter(
@@ -121,7 +124,7 @@ class AccountListFragment : Fragment(R.layout.account_list) {
 
   override fun onStart() {
     super.onStart()
-    this.configureToolbar(this.requireActivity())
+    this.configureToolbar()
 
     this.viewModel.accountEvents
       .subscribe(this::onAccountEvent)
@@ -145,10 +148,14 @@ class AccountListFragment : Fragment(R.layout.account_list) {
     }
   }
 
-  private fun configureToolbar(activity: Activity) {
-    this.supportActionBar?.apply {
-      title = getString(R.string.accounts)
-      subtitle = null
+  private fun configureToolbar() {
+    val actionBar = this.supportActionBar ?: return
+    actionBar.show()
+    actionBar.setDisplayHomeAsUpEnabled(true)
+    actionBar.setHomeActionContentDescription(null)
+    actionBar.setTitle(R.string.accounts)
+    this.toolbar.setLogoOnClickListener {
+      this.listener.post(AccountListEvent.GoUpwards)
     }
   }
 

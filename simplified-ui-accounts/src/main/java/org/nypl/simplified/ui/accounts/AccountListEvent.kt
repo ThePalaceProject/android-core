@@ -22,4 +22,10 @@ sealed class AccountListEvent {
    */
 
   object AddAccount : AccountListEvent()
+
+  /**
+   * The patron doesn't want to look at the account list anymore.
+   */
+
+  object GoUpwards : AccountListEvent()
 }
