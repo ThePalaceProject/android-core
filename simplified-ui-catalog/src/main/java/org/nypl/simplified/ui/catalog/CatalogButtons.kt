@@ -1,6 +1,8 @@
 package org.nypl.simplified.ui.catalog
 
 import android.content.Context
+import android.content.res.ColorStateList
+import android.text.method.ScrollingMovementMethod
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +15,7 @@ import androidx.annotation.UiThread
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.content.ContextCompat
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 
 /**
@@ -23,6 +26,22 @@ class CatalogButtons(
   private val context: Context,
   private val screenSizeInformation: ScreenSizeInformationType
 ) {
+
+  private fun colorStateListForButtonItems(): ColorStateList {
+    val states =
+      arrayOf(
+        intArrayOf(android.R.attr.state_pressed),
+        intArrayOf(-android.R.attr.state_pressed)
+      )
+
+    val colors =
+      intArrayOf(
+        ContextCompat.getColor(context, R.color.neutralColorBackground),
+        ContextCompat.getColor(context, R.color.neutralColorPrimary)
+      )
+
+    return ColorStateList(states, colors)
+  }
 
   @UiThread
   fun createButtonSpace(): Space {
@@ -92,20 +111,30 @@ class CatalogButtons(
     @StringRes res: Int,
     onClick: () -> Unit
   ): LinearLayout {
-    val textRead = this.createCenteredTextForButtons(res).apply {
+
+    val mainText = this.createCenteredTextForButtons(res).apply {
       this.layoutParams = wrapContentParameters()
+      this.setTextColor(colorStateListForButtonItems())
+      this.textSize = 12f
+      this.isDuplicateParentStateEnabled = true
+      this.movementMethod = ScrollingMovementMethod()
     }
 
     val textLoanDuration = this.createCenteredTextForButtons(loanDuration).apply {
       this.layoutParams = wrapContentParameters()
+      this.setTextColor(colorStateListForButtonItems())
       this.textSize = 12f
+      this.isDuplicateParentStateEnabled = true
+      this.movementMethod = ScrollingMovementMethod()
     }
 
     val imageView = AppCompatImageView(this.context).apply {
       this.layoutParams = ViewGroup.MarginLayoutParams(25, 25).apply {
         this.bottomMargin = 4
       }
+      this.isDuplicateParentStateEnabled = true
       this.setImageResource(R.drawable.ic_clock)
+      this.imageTintList = colorStateListForButtonItems()
     }
 
     val linearLayout = LinearLayout(this.context).apply {
@@ -115,8 +144,9 @@ class CatalogButtons(
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.MATCH_PARENT
       ).apply {
-        this.marginEnd = screenSizeInformation.dpToPixels(16).toInt()
+        this.marginEnd = screenSizeInformation.dpToPixels(6).toInt()
       }
+      this.isDuplicateParentStateEnabled = true
       this.addView(imageView)
       this.addView(textLoanDuration)
     }
@@ -134,7 +164,7 @@ class CatalogButtons(
         this.isEnabled = true
       }
       this.addView(linearLayout)
-      this.addView(textRead)
+      this.addView(mainText)
     }
   }
 

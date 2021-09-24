@@ -247,9 +247,13 @@ object CatalogBookAvailabilityStrings {
       }
 
       // Use hours.
-      else -> {
+      hours > 0 -> {
         unit = resources.getString(R.string.catalogBookIntervalHoursShort)
         value = hours
+      }
+
+      else -> {
+        return ""
       }
     }
 
