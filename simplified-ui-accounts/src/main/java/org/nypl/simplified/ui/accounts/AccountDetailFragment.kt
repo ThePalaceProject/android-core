@@ -148,6 +148,8 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
+    this.accountEULA =
+      view.findViewById(R.id.accountEULA)
     this.accountTitle =
       view.findViewById(R.id.accountCellTitle)
     this.accountSubtitle =
@@ -189,8 +191,6 @@ class AccountDetailFragment : Fragment(R.layout.account) {
       view.findViewById(R.id.accountLoginProgressText)
     this.loginButtonErrorDetails =
       view.findViewById(R.id.accountLoginButtonErrorDetails)
-    this.accountEULA =
-      view.findViewById(R.id.accountEULA)
     this.signUpButton =
       view.findViewById(R.id.accountCardCreatorSignUp)
     this.signUpLabel =
