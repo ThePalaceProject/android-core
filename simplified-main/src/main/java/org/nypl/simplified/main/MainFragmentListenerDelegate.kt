@@ -43,7 +43,8 @@ import org.nypl.simplified.ui.profiles.ProfileTabEvent
 import org.nypl.simplified.ui.settings.SettingsCustomOPDSFragment
 import org.nypl.simplified.ui.settings.SettingsDebugEvent
 import org.nypl.simplified.ui.settings.SettingsDebugFragment
-import org.nypl.simplified.ui.settings.SettingsFragmentDocumentViewer
+import org.nypl.simplified.ui.settings.SettingsDocumentViewerEvent
+import org.nypl.simplified.ui.settings.SettingsDocumentViewerFragment
 import org.nypl.simplified.ui.settings.SettingsMainEvent
 import org.nypl.simplified.viewer.api.Viewers
 import org.nypl.simplified.viewer.spi.ViewerPreferences
@@ -135,6 +136,8 @@ internal class MainFragmentListenerDelegate(
         this.handleSettingsMainEvent(event.event, state)
       is MainFragmentListenedEvent.SettingsDebugEvent ->
         this.handleSettingsDebugEvent(event.event, state)
+      is MainFragmentListenedEvent.SettingsDocumentViewerEvent ->
+        this.handleSettingsDocumentViewerEvent(event.event, state)
       is MainFragmentListenedEvent.AccountListRegistryEvent ->
         this.handleAccountListRegistryEvent(event.event, state)
       is MainFragmentListenedEvent.AccountListEvent ->
@@ -397,6 +400,18 @@ internal class MainFragmentListenerDelegate(
     }
   }
 
+  private fun handleSettingsDocumentViewerEvent(
+    event: SettingsDocumentViewerEvent,
+    state: MainFragmentState
+  ): MainFragmentState {
+    return when (event) {
+      SettingsDocumentViewerEvent.GoUpwards -> {
+        this.goUpwards()
+        state
+      }
+    }
+  }
+
   private fun handleProfileTabEvent(
     event: ProfileTabEvent,
     state: MainFragmentState
@@ -415,7 +430,7 @@ internal class MainFragmentListenerDelegate(
 
   private fun openSettingsAbout(title: String, url: String) {
     this.navigator.addFragment(
-      fragment = SettingsFragmentDocumentViewer.create(title, url),
+      fragment = SettingsDocumentViewerFragment.create(title, url),
       tab = R.id.tabSettings
     )
   }
@@ -433,35 +448,35 @@ internal class MainFragmentListenerDelegate(
 
   private fun openSettingsAcknowledgements(title: String, url: String) {
     this.navigator.addFragment(
-      fragment = SettingsFragmentDocumentViewer.create(title, url),
+      fragment = SettingsDocumentViewerFragment.create(title, url),
       tab = R.id.tabSettings
     )
   }
 
   private fun openSettingsEULA(title: String, url: String) {
     this.navigator.addFragment(
-      fragment = SettingsFragmentDocumentViewer.create(title, url),
+      fragment = SettingsDocumentViewerFragment.create(title, url),
       tab = R.id.tabSettings
     )
   }
 
   private fun openSettingsFaq(title: String, url: String) {
     this.navigator.addFragment(
-      fragment = SettingsFragmentDocumentViewer.create(title, url),
+      fragment = SettingsDocumentViewerFragment.create(title, url),
       tab = R.id.tabSettings
     )
   }
 
   private fun openSettingsLicense(title: String, url: String) {
     this.navigator.addFragment(
-      fragment = SettingsFragmentDocumentViewer.create(title, url),
+      fragment = SettingsDocumentViewerFragment.create(title, url),
       tab = R.id.tabSettings
     )
   }
 
   private fun openSettingsPrivacy(title: String, url: String) {
     this.navigator.addFragment(
-      fragment = SettingsFragmentDocumentViewer.create(title, url),
+      fragment = SettingsDocumentViewerFragment.create(title, url),
       tab = R.id.tabSettings
     )
   }
@@ -524,7 +539,7 @@ internal class MainFragmentListenerDelegate(
     url: URL
   ) {
     this.navigator.addFragment(
-      fragment = SettingsFragmentDocumentViewer.create(title, url.toString()),
+      fragment = SettingsDocumentViewerFragment.create(title, url.toString()),
       tab = this.navigator.currentTab()
     )
   }

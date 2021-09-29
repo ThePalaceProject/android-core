@@ -42,6 +42,10 @@ sealed class MainFragmentListenedEvent {
     val event: org.nypl.simplified.ui.settings.SettingsDebugEvent
   ) : MainFragmentListenedEvent()
 
+  data class SettingsDocumentViewerEvent(
+    val event: org.nypl.simplified.ui.settings.SettingsDocumentViewerEvent
+  ) : MainFragmentListenedEvent()
+
   data class ProfileTabEvent(
     val event: org.nypl.simplified.ui.profiles.ProfileTabEvent
   ) : MainFragmentListenedEvent()
