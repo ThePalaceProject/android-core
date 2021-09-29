@@ -142,11 +142,15 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
   }
 
   private fun onAccountProvidersListUpdated(availableDescriptions: List<AccountProviderDescription>) {
-    this.title.setText(if (availableDescriptions.isEmpty()) {
-      R.string.accountRegistryEmpty
-    } else {
-      R.string.accountRegistrySelect
-    })
+    this.title.setText(
+      if (
+        availableDescriptions.isEmpty()
+      ) {
+        R.string.accountRegistryEmpty
+      } else {
+        R.string.accountRegistrySelect
+      }
+    )
 
     this.accountListAdapter.submitList(availableDescriptions)
   }
