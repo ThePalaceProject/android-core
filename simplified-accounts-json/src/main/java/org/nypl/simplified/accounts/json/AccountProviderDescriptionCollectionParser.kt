@@ -113,6 +113,7 @@ class AccountProviderDescriptionCollectionParser internal constructor(
     return AccountProviderDescription(
       id = id!!,
       title = catalog.metadata.title.title,
+      description = catalog.metadata.description,
       updated = updated!!,
       links = catalog.links,
       images = listOf(),

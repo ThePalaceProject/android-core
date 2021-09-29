@@ -18,31 +18,38 @@
         android:id="@+id/accountTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:ellipsize="end"
         android:maxLines="1"
         android:singleLine="true"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        app:layout_constraintEnd_toStartOf="@id/accountBarrier"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/accountIcon"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="New York Public Library" />
 
+    <ImageView
+        android:id="@+id/accountIcon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:contentDescription="@null"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/account_add" />
 
     <TextView
         android:id="@+id/accountCaption"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
         android:layout_marginEnd="16dp"
         android:ellipsize="end"
-        android:maxLines="1"
-        android:singleLine="true"
         android:textAppearance="@style/TextAppearance.AppCompat.Small"
         android:textSize="12sp"
-        android:textStyle="italic"
         android:visibility="gone"
-        app:layout_constraintEnd_toStartOf="@id/accountBarrier"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/accountTitle"
         app:layout_constraintTop_toBottomOf="@id/accountTitle"
         tools:text="Inspire lifelong learning, advance knowledge, and strengthen our communities."
         tools:visibility="visible" />
@@ -98,8 +105,8 @@
         android:textAlignment="center"
         android:textColor="@android:color/white"
         android:textSize="12sp"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:visibility="invisible" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

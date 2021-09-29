@@ -219,6 +219,8 @@ object AccountProvidersJSON {
         this.parseAuthenticationAlternatives(obj)
       val displayName =
         JSONParserUtilities.getString(obj, "displayName")
+      val description =
+        JSONParserUtilities.getStringOrNull(obj, "description")
       val mainColor =
         JSONParserUtilities.getStringOrNull(obj, "mainColor") ?: "red"
       val eula =
@@ -261,6 +263,7 @@ object AccountProvidersJSON {
         authenticationDocumentURI = authenticationDocumentURI,
         cardCreatorURI = cardCreatorURI,
         catalogURI = catalogURI,
+        description = description,
         displayName = displayName,
         eula = eula,
         id = idUUID,

@@ -42,6 +42,12 @@ interface AccountProviderType : Comparable<AccountProviderType> {
   val displayName: String
 
   /**
+   * @return The description
+   */
+
+  val description: String?
+
+  /**
    * @return The subtitle
    */
 
@@ -241,6 +247,7 @@ interface AccountProviderType : Comparable<AccountProviderType> {
       AccountProviderDescription(
         id = id,
         title = displayName,
+        description = description,
         updated = updated,
         links = links.toList(),
         images = imageLinks.toList(),
