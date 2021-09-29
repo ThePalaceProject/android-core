@@ -117,7 +117,7 @@ class CatalogButtons(
       this.setTextColor(colorStateListForButtonItems())
       this.textSize = 12f
       this.isDuplicateParentStateEnabled = true
-      this.movementMethod = ScrollingMovementMethod()
+      this.movementMethod = null
     }
 
     val textLoanDuration = this.createCenteredTextForButtons(loanDuration).apply {
@@ -125,7 +125,7 @@ class CatalogButtons(
       this.setTextColor(colorStateListForButtonItems())
       this.textSize = 12f
       this.isDuplicateParentStateEnabled = true
-      this.movementMethod = ScrollingMovementMethod()
+      this.movementMethod = null
     }
 
     val imageView = AppCompatImageView(this.context).apply {
