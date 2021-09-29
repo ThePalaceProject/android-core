@@ -91,6 +91,7 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
       AccountProviderDescription(
         id = URI.create("urn:fake:0"),
         title = "Title",
+        description = "Description",
         updated = DateTime.parse("2019-07-09T08:33:40+00:00"),
         links = listOf(),
         images = listOf(),
@@ -128,6 +129,7 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
       AccountProviderDescription(
         id = URI.create("urn:fake:0"),
         title = "Title",
+        description = "Description",
         updated = DateTime.parse("2019-07-09T08:33:40+00:00"),
         links = listOf(
           Link.LinkBasic(
@@ -174,6 +176,7 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
       AccountProviderDescription(
         id = URI.create("urn:fake:0"),
         title = "Title",
+        description = "Description",
         updated = DateTime.parse("2019-07-09T08:33:40+00:00"),
         links = listOf(
           Link.LinkBasic(
@@ -213,6 +216,7 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
       AccountProviderDescription(
         id = URI.create("urn:fake:0"),
         title = "Title",
+        description = "Description",
         updated = DateTime.parse("2019-07-09T08:33:40+00:00"),
         links = listOf(
           Link.LinkBasic(
@@ -266,6 +270,7 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
       AccountProviderDescription(
         id = URI.create("urn:fake:0"),
         title = "Title",
+        description = "Description",
         updated = DateTime.parse("2019-07-09T08:33:40+00:00"),
         links = listOf(
           Link.LinkBasic(
@@ -406,6 +411,7 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
       authenticationDocumentURI = this.server.url("auth").toUri(),
       cardCreatorURI = URI("http://www.example.com/card.xml"),
       catalogURI = URI("http://www.example.com/feed.xml"),
+      description = "Description",
       displayName = "Auth",
       eula = URI("http://www.example.com/eula.xml"),
       id = URI.create("urn:fake:0"),
@@ -437,6 +443,7 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
       AccountProviderDescription(
         id = URI.create("urn:fake:0"),
         title = "Title",
+        description = "Description",
         updated = DateTime.parse("2019-07-09T08:33:40+00:00"),
         links = listOf(
           Link.LinkBasic(
@@ -557,6 +564,7 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
       authenticationDocumentURI = this.server.url("auth").toUri(),
       cardCreatorURI = URI("http://www.example.com/card.xml"),
       catalogURI = URI("http://www.example.com/feed.xml"),
+      description = "Description",
       displayName = "Auth",
       eula = URI("http://www.example.com/eula.xml"),
       id = URI.create("urn:fake:0"),
@@ -588,6 +596,7 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
       AccountProviderDescription(
         id = URI.create("urn:fake:0"),
         title = "Title",
+        description = "Description",
         updated = DateTime.parse("2019-07-09T08:33:40+00:00"),
         links = listOf(
           Link.LinkBasic(
@@ -688,6 +697,7 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
       authenticationDocumentURI = this.server.url("auth").toUri(),
       cardCreatorURI = URI("http://www.example.com/card.xml"),
       catalogURI = URI("http://www.example.com/feed.xml"),
+      description = "Description",
       displayName = "Auth",
       eula = URI("http://www.example.com/eula.xml"),
       id = URI.create("urn:fake:0"),
@@ -719,6 +729,7 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
       AccountProviderDescription(
         id = URI.create("urn:fake:0"),
         title = "Title",
+        description = "Description",
         updated = DateTime.parse("2019-07-09T08:33:40+00:00"),
         links = listOf(
           Link.LinkBasic(
@@ -832,6 +843,7 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
       AccountProviderDescription(
         id = URI.create("urn:fake:0"),
         title = "Title",
+        description = "Description",
         updated = DateTime.parse("2019-07-09T08:33:40+00:00"),
         links = listOf(
           Link.LinkBasic(
@@ -944,6 +956,7 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
       AccountProviderDescription(
         id = URI.create("urn:fake:0"),
         title = "Title",
+        description = "Description",
         updated = DateTime.parse("2019-07-09T08:33:40+00:00"),
         links = listOf(
           Link.LinkBasic(

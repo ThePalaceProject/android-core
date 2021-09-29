@@ -58,6 +58,7 @@ class MockAccount(override val id: AccountID) : AccountType {
         authenticationDocumentURI = null,
         cardCreatorURI = null,
         catalogURI = URI.create("catalog"),
+        description = "Library Description ${this.id.uuid}",
         displayName = "Library ${this.id.uuid}",
         eula = null,
         id = URI.create("urn:uuid:${this.providerId}"),
