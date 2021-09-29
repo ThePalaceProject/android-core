@@ -2,7 +2,6 @@ package org.nypl.simplified.ui.catalog
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.text.method.ScrollingMovementMethod
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
