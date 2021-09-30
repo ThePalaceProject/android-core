@@ -23,6 +23,7 @@ import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
+import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.threads.NamedThreadPools
 import org.slf4j.LoggerFactory
 import java.net.URI
@@ -91,6 +92,9 @@ class AccountListRegistryViewModel(private val locationManager: LocationManager)
   val accountCreationEvents: UnicastWorkSubject<AccountEvent> =
     UnicastWorkSubject.create()
 
+  val accountProvidersList: UnicastWorkSubject<List<AccountProviderDescription>> =
+    UnicastWorkSubject.create()
+
   val accountRegistryStatus: AccountProviderRegistryStatus
     get() = this.accountRegistry.status
 
@@ -145,7 +149,7 @@ class AccountListRegistryViewModel(private val locationManager: LocationManager)
    * if no account already exists for it in the current profile.
    */
 
-  fun determineAvailableAccountProviderDescriptions(): List<AccountProviderDescription> {
+  fun determineAvailableAccountProviderDescriptions() {
     val usedAccountProviders =
       this.profilesController
         .profileCurrentlyUsedAccountProviders()
@@ -161,8 +165,32 @@ class AccountListRegistryViewModel(private val locationManager: LocationManager)
         .toMutableList()
     availableAccountProviders.removeAll(usedAccountProviders)
 
-    this.logger.debug("returning {} available providers", availableAccountProviders.size)
-    return availableAccountProviders
+    this.backgroundExecutor.execute {
+
+      availableAccountProviders.forEach {
+        val result = accountRegistry.resolve(
+          { _, _ -> },
+          it
+        )
+
+        when (result) {
+          is TaskResult.Success -> {
+            this.logger.debug("successfully resolved the account provider")
+          }
+          is TaskResult.Failure -> {
+            this.logger.error("failed to resolve account provider: ", result.exception)
+          }
+        }
+      }
+
+      val updatedProvidersList = this.accountRegistry.accountProviderDescriptions()
+        .values
+        // Palace hides the default account from end users.
+        .filter { it.id != accountRegistry.defaultProvider.id }
+        .toMutableList()
+      updatedProvidersList.removeAll(usedAccountProviders)
+      accountProvidersList.onNext(updatedProvidersList)
+    }
   }
 
   @RequiresPermission(value = Manifest.permission.ACCESS_COARSE_LOCATION)
