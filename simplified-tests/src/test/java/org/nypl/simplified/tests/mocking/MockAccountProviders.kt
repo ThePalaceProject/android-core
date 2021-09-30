@@ -2,6 +2,7 @@ package org.nypl.simplified.tests.mocking
 
 import android.content.Context
 import com.google.common.base.Preconditions
+import com.nhaarman.mockitokotlin2.description
 import org.joda.time.DateTime
 import org.mockito.Mockito
 import org.nypl.simplified.accounts.api.AccountProvider
@@ -58,6 +59,7 @@ object MockAccountProviders {
       authenticationDocumentURI = null,
       cardCreatorURI = null,
       catalogURI = URI.create("http://$host:$port/accounts0/feed.xml"),
+      description = "Fake Library description",
       displayName = "Fake Library",
       eula = null,
       id = URI.create(providerId),

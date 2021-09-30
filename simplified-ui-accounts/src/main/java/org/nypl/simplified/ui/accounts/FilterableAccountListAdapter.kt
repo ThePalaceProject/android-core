@@ -123,7 +123,7 @@ class AccountItemViewHolder(
   private val imageLoader: ImageLoaderType,
   private val onItemClicked: (AccountProviderDescription) -> Unit
 ) : RecyclerView.ViewHolder(itemView) {
-  private val accountIcon: ImageView? =
+  private val accountIcon: ImageView =
     itemView.findViewById(R.id.accountIcon)
   private val accountTitleView =
     itemView.findViewById<TextView>(R.id.accountTitle)
@@ -142,21 +142,19 @@ class AccountItemViewHolder(
 
   fun bind(item: AccountProviderDescription) {
     this.accountTitleView.text = item.title
-    this.accountCaptionView.text = ""
     this.accountCaptionView.visibility =
-      if (this.accountCaptionView.text.isNotEmpty()) {
+      if (!item.description.isNullOrEmpty()) {
+        this.accountCaptionView.text = item.description
         View.VISIBLE
       } else {
         View.GONE
       }
-    if (this.accountIcon != null) {
-      ImageAccountIcons.loadAccountLogoIntoView(
-        loader = this.imageLoader.loader,
-        account = item,
-        defaultIcon = R.drawable.account_default,
-        iconView = this.accountIcon
-      )
-    }
+    ImageAccountIcons.loadAccountLogoIntoView(
+      loader = this.imageLoader.loader,
+      account = item,
+      defaultIcon = R.drawable.account_default,
+      iconView = this.accountIcon
+    )
     this.accountItem = item
   }
 }

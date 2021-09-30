@@ -132,7 +132,25 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
       .subscribe { this.noLocation.isVisible = it }
       .let(this.subscriptions::add)
 
+    this.viewModel.accountProvidersList
+      .subscribe(this::onAccountProvidersListUpdated)
+      .let { subscriptions.add(it) }
+
     this.reconfigureViewForRegistryStatus(this.viewModel.accountRegistryStatus)
+
+    this.viewModel.determineAvailableAccountProviderDescriptions()
+  }
+
+  private fun onAccountProvidersListUpdated(availableDescriptions: List<AccountProviderDescription?>) {
+    this.title.setText(
+      if (availableDescriptions.isEmpty()) {
+        R.string.accountRegistryEmpty
+      } else {
+        R.string.accountRegistrySelect
+      }
+    )
+
+    this.accountListAdapter.submitList(availableDescriptions)
   }
 
   private fun onAccountEvent(event: AccountEvent) {
@@ -247,15 +265,6 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
         this.accountList.visibility = View.VISIBLE
         this.progress.hide()
         this.reload?.isEnabled = true
-
-        val availableDescriptions =
-          this.viewModel.determineAvailableAccountProviderDescriptions()
-        if (availableDescriptions.isEmpty()) {
-          this.title.setText(R.string.accountRegistryEmpty)
-        } else {
-          this.title.setText(R.string.accountRegistrySelect)
-        }
-        this.accountListAdapter.submitList(availableDescriptions)
       }
 
       AccountProviderRegistryStatus.Refreshing -> {

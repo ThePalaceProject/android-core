@@ -397,6 +397,7 @@ abstract class AccountProviderDescriptionRegistryContract {
       AccountProviderDescription(
         id = URI.create("urn:0"),
         title = "Title 0",
+        description = "Description 0",
         updated = DateTime.now(),
         links = listOf(),
         images = listOf(),
@@ -420,6 +421,7 @@ abstract class AccountProviderDescriptionRegistryContract {
       AccountProviderDescription(
         id = URI.create("urn:1"),
         title = "Title 1",
+        description = "Description 1",
         updated = DateTime.now(),
         links = listOf(),
         images = listOf(),
@@ -432,6 +434,7 @@ abstract class AccountProviderDescriptionRegistryContract {
       AccountProviderDescription(
         id = URI.create("urn:2"),
         title = "Title 2",
+        description = "Description 2",
         updated = DateTime.now(),
         links = listOf(),
         images = listOf(),
@@ -444,6 +447,7 @@ abstract class AccountProviderDescriptionRegistryContract {
       AccountProviderDescription(
         id = URI.create("urn:0"),
         title = "Title 0",
+        description = "Description 0",
         updated = DateTime.parse("1900-01-01T00:00:00Z"),
         links = listOf(),
         images = listOf(),
@@ -456,6 +460,7 @@ abstract class AccountProviderDescriptionRegistryContract {
       AccountProviderDescription(
         id = URI.create("urn:1"),
         title = "Title 1",
+        description = "Description 1",
         updated = DateTime.parse("1900-01-01T00:00:00Z"),
         links = listOf(),
         images = listOf(),
@@ -468,6 +473,7 @@ abstract class AccountProviderDescriptionRegistryContract {
       AccountProviderDescription(
         id = URI.create("urn:2"),
         title = "Title 2",
+        description = "Description 2",
         updated = DateTime.parse("1900-01-01T00:00:00Z"),
         links = listOf(),
         images = listOf(),

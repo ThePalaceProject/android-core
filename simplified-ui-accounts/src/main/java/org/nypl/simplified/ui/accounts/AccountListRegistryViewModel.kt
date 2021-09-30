@@ -23,6 +23,7 @@ import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
+import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.threads.NamedThreadPools
 import org.slf4j.LoggerFactory
 import java.net.URI
@@ -96,6 +97,9 @@ class AccountListRegistryViewModel(private val locationManager: LocationManager)
   val accountCreationEvents: UnicastWorkSubject<AccountEvent> =
     UnicastWorkSubject.create()
 
+  val accountProvidersList: UnicastWorkSubject<List<AccountProviderDescription?>> =
+    UnicastWorkSubject.create()
+
   val accountRegistryStatus: AccountProviderRegistryStatus
     get() = this.accountRegistry.status
 
@@ -150,7 +154,7 @@ class AccountListRegistryViewModel(private val locationManager: LocationManager)
    * if no account already exists for it in the current profile.
    */
 
-  fun determineAvailableAccountProviderDescriptions(): List<AccountProviderDescription?> {
+  fun determineAvailableAccountProviderDescriptions() {
     val usedAccountProviders =
       this.profilesController
         .profileCurrentlyUsedAccountProviders()
@@ -166,29 +170,53 @@ class AccountListRegistryViewModel(private val locationManager: LocationManager)
         .toMutableList()
     availableAccountProviders.removeAll(usedAccountProviders)
 
-    val featuredLibrariesList = availableAccountProviders.filter {
-      featuredLibrariesList.contains(it.id.toString())
-    }.sortedBy { it.title }
+    this.backgroundExecutor.execute {
 
-    return if (
-      featuredLibrariesList.isNotEmpty()
-    ) {
-      availableAccountProviders.removeAll(featuredLibrariesList)
-      arrayListOf<AccountProviderDescription?>()
-        .apply {
-          this.addAll(featuredLibrariesList)
+      availableAccountProviders.forEach {
+        val result = accountRegistry.resolve(
+          { _, _ -> },
+          it
+        )
 
-          // if we have more libraries than the featured ones, we need to add a space between them
-          if (
-            availableAccountProviders.isNotEmpty()
-          ) {
-            this.add(null)
-            this.addAll(availableAccountProviders)
+        when (result) {
+          is TaskResult.Success -> {
+            this.logger.debug("successfully resolved the account provider")
+          }
+          is TaskResult.Failure -> {
+            this.logger.error("failed to resolve account provider: ", result.exception)
           }
         }
-    } else {
-      this.logger.debug("returning {} available providers", availableAccountProviders.size)
-      availableAccountProviders
+      }
+
+      val updatedProvidersList = this.accountRegistry.accountProviderDescriptions()
+        .values
+        // Palace hides the default account from end users.
+        .filter { it.id != accountRegistry.defaultProvider.id }
+        .toMutableList()
+      updatedProvidersList.removeAll(usedAccountProviders)
+
+      val featuredLibrariesList = updatedProvidersList.filter {
+        featuredLibrariesList.contains(it.id.toString())
+      }.sortedBy { it.title }
+
+      accountProvidersList.onNext(
+        if (featuredLibrariesList.isNotEmpty()) {
+          updatedProvidersList.removeAll(featuredLibrariesList)
+          arrayListOf<AccountProviderDescription?>()
+            .apply {
+              this.addAll(featuredLibrariesList)
+
+              // if we have more libraries than the featured ones, we need to add a space between them
+              if (updatedProvidersList.isNotEmpty()) {
+                this.add(null)
+                this.addAll(updatedProvidersList)
+              }
+            }
+        } else {
+          this.logger.debug("returning {} available providers", availableAccountProviders.size)
+          updatedProvidersList
+        }
+      )
     }
   }
 

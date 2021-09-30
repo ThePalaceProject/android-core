@@ -28,6 +28,12 @@ interface OPDS2MetadataType : OPDS2ElementType {
   val subtitle: OPDS2Title?
 
   /**
+   * The description of the publication.
+   */
+
+  val description: String?
+
+  /**
    * The time the publication was last modified.
    */
 
