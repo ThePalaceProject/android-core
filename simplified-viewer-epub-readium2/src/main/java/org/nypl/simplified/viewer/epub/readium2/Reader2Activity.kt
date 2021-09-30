@@ -302,7 +302,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
     return when (event) {
       SR2ReaderViewNavigationClose ->
-        this.tocClose()
+        this.onBackPressed()
       SR2ReaderViewNavigationOpenTOC ->
         this.tocOpen()
       is SR2ControllerBecameAvailable ->
