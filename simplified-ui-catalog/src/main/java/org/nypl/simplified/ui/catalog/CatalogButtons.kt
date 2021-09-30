@@ -105,6 +105,14 @@ class CatalogButtons(
   }
 
   @UiThread
+  fun createListenButtonWithLoanDuration(
+    loanDuration: String,
+    onClick: () -> Unit
+  ): LinearLayout {
+    return createButtonWithDuration(loanDuration, R.string.catalogListen, onClick)
+  }
+
+  @UiThread
   fun createButtonWithDuration(
     loanDuration: String,
     @StringRes res: Int,
@@ -117,6 +125,7 @@ class CatalogButtons(
       this.textSize = 12f
       this.isDuplicateParentStateEnabled = true
       this.movementMethod = null
+      this.isVerticalScrollBarEnabled = false
     }
 
     val textLoanDuration = this.createCenteredTextForButtons(loanDuration).apply {
@@ -125,6 +134,7 @@ class CatalogButtons(
       this.textSize = 12f
       this.isDuplicateParentStateEnabled = true
       this.movementMethod = null
+      this.isVerticalScrollBarEnabled = false
     }
 
     val imageView = AppCompatImageView(this.context).apply {

@@ -399,9 +399,16 @@ class CatalogPagedViewHolder(
         )
       }
       is BookFormat.BookFormatAudioBook -> {
+        val loanDuration = getLoanDuration(book)
         this.idleButtons.addView(
-          this.buttonCreator.createListenButton {
-            this.listener.openViewer(book, format)
+          if (loanDuration.isNotEmpty()) {
+            this.buttonCreator.createListenButtonWithLoanDuration(loanDuration) {
+              this.listener.openViewer(book, format)
+            }
+          } else {
+            this.buttonCreator.createListenButton {
+              this.listener.openViewer(book, format)
+            }
           }
         )
       }
