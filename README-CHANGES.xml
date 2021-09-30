@@ -50,7 +50,7 @@
         <c:change date="2021-09-10T00:00:00+00:00" summary="Introduced a new color scheme for the application."/>
       </c:changes>
     </c:release>
-    <c:release date="2021-09-28T22:20:51+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.3">
+    <c:release date="2021-09-30T11:42:43+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.3">
       <c:changes>
         <c:change date="2021-07-14T00:00:00+00:00" summary="Improve fixed-layout EPUB handling.">
           <c:tickets>
@@ -88,7 +88,8 @@
             <c:ticket id="SMA-237"/>
           </c:tickets>
         </c:change>
-        <c:change date="2021-09-28T22:20:51+00:00" summary="Fix long chapter titles overlapping elapsed/total time displays in audiobook player"/>
+        <c:change date="2021-09-28T00:00:00+00:00" summary="Fix long chapter titles overlapping elapsed/total time displays in audiobook player"/>
+        <c:change date="2021-09-30T11:42:43+00:00" summary="Add icons and descriptions to Add Library screen"/>
       </c:changes>
     </c:release>
   </c:releases>

@@ -28,7 +28,7 @@ interface OPDS2MetadataType : OPDS2ElementType {
   val subtitle: OPDS2Title?
 
   /**
-   * The subtitle of the publication.
+   * The description of the publication.
    */
 
   val description: String?
