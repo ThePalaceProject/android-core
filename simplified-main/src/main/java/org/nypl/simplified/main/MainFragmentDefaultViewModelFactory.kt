@@ -13,6 +13,7 @@ import org.nypl.simplified.ui.catalog.CatalogFeedEvent
 import org.nypl.simplified.ui.catalog.saml20.CatalogSAML20Event
 import org.nypl.simplified.ui.profiles.ProfileTabEvent
 import org.nypl.simplified.ui.settings.SettingsDebugEvent
+import org.nypl.simplified.ui.settings.SettingsDocumentViewerEvent
 import org.nypl.simplified.ui.settings.SettingsMainEvent
 
 class MainFragmentDefaultViewModelFactory(fallbackFactory: ViewModelProvider.Factory) :
@@ -31,6 +32,7 @@ class MainFragmentDefaultViewModelFactory(fallbackFactory: ViewModelProvider.Fac
     repository.registerListener(AccountPickerEvent::class, MainFragmentListenedEvent::AccountPickerEvent)
     repository.registerListener(SettingsMainEvent::class, MainFragmentListenedEvent::SettingsMainEvent)
     repository.registerListener(SettingsDebugEvent::class, MainFragmentListenedEvent::SettingsDebugEvent)
+    repository.registerListener(SettingsDocumentViewerEvent::class, MainFragmentListenedEvent::SettingsDocumentViewerEvent)
     repository.registerListener(ProfileTabEvent::class, MainFragmentListenedEvent::ProfileTabEvent)
   }
 }
