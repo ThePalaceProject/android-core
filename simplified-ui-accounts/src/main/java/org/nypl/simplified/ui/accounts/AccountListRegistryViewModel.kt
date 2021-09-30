@@ -176,9 +176,15 @@ class AccountListRegistryViewModel(private val locationManager: LocationManager)
       availableAccountProviders.removeAll(featuredLibrariesList)
       arrayListOf<AccountProviderDescription?>()
         .apply {
-          addAll(featuredLibrariesList)
-          add(null)
-          addAll(availableAccountProviders)
+          this.addAll(featuredLibrariesList)
+
+          // if we have more libraries than the featured ones, we need to add a space between them
+          if (
+            availableAccountProviders.isNotEmpty()
+          ) {
+            this.add(null)
+            this.addAll(availableAccountProviders)
+          }
         }
     } else {
       this.logger.debug("returning {} available providers", availableAccountProviders.size)
