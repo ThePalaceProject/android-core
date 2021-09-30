@@ -258,6 +258,7 @@ class SettingsDebugViewModel(application: Application) : AndroidViewModel(applic
         authenticationAlternatives = listOf(this.cleverAuth),
         cardCreatorURI = null,
         catalogURI = URI.create("https://qa-circulation.openebooks.us/USOEI/groups"),
+        description = "Open eBooks for everyone",
         displayName = "Open eBooks (QA)",
         eula = null,
         id = URI.create("https://qa-circulation.openebooks.us/USOEI/authentication_document"),

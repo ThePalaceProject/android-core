@@ -3,6 +3,7 @@ package org.nypl.simplified.tests
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.nhaarman.mockitokotlin2.description
 import org.joda.time.DateTime
 import org.nypl.simplified.accounts.api.AccountProvider
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
@@ -63,6 +64,7 @@ class TransformProviders {
             authenticationAlternatives = listOf(),
             catalogURI = URI.create(entry.catalogUrl),
             cardCreatorURI = null,
+            description = null,
             displayName = entry.name!!,
             eula = entry.eulaUrl?.let { URI.create(it) },
             id = URI.create(entry.id_uuid),

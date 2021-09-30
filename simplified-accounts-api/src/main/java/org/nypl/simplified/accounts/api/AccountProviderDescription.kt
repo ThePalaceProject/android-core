@@ -29,6 +29,12 @@ data class AccountProviderDescription(
   val title: String,
 
   /**
+   * The account description.
+   */
+
+  val description: String?,
+
+  /**
    * The time that the description was last updated.
    */
 

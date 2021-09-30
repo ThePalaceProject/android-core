@@ -47,6 +47,7 @@ class ProfileAccountCreateCustomOPDSTask(
 ) : Callable<TaskResult<AccountType>> {
 
   private var title: String = ""
+  private var description: String = ""
   private val logger = LoggerFactory.getLogger(ProfileAccountCreateCustomOPDSTask::class.java)
   private val taskRecorder = TaskRecorder.create()
 
@@ -156,6 +157,7 @@ class ProfileAccountCreateCustomOPDSTask(
       AccountProviderDescription(
         id = id,
         title = this.title,
+        description = this.description,
         updated = DateTime.now(),
         links = links,
         images = listOf(),

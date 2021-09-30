@@ -24,6 +24,7 @@ class VanillaAccountFallback : AccountProviderFallbackType {
       authenticationAlternatives = listOf(),
       cardCreatorURI = null,
       catalogURI = URI.create("https://circulation.librarysimplified.org/CLASSICS/groups/1832"),
+      description = "SimplyE Collection ebooks",
       displayName = "The SimplyE Collection",
       eula = null,
       id = URI.create("urn:uuid:56906f26-2c9a-4ae9-bd02-552557720b99"),

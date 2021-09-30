@@ -21,6 +21,7 @@ class PalaceAccountFallback : AccountProviderFallbackType {
       authenticationAlternatives = listOf(),
       cardCreatorURI = null,
       catalogURI = URI.create("https://openbookshelf.dp.la/OB/groups/3"),
+      description = "Popular books free to download and keep, handpicked by librarians across the US.",
       displayName = "Digital Public Library of America",
       eula = null,
       // This id is intentionally different than the id for the "real" DPLA library retrieved from

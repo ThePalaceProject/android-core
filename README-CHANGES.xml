@@ -89,6 +89,7 @@
           </c:tickets>
         </c:change>
         <c:change date="2021-09-28T00:00:00+00:00" summary="Fix long chapter titles overlapping elapsed/total time displays in audiobook player"/>
+        <c:change date="2021-09-30T11:42:43+00:00" summary="Add icons and descriptions to Add Library screen"/>
         <c:change date="2021-09-30T15:57:34+00:00" summary="Add book loan duration to buttons"/>
       </c:changes>
     </c:release>

@@ -100,6 +100,9 @@ class AccountProviderResolution(
       val title =
         this.findTitle(authDocument)
 
+      val description =
+        this.findDescription(authDocument)
+
       val annotationsURI =
         this.findAnnotationsLink()
 
@@ -112,6 +115,7 @@ class AccountProviderResolution(
           authenticationDocumentURI = this.description.authenticationDocumentURI?.hrefURI,
           cardCreatorURI = authDocument?.cardCreatorURI,
           catalogURI = catalogURI,
+          description = description,
           displayName = title,
           eula = authDocument?.eulaURI,
           id = this.description.id,
@@ -165,6 +169,19 @@ class AccountProviderResolution(
 
     this.logger.debug("took title from metadata")
     return this.description.title
+  }
+
+  private fun findDescription(
+    authDocument: AuthenticationDocument?
+  ): String {
+    val authDescription = authDocument?.description
+    if (authDescription != null) {
+      this.logger.debug("took description from authentication document")
+      return authDescription
+    }
+
+    this.logger.debug("took description from metadata")
+    return this.description.description.orEmpty()
   }
 
   private fun findCatalogURI(

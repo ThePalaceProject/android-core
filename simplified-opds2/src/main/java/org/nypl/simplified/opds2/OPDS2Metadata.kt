@@ -28,6 +28,11 @@ data class OPDS2Metadata(
   override val subtitle: OPDS2Title?,
 
   /**
+   * The description of the publication.
+   */
+  override val description: String?,
+
+  /**
    * The time the publication was last modified.
    */
 
