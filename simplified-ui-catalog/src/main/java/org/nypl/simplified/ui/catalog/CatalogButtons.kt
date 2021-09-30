@@ -1,8 +1,10 @@
 package org.nypl.simplified.ui.catalog
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Space
@@ -10,7 +12,9 @@ import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.annotation.UiThread
 import androidx.appcompat.widget.AppCompatButton
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.content.ContextCompat
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 
 /**
@@ -21,6 +25,22 @@ class CatalogButtons(
   private val context: Context,
   private val screenSizeInformation: ScreenSizeInformationType
 ) {
+
+  private fun colorStateListForButtonItems(): ColorStateList {
+    val states =
+      arrayOf(
+        intArrayOf(android.R.attr.state_pressed),
+        intArrayOf(-android.R.attr.state_pressed)
+      )
+
+    val colors =
+      intArrayOf(
+        ContextCompat.getColor(context, R.color.neutralColorBackground),
+        ContextCompat.getColor(context, R.color.neutralColorPrimary)
+      )
+
+    return ColorStateList(states, colors)
+  }
 
   @UiThread
   fun createButtonSpace(): Space {
@@ -40,6 +60,16 @@ class CatalogButtons(
   }
 
   @UiThread
+  fun createCenteredTextForButtons(
+    centeredText: String
+  ): TextView {
+    return AppCompatTextView(this.context).apply {
+      gravity = Gravity.CENTER
+      text = centeredText
+    }
+  }
+
+  @UiThread
   fun createButton(
     context: Context,
     text: Int,
@@ -56,6 +86,95 @@ class CatalogButtons(
       button.isEnabled = true
     }
     return button
+  }
+
+  @UiThread
+  fun createReadButtonWithLoanDuration(
+    loanDuration: String,
+    onClick: () -> Unit
+  ): LinearLayout {
+    return createButtonWithDuration(loanDuration, R.string.catalogRead, onClick)
+  }
+
+  @UiThread
+  fun createDownloadButtonWithLoanDuration(
+    loanDuration: String,
+    onClick: () -> Unit
+  ): LinearLayout {
+    return createButtonWithDuration(loanDuration, R.string.catalogDownload, onClick)
+  }
+
+  @UiThread
+  fun createListenButtonWithLoanDuration(
+    loanDuration: String,
+    onClick: () -> Unit
+  ): LinearLayout {
+    return createButtonWithDuration(loanDuration, R.string.catalogListen, onClick)
+  }
+
+  @UiThread
+  fun createButtonWithDuration(
+    loanDuration: String,
+    @StringRes res: Int,
+    onClick: () -> Unit
+  ): LinearLayout {
+
+    val mainText = this.createCenteredTextForButtons(res).apply {
+      this.layoutParams = wrapContentParameters()
+      this.setTextColor(colorStateListForButtonItems())
+      this.textSize = 12f
+      this.isDuplicateParentStateEnabled = true
+      this.movementMethod = null
+      this.isVerticalScrollBarEnabled = false
+    }
+
+    val textLoanDuration = this.createCenteredTextForButtons(loanDuration).apply {
+      this.layoutParams = wrapContentParameters()
+      this.setTextColor(colorStateListForButtonItems())
+      this.textSize = 12f
+      this.isDuplicateParentStateEnabled = true
+      this.movementMethod = null
+      this.isVerticalScrollBarEnabled = false
+    }
+
+    val imageView = AppCompatImageView(this.context).apply {
+      this.layoutParams = ViewGroup.MarginLayoutParams(25, 25).apply {
+        this.bottomMargin = 4
+      }
+      this.isDuplicateParentStateEnabled = true
+      this.setImageResource(R.drawable.ic_clock)
+      this.imageTintList = colorStateListForButtonItems()
+    }
+
+    val linearLayout = LinearLayout(this.context).apply {
+      this.orientation = LinearLayout.VERTICAL
+      this.gravity = Gravity.CENTER
+      this.layoutParams = ViewGroup.MarginLayoutParams(
+        ViewGroup.LayoutParams.WRAP_CONTENT,
+        ViewGroup.LayoutParams.MATCH_PARENT
+      ).apply {
+        this.marginEnd = screenSizeInformation.dpToPixels(6).toInt()
+      }
+      this.isDuplicateParentStateEnabled = true
+      this.addView(imageView)
+      this.addView(textLoanDuration)
+    }
+
+    return LinearLayout(this.context, null, androidx.appcompat.R.attr.buttonStyle).apply {
+      this.orientation = LinearLayout.HORIZONTAL
+      this.gravity = Gravity.CENTER
+      this.layoutParams = LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.WRAP_CONTENT,
+        LinearLayout.LayoutParams.MATCH_PARENT
+      )
+      this.setOnClickListener {
+        this.isEnabled = false
+        onClick.invoke()
+        this.isEnabled = true
+      }
+      this.addView(linearLayout)
+      this.addView(mainText)
+    }
   }
 
   @UiThread
@@ -226,5 +345,13 @@ class CatalogButtons(
     buttonLayoutParams.height = LinearLayout.LayoutParams.WRAP_CONTENT
     buttonLayoutParams.width = this.screenSizeInformation.dpToPixels(80).toInt()
     return buttonLayoutParams
+  }
+
+  @UiThread
+  fun wrapContentParameters(): LinearLayout.LayoutParams {
+    return LinearLayout.LayoutParams(
+      LinearLayout.LayoutParams.WRAP_CONTENT,
+      LinearLayout.LayoutParams.WRAP_CONTENT
+    )
   }
 }

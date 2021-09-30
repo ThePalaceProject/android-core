@@ -197,7 +197,8 @@ object CatalogBookAvailabilityStrings {
   }
 
   /**
-   * Construct a short time interval string like "3w", with units up to a year.
+   * Construct a short time interval string like "3 w", with units up to a year, that will be used
+   * to show the user the duration of his book's loan.
    *
    * @param resources The application resources
    * @param lower The lower bound of the time period
@@ -206,7 +207,7 @@ object CatalogBookAvailabilityStrings {
    * @return A time interval string
    */
 
-  fun intervalStringShort(
+  fun intervalStringLoanDuration(
     resources: Resources,
     lower: DateTime,
     upper: DateTime
@@ -220,24 +221,43 @@ object CatalogBookAvailabilityStrings {
     val unit: String
     val value: Long
 
-    if (years > 0) {
-      unit = resources.getString(R.string.catalogBookIntervalYearsShort)
-      value = years
-    } else if (weeks > 8) {
-      unit = resources.getString(R.string.catalogBookIntervalMonthsShort)
-      value = months
-    } else if (weeks > 0) {
-      unit = resources.getString(R.string.catalogBookIntervalWeeksShort)
-      value = weeks
-    } else if (days > 0) {
-      unit = resources.getString(R.string.catalogBookIntervalDaysShort)
-      value = days
-    } else {
-      unit = resources.getString(R.string.catalogBookIntervalHoursShort)
-      value = hours
+    when {
+      // Switch to years after ~48 months.
+      years >= 4 -> {
+        unit = resources.getString(R.string.catalogBookIntervalYearsShort)
+        value = years
+      }
+
+      // Switch to months after ~16 weeks.
+      months >= 4 -> {
+        unit = resources.getString(R.string.catalogBookIntervalMonthsShort)
+        value = months
+      }
+
+      // Switch to weeks after 28 days.
+      weeks >= 4 -> {
+        unit = resources.getString(R.string.catalogBookIntervalWeeksShort)
+        value = weeks
+      }
+
+      // Switch to days after 48 hours.
+      days >= 2 -> {
+        unit = resources.getString(R.string.catalogBookIntervalDaysShort)
+        value = days
+      }
+
+      // Use hours.
+      hours > 0 -> {
+        unit = resources.getString(R.string.catalogBookIntervalHoursShort)
+        value = hours
+      }
+
+      else -> {
+        return ""
+      }
     }
 
-    return String.format("%d%s", value, unit)
+    return String.format("%d %s", value, unit)
   }
 
   private fun calendarHoursBetween(
