@@ -47,6 +47,11 @@ class AccountListRegistryViewModel(private val locationManager: LocationManager)
   private val logger =
     LoggerFactory.getLogger(AccountListRegistryViewModel::class.java)
 
+  private val featuredLibrariesList = arrayOf(
+    "urn:uuid:6b849570-070f-43b4-9dcc-7ebb4bca292e", // DPLA
+    "urn:uuid:5278562c-d642-4fda-ad7e-1613077cfb8d" // Open Textbook Library
+  )
+
   private val locationUpdates = BehaviorSubject.create<Unit>()
   private val queries = BehaviorSubject.createDefault("")
 
@@ -145,7 +150,7 @@ class AccountListRegistryViewModel(private val locationManager: LocationManager)
    * if no account already exists for it in the current profile.
    */
 
-  fun determineAvailableAccountProviderDescriptions(): List<AccountProviderDescription> {
+  fun determineAvailableAccountProviderDescriptions(): List<AccountProviderDescription?> {
     val usedAccountProviders =
       this.profilesController
         .profileCurrentlyUsedAccountProviders()
@@ -161,8 +166,24 @@ class AccountListRegistryViewModel(private val locationManager: LocationManager)
         .toMutableList()
     availableAccountProviders.removeAll(usedAccountProviders)
 
-    this.logger.debug("returning {} available providers", availableAccountProviders.size)
-    return availableAccountProviders
+    val featuredLibrariesList = availableAccountProviders.filter {
+      featuredLibrariesList.contains(it.id.toString())
+    }.sortedBy { it.title }
+
+    return if (
+      featuredLibrariesList.isNotEmpty()
+    ) {
+      availableAccountProviders.removeAll(featuredLibrariesList)
+      arrayListOf<AccountProviderDescription?>()
+        .apply {
+          addAll(featuredLibrariesList)
+          add(null)
+          addAll(availableAccountProviders)
+        }
+    } else {
+      this.logger.debug("returning {} available providers", availableAccountProviders.size)
+      availableAccountProviders
+    }
   }
 
   @RequiresPermission(value = Manifest.permission.ACCESS_COARSE_LOCATION)

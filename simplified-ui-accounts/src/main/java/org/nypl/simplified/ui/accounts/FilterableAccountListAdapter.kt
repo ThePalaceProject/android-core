@@ -22,35 +22,61 @@ import org.slf4j.LoggerFactory
 class FilterableAccountListAdapter(
   private val imageLoader: ImageLoaderType,
   private val onItemClicked: (AccountProviderDescription) -> Unit
-) : ListAdapter<AccountProviderDescription, AccountItemViewHolder>(DIFF_CALLBACK) {
+) : ListAdapter<AccountProviderDescription?, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
+
+  companion object {
+    private const val VIEW_TYPE_ACCOUNT = 0
+    private const val VIEW_TYPE_GAP = 1
+  }
 
   private val logger =
     LoggerFactory.getLogger(FilterableAccountListAdapter::class.java)
   private var listCopy =
-    mutableListOf<AccountProviderDescription>()
+    mutableListOf<AccountProviderDescription?>()
 
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AccountItemViewHolder {
+  override fun getItemViewType(position: Int): Int {
+    return if (
+      currentList.isEmpty() ||
+      currentList[position] != null
+    ) {
+      VIEW_TYPE_ACCOUNT
+    } else {
+      VIEW_TYPE_GAP
+    }
+  }
+
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
     val inflater = LayoutInflater.from(parent.context)
-    val item = inflater.inflate(R.layout.account_list_item, parent, false)
 
-    return AccountItemViewHolder(
-      item,
-      this.imageLoader,
-      this.onItemClicked
-    )
+    return if (
+      viewType == VIEW_TYPE_ACCOUNT
+    ) {
+      val item = inflater.inflate(R.layout.account_list_item, parent, false)
+
+      AccountItemViewHolder(
+        item,
+        this.imageLoader,
+        this.onItemClicked
+      )
+    } else {
+      val gap = inflater.inflate(R.layout.account_list_gap, parent, false)
+      return GapViewHolder(gap)
+    }
   }
 
-  override fun onBindViewHolder(holder: AccountItemViewHolder, position: Int) {
-    holder.bind(getItem(position))
+  override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    val item = getItem(position)
+    item ?: return
+    (holder as? AccountItemViewHolder)?.bind(item)
   }
 
-  override fun submitList(list: List<AccountProviderDescription>?) {
+  override fun submitList(list: List<AccountProviderDescription?>?) {
     this.listCopy.clear()
     super.submitList(list)
   }
 
   override fun submitList(
-    list: List<AccountProviderDescription>?,
+    list: List<AccountProviderDescription?>?,
     commitCallback: Runnable?
   ) {
     this.listCopy.clear()
@@ -68,7 +94,7 @@ class FilterableAccountListAdapter(
    * original 'unfiltered' list is used as the base.
    */
 
-  fun filterList(filter: (AccountProviderDescription) -> Boolean) {
+  fun filterList(filter: (AccountProviderDescription?) -> Boolean) {
     if (this.listCopy.isEmpty()) {
       this.listCopy.addAll(this.currentList)
     }
@@ -135,12 +161,14 @@ class AccountItemViewHolder(
   }
 }
 
+class GapViewHolder(val itemView: View) : RecyclerView.ViewHolder(itemView)
+
 /**
  * Callback for calculating the diff between two non-null items in a list.
  */
 
 val DIFF_CALLBACK =
-  object : DiffUtil.ItemCallback<AccountProviderDescription>() {
+  object : DiffUtil.ItemCallback<AccountProviderDescription?>() {
     override fun areItemsTheSame(
       oldItem: AccountProviderDescription,
       newItem: AccountProviderDescription
