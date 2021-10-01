@@ -141,11 +141,9 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
     this.viewModel.determineAvailableAccountProviderDescriptions()
   }
 
-  private fun onAccountProvidersListUpdated(availableDescriptions: List<AccountProviderDescription>) {
+  private fun onAccountProvidersListUpdated(availableDescriptions: List<AccountProviderDescription?>) {
     this.title.setText(
-      if (
-        availableDescriptions.isEmpty()
-      ) {
+      if (availableDescriptions.isEmpty()) {
         R.string.accountRegistryEmpty
       } else {
         R.string.accountRegistrySelect
@@ -198,12 +196,14 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
           }
           newText.equals("NYPL", ignoreCase = true) -> {
             this@AccountListRegistryFragment.accountListAdapter.filterList { account ->
-              account.title.contains("New York Public Library", ignoreCase = true)
+              account != null &&
+                account.title.contains("New York Public Library", ignoreCase = true)
             }
           }
           else -> {
             this@AccountListRegistryFragment.accountListAdapter.filterList { account ->
-              account.title.contains(newText, ignoreCase = true)
+              account != null &&
+                account.title.contains(newText, ignoreCase = true)
             }
           }
         }
