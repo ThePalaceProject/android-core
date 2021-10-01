@@ -40,4 +40,6 @@ class SimplyEBuildConfigurationService : BuildConfigurationServiceType {
     get() = BuildConfig.SIMPLIFIED_VERSION
   override val showAgeGateUi: Boolean
     get() = true
+  override val featuredLibrariesIdsList: List<String>
+    get() = emptyList()
 }

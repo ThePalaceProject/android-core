@@ -48,11 +48,6 @@ class AccountListRegistryViewModel(private val locationManager: LocationManager)
   private val logger =
     LoggerFactory.getLogger(AccountListRegistryViewModel::class.java)
 
-  private val featuredLibrariesList = arrayOf(
-    "urn:uuid:6b849570-070f-43b4-9dcc-7ebb4bca292e", // DPLA
-    "urn:uuid:5278562c-d642-4fda-ad7e-1613077cfb8d" // Open Textbook Library
-  )
-
   private val locationUpdates = BehaviorSubject.create<Unit>()
   private val queries = BehaviorSubject.createDefault("")
 
@@ -195,8 +190,10 @@ class AccountListRegistryViewModel(private val locationManager: LocationManager)
         .toMutableList()
       updatedProvidersList.removeAll(usedAccountProviders)
 
+      val supportedFeaturedLibrariesIds = this.buildConfig.featuredLibrariesIdsList
+
       val featuredLibrariesList = updatedProvidersList.filter {
-        featuredLibrariesList.contains(it.id.toString())
+        supportedFeaturedLibrariesIds.contains(it.id.toString())
       }.sortedBy { it.title }
 
       accountProvidersList.onNext(
