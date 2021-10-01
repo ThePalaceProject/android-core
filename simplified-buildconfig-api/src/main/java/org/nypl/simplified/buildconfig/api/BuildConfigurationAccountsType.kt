@@ -42,4 +42,10 @@ interface BuildConfigurationAccountsType {
    */
 
   val showAgeGateUi: Boolean
+
+  /**
+   * The list of ids of the supported featured libraries by this app.
+   */
+
+  val featuredLibrariesIdsList: List<String>
 }

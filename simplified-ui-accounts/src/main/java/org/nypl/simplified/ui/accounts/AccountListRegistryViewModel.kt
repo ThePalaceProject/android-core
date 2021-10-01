@@ -92,7 +92,7 @@ class AccountListRegistryViewModel(private val locationManager: LocationManager)
   val accountCreationEvents: UnicastWorkSubject<AccountEvent> =
     UnicastWorkSubject.create()
 
-  val accountProvidersList: UnicastWorkSubject<List<AccountProviderDescription>> =
+  val accountProvidersList: UnicastWorkSubject<List<AccountProviderDescription?>> =
     UnicastWorkSubject.create()
 
   val accountRegistryStatus: AccountProviderRegistryStatus
@@ -189,7 +189,31 @@ class AccountListRegistryViewModel(private val locationManager: LocationManager)
         .filter { it.id != accountRegistry.defaultProvider.id }
         .toMutableList()
       updatedProvidersList.removeAll(usedAccountProviders)
-      accountProvidersList.onNext(updatedProvidersList)
+
+      val supportedFeaturedLibrariesIds = this.buildConfig.featuredLibrariesIdsList
+
+      val featuredLibrariesList = updatedProvidersList.filter {
+        supportedFeaturedLibrariesIds.contains(it.id.toString())
+      }.sortedBy { it.title }
+
+      accountProvidersList.onNext(
+        if (featuredLibrariesList.isNotEmpty()) {
+          updatedProvidersList.removeAll(featuredLibrariesList)
+          arrayListOf<AccountProviderDescription?>()
+            .apply {
+              this.addAll(featuredLibrariesList)
+
+              // if we have more libraries than the featured ones, we need to add a space between them
+              if (updatedProvidersList.isNotEmpty()) {
+                this.add(null)
+                this.addAll(updatedProvidersList)
+              }
+            }
+        } else {
+          this.logger.debug("returning {} available providers", availableAccountProviders.size)
+          updatedProvidersList
+        }
+      )
     }
   }
 

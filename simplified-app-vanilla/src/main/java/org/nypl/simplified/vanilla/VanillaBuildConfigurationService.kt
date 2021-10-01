@@ -16,6 +16,11 @@ class VanillaBuildConfigurationService : BuildConfigurationServiceType {
     get() = true
   override val allowAccountsRegistryAccess: Boolean
     get() = true
+  override val featuredLibrariesIdsList: List<String>
+    get() = listOf(
+      "urn:uuid:6b849570-070f-43b4-9dcc-7ebb4bca292e", // DPLA
+      "urn:uuid:5278562c-d642-4fda-ad7e-1613077cfb8d" // Open Textbook Library
+    )
   override val showDebugBookDetailStatus: Boolean
     get() = false
   override val showSettingsTab: Boolean
