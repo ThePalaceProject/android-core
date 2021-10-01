@@ -2,6 +2,7 @@ package org.nypl.simplified.ui.catalog
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -122,7 +123,7 @@ class CatalogButtons(
     val mainText = this.createCenteredTextForButtons(res).apply {
       this.layoutParams = wrapContentParameters()
       this.setTextColor(colorStateListForButtonItems())
-      this.textSize = 12f
+      this.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
       this.isDuplicateParentStateEnabled = true
       this.movementMethod = null
       this.isVerticalScrollBarEnabled = false
@@ -131,14 +132,16 @@ class CatalogButtons(
     val textLoanDuration = this.createCenteredTextForButtons(loanDuration).apply {
       this.layoutParams = wrapContentParameters()
       this.setTextColor(colorStateListForButtonItems())
-      this.textSize = 12f
+      this.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
       this.isDuplicateParentStateEnabled = true
       this.movementMethod = null
       this.isVerticalScrollBarEnabled = false
     }
 
+    val imageViewDimension = this.screenSizeInformation.dpToPixels(8).toInt()
+
     val imageView = AppCompatImageView(this.context).apply {
-      this.layoutParams = ViewGroup.MarginLayoutParams(25, 25).apply {
+      this.layoutParams = ViewGroup.MarginLayoutParams(imageViewDimension, imageViewDimension).apply {
         this.bottomMargin = 4
       }
       this.isDuplicateParentStateEnabled = true
