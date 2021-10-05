@@ -68,5 +68,31 @@ sealed class FeedFacet : Serializable {
         SORT_BY_TITLE
       }
     }
+
+    /**
+     * A filtering facet.
+     */
+
+    data class FilteringForStatus(
+      override val title: String,
+      override val isActive: Boolean,
+      val filterStatus: Status
+    ) : FeedFacetPseudo() {
+
+      enum class Status {
+
+        /**
+         * Filter the feed to show all the status.
+         */
+
+        ALL,
+
+        /**
+         * Filter the feed to show the on loan books.
+         */
+
+        ON_LOAN
+      }
+    }
   }
 }

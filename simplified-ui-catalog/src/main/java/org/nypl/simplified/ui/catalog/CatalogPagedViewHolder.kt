@@ -285,12 +285,26 @@ class CatalogPagedViewHolder(
           this.listener.borrowMaybeAuthenticated(book)
         }
       } else {
-        this.buttonCreator.createDownloadButton {
-          this.listener.borrowMaybeAuthenticated(book)
-        }
+        this.buttonCreator.createDownloadButton(
+          onClick = {
+            this.listener.borrowMaybeAuthenticated(book)
+          },
+          heightMatchParent = true
+        )
       }
     )
-    this.idleButtons.addView(this.buttonCreator.createButtonSizedSpace())
+    this.idleButtons.addView(
+      this.buttonCreator.createButtonSpace()
+    )
+
+    this.idleButtons.addView(
+      this.buttonCreator.createRevokeLoanButton(
+        onClick = {
+          this.listener.revokeMaybeAuthenticated(book)
+        },
+        heightMatchParent = true
+      )
+    )
   }
 
   private fun onBookStatusLoanable(book: Book) {
@@ -301,9 +315,11 @@ class CatalogPagedViewHolder(
 
     this.idleButtons.removeAllViews()
     this.idleButtons.addView(
-      this.buttonCreator.createGetButton {
-        this.listener.borrowMaybeAuthenticated(book)
-      }
+      this.buttonCreator.createGetButton(
+        onClick = {
+          this.listener.borrowMaybeAuthenticated(book)
+        }
+      )
     )
     this.idleButtons.addView(this.buttonCreator.createButtonSizedSpace())
     this.idleButtons.addView(this.buttonCreator.createButtonSizedSpace())
@@ -317,9 +333,11 @@ class CatalogPagedViewHolder(
 
     this.idleButtons.removeAllViews()
     this.idleButtons.addView(
-      this.buttonCreator.createReserveButton {
-        this.listener.reserveMaybeAuthenticated(book)
-      }
+      this.buttonCreator.createReserveButton(
+        onClick = {
+          this.listener.reserveMaybeAuthenticated(book)
+        }
+      )
     )
     this.idleButtons.addView(this.buttonCreator.createButtonSizedSpace())
     this.idleButtons.addView(this.buttonCreator.createButtonSizedSpace())
@@ -337,15 +355,19 @@ class CatalogPagedViewHolder(
     this.idleButtons.removeAllViews()
     if (status.isRevocable) {
       this.idleButtons.addView(
-        this.buttonCreator.createRevokeHoldButton {
-          this.listener.revokeMaybeAuthenticated(book)
-        }
+        this.buttonCreator.createRevokeHoldButton(
+          onClick = {
+            this.listener.revokeMaybeAuthenticated(book)
+          }
+        )
       )
     }
     this.idleButtons.addView(
-      this.buttonCreator.createGetButton {
-        this.listener.borrowMaybeAuthenticated(book)
-      }
+      this.buttonCreator.createGetButton(
+        onClick = {
+          this.listener.borrowMaybeAuthenticated(book)
+        }
+      )
     )
   }
 
@@ -361,9 +383,11 @@ class CatalogPagedViewHolder(
     this.idleButtons.removeAllViews()
     if (status.isRevocable) {
       this.idleButtons.addView(
-        this.buttonCreator.createRevokeHoldButton {
-          this.listener.revokeMaybeAuthenticated(book)
-        }
+        this.buttonCreator.createRevokeHoldButton(
+          onClick = {
+            this.listener.revokeMaybeAuthenticated(book)
+          }
+        )
       )
       this.idleButtons.addView(this.buttonCreator.createButtonSizedSpace())
       this.idleButtons.addView(this.buttonCreator.createButtonSizedSpace())
@@ -392,9 +416,12 @@ class CatalogPagedViewHolder(
               this.listener.openViewer(book, format)
             }
           } else {
-            this.buttonCreator.createReadButton {
-              this.listener.openViewer(book, format)
-            }
+            this.buttonCreator.createReadButton(
+              onClick = {
+                this.listener.openViewer(book, format)
+              },
+              heightMatchParent = true
+            )
           }
         )
       }
@@ -406,9 +433,12 @@ class CatalogPagedViewHolder(
               this.listener.openViewer(book, format)
             }
           } else {
-            this.buttonCreator.createListenButton {
-              this.listener.openViewer(book, format)
-            }
+            this.buttonCreator.createListenButton(
+              onClick = {
+                this.listener.openViewer(book, format)
+              },
+              heightMatchParent = true
+            )
           }
         )
       }
@@ -416,9 +446,18 @@ class CatalogPagedViewHolder(
         this.idleButtons.addView(this.buttonCreator.createButtonSizedSpace())
       }
     }
+    this.idleButtons.addView(
+      this.buttonCreator.createButtonSpace()
+    )
 
-    this.idleButtons.addView(this.buttonCreator.createButtonSizedSpace())
-    this.idleButtons.addView(this.buttonCreator.createButtonSizedSpace())
+    this.idleButtons.addView(
+      this.buttonCreator.createRevokeLoanButton(
+        onClick = {
+          this.listener.revokeMaybeAuthenticated(book)
+        },
+        heightMatchParent = true
+      )
+    )
   }
 
   @Suppress("UNUSED_PARAMETER")

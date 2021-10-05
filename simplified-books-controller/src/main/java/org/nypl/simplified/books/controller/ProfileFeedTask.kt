@@ -10,6 +10,7 @@ import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedBooksSelection
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedFacet
+import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetPseudo.FilteringForStatus
 import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetPseudo.FilteringForAccount
 import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetPseudo.Sorting
 import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetPseudo.Sorting.SortBy
@@ -64,6 +65,8 @@ internal class ProfileFeedTask(
       this.logger.debug("after searching, {} candidate books remain", books.size)
       this.sortBooks(this.request.sortBy, books)
       this.logger.debug("after sorting, {} candidate books remain", books.size)
+      this.filterBooksStatus(this.request.filterStatus, books)
+      this.logger.debug("after filtering by type, {} candidate books remain", books.size)
 
       for (book in books) {
         feed.entriesInOrder.add(
@@ -83,10 +86,12 @@ internal class ProfileFeedTask(
   private fun makeFacets(): Map<String, List<FeedFacet>> {
     val sorting = this.makeSortingFacets()
     val filtering = this.makeFilteringFacets()
+    val filteringStatus = this.makeStatusFilteringFacets()
     val results = mutableMapOf<String, List<FeedFacet>>()
     results[sorting.first] = sorting.second
     results[filtering.first] = filtering.second
-    check(results.size == 2)
+    results[filteringStatus.first] = filteringStatus.second
+    check(results.size == 3)
     return results.toMap()
   }
 
@@ -107,6 +112,21 @@ internal class ProfileFeedTask(
       )
     )
     return Pair(this.request.facetTitleProvider.collection, facets)
+  }
+
+  private fun makeStatusFilteringFacets(): Pair<String, List<FeedFacet>> {
+    val facets = mutableListOf<FeedFacet>()
+    val values = FilteringForStatus.Status.values()
+    for (filteringFacet in values) {
+      val active = filteringFacet == this.request.filterStatus
+      val title =
+        when (filteringFacet) {
+          FilteringForStatus.Status.ALL -> this.request.facetTitleProvider.showAll
+          FilteringForStatus.Status.ON_LOAN -> this.request.facetTitleProvider.showOnLoan
+        }
+      facets.add(FilteringForStatus(title, active, filteringFacet))
+    }
+    return Pair(this.request.facetTitleProvider.show, facets)
   }
 
   private fun makeSortingFacets(): Pair<String, List<FeedFacet>> {
@@ -170,6 +190,25 @@ internal class ProfileFeedTask(
     when (sortBy) {
       SortBy.SORT_BY_AUTHOR -> this.sortBooksByAuthor(books)
       SortBy.SORT_BY_TITLE -> this.sortBooksByTitle(books)
+    }
+  }
+
+  private fun filterBooksStatus(
+    filterForStatus: FilteringForStatus.Status,
+    books: ArrayList<BookWithStatus>
+  ) {
+    when (filterForStatus) {
+      FilteringForStatus.Status.ON_LOAN -> this.filterOnLoanBooks(books)
+      FilteringForStatus.Status.ALL -> {
+        // do nothing
+      }
+    }
+  }
+
+  private fun filterOnLoanBooks(books: ArrayList<BookWithStatus>) {
+    books.removeAll {
+      it.status !is BookStatus.Loaned.LoanedNotDownloaded &&
+        it.status !is BookStatus.Loaned.LoanedDownloaded
     }
   }
 

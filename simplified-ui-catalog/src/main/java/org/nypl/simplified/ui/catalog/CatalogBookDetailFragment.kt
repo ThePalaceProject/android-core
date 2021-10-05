@@ -446,9 +446,11 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
     this.buttons.removeAllViews()
     this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
     this.buttons.addView(
-      this.buttonCreator.createGetButton {
-        this.viewModel.borrowMaybeAuthenticated()
-      }
+      this.buttonCreator.createGetButton(
+        onClick = {
+          this.viewModel.borrowMaybeAuthenticated()
+        }
+      )
     )
     this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
     this.checkButtonViewCount()
@@ -467,9 +469,11 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
     this.buttons.removeAllViews()
     this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
     this.buttons.addView(
-      this.buttonCreator.createReserveButton {
-        this.viewModel.reserveMaybeAuthenticated()
-      }
+      this.buttonCreator.createReserveButton(
+        onClick = {
+          this.viewModel.reserveMaybeAuthenticated()
+        }
+      )
     )
     this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
     this.checkButtonViewCount()
@@ -492,9 +496,11 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
         if (bookStatus.isRevocable) {
           this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
           this.buttons.addView(
-            this.buttonCreator.createRevokeHoldButton {
-              this.viewModel.revokeMaybeAuthenticated()
-            }
+            this.buttonCreator.createRevokeHoldButton(
+              onClick = {
+                this.viewModel.revokeMaybeAuthenticated()
+              }
+            )
           )
           this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
         } else {
@@ -506,15 +512,19 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
       is BookStatus.Held.HeldReady -> {
         if (bookStatus.isRevocable) {
           this.buttons.addView(
-            this.buttonCreator.createRevokeHoldButton {
-              this.viewModel.revokeMaybeAuthenticated()
-            }
+            this.buttonCreator.createRevokeHoldButton(
+              onClick = {
+                this.viewModel.revokeMaybeAuthenticated()
+              }
+            )
           )
         }
         this.buttons.addView(
-          this.buttonCreator.createGetButton {
-            this.viewModel.borrowMaybeAuthenticated()
-          }
+          this.buttonCreator.createGetButton(
+            onClick = {
+              this.viewModel.borrowMaybeAuthenticated()
+            }
+          )
         )
       }
     }
@@ -535,9 +545,11 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
     when (bookStatus) {
       is BookStatus.Loaned.LoanedNotDownloaded ->
         this.buttons.addView(
-          this.buttonCreator.createDownloadButton {
-            this.viewModel.borrowMaybeAuthenticated()
-          }
+          this.buttonCreator.createDownloadButton(
+            onClick = {
+              this.viewModel.borrowMaybeAuthenticated()
+            }
+          )
         )
 
       is BookStatus.Loaned.LoanedDownloaded ->
@@ -545,16 +557,20 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
           is BookFormat.BookFormatPDF,
           is BookFormat.BookFormatEPUB -> {
             this.buttons.addView(
-              this.buttonCreator.createReadButton {
-                this.viewModel.openViewer(format)
-              }
+              this.buttonCreator.createReadButton(
+                onClick = {
+                  this.viewModel.openViewer(format)
+                }
+              )
             )
           }
           is BookFormat.BookFormatAudioBook -> {
             this.buttons.addView(
-              this.buttonCreator.createListenButton {
-                this.viewModel.openViewer(format)
-              }
+              this.buttonCreator.createListenButton(
+                onClick = {
+                  this.viewModel.openViewer(format)
+                }
+              )
             )
           }
         }
@@ -563,9 +579,11 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
     if (this.viewModel.bookCanBeRevoked && this.buildConfig.allowReturns()) {
       this.buttons.addView(this.buttonCreator.createButtonSpace())
       this.buttons.addView(
-        this.buttonCreator.createRevokeLoanButton {
-          this.viewModel.revokeMaybeAuthenticated()
-        }
+        this.buttonCreator.createRevokeLoanButton(
+          onClick = {
+            this.viewModel.revokeMaybeAuthenticated()
+          }
+        )
       )
     }
 

@@ -242,6 +242,7 @@ object BottomNavigators {
         searchTerms = null,
         selection = FeedBooksSelection.BOOKS_FEED_LOANED,
         sortBy = FeedFacet.FeedFacetPseudo.Sorting.SortBy.SORT_BY_TITLE,
+        filterStatus = FeedFacet.FeedFacetPseudo.FilteringForStatus.Status.ALL,
         title = context.getString(R.string.tabBooks)
       )
     )
