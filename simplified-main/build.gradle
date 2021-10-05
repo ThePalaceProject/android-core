@@ -59,29 +59,34 @@ dependencies {
   api project(":simplified-threads")
   api project(":simplified-ui-announcements")
   api project(":simplified-ui-images")
-  api project(':simplified-ui-listeners-api')
   api project(":simplified-ui-navigation-tabs")
+  api project(":simplified-ui-onboarding")
   api project(":simplified-ui-profiles")
   api project(":simplified-ui-screen")
   api project(":simplified-ui-splash")
-  api project(":simplified-ui-onboarding")
   api project(":simplified-ui-thread-api")
   api project(":simplified-viewer-api")
   api project(":simplified-viewer-audiobook")
   api project(":simplified-viewer-epub-readium2")
   api project(":simplified-viewer-pdf")
   api project(":simplified-viewer-spi")
+  api project(':simplified-ui-listeners-api')
 
-  api libraries.androidx_appcompat
-  api libraries.kotlin_stdlib
-  api libraries.nypl_http_api
-  api libraries.nypl_http_bearer_token
-  api libraries.nypl_http_vanilla
-  api libraries.r2_lcp
-  api libraries.rxandroid2
-  api libraries.rxjava2
-  api libraries.rxjava2extensions
-  api libraries.slf4j
+  api libs.androidx.app.compat
+  api libs.kotlin.stdlib
+  api libs.logback.android
+  api libs.nypl.http.api
+  api libs.nypl.http.bearer.token
+  api libs.nypl.http.vanilla
+  api libs.r2.lcp
+  api libs.rxandroid2
+  api libs.rxjava2
+  api libs.rxjava2.extensions
+  api libs.slf4j
 
-  api libraries.logback_android
+  implementation (libs.readium.lcp) {
+    artifact {
+      type = "aar"
+    }
+  }
 }

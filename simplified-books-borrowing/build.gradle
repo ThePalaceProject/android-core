@@ -11,13 +11,19 @@ dependencies {
   implementation project(":simplified-adobe-extensions")
   implementation project(":simplified-taskrecorder-api")
 
-  implementation libraries.kotlin_coroutines
-  implementation libraries.kotlin_reflect
-  implementation libraries.kotlin_stdlib
-  implementation libraries.nypl_drm_core
-  implementation libraries.nypl_http_api
-  implementation libraries.nypl_http_downloads
-  implementation libraries.r2_lcp
-  implementation libraries.r2_shared
-  implementation libraries.slf4j
+  implementation libs.kotlin.coroutines
+  implementation libs.kotlin.reflect
+  implementation libs.kotlin.stdlib
+  implementation libs.nypl.drm.core
+  implementation libs.nypl.http.api
+  implementation libs.nypl.http.downloads
+  implementation libs.r2.lcp
+  implementation libs.r2.shared
+  implementation libs.slf4j
+
+  implementation (libs.readium.lcp) {
+    artifact {
+      type = "aar"
+    }
+  }
 }

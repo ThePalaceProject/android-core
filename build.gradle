@@ -3,34 +3,36 @@ import java.time.ZoneId
 import java.time.ZoneOffset
 
 buildscript {
-  // Load in our list of dependencies.
-  //
-  apply from: file("$rootDir/build_libraries.gradle")
-
   repositories {
     mavenCentral()
     google()
-    jcenter()
   }
 
+  ext.kotlin_version = "1.5.30"
+
   dependencies {
-    classpath 'com.android.tools.build:gradle:4.1.1'
+    classpath 'com.android.tools.build:gradle:7.0.2'
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    classpath "androidx.navigation:navigation-safe-args-gradle-plugin:${versions.androidx_navigation}"
-    classpath "biz.aQute.bnd:biz.aQute.bnd.gradle:5.2.0"
+    classpath "androidx.navigation:navigation-safe-args-gradle-plugin:2.3.4"
+    classpath "biz.aQute.bnd:biz.aQute.bnd.gradle:5.3.0"
     classpath "com.nabilhachicha:android-native-dependencies:0.1.2"
     classpath 'com.google.gms:google-services:4.3.4'
-    classpath 'com.google.firebase:firebase-crashlytics-gradle:2.4.1'
+    classpath 'com.google.firebase:firebase-crashlytics-gradle:2.5.2'
     classpath "de.mannodermaus.gradle.plugins:android-junit5:1.7.1.1"
   }
 }
 
 plugins {
-  id "com.github.ben-manes.versions" version "0.27.0"
+  id "com.github.ben-manes.versions" version "0.39.0"
   id "ru.vyarus.animalsniffer" version "1.5.0"
 }
 
 ext {
+  android_build_tools_version = "30.0.2"
+  android_compile_sdk_version = 29
+  android_min_sdk_version = 21
+  android_target_sdk_version = 29
+
   nyplDrmEnabled =
     project.findProperty('org.thepalaceproject.drm.enabled') as Boolean
 
@@ -48,12 +50,18 @@ ext {
   // Check that non -SNAPSHOT builds don't use -SNAPSHOT dependencies.
   //
 
-  final String versionName = project.ext["VERSION_NAME"];
+  final String versionName = project.ext["VERSION_NAME"]
+  final Set<String> snapshots = new HashSet<>()
+
   if (!versionName.endsWith("-SNAPSHOT")) {
-    final Set<String> snapshots = new HashSet<>();
-    ext.libraries.each { name, version ->
-      if (version.toString().endsWith("-SNAPSHOT")) {
-        snapshots.add(version.toString())
+    final List<String> versionAliases = libs.getVersionAliases()
+    versionAliases.each { name ->
+      final java.util.Optional<VersionConstraint> versionConstraintOpt = libs.findVersion(name)
+      if (versionConstraintOpt.isPresent()) {
+        final VersionConstraint versionConstraint = versionConstraintOpt.get()
+        if (versionConstraint.requiredVersion.endsWith("-SNAPSHOT")) {
+          snapshots.add("$name ${versionConstraint.requiredVersion}")
+        }
       }
     }
 
@@ -76,38 +84,7 @@ ext {
 }
 
 subprojects {
-  /*
-   * We currently have transitive dependencies that specify dependencies on newer versions
-   * of SLF4J. These are subtly incompatible with Logback-Android, and it will be a while before
-   * new versions appear of both artifacts. Remove this when both are updated!
-   */
-  configurations.all {
-    resolutionStrategy.force libraries.slf4j
-  }
 
-  /*
-   * Ensure consistent R2 module versions.
-   */
-
-  configurations.all {
-    resolutionStrategy.force libraries.r2_lcp
-    resolutionStrategy.force libraries.r2_opds
-    resolutionStrategy.force libraries.r2_shared
-    resolutionStrategy.force libraries.r2_streamer
-  }
-
-  /*
-   * Ensure consistent Kotlin versions.
-   */
-
-  configurations.all {
-    resolutionStrategy.force libraries.kotlin_coroutines
-    resolutionStrategy.force libraries.kotlin_coroutines_android
-    resolutionStrategy.force libraries.kotlin_reflect
-    resolutionStrategy.force libraries.kotlin_stdlib
-    resolutionStrategy.force libraries.kotlin_stdlib_common
-    resolutionStrategy.force libraries.kotlin_stdlib_jdk7
-  }
 }
 
 subprojects { project ->
@@ -192,14 +169,18 @@ subprojects { project ->
       name = "LCP"
       url = uri('https://liblcp.dita.digital')
       patternLayout {
-        artifact ("/[organisation]/[module]/android/aar/test/[revision].[ext]")
+        artifact ("/[organisation]/[module]/android/aar/test/[revision].aar")
       }
       metadataSources {
         artifact()
       }
     }
 
-    maven { url "http://maven.findawayworld.com/artifactory/libs-release/" }
+    maven {
+      url "http://maven.findawayworld.com/artifactory/libs-release/"
+      allowInsecureProtocol true
+    }
+
     maven { url "https://jitpack.io" }
     jcenter()
   }
