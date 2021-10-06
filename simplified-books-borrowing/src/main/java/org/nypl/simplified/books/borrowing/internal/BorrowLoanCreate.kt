@@ -131,7 +131,8 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
           LoanedNotDownloaded(
             id = context.bookCurrent.id,
             loanExpiryDate = null,
-            returnable = false
+            returnable = false,
+            deletable = false
           )
         )
         return
@@ -217,7 +218,8 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
             LoanedNotDownloaded(
               id = context.bookCurrent.id,
               loanExpiryDate = a.endDateOrNull,
-              returnable = a.revoke.isSome
+              returnable = a.revoke.isSome,
+              deletable = a.revoke.isNone
             )
           )
         }
@@ -241,7 +243,8 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
             LoanedNotDownloaded(
               id = context.bookCurrent.id,
               loanExpiryDate = a.endDateOrNull,
-              returnable = a.revoke.isSome
+              returnable = a.revoke.isSome,
+              deletable = true
             )
           )
         }

@@ -590,9 +590,11 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
     if (this.viewModel.bookCanBeDeleted) {
       this.buttons.addView(this.buttonCreator.createButtonSpace())
       this.buttons.addView(
-        this.buttonCreator.createDeleteButton {
-          this.viewModel.delete()
-        }
+        this.buttonCreator.createDeleteButton(
+          onClick = {
+            this.viewModel.delete()
+          }
+        )
       )
     }
 

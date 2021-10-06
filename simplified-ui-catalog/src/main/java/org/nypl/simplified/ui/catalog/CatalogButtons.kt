@@ -293,12 +293,14 @@ class CatalogButtons(
 
   @UiThread
   fun createDeleteButton(
-    onClick: (Button) -> Unit
+    onClick: (Button) -> Unit,
+    heightMatchParent: Boolean = false
   ): Button {
     return this.createButton(
       context = this.context,
       text = R.string.catalogDelete,
       description = R.string.catalogAccessibilityBookDelete,
+      heightMatchParent = heightMatchParent,
       onClick = onClick
     )
   }

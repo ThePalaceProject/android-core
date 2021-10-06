@@ -66,7 +66,7 @@ internal class ProfileFeedTask(
       this.sortBooks(this.request.sortBy, books)
       this.logger.debug("after sorting, {} candidate books remain", books.size)
       this.filterBooksStatus(this.request.filterStatus, books)
-      this.logger.debug("after filtering by type, {} candidate books remain", books.size)
+      this.logger.debug("after filtering by status, {} candidate books remain", books.size)
 
       for (book in books) {
         feed.entriesInOrder.add(
@@ -207,8 +207,8 @@ internal class ProfileFeedTask(
 
   private fun filterOnLoanBooks(books: ArrayList<BookWithStatus>) {
     books.removeAll {
-      it.status !is BookStatus.Loaned.LoanedNotDownloaded &&
-        it.status !is BookStatus.Loaned.LoanedDownloaded
+      (it.status as? BookStatus.Loaned.LoanedDownloaded)?.returnable == false ||
+        (it.status as? BookStatus.Loaned.LoanedNotDownloaded)?.returnable == false
     }
   }
 

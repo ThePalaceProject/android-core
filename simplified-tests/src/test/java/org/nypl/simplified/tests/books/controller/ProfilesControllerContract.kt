@@ -462,10 +462,8 @@ abstract class ProfilesControllerContract {
               get() = "Show"
             override val showAll: String
               get() = "All"
-            override val showEBooks: String
-              get() = "eBooks"
-            override val showAudioBooks: String
-              get() = "AudioBooks"
+            override val showOnLoan: String
+              get() = "On Loan"
           }
         )
       ).get()
