@@ -100,7 +100,7 @@ class AccessibilityServiceTest {
     this.bookRegistry.update(
       BookWithStatus(
         book = this.book0,
-        status = LoanedDownloaded(this.book0.id, null, false)
+        status = LoanedDownloaded(this.book0.id, null, false, false)
       )
     )
 
@@ -124,7 +124,7 @@ class AccessibilityServiceTest {
     this.bookRegistry.update(
       BookWithStatus(
         book = this.book0,
-        status = LoanedDownloaded(this.book0.id, null, false)
+        status = LoanedDownloaded(this.book0.id, null, false, false)
       )
     )
 
@@ -161,7 +161,7 @@ class AccessibilityServiceTest {
     this.bookRegistry.update(
       BookWithStatus(
         book = this.book0,
-        status = LoanedDownloaded(this.book0.id, null, false)
+        status = LoanedDownloaded(this.book0.id, null, false, false)
       )
     )
 
