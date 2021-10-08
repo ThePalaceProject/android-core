@@ -21,6 +21,15 @@ import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedEntry.FeedEntryCorrupt
 import org.nypl.simplified.feeds.api.FeedEntry.FeedEntryOPDS
 import org.nypl.simplified.futures.FluentFutureExtensions.map
+import org.nypl.simplified.opds.core.OPDSAvailabilityHeld
+import org.nypl.simplified.opds.core.OPDSAvailabilityHeldReady
+import org.nypl.simplified.opds.core.OPDSAvailabilityHoldable
+import org.nypl.simplified.opds.core.OPDSAvailabilityLoanable
+import org.nypl.simplified.opds.core.OPDSAvailabilityLoaned
+import org.nypl.simplified.opds.core.OPDSAvailabilityMatcherType
+import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
+import org.nypl.simplified.opds.core.OPDSAvailabilityRevoked
+import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 
 /**
  * A view holder for a single cell in an infinitely-scrolling feed.
@@ -32,6 +41,7 @@ class CatalogPagedViewHolder(
   private val parent: View,
   private val buttonCreator: CatalogButtons,
   private val bookCovers: BookCoverProviderType,
+  private val profilesController: ProfilesControllerType
 ) : RecyclerView.ViewHolder(parent) {
 
   private var thumbnailLoading: FluentFuture<Unit>? = null
@@ -296,7 +306,8 @@ class CatalogPagedViewHolder(
         )
       }
     )
-    if (bookStatus.returnable) {
+
+    if (isBookReturnable(book)) {
       this.idleButtons.addView(this.buttonCreator.createButtonSpace())
       this.idleButtons.addView(
         this.buttonCreator.createRevokeLoanButton(
@@ -306,7 +317,7 @@ class CatalogPagedViewHolder(
           heightMatchParent = true
         )
       )
-    } else if (bookStatus.deletable) {
+    } else if (isBookDeletable(book)) {
       this.idleButtons.addView(this.buttonCreator.createButtonSpace())
       this.idleButtons.addView(
         this.buttonCreator.createDeleteButton(
@@ -401,8 +412,6 @@ class CatalogPagedViewHolder(
           }
         )
       )
-      this.idleButtons.addView(this.buttonCreator.createButtonSizedSpace())
-      this.idleButtons.addView(this.buttonCreator.createButtonSizedSpace())
     } else {
       this.idleButtons.addView(
         this.buttonCreator.createCenteredTextForButtons(R.string.catalogHoldCannotCancel)
@@ -462,7 +471,7 @@ class CatalogPagedViewHolder(
       }
     }
 
-    if (bookStatus.returnable) {
+    if (isBookReturnable(book)) {
       this.idleButtons.addView(this.buttonCreator.createButtonSpace())
       this.idleButtons.addView(
         this.buttonCreator.createRevokeLoanButton(
@@ -472,7 +481,7 @@ class CatalogPagedViewHolder(
           heightMatchParent = true
         )
       )
-    } else if (bookStatus.deletable) {
+    } else if (isBookDeletable(book)) {
       this.idleButtons.addView(this.buttonCreator.createButtonSpace())
       this.idleButtons.addView(
         this.buttonCreator.createDeleteButton(
@@ -592,6 +601,62 @@ class CatalogPagedViewHolder(
       }
     } else {
       ""
+    }
+  }
+
+  private fun isBookReturnable(book: Book): Boolean {
+    val profile = this.profilesController.profileCurrent()
+    val account = profile.account(book.account)
+
+    return try {
+      if (account.bookDatabase.books().contains(book.id)) {
+        when (val status = BookStatus.fromBook(book)) {
+          is BookStatus.Loaned ->
+            status.returnable
+          else ->
+            false
+        }
+      } else {
+        false
+      }
+    } catch (e: Exception) {
+      false
+    }
+  }
+
+  private fun isBookDeletable(book: Book): Boolean {
+    return try {
+      val profile = this.profilesController.profileCurrent()
+      val account = profile.account(book.account)
+      return if (account.bookDatabase.books().contains(book.id)) {
+        book.entry.availability.matchAvailability(
+          object : OPDSAvailabilityMatcherType<Boolean, Exception> {
+            override fun onHeldReady(availability: OPDSAvailabilityHeldReady): Boolean =
+              false
+
+            override fun onHeld(availability: OPDSAvailabilityHeld): Boolean =
+              false
+
+            override fun onHoldable(availability: OPDSAvailabilityHoldable): Boolean =
+              false
+
+            override fun onLoaned(availability: OPDSAvailabilityLoaned): Boolean =
+              availability.revoke.isNone && book.isDownloaded
+
+            override fun onLoanable(availability: OPDSAvailabilityLoanable): Boolean =
+              true
+
+            override fun onOpenAccess(availability: OPDSAvailabilityOpenAccess): Boolean =
+              true
+
+            override fun onRevoked(availability: OPDSAvailabilityRevoked): Boolean =
+              false
+          })
+      } else {
+        false
+      }
+    } catch (e: Exception) {
+      false
     }
   }
 }

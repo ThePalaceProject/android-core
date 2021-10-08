@@ -494,7 +494,6 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
     when (bookStatus) {
       is BookStatus.Held.HeldInQueue ->
         if (bookStatus.isRevocable) {
-          this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
           this.buttons.addView(
             this.buttonCreator.createRevokeHoldButton(
               onClick = {
@@ -502,7 +501,6 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
               }
             )
           )
-          this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
         } else {
           this.buttons.addView(
             this.buttonCreator.createCenteredTextForButtons(R.string.catalogHoldCannotCancel)

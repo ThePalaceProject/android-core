@@ -415,6 +415,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
         listener = this.viewModel,
         buttonCreator = this.buttonCreator,
         bookCovers = this.bookCovers,
+        profilesController = this.profilesController
       )
 
     this.feedWithoutGroupsList.adapter = this.feedWithoutGroupsAdapter

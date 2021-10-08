@@ -224,12 +224,6 @@ sealed class BookStatus {
     abstract val returnable: Boolean
 
     /**
-     * `true` if the book can be deleted
-     */
-
-    abstract val deletable: Boolean
-
-    /**
      * The given book is owned/loaned but is not downloaded and is therefore not
      * ready for reading.
      */
@@ -237,8 +231,7 @@ sealed class BookStatus {
     data class LoanedNotDownloaded(
       override val id: BookID,
       override val loanExpiryDate: DateTime?,
-      override val returnable: Boolean,
-      override val deletable: Boolean
+      override val returnable: Boolean
     ) : Loaned() {
 
       override val priority: BookStatusPriorityOrdering
@@ -252,8 +245,7 @@ sealed class BookStatus {
     data class LoanedDownloaded(
       override val id: BookID,
       override val loanExpiryDate: DateTime?,
-      override val returnable: Boolean,
-      override val deletable: Boolean
+      override val returnable: Boolean
     ) : Loaned() {
 
       override val priority: BookStatusPriorityOrdering
@@ -416,15 +408,13 @@ sealed class BookStatus {
         Loaned.LoanedDownloaded(
           id = book.id,
           loanExpiryDate = this.someOrNull(a.endDate),
-          returnable = a.revoke.isSome,
-          deletable = true
+          returnable = a.revoke.isSome
         )
       } else {
         Loaned.LoanedNotDownloaded(
           id = book.id,
           loanExpiryDate = this.someOrNull(a.endDate),
-          returnable = a.revoke.isSome,
-          deletable = true
+          returnable = a.revoke.isSome
         )
       }
     }
@@ -445,15 +435,13 @@ sealed class BookStatus {
         Loaned.LoanedDownloaded(
           id = book.id,
           loanExpiryDate = this.someOrNull(a.endDate),
-          returnable = returnable,
-          deletable = a.revoke.isNone
+          returnable = returnable
         )
       } else {
         Loaned.LoanedNotDownloaded(
           id = book.id,
           loanExpiryDate = this.someOrNull(a.endDate),
-          returnable = returnable,
-          deletable = false
+          returnable = returnable
         )
       }
     }
