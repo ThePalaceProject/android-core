@@ -219,7 +219,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
               id = context.bookCurrent.id,
               loanExpiryDate = a.endDateOrNull,
               returnable = a.revoke.isSome,
-              deletable = a.revoke.isNone
+              deletable = false
             )
           )
         }
