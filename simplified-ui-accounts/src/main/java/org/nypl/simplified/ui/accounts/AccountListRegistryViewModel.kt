@@ -150,24 +150,13 @@ class AccountListRegistryViewModel(private val locationManager: LocationManager)
    */
 
   fun determineAvailableAccountProviderDescriptions() {
-    val usedAccountProviders =
-      this.profilesController
-        .profileCurrentlyUsedAccountProviders()
-        .map { p -> p.toDescription() }
 
-    this.logger.debug("profile is using {} providers", usedAccountProviders.size)
-
-    val availableAccountProviders =
-      this.accountRegistry.accountProviderDescriptions()
-        .values
-        // Palace hides the default account from end users.
-        .filter { it.id != accountRegistry.defaultProvider.id }
-        .toMutableList()
-    availableAccountProviders.removeAll(usedAccountProviders)
+    val accountListToDisplay = updateListToDisplay()
+    accountProvidersList.onNext(accountListToDisplay)
 
     this.backgroundExecutor.execute {
 
-      availableAccountProviders.forEach {
+      accountListToDisplay.filterNotNull().forEach {
         val result = accountRegistry.resolve(
           { _, _ -> },
           it
@@ -183,37 +172,51 @@ class AccountListRegistryViewModel(private val locationManager: LocationManager)
         }
       }
 
-      val updatedProvidersList = this.accountRegistry.accountProviderDescriptions()
+      accountProvidersList.onNext(updateListToDisplay())
+    }
+  }
+
+  private fun updateListToDisplay(): List<AccountProviderDescription?> {
+    val usedAccountProviders =
+      this.profilesController
+        .profileCurrentlyUsedAccountProviders()
+        .map { p -> p.toDescription() }
+
+    this.logger.debug("profile is using {} providers", usedAccountProviders.size)
+
+    val availableAccountProviders =
+      this.accountRegistry.accountProviderDescriptions()
         .values
         // Palace hides the default account from end users.
         .filter { it.id != accountRegistry.defaultProvider.id }
         .toMutableList()
-      updatedProvidersList.removeAll(usedAccountProviders)
+    availableAccountProviders.removeAll { accountProvider ->
+      usedAccountProviders.any { usedAccount ->
+        usedAccount.id == accountProvider.id
+      }
+    }
 
-      val supportedFeaturedLibrariesIds = this.buildConfig.featuredLibrariesIdsList
+    val supportedFeaturedLibrariesIds = this.buildConfig.featuredLibrariesIdsList
 
-      val featuredLibrariesList = updatedProvidersList.filter {
-        supportedFeaturedLibrariesIds.contains(it.id.toString())
-      }.sortedBy { it.title }
+    val featuredLibrariesList = availableAccountProviders.filter {
+      supportedFeaturedLibrariesIds.contains(it.id.toString())
+    }.sortedBy { it.title }
 
-      accountProvidersList.onNext(
-        if (featuredLibrariesList.isNotEmpty()) {
-          updatedProvidersList.removeAll(featuredLibrariesList)
-          arrayListOf<AccountProviderDescription?>()
-            .apply {
-              this.addAll(featuredLibrariesList)
+    return if (featuredLibrariesList.isNotEmpty()) {
+      availableAccountProviders.removeAll(featuredLibrariesList)
+      arrayListOf<AccountProviderDescription?>()
+        .apply {
+          this.addAll(featuredLibrariesList)
 
-              // if we have more libraries than the featured ones, we need to add a space between them
-              if (updatedProvidersList.isNotEmpty()) {
-                this.add(null)
-                this.addAll(updatedProvidersList)
-              }
-            }
-        } else {
-          this.logger.debug("returning {} available providers", availableAccountProviders.size)
-          updatedProvidersList
+          // if we have more libraries than the featured ones, we need to add a space between them
+          if (availableAccountProviders.isNotEmpty()) {
+            this.add(null)
+            this.addAll(availableAccountProviders)
+          }
         }
-      )
+    } else {
+      this.logger.debug("returning {} available providers", availableAccountProviders.size)
+      availableAccountProviders
     }
   }
 

@@ -178,6 +178,6 @@ val DIFF_CALLBACK =
       oldItem: AccountProviderDescription,
       newItem: AccountProviderDescription
     ): Boolean {
-      return oldItem.title == newItem.title
+      return oldItem.title == newItem.title && oldItem.logoURI == newItem.logoURI
     }
   }
