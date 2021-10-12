@@ -21,6 +21,15 @@ import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedEntry.FeedEntryCorrupt
 import org.nypl.simplified.feeds.api.FeedEntry.FeedEntryOPDS
 import org.nypl.simplified.futures.FluentFutureExtensions.map
+import org.nypl.simplified.opds.core.OPDSAvailabilityHeld
+import org.nypl.simplified.opds.core.OPDSAvailabilityHeldReady
+import org.nypl.simplified.opds.core.OPDSAvailabilityHoldable
+import org.nypl.simplified.opds.core.OPDSAvailabilityLoanable
+import org.nypl.simplified.opds.core.OPDSAvailabilityLoaned
+import org.nypl.simplified.opds.core.OPDSAvailabilityMatcherType
+import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
+import org.nypl.simplified.opds.core.OPDSAvailabilityRevoked
+import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 
 /**
  * A view holder for a single cell in an infinitely-scrolling feed.
@@ -32,6 +41,7 @@ class CatalogPagedViewHolder(
   private val parent: View,
   private val buttonCreator: CatalogButtons,
   private val bookCovers: BookCoverProviderType,
+  private val profilesController: ProfilesControllerType
 ) : RecyclerView.ViewHolder(parent) {
 
   private var thumbnailLoading: FluentFuture<Unit>? = null
@@ -176,9 +186,9 @@ class CatalogPagedViewHolder(
       is BookStatus.Loanable ->
         this.onBookStatusLoanable(book.book)
       is BookStatus.Loaned.LoanedNotDownloaded ->
-        this.onBookStatusLoanedNotDownloaded(book.book)
+        this.onBookStatusLoanedNotDownloaded(status, book.book)
       is BookStatus.Loaned.LoanedDownloaded ->
-        this.onBookStatusLoanedDownloaded(book.book)
+        this.onBookStatusLoanedDownloaded(status, book.book)
       is BookStatus.Revoked ->
         this.onBookStatusRevoked(book)
       is BookStatus.FailedRevoke ->
@@ -269,7 +279,10 @@ class CatalogPagedViewHolder(
     }
   }
 
-  private fun onBookStatusLoanedNotDownloaded(book: Book) {
+  private fun onBookStatusLoanedNotDownloaded(
+    bookStatus: BookStatus.Loaned.LoanedNotDownloaded,
+    book: Book
+  ) {
     this.setVisibilityIfNecessary(this.corrupt, View.GONE)
     this.setVisibilityIfNecessary(this.error, View.GONE)
     this.setVisibilityIfNecessary(this.idle, View.VISIBLE)
@@ -285,12 +298,36 @@ class CatalogPagedViewHolder(
           this.listener.borrowMaybeAuthenticated(book)
         }
       } else {
-        this.buttonCreator.createDownloadButton {
-          this.listener.borrowMaybeAuthenticated(book)
-        }
+        this.buttonCreator.createDownloadButton(
+          onClick = {
+            this.listener.borrowMaybeAuthenticated(book)
+          },
+          heightMatchParent = true
+        )
       }
     )
-    this.idleButtons.addView(this.buttonCreator.createButtonSizedSpace())
+
+    if (isBookReturnable(book)) {
+      this.idleButtons.addView(this.buttonCreator.createButtonSpace())
+      this.idleButtons.addView(
+        this.buttonCreator.createRevokeLoanButton(
+          onClick = {
+            this.listener.revokeMaybeAuthenticated(book)
+          },
+          heightMatchParent = true
+        )
+      )
+    } else if (isBookDeletable(book)) {
+      this.idleButtons.addView(this.buttonCreator.createButtonSpace())
+      this.idleButtons.addView(
+        this.buttonCreator.createDeleteButton(
+          onClick = {
+            this.listener.delete(this.feedEntry as FeedEntryOPDS)
+          },
+          heightMatchParent = true
+        )
+      )
+    }
   }
 
   private fun onBookStatusLoanable(book: Book) {
@@ -301,9 +338,11 @@ class CatalogPagedViewHolder(
 
     this.idleButtons.removeAllViews()
     this.idleButtons.addView(
-      this.buttonCreator.createGetButton {
-        this.listener.borrowMaybeAuthenticated(book)
-      }
+      this.buttonCreator.createGetButton(
+        onClick = {
+          this.listener.borrowMaybeAuthenticated(book)
+        }
+      )
     )
     this.idleButtons.addView(this.buttonCreator.createButtonSizedSpace())
     this.idleButtons.addView(this.buttonCreator.createButtonSizedSpace())
@@ -317,9 +356,11 @@ class CatalogPagedViewHolder(
 
     this.idleButtons.removeAllViews()
     this.idleButtons.addView(
-      this.buttonCreator.createReserveButton {
-        this.listener.reserveMaybeAuthenticated(book)
-      }
+      this.buttonCreator.createReserveButton(
+        onClick = {
+          this.listener.reserveMaybeAuthenticated(book)
+        }
+      )
     )
     this.idleButtons.addView(this.buttonCreator.createButtonSizedSpace())
     this.idleButtons.addView(this.buttonCreator.createButtonSizedSpace())
@@ -337,15 +378,19 @@ class CatalogPagedViewHolder(
     this.idleButtons.removeAllViews()
     if (status.isRevocable) {
       this.idleButtons.addView(
-        this.buttonCreator.createRevokeHoldButton {
-          this.listener.revokeMaybeAuthenticated(book)
-        }
+        this.buttonCreator.createRevokeHoldButton(
+          onClick = {
+            this.listener.revokeMaybeAuthenticated(book)
+          }
+        )
       )
     }
     this.idleButtons.addView(
-      this.buttonCreator.createGetButton {
-        this.listener.borrowMaybeAuthenticated(book)
-      }
+      this.buttonCreator.createGetButton(
+        onClick = {
+          this.listener.borrowMaybeAuthenticated(book)
+        }
+      )
     )
   }
 
@@ -361,12 +406,12 @@ class CatalogPagedViewHolder(
     this.idleButtons.removeAllViews()
     if (status.isRevocable) {
       this.idleButtons.addView(
-        this.buttonCreator.createRevokeHoldButton {
-          this.listener.revokeMaybeAuthenticated(book)
-        }
+        this.buttonCreator.createRevokeHoldButton(
+          onClick = {
+            this.listener.revokeMaybeAuthenticated(book)
+          }
+        )
       )
-      this.idleButtons.addView(this.buttonCreator.createButtonSizedSpace())
-      this.idleButtons.addView(this.buttonCreator.createButtonSizedSpace())
     } else {
       this.idleButtons.addView(
         this.buttonCreator.createCenteredTextForButtons(R.string.catalogHoldCannotCancel)
@@ -374,7 +419,10 @@ class CatalogPagedViewHolder(
     }
   }
 
-  private fun onBookStatusLoanedDownloaded(book: Book) {
+  private fun onBookStatusLoanedDownloaded(
+    bookStatus: BookStatus.Loaned.LoanedDownloaded,
+    book: Book
+  ) {
     this.setVisibilityIfNecessary(this.corrupt, View.GONE)
     this.setVisibilityIfNecessary(this.error, View.GONE)
     this.setVisibilityIfNecessary(this.idle, View.VISIBLE)
@@ -392,9 +440,12 @@ class CatalogPagedViewHolder(
               this.listener.openViewer(book, format)
             }
           } else {
-            this.buttonCreator.createReadButton {
-              this.listener.openViewer(book, format)
-            }
+            this.buttonCreator.createReadButton(
+              onClick = {
+                this.listener.openViewer(book, format)
+              },
+              heightMatchParent = true
+            )
           }
         )
       }
@@ -406,9 +457,12 @@ class CatalogPagedViewHolder(
               this.listener.openViewer(book, format)
             }
           } else {
-            this.buttonCreator.createListenButton {
-              this.listener.openViewer(book, format)
-            }
+            this.buttonCreator.createListenButton(
+              onClick = {
+                this.listener.openViewer(book, format)
+              },
+              heightMatchParent = true
+            )
           }
         )
       }
@@ -417,8 +471,27 @@ class CatalogPagedViewHolder(
       }
     }
 
-    this.idleButtons.addView(this.buttonCreator.createButtonSizedSpace())
-    this.idleButtons.addView(this.buttonCreator.createButtonSizedSpace())
+    if (isBookReturnable(book)) {
+      this.idleButtons.addView(this.buttonCreator.createButtonSpace())
+      this.idleButtons.addView(
+        this.buttonCreator.createRevokeLoanButton(
+          onClick = {
+            this.listener.revokeMaybeAuthenticated(book)
+          },
+          heightMatchParent = true
+        )
+      )
+    } else if (isBookDeletable(book)) {
+      this.idleButtons.addView(this.buttonCreator.createButtonSpace())
+      this.idleButtons.addView(
+        this.buttonCreator.createDeleteButton(
+          onClick = {
+            this.listener.delete(this.feedEntry as FeedEntryOPDS)
+          },
+          heightMatchParent = true
+        )
+      )
+    }
   }
 
   @Suppress("UNUSED_PARAMETER")
@@ -528,6 +601,62 @@ class CatalogPagedViewHolder(
       }
     } else {
       ""
+    }
+  }
+
+  private fun isBookReturnable(book: Book): Boolean {
+    val profile = this.profilesController.profileCurrent()
+    val account = profile.account(book.account)
+
+    return try {
+      if (account.bookDatabase.books().contains(book.id)) {
+        when (val status = BookStatus.fromBook(book)) {
+          is BookStatus.Loaned ->
+            status.returnable
+          else ->
+            false
+        }
+      } else {
+        false
+      }
+    } catch (e: Exception) {
+      false
+    }
+  }
+
+  private fun isBookDeletable(book: Book): Boolean {
+    return try {
+      val profile = this.profilesController.profileCurrent()
+      val account = profile.account(book.account)
+      return if (account.bookDatabase.books().contains(book.id)) {
+        book.entry.availability.matchAvailability(
+          object : OPDSAvailabilityMatcherType<Boolean, Exception> {
+            override fun onHeldReady(availability: OPDSAvailabilityHeldReady): Boolean =
+              false
+
+            override fun onHeld(availability: OPDSAvailabilityHeld): Boolean =
+              false
+
+            override fun onHoldable(availability: OPDSAvailabilityHoldable): Boolean =
+              false
+
+            override fun onLoaned(availability: OPDSAvailabilityLoaned): Boolean =
+              availability.revoke.isNone && book.isDownloaded
+
+            override fun onLoanable(availability: OPDSAvailabilityLoanable): Boolean =
+              true
+
+            override fun onOpenAccess(availability: OPDSAvailabilityOpenAccess): Boolean =
+              true
+
+            override fun onRevoked(availability: OPDSAvailabilityRevoked): Boolean =
+              false
+          })
+      } else {
+        false
+      }
+    } catch (e: Exception) {
+      false
     }
   }
 }

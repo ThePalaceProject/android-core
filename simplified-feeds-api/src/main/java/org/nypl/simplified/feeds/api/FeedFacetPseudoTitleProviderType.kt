@@ -14,4 +14,7 @@ interface FeedFacetPseudoTitleProviderType {
   val sortBy: String
   val sortByAuthor: String
   val sortByTitle: String
+  val show: String
+  val showAll: String
+  val showOnLoan: String
 }

@@ -75,12 +75,13 @@ class CatalogButtons(
     context: Context,
     text: Int,
     description: Int,
+    heightMatchParent: Boolean = false,
     onClick: (Button) -> Unit
   ): Button {
     val button = AppCompatButton(this.context)
     button.text = context.getString(text)
     button.contentDescription = context.getString(description)
-    button.layoutParams = this.buttonLayoutParameters()
+    button.layoutParams = this.buttonLayoutParameters(heightMatchParent)
     button.setOnClickListener {
       button.isEnabled = false
       onClick.invoke(button)
@@ -182,60 +183,70 @@ class CatalogButtons(
 
   @UiThread
   fun createReadButton(
-    onClick: (Button) -> Unit
+    onClick: (Button) -> Unit,
+    heightMatchParent: Boolean = false
   ): Button {
     return this.createButton(
       context = this.context,
       text = R.string.catalogRead,
       description = R.string.catalogAccessibilityBookRead,
+      heightMatchParent = heightMatchParent,
       onClick = onClick
     )
   }
 
   @UiThread
   fun createListenButton(
-    onClick: (Button) -> Unit
+    onClick: (Button) -> Unit,
+    heightMatchParent: Boolean = false
   ): Button {
     return this.createButton(
       context = this.context,
       text = R.string.catalogListen,
       description = R.string.catalogAccessibilityBookListen,
+      heightMatchParent = heightMatchParent,
       onClick = onClick
     )
   }
 
   @UiThread
   fun createDownloadButton(
-    onClick: (Button) -> Unit
+    onClick: (Button) -> Unit,
+    heightMatchParent: Boolean = false
   ): Button {
     return this.createButton(
       context = this.context,
       text = R.string.catalogDownload,
       description = R.string.catalogAccessibilityBookDownload,
+      heightMatchParent = heightMatchParent,
       onClick = onClick
     )
   }
 
   @UiThread
   fun createRevokeHoldButton(
-    onClick: (Button) -> Unit
+    onClick: (Button) -> Unit,
+    heightMatchParent: Boolean = false
   ): Button {
     return this.createButton(
       context = this.context,
       text = R.string.catalogCancelHold,
       description = R.string.catalogAccessibilityBookRevokeHold,
+      heightMatchParent = heightMatchParent,
       onClick = onClick
     )
   }
 
   @UiThread
   fun createRevokeLoanButton(
-    onClick: (Button) -> Unit
+    onClick: (Button) -> Unit,
+    heightMatchParent: Boolean = false
   ): Button {
     return this.createButton(
       context = this.context,
       text = R.string.catalogReturn,
       description = R.string.catalogAccessibilityBookRevokeLoan,
+      heightMatchParent = heightMatchParent,
       onClick = onClick
     )
   }
@@ -254,36 +265,42 @@ class CatalogButtons(
 
   @UiThread
   fun createReserveButton(
-    onClick: (Button) -> Unit
+    onClick: (Button) -> Unit,
+    heightMatchParent: Boolean = false
   ): Button {
     return this.createButton(
       context = this.context,
       text = R.string.catalogReserve,
       description = R.string.catalogAccessibilityBookReserve,
+      heightMatchParent = heightMatchParent,
       onClick = onClick
     )
   }
 
   @UiThread
   fun createGetButton(
-    onClick: (Button) -> Unit
+    onClick: (Button) -> Unit,
+    heightMatchParent: Boolean = false
   ): Button {
     return this.createButton(
       context = this.context,
       text = R.string.catalogGet,
       description = R.string.catalogAccessibilityBookBorrow,
+      heightMatchParent = heightMatchParent,
       onClick = onClick
     )
   }
 
   @UiThread
   fun createDeleteButton(
-    onClick: (Button) -> Unit
+    onClick: (Button) -> Unit,
+    heightMatchParent: Boolean = false
   ): Button {
     return this.createButton(
       context = this.context,
       text = R.string.catalogDelete,
       description = R.string.catalogAccessibilityBookDelete,
+      heightMatchParent = heightMatchParent,
       onClick = onClick
     )
   }
@@ -342,10 +359,14 @@ class CatalogButtons(
   }
 
   @UiThread
-  fun buttonLayoutParameters(): LinearLayout.LayoutParams {
+  fun buttonLayoutParameters(heightMatchParent: Boolean = false): LinearLayout.LayoutParams {
     val buttonLayoutParams = LinearLayout.LayoutParams(0, 0)
     buttonLayoutParams.weight = 1.0f
-    buttonLayoutParams.height = LinearLayout.LayoutParams.WRAP_CONTENT
+    buttonLayoutParams.height = if (heightMatchParent) {
+      LinearLayout.LayoutParams.MATCH_PARENT
+    } else {
+      LinearLayout.LayoutParams.WRAP_CONTENT
+    }
     buttonLayoutParams.width = this.screenSizeInformation.dpToPixels(80).toInt()
     return buttonLayoutParams
   }

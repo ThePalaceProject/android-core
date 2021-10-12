@@ -458,6 +458,12 @@ abstract class ProfilesControllerContract {
               get() = "Author"
             override val sortByTitle: String
               get() = "Title"
+            override val show: String
+              get() = "Show"
+            override val showAll: String
+              get() = "All"
+            override val showOnLoan: String
+              get() = "On Loan"
           }
         )
       ).get()

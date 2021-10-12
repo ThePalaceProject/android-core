@@ -98,6 +98,10 @@
         <c:change date="2021-09-30T00:00:00+00:00" summary="Add book loan duration to buttons"/>
         <c:change date="2021-10-01T00:00:00+00:00" summary="Change order of reader menu icons to TOC, Settings, Bookmarks"/>
         <c:change date="2021-10-01T00:00:00+00:00" summary="Add back button to reader toolbar"/>
+        <c:change date="2021-10-06T22:59:50+00:00" summary="Rename 'Books' tab to 'My Books" />
+        <c:change date="2021-10-06T22:59:50+00:00" summary="Rename 'Holds' tab to 'Reservations'"/>
+        <c:change date="2021-10-06T22:59:50+00:00" summary="Add Return buttons to My Books list"/>
+        <c:change date="2021-10-06T22:59:50+00:00" summary="Add 'Show' button to filter My Books by loan status"/>
         <c:change date="2021-10-07T00:00:00+00:00" summary="Always show progress bar when reading a book"/>
         <c:change date="2021-10-07T02:01:14+00:00" summary="Prevent page size from changing when the reader toolbar is shown and hidden"/>
       </c:changes>

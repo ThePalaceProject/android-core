@@ -404,7 +404,8 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
       facetTabs = this.feedWithoutGroupsTabs,
       facetLayoutScroller = this.feedWithoutGroupsFacetsScroll,
       facetLayout = this.feedWithoutGroupsFacets,
-      facetsByGroup = feedState.facetsByGroup
+      facetsByGroup = feedState.facetsByGroup,
+      sortFacets = false
     )
     this.configureLogoHeader(feedState)
 
@@ -414,6 +415,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
         listener = this.viewModel,
         buttonCreator = this.buttonCreator,
         bookCovers = this.bookCovers,
+        profilesController = this.profilesController
       )
 
     this.feedWithoutGroupsList.adapter = this.feedWithoutGroupsAdapter
@@ -440,7 +442,8 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
       facetTabs = this.feedWithGroupsTabs,
       facetLayoutScroller = this.feedWithGroupsFacetsScroll,
       facetLayout = this.feedWithGroupsFacets,
-      facetsByGroup = feedState.feed.facetsByGroup
+      facetsByGroup = feedState.feed.facetsByGroup,
+      sortFacets = true
     )
     this.configureLogoHeader(feedState)
 
@@ -646,7 +649,8 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
     facetTabs: RadioGroup,
     facetLayoutScroller: ViewGroup,
     facetLayout: LinearLayout,
-    facetsByGroup: Map<String, List<FeedFacet>>
+    facetsByGroup: Map<String, List<FeedFacet>>,
+    sortFacets: Boolean
   ) {
     /*
      * If the facet groups are empty, hide the header entirely.
@@ -706,7 +710,11 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
         LinearLayout.LayoutParams.MATCH_PARENT
       )
 
-    val sortedNames = remainingGroups.keys.sorted()
+    val sortedNames = if (sortFacets) {
+      remainingGroups.keys.sorted()
+    } else {
+      remainingGroups.keys
+    }
     val context = this.requireContext()
 
     facetLayout.removeAllViews()
