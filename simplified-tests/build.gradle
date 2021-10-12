@@ -94,6 +94,8 @@ dependencies {
   implementation libs.nypl.readium
   implementation libs.nypl.readium.js
   implementation libs.okhttp3.mockwebserver
+  implementation libs.r2.lcp
+  implementation libs.r2.shared
   implementation libs.slf4j
 
   implementation (libs.readium.lcp) {
