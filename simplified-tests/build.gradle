@@ -37,10 +37,10 @@ dependencies {
   api project(":simplified-files")
   api project(":simplified-futures")
   api project(":simplified-json-core")
-  api project(":simplified-migration-from3master")
-  api project(":simplified-migration-spi")
   api project(":simplified-metrics")
   api project(":simplified-metrics-api")
+  api project(":simplified-migration-from3master")
+  api project(":simplified-migration-spi")
   api project(":simplified-notifications")
   api project(":simplified-oauth")
   api project(":simplified-opds-auth-document")
@@ -66,37 +66,45 @@ dependencies {
   api project(":simplified-ui-splash")
   api project(":simplified-webview")
 
-  api libraries.nypl_audiobook_api
-  api libraries.nypl_audiobook_downloads
-  api libraries.nypl_audiobook_feedbooks
-  api libraries.nypl_audiobook_manifest_license_check_api
-  api libraries.nypl_audiobook_manifest_fulfill_api
-  api libraries.nypl_audiobook_manifest_fulfill_basic
-  api libraries.nypl_audiobook_manifest_parser_webpub
-  api libraries.nypl_audiobook_open_access
-  api libraries.nypl_audiobook_rbdigital
-  api libraries.nypl_audiobook_views
+  api libs.palace.audiobook.api
+  api libs.palace.audiobook.downloads
+  api libs.palace.audiobook.feedbooks
+  api libs.palace.audiobook.manifest.license.check.api
+  api libs.palace.audiobook.manifest.fulfill.api
+  api libs.palace.audiobook.manifest.fulfill.basic
+  api libs.palace.audiobook.manifest.parser.webpub
+  api libs.palace.audiobook.open.access
+  api libs.palace.audiobook.rbdigital
+  api libs.palace.audiobook.views
 
-  implementation libraries.io7m_jfunctional
-  implementation libraries.io7m_jnull
-  implementation libraries.jackson_databind
-  implementation libraries.junit
-  implementation libraries.junit_jupiter_api
-  implementation libraries.junit_jupiter_engine
-  implementation libraries.kotlin_reflect
-  implementation libraries.kotlin_stdlib
-  implementation libraries.mockito_android
-  implementation libraries.mockito_kotlin
-  implementation libraries.nypl_drm_core
-  implementation libraries.nypl_http_api
-  implementation libraries.nypl_http_bearer_token
-  implementation libraries.nypl_http_vanilla
-  implementation libraries.okhttp3_mockwebserver
-  implementation libraries.r2_lcp
-  implementation libraries.r2_shared
-  implementation libraries.slf4j
+  implementation libs.io7m.jfunctional
+  implementation libs.io7m.jnull
+  implementation libs.jackson.databind
+  implementation libs.junit
+  implementation libs.junit.jupiter.api
+  implementation libs.junit.jupiter.engine
+  implementation libs.kotlin.reflect
+  implementation libs.kotlin.stdlib
+  implementation libs.mockito.android
+  implementation libs.mockito.kotlin
+  implementation libs.nypl.drm.core
+  implementation libs.nypl.http.api
+  implementation libs.nypl.http.bearer.token
+  implementation libs.nypl.http.vanilla
+  implementation libs.nypl.readium
+  implementation libs.nypl.readium.js
+  implementation libs.okhttp3.mockwebserver
+  implementation libs.r2.lcp
+  implementation libs.r2.shared
+  implementation libs.slf4j
 
-  testImplementation libraries.logback_classic
-  testImplementation libraries.junit
-  testImplementation libraries.robolectric
+  implementation (libs.readium.lcp) {
+    artifact {
+      type = "aar"
+    }
+  }
+
+  testImplementation libs.logback.android
+  testImplementation libs.junit
+  testImplementation libs.robolectric
 }

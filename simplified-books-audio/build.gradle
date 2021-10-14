@@ -4,16 +4,16 @@ dependencies {
 
   implementation project(":simplified-books-database-api")
 
-  api libraries.nypl_audiobook_manifest_license_check_api
-  api libraries.nypl_audiobook_api
-  api libraries.nypl_audiobook_manifest_fulfill_api
-  api libraries.nypl_audiobook_manifest_parser_api
+  api libs.palace.audiobook.manifest.license.check.api
+  api libs.palace.audiobook.api
+  api libs.palace.audiobook.manifest.fulfill.api
+  api libs.palace.audiobook.manifest.parser.api
 
-  implementation libraries.kotlin_stdlib
-  implementation libraries.kotlin_reflect
-  implementation libraries.nypl_audiobook_downloads
-  implementation libraries.nypl_audiobook_feedbooks
-  implementation libraries.nypl_audiobook_manifest_fulfill_basic
-  implementation libraries.nypl_audiobook_manifest_fulfill_opa
-  implementation libraries.nypl_audiobook_manifest_parser_webpub
+  implementation libs.kotlin.stdlib
+  implementation libs.kotlin.reflect
+  implementation libs.palace.audiobook.downloads
+  implementation libs.palace.audiobook.feedbooks
+  implementation libs.palace.audiobook.manifest.fulfill.basic
+  implementation libs.palace.audiobook.manifest.fulfill.opa
+  implementation libs.palace.audiobook.manifest.parser.webpub
 }

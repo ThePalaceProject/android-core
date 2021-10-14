@@ -15,20 +15,20 @@ dependencies {
   implementation project(":simplified-ui-thread-api")
   implementation project(":simplified-viewer-spi")
 
-  api libraries.nypl_audiobook_api
-  api libraries.nypl_audiobook_downloads
-  api libraries.nypl_audiobook_feedbooks
-  api libraries.nypl_audiobook_manifest_license_check_api
-  api libraries.nypl_audiobook_manifest_fulfill_api
-  api libraries.nypl_audiobook_manifest_fulfill_basic
-  api libraries.nypl_audiobook_manifest_parser_api
-  api libraries.nypl_audiobook_manifest_parser_webpub
-  api libraries.nypl_audiobook_open_access
-  api libraries.nypl_audiobook_rbdigital
-  api libraries.nypl_audiobook_views
+  api libs.palace.audiobook.api
+  api libs.palace.audiobook.downloads
+  api libs.palace.audiobook.feedbooks
+  api libs.palace.audiobook.manifest.license.check.api
+  api libs.palace.audiobook.manifest.fulfill.api
+  api libs.palace.audiobook.manifest.fulfill.basic
+  api libs.palace.audiobook.manifest.parser.api
+  api libs.palace.audiobook.manifest.parser.webpub
+  api libs.palace.audiobook.open.access
+  api libs.palace.audiobook.rbdigital
+  api libs.palace.audiobook.views
 
-  implementation libraries.androidx_activity
-  implementation libraries.androidx_appcompat
-  implementation libraries.kotlin_stdlib
-  implementation libraries.kotlin_reflect
+  implementation libs.androidx.activity
+  implementation libs.androidx.app.compat
+  implementation libs.kotlin.stdlib
+  implementation libs.kotlin.reflect
 }
