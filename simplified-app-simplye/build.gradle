@@ -44,8 +44,5 @@ dependencies {
   implementation libraries.nypl_findaway
   implementation libraries.nypl_overdrive
 
-  if (nyplNexusDepend) {
-    implementation libraries.nypl_drm_adobe
-  }
   annotationProcessor libraries.google_autovalue_processor
 }

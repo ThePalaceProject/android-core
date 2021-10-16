@@ -39,7 +39,7 @@ dependencies {
 
   implementation libs.firebase.analytics
   implementation libs.firebase.crashlytics
-  implementation libs.nypl.drm.adobe
+  implementation libs.palace.drm.adobe
   implementation libs.nypl.drm.core
   implementation libs.nypl.readium
   implementation libs.palace.findaway

@@ -37,7 +37,7 @@ class SettingsDocumentViewerFragment : Fragment() {
     if (!url.isNullOrBlank()) {
       binding.documentViewerWebView.webViewClient = WebViewClient()
       binding.documentViewerWebView.webChromeClient = WebChromeClient()
-      binding.documentViewerWebView.loadUrl(url)
+      binding.documentViewerWebView.loadUrl(url!!)
     }
   }
 
