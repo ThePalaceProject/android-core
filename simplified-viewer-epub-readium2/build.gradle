@@ -14,7 +14,7 @@ dependencies {
   implementation libs.androidx.lifecycle.viewmodel
   implementation libs.kotlin.stdlib
   implementation libs.kotlin.reflect
-  implementation libs.nypl.readium2.api
-  implementation libs.nypl.readium2.vanilla
-  implementation libs.nypl.readium2.views
+  implementation libs.palace.readium2.api
+  implementation libs.palace.readium2.vanilla
+  implementation libs.palace.readium2.views
 }
