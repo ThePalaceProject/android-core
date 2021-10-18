@@ -4,7 +4,7 @@ dependencies {
 
   api libs.google.guava
   api libs.joda.time
-  api libs.nypl.drm.core
+
 
   implementation libs.kotlin.stdlib
   implementation libs.kotlin.reflect

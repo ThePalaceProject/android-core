@@ -6,7 +6,7 @@ dependencies {
 
   api libs.google.guava
   api libs.joda.time
-  api libs.nypl.drm.core
+
   api libs.rxjava2
 
   implementation libs.kotlin.stdlib

@@ -2,7 +2,7 @@ dependencies {
   api project(":simplified-profiles-api")
 
   api libs.io7m.jfunctional
-  api libs.nypl.drm.core
+
 
   implementation project(":simplified-accounts-source-spi")
   implementation project(":simplified-analytics-api")

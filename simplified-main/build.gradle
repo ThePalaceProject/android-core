@@ -78,6 +78,7 @@ dependencies {
   api libs.nypl.http.api
   api libs.nypl.http.bearer.token
   api libs.nypl.http.vanilla
+  api libs.palace.drm.core
   api libs.r2.lcp
   api libs.rxandroid2
   api libs.rxjava2

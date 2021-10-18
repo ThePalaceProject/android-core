@@ -3,7 +3,7 @@ dependencies {
 
   api libs.google.guava
   api libs.joda.time
-  api libs.nypl.drm.core
+
 
   implementation libs.jackson.databind
   implementation libs.kotlin.stdlib

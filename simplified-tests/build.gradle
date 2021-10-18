@@ -87,7 +87,7 @@ dependencies {
   implementation libs.kotlin.stdlib
   implementation libs.mockito.android
   implementation libs.mockito.kotlin
-  implementation libs.nypl.drm.core
+
   implementation libs.nypl.http.api
   implementation libs.nypl.http.bearer.token
   implementation libs.nypl.http.vanilla

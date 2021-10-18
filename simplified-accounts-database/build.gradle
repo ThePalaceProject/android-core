@@ -5,7 +5,7 @@ dependencies {
   api project(':simplified-books-database-api')
 
   api libs.io7m.jfunctional
-  api libs.nypl.drm.core
+
   api libs.rxjava2
 
   implementation project(':simplified-files')

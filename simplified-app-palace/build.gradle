@@ -31,6 +31,10 @@ android {
   }
 }
 
+configurations.all {
+  exclude group: 'org.librarysimplified.drm'
+}
+
 dependencies {
   implementation project(":simplified-main")
   implementation project(":simplified-accounts-source-nyplregistry")
@@ -39,10 +43,13 @@ dependencies {
 
   implementation libs.firebase.analytics
   implementation libs.firebase.crashlytics
-  implementation libs.palace.drm.adobe
-  implementation libs.nypl.drm.core
   implementation libs.nypl.readium
+  implementation libs.palace.drm.adobe
   implementation libs.palace.findaway
+  implementation libs.r2.lcp
+  implementation libs.r2.opds
+  implementation libs.r2.shared
+  implementation libs.r2.streamer
 
   implementation (libs.readium.lcp) {
     artifact {

@@ -5,4 +5,5 @@ dependencies {
   implementation libs.androidx.webkit
   implementation libs.kotlin.stdlib
   implementation libs.kotlin.reflect
+  implementation libs.palace.drm.core
 }
