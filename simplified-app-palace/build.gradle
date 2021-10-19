@@ -7,7 +7,7 @@ apply plugin: 'com.google.firebase.crashlytics'
 //
 def requiredFiles = [:]
 requiredFiles["ReaderClientCert.sig"] =
-  "58fe2fb9e6a352c54311da8ee91a8dbb8295138b630ee764164770e5b0a85b1b"
+  "b064e68b96e258e42fe1ca66ae3fc4863dd802c46585462220907ed291e1217d"
 requiredFiles["secrets.conf"] =
   "9c211ae0d153c29b72baab3bfad9de6c5cecb6b39bcda8206d36a65aaca0db21"
 
@@ -31,6 +31,10 @@ android {
   }
 }
 
+configurations.all {
+  exclude group: 'org.librarysimplified.drm'
+}
+
 dependencies {
   implementation project(":simplified-main")
   implementation project(":simplified-accounts-source-nyplregistry")
@@ -39,10 +43,13 @@ dependencies {
 
   implementation libs.firebase.analytics
   implementation libs.firebase.crashlytics
-  implementation libs.nypl.drm.adobe
-  implementation libs.nypl.drm.core
   implementation libs.nypl.readium
+  implementation libs.palace.drm.adobe
   implementation libs.palace.findaway
+  implementation libs.r2.lcp
+  implementation libs.r2.opds
+  implementation libs.r2.shared
+  implementation libs.r2.streamer
 
   implementation (libs.readium.lcp) {
     artifact {

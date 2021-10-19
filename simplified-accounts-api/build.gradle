@@ -9,11 +9,11 @@ dependencies {
   api libs.io7m.jfunctional
   api libs.jackson.databind
   api libs.joda.time
-  api libs.nypl.drm.core
   api libs.nypl.http.api
 
   implementation project(':simplified-opds-core')
 
+  implementation libs.palace.drm.core
   implementation libs.kotlin.stdlib
   implementation libs.kotlin.reflect
 
