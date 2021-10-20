@@ -344,8 +344,6 @@ class CatalogPagedViewHolder(
         }
       )
     )
-    this.idleButtons.addView(this.buttonCreator.createButtonSizedSpace())
-    this.idleButtons.addView(this.buttonCreator.createButtonSizedSpace())
   }
 
   private fun onBookStatusHoldable(book: Book) {
@@ -362,8 +360,6 @@ class CatalogPagedViewHolder(
         }
       )
     )
-    this.idleButtons.addView(this.buttonCreator.createButtonSizedSpace())
-    this.idleButtons.addView(this.buttonCreator.createButtonSizedSpace())
   }
 
   private fun onBookStatusHeldReady(
@@ -383,6 +379,9 @@ class CatalogPagedViewHolder(
             this.listener.revokeMaybeAuthenticated(book)
           }
         )
+      )
+      this.idleButtons.addView(
+        this.buttonCreator.createButtonSpace()
       )
     }
     this.idleButtons.addView(

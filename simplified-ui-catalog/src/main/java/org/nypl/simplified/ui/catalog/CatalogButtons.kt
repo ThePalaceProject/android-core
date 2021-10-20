@@ -167,9 +167,8 @@ class CatalogButtons(
     return LinearLayout(this.context, null, androidx.appcompat.R.attr.buttonStyle).apply {
       this.orientation = LinearLayout.HORIZONTAL
       this.gravity = Gravity.CENTER
-      this.layoutParams = LinearLayout.LayoutParams(
-        LinearLayout.LayoutParams.WRAP_CONTENT,
-        LinearLayout.LayoutParams.MATCH_PARENT
+      this.layoutParams = buttonLayoutParameters(
+        heightMatchParent = true
       )
       this.setOnClickListener {
         this.isEnabled = false
@@ -342,7 +341,7 @@ class CatalogButtons(
   }
 
   @UiThread
-  fun createButtonSizedSpace(): View? {
+  fun createButtonSizedSpace(): View {
     val space = Space(this.context)
     space.layoutParams = this.buttonLayoutParameters()
     space.visibility = View.INVISIBLE
@@ -367,7 +366,7 @@ class CatalogButtons(
     } else {
       LinearLayout.LayoutParams.WRAP_CONTENT
     }
-    buttonLayoutParams.width = this.screenSizeInformation.dpToPixels(80).toInt()
+    buttonLayoutParams.width = 0
     return buttonLayoutParams
   }
 
