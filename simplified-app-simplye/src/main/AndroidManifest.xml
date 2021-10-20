@@ -72,6 +72,7 @@
       android:name="org.nypl.simplified.viewer.audiobook.AudioBookPlayerActivity"
       android:contentDescription="@string/appName"
       android:exported="false"
+      android:screenOrientation="portrait"
       android:label="@string/appName" />
 
     <activity
