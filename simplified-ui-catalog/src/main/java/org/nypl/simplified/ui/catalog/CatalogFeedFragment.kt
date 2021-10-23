@@ -32,6 +32,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.android.ktx.supportActionBar
@@ -134,6 +135,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
   private lateinit var feedLoading: ViewGroup
   private lateinit var feedNavigation: ViewGroup
   private lateinit var feedWithGroups: ViewGroup
+  private lateinit var feedWithGroupsRefresh: SwipeRefreshLayout
   private lateinit var feedWithGroupsAdapter: CatalogFeedWithGroupsAdapter
   private lateinit var feedWithGroupsFacets: LinearLayout
   private lateinit var feedWithGroupsFacetsScroll: ViewGroup
@@ -144,6 +146,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
   private lateinit var feedWithGroupsLogoText: TextView
   private lateinit var feedWithGroupsTabs: RadioGroup
   private lateinit var feedWithoutGroups: ViewGroup
+  private lateinit var feedWithoutGroupsRefresh: SwipeRefreshLayout
   private lateinit var feedWithoutGroupsAdapter: CatalogPagedAdapter
   private lateinit var feedWithoutGroupsFacets: LinearLayout
   private lateinit var feedWithoutGroupsFacetsScroll: ViewGroup
@@ -192,6 +195,8 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
 
     this.feedWithGroupsHeader =
       view.findViewById(R.id.feedWithGroupsHeader)
+    this.feedWithGroupsRefresh =
+      view.findViewById(R.id.feedWithGroupsRefresh)
     this.feedWithGroupsFacetsScroll =
       this.feedWithGroupsHeader.findViewById(R.id.feedHeaderFacetsScroll)
     this.feedWithGroupsFacets =
@@ -206,6 +211,8 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
     this.feedWithGroupsLogoText =
       this.feedWithGroupsLogoHeader.findViewById(R.id.feedLibraryText)
 
+    this.feedWithoutGroupsRefresh =
+      this.feedWithoutGroups.findViewById(R.id.feedWithoutGroupsRefresh)
     this.feedWithoutGroupsLogoHeader =
       this.feedWithoutGroups.findViewById(R.id.feedWithoutGroupsLogoHeader)
     this.feedWithoutGroupsLogoImage =
@@ -256,6 +263,15 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
     this.feedNavigation.visibility = View.INVISIBLE
     this.feedWithGroups.visibility = View.INVISIBLE
     this.feedWithoutGroups.visibility = View.INVISIBLE
+
+    this.feedWithGroupsRefresh.setOnRefreshListener {
+      this.refresh()
+      this.feedWithGroupsRefresh.isRefreshing = false
+    }
+    this.feedWithoutGroupsRefresh.setOnRefreshListener {
+      this.refresh()
+      this.feedWithoutGroupsRefresh.isRefreshing = false
+    }
   }
 
   override fun onStart() {
@@ -284,12 +300,13 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
         }
         true
       }
-      R.id.catalogMenuActionReload -> {
-        this.viewModel.syncAccounts()
-        true
-      }
       else -> super.onOptionsItemSelected(item)
     }
+  }
+
+  private fun refresh() {
+    this.viewModel.syncAccounts()
+    this.viewModel.reloadFeed()
   }
 
   private fun reconfigureUI(feedState: CatalogFeedState) {
