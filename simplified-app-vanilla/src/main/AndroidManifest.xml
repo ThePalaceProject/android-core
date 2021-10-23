@@ -72,7 +72,8 @@
     <activity
       android:name="org.nypl.simplified.viewer.audiobook.AudioBookPlayerActivity"
       android:screenOrientation="portrait"
-      android:exported="false" />
+      android:exported="false"
+      android:theme="@style/NeutralTheme_NoActionBar" />
 
     <activity
       android:name="org.nypl.simplified.cardcreator.CardCreatorActivity"

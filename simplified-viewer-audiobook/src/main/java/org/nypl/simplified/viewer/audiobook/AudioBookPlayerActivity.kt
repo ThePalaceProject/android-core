@@ -147,7 +147,6 @@ class AudioBookPlayerActivity :
     this.log.debug("book id:       {}", this.parameters.bookID)
     this.log.debug("entry id:      {}", this.parameters.opdsEntry.id)
 
-    this.setTheme(R.style.NeutralTheme_ActionBar)
     this.setContentView(R.layout.audio_book_player_base)
     this.playerScheduledExecutor = Executors.newSingleThreadScheduledExecutor()
 
@@ -671,6 +670,10 @@ class AudioBookPlayerActivity :
 
   override fun onPlayerTOCWantsBook(): PlayerAudioBookType {
     return this.book
+  }
+
+  override fun onPlayerShouldBeClosed() {
+    onBackPressed()
   }
 
   override fun onPlayerTOCWantsClose() {

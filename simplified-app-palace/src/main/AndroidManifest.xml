@@ -73,7 +73,8 @@
       android:contentDescription="@string/app_name"
       android:exported="false"
       android:screenOrientation="portrait"
-      android:label="@string/app_name" />
+      android:label="@string/app_name"
+      android:theme="@style/NeutralTheme_NoActionBar" />
 
     <activity
       android:name="org.nypl.simplified.cardcreator.CardCreatorActivity"
