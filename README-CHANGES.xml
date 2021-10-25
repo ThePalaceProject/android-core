@@ -108,6 +108,7 @@
         <c:change date="2021-10-15T00:00:00+00:00" summary="Added portrait screen orientation to AudioBookActivity on manifest"/>
         <c:change date="2021-10-20T00:00:00+00:00" summary="Adjusted catalog buttons dimension to prevent weird UI displaying"/>
         <c:change date="2021-10-21T00:00:00+00:00" summary="Fixed crash when tapping to enable debug options"/>
+        <c:change date="2021-10-23T23:41:43+00:00" summary="Added back button to the Audiobook details screen"/>
         <c:change date="2021-10-25T00:00:00+00:00" summary="Changed &quot;switch library&quot; language to &quot;find your library&quot;"/>
         <c:change date="2021-10-25T00:00:00+00:00" summary="Implemented swipe-to-refresh in catalog feeds"/>
         <c:change date="2021-10-25T00:00:00+00:00" summary="Correctly use Open Sans in the toolbar"/>
