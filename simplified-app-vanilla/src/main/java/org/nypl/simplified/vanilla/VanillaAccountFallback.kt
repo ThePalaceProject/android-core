@@ -40,7 +40,8 @@ class VanillaAccountFallback : AccountProviderFallbackType {
       supportEmail = "mailto:gethelp+simplye-collection@nypl.org",
       supportsReservations = false,
       updated = DateTime.parse("2019-07-08T16:32:52+00:00"),
-      location = null
+      location = null,
+      alternateURI = null
     )
   }
 }

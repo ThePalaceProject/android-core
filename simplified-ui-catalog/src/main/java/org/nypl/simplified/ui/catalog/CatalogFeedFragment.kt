@@ -2,7 +2,9 @@ package org.nypl.simplified.ui.catalog
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
+import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.Gravity
@@ -32,6 +34,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.android.ktx.supportActionBar
@@ -134,6 +137,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
   private lateinit var feedLoading: ViewGroup
   private lateinit var feedNavigation: ViewGroup
   private lateinit var feedWithGroups: ViewGroup
+  private lateinit var feedWithGroupsRefresh: SwipeRefreshLayout
   private lateinit var feedWithGroupsAdapter: CatalogFeedWithGroupsAdapter
   private lateinit var feedWithGroupsFacets: LinearLayout
   private lateinit var feedWithGroupsFacetsScroll: ViewGroup
@@ -144,6 +148,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
   private lateinit var feedWithGroupsLogoText: TextView
   private lateinit var feedWithGroupsTabs: RadioGroup
   private lateinit var feedWithoutGroups: ViewGroup
+  private lateinit var feedWithoutGroupsRefresh: SwipeRefreshLayout
   private lateinit var feedWithoutGroupsAdapter: CatalogPagedAdapter
   private lateinit var feedWithoutGroupsFacets: LinearLayout
   private lateinit var feedWithoutGroupsFacetsScroll: ViewGroup
@@ -192,6 +197,8 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
 
     this.feedWithGroupsHeader =
       view.findViewById(R.id.feedWithGroupsHeader)
+    this.feedWithGroupsRefresh =
+      view.findViewById(R.id.feedWithGroupsRefresh)
     this.feedWithGroupsFacetsScroll =
       this.feedWithGroupsHeader.findViewById(R.id.feedHeaderFacetsScroll)
     this.feedWithGroupsFacets =
@@ -206,6 +213,8 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
     this.feedWithGroupsLogoText =
       this.feedWithGroupsLogoHeader.findViewById(R.id.feedLibraryText)
 
+    this.feedWithoutGroupsRefresh =
+      this.feedWithoutGroups.findViewById(R.id.feedWithoutGroupsRefresh)
     this.feedWithoutGroupsLogoHeader =
       this.feedWithoutGroups.findViewById(R.id.feedWithoutGroupsLogoHeader)
     this.feedWithoutGroupsLogoImage =
@@ -256,6 +265,43 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
     this.feedNavigation.visibility = View.INVISIBLE
     this.feedWithGroups.visibility = View.INVISIBLE
     this.feedWithoutGroups.visibility = View.INVISIBLE
+
+    this.feedWithGroupsRefresh.setOnRefreshListener {
+      this.refresh()
+      this.feedWithGroupsRefresh.isRefreshing = false
+    }
+    this.feedWithoutGroupsRefresh.setOnRefreshListener {
+      this.refresh()
+      this.feedWithoutGroupsRefresh.isRefreshing = false
+    }
+
+    this.feedWithGroupsLogoHeader.setOnClickListener {
+      this.openLogoLink()
+    }
+    this.feedWithoutGroupsLogoHeader.setOnClickListener {
+      this.openLogoLink()
+    }
+  }
+
+  private fun openLogoLink() {
+    this.logger.debug("logo: attempting to open link")
+
+    try {
+      val accountProvider = this.viewModel.accountProvider
+      if (accountProvider != null) {
+        val alternate = accountProvider.alternateURI
+        if (alternate != null) {
+          val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(alternate.toString()))
+          this.startActivity(browserIntent)
+        } else {
+          this.logger.debug("logo: no alternate link")
+        }
+      } else {
+        this.logger.debug("logo: account provider was null")
+      }
+    } catch (e: Exception) {
+      this.logger.error("logo: unable to handle alternate link: ", e)
+    }
   }
 
   override fun onStart() {
@@ -284,12 +330,13 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
         }
         true
       }
-      R.id.catalogMenuActionReload -> {
-        this.viewModel.syncAccounts()
-        true
-      }
       else -> super.onOptionsItemSelected(item)
     }
+  }
+
+  private fun refresh() {
+    this.viewModel.syncAccounts()
+    this.viewModel.reloadFeed()
   }
 
   private fun reconfigureUI(feedState: CatalogFeedState) {

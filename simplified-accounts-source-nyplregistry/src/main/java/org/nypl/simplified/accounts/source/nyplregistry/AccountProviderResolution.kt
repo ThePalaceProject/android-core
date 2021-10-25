@@ -103,8 +103,8 @@ class AccountProviderResolution(
       val description =
         this.findDescription(authDocument)
 
-      val annotationsURI =
-        this.findAnnotationsLink()
+      val alternateURI =
+        this.findAlternateLink()
 
       val accountProvider =
         AccountProvider(
@@ -131,7 +131,8 @@ class AccountProviderResolution(
           supportEmail = authDocument?.supportURI?.toString(),
           supportsReservations = supportsReservations,
           updated = updated,
-          location = this.description.location
+          location = this.description.location,
+          alternateURI = alternateURI
         )
 
       taskRecorder.finishSuccess(accountProvider)
@@ -146,15 +147,10 @@ class AccountProviderResolution(
     }
   }
 
-  /*
-   * The annotations URI can only be located by an authenticated user, but there _might_ be
-   * one left over from the original description. We'll use that if one exists.
-   */
-
-  private fun findAnnotationsLink(): URI? {
+  private fun findAlternateLink(): URI? {
     return this.description.links.firstOrNull {
       link ->
-      link.relation == "http://www.w3.org/ns/oa#annotationService"
+      link.relation == "alternate"
     }?.hrefURI
   }
 

@@ -50,7 +50,7 @@
         <c:change date="2021-09-10T00:00:00+00:00" summary="Introduced a new color scheme for the application."/>
       </c:changes>
     </c:release>
-    <c:release date="2021-10-23T23:41:43+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.3">
+    <c:release date="2021-10-25T10:51:15+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.3">
       <c:changes>
         <c:change date="2021-07-14T00:00:00+00:00" summary="Improve fixed-layout EPUB handling.">
           <c:tickets>
@@ -109,6 +109,10 @@
         <c:change date="2021-10-20T00:00:00+00:00" summary="Adjusted catalog buttons dimension to prevent weird UI displaying"/>
         <c:change date="2021-10-21T00:00:00+00:00" summary="Fixed crash when tapping to enable debug options"/>
         <c:change date="2021-10-23T23:41:43+00:00" summary="Added back button to the Audiobook details screen"/>
+        <c:change date="2021-10-25T00:00:00+00:00" summary="Changed &quot;switch library&quot; language to &quot;find your library&quot;"/>
+        <c:change date="2021-10-25T00:00:00+00:00" summary="Implemented swipe-to-refresh in catalog feeds"/>
+        <c:change date="2021-10-25T00:00:00+00:00" summary="Correctly use Open Sans in the toolbar"/>
+        <c:change date="2021-10-25T10:51:15+00:00" summary="Library logos are now clickable links"/>
       </c:changes>
     </c:release>
   </c:releases>

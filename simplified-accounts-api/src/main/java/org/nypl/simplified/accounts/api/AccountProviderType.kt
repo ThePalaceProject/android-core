@@ -146,6 +146,12 @@ interface AccountProviderType : Comparable<AccountProviderType> {
   val patronSettingsURI: URI?
 
   /**
+   * An "alternate" URI; typically the address of a web site for the library in question.
+   */
+
+  val alternateURI: URI?
+
+  /**
    * Determine the correct catalog URI to use for readers of a given age.
    *
    * @param age The age of the reader
