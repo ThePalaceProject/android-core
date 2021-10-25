@@ -67,6 +67,7 @@ object AccountProvidersJSON {
     node.put("supportsReservations", provider.supportsReservations)
     node.put("updated", provider.updated.toString())
 
+    this.putConditionally(node, "alternateURI", provider.alternateURI)
     this.putConditionally(node, "authenticationDocumentURI", provider.authenticationDocumentURI)
     this.putConditionally(node, "cardCreatorURI", provider.cardCreatorURI)
     this.putConditionally(node, "catalogURI", provider.catalogURI)
@@ -203,8 +204,8 @@ object AccountProvidersJSON {
     try {
       val addAutomatically =
         JSONParserUtilities.getBooleanDefault(obj, "addAutomatically", false)
-      val annotationsURI =
-        JSONParserUtilities.getURIOrNull(obj, "annotationsURI")
+      val alternateURI =
+        JSONParserUtilities.getURIOrNull(obj, "alternateURI")
       val authenticationDocumentURI =
         JSONParserUtilities.getURIOrNull(obj, "authenticationDocumentURI")
       val cardCreatorURI =
@@ -257,6 +258,7 @@ object AccountProvidersJSON {
 
       return AccountProvider(
         addAutomatically = addAutomatically,
+        alternateURI = alternateURI,
         announcements = announcements,
         authentication = authentication,
         authenticationAlternatives = authenticationAlternatives,
@@ -271,6 +273,7 @@ object AccountProvidersJSON {
         isProduction = isProduction,
         license = license,
         loansURI = loansURI,
+        location = location,
         logo = logo,
         mainColor = mainColor,
         patronSettingsURI = patronSettingsURI,
@@ -279,7 +282,6 @@ object AccountProvidersJSON {
         supportEmail = supportEmail,
         supportsReservations = supportsReservations,
         updated = updated,
-        location = location
       )
     } catch (e: JSONParseException) {
       throw JSONParseException("Unable to parse provider $idUUID", e)

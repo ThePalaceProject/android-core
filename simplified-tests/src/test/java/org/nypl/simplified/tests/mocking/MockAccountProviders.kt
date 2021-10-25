@@ -75,7 +75,8 @@ object MockAccountProviders {
       supportEmail = "postmaster@example.com",
       supportsReservations = false,
       updated = DateTime.parse("2000-01-01T00:00:00Z"),
-      location = null
+      location = null,
+      alternateURI = URI.create("https://www.example.com/alternate")
     )
   }
 

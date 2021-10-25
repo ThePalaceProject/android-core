@@ -2,7 +2,9 @@ package org.nypl.simplified.ui.catalog
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
+import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.Gravity
@@ -271,6 +273,34 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
     this.feedWithoutGroupsRefresh.setOnRefreshListener {
       this.refresh()
       this.feedWithoutGroupsRefresh.isRefreshing = false
+    }
+
+    this.feedWithGroupsLogoHeader.setOnClickListener {
+      this.openLogoLink()
+    }
+    this.feedWithoutGroupsLogoHeader.setOnClickListener {
+      this.openLogoLink()
+    }
+  }
+
+  private fun openLogoLink() {
+    this.logger.debug("logo: attempting to open link")
+
+    try {
+      val accountProvider = this.viewModel.accountProvider
+      if (accountProvider != null) {
+        val alternate = accountProvider.alternateURI
+        if (alternate != null) {
+          val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(alternate.toString()))
+          this.startActivity(browserIntent)
+        } else {
+          this.logger.debug("logo: no alternate link")
+        }
+      } else {
+        this.logger.debug("logo: account provider was null")
+      }
+    } catch (e: Exception) {
+      this.logger.error("logo: unable to handle alternate link: ", e)
     }
   }
 

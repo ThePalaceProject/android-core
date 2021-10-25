@@ -39,7 +39,8 @@ class PalaceAccountFallback : AccountProviderFallbackType {
       supportEmail = "mailto:ebooks@dp.la",
       supportsReservations = false,
       updated = DateTime.parse("2021-07-07T23:10:18.238-04:00"),
-      location = null
+      location = null,
+      alternateURI = URI.create("https://dp.la")
     )
   }
 }

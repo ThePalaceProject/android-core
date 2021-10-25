@@ -80,7 +80,8 @@ class TransformProviders {
             supportEmail = entry.supportEmail,
             supportsReservations = entry.supportsReservations,
             updated = DateTime.parse(entry.updated),
-            location = null
+            location = null,
+            alternateURI = null,
           )
         providers.add(provider)
       }

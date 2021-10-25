@@ -276,6 +276,10 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
           Link.LinkBasic(
             this.server.url("auth").toUri(),
             AUTH_DOCUMENT_TYPE
+          ),
+          Link.LinkBasic(
+            href = URI("https://www.example.com/alternate"),
+            relation = "alternate"
           )
         ),
         images = listOf(),
@@ -427,7 +431,8 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
       supportEmail = "mailto:someone@example.com",
       supportsReservations = true,
       updated = DateTime.parse("1970-01-01T00:00:00.000Z"),
-      location = null
+      location = null,
+      alternateURI = URI.create("https://www.example.com/alternate")
     )
 
     Assertions.assertEquals(provider, result.result)
@@ -449,6 +454,10 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
           Link.LinkBasic(
             this.server.url("auth").toUri(),
             AUTH_DOCUMENT_TYPE
+          ),
+          Link.LinkBasic(
+            href = URI("https://www.example.com/alternate"),
+            relation = "alternate"
           )
         ),
         images = listOf(),
@@ -580,7 +589,8 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
       supportEmail = "mailto:someone@example.com",
       supportsReservations = true,
       updated = DateTime.parse("1970-01-01T00:00:00.000Z"),
-      location = null
+      location = null,
+      alternateURI = URI.create("https://www.example.com/alternate")
     )
 
     Assertions.assertEquals(provider, result.result)
@@ -602,6 +612,10 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
           Link.LinkBasic(
             this.server.url("auth").toUri(),
             AUTH_DOCUMENT_TYPE
+          ),
+          Link.LinkBasic(
+            href = URI("https://www.example.com/alternate"),
+            relation = "alternate"
           )
         ),
         images = listOf(),
@@ -713,7 +727,8 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
       supportEmail = "mailto:someone@example.com",
       supportsReservations = true,
       updated = DateTime.parse("1970-01-01T00:00:00.000Z"),
-      location = null
+      location = null,
+      alternateURI = URI.create("https://www.example.com/alternate")
     )
 
     Assertions.assertEquals(provider, result.result)

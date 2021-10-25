@@ -74,7 +74,8 @@ class MockAccount(override val id: AccountID) : AccountType {
         supportEmail = null,
         supportsReservations = false,
         updated = DateTime(),
-        location = null
+        location = null,
+        alternateURI = URI.create("https://www.example.com/alternate")
       )
     }
 
