@@ -115,6 +115,7 @@ object Reports {
           this.putExtra(Intent.EXTRA_TEXT, extendBody(body))
           this.putExtra(Intent.EXTRA_STREAM, ArrayList(contentUris))
           this.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+          this.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         context.startActivity(intent)
         Sent
