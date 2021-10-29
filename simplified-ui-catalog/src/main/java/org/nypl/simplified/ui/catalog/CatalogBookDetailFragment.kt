@@ -598,7 +598,7 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
         )
       )
       // if the book is not revocable and can't be deleted, we need to add an "empty button" before
-    //and after the action button
+      // and after the action button
     } else if (!isRevocable) {
       this.buttons.addView(this.buttonCreator.createButtonSizedSpace(), 0)
       this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
