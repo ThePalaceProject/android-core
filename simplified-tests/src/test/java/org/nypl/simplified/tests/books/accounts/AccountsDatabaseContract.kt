@@ -90,18 +90,20 @@ abstract class AccountsDatabaseContract {
     val f_p = File(fileProfiles, "0")
     f_p.mkdirs()
     val f_acc = File(f_p, "accounts")
+    val fAccGraveyard = File(f_p, "accounts-graveyard")
 
     FileUtilities.fileWriteUTF8(f_acc, "Hello!")
 
     val ex = Assertions.assertThrows(AccountsDatabaseException::class.java) {
       AccountsDatabase.open(
-        this.context(),
-        this.accountEvents,
-        this.bookDatabases(),
-        BookFormatsTesting.supportsEverything,
-        this.credentialStore,
-        this.accountProviders,
-        f_acc
+        context = this.context(),
+        accountEvents = this.accountEvents,
+        bookDatabases = this.bookDatabases(),
+        bookFormatSupport = BookFormatsTesting.supportsEverything,
+        accountCredentials = this.credentialStore,
+        accountProviders = this.accountProviders,
+        directory = f_acc,
+        directoryGraveyard = fAccGraveyard
       )
     }
 
@@ -137,18 +139,23 @@ abstract class AccountsDatabaseContract {
     f_p.mkdirs()
     val f_acc = File(f_p, "accounts")
     f_acc.mkdirs()
+    val fAccGraveyard = File(f_p, "accounts-graveyard")
+    fAccGraveyard.mkdirs()
     val f_a = File(f_acc, "xyz")
     f_a.mkdirs()
 
+    Assertions.assertEquals(0, fAccGraveyard.list()!!.size)
+
     val ex = Assertions.assertThrows(AccountsDatabaseException::class.java) {
       val database = AccountsDatabase.open(
-        this.context(),
-        this.accountEvents,
-        this.bookDatabases(),
-        BookFormatsTesting.supportsEverything,
-        this.credentialStore,
-        this.accountProviders,
-        f_acc
+        context = this.context(),
+        accountEvents = this.accountEvents,
+        bookDatabases = this.bookDatabases(),
+        bookFormatSupport = BookFormatsTesting.supportsEverything,
+        accountCredentials = this.credentialStore,
+        accountProviders = this.accountProviders,
+        directory = f_acc,
+        directoryGraveyard = fAccGraveyard
       )
     }
 
@@ -157,6 +164,8 @@ abstract class AccountsDatabaseContract {
         .filterIsInstance<IOException>()
         .find { ex -> ex.message!!.contains("Could not parse account: ") }
     Assertions.assertTrue(causes != null)
+
+    Assertions.assertEquals(1, fAccGraveyard.list()!!.size)
   }
 
   @Test
@@ -171,16 +180,18 @@ abstract class AccountsDatabaseContract {
     f_acc.mkdirs()
     val f_a = File(f_acc, "64e606e8-e242-4c5f-9bfb-63df11b187bd")
     f_a.mkdirs()
+    val fAccGraveyard = File(f_p, "accounts-graveyard")
 
     val ex = Assertions.assertThrows(AccountsDatabaseException::class.java) {
       AccountsDatabase.open(
-        this.context(),
-        this.accountEvents,
-        this.bookDatabases(),
-        BookFormatsTesting.supportsEverything,
-        this.credentialStore,
-        this.accountProviders,
-        f_acc
+        context = this.context(),
+        accountEvents = this.accountEvents,
+        bookDatabases = this.bookDatabases(),
+        bookFormatSupport = BookFormatsTesting.supportsEverything,
+        accountCredentials = this.credentialStore,
+        accountProviders = this.accountProviders,
+        directory = f_acc,
+        directoryGraveyard = fAccGraveyard
       )
     }
 
@@ -203,19 +214,24 @@ abstract class AccountsDatabaseContract {
     f_acc.mkdirs()
     val f_a = File(f_acc, "0")
     f_a.mkdirs()
+    val fAccGraveyard = File(f_p, "accounts-graveyard")
+    fAccGraveyard.mkdirs()
 
     val f_f = File(f_a, "account.json")
     FileUtilities.fileWriteUTF8(f_f, "} { this is not JSON { } { }")
 
+    Assertions.assertEquals(0, fAccGraveyard.list()!!.size)
+
     val ex = Assertions.assertThrows(AccountsDatabaseException::class.java) {
       AccountsDatabase.open(
-        this.context(),
-        this.accountEvents,
-        this.bookDatabases(),
-        BookFormatsTesting.supportsEverything,
-        this.credentialStore,
-        this.accountProviders,
-        f_acc
+        context = this.context(),
+        accountEvents = this.accountEvents,
+        bookDatabases = this.bookDatabases(),
+        bookFormatSupport = BookFormatsTesting.supportsEverything,
+        accountCredentials = this.credentialStore,
+        accountProviders = this.accountProviders,
+        directory = f_acc,
+        directoryGraveyard = fAccGraveyard
       )
     }
 
@@ -224,6 +240,8 @@ abstract class AccountsDatabaseContract {
         .filterIsInstance<IOException>()
         .find { ex -> ex.message!!.contains("Could not parse account: ") }
     Assertions.assertTrue(causes != null)
+
+    Assertions.assertEquals(1, fAccGraveyard.list()!!.size)
   }
 
   @Test
@@ -235,15 +253,17 @@ abstract class AccountsDatabaseContract {
     val f_p = File(fileProfiles, "0")
     f_p.mkdirs()
     val f_acc = File(f_p, "accounts")
+    val fAccGraveyard = File(f_p, "accounts-graveyard")
 
     val db = AccountsDatabase.open(
-      this.context(),
-      this.accountEvents,
-      this.bookDatabases(),
-      BookFormatsTesting.supportsEverything,
-      this.credentialStore,
-      this.accountProviders,
-      f_acc
+      context = this.context(),
+      accountEvents = this.accountEvents,
+      bookDatabases = this.bookDatabases(),
+      bookFormatSupport = BookFormatsTesting.supportsEverything,
+      accountCredentials = this.credentialStore,
+      accountProviders = this.accountProviders,
+      directory = f_acc,
+      directoryGraveyard = fAccGraveyard
     )
 
     Assertions.assertEquals(0, db.accounts().size.toLong())
@@ -259,18 +279,20 @@ abstract class AccountsDatabaseContract {
     val f_p = File(fileProfiles, "0")
     f_p.mkdirs()
     val f_acc = File(f_p, "accounts")
+    val fAccGraveyard = File(f_p, "accounts-graveyard")
 
     val accountProviders =
       MockAccountProviders.fakeAccountProviders()
 
     val db = AccountsDatabase.open(
-      this.context(),
-      this.accountEvents,
-      this.bookDatabases(),
-      BookFormatsTesting.supportsEverything,
-      this.credentialStore,
-      this.accountProviders,
-      f_acc
+      context = this.context(),
+      accountEvents = this.accountEvents,
+      bookDatabases = this.bookDatabases(),
+      bookFormatSupport = BookFormatsTesting.supportsEverything,
+      accountCredentials = this.credentialStore,
+      accountProviders = this.accountProviders,
+      directory = f_acc,
+      directoryGraveyard = fAccGraveyard
     )
 
     val provider0 =
@@ -305,16 +327,18 @@ abstract class AccountsDatabaseContract {
     val f_p = File(fileProfiles, "0")
     f_p.mkdirs()
     val f_acc = File(f_p, "accounts")
+    val fAccGraveyard = File(f_p, "accounts-graveyard")
 
     val db =
       AccountsDatabase.open(
-        this.context(),
-        this.accountEvents,
-        this.bookDatabases(),
-        BookFormatsTesting.supportsEverything,
-        this.credentialStore,
-        this.accountProviders,
-        f_acc
+        context = this.context(),
+        accountEvents = this.accountEvents,
+        bookDatabases = this.bookDatabases(),
+        bookFormatSupport = BookFormatsTesting.supportsEverything,
+        accountCredentials = this.credentialStore,
+        accountProviders = this.accountProviders,
+        directory = f_acc,
+        directoryGraveyard = fAccGraveyard
       )
 
     val provider0 =
@@ -336,15 +360,17 @@ abstract class AccountsDatabaseContract {
     val f_p = File(fileProfiles, "0")
     f_p.mkdirs()
     val f_acc = File(f_p, "accounts")
+    val fAccGraveyard = File(f_p, "accounts-graveyard")
 
     val db0 = AccountsDatabase.open(
-      this.context(),
-      this.accountEvents,
-      this.bookDatabases(),
-      BookFormatsTesting.supportsEverything,
-      this.credentialStore,
-      this.accountProviders,
-      f_acc
+      context = this.context(),
+      accountEvents = this.accountEvents,
+      bookDatabases = this.bookDatabases(),
+      bookFormatSupport = BookFormatsTesting.supportsEverything,
+      accountCredentials = this.credentialStore,
+      accountProviders = this.accountProviders,
+      directory = f_acc,
+      directoryGraveyard = fAccGraveyard
     )
 
     val provider0 =
@@ -356,13 +382,14 @@ abstract class AccountsDatabaseContract {
     val acc1 = db0.createAccount(provider1)
 
     val db1 = AccountsDatabase.open(
-      this.context(),
-      this.accountEvents,
-      this.bookDatabases(),
-      BookFormatsTesting.supportsEverything,
-      this.credentialStore,
-      this.accountProviders,
-      f_acc
+      context = this.context(),
+      accountEvents = this.accountEvents,
+      bookDatabases = this.bookDatabases(),
+      bookFormatSupport = BookFormatsTesting.supportsEverything,
+      accountCredentials = this.credentialStore,
+      accountProviders = this.accountProviders,
+      directory = f_acc,
+      directoryGraveyard = fAccGraveyard
     )
 
     val acr0 = db1.accounts()[acc0.id]!!
@@ -385,15 +412,17 @@ abstract class AccountsDatabaseContract {
     val f_p = File(fileProfiles, "0")
     f_p.mkdirs()
     val f_acc = File(f_p, "accounts")
+    val fAccGraveyard = File(f_p, "accounts-graveyard")
 
     val db0 = AccountsDatabase.open(
-      this.context(),
-      this.accountEvents,
-      this.bookDatabases(),
-      BookFormatsTesting.supportsEverything,
-      this.credentialStore,
-      this.accountProviders,
-      f_acc
+      context = this.context(),
+      accountEvents = this.accountEvents,
+      bookDatabases = this.bookDatabases(),
+      bookFormatSupport = BookFormatsTesting.supportsEverything,
+      accountCredentials = this.credentialStore,
+      accountProviders = this.accountProviders,
+      directory = f_acc,
+      directoryGraveyard = fAccGraveyard
     )
 
     val provider0 =
@@ -438,15 +467,17 @@ abstract class AccountsDatabaseContract {
     val f_p = File(fileProfiles, "0")
     f_p.mkdirs()
     val f_acc = File(f_p, "accounts")
+    val fAccGraveyard = File(f_p, "accounts-graveyard")
 
     val db0 = AccountsDatabase.open(
-      this.context(),
-      this.accountEvents,
-      this.bookDatabases(),
-      BookFormatsTesting.supportsEverything,
-      this.credentialStore,
-      this.accountProviders,
-      f_acc
+      context = this.context(),
+      accountEvents = this.accountEvents,
+      bookDatabases = this.bookDatabases(),
+      bookFormatSupport = BookFormatsTesting.supportsEverything,
+      accountCredentials = this.credentialStore,
+      accountProviders = this.accountProviders,
+      directory = f_acc,
+      directoryGraveyard = fAccGraveyard
     )
 
     val provider0 =
@@ -470,15 +501,17 @@ abstract class AccountsDatabaseContract {
     val f_p = File(fileProfiles, "0")
     f_p.mkdirs()
     val f_acc = File(f_p, "accounts")
+    val fAccGraveyard = File(f_p, "accounts-graveyard")
 
     val db0 = AccountsDatabase.open(
-      this.context(),
-      this.accountEvents,
-      this.bookDatabases(),
-      BookFormatsTesting.supportsEverything,
-      this.credentialStore,
-      this.accountProviders,
-      f_acc
+      context = this.context(),
+      accountEvents = this.accountEvents,
+      bookDatabases = this.bookDatabases(),
+      bookFormatSupport = BookFormatsTesting.supportsEverything,
+      accountCredentials = this.credentialStore,
+      accountProviders = this.accountProviders,
+      directory = f_acc,
+      directoryGraveyard = fAccGraveyard
     )
 
     val provider0 =

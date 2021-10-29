@@ -24,6 +24,7 @@ interface AccountsDatabaseFactoryType {
    * @param bookFormatSupport The book format support information
    * @param accountAuthenticationCredentialsStore The credentials store
    * @param directory The directory
+   * @param directoryGraveyard The graveyard directory for broken accounts
    * @return A profile database
    * @throws AccountsDatabaseException If any errors occurred whilst trying to open the database
    */
@@ -36,7 +37,8 @@ interface AccountsDatabaseFactoryType {
     bookDatabases: BookDatabaseFactoryType,
     bookFormatSupport: BookFormatSupportType,
     context: Context,
-    directory: File
+    directory: File,
+    directoryGraveyard: File
   ): AccountsDatabaseType
 
   /**
@@ -47,6 +49,7 @@ interface AccountsDatabaseFactoryType {
    * @param accountAuthenticationCredentialsStore The credentials store
    * @param bookFormatSupport The book format support information
    * @param directory The directory
+   * @param directoryGraveyard The graveyard directory for broken accounts
    * @return A profile database
    * @throws AccountsDatabaseException If any errors occurred whilst trying to open the database
    */
@@ -58,6 +61,7 @@ interface AccountsDatabaseFactoryType {
     accountProviders: AccountProviderRegistryType,
     bookFormatSupport: BookFormatSupportType,
     context: Context,
-    directory: File
+    directory: File,
+    directoryGraveyard: File
   ): AccountsDatabaseType
 }

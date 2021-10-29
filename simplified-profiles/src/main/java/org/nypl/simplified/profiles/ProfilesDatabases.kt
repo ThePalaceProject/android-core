@@ -355,7 +355,10 @@ object ProfilesDatabases {
       return null
     }
 
-    val profileAccountsDir = File(profileDir, "accounts")
+    val profileAccountsDir =
+      File(profileDir, "accounts")
+    val profileAccountsGraveyardDir =
+      File(profileDir, "accounts-graveyard")
 
     val accountsDatabase: AccountsDatabaseType =
       try {
@@ -366,7 +369,8 @@ object ProfilesDatabases {
             accountProviders = accountProviders,
             bookFormatSupport = bookFormatSupport,
             context = context,
-            directory = profileAccountsDir
+            directory = profileAccountsDir,
+            directoryGraveyard = profileAccountsGraveyardDir
           )
 
         this.createAutomaticAccounts(
@@ -456,6 +460,8 @@ object ProfilesDatabases {
         File(directory, id.uuid.toString())
       val profileAccountsDir =
         File(profileDir, "accounts")
+      val profileAccountsGraveyardDir =
+        File(profileDir, "accounts-graveyard")
 
       try {
         val accounts =
@@ -465,7 +471,8 @@ object ProfilesDatabases {
             accountProviders = accountProviders,
             bookFormatSupport = bookFormatSupport,
             context = context,
-            directory = profileAccountsDir
+            directory = profileAccountsDir,
+            directoryGraveyard = profileAccountsGraveyardDir
           )
 
         this.createAutomaticAccounts(

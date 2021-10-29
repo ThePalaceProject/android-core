@@ -27,7 +27,8 @@ object AccountsDatabases : AccountsDatabaseFactoryType {
     bookDatabases: BookDatabaseFactoryType,
     bookFormatSupport: BookFormatSupportType,
     context: Context,
-    directory: File
+    directory: File,
+    directoryGraveyard: File
   ): AccountsDatabaseType {
     return AccountsDatabase.open(
       context = context,
@@ -36,7 +37,8 @@ object AccountsDatabases : AccountsDatabaseFactoryType {
       bookFormatSupport = bookFormatSupport,
       accountCredentials = accountAuthenticationCredentialsStore,
       accountProviders = accountProviders,
-      directory = directory
+      directory = directory,
+      directoryGraveyard = directoryGraveyard
     )
   }
 
@@ -47,7 +49,8 @@ object AccountsDatabases : AccountsDatabaseFactoryType {
     accountProviders: AccountProviderRegistryType,
     bookFormatSupport: BookFormatSupportType,
     context: Context,
-    directory: File
+    directory: File,
+    directoryGraveyard: File
   ): AccountsDatabaseType {
     return AccountsDatabase.open(
       context = context,
@@ -56,7 +59,8 @@ object AccountsDatabases : AccountsDatabaseFactoryType {
       bookFormatSupport = bookFormatSupport,
       accountCredentials = accountAuthenticationCredentialsStore,
       accountProviders = accountProviders,
-      directory = directory
+      directory = directory,
+      directoryGraveyard = directoryGraveyard
     )
   }
 }
