@@ -215,8 +215,8 @@ class CatalogButtons(
   ): Button {
     return this.createButton(
       context = this.context,
-      text = R.string.catalogDownload,
-      description = R.string.catalogAccessibilityBookDownload,
+      text = R.string.catalogGet,
+      description = R.string.catalogAccessibilityBookBorrow,
       heightMatchParent = heightMatchParent,
       onClick = onClick
     )
