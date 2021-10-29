@@ -57,6 +57,7 @@ import java.util.concurrent.ConcurrentSkipListMap
 class AccountsDatabase private constructor(
   private val context: Context,
   private val directory: File,
+  private val directoryGraveyard: File,
   private val accountEvents: Subject<AccountEvent>,
   @GuardedBy("accountsLock")
   private val accounts: SortedMap<AccountID, Account>,
@@ -448,9 +449,11 @@ class AccountsDatabase private constructor(
       bookFormatSupport: BookFormatSupportType,
       accountCredentials: AccountAuthenticationCredentialsStoreType,
       accountProviders: AccountProviderRegistryType,
-      directory: File
+      directory: File,
+      directoryGraveyard: File
     ): AccountsDatabaseType {
       this.logger.debug("opening account database: {}", directory)
+      this.logger.debug("graveyard directory is: {}", directoryGraveyard)
 
       val accounts = ConcurrentSkipListMap<AccountID, Account>()
       val accountsByProvider = ConcurrentSkipListMap<URI, Account>()
@@ -477,6 +480,7 @@ class AccountsDatabase private constructor(
         bookFormatSupport = bookFormatSupport,
         context = context,
         directory = directory,
+        directoryGraveyard = directoryGraveyard,
         errors = errors,
         objectMapper = objectMapper
       )
@@ -494,6 +498,7 @@ class AccountsDatabase private constructor(
       return AccountsDatabase(
         context = context,
         directory = directory,
+        directoryGraveyard = directoryGraveyard,
         accountEvents = accountEvents,
         accounts = accounts,
         accountsByProvider = accountsByProvider,
@@ -535,6 +540,7 @@ class AccountsDatabase private constructor(
       bookFormatSupport: BookFormatSupportType,
       context: Context,
       directory: File,
+      directoryGraveyard: File,
       errors: MutableList<Exception>,
       objectMapper: ObjectMapper
     ) {
@@ -554,6 +560,7 @@ class AccountsDatabase private constructor(
               context = context,
               credentialsStore = accountCredentials,
               directory = directory,
+              directoryGraveyard = directoryGraveyard,
               errors = errors,
               objectMapper = objectMapper
             )
@@ -575,13 +582,10 @@ class AccountsDatabase private constructor(
                 .append("\n")
                 .toString()
               this.logger.error("{}", message)
-
-              try {
-                account.delete()
-              } catch (e: AccountsDatabaseIOException) {
-                this.logger.error("could not delete broken account: ", e)
-              }
-
+              this.moveToGraveyard(
+                accountDir = account.directory(),
+                accountGraveyardDir = File(directoryGraveyard, accountIdName)
+              )
               continue
             }
 
@@ -675,6 +679,7 @@ class AccountsDatabase private constructor(
       context: Context,
       credentialsStore: AccountAuthenticationCredentialsStoreType,
       directory: File,
+      directoryGraveyard: File,
       errors: MutableList<Exception>,
       objectMapper: ObjectMapper
     ): Account? {
@@ -682,6 +687,8 @@ class AccountsDatabase private constructor(
         this.openOneAccountDirectory(errors, directory, accountIdName) ?: return null
       val accountDir =
         File(directory, accountId.toString())
+      val accountGraveyardDir =
+        File(directoryGraveyard, accountId.toString())
       val accountFile =
         File(accountDir, "account.json")
       val booksDir =
@@ -737,10 +744,22 @@ class AccountsDatabase private constructor(
       } catch (e: Exception) {
         this.logger.error("could not open account: {}: ", accountFile, e)
         errors.add(IOException("Could not parse account: $accountFile", e))
-        this.logger.debug("deleting {}", accountDir)
-        DirectoryUtilities.directoryDelete(accountDir)
+        this.moveToGraveyard(
+          accountDir = accountDir,
+          accountGraveyardDir = accountGraveyardDir
+        )
         null
       }
+    }
+
+    private fun moveToGraveyard(
+      accountDir: File,
+      accountGraveyardDir: File
+    ) {
+      this.logger.debug("moving {} to account graveyard {}", accountDir, accountGraveyardDir)
+
+      DirectoryUtilities.directoryCreate(accountGraveyardDir.parentFile)
+      FileUtilities.fileRename(accountDir, accountGraveyardDir)
     }
 
     /**
