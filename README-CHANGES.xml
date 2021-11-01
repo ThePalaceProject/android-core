@@ -95,7 +95,7 @@
         <c:change date="2021-09-28T00:00:00+00:00" summary="Fix long chapter titles overlapping elapsed/total time displays in audiobook player"/>
         <c:change date="2021-09-30T00:00:00+00:00" summary="Add support for featured libraries"/>
         <c:change date="2021-09-30T00:00:00+00:00" summary="Add icons and descriptions to Add Library screen"/>
-        <c:change date="2021-09-30T00:00:00+00:00" summary="Add book loan duration to buttons"/>
+        <c:change date="2021-09-30T00:00:00+00:00" summary="Add remaining loan duration to bookshelf buttons"/>
         <c:change date="2021-10-01T00:00:00+00:00" summary="Change order of reader menu icons to TOC, Settings, Bookmarks"/>
         <c:change date="2021-10-01T00:00:00+00:00" summary="Add back button to reader toolbar"/>
         <c:change date="2021-10-06T00:00:00+00:00" summary="Rename 'Books' tab to 'My Books"/>
@@ -104,17 +104,15 @@
         <c:change date="2021-10-06T00:00:00+00:00" summary="Add 'Show' button to filter My Books by loan status"/>
         <c:change date="2021-10-07T00:00:00+00:00" summary="Always show progress bar when reading a book"/>
         <c:change date="2021-10-07T00:00:00+00:00" summary="Prevent page size from changing when the reader toolbar is shown and hidden"/>
-        <c:change date="2021-10-12T00:00:00+00:00" summary="Updated libraries logo loading to be asynchronous"/>
-        <c:change date="2021-10-15T00:00:00+00:00" summary="Added portrait screen orientation to AudioBookActivity on manifest"/>
-        <c:change date="2021-10-20T00:00:00+00:00" summary="Adjusted catalog buttons dimension to prevent weird UI displaying"/>
-        <c:change date="2021-10-21T00:00:00+00:00" summary="Fixed crash when tapping to enable debug options"/>
-        <c:change date="2021-10-23T00:00:00+00:00" summary="Added back button to the Audiobook details screen"/>
-        <c:change date="2021-10-25T00:00:00+00:00" summary="Changed &quot;switch library&quot; language to &quot;find your library&quot;"/>
-        <c:change date="2021-10-25T00:00:00+00:00" summary="Implemented swipe-to-refresh in catalog feeds"/>
+        <c:change date="2021-10-15T00:00:00+00:00" summary="Prevent audiobook player from changing screen orientation (as this can stop the book from playing)"/>
+        <c:change date="2021-10-21T00:00:00+00:00" summary="Fix crash when tapping to enable debug options"/>
+        <c:change date="2021-10-23T00:00:00+00:00" summary="Add back button to the Audiobook details screen"/>
+        <c:change date="2021-10-25T00:00:00+00:00" summary="Change &quot;switch library&quot; language to &quot;find your library&quot;"/>
+        <c:change date="2021-10-25T00:00:00+00:00" summary="Implement swipe-to-refresh in catalog feeds"/>
         <c:change date="2021-10-25T00:00:00+00:00" summary="Correctly use Open Sans in the toolbar"/>
-        <c:change date="2021-10-25T00:00:00+00:00" summary="Library logos are now clickable links"/>
-        <c:change date="2021-10-26T00:00:00+00:00" summary="Fixed send report button not opening the action options"/>
-        <c:change date="2021-10-29T18:42:54+00:00" summary="Fixed UI buttons inconsistency"/>
+        <c:change date="2021-10-25T00:00:00+00:00" summary="Make library logos clickable links"/>
+        <c:change date="2021-10-26T00:00:00+00:00" summary="Fix send report button not performing any action"/>
+        <c:change date="2021-10-29T18:42:54+00:00" summary="Change 'Download' button label to 'Get'"/>
       </c:changes>
     </c:release>
   </c:releases>
