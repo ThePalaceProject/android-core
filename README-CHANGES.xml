@@ -50,7 +50,7 @@
         <c:change date="2021-09-10T00:00:00+00:00" summary="Introduced a new color scheme for the application."/>
       </c:changes>
     </c:release>
-    <c:release date="2021-11-01T20:10:11+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.0.3">
+    <c:release date="2021-11-01T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.0.3">
       <c:changes>
         <c:change date="2021-07-14T00:00:00+00:00" summary="Improve fixed-layout EPUB handling.">
           <c:tickets>
@@ -114,6 +114,9 @@
         <c:change date="2021-10-26T00:00:00+00:00" summary="Fix send report button not performing any action"/>
         <c:change date="2021-10-29T00:00:00+00:00" summary="Change 'Download' button label to 'Get'"/>
       </c:changes>
+    </c:release>
+    <c:release date="2021-11-02T17:44:44+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.4">
+      <c:changes/>
     </c:release>
   </c:releases>
   <c:ticket-systems>
