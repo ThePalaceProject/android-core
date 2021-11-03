@@ -576,7 +576,11 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
         }
     }
 
-    val isRevocable = this.viewModel.bookCanBeRevoked && this.buildConfig.allowReturns()
+    val isRevocable = (
+      bookStatus is BookStatus.Loaned.LoanedNotDownloaded ||
+        this.viewModel.bookCanBeRevoked
+      ) && this.buildConfig.allowReturns()
+
     if (isRevocable) {
       this.buttons.addView(this.buttonCreator.createButtonSpace())
       this.buttons.addView(

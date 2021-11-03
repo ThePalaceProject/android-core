@@ -306,23 +306,22 @@ class CatalogPagedViewHolder(
         )
       }
     )
-
-    if (isBookReturnable(book)) {
-      this.idleButtons.addView(this.buttonCreator.createButtonSpace())
-      this.idleButtons.addView(
-        this.buttonCreator.createRevokeLoanButton(
-          onClick = {
-            this.listener.revokeMaybeAuthenticated(book)
-          },
-          heightMatchParent = true
-        )
-      )
-    } else if (isBookDeletable(book)) {
+    if (isBookDeletable(book)) {
       this.idleButtons.addView(this.buttonCreator.createButtonSpace())
       this.idleButtons.addView(
         this.buttonCreator.createDeleteButton(
           onClick = {
             this.listener.delete(this.feedEntry as FeedEntryOPDS)
+          },
+          heightMatchParent = true
+        )
+      )
+    } else {
+      this.idleButtons.addView(this.buttonCreator.createButtonSpace())
+      this.idleButtons.addView(
+        this.buttonCreator.createRevokeLoanButton(
+          onClick = {
+            this.listener.revokeMaybeAuthenticated(book)
           },
           heightMatchParent = true
         )
