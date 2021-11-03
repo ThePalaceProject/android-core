@@ -115,8 +115,10 @@
         <c:change date="2021-10-29T00:00:00+00:00" summary="Change 'Download' button label to 'Get'"/>
       </c:changes>
     </c:release>
-    <c:release date="2021-11-02T17:44:44+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.4">
-      <c:changes/>
+    <c:release date="2021-11-03T15:24:55+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.4">
+      <c:changes>
+        <c:change date="2021-11-03T15:24:55+00:00" summary="Fix a startup crash involving malformed bookmarks"/>
+      </c:changes>
     </c:release>
   </c:releases>
   <c:ticket-systems>
