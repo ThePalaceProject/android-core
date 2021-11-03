@@ -16,6 +16,7 @@ import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle
 import org.nypl.simplified.files.DirectoryUtilities
 import org.nypl.simplified.files.FileUtilities
 import org.nypl.simplified.json.core.JSONParserUtilities
+import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
 import java.lang.IllegalStateException
@@ -191,6 +192,9 @@ internal class DatabaseFormatHandleEPUB internal constructor(
 
   companion object {
 
+    private val logger =
+      LoggerFactory.getLogger(DatabaseFormatHandleEPUB::class.java)
+
     @Throws(IOException::class)
     private fun loadInitial(
       objectMapper: ObjectMapper,
@@ -245,10 +249,15 @@ internal class DatabaseFormatHandleEPUB internal constructor(
       fileLastRead: File
     ): Bookmark? {
       return if (fileLastRead.isFile) {
-        loadLastReadLocation(
-          objectMapper = objectMapper,
-          fileLastRead = fileLastRead
-        )
+        try {
+          loadLastReadLocation(
+            objectMapper = objectMapper,
+            fileLastRead = fileLastRead
+          )
+        } catch (e: Exception) {
+          logger.error("failed to read the last-read location: ", e)
+          null
+        }
       } else {
         null
       }
