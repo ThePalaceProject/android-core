@@ -306,22 +306,23 @@ class CatalogPagedViewHolder(
         )
       }
     )
-    if (isBookDeletable(book)) {
-      this.idleButtons.addView(this.buttonCreator.createButtonSpace())
-      this.idleButtons.addView(
-        this.buttonCreator.createDeleteButton(
-          onClick = {
-            this.listener.delete(this.feedEntry as FeedEntryOPDS)
-          },
-          heightMatchParent = true
-        )
-      )
-    } else {
+
+    if (isBookReturnable(book)) {
       this.idleButtons.addView(this.buttonCreator.createButtonSpace())
       this.idleButtons.addView(
         this.buttonCreator.createRevokeLoanButton(
           onClick = {
             this.listener.revokeMaybeAuthenticated(book)
+          },
+          heightMatchParent = true
+        )
+      )
+    } else if (isBookDeletable(book)) {
+      this.idleButtons.addView(this.buttonCreator.createButtonSpace())
+      this.idleButtons.addView(
+        this.buttonCreator.createDeleteButton(
+          onClick = {
+            this.listener.delete(this.feedEntry as FeedEntryOPDS)
           },
           heightMatchParent = true
         )
@@ -609,8 +610,10 @@ class CatalogPagedViewHolder(
     return try {
       if (account.bookDatabase.books().contains(book.id)) {
         when (val status = BookStatus.fromBook(book)) {
-          is BookStatus.Loaned ->
+          is BookStatus.Loaned.LoanedDownloaded ->
             status.returnable
+          is BookStatus.Loaned.LoanedNotDownloaded ->
+            true
           else ->
             false
         }
