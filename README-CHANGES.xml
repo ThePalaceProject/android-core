@@ -116,6 +116,14 @@
       </c:changes>
     </c:release>
     <c:release date="2021-11-02T17:44:44+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.4">
+        <c:change date="2021-09-22T00:00:00+00:00" summary="Implement dark mode">
+          <c:tickets>
+            <c:ticket id="SMA-220"/>
+            <c:ticket id="SMA-221"/>
+            <c:ticket id="SMA-222"/>
+            <c:ticket id="SMA-223"/>
+          </c:tickets>
+        </c:change>
       <c:changes/>
     </c:release>
   </c:releases>

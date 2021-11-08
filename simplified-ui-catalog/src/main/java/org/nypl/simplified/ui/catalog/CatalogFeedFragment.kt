@@ -3,7 +3,6 @@ package org.nypl.simplified.ui.catalog
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
@@ -26,7 +25,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -861,7 +859,6 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
       }
 
       button.text = facet.title
-      button.setTextColor(this.colorStateListForFacetTabs())
       button.setOnClickListener {
         this.logger.debug("selected entry point facet: {}", facet.title)
         this.viewModel.openFacet(facet)
@@ -885,24 +882,6 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
         facetTabs.check(button.id)
       }
     }
-  }
-
-  private fun colorStateListForFacetTabs(): ColorStateList {
-    val activity = this.requireActivity()
-
-    val states =
-      arrayOf(
-        intArrayOf(android.R.attr.state_checked),
-        intArrayOf(-android.R.attr.state_checked)
-      )
-
-    val colors =
-      intArrayOf(
-        ContextCompat.getColor(activity, R.color.neutralColorBackground),
-        ContextCompat.getColor(activity, R.color.neutralColorPrimary)
-      )
-
-    return ColorStateList(states, colors)
   }
 
   private fun showFacetSelectDialog(

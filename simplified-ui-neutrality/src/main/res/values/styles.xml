@@ -25,7 +25,7 @@
     The default theme that has no action bar.
   -->
 
-  <style name="NeutralTheme_NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+  <style name="NeutralTheme_NoActionBar" parent="SimplifiedTheme.NoActionBar">
     <item name="android:fontFamily">@font/open_sans_regular</item>
 
     <item name="colorPrimary">@color/neutralColorPrimary</item>
@@ -51,7 +51,7 @@
     The default theme that has an action bar.
   -->
 
-  <style name="NeutralTheme_ActionBar" parent="Theme.AppCompat.Light">
+  <style name="NeutralTheme_ActionBar" parent="SimplifiedTheme.ActionBar">
     <item name="android:fontFamily">@font/open_sans_regular</item>
 
     <item name="colorPrimary">@color/neutralColorPrimary</item>

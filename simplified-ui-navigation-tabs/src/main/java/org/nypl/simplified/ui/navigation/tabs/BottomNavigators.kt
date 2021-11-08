@@ -1,9 +1,7 @@
 package org.nypl.simplified.ui.navigation.tabs
 
 import android.content.Context
-import android.content.res.ColorStateList
 import androidx.annotation.IdRes
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomnavigation.LabelVisibilityMode
@@ -89,8 +87,6 @@ object BottomNavigators {
         instanceOwner = fragment
       )
 
-    navigationView.itemIconTintList = colorStateListForTabs(context)
-    navigationView.itemTextColor = colorStateListForTabs(context)
     navigationView.labelVisibilityMode = LabelVisibilityMode.LABEL_VISIBILITY_LABELED
 
     return navigator
@@ -152,22 +148,6 @@ object BottomNavigators {
       isSearchResults = false,
       title = context.getString(R.string.tabCatalog)
     )
-  }
-
-  private fun colorStateListForTabs(context: Context): ColorStateList {
-    val states =
-      arrayOf(
-        intArrayOf(android.R.attr.state_checked),
-        intArrayOf(-android.R.attr.state_checked)
-      )
-
-    val colors =
-      intArrayOf(
-        ContextCompat.getColor(context, R.color.neutralColor),
-        ContextCompat.getColor(context, R.color.neutralColorShade)
-      )
-
-    return ColorStateList(states, colors)
   }
 
   private fun createSettingsFragment(id: Int): Fragment {

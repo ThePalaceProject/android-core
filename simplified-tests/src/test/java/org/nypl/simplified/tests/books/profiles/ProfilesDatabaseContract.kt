@@ -1201,6 +1201,7 @@ abstract class ProfilesDatabaseContract {
 
     val pro0 = db0.currentProfileUnsafe()
 
+    // Palace automatically deletes the default account, so we need to create an initial account.
     val acc0p = MockAccountProviders.fakeProvider("urn:fake:1")
     val acc0 = pro0.createAccount(acc0p)
 

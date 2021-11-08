@@ -7,29 +7,22 @@ import kotlinx.coroutines.launch
 import org.nypl.simplified.cardcreator.model.Username
 import org.nypl.simplified.cardcreator.model.ValidateUsernameResponse
 import org.nypl.simplified.cardcreator.network.CardCreatorService
-import org.slf4j.LoggerFactory
-import retrofit2.HttpException
+import org.nypl.simplified.cardcreator.utils.Channel
 
-class UsernameViewModel : ViewModel() {
+class UsernameViewModel(
+  private val cardCreatorService: CardCreatorService
+) : ViewModel() {
 
-  private val logger = LoggerFactory.getLogger(UsernameViewModel::class.java)
+  val pendingRequest = MutableLiveData(false)
 
-  val validateUsernameResponse = MutableLiveData<ValidateUsernameResponse>()
-  val apiError = MutableLiveData<Int?>()
+  val validateUsernameResponse = Channel<ValidateUsernameResponse>()
 
-  fun validateUsername(username: String, authUsername: String, authPassword: String) {
+  fun validateUsername(username: String) {
     viewModelScope.launch {
-      try {
-        val cardCreatorService = CardCreatorService(authUsername, authPassword)
-        val response = cardCreatorService.validateUsername(Username(username))
-        validateUsernameResponse.postValue(response)
-      } catch (e: Exception) {
-        logger.error("validateUsername call failed!", e)
-        when (e) {
-          is HttpException -> { apiError.postValue(e.code()) }
-          else -> { apiError.postValue(null) }
-        }
-      }
+      pendingRequest.value = true
+      val response = cardCreatorService.validateUsername(Username(username))
+      validateUsernameResponse.send(response)
+      pendingRequest.value = false
     }
   }
 }
