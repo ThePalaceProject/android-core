@@ -13,4 +13,11 @@ sealed class MainFragmentState {
    */
 
   object CatalogWaitingForLogin : MainFragmentState()
+
+  /**
+   * Book details required the patron to be logged in.
+   */
+
+  object BookDetailsWaitingForLogin : MainFragmentState()
+
 }

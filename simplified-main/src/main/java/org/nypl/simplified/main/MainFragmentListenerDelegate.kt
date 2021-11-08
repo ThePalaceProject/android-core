@@ -208,7 +208,7 @@ internal class MainFragmentListenerDelegate(
     return when (event) {
       is CatalogBookDetailEvent.LoginRequired -> {
         this.openSettingsAccount(event.account, showPleaseLogInTitle = true)
-        MainFragmentState.CatalogWaitingForLogin
+        MainFragmentState.BookDetailsWaitingForLogin
       }
       is CatalogBookDetailEvent.OpenErrorPage -> {
         this.openErrorPage(event.parameters)
@@ -283,11 +283,18 @@ internal class MainFragmentListenerDelegate(
   ): MainFragmentState {
     return when (event) {
       AccountDetailEvent.LoginSucceeded ->
-        if (state is MainFragmentState.CatalogWaitingForLogin) {
-          this.openCatalog()
-          MainFragmentState.EmptyState
-        } else {
-          state
+        when (state) {
+            is MainFragmentState.CatalogWaitingForLogin -> {
+              this.openCatalog()
+              MainFragmentState.EmptyState
+            }
+          is MainFragmentState.BookDetailsWaitingForLogin -> {
+            this.returnToCatalogTab()
+            MainFragmentState.EmptyState
+          }
+          else -> {
+            state
+          }
         }
       is AccountDetailEvent.OpenErrorPage -> {
         this.openErrorPage(event.parameters)
@@ -576,6 +583,10 @@ internal class MainFragmentListenerDelegate(
   private fun openCatalog() {
     this.navigator.popBackStack()
     this.navigator.reset(R.id.tabCatalog, false)
+  }
+
+  private fun returnToCatalogTab() {
+    this.navigator.goToTab(R.id.tabCatalog)
   }
 
   private fun openViewer(
