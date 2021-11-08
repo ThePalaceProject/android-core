@@ -19,5 +19,4 @@ sealed class MainFragmentState {
    */
 
   object BookDetailsWaitingForLogin : MainFragmentState()
-
 }

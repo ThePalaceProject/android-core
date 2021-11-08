@@ -284,10 +284,10 @@ internal class MainFragmentListenerDelegate(
     return when (event) {
       AccountDetailEvent.LoginSucceeded ->
         when (state) {
-            is MainFragmentState.CatalogWaitingForLogin -> {
-              this.openCatalog()
-              MainFragmentState.EmptyState
-            }
+          is MainFragmentState.CatalogWaitingForLogin -> {
+            this.openCatalog()
+            MainFragmentState.EmptyState
+          }
           is MainFragmentState.BookDetailsWaitingForLogin -> {
             this.returnToCatalogTab()
             MainFragmentState.EmptyState
