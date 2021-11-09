@@ -282,20 +282,29 @@ internal class ProfileFeedTask(
         values.filter { book -> book.book.account == accountID }
       } else {
         values
-      }.filter {
-        this.accountIsLoggedIn(it.book.account)
+      }.filter { bookStatus ->
+        if (!this.requiresLogin(bookStatus.book.account)) {
+          bookStatus.status is BookStatus.Loaned.LoanedDownloaded
+        } else {
+          this.accountIsLoggedIn(bookStatus.book.account)
+        }
       }
     return ArrayList(allBooks)
+  }
+
+  private fun requiresLogin(accountID: AccountID): Boolean {
+    return try {
+      val account = this.profiles.profileCurrent().account(accountID)
+      account.provider.authentication.isLoginPossible
+    } catch (e: Exception) {
+      false
+    }
   }
 
   private fun accountIsLoggedIn(accountID: AccountID): Boolean {
     return try {
       val account = this.profiles.profileCurrent().account(accountID)
-      if (!account.provider.authentication.isLoginPossible) {
-        true
-      } else {
-        account.loginState is AccountLoginState.AccountLoggedIn
-      }
+      account.loginState is AccountLoginState.AccountLoggedIn
     } catch (e: Exception) {
       false
     }
