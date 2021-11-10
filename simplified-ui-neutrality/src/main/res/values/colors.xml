@@ -5,4 +5,8 @@
   <color name="neutralColorShade">#b4b4b4</color>
   <color name="neutralColorShadeDark">#878787</color>
   <color name="neutralColor">#000000</color>
+
+  <color name="neutralColorPrimaryLight">@color/neutralColorShade</color>
+  <color name="neutralColorPrimary">@color/neutralColor</color>
+  <color name="neutralColorPrimaryDark">@color/neutralColor</color>
 </resources>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <style name="NeutralTheme.NoActionBar" parent="NeutralTheme.NoActionBar.Base">
+    <item name="simplifiedColorPrimary">@color/neutralColorPrimary</item>
+    <item name="simplifiedColorPrimaryLight">@color/neutralColorPrimaryLight</item>
+    <item name="simplifiedColorPrimaryDark">@color/neutralColorPrimaryDark</item>
+  </style>
+
+  <style name="NeutralTheme.ActionBar" parent="NeutralTheme.ActionBar.Base">
+    <item name="simplifiedColorPrimary">@color/neutralColorPrimary</item>
+    <item name="simplifiedColorPrimaryLight">@color/neutralColorPrimaryLight</item>
+    <item name="simplifiedColorPrimaryDark">@color/neutralColorPrimaryDark</item>
+  </style>
+</resources>

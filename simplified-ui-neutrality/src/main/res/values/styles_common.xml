@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <style name="Neutral.ActionBarTitle" parent="Simplified.ActionBarTitle">
+    <item name="android:textColor">?attr/simplifiedColorText</item>
+    <item name="android:fontFamily">@font/open_sans_regular</item>
+  </style>
+</resources>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <style name="NeutralTheme.NoActionBar.Base" parent="SimplifiedTheme.NoActionBar">
+    <item name="android:fontFamily">@font/open_sans_regular</item>
+    <item name="simplifiedColorNavigationUnselected">@color/neutralColorShade</item>"
+  </style>
+
+  <style name="NeutralTheme.ActionBar.Base" parent="SimplifiedTheme.ActionBar">
+    <item name="android:fontFamily">@font/open_sans_regular</item>
+    <item name="simplifiedColorNavigationUnselected">@color/neutralColorShade</item>"
+  </style>
+</resources>

@@ -4,7 +4,7 @@
   android:id="@+id/bookDetailStatusIdle"
   android:layout_width="match_parent"
   android:layout_height="@dimen/catalogBookDetailStatusHeight"
-  tools:background="?attr/colorPrimary">
+  tools:background="?attr/simplifiedColorBookStatus">
 
   <TextView
     android:id="@+id/idleText"
@@ -16,6 +16,6 @@
     android:gravity="center"
     android:maxLines="2"
     android:textAlignment="center"
-    android:textColor="#fff"
+    android:textColor="@color/white"
     tools:text="@string/catalogPlaceholder" />
 </FrameLayout>
