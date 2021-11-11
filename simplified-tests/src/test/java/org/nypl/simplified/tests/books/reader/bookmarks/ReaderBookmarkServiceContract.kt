@@ -36,7 +36,7 @@ import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
 import org.nypl.simplified.books.book_database.api.BookDatabaseType
 import org.nypl.simplified.books.book_database.api.BookFormats
-import org.nypl.simplified.books.reader.bookmarks.ReaderBookmarkHTTPCalls
+import org.nypl.simplified.books.reader.bookmarks.internal.RBHTTPCalls
 import org.nypl.simplified.profiles.api.ProfileEvent
 import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfileType
@@ -157,6 +157,7 @@ abstract class ReaderBookmarkServiceContract {
   @AfterEach
   fun tearDown() {
     this.readerBookmarkService?.close()
+    this.server.shutdown()
     this.server.close()
   }
 
@@ -171,7 +172,7 @@ abstract class ReaderBookmarkServiceContract {
     this.addResponse("http://www.example.com/patron", this.patronSettingsWithAnnotationsEnabled)
     this.addResponse("http://www.example.com/annotations", this.annotationsEmpty)
 
-    val httpCalls = ReaderBookmarkHTTPCalls(this.objectMapper, this.http)
+    val httpCalls = RBHTTPCalls(this.objectMapper, this.http)
 
     val profileEvents =
       EventLogging.create<ProfileEvent>(this.logger, 1)
@@ -317,7 +318,7 @@ abstract class ReaderBookmarkServiceContract {
     """
     )
 
-    val httpCalls = ReaderBookmarkHTTPCalls(this.objectMapper, this.http)
+    val httpCalls = RBHTTPCalls(this.objectMapper, this.http)
 
     val profileEvents =
       EventLogging.create<ProfileEvent>(this.logger, 1)
@@ -508,7 +509,7 @@ abstract class ReaderBookmarkServiceContract {
 
     this.addResponse("http://www.example.com/annotations", responseText)
 
-    val httpCalls = ReaderBookmarkHTTPCalls(this.objectMapper, this.http)
+    val httpCalls = RBHTTPCalls(this.objectMapper, this.http)
 
     val profileEvents =
       EventLogging.create<ProfileEvent>(this.logger, 1)
@@ -674,7 +675,7 @@ abstract class ReaderBookmarkServiceContract {
   @Timeout(value = 10L, unit = TimeUnit.SECONDS)
   fun testEnableBookmarkSyncingNotSupported() {
     val httpCalls =
-      ReaderBookmarkHTTPCalls(this.objectMapper, this.http)
+      RBHTTPCalls(this.objectMapper, this.http)
     val bookmarkEvents =
       EventLogging.create<ReaderBookmarkEvent>(this.logger, 3)
     val profiles =
@@ -705,7 +706,7 @@ abstract class ReaderBookmarkServiceContract {
   @Timeout(value = 10L, unit = TimeUnit.SECONDS)
   fun testEnableBookmarkSyncingSupportedEnable() {
     val httpCalls =
-      ReaderBookmarkHTTPCalls(this.objectMapper, this.http)
+      RBHTTPCalls(this.objectMapper, this.http)
     val bookmarkEvents =
       EventLogging.create<ReaderBookmarkEvent>(this.logger, 3)
     val profiles =
@@ -754,6 +755,10 @@ abstract class ReaderBookmarkServiceContract {
       this.patronURI.toString(),
       this.patronSettingsWithAnnotationsEnabled
     )
+    this.addResponse(
+      this.annotationsURI.toString(),
+      this.annotationsEmpty
+    )
 
     this.readerBookmarkService =
       this.bookmarkService(
@@ -797,7 +802,7 @@ abstract class ReaderBookmarkServiceContract {
   @Timeout(value = 10L, unit = TimeUnit.SECONDS)
   fun testEnableBookmarkSyncingSupportedDisable() {
     val httpCalls =
-      ReaderBookmarkHTTPCalls(this.objectMapper, this.http)
+      RBHTTPCalls(this.objectMapper, this.http)
     val bookmarkEvents =
       EventLogging.create<ReaderBookmarkEvent>(this.logger, 3)
     val profiles =

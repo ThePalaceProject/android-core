@@ -16,7 +16,7 @@ import org.mockito.Mockito
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountUsername
-import org.nypl.simplified.books.reader.bookmarks.ReaderBookmarkHTTPCalls
+import org.nypl.simplified.books.reader.bookmarks.internal.RBHTTPCalls
 import org.nypl.simplified.reader.bookmarks.api.BookmarkAnnotation
 import org.nypl.simplified.reader.bookmarks.api.BookmarkAnnotationBodyNode
 import org.nypl.simplified.reader.bookmarks.api.BookmarkAnnotationSelectorNode
@@ -25,7 +25,7 @@ import java.io.IOException
 import java.net.URI
 import java.util.concurrent.TimeUnit
 
-class ReaderBookmarkHTTPCallsTest {
+class RBHTTPCallsTest {
 
   private lateinit var http: LSHTTPClientType
   private lateinit var server: MockWebServer
@@ -35,7 +35,7 @@ class ReaderBookmarkHTTPCallsTest {
     serverResponseText: String
   ) {
     val objectMapper = ObjectMapper()
-    val calls = ReaderBookmarkHTTPCalls(objectMapper, this.http)
+    val calls = RBHTTPCalls(objectMapper, this.http)
 
     val credentials =
       AccountAuthenticationCredentials.Basic(
@@ -64,7 +64,7 @@ class ReaderBookmarkHTTPCallsTest {
     serverResponseText: String
   ) {
     val objectMapper = ObjectMapper()
-    val calls = ReaderBookmarkHTTPCalls(objectMapper, this.http)
+    val calls = RBHTTPCalls(objectMapper, this.http)
 
     val credentials =
       AccountAuthenticationCredentials.Basic(
@@ -287,7 +287,7 @@ class ReaderBookmarkHTTPCallsTest {
   @Test
   fun testGetSyncingFailure0() {
     val objectMapper = ObjectMapper()
-    val calls = ReaderBookmarkHTTPCalls(objectMapper, this.http)
+    val calls = RBHTTPCalls(objectMapper, this.http)
 
     val credentials =
       AccountAuthenticationCredentials.Basic(
@@ -315,7 +315,7 @@ class ReaderBookmarkHTTPCallsTest {
   @Test
   fun testGetBookmarksFailure0() {
     val objectMapper = ObjectMapper()
-    val calls = ReaderBookmarkHTTPCalls(objectMapper, this.http)
+    val calls = RBHTTPCalls(objectMapper, this.http)
 
     val credentials =
       AccountAuthenticationCredentials.Basic(
@@ -343,7 +343,7 @@ class ReaderBookmarkHTTPCallsTest {
   @Test
   fun testAddBookmarksFailure0() {
     val objectMapper = ObjectMapper()
-    val calls = ReaderBookmarkHTTPCalls(objectMapper, this.http)
+    val calls = RBHTTPCalls(objectMapper, this.http)
 
     val credentials =
       AccountAuthenticationCredentials.Basic(
