@@ -118,7 +118,7 @@
     <c:release date="2021-11-08T22:36:45+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.4">
       <c:changes>
         <c:change date="2021-11-03T00:00:00+00:00" summary="Fix a startup crash involving malformed bookmarks"/>
-        <c:change date="2021-11-08T22:36:45+00:00" summary="Changed user redirect screen to a book details screen  after logging in from there"/>
+        <c:change date="2021-11-08T22:36:45+00:00" summary="Return to book details after logging in while borrowing a book"/>
       </c:changes>
     </c:release>
   </c:releases>
