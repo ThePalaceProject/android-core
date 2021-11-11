@@ -15,6 +15,7 @@ import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetPseudo.FilteringForAccou
 import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetPseudo.Sorting
 import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetPseudo.Sorting.SortBy
 import org.nypl.simplified.feeds.api.FeedSearch
+import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
 import org.nypl.simplified.profiles.controller.api.ProfileFeedRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.slf4j.LoggerFactory
@@ -283,28 +284,19 @@ internal class ProfileFeedTask(
       } else {
         values
       }.filter { bookStatus ->
-        if (!this.requiresLogin(bookStatus.book.account)) {
-          bookStatus.status is BookStatus.Loaned.LoanedDownloaded
-        } else {
-          this.accountIsLoggedIn(bookStatus.book.account)
-        }
+        this.accountIsLoggedIn(bookStatus.book.account) || (
+          bookStatus.book.entry.availability is OPDSAvailabilityOpenAccess &&
+            bookStatus.status is BookStatus.Loaned.LoanedDownloaded
+          )
       }
     return ArrayList(allBooks)
-  }
-
-  private fun requiresLogin(accountID: AccountID): Boolean {
-    return try {
-      val account = this.profiles.profileCurrent().account(accountID)
-      account.provider.authentication.isLoginPossible
-    } catch (e: Exception) {
-      false
-    }
   }
 
   private fun accountIsLoggedIn(accountID: AccountID): Boolean {
     return try {
       val account = this.profiles.profileCurrent().account(accountID)
-      account.loginState is AccountLoginState.AccountLoggedIn
+      account.provider.authentication.isLoginPossible &&
+        account.loginState is AccountLoginState.AccountLoggedIn
     } catch (e: Exception) {
       false
     }
