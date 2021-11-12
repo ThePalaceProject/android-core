@@ -28,7 +28,7 @@ class CatalogButtons(
 ) {
 
   private fun colorStateListForButtonItems(): ColorStateList? {
-    return ContextCompat.getColorStateList(context, R.color.simplified_button_text);
+    return ContextCompat.getColorStateList(context, R.color.simplified_button_text)
   }
 
   @UiThread
