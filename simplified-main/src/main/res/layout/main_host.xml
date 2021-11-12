@@ -8,6 +8,7 @@
 
   <org.nypl.simplified.ui.neutrality.NeutralToolbar
     android:id="@+id/mainToolbar"
+    android:theme="?android:attr/actionBarTheme"
     android:layout_width="match_parent"
     android:layout_height="wrap_content" />
 
