@@ -224,10 +224,14 @@ class CatalogFeedViewModel(
       }
     }
 
-    when (event.statusNow) {
-      is BookStatus.Held, is BookStatus.Loaned, is BookStatus.Revoked -> {
-        if (this.state.arguments.isLocallyGenerated) {
-          this.reloadFeed()
+    if (event is BookStatusEvent.BookStatusEventRemoved && this.state.arguments.isLocallyGenerated) {
+      this.reloadFeed()
+    } else {
+      when (event.statusNow) {
+        is BookStatus.Held, is BookStatus.Loaned, is BookStatus.Revoked -> {
+          if (this.state.arguments.isLocallyGenerated) {
+            this.reloadFeed()
+          }
         }
       }
     }
