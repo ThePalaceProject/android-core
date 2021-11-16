@@ -116,8 +116,10 @@ class CatalogBookDetailViewModel(
 
     if (account.bookDatabase.books().contains(book.id)) {
       when (val status = this.bookWithStatus.status) {
-        is BookStatus.Loaned ->
+        is BookStatus.Loaned.LoanedDownloaded ->
           status.returnable
+        is BookStatus.Loaned.LoanedNotDownloaded ->
+          true
         else ->
           false
       }

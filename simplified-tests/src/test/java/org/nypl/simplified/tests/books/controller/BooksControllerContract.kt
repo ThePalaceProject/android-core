@@ -87,6 +87,7 @@ import java.io.InputStream
 import java.net.URI
 import java.util.ArrayList
 import java.util.Collections
+import java.util.NoSuchElementException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -757,10 +758,7 @@ abstract class BooksControllerContract {
     val result = controller.bookDelete(account.id, bookId).get()
     result as TaskResult.Success
 
-    val newStatus = this.bookRegistry.bookOrException(bookId).status
-    newStatus as BookStatus.Loaned.LoanedNotDownloaded
-
-    assertThrows<Exception> { account.bookDatabase.entry(bookId) }
+    assertThrows<NoSuchElementException> { this.bookRegistry.bookOrException(bookId).status }
   }
 
   /**
