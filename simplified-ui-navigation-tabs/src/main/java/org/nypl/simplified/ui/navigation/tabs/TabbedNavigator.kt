@@ -56,6 +56,10 @@ class TabbedNavigator private constructor (private val navigator: BottomNavigato
     this.navigator.addFragment(fragment, tab)
   }
 
+  fun goToTab(@IdRes tab: Int) {
+    this.navigator.switchTab(tab)
+  }
+
   fun reset(@IdRes tab: Int, resetRootFragment: Boolean) {
     this.navigator.reset(tab, resetRootFragment)
   }
