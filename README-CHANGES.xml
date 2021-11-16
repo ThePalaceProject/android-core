@@ -126,6 +126,7 @@
         <c:change date="2021-11-12T05:39:10+00:00" summary="Change reader toolbar color to black on white."/>
         <c:change date="2021-11-16T16:18:33+00:00" summary="Added return option to all loaned books"/>
         <c:change date="2021-11-16T16:03:02+00:00" summary="Fixed Palace books not being removed from 'My Books' when they're returned"/>
+        <c:change date="2021-11-16T15:38:27+00:00" summary="Updated catalog feed groups UI"/>
       </c:changes>
     </c:release>
   </c:releases>

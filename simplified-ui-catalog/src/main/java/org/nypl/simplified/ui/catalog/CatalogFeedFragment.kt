@@ -3,7 +3,6 @@ package org.nypl.simplified.ui.catalog
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
@@ -832,7 +831,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
       val button = RadioButton(this.requireContext())
       val buttonLayout =
         LinearLayout.LayoutParams(
-          this.screenInformation.dpToPixels(160).toInt(),
+          0,
           ViewGroup.LayoutParams.MATCH_PARENT,
           1.0f / size.toFloat()
         )
@@ -849,19 +848,11 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
 
       button.id = View.generateViewId()
 
-      if (index == 0) {
-        button.setBackgroundResource(R.drawable.catalog_facet_tab_button_background_left)
-        button.setButtonDrawable(R.drawable.catalog_facet_tab_button_background_left)
-      } else if (index == size - 1) {
-        button.setBackgroundResource(R.drawable.catalog_facet_tab_button_background_right)
-        button.setButtonDrawable(R.drawable.catalog_facet_tab_button_background_right)
-      } else {
-        button.setBackgroundResource(R.drawable.catalog_facet_tab_button_background_middle)
-        button.setButtonDrawable(R.drawable.catalog_facet_tab_button_background_middle)
-      }
+      button.setBackgroundResource(R.drawable.catalog_facet_tab_button_background)
+      button.setButtonDrawable(R.drawable.catalog_facet_tab_button_background)
 
       button.text = facet.title
-      button.setTextColor(this.colorStateListForFacetTabs())
+      button.setTextColor(ContextCompat.getColor(this.requireContext(), R.color.neutralColorPrimary))
       button.setOnClickListener {
         this.logger.debug("selected entry point facet: {}", facet.title)
         this.viewModel.openFacet(facet)
@@ -885,24 +876,6 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
         facetTabs.check(button.id)
       }
     }
-  }
-
-  private fun colorStateListForFacetTabs(): ColorStateList {
-    val activity = this.requireActivity()
-
-    val states =
-      arrayOf(
-        intArrayOf(android.R.attr.state_checked),
-        intArrayOf(-android.R.attr.state_checked)
-      )
-
-    val colors =
-      intArrayOf(
-        ContextCompat.getColor(activity, R.color.neutralColorBackground),
-        ContextCompat.getColor(activity, R.color.neutralColorPrimary)
-      )
-
-    return ColorStateList(states, colors)
   }
 
   private fun showFacetSelectDialog(
