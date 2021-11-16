@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-  <color name="neutralColorPrimaryLight">@color/neutralColorShade</color>
+  <color name="neutralColorPrimaryLight">#E0E1E1</color>
   <color name="neutralColorPrimary">@color/neutralColor</color>
   <color name="neutralColorPrimaryDark">@color/neutralColor</color>
   <color name="neutralColorDisabled">@color/neutralColorShade</color>
