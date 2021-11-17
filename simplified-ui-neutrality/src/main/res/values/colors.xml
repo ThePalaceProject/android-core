@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-  <color name="neutralColorShadeLight">#e1e1e1</color>
+  <color name="neutralColorShadeLight">#e0e1e1</color>
   <color name="neutralColorShade">#b4b4b4</color>
   <color name="neutralColorShadeDark">#878787</color>
   <color name="neutralColor">#000000</color>

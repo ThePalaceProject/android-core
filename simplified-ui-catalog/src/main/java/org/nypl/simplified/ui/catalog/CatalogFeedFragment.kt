@@ -3,6 +3,7 @@ package org.nypl.simplified.ui.catalog
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
@@ -25,6 +26,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -830,7 +832,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
       val button = RadioButton(this.requireContext())
       val buttonLayout =
         LinearLayout.LayoutParams(
-          this.screenInformation.dpToPixels(160).toInt(),
+          0,
           ViewGroup.LayoutParams.MATCH_PARENT,
           1.0f / size.toFloat()
         )
@@ -847,18 +849,13 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
 
       button.id = View.generateViewId()
 
-      if (index == 0) {
-        button.setBackgroundResource(R.drawable.catalog_facet_tab_button_background_left)
-        button.setButtonDrawable(R.drawable.catalog_facet_tab_button_background_left)
-      } else if (index == size - 1) {
-        button.setBackgroundResource(R.drawable.catalog_facet_tab_button_background_right)
-        button.setButtonDrawable(R.drawable.catalog_facet_tab_button_background_right)
-      } else {
-        button.setBackgroundResource(R.drawable.catalog_facet_tab_button_background_middle)
-        button.setButtonDrawable(R.drawable.catalog_facet_tab_button_background_middle)
-      }
+      button.setBackgroundResource(R.drawable.catalog_facet_tab_button_background)
+      button.setButtonDrawable(R.drawable.catalog_facet_tab_button_background)
 
       button.text = facet.title
+      button.setTextColor(
+        ContextCompat.getColor(this.requireContext(), R.color.simplified_button_text)
+      )
       button.setOnClickListener {
         this.logger.debug("selected entry point facet: {}", facet.title)
         this.viewModel.openFacet(facet)

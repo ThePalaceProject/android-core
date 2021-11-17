@@ -4,13 +4,13 @@
     <item name="android:actionBarTheme">@style/Neutral.ActionBarTheme</item>
     <item name="android:fontFamily">@font/open_sans_regular</item>
     <item name="simplifiedColorControlActionBar">?attr/simplifiedColorText</item>
-    <item name="simplifiedColorNavigationUnselected">@color/neutralColorShade</item>"
+    <item name="simplifiedColorNavigationUnselected">@color/neutralColorShade</item>
   </style>
 
   <style name="NeutralTheme.ActionBar.Base" parent="SimplifiedTheme.ActionBar">
     <item name="android:actionBarTheme">@style/Neutral.ActionBarTheme</item>
     <item name="android:fontFamily">@font/open_sans_regular</item>
     <item name="simplifiedColorControlActionBar">?attr/simplifiedColorText</item>
-    <item name="simplifiedColorNavigationUnselected">@color/neutralColorShade</item>"
+    <item name="simplifiedColorNavigationUnselected">@color/neutralColorShade</item>
   </style>
 </resources>

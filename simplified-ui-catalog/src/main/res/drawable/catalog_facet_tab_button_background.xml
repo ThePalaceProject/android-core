@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:state_checked="true">
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/catalogFacetTabCornerRadius" />
+            <solid android:color="?attr/simplifiedColorBackground" />
+            <stroke android:width="@dimen/catalogFacetTabStroke" android:color="?attr/simplifiedColorSegmentedControlBackground" />
+        </shape>
+    </item>
+
+</selector>

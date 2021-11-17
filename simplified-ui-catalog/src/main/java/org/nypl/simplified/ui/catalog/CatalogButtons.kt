@@ -91,7 +91,7 @@ class CatalogButtons(
     loanDuration: String,
     onClick: () -> Unit
   ): LinearLayout {
-    return createButtonWithDuration(loanDuration, R.string.catalogDownload, onClick)
+    return createButtonWithDuration(loanDuration, R.string.catalogGet, onClick)
   }
 
   @UiThread

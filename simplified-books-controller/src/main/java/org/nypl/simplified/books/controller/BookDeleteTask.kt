@@ -5,8 +5,6 @@ import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.book_database.api.BookDatabaseException
 import org.nypl.simplified.books.book_registry.BookRegistryType
-import org.nypl.simplified.books.book_registry.BookStatus
-import org.nypl.simplified.books.book_registry.BookWithStatus
 import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
@@ -36,10 +34,8 @@ class BookDeleteTask(
 
     return try {
       val entry = account.bookDatabase.entry(this.bookID)
-      val newBook = entry.book.copy(formats = emptyList())
       entry.delete()
-      val status = BookStatus.fromBook(newBook)
-      this.bookRegistry.update(BookWithStatus(entry.book, status))
+      this.bookRegistry.clearFor(entry.book.id)
       this.taskRecorder.finishSuccess(Unit)
     } catch (e: Exception) {
       this.taskRecorder.currentStepFailed(
