@@ -3,7 +3,6 @@ package org.nypl.simplified.ui.catalog
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
@@ -860,6 +859,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
         this.logger.debug("selected entry point facet: {}", facet.title)
         this.viewModel.openFacet(facet)
       }
+      button.setPadding(0, 0, 0, 0)
       facetTabs.addView(button)
     }
 
