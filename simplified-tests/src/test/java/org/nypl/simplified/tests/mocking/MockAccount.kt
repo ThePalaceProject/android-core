@@ -9,11 +9,15 @@ import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.book_database.api.BookDatabaseType
+import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URI
 import java.util.UUID
 
 class MockAccount(override val id: AccountID) : AccountType {
+
+  private val logger =
+    LoggerFactory.getLogger(MockAccount::class.java)
 
   @Volatile
   private var preferencesCurrent: AccountPreferences =
@@ -33,6 +37,7 @@ class MockAccount(override val id: AccountID) : AccountType {
     get() = this.bookDatabaseProperty
 
   override fun setPreferences(preferences: AccountPreferences) {
+    this.logger.debug("setPreferences: {}", preferences)
     this.preferencesCurrent = preferences
   }
 

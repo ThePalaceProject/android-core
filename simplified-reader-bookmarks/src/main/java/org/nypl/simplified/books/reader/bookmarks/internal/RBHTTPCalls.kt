@@ -198,11 +198,14 @@ class RBHTTPCalls(
   }
 
   private fun deserializeSyncingEnabledFromJSONObject(node: ObjectNode): Boolean {
-    val settings = JSONParserUtilities.getObject(node, "settings")
-
-    return if (settings.has("simplified:synchronize_annotations")) {
-      val text: String? = settings.get("simplified:synchronize_annotations").asText()
-      text == "true"
+    val settings = JSONParserUtilities.getObjectOrNull(node, "settings")
+    return if (settings != null) {
+      if (settings.has("simplified:synchronize_annotations")) {
+        val text: String? = settings.get("simplified:synchronize_annotations").asText()
+        text == "true"
+      } else {
+        false
+      }
     } else {
       false
     }
