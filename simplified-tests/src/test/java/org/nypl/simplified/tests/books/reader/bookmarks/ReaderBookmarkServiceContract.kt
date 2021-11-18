@@ -71,6 +71,7 @@ abstract class ReaderBookmarkServiceContract {
   private val objectMapper = ObjectMapper()
   private var readerBookmarkService: ReaderBookmarkServiceType? = null
   private lateinit var server: MockWebServer
+  private lateinit var serverDispatcher: EndpointDispatcher
   private lateinit var http: LSHTTPClientType
   private lateinit var annotationsURI: URI
   private lateinit var patronURI: URI
@@ -124,8 +125,9 @@ abstract class ReaderBookmarkServiceContract {
     uri: String,
     response: String
   ) {
-    this.server.enqueue(
-      MockResponse()
+    this.serverDispatcher.addResponse(
+      endpoint = uri,
+      response = MockResponse()
         .setResponseCode(200)
         .setBody(response)
     )
@@ -157,6 +159,8 @@ abstract class ReaderBookmarkServiceContract {
     this.server.start(
       InetAddress.getByName("127.0.0.1"), 10000
     )
+    this.serverDispatcher = EndpointDispatcher()
+    this.server.dispatcher = this.serverDispatcher
     this.annotationsURI =
       URI.create("http://localhost:10000/annotations")
     this.patronURI =
@@ -178,8 +182,8 @@ abstract class ReaderBookmarkServiceContract {
   @Test
   @Timeout(value = 10L, unit = TimeUnit.SECONDS)
   fun testInitializeEmpty() {
-    this.addResponse("http://www.example.com/patron", this.patronSettingsWithAnnotationsEnabled)
-    this.addResponse("http://www.example.com/annotations", this.annotationsEmpty)
+    this.addResponse("/patron", this.patronSettingsWithAnnotationsEnabled)
+    this.addResponse("/annotations", this.annotationsEmpty)
 
     val httpCalls = RBHTTPCalls(this.objectMapper, this.http)
 
@@ -300,10 +304,10 @@ abstract class ReaderBookmarkServiceContract {
   @Test
   @Timeout(value = 5L, unit = TimeUnit.SECONDS)
   fun testInitializeReceive() {
-    this.addResponse("http://www.example.com/patron", this.patronSettingsWithAnnotationsEnabled)
+    this.addResponse("/patron", this.patronSettingsWithAnnotationsEnabled)
 
     this.addResponse(
-      "http://www.example.com/annotations",
+      "/annotations",
       """
     {
        "id" : "http://www.example.com/annotations/",
@@ -497,7 +501,7 @@ abstract class ReaderBookmarkServiceContract {
   @Test
   @Timeout(value = 5L, unit = TimeUnit.SECONDS)
   fun testInitializeSendBookmarks() {
-    this.addResponse("http://www.example.com/patron", this.patronSettingsWithAnnotationsEnabled)
+    this.addResponse("/patron", this.patronSettingsWithAnnotationsEnabled)
 
     val responseText = """
     {
@@ -536,7 +540,7 @@ abstract class ReaderBookmarkServiceContract {
     }
     """
 
-    this.addResponse("http://www.example.com/annotations", responseText)
+    this.addResponse("/annotations", responseText)
 
     val httpCalls = RBHTTPCalls(this.objectMapper, this.http)
 
@@ -657,7 +661,10 @@ abstract class ReaderBookmarkServiceContract {
     this.readerBookmarkService =
       this.bookmarkService(::Thread, bookmarkEvents.events, httpCalls, profiles)
 
-    bookmarkEvents.latch.await()
+    this.waitForServiceQuiescence(
+      this.readerBookmarkService!!,
+      MockProfilesController(1, 1)
+    )
 
     EventAssertions.isTypeAndMatches(
       ReaderBookmarkEvent.ReaderBookmarkSyncStarted::class.java,

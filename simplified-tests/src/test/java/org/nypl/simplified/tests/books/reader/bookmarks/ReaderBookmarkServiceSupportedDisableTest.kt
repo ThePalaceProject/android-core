@@ -69,6 +69,7 @@ class ReaderBookmarkServiceSupportedDisableTest {
   private lateinit var http: LSHTTPClientType
   private lateinit var annotationsURI: URI
   private lateinit var patronURI: URI
+  private lateinit var serverDispatcher: EndpointDispatcher
 
   private val annotationsEmpty = """
 {
@@ -110,8 +111,9 @@ class ReaderBookmarkServiceSupportedDisableTest {
     uri: String,
     response: String
   ) {
-    this.server.enqueue(
-      MockResponse()
+    this.serverDispatcher.addResponse(
+      endpoint = uri,
+      response = MockResponse()
         .setResponseCode(200)
         .setBody(response)
     )
@@ -143,6 +145,8 @@ class ReaderBookmarkServiceSupportedDisableTest {
     this.server.start(
       InetAddress.getByName("127.0.0.1"), 10000
     )
+    this.serverDispatcher = EndpointDispatcher()
+    this.server.dispatcher = this.serverDispatcher
     this.annotationsURI =
       URI.create("http://localhost:10000/annotations")
     this.patronURI =
@@ -204,11 +208,11 @@ class ReaderBookmarkServiceSupportedDisableTest {
      */
 
     this.addResponse(
-      this.patronURI.toString(),
+      this.patronURI.path,
       this.patronSettingsWithAnnotationsEnabled
     )
     this.addResponse(
-      this.annotationsURI.toString(),
+      this.annotationsURI.path,
       this.annotationsEmpty
     )
 
@@ -218,11 +222,15 @@ class ReaderBookmarkServiceSupportedDisableTest {
      */
 
     this.addResponse(
-      this.patronURI.toString(),
+      this.patronURI.path,
       this.patronSettingsWithAnnotationsDisabled
     )
     this.addResponse(
-      this.patronURI.toString(),
+      this.patronURI.path,
+      this.patronSettingsWithAnnotationsDisabled
+    )
+    this.addResponse(
+      this.patronURI.path,
       this.patronSettingsWithAnnotationsDisabled
     )
 
