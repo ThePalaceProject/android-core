@@ -27,6 +27,7 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.setPadding
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -859,7 +860,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
         this.logger.debug("selected entry point facet: {}", facet.title)
         this.viewModel.openFacet(facet)
       }
-      button.setPadding(0, 0, 0, 0)
+      button.setPadding(0)
       facetTabs.addView(button)
     }
 
