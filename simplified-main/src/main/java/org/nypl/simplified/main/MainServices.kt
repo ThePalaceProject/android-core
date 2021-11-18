@@ -62,8 +62,8 @@ import org.nypl.simplified.books.covers.BookCoverGeneratorType
 import org.nypl.simplified.books.covers.BookCoverProvider
 import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
-import org.nypl.simplified.books.reader.bookmarks.ReaderBookmarkHTTPCalls
 import org.nypl.simplified.books.reader.bookmarks.ReaderBookmarkService
+import org.nypl.simplified.books.reader.bookmarks.internal.RBHTTPCalls
 import org.nypl.simplified.boot.api.BootEvent
 import org.nypl.simplified.boot.api.BootFailureTesting
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
@@ -415,7 +415,7 @@ internal object MainServices {
       ReaderBookmarkServiceProviderType.Requirements(
         threads = threadFactory,
         events = PublishSubject.create(),
-        httpCalls = ReaderBookmarkHTTPCalls(ObjectMapper(), http),
+        httpCalls = RBHTTPCalls(ObjectMapper(), http),
         profilesController = bookController
       )
     )

@@ -107,7 +107,7 @@ object BookmarkJSON {
       location = location,
       time = timeParsed,
       chapterTitle = JSONParserUtilities.getString(node, "chapterTitle"),
-      bookProgress = JSONParserUtilities.getDouble(node, "bookProgress"),
+      bookProgress = JSONParserUtilities.getDoubleDefault(node, "bookProgress", 0.0),
       uri = this.toNullable(JSONParserUtilities.getURIOptional(node, "uri")),
       deviceID = JSONParserUtilities.getStringDefault(node, "deviceID", null)
     )

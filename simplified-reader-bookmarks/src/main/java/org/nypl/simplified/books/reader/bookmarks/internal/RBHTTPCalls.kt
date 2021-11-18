@@ -1,4 +1,4 @@
-package org.nypl.simplified.books.reader.bookmarks
+package org.nypl.simplified.books.reader.bookmarks.internal
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -25,12 +25,12 @@ import java.net.URI
  * A minimal class around the various annotations and user profile REST calls.
  */
 
-class ReaderBookmarkHTTPCalls(
+class RBHTTPCalls(
   private val objectMapper: ObjectMapper,
   private val http: LSHTTPClientType
 ) : ReaderBookmarkHTTPCallsType {
 
-  private val logger = LoggerFactory.getLogger(ReaderBookmarkHTTPCalls::class.java)
+  private val logger = LoggerFactory.getLogger(RBHTTPCalls::class.java)
 
   override fun bookmarksGet(
     annotationsURI: URI,
@@ -43,14 +43,15 @@ class ReaderBookmarkHTTPCalls(
         .setAuthorization(auth)
         .build()
 
-    val response = request.execute()
-    return when (val status = response.status) {
-      is LSHTTPResponseStatus.Responded.OK ->
-        this.deserializeBookmarksFromStream(status.bodyStream ?: this.emptyStream())
-      is LSHTTPResponseStatus.Responded.Error ->
-        this.logAndFail(annotationsURI, status)
-      is LSHTTPResponseStatus.Failed ->
-        throw status.exception
+    return request.execute().use { response ->
+      when (val status = response.status) {
+        is LSHTTPResponseStatus.Responded.OK ->
+          this.deserializeBookmarksFromStream(status.bodyStream ?: this.emptyStream())
+        is LSHTTPResponseStatus.Responded.Error ->
+          this.logAndFail(annotationsURI, status)
+        is LSHTTPResponseStatus.Failed ->
+          throw status.exception
+      }
     }
   }
 
@@ -66,16 +67,17 @@ class ReaderBookmarkHTTPCalls(
         .setMethod(Delete)
         .build()
 
-    val response = request.execute()
-    return when (val status = response.status) {
-      is LSHTTPResponseStatus.Responded.OK -> {
-        this.deserializeBookmarksFromStream(status.bodyStream ?: this.emptyStream())
-        Unit
+    return request.execute().use { response ->
+      when (val status = response.status) {
+        is LSHTTPResponseStatus.Responded.OK -> {
+          this.deserializeBookmarksFromStream(status.bodyStream ?: this.emptyStream())
+          Unit
+        }
+        is LSHTTPResponseStatus.Responded.Error ->
+          this.logAndFail(bookmarkURI, status)
+        is LSHTTPResponseStatus.Failed ->
+          throw status.exception
       }
-      is LSHTTPResponseStatus.Responded.Error ->
-        this.logAndFail(bookmarkURI, status)
-      is LSHTTPResponseStatus.Failed ->
-        throw status.exception
     }
   }
 
@@ -98,14 +100,15 @@ class ReaderBookmarkHTTPCalls(
         .setMethod(post)
         .build()
 
-    val response = request.execute()
-    return when (val status = response.status) {
-      is LSHTTPResponseStatus.Responded.OK ->
-        Unit
-      is LSHTTPResponseStatus.Responded.Error ->
-        this.logAndFail(annotationsURI, status)
-      is LSHTTPResponseStatus.Failed ->
-        throw status.exception
+    return request.execute().use { response ->
+      when (val status = response.status) {
+        is LSHTTPResponseStatus.Responded.OK ->
+          Unit
+        is LSHTTPResponseStatus.Responded.Error ->
+          this.logAndFail(annotationsURI, status)
+        is LSHTTPResponseStatus.Failed ->
+          throw status.exception
+      }
     }
   }
 
@@ -126,14 +129,15 @@ class ReaderBookmarkHTTPCalls(
         .setMethod(put)
         .build()
 
-    val response = request.execute()
-    return when (val status = response.status) {
-      is LSHTTPResponseStatus.Responded.OK ->
-        Unit
-      is LSHTTPResponseStatus.Responded.Error ->
-        this.logAndFail(settingsURI, status)
-      is LSHTTPResponseStatus.Failed ->
-        throw status.exception
+    return request.execute().use { response ->
+      when (val status = response.status) {
+        is LSHTTPResponseStatus.Responded.OK ->
+          Unit
+        is LSHTTPResponseStatus.Responded.Error ->
+          this.logAndFail(settingsURI, status)
+        is LSHTTPResponseStatus.Failed ->
+          throw status.exception
+      }
     }
   }
 
@@ -148,14 +152,15 @@ class ReaderBookmarkHTTPCalls(
         .setAuthorization(auth)
         .build()
 
-    val response = request.execute()
-    return when (val status = response.status) {
-      is LSHTTPResponseStatus.Responded.OK ->
-        this.deserializeSyncingEnabledFromStream(status.bodyStream ?: emptyStream())
-      is LSHTTPResponseStatus.Responded.Error ->
-        this.logAndFail(settingsURI, status)
-      is LSHTTPResponseStatus.Failed ->
-        throw status.exception
+    return request.execute().use { response ->
+      when (val status = response.status) {
+        is LSHTTPResponseStatus.Responded.OK ->
+          this.deserializeSyncingEnabledFromStream(status.bodyStream ?: emptyStream())
+        is LSHTTPResponseStatus.Responded.Error ->
+          this.logAndFail(settingsURI, status)
+        is LSHTTPResponseStatus.Failed ->
+          throw status.exception
+      }
     }
   }
 
@@ -193,11 +198,14 @@ class ReaderBookmarkHTTPCalls(
   }
 
   private fun deserializeSyncingEnabledFromJSONObject(node: ObjectNode): Boolean {
-    val settings = JSONParserUtilities.getObject(node, "settings")
-
-    return if (settings.has("simplified:synchronize_annotations")) {
-      val text: String? = settings.get("simplified:synchronize_annotations").asText()
-      text == "true"
+    val settings = JSONParserUtilities.getObjectOrNull(node, "settings")
+    return if (settings != null) {
+      if (settings.has("simplified:synchronize_annotations")) {
+        val text: String? = settings.get("simplified:synchronize_annotations").asText()
+        text == "true"
+      } else {
+        false
+      }
     } else {
       false
     }
