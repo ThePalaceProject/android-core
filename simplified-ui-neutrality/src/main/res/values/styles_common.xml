@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <style name="Neutral.ActionBarTheme" parent="Simplified.ActionBarTheme">
+    <item name="toolbarStyle">@style/Neutral.ActionBarStyle</item>
+  </style>
+
+  <style name="Neutral.ActionBarStyle" parent="Simplified.ActionBarStyle">
+    <item name="android:background">?attr/simplifiedColorBackground</item>
+    <item name="titleTextAppearance">@style/Neutral.ActionBarTitle</item>
+    <item name="subtitleTextAppearance">@style/Neutral.ActionBarSubtitle</item>
+  </style>
+
+  <style name="Neutral.ActionBarTitle" parent="Simplified.ActionBarTitle">
+    <item name="android:textColor">?attr/simplifiedColorText</item>
+    <item name="android:fontFamily">@font/open_sans_regular</item>
+  </style>
+
+  <style name="Neutral.ActionBarSubtitle" parent="Simplified.ActionBarSubtitle">
+    <item name="android:textColor">?attr/simplifiedColorText</item>
+    <item name="android:fontFamily">@font/open_sans_regular</item>
+  </style>
+</resources>

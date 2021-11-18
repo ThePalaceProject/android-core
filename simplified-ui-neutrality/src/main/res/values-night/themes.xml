@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <style name="NeutralTheme.NoActionBar" parent="NeutralTheme.NoActionBar.Base">
+    <item name="simplifiedColorText">@color/white</item>
+    <item name="simplifiedColorSegmentedControlBackground">?attr/simplifiedColorBookStatus</item>
+  </style>
+
+  <style name="NeutralTheme.ActionBar" parent="NeutralTheme.ActionBar.Base">
+    <item name="simplifiedColorText">@color/white</item>
+    <item name="simplifiedColorSegmentedControlBackground">?attr/simplifiedColorBookStatus</item>
+  </style>
+</resources>

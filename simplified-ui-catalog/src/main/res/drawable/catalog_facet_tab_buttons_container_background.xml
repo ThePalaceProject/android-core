@@ -3,5 +3,5 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
     <corners android:radius="@dimen/catalogFacetTabCornerRadius" />
-    <solid android:color="@color/neutralColorPrimaryLight" />
+    <solid android:color="?attr/simplifiedColorSegmentedControlBackground" />
 </shape>

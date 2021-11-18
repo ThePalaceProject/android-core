@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <style name="NeutralTheme.NoActionBar.Base" parent="SimplifiedTheme.NoActionBar">
+    <item name="android:actionBarTheme">@style/Neutral.ActionBarTheme</item>
+    <item name="android:fontFamily">@font/open_sans_regular</item>
+    <item name="simplifiedColorControlActionBar">?attr/simplifiedColorText</item>
+    <item name="simplifiedColorNavigationUnselected">@color/neutralColorShade</item>
+    <item name="simplifiedColorPrimary">@color/neutralColorPrimary</item>
+    <item name="simplifiedColorPrimaryLight">@color/neutralColorPrimaryLight</item>
+    <item name="simplifiedColorPrimaryDark">@color/neutralColorPrimaryDark</item>
+    <item name="simplifiedColorSegmentedControlBackground">@color/neutralColorShadeLight</item>
+  </style>
+
+  <style name="NeutralTheme.ActionBar.Base" parent="SimplifiedTheme.ActionBar">
+    <item name="android:actionBarTheme">@style/Neutral.ActionBarTheme</item>
+    <item name="android:fontFamily">@font/open_sans_regular</item>
+    <item name="simplifiedColorControlActionBar">?attr/simplifiedColorText</item>
+    <item name="simplifiedColorNavigationUnselected">@color/neutralColorShade</item>
+    <item name="simplifiedColorPrimary">@color/neutralColorPrimary</item>
+    <item name="simplifiedColorPrimaryLight">@color/neutralColorPrimaryLight</item>
+    <item name="simplifiedColorPrimaryDark">@color/neutralColorPrimaryDark</item>
+    <item name="simplifiedColorSegmentedControlBackground">@color/neutralColorShadeLight</item>
+  </style>
+</resources>

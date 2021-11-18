@@ -27,6 +27,7 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.setPadding
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -852,11 +853,14 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
       button.setButtonDrawable(R.drawable.catalog_facet_tab_button_background)
 
       button.text = facet.title
-      button.setTextColor(ContextCompat.getColor(this.requireContext(), R.color.neutralColorPrimary))
+      button.setTextColor(
+        ContextCompat.getColor(this.requireContext(), R.color.simplified_button_text)
+      )
       button.setOnClickListener {
         this.logger.debug("selected entry point facet: {}", facet.title)
         this.viewModel.openFacet(facet)
       }
+      button.setPadding(0)
       facetTabs.addView(button)
     }
 

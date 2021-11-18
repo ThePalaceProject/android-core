@@ -7,10 +7,10 @@
 
   <org.nypl.simplified.ui.neutrality.NeutralToolbar
     android:id="@+id/mainToolbar"
-    style="@style/Neutral.ActionBar"
+    style="@style/Simplified.ActionBarStyle"
     android:layout_width="match_parent"
     android:layout_height="?android:attr/actionBarSize"
-    app:theme="@style/Neutral.Toolbar" />
+    app:theme="@style/Simplified.ActionBarTheme" />
 
   <FrameLayout
     android:id="@+id/fragmentHolder"

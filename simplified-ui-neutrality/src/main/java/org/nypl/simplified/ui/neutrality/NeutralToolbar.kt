@@ -48,7 +48,7 @@ class NeutralToolbar(
 
   init {
     this.iconKind = ICON_IS_LOGO
-    TextViewCompat.setTextAppearance(this.titleView, R.style.Neutral_Toolbar_Title)
+    TextViewCompat.setTextAppearance(this.titleView, R.style.Neutral_ActionBarTitle)
     this.addView(this.titleView, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT))
     this.addView(this.iconView, LayoutParams(this.dpToPixelsIntegral(64), this.dpToPixelsIntegral(64)))
     this.tag = neutralToolbarName

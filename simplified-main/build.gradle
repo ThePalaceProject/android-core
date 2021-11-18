@@ -60,6 +60,7 @@ dependencies {
   api project(":simplified-ui-announcements")
   api project(":simplified-ui-images")
   api project(":simplified-ui-navigation-tabs")
+  api project(":simplified-ui-neutrality")
   api project(":simplified-ui-onboarding")
   api project(":simplified-ui-profiles")
   api project(":simplified-ui-screen")

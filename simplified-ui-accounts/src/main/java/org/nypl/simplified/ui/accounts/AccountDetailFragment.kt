@@ -111,7 +111,6 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   private lateinit var authenticationViews: AccountAuthenticationViews
   private lateinit var bookmarkSync: ViewGroup
   private lateinit var bookmarkSyncCheck: SwitchCompat
-  private lateinit var bookmarkSyncLabel: View
   private lateinit var bookmarkSyncProgress: ProgressBar
   private lateinit var loginButtonErrorDetails: Button
   private lateinit var loginProgress: ViewGroup
@@ -178,8 +177,6 @@ class AccountDetailFragment : Fragment(R.layout.account) {
       view.findViewById(R.id.accountSyncBookmarks)
     this.bookmarkSyncCheck =
       this.bookmarkSync.findViewById(R.id.accountSyncBookmarksCheck)
-    this.bookmarkSyncLabel =
-      this.bookmarkSync.findViewById(R.id.accountSyncBookmarksLabel)
 
     this.loginTitle =
       view.findViewById(R.id.accountTitleAnnounce)
@@ -277,7 +274,6 @@ class AccountDetailFragment : Fragment(R.layout.account) {
 
             this.bookmarkSyncCheck.isChecked = isPermitted
             this.bookmarkSyncCheck.isEnabled = isSupported
-            this.bookmarkSyncLabel.isEnabled = isSupported
 
             this.bookmarkSyncCheck.setOnCheckedChangeListener { _, isChecked ->
               this.viewModel.enableBookmarkSyncing(isChecked)

@@ -26,6 +26,7 @@ dependencies {
   implementation project(":simplified-ui-catalog")
   implementation project(":simplified-ui-errorpage")
   implementation project(":simplified-ui-images")
+  implementation project(":simplified-ui-neutrality")
   implementation project(":simplified-ui-profiles")
   implementation project(":simplified-ui-screen")
   implementation project(":simplified-ui-settings")
@@ -49,6 +50,7 @@ dependencies {
   implementation libs.leak.canary
   implementation libs.logback.android
   implementation libs.mockito.android
+  implementation libs.nypl.theme
   implementation libs.pandora.bottom.navigator
   implementation libs.slf4j
 }

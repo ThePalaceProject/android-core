@@ -92,6 +92,7 @@ dependencies {
   implementation libs.nypl.http.vanilla
   implementation libs.nypl.readium
   implementation libs.nypl.readium.js
+  implementation libs.nypl.theme
   implementation libs.okhttp3.mockwebserver
   implementation libs.palace.drm.core
   implementation libs.r2.lcp

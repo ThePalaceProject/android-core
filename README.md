@@ -1,9 +1,7 @@
 Library Simplified
 ===
 
-[![Build Status](https://img.shields.io/github/workflow/status/lyrasis/simplye-Android-Core/Android%20CI%20(Authenticated)?style=flat-square)](https://github.com/lyrasis/simplye-Android-Core/actions?query=workflow%3A%22Android+CI+%28Authenticated%29%22)
-<!-- [![Maven Central](https://img.shields.io/maven-central/v/org.librarysimplified/org.librarysimplified.main?style=flat-square)](https://repo1.maven.org/maven2/org/librarysimplified/)
-[![Maven Central (snapshot)](https://img.shields.io/nexus/s/https/oss.sonatype.org/org.librarysimplified/org.librarysimplified.main.svg?style=flat-square)](https://oss.sonatype.org/content/repositories/snapshots/org.librarysimplified/) -->
+[![Build Status](https://img.shields.io/github/workflow/status/ThePalaceProject/android-core/Android%20CI%20(Authenticated)?style=flat-square)](https://github.com/ThePalaceProject/android-core/actions?query=workflow%3A%22Android+CI+%28Authenticated%29%22)
 
 LYRASIS fork of the NYPL's [Library Simplified](http://www.librarysimplified.org/) Android client.
 
@@ -128,21 +126,23 @@ OpenJDK 64-Bit Server VM (build 11.0.8+10, mixed mode)
 
 #### S3 Credentials
 
-The DRM-enabled app uses packages that are only available from our
-Maven repository on S3. If you wish to use these packages, you need to obtain
+Our application can use packages that are only available from our
+S3 bucket. If you wish to use these packages, you need to obtain
 S3 credentials and then tell Gradle to use them.
 
 S3 credentials can be obtained by emailing `Jonathan.Green@lyrasis.org`
 or by asking in the `#palace-project-tech` channel of
 [lyrasis.slack.com](https://lyrasis.slack.com).
 
-Once you have your credentials, the following lines must be added to `$HOME/.gradle/gradle.properties`:
+Once you have your credentials, the following lines must be added to 
+`$HOME/.gradle/gradle.properties`:
 
 ~~~
-# Replace AWS_ACCESS_KEY_ID and AWS_SECRET_KEY appropriately.
+# Replace ACCESS_KEY and SECRET_ACCESS_KEY appropriately.
 # Do NOT use quotes around either value.
-org.thepalaceproject.aws.access_key_id=AWS_ACCESS_KEY_ID
-org.thepalaceproject.aws.secret_access_key=AWS_SECRET_KEY
+org.thepalaceproject.aws.access_key_id=ACCESS_KEY
+org.thepalaceproject.aws.secret_access_key=SECRET_ACCESS_KEY
+org.thepalaceproject.s3.depend=true
 ~~~
 
 #### APK signing
@@ -222,13 +222,8 @@ a Findaway license and want to produce a Findaway-enabled build.
 
 ### Branching/Merging
 
-We use [git flow](https://nvie.com/posts/a-successful-git-branching-model/) as our
-basis for branching and creating releases. We highly recommend installing
-[Git Flow AVH Edition](https://github.com/petervanderdoes/gitflow-avh) to
-automate some of the work of branching and tagging. Using `gitflow-avh`
-is not required, but by automating the underlying repository operations,
-it eliminates the possibility of making mistakes, and keeps the various
-branches consistent.
+All new features should be created on feature branches and merged to `develop` once
+completed.
 
 ### Project Structure / Architecture
 
@@ -429,7 +424,7 @@ _The above table is generated with [ReadMe.java](src/misc/ReadMe.java)._
 
 ### Binaries
 
-Binaries for every commit are built and published in the [binaries](https://github.com/lyrasis/simplye-android-binaries)
+Binaries for every commit are built and published in the [android-binaries](https://github.com/ThePalaceProject/android-binaries)
 repository. Note that these binaries are _not_ to be considered production ready and may have
 undergone little or no testing. Use at your own risk!
 

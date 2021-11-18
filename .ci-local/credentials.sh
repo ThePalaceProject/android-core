@@ -59,6 +59,7 @@ cp "${CREDENTIALS_PATH}/PlayStore/play_store_api_key.json" "simplified-app-palac
 cat >> "${HOME}/.gradle/gradle.properties" <<EOF
 org.thepalaceproject.drm.enabled=true
 
+org.thepalaceproject.s3.depend=true
 org.thepalaceproject.aws.access_key_id=${CI_AWS_ACCESS_ID}
 org.thepalaceproject.aws.secret_access_key=${CI_AWS_SECRET_KEY}
 

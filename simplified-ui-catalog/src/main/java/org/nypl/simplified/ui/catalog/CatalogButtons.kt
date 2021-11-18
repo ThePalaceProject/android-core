@@ -27,20 +27,8 @@ class CatalogButtons(
   private val screenSizeInformation: ScreenSizeInformationType
 ) {
 
-  private fun colorStateListForButtonItems(): ColorStateList {
-    val states =
-      arrayOf(
-        intArrayOf(android.R.attr.state_pressed),
-        intArrayOf(-android.R.attr.state_pressed)
-      )
-
-    val colors =
-      intArrayOf(
-        ContextCompat.getColor(context, R.color.neutralColorBackground),
-        ContextCompat.getColor(context, R.color.neutralColorPrimary)
-      )
-
-    return ColorStateList(states, colors)
+  private fun colorStateListForButtonItems(): ColorStateList? {
+    return ContextCompat.getColorStateList(context, R.color.simplified_button_text)
   }
 
   @UiThread

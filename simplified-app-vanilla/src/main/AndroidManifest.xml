@@ -19,7 +19,7 @@
     android:largeHeap="true"
     android:networkSecurityConfig="@xml/network_security_config"
     android:roundIcon="@mipmap/ic_launcher_round"
-    android:theme="@style/NeutralTheme_NoActionBar"
+    android:theme="@style/NeutralTheme.NoActionBar"
     tools:replace="android:allowBackup">
 
     <!-- Main entry point for the application. -->
@@ -63,7 +63,7 @@
       android:exported="false"
       android:parentActivityName="org.nypl.simplified.main.MainActivity"
       android:screenOrientation="portrait"
-      android:theme="@style/NeutralTheme_NoActionBar" />
+      android:theme="@style/NeutralTheme.NoActionBar" />
 
     <activity
       android:name="org.nypl.simplified.viewer.pdf.PdfReaderActivity"
@@ -73,7 +73,7 @@
       android:name="org.nypl.simplified.viewer.audiobook.AudioBookPlayerActivity"
       android:screenOrientation="portrait"
       android:exported="false"
-      android:theme="@style/NeutralTheme_NoActionBar" />
+      android:theme="@style/NeutralTheme.NoActionBar" />
 
     <activity
       android:name="org.nypl.simplified.cardcreator.CardCreatorActivity"

@@ -29,21 +29,44 @@ plugins {
 
 ext {
   android_build_tools_version = "30.0.2"
-  android_compile_sdk_version = 30
+  android_compile_sdk_version = 31
   android_min_sdk_version = 21
   android_target_sdk_version = 30
 
+  // Required for some dependencies only available from our private S3
+  //
+  nyplS3Depend =
+    project.findProperty('org.thepalaceproject.s3.depend') as Boolean
+  nyplS3AccessKey =
+    project.findProperty('org.thepalaceproject.aws.access_key_id') ?: ''
+  nyplS3SecretKey =
+    project.findProperty('org.thepalaceproject.aws.secret_access_key') ?: ''
+
+  if (nyplS3Depend && !nyplS3AccessKey) {
+    throw new GradleException(
+      """\
+      'org.thepalaceproject.aws.access_key_id' is undefined!
+        ^ required by 'org.thepalaceproject.s3.depend'\
+      """.stripIndent())
+  }
+  if (nyplS3Depend && !nyplS3SecretKey) {
+    throw new GradleException(
+      """\
+      'org.thepalaceproject.aws.secret_access_key' is undefined!
+        ^ required by 'org.thepalaceproject.s3.depend'\
+      """.stripIndent())
+  }
+
+  // Required by some projects to build with drm support
+  //
   nyplDrmEnabled =
     project.findProperty('org.thepalaceproject.drm.enabled') as Boolean
-
-  if (nyplDrmEnabled) {
-    awsAccessKeyId =
-      project.property("org.thepalaceproject.aws.access_key_id")
-    awsSecretKey =
-      project.property("org.thepalaceproject.aws.secret_access_key")
-  } else {
-    awsAccessKeyId = ""
-    awsSecretKey = ""
+  if (nyplDrmEnabled && !nyplS3Depend) {
+    throw new GradleException(
+      """\
+      'org.thepalaceproject.s3.depend' is undefined!
+        ^ required by 'org.thepalaceproject.drm.enabled'\
+      """.stripIndent())
   }
 
   //
@@ -81,10 +104,6 @@ ext {
       throw new GradleException(text);
     }
   }
-}
-
-subprojects {
-
 }
 
 subprojects { project ->
@@ -126,8 +145,6 @@ subprojects { project ->
 
   repositories {
     mavenLocal()
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-    maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
     mavenCentral()
     google()
 
@@ -140,8 +157,8 @@ subprojects { project ->
         name = "S3 Snapshots"
         url = "s3://se-maven-repo/snapshots/"
         credentials(AwsCredentials) {
-          accessKey = awsAccessKeyId
-          secretKey = awsSecretKey
+          accessKey = nyplS3AccessKey
+          secretKey = nyplS3SecretKey
         }
         mavenContent {
           snapshotsOnly()
@@ -152,8 +169,8 @@ subprojects { project ->
         name = "S3 Releases"
         url = "s3://se-maven-repo/releases/"
         credentials(AwsCredentials) {
-          accessKey = awsAccessKeyId
-          secretKey = awsSecretKey
+          accessKey = nyplS3AccessKey
+          secretKey = nyplS3SecretKey
         }
         mavenContent {
           releasesOnly()
@@ -176,11 +193,12 @@ subprojects { project ->
       }
     }
 
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
     maven {
       url "http://maven.findawayworld.com/artifactory/libs-release/"
       allowInsecureProtocol true
     }
-
     maven { url "https://jitpack.io" }
     jcenter()
   }
@@ -243,4 +261,11 @@ static Integer calculateVersionCode(Project project) {
   // Seconds since 2021-03-15 09:20:00 UTC
   def nowReduced = nowSeconds - 1615800000
   return nowReduced
+}
+
+task listrepos {
+    doLast {
+        println "Repositories:"
+        project.repositories.each { println "Name: " + it.name + "; url: " + it.url }
+   }
 }
