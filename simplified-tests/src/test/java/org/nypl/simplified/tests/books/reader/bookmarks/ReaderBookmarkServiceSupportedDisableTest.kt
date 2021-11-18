@@ -202,18 +202,9 @@ class ReaderBookmarkServiceSupportedDisableTest {
       )
     )
 
-    /*
-     * The service checks to see if the patron has syncing enabled. As it is initially enabled,
-     * there'll be a request for bookmarks right after.
-     */
-
     this.addResponse(
       this.patronURI.path,
       this.patronSettingsWithAnnotationsEnabled
-    )
-    this.addResponse(
-      this.annotationsURI.path,
-      this.annotationsEmpty
     )
 
     /*
@@ -258,12 +249,6 @@ class ReaderBookmarkServiceSupportedDisableTest {
         this.matchesEndpoint(request, "/patron")
       }.size > 2,
       "At least two requests made to ${this.patronURI}"
-    )
-    Assertions.assertTrue(
-      allRequests.any { request ->
-        this.matchesEndpoint(request, "/annotations")
-      },
-      "At least one request made to ${this.annotationsURI}"
     )
     Assertions.assertEquals(SYNC_DISABLED, result)
     Assertions.assertEquals(false, account.preferences.bookmarkSyncingPermitted)
