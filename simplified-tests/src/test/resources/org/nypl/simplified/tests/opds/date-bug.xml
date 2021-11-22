@@ -1,0 +1,37 @@
+<entry
+  schema:additionalType="http://schema.org/EBook"
+  xmlns:schema="http://schema.org/"
+  xmlns="http://www.w3.org/2005/Atom"
+  xmlns:bibframe="http://bibframe.org/vocab/"
+  xmlns:dcterms="http://purl.org/dc/terms/"
+  xmlns:opds="http://opds-spec.org/2010/catalog"
+  xmlns:simplified="http://librarysimplified.org/terms/">
+  <title>Anthem</title>
+  <author>
+    <name>Ayn Rand</name>
+    <link href="https://openbookshelf.dp.la/OB/works/contributor/Ayn%20Rand/eng/Adult%2CAdults%2BOnly%2CAll%2BAges%2CChildren%2CYoung%2BAdult" type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="contributor" title="Ayn Rand"/>
+  </author>
+  <summary type="html">&lt;p&gt;Anthem is a dystopian fiction novella by Ayn Rand, first published in 1938. It takes place at some unspecified future date when mankind has entered another dark age as a result of the evils of irrationality and collectivism and the weaknesses of socialistic thinking and economics. Technological advancement is now carefully planned (when it is allowed to occur at all) and the concept of individuality has been eliminated (for example, the word "I" has disappeared from the language). As is common in her work, Rand draws a clear distinction between the "socialist/communal" values of equality and brotherhood and the "productive/capitalist" values of achievement and individuality.&#13;
+    &lt;br /&gt;Many of the novella's core themes, such as the struggle between individualism and collectivism, are echoed in Rand's later books, such as The Fountainhead and Atlas Shrugged. However, the style of "Anthem" is unique among Rand's work, more narrative-centered and economical, lacking the intense didactic expressions of philosophical abstraction that occur in later works. It is probably her most accessible work.&lt;/p&gt;</summary>
+  <simplified:pwid>1bdc8999-d1c2-138f-fd54-b1544ab1e5c8</simplified:pwid>
+  <link href="https://s3.amazonaws.com/open-bookshelf-covers/FeedBooks/URI/http%3A//www.feedbooks.com/book/2837/2837.jpg" type="image/jpeg" rel="http://opds-spec.org/image"/>
+  <link href="https://s3.amazonaws.com/open-bookshelf-covers/scaled/300/FeedBooks/URI/http%3A//www.feedbooks.com/book/2837/2837.png" type="image/png" rel="http://opds-spec.org/image/thumbnail"/>
+  <category term="Adult" scheme="http://schema.org/audience" label="Adult"/>
+  <category term="http://librarysimplified.org/terms/fiction/Fiction" scheme="http://librarysimplified.org/terms/fiction/" label="Fiction"/>
+  <category term="http://librarysimplified.org/terms/genres/Simplified/Science%20Fiction" scheme="http://librarysimplified.org/terms/genres/Simplified/" label="Science Fiction"/>
+  <category term="http://librarysimplified.org/terms/genres/Simplified/Literary%20Fiction" scheme="http://librarysimplified.org/terms/genres/Simplified/" label="Literary Fiction"/>
+  <dcterms:language>en</dcterms:language>
+  <dcterms:issued>1938-05-01</dcterms:issued>
+  <link href="https://openbookshelf.dp.la/OB/works/URI/http://www.feedbooks.com/book/2837/report" rel="issues"/>
+  <id>http://www.feedbooks.com/book/2837</id>
+  <link href="https://openbookshelf.dp.la/OB/works/URI/http://www.feedbooks.com/book/2837" type="application/atom+xml;type=entry;profile=opds-catalog" rel="alternate"/>
+  <bibframe:distribution bibframe:ProviderName="FeedBooks"/>
+  <published>2018-03-25T00:00:00Z</published>
+  <link href="https://openbookshelf.dp.la/OB/feed/411?entrypoint=Book" rel="collection" title="Our Picks"/>
+  <updated>2020-05-02T15:00:55Z</updated>
+  <link href="https://openbookshelf.dp.la/OB/works/9760/fulfill/1" rel="http://opds-spec.org/acquisition/open-access" type="application/epub+zip" dcterms:rights="https://creativecommons.org/licenses/by-nc/4.0">
+    <opds:availability status="available"/>
+  </link>
+  <link href="https://openbookshelf.dp.la/OB/works/URI/http://www.feedbooks.com/book/2837/related_books" type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="related" title="Recommended Works"/>
+  <link href="https://openbookshelf.dp.la/OB/analytics/URI/http://www.feedbooks.com/book/2837/open_book" rel="http://librarysimplified.org/terms/rel/analytics/open-book"/>
+</entry>
