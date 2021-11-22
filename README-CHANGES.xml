@@ -127,7 +127,7 @@
         <c:change date="2021-11-16T00:00:00+00:00" summary="Added return option to all loaned books"/>
         <c:change date="2021-11-16T00:00:00+00:00" summary="Fixed Palace books not being removed from 'My Books' when they're returned"/>
         <c:change date="2021-11-16T00:00:00+00:00" summary="Updated catalog feed groups UI"/>
-        <c:change date="2021-11-17T00:00:00+00:00" summary="Implement dark mode">
+        <c:change date="2021-11-17T00:00:00+00:00" summary="Implemented dark mode">
           <c:tickets>
             <c:ticket id="SMA-220"/>
             <c:ticket id="SMA-221"/>
@@ -136,6 +136,7 @@
           </c:tickets>
         </c:change>
         <c:change date="2021-11-22T13:46:49+00:00" summary="Ensure that dates are parsed correctly as UTC in OPDS feeds"/>
+        <c:change date="2021-11-20T05:22:22+00:00" summary="Enabled dark mode in audiobook player"/>
       </c:changes>
     </c:release>
   </c:releases>
