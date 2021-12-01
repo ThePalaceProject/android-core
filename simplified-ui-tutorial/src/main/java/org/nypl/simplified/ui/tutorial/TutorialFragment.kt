@@ -38,5 +38,4 @@ class TutorialFragment : Fragment(R.layout.tutorial_fragment) {
   private fun closeTutorial() {
     this.listener.post(TutorialEvent.TutorialCompleted)
   }
-
 }

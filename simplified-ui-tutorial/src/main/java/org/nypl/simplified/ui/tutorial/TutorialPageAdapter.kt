@@ -8,17 +8,22 @@ import androidx.recyclerview.widget.RecyclerView
 
 class TutorialPageAdapter : RecyclerView.Adapter<TutorialPageAdapter.TutorialPageViewHolder>() {
 
-  private val images = arrayOf(R.drawable.background_image_tutorial1,
+  private val images = arrayOf(
+    R.drawable.background_image_tutorial1,
     R.drawable.background_image_tutorial2,
-    R.drawable.background_image_tutorial3)
+    R.drawable.background_image_tutorial3
+  )
 
   override fun getItemCount(): Int {
     return this.images.size
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TutorialPageViewHolder {
-    return TutorialPageViewHolder(LayoutInflater.from(parent.context).inflate(
-      R.layout.view_tutorial_page, parent, false))
+    return TutorialPageViewHolder(
+      LayoutInflater.from(parent.context).inflate(
+        R.layout.view_tutorial_page, parent, false
+      )
+    )
   }
 
   override fun onBindViewHolder(holder: TutorialPageViewHolder, position: Int) {
