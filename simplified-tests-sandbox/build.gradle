@@ -32,6 +32,7 @@ dependencies {
   implementation project(":simplified-ui-settings")
   implementation project(":simplified-ui-splash")
   implementation project(":simplified-ui-thread-api")
+  implementation project(":simplified-ui-tutorial")
   implementation project(":simplified-viewer-api")
   implementation project(":simplified-viewer-audiobook")
   implementation project(":simplified-viewer-pdf")

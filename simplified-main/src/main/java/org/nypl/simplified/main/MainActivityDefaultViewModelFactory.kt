@@ -7,6 +7,7 @@ import org.nypl.simplified.ui.onboarding.OnboardingEvent
 import org.nypl.simplified.ui.profiles.ProfileModificationEvent
 import org.nypl.simplified.ui.profiles.ProfileSelectionEvent
 import org.nypl.simplified.ui.splash.SplashEvent
+import org.nypl.simplified.ui.tutorial.TutorialEvent
 
 class MainActivityDefaultViewModelFactory(fallbackFactory: ViewModelProvider.Factory) :
   ListenerRepositoryFactory<MainActivityListenedEvent, Unit>(fallbackFactory) {
@@ -16,6 +17,7 @@ class MainActivityDefaultViewModelFactory(fallbackFactory: ViewModelProvider.Fac
   override fun onListenerRepositoryCreated(repository: ListenerRepository<MainActivityListenedEvent, Unit>) {
     repository.registerListener(SplashEvent::class, MainActivityListenedEvent::SplashEvent)
     repository.registerListener(OnboardingEvent::class, MainActivityListenedEvent::OnboardingEvent)
+    repository.registerListener(TutorialEvent::class, MainActivityListenedEvent::TutorialEvent)
     repository.registerListener(MainFragmentEvent::class, MainActivityListenedEvent::MainFragmentEvent)
     repository.registerListener(ProfileSelectionEvent::class, MainActivityListenedEvent::ProfileSelectionEvent)
     repository.registerListener(ProfileModificationEvent::class, MainActivityListenedEvent::ProfileModificationEvent)

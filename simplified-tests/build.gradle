@@ -64,6 +64,7 @@ dependencies {
   api project(":simplified-ui-branding")
   api project(":simplified-ui-errorpage")
   api project(":simplified-ui-splash")
+  api project(":simplified-ui-tutorial")
   api project(":simplified-webview")
 
   api libs.palace.audiobook.api

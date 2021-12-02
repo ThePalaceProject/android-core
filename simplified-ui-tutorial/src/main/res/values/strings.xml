@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <!-- Accessibility -->
+  <string name="contentDescriptionTutorialPage">Tutorial page</string>
+  <string name="contentDescriptionSkipButton">Skip button</string>
+
+</resources>

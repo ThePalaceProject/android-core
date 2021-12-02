@@ -33,6 +33,8 @@ import org.nypl.simplified.ui.profiles.ProfileSelectionEvent
 import org.nypl.simplified.ui.profiles.ProfileSelectionFragment
 import org.nypl.simplified.ui.splash.SplashEvent
 import org.nypl.simplified.ui.splash.SplashFragment
+import org.nypl.simplified.ui.tutorial.TutorialEvent
+import org.nypl.simplified.ui.tutorial.TutorialFragment
 import org.slf4j.LoggerFactory
 import java.util.ServiceLoader
 
@@ -161,6 +163,8 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     return when (event) {
       is MainActivityListenedEvent.SplashEvent ->
         this.handleSplashEvent(event.event)
+      is MainActivityListenedEvent.TutorialEvent ->
+        this.handleTutorialEvent(event.event)
       is MainActivityListenedEvent.OnboardingEvent ->
         this.handleOnboardingEvent(event.event)
       is MainActivityListenedEvent.MainFragmentEvent ->
@@ -181,6 +185,27 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
   private fun onSplashFinished() {
     this.logger.debug("onSplashFinished")
+
+    val appCache =
+      AppCache(this)
+
+    if (appCache.isTutorialSeen()) {
+      this.onTutorialFinished()
+    } else {
+      this.openTutorial()
+      appCache.setTutorialSeen(true)
+    }
+  }
+
+  private fun handleTutorialEvent(event: TutorialEvent) {
+    return when (event) {
+      TutorialEvent.TutorialCompleted ->
+        this.onTutorialFinished()
+    }
+  }
+
+  private fun onTutorialFinished() {
+    this.logger.debug("onTutorialFinished")
 
     val services =
       Services.serviceDirectory()
@@ -326,6 +351,15 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     this.supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
     this.supportFragmentManager.commit {
       replace(R.id.mainFragmentHolder, splashFragment, "SPLASH_MAIN")
+    }
+  }
+
+  private fun openTutorial() {
+    this.logger.debug("openTutorial")
+    val tutorialFragment = TutorialFragment()
+    this.supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+    this.supportFragmentManager.commit {
+      replace(R.id.mainFragmentHolder, tutorialFragment)
     }
   }
 
