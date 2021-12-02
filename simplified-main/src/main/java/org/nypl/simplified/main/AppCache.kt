@@ -20,16 +20,16 @@ class AppCache internal constructor(private val sharedPreferences: SharedPrefere
   }
 
   /**
-   * Confirms the tutorial was seen
+   * Determines if the tutorial was seen or not
    */
-  fun confirmTutorialWasSeen() {
-    sharedPreferences.edit().putBoolean(KEY_SEEN_TUTORIAL, true).apply()
+  fun setTutorialSeen(seen: Boolean) {
+    sharedPreferences.edit().putBoolean(KEY_SEEN_TUTORIAL, seen).apply()
   }
 
   /**
    * Checks if the tutorial was seen
    */
-  fun wasTutorialSeen(): Boolean {
+  fun isTutorialSeen(): Boolean {
     return sharedPreferences.getBoolean(KEY_SEEN_TUTORIAL, false)
   }
 }

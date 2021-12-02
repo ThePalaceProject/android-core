@@ -189,11 +189,11 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     val appCache =
       AppCache(this)
 
-    if (appCache.wasTutorialSeen()) {
+    if (appCache.isTutorialSeen()) {
       this.onTutorialFinished()
     } else {
       this.openTutorial()
-      appCache.confirmTutorialWasSeen()
+      appCache.setTutorialSeen(true)
     }
   }
 
