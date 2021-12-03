@@ -52,8 +52,6 @@ import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.reader.bookmarks.api.ReaderBookmarkServiceType
 import org.nypl.simplified.ui.thread.api.UIThreadServiceType
 import org.readium.r2.shared.publication.asset.FileAsset
-import org.readium.r2.streamer.Streamer
-import org.readium.r2.streamer.parser.epub.EpubParser
 import org.slf4j.LoggerFactory
 import java.util.ServiceLoader
 import java.util.concurrent.ExecutionException
@@ -240,14 +238,6 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
         provider.create(this)
       }
 
-    val streamer =
-      Streamer(
-        context = this,
-        parsers = listOf(EpubParser()),
-        contentProtections = contentProtections,
-        ignoreDefaultParsers = true
-      )
-
     /*
      * Load the most recently configured theme from the profile's preferences.
      */
@@ -276,7 +266,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       }
 
     return SR2ReaderParameters(
-      streamer = streamer,
+      contentProtections = contentProtections,
       bookFile = bookFile,
       bookId = this.parameters.entry.feedEntry.id,
       theme = initialTheme,
