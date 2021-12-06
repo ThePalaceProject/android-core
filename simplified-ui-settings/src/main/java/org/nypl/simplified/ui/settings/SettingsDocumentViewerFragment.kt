@@ -13,6 +13,7 @@ import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.fragmentListeners
 import org.nypl.simplified.ui.neutrality.NeutralToolbar
 import org.nypl.simplified.ui.settings.databinding.SettingsDocumentViewerBinding
+import org.nypl.simplified.webview.WebViewUtilities
 
 class SettingsDocumentViewerFragment : Fragment() {
 
@@ -39,6 +40,9 @@ class SettingsDocumentViewerFragment : Fragment() {
         webView.webViewClient = WebViewClient()
         webView.webChromeClient = WebChromeClient()
         webView.settings.allowFileAccess = true
+
+        WebViewUtilities.setForcedDark(webView.settings, resources.configuration)
+
         webView.loadUrl(url!!)
       }
     }

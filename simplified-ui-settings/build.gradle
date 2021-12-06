@@ -24,6 +24,7 @@ dependencies {
   implementation project(":simplified-ui-images")
   implementation project(":simplified-ui-neutrality")
   implementation project(':simplified-ui-listeners-api')
+  implementation project(':simplified-webview')
 
   implementation libs.androidx.app.compat
   implementation libs.androidx.constraint.layout
