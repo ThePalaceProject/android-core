@@ -139,6 +139,7 @@
         <c:change date="2021-11-20T00:00:00+00:00" summary="Enabled dark mode in audiobook player"/>
         <c:change date="2021-11-30T00:00:00+00:00" summary="Added 3-step tutorial to be shown when launching the app for the first time"/>
         <c:change date="2021-12-03T00:00:00+00:00" summary="Enabled dark mode in epub reader"/>
+        <c:change date="2021-12-05T11:34:17+00:00" summary="Added page indicator and swipe-to-close feature to tutorial"/>
         <c:change date="2021-12-06T18:31:33+00:00" summary="Fixed documentation failing to display"/>
       </c:changes>
     </c:release>
