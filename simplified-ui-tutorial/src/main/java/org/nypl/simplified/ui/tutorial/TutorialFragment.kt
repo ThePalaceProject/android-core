@@ -80,8 +80,20 @@ class TutorialFragment : Fragment(R.layout.fragment_tutorial) {
 
     tutorialViewPager.registerOnPageChangeCallback(pageChangeCallback)
 
-    TabLayoutMediator(tutorialTabLayout, tutorialViewPager) { _, _ ->
-      // do nothing
+    TabLayoutMediator(tutorialTabLayout, tutorialViewPager) { tab, position ->
+      tab.contentDescription = getString(
+        when (position) {
+          0 -> {
+            R.string.contentDescriptionStep1
+          }
+          1 -> {
+            R.string.contentDescriptionStep2
+          }
+          else -> {
+            R.string.contentDescriptionStep3
+          }
+        }
+      )
     }.attach()
 
     adjustTabLayoutTabMargins()
