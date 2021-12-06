@@ -4,5 +4,8 @@
   <!-- Accessibility -->
   <string name="contentDescriptionTutorialPage">Tutorial page</string>
   <string name="contentDescriptionSkipButton">Skip button</string>
+  <string name="contentDescriptionStep1">Step 1 - Find your library</string>
+  <string name="contentDescriptionStep2">Step 2 - Can\'t find your library? Go to the Palace Bookshelf for more than 10000 free titles that you can enjoy now</string>
+  <string name="contentDescriptionStep3">Step 3 - Read. Listen. Enjoy!</string>
 
 </resources>
