@@ -35,9 +35,12 @@ class SettingsDocumentViewerFragment : Fragment() {
       view.rootView.findViewWithTag(NeutralToolbar.neutralToolbarName)
 
     if (!url.isNullOrBlank()) {
-      binding.documentViewerWebView.webViewClient = WebViewClient()
-      binding.documentViewerWebView.webChromeClient = WebChromeClient()
-      binding.documentViewerWebView.loadUrl(url!!)
+      binding.documentViewerWebView.let { webView ->
+        webView.webViewClient = WebViewClient()
+        webView.webChromeClient = WebChromeClient()
+        webView.settings.allowFileAccess = true
+        webView.loadUrl(url!!)
+      }
     }
   }
 
