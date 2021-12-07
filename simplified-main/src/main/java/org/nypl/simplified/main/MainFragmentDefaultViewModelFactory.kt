@@ -11,6 +11,7 @@ import org.nypl.simplified.ui.accounts.saml20.AccountSAML20Event
 import org.nypl.simplified.ui.catalog.CatalogBookDetailEvent
 import org.nypl.simplified.ui.catalog.CatalogFeedEvent
 import org.nypl.simplified.ui.catalog.saml20.CatalogSAML20Event
+import org.nypl.simplified.ui.errorpage.ErrorPageEvent
 import org.nypl.simplified.ui.profiles.ProfileTabEvent
 import org.nypl.simplified.ui.settings.SettingsDebugEvent
 import org.nypl.simplified.ui.settings.SettingsDocumentViewerEvent
@@ -30,6 +31,7 @@ class MainFragmentDefaultViewModelFactory(fallbackFactory: ViewModelProvider.Fac
     repository.registerListener(AccountListRegistryEvent::class, MainFragmentListenedEvent::AccountListRegistryEvent)
     repository.registerListener(AccountListEvent::class, MainFragmentListenedEvent::AccountListEvent)
     repository.registerListener(AccountPickerEvent::class, MainFragmentListenedEvent::AccountPickerEvent)
+    repository.registerListener(ErrorPageEvent::class, MainFragmentListenedEvent::ErrorPageEvent)
     repository.registerListener(SettingsMainEvent::class, MainFragmentListenedEvent::SettingsMainEvent)
     repository.registerListener(SettingsDebugEvent::class, MainFragmentListenedEvent::SettingsDebugEvent)
     repository.registerListener(SettingsDocumentViewerEvent::class, MainFragmentListenedEvent::SettingsDocumentViewerEvent)

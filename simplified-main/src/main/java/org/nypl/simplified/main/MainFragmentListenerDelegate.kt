@@ -35,6 +35,7 @@ import org.nypl.simplified.ui.catalog.CatalogBookDetailFragment
 import org.nypl.simplified.ui.catalog.CatalogBookDetailFragmentParameters
 import org.nypl.simplified.ui.catalog.CatalogFeedFragment
 import org.nypl.simplified.ui.catalog.saml20.CatalogSAML20Event
+import org.nypl.simplified.ui.errorpage.ErrorPageEvent
 import org.nypl.simplified.ui.errorpage.ErrorPageFragment
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.navigation.tabs.R
@@ -148,6 +149,8 @@ internal class MainFragmentListenerDelegate(
         this.handleAccountSAML20Event(event.event, state)
       is MainFragmentListenedEvent.AccountPickerEvent ->
         this.handleAccountPickerEvent(event.event, state)
+      is MainFragmentListenedEvent.ErrorPageEvent ->
+        this.handleErrorPageEvent(event.event, state)
       is MainFragmentListenedEvent.ProfileTabEvent ->
         this.handleProfileTabEvent(event.event, state)
     }
@@ -342,6 +345,18 @@ internal class MainFragmentListenerDelegate(
       }
       AccountPickerEvent.AddAccount -> {
         this.openSettingsAccountRegistry()
+        state
+      }
+    }
+  }
+
+  private fun handleErrorPageEvent(
+    event: ErrorPageEvent,
+    state: MainFragmentState
+  ): MainFragmentState {
+    return when (event) {
+      ErrorPageEvent.GoUpwards -> {
+        this.goUpwards()
         state
       }
     }
