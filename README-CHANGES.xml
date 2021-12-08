@@ -121,7 +121,7 @@
         <c:change date="2021-11-08T00:00:00+00:00" summary="Return to book details after logging in while borrowing a book"/>
       </c:changes>
     </c:release>
-    <c:release date="2021-12-06T18:31:33+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.5">
+    <c:release date="2021-12-07T19:48:14+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.5">
       <c:changes>
         <c:change date="2021-11-12T00:00:00+00:00" summary="Change reader toolbar color to black on white."/>
         <c:change date="2021-11-16T00:00:00+00:00" summary="Added return option to all loaned books"/>
@@ -139,8 +139,9 @@
         <c:change date="2021-11-20T00:00:00+00:00" summary="Enabled dark mode in audiobook player"/>
         <c:change date="2021-11-30T00:00:00+00:00" summary="Added 3-step tutorial to be shown when launching the app for the first time"/>
         <c:change date="2021-12-03T00:00:00+00:00" summary="Enabled dark mode in epub reader"/>
-        <c:change date="2021-12-05T11:34:17+00:00" summary="Added page indicator and swipe-to-close feature to tutorial"/>
-        <c:change date="2021-12-06T18:31:33+00:00" summary="Fixed documentation failing to display"/>
+        <c:change date="2021-12-05T00:00:00+00:00" summary="Added page indicator and swipe-to-close feature to tutorial"/>
+        <c:change date="2021-12-06T00:00:00+00:00" summary="Fixed documentation failing to display"/>
+        <c:change date="2021-12-07T19:48:14+00:00" summary="Fixed back button not working on Error Details screen."/>
       </c:changes>
     </c:release>
   </c:releases>

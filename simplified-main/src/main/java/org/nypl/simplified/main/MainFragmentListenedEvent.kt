@@ -34,6 +34,10 @@ sealed class MainFragmentListenedEvent {
     val event: org.nypl.simplified.ui.accounts.AccountPickerEvent
   ) : MainFragmentListenedEvent()
 
+  data class ErrorPageEvent(
+    val event: org.nypl.simplified.ui.errorpage.ErrorPageEvent
+  ) : MainFragmentListenedEvent()
+
   data class SettingsMainEvent(
     val event: org.nypl.simplified.ui.settings.SettingsMainEvent
   ) : MainFragmentListenedEvent()

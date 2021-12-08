@@ -13,7 +13,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import org.nypl.simplified.android.ktx.supportActionBar
+import org.nypl.simplified.listeners.api.FragmentListenerType
+import org.nypl.simplified.listeners.api.fragmentListeners
 import org.nypl.simplified.reports.Reports
+import org.nypl.simplified.ui.neutrality.NeutralToolbar
 import org.slf4j.LoggerFactory
 
 /**
@@ -50,6 +53,9 @@ class ErrorPageFragment : Fragment(R.layout.error_page) {
   private lateinit var errorStepsList: RecyclerView
   private lateinit var parameters: ErrorPageParameters
   private lateinit var sendButton: Button
+  private lateinit var toolbar: NeutralToolbar
+
+  private val listener: FragmentListenerType<ErrorPageEvent> by fragmentListeners()
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
@@ -60,6 +66,8 @@ class ErrorPageFragment : Fragment(R.layout.error_page) {
       view.findViewById(R.id.errorSteps)
     this.sendButton =
       view.findViewById(R.id.errorSendButton)
+    this.toolbar =
+      view.rootView.findViewWithTag(NeutralToolbar.neutralToolbarName)
 
     this.parameters =
       this.arguments!!.getSerializable(PARAMETERS_ID)
@@ -112,9 +120,14 @@ class ErrorPageFragment : Fragment(R.layout.error_page) {
   }
 
   private fun configureToolbar() {
-    this.supportActionBar?.apply {
-      title = getString(R.string.errorDetailsTitle)
-      subtitle = null
+    val actionBar = this.supportActionBar ?: return
+
+    actionBar.show()
+    actionBar.setDisplayHomeAsUpEnabled(true)
+    actionBar.setHomeActionContentDescription(null)
+    actionBar.setTitle(getString(R.string.errorDetailsTitle))
+    this.toolbar.setLogoOnClickListener {
+      this.listener.post(ErrorPageEvent.GoUpwards)
     }
   }
 }
