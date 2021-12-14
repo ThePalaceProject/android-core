@@ -2,6 +2,9 @@ package org.nypl.simplified.books.covers
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.widget.ImageView
 import com.google.common.util.concurrent.FluentFuture
 import com.google.common.util.concurrent.SettableFuture
@@ -9,6 +12,7 @@ import com.io7m.jfunctional.OptionType
 import com.io7m.jfunctional.Some
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
+import com.squareup.picasso.Target
 import org.nypl.simplified.books.book_registry.BookRegistryReadableType
 import org.nypl.simplified.books.bundled.api.BundledContentResolverType
 import org.nypl.simplified.feeds.api.FeedEntry
@@ -130,6 +134,54 @@ class BookCoverProvider private constructor(
     return FluentFuture.from(future)
   }
 
+  private fun doLoadCoverAsBitmap(
+    coverURI: URI?,
+    onBitmapLoaded: (Bitmap) -> Unit,
+    defaultResource: Int
+  ) {
+
+    this.picasso
+      .load(coverURI?.toString())
+      .error(defaultResource)
+      .into(object : Target {
+
+        override fun onBitmapLoaded(bitmap: Bitmap, from: Picasso.LoadedFrom) {
+          onBitmapLoaded(bitmap)
+        }
+
+        override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
+          placeHolderDrawable?.let {
+            onBitmapLoaded(getBitmapFromDrawable(it))
+          }
+        }
+
+        override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+          errorDrawable?.let {
+            onBitmapLoaded(getBitmapFromDrawable(it))
+          }
+        }
+      })
+  }
+
+  private fun getBitmapFromDrawable(drawable: Drawable): Bitmap {
+    if (drawable is BitmapDrawable) {
+      if (drawable.bitmap != null) {
+        return drawable.bitmap
+      }
+    }
+
+    val bitmap: Bitmap = if (drawable.intrinsicWidth <= 0 || drawable.intrinsicHeight <= 0) {
+      Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+    } else {
+      Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
+    }
+
+    val canvas = Canvas(bitmap)
+    drawable.setBounds(0, 0, canvas.width, canvas.height)
+    drawable.draw(canvas)
+    return bitmap
+  }
+
   private fun coverURIOf(entry: FeedEntry.FeedEntryOPDS): URI? {
     val bookWithStatus =
       this.bookRegistry.bookOrNull(entry.bookID)
@@ -171,6 +223,18 @@ class BookCoverProvider private constructor(
       height = height,
       tag = coverTag,
       uriSpecified = coverURIOf(entry)
+    )
+  }
+
+  override fun loadCoverAsBitmap(
+    entry: FeedEntry.FeedEntryOPDS,
+    onBitmapLoaded: (Bitmap) -> Unit,
+    defaultResource: Int
+  ) {
+    doLoadCoverAsBitmap(
+      coverURI = coverURIOf(entry),
+      onBitmapLoaded = onBitmapLoaded,
+      defaultResource = defaultResource
     )
   }
 

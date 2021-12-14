@@ -3,6 +3,7 @@ package org.nypl.simplified.viewer.audiobook
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
@@ -692,6 +693,18 @@ class AudioBookPlayerActivity :
 
   override fun onPlayerWantsAuthor(): String {
     return this.bookAuthor
+  }
+
+  override fun onPlayerNotificationWantsSmallIcon(): Int {
+    return R.drawable.main_icon
+  }
+
+  override fun onPlayerNotificationWantsBookCover(onBookCoverLoaded: (Bitmap) -> Unit) {
+    this.covers.loadCoverAsBitmap(
+      FeedEntry.FeedEntryOPDS(this.parameters.accountID, this.parameters.opdsEntry),
+      onBookCoverLoaded,
+      R.drawable.main_icon
+    )
   }
 
   override fun onPlayerWantsCoverImage(view: ImageView) {
