@@ -24,6 +24,7 @@
       android:name="org.nypl.simplified.main.MainActivity"
       android:contentDescription="@string/app_name"
       android:launchMode="singleTop"
+      android:screenOrientation="portrait"
       android:exported="true"
       android:label="@string/app_name">
     <intent-filter>
@@ -66,6 +67,7 @@
       android:name="org.nypl.simplified.viewer.pdf.PdfReaderActivity"
       android:contentDescription="@string/app_name"
       android:exported="false"
+      android:screenOrientation="portrait"
       android:label="@string/app_name" />
 
     <activity
@@ -80,6 +82,7 @@
       android:name="org.nypl.simplified.cardcreator.CardCreatorActivity"
       android:contentDescription="@string/app_name"
       android:exported="false"
+      android:screenOrientation="portrait"
       android:label="@string/app_name" />
 
   </application>
