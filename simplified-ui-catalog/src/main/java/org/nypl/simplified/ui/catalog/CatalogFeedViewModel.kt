@@ -963,12 +963,7 @@ class CatalogFeedViewModel(
   }
 
   fun title(): String {
-    return when (val arguments = this.feedArguments) {
-      is CatalogFeedArgumentsLocalBooks ->
-        arguments.title
-      is CatalogFeedArgumentsRemote ->
-        this.resources.getString(R.string.feedTitleCatalog)
-    }
+    return this.feedArguments.title
   }
 
   private fun openLoginDialogIfNecessary(accountID: AccountID) {
