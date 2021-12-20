@@ -22,21 +22,15 @@ internal class RBServiceOpCheckSyncStatusForAccount(
       this.syncableAccount.account.id
     )
 
-    val syncable =
-      this.checkSyncingIsEnabledForAccount(this.profile, this.syncableAccount)
-
-    this.syncableAccount.account.setPreferences(
-      this.syncableAccount.account.preferences.copy(
-        bookmarkSyncingPermitted = syncable != null
-      )
-    )
+    this.checkSyncingIsEnabledForAccount(this.profile, this.syncableAccount)
   }
 
   private fun checkSyncingIsEnabledForAccount(
     profile: ProfileReadableType,
     account: RBSyncableAccount
-  ): RBSyncableAccount? {
-    return try {
+  ) {
+
+    try {
       this.logger.debug(
         "[{}]: checking account {} has syncing enabled",
         profile.id.uuid,
@@ -49,18 +43,15 @@ internal class RBServiceOpCheckSyncStatusForAccount(
           profile.id.uuid,
           account.account.id
         )
-        account
       } else {
         this.logger.debug(
           "[{}]: account {} does not have syncing enabled",
           profile.id.uuid,
           account.account.id
         )
-        null
       }
     } catch (e: Exception) {
       this.logger.error("error checking account for syncing: ", e)
-      return null
     }
   }
 }
