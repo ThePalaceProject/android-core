@@ -7,20 +7,38 @@
   android:clipToPadding="false"
   android:orientation="vertical">
 
-  <TextView
-    android:id="@+id/feedLaneTitle"
+  <LinearLayout
+    android:id="@+id/feedLaneTitleContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginLeft="16dp"
+    android:layout_marginStart="16dp"
     android:layout_marginTop="16dp"
-    android:layout_marginRight="16dp"
+    android:gravity="center_vertical"
+    android:layout_marginEnd="16dp"
     android:layout_marginBottom="8dp"
-    android:ellipsize="end"
-    android:maxLines="1"
-    android:text="@string/catalogPlaceholder"
-    android:textColor="?attr/simplifiedColorText"
-    android:textSize="18sp"
-    android:textStyle="bold" />
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/feedLaneTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginEnd="16dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="@string/catalogPlaceholder"
+        android:textColor="?attr/simplifiedColorText"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/catalogMore"
+        android:textColor="?attr/simplifiedColorText"
+        android:textSize="14sp" />
+
+  </LinearLayout>
 
   <androidx.recyclerview.widget.RecyclerView
     android:id="@+id/feedLaneCoversScroll"

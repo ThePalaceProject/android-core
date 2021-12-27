@@ -61,6 +61,7 @@
   <string name="catalogMetaPublicationDate">Published</string>
   <string name="catalogMetaPublisher">Publisher</string>
   <string name="catalogMetaUpdatedDate">Updated</string>
+  <string name="catalogMore">More…</string>
   <string name="catalogOperationFailed">The operation could not be completed.</string>
   <string name="catalogPlaceholder">Lorem ipsum dolor sit amet, probatus volutpat has at, vis adhuc iuvaret omittantur an, sadipscing conclusionemque his ad. Eam ut simul tempor. Primis consetetur appellantur vim eu, eum an iudico dolorum. Ad vis utamur honestatis, sanctus debitis referrentur an eam.</string>
   <string name="catalogRead">Read</string>
