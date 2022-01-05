@@ -37,6 +37,21 @@ interface ReaderBookmarkServiceUsableType {
   ): FluentFuture<ReaderBookmarkSyncEnableResult>
 
   /**
+   * Sync the bookmarks for the given account.
+   */
+  fun bookmarkSyncAccount(
+    accountID: AccountID
+  ): FluentFuture<Unit>
+
+  /**
+   * Sync the bookmarks for the given account, and load bookmarks for the given book.
+   */
+  fun bookmarkSyncAndLoad(
+    accountID: AccountID,
+    book: BookID
+  ): FluentFuture<ReaderBookmarks>
+
+  /**
    * The user wants their current bookmarks.
    */
 

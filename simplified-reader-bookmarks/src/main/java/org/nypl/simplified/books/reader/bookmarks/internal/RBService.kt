@@ -251,6 +251,49 @@ class RBService(
     }
   }
 
+  override fun bookmarkSyncAccount(
+    accountID: AccountID
+  ): FluentFuture<Unit> {
+    return try {
+      FluentFuture.from(
+        this.executor.submit(
+          RBServiceOpSyncOneAccount(
+            this.logger,
+            this.httpCalls,
+            this.bookmarkEventsOut,
+            this.objectMapper,
+            this.profilesController.profileCurrent(),
+            accountID
+          )
+        )
+      )
+    } catch (e: Exception) {
+      this.logger.error("sync: unable to sync account: ", e)
+      FluentFuture.from(Futures.immediateFailedFuture(e))
+    }
+  }
+
+  override fun bookmarkSyncAndLoad(
+    accountID: AccountID,
+    book: BookID
+  ): FluentFuture<ReaderBookmarks> {
+    return this.bookmarkSyncAccount(accountID)
+      .transformAsync(
+        {
+          this.bookmarkLoad(accountID, book)
+        },
+        this.executor
+      )
+      .catchingAsync(
+        Exception::class.java,
+        {
+          // If sync fails, continue to load the local bookmarks.
+          this.bookmarkLoad(accountID, book)
+        },
+        this.executor
+      )
+  }
+
   override fun bookmarkLoad(
     accountID: AccountID,
     book: BookID
