@@ -135,6 +135,7 @@
     </c:release>
     <c:release date="2021-12-20T11:06:40+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.6">
       <c:changes>
+        <c:change date="2021-12-14T00:00:00+00:00" summary="Added audiobook player commands to lock screen"/>
         <c:change date="2021-12-15T00:00:00+00:00" summary="Disabled landscape mode"/>
         <c:change date="2021-12-15T00:00:00+00:00" summary="Added books list name to top of screen"/>
         <c:change date="2021-12-20T11:06:40+00:00" summary="Turn on sync bookmarks by default"/>
