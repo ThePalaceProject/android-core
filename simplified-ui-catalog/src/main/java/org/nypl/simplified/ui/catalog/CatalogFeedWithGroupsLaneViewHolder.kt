@@ -19,6 +19,8 @@ class CatalogFeedWithGroupsLaneViewHolder(
   private val onBookSelected: (FeedEntry.FeedEntryOPDS) -> Unit
 ) : RecyclerView.ViewHolder(parent) {
 
+  private val titleContainer =
+    this.parent.findViewById<View>(R.id.feedLaneTitleContainer)
   private val title =
     this.parent.findViewById<TextView>(R.id.feedLaneTitle)
   private val scrollView =
@@ -40,7 +42,7 @@ class CatalogFeedWithGroupsLaneViewHolder(
 
   fun bindTo(group: FeedGroup) {
     this.title.text = group.groupTitle
-    this.title.setOnClickListener {
+    this.titleContainer.setOnClickListener {
       this.onFeedSelected.invoke(group.groupTitle, group.groupURI)
     }
 
