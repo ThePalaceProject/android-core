@@ -37,7 +37,7 @@ data class AccountPreferences(
     fun defaultPreferences(): AccountPreferences {
       return AccountPreferences(
         announcementsAcknowledged = listOf(),
-        bookmarkSyncingPermitted = false,
+        bookmarkSyncingPermitted = true,
         catalogURIOverride = null
       )
     }

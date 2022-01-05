@@ -142,7 +142,7 @@ class RBHTTPCallsTest {
   @Test
   fun testGetSyncingFalse2() {
     this.checkGetSyncing(
-      expected = false,
+      expected = true,
       serverResponseText = """
         {
           "settings": {
