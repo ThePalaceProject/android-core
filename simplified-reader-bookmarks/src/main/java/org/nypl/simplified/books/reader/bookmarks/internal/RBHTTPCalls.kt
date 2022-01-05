@@ -204,10 +204,10 @@ class RBHTTPCalls(
         val text: String? = settings.get("simplified:synchronize_annotations").asText()
         text == "true"
       } else {
-        false
+        true
       }
     } else {
-      false
+      true
     }
   }
 

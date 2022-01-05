@@ -1,5 +1,6 @@
 package org.nypl.simplified.books.covers
 
+import android.graphics.Bitmap
 import android.widget.ImageView
 import com.google.common.util.concurrent.FluentFuture
 import org.nypl.simplified.feeds.api.FeedEntry
@@ -60,4 +61,19 @@ interface BookCoverProviderType {
     width: Int,
     height: Int
   ): FluentFuture<Unit>
+
+  /**
+   * Load the cover based on `entry` as bitmap to be used as the argument of the callback
+   *
+   * @param entry The feed entry
+   * @param onBitmapLoaded The callback to call when the image is loaded
+   * @param defaultResource The id for the default resource if something goes wrong while loading
+   * the bitmapUse 0 as desired dimension to resize keeping aspect ratio.
+   **/
+
+  fun loadCoverAsBitmap(
+    entry: FeedEntry.FeedEntryOPDS,
+    onBitmapLoaded: (Bitmap) -> Unit,
+    defaultResource: Int
+  )
 }
