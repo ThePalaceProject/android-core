@@ -31,8 +31,8 @@ object Reader2Bookmarks {
   ): ReaderBookmarks {
     return try {
       bookmarkService
-        .bookmarkLoad(accountID, bookID)
-        .get(10L, TimeUnit.SECONDS)
+        .bookmarkSyncAndLoad(accountID, bookID)
+        .get(15L, TimeUnit.SECONDS)
     } catch (e: Exception) {
       this.logger.error("could not load bookmarks: ", e)
       ReaderBookmarks(null, emptyList())
