@@ -231,7 +231,8 @@ sealed class BookStatus {
     data class LoanedNotDownloaded(
       override val id: BookID,
       override val loanExpiryDate: DateTime?,
-      override val returnable: Boolean
+      override val returnable: Boolean,
+      val isOpenAccess: Boolean
     ) : Loaned() {
 
       override val priority: BookStatusPriorityOrdering
@@ -414,7 +415,8 @@ sealed class BookStatus {
         Loaned.LoanedNotDownloaded(
           id = book.id,
           loanExpiryDate = this.someOrNull(a.endDate),
-          returnable = a.revoke.isSome
+          returnable = a.revoke.isSome,
+          isOpenAccess = true
         )
       }
     }
@@ -441,7 +443,8 @@ sealed class BookStatus {
         Loaned.LoanedNotDownloaded(
           id = book.id,
           loanExpiryDate = this.someOrNull(a.endDate),
-          returnable = returnable
+          returnable = returnable,
+          isOpenAccess = false
         )
       }
     }

@@ -545,11 +545,19 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
     when (bookStatus) {
       is BookStatus.Loaned.LoanedNotDownloaded ->
         this.buttons.addView(
-          this.buttonCreator.createDownloadButton(
-            onClick = {
-              this.viewModel.borrowMaybeAuthenticated()
-            }
-          )
+          if (bookStatus.isOpenAccess) {
+            this.buttonCreator.createGetButton(
+              onClick = {
+                this.viewModel.borrowMaybeAuthenticated()
+              }
+            )
+          } else {
+            this.buttonCreator.createDownloadButton(
+              onClick = {
+                this.viewModel.borrowMaybeAuthenticated()
+              }
+            )
+          }
         )
 
       is BookStatus.Loaned.LoanedDownloaded ->
