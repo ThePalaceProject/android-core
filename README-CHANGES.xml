@@ -142,6 +142,8 @@
         <c:change date="2021-12-27T00:00:00+00:00" summary="Added 'more' label to catalog list titles"/>
         <c:change date="2022-01-05T00:00:00+00:00" summary="Fixed reading position from other devices not remembered when opening a book."/>
         <c:change date="2022-01-07T00:00:00+00:00" summary="Changed the button label for the checked out books"/>
+        <c:change date="2022-01-11T00:00:00+00:00" summary="Fixed &quot;Error code: 51000&quot; error when playing certain audiobooks."/>
+        <c:change date="2022-01-11T00:00:00+00:00" summary="Removed EULA screen from initial startup."/>
         <c:change date="2022-01-12T11:19:53+00:00" summary="Added isOpenAccess flag to Loaned.NotDownloaded book status"/>
       </c:changes>
     </c:release>
