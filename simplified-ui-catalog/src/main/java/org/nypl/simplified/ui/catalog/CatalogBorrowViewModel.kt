@@ -122,13 +122,9 @@ class CatalogBorrowViewModel(
   fun tryBorrowMaybeAuthenticated(
     book: Book
   ) {
-    this.bookRegistry.updateIfStatusIsMoreImportant(
-      BookWithStatus(
-        book, BookStatus.RequestingLoan(book.id, "")
-      )
-    )
 
     if (!this.isLoginRequired(book.account)) {
+      this.onRequestLoanStarted(book)
       return this.tryBorrowAuthenticated(book)
     }
 
@@ -137,6 +133,7 @@ class CatalogBorrowViewModel(
       bookID = book.id,
       runOnSuccess = {
         if (!this.isLoginRequired(book.account)) {
+          this.onRequestLoanStarted(book)
           this.tryBorrowAuthenticated(book)
         } else {
           this.onBorrowAttemptCancelled(book)
@@ -145,6 +142,15 @@ class CatalogBorrowViewModel(
       runOnCancel = {
         this.onBorrowAttemptCancelled(book)
       }
+    )
+  }
+
+  private fun onRequestLoanStarted(book: Book) {
+    this.logger.debug("request loan started")
+    this.bookRegistry.updateIfStatusIsMoreImportant(
+      BookWithStatus(
+        book, BookStatus.RequestingLoan(book.id, "")
+      )
     )
   }
 
@@ -198,13 +204,9 @@ class CatalogBorrowViewModel(
   fun tryReserveMaybeAuthenticated(
     book: Book
   ) {
-    this.bookRegistry.updateIfStatusIsMoreImportant(
-      BookWithStatus(
-        book, BookStatus.RequestingLoan(book.id, "")
-      )
-    )
 
     if (!this.isLoginRequired(book.account)) {
+      this.onRequestLoanStarted(book)
       return this.tryReserveAuthenticated(book)
     }
 
@@ -213,6 +215,7 @@ class CatalogBorrowViewModel(
       bookID = book.id,
       runOnSuccess = {
         if (!this.isLoginRequired(book.account)) {
+          this.onRequestLoanStarted(book)
           this.tryReserveAuthenticated(book)
         } else {
           this.onReserveAttemptCancelled(book)

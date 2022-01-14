@@ -178,7 +178,7 @@ internal class MainFragmentListenerDelegate(
   ): MainFragmentState {
     return when (event) {
       is CatalogFeedEvent.LoginRequired -> {
-        this.openSettingsAccount(event.account, showPleaseLogInTitle = true)
+        this.openSettingsAccount(event.account, comingFromBookLoanRequest = true)
         MainFragmentState.CatalogWaitingForLogin
       }
       is CatalogFeedEvent.OpenErrorPage -> {
@@ -210,7 +210,7 @@ internal class MainFragmentListenerDelegate(
   ): MainFragmentState {
     return when (event) {
       is CatalogBookDetailEvent.LoginRequired -> {
-        this.openSettingsAccount(event.account, showPleaseLogInTitle = true)
+        this.openSettingsAccount(event.account, comingFromBookLoanRequest = true)
         MainFragmentState.BookDetailsWaitingForLogin
       }
       is CatalogBookDetailEvent.OpenErrorPage -> {
@@ -262,7 +262,7 @@ internal class MainFragmentListenerDelegate(
   ): MainFragmentState {
     return when (event) {
       is AccountListEvent.AccountSelected -> {
-        this.openSettingsAccount(event.account, showPleaseLogInTitle = false)
+        this.openSettingsAccount(event.account, comingFromBookLoanRequest = false)
         state
       }
       AccountListEvent.AddAccount -> {
@@ -528,16 +528,20 @@ internal class MainFragmentListenerDelegate(
     this.navigator.popBackStack()
   }
 
-  private fun openSettingsAccount(account: AccountID, showPleaseLogInTitle: Boolean) {
+  private fun openSettingsAccount(account: AccountID, comingFromBookLoanRequest: Boolean) {
     this.navigator.addFragment(
       fragment = AccountDetailFragment.create(
         AccountFragmentParameters(
           accountId = account,
           closeOnLoginSuccess = false,
-          showPleaseLogInTitle = showPleaseLogInTitle
+          showPleaseLogInTitle = comingFromBookLoanRequest
         )
       ),
-      tab = R.id.tabSettings
+      tab = if (comingFromBookLoanRequest) {
+        R.id.tabCatalog
+      } else {
+        R.id.tabSettings
+      }
     )
   }
 
