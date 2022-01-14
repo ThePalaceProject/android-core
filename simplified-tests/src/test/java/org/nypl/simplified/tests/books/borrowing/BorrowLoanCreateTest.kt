@@ -49,6 +49,7 @@ import org.nypl.simplified.books.formats.api.StandardFormatNames.opdsAcquisition
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
 import org.nypl.simplified.opds.core.OPDSAvailabilityLoanable
+import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
 import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
@@ -158,7 +159,8 @@ class BorrowLoanCreateTest {
         account = this.accountId,
         cover = null,
         thumbnail = null,
-        entry = OPDSAcquisitionFeedEntry.newBuilder("x", "Title", DateTime.now(), OPDSAvailabilityLoanable.get()).build(),
+        entry = OPDSAcquisitionFeedEntry.newBuilder("x", "Title", DateTime.now(), OPDSAvailabilityOpenAccess.get(
+          Option.none<URI>())).build(),
         formats = listOf()
       )
 
@@ -397,6 +399,10 @@ class BorrowLoanCreateTest {
     assertEquals(1, this.context.receivedURIs.size)
 
     this.verifyBookRegistryHasStatus(LoanedNotDownloaded::class.java)
+
+    val bookStatus = this.bookRegistry.bookStatusOrNull(this.bookID) as? LoanedNotDownloaded
+    assertEquals(false, bookStatus?.isOpenAccess)
+
     assertEquals(1, this.bookDatabaseEntry.entryWrites)
 
     assertEquals(RequestingLoan::class.java, this.bookStates.removeAt(0).javaClass)
@@ -465,6 +471,59 @@ class BorrowLoanCreateTest {
     assertEquals("Bearer abcd", sent1.getHeader("Authorization"))
 
     this.verifyBookRegistryHasStatus(LoanedNotDownloaded::class.java)
+    assertEquals(1, this.bookDatabaseEntry.entryWrites)
+
+    assertEquals(RequestingLoan::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(LoanedNotDownloaded::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(0, this.bookStates.size)
+  }
+
+  /**
+   * A loan is created for an open access book.
+   */
+
+  @Test
+  fun testLoanOkEPUBOpenAccess() {
+    val task = BorrowLoanCreate.createSubtask()
+
+    this.context.currentURIField =
+      this.webServer.url("/book.epub").toUri()
+    this.context.currentAcquisitionPathElement =
+      OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
+    this.context.currentRemainingOPDSPathElements =
+      listOf(OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap()))
+
+    val feedText = """
+<entry xmlns="http://www.w3.org/2005/Atom" xmlns:opds="http://opds-spec.org/2010/catalog">
+  <title>Open Access Example</title>
+  <updated>2022-01-14T16:14:51+0000</updated>
+  <id>7264f7f8-7bea-4ce6-906e-615406ca38cb</id>
+  <link href="${this.webServer.url("/next")}" rel="http://opds-spec.org/acquisition/open-access" type="application/epub+zip">
+    <opds:availability since="2022-01-01T10:41:52+0000" status="available" until="2022-09-23T11:38:11+0000" />
+    <opds:holds total="0" />
+    <opds:copies available="5" total="5" />
+  </link>
+</entry>
+    """.trimIndent()
+
+    val response =
+      MockResponse()
+        .setResponseCode(200)
+        .setHeader("Content-Type", opdsAcquisitionFeedEntry)
+        .setBody(feedText)
+
+    this.webServer.enqueue(response)
+
+    task.execute(this.context)
+
+    assertEquals(this.webServer.url("/next").toUri(), this.context.receivedURIs[0])
+    assertEquals(1, this.context.receivedURIs.size)
+
+    this.verifyBookRegistryHasStatus(LoanedNotDownloaded::class.java)
+
+    val bookStatus = this.bookRegistry.bookStatusOrNull(this.bookID) as? LoanedNotDownloaded
+    assertEquals(true, bookStatus?.isOpenAccess)
+
     assertEquals(1, this.bookDatabaseEntry.entryWrites)
 
     assertEquals(RequestingLoan::class.java, this.bookStates.removeAt(0).javaClass)
