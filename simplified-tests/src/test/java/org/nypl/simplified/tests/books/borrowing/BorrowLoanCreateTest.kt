@@ -48,8 +48,6 @@ import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFile
 import org.nypl.simplified.books.formats.api.StandardFormatNames.opdsAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
-import org.nypl.simplified.opds.core.OPDSAvailabilityLoanable
-import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
 import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
@@ -159,8 +157,7 @@ class BorrowLoanCreateTest {
         account = this.accountId,
         cover = null,
         thumbnail = null,
-        entry = OPDSAcquisitionFeedEntry.newBuilder("x", "Title", DateTime.now(), OPDSAvailabilityOpenAccess.get(
-          Option.none<URI>())).build(),
+        entry = OPDSAcquisitionFeedEntry.newBuilder("x", "Title", DateTime.now(), OPDSAvailabilityLoanable.get()).build(),
         formats = listOf()
       )
 
