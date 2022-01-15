@@ -293,17 +293,28 @@ class CatalogPagedViewHolder(
     val loanDuration = getLoanDuration(book)
 
     this.idleButtons.addView(
-      if (loanDuration.isNotEmpty()) {
-        this.buttonCreator.createDownloadButtonWithLoanDuration(loanDuration) {
-          this.listener.borrowMaybeAuthenticated(book)
-        }
-      } else {
-        this.buttonCreator.createDownloadButton(
-          onClick = {
+      when {
+        loanDuration.isNotEmpty() -> {
+          this.buttonCreator.createDownloadButtonWithLoanDuration(loanDuration) {
             this.listener.borrowMaybeAuthenticated(book)
-          },
-          heightMatchParent = true
-        )
+          }
+        }
+        bookStatus.isOpenAccess -> {
+          this.buttonCreator.createGetButton(
+            onClick = {
+              this.listener.borrowMaybeAuthenticated(book)
+            },
+            heightMatchParent = true
+          )
+        }
+        else -> {
+          this.buttonCreator.createDownloadButton(
+            onClick = {
+              this.listener.borrowMaybeAuthenticated(book)
+            },
+            heightMatchParent = true
+          )
+        }
       }
     )
 
