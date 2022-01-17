@@ -9,7 +9,7 @@ def requiredFiles = [:]
 requiredFiles["ReaderClientCert.sig"] =
   "b064e68b96e258e42fe1ca66ae3fc4863dd802c46585462220907ed291e1217d"
 requiredFiles["secrets.conf"] =
-  "d7fcc3c93c0baa881b83683654d27796a3f816e0d77629f4c114493e6a53a743"
+  "756e525becd6f266e8e063abdb8bd03dfca352f0551b33756e21ecb826dfd01b"
 
 android {
   defaultConfig {
@@ -46,6 +46,7 @@ dependencies {
   implementation libs.nypl.readium
   implementation libs.palace.drm.adobe
   implementation libs.palace.findaway
+  implementation libs.palace.overdrive
   implementation libs.r2.lcp
   implementation libs.r2.opds
   implementation libs.r2.shared
