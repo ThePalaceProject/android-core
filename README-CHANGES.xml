@@ -133,7 +133,7 @@
         <c:change date="2021-12-07T00:00:00+00:00" summary="Fixed back button not working on Error Details screen"/>
       </c:changes>
     </c:release>
-    <c:release date="2022-01-14T18:50:03+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.6">
+    <c:release date="2022-01-17T18:43:38+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.6">
       <c:changes>
         <c:change date="2021-12-14T00:00:00+00:00" summary="Added audiobook player commands to lock screen"/>
         <c:change date="2021-12-15T00:00:00+00:00" summary="Disabled landscape mode"/>
@@ -147,7 +147,8 @@
         <c:change date="2022-01-12T00:00:00+00:00" summary="Added isOpenAccess flag to Loaned.NotDownloaded book status"/>
         <c:change date="2022-01-13T00:00:00+00:00" summary="Fixed book title request infinite loading if the user didn't authenticate"/>
         <c:change date="2022-01-13T00:00:00+00:00" summary="Fixed user not returning to book title or feed after pressing back on the auth screen after requesting a book"/>
-        <c:change date="2022-01-14T18:50:03+00:00" summary="Added backward and forward actions to lock screen notification controls"/>
+        <c:change date="2022-01-14T00:00:00+00:00" summary="Added backward and forward actions to lock screen notification controls"/>
+        <c:change date="2022-01-17T18:43:38+00:00" summary="Add Palace Overdrive audiobooks module"/>
       </c:changes>
     </c:release>
   </c:releases>
