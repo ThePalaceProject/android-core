@@ -1,7 +1,7 @@
 [submodule ".ci"]
 	path = .ci
 	url = https://github.com/ThePalaceProject/android-ci
-    branch = main
+	branch = main
 
 [submodule "simplified-tests/src/test/resources/org/nypl/simplified/tests/bookmark_annotations/spec"]
 	path = simplified-tests/src/test/resources/org/nypl/simplified/tests/bookmark_annotations/spec
