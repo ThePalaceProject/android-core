@@ -38,7 +38,11 @@ object CatalogBookAvailabilityStrings {
       is BookStatus.Loanable ->
         onLoanable(resources)
       is BookStatus.Loaned.LoanedNotDownloaded ->
-        onLoaned(resources, Option.of(status.loanExpiryDate))
+        if (status.isOpenAccess) {
+          onLoanable(resources)
+        } else {
+          onLoaned(resources, Option.of(status.loanExpiryDate))
+        }
       is BookStatus.Loaned.LoanedDownloaded ->
         onLoaned(resources, Option.of(status.loanExpiryDate))
       is BookStatus.RequestingLoan ->
