@@ -2,7 +2,6 @@ package org.nypl.simplified.ui.catalog
 
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.feeds.api.FeedBooksSelection
-import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetPseudo.FilteringForStatus.Status
 import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetPseudo.Sorting.SortBy
 import java.io.Serializable
 import java.net.URI
@@ -60,7 +59,6 @@ sealed class CatalogFeedArguments : Serializable {
     override val title: String,
     override val ownership: CatalogFeedOwnership,
     val sortBy: SortBy = SortBy.SORT_BY_TITLE,
-    val filterStatus: Status = Status.ALL,
     val searchTerms: String?,
     val selection: FeedBooksSelection,
     val filterAccount: AccountID?
