@@ -38,7 +38,6 @@ import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedFacet
 import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetPseudo
 import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetPseudo.FilteringForAccount
-import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetPseudo.FilteringForStatus
 import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetPseudo.Sorting
 import org.nypl.simplified.feeds.api.FeedFacetPseudoTitleProviderType
 import org.nypl.simplified.feeds.api.FeedLoaderResult
@@ -338,7 +337,7 @@ class CatalogFeedViewModel(
         filterByAccountID = arguments.filterAccount,
         search = arguments.searchTerms,
         sortBy = arguments.sortBy,
-        filterStatus = arguments.filterStatus,
+//        filterStatus = arguments.filterStatus,
         title = arguments.title,
         uri = booksUri
       )
@@ -861,20 +860,8 @@ class CatalogFeedViewModel(
               searchTerms = currentArguments.searchTerms,
               selection = currentArguments.selection,
               sortBy = facet.sortBy,
-              filterStatus = currentArguments.filterStatus,
               title = facet.title
             )
-
-          is FilteringForStatus -> {
-            CatalogFeedArgumentsLocalBooks(
-              filterAccount = currentArguments.filterAccount,
-              ownership = currentArguments.ownership,
-              searchTerms = currentArguments.searchTerms,
-              selection = currentArguments.selection,
-              filterStatus = facet.filterStatus,
-              title = currentArguments.title
-            )
-          }
 
           is FilteringForAccount ->
             CatalogFeedArgumentsLocalBooks(
@@ -883,7 +870,6 @@ class CatalogFeedViewModel(
               searchTerms = currentArguments.searchTerms,
               selection = currentArguments.selection,
               sortBy = currentArguments.sortBy,
-              filterStatus = currentArguments.filterStatus,
               title = facet.title
             )
         }

@@ -51,7 +51,6 @@ object BottomNavigators {
         rootFragmentsFactory = mapOf(
           R.id.tabCatalog to {
             createCatalogFragment(
-              context = context,
               id = R.id.tabCatalog,
               feedArguments = catalogFeedArguments(
                 context,
@@ -222,14 +221,12 @@ object BottomNavigators {
         searchTerms = null,
         selection = FeedBooksSelection.BOOKS_FEED_LOANED,
         sortBy = FeedFacet.FeedFacetPseudo.Sorting.SortBy.SORT_BY_TITLE,
-        filterStatus = FeedFacet.FeedFacetPseudo.FilteringForStatus.Status.ALL,
         title = context.getString(R.string.tabBooks)
       )
     )
   }
 
   private fun createCatalogFragment(
-    context: Context,
     id: Int,
     feedArguments: CatalogFeedArguments.CatalogFeedArgumentsRemote
   ): Fragment {
