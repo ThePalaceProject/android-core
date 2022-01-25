@@ -24,14 +24,6 @@ $ git submodule init
 $ git submodule update --remote --recursive
 ```
 
-#### SimplyE Or Open eBooks?
-
-Currently, this project contains two published applications: SimplyE and Open eBooks.
-The instructions here are written in a manner that allows for both applications
-to follow independent release cycles. The only parts that change in each case
-are the `gradle.properties` file that must be edited, and the names of the `git`
-tags.
-
 #### Prepare To Create A Release Branch
 
 The first step required is to set the project version numbers to the values
@@ -83,30 +75,23 @@ a separate release branch.
 ##### Update Version Numbers
 
 So, firstly, set the application version numbers to the _next_ release, `99.1.0-SNAPSHOT`, 
-as described above.
-
-  * If you're releasing SimplyE, edit `simplified-app-simplye/gradle.properties`
-  * If you're releasing Open eBooks, edit `simplified-app-openebooks/gradle.properties`
-
-In order to avoid writing the same instructions twice, we'll refer to whichever
-properties file you're using as `$app/gradle.properties`. You'll obviously need
-to substitute in the correct file yourself.
+as described above. This is done by editing `gradle.properties`.
 
 ```
-# Make sure we're on the develop branch
+# Make sure we're on the main branch
 $ git branch
-develop
+main
 
 # Make sure the version numbers are what we expect to see.
-$ grep VERSION_NAME $app/gradle.properties
+$ grep VERSION_NAME gradle.properties
 VERSION_NAME=98.0.0
 
 # Update the version numbers.
-$ $EDITOR $app/gradle.properties
+$ $EDITOR gradle.properties
 <... edit VERSION_NAME to 99.1.0-SNAPSHOT ...>
 
 # Add the version files to be staged for the next commit.
-$ git add $app/gradle.properties
+$ git add gradle.properties
 ```
 
 Don't commit yet: There's more work to do!
@@ -160,48 +145,38 @@ $ git push
 
 Now, create a release branch for the `99.0.0` release.
 
-  * If you're releasing SimplyE, use `release/simplye-99.0.0` as the branch name.
-  * If you're releasing Open eBooks, use `release/openebooks-99.0.0` as the branch name.
+Use `release/99.0.0` as the branch name.
 
-In order to avoid writing the same instructions twice, we'll refer to whichever
-branch you're using as `release/$app-99.0.0`. You'll obviously need to substitute in the 
-correct branch name yourself.
 
 ```
-$ git checkout -b release/$app-99.0.0
+$ git checkout -b release/99.0.0
 ```
 
-This creates a new `release/$app-99.0.0` branch to which various commits
+This creates a new `release/99.0.0` branch to which various commits
 may be made to increment version numbers, update change logs, run
 any last test builds, etc.
 
 #### Set The Release Version
 
-Set the app versions to `99.0.0`
-
-  * If you're releasing SimplyE, edit `simplified-app-simplye/gradle.properties`
-  * If you're releasing Open eBooks, edit `simplified-app-openebooks/gradle.properties`
-
-In order to avoid writing the same instructions twice, we'll refer to whichever
-properties file you're using as `$app/gradle.properties`. You'll obviously need
-to substitute in the correct file yourself.
+Set the app version to `99.0.0` by editing `gradle.properties`.
 
 ```
 # Make sure we're on the release branch
 $ git branch
-release/$app-99.0.0
+release/99.0.0
 
 # Make sure the version numbers are what we expect to see.
-$ grep VERSION_NAME $app/gradle.properties
+$ grep VERSION_NAME gradle.properties
 VERSION_NAME=99.1.0-SNAPSHOT
 
 # Update the version numbers.
-$ $EDITOR $app/gradle.properties
+$ $EDITOR gradle.properties
 <... edit VERSION_NAME to 99.0.0 ...>
 
-$ git add $app/gradle.properties
+$ git add gradle.properties
 ```
 
+<!--
 #### Verify Library Dependencies
 
 Run `.ci/ci-check-versions.sh` to check if all library dependencies are
@@ -212,6 +187,7 @@ $ .ci/ci-check-versions.sh
 All of the checked libraries are up-to-date.
 31 libraries were checked. 101 libraries were ignored.
 ```
+-->
 
 #### Commit And Push
 
@@ -227,13 +203,13 @@ $ git push --all
 #### Wait For QA To Test
 
 At this point, the CI process will produce a release candidate build of `0.99.0`.
-If there are issues with the build, then fixes _MUST_ be commited to the `develop`
-branch and _NOT_ the `release/$app-0.99.0` branch. Individual fixes should then be merged
-from `develop` into `release/$app-0.99.0` and _NEVER_ in the opposite direction:
+If there are issues with the build, then fixes _MUST_ be commited to the `main`
+branch and _NOT_ the `release/0.99.0` branch. Individual fixes should then be merged
+from `develop` into `release/0.99.0` and _NEVER_ in the opposite direction:
 
 ```
 $ git branch
-release/$app-99.0.0
+release/99.0.0
 
 $ git merge develop --no-ff
 
@@ -246,25 +222,20 @@ $ git push
 
 Each time new commits are pushed, a new release candidate will be built by the CI.
 
-#### Tag The Final Release
+#### Tag and Publish the Final Release
 
 When QA are satisfied that a build is working, it's time to create the final
-tag.
+tag, and publish releases to GitHub and the Play Store. This is automated by the
+Create Release workflow in GitHub.
 
-* If you're releasing SimplyE, use `simplye-99.0.0` as the tag name.
-* If you're releasing Open eBooks, use `openebooks-99.0.0` as the tag name.
+1. In GitHub, open the Actions tab, and select the "Create Release" workflow.
+2. Open the "Run workflow" dropdown.
+3. In the "Use workflow from" dropdown, select the `release/99.0.0` branch.
+4. Click the "Run workflow" button.
 
-In order to avoid writing the same instructions twice, we'll refer to whichever
-tag you're using as `$app-99.0.0`. You'll obviously need to substitute in the
-correct tag name yourself.
-
-```
-$ git tag -s '$app-99.0.0'
-$ git push --tags
-```
-
-When the CI encounters a tagged commit, it will push the build it produces to
-the Play Store, and will push various components to Maven Central.
+The workflow will tag the commit, and create a GitHub release with generated release
+notes. It will produce a release build, and push it to the Play Store, with a link to the
+release notes in GitHub. It will also push various components to Maven Central.
 
 ## Epilogue
 
