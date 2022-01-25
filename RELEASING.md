@@ -234,7 +234,7 @@ Create Release workflow in GitHub.
 4. Click the "Run workflow" button.
 
 The workflow will tag the commit, and create a GitHub release with generated release
-notes. It produce a release build, and push it to the Play Store, with a link to the
+notes. It will produce a release build, and push it to the Play Store, with a link to the
 release notes in GitHub. It will also push various components to Maven Central.
 
 ## Epilogue
