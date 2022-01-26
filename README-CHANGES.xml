@@ -135,23 +135,20 @@
     </c:release>
     <c:release date="2022-01-21T19:03:34+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.6">
       <c:changes>
-        <c:change date="2021-12-14T00:00:00+00:00" summary="Added audiobook player commands to lock screen"/>
-        <c:change date="2021-12-15T00:00:00+00:00" summary="Disabled landscape mode"/>
-        <c:change date="2021-12-15T00:00:00+00:00" summary="Added books list name to top of screen"/>
-        <c:change date="2021-12-20T00:00:00+00:00" summary="Turn on sync bookmarks by default"/>
-        <c:change date="2021-12-27T00:00:00+00:00" summary="Added 'more' label to catalog list titles"/>
-        <c:change date="2022-01-05T00:00:00+00:00" summary="Fixed reading position from other devices not remembered when opening a book."/>
-        <c:change date="2022-01-07T00:00:00+00:00" summary="Changed the button label for the checked out books"/>
-        <c:change date="2022-01-11T00:00:00+00:00" summary="Fixed &quot;Error code: 51000&quot; error when playing certain audiobooks."/>
-        <c:change date="2022-01-11T00:00:00+00:00" summary="Removed EULA screen from initial startup."/>
-        <c:change date="2022-01-12T00:00:00+00:00" summary="Added isOpenAccess flag to Loaned.NotDownloaded book status"/>
-        <c:change date="2022-01-13T00:00:00+00:00" summary="Fixed book title request infinite loading if the user didn't authenticate"/>
-        <c:change date="2022-01-13T00:00:00+00:00" summary="Fixed user not returning to book title or feed after pressing back on the auth screen after requesting a book"/>
-        <c:change date="2022-01-14T00:00:00+00:00" summary="Added backward and forward actions to lock screen notification controls"/>
-        <c:change date="2022-01-17T00:00:00+00:00" summary="Add Palace Overdrive audiobooks module"/>
-        <c:change date="2022-01-19T00:00:00+00:00" summary="Updated borrow label on open access books detail page"/>
-        <c:change date="2022-01-20T00:00:00+00:00" summary="Fixed crash when opening the TOC page on audiobooks"/>
-        <c:change date="2022-01-21T19:03:34+00:00" summary="Removed Show filter"/>
+        <c:change date="2021-12-14T00:00:00+00:00" summary="Added audiobook player controls to the lock screen."/>
+        <c:change date="2021-12-15T00:00:00+00:00" summary="Disabled landscape mode for now. It was causing some problems."/>
+        <c:change date="2021-12-15T00:00:00+00:00" summary="Changed the title bar to show the name of the current lane when browsing the catalog."/>
+        <c:change date="2021-12-20T00:00:00+00:00" summary="Changed the sync bookmarks setting to be on by default after logging in to a library."/>
+        <c:change date="2021-12-27T00:00:00+00:00" summary="Added &quot;More...&quot; label back to catalog lanes."/>
+        <c:change date="2022-01-05T00:00:00+00:00" summary="Fixed the reading position from other devices not being remembered when opening a book."/>
+        <c:change date="2022-01-07T00:00:00+00:00" summary="Changed the button label for books that are checked out but not downloaded from &quot;Get&quot; to &quot;Download&quot;" />
+        <c:change date="2022-01-11T00:00:00+00:00" summary="Fixed the &quot;Error code: 51000&quot; error that could occur when playing certain audiobooks."/>
+        <c:change date="2022-01-11T00:00:00+00:00" summary="Removed the EULA screen from initial startup."/>
+        <c:change date="2022-01-13T00:00:00+00:00" summary="Fixed books becoming stuck in the &quot;Requesting...&quot; state after cancelling a login while borrowing."/>
+        <c:change date="2022-01-13T00:00:00+00:00" summary="Fixed the app not returning to the correct book detail or catalog screen after cancelling a login while borrowing."/>
+        <c:change date="2022-01-17T00:00:00+00:00" summary="Added support for Overdrive audiobooks."/>
+        <c:change date="2022-01-20T00:00:00+00:00" summary="Fixed a crash when opening a chapter from the TOC on audiobooks."/>
+        <c:change date="2022-01-21T19:03:34+00:00" summary="Removed the &quot;Show&quot; filter from My Books. This wasn't useful."/>
       </c:changes>
     </c:release>
   </c:releases>
