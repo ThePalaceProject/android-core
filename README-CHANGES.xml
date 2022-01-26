@@ -133,7 +133,7 @@
         <c:change date="2021-12-07T00:00:00+00:00" summary="Fixed back button not working on Error Details screen"/>
       </c:changes>
     </c:release>
-    <c:release date="2022-01-21T19:03:34+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.6">
+    <c:release date="2022-01-26T16:58:33+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.0.6">
       <c:changes>
         <c:change date="2021-12-14T00:00:00+00:00" summary="Added audiobook player controls to the lock screen."/>
         <c:change date="2021-12-15T00:00:00+00:00" summary="Disabled landscape mode for now. It was causing some problems."/>
@@ -141,14 +141,14 @@
         <c:change date="2021-12-20T00:00:00+00:00" summary="Changed the sync bookmarks setting to be on by default after logging in to a library."/>
         <c:change date="2021-12-27T00:00:00+00:00" summary="Added &quot;More...&quot; label back to catalog lanes."/>
         <c:change date="2022-01-05T00:00:00+00:00" summary="Fixed the reading position from other devices not being remembered when opening a book."/>
-        <c:change date="2022-01-07T00:00:00+00:00" summary="Changed the button label for books that are checked out but not downloaded from &quot;Get&quot; to &quot;Download&quot;" />
+        <c:change date="2022-01-07T00:00:00+00:00" summary="Changed the button label for books that are checked out but not downloaded from &quot;Get&quot; to &quot;Download&quot;"/>
         <c:change date="2022-01-11T00:00:00+00:00" summary="Fixed the &quot;Error code: 51000&quot; error that could occur when playing certain audiobooks."/>
         <c:change date="2022-01-11T00:00:00+00:00" summary="Removed the EULA screen from initial startup."/>
         <c:change date="2022-01-13T00:00:00+00:00" summary="Fixed books becoming stuck in the &quot;Requesting...&quot; state after cancelling a login while borrowing."/>
         <c:change date="2022-01-13T00:00:00+00:00" summary="Fixed the app not returning to the correct book detail or catalog screen after cancelling a login while borrowing."/>
         <c:change date="2022-01-17T00:00:00+00:00" summary="Added support for Overdrive audiobooks."/>
         <c:change date="2022-01-20T00:00:00+00:00" summary="Fixed a crash when opening a chapter from the TOC on audiobooks."/>
-        <c:change date="2022-01-21T19:03:34+00:00" summary="Removed the &quot;Show&quot; filter from My Books. This wasn't useful."/>
+        <c:change date="2022-01-21T00:00:00+00:00" summary="Removed the &quot;Show&quot; filter from My Books. This wasn't useful."/>
       </c:changes>
     </c:release>
   </c:releases>
