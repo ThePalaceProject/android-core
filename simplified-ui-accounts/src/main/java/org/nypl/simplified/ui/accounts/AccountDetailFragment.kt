@@ -4,8 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.view.View.INVISIBLE
-import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
@@ -212,7 +210,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
       this.reportIssueGroup.findViewById(R.id.accountReportIssueEmail)
 
     if (this.parameters.showPleaseLogInTitle) {
-      this.loginTitle.visibility = VISIBLE
+      this.loginTitle.visibility = View.VISIBLE
     } else {
       this.loginTitle.visibility = View.GONE
     }
@@ -254,12 +252,12 @@ class AccountDetailFragment : Fragment(R.layout.account) {
     val account = this.viewModel.account
     return when (status) {
       is ReaderBookmarkSyncEnableStatus.Changing -> {
-        this.bookmarkSyncProgress.visibility = VISIBLE
+        this.bookmarkSyncProgress.visibility = View.VISIBLE
         this.bookmarkSyncCheck.isEnabled = false
       }
 
       is ReaderBookmarkSyncEnableStatus.Idle -> {
-        this.bookmarkSyncProgress.visibility = INVISIBLE
+        this.bookmarkSyncProgress.visibility = View.INVISIBLE
 
         when (status.status) {
           SYNC_ENABLE_NOT_SUPPORTED -> {
@@ -436,7 +434,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
     if (email != null) {
       val address = email.removePrefix("mailto:")
 
-      this.reportIssueGroup.visibility = VISIBLE
+      this.reportIssueGroup.visibility = View.VISIBLE
       this.reportIssueEmail.text = address
       this.reportIssueGroup.setOnClickListener {
         val emailIntent =
@@ -476,7 +474,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
       view = buttonImage,
       onSuccess = {
         container.background = null
-        buttonImage.visibility = VISIBLE
+        buttonImage.visibility = View.VISIBLE
         buttonText.visibility = View.GONE
       }
     )
@@ -592,6 +590,12 @@ class AccountDetailFragment : Fragment(R.layout.account) {
     this.accountSubtitle.text =
       this.viewModel.account.provider.subtitle
 
+    this.bookmarkSync.visibility = if (this.viewModel.account.requiresCredentials) {
+      View.VISIBLE
+    } else {
+      View.GONE
+    }
+
     /*
      * Only show a EULA if there's actually a EULA.
      */
@@ -656,7 +660,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
     this.accountCustomOPDSField.text = catalogURIOverride?.toString() ?: ""
     this.accountCustomOPDS.visibility =
       if (catalogURIOverride != null) {
-        VISIBLE
+        View.VISIBLE
       } else {
         View.GONE
       }
@@ -681,8 +685,8 @@ class AccountDetailFragment : Fragment(R.layout.account) {
       }
 
       is AccountLoggingIn -> {
-        this.loginProgress.visibility = VISIBLE
-        this.loginProgressBar.visibility = VISIBLE
+        this.loginProgress.visibility = View.VISIBLE
+        this.loginProgressBar.visibility = View.VISIBLE
         this.loginProgressText.text = loginState.status
         this.loginButtonErrorDetails.visibility = View.GONE
         this.loginFormLock()
@@ -700,8 +704,8 @@ class AccountDetailFragment : Fragment(R.layout.account) {
       }
 
       is AccountLoggingInWaitingForExternalAuthentication -> {
-        this.loginProgress.visibility = VISIBLE
-        this.loginProgressBar.visibility = VISIBLE
+        this.loginProgress.visibility = View.VISIBLE
+        this.loginProgressBar.visibility = View.VISIBLE
         this.loginProgressText.text = loginState.status
         this.loginButtonErrorDetails.visibility = View.GONE
         this.loginFormLock()
@@ -718,7 +722,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
       }
 
       is AccountLoginFailed -> {
-        this.loginProgress.visibility = VISIBLE
+        this.loginProgress.visibility = View.VISIBLE
         this.loginProgressBar.visibility = View.GONE
         this.loginProgressText.text = loginState.taskResult.steps.last().resolution.message
         this.loginFormUnlock()
@@ -729,7 +733,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
             this.tryLogin()
           }
         )
-        this.loginButtonErrorDetails.visibility = VISIBLE
+        this.loginButtonErrorDetails.visibility = View.VISIBLE
         this.loginButtonErrorDetails.setOnClickListener {
           this.viewModel.openErrorPage(loginState.taskResult.steps)
         }
@@ -774,9 +778,9 @@ class AccountDetailFragment : Fragment(R.layout.account) {
           }
         }
 
-        this.loginProgress.visibility = VISIBLE
+        this.loginProgress.visibility = View.VISIBLE
         this.loginButtonErrorDetails.visibility = View.GONE
-        this.loginProgressBar.visibility = VISIBLE
+        this.loginProgressBar.visibility = View.VISIBLE
         this.loginProgressText.text = loginState.status
         this.loginFormLock()
         this.setLoginButtonStatus(AsLogoutButtonDisabled)
@@ -795,7 +799,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
           }
         }
 
-        this.loginProgress.visibility = VISIBLE
+        this.loginProgress.visibility = View.VISIBLE
         this.loginProgressBar.visibility = View.GONE
         this.loginProgressText.text = loginState.taskResult.steps.last().resolution.message
         this.cancelImageButtonLoading()
@@ -807,7 +811,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
           }
         )
 
-        this.loginButtonErrorDetails.visibility = VISIBLE
+        this.loginButtonErrorDetails.visibility = View.VISIBLE
         this.loginButtonErrorDetails.setOnClickListener {
           this.viewModel.openErrorPage(loginState.taskResult.steps)
         }
@@ -893,7 +897,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   ) {
     if (uri != null) {
       view.setImageDrawable(null)
-      view.visibility = VISIBLE
+      view.visibility = View.VISIBLE
       this.imageLoader.loader.load(uri.toString())
         .fit()
         .tag(this.imageButtonLoadingTag)
@@ -954,7 +958,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
 
   private fun authenticationAlternativesShow() {
     if (this.viewModel.account.provider.authenticationAlternatives.isNotEmpty()) {
-      this.authenticationAlternatives.visibility = VISIBLE
+      this.authenticationAlternatives.visibility = View.VISIBLE
     }
   }
 
@@ -982,7 +986,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
    */
   private fun hideCardCreatorForNonNYPL() {
     if (this.viewModel.account.provider.cardCreatorURI != null) {
-      this.settingsCardCreator.visibility = VISIBLE
+      this.settingsCardCreator.visibility = View.VISIBLE
     }
   }
 

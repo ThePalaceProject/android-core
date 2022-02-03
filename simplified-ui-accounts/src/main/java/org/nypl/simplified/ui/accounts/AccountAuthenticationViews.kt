@@ -4,6 +4,7 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Anonymous
@@ -59,6 +60,13 @@ class AccountAuthenticationViews(
       this.coppa
     )
 
+  private val dividers =
+    listOf<View>(
+      this.viewGroup.findViewById(R.id.authTopDivider),
+      this.viewGroup.findViewById(R.id.authSpace),
+      this.viewGroup.findViewById(R.id.authBottomDivider)
+    )
+
   /**
    * Lock all of the views in the collection.
    *
@@ -107,6 +115,7 @@ class AccountAuthenticationViews(
    */
 
   fun showFor(description: AccountProviderAuthenticationDescription) {
+    this.dividers.forEach { it.isVisible = description !is Anonymous }
     this.viewGroups.forEach { it.viewGroup.visibility = GONE }
 
     return when (description) {

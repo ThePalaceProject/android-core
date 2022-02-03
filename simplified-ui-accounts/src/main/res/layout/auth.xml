@@ -1,14 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  android:id="@+id/auth"
-  android:layout_width="match_parent"
-  android:layout_height="wrap_content">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/auth"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
-  <include layout="@layout/auth_anon" />
-  <include layout="@layout/auth_basic" />
-  <include layout="@layout/auth_coppa" />
-  <include layout="@layout/auth_oauth" />
-  <include layout="@layout/auth_saml" />
+    <View
+        android:id="@+id/authTopDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?attr/simplifiedColorDisabledAccessibility" />
 
-</FrameLayout>
+    <Space
+        android:id="@+id/authSpace"
+        android:layout_width="match_parent"
+        android:layout_height="16dp" />
+
+    <include layout="@layout/auth_anon" />
+
+    <include layout="@layout/auth_basic" />
+
+    <include layout="@layout/auth_coppa" />
+
+    <include layout="@layout/auth_oauth" />
+
+    <include layout="@layout/auth_saml" />
+
+    <View
+        android:id="@+id/authBottomDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider" />
+
+</LinearLayout>
