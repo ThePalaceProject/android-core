@@ -151,9 +151,10 @@
         <c:change date="2022-01-21T00:00:00+00:00" summary="Removed the &quot;Show&quot; filter from My Books. This wasn't useful."/>
       </c:changes>
     </c:release>
-    <c:release date="2022-01-28T20:21:11+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.7">
+    <c:release date="2022-02-03T15:19:49+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.7">
       <c:changes>
-        <c:change date="2022-01-28T20:21:11+00:00" summary="Fixed the audiobook playback rate getting reset back to 1x after pausing."/>
+        <c:change date="2022-01-28T00:00:00+00:00" summary="Fixed the audiobook playback rate getting reset back to 1x after pausing."/>
+        <c:change date="2022-02-03T15:19:49+00:00" summary="Fixed a crash that could happen when exiting an audiobook while it's playing."/>
       </c:changes>
     </c:release>
   </c:releases>
