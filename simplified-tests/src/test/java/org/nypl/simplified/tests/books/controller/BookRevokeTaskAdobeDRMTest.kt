@@ -50,7 +50,6 @@ import org.nypl.simplified.books.book_database.api.BookDatabaseType
 import org.nypl.simplified.books.book_database.api.BookFormats
 import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
-import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.bundled.api.BundledContentResolverType
 import org.nypl.simplified.books.controller.BookRevokeTask
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
@@ -322,8 +321,7 @@ class BookRevokeTaskAdobeDRMTest {
     TaskDumps.dump(logger, result)
     result as TaskResult.Success
 
-    val newStatus = this.bookRegistry.bookOrException(bookId).status
-    newStatus as BookStatus.Loaned.LoanedNotDownloaded
+    Assertions.assertNull(this.bookRegistry.bookOrNull(bookId))
 
     Mockito.verify(bookDatabaseEntry, Times(1)).delete()
   }
@@ -439,8 +437,7 @@ class BookRevokeTaskAdobeDRMTest {
     TaskDumps.dump(logger, result)
     result as TaskResult.Success
 
-    val newStatus = this.bookRegistry.bookOrException(bookId).status
-    newStatus as BookStatus.Loaned.LoanedNotDownloaded
+    Assertions.assertNull(this.bookRegistry.bookOrNull(bookId))
 
     Mockito.verify(bookDatabaseEntry, Times(1)).delete()
   }
@@ -600,8 +597,7 @@ class BookRevokeTaskAdobeDRMTest {
     TaskDumps.dump(logger, result)
     result as TaskResult.Success
 
-    val newStatus = this.bookRegistry.bookOrException(bookId).status
-    newStatus as BookStatus.Loaned.LoanedNotDownloaded
+    Assertions.assertNull(this.bookRegistry.bookOrNull(bookId))
 
     Mockito.verify(bookDatabaseEntry, Times(1)).delete()
     Mockito.verify(drmHandle, Times(1)).setAdobeRightsInformation(null)
