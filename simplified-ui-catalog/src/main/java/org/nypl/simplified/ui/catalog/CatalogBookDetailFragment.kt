@@ -490,10 +490,10 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
     bookStatus: BookStatus.Held,
     book: Book
   ) {
-    this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
     this.buttons.removeAllViews()
     when (bookStatus) {
-      is BookStatus.Held.HeldInQueue ->
+      is BookStatus.Held.HeldInQueue -> {
+        this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
         if (bookStatus.isRevocable) {
           this.buttons.addView(
             this.buttonCreator.createRevokeHoldButton(
@@ -508,6 +508,9 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
           )
         }
 
+        this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
+      }
+
       is BookStatus.Held.HeldReady -> {
         if (bookStatus.isRevocable) {
           this.buttons.addView(
@@ -517,7 +520,11 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
               }
             )
           )
+          this.buttons.addView(this.buttonCreator.createButtonSpace())
+        } else {
+          this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
         }
+
         this.buttons.addView(
           this.buttonCreator.createGetButton(
             onClick = {
@@ -525,9 +532,13 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
             }
           )
         )
+
+        // if the book is not revocable, we need to add a dummy button on the right
+        if (!bookStatus.isRevocable) {
+          this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
+        }
       }
     }
-    this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
     this.checkButtonViewCount()
 
     this.statusInProgress.visibility = View.INVISIBLE
