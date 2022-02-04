@@ -17,6 +17,7 @@ import org.joda.time.Duration
 import org.joda.time.Instant
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -276,8 +277,7 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    val newStatus = this.bookRegistry.bookOrException(bookId).status
-    newStatus as BookStatus.Loaned.LoanedNotDownloaded
+    assertNull(this.bookRegistry.bookOrNull(bookId))
 
     assertTrue(bookDatabaseEntry.deleted)
     assertEquals(0, this.server.requestCount)
@@ -683,8 +683,7 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    val newStatus = this.bookRegistry.bookOrException(bookId).status
-    newStatus as BookStatus.Loaned.LoanedNotDownloaded
+    assertNull(this.bookRegistry.bookOrNull(bookId))
 
     Mockito.verify(bookDatabaseEntry, Times(1)).delete()
 
@@ -816,8 +815,7 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    val newStatus = this.bookRegistry.bookOrException(bookId).status
-    newStatus as BookStatus.Loanable
+    assertNull(this.bookRegistry.bookOrNull(bookId))
 
     assertTrue(bookDatabaseEntry.deleted)
     assertEquals(1, this.server.requestCount)
@@ -1050,8 +1048,7 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    val newStatus = this.bookRegistry.bookOrException(bookId).status
-    newStatus as BookStatus.Holdable
+    assertNull(this.bookRegistry.bookOrNull(bookId))
 
     assertTrue(bookDatabaseEntry.deleted)
     assertEquals(1, this.server.requestCount)
@@ -1177,8 +1174,7 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    val newStatus = this.bookRegistry.bookOrException(bookId).status
-    newStatus as BookStatus.Holdable
+    assertNull(this.bookRegistry.bookOrNull(bookId))
 
     assertTrue(bookDatabaseEntry.deleted)
     assertEquals(0, this.server.requestCount)
@@ -1312,8 +1308,7 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    val newStatus = this.bookRegistry.bookOrException(bookId).status
-    newStatus as BookStatus.Loaned.LoanedNotDownloaded
+    assertNull(this.bookRegistry.bookOrNull(bookId))
 
     assertTrue(bookDatabaseEntry.deleted)
     assertEquals(1, this.server.requestCount)
@@ -1415,8 +1410,7 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    val newStatus = this.bookRegistry.bookOrException(bookId).status
-    newStatus is BookStatus.Loanable
+    assertNull(this.bookRegistry.bookOrNull(bookId))
 
     assertTrue(bookDatabaseEntry.deleted)
     assertEquals(0, this.server.requestCount)
@@ -1546,8 +1540,7 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    val newStatus = this.bookRegistry.bookOrException(bookId).status
-    newStatus as BookStatus.Loaned.LoanedNotDownloaded
+    assertNull(this.bookRegistry.bookOrNull(bookId))
 
     assertTrue(bookDatabaseEntry.deleted)
     assertEquals(1, this.server.requestCount)
@@ -2473,8 +2466,7 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    val newStatus = this.bookRegistry.bookOrException(bookId).status
-    newStatus as BookStatus.Loaned.LoanedNotDownloaded
+    assertNull(this.bookRegistry.bookOrNull(bookId))
 
     Mockito.verify(bookDatabaseEntry, Times(1)).delete()
 
@@ -2601,8 +2593,7 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    val newStatus = this.bookRegistry.bookOrException(bookId).status
-    newStatus as BookStatus.Loaned.LoanedNotDownloaded
+    assertNull(this.bookRegistry.bookOrNull(bookId))
 
     assertTrue(bookDatabaseEntry.deleted)
     assertEquals(1, this.server.requestCount)
