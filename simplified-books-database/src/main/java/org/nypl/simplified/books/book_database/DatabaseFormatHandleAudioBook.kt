@@ -192,6 +192,7 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
             val engine =
               PlayerAudioEngines.findBestFor(
                 PlayerAudioEngineRequest(
+                  file = this.fileBook,
                   manifest = manifestResult.result,
                   filter = { true },
                   downloadProvider = NullDownloadProvider(),

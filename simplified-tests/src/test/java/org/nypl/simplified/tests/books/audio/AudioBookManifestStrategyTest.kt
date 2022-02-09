@@ -14,7 +14,7 @@ import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfillmentS
 import org.librarysimplified.audiobook.manifest_parser.api.ManifestParsersType
 import org.mockito.Mockito
 import org.nypl.simplified.books.audio.AudioBookManifestRequest
-import org.nypl.simplified.books.audio.AudioBookManifestStrategy
+import org.nypl.simplified.books.audio.UnpackagedAudioBookManifestStrategy
 import org.nypl.simplified.books.book_database.api.BookFormats
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.tests.MutableServiceDirectory
@@ -64,7 +64,7 @@ class AudioBookManifestStrategyTest {
   @Test
   fun testNoBasicStrategyAvailable() {
     val strategy =
-      AudioBookManifestStrategy(
+      UnpackagedAudioBookManifestStrategy(
         AudioBookManifestRequest(
           targetURI = URI.create("http://www.example.com"),
           contentType = BookFormats.audioBookGenericMimeTypes().first(),
@@ -105,7 +105,7 @@ class AudioBookManifestStrategyTest {
       .thenReturn(fulfillmentResult)
 
     val strategy =
-      AudioBookManifestStrategy(
+      UnpackagedAudioBookManifestStrategy(
         AudioBookManifestRequest(
           targetURI = URI.create("http://www.example.com"),
           contentType = BookFormats.audioBookGenericMimeTypes().first(),
@@ -152,7 +152,7 @@ class AudioBookManifestStrategyTest {
       .thenReturn(fulfillmentResult)
 
     val strategy =
-      AudioBookManifestStrategy(
+      UnpackagedAudioBookManifestStrategy(
         AudioBookManifestRequest(
           targetURI = URI.create("http://www.example.com"),
           contentType = BookFormats.audioBookGenericMimeTypes().first(),
@@ -202,7 +202,7 @@ class AudioBookManifestStrategyTest {
       .thenReturn(fulfillmentResult)
 
     val strategy =
-      AudioBookManifestStrategy(
+      UnpackagedAudioBookManifestStrategy(
         AudioBookManifestRequest(
           targetURI = URI.create("http://www.example.com"),
           contentType = BookFormats.audioBookGenericMimeTypes().first(),
@@ -253,7 +253,7 @@ class AudioBookManifestStrategyTest {
       .thenReturn(fulfillmentResult)
 
     val strategy =
-      AudioBookManifestStrategy(
+      UnpackagedAudioBookManifestStrategy(
         AudioBookManifestRequest(
           targetURI = URI.create("http://www.example.com"),
           contentType = BookFormats.audioBookGenericMimeTypes().first(),
@@ -276,7 +276,7 @@ class AudioBookManifestStrategyTest {
   @Test
   fun testNoNetworkLoadFails() {
     val strategy =
-      AudioBookManifestStrategy(
+      UnpackagedAudioBookManifestStrategy(
         AudioBookManifestRequest(
           targetURI = URI.create("http://www.example.com"),
           contentType = BookFormats.audioBookGenericMimeTypes().first(),
@@ -296,7 +296,7 @@ class AudioBookManifestStrategyTest {
   @Test
   fun testNoNetworkLoadSucceeds() {
     val strategy =
-      AudioBookManifestStrategy(
+      UnpackagedAudioBookManifestStrategy(
         AudioBookManifestRequest(
           targetURI = URI.create("http://www.example.com"),
           contentType = BookFormats.audioBookGenericMimeTypes().first(),

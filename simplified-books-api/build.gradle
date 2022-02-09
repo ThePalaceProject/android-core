@@ -1,5 +1,6 @@
 dependencies {
   api project(":simplified-accounts-api")
+  api project(":simplified-lcp")
   api project(":simplified-opds-core")
   api project(":simplified-json-core")
 
@@ -11,6 +12,7 @@ dependencies {
   implementation libs.kotlin.reflect
   implementation libs.kotlin.stdlib
   implementation libs.palace.drm.core
+  implementation libs.palace.readium2.api
   implementation libs.slf4j
 
   compileOnly libs.google.auto.value
