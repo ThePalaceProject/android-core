@@ -209,7 +209,7 @@ class CatalogBookDetailViewModel(
     return when (val arguments = this.parameters.feedArguments) {
       is CatalogFeedArguments.CatalogFeedArgumentsRemote ->
         CatalogFeedArguments.CatalogFeedArgumentsRemote(
-          feedURI = arguments.feedURI.resolve(uri).normalize(),
+          feedURI = arguments.feedURI.resolve(uri),
           isSearchResults = false,
           ownership = CatalogFeedOwnership.OwnedByAccount(accountID),
           title = title
@@ -217,7 +217,7 @@ class CatalogBookDetailViewModel(
 
       is CatalogFeedArguments.CatalogFeedArgumentsLocalBooks -> {
         CatalogFeedArguments.CatalogFeedArgumentsRemote(
-          feedURI = uri.normalize(),
+          feedURI = uri,
           isSearchResults = false,
           ownership = CatalogFeedOwnership.OwnedByAccount(accountID),
           title = title
