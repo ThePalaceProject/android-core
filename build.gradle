@@ -104,6 +104,42 @@ ext {
       throw new GradleException(text);
     }
   }
+
+  //
+  // Load secrets stored in secrets.conf.
+  //
+
+  assetPath = project.findProperty('org.thepalaceproject.app.assets.palace')
+  secrets = new Properties()
+
+  if (nyplDrmEnabled) {
+    file("$assetPath/secrets.conf").withInputStream {
+      secrets.load(it)
+    }
+  }
+
+  //
+  // Get the LCP production license key from secrets, or default to the test key.
+  //
+
+  lcpLicenseKey = secrets.getProperty('lcp.prod.license.key', 'test')
+}
+
+//
+// If we're not using the production LCP module, the only version available is 1.0.0, so
+// substitute out the version that was requested.
+//
+
+if (lcpLicenseKey == 'test') {
+  allprojects {
+    configurations.all {
+      resolutionStrategy {
+        dependencySubstitution {
+          substitute module('readium:liblcp') using module('readium:liblcp:1.0.0') because 'no LCP production license key was found, and the LCP test repository only contains version 1.0.0'
+        }
+      }
+    }
+  }
 }
 
 subprojects { project ->
@@ -186,7 +222,7 @@ subprojects { project ->
       name = "LCP"
       url = uri('https://liblcp.dita.digital')
       patternLayout {
-        artifact ("/[organisation]/[module]/android/aar/test/[revision].aar")
+        artifact ("/[organisation]/[module]/android/aar/$lcpLicenseKey/[revision].[ext]")
       }
       metadataSources {
         artifact()
