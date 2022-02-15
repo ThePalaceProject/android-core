@@ -32,15 +32,11 @@ interface BookCoverProviderType {
    *
    * @param entry The feed entry
    * @param imageView The image view
-   * @param width Use 0 as desired dimension to resize keeping aspect ratio.
-   * @param height Use 0 as desired dimension to resize keeping aspect ratio.
    */
 
   fun loadThumbnailInto(
     entry: FeedEntry.FeedEntryOPDS,
     imageView: ImageView,
-    width: Int,
-    height: Int
   ): FluentFuture<Unit>
 
   /**
@@ -51,15 +47,11 @@ interface BookCoverProviderType {
    *
    * @param entry The feed entry
    * @param imageView The image view
-   * @param width Use 0 as desired dimension to resize keeping aspect ratio.
-   * @param height Use 0 as desired dimension to resize keeping aspect ratio.
    */
 
   fun loadCoverInto(
     entry: FeedEntry.FeedEntryOPDS,
     imageView: ImageView,
-    width: Int,
-    height: Int
   ): FluentFuture<Unit>
 
   /**

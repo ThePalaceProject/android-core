@@ -718,9 +718,7 @@ class AudioBookPlayerActivity :
 
     this.covers.loadCoverInto(
       FeedEntry.FeedEntryOPDS(this.parameters.accountID, this.parameters.opdsEntry),
-      view,
-      this.screenSize.dpToPixels(300).toInt(),
-      this.screenSize.dpToPixels(400).toInt()
+      view
     )
   }
 

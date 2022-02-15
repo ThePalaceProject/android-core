@@ -52,8 +52,6 @@ class BookCoverProvider private constructor(
   private fun doLoad(
     entry: FeedEntry.FeedEntryOPDS,
     imageView: ImageView,
-    width: Int,
-    height: Int,
     tag: String,
     uriSpecified: URI?
   ): FluentFuture<Unit> {
@@ -106,7 +104,6 @@ class BookCoverProvider private constructor(
             .tag(tag)
             .error(R.drawable.cover_error)
             .placeholder(R.drawable.cover_loading)
-            .resize(width, height)
             .transform(badgePainter)
             .into(imageView, callbackFinal)
         }
@@ -116,7 +113,6 @@ class BookCoverProvider private constructor(
         .tag(tag)
         .error(R.drawable.cover_error)
         .placeholder(R.drawable.cover_loading)
-        .resize(width, height)
         .transform(badgePainter)
         .into(imageView, fallbackToGeneration)
     } else {
@@ -126,7 +122,6 @@ class BookCoverProvider private constructor(
         .tag(tag)
         .error(R.drawable.cover_error)
         .placeholder(R.drawable.cover_loading)
-        .resize(width, height)
         .transform(badgePainter)
         .into(imageView, callbackFinal)
     }
@@ -197,14 +192,10 @@ class BookCoverProvider private constructor(
   override fun loadThumbnailInto(
     entry: FeedEntry.FeedEntryOPDS,
     imageView: ImageView,
-    width: Int,
-    height: Int
   ): FluentFuture<Unit> {
     return doLoad(
       entry = entry,
       imageView = imageView,
-      width = width,
-      height = height,
       tag = thumbnailTag,
       uriSpecified = thumbnailURIOf(entry)
     )
@@ -213,14 +204,10 @@ class BookCoverProvider private constructor(
   override fun loadCoverInto(
     entry: FeedEntry.FeedEntryOPDS,
     imageView: ImageView,
-    width: Int,
-    height: Int
   ): FluentFuture<Unit> {
     return doLoad(
       entry = entry,
       imageView = imageView,
-      width = width,
-      height = height,
       tag = coverTag,
       uriSpecified = coverURIOf(entry)
     )
