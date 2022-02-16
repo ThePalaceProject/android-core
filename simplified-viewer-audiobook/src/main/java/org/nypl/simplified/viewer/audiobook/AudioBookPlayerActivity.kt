@@ -709,18 +709,11 @@ class AudioBookPlayerActivity :
   }
 
   override fun onPlayerWantsCoverImage(view: ImageView) {
-    /*
-     * Use the cover provider to load a cover image into the image view. The width and height
-     * are essentially hints; the target image view almost certainly won't have a usable size
-     * before this method is called, so we pass in a width/height hint that should give something
-     * reasonably close to the expected 3:4 cover image size ratio.
-     */
-
     this.covers.loadCoverInto(
-      FeedEntry.FeedEntryOPDS(this.parameters.accountID, this.parameters.opdsEntry),
-      view,
-      this.screenSize.dpToPixels(300).toInt(),
-      this.screenSize.dpToPixels(400).toInt()
+      entry = FeedEntry.FeedEntryOPDS(this.parameters.accountID, this.parameters.opdsEntry),
+      imageView = view,
+      width = 0,
+      height = 0
     )
   }
 
