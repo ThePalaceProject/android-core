@@ -27,55 +27,55 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_marginBottom="16dp"
-      android:text="Crash" />
+      android:text="@string/settingsDevCrash" />
 
     <Button
       android:id="@+id/settingsVersionDevShowCacheDir"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_marginBottom="16dp"
-      android:text="Show Cache Directory" />
+      android:text="@string/settingsDevCacheDir" />
 
     <Button
       android:id="@+id/settingsVersionDevSendReports"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_marginBottom="16dp"
-      android:text="Send Error Logs" />
+      android:text="@string/settingsDevSendErrorLogs" />
 
     <Button
       android:id="@+id/settingsVersionDevShowError"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_marginBottom="16dp"
-      android:text="Show Error Page" />
+      android:text="@string/settingsDevShowErrorPage" />
 
     <Button
       android:id="@+id/settingsVersionDevSyncAnalytics"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_marginBottom="16dp"
-      android:text="Send Analytics" />
+      android:text="@string/settingsDevSendAnalytics" />
 
     <Button
       android:id="@+id/settingsVersionDevSyncAccounts"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_marginBottom="16dp"
-      android:text="Sync Accounts" />
+      android:text="@string/settingsDevSyncAccounts" />
 
     <Button
       android:id="@+id/settingsVersionDevUnacknowledgeAnnouncements"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_marginBottom="16dp"
-      android:text="Forget All Announcements" />
+      android:text="@string/settingsDevForgetAllAnnouncements" />
 
     <TextView
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_marginBottom="16dp"
-      android:text="DRM Support"
+      android:text="@string/settingsDevDrmSupport"
       android:textSize="24sp"
       android:textStyle="bold" />
 
@@ -83,13 +83,13 @@
       android:id="@+id/settingsVersionDrmSupport"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:layout_marginBottom="16dp"></TableLayout>
+      android:layout_marginBottom="16dp" />
 
     <TextView
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_marginBottom="16dp"
-      android:text="Adobe DRM Activations"
+      android:text="@string/settingsDevAdobeDrmActivations"
       android:textSize="14sp"
       android:textStyle="bold" />
 
@@ -108,15 +108,15 @@
 
         <TableRow>
 
-          <TextView android:text="Placeholder" />
+          <TextView android:text="@string/settingsDevPlaceholder" />
 
-          <TextView android:text="Placeholder" />
+          <TextView android:text="@string/settingsDevPlaceholder" />
 
-          <TextView android:text="Placeholder" />
+          <TextView android:text="@string/settingsDevPlaceholder" />
 
-          <TextView android:text="Placeholder" />
+          <TextView android:text="@string/settingsDevPlaceholder" />
 
-          <TextView android:text="Placeholder" />
+          <TextView android:text="@string/settingsDevPlaceholder" />
         </TableRow>
       </TableLayout>
     </HorizontalScrollView>
@@ -125,7 +125,7 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_marginBottom="16dp"
-      android:text="Crashlytics"
+      android:text="@string/settingsDevCrashlytics"
       android:textSize="24sp"
       android:textStyle="bold" />
 
@@ -133,7 +133,7 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_marginBottom="16dp"
-      android:text="Current Crashlytics User ID"
+      android:text="@string/settingsDevCrashlyticsCurrentUserId"
       android:textSize="14sp"
       android:textStyle="bold" />
 
@@ -142,8 +142,9 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_marginBottom="16dp"
+      android:textAllCaps="true"
       android:fontFamily="monospace"
-      android:text="PLACEHOLDER"
+      android:text="@string/settingsDevPlaceholder"
       android:textIsSelectable="true"
       android:textSize="14sp"
       android:textStyle="bold" />
@@ -152,7 +153,7 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_marginBottom="16dp"
-      android:text="Testing Features"
+      android:text="@string/settingsDevTestingFeatures"
       android:textSize="24sp"
       android:textStyle="bold" />
 
@@ -163,7 +164,7 @@
       android:layout_marginBottom="16dp"
       android:checked="false"
       android:enabled="true"
-      android:text="Show non-production libraries" />
+      android:text="@string/settingsDevEnableHiddenLibraries" />
 
     <androidx.appcompat.widget.SwitchCompat
       android:id="@+id/settingsVersionDevFailNextBootSwitch"
@@ -172,7 +173,7 @@
       android:layout_marginBottom="16dp"
       android:checked="false"
       android:enabled="true"
-      android:text="Cause the next application startup to fail" />
+      android:text="@string/settingsDevFailNextStartup" />
 
     <androidx.appcompat.widget.SwitchCompat
       android:id="@+id/settingsVersionDevSeenLibrarySelectionScreen"
@@ -181,7 +182,7 @@
       android:layout_marginBottom="16dp"
       android:checked="false"
       android:enabled="true"
-      android:text="User has seen library selection screen?" />
+      android:text="@string/settingsDevUserSeenLibrarySelection" />
 
     <androidx.appcompat.widget.SwitchCompat
       android:id="@+id/settingsVersionDevCardCreatorLocationSwitch"
@@ -190,7 +191,7 @@
       android:layout_marginBottom="16dp"
       android:checked="false"
       android:enabled="true"
-      android:text="Card Creator: Pretend the user is in New York"
+      android:text="@string/settingsDevCardCreatorUserNewYork"
       android:visibility="gone" />
 
     <androidx.appcompat.widget.SwitchCompat
@@ -200,14 +201,14 @@
       android:layout_marginBottom="16dp"
       android:checked="false"
       android:enabled="true"
-      android:text="Only show supported books (Uncheck to show unsupported books)" />
+      android:text="@string/settingsDevShowSupportedBooks" />
 
     <Button
       android:id="@+id/settingsVersionDevCustomOPDS"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_marginBottom="16dp"
-      android:text="Add Custom OPDS Feed" />
+      android:text="@string/settingsDevAddCustomOpdsFeed" />
 
     <Button
       android:id="@+id/settingsVersionDevEnableOpenEBooksQA"
@@ -216,7 +217,7 @@
       android:layout_marginBottom="16dp"
       android:checked="false"
       android:enabled="true"
-      android:text="Toggle OpenEBooks QA Account" />
+      android:text="@string/settingsDevToggleOpenEBooksQAAccount" />
 
     <include layout="@layout/settings_debug_library_registry" />
   </LinearLayout>
