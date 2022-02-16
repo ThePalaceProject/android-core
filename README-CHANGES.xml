@@ -159,6 +159,7 @@
         <c:change date="2022-02-04T00:00:00+00:00" summary="Fixed books remaining in My Books after they've been returned."/>
         <c:change date="2022-02-08T00:00:00+00:00" summary="Fixed reader toolbar not changing color to match the selected color scheme."/>
         <c:change date="2022-02-08T00:00:00+00:00" summary="Fixed related books error"/>
+        <c:change date="2022-02-15T16:30:25+00:00" summary="Removed audiobook cover image resizing dimensions"/>
         <c:change date="2022-02-15T23:16:55+00:00" summary="Updated text on debug options"/>
       </c:changes>
     </c:release>

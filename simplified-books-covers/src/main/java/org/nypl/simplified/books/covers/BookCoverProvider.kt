@@ -102,32 +102,45 @@ class BookCoverProvider private constructor(
             e
           )
 
-          this@BookCoverProvider.picasso.load(uriGenerated.toString())
+          val requestCreator = this@BookCoverProvider.picasso.load(uriGenerated.toString())
             .tag(tag)
             .error(R.drawable.cover_error)
             .placeholder(R.drawable.cover_loading)
-            .resize(width, height)
+
+          if (width > 0 || height > 0) {
+            requestCreator.resize(width, height)
+          }
+
+          requestCreator
             .transform(badgePainter)
             .into(imageView, callbackFinal)
         }
       }
 
-      this.picasso.load(uriSpecified.toString())
+      val requestCreator = this.picasso.load(uriSpecified.toString())
         .tag(tag)
         .error(R.drawable.cover_error)
         .placeholder(R.drawable.cover_loading)
-        .resize(width, height)
-        .transform(badgePainter)
+
+      if (width > 0 || height > 0) {
+        requestCreator.resize(width, height)
+      }
+
+      requestCreator.transform(badgePainter)
         .into(imageView, fallbackToGeneration)
     } else {
       this.logger.debug("{}: {}: loading generated uri {}", tag, entry.bookID, uriGenerated)
 
-      this.picasso.load(uriGenerated.toString())
+      val requestCreator = this.picasso.load(uriGenerated.toString())
         .tag(tag)
         .error(R.drawable.cover_error)
         .placeholder(R.drawable.cover_loading)
-        .resize(width, height)
-        .transform(badgePainter)
+
+      if (width > 0 || height > 0) {
+        requestCreator.resize(width, height)
+      }
+
+      requestCreator.transform(badgePainter)
         .into(imageView, callbackFinal)
     }
 
@@ -173,7 +186,11 @@ class BookCoverProvider private constructor(
     val bitmap: Bitmap = if (drawable.intrinsicWidth <= 0 || drawable.intrinsicHeight <= 0) {
       Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
     } else {
-      Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
+      Bitmap.createBitmap(
+        drawable.intrinsicWidth,
+        drawable.intrinsicHeight,
+        Bitmap.Config.ARGB_8888
+      )
     }
 
     val canvas = Canvas(bitmap)
