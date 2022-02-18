@@ -3,7 +3,9 @@ package org.nypl.simplified.viewer.pdf
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import edu.umn.minitex.pdf.android.api.PdfFragmentListenerType
 import edu.umn.minitex.pdf.android.api.TableOfContentsFragmentListenerType
 import edu.umn.minitex.pdf.android.api.TableOfContentsItem
@@ -84,6 +86,12 @@ class PdfReaderActivity :
     this.account = currentProfile.account(accountId)
     this.books = account.bookDatabase
 
+    val toolbar = this.findViewById(R.id.pdf_toolbar) as Toolbar
+    this.setSupportActionBar(toolbar)
+    this.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    this.supportActionBar?.setDisplayShowHomeEnabled(true)
+    this.supportActionBar?.title = ""
+
     try {
       this.entry = books.entry(id)
       this.handle = entry.findFormatHandle(BookDatabaseEntryFormatHandlePDF::class.java)!!
@@ -104,6 +112,13 @@ class PdfReaderActivity :
       this.tableOfContentsList =
         savedInstanceState.getParcelableArrayList(TABLE_OF_CONTENTS) ?: arrayListOf()
     }
+  }
+
+  override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    if (item.itemId == android.R.id.home) {
+      onBackPressed()
+    }
+    return super.onOptionsItemSelected(item)
   }
 
   override fun onSaveInstanceState(outState: Bundle) {
