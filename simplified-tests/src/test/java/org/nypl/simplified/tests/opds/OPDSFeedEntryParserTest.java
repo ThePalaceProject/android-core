@@ -118,6 +118,7 @@ public final class OPDSFeedEntryParserTest {
 
     Assertions.assertEquals(expected, availability);
 
+    Assertions.assertEquals(1, e.getNarrators().size());
     Assertions.assertEquals(1, e.getAcquisitions().size());
     final OPDSAcquisition acquisition = e.getAcquisitions().get(0);
     Assertions.assertTrue(

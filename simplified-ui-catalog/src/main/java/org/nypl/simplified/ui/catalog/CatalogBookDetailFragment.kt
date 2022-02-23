@@ -333,6 +333,14 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
       this.metadata.addView(row)
     }
 
+    val narrators = entry.narrators.filterNot { it.isBlank() }
+    if (narrators.isNotEmpty()) {
+      val (row, rowKey, rowVal) = this.tableRowOf()
+      rowKey.text = this.getString(R.string.catalogMetaNarrators)
+      rowVal.text = narrators.joinToString(", ")
+      this.metadata.addView(row)
+    }
+
     this.run {
       val (row, rowKey, rowVal) = this.tableRowOf()
       rowKey.text = this.getString(R.string.catalogMetaUpdatedDate)

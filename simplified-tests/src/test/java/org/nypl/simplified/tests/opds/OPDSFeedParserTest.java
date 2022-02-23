@@ -93,6 +93,7 @@ public final class OPDSFeedParserTest {
       final DateTime e_u = e.getUpdated();
       final List<OPDSAcquisition> e_acq = e.getAcquisitions();
       final List<String> e_authors = e.getAuthors();
+      final List<String> e_narrators = e.getNarrators();
       final OptionType<URI> e_thumb = e.getThumbnail();
       final OptionType<URI> e_cover = e.getCover();
 
@@ -107,6 +108,12 @@ public final class OPDSFeedParserTest {
         System.out.print(ea);
       }
 
+      System.out.print("narrators: ");
+      for (final String n : e_narrators) {
+        System.out.print(n);
+      }
+      System.out.println();
+
       System.out.println();
       System.out.println("id: " + e_id);
       System.out.println("title: " + e_title);
@@ -116,6 +123,7 @@ public final class OPDSFeedParserTest {
 
       Assertions.assertTrue(e.getPublisher().isSome());
       Assertions.assertTrue(e_authors.size() > 0);
+      Assertions.assertTrue(e_narrators.size() > 0);
       Assertions.assertTrue(e_acq.size() > 0);
 
       if (ids.contains(e_id)) {
