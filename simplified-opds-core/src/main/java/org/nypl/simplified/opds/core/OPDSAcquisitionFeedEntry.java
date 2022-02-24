@@ -39,6 +39,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
   private final OptionType<String> publisher;
   private final String distribution;
   private final String summary;
+  private final List<String> narrators;
   private final OptionType<URI> thumbnail;
   private final String title;
   private final DateTime updated;
@@ -61,6 +62,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     final OptionType<URI> in_thumbnail,
     final DateTime in_updated,
     final String in_summary,
+    final List<String> in_narrators,
     final OptionType<DateTime> in_published,
     final OptionType<String> in_publisher,
     final String in_distribution,
@@ -82,6 +84,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     this.thumbnail = NullCheck.notNull(in_thumbnail);
     this.updated = NullCheck.notNull(in_updated);
     this.summary = NullCheck.notNull(in_summary);
+    this.narrators = NullCheck.notNull(in_narrators);
     this.published = NullCheck.notNull(in_published);
     this.publisher = NullCheck.notNull(in_publisher);
     this.distribution = NullCheck.notNull(in_distribution);
@@ -229,6 +232,14 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
 
   public List<OPDSCategory> getCategories() {
     return this.categories;
+  }
+
+  /**
+   * @return The list of narrators
+   */
+
+  public List<String> getNarrators() {
+    return this.narrators;
   }
 
   /**
@@ -444,6 +455,8 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     b.append(this.distribution);
     b.append(", summary=");
     b.append(this.summary);
+    b.append(", narrator=");
+    b.append(this.narrators);
     b.append(", thumbnail=");
     b.append(this.thumbnail);
     b.append(", title=");
@@ -476,6 +489,8 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     private OptionType<String> publisher;
     private String distribution;
     private String summary;
+    private List<String> narrators;
+    private OptionType<String> copyright;
     private OptionType<URI> thumbnail;
     private OptionType<DRMLicensor> licensor;
 
@@ -492,6 +507,8 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
       this.updated = NullCheck.notNull(in_updated);
       this.availability = NullCheck.notNull(in_availability);
       this.summary = "";
+      this.narrators = new ArrayList<String>();
+      this.copyright = Option.none();
       this.thumbnail = Option.none();
       this.cover = Option.none();
       this.alternate = Option.none();
@@ -560,6 +577,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
         this.thumbnail,
         this.updated,
         this.summary,
+        this.narrators,
         this.published,
         this.publisher,
         this.distribution,
@@ -653,6 +671,12 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
       } else {
         this.summary = ((Some<String>) text).get();
       }
+      return this;
+    }
+
+    @Override
+    public OPDSAcquisitionFeedEntryBuilderType addNarrator(String name) {
+      this.narrators.add(NullCheck.notNull(name));
       return this;
     }
 
