@@ -76,6 +76,7 @@ public final class OPDSJSONSerializerTest {
       Assertions.assertEquals(e0.getCover(), e1.getCover());
       Assertions.assertEquals(e0.getGroups(), e1.getGroups());
       Assertions.assertEquals(e0.getID(), e1.getID());
+      Assertions.assertEquals(e0.getNarrators(), e1.getNarrators());
       Assertions.assertEquals(e0.getPublished(), e1.getPublished());
       Assertions.assertEquals(e0.getPublisher(), e1.getPublisher());
       Assertions.assertEquals(e0.getSummary(), e1.getSummary());
@@ -117,6 +118,7 @@ public final class OPDSJSONSerializerTest {
         Assertions.assertEquals(e0.getCover(), e1.getCover());
         Assertions.assertEquals(e0.getGroups(), e1.getGroups());
         Assertions.assertEquals(e0.getID(), e1.getID());
+        Assertions.assertEquals(e0.getNarrators(), e1.getNarrators());
         Assertions.assertEquals(e0.getPublisher(), e1.getPublisher());
         Assertions.assertEquals(e0.getSummary(), e1.getSummary());
         Assertions.assertEquals(e0.getThumbnail(), e1.getThumbnail());

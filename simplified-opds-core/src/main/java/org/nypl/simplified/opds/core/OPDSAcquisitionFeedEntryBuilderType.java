@@ -165,6 +165,15 @@ public interface OPDSAcquisitionFeedEntryBuilderType
     OptionType<String> text);
 
   /**
+   * Set the narrator.
+   *
+   * @param name The narrator's name
+   */
+
+  OPDSAcquisitionFeedEntryBuilderType addNarrator(
+    final String name);
+
+  /**
    * Set the thumbnail.
    *
    * @param uri The thumbnail

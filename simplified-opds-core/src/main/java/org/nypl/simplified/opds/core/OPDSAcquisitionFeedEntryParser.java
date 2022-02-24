@@ -23,6 +23,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -73,6 +74,26 @@ public final class OPDSAcquisitionFeedEntryParser implements OPDSAcquisitionFeed
       final String name =
         OPDSXML.getFirstChildElementTextWithName(Objects.requireNonNull(ea), ATOM_URI, "name");
       eb.addAuthor(name);
+    }
+  }
+
+  private void findNarrators(
+    final Element element,
+    final OPDSAcquisitionFeedEntryBuilderType eb)
+    throws OPDSParseException {
+
+    final List<Element> e_contributors =
+      OPDSXML.getChildElementsWithName(element, ATOM_URI, "contributor");
+    for (final Element ec : e_contributors) {
+      Objects.requireNonNull(ec);
+      if (ec.hasAttribute("opf:role")) {
+        String role = ec.getAttribute("opf:role");
+        if (role.toLowerCase(Locale.ROOT).equals("nrt")) {
+          final String narratorName =
+            OPDSXML.getFirstChildElementTextWithName(Objects.requireNonNull(ec), ATOM_URI, "name");
+          eb.addNarrator(narratorName);
+        }
+      }
     }
   }
 
@@ -166,6 +187,7 @@ public final class OPDSAcquisitionFeedEntryParser implements OPDSAcquisitionFeed
     parseCategories(element, entry_builder);
 
     findAcquisitionAuthors(element, entry_builder);
+    findNarrators(element, entry_builder);
     entry_builder.setPublisherOption(findPublisher(element));
     entry_builder.setDistribution(findDistribution(element));
     entry_builder.setPublishedOption(OPDSAtom.findPublished(element));

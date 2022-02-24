@@ -47,6 +47,9 @@
   "cover": "https://d3pqhns20516vc.cloudfront.net/3M/beunz9/cover.jpg",
   "groups": [],
   "id": "urn:librarysimplified.org/terms/id/Bibliotheca%20ID/beunz9",
+  "narrators": [
+    "Simon Vance"
+  ],
   "published": "2014-04-01T01:00:00Z",
   "publisher": "Little, Brown and Company",
   "distribution": "Bibliotheca",
