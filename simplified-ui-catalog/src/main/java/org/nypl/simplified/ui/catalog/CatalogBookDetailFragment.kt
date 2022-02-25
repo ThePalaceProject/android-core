@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
-import android.widget.TableLayout
 import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -93,7 +92,7 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
   private lateinit var covers: BookCoverProviderType
   private lateinit var debugStatus: TextView
   private lateinit var format: TextView
-  private lateinit var metadata: TableLayout
+  private lateinit var metadata: LinearLayout
   private lateinit var related: TextView
   private lateinit var report: TextView
   private lateinit var screenSize: ScreenSizeInformationType
@@ -303,7 +302,7 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
 
     val publishedOpt = entry.published
     if (publishedOpt is Some<DateTime>) {
-      val (row, rowKey, rowVal) = this.tableRowOf()
+      val (row, rowKey, rowVal) = this.bookInfoViewOf()
       rowKey.text = this.getString(R.string.catalogMetaPublicationDate)
       rowVal.text = this.dateFormatter.print(publishedOpt.get())
       this.metadata.addView(row)
@@ -311,14 +310,14 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
 
     val publisherOpt = entry.publisher
     if (publisherOpt is Some<String>) {
-      val (row, rowKey, rowVal) = this.tableRowOf()
+      val (row, rowKey, rowVal) = this.bookInfoViewOf()
       rowKey.text = this.getString(R.string.catalogMetaPublisher)
       rowVal.text = publisherOpt.get()
       this.metadata.addView(row)
     }
 
     if (entry.distribution.isNotBlank()) {
-      val (row, rowKey, rowVal) = this.tableRowOf()
+      val (row, rowKey, rowVal) = this.bookInfoViewOf()
       rowKey.text = this.getString(R.string.catalogMetaDistributor)
       rowVal.text = entry.distribution
       this.metadata.addView(row)
@@ -327,7 +326,7 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
     val categories =
       entry.categories.filter { opdsCategory -> opdsCategory.scheme == this.genreUriScheme }
     if (categories.isNotEmpty()) {
-      val (row, rowKey, rowVal) = this.tableRowOf()
+      val (row, rowKey, rowVal) = this.bookInfoViewOf()
       rowKey.text = this.getString(R.string.catalogMetaCategories)
       rowVal.text = categories.joinToString(", ") { opdsCategory -> opdsCategory.effectiveLabel }
       this.metadata.addView(row)
@@ -335,21 +334,21 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
 
     val narrators = entry.narrators.filterNot { it.isBlank() }
     if (narrators.isNotEmpty()) {
-      val (row, rowKey, rowVal) = this.tableRowOf()
+      val (row, rowKey, rowVal) = this.bookInfoViewOf()
       rowKey.text = this.getString(R.string.catalogMetaNarrators)
       rowVal.text = narrators.joinToString(", ")
       this.metadata.addView(row)
     }
 
     this.run {
-      val (row, rowKey, rowVal) = this.tableRowOf()
+      val (row, rowKey, rowVal) = this.bookInfoViewOf()
       rowKey.text = this.getString(R.string.catalogMetaUpdatedDate)
       rowVal.text = this.dateTimeFormatter.print(entry.updated)
       this.metadata.addView(row)
     }
   }
 
-  private fun tableRowOf(): Triple<View, TextView, TextView> {
+  private fun bookInfoViewOf(): Triple<View, TextView, TextView> {
     val row = this.layoutInflater.inflate(R.layout.book_detail_metadata_item, this.metadata, false)
     val rowKey = row.findViewById<TextView>(R.id.key)
     val rowVal = row.findViewById<TextView>(R.id.value)
