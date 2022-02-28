@@ -185,16 +185,14 @@
       android:textSize="18sp"
       android:textStyle="bold" />
 
-    <TableLayout
+    <LinearLayout
       android:id="@+id/bookDetailMetadataTable"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
+      android:orientation="vertical"
       android:layout_marginStart="16dp"
       android:layout_marginEnd="16dp"
-      android:layout_marginBottom="16dp">
-
-      <include layout="@layout/book_detail_metadata_item" />
-    </TableLayout>
+      android:layout_marginBottom="16dp" />
 
     <View
       android:layout_width="match_parent"
