@@ -37,6 +37,7 @@ dependencies {
   api project(":simplified-files")
   api project(":simplified-futures")
   api project(":simplified-json-core")
+  api project(":simplified-lcp")
   api project(":simplified-metrics")
   api project(":simplified-metrics-api")
   api project(":simplified-migration-from3master")
