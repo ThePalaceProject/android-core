@@ -16,7 +16,12 @@ import org.slf4j.LoggerFactory
 class LCPContentProtectionProvider : ContentProtectionProvider {
 
   /**
-   * The passphrase that will be used to open the next book.
+   * The hashed passphrase that will be used to open the next book. The value may be set to a hex
+   * string, or to its base-64 encoding, according to the spec:
+   * https://readium.org/lcp-specs/notes/lcp-key-retrieval.html#sample-of-readium-web-publication-manifest-supporting-a-link-to-an-lcp-license-and-an-lcp_hashed_passphrase-property
+   *
+   * Note: This file uses the terms "passphrase" and "hashed passphrase" interchangeably, in all
+   * cases referring to what the LCP spec calls a "hashed passphrase" or "User Key".
    *
    * XXX: This kind of back-door access is required because we can't yet change the
    *      `org.nypl.drm.core.ContentProtectionProvider` interface.
@@ -24,9 +29,13 @@ class LCPContentProtectionProvider : ContentProtectionProvider {
 
   @Volatile
   var passphrase: String? = null
+    set(value) {
+      field = value?.let { LCPHashedPassphrase.conditionallyBase64Decode(it) }
+    }
 
   /**
-   * @return The passphrase that will be used to open the next book.
+   * @return The hashed passphrase that will be used to open the next book, as a hex string (not
+   * base-64 encoded).
    */
 
   fun passphrase(): String {
