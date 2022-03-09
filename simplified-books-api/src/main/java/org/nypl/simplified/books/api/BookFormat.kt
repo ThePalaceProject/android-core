@@ -95,6 +95,14 @@ sealed class BookFormat {
     val manifest: AudioBookManifestReference?,
 
     /**
+     * The audio book file on disk, if one has been downloaded. This is used for packaged audio
+     * books, where the entire book is downloaded in one file. For unpackaged audio books, where
+     * only the manifest is downloaded, this will always be null.
+     */
+
+    val file: File?,
+
+    /**
      * The most recent playback position.
      */
 

@@ -80,6 +80,9 @@ class BookFormatSupport private constructor(
       if (audio.supportsDPLAAudioBooks) {
         types.add(StandardFormatNames.dplaAudioBooks)
       }
+      if (this.parameters.supportsLCP) {
+        types.add(StandardFormatNames.lcpAudioBooks)
+      }
     }
   }
 
