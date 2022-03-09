@@ -22,6 +22,7 @@ class MockBookDatabaseEntryFormatHandleAudioBook(
     BookFormat.BookFormatAudioBook(
       drmInformation = BookDRMInformation.None,
       contentType = StandardFormatNames.genericAudioBooks.first(),
+      file = null,
       manifest = null,
       position = null
     )
@@ -42,6 +43,10 @@ class MockBookDatabaseEntryFormatHandleAudioBook(
         File("whatever")
       )
     )
+  }
+
+  override fun copyInBook(file: File) {
+    TODO("Not yet implemented")
   }
 
   override fun savePlayerPosition(position: PlayerPosition) {
