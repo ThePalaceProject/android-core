@@ -41,7 +41,7 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
     LoggerFactory.getLogger(DatabaseFormatHandleAudioBook::class.java)
 
   private val fileBook: File =
-    File(this.parameters.directory, "audiobook.zip")
+    File(this.parameters.directory, "audiobook-book.zip")
   private val fileManifest: File =
     File(this.parameters.directory, "audiobook-manifest.json")
   private val fileManifestURI: File =

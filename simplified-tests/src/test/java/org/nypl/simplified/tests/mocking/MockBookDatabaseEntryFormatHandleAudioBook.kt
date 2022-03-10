@@ -46,7 +46,10 @@ class MockBookDatabaseEntryFormatHandleAudioBook(
   }
 
   override fun copyInBook(file: File) {
-    TODO("Not yet implemented")
+    this.bookData = file.readText()
+    this.bookFile = file
+    this.formatField = this.formatField.copy(file = this.bookFile)
+    check(this.formatField.isDownloaded)
   }
 
   override fun savePlayerPosition(position: PlayerPosition) {

@@ -260,6 +260,12 @@ class BorrowLCP private constructor() : BorrowSubtaskType {
       throw BorrowSubtaskFailed()
     }
 
+    /*
+     * LCP is a special case in the sense that it supersedes any acquisition
+     * path elements that might follow this one. We mark this subtask as having halted
+     * early.
+     */
+
     throw BorrowSubtaskHaltedEarly()
   }
 
