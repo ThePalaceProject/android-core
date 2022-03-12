@@ -207,6 +207,28 @@ object BorrowTestFeeds {
     return parsedEntry
   }
 
+  fun opdsLCPFeedEntryOfType(
+    webServer: MockWebServer,
+    mime: String,
+    id: String,
+    hashedPassphrase: String
+  ): OPDSAcquisitionFeedEntry {
+    val parsedEntry = this.opdsFeedEntryOf(
+      """
+      <entry xmlns="http://www.w3.org/2005/Atom" xmlns:opds="http://opds-spec.org/2010/catalog" xmlns:lcp="http://readium.org/lcp-specs/ns">
+        <title>Example</title>
+        <updated>2020-09-17T16:48:51+0000</updated>
+        <id>$id</id>
+        <link type="application/vnd.readium.lcp.license.v1.0+json" rel="http://opds-spec.org/acquisition" href="${webServer.url("/next")}">
+          <opds:indirectAcquisition type="$mime"/>
+          <lcp:hashed_passphrase>$hashedPassphrase</lcp:hashed_passphrase>
+        </link>
+      </entry>
+      """
+    )
+    return parsedEntry
+  }
+
   fun opdsFeedEntryOf(text: String): OPDSAcquisitionFeedEntry {
     return OPDSAcquisitionFeedEntryParser.newParser()
       .parseEntryStream(URI.create("urn:stdin"), text.byteInputStream())

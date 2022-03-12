@@ -22,6 +22,7 @@ class MockBookDatabaseEntryFormatHandleAudioBook(
     BookFormat.BookFormatAudioBook(
       drmInformation = BookDRMInformation.None,
       contentType = StandardFormatNames.genericAudioBooks.first(),
+      file = null,
       manifest = null,
       position = null
     )
@@ -42,6 +43,13 @@ class MockBookDatabaseEntryFormatHandleAudioBook(
         File("whatever")
       )
     )
+  }
+
+  override fun copyInBook(file: File) {
+    this.bookData = file.readText()
+    this.bookFile = file
+    this.formatField = this.formatField.copy(file = this.bookFile)
+    check(this.formatField.isDownloaded)
   }
 
   override fun savePlayerPosition(position: PlayerPosition) {

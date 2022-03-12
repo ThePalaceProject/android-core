@@ -112,11 +112,11 @@ sealed class BookFormat {
   ) : BookFormat() {
 
     /*
-     * Audio books are downloaded if there's a manifest available.
+     * Audio books are downloaded if there's a manifest or audio book file available.
      */
 
     override val isDownloaded: Boolean
-      get() = this.manifest != null
+      get() = this.manifest != null || this.file != null
   }
 
   /**

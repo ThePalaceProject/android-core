@@ -2367,6 +2367,7 @@ class BookRevokeTaskTest {
 
     val bookFormat =
       BookFormat.BookFormatAudioBook(
+        file = null,
         manifest = null,
         position = null,
         contentType = BookFormats.audioBookGenericMimeTypes().first(),
