@@ -42,6 +42,7 @@ class MockBorrowContext(
   override var isCancelled: Boolean,
   override var bookDatabaseEntry: BookDatabaseEntryType,
   override var samlDownloadContext: SAMLDownloadContext? = null,
+  override var lcpService: LcpService? = null,
   bookInitial: Book,
 ) : BorrowContextType {
 
@@ -53,8 +54,6 @@ class MockBorrowContext(
 
   override lateinit var audioBookManifestStrategies: AudioBookManifestStrategiesType
   override lateinit var services: ServiceDirectoryType
-
-  override val lcpService: LcpService? = null
 
   override var adobeExecutorTimeout: BorrowTimeoutConfiguration =
     BorrowTimeoutConfiguration(2L, TimeUnit.SECONDS)

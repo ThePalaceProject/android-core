@@ -168,8 +168,10 @@
         <c:change date="2022-03-01T00:00:00+00:00" summary="Removed Open Textbook Library from the featured libraries."/>
       </c:changes>
     </c:release>
-    <c:release date="2022-03-09T18:09:32+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.8">
-      <c:changes/>
+    <c:release date="2022-03-09T19:15:05+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.8">
+      <c:changes>
+        <c:change date="2022-03-09T19:15:05+00:00" summary="Added support for acquiring LCP audiobooks (playing them does not work yet)."/>
+      </c:changes>
     </c:release>
   </c:releases>
   <c:ticket-systems>

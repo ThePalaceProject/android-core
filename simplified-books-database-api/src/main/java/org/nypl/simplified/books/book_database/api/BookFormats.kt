@@ -36,6 +36,11 @@ object BookFormats {
       "audio/mpeg"
     )
 
+  private val LCP_AUDIO_BOOKS =
+    mimesOf(
+      "application/audiobook+lcp"
+    )
+
   private val OVERDRIVE_AUDIO_BOOKS =
     mimesOf(
       "application/vnd.overdrive.circulation.api+json;profile=audiobook"
@@ -45,6 +50,7 @@ object BookFormats {
     unionOf(
       FINDAWAY_AUDIO_BOOKS,
       GENERIC_AUDIO_BOOKS,
+      LCP_AUDIO_BOOKS,
       OVERDRIVE_AUDIO_BOOKS
     )
 

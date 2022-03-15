@@ -9,6 +9,7 @@ import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFiles
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericPDFFiles
+import org.nypl.simplified.books.formats.api.StandardFormatNames.lcpAudioBooks
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionPaths
 import org.slf4j.LoggerFactory
@@ -86,6 +87,10 @@ class MockBookDatabaseEntry(private val bookInitial: Book) : BookDatabaseEntryTy
       }
       if (MIMECompatibility.isCompatibleStrictWithoutAttributes(finalType, genericPDFFiles)) {
         formats.add(MockBookDatabaseEntryFormatHandlePDF(bookId))
+        continue
+      }
+      if (MIMECompatibility.isCompatibleStrictWithoutAttributes(finalType, lcpAudioBooks)) {
+        formats.add(MockBookDatabaseEntryFormatHandleAudioBook(bookId))
         continue
       }
     }

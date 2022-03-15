@@ -17,6 +17,7 @@ import org.nypl.simplified.books.api.BookDRMKind
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.book_database.api.BookDRMInformationHandle
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook
+import org.nypl.simplified.files.DirectoryUtilities
 import org.nypl.simplified.files.FileUtilities
 import org.nypl.simplified.json.core.JSONParserUtilities
 import org.nypl.simplified.json.core.JSONSerializerUtilities
@@ -39,6 +40,8 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
   private val log =
     LoggerFactory.getLogger(DatabaseFormatHandleAudioBook::class.java)
 
+  private val fileBook: File =
+    File(this.parameters.directory, "audiobook-book.zip")
   private val fileManifest: File =
     File(this.parameters.directory, "audiobook-manifest.json")
   private val fileManifestURI: File =
@@ -90,6 +93,7 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
     synchronized(this.dataLock) {
       loadInitial(
         objectMapper = this.parameters.objectMapper,
+        fileBook = this.fileBook,
         fileManifest = this.fileManifest,
         fileManifestURI = this.fileManifestURI,
         filePosition = this.filePosition,
@@ -133,7 +137,17 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
     val newFormat = synchronized(this.dataLock) {
       FileUtilities.fileDelete(this.filePosition)
 
-      this.formatRef = this.formatRef.copy(position = null)
+      if (this.fileBook.isDirectory) {
+        DirectoryUtilities.directoryDelete(this.fileBook)
+      } else {
+        FileUtilities.fileDelete(this.fileBook)
+      }
+
+      this.formatRef = this.formatRef.copy(
+        file = null,
+        position = null
+      )
+
       this.formatRef
     }
 
@@ -240,6 +254,27 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
     this.parameters.onUpdated.invoke(newFormat)
   }
 
+  override fun copyInBook(file: File) {
+    val newFormat = synchronized(this.dataLock) {
+      if (file.isDirectory) {
+        DirectoryUtilities.directoryCopy(file, this.fileBook)
+      } else {
+        FileUtilities.fileCopy(file, this.fileBook)
+      }
+
+      this.formatRef = this.formatRef.copy(
+        file = this.fileBook,
+        manifest = BookFormat.AudioBookManifestReference(
+          manifestURI = URI("manifest.json"),
+          manifestFile = this.fileManifest
+        )
+      )
+      this.formatRef
+    }
+
+    this.parameters.onUpdated.invoke(newFormat)
+  }
+
   override fun savePlayerPosition(position: PlayerPosition) {
     val text =
       JSONSerializerUtilities.serializeToString(PlayerPositions.serializeToObjectNode(position))
@@ -270,6 +305,7 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
 
     private fun loadInitial(
       objectMapper: ObjectMapper,
+      fileBook: File,
       fileManifest: File,
       fileManifestURI: File,
       filePosition: File,
@@ -277,6 +313,7 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
       drmInfo: BookDRMInformation
     ): BookFormat.BookFormatAudioBook {
       return BookFormat.BookFormatAudioBook(
+        file = if (fileBook.exists()) fileBook else null,
         manifest = this.loadManifestIfNecessary(fileManifest, fileManifestURI),
         position = this.loadPositionIfNecessary(objectMapper, filePosition),
         contentType = contentType,

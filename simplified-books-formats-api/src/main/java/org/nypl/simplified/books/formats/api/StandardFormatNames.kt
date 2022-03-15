@@ -55,6 +55,9 @@ object StandardFormatNames {
   val dplaAudioBooks =
     this.mimeOf("application/audiobook+json;profile=http://www.feedbooks.com/audiobooks/access-restriction")
 
+  val lcpAudioBooks =
+    this.mimeOf("application/audiobook+lcp")
+
   /**
    * Various standard format names used for generic, unencrypted audio books.
    */
