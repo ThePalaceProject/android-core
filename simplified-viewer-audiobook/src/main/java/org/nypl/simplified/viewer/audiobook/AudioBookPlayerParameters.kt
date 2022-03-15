@@ -6,6 +6,7 @@ import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfilled
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
+import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.audio.AudioBookCredentials
 import org.nypl.simplified.books.audio.AudioBookManifestRequest
@@ -21,6 +22,13 @@ import java.net.URI
  */
 
 data class AudioBookPlayerParameters(
+
+  /**
+   * The audio book file, if this is a packaged audio book. This must be null for unpackaged audio
+   * books.
+   */
+
+  val file: File?,
 
   /**
    * The user agent string used to make manifest requests.
@@ -62,7 +70,13 @@ data class AudioBookPlayerParameters(
    * The OPDS entry for the book.
    */
 
-  val opdsEntry: OPDSAcquisitionFeedEntry
+  val opdsEntry: OPDSAcquisitionFeedEntry,
+
+  /**
+   * The DRM information for the book.
+   */
+
+  val drmInfo: BookDRMInformation
 ) : Serializable {
 
   /**
@@ -104,6 +118,7 @@ data class AudioBookPlayerParameters(
 
     val request =
       AudioBookManifestRequest(
+        file = this.file,
         targetURI = this.manifestURI,
         contentType = manifestContentType,
         userAgent = userAgent,

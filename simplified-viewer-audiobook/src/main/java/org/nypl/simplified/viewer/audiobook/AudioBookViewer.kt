@@ -51,6 +51,8 @@ class AudioBookViewer : ViewerProviderType {
   ) {
     val formatAudio =
       format as BookFormat.BookFormatAudioBook
+    val file =
+      formatAudio.file
     val manifest =
       formatAudio.manifest!!
     val httpClient =
@@ -61,6 +63,8 @@ class AudioBookViewer : ViewerProviderType {
       AudioBookPlayerParameters(
         accountID = book.account,
         bookID = book.id,
+        file = file,
+        drmInfo = formatAudio.drmInformation,
         manifestContentType = format.contentType.fullType,
         manifestFile = manifest.manifestFile,
         manifestURI = manifest.manifestURI,

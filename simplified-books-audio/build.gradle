@@ -9,6 +9,7 @@ dependencies {
   api libs.palace.audiobook.manifest.fulfill.api
   api libs.palace.audiobook.manifest.parser.api
 
+  implementation libs.kotlin.coroutines
   implementation libs.kotlin.stdlib
   implementation libs.kotlin.reflect
   implementation libs.palace.audiobook.downloads
@@ -16,4 +17,5 @@ dependencies {
   implementation libs.palace.audiobook.manifest.fulfill.basic
   implementation libs.palace.audiobook.manifest.fulfill.opa
   implementation libs.palace.audiobook.manifest.parser.webpub
+  implementation libs.r2.shared
 }

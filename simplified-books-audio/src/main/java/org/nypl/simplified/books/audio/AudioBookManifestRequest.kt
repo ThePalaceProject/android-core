@@ -22,9 +22,18 @@ import java.util.ServiceLoader
 data class AudioBookManifestRequest(
 
   /**
+   * The audio book file on disk, if one has been downloaded. This is used for packaged audio
+   * books, where the entire book is downloaded in one file. For unpackaged audio books, where
+   * only the manifest is downloaded, this will always be null.
+   */
+
+  val file: File? = null,
+
+  /**
    * The target URI of the manifest. This must be a stable URI that can be accessed repeatedly
-   * in an idempotent manner. In practice, this will be the "fulfill" URI provided by the
-   * Circulation Manager.
+   * in an idempotent manner. In practice, this will be either:
+   * - The "fulfill" URI provided by the Circulation Manager, for unpackaged audio books.
+   * - The path to the manifest file in the archive, for packaged audio books.
    */
 
   val targetURI: URI,

@@ -47,7 +47,9 @@ import org.librarysimplified.audiobook.views.PlayerTOCFragmentParameters
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.librarysimplified.services.api.Services
+import org.nypl.drm.core.ContentProtectionProvider
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
+import org.nypl.simplified.books.api.BookContentProtections
 import org.nypl.simplified.books.audio.AudioBookFeedbooksSecretServiceType
 import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook
@@ -81,6 +83,9 @@ class AudioBookPlayerActivity :
   PlayerFragmentListenerType {
 
   private val log: Logger = LoggerFactory.getLogger(AudioBookPlayerActivity::class.java)
+
+  private val contentProtectionProviders =
+    ServiceLoader.load(ContentProtectionProvider::class.java).toList()
 
   companion object {
 
@@ -323,16 +328,24 @@ class AudioBookPlayerActivity :
   override fun onLoadingFragmentLoadingFinished(manifest: PlayerManifest) {
     this.log.debug("finished loading")
 
+    val contentProtections = BookContentProtections.create(
+      context = this,
+      contentProtectionProviders = this.contentProtectionProviders,
+      drmInfo = this.parameters.drmInfo
+    )
+
     /*
      * Ask the API for the best audio engine available that can handle the given manifest.
      */
 
     val engine = PlayerAudioEngines.findBestFor(
       PlayerAudioEngineRequest(
+        file = this.parameters.file,
         manifest = manifest,
         filter = { true },
         downloadProvider = DownloadProvider.create(this.downloadExecutor),
-        userAgent = PlayerUserAgent(this.parameters.userAgent)
+        userAgent = PlayerUserAgent(this.parameters.userAgent),
+        contentProtections = contentProtections
       )
     )
 
