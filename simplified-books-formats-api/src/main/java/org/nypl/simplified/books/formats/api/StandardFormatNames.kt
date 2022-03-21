@@ -111,6 +111,13 @@ object StandardFormatNames {
     this.mimeOf("application/pdf")
 
   /**
+   * The MIME type used for ZIP files.
+   */
+
+  val genericZIPFiles =
+    this.mimeOf("application/zip")
+
+  /**
    * The MIME type used for OPDS feeds.
    */
 

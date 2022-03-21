@@ -4,6 +4,7 @@ import android.content.Context
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
+import okio.Buffer
 import org.joda.time.Instant
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
@@ -65,6 +66,7 @@ import java.io.IOException
 import java.net.URI
 import java.nio.file.Files
 import java.util.concurrent.TimeUnit
+import java.util.zip.ZipFile
 
 class BorrowLCPTest {
 
@@ -175,7 +177,10 @@ class BorrowLCPTest {
     bookDatabaseEntry.formatHandlesField.clear()
 
     bookDatabaseEntry.formatHandlesField.add(
-      MockBookDatabaseEntryFormatHandleEPUB(book.id).apply {
+      MockBookDatabaseEntryFormatHandleEPUB(
+        book.id,
+        Files.createTempDirectory(tempDirPath, "lcpFormatHandleEPUB").toFile()
+      ).apply {
         drmInformationHandleField = BookDRMInformationHandleLCP(
           directory = Files.createTempDirectory(tempDirPath, "lcpDRMInfoEPUB").toFile(),
           format = formatDefinition,
@@ -185,7 +190,10 @@ class BorrowLCPTest {
     )
 
     bookDatabaseEntry.formatHandlesField.add(
-      MockBookDatabaseEntryFormatHandleAudioBook(book.id).apply {
+      MockBookDatabaseEntryFormatHandleAudioBook(
+        book.id,
+        Files.createTempDirectory(tempDirPath, "lcpFormatHandleAudioBook").toFile()
+      ).apply {
         drmInformationHandleField = BookDRMInformationHandleLCP(
           directory = Files.createTempDirectory(tempDirPath, "lcpDRMInfoAudioBook").toFile(),
           format = formatDefinition,
@@ -297,24 +305,90 @@ class BorrowLCPTest {
 
     // Expect a request to the acquisition URL to get the LCP license.
 
+    val licensePublicationPath = "/publication/12345"
+    val licensePublicationURL = webServer.url(licensePublicationPath)
+
     val licenseResponse =
       MockResponse()
         .setResponseCode(200)
         .setHeader("Content-Type", "application/vnd.readium.lcp.license.v1.0+json")
-        .setBody("{}")
+        .setBody(
+          """
+          {
+            "provider": "https://www.cantook.net",
+            "id": "9876",
+            "issued": "2022-02-22T19:37:31Z",
+            "updated": "2022-02-22T19:37:31Z",
+            "encryption": {
+              "profile": "http://readium.org/lcp/profile-1.0",
+              "content_key": {
+                "algorithm": "http://www.w3.org/2001/04/xmlenc#aes256-cbc",
+                "encrypted_value": "foo"
+              },
+              "user_key": {
+                "algorithm": "http://www.w3.org/2001/04/xmlenc#sha256",
+                "text_hint": "Please contact your administrator to restore the passphrase",
+                "key_check": "foo"
+              }
+            },
+            "links": [
+              {
+                "rel": "hint",
+                "href": "https://example.org/lcp/hint",
+                "type": "text/html"
+              },
+              {
+                "rel": "status",
+                "href": "https://example.org/status",
+                "type": "application/vnd.readium.license.status.v1.0+json"
+              },
+              {
+                "rel": "publication",
+                "href": "$licensePublicationURL",
+                "type": "application/epub+zip"
+              }
+            ],
+            "user": {
+              "id": "1234"
+            },
+            "rights": {
+              "print": 0,
+              "copy": 0,
+              "start": "2022-02-22T19:37:31Z",
+              "end": "2022-03-15T19:36:56Z"
+            },
+            "signature": {
+              "certificate": "foo",
+              "value": "bar",
+              "algorithm": "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256"
+            }
+          }
+          """
+        )
 
     this.webServer.enqueue(licenseResponse)
 
-    // Expect the LcpService to be used to download the publication. Create a mock downloaded file.
+    // Expect a request to download the publication.
 
-    val downloadedFile = copyToTempFile("/org/nypl/simplified/tests/books/empty.epub")
+    val downloadResponse =
+      MockResponse()
+        .setResponseCode(200)
+        .setHeader("Content-Type", "application/epub+zip")
+        .setBody(
+          Buffer().readFrom(
+            BorrowLCPTest::class.java.getResourceAsStream(
+              "/org/nypl/simplified/tests/books/minimal.epub"
+            )
+          )
+        )
+
+    this.webServer.enqueue(downloadResponse)
 
     // Create a mock borrow context.
 
     val context = createContext(
       feedEntry,
-      acquisitionPath,
-      downloadedFile
+      acquisitionPath
     )
 
     // Execute the task. It is expected to halt early.
@@ -327,7 +401,7 @@ class BorrowLCPTest {
 
     // The first request should have been to the loans feed for the account.
 
-    Assertions.assertEquals(2, this.webServer.requestCount)
+    Assertions.assertEquals(3, this.webServer.requestCount)
 
     Assertions.assertEquals(
       this.account.provider.loansURI.toString().toHttpUrl(),
@@ -341,14 +415,32 @@ class BorrowLCPTest {
       this.webServer.takeRequest().requestUrl
     )
 
-    // The downloaded file should now be in the book format.
+    // The next request should have been to the publication download url.
+
+    Assertions.assertEquals(
+      this.webServer.url(licensePublicationPath),
+      this.webServer.takeRequest().requestUrl
+    )
+
+    // The downloaded file should now be in the book format, and the license should be installed.
 
     val formatHandle = context.bookDatabaseEntry
       .findFormatHandleForContentType(StandardFormatNames.genericEPUBFiles)!!
 
     val format = formatHandle.format!! as BookFormat.BookFormatEPUB
+    val zip = ZipFile(format.file)
+    val zipEntries = zip.entries().toList()
 
-    Assertions.assertEquals(downloadedFile, format.file)
+    listOf(
+      "META-INF/container.xml",
+      "OEBPS/minimal-chapter.xhtml",
+      "META-INF/license.lcpl"
+    ).forEach { expectedFilename ->
+      Assertions.assertTrue(
+        zipEntries.any { it.name == expectedFilename },
+        "$expectedFilename should be in downloaded zip file"
+      )
+    }
 
     // The DRM info should now contain the hashed passphrase that was just retrieved.
 
@@ -414,24 +506,90 @@ class BorrowLCPTest {
 
     // Expect a request to the acquisition URL to get the LCP license.
 
+    val licensePublicationPath = "/publication/12345"
+    val licensePublicationURL = webServer.url(licensePublicationPath)
+
     val licenseResponse =
       MockResponse()
         .setResponseCode(200)
         .setHeader("Content-Type", "application/vnd.readium.lcp.license.v1.0+json")
-        .setBody("{}")
+        .setBody(
+          """
+          {
+            "provider": "https://www.cantook.net",
+            "id": "9876",
+            "issued": "2022-02-22T19:37:31Z",
+            "updated": "2022-02-22T19:37:31Z",
+            "encryption": {
+              "profile": "http://readium.org/lcp/profile-1.0",
+              "content_key": {
+                "algorithm": "http://www.w3.org/2001/04/xmlenc#aes256-cbc",
+                "encrypted_value": "foo"
+              },
+              "user_key": {
+                "algorithm": "http://www.w3.org/2001/04/xmlenc#sha256",
+                "text_hint": "Please contact your administrator to restore the passphrase",
+                "key_check": "foo"
+              }
+            },
+            "links": [
+              {
+                "rel": "hint",
+                "href": "https://example.org/lcp/hint",
+                "type": "text/html"
+              },
+              {
+                "rel": "status",
+                "href": "https://example.org/status",
+                "type": "application/vnd.readium.license.status.v1.0+json"
+              },
+              {
+                "rel": "publication",
+                "href": "$licensePublicationURL",
+                "type": "application/audiobook+lcp"
+              }
+            ],
+            "user": {
+              "id": "1234"
+            },
+            "rights": {
+              "print": 0,
+              "copy": 0,
+              "start": "2022-02-22T19:37:31Z",
+              "end": "2022-03-15T19:36:56Z"
+            },
+            "signature": {
+              "certificate": "foo",
+              "value": "bar",
+              "algorithm": "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256"
+            }
+          }
+          """
+        )
 
     this.webServer.enqueue(licenseResponse)
 
-    // Expect the LcpService to be used to download the publication. Create a mock downloaded file.
+    // Expect a request to download the publication.
 
-    val downloadedFile = copyToTempFile("/org/nypl/simplified/tests/books/empty.lcpa")
+    val downloadResponse =
+      MockResponse()
+        .setResponseCode(200)
+        .setHeader("Content-Type", "application/audiobook+lcp")
+        .setBody(
+          Buffer().readFrom(
+            BorrowLCPTest::class.java.getResourceAsStream(
+              "/org/nypl/simplified/tests/books/minimal.lcpa"
+            )
+          )
+        )
+
+    this.webServer.enqueue(downloadResponse)
 
     // Create a mock borrow context.
 
     val context = createContext(
       feedEntry,
       acquisitionPath,
-      downloadedFile
     )
 
     // Execute the task. It is expected to halt early.
@@ -444,7 +602,7 @@ class BorrowLCPTest {
 
     // The first request should have been to the loans feed for the account.
 
-    Assertions.assertEquals(2, this.webServer.requestCount)
+    Assertions.assertEquals(3, this.webServer.requestCount)
 
     Assertions.assertEquals(
       this.account.provider.loansURI.toString().toHttpUrl(),
@@ -458,14 +616,32 @@ class BorrowLCPTest {
       this.webServer.takeRequest().requestUrl
     )
 
-    // The downloaded file should now be in the book format.
+    // The next request should have been to the publication download url.
+
+    Assertions.assertEquals(
+      this.webServer.url(licensePublicationPath),
+      this.webServer.takeRequest().requestUrl
+    )
+
+    // The downloaded file should now be in the book format, and the license should be installed.
 
     val formatHandle = context.bookDatabaseEntry
       .findFormatHandleForContentType(StandardFormatNames.lcpAudioBooks)!!
 
     val format = formatHandle.format!! as BookFormat.BookFormatAudioBook
+    val zip = ZipFile(format.file)
+    val zipEntries = zip.entries().toList()
 
-    Assertions.assertEquals(downloadedFile, format.file)
+    listOf(
+      "manifest.json",
+      "minimal-track.mp3",
+      "license.lcpl"
+    ).forEach { expectedFilename ->
+      Assertions.assertTrue(
+        zipEntries.any { it.name == expectedFilename },
+        "$expectedFilename should be in downloaded zip file"
+      )
+    }
 
     // The DRM info should now contain the hashed passphrase that was just retrieved.
 

@@ -139,7 +139,9 @@ interface BorrowContextType {
    */
 
   @Throws(IOException::class)
-  fun temporaryFile(): File
+  fun temporaryFile(
+    extension: String = "tmp"
+  ): File
 
   /**
    * The full OPDS acquisition path that we are currently traversing.

@@ -283,6 +283,17 @@ sealed class BookDatabaseEntryFormatHandle {
     abstract fun copyInBook(file: File)
 
     /**
+     * Move the given audio book file into the directory as the book data.
+     *
+     * @param file The file to be copied
+     *
+     * @throws IOException On I/O errors
+     */
+
+    @Throws(IOException::class)
+    abstract fun moveInBook(file: File)
+
+    /**
      * Save the given player position to the database.
      *
      * @throws IOException On I/O errors or lock acquisition failures

@@ -1,6 +1,9 @@
 package org.nypl.simplified.books.borrowing.internal
 
-import kotlinx.coroutines.runBlocking
+import net.java.truevfs.access.TConfig
+import net.java.truevfs.access.TFile
+import net.java.truevfs.access.TVFS
+import net.java.truevfs.kernel.spec.FsAccessOption
 import one.irradia.mime.api.MIMECompatibility
 import one.irradia.mime.api.MIMEType
 import org.librarysimplified.http.api.LSHTTPResponseStatus
@@ -23,7 +26,10 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskType
 import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.nypl.simplified.opds.core.OPDSAcquisitionPaths
 import org.nypl.simplified.opds.core.OPDSFeedParserType
-import org.readium.r2.lcp.LcpService
+import org.readium.r2.lcp.LcpException
+import org.readium.r2.lcp.license.model.LicenseDocument
+import java.io.ByteArrayInputStream
+import java.io.File
 import java.net.URI
 
 /**
@@ -227,30 +233,58 @@ class BorrowLCP private constructor() : BorrowSubtaskType {
     licenseBytes: ByteArray,
     passphrase: String
   ) {
-    context.bookDownloadIsRunning("Downloading...")
     context.taskRecorder.beginNewStep("Fulfilling book...")
     context.checkCancelled()
 
-    val lcpService = context.lcpService!!
+    val fulfillmentMimeType = context.opdsAcquisitionPath.asMIMETypes().last()
 
-    val result =
-      runBlocking {
-        lcpService.acquirePublication(
-          lcpl = licenseBytes,
-          onProgress = { percent ->
-            context.bookDownloadIsRunning(
-              message = "Downloading…",
-              receivedSize = (percent * 100).toLong(),
-              expectedSize = 100,
-              bytesPerSecond = null
-            )
-          }
-        )
-      }
+    // An LCP download is always actually a zip file, whether it's an epub, audio book, or pdf.
+    // TrueVFS will by default detect files with the .zip extension as ZIP archives that can be
+    // mounted, so the extension is important to install the license.
+
+    val temporaryFile = context.temporaryFile("zip")
 
     try {
-      val publication = result.getOrThrow()
-      this.saveFulfilledBook(context, publication, passphrase)
+      val license = LicenseDocument(licenseBytes)
+      val link = license.link(LicenseDocument.Rel.publication)
+      val url = link?.url
+        ?: throw LcpException.Parsing.Url(rel = LicenseDocument.Rel.publication.rawValue)
+
+      val downloadRequest =
+        BorrowHTTP.createDownloadRequest(
+          context = context,
+          target = url.toURI(),
+          outputFile = temporaryFile,
+          requestModifier = { properties ->
+            properties.copy(
+              authorization = null
+            )
+          },
+          expectedTypes = hashSetOf(
+            fulfillmentMimeType,
+            // Sometimes fulfillment servers will set the content type to generic zip or octet
+            // stream, so these are acceptable too.
+            StandardFormatNames.genericZIPFiles,
+            MIMECompatibility.applicationOctetStream
+          )
+        )
+
+      when (val result = LSHTTPDownloads.download(downloadRequest)) {
+        LSHTTPDownloadState.LSHTTPDownloadResult.DownloadCancelled ->
+          throw BorrowSubtaskCancelled()
+        is LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedServer ->
+          throw BorrowHTTP.onDownloadFailedServer(context, result)
+        is LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedUnacceptableMIME ->
+          throw BorrowSubtaskFailed()
+        is LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedExceptionally ->
+          throw BorrowHTTP.onDownloadFailedExceptionally(context, result)
+        is LSHTTPDownloadState.LSHTTPDownloadResult.DownloadCompletedSuccessfully -> {
+          this.installLicense(context, fulfillmentMimeType, temporaryFile, licenseBytes)
+          this.saveFulfilledBook(context, temporaryFile, passphrase)
+
+          context.bookDownloadSucceeded()
+        }
+      }
     } catch (e: Exception) {
       context.taskRecorder.currentStepFailed(
         message = "LCP fulfillment error: ${e.message}",
@@ -258,6 +292,8 @@ class BorrowLCP private constructor() : BorrowSubtaskType {
         exception = e
       )
       throw BorrowSubtaskFailed()
+    } finally {
+      temporaryFile.delete()
     }
 
     /*
@@ -269,9 +305,43 @@ class BorrowLCP private constructor() : BorrowSubtaskType {
     throw BorrowSubtaskHaltedEarly()
   }
 
+  /**
+   * Install the license into the fulfilled book, which is in all cases a zip file. This is done
+   * efficiently, without fully rewriting the potentially large file.
+   */
+
+  private fun installLicense(
+    context: BorrowContextType,
+    bookType: MIMEType,
+    bookFile: File,
+    licenseBytes: ByteArray
+  ) {
+    context.taskRecorder.beginNewStep("Installing license...")
+
+    val pathInZIP = when (bookType) {
+      StandardFormatNames.genericEPUBFiles -> "META-INF/license.lcpl"
+      else -> "license.lcpl"
+    }
+
+    // Use TrueVFS to mount the zip file, and copy in the license. The GROW option ensures that
+    // adding the new entry to the zip only appends the file to the end of the archive, without
+    // rewriting the entire file.
+
+    TConfig.current().setAccessPreference(FsAccessOption.GROW, true)
+
+    TFile.cp(
+      ByteArrayInputStream(licenseBytes),
+      TFile(bookFile, pathInZIP)
+    )
+
+    TVFS.umount()
+
+    context.taskRecorder.currentStepSucceeded("License installed.")
+  }
+
   private fun saveFulfilledBook(
     context: BorrowContextType,
-    publication: LcpService.AcquiredPublication,
+    bookFile: File,
     passphrase: String
   ) {
     context.taskRecorder.beginNewStep("Saving fulfilled book...")
@@ -284,10 +354,10 @@ class BorrowLCP private constructor() : BorrowSubtaskType {
 
     when (formatHandle) {
       is BookDatabaseEntryFormatHandleEPUB -> {
-        formatHandle.copyInBook(publication.localFile)
+        formatHandle.copyInBook(bookFile)
       }
       is BookDatabaseEntryFormatHandleAudioBook -> {
-        formatHandle.copyInBook(publication.localFile)
+        formatHandle.moveInBook(bookFile)
       }
       is BookDatabaseEntryFormatHandlePDF ->
         // TODO
@@ -295,7 +365,6 @@ class BorrowLCP private constructor() : BorrowSubtaskType {
     }
 
     context.taskRecorder.currentStepSucceeded("Saved book.")
-    context.bookDownloadSucceeded()
   }
 
   /**

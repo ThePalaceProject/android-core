@@ -26,6 +26,10 @@ android {
   }
 }
 
+configurations.all {
+  exclude group: 'com.google.code.findbugs', module: 'annotations'
+}
+
 dependencies {
   implementation project(":simplified-main")
   implementation project(":simplified-accounts-source-nyplregistry")

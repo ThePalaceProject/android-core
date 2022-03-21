@@ -10,9 +10,12 @@ import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle
 import org.nypl.simplified.books.formats.api.StandardFormatNames
 import java.io.File
 import java.net.URI
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 
 class MockBookDatabaseEntryFormatHandleAudioBook(
-  val bookID: BookID
+  val bookID: BookID,
+  val directory: File? = null,
 ) : BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook() {
 
   var bookData: String? = null
@@ -47,7 +50,20 @@ class MockBookDatabaseEntryFormatHandleAudioBook(
 
   override fun copyInBook(file: File) {
     this.bookData = file.readText()
-    this.bookFile = file
+    this.bookFile = File(this.directory, "book.epub")
+
+    Files.copy(file.toPath(), this.bookFile!!.toPath(), StandardCopyOption.REPLACE_EXISTING)
+
+    this.formatField = this.formatField.copy(file = this.bookFile)
+    check(this.formatField.isDownloaded)
+  }
+
+  override fun moveInBook(file: File) {
+    this.bookData = file.readText()
+    this.bookFile = File(this.directory, "book.zip")
+
+    file.renameTo(this.bookFile)
+
     this.formatField = this.formatField.copy(file = this.bookFile)
     check(this.formatField.isDownloaded)
   }

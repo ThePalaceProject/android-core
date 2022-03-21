@@ -109,5 +109,6 @@ dependencies {
 
   testImplementation libs.logback.classic
   testImplementation libs.junit
+  testImplementation libs.org.json
   testImplementation libs.robolectric
 }

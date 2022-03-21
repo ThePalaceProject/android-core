@@ -26,4 +26,8 @@ dependencies {
       type = "aar"
     }
   }
+
+  implementation(libs.truevfs.access)
+  implementation(libs.truevfs.driver.zip)
+  implementation(libs.truecommons.key.disable)
 }

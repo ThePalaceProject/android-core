@@ -9,9 +9,12 @@ import org.nypl.simplified.books.book_database.api.BookDRMInformationHandle
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleEPUB
 import org.nypl.simplified.books.formats.api.StandardFormatNames
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 
 class MockBookDatabaseEntryFormatHandleEPUB(
-  val bookID: BookID
+  val bookID: BookID,
+  val directory: File? = null
 ) : BookDatabaseEntryFormatHandleEPUB() {
 
   var bookData: String? = null
@@ -37,7 +40,10 @@ class MockBookDatabaseEntryFormatHandleEPUB(
 
   override fun copyInBook(file: File) {
     this.bookData = file.readText()
-    this.bookFile = file
+    this.bookFile = File(this.directory, "book.epub")
+
+    Files.copy(file.toPath(), this.bookFile!!.toPath(), StandardCopyOption.REPLACE_EXISTING)
+
     this.formatField = this.formatField.copy(file = this.bookFile)
     check(this.formatField.isDownloaded)
   }

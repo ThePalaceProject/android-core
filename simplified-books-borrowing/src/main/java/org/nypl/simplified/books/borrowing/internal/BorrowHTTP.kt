@@ -49,7 +49,8 @@ object BorrowHTTP {
     context: BorrowContextType,
     target: URI,
     outputFile: File,
-    requestModifier: ((LSHTTPRequestProperties) -> LSHTTPRequestProperties)? = null
+    requestModifier: ((LSHTTPRequestProperties) -> LSHTTPRequestProperties)? = null,
+    expectedTypes: Set<MIMEType> = hashSetOf(context.currentAcquisitionPathElement.mimeType)
   ): LSHTTPDownloadRequest {
     val request =
       context.httpClient.newRequest(target)
@@ -69,7 +70,7 @@ object BorrowHTTP {
         this.onDownloadProgressEvent(context, it)
       },
       isMIMETypeAcceptable = {
-        this.isMimeTypeAcceptable(context, it)
+        this.isMimeTypeAcceptable(context, expectedTypes, it)
       },
       isCancelled = {
         context.isCancelled
@@ -121,12 +122,35 @@ object BorrowHTTP {
     context: BorrowContextType,
     receivedType: MIMEType
   ): Boolean {
-    val expectedType = context.currentAcquisitionPathElement.mimeType
-    return if (MIMECompatibility.isCompatibleLax(receivedType, expectedType)) {
+    return isMimeTypeAcceptable(
+      context,
+      hashSetOf(context.currentAcquisitionPathElement.mimeType),
+      receivedType
+    )
+  }
+
+  /**
+   * Check to see if the given MIME type is "acceptable", given a set of expected types. If the type
+   * is not acceptable, the current task recorder step will be marked as failed with an appropriate
+   * error message.
+   *
+   * @return `true` if the received MIME type is acceptable
+   */
+
+  fun isMimeTypeAcceptable(
+    context: BorrowContextType,
+    expectedTypes: Set<MIMEType>,
+    receivedType: MIMEType
+  ): Boolean {
+    return if (
+      expectedTypes.any { MIMECompatibility.isCompatibleLax(receivedType, it) }
+    ) {
       true
     } else {
+      val expectedTypesDesc = expectedTypes.map { it.fullType }.joinToString(" or ")
+
       context.taskRecorder.currentStepFailed(
-        message = "The server returned an incompatible context type: We wanted something compatible with ${expectedType.fullType} but received ${receivedType.fullType}.",
+        message = "The server returned an incompatible context type: We wanted something compatible with $expectedTypesDesc but received ${receivedType.fullType}.",
         errorCode = BorrowErrorCodes.httpContentTypeIncompatible
       )
       false
