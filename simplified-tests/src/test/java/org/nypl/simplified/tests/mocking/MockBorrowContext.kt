@@ -165,10 +165,12 @@ class MockBorrowContext(
   override fun logWarn(message: String, vararg arguments: Any?) =
     this.logger.warn("[{}] $message", this.bookIdBrief, *arguments)
 
-  override fun temporaryFile(): File {
+  override fun temporaryFile(extension: String): File {
+    val ext = if (extension.length > 0) ".$extension" else ""
+
     this.temporaryDirectory.mkdirs()
     for (i in 0..100) {
-      val file = File(this.temporaryDirectory, "${UUID.randomUUID()}.tmp")
+      val file = File(this.temporaryDirectory, "${UUID.randomUUID()}$ext")
       if (!file.exists()) {
         return file
       }

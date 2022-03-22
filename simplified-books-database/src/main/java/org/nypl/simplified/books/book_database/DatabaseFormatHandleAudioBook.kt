@@ -276,6 +276,23 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
     this.parameters.onUpdated.invoke(newFormat)
   }
 
+  override fun moveInBook(file: File) {
+    val newFormat = synchronized(this.dataLock) {
+      FileUtilities.fileRename(file, this.fileBook)
+
+      this.formatRef = this.formatRef.copy(
+        file = this.fileBook,
+        manifest = BookFormat.AudioBookManifestReference(
+          manifestURI = URI("manifest.json"),
+          manifestFile = this.fileManifest
+        )
+      )
+      this.formatRef
+    }
+
+    this.parameters.onUpdated.invoke(newFormat)
+  }
+
   override fun savePlayerPosition(position: PlayerPosition) {
     val text =
       JSONSerializerUtilities.serializeToString(PlayerPositions.serializeToObjectNode(position))

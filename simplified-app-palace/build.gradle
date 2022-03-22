@@ -33,6 +33,7 @@ android {
 
 configurations.all {
   exclude group: 'org.librarysimplified.drm'
+  exclude group: 'com.google.code.findbugs', module: 'annotations'
 }
 
 dependencies {

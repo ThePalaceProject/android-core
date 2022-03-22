@@ -55,6 +55,7 @@ import org.nypl.simplified.tests.mocking.MockBorrowContext
 import org.nypl.simplified.tests.mocking.MockBundledContentResolver
 import org.nypl.simplified.tests.mocking.MockContentResolver
 import org.slf4j.LoggerFactory
+import java.io.File
 import java.net.URI
 import java.util.concurrent.TimeUnit
 
@@ -80,6 +81,7 @@ class BorrowAudioBookTest {
   private lateinit var profile: ProfileReadableType
   private lateinit var services: MutableServiceDirectory
   private lateinit var taskRecorder: TaskRecorderType
+  private lateinit var tempDir: File
   private var bookRegistrySub: Disposable? = null
 
   private val logger = LoggerFactory.getLogger(BorrowAudioBookTest::class.java)
@@ -166,12 +168,13 @@ class BorrowAudioBookTest {
         formats = listOf()
       )
 
+    this.tempDir = TestDirectories.temporaryDirectory()
     this.bookDatabase =
       MockBookDatabase(this.accountId)
     this.bookDatabaseEntry =
       MockBookDatabaseEntry(bookInitial)
     this.audioBookHandle =
-      MockBookDatabaseEntryFormatHandleAudioBook(this.bookID)
+      MockBookDatabaseEntryFormatHandleAudioBook(this.bookID, this.tempDir)
     this.bookDatabaseEntry.formatHandlesField.clear()
     this.bookDatabaseEntry.formatHandlesField.add(this.audioBookHandle)
 
@@ -188,7 +191,7 @@ class BorrowAudioBookTest {
         isCancelled = false,
         logger = this.logger,
         taskRecorder = this.taskRecorder,
-        temporaryDirectory = TestDirectories.temporaryDirectory()
+        temporaryDirectory = this.tempDir
       )
 
     this.context.audioBookManifestStrategies =

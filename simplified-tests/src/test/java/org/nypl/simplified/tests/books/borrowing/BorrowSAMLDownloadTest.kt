@@ -244,6 +244,8 @@ class BorrowSAMLDownloadTest {
 
     this.context.currentURIField =
       this.webServer.url("/book.epub").toUri()
+    this.context.currentAcquisitionPathElement =
+      OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
 
     try {
       task.execute(this.context)
@@ -270,6 +272,8 @@ class BorrowSAMLDownloadTest {
 
     this.context.currentURIField =
       this.webServer.url("/book.epub").toUri()
+    this.context.currentAcquisitionPathElement =
+      OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
 
     this.webServer.enqueue(MockResponse().setResponseCode(404))
 
