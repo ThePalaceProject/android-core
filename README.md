@@ -186,15 +186,19 @@ build failure: When DRM is enabled, the build system will check that you have
 provided various configuration files containing secrets that the DRM systems
 require, and will refuse to build the app if you've failed to do this. The
 build system can copy in the correct secrets for you if tell it the location
-of directories containing those secrets. For example, assuming that you have
-[Palace's](simplified-app-palace) secrets in `/path/to/palace/secrets`<!--and
-[Open eBook's](simplified-app-openebooks) secrets in `/path/to/openebooks/secrets` -->,
-you can add the following properties to your `$HOME/.gradle/gradle.properties` file
-and the build system will copy in the required secrets at build time:
+of directories containing those secrets. There are two directories to configure:
+A credentials directory, containing secrets needed to build the app, and an
+assets directory, containing secrets needed by the app at runtime (which will be
+installed as assets in the app). For example, assuming that you have
+[Palace's](simplified-app-palace) credentials in '/path/to/palace/credentials',
+and assets in `/path/to/palace/assets`, you can add the following properties to
+your `$HOME/.gradle/gradle.properties` file and the build system will copy in
+the required secrets at build time:
 
 <!-- org.librarysimplified.app.assets.openebooks=/path/to/openebooks/secrets -->
 ```
-org.thepalaceproject.app.assets.palace=/path/to/palace/secrets
+org.thepalaceproject.app.credentials.palace=/path/to/palace/credentials
+org.thepalaceproject.app.assets.palace=/path/to/palace/assets
 ```
 
 #### Adobe DRM Support
