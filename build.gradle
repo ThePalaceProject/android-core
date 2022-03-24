@@ -105,24 +105,17 @@ ext {
     }
   }
 
-  //
-  // Load secrets stored in secrets.conf.
-  //
+  credentialsPath =
+    project.findProperty('org.thepalaceproject.app.credentials.palace') ?: ''
+  lcpLicenseFile = "${credentialsPath}/LCP/prod_license_key.txt"
+  lcpLicenseKey = 'test'
 
-  assetPath = project.findProperty('org.thepalaceproject.app.assets.palace')
-  secrets = new Properties()
-
-  if (nyplDrmEnabled) {
-    file("$assetPath/secrets.conf").withInputStream {
-      secrets.load(it)
-    }
+  try {
+    lcpLicenseKey = new File(lcpLicenseFile).text.trim()
+  } catch (Exception ex) {
+    logger.error("Failed to read production LCP license key from {}", lcpLicenseFile)
+    logger.error("Test liblcp will be used")
   }
-
-  //
-  // Get the LCP production license key from secrets, or default to the test key.
-  //
-
-  lcpLicenseKey = secrets.getProperty('lcp.prod.license.key', 'test')
 }
 
 //

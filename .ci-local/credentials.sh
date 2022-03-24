@@ -46,11 +46,11 @@ cat ".ci/credentials/APK Signing/keystore.properties" >> "${HOME}/.gradle/gradle
 CREDENTIALS_PATH=$(realpath ".ci/credentials") ||
   fatal "could not resolve credentials path"
 
-SIMPLYE_CREDENTIALS="${CREDENTIALS_PATH}/Certificates/Palace/Android"
+ASSETS_PATH="${CREDENTIALS_PATH}/Certificates/Palace/Android"
 
-if [ ! -d "${SIMPLYE_CREDENTIALS}" ]
+if [ ! -d "${ASSETS_PATH}" ]
 then
-  fatal "${SIMPLYE_CREDENTIALS} does not exist, or is not a directory"
+  fatal "${ASSETS_PATH} does not exist, or is not a directory"
 fi
 
 cp "${CREDENTIALS_PATH}/PlayStore/play_store_api_key.json" "simplified-app-palace/play_store_api_key.json" ||
@@ -63,7 +63,8 @@ org.thepalaceproject.s3.depend=true
 org.thepalaceproject.aws.access_key_id=${CI_AWS_ACCESS_ID}
 org.thepalaceproject.aws.secret_access_key=${CI_AWS_SECRET_KEY}
 
-org.thepalaceproject.app.assets.palace=${SIMPLYE_CREDENTIALS}
+org.thepalaceproject.app.credentials.palace=${CREDENTIALS_PATH}
+org.thepalaceproject.app.assets.palace=${ASSETS_PATH}
 EOF
 
 #------------------------------------------------------------------------
