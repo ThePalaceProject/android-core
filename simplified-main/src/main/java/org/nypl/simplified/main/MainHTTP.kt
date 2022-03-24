@@ -25,10 +25,10 @@ object MainHTTP {
       LSHTTPClientConfiguration(
         applicationName = name,
         applicationVersion = version,
-        // TODO: The 5 minute timeout is for download of large LCP audiobooks (in BorrowLCP).
+        // TODO: The 15 minute timeout is for download of large LCP audiobooks (in BorrowLCP).
         // Otherwise, the default of 1 minute would be sufficient. In the future we might want to
         // allow per-request timeouts.
-        timeout = Pair(5L, TimeUnit.MINUTES)
+        timeout = Pair(15L, TimeUnit.MINUTES)
       )
 
     return LSHTTPClients().create(context, configuration)
