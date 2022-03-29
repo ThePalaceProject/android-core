@@ -51,7 +51,8 @@ class PdfViewerProvider : ViewerProviderType {
         accountId = book.account,
         documentTile = book.entry.title,
         pdfFile = formatPDF.file!!,
-        id = book.id
+        id = book.id,
+        drmInfo = formatPDF.drmInformation
       )
     )
   }

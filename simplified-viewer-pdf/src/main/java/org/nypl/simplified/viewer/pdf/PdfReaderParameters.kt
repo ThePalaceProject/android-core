@@ -1,6 +1,7 @@
 package org.nypl.simplified.viewer.pdf
 
 import org.nypl.simplified.accounts.api.AccountID
+import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookID
 import java.io.File
 import java.io.Serializable
@@ -17,5 +18,6 @@ data class PdfReaderParameters(
   val accountId: AccountID,
   val documentTile: String,
   val pdfFile: File,
-  val id: BookID
+  val id: BookID,
+  val drmInfo: BookDRMInformation
 ) : Serializable

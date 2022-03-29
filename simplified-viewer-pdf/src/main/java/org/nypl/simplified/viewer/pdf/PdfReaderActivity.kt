@@ -1,9 +1,11 @@
 package org.nypl.simplified.viewer.pdf
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import edu.umn.minitex.pdf.android.api.PdfFragmentListenerType
@@ -11,19 +13,39 @@ import edu.umn.minitex.pdf.android.api.TableOfContentsFragmentListenerType
 import edu.umn.minitex.pdf.android.api.TableOfContentsItem
 import edu.umn.minitex.pdf.android.pdfviewer.PdfViewerFragment
 import edu.umn.minitex.pdf.android.pdfviewer.TableOfContentsFragment
+import kotlinx.coroutines.runBlocking
 import org.librarysimplified.services.api.Services
+import org.nypl.drm.core.ContentProtectionProvider
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.database.api.AccountType
+import org.nypl.simplified.books.api.BookContentProtections
+import org.nypl.simplified.books.api.BookDRMInformation
+import org.nypl.simplified.books.api.BookDRMKind
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandlePDF
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
 import org.nypl.simplified.books.book_database.api.BookDatabaseType
 import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
+import org.nypl.simplified.ui.thread.api.UIThreadServiceType
+import org.readium.r2.shared.fetcher.ResourceInputStream
+import org.readium.r2.shared.publication.asset.FileAsset
+import org.readium.r2.shared.publication.services.isRestricted
+import org.readium.r2.shared.publication.services.protectionError
+import org.readium.r2.shared.util.getOrElse
+import org.readium.r2.shared.util.http.DefaultHttpClient
+import org.readium.r2.shared.util.logging.ConsoleWarningLogger
+import org.readium.r2.shared.util.mediatype.MediaType
+import org.readium.r2.streamer.Streamer
+import org.readium.r2.streamer.parser.readium.ReadiumWebPubParser
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.io.ByteArrayInputStream
 import java.io.File
+import java.io.IOException
 import java.io.InputStream
+import java.util.ServiceLoader
+import kotlin.collections.ArrayList
 
 class PdfReaderActivity :
   AppCompatActivity(),
@@ -54,6 +76,7 @@ class PdfReaderActivity :
 
   // vars assigned in onCreate and passed with the intent
   private lateinit var documentTitle: String
+  private lateinit var drmInfo: BookDRMInformation
   private lateinit var pdfFile: File
   private lateinit var accountId: AccountID
   private lateinit var id: BookID
@@ -62,10 +85,14 @@ class PdfReaderActivity :
   private lateinit var books: BookDatabaseType
   private lateinit var entry: BookDatabaseEntryType
   private lateinit var handle: BookDatabaseEntryFormatHandlePDF
+  private lateinit var uiThread: UIThreadServiceType
 
   // vars for the activity to pass back to the reader or table of contents fragment
   private var documentPageIndex: Int = 0
   private var tableOfContentsList: ArrayList<TableOfContentsItem> = arrayListOf()
+
+  private val contentProtectionProviders =
+    ServiceLoader.load(ContentProtectionProvider::class.java).toList()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     log.debug("onCreate")
@@ -74,12 +101,16 @@ class PdfReaderActivity :
 
     val intentParams = intent?.getSerializableExtra(PARAMS_ID) as PdfReaderParameters
     this.documentTitle = intentParams.documentTile
+    this.drmInfo = intentParams.drmInfo
     this.pdfFile = intentParams.pdfFile
     this.accountId = intentParams.accountId
     this.id = intentParams.id
 
     val services =
       Services.serviceDirectory()
+
+    this.uiThread =
+      services.requireService(UIThreadServiceType::class.java)
 
     this.currentProfile =
       services.requireService(ProfilesControllerType::class.java).profileCurrent()
@@ -130,7 +161,62 @@ class PdfReaderActivity :
   //region [PdfFragmentListenerType]
   override fun onReaderWantsInputStream(): InputStream {
     log.debug("onReaderWantsInputStream")
-    return pdfFile.inputStream()
+
+    return when (this.drmInfo.kind) {
+      BookDRMKind.LCP ->
+        try {
+          this.lcpInputStream()
+        } catch (exception: Exception) {
+          showErrorWithRunnable(
+            context = this,
+            title = exception.message ?: "",
+            failure = exception,
+            execute = this::finish
+          )
+
+          // Return a dummy stream in case the PDF couldn't be opened or decrypted.
+          ByteArrayInputStream(ByteArray(0))
+        }
+      else ->
+        pdfFile.inputStream()
+    }
+  }
+
+  private fun lcpInputStream(): InputStream {
+    val streamer = Streamer(
+      context = this,
+      parsers = listOf(
+        ReadiumWebPubParser(
+          httpClient = DefaultHttpClient(),
+          pdfFactory = null
+        )
+      ),
+      contentProtections = BookContentProtections.create(
+        context = this,
+        contentProtectionProviders = this.contentProtectionProviders,
+        drmInfo = this.drmInfo
+      ),
+      ignoreDefaultParsers = true
+    )
+
+    val publication = runBlocking {
+      streamer.open(
+        asset = FileAsset(pdfFile, MediaType.LCP_PROTECTED_PDF),
+        allowUserInteraction = false,
+        warnings = ConsoleWarningLogger()
+      )
+    }.getOrElse {
+      throw IOException("Failed to open PDF", it)
+    }
+
+    if (publication.isRestricted) {
+      throw IOException("Failed to unlock PDF", publication.protectionError)
+    }
+
+    // We only support a single PDF file in the archive.
+    val link = publication.readingOrder.first()
+
+    return ResourceInputStream(publication.get(link)).buffered(256 * 1024)
   }
 
   override fun onReaderWantsTitle(): String {
@@ -192,4 +278,23 @@ class PdfReaderActivity :
     onBackPressed()
   }
   //endregion
+
+  private fun showErrorWithRunnable(
+    context: Context,
+    title: String,
+    failure: Exception,
+    execute: () -> Unit
+  ) {
+    this.log.error("error: {}: ", title, failure)
+
+    this.uiThread.runOnUIThread {
+      AlertDialog.Builder(context)
+        .setTitle(title)
+        .setMessage(failure.localizedMessage)
+        .setOnDismissListener {
+          execute.invoke()
+        }
+        .show()
+    }
+  }
 }
