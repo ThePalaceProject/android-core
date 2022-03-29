@@ -168,7 +168,7 @@
         <c:change date="2022-03-01T00:00:00+00:00" summary="Removed Open Textbook Library from the featured libraries."/>
       </c:changes>
     </c:release>
-    <c:release date="2022-03-23T15:42:33+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.8">
+    <c:release date="2022-03-29T17:38:50+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.0.8">
       <c:changes>
         <c:change date="2022-03-15T00:00:00+00:00" summary="Added support for acquiring and playing audiobooks that use LCP DRM."/>
         <c:change date="2022-03-22T00:00:00+00:00" summary="Changed the label of untitled audiobook files from &quot;Chapter&quot; to &quot;Track&quot;."/>
