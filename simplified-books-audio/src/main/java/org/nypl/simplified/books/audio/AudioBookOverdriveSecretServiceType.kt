@@ -11,11 +11,11 @@ interface AudioBookOverdriveSecretServiceType : AudioBookSecretServiceType {
    * The client key.
    */
 
-  val clientKey: String
+  val clientKey: String?
 
   /**
    * The client secret.
    */
 
-  val clientPass: String
+  val clientPass: String?
 }

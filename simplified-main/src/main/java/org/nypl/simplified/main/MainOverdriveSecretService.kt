@@ -5,7 +5,6 @@ import org.nypl.simplified.books.audio.AudioBookOverdriveSecretServiceType
 import org.slf4j.LoggerFactory
 import java.io.FileNotFoundException
 import java.io.InputStream
-import java.lang.NullPointerException
 import java.util.Properties
 
 /**
@@ -13,8 +12,8 @@ import java.util.Properties
  */
 
 class MainOverdriveSecretService private constructor(
-  override val clientKey: String,
-  override val clientPass: String
+  override val clientKey: String?,
+  override val clientPass: String?
 ) : AudioBookOverdriveSecretServiceType {
 
   companion object {
@@ -44,10 +43,8 @@ class MainOverdriveSecretService private constructor(
 
       val clientKey =
         properties.getProperty("overdrive.prod.client.key")
-          ?: throw NullPointerException("overdrive.prod.client.key is missing")
       val clientPass =
         properties.getProperty("overdrive.prod.client.secret")
-          ?: throw NullPointerException("overdrive.prod.client.secret is missing")
 
       return MainOverdriveSecretService(
         clientKey = clientKey,
