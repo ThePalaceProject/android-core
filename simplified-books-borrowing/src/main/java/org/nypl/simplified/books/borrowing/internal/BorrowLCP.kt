@@ -363,8 +363,7 @@ class BorrowLCP private constructor() : BorrowSubtaskType {
         formatHandle.moveInBook(bookFile)
       }
       is BookDatabaseEntryFormatHandlePDF ->
-        // TODO
-        throw NotImplementedError("LCP-encrypted PDF downloads are not yet implemented")
+        formatHandle.copyInBook(bookFile)
     }
 
     context.taskRecorder.currentStepSucceeded("Saved book.")
