@@ -1,6 +1,5 @@
 package org.nypl.simplified.ui.catalog
 
-import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import org.librarysimplified.services.api.ServiceDirectoryType
@@ -12,7 +11,6 @@ import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.slf4j.LoggerFactory
 
 class CatalogBookDetailViewModelFactory(
-  private val application: Application,
   private val services: ServiceDirectoryType,
   private val borrowViewModel: CatalogBorrowViewModel,
   private val listener: FragmentListenerType<CatalogBookDetailEvent>,
@@ -37,7 +35,6 @@ class CatalogBookDetailViewModelFactory(
           services.requireService(BuildConfigurationServiceType::class.java)
 
         CatalogBookDetailViewModel(
-          this.application.resources,
           feedLoader,
           profilesController,
           bookRegistry,

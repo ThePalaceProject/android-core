@@ -41,11 +41,10 @@ import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.slf4j.LoggerFactory
 import java.net.URI
-import java.util.*
+import java.util.UUID
 import javax.annotation.concurrent.GuardedBy
 
 class CatalogBookDetailViewModel(
-  private val resources: Resources,
   private val feedLoader: FeedLoaderType,
   private val profilesController: ProfilesControllerType,
   private val bookRegistry: BookRegistryType,
@@ -155,27 +154,28 @@ class CatalogBookDetailViewModel(
   val showDebugBookDetailStatus: Boolean
     get() = this.buildConfiguration.showDebugBookDetailStatus
 
-  val bookCanBeRevoked: Boolean get() = try {
-    val book = this.bookWithStatus.book
-    val profile = this.profilesController.profileCurrent()
-    val account = profile.account(book.account)
+  val bookCanBeRevoked: Boolean
+    get() = try {
+      val book = this.bookWithStatus.book
+      val profile = this.profilesController.profileCurrent()
+      val account = profile.account(book.account)
 
-    if (account.bookDatabase.books().contains(book.id)) {
-      when (val status = this.bookWithStatus.status) {
-        is BookStatus.Loaned.LoanedDownloaded ->
-          status.returnable
-        is BookStatus.Loaned.LoanedNotDownloaded ->
-          true
-        else ->
-          false
+      if (account.bookDatabase.books().contains(book.id)) {
+        when (val status = this.bookWithStatus.status) {
+          is BookStatus.Loaned.LoanedDownloaded ->
+            status.returnable
+          is BookStatus.Loaned.LoanedNotDownloaded ->
+            true
+          else ->
+            false
+        }
+      } else {
+        false
       }
-    } else {
+    } catch (e: Exception) {
+      this.logger.error("could not determine if the book could be revoked: ", e)
       false
     }
-  } catch (e: Exception) {
-    this.logger.error("could not determine if the book could be revoked: ", e)
-    false
-  }
 
   /**
    * Determine whether or not a book can be "deleted".
@@ -187,43 +187,44 @@ class CatalogBookDetailViewModel(
    * * It is open access but there is a book database entry for it
    */
 
-  val bookCanBeDeleted: Boolean get() {
-    return try {
-      val book = this.bookWithStatus.book
-      val profile = this.profilesController.profileCurrent()
-      val account = profile.account(book.account)
-      return if (account.bookDatabase.books().contains(book.id)) {
-        book.entry.availability.matchAvailability(
-          object : OPDSAvailabilityMatcherType<Boolean, Exception> {
-            override fun onHeldReady(availability: OPDSAvailabilityHeldReady): Boolean =
-              false
+  val bookCanBeDeleted: Boolean
+    get() {
+      return try {
+        val book = this.bookWithStatus.book
+        val profile = this.profilesController.profileCurrent()
+        val account = profile.account(book.account)
+        return if (account.bookDatabase.books().contains(book.id)) {
+          book.entry.availability.matchAvailability(
+            object : OPDSAvailabilityMatcherType<Boolean, Exception> {
+              override fun onHeldReady(availability: OPDSAvailabilityHeldReady): Boolean =
+                false
 
-            override fun onHeld(availability: OPDSAvailabilityHeld): Boolean =
-              false
+              override fun onHeld(availability: OPDSAvailabilityHeld): Boolean =
+                false
 
-            override fun onHoldable(availability: OPDSAvailabilityHoldable): Boolean =
-              false
+              override fun onHoldable(availability: OPDSAvailabilityHoldable): Boolean =
+                false
 
-            override fun onLoaned(availability: OPDSAvailabilityLoaned): Boolean =
-              availability.revoke.isNone && book.isDownloaded
+              override fun onLoaned(availability: OPDSAvailabilityLoaned): Boolean =
+                availability.revoke.isNone && book.isDownloaded
 
-            override fun onLoanable(availability: OPDSAvailabilityLoanable): Boolean =
-              true
+              override fun onLoanable(availability: OPDSAvailabilityLoanable): Boolean =
+                true
 
-            override fun onOpenAccess(availability: OPDSAvailabilityOpenAccess): Boolean =
-              true
+              override fun onOpenAccess(availability: OPDSAvailabilityOpenAccess): Boolean =
+                true
 
-            override fun onRevoked(availability: OPDSAvailabilityRevoked): Boolean =
-              false
-          })
-      } else {
+              override fun onRevoked(availability: OPDSAvailabilityRevoked): Boolean =
+                false
+            })
+        } else {
+          false
+        }
+      } catch (e: Exception) {
+        this.logger.error("could not determine if the book could be deleted: ", e)
         false
       }
-    } catch (e: Exception) {
-      this.logger.error("could not determine if the book could be deleted: ", e)
-      false
     }
-  }
 
   override fun openBookDetail(opdsEntry: FeedEntry.FeedEntryOPDS) {
     this.listener.post(
@@ -379,8 +380,10 @@ class CatalogBookDetailViewModel(
   }
 
   private fun onFeedLoaderResult(resultWithArguments: LoaderResultWithArguments) {
-    this.logger.debug("[{}]: feed status updated: {}", this.instanceId,
-      resultWithArguments.arguments.javaClass)
+    this.logger.debug(
+      "[{}]: feed status updated: {}", this.instanceId,
+      resultWithArguments.arguments.javaClass
+    )
 
     this.relatedBooksFeedStateMutable.value =
       this.feedLoaderResultToFeedState(resultWithArguments.arguments, resultWithArguments.result)

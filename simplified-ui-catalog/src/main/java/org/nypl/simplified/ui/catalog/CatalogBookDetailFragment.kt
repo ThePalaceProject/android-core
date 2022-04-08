@@ -91,7 +91,6 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
   private val viewModel: CatalogBookDetailViewModel by viewModels(
     factoryProducer = {
       CatalogBookDetailViewModelFactory(
-        requireActivity().application,
         this.services,
         this.borrowViewModel,
         this.listener,
@@ -330,7 +329,10 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
     if (feedRelatedOpt is Some<URI>) {
       val feedRelated = feedRelatedOpt.get()
 
-      this.viewModel.relatedBooksFeedState.observe(this.viewLifecycleOwner, this::updateRelatedBooksUI)
+      this.viewModel.relatedBooksFeedState.observe(
+        this.viewLifecycleOwner,
+        this::updateRelatedBooksUI
+      )
       this.relatedBooksContainer.visibility = View.VISIBLE
       this.viewModel.loadRelatedBooks(feedRelated)
     } else {
@@ -439,9 +441,9 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
       is CatalogFeedState.CatalogFeedLoading -> {
         this.onCatalogFeedLoading()
       }
-       is CatalogFeedState.CatalogFeedLoaded.CatalogFeedWithGroups -> {
-         this.onCatalogFeedWithGroups(feedState)
-       }
+      is CatalogFeedState.CatalogFeedLoaded.CatalogFeedWithGroups -> {
+        this.onCatalogFeedWithGroups(feedState)
+      }
       is CatalogFeedState.CatalogFeedLoaded.CatalogFeedWithoutGroups -> {
         this.onCatalogFeedWithoutGroups(feedState)
       }
