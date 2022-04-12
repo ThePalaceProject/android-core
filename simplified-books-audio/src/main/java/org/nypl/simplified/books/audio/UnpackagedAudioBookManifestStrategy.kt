@@ -116,8 +116,8 @@ class UnpackagedAudioBookManifestStrategy(
             OPAParameters(
               userName = credentials.userName,
               password = OPAPassword.Password(credentials.password),
-              clientKey = secretService.clientKey,
-              clientPass = secretService.clientPass,
+              clientKey = secretService.clientKey.orEmpty(),
+              clientPass = secretService.clientPass.orEmpty(),
               targetURI = OPAManifestURI.Indirect(this.request.targetURI),
               userAgent = this.request.userAgent
             )
@@ -125,8 +125,8 @@ class UnpackagedAudioBookManifestStrategy(
             OPAParameters(
               userName = credentials.userName,
               password = OPAPassword.NotRequired,
-              clientKey = secretService.clientKey,
-              clientPass = secretService.clientPass,
+              clientKey = secretService.clientKey.orEmpty(),
+              clientPass = secretService.clientPass.orEmpty(),
               targetURI = OPAManifestURI.Indirect(this.request.targetURI),
               userAgent = this.request.userAgent
             )

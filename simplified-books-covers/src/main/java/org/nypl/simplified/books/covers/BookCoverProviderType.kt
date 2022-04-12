@@ -51,6 +51,7 @@ interface BookCoverProviderType {
    *
    * @param entry The feed entry
    * @param imageView The image view
+   * @param hasBadge If the image should have the red icon at the bottom right corner
    * @param width Use 0 as desired dimension to resize keeping aspect ratio.
    * @param height Use 0 as desired dimension to resize keeping aspect ratio.
    */
@@ -58,6 +59,7 @@ interface BookCoverProviderType {
   fun loadCoverInto(
     entry: FeedEntry.FeedEntryOPDS,
     imageView: ImageView,
+    hasBadge: Boolean,
     width: Int,
     height: Int
   ): FluentFuture<Unit>

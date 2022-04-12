@@ -724,6 +724,7 @@ class AudioBookPlayerActivity :
   override fun onPlayerWantsCoverImage(view: ImageView) {
     this.covers.loadCoverInto(
       entry = FeedEntry.FeedEntryOPDS(this.parameters.accountID, this.parameters.opdsEntry),
+      hasBadge = false,
       imageView = view,
       width = 0,
       height = 0
