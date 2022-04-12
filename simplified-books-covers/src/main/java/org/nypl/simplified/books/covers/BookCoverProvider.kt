@@ -134,7 +134,6 @@ class BookCoverProvider private constructor(
       }
 
       requestCreator.into(imageView, callbackFinal)
-
     } else {
       this.logger.debug("{}: {}: loading generated uri {}", tag, entry.bookID, uriGenerated)
 
