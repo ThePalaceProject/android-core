@@ -238,7 +238,7 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
     val targetHeight =
       this.resources.getDimensionPixelSize(R.dimen.cover_detail_height)
     this.covers.loadCoverInto(
-      this.parameters.feedEntry, this.cover, 0, targetHeight
+      this.parameters.feedEntry, this.cover, hasBadge = true, 0, targetHeight
     )
 
     this.relatedBooksList.setHasFixedSize(true)

@@ -52,6 +52,7 @@ class BookCoverProvider private constructor(
   private fun doLoad(
     entry: FeedEntry.FeedEntryOPDS,
     imageView: ImageView,
+    hasBadge: Boolean,
     width: Int,
     height: Int,
     tag: String,
@@ -111,9 +112,11 @@ class BookCoverProvider private constructor(
             requestCreator.resize(width, height)
           }
 
-          requestCreator
-            .transform(badgePainter)
-            .into(imageView, callbackFinal)
+          if (hasBadge) {
+            requestCreator.transform(badgePainter)
+          }
+
+          requestCreator.into(imageView, callbackFinal)
         }
       }
 
@@ -126,8 +129,11 @@ class BookCoverProvider private constructor(
         requestCreator.resize(width, height)
       }
 
-      requestCreator.transform(badgePainter)
-        .into(imageView, fallbackToGeneration)
+      if (hasBadge) {
+        requestCreator.transform(badgePainter)
+      }
+
+      requestCreator.into(imageView, callbackFinal)
     } else {
       this.logger.debug("{}: {}: loading generated uri {}", tag, entry.bookID, uriGenerated)
 
@@ -140,8 +146,11 @@ class BookCoverProvider private constructor(
         requestCreator.resize(width, height)
       }
 
-      requestCreator.transform(badgePainter)
-        .into(imageView, callbackFinal)
+      if (hasBadge) {
+        requestCreator.transform(badgePainter)
+      }
+
+      requestCreator.into(imageView, callbackFinal)
     }
 
     return FluentFuture.from(future)
@@ -220,6 +229,7 @@ class BookCoverProvider private constructor(
     return doLoad(
       entry = entry,
       imageView = imageView,
+      hasBadge = true,
       width = width,
       height = height,
       tag = thumbnailTag,
@@ -230,12 +240,14 @@ class BookCoverProvider private constructor(
   override fun loadCoverInto(
     entry: FeedEntry.FeedEntryOPDS,
     imageView: ImageView,
+    hasBadge: Boolean,
     width: Int,
     height: Int
   ): FluentFuture<Unit> {
     return doLoad(
       entry = entry,
       imageView = imageView,
+      hasBadge = hasBadge,
       width = width,
       height = height,
       tag = coverTag,
