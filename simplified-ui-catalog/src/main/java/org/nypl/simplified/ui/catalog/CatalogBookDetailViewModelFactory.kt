@@ -1,17 +1,16 @@
 package org.nypl.simplified.ui.catalog
 
-import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
+import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.slf4j.LoggerFactory
 
 class CatalogBookDetailViewModelFactory(
-  private val application: Application,
   private val services: ServiceDirectoryType,
   private val borrowViewModel: CatalogBorrowViewModel,
   private val listener: FragmentListenerType<CatalogBookDetailEvent>,
@@ -26,6 +25,8 @@ class CatalogBookDetailViewModelFactory(
 
     return when {
       modelClass.isAssignableFrom(CatalogBookDetailViewModel::class.java) -> {
+        val feedLoader: FeedLoaderType =
+          this.services.requireService(FeedLoaderType::class.java)
         val profilesController =
           services.requireService(ProfilesControllerType::class.java)
         val bookRegistry =
@@ -34,7 +35,7 @@ class CatalogBookDetailViewModelFactory(
           services.requireService(BuildConfigurationServiceType::class.java)
 
         CatalogBookDetailViewModel(
-          this.application.resources,
+          feedLoader,
           profilesController,
           bookRegistry,
           configurationService,

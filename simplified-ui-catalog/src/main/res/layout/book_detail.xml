@@ -200,17 +200,25 @@
       android:layout_marginBottom="16dp"
       android:background="?android:attr/listDivider" />
 
-    <TextView
-      android:id="@+id/bookDetailRelated"
+    <FrameLayout
+      android:id="@+id/bookDetailRelatedBooksContainer"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:layout_marginStart="16dp"
-      android:layout_marginEnd="16dp"
-      android:layout_marginBottom="16dp"
-      android:enabled="false"
-      android:text="@string/catalogRelatedBooks"
-      android:textSize="18sp"
-      android:textStyle="bold" />
+      android:layout_marginBottom="16dp">
+
+      <include
+          layout="@layout/feed_loading"
+          tools:visibility="visible" />
+
+      <androidx.recyclerview.widget.RecyclerView
+          android:id="@+id/relatedBooksList"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:clipChildren="false"
+          android:clipToPadding="false"
+          android:overScrollMode="never" />
+
+    </FrameLayout>
 
     <View
       android:layout_width="match_parent"
