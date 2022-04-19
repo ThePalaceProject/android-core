@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.text.Html
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -11,6 +12,9 @@ import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.common.base.Preconditions
 import com.google.common.util.concurrent.FluentFuture
 import com.io7m.jfunctional.Some
@@ -26,11 +30,14 @@ import org.nypl.simplified.books.book_registry.BookWithStatus
 import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.feeds.api.FeedEntry.FeedEntryOPDS
+import org.nypl.simplified.feeds.api.FeedGroup
 import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.fragmentListeners
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
+import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.neutrality.NeutralToolbar
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
+import org.slf4j.LoggerFactory
 import java.net.URI
 
 /**
@@ -55,8 +62,19 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
     }
   }
 
+  private val logger = LoggerFactory.getLogger(CatalogBookDetailFragment::class.java)
+
   private val services =
     Services.serviceDirectory()
+
+  private val bookCovers =
+    services.requireService(BookCoverProviderType::class.java)
+
+  private val profilesController =
+    services.requireService(ProfilesControllerType::class.java)
+
+  private val screenInformation =
+    services.requireService(ScreenSizeInformationType::class.java)
 
   private val parameters: CatalogBookDetailFragmentParameters by lazy {
     this.requireArguments()[PARAMETERS_ID] as CatalogBookDetailFragmentParameters
@@ -73,7 +91,6 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
   private val viewModel: CatalogBookDetailViewModel by viewModels(
     factoryProducer = {
       CatalogBookDetailViewModelFactory(
-        requireActivity().application,
         this.services,
         this.borrowViewModel,
         this.listener,
@@ -91,9 +108,13 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
   private lateinit var cover: ImageView
   private lateinit var covers: BookCoverProviderType
   private lateinit var debugStatus: TextView
+  private lateinit var feedWithGroupsAdapter: CatalogFeedWithGroupsAdapter
+  private lateinit var feedWithoutGroupsAdapter: CatalogPagedAdapter
   private lateinit var format: TextView
   private lateinit var metadata: LinearLayout
-  private lateinit var related: TextView
+  private lateinit var relatedBooksContainer: FrameLayout
+  private lateinit var relatedBooksList: RecyclerView
+  private lateinit var relatedBooksLoading: ViewGroup
   private lateinit var report: TextView
   private lateinit var screenSize: ScreenSizeInformationType
   private lateinit var status: ViewGroup
@@ -131,6 +152,8 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
       .appendLiteral(':')
       .appendSecondOfMinute(2)
       .toFormatter()
+
+  private val feedWithGroupsData: MutableList<FeedGroup> = mutableListOf()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -170,8 +193,12 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
       view.findViewById(R.id.bookDetailMetadataTable)
     this.buttons =
       view.findViewById(R.id.bookDetailButtons)
-    this.related =
-      view.findViewById(R.id.bookDetailRelated)
+    this.relatedBooksContainer =
+      view.findViewById(R.id.bookDetailRelatedBooksContainer)
+    this.relatedBooksList =
+      view.findViewById(R.id.relatedBooksList)
+    this.relatedBooksLoading =
+      view.findViewById(R.id.feedLoading)
     this.report =
       view.findViewById(R.id.bookDetailReport)
 
@@ -211,8 +238,24 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
     val targetHeight =
       this.resources.getDimensionPixelSize(R.dimen.cover_detail_height)
     this.covers.loadCoverInto(
-      this.parameters.feedEntry, this.cover, 0, targetHeight
+      this.parameters.feedEntry, this.cover, hasBadge = true, 0, targetHeight
     )
+
+    this.relatedBooksList.setHasFixedSize(true)
+    this.relatedBooksList.setItemViewCacheSize(32)
+    this.relatedBooksList.layoutManager = LinearLayoutManager(this.context)
+    (this.relatedBooksList.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+    this.relatedBooksList.addItemDecoration(
+      CatalogFeedWithGroupsDecorator(this.screenInformation.dpToPixels(16).toInt())
+    )
+
+    this.feedWithGroupsAdapter =
+      CatalogFeedWithGroupsAdapter(
+        groups = this.feedWithGroupsData,
+        coverLoader = this.bookCovers,
+        onFeedSelected = this.viewModel::openFeed,
+        onBookSelected = this.viewModel::openBookDetail
+      )
 
     this.configureOPDSEntry(this.parameters.feedEntry)
   }
@@ -285,12 +328,15 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
     val feedRelatedOpt = feedEntry.feedEntry.related
     if (feedRelatedOpt is Some<URI>) {
       val feedRelated = feedRelatedOpt.get()
-      this.related.setOnClickListener {
-        this.viewModel.openRelatedFeed(feedRelated)
-      }
-      this.related.isEnabled = true
+
+      this.viewModel.relatedBooksFeedState.observe(
+        this.viewLifecycleOwner,
+        this::updateRelatedBooksUI
+      )
+      this.relatedBooksContainer.visibility = View.VISIBLE
+      this.viewModel.loadRelatedBooks(feedRelated)
     } else {
-      this.related.isEnabled = false
+      this.relatedBooksContainer.visibility = View.GONE
     }
   }
 
@@ -388,6 +434,66 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
       is BookStatus.DownloadExternalAuthenticationInProgress ->
         this.onBookStatusDownloadExternalAuthenticationInProgress()
     }
+  }
+
+  private fun updateRelatedBooksUI(feedState: CatalogFeedState?) {
+    when (feedState) {
+      is CatalogFeedState.CatalogFeedLoading -> {
+        this.onCatalogFeedLoading()
+      }
+      is CatalogFeedState.CatalogFeedLoaded.CatalogFeedWithGroups -> {
+        this.onCatalogFeedWithGroups(feedState)
+      }
+      is CatalogFeedState.CatalogFeedLoaded.CatalogFeedWithoutGroups -> {
+        this.onCatalogFeedWithoutGroups(feedState)
+      }
+      else -> {
+        this.relatedBooksContainer.visibility = View.GONE
+      }
+    }
+  }
+
+  private fun onCatalogFeedLoading() {
+    this.relatedBooksContainer.visibility = View.VISIBLE
+    this.relatedBooksList.visibility = View.INVISIBLE
+    this.relatedBooksLoading.visibility = View.VISIBLE
+  }
+
+  private fun onCatalogFeedWithoutGroups(
+    feedState: CatalogFeedState.CatalogFeedLoaded.CatalogFeedWithoutGroups
+  ) {
+
+    this.relatedBooksContainer.visibility = View.VISIBLE
+    this.relatedBooksLoading.visibility = View.INVISIBLE
+    this.relatedBooksList.visibility = View.VISIBLE
+
+    this.feedWithoutGroupsAdapter =
+      CatalogPagedAdapter(
+        context = requireActivity(),
+        listener = this.viewModel,
+        buttonCreator = this.buttonCreator,
+        bookCovers = this.bookCovers,
+        profilesController = this.profilesController
+      )
+
+    this.relatedBooksList.adapter = this.feedWithoutGroupsAdapter
+    feedState.entries.observe(this) { newPagedList ->
+      this.logger.debug("received paged list ({} elements)", newPagedList.size)
+      this.feedWithoutGroupsAdapter.submitList(newPagedList)
+    }
+  }
+
+  private fun onCatalogFeedWithGroups(
+    feedState: CatalogFeedState.CatalogFeedLoaded.CatalogFeedWithGroups
+  ) {
+    this.relatedBooksContainer.visibility = View.VISIBLE
+    this.relatedBooksLoading.visibility = View.INVISIBLE
+    this.relatedBooksList.visibility = View.VISIBLE
+
+    this.relatedBooksList.adapter = this.feedWithGroupsAdapter
+    this.feedWithGroupsData.clear()
+    this.feedWithGroupsData.addAll(feedState.feed.feedGroupsInOrder)
+    this.feedWithGroupsAdapter.notifyDataSetChanged()
   }
 
   private fun onBookStatusFailedLoan(
