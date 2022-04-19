@@ -3,6 +3,7 @@ package org.nypl.simplified.ui.catalog
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
+import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 
 sealed class CatalogBookDetailEvent {
@@ -20,6 +21,11 @@ sealed class CatalogBookDetailEvent {
   data class OpenViewer(
     val book: Book,
     val format: BookFormat
+  ) : CatalogBookDetailEvent()
+
+  data class OpenBookDetail(
+    val feedArguments: CatalogFeedArguments,
+    val opdsEntry: FeedEntry.FeedEntryOPDS
   ) : CatalogBookDetailEvent()
 
   data class OpenFeed(

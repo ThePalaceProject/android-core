@@ -584,11 +584,11 @@ class CatalogFeedViewModel(
     override val sortBy: String
       get() = this.resources.getString(R.string.feedSortBy)
     override val show: String
-      get() = "Show"
+      get() = this.resources.getString(R.string.feedShow)
     override val showAll: String
-      get() = "All"
+      get() = this.resources.getString(R.string.feedShowAll)
     override val showOnLoan: String
-      get() = "On Loan"
+      get() = this.resources.getString(R.string.feedShowOnLoan)
   }
 
   val accountProvider: AccountProviderType?

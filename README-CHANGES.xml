@@ -177,6 +177,7 @@
     <c:release date="2022-04-12T13:57:52+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.9">
       <c:changes>
         <c:change date="2022-04-07T00:00:00+00:00" summary="Added support for PDF books with LCP DRM."/>
+        <c:change date="2022-04-08T14:48:28+00:00" summary="Added automatic loading and displaying of related books in a book details screen"/>
         <c:change date="2022-04-12T13:57:52+00:00" summary="Removed red icon from audiobook cover in the audiobook player screen"/>
       </c:changes>
     </c:release>
