@@ -18,8 +18,8 @@
   <string name="feedTitleBooks">Books</string>
   <string name="feedTitleCatalog">Catalog</string>
   <string name="feedTitleHolds">Holds</string>
-  <string name="feedWithGroupsEmptyHolds">When you reserve a book from the catalog, it will show up here. Look here from time to time to see if your book is available to download</string>
-  <string name="feedWithGroupsEmptyLoaned">Visit the Catalog to add books to My Books</string>
+  <string name="feedWithGroupsEmptyHolds">When you reserve a book from the catalog, it will show up here. Look here from time to time to see if your book is available to download.</string>
+  <string name="feedWithGroupsEmptyLoaned">Visit the Catalog to add books to My Books.</string>
   <string name="ageGateBirthYearPrompt">Please enter your birth year</string>
   <string name="selectYear">Select Year</string>
   <string name="ageVerification">Age Verification</string>
