@@ -40,6 +40,7 @@ import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.android.ktx.supportActionBar
 import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
+import org.nypl.simplified.feeds.api.FeedBooksSelection
 import org.nypl.simplified.feeds.api.FeedFacet
 import org.nypl.simplified.feeds.api.FeedFacets
 import org.nypl.simplified.feeds.api.FeedGroup
@@ -130,35 +131,26 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
     services.requireService(ImageLoaderType::class.java)
 
   private lateinit var buttonCreator: CatalogButtons
-  private lateinit var feedEmpty: ViewGroup
+  private lateinit var feedContent: ViewGroup
   private lateinit var feedError: ViewGroup
   private lateinit var feedErrorDetails: Button
   private lateinit var feedErrorRetry: Button
   private lateinit var feedLoading: ViewGroup
   private lateinit var feedNavigation: ViewGroup
-  private lateinit var feedWithGroups: ViewGroup
-  private lateinit var feedWithGroupsRefresh: SwipeRefreshLayout
+  private lateinit var feedContentFacets: LinearLayout
+  private lateinit var feedContentFacetsScroll: ViewGroup
+  private lateinit var feedContentHeader: ViewGroup
+  private lateinit var feedContentLogoHeader: ViewGroup
+  private lateinit var feedContentLogoImage: ImageView
+  private lateinit var feedContentLogoText: TextView
+  private lateinit var feedEmptyMessage: TextView
+  private lateinit var feedContentTabs: RadioGroup
+  private lateinit var feedContentRefresh: SwipeRefreshLayout
   private lateinit var feedWithGroupsAdapter: CatalogFeedWithGroupsAdapter
-  private lateinit var feedWithGroupsFacets: LinearLayout
-  private lateinit var feedWithGroupsFacetsScroll: ViewGroup
-  private lateinit var feedWithGroupsHeader: ViewGroup
   private lateinit var feedWithGroupsList: RecyclerView
-  private lateinit var feedWithGroupsLogoHeader: ViewGroup
-  private lateinit var feedWithGroupsLogoImage: ImageView
-  private lateinit var feedWithGroupsLogoText: TextView
-  private lateinit var feedWithGroupsTabs: RadioGroup
-  private lateinit var feedWithoutGroups: ViewGroup
-  private lateinit var feedWithoutGroupsRefresh: SwipeRefreshLayout
   private lateinit var feedWithoutGroupsAdapter: CatalogPagedAdapter
-  private lateinit var feedWithoutGroupsFacets: LinearLayout
-  private lateinit var feedWithoutGroupsFacetsScroll: ViewGroup
-  private lateinit var feedWithoutGroupsHeader: ViewGroup
   private lateinit var feedWithoutGroupsList: RecyclerView
-  private lateinit var feedWithoutGroupsLogoHeader: ViewGroup
-  private lateinit var feedWithoutGroupsLogoImage: ImageView
-  private lateinit var feedWithoutGroupsLogoText: TextView
   private lateinit var feedWithoutGroupsScrollListener: RecyclerView.OnScrollListener
-  private lateinit var feedWithoutGroupsTabs: RadioGroup
   private lateinit var toolbar: NeutralToolbar
 
   private var ageGateDialog: DialogFragment? = null
@@ -168,7 +160,8 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
     super.onCreate(savedInstanceState)
     setHasOptionsMenu(true)
 
-    this.ageGateDialog = childFragmentManager.findFragmentByTag(AGE_GATE_DIALOG_TAG) as? DialogFragment
+    this.ageGateDialog =
+      childFragmentManager.findFragmentByTag(AGE_GATE_DIALOG_TAG) as? DialogFragment
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -182,47 +175,53 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
     this.buttonCreator =
       CatalogButtons(this.requireContext(), this.screenInformation)
 
-    this.feedEmpty =
-      view.findViewById(R.id.feedEmpty)
     this.feedError =
       view.findViewById(R.id.feedError)
     this.feedLoading =
       view.findViewById(R.id.feedLoading)
     this.feedNavigation =
       view.findViewById(R.id.feedNavigation)
-    this.feedWithGroups =
-      view.findViewById(R.id.feedWithGroups)
-    this.feedWithoutGroups =
-      view.findViewById(R.id.feedWithoutGroups)
+    this.feedContent =
+      view.findViewById(R.id.feedContent)
 
-    this.feedWithGroupsHeader =
-      view.findViewById(R.id.feedWithGroupsHeader)
-    this.feedWithGroupsRefresh =
-      view.findViewById(R.id.feedWithGroupsRefresh)
-    this.feedWithGroupsFacetsScroll =
-      this.feedWithGroupsHeader.findViewById(R.id.feedHeaderFacetsScroll)
-    this.feedWithGroupsFacets =
-      this.feedWithGroupsHeader.findViewById(R.id.feedHeaderFacets)
-    this.feedWithGroupsTabs =
-      this.feedWithGroupsHeader.findViewById(R.id.feedHeaderTabs)
+    this.feedContentHeader =
+      view.findViewById(R.id.feedContentHeader)
+    this.feedContentRefresh =
+      view.findViewById(R.id.feedContentRefresh)
+    this.feedContentFacetsScroll =
+      this.feedContentHeader.findViewById(R.id.feedHeaderFacetsScroll)
+    this.feedEmptyMessage =
+      this.feedContent.findViewById(R.id.feedEmptyMessage)
 
-    this.feedWithGroupsLogoHeader =
-      this.feedWithGroups.findViewById(R.id.feedWithGroupsLogoHeader)
-    this.feedWithGroupsLogoImage =
-      this.feedWithGroupsLogoHeader.findViewById(R.id.feedLibraryLogo)
-    this.feedWithGroupsLogoText =
-      this.feedWithGroupsLogoHeader.findViewById(R.id.feedLibraryText)
+    if (parameters is CatalogFeedArguments.CatalogFeedArgumentsLocalBooks) {
+      this.feedEmptyMessage.setText(
+        if (
+          (parameters as CatalogFeedArguments.CatalogFeedArgumentsLocalBooks).selection ==
+          FeedBooksSelection.BOOKS_FEED_HOLDS
+        ) {
+          R.string.feedWithGroupsEmptyHolds
+        } else {
+          R.string.feedWithGroupsEmptyLoaned
+        }
+      )
+    }
 
-    this.feedWithoutGroupsRefresh =
-      this.feedWithoutGroups.findViewById(R.id.feedWithoutGroupsRefresh)
-    this.feedWithoutGroupsLogoHeader =
-      this.feedWithoutGroups.findViewById(R.id.feedWithoutGroupsLogoHeader)
-    this.feedWithoutGroupsLogoImage =
-      this.feedWithoutGroupsLogoHeader.findViewById(R.id.feedLibraryLogo)
-    this.feedWithoutGroupsLogoText =
-      this.feedWithoutGroupsLogoHeader.findViewById(R.id.feedLibraryText)
+    this.feedContentFacets =
+      this.feedContentHeader.findViewById(R.id.feedHeaderFacets)
+    this.feedContentTabs =
+      this.feedContentHeader.findViewById(R.id.feedHeaderTabs)
 
-    this.feedWithGroupsList = this.feedWithGroups.findViewById(R.id.feedWithGroupsList)
+    this.feedContentLogoHeader =
+      this.feedContent.findViewById(R.id.feedContentLogoHeader)
+    this.feedContentLogoImage =
+      this.feedContent.findViewById(R.id.feedLibraryLogo)
+    this.feedContentLogoText =
+      this.feedContent.findViewById(R.id.feedLibraryText)
+
+    this.feedContentRefresh =
+      this.feedContent.findViewById(R.id.feedContentRefresh)
+
+    this.feedWithGroupsList = this.feedContent.findViewById(R.id.feedWithGroupsList)
     this.feedWithGroupsList.setHasFixedSize(true)
     this.feedWithGroupsList.setItemViewCacheSize(32)
     this.feedWithGroupsList.layoutManager = LinearLayoutManager(this.context)
@@ -239,17 +238,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
         onBookSelected = this.viewModel::openBookDetail
       )
     this.feedWithGroupsList.adapter = this.feedWithGroupsAdapter
-
-    this.feedWithoutGroupsHeader =
-      view.findViewById(R.id.feedWithoutGroupsHeader)
-    this.feedWithoutGroupsFacetsScroll =
-      this.feedWithoutGroupsHeader.findViewById(R.id.feedHeaderFacetsScroll)
-    this.feedWithoutGroupsFacets =
-      this.feedWithoutGroupsHeader.findViewById(R.id.feedHeaderFacets)
-    this.feedWithoutGroupsTabs =
-      this.feedWithoutGroupsHeader.findViewById(R.id.feedHeaderTabs)
-
-    this.feedWithoutGroupsList = this.feedWithoutGroups.findViewById(R.id.feedWithoutGroupsList)
+    this.feedWithoutGroupsList = this.feedContent.findViewById(R.id.feedWithoutGroupsList)
     this.feedWithoutGroupsList.setHasFixedSize(true)
     this.feedWithoutGroupsList.setItemViewCacheSize(32)
     this.feedWithoutGroupsList.layoutManager = LinearLayoutManager(this.context)
@@ -260,25 +249,17 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
     this.feedErrorDetails =
       this.feedError.findViewById(R.id.feedErrorDetails)
 
+    this.feedContent.visibility = View.INVISIBLE
     this.feedError.visibility = View.INVISIBLE
     this.feedLoading.visibility = View.INVISIBLE
     this.feedNavigation.visibility = View.INVISIBLE
-    this.feedWithGroups.visibility = View.INVISIBLE
-    this.feedWithoutGroups.visibility = View.INVISIBLE
 
-    this.feedWithGroupsRefresh.setOnRefreshListener {
+    this.feedContentRefresh.setOnRefreshListener {
       this.refresh()
-      this.feedWithGroupsRefresh.isRefreshing = false
-    }
-    this.feedWithoutGroupsRefresh.setOnRefreshListener {
-      this.refresh()
-      this.feedWithoutGroupsRefresh.isRefreshing = false
+      this.feedContentRefresh.isRefreshing = false
     }
 
-    this.feedWithGroupsLogoHeader.setOnClickListener {
-      this.openLogoLink()
-    }
-    this.feedWithoutGroupsLogoHeader.setOnClickListener {
+    this.feedContentLogoHeader.setOnClickListener {
       this.openLogoLink()
     }
   }
@@ -379,12 +360,13 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
     @Suppress("UNUSED_PARAMETER") feedState: CatalogFeedAgeGate
   ) {
     this.openAgeGateDialog()
-    this.feedEmpty.visibility = View.INVISIBLE
+    this.feedContent.visibility = View.INVISIBLE
+//    this.feedEmpty.visibility = View.INVISIBLE
     this.feedError.visibility = View.INVISIBLE
     this.feedLoading.visibility = View.INVISIBLE
     this.feedNavigation.visibility = View.INVISIBLE
-    this.feedWithGroups.visibility = View.INVISIBLE
-    this.feedWithoutGroups.visibility = View.INVISIBLE
+//    this.feedWithGroups.visibility = View.INVISIBLE
+//    this.feedWithoutGroups.visibility = View.INVISIBLE
 
     this.configureToolbar()
   }
@@ -393,12 +375,14 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
     @Suppress("UNUSED_PARAMETER") feedState: CatalogFeedEmpty
   ) {
     this.dismissAgeGateDialog()
-    this.feedEmpty.visibility = View.VISIBLE
+    this.feedContent.visibility = View.VISIBLE
+    this.feedEmptyMessage.visibility = View.VISIBLE
+    this.feedContentHeader.visibility = View.GONE
+    this.feedWithGroupsList.visibility = View.INVISIBLE
+    this.feedWithoutGroupsList.visibility = View.INVISIBLE
     this.feedError.visibility = View.INVISIBLE
     this.feedLoading.visibility = View.INVISIBLE
     this.feedNavigation.visibility = View.INVISIBLE
-    this.feedWithGroups.visibility = View.INVISIBLE
-    this.feedWithoutGroups.visibility = View.INVISIBLE
 
     this.configureLogoHeader(feedState)
     this.configureToolbar()
@@ -408,13 +392,10 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
     @Suppress("UNUSED_PARAMETER") feedState: CatalogFeedLoading
   ) {
     this.dismissAgeGateDialog()
-    this.feedEmpty.visibility = View.INVISIBLE
+    this.feedContent.visibility = View.INVISIBLE
     this.feedError.visibility = View.INVISIBLE
     this.feedLoading.visibility = View.VISIBLE
     this.feedNavigation.visibility = View.INVISIBLE
-    this.feedWithGroups.visibility = View.INVISIBLE
-    this.feedWithoutGroups.visibility = View.INVISIBLE
-    this.feedWithoutGroups.visibility = View.INVISIBLE
 
     this.configureToolbar()
   }
@@ -423,12 +404,10 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
     @Suppress("UNUSED_PARAMETER") feedState: CatalogFeedNavigation
   ) {
     this.dismissAgeGateDialog()
-    this.feedEmpty.visibility = View.INVISIBLE
+    this.feedContent.visibility = View.INVISIBLE
     this.feedError.visibility = View.INVISIBLE
     this.feedLoading.visibility = View.INVISIBLE
     this.feedNavigation.visibility = View.VISIBLE
-    this.feedWithGroups.visibility = View.INVISIBLE
-    this.feedWithoutGroups.visibility = View.INVISIBLE
 
     this.configureLogoHeader(feedState)
     this.configureToolbar()
@@ -438,19 +417,16 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
     feedState: CatalogFeedWithoutGroups
   ) {
     this.dismissAgeGateDialog()
-    this.feedEmpty.visibility = View.INVISIBLE
+    this.feedContent.visibility = View.VISIBLE
+    this.feedEmptyMessage.visibility = View.INVISIBLE
     this.feedError.visibility = View.INVISIBLE
     this.feedLoading.visibility = View.INVISIBLE
     this.feedNavigation.visibility = View.INVISIBLE
-    this.feedWithGroups.visibility = View.INVISIBLE
-    this.feedWithoutGroups.visibility = View.VISIBLE
+    this.feedWithGroupsList.visibility = View.INVISIBLE
+    this.feedWithoutGroupsList.visibility = View.VISIBLE
 
     this.configureToolbar()
     this.configureFacets(
-      facetHeader = this.feedWithoutGroupsHeader,
-      facetTabs = this.feedWithoutGroupsTabs,
-      facetLayoutScroller = this.feedWithoutGroupsFacetsScroll,
-      facetLayout = this.feedWithoutGroupsFacets,
       facetsByGroup = feedState.facetsByGroup,
       sortFacets = false
     )
@@ -476,19 +452,16 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
     feedState: CatalogFeedWithGroups
   ) {
     this.dismissAgeGateDialog()
-    this.feedEmpty.visibility = View.INVISIBLE
+    this.feedContent.visibility = View.VISIBLE
+    this.feedEmptyMessage.visibility = View.INVISIBLE
     this.feedError.visibility = View.INVISIBLE
     this.feedLoading.visibility = View.INVISIBLE
     this.feedNavigation.visibility = View.INVISIBLE
-    this.feedWithGroups.visibility = View.VISIBLE
-    this.feedWithoutGroups.visibility = View.INVISIBLE
+    this.feedWithGroupsList.visibility = View.VISIBLE
+    this.feedWithoutGroupsList.visibility = View.INVISIBLE
 
     this.configureToolbar()
     this.configureFacets(
-      facetHeader = this.feedWithGroupsHeader,
-      facetTabs = this.feedWithGroupsTabs,
-      facetLayoutScroller = this.feedWithGroupsFacetsScroll,
-      facetLayout = this.feedWithGroupsFacets,
       facetsByGroup = feedState.feed.facetsByGroup,
       sortFacets = true
     )
@@ -501,11 +474,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
 
   private fun configureLogoHeader(feedState: CatalogFeedLoaded) {
 
-    fun loadImageAndText(
-      accountId: AccountID,
-      imageView: ImageView,
-      textView: TextView
-    ) {
+    fun loadImageAndText(accountId: AccountID) {
       try {
         val account =
           this.profilesController.profileCurrent()
@@ -515,55 +484,30 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
           loader = this.imageLoader.loader,
           account = account.provider.toDescription(),
           defaultIcon = org.nypl.simplified.ui.accounts.R.drawable.account_default,
-          iconView = imageView
+          iconView = feedContentLogoImage
         )
 
-        textView.text = account.provider.displayName
+        feedContentLogoText.text = account.provider.displayName
       } catch (e: Exception) {
         this.logger.debug("error configuring header: ", e)
       }
     }
 
-    return when (feedState) {
-      is CatalogFeedEmpty,
-      is CatalogFeedNavigation ->
-        Unit
-
-      is CatalogFeedWithGroups ->
+    when (feedState) {
+      is CatalogFeedNavigation -> {
+        // do nothing
+      }
+      else -> {
         when (val ownership = feedState.arguments.ownership) {
           CollectedFromAccounts -> {
-            this.feedWithGroupsLogoHeader.visibility = View.GONE
-            this.feedWithoutGroupsLogoHeader.visibility = View.GONE
+            this.feedContentLogoHeader.visibility = View.GONE
           }
           is OwnedByAccount -> {
-            this.feedWithGroupsLogoHeader.visibility = View.VISIBLE
-            this.feedWithoutGroupsLogoHeader.visibility = View.GONE
-
-            loadImageAndText(
-              accountId = ownership.accountId,
-              imageView = this.feedWithGroupsLogoImage,
-              textView = this.feedWithGroupsLogoText
-            )
+            this.feedContentLogoHeader.visibility = View.VISIBLE
+            loadImageAndText(accountId = ownership.accountId)
           }
         }
-
-      is CatalogFeedWithoutGroups ->
-        when (val ownership = feedState.arguments.ownership) {
-          CollectedFromAccounts -> {
-            this.feedWithGroupsLogoHeader.visibility = View.GONE
-            this.feedWithoutGroupsLogoHeader.visibility = View.GONE
-          }
-          is OwnedByAccount -> {
-            this.feedWithGroupsLogoHeader.visibility = View.GONE
-            this.feedWithoutGroupsLogoHeader.visibility = View.VISIBLE
-
-            loadImageAndText(
-              accountId = ownership.accountId,
-              imageView = this.feedWithoutGroupsLogoImage,
-              textView = this.feedWithoutGroupsLogoText
-            )
-          }
-        }
+      }
     }
   }
 
@@ -571,12 +515,10 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
     feedState: CatalogFeedLoadFailed
   ) {
     this.dismissAgeGateDialog()
-    this.feedEmpty.visibility = View.INVISIBLE
+    this.feedContent.visibility = View.INVISIBLE
     this.feedError.visibility = View.VISIBLE
     this.feedLoading.visibility = View.INVISIBLE
     this.feedNavigation.visibility = View.INVISIBLE
-    this.feedWithGroups.visibility = View.INVISIBLE
-    this.feedWithoutGroups.visibility = View.INVISIBLE
 
     this.configureToolbar()
 
@@ -692,10 +634,6 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
   }
 
   private fun configureFacets(
-    facetHeader: ViewGroup,
-    facetTabs: RadioGroup,
-    facetLayoutScroller: ViewGroup,
-    facetLayout: LinearLayout,
     facetsByGroup: Map<String, List<FeedFacet>>,
     sortFacets: Boolean
   ) {
@@ -704,7 +642,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
      */
 
     if (facetsByGroup.isEmpty()) {
-      facetHeader.visibility = View.GONE
+      feedContentHeader.visibility = View.GONE
       return
     }
 
@@ -713,7 +651,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
      * the tab layout entirely.
      */
 
-    this.configureFacetTabs(FeedFacets.findEntryPointFacetGroup(facetsByGroup), facetTabs)
+    this.configureFacetTabs(FeedFacets.findEntryPointFacetGroup(facetsByGroup), feedContentTabs)
 
     /*
      * Otherwise, for each remaining non-entrypoint facet group, show a drop-down menu allowing
@@ -733,7 +671,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
       }
 
     if (remainingGroups.isEmpty()) {
-      facetLayoutScroller.visibility = View.GONE
+      feedContentFacetsScroll.visibility = View.GONE
       return
     }
 
@@ -764,7 +702,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
     }
     val context = this.requireContext()
 
-    facetLayout.removeAllViews()
+    feedContentFacets.removeAllViews()
     sortedNames.forEach { groupName ->
       val group = remainingGroups.getValue(groupName)
       if (FeedFacets.facetGroupIsEntryPointTyped(group)) {
@@ -802,14 +740,14 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
       buttonLabel.textAlignment = TEXT_ALIGNMENT_TEXT_END
       buttonLabel.gravity = Gravity.END or Gravity.CENTER_VERTICAL
 
-      facetLayout.addView(spaceStart)
-      facetLayout.addView(buttonLabel)
-      facetLayout.addView(spaceMiddle)
-      facetLayout.addView(button)
-      facetLayout.addView(spaceEnd)
+      feedContentFacets.addView(spaceStart)
+      feedContentFacets.addView(buttonLabel)
+      feedContentFacets.addView(spaceMiddle)
+      feedContentFacets.addView(button)
+      feedContentFacets.addView(spaceEnd)
     }
 
-    facetLayoutScroller.scrollTo(0, 0)
+    feedContentFacetsScroll.scrollTo(0, 0)
   }
 
   private fun configureFacetTabs(

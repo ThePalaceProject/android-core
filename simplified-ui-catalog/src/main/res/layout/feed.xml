@@ -6,10 +6,6 @@
   android:layout_height="match_parent">
 
   <include
-    layout="@layout/feed_empty"
-    tools:visibility="visible" />
-
-  <include
     layout="@layout/feed_error"
     tools:visibility="visible" />
 
@@ -22,11 +18,7 @@
     tools:visibility="visible" />
 
   <include
-    layout="@layout/feed_with_groups"
-    tools:visibility="visible" />
-
-  <include
-    layout="@layout/feed_without_groups"
-    tools:visibility="visible" />
+      layout="@layout/feed_content"
+      tools:visibility="visible" />
 
 </FrameLayout>

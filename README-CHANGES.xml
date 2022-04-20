@@ -179,6 +179,7 @@
         <c:change date="2022-04-07T00:00:00+00:00" summary="Added support for PDF books with LCP DRM."/>
         <c:change date="2022-04-08T00:00:00+00:00" summary="Added automatic loading and displaying of related books in a book details screen"/>
         <c:change date="2022-04-12T00:00:00+00:00" summary="Removed red icon from audiobook cover in the audiobook player screen"/>
+        <c:change date="2022-04-18T00:00:00+00:00" summary="Updated My Books and Reservations layout"/>
         <c:change date="2022-04-20T04:11:25+00:00" summary="Removed padding from audiobook cover image"/>
       </c:changes>
     </c:release>
