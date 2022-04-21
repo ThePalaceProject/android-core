@@ -311,4 +311,16 @@ class SettingsDebugViewModel(application: Application) : AndroidViewModel(applic
       )
     }
   }
+
+  var enablePDFJSReader: Boolean
+    get() =
+      this.profilesController
+        .profileCurrent()
+        .preferences()
+        .enablePDFJSReader
+    set(value) {
+      this.profilesController.profileUpdate { description ->
+        description.copy(preferences = description.preferences.copy(enablePDFJSReader = value))
+      }
+    }
 }

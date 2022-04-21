@@ -71,6 +71,7 @@ dependencies {
   api project(":simplified-viewer-audiobook")
   api project(":simplified-viewer-epub-readium2")
   api project(":simplified-viewer-pdf")
+  api project(":simplified-viewer-pdf-pdfjs")
   api project(":simplified-viewer-spi")
   api project(':simplified-ui-listeners-api')
 
