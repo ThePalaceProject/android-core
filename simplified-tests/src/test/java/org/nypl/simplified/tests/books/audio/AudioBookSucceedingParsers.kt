@@ -20,7 +20,8 @@ object AudioBookSucceedingParsers : ManifestParsersType {
         encrypted = null
       ),
       links = listOf(),
-      extensions = listOf()
+      extensions = listOf(),
+      toc = listOf()
     )
 
   override fun parse(
