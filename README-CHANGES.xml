@@ -174,7 +174,7 @@
         <c:change date="2022-03-22T00:00:00+00:00" summary="Changed the label of untitled audiobook files from &quot;Chapter&quot; to &quot;Track&quot;."/>
       </c:changes>
     </c:release>
-    <c:release date="2022-04-27T18:45:30+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.0.9">
+    <c:release date="2022-04-27T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.0.9">
       <c:changes>
         <c:change date="2022-04-07T00:00:00+00:00" summary="Added support for PDF books with LCP DRM."/>
         <c:change date="2022-04-08T00:00:00+00:00" summary="Added automatic loading and displaying of related books on the book details screen."/>
@@ -183,6 +183,9 @@
         <c:change date="2022-04-20T00:00:00+00:00" summary="Removed padding from the audio book cover image on the audio book player screen."/>
         <c:change date="2022-04-21T00:00:00+00:00" summary="Improved the chapter titles displayed in the audio book player. The chapter titles from the table of contents are now used, when one is supplied in the manifest. Previously, a file name was displayed for some books."/>
       </c:changes>
+    </c:release>
+    <c:release date="2022-04-27T22:43:25+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.10">
+      <c:changes/>
     </c:release>
   </c:releases>
   <c:ticket-systems>
