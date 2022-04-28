@@ -9,7 +9,7 @@ def requiredFiles = [:]
 requiredFiles["ReaderClientCert.sig"] =
   "b064e68b96e258e42fe1ca66ae3fc4863dd802c46585462220907ed291e1217d"
 requiredFiles["secrets.conf"] =
-  "756e525becd6f266e8e063abdb8bd03dfca352f0551b33756e21ecb826dfd01b"
+  "9c211ae0d153c29b72baab3bfad9de6c5cecb6b39bcda8206d36a65aaca0db21"
 
 android {
   defaultConfig {

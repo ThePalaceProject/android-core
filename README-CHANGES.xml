@@ -184,8 +184,10 @@
         <c:change date="2022-04-21T00:00:00+00:00" summary="Improved the chapter titles displayed in the audio book player. The chapter titles from the table of contents are now used, when one is supplied in the manifest. Previously, a file name was displayed for some books."/>
       </c:changes>
     </c:release>
-    <c:release date="2022-04-27T22:43:25+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.10">
-      <c:changes/>
+    <c:release date="2022-04-28T16:46:11+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.10">
+      <c:changes>
+        <c:change date="2022-04-28T16:46:11+00:00" summary="Improved security of OverDrive audio book downloads."/>
+      </c:changes>
     </c:release>
   </c:releases>
   <c:ticket-systems>
