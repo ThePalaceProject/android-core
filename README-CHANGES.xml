@@ -190,8 +190,11 @@
         <c:change date="2022-04-29T00:00:00+00:00" summary="Fixed &quot;Unable to initialize audio engine&quot; error playing some audio books."/>
       </c:changes>
     </c:release>
-    <c:release date="2022-04-29T17:20:09+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.11">
-      <c:changes/>
+    <c:release date="2022-05-05T16:08:12+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.11">
+      <c:changes>
+        <c:change date="2022-05-05T00:00:00+00:00" summary="Fixed catalog facet labels being cropped"/>
+        <c:change date="2022-05-05T16:08:12+00:00" summary="Disabled searching button on catalog search when the input is blank"/>
+      </c:changes>
     </c:release>
   </c:releases>
   <c:ticket-systems>
