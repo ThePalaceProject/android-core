@@ -7,7 +7,7 @@
   <string name="feedCollection">Collection</string>
   <string name="feedCollectionAll">All</string>
   <string name="feedDetails">@string/catalogDetails</string>
-  <string name="feedEmpty">No results.</string>
+  <string name="feedEmpty">No results found.</string>
   <string name="feedLoadingError">An error occurred while loading the catalog.</string>
   <string name="feedNavigationNotSupported">Navigation feeds are not currently supported. Sorry!</string>
   <string name="feedRetry">@string/catalogRetry</string>

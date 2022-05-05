@@ -28,6 +28,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.setPadding
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -631,6 +632,13 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
       }
     }
     dialog.show()
+
+    // disabling the positive button can only be called after the dialog is shown
+    val dialogPositiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+    dialogPositiveButton.isEnabled = false
+    searchView.doAfterTextChanged { text ->
+      dialogPositiveButton.isEnabled = !text.isNullOrBlank()
+    }
   }
 
   private fun configureFacets(
@@ -677,7 +685,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
 
     val buttonLayoutParams =
       LinearLayout.LayoutParams(
-        this.screenInformation.dpToPixels(96).toInt(),
+        LinearLayout.LayoutParams.WRAP_CONTENT,
         LinearLayout.LayoutParams.WRAP_CONTENT
       )
 
@@ -719,7 +727,6 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
         group.find { facet -> facet.isActive }
           ?: group.firstOrNull()
 
-      buttonLayoutParams.weight = 1.0f
       button.id = View.generateViewId()
       button.layoutParams = buttonLayoutParams
       button.text = active?.title
