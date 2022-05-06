@@ -56,15 +56,15 @@
         android:id="@+id/feedEmptyMessage"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_margin="16dp"
         android:gravity="center"
+        android:text="@string/feedEmpty"
         android:textAlignment="center"
         android:visibility="invisible"
-        android:layout_margin="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/feedContentLogoHeader"
-        tools:text="@string/feedEmpty"
         tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
