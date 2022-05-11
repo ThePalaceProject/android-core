@@ -126,7 +126,7 @@ data class AudioBookPlayerParameters(
         services = Services.serviceDirectory(),
         isNetworkAvailable = isNetworkAvailable,
         loadFallbackData = {
-          ManifestFulfilled(manifestContentType, this.manifestFile.readBytes())
+          ManifestFulfilled(manifestContentType, null, this.manifestFile.readBytes())
         },
         cacheDirectory = cacheDirectory
       )

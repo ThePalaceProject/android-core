@@ -13,6 +13,7 @@ import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfillmentE
 import org.librarysimplified.audiobook.parser.api.ParseError
 import org.librarysimplified.audiobook.parser.api.ParseResult
 import org.librarysimplified.audiobook.parser.api.ParseWarning
+import org.librarysimplified.http.api.LSHTTPAuthorizationType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import org.nypl.simplified.taskrecorder.api.TaskResult
@@ -68,7 +69,7 @@ abstract class AbstractAudioBookManifestStrategy(
       }
 
       taskRecorder.beginNewStep("Parsing manifest…")
-      val (contentType, downloadBytes) = (fulfillResult as PlayerResult.Success).result
+      val (contentType, authorization, downloadBytes) = (fulfillResult as PlayerResult.Success).result
       val parseResult = this.parseManifest(this.request.targetURI, downloadBytes)
       if (parseResult is ParseResult.Failure) {
         taskRecorder.currentStepFailed(
@@ -93,6 +94,7 @@ abstract class AbstractAudioBookManifestStrategy(
         parsedManifest = parsedManifest,
         downloadBytes = downloadBytes,
         contentType = contentType,
+        authorization = authorization,
         taskRecorder = taskRecorder
       )
     } catch (e: Exception) {
@@ -209,6 +211,7 @@ abstract class AbstractAudioBookManifestStrategy(
     parsedManifest: PlayerManifest,
     downloadBytes: ByteArray,
     contentType: MIMEType,
+    authorization: LSHTTPAuthorizationType?,
     taskRecorder: TaskRecorderType
   ): TaskResult<AudioBookManifestData> {
     return taskRecorder.finishSuccess(
@@ -216,6 +219,7 @@ abstract class AbstractAudioBookManifestStrategy(
         manifest = parsedManifest,
         fulfilled = ManifestFulfilled(
           contentType = contentType,
+          authorization = authorization,
           data = downloadBytes
         )
       )

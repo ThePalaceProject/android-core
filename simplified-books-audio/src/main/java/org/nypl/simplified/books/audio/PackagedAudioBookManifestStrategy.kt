@@ -53,7 +53,7 @@ class PackagedAudioBookManifestStrategy(
     return if (manifestBytes == null) {
       PlayerResult.Failure(ExtractFailed("Unable to extract manifest from audio book file"))
     } else {
-      PlayerResult.unit(ManifestFulfilled(this.request.contentType, manifestBytes))
+      PlayerResult.unit(ManifestFulfilled(this.request.contentType, null, manifestBytes))
     }
   }
 

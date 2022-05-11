@@ -13,6 +13,7 @@ import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfilled
 import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfillmentErrorType
 import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfillmentEvent
 import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfillmentStrategyType
+import org.librarysimplified.http.api.LSHTTPClientType
 import org.nypl.simplified.books.book_database.api.BookFormats
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import org.slf4j.LoggerFactory
@@ -166,6 +167,7 @@ class UnpackagedAudioBookManifestStrategy(
                 )
             }
           },
+          httpClient = this.request.services.requireService(LSHTTPClientType::class.java),
           userAgent = this.request.userAgent
         )
 

@@ -9,7 +9,7 @@ dependencies {
   api libs.io7m.jfunctional
   api libs.jackson.databind
   api libs.joda.time
-  api libs.nypl.http.api
+  api libs.palace.http.api
 
   implementation project(':simplified-opds-core')
 

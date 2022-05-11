@@ -216,7 +216,7 @@ class BorrowAudioBookTest {
 
     return AudioBookManifestData(
       manifest = manifest,
-      fulfilled = ManifestFulfilled(genericAudioBooks.first(), data)
+      fulfilled = ManifestFulfilled(genericAudioBooks.first(), null, data)
     )
   }
 

@@ -3,7 +3,7 @@ dependencies {
   api project(":simplified-opds-core")
 
   api libs.joda.time
-  api libs.nypl.http.api
+  api libs.palace.http.api
 
   implementation libs.kotlin.stdlib
   implementation libs.kotlin.reflect

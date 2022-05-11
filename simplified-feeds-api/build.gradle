@@ -12,7 +12,7 @@ dependencies {
 
   implementation libs.kotlin.stdlib
   implementation libs.kotlin.reflect
-  implementation libs.nypl.http.api
+  implementation libs.palace.http.api
   implementation libs.slf4j
 
   compileOnly libs.google.auto.value
