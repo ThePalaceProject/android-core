@@ -110,7 +110,6 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
   private lateinit var debugStatus: TextView
   private lateinit var feedWithGroupsAdapter: CatalogFeedWithGroupsAdapter
   private lateinit var feedWithoutGroupsAdapter: CatalogPagedAdapter
-  private lateinit var format: TextView
   private lateinit var metadata: LinearLayout
   private lateinit var relatedBooksContainer: FrameLayout
   private lateinit var relatedBooksList: RecyclerView
@@ -181,8 +180,6 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
       view.findViewById(R.id.bookDetailCoverImage)
     this.title =
       view.findViewById(R.id.bookDetailTitle)
-    this.format =
-      view.findViewById(R.id.bookDetailFormat)
     this.authors =
       view.findViewById(R.id.bookDetailAuthors)
     this.status =
@@ -295,16 +292,6 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
     this.title.text = opds.title
     this.authors.text = opds.authorsCommaSeparated
 
-    this.format.text = when (feedEntry.probableFormat) {
-      BookFormats.BookFormatDefinition.BOOK_FORMAT_EPUB ->
-        context.getString(R.string.catalogBookFormatEPUB)
-      BookFormats.BookFormatDefinition.BOOK_FORMAT_AUDIO ->
-        context.getString(R.string.catalogBookFormatAudioBook)
-      BookFormats.BookFormatDefinition.BOOK_FORMAT_PDF ->
-        context.getString(R.string.catalogBookFormatPDF)
-      null -> ""
-    }
-
     this.cover.contentDescription =
       CatalogBookAccessibilityStrings.coverDescription(this.resources, feedEntry)
 
@@ -319,7 +306,7 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
       this.summary.text = Html.fromHtml(opds.summary)
     }
 
-    this.configureMetadataTable(opds)
+    this.configureMetadataTable(feedEntry.probableFormat, opds)
 
     /*
      * If there's a related feed, enable the "Related books..." item and open the feed
@@ -344,8 +331,30 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
   private val genreUriScheme =
     "http://librarysimplified.org/terms/genres/Simplified/"
 
-  private fun configureMetadataTable(entry: OPDSAcquisitionFeedEntry) {
+  private fun configureMetadataTable(
+    probableFormat: BookFormats.BookFormatDefinition?,
+    entry: OPDSAcquisitionFeedEntry
+  ) {
     this.metadata.removeAllViews()
+
+    val bookFormatText = when (probableFormat) {
+      BookFormats.BookFormatDefinition.BOOK_FORMAT_EPUB ->
+        getString(R.string.catalogBookFormatEPUB)
+      BookFormats.BookFormatDefinition.BOOK_FORMAT_AUDIO ->
+        getString(R.string.catalogBookFormatAudioBook)
+      BookFormats.BookFormatDefinition.BOOK_FORMAT_PDF ->
+        getString(R.string.catalogBookFormatPDF)
+      else -> {
+        ""
+      }
+    }
+
+    if (bookFormatText.isNotEmpty()) {
+      val (row, rowKey, rowVal) = this.bookInfoViewOf()
+      rowKey.text = this.getString(R.string.catalogMetaFormat)
+      rowVal.text = bookFormatText
+      this.metadata.addView(row)
+    }
 
     val publishedOpt = entry.published
     if (publishedOpt is Some<DateTime>) {

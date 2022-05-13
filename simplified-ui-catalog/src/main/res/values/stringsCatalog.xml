@@ -57,6 +57,7 @@
   <string name="catalogInformation">Information</string>
   <string name="catalogListen">Listen</string>
   <string name="catalogMetaCategories">Categories</string>
+  <string name="catalogMetaFormat">Format</string>
   <string name="catalogMetaNarrators">Narrators</string>
   <string name="catalogMetaDistributor">Distributor</string>
   <string name="catalogMetaPublicationDate">Published</string>

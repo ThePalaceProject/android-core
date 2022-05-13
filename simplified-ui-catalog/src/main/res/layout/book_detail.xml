@@ -68,21 +68,6 @@
         app:layout_constraintTop_toBottomOf="@id/bookDetailTitle"
         tools:text="Mary Shelley" />
 
-      <TextView
-        android:id="@+id/bookDetailFormat"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:singleLine="true"
-        android:textSize="14sp"
-        android:textStyle="italic"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/bookDetailCover"
-        app:layout_constraintTop_toBottomOf="@id/bookDetailAuthors"
-        tools:text="eBook" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View
