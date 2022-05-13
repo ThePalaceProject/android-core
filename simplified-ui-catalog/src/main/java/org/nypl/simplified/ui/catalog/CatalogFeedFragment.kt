@@ -362,12 +362,9 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
   ) {
     this.openAgeGateDialog()
     this.feedContent.visibility = View.INVISIBLE
-//    this.feedEmpty.visibility = View.INVISIBLE
     this.feedError.visibility = View.INVISIBLE
     this.feedLoading.visibility = View.INVISIBLE
     this.feedNavigation.visibility = View.INVISIBLE
-//    this.feedWithGroups.visibility = View.INVISIBLE
-//    this.feedWithoutGroups.visibility = View.INVISIBLE
 
     this.configureToolbar()
   }
@@ -537,7 +534,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
 
   private fun configureToolbar() {
     try {
-      this.toolbar.setTitle(this.viewModel.title())
+      this.toolbar.title = this.viewModel.title()
       val actionBar = this.supportActionBar ?: return
       actionBar.show()
 

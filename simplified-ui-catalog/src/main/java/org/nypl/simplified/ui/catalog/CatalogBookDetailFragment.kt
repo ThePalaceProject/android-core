@@ -281,6 +281,7 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
     actionBar.setDisplayHomeAsUpEnabled(true)
     actionBar.setHomeActionContentDescription(null)
     actionBar.show()
+    this.toolbar.title = ""
     this.toolbar.setLogoOnClickListener {
       this.viewModel.goUpwards()
     }

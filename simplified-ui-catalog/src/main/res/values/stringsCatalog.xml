@@ -23,7 +23,7 @@
   <string name="catalogBookAvailabilityHeldQueue">You are at position %1$d in the queue for this book.</string>
   <string name="catalogBookAvailabilityHeldTimed">You will be able to borrow this book in %1$s.</string>
   <string name="catalogBookAvailabilityHoldable">All copies of this book are currently on loan.</string>
-  <string name="catalogBookAvailabilityLoanable">This book is available for loan.</string>
+  <string name="catalogBookAvailabilityLoanable">This book is available to borrow.</string>
   <string name="catalogBookAvailabilityLoanedIndefinite">You have this book on loan.</string>
   <string name="catalogBookAvailabilityLoanedTimed">You have this book on loan for %1$s.</string>
   <string name="catalogBookAvailabilityOpenAccess">This book is yours to keep.</string>

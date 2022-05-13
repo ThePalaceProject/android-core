@@ -3,6 +3,7 @@ package org.nypl.simplified.ui.neutrality
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import android.view.Gravity
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
@@ -47,16 +48,26 @@ class NeutralToolbar(
   }
 
   init {
+    val iconDimension = this.dpToPixelsIntegral(64)
+
     this.iconKind = ICON_IS_LOGO
     TextViewCompat.setTextAppearance(this.titleView, R.style.Neutral_ActionBarTitle)
-    this.addView(this.titleView, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT))
-    this.addView(this.iconView, LayoutParams(this.dpToPixelsIntegral(64), this.dpToPixelsIntegral(64)))
+    this.titleView.apply {
+      layoutParams = MarginLayoutParams(
+        LayoutParams.MATCH_PARENT,
+        LayoutParams.MATCH_PARENT
+      ).apply {
+        marginStart = iconDimension
+      }
+      gravity = Gravity.CENTER
+    }
+    this.addView(this.titleView)
+    this.addView(this.iconView, LayoutParams(iconDimension, iconDimension))
     this.tag = neutralToolbarName
   }
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     super.onLayout(changed, l, t, r, b)
-    this.titleView.x = ((this.width - this.titleView.width) / 2).toFloat()
 
     when (this.iconKind) {
       ICON_IS_NAVIGATION -> {
