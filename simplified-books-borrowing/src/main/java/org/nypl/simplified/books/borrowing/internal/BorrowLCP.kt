@@ -59,8 +59,6 @@ class BorrowLCP private constructor() : BorrowSubtaskType {
     try {
       this.checkDRMSupport(context)
 
-      val passphrase = this.findPassphrase(context)
-
       context.taskRecorder.beginNewStep("Downloading LCP license…")
       context.bookDownloadIsRunning(
         "Downloading...",
@@ -68,6 +66,8 @@ class BorrowLCP private constructor() : BorrowSubtaskType {
         expectedSize = 100L,
         bytesPerSecond = 1L
       )
+
+      val passphrase = this.findPassphrase(context)
 
       val currentURI = context.currentURICheck()
       context.logDebug("downloading {}", currentURI)
