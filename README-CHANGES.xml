@@ -190,7 +190,7 @@
         <c:change date="2022-04-29T00:00:00+00:00" summary="Fixed &quot;Unable to initialize audio engine&quot; error playing some audio books."/>
       </c:changes>
     </c:release>
-    <c:release date="2022-05-13T15:39:45+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.11">
+    <c:release date="2022-05-17T15:03:53+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.11">
       <c:changes>
         <c:change date="2022-05-05T00:00:00+00:00" summary="Fixed catalog facet labels being cropped."/>
         <c:change date="2022-05-05T00:00:00+00:00" summary="Disabled searching button on catalog search when the input is blank."/>
@@ -198,7 +198,8 @@
         <c:change date="2022-05-13T00:00:00+00:00" summary="Removed section title from book detail screen."/>
         <c:change date="2022-05-13T00:00:00+00:00" summary="Updated displayed text when a book is available to borrow."/>
         <c:change date="2022-05-13T00:00:00+00:00" summary="Moved book format text to the Information block."/>
-        <c:change date="2022-05-13T15:39:45+00:00" summary="Upgraded Readium library in EPUB reader to version 2.2.0."/>
+        <c:change date="2022-05-13T00:00:00+00:00" summary="Upgraded Readium library in EPUB reader to version 2.2.0."/>
+        <c:change date="2022-05-17T15:03:53+00:00" summary="Added loading to book details when the passphrase is being retrieved."/>
       </c:changes>
     </c:release>
   </c:releases>

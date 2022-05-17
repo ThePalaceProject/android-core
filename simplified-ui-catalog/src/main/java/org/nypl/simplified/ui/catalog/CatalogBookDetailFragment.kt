@@ -286,8 +286,6 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
   }
 
   private fun configureOPDSEntry(feedEntry: FeedEntryOPDS) {
-    val context = this.requireContext()
-
     val opds = feedEntry.feedEntry
     this.title.text = opds.title
     this.authors.text = opds.authorsCommaSeparated
