@@ -163,7 +163,10 @@ class UnpackagedAudioBookManifestStrategy(
                 )
               is AudioBookCredentials.BearerToken ->
                 throw UnsupportedOperationException(
-                  "Can't use bearer tokens for audio book fulfillment"
+                  "Can't use bearer tokens for direct audio book fulfillment"
+                  // NB: Indirect bearer token fulfillment is supported: If basic auth is used, and
+                  // the CM returns a bearer token document, the http client will automatically use
+                  // the bearer token to complete the download.
                 )
             }
           },
