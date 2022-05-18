@@ -36,6 +36,7 @@ import org.librarysimplified.audiobook.api.extensions.PlayerExtensionType
 import org.librarysimplified.audiobook.downloads.DownloadProvider
 import org.librarysimplified.audiobook.feedbooks.FeedbooksPlayerExtension
 import org.librarysimplified.audiobook.manifest.api.PlayerManifest
+import org.librarysimplified.audiobook.open_access.BearerTokenExtension
 import org.librarysimplified.audiobook.views.PlayerAccessibilityEvent
 import org.librarysimplified.audiobook.views.PlayerFragment
 import org.librarysimplified.audiobook.views.PlayerFragmentListenerType
@@ -44,6 +45,7 @@ import org.librarysimplified.audiobook.views.PlayerPlaybackRateFragment
 import org.librarysimplified.audiobook.views.PlayerSleepTimerFragment
 import org.librarysimplified.audiobook.views.PlayerTOCFragment
 import org.librarysimplified.audiobook.views.PlayerTOCFragmentParameters
+import org.librarysimplified.http.api.LSHTTPAuthorizationType
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.librarysimplified.services.api.Services
@@ -51,6 +53,7 @@ import org.nypl.drm.core.ContentProtectionProvider
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.books.api.BookContentProtections
 import org.nypl.simplified.books.audio.AudioBookFeedbooksSecretServiceType
+import org.nypl.simplified.books.audio.AudioBookManifestData
 import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook
 import org.nypl.simplified.books.controller.api.BooksControllerType
@@ -325,7 +328,7 @@ class AudioBookPlayerActivity :
     )
   }
 
-  override fun onLoadingFragmentLoadingFinished(manifest: PlayerManifest) {
+  override fun onLoadingFragmentLoadingFinished(manifest: PlayerManifest, authorization: LSHTTPAuthorizationType?) {
     this.log.debug("finished loading")
 
     val contentProtections = BookContentProtections.create(
@@ -372,7 +375,7 @@ class AudioBookPlayerActivity :
      */
 
     val extensions =
-      this.loadAndConfigureExtensions()
+      this.loadAndConfigureExtensions(authorization)
 
     /*
      * Create the audio book.
@@ -430,7 +433,7 @@ class AudioBookPlayerActivity :
 
   private fun downloadAndSaveManifest(
     credentials: AccountAuthenticationCredentials?
-  ): PlayerManifest {
+  ): AudioBookManifestData {
     this.log.debug("downloading and saving manifest")
     val strategy =
       this.parameters.toManifestStrategy(
@@ -447,7 +450,7 @@ class AudioBookPlayerActivity :
           manifestURI = this.parameters.manifestURI,
           manifest = strategyResult.result.fulfilled
         )
-        strategyResult.result.manifest
+        strategyResult.result
       }
       is TaskResult.Failure ->
         throw IOException(strategyResult.message)
@@ -461,13 +464,13 @@ class AudioBookPlayerActivity :
       this.log.debug("attempting to download fresh manifest due to expired links")
       this.downloadExecutor.execute {
         try {
-          this.book.replaceManifest(
-            this.downloadAndSaveManifest(
-              this.profiles.profileAccountForBook(this.parameters.bookID)
-                .loginState
-                .credentials
-            )
+          val manifestData = this.downloadAndSaveManifest(
+            this.profiles.profileAccountForBook(this.parameters.bookID)
+              .loginState
+              .credentials
           )
+
+          this.book.replaceManifest(manifestData.manifest)
         } catch (e: Exception) {
           this.log.error("onDownloadExpired: failed to download/replace manifest: ", e)
         } finally {
@@ -477,12 +480,15 @@ class AudioBookPlayerActivity :
     }
   }
 
-  private fun loadAndConfigureExtensions(): List<PlayerExtensionType> {
+  private fun loadAndConfigureExtensions(
+    authorization: LSHTTPAuthorizationType?
+  ): List<PlayerExtensionType> {
     val extensions =
       ServiceLoader.load(PlayerExtensionType::class.java)
         .toList()
 
     val services = Services.serviceDirectory()
+    this.loadAndConfigureBearerToken(extensions, authorization)
     this.loadAndConfigureFeedbooks(services, extensions)
     return extensions
   }
@@ -505,6 +511,22 @@ class AudioBookPlayerActivity :
       } else {
         this.log.debug("feedbooks extension is not available")
       }
+    }
+  }
+
+  private fun loadAndConfigureBearerToken(
+    extensions: List<PlayerExtensionType>,
+    authorization: LSHTTPAuthorizationType?
+  ) {
+    this.log.debug("configuring bearer token extension with authorization: {}", authorization?.toHeaderValue())
+    val extension =
+      extensions.filterIsInstance<BearerTokenExtension>()
+        .firstOrNull()
+    if (extension != null) {
+      this.log.debug("bearer token extension is available")
+      extension.authorization = authorization
+    } else {
+      this.log.debug("bearer token extension is not available")
     }
   }
 

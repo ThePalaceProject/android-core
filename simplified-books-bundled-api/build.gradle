@@ -2,5 +2,5 @@ dependencies {
   implementation libs.kotlin.stdlib
   implementation libs.kotlin.reflect
 
-  implementation libs.nypl.http.api
+  implementation libs.palace.http.api
 }

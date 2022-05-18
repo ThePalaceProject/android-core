@@ -26,9 +26,9 @@ dependencies {
 
   implementation libs.kotlin.reflect
   implementation libs.kotlin.stdlib
-  implementation libs.nypl.http.api
   implementation libs.palace.audiobook.manifest.fulfill.api
   implementation libs.palace.drm.core
+  implementation libs.palace.http.api
   implementation libs.slf4j
 
   compileOnly libs.google.auto.value

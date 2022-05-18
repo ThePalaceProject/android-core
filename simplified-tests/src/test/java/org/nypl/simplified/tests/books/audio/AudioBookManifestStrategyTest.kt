@@ -12,6 +12,7 @@ import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfilled
 import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfillmentErrorType
 import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfillmentStrategyType
 import org.librarysimplified.audiobook.manifest_parser.api.ManifestParsersType
+import org.librarysimplified.http.api.LSHTTPClientType
 import org.mockito.Mockito
 import org.nypl.simplified.books.audio.AudioBookManifestRequest
 import org.nypl.simplified.books.audio.UnpackagedAudioBookManifestStrategy
@@ -32,6 +33,7 @@ class AudioBookManifestStrategyTest {
   private lateinit var basicStrategies: ManifestFulfillmentBasicType
   private lateinit var basicStrategy: ManifestFulfillmentStrategyType
   private lateinit var fulfillError: ManifestFulfillmentErrorType
+  private lateinit var httpClient: LSHTTPClientType
   private lateinit var manifestParsers: ManifestParsersType
   private lateinit var services: MutableServiceDirectory
   private lateinit var strategies: ManifestFulfillmentStrategyRegistryType
@@ -47,6 +49,8 @@ class AudioBookManifestStrategyTest {
       Mockito.mock(ManifestFulfillmentStrategyRegistryType::class.java)
     this.manifestParsers =
       Mockito.mock(ManifestParsersType::class.java)
+    this.httpClient =
+      Mockito.mock(LSHTTPClientType::class.java)
 
     this.tempFolder =
       TestDirectories.temporaryDirectory()
@@ -58,6 +62,7 @@ class AudioBookManifestStrategyTest {
       }
 
     this.services = MutableServiceDirectory()
+    this.services.putService(LSHTTPClientType::class.java, this.httpClient)
     this.services.putService(ManifestFulfillmentStrategyRegistryType::class.java, this.strategies)
   }
 
@@ -144,6 +149,7 @@ class AudioBookManifestStrategyTest {
       PlayerResult.Success<ManifestFulfilled, ManifestFulfillmentErrorType>(
         ManifestFulfilled(
           BookFormats.audioBookGenericMimeTypes().first(),
+          null,
           ByteArray(23)
         )
       )
@@ -194,6 +200,7 @@ class AudioBookManifestStrategyTest {
       PlayerResult.Success<ManifestFulfilled, ManifestFulfillmentErrorType>(
         ManifestFulfilled(
           BookFormats.audioBookGenericMimeTypes().first(),
+          null,
           ByteArray(23)
         )
       )
@@ -245,6 +252,7 @@ class AudioBookManifestStrategyTest {
       PlayerResult.Success<ManifestFulfilled, ManifestFulfillmentErrorType>(
         ManifestFulfilled(
           BookFormats.audioBookGenericMimeTypes().first(),
+          null,
           ByteArray(23)
         )
       )
@@ -305,6 +313,7 @@ class AudioBookManifestStrategyTest {
           loadFallbackData = {
             ManifestFulfilled(
               BookFormats.audioBookGenericMimeTypes().first(),
+              null,
               ByteArray(23)
             )
           },

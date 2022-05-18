@@ -13,6 +13,7 @@ import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfilled
 import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfillmentErrorType
 import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfillmentEvent
 import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfillmentStrategyType
+import org.librarysimplified.http.api.LSHTTPClientType
 import org.nypl.simplified.books.book_database.api.BookFormats
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import org.slf4j.LoggerFactory
@@ -162,10 +163,14 @@ class UnpackagedAudioBookManifestStrategy(
                 )
               is AudioBookCredentials.BearerToken ->
                 throw UnsupportedOperationException(
-                  "Can't use bearer tokens for audio book fulfillment"
+                  "Can't use bearer tokens for direct audio book fulfillment"
+                  // NB: Indirect bearer token fulfillment is supported: If basic auth is used, and
+                  // the CM returns a bearer token document, the http client will automatically use
+                  // the bearer token to complete the download.
                 )
             }
           },
+          httpClient = this.request.services.requireService(LSHTTPClientType::class.java),
           userAgent = this.request.userAgent
         )
 

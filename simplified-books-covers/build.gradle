@@ -9,6 +9,6 @@ dependencies {
   implementation libs.io7m.jfunctional
   implementation libs.kotlin.stdlib
   implementation libs.kotlin.reflect
-  implementation libs.nypl.http.uri
+  implementation libs.palace.http.uri
   implementation libs.slf4j
 }

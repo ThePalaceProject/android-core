@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import com.google.common.util.concurrent.ListeningExecutorService
-import org.librarysimplified.audiobook.manifest.api.PlayerManifest
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
+import org.nypl.simplified.books.audio.AudioBookManifestData
 import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.taskrecorder.api.TaskResult
@@ -108,14 +108,16 @@ class AudioBookLoadingFragment : Fragment() {
           this.progress.progress = 0
         }
 
-        val manifest = this.downloadAndSaveManifest(credentials)
+        val manifestData = this.downloadAndSaveManifest(credentials)
+        val authorization = manifestData.fulfilled.authorization
+        val manifest = manifestData.manifest
 
         this.uiThread.runOnUIThread {
           this.progress.isIndeterminate = false
           this.progress.progress = 100
         }
 
-        this.listener.onLoadingFragmentLoadingFinished(manifest)
+        this.listener.onLoadingFragmentLoadingFinished(manifest, authorization)
       } catch (e: Exception) {
         this.uiThread.runOnUIThread {
           this.progress.isIndeterminate = false
@@ -129,7 +131,7 @@ class AudioBookLoadingFragment : Fragment() {
 
   private fun downloadAndSaveManifest(
     credentials: AccountAuthenticationCredentials?
-  ): PlayerManifest {
+  ): AudioBookManifestData {
     val strategy =
       this.playerParameters.toManifestStrategy(
         this.strategies,
@@ -145,7 +147,7 @@ class AudioBookLoadingFragment : Fragment() {
           manifestURI = this.playerParameters.manifestURI,
           manifest = strategyResult.result.fulfilled
         )
-        strategyResult.result.manifest
+        strategyResult.result
       }
       is TaskResult.Failure ->
         throw IOException(strategyResult.message)

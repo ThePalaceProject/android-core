@@ -12,7 +12,7 @@ dependencies {
   implementation project(":simplified-opds2-irradia")
   implementation project(':simplified-accounts-registry-api')
 
-  implementation libs.nypl.http.api
+  implementation libs.palace.http.api
   implementation libs.slf4j
   implementation libs.kotlin.stdlib
   implementation libs.kotlin.reflect
