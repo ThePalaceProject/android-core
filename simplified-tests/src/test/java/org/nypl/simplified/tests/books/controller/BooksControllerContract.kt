@@ -63,6 +63,7 @@ import org.nypl.simplified.opds.core.OPDSParseException
 import org.nypl.simplified.opds.core.OPDSSearchParser
 import org.nypl.simplified.patron.api.PatronUserProfileParsersType
 import org.nypl.simplified.profiles.ProfilesDatabases
+import org.nypl.simplified.profiles.api.ProfileCreationEvent
 import org.nypl.simplified.profiles.api.ProfileDatabaseException
 import org.nypl.simplified.profiles.api.ProfileEvent
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
@@ -832,16 +833,8 @@ abstract class BooksControllerContract {
       ).addAcquisition(bookAcquisition)
         .build()
 
-    Assertions.assertFalse(
-      this.bookRegistry.bookOrException(bookId)
-        .book
-        .isDownloaded,
-      "Book must not have a saved EPUB file"
-    )
-
     controller.bookBorrow(account.id, bookId, bookEntry).get()
-    val result = controller.bookCancelDownloadAndDelete(account.id, bookId).get()
-    result as TaskResult.Success
+    controller.bookCancelDownloadAndDelete(account.id, bookId).get()
 
     assertThrows<NoSuchElementException> { this.bookRegistry.bookOrException(bookId).status }
   }
