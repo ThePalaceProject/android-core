@@ -116,6 +116,7 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
   private lateinit var relatedBooksLoading: ViewGroup
   private lateinit var report: TextView
   private lateinit var screenSize: ScreenSizeInformationType
+  private lateinit var seeMore: TextView
   private lateinit var status: ViewGroup
   private lateinit var statusFailed: ViewGroup
   private lateinit var statusFailedText: TextView
@@ -182,6 +183,8 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
       view.findViewById(R.id.bookDetailTitle)
     this.authors =
       view.findViewById(R.id.bookDetailAuthors)
+    this.seeMore =
+      view.findViewById(R.id.seeMoreText)
     this.status =
       view.findViewById(R.id.bookDetailStatus)
     this.summary =
@@ -302,6 +305,19 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
     } else {
       @Suppress("DEPRECATION")
       this.summary.text = Html.fromHtml(opds.summary)
+    }
+
+    this.summary.post {
+      this.seeMore.visibility = if (this.summary.lineCount > 6) {
+        this.summary.maxLines = 6
+        this.seeMore.setOnClickListener {
+          this.summary.maxLines = Integer.MAX_VALUE
+          this.seeMore.visibility = View.GONE
+        }
+        View.VISIBLE
+      } else {
+        View.GONE
+      }
     }
 
     this.configureMetadataTable(feedEntry.probableFormat, opds)
