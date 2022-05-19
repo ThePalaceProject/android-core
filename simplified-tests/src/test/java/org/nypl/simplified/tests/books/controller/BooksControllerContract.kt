@@ -63,7 +63,6 @@ import org.nypl.simplified.opds.core.OPDSParseException
 import org.nypl.simplified.opds.core.OPDSSearchParser
 import org.nypl.simplified.patron.api.PatronUserProfileParsersType
 import org.nypl.simplified.profiles.ProfilesDatabases
-import org.nypl.simplified.profiles.api.ProfileCreationEvent
 import org.nypl.simplified.profiles.api.ProfileDatabaseException
 import org.nypl.simplified.profiles.api.ProfileEvent
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
