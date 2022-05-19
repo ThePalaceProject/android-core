@@ -238,6 +238,7 @@ class CatalogBorrowViewModel(
     this.logger.debug("reserving: {}", book.id)
     this.booksController.bookBorrow(
       accountID = book.account,
+      bookID = book.id,
       entry = book.entry
     )
   }
@@ -258,6 +259,7 @@ class CatalogBorrowViewModel(
     this.logger.debug("borrowing: {}", book.id)
     this.booksController.bookBorrow(
       accountID = book.account,
+      bookID = book.id,
       entry = book.entry
     )
   }
@@ -275,6 +277,14 @@ class CatalogBorrowViewModel(
   ) {
     this.logger.debug("dismissing revoke error: {}", bookID)
     this.booksController.bookRevokeFailedDismiss(accountID, bookID)
+  }
+
+  fun tryCancelDownload(
+    accountID: AccountID,
+    bookID: BookID
+  ) {
+    this.logger.debug("cancelling download: {}", bookID)
+    this.booksController.bookCancelDownloadAndDelete(accountID, bookID)
   }
 
   fun tryDelete(

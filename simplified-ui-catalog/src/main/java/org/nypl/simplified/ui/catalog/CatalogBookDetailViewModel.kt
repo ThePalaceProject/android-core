@@ -533,6 +533,13 @@ class CatalogBookDetailViewModel(
     )
   }
 
+  fun cancelDownload() {
+    this.borrowViewModel.tryCancelDownload(
+      this.bookWithStatus.book.account,
+      this.bookWithStatus.book.id
+    )
+  }
+
   fun delete() {
     this.borrowViewModel.tryDelete(
       this.bookWithStatus.book.account,

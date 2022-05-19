@@ -201,6 +201,7 @@
         <c:change date="2022-05-13T00:00:00+00:00" summary="Upgraded Readium library in EPUB reader to version 2.2.0."/>
         <c:change date="2022-05-17T00:00:00+00:00" summary="Added loading to book details when the passphrase is being retrieved."/>
         <c:change date="2022-05-17T00:00:00+00:00" summary="Fixed error downloading BiblioBoard audio books."/>
+        <c:change date="2022-05-18T15:55:42+00:00" summary="Added cancel download button to book details screen."/>
         <c:change date="2022-05-19T14:43:39+00:00" summary="Added 'More' button to display the whole book's description in a book details screen."/>
       </c:changes>
     </c:release>

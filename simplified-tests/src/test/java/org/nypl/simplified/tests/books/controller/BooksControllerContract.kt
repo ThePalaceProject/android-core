@@ -3,10 +3,12 @@ package org.nypl.simplified.tests.books.controller
 import android.content.Context
 import com.google.common.util.concurrent.ListeningExecutorService
 import com.google.common.util.concurrent.MoreExecutors
+import com.io7m.jfunctional.Option
 import io.reactivex.subjects.PublishSubject
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okio.Buffer
+import org.joda.time.DateTime
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -44,13 +46,17 @@ import org.nypl.simplified.books.controller.Controller
 import org.nypl.simplified.books.controller.api.BookRevokeStringResourcesType
 import org.nypl.simplified.books.controller.api.BooksControllerType
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
+import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.feeds.api.FeedHTTPTransport
 import org.nypl.simplified.feeds.api.FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.files.DirectoryUtilities
 import org.nypl.simplified.opds.auth_document.api.AuthenticationDocumentParsersType
+import org.nypl.simplified.opds.core.OPDSAcquisition
+import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
+import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
 import org.nypl.simplified.opds.core.OPDSFeedParser
 import org.nypl.simplified.opds.core.OPDSFeedParserType
 import org.nypl.simplified.opds.core.OPDSParseException
@@ -757,6 +763,77 @@ abstract class BooksControllerContract {
 
     val result = controller.bookDelete(account.id, bookId).get()
     result as TaskResult.Success
+
+    assertThrows<NoSuchElementException> { this.bookRegistry.bookOrException(bookId).status }
+  }
+
+  /**
+   * Cancelling a book download works.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  @Timeout(value = 3L, unit = TimeUnit.SECONDS)
+  @Throws(Exception::class)
+  fun testBooksCancelDownload() {
+    val controller =
+      createController(
+        exec = this.executorBooks,
+        feedExecutor = this.executorFeeds,
+        accountEvents = this.accountEvents,
+        profileEvents = this.profileEvents,
+        http = this.lsHTTP,
+        books = this.bookRegistry,
+        profiles = this.profiles,
+        accountProviders = MockAccountProviders.fakeAccountProviders(),
+        patronUserProfileParsers = this.patronUserProfileParsers
+      )
+
+    val provider =
+      MockAccountProviders.fakeAuthProvider(
+        uri = "urn:fake-auth:0",
+        host = this.server.hostName,
+        port = this.server.port
+      )
+
+    val profile = this.profiles.createProfile(provider, "Kermit")
+    this.profiles.setProfileCurrent(profile.id)
+    val account = profile.accounts().values.first()
+    account.setLoginState(AccountLoggedIn(correctCredentials()))
+
+    this.server.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+        .setBody(this.simpleUserProfile())
+    )
+
+    this.server.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+        .setBody(Buffer().readFrom(resource("testBooksDelete.xml")))
+    )
+
+    val bookId = BookID.create("39434e1c3ea5620fdcc2303c878da54cc421175eb09ce1a6709b54589eb8711f")
+    val bookAcquisition =
+      OPDSAcquisition(
+        OPDSAcquisition.Relation.ACQUISITION_OPEN_ACCESS,
+        this.server.url("/book.epub").toUri(),
+        StandardFormatNames.genericEPUBFiles,
+        listOf(),
+        mapOf()
+      )
+    val bookEntry =
+      OPDSAcquisitionFeedEntry.newBuilder(
+        "5b7ec7e5-b137-4a11-b2df-4378e63ffb25",
+        "Example Book 0",
+        DateTime.now(),
+        OPDSAvailabilityOpenAccess[Option.none()]
+      ).addAcquisition(bookAcquisition)
+        .build()
+
+    controller.bookBorrow(account.id, bookId, bookEntry).get()
+    controller.bookCancelDownloadAndDelete(account.id, bookId).get()
 
     assertThrows<NoSuchElementException> { this.bookRegistry.bookOrException(bookId).status }
   }
