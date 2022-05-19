@@ -19,7 +19,6 @@ import org.nypl.simplified.accounts.api.AccountEventUpdated
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountLoginStringResourcesType
 import org.nypl.simplified.accounts.api.AccountLogoutStringResourcesType
-import org.nypl.simplified.accounts.api.AccountProviderResolutionStringsType
 import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.accounts.database.api.AccountsDatabaseNonexistentException
@@ -33,6 +32,7 @@ import org.nypl.simplified.books.book_registry.BookWithStatus
 import org.nypl.simplified.books.borrowing.BorrowRequest
 import org.nypl.simplified.books.borrowing.BorrowRequirements
 import org.nypl.simplified.books.borrowing.BorrowTask
+import org.nypl.simplified.books.borrowing.BorrowTaskType
 import org.nypl.simplified.books.borrowing.SAMLDownloadContext
 import org.nypl.simplified.books.controller.api.BookRevokeStringResourcesType
 import org.nypl.simplified.books.controller.api.BooksControllerType
@@ -45,7 +45,6 @@ import org.nypl.simplified.futures.FluentFutureExtensions
 import org.nypl.simplified.futures.FluentFutureExtensions.flatMap
 import org.nypl.simplified.futures.FluentFutureExtensions.map
 import org.nypl.simplified.metrics.api.MetricServiceType
-import org.nypl.simplified.opds.auth_document.api.AuthenticationDocumentParsersType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSFeedParserType
 import org.nypl.simplified.patron.api.PatronUserProfileParsersType
@@ -90,23 +89,19 @@ class Controller private constructor(
   private val taskExecutor: ListeningExecutorService
 ) : BooksControllerType, ProfilesControllerType {
 
-  private val borrows: ConcurrentHashMap<BookID, BorrowTask>
+  private val borrows: ConcurrentHashMap<BookID, BorrowTaskType>
 
   private val borrowRequirements: BorrowRequirements
   private val accountLoginStringResources =
     this.services.requireService(AccountLoginStringResourcesType::class.java)
   private val accountLogoutStringResources =
     this.services.requireService(AccountLogoutStringResourcesType::class.java)
-  private val accountProviderResolutionStrings =
-    this.services.requireService(AccountProviderResolutionStringsType::class.java)
   private val accountProviders =
     this.services.requireService(AccountProviderRegistryType::class.java)
   private val adobeDrm =
     this.services.optionalService(AdobeAdeptExecutorType::class.java)
   private val analytics =
     this.services.requireService(AnalyticsType::class.java)
-  private val authDocumentParsers =
-    this.services.requireService(AuthenticationDocumentParsersType::class.java)
   private val bookRegistry =
     this.services.requireService(BookRegistryType::class.java)
   private val bookFormatSupport =
@@ -551,6 +546,7 @@ class Controller private constructor(
 
   override fun bookBorrow(
     accountID: AccountID,
+    bookID: BookID,
     entry: OPDSAcquisitionFeedEntry,
     samlDownloadContext: SAMLDownloadContext?
   ): FluentFuture<TaskResult<*>> {
@@ -563,8 +559,10 @@ class Controller private constructor(
             opdsAcquisitionFeedEntry = entry,
             samlDownloadContext = samlDownloadContext
           )
-        BorrowTask.createBorrowTask(this.borrowRequirements, request)
-          .execute()
+
+        val borrowTask = BorrowTask.createBorrowTask(this.borrowRequirements, request)
+        borrows[bookID] = borrowTask
+        borrowTask.execute()
       }
     )
   }
@@ -584,11 +582,12 @@ class Controller private constructor(
     )
   }
 
-  override fun bookDownloadCancel(
+  override fun bookCancelDownloadAndDelete(
     accountID: AccountID,
     bookID: BookID
-  ) {
+  ): FluentFuture<TaskResult<Unit>> {
     this.borrows[bookID]?.cancel()
+    return this.bookDelete(accountID, bookID)
   }
 
   override fun bookReport(
