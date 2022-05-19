@@ -18,11 +18,13 @@ interface BooksControllerType {
    * Attempt to borrow the given book.
    *
    * @param accountID The account that will receive the book
+   * @param bookID The book ID
    * @param entry The OPDS feed entry for the book
    */
 
   fun bookBorrow(
     accountID: AccountID,
+    bookID: BookID,
     entry: OPDSAcquisitionFeedEntry,
     samlDownloadContext: SAMLDownloadContext? = null
   ): FluentFuture<TaskResult<*>>
@@ -46,10 +48,10 @@ interface BooksControllerType {
    * @param bookID The ID of the book
    */
 
-  fun bookDownloadCancel(
+  fun bookCancelDownloadAndDelete(
     accountID: AccountID,
     bookID: BookID
-  )
+  ): FluentFuture<TaskResult<Unit>>
 
   /**
    * Submit a problem report for a book
@@ -68,7 +70,7 @@ interface BooksControllerType {
   /**
    * Sync all books for the given account.
    *
-   * @param account The account
+   * @param accountID The account ID
    */
 
   fun booksSync(
@@ -103,7 +105,7 @@ interface BooksControllerType {
    * Dismiss a failed book revocation.
    *
    * @param accountID The account that failed to revoke the book
-   * @param id The ID of the book
+   * @param bookID The ID of the book
    */
 
   fun bookRevokeFailedDismiss(

@@ -764,6 +764,15 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
      */
 
     this.buttons.removeAllViews()
+    this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
+    this.buttons.addView(
+      this.buttonCreator.createCancelDownloadButton(
+        onClick = {
+          this.viewModel.cancelDownload()
+        }
+      )
+    )
+    this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
 
     this.statusInProgress.visibility = View.VISIBLE
     this.statusIdle.visibility = View.INVISIBLE

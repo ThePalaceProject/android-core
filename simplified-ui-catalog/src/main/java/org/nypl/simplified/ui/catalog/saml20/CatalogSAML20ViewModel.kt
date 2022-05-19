@@ -261,6 +261,7 @@ class CatalogSAML20ViewModel(
 
           this.booksController.bookBorrow(
             accountID = book.account,
+            bookID = book.id,
             entry = book.entry,
             samlDownloadContext = SAMLDownloadContext(
               isSAMLAuthComplete = true,
@@ -287,7 +288,7 @@ class CatalogSAML20ViewModel(
 
       if (bookWithStatus != null) {
         val book = bookWithStatus.book
-        this.booksController.bookDownloadCancel(book.account, this.parameters.bookID)
+        this.booksController.bookCancelDownloadAndDelete(book.account, this.parameters.bookID)
         this.bookRegistry.update(BookWithStatus(book, BookStatus.fromBook(book)))
       }
     }

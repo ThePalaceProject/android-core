@@ -29,6 +29,7 @@ import org.nypl.simplified.accounts.database.AccountsDatabases
 import org.nypl.simplified.accounts.registry.AccountProviderRegistry
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.analytics.api.AnalyticsType
+import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
 import org.nypl.simplified.books.audio.AudioBookManifests
 import org.nypl.simplified.books.book_registry.BookRegistry
@@ -322,8 +323,10 @@ class Simply3635Test {
         .setBody("HELLO!")
     )
 
+    val bookID = BookID.create("id")
+
     this.logger.debug("downloading book on profile 1")
-    this.controller.bookBorrow(profile1.accounts().values.first().id, bookEntry0)
+    this.controller.bookBorrow(profile1.accounts().values.first().id, bookID, bookEntry0)
       .get()
 
     this.logger.debug("selecting profile 0")
@@ -337,7 +340,7 @@ class Simply3635Test {
     )
 
     this.logger.debug("downloading book on profile 0")
-    this.controller.bookBorrow(profile0.accounts().values.first().id, bookEntry0)
+    this.controller.bookBorrow(profile0.accounts().values.first().id, bookID, bookEntry0)
       .get()
   }
 }
