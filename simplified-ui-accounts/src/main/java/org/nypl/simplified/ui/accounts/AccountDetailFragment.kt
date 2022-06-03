@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.URLUtil
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
@@ -437,20 +438,30 @@ class AccountDetailFragment : Fragment(R.layout.account) {
       this.reportIssueGroup.visibility = View.VISIBLE
       this.reportIssueEmail.text = address
       this.reportIssueGroup.setOnClickListener {
-        val emailIntent =
+        val intent = if (email.contains("mailto:")) {
           Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", address, null))
-        val chosenIntent =
-          Intent.createChooser(emailIntent, this.resources.getString(R.string.accountReportIssue))
+        } else if (URLUtil.isValidUrl(address)) {
+          Intent(Intent.ACTION_VIEW, Uri.parse(address))
+        } else {
+          null
+        }
 
-        try {
-          this.startActivity(chosenIntent)
-        } catch (e: Exception) {
-          this.logger.error("unable to start activity: ", e)
-          val context = this.requireContext()
-          AlertDialog.Builder(context)
-            .setMessage(context.getString(R.string.accountReportFailed, address))
-            .create()
-            .show()
+        if (intent != null) {
+          val chosenIntent =
+            Intent.createChooser(intent, this.resources.getString(R.string.accountReportIssue))
+
+          try {
+            this.startActivity(chosenIntent)
+          } catch (e: Exception) {
+            this.logger.error("unable to start activity: ", e)
+            val context = this.requireContext()
+            AlertDialog.Builder(context)
+              .setMessage(context.getString(R.string.accountReportFailed, address))
+              .create()
+              .show()
+          }
+        } else {
+          this.reportIssueGroup.visibility = View.GONE
         }
       }
     } else {
