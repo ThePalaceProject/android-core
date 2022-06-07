@@ -427,21 +427,20 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   }
 
   /**
-   * If there's a support email, enable an option to use it.
+   * If there's a support url, enable an option to use it.
    */
 
   private fun configureReportIssue() {
-    val email = this.viewModel.account.provider.supportEmail
-    if (email != null) {
-      val address = email.removePrefix("mailto:")
+    val supportUrl = this.viewModel.account.provider.supportEmail
 
+    if (supportUrl != null) {
       this.reportIssueGroup.visibility = View.VISIBLE
-      this.reportIssueEmail.text = address
+      this.reportIssueEmail.text = supportUrl.replace("mailto:", "")
       this.reportIssueGroup.setOnClickListener {
-        val intent = if (email.contains("mailto:")) {
-          Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", address, null))
-        } else if (URLUtil.isValidUrl(address)) {
-          Intent(Intent.ACTION_VIEW, Uri.parse(address))
+        val intent = if (supportUrl.startsWith("mailto:")) {
+          Intent(Intent.ACTION_SENDTO, Uri.parse(supportUrl))
+        } else if (URLUtil.isValidUrl(supportUrl)) {
+          Intent(Intent.ACTION_VIEW, Uri.parse(supportUrl))
         } else {
           null
         }
@@ -456,7 +455,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
             this.logger.error("unable to start activity: ", e)
             val context = this.requireContext()
             AlertDialog.Builder(context)
-              .setMessage(context.getString(R.string.accountReportFailed, address))
+              .setMessage(context.getString(R.string.accountReportFailed, supportUrl))
               .create()
               .show()
           }
