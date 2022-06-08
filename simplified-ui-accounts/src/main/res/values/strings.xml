@@ -45,7 +45,7 @@
   <string name="accountSAML20NoPatronInfo">Failed to retrieve patron info from the URI: %1$s</string>
   <string name="accountSearchHint">Search accounts&#8230;</string>
   <string name="accountMore">More options</string>
-  <string name="accountReportFailed">Sorry, we weren\'t able to find a usable email app. Please send email to %1$s if you need to report an issue.</string>
+  <string name="accountReportFailed">Sorry, we weren\'t able to find a usable app to contact support. Please send email to %1$s if you need to report an issue.</string>
   <string name="accountPrivacyPolicy">Privacy Policy</string>
   <string name="accountLicenses">Content Licenses</string>
   <string name="accountEULA">End User License Agreement</string>

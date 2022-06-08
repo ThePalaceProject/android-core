@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.URLUtil
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
@@ -426,31 +427,40 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   }
 
   /**
-   * If there's a support email, enable an option to use it.
+   * If there's a support url, enable an option to use it.
    */
 
   private fun configureReportIssue() {
-    val email = this.viewModel.account.provider.supportEmail
-    if (email != null) {
-      val address = email.removePrefix("mailto:")
+    val supportUrl = this.viewModel.account.provider.supportEmail
 
+    if (supportUrl != null) {
       this.reportIssueGroup.visibility = View.VISIBLE
-      this.reportIssueEmail.text = address
+      this.reportIssueEmail.text = supportUrl.replace("mailto:", "")
       this.reportIssueGroup.setOnClickListener {
-        val emailIntent =
-          Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", address, null))
-        val chosenIntent =
-          Intent.createChooser(emailIntent, this.resources.getString(R.string.accountReportIssue))
+        val intent = if (supportUrl.startsWith("mailto:")) {
+          Intent(Intent.ACTION_SENDTO, Uri.parse(supportUrl))
+        } else if (URLUtil.isValidUrl(supportUrl)) {
+          Intent(Intent.ACTION_VIEW, Uri.parse(supportUrl))
+        } else {
+          null
+        }
 
-        try {
-          this.startActivity(chosenIntent)
-        } catch (e: Exception) {
-          this.logger.error("unable to start activity: ", e)
-          val context = this.requireContext()
-          AlertDialog.Builder(context)
-            .setMessage(context.getString(R.string.accountReportFailed, address))
-            .create()
-            .show()
+        if (intent != null) {
+          val chosenIntent =
+            Intent.createChooser(intent, this.resources.getString(R.string.accountReportIssue))
+
+          try {
+            this.startActivity(chosenIntent)
+          } catch (e: Exception) {
+            this.logger.error("unable to start activity: ", e)
+            val context = this.requireContext()
+            AlertDialog.Builder(context)
+              .setMessage(context.getString(R.string.accountReportFailed, supportUrl))
+              .create()
+              .show()
+          }
+        } else {
+          this.reportIssueGroup.visibility = View.GONE
         }
       }
     } else {
