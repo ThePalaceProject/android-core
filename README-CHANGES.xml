@@ -190,7 +190,7 @@
         <c:change date="2022-04-29T00:00:00+00:00" summary="Fixed &quot;Unable to initialize audio engine&quot; error playing some audio books."/>
       </c:changes>
     </c:release>
-    <c:release date="2022-06-10T13:53:51+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.11">
+    <c:release date="2022-06-15T15:22:15+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.11">
       <c:changes>
         <c:change date="2022-05-05T00:00:00+00:00" summary="Fixed catalog facet labels being cropped."/>
         <c:change date="2022-05-05T00:00:00+00:00" summary="Disabled searching button on catalog search when the input is blank."/>
@@ -204,7 +204,8 @@
         <c:change date="2022-05-18T00:00:00+00:00" summary="Added cancel download button to book details screen."/>
         <c:change date="2022-05-19T00:00:00+00:00" summary="Added 'More' button to display the whole book's description in a book details screen."/>
         <c:change date="2022-06-03T00:00:00+00:00" summary="Added support to urls in an account's support email field"/>
-        <c:change date="2022-06-10T13:53:51+00:00" summary="Fixed error playing audio books after switching libraries."/>
+        <c:change date="2022-06-10T00:00:00+00:00" summary="Fixed error playing audio books after switching libraries."/>
+        <c:change date="2022-06-15T15:22:15+00:00" summary="Fixed cropping of non-square audio book covers in the player."/>
       </c:changes>
     </c:release>
   </c:releases>
