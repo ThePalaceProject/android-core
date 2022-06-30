@@ -1,7 +1,7 @@
 package org.nypl.simplified.books.api
 
 import one.irradia.mime.api.MIMEType
-import org.librarysimplified.audiobook.api.PlayerPosition
+import org.nypl.simplified.books.api.bookmark.Bookmark
 import java.io.File
 import java.net.URI
 
@@ -47,13 +47,13 @@ sealed class BookFormat {
      * The last read location of the book, if any.
      */
 
-    val lastReadLocation: Bookmark?,
+    val lastReadLocation: Bookmark.ReaderBookmark?,
 
     /**
      * The list of bookmarks.
      */
 
-    val bookmarks: List<Bookmark>,
+    val bookmarks: List<Bookmark.ReaderBookmark>,
 
     override val contentType: MIMEType
   ) : BookFormat() {
@@ -103,10 +103,14 @@ sealed class BookFormat {
     val file: File?,
 
     /**
-     * The most recent playback position.
+     * The last read location of the audiobook, if any.
      */
+    val lastReadLocation: Bookmark.AudiobookBookmark?,
 
-    val position: PlayerPosition?,
+    /**
+     * The list of bookmarks.
+     */
+    val bookmarks: List<Bookmark.AudiobookBookmark>,
 
     override val contentType: MIMEType
   ) : BookFormat() {

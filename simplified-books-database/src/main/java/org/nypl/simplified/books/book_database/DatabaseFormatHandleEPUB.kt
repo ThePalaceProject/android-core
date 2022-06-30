@@ -7,10 +7,9 @@ import one.irradia.mime.api.MIMEType
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookDRMKind
 import org.nypl.simplified.books.api.BookFormat
-import org.nypl.simplified.books.api.Bookmark
-import org.nypl.simplified.books.api.BookmarkJSON
-import org.nypl.simplified.books.api.BookmarkKind.ReaderBookmarkExplicit
-import org.nypl.simplified.books.api.BookmarkKind.ReaderBookmarkLastReadLocation
+import org.nypl.simplified.books.api.bookmark.Bookmark
+import org.nypl.simplified.books.api.bookmark.BookmarkJSON
+import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.books.book_database.api.BookDRMInformationHandle
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleEPUB
 import org.nypl.simplified.files.DirectoryUtilities
@@ -19,7 +18,6 @@ import org.nypl.simplified.json.core.JSONParserUtilities
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
-import java.lang.IllegalStateException
 
 /**
  * Operations on EPUB formats in database entries.
@@ -152,18 +150,18 @@ internal class DatabaseFormatHandleEPUB internal constructor(
     this.parameters.onUpdated.invoke(newFormat)
   }
 
-  override fun setLastReadLocation(bookmark: Bookmark?) {
+  override fun setLastReadLocation(bookmark: Bookmark.ReaderBookmark?) {
     val newFormat = synchronized(this.dataLock) {
       if (bookmark != null) {
         Preconditions.checkArgument(
-          bookmark.kind == ReaderBookmarkLastReadLocation,
+          bookmark.kind == BookmarkKind.BookmarkLastReadLocation,
           "Must use a last-read-location bookmark"
         )
 
         FileUtilities.fileWriteUTF8Atomically(
           this.fileLastRead,
           this.fileLastReadTmp,
-          BookmarkJSON.serializeToString(this.parameters.objectMapper, bookmark)
+          BookmarkJSON.serializeReaderBookmarkToString(this.parameters.objectMapper, bookmark)
         )
       } else {
         FileUtilities.fileDelete(this.fileLastRead)
@@ -176,12 +174,12 @@ internal class DatabaseFormatHandleEPUB internal constructor(
     this.parameters.onUpdated.invoke(newFormat)
   }
 
-  override fun setBookmarks(bookmarks: List<Bookmark>) {
+  override fun setBookmarks(bookmarks: List<Bookmark.ReaderBookmark>) {
     val newFormat = synchronized(this.dataLock) {
       FileUtilities.fileWriteUTF8Atomically(
         this.fileBookmarks,
         this.fileBookmarksTmp,
-        BookmarkJSON.serializeToString(this.parameters.objectMapper, bookmarks)
+        BookmarkJSON.serializeReaderBookmarksToString(this.parameters.objectMapper, bookmarks)
       )
       this.formatRef = this.formatRef.copy(bookmarks = bookmarks)
       this.formatRef
@@ -217,7 +215,7 @@ internal class DatabaseFormatHandleEPUB internal constructor(
     private fun loadBookmarksIfPresent(
       objectMapper: ObjectMapper,
       fileBookmarks: File
-    ): List<Bookmark> {
+    ): List<Bookmark.ReaderBookmark> {
       return if (fileBookmarks.isFile) {
         loadBookmarks(
           objectMapper = objectMapper,
@@ -231,13 +229,12 @@ internal class DatabaseFormatHandleEPUB internal constructor(
     private fun loadBookmarks(
       objectMapper: ObjectMapper,
       fileBookmarks: File
-    ): List<Bookmark> {
+    ): List<Bookmark.ReaderBookmark> {
       val tree = objectMapper.readTree(fileBookmarks)
       val array = JSONParserUtilities.checkArray(null, tree)
       return array.map { node ->
-        BookmarkJSON.deserializeFromJSON(
-          objectMapper = objectMapper,
-          kind = ReaderBookmarkExplicit,
+        BookmarkJSON.deserializeReaderBookmarkFromJSON(
+          kind = BookmarkKind.BookmarkExplicit,
           node = node
         )
       }
@@ -247,7 +244,7 @@ internal class DatabaseFormatHandleEPUB internal constructor(
     private fun loadLastReadLocationIfPresent(
       objectMapper: ObjectMapper,
       fileLastRead: File
-    ): Bookmark? {
+    ): Bookmark.ReaderBookmark? {
       return if (fileLastRead.isFile) {
         try {
           loadLastReadLocation(
@@ -267,11 +264,11 @@ internal class DatabaseFormatHandleEPUB internal constructor(
     private fun loadLastReadLocation(
       objectMapper: ObjectMapper,
       fileLastRead: File
-    ): Bookmark {
+    ): Bookmark.ReaderBookmark {
       val serialized = FileUtilities.fileReadUTF8(fileLastRead)
-      return BookmarkJSON.deserializeFromString(
+      return BookmarkJSON.deserializeReaderBookmarkFromString(
         objectMapper = objectMapper,
-        kind = ReaderBookmarkLastReadLocation,
+        kind = BookmarkKind.BookmarkLastReadLocation,
         serialized = serialized
       )
     }

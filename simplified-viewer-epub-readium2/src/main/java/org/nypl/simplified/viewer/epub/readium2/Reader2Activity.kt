@@ -46,10 +46,10 @@ import org.nypl.simplified.accessibility.AccessibilityServiceType
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.analytics.api.AnalyticsEvent
 import org.nypl.simplified.analytics.api.AnalyticsType
+import org.nypl.simplified.bookmarks.api.BookmarkServiceType
 import org.nypl.simplified.books.api.BookContentProtections
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
-import org.nypl.simplified.reader.bookmarks.api.ReaderBookmarkServiceType
 import org.nypl.simplified.ui.thread.api.UIThreadServiceType
 import org.readium.r2.shared.publication.asset.FileAsset
 import org.slf4j.LoggerFactory
@@ -100,7 +100,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
   private val analyticsService =
     services.requireService(AnalyticsType::class.java)
   private val bookmarkService =
-    services.requireService(ReaderBookmarkServiceType::class.java)
+    services.requireService(BookmarkServiceType::class.java)
   private val profilesController =
     services.requireService(ProfilesControllerType::class.java)
   private val uiThread =
@@ -299,8 +299,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
         Reader2Bookmarks.loadBookmarks(
           bookmarkService = this.bookmarkService,
           accountID = this.parameters.accountId,
-          bookID = this.parameters.bookId,
-          bookMetadata = reference.controller.bookMetadata
+          bookID = this.parameters.bookId
         )
 
       val lastRead = bookmarks.find { bookmark -> bookmark.type == SR2Bookmark.Type.LAST_READ }

@@ -1,17 +1,16 @@
 package org.nypl.simplified.viewer.epub.readium2
 
-import org.librarysimplified.r2.api.SR2BookMetadata
 import org.librarysimplified.r2.api.SR2Bookmark
 import org.librarysimplified.r2.api.SR2Locator
 import org.nypl.simplified.accounts.api.AccountID
+import org.nypl.simplified.bookmarks.api.BookmarkServiceUsableType
+import org.nypl.simplified.bookmarks.api.Bookmarks
 import org.nypl.simplified.books.api.BookChapterProgress
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.api.BookLocation
-import org.nypl.simplified.books.api.Bookmark
-import org.nypl.simplified.books.api.BookmarkKind
+import org.nypl.simplified.books.api.bookmark.Bookmark
+import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.feeds.api.FeedEntry
-import org.nypl.simplified.reader.bookmarks.api.ReaderBookmarkServiceUsableType
-import org.nypl.simplified.reader.bookmarks.api.ReaderBookmarks
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 
@@ -25,17 +24,17 @@ object Reader2Bookmarks {
     LoggerFactory.getLogger(Reader2Bookmarks::class.java)
 
   private fun loadRawBookmarks(
-    bookmarkService: ReaderBookmarkServiceUsableType,
+    bookmarkService: BookmarkServiceUsableType,
     accountID: AccountID,
     bookID: BookID
-  ): ReaderBookmarks {
+  ): Bookmarks {
     return try {
       bookmarkService
         .bookmarkSyncAndLoad(accountID, bookID)
         .get(15L, TimeUnit.SECONDS)
     } catch (e: Exception) {
       this.logger.error("could not load bookmarks: ", e)
-      ReaderBookmarks(null, emptyList())
+      Bookmarks(null, emptyList())
     }
   }
 
@@ -44,10 +43,9 @@ object Reader2Bookmarks {
    */
 
   fun loadBookmarks(
-    bookmarkService: ReaderBookmarkServiceUsableType,
+    bookmarkService: BookmarkServiceUsableType,
     accountID: AccountID,
-    bookID: BookID,
-    bookMetadata: SR2BookMetadata
+    bookID: BookID
   ): List<SR2Bookmark> {
     val rawBookmarks =
       this.loadRawBookmarks(
@@ -56,9 +54,9 @@ object Reader2Bookmarks {
         bookID = bookID
       )
     val lastRead =
-      rawBookmarks.lastRead?.let { this.toSR2Bookmark(bookMetadata, it) }
+      rawBookmarks.lastRead?.let { this.toSR2Bookmark(it) }
     val explicits =
-      rawBookmarks.bookmarks.mapNotNull { this.toSR2Bookmark(bookMetadata, it) }
+      rawBookmarks.bookmarks.mapNotNull { this.toSR2Bookmark(it) }
 
     val results = mutableListOf<SR2Bookmark>()
     lastRead?.let(results::add)
@@ -74,7 +72,7 @@ object Reader2Bookmarks {
     bookEntry: FeedEntry.FeedEntryOPDS,
     deviceId: String,
     source: SR2Bookmark
-  ): Bookmark {
+  ): Bookmark.ReaderBookmark {
     val progress = BookChapterProgress(
       chapterHref = source.locator.chapterHref,
       chapterProgress = when (val locator = source.locator) {
@@ -88,12 +86,12 @@ object Reader2Bookmarks {
 
     val kind = when (source.type) {
       SR2Bookmark.Type.EXPLICIT ->
-        BookmarkKind.ReaderBookmarkExplicit
+        BookmarkKind.BookmarkExplicit
       SR2Bookmark.Type.LAST_READ ->
-        BookmarkKind.ReaderBookmarkLastReadLocation
+        BookmarkKind.BookmarkLastReadLocation
     }
 
-    return Bookmark.create(
+    return Bookmark.ReaderBookmark.create(
       opdsId = bookEntry.feedEntry.id,
       location = location,
       time = source.date,
@@ -110,9 +108,11 @@ object Reader2Bookmarks {
    */
 
   fun toSR2Bookmark(
-    bookMetadata: SR2BookMetadata,
     source: Bookmark
   ): SR2Bookmark? {
+    if (source !is Bookmark.ReaderBookmark) {
+      throw IllegalStateException("Unsupported type of bookmark: $source")
+    }
     return when (val location = source.location) {
       is BookLocation.BookLocationR2 ->
         this.r2ToSR2Bookmark(source, location)
@@ -122,15 +122,15 @@ object Reader2Bookmarks {
   }
 
   private fun r2ToSR2Bookmark(
-    source: Bookmark,
+    source: Bookmark.ReaderBookmark,
     location: BookLocation.BookLocationR2
   ): SR2Bookmark =
     SR2Bookmark(
       date = source.time.toDateTime(),
       type = when (source.kind) {
-        BookmarkKind.ReaderBookmarkLastReadLocation ->
+        BookmarkKind.BookmarkLastReadLocation ->
           SR2Bookmark.Type.LAST_READ
-        BookmarkKind.ReaderBookmarkExplicit ->
+        BookmarkKind.BookmarkExplicit ->
           SR2Bookmark.Type.EXPLICIT
       },
       title = source.chapterTitle,

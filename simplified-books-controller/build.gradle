@@ -7,6 +7,7 @@ dependencies {
   implementation project(":simplified-accounts-source-spi")
   implementation project(":simplified-adobe-extensions")
   implementation project(":simplified-analytics-api")
+  implementation project(":simplified-bookmarks-api")
   implementation project(":simplified-books-audio")
   implementation project(":simplified-books-borrowing")
   implementation project(":simplified-books-registry-api")
@@ -20,7 +21,6 @@ dependencies {
   implementation project(":simplified-opds-core")
   implementation project(":simplified-patron-api")
   implementation project(":simplified-profiles-api")
-  implementation project(":simplified-reader-bookmarks-api")
   implementation project(":simplified-services-api")
   implementation project(":simplified-taskrecorder-api")
 
