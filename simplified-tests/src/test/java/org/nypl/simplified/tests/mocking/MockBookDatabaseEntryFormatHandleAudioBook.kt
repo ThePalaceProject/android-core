@@ -1,10 +1,10 @@
 package org.nypl.simplified.tests.mocking
 
-import org.librarysimplified.audiobook.api.PlayerPosition
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookDRMKind
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.api.BookID
+import org.nypl.simplified.books.api.bookmark.Bookmark
 import org.nypl.simplified.books.book_database.api.BookDRMInformationHandle
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle
 import org.nypl.simplified.books.formats.api.StandardFormatNames
@@ -27,7 +27,8 @@ class MockBookDatabaseEntryFormatHandleAudioBook(
       contentType = StandardFormatNames.genericAudioBooks.first(),
       file = null,
       manifest = null,
-      position = null
+      lastReadLocation = null,
+      bookmarks = listOf()
     )
 
   var drmInformationHandleField: BookDRMInformationHandle =
@@ -68,15 +69,15 @@ class MockBookDatabaseEntryFormatHandleAudioBook(
     check(this.formatField.isDownloaded)
   }
 
-  override fun savePlayerPosition(position: PlayerPosition) {
+  override fun setLastReadLocation(bookmark: Bookmark.AudiobookBookmark?) {
     this.formatField = this.formatField.copy(
-      position = position
+      lastReadLocation = bookmark
     )
   }
 
-  override fun clearPlayerPosition() {
+  override fun setBookmarks(bookmarks: List<Bookmark.AudiobookBookmark>) {
     this.formatField = this.formatField.copy(
-      position = null
+      bookmarks = bookmarks
     )
   }
 

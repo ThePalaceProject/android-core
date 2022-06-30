@@ -1,4 +1,4 @@
-package org.nypl.simplified.tests.bookmarks
+package org.nypl.simplified.tests.bookmark_annotations
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
@@ -7,25 +7,25 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.nypl.simplified.bookmarks.api.BookmarkAnnotation
+import org.nypl.simplified.bookmarks.api.BookmarkAnnotationBodyNode
+import org.nypl.simplified.bookmarks.api.BookmarkAnnotationFirstNode
+import org.nypl.simplified.bookmarks.api.BookmarkAnnotationResponse
+import org.nypl.simplified.bookmarks.api.BookmarkAnnotations
+import org.nypl.simplified.bookmarks.api.BookmarkAnnotationSelectorNode
+import org.nypl.simplified.bookmarks.api.BookmarkAnnotationsJSON
+import org.nypl.simplified.bookmarks.api.BookmarkAnnotationTargetNode
 import org.nypl.simplified.books.api.BookLocation
-import org.nypl.simplified.books.api.BookmarkKind
+import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.json.core.JSONParseException
-import org.nypl.simplified.reader.bookmarks.api.BookmarkAnnotation
-import org.nypl.simplified.reader.bookmarks.api.BookmarkAnnotationBodyNode
-import org.nypl.simplified.reader.bookmarks.api.BookmarkAnnotationFirstNode
-import org.nypl.simplified.reader.bookmarks.api.BookmarkAnnotationResponse
-import org.nypl.simplified.reader.bookmarks.api.BookmarkAnnotationSelectorNode
-import org.nypl.simplified.reader.bookmarks.api.BookmarkAnnotationTargetNode
-import org.nypl.simplified.reader.bookmarks.api.BookmarkAnnotations
-import org.nypl.simplified.reader.bookmarks.api.BookmarkAnnotationsJSON
 import org.slf4j.LoggerFactory
 import java.io.FileNotFoundException
 import java.io.InputStream
 
-class BookmarkAnnotationsJSONTest {
+class ReaderBookmarkAnnotationsJSONTest {
 
   private val logger =
-    LoggerFactory.getLogger(BookmarkAnnotationsJSONTest::class.java)
+    LoggerFactory.getLogger(ReaderBookmarkAnnotationsJSONTest::class.java)
 
   private val objectMapper: ObjectMapper = ObjectMapper()
 
@@ -261,10 +261,10 @@ class BookmarkAnnotationsJSONTest {
         node = this.resourceNode("valid-bookmark-0.json")
       )
 
-    val bookmark = BookmarkAnnotations.toBookmark(this.objectMapper, annotation)
+    val bookmark = BookmarkAnnotations.toReaderBookmark(this.objectMapper, annotation)
     assertEquals("urn:uuid:1daa8de6-94e8-4711-b7d1-e43b572aa6e0", bookmark.opdsId)
     assertEquals("urn:uuid:c83db5b1-9130-4b86-93ea-634b00235c7c", bookmark.deviceID)
-    assertEquals(BookmarkKind.ReaderBookmarkLastReadLocation, bookmark.kind)
+    assertEquals(BookmarkKind.BookmarkLastReadLocation, bookmark.kind)
     assertEquals("2021-03-12T16:32:49.000Z", bookmark.time.toString())
     assertEquals("", bookmark.chapterTitle)
 
@@ -285,10 +285,10 @@ class BookmarkAnnotationsJSONTest {
 
     DateTimeUtils.setCurrentMillisFixed(0L)
 
-    val bookmark = BookmarkAnnotations.toBookmark(this.objectMapper, annotation)
+    val bookmark = BookmarkAnnotations.toReaderBookmark(this.objectMapper, annotation)
     assertEquals("urn:uuid:1daa8de6-94e8-4711-b7d1-e43b572aa6e0", bookmark.opdsId)
     assertEquals("urn:uuid:c83db5b1-9130-4b86-93ea-634b00235c7c", bookmark.deviceID)
-    assertEquals(BookmarkKind.ReaderBookmarkLastReadLocation, bookmark.kind)
+    assertEquals(BookmarkKind.BookmarkLastReadLocation, bookmark.kind)
     assertEquals("2021-03-12T16:32:49.000Z", bookmark.time.toString())
     assertEquals("", bookmark.chapterTitle)
 
@@ -309,10 +309,10 @@ class BookmarkAnnotationsJSONTest {
 
     DateTimeUtils.setCurrentMillisFixed(0L)
 
-    val bookmark = BookmarkAnnotations.toBookmark(this.objectMapper, annotation)
+    val bookmark = BookmarkAnnotations.toReaderBookmark(this.objectMapper, annotation)
     assertEquals("urn:uuid:1daa8de6-94e8-4711-b7d1-e43b572aa6e0", bookmark.opdsId)
     assertEquals("urn:uuid:c83db5b1-9130-4b86-93ea-634b00235c7c", bookmark.deviceID)
-    assertEquals(BookmarkKind.ReaderBookmarkExplicit, bookmark.kind)
+    assertEquals(BookmarkKind.BookmarkExplicit, bookmark.kind)
     assertEquals("2021-03-12T16:32:49.000Z", bookmark.time.toString())
     assertEquals("", bookmark.chapterTitle)
 
@@ -333,10 +333,10 @@ class BookmarkAnnotationsJSONTest {
 
     DateTimeUtils.setCurrentMillisFixed(0L)
 
-    val bookmark = BookmarkAnnotations.toBookmark(this.objectMapper, annotation)
+    val bookmark = BookmarkAnnotations.toReaderBookmark(this.objectMapper, annotation)
     assertEquals("urn:uuid:1daa8de6-94e8-4711-b7d1-e43b572aa6e0", bookmark.opdsId)
     assertEquals("urn:uuid:c83db5b1-9130-4b86-93ea-634b00235c7c", bookmark.deviceID)
-    assertEquals(BookmarkKind.ReaderBookmarkExplicit, bookmark.kind)
+    assertEquals(BookmarkKind.BookmarkExplicit, bookmark.kind)
     assertEquals("2021-03-12T16:32:49.000Z", bookmark.time.toString())
     assertEquals("", bookmark.chapterTitle)
 
@@ -350,7 +350,7 @@ class BookmarkAnnotationsJSONTest {
   @Test
   fun testSpecValidLocator0() {
     val location =
-      BookmarkAnnotationsJSON.deserializeLocation(
+      BookmarkAnnotationsJSON.deserializeReaderLocation(
         objectMapper = this.objectMapper,
         value = this.resourceText("valid-locator-0.json")
       )
@@ -363,7 +363,7 @@ class BookmarkAnnotationsJSONTest {
   @Test
   fun testSpecValidLocator1() {
     val location =
-      BookmarkAnnotationsJSON.deserializeLocation(
+      BookmarkAnnotationsJSON.deserializeReaderLocation(
         objectMapper = this.objectMapper,
         value = this.resourceText("valid-locator-1.json")
       )
@@ -480,11 +480,11 @@ class BookmarkAnnotationsJSONTest {
     this.compareAnnotations(bookmarkAnnotation, deserialized)
 
     val toBookmark =
-      BookmarkAnnotations.toBookmark(this.objectMapper, deserialized)
+      BookmarkAnnotations.toReaderBookmark(this.objectMapper, deserialized)
     val fromBookmark =
-      BookmarkAnnotations.fromBookmark(this.objectMapper, toBookmark)
+      BookmarkAnnotations.fromReaderBookmark(this.objectMapper, toBookmark)
     val toBookmarkAgain =
-      BookmarkAnnotations.toBookmark(this.objectMapper, fromBookmark)
+      BookmarkAnnotations.toReaderBookmark(this.objectMapper, fromBookmark)
 
     this.compareAnnotations(bookmarkAnnotation, deserialized)
     this.compareAnnotations(bookmarkAnnotation, fromBookmark)
@@ -509,9 +509,9 @@ class BookmarkAnnotationsJSONTest {
     assertEquals(x.target.selector.type, y.target.selector.type)
 
     val xSelectorValue =
-      BookmarkAnnotationsJSON.deserializeLocation(this.objectMapper, x.target.selector.value)
+      BookmarkAnnotationsJSON.deserializeReaderLocation(this.objectMapper, x.target.selector.value)
     val ySelectorValue =
-      BookmarkAnnotationsJSON.deserializeLocation(this.objectMapper, y.target.selector.value)
+      BookmarkAnnotationsJSON.deserializeReaderLocation(this.objectMapper, y.target.selector.value)
 
     assertEquals(xSelectorValue, ySelectorValue)
     assertEquals(x.target.source, y.target.source)
@@ -524,7 +524,7 @@ class BookmarkAnnotationsJSONTest {
     val fileName =
       "/org/nypl/simplified/tests/bookmark_annotations/spec/$name"
     val url =
-      BookmarkAnnotationsJSONTest::class.java.getResource(fileName)
+      ReaderBookmarkAnnotationsJSONTest::class.java.getResource(fileName)
         ?: throw FileNotFoundException("No such resource: $fileName")
     return url.openStream()
   }

@@ -30,21 +30,21 @@ import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.api.BookLocation
-import org.nypl.simplified.books.api.Bookmark
-import org.nypl.simplified.books.api.BookmarkKind
+import org.nypl.simplified.books.api.bookmark.Bookmark
+import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleEPUB
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
 import org.nypl.simplified.books.book_database.api.BookDatabaseType
 import org.nypl.simplified.books.book_database.api.BookFormats
-import org.nypl.simplified.books.reader.bookmarks.internal.RBHTTPCalls
 import org.nypl.simplified.profiles.api.ProfileEvent
 import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
-import org.nypl.simplified.reader.bookmarks.api.ReaderBookmarkEvent
-import org.nypl.simplified.reader.bookmarks.api.ReaderBookmarkHTTPCallsType
-import org.nypl.simplified.reader.bookmarks.api.ReaderBookmarkServiceType
-import org.nypl.simplified.reader.bookmarks.api.ReaderBookmarkSyncEnableResult.SYNC_ENABLE_NOT_SUPPORTED
+import org.nypl.simplified.bookmarks.api.BookmarkEvent
+import org.nypl.simplified.bookmarks.api.BookmarkHTTPCallsType
+import org.nypl.simplified.bookmarks.api.BookmarkServiceType
+import org.nypl.simplified.bookmarks.api.BookmarkSyncEnableResult.SYNC_ENABLE_NOT_SUPPORTED
+import org.nypl.simplified.bookmarks.internal.BHTTPCalls
 import org.nypl.simplified.tests.EventAssertions
 import org.nypl.simplified.tests.EventLogging
 import org.nypl.simplified.tests.mocking.MockProfilesController
@@ -63,13 +63,13 @@ abstract class ReaderBookmarkServiceContract {
 
   protected abstract fun bookmarkService(
     threads: (Runnable) -> Thread,
-    events: Subject<ReaderBookmarkEvent>,
-    httpCalls: ReaderBookmarkHTTPCallsType,
+    events: Subject<BookmarkEvent>,
+    httpCalls: BookmarkHTTPCallsType,
     profilesController: ProfilesControllerType
-  ): ReaderBookmarkServiceType
+  ): BookmarkServiceType
 
   private val objectMapper = ObjectMapper()
-  private var readerBookmarkService: ReaderBookmarkServiceType? = null
+  private var readerBookmarkService: BookmarkServiceType? = null
   private lateinit var server: MockWebServer
   private lateinit var serverDispatcher: EndpointDispatcher
   private lateinit var http: LSHTTPClientType
@@ -185,12 +185,12 @@ abstract class ReaderBookmarkServiceContract {
     this.addResponse("/patron", this.patronSettingsWithAnnotationsEnabled)
     this.addResponse("/annotations", this.annotationsEmpty)
 
-    val httpCalls = RBHTTPCalls(this.objectMapper, this.http)
+    val httpCalls = BHTTPCalls(this.objectMapper, this.http)
 
     val profileEvents =
       EventLogging.create<ProfileEvent>(this.logger, 1)
     val bookmarkEvents =
-      EventLogging.create<ReaderBookmarkEvent>(this.logger, 2)
+      EventLogging.create<BookmarkEvent>(this.logger, 2)
     val accountEvents =
       EventLogging.create<AccountEvent>(this.logger, 1)
 
@@ -257,14 +257,14 @@ abstract class ReaderBookmarkServiceContract {
     bookmarkEvents.latch.await()
 
     EventAssertions.isTypeAndMatches(
-      ReaderBookmarkEvent.ReaderBookmarkSyncStarted::class.java,
+      BookmarkEvent.BookmarkSyncStarted::class.java,
       bookmarkEvents.eventLog,
       0,
       { event -> Assertions.assertEquals(this.fakeAccountID, event.accountID) }
     )
 
     EventAssertions.isTypeAndMatches(
-      ReaderBookmarkEvent.ReaderBookmarkSyncFinished::class.java,
+      BookmarkEvent.BookmarkSyncFinished::class.java,
       bookmarkEvents.eventLog,
       1,
       { event -> Assertions.assertEquals(this.fakeAccountID, event.accountID) }
@@ -346,12 +346,12 @@ abstract class ReaderBookmarkServiceContract {
     """
     )
 
-    val httpCalls = RBHTTPCalls(this.objectMapper, this.http)
+    val httpCalls = BHTTPCalls(this.objectMapper, this.http)
 
     val profileEvents =
       EventLogging.create<ProfileEvent>(this.logger, 1)
     val bookmarkEvents =
-      EventLogging.create<ReaderBookmarkEvent>(this.logger, 3)
+      EventLogging.create<BookmarkEvent>(this.logger, 3)
     val accountEvents =
       EventLogging.create<AccountEvent>(this.logger, 1)
 
@@ -454,21 +454,21 @@ abstract class ReaderBookmarkServiceContract {
     bookmarkEvents.latch.await()
 
     EventAssertions.isTypeAndMatches(
-      ReaderBookmarkEvent.ReaderBookmarkSyncStarted::class.java,
+      BookmarkEvent.BookmarkSyncStarted::class.java,
       bookmarkEvents.eventLog,
       0,
       { event -> Assertions.assertEquals(this.fakeAccountID, event.accountID) }
     )
 
     EventAssertions.isTypeAndMatches(
-      ReaderBookmarkEvent.ReaderBookmarkSaved::class.java,
+      BookmarkEvent.BookmarkSaved::class.java,
       bookmarkEvents.eventLog,
       1,
       { event -> Assertions.assertEquals(this.fakeAccountID, event.accountID) }
     )
 
     EventAssertions.isTypeAndMatches(
-      ReaderBookmarkEvent.ReaderBookmarkSyncFinished::class.java,
+      BookmarkEvent.BookmarkSyncFinished::class.java,
       bookmarkEvents.eventLog,
       2,
       { event -> Assertions.assertEquals(this.fakeAccountID, event.accountID) }
@@ -542,12 +542,12 @@ abstract class ReaderBookmarkServiceContract {
 
     this.addResponse("/annotations", responseText)
 
-    val httpCalls = RBHTTPCalls(this.objectMapper, this.http)
+    val httpCalls = BHTTPCalls(this.objectMapper, this.http)
 
     val profileEvents =
       EventLogging.create<ProfileEvent>(this.logger, 1)
     val bookmarkEvents =
-      EventLogging.create<ReaderBookmarkEvent>(this.logger, 3)
+      EventLogging.create<BookmarkEvent>(this.logger, 3)
     val accountEvents =
       EventLogging.create<AccountEvent>(this.logger, 1)
 
@@ -559,10 +559,10 @@ abstract class ReaderBookmarkServiceContract {
 
     val startingBookmarks =
       listOf(
-        Bookmark.create(
+        Bookmark.ReaderBookmark.create(
           opdsId = "urn:example.com/terms/id/c083c0a6-54c6-4cc5-9d3a-425317da662a",
           location = BookLocation.BookLocationR1(0.5, null, "x"),
-          kind = BookmarkKind.ReaderBookmarkLastReadLocation,
+          kind = BookmarkKind.BookmarkLastReadLocation,
           time = DateTime.now(DateTimeZone.UTC),
           chapterTitle = "A Title",
           bookProgress = 0.5,
@@ -667,21 +667,21 @@ abstract class ReaderBookmarkServiceContract {
     )
 
     EventAssertions.isTypeAndMatches(
-      ReaderBookmarkEvent.ReaderBookmarkSyncStarted::class.java,
+      BookmarkEvent.BookmarkSyncStarted::class.java,
       bookmarkEvents.eventLog,
       0,
       { event -> Assertions.assertEquals(this.fakeAccountID, event.accountID) }
     )
 
     EventAssertions.isTypeAndMatches(
-      ReaderBookmarkEvent.ReaderBookmarkSaved::class.java,
+      BookmarkEvent.BookmarkSaved::class.java,
       bookmarkEvents.eventLog,
       1,
       { event -> Assertions.assertEquals(this.fakeAccountID, event.accountID) }
     )
 
     EventAssertions.isTypeAndMatches(
-      ReaderBookmarkEvent.ReaderBookmarkSyncFinished::class.java,
+      BookmarkEvent.BookmarkSyncFinished::class.java,
       bookmarkEvents.eventLog,
       2,
       { event -> Assertions.assertEquals(this.fakeAccountID, event.accountID) }
@@ -716,9 +716,9 @@ abstract class ReaderBookmarkServiceContract {
   @Timeout(value = 10L, unit = TimeUnit.SECONDS)
   fun testEnableBookmarkSyncingNotSupported() {
     val httpCalls =
-      RBHTTPCalls(this.objectMapper, this.http)
+      BHTTPCalls(this.objectMapper, this.http)
     val bookmarkEvents =
-      EventLogging.create<ReaderBookmarkEvent>(this.logger, 3)
+      EventLogging.create<BookmarkEvent>(this.logger, 3)
     val profiles =
       MockProfilesController(1, 1)
 
@@ -744,7 +744,7 @@ abstract class ReaderBookmarkServiceContract {
  */
 
   private fun waitForServiceQuiescence(
-    service: ReaderBookmarkServiceType,
+    service: BookmarkServiceType,
     profiles: MockProfilesController
   ) {
 

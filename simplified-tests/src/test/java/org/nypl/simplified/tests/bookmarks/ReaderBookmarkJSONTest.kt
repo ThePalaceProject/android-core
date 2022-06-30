@@ -11,14 +11,15 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.nypl.simplified.books.api.BookLocation
-import org.nypl.simplified.books.api.Bookmark
-import org.nypl.simplified.books.api.BookmarkJSON
-import org.nypl.simplified.books.api.BookmarkKind
+import org.nypl.simplified.books.api.bookmark.Bookmark
+import org.nypl.simplified.books.api.bookmark.BookmarkJSON
+import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.json.core.JSONParseException
+import org.nypl.simplified.tests.bookmark_annotations.ReaderBookmarkAnnotationsJSONTest
 import java.io.FileNotFoundException
 import java.io.InputStream
 
-class BookmarkJSONTest {
+class ReaderBookmarkJSONTest {
 
   private lateinit var objectMapper: ObjectMapper
   private lateinit var formatter: DateTimeFormatter
@@ -42,9 +43,9 @@ class BookmarkJSONTest {
 
   @Test
   fun testDeserializeJSONWithTopLevelChapterProgress() {
-    val bookmark = BookmarkJSON.deserializeFromString(
+    val bookmark = BookmarkJSON.deserializeReaderBookmarkFromString(
       objectMapper = this.objectMapper,
-      kind = BookmarkKind.ReaderBookmarkExplicit,
+      kind = BookmarkKind.BookmarkExplicit,
       serialized = """
         {
           "opdsId" : "urn:isbn:9781683609438",
@@ -72,9 +73,9 @@ class BookmarkJSONTest {
 
   @Test
   fun testDeserializeJSONWithNestedChapterProgress() {
-    val bookmark = BookmarkJSON.deserializeFromString(
+    val bookmark = BookmarkJSON.deserializeReaderBookmarkFromString(
       objectMapper = this.objectMapper,
-      kind = BookmarkKind.ReaderBookmarkExplicit,
+      kind = BookmarkKind.BookmarkExplicit,
       serialized = """
         {
           "opdsId" : "urn:isbn:9781683601111",
@@ -105,9 +106,9 @@ class BookmarkJSONTest {
     DateTimeZone.setDefault(DateTimeZone.getDefault())
 
     val text = this.resourceText("bookmark-20210317-r1-0.json")
-    val bookmark = BookmarkJSON.deserializeFromString(
+    val bookmark = BookmarkJSON.deserializeReaderBookmarkFromString(
       objectMapper = this.objectMapper,
-      kind = BookmarkKind.ReaderBookmarkExplicit,
+      kind = BookmarkKind.BookmarkExplicit,
       serialized = text
     )
 
@@ -115,7 +116,7 @@ class BookmarkJSONTest {
     assertEquals("urn:isbn:9781683607144", bookmark.opdsId)
     assertEquals("A title!", bookmark.chapterTitle)
     assertEquals("fc4f5d19-43a2-4181-99a0-7579e0a4935b", bookmark.deviceID)
-    assertEquals(BookmarkKind.ReaderBookmarkExplicit, bookmark.kind)
+    assertEquals(BookmarkKind.BookmarkExplicit, bookmark.kind)
 
     val location = bookmark.location as BookLocation.BookLocationR1
     assertEquals("/4/2[title-page]/2/2/1:0", location.contentCFI)
@@ -130,9 +131,9 @@ class BookmarkJSONTest {
     DateTimeZone.setDefault(DateTimeZone.getDefault())
 
     val text = this.resourceText("bookmark-20210317-r2-0.json")
-    val bookmark = BookmarkJSON.deserializeFromString(
+    val bookmark = BookmarkJSON.deserializeReaderBookmarkFromString(
       objectMapper = this.objectMapper,
-      kind = BookmarkKind.ReaderBookmarkExplicit,
+      kind = BookmarkKind.BookmarkExplicit,
       serialized = text
     )
 
@@ -140,7 +141,7 @@ class BookmarkJSONTest {
     assertEquals("urn:isbn:9781683607144", bookmark.opdsId)
     assertEquals("Another title", bookmark.chapterTitle)
     assertEquals("null", bookmark.deviceID)
-    assertEquals(BookmarkKind.ReaderBookmarkExplicit, bookmark.kind)
+    assertEquals(BookmarkKind.BookmarkExplicit, bookmark.kind)
 
     val location = bookmark.location as BookLocation.BookLocationR2
     assertEquals(0.25, location.progress.chapterProgress, 0.0)
@@ -154,9 +155,9 @@ class BookmarkJSONTest {
     DateTimeZone.setDefault(DateTimeZone.getDefault())
 
     val text = this.resourceText("bookmark-legacy-r1-0.json")
-    val bookmark = BookmarkJSON.deserializeFromString(
+    val bookmark = BookmarkJSON.deserializeReaderBookmarkFromString(
       objectMapper = this.objectMapper,
-      kind = BookmarkKind.ReaderBookmarkExplicit,
+      kind = BookmarkKind.BookmarkExplicit,
       serialized = text
     )
 
@@ -164,7 +165,7 @@ class BookmarkJSONTest {
     assertEquals("urn:isbn:9781683607144", bookmark.opdsId)
     assertEquals("Some title", bookmark.chapterTitle)
     assertEquals("70c47074-c048-48c0-8eae-286b9738c108", bookmark.deviceID)
-    assertEquals(BookmarkKind.ReaderBookmarkExplicit, bookmark.kind)
+    assertEquals(BookmarkKind.BookmarkExplicit, bookmark.kind)
 
     val location = bookmark.location as BookLocation.BookLocationR1
     assertEquals("/4/2[title-page]/2/2/1:0", location.contentCFI)
@@ -179,9 +180,9 @@ class BookmarkJSONTest {
     DateTimeZone.setDefault(DateTimeZone.getDefault())
 
     val text = this.resourceText("bookmark-legacy-r1-1.json")
-    val bookmark = BookmarkJSON.deserializeFromString(
+    val bookmark = BookmarkJSON.deserializeReaderBookmarkFromString(
       objectMapper = this.objectMapper,
-      kind = BookmarkKind.ReaderBookmarkExplicit,
+      kind = BookmarkKind.BookmarkExplicit,
       serialized = text
     )
 
@@ -189,7 +190,7 @@ class BookmarkJSONTest {
     assertEquals("urn:isbn:9781683606123", bookmark.opdsId)
     assertEquals("Unknown", bookmark.chapterTitle)
     assertEquals("null", bookmark.deviceID)
-    assertEquals(BookmarkKind.ReaderBookmarkExplicit, bookmark.kind)
+    assertEquals(BookmarkKind.BookmarkExplicit, bookmark.kind)
 
     val location = bookmark.location as BookLocation.BookLocationR1
     assertEquals("/4/2[cover-image]/2", location.contentCFI)
@@ -199,11 +200,11 @@ class BookmarkJSONTest {
     this.checkRoundTrip(bookmark)
   }
 
-  private fun checkRoundTrip(bookmark: Bookmark) {
+  private fun checkRoundTrip(bookmark: Bookmark.ReaderBookmark) {
     val serializedText =
-      BookmarkJSON.serializeToString(this.objectMapper, bookmark)
+      BookmarkJSON.serializeReaderBookmarkToString(this.objectMapper, bookmark)
     val serialized =
-      BookmarkJSON.deserializeFromString(
+      BookmarkJSON.deserializeReaderBookmarkFromString(
         objectMapper = this.objectMapper,
         kind = bookmark.kind,
         serialized = serializedText
@@ -218,9 +219,9 @@ class BookmarkJSONTest {
     val text = this.resourceText("bookmark-legacy-r2-0.json")
 
     val ex = assertThrows(JSONParseException::class.java) {
-      BookmarkJSON.deserializeFromString(
+      BookmarkJSON.deserializeReaderBookmarkFromString(
         objectMapper = this.objectMapper,
-        kind = BookmarkKind.ReaderBookmarkExplicit,
+        kind = BookmarkKind.BookmarkExplicit,
         serialized = text
       )
     }
@@ -239,7 +240,7 @@ class BookmarkJSONTest {
     val fileName =
       "/org/nypl/simplified/tests/bookmarks/$name"
     val url =
-      BookmarkAnnotationsJSONTest::class.java.getResource(fileName)
+      ReaderBookmarkAnnotationsJSONTest::class.java.getResource(fileName)
         ?: throw FileNotFoundException("No such resource: $fileName")
     return url.openStream()
   }
@@ -249,9 +250,9 @@ class BookmarkJSONTest {
     DateTimeZone.setDefault(DateTimeZone.UTC)
 
     val text = this.resourceText("bookmark-20210317-r1-0.json")
-    val bookmark = BookmarkJSON.deserializeFromString(
+    val bookmark = BookmarkJSON.deserializeReaderBookmarkFromString(
       objectMapper = this.objectMapper,
-      kind = BookmarkKind.ReaderBookmarkExplicit,
+      kind = BookmarkKind.BookmarkExplicit,
       serialized = text
     )
 
@@ -259,7 +260,7 @@ class BookmarkJSONTest {
     assertEquals("urn:isbn:9781683607144", bookmark.opdsId)
     assertEquals("A title!", bookmark.chapterTitle)
     assertEquals("fc4f5d19-43a2-4181-99a0-7579e0a4935b", bookmark.deviceID)
-    assertEquals(BookmarkKind.ReaderBookmarkExplicit, bookmark.kind)
+    assertEquals(BookmarkKind.BookmarkExplicit, bookmark.kind)
 
     val location = bookmark.location as BookLocation.BookLocationR1
     assertEquals("/4/2[title-page]/2/2/1:0", location.contentCFI)
@@ -274,9 +275,9 @@ class BookmarkJSONTest {
     DateTimeZone.setDefault(DateTimeZone.UTC)
 
     val text = this.resourceText("bookmark-20210317-r2-0.json")
-    val bookmark = BookmarkJSON.deserializeFromString(
+    val bookmark = BookmarkJSON.deserializeReaderBookmarkFromString(
       objectMapper = this.objectMapper,
-      kind = BookmarkKind.ReaderBookmarkExplicit,
+      kind = BookmarkKind.BookmarkExplicit,
       serialized = text
     )
 
@@ -284,7 +285,7 @@ class BookmarkJSONTest {
     assertEquals("urn:isbn:9781683607144", bookmark.opdsId)
     assertEquals("Another title", bookmark.chapterTitle)
     assertEquals("null", bookmark.deviceID)
-    assertEquals(BookmarkKind.ReaderBookmarkExplicit, bookmark.kind)
+    assertEquals(BookmarkKind.BookmarkExplicit, bookmark.kind)
 
     val location = bookmark.location as BookLocation.BookLocationR2
     assertEquals(0.25, location.progress.chapterProgress, 0.0)
@@ -298,9 +299,9 @@ class BookmarkJSONTest {
     DateTimeZone.setDefault(DateTimeZone.UTC)
 
     val text = this.resourceText("bookmark-legacy-r1-0.json")
-    val bookmark = BookmarkJSON.deserializeFromString(
+    val bookmark = BookmarkJSON.deserializeReaderBookmarkFromString(
       objectMapper = this.objectMapper,
-      kind = BookmarkKind.ReaderBookmarkExplicit,
+      kind = BookmarkKind.BookmarkExplicit,
       serialized = text
     )
 
@@ -308,7 +309,7 @@ class BookmarkJSONTest {
     assertEquals("urn:isbn:9781683607144", bookmark.opdsId)
     assertEquals("Some title", bookmark.chapterTitle)
     assertEquals("70c47074-c048-48c0-8eae-286b9738c108", bookmark.deviceID)
-    assertEquals(BookmarkKind.ReaderBookmarkExplicit, bookmark.kind)
+    assertEquals(BookmarkKind.BookmarkExplicit, bookmark.kind)
 
     val location = bookmark.location as BookLocation.BookLocationR1
     assertEquals("/4/2[title-page]/2/2/1:0", location.contentCFI)
@@ -323,9 +324,9 @@ class BookmarkJSONTest {
     DateTimeZone.setDefault(DateTimeZone.UTC)
 
     val text = this.resourceText("bookmark-legacy-r1-1.json")
-    val bookmark = BookmarkJSON.deserializeFromString(
+    val bookmark = BookmarkJSON.deserializeReaderBookmarkFromString(
       objectMapper = this.objectMapper,
-      kind = BookmarkKind.ReaderBookmarkExplicit,
+      kind = BookmarkKind.BookmarkExplicit,
       serialized = text
     )
 
@@ -333,7 +334,7 @@ class BookmarkJSONTest {
     assertEquals("urn:isbn:9781683606123", bookmark.opdsId)
     assertEquals("Unknown", bookmark.chapterTitle)
     assertEquals("null", bookmark.deviceID)
-    assertEquals(BookmarkKind.ReaderBookmarkExplicit, bookmark.kind)
+    assertEquals(BookmarkKind.BookmarkExplicit, bookmark.kind)
 
     val location = bookmark.location as BookLocation.BookLocationR1
     assertEquals("/4/2[cover-image]/2", location.contentCFI)

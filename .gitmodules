@@ -5,8 +5,8 @@
 
 [submodule "simplified-tests/src/test/resources/org/nypl/simplified/tests/bookmark_annotations/spec"]
 	path = simplified-tests/src/test/resources/org/nypl/simplified/tests/bookmark_annotations/spec
-	url = https://github.com/NYPL-Simplified/Simplified-Bookmarks-Spec
-    branch = master
+	url = https://github.com/ThePalaceProject/mobile-specs
+    branch = main
 
 [submodule "org.thepalaceproject.android.platform"]
 	path = org.thepalaceproject.android.platform

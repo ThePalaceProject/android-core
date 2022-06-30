@@ -62,7 +62,7 @@ import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.reader.api.ReaderColorScheme
 import org.nypl.simplified.reader.api.ReaderFontSelection
 import org.nypl.simplified.reader.api.ReaderPreferences
-import org.nypl.simplified.reader.bookmarks.api.ReaderBookmarkEvent
+import org.nypl.simplified.bookmarks.api.BookmarkEvent
 import org.nypl.simplified.tests.EventAssertions
 import org.nypl.simplified.tests.MutableServiceDirectory
 import org.nypl.simplified.tests.books.BookFormatsTesting
@@ -107,7 +107,7 @@ abstract class ProfilesControllerContract {
   private lateinit var patronUserProfileParsers: PatronUserProfileParsersType
   private lateinit var profileEvents: PublishSubject<ProfileEvent>
   private lateinit var profileEventsReceived: MutableList<ProfileEvent>
-  private lateinit var readerBookmarkEvents: PublishSubject<ReaderBookmarkEvent>
+  private lateinit var readerBookmarkEvents: PublishSubject<BookmarkEvent>
 
   protected abstract val logger: Logger
 

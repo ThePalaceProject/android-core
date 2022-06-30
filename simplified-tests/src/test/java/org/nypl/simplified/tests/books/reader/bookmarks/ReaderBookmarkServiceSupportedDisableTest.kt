@@ -22,14 +22,14 @@ import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountProvider
 import org.nypl.simplified.accounts.api.AccountUsername
 import org.nypl.simplified.books.api.BookID
-import org.nypl.simplified.books.reader.bookmarks.ReaderBookmarkService
-import org.nypl.simplified.books.reader.bookmarks.internal.RBHTTPCalls
+import org.nypl.simplified.bookmarks.BookmarkService
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
-import org.nypl.simplified.reader.bookmarks.api.ReaderBookmarkEvent
-import org.nypl.simplified.reader.bookmarks.api.ReaderBookmarkHTTPCallsType
-import org.nypl.simplified.reader.bookmarks.api.ReaderBookmarkServiceProviderType
-import org.nypl.simplified.reader.bookmarks.api.ReaderBookmarkServiceType
-import org.nypl.simplified.reader.bookmarks.api.ReaderBookmarkSyncEnableResult.SYNC_DISABLED
+import org.nypl.simplified.bookmarks.api.BookmarkEvent
+import org.nypl.simplified.bookmarks.api.BookmarkHTTPCallsType
+import org.nypl.simplified.bookmarks.api.BookmarkServiceProviderType
+import org.nypl.simplified.bookmarks.api.BookmarkServiceType
+import org.nypl.simplified.bookmarks.api.BookmarkSyncEnableResult.SYNC_DISABLED
+import org.nypl.simplified.bookmarks.internal.BHTTPCalls
 import org.nypl.simplified.tests.EventLogging
 import org.nypl.simplified.tests.mocking.MockProfilesController
 import org.slf4j.Logger
@@ -49,12 +49,12 @@ class ReaderBookmarkServiceSupportedDisableTest {
 
   private fun bookmarkService(
     threads: (Runnable) -> Thread,
-    events: Subject<ReaderBookmarkEvent>,
-    httpCalls: ReaderBookmarkHTTPCallsType,
+    events: Subject<BookmarkEvent>,
+    httpCalls: BookmarkHTTPCallsType,
     profilesController: ProfilesControllerType
-  ): ReaderBookmarkServiceType {
-    return ReaderBookmarkService.createService(
-      ReaderBookmarkServiceProviderType.Requirements(
+  ): BookmarkServiceType {
+    return BookmarkService.createService(
+      BookmarkServiceProviderType.Requirements(
         threads = threads,
         events = events,
         httpCalls = httpCalls,
@@ -64,7 +64,7 @@ class ReaderBookmarkServiceSupportedDisableTest {
   }
 
   private val objectMapper = ObjectMapper()
-  private var readerBookmarkService: ReaderBookmarkServiceType? = null
+  private var readerBookmarkService: BookmarkServiceType? = null
   private lateinit var server: MockWebServer
   private lateinit var http: LSHTTPClientType
   private lateinit var annotationsURI: URI
@@ -179,9 +179,9 @@ class ReaderBookmarkServiceSupportedDisableTest {
   @Timeout(value = 10L, unit = TimeUnit.SECONDS)
   fun testEnableBookmarkSyncingSupportedDisable() {
     val httpCalls =
-      RBHTTPCalls(this.objectMapper, this.http)
+      BHTTPCalls(this.objectMapper, this.http)
     val bookmarkEvents =
-      EventLogging.create<ReaderBookmarkEvent>(this.logger, 3)
+      EventLogging.create<BookmarkEvent>(this.logger, 3)
     val profiles =
       MockProfilesController(1, 1)
 
@@ -259,7 +259,7 @@ class ReaderBookmarkServiceSupportedDisableTest {
  */
 
   private fun waitForServiceQuiescence(
-    service: ReaderBookmarkServiceType,
+    service: BookmarkServiceType,
     profiles: MockProfilesController
   ) {
 

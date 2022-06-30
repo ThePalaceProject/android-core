@@ -2369,9 +2369,10 @@ class BookRevokeTaskTest {
       BookFormat.BookFormatAudioBook(
         file = null,
         manifest = null,
-        position = null,
+        lastReadLocation = null,
         contentType = BookFormats.audioBookGenericMimeTypes().first(),
-        drmInformation = BookDRMInformation.None
+        drmInformation = BookDRMInformation.None,
+        bookmarks = listOf()
       )
 
     val acquisition =
