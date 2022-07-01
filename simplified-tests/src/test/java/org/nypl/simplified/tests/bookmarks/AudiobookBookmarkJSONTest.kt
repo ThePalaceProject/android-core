@@ -36,10 +36,10 @@ class AudiobookBookmarkJSONTest {
         {
           "opdsId" : "urn:isbn:9781683609438",
           "location" : {
-            "number" : 1,
+            "chapter" : 1,
             "part" : 2,
             "title" : "Is That You, Walt Whitman?",
-            "playheadOffset" : 100
+            "time" : 100
           },
           "time" : "2022-06-27T14:51:46.238",
           "chapterTitle" : "Is That You, Walt Whitman?"

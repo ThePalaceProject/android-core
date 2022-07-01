@@ -3,8 +3,6 @@ package org.nypl.simplified.tests.bookmark_annotations
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertThrows
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotation
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotationBodyNode
@@ -15,7 +13,6 @@ import org.nypl.simplified.bookmarks.api.BookmarkAnnotations
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotationsJSON
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotationTargetNode
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
-import org.nypl.simplified.json.core.JSONParseException
 import org.slf4j.LoggerFactory
 import java.io.FileNotFoundException
 import java.io.InputStream
@@ -26,13 +23,15 @@ class AudiobookBookmarkAnnotationsJSONTest {
     LoggerFactory.getLogger(AudiobookBookmarkAnnotationsJSONTest::class.java)
 
   private val objectMapper: ObjectMapper = ObjectMapper()
-
   private val targetValue0 =
-    "{\n \"title\": \"Chapter title\",\n \"number\": 1,\n  \"part\": 1,\n  \"playheadOffset\":123\n}\n"
+    "{\n \"title\": \"Chapter title\",\n \"chapter\": 1,\n  \"part\": 1,\n  \"time\":123,\n" +
+      "\"duration\": \"190\",\n \"audiobookID\": \"urn:uuid:b309844e-7d4e-403e-945b-fbc78acd5e03\"\n}\n"
   private val targetValue1 =
-    "{\n \"title\": \"Chapter title 2\",\n  \"number\": 2,\n  \"part\": 1,\n  \"playheadOffset\":111\n}\n"
+    "{\n \"title\": \"Chapter title 2\",\n  \"chapter\": 2,\n  \"part\": 1,\n  \"time\":111,\n" +
+      "\"duration\": \"190\",\n \"audiobookID\": \"urn:uuid:b309844e-7d4e-403e-945b-fbc78acd5e03\"\n}\n"
   private val targetValue2 =
-    "{\n \"title\": \"Chapter title 3\",\n  \"number\": 3,\n  \"part\": 1,\n  \"playheadOffset\":100\n}\n"
+    "{\n \"title\": \"Chapter title 3\",\n  \"chapter\": 3,\n  \"part\": 1,\n  \"time\":100\n,\n" +
+      "\"duration\": \"190\",\n \"audiobookID\": \"urn:uuid:b309844e-7d4e-403e-945b-fbc78acd5e03\"\n}\n"
 
   private val bookmarkBody0 =
     BookmarkAnnotationBodyNode(
@@ -282,22 +281,11 @@ class AudiobookBookmarkAnnotationsJSONTest {
 
     val location = bookmark.location
     assertEquals("Chapter title", location.title)
-    assertEquals(1, location.chapter)
-    assertEquals(1, location.part)
-    assertEquals(123, location.offsetMilliseconds)
+    assertEquals(32, location.chapter)
+    assertEquals(3, location.part)
+    assertEquals(78000000, location.offsetMilliseconds)
 
     this.checkRoundTrip(annotation)
-  }
-
-  @Test
-  fun testSpecInvalidBookmark() {
-    val ex = assertThrows(JSONParseException::class.java) {
-      BookmarkAnnotationsJSON.deserializeBookmarkAnnotationFromJSON(
-        objectMapper = this.objectMapper,
-        node = this.resourceNode("invalid-bookmark-7.json")
-      )
-    }
-    assertTrue(ex.message!!.contains("Expected: A key 'http://librarysimplified.org/terms/time'"))
   }
 
   private fun resourceText(
@@ -380,7 +368,7 @@ class AudiobookBookmarkAnnotationsJSONTest {
     name: String
   ): InputStream {
     val fileName =
-      "/org/nypl/simplified/tests/bookmark_annotations/spec/$name"
+      "/org/nypl/simplified/tests/bookmark_annotations/spec/bookmarks/$name"
     val url =
       AudiobookBookmarkAnnotationsJSONTest::class.java.getResource(fileName)
         ?: throw FileNotFoundException("No such resource: $fileName")

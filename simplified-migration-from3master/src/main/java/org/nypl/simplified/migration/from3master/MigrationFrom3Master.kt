@@ -420,7 +420,8 @@ class MigrationFrom3Master(
           uri = null,
           time = DateTime.now(),
           deviceID = "",
-          location = book.audioBookPosition
+          location = book.audioBookPosition,
+          duration = 0L
         )
       )
     }

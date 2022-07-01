@@ -522,7 +522,7 @@ class ReaderBookmarkAnnotationsJSONTest {
     name: String
   ): InputStream {
     val fileName =
-      "/org/nypl/simplified/tests/bookmark_annotations/spec/$name"
+      "/org/nypl/simplified/tests/bookmark_annotations/spec/bookmarks/$name"
     val url =
       ReaderBookmarkAnnotationsJSONTest::class.java.getResource(fileName)
         ?: throw FileNotFoundException("No such resource: $fileName")

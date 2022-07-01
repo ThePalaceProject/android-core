@@ -585,7 +585,6 @@ class AudioBookPlayerActivity :
         location = position ?: this.book.spine.first().position,
         playAutomatically = false
       )
-
     } catch (e: Exception) {
       this.log.error("unable to load saved player position: ", e)
     }
