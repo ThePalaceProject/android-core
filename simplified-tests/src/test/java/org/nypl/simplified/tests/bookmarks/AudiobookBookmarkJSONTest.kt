@@ -39,7 +39,7 @@ class AudiobookBookmarkJSONTest {
             "chapter" : 1,
             "part" : 2,
             "title" : "Is That You, Walt Whitman?",
-            "time" : 100
+            "time" : 100000
           },
           "time" : "2022-06-27T14:51:46.238",
           "chapterTitle" : "Is That You, Walt Whitman?",

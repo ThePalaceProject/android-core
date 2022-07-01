@@ -283,7 +283,7 @@ class AudiobookBookmarkAnnotationsJSONTest {
     assertEquals("Chapter title", location.title)
     assertEquals(32, location.chapter)
     assertEquals(3, location.part)
-    assertEquals(78000000, location.offsetMilliseconds)
+    assertEquals(78000, location.offsetMilliseconds)
 
     this.checkRoundTrip(annotation)
   }

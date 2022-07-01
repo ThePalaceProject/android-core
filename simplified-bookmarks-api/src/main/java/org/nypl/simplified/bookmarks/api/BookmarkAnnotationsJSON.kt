@@ -349,15 +349,12 @@ object BookmarkAnnotationsJSON {
     bookmark: Bookmark.AudiobookBookmark
   ): ObjectNode {
 
-    val locationSeconds = bookmark.location.offsetMilliseconds.toDouble() / 1000.0
-    val durationSeconds = bookmark.duration.toDouble() / 1000.0
-
     val objectNode = objectMapper.createObjectNode()
     objectNode.put("@type", "LocatorAudioBookTime")
     objectNode.put("audiobookID", bookmark.opdsId)
-    objectNode.put("duration", durationSeconds)
+    objectNode.put("duration", bookmark.duration)
     objectNode.put("chapter", bookmark.location.chapter)
-    objectNode.put("time", locationSeconds)
+    objectNode.put("time", bookmark.location.offsetMilliseconds)
     objectNode.put("part", bookmark.location.part)
     objectNode.put("title", bookmark.location.title.orEmpty())
 
@@ -376,7 +373,7 @@ object BookmarkAnnotationsJSON {
 
     return PlayerPosition(
       chapter = JSONParserUtilities.getIntegerDefault(obj, "chapter", 0),
-      offsetMilliseconds = (JSONParserUtilities.getDouble(obj, "time") * 1000.0).toLong(),
+      offsetMilliseconds = JSONParserUtilities.getInteger(obj, "time").toLong(),
       part = JSONParserUtilities.getIntegerDefault(obj, "part", 0),
       title = JSONParserUtilities.getStringOrNull(obj, "title")
     )
@@ -392,7 +389,7 @@ object BookmarkAnnotationsJSON {
     val obj =
       JSONParserUtilities.checkObject(null, node)
 
-    return (JSONParserUtilities.getDouble(obj, "duration") * 1000.0).toLong()
+    return JSONParserUtilities.getInteger(obj, "duration").toLong()
   }
 
   @Throws(JSONParseException::class)

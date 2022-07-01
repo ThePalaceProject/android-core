@@ -34,8 +34,8 @@ object AudiobookLocationJSON {
       title = JSONParserUtilities.getStringOrNull(obj, "title"),
       part = JSONParserUtilities.getIntegerDefault(obj, "part", 0),
       chapter = JSONParserUtilities.getIntegerDefault(obj, "chapter", 0),
-      offsetMilliseconds =
-        (JSONParserUtilities.getDoubleDefault(obj, "time", 0.0) * 1000.0).toLong()
+      offsetMilliseconds = JSONParserUtilities.getIntegerDefault(obj, "time", 0)
+        .toLong()
     )
   }
 
@@ -51,12 +51,9 @@ object AudiobookLocationJSON {
     objectMapper: ObjectMapper,
     position: PlayerPosition
   ): ObjectNode {
-
-    val locationSeconds = position.offsetMilliseconds.toDouble() / 1000.0
-
     val root = objectMapper.createObjectNode()
     root.put("chapter", position.chapter)
-    root.put("time", locationSeconds)
+    root.put("time", position.offsetMilliseconds)
     root.put("part", position.part)
     root.put("title", position.title)
     return root

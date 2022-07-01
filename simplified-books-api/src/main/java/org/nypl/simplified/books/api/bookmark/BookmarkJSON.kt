@@ -128,13 +128,8 @@ object BookmarkJSON {
     val location =
       AudiobookLocationJSON.deserializeFromJSON(locationJSON)
 
-    val duration = (
-      JSONParserUtilities.getDoubleDefault(
-        locationJSON,
-        "duration",
-        0.0
-      ) * 1000.0
-      ).toLong()
+    val duration =
+      JSONParserUtilities.getIntegerDefault(locationJSON, "duration", 0).toLong()
     val timeParsed = parseTime(JSONParserUtilities.getString(node, "time"))
 
     return Bookmark.AudiobookBookmark.create(
