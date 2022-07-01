@@ -1,4 +1,4 @@
-package org.nypl.simplified.tests.books.reader.bookmarks
+package org.nypl.simplified.tests.books.bookmarks
 
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse

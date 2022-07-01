@@ -1,4 +1,4 @@
-package org.nypl.simplified.tests.books.reader.bookmarks
+package org.nypl.simplified.tests.books.bookmarks
 
 import io.reactivex.subjects.Subject
 import org.nypl.simplified.bookmarks.BookmarkService
@@ -10,9 +10,9 @@ import org.nypl.simplified.bookmarks.api.BookmarkServiceType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class ReaderBookmarkServiceTest : ReaderBookmarkServiceContract() {
+class BookmarkServiceTest : BookmarkServiceContract() {
 
-  override val logger: Logger = LoggerFactory.getLogger(ReaderBookmarkServiceTest::class.java)
+  override val logger: Logger = LoggerFactory.getLogger(BookmarkServiceTest::class.java)
 
   override fun bookmarkService(
     threads: (Runnable) -> Thread,

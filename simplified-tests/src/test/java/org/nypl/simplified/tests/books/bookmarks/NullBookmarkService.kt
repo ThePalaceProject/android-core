@@ -1,4 +1,4 @@
-package org.nypl.simplified.tests.books.reader.bookmarks
+package org.nypl.simplified.tests.books.bookmarks
 
 import com.google.common.util.concurrent.FluentFuture
 import com.google.common.util.concurrent.Futures
@@ -13,7 +13,7 @@ import org.nypl.simplified.bookmarks.api.BookmarkSyncEnableResult
 import org.nypl.simplified.bookmarks.api.BookmarkSyncEnableStatus
 import org.nypl.simplified.bookmarks.api.Bookmarks
 
-class NullReaderBookmarkService(
+class NullBookmarkService(
   val events: Observable<BookmarkEvent>
 ) : BookmarkServiceType {
 
@@ -69,7 +69,7 @@ class NullReaderBookmarkService(
     override fun createService(
       requirements: BookmarkServiceProviderType.Requirements
     ): BookmarkServiceType {
-      return NullReaderBookmarkService(requirements.events)
+      return NullBookmarkService(requirements.events)
     }
   }
 }

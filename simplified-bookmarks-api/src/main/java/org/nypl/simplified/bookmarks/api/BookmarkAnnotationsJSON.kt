@@ -32,13 +32,20 @@ object BookmarkAnnotationsJSON {
      */
 
     try {
-      deserializeAudiobookLocation(objectMapper, value)
-    } catch (exception: JSONParseException) {
-      try {
+      val selectorNode =
+        objectMapper.readTree(value)
+      val selectorObj =
+        JSONParserUtilities.checkObject(null, selectorNode)
+      val selectorType =
+        JSONParserUtilities.getStringOrNull(selectorObj, "@type")
+
+      if (selectorType == "LocatorAudioBookTime") {
+        deserializeAudiobookLocation(objectMapper, value)
+      } else {
         deserializeReaderLocation(objectMapper, value)
-      } catch (e: Exception) {
-        throw JSONParseException(e)
       }
+    } catch (e: Exception) {
+      throw JSONParseException(e)
     }
 
     when (type) {

@@ -3,9 +3,7 @@ package org.nypl.simplified.tests.bookmark_annotations
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import org.joda.time.DateTimeUtils
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertThrows
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotation
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotationBodyNode
@@ -41,7 +39,7 @@ class ReaderBookmarkAnnotationsJSONTest {
       timestamp = "2019-01-25T20:00:37+0000",
       device = "cca80416-3168-4e58-b621-7964b9265ac9",
       chapterTitle = "A Title",
-      bookProgress = 50.0f
+      bookProgress = null
     )
 
   private val bookmarkBody1 =
@@ -65,7 +63,7 @@ class ReaderBookmarkAnnotationsJSONTest {
       timestamp = "2019-01-25T20:00:37Z",
       device = "cca80416-3168-4e58-b621-7964b9265ac9",
       chapterTitle = "A Title",
-      bookProgress = 50.0f
+      bookProgress = null
     )
 
   private val bookmark0 =
@@ -160,15 +158,10 @@ class ReaderBookmarkAnnotationsJSONTest {
       "cca80416-3168-4e58-b621-7964b9265ac9",
       node["http://librarysimplified.org/terms/device"].textValue()
     )
-    assertEquals(
-      null,
-      node["http://librarysimplified.org/terms/progressWithinChapter"]
-    )
-    assertEquals(
-      50.0,
-      node["http://librarysimplified.org/terms/progressWithinBook"].doubleValue(),
-      0.0
-    )
+
+    assertNull(node["http://librarysimplified.org/terms/progressWithinChapter"])
+    assertNull(node["http://librarysimplified.org/terms/progressWithinBook"])
+
     assertEquals(
       "A Title",
       node["http://librarysimplified.org/terms/chapter"].textValue()

@@ -1,4 +1,4 @@
-package org.nypl.simplified.tests.books.reader.bookmarks
+package org.nypl.simplified.tests.books.bookmarks
 
 import android.content.Context
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -25,7 +25,7 @@ import java.io.IOException
 import java.net.URI
 import java.util.concurrent.TimeUnit
 
-class RBHTTPCallsTest {
+class BHTTPCallsTest {
 
   private lateinit var http: LSHTTPClientType
   private lateinit var server: MockWebServer

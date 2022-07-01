@@ -1,4 +1,4 @@
-package org.nypl.simplified.tests.books.reader.bookmarks
+package org.nypl.simplified.tests.books.bookmarks
 
 import android.content.Context
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -54,7 +54,7 @@ import java.net.URI
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-abstract class ReaderBookmarkServiceContract {
+abstract class BookmarkServiceContract {
 
   val fakeAccountID =
     AccountID(UUID.fromString("46d17029-14ba-4e34-bcaa-def02713575a"))
