@@ -201,13 +201,17 @@ object ProfileDescriptionJSON {
         ?.let { AccountID(UUID.fromString(it)) }
         ?: mostRecentAccountFallback
 
+    val enablePDFJSReader =
+      JSONParserUtilities.getBooleanDefault(objectNode, "enablePDFJSReader", false)
+
     return ProfilePreferences(
       dateOfBirth = dateOfBirth,
       showTestingLibraries = showTestingLibraries,
       readerPreferences = readerPreferences,
       mostRecentAccount = mostRecentAccount,
       hasSeenLibrarySelectionScreen = hasSeenLibrarySelectionScreen,
-      showDebugSettings = showDebugSettings
+      showDebugSettings = showDebugSettings,
+      enablePDFJSReader = enablePDFJSReader
     )
   }
 
@@ -401,6 +405,7 @@ object ProfileDescriptionJSON {
     output.put("hasSeenLibrarySelectionScreen", preferences.hasSeenLibrarySelectionScreen)
     output.put("showDebugSettings", preferences.showDebugSettings)
     output.put("mostRecentAccount", preferences.mostRecentAccount.uuid.toString())
+    output.put("enablePDFJSReader", preferences.enablePDFJSReader)
 
     output.set<ObjectNode>(
       "readerPreferences",

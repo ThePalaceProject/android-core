@@ -39,5 +39,9 @@ data class ProfilePreferences(
 
   /** @return `true` if the debug settings should be visible. */
 
-  val showDebugSettings: Boolean = false
+  val showDebugSettings: Boolean = false,
+
+  /** @return `true` if the pdf.js-based PDF reader should be used. */
+
+  val enablePDFJSReader: Boolean = false
 )

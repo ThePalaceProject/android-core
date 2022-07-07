@@ -167,6 +167,15 @@
       android:text="@string/settingsDevEnableHiddenLibraries" />
 
     <androidx.appcompat.widget.SwitchCompat
+      android:id="@+id/settingsVersionDevEnablePDFJSReaderSwitch"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginBottom="16dp"
+      android:checked="false"
+      android:enabled="true"
+      android:text="@string/settingsDevEnablePDFJSReader" />
+
+    <androidx.appcompat.widget.SwitchCompat
       android:id="@+id/settingsVersionDevFailNextBootSwitch"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
