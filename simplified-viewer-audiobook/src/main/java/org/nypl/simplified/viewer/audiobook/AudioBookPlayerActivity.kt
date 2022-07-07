@@ -25,6 +25,7 @@ import org.librarysimplified.audiobook.api.PlayerEvent.PlayerEventWithSpineEleme
 import org.librarysimplified.audiobook.api.PlayerEvent.PlayerEventWithSpineElement.PlayerEventPlaybackProgressUpdate
 import org.librarysimplified.audiobook.api.PlayerEvent.PlayerEventWithSpineElement.PlayerEventPlaybackStarted
 import org.librarysimplified.audiobook.api.PlayerEvent.PlayerEventWithSpineElement.PlayerEventPlaybackStopped
+import org.librarysimplified.audiobook.api.PlayerEvent.PlayerEventWithSpineElement.PlayerEventPlaybackWaitingForAction
 import org.librarysimplified.audiobook.api.PlayerPosition
 import org.librarysimplified.audiobook.api.PlayerResult
 import org.librarysimplified.audiobook.api.PlayerSleepTimer
@@ -536,7 +537,7 @@ class AudioBookPlayerActivity :
     try {
       val position = this.formatHandle.format.position
       if (position != null) {
-        this.player.movePlayheadToLocation(position)
+        this.player.movePlayheadToLocation(position, false)
         restored = true
       }
     } catch (e: Exception) {
@@ -548,7 +549,7 @@ class AudioBookPlayerActivity :
      */
 
     if (!restored) {
-      this.player.movePlayheadToLocation(this.book.spine[0].position)
+      this.player.movePlayheadToLocation(this.book.spine[0].position, false)
     }
   }
 
@@ -572,7 +573,8 @@ class AudioBookPlayerActivity :
       is PlayerEventPlaybackBuffering,
       is PlayerEventPlaybackProgressUpdate,
       is PlayerEventPlaybackPaused,
-      is PlayerEventPlaybackStopped -> {
+      is PlayerEventPlaybackStopped,
+      is PlayerEventPlaybackWaitingForAction -> {
       }
 
       is PlayerEventChapterCompleted ->
