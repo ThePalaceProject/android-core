@@ -96,7 +96,7 @@ class PdfReaderActivity : AppCompatActivity() {
         it.start()
 
         this.webView.loadUrl(
-          "http://localhost:${it.port}/assets/viewer.html?file=%2Fbook.pdf#page=${this.documentPageIndex}"
+          "http://localhost:${it.port}/assets/pdf-viewer/viewer.html?file=%2Fbook.pdf#page=${this.documentPageIndex}"
         )
       }
     }

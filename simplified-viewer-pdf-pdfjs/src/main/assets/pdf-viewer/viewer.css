@@ -1,0 +1,139 @@
+:root {
+  --sidebar-width: 300px;
+}
+
+body.palace, .palace input, .palace button, .palace select {
+  font-family: Open Sans;
+}
+
+#sidebarContainer {
+  top: 0;
+  bottom: 5px;
+}
+
+#toolbarSidebar {
+  height: 52px;
+}
+
+#sidebarContent {
+  top: 53px;
+}
+
+#viewerContainer {
+  top: 0;
+  right: 0;
+  bottom: 52px;
+  left: 0;
+}
+
+#toolbarContainer {
+  height: 52px;
+}
+
+#loadingBar {
+  height: 0;
+}
+
+.toolbar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.toolbarButton {
+  width: 48px;
+  height: 48px;
+}
+
+.toolbarField {
+  margin: 2px 0 0 0;
+  font-size: 14px;
+  line-height: 39px;
+}
+
+.toolbarField:focus {
+  border-color: var(--main-color);
+}
+
+.toolbarLabel {
+  margin: 2px 2px 0 2px;
+  padding: 5px 7px;
+  font-size: 14px;
+  line-height: 39px;
+}
+
+.splitToolbarButtonSeparator {
+  margin: 12px 0;
+  height: 26px;
+}
+
+.verticalToolbarSeparator {
+  margin: 12px 2px;
+  height: 26px;
+}
+
+#pageNumber {
+  width: 50px;
+}
+
+.findbar, .secondaryToolbar {
+  top: 0;
+}
+
+.doorHanger:after, .doorHanger:before, .doorHangerRight:after, .doorHangerRight:before {
+  border: none;
+}
+
+#secondaryToolbarButtonContainer {
+  max-width: 300px;
+}
+
+.secondaryToolbarButton {
+  padding: 12px 0 13px;
+}
+
+.secondaryToolbarButton::before {
+  top: 11px;
+}
+
+.toolbarButton, .dropdownToolbarButton, .secondaryToolbarButton, .dialogButton {
+  font-size: 18px;
+  line-height: 20px;
+}
+
+.toolbarButton::before {
+  top: 15px;
+  left: 15px;
+}
+
+.toolbarButton::before, .secondaryToolbarButton::before, .dropdownToolbarButton::after, .treeItemToggler::before {
+  width: 20px;
+  height: 20px;
+}
+
+.treeItemToggler::before {
+  top: 7px;
+}
+
+[dir="ltr"] .treeItemToggler::before {
+  right: 2px;
+}
+
+[dir="rtl"] .treeItemToggler::before {
+  left: 2px;
+}
+
+[dir="ltr"] .secondaryToolbarButton {
+  padding-left: 42px;
+}
+
+[dir="rtl"] .secondaryToolbarButton {
+  padding-right: 42px;
+}
+
+.treeItem > a {
+  font-size: 18px;
+  line-height: 22px;
+  padding: 8px 0 11px;
+}
