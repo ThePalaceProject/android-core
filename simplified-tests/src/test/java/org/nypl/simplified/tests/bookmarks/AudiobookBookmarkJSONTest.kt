@@ -34,6 +34,7 @@ class AudiobookBookmarkJSONTest {
       kind = BookmarkKind.BookmarkLastReadLocation,
       serialized = """
         {
+          @version: 2,
           "opdsId" : "urn:isbn:9781683609438",
           "location" : {
             "chapter" : 1,
