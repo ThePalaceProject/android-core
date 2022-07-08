@@ -42,7 +42,7 @@ class ReaderBookmarkAnnotationsJSONTest {
       timestamp = "2019-01-25T20:00:37+0000",
       device = "cca80416-3168-4e58-b621-7964b9265ac9",
       chapterTitle = "A Title",
-      bookProgress = null
+      bookProgress = 50.0f
     )
 
   private val bookmarkBody1 =
@@ -163,7 +163,12 @@ class ReaderBookmarkAnnotationsJSONTest {
     )
 
     assertNull(node["http://librarysimplified.org/terms/progressWithinChapter"])
-    assertNull(node["http://librarysimplified.org/terms/progressWithinBook"])
+
+    assertEquals(
+      50.0,
+      node["http://librarysimplified.org/terms/progressWithinBook"].doubleValue(),
+      0.0
+    )
 
     assertEquals(
       "A Title",

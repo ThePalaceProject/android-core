@@ -54,7 +54,7 @@ class AudiobookBookmarkJSONTest {
     assertEquals("Is That You, Walt Whitman?", bookmark.location.title)
 
     val serializedText =
-      BookmarkJSON.serializeAudiobookBookmarkToString(this.objectMapper, bookmark)
+      BookmarkJSON.serializeAudiobookBookmarkToString(bookmark)
     val serialized =
       BookmarkJSON.deserializeAudiobookBookmarkFromString(
         objectMapper = this.objectMapper,

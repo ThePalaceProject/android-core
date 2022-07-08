@@ -36,17 +36,21 @@ internal class BServiceOpLoadBookmarks(
         val bookmarks: List<Bookmark>
         val lastReadLocation: Bookmark?
 
-        if (handle.format is BookFormat.BookFormatEPUB) {
-          val format = handle.format as BookFormat.BookFormatEPUB
-          bookmarks = format.bookmarks
-          lastReadLocation = format.lastReadLocation
-        } else if (handle.format is BookFormat.BookFormatAudioBook) {
-          val format = handle.format as BookFormat.BookFormatAudioBook
-          bookmarks = format.bookmarks
-          lastReadLocation = format.lastReadLocation
-        } else {
-          bookmarks = emptyList()
-          lastReadLocation = null
+        when (handle.format) {
+          is BookFormat.BookFormatEPUB -> {
+            val format = handle.format as BookFormat.BookFormatEPUB
+            bookmarks = format.bookmarks
+            lastReadLocation = format.lastReadLocation
+          }
+          is BookFormat.BookFormatAudioBook -> {
+            val format = handle.format as BookFormat.BookFormatAudioBook
+            bookmarks = format.bookmarks
+            lastReadLocation = format.lastReadLocation
+          }
+          else -> {
+            bookmarks = emptyList()
+            lastReadLocation = null
+          }
         }
 
         this.logger.debug(

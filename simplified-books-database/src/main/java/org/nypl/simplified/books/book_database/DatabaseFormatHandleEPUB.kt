@@ -14,6 +14,7 @@ import org.nypl.simplified.books.book_database.api.BookDRMInformationHandle
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleEPUB
 import org.nypl.simplified.files.DirectoryUtilities
 import org.nypl.simplified.files.FileUtilities
+import org.nypl.simplified.json.core.JSONParseException
 import org.nypl.simplified.json.core.JSONParserUtilities
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -232,12 +233,22 @@ internal class DatabaseFormatHandleEPUB internal constructor(
     ): List<Bookmark.ReaderBookmark> {
       val tree = objectMapper.readTree(fileBookmarks)
       val array = JSONParserUtilities.checkArray(null, tree)
-      return array.map { node ->
-        BookmarkJSON.deserializeReaderBookmarkFromJSON(
-          kind = BookmarkKind.BookmarkExplicit,
-          node = node
-        )
+
+      val bookmarks = arrayListOf<Bookmark.ReaderBookmark>()
+
+      array.forEach { node ->
+        try {
+          val bookmark = BookmarkJSON.deserializeReaderBookmarkFromJSON(
+            kind = BookmarkKind.BookmarkExplicit,
+            node = node
+          )
+          bookmarks.add(bookmark)
+        } catch (exception: JSONParseException) {
+          this.logger.debug("There was an error parsing the reader bookmark from bookmarks file")
+        }
       }
+
+      return bookmarks
     }
 
     @Throws(IOException::class)

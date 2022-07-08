@@ -9,9 +9,11 @@ import com.io7m.jfunctional.Some
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.format.ISODateTimeFormat
+import org.librarysimplified.audiobook.api.PlayerPosition
+import org.librarysimplified.audiobook.api.PlayerPositions
+import org.librarysimplified.audiobook.api.PlayerResult
 import org.nypl.simplified.books.api.BookLocation
 import org.nypl.simplified.books.api.helper.ReaderLocationJSON
-import org.nypl.simplified.books.api.helper.AudiobookLocationJSON
 import org.nypl.simplified.json.core.JSONParseException
 import org.nypl.simplified.json.core.JSONParserUtilities
 import org.nypl.simplified.json.core.JSONSerializerUtilities
@@ -124,22 +126,24 @@ object BookmarkJSON {
     kind: BookmarkKind,
     node: ObjectNode
   ): Bookmark.AudiobookBookmark {
-    val locationJSON = JSONParserUtilities.getObjectOrNull(node, "location")
-    val location =
-      AudiobookLocationJSON.deserializeFromJSON(locationJSON)
+    val locationResult = PlayerPositions.parseFromObjectNode(node)
+    val location: PlayerPosition
 
-    val duration =
-      JSONParserUtilities.getIntegerDefault(locationJSON, "duration", 0).toLong()
-    val timeParsed = parseTime(JSONParserUtilities.getString(node, "time"))
+    when (locationResult) {
+      is PlayerResult.Success -> {
+        location = locationResult.result
+      }
+      is PlayerResult.Failure -> throw locationResult.failure
+    }
 
     return Bookmark.AudiobookBookmark.create(
-      opdsId = JSONParserUtilities.getString(node, "opdsId"),
+      opdsId = JSONParserUtilities.getStringDefault(node, "opdsId", ""),
       kind = kind,
       location = location,
-      duration = duration,
-      time = timeParsed,
+      duration = 0L,
+      time = DateTime.now(),
       uri = toNullable(JSONParserUtilities.getURIOptional(node, "uri")),
-      deviceID = JSONParserUtilities.getStringDefault(node, "deviceID", null)
+      deviceID = JSONParserUtilities.getStringDefault(node, "deviceID", "")
     )
   }
 
@@ -354,23 +358,17 @@ object BookmarkJSON {
   /**
    * Serialize a bookmark to JSON.
    *
-   * @param objectMapper A JSON object mapper
    * @param bookmark An audiobook bookmark
    * @return A serialized object
    */
 
   @JvmStatic
   fun serializeAudiobookBookmarkToJSON(
-    objectMapper: ObjectMapper,
     bookmark: Bookmark.AudiobookBookmark
   ): ObjectNode {
-    val node = objectMapper.createObjectNode()
+    val node = PlayerPositions.serializeToObjectNode(bookmark.location)
     node.put("opdsId", bookmark.opdsId)
-    val location = AudiobookLocationJSON.serializeToJSON(objectMapper, bookmark.location)
-    node.set<ObjectNode>("location", location)
     node.put("time", dateFormatter.print(bookmark.time))
-    node.put("chapterTitle", bookmark.location.title.orEmpty())
-    node.put("deviceId", bookmark.deviceID)
     bookmark.deviceID.let { device -> node.put("deviceID", device) }
     return node
   }
@@ -392,7 +390,6 @@ object BookmarkJSON {
     bookmarks.forEach { bookmark ->
       node.add(
         serializeAudiobookBookmarkToJSON(
-          objectMapper,
           bookmark
         )
       )
@@ -403,7 +400,6 @@ object BookmarkJSON {
   /**
    * Serialize a bookmark to a JSON string.
    *
-   * @param objectMapper A JSON object mapper
    * @param bookmark An audiobook bookmark
    * @return A JSON string
    * @throws IOException On serialization errors
@@ -412,10 +408,9 @@ object BookmarkJSON {
   @JvmStatic
   @Throws(IOException::class)
   fun serializeAudiobookBookmarkToString(
-    objectMapper: ObjectMapper,
     bookmark: Bookmark.AudiobookBookmark
   ): String {
-    val json = serializeAudiobookBookmarkToJSON(objectMapper, bookmark)
+    val json = serializeAudiobookBookmarkToJSON(bookmark)
     val output = ByteArrayOutputStream(1024)
     JSONSerializerUtilities.serialize(json, output)
     return output.toString("UTF-8")

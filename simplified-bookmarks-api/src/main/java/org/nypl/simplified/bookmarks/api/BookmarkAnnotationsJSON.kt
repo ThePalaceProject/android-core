@@ -1,5 +1,6 @@
 package org.nypl.simplified.bookmarks.api
 
+import android.util.Log
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
@@ -109,6 +110,9 @@ object BookmarkAnnotationsJSON {
     node.put("http://librarysimplified.org/terms/device", target.device)
     target.chapterTitle?.let { v ->
       node.put("http://librarysimplified.org/terms/chapter", v)
+    }
+    target.bookProgress?.let { v ->
+      node.put("http://librarysimplified.org/terms/progressWithinBook", v)
     }
     return node
   }
@@ -222,15 +226,24 @@ object BookmarkAnnotationsJSON {
     objectMapper: ObjectMapper,
     node: ObjectNode
   ): BookmarkAnnotationFirstNode {
+
+    val bookmarkAnnotations = arrayListOf<BookmarkAnnotation>()
+    JSONParserUtilities.getArray(node, "items").map { item ->
+      try {
+        val bookmarkAnnotation = deserializeBookmarkAnnotationFromJSON(
+          objectMapper = objectMapper,
+          node = JSONParserUtilities.checkObject(null, item)
+        )
+        bookmarkAnnotations.add(bookmarkAnnotation)
+      } catch (exception: JSONParseException) {
+        Log.d("BookmarkAnnotationsJSON", "Error deserializing bookmark annotation")
+      }
+    }
+
     return BookmarkAnnotationFirstNode(
       type = JSONParserUtilities.getString(node, "type"),
       id = JSONParserUtilities.getString(node, "id"),
-      items = JSONParserUtilities.getArray(node, "items").map { items ->
-        deserializeBookmarkAnnotationFromJSON(
-          objectMapper = objectMapper,
-          node = JSONParserUtilities.checkObject(null, items)
-        )
-      }
+      items = bookmarkAnnotations
     )
   }
 
@@ -351,12 +364,15 @@ object BookmarkAnnotationsJSON {
 
     val objectNode = objectMapper.createObjectNode()
     objectNode.put("@type", "LocatorAudioBookTime")
-    objectNode.put("audiobookID", bookmark.opdsId)
-    objectNode.put("duration", bookmark.duration)
     objectNode.put("chapter", bookmark.location.chapter)
     objectNode.put("time", bookmark.location.offsetMilliseconds)
     objectNode.put("part", bookmark.location.part)
     objectNode.put("title", bookmark.location.title.orEmpty())
+
+    // these fields are required by the iOS app, so we're sending them but since we don't need them
+    // in the Android app, there's no need to parsing them back
+    objectNode.put("audiobookID", bookmark.opdsId)
+    objectNode.put("duration", bookmark.duration)
 
     return objectNode
   }
