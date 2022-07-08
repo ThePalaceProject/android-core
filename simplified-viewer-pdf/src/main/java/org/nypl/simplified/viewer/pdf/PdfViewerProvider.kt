@@ -29,7 +29,7 @@ class PdfViewerProvider : ViewerProviderType {
         false
       }
       is BookFormat.BookFormatPDF -> {
-        true
+        preferences.flags["enablePDFJSReader"] != true
       }
     }
   }

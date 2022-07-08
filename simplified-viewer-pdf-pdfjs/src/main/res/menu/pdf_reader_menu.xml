@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+  <item
+    android:id="@+id/readerMenuTOC"
+    android:contentDescription="@string/accessibility_table_of_contents"
+    android:icon="@drawable/pdf_toc"
+    android:title="@string/table_of_contents_title"
+    app:showAsAction="ifRoom" />
+  <item
+    android:id="@+id/readerMenuSettings"
+    android:icon="@drawable/pdf_settings"
+    android:contentDescription="@string/accessibility_settings"
+    android:title="@string/settings_title"
+    app:showAsAction="ifRoom" />
+</menu>

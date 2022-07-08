@@ -1,0 +1,27 @@
+dependencies {
+  implementation project(":simplified-accounts-api")
+  implementation project(":simplified-books-api")
+  implementation project(":simplified-books-database-api")
+  implementation project(":simplified-profiles-controller-api")
+  implementation project(":simplified-services-api")
+  implementation project(":simplified-ui-thread-api")
+  implementation project(":simplified-viewer-spi")
+
+  implementation libs.androidx.activity
+  implementation libs.androidx.app.compat
+  implementation libs.androidx.webkit
+  implementation libs.kotlin.coroutines
+  implementation libs.kotlin.reflect
+  implementation libs.kotlin.stdlib
+  implementation libs.nypl.pdf.api
+  implementation libs.nypl.pdf.viewer
+  implementation libs.palace.drm.core
+  implementation libs.r2.streamer
+  implementation libs.slf4j
+  implementation("com.github.edrlab.nanohttpd:nanohttpd:master-SNAPSHOT") {
+    exclude group: "org.parboiled"
+  }
+  implementation("com.github.edrlab.nanohttpd:nanohttpd-nanolets:master-SNAPSHOT") {
+    exclude group: "org.parboiled"
+  }
+}
