@@ -136,8 +136,9 @@ object BookmarkJSON {
       is PlayerResult.Failure -> throw locationResult.failure
     }
 
-    val parsedTime = parseTime(JSONParserUtilities.getStringDefault(node, "time",
-      dateFormatter.print(DateTime.now())))
+    val parsedTime = parseTime(
+      JSONParserUtilities.getStringDefault(node, "time", dateFormatter.print(DateTime.now()))
+    )
 
     return Bookmark.AudiobookBookmark.create(
       opdsId = JSONParserUtilities.getStringDefault(node, "opdsId", ""),
