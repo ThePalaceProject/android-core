@@ -391,7 +391,7 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
 
       val bookmarks = arrayListOf<Bookmark.AudiobookBookmark>()
 
-      array.map { node ->
+      array.forEach { node ->
         try {
           val bookmark = BookmarkJSON.deserializeAudiobookBookmarkFromJSON(
             kind = BookmarkKind.BookmarkExplicit,
