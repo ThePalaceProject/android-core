@@ -21,9 +21,9 @@ import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.profiles.api.ProfileDateOfBirth
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
-import org.nypl.simplified.reader.bookmarks.api.ReaderBookmarkEvent.ReaderBookmarkSyncSettingChanged
-import org.nypl.simplified.reader.bookmarks.api.ReaderBookmarkServiceType
-import org.nypl.simplified.reader.bookmarks.api.ReaderBookmarkSyncEnableStatus
+import org.nypl.simplified.bookmarks.api.BookmarkEvent.BookmarkSyncSettingChanged
+import org.nypl.simplified.bookmarks.api.BookmarkServiceType
+import org.nypl.simplified.bookmarks.api.BookmarkSyncEnableStatus
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.taskrecorder.api.TaskStep
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
@@ -43,8 +43,8 @@ class AccountDetailViewModel(
   private val profilesController =
     services.requireService(ProfilesControllerType::class.java)
 
-  private val readerBookmarkService =
-    services.requireService(ReaderBookmarkServiceType::class.java)
+  private val bookmarkService =
+    services.requireService(BookmarkServiceType::class.java)
 
   /**
    * Logging in was explicitly requested. This is tracked in order to allow for optionally
@@ -74,10 +74,10 @@ class AccountDetailViewModel(
    * current account.
    */
 
-  private val accountSyncingSwitchStatusMutable: MutableLiveData<ReaderBookmarkSyncEnableStatus> =
-    MutableLiveData(this.readerBookmarkService.bookmarkSyncStatus(account.id))
+  private val accountSyncingSwitchStatusMutable: MutableLiveData<BookmarkSyncEnableStatus> =
+    MutableLiveData(this.bookmarkService.bookmarkSyncStatus(account.id))
 
-  val accountSyncingSwitchStatus: LiveData<ReaderBookmarkSyncEnableStatus> =
+  val accountSyncingSwitchStatus: LiveData<BookmarkSyncEnableStatus> =
     this.accountSyncingSwitchStatusMutable
 
   init {
@@ -87,15 +87,15 @@ class AccountDetailViewModel(
         .subscribe(this::onAccountEvent)
     )
     this.subscriptions.add(
-      this.readerBookmarkService.bookmarkEvents
-        .ofType(ReaderBookmarkSyncSettingChanged::class.java)
+      this.bookmarkService.bookmarkEvents
+        .ofType(BookmarkSyncSettingChanged::class.java)
         .filter { event -> event.accountID == this.accountId }
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(this::onBookmarkEvent)
     )
   }
 
-  private fun onBookmarkEvent(event: ReaderBookmarkSyncSettingChanged) {
+  private fun onBookmarkEvent(event: BookmarkSyncSettingChanged) {
     this.accountSyncingSwitchStatusMutable.postValue(event.status)
   }
 
@@ -123,9 +123,9 @@ class AccountDetailViewModel(
      */
 
     this.onBookmarkEvent(
-      ReaderBookmarkSyncSettingChanged(
+      BookmarkSyncSettingChanged(
         accountID = event.accountID,
-        status = this.readerBookmarkService.bookmarkSyncStatus(event.accountID)
+        status = this.bookmarkService.bookmarkSyncStatus(event.accountID)
       )
     )
   }
@@ -179,7 +179,7 @@ class AccountDetailViewModel(
    */
 
   fun enableBookmarkSyncing(enabled: Boolean) {
-    this.readerBookmarkService.bookmarkSyncEnable(this.accountId, enabled)
+    this.bookmarkService.bookmarkSyncEnable(this.accountId, enabled)
   }
 
   var isOver13: Boolean

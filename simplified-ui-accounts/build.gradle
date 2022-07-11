@@ -1,12 +1,12 @@
 dependencies {
   implementation project(":simplified-android-ktx")
+  implementation project(":simplified-bookmarks-api")
   implementation project(":simplified-buildconfig-api")
   implementation project(":simplified-cardcreator")
   implementation project(":simplified-documents")
   implementation project(":simplified-metrics-api")
   implementation project(":simplified-oauth")
   implementation project(":simplified-profiles-controller-api")
-  implementation project(":simplified-reader-bookmarks-api")
   implementation project(":simplified-services-api")
   implementation project(":simplified-threads")
   implementation project(":simplified-ui-errorpage")

@@ -58,8 +58,6 @@ dependencies {
   api project(":simplified-profiles-api")
   api project(":simplified-profiles-controller-api")
   api project(":simplified-reader-api")
-  api project(":simplified-reader-bookmarks")
-  api project(":simplified-reader-bookmarks-api")
   api project(":simplified-services-api")
   api project(":simplified-tenprint")
   api project(":simplified-threads")

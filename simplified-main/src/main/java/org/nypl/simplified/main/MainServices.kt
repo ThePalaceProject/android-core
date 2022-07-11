@@ -43,6 +43,8 @@ import org.nypl.simplified.analytics.api.Analytics
 import org.nypl.simplified.analytics.api.AnalyticsConfiguration
 import org.nypl.simplified.analytics.api.AnalyticsEvent
 import org.nypl.simplified.analytics.api.AnalyticsType
+import org.nypl.simplified.bookmarks.api.BookmarkServiceProviderType
+import org.nypl.simplified.bookmarks.api.BookmarkServiceType
 import org.nypl.simplified.books.audio.AudioBookFeedbooksSecretServiceType
 import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
 import org.nypl.simplified.books.audio.AudioBookManifests
@@ -62,8 +64,8 @@ import org.nypl.simplified.books.covers.BookCoverGeneratorType
 import org.nypl.simplified.books.covers.BookCoverProvider
 import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
-import org.nypl.simplified.books.reader.bookmarks.ReaderBookmarkService
-import org.nypl.simplified.books.reader.bookmarks.internal.RBHTTPCalls
+import org.nypl.simplified.bookmarks.BookmarkService
+import org.nypl.simplified.bookmarks.internal.BHTTPCalls
 import org.nypl.simplified.boot.api.BootEvent
 import org.nypl.simplified.boot.api.BootFailureTesting
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
@@ -101,9 +103,6 @@ import org.nypl.simplified.profiles.api.idle_timer.ProfileIdleTimerType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountCreationStringResourcesType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountDeletionStringResourcesType
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
-import org.nypl.simplified.reader.bookmarks.api.ReaderBookmarkServiceProviderType
-import org.nypl.simplified.reader.bookmarks.api.ReaderBookmarkServiceType
-import org.nypl.simplified.reader.bookmarks.api.ReaderBookmarkServiceUsableType
 import org.nypl.simplified.tenprint.TenPrintGenerator
 import org.nypl.simplified.tenprint.TenPrintGeneratorType
 import org.nypl.simplified.threads.NamedThreadPools
@@ -403,19 +402,37 @@ internal object MainServices {
     return ProfileIdleTimer.create(execProfileTimer, profileEvents)
   }
 
-  private fun createReaderBookmarksService(
+//  private fun createReaderBookmarksService(
+//    http: LSHTTPClientType,
+//    bookController: ProfilesControllerType
+//  ): ReaderBookmarkServiceType {
+//    val threadFactory: (Runnable) -> Thread = { runnable ->
+//      NamedThreadPools.namedThreadPoolFactory("reader-bookmarks", 19).newThread(runnable)
+//    }
+//
+//    return BookmarkService.createService(
+//      BookmarkServiceProviderType.Requirements(
+//        threads = threadFactory,
+//        events = PublishSubject.create(),
+//        httpCalls = BHTTPCalls(ObjectMapper(), http),
+//        profilesController = bookController
+//      )
+//    )
+//  }
+
+  private fun createBookmarksService(
     http: LSHTTPClientType,
     bookController: ProfilesControllerType
-  ): ReaderBookmarkServiceType {
+  ): BookmarkServiceType {
     val threadFactory: (Runnable) -> Thread = { runnable ->
-      NamedThreadPools.namedThreadPoolFactory("reader-bookmarks", 19).newThread(runnable)
+      NamedThreadPools.namedThreadPoolFactory("bookmarks", 19).newThread(runnable)
     }
 
-    return ReaderBookmarkService.createService(
-      ReaderBookmarkServiceProviderType.Requirements(
+    return BookmarkService.createService(
+      BookmarkServiceProviderType.Requirements(
         threads = threadFactory,
         events = PublishSubject.create(),
-        httpCalls = RBHTTPCalls(ObjectMapper(), http),
+        httpCalls = BHTTPCalls(ObjectMapper(), http),
         profilesController = bookController
       )
     )
@@ -930,19 +947,28 @@ internal object MainServices {
       controller
     }
 
-    publishEvent(strings.bootingGeneral("reader bookmark service"))
-    val readerBookmarksService =
-      this.createReaderBookmarksService(lsHTTP, bookController)
+    publishEvent(strings.bootingGeneral("bookmark service"))
+//    val readerBookmarksService =
+//      this.createBookmarksService(lsHTTP, bookController)
+//
+//    addService(
+//      message = strings.bootingGeneral("reader bookmark service"),
+//      interfaceType = ReaderBookmarkServiceType::class.java,
+//      serviceConstructor = { readerBookmarksService }
+//    )
+//    addService(
+//      message = strings.bootingGeneral("reader bookmark service"),
+//      interfaceType = ReaderBookmarkServiceUsableType::class.java,
+//      serviceConstructor = { readerBookmarksService }
+//    )
+
+    val bookmarksService =
+      this.createBookmarksService(lsHTTP, bookController)
 
     addService(
-      message = strings.bootingGeneral("reader bookmark service"),
-      interfaceType = ReaderBookmarkServiceType::class.java,
-      serviceConstructor = { readerBookmarksService }
-    )
-    addService(
-      message = strings.bootingGeneral("reader bookmark service"),
-      interfaceType = ReaderBookmarkServiceUsableType::class.java,
-      serviceConstructor = { readerBookmarksService }
+      message = strings.bootingGeneral("bookmarks service"),
+      interfaceType = BookmarkServiceType::class.java,
+      serviceConstructor = { bookmarksService }
     )
 
     val badgeLookup =

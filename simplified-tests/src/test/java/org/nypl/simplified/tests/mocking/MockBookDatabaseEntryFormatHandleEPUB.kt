@@ -4,7 +4,7 @@ import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookDRMKind
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.api.BookID
-import org.nypl.simplified.books.api.Bookmark
+import org.nypl.simplified.books.api.bookmark.Bookmark
 import org.nypl.simplified.books.book_database.api.BookDRMInformationHandle
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleEPUB
 import org.nypl.simplified.books.formats.api.StandardFormatNames
@@ -48,11 +48,11 @@ class MockBookDatabaseEntryFormatHandleEPUB(
     check(this.formatField.isDownloaded)
   }
 
-  override fun setLastReadLocation(bookmark: Bookmark?) {
+  override fun setLastReadLocation(bookmark: Bookmark.ReaderBookmark?) {
     this.formatField = this.formatField.copy(lastReadLocation = bookmark)
   }
 
-  override fun setBookmarks(bookmarks: List<Bookmark>) {
+  override fun setBookmarks(bookmarks: List<Bookmark.ReaderBookmark>) {
     this.formatField = this.formatField.copy(bookmarks = bookmarks)
   }
 

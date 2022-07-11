@@ -43,10 +43,10 @@ import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.Basic
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.OAuthWithIntermediaryCancel
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.OAuthWithIntermediaryInitiate
-import org.nypl.simplified.reader.bookmarks.api.ReaderBookmarkSyncEnableResult.SYNC_DISABLED
-import org.nypl.simplified.reader.bookmarks.api.ReaderBookmarkSyncEnableResult.SYNC_ENABLED
-import org.nypl.simplified.reader.bookmarks.api.ReaderBookmarkSyncEnableResult.SYNC_ENABLE_NOT_SUPPORTED
-import org.nypl.simplified.reader.bookmarks.api.ReaderBookmarkSyncEnableStatus
+import org.nypl.simplified.bookmarks.api.BookmarkSyncEnableResult.SYNC_DISABLED
+import org.nypl.simplified.bookmarks.api.BookmarkSyncEnableResult.SYNC_ENABLED
+import org.nypl.simplified.bookmarks.api.BookmarkSyncEnableResult.SYNC_ENABLE_NOT_SUPPORTED
+import org.nypl.simplified.bookmarks.api.BookmarkSyncEnableStatus
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsCancelButtonDisabled
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsCancelButtonEnabled
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsLoginButtonDisabled
@@ -238,7 +238,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
     }
   }
 
-  private fun reconfigureBookmarkSyncingSwitch(status: ReaderBookmarkSyncEnableStatus) {
+  private fun reconfigureBookmarkSyncingSwitch(status: BookmarkSyncEnableStatus) {
 
     /*
      * Remove the checked-change listener, because setting `isChecked` will trigger the listener.
@@ -252,12 +252,12 @@ class AccountDetailFragment : Fragment(R.layout.account) {
 
     val account = this.viewModel.account
     return when (status) {
-      is ReaderBookmarkSyncEnableStatus.Changing -> {
+      is BookmarkSyncEnableStatus.Changing -> {
         this.bookmarkSyncProgress.visibility = View.VISIBLE
         this.bookmarkSyncCheck.isEnabled = false
       }
 
-      is ReaderBookmarkSyncEnableStatus.Idle -> {
+      is BookmarkSyncEnableStatus.Idle -> {
         this.bookmarkSyncProgress.visibility = View.INVISIBLE
 
         when (status.status) {

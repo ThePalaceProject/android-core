@@ -89,37 +89,6 @@ class BookCoverProvider private constructor(
     if (uriSpecified != null) {
       this.logger.debug("{}: {}: loading specified uri {}", tag, entry.bookID, uriSpecified)
 
-      val fallbackToGeneration = object : Callback {
-        override fun onSuccess() {
-          future.set(Unit)
-        }
-
-        override fun onError(e: Exception) {
-          this@BookCoverProvider.logger.debug(
-            "{}: {}: failed to load uri {}, falling back to generation: ",
-            tag,
-            entry.bookID,
-            uriSpecified,
-            e
-          )
-
-          val requestCreator = this@BookCoverProvider.picasso.load(uriGenerated.toString())
-            .tag(tag)
-            .error(R.drawable.cover_error)
-            .placeholder(R.drawable.cover_loading)
-
-          if (width > 0 || height > 0) {
-            requestCreator.resize(width, height)
-          }
-
-          if (hasBadge) {
-            requestCreator.transform(badgePainter)
-          }
-
-          requestCreator.into(imageView, callbackFinal)
-        }
-      }
-
       val requestCreator = this.picasso.load(uriSpecified.toString())
         .tag(tag)
         .error(R.drawable.cover_error)

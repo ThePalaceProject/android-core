@@ -16,6 +16,8 @@ import org.nypl.simplified.books.api.BookFormat.BookFormatAudioBook
 import org.nypl.simplified.books.api.BookFormat.BookFormatEPUB
 import org.nypl.simplified.books.api.BookFormat.BookFormatPDF
 import org.nypl.simplified.books.api.BookID
+import org.nypl.simplified.books.api.bookmark.Bookmark
+import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.books.book_database.BookDRMInformationHandleACS
 import org.nypl.simplified.books.book_database.BookDRMInformationHandleNone
 import org.nypl.simplified.books.book_database.BookDatabase
@@ -376,7 +378,7 @@ abstract class BookDatabaseContract {
       Assertions.assertTrue(audioFormat != null, "Format is present")
 
       audioFormat!!
-      Assertions.assertTrue(audioFormat.position == null, "No position")
+      Assertions.assertTrue(audioFormat.lastReadLocation == null, "No position")
       Assertions.assertTrue(audioFormat.manifest == null, "No manifest")
 
       Assertions.assertEquals(
@@ -409,7 +411,7 @@ abstract class BookDatabaseContract {
       Assertions.assertTrue(audioFormat != null, "Format is present")
 
       audioFormat!!
-      Assertions.assertTrue(audioFormat.position == null, "No position")
+      Assertions.assertTrue(audioFormat.lastReadLocation == null, "No position")
       Assertions.assertTrue(audioFormat.manifest == null, "No manifest")
 
       Assertions.assertEquals(
@@ -628,40 +630,55 @@ abstract class BookDatabaseContract {
 
     val format = databaseEntry.findFormatHandle(BookDatabaseEntryFormatHandleAudioBook::class.java)
     format!!
-    format.savePlayerPosition(
-      PlayerPosition(title = "Title", part = 0, chapter = 1, offsetMilliseconds = 23L)
+    format.setLastReadLocation(
+      Bookmark.AudiobookBookmark.create(
+        opdsId = feedEntry.id,
+        kind = BookmarkKind.BookmarkLastReadLocation,
+        location = PlayerPosition(title = "Title", part = 0, chapter = 1, offsetMilliseconds = 230000L),
+        deviceID = "",
+        time = DateTime.now(),
+        uri = null,
+        duration = 500000L
+      )
     )
 
     run {
       val book = databaseEntry.book
       val bookFormat = book.findFormat(BookFormatAudioBook::class.java)
-      val position = bookFormat!!.position!!
-      Assertions.assertEquals("Title", position.title)
-      Assertions.assertEquals(0, position.part)
-      Assertions.assertEquals(1, position.chapter)
-      Assertions.assertEquals(23L, position.offsetMilliseconds)
+      val lastReadLocation = bookFormat!!.lastReadLocation!!
+      Assertions.assertEquals("Title", lastReadLocation.location.title)
+      Assertions.assertEquals(0, lastReadLocation.location.part)
+      Assertions.assertEquals(1, lastReadLocation.location.chapter)
+      Assertions.assertEquals(230000, lastReadLocation.location.offsetMilliseconds)
     }
 
-    format.savePlayerPosition(
-      PlayerPosition(title = "Title 2", part = 2, chapter = 3, offsetMilliseconds = 46L)
+    format.setLastReadLocation(
+      Bookmark.AudiobookBookmark.create(
+        opdsId = feedEntry.id,
+        kind = BookmarkKind.BookmarkLastReadLocation,
+        location = PlayerPosition(title = "Title 2", part = 2, chapter = 3, offsetMilliseconds = 46000),
+        deviceID = "",
+        time = DateTime.now(),
+        uri = null,
+        duration = 80000
+      )
     )
-
     run {
       val book = databaseEntry.book
       val bookFormat = book.findFormat(BookFormatAudioBook::class.java)
-      val position = bookFormat!!.position!!
-      Assertions.assertEquals("Title 2", position.title)
-      Assertions.assertEquals(2, position.part)
-      Assertions.assertEquals(3, position.chapter)
-      Assertions.assertEquals(46L, position.offsetMilliseconds)
+      val lastReadLocation = bookFormat!!.lastReadLocation!!
+      Assertions.assertEquals("Title 2", lastReadLocation.location.title)
+      Assertions.assertEquals(2, lastReadLocation.location.part)
+      Assertions.assertEquals(3, lastReadLocation.location.chapter)
+      Assertions.assertEquals(46000, lastReadLocation.location.offsetMilliseconds)
     }
 
-    format.clearPlayerPosition()
+    format.setLastReadLocation(null)
 
     run {
       val book = databaseEntry.book
       val bookFormat = book.findFormat(BookFormatAudioBook::class.java)
-      Assertions.assertEquals(null, bookFormat!!.position)
+      Assertions.assertEquals(null, bookFormat!!.lastReadLocation)
     }
   }
 

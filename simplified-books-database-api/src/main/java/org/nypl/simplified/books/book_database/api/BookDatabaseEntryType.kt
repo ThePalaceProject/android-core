@@ -1,14 +1,13 @@
 package org.nypl.simplified.books.book_database.api
 
 import one.irradia.mime.api.MIMEType
-import org.librarysimplified.audiobook.api.PlayerPosition
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookDRMKind
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.api.BookFormat.BookFormatAudioBook
 import org.nypl.simplified.books.api.BookFormat.BookFormatEPUB
 import org.nypl.simplified.books.api.BookFormat.BookFormatPDF
-import org.nypl.simplified.books.api.Bookmark
+import org.nypl.simplified.books.api.bookmark.Bookmark
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleEPUB
 import org.nypl.simplified.books.book_database.api.BookFormats.BookFormatDefinition.BOOK_FORMAT_AUDIO
@@ -200,7 +199,7 @@ sealed class BookDatabaseEntryFormatHandle {
      */
 
     @Throws(IOException::class)
-    abstract fun setLastReadLocation(bookmark: Bookmark?)
+    abstract fun setLastReadLocation(bookmark: Bookmark.ReaderBookmark?)
 
     /**
      * Set the bookmarks for the book.
@@ -211,7 +210,7 @@ sealed class BookDatabaseEntryFormatHandle {
      */
 
     @Throws(IOException::class)
-    abstract fun setBookmarks(bookmarks: List<Bookmark>)
+    abstract fun setBookmarks(bookmarks: List<Bookmark.ReaderBookmark>)
   }
 
   /**
@@ -294,21 +293,25 @@ sealed class BookDatabaseEntryFormatHandle {
     abstract fun moveInBook(file: File)
 
     /**
-     * Save the given player position to the database.
+     * Set the last read location for the book.
      *
-     * @throws IOException On I/O errors or lock acquisition failures
+     * @param bookmark The location
+     *
+     * @throws IOException On I/O errors
      */
 
     @Throws(IOException::class)
-    abstract fun savePlayerPosition(position: PlayerPosition)
+    abstract fun setLastReadLocation(bookmark: Bookmark.AudiobookBookmark?)
 
     /**
-     * Clear the saved player position in the database.
+     * Set the bookmarks for the book.
      *
-     * @throws IOException On I/O errors or lock acquisition failures
+     * @param bookmarks The list of bookmarks
+     *
+     * @throws IOException On I/O errors
      */
 
     @Throws(IOException::class)
-    abstract fun clearPlayerPosition()
+    abstract fun setBookmarks(bookmarks: List<Bookmark.AudiobookBookmark>)
   }
 }

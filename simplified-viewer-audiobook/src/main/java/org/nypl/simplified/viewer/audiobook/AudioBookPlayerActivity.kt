@@ -10,6 +10,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.common.util.concurrent.ListeningExecutorService
 import com.google.common.util.concurrent.MoreExecutors
+import org.joda.time.DateTime
 import org.librarysimplified.audiobook.api.PlayerAudioBookType
 import org.librarysimplified.audiobook.api.PlayerAudioEngineRequest
 import org.librarysimplified.audiobook.api.PlayerAudioEngines
@@ -52,7 +53,10 @@ import org.librarysimplified.services.api.ServiceDirectoryType
 import org.librarysimplified.services.api.Services
 import org.nypl.drm.core.ContentProtectionProvider
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
+import org.nypl.simplified.bookmarks.api.BookmarkServiceType
 import org.nypl.simplified.books.api.BookContentProtections
+import org.nypl.simplified.books.api.bookmark.Bookmark
+import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.books.audio.AudioBookFeedbooksSecretServiceType
 import org.nypl.simplified.books.audio.AudioBookManifestData
 import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
@@ -139,6 +143,14 @@ class AudioBookPlayerActivity :
   private lateinit var uiThread: UIThreadServiceType
   private var playerInitialized: Boolean = false
   private val reloadingManifest = AtomicBoolean(false)
+
+  private val services =
+    Services.serviceDirectory()
+
+  private val bookmarkService =
+    services.requireService(BookmarkServiceType::class.java)
+  private val profilesController =
+    services.requireService(ProfilesControllerType::class.java)
 
   @Volatile
   private var destroying: Boolean = false
@@ -295,13 +307,25 @@ class AudioBookPlayerActivity :
 
   private fun savePlayerPosition(event: PlayerEventCreateBookmark) {
     try {
-      this.formatHandle.savePlayerPosition(
-        PlayerPosition(
+
+      val bookmark = Bookmark.AudiobookBookmark.create(
+        opdsId = this.parameters.opdsEntry.id,
+        location = PlayerPosition(
           title = event.spineElement.position.title,
           part = event.spineElement.position.part,
           chapter = event.spineElement.position.chapter,
           offsetMilliseconds = event.offsetMilliseconds
-        )
+        ),
+        duration = event.spineElement.duration?.millis ?: 0L,
+        kind = BookmarkKind.BookmarkLastReadLocation,
+        time = DateTime.now(),
+        deviceID = AudioBookDevices.deviceId(this.profilesController, this.parameters.bookID),
+        uri = null
+      )
+
+      this.bookmarkService.bookmarkCreate(
+        accountID = this.parameters.accountID,
+        bookmark = bookmark
       )
     } catch (e: Exception) {
       this.log.error("could not save player position: ", e)
@@ -329,7 +353,10 @@ class AudioBookPlayerActivity :
     )
   }
 
-  override fun onLoadingFragmentLoadingFinished(manifest: PlayerManifest, authorization: LSHTTPAuthorizationType?) {
+  override fun onLoadingFragmentLoadingFinished(
+    manifest: PlayerManifest,
+    authorization: LSHTTPAuthorizationType?
+  ) {
     this.log.debug("finished loading")
 
     val contentProtections = BookContentProtections.create(
@@ -519,7 +546,10 @@ class AudioBookPlayerActivity :
     extensions: List<PlayerExtensionType>,
     authorization: LSHTTPAuthorizationType?
   ) {
-    this.log.debug("configuring bearer token extension with authorization: {}", authorization?.toHeaderValue())
+    this.log.debug(
+      "configuring bearer token extension with authorization: {}",
+      authorization?.toHeaderValue()
+    )
     val extension =
       extensions.filterIsInstance<BearerTokenExtension>()
         .firstOrNull()
@@ -532,24 +562,31 @@ class AudioBookPlayerActivity :
   }
 
   private fun restoreSavedPlayerPosition() {
-    var restored = false
+
+    val bookmarks =
+      AudioBookHelpers.loadBookmarks(
+        bookmarkService = this.bookmarkService,
+        accountID = this.parameters.accountID,
+        bookID = this.parameters.bookID
+      )
 
     try {
-      val position = this.formatHandle.format.position
-      if (position != null) {
-        this.player.movePlayheadToLocation(position, false)
-        restored = true
-      }
+
+      val bookMarkLastReadPosition = bookmarks
+        .filterIsInstance<Bookmark.AudiobookBookmark>()
+        .find { bookmark ->
+          bookmark.kind == BookmarkKind.BookmarkLastReadLocation
+        }
+      val position =
+        bookMarkLastReadPosition?.location ?: this.formatHandle.format.lastReadLocation?.location
+
+      this.player.movePlayheadToLocation(
+        // Explicitly wind back to the start of the book if there isn't a suitable position saved.
+        location = position ?: this.book.spine.first().position,
+        playAutomatically = false
+      )
     } catch (e: Exception) {
       this.log.error("unable to load saved player position: ", e)
-    }
-
-    /*
-     * Explicitly wind back to the start of the book if there isn't a suitable position saved.
-     */
-
-    if (!restored) {
-      this.player.movePlayheadToLocation(this.book.spine[0].position, false)
     }
   }
 

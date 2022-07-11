@@ -16,16 +16,8 @@ object Reader2Devices {
     val account = profilesController.profileAccountForBook(bookID)
     val state = account.loginState
     val credentials = state.credentials
-    if (credentials != null) {
-      val preActivation = credentials.adobeCredentials
-      if (preActivation != null) {
-        val postActivation = preActivation.postActivationCredentials
-        if (postActivation != null) {
-          return postActivation.deviceID.value
-        }
-      }
-    }
+
     // Yes, really return a string that says "null"
-    return "null"
+    return credentials?.adobeCredentials?.postActivationCredentials?.deviceID?.value ?: "null"
   }
 }

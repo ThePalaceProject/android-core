@@ -1,30 +1,33 @@
 package org.nypl.simplified.books.book_database
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.google.common.base.Preconditions
 import net.jcip.annotations.GuardedBy
 import one.irradia.mime.api.MIMEType
 import org.librarysimplified.audiobook.api.PlayerAudioEngineRequest
 import org.librarysimplified.audiobook.api.PlayerAudioEngines
-import org.librarysimplified.audiobook.api.PlayerPosition
 import org.librarysimplified.audiobook.api.PlayerPositions
 import org.librarysimplified.audiobook.api.PlayerResult
 import org.librarysimplified.audiobook.api.PlayerUserAgent
 import org.librarysimplified.audiobook.manifest.api.PlayerManifest
 import org.librarysimplified.audiobook.manifest_parser.api.ManifestParsers
 import org.librarysimplified.audiobook.parser.api.ParseResult
-import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookDRMKind
+import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookFormat
+import org.nypl.simplified.books.api.bookmark.Bookmark
+import org.nypl.simplified.books.api.bookmark.BookmarkJSON
+import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.books.book_database.api.BookDRMInformationHandle
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook
 import org.nypl.simplified.files.DirectoryUtilities
 import org.nypl.simplified.files.FileUtilities
+import org.nypl.simplified.json.core.JSONParseException
 import org.nypl.simplified.json.core.JSONParserUtilities
 import org.nypl.simplified.json.core.JSONSerializerUtilities
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileInputStream
-import java.io.FileNotFoundException
 import java.io.IOException
 import java.lang.IllegalStateException
 import java.net.URI
@@ -52,6 +55,10 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
     File(this.parameters.directory, "audiobook-position.json")
   private val filePositionTmp: File =
     File(this.parameters.directory, "audiobook-position.json.tmp")
+  private val fileBookmarks: File =
+    File(this.parameters.directory, "audiobook-bookmarks.json")
+  private val fileBookmarksTmp: File =
+    File(this.parameters.directory, "audiobook-bookmarks.json.tmp")
 
   private val dataLock: Any = Any()
 
@@ -96,6 +103,7 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
         fileBook = this.fileBook,
         fileManifest = this.fileManifest,
         fileManifestURI = this.fileManifestURI,
+        fileBookmarks = this.fileBookmarks,
         filePosition = this.filePosition,
         contentType = this.parameters.contentType,
         drmInfo = this.drmInformationHandle.info
@@ -145,7 +153,7 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
 
       this.formatRef = this.formatRef.copy(
         file = null,
-        position = null
+        lastReadLocation = null
       )
 
       this.formatRef
@@ -293,23 +301,41 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
     this.parameters.onUpdated.invoke(newFormat)
   }
 
-  override fun savePlayerPosition(position: PlayerPosition) {
-    val text =
-      JSONSerializerUtilities.serializeToString(PlayerPositions.serializeToObjectNode(position))
-
+  override fun setBookmarks(bookmarks: List<Bookmark.AudiobookBookmark>) {
     val newFormat = synchronized(this.dataLock) {
-      FileUtilities.fileWriteUTF8Atomically(this.filePosition, this.filePositionTmp, text)
-      this.formatRef = this.formatRef.copy(position = position)
+      FileUtilities.fileWriteUTF8Atomically(
+        this.fileBookmarks,
+        this.fileBookmarksTmp,
+        BookmarkJSON.serializeAudiobookBookmarksToString(this.parameters.objectMapper, bookmarks)
+      )
+      this.formatRef = this.formatRef.copy(bookmarks = bookmarks)
       this.formatRef
     }
 
     this.parameters.onUpdated.invoke(newFormat)
   }
 
-  override fun clearPlayerPosition() {
+  override fun setLastReadLocation(bookmark: Bookmark.AudiobookBookmark?) {
+
     val newFormat = synchronized(this.dataLock) {
-      FileUtilities.fileDelete(this.filePosition)
-      this.formatRef = this.formatRef.copy(position = null)
+      if (bookmark != null) {
+        Preconditions.checkArgument(
+          bookmark.kind == BookmarkKind.BookmarkLastReadLocation,
+          "Must use a last-read-location bookmark"
+        )
+
+        FileUtilities.fileWriteUTF8Atomically(
+          this.filePosition,
+          this.filePositionTmp,
+          JSONSerializerUtilities.serializeToString(
+            PlayerPositions.serializeToObjectNode(bookmark.location)
+          )
+        )
+      } else {
+        FileUtilities.fileDelete(this.filePosition)
+      }
+
+      this.formatRef = this.formatRef.copy(lastReadLocation = bookmark)
       this.formatRef
     }
 
@@ -326,6 +352,7 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
       fileBook: File,
       fileManifest: File,
       fileManifestURI: File,
+      fileBookmarks: File,
       filePosition: File,
       contentType: MIMEType,
       drmInfo: BookDRMInformation
@@ -333,45 +360,84 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
       return BookFormat.BookFormatAudioBook(
         file = if (fileBook.exists()) fileBook else null,
         manifest = this.loadManifestIfNecessary(fileManifest, fileManifestURI),
-        position = this.loadPositionIfNecessary(objectMapper, filePosition),
         contentType = contentType,
-        drmInformation = drmInfo
+        drmInformation = drmInfo,
+        bookmarks = loadBookmarksIfPresent(objectMapper, fileBookmarks),
+        lastReadLocation = loadLastReadLocationIfPresent(objectMapper, filePosition),
       )
     }
 
-    private fun loadPositionIfNecessary(
+    @Throws(IOException::class)
+    private fun loadBookmarksIfPresent(
       objectMapper: ObjectMapper,
-      filePosition: File
-    ): PlayerPosition? {
-      return if (filePosition.isFile) {
-        this.loadPosition(objectMapper, filePosition)
+      fileBookmarks: File
+    ): List<Bookmark.AudiobookBookmark> {
+      return if (fileBookmarks.isFile) {
+        loadBookmarks(
+          objectMapper = objectMapper,
+          fileBookmarks = fileBookmarks
+        )
+      } else {
+        listOf()
+      }
+    }
+
+    private fun loadBookmarks(
+      objectMapper: ObjectMapper,
+      fileBookmarks: File
+    ): List<Bookmark.AudiobookBookmark> {
+      val tree = objectMapper.readTree(fileBookmarks)
+      val array = JSONParserUtilities.checkArray(null, tree)
+
+      val bookmarks = arrayListOf<Bookmark.AudiobookBookmark>()
+
+      array.forEach { node ->
+        try {
+          val bookmark = BookmarkJSON.deserializeAudiobookBookmarkFromJSON(
+            kind = BookmarkKind.BookmarkExplicit,
+            node = node
+          )
+
+          bookmarks.add(bookmark)
+        } catch (exception: JSONParseException) {
+          this.logger.debug("Failed to parse an audiobook bookmark from the bookmarks file")
+        }
+      }
+
+      return bookmarks
+    }
+
+    @Throws(IOException::class)
+    private fun loadLastReadLocationIfPresent(
+      objectMapper: ObjectMapper,
+      fileLastRead: File
+    ): Bookmark.AudiobookBookmark? {
+      return if (fileLastRead.isFile) {
+        try {
+          loadLastReadLocation(
+            objectMapper = objectMapper,
+            fileLastRead = fileLastRead
+          )
+        } catch (e: Exception) {
+          logger.error("failed to read the last-read location: ", e)
+          null
+        }
       } else {
         null
       }
     }
 
-    private fun loadPosition(
+    @Throws(IOException::class)
+    private fun loadLastReadLocation(
       objectMapper: ObjectMapper,
-      filePosition: File
-    ): PlayerPosition? {
-      return try {
-        FileInputStream(filePosition).use { stream ->
-          val result =
-            PlayerPositions.parseFromObjectNode(
-              JSONParserUtilities.checkObject(null, objectMapper.readTree(stream))
-            )
-
-          when (result) {
-            is PlayerResult.Success -> result.result
-            is PlayerResult.Failure -> throw result.failure
-          }
-        }
-      } catch (e: FileNotFoundException) {
-        null
-      } catch (e: Exception) {
-        this.logger.debug("failed to parse position value: ", e)
-        null
-      }
+      fileLastRead: File
+    ): Bookmark.AudiobookBookmark {
+      val serialized = FileUtilities.fileReadUTF8(fileLastRead)
+      return BookmarkJSON.deserializeAudiobookBookmarkFromString(
+        objectMapper = objectMapper,
+        kind = BookmarkKind.BookmarkLastReadLocation,
+        serialized = serialized
+      )
     }
 
     private fun loadManifestIfNecessary(

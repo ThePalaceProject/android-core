@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.base.Preconditions
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
+import org.joda.time.DateTime
 import org.joda.time.LocalDateTime
 import org.joda.time.format.ISODateTimeFormat
 import org.librarysimplified.audiobook.api.PlayerPosition
@@ -26,8 +27,8 @@ import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.api.BookIDs
 import org.nypl.simplified.books.api.BookLocation
-import org.nypl.simplified.books.api.Bookmark
-import org.nypl.simplified.books.api.BookmarkKind
+import org.nypl.simplified.books.api.bookmark.Bookmark
+import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.books.book_database.api.BookDRMInformationHandle
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook
@@ -167,7 +168,7 @@ class MigrationFrom3Master(
     val bookEntry: OPDSAcquisitionFeedEntry,
     val epubFile: File,
     val epubAdobeLoan: AdobeAdeptLoan?,
-    val epubBookmarks: List<Bookmark>?,
+    val epubBookmarks: List<Bookmark.ReaderBookmark>?,
     val audioBookPosition: PlayerPosition?,
     val audioBookManifest: BookFormat.AudioBookManifestReference?
   )
@@ -412,7 +413,17 @@ class MigrationFrom3Master(
       )
     }
     if (book.audioBookPosition != null) {
-      handle.savePlayerPosition(book.audioBookPosition)
+      handle.setLastReadLocation(
+        Bookmark.AudiobookBookmark.create(
+          opdsId = book.bookEntry.id,
+          kind = BookmarkKind.BookmarkLastReadLocation,
+          uri = null,
+          time = DateTime.now(),
+          deviceID = "",
+          location = book.audioBookPosition,
+          duration = 0L
+        )
+      )
     }
     return CopiedBook(book)
   }
@@ -448,7 +459,7 @@ class MigrationFrom3Master(
         this.publishStepSucceeded(BOOKMARK, this.strings.successCopiedBookmarks(book.bookEntry.title, book.epubBookmarks.size))
         handle.setLastReadLocation(
           book.epubBookmarks.find { bookmark ->
-            bookmark.kind == BookmarkKind.ReaderBookmarkLastReadLocation
+            bookmark?.kind == BookmarkKind.BookmarkLastReadLocation
           }
         )
       }
@@ -614,7 +625,7 @@ class MigrationFrom3Master(
   private fun loadBookmarks(
     title: String,
     file: File
-  ): List<Bookmark>? {
+  ): List<Bookmark.ReaderBookmark>? {
     return try {
       FileInputStream(file).use { stream ->
         this.parseBookmarks(stream).mapNotNull { annotation ->
@@ -659,7 +670,7 @@ class MigrationFrom3Master(
   private fun parseAnnotationToBookmark(
     title: String,
     annotation: BookmarkAnnotation
-  ): Bookmark? {
+  ): Bookmark.ReaderBookmark? {
     val formatter = ISODateTimeFormat.dateTimeParser()
 
     return try {
@@ -678,7 +689,7 @@ class MigrationFrom3Master(
       val uri =
         annotation.id?.let(::URI)
 
-      Bookmark.create(
+      Bookmark.ReaderBookmark.create(
         opdsId = annotation.target.source,
         location = bookLocation,
         kind = kind,
