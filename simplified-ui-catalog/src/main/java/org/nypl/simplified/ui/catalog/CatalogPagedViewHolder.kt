@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.google.common.base.Preconditions
 import com.google.common.util.concurrent.FluentFuture
@@ -191,6 +192,8 @@ class CatalogPagedViewHolder(
         this.onBookStatusLoanedDownloaded(status, book.book)
       is BookStatus.Revoked ->
         this.onBookStatusRevoked(book)
+      is BookStatus.ReachedLoanLimit ->
+        this.onBookStatusReachedLoanLimit()
       is BookStatus.FailedRevoke ->
         this.onBookStatusFailedRevoke(status, book.book)
       is BookStatus.FailedDownload ->
@@ -355,6 +358,20 @@ class CatalogPagedViewHolder(
         }
       )
     )
+  }
+
+  private fun onBookStatusReachedLoanLimit() {
+
+    AlertDialog.Builder(context)
+      .setTitle(R.string.bookReachedLoanLimitDialogTitle)
+      .setMessage(R.string.bookReachedLoanLimitDialogMessage)
+      .setPositiveButton(R.string.bookReachedLoanLimitDialogButton) { dialog, _ ->
+        dialog.dismiss()
+      }
+      .create()
+      .show()
+
+    this.listener.getInitialBookStatus(this.feedEntry as FeedEntryOPDS)
   }
 
   private fun onBookStatusHoldable(book: Book) {

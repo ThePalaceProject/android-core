@@ -112,6 +112,13 @@ class AccessibilityService private constructor(
           // Nothing to do
         }
 
+      is BookStatus.ReachedLoanLimit ->
+        if (this.previousStatusIsNot(event, BookStatus.ReachedLoanLimit::class.java)) {
+          this.speak(this.strings.bookLoanLimitReached())
+        } else {
+          // Nothing to do
+        }
+
       is BookStatus.Held.HeldReady,
       is BookStatus.Loaned.LoanedNotDownloaded,
       is BookStatus.RequestingRevoke,

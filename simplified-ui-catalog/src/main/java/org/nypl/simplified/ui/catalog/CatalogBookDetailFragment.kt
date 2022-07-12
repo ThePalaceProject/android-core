@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -443,6 +444,8 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
         this.onBookStatusRevoked(status)
       is BookStatus.FailedLoan ->
         this.onBookStatusFailedLoan(status)
+      is BookStatus.ReachedLoanLimit ->
+        this.onBookStatusReachedLoanLimit()
       is BookStatus.FailedRevoke ->
         this.onBookStatusFailedRevoke(status)
       is BookStatus.FailedDownload ->
@@ -598,6 +601,20 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
 
     this.statusIdleText.text =
       CatalogBookAvailabilityStrings.statusString(this.resources, bookStatus)
+  }
+
+  private fun onBookStatusReachedLoanLimit() {
+
+    AlertDialog.Builder(requireContext())
+      .setTitle(R.string.bookReachedLoanLimitDialogTitle)
+      .setMessage(R.string.bookReachedLoanLimitDialogMessage)
+      .setPositiveButton(R.string.bookReachedLoanLimitDialogButton) { dialog, _ ->
+        dialog.dismiss()
+      }
+      .create()
+      .show()
+
+    viewModel.getInitialBookStatus(this.parameters.feedEntry)
   }
 
   private fun onBookStatusHoldable(

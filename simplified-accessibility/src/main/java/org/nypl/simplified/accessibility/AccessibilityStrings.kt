@@ -29,4 +29,7 @@ class AccessibilityStrings(
 
   override fun bookFailedDownload(title: String): String =
     this.resources.getString(R.string.bookFailedDownload, title)
+
+  override fun bookLoanLimitReached(): String =
+    this.resources.getString(R.string.reachedLoanLimit)
 }

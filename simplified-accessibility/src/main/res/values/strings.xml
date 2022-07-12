@@ -8,4 +8,5 @@
   <string name="bookIsDownloading">The book \'%1$s\' has started downloading</string>
   <string name="bookIsOnHold">A reservation has been placed for the book \'%1$s\'</string>
   <string name="bookReturned">The book \'%1$s\' has been successfully returned</string>
+  <string name="reachedLoanLimit">u have reached your loan limit</string>
 </resources>

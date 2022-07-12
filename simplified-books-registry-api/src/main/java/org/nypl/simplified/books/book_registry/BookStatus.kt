@@ -182,6 +182,24 @@ sealed class BookStatus {
   }
 
   /**
+   * The given book could not be downloaded because the user has reached his loan limit number.
+   */
+
+  data class ReachedLoanLimit(
+    override val id: BookID,
+
+    /**
+     * The list of steps that lead to the failure.
+     */
+
+    val result: TaskResult.Failure<Unit>
+  ) : BookStatus() {
+
+    override val priority: BookStatusPriorityOrdering
+      get() = BookStatusPriorityOrdering.BOOK_STATUS_DOWNLOAD_FAILED
+  }
+
+  /**
    * The given book not available for loan, but may be placed on hold.
    */
 
