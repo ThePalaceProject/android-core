@@ -901,11 +901,16 @@ class CatalogFeedViewModel(
   }
 
   override fun getInitialBookStatus(feedEntry: FeedEntry.FeedEntryOPDS) {
+
+    val initialBookStatus = synthesizeBookWithStatus(feedEntry)
+
     this.bookModels[feedEntry.bookID]?.let { model ->
       model.onBookChanged.forEach { callback ->
-        callback(synthesizeBookWithStatus(feedEntry))
+        callback(initialBookStatus)
       }
     }
+
+    this.bookRegistry.update(initialBookStatus)
   }
 
   override fun registerObserver(

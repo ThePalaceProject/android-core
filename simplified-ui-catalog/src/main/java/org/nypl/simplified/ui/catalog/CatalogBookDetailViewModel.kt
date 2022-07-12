@@ -273,7 +273,9 @@ class CatalogBookDetailViewModel(
   }
 
   override fun getInitialBookStatus(feedEntry: FeedEntry.FeedEntryOPDS) {
-    this.bookWithStatusMutable.value = synthesizeBookWithStatus(feedEntry)
+    val initialBookStatus = synthesizeBookWithStatus(feedEntry)
+    this.bookRegistry.update(initialBookStatus)
+    this.bookWithStatusMutable.value = initialBookStatus
   }
 
   override fun borrowMaybeAuthenticated(book: Book) {
