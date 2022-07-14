@@ -65,6 +65,8 @@ object CatalogBookAvailabilityStrings {
         ""
       is BookStatus.DownloadExternalAuthenticationInProgress ->
         ""
+      is BookStatus.ReachedLoanLimit ->
+        ""
     }
   }
 

@@ -26,4 +26,10 @@ sealed class BorrowSubtaskException : Exception() {
    */
 
   class BorrowSubtaskFailed : BorrowSubtaskException()
+
+  /**
+   * The subtask failed because the loan limit has been reached.
+   */
+
+  class BorrowReachedLoanLimit : BorrowSubtaskException()
 }

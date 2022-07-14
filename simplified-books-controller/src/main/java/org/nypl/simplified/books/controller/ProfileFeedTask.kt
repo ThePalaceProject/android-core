@@ -267,6 +267,7 @@ internal class ProfileFeedTask(
       is BookStatus.Held,
       is BookStatus.Holdable,
       is BookStatus.Loanable,
+      is BookStatus.ReachedLoanLimit,
       is BookStatus.Revoked ->
         false
 
@@ -298,6 +299,7 @@ internal class ProfileFeedTask(
       is BookStatus.Holdable,
       is BookStatus.Loanable,
       is BookStatus.Loaned,
+      is BookStatus.ReachedLoanLimit,
       is BookStatus.RequestingDownload,
       is BookStatus.RequestingLoan,
       is BookStatus.RequestingRevoke,
