@@ -110,6 +110,22 @@ class AccountAuthenticationViews(
   }
 
   /**
+   * Set the status of the password reset label.
+   *
+   * @see [AccountAuthenticationViewBindings.setResetPasswordLabelStatus]
+   */
+
+  fun setResetPasswordLabelStatus(
+    status: AccountLoginButtonStatus,
+    isVisible: Boolean,
+    onClick: () -> Unit
+  ) {
+    this.viewGroups.forEach {
+      it.setResetPasswordLabelStatus(status, isVisible, onClick)
+    }
+  }
+
+  /**
    * Set the visibility of the views such that the displayed view is the one that's suitable
    * for the given authentication description.
    */

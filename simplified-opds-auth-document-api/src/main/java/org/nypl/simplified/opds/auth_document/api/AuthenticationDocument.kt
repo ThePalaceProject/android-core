@@ -95,4 +95,9 @@ data class AuthenticationDocument(
 
   val supportURI: URI? =
     this.links.find { link -> link.relation == "help" }?.hrefURI
+
+  //TODO confirm the correct term
+  val resetPasswordURI: URI? =
+    this.links.find { link -> link.relation == "register" }?.hrefURI
+
 }

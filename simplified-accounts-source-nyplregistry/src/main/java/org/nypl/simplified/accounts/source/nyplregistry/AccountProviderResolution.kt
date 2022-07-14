@@ -127,6 +127,7 @@ class AccountProviderResolution(
           mainColor = authDocument?.mainColor ?: "red",
           patronSettingsURI = authDocument?.patronSettingsURI,
           privacyPolicy = authDocument?.privacyPolicyURI,
+          resetPasswordURI = authDocument?.resetPasswordURI,
           subtitle = authDocument?.description,
           supportEmail = authDocument?.supportURI?.toString(),
           supportsReservations = supportsReservations,

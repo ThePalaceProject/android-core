@@ -270,6 +270,7 @@ class SettingsDebugViewModel(application: Application) : AndroidViewModel(applic
         mainColor = "teal",
         patronSettingsURI = URI.create("https://qa-circulation.openebooks.us/USOEI/patrons/me/"),
         privacyPolicy = URI.create("https://openebooks.net/app_privacy.html"),
+        resetPasswordURI = URI.create("http://www.librarysimplified.org/account/reset-password"),
         subtitle = "",
         supportEmail = null,
         supportsReservations = false,

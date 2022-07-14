@@ -236,6 +236,9 @@ object AccountProvidersJSON {
         JSONParserUtilities.getURIOrNull(obj, "patronSettingsURI")
       val privacyPolicy =
         JSONParserUtilities.getURIOrNull(obj, "privacyPolicy")
+      //TODO confirm if this is the correct key
+      val resetPasswordURI =
+        JSONParserUtilities.getURIOrNull(obj, "resetPasswordURI")
       val subtitle =
         JSONParserUtilities.getStringOrNull(obj, "subtitle") ?: ""
       val supportEmail =
@@ -278,6 +281,7 @@ object AccountProvidersJSON {
         mainColor = mainColor,
         patronSettingsURI = patronSettingsURI,
         privacyPolicy = privacyPolicy,
+        resetPasswordURI = resetPasswordURI,
         subtitle = subtitle,
         supportEmail = supportEmail,
         supportsReservations = supportsReservations,
