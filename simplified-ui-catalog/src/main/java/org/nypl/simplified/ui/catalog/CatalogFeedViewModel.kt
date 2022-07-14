@@ -900,7 +900,7 @@ class CatalogFeedViewModel(
     this.listener.post(CatalogFeedEvent.OpenErrorPage(errorPageParameters))
   }
 
-  override fun getInitialBookStatus(feedEntry: FeedEntry.FeedEntryOPDS) {
+  override fun resetInitialBookStatus(feedEntry: FeedEntry.FeedEntryOPDS) {
 
     val initialBookStatus = synthesizeBookWithStatus(feedEntry)
 

@@ -272,7 +272,7 @@ class CatalogBookDetailViewModel(
     this.borrowViewModel.tryDelete(feedEntry.accountID, feedEntry.bookID)
   }
 
-  override fun getInitialBookStatus(feedEntry: FeedEntry.FeedEntryOPDS) {
+  override fun resetInitialBookStatus(feedEntry: FeedEntry.FeedEntryOPDS) {
     val initialBookStatus = synthesizeBookWithStatus(feedEntry)
     this.bookRegistry.update(initialBookStatus)
     this.bookWithStatusMutable.value = initialBookStatus

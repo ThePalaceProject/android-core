@@ -182,7 +182,7 @@ sealed class BookStatus {
   }
 
   /**
-   * The given book could not be downloaded because the user has reached his loan limit number.
+   * The given book could not be downloaded because the user has reached their loan limit number.
    */
 
   data class ReachedLoanLimit(

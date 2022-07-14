@@ -221,7 +221,7 @@ interface BorrowContextType {
   fun bookLoanFailed()
 
   /**
-   * Indicate that borrowing the current book failed because the user has reached his
+   * Indicate that borrowing the current book failed because the user has reached their
    * loan limit.
    */
 

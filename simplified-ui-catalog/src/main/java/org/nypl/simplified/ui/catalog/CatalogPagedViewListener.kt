@@ -26,7 +26,7 @@ interface CatalogPagedViewListener {
 
   fun borrowMaybeAuthenticated(book: Book)
 
-  fun getInitialBookStatus(feedEntry: FeedEntry.FeedEntryOPDS)
+  fun resetInitialBookStatus(feedEntry: FeedEntry.FeedEntryOPDS)
 
   fun reserveMaybeAuthenticated(book: Book)
 

@@ -614,7 +614,7 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
       .create()
       .show()
 
-    viewModel.getInitialBookStatus(this.parameters.feedEntry)
+    viewModel.resetInitialBookStatus(this.parameters.feedEntry)
   }
 
   private fun onBookStatusHoldable(

@@ -371,7 +371,7 @@ class CatalogPagedViewHolder(
       .create()
       .show()
 
-    this.listener.getInitialBookStatus(this.feedEntry as FeedEntryOPDS)
+    this.listener.resetInitialBookStatus(this.feedEntry as FeedEntryOPDS)
   }
 
   private fun onBookStatusHoldable(book: Book) {
