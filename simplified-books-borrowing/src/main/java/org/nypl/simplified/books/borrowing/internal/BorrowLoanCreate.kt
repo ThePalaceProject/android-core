@@ -20,6 +20,7 @@ import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.opdsFeedEnt
 import org.nypl.simplified.books.borrowing.internal.BorrowHTTP.authorizationOf
 import org.nypl.simplified.books.borrowing.internal.BorrowHTTP.isMimeTypeAcceptable
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException
+import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowReachedLoanLimit
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskFailed
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskHaltedEarly
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskFactoryType
@@ -102,6 +103,9 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
     } catch (e: BorrowSubtaskFailed) {
       context.bookLoanFailed()
       throw e
+    } catch (e: BorrowReachedLoanLimit) {
+      context.bookReachedLoanLimit()
+      throw e
     }
   }
 
@@ -144,6 +148,11 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
       errorCode = httpRequestFailed,
       exception = null
     )
+
+    if (report?.type == "http://librarysimplified.org/terms/problem/loan-limit-reached") {
+      throw BorrowReachedLoanLimit()
+    }
+
     throw BorrowSubtaskFailed()
   }
 

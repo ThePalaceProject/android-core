@@ -113,6 +113,15 @@ class MockBorrowContext(
     )
   }
 
+  override fun bookReachedLoanLimit() {
+    this.bookPublishStatus(
+      BookStatus.ReachedLoanLimit(
+        id = this.bookCurrent.id,
+        result = this.taskRecorder.finishFailure()
+      )
+    )
+  }
+
   override fun bookLoanIsRequesting(message: String) {
     this.bookPublishStatus(
       BookStatus.RequestingLoan(

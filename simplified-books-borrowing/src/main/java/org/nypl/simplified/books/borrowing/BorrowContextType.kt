@@ -221,6 +221,13 @@ interface BorrowContextType {
   fun bookLoanFailed()
 
   /**
+   * Indicate that borrowing the current book failed because the user has reached their
+   * loan limit.
+   */
+
+  fun bookReachedLoanLimit()
+
+  /**
    * Information about the current SAML download, if one is in progress.
    */
 

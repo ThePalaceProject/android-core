@@ -900,6 +900,19 @@ class CatalogFeedViewModel(
     this.listener.post(CatalogFeedEvent.OpenErrorPage(errorPageParameters))
   }
 
+  override fun resetInitialBookStatus(feedEntry: FeedEntry.FeedEntryOPDS) {
+
+    val initialBookStatus = synthesizeBookWithStatus(feedEntry)
+
+    this.bookModels[feedEntry.bookID]?.let { model ->
+      model.onBookChanged.forEach { callback ->
+        callback(initialBookStatus)
+      }
+    }
+
+    this.bookRegistry.update(initialBookStatus)
+  }
+
   override fun registerObserver(
     feedEntry: FeedEntry.FeedEntryOPDS,
     callback: (BookWithStatus) -> Unit
