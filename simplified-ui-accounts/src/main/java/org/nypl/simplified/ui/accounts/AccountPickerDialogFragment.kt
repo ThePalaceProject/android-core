@@ -228,11 +228,12 @@ class AccountPickerAdapter(
 
   override fun getItemViewType(position: Int) = when (position) {
     accounts.size + 1 -> LIST_CANCEL
-    accounts.size -> if (showAddAccount) {
-      LIST_ADD_ACCOUNT
-    } else {
-      LIST_CANCEL
-    }
+    accounts.size ->
+      if (showAddAccount) {
+        LIST_ADD_ACCOUNT
+      } else {
+        LIST_CANCEL
+      }
     else -> LIST_ITEM
   }
 
