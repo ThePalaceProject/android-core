@@ -113,6 +113,10 @@ class AccountPickerDialogFragment : BottomSheetDialogFragment(), OnAccountClickL
     this.listener.post(AccountPickerEvent.AddAccount)
     dismiss()
   }
+
+  override fun onCancelClick() {
+    dismiss()
+  }
 }
 
 class AccountPickerViewHolder(
@@ -154,7 +158,7 @@ class AccountPickerViewHolder(
   }
 }
 
-class FooterViewHolder(
+class AddAccountViewHolder(
   view: View,
   private val listener: OnAccountClickListener
 ) : RecyclerView.ViewHolder(view) {
@@ -174,6 +178,24 @@ class FooterViewHolder(
   }
 }
 
+class CancelViewHolder(
+  view: View,
+  private val listener: OnAccountClickListener
+) : RecyclerView.ViewHolder(view) {
+
+  init {
+    val titleView: TextView = view.findViewById(R.id.accountTitle)
+    titleView.setText(R.string.accountCancel)
+
+    val iconView: ImageView = view.findViewById(R.id.accountIcon)
+    iconView.visibility = View.GONE
+
+    view.setOnClickListener {
+      listener.onCancelClick()
+    }
+  }
+}
+
 class AccountPickerAdapter(
   private val accounts: List<AccountType>,
   private val currentId: AccountID,
@@ -184,26 +206,34 @@ class AccountPickerAdapter(
 
   companion object {
     private const val LIST_ITEM = 1
-    private const val LIST_FOOTER = 2
+    private const val LIST_ADD_ACCOUNT = 2
+    private const val LIST_CANCEL = 3
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
     val inflater = LayoutInflater.from(parent.context)
     val view = inflater.inflate(R.layout.account_picker_item, parent, false)
     return when (viewType) {
-      LIST_FOOTER -> FooterViewHolder(view, listener)
+      LIST_CANCEL -> CancelViewHolder(view, listener)
+      LIST_ADD_ACCOUNT -> AddAccountViewHolder(view, listener)
       else -> AccountPickerViewHolder(view, imageLoader, listener)
     }
   }
 
-  override fun getItemCount() = if (showAddAccount) {
-    accounts.size + 1 // Show the 'add account' footer
+  override fun getItemCount() = accounts.size + if (showAddAccount) {
+    2 // Show the 'add account' and 'cancel' options
   } else {
-    accounts.size
+    1 // Show 'cancel' option
   }
 
   override fun getItemViewType(position: Int) = when (position) {
-    accounts.size -> LIST_FOOTER
+    accounts.size + 1 -> LIST_CANCEL
+    accounts.size ->
+      if (showAddAccount) {
+        LIST_ADD_ACCOUNT
+      } else {
+        LIST_CANCEL
+      }
     else -> LIST_ITEM
   }
 
@@ -219,5 +249,6 @@ class AccountPickerAdapter(
   interface OnAccountClickListener {
     fun onAccountClick(account: AccountType)
     fun onAddAccountClick()
+    fun onCancelClick()
   }
 }

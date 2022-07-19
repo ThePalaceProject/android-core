@@ -190,7 +190,7 @@
         <c:change date="2022-04-29T00:00:00+00:00" summary="Fixed &quot;Unable to initialize audio engine&quot; error playing some audio books."/>
       </c:changes>
     </c:release>
-    <c:release date="2022-07-12T18:04:34+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.11">
+    <c:release date="2022-07-15T17:26:47+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.11">
       <c:changes>
         <c:change date="2022-05-05T00:00:00+00:00" summary="Fixed catalog facet labels being cropped."/>
         <c:change date="2022-05-05T00:00:00+00:00" summary="Disabled searching button on catalog search when the input is blank."/>
@@ -207,8 +207,9 @@
         <c:change date="2022-06-10T00:00:00+00:00" summary="Fixed error playing audio books after switching libraries."/>
         <c:change date="2022-06-15T00:00:00+00:00" summary="Fixed cropping of non-square audio book covers in the player."/>
         <c:change date="2022-06-29T00:00:00+00:00" summary="Added new PDF reader implementation that can be optionally enabled."/>
-        <c:change date="2022-06-30T00:00:00+00:00" summary="Added bookmarks to audiobooks"/>
-        <c:change date="2022-07-12T18:04:34+00:00" summary="Added dialog with the loan limit message instead of displaying it as an error with options."/>
+        <c:change date="2022-06-30T00:00:00+00:00" summary="Added bookmarks to audiobooks."/>
+        <c:change date="2022-07-12T00:00:00+00:00" summary="Added dialog with the loan limit message instead of displaying it as an error with options."/>
+        <c:change date="2022-07-15T17:26:47+00:00" summary="Added 'Cancel' option to library selection dialog."/>
       </c:changes>
     </c:release>
   </c:releases>
