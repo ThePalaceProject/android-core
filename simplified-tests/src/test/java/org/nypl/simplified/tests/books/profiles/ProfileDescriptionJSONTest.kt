@@ -52,7 +52,8 @@ class ProfileDescriptionJSONTest {
           showTestingLibraries = false,
           hasSeenLibrarySelectionScreen = false,
           readerPreferences = ReaderPreferences.builder().build(),
-          mostRecentAccount = AccountID.generate()
+          mostRecentAccount = AccountID.generate(),
+          playbackRates = hashMapOf()
         ),
         attributes = ProfileAttributes(
           sortedMapOf(
@@ -142,6 +143,24 @@ class ProfileDescriptionJSONTest {
     assertEquals(ReaderFontSelection.READER_FONT_OPEN_DYSLEXIC, description.preferences.readerPreferences.fontFamily())
     assertEquals(ReaderColorScheme.SCHEME_WHITE_ON_BLACK, description.preferences.readerPreferences.colorScheme())
     assertEquals("5310437f-db1a-492e-a09f-1ceaa43303dd", description.preferences.mostRecentAccount.uuid.toString())
+  }
+
+  @Test
+  fun testPlaybackRates() {
+    val mapper = ObjectMapper()
+    val mostRecentAccountFallback = AccountID.generate()
+    val description =
+      ProfileDescriptionJSON.deserializeFromText(
+        mapper,
+        this.ofResource("profile-rates.json"),
+        mostRecentAccountFallback
+      )
+
+    assertEquals(2, description.preferences.playbackRates.size)
+    assertEquals("bookid1", description.preferences.playbackRates.keys.first())
+    assertEquals("bookid2", description.preferences.playbackRates.keys.last())
+    assertEquals(1.0, description.preferences.playbackRates["bookid1"]?.speed)
+    assertEquals(1.25, description.preferences.playbackRates["bookid2"]?.speed)
   }
 
   /**

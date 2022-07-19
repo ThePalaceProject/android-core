@@ -27,6 +27,7 @@ import org.librarysimplified.audiobook.api.PlayerEvent.PlayerEventWithSpineEleme
 import org.librarysimplified.audiobook.api.PlayerEvent.PlayerEventWithSpineElement.PlayerEventPlaybackStarted
 import org.librarysimplified.audiobook.api.PlayerEvent.PlayerEventWithSpineElement.PlayerEventPlaybackStopped
 import org.librarysimplified.audiobook.api.PlayerEvent.PlayerEventWithSpineElement.PlayerEventPlaybackWaitingForAction
+import org.librarysimplified.audiobook.api.PlayerPlaybackRate
 import org.librarysimplified.audiobook.api.PlayerPosition
 import org.librarysimplified.audiobook.api.PlayerResult
 import org.librarysimplified.audiobook.api.PlayerSleepTimer
@@ -449,7 +450,11 @@ class AudioBookPlayerActivity :
       // Sanity check; Verify the state of the lifecycle before continuing as it's possible the
       // activity could be finishing.
       if (!this.isFinishing && !this.supportFragmentManager.isDestroyed) {
-        this.playerFragment = PlayerFragment.newInstance(PlayerFragmentParameters())
+        this.playerFragment = PlayerFragment.newInstance(
+          PlayerFragmentParameters(
+            currentRate = getBookCurrentPlaybackRate()
+          )
+        )
 
         this.supportFragmentManager
           .beginTransaction()
@@ -506,6 +511,12 @@ class AudioBookPlayerActivity :
         }
       }
     }
+  }
+
+  private fun getBookCurrentPlaybackRate(): PlayerPlaybackRate? {
+    val playbackRates = this.profilesController.profileCurrent().preferences().playbackRates
+    val bookID = this.parameters.bookID.value()
+    return playbackRates[bookID]
   }
 
   private fun loadAndConfigureExtensions(
@@ -618,7 +629,9 @@ class AudioBookPlayerActivity :
         this.onPlayerChapterCompleted(event)
 
       is PlayerEventChapterWaiting -> Unit
-      is PlayerEventPlaybackRateChanged -> Unit
+      is PlayerEventPlaybackRateChanged -> {
+        this.onPlaybackRateChanged(event.rate)
+      }
       is PlayerEventError ->
         this.onLogPlayerError(event)
 
@@ -643,6 +656,21 @@ class AudioBookPlayerActivity :
           }
         },
         5L, TimeUnit.SECONDS
+      )
+    }
+  }
+
+  private fun onPlaybackRateChanged(playbackRate: PlayerPlaybackRate) {
+    val playbackRates =
+      HashMap(this.profilesController.profileCurrent().preferences().playbackRates)
+    val bookID = this.parameters.bookID.value()
+    playbackRates[bookID] = playbackRate
+
+    this.profilesController.profileUpdate { current ->
+      current.copy(
+        preferences = current.preferences.copy(
+          playbackRates = playbackRates
+        )
       )
     }
   }
@@ -707,7 +735,11 @@ class AudioBookPlayerActivity :
 
     this.uiThread.runOnUIThread {
       val fragment =
-        PlayerPlaybackRateFragment.newInstance(PlayerFragmentParameters())
+        PlayerPlaybackRateFragment.newInstance(
+          PlayerFragmentParameters(
+            currentRate = getBookCurrentPlaybackRate()
+          )
+        )
       fragment.show(this.supportFragmentManager, "PLAYER_RATE")
     }
   }

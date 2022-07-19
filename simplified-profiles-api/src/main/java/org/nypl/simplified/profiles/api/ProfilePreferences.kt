@@ -1,5 +1,6 @@
 package org.nypl.simplified.profiles.api
 
+import org.librarysimplified.audiobook.api.PlayerPlaybackRate
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.reader.api.ReaderPreferences
 
@@ -32,6 +33,10 @@ data class ProfilePreferences(
   /** @return The reader-specific preferences */
 
   val readerPreferences: ReaderPreferences,
+
+  /** @return The playback rates for every audiobook */
+
+  val playbackRates: Map<String, PlayerPlaybackRate>,
 
   /** The most recently used account provider. */
 

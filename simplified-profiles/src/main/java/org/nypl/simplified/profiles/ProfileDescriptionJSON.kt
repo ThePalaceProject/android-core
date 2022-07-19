@@ -10,6 +10,7 @@ import com.io7m.jfunctional.Some
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormatter
 import org.joda.time.format.DateTimeFormatterBuilder
+import org.librarysimplified.audiobook.api.PlayerPlaybackRate
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.files.FileUtilities
 import org.nypl.simplified.json.core.JSONParseException
@@ -196,6 +197,9 @@ object ProfileDescriptionJSON {
     val readerPreferences =
       deserializeReaderPreferences(objectMapper, objectNode)
 
+    val playbackRates =
+      deserializePlaybackRates(objectMapper, objectNode)
+
     val mostRecentAccount =
       JSONParserUtilities.getStringOrNull(objectNode, "mostRecentAccount")
         ?.let { AccountID(UUID.fromString(it)) }
@@ -211,7 +215,8 @@ object ProfileDescriptionJSON {
       mostRecentAccount = mostRecentAccount,
       hasSeenLibrarySelectionScreen = hasSeenLibrarySelectionScreen,
       showDebugSettings = showDebugSettings,
-      enablePDFJSReader = enablePDFJSReader
+      enablePDFJSReader = enablePDFJSReader,
+      playbackRates = playbackRates
     )
   }
 
@@ -238,6 +243,9 @@ object ProfileDescriptionJSON {
     val readerPreferences =
       deserializeReaderPreferences(objectMapper, objectNode)
 
+    val playbackRates =
+      deserializePlaybackRates(objectMapper, objectNode)
+
     val mostRecentAccount =
       JSONParserUtilities.getStringOrNull(objectNode, "mostRecentAccount")
         ?.let { AccountID(UUID.fromString(it)) }
@@ -248,7 +256,8 @@ object ProfileDescriptionJSON {
       showTestingLibraries = showTestingLibraries,
       readerPreferences = readerPreferences,
       mostRecentAccount = mostRecentAccount,
-      hasSeenLibrarySelectionScreen = true
+      hasSeenLibrarySelectionScreen = true,
+      playbackRates = playbackRates
     )
   }
 
@@ -296,6 +305,9 @@ object ProfileDescriptionJSON {
         ProfileDateOfBirth(dateValue, dateOfBirthSynthesized)
       }
 
+    val playbackRates =
+      deserializePlaybackRates(objectMapper, preferencesNode)
+
     val readerPrefs =
       deserializeReaderPreferences(objectMapper, preferencesNode)
 
@@ -305,7 +317,8 @@ object ProfileDescriptionJSON {
         showTestingLibraries = showTestingLibraries,
         readerPreferences = readerPrefs,
         mostRecentAccount = mostRecentAccountFallback,
-        hasSeenLibrarySelectionScreen = true
+        hasSeenLibrarySelectionScreen = true,
+        playbackRates = playbackRates
       )
 
     val attributeMap = mutableMapOf<String, String>()
@@ -341,6 +354,23 @@ object ProfileDescriptionJSON {
           return some.get()
         }
       })
+  }
+
+  private fun deserializePlaybackRates(
+    objectMapper: ObjectMapper,
+    node: ObjectNode?
+  ): Map<String, PlayerPlaybackRate> {
+
+    val str = JSONParserUtilities.getStringDefault(
+      node, "playbackRates", "{}"
+    )
+
+    val mapOfStrings = objectMapper.readValue(str, Map::class.java)
+      as? HashMap<String, String> ?: HashMap()
+
+    return mapOfStrings.mapValues { entry ->
+      PlayerPlaybackRate.valueOf(entry.value)
+    }
   }
 
   private fun <T> someOrNull(opt: OptionType<T>?): T? {
@@ -406,6 +436,7 @@ object ProfileDescriptionJSON {
     output.put("showDebugSettings", preferences.showDebugSettings)
     output.put("mostRecentAccount", preferences.mostRecentAccount.uuid.toString())
     output.put("enablePDFJSReader", preferences.enablePDFJSReader)
+    output.put("playbackRates", objectMapper.writeValueAsString(preferences.playbackRates))
 
     output.set<ObjectNode>(
       "readerPreferences",
