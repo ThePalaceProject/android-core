@@ -138,6 +138,7 @@ class ProfileDescriptionJSONTest {
       )
 
     assertEquals("", description.displayName)
+    assertEquals(0, description.preferences.playbackRates.size)
     assertEquals(1.0, description.preferences.readerPreferences.brightness())
     assertEquals(100.0, description.preferences.readerPreferences.fontScale())
     assertEquals(ReaderFontSelection.READER_FONT_OPEN_DYSLEXIC, description.preferences.readerPreferences.fontFamily())

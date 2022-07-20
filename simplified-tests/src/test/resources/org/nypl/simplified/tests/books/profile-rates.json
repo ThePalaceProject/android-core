@@ -12,7 +12,10 @@
       "font_family" : "READER_FONT_OPEN_DYSLEXIC",
       "color_scheme" : "SCHEME_WHITE_ON_BLACK"
     },
-    "playbackRates" : "{\"bookid1\": \"NORMAL_TIME\", \"bookid2\": \"ONE_AND_A_QUARTER_TIME\"}",
+    "playbackRates" : {
+      "bookid1" : "NORMAL_TIME",
+      "bookid2" : "ONE_AND_A_QUARTER_TIME"
+    },
     "dateOfBirth" : {
       "date" : "2006-08-07",
       "isSynthesized" : true

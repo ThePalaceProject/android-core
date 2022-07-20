@@ -1,5 +1,6 @@
 package org.nypl.simplified.profiles
 
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
@@ -361,14 +362,18 @@ object ProfileDescriptionJSON {
     node: ObjectNode?
   ): Map<String, PlayerPlaybackRate> {
 
-    val str = JSONParserUtilities.getStringDefault(
-      node, "playbackRates", "{}"
+    val str = JSONParserUtilities.getObjectOrNull(
+      node, "playbackRates"
+    ) ?: return hashMapOf()
+
+    val map = objectMapper.readValue(
+      str.toString(),
+      object : TypeReference<Map<String, String>>() {
+        // Do nothing
+      }
     )
 
-    val mapOfStrings = objectMapper.readValue(str, Map::class.java)
-      as? HashMap<String, String> ?: HashMap()
-
-    return mapOfStrings.mapValues { entry ->
+    return map.mapValues { entry ->
       PlayerPlaybackRate.valueOf(entry.value)
     }
   }
@@ -436,7 +441,11 @@ object ProfileDescriptionJSON {
     output.put("showDebugSettings", preferences.showDebugSettings)
     output.put("mostRecentAccount", preferences.mostRecentAccount.uuid.toString())
     output.put("enablePDFJSReader", preferences.enablePDFJSReader)
-    output.put("playbackRates", objectMapper.writeValueAsString(preferences.playbackRates))
+
+    output.set<ObjectNode>(
+      "playbackRates",
+      serializePlaybackRatesToJSON(objectMapper, preferences.playbackRates)
+    )
 
     output.set<ObjectNode>(
       "readerPreferences",
@@ -452,6 +461,18 @@ object ProfileDescriptionJSON {
     }
 
     return output
+  }
+
+  fun serializePlaybackRatesToJSON(
+    objectMapper: ObjectMapper,
+    playbackRates: Map<String, PlayerPlaybackRate>
+  ): ObjectNode {
+
+    val objectNode = objectMapper.createObjectNode()
+    playbackRates.keys.forEach { key ->
+      objectNode.put(key, playbackRates[key]?.name)
+    }
+    return objectNode
   }
 
   /**
