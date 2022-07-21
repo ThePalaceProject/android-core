@@ -34,7 +34,8 @@ class MockProfile(
         showTestingLibraries = false,
         hasSeenLibrarySelectionScreen = false,
         readerPreferences = ReaderPreferences.builder().build(),
-        mostRecentAccount = this.accounts.firstKey()
+        mostRecentAccount = this.accounts.firstKey(),
+        playbackRates = hashMapOf()
       ),
       attributes = ProfileAttributes(sortedMapOf())
     )
