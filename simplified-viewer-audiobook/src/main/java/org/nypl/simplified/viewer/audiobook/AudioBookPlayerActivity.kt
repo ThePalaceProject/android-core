@@ -180,7 +180,6 @@ class AudioBookPlayerActivity :
 
     val services = Services.serviceDirectory()
 
-
     this.profiles =
       services.requireService(ProfilesControllerType::class.java)
     this.http =
