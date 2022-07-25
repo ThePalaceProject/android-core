@@ -41,16 +41,10 @@ class CardCreatorContract(
       USER_IDENTIFIER_KEY to input.userIdentifier
     )
 
-  override fun parseResult(resultCode: Int, intent: Intent?): Output? =
-    if (intent == null || resultCode != Activity.RESULT_OK) {
-      null
-    } else {
-      this.parseResult(intent.extras!!)
-    }
-
-  private fun parseResult(result: Bundle): Output {
-    val barcode = result.getString(BARCODE_KEY)!!
-    val pin = result.getString(PIN_KEY)!!
+  override fun parseResult(resultCode: Int, intent: Intent?): Output {
+    val extras = intent?.extras
+    val barcode = extras?.getString(BARCODE_KEY).orEmpty()
+    val pin = extras?.getString(PIN_KEY).orEmpty()
 
     return Output(barcode, pin)
   }
