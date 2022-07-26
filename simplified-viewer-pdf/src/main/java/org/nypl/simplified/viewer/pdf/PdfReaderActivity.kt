@@ -95,7 +95,7 @@ class PdfReaderActivity :
     ServiceLoader.load(ContentProtectionProvider::class.java).toList()
 
   override fun onCreate(savedInstanceState: Bundle?) {
-    log.debug("onCreate ")
+    log.debug("onCreate")
     super.onCreate(savedInstanceState)
     setContentView(R.layout.pdf_reader)
 
