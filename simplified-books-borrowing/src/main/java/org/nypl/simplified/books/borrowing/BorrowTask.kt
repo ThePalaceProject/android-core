@@ -22,6 +22,7 @@ import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.noSupported
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.profileNotFound
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.subtaskFailed
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.unexpectedException
+import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowReachedLoanLimit
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskCancelled
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskHaltedEarly
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskFactoryType
@@ -236,6 +237,13 @@ class BorrowTask private constructor(
     } catch (e: BorrowSubtaskHaltedEarly) {
       throw e
     } catch (e: BorrowSubtaskCancelled) {
+      throw e
+    } catch (e: BorrowReachedLoanLimit) {
+      step.resolution = TaskStepFailed(
+        message = "Subtask '$name' raised an unexpected exception",
+        exception = e,
+        errorCode = subtaskFailed
+      )
       throw e
     } catch (e: Exception) {
       step.resolution = TaskStepFailed(
@@ -474,6 +482,15 @@ class BorrowTask private constructor(
     override fun bookLoanFailed() {
       this.bookPublishStatus(
         BookStatus.FailedLoan(
+          id = this.bookCurrent.id,
+          result = this.taskRecorder.finishFailure()
+        )
+      )
+    }
+
+    override fun bookReachedLoanLimit() {
+      this.bookPublishStatus(
+        BookStatus.ReachedLoanLimit(
           id = this.bookCurrent.id,
           result = this.taskRecorder.finishFailure()
         )

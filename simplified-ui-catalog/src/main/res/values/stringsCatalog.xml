@@ -77,4 +77,8 @@
   <string name="catalogReturn">Return</string>
   <string name="catalogSearch">Search</string>
   <string name="catalogDelete">Delete</string>
+
+  <string name="bookReachedLoanLimitDialogMessage">You have reached your loan limit. You cannot borrow anything further until you return something.</string>
+  <string name="bookReachedLoanLimitDialogTitle">Loan limit reached.</string>
+  <string name="bookReachedLoanLimitDialogButton">OK</string>
 </resources>

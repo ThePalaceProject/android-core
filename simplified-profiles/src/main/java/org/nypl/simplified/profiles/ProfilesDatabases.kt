@@ -499,7 +499,8 @@ object ProfilesDatabases {
               showTestingLibraries = false,
               readerPreferences = ReaderPreferences.builder().build(),
               mostRecentAccount = account.id,
-              hasSeenLibrarySelectionScreen = false
+              hasSeenLibrarySelectionScreen = false,
+              playbackRates = hashMapOf()
             ),
             attributes = ProfileAttributes(sortedMapOf())
           )

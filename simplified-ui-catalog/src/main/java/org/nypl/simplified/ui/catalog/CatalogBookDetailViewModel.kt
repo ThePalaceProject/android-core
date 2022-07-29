@@ -272,6 +272,12 @@ class CatalogBookDetailViewModel(
     this.borrowViewModel.tryDelete(feedEntry.accountID, feedEntry.bookID)
   }
 
+  override fun resetInitialBookStatus(feedEntry: FeedEntry.FeedEntryOPDS) {
+    val initialBookStatus = synthesizeBookWithStatus(feedEntry)
+    this.bookRegistry.update(initialBookStatus)
+    this.bookWithStatusMutable.value = initialBookStatus
+  }
+
   override fun borrowMaybeAuthenticated(book: Book) {
     // do nothing
   }
