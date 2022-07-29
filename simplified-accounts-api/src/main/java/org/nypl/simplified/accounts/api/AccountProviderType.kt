@@ -95,7 +95,6 @@ interface AccountProviderType : Comparable<AccountProviderType> {
 
   val cardCreatorURI: URI?
 
-
   /**
    * @return The address of the authentication document for the account provider
    */

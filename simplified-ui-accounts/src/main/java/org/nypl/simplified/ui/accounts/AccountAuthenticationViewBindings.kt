@@ -198,8 +198,9 @@ sealed class AccountAuthenticationViewBindings {
       this.resetPasswordLabel.setOnClickListener {
         onClick()
       }
-      this.resetPasswordLabel.isVisible = isVisible && (status is AsLoginButtonEnabled ||
-        status is AsLoginButtonDisabled)
+      this.resetPasswordLabel.isVisible = isVisible && (
+        status is AsLoginButtonEnabled || status is AsLoginButtonDisabled
+        )
     }
 
     override fun clearActual() {

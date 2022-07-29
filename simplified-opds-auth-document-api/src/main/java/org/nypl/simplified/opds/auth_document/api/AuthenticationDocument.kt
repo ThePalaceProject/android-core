@@ -97,6 +97,7 @@ data class AuthenticationDocument(
     this.links.find { link -> link.relation == "help" }?.hrefURI
 
   val resetPasswordURI: URI? =
-    this.links.find { link -> link.relation == "http://librarysimplified.org/terms/rel/patron-password-reset" }?.hrefURI
-
+    this.links.find { link ->
+      link.relation == "http://librarysimplified.org/terms/rel/patron-password-reset"
+    }?.hrefURI
 }
