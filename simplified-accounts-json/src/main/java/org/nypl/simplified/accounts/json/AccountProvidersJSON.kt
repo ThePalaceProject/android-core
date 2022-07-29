@@ -77,6 +77,7 @@ object AccountProvidersJSON {
     this.putConditionally(node, "logo", provider.logo)
     this.putConditionally(node, "patronSettingsURI", provider.patronSettingsURI)
     this.putConditionally(node, "privacyPolicy", provider.privacyPolicy)
+    this.putConditionally(node, "resetPasswordURI", provider.resetPasswordURI)
     this.putConditionally(node, "subtitle", provider.subtitle)
     this.putConditionally(node, "supportEmail", provider.supportEmail)
 
@@ -236,7 +237,6 @@ object AccountProvidersJSON {
         JSONParserUtilities.getURIOrNull(obj, "patronSettingsURI")
       val privacyPolicy =
         JSONParserUtilities.getURIOrNull(obj, "privacyPolicy")
-      //TODO confirm if this is the correct key
       val resetPasswordURI =
         JSONParserUtilities.getURIOrNull(obj, "resetPasswordURI")
       val subtitle =
