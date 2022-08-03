@@ -13,6 +13,7 @@
   <string name="accountDelete">Delete</string>
   <string name="accountEULAStatement">By signing in, you agree to the End User License Agreement.</string>
   <string name="accountLogin">Log in</string>
+  <string name="accountForgotPassword">Forgot your password?</string>
   <string name="accountWantChildCard">Want a card for your child?</string>
   <string name="accountCreateCard">Create Card</string>
   <string name="accountLoginAlternatives">Alternative Login Methods</string>
@@ -45,6 +46,7 @@
   <string name="accountSAML20NoPatronInfo">Failed to retrieve patron info from the URI: %1$s</string>
   <string name="accountSearchHint">Search accounts&#8230;</string>
   <string name="accountMore">More options</string>
+  <string name="accountPasswordResetFailed">Sorry, we weren\'t able to find a usable app to reset your password. Please send email to %1$s if you need to report an issue.</string>
   <string name="accountReportFailed">Sorry, we weren\'t able to find a usable app to contact support. Please send email to %1$s if you need to report an issue.</string>
   <string name="accountPrivacyPolicy">Privacy Policy</string>
   <string name="accountLicenses">Content Licenses</string>

@@ -6,8 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.CheckBox
+import android.widget.TextView
 import android.widget.TextView.BufferType.EDITABLE
 import androidx.appcompat.widget.SwitchCompat
+import androidx.core.view.isVisible
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import org.nypl.simplified.accounts.api.AccountPassword
@@ -64,6 +66,12 @@ sealed class AccountAuthenticationViewBindings {
 
   abstract fun setLoginButtonStatus(status: AccountLoginButtonStatus)
 
+  abstract fun setResetPasswordLabelStatus(
+    status: AccountLoginButtonStatus,
+    isVisible: Boolean,
+    onClick: () -> Unit
+  )
+
   abstract class Base : AccountAuthenticationViewBindings() {
     private val cleared = AtomicBoolean(false)
 
@@ -84,7 +92,8 @@ sealed class AccountAuthenticationViewBindings {
     val user: TextInputEditText,
     val userLabel: TextInputLayout,
     val onUsernamePasswordChangeListener: (AccountUsername, AccountPassword) -> Unit,
-    val loginButton: Button
+    val loginButton: Button,
+    val resetPasswordLabel: TextView
   ) : Base() {
 
     private val logger = LoggerFactory.getLogger(ViewsForBasic::class.java)
@@ -181,6 +190,19 @@ sealed class AccountAuthenticationViewBindings {
       }
     }
 
+    override fun setResetPasswordLabelStatus(
+      status: AccountLoginButtonStatus,
+      isVisible: Boolean,
+      onClick: () -> Unit
+    ) {
+      this.resetPasswordLabel.setOnClickListener {
+        onClick()
+      }
+      this.resetPasswordLabel.isVisible = isVisible && (
+        status is AsLoginButtonEnabled || status is AsLoginButtonDisabled
+        )
+    }
+
     override fun clearActual() {
       this.user.removeTextChangedListener(this.userTextListener)
       this.pass.removeTextChangedListener(this.passTextListener)
@@ -272,7 +294,8 @@ sealed class AccountAuthenticationViewBindings {
           userLabel = viewGroup.findViewById(R.id.authBasicUserLabel),
           showPass = viewGroup.findViewById(R.id.authBasicShowPass),
           onUsernamePasswordChangeListener = onUsernamePasswordChangeListener,
-          loginButton = viewGroup.findViewById(R.id.authBasicLogin)
+          loginButton = viewGroup.findViewById(R.id.authBasicLogin),
+          resetPasswordLabel = viewGroup.findViewById(R.id.resetPasswordLabel)
         )
       }
     }
@@ -280,7 +303,8 @@ sealed class AccountAuthenticationViewBindings {
 
   class ViewsForSAML2_0(
     override val viewGroup: ViewGroup,
-    private val loginButton: Button
+    private val loginButton: Button,
+    private val resetPasswordLabel: TextView
   ) : Base() {
 
     private var loginText =
@@ -330,6 +354,18 @@ sealed class AccountAuthenticationViewBindings {
       }
     }
 
+    override fun setResetPasswordLabelStatus(
+      status: AccountLoginButtonStatus,
+      isVisible: Boolean,
+      onClick: () -> Unit
+    ) {
+
+      this.resetPasswordLabel.setOnClickListener {
+        onClick()
+      }
+      this.resetPasswordLabel.isVisible = isVisible && status is AsLoginButtonEnabled
+    }
+
     override fun clearActual() {
       // Nothing
     }
@@ -346,7 +382,8 @@ sealed class AccountAuthenticationViewBindings {
       fun bind(viewGroup: ViewGroup): ViewsForSAML2_0 {
         return ViewsForSAML2_0(
           viewGroup = viewGroup,
-          loginButton = viewGroup.findViewById(R.id.authSAMLLogin)
+          loginButton = viewGroup.findViewById(R.id.authSAMLLogin),
+          resetPasswordLabel = viewGroup.findViewById(R.id.resetPasswordLabel)
         )
       }
     }
@@ -365,6 +402,14 @@ sealed class AccountAuthenticationViewBindings {
     }
 
     override fun setLoginButtonStatus(status: AccountLoginButtonStatus) {
+      // Nothing
+    }
+
+    override fun setResetPasswordLabelStatus(
+      status: AccountLoginButtonStatus,
+      isVisible: Boolean,
+      onClick: () -> Unit
+    ) {
       // Nothing
     }
 
@@ -393,6 +438,14 @@ sealed class AccountAuthenticationViewBindings {
     }
 
     override fun setLoginButtonStatus(status: AccountLoginButtonStatus) {
+      // Nothing
+    }
+
+    override fun setResetPasswordLabelStatus(
+      status: AccountLoginButtonStatus,
+      isVisible: Boolean,
+      onClick: () -> Unit
+    ) {
       // Nothing
     }
 
@@ -433,6 +486,14 @@ sealed class AccountAuthenticationViewBindings {
     }
 
     override fun setLoginButtonStatus(status: AccountLoginButtonStatus) {
+      // Nothing
+    }
+
+    override fun setResetPasswordLabelStatus(
+      status: AccountLoginButtonStatus,
+      isVisible: Boolean,
+      onClick: () -> Unit
+    ) {
       // Nothing
     }
 

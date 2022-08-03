@@ -71,6 +71,7 @@ object MockAccountProviders {
       mainColor = "#ff0000",
       patronSettingsURI = URI.create("http://$host:$port/accounts0/patrons/me"),
       privacyPolicy = null,
+      resetPasswordURI = URI.create("http://$host:$port/reset-password"),
       subtitle = "Imaginary books",
       supportEmail = "postmaster@example.com",
       supportsReservations = false,

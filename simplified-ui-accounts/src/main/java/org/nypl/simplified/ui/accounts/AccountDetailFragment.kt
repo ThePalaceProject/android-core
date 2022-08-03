@@ -855,6 +855,27 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   ) {
     this.authenticationViews.setLoginButtonStatus(status)
 
+    val supportUrl = this.viewModel.account.provider.supportEmail
+    val resetPasswordURI = this.viewModel.account.provider.resetPasswordURI
+
+    this.authenticationViews.setResetPasswordLabelStatus(
+      status,
+      isVisible = resetPasswordURI != null,
+      onClick = {
+        try {
+          val intent = Intent(Intent.ACTION_VIEW, Uri.parse(resetPasswordURI.toString()))
+          this.startActivity(intent)
+        } catch (e: Exception) {
+          this.logger.error("unable to start activity: ", e)
+          val context = this.requireContext()
+          AlertDialog.Builder(context)
+            .setMessage(context.getString(R.string.accountPasswordResetFailed, supportUrl))
+            .create()
+            .show()
+        }
+      }
+    )
+
     return when (status) {
       is AsLoginButtonEnabled -> {
         this.signUpLabel.setText(R.string.accountCardCreatorLabel)

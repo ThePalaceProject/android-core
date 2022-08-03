@@ -35,6 +35,7 @@ class PalaceAccountFallback : AccountProviderFallbackType {
       mainColor = "cyan",
       patronSettingsURI = URI.create("https://openbookshelf.dp.la/OB/patrons/me/"),
       privacyPolicy = null,
+      resetPasswordURI = null,
       subtitle = "Popular books free to download and keep, handpicked by librarians across the US.",
       supportEmail = "mailto:ebooks@dp.la",
       supportsReservations = false,

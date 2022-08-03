@@ -76,6 +76,7 @@ class TransformProviders {
             mainColor = entry.mainColor!!,
             patronSettingsURI = null,
             privacyPolicy = entry.privacyUrl,
+            resetPasswordURI = null,
             subtitle = entry.subtitle,
             supportEmail = entry.supportEmail,
             supportsReservations = entry.supportsReservations,

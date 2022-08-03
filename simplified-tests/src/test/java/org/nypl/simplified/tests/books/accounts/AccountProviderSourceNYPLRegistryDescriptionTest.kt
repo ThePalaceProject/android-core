@@ -427,6 +427,7 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
       mainColor = "blue",
       patronSettingsURI = URI("http://www.example.com/settings.xml"),
       privacyPolicy = URI("http://www.example.com/privacy.xml"),
+      resetPasswordURI = null,
       subtitle = "Some library you've never heard of",
       supportEmail = "mailto:someone@example.com",
       supportsReservations = true,
@@ -549,6 +550,10 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
           Link.LinkBasic(
             href = URI("http://www.example.com/logo.png"),
             relation = "logo"
+          ),
+          Link.LinkBasic(
+            href = URI("http://www.example.com/reset-password"),
+            relation = "http://librarysimplified.org/terms/rel/patron-password-reset"
           )
         )
       )
@@ -585,6 +590,7 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
       mainColor = "blue",
       patronSettingsURI = URI("http://www.example.com/settings.xml"),
       privacyPolicy = URI("http://www.example.com/privacy.xml"),
+      resetPasswordURI = URI("http://www.example.com/reset-password"),
       subtitle = "Some library you've never heard of",
       supportEmail = "mailto:someone@example.com",
       supportsReservations = true,
@@ -690,6 +696,10 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
           Link.LinkBasic(
             href = URI("http://www.example.com/logo.png"),
             relation = "logo"
+          ),
+          Link.LinkBasic(
+            href = URI("http://www.example.com/reset-password"),
+            relation = "http://librarysimplified.org/terms/rel/patron-password-reset"
           )
         )
       )
@@ -723,6 +733,7 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
       mainColor = "blue",
       patronSettingsURI = URI("http://www.example.com/settings.xml"),
       privacyPolicy = URI("http://www.example.com/privacy.xml"),
+      resetPasswordURI = URI("http://www.example.com/reset-password"),
       subtitle = "Some library you've never heard of",
       supportEmail = "mailto:someone@example.com",
       supportsReservations = true,

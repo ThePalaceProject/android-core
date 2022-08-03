@@ -77,6 +77,7 @@ object AccountProvidersJSON {
     this.putConditionally(node, "logo", provider.logo)
     this.putConditionally(node, "patronSettingsURI", provider.patronSettingsURI)
     this.putConditionally(node, "privacyPolicy", provider.privacyPolicy)
+    this.putConditionally(node, "resetPasswordURI", provider.resetPasswordURI)
     this.putConditionally(node, "subtitle", provider.subtitle)
     this.putConditionally(node, "supportEmail", provider.supportEmail)
 
@@ -236,6 +237,8 @@ object AccountProvidersJSON {
         JSONParserUtilities.getURIOrNull(obj, "patronSettingsURI")
       val privacyPolicy =
         JSONParserUtilities.getURIOrNull(obj, "privacyPolicy")
+      val resetPasswordURI =
+        JSONParserUtilities.getURIOrNull(obj, "resetPasswordURI")
       val subtitle =
         JSONParserUtilities.getStringOrNull(obj, "subtitle") ?: ""
       val supportEmail =
@@ -278,6 +281,7 @@ object AccountProvidersJSON {
         mainColor = mainColor,
         patronSettingsURI = patronSettingsURI,
         privacyPolicy = privacyPolicy,
+        resetPasswordURI = resetPasswordURI,
         subtitle = subtitle,
         supportEmail = supportEmail,
         supportsReservations = supportsReservations,

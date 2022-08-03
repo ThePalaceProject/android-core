@@ -75,6 +75,7 @@ class MockAccount(override val id: AccountID) : AccountType {
         loansURI = null,
         patronSettingsURI = null,
         privacyPolicy = null,
+        resetPasswordURI = null,
         subtitle = "Library ${this.id.uuid} Subtitle!",
         supportEmail = null,
         supportsReservations = false,
