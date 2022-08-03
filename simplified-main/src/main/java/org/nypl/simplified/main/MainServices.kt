@@ -402,24 +402,6 @@ internal object MainServices {
     return ProfileIdleTimer.create(execProfileTimer, profileEvents)
   }
 
-//  private fun createReaderBookmarksService(
-//    http: LSHTTPClientType,
-//    bookController: ProfilesControllerType
-//  ): ReaderBookmarkServiceType {
-//    val threadFactory: (Runnable) -> Thread = { runnable ->
-//      NamedThreadPools.namedThreadPoolFactory("reader-bookmarks", 19).newThread(runnable)
-//    }
-//
-//    return BookmarkService.createService(
-//      BookmarkServiceProviderType.Requirements(
-//        threads = threadFactory,
-//        events = PublishSubject.create(),
-//        httpCalls = BHTTPCalls(ObjectMapper(), http),
-//        profilesController = bookController
-//      )
-//    )
-//  }
-
   private fun createBookmarksService(
     http: LSHTTPClientType,
     bookController: ProfilesControllerType

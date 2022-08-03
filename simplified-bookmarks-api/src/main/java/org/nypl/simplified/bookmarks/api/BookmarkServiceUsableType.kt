@@ -61,10 +61,19 @@ interface BookmarkServiceUsableType {
   ): FluentFuture<Bookmarks>
 
   /**
-   * The user has created a bookmark.
+   * Create a local bookmark.
    */
 
-  fun bookmarkCreate(
+  fun bookmarkCreateLocal(
+    accountID: AccountID,
+    bookmark: Bookmark
+  ): FluentFuture<Unit>
+
+  /**
+   * Create a remote bookmark.
+   */
+
+  fun bookmarkCreateRemote(
     accountID: AccountID,
     bookmark: Bookmark
   ): FluentFuture<Unit>

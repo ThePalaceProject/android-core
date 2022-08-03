@@ -336,7 +336,12 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
             source = event.bookmark
           )
 
-        this.bookmarkService.bookmarkCreate(
+        this.bookmarkService.bookmarkCreateLocal(
+          accountID = this.parameters.accountId,
+          bookmark = bookmark
+        )
+
+        this.bookmarkService.bookmarkCreateRemote(
           accountID = this.parameters.accountId,
           bookmark = bookmark
         )
