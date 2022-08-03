@@ -213,6 +213,7 @@
         <c:change date="2022-07-19T00:00:00+00:00" summary="Added playbackRates to profile preferences so the user can save all audiobook's current playback rates."/>
         <c:change date="2022-07-22T00:00:00+00:00" summary="Added 'Cancel' option to player settings dialogs."/>
         <c:change date="2022-07-27T00:00:00+00:00" summary="Fixed failing builds on CI."/>
+        <c:change date="2022-07-28T17:40:57+00:00" summary="Fixed account name not being fully displayed on account details screen."/>
         <c:change date="2022-07-29T15:13:53+00:00" summary="Added option to reset patron's password on account details screen."/>
       </c:changes>
     </c:release>
