@@ -46,7 +46,11 @@ class NullBookmarkService(
     return FluentFuture.from(Futures.immediateFuture(BookmarkSyncEnableResult.SYNC_ENABLE_NOT_SUPPORTED))
   }
 
-  override fun bookmarkCreate(accountID: AccountID, bookmark: Bookmark): FluentFuture<Unit> {
+  override fun bookmarkCreateLocal(accountID: AccountID, bookmark: Bookmark): FluentFuture<Unit> {
+    return FluentFuture.from(Futures.immediateFuture(Unit))
+  }
+
+  override fun bookmarkCreateRemote(accountID: AccountID, bookmark: Bookmark): FluentFuture<Unit> {
     return FluentFuture.from(Futures.immediateFuture(Unit))
   }
 

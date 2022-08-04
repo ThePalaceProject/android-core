@@ -145,6 +145,8 @@ class AudioBookPlayerActivity :
   private var playerInitialized: Boolean = false
   private val reloadingManifest = AtomicBoolean(false)
 
+  private var lastLocalBookmark: Bookmark? = null
+
   private val services =
     Services.serviceDirectory()
 
@@ -269,6 +271,16 @@ class AudioBookPlayerActivity :
 
   override fun onDestroy() {
     this.log.debug("onDestroy")
+
+    // if there's a local bookmark that has been saved, we save it remotely before exiting
+    // the player screen
+    if (lastLocalBookmark != null) {
+      this.bookmarkService.bookmarkCreateRemote(
+        accountID = this.parameters.accountID,
+        bookmark = lastLocalBookmark!!
+      )
+    }
+
     super.onDestroy()
 
     /*
@@ -324,10 +336,18 @@ class AudioBookPlayerActivity :
         uri = null
       )
 
-      this.bookmarkService.bookmarkCreate(
-        accountID = this.parameters.accountID,
-        bookmark = bookmark
-      )
+      if (event.isLocalBookmark) {
+        lastLocalBookmark = bookmark
+        this.bookmarkService.bookmarkCreateLocal(
+          accountID = this.parameters.accountID,
+          bookmark = bookmark
+        )
+      } else {
+        this.bookmarkService.bookmarkCreateRemote(
+          accountID = this.parameters.accountID,
+          bookmark = bookmark
+        )
+      }
     } catch (e: Exception) {
       this.log.error("could not save player position: ", e)
     }
