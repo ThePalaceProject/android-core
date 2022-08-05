@@ -76,6 +76,8 @@ class CatalogBookDetailViewModel(
 
   private lateinit var feedArguments: CatalogFeedArguments.CatalogFeedArgumentsRemote
 
+  private var feedEntry = parameters.feedEntry
+
   private val bookWithStatusMutable: MutableLiveData<BookWithStatus> =
     MutableLiveData(this.createBookWithStatus())
 
@@ -125,7 +127,7 @@ class CatalogBookDetailViewModel(
       account = item.accountID,
       cover = null,
       thumbnail = null,
-      entry = item.feedEntry,
+      entry = feedEntry.feedEntry,
       formats = listOf()
     )
     val status = BookStatus.fromBook(book)
@@ -570,7 +572,10 @@ class CatalogBookDetailViewModel(
   fun revokeMaybeAuthenticated() {
     this.openLoginDialogIfNecessary()
     this.borrowViewModel.tryRevokeMaybeAuthenticated(
-      this.bookWithStatus.book
+      book = this.bookWithStatus.book,
+      onNewBookEntry = { newBookEntry ->
+        feedEntry = newBookEntry
+      }
     )
   }
 

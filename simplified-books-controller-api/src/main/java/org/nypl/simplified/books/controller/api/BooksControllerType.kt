@@ -82,11 +82,13 @@ interface BooksControllerType {
    *
    * @param accountID The account
    * @param bookId The ID of the book
+   * @param onNewBookEntry The action to perform after receiving a new feed entry
    */
 
   fun bookRevoke(
     accountID: AccountID,
-    bookId: BookID
+    bookId: BookID,
+    onNewBookEntry: (FeedEntry.FeedEntryOPDS) -> Unit = { }
   ): FluentFuture<TaskResult<Unit>>
 
   /**
