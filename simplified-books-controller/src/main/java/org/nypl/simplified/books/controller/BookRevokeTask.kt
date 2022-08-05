@@ -25,7 +25,6 @@ import org.nypl.simplified.books.controller.api.BookRevokeExceptionDeviceNotActi
 import org.nypl.simplified.books.controller.api.BookRevokeExceptionNotRevocable
 import org.nypl.simplified.books.controller.api.BookRevokeStringResourcesType
 import org.nypl.simplified.feeds.api.Feed
-import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedEntry.FeedEntryCorrupt
 import org.nypl.simplified.feeds.api.FeedEntry.FeedEntryOPDS
 import org.nypl.simplified.feeds.api.FeedHTTPTransportException
@@ -63,7 +62,7 @@ class BookRevokeTask(
   private val bookID: BookID,
   private val bookRegistry: BookRegistryType,
   private val feedLoader: FeedLoaderType,
-  private val onNewBookEntry: (FeedEntry.FeedEntryOPDS) -> Unit,
+  private val onNewBookEntry: (FeedEntryOPDS) -> Unit = {},
   private val revokeStrings: BookRevokeStringResourcesType,
   private val revokeACSTimeoutDuration: Duration = Duration.standardMinutes(1L),
   private val revokeServerTimeoutDuration: Duration = Duration.standardMinutes(3L)
