@@ -17,6 +17,7 @@ import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookWithStatus
 import org.nypl.simplified.books.controller.api.BooksControllerType
+import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap
@@ -164,7 +165,8 @@ class CatalogBorrowViewModel(
    */
 
   fun tryRevokeMaybeAuthenticated(
-    book: Book
+    book: Book,
+    onNewBookEntry: (FeedEntry.FeedEntryOPDS) -> Unit = {}
   ) {
     this.bookRegistry.updateIfStatusIsMoreImportant(
       BookWithStatus(
@@ -173,7 +175,7 @@ class CatalogBorrowViewModel(
     )
 
     if (!this.isLoginRequired(book.account)) {
-      return this.tryRevokeAuthenticated(book)
+      return this.tryRevokeAuthenticated(book, onNewBookEntry)
     }
 
     this.executeAfterLogin(
@@ -181,7 +183,7 @@ class CatalogBorrowViewModel(
       bookID = book.id,
       runOnSuccess = {
         if (!this.isLoginRequired(book.account)) {
-          this.tryRevokeAuthenticated(book)
+          this.tryRevokeAuthenticated(book, onNewBookEntry)
         } else {
           this.onRevokeAttemptCancelled(book)
         }
@@ -244,12 +246,14 @@ class CatalogBorrowViewModel(
   }
 
   private fun tryRevokeAuthenticated(
-    book: Book
+    book: Book,
+    onNewBookEntry: (FeedEntry.FeedEntryOPDS) -> Unit
   ) {
     this.logger.debug("revoking: {}", book.id)
     this.booksController.bookRevoke(
       accountID = book.account,
-      bookId = book.id
+      bookId = book.id,
+      onNewBookEntry = onNewBookEntry
     )
   }
 
