@@ -9,6 +9,8 @@ import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookDRMKind
 import org.nypl.simplified.books.api.BookIDs
+import org.nypl.simplified.books.api.bookmark.Bookmark
+import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.books.book_database.BookDRMInformationHandleACS
 import org.nypl.simplified.books.book_database.BookDRMInformationHandleLCP
 import org.nypl.simplified.books.book_database.BookDRMInformationHandleNone
@@ -65,10 +67,17 @@ abstract class BookDatabasePDFContract {
       formatHandle!!
       Assertions.assertEquals(null, formatHandle.format.lastReadLocation)
 
-      val pageNumber = 25
+      val bookmark = Bookmark.PDFBookmark.create(
+        opdsId = "",
+        kind = BookmarkKind.BookmarkLastReadLocation,
+        time = DateTime.now(),
+        pageNumber = 25,
+        deviceID = "",
+        uri = null
+      )
 
-      formatHandle.setLastReadLocation(pageNumber)
-      Assertions.assertEquals(pageNumber, formatHandle.format.lastReadLocation)
+      formatHandle.setLastReadLocation(bookmark)
+      Assertions.assertEquals(bookmark, formatHandle.format.lastReadLocation)
 
       formatHandle.setLastReadLocation(null)
       Assertions.assertEquals(null, formatHandle.format.lastReadLocation)

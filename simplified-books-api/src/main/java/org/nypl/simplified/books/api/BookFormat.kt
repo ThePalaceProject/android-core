@@ -134,7 +134,12 @@ sealed class BookFormat {
      * The last read location of the PDF book, if any.
      */
 
-    val lastReadLocation: Int?,
+    val lastReadLocation: Bookmark.PDFBookmark?,
+
+    /**
+     * The list of bookmarks.
+     */
+    val bookmarks: List<Bookmark.PDFBookmark>,
 
     /**
      * The PDF file on disk, if one has been downloaded.

@@ -93,6 +93,25 @@ internal class BServiceOpDeleteBookmark(
             )
           }
         }
+        is Bookmark.PDFBookmark -> {
+          val handle =
+            entry.findFormatHandle(BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandlePDF::class.java)
+
+          if (handle != null) {
+            when (this.bookmark.kind) {
+              BookmarkKind.BookmarkLastReadLocation ->
+                handle.setLastReadLocation(null)
+              BookmarkKind.BookmarkExplicit -> {
+                // do nothing
+              }
+            }
+          } else {
+            this.logger.debug(
+              "[{}]: unable to delete bookmark; no format handle",
+              this.profile.id.uuid
+            )
+          }
+        }
         is Bookmark.AudiobookBookmark -> {
           val handle =
             entry.findFormatHandle(BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook::class.java)

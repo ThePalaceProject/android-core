@@ -65,6 +65,27 @@ object BookmarkJSON {
    *
    * @param kind The kind of bookmark
    * @param node A JSON node
+   * @return A pdf bookmark
+   * @throws JSONParseException On parse errors
+   */
+
+  @JvmStatic
+  @Throws(JSONParseException::class)
+  fun deserializePdfBookmarkFromJSON(
+    kind: BookmarkKind,
+    node: JsonNode
+  ): Bookmark.PDFBookmark {
+    return deserializePdfBookmarkFromJSON(
+      kind = kind,
+      node = JSONParserUtilities.checkObject(null, node)
+    )
+  }
+
+  /**
+   * Deserialize bookmarks from the given JSON node.
+   *
+   * @param kind The kind of bookmark
+   * @param node A JSON node
    * @return A reader bookmark
    * @throws JSONParseException On parse errors
    */
@@ -82,6 +103,29 @@ object BookmarkJSON {
         deserializeReaderBookmarkFromJSON20210828(kind, node)
       null ->
         deserializeReaderBookmarkFromJSONOld(kind, node)
+      else ->
+        throw JSONParseException("Unsupported bookmark version: $version")
+    }
+  }
+
+  /**
+   * Deserialize bookmarks from the given JSON node.
+   *
+   * @param kind The kind of bookmark
+   * @param node A JSON node
+   * @return A pdf bookmark
+   * @throws JSONParseException On parse errors
+   */
+
+  @JvmStatic
+  @Throws(JSONParseException::class)
+  fun deserializePdfBookmarkFromJSON(
+    kind: BookmarkKind,
+    node: ObjectNode
+  ): Bookmark.PDFBookmark {
+    return when (val version = JSONParserUtilities.getIntegerOrNull(node, "@version")) {
+      1 ->
+        deserializePdfBookmarkFromJSONVersion1(kind, node)
       else ->
         throw JSONParseException("Unsupported bookmark version: $version")
     }
@@ -148,6 +192,27 @@ object BookmarkJSON {
       time = parsedTime,
       uri = toNullable(JSONParserUtilities.getURIOptional(node, "uri")),
       deviceID = JSONParserUtilities.getStringDefault(node, "deviceID", "")
+    )
+  }
+
+  private fun deserializePdfBookmarkFromJSONVersion1(
+    kind: BookmarkKind,
+    node: ObjectNode
+  ): Bookmark.PDFBookmark {
+    val locationObj = JSONParserUtilities.getObject(node, "location")
+    val pageIndex =
+      JSONParserUtilities.getIntegerOrNull(locationObj, "page") ?: 1
+
+    val timeParsed =
+      parseTime(JSONParserUtilities.getString(node, "time"))
+
+    return Bookmark.PDFBookmark.create(
+      opdsId = JSONParserUtilities.getString(node, "opdsId"),
+      kind = kind,
+      pageNumber = pageIndex,
+      time = timeParsed,
+      uri = toNullable(JSONParserUtilities.getURIOptional(node, "uri")),
+      deviceID = JSONParserUtilities.getStringDefault(node, "deviceID", null)
     )
   }
 
@@ -272,6 +337,31 @@ object BookmarkJSON {
    * Serialize a bookmark to JSON.
    *
    * @param objectMapper A JSON object mapper
+   * @param bookmark A pdf bookmark
+   * @return A serialized object
+   */
+
+  @JvmStatic
+  fun serializePdfBookmarkToJSON(
+    objectMapper: ObjectMapper,
+    bookmark: Bookmark.PDFBookmark
+  ): ObjectNode {
+    val node = objectMapper.createObjectNode()
+    node.put("@version", 1)
+    node.put("opdsId", bookmark.opdsId)
+
+    val locationObject = objectMapper.createObjectNode()
+    locationObject.put("page", bookmark.pageNumber)
+    node.set<ObjectNode>("location", locationObject)
+    node.put("time", dateFormatter.print(bookmark.time))
+    bookmark.deviceID.let { device -> node.put("deviceID", device) }
+    return node
+  }
+
+  /**
+   * Serialize a bookmark to JSON.
+   *
+   * @param objectMapper A JSON object mapper
    * @param bookmarks A list of reader bookmarks
    * @return A serialized object
    */
@@ -285,6 +375,31 @@ object BookmarkJSON {
     bookmarks.forEach { bookmark ->
       node.add(
         serializeReaderBookmarkToJSON(
+          objectMapper,
+          bookmark
+        )
+      )
+    }
+    return node
+  }
+
+  /**
+   * Serialize a bookmark to JSON.
+   *
+   * @param objectMapper A JSON object mapper
+   * @param bookmarks A list of pdf bookmarks
+   * @return A serialized object
+   */
+
+  @JvmStatic
+  fun serializePdfBookmarksToJSON(
+    objectMapper: ObjectMapper,
+    bookmarks: List<Bookmark.PDFBookmark>
+  ): ArrayNode {
+    val node = objectMapper.createArrayNode()
+    bookmarks.forEach { bookmark ->
+      node.add(
+        serializePdfBookmarkToJSON(
           objectMapper,
           bookmark
         )
@@ -318,6 +433,27 @@ object BookmarkJSON {
    * Serialize a bookmark to a JSON string.
    *
    * @param objectMapper A JSON object mapper
+   * @param bookmark A pdf bookmark
+   * @return A JSON string
+   * @throws IOException On serialization errors
+   */
+
+  @JvmStatic
+  @Throws(IOException::class)
+  fun serializePdfBookmarkToString(
+    objectMapper: ObjectMapper,
+    bookmark: Bookmark.PDFBookmark
+  ): String {
+    val json = serializePdfBookmarkToJSON(objectMapper, bookmark)
+    val output = ByteArrayOutputStream(1024)
+    JSONSerializerUtilities.serialize(json, output)
+    return output.toString("UTF-8")
+  }
+
+  /**
+   * Serialize a bookmark to a JSON string.
+   *
+   * @param objectMapper A JSON object mapper
    * @param bookmarks A list of reader bookmarks
    * @return A JSON string
    * @throws IOException On serialization errors
@@ -337,12 +473,34 @@ object BookmarkJSON {
   }
 
   /**
+   * Serialize a bookmark to a JSON string.
+   *
+   * @param objectMapper A JSON object mapper
+   * @param bookmarks A list of pdf bookmarks
+   * @return A JSON string
+   * @throws IOException On serialization errors
+   */
+
+  @JvmStatic
+  @Throws(IOException::class)
+  fun serializePdfBookmarksToString(
+    objectMapper: ObjectMapper,
+    bookmarks: List<Bookmark.PDFBookmark>
+  ): String {
+    val json = serializePdfBookmarksToJSON(objectMapper, bookmarks)
+    val output = ByteArrayOutputStream(1024)
+    val writer = objectMapper.writerWithDefaultPrettyPrinter()
+    writer.writeValue(output, json)
+    return output.toString("UTF-8")
+  }
+
+  /**
    * Deserialize a bookmark from the given string.
    *
    * @param objectMapper A JSON object mapper
    * @param kind The kind of bookmark
    * @param serialized A serialized JSON string
-   * @return An audiobook bookmark
+   * @return A reader bookmark
    * @throws IOException On I/O or parser errors
    */
 
@@ -354,6 +512,29 @@ object BookmarkJSON {
     serialized: String
   ): Bookmark.ReaderBookmark {
     return deserializeReaderBookmarkFromJSON(
+      kind = kind,
+      node = objectMapper.readTree(serialized)
+    )
+  }
+
+  /**
+   * Deserialize a bookmark from the given string.
+   *
+   * @param objectMapper A JSON object mapper
+   * @param kind The kind of bookmark
+   * @param serialized A serialized JSON string
+   * @return A pdf bookmark
+   * @throws IOException On I/O or parser errors
+   */
+
+  @JvmStatic
+  @Throws(IOException::class)
+  fun deserializePdfBookmarkFromString(
+    objectMapper: ObjectMapper,
+    kind: BookmarkKind,
+    serialized: String
+  ): Bookmark.PDFBookmark {
+    return deserializePdfBookmarkFromJSON(
       kind = kind,
       node = objectMapper.readTree(serialized)
     )

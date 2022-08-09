@@ -206,6 +206,90 @@ sealed class Bookmark {
   }
 
   /**
+   * Class for bookmarks of PDF type.
+   *
+   * <p>Note: The type is {@link Serializable} purely because the Android API requires this
+   * in order pass values of this type between activities. We make absolutely no guarantees
+   * that serialized values of this class will be compatible with future releases.</p>
+   */
+
+  data class PDFBookmark(
+    override val opdsId: String,
+    override val time: DateTime,
+    override val deviceID: String,
+    override val kind: BookmarkKind,
+    override val uri: URI?,
+    val pageNumber: Int
+  ) : Bookmark(), Serializable {
+
+    override val book: BookID = BookIDs.newFromText(this.opdsId)
+
+    override val bookmarkId: BookmarkID = createBookmarkID(this.book, this.kind)
+
+    override fun toLastReadLocation(): Bookmark {
+      return this.copy(kind = BookmarkKind.BookmarkLastReadLocation)
+    }
+
+    override fun toExplicit(): Bookmark {
+      return this.copy(kind = BookmarkKind.BookmarkExplicit)
+    }
+
+    init {
+      check(this.time.zone == DateTimeZone.UTC) {
+        "Bookmark time zones must be UTC"
+      }
+    }
+
+    /**
+     * Create a bookmark ID from the given book ID and kind.
+     */
+
+    private fun createBookmarkID(
+      book: BookID,
+      kind: BookmarkKind
+    ): BookmarkID {
+      try {
+        val messageDigest = MessageDigest.getInstance("SHA-256")
+        val utf8 = Charset.forName("UTF-8")
+        messageDigest.update(book.value().toByteArray(utf8))
+        messageDigest.update(kind.motivationURI.toByteArray(utf8))
+
+        val digestResult = messageDigest.digest()
+        val builder = StringBuilder(64)
+        for (index in digestResult.indices) {
+          val bb = digestResult[index]
+          builder.append(String.format("%02x", bb))
+        }
+
+        return BookmarkID(builder.toString())
+      } catch (e: NoSuchAlgorithmException) {
+        throw IllegalStateException(e)
+      }
+    }
+
+    companion object {
+
+      fun create(
+        opdsId: String,
+        kind: BookmarkKind,
+        time: DateTime,
+        pageNumber: Int,
+        deviceID: String,
+        uri: URI?
+      ): PDFBookmark {
+        return PDFBookmark(
+          opdsId = opdsId,
+          pageNumber = pageNumber,
+          kind = kind,
+          time = time.toDateTime(DateTimeZone.UTC),
+          deviceID = deviceID,
+          uri = uri
+        )
+      }
+    }
+  }
+
+  /**
    * Class for bookmarks of audiobook type.
    *
    * <p>Note: The type is {@link Serializable} purely because the Android API requires this
@@ -252,7 +336,7 @@ sealed class Bookmark {
     }
 
     /**
-     * Create a bookmark ID from the given book ID, location, and kind.
+     * Create a bookmark ID from the given book ID and kind.
      */
 
     private fun createBookmarkID(

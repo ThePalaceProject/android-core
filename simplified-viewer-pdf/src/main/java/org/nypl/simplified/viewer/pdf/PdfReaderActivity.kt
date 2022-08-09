@@ -5,26 +5,34 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
+import android.widget.ProgressBar
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import com.google.common.util.concurrent.MoreExecutors
 import edu.umn.minitex.pdf.android.api.PdfFragmentListenerType
 import edu.umn.minitex.pdf.android.api.TableOfContentsFragmentListenerType
 import edu.umn.minitex.pdf.android.api.TableOfContentsItem
 import edu.umn.minitex.pdf.android.pdfviewer.PdfViewerFragment
 import edu.umn.minitex.pdf.android.pdfviewer.TableOfContentsFragment
 import kotlinx.coroutines.runBlocking
+import org.joda.time.DateTime
 import org.librarysimplified.services.api.Services
 import org.nypl.drm.core.ContentProtectionProvider
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.database.api.AccountType
+import org.nypl.simplified.bookmarks.api.BookmarkServiceType
 import org.nypl.simplified.books.api.BookContentProtections
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookDRMKind
 import org.nypl.simplified.books.api.BookID
+import org.nypl.simplified.books.api.bookmark.Bookmark
+import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandlePDF
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
 import org.nypl.simplified.books.book_database.api.BookDatabaseType
+import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.thread.api.UIThreadServiceType
@@ -45,6 +53,7 @@ import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.util.ServiceLoader
+import java.util.concurrent.Executors
 import kotlin.collections.ArrayList
 
 class PdfReaderActivity :
@@ -83,6 +92,8 @@ class PdfReaderActivity :
   private lateinit var currentProfile: ProfileReadableType
   private lateinit var account: AccountType
   private lateinit var books: BookDatabaseType
+  private lateinit var feedEntry: FeedEntry.FeedEntryOPDS
+  private lateinit var loadingBar: ProgressBar
   private lateinit var entry: BookDatabaseEntryType
   private lateinit var handle: BookDatabaseEntryFormatHandlePDF
   private lateinit var uiThread: UIThreadServiceType
@@ -90,6 +101,13 @@ class PdfReaderActivity :
   // vars for the activity to pass back to the reader or table of contents fragment
   private var documentPageIndex: Int = 0
   private var tableOfContentsList: ArrayList<TableOfContentsItem> = arrayListOf()
+
+  private val services =
+    Services.serviceDirectory()
+  private val bookmarkService =
+    services.requireService(BookmarkServiceType::class.java)
+  private val profilesController =
+    services.requireService(ProfilesControllerType::class.java)
 
   private val contentProtectionProviders =
     ServiceLoader.load(ContentProtectionProvider::class.java).toList()
@@ -99,11 +117,14 @@ class PdfReaderActivity :
     super.onCreate(savedInstanceState)
     setContentView(R.layout.pdf_reader)
 
+    this.loadingBar = findViewById(R.id.pdf_loading_progress)
+
     val intentParams = intent?.getSerializableExtra(PARAMS_ID) as PdfReaderParameters
     this.documentTitle = intentParams.documentTile
     this.drmInfo = intentParams.drmInfo
     this.pdfFile = intentParams.pdfFile
     this.accountId = intentParams.accountId
+    this.feedEntry = intentParams.entry
     this.id = intentParams.id
 
     val services =
@@ -123,25 +144,55 @@ class PdfReaderActivity :
     this.supportActionBar?.setDisplayShowHomeEnabled(true)
     this.supportActionBar?.title = ""
 
+    val backgroundThread = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(1))
+
+    backgroundThread.execute {
+      restoreSavedPosition()
+
+      if (savedInstanceState == null) {
+
+        this.uiThread.runOnUIThread {
+          this.loadingBar.visibility = View.GONE
+
+          // Get the new instance of the reader you want to load here.
+          val readerFragment = PdfViewerFragment.newInstance()
+
+          this.supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.pdf_reader_fragment_holder, readerFragment, "READER")
+            .commit()
+        }
+      } else {
+        this.tableOfContentsList =
+          savedInstanceState.getParcelableArrayList(TABLE_OF_CONTENTS) ?: arrayListOf()
+      }
+    }
+  }
+
+  private fun restoreSavedPosition() {
+
+    val bookmarks =
+      PdfReaderBookmarks.loadBookmarks(
+        bookmarkService = this.bookmarkService,
+        accountID = this.accountId,
+        bookID = this.id
+      )
+
     try {
+
       this.entry = books.entry(id)
       this.handle = entry.findFormatHandle(BookDatabaseEntryFormatHandlePDF::class.java)!!
-      this.documentPageIndex = handle.format.lastReadLocation!!
+
+      val bookMarkLastReadPosition = bookmarks
+        .filterIsInstance<Bookmark.PDFBookmark>()
+        .find { bookmark ->
+          bookmark.kind == BookmarkKind.BookmarkLastReadLocation
+        }
+
+      this.documentPageIndex =
+        bookMarkLastReadPosition?.pageNumber ?: this.handle.format.lastReadLocation!!.pageNumber
     } catch (e: Exception) {
       log.error("Could not get lastReadLocation, defaulting to the 1st page", e)
-    }
-
-    if (savedInstanceState == null) {
-      // Get the new instance of the reader you want to load here.
-      val readerFragment = PdfViewerFragment.newInstance()
-
-      this.supportFragmentManager
-        .beginTransaction()
-        .replace(R.id.pdf_reader_fragment_holder, readerFragment, "READER")
-        .commit()
-    } else {
-      this.tableOfContentsList =
-        savedInstanceState.getParcelableArrayList(TABLE_OF_CONTENTS) ?: arrayListOf()
     }
   }
 
@@ -232,7 +283,25 @@ class PdfReaderActivity :
   override fun onReaderPageChanged(pageIndex: Int) {
     log.debug("onReaderPageChanged")
     this.documentPageIndex = pageIndex
-    handle.setLastReadLocation(pageIndex)
+
+    val bookmark = Bookmark.PDFBookmark.create(
+      opdsId = this.feedEntry.feedEntry.id,
+      time = DateTime.now(),
+      kind = BookmarkKind.BookmarkLastReadLocation,
+      pageNumber = pageIndex,
+      deviceID = PdfReaderDevices.deviceId(this.profilesController, this.id),
+      uri = null
+    )
+
+    this.bookmarkService.bookmarkCreateLocal(
+      accountID = this.accountId,
+      bookmark = bookmark
+    )
+
+    this.bookmarkService.bookmarkCreateRemote(
+      accountID = this.accountId,
+      bookmark = bookmark
+    )
   }
 
   override fun onReaderLoadedTableOfContents(tableOfContentsList: ArrayList<TableOfContentsItem>) {

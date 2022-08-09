@@ -238,12 +238,23 @@ sealed class BookDatabaseEntryFormatHandle {
     /**
      * Set the last read location for the PDF book.
      *
-     * @param pageNumber The Int page number of the PDF book
+     * @param bookmark The bookmark of the PDF book
      *
      * @throws IOException On I/O errors
      */
     @Throws(IOException::class)
-    abstract fun setLastReadLocation(pageNumber: Int?)
+    abstract fun setLastReadLocation(bookmark: Bookmark.PDFBookmark?)
+
+    /**
+     * Set the bookmarks for the book.
+     *
+     * @param bookmarks The list of bookmarks
+     *
+     * @throws IOException On I/O errors
+     */
+
+    @Throws(IOException::class)
+    abstract fun setBookmarks(bookmarks: List<Bookmark.PDFBookmark>)
   }
 
   /**

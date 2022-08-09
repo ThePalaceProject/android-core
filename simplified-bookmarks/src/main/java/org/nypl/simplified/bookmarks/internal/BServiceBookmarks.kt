@@ -62,4 +62,28 @@ internal object BServiceBookmarks {
 
     return bookmarksById.values.toList()
   }
+
+  fun normalizeBookmarks(
+    logger: Logger,
+    profileId: ProfileID,
+    handle: BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandlePDF,
+    bookmark: Bookmark.PDFBookmark
+  ): List<Bookmark.PDFBookmark> {
+    val originalBookmarks =
+      handle.format.bookmarks
+    val bookmarksById =
+      originalBookmarks.associateBy { mark -> mark.bookmarkId }
+        .toMutableMap()
+
+    bookmarksById[bookmark.bookmarkId] = bookmark
+
+    logger.debug(
+      "[{}]: normalized {} -> {} bookmarks",
+      profileId.uuid,
+      originalBookmarks.size,
+      bookmarksById.size
+    )
+
+    return bookmarksById.values.toList()
+  }
 }
