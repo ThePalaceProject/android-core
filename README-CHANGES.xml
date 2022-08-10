@@ -190,7 +190,7 @@
         <c:change date="2022-04-29T00:00:00+00:00" summary="Fixed &quot;Unable to initialize audio engine&quot; error playing some audio books."/>
       </c:changes>
     </c:release>
-    <c:release date="2022-08-05T08:51:13+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.11">
+    <c:release date="2022-08-10T14:20:57+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.11">
       <c:changes>
         <c:change date="2022-05-05T00:00:00+00:00" summary="Fixed catalog facet labels being cropped."/>
         <c:change date="2022-05-05T00:00:00+00:00" summary="Disabled searching button on catalog search when the input is blank."/>
@@ -216,7 +216,8 @@
         <c:change date="2022-07-28T00:00:00+00:00" summary="Fixed account name not being fully displayed on account details screen."/>
         <c:change date="2022-07-29T00:00:00+00:00" summary="Added option to reset patron's password on account details screen."/>
         <c:change date="2022-08-03T00:00:00+00:00" summary="Fixed audiobook bookmarks not being saved after exiting the player."/>
-        <c:change date="2022-08-05T08:51:13+00:00" summary="Fix broken state after returning a book."/>
+        <c:change date="2022-08-05T00:00:00+00:00" summary="Fix broken state after returning a book."/>
+        <c:change date="2022-08-10T14:20:57+00:00" summary="Added 'content description' text to back button and logo on toolbar."/>
       </c:changes>
     </c:release>
   </c:releases>
