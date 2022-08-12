@@ -6,6 +6,8 @@ import android.util.AttributeSet
 import android.view.Gravity
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.widget.ActionMenuView
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.widget.TextViewCompat
 import org.nypl.simplified.ui.neutrality.NeutralToolbar.IconKind.ICON_IS_LOGO
@@ -122,9 +124,38 @@ class NeutralToolbar(
     this.titleView.text = title
   }
 
+  private fun getSearchViewFromToolbar(): SearchView? {
+    var actionMenuView: ActionMenuView?
+
+    for (i in 0 until childCount) {
+      actionMenuView = getChildAt(i) as? ActionMenuView
+      if (actionMenuView != null) {
+        for (n in 0 until actionMenuView.childCount) {
+          val childView = actionMenuView.getChildAt(n) as? SearchView
+          if (childView != null) {
+            return childView
+          }
+        }
+        break
+      }
+    }
+
+    return null
+  }
+
   fun setLogoOnClickListener(listener: () -> Unit) {
     this.iconView.setOnClickListener {
-      listener()
+
+      // get the SearchView of the toolbar, if any
+      val searchView = getSearchViewFromToolbar()
+
+      // if the SearchView is not iconified, it means it's 'expanded' so the back action will close
+      // it instead of navigating between screens
+      if (searchView?.isIconified == false) {
+        searchView.isIconified = true
+      } else {
+        listener()
+      }
     }
   }
 }
