@@ -190,34 +190,41 @@
         <c:change date="2022-04-29T00:00:00+00:00" summary="Fixed &quot;Unable to initialize audio engine&quot; error playing some audio books."/>
       </c:changes>
     </c:release>
-    <c:release date="2022-08-10T14:20:57+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.0.11">
+    <c:release date="2022-08-15T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.1.0">
       <c:changes>
-        <c:change date="2022-05-05T00:00:00+00:00" summary="Fixed catalog facet labels being cropped."/>
-        <c:change date="2022-05-05T00:00:00+00:00" summary="Disabled searching button on catalog search when the input is blank."/>
-        <c:change date="2022-05-13T00:00:00+00:00" summary="Fixed section title overlapping back button."/>
-        <c:change date="2022-05-13T00:00:00+00:00" summary="Removed section title from book detail screen."/>
-        <c:change date="2022-05-13T00:00:00+00:00" summary="Updated displayed text when a book is available to borrow."/>
-        <c:change date="2022-05-13T00:00:00+00:00" summary="Moved book format text to the Information block."/>
-        <c:change date="2022-05-13T00:00:00+00:00" summary="Upgraded Readium library in EPUB reader to version 2.2.0."/>
-        <c:change date="2022-05-17T00:00:00+00:00" summary="Added loading to book details when the passphrase is being retrieved."/>
-        <c:change date="2022-05-17T00:00:00+00:00" summary="Fixed error downloading BiblioBoard audio books."/>
-        <c:change date="2022-05-18T00:00:00+00:00" summary="Added cancel download button to book details screen."/>
-        <c:change date="2022-05-19T00:00:00+00:00" summary="Added 'More' button to display the whole book's description in a book details screen."/>
-        <c:change date="2022-06-03T00:00:00+00:00" summary="Added support to urls in an account's support email field"/>
-        <c:change date="2022-06-10T00:00:00+00:00" summary="Fixed error playing audio books after switching libraries."/>
+        <c:change date="2022-05-05T00:00:00+00:00" summary="Fixed the labels of the filtering and sorting buttons in the catalog being cut off."/>
+        <c:change date="2022-05-05T00:00:00+00:00" summary="Disabled the Search button on the catalog search pop-up when the input is blank."/>
+        <c:change date="2022-05-05T00:00:00+00:00" summary="Added a &quot;No results found&quot; message when a search of the catalog has no results."/>
+        <c:change date="2022-05-13T00:00:00+00:00" summary="Fixed the title of the current catalog lane overlapping the back button."/>
+        <c:change date="2022-05-13T00:00:00+00:00" summary="Removed the title of the current catalog lane from book detail screen."/>
+        <c:change date="2022-05-13T00:00:00+00:00" summary="Changed &quot;This book is available for loan&quot; to &quot;This book is available to borrow&quot; on the book detail screen."/>
+        <c:change date="2022-05-13T00:00:00+00:00" summary="Moved the book format information (EPUB, PDF, audiobook) down to the Information block on the book detail screen."/>
+        <c:change date="2022-05-13T00:00:00+00:00" summary="Upgraded the Readium library used by the EPUB reader to version 2.2.0."/>
+        <c:change date="2022-05-17T00:00:00+00:00" summary="Added a loading indicator to the book detail screen while an LCP passphrase is being retrieved."/>
+        <c:change date="2022-05-17T00:00:00+00:00" summary="Fixed an error that occurred when downloading BiblioBoard audio books."/>
+        <c:change date="2022-05-18T00:00:00+00:00" summary="Added a &quot;Cancel&quot; button to the book detail screen to stop a download that is in progress."/>
+        <c:change date="2022-05-19T00:00:00+00:00" summary="Added a &quot;More&quot; button to reveal the entire book description on the book detail screen."/>
+        <c:change date="2022-06-03T00:00:00+00:00" summary="Added support for library support URLs (in addition to library support email addresses) on the account detail screen."/>
+        <c:change date="2022-06-10T00:00:00+00:00" summary="Fixed an error that occurred when playing audio books after switching libraries."/>
         <c:change date="2022-06-15T00:00:00+00:00" summary="Fixed cropping of non-square audio book covers in the player."/>
-        <c:change date="2022-06-29T00:00:00+00:00" summary="Added new PDF reader implementation that can be optionally enabled."/>
-        <c:change date="2022-06-30T00:00:00+00:00" summary="Added bookmarks to audiobooks."/>
-        <c:change date="2022-07-12T00:00:00+00:00" summary="Added dialog with the loan limit message instead of displaying it as an error with options."/>
-        <c:change date="2022-07-15T00:00:00+00:00" summary="Added 'Cancel' option to library selection dialog."/>
-        <c:change date="2022-07-19T00:00:00+00:00" summary="Added playbackRates to profile preferences so the user can save all audiobook's current playback rates."/>
-        <c:change date="2022-07-22T00:00:00+00:00" summary="Added 'Cancel' option to player settings dialogs."/>
-        <c:change date="2022-07-27T00:00:00+00:00" summary="Fixed failing builds on CI."/>
-        <c:change date="2022-07-28T00:00:00+00:00" summary="Fixed account name not being fully displayed on account details screen."/>
-        <c:change date="2022-07-29T00:00:00+00:00" summary="Added option to reset patron's password on account details screen."/>
-        <c:change date="2022-08-03T00:00:00+00:00" summary="Fixed audiobook bookmarks not being saved after exiting the player."/>
-        <c:change date="2022-08-05T00:00:00+00:00" summary="Fix broken state after returning a book."/>
-        <c:change date="2022-08-10T14:20:57+00:00" summary="Added 'content description' text to back button and logo on toolbar."/>
+        <c:change date="2022-06-29T00:00:00+00:00" summary="Added a new PDF reader implementation that can be enabled for testing."/>
+        <c:change date="2022-06-30T00:00:00+00:00" summary="Added syncing of the current audio book position across devices."/>
+        <c:change date="2022-06-30T00:00:00+00:00" summary="Stopped automatically playing an audio book when the player is opened."/>
+        <c:change date="2022-07-12T00:00:00+00:00" summary="Added a &quot;Loan limit reached&quot; pop-up message instead of showing a generic &quot;The operation could not be completed&quot; error."/>
+        <c:change date="2022-07-15T00:00:00+00:00" summary="Added a &quot;Cancel&quot; option to the library selection menu."/>
+        <c:change date="2022-07-19T00:00:00+00:00" summary="Fixed the playback rate not being retained after closing and reopening an audio book."/>
+        <c:change date="2022-07-20T00:00:00+00:00" summary="Changed the audio book progress bar to require a drag on the handle instead of just a tap to jump to a new location."/>
+        <c:change date="2022-07-22T00:00:00+00:00" summary="Added a &quot;Cancel&quot; option to the sleep timer and playback rate menus in the audio book player."/>
+        <c:change date="2022-07-28T00:00:00+00:00" summary="Fixed the library name not being fully displayed on the account detail screen."/>
+        <c:change date="2022-07-29T00:00:00+00:00" summary="Added an option to reset the patron's password on the account detail screen."/>
+        <c:change date="2022-08-03T00:00:00+00:00" summary="Fixed the audio book position sometimes not being retained after exiting the player."/>
+        <c:change date="2022-08-05T00:00:00+00:00" summary="Fixed a &quot;Download&quot; button appearing after returning a book, that would lead to an error if tapped."/>
+      </c:changes>
+    </c:release>
+    <c:release date="2022-08-16T16:36:07+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.2.0">
+      <c:changes>
+        <c:change date="2022-08-10T00:00:00+00:00" summary="Added &quot;content description&quot; text to back button and logo on toolbar."/>
+        <c:change date="2022-08-16T16:36:07+00:00" summary="Changed the chapter duration display in the audio book player to a running remaining time display."/>
       </c:changes>
     </c:release>
   </c:releases>
