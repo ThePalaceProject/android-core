@@ -190,7 +190,7 @@
         <c:change date="2022-04-29T00:00:00+00:00" summary="Fixed &quot;Unable to initialize audio engine&quot; error playing some audio books."/>
       </c:changes>
     </c:release>
-    <c:release date="2022-08-15T19:09:20+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.1.0">
+    <c:release date="2022-08-15T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.1.0">
       <c:changes>
         <c:change date="2022-05-05T00:00:00+00:00" summary="Fixed the labels of the filtering and sorting buttons in the catalog being cut off."/>
         <c:change date="2022-05-05T00:00:00+00:00" summary="Disabled the Search button on the catalog search pop-up when the input is blank."/>
@@ -220,6 +220,9 @@
         <c:change date="2022-08-03T00:00:00+00:00" summary="Fixed the audio book position sometimes not being retained after exiting the player."/>
         <c:change date="2022-08-05T00:00:00+00:00" summary="Fixed a &quot;Download&quot; button appearing after returning a book, that would lead to an error if tapped."/>
       </c:changes>
+    </c:release>
+    <c:release date="2022-08-16T16:09:20+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.2.0">
+      <c:changes/>
     </c:release>
   </c:releases>
   <c:ticket-systems>
