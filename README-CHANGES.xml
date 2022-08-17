@@ -223,6 +223,7 @@
     </c:release>
     <c:release date="2022-08-16T16:36:07+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.2.0">
       <c:changes>
+        <c:change date="2022-08-10T00:00:00+00:00" summary="Added &quot;content description&quot; text to back button and logo on toolbar."/>
         <c:change date="2022-08-16T16:36:07+00:00" summary="Changed the chapter duration display in the audio book player to a running remaining time display."/>
       </c:changes>
     </c:release>
