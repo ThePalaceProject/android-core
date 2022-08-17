@@ -286,6 +286,9 @@ public final class OPDSAcquisitionFeedEntryParser implements OPDSAcquisitionFeed
 
     if (rel_text.startsWith(ACQUISITION_URI_PREFIX_TEXT)) {
       for (final Relation v : Relation.values()) {
+        if (!isRelationSupported(v)) {
+          continue;
+        }
         final String uri_text = v.getUri().toString();
         if (rel_text.equals(uri_text)) {
           final URI href;
@@ -322,6 +325,21 @@ public final class OPDSAcquisitionFeedEntryParser implements OPDSAcquisitionFeed
 
       tryConsumeDRMLicensorInformation(entry_builder, link);
     }
+  }
+
+  private boolean isRelationSupported(OPDSAcquisition.Relation relation) {
+    switch (relation) {
+      case ACQUISITION_BORROW:
+      case ACQUISITION_GENERIC:
+      case ACQUISITION_OPEN_ACCESS:
+        return true;
+      case ACQUISITION_BUY:
+      case ACQUISITION_SAMPLE:
+      case ACQUISITION_SUBSCRIBE:
+        return false;
+    }
+
+    return false;
   }
 
   private static Map<String, String> consumeExtraAcquisitionProperties(Element link) {
