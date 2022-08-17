@@ -98,6 +98,8 @@ sealed class AccountAuthenticationViewBindings {
 
     private val logger = LoggerFactory.getLogger(ViewsForBasic::class.java)
 
+    private var showPassClicked = false
+
     private val userTextListener =
       OnTextChangeListener(
         onChanged = { _, _, _, _ ->
@@ -111,6 +113,12 @@ sealed class AccountAuthenticationViewBindings {
     private val passTextListener =
       OnTextChangeListener(
         onChanged = { _, _, _, _ ->
+
+          if (showPassClicked) {
+            showPassClicked = false
+            return@OnTextChangeListener
+          }
+
           this.onUsernamePasswordChangeListener.invoke(
             AccountUsername(this.user.text.toString()),
             AccountPassword(this.pass.text.toString())
@@ -122,11 +130,13 @@ sealed class AccountAuthenticationViewBindings {
 
       /*
        * Configure a checkbox listener that shows and hides the password field. Note that
-       * this will trigger the "text changed" listener on the password field, so we lock this
-       * checkbox during login/logout to avoid any chance of the UI becoming inconsistent.
+       * this will trigger the "text changed" listener on the password field, so we are using
+       * a flag to determine when this listener is called from enabling/disabling the checkbox
+       * or not.
        */
 
       this.showPass.setOnCheckedChangeListener { _, isChecked ->
+        showPassClicked = true
         setPasswordVisible(isChecked)
       }
 
@@ -149,13 +159,11 @@ sealed class AccountAuthenticationViewBindings {
     override fun lock() {
       this.user.isEnabled = false
       this.pass.isEnabled = false
-      this.showPass.isEnabled = false
     }
 
     override fun unlock() {
       this.user.isEnabled = true
       this.pass.isEnabled = true
-      this.showPass.isEnabled = true
     }
 
     override fun setLoginButtonStatus(status: AccountLoginButtonStatus) {

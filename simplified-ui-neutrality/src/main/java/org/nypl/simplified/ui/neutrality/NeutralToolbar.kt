@@ -100,9 +100,11 @@ class NeutralToolbar(
       this.iconView.x = this.dpToPixelsReal(16).toFloat()
       this.iconView.y = (this.height / 2.0f) - (iconHeight / 2.0f)
       this.iconView.layoutParams = LayoutParams(iconWidth.toInt(), iconHeight.toInt())
+      this.iconView.contentDescription = context.getString(R.string.contentDescriptionBack)
     } else {
       this.iconKind = ICON_IS_LOGO
       this.setLogo(this.iconLogoLast)
+      this.iconView.contentDescription = context.getString(R.string.contentDescriptionLogo)
     }
   }
 
