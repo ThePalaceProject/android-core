@@ -448,6 +448,7 @@ class BorrowTaskTest {
     this.webServer.enqueue(
       MockResponse()
         .setResponseCode(200)
+        .setBody("A cold star looked down on his creations")
     )
 
     val feedEntry = BorrowTestFeeds.opdsOpenAccessFeedEntryOfTypeWithTwoLinks(
@@ -476,7 +477,7 @@ class BorrowTaskTest {
     val handle =
       entry.findFormatHandle(BookDatabaseEntryFormatHandleEPUB::class.java)!!
 
-    assertEquals("Example", handle.format.file!!.readText())
+    assertEquals("A cold star looked down on his creations", handle.format.file!!.readText())
   }
 
   /**
