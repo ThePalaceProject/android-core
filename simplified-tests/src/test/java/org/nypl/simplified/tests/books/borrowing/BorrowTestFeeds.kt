@@ -173,7 +173,7 @@ object BorrowTestFeeds {
         <opds:holds total="0" />
         <opds:copies available="5" total="5" />
       </link>
-      <link rel="http://opds-spec.org/acquisition/sample" href="https://samples.overdrive.com/breath-of-scandal-0a8b4d?.epub-sample.overdrive.com" type="application/epub+zip"/>
+      <link rel="http://opds-spec.org/acquisition/sample" href="${webServer.url("/preview")}" type="$mime"/>
     </entry>
     """
     )
