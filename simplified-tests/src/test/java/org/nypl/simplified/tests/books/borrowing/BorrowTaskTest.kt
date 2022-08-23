@@ -63,6 +63,7 @@ import org.nypl.simplified.books.formats.api.StandardFormatNames.opdsAcquisition
 import org.nypl.simplified.books.formats.api.StandardFormatNames.simplifiedBearerToken
 import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
+import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
 import org.nypl.simplified.opds.core.OPDSJSONParser
 import org.nypl.simplified.opds.core.OPDSJSONSerializer
 import org.nypl.simplified.profiles.api.ProfileID
@@ -91,8 +92,11 @@ import org.nypl.simplified.tests.mocking.MockBorrowSubtaskDirectory
 import org.nypl.simplified.tests.mocking.MockBundledContentResolver
 import org.nypl.simplified.tests.mocking.MockContentResolver
 import org.nypl.simplified.tests.mocking.MockLCPService
+import org.nypl.simplified.tests.opds.OPDSFeedEntryParserTest
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.io.FileNotFoundException
+import java.io.InputStream
 import java.net.URI
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -345,6 +349,14 @@ class BorrowTaskTest {
     this.bookEvents.add(event)
   }
 
+  @Throws(Exception::class)
+  private fun getEpubToBorrowResource(): InputStream? {
+    val path = "/org/nypl/simplified/tests/books/borrow-epub-1.xml"
+    val url = OPDSFeedEntryParserTest::class.java.getResource(path)
+      ?: throw FileNotFoundException(path)
+    return url.openStream()
+  }
+
   /**
    * If the book database can't be set up, borrowing fails.
    */
@@ -393,6 +405,29 @@ class BorrowTaskTest {
   fun testNoAvailableAcquisitions() {
     val request =
       BorrowRequest.Start(this.accountId, this.profile.id, this.opdsEmptyFeedEntry)
+    val task =
+      this.createTask(request)
+
+    val result = this.executeAssumingFailure(task)
+    assertEquals(BorrowErrorCodes.noSupportedAcquisitions, result.lastErrorCode)
+
+    this.verifyBookRegistryHasStatus(FailedLoan::class.java)
+  }
+
+  /**
+   * A feed entry that only provides a sample acquisition can't be borrowed.
+   */
+
+  @Test
+  fun testNoAvailableBorrowAcquisitions() {
+
+    val feedEntryParser = OPDSAcquisitionFeedEntryParser.newParser()
+    val entry = feedEntryParser.parseEntryStream(URI.create("urn:test"), getEpubToBorrowResource())
+
+    assertEquals(1, entry.acquisitions.size)
+
+    val request =
+      BorrowRequest.Start(this.accountId, this.profile.id, entry)
     val task =
       this.createTask(request)
 

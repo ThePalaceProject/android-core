@@ -284,7 +284,7 @@ public final class OPDSAcquisitionFeedEntryParser implements OPDSAcquisitionFeed
     final String rel_text)
     throws OPDSParseException {
 
-    if (rel_text.startsWith(ACQUISITION_URI_PREFIX_TEXT) || rel_text.toLowerCase().equals("preview")) {
+    if (rel_text.startsWith(ACQUISITION_URI_PREFIX_TEXT)) {
       for (final Relation v : Relation.values()) {
         final String uri_text = v.getUri().toString();
         if (rel_text.equals(uri_text)) {
