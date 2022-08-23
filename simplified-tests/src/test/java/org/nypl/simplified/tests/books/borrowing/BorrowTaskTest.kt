@@ -45,6 +45,7 @@ import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookStatus.Downloading
 import org.nypl.simplified.books.book_registry.BookStatus.FailedLoan
+import org.nypl.simplified.books.book_registry.BookStatus.Loanable
 import org.nypl.simplified.books.book_registry.BookStatus.Loaned.LoanedDownloaded
 import org.nypl.simplified.books.book_registry.BookStatus.Loaned.LoanedNotDownloaded
 import org.nypl.simplified.books.book_registry.BookStatus.RequestingLoan
@@ -464,12 +465,11 @@ class BorrowTaskTest {
       this.createTask(request)
 
     val result = this.executeAssumingSuccess(task)
-    this.verifyBookRegistryHasStatus(BookStatus.Loanable::class.java)
+    this.verifyBookRegistryHasStatus(Loanable::class.java)
 
     assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
-    assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
-    assertEquals(LoanedDownloaded::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(Loanable::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(0, this.bookStates.size)
 
     val entry = this.bookDatabase.entry(this.bookID)
