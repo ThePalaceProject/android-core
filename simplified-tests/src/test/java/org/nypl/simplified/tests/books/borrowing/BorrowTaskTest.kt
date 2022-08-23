@@ -444,6 +444,11 @@ class BorrowTaskTest {
   @Test
   fun testTwoAvailableAcquisitions() {
 
+    this.webServer.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+    )
+
     val feedEntry = BorrowTestFeeds.opdsOpenAccessFeedEntryOfTypeWithTwoLinks(
       this.webServer,
       genericEPUBFiles.fullType
