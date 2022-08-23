@@ -1,0 +1,41 @@
+<entry xmlns:app="http://www.w3.org/2007/app" xmlns:bibframe="http://bibframe.org/vocab/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:drm="http://librarysimplified.org/terms/drm" xmlns:opds="http://opds-spec.org/2010/catalog" xmlns:schema="http://schema.org/" xmlns:simplified="http://librarysimplified.org/terms/" xmlns="http://www.w3.org/2005/Atom"
+    schema:additionalType="http://schema.org/EBook">
+  <title>Breath of Scandal</title>
+  <author>
+    <name>Sandra Brown</name>
+    <link rel="contributor" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Sandra Brown" href="https://centaur.tpp-qa.lyrasistechnology.org/overdrive-integration/works/contributor/Sandra%20Brown/eng/Adult%2CAdults%2BOnly%2CAll%2BAges%2CChildren%2CYoung%2BAdult"/>
+  </author>
+  <summary type="html">&lt;B&gt;Years after surviving a devastating attack, a young Southern woman returns to her hometown to exact revenge on the wealthy family who tried to destroy her.&lt;/B&gt;&lt;/br&gt;On a rainy Southern night, Jade Sperry endured a young woman's worst nightmare at the hands of three local hell-raisers. Robbed of her youthful ideals and at the center of scandal and tragedy, Jade ran as far and as fast as she could.&lt;/br&gt; Years later, Jade has never forgotten the sleepy "company town" where every man, woman, and child was dependent on one wealthy family. And she's never forgotten their spoiled son and his two friends, who changed her life forever. Now, she will return for her day of reckoning, free herself from fear, and stand up to the powerful family that could crush her in a heartbeat.&lt;/br&gt;&lt;B&gt;&lt;/B&gt;</summary>
+  <simplified:pwid>bb5a2120-34c3-1598-52a9-85e982af6a13</simplified:pwid>
+  <link rel="http://opds-spec.org/image" href="https://img1.od-cdn.com/ImageType-100/0017-1/%7B0A8B4D8E-FD32-41AE-B6A1-6FB87362622C%7DImg100.jpg" type="image/jpeg"/>
+  <link rel="http://opds-spec.org/image/thumbnail" href="https://img1.od-cdn.com/ImageType-400/0017-1/0A8/B4D/8E/%7B0A8B4D8E-FD32-41AE-B6A1-6FB87362622C%7DImg400.jpg" type="image/jpeg"/>
+  <link rel="http://opds-spec.org/acquisition/sample" href="https://samples.overdrive.com/breath-of-scandal-0a8b4d?.epub-sample.overdrive.com" type="application/epub+zip"/>
+  <category scheme="http://librarysimplified.org/terms/fiction/" term="http://librarysimplified.org/terms/fiction/Fiction" label="Fiction"/>
+  <category scheme="http://librarysimplified.org/terms/genres/Simplified/" term="http://librarysimplified.org/terms/genres/Simplified/Romance" label="Romance"/>
+  <category scheme="http://librarysimplified.org/terms/genres/Simplified/" term="http://librarysimplified.org/terms/genres/Simplified/Suspense/Thriller" label="Suspense/Thriller"/>
+  <category scheme="http://schema.org/audience" term="Adult" label="Adult"/>
+  <dcterms:language>en</dcterms:language>
+  <dcterms:publisher>Grand Central Publishing</dcterms:publisher>
+  <dcterms:issued>2013-02-26</dcterms:issued>
+  <link rel="issues" href="https://centaur.tpp-qa.lyrasistechnology.org/overdrive-integration/works/Overdrive%20ID/0a8b4d8e-fd32-41ae-b6a1-6fb87362622c/report"/>
+  <id>urn:librarysimplified.org/terms/id/Overdrive%20ID/0a8b4d8e-fd32-41ae-b6a1-6fb87362622c</id>
+  <link rel="alternate" href="https://centaur.tpp-qa.lyrasistechnology.org/overdrive-integration/works/Overdrive%20ID/0a8b4d8e-fd32-41ae-b6a1-6fb87362622c" type="application/atom+xml;type=entry;profile=opds-catalog"/>
+  <bibframe:distribution bibframe:ProviderName="Overdrive"/>
+  <published>2022-04-13T00:00:00Z</published>
+  <updated>2022-08-03T16:00:30+00:00</updated>
+  <link type="application/atom+xml;type=entry;profile=opds-catalog" rel="http://opds-spec.org/acquisition/borrow" href="https://centaur.tpp-qa.lyrasistechnology.org/overdrive-integration/works/Overdrive%20ID/0a8b4d8e-fd32-41ae-b6a1-6fb87362622c/borrow">
+    <opds:indirectAcquisition type="application/vnd.adobe.adept+xml">
+      <opds:indirectAcquisition type="application/epub+zip"/>
+    </opds:indirectAcquisition>
+    <opds:indirectAcquisition type="application/vnd.overdrive.circulation.api+json;profile=ebook"/>
+    <opds:indirectAcquisition type="application/atom+xml;type=entry;profile=opds-catalog">
+      <opds:indirectAcquisition type="text/html;profile=&quot;http://librarysimplified.org/terms/profiles/streaming-media&quot;"/>
+    </opds:indirectAcquisition>
+    <opds:availability status="available"/>
+    <opds:holds total="0"/>
+    <opds:copies total="2" available="2"/>
+  </link>
+  <link rel="related" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Recommended Works" href="https://centaur.tpp-qa.lyrasistechnology.org/overdrive-integration/works/Overdrive%20ID/0a8b4d8e-fd32-41ae-b6a1-6fb87362622c/related_books"/>
+  <link rel="http://www.w3.org/ns/oa#annotationService" type="application/ld+json; profile=&quot;http://www.w3.org/ns/anno.jsonld&quot;" href="https://centaur.tpp-qa.lyrasistechnology.org/overdrive-integration/annotations/Overdrive%20ID/0a8b4d8e-fd32-41ae-b6a1-6fb87362622c"/>
+  <link rel="http://librarysimplified.org/terms/rel/analytics/open-book" href="https://centaur.tpp-qa.lyrasistechnology.org/overdrive-integration/analytics/Overdrive%20ID/0a8b4d8e-fd32-41ae-b6a1-6fb87362622c/open_book"/>
+</entry>

@@ -350,8 +350,8 @@ class BorrowTaskTest {
   }
 
   @Throws(Exception::class)
-  private fun getEpubToBorrowResource(): InputStream? {
-    val path = "/org/nypl/simplified/tests/books/borrow-epub-1.xml"
+  private fun getEpubToBorrowResource(resourceName: String): InputStream? {
+    val path = "/org/nypl/simplified/tests/books/$resourceName"
     val url = OPDSFeedEntryParserTest::class.java.getResource(path)
       ?: throw FileNotFoundException(path)
     return url.openStream()
@@ -422,14 +422,15 @@ class BorrowTaskTest {
   fun testNoAvailableBorrowAcquisitions() {
 
     val feedEntryParser = OPDSAcquisitionFeedEntryParser.newParser()
-    val entry = feedEntryParser.parseEntryStream(URI.create("urn:test"), getEpubToBorrowResource())
+    val feedEntry = feedEntryParser.parseEntryStream(URI.create("urn:test"),
+      getEpubToBorrowResource("borrow-epub-1.xml"))
     this.bookID =
-      BookIDs.newFromOPDSEntry(entry)
+      BookIDs.newFromOPDSEntry(feedEntry)
 
-    assertEquals(1, entry.acquisitions.size)
+    assertEquals(1, feedEntry.acquisitions.size)
 
     val request =
-      BorrowRequest.Start(this.accountId, this.profile.id, entry)
+      BorrowRequest.Start(this.accountId, this.profile.id, feedEntry)
     val task =
       this.createTask(request)
 
@@ -437,6 +438,43 @@ class BorrowTaskTest {
     assertEquals(BorrowErrorCodes.noSupportedAcquisitions, result.lastErrorCode)
 
     this.verifyBookRegistryHasStatus(FailedLoan::class.java)
+  }
+
+  /**
+   * A feed entry that has two acquisitions (one for borrowing and another one to a sample)
+   * should be correctly borrowed.
+   */
+
+  @Test
+  fun testTwoAvailableAcquisitions() {
+
+    val feedEntryParser = OPDSAcquisitionFeedEntryParser.newParser()
+    val feedEntry = feedEntryParser.parseEntryStream(URI.create("urn:test"),
+      getEpubToBorrowResource("borrow-epub-2.xml"))
+    this.bookID =
+      BookIDs.newFromOPDSEntry(feedEntry)
+
+    assertEquals(2, feedEntry.acquisitions.size)
+
+    val request =
+      BorrowRequest.Start(this.accountId, this.profile.id, feedEntry)
+    val task =
+      this.createTask(request)
+
+    val result = this.executeAssumingSuccess(task)
+    this.verifyBookRegistryHasStatus(LoanedDownloaded::class.java)
+
+    assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(LoanedDownloaded::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(0, this.bookStates.size)
+
+    val entry = this.bookDatabase.entry(this.bookID)
+    val handle =
+      entry.findFormatHandle(BookDatabaseEntryFormatHandleEPUB::class.java)!!
+
+    assertEquals("A cold star looked down on his creations", handle.format.file!!.readText())
   }
 
   /**
