@@ -162,7 +162,7 @@ object BorrowTestFeeds {
     webServer: MockWebServer,
     mime: String
   ): OPDSAcquisitionFeedEntry {
-    val parsedEntry = this.opdsFeedEntryOf(
+    return this.opdsFeedEntryOf(
       """
     <entry xmlns="http://www.w3.org/2005/Atom" xmlns:opds="http://opds-spec.org/2010/catalog">
       <title>Example</title>
@@ -177,12 +177,10 @@ object BorrowTestFeeds {
     </entry>
     """
     )
-    check(parsedEntry.availability is OPDSAvailabilityOpenAccess) { "Feed entry must be OpenAccess" }
-    return parsedEntry
   }
 
   fun opdsOpenAccessFeedEntryWithNoBorrowLink(): OPDSAcquisitionFeedEntry {
-    val parsedEntry = this.opdsFeedEntryOf(
+    return this.opdsFeedEntryOf(
       """
     <entry xmlns="http://www.w3.org/2005/Atom" xmlns:opds="http://opds-spec.org/2010/catalog">
       <title>Example</title>
@@ -192,8 +190,6 @@ object BorrowTestFeeds {
     </entry>
     """
     )
-    check(parsedEntry.availability is OPDSAvailabilityOpenAccess) { "Feed entry must be OpenAccess" }
-    return parsedEntry
   }
 
   fun opdsLoanedFeedEntryOfType(
