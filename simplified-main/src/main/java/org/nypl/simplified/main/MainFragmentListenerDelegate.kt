@@ -619,8 +619,8 @@ internal class MainFragmentListenerDelegate(
     val viewerPreferences =
       ViewerPreferences(
         flags = mapOf(
-          "enablePDFJSReader" to
-            this.profilesController.profileCurrent().preferences().enablePDFJSReader
+          "enableOldPDFReader" to
+            this.profilesController.profileCurrent().preferences().enableOldPDFReader
         )
       )
 

@@ -46,7 +46,7 @@ data class ProfilePreferences(
 
   val showDebugSettings: Boolean = false,
 
-  /** @return `true` if the pdf.js-based PDF reader should be used. */
+  /** @return `true` if the old PDF reader should be used. */
 
-  val enablePDFJSReader: Boolean = false
+  val enableOldPDFReader: Boolean = false
 )

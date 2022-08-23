@@ -15,22 +15,7 @@ class PdfViewerProviderTest {
   fun supportsPdfBooksWhenEnabled() {
     val preferences = ViewerPreferences(
       flags = mapOf(
-        "enablePDFJSReader" to true
-      )
-    )
-
-    val book = Mockito.mock(Book::class.java)
-    val format = Mockito.mock(BookFormat.BookFormatPDF::class.java)
-    val provider = PdfViewerProvider()
-
-    Assertions.assertTrue(provider.canSupport(preferences, book, format))
-  }
-
-  @Test
-  fun doesNotSupportPdfBooksWhenDisabled() {
-    val preferences = ViewerPreferences(
-      flags = mapOf(
-        "enablePDFJSReader" to false
+        "enableOldPDFReader" to true
       )
     )
 
@@ -39,6 +24,21 @@ class PdfViewerProviderTest {
     val provider = PdfViewerProvider()
 
     Assertions.assertFalse(provider.canSupport(preferences, book, format))
+  }
+
+  @Test
+  fun doesNotSupportPdfBooksWhenDisabled() {
+    val preferences = ViewerPreferences(
+      flags = mapOf(
+        "enableOldPDFReader" to false
+      )
+    )
+
+    val book = Mockito.mock(Book::class.java)
+    val format = Mockito.mock(BookFormat.BookFormatPDF::class.java)
+    val provider = PdfViewerProvider()
+
+    Assertions.assertTrue(provider.canSupport(preferences, book, format))
   }
 
   @Test
