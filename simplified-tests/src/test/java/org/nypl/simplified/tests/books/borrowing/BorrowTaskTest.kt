@@ -422,8 +422,10 @@ class BorrowTaskTest {
   fun testNoAvailableBorrowAcquisitions() {
 
     val feedEntryParser = OPDSAcquisitionFeedEntryParser.newParser()
-    val feedEntry = feedEntryParser.parseEntryStream(URI.create("urn:test"),
-      getEpubToBorrowResource("borrow-epub-1.xml"))
+    val feedEntry = feedEntryParser.parseEntryStream(
+      URI.create("urn:test"),
+      getEpubToBorrowResource("borrow-epub-1.xml")
+    )
     this.bookID =
       BookIDs.newFromOPDSEntry(feedEntry)
 
@@ -449,8 +451,10 @@ class BorrowTaskTest {
   fun testTwoAvailableAcquisitions() {
 
     val feedEntryParser = OPDSAcquisitionFeedEntryParser.newParser()
-    val feedEntry = feedEntryParser.parseEntryStream(URI.create("urn:test"),
-      getEpubToBorrowResource("borrow-epub-2.xml"))
+    val feedEntry = feedEntryParser.parseEntryStream(
+      URI.create("urn:test"),
+      getEpubToBorrowResource("borrow-epub-2.xml")
+    )
     this.bookID =
       BookIDs.newFromOPDSEntry(feedEntry)
 
