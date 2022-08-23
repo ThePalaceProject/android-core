@@ -423,6 +423,8 @@ class BorrowTaskTest {
 
     val feedEntryParser = OPDSAcquisitionFeedEntryParser.newParser()
     val entry = feedEntryParser.parseEntryStream(URI.create("urn:test"), getEpubToBorrowResource())
+    this.bookID =
+      BookIDs.newFromOPDSEntry(entry)
 
     assertEquals(1, entry.acquisitions.size)
 
