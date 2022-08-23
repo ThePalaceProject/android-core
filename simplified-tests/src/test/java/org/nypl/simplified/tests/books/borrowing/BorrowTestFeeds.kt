@@ -168,7 +168,7 @@ object BorrowTestFeeds {
       <title>Example</title>
       <updated>2020-09-17T16:48:51+0000</updated>
       <id>7264f7f8-7bea-4ce6-906e-615406ca38cb</id>
-      <link href="${webServer.url("/next")}" rel="http://opds-spec.org/acquisition/open-access" type="$mime" />
+      <link href="${webServer.url("/next")}" rel="http://opds-spec.org/acquisition/borrow" type="$mime" />
       <link rel="http://opds-spec.org/acquisition/sample" href="${webServer.url("/preview")}" type="$mime"/>
     </entry>
     """
