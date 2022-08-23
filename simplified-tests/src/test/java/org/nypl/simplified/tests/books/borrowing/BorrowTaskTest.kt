@@ -63,7 +63,6 @@ import org.nypl.simplified.books.formats.api.StandardFormatNames.opdsAcquisition
 import org.nypl.simplified.books.formats.api.StandardFormatNames.simplifiedBearerToken
 import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
 import org.nypl.simplified.opds.core.OPDSJSONParser
 import org.nypl.simplified.opds.core.OPDSJSONSerializer
 import org.nypl.simplified.profiles.api.ProfileID
@@ -420,12 +419,7 @@ class BorrowTaskTest {
 
   @Test
   fun testNoAvailableBorrowAcquisitions() {
-
-    val feedEntryParser = OPDSAcquisitionFeedEntryParser.newParser()
-    val feedEntry = feedEntryParser.parseEntryStream(
-      URI.create("urn:test"),
-      getEpubToBorrowResource("borrow-epub-1.xml")
-    )
+    val feedEntry = BorrowTestFeeds.opdsOpenAccessFeedEntryWithNoBorrowLink()
     this.bookID =
       BookIDs.newFromOPDSEntry(feedEntry)
 
@@ -450,10 +444,9 @@ class BorrowTaskTest {
   @Test
   fun testTwoAvailableAcquisitions() {
 
-    val feedEntryParser = OPDSAcquisitionFeedEntryParser.newParser()
-    val feedEntry = feedEntryParser.parseEntryStream(
-      URI.create("urn:test"),
-      getEpubToBorrowResource("borrow-epub-2.xml")
+    val feedEntry = BorrowTestFeeds.opdsOpenAccessFeedEntryOfTypeWithTwoLinks(
+      this.webServer,
+      genericEPUBFiles.fullType
     )
     this.bookID =
       BookIDs.newFromOPDSEntry(feedEntry)

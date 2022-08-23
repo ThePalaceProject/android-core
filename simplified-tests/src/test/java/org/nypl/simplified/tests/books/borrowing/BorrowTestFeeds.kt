@@ -158,6 +158,44 @@ object BorrowTestFeeds {
     return parsedEntry
   }
 
+  fun opdsOpenAccessFeedEntryOfTypeWithTwoLinks(
+    webServer: MockWebServer,
+    mime: String
+  ): OPDSAcquisitionFeedEntry {
+    val parsedEntry = this.opdsFeedEntryOf(
+      """
+    <entry xmlns="http://www.w3.org/2005/Atom" xmlns:opds="http://opds-spec.org/2010/catalog">
+      <title>Example</title>
+      <updated>2020-09-17T16:48:51+0000</updated>
+      <id>7264f7f8-7bea-4ce6-906e-615406ca38cb</id>
+      <link href="${webServer.url("/next")}" rel="http://opds-spec.org/acquisition/open-access" type="$mime">
+        <opds:availability since="2020-09-17T16:48:51+0000" status="available" until="2020-09-17T16:48:51+0000" />
+        <opds:holds total="0" />
+        <opds:copies available="5" total="5" />
+      </link>
+      <link rel="http://opds-spec.org/acquisition/sample" href="https://samples.overdrive.com/breath-of-scandal-0a8b4d?.epub-sample.overdrive.com" type="application/epub+zip"/>
+    </entry>
+    """
+    )
+    check(parsedEntry.availability is OPDSAvailabilityOpenAccess) { "Feed entry must be OpenAccess" }
+    return parsedEntry
+  }
+
+  fun opdsOpenAccessFeedEntryWithNoBorrowLink(): OPDSAcquisitionFeedEntry {
+    val parsedEntry = this.opdsFeedEntryOf(
+      """
+    <entry xmlns="http://www.w3.org/2005/Atom" xmlns:opds="http://opds-spec.org/2010/catalog">
+      <title>Example</title>
+      <updated>2020-09-17T16:48:51+0000</updated>
+      <id>7264f7f8-7bea-4ce6-906e-615406ca38cb</id>
+      <link rel="http://opds-spec.org/acquisition/sample" href="https://samples.overdrive.com/breath-of-scandal-0a8b4d?.epub-sample.overdrive.com" type="application/epub+zip"/>
+    </entry>
+    """
+    )
+    check(parsedEntry.availability is OPDSAvailabilityOpenAccess) { "Feed entry must be OpenAccess" }
+    return parsedEntry
+  }
+
   fun opdsLoanedFeedEntryOfType(
     webServer: MockWebServer,
     mime: String
