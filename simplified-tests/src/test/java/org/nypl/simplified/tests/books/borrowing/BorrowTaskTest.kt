@@ -476,7 +476,7 @@ class BorrowTaskTest {
     val handle =
       entry.findFormatHandle(BookDatabaseEntryFormatHandleEPUB::class.java)!!
 
-    assertEquals("A cold star looked down on his creations", handle.format.file!!.readText())
+    assertEquals("Example", handle.format.file!!.readText())
   }
 
   /**
