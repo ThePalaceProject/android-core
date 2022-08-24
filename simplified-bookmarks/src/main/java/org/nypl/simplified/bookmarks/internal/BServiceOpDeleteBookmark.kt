@@ -102,7 +102,7 @@ internal class BServiceOpDeleteBookmark(
               BookmarkKind.BookmarkLastReadLocation ->
                 handle.setLastReadLocation(null)
               BookmarkKind.BookmarkExplicit -> {
-                // do nothing
+                handle.setBookmarks(handle.format.bookmarks.minus(this.bookmark))
               }
             }
           } else {

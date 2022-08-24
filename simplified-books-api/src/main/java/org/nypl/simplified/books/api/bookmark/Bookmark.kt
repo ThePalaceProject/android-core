@@ -224,7 +224,7 @@ sealed class Bookmark {
 
     override val book: BookID = BookIDs.newFromText(this.opdsId)
 
-    override val bookmarkId: BookmarkID = createBookmarkID(this.book, this.kind)
+    override val bookmarkId: BookmarkID = createBookmarkID(this.book, this.kind, this.pageNumber)
 
     override fun toLastReadLocation(): Bookmark {
       return this.copy(kind = BookmarkKind.BookmarkLastReadLocation)
@@ -241,18 +241,20 @@ sealed class Bookmark {
     }
 
     /**
-     * Create a bookmark ID from the given book ID and kind.
+     * Create a bookmark ID from the given book ID, kind and page number.
      */
 
     private fun createBookmarkID(
       book: BookID,
-      kind: BookmarkKind
+      kind: BookmarkKind,
+      pageNumber: Int
     ): BookmarkID {
       try {
         val messageDigest = MessageDigest.getInstance("SHA-256")
         val utf8 = Charset.forName("UTF-8")
         messageDigest.update(book.value().toByteArray(utf8))
         messageDigest.update(kind.motivationURI.toByteArray(utf8))
+        messageDigest.update(pageNumber.toString().toByteArray(utf8))
 
         val digestResult = messageDigest.digest()
         val builder = StringBuilder(64)
@@ -319,7 +321,7 @@ sealed class Bookmark {
 
     override val book: BookID = BookIDs.newFromText(this.opdsId)
 
-    override val bookmarkId: BookmarkID = createBookmarkID(this.book, this.kind)
+    override val bookmarkId: BookmarkID = createBookmarkID(this.book, this.kind, this.location)
 
     override fun toLastReadLocation(): Bookmark {
       return this.copy(kind = BookmarkKind.BookmarkLastReadLocation)
@@ -336,18 +338,22 @@ sealed class Bookmark {
     }
 
     /**
-     * Create a bookmark ID from the given book ID and kind.
+     * Create a bookmark ID from the given book ID, kind and location.
      */
 
     private fun createBookmarkID(
       book: BookID,
-      kind: BookmarkKind
+      kind: BookmarkKind,
+      location: PlayerPosition
     ): BookmarkID {
       try {
         val messageDigest = MessageDigest.getInstance("SHA-256")
         val utf8 = Charset.forName("UTF-8")
         messageDigest.update(book.value().toByteArray(utf8))
         messageDigest.update(kind.motivationURI.toByteArray(utf8))
+        messageDigest.update(location.chapter.toString().toByteArray(utf8))
+        messageDigest.update(location.part.toString().toByteArray(utf8))
+        messageDigest.update(location.offsetMilliseconds.toString().toByteArray(utf8))
 
         val digestResult = messageDigest.digest()
         val builder = StringBuilder(64)
