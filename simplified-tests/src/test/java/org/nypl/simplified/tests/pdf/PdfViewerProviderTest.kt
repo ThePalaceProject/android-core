@@ -12,8 +12,9 @@ import org.nypl.simplified.viewer.spi.ViewerPreferences
 class PdfViewerProviderTest {
 
   @Test
-  fun supportsPdfBooksWhenEnabled() {
+  fun doesNotSupportPdfBooksWhenDisabled() {
     val preferences = ViewerPreferences(
+      // by setting the old PDF reader setting to true, we're disabling the PDF-JS reader
       flags = mapOf(
         "enableOldPDFReader" to true
       )
@@ -27,8 +28,9 @@ class PdfViewerProviderTest {
   }
 
   @Test
-  fun doesNotSupportPdfBooksWhenDisabled() {
+  fun supportsPdfBooksWhenEnabled() {
     val preferences = ViewerPreferences(
+      // by setting the old PDF reader setting to false, we're enabling the PDF-JS reader
       flags = mapOf(
         "enableOldPDFReader" to false
       )
