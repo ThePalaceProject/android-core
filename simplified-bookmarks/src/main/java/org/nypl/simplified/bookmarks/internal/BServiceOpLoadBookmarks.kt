@@ -7,6 +7,7 @@ import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.api.bookmark.Bookmark
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleEPUB
+import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandlePDF
 import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.slf4j.Logger
 
@@ -30,6 +31,7 @@ internal class BServiceOpLoadBookmarks(
       val entry = books.entry(this.book)
       val handle = entry.findFormatHandle(BookDatabaseEntryFormatHandleEPUB::class.java)
         ?: entry.findFormatHandle(BookDatabaseEntryFormatHandleAudioBook::class.java)
+        ?: entry.findFormatHandle(BookDatabaseEntryFormatHandlePDF::class.java)
 
       if (handle != null) {
 
@@ -44,6 +46,11 @@ internal class BServiceOpLoadBookmarks(
           }
           is BookFormat.BookFormatAudioBook -> {
             val format = handle.format as BookFormat.BookFormatAudioBook
+            bookmarks = format.bookmarks
+            lastReadLocation = format.lastReadLocation
+          }
+          is BookFormat.BookFormatPDF -> {
+            val format = handle.format as BookFormat.BookFormatPDF
             bookmarks = format.bookmarks
             lastReadLocation = format.lastReadLocation
           }

@@ -15,6 +15,16 @@
     <FrameLayout
         android:id="@+id/pdf_reader_fragment_holder"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <ProgressBar
+            android:id="@+id/pdf_loading_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="128dp"
+            android:layout_height="32dp"
+            android:indeterminate="true"
+            android:layout_gravity="center"/>
+
+    </FrameLayout>
 
 </LinearLayout>

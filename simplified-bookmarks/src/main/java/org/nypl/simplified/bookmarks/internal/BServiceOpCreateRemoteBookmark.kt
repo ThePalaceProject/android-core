@@ -48,6 +48,8 @@ internal class BServiceOpCreateRemoteBookmark(
           BookmarkAnnotations.fromReaderBookmark(this.objectMapper, this.bookmark)
         is Bookmark.AudiobookBookmark ->
           BookmarkAnnotations.fromAudiobookBookmark(this.objectMapper, this.bookmark)
+        is Bookmark.PDFBookmark ->
+          BookmarkAnnotations.fromPdfBookmark(this.objectMapper, this.bookmark)
         else ->
           throw IllegalStateException("Unsupported bookmark type: $bookmark")
       }

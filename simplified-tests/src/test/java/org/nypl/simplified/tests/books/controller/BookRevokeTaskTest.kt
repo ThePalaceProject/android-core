@@ -2500,7 +2500,8 @@ class BookRevokeTaskTest {
         lastReadLocation = null,
         file = null,
         contentType = BookFormats.pdfMimeTypes().first(),
-        drmInformation = BookDRMInformation.None
+        drmInformation = BookDRMInformation.None,
+        bookmarks = listOf()
       )
 
     val acquisition =

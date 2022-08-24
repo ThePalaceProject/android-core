@@ -37,13 +37,17 @@ object BookmarkAnnotationsJSON {
         objectMapper.readTree(value)
       val selectorObj =
         JSONParserUtilities.checkObject(null, selectorNode)
-      val selectorType =
-        JSONParserUtilities.getStringOrNull(selectorObj, "@type")
 
-      if (selectorType == "LocatorAudioBookTime") {
-        deserializeAudiobookLocation(objectMapper, value)
-      } else {
-        deserializeReaderLocation(objectMapper, value)
+      when (JSONParserUtilities.getStringOrNull(selectorObj, "@type")) {
+        "LocatorAudioBookTime" -> {
+          deserializeAudiobookLocation(objectMapper, value)
+        }
+        "LocatorPage" -> {
+          deserializePdfLocation(objectMapper, value)
+        }
+        else -> {
+          deserializeReaderLocation(objectMapper, value)
+        }
       }
     } catch (e: Exception) {
       throw JSONParseException(e)
@@ -324,9 +328,23 @@ object BookmarkAnnotationsJSON {
             bookmark.location
           )
         )
+      is Bookmark.PDFBookmark -> {
+        objectMapper.writeValueAsString(serializeIndexToNode(objectMapper, bookmark.pageNumber))
+      }
       else ->
         throw IllegalArgumentException("Unsupported bookmark type: $bookmark")
     }
+  }
+
+  @Throws(JSONParseException::class)
+  private fun serializeIndexToNode(
+    objectMapper: ObjectMapper,
+    pageIndex: Int
+  ): ObjectNode {
+    val objectNode = objectMapper.createObjectNode()
+    objectNode.put("@type", "LocatorPage")
+    objectNode.put("page", pageIndex)
+    return objectNode
   }
 
   @Throws(JSONParseException::class)
@@ -406,6 +424,19 @@ object BookmarkAnnotationsJSON {
       JSONParserUtilities.checkObject(null, node)
 
     return JSONParserUtilities.getInteger(obj, "duration").toLong()
+  }
+
+  @Throws(JSONParseException::class)
+  fun deserializePdfLocation(
+    objectMapper: ObjectMapper,
+    value: String
+  ): Int {
+    val node =
+      objectMapper.readTree(value)
+    val obj =
+      JSONParserUtilities.checkObject(null, node)
+
+    return JSONParserUtilities.getInteger(obj, "page")
   }
 
   @Throws(JSONParseException::class)
