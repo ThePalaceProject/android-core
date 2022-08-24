@@ -313,15 +313,15 @@ class SettingsDebugViewModel(application: Application) : AndroidViewModel(applic
     }
   }
 
-  var enablePDFJSReader: Boolean
+  var enableOldPDFReader: Boolean
     get() =
       this.profilesController
         .profileCurrent()
         .preferences()
-        .enablePDFJSReader
+        .enableOldPDFReader
     set(value) {
       this.profilesController.profileUpdate { description ->
-        description.copy(preferences = description.preferences.copy(enablePDFJSReader = value))
+        description.copy(preferences = description.preferences.copy(enableOldPDFReader = value))
       }
     }
 }
