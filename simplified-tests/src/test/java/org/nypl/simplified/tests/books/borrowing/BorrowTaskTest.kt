@@ -92,11 +92,8 @@ import org.nypl.simplified.tests.mocking.MockBorrowSubtaskDirectory
 import org.nypl.simplified.tests.mocking.MockBundledContentResolver
 import org.nypl.simplified.tests.mocking.MockContentResolver
 import org.nypl.simplified.tests.mocking.MockLCPService
-import org.nypl.simplified.tests.opds.OPDSFeedEntryParserTest
 import org.slf4j.LoggerFactory
 import java.io.File
-import java.io.FileNotFoundException
-import java.io.InputStream
 import java.net.URI
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -347,14 +344,6 @@ class BorrowTaskTest {
     this.logger.debug("status: {}", status)
     this.bookStates.add(status)
     this.bookEvents.add(event)
-  }
-
-  @Throws(Exception::class)
-  private fun getEpubToBorrowResource(resourceName: String): InputStream? {
-    val path = "/org/nypl/simplified/tests/books/$resourceName"
-    val url = OPDSFeedEntryParserTest::class.java.getResource(path)
-      ?: throw FileNotFoundException(path)
-    return url.openStream()
   }
 
   /**
