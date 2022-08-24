@@ -619,7 +619,8 @@ class Controller private constructor(
 
   override fun bookRevoke(
     accountID: AccountID,
-    bookId: BookID
+    bookId: BookID,
+    onNewBookEntry: (FeedEntry.FeedEntryOPDS) -> Unit
   ): FluentFuture<TaskResult<Unit>> {
     this.publishRequestingDelete(bookId)
     return this.submitTask(
@@ -631,6 +632,7 @@ class Controller private constructor(
         bookID = bookId,
         bookRegistry = this.bookRegistry,
         feedLoader = this.feedLoader,
+        onNewBookEntry = onNewBookEntry,
         revokeStrings = this.revokeStrings
       )
     )

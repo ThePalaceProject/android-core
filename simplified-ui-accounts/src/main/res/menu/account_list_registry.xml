@@ -7,7 +7,7 @@
     android:icon="@drawable/search"
     android:title="@string/accountMenuSearch"
     app:actionViewClass="androidx.appcompat.widget.SearchView"
-    app:showAsAction="collapseActionView|ifRoom" />
+    app:showAsAction="ifRoom" />
   <item
     android:id="@+id/accountMenuActionReload"
     android:icon="@drawable/refresh"

@@ -62,6 +62,7 @@ class BookRevokeTask(
   private val bookID: BookID,
   private val bookRegistry: BookRegistryType,
   private val feedLoader: FeedLoaderType,
+  private val onNewBookEntry: (FeedEntryOPDS) -> Unit = {},
   private val revokeStrings: BookRevokeStringResourcesType,
   private val revokeACSTimeoutDuration: Duration = Duration.standardMinutes(1L),
   private val revokeServerTimeoutDuration: Duration = Duration.standardMinutes(3L)
@@ -231,6 +232,7 @@ class BookRevokeTask(
     }
 
     this.revokeNotifyServerSaveNewEntry(newEntry)
+    this.onNewBookEntry(newEntry)
   }
 
   private fun feedEntryWithAvailability(
