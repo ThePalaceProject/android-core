@@ -466,6 +466,7 @@ class BorrowTaskTest {
       this.createTask(request)
 
     val result = this.executeAssumingSuccess(task)
+
     this.verifyBookRegistryHasStatus(Loanable::class.java)
 
     assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
