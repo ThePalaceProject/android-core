@@ -5,6 +5,7 @@ import one.irradia.mime.api.MIMEType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.formats.api.StandardFormatNames
+import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.viewer.spi.ViewerPreferences
 import org.nypl.simplified.viewer.spi.ViewerProviderType
 import org.slf4j.LoggerFactory
@@ -29,7 +30,7 @@ class PdfViewerProvider : ViewerProviderType {
         false
       }
       is BookFormat.BookFormatPDF -> {
-        preferences.flags["enablePDFJSReader"] != true
+        preferences.flags["enableOldPDFReader"] == true
       }
     }
   }
@@ -45,6 +46,8 @@ class PdfViewerProvider : ViewerProviderType {
     format: BookFormat
   ) {
     val formatPDF = format as BookFormat.BookFormatPDF
+    val entry =
+      FeedEntry.FeedEntryOPDS(book.account, book.entry)
     PdfReaderActivity.startActivity(
       from = activity,
       parameters = PdfReaderParameters(
@@ -52,7 +55,8 @@ class PdfViewerProvider : ViewerProviderType {
         documentTile = book.entry.title,
         pdfFile = formatPDF.file!!,
         id = book.id,
-        drmInfo = formatPDF.drmInformation
+        drmInfo = formatPDF.drmInformation,
+        entry = entry
       )
     )
   }

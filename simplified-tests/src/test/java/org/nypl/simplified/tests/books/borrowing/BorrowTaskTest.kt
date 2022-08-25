@@ -45,6 +45,7 @@ import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookStatus.Downloading
 import org.nypl.simplified.books.book_registry.BookStatus.FailedLoan
+import org.nypl.simplified.books.book_registry.BookStatus.Loanable
 import org.nypl.simplified.books.book_registry.BookStatus.Loaned.LoanedDownloaded
 import org.nypl.simplified.books.book_registry.BookStatus.Loaned.LoanedNotDownloaded
 import org.nypl.simplified.books.book_registry.BookStatus.RequestingLoan
@@ -400,6 +401,74 @@ class BorrowTaskTest {
     assertEquals(BorrowErrorCodes.noSupportedAcquisitions, result.lastErrorCode)
 
     this.verifyBookRegistryHasStatus(FailedLoan::class.java)
+  }
+
+  /**
+   * A feed entry that only provides a sample acquisition can't be borrowed.
+   */
+
+  @Test
+  fun testNoAvailableBorrowAcquisitions() {
+    val feedEntry = BorrowTestFeeds.opdsOpenAccessFeedEntryWithNoBorrowLink()
+    this.bookID =
+      BookIDs.newFromOPDSEntry(feedEntry)
+
+    assertEquals(1, feedEntry.acquisitions.size)
+
+    val request =
+      BorrowRequest.Start(this.accountId, this.profile.id, feedEntry)
+    val task =
+      this.createTask(request)
+
+    val result = this.executeAssumingFailure(task)
+    assertEquals(BorrowErrorCodes.noSupportedAcquisitions, result.lastErrorCode)
+
+    this.verifyBookRegistryHasStatus(FailedLoan::class.java)
+  }
+
+  /**
+   * A feed entry that has two acquisitions (one for borrowing and another one to a sample)
+   * should be correctly borrowed.
+   */
+
+  @Test
+  fun testTwoAvailableAcquisitions() {
+
+    this.webServer.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+        .setBody("A cold star looked down on his creations")
+    )
+
+    val feedEntry = BorrowTestFeeds.opdsOpenAccessFeedEntryOfTypeWithTwoLinks(
+      this.webServer,
+      genericEPUBFiles.fullType
+    )
+    this.bookID =
+      BookIDs.newFromOPDSEntry(feedEntry)
+
+    assertEquals(2, feedEntry.acquisitions.size)
+
+    val request =
+      BorrowRequest.Start(this.accountId, this.profile.id, feedEntry)
+    val task =
+      this.createTask(request)
+
+    val result = this.executeAssumingSuccess(task)
+
+    this.verifyBookRegistryHasStatus(Loanable::class.java)
+
+    assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(Loanable::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(0, this.bookStates.size)
+
+    val entry = this.bookDatabase.entry(this.bookID)
+    val handle =
+      entry.findFormatHandle(BookDatabaseEntryFormatHandleEPUB::class.java)!!
+
+    assertEquals("A cold star looked down on his creations", handle.format.file!!.readText())
   }
 
   /**

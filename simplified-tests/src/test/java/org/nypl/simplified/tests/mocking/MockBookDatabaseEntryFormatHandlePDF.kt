@@ -5,6 +5,7 @@ import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookDRMKind
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.api.BookID
+import org.nypl.simplified.books.api.bookmark.Bookmark
 import org.nypl.simplified.books.book_database.api.BookDRMInformationHandle
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandlePDF
 import org.nypl.simplified.books.formats.api.StandardFormatNames
@@ -22,7 +23,8 @@ class MockBookDatabaseEntryFormatHandlePDF(
       drmInformation = BookDRMInformation.None,
       file = this.bookFile,
       lastReadLocation = null,
-      contentType = StandardFormatNames.genericPDFFiles
+      contentType = StandardFormatNames.genericPDFFiles,
+      bookmarks = listOf()
     )
 
   var drmInformationHandleField: BookDRMInformationHandle =
@@ -41,8 +43,12 @@ class MockBookDatabaseEntryFormatHandlePDF(
     check(this.formatField.isDownloaded)
   }
 
-  override fun setLastReadLocation(pageNumber: Int?) {
-    this.formatField = this.formatField.copy(lastReadLocation = pageNumber)
+  override fun setLastReadLocation(bookmark: Bookmark.PDFBookmark?) {
+    this.formatField = this.formatField.copy(lastReadLocation = bookmark)
+  }
+
+  override fun setBookmarks(bookmarks: List<Bookmark.PDFBookmark>) {
+    this.formatField = this.formatField.copy(bookmarks = bookmarks)
   }
 
   override val drmInformationHandle: BookDRMInformationHandle

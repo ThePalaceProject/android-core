@@ -3,63 +3,64 @@ package org.nypl.simplified.tests.bookmark_annotations
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotation
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotationBodyNode
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotationFirstNode
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotationResponse
-import org.nypl.simplified.bookmarks.api.BookmarkAnnotationSelectorNode
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotations
+import org.nypl.simplified.bookmarks.api.BookmarkAnnotationSelectorNode
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotationsJSON
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotationTargetNode
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
+import org.nypl.simplified.json.core.JSONParseException
 import org.slf4j.LoggerFactory
 import java.io.FileNotFoundException
 import java.io.InputStream
 
-class AudiobookBookmarkAnnotationsJSONTest {
+class PDFBookmarkAnnotationsJSONTest {
 
   private val logger =
-    LoggerFactory.getLogger(AudiobookBookmarkAnnotationsJSONTest::class.java)
+    LoggerFactory.getLogger(PDFBookmarkAnnotationsJSONTest::class.java)
 
   private val objectMapper: ObjectMapper = ObjectMapper()
+
   private val targetValue0 =
-    "{\n \"title\": \"Chapter title\",\n \"chapter\": 1,\n  \"part\": 1,\n  \"time\":123,\n" +
-      "\"duration\": \"190\",\n \"audiobookID\": \"urn:uuid:b309844e-7d4e-403e-945b-fbc78acd5e03\"\n}\n"
+    "{\n  \"@type\": \"LocatorPage\",\n  \"page\": 2\n}\n"
   private val targetValue1 =
-    "{\n \"title\": \"Chapter title 2\",\n  \"chapter\": 2,\n  \"part\": 1,\n  \"time\":111,\n" +
-      "\"duration\": \"190\",\n \"audiobookID\": \"urn:uuid:b309844e-7d4e-403e-945b-fbc78acd5e03\"\n}\n"
+    "{\n  \"@type\": \"LocatorPage\",\n  \"page\": 3\n}\n"
   private val targetValue2 =
-    "{\n \"title\": \"Chapter title 3\",\n  \"chapter\": 3,\n  \"part\": 1,\n  \"time\":100\n,\n" +
-      "\"duration\": \"190\",\n \"audiobookID\": \"urn:uuid:b309844e-7d4e-403e-945b-fbc78acd5e03\"\n}\n"
+    "{\n  \"@type\": \"LocatorPage\",\n  \"page\": 4\n}\n"
 
   private val bookmarkBody0 =
     BookmarkAnnotationBodyNode(
-      timestamp = "2022-06-27T12:39:37+0000",
+      timestamp = "2022-08-05T18:35:37+0000",
       device = "cca80416-3168-4e58-b621-7964b9265ac9",
-      chapterTitle = "A Title",
+      chapterTitle = null,
       bookProgress = null
     )
 
   private val bookmarkBody1 =
     BookmarkAnnotationBodyNode(
-      timestamp = "2022-06-27T12:39:37+0000",
+      timestamp = "2022-08-05T18:36:37+0000",
       device = "cca80416-3168-4e58-b621-7964b9265ac9",
-      chapterTitle = "A Title",
+      chapterTitle = null,
       bookProgress = null
     )
 
   private val bookmarkBody2 =
     BookmarkAnnotationBodyNode(
-      timestamp = "2022-06-27T12:39:37+0000",
+      timestamp = "2022-08-05T18:37:37+0000",
       device = "cca80416-3168-4e58-b621-7964b9265ac9",
-      chapterTitle = "A Title",
+      chapterTitle = null,
       bookProgress = null
     )
 
   private val bookmarkBodyBadDate =
     BookmarkAnnotationBodyNode(
-      timestamp = "2022-06-27T20:00:37Z",
+      timestamp = "2022-08-05T18:00:37Z",
       device = "cca80416-3168-4e58-b621-7964b9265ac9",
       chapterTitle = "A Title",
       bookProgress = null
@@ -127,19 +128,13 @@ class AudiobookBookmarkAnnotationsJSONTest {
     assertEquals("oa:FragmentSelector", node["type"].textValue())
     assertEquals(this.targetValue0, node["value"].textValue())
 
-    assertEquals(
-      input,
-      BookmarkAnnotationsJSON.deserializeSelectorNodeFromJSON(this.objectMapper, node)
-    )
+    assertEquals(input, BookmarkAnnotationsJSON.deserializeSelectorNodeFromJSON(this.objectMapper, node))
   }
 
   @Test
   fun testTarget() {
     val input =
-      BookmarkAnnotationTargetNode(
-        "z",
-        BookmarkAnnotationSelectorNode("oa:FragmentSelector", this.targetValue0)
-      )
+      BookmarkAnnotationTargetNode("z", BookmarkAnnotationSelectorNode("oa:FragmentSelector", this.targetValue0))
     val node =
       BookmarkAnnotationsJSON.serializeTargetNodeToJSON(this.objectMapper, input)
 
@@ -147,10 +142,7 @@ class AudiobookBookmarkAnnotationsJSONTest {
     assertEquals("oa:FragmentSelector", node["selector"]["type"].textValue())
     assertEquals(this.targetValue0, node["selector"]["value"].textValue())
 
-    assertEquals(
-      input,
-      BookmarkAnnotationsJSON.deserializeTargetNodeFromJSON(this.objectMapper, node)
-    )
+    assertEquals(input, BookmarkAnnotationsJSON.deserializeTargetNodeFromJSON(this.objectMapper, node))
   }
 
   @Test
@@ -159,42 +151,21 @@ class AudiobookBookmarkAnnotationsJSONTest {
       BookmarkAnnotationsJSON.serializeBodyNodeToJSON(this.objectMapper, this.bookmarkBody0)
 
     assertEquals(
-      "2022-06-27T12:39:37+0000",
+      "2022-08-05T18:35:37+0000",
       node["http://librarysimplified.org/terms/time"].textValue()
     )
     assertEquals(
       "cca80416-3168-4e58-b621-7964b9265ac9",
       node["http://librarysimplified.org/terms/device"].textValue()
     )
-    assertEquals(
-      "A Title",
-      node["http://librarysimplified.org/terms/chapter"].textValue()
-    )
 
     assertEquals(this.bookmarkBody0, BookmarkAnnotationsJSON.deserializeBodyNodeFromJSON(node))
   }
 
   @Test
-  fun testSpecValidLocator() {
-    val location =
-      BookmarkAnnotationsJSON.deserializeAudiobookLocation(
-        objectMapper = this.objectMapper,
-        value = this.resourceText("valid-locator-3.json")
-      )
-
-    assertEquals(32, location.chapter)
-    assertEquals(3, location.part)
-    assertEquals("Chapter title", location.title)
-    assertEquals(78000, location.offsetMilliseconds)
-  }
-
-  @Test
   fun testBookmark() {
     val target =
-      BookmarkAnnotationTargetNode(
-        "z",
-        BookmarkAnnotationSelectorNode("oa:FragmentSelector", this.targetValue0)
-      )
+      BookmarkAnnotationTargetNode("z", BookmarkAnnotationSelectorNode("oa:FragmentSelector", this.targetValue0))
 
     val input =
       BookmarkAnnotation(
@@ -209,10 +180,7 @@ class AudiobookBookmarkAnnotationsJSONTest {
     val node =
       BookmarkAnnotationsJSON.serializeBookmarkAnnotationToJSON(this.objectMapper, input)
 
-    this.compareAnnotations(
-      input,
-      BookmarkAnnotationsJSON.deserializeBookmarkAnnotationFromJSON(this.objectMapper, node)
-    )
+    this.compareAnnotations(input, BookmarkAnnotationsJSON.deserializeBookmarkAnnotationFromJSON(this.objectMapper, node))
   }
 
   @Test
@@ -229,10 +197,7 @@ class AudiobookBookmarkAnnotationsJSONTest {
 
     assertEquals(
       input,
-      BookmarkAnnotationsJSON.deserializeBookmarkAnnotationFirstNodeFromJSON(
-        this.objectMapper,
-        node
-      )
+      BookmarkAnnotationsJSON.deserializeBookmarkAnnotationFirstNodeFromJSON(this.objectMapper, node)
     )
   }
 
@@ -255,10 +220,7 @@ class AudiobookBookmarkAnnotationsJSONTest {
   @Test
   fun testBookmarkBadDateSIMPLY_1938() {
     val target =
-      BookmarkAnnotationTargetNode(
-        "z",
-        BookmarkAnnotationSelectorNode("oa:FragmentSelector", this.targetValue0)
-      )
+      BookmarkAnnotationTargetNode("z", BookmarkAnnotationSelectorNode("oa:FragmentSelector", this.targetValue0))
 
     val input =
       BookmarkAnnotation(
@@ -273,10 +235,7 @@ class AudiobookBookmarkAnnotationsJSONTest {
     val node =
       BookmarkAnnotationsJSON.serializeBookmarkAnnotationToJSON(this.objectMapper, input)
 
-    this.compareAnnotations(
-      input,
-      BookmarkAnnotationsJSON.deserializeBookmarkAnnotationFromJSON(this.objectMapper, node)
-    )
+    this.compareAnnotations(input, BookmarkAnnotationsJSON.deserializeBookmarkAnnotationFromJSON(this.objectMapper, node))
   }
 
   @Test
@@ -284,22 +243,39 @@ class AudiobookBookmarkAnnotationsJSONTest {
     val annotation =
       BookmarkAnnotationsJSON.deserializeBookmarkAnnotationFromJSON(
         objectMapper = this.objectMapper,
-        node = this.resourceNode("valid-bookmark-4.json")
+        node = this.resourceNode("valid-bookmark-5.json")
       )
 
-    val bookmark = BookmarkAnnotations.toAudiobookBookmark(this.objectMapper, annotation)
+    val bookmark = BookmarkAnnotations.toPdfBookmark(this.objectMapper, annotation)
     assertEquals("urn:uuid:1daa8de6-94e8-4711-b7d1-e43b572aa6e0", bookmark.opdsId)
     assertEquals("urn:uuid:c83db5b1-9130-4b86-93ea-634b00235c7c", bookmark.deviceID)
     assertEquals(BookmarkKind.BookmarkLastReadLocation, bookmark.kind)
-    assertEquals("2022-06-27T12:47:49.000Z", bookmark.time.toString())
-
-    val location = bookmark.location
-    assertEquals("Chapter title", location.title)
-    assertEquals(32, location.chapter)
-    assertEquals(3, location.part)
-    assertEquals(78000, location.offsetMilliseconds)
+    assertEquals("2022-08-05T16:32:49.000Z", bookmark.time.toString())
+    assertEquals(2, bookmark.pageNumber)
 
     this.checkRoundTrip(annotation)
+  }
+
+  @Test
+  fun testSpecValidLocator() {
+    val location =
+      BookmarkAnnotationsJSON.deserializePdfLocation(
+        objectMapper = this.objectMapper,
+        value = this.resourceText("valid-locator-2.json")
+      )
+
+    assertEquals(23, location)
+  }
+
+  @Test
+  fun testSpecInvalidBookmark() {
+    val ex = assertThrows(JSONParseException::class.java) {
+      BookmarkAnnotationsJSON.deserializeBookmarkAnnotationFromJSON(
+        objectMapper = this.objectMapper,
+        node = this.resourceNode("invalid-bookmark-7.json")
+      )
+    }
+    assertTrue(ex.message!!.contains("Expected: A key 'page'"))
   }
 
   private fun resourceText(
@@ -316,10 +292,7 @@ class AudiobookBookmarkAnnotationsJSONTest {
 
   private fun checkRoundTrip(bookmarkAnnotation: BookmarkAnnotation) {
     val serialized =
-      BookmarkAnnotationsJSON.serializeBookmarkAnnotationToBytes(
-        this.objectMapper,
-        bookmarkAnnotation
-      )
+      BookmarkAnnotationsJSON.serializeBookmarkAnnotationToBytes(this.objectMapper, bookmarkAnnotation)
     val serializedText =
       serialized.decodeToString()
 
@@ -334,11 +307,11 @@ class AudiobookBookmarkAnnotationsJSONTest {
     this.compareAnnotations(bookmarkAnnotation, deserialized)
 
     val toBookmark =
-      BookmarkAnnotations.toAudiobookBookmark(this.objectMapper, deserialized)
+      BookmarkAnnotations.toPdfBookmark(this.objectMapper, deserialized)
     val fromBookmark =
-      BookmarkAnnotations.fromAudiobookBookmark(this.objectMapper, toBookmark)
+      BookmarkAnnotations.fromPdfBookmark(this.objectMapper, toBookmark)
     val toBookmarkAgain =
-      BookmarkAnnotations.toAudiobookBookmark(this.objectMapper, fromBookmark)
+      BookmarkAnnotations.toPdfBookmark(this.objectMapper, fromBookmark)
 
     this.compareAnnotations(bookmarkAnnotation, deserialized)
     this.compareAnnotations(bookmarkAnnotation, fromBookmark)
@@ -363,15 +336,9 @@ class AudiobookBookmarkAnnotationsJSONTest {
     assertEquals(x.target.selector.type, y.target.selector.type)
 
     val xSelectorValue =
-      BookmarkAnnotationsJSON.deserializeAudiobookLocation(
-        this.objectMapper,
-        x.target.selector.value
-      )
+      BookmarkAnnotationsJSON.deserializePdfLocation(this.objectMapper, x.target.selector.value)
     val ySelectorValue =
-      BookmarkAnnotationsJSON.deserializeAudiobookLocation(
-        this.objectMapper,
-        y.target.selector.value
-      )
+      BookmarkAnnotationsJSON.deserializePdfLocation(this.objectMapper, y.target.selector.value)
 
     assertEquals(xSelectorValue, ySelectorValue)
     assertEquals(x.target.source, y.target.source)
@@ -384,7 +351,7 @@ class AudiobookBookmarkAnnotationsJSONTest {
     val fileName =
       "/org/nypl/simplified/tests/bookmark_annotations/spec/bookmarks/$name"
     val url =
-      AudiobookBookmarkAnnotationsJSONTest::class.java.getResource(fileName)
+      PDFBookmarkAnnotationsJSONTest::class.java.getResource(fileName)
         ?: throw FileNotFoundException("No such resource: $fileName")
     return url.openStream()
   }

@@ -89,6 +89,8 @@ internal class BServiceOpSyncOneAccount(
             BookmarkAnnotations.fromReaderBookmark(this.objectMapper, bookmark)
           is Bookmark.AudiobookBookmark ->
             BookmarkAnnotations.fromAudiobookBookmark(this.objectMapper, bookmark)
+          is Bookmark.PDFBookmark ->
+            BookmarkAnnotations.fromPdfBookmark(this.objectMapper, bookmark)
           else ->
             throw IllegalStateException("Unsupported bookmark type: $bookmark")
         }
@@ -129,8 +131,8 @@ internal class BServiceOpSyncOneAccount(
 
     val bookmarks: List<Bookmark> =
       try {
-        this.httpCalls.bookmarksGet(syncable.annotationsURI, syncable.credentials)
-          .mapNotNull(this::parseBookmarkOrNull)
+        val annotations = this.httpCalls.bookmarksGet(syncable.annotationsURI, syncable.credentials)
+        annotations.mapNotNull(this::parseBookmarkOrNull)
       } catch (e: Exception) {
         this.logger.error(
           "[{}]: could not receive bookmarks for account {}: ",
@@ -168,6 +170,32 @@ internal class BServiceOpSyncOneAccount(
                       bookmark = bookmark
                     )
                   )
+              }
+
+              this.bookmarkEventsOut.onNext(
+                BookmarkEvent.BookmarkSaved(
+                  syncable.account.id,
+                  bookmark
+                )
+              )
+            }
+          }
+          is Bookmark.PDFBookmark -> {
+            val handle = entry.findFormatHandle(BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandlePDF::class.java)
+            if (handle != null) {
+              when (bookmark.kind) {
+                BookmarkKind.BookmarkLastReadLocation ->
+                  handle.setLastReadLocation(bookmark)
+                BookmarkKind.BookmarkExplicit -> {
+                  handle.setBookmarks(
+                    BServiceBookmarks.normalizeBookmarks(
+                      logger = this.logger,
+                      profileId = this.profile.id,
+                      handle = handle,
+                      bookmark = bookmark
+                    )
+                  )
+                }
               }
 
               this.bookmarkEventsOut.onNext(
@@ -232,8 +260,14 @@ internal class BServiceOpSyncOneAccount(
         this.logger.debug("Reader bookmark successfully parsed")
         bookmark
       } catch (e: Exception) {
-        this.logger.error("unable to parse bookmark: ", e)
-        null
+        try {
+          val bookmark = BookmarkAnnotations.toPdfBookmark(this.objectMapper, annotation)
+          this.logger.debug("PDF bookmark successfully parsed")
+          bookmark
+        } catch (e: Exception) {
+          this.logger.error("unable to parse bookmark: ", e)
+          null
+        }
       }
     }
   }

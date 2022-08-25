@@ -71,6 +71,39 @@ internal class BServiceOpCreateLocalBookmark(
             )
           }
         }
+        is Bookmark.PDFBookmark -> {
+          val handle =
+            entry.findFormatHandle(BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandlePDF::class.java)
+
+          if (handle != null) {
+            when (this.bookmark.kind) {
+              BookmarkKind.BookmarkLastReadLocation ->
+                handle.setLastReadLocation(this.bookmark)
+              BookmarkKind.BookmarkExplicit -> {
+                handle.setBookmarks(
+                  BServiceBookmarks.normalizeBookmarks(
+                    logger = this.logger,
+                    profileId = this.profile.id,
+                    handle = handle,
+                    bookmark = bookmark
+                  )
+                )
+              }
+            }
+
+            this.bookmarkEventsOut.onNext(
+              BookmarkEvent.BookmarkSaved(
+                this.accountID,
+                this.bookmark
+              )
+            )
+          } else {
+            this.logger.debug(
+              "[{}]: unable to save bookmark; no format handle",
+              this.profile.id.uuid
+            )
+          }
+        }
         is Bookmark.AudiobookBookmark -> {
           val handle =
             entry.findFormatHandle(BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook::class.java)

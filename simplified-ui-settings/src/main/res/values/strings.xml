@@ -33,7 +33,7 @@
   <string name="settingsDevCrashlyticsCurrentUserId">Current Crashlytics User ID</string>
   <string name="settingsDevDrmSupport">DRM Support</string>
   <string name="settingsDevEnableHiddenLibraries">Enable Hidden Libraries</string>
-  <string name="settingsDevEnablePDFJSReader">Use new PDF reader</string>
+  <string name="settingsDevEnableOldPDFReader">Use old PDF reader</string>
   <string name="settingsDevFailNextStartup">Cause the next application startup to fail</string>
   <string name="settingsDevForgetAllAnnouncements">Forget All Announcements</string>
   <string name="settingsDevPlaceholder">Placeholder</string>
