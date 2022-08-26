@@ -9,7 +9,6 @@ import android.text.InputType
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
-import android.view.MenuItem.OnActionExpandListener
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
@@ -183,6 +182,8 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
     searchView.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_WORDS
     searchView.queryHint = getString(R.string.accountSearchHint)
 
+    searchView.maxWidth = getAvailableWidthForSearchView()
+
     searchView.setOnQueryTextListener(object : OnQueryTextListener {
       override fun onQueryTextSubmit(query: String): Boolean {
         search.collapseActionView()
@@ -210,18 +211,6 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
         return true
       }
     })
-
-    search.setOnActionExpandListener(object : OnActionExpandListener {
-      override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
-        // Do nothing
-        return true
-      }
-
-      override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
-        this@AccountListRegistryFragment.accountListAdapter.resetFilter()
-        return true
-      }
-    })
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -232,6 +221,18 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
       }
       else -> super.onOptionsItemSelected(item)
     }
+  }
+
+  private fun getAvailableWidthForSearchView(): Int {
+    val fullWidth = this.resources.displayMetrics.widthPixels
+    val scale = this.resources.displayMetrics.density
+
+    // return the size of the 3 icons on the toolbar when the SearchView is expanded (navigation
+    // icon, clear button and more options icon)
+    val toolbarIconsWidth = (24 * 3 * scale).toDouble() + 0.5
+
+    // return the full width of the screen minus the icons width
+    return (fullWidth - toolbarIconsWidth).toInt()
   }
 
   private fun configureToolbar(activity: Activity) {
