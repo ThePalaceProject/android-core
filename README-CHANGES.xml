@@ -221,7 +221,7 @@
         <c:change date="2022-08-05T00:00:00+00:00" summary="Fixed a &quot;Download&quot; button appearing after returning a book, that would lead to an error if tapped."/>
       </c:changes>
     </c:release>
-    <c:release date="2022-08-24T11:19:44+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.2.0">
+    <c:release date="2022-08-31T00:16:57+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.2.0">
       <c:changes>
         <c:change date="2022-08-09T00:00:00+00:00" summary="Added bookmarks for PDF books."/>
         <c:change date="2022-08-10T00:00:00+00:00" summary="Added &quot;content description&quot; text to back button and logo on toolbar."/>
@@ -230,7 +230,8 @@
         <c:change date="2022-08-16T00:00:00+00:00" summary="Added ability to always show the password in the account details screen."/>
         <c:change date="2022-08-17T00:00:00+00:00" summary="Fixed sample preview being handled as full content acquisition link."/>
         <c:change date="2022-08-23T00:00:00+00:00" summary="Switched default PDF reader to the PDF-JS Reader."/>
-        <c:change date="2022-08-24T11:19:44+00:00" summary="Fixed searching field text overlapping back button."/>
+        <c:change date="2022-08-24T00:00:00+00:00" summary="Fixed searching field text overlapping back button."/>
+        <c:change date="2022-08-31T00:16:57+00:00" summary="Added remaining time display to audio book player."/>
       </c:changes>
     </c:release>
   </c:releases>
