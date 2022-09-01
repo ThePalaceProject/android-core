@@ -1,7 +1,6 @@
 package org.nypl.simplified.ui.accounts
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.location.LocationManager
 import android.os.Bundle
@@ -28,11 +27,11 @@ import org.nypl.simplified.accounts.api.AccountEventCreation
 import org.nypl.simplified.accounts.api.AccountProviderDescription
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryEvent
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus
-import org.nypl.simplified.android.ktx.supportActionBar
 import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.fragmentListeners
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.images.ImageLoaderType
+import org.nypl.simplified.ui.neutrality.NeutralToolbar
 import org.slf4j.LoggerFactory
 
 /**
@@ -58,9 +57,10 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
   private lateinit var accountList: RecyclerView
   private lateinit var accountListAdapter: FilterableAccountListAdapter
   private lateinit var imageLoader: ImageLoaderType
+  private lateinit var noLocation: TextView
   private lateinit var progress: ContentLoadingProgressBar
   private lateinit var title: TextView
-  private lateinit var noLocation: TextView
+  private lateinit var toolbar: NeutralToolbar
   private var reload: MenuItem? = null
   private var errorDialog: AlertDialog? = null
 
@@ -86,6 +86,8 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
       view.findViewById(R.id.accountRegistryList)
     this.noLocation =
       view.findViewById(R.id.accountRegistryNoLocation)
+    this.toolbar =
+      view.rootView.findViewWithTag(NeutralToolbar.neutralToolbarName)
 
     this.accountListAdapter =
       FilterableAccountListAdapter(
@@ -117,7 +119,7 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
 
   override fun onStart() {
     super.onStart()
-    this.configureToolbar(this.requireActivity())
+    this.configureToolbar()
 
     this.viewModel.accountRegistryEvents
       .subscribe(this::onAccountRegistryEvent)
@@ -181,8 +183,7 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
     searchView.imeOptions = EditorInfo.IME_ACTION_DONE
     searchView.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_WORDS
     searchView.queryHint = getString(R.string.accountSearchHint)
-
-    searchView.maxWidth = getAvailableWidthForSearchView()
+    searchView.maxWidth = toolbar.getAvailableWidthForSearchView()
 
     searchView.setOnQueryTextListener(object : OnQueryTextListener {
       override fun onQueryTextSubmit(query: String): Boolean {
@@ -223,23 +224,8 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
     }
   }
 
-  private fun getAvailableWidthForSearchView(): Int {
-    val fullWidth = this.resources.displayMetrics.widthPixels
-    val scale = this.resources.displayMetrics.density
-
-    // return the size of the 3 icons on the toolbar when the SearchView is expanded (navigation
-    // icon, clear button and more options icon)
-    val toolbarIconsWidth = (24 * 3 * scale).toDouble() + 0.5
-
-    // return the full width of the screen minus the icons width
-    return (fullWidth - toolbarIconsWidth).toInt()
-  }
-
-  private fun configureToolbar(activity: Activity) {
-    this.supportActionBar?.apply {
-      title = getString(R.string.accountAdd)
-      subtitle = null
-    }
+  private fun configureToolbar() {
+    this.toolbar.title = getString(R.string.accountAdd)
   }
 
   private fun reload() {

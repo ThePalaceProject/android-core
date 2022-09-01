@@ -160,4 +160,13 @@ class NeutralToolbar(
       }
     }
   }
+
+  fun getAvailableWidthForSearchView(): Int {
+    val fullWidth = this.resources.displayMetrics.widthPixels
+
+    // the contentInsetStartWithNavigation already returns the size of the navigation icon, so the
+    // available width for the SearchView can be calculated from the entire screen's width minus
+    // that value
+    return fullWidth - contentInsetStartWithNavigation
+  }
 }
