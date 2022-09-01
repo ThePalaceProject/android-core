@@ -12,4 +12,6 @@ sealed class AccountListRegistryEvent {
   data class OpenErrorPage(
     val parameters: ErrorPageParameters
   ) : AccountListRegistryEvent()
+
+  object GoUpwards : AccountListRegistryEvent()
 }
