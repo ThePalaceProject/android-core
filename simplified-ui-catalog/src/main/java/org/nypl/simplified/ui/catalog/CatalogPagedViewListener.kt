@@ -22,8 +22,6 @@ interface CatalogPagedViewListener {
 
   fun dismissRevokeError(feedEntry: FeedEntry.FeedEntryOPDS)
 
-  fun delete(feedEntry: FeedEntry.FeedEntryOPDS)
-
   fun borrowMaybeAuthenticated(book: Book)
 
   fun resetInitialBookStatus(feedEntry: FeedEntry.FeedEntryOPDS)
