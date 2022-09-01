@@ -119,7 +119,7 @@ class OnboardingFragment :
       is AccountListRegistryEvent.OpenErrorPage ->
         this.openErrorPage(event.parameters)
       is AccountListRegistryEvent.GoUpwards -> {
-        // do nothing
+        this.childFragmentManager.popBackStack()
       }
     }
   }
