@@ -11,6 +11,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SearchView.OnQueryTextListener
@@ -43,6 +44,10 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
   private val subscriptions = CompositeDisposable()
   private val listener: FragmentListenerType<AccountListRegistryEvent> by fragmentListeners()
 
+  private val requestLocationPermission = registerForActivityResult(
+    ActivityResultContracts.RequestPermission(),
+    ::getLocation
+  )
   private val viewModel: AccountListRegistryViewModel by assistedViewModels {
     val locationManager =
       requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -178,8 +183,7 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
     searchView.imeOptions = EditorInfo.IME_ACTION_DONE
     searchView.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_WORDS
     searchView.queryHint = getString(R.string.accountSearchHint)
-
-    searchView.maxWidth = getAvailableWidthForSearchView()
+    searchView.maxWidth = toolbar.getAvailableWidthForSearchView()
 
     searchView.setOnQueryTextListener(object : OnQueryTextListener {
       override fun onQueryTextSubmit(query: String): Boolean {
@@ -220,23 +224,8 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
     }
   }
 
-  private fun getAvailableWidthForSearchView(): Int {
-    val fullWidth = this.resources.displayMetrics.widthPixels
-    val scale = this.resources.displayMetrics.density
-
-    // return the size of the 3 icons on the toolbar when the SearchView is expanded (navigation
-    // icon, clear button and more options icon)
-    val toolbarIconsWidth = (24 * 3 * scale).toDouble() + 0.5
-
-    // return the full width of the screen minus the icons width
-    return (fullWidth - toolbarIconsWidth).toInt()
-  }
-
   private fun configureToolbar() {
     this.toolbar.title = getString(R.string.accountAdd)
-    this.toolbar.setLogoOnClickListener {
-      this.listener.post(AccountListRegistryEvent.GoUpwards)
-    }
   }
 
   private fun reload() {
