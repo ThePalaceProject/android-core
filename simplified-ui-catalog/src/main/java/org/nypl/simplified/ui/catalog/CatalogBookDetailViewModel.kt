@@ -26,6 +26,14 @@ import org.nypl.simplified.feeds.api.FeedLoaderResult
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.futures.FluentFutureExtensions.map
 import org.nypl.simplified.listeners.api.FragmentListenerType
+import org.nypl.simplified.opds.core.OPDSAvailabilityHeld
+import org.nypl.simplified.opds.core.OPDSAvailabilityHeldReady
+import org.nypl.simplified.opds.core.OPDSAvailabilityHoldable
+import org.nypl.simplified.opds.core.OPDSAvailabilityLoanable
+import org.nypl.simplified.opds.core.OPDSAvailabilityLoaned
+import org.nypl.simplified.opds.core.OPDSAvailabilityMatcherType
+import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
+import org.nypl.simplified.opds.core.OPDSAvailabilityRevoked
 import org.nypl.simplified.profiles.api.ProfilePreferences
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.taskrecorder.api.TaskResult
@@ -170,6 +178,55 @@ class CatalogBookDetailViewModel(
       false
     }
 
+  /**
+   * Determine whether or not a book can be "deleted".
+   *
+   * A book can be deleted if:
+   *
+   * * It is loaned, downloaded, and not revocable (because otherwise, a revocation is needed).
+   * * It is loanable, but there is a book database entry for it
+   * * It is open access but there is a book database entry for it
+   */
+
+  val bookCanBeDeleted: Boolean
+    get() {
+      return try {
+        val book = this.bookWithStatus.book
+        val profile = this.profilesController.profileCurrent()
+        val account = profile.account(book.account)
+        return if (account.bookDatabase.books().contains(book.id)) {
+          book.entry.availability.matchAvailability(
+            object : OPDSAvailabilityMatcherType<Boolean, Exception> {
+              override fun onHeldReady(availability: OPDSAvailabilityHeldReady): Boolean =
+                false
+
+              override fun onHeld(availability: OPDSAvailabilityHeld): Boolean =
+                false
+
+              override fun onHoldable(availability: OPDSAvailabilityHoldable): Boolean =
+                false
+
+              override fun onLoaned(availability: OPDSAvailabilityLoaned): Boolean =
+                availability.revoke.isNone && book.isDownloaded
+
+              override fun onLoanable(availability: OPDSAvailabilityLoanable): Boolean =
+                true
+
+              override fun onOpenAccess(availability: OPDSAvailabilityOpenAccess): Boolean =
+                true
+
+              override fun onRevoked(availability: OPDSAvailabilityRevoked): Boolean =
+                false
+            })
+        } else {
+          false
+        }
+      } catch (e: Exception) {
+        this.logger.error("could not determine if the book could be deleted: ", e)
+        false
+      }
+    }
+
   override fun openBookDetail(opdsEntry: FeedEntry.FeedEntryOPDS) {
     this.listener.post(
       CatalogBookDetailEvent.OpenBookDetail(this.feedArguments, opdsEntry)
@@ -211,6 +268,10 @@ class CatalogBookDetailViewModel(
 
   override fun dismissRevokeError(feedEntry: FeedEntry.FeedEntryOPDS) {
     this.borrowViewModel.tryDismissRevokeError(feedEntry.accountID, feedEntry.bookID)
+  }
+
+  override fun delete(feedEntry: FeedEntry.FeedEntryOPDS) {
+    this.borrowViewModel.tryDelete(feedEntry.accountID, feedEntry.bookID)
   }
 
   override fun resetInitialBookStatus(feedEntry: FeedEntry.FeedEntryOPDS) {
@@ -482,6 +543,13 @@ class CatalogBookDetailViewModel(
 
   fun cancelDownload() {
     this.borrowViewModel.tryCancelDownload(
+      this.bookWithStatus.book.account,
+      this.bookWithStatus.book.id
+    )
+  }
+
+  fun delete() {
+    this.borrowViewModel.tryDelete(
       this.bookWithStatus.book.account,
       this.bookWithStatus.book.id
     )

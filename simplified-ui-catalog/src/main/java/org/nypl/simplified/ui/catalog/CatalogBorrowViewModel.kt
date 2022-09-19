@@ -290,4 +290,12 @@ class CatalogBorrowViewModel(
     this.logger.debug("cancelling download: {}", bookID)
     this.booksController.bookCancelDownloadAndDelete(accountID, bookID)
   }
+
+  fun tryDelete(
+    accountID: AccountID,
+    bookID: BookID
+  ) {
+    this.logger.debug("deleting: {}", bookID)
+    this.booksController.bookDelete(accountID, bookID)
+  }
 }

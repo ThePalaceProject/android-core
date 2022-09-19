@@ -759,9 +759,16 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
           }
         )
       )
-    }
-
-    if (!isRevocable) {
+    } else if (this.viewModel.bookCanBeDeleted) {
+      this.buttons.addView(this.buttonCreator.createButtonSpace())
+      this.buttons.addView(
+        this.buttonCreator.createRevokeLoanButton(
+          onClick = {
+            this.viewModel.delete()
+          }
+        )
+      )
+    } else {
       this.buttons.addView(this.buttonCreator.createButtonSizedSpace(), 0)
       this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
     }

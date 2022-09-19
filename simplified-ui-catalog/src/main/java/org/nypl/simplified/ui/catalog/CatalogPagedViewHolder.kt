@@ -22,6 +22,14 @@ import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedEntry.FeedEntryCorrupt
 import org.nypl.simplified.feeds.api.FeedEntry.FeedEntryOPDS
 import org.nypl.simplified.futures.FluentFutureExtensions.map
+import org.nypl.simplified.opds.core.OPDSAvailabilityHeld
+import org.nypl.simplified.opds.core.OPDSAvailabilityHeldReady
+import org.nypl.simplified.opds.core.OPDSAvailabilityHoldable
+import org.nypl.simplified.opds.core.OPDSAvailabilityLoanable
+import org.nypl.simplified.opds.core.OPDSAvailabilityLoaned
+import org.nypl.simplified.opds.core.OPDSAvailabilityMatcherType
+import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
+import org.nypl.simplified.opds.core.OPDSAvailabilityRevoked
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 
 /**
@@ -323,6 +331,16 @@ class CatalogPagedViewHolder(
           heightMatchParent = true
         )
       )
+    } else if (isBookDeletable(book)) {
+      this.idleButtons.addView(this.buttonCreator.createButtonSpace())
+      this.idleButtons.addView(
+        this.buttonCreator.createRevokeLoanButton(
+          onClick = {
+            this.listener.delete(this.feedEntry as FeedEntryOPDS)
+          },
+          heightMatchParent = true
+        )
+      )
     }
   }
 
@@ -617,6 +635,42 @@ class CatalogPagedViewHolder(
           else ->
             false
         }
+      } else {
+        false
+      }
+    } catch (e: Exception) {
+      false
+    }
+  }
+
+  private fun isBookDeletable(book: Book): Boolean {
+    return try {
+      val profile = this.profilesController.profileCurrent()
+      val account = profile.account(book.account)
+      return if (account.bookDatabase.books().contains(book.id)) {
+        book.entry.availability.matchAvailability(
+          object : OPDSAvailabilityMatcherType<Boolean, Exception> {
+            override fun onHeldReady(availability: OPDSAvailabilityHeldReady): Boolean =
+              false
+
+            override fun onHeld(availability: OPDSAvailabilityHeld): Boolean =
+              false
+
+            override fun onHoldable(availability: OPDSAvailabilityHoldable): Boolean =
+              false
+
+            override fun onLoaned(availability: OPDSAvailabilityLoaned): Boolean =
+              availability.revoke.isNone && book.isDownloaded
+
+            override fun onLoanable(availability: OPDSAvailabilityLoanable): Boolean =
+              true
+
+            override fun onOpenAccess(availability: OPDSAvailabilityOpenAccess): Boolean =
+              true
+
+            override fun onRevoked(availability: OPDSAvailabilityRevoked): Boolean =
+              false
+          })
       } else {
         false
       }

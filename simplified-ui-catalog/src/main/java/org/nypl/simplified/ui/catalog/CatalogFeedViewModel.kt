@@ -942,6 +942,10 @@ class CatalogFeedViewModel(
     this.borrowViewModel.tryDismissRevokeError(feedEntry.accountID, feedEntry.bookID)
   }
 
+  override fun delete(feedEntry: FeedEntry.FeedEntryOPDS) {
+    this.borrowViewModel.tryDelete(feedEntry.accountID, feedEntry.bookID)
+  }
+
   override fun borrowMaybeAuthenticated(book: Book) {
     this.openLoginDialogIfNecessary(book.account)
     this.borrowViewModel.tryBorrowMaybeAuthenticated(book)
