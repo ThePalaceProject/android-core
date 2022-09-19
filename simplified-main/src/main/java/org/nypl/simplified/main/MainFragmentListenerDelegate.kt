@@ -251,6 +251,10 @@ internal class MainFragmentListenerDelegate(
         this.openErrorPage(event.parameters)
         state
       }
+      is AccountListRegistryEvent.GoUpwards -> {
+        this.goUpwards()
+        state
+      }
     }
   }
 
@@ -270,7 +274,7 @@ internal class MainFragmentListenerDelegate(
         state
       }
       AccountListEvent.AddAccount -> {
-        this.openSettingsAccountRegistry()
+        this.openAccountRegistry(tab = R.id.tabSettings)
         state
       }
       is AccountListEvent.OpenErrorPage -> {
@@ -348,7 +352,7 @@ internal class MainFragmentListenerDelegate(
         state
       }
       AccountPickerEvent.AddAccount -> {
-        this.openSettingsAccountRegistry()
+        this.openAccountRegistry(tab = R.id.tabCatalog)
         state
       }
     }
@@ -596,10 +600,10 @@ internal class MainFragmentListenerDelegate(
     )
   }
 
-  private fun openSettingsAccountRegistry() {
+  private fun openAccountRegistry(tab: Int) {
     this.navigator.addFragment(
       fragment = AccountListRegistryFragment(),
-      tab = R.id.tabSettings
+      tab = tab
     )
   }
 
