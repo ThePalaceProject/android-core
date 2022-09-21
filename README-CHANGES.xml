@@ -221,20 +221,21 @@
         <c:change date="2022-08-05T00:00:00+00:00" summary="Fixed a &quot;Download&quot; button appearing after returning a book, that would lead to an error if tapped."/>
       </c:changes>
     </c:release>
-    <c:release date="2022-09-01T23:15:01+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.2.0">
+    <c:release date="2022-09-19T04:00:37+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.2.0">
       <c:changes>
-        <c:change date="2022-08-09T00:00:00+00:00" summary="Added bookmarks for PDF books."/>
-        <c:change date="2022-08-10T00:00:00+00:00" summary="Added &quot;content description&quot; text to back button and logo on toolbar."/>
-        <c:change date="2022-08-12T00:00:00+00:00" summary="Added back button when search field appears."/>
+        <c:change date="2022-08-09T00:00:00+00:00" summary="Fixed the reading position in PDF books not being synced across devices."/>
+        <c:change date="2022-08-10T00:00:00+00:00" summary="Improved announcement of controls when using TalkBack."/>
+        <c:change date="2022-08-12T00:00:00+00:00" summary="Added a back button when searching for a library."/>
         <c:change date="2022-08-16T00:00:00+00:00" summary="Changed the chapter duration display in the audio book player to a running remaining time display."/>
-        <c:change date="2022-08-16T00:00:00+00:00" summary="Added ability to always show the password in the account details screen."/>
-        <c:change date="2022-08-17T00:00:00+00:00" summary="Fixed sample preview being handled as full content acquisition link."/>
-        <c:change date="2022-08-23T00:00:00+00:00" summary="Switched default PDF reader to the PDF-JS Reader."/>
+        <c:change date="2022-08-16T00:00:00+00:00" summary="Added the ability to show the password in the account details screen of any library that has been signed into."/>
+        <c:change date="2022-08-17T00:00:00+00:00" summary="Fixed books with preview links not opening."/>
+        <c:change date="2022-08-23T00:00:00+00:00" summary="Introduced a new PDF reader that is able to open many books that couldn't previously be opened."/>
         <c:change date="2022-08-24T00:00:00+00:00" summary="Fixed searching field text overlapping back button."/>
-        <c:change date="2022-08-30T00:00:00+00:00" summary="Fixed back button not returning to catalog."/>
-        <c:change date="2022-08-31T00:00:00+00:00" summary="Added remaining time display to audio book player."/>
-        <c:change date="2022-09-01T00:00:00+00:00" summary="Fixed back button not working on onboarding's account selection screen."/>
-        <c:change date="2022-09-01T23:15:01+00:00" summary="Removed delete option from book details screen."/>
+        <c:change date="2022-08-30T00:00:00+00:00" summary="Fixed the back button on the account detail screen not returning to the catalog when signing in while borrowing a book."/>
+        <c:change date="2022-08-31T00:00:00+00:00" summary="Added a remaining time display to the audio book player."/>
+        <c:change date="2022-09-01T00:00:00+00:00" summary="Fixed the back button on the account detail screen not working when opened from the onboarding screen."/>
+        <c:change date="2022-09-01T00:00:00+00:00" summary="Removed delete option from book details screen."/>
+        <c:change date="2022-09-19T00:00:00+00:00" summary="Fixed a crash that occurred on some Samsung devices."/>
       </c:changes>
     </c:release>
   </c:releases>
