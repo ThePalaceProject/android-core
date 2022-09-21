@@ -508,6 +508,16 @@ class CatalogPagedViewHolder(
           heightMatchParent = true
         )
       )
+    } else if (isBookDeletable(book)) {
+      this.idleButtons.addView(this.buttonCreator.createButtonSpace())
+      this.idleButtons.addView(
+        this.buttonCreator.createRevokeLoanButton(
+          onClick = {
+            this.listener.delete(this.feedEntry as FeedEntryOPDS)
+          },
+          heightMatchParent = true
+        )
+      )
     }
   }
 
