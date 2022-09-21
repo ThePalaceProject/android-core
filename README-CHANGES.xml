@@ -221,7 +221,7 @@
         <c:change date="2022-08-05T00:00:00+00:00" summary="Fixed a &quot;Download&quot; button appearing after returning a book, that would lead to an error if tapped."/>
       </c:changes>
     </c:release>
-    <c:release date="2022-09-19T04:00:37+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.2.0">
+    <c:release date="2022-09-19T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.2.0">
       <c:changes>
         <c:change date="2022-08-09T00:00:00+00:00" summary="Fixed the reading position in PDF books not being synced across devices."/>
         <c:change date="2022-08-10T00:00:00+00:00" summary="Improved announcement of controls when using TalkBack."/>
@@ -234,8 +234,12 @@
         <c:change date="2022-08-30T00:00:00+00:00" summary="Fixed the back button on the account detail screen not returning to the catalog when signing in while borrowing a book."/>
         <c:change date="2022-08-31T00:00:00+00:00" summary="Added a remaining time display to the audio book player."/>
         <c:change date="2022-09-01T00:00:00+00:00" summary="Fixed the back button on the account detail screen not working when opened from the onboarding screen."/>
-        <c:change date="2022-09-01T00:00:00+00:00" summary="Removed delete option from book details screen."/>
         <c:change date="2022-09-19T00:00:00+00:00" summary="Fixed a crash that occurred on some Samsung devices."/>
+      </c:changes>
+    </c:release>
+    <c:release date="2022-09-21T15:04:47+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.3.0">
+      <c:changes>
+        <c:change date="2022-09-21T15:04:47+00:00" summary="Removed delete option from book details screen."/>
       </c:changes>
     </c:release>
   </c:releases>
