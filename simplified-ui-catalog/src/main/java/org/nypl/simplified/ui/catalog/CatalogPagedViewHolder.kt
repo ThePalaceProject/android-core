@@ -334,7 +334,7 @@ class CatalogPagedViewHolder(
     } else if (isBookDeletable(book)) {
       this.idleButtons.addView(this.buttonCreator.createButtonSpace())
       this.idleButtons.addView(
-        this.buttonCreator.createDeleteButton(
+        this.buttonCreator.createRevokeLoanButton(
           onClick = {
             this.listener.delete(this.feedEntry as FeedEntryOPDS)
           },
@@ -511,7 +511,7 @@ class CatalogPagedViewHolder(
     } else if (isBookDeletable(book)) {
       this.idleButtons.addView(this.buttonCreator.createButtonSpace())
       this.idleButtons.addView(
-        this.buttonCreator.createDeleteButton(
+        this.buttonCreator.createRevokeLoanButton(
           onClick = {
             this.listener.delete(this.feedEntry as FeedEntryOPDS)
           },
