@@ -88,11 +88,11 @@ class ProfileAccountLogoutTask(
       when (val state = this.account.loginState) {
         is AccountLoggedIn -> state.credentials
         is AccountLogoutFailed -> state.credentials
+        is AccountLoggingOut -> state.credentials
         is AccountNotLoggedIn,
         is AccountLoggingIn,
         is AccountLoginFailed,
-        is AccountLoggingInWaitingForExternalAuthentication,
-        is AccountLoggingOut -> {
+        is AccountLoggingInWaitingForExternalAuthentication -> {
           this.warn("attempted to log out with account in state {}", state.javaClass.canonicalName)
           this.steps.currentStepSucceeded(this.logoutStrings.logoutNotLoggedIn)
           return this.steps.finishSuccess(Unit)
@@ -100,7 +100,6 @@ class ProfileAccountLogoutTask(
       }
 
     return try {
-      this.updateLoggingOutState()
       this.runDeviceDeactivation()
       this.runUpdateOPDSEntries()
       this.runBookRegistryClear()
