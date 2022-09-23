@@ -759,20 +759,16 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
           }
         )
       )
-    }
-
-    if (this.viewModel.bookCanBeDeleted) {
+    } else if (this.viewModel.bookCanBeDeleted) {
       this.buttons.addView(this.buttonCreator.createButtonSpace())
       this.buttons.addView(
-        this.buttonCreator.createDeleteButton(
+        this.buttonCreator.createRevokeLoanButton(
           onClick = {
             this.viewModel.delete()
           }
         )
       )
-      // if the book is not revocable and can't be deleted, we need to add an "empty button" before
-      // and after the action button
-    } else if (!isRevocable) {
+    } else {
       this.buttons.addView(this.buttonCreator.createButtonSizedSpace(), 0)
       this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
     }
