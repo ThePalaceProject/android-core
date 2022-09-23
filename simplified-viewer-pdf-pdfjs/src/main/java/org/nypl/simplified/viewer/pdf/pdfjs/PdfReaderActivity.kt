@@ -228,13 +228,17 @@ class PdfReaderActivity : AppCompatActivity() {
   }
 
   private fun toggleSidebar() {
-    this.webView.evaluateJavascript("toggleSidebar()") { result ->
-      this.isSidebarOpen = (result == "true")
+    if (::webView.isInitialized) {
+      this.webView.evaluateJavascript("toggleSidebar()") { result ->
+        this.isSidebarOpen = (result == "true")
+      }
     }
   }
 
   private fun onReaderMenuSettingsSelected(): Boolean {
-    this.webView.evaluateJavascript("toggleSecondaryToolbar()", null)
+    if (::webView.isInitialized) {
+      this.webView.evaluateJavascript("toggleSecondaryToolbar()", null)
+    }
 
     return true
   }
