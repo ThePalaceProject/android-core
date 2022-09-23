@@ -3,7 +3,6 @@ package org.nypl.simplified.ui.accounts
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.google.common.util.concurrent.FluentFuture
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import org.joda.time.DateTime
@@ -24,7 +23,6 @@ import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.bookmarks.api.BookmarkEvent.BookmarkSyncSettingChanged
 import org.nypl.simplified.bookmarks.api.BookmarkServiceType
 import org.nypl.simplified.bookmarks.api.BookmarkSyncEnableStatus
-import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.taskrecorder.api.TaskStep
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 
@@ -220,9 +218,23 @@ class AccountDetailViewModel(
     this.profilesController.profileAccountLogin(request)
   }
 
-  fun tryLogout(): FluentFuture<TaskResult<Unit>> {
+  fun tryLogout() {
     this.pendingLogout = true
-    return this.profilesController.profileAccountLogout(this.accountId)
+
+    // update the login state here so the UI is changed and the user is aware
+    // that something's happening
+    if (this.account.loginState is AccountLoginState.AccountLoggedIn ||
+      this.account.loginState is AccountLoginState.AccountLogoutFailed
+    ) {
+      this.account.setLoginState(
+        AccountLoginState.AccountLoggingOut(
+          this.account.loginState.credentials!!,
+          ""
+        )
+      )
+    }
+
+    this.profilesController.profileAccountLogout(this.accountId)
   }
 
   fun openErrorPage(taskSteps: List<TaskStep>) {
