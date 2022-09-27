@@ -237,11 +237,12 @@
         <c:change date="2022-09-19T00:00:00+00:00" summary="Fixed a crash that occurred on some Samsung devices."/>
       </c:changes>
     </c:release>
-    <c:release date="2022-09-22T17:25:39+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.3.0">
+    <c:release date="2022-09-27T10:36:01+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.3.0">
       <c:changes>
-        <c:change date="2022-09-21T15:04:47+00:00" summary="Removed delete option from book details screen."/>
-        <c:change date="2022-09-21T15:01:57+00:00" summary="Fixed logging out action not being performed sometimes."/>
-        <c:change date="2022-09-22T17:25:39+00:00" summary="Fixed app crashing when opening TOC or settings before the PDF was completely loaded."/>
+        <c:change date="2022-09-21T00:00:00+00:00" summary="Removed delete option from book details screen."/>
+        <c:change date="2022-09-21T00:00:00+00:00" summary="Fixed logging out action not being performed sometimes."/>
+        <c:change date="2022-09-22T00:00:00+00:00" summary="Fixed app crashing when opening TOC or settings before the PDF was completely loaded."/>
+        <c:change date="2022-09-27T10:36:01+00:00" summary="Added content description to back button on reader screen."/>
       </c:changes>
     </c:release>
   </c:releases>

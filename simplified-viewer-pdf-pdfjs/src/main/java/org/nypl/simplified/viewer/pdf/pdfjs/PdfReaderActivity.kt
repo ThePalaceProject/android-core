@@ -157,6 +157,7 @@ class PdfReaderActivity : AppCompatActivity() {
     val toolbar = this.findViewById(R.id.pdf_toolbar) as Toolbar
 
     this.setSupportActionBar(toolbar)
+    this.supportActionBar?.setHomeActionContentDescription(R.string.content_description_back)
 
     this.supportActionBar?.setDisplayHomeAsUpEnabled(true)
     this.supportActionBar?.setDisplayShowHomeEnabled(true)
