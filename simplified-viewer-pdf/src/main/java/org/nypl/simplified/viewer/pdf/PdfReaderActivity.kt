@@ -142,6 +142,7 @@ class PdfReaderActivity :
     this.setSupportActionBar(toolbar)
     this.supportActionBar?.setDisplayHomeAsUpEnabled(true)
     this.supportActionBar?.setDisplayShowHomeEnabled(true)
+    this.supportActionBar?.setHomeActionContentDescription(R.string.content_description_back)
     this.supportActionBar?.title = ""
 
     val backgroundThread = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(1))
