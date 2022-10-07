@@ -33,6 +33,9 @@ ext {
   android_min_sdk_version = 21
   android_target_sdk_version = 30
 
+  credentialsPath = project.findProperty('org.thepalaceproject.app.credentials.palace') ?: rootDir
+  lcpProfile = "prod"
+
   // Required for some dependencies only available from our private S3
   //
   nyplS3Depend =
@@ -104,38 +107,11 @@ ext {
       throw new GradleException(text);
     }
   }
-
-  credentialsPath =
-    project.findProperty('org.thepalaceproject.app.credentials.palace') ?: ''
-  lcpLicenseFile = "${credentialsPath}/LCP/prod_license_key.txt"
-  lcpLicenseKey = 'test'
-
-  try {
-    lcpLicenseKey = new File(lcpLicenseFile).text.trim()
-  } catch (Exception ex) {
-    logger.error("Failed to read production LCP license key from {}", lcpLicenseFile)
-    logger.error("Test liblcp will be used")
-  }
-}
-
-//
-// If we're not using the production LCP module, the only version available is 1.0.0, so
-// substitute out the version that was requested.
-//
-
-if (lcpLicenseKey == 'test') {
-  allprojects {
-    configurations.all {
-      resolutionStrategy {
-        dependencySubstitution {
-          substitute module('readium:liblcp') using module('readium:liblcp:1.0.0') because 'no LCP production license key was found, and the LCP test repository only contains version 1.0.0'
-        }
-      }
-    }
-  }
 }
 
 subprojects { project ->
+  apply from: file("${credentialsPath}/LCP/Android/build_lcp_${lcpProfile}.gradle")
+
   group = project.ext["GROUP"]
   version = project.ext["VERSION_NAME"]
 
@@ -204,21 +180,6 @@ subprojects { project ->
         mavenContent {
           releasesOnly()
         }
-      }
-    }
-
-    /*
-     * LCP repository.
-     */
-
-    ivy {
-      name = "LCP"
-      url = uri('https://liblcp.dita.digital')
-      patternLayout {
-        artifact ("/[organisation]/[module]/android/aar/$lcpLicenseKey/[revision].[ext]")
-      }
-      metadataSources {
-        artifact()
       }
     }
 
