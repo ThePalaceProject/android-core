@@ -585,8 +585,6 @@ class AccountDetailFragment : Fragment(R.layout.account) {
     this.logger.debug("broadcasting login state")
     this.viewModel.account.setLoginState(this.viewModel.account.loginState)
 
-    this.accountIcon.setImageDrawable(null)
-    this.authenticationViews.clear()
     this.subscriptions.clear()
   }
 
