@@ -36,7 +36,6 @@ import java.net.ServerSocket
 import java.util.ServiceLoader
 import java.util.concurrent.Executors
 
-
 class PdfReaderActivity : AppCompatActivity() {
 
   companion object {
