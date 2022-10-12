@@ -14,6 +14,16 @@ PDFViewerApplication.initializedPromise.then(() => {
 });
 
 /**
+ * Check if the side bar is open.
+ *
+ * @return true if the sidebar is open, false if it is closed.
+ **/
+
+function isSideBarOpen() {
+    return PDFViewerApplication.pdfSidebar.isOpen;
+}
+
+/**
  * Toggle the sidebar.
  *
  * @return true if the sidebar is open after toggling, false if it is closed.
@@ -21,7 +31,7 @@ PDFViewerApplication.initializedPromise.then(() => {
 function toggleSidebar() {
   PDFViewerApplication.pdfSidebar.toggle();
 
-  return PDFViewerApplication.pdfSidebar.isOpen;
+  return isSideBarOpen();
 }
 
 /**

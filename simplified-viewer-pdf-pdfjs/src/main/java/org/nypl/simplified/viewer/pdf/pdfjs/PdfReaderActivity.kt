@@ -9,6 +9,7 @@ import android.view.MenuItem
 import android.view.View
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.FrameLayout
 import android.widget.ProgressBar
 import androidx.appcompat.app.AlertDialog
@@ -32,8 +33,9 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.ServerSocket
-import java.util.ServiceLoader
+import java.util.*
 import java.util.concurrent.Executors
+
 
 class PdfReaderActivity : AppCompatActivity() {
 
@@ -116,6 +118,16 @@ class PdfReaderActivity : AppCompatActivity() {
             this.webView.loadUrl(
               "http://localhost:${it.port}/assets/pdf-viewer/viewer.html?file=%2Fbook.pdf#page=${this.documentPageIndex}"
             )
+
+            this.webView.webViewClient = object : WebViewClient() {
+              override fun onPageFinished(view: WebView, url: String) {
+                webView.evaluateJavascript("isSideBarOpen()") { result ->
+                  if (result == "true") {
+                    toggleSidebar()
+                  }
+                }
+              }
+            }
           }
         }
       }
