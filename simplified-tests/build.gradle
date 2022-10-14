@@ -100,12 +100,6 @@ dependencies {
   implementation libs.r2.shared
   implementation libs.slf4j
 
-  implementation (libs.readium.lcp) {
-    artifact {
-      type = "aar"
-    }
-  }
-
   testImplementation libs.logback.classic
   testImplementation libs.junit
   testImplementation libs.org.json

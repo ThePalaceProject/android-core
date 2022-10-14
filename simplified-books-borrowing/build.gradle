@@ -21,12 +21,6 @@ dependencies {
   implementation libs.r2.shared
   implementation libs.slf4j
 
-  implementation (libs.readium.lcp) {
-    artifact {
-      type = "aar"
-    }
-  }
-
   implementation(libs.truevfs.access)
   implementation(libs.truevfs.driver.zip)
   implementation(libs.truecommons.key.disable)
