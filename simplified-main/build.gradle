@@ -89,10 +89,4 @@ dependencies {
   api libs.rxjava2
   api libs.rxjava2.extensions
   api libs.slf4j
-
-  implementation (libs.readium.lcp) {
-    artifact {
-      type = "aar"
-    }
-  }
 }

@@ -222,6 +222,14 @@ audiobook player module, but there is also an NYPL-developed Findaway
 module for Findaway licensees. Please get in touch with us if you have
 a Findaway license and want to produce a Findaway-enabled build.
 
+#### LCP DRM Support
+
+The project uses Readium's liblcp module to provide support for LCP
+content protection. This module must be available on the classpath
+when the `org.thepalaceproject.drm.enabled` property is true. Otherwise,
+the project will not compile. Please get in touch with us if you have
+an LCP license and want to produce a DRM-enabled build.
+
 ## Development
 
 ### Branching/Merging
