@@ -93,7 +93,7 @@ class ProfileAccountLogoutTask(
         is AccountLoggingIn,
         is AccountLoginFailed,
         is AccountLoggingInWaitingForExternalAuthentication -> {
-          this.warn("attempted to log out with account in state {}", state.javaClass.canonicalName)
+          this.warn("attempted to sign out with account in state {}", state.javaClass.canonicalName)
           this.steps.currentStepSucceeded(this.logoutStrings.logoutNotLoggedIn)
           return this.steps.finishSuccess(Unit)
         }

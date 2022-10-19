@@ -295,12 +295,9 @@ internal class MainFragmentListenerDelegate(
     return when (event) {
       AccountDetailEvent.LoginSucceeded ->
         when (state) {
-          is MainFragmentState.CatalogWaitingForLogin -> {
-            this.openCatalog()
-            MainFragmentState.EmptyState
-          }
+          is MainFragmentState.CatalogWaitingForLogin,
           is MainFragmentState.BookDetailsWaitingForLogin -> {
-            this.returnToCatalogTab()
+            this.navigator.popBackStack()
             MainFragmentState.EmptyState
           }
           else -> {
@@ -541,15 +538,10 @@ internal class MainFragmentListenerDelegate(
       fragment = AccountDetailFragment.create(
         AccountFragmentParameters(
           accountId = account,
-          closeOnLoginSuccess = false,
           showPleaseLogInTitle = comingFromBookLoanRequest
         )
       ),
-      tab = if (comingFromBookLoanRequest) {
-        R.id.tabCatalog
-      } else {
-        R.id.tabSettings
-      }
+      tab = this.navigator.currentTab()
     )
   }
 
@@ -610,10 +602,6 @@ internal class MainFragmentListenerDelegate(
   private fun openCatalog() {
     this.navigator.popBackStack()
     this.navigator.reset(R.id.tabCatalog, false)
-  }
-
-  private fun returnToCatalogTab() {
-    this.navigator.goToTab(R.id.tabCatalog)
   }
 
   private fun openViewer(

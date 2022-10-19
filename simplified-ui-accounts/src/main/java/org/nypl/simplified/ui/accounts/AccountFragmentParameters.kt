@@ -16,12 +16,6 @@ data class AccountFragmentParameters(
   val accountId: AccountID,
 
   /**
-   * Close on login succeeded?
-   */
-
-  val closeOnLoginSuccess: Boolean,
-
-  /**
    * Show the "please log in to continue" title.
    */
 

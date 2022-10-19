@@ -18,7 +18,7 @@
 *.jks
 secrets.conf
 ReaderClientCert.sig
-LCP/prod_license_key.txt
+LCP/*
 
 # Backup files
 *~
