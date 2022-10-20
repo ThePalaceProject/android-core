@@ -114,6 +114,20 @@ subprojects { project ->
     apply from: file("${credentialsPath}/LCP/Android/build_lcp_${lcpProfile}.gradle")
   }
 
+  // Workaround for failing readium nanohttpd artifact downloads. Remove this when readium has
+  // fixed the issue.
+  configurations.all {
+    resolutionStrategy {
+      dependencySubstitution {
+        all { DependencySubstitution dependency ->
+          if (dependency.requested instanceof ModuleComponentSelector && dependency.requested.group == 'com.github.edrlab.nanohttpd') {
+            dependency.useTarget ('com.github.readium.nanohttpd:' + dependency.requested.module + ':' + dependency.requested.version, 'because nanohttpd ownership changed from edrlab to readium')
+          }
+        }
+      }
+    }
+  }
+
   group = project.ext["GROUP"]
   version = project.ext["VERSION_NAME"]
 
