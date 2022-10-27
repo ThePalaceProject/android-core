@@ -14,7 +14,7 @@ android {
 }
 
 dependencies {
-  api libs.androidx.legacy.support.v4
+  api libs.androidx.core
   api libs.kotlin.stdlib
   api libs.slf4j
 }

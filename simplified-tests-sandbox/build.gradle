@@ -45,7 +45,6 @@ dependencies {
 
   implementation libs.androidx.app.compat
   implementation libs.androidx.constraint.layout
-  implementation libs.androidx.legacy.support.v4
   implementation libs.androidx.lifecycle
   implementation libs.google.material
   implementation libs.io7m.jfunctional
