@@ -8,7 +8,6 @@ dependencies {
   implementation project(':simplified-webview')
 
   implementation libs.slf4j
-  implementation libs.androidx.legacy.support.v4
   implementation libs.androidx.activity
   implementation libs.androidx.app.compat
   implementation libs.androidx.constraint.layout

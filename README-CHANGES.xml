@@ -247,8 +247,9 @@
         <c:change date="2022-10-04T00:00:00+00:00" summary="Fixed audiobook chapter's time elapsed and remaining and book remaining time not being updated when dragging the player seekbar."/>
         <c:change date="2022-10-04T00:00:00+00:00" summary="Fixed track durations not being displayed on Overdrive audio books."/>
         <c:change date="2022-10-08T00:00:00+00:00" summary="Fixed login button being disabled when reentering the app."/>
+        <c:change date="2022-10-19T00:00:00+00:00" summary="Changed target version to Android 12."/>
         <c:change date="2022-10-19T00:00:00+00:00" summary="Fixed app not redirecting user to book details after logging in."/>
-        <c:change date="2022-10-19T17:13:45+00:00" summary="Updated 'Log inÂ' and Â'Log outÂ' to 'Sign inÂ' and Â'Sign out'"/>
+        <c:change date="2022-10-19T17:13:45+00:00" summary="Updated &quot;Log in&quot; and &quot;Log out&quot; to &quot;Sign in&quot; and &quot;Sign out&quot;"/>
       </c:changes>
     </c:release>
   </c:releases>
