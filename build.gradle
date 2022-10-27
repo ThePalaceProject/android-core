@@ -204,6 +204,22 @@ subprojects { project ->
       task.onlyIf { nyplDrmEnabled }
     }
   }
+
+  // Workaround for failing readium nanohttpd artifact downloads. Remove this when readium has
+  // fixed the issue.
+  if (nyplDrmEnabled || !nyplDrmRequired) {
+    project.configurations.all {
+      resolutionStrategy {
+        dependencySubstitution {
+          all { DependencySubstitution dependency ->
+            if (dependency.requested instanceof ModuleComponentSelector && dependency.requested.group == 'com.github.edrlab.nanohttpd') {
+              dependency.useTarget ('com.github.readium.nanohttpd:' + dependency.requested.module + ':' + dependency.requested.version, 'because nanohttpd ownership changed from edrlab to readium')
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 /**
