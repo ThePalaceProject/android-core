@@ -219,11 +219,11 @@ class LocationFragment : Fragment(), LocationListener {
 
     try {
       if (location != null) {
-        address = geocoder.getFromLocation(location.latitude, location.longitude, maxResults)[0]
-        logger.debug("Region is: ${address.adminArea} ${address.countryCode} ")
-        binding.regionEt.setText("${address.adminArea} ${address.countryCode}", TextView.BufferType.EDITABLE)
+        address = geocoder.getFromLocation(location.latitude, location.longitude, maxResults)?.get(0)
+        logger.debug("Region is: ${address?.adminArea} ${address?.countryCode} ")
+        binding.regionEt.setText("${address?.adminArea} ${address?.countryCode}", TextView.BufferType.EDITABLE)
 
-        if (address.countryCode == "US" && (address.adminArea == "New York" || address.adminArea == "NY")) {
+        if (address?.countryCode == "US" && (address?.adminArea == "New York" || address?.adminArea == "NY")) {
           logger.debug("User is in New York")
           logger.debug("Stopping location updates")
           locationManager.removeUpdates(this)
@@ -281,11 +281,11 @@ class LocationFragment : Fragment(), LocationListener {
       val address: Address?
 
       try {
-        address = geocoder.getFromLocation(location.latitude, location.longitude, maxResults)[0]
-        logger.debug("Region is: ${address.adminArea} ${address.countryCode} ")
-        binding.regionEt.setText("${address.adminArea} ${address.countryCode}", TextView.BufferType.EDITABLE)
+        address = geocoder.getFromLocation(location.latitude, location.longitude, maxResults)?.get(0)
+        logger.debug("Region is: ${address?.adminArea} ${address?.countryCode} ")
+        binding.regionEt.setText("${address?.adminArea} ${address?.countryCode}", TextView.BufferType.EDITABLE)
 
-        if (address.countryCode == "US" && (address.adminArea == "New York" || address.adminArea == "NY")) {
+        if (address?.countryCode == "US" && (address?.adminArea == "New York" || address?.adminArea == "NY")) {
           logger.debug("User is in New York")
           logger.debug("Stopping location updates")
           locationManager.removeUpdates(this)

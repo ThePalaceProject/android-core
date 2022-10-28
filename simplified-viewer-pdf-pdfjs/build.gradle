@@ -14,15 +14,15 @@ dependencies {
   implementation libs.kotlin.coroutines
   implementation libs.kotlin.reflect
   implementation libs.kotlin.stdlib
+  implementation (libs.nano.httpd) {
+    exclude group: "org.parboiled"
+  }
+  implementation (libs.nano.httpd.nanolets) {
+    exclude group: "org.parboiled"
+  }
   implementation libs.nypl.pdf.api
   implementation libs.nypl.pdf.viewer
   implementation libs.palace.drm.core
   implementation libs.r2.streamer
   implementation libs.slf4j
-  implementation("com.github.edrlab.nanohttpd:nanohttpd:master-SNAPSHOT") {
-    exclude group: "org.parboiled"
-  }
-  implementation("com.github.edrlab.nanohttpd:nanohttpd-nanolets:master-SNAPSHOT") {
-    exclude group: "org.parboiled"
-  }
 }

@@ -237,7 +237,7 @@
         <c:change date="2022-09-19T00:00:00+00:00" summary="Fixed a crash that occurred on some Samsung devices."/>
       </c:changes>
     </c:release>
-    <c:release date="2022-10-19T17:13:45+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.3.0">
+    <c:release date="2022-10-27T17:52:31+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.3.0">
       <c:changes>
         <c:change date="2022-09-21T00:00:00+00:00" summary="Removed delete option from book details screen."/>
         <c:change date="2022-09-21T00:00:00+00:00" summary="Fixed logging out action not being performed sometimes."/>
@@ -250,6 +250,7 @@
         <c:change date="2022-10-19T00:00:00+00:00" summary="Changed target version to Android 12."/>
         <c:change date="2022-10-19T00:00:00+00:00" summary="Fixed app not redirecting user to book details after logging in."/>
         <c:change date="2022-10-19T17:13:45+00:00" summary="Updated &quot;Log in&quot; and &quot;Log out&quot; to &quot;Sign in&quot; and &quot;Sign out&quot;"/>
+        <c:change date="2022-10-27T17:52:31+00:00" summary="Changed target version to Android 13."/>
       </c:changes>
     </c:release>
   </c:releases>

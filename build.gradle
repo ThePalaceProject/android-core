@@ -28,10 +28,10 @@ plugins {
 }
 
 ext {
-  android_build_tools_version = "32.0.0"
-  android_compile_sdk_version = 32
+  android_build_tools_version = "33.0.0"
+  android_compile_sdk_version = 33
   android_min_sdk_version = 21
-  android_target_sdk_version = 32
+  android_target_sdk_version = 33
 
   credentialsPath = project.findProperty('org.thepalaceproject.app.credentials.palace')
   lcpProfile = "prod"
@@ -202,22 +202,6 @@ subprojects { project ->
   if (nyplDrmRequired) {
     project.tasks.all { task ->
       task.onlyIf { nyplDrmEnabled }
-    }
-  }
-
-  // Workaround for failing readium nanohttpd artifact downloads. Remove this when readium has
-  // fixed the issue.
-  if (nyplDrmEnabled || !nyplDrmRequired) {
-    project.configurations.all {
-      resolutionStrategy {
-        dependencySubstitution {
-          all { DependencySubstitution dependency ->
-            if (dependency.requested instanceof ModuleComponentSelector && dependency.requested.group == 'com.github.edrlab.nanohttpd') {
-              dependency.useTarget ('com.github.readium.nanohttpd:' + dependency.requested.module + ':' + dependency.requested.version, 'because nanohttpd ownership changed from edrlab to readium')
-            }
-          }
-        }
-      }
     }
   }
 }
