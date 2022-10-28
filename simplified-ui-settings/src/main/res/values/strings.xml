@@ -56,10 +56,10 @@
   <string name="settingsInfo">App info</string>
   <string name="settingsLicense">Software Licenses</string>
   <string name="settingsLicenseSummary" />
-  <string name="settingsLogin">Log in</string>
-  <string name="settingsLoginWith">Log in with %1$s</string>
+  <string name="settingsLogin">Sign in</string>
+  <string name="settingsLoginWith">Sign in with %1$s</string>
   <string name="settingsLoginAlternatives">Alternative Login Methods</string>
-  <string name="settingsLogout">Log out</string>
+  <string name="settingsLogout">Sign out</string>
   <string name="settingsPassword">Password</string>
   <string name="settingsPasswordHide">Hide password</string>
   <string name="settingsPasswordShow">Show password</string>

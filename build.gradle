@@ -204,6 +204,7 @@ subprojects { project ->
       task.onlyIf { nyplDrmEnabled }
     }
   }
+
   // Workaround for failing readium nanohttpd artifact downloads. Remove this when readium has
   // fixed the issue.
   if (nyplDrmEnabled || !nyplDrmRequired) {
