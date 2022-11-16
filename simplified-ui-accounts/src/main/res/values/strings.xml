@@ -12,7 +12,7 @@
   <string name="accountCreationFailedMessage">The library could not be created.</string>
   <string name="accountDelete">Delete</string>
   <string name="accountEULAStatement">By signing in, you agree to the End User License Agreement.</string>
-  <string name="accountLogin">Sign In</string>
+  <string name="accountLogin">Sign in</string>
   <string name="accountForgotPassword">Forgot your password?</string>
   <string name="accountWantChildCard">Want a card for your child?</string>
   <string name="accountCreateCard">Create Card</string>
