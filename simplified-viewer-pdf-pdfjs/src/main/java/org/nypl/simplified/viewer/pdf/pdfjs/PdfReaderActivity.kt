@@ -6,11 +6,13 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.MotionEvent
 import android.view.View
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.widget.FrameLayout
 import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -75,11 +77,13 @@ class PdfReaderActivity : AppCompatActivity() {
   private lateinit var bookID: BookID
   private lateinit var feedEntry: FeedEntry.FeedEntryOPDS
   private lateinit var loadingBar: ProgressBar
+  private lateinit var pdfTitle: TextView
   private lateinit var webView: WebView
 
   private var pdfServer: PdfServer? = null
   private var isSidebarOpen = false
   private var documentPageIndex: Int = 0
+  private var lastEvent: Int = -1
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -90,6 +94,8 @@ class PdfReaderActivity : AppCompatActivity() {
     createToolbar(params.documentTitle)
 
     this.loadingBar = findViewById(R.id.pdf_loading_progress)
+    this.pdfTitle = findViewById(R.id.pdf_title)
+    this.pdfTitle.text = params.documentTitle
 
     this.accountId = params.accountId
     this.feedEntry = params.entry
@@ -183,6 +189,29 @@ class PdfReaderActivity : AppCompatActivity() {
 
     this.pdfReaderContainer = findViewById(R.id.pdf_reader_container)
     this.pdfReaderContainer.addView(this.webView)
+
+    this.webView.setOnTouchListener(object : View.OnTouchListener {
+
+      override fun onTouch(view: View?, event: MotionEvent?): Boolean {
+        event ?: return false
+
+        if (lastEvent == MotionEvent.ACTION_DOWN && event.action == MotionEvent.ACTION_UP) {
+          onClickPerformedOnWebView()
+        }
+
+        lastEvent = event?.action
+
+        return false
+      }
+    })
+  }
+
+  private fun onClickPerformedOnWebView() {
+    if (this.supportActionBar?.isShowing == true) {
+      this.supportActionBar?.hide()
+    } else {
+      this.supportActionBar?.show()
+    }
   }
 
   private fun createPdfServer(drmInfo: BookDRMInformation, pdfFile: File) {
