@@ -19,4 +19,9 @@
     <item name="android:textColor">?attr/simplifiedColorText</item>
     <item name="android:fontFamily">@font/open_sans_regular</item>
   </style>
+
+  <style name="Enabled.Switch" parent="Theme.AppCompat.Light">
+    <item name="colorControlActivated">#2ED158</item>
+  </style>
+
 </resources>
