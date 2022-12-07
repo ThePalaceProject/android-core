@@ -42,6 +42,9 @@ class PdfReaderActivity : AppCompatActivity() {
   companion object {
     private const val PARAMS_ID = "org.nypl.simplified.viewer.pdf.pdfjs.PdfReaderActivity.params"
 
+    private const val CLICK_MAX_DURATION = 200
+    private const val CLICK_MAX_DISTANCE = 15
+
     /**
      * Factory method to start a [PdfReaderActivity]
      */
@@ -83,7 +86,10 @@ class PdfReaderActivity : AppCompatActivity() {
   private var pdfServer: PdfServer? = null
   private var isSidebarOpen = false
   private var documentPageIndex: Int = 0
-  private var lastEvent: Int = -1
+  private var pressStartTimestamp = 0L
+  private var pressedX = 0f
+  private var pressedY = 0f
+  private var isWithinClickDistance = false
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -195,11 +201,26 @@ class PdfReaderActivity : AppCompatActivity() {
       override fun onTouch(view: View?, event: MotionEvent?): Boolean {
         event ?: return false
 
-        if (lastEvent == MotionEvent.ACTION_DOWN && event.action == MotionEvent.ACTION_UP) {
-          onClickPerformedOnWebView()
+        when (event.action) {
+          MotionEvent.ACTION_DOWN -> {
+            pressStartTimestamp = System.currentTimeMillis()
+            pressedX = event.x
+            pressedY = event.y
+            isWithinClickDistance = true
+          }
+          MotionEvent.ACTION_MOVE -> {
+            if (isWithinClickDistance && getDistanceBetweenLastAndCurrentEvent(event.x, event.y) > CLICK_MAX_DISTANCE) {
+              isWithinClickDistance = false
+            }
+            return true
+          }
+          MotionEvent.ACTION_UP -> {
+            val pressDuration = System.currentTimeMillis() - pressStartTimestamp
+            if (pressDuration < CLICK_MAX_DURATION && isWithinClickDistance) {
+              onClickPerformedOnWebView()
+            }
+          }
         }
-
-        lastEvent = event?.action
 
         return false
       }
@@ -235,6 +256,14 @@ class PdfReaderActivity : AppCompatActivity() {
         execute = this::finish
       )
     }
+  }
+
+  private fun getDistanceBetweenLastAndCurrentEvent(x: Float, y: Float): Float {
+    val dx = (pressedX - x).toDouble()
+    val dy = (pressedY - y).toDouble()
+    val pxDistance = Math.sqrt(dx * dx + dy * dy)
+    val dpDistance = pxDistance / resources.displayMetrics.density
+    return dpDistance.toFloat()
   }
 
   override fun onCreateOptionsMenu(menu: Menu?): Boolean {
