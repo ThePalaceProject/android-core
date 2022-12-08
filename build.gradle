@@ -76,13 +76,14 @@ ext {
   // Check that non -SNAPSHOT builds don't use -SNAPSHOT dependencies.
   //
 
+  final versionCatalog = extensions.getByType(VersionCatalogsExtension).named("libs")
   final String versionName = project.ext["VERSION_NAME"]
   final Set<String> snapshots = new HashSet<>()
 
   if (!versionName.endsWith("-SNAPSHOT")) {
-    final List<String> versionAliases = libs.getVersionAliases()
+    final List<String> versionAliases = versionCatalog.getVersionAliases()
     versionAliases.each { name ->
-      final java.util.Optional<VersionConstraint> versionConstraintOpt = libs.findVersion(name)
+      final java.util.Optional<VersionConstraint> versionConstraintOpt = versionCatalog.findVersion(name)
       if (versionConstraintOpt.isPresent()) {
         final VersionConstraint versionConstraint = versionConstraintOpt.get()
         if (versionConstraint.requiredVersion.endsWith("-SNAPSHOT")) {
