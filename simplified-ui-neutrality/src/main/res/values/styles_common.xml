@@ -19,4 +19,10 @@
     <item name="android:textColor">?attr/simplifiedColorText</item>
     <item name="android:fontFamily">@font/open_sans_regular</item>
   </style>
+
+  <style name="Enabled.Switch" parent="Widget.AppCompat.CompoundButton.Switch">
+    <item name="android:textSize">14sp</item>
+    <item name="colorControlActivated">#2ED158</item>
+  </style>
+
 </resources>
