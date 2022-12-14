@@ -212,7 +212,6 @@ class PdfReaderActivity : AppCompatActivity() {
             if (isWithinClickDistance && getDistanceBetweenLastAndCurrentEvent(event.x, event.y) > CLICK_MAX_DISTANCE) {
               isWithinClickDistance = false
             }
-            return true
           }
           MotionEvent.ACTION_UP -> {
             val pressDuration = System.currentTimeMillis() - pressStartTimestamp
