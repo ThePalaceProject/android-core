@@ -10,9 +10,9 @@ import java.net.URL
 
 internal abstract class AbstractDocument internal constructor(
   private val http: LSHTTPClientType,
-  initialStreams: () -> InputStream,
-  private val file: File,
-  private val fileTmp: File,
+  initialStreams: (() -> InputStream)?,
+  private val file: File?,
+  private val fileTmp: File?,
   private val remoteURL: URL
 ) : DocumentType {
 
@@ -20,18 +20,20 @@ internal abstract class AbstractDocument internal constructor(
     LoggerFactory.getLogger(AbstractDocument::class.java)
 
   init {
-    if (!this.file.isFile) {
+    if (this.file != null && initialStreams != null && !this.file.isFile) {
       this.logger.debug("creating initial file {}", this.file)
       initialStreams.invoke().use { stream ->
-        this.fileTmp.outputStream().use { output ->
+        this.fileTmp?.outputStream()?.use { output ->
           stream.copyTo(output)
         }
-        this.fileTmp.renameTo(this.file)
+        this.fileTmp?.renameTo(this.file)
       }
     }
   }
 
   override fun update() {
+    this.file ?: return
+
     this.logger.debug("updating document {} from {}", this.file, this.remoteURL)
 
     val request =
@@ -43,10 +45,10 @@ internal abstract class AbstractDocument internal constructor(
       is LSHTTPResponseStatus.Responded.OK -> {
         val stream = status.bodyStream
         if (stream != null) {
-          this.fileTmp.outputStream().use { output ->
+          this.fileTmp?.outputStream()?.use { output ->
             stream.copyTo(output)
           }
-          this.fileTmp.renameTo(this.file)
+          this.fileTmp?.renameTo(this.file)
           Unit
         } else {
           this.logger.debug("no body")
@@ -59,5 +61,5 @@ internal abstract class AbstractDocument internal constructor(
   }
 
   override val readableURL: URL =
-    this.file.toURI().toURL()
+    this.file?.toURI()?.toURL() ?: remoteURL
 }

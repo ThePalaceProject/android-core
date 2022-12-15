@@ -7,9 +7,9 @@ import java.net.URL
 
 internal class PlainDocument internal constructor(
   http: LSHTTPClientType,
-  initialStreams: () -> InputStream,
-  file: File,
-  fileTmp: File,
+  initialStreams: (() -> InputStream)?,
+  file: File?,
+  fileTmp: File?,
   remoteURL: URL
 ) : AbstractDocument(
   http = http,
