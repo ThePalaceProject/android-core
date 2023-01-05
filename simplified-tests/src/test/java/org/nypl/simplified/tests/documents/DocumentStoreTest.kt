@@ -10,7 +10,12 @@ import org.librarysimplified.documents.DocumentConfiguration
 import org.librarysimplified.documents.DocumentConfigurationServiceType
 import org.librarysimplified.documents.DocumentStores
 import org.librarysimplified.documents.DocumentType
-import org.librarysimplified.http.api.*
+import org.librarysimplified.http.api.LSHTTPClientType
+import org.librarysimplified.http.api.LSHTTPRequestBuilderType
+import org.librarysimplified.http.api.LSHTTPRequestType
+import org.librarysimplified.http.api.LSHTTPResponseProperties
+import org.librarysimplified.http.api.LSHTTPResponseStatus
+import org.librarysimplified.http.api.LSHTTPResponseType
 import org.mockito.Mockito
 import org.nypl.simplified.tests.TestDirectories
 import java.io.File
