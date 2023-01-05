@@ -140,6 +140,10 @@ class DocumentStoreTest {
 
     store.update(executor)
 
+    // this sleep is needed for some reason when this test and the 'testAllDocumentUpdates' test
+    // are both called in the test suite
+    Thread.sleep(50)
+
     Mockito.verify(http, Mockito.times(1)).newRequest(documentWithName.remoteURI)
   }
 
