@@ -13,21 +13,24 @@ class PalaceDocumentStoreConfiguration : DocumentConfigurationServiceType {
     )
 
   override val about: DocumentConfiguration? =
-    null
+    DocumentConfiguration(
+      name = null,
+      remoteURI = URI.create("http://thepalaceproject.org/")
+    )
 
   override val acknowledgements: DocumentConfiguration? =
     null
 
   override val eula: DocumentConfiguration? =
     DocumentConfiguration(
-      "eula.html",
-      URI.create("https://legal.palaceproject.io/End%20User%20License%20Agreement.html")
+      name = "eula.html",
+      remoteURI = URI.create("https://legal.palaceproject.io/End%20User%20License%20Agreement.html")
     )
 
   override val licenses: DocumentConfiguration? =
     DocumentConfiguration(
-      "software-licenses.html",
-      URI.create("https://legal.palaceproject.io/software-licenses.html")
+      name = "software-licenses.html",
+      remoteURI = URI.create("https://legal.palaceproject.io/software-licenses.html")
     )
 
   override val faq: DocumentConfiguration? =

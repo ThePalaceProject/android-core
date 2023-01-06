@@ -2,7 +2,7 @@
 
 <resources>
   <string name="settings">Settings</string>
-  <string name="settingsAbout">About</string>
+  <string name="settingsAbout">About Palace</string>
   <string name="settingsAboutSummary" />
   <string name="settingsAccounts">Libraries</string>
   <string name="settingsAccountsSummary">Add, remove, or configure libraries</string>

@@ -256,10 +256,11 @@
         <c:change date="2022-11-29T00:00:00+00:00" summary="Fixed audiobooks not pausing when headphones are unplugged."/>
       </c:changes>
     </c:release>
-    <c:release date="2022-12-14T14:42:56+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.4.0">
+    <c:release date="2022-12-15T11:43:00+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.4.0">
       <c:changes>
         <c:change date="2022-12-12T00:00:00+00:00" summary="Changed the Switch's enabled color to green."/>
-        <c:change date="2022-12-14T14:42:56+00:00" summary="Downgraded Gradle version."/>
+        <c:change date="2022-12-14T00:00:00+00:00" summary="Downgraded Gradle version."/>
+        <c:change date="2022-12-15T11:43:00+00:00" summary="Added &quot;About Palace&quot; option to Settings screen."/>
       </c:changes>
     </c:release>
   </c:releases>

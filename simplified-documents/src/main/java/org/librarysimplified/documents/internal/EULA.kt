@@ -8,9 +8,9 @@ import java.net.URL
 
 internal class EULA internal constructor(
   http: LSHTTPClientType,
-  initialStreams: () -> InputStream,
-  file: File,
-  fileTmp: File,
+  initialStreams: (() -> InputStream)?,
+  file: File?,
+  fileTmp: File?,
   private val fileAgreed: File,
   remoteURL: URL
 ) : AbstractDocument(

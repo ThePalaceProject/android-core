@@ -110,16 +110,27 @@ internal class DocumentStore private constructor(
     ): EULAType {
       this.logger.debug("eula {} ({})", config.name, config.remoteURI)
 
-      return EULA(
-        http = http,
-        initialStreams = {
-          assetManager.open(config.name)
-        },
-        file = File(baseDirectory, config.name),
-        fileTmp = File(baseDirectory, config.name + ".tmp"),
-        fileAgreed = File(baseDirectory, "eula_agreed.dat"),
-        remoteURL = config.remoteURI.toURL()
-      )
+      return if (!config.name.isNullOrBlank()) {
+        EULA(
+          http = http,
+          initialStreams = {
+            assetManager.open(config.name)
+          },
+          file = File(baseDirectory, config.name),
+          fileTmp = File(baseDirectory, config.name + ".tmp"),
+          fileAgreed = File(baseDirectory, "eula_agreed.dat"),
+          remoteURL = config.remoteURI.toURL()
+        )
+      } else {
+        EULA(
+          http = http,
+          initialStreams = null,
+          file = null,
+          fileTmp = null,
+          fileAgreed = File(baseDirectory, "eula_agreed.dat"),
+          remoteURL = config.remoteURI.toURL()
+        )
+      }
     }
 
     private fun documentForMaybe(
@@ -141,15 +152,25 @@ internal class DocumentStore private constructor(
     ): DocumentType {
       this.logger.debug("plain document {} ({})", config.name, config.remoteURI)
 
-      return PlainDocument(
-        http = http,
-        initialStreams = {
-          assetManager.open(config.name)
-        },
-        file = File(baseDirectory, config.name),
-        fileTmp = File(baseDirectory, config.name + ".tmp"),
-        remoteURL = config.remoteURI.toURL()
-      )
+      return if (!config.name.isNullOrBlank()) {
+        PlainDocument(
+          http = http,
+          initialStreams = {
+            assetManager.open(config.name)
+          },
+          file = File(baseDirectory, config.name),
+          fileTmp = File(baseDirectory, config.name + ".tmp"),
+          remoteURL = config.remoteURI.toURL()
+        )
+      } else {
+        PlainDocument(
+          http = http,
+          initialStreams = null,
+          file = null,
+          fileTmp = null,
+          remoteURL = config.remoteURI.toURL()
+        )
+      }
     }
   }
 
