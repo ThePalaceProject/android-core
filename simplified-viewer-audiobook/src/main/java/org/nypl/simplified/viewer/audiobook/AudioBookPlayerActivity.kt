@@ -796,6 +796,10 @@ class AudioBookPlayerActivity :
     }
   }
 
+  override fun onPlayerNotificationWantsIntent(): Intent {
+    return parentActivityIntent ?: intent
+  }
+
   override fun onPlayerTOCWantsBook(): PlayerAudioBookType {
     return this.book
   }
