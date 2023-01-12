@@ -12,6 +12,7 @@ import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormatter
 import org.joda.time.format.DateTimeFormatterBuilder
 import org.librarysimplified.audiobook.api.PlayerPlaybackRate
+import org.librarysimplified.audiobook.api.PlayerSleepTimerConfiguration
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.files.FileUtilities
 import org.nypl.simplified.json.core.JSONParseException
@@ -201,6 +202,9 @@ object ProfileDescriptionJSON {
     val playbackRates =
       deserializePlaybackRates(objectMapper, objectNode)
 
+    val sleepTimers =
+      deserializeSleepTimers(objectMapper, objectNode)
+
     val mostRecentAccount =
       JSONParserUtilities.getStringOrNull(objectNode, "mostRecentAccount")
         ?.let { AccountID(UUID.fromString(it)) }
@@ -217,7 +221,8 @@ object ProfileDescriptionJSON {
       hasSeenLibrarySelectionScreen = hasSeenLibrarySelectionScreen,
       showDebugSettings = showDebugSettings,
       enableOldPDFReader = enableOldPDFReader,
-      playbackRates = playbackRates
+      playbackRates = playbackRates,
+      sleepTimers = sleepTimers
     )
   }
 
@@ -247,6 +252,9 @@ object ProfileDescriptionJSON {
     val playbackRates =
       deserializePlaybackRates(objectMapper, objectNode)
 
+    val sleepTimers =
+      deserializeSleepTimers(objectMapper, objectNode)
+
     val mostRecentAccount =
       JSONParserUtilities.getStringOrNull(objectNode, "mostRecentAccount")
         ?.let { AccountID(UUID.fromString(it)) }
@@ -258,7 +266,8 @@ object ProfileDescriptionJSON {
       readerPreferences = readerPreferences,
       mostRecentAccount = mostRecentAccount,
       hasSeenLibrarySelectionScreen = true,
-      playbackRates = playbackRates
+      playbackRates = playbackRates,
+      sleepTimers = sleepTimers
     )
   }
 
@@ -309,6 +318,9 @@ object ProfileDescriptionJSON {
     val playbackRates =
       deserializePlaybackRates(objectMapper, preferencesNode)
 
+    val sleepTimers =
+      deserializeSleepTimers(objectMapper, preferencesNode)
+
     val readerPrefs =
       deserializeReaderPreferences(objectMapper, preferencesNode)
 
@@ -319,7 +331,8 @@ object ProfileDescriptionJSON {
         readerPreferences = readerPrefs,
         mostRecentAccount = mostRecentAccountFallback,
         hasSeenLibrarySelectionScreen = true,
-        playbackRates = playbackRates
+        playbackRates = playbackRates,
+        sleepTimers = sleepTimers
       )
 
     val attributeMap = mutableMapOf<String, String>()
@@ -375,6 +388,27 @@ object ProfileDescriptionJSON {
 
     return map.mapValues { entry ->
       PlayerPlaybackRate.valueOf(entry.value)
+    }
+  }
+
+  private fun deserializeSleepTimers(
+    objectMapper: ObjectMapper,
+    node: ObjectNode?
+  ): Map<String, PlayerSleepTimerConfiguration> {
+
+    val str = JSONParserUtilities.getObjectOrNull(
+      node, "sleepTimers"
+    ) ?: return hashMapOf()
+
+    val map = objectMapper.readValue(
+      str.toString(),
+      object : TypeReference<Map<String, String>>() {
+        // Do nothing
+      }
+    )
+
+    return map.mapValues { entry ->
+      PlayerSleepTimerConfiguration.valueOf(entry.value)
     }
   }
 
@@ -448,6 +482,11 @@ object ProfileDescriptionJSON {
     )
 
     output.set<ObjectNode>(
+      "sleepTimers",
+      serializeSleepTimersToJSON(objectMapper, preferences.sleepTimers)
+    )
+
+    output.set<ObjectNode>(
       "readerPreferences",
       ReaderPreferencesJSON.serializeToJSON(objectMapper, preferences.readerPreferences)
     )
@@ -471,6 +510,17 @@ object ProfileDescriptionJSON {
     val objectNode = objectMapper.createObjectNode()
     playbackRates.keys.forEach { key ->
       objectNode.put(key, playbackRates[key]?.name)
+    }
+    return objectNode
+  }
+
+  fun serializeSleepTimersToJSON(
+    objectMapper: ObjectMapper,
+    sleepTimers: Map<String, PlayerSleepTimerConfiguration>
+  ): ObjectNode {
+    val objectNode = objectMapper.createObjectNode()
+    sleepTimers.keys.forEach { key ->
+      objectNode.put(key, sleepTimers[key]?.name)
     }
     return objectNode
   }

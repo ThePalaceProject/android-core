@@ -500,7 +500,8 @@ object ProfilesDatabases {
               readerPreferences = ReaderPreferences.builder().build(),
               mostRecentAccount = account.id,
               hasSeenLibrarySelectionScreen = false,
-              playbackRates = hashMapOf()
+              playbackRates = hashMapOf(),
+              sleepTimers = hashMapOf()
             ),
             attributes = ProfileAttributes(sortedMapOf())
           )

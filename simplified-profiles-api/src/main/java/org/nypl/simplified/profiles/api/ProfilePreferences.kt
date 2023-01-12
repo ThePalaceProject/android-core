@@ -1,6 +1,7 @@
 package org.nypl.simplified.profiles.api
 
 import org.librarysimplified.audiobook.api.PlayerPlaybackRate
+import org.librarysimplified.audiobook.api.PlayerSleepTimerConfiguration
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.reader.api.ReaderPreferences
 
@@ -37,6 +38,10 @@ data class ProfilePreferences(
   /** @return The playback rates for every audiobook */
 
   val playbackRates: Map<String, PlayerPlaybackRate>,
+
+  /** @return The sleep timer for every audiobook */
+
+  val sleepTimers: Map<String, PlayerSleepTimerConfiguration>,
 
   /** The most recently used account provider. */
 
