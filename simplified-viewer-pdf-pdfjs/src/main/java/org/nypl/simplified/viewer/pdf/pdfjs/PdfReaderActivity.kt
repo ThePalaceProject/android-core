@@ -6,7 +6,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.MotionEvent
 import android.view.View
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
@@ -41,9 +40,6 @@ class PdfReaderActivity : AppCompatActivity() {
 
   companion object {
     private const val PARAMS_ID = "org.nypl.simplified.viewer.pdf.pdfjs.PdfReaderActivity.params"
-
-    private const val CLICK_MAX_DURATION = 200
-    private const val CLICK_MAX_DISTANCE = 15
 
     /**
      * Factory method to start a [PdfReaderActivity]
@@ -86,10 +82,6 @@ class PdfReaderActivity : AppCompatActivity() {
   private var pdfServer: PdfServer? = null
   private var isSidebarOpen = false
   private var documentPageIndex: Int = 0
-  private var pressStartTimestamp = 0L
-  private var pressedX = 0f
-  private var pressedY = 0f
-  private var isWithinClickDistance = false
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -189,49 +181,17 @@ class PdfReaderActivity : AppCompatActivity() {
         fun onPageChanged(pageIndex: Int) {
           this@PdfReaderActivity.onReaderPageChanged(pageIndex)
         }
+
+        @JavascriptInterface
+        fun onPageClick() {
+          this@PdfReaderActivity.onReaderPageClick()
+        }
       },
       "PDFListener"
     )
 
     this.pdfReaderContainer = findViewById(R.id.pdf_reader_container)
     this.pdfReaderContainer.addView(this.webView)
-
-    this.webView.setOnTouchListener(object : View.OnTouchListener {
-
-      override fun onTouch(view: View?, event: MotionEvent?): Boolean {
-        event ?: return false
-
-        when (event.action) {
-          MotionEvent.ACTION_DOWN -> {
-            pressStartTimestamp = System.currentTimeMillis()
-            pressedX = event.x
-            pressedY = event.y
-            isWithinClickDistance = true
-          }
-          MotionEvent.ACTION_MOVE -> {
-            if (isWithinClickDistance && getDistanceBetweenLastAndCurrentEvent(event.x, event.y) > CLICK_MAX_DISTANCE) {
-              isWithinClickDistance = false
-            }
-          }
-          MotionEvent.ACTION_UP -> {
-            val pressDuration = System.currentTimeMillis() - pressStartTimestamp
-            if (pressDuration < CLICK_MAX_DURATION && isWithinClickDistance) {
-              onClickPerformedOnWebView()
-            }
-          }
-        }
-
-        return false
-      }
-    })
-  }
-
-  private fun onClickPerformedOnWebView() {
-    if (this.supportActionBar?.isShowing == true) {
-      this.supportActionBar?.hide()
-    } else {
-      this.supportActionBar?.show()
-    }
   }
 
   private fun createPdfServer(drmInfo: BookDRMInformation, pdfFile: File) {
@@ -255,14 +215,6 @@ class PdfReaderActivity : AppCompatActivity() {
         execute = this::finish
       )
     }
-  }
-
-  private fun getDistanceBetweenLastAndCurrentEvent(x: Float, y: Float): Float {
-    val dx = (pressedX - x).toDouble()
-    val dy = (pressedY - y).toDouble()
-    val pxDistance = Math.sqrt(dx * dx + dy * dy)
-    val dpDistance = pxDistance / resources.displayMetrics.density
-    return dpDistance.toFloat()
   }
 
   override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -323,6 +275,16 @@ class PdfReaderActivity : AppCompatActivity() {
     }
 
     return super.onOptionsItemSelected(item)
+  }
+
+  private fun onReaderPageClick() {
+    this.uiThread.runOnUIThread {
+      if (this.supportActionBar?.isShowing == true) {
+        this.supportActionBar?.hide()
+      } else {
+        this.supportActionBar?.show()
+      }
+    }
   }
 
   private fun onReaderPageChanged(pageIndex: Int) {
