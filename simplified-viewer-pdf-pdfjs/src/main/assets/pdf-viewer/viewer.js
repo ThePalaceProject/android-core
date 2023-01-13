@@ -11,7 +11,22 @@ PDFViewerApplication.initializedPromise.then(() => {
 
     PDFListener.onPageChanged(PDFViewerApplication.page);
   }, { external: true });
+
+  // Detect click events on the PDF viewer.
+
+  const viewers = document.getElementsByClassName("pdfViewer");
+
+  if (viewers.length > 0) {
+    viewers[0].addEventListener("click", onPDFViewerClick, { passive: true });
+  }
 });
+
+/**
+ * Notify the activity of a click on the PDF viewer.
+ **/
+function onPDFViewerClick() {
+  PDFListener.onPageClick();
+}
 
 /**
  * Toggle the sidebar.
