@@ -820,6 +820,14 @@ class AudioBookPlayerActivity :
     }
   }
 
+  override fun onPlayerNotificationWantsIntent(): Intent {
+    return parentActivityIntent ?: intent
+  }
+
+  override fun onPlayerSleepTimerUpdated(item: PlayerSleepTimerConfiguration) {
+    // do nothing for now
+  }
+
   override fun onPlayerTOCWantsBook(): PlayerAudioBookType {
     return this.book
   }
