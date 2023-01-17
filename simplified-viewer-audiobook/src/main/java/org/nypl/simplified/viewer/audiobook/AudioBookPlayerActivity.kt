@@ -473,7 +473,8 @@ class AudioBookPlayerActivity :
       if (!this.isFinishing && !this.supportFragmentManager.isDestroyed) {
         this.playerFragment = PlayerFragment.newInstance(
           PlayerFragmentParameters(
-            currentRate = getBookCurrentPlaybackRate()
+            currentRate = getBookCurrentPlaybackRate(),
+            currentSleepTimer = getBookCurrentSleepTimer()
           )
         )
 
@@ -538,6 +539,12 @@ class AudioBookPlayerActivity :
     val playbackRates = this.profilesController.profileCurrent().preferences().playbackRates
     val bookID = this.parameters.bookID.value()
     return playbackRates[bookID]
+  }
+
+  private fun getBookCurrentSleepTimer(): PlayerSleepTimerConfiguration? {
+    val sleepTimers = this.profilesController.profileCurrent().preferences().sleepTimers
+    val bookID = this.parameters.bookID.value()
+    return sleepTimers[bookID]
   }
 
   private fun loadAndConfigureExtensions(
@@ -758,7 +765,8 @@ class AudioBookPlayerActivity :
       val fragment =
         PlayerPlaybackRateFragment.newInstance(
           PlayerFragmentParameters(
-            currentRate = getBookCurrentPlaybackRate()
+            currentRate = getBookCurrentPlaybackRate(),
+            currentSleepTimer = getBookCurrentSleepTimer()
           )
         )
       fragment.show(this.supportFragmentManager, "PLAYER_RATE")
@@ -774,6 +782,21 @@ class AudioBookPlayerActivity :
       val fragment =
         PlayerSleepTimerFragment.newInstance(PlayerFragmentParameters())
       fragment.show(this.supportFragmentManager, "PLAYER_SLEEP_TIMER")
+    }
+  }
+
+  override fun onPlayerSleepTimerUpdated(item: PlayerSleepTimerConfiguration) {
+    val sleepTimers =
+      HashMap(this.profilesController.profileCurrent().preferences().sleepTimers)
+    val bookID = this.parameters.bookID.value()
+    sleepTimers[bookID] = item
+
+    this.profilesController.profileUpdate { current ->
+      current.copy(
+        preferences = current.preferences.copy(
+          sleepTimers = sleepTimers
+        )
+      )
     }
   }
 
@@ -799,10 +822,6 @@ class AudioBookPlayerActivity :
 
   override fun onPlayerNotificationWantsIntent(): Intent {
     return parentActivityIntent ?: intent
-  }
-
-  override fun onPlayerSleepTimerUpdated(item: PlayerSleepTimerConfiguration) {
-    // do nothing for now
   }
 
   override fun onPlayerTOCWantsBook(): PlayerAudioBookType {

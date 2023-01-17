@@ -256,13 +256,14 @@
         <c:change date="2022-11-29T00:00:00+00:00" summary="Fixed audiobooks not pausing when headphones are unplugged."/>
       </c:changes>
     </c:release>
-    <c:release date="2023-01-13T02:09:33+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.4.0">
+    <c:release date="2023-01-17T17:46:24+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.4.0">
       <c:changes>
         <c:change date="2022-12-12T00:00:00+00:00" summary="Changed the Switch's enabled color to green."/>
         <c:change date="2022-12-14T00:00:00+00:00" summary="Downgraded Gradle version."/>
         <c:change date="2022-12-15T00:00:00+00:00" summary="Added &quot;About Palace&quot; option to Settings screen."/>
         <c:change date="2023-01-11T00:00:00+00:00" summary="Added ability to open the app when clicking on the audiobook's player notification."/>
-        <c:change date="2023-01-13T02:09:33+00:00" summary="Added the ability to hide the toolbar and show the PDF title when pressing the PDF's webview."/>
+        <c:change date="2023-01-13T00:00:00+00:00" summary="Added the ability to hide the toolbar and show the PDF title when pressing the PDF's webview."/>
+        <c:change date="2023-01-17T17:46:24+00:00" summary="Added sleepTimers to profile preferences so the user can save all audiobook's current sleep timers."/>
       </c:changes>
     </c:release>
   </c:releases>
