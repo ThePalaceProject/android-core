@@ -31,6 +31,7 @@ import org.librarysimplified.audiobook.api.PlayerPlaybackRate
 import org.librarysimplified.audiobook.api.PlayerPosition
 import org.librarysimplified.audiobook.api.PlayerResult
 import org.librarysimplified.audiobook.api.PlayerSleepTimer
+import org.librarysimplified.audiobook.api.PlayerSleepTimerConfiguration
 import org.librarysimplified.audiobook.api.PlayerSleepTimerType
 import org.librarysimplified.audiobook.api.PlayerSpineElementDownloadStatus.PlayerSpineElementDownloadExpired
 import org.librarysimplified.audiobook.api.PlayerType
@@ -798,6 +799,10 @@ class AudioBookPlayerActivity :
 
   override fun onPlayerNotificationWantsIntent(): Intent {
     return parentActivityIntent ?: intent
+  }
+
+  override fun onPlayerSleepTimerUpdated(item: PlayerSleepTimerConfiguration) {
+    // do nothing for now
   }
 
   override fun onPlayerTOCWantsBook(): PlayerAudioBookType {
