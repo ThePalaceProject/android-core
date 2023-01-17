@@ -10,6 +10,7 @@ dependencies {
 
   implementation libs.androidx.activity
   implementation libs.androidx.app.compat
+  implementation libs.androidx.constraint.layout
   implementation libs.androidx.webkit
   implementation libs.kotlin.coroutines
   implementation libs.kotlin.reflect
