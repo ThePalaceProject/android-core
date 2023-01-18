@@ -311,8 +311,8 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
       }
       is CatalogFeedArguments.CatalogFeedArgumentsRemote -> {
         val uri =
-          Uri.parse((parameters as CatalogFeedArguments.CatalogFeedArgumentsRemote).feedURI
-            .toString()
+          Uri.parse(
+            (parameters as CatalogFeedArguments.CatalogFeedArgumentsRemote).feedURI.toString()
           )
         uri.getQueryParameter("q").orEmpty()
       }
