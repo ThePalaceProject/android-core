@@ -181,8 +181,8 @@ class ProfileDescriptionJSONTest {
     assertEquals(2, description.preferences.sleepTimers.size)
     assertEquals("bookid1", description.preferences.sleepTimers.keys.first())
     assertEquals("bookid2", description.preferences.sleepTimers.keys.last())
-    assertEquals(Duration.standardMinutes(15L), description.preferences.sleepTimers["bookid1"]?.duration)
-    assertEquals(Duration.standardMinutes(30L), description.preferences.sleepTimers["bookid2"]?.duration)
+    assertEquals(Duration.standardMinutes(15L).millis, description.preferences.sleepTimers["bookid1"])
+    assertEquals(Duration.standardMinutes(30L).millis, description.preferences.sleepTimers["bookid2"])
   }
 
   /**

@@ -31,7 +31,6 @@ import org.librarysimplified.audiobook.api.PlayerPlaybackRate
 import org.librarysimplified.audiobook.api.PlayerPosition
 import org.librarysimplified.audiobook.api.PlayerResult
 import org.librarysimplified.audiobook.api.PlayerSleepTimer
-import org.librarysimplified.audiobook.api.PlayerSleepTimerConfiguration
 import org.librarysimplified.audiobook.api.PlayerSleepTimerType
 import org.librarysimplified.audiobook.api.PlayerSpineElementDownloadStatus.PlayerSpineElementDownloadExpired
 import org.librarysimplified.audiobook.api.PlayerType
@@ -474,7 +473,7 @@ class AudioBookPlayerActivity :
         this.playerFragment = PlayerFragment.newInstance(
           PlayerFragmentParameters(
             currentRate = getBookCurrentPlaybackRate(),
-            currentSleepTimer = getBookCurrentSleepTimer()
+            currentSleepTimerDuration = getBookSleepTimerMissingDuration()
           )
         )
 
@@ -541,7 +540,7 @@ class AudioBookPlayerActivity :
     return playbackRates[bookID]
   }
 
-  private fun getBookCurrentSleepTimer(): PlayerSleepTimerConfiguration? {
+  private fun getBookSleepTimerMissingDuration(): Long? {
     val sleepTimers = this.profilesController.profileCurrent().preferences().sleepTimers
     val bookID = this.parameters.bookID.value()
     return sleepTimers[bookID]
@@ -766,7 +765,7 @@ class AudioBookPlayerActivity :
         PlayerPlaybackRateFragment.newInstance(
           PlayerFragmentParameters(
             currentRate = getBookCurrentPlaybackRate(),
-            currentSleepTimer = getBookCurrentSleepTimer()
+            currentSleepTimerDuration = getBookSleepTimerMissingDuration()
           )
         )
       fragment.show(this.supportFragmentManager, "PLAYER_RATE")
@@ -785,11 +784,11 @@ class AudioBookPlayerActivity :
     }
   }
 
-  override fun onPlayerSleepTimerUpdated(item: PlayerSleepTimerConfiguration) {
+  override fun onPlayerSleepTimerUpdated(missingDuration: Long?) {
     val sleepTimers =
       HashMap(this.profilesController.profileCurrent().preferences().sleepTimers)
     val bookID = this.parameters.bookID.value()
-    sleepTimers[bookID] = item
+    sleepTimers[bookID] = missingDuration
 
     this.profilesController.profileUpdate { current ->
       current.copy(

@@ -12,7 +12,6 @@ import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormatter
 import org.joda.time.format.DateTimeFormatterBuilder
 import org.librarysimplified.audiobook.api.PlayerPlaybackRate
-import org.librarysimplified.audiobook.api.PlayerSleepTimerConfiguration
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.files.FileUtilities
 import org.nypl.simplified.json.core.JSONParseException
@@ -394,7 +393,7 @@ object ProfileDescriptionJSON {
   private fun deserializeSleepTimers(
     objectMapper: ObjectMapper,
     node: ObjectNode?
-  ): Map<String, PlayerSleepTimerConfiguration> {
+  ): Map<String, Long> {
 
     val str = JSONParserUtilities.getObjectOrNull(
       node, "sleepTimers"
@@ -408,7 +407,7 @@ object ProfileDescriptionJSON {
     )
 
     return map.mapValues { entry ->
-      PlayerSleepTimerConfiguration.valueOf(entry.value)
+      entry.value.toLong()
     }
   }
 
@@ -516,11 +515,11 @@ object ProfileDescriptionJSON {
 
   fun serializeSleepTimersToJSON(
     objectMapper: ObjectMapper,
-    sleepTimers: Map<String, PlayerSleepTimerConfiguration>
+    sleepTimers: Map<String, Long>
   ): ObjectNode {
     val objectNode = objectMapper.createObjectNode()
     sleepTimers.keys.forEach { key ->
-      objectNode.put(key, sleepTimers[key]?.name)
+      objectNode.put(key, sleepTimers[key])
     }
     return objectNode
   }
