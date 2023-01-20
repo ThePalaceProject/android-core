@@ -329,6 +329,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
         viewModel.stateLive.value?.search?.let { search ->
           viewModel.performSearch(search, query)
         }
+        searchView.clearFocus()
         return true
       }
 
@@ -336,6 +337,8 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
         return true
       }
     })
+
+    searchView.clearFocus()
   }
 
   override fun onPrepareOptionsMenu(menu: Menu) {
