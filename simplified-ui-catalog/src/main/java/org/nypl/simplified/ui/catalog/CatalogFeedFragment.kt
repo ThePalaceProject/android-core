@@ -5,12 +5,12 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.InputType
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.View.TEXT_ALIGNMENT_TEXT_END
 import android.view.ViewGroup
@@ -25,6 +25,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.setPadding
@@ -295,6 +296,46 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
     inflater.inflate(R.menu.catalog, menu)
+
+    val search = menu.findItem(R.id.catalogMenuActionSearch)
+    val searchView = search.actionView as SearchView
+
+    searchView.imeOptions = EditorInfo.IME_ACTION_DONE
+    searchView.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_WORDS
+    searchView.queryHint = getString(R.string.catalogSearch)
+    searchView.maxWidth = toolbar.getAvailableWidthForSearchView()
+
+    val currentQuery = when (parameters) {
+      is CatalogFeedArguments.CatalogFeedArgumentsLocalBooks -> {
+        (parameters as CatalogFeedArguments.CatalogFeedArgumentsLocalBooks).searchTerms.orEmpty()
+      }
+      is CatalogFeedArguments.CatalogFeedArgumentsRemote -> {
+        val uri =
+          Uri.parse(
+            (parameters as CatalogFeedArguments.CatalogFeedArgumentsRemote).feedURI.toString()
+          )
+        uri.getQueryParameter("q").orEmpty()
+      }
+    }
+
+    searchView.setQuery(currentQuery, false)
+
+    // if there's no query, the search should be iconified, i.e., collapsed
+    searchView.isIconified = currentQuery.isBlank()
+
+    searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+      override fun onQueryTextSubmit(query: String): Boolean {
+        val viewModel = this@CatalogFeedFragment.viewModel
+        viewModel.stateLive.value?.search?.let { search ->
+          viewModel.performSearch(search, query)
+        }
+        return true
+      }
+
+      override fun onQueryTextChange(newText: String): Boolean {
+        return true
+      }
+    })
   }
 
   override fun onPrepareOptionsMenu(menu: Menu) {
@@ -302,18 +343,6 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
 
     // Necessary to reconfigure the Toolbar here due to the "Switch Account" action.
     this.configureToolbar()
-  }
-
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    return when (item.itemId) {
-      R.id.catalogMenuActionSearch -> {
-        this.viewModel.stateLive.value?.search?.let { search ->
-          this.openSearchDialog(requireContext(), search)
-        }
-        true
-      }
-      else -> super.onOptionsItemSelected(item)
-    }
   }
 
   private fun refresh() {
