@@ -473,7 +473,7 @@ class AudioBookPlayerActivity :
         this.playerFragment = PlayerFragment.newInstance(
           PlayerFragmentParameters(
             currentRate = getBookCurrentPlaybackRate(),
-            currentSleepTimerDuration = getBookSleepTimerMissingDuration()
+            currentSleepTimerDuration = getBookSleepTimerRemainingDuration()
           )
         )
 
@@ -540,7 +540,7 @@ class AudioBookPlayerActivity :
     return playbackRates[bookID]
   }
 
-  private fun getBookSleepTimerMissingDuration(): Long? {
+  private fun getBookSleepTimerRemainingDuration(): Long? {
     val sleepTimers = this.profilesController.profileCurrent().preferences().sleepTimers
     val bookID = this.parameters.bookID.value()
     return sleepTimers[bookID]
@@ -765,7 +765,7 @@ class AudioBookPlayerActivity :
         PlayerPlaybackRateFragment.newInstance(
           PlayerFragmentParameters(
             currentRate = getBookCurrentPlaybackRate(),
-            currentSleepTimerDuration = getBookSleepTimerMissingDuration()
+            currentSleepTimerDuration = getBookSleepTimerRemainingDuration()
           )
         )
       fragment.show(this.supportFragmentManager, "PLAYER_RATE")
@@ -784,11 +784,11 @@ class AudioBookPlayerActivity :
     }
   }
 
-  override fun onPlayerSleepTimerUpdated(missingDuration: Long?) {
+  override fun onPlayerSleepTimerUpdated(remainingDuration: Long?) {
     val sleepTimers =
       HashMap(this.profilesController.profileCurrent().preferences().sleepTimers)
     val bookID = this.parameters.bookID.value()
-    sleepTimers[bookID] = missingDuration
+    sleepTimers[bookID] = remainingDuration
 
     this.profilesController.profileUpdate { current ->
       current.copy(
