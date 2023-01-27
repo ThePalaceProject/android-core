@@ -393,7 +393,7 @@ object ProfileDescriptionJSON {
   private fun deserializeSleepTimers(
     objectMapper: ObjectMapper,
     node: ObjectNode?
-  ): Map<String, Long> {
+  ): Map<String, Long?> {
 
     val str = JSONParserUtilities.getObjectOrNull(
       node, "sleepTimers"
@@ -407,7 +407,11 @@ object ProfileDescriptionJSON {
     )
 
     return map.mapValues { entry ->
-      entry.value.toLong()
+      try {
+        entry.value.toLong()
+      } catch (exception: NumberFormatException) {
+        null
+      }
     }
   }
 
@@ -515,7 +519,7 @@ object ProfileDescriptionJSON {
 
   fun serializeSleepTimersToJSON(
     objectMapper: ObjectMapper,
-    sleepTimers: Map<String, Long>
+    sleepTimers: Map<String, Long?>
   ): ObjectNode {
     val objectNode = objectMapper.createObjectNode()
     sleepTimers.keys.forEach { key ->
