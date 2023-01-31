@@ -13,8 +13,8 @@
       "color_scheme" : "SCHEME_WHITE_ON_BLACK"
     },
     "sleepTimers" : {
-      "bookid1" : "MINUTES_15",
-      "bookid2" : "MINUTES_30"
+      "bookid1" : 900000,
+      "bookid2" : 1800000
     },
     "dateOfBirth" : {
       "date" : "2006-08-07",

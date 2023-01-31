@@ -31,7 +31,6 @@ import org.librarysimplified.audiobook.api.PlayerPlaybackRate
 import org.librarysimplified.audiobook.api.PlayerPosition
 import org.librarysimplified.audiobook.api.PlayerResult
 import org.librarysimplified.audiobook.api.PlayerSleepTimer
-import org.librarysimplified.audiobook.api.PlayerSleepTimerConfiguration
 import org.librarysimplified.audiobook.api.PlayerSleepTimerType
 import org.librarysimplified.audiobook.api.PlayerSpineElementDownloadStatus.PlayerSpineElementDownloadExpired
 import org.librarysimplified.audiobook.api.PlayerType
@@ -474,7 +473,7 @@ class AudioBookPlayerActivity :
         this.playerFragment = PlayerFragment.newInstance(
           PlayerFragmentParameters(
             currentRate = getBookCurrentPlaybackRate(),
-            currentSleepTimer = getBookCurrentSleepTimer()
+            currentSleepTimerDuration = getBookSleepTimerRemainingDuration()
           )
         )
 
@@ -541,10 +540,14 @@ class AudioBookPlayerActivity :
     return playbackRates[bookID]
   }
 
-  private fun getBookCurrentSleepTimer(): PlayerSleepTimerConfiguration? {
+  private fun getBookSleepTimerRemainingDuration(): Long? {
     val sleepTimers = this.profilesController.profileCurrent().preferences().sleepTimers
     val bookID = this.parameters.bookID.value()
-    return sleepTimers[bookID]
+    return if (sleepTimers.containsKey(bookID)) {
+      sleepTimers[bookID]
+    } else {
+      0L
+    }
   }
 
   private fun loadAndConfigureExtensions(
@@ -766,7 +769,7 @@ class AudioBookPlayerActivity :
         PlayerPlaybackRateFragment.newInstance(
           PlayerFragmentParameters(
             currentRate = getBookCurrentPlaybackRate(),
-            currentSleepTimer = getBookCurrentSleepTimer()
+            currentSleepTimerDuration = getBookSleepTimerRemainingDuration()
           )
         )
       fragment.show(this.supportFragmentManager, "PLAYER_RATE")
@@ -785,11 +788,11 @@ class AudioBookPlayerActivity :
     }
   }
 
-  override fun onPlayerSleepTimerUpdated(item: PlayerSleepTimerConfiguration) {
+  override fun onPlayerSleepTimerUpdated(remainingDuration: Long?) {
     val sleepTimers =
       HashMap(this.profilesController.profileCurrent().preferences().sleepTimers)
     val bookID = this.parameters.bookID.value()
-    sleepTimers[bookID] = item
+    sleepTimers[bookID] = remainingDuration
 
     this.profilesController.profileUpdate { current ->
       current.copy(
