@@ -15,6 +15,8 @@ android {
 }
 
 dependencies {
+  implementation 'com.transifex.txnative:txsdk:1.2.1'
+
   api project(":simplified-accessibility")
   api project(":simplified-accounts-database")
   api project(":simplified-accounts-database-api")
