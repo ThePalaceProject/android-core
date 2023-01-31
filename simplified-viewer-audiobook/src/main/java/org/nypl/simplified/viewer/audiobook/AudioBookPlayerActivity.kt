@@ -543,7 +543,7 @@ class AudioBookPlayerActivity :
   private fun getBookSleepTimerRemainingDuration(): Long? {
     val sleepTimers = this.profilesController.profileCurrent().preferences().sleepTimers
     val bookID = this.parameters.bookID.value()
-    return if (sleepTimers.containsKey(bookID)){
+    return if (sleepTimers.containsKey(bookID)) {
       sleepTimers[bookID]
     } else {
       0L
