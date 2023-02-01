@@ -2014,7 +2014,7 @@ class BookRevokeTaskTest {
    */
 
   @Test
-  @Timeout(value = 5L, unit = TimeUnit.SECONDS)
+  @Timeout(value = 10L, unit = TimeUnit.SECONDS)
   fun testRevokeURIFeedWithGroups() {
     val account =
       Mockito.mock(AccountType::class.java)

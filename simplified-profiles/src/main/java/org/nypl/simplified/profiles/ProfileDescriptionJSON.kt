@@ -401,15 +401,19 @@ object ProfileDescriptionJSON {
 
     val map = objectMapper.readValue(
       str.toString(),
-      object : TypeReference<Map<String, String>>() {
+      object : TypeReference<Map<String, String?>>() {
         // Do nothing
       }
     )
 
     return map.mapValues { entry ->
-      try {
-        entry.value.toLong()
-      } catch (exception: NumberFormatException) {
+      if (entry.value != null) {
+        try {
+          entry.value?.toLong()
+        } catch (exception: NumberFormatException) {
+          0L
+        }
+      } else {
         null
       }
     }
