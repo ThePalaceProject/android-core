@@ -6,6 +6,10 @@ android {
   }
 }
 
+configurations.all {
+  exclude group: 'com.google.code.findbugs', module: 'annotations'
+}
+
 dependencies {
 
   api project(":simplified-accessibility")
