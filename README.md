@@ -1,40 +1,29 @@
-Library Simplified
+The Palace Project Android Client
 ===
 
-[![Build Status](https://img.shields.io/github/workflow/status/ThePalaceProject/android-core/Android%20CI%20(Authenticated)?style=flat-square)](https://github.com/ThePalaceProject/android-core/actions?query=workflow%3A%22Android+CI+%28Authenticated%29%22)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/ThePalaceProject/android-core/android-main.yml?branch=main)](https://github.com/ThePalaceProject/android-core/actions/workflows/android-main.yml)
 
-LYRASIS fork of the NYPL's [Library Simplified](http://www.librarysimplified.org/) Android client.
+Lyrasis fork of the NYPL's [Library Simplified](http://www.librarysimplified.org/) Android client.
 
 ![simplified](./src/site/resources/simplified.jpg?raw=true)
 
 _Image by [Predrag Kezic](https://pixabay.com/users/PredragKezic-582203/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=581229) from [Pixabay](https://pixabay.com/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=581229)_
 
-<!-- |Build|Status|
-|-----|------|
-|[Nightly, DRM, JDK 11](https://github.com/NYPL-Simplified/Simplified-Android-Core/actions?query=workflow%3A%22Android+CI+%28Daily+Authenticated%2C+JDK+11%29%22)|[![Build Status](https://img.shields.io/github/workflow/status/NYPL-Simplified/Simplified-Android-Core/Android%20CI%20(Daily%20Authenticated,%20JDK%2011)?style=flat-square)](https://github.com/NYPL-Simplified/Simplified-Android-Core/actions?query=workflow%3A%22Android+CI+%28Daily+Authenticated%2C+JDK+11%29%22)|
-|[Nightly, DRM-Free, JDK 11](https://github.com/NYPL-Simplified/Simplified-Android-Core/actions?query=workflow%3A%22Android+CI+%28Daily+DRM-Free%2C+JDK+11%29%22)|[![Build Status](https://img.shields.io/github/workflow/status/NYPL-Simplified/Simplified-Android-Core/Android%20CI%20(Daily%20DRM-Free,%20JDK%2011)?style=flat-square)](https://github.com/NYPL-Simplified/Simplified-Android-Core/actions?query=workflow%3A%22Android+CI+%28Daily+DRM-Free%2C+JDK+11%29%22)|
-|[Nightly, DRM-Free, JDK 15](https://github.com/NYPL-Simplified/Simplified-Android-Core/actions?query=workflow%3A%22Android+CI+%28Daily+DRM-Free%2C+JDK+15%29%22)|[![Build Status](https://img.shields.io/github/workflow/status/NYPL-Simplified/Simplified-Android-Core/Android%20CI%20(Daily%20DRM-Free,%20JDK%2015)?style=flat-square)](https://github.com/NYPL-Simplified/Simplified-Android-Core/actions?query=workflow%3A%22Android+CI+%28Daily+DRM-Free%2C+JDK+15%29%22)|
-|[Last Commit](https://github.com/NYPL-Simplified/Simplified-Android-Core/actions?query=workflow%3A%22Android+CI+%28Authenticated%29%22)|[![Build Status](https://img.shields.io/github/workflow/status/NYPL-Simplified/Simplified-Android-Core/Android%20CI%20(Authenticated)?style=flat-square)](https://github.com/NYPL-Simplified/Simplified-Android-Core/actions?query=workflow%3A%22Android+CI+%28Authenticated%29%22)| -->
-
 ### What Is This?
 
-The contents of this repository provide the framework of an application used to build,
-amongst others, the NYPL's official [SimplyE](https://www.nypl.org/books-music-movies/ebookcentral/simplye)
-application. The framework provides a base application with numerous configuration
-switches, and configurable _branding_. The expectation is that third parties will
-produce final builds of applications by defining _application frontends_ that specify
-dependencies on the framework, custom color schemes, and logos.
+The contents of this repository provide the framework of an application used to build The Palace
+Project's Android client application, Palace. The framework provides a base application with
+numerous configuration switches and configurable branding.
 
-The repository contains a number of applications that are all built from the
-same core:
+The repository contains multiple applications that are all built from the same core:
 
 |Application|Module|Description|
 |-----------|------|-----------|
 |Vanilla|[simplified-app-vanilla](simplified-app-vanilla)|DRM-free generic reading application|
 |Palace|[simplified-app-palace](simplified-app-palace)|The DRM-enabled application|
-<!-- |SimplyE|[simplified-app-simplye](simplified-app-simplye)|The NYPL's official [SimplyE](https://www.nypl.org/books-music-movies/ebookcentral/simplye) application|
-|Open eBooks|[simplified-app-openebooks](simplified-app-openebooks)|The [Open eBooks](https://openebooks.net/) application| -->
 
+The Vanilla application is currently not included in a build of the project. It can be included by
+uncommenting its `include` line in [settings.gradle](https://github.com/ThePalaceProject/android-core/blob/d718c83aac4d54ba79f8cafb538d8169fa7f0a06/settings.gradle#L31).
 
 ## Contents
 
@@ -62,28 +51,14 @@ same core:
 
 ## Building The Code
 
-#### The Short Version
+#### Cloning the Repository
 
 Make sure you clone this repository with `git clone --recursive`. 
 If you forgot to use `--recursive`, then execute:
 
 ```
-$ git submodule init
-$ git submodule update --remote --recursive
+$ git submodule update --init
 ```
-
-Install an [Android SDK](#android-sdk) and a [JDK](#jdk) and run:
-
-~~~
-$ ./gradlew clean ktlint assembleDebug test
-~~~
-
-This will build all of the code and run the unit tests, but only the
-[Vanilla](simplified-app-vanilla) application will be built by default. In
-order to build the other applications such as [Palace](simplified-app-palace),
-it's necessary to <!--obtain the correct [credentials](#s3-credentials) from LYRASIS and--> [enable DRM](#enabling-drm).
-
-#### The Longer Version
 
 #### Android SDK
 
@@ -92,10 +67,8 @@ support the use of any other IDE at the moment.
 
 #### JDK
 
-Install a reasonably modern JDK: Java 11 is the current long-term support (LTS) release of Java. We
-perform nightly builds using the current LTS Java release, and the current bleeding-edge Java
-release in order to try to detect any upcoming compatibility issues, but we don't recommend building
-on anything other than the current LTS JDK for everyday usage.
+Install a reasonably modern JDK, at least JDK 11. We don't recommend building
+on anything newer than the current LTS JDK for everyday usage.
 
 Any of the following JDKs should work:
 
@@ -147,7 +120,7 @@ org.thepalaceproject.s3.depend=true
 
 #### APK signing
 
-If you wish to generate a signed APK for publishing the Vanilla application, you will need to copy
+If you wish to generate a signed APK for publishing the application, you will need to copy
 a keystore to `release.jks` and set the following values correctly in
 `$HOME/.gradle/gradle.properties`:
 
@@ -195,7 +168,6 @@ and assets in `/path/to/palace/assets`, you can add the following properties to
 your `$HOME/.gradle/gradle.properties` file and the build system will copy in
 the required secrets at build time:
 
-<!-- org.librarysimplified.app.assets.openebooks=/path/to/openebooks/secrets -->
 ```
 org.thepalaceproject.app.credentials.palace=/path/to/palace/credentials
 org.thepalaceproject.app.assets.palace=/path/to/palace/assets
@@ -203,23 +175,21 @@ org.thepalaceproject.app.assets.palace=/path/to/palace/assets
 
 #### Adobe DRM Support
 
-The project currently makes calls to the NYPL's [Adobe DRM
-API](https://github.com/NYPL-Simplified/DRM-Android-Core). The API
+The project currently makes calls to the Palace [Adobe DRM
+API](https://github.com/ThePalaceProject/android-drm-core). The API
 is structured in a manner that means that enabling actual support
-for Adobe DRM simply entails adding a dependency on the NYPL's Adobe
+for Adobe DRM simply entails adding a dependency on the Palace Adobe
 DRM _implementation_. This implementation is only available to DRM
 licensees. Please get in touch with us if you have a DRM license and
 want to produce a DRM-enabled build!
 
 #### Findaway Audiobook DRM support
 
-The project currently uses the NYPL's [AudioBook API](https://github.com/NYPL-Simplified/audiobook-android)
+The project currently uses the Palace [AudioBook API](https://github.com/ThePalaceProject/android-audiobook)
 to provide support for playing audio books. The API is structured such
 that adding support for new types of audiobooks and playback engines
-only involves adding those modules to the classpath. By default, the
-application framework only specifies a dependency on the NYPL's DRM-free
-audiobook player module, but there is also an NYPL-developed Findaway
-module for Findaway licensees. Please get in touch with us if you have
+only involves adding those modules to the classpath. The Palace app depends on a Findaway
+module to play Findaway audio books. Please get in touch with us if you have
 a Findaway license and want to produce a Findaway-enabled build.
 
 #### LCP DRM Support
@@ -234,7 +204,7 @@ an LCP license and want to produce a DRM-enabled build.
 
 ### Branching/Merging
 
-All new features should be created on feature branches and merged to `develop` once
+All new features should be created on feature branches and merged to `main` once
 completed.
 
 ### Project Structure / Architecture
@@ -321,7 +291,7 @@ module.
 
 We aggregate all unit tests in the [simplified-tests](simplified-tests) module. Tests should
 be written using the JUnit 5 library, although at the time of writing we have [one test](simplified-tests/src/test/java/org/nypl/simplified/tests/webview/CookiesContract.kt)
-that still requires JUnit 4 due to the use of [Roboelectric](http://robolectric.org/).
+that still requires JUnit 4 due to the use of [Robolectric](http://robolectric.org/).
 
 #### Modules
 
