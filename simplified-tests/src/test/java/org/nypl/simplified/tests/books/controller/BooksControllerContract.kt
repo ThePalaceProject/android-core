@@ -21,6 +21,7 @@ import org.librarysimplified.http.vanilla.LSHTTPClients
 import org.mockito.Mockito
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountEvent
+import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggedIn
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountNotLoggedIn
 import org.nypl.simplified.accounts.api.AccountLoginStringResourcesType
@@ -35,6 +36,8 @@ import org.nypl.simplified.analytics.api.AnalyticsType
 import org.nypl.simplified.books.api.BookEvent
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
+import org.nypl.simplified.books.book_registry.BookPreviewRegistry
+import org.nypl.simplified.books.book_registry.BookPreviewStatus
 import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatus
@@ -45,9 +48,11 @@ import org.nypl.simplified.books.bundled.api.BundledContentResolverType
 import org.nypl.simplified.books.controller.Controller
 import org.nypl.simplified.books.controller.api.BookRevokeStringResourcesType
 import org.nypl.simplified.books.controller.api.BooksControllerType
+import org.nypl.simplified.books.controller.api.BooksPreviewControllerType
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.nypl.simplified.content.api.ContentResolverType
+import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedHTTPTransport
 import org.nypl.simplified.feeds.api.FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderType
@@ -60,6 +65,7 @@ import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
 import org.nypl.simplified.opds.core.OPDSFeedParser
 import org.nypl.simplified.opds.core.OPDSFeedParserType
 import org.nypl.simplified.opds.core.OPDSParseException
+import org.nypl.simplified.opds.core.OPDSPreviewAcquisition
 import org.nypl.simplified.opds.core.OPDSSearchParser
 import org.nypl.simplified.patron.api.PatronUserProfileParsersType
 import org.nypl.simplified.profiles.ProfilesDatabases
@@ -108,6 +114,7 @@ abstract class BooksControllerContract {
   private lateinit var authDocumentParsers: AuthenticationDocumentParsersType
   private lateinit var bookEvents: MutableList<BookEvent>
   private lateinit var bookFormatSupport: MockBookFormatSupport
+  private lateinit var bookPreviewRegistry: BookPreviewRegistry
   private lateinit var bookRegistry: BookRegistryType
   private lateinit var borrowSubtasks: BorrowSubtaskDirectoryType
   private lateinit var cacheDirectory: File
@@ -193,6 +200,69 @@ abstract class BooksControllerContract {
     services.putService(AuthenticationDocumentParsersType::class.java, this.authDocumentParsers)
     services.putService(BookFormatSupportType::class.java, this.bookFormatSupport)
     services.putService(BookRegistryType::class.java, this.bookRegistry)
+    services.putService(BookPreviewRegistry::class.java, this.bookPreviewRegistry)
+    services.putService(BorrowSubtaskDirectoryType::class.java, this.borrowSubtasks)
+    services.putService(BookRevokeStringResourcesType::class.java, revokeStringResources)
+    services.putService(BundledContentResolverType::class.java, bundledContent)
+    services.putService(ContentResolverType::class.java, this.contentResolver)
+    services.putService(FeedLoaderType::class.java, feedLoader)
+    services.putService(LSHTTPClientType::class.java, this.lsHTTP)
+    services.putService(OPDSFeedParserType::class.java, parser)
+    services.putService(PatronUserProfileParsersType::class.java, patronUserProfileParsers)
+    services.putService(ProfileAccountCreationStringResourcesType::class.java, profileAccountCreationStringResources)
+    services.putService(ProfileAccountDeletionStringResourcesType::class.java, profileAccountDeletionStringResources)
+    services.putService(ProfileIdleTimerType::class.java, InoperableIdleTimer())
+    services.putService(ProfilesDatabaseType::class.java, profiles)
+
+    return Controller.createFromServiceDirectory(
+      services = services,
+      executorService = exec,
+      accountEvents = accountEvents,
+      profileEvents = profileEvents,
+      cacheDirectory = this.cacheDirectory
+    )
+  }
+
+  private fun createPreviewController(
+    exec: ExecutorService,
+    feedExecutor: ListeningExecutorService,
+    accountEvents: PublishSubject<AccountEvent>,
+    profileEvents: PublishSubject<ProfileEvent>,
+    http: LSHTTPClientType,
+    profiles: ProfilesDatabaseType,
+    accountProviders: AccountProviderRegistryType,
+    patronUserProfileParsers: PatronUserProfileParsersType
+  ): BooksPreviewControllerType {
+    val parser =
+      OPDSFeedParser.newParser(OPDSAcquisitionFeedEntryParser.newParser())
+    val transport =
+      FeedHTTPTransport(http)
+
+    val bundledContent =
+      BundledContentResolverType { uri -> throw FileNotFoundException(uri.toString()) }
+
+    val feedLoader =
+      FeedLoader.create(
+        bookFormatSupport = this.bookFormatSupport,
+        bundledContent = bundledContent,
+        contentResolver = this.contentResolver,
+        exec = feedExecutor,
+        parser = parser,
+        searchParser = OPDSSearchParser.newParser(),
+        transport = transport
+      )
+
+    val services = MutableServiceDirectory()
+    services.putService(AccountLoginStringResourcesType::class.java, this.accountLoginStringResources)
+    services.putService(AccountLogoutStringResourcesType::class.java, this.accountLogoutStringResources)
+    services.putService(AccountProviderRegistryType::class.java, accountProviders)
+    services.putService(AccountProviderResolutionStringsType::class.java, this.accountProviderResolutionStrings)
+    services.putService(AnalyticsType::class.java, this.analytics)
+    services.putService(AudioBookManifestStrategiesType::class.java, this.audioBookManifestStrategies)
+    services.putService(AuthenticationDocumentParsersType::class.java, this.authDocumentParsers)
+    services.putService(BookFormatSupportType::class.java, this.bookFormatSupport)
+    services.putService(BookRegistryType::class.java, this.bookRegistry)
+    services.putService(BookPreviewRegistry::class.java, this.bookPreviewRegistry)
     services.putService(BorrowSubtaskDirectoryType::class.java, this.borrowSubtasks)
     services.putService(BookRevokeStringResourcesType::class.java, revokeStringResources)
     services.putService(BundledContentResolverType::class.java, bundledContent)
@@ -224,6 +294,7 @@ abstract class BooksControllerContract {
     this.authDocumentParsers = Mockito.mock(AuthenticationDocumentParsersType::class.java)
     this.bookEvents = Collections.synchronizedList(ArrayList())
     this.bookFormatSupport = MockBookFormatSupport()
+    this.bookPreviewRegistry = BookPreviewRegistry(DirectoryUtilities.directoryCreateTemporary())
     this.bookRegistry = BookRegistry.create()
     this.borrowSubtasks = BorrowSubtasks.directory()
     this.cacheDirectory = File.createTempFile("book-borrow-tmp", "dir")
@@ -896,6 +967,139 @@ abstract class BooksControllerContract {
 
     val statusAfter = this.bookRegistry.bookOrException(bookId).status
     Assertions.assertEquals(statusBefore, statusAfter)
+  }
+
+  @Test
+  @Timeout(value = 3L, unit = TimeUnit.SECONDS)
+  fun testBooksPreviewSuccess() {
+    val controller =
+      createPreviewController(
+        exec = this.executorBooks,
+        feedExecutor = this.executorFeeds,
+        accountEvents = this.accountEvents,
+        profileEvents = this.profileEvents,
+        http = this.lsHTTP,
+        profiles = this.profiles,
+        accountProviders = MockAccountProviders.fakeAccountProviders(),
+        patronUserProfileParsers = this.patronUserProfileParsers
+      )
+
+    this.server.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+        .setBody(this.simpleUserProfile())
+    )
+
+    this.server.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+        .setBody(Buffer().readFrom(resource("testBooksDelete.xml")))
+    )
+
+    val bookPreviewStatus = arrayListOf<BookPreviewStatus>()
+    this.bookPreviewRegistry.observeBookPreviewStatus().subscribe {
+      bookPreviewStatus.add(it)
+    }
+    val acquisition =
+      OPDSAcquisition(
+        OPDSAcquisition.Relation.ACQUISITION_OPEN_ACCESS,
+        this.server.url("/book.epub").toUri(),
+        StandardFormatNames.genericEPUBFiles,
+        listOf(),
+        mapOf()
+      )
+    val previewAcquisition =
+      OPDSPreviewAcquisition(
+        this.server.url("/book.epub").toUri(),
+        StandardFormatNames.genericEPUBFiles
+      )
+    val bookEntry =
+      OPDSAcquisitionFeedEntry.newBuilder(
+        "5b7ec7e5-b137-4a11-b2df-4378e63ffb25",
+        "Example Book 0",
+        DateTime.now(),
+        OPDSAvailabilityOpenAccess[Option.none()]
+      )
+        .addAcquisition(acquisition)
+        .addPreviewAcquisition(previewAcquisition)
+        .build()
+
+    controller.handleBookPreviewStatus(
+      entry = FeedEntry.FeedEntryOPDS(
+        accountID = AccountID.generate(),
+        feedEntry = bookEntry
+      )
+    ).get()
+
+    assertInstanceOf(
+      bookPreviewStatus.removeAt(0),
+      BookPreviewStatus.HasPreview.Downloading::class.java
+    )
+    assertInstanceOf(
+      bookPreviewStatus.removeAt(0),
+      BookPreviewStatus.HasPreview.Downloading::class.java
+    )
+    assertInstanceOf(
+      bookPreviewStatus.removeAt(0),
+      BookPreviewStatus.HasPreview.Downloading::class.java
+    )
+    assertInstanceOf(
+      bookPreviewStatus.removeAt(0),
+      BookPreviewStatus.HasPreview.Ready.BookPreview::class.java
+    )
+
+    Assertions.assertEquals(0, bookPreviewStatus.size)
+  }
+
+  @Test
+  fun testBooksNoPreview() {
+    val controller =
+      createPreviewController(
+        exec = this.executorBooks,
+        feedExecutor = this.executorFeeds,
+        accountEvents = this.accountEvents,
+        profileEvents = this.profileEvents,
+        http = this.lsHTTP,
+        profiles = this.profiles,
+        accountProviders = MockAccountProviders.fakeAccountProviders(),
+        patronUserProfileParsers = this.patronUserProfileParsers
+      )
+
+    val bookPreviewStatus = arrayListOf<BookPreviewStatus>()
+    this.bookPreviewRegistry.observeBookPreviewStatus().subscribe {
+      bookPreviewStatus.add(it)
+    }
+    val acquisition =
+      OPDSAcquisition(
+        OPDSAcquisition.Relation.ACQUISITION_OPEN_ACCESS,
+        this.server.url("/book.epub").toUri(),
+        StandardFormatNames.genericEPUBFiles,
+        listOf(),
+        mapOf()
+      )
+
+    val bookEntry =
+      OPDSAcquisitionFeedEntry.newBuilder(
+        "5b7ec7e5-b137-4a11-b2df-4378e63ffb25",
+        "Example Book 0",
+        DateTime.now(),
+        OPDSAvailabilityOpenAccess[Option.none()]
+      )
+        .addAcquisition(acquisition)
+        .build()
+
+    controller.handleBookPreviewStatus(
+      entry = FeedEntry.FeedEntryOPDS(
+        accountID = AccountID.generate(),
+        feedEntry = bookEntry
+      )
+    ).get()
+
+    assertInstanceOf(
+      bookPreviewStatus.removeAt(0),
+      BookPreviewStatus.None::class.java
+    )
+    Assertions.assertEquals(0, bookPreviewStatus.size)
   }
 
   private fun resource(file: String): InputStream {

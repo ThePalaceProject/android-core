@@ -43,6 +43,8 @@
   <string name="catalogBookIntervalSubHour">less than an hour</string>
   <string name="catalogBookIntervalWeeksShort">w</string>
   <string name="catalogBookIntervalYearsShort">y</string>
+  <string name="catalogBookPreviewAudioBook">Play Sample</string>
+  <string name="catalogBookPreviewBook">Read Preview</string>
   <string name="catalogCancel">Cancel</string>
   <string name="catalogCancelHold">Remove</string>
   <string name="catalogCancelling">Cancelling…</string>

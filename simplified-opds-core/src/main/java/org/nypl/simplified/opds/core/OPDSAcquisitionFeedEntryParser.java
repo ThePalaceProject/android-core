@@ -46,8 +46,10 @@ import static org.nypl.simplified.opds.core.OPDSFeedConstants.IMAGE_URI_TEXT;
 import static org.nypl.simplified.opds.core.OPDSFeedConstants.ISSUES_REL_TEXT;
 import static org.nypl.simplified.opds.core.OPDSFeedConstants.LCP_URI;
 import static org.nypl.simplified.opds.core.OPDSFeedConstants.OPDS_URI;
+import static org.nypl.simplified.opds.core.OPDSFeedConstants.PREVIEW_TEXT;
 import static org.nypl.simplified.opds.core.OPDSFeedConstants.RELATED_REL_TEXT;
 import static org.nypl.simplified.opds.core.OPDSFeedConstants.REVOKE_URI_TEXT;
+import static org.nypl.simplified.opds.core.OPDSFeedConstants.SAMPLE_TEXT;
 import static org.nypl.simplified.opds.core.OPDSFeedConstants.THUMBNAIL_URI_TEXT;
 
 /**
@@ -177,6 +179,10 @@ public final class OPDSAcquisitionFeedEntryParser implements OPDSAcquisitionFeed
         }
 
         if (tryConsumeLinkCover(source, entry_builder, e_link, rel_text)) {
+          continue;
+        }
+
+        if (tryConsumeLinkPreview(source, entry_builder, e_link, rel_text)) {
           continue;
         }
 
@@ -374,6 +380,38 @@ public final class OPDSAcquisitionFeedEntryParser implements OPDSAcquisitionFeed
         } catch (URISyntaxException e) {
           entry_builder.addParseError(
             this.invalidURI(source, hrefAttributeOfLinkRel(IMAGE_URI_TEXT), e));
+        }
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Check if the given link refers to a preview or sample. If it is, add it to the builder and
+   * return {@code true}.
+   */
+
+  private boolean tryConsumeLinkPreview(
+    final URI source,
+    final OPDSAcquisitionFeedEntryBuilderType entry_builder,
+    final Element e_link,
+    final String rel_text) {
+
+    if (rel_text.equals(SAMPLE_TEXT) || rel_text.equals(PREVIEW_TEXT)) {
+      if (e_link.hasAttribute("href")) {
+        try {
+          final URI u = scrubURI(source, e_link.getAttribute("href"));
+          final OptionType<MIMEType> typeOpt =
+            typeAttributeWithSupportedValue(e_link);
+          final MIMEType type = ((Some<MIMEType>) typeOpt).get();
+          entry_builder.addPreviewAcquisition(
+            new OPDSPreviewAcquisition(u, type)
+          );
+        } catch (URISyntaxException e) {
+          entry_builder.addParseError(
+            this.invalidURI(source, hrefAttributeOfLinkRel(rel_text.equals(SAMPLE_TEXT) ?
+              SAMPLE_TEXT : PREVIEW_TEXT), e));
         }
         return true;
       }

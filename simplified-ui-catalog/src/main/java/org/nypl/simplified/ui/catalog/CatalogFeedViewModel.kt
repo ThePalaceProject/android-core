@@ -883,6 +883,10 @@ class CatalogFeedViewModel(
     )
   }
 
+  override fun openBookPreview(feedEntry: FeedEntry.FeedEntryOPDS) {
+    // do nothing
+  }
+
   override fun openViewer(book: Book, format: BookFormat) {
     this.listener.post(CatalogFeedEvent.OpenViewer(book, format))
   }

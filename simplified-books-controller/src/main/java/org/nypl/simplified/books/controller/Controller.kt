@@ -26,6 +26,7 @@ import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryEvent
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.analytics.api.AnalyticsType
 import org.nypl.simplified.books.api.BookID
+import org.nypl.simplified.books.book_registry.BookPreviewRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookWithStatus
@@ -36,7 +37,10 @@ import org.nypl.simplified.books.borrowing.BorrowTaskType
 import org.nypl.simplified.books.borrowing.SAMLDownloadContext
 import org.nypl.simplified.books.controller.api.BookRevokeStringResourcesType
 import org.nypl.simplified.books.controller.api.BooksControllerType
+import org.nypl.simplified.books.controller.api.BooksPreviewControllerType
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
+import org.nypl.simplified.books.preview.BookPreviewRequirements
+import org.nypl.simplified.books.preview.BookPreviewTask
 import org.nypl.simplified.crashlytics.api.CrashlyticsServiceType
 import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedEntry
@@ -87,7 +91,7 @@ class Controller private constructor(
   private val profileEvents: Subject<ProfileEvent>,
   private val services: ServiceDirectoryType,
   private val taskExecutor: ListeningExecutorService
-) : BooksControllerType, ProfilesControllerType {
+) : BooksControllerType, BooksPreviewControllerType, ProfilesControllerType {
 
   private val borrows: ConcurrentHashMap<BookID, BorrowTaskType>
 
@@ -104,6 +108,8 @@ class Controller private constructor(
     this.services.requireService(AnalyticsType::class.java)
   private val bookRegistry =
     this.services.requireService(BookRegistryType::class.java)
+  private val bookPreviewRegistry =
+    this.services.requireService(BookPreviewRegistry::class.java)
   private val bookFormatSupport =
     this.services.requireService(BookFormatSupportType::class.java)
   private val feedLoader =
@@ -677,6 +683,28 @@ class Controller private constructor(
         bookID = bookID,
         bookRegistry = this.bookRegistry,
       )
+    )
+  }
+
+  override fun handleBookPreviewStatus(
+    entry: FeedEntry.FeedEntryOPDS
+  ): FluentFuture<TaskResult<*>> {
+    val requirements = BookPreviewRequirements(
+      clock = { Instant.now() },
+      httpClient = this.lsHttp,
+      temporaryDirectory = temporaryDirectory
+    )
+
+    return this.submitTask(
+      Callable<TaskResult<*>> {
+        val bookPreviewTask = BookPreviewTask(
+          bookPreviewRegistry = bookPreviewRegistry,
+          bookPreviewRequirements = requirements,
+          feedEntry = entry.feedEntry,
+          format = entry.probableFormat
+        )
+        bookPreviewTask.execute()
+      }
     )
   }
 

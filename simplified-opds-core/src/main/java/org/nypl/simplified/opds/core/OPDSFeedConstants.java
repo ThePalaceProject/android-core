@@ -14,6 +14,8 @@ public final class OPDSFeedConstants {
   public static final String FACET_URI_TEXT;
   public static final String GROUP_REL_TEXT;
   public static final String IMAGE_URI_TEXT;
+  public static final String SAMPLE_TEXT;
+  public static final String PREVIEW_TEXT;
   public static final String OPDS_URI_TEXT;
   public static final String DRM_URI_TEXT;
   public static final String THUMBNAIL_URI_TEXT;
@@ -97,6 +99,9 @@ public final class OPDSFeedConstants {
       NullCheck.notNull(URI.create("http://opds-spec.org/image"));
     IMAGE_URI_TEXT =
       NullCheck.notNull(OPDSFeedConstants.IMAGE_URI.toString());
+
+    PREVIEW_TEXT = "preview";
+    SAMPLE_TEXT = "http://opds-spec.org/acquisition/sample";
 
     SCHEMA_URI =
       NullCheck.notNull(URI.create("http://schema.org/"));

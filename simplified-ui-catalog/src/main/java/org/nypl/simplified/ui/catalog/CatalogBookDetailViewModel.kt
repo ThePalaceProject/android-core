@@ -16,6 +16,7 @@ import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.book_registry.BookRegistryType
+import org.nypl.simplified.books.book_registry.BookPreviewStatus
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookStatusEvent
 import org.nypl.simplified.books.book_registry.BookWithStatus
@@ -78,6 +79,9 @@ class CatalogBookDetailViewModel(
 
   private var feedEntry = parameters.feedEntry
 
+  private val bookPreviewStatusMutable: MutableLiveData<BookPreviewStatus> =
+    MutableLiveData(getBookPreviewStatus())
+
   private val bookWithStatusMutable: MutableLiveData<BookWithStatus> =
     MutableLiveData(this.createBookWithStatus())
 
@@ -119,6 +123,15 @@ class CatalogBookDetailViewModel(
       ?: synthesizeBookWithStatus(this.parameters.feedEntry)
   }
 
+  private fun getBookPreviewStatus(): BookPreviewStatus {
+    return if (!parameters.feedEntry.feedEntry.previewAcquisitions.isNullOrEmpty()
+    ) {
+      BookPreviewStatus.HasPreview()
+    } else {
+      BookPreviewStatus.None
+    }
+  }
+
   private fun synthesizeBookWithStatus(
     item: FeedEntry.FeedEntryOPDS
   ): BookWithStatus {
@@ -142,6 +155,9 @@ class CatalogBookDetailViewModel(
 
   val bookWithStatusLive: LiveData<BookWithStatus>
     get() = bookWithStatusMutable
+
+  val bookPreviewLive: LiveData<BookPreviewStatus>
+    get() = bookPreviewStatusMutable
 
   val accountProvider = try {
     this.profilesController.profileCurrent()
@@ -231,6 +247,10 @@ class CatalogBookDetailViewModel(
     this.listener.post(
       CatalogBookDetailEvent.OpenBookDetail(this.feedArguments, opdsEntry)
     )
+  }
+
+  override fun openBookPreview(feedEntry: FeedEntry.FeedEntryOPDS) {
+    this.listener.post(CatalogBookDetailEvent.OpenPreviewViewer(feedEntry))
   }
 
   override fun openViewer(book: Book, format: BookFormat) {

@@ -16,6 +16,8 @@ interface CatalogPagedViewListener {
 
   fun openBookDetail(opdsEntry: FeedEntry.FeedEntryOPDS)
 
+  fun openBookPreview(feedEntry: FeedEntry.FeedEntryOPDS)
+
   fun showTaskError(book: Book, result: TaskResult.Failure<*>)
 
   fun dismissBorrowError(feedEntry: FeedEntry.FeedEntryOPDS)

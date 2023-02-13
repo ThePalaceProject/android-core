@@ -254,6 +254,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       contentProtections = contentProtections,
       bookFile = bookFile,
       bookId = this.parameters.entry.feedEntry.id,
+      isPreview = false,
       theme = initialTheme,
       controllers = SR2Controllers(),
       scrollingMode = if (this.accessibilityService.spokenFeedbackEnabled) {

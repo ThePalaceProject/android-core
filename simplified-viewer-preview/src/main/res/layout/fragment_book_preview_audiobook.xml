@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_gravity="top"
+        android:background="?attr/simplifiedColorBackground"
+        android:minHeight="?attr/actionBarSize"
+        android:padding="0dp"
+        app:navigationIcon="@drawable/back"
+        app:titleTextColor="?attr/simplifiedColorText"
+        tools:title="Placeholder" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
+
+        <ImageView
+            android:id="@+id/player_cover"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:contentDescription="@string/bookPreviewAccessibilityCover"
+            android:scaleType="fitCenter"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/player_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="16dp"
+            android:gravity="start"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/player_cover"
+            app:layout_constraintTop_toTopOf="@id/player_cover"
+            tools:text="Very, very, very long placeholder text that should never be seen in practice." />
+
+        <TextView
+            android:id="@+id/player_author"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:gravity="start"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/player_title"
+            app:layout_constraintTop_toBottomOf="@id/player_title"
+            tools:text="Very, very, very long placeholder text that should never be seen in practice." />
+
+        <TextView
+            android:id="@+id/player_remaining_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:gravity="center"
+            android:lines="1"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/player_seekbar"
+            tools:text="4 hr 56 min remaining" />
+
+        <SeekBar
+            android:id="@+id/player_seekbar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="16dp"
+            android:progress="0"
+            android:scaleY="2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/barrier" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrier"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="player_author,player_cover" />
+
+        <TextView
+            android:id="@+id/player_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/bookPreviewPlayerInitialTime"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/player_seekbar" />
+
+        <ImageView
+            android:id="@+id/player_play_pause_button"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginTop="16dp"
+            android:contentDescription="@string/bookPreviewAccessibilityPlay"
+            android:src="@drawable/play_icon"
+            app:layout_constraintEnd_toEndOf="@id/player_seekbar"
+            app:layout_constraintStart_toStartOf="@id/player_seekbar"
+            app:layout_constraintTop_toBottomOf="@id/player_remaining_time"
+            app:tint="?attr/simplifiedColorControlIcon"
+            app:tintMode="src_in" />
+
+        <ImageView
+            android:id="@+id/player_jump_backwards"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:contentDescription="@string/bookPreviewAccessibilityBackward30"
+            android:src="@drawable/circle_arrow_backward"
+            app:layout_constraintBottom_toBottomOf="@id/player_play_pause_button"
+            app:layout_constraintEnd_toStartOf="@id/player_play_pause_button"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/player_play_pause_button"
+            app:tint="?attr/simplifiedColorControlIcon"
+            app:tintMode="src_in" />
+
+        <TextView
+            android:id="@+id/player_jump_forwards_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/bookPreviewPlayerSeek30"
+            android:textColor="?attr/simplifiedColorControlIcon"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/player_jump_forwards"
+            app:layout_constraintEnd_toEndOf="@id/player_jump_forwards"
+            app:layout_constraintStart_toStartOf="@id/player_jump_forwards"
+            app:layout_constraintTop_toTopOf="@id/player_jump_forwards" />
+
+        <ImageView
+            android:id="@+id/player_jump_forwards"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:contentDescription="@string/bookPreviewAccessibilityForward30"
+            android:src="@drawable/circle_arrow_forward"
+            app:layout_constraintBottom_toBottomOf="@id/player_play_pause_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/player_play_pause_button"
+            app:layout_constraintTop_toTopOf="@id/player_play_pause_button"
+            app:tint="?attr/simplifiedColorControlIcon"
+            app:tintMode="src_in" />
+
+        <TextView
+            android:id="@+id/player_jump_backwards_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/bookPreviewPlayerSeek30"
+            android:textColor="?attr/simplifiedColorControlIcon"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/player_jump_backwards"
+            app:layout_constraintEnd_toEndOf="@id/player_jump_backwards"
+            app:layout_constraintStart_toStartOf="@id/player_jump_backwards"
+            app:layout_constraintTop_toTopOf="@id/player_jump_backwards" />
+
+        <!--        <com.google.android.exoplayer2.ui.PlayerView-->
+        <!--            android:id="@+id/player"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--            app:layout_constraintEnd_toEndOf="parent"-->
+        <!--            app:layout_constraintStart_toStartOf="parent"-->
+        <!--            app:layout_constraintTop_toTopOf="parent" />-->
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

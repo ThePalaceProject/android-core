@@ -66,6 +66,8 @@ import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.bookmarks.BookmarkService
 import org.nypl.simplified.bookmarks.internal.BHTTPCalls
+import org.nypl.simplified.books.book_registry.BookPreviewRegistry
+import org.nypl.simplified.books.controller.api.BooksPreviewControllerType
 import org.nypl.simplified.boot.api.BootEvent
 import org.nypl.simplified.boot.api.BootFailureTesting
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
@@ -675,6 +677,12 @@ internal object MainServices {
     )
 
     addService(
+      message = strings.bootingGeneral("book preview registry"),
+      interfaceType = BookPreviewRegistry::class.java,
+      serviceConstructor = { BookPreviewRegistry(directories.directoryStorageDownloads) }
+    )
+
+    addService(
       message = strings.bootingGeneral("accessibility service"),
       interfaceType = AccessibilityServiceType::class.java,
       serviceConstructor = { AccessibilityService.create(context, bookRegistry) }
@@ -924,6 +932,11 @@ internal object MainServices {
       addService(
         message = strings.bootingGeneral("books controller"),
         interfaceType = BooksControllerType::class.java,
+        serviceConstructor = { controller }
+      )
+      addService(
+        message = strings.bootingGeneral("books preview controller"),
+        interfaceType = BooksPreviewControllerType::class.java,
         serviceConstructor = { controller }
       )
       controller

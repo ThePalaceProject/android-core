@@ -10,7 +10,9 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.AppCompatButton
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,6 +28,7 @@ import org.nypl.simplified.android.ktx.supportActionBar
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.book_database.api.BookFormats
+import org.nypl.simplified.books.book_registry.BookPreviewStatus
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookWithStatus
 import org.nypl.simplified.books.covers.BookCoverProviderType
@@ -89,6 +92,12 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
     }
   )
 
+  private val previewViewModel: CatalogBookPreviewViewModel by viewModels(
+    factoryProducer = {
+      CatalogBookPreviewViewModelFactory(services)
+    }
+  )
+
   private val viewModel: CatalogBookDetailViewModel by viewModels(
     factoryProducer = {
       CatalogBookDetailViewModelFactory(
@@ -112,6 +121,7 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
   private lateinit var feedWithGroupsAdapter: CatalogFeedWithGroupsAdapter
   private lateinit var feedWithoutGroupsAdapter: CatalogPagedAdapter
   private lateinit var metadata: LinearLayout
+  private lateinit var previewButton: AppCompatButton
   private lateinit var relatedBooksContainer: FrameLayout
   private lateinit var relatedBooksList: RecyclerView
   private lateinit var relatedBooksLoading: ViewGroup
@@ -177,6 +187,7 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
       view.rootView.findViewWithTag(NeutralToolbar.neutralToolbarName)
 
     this.viewModel.bookWithStatusLive.observe(this.viewLifecycleOwner, this::reconfigureUI)
+    this.viewModel.bookPreviewLive.observe(this.viewLifecycleOwner, this::configurePreviewButton)
 
     this.cover =
       view.findViewById(R.id.bookDetailCoverImage)
@@ -194,6 +205,8 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
       view.findViewById(R.id.bookDetailMetadataTable)
     this.buttons =
       view.findViewById(R.id.bookDetailButtons)
+    this.previewButton =
+      view.findViewById(R.id.bookPreviewButton)
     this.relatedBooksContainer =
       view.findViewById(R.id.bookDetailRelatedBooksContainer)
     this.relatedBooksList =
@@ -287,6 +300,23 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
       this.viewModel.goUpwards()
     }
     return
+  }
+
+  private fun configurePreviewButton(previewStatus: BookPreviewStatus) {
+    val feedEntry = this.parameters.feedEntry
+    this.previewButton.apply {
+      isVisible = previewStatus != BookPreviewStatus.None
+      setText(
+        if (feedEntry.probableFormat == BookFormats.BookFormatDefinition.BOOK_FORMAT_AUDIO) {
+          R.string.catalogBookPreviewAudioBook
+        } else {
+          R.string.catalogBookPreviewBook
+        }
+      )
+      setOnClickListener {
+        viewModel.openBookPreview(this@CatalogBookDetailFragment.parameters.feedEntry)
+      }
+    }
   }
 
   private fun configureOPDSEntry(feedEntry: FeedEntryOPDS) {
