@@ -304,8 +304,26 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
       val lastRead = bookmarks.find { bookmark -> bookmark.type == SR2Bookmark.Type.LAST_READ }
       reference.controller.submitCommand(SR2Command.BookmarksLoad(bookmarks))
-      val startLocator = lastRead?.locator ?: reference.controller.bookMetadata.start
-      reference.controller.submitCommand(SR2Command.OpenChapter(startLocator))
+
+      if (lastRead != null) {
+        AlertDialog.Builder(this)
+          .setTitle(R.string.reader_position_title)
+          .setMessage(R.string.reader_position_message)
+          .setNegativeButton(R.string.reader_position_move) { dialog, _ ->
+            reference.controller.submitCommand(SR2Command.OpenChapter(lastRead.locator))
+            dialog.dismiss()
+          }
+          .setPositiveButton(R.string.reader_position_stay) { dialog, _ ->
+            val startLocator = reference.controller.bookMetadata.start
+            reference.controller.submitCommand(SR2Command.OpenChapter(startLocator))
+            dialog.dismiss()
+          }
+          .create()
+          .show()
+      } else {
+        val startLocator = reference.controller.bookMetadata.start
+        reference.controller.submitCommand(SR2Command.OpenChapter(startLocator))
+      }
     } else {
       // Refresh whatever the controller was looking at previously.
       reference.controller.submitCommand(SR2Command.Refresh)

@@ -7,4 +7,9 @@
   <string name="accessibility_settings">Open the settings menu</string>
   <string name="settings_title">Settings</string>
   <string name="content_description_back">Back</string>
+
+  <string name="viewer_position_title">Sync Reading Position</string>
+  <string name="viewer_position_message">Do you want to move to the page on which you left off?</string>
+  <string name="viewer_position_move">Move</string>
+  <string name="viewer_position_stay">Stay</string>
 </resources>

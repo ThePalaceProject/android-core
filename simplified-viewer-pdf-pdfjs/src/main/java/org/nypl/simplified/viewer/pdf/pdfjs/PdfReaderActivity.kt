@@ -105,28 +105,31 @@ class PdfReaderActivity : AppCompatActivity() {
     val backgroundThread = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(1))
 
     backgroundThread.execute {
-      restoreSavedPosition()
+      restoreSavedPosition(
+        params = params,
+        isSavedInstanceStateNull = savedInstanceState == null
+      )
+    }
+  }
 
-      this.uiThread.runOnUIThread {
-        this.loadingBar.visibility = View.GONE
+  private fun completeReaderSetup(params: PdfReaderParameters, isSavedInstanceStateNull: Boolean) {
+    this.loadingBar.visibility = View.GONE
 
-        if (savedInstanceState == null) {
-          createWebView()
-          createPdfServer(params.drmInfo, params.pdfFile)
+    if (isSavedInstanceStateNull) {
+      createWebView()
+      createPdfServer(params.drmInfo, params.pdfFile)
 
-          this.pdfServer?.let {
-            it.start()
+      this.pdfServer?.let {
+        it.start()
 
-            this.webView.loadUrl(
-              "http://localhost:${it.port}/assets/pdf-viewer/viewer.html?file=%2Fbook.pdf#page=${this.documentPageIndex}"
-            )
-          }
-        }
+        this.webView.loadUrl(
+          "http://localhost:${it.port}/assets/pdf-viewer/viewer.html?file=%2Fbook.pdf#page=${this.documentPageIndex}"
+        )
       }
     }
   }
 
-  private fun restoreSavedPosition() {
+  private fun restoreSavedPosition(params: PdfReaderParameters, isSavedInstanceStateNull: Boolean) {
 
     val bookmarks =
       PdfReaderBookmarks.loadBookmarks(
@@ -150,10 +153,48 @@ class PdfReaderActivity : AppCompatActivity() {
           bookmark.kind == BookmarkKind.BookmarkLastReadLocation
         }
 
-      this.documentPageIndex =
-        bookMarkLastReadPosition?.pageNumber ?: this.handle.format.lastReadLocation!!.pageNumber
+      val newPosition = bookMarkLastReadPosition?.pageNumber
+        ?: this.handle.format.lastReadLocation!!.pageNumber
+
+      this.uiThread.runOnUIThread {
+
+        if (newPosition != this.documentPageIndex) {
+          AlertDialog.Builder(this)
+            .setTitle(R.string.viewer_position_title)
+            .setMessage(R.string.viewer_position_message)
+            .setNegativeButton(R.string.viewer_position_move) { dialog, _ ->
+              this.documentPageIndex = newPosition
+              completeReaderSetup(
+                params = params,
+                isSavedInstanceStateNull = isSavedInstanceStateNull
+              )
+              dialog.dismiss()
+            }
+            .setPositiveButton(R.string.viewer_position_stay) { dialog, _ ->
+              completeReaderSetup(
+                params = params,
+                isSavedInstanceStateNull = isSavedInstanceStateNull
+              )
+              dialog.dismiss()
+            }
+            .create()
+            .show()
+        } else {
+          completeReaderSetup(
+            params = params,
+            isSavedInstanceStateNull = isSavedInstanceStateNull
+          )
+        }
+      }
     } catch (e: Exception) {
       log.error("Could not get lastReadLocation, defaulting to the 1st page", e)
+
+      this.uiThread.runOnUIThread {
+        completeReaderSetup(
+          params = params,
+          isSavedInstanceStateNull = isSavedInstanceStateNull
+        )
+      }
     }
   }
 

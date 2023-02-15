@@ -148,29 +148,13 @@ class PdfReaderActivity :
     val backgroundThread = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(1))
 
     backgroundThread.execute {
-      restoreSavedPosition()
-
-      if (savedInstanceState == null) {
-
-        this.uiThread.runOnUIThread {
-          this.loadingBar.visibility = View.GONE
-
-          // Get the new instance of the reader you want to load here.
-          val readerFragment = PdfViewerFragment.newInstance()
-
-          this.supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.pdf_reader_fragment_holder, readerFragment, "READER")
-            .commit()
-        }
-      } else {
-        this.tableOfContentsList =
-          savedInstanceState.getParcelableArrayList(TABLE_OF_CONTENTS) ?: arrayListOf()
-      }
+      restoreSavedPosition(
+        savedInstanceState = savedInstanceState
+      )
     }
   }
 
-  private fun restoreSavedPosition() {
+  private fun restoreSavedPosition(savedInstanceState: Bundle?) {
 
     val bookmarks =
       PdfReaderBookmarks.loadBookmarks(
@@ -190,10 +174,43 @@ class PdfReaderActivity :
           bookmark.kind == BookmarkKind.BookmarkLastReadLocation
         }
 
-      this.documentPageIndex =
-        bookMarkLastReadPosition?.pageNumber ?: this.handle.format.lastReadLocation!!.pageNumber
+      val newPosition = bookMarkLastReadPosition?.pageNumber
+        ?: this.handle.format.lastReadLocation!!.pageNumber
+
+      this.uiThread.runOnUIThread {
+
+        if (newPosition != this.documentPageIndex) {
+          AlertDialog.Builder(this)
+            .setTitle(R.string.viewer_position_title)
+            .setMessage(R.string.viewer_position_message)
+            .setNegativeButton(R.string.viewer_position_move) { dialog, _ ->
+              this.documentPageIndex = newPosition
+              completeReaderSetup(
+                savedInstanceState = savedInstanceState
+              )
+              dialog.dismiss()
+            }
+            .setPositiveButton(R.string.viewer_position_stay) { dialog, _ ->
+              completeReaderSetup(
+                savedInstanceState = savedInstanceState
+              )
+              dialog.dismiss()
+            }
+            .create()
+            .show()
+        } else {
+          completeReaderSetup(
+            savedInstanceState = savedInstanceState
+          )
+        }
+      }
     } catch (e: Exception) {
       log.error("Could not get lastReadLocation, defaulting to the 1st page", e)
+      this.uiThread.runOnUIThread {
+        completeReaderSetup(
+          savedInstanceState = savedInstanceState
+        )
+      }
     }
   }
 
@@ -231,6 +248,26 @@ class PdfReaderActivity :
         }
       else ->
         pdfFile.inputStream()
+    }
+  }
+
+  private fun completeReaderSetup(savedInstanceState: Bundle?) {
+    if (savedInstanceState == null) {
+
+      this.uiThread.runOnUIThread {
+        this.loadingBar.visibility = View.GONE
+
+        // Get the new instance of the reader you want to load here.
+        val readerFragment = PdfViewerFragment.newInstance()
+
+        this.supportFragmentManager
+          .beginTransaction()
+          .replace(R.id.pdf_reader_fragment_holder, readerFragment, "READER")
+          .commit()
+      }
+    } else {
+      this.tableOfContentsList =
+        savedInstanceState.getParcelableArrayList(TABLE_OF_CONTENTS) ?: arrayListOf()
     }
   }
 
