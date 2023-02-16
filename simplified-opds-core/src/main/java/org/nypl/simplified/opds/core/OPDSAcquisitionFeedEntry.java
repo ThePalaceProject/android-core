@@ -629,13 +629,6 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
       return this;
     }
 
-//    @Override
-//    public OPDSAcquisitionFeedEntryBuilderType setPreviewOption(
-//      final OptionType<URI> uri) {
-//      this.preview = NullCheck.notNull(uri);
-//      return this;
-//    }
-
     @Override
     public OPDSAcquisitionFeedEntryBuilderType addPreviewAcquisition(
       OPDSPreviewAcquisition previewAcquisition) {

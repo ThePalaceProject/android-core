@@ -54,6 +54,20 @@ public final class OPDSJSONSerializer implements OPDSJSONSerializerType {
     return node;
   }
 
+  @Override
+  public ObjectNode serializePreviewAcquisition(
+    final OPDSPreviewAcquisition a)
+    throws OPDSSerializationException {
+      NullCheck.notNull(a, "PreviewAcquisition");
+
+      final ObjectMapper jom = new ObjectMapper();
+      final ObjectNode node = jom.createObjectNode();
+      node.put("type", a.getType().toString());
+      node.put("uri", a.getUri().toString());
+      return node;
+  }
+
+
   private ObjectNode serializeProperties(
     final Map<String, String> properties) {
     final ObjectMapper jom = new ObjectMapper();
@@ -259,6 +273,14 @@ public final class OPDSJSONSerializer implements OPDSJSONSerializerType {
         ja.add(this.serializeAcquisition(NullCheck.notNull(a)));
       }
       je.set("acquisitions", ja);
+    }
+
+    {
+      final ArrayNode ja = jom.createArrayNode();
+      for (final OPDSPreviewAcquisition a : e.getPreviewAcquisitions()) {
+        ja.add(this.serializePreviewAcquisition(NullCheck.notNull(a)));
+      }
+      je.set("previews", ja);
     }
 
     {

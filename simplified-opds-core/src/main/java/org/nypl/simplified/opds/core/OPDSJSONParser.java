@@ -440,66 +440,6 @@ public final class OPDSJSONParser implements OPDSJSONParserType {
         }
       }
 
-//      {
-//        JSONParserUtilities.getObjectOptional(s, "search").mapPartial(
-//          new PartialFunctionType<ObjectNode, OPDSSearchLink,
-//            JSONParseException>() {
-//            @Override
-//            public OPDSSearchLink call(
-//              final ObjectNode o)
-//              throws JSONParseException {
-//              final String in_search_type =
-//                JSONParserUtilities.getString(o, "type");
-//              final URI in_search_uri = JSONParserUtilities.getURI(o, "uri");
-//              return new OPDSSearchLink(in_search_type, in_search_uri);
-//            }
-//          }));
-
-
-//        final OptionType<OPDSPreviewAcquisition> p = JSONParserUtilities.getObjectOptional()
-//
-//
-//
-//        final MIMEType type =
-//          MIMEParser.Companion.parseRaisingException(JSONParserUtilities.getString(obj, "type"));
-//
-//        final OptionType<String> o = JSONParserUtilities.getStringOptional(
-//          s, "preview");
-//        o.mapPartial(
-//          new PartialFunctionType<String, Unit, OPDSParseException>() {
-//            @Override
-//            public Unit call(
-//              final String u)
-//              throws OPDSParseException {
-//              try {
-//                fb.setPreviewOption(Option.some(new URI(u)));
-//                return Unit.unit();
-//              } catch (final URISyntaxException e) {
-//                throw new OPDSParseException(e);
-//              }
-//            }
-//          });
-//      }
-//
-//      {
-//        final OptionType<String> o = JSONParserUtilities.getStringOptional(
-//          s, "http://opds-spec.org/acquisition/sample");
-//        o.mapPartial(
-//          new PartialFunctionType<String, Unit, OPDSParseException>() {
-//            @Override
-//            public Unit call(
-//              final String u)
-//              throws OPDSParseException {
-//              try {
-//                fb.setPreviewOption(Option.some(new URI(u)));
-//                return Unit.unit();
-//              } catch (final URISyntaxException e) {
-//                throw new OPDSParseException(e);
-//              }
-//            }
-//          });
-//      }
-
       {
         final OptionType<String> o =
           JSONParserUtilities.getStringOptional(s, "thumbnail");

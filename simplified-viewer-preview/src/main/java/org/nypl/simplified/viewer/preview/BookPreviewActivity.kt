@@ -230,10 +230,16 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
 
     this.logger.debug("TOC opening")
 
-    this.supportFragmentManager.beginTransaction()
+    val transaction = this.supportFragmentManager.beginTransaction()
       .hide(readerFragment)
-      .show(tocFragment)
-      .commitAllowingStateLoss()
+
+    if (tocFragment.isAdded) {
+      transaction.show(tocFragment)
+    } else {
+      transaction.add(R.id.preview_container, tocFragment)
+    }
+
+    transaction.commitAllowingStateLoss()
   }
 
   private fun closeTOC() {
