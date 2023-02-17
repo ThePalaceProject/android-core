@@ -31,6 +31,7 @@ dependencies {
   api project(":simplified-books-database-api")
   api project(":simplified-books-formats")
   api project(":simplified-books-formats-api")
+  api project(":simplified-books-preview")
   api project(":simplified-books-registry-api")
   api project(":simplified-boot-api")
   api project(":simplified-feeds-api")
@@ -104,5 +105,4 @@ dependencies {
   testImplementation libs.junit
   testImplementation libs.org.json
   testImplementation libs.robolectric
-    testImplementation project(path: ':simplified-books-preview')
 }

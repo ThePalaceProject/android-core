@@ -15,6 +15,7 @@ import org.librarysimplified.http.vanilla.LSHTTPClients
 import org.mockito.Mockito
 import org.nypl.simplified.books.book_database.api.BookFormats
 import org.nypl.simplified.books.book_registry.BookPreviewRegistry
+import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
 import org.nypl.simplified.books.book_registry.BookPreviewStatus
 import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.nypl.simplified.books.preview.BookPreviewErrorCodes
@@ -30,7 +31,7 @@ import java.util.concurrent.TimeUnit
 class BookPreviewTaskTest {
 
   private lateinit var bookPreviewStatus: ArrayList<BookPreviewStatus>
-  private lateinit var bookPreviewRegistry: BookPreviewRegistry
+  private lateinit var bookPreviewRegistry: BookPreviewRegistryType
   private lateinit var disposable: Disposable
   private lateinit var httpClient: LSHTTPClientType
   private lateinit var opdsFeedEntryNoPreviews: OPDSAcquisitionFeedEntry
@@ -69,13 +70,13 @@ class BookPreviewTaskTest {
     this.opdsFeedEntryPreviewWMA =
       BookPreviewTestUtils.opdsFeedEntryOfType(
         this.webServer,
-        StandardFormatNames.audiobookWmaPreviewFile.fullType
+        StandardFormatNames.wmaAudioBooks.fullType
       )
 
     this.opdsFeedEntryTwoPreviews =
       BookPreviewTestUtils.opdsFeedEntryOfTypes(
         this.webServer,
-        StandardFormatNames.bookPreviewFiles.first().fullType,
+        StandardFormatNames.textHtmlBook.fullType,
         StandardFormatNames.genericEPUBFiles.fullType
       )
 

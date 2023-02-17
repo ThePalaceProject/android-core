@@ -1,6 +1,7 @@
 package org.nypl.simplified.books.preview
 
 import org.nypl.simplified.books.formats.api.StandardFormatNames
+import org.nypl.simplified.books.formats.api.StandardFormatNames.textHtmlBook
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSPreviewAcquisition
 
@@ -18,7 +19,7 @@ object BookPreviewAcquisitions {
     // isn't one, we return the first preview acquisition that is on the list of supported book
     // previews, if any, or null, if none.
     return entry.previewAcquisitions.firstOrNull {
-      it.type == StandardFormatNames.bookPreviewFiles.first()
+      it.type == textHtmlBook
     } ?: entry.previewAcquisitions.firstOrNull {
       StandardFormatNames.bookPreviewFiles.contains(it.type)
     }

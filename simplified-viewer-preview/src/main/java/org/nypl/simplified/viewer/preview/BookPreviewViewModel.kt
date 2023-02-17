@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import org.nypl.simplified.books.book_registry.BookPreviewRegistry
+import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
 import org.nypl.simplified.books.book_registry.BookPreviewStatus
 import org.nypl.simplified.books.controller.api.BooksPreviewControllerType
 import org.nypl.simplified.feeds.api.FeedEntry
@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory
  */
 
 class BookPreviewViewModel(
-  private val bookPreviewRegistry: BookPreviewRegistry,
+  private val bookPreviewRegistry: BookPreviewRegistryType,
   private val booksPreviewController: BooksPreviewControllerType
 ) : ViewModel() {
 

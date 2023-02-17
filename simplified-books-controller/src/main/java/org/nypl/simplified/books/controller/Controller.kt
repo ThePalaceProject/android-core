@@ -26,7 +26,7 @@ import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryEvent
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.analytics.api.AnalyticsType
 import org.nypl.simplified.books.api.BookID
-import org.nypl.simplified.books.book_registry.BookPreviewRegistry
+import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookWithStatus
@@ -109,7 +109,7 @@ class Controller private constructor(
   private val bookRegistry =
     this.services.requireService(BookRegistryType::class.java)
   private val bookPreviewRegistry =
-    this.services.requireService(BookPreviewRegistry::class.java)
+    this.services.requireService(BookPreviewRegistryType::class.java)
   private val bookFormatSupport =
     this.services.requireService(BookFormatSupportType::class.java)
   private val feedLoader =

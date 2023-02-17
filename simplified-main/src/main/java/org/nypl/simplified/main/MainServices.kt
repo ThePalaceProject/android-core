@@ -49,9 +49,6 @@ import org.nypl.simplified.books.audio.AudioBookFeedbooksSecretServiceType
 import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
 import org.nypl.simplified.books.audio.AudioBookManifests
 import org.nypl.simplified.books.audio.AudioBookOverdriveSecretServiceType
-import org.nypl.simplified.books.book_registry.BookRegistry
-import org.nypl.simplified.books.book_registry.BookRegistryReadableType
-import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.borrowing.BorrowSubtasks
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskDirectoryType
 import org.nypl.simplified.books.bundled.api.BundledContentResolverType
@@ -66,7 +63,7 @@ import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.bookmarks.BookmarkService
 import org.nypl.simplified.bookmarks.internal.BHTTPCalls
-import org.nypl.simplified.books.book_registry.BookPreviewRegistry
+import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
 import org.nypl.simplified.books.controller.api.BooksPreviewControllerType
 import org.nypl.simplified.boot.api.BootEvent
 import org.nypl.simplified.boot.api.BootFailureTesting
@@ -678,7 +675,7 @@ internal object MainServices {
 
     addService(
       message = strings.bootingGeneral("book preview registry"),
-      interfaceType = BookPreviewRegistry::class.java,
+      interfaceType = BookPreviewRegistryType::class.java,
       serviceConstructor = { BookPreviewRegistry(directories.directoryStorageDownloads) }
     )
 

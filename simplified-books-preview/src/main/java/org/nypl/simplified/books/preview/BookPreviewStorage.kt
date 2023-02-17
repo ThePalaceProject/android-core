@@ -36,10 +36,10 @@ data class BookPreviewStorage(
   ) {
 
     val previewFile = when (mimeType) {
-      StandardFormatNames.audiobookMp3PreviewFile -> {
+      StandardFormatNames.mpegAudioBooks -> {
         audiobookMp3PreviewFile
       }
-      StandardFormatNames.audiobookWmaPreviewFile -> {
+      StandardFormatNames.wmaAudioBooks -> {
         audiobookWmaPreviewFile
       }
       else -> {

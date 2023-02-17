@@ -3,7 +3,7 @@ package org.nypl.simplified.viewer.preview
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import org.librarysimplified.services.api.ServiceDirectoryType
-import org.nypl.simplified.books.book_registry.BookPreviewRegistry
+import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
 import org.nypl.simplified.books.controller.api.BooksPreviewControllerType
 import org.slf4j.LoggerFactory
 
@@ -23,8 +23,8 @@ class BookPreviewViewModelFactory(
 
     return when {
       modelClass.isAssignableFrom(BookPreviewViewModel::class.java) -> {
-        val bookPreviewRegistry: BookPreviewRegistry =
-          this.services.requireService(BookPreviewRegistry::class.java)
+        val bookPreviewRegistry: BookPreviewRegistryType =
+          this.services.requireService(BookPreviewRegistryType::class.java)
         val booksPreviewController: BooksPreviewControllerType =
           this.services.requireService(BooksPreviewControllerType::class.java)
         BookPreviewViewModel(bookPreviewRegistry, booksPreviewController) as T

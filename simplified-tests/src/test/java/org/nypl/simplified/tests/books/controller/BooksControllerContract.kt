@@ -37,6 +37,7 @@ import org.nypl.simplified.books.api.BookEvent
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
 import org.nypl.simplified.books.book_registry.BookPreviewRegistry
+import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
 import org.nypl.simplified.books.book_registry.BookPreviewStatus
 import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
@@ -114,7 +115,7 @@ abstract class BooksControllerContract {
   private lateinit var authDocumentParsers: AuthenticationDocumentParsersType
   private lateinit var bookEvents: MutableList<BookEvent>
   private lateinit var bookFormatSupport: MockBookFormatSupport
-  private lateinit var bookPreviewRegistry: BookPreviewRegistry
+  private lateinit var bookPreviewRegistry: BookPreviewRegistryType
   private lateinit var bookRegistry: BookRegistryType
   private lateinit var borrowSubtasks: BorrowSubtaskDirectoryType
   private lateinit var cacheDirectory: File
@@ -200,7 +201,7 @@ abstract class BooksControllerContract {
     services.putService(AuthenticationDocumentParsersType::class.java, this.authDocumentParsers)
     services.putService(BookFormatSupportType::class.java, this.bookFormatSupport)
     services.putService(BookRegistryType::class.java, this.bookRegistry)
-    services.putService(BookPreviewRegistry::class.java, this.bookPreviewRegistry)
+    services.putService(BookPreviewRegistryType::class.java, this.bookPreviewRegistry)
     services.putService(BorrowSubtaskDirectoryType::class.java, this.borrowSubtasks)
     services.putService(BookRevokeStringResourcesType::class.java, revokeStringResources)
     services.putService(BundledContentResolverType::class.java, bundledContent)
@@ -262,7 +263,7 @@ abstract class BooksControllerContract {
     services.putService(AuthenticationDocumentParsersType::class.java, this.authDocumentParsers)
     services.putService(BookFormatSupportType::class.java, this.bookFormatSupport)
     services.putService(BookRegistryType::class.java, this.bookRegistry)
-    services.putService(BookPreviewRegistry::class.java, this.bookPreviewRegistry)
+    services.putService(BookPreviewRegistryType::class.java, this.bookPreviewRegistry)
     services.putService(BorrowSubtaskDirectoryType::class.java, this.borrowSubtasks)
     services.putService(BookRevokeStringResourcesType::class.java, revokeStringResources)
     services.putService(BundledContentResolverType::class.java, bundledContent)
@@ -993,7 +994,6 @@ abstract class BooksControllerContract {
     this.server.enqueue(
       MockResponse()
         .setResponseCode(200)
-        .setBody(Buffer().readFrom(resource("testBooksDelete.xml")))
     )
 
     val bookPreviewStatus = arrayListOf<BookPreviewStatus>()

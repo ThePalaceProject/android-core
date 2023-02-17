@@ -1,7 +1,7 @@
 package org.nypl.simplified.books.preview
 
 import org.nypl.simplified.books.book_database.api.BookFormats
-import org.nypl.simplified.books.book_registry.BookPreviewRegistry
+import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
 import org.nypl.simplified.books.book_registry.BookPreviewStatus
 import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
@@ -15,7 +15,7 @@ import java.io.File
 import java.net.URL
 
 class BookPreviewTask(
-  private val bookPreviewRegistry: BookPreviewRegistry,
+  private val bookPreviewRegistry: BookPreviewRegistryType,
   private val bookPreviewRequirements: BookPreviewRequirements,
   private val feedEntry: OPDSAcquisitionFeedEntry,
   private val format: BookFormats.BookFormatDefinition?
@@ -62,7 +62,7 @@ class BookPreviewTask(
           onPreviewFileReady = onPreviewFileReady,
           previewAcquisition = previewAcquisition,
           taskRecorder = taskRecorder,
-          temporaryDirectory = bookPreviewRegistry.downloadDirectory
+          temporaryDirectory = bookPreviewRegistry.getPreviewDownloadDirectory()
         )
       ).execute()
 
@@ -143,7 +143,7 @@ class BookPreviewTask(
     val previewAcquisition = pickPreviewAcquisition()
 
     // the preview acquisition is a 'text/html'
-    return if (previewAcquisition.type == StandardFormatNames.bookPreviewFiles.first()) {
+    return if (previewAcquisition.type == StandardFormatNames.textHtmlBook) {
       bookPreviewRegistry.updatePreviewStatus(
         BookPreviewStatus.HasPreview.Ready.Embedded(
           url = URL(previewAcquisition.uri.toString())
