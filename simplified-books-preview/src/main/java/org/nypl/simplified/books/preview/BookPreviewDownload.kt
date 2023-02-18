@@ -1,6 +1,6 @@
 package org.nypl.simplified.books.preview
 
-data class BookPreviewDownload(
+class BookPreviewDownload(
   private val parameters: BookPreviewParameters
 ) {
 
