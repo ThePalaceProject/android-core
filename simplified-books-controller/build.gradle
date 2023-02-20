@@ -10,6 +10,7 @@ dependencies {
   implementation project(":simplified-bookmarks-api")
   implementation project(":simplified-books-audio")
   implementation project(":simplified-books-borrowing")
+  implementation project(":simplified-books-preview")
   implementation project(":simplified-books-registry-api")
   implementation project(":simplified-crashlytics-api")
   implementation project(":simplified-metrics-api")

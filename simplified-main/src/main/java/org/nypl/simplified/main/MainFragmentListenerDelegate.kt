@@ -48,6 +48,7 @@ import org.nypl.simplified.ui.settings.SettingsDocumentViewerEvent
 import org.nypl.simplified.ui.settings.SettingsDocumentViewerFragment
 import org.nypl.simplified.ui.settings.SettingsMainEvent
 import org.nypl.simplified.viewer.api.Viewers
+import org.nypl.simplified.viewer.preview.BookPreviewActivity
 import org.nypl.simplified.viewer.spi.ViewerPreferences
 import org.slf4j.LoggerFactory
 import java.net.URL
@@ -229,11 +230,22 @@ internal class MainFragmentListenerDelegate(
         this.openBookDetail(event.feedArguments, event.opdsEntry)
         state
       }
+      is CatalogBookDetailEvent.OpenPreviewViewer -> {
+        this.openPreviewViewer(event.feedEntry)
+        state
+      }
       CatalogBookDetailEvent.GoUpwards -> {
         this.goUpwards()
         state
       }
     }
+  }
+
+  private fun openPreviewViewer(feedEntry: FeedEntry.FeedEntryOPDS) {
+    BookPreviewActivity.startActivity(
+      fragment.requireActivity(),
+      feedEntry
+    )
   }
 
   private fun handleAccountListRegistryEvent(

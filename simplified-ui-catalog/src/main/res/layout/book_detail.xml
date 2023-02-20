@@ -1,256 +1,263 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:app="http://schemas.android.com/apk/res-auto"
-  xmlns:tools="http://schemas.android.com/tools"
-  android:layout_width="match_parent"
-  android:layout_height="match_parent">
-
-  <LinearLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginBottom="16dp"
-      android:clipChildren="false"
-      android:clipToPadding="false">
-
-      <androidx.cardview.widget.CardView
-        android:id="@+id/bookDetailCover"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/cover_thumbnail_height"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        app:cardCornerRadius="@dimen/cover_corner_radius"
-        app:cardElevation="2dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-          android:id="@+id/bookDetailCoverImage"
-          android:layout_width="wrap_content"
-          android:layout_height="match_parent"
-          android:adjustViewBounds="true"
-          android:contentDescription="@null"
-          android:scaleType="fitXY"
-          app:srcCompat="@drawable/cover_loading" />
-      </androidx.cardview.widget.CardView>
-
-      <TextView
-        android:id="@+id/bookDetailTitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/bookDetailCover"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="The Modern Prometheus" />
-
-      <TextView
-        android:id="@+id/bookDetailAuthors"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:ellipsize="end"
-        android:maxLines="2"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/bookDetailCover"
-        app:layout_constraintTop_toBottomOf="@id/bookDetailTitle"
-        tools:text="Mary Shelley" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <View
-      android:layout_width="match_parent"
-      android:layout_height="1dp"
-      android:background="?android:attr/listDivider" />
+    android:layout_height="match_parent">
 
     <LinearLayout
-      android:id="@+id/bookDetailButtons"
-      android:layout_width="match_parent"
-      android:layout_height="@dimen/catalogBookDetailButtonsHeight"
-      android:layout_marginStart="16dp"
-      android:layout_marginEnd="16dp"
-      android:gravity="center|center_horizontal"
-      android:orientation="horizontal">
-
-      <!-- These views are removed at runtime and are just present for the sake of the UI editor preview -->
-
-      <Button
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:visibility="gone"
-        tools:text="@string/catalogGet"
-        tools:visibility="visible" />
+        android:orientation="vertical">
 
-      <Space
-        android:layout_width="16dp"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        tools:visibility="visible" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:clipChildren="false"
+            android:clipToPadding="false">
 
-      <Button
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:visibility="gone"
-        tools:text="@string/catalogGet"
-        tools:visibility="visible" />
+            <androidx.cardview.widget.CardView
+                android:id="@+id/bookDetailCover"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/cover_thumbnail_height"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="@dimen/cover_corner_radius"
+                app:cardElevation="2dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-      <Space
-        android:layout_width="16dp"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        tools:visibility="visible" />
+                <ImageView
+                    android:id="@+id/bookDetailCoverImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="@null"
+                    android:scaleType="fitXY"
+                    app:srcCompat="@drawable/cover_loading" />
+            </androidx.cardview.widget.CardView>
 
-      <Button
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="@string/catalogGet"
-        android:visibility="gone"
-        tools:visibility="visible" />
+            <TextView
+                android:id="@+id/bookDetailTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/bookDetailCover"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="The Modern Prometheus" />
+
+            <TextView
+                android:id="@+id/bookDetailAuthors"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/bookDetailCover"
+                app:layout_constraintTop_toBottomOf="@id/bookDetailTitle"
+                tools:text="Mary Shelley" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/bookPreviewButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@id/bookDetailTitle"
+                tools:text="@string/catalogBookPreviewBook" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
+
+        <LinearLayout
+            android:id="@+id/bookDetailButtons"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/catalogBookDetailButtonsHeight"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:gravity="center|center_horizontal"
+            android:orientation="horizontal">
+
+            <!-- These views are removed at runtime and are just present for the sake of the UI editor preview -->
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:visibility="gone"
+                tools:text="@string/catalogGet"
+                tools:visibility="visible" />
+
+            <Space
+                android:layout_width="16dp"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:visibility="gone"
+                tools:text="@string/catalogGet"
+                tools:visibility="visible" />
+
+            <Space
+                android:layout_width="16dp"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/catalogGet"
+                android:visibility="gone"
+                tools:visibility="visible" />
+        </LinearLayout>
+
+        <include
+            layout="@layout/book_detail_status"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/catalogBookDetailStatusHeight"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:id="@+id/bookDetailDescriptionTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="32dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/catalogDescription"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/bookDetailDescriptionText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/catalogPlaceholder" />
+
+        <TextView
+            android:id="@+id/seeMoreText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginEnd="16dp"
+            android:padding="8dp"
+            android:text="@string/catalogMore"
+            android:textSize="12sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="16dp"
+            android:background="?android:attr/listDivider" />
+
+        <TextView
+            android:id="@+id/bookDetailMetadataTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/catalogInformation"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:id="@+id/bookDetailMetadataTable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="16dp"
+            android:background="?android:attr/listDivider" />
+
+        <FrameLayout
+            android:id="@+id/bookDetailRelatedBooksContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp">
+
+            <include
+                layout="@layout/feed_loading"
+                tools:visibility="visible" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/relatedBooksList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:overScrollMode="never" />
+
+        </FrameLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="16dp"
+            android:background="?android:attr/listDivider"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/bookDetailReport"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:enabled="false"
+            android:text="@string/catalogReportIssue"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="16dp"
+            android:background="?android:attr/listDivider" />
+
+        <TextView
+            android:id="@+id/bookDetailDebugStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/catalogPlaceholder"
+            android:typeface="monospace" />
+
     </LinearLayout>
-
-    <include
-      layout="@layout/book_detail_status"
-      android:layout_width="match_parent"
-      android:layout_height="@dimen/catalogBookDetailStatusHeight"
-      android:layout_marginBottom="16dp" />
-
-    <TextView
-      android:id="@+id/bookDetailDescriptionTitle"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="16dp"
-      android:layout_marginEnd="16dp"
-      android:layout_marginBottom="32dp"
-      android:ellipsize="end"
-      android:maxLines="1"
-      android:text="@string/catalogDescription"
-      android:textSize="18sp"
-      android:textStyle="bold" />
-
-    <TextView
-      android:id="@+id/bookDetailDescriptionText"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="16dp"
-      android:layout_marginEnd="16dp"
-      android:layout_marginBottom="16dp"
-      android:text="@string/catalogPlaceholder" />
-
-    <TextView
-        android:id="@+id/seeMoreText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:textSize="12sp"
-        android:layout_gravity="end"
-        android:padding="8dp"
-        android:text="@string/catalogMore" />
-
-    <View
-      android:layout_width="match_parent"
-      android:layout_height="1dp"
-      android:layout_marginBottom="16dp"
-      android:background="?android:attr/listDivider" />
-
-    <TextView
-      android:id="@+id/bookDetailMetadataTitle"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="16dp"
-      android:layout_marginEnd="16dp"
-      android:layout_marginBottom="16dp"
-      android:ellipsize="end"
-      android:maxLines="1"
-      android:text="@string/catalogInformation"
-      android:textSize="18sp"
-      android:textStyle="bold" />
-
-    <LinearLayout
-      android:id="@+id/bookDetailMetadataTable"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:orientation="vertical"
-      android:layout_marginStart="16dp"
-      android:layout_marginEnd="16dp"
-      android:layout_marginBottom="16dp" />
-
-    <View
-      android:layout_width="match_parent"
-      android:layout_height="1dp"
-      android:layout_marginBottom="16dp"
-      android:background="?android:attr/listDivider" />
-
-    <FrameLayout
-      android:id="@+id/bookDetailRelatedBooksContainer"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginBottom="16dp">
-
-      <include
-          layout="@layout/feed_loading"
-          tools:visibility="visible" />
-
-      <androidx.recyclerview.widget.RecyclerView
-          android:id="@+id/relatedBooksList"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:clipChildren="false"
-          android:clipToPadding="false"
-          android:overScrollMode="never" />
-
-    </FrameLayout>
-
-    <View
-      android:layout_width="match_parent"
-      android:layout_height="1dp"
-      android:layout_marginBottom="16dp"
-      android:background="?android:attr/listDivider"
-      android:visibility="gone" />
-
-    <TextView
-      android:id="@+id/bookDetailReport"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="16dp"
-      android:layout_marginEnd="16dp"
-      android:layout_marginBottom="16dp"
-      android:enabled="false"
-      android:text="@string/catalogReportIssue"
-      android:textSize="18sp"
-      android:textStyle="bold"
-      android:visibility="gone" />
-
-    <View
-      android:layout_width="match_parent"
-      android:layout_height="1dp"
-      android:layout_marginBottom="16dp"
-      android:background="?android:attr/listDivider" />
-
-    <TextView
-      android:id="@+id/bookDetailDebugStatus"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="16dp"
-      android:layout_marginEnd="16dp"
-      android:layout_marginBottom="16dp"
-      android:text="@string/catalogPlaceholder"
-      android:typeface="monospace" />
-
-  </LinearLayout>
 
 </ScrollView>

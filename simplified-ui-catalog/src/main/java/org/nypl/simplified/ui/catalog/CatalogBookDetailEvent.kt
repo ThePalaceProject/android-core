@@ -28,6 +28,10 @@ sealed class CatalogBookDetailEvent {
     val opdsEntry: FeedEntry.FeedEntryOPDS
   ) : CatalogBookDetailEvent()
 
+  data class OpenPreviewViewer(
+    val feedEntry: FeedEntry.FeedEntryOPDS
+  ) : CatalogBookDetailEvent()
+
   data class OpenFeed(
     val feedArguments: CatalogFeedArguments
   ) : CatalogBookDetailEvent()
