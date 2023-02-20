@@ -30,6 +30,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
   private final OPDSAvailabilityType availability;
   private final List<OPDSCategory> categories;
   private final OptionType<URI> cover;
+  private final List<OPDSPreviewAcquisition> previews;
   private final OptionType<URI> annotations;
   private final Set<Pair<String, URI>> groups;
   private final String id;
@@ -54,6 +55,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     final OPDSAvailabilityType in_availability,
     final Set<Pair<String, URI>> in_groups,
     final OptionType<URI> in_cover,
+    final List<OPDSPreviewAcquisition> in_previews,
     final OptionType<URI> in_annotations,
     final String in_id,
     final OptionType<URI> in_issues,
@@ -76,6 +78,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     this.availability = NullCheck.notNull(in_availability);
     this.groups = NullCheck.notNull(in_groups);
     this.cover = NullCheck.notNull(in_cover);
+    this.previews = NullCheck.notNull(Collections.unmodifiableList(in_previews));
     this.annotations = NullCheck.notNull(in_annotations);
     this.id = NullCheck.notNull(in_id);
     this.issues = NullCheck.notNull(in_issues);
@@ -144,6 +147,10 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
       b.addCategory(c);
     }
 
+    for (final OPDSPreviewAcquisition p : e.getPreviewAcquisitions()) {
+      b.addPreviewAcquisition(p);
+    }
+
     b.setCoverOption(e.getCover());
     b.setIssuesOption(e.getIssues());
     b.setAnnotationsOption(e.getAnnotations());
@@ -186,6 +193,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
       && this.groups.equals(other.groups)
       && this.categories.equals(other.categories)
       && this.cover.equals(other.cover)
+      && this.previews.equals(other.previews)
       && this.alternate.equals(other.alternate)
       && this.analytics.equals(other.analytics)
       && this.annotations.equals(other.annotations)
@@ -248,6 +256,14 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
 
   public OptionType<URI> getCover() {
     return this.cover;
+  }
+
+  /**
+   * @return The list of preview acquisitions
+   */
+
+  public List<OPDSPreviewAcquisition> getPreviewAcquisitions() {
+    return this.previews;
   }
 
   /**
@@ -402,6 +418,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     result = (prime * result) + this.authors.hashCode();
     result = (prime * result) + this.groups.hashCode();
     result = (prime * result) + this.cover.hashCode();
+    result = (prime * result) + this.previews.hashCode();
     result = (prime * result) + this.alternate.hashCode();
     result = (prime * result) + this.analytics.hashCode();
     result = (prime * result) + this.annotations.hashCode();
@@ -433,6 +450,8 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     b.append(this.categories);
     b.append(", cover=");
     b.append(this.cover);
+    b.append(", previews=");
+    b.append(this.previews);
     b.append(", alternate=");
     b.append(this.alternate);
     b.append(", analytics=");
@@ -480,6 +499,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     private final ArrayList<ParseError> errors;
     private OPDSAvailabilityType availability;
     private OptionType<URI> cover;
+    private List<OPDSPreviewAcquisition> previews;
     private OptionType<URI> alternate;
     private OptionType<URI> analytics;
     private OptionType<URI> annotations;
@@ -511,6 +531,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
       this.copyright = Option.none();
       this.thumbnail = Option.none();
       this.cover = Option.none();
+      this.previews = new ArrayList<OPDSPreviewAcquisition>(8);
       this.alternate = Option.none();
       this.analytics = Option.none();
       this.annotations = Option.none();
@@ -569,6 +590,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
         this.availability,
         this.groups,
         this.cover,
+        this.previews,
         this.annotations,
         this.id,
         this.issues,
@@ -604,6 +626,13 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     public OPDSAcquisitionFeedEntryBuilderType setCoverOption(
       final OptionType<URI> uri) {
       this.cover = NullCheck.notNull(uri);
+      return this;
+    }
+
+    @Override
+    public OPDSAcquisitionFeedEntryBuilderType addPreviewAcquisition(
+      OPDSPreviewAcquisition previewAcquisition) {
+      this.previews.add(NullCheck.notNull(previewAcquisition));
       return this;
     }
 

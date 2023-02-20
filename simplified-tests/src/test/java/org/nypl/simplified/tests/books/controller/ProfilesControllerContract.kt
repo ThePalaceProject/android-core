@@ -63,6 +63,8 @@ import org.nypl.simplified.reader.api.ReaderColorScheme
 import org.nypl.simplified.reader.api.ReaderFontSelection
 import org.nypl.simplified.reader.api.ReaderPreferences
 import org.nypl.simplified.bookmarks.api.BookmarkEvent
+import org.nypl.simplified.books.book_registry.BookPreviewRegistry
+import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
 import org.nypl.simplified.tests.EventAssertions
 import org.nypl.simplified.tests.MutableServiceDirectory
 import org.nypl.simplified.tests.books.BookFormatsTesting
@@ -94,6 +96,7 @@ abstract class ProfilesControllerContract {
   private lateinit var audioBookManifestStrategies: AudioBookManifestStrategiesType
   private lateinit var authDocumentParsers: AuthenticationDocumentParsersType
   private lateinit var bookFormatSupport: BookFormatSupportType
+  private lateinit var bookPreviewRegistry: BookPreviewRegistryType
   private lateinit var bookRegistry: BookRegistryType
   private lateinit var cacheDirectory: File
   private lateinit var contentResolver: ContentResolverType
@@ -160,6 +163,7 @@ abstract class ProfilesControllerContract {
     services.putService(AudioBookManifestStrategiesType::class.java, this.audioBookManifestStrategies)
     services.putService(AuthenticationDocumentParsersType::class.java, this.authDocumentParsers)
     services.putService(BookFormatSupportType::class.java, this.bookFormatSupport)
+    services.putService(BookPreviewRegistryType::class.java, this.bookPreviewRegistry)
     services.putService(BookRegistryType::class.java, this.bookRegistry)
     services.putService(BookRevokeStringResourcesType::class.java, this.bookRevokeStringResources)
     services.putService(BorrowSubtaskDirectoryType::class.java, BorrowSubtasks.directory())
@@ -204,6 +208,7 @@ abstract class ProfilesControllerContract {
     this.cacheDirectory.mkdirs()
     this.contentResolver = Mockito.mock(ContentResolverType::class.java)
     this.readerBookmarkEvents = PublishSubject.create()
+    this.bookPreviewRegistry = BookPreviewRegistry(DirectoryUtilities.directoryCreateTemporary())
     this.bookRegistry = BookRegistry.create()
     this.patronUserProfileParsers = Mockito.mock(PatronUserProfileParsersType::class.java)
     this.bookFormatSupport = Mockito.mock(BookFormatSupportType::class.java)

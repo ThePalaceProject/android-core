@@ -104,6 +104,38 @@ object StandardFormatNames {
     this.mimeOf("application/epub+zip")
 
   /**
+   * The MIME type used for text/html book files.
+   */
+
+  val textHtmlBook =
+    this.mimeOf("text/html")
+
+  /**
+   * The MIME type used for mp3 audiobook files.
+   */
+
+  val mpegAudioBooks =
+    this.mimeOf("audio/mpeg")
+
+  /**
+   * The MIME type used for wma audiobook files.
+   */
+
+  val wmaAudioBooks =
+    this.mimeOf("audio/x-ms-wma")
+
+  /**
+   * The MIME types used for book preview files.
+   */
+
+  val bookPreviewFiles = listOf(
+    textHtmlBook,
+    genericEPUBFiles,
+    mpegAudioBooks,
+    wmaAudioBooks
+  )
+
+  /**
    * The MIME type used for PDF files, encrypted or otherwise.
    */
 

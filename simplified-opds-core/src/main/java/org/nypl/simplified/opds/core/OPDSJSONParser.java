@@ -422,6 +422,27 @@ public final class OPDSJSONParser implements OPDSJSONParserType {
       }
 
       {
+        final ArrayNode a = JSONParserUtilities.getArrayOrNull(s, "previews");
+        if (a != null) {
+          for (int index = 0; index < a.size(); ++index) {
+            try {
+              final ObjectNode jo = JSONParserUtilities.checkObject(
+                null, a.get(index));
+              final URI in_uri = new URI(
+                JSONParserUtilities.getString(
+                  jo, "uri"));
+              final MIMEType in_type =
+                MIMEParser.Companion.parseRaisingException(
+                  JSONParserUtilities.getString(jo, "type"));
+              fb.addPreviewAcquisition(new OPDSPreviewAcquisition(in_uri, in_type));
+            } catch (final Exception e) {
+              throw new OPDSParseException(e);
+            }
+          }
+        }
+      }
+
+      {
         final OptionType<String> o =
           JSONParserUtilities.getStringOptional(s, "thumbnail");
         o.mapPartial(

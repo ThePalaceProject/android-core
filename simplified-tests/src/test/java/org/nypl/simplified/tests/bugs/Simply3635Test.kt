@@ -32,6 +32,8 @@ import org.nypl.simplified.analytics.api.AnalyticsType
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
 import org.nypl.simplified.books.audio.AudioBookManifests
+import org.nypl.simplified.books.book_registry.BookPreviewRegistry
+import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
 import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.borrowing.internal.BorrowSubtaskDirectory
@@ -88,6 +90,7 @@ class Simply3635Test {
   private lateinit var accountsDatabases: AccountsDatabases
   private lateinit var analytics: AnalyticsType
   private lateinit var baseDirectory: File
+  private lateinit var bookPreviewRegistry: BookPreviewRegistryType
   private lateinit var bookRegistry: BookRegistryType
   private lateinit var bundledContent: MockBundledContentResolver
   private lateinit var cacheDirectory: File
@@ -158,6 +161,8 @@ class Simply3635Test {
       Executors.newFixedThreadPool(1)
     this.feedExecutorService =
       MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(1))
+    this.bookPreviewRegistry =
+      BookPreviewRegistry(TestDirectories.temporaryDirectory())
     this.bookRegistry =
       BookRegistry.create()
     this.bundledContent =
@@ -226,6 +231,7 @@ class Simply3635Test {
     b.addService(AudioBookManifestStrategiesType::class.java, AudioBookManifests)
     b.addService(AuthenticationDocumentParsersType::class.java, AuthenticationDocumentParsers())
     b.addService(BookFormatSupportType::class.java, bookFormatSupport)
+    b.addService(BookPreviewRegistryType::class.java, this.bookPreviewRegistry)
     b.addService(BookRegistryType::class.java, this.bookRegistry)
     b.addService(BorrowSubtaskDirectoryType::class.java, this.borrowSubtasks)
     b.addService(BundledContentResolverType::class.java, this.bundledContent)
