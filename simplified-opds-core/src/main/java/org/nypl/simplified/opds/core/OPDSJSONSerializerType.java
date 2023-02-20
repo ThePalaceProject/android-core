@@ -58,6 +58,16 @@ public interface OPDSJSONSerializerType {
     OPDSAcquisition a) throws OPDSSerializationException;
 
   /**
+   * Serialize the given preview acquisition to JSON.
+   *
+   * @param a The preview acquisition
+   * @return JSON
+   */
+
+  ObjectNode serializePreviewAcquisition(
+    OPDSPreviewAcquisition a) throws OPDSSerializationException;
+
+  /**
    * Serialize the given category to JSON.
    *
    * @param c The category

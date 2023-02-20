@@ -413,7 +413,7 @@ class BorrowTaskTest {
     this.bookID =
       BookIDs.newFromOPDSEntry(feedEntry)
 
-    assertEquals(1, feedEntry.acquisitions.size)
+    assertEquals(0, feedEntry.acquisitions.size)
 
     val request =
       BorrowRequest.Start(this.accountId, this.profile.id, feedEntry)

@@ -92,6 +92,15 @@ public interface OPDSAcquisitionFeedEntryBuilderType
     OptionType<URI> uri);
 
   /**
+   * Add a preview.
+   *
+   * @param previewAcquisition The preview acquisition
+   */
+
+  OPDSAcquisitionFeedEntryBuilderType addPreviewAcquisition(
+    OPDSPreviewAcquisition previewAcquisition);
+
+  /**
    * @param uri The annotations URI
    */
 

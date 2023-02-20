@@ -330,6 +330,7 @@ coupled as possible. New features should typically be implemented as new modules
 |[org.librarysimplified.books.database.api](simplified-books-database-api)|Book database API|
 |[org.librarysimplified.books.formats](simplified-books-formats)|Book formats implementation|
 |[org.librarysimplified.books.formats.api](simplified-books-formats-api)|Book formats API|
+|[org.librarysimplified.books.preview](simplified-books-preview)|Book preview API|
 |[org.librarysimplified.books.registry.api](simplified-books-registry-api)|Book registry API|
 |[org.librarysimplified.boot.api](simplified-boot-api)|Application boot API|
 |[org.librarysimplified.buildconfig.api](simplified-buildconfig-api)|Build-time configuration API|
@@ -400,6 +401,7 @@ coupled as possible. New features should typically be implemented as new modules
 |[org.librarysimplified.viewer.audiobook](simplified-viewer-audiobook)|AudioBook viewer|
 |[org.librarysimplified.viewer.epub.readium2](simplified-viewer-epub-readium2)|Readium 2 EPUB reader|
 |[org.librarysimplified.viewer.pdf](simplified-viewer-pdf)|PDF reader|
+|[org.librarysimplified.viewer.preview](simplified-viewer-preview)|Book preview reader/player|
 |[org.librarysimplified.viewer.spi](simplified-viewer-spi)|Viewer SPI|
 |[org.librarysimplified.webview](simplified-webview)|WebView utilities|
 

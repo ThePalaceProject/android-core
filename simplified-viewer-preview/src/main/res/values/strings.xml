@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <string name="bookPreviewPlayerInitialTime">"00:00:00"</string>
+    <string name="bookPreviewPlayerSeek30">"30"</string>
+
+    <string name="bookPreviewFailedTitle">"Book preview downloading failed</string>
+    <string name="bookPreviewFailedMessage">"There was an error downloading this book's preview. Please try again later."</string>
+
+    <string name="bookPreviewAccessibilityBack">Back</string>
+    <string name="bookPreviewAccessibilityForward30">Fast forward 30 seconds</string>
+    <string name="bookPreviewAccessibilityBackward30">Rewind 30 seconds</string>
+    <string name="bookPreviewAccessibilityPlay">Play</string>
+    <string name="bookPreviewAccessibilityPause">Pause</string>
+    <string name="bookPreviewAccessibilityCover">Book cover</string>
+    <string name="bookPreviewAccessibilityTimeCurrent">%s Played</string>
+    <string name="bookPreviewAccessibilityTimeRemaining">%s Remaining</string>
+    <string name="bookPreviewAccessibilityHours">Hours</string>
+    <string name="bookPreviewAccessibilityMinutes">Minutes</string>
+    <string name="bookPreviewAccessibilitySeconds">Seconds</string>
+    <string name="bookPreviewAccessibilityHour">Hour</string>
+    <string name="bookPreviewAccessibilityMinute">Minute</string>
+    <string name="bookPreviewAccessibilitySecond">Second</string>
+
+</resources>
