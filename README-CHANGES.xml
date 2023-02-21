@@ -267,7 +267,7 @@
         <c:change date="2023-01-18T00:00:00+00:00" summary="Display the search query on the search bar."/>
         <c:change date="2023-01-27T00:00:00+00:00" summary="Updated audiobook sleep timer stored value so the can be resumed instead of recreated when reopening an audiobook."/>
         <c:change date="2023-02-13T00:00:00+00:00" summary="Added support for book previews."/>
-        <c:change date="2023-02-20T20:13:35+00:00" summary="Updated book's MIMEType stored information."/>
+        <c:change date="2023-02-20T20:13:35+00:00" summary="Fixed some audio books not appearing in the bookshelf when offline."/>
       </c:changes>
     </c:release>
   </c:releases>

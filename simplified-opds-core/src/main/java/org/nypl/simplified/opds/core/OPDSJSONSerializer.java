@@ -50,7 +50,7 @@ public final class OPDSJSONSerializer implements OPDSJSONSerializerType {
     final ObjectNode node = jom.createObjectNode();
     node.put("type", a.getRelation().toString());
     node.put("uri", a.getUri().toString());
-    node.put("content_type", getFullMimeTypeInfo(a.getType()));
+    node.put("content_type", serializeContentType(a.getType()));
     node.put("properties", serializeProperties(a.getProperties()));
     node.set("indirect_acquisitions", serializeIndirectAcquisitions(a.getIndirectAcquisitions()));
     return node;
@@ -69,7 +69,7 @@ public final class OPDSJSONSerializer implements OPDSJSONSerializerType {
       return node;
   }
 
-  private String getFullMimeTypeInfo(MIMEType mimeType) {
+  private String serializeContentType(MIMEType mimeType) {
     Map<String, String> parameters = mimeType.getParameters();
 
     if (parameters.isEmpty()) {
