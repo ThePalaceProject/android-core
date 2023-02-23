@@ -256,7 +256,7 @@
         <c:change date="2022-11-29T00:00:00+00:00" summary="Fixed audiobooks not pausing when headphones are unplugged."/>
       </c:changes>
     </c:release>
-    <c:release date="2023-02-20T20:17:27+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.4.0">
+    <c:release date="2023-02-23T12:16:51+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.4.0">
       <c:changes>
         <c:change date="2022-12-12T00:00:00+00:00" summary="Changed the Switch's enabled color to green."/>
         <c:change date="2022-12-14T00:00:00+00:00" summary="Downgraded Gradle version."/>
@@ -267,7 +267,8 @@
         <c:change date="2023-01-18T00:00:00+00:00" summary="Display the search query on the search bar."/>
         <c:change date="2023-01-27T00:00:00+00:00" summary="Updated audiobook sleep timer stored value so the can be resumed instead of recreated when reopening an audiobook."/>
         <c:change date="2023-02-13T00:00:00+00:00" summary="Added support for book previews."/>
-        <c:change date="2023-02-20T20:17:27+00:00" summary="Added prompt to move to the last reading position or stay on current one."/>
+        <c:change date="2023-02-20T00:00:00+00:00" summary="Fixed some audio books not appearing in the bookshelf when offline."/>
+        <c:change date="2023-02-23T12:16:51+00:00" summary="Added prompt to move to the last reading position or stay on current one."/>
       </c:changes>
     </c:release>
   </c:releases>

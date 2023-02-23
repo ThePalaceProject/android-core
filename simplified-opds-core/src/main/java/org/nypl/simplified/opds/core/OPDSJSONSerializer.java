@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import one.irradia.mime.api.MIMEType;
+
 /**
  * The default implementation of the {@link OPDSJSONSerializerType} interface.
  */
@@ -48,7 +50,7 @@ public final class OPDSJSONSerializer implements OPDSJSONSerializerType {
     final ObjectNode node = jom.createObjectNode();
     node.put("type", a.getRelation().toString());
     node.put("uri", a.getUri().toString());
-    node.put("content_type", a.getType().getFullType());
+    node.put("content_type", serializeContentType(a.getType()));
     node.put("properties", serializeProperties(a.getProperties()));
     node.set("indirect_acquisitions", serializeIndirectAcquisitions(a.getIndirectAcquisitions()));
     return node;
@@ -67,6 +69,21 @@ public final class OPDSJSONSerializer implements OPDSJSONSerializerType {
       return node;
   }
 
+  private String serializeContentType(MIMEType mimeType) {
+    Map<String, String> parameters = mimeType.getParameters();
+
+    if (parameters.isEmpty()) {
+      return mimeType.getFullType();
+    } else {
+      StringBuilder stringBuilder = new StringBuilder();
+      stringBuilder.append(mimeType.getFullType());
+      for (String key : parameters.keySet()) {
+        stringBuilder.append(";").append(key).append("=").append(parameters.get(key));
+      }
+
+      return stringBuilder.toString();
+    }
+  }
 
   private ObjectNode serializeProperties(
     final Map<String, String> properties) {
