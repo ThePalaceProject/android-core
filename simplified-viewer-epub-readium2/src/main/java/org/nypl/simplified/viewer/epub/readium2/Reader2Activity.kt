@@ -303,24 +303,31 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
           bookID = this.parameters.bookId
         )
 
-      val lastRead = bookmarks.find { bookmark -> bookmark.type == SR2Bookmark.Type.LAST_READ }
       reference.controller.submitCommand(SR2Command.BookmarksLoad(bookmarks))
 
-      if (lastRead != null) {
-        AlertDialog.Builder(this)
-          .setTitle(R.string.reader_position_title)
-          .setMessage(R.string.reader_position_message)
-          .setNegativeButton(R.string.reader_position_move) { dialog, _ ->
-            reference.controller.submitCommand(SR2Command.OpenChapter(lastRead.locator))
-            dialog.dismiss()
-          }
-          .setPositiveButton(R.string.reader_position_stay) { dialog, _ ->
-            val startLocator = reference.controller.bookMetadata.start
-            reference.controller.submitCommand(SR2Command.OpenChapter(startLocator))
-            dialog.dismiss()
-          }
-          .create()
-          .show()
+      val lastReadBookmarks = bookmarks.filter { bookmark ->
+        bookmark.type == SR2Bookmark.Type.LAST_READ
+      }
+
+      // if there's more than one last read bookmark, we'll need to compare their dates
+      if (lastReadBookmarks.size > 1) {
+
+        val localLastReadBookmark = lastReadBookmarks.first()
+        val serverLastReadBookmark = lastReadBookmarks.last()
+
+        if (serverLastReadBookmark.date.isAfter(localLastReadBookmark.date) &&
+          localLastReadBookmark.locator != serverLastReadBookmark.locator
+        ) {
+          showBookmarkPrompt(reference.controller, localLastReadBookmark, serverLastReadBookmark)
+        } else {
+          reference.controller.submitCommand(SR2Command.OpenChapter(localLastReadBookmark.locator))
+        }
+      } else if (lastReadBookmarks.isNotEmpty()) {
+        reference.controller.submitCommand(
+          SR2Command.OpenChapter(
+            lastReadBookmarks.first().locator
+          )
+        )
       } else {
         val startLocator = reference.controller.bookMetadata.start
         reference.controller.submitCommand(SR2Command.OpenChapter(startLocator))
@@ -329,6 +336,57 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       // Refresh whatever the controller was looking at previously.
       reference.controller.submitCommand(SR2Command.Refresh)
     }
+  }
+
+  private fun showBookmarkPrompt(
+    controller: SR2ControllerType,
+    localLastReadBookmark: SR2Bookmark,
+    serverLastReadBookmark: SR2Bookmark
+  ) {
+    AlertDialog.Builder(this)
+      .setTitle(R.string.reader_position_title)
+      .setMessage(R.string.reader_position_message)
+      .setNegativeButton(R.string.reader_position_move) { dialog, _ ->
+        dialog.dismiss()
+        createLocalBookmarkFromPromptAction(
+          bookmark = serverLastReadBookmark
+        )
+        controller.submitCommand(
+          SR2Command.OpenChapter(
+            serverLastReadBookmark.locator
+          )
+        )
+      }
+      .setPositiveButton(R.string.reader_position_stay) { dialog, _ ->
+        dialog.dismiss()
+        createLocalBookmarkFromPromptAction(
+          bookmark = localLastReadBookmark
+        )
+        controller.submitCommand(
+          SR2Command.OpenChapter(
+            localLastReadBookmark.locator
+          )
+        )
+      }
+      .create()
+      .show()
+  }
+
+  private fun createLocalBookmarkFromPromptAction(bookmark: SR2Bookmark) {
+    // we need to create a local bookmark after choosing an option from the prompt because the local
+    // bookmark is no longer created when syncing from the server returns a last read location
+    // bookmark
+    this.bookmarkService.bookmarkCreateLocal(
+      accountID = this.parameters.accountId,
+      bookmark = Reader2Bookmarks.fromSR2Bookmark(
+        bookEntry = this.parameters.entry,
+        deviceId = Reader2Devices.deviceId(
+          this.profilesController,
+          this.parameters.bookId
+        ),
+        source = bookmark
+      )
+    )
   }
 
   override fun onBackPressed() {

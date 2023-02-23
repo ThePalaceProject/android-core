@@ -19,7 +19,8 @@ internal class BServiceOpLoadBookmarks(
   logger: Logger,
   private val profile: ProfileReadableType,
   private val accountID: AccountID,
-  private val book: BookID
+  private val book: BookID,
+  private val lastReadBookmarkServer: Bookmark?
 ) : BServiceOp<Bookmarks>(logger) {
 
   override fun runActual(): Bookmarks {
@@ -67,8 +68,9 @@ internal class BServiceOpLoadBookmarks(
         )
 
         return Bookmarks(
-          lastReadLocation,
-          bookmarks
+          lastReadLocal = lastReadLocation,
+          lastReadServer = lastReadBookmarkServer,
+          bookmarks = bookmarks
         )
       }
     } catch (e: Exception) {
@@ -76,6 +78,6 @@ internal class BServiceOpLoadBookmarks(
     }
 
     this.logger.debug("[{}]: returning empty bookmarks", this.profile.id.uuid)
-    return Bookmarks(null, listOf())
+    return Bookmarks(null, null, listOf())
   }
 }

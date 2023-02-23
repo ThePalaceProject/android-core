@@ -163,50 +163,47 @@ class PdfReaderActivity :
         bookID = this.id
       )
 
-    try {
+    val lastReadBookmarks = bookmarks
+      .filterIsInstance<Bookmark.PDFBookmark>()
+      .filter { bookmark ->
+        bookmark.kind == BookmarkKind.BookmarkLastReadLocation
+      }
 
-      this.entry = books.entry(id)
-      this.handle = entry.findFormatHandle(BookDatabaseEntryFormatHandlePDF::class.java)!!
+    this.uiThread.runOnUIThread {
+      try {
 
-      val bookMarkLastReadPosition = bookmarks
-        .filterIsInstance<Bookmark.PDFBookmark>()
-        .find { bookmark ->
-          bookmark.kind == BookmarkKind.BookmarkLastReadLocation
-        }
+        // if there's more than one last read bookmark, we'll need to compare their dates
+        if (lastReadBookmarks.size > 1) {
 
-      val newPosition = bookMarkLastReadPosition?.pageNumber
-        ?: this.handle.format.lastReadLocation!!.pageNumber
+          val localLastReadBookmark = lastReadBookmarks.first()
+          val serverLastReadBookmark = lastReadBookmarks.last()
 
-      this.uiThread.runOnUIThread {
-
-        if (newPosition != this.documentPageIndex) {
-          AlertDialog.Builder(this)
-            .setTitle(R.string.viewer_position_title)
-            .setMessage(R.string.viewer_position_message)
-            .setNegativeButton(R.string.viewer_position_move) { dialog, _ ->
-              this.documentPageIndex = newPosition
-              completeReaderSetup(
-                savedInstanceState = savedInstanceState
-              )
-              dialog.dismiss()
-            }
-            .setPositiveButton(R.string.viewer_position_stay) { dialog, _ ->
-              completeReaderSetup(
-                savedInstanceState = savedInstanceState
-              )
-              dialog.dismiss()
-            }
-            .create()
-            .show()
+          if (serverLastReadBookmark.time.isAfter(localLastReadBookmark.time) &&
+            serverLastReadBookmark.pageNumber != localLastReadBookmark.pageNumber
+          ) {
+            showBookmarkPrompt(
+              localLastReadBookmark = localLastReadBookmark,
+              serverLastReadBookmark = serverLastReadBookmark,
+              savedInstanceState = savedInstanceState
+            )
+          } else {
+            this.documentPageIndex = localLastReadBookmark.pageNumber
+            completeReaderSetup(
+              savedInstanceState = savedInstanceState
+            )
+          }
+        } else if (lastReadBookmarks.isNotEmpty()) {
+          this.documentPageIndex = lastReadBookmarks.first().pageNumber
+          completeReaderSetup(
+            savedInstanceState = savedInstanceState
+          )
         } else {
           completeReaderSetup(
             savedInstanceState = savedInstanceState
           )
         }
-      }
-    } catch (e: Exception) {
-      log.error("Could not get lastReadLocation, defaulting to the 1st page", e)
-      this.uiThread.runOnUIThread {
+      } catch (e: Exception) {
+        log.error("Could not get lastReadLocation, defaulting to the 1st page", e)
         completeReaderSetup(
           savedInstanceState = savedInstanceState
         )
@@ -249,6 +246,38 @@ class PdfReaderActivity :
       else ->
         pdfFile.inputStream()
     }
+  }
+
+  private fun showBookmarkPrompt(
+    localLastReadBookmark: Bookmark.PDFBookmark,
+    serverLastReadBookmark: Bookmark.PDFBookmark,
+    savedInstanceState: Bundle?
+  ) {
+    AlertDialog.Builder(this)
+      .setTitle(R.string.viewer_position_title)
+      .setMessage(R.string.viewer_position_message)
+      .setNegativeButton(R.string.viewer_position_move) { dialog, _ ->
+        this.documentPageIndex = serverLastReadBookmark.pageNumber
+        dialog.dismiss()
+        createLocalBookmarkFromPromptAction(
+          bookmark = serverLastReadBookmark
+        )
+        completeReaderSetup(
+          savedInstanceState = savedInstanceState
+        )
+      }
+      .setPositiveButton(R.string.viewer_position_stay) { dialog, _ ->
+        this.documentPageIndex = localLastReadBookmark.pageNumber
+        dialog.dismiss()
+        createLocalBookmarkFromPromptAction(
+          bookmark = localLastReadBookmark
+        )
+        completeReaderSetup(
+          savedInstanceState = savedInstanceState
+        )
+      }
+      .create()
+      .show()
   }
 
   private fun completeReaderSetup(savedInstanceState: Bundle?) {
@@ -385,6 +414,16 @@ class PdfReaderActivity :
     onBackPressed()
   }
   //endregion
+
+  private fun createLocalBookmarkFromPromptAction(bookmark: Bookmark.PDFBookmark) {
+    // we need to create a local bookmark after choosing an option from the prompt because the local
+    // bookmark is no longer created when syncing from the server returns a last read location
+    // bookmark
+    this.bookmarkService.bookmarkCreateLocal(
+      accountID = this.accountId,
+      bookmark = bookmark
+    )
+  }
 
   private fun showErrorWithRunnable(
     context: Context,

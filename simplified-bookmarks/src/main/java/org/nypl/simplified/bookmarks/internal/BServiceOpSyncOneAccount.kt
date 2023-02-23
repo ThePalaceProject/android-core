@@ -7,6 +7,8 @@ import org.nypl.simplified.bookmarks.api.BookmarkAnnotation
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotations
 import org.nypl.simplified.bookmarks.api.BookmarkEvent
 import org.nypl.simplified.bookmarks.api.BookmarkHTTPCallsType
+import org.nypl.simplified.bookmarks.api.Bookmarks
+import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.api.bookmark.Bookmark
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle
@@ -24,10 +26,11 @@ internal class BServiceOpSyncOneAccount(
   private val bookmarkEventsOut: Subject<BookmarkEvent>,
   private val objectMapper: ObjectMapper,
   private val profile: ProfileReadableType,
-  private val accountID: AccountID
-) : BServiceOp<Unit>(logger) {
+  private val accountID: AccountID,
+  private val bookID: BookID?
+) : BServiceOp<Bookmark?>(logger) {
 
-  override fun runActual() {
+  override fun runActual(): Bookmark? {
     this.logger.debug(
       "[{}]: syncing account {}",
       this.profile.id.uuid,
@@ -39,7 +42,7 @@ internal class BServiceOpSyncOneAccount(
 
     if (syncable == null) {
       this.logger.error("[{}]: account no longer syncable", this.accountID.uuid)
-      return
+      return null
     }
 
     try {
@@ -55,12 +58,14 @@ internal class BServiceOpSyncOneAccount(
 
     if (!syncable.account.preferences.bookmarkSyncingPermitted) {
       this.logger.debug("[{}]: syncing not permitted", this.accountID.uuid)
-      return
+      return null
     }
 
-    val received = this.readBookmarksFromServer(syncable)
-    this.sendBookmarksToServer(syncable, received)
+    val received = this.readBookmarksFromServer(syncable, bookID)
+    this.sendBookmarksToServer(syncable, received.bookmarks)
     this.bookmarkEventsOut.onNext(BookmarkEvent.BookmarkSyncFinished(syncable.account.id))
+
+    return received.lastReadServer
   }
 
   private fun sendBookmarksToServer(
@@ -125,8 +130,9 @@ internal class BServiceOpSyncOneAccount(
   }
 
   private fun readBookmarksFromServer(
-    syncable: BSyncableAccount
-  ): List<Bookmark> {
+    syncable: BSyncableAccount,
+    bookID: BookID?
+  ): Bookmarks {
     this.bookmarkEventsOut.onNext(BookmarkEvent.BookmarkSyncStarted(syncable.account.id))
 
     val bookmarks: List<Bookmark> =
@@ -144,6 +150,9 @@ internal class BServiceOpSyncOneAccount(
       }
 
     this.logger.debug("[{}]: received {} bookmarks", this.profile.id.uuid, bookmarks.size)
+
+    var serverLastReadBookmark: Bookmark? = null
+
     for (bookmark in bookmarks) {
       try {
         this.logger.debug(
@@ -159,9 +168,15 @@ internal class BServiceOpSyncOneAccount(
             val handle = entry.findFormatHandle(BookDatabaseEntryFormatHandleEPUB::class.java)
             if (handle != null) {
               when (bookmark.kind) {
-                BookmarkKind.BookmarkLastReadLocation ->
-                  handle.setLastReadLocation(bookmark)
-                BookmarkKind.BookmarkExplicit ->
+                BookmarkKind.BookmarkLastReadLocation -> {
+                  // check if it's the last read bookmark for the given book ID
+                  if (bookID != null && bookmark.book == bookID) {
+                    serverLastReadBookmark = bookmark
+                  } else {
+                    handle.setLastReadLocation(bookmark)
+                  }
+                }
+                BookmarkKind.BookmarkExplicit -> {
                   handle.setBookmarks(
                     BServiceBookmarks.normalizeBookmarks(
                       logger = this.logger,
@@ -170,6 +185,7 @@ internal class BServiceOpSyncOneAccount(
                       bookmark = bookmark
                     )
                   )
+                }
               }
 
               this.bookmarkEventsOut.onNext(
@@ -181,11 +197,19 @@ internal class BServiceOpSyncOneAccount(
             }
           }
           is Bookmark.PDFBookmark -> {
-            val handle = entry.findFormatHandle(BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandlePDF::class.java)
+            val handle = entry.findFormatHandle(
+              BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandlePDF::class.java
+            )
             if (handle != null) {
               when (bookmark.kind) {
-                BookmarkKind.BookmarkLastReadLocation ->
-                  handle.setLastReadLocation(bookmark)
+                BookmarkKind.BookmarkLastReadLocation -> {
+                  // check if it's the last read bookmark for the given book ID
+                  if (bookID != null && bookmark.book == bookID) {
+                    serverLastReadBookmark = bookmark
+                  } else {
+                    handle.setLastReadLocation(bookmark)
+                  }
+                }
                 BookmarkKind.BookmarkExplicit -> {
                   handle.setBookmarks(
                     BServiceBookmarks.normalizeBookmarks(
@@ -208,12 +232,15 @@ internal class BServiceOpSyncOneAccount(
           }
           is Bookmark.AudiobookBookmark -> {
             val handle =
-              entry.findFormatHandle(BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook::class.java)
+              entry.findFormatHandle(
+                BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook::class.java
+              )
             if (handle != null) {
               when (bookmark.kind) {
-                BookmarkKind.BookmarkLastReadLocation ->
+                BookmarkKind.BookmarkLastReadLocation -> {
                   handle.setLastReadLocation(bookmark)
-                BookmarkKind.BookmarkExplicit ->
+                }
+                BookmarkKind.BookmarkExplicit -> {
                   handle.setBookmarks(
                     BServiceBookmarks.normalizeBookmarks(
                       logger = this.logger,
@@ -222,6 +249,7 @@ internal class BServiceOpSyncOneAccount(
                       bookmark = bookmark
                     )
                   )
+                }
               }
               this.bookmarkEventsOut.onNext(
                 BookmarkEvent.BookmarkSaved(
@@ -243,7 +271,12 @@ internal class BServiceOpSyncOneAccount(
         )
       }
     }
-    return bookmarks
+
+    return Bookmarks(
+      lastReadLocal = null,
+      lastReadServer = serverLastReadBookmark,
+      bookmarks = bookmarks
+    )
   }
 
   private fun parseBookmarkOrNull(
