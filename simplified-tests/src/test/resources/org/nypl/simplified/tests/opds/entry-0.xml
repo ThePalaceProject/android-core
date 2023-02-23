@@ -41,4 +41,5 @@
     rel="http://opds-spec.org/acquisition/borrow" />
   <link rel="http://librarysimplified.org/terms/rel/revoke"
         href="http://example.com/revoke"/>
+  <link rel="preview" type="application/epub+zip" href="http://example.com/preview"/>
 </entry>

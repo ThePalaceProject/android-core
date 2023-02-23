@@ -65,7 +65,7 @@ public final class OPDSJSONSerializerTest {
         final OPDSAcquisition a0 = e0a.get(index);
         final OPDSAcquisition a1 = e1a.get(index);
         Assertions.assertEquals(a0.getRelation(), a1.getRelation());
-        Assertions.assertEquals(a0.getType().getFullType(), a1.getType().getFullType());
+        Assertions.assertEquals(a0.getType(), a1.getType());
         Assertions.assertEquals(a0.getUri(), a1.getUri());
         Assertions.assertEquals(a0.getIndirectAcquisitions(), a1.getIndirectAcquisitions());
       }
@@ -77,6 +77,7 @@ public final class OPDSJSONSerializerTest {
       Assertions.assertEquals(e0.getGroups(), e1.getGroups());
       Assertions.assertEquals(e0.getID(), e1.getID());
       Assertions.assertEquals(e0.getNarrators(), e1.getNarrators());
+      Assertions.assertEquals(e0.getPreviewAcquisitions(), e1.getPreviewAcquisitions());
       Assertions.assertEquals(e0.getPublished(), e1.getPublished());
       Assertions.assertEquals(e0.getPublisher(), e1.getPublisher());
       Assertions.assertEquals(e0.getSummary(), e1.getSummary());
@@ -119,6 +120,7 @@ public final class OPDSJSONSerializerTest {
         Assertions.assertEquals(e0.getGroups(), e1.getGroups());
         Assertions.assertEquals(e0.getID(), e1.getID());
         Assertions.assertEquals(e0.getNarrators(), e1.getNarrators());
+        Assertions.assertEquals(e0.getPreviewAcquisitions(), e1.getPreviewAcquisitions());
         Assertions.assertEquals(e0.getPublisher(), e1.getPublisher());
         Assertions.assertEquals(e0.getSummary(), e1.getSummary());
         Assertions.assertEquals(e0.getThumbnail(), e1.getThumbnail());
@@ -128,6 +130,51 @@ public final class OPDSJSONSerializerTest {
         // Assert.assertEquals(e0.getUpdated(), e1.getUpdated());
         // Assert.assertEquals(e0.getPublished(), e1.getPublished());
       }
+    }
+  }
+
+  @Test
+  public void testMimeTypes()
+    throws Exception {
+    final OPDSAcquisitionFeedEntryParserType p =
+      OPDSAcquisitionFeedEntryParser.newParser();
+
+    final OPDSJSONParserType jp = OPDSJSONParser.newParser();
+
+    final OPDSJSONSerializerType s = OPDSJSONSerializer.newSerializer();
+
+    final InputStream rs0 =
+      OPDSJSONSerializerTest.getResource("entry-0.xml");
+    final OPDSAcquisitionFeedEntry e0 = p.parseEntryStream(URI.create("urn:test"), rs0);
+
+    final ByteArrayOutputStream bao0 = new ByteArrayOutputStream();
+    s.serializeToStream(s.serializeFeedEntry(e0), bao0);
+
+    final InputStream rs1 = new ByteArrayInputStream(bao0.toByteArray());
+    final OPDSAcquisitionFeedEntry e1 =
+      jp.parseAcquisitionFeedEntryFromStream(rs1);
+
+    final List<OPDSAcquisition> e0a = e0.getAcquisitions();
+    final List<OPDSAcquisition> e1a = e1.getAcquisitions();
+    Assertions.assertEquals(e0a.size(), 1);
+    Assertions.assertEquals(e0a.size(), e1a.size());
+
+    final OPDSAcquisition e0FirstAcquisition = e0a.get(0);
+    final OPDSAcquisition e1FirstAcquisition = e1a.get(0);
+
+    Assertions.assertEquals(e0FirstAcquisition.getType().getSubtype(),
+      e1FirstAcquisition.getType().getSubtype());
+    Assertions.assertEquals(e0FirstAcquisition.getType().getType(),
+      e1FirstAcquisition.getType().getType());
+    Assertions.assertEquals(e0FirstAcquisition.getType().getFullType(),
+      e1FirstAcquisition.getType().getFullType());
+    Assertions.assertEquals(e0FirstAcquisition.getType().getParameters().size(),
+      e1FirstAcquisition.getType().getParameters().size());
+
+    for (String key : e0FirstAcquisition.getType().getParameters().keySet()) {
+      Assertions.assertTrue(e1FirstAcquisition.getType().getParameters().containsKey(key));
+      Assertions.assertEquals(e0FirstAcquisition.getType().getParameters().get(key),
+        e1FirstAcquisition.getType().getParameters().get(key));
     }
   }
 }
