@@ -7,7 +7,9 @@ import android.view.ViewGroup
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.FrameLayout
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import org.nypl.simplified.webview.WebViewUtilities
 
@@ -57,7 +59,7 @@ class BookPreviewEmbeddedFragment : Fragment() {
   private fun configureWebView() {
     webView.apply {
       webViewClient = WebViewClient()
-      webChromeClient = WebChromeClient()
+      webChromeClient = CustomWebChromeClient()
       settings.allowFileAccess = true
       settings.javaScriptEnabled = true
       settings.domStorageEnabled = true
@@ -65,6 +67,37 @@ class BookPreviewEmbeddedFragment : Fragment() {
       WebViewUtilities.setForcedDark(settings, resources.configuration)
 
       loadUrl(requireArguments().getString(BUNDLE_EXTRA_URL).orEmpty())
+    }
+  }
+
+  inner class CustomWebChromeClient : WebChromeClient() {
+    private var fullscreenView: View? = null
+
+    override fun onHideCustomView() {
+      fullscreenView?.isVisible = false
+      webView.isVisible = true
+    }
+
+    override fun onShowCustomView(view: View?, callback: CustomViewCallback?) {
+
+      val decorView = requireActivity().window.decorView as? FrameLayout ?: return
+      webView.isVisible = false
+
+      if (fullscreenView != null) {
+        decorView.removeView(fullscreenView)
+      }
+
+      fullscreenView = view
+
+      decorView.addView(
+        fullscreenView,
+        FrameLayout.LayoutParams(
+          FrameLayout.LayoutParams.MATCH_PARENT,
+          FrameLayout.LayoutParams.MATCH_PARENT
+        )
+      )
+
+      fullscreenView?.isVisible = true
     }
   }
 }
