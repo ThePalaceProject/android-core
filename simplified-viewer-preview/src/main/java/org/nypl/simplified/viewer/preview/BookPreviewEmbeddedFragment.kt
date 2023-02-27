@@ -49,6 +49,13 @@ class BookPreviewEmbeddedFragment : Fragment() {
     configureWebView()
   }
 
+  override fun onDestroyView() {
+    if (::webView.isInitialized) {
+      webView.destroy()
+    }
+    super.onDestroyView()
+  }
+
   private fun configureToolbar() {
     this.toolbar.setNavigationOnClickListener {
       requireActivity().finish()
