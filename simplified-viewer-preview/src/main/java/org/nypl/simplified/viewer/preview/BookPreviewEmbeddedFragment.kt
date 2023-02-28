@@ -9,6 +9,9 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.FrameLayout
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import org.nypl.simplified.webview.WebViewUtilities
@@ -78,11 +81,22 @@ class BookPreviewEmbeddedFragment : Fragment() {
   }
 
   inner class CustomWebChromeClient : WebChromeClient() {
+
+    private val window = requireActivity().window
+    private val windowInsetsController =
+      WindowCompat.getInsetsController(window, window.decorView)
+
     private var fullscreenView: View? = null
+
+    init {
+      windowInsetsController?.systemBarsBehavior =
+        WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+    }
 
     override fun onHideCustomView() {
       fullscreenView?.isVisible = false
       webView.isVisible = true
+      windowInsetsController?.show(WindowInsetsCompat.Type.systemBars())
     }
 
     override fun onShowCustomView(view: View?, callback: CustomViewCallback?) {
@@ -105,6 +119,7 @@ class BookPreviewEmbeddedFragment : Fragment() {
       )
 
       fullscreenView?.isVisible = true
+      windowInsetsController?.hide(WindowInsetsCompat.Type.systemBars())
     }
   }
 }
