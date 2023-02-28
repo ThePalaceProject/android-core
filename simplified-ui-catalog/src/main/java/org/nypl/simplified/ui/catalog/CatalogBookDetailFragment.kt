@@ -696,18 +696,7 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
       }
 
       is BookStatus.Held.HeldReady -> {
-        if (bookStatus.isRevocable) {
-          this.buttons.addView(
-            this.buttonCreator.createRevokeHoldButton(
-              onClick = {
-                this.viewModel.revokeMaybeAuthenticated()
-              }
-            )
-          )
-          this.buttons.addView(this.buttonCreator.createButtonSpace())
-        } else {
-          this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
-        }
+        this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
 
         this.buttons.addView(
           this.buttonCreator.createGetButton(
@@ -717,8 +706,19 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
           )
         )
 
-        // if the book is not revocable, we need to add a dummy button on the right
-        if (!bookStatus.isRevocable) {
+        if (bookStatus.isRevocable) {
+          this.buttons.addView(this.buttonCreator.createButtonSpace())
+
+          this.buttons.addView(
+            this.buttonCreator.createRevokeHoldButton(
+              onClick = {
+                this.viewModel.revokeMaybeAuthenticated()
+              }
+            )
+          )
+        } else {
+
+          // if the book is not revocable, we need to add a dummy button on the right
           this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
         }
       }
