@@ -13,6 +13,7 @@
         android:background="?attr/simplifiedColorBackground"
         android:minHeight="?attr/actionBarSize"
         android:padding="0dp"
+        android:theme="?android:attr/actionBarTheme"
         app:navigationIcon="@drawable/back"
         app:titleTextColor="?attr/simplifiedColorText"
         tools:title="Placeholder" />
