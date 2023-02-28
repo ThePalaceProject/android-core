@@ -63,7 +63,7 @@ internal object AudioBookHelpers {
         .get(15L, TimeUnit.SECONDS)
     } catch (e: Exception) {
       this.logger.error("could not load bookmarks: ", e)
-      Bookmarks(null, emptyList())
+      Bookmarks(null, null, emptyList())
     }
   }
 
@@ -82,7 +82,10 @@ internal object AudioBookHelpers {
         accountID = accountID,
         bookID = bookID
       )
-    val lastRead = rawBookmarks.lastRead
+
+    // for now we'll keep the existing behavior and ignore the "lastReadServer" field that is always
+    // null for the audiobook bookmarks
+    val lastRead = rawBookmarks.lastReadLocal
     val explicits = rawBookmarks.bookmarks
 
     val results = mutableListOf<Bookmark>()

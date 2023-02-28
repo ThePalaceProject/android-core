@@ -12,6 +12,7 @@ import java.io.Serializable
  */
 
 data class Bookmarks(
-  val lastRead: Bookmark?,
+  val lastReadLocal: Bookmark?,
+  val lastReadServer: Bookmark?,
   val bookmarks: List<Bookmark>
 ) : Serializable
