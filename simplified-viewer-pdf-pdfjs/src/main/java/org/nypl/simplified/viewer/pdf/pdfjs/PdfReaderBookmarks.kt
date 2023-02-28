@@ -24,7 +24,7 @@ internal object PdfReaderBookmarks {
         .get(15L, TimeUnit.SECONDS)
     } catch (e: Exception) {
       this.logger.error("could not load bookmarks: ", e)
-      Bookmarks(null, emptyList())
+      Bookmarks(null, null, emptyList())
     }
   }
 
@@ -43,11 +43,13 @@ internal object PdfReaderBookmarks {
         accountID = accountID,
         bookID = bookID
       )
-    val lastRead = rawBookmarks.lastRead
+    val lastReadLocal = rawBookmarks.lastReadLocal
+    val lastReadServer = rawBookmarks.lastReadServer
     val explicits = rawBookmarks.bookmarks
 
     val results = mutableListOf<Bookmark>()
-    lastRead?.let(results::add)
+    lastReadLocal?.let(results::add)
+    lastReadServer?.let(results::add)
     results.addAll(explicits)
     return results.toList()
   }

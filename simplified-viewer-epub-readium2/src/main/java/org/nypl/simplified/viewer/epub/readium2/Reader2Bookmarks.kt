@@ -34,7 +34,7 @@ object Reader2Bookmarks {
         .get(15L, TimeUnit.SECONDS)
     } catch (e: Exception) {
       this.logger.error("could not load bookmarks: ", e)
-      Bookmarks(null, emptyList())
+      Bookmarks(null, null, emptyList())
     }
   }
 
@@ -53,13 +53,16 @@ object Reader2Bookmarks {
         accountID = accountID,
         bookID = bookID
       )
-    val lastRead =
-      rawBookmarks.lastRead?.let { this.toSR2Bookmark(it) }
+    val lastReadLocal =
+      rawBookmarks.lastReadLocal?.let { this.toSR2Bookmark(it) }
+    val lastReadServer =
+      rawBookmarks.lastReadServer?.let { this.toSR2Bookmark(it) }
     val explicits =
       rawBookmarks.bookmarks.mapNotNull { this.toSR2Bookmark(it) }
 
     val results = mutableListOf<SR2Bookmark>()
-    lastRead?.let(results::add)
+    lastReadLocal?.let(results::add)
+    lastReadServer?.let(results::add)
     results.addAll(explicits)
     return results.toList()
   }

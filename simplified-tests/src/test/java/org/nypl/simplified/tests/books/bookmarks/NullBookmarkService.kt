@@ -23,15 +23,16 @@ class NullBookmarkService(
   override val bookmarkEvents: Observable<BookmarkEvent>
     get() = this.events
 
-  override fun bookmarkSyncAccount(accountID: AccountID): FluentFuture<Unit> {
-    return FluentFuture.from(Futures.immediateFuture(Unit))
+  override fun bookmarkSyncAccount(accountID: AccountID, bookID: BookID): FluentFuture<Bookmark?> {
+    return FluentFuture.from(null)
   }
 
   override fun bookmarkSyncAndLoad(accountID: AccountID, book: BookID): FluentFuture<Bookmarks> {
     return FluentFuture.from(
       Futures.immediateFuture(
         Bookmarks(
-          lastRead = null,
+          lastReadLocal = null,
+          lastReadServer = null,
           bookmarks = listOf()
         )
       )
@@ -58,11 +59,16 @@ class NullBookmarkService(
     return FluentFuture.from(Futures.immediateFuture(Unit))
   }
 
-  override fun bookmarkLoad(accountID: AccountID, book: BookID): FluentFuture<Bookmarks> {
+  override fun bookmarkLoad(
+    accountID: AccountID,
+    book: BookID,
+    lastReadBookmarkServer: Bookmark?
+  ): FluentFuture<Bookmarks> {
     return FluentFuture.from(
       Futures.immediateFuture(
         Bookmarks(
-          lastRead = null,
+          lastReadLocal = null,
+          lastReadServer = null,
           bookmarks = listOf()
         )
       )
