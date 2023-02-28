@@ -268,7 +268,7 @@
         <c:change date="2023-01-27T00:00:00+00:00" summary="Updated audiobook sleep timer stored value so the can be resumed instead of recreated when reopening an audiobook."/>
         <c:change date="2023-02-13T00:00:00+00:00" summary="Added support for book previews."/>
         <c:change date="2023-02-20T00:00:00+00:00" summary="Fixed some audio books not appearing in the bookshelf when offline."/>
-        <c:change date="2023-02-23T19:27:04+00:00" summary="Change position of 'Remove' button."/>
+        <c:change date="2023-02-23T19:27:04+00:00" summary="Moved 'Remove' button after 'Get' button on Reservations screen."/>
       </c:changes>
     </c:release>
   </c:releases>
