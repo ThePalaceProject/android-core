@@ -400,18 +400,6 @@ class CatalogPagedViewHolder(
     this.setVisibilityIfNecessary(this.progress, View.GONE)
 
     this.idleButtons.removeAllViews()
-    if (status.isRevocable) {
-      this.idleButtons.addView(
-        this.buttonCreator.createRevokeHoldButton(
-          onClick = {
-            this.listener.revokeMaybeAuthenticated(book)
-          }
-        )
-      )
-      this.idleButtons.addView(
-        this.buttonCreator.createButtonSpace()
-      )
-    }
     this.idleButtons.addView(
       this.buttonCreator.createGetButton(
         onClick = {
@@ -419,6 +407,19 @@ class CatalogPagedViewHolder(
         }
       )
     )
+
+    if (status.isRevocable) {
+      this.idleButtons.addView(
+        this.buttonCreator.createButtonSpace()
+      )
+      this.idleButtons.addView(
+        this.buttonCreator.createRevokeHoldButton(
+          onClick = {
+            this.listener.revokeMaybeAuthenticated(book)
+          }
+        )
+      )
+    }
   }
 
   private fun onBookStatusHeldInQueue(
