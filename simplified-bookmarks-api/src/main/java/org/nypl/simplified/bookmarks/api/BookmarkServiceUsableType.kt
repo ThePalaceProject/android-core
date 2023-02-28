@@ -40,8 +40,9 @@ interface BookmarkServiceUsableType {
    * Sync the bookmarks for the given account.
    */
   fun bookmarkSyncAccount(
-    accountID: AccountID
-  ): FluentFuture<Unit>
+    accountID: AccountID,
+    bookID: BookID
+  ): FluentFuture<Bookmark?>
 
   /**
    * Sync the bookmarks for the given account, and load bookmarks for the given book.
@@ -57,7 +58,8 @@ interface BookmarkServiceUsableType {
 
   fun bookmarkLoad(
     accountID: AccountID,
-    book: BookID
+    book: BookID,
+    lastReadBookmarkServer: Bookmark?
   ): FluentFuture<Bookmarks>
 
   /**

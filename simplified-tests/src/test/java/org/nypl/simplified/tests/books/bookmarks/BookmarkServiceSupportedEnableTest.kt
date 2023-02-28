@@ -286,7 +286,8 @@ class BookmarkServiceSupportedEnableTest {
     try {
       service.bookmarkLoad(
         accountID = profiles.profileList[0].accountList[0].id,
-        book = BookID.create("x")
+        book = BookID.create("x"),
+        lastReadBookmarkServer = null
       ).get(3L, TimeUnit.SECONDS)
     } catch (e: Exception) {
       // Not a problem

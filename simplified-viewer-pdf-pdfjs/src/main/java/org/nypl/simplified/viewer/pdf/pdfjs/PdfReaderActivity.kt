@@ -105,29 +105,31 @@ class PdfReaderActivity : AppCompatActivity() {
     val backgroundThread = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(1))
 
     backgroundThread.execute {
-      restoreSavedPosition()
+      restoreSavedPosition(
+        params = params,
+        isSavedInstanceStateNull = savedInstanceState == null
+      )
+    }
+  }
 
-      this.uiThread.runOnUIThread {
-        this.loadingBar.visibility = View.GONE
+  private fun completeReaderSetup(params: PdfReaderParameters, isSavedInstanceStateNull: Boolean) {
+    this.loadingBar.visibility = View.GONE
 
-        if (savedInstanceState == null) {
-          createWebView()
-          createPdfServer(params.drmInfo, params.pdfFile)
+    if (isSavedInstanceStateNull) {
+      createWebView()
+      createPdfServer(params.drmInfo, params.pdfFile)
 
-          this.pdfServer?.let {
-            it.start()
+      this.pdfServer?.let {
+        it.start()
 
-            this.webView.loadUrl(
-              "http://localhost:${it.port}/assets/pdf-viewer/viewer.html?file=%2Fbook.pdf#page=${this.documentPageIndex}"
-            )
-          }
-        }
+        this.webView.loadUrl(
+          "http://localhost:${it.port}/assets/pdf-viewer/viewer.html?file=%2Fbook.pdf#page=${this.documentPageIndex}"
+        )
       }
     }
   }
 
-  private fun restoreSavedPosition() {
-
+  private fun restoreSavedPosition(params: PdfReaderParameters, isSavedInstanceStateNull: Boolean) {
     val bookmarks =
       PdfReaderBookmarks.loadBookmarks(
         bookmarkService = this.bookmarkService,
@@ -135,26 +137,93 @@ class PdfReaderActivity : AppCompatActivity() {
         bookID = this.bookID
       )
 
-    try {
-      val books =
-        services.requireService(ProfilesControllerType::class.java)
-          .profileCurrent()
-          .account(this.accountId)
-          .bookDatabase
-      val entry = books.entry(this.bookID)
-      this.handle = entry.findFormatHandle(BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandlePDF::class.java)!!
+    val lastReadBookmarks = bookmarks
+      .filterIsInstance<Bookmark.PDFBookmark>()
+      .filter { bookmark ->
+        bookmark.kind == BookmarkKind.BookmarkLastReadLocation
+      }
 
-      val bookMarkLastReadPosition = bookmarks
-        .filterIsInstance<Bookmark.PDFBookmark>()
-        .find { bookmark ->
-          bookmark.kind == BookmarkKind.BookmarkLastReadLocation
+    this.uiThread.runOnUIThread {
+
+      try {
+        // if there's more than one last read bookmark, we'll need to compare their dates
+        if (lastReadBookmarks.size > 1) {
+
+          val localLastReadBookmark = lastReadBookmarks.first()
+          val serverLastReadBookmark = lastReadBookmarks.last()
+
+          if (serverLastReadBookmark.time.isAfter(localLastReadBookmark.time) &&
+            localLastReadBookmark.pageNumber != serverLastReadBookmark.pageNumber
+          ) {
+            showBookmarkPrompt(
+              localLastReadBookmark = localLastReadBookmark,
+              serverLastReadBookmark = serverLastReadBookmark,
+              params = params,
+              isSavedInstanceStateNull = isSavedInstanceStateNull
+            )
+          } else {
+            this.documentPageIndex = lastReadBookmarks.first().pageNumber
+            completeReaderSetup(
+              params = params,
+              isSavedInstanceStateNull = isSavedInstanceStateNull
+            )
+          }
+        } else if (lastReadBookmarks.isNotEmpty()) {
+          this.documentPageIndex = lastReadBookmarks.first().pageNumber
+
+          completeReaderSetup(
+            params = params,
+            isSavedInstanceStateNull = isSavedInstanceStateNull
+          )
+        } else {
+          completeReaderSetup(
+            params = params,
+            isSavedInstanceStateNull = isSavedInstanceStateNull
+          )
         }
-
-      this.documentPageIndex =
-        bookMarkLastReadPosition?.pageNumber ?: this.handle.format.lastReadLocation!!.pageNumber
-    } catch (e: Exception) {
-      log.error("Could not get lastReadLocation, defaulting to the 1st page", e)
+      } catch (e: Exception) {
+        log.error("Could not get lastReadLocation, defaulting to the 1st page", e)
+        completeReaderSetup(
+          params = params,
+          isSavedInstanceStateNull = isSavedInstanceStateNull
+        )
+      }
     }
+  }
+
+  private fun showBookmarkPrompt(
+    localLastReadBookmark: Bookmark.PDFBookmark,
+    serverLastReadBookmark: Bookmark.PDFBookmark,
+    params: PdfReaderParameters,
+    isSavedInstanceStateNull: Boolean
+  ) {
+    AlertDialog.Builder(this)
+      .setTitle(R.string.viewer_position_title)
+      .setMessage(R.string.viewer_position_message)
+      .setNegativeButton(R.string.viewer_position_move) { dialog, _ ->
+        this.documentPageIndex = serverLastReadBookmark.pageNumber
+        dialog.dismiss()
+        createLocalBookmarkFromPromptAction(
+          bookmark = serverLastReadBookmark
+        )
+        completeReaderSetup(
+          params = params,
+          isSavedInstanceStateNull = isSavedInstanceStateNull
+        )
+      }
+      .setPositiveButton(R.string.viewer_position_stay) { dialog, _ ->
+        this.documentPageIndex = localLastReadBookmark.pageNumber
+        dialog.dismiss()
+        createLocalBookmarkFromPromptAction(
+          bookmark = localLastReadBookmark
+        )
+        completeReaderSetup(
+          params = params,
+          isSavedInstanceStateNull = isSavedInstanceStateNull
+        )
+      }
+      .create()
+      .show()
   }
 
   private fun createToolbar(title: String) {
@@ -307,6 +376,16 @@ class PdfReaderActivity : AppCompatActivity() {
     )
 
     this.bookmarkService.bookmarkCreateRemote(
+      accountID = this.accountId,
+      bookmark = bookmark
+    )
+  }
+
+  private fun createLocalBookmarkFromPromptAction(bookmark: Bookmark.PDFBookmark) {
+    // we need to create a local bookmark after choosing an option from the prompt because the local
+    // bookmark is no longer created when syncing from the server returns a last read location
+    // bookmark
+    this.bookmarkService.bookmarkCreateLocal(
       accountID = this.accountId,
       bookmark = bookmark
     )

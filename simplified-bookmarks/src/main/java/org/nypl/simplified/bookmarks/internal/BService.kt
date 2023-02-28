@@ -252,8 +252,9 @@ class BService(
   }
 
   override fun bookmarkSyncAccount(
-    accountID: AccountID
-  ): FluentFuture<Unit> {
+    accountID: AccountID,
+    bookID: BookID
+  ): FluentFuture<Bookmark?> {
     return try {
       FluentFuture.from(
         this.executor.submit(
@@ -263,7 +264,8 @@ class BService(
             this.bookmarkEventsOut,
             this.objectMapper,
             this.profilesController.profileCurrent(),
-            accountID
+            accountID,
+            bookID
           )
         )
       )
@@ -277,10 +279,10 @@ class BService(
     accountID: AccountID,
     book: BookID
   ): FluentFuture<Bookmarks> {
-    return this.bookmarkSyncAccount(accountID)
+    return this.bookmarkSyncAccount(accountID, book)
       .transformAsync(
-        {
-          this.bookmarkLoad(accountID, book)
+        { lastReadServer ->
+          this.bookmarkLoad(accountID, book, lastReadServer)
         },
         this.executor
       )
@@ -288,7 +290,7 @@ class BService(
         Exception::class.java,
         {
           // If sync fails, continue to load the local bookmarks.
-          this.bookmarkLoad(accountID, book)
+          this.bookmarkLoad(accountID, book, null)
         },
         this.executor
       )
@@ -296,7 +298,8 @@ class BService(
 
   override fun bookmarkLoad(
     accountID: AccountID,
-    book: BookID
+    book: BookID,
+    lastReadBookmarkServer: Bookmark?
   ): FluentFuture<Bookmarks> {
     return try {
       FluentFuture.from(
@@ -305,7 +308,8 @@ class BService(
             logger = this.logger,
             accountID = accountID,
             profile = profilesController.profileCurrent(),
-            book = book
+            book = book,
+            lastReadBookmarkServer = lastReadBookmarkServer
           )
         )
       )
