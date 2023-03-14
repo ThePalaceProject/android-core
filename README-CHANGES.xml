@@ -256,7 +256,7 @@
         <c:change date="2022-11-29T00:00:00+00:00" summary="Fixed audiobooks not pausing when headphones are unplugged."/>
       </c:changes>
     </c:release>
-    <c:release date="2023-03-14T22:04:49+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.4.0">
+    <c:release date="2023-03-14T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.4.0">
       <c:changes>
         <c:change date="2022-12-12T00:00:00+00:00" summary="Changed the color of enabled switches to green."/>
         <c:change date="2022-12-15T00:00:00+00:00" summary="Added &quot;About Palace&quot; to the Documentation available on the Settings screen."/>
@@ -269,6 +269,9 @@
         <c:change date="2023-02-23T00:00:00+00:00" summary="Added a prompt to move to the reading position saved from another device when opening a book."/>
         <c:change date="2023-02-28T00:00:00+00:00" summary="Moved the 'Remove' button after the 'Get' button on the Reservations screen."/>
       </c:changes>
+    </c:release>
+    <c:release date="2023-03-14T23:06:06+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.5.0">
+      <c:changes/>
     </c:release>
   </c:releases>
   <c:ticket-systems>
