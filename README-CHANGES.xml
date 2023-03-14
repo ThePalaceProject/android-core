@@ -258,19 +258,16 @@
     </c:release>
     <c:release date="2023-02-28T17:24:40+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.4.0">
       <c:changes>
-        <c:change date="2022-12-12T00:00:00+00:00" summary="Changed the Switch's enabled color to green."/>
-        <c:change date="2022-12-14T00:00:00+00:00" summary="Downgraded Gradle version."/>
-        <c:change date="2022-12-15T00:00:00+00:00" summary="Added &quot;About Palace&quot; option to Settings screen."/>
-        <c:change date="2023-01-11T00:00:00+00:00" summary="Added ability to open the app when clicking on the audiobook's player notification."/>
-        <c:change date="2023-01-13T00:00:00+00:00" summary="Added the ability to hide the toolbar and show the PDF title when pressing the PDF's webview."/>
-        <c:change date="2023-01-17T00:00:00+00:00" summary="Added sleepTimers to profile preferences so the user can save all audiobook's current sleep timers."/>
-        <c:change date="2023-01-18T00:00:00+00:00" summary="Display the search query on the search bar."/>
-        <c:change date="2023-01-27T00:00:00+00:00" summary="Updated audiobook sleep timer stored value so the can be resumed instead of recreated when reopening an audiobook."/>
-        <c:change date="2023-02-13T00:00:00+00:00" summary="Added support for book previews."/>
+        <c:change date="2022-12-12T00:00:00+00:00" summary="Changed the color of enabled switches to green."/>
+        <c:change date="2022-12-15T00:00:00+00:00" summary="Added &quot;About Palace&quot; to the Documentation available on the Settings screen."/>
+        <c:change date="2023-01-11T00:00:00+00:00" summary="Added the ability to open the app by clicking on an audio book player notification."/>
+        <c:change date="2023-01-13T00:00:00+00:00" summary="Added the ability to toggle the toolbar and title when reading a PDF by clicking on the page."/>
+        <c:change date="2023-01-17T00:00:00+00:00" summary="Fixed audiobook sleep timers not being restored when exiting and restarting the app."/>
+        <c:change date="2023-01-18T00:00:00+00:00" summary="Added display of the search query on search result screens."/>
+        <c:change date="2023-02-13T00:00:00+00:00" summary="Added support for viewing book preview samples."/>
         <c:change date="2023-02-20T00:00:00+00:00" summary="Fixed some audio books not appearing in the bookshelf when offline."/>
-        <c:change date="2023-02-23T00:00:00+00:00" summary="Added prompt to move to the last reading position or stay on current one."/>
-        <c:change date="2023-02-28T00:00:00+00:00" summary="Moved 'Remove' button after 'Get' button on Reservations screen."/>
-        <c:change date="2023-02-28T17:24:40+00:00" summary="Fixed book preview webview commands not working."/>
+        <c:change date="2023-02-23T00:00:00+00:00" summary="Added a prompt to move to the reading position saved from another device when opening a book."/>
+        <c:change date="2023-02-28T00:00:00+00:00" summary="Moved the 'Remove' button after the 'Get' button on the Reservations screen."/>
       </c:changes>
     </c:release>
   </c:releases>
