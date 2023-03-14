@@ -256,7 +256,7 @@
         <c:change date="2022-11-29T00:00:00+00:00" summary="Fixed audiobooks not pausing when headphones are unplugged."/>
       </c:changes>
     </c:release>
-    <c:release date="2023-02-28T17:24:40+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.4.0">
+    <c:release date="2023-03-14T22:04:49+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.4.0">
       <c:changes>
         <c:change date="2022-12-12T00:00:00+00:00" summary="Changed the color of enabled switches to green."/>
         <c:change date="2022-12-15T00:00:00+00:00" summary="Added &quot;About Palace&quot; to the Documentation available on the Settings screen."/>
