@@ -18,7 +18,7 @@ jobs:
       - name: Finish release
         run: .ci/ci-release-finish.sh --tag
       - name: Create GitHub release
-        uses: actions/create-release@v1
+        uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_NOTES_PATH: ${{ env.RELEASE_NOTES_PATH }}
@@ -26,7 +26,7 @@ jobs:
           VERSION_NUM: ${{ env.VERSION_NUM }}
         with:
           tag_name: ${{ env.TAG_NAME }}
-          release_name: ${{ env.VERSION_NUM }}
+          name: ${{ env.VERSION_NUM }}
           body_path: ${{ env.RELEASE_NOTES_PATH }}
           draft: false
       - name: Build
