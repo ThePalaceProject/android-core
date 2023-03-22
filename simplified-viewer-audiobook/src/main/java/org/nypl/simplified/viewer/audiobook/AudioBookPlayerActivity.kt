@@ -353,6 +353,81 @@ class AudioBookPlayerActivity :
     }
   }
 
+  private fun savePlayerPosition(event: PlayerEventPlaybackStarted) {
+    try {
+      val bookmark = Bookmark.AudiobookBookmark.create(
+        opdsId = this.parameters.opdsEntry.id,
+        location = PlayerPosition(
+          title = event.spineElement.position.title,
+          part = event.spineElement.position.part,
+          chapter = event.spineElement.position.chapter,
+          offsetMilliseconds = event.offsetMilliseconds
+        ),
+        duration = event.spineElement.duration?.millis ?: 0L,
+        kind = BookmarkKind.BookmarkLastReadLocation,
+        time = DateTime.now(),
+        deviceID = AudioBookDevices.deviceId(this.profilesController, this.parameters.bookID),
+        uri = null
+      )
+      this.bookmarkService.bookmarkCreateRemote(
+        accountID = this.parameters.accountID,
+        bookmark = bookmark
+      )
+    } catch (e: Exception) {
+      this.log.error("could not save player position: ", e)
+    }
+  }
+
+  private fun savePlayerPosition(event: PlayerEventPlaybackPaused) {
+    try {
+      val bookmark = Bookmark.AudiobookBookmark.create(
+        opdsId = this.parameters.opdsEntry.id,
+        location = PlayerPosition(
+          title = event.spineElement.position.title,
+          part = event.spineElement.position.part,
+          chapter = event.spineElement.position.chapter,
+          offsetMilliseconds = event.offsetMilliseconds
+        ),
+        duration = event.spineElement.duration?.millis ?: 0L,
+        kind = BookmarkKind.BookmarkLastReadLocation,
+        time = DateTime.now(),
+        deviceID = AudioBookDevices.deviceId(this.profilesController, this.parameters.bookID),
+        uri = null
+      )
+      this.bookmarkService.bookmarkCreateRemote(
+        accountID = this.parameters.accountID,
+        bookmark = bookmark
+      )
+    } catch (e: Exception) {
+      this.log.error("could not save player position: ", e)
+    }
+  }
+  private fun savePlayerPosition(event: PlayerEventPlaybackStopped) {
+    try {
+      val bookmark = Bookmark.AudiobookBookmark.create(
+        opdsId = this.parameters.opdsEntry.id,
+        location = PlayerPosition(
+          title = event.spineElement.position.title,
+          part = event.spineElement.position.part,
+          chapter = event.spineElement.position.chapter,
+          offsetMilliseconds = event.offsetMilliseconds
+        ),
+        duration = event.spineElement.duration?.millis ?: 0L,
+        kind = BookmarkKind.BookmarkLastReadLocation,
+        time = DateTime.now(),
+        deviceID = AudioBookDevices.deviceId(this.profilesController, this.parameters.bookID),
+        uri = null
+      )
+      this.bookmarkService.bookmarkCreateRemote(
+        accountID = this.parameters.accountID,
+        bookmark = bookmark
+      )
+    } catch (e: Exception) {
+      this.log.error("could not save player position: ", e)
+    }
+  }
+
+
   override fun onLoadingFragmentWantsIOExecutor(): ListeningExecutorService {
     return this.downloadExecutor
   }
@@ -648,11 +723,20 @@ class AudioBookPlayerActivity :
         this.savePlayerPosition(event)
       }
 
-      is PlayerEventPlaybackStarted,
+      is PlayerEventPlaybackStarted -> {
+        this.savePlayerPosition(event)
+      }
+
+      is PlayerEventPlaybackPaused  -> {
+        this.savePlayerPosition(event)
+      }
+
+      is PlayerEventPlaybackStopped  -> {
+        this.savePlayerPosition(event)
+      }
+
       is PlayerEventPlaybackBuffering,
       is PlayerEventPlaybackProgressUpdate,
-      is PlayerEventPlaybackPaused,
-      is PlayerEventPlaybackStopped,
       is PlayerEventPlaybackWaitingForAction -> {
       }
 
