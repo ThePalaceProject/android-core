@@ -383,7 +383,8 @@ object BookmarkAnnotationsJSON {
     val objectNode = objectMapper.createObjectNode()
     objectNode.put("@type", "LocatorAudioBookTime")
     objectNode.put("chapter", bookmark.location.chapter)
-    objectNode.put("time", bookmark.location.offsetMilliseconds)
+    objectNode.put("startOffset", bookmark.location.startOffset)
+    objectNode.put("time", bookmark.location.currentOffset)
     objectNode.put("part", bookmark.location.part)
     objectNode.put("title", bookmark.location.title.orEmpty())
 
@@ -405,9 +406,12 @@ object BookmarkAnnotationsJSON {
     val obj =
       JSONParserUtilities.checkObject(null, node)
 
+    val startOffset = JSONParserUtilities.getInteger(obj, "startOffset").toLong()
+
     return PlayerPosition(
       chapter = JSONParserUtilities.getIntegerDefault(obj, "chapter", 0),
-      offsetMilliseconds = JSONParserUtilities.getInteger(obj, "time").toLong(),
+      startOffset = startOffset,
+      currentOffset = JSONParserUtilities.getInteger(obj, "time").toLong() - startOffset,
       part = JSONParserUtilities.getIntegerDefault(obj, "part", 0),
       title = JSONParserUtilities.getStringOrNull(obj, "title")
     )
