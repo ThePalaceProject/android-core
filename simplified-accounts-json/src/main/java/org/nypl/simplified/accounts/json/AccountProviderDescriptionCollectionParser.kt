@@ -116,7 +116,7 @@ class AccountProviderDescriptionCollectionParser internal constructor(
       description = catalog.metadata.description,
       updated = updated!!,
       links = catalog.links,
-      images = listOf(),
+      images = catalog.images,
       isAutomatic = catalog.metadata.isAutomatic,
       isProduction = catalog.metadata.isProduction,
       location = location

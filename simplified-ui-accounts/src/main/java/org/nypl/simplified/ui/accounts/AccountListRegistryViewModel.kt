@@ -23,7 +23,6 @@ import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
-import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.threads.NamedThreadPools
 import org.slf4j.LoggerFactory
 import java.net.URI
@@ -150,30 +149,8 @@ class AccountListRegistryViewModel(private val locationManager: LocationManager)
    */
 
   fun determineAvailableAccountProviderDescriptions() {
-
     val accountListToDisplay = updateListToDisplay()
     accountProvidersList.onNext(accountListToDisplay)
-
-    this.backgroundExecutor.execute {
-
-      accountListToDisplay.filterNotNull().forEach {
-        val result = accountRegistry.resolve(
-          { _, _ -> },
-          it
-        )
-
-        when (result) {
-          is TaskResult.Success -> {
-            this.logger.debug("successfully resolved the account provider")
-          }
-          is TaskResult.Failure -> {
-            this.logger.error("failed to resolve account provider: ", result.exception)
-          }
-        }
-      }
-
-      accountProvidersList.onNext(updateListToDisplay())
-    }
   }
 
   private fun updateListToDisplay(): List<AccountProviderDescription?> {

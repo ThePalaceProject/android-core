@@ -270,8 +270,10 @@
         <c:change date="2023-02-28T00:00:00+00:00" summary="Moved the 'Remove' button after the 'Get' button on the Reservations screen."/>
       </c:changes>
     </c:release>
-    <c:release date="2023-03-14T23:06:06+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.5.0">
-      <c:changes/>
+    <c:release date="2023-03-28T18:49:54+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.5.0">
+      <c:changes>
+        <c:change date="2023-03-28T18:49:54+00:00" summary="Updated library logos loading source in registry feed."/>
+      </c:changes>
     </c:release>
   </c:releases>
   <c:ticket-systems>
