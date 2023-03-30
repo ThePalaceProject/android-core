@@ -271,10 +271,9 @@
       </c:changes>
     </c:release>
     <c:release date="2023-03-14T23:06:06+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.5.0">
-      <c:changes/>
-    </c:release>
-    <c:release date="2023-03-14T23:06:06+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.5.1">
+      <c:changes>
         <c:change date="2023-03-30T00:00:00+00:00" summary="Save reading position of audiobooks on play, pause, and stop (which also includes when seeking and changing chapters)."/>
+      </c:changes>
     </c:release>
   </c:releases>
   <c:ticket-systems>
