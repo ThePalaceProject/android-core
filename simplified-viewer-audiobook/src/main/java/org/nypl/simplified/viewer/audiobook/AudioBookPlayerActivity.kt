@@ -363,7 +363,6 @@ class AudioBookPlayerActivity :
           bookmark = bookmark
         )
       }
-
     } catch (e: Exception) {
       this.log.error("could not save player position: ", e)
     }
