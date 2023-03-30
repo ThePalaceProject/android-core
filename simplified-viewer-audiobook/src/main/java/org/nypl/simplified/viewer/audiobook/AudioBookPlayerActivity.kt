@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.util.Log
 import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -320,7 +319,6 @@ class AudioBookPlayerActivity :
   }
 
   private fun savePlayerPosition(event: PlayerEventCreateBookmark) {
-    Log.d("savePlayerPosition", "bookmark created");
     savePlayerPosition(event as PlayerEvent.PlayerEventWithSpineElement, event.offsetMilliseconds)
   }
 
