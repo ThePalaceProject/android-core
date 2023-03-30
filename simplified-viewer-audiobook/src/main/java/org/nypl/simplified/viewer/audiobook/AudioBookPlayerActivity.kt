@@ -667,11 +667,11 @@ class AudioBookPlayerActivity :
         this.savePlayerPosition(event)
       }
 
-      is PlayerEventPlaybackPaused  -> {
+      is PlayerEventPlaybackPaused -> {
         this.savePlayerPosition(event)
       }
 
-      is PlayerEventPlaybackStopped  -> {
+      is PlayerEventPlaybackStopped -> {
         this.savePlayerPosition(event)
       }
 
