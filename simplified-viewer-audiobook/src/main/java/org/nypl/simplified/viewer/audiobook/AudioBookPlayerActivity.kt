@@ -319,30 +319,15 @@ class AudioBookPlayerActivity :
   }
 
   private fun savePlayerPosition(event: PlayerEventCreateBookmark) {
-    savePlayerPosition(event as PlayerEvent.PlayerEventWithSpineElement, event.offsetMilliseconds)
-  }
-
-  private fun savePlayerPosition(event: PlayerEventPlaybackStarted) {
-    savePlayerPosition(event as PlayerEvent.PlayerEventWithSpineElement, event.offsetMilliseconds)
-  }
-
-  private fun savePlayerPosition(event: PlayerEventPlaybackPaused) {
-    savePlayerPosition(event as PlayerEvent.PlayerEventWithSpineElement, event.offsetMilliseconds)
-  }
-
-  private fun savePlayerPosition(event: PlayerEventPlaybackStopped) {
-    savePlayerPosition(event as PlayerEvent.PlayerEventWithSpineElement, event.offsetMilliseconds)
-  }
-
-  private fun savePlayerPosition(event: PlayerEvent.PlayerEventWithSpineElement, offsetMilliseconds: Long) {
     try {
+
       val bookmark = Bookmark.AudiobookBookmark.create(
         opdsId = this.parameters.opdsEntry.id,
         location = PlayerPosition(
           title = event.spineElement.position.title,
           part = event.spineElement.position.part,
           chapter = event.spineElement.position.chapter,
-          offsetMilliseconds = offsetMilliseconds
+          offsetMilliseconds = event.offsetMilliseconds
         ),
         duration = event.spineElement.duration?.millis ?: 0L,
         kind = BookmarkKind.BookmarkLastReadLocation,
@@ -351,7 +336,7 @@ class AudioBookPlayerActivity :
         uri = null
       )
 
-      if (event is PlayerEventCreateBookmark && event.isLocalBookmark) {
+      if (event.isLocalBookmark) {
         lastLocalBookmark = bookmark
         this.bookmarkService.bookmarkCreateLocal(
           accountID = this.parameters.accountID,
@@ -664,15 +649,18 @@ class AudioBookPlayerActivity :
       }
 
       is PlayerEventPlaybackStarted -> {
-        this.savePlayerPosition(event)
+        this.savePlayerPosition(PlayerEventCreateBookmark(event.spineElement, event.offsetMilliseconds,
+          isLocalBookmark = false))
       }
 
       is PlayerEventPlaybackPaused -> {
-        this.savePlayerPosition(event)
+        this.savePlayerPosition(PlayerEventCreateBookmark(event.spineElement, event.offsetMilliseconds,
+          isLocalBookmark = false))
       }
 
       is PlayerEventPlaybackStopped -> {
-        this.savePlayerPosition(event)
+        this.savePlayerPosition(PlayerEventCreateBookmark(event.spineElement, event.offsetMilliseconds,
+          isLocalBookmark = false))
       }
 
       is PlayerEventPlaybackBuffering,
