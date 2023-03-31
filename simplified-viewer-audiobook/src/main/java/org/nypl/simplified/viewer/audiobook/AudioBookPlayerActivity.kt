@@ -649,18 +649,27 @@ class AudioBookPlayerActivity :
       }
 
       is PlayerEventPlaybackStarted -> {
-        this.savePlayerPosition(PlayerEventCreateBookmark(event.spineElement, event.offsetMilliseconds,
-          isLocalBookmark = false))
+        this.savePlayerPosition(PlayerEventCreateBookmark(
+          event.spineElement,
+          event.offsetMilliseconds,
+          isLocalBookmark = false)
+        )
       }
 
       is PlayerEventPlaybackPaused -> {
-        this.savePlayerPosition(PlayerEventCreateBookmark(event.spineElement, event.offsetMilliseconds,
-          isLocalBookmark = false))
+        this.savePlayerPosition(PlayerEventCreateBookmark(
+          event.spineElement,
+          event.offsetMilliseconds,
+          isLocalBookmark = false)
+        )
       }
 
       is PlayerEventPlaybackStopped -> {
-        this.savePlayerPosition(PlayerEventCreateBookmark(event.spineElement, event.offsetMilliseconds,
-          isLocalBookmark = false))
+        this.savePlayerPosition(PlayerEventCreateBookmark(
+          event.spineElement,
+          event.offsetMilliseconds,
+          isLocalBookmark = false)
+        )
       }
 
       is PlayerEventPlaybackBuffering,
