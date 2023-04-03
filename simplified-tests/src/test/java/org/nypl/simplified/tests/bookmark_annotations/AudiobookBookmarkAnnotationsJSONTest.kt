@@ -25,13 +25,13 @@ class AudiobookBookmarkAnnotationsJSONTest {
   private val objectMapper: ObjectMapper = ObjectMapper()
   private val targetValue0 =
     "{\n \"title\": \"Chapter title\",\n \"chapter\": 1,\n  \"part\": 1,\n  \"time\":123,\n" +
-      "\"duration\": \"190\",\n \"audiobookID\": \"urn:uuid:b309844e-7d4e-403e-945b-fbc78acd5e03\"\n}\n"
+      "\n \"startOffset\":25\n,\n\"duration\": \"190\",\n \"audiobookID\": \"urn:uuid:b309844e-7d4e-403e-945b-fbc78acd5e03\"\n}\n"
   private val targetValue1 =
     "{\n \"title\": \"Chapter title 2\",\n  \"chapter\": 2,\n  \"part\": 1,\n  \"time\":111,\n" +
-      "\"duration\": \"190\",\n \"audiobookID\": \"urn:uuid:b309844e-7d4e-403e-945b-fbc78acd5e03\"\n}\n"
+      "\n \"startOffset\":40\n,\n\"duration\": \"190\",\n \"audiobookID\": \"urn:uuid:b309844e-7d4e-403e-945b-fbc78acd5e03\"\n}\n"
   private val targetValue2 =
     "{\n \"title\": \"Chapter title 3\",\n  \"chapter\": 3,\n  \"part\": 1,\n  \"time\":100\n,\n" +
-      "\"duration\": \"190\",\n \"audiobookID\": \"urn:uuid:b309844e-7d4e-403e-945b-fbc78acd5e03\"\n}\n"
+      "\n \"startOffset\":50\n,\n\"duration\": \"190\",\n \"audiobookID\": \"urn:uuid:b309844e-7d4e-403e-945b-fbc78acd5e03\"\n}\n"
 
   private val bookmarkBody0 =
     BookmarkAnnotationBodyNode(
@@ -185,7 +185,7 @@ class AudiobookBookmarkAnnotationsJSONTest {
     assertEquals(32, location.chapter)
     assertEquals(3, location.part)
     assertEquals("Chapter title", location.title)
-    assertEquals(78000, location.startOffset)
+    assertEquals(0, location.startOffset)
     assertEquals(78000, location.currentOffset)
   }
 
@@ -201,7 +201,7 @@ class AudiobookBookmarkAnnotationsJSONTest {
     assertEquals(3, location.part)
     assertEquals("Chapter title", location.title)
     assertEquals(15000, location.startOffset)
-    assertEquals(78000, location.currentOffset)
+    assertEquals(63000, location.currentOffset)
   }
 
   @Test
@@ -313,7 +313,7 @@ class AudiobookBookmarkAnnotationsJSONTest {
     assertEquals("Chapter title", location.title)
     assertEquals(32, location.chapter)
     assertEquals(3, location.part)
-    assertEquals(78000, location.startOffset)
+    assertEquals(0, location.startOffset)
     assertEquals(78000, location.currentOffset)
 
     this.checkRoundTrip(annotation)
@@ -338,7 +338,7 @@ class AudiobookBookmarkAnnotationsJSONTest {
     assertEquals(32, location.chapter)
     assertEquals(3, location.part)
     assertEquals(15000, location.startOffset)
-    assertEquals(78000, location.currentOffset)
+    assertEquals(63000, location.currentOffset)
 
     this.checkRoundTrip(annotation)
   }

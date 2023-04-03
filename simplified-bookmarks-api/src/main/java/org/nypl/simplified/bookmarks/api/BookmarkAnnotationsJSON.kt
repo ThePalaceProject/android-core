@@ -406,7 +406,7 @@ object BookmarkAnnotationsJSON {
     val obj =
       JSONParserUtilities.checkObject(null, node)
 
-    val startOffset = JSONParserUtilities.getInteger(obj, "startOffset").toLong()
+    val startOffset = JSONParserUtilities.getIntegerDefault(obj, "startOffset", 0).toLong()
 
     return PlayerPosition(
       chapter = JSONParserUtilities.getIntegerDefault(obj, "chapter", 0),
