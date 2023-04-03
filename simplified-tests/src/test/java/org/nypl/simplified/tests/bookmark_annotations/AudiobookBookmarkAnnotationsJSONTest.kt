@@ -185,7 +185,23 @@ class AudiobookBookmarkAnnotationsJSONTest {
     assertEquals(32, location.chapter)
     assertEquals(3, location.part)
     assertEquals("Chapter title", location.title)
-    assertEquals(78000, location.offsetMilliseconds)
+    assertEquals(78000, location.startOffset)
+    assertEquals(78000, location.currentOffset)
+  }
+
+  @Test
+  fun testSpecValidLocatorTwoOffsets() {
+    val location =
+      BookmarkAnnotationsJSON.deserializeAudiobookLocation(
+        objectMapper = this.objectMapper,
+        value = this.resourceText("valid-locator-4.json")
+      )
+
+    assertEquals(32, location.chapter)
+    assertEquals(3, location.part)
+    assertEquals("Chapter title", location.title)
+    assertEquals(15000, location.startOffset)
+    assertEquals(78000, location.currentOffset)
   }
 
   @Test
@@ -297,7 +313,32 @@ class AudiobookBookmarkAnnotationsJSONTest {
     assertEquals("Chapter title", location.title)
     assertEquals(32, location.chapter)
     assertEquals(3, location.part)
-    assertEquals(78000, location.offsetMilliseconds)
+    assertEquals(78000, location.startOffset)
+    assertEquals(78000, location.currentOffset)
+
+    this.checkRoundTrip(annotation)
+  }
+
+  @Test
+  fun testSpecValidBookmarkTwoOffsets() {
+    val annotation =
+      BookmarkAnnotationsJSON.deserializeBookmarkAnnotationFromJSON(
+        objectMapper = this.objectMapper,
+        node = this.resourceNode("valid-bookmark-6.json")
+      )
+
+    val bookmark = BookmarkAnnotations.toAudiobookBookmark(this.objectMapper, annotation)
+    assertEquals("urn:uuid:1daa8de6-94e8-4711-b7d1-e43b572aa6e0", bookmark.opdsId)
+    assertEquals("urn:uuid:c83db5b1-9130-4b86-93ea-634b00235c7c", bookmark.deviceID)
+    assertEquals(BookmarkKind.BookmarkLastReadLocation, bookmark.kind)
+    assertEquals("2022-06-27T12:47:49.000Z", bookmark.time.toString())
+
+    val location = bookmark.location
+    assertEquals("Chapter title", location.title)
+    assertEquals(32, location.chapter)
+    assertEquals(3, location.part)
+    assertEquals(15000, location.startOffset)
+    assertEquals(78000, location.currentOffset)
 
     this.checkRoundTrip(annotation)
   }
