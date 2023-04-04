@@ -270,9 +270,10 @@
         <c:change date="2023-02-28T00:00:00+00:00" summary="Moved the 'Remove' button after the 'Get' button on the Reservations screen."/>
       </c:changes>
     </c:release>
-    <c:release date="2023-03-27T14:28:59+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.5.0">
+    <c:release date="2023-04-04T18:43:57+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.5.0">
       <c:changes>
-        <c:change date="2023-03-27T14:28:59+00:00" summary="Added support to the new Audible TOC."/>
+        <c:change date="2023-03-30T00:00:00+00:00" summary="Save reading position of audiobooks on play, pause, and stop (which also includes when seeking and changing chapters)."/>
+        <c:change date="2023-04-04T18:43:57+00:00" summary="Added support to the new Audible TOC."/>
       </c:changes>
     </c:release>
   </c:releases>
