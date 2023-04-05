@@ -42,7 +42,7 @@ class AccountProviderDescriptionCollectionParserTest {
       val collection = success.result
       Assertions.assertEquals(182, collection.providers.size)
       Assertions.assertTrue(collection.providers.any { p -> p.links.isNotEmpty() })
-      Assertions.assertFalse(collection.providers.any { p -> p.images.isNotEmpty() })
+      Assertions.assertTrue(collection.providers.any { p -> p.images.isNotEmpty() })
       Assertions.assertEquals(4, collection.links.size)
       Assertions.assertEquals("Libraries", collection.metadata.title)
     }
