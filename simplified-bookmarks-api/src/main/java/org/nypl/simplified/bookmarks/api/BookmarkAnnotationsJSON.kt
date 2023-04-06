@@ -384,7 +384,8 @@ object BookmarkAnnotationsJSON {
     objectNode.put("@type", "LocatorAudioBookTime")
     objectNode.put("chapter", bookmark.location.chapter)
     objectNode.put("startOffset", bookmark.location.startOffset)
-    objectNode.put("time", bookmark.location.currentOffset)
+    objectNode.put("time", bookmark.location.startOffset +
+      bookmark.location.currentOffset)
     objectNode.put("part", bookmark.location.part)
     objectNode.put("title", bookmark.location.title.orEmpty())
 

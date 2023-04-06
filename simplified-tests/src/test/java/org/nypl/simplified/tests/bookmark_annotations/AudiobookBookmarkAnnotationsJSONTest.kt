@@ -339,6 +339,8 @@ class AudiobookBookmarkAnnotationsJSONTest {
     assertEquals(3, location.part)
     assertEquals(15000, location.startOffset)
     assertEquals(63000, location.currentOffset)
+
+    this.checkRoundTrip(annotation)
   }
 
   private fun resourceText(

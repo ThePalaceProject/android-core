@@ -106,19 +106,26 @@ internal class BServiceOpCreateLocalBookmark(
         }
         is Bookmark.AudiobookBookmark -> {
           val handle =
-            entry.findFormatHandle(BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook::class.java)
+            entry.findFormatHandle(
+              BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook::class.java
+            )
 
           if (handle != null) {
+            val updatedBookmark = bookmark.copy(
+              location = bookmark.location.copy(
+                currentOffset = bookmark.location.startOffset + bookmark.location.currentOffset
+              )
+            )
             when (this.bookmark.kind) {
               BookmarkKind.BookmarkLastReadLocation ->
-                handle.setLastReadLocation(this.bookmark)
+                handle.setLastReadLocation(updatedBookmark)
               BookmarkKind.BookmarkExplicit ->
                 handle.setBookmarks(
                   BServiceBookmarks.normalizeBookmarks(
                     logger = this.logger,
                     profileId = this.profile.id,
                     handle = handle,
-                    bookmark = bookmark
+                    bookmark = updatedBookmark
                   )
                 )
             }
@@ -126,7 +133,7 @@ internal class BServiceOpCreateLocalBookmark(
             this.bookmarkEventsOut.onNext(
               BookmarkEvent.BookmarkSaved(
                 this.accountID,
-                this.bookmark
+                updatedBookmark
               )
             )
           } else {
