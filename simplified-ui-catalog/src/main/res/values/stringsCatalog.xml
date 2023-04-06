@@ -9,6 +9,8 @@
   <string name="catalogAccessibilityBookErrorDismiss">Dismiss Button</string>
   <string name="catalogAccessibilityBookErrorRetry">Retry Button</string>
   <string name="catalogAccessibilityBookListen">Listen Button</string>
+  <string name="catalogAccessibilityBookPreviewPlay">Play Sample</string>
+  <string name="catalogAccessibilityBookPreviewRead">Read Sample</string>
   <string name="catalogAccessibilityBookRead">Read Button</string>
   <string name="catalogAccessibilityBookReserve">Reserve Button</string>
   <string name="catalogAccessibilityBookRevokeHold">Remove Button</string>
@@ -44,7 +46,7 @@
   <string name="catalogBookIntervalWeeksShort">w</string>
   <string name="catalogBookIntervalYearsShort">y</string>
   <string name="catalogBookPreviewAudioBook">Play Sample</string>
-  <string name="catalogBookPreviewBook">Read Preview</string>
+  <string name="catalogBookPreviewBook">Read Sample</string>
   <string name="catalogCancel">Cancel</string>
   <string name="catalogCancelHold">Remove</string>
   <string name="catalogCancelling">Cancelling…</string>

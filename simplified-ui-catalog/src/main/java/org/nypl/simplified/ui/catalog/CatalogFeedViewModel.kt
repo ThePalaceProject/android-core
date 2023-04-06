@@ -46,6 +46,8 @@ import org.nypl.simplified.feeds.api.FeedSearch
 import org.nypl.simplified.futures.FluentFutureExtensions.map
 import org.nypl.simplified.futures.FluentFutureExtensions.onAnyError
 import org.nypl.simplified.listeners.api.FragmentListenerType
+import org.nypl.simplified.opds.core.OPDSAvailabilityLoaned
+import org.nypl.simplified.opds.core.getOrNull
 import org.nypl.simplified.profiles.api.ProfileDateOfBirth
 import org.nypl.simplified.profiles.api.ProfileDescription
 import org.nypl.simplified.profiles.api.ProfilePreferences
@@ -343,7 +345,14 @@ class CatalogFeedViewModel(
       )
 
     val future = this.profilesController.profileFeed(request)
-      .map { f -> FeedLoaderResult.FeedLoaderSuccess(f) as FeedLoaderResult }
+      .map { feed ->
+        feed.entriesInOrder.removeAll { feedEntry ->
+          feedEntry is FeedEntry.FeedEntryOPDS &&
+            feedEntry.feedEntry.availability is OPDSAvailabilityLoaned &&
+            feedEntry.feedEntry.availability.endDate.getOrNull()?.isBeforeNow == true
+        }
+        FeedLoaderResult.FeedLoaderSuccess(feed) as FeedLoaderResult
+      }
       .onAnyError { ex -> FeedLoaderResult.wrapException(booksUri, ex) }
 
     this.createNewStatus(

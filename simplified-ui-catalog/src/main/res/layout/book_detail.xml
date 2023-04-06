@@ -67,17 +67,6 @@
                 app:layout_constraintTop_toBottomOf="@id/bookDetailTitle"
                 tools:text="Mary Shelley" />
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/bookPreviewButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="@id/bookDetailTitle"
-                app:layout_constraintTop_toBottomOf="@id/bookDetailAuthors"
-                app:layout_constraintVertical_bias="1"
-                tools:text="@string/catalogBookPreviewBook" />
-
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <View

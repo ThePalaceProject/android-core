@@ -79,14 +79,11 @@ class CatalogBookDetailViewModel(
 
   private var feedEntry = parameters.feedEntry
 
-  private val bookPreviewStatusMutable: MutableLiveData<BookPreviewStatus> =
-    MutableLiveData(getBookPreviewStatus())
-
-  private val bookWithStatusMutable: MutableLiveData<BookWithStatus> =
-    MutableLiveData(this.createBookWithStatus())
+  private val bookWithStatusMutable: MutableLiveData<Pair<BookWithStatus, BookPreviewStatus>> =
+    MutableLiveData(Pair(this.createBookWithStatus(), getBookPreviewStatus()))
 
   private val bookWithStatus: BookWithStatus
-    get() = bookWithStatusMutable.value!!
+    get() = bookWithStatusMutable.value!!.first
 
   private val relatedBooksFeedStateMutable: MutableLiveData<CatalogFeedState?> =
     MutableLiveData(null)
@@ -109,7 +106,7 @@ class CatalogBookDetailViewModel(
 
   private fun onBookStatusEvent(event: BookStatusEvent) {
     val bookWithStatus = this.createBookWithStatus()
-    this.bookWithStatusMutable.value = bookWithStatus
+    this.bookWithStatusMutable.value = Pair(bookWithStatus, bookWithStatusMutable.value!!.second)
   }
 
   /*
@@ -153,11 +150,8 @@ class CatalogBookDetailViewModel(
     subscriptions.clear()
   }
 
-  val bookWithStatusLive: LiveData<BookWithStatus>
+  val bookWithStatusLive: LiveData<Pair<BookWithStatus, BookPreviewStatus>>
     get() = bookWithStatusMutable
-
-  val bookPreviewLive: LiveData<BookPreviewStatus>
-    get() = bookPreviewStatusMutable
 
   val accountProvider = try {
     this.profilesController.profileCurrent()
@@ -297,7 +291,7 @@ class CatalogBookDetailViewModel(
   override fun resetInitialBookStatus(feedEntry: FeedEntry.FeedEntryOPDS) {
     val initialBookStatus = synthesizeBookWithStatus(feedEntry)
     this.bookRegistry.update(initialBookStatus)
-    this.bookWithStatusMutable.value = initialBookStatus
+    this.bookWithStatusMutable.value = Pair(initialBookStatus, BookPreviewStatus.None)
   }
 
   override fun borrowMaybeAuthenticated(book: Book) {

@@ -10,9 +10,7 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.AppCompatButton
 import androidx.core.os.bundleOf
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -121,7 +119,6 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
   private lateinit var feedWithGroupsAdapter: CatalogFeedWithGroupsAdapter
   private lateinit var feedWithoutGroupsAdapter: CatalogPagedAdapter
   private lateinit var metadata: LinearLayout
-  private lateinit var previewButton: AppCompatButton
   private lateinit var relatedBooksContainer: FrameLayout
   private lateinit var relatedBooksList: RecyclerView
   private lateinit var relatedBooksLoading: ViewGroup
@@ -186,8 +183,11 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
     this.toolbar =
       view.rootView.findViewWithTag(NeutralToolbar.neutralToolbarName)
 
-    this.viewModel.bookWithStatusLive.observe(this.viewLifecycleOwner, this::reconfigureUI)
-    this.viewModel.bookPreviewLive.observe(this.viewLifecycleOwner, this::configurePreviewButton)
+    this.viewModel.bookWithStatusLive.observe(this.viewLifecycleOwner) { info ->
+      reconfigureUI(info.first, info.second)
+    }
+//    this.viewModel.bookWithStatusLive.observe(this.viewLifecycleOwner, this::reconfigureUI)
+//    this.viewModel.bookPreviewLive.observe(this.viewLifecycleOwner, this::configurePreviewButton)
 
     this.cover =
       view.findViewById(R.id.bookDetailCoverImage)
@@ -205,8 +205,6 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
       view.findViewById(R.id.bookDetailMetadataTable)
     this.buttons =
       view.findViewById(R.id.bookDetailButtons)
-    this.previewButton =
-      view.findViewById(R.id.bookPreviewButton)
     this.relatedBooksContainer =
       view.findViewById(R.id.bookDetailRelatedBooksContainer)
     this.relatedBooksList =
@@ -302,22 +300,22 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
     return
   }
 
-  private fun configurePreviewButton(previewStatus: BookPreviewStatus) {
-    val feedEntry = this.parameters.feedEntry
-    this.previewButton.apply {
-      isVisible = previewStatus != BookPreviewStatus.None
-      setText(
-        if (feedEntry.probableFormat == BookFormats.BookFormatDefinition.BOOK_FORMAT_AUDIO) {
-          R.string.catalogBookPreviewAudioBook
-        } else {
-          R.string.catalogBookPreviewBook
-        }
-      )
-      setOnClickListener {
-        viewModel.openBookPreview(this@CatalogBookDetailFragment.parameters.feedEntry)
-      }
-    }
-  }
+//  private fun configurePreviewButton(previewStatus: BookPreviewStatus) {
+//    val feedEntry = this.parameters.feedEntry
+//    this.previewButton.apply {
+//      isVisible = previewStatus != BookPreviewStatus.None
+//      setText(
+//        if (feedEntry.probableFormat == BookFormats.BookFormatDefinition.BOOK_FORMAT_AUDIO) {
+//          R.string.catalogBookPreviewAudioBook
+//        } else {
+//          R.string.catalogBookPreviewBook
+//        }
+//      )
+//      setOnClickListener {
+//        viewModel.openBookPreview(this@CatalogBookDetailFragment.parameters.feedEntry)
+//      }
+//    }
+//  }
 
   private fun configureOPDSEntry(feedEntry: FeedEntryOPDS) {
     val opds = feedEntry.feedEntry
@@ -456,40 +454,55 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
     return Triple(row, rowKey, rowVal)
   }
 
-  private fun reconfigureUI(book: BookWithStatus) {
+  private fun reconfigureUI(book: BookWithStatus, bookPreviewStatus: BookPreviewStatus) {
     this.debugStatus.text = book.javaClass.simpleName
 
-    return when (val status = book.status) {
-      is BookStatus.Held ->
-        this.onBookStatusHeld(status, book.book)
-      is BookStatus.Loaned ->
-        this.onBookStatusLoaned(status, book.book)
-      is BookStatus.Holdable ->
-        this.onBookStatusHoldable(status)
-      is BookStatus.Loanable ->
-        this.onBookStatusLoanable(status)
-      is BookStatus.RequestingLoan ->
+    when (val status = book.status) {
+      is BookStatus.Held -> {
+        this.onBookStatusHeld(status, bookPreviewStatus)
+      }
+      is BookStatus.Loaned -> {
+        this.onBookStatusLoaned(status, book.book, bookPreviewStatus)
+      }
+      is BookStatus.Holdable -> {
+        this.onBookStatusHoldable(status, bookPreviewStatus)
+      }
+      is BookStatus.Loanable -> {
+        this.onBookStatusLoanable(status, bookPreviewStatus)
+      }
+      is BookStatus.RequestingLoan -> {
         this.onBookStatusRequestingLoan()
-      is BookStatus.Revoked ->
+      }
+      is BookStatus.Revoked -> {
         this.onBookStatusRevoked(status)
-      is BookStatus.FailedLoan ->
+      }
+      is BookStatus.FailedLoan -> {
         this.onBookStatusFailedLoan(status)
-      is BookStatus.ReachedLoanLimit ->
+      }
+      is BookStatus.ReachedLoanLimit -> {
         this.onBookStatusReachedLoanLimit()
-      is BookStatus.FailedRevoke ->
+      }
+      is BookStatus.FailedRevoke -> {
         this.onBookStatusFailedRevoke(status)
-      is BookStatus.FailedDownload ->
+      }
+      is BookStatus.FailedDownload -> {
         this.onBookStatusFailedDownload(status)
-      is BookStatus.RequestingRevoke ->
+      }
+      is BookStatus.RequestingRevoke -> {
         this.onBookStatusRequestingRevoke()
-      is BookStatus.RequestingDownload ->
+      }
+      is BookStatus.RequestingDownload -> {
         this.onBookStatusRequestingDownload()
-      is BookStatus.Downloading ->
+      }
+      is BookStatus.Downloading -> {
         this.onBookStatusDownloading(status)
-      is BookStatus.DownloadWaitingForExternalAuthentication ->
+      }
+      is BookStatus.DownloadWaitingForExternalAuthentication -> {
         this.onBookStatusDownloadWaitingForExternalAuthentication()
-      is BookStatus.DownloadExternalAuthenticationInProgress ->
+      }
+      is BookStatus.DownloadExternalAuthenticationInProgress -> {
         this.onBookStatusDownloadExternalAuthenticationInProgress()
+      }
     }
   }
 
@@ -612,9 +625,18 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
 
   private fun onBookStatusLoanable(
     bookStatus: BookStatus.Loanable,
+    bookPreviewStatus: BookPreviewStatus
   ) {
     this.buttons.removeAllViews()
-    this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
+
+    val createPreviewButton = bookPreviewStatus != BookPreviewStatus.None
+
+    if (createPreviewButton) {
+      this.buttons.addView(this.buttonCreator.createButtonSpace())
+    } else {
+      this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
+    }
+
     this.buttons.addView(
       this.buttonCreator.createGetButton(
         onClick = {
@@ -622,7 +644,21 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
         }
       )
     )
-    this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
+
+    if (createPreviewButton) {
+      this.buttons.addView(this.buttonCreator.createButtonSpace())
+      this.buttons.addView(
+        this.buttonCreator.createReadPreviewButton(
+          bookFormat = parameters.feedEntry.probableFormat,
+          onClick = {
+            viewModel.openBookPreview(parameters.feedEntry)
+          }
+        )
+      )
+      this.buttons.addView(this.buttonCreator.createButtonSpace())
+    } else {
+      this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
+    }
     this.checkButtonViewCount()
 
     this.statusInProgress.visibility = View.INVISIBLE
@@ -649,9 +685,18 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
 
   private fun onBookStatusHoldable(
     bookStatus: BookStatus.Holdable,
+    bookPreviewStatus: BookPreviewStatus
   ) {
     this.buttons.removeAllViews()
-    this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
+
+    val createPreviewButton = bookPreviewStatus != BookPreviewStatus.None
+
+    if (createPreviewButton) {
+      this.buttons.addView(this.buttonCreator.createButtonSpace())
+    } else {
+      this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
+    }
+
     this.buttons.addView(
       this.buttonCreator.createReserveButton(
         onClick = {
@@ -659,7 +704,22 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
         }
       )
     )
-    this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
+
+    if (createPreviewButton) {
+      this.buttons.addView(this.buttonCreator.createButtonSpace())
+      this.buttons.addView(
+        this.buttonCreator.createReadPreviewButton(
+          bookFormat = parameters.feedEntry.probableFormat,
+          onClick = {
+            viewModel.openBookPreview(parameters.feedEntry)
+          }
+        )
+      )
+      this.buttons.addView(this.buttonCreator.createButtonSpace())
+    } else {
+      this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
+    }
+
     this.checkButtonViewCount()
 
     this.statusInProgress.visibility = View.INVISIBLE
@@ -672,12 +732,29 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
 
   private fun onBookStatusHeld(
     bookStatus: BookStatus.Held,
-    book: Book
+    bookPreviewStatus: BookPreviewStatus
   ) {
     this.buttons.removeAllViews()
+
+    val createPreviewButton = bookPreviewStatus != BookPreviewStatus.None
+
     when (bookStatus) {
       is BookStatus.Held.HeldInQueue -> {
-        this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
+
+        if (createPreviewButton) {
+          this.buttons.addView(
+            this.buttonCreator.createReadPreviewButton(
+              bookFormat = parameters.feedEntry.probableFormat,
+              onClick = {
+                viewModel.openBookPreview(parameters.feedEntry)
+              }
+            )
+          )
+          this.buttons.addView(this.buttonCreator.createButtonSpace())
+        } else {
+          this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
+        }
+
         if (bookStatus.isRevocable) {
           this.buttons.addView(
             this.buttonCreator.createRevokeHoldButton(
@@ -692,11 +769,22 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
           )
         }
 
-        this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
+        this.buttons.addView(
+          if (createPreviewButton) {
+            this.buttonCreator.createButtonSpace()
+          } else {
+            this.buttonCreator.createButtonSizedSpace()
+          }
+        )
       }
 
       is BookStatus.Held.HeldReady -> {
-        this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
+        // if there will be at least one more button
+        if (createPreviewButton || bookStatus.isRevocable) {
+          this.buttons.addView(this.buttonCreator.createButtonSpace())
+        } else {
+          this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
+        }
 
         this.buttons.addView(
           this.buttonCreator.createGetButton(
@@ -705,6 +793,19 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
             }
           )
         )
+
+        if (createPreviewButton) {
+          this.buttons.addView(this.buttonCreator.createButtonSpace())
+
+          this.buttons.addView(
+            this.buttonCreator.createReadPreviewButton(
+              bookFormat = parameters.feedEntry.probableFormat,
+              onClick = {
+                viewModel.openBookPreview(parameters.feedEntry)
+              }
+            )
+          )
+        }
 
         if (bookStatus.isRevocable) {
           this.buttons.addView(this.buttonCreator.createButtonSpace())
@@ -716,9 +817,12 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
               }
             )
           )
-        } else {
 
-          // if the book is not revocable, we need to add a dummy button on the right
+          this.buttons.addView(this.buttonCreator.createButtonSpace())
+        } else if (!createPreviewButton) {
+
+          // if the book is not revocable and there's no preview button, we need to add a dummy
+          // button on the right
           this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
         }
       }
@@ -734,11 +838,15 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
 
   private fun onBookStatusLoaned(
     bookStatus: BookStatus.Loaned,
-    book: Book
+    book: Book,
+    bookPreviewStatus: BookPreviewStatus
   ) {
     this.buttons.removeAllViews()
+
+    var createPreviewButton = bookPreviewStatus != BookPreviewStatus.None
+
     when (bookStatus) {
-      is BookStatus.Loaned.LoanedNotDownloaded ->
+      is BookStatus.Loaned.LoanedNotDownloaded -> {
         this.buttons.addView(
           if (bookStatus.isOpenAccess) {
             this.buttonCreator.createGetButton(
@@ -755,7 +863,22 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
           }
         )
 
-      is BookStatus.Loaned.LoanedDownloaded ->
+        if (createPreviewButton) {
+          this.buttons.addView(this.buttonCreator.createButtonSpace())
+          this.buttons.addView(
+            this.buttonCreator.createReadPreviewButton(
+              bookFormat = parameters.feedEntry.probableFormat,
+              onClick = {
+                viewModel.openBookPreview(parameters.feedEntry)
+              }
+            )
+          )
+        }
+      }
+      is BookStatus.Loaned.LoanedDownloaded -> {
+        // the book preview button can be ignored
+        createPreviewButton = false
+
         when (val format = book.findPreferredFormat()) {
           is BookFormat.BookFormatPDF,
           is BookFormat.BookFormatEPUB -> {
@@ -776,7 +899,11 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
               )
             )
           }
+          else -> {
+            // do nothing
+          }
         }
+      }
     }
 
     val isRevocable = this.viewModel.bookCanBeRevoked && this.buildConfig.allowReturns()
@@ -798,7 +925,8 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
           }
         )
       )
-    } else {
+    } else if (!createPreviewButton) {
+      // add spaces on both sides if there aren't any other buttons
       this.buttons.addView(this.buttonCreator.createButtonSizedSpace(), 0)
       this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
     }
