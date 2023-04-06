@@ -16,6 +16,7 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
+import org.nypl.simplified.books.book_database.api.BookFormats
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 
 /**
@@ -178,6 +179,27 @@ class CatalogButtons(
       text = R.string.catalogRead,
       description = R.string.catalogAccessibilityBookRead,
       heightMatchParent = heightMatchParent,
+      onClick = onClick
+    )
+  }
+
+  @UiThread
+  fun createReadPreviewButton(
+    bookFormat: BookFormats.BookFormatDefinition?,
+    onClick: (Button) -> Unit
+  ): Button {
+    return this.createButton(
+      context = this.context,
+      text = if (bookFormat == BookFormats.BookFormatDefinition.BOOK_FORMAT_AUDIO) {
+        R.string.catalogBookPreviewAudioBook
+      } else {
+        R.string.catalogBookPreviewBook
+      },
+      description = if (bookFormat == BookFormats.BookFormatDefinition.BOOK_FORMAT_AUDIO) {
+        R.string.catalogAccessibilityBookPreviewPlay
+      } else {
+        R.string.catalogAccessibilityBookPreviewRead
+      },
       onClick = onClick
     )
   }
