@@ -634,7 +634,7 @@ abstract class BookDatabaseContract {
       Bookmark.AudiobookBookmark.create(
         opdsId = feedEntry.id,
         kind = BookmarkKind.BookmarkLastReadLocation,
-        location = PlayerPosition(title = "Title", part = 0, chapter = 1, offsetMilliseconds = 230000L),
+        location = PlayerPosition(title = "Title", part = 0, chapter = 1, startOffset = 1000L, currentOffset = 230000L),
         deviceID = "",
         time = DateTime.now(),
         uri = null,
@@ -649,14 +649,15 @@ abstract class BookDatabaseContract {
       Assertions.assertEquals("Title", lastReadLocation.location.title)
       Assertions.assertEquals(0, lastReadLocation.location.part)
       Assertions.assertEquals(1, lastReadLocation.location.chapter)
-      Assertions.assertEquals(230000, lastReadLocation.location.offsetMilliseconds)
+      Assertions.assertEquals(1000, lastReadLocation.location.startOffset)
+      Assertions.assertEquals(230000, lastReadLocation.location.currentOffset)
     }
 
     format.setLastReadLocation(
       Bookmark.AudiobookBookmark.create(
         opdsId = feedEntry.id,
         kind = BookmarkKind.BookmarkLastReadLocation,
-        location = PlayerPosition(title = "Title 2", part = 2, chapter = 3, offsetMilliseconds = 46000),
+        location = PlayerPosition(title = "Title 2", part = 2, chapter = 3, currentOffset = 46000, startOffset = 0),
         deviceID = "",
         time = DateTime.now(),
         uri = null,
@@ -670,7 +671,8 @@ abstract class BookDatabaseContract {
       Assertions.assertEquals("Title 2", lastReadLocation.location.title)
       Assertions.assertEquals(2, lastReadLocation.location.part)
       Assertions.assertEquals(3, lastReadLocation.location.chapter)
-      Assertions.assertEquals(46000, lastReadLocation.location.offsetMilliseconds)
+      Assertions.assertEquals(0, lastReadLocation.location.startOffset)
+      Assertions.assertEquals(46000, lastReadLocation.location.currentOffset)
     }
 
     format.setLastReadLocation(null)

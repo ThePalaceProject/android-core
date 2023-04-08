@@ -25,13 +25,13 @@ class AudiobookBookmarkAnnotationsJSONTest {
   private val objectMapper: ObjectMapper = ObjectMapper()
   private val targetValue0 =
     "{\n \"title\": \"Chapter title\",\n \"chapter\": 1,\n  \"part\": 1,\n  \"time\":123,\n" +
-      "\"duration\": \"190\",\n \"audiobookID\": \"urn:uuid:b309844e-7d4e-403e-945b-fbc78acd5e03\"\n}\n"
+      "\n \"startOffset\":25\n,\n\"duration\": \"190\",\n \"audiobookID\": \"urn:uuid:b309844e-7d4e-403e-945b-fbc78acd5e03\"\n}\n"
   private val targetValue1 =
     "{\n \"title\": \"Chapter title 2\",\n  \"chapter\": 2,\n  \"part\": 1,\n  \"time\":111,\n" +
-      "\"duration\": \"190\",\n \"audiobookID\": \"urn:uuid:b309844e-7d4e-403e-945b-fbc78acd5e03\"\n}\n"
+      "\n \"startOffset\":40\n,\n\"duration\": \"190\",\n \"audiobookID\": \"urn:uuid:b309844e-7d4e-403e-945b-fbc78acd5e03\"\n}\n"
   private val targetValue2 =
     "{\n \"title\": \"Chapter title 3\",\n  \"chapter\": 3,\n  \"part\": 1,\n  \"time\":100\n,\n" +
-      "\"duration\": \"190\",\n \"audiobookID\": \"urn:uuid:b309844e-7d4e-403e-945b-fbc78acd5e03\"\n}\n"
+      "\n \"startOffset\":50\n,\n\"duration\": \"190\",\n \"audiobookID\": \"urn:uuid:b309844e-7d4e-403e-945b-fbc78acd5e03\"\n}\n"
 
   private val bookmarkBody0 =
     BookmarkAnnotationBodyNode(
@@ -185,7 +185,23 @@ class AudiobookBookmarkAnnotationsJSONTest {
     assertEquals(32, location.chapter)
     assertEquals(3, location.part)
     assertEquals("Chapter title", location.title)
-    assertEquals(78000, location.offsetMilliseconds)
+    assertEquals(0, location.startOffset)
+    assertEquals(78000, location.currentOffset)
+  }
+
+  @Test
+  fun testSpecValidLocatorTwoOffsets() {
+    val location =
+      BookmarkAnnotationsJSON.deserializeAudiobookLocation(
+        objectMapper = this.objectMapper,
+        value = this.resourceText("valid-locator-4.json")
+      )
+
+    assertEquals(32, location.chapter)
+    assertEquals(3, location.part)
+    assertEquals("Chapter title", location.title)
+    assertEquals(15000, location.startOffset)
+    assertEquals(63000, location.currentOffset)
   }
 
   @Test
@@ -297,7 +313,32 @@ class AudiobookBookmarkAnnotationsJSONTest {
     assertEquals("Chapter title", location.title)
     assertEquals(32, location.chapter)
     assertEquals(3, location.part)
-    assertEquals(78000, location.offsetMilliseconds)
+    assertEquals(0, location.startOffset)
+    assertEquals(78000, location.currentOffset)
+
+    this.checkRoundTrip(annotation)
+  }
+
+  @Test
+  fun testSpecValidBookmarkTwoOffsets() {
+    val annotation =
+      BookmarkAnnotationsJSON.deserializeBookmarkAnnotationFromJSON(
+        objectMapper = this.objectMapper,
+        node = this.resourceNode("valid-bookmark-6.json")
+      )
+
+    val bookmark = BookmarkAnnotations.toAudiobookBookmark(this.objectMapper, annotation)
+    assertEquals("urn:uuid:1daa8de6-94e8-4711-b7d1-e43b572aa6e0", bookmark.opdsId)
+    assertEquals("urn:uuid:c83db5b1-9130-4b86-93ea-634b00235c7c", bookmark.deviceID)
+    assertEquals(BookmarkKind.BookmarkLastReadLocation, bookmark.kind)
+    assertEquals("2022-06-27T12:47:49.000Z", bookmark.time.toString())
+
+    val location = bookmark.location
+    assertEquals("Chapter title", location.title)
+    assertEquals(32, location.chapter)
+    assertEquals(3, location.part)
+    assertEquals(15000, location.startOffset)
+    assertEquals(63000, location.currentOffset)
 
     this.checkRoundTrip(annotation)
   }

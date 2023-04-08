@@ -327,7 +327,8 @@ class AudioBookPlayerActivity :
           title = event.spineElement.position.title,
           part = event.spineElement.position.part,
           chapter = event.spineElement.position.chapter,
-          offsetMilliseconds = event.offsetMilliseconds
+          startOffset = event.spineElement.position.startOffset,
+          currentOffset = event.offsetMilliseconds
         ),
         duration = event.spineElement.duration?.millis ?: 0L,
         kind = BookmarkKind.BookmarkLastReadLocation,

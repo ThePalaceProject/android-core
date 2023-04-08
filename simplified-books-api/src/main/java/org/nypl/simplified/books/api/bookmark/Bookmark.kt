@@ -353,7 +353,8 @@ sealed class Bookmark {
         messageDigest.update(kind.motivationURI.toByteArray(utf8))
         messageDigest.update(location.chapter.toString().toByteArray(utf8))
         messageDigest.update(location.part.toString().toByteArray(utf8))
-        messageDigest.update(location.offsetMilliseconds.toString().toByteArray(utf8))
+        messageDigest.update(location.startOffset.toString().toByteArray(utf8))
+        messageDigest.update(location.currentOffset.toString().toByteArray(utf8))
 
         val digestResult = messageDigest.digest()
         val builder = StringBuilder(64)
