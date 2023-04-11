@@ -1,5 +1,7 @@
 package org.nypl.simplified.viewer.preview
 
+import android.content.IntentFilter
+import android.media.AudioManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -31,6 +33,14 @@ class BookPreviewEmbeddedFragment : Fragment() {
     }
   }
 
+  private val playerMediaReceiver by lazy {
+    BookPreviewPlayerMediaReceiver(
+      onAudioBecomingNoisy = {
+        pauseWebViewPlayer()
+      }
+    )
+  }
+
   private lateinit var toolbar: Toolbar
   private lateinit var webView: WebView
 
@@ -50,12 +60,18 @@ class BookPreviewEmbeddedFragment : Fragment() {
 
     configureToolbar()
     configureWebView()
+
+    requireActivity().registerReceiver(
+      playerMediaReceiver,
+      IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+    )
   }
 
   override fun onDestroyView() {
     if (::webView.isInitialized) {
       webView.destroy()
     }
+    requireActivity().unregisterReceiver(playerMediaReceiver)
     super.onDestroyView()
   }
 
@@ -80,7 +96,18 @@ class BookPreviewEmbeddedFragment : Fragment() {
     }
   }
 
-  inner class CustomWebChromeClient : WebChromeClient() {
+  private fun pauseWebViewPlayer() {
+    webView.loadUrl(
+      "javascript:(function(){" +
+        "button=document.getElementsByClassName('playback-toggle halo')[0];" +
+        "event=document.createEvent('HTMLEvents');" +
+        "event.initEvent('click',true,true);" +
+        "button.dispatchEvent(event);" +
+        "})()"
+    )
+  }
+
+  private inner class CustomWebChromeClient : WebChromeClient() {
 
     private val window = requireActivity().window
     private val windowInsetsController =
