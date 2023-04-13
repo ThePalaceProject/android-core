@@ -37,6 +37,22 @@
         <category android:name="android.intent.category.BROWSABLE" />
         <data android:scheme="palace-oauth" />
       </intent-filter>
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW"/>
+        <category android:name="android.intent.category.DEFAULT"/>
+        <category android:name="android.intent.category.BROWSABLE"/>
+        <data
+            android:host="palace.page.link"
+            android:scheme="https"/>
+      </intent-filter>
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW"/>
+        <category android:name="android.intent.category.DEFAULT"/>
+        <category android:name="android.intent.category.BROWSABLE"/>
+        <data
+            android:host="thepalaceproject.page.link"
+            android:scheme="https"/>
+      </intent-filter>
     </activity>
 
     <!-- A file provider that exposes everything in the app. -->
