@@ -88,4 +88,5 @@ dependencies {
   api libs.rxjava2
   api libs.rxjava2.extensions
   api libs.slf4j
+    implementation 'com.google.firebase:firebase-dynamic-links-ktx:21.1.0'
 }
