@@ -4,11 +4,13 @@ import android.app.ActionBar
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
@@ -55,6 +57,21 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     this.logger.debug("onCreate (recreating {})", savedInstanceState != null)
     super.onCreate(savedInstanceState)
     this.logger.debug("onCreate (super completed)")
+
+
+    FirebaseDynamicLinks.getInstance()
+      .getDynamicLink(intent)
+      .addOnSuccessListener(this) { pendingDynamicLinkData ->
+        // Get deep link from result (may be null if no link is found)
+        val deepLink: Uri? = pendingDynamicLinkData?.link
+
+        // Handle the deep link.
+        Log.d("DeepLinks", deepLink.toString())
+      }
+      .addOnFailureListener(this) { e ->
+        Log.w("DeepLinks", "getDynamicLink:onFailure", e)
+      }
+
 
     val toolbar = this.findViewById(R.id.mainToolbar) as Toolbar
     this.setSupportActionBar(toolbar)
