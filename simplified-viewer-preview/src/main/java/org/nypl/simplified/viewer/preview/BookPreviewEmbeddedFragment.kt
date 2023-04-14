@@ -3,6 +3,7 @@ package org.nypl.simplified.viewer.preview
 import android.content.IntentFilter
 import android.media.AudioManager
 import android.os.Bundle
+import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,12 +18,16 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import org.nypl.simplified.webview.WebViewUtilities
+import java.net.URLEncoder
+import java.nio.charset.Charset
 
 class BookPreviewEmbeddedFragment : Fragment() {
 
   companion object {
     private const val BUNDLE_EXTRA_URL =
       "org.nypl.simplified.viewer.preview.BookPreviewEmbeddedFragment.url"
+
+    private const val UTF_8 = "UTF-8"
 
     fun newInstance(url: String): BookPreviewEmbeddedFragment {
       return BookPreviewEmbeddedFragment().apply {
@@ -84,7 +89,7 @@ class BookPreviewEmbeddedFragment : Fragment() {
 
   private fun configureWebView() {
     webView.apply {
-      webViewClient = WebViewClient()
+      webViewClient = CustomWebViewClient()
       webChromeClient = CustomWebChromeClient()
       settings.allowFileAccess = true
       settings.javaScriptEnabled = true
@@ -97,14 +102,40 @@ class BookPreviewEmbeddedFragment : Fragment() {
   }
 
   private fun pauseWebViewPlayer() {
-    webView.loadUrl(
-      "javascript:(function(){" +
-        "button=document.getElementsByClassName('playback-toggle halo')[0];" +
-        "event=document.createEvent('HTMLEvents');" +
-        "event.initEvent('click',true,true);" +
-        "button.dispatchEvent(event);" +
-        "})()"
-    )
+    webView.evaluateJavascript("pausePlayer()", null)
+  }
+
+  private inner class CustomWebViewClient : WebViewClient() {
+    override fun onPageFinished(view: WebView?, url: String?) {
+      injectJavaScript()
+      super.onPageFinished(view, url)
+    }
+
+    private fun injectJavaScript() {
+      try {
+        val inputStream = requireActivity().assets.open("preview_player_commands.js")
+        val buffer = ByteArray(inputStream.available())
+        inputStream.read(buffer)
+        inputStream.close()
+
+        val encodedContent = URLEncoder.encode(String(buffer, Charset.forName(UTF_8)), UTF_8)
+          .replace("+", "%20")
+        val encodedString = Base64.encodeToString(encodedContent.toByteArray(), Base64.NO_WRAP)
+
+        webView.evaluateJavascript(
+          "javascript:(function() {" +
+            "const parent = document.getElementsByTagName('head').item(0);" +
+            "const script = document.createElement('script');" +
+            "script.type = 'text/javascript';" +
+            "script.innerHTML = decodeURIComponent(window.atob('" + encodedString + "'));" +
+            "parent.appendChild(script)" +
+            "})()",
+          null
+        )
+      } catch (e: Exception) {
+        e.printStackTrace()
+      }
+    }
   }
 
   private inner class CustomWebChromeClient : WebChromeClient() {
