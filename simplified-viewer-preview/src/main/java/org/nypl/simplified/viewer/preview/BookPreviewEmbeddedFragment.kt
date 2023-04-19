@@ -18,16 +18,13 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import org.nypl.simplified.webview.WebViewUtilities
-import java.net.URLEncoder
-import java.nio.charset.Charset
+import java.io.BufferedReader
 
 class BookPreviewEmbeddedFragment : Fragment() {
 
   companion object {
     private const val BUNDLE_EXTRA_URL =
       "org.nypl.simplified.viewer.preview.BookPreviewEmbeddedFragment.url"
-
-    private const val UTF_8 = "UTF-8"
 
     fun newInstance(url: String): BookPreviewEmbeddedFragment {
       return BookPreviewEmbeddedFragment().apply {
@@ -102,7 +99,7 @@ class BookPreviewEmbeddedFragment : Fragment() {
   }
 
   private fun pauseWebViewPlayer() {
-    webView.evaluateJavascript("pausePlayer()", null)
+    webView.evaluateJavascript("PalacePreviewPlayerCommands.pausePlayer()", null)
   }
 
   private inner class CustomWebViewClient : WebViewClient() {
@@ -114,26 +111,19 @@ class BookPreviewEmbeddedFragment : Fragment() {
     private fun injectJavaScript() {
       try {
         val inputStream = requireActivity().assets.open("preview_player_commands.js")
-        val buffer = ByteArray(inputStream.available())
-        inputStream.read(buffer)
-        inputStream.close()
-
-        val encodedContent = URLEncoder.encode(String(buffer, Charset.forName(UTF_8)), UTF_8)
-          .replace("+", "%20")
-        val encodedString = Base64.encodeToString(encodedContent.toByteArray(), Base64.NO_WRAP)
-
+        inputStream.bufferedReader().use(BufferedReader::readText)
+      } catch (e: Exception) {
+        null
+      }?.let {
+        val encodedString = Base64.encodeToString(it.toByteArray(), Base64.NO_WRAP)
         webView.evaluateJavascript(
-          "javascript:(function() {" +
-            "const parent = document.getElementsByTagName('head').item(0);" +
+          "(function() {" +
             "const script = document.createElement('script');" +
-            "script.type = 'text/javascript';" +
             "script.innerHTML = decodeURIComponent(window.atob('" + encodedString + "'));" +
-            "parent.appendChild(script)" +
+            "document.head.appendChild(script);" +
             "})()",
           null
         )
-      } catch (e: Exception) {
-        e.printStackTrace()
       }
     }
   }
