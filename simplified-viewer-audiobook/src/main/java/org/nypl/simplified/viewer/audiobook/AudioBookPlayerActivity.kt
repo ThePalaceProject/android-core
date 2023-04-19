@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.common.util.concurrent.ListeningExecutorService
@@ -14,6 +15,7 @@ import org.joda.time.DateTime
 import org.librarysimplified.audiobook.api.PlayerAudioBookType
 import org.librarysimplified.audiobook.api.PlayerAudioEngineRequest
 import org.librarysimplified.audiobook.api.PlayerAudioEngines
+import org.librarysimplified.audiobook.api.PlayerBookmark
 import org.librarysimplified.audiobook.api.PlayerDownloadProviderType
 import org.librarysimplified.audiobook.api.PlayerEvent
 import org.librarysimplified.audiobook.api.PlayerEvent.PlayerEventError
@@ -46,8 +48,7 @@ import org.librarysimplified.audiobook.views.PlayerFragmentListenerType
 import org.librarysimplified.audiobook.views.PlayerFragmentParameters
 import org.librarysimplified.audiobook.views.PlayerPlaybackRateFragment
 import org.librarysimplified.audiobook.views.PlayerSleepTimerFragment
-import org.librarysimplified.audiobook.views.PlayerTOCFragment
-import org.librarysimplified.audiobook.views.PlayerTOCFragmentParameters
+import org.librarysimplified.audiobook.views.toc.PlayerTOCFragment
 import org.librarysimplified.http.api.LSHTTPAuthorizationType
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.services.api.ServiceDirectoryType
@@ -144,6 +145,8 @@ class AudioBookPlayerActivity :
   private lateinit var uiThread: UIThreadServiceType
   private var playerInitialized: Boolean = false
   private val reloadingManifest = AtomicBoolean(false)
+
+  private val currentBookmarks = arrayListOf<Bookmark.AudiobookBookmark>()
 
   private var lastLocalBookmark: Bookmark? = null
 
@@ -620,6 +623,13 @@ class AudioBookPlayerActivity :
         .find { bookmark ->
           bookmark.kind == BookmarkKind.BookmarkLastReadLocation
         }
+
+      currentBookmarks.addAll(
+        bookmarks
+          .filterIsInstance<Bookmark.AudiobookBookmark>()
+          .filter { bookmark -> bookmark.kind == BookmarkKind.BookmarkExplicit }
+      )
+
       val position =
         bookMarkLastReadPosition?.location ?: this.formatHandle.format.lastReadLocation?.location
 
@@ -840,7 +850,7 @@ class AudioBookPlayerActivity :
     this.uiThread.runOnUIThread {
       this.supportActionBar?.setTitle(R.string.audiobook_player_toc_title)
 
-      val fragment = PlayerTOCFragment.newInstance(PlayerTOCFragmentParameters())
+      val fragment = PlayerTOCFragment.newInstance()
 
       this.supportFragmentManager
         .beginTransaction()
@@ -920,6 +930,74 @@ class AudioBookPlayerActivity :
   }
 
   override fun onPlayerAccessibilityEvent(event: PlayerAccessibilityEvent) {
+    // do nothing
+  }
+
+  override fun onPlayerTOCWantsBookmarks(): List<PlayerBookmark> {
+    return currentBookmarks
+      .map { bookmark ->
+        AudioBookHelpers.toPlayerBookmark(bookmark)
+      }
+      .sortedByDescending { bookmark ->
+        bookmark.date.millis
+      }
+  }
+
+  override fun onPlayerShouldDeleteBookmark(playerBookmark: PlayerBookmark) {
+    val bookmark = AudioBookHelpers.fromPlayerBookmark(
+      opdsId = this.parameters.opdsEntry.id,
+      deviceID = AudioBookDevices.deviceId(this.profilesController, this.parameters.bookID),
+      playerBookmark = playerBookmark
+    )
+
+    currentBookmarks.remove(bookmark)
+
+    bookmarkService.bookmarkDelete(
+      accountID = this.parameters.accountID,
+      bookmark = bookmark
+    )
+  }
+
+  override fun onPlayerShouldAddBookmark(playerBookmark: PlayerBookmark?) {
+    if (playerBookmark == null) {
+
+      Toast.makeText(this, R.string.audio_book_player_bookmark_error_adding, Toast.LENGTH_SHORT)
+        .show()
+
+      return
+    }
+
+    try {
+      val bookmark = AudioBookHelpers.fromPlayerBookmark(
+        opdsId = this.parameters.opdsEntry.id,
+        deviceID = AudioBookDevices.deviceId(this.profilesController, this.parameters.bookID),
+        playerBookmark = playerBookmark
+      )
+
+      if (!currentBookmarks.any { it.location == bookmark.location }) {
+        this.bookmarkService.bookmarkCreateLocal(
+          accountID = this.parameters.accountID,
+          bookmark = bookmark
+        )
+
+        this.bookmarkService.bookmarkCreateRemote(
+          accountID = this.parameters.accountID,
+          bookmark = bookmark
+        )
+
+        currentBookmarks.add(bookmark)
+
+        Toast.makeText(this, R.string.audio_book_player_bookmark_added, Toast.LENGTH_SHORT)
+          .show()
+      } else {
+        Toast.makeText(this, R.string.audio_book_player_bookmark_already_added,
+          Toast.LENGTH_SHORT).show()
+      }
+    } catch (e: Exception) {
+      Toast.makeText(this, R.string.audio_book_player_bookmark_error_adding,
+        Toast.LENGTH_SHORT).show()
+      this.log.error("could not save bookmark: ", e)
+    }
   }
 
   private fun showErrorWithRunnable(
