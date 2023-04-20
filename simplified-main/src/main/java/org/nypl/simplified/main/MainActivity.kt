@@ -58,7 +58,6 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     super.onCreate(savedInstanceState)
     this.logger.debug("onCreate (super completed)")
 
-
     FirebaseDynamicLinks.getInstance()
       .getDynamicLink(intent)
       .addOnSuccessListener(this) { pendingDynamicLinkData ->
@@ -67,6 +66,10 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
         // Handle the deep link.
         Log.d("DeepLinks", deepLink.toString())
+        Log.d("DeepLinks", "Fragment" + deepLink?.fragment)
+        Log.d("DeepLinks", "Query" + deepLink?.query)
+        Log.d("DeepLinks", "Query ?uuid= " + deepLink?.getQueryParameter("uuid"))
+
       }
       .addOnFailureListener(this) { e ->
         Log.w("DeepLinks", "getDynamicLink:onFailure", e)
