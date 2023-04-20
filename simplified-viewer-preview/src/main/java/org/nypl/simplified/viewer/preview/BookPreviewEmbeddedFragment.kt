@@ -1,6 +1,9 @@
 package org.nypl.simplified.viewer.preview
 
+import android.content.IntentFilter
+import android.media.AudioManager
 import android.os.Bundle
+import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +18,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import org.nypl.simplified.webview.WebViewUtilities
+import java.io.BufferedReader
 
 class BookPreviewEmbeddedFragment : Fragment() {
 
@@ -29,6 +33,14 @@ class BookPreviewEmbeddedFragment : Fragment() {
         }
       }
     }
+  }
+
+  private val playerMediaReceiver by lazy {
+    BookPreviewPlayerMediaReceiver(
+      onAudioBecomingNoisy = {
+        pauseWebViewPlayer()
+      }
+    )
   }
 
   private lateinit var toolbar: Toolbar
@@ -50,12 +62,18 @@ class BookPreviewEmbeddedFragment : Fragment() {
 
     configureToolbar()
     configureWebView()
+
+    requireActivity().registerReceiver(
+      playerMediaReceiver,
+      IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+    )
   }
 
   override fun onDestroyView() {
     if (::webView.isInitialized) {
       webView.destroy()
     }
+    requireActivity().unregisterReceiver(playerMediaReceiver)
     super.onDestroyView()
   }
 
@@ -68,7 +86,7 @@ class BookPreviewEmbeddedFragment : Fragment() {
 
   private fun configureWebView() {
     webView.apply {
-      webViewClient = WebViewClient()
+      webViewClient = CustomWebViewClient()
       webChromeClient = CustomWebChromeClient()
       settings.allowFileAccess = true
       settings.javaScriptEnabled = true
@@ -80,7 +98,37 @@ class BookPreviewEmbeddedFragment : Fragment() {
     }
   }
 
-  inner class CustomWebChromeClient : WebChromeClient() {
+  private fun pauseWebViewPlayer() {
+    webView.evaluateJavascript("PalacePreviewPlayerCommands.pausePlayer()", null)
+  }
+
+  private inner class CustomWebViewClient : WebViewClient() {
+    override fun onPageFinished(view: WebView?, url: String?) {
+      injectJavaScript()
+      super.onPageFinished(view, url)
+    }
+
+    private fun injectJavaScript() {
+      try {
+        val inputStream = requireActivity().assets.open("preview_player_commands.js")
+        inputStream.bufferedReader().use(BufferedReader::readText)
+      } catch (e: Exception) {
+        null
+      }?.let {
+        val encodedString = Base64.encodeToString(it.toByteArray(), Base64.NO_WRAP)
+        webView.evaluateJavascript(
+          "(function() {" +
+            "const script = document.createElement('script');" +
+            "script.innerHTML = decodeURIComponent(window.atob('" + encodedString + "'));" +
+            "document.head.appendChild(script);" +
+            "})()",
+          null
+        )
+      }
+    }
+  }
+
+  private inner class CustomWebChromeClient : WebChromeClient() {
 
     private val window = requireActivity().window
     private val windowInsetsController =
