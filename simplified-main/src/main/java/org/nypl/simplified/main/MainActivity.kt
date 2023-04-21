@@ -65,10 +65,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
         val deepLink: Uri? = pendingDynamicLinkData?.link
 
         // Handle the deep link.
-        Log.d("DeepLinks", deepLink.toString())
-        Log.d("DeepLinks", "Fragment" + deepLink?.fragment)
-        Log.d("DeepLinks", "Query" + deepLink?.query)
-        Log.d("DeepLinks", "Query ?uuid= " + deepLink?.getQueryParameter("uuid"))
+        Log.d("DeepLinks", "uuid: " + deepLink?.getQueryParameter("uuid"))
 
       }
       .addOnFailureListener(this) { e ->
