@@ -24,6 +24,7 @@ import org.nypl.simplified.profiles.api.ProfilesDatabaseType.AnonymousProfileEna
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType.AnonymousProfileEnabled.ANONYMOUS_PROFILE_ENABLED
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.OAuthWithIntermediaryComplete
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
+import org.nypl.simplified.ui.accounts.AccountListRegistryFragment
 import org.nypl.simplified.ui.branding.BrandingSplashServiceType
 import org.nypl.simplified.ui.onboarding.OnboardingEvent
 import org.nypl.simplified.ui.onboarding.OnboardingFragment
@@ -67,11 +68,14 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
         // Handle the deep link.
         Log.d("DeepLinks", "uuid: " + deepLink?.getQueryParameter("uuid"))
 
+        if (deepLink?.getQueryParameter("uuid") != null) {
+          openAccountListRegistry();
+        }
+
       }
       .addOnFailureListener(this) { e ->
         Log.w("DeepLinks", "getDynamicLink:onFailure", e)
       }
-
 
     val toolbar = this.findViewById(R.id.mainToolbar) as Toolbar
     this.setSupportActionBar(toolbar)
@@ -395,6 +399,15 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     this.supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
     this.supportFragmentManager.commit {
       replace(R.id.mainFragmentHolder, profilesFragment)
+    }
+  }
+
+  private fun openAccountListRegistry() {
+    this.logger.debug("openAccountListRegistry")
+    val accountListRegistryFragment = AccountListRegistryFragment()
+    this.supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+    this.supportFragmentManager.commit {
+      replace(R.id.mainFragmentHolder, accountListRegistryFragment)
     }
   }
 

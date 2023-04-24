@@ -43,7 +43,8 @@
         <category android:name="android.intent.category.BROWSABLE"/>
         <data
             android:host="thepalaceproject.org"
-            android:scheme="https"/>
+            android:scheme="https"
+            android:pathPattern=".*" />
       </intent-filter>
     </activity>
 
