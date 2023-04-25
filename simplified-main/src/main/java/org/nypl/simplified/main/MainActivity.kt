@@ -39,6 +39,7 @@ import org.nypl.simplified.ui.splash.SplashFragment
 import org.nypl.simplified.ui.tutorial.TutorialEvent
 import org.nypl.simplified.ui.tutorial.TutorialFragment
 import org.slf4j.LoggerFactory
+import java.net.URI
 import java.util.ServiceLoader
 
 class MainActivity : AppCompatActivity(R.layout.main_host) {
@@ -66,12 +67,16 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
         val deepLink: Uri? = pendingDynamicLinkData?.link
 
         // Handle the deep link.
-        Log.d("DeepLinks", "uuid: " + deepLink?.getQueryParameter("uuid"))
+        val uuid: String? = deepLink?.getQueryParameter("uuid")
+        Log.d("DeepLinks", "uuid: " + uuid)
+        Log.d("DeepLinks", "uuid as URI: " + URI("urn:uuid:"+ uuid).toString())
 
-        if (deepLink?.getQueryParameter("uuid") != null) {
-          openAccountListRegistry();
+        if (uuid != null) {
+          val profilesController =
+            Services.serviceDirectory()
+              .requireService(ProfilesControllerType::class.java)
+          profilesController.profileAccountCreate(URI("urn:uuid:"+ uuid))
         }
-
       }
       .addOnFailureListener(this) { e ->
         Log.w("DeepLinks", "getDynamicLink:onFailure", e)
@@ -399,15 +404,6 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     this.supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
     this.supportFragmentManager.commit {
       replace(R.id.mainFragmentHolder, profilesFragment)
-    }
-  }
-
-  private fun openAccountListRegistry() {
-    this.logger.debug("openAccountListRegistry")
-    val accountListRegistryFragment = AccountListRegistryFragment()
-    this.supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-    this.supportFragmentManager.commit {
-      replace(R.id.mainFragmentHolder, accountListRegistryFragment)
     }
   }
 
