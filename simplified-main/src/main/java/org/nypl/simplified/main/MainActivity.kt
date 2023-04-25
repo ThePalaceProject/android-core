@@ -67,15 +67,15 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
         val deepLink: Uri? = pendingDynamicLinkData?.link
 
         // Handle the deep link.
-        val uuid: String? = deepLink?.getQueryParameter("uuid")
-        Log.d("DeepLinks", "uuid: " + uuid)
-        Log.d("DeepLinks", "uuid as URI: " + URI("urn:uuid:"+ uuid).toString())
+        val libraryId: String? = deepLink?.getQueryParameter("libraryid")
+        Log.d("DeepLinks", "libraryId: " + libraryId)
+        Log.d("DeepLinks", "libraryId as URI: " + URI("urn:uuid:"+ libraryId).toString())
 
-        if (uuid != null) {
+        if (libraryId != null) {
           val profilesController =
             Services.serviceDirectory()
               .requireService(ProfilesControllerType::class.java)
-          profilesController.profileAccountCreate(URI("urn:uuid:"+ uuid))
+          profilesController.profileAccountCreate(URI("urn:uuid:"+ libraryId))
         }
       }
       .addOnFailureListener(this) { e ->
