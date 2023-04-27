@@ -987,15 +987,18 @@ class AudioBookPlayerActivity :
 
         currentBookmarks.add(bookmark)
 
-        Toast.makeText(this, R.string.audio_book_player_bookmark_added, Toast.LENGTH_SHORT)
-          .show()
+        Toast.makeText(
+          this, R.string.audio_book_player_bookmark_added, Toast.LENGTH_SHORT
+        ).show()
       } else {
-        Toast.makeText(this, R.string.audio_book_player_bookmark_already_added,
-          Toast.LENGTH_SHORT).show()
+        Toast.makeText(
+          this, R.string.audio_book_player_bookmark_already_added, Toast.LENGTH_SHORT
+        ).show()
       }
     } catch (e: Exception) {
-      Toast.makeText(this, R.string.audio_book_player_bookmark_error_adding,
-        Toast.LENGTH_SHORT).show()
+      Toast.makeText(
+        this, R.string.audio_book_player_bookmark_error_adding, Toast.LENGTH_SHORT
+      ).show()
       this.log.error("could not save bookmark: ", e)
     }
   }
