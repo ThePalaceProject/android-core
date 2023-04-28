@@ -15,7 +15,9 @@ import org.librarysimplified.services.api.Services
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
+import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.ListenerRepository
+import org.nypl.simplified.listeners.api.fragmentListeners
 import org.nypl.simplified.listeners.api.listenerRepositories
 import org.nypl.simplified.oauth.OAuthCallbackIntentParsing
 import org.nypl.simplified.oauth.OAuthParseResult
@@ -24,6 +26,7 @@ import org.nypl.simplified.profiles.api.ProfilesDatabaseType.AnonymousProfileEna
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType.AnonymousProfileEnabled.ANONYMOUS_PROFILE_ENABLED
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.OAuthWithIntermediaryComplete
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
+import org.nypl.simplified.ui.accounts.AccountListRegistryEvent
 import org.nypl.simplified.ui.accounts.AccountListRegistryFragment
 import org.nypl.simplified.ui.branding.BrandingSplashServiceType
 import org.nypl.simplified.ui.onboarding.OnboardingEvent
@@ -41,6 +44,7 @@ import org.nypl.simplified.ui.tutorial.TutorialFragment
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.util.ServiceLoader
+import java.util.UUID
 
 class MainActivity : AppCompatActivity(R.layout.main_host) {
 
@@ -50,6 +54,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
   private val logger = LoggerFactory.getLogger(MainActivity::class.java)
   private val listenerRepo: ListenerRepository<MainActivityListenedEvent, Unit> by listenerRepositories()
+  private val listener: FragmentListenerType<AccountListRegistryEvent> by fragmentListeners()
 
   private val defaultViewModelFactory: ViewModelProvider.Factory by lazy {
     MainActivityDefaultViewModelFactory(super.getDefaultViewModelProviderFactory())
@@ -67,15 +72,19 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
         val deepLink: Uri? = pendingDynamicLinkData?.link
 
         // Handle the deep link.
-        val libraryId: String? = deepLink?.getQueryParameter("libraryid")
-        Log.d("DeepLinks", "libraryId: " + libraryId)
-        Log.d("DeepLinks", "libraryId as URI: " + URI("urn:uuid:"+ libraryId).toString())
+        val libraryID: String? = deepLink?.getQueryParameter("libraryid")
+        Log.d("DeepLinks", "libraryID: " + libraryID)
+        Log.d("DeepLinks", "libraryID as URI: " + URI("urn:uuid:"+ libraryID).toString())
 
-        if (libraryId != null) {
+        if (libraryID != null) {
           val profilesController =
             Services.serviceDirectory()
               .requireService(ProfilesControllerType::class.java)
-          profilesController.profileAccountCreate(URI("urn:uuid:"+ libraryId))
+          profilesController.profileAccountCreate(URI("urn:uuid:"+ libraryID))
+
+          val uuid = UUID.fromString(libraryID)
+          val accountID = AccountID(uuid)
+          this.listener.post(AccountListRegistryEvent.AccountCreated(accountID, true))
         }
       }
       .addOnFailureListener(this) { e ->
