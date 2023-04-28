@@ -1,11 +1,13 @@
 package org.nypl.simplified.viewer.audiobook
 
+import org.librarysimplified.audiobook.api.PlayerBookmark
 import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfilled
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.bookmarks.api.BookmarkServiceUsableType
 import org.nypl.simplified.bookmarks.api.Bookmarks
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.api.bookmark.Bookmark
+import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.slf4j.LoggerFactory
@@ -92,5 +94,26 @@ internal object AudioBookHelpers {
     lastRead?.let(results::add)
     results.addAll(explicits)
     return results.toList()
+  }
+
+  fun toPlayerBookmark(bookmark: Bookmark.AudiobookBookmark): PlayerBookmark {
+    return PlayerBookmark(
+      date = bookmark.time,
+      position = bookmark.location,
+      duration = bookmark.duration,
+      uri = bookmark.uri
+    )
+  }
+
+  fun fromPlayerBookmark(opdsId: String, deviceID: String, playerBookmark: PlayerBookmark): Bookmark.AudiobookBookmark {
+    return Bookmark.AudiobookBookmark(
+      opdsId = opdsId,
+      deviceID = deviceID,
+      time = playerBookmark.date,
+      kind = BookmarkKind.BookmarkExplicit,
+      uri = playerBookmark.uri,
+      location = playerBookmark.position,
+      duration = playerBookmark.duration
+    )
   }
 }

@@ -2,6 +2,9 @@
 
 <resources>
   <string name="audio_book_player">Audiobook Player</string>
+  <string name="audio_book_player_bookmark_added">Bookmark added</string>
+  <string name="audio_book_player_bookmark_already_added">A bookmark has already been saved at this location.</string>
+  <string name="audio_book_player_bookmark_error_adding">There was an error while adding the bookmark</string>
   <string name="audio_book_player_do_keep">Keep</string>
   <string name="audio_book_player_do_return">Return</string>
   <string name="audio_book_player_error_book_open">Unable to open audio book</string>
