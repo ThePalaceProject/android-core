@@ -26,6 +26,8 @@ import org.nypl.simplified.profiles.api.ProfilesDatabaseType.AnonymousProfileEna
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType.AnonymousProfileEnabled.ANONYMOUS_PROFILE_ENABLED
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.OAuthWithIntermediaryComplete
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
+import org.nypl.simplified.ui.accounts.AccountDetailEvent
+import org.nypl.simplified.ui.accounts.AccountDetailFragment
 import org.nypl.simplified.ui.accounts.AccountListRegistryEvent
 import org.nypl.simplified.ui.accounts.AccountListRegistryFragment
 import org.nypl.simplified.ui.branding.BrandingSplashServiceType
@@ -54,7 +56,6 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
   private val logger = LoggerFactory.getLogger(MainActivity::class.java)
   private val listenerRepo: ListenerRepository<MainActivityListenedEvent, Unit> by listenerRepositories()
-  private val listener: FragmentListenerType<AccountListRegistryEvent> by fragmentListeners()
 
   private val defaultViewModelFactory: ViewModelProvider.Factory by lazy {
     MainActivityDefaultViewModelFactory(super.getDefaultViewModelProviderFactory())
@@ -84,7 +85,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
           val uuid = UUID.fromString(libraryID)
           val accountID = AccountID(uuid)
-          this.listener.post(AccountListRegistryEvent.AccountCreated(accountID, true))
+//          this.listener.post(AccountListRegistryEvent.AccountCreated(accountID, true))
         }
       }
       .addOnFailureListener(this) { e ->
@@ -195,19 +196,28 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
   @Suppress("UNUSED_PARAMETER")
   private fun handleEvent(event: MainActivityListenedEvent, state: Unit) {
+    Log.d("handleEvent", event.toString());
     return when (event) {
       is MainActivityListenedEvent.SplashEvent ->
         this.handleSplashEvent(event.event)
+
       is MainActivityListenedEvent.TutorialEvent ->
         this.handleTutorialEvent(event.event)
+
       is MainActivityListenedEvent.OnboardingEvent ->
         this.handleOnboardingEvent(event.event)
+
       is MainActivityListenedEvent.MainFragmentEvent ->
         this.handleMainFragmentEvent(event.event)
+
       is MainActivityListenedEvent.ProfileSelectionEvent ->
         this.handleProfileSelectionEvent(event.event)
+
       is MainActivityListenedEvent.ProfileModificationEvent ->
         this.handleProfileModificationEvent(event.event)
+
+      is MainActivityListenedEvent.AccountDetailEvent ->
+        this.handleAccountDetailEvent(event.event)
     }
   }
 
@@ -310,6 +320,15 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
         this.onProfileModificationCancelled()
       ProfileModificationEvent.Succeeded ->
         this.onProfileModificationSucceeded()
+    }
+  }
+
+  private fun handleAccountDetailEvent(event: AccountDetailEvent) {
+    this.logger.debug("handleAccountDetailEvent")
+    val accountDetailFragment = AccountDetailFragment()
+    this.supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+    this.supportFragmentManager.commit {
+      replace(R.id.mainFragmentHolder, accountDetailFragment, "ACCOUNT_DETAIL")
     }
   }
 
