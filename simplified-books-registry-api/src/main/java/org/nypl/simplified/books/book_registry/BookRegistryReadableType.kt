@@ -30,6 +30,12 @@ interface BookRegistryReadableType {
   fun bookEvents(): Observable<BookStatusEvent>
 
   /**
+   * @return An observable that publishes book holds events
+   */
+
+  fun bookHoldsUpdateEvents(): Observable<BookHoldsUpdateEvent>
+
+  /**
    * @param id The book ID
    * @return The status for the given book, if any.
    */

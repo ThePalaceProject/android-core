@@ -61,7 +61,8 @@ sealed class CatalogFeedArguments : Serializable {
     val sortBy: SortBy = SortBy.SORT_BY_TITLE,
     val searchTerms: String?,
     val selection: FeedBooksSelection,
-    val filterAccount: AccountID?
+    val filterAccount: AccountID?,
+    val updateHolds: Boolean
   ) : CatalogFeedArguments() {
     override val isSearchResults: Boolean = false
     override val isLocallyGenerated: Boolean = true

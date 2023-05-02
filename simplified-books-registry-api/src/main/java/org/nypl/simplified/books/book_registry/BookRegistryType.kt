@@ -34,4 +34,10 @@ interface BookRegistryType : BookRegistryReadableType {
    */
 
   fun clearFor(id: BookID)
+
+  /**
+   * Update the current number of holds the current logged user has.
+   */
+
+  fun updateHolds(numberOfHolds: Int)
 }

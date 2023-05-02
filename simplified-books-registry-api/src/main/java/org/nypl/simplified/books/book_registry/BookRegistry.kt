@@ -21,6 +21,8 @@ class BookRegistry private constructor(
     Collections.unmodifiableSortedMap(this.books)
   private val observable: PublishSubject<BookStatusEvent> =
     PublishSubject.create()
+  private val bookHoldsUpdate: PublishSubject<BookHoldsUpdateEvent> =
+    PublishSubject.create()
 
   override fun books(): SortedMap<BookID, BookWithStatus> {
     return this.booksReadOnly
@@ -28,6 +30,10 @@ class BookRegistry private constructor(
 
   override fun bookEvents(): Observable<BookStatusEvent> {
     return this.observable
+  }
+
+  override fun bookHoldsUpdateEvents(): Observable<BookHoldsUpdateEvent> {
+    return this.bookHoldsUpdate
   }
 
   override fun bookStatus(id: BookID): OptionType<BookStatus> {
@@ -97,6 +103,14 @@ class BookRegistry private constructor(
     if (oldStatus != null) {
       this.observable.onNext(BookStatusEvent.BookStatusEventRemoved(id, oldStatus.status))
     }
+  }
+
+  override fun updateHolds(numberOfHolds: Int) {
+    this.bookHoldsUpdate.onNext(
+      BookHoldsUpdateEvent(
+        numberOfHolds = numberOfHolds
+      )
+    )
   }
 
   companion object {
