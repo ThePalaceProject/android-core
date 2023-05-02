@@ -111,7 +111,7 @@ class MainFragmentViewModel(
       .filter {
         val getHolds = showHoldsTab &&
           profilesController.profileCurrent().mostRecentAccount().loginState is
-            AccountLoginState.AccountLoggedIn
+          AccountLoginState.AccountLoggedIn
 
         if (!getHolds) {
           bookRegistry.updateHolds(

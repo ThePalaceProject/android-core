@@ -280,7 +280,6 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
     }
   }
 
-
   private fun checkForAnnouncements() {
     val currentProfile = this.viewModel.profilesController.profileCurrent()
     val mostRecentAccountId = currentProfile.preferences().mostRecentAccount
