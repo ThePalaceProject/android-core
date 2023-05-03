@@ -152,6 +152,10 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
       .subscribe(this::onBookStatusEvent)
       .let { subscriptions.add(it) }
 
+    viewModel.deepLinkEvents
+      .subscribe(this::onDeepLinkEvent)
+      .let { subscriptions.add(it) }
+
     /*
      * Show the Adobe DRM warning dialog if necessary,
      */
@@ -239,6 +243,10 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
         this.openBookDownloadLogin(status.id, status.downloadURI)
       }
     }
+  }
+
+  private fun onDeepLinkEvent(event: DeepLinkEvent) {
+    // TODO: navigate to correct place using the event libraryID
   }
 
   private fun checkForAnnouncements() {

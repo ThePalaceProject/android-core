@@ -11,9 +11,12 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
+import io.reactivex.Observable
+import io.reactivex.subjects.PublishSubject
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
+import org.nypl.simplified.books.book_registry.BookStatusEvent
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.ListenerRepository
@@ -56,9 +59,15 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
   private val logger = LoggerFactory.getLogger(MainActivity::class.java)
   private val listenerRepo: ListenerRepository<MainActivityListenedEvent, Unit> by listenerRepositories()
+  private val observable: PublishSubject<DeepLinkEvent> =
+    PublishSubject.create()
 
   private val defaultViewModelFactory: ViewModelProvider.Factory by lazy {
     MainActivityDefaultViewModelFactory(super.getDefaultViewModelProviderFactory())
+  }
+
+  fun deepLinkEvents(): Observable<DeepLinkEvent> {
+    return this.observable
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,7 +94,9 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
           val uuid = UUID.fromString(libraryID)
           val accountID = AccountID(uuid)
-//          this.listener.post(AccountListRegistryEvent.AccountCreated(accountID, true))
+          this.observable.onNext(DeepLinkEvent.DeepLinkIntercepted(
+            libraryID = accountID
+          ))
         }
       }
       .addOnFailureListener(this) { e ->

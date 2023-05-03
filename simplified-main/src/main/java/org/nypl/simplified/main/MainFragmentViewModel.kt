@@ -11,6 +11,7 @@ import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatusEvent
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.profiles.api.ProfileEvent
+import org.nypl.simplified.profiles.controller.api.DeepLinksControllerType
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 
 /**
@@ -25,6 +26,8 @@ class MainFragmentViewModel : ViewModel() {
     UnicastWorkSubject.create()
   val registryEvents: UnicastWorkSubject<BookStatusEvent> =
     UnicastWorkSubject.create()
+  val deepLinkEvents: UnicastWorkSubject<DeepLinkEvent> =
+    UnicastWorkSubject.create()
 
   private val services =
     Services.serviceDirectory()
@@ -34,6 +37,8 @@ class MainFragmentViewModel : ViewModel() {
     services.requireService(AccountProviderRegistryType::class.java)
   val bookRegistry: BookRegistryType =
     services.requireService(BookRegistryType::class.java)
+  val deepLinksController: DeepLinksControllerType =
+    services.requireService(DeepLinksControllerType::class.java)
   val buildConfig =
     services.requireService(BuildConfigurationServiceType::class.java)
   val showHoldsTab: Boolean
@@ -75,6 +80,18 @@ class MainFragmentViewModel : ViewModel() {
   private fun onBookStatusEvent(event: BookStatusEvent) {
     registryEvents.onNext(event)
   }
+
+  init {
+    this.deepLinksController.deepLinkEvents()
+      .observeOn(AndroidSchedulers.mainThread())
+      .subscribe(this::onDeepLinkEvent)
+      .let { subscriptions.add(it) }
+  }
+
+  private fun onDeepLinkEvent(event: DeepLinkEvent) {
+    deepLinkEvents.onNext(event)
+  }
+
 
   override fun onCleared() {
     super.onCleared()
