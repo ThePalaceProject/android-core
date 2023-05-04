@@ -66,10 +66,6 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     MainActivityDefaultViewModelFactory(super.getDefaultViewModelProviderFactory())
   }
 
-  fun deepLinkEvents(): Observable<DeepLinkEvent> {
-    return this.observable
-  }
-
   override fun onCreate(savedInstanceState: Bundle?) {
     this.logger.debug("onCreate (recreating {})", savedInstanceState != null)
     super.onCreate(savedInstanceState)
