@@ -12,7 +12,7 @@ sealed class DeepLinkEvent() {
    * The library ID to be navigated to
    */
 
-  abstract val libraryID: AccountID?
+  abstract val libraryID: AccountID
 
   /**
    * A new deep link was intercepted

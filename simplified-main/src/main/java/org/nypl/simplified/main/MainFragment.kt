@@ -26,6 +26,8 @@ import org.nypl.simplified.profiles.api.ProfilesDatabaseType.AnonymousProfileEna
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType.AnonymousProfileEnabled.ANONYMOUS_PROFILE_ENABLED
 import org.nypl.simplified.profiles.api.idle_timer.ProfileIdleTimeOutSoon
 import org.nypl.simplified.profiles.api.idle_timer.ProfileIdleTimedOut
+import org.nypl.simplified.ui.accounts.AccountDetailFragment
+import org.nypl.simplified.ui.accounts.AccountFragmentParameters
 import org.nypl.simplified.ui.announcements.AnnouncementsDialog
 import org.nypl.simplified.ui.catalog.saml20.CatalogSAML20Fragment
 import org.nypl.simplified.ui.catalog.saml20.CatalogSAML20FragmentParameters
@@ -246,7 +248,15 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
   }
 
   private fun onDeepLinkEvent(event: DeepLinkEvent) {
-    // TODO: navigate to correct place using the event libraryID
+    this.navigator.addFragment(
+      fragment = AccountDetailFragment.create(
+          AccountFragmentParameters(
+          accountId = event.libraryID,
+          showPleaseLogInTitle = false
+        )
+      ),
+      tab = this.navigator.currentTab()
+    )
   }
 
   private fun checkForAnnouncements() {
