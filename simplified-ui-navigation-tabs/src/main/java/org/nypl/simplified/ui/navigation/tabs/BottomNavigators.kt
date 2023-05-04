@@ -185,7 +185,8 @@ object BottomNavigators {
         searchTerms = null,
         selection = FeedBooksSelection.BOOKS_FEED_HOLDS,
         sortBy = FeedFacet.FeedFacetPseudo.Sorting.SortBy.SORT_BY_TITLE,
-        title = context.getString(R.string.tabHolds)
+        title = context.getString(R.string.tabHolds),
+        updateHolds = true
       )
     )
   }
@@ -221,7 +222,8 @@ object BottomNavigators {
         searchTerms = null,
         selection = FeedBooksSelection.BOOKS_FEED_LOANED,
         sortBy = FeedFacet.FeedFacetPseudo.Sorting.SortBy.SORT_BY_TITLE,
-        title = context.getString(R.string.tabBooks)
+        title = context.getString(R.string.tabBooks),
+        updateHolds = false
       )
     )
   }
