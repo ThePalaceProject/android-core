@@ -17,6 +17,8 @@ import org.nypl.drm.core.AdobeAdeptExecutorType
 import org.nypl.simplified.accounts.api.*
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.accounts.database.api.AccountsDatabaseNonexistentException
+import org.nypl.simplified.accounts.registry.DeepLinkEvent
+import org.nypl.simplified.accounts.registry.DeepLinksControllerType
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryEvent
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.analytics.api.AnalyticsType
@@ -84,11 +86,11 @@ class Controller private constructor(
   private val cacheDirectory: File,
   private val accountEvents: Subject<AccountEvent>,
   private val profileEvents: Subject<ProfileEvent>,
-  private val deepLinkEvents: Subject<org.nypl.simplified.accounts.registry.DeepLinkEvent>,
+  private val deepLinkEvents: Subject<DeepLinkEvent>,
   private val services: ServiceDirectoryType,
   private val taskExecutor: ListeningExecutorService
 ) : BooksControllerType, BooksPreviewControllerType, ProfilesControllerType,
-  org.nypl.simplified.accounts.registry.DeepLinksControllerType {
+  DeepLinksControllerType {
 
   private val borrows: ConcurrentHashMap<BookID, BorrowTaskType>
 
