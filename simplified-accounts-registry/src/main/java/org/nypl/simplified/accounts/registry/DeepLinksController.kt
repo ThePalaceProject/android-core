@@ -30,7 +30,7 @@ class DeepLinksController private constructor(
    * @return An observable that publishes profile events
    */
 
-  fun deepLinkEvents(): Observable<DeepLinkEvent> {
+  override fun deepLinkEvents(): Observable<DeepLinkEvent> {
     return this.observable
   }
 

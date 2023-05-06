@@ -293,6 +293,10 @@ class Controller private constructor(
     return FluentFuture.from(future)
   }
 
+  override fun deepLinkEvents(): Observable<DeepLinkEvent> {
+    return this.deepLinkEvents
+  }
+
   override fun profiles(): SortedMap<ProfileID, ProfileReadableType> {
     return this.castMap(this.profiles.profiles())
   }
@@ -726,7 +730,7 @@ class Controller private constructor(
       executorService: ExecutorService,
       accountEvents: Subject<AccountEvent>,
       profileEvents: Subject<ProfileEvent>,
-      deepLinkEvents: Subject<org.nypl.simplified.accounts.registry.DeepLinkEvent>,
+      deepLinkEvents: Subject<DeepLinkEvent>,
       cacheDirectory: File
     ): Controller {
       return Controller(
