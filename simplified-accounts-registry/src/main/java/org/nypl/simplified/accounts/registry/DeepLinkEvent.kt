@@ -1,4 +1,4 @@
-package org.nypl.simplified.main
+package org.nypl.simplified.accounts.registry
 
 import org.nypl.simplified.accounts.api.AccountID
 

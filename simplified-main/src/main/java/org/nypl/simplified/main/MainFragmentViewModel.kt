@@ -6,12 +6,13 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.accounts.api.AccountEvent
+import org.nypl.simplified.accounts.registry.DeepLinkEvent
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatusEvent
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.profiles.api.ProfileEvent
-import org.nypl.simplified.profiles.controller.api.DeepLinksControllerType
+import org.nypl.simplified.accounts.registry.DeepLinksControllerType
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 
 /**

@@ -14,12 +14,7 @@ import org.joda.time.Instant
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.nypl.drm.core.AdobeAdeptExecutorType
-import org.nypl.simplified.accounts.api.AccountEvent
-import org.nypl.simplified.accounts.api.AccountEventUpdated
-import org.nypl.simplified.accounts.api.AccountID
-import org.nypl.simplified.accounts.api.AccountLoginStringResourcesType
-import org.nypl.simplified.accounts.api.AccountLogoutStringResourcesType
-import org.nypl.simplified.accounts.api.AccountProviderType
+import org.nypl.simplified.accounts.api.*
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.accounts.database.api.AccountsDatabaseNonexistentException
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryEvent
@@ -89,9 +84,11 @@ class Controller private constructor(
   private val cacheDirectory: File,
   private val accountEvents: Subject<AccountEvent>,
   private val profileEvents: Subject<ProfileEvent>,
+  private val deepLinkEvents: Subject<org.nypl.simplified.accounts.registry.DeepLinkEvent>,
   private val services: ServiceDirectoryType,
   private val taskExecutor: ListeningExecutorService
-) : BooksControllerType, BooksPreviewControllerType, ProfilesControllerType {
+) : BooksControllerType, BooksPreviewControllerType, ProfilesControllerType,
+  org.nypl.simplified.accounts.registry.DeepLinksControllerType {
 
   private val borrows: ConcurrentHashMap<BookID, BorrowTaskType>
 
@@ -727,12 +724,14 @@ class Controller private constructor(
       executorService: ExecutorService,
       accountEvents: Subject<AccountEvent>,
       profileEvents: Subject<ProfileEvent>,
+      deepLinkEvents: Subject<org.nypl.simplified.accounts.registry.DeepLinkEvent>,
       cacheDirectory: File
     ): Controller {
       return Controller(
         cacheDirectory = cacheDirectory,
         accountEvents = accountEvents,
         profileEvents = profileEvents,
+        deepLinkEvents = deepLinkEvents,
         services = services,
         taskExecutor = MoreExecutors.listeningDecorator(executorService)
       )

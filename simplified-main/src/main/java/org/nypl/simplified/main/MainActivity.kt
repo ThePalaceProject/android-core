@@ -11,29 +11,22 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
-import io.reactivex.Observable
-import io.reactivex.subjects.PublishSubject
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.accounts.api.AccountID
+import org.nypl.simplified.accounts.registry.DeepLinksController
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
-import org.nypl.simplified.books.book_registry.BookStatusEvent
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
-import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.ListenerRepository
-import org.nypl.simplified.listeners.api.fragmentListeners
 import org.nypl.simplified.listeners.api.listenerRepositories
 import org.nypl.simplified.oauth.OAuthCallbackIntentParsing
 import org.nypl.simplified.oauth.OAuthParseResult
 import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType.AnonymousProfileEnabled.ANONYMOUS_PROFILE_DISABLED
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType.AnonymousProfileEnabled.ANONYMOUS_PROFILE_ENABLED
-import org.nypl.simplified.profiles.controller.api.DeepLinksControllerType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.OAuthWithIntermediaryComplete
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.accounts.AccountDetailEvent
 import org.nypl.simplified.ui.accounts.AccountDetailFragment
-import org.nypl.simplified.ui.accounts.AccountListRegistryEvent
-import org.nypl.simplified.ui.accounts.AccountListRegistryFragment
 import org.nypl.simplified.ui.branding.BrandingSplashServiceType
 import org.nypl.simplified.ui.onboarding.OnboardingEvent
 import org.nypl.simplified.ui.onboarding.OnboardingFragment
@@ -92,7 +85,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
           val deepLinksController =
             Services.serviceDirectory()
-              .requireService(DeepLinksControllerType::class.java)
+              .requireService(DeepLinksController::class.java)
           deepLinksController.publishDeepLinkEvent(accountID)
         }
       }

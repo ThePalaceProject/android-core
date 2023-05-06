@@ -21,19 +21,14 @@ import org.nypl.drm.core.AxisNowServiceFactoryType
 import org.nypl.drm.core.AxisNowServiceType
 import org.nypl.simplified.accessibility.AccessibilityService
 import org.nypl.simplified.accessibility.AccessibilityServiceType
-import org.nypl.simplified.accounts.api.AccountAuthenticationCredentialsStoreType
-import org.nypl.simplified.accounts.api.AccountBundledCredentialsType
-import org.nypl.simplified.accounts.api.AccountEvent
-import org.nypl.simplified.accounts.api.AccountLoginStringResourcesType
-import org.nypl.simplified.accounts.api.AccountLogoutStringResourcesType
-import org.nypl.simplified.accounts.api.AccountProviderFallbackType
-import org.nypl.simplified.accounts.api.AccountProviderResolutionStringsType
-import org.nypl.simplified.accounts.api.AccountProviderType
+import org.nypl.simplified.accounts.api.*
 import org.nypl.simplified.accounts.database.AccountAuthenticationCredentialsStore
 import org.nypl.simplified.accounts.database.AccountBundledCredentialsEmpty
 import org.nypl.simplified.accounts.database.AccountsDatabases
 import org.nypl.simplified.accounts.json.AccountBundledCredentialsJSON
 import org.nypl.simplified.accounts.registry.AccountProviderRegistry
+import org.nypl.simplified.accounts.registry.DeepLinkEvent
+import org.nypl.simplified.accounts.registry.DeepLinksControllerType
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryDebugging
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.accounts.source.spi.AccountProviderSourceResolutionStrings
@@ -913,6 +908,7 @@ internal object MainServices {
       serviceConstructor = { createMetricService(context) }
     )
 
+    val deepLinkEvents = PublishSubject.create<DeepLinkEvent>()
     val bookController = this.run {
       publishEvent(strings.bootingGeneral("books controller"))
       val execBooks =
@@ -923,11 +919,17 @@ internal object MainServices {
           executorService = execBooks,
           accountEvents = accountEvents,
           profileEvents = profileEvents,
+          deepLinkEvents = deepLinkEvents,
           cacheDirectory = context.cacheDir
         )
       addService(
-        message = strings.bootingGeneral("books controller"),
+        message = strings.bootingGeneral("profiles controller"),
         interfaceType = ProfilesControllerType::class.java,
+        serviceConstructor = { controller }
+      )
+      addService(
+        message = strings.bootingGeneral("deep links controller"),
+        interfaceType = DeepLinksControllerType::class.java,
         serviceConstructor = { controller }
       )
       addService(

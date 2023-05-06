@@ -1,9 +1,8 @@
-package org.nypl.simplified.main;
+package org.nypl.simplified.accounts.registry;
 
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import org.nypl.simplified.accounts.api.AccountID
-import org.nypl.simplified.profiles.controller.api.DeepLinksControllerType
 import org.slf4j.LoggerFactory
 import java.util.*
 import java.util.concurrent.ConcurrentSkipListMap
@@ -36,9 +35,11 @@ class DeepLinksController private constructor(
   }
 
   fun publishDeepLinkEvent(accountID: AccountID) {
-    this.observable.onNext(DeepLinkEvent.DeepLinkIntercepted(
-      libraryID = accountID
-    ))
+    this.observable.onNext(
+      DeepLinkEvent.DeepLinkIntercepted(
+        libraryID = accountID
+      )
+    )
   }
 
   companion object {
