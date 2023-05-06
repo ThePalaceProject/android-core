@@ -27,6 +27,7 @@ import org.nypl.simplified.oauth.OAuthParseResult
 import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType.AnonymousProfileEnabled.ANONYMOUS_PROFILE_DISABLED
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType.AnonymousProfileEnabled.ANONYMOUS_PROFILE_ENABLED
+import org.nypl.simplified.profiles.controller.api.DeepLinksControllerType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.OAuthWithIntermediaryComplete
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.accounts.AccountDetailEvent
@@ -59,8 +60,6 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
   private val logger = LoggerFactory.getLogger(MainActivity::class.java)
   private val listenerRepo: ListenerRepository<MainActivityListenedEvent, Unit> by listenerRepositories()
-  private val observable: PublishSubject<DeepLinkEvent> =
-    PublishSubject.create()
 
   private val defaultViewModelFactory: ViewModelProvider.Factory by lazy {
     MainActivityDefaultViewModelFactory(super.getDefaultViewModelProviderFactory())
@@ -90,9 +89,11 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
           val uuid = UUID.fromString(libraryID)
           val accountID = AccountID(uuid)
-          this.observable.onNext(DeepLinkEvent.DeepLinkIntercepted(
-            libraryID = accountID
-          ))
+
+          val deepLinksController =
+            Services.serviceDirectory()
+              .requireService(DeepLinksControllerType::class.java)
+          deepLinksController.publishDeepLinkEvent(accountID)
         }
       }
       .addOnFailureListener(this) { e ->
