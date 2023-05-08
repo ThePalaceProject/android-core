@@ -89,7 +89,6 @@ class Controller private constructor(
   private val cacheDirectory: File,
   private val accountEvents: Subject<AccountEvent>,
   private val profileEvents: Subject<ProfileEvent>,
-  private val deepLinkEvents: Subject<DeepLinkEvent>,
   private val services: ServiceDirectoryType,
   private val taskExecutor: ListeningExecutorService
 ) : BooksControllerType, BooksPreviewControllerType, ProfilesControllerType,
@@ -745,14 +744,12 @@ class Controller private constructor(
       executorService: ExecutorService,
       accountEvents: Subject<AccountEvent>,
       profileEvents: Subject<ProfileEvent>,
-      deepLinkEvents: Subject<DeepLinkEvent>,
       cacheDirectory: File
     ): Controller {
       return Controller(
         cacheDirectory = cacheDirectory,
         accountEvents = accountEvents,
         profileEvents = profileEvents,
-        deepLinkEvents = deepLinkEvents,
         services = services,
         taskExecutor = MoreExecutors.listeningDecorator(executorService)
       )

@@ -919,7 +919,6 @@ internal object MainServices {
           executorService = execBooks,
           accountEvents = accountEvents,
           profileEvents = profileEvents,
-          deepLinkEvents = deepLinkEvents,
           cacheDirectory = context.cacheDir
         )
       addService(
