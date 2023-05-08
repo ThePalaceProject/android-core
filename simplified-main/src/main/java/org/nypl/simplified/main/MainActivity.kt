@@ -199,7 +199,6 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
   @Suppress("UNUSED_PARAMETER")
   private fun handleEvent(event: MainActivityListenedEvent, state: Unit) {
-    Log.d("handleEvent", event.toString())
     return when (event) {
       is MainActivityListenedEvent.SplashEvent ->
         this.handleSplashEvent(event.event)
@@ -218,7 +217,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
       is MainActivityListenedEvent.ProfileModificationEvent ->
         this.handleProfileModificationEvent(event.event)
-      
+
     }
   }
 
