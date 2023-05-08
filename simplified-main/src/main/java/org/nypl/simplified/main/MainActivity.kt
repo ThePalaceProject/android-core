@@ -218,9 +218,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
       is MainActivityListenedEvent.ProfileModificationEvent ->
         this.handleProfileModificationEvent(event.event)
-
-      is MainActivityListenedEvent.AccountDetailEvent ->
-        this.handleAccountDetailEvent(event.event)
+      
     }
   }
 
