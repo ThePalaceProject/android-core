@@ -1,12 +1,17 @@
 package org.nypl.simplified.main
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import io.reactivex.disposables.CompositeDisposable
 import org.librarysimplified.services.api.Services
@@ -15,6 +20,7 @@ import org.nypl.simplified.accounts.api.AccountEventDeletion
 import org.nypl.simplified.accounts.api.AccountEventUpdated
 import org.nypl.simplified.accounts.registry.DeepLinkEvent
 import org.nypl.simplified.books.api.BookID
+import org.nypl.simplified.books.book_registry.BookHoldsUpdateEvent
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookStatusEvent
 import org.nypl.simplified.listeners.api.FragmentListenerType
@@ -55,7 +61,13 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
   private val logger = LoggerFactory.getLogger(MainFragment::class.java)
   private val subscriptions = CompositeDisposable()
 
-  private val viewModel: MainFragmentViewModel by viewModels()
+  private val viewModel: MainFragmentViewModel by viewModels(
+    factoryProducer = {
+      MainFragmentViewModelFactory(
+        resources = this.requireActivity().resources
+      )
+    }
+  )
 
   private val listener: FragmentListenerType<MainFragmentEvent> by fragmentListeners()
   private val listenerRepo: ListenerRepository<MainFragmentListenedEvent, MainFragmentState> by listenerRepositories()
@@ -159,6 +171,10 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
       .subscribe(this::onDeepLinkEvent)
       .let { subscriptions.add(it) }
 
+    viewModel.bookHoldEvents
+      .subscribe(this::onBookHoldsUpdateEvent)
+      .let { subscriptions.add(it) }
+
     /*
      * Show the Adobe DRM warning dialog if necessary,
      */
@@ -259,6 +275,29 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
       ),
       tab = this.navigator.currentTab()
     )
+  }
+
+  private fun onBookHoldsUpdateEvent(event: BookHoldsUpdateEvent) {
+    val numberOfHolds = event.numberOfHolds
+    if (viewModel.showHoldsTab) {
+      val bottomNavigationItem = this.bottomView.findViewById<BottomNavigationItemView>(R.id.tabHolds)
+      var badgeView = bottomNavigationItem.findViewById<View>(R.id.badgeView)
+
+      if (numberOfHolds > 0) {
+
+        if (badgeView == null) {
+          badgeView = LayoutInflater.from(requireContext()).inflate(
+            R.layout.layout_menu_item_badge, bottomNavigationItem, false
+          )
+          bottomNavigationItem.addView(badgeView)
+        }
+
+        val badgeNumber = (badgeView as? ViewGroup)?.findViewById<TextView>(R.id.badgeNumber)
+        badgeNumber?.text = numberOfHolds.toString()
+      }
+
+      badgeView?.isVisible = numberOfHolds > 0
+    }
   }
 
   private fun checkForAnnouncements() {

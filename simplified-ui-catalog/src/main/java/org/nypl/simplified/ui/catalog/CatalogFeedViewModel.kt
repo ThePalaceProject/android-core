@@ -46,6 +46,7 @@ import org.nypl.simplified.feeds.api.FeedSearch
 import org.nypl.simplified.futures.FluentFutureExtensions.map
 import org.nypl.simplified.futures.FluentFutureExtensions.onAnyError
 import org.nypl.simplified.listeners.api.FragmentListenerType
+import org.nypl.simplified.opds.core.OPDSAvailabilityHeldReady
 import org.nypl.simplified.opds.core.OPDSAvailabilityLoaned
 import org.nypl.simplified.opds.core.getOrNull
 import org.nypl.simplified.profiles.api.ProfileDateOfBirth
@@ -350,6 +351,14 @@ class CatalogFeedViewModel(
           feedEntry is FeedEntry.FeedEntryOPDS &&
             feedEntry.feedEntry.availability is OPDSAvailabilityLoaned &&
             feedEntry.feedEntry.availability.endDate.getOrNull()?.isBeforeNow == true
+        }
+        if (arguments.updateHolds) {
+          bookRegistry.updateHolds(
+            numberOfHolds = feed.entriesInOrder.filter { feedEntry ->
+              feedEntry is FeedEntry.FeedEntryOPDS &&
+                feedEntry.feedEntry.availability is OPDSAvailabilityHeldReady
+            }.size
+          )
         }
         FeedLoaderResult.FeedLoaderSuccess(feed) as FeedLoaderResult
       }
@@ -770,7 +779,8 @@ class CatalogFeedViewModel(
               searchTerms = query,
               selection = currentArguments.selection,
               sortBy = currentArguments.sortBy,
-              title = currentArguments.title
+              title = currentArguments.title,
+              updateHolds = currentArguments.updateHolds
             )
           }
           is FeedSearch.FeedSearchOpen1_1 -> {
@@ -780,7 +790,8 @@ class CatalogFeedViewModel(
               searchTerms = query,
               selection = currentArguments.selection,
               sortBy = currentArguments.sortBy,
-              title = currentArguments.title
+              title = currentArguments.title,
+              updateHolds = currentArguments.updateHolds
             )
           }
         }
@@ -869,7 +880,8 @@ class CatalogFeedViewModel(
               searchTerms = currentArguments.searchTerms,
               selection = currentArguments.selection,
               sortBy = facet.sortBy,
-              title = facet.title
+              title = facet.title,
+              updateHolds = currentArguments.updateHolds
             )
 
           is FilteringForAccount ->
@@ -879,7 +891,8 @@ class CatalogFeedViewModel(
               searchTerms = currentArguments.searchTerms,
               selection = currentArguments.selection,
               sortBy = currentArguments.sortBy,
-              title = facet.title
+              title = facet.title,
+              updateHolds = currentArguments.updateHolds
             )
         }
       }
