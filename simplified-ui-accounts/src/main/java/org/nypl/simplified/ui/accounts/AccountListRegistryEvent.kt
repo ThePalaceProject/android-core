@@ -6,8 +6,7 @@ import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 sealed class AccountListRegistryEvent {
 
   data class AccountCreated(
-    val accountID: AccountID,
-    val isDeepLink: Boolean
+    val accountID: AccountID
   ) : AccountListRegistryEvent()
 
   data class OpenErrorPage(

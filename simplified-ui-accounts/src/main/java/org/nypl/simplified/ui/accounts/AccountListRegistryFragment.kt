@@ -163,7 +163,7 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
       }
 
       is AccountEventCreation.AccountEventCreationSucceeded -> {
-        this.listener.post(AccountListRegistryEvent.AccountCreated(event.id, false))
+        this.listener.post(AccountListRegistryEvent.AccountCreated(event.id))
       }
 
       is AccountEventCreation.AccountEventCreationFailed -> {
