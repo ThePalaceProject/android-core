@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
           val deepLinksController =
             Services.serviceDirectory()
-              .requireService(DeepLinksController::class.java)
+              .requireService(DeepLinksControllerType::class.java)
           deepLinksController.publishDeepLinkEvent(accountID)
         }
       }
