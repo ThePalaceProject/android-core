@@ -3,8 +3,8 @@ package org.nypl.simplified.accounts.registry
 import org.nypl.simplified.accounts.api.AccountID
 
 /**
-   * The type of deep link events.
-   */
+ * The type of deep link events.
+ */
 
 sealed class DeepLinkEvent() {
 

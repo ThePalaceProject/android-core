@@ -268,7 +268,7 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
     logger.debug("onDeepLinkEvent called in MainFragment")
     this.navigator.addFragment(
       fragment = AccountDetailFragment.create(
-          AccountFragmentParameters(
+        AccountFragmentParameters(
           accountId = event.libraryID,
           showPleaseLogInTitle = false
         )

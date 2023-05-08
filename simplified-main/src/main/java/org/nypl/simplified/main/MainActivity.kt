@@ -72,7 +72,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
         // Handle the deep link.
         val libraryID: String? = deepLink?.getQueryParameter("libraryid")
         Log.d("DeepLinks", "libraryID: " + libraryID)
-        Log.d("DeepLinks", "libraryID as URI: " + URI("urn:uuid:"+ libraryID).toString())
+        Log.d("DeepLinks", "libraryID as URI: " + URI("urn:uuid:" + libraryID).toString())
 
         if (libraryID != null) {
 //          val profilesController =
@@ -199,7 +199,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
   @Suppress("UNUSED_PARAMETER")
   private fun handleEvent(event: MainActivityListenedEvent, state: Unit) {
-    Log.d("handleEvent", event.toString());
+    Log.d("handleEvent", event.toString())
     return when (event) {
       is MainActivityListenedEvent.SplashEvent ->
         this.handleSplashEvent(event.event)

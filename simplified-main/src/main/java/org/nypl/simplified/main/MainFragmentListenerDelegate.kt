@@ -257,7 +257,6 @@ internal class MainFragmentListenerDelegate(
         this.setMostRecentAccount(event.accountID)
         if (event.isDeepLink) {
           // Event came from deep link
-
         } else {
           this.popBackStack()
           this.openCatalog()

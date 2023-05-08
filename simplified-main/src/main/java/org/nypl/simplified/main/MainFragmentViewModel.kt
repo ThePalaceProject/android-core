@@ -183,7 +183,6 @@ class MainFragmentViewModel(
     deepLinkEvents.onNext(event)
   }
 
-
   override fun onCleared() {
     super.onCleared()
     subscriptions.clear()

@@ -8,5 +8,4 @@ interface DeepLinksControllerType {
   fun deepLinkEvents(): Observable<DeepLinkEvent>
 
   fun publishDeepLinkEvent(accountID: AccountID)
-
 }
