@@ -13,7 +13,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.accounts.api.AccountID
-import org.nypl.simplified.accounts.registry.DeepLinksController
 import org.nypl.simplified.accounts.registry.DeepLinksControllerType
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
