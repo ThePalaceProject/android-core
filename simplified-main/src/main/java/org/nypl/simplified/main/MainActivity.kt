@@ -54,7 +54,6 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
   private val logger = LoggerFactory.getLogger(MainActivity::class.java)
   private val listenerRepo: ListenerRepository<MainActivityListenedEvent, Unit> by listenerRepositories()
-  private val deepLinksController = DeepLinksController()
 
   private val defaultViewModelFactory: ViewModelProvider.Factory by lazy {
     MainActivityDefaultViewModelFactory(super.getDefaultViewModelProviderFactory())
@@ -77,10 +76,10 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
         Log.d("DeepLinks", "libraryID as URI: " + URI("urn:uuid:"+ libraryID).toString())
 
         if (libraryID != null) {
-          val profilesController =
-            Services.serviceDirectory()
-              .requireService(ProfilesControllerType::class.java)
-          profilesController.profileAccountCreate(URI("urn:uuid:"+ libraryID))
+//          val profilesController =
+//            Services.serviceDirectory()
+//              .requireService(ProfilesControllerType::class.java)
+//          profilesController.profileAccountCreate(URI("urn:uuid:"+ libraryID))
 
           val uuid = UUID.fromString(libraryID)
           val accountID = AccountID(uuid)
@@ -88,6 +87,8 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
           val deepLinksController =
             Services.serviceDirectory()
               .requireService(DeepLinksControllerType::class.java)
+          Log.d("DeepLinks", "calling publishDeepLinkEvent...")
+
           deepLinksController.publishDeepLinkEvent(accountID)
         }
       }

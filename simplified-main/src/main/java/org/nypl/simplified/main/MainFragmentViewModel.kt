@@ -1,5 +1,6 @@
 package org.nypl.simplified.main
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import hu.akarnokd.rxjava2.subjects.UnicastWorkSubject
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -90,6 +91,7 @@ class MainFragmentViewModel : ViewModel() {
   }
 
   private fun onDeepLinkEvent(event: DeepLinkEvent) {
+    Log.d("DeepLink", "onDeepLinkEvent called")
     deepLinkEvents.onNext(event)
   }
 

@@ -32,6 +32,7 @@ dependencies {
   implementation libs.palace.http.api
   implementation libs.slf4j
     implementation project(path: ':simplified-accounts-registry')
+    implementation project(path: ':simplified-accounts-registry')
 
     compileOnly libs.google.auto.value
   annotationProcessor libs.google.auto.value.processor

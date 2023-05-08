@@ -35,6 +35,7 @@ class DeepLinksController private constructor(
   }
 
   override fun publishDeepLinkEvent(accountID: AccountID) {
+    logger.debug("publishDeepLinkEvent called in DeepLinksController");
     this.observable.onNext(
       DeepLinkEvent.DeepLinkIntercepted(
         libraryID = accountID

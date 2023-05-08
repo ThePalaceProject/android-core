@@ -1,5 +1,6 @@
 package org.nypl.simplified.books.controller
 
+import android.util.Log
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.FluentFuture
 import com.google.common.util.concurrent.ListeningExecutorService
@@ -18,6 +19,7 @@ import org.nypl.simplified.accounts.api.*
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.accounts.database.api.AccountsDatabaseNonexistentException
 import org.nypl.simplified.accounts.registry.DeepLinkEvent
+import org.nypl.simplified.accounts.registry.DeepLinksController
 import org.nypl.simplified.accounts.registry.DeepLinksControllerType
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryEvent
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
@@ -133,6 +135,8 @@ class Controller private constructor(
     this.services.optionalService(CrashlyticsServiceType::class.java)
   private val metrics =
     this.services.optionalService(MetricServiceType::class.java)
+//  private val deepLinks =
+//    this.services.requireService(DeepLinksControllerType::class.java)
 
   private val temporaryDirectory =
     File(this.cacheDirectory, "tmp")
@@ -293,8 +297,13 @@ class Controller private constructor(
     return FluentFuture.from(future)
   }
 
-  override fun deepLinkEvents(): Observable<DeepLinkEvent> {
+   override fun deepLinkEvents(): Observable<DeepLinkEvent> {
     return this.deepLinkEvents
+  }
+
+   override fun publishDeepLinkEvent(accountID: AccountID) {
+     Log.d("DeepLinks", "publishDeepLinkEvent called in Controller")
+//     this.deepLinks.publishDeepLinkEvent(accountID)
   }
 
   override fun profiles(): SortedMap<ProfileID, ProfileReadableType> {
