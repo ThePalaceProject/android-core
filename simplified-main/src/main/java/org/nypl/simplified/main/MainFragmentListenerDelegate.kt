@@ -255,12 +255,8 @@ internal class MainFragmentListenerDelegate(
     return when (event) {
       is AccountListRegistryEvent.AccountCreated -> {
         this.setMostRecentAccount(event.accountID)
-        if (event.isDeepLink) {
-          // Event came from deep link
-        } else {
-          this.popBackStack()
-          this.openCatalog()
-        }
+        this.popBackStack()
+        this.openCatalog()
         state
       }
       is AccountListRegistryEvent.OpenErrorPage -> {
