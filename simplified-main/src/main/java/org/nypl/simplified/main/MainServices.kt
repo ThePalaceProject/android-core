@@ -915,7 +915,6 @@ internal object MainServices {
       serviceConstructor = { createMetricService(context) }
     )
 
-    val deepLinkEvents = PublishSubject.create<DeepLinkEvent>()
     val bookController = this.run {
       publishEvent(strings.bootingGeneral("books controller"))
       val execBooks =
