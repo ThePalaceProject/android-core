@@ -10,6 +10,7 @@ import com.io7m.jfunctional.Some
 import com.io7m.junreachable.UnreachableCodeException
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
+import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
 import org.joda.time.Instant
 import org.librarysimplified.http.api.LSHTTPClientType
@@ -19,7 +20,6 @@ import org.nypl.simplified.accounts.api.*
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.accounts.database.api.AccountsDatabaseNonexistentException
 import org.nypl.simplified.accounts.registry.DeepLinkEvent
-import org.nypl.simplified.accounts.registry.DeepLinksController
 import org.nypl.simplified.accounts.registry.DeepLinksControllerType
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryEvent
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
@@ -78,6 +78,7 @@ import java.net.URI
 import java.util.SortedMap
 import java.util.concurrent.Callable
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentSkipListMap
 import java.util.concurrent.ExecutorService
 
 /**
@@ -93,6 +94,9 @@ class Controller private constructor(
   private val taskExecutor: ListeningExecutorService
 ) : BooksControllerType, BooksPreviewControllerType, ProfilesControllerType,
   DeepLinksControllerType {
+
+  private val deepLinkEventsObservable: PublishSubject<DeepLinkEvent> =
+    PublishSubject.create()
 
   private val borrows: ConcurrentHashMap<BookID, BorrowTaskType>
 
@@ -135,8 +139,6 @@ class Controller private constructor(
     this.services.optionalService(CrashlyticsServiceType::class.java)
   private val metrics =
     this.services.optionalService(MetricServiceType::class.java)
-//  private val deepLinks =
-//    this.services.requireService(DeepLinksControllerType::class.java)
 
   private val temporaryDirectory =
     File(this.cacheDirectory, "tmp")
@@ -298,12 +300,16 @@ class Controller private constructor(
   }
 
    override fun deepLinkEvents(): Observable<DeepLinkEvent> {
-    return this.deepLinkEvents
+    return this.deepLinkEventsObservable
   }
 
    override fun publishDeepLinkEvent(accountID: AccountID) {
      Log.d("DeepLinks", "publishDeepLinkEvent called in Controller")
-//     this.deepLinks.publishDeepLinkEvent(accountID)
+     this.deepLinkEventsObservable.onNext(
+       DeepLinkEvent.DeepLinkIntercepted(
+         libraryID = accountID
+       )
+     )
   }
 
   override fun profiles(): SortedMap<ProfileID, ProfileReadableType> {
