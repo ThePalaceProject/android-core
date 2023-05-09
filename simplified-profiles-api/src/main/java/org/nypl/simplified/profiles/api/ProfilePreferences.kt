@@ -48,9 +48,5 @@ data class ProfilePreferences(
 
   /** @return `true` if the debug settings should be visible. */
 
-  val showDebugSettings: Boolean = false,
-
-  /** @return `true` if the old PDF reader should be used. */
-
-  val enableOldPDFReader: Boolean = false
+  val showDebugSettings: Boolean = false
 )

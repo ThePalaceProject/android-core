@@ -12,28 +12,9 @@ import org.nypl.simplified.viewer.spi.ViewerPreferences
 class PdfViewerProviderTest {
 
   @Test
-  fun doesNotSupportPdfBooksWhenDisabled() {
+  fun supportsPdfBooks() {
     val preferences = ViewerPreferences(
-      // by setting the old PDF reader setting to true, we're disabling the PDF-JS reader
-      flags = mapOf(
-        "enableOldPDFReader" to true
-      )
-    )
-
-    val book = Mockito.mock(Book::class.java)
-    val format = Mockito.mock(BookFormat.BookFormatPDF::class.java)
-    val provider = PdfViewerProvider()
-
-    Assertions.assertFalse(provider.canSupport(preferences, book, format))
-  }
-
-  @Test
-  fun supportsPdfBooksWhenEnabled() {
-    val preferences = ViewerPreferences(
-      // by setting the old PDF reader setting to false, we're enabling the PDF-JS reader
-      flags = mapOf(
-        "enableOldPDFReader" to false
-      )
+      flags = mapOf()
     )
 
     val book = Mockito.mock(Book::class.java)

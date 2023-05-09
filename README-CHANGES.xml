@@ -270,7 +270,7 @@
         <c:change date="2023-02-28T00:00:00+00:00" summary="Moved the 'Remove' button after the 'Get' button on the Reservations screen."/>
       </c:changes>
     </c:release>
-    <c:release date="2023-05-02T22:31:26+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.5.0">
+    <c:release date="2023-05-09T08:57:44+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.5.0">
       <c:changes>
         <c:change date="2023-03-30T00:00:00+00:00" summary="Save reading position of audiobooks on play, pause, and stop (which also includes when seeking and changing chapters)."/>
         <c:change date="2023-04-04T00:00:00+00:00" summary="Updated library logos loading source in registry feed."/>
@@ -281,7 +281,8 @@
         <c:change date="2023-04-11T00:00:00+00:00" summary="Fixed WebView audiobook preview not pausing when earphones are unplugged."/>
         <c:change date="2023-04-26T00:00:00+00:00" summary="Added support for Bluetooth audio controls to play, pause, and skip tracks."/>
         <c:change date="2023-04-27T00:00:00+00:00" summary="Added support to audiobook bookmarks."/>
-        <c:change date="2023-05-02T22:31:26+00:00" summary="Added badge to holds tab with the number of available holds."/>
+        <c:change date="2023-05-02T00:00:00+00:00" summary="Added badge to holds tab with the number of available holds."/>
+        <c:change date="2023-05-09T08:57:44+00:00" summary="Removed old pdf reader."/>
       </c:changes>
     </c:release>
   </c:releases>

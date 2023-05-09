@@ -622,10 +622,7 @@ internal class MainFragmentListenerDelegate(
   ) {
     val viewerPreferences =
       ViewerPreferences(
-        flags = mapOf(
-          "enableOldPDFReader" to
-            this.profilesController.profileCurrent().preferences().enableOldPDFReader
-        )
+        flags = mapOf()
       )
 
     Viewers.openViewer(

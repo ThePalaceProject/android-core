@@ -15,6 +15,6 @@ the implementation via `ServiceLoader`.
 * [AudioBook](https://github.com/NYPL-Simplified/audiobook-android)
 * [org.librarysimplified.viewer.audiobook](../simplified-viewer-audiobook/README.md)
 * [org.librarysimplified.viewer.epub.readium1](../simplified-viewer-epub-readium1/README.md)
-* [org.librarysimplified.viewer.pdf](../simplified-viewer-pdf/README.md)
+* [org.librarysimplified.viewer.pdf.pdfjs](../simplified-viewer-pdf-pdfjs/README.md)
 * [org.librarysimplified.viewer.spi](../simplified-viewer-spi/README.md)
 * [Readium](https://www.readium.org)
