@@ -282,6 +282,7 @@
         <c:change date="2023-04-26T00:00:00+00:00" summary="Added support for Bluetooth audio controls to play, pause, and skip tracks."/>
         <c:change date="2023-04-27T00:00:00+00:00" summary="Added support to audiobook bookmarks."/>
         <c:change date="2023-05-02T22:31:26+00:00" summary="Added badge to holds tab with the number of available holds."/>
+        <c:change date="2023-05-09T22:31:26+00:00" summary="Always show audio controls on lock screen."/>
       </c:changes>
     </c:release>
   </c:releases>
