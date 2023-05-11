@@ -209,9 +209,6 @@ object ProfileDescriptionJSON {
         ?.let { AccountID(UUID.fromString(it)) }
         ?: mostRecentAccountFallback
 
-    val enableOldPDFReader =
-      JSONParserUtilities.getBooleanDefault(objectNode, "enableOldPDFReader", false)
-
     return ProfilePreferences(
       dateOfBirth = dateOfBirth,
       showTestingLibraries = showTestingLibraries,
@@ -219,7 +216,6 @@ object ProfileDescriptionJSON {
       mostRecentAccount = mostRecentAccount,
       hasSeenLibrarySelectionScreen = hasSeenLibrarySelectionScreen,
       showDebugSettings = showDebugSettings,
-      enableOldPDFReader = enableOldPDFReader,
       playbackRates = playbackRates,
       sleepTimers = sleepTimers
     )
@@ -481,7 +477,6 @@ object ProfileDescriptionJSON {
     output.put("hasSeenLibrarySelectionScreen", preferences.hasSeenLibrarySelectionScreen)
     output.put("showDebugSettings", preferences.showDebugSettings)
     output.put("mostRecentAccount", preferences.mostRecentAccount.uuid.toString())
-    output.put("enableOldPDFReader", preferences.enableOldPDFReader)
 
     output.set<ObjectNode>(
       "playbackRates",

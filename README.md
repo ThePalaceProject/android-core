@@ -298,112 +298,112 @@ that still requires JUnit 4 due to the use of [Robolectric](http://robolectric.o
 The project is heavily modularized in order to keep the separate application components as loosely
 coupled as possible. New features should typically be implemented as new modules.
 
-|Module|Description|
-|------|-----------|
-|[org.librarysimplified.accessibility](simplified-accessibility)|Accessibility APIs and functionality|
-|[org.librarysimplified.accounts.api](simplified-accounts-api)|Accounts API|
-|[org.librarysimplified.accounts.database](simplified-accounts-database)|Accounts database implementation|
-|[org.librarysimplified.accounts.database.api](simplified-accounts-database-api)|Accounts database API|
-|[org.librarysimplified.accounts.json](simplified-accounts-json)|Shared JSON classes|
-|[org.librarysimplified.accounts.registry](simplified-accounts-registry)|Account provider registry implementation|
-|[org.librarysimplified.accounts.registry.api](simplified-accounts-registry-api)|Account provider registry API|
-|[org.librarysimplified.accounts.source.filebased](simplified-accounts-source-filebased)|File/asset based registry source implementation|
-|[org.librarysimplified.accounts.source.nyplregistry](simplified-accounts-source-nyplregistry)|NYPL registry client implementation|
-|[org.librarysimplified.accounts.source.spi](simplified-accounts-source-spi)|Account provider source SPI|
-|[org.librarysimplified.adobe.extensions](simplified-adobe-extensions)|Adobe DRM convenience functions|
-|[org.librarysimplified.analytics.api](simplified-analytics-api)|Analytics API|
-|[org.librarysimplified.analytics.circulation](simplified-analytics-circulation)|Circulation manager analytics implementation|
-|[org.librarysimplified.android.ktx](simplified-android-ktx)|Kotlin Android Extensions|
-|[org.librarysimplified.announcements](simplified-announcements)|Announcements API|
-|[org.nypl.labs.OpenEbooks.app](simplified-app-openebooks)|Open eBooks(Application|
-|[org.thepalaceproject.palace](simplified-app-palace)|Palace|
-|[org.librarysimplified.simplye.app](simplified-app-simplye)|SimplyE (Application|
-|[org.librarysimplified.app.vanilla](simplified-app-vanilla)|Vanilla application|
-|[org.librarysimplified.books.api](simplified-books-api)|Book types|
-|[org.librarysimplified.books.audio](simplified-books-audio)|Audio book support code|
-|[org.librarysimplified.books.borrowing](simplified-books-borrowing)|Book borrowing|
-|[org.librarysimplified.books.bundled.api](simplified-books-bundled-api)|Bundled books API|
-|[org.librarysimplified.books.controller](simplified-books-controller)|Books/Profiles controller implementation|
-|[org.librarysimplified.books.controller.api](simplified-books-controller-api)|Books controller API|
-|[org.librarysimplified.books.covers](simplified-books-covers)|Book cover loading and generation|
-|[org.librarysimplified.books.database](simplified-books-database)|Book database implementation|
-|[org.librarysimplified.books.database.api](simplified-books-database-api)|Book database API|
-|[org.librarysimplified.books.formats](simplified-books-formats)|Book formats implementation|
-|[org.librarysimplified.books.formats.api](simplified-books-formats-api)|Book formats API|
-|[org.librarysimplified.books.preview](simplified-books-preview)|Book preview API|
-|[org.librarysimplified.books.registry.api](simplified-books-registry-api)|Book registry API|
-|[org.librarysimplified.boot.api](simplified-boot-api)|Application boot API|
-|[org.librarysimplified.buildconfig.api](simplified-buildconfig-api)|Build-time configuration API|
-|[org.librarysimplified.cardcreator](simplified-cardcreator)|NYPL card creator|
-|[org.librarysimplified.content.api](simplified-content-api)|Content resolver API|
-|[org.librarysimplified.crashlytics](simplified-crashlytics)|Crashlytics|
-|[org.librarysimplified.crashlytics.api](simplified-crashlytics-api)|Crashlytics functionality|
-|[org.librarysimplified.documents](simplified-documents)|Documents|
-|[org.librarysimplified.feeds.api](simplified-feeds-api)|Feed API|
-|[org.librarysimplified.files](simplified-files)|File utilities|
-|[org.librarysimplified.futures](simplified-futures)|Guava Future extensions|
-|[org.librarysimplified.json.core](simplified-json-core)|JSON utilities|
-|[org.librarysimplified.lcp](simplified-lcp)|LCP content protection provider|
-|[org.librarysimplified.links](simplified-links)|Link types|
-|[org.librarysimplified.links.json](simplified-links-json)|Link JSON parsing|
-|[org.librarysimplified.main](simplified-main)|Main application module|
-|[org.librarysimplified.metrics](simplified-metrics)|Metrics|
-|[org.librarysimplified.metrics](simplified-metrics-api)|Metrics|
-|[org.librarysimplified.migration.api](simplified-migration-api)|Data migration API|
-|[org.librarysimplified.migration.fake](simplified-migration-fake)|Fake data migration for testing purposes|
-|[org.librarysimplified.migration.from3master](simplified-migration-from3master)|Data migration from 3.0.0 master branch data|
-|[org.librarysimplified.migration.spi](simplified-migration-spi)|Data migration SPI|
-|[org.librarysimplified.networkconnectivity](simplified-networkconnectivity)|Network connectivity|
-|[org.librarysimplified.networkconnectivity.api](simplified-networkconnectivity-api)|Network connectivity API|
-|[org.librarysimplified.notifications](simplified-notifications)|Notification service|
-|[org.librarysimplified.oauth](simplified-oauth)|OAuth|
-|[org.librarysimplified.opds.auth_document](simplified-opds-auth-document)|OPDS authentication document parser implementation|
-|[org.librarysimplified.opds.auth_document.api](simplified-opds-auth-document-api)|OPDS authentication document parser API|
-|[org.librarysimplified.opds.core](simplified-opds-core)|OPDS feed parser|
-|[org.librarysimplified.opds2](simplified-opds2)|OPDS 2.0 model definitions|
-|[org.librarysimplified.opds2.irradia](simplified-opds2-irradia)|OPDS 2.0 Parser [Irradia]|
-|[org.librarysimplified.opds2.parser.api](simplified-opds2-parser-api)|OPDS 2.0 parser API|
-|[org.librarysimplified.opds2.r2](simplified-opds2-r2)|OPDS 2.0 Parser [R2]|
-|[org.librarysimplified.parser.api](simplified-parser-api)|Parser API|
-|[org.librarysimplified.patron](simplified-patron)|Patron user profile parser implementation|
-|[org.librarysimplified.patron.api](simplified-patron-api)|Patron user profile parser API|
-|[org.librarysimplified.presentableerror.api](simplified-presentableerror-api)|Presentable error API|
-|[org.librarysimplified.profiles](simplified-profiles)|Profile database implementation|
-|[org.librarysimplified.profiles.api](simplified-profiles-api)|Profile database API|
-|[org.librarysimplified.profiles.controller.api](simplified-profiles-controller-api)|Profile controller API|
-|[org.librarysimplified.reader.api](simplified-reader-api)|Reader API types|
-|[org.librarysimplified.reader.bookmarks](simplified-reader-bookmarks)|Reader bookmark service implementation|
-|[org.librarysimplified.reader.bookmarks.api](simplified-reader-bookmarks-api)|Reader bookmark service API|
-|[org.librarysimplified.reports](simplified-reports)|Error reporting|
-|[org.librarysimplified.services.api](simplified-services-api)|Application services API|
-|[org.librarysimplified.taskrecorder.api](simplified-taskrecorder-api)|Task recorder API|
-|[org.librarysimplified.tenprint](simplified-tenprint)|10PRINT implementation|
-|[org.librarysimplified.tests](simplified-tests)|Test suite|
-|[org.librarysimplified.tests.sandbox](simplified-tests-sandbox)|Sandbox for informal testing|
-|[org.librarysimplified.threads](simplified-threads)|Thread utilities|
-|[org.librarysimplified.ui.accounts](simplified-ui-accounts)|Accounts UI components|
-|[org.librarysimplified.ui.announcements](simplified-ui-announcements)|Announcements UI components|
-|[org.librarysimplified.ui.branding](simplified-ui-branding)|Branding functionality|
-|[org.librarysimplified.ui.catalog](simplified-ui-catalog)|Catalog components|
-|[org.librarysimplified.ui.errorpage](simplified-ui-errorpage)|Error details screen|
-|[org.librarysimplified.ui.images](simplified-ui-images)|Image loader API for general image resources|
-|[org.librarysimplified.ui.listeners.api](simplified-ui-listeners-api)|Listeners API|
-|[org.librarysimplified.ui.tabs](simplified-ui-navigation-tabs)|Tabbed UI|
-|[org.librarysimplified.ui.neutrality](simplified-ui-neutrality)|Neutral color schemes|
-|[org.librarysimplified.ui.onboarding](simplified-ui-onboarding)|Onboarding|
-|[org.librarysimplified.ui.profiles](simplified-ui-profiles)|Profiles UI|
-|[org.librarysimplified.ui.screen](simplified-ui-screen)|Screen API|
-|[org.librarysimplified.ui.settings](simplified-ui-settings)|Settings screens|
-|[org.librarysimplified.ui.splash](simplified-ui-splash)|Splash screen|
-|[org.librarysimplified.ui.thread.api](simplified-ui-thread-api)|UI thread service|
-|[org.librarysimplified.ui.tutorial](simplified-ui-tutorial)|Tutorial screen|
-|[org.librarysimplified.viewer.api](simplified-viewer-api)|Viewer API|
-|[org.librarysimplified.viewer.audiobook](simplified-viewer-audiobook)|AudioBook viewer|
-|[org.librarysimplified.viewer.epub.readium2](simplified-viewer-epub-readium2)|Readium 2 EPUB reader|
-|[org.librarysimplified.viewer.pdf](simplified-viewer-pdf)|PDF reader|
-|[org.librarysimplified.viewer.preview](simplified-viewer-preview)|Book preview reader/player|
-|[org.librarysimplified.viewer.spi](simplified-viewer-spi)|Viewer SPI|
-|[org.librarysimplified.webview](simplified-webview)|WebView utilities|
+| Module                                                                                        |Description|
+|-----------------------------------------------------------------------------------------------|-----------|
+| [org.librarysimplified.accessibility](simplified-accessibility)                               |Accessibility APIs and functionality|
+| [org.librarysimplified.accounts.api](simplified-accounts-api)                                 |Accounts API|
+| [org.librarysimplified.accounts.database](simplified-accounts-database)                       |Accounts database implementation|
+| [org.librarysimplified.accounts.database.api](simplified-accounts-database-api)               |Accounts database API|
+| [org.librarysimplified.accounts.json](simplified-accounts-json)                               |Shared JSON classes|
+| [org.librarysimplified.accounts.registry](simplified-accounts-registry)                       |Account provider registry implementation|
+| [org.librarysimplified.accounts.registry.api](simplified-accounts-registry-api)               |Account provider registry API|
+| [org.librarysimplified.accounts.source.filebased](simplified-accounts-source-filebased)       |File/asset based registry source implementation|
+| [org.librarysimplified.accounts.source.nyplregistry](simplified-accounts-source-nyplregistry) |NYPL registry client implementation|
+| [org.librarysimplified.accounts.source.spi](simplified-accounts-source-spi)                   |Account provider source SPI|
+| [org.librarysimplified.adobe.extensions](simplified-adobe-extensions)                         |Adobe DRM convenience functions|
+| [org.librarysimplified.analytics.api](simplified-analytics-api)                               |Analytics API|
+| [org.librarysimplified.analytics.circulation](simplified-analytics-circulation)               |Circulation manager analytics implementation|
+| [org.librarysimplified.android.ktx](simplified-android-ktx)                                   |Kotlin Android Extensions|
+| [org.librarysimplified.announcements](simplified-announcements)                               |Announcements API|
+| [org.nypl.labs.OpenEbooks.app](simplified-app-openebooks)                                     |Open eBooks(Application|
+| [org.thepalaceproject.palace](simplified-app-palace)                                          |Palace|
+| [org.librarysimplified.simplye.app](simplified-app-simplye)                                   |SimplyE (Application|
+| [org.librarysimplified.app.vanilla](simplified-app-vanilla)                                   |Vanilla application|
+| [org.librarysimplified.books.api](simplified-books-api)                                       |Book types|
+| [org.librarysimplified.books.audio](simplified-books-audio)                                   |Audio book support code|
+| [org.librarysimplified.books.borrowing](simplified-books-borrowing)                           |Book borrowing|
+| [org.librarysimplified.books.bundled.api](simplified-books-bundled-api)                       |Bundled books API|
+| [org.librarysimplified.books.controller](simplified-books-controller)                         |Books/Profiles controller implementation|
+| [org.librarysimplified.books.controller.api](simplified-books-controller-api)                 |Books controller API|
+| [org.librarysimplified.books.covers](simplified-books-covers)                                 |Book cover loading and generation|
+| [org.librarysimplified.books.database](simplified-books-database)                             |Book database implementation|
+| [org.librarysimplified.books.database.api](simplified-books-database-api)                     |Book database API|
+| [org.librarysimplified.books.formats](simplified-books-formats)                               |Book formats implementation|
+| [org.librarysimplified.books.formats.api](simplified-books-formats-api)                       |Book formats API|
+| [org.librarysimplified.books.preview](simplified-books-preview)                               |Book preview API|
+| [org.librarysimplified.books.registry.api](simplified-books-registry-api)                     |Book registry API|
+| [org.librarysimplified.boot.api](simplified-boot-api)                                         |Application boot API|
+| [org.librarysimplified.buildconfig.api](simplified-buildconfig-api)                           |Build-time configuration API|
+| [org.librarysimplified.cardcreator](simplified-cardcreator)                                   |NYPL card creator|
+| [org.librarysimplified.content.api](simplified-content-api)                                   |Content resolver API|
+| [org.librarysimplified.crashlytics](simplified-crashlytics)                                   |Crashlytics|
+| [org.librarysimplified.crashlytics.api](simplified-crashlytics-api)                           |Crashlytics functionality|
+| [org.librarysimplified.documents](simplified-documents)                                       |Documents|
+| [org.librarysimplified.feeds.api](simplified-feeds-api)                                       |Feed API|
+| [org.librarysimplified.files](simplified-files)                                               |File utilities|
+| [org.librarysimplified.futures](simplified-futures)                                           |Guava Future extensions|
+| [org.librarysimplified.json.core](simplified-json-core)                                       |JSON utilities|
+| [org.librarysimplified.lcp](simplified-lcp)                                                   |LCP content protection provider|
+| [org.librarysimplified.links](simplified-links)                                               |Link types|
+| [org.librarysimplified.links.json](simplified-links-json)                                     |Link JSON parsing|
+| [org.librarysimplified.main](simplified-main)                                                 |Main application module|
+| [org.librarysimplified.metrics](simplified-metrics)                                           |Metrics|
+| [org.librarysimplified.metrics](simplified-metrics-api)                                       |Metrics|
+| [org.librarysimplified.migration.api](simplified-migration-api)                               |Data migration API|
+| [org.librarysimplified.migration.fake](simplified-migration-fake)                             |Fake data migration for testing purposes|
+| [org.librarysimplified.migration.from3master](simplified-migration-from3master)               |Data migration from 3.0.0 master branch data|
+| [org.librarysimplified.migration.spi](simplified-migration-spi)                               |Data migration SPI|
+| [org.librarysimplified.networkconnectivity](simplified-networkconnectivity)                   |Network connectivity|
+| [org.librarysimplified.networkconnectivity.api](simplified-networkconnectivity-api)           |Network connectivity API|
+| [org.librarysimplified.notifications](simplified-notifications)                               |Notification service|
+| [org.librarysimplified.oauth](simplified-oauth)                                               |OAuth|
+| [org.librarysimplified.opds.auth_document](simplified-opds-auth-document)                     |OPDS authentication document parser implementation|
+| [org.librarysimplified.opds.auth_document.api](simplified-opds-auth-document-api)             |OPDS authentication document parser API|
+| [org.librarysimplified.opds.core](simplified-opds-core)                                       |OPDS feed parser|
+| [org.librarysimplified.opds2](simplified-opds2)                                               |OPDS 2.0 model definitions|
+| [org.librarysimplified.opds2.irradia](simplified-opds2-irradia)                               |OPDS 2.0 Parser [Irradia]|
+| [org.librarysimplified.opds2.parser.api](simplified-opds2-parser-api)                         |OPDS 2.0 parser API|
+| [org.librarysimplified.opds2.r2](simplified-opds2-r2)                                         |OPDS 2.0 Parser [R2]|
+| [org.librarysimplified.parser.api](simplified-parser-api)                                     |Parser API|
+| [org.librarysimplified.patron](simplified-patron)                                             |Patron user profile parser implementation|
+| [org.librarysimplified.patron.api](simplified-patron-api)                                     |Patron user profile parser API|
+| [org.librarysimplified.presentableerror.api](simplified-presentableerror-api)                 |Presentable error API|
+| [org.librarysimplified.profiles](simplified-profiles)                                         |Profile database implementation|
+| [org.librarysimplified.profiles.api](simplified-profiles-api)                                 |Profile database API|
+| [org.librarysimplified.profiles.controller.api](simplified-profiles-controller-api)           |Profile controller API|
+| [org.librarysimplified.reader.api](simplified-reader-api)                                     |Reader API types|
+| [org.librarysimplified.reader.bookmarks](simplified-reader-bookmarks)                         |Reader bookmark service implementation|
+| [org.librarysimplified.reader.bookmarks.api](simplified-reader-bookmarks-api)                 |Reader bookmark service API|
+| [org.librarysimplified.reports](simplified-reports)                                           |Error reporting|
+| [org.librarysimplified.services.api](simplified-services-api)                                 |Application services API|
+| [org.librarysimplified.taskrecorder.api](simplified-taskrecorder-api)                         |Task recorder API|
+| [org.librarysimplified.tenprint](simplified-tenprint)                                         |10PRINT implementation|
+| [org.librarysimplified.tests](simplified-tests)                                               |Test suite|
+| [org.librarysimplified.tests.sandbox](simplified-tests-sandbox)                               |Sandbox for informal testing|
+| [org.librarysimplified.threads](simplified-threads)                                           |Thread utilities|
+| [org.librarysimplified.ui.accounts](simplified-ui-accounts)                                   |Accounts UI components|
+| [org.librarysimplified.ui.announcements](simplified-ui-announcements)                         |Announcements UI components|
+| [org.librarysimplified.ui.branding](simplified-ui-branding)                                   |Branding functionality|
+| [org.librarysimplified.ui.catalog](simplified-ui-catalog)                                     |Catalog components|
+| [org.librarysimplified.ui.errorpage](simplified-ui-errorpage)                                 |Error details screen|
+| [org.librarysimplified.ui.images](simplified-ui-images)                                       |Image loader API for general image resources|
+| [org.librarysimplified.ui.listeners.api](simplified-ui-listeners-api)                         |Listeners API|
+| [org.librarysimplified.ui.tabs](simplified-ui-navigation-tabs)                                |Tabbed UI|
+| [org.librarysimplified.ui.neutrality](simplified-ui-neutrality)                               |Neutral color schemes|
+| [org.librarysimplified.ui.onboarding](simplified-ui-onboarding)                               |Onboarding|
+| [org.librarysimplified.ui.profiles](simplified-ui-profiles)                                   |Profiles UI|
+| [org.librarysimplified.ui.screen](simplified-ui-screen)                                       |Screen API|
+| [org.librarysimplified.ui.settings](simplified-ui-settings)                                   |Settings screens|
+| [org.librarysimplified.ui.splash](simplified-ui-splash)                                       |Splash screen|
+| [org.librarysimplified.ui.thread.api](simplified-ui-thread-api)                               |UI thread service|
+| [org.librarysimplified.ui.tutorial](simplified-ui-tutorial)                                   |Tutorial screen|
+| [org.librarysimplified.viewer.api](simplified-viewer-api)                                     |Viewer API|
+| [org.librarysimplified.viewer.audiobook](simplified-viewer-audiobook)                         |AudioBook viewer|
+| [org.librarysimplified.viewer.epub.readium2](simplified-viewer-epub-readium2)                 |Readium 2 EPUB reader|
+| [org.librarysimplified.viewer.pdf-pdfjs](simplified-viewer-pdf-pdfjs)                         |PDF reader|
+| [org.librarysimplified.viewer.preview](simplified-viewer-preview)                             |Book preview reader/player|
+| [org.librarysimplified.viewer.spi](simplified-viewer-spi)                                     |Viewer SPI|
+| [org.librarysimplified.webview](simplified-webview)                                           |WebView utilities|
 
 _The above table is generated with [ReadMe.java](src/misc/ReadMe.java)._
 
