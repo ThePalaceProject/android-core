@@ -283,7 +283,7 @@
         <c:change date="2023-04-27T00:00:00+00:00" summary="Added support to audiobook bookmarks."/>
         <c:change date="2023-05-02T00:00:00+00:00" summary="Added badge to holds tab with the number of available holds."/>
         <c:change date="2023-05-09T00:00:00+00:00" summary="Always show audio controls on lock screen."/>
-        <c:change date="2023-05-11T13:48:54+00:00" summary="Removed old pdf reader. "/>
+        <c:change date="2023-05-11T13:48:54+00:00" summary="Removed old pdf reader."/>
       </c:changes>
     </c:release>
   </c:releases>
