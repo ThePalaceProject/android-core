@@ -168,16 +168,6 @@
       android:text="@string/settingsDevEnableHiddenLibraries" />
 
     <androidx.appcompat.widget.SwitchCompat
-      android:id="@+id/settingsVersionDevEnableOldPDFReaderSwitch"
-      android:theme="@style/Enabled.Switch"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginBottom="16dp"
-      android:checked="false"
-      android:enabled="true"
-      android:text="@string/settingsDevEnableOldPDFReader" />
-
-    <androidx.appcompat.widget.SwitchCompat
       android:id="@+id/settingsVersionDevFailNextBootSwitch"
       android:theme="@style/Enabled.Switch"
       android:layout_width="match_parent"

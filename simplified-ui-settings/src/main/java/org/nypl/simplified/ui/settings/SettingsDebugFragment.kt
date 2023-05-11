@@ -50,7 +50,6 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
   private lateinit var crashlyticsId: TextView
   private lateinit var customOPDS: Button
   private lateinit var drmTable: TableLayout
-  private lateinit var enableOldPDFReader: SwitchCompat
   private lateinit var failNextBoot: SwitchCompat
   private lateinit var forgetAnnouncementsButton: Button
   private lateinit var hasSeenLibrarySelection: SwitchCompat
@@ -111,8 +110,6 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
       view.findViewById(R.id.libraryRegistryOverrideSet)
     this.enableOpenEBooksQA =
       view.findViewById(R.id.settingsVersionDevEnableOpenEBooksQA)
-    this.enableOldPDFReader =
-      view.findViewById(R.id.settingsVersionDevEnableOldPDFReaderSwitch)
 
     this.drmTable.addView(
       this.createDrmSupportRow("Adobe Acs", this.viewModel.adeptSupported)
@@ -129,8 +126,6 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
 
     this.showTesting.isChecked =
       this.viewModel.showTestingLibraries
-    this.enableOldPDFReader.isChecked =
-      this.viewModel.enableOldPDFReader
     this.failNextBoot.isChecked =
       this.viewModel.isBootFailureEnabled
     this.hasSeenLibrarySelection.isChecked =
@@ -244,10 +239,6 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
 
     this.customOPDS.setOnClickListener {
       this.listener.post(SettingsDebugEvent.OpenCustomOPDS)
-    }
-
-    this.enableOldPDFReader.setOnCheckedChangeListener { _, checked ->
-      this.viewModel.enableOldPDFReader = checked
     }
 
     this.configureLibraryRegistryCustomUI()

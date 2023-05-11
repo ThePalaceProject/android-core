@@ -312,16 +312,4 @@ class SettingsDebugViewModel(application: Application) : AndroidViewModel(applic
       )
     }
   }
-
-  var enableOldPDFReader: Boolean
-    get() =
-      this.profilesController
-        .profileCurrent()
-        .preferences()
-        .enableOldPDFReader
-    set(value) {
-      this.profilesController.profileUpdate { description ->
-        description.copy(preferences = description.preferences.copy(enableOldPDFReader = value))
-      }
-    }
 }
