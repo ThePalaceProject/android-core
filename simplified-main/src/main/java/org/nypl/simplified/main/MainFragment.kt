@@ -35,6 +35,8 @@ import org.nypl.simplified.profiles.api.idle_timer.ProfileIdleTimeOutSoon
 import org.nypl.simplified.profiles.api.idle_timer.ProfileIdleTimedOut
 import org.nypl.simplified.ui.accounts.AccountDetailFragment
 import org.nypl.simplified.ui.accounts.AccountFragmentParameters
+import org.nypl.simplified.ui.accounts.AccountListFragment
+import org.nypl.simplified.ui.accounts.AccountListFragmentParameters
 import org.nypl.simplified.ui.announcements.AnnouncementsDialog
 import org.nypl.simplified.ui.catalog.saml20.CatalogSAML20Fragment
 import org.nypl.simplified.ui.catalog.saml20.CatalogSAML20FragmentParameters
@@ -265,16 +267,26 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
   }
 
   private fun onDeepLinkEvent(event: DeepLinkEvent) {
-    logger.debug("onDeepLinkEvent called in MainFragment")
+    logger.debug("onDeepLinkEvent called in MainFragment with libraryID: " + event.libraryID)
+//    this.navigator.addFragment(
+//      fragment = AccountDetailFragment.create(
+//        AccountFragmentParameters(
+//          accountId = event.libraryID,
+//          showPleaseLogInTitle = false
+//        )
+//      ),
+//      tab = this.navigator.currentTab()
+//    )
+
     this.navigator.addFragment(
-      fragment = AccountDetailFragment.create(
-        AccountFragmentParameters(
-          accountId = event.libraryID,
-          showPleaseLogInTitle = false
+      fragment = AccountListFragment.create(
+        AccountListFragmentParameters(
+          shouldShowLibraryRegistryMenu = false
         )
       ),
-      tab = this.navigator.currentTab()
+      tab = org.nypl.simplified.ui.navigation.tabs.R.id.tabSettings
     )
+
   }
 
   private fun onBookHoldsUpdateEvent(event: BookHoldsUpdateEvent) {

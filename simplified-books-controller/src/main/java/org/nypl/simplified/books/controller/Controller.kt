@@ -10,7 +10,7 @@ import com.io7m.jfunctional.Some
 import com.io7m.junreachable.UnreachableCodeException
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
-import io.reactivex.subjects.PublishSubject
+import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.Subject
 import org.joda.time.Instant
 import org.librarysimplified.http.api.LSHTTPClientType
@@ -100,8 +100,8 @@ class Controller private constructor(
   ProfilesControllerType,
   DeepLinksControllerType {
 
-  private val deepLinkEventsObservable: PublishSubject<DeepLinkEvent> =
-    PublishSubject.create()
+  private val deepLinkEventsObservable: BehaviorSubject<DeepLinkEvent> =
+    BehaviorSubject.create()
 
   private val borrows: ConcurrentHashMap<BookID, BorrowTaskType>
 

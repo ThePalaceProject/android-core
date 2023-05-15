@@ -63,6 +63,25 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     super.onCreate(savedInstanceState)
     this.logger.debug("onCreate (super completed)")
 
+    interceptDeepLink()
+    val toolbar = this.findViewById(R.id.mainToolbar) as Toolbar
+    this.setSupportActionBar(toolbar)
+    this.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    this.supportActionBar?.setDisplayShowHomeEnabled(true)
+    this.supportActionBar?.hide() // Hide toolbar until requested
+
+    if (savedInstanceState == null) {
+      this.openSplashScreen()
+    } else {
+      if (savedInstanceState.getBoolean(STATE_ACTION_BAR_IS_SHOWING)) {
+        this.supportActionBar?.show()
+      } else {
+        this.supportActionBar?.hide()
+      }
+    }
+  }
+
+  fun interceptDeepLink() {
     FirebaseDynamicLinks.getInstance()
       .getDynamicLink(intent)
       .addOnSuccessListener(this) { pendingDynamicLinkData ->
@@ -95,21 +114,6 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
         Log.w("DeepLinks", "getDynamicLink:onFailure", e)
       }
 
-    val toolbar = this.findViewById(R.id.mainToolbar) as Toolbar
-    this.setSupportActionBar(toolbar)
-    this.supportActionBar?.setDisplayHomeAsUpEnabled(true)
-    this.supportActionBar?.setDisplayShowHomeEnabled(true)
-    this.supportActionBar?.hide() // Hide toolbar until requested
-
-    if (savedInstanceState == null) {
-      this.openSplashScreen()
-    } else {
-      if (savedInstanceState.getBoolean(STATE_ACTION_BAR_IS_SHOWING)) {
-        this.supportActionBar?.show()
-      } else {
-        this.supportActionBar?.hide()
-      }
-    }
   }
 
   override fun getDefaultViewModelProviderFactory(): ViewModelProvider.Factory {
@@ -190,6 +194,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
   override fun onStart() {
     super.onStart()
     this.listenerRepo.registerHandler(this::handleEvent)
+    interceptDeepLink()
   }
 
   override fun onStop() {
