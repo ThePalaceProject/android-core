@@ -129,6 +129,10 @@ class AccountListFragment : Fragment(R.layout.account_list) {
     this.viewModel.accountEvents
       .subscribe(this::onAccountEvent)
       .let { subscriptions.add(it) }
+
+    if (this.parameters.libraryID != null) {
+      this.listener.post(AccountListEvent.AccountSelected(this.parameters.libraryID!!))
+    }
   }
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

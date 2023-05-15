@@ -478,7 +478,8 @@ internal class MainFragmentListenerDelegate(
     this.navigator.addFragment(
       fragment = AccountListFragment.create(
         AccountListFragmentParameters(
-          shouldShowLibraryRegistryMenu = this.settingsConfiguration.allowAccountsRegistryAccess
+          shouldShowLibraryRegistryMenu = this.settingsConfiguration.allowAccountsRegistryAccess,
+          null
         )
       ),
       tab = R.id.tabSettings
