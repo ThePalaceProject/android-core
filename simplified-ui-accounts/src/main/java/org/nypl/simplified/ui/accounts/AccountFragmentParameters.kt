@@ -19,6 +19,12 @@ data class AccountFragmentParameters(
    * Show the "please log in to continue" title.
    */
 
-  val showPleaseLogInTitle: Boolean
+  val showPleaseLogInTitle: Boolean,
+
+  /**
+   * Pre-populate the barcode with the provided value (e.g. from deep links).
+   */
+
+  val barcode: String?
 
 ) : Serializable

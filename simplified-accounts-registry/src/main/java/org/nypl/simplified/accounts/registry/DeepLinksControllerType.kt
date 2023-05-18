@@ -7,5 +7,5 @@ interface DeepLinksControllerType {
 
   fun deepLinkEvents(): Observable<DeepLinkEvent>
 
-  fun publishDeepLinkEvent(accountID: AccountID)
+  fun publishDeepLinkEvent(accountID: AccountID, barcode: String?)
 }

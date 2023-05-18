@@ -92,7 +92,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
         val deepLink: Uri? = pendingDynamicLinkData?.link
 
         // Handle the deep link.
-        val libraryID: String? = deepLink?.getQueryParameter("libraryid")
+        val libraryID = deepLink?.getQueryParameter("libraryid")
         Log.d("DeepLinks", "libraryID: " + libraryID)
         Log.d("DeepLinks", "libraryID as URI: " + URI("urn:uuid:" + libraryID).toString())
 
@@ -112,7 +112,8 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
             Services.serviceDirectory()
               .requireService(DeepLinksControllerType::class.java)
           Log.d("DeepLinks", "calling publishDeepLinkEvent...")
-          deepLinksController.publishDeepLinkEvent(accountID)
+          val barcode = deepLink?.getQueryParameter("barcode")
+          deepLinksController.publishDeepLinkEvent(accountID, barcode)
         }
       }
       .addOnFailureListener(this) { e ->

@@ -267,12 +267,12 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
   }
 
   private fun onDeepLinkEvent(event: DeepLinkEvent) {
-    logger.debug("onDeepLinkEvent called in MainFragment with libraryID: " + event.libraryID)
+    logger.debug("onDeepLinkEvent called in MainFragment with libraryID: " + event.accountID)
     this.navigator.addFragment(
       fragment = AccountListFragment.create(
         AccountListFragmentParameters(
           shouldShowLibraryRegistryMenu = false,
-          libraryID = event.libraryID
+          accountID = event.accountID
         )
       ),
       tab = org.nypl.simplified.ui.navigation.tabs.R.id.tabSettings

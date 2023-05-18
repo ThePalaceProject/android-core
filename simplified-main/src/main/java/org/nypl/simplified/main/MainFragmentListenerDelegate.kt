@@ -551,7 +551,8 @@ internal class MainFragmentListenerDelegate(
       fragment = AccountDetailFragment.create(
         AccountFragmentParameters(
           accountId = account,
-          showPleaseLogInTitle = comingFromBookLoanRequest
+          showPleaseLogInTitle = comingFromBookLoanRequest,
+          null
         )
       ),
       tab = this.navigator.currentTab()

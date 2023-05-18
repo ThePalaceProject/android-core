@@ -132,9 +132,9 @@ class AccountListFragment : Fragment(R.layout.account_list) {
       .subscribe(this::onAccountEvent)
       .let { subscriptions.add(it) }
 
-    if (this.parameters.libraryID != null) {
-      Log.d("DeepLinks", "deep link intercepted with with this.parameters.libraryID " + this.parameters.libraryID)
-      this.listener.post(AccountListEvent.AccountSelected(this.parameters.libraryID!!))
+    if (this.parameters.accountID != null) {
+      Log.d("DeepLinks", "deep link intercepted with with this.parameters.libraryID " + this.parameters.accountID)
+      this.listener.post(AccountListEvent.AccountSelected(this.parameters.accountID!!))
     }
   }
 

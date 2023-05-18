@@ -5,20 +5,27 @@ import org.nypl.simplified.accounts.api.AccountID
 /**
  * The type of deep link events.
  */
-
 sealed class DeepLinkEvent() {
 
   /**
-   * The library ID to be navigated to
+   * The account ID for the library login screen to be navigated to.
    */
 
-  abstract val libraryID: AccountID
+  abstract val accountID: AccountID
+
+  /**
+   * The barcode to populate on the library login screen. (Optional)
+   */
+
+  abstract val barcode: String?
 
   /**
    * A new deep link was intercepted
    */
 
   data class DeepLinkIntercepted(
-    override val libraryID: AccountID,
+    override val accountID: AccountID,
+    override val barcode: String?
   ) : DeepLinkEvent()
 }
+

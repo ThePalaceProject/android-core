@@ -16,10 +16,10 @@ data class AccountListFragmentParameters(
   val shouldShowLibraryRegistryMenu: Boolean,
 
   /**
-   * The library ID to be navigated to.
+   * The accountID to be navigated to.
    */
 
-  val libraryID: AccountID?
+  val accountID: AccountID?
 
 
 

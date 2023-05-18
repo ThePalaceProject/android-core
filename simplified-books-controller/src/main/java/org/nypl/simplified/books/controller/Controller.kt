@@ -308,11 +308,12 @@ class Controller private constructor(
     return this.deepLinkEventsObservable
   }
 
-  override fun publishDeepLinkEvent(accountID: AccountID) {
+  override fun publishDeepLinkEvent(accountID: AccountID, barcode: String?) {
     Log.d("DeepLinks", "publishDeepLinkEvent called in Controller")
     this.deepLinkEventsObservable.onNext(
       DeepLinkEvent.DeepLinkIntercepted(
-        libraryID = accountID
+        accountID = accountID,
+        barcode = barcode
       )
     )
   }
