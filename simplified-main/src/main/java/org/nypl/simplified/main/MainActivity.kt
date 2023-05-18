@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.accounts.api.AccountID
+import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.accounts.registry.DeepLinksControllerType
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
@@ -25,6 +26,7 @@ import org.nypl.simplified.profiles.api.ProfilesDatabaseType.AnonymousProfileEna
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType.AnonymousProfileEnabled.ANONYMOUS_PROFILE_ENABLED
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.OAuthWithIntermediaryComplete
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
+import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.ui.accounts.AccountDetailEvent
 import org.nypl.simplified.ui.accounts.AccountDetailFragment
 import org.nypl.simplified.ui.branding.BrandingSplashServiceType
@@ -44,6 +46,7 @@ import org.slf4j.LoggerFactory
 import java.net.URI
 import java.util.ServiceLoader
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity(R.layout.main_host) {
 
@@ -81,7 +84,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     }
   }
 
-  fun interceptDeepLink() {
+  private fun interceptDeepLink() {
     FirebaseDynamicLinks.getInstance()
       .getDynamicLink(intent)
       .addOnSuccessListener(this) { pendingDynamicLinkData ->
@@ -94,26 +97,27 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
         Log.d("DeepLinks", "libraryID as URI: " + URI("urn:uuid:" + libraryID).toString())
 
         if (libraryID != null) {
-//          val profilesController =
-//            Services.serviceDirectory()
-//              .requireService(ProfilesControllerType::class.java)
-//          profilesController.profileAccountCreate(URI("urn:uuid:"+ libraryID))
+          val profilesController =
+            Services.serviceDirectory()
+              .requireService(ProfilesControllerType::class.java)
+          val result = profilesController.profileAccountCreateOrReturnExisting(URI("urn:uuid:" + libraryID)).get(3L, TimeUnit.MINUTES)
 
-          val uuid = UUID.fromString(libraryID)
-          val accountID = AccountID(uuid)
+          lateinit var accountID: AccountID
+          when (result) {
+            is TaskResult.Success -> accountID = result.result.id
+            is TaskResult.Failure -> null
+          }
 
           val deepLinksController =
             Services.serviceDirectory()
               .requireService(DeepLinksControllerType::class.java)
           Log.d("DeepLinks", "calling publishDeepLinkEvent...")
-
           deepLinksController.publishDeepLinkEvent(accountID)
         }
       }
       .addOnFailureListener(this) { e ->
         Log.w("DeepLinks", "getDynamicLink:onFailure", e)
       }
-
   }
 
   override fun getDefaultViewModelProviderFactory(): ViewModelProvider.Factory {

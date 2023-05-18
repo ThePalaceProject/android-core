@@ -1,6 +1,7 @@
 package org.nypl.simplified.ui.accounts
 
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -94,6 +95,7 @@ class AccountListFragment : Fragment(R.layout.account_list) {
   }
 
   private fun onAccountClicked(account: AccountType) {
+    Log.d("DeepLinks", "onAccountClicked with account.id " + account.id)
     this.listener.post(AccountListEvent.AccountSelected(account.id))
   }
 
@@ -131,6 +133,7 @@ class AccountListFragment : Fragment(R.layout.account_list) {
       .let { subscriptions.add(it) }
 
     if (this.parameters.libraryID != null) {
+      Log.d("DeepLinks", "deep link intercepted with with this.parameters.libraryID " + this.parameters.libraryID)
       this.listener.post(AccountListEvent.AccountSelected(this.parameters.libraryID!!))
     }
   }
