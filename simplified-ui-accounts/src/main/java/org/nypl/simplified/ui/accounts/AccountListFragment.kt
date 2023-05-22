@@ -133,6 +133,7 @@ class AccountListFragment : Fragment(R.layout.account_list) {
 
     if (this.parameters.accountID != null) {
       Log.d("DeepLinks", "deep link intercepted with with this.parameters.libraryID " + this.parameters.accountID)
+      Log.d("DeepLinks", "deep link intercepted with with this.parameters.barcode " + this.parameters.barcode)
       this.listener.post(AccountListEvent.AccountSelected(this.parameters.accountID!!, this.parameters.barcode))
     }
   }

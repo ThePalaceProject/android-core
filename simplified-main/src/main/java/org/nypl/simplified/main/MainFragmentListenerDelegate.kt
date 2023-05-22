@@ -282,7 +282,7 @@ internal class MainFragmentListenerDelegate(
   ): MainFragmentState {
     return when (event) {
       is AccountListEvent.AccountSelected -> {
-        this.openSettingsAccount(event.account, comingFromBookLoanRequest = false, barcode = null)
+        this.openSettingsAccount(event.account, comingFromBookLoanRequest = false, barcode = event.barcode)
         state
       }
       AccountListEvent.AddAccount -> {

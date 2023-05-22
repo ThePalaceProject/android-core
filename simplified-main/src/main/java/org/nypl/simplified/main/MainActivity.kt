@@ -102,10 +102,16 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
               .requireService(ProfilesControllerType::class.java)
           val result = profilesController.profileAccountCreateOrReturnExisting(URI("urn:uuid:" + libraryID)).get(3L, TimeUnit.MINUTES)
 
+          Log.d("DeepLinks", "result: " + result)
+
           lateinit var accountID: AccountID
           when (result) {
-            is TaskResult.Success -> accountID = result.result.id
-            is TaskResult.Failure -> null
+            is TaskResult.Success -> {
+              accountID = result.result.id
+            }
+            is TaskResult.Failure -> {
+              Log.e("MainActivity", "Error: unable to create or return existing account for library $libraryID")
+            }
           }
 
           val deepLinksController =
@@ -114,6 +120,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
           val barcode = deepLink?.getQueryParameter("barcode")
           Log.d("DeepLinks", "calling publishDeepLinkEvent with barcode: $barcode")
           deepLinksController.publishDeepLinkEvent(accountID, barcode)
+
         }
       }
       .addOnFailureListener(this) { e ->
