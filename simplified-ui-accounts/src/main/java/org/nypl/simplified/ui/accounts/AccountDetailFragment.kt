@@ -3,6 +3,7 @@ package org.nypl.simplified.ui.accounts
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.URLUtil
@@ -388,6 +389,21 @@ class AccountDetailFragment : Fragment(R.layout.account) {
      */
 
     this.configureReportIssue()
+
+    /*
+     * Populate the barcode if passed in (e.g. via deep link)
+     */
+
+    var barcode = this.parameters.barcode
+    Log.d("DeepLinks", "Barcode: " + barcode)
+    if (barcode != null) {
+      Log.d("DeepLinks", "Barcode not null. Setting basic user and pass with barcode: " + barcode)
+      this.authenticationViews.setBasicUserAndPass(
+        user = barcode,
+        password = ""
+      )
+    }
+
   }
 
   private fun instantiateAlternativeAuthenticationViews() {

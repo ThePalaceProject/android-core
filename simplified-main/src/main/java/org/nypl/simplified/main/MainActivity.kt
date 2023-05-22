@@ -111,8 +111,8 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
           val deepLinksController =
             Services.serviceDirectory()
               .requireService(DeepLinksControllerType::class.java)
-          Log.d("DeepLinks", "calling publishDeepLinkEvent...")
           val barcode = deepLink?.getQueryParameter("barcode")
+          Log.d("DeepLinks", "calling publishDeepLinkEvent with barcode: $barcode")
           deepLinksController.publishDeepLinkEvent(accountID, barcode)
         }
       }
