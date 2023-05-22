@@ -179,7 +179,7 @@ internal class MainFragmentListenerDelegate(
   ): MainFragmentState {
     return when (event) {
       is CatalogFeedEvent.LoginRequired -> {
-        this.openSettingsAccount(event.account, comingFromBookLoanRequest = true)
+        this.openSettingsAccount(event.account, comingFromBookLoanRequest = true, barcode = null)
         MainFragmentState.CatalogWaitingForLogin
       }
       is CatalogFeedEvent.OpenErrorPage -> {
@@ -211,7 +211,7 @@ internal class MainFragmentListenerDelegate(
   ): MainFragmentState {
     return when (event) {
       is CatalogBookDetailEvent.LoginRequired -> {
-        this.openSettingsAccount(event.account, comingFromBookLoanRequest = true)
+        this.openSettingsAccount(event.account, comingFromBookLoanRequest = true, barcode = null)
         MainFragmentState.BookDetailsWaitingForLogin
       }
       is CatalogBookDetailEvent.OpenErrorPage -> {
@@ -282,7 +282,7 @@ internal class MainFragmentListenerDelegate(
   ): MainFragmentState {
     return when (event) {
       is AccountListEvent.AccountSelected -> {
-        this.openSettingsAccount(event.account, comingFromBookLoanRequest = false)
+        this.openSettingsAccount(event.account, comingFromBookLoanRequest = false, barcode = null)
         state
       }
       AccountListEvent.AddAccount -> {
@@ -479,7 +479,8 @@ internal class MainFragmentListenerDelegate(
       fragment = AccountListFragment.create(
         AccountListFragmentParameters(
           shouldShowLibraryRegistryMenu = this.settingsConfiguration.allowAccountsRegistryAccess,
-          null
+          accountID = null,
+          barcode = null
         )
       ),
       tab = R.id.tabSettings
@@ -546,13 +547,13 @@ internal class MainFragmentListenerDelegate(
     this.navigator.popBackStack()
   }
 
-  private fun openSettingsAccount(account: AccountID, comingFromBookLoanRequest: Boolean) {
+  private fun openSettingsAccount(account: AccountID, comingFromBookLoanRequest: Boolean, barcode: String?) {
     this.navigator.addFragment(
       fragment = AccountDetailFragment.create(
         AccountFragmentParameters(
           accountId = account,
           showPleaseLogInTitle = comingFromBookLoanRequest,
-          null
+          barcode = barcode
         )
       ),
       tab = this.navigator.currentTab()

@@ -10,7 +10,8 @@ sealed class AccountListEvent {
    */
 
   data class AccountSelected(
-    val account: AccountID
+    val account: AccountID,
+    val barcode: String?
   ) : AccountListEvent()
 
   data class OpenErrorPage(

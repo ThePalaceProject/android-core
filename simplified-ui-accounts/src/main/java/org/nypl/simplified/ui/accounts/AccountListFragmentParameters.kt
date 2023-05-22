@@ -19,8 +19,13 @@ data class AccountListFragmentParameters(
    * The accountID to be navigated to.
    */
 
-  val accountID: AccountID?
+  val accountID: AccountID?,
 
+  /**
+   * The barcode to pre-populate on the library login screen.
+   */
+
+  val barcode: String?
 
 
 

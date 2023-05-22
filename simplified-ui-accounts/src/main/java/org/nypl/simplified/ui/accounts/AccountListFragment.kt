@@ -95,8 +95,7 @@ class AccountListFragment : Fragment(R.layout.account_list) {
   }
 
   private fun onAccountClicked(account: AccountType) {
-    Log.d("DeepLinks", "onAccountClicked with account.id " + account.id)
-    this.listener.post(AccountListEvent.AccountSelected(account.id))
+    this.listener.post(AccountListEvent.AccountSelected(account.id, null))
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -134,7 +133,7 @@ class AccountListFragment : Fragment(R.layout.account_list) {
 
     if (this.parameters.accountID != null) {
       Log.d("DeepLinks", "deep link intercepted with with this.parameters.libraryID " + this.parameters.accountID)
-      this.listener.post(AccountListEvent.AccountSelected(this.parameters.accountID!!))
+      this.listener.post(AccountListEvent.AccountSelected(this.parameters.accountID!!, this.parameters.barcode))
     }
   }
 
