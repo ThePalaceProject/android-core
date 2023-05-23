@@ -395,6 +395,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
 
     var barcode = this.parameters.barcode
     if (barcode != null) {
+      this.toolbar.visibility = View.GONE
       this.authenticationViews.setBasicUserAndPass(
         user = barcode,
         password = ""
