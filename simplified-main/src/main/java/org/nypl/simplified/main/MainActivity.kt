@@ -91,9 +91,6 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
         // Handle the deep link.
         val libraryID = deepLink?.getQueryParameter("libraryid")
-        Log.d("DeepLinks", "libraryID: " + libraryID)
-        Log.d("DeepLinks", "libraryID as URI: " + URI("urn:uuid:" + libraryID).toString())
-
         if (libraryID != null) {
           val profilesController =
             Services.serviceDirectory()
@@ -116,7 +113,6 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
             Services.serviceDirectory()
               .requireService(DeepLinksControllerType::class.java)
           val barcode = deepLink?.getQueryParameter("barcode")
-          Log.d("DeepLinks", "calling publishDeepLinkEvent with barcode: $barcode")
           deepLinksController.publishDeepLinkEvent(accountID, barcode)
         }
       }

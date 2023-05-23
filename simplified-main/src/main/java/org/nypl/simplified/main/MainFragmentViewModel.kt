@@ -179,7 +179,6 @@ class MainFragmentViewModel(
   }
 
   private fun onDeepLinkEvent(event: DeepLinkEvent) {
-    Log.d("DeepLink", "onDeepLinkEvent called")
     deepLinkEvents.onNext(event)
   }
 

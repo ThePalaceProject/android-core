@@ -395,9 +395,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
      */
 
     var barcode = this.parameters.barcode
-    Log.d("DeepLinks", "Barcode: " + barcode)
     if (barcode != null) {
-      Log.d("DeepLinks", "Barcode not null. Setting basic user and pass with barcode: " + barcode)
       this.authenticationViews.setBasicUserAndPass(
         user = barcode,
         password = ""
