@@ -33,8 +33,6 @@ import org.nypl.simplified.profiles.api.ProfilesDatabaseType.AnonymousProfileEna
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType.AnonymousProfileEnabled.ANONYMOUS_PROFILE_ENABLED
 import org.nypl.simplified.profiles.api.idle_timer.ProfileIdleTimeOutSoon
 import org.nypl.simplified.profiles.api.idle_timer.ProfileIdleTimedOut
-import org.nypl.simplified.ui.accounts.AccountDetailFragment
-import org.nypl.simplified.ui.accounts.AccountFragmentParameters
 import org.nypl.simplified.ui.accounts.AccountListFragment
 import org.nypl.simplified.ui.accounts.AccountListFragmentParameters
 import org.nypl.simplified.ui.announcements.AnnouncementsDialog

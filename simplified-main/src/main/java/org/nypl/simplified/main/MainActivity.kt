@@ -13,7 +13,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.accounts.api.AccountID
-import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.accounts.registry.DeepLinksControllerType
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
@@ -45,7 +44,6 @@ import org.nypl.simplified.ui.tutorial.TutorialFragment
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.util.ServiceLoader
-import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity(R.layout.main_host) {
@@ -120,7 +118,6 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
           val barcode = deepLink?.getQueryParameter("barcode")
           Log.d("DeepLinks", "calling publishDeepLinkEvent with barcode: $barcode")
           deepLinksController.publishDeepLinkEvent(accountID, barcode)
-
         }
       }
       .addOnFailureListener(this) { e ->
@@ -234,7 +231,6 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
       is MainActivityListenedEvent.ProfileModificationEvent ->
         this.handleProfileModificationEvent(event.event)
-
     }
   }
 

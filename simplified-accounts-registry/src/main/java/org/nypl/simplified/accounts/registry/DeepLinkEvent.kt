@@ -28,4 +28,3 @@ sealed class DeepLinkEvent() {
     override val barcode: String?
   ) : DeepLinkEvent()
 }
-

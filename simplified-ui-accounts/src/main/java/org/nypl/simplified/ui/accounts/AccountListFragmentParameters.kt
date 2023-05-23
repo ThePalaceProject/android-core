@@ -27,6 +27,4 @@ data class AccountListFragmentParameters(
 
   val barcode: String?
 
-
-
 ) : Serializable

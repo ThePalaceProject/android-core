@@ -403,7 +403,6 @@ class AccountDetailFragment : Fragment(R.layout.account) {
         password = ""
       )
     }
-
   }
 
   private fun instantiateAlternativeAuthenticationViews() {
