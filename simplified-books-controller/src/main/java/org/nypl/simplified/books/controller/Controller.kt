@@ -1,6 +1,5 @@
 package org.nypl.simplified.books.controller
 
-import android.util.Log
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.FluentFuture
 import com.google.common.util.concurrent.ListeningExecutorService

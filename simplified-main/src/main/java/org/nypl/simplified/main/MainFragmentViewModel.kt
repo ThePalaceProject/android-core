@@ -1,6 +1,5 @@
 package org.nypl.simplified.main
 
-import android.util.Log
 import android.content.res.Resources
 import androidx.lifecycle.ViewModel
 import hu.akarnokd.rxjava2.subjects.UnicastWorkSubject
