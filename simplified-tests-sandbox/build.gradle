@@ -39,7 +39,7 @@ dependencies {
   implementation project(":simplified-ui-tutorial")
   implementation project(":simplified-viewer-api")
   implementation project(":simplified-viewer-audiobook")
-  implementation project(":simplified-viewer-pdf")
+  implementation project(":simplified-viewer-pdf-pdfjs")
   implementation project(':simplified-ui-listeners-api')
   implementation project(':simplified-ui-navigation-tabs')
 
