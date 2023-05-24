@@ -94,7 +94,7 @@ class AccountListFragment : Fragment(R.layout.account_list) {
   }
 
   private fun onAccountClicked(account: AccountType) {
-    this.listener.post(AccountListEvent.AccountSelected(account.id, null))
+    this.listener.post(AccountListEvent.AccountSelected(accountID = account.id, comingFromDeepLink = false, barcode = null))
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -131,7 +131,7 @@ class AccountListFragment : Fragment(R.layout.account_list) {
       .let { subscriptions.add(it) }
 
     if (this.parameters.accountID != null) {
-      this.listener.post(AccountListEvent.AccountSelected(this.parameters.accountID!!, this.parameters.barcode))
+      this.listener.post(AccountListEvent.AccountSelected(this.parameters.accountID!!, barcode = this.parameters.barcode, comingFromDeepLink = true))
     }
   }
 

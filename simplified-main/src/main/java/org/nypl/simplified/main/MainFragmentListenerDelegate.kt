@@ -1,5 +1,6 @@
 package org.nypl.simplified.main
 
+import android.util.Log
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -179,7 +180,7 @@ internal class MainFragmentListenerDelegate(
   ): MainFragmentState {
     return when (event) {
       is CatalogFeedEvent.LoginRequired -> {
-        this.openSettingsAccount(event.account, comingFromBookLoanRequest = true, barcode = null)
+        this.openSettingsAccount(event.account, comingFromBookLoanRequest = true, comingFromDeepLink = false, barcode = null)
         MainFragmentState.CatalogWaitingForLogin
       }
       is CatalogFeedEvent.OpenErrorPage -> {
@@ -211,7 +212,7 @@ internal class MainFragmentListenerDelegate(
   ): MainFragmentState {
     return when (event) {
       is CatalogBookDetailEvent.LoginRequired -> {
-        this.openSettingsAccount(event.account, comingFromBookLoanRequest = true, barcode = null)
+        this.openSettingsAccount(event.account, comingFromBookLoanRequest = true, comingFromDeepLink = false, barcode = null)
         MainFragmentState.BookDetailsWaitingForLogin
       }
       is CatalogBookDetailEvent.OpenErrorPage -> {
@@ -282,7 +283,7 @@ internal class MainFragmentListenerDelegate(
   ): MainFragmentState {
     return when (event) {
       is AccountListEvent.AccountSelected -> {
-        this.openSettingsAccount(event.account, comingFromBookLoanRequest = false, barcode = event.barcode)
+        this.openSettingsAccount(accountID = event.accountID, comingFromBookLoanRequest = false, comingFromDeepLink = event.comingFromDeepLink, barcode = event.barcode)
         state
       }
       AccountListEvent.AddAccount -> {
@@ -547,12 +548,14 @@ internal class MainFragmentListenerDelegate(
     this.navigator.popBackStack()
   }
 
-  private fun openSettingsAccount(account: AccountID, comingFromBookLoanRequest: Boolean, barcode: String?) {
+  private fun openSettingsAccount(accountID: AccountID, comingFromBookLoanRequest: Boolean, comingFromDeepLink: Boolean, barcode: String?) {
+    Log.d("DeepLinks", "openSettingsAccount called with comingFromDeepLink: $comingFromDeepLink")
     this.navigator.addFragment(
       fragment = AccountDetailFragment.create(
         AccountFragmentParameters(
-          accountId = account,
+          accountID = accountID,
           showPleaseLogInTitle = comingFromBookLoanRequest,
+          hideToolbar = comingFromDeepLink,
           barcode = barcode
         )
       ),

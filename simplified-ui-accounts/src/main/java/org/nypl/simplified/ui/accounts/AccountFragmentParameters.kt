@@ -13,13 +13,19 @@ data class AccountFragmentParameters(
    * The account that will be displayed.
    */
 
-  val accountId: AccountID,
+  val accountID: AccountID,
 
   /**
    * Show the "please log in to continue" title.
    */
 
   val showPleaseLogInTitle: Boolean,
+
+  /**
+   * Hide the toolbar and back button.
+   */
+
+  val hideToolbar: Boolean,
 
   /**
    * Pre-populate the barcode with the provided value (e.g. from deep links).

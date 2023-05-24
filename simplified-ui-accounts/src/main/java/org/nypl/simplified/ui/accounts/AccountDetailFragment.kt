@@ -3,6 +3,7 @@ package org.nypl.simplified.ui.accounts
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.URLUtil
@@ -65,6 +66,8 @@ import java.net.URI
 
 class AccountDetailFragment : Fragment(R.layout.account) {
 
+  private var hideToolbar = false
+
   private val logger =
     LoggerFactory.getLogger(AccountDetailFragment::class.java)
 
@@ -82,7 +85,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   private val viewModel: AccountDetailViewModel by viewModels(
     factoryProducer = {
       AccountDetailViewModelFactory(
-        account = this.parameters.accountId,
+        account = this.parameters.accountID,
         listener = this.listener
       )
     }
@@ -236,6 +239,8 @@ class AccountDetailFragment : Fragment(R.layout.account) {
     this.viewModel.accountSyncingSwitchStatus.observe(this.viewLifecycleOwner) { status ->
       this.reconfigureBookmarkSyncingSwitch(status)
     }
+
+    this.hideToolbar = this.parameters.hideToolbar
   }
 
   private fun reconfigureBookmarkSyncingSwitch(status: BookmarkSyncEnableStatus) {
@@ -389,18 +394,36 @@ class AccountDetailFragment : Fragment(R.layout.account) {
 
     this.configureReportIssue()
 
+    Log.d("DeepLinks", "onStart")
     /*
-     * Populate the barcode if passed in (e.g. via deep link)
-     */
+    * Populate the barcode if passed in (e.g. via deep link).
+    */
 
     var barcode = this.parameters.barcode
-    if (barcode != null) {
-      this.toolbar.visibility = View.GONE
+    if (barcode == null) {
+      Log.d("DeepLinks", "barcode null - setting user and pass to blank")
+      this.authenticationViews.setBasicUserAndPass("", "")
+    } else {
+      Log.d("DeepLinks", "barcode not null - populating...")
       this.authenticationViews.setBasicUserAndPass(
         user = barcode,
         password = ""
       )
     }
+
+    /*
+     * Hide the toolbar and back arrow if there is no page to return to (e.g. coming from a deep link).
+     */
+    if (this.hideToolbar) {
+      Log.d("DeepLinks", "hide toolbar")
+      this.toolbar.visibility = View.GONE
+      this.hideToolbar = false // Show toolbar and back arrow on subsequent visits to this screen
+    } else {
+      Log.d("DeepLinks", "show toolbar")
+      this.toolbar.visibility = View.VISIBLE
+    }
+
+
   }
 
   private fun instantiateAlternativeAuthenticationViews() {
@@ -508,13 +531,13 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   ) {
     this.viewModel.tryLogin(
       ProfileAccountLoginRequest.SAML20Initiate(
-        accountId = this.parameters.accountId,
+        accountId = this.parameters.accountID,
         description = authenticationDescription
       )
     )
 
     this.listener.post(
-      AccountDetailEvent.OpenSAML20Login(this.parameters.accountId, authenticationDescription)
+      AccountDetailEvent.OpenSAML20Login(this.parameters.accountID, authenticationDescription)
     )
   }
 
