@@ -97,8 +97,6 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
               .requireService(ProfilesControllerType::class.java)
           val result = profilesController.profileAccountCreateOrReturnExisting(URI("urn:uuid:" + libraryID)).get(3L, TimeUnit.MINUTES)
 
-          Log.d("DeepLinks", "result: " + result)
-
           lateinit var accountID: AccountID
           when (result) {
             is TaskResult.Success -> {
@@ -117,7 +115,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
         }
       }
       .addOnFailureListener(this) { e ->
-        Log.w("DeepLinks", "getDynamicLink:onFailure", e)
+        Log.w("MainActivity", "getDynamicLink:onFailure", e)
       }
   }
 

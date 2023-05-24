@@ -3,7 +3,6 @@ package org.nypl.simplified.ui.accounts
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.URLUtil
@@ -65,8 +64,6 @@ import java.net.URI
  */
 
 class AccountDetailFragment : Fragment(R.layout.account) {
-
-  private var hideToolbar = false
 
   private val logger =
     LoggerFactory.getLogger(AccountDetailFragment::class.java)
@@ -239,8 +236,6 @@ class AccountDetailFragment : Fragment(R.layout.account) {
     this.viewModel.accountSyncingSwitchStatus.observe(this.viewLifecycleOwner) { status ->
       this.reconfigureBookmarkSyncingSwitch(status)
     }
-
-    this.hideToolbar = this.parameters.hideToolbar
   }
 
   private fun reconfigureBookmarkSyncingSwitch(status: BookmarkSyncEnableStatus) {
@@ -394,17 +389,14 @@ class AccountDetailFragment : Fragment(R.layout.account) {
 
     this.configureReportIssue()
 
-    Log.d("DeepLinks", "onStart")
     /*
     * Populate the barcode if passed in (e.g. via deep link).
     */
 
     var barcode = this.parameters.barcode
     if (barcode == null) {
-      Log.d("DeepLinks", "barcode null - setting user and pass to blank")
       this.authenticationViews.setBasicUserAndPass("", "")
     } else {
-      Log.d("DeepLinks", "barcode not null - populating...")
       this.authenticationViews.setBasicUserAndPass(
         user = barcode,
         password = ""
@@ -414,16 +406,11 @@ class AccountDetailFragment : Fragment(R.layout.account) {
     /*
      * Hide the toolbar and back arrow if there is no page to return to (e.g. coming from a deep link).
      */
-    if (this.hideToolbar) {
-      Log.d("DeepLinks", "hide toolbar")
+    if (this.parameters.hideToolbar) {
       this.toolbar.visibility = View.GONE
-      this.hideToolbar = false // Show toolbar and back arrow on subsequent visits to this screen
     } else {
-      Log.d("DeepLinks", "show toolbar")
       this.toolbar.visibility = View.VISIBLE
     }
-
-
   }
 
   private fun instantiateAlternativeAuthenticationViews() {
