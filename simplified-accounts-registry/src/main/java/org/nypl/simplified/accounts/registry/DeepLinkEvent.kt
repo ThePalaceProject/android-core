@@ -31,7 +31,7 @@ sealed class DeepLinkEvent() {
 
   data class DeepLinkIntercepted(
     override val accountID: AccountID,
-    override val screenID : ScreenID,
+    override val screenID: ScreenID,
     override val barcode: String?
   ) : DeepLinkEvent()
 }
