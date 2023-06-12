@@ -19,6 +19,7 @@ import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.accounts.api.AccountEventDeletion
 import org.nypl.simplified.accounts.api.AccountEventUpdated
 import org.nypl.simplified.accounts.registry.DeepLinkEvent
+import org.nypl.simplified.accounts.registry.ScreenID
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.book_registry.BookHoldsUpdateEvent
 import org.nypl.simplified.books.book_registry.BookStatus
@@ -265,16 +266,18 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
   }
 
   private fun onDeepLinkEvent(event: DeepLinkEvent) {
-    this.navigator.addFragment(
-      fragment = AccountListFragment.create(
-        AccountListFragmentParameters(
-          shouldShowLibraryRegistryMenu = false,
-          accountID = event.accountID,
-          barcode = event.barcode
-        )
-      ),
-      tab = org.nypl.simplified.ui.navigation.tabs.R.id.tabSettings
-    )
+    if (event.screenID == ScreenID.LOGIN) {
+      this.navigator.addFragment(
+        fragment = AccountListFragment.create(
+          AccountListFragmentParameters(
+            shouldShowLibraryRegistryMenu = false,
+            accountID = event.accountID,
+            barcode = event.barcode
+          )
+        ),
+        tab = org.nypl.simplified.ui.navigation.tabs.R.id.tabSettings
+      )
+    }
   }
 
   private fun onBookHoldsUpdateEvent(event: BookHoldsUpdateEvent) {

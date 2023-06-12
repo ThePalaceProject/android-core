@@ -25,6 +25,7 @@ import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.accounts.database.api.AccountsDatabaseNonexistentException
 import org.nypl.simplified.accounts.registry.DeepLinkEvent
 import org.nypl.simplified.accounts.registry.DeepLinksControllerType
+import org.nypl.simplified.accounts.registry.ScreenID
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryEvent
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.analytics.api.AnalyticsType
@@ -307,10 +308,11 @@ class Controller private constructor(
     return this.deepLinkEventsObservable
   }
 
-  override fun publishDeepLinkEvent(accountID: AccountID, barcode: String?) {
+  override fun publishDeepLinkEvent(accountID: AccountID, screenID: ScreenID, barcode: String?) {
     this.deepLinkEventsObservable.onNext(
       DeepLinkEvent.DeepLinkIntercepted(
         accountID = accountID,
+        screenID = screenID,
         barcode = barcode
       )
     )

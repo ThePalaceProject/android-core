@@ -14,6 +14,7 @@ import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.registry.DeepLinksControllerType
+import org.nypl.simplified.accounts.registry.ScreenID
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.listeners.api.ListenerRepository
@@ -107,11 +108,20 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
             }
           }
 
+          lateinit var screenID: ScreenID
+          if (deepLink?.getQueryParameter("screen") == "login") {
+            screenID = ScreenID.LOGIN
+          } else {
+            Log.e("MainActivity", "Error: screen ID not specified")
+            screenID = ScreenID.UNSPECIFIED
+          }
+
+          val barcode = deepLink?.getQueryParameter("barcode")
+
           val deepLinksController =
             Services.serviceDirectory()
               .requireService(DeepLinksControllerType::class.java)
-          val barcode = deepLink?.getQueryParameter("barcode")
-          deepLinksController.publishDeepLinkEvent(accountID, barcode)
+          deepLinksController.publishDeepLinkEvent(accountID, screenID, barcode)
         }
       }
       .addOnFailureListener(this) { e ->
