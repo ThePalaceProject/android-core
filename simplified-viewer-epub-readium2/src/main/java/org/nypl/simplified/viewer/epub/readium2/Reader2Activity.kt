@@ -118,7 +118,10 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
   private var viewSubscription: Disposable? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
-    this.logger.debug("loaded {} content protection providers", this.contentProtectionProviders.size)
+    this.logger.debug(
+      "loaded {} content protection providers",
+      this.contentProtectionProviders.size
+    )
     this.contentProtectionProviders.forEachIndexed { index, provider ->
       this.logger.debug("[{}] available provider {}", index, provider.javaClass.canonicalName)
     }
@@ -163,9 +166,15 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
     if (savedInstanceState == null) {
       this.readerFragment =
-        this.supportFragmentManager.fragmentFactory.instantiate(this.classLoader, SR2ReaderFragment::class.java.name)
+        this.supportFragmentManager.fragmentFactory.instantiate(
+          this.classLoader,
+          SR2ReaderFragment::class.java.name
+        )
       this.tocFragment =
-        this.supportFragmentManager.fragmentFactory.instantiate(this.classLoader, SR2TOCFragment::class.java.name)
+        this.supportFragmentManager.fragmentFactory.instantiate(
+          this.classLoader,
+          SR2TOCFragment::class.java.name
+        )
 
       this.supportFragmentManager.beginTransaction()
         .replace(R.id.reader2FragmentHost, this.readerFragment, READER_FRAGMENT_TAG)
@@ -220,7 +229,12 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     val contentProtections = BookContentProtections.create(
       context = this,
       contentProtectionProviders = this.contentProtectionProviders,
-      drmInfo = this.parameters.drmInfo
+      drmInfo = this.parameters.drmInfo,
+      isManualPassphraseEnabled =
+        profilesController.profileCurrent().preferences().isManualLCPPassphraseEnabled,
+      onLCPDialogDismissed = {
+        finish()
+      }
     )
 
     /*
@@ -493,7 +507,10 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
     val currentTocFragment = this.tocFragment
     this.tocFragment =
-      this.supportFragmentManager.fragmentFactory.instantiate(this.classLoader, SR2TOCFragment::class.java.name)
+      this.supportFragmentManager.fragmentFactory.instantiate(
+        this.classLoader,
+        SR2TOCFragment::class.java.name
+      )
     this.supportFragmentManager.beginTransaction()
       .remove(currentTocFragment)
       .add(R.id.reader2FragmentHost, this.tocFragment)
@@ -520,7 +537,13 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
     AlertDialog.Builder(this)
       .setTitle(R.string.bookOpenFailedTitle)
-      .setMessage(this.getString(R.string.bookOpenFailedMessage, actualException.javaClass.name, actualException.message))
+      .setMessage(
+        this.getString(
+          R.string.bookOpenFailedMessage,
+          actualException.javaClass.name,
+          actualException.message
+        )
+      )
       .setOnDismissListener { this.finish() }
       .create()
       .show()

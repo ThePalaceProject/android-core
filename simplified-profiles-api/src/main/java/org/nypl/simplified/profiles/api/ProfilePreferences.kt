@@ -46,6 +46,10 @@ data class ProfilePreferences(
 
   val mostRecentAccount: AccountID,
 
+  /** @return `true` if the manual lcp passphrase is enabled. */
+
+  val isManualLCPPassphraseEnabled: Boolean = false,
+
   /** @return `true` if the debug settings should be visible. */
 
   val showDebugSettings: Boolean = false
