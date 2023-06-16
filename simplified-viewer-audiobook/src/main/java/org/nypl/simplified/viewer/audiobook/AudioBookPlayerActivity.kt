@@ -272,55 +272,6 @@ class AudioBookPlayerActivity :
     return entry.authors.first()
   }
 
-  override fun onDestroy() {
-    this.log.debug("onDestroy")
-
-    // if there's a local bookmark that has been saved, we save it remotely before exiting
-    // the player screen
-    if (lastLocalBookmark != null) {
-      this.bookmarkService.bookmarkCreateRemote(
-        accountID = this.parameters.accountID,
-        bookmark = lastLocalBookmark!!
-      )
-    }
-
-    super.onDestroy()
-
-    /*
-     * We set a flag to indicate that the activity is currently being destroyed because
-     * there may be scheduled tasks that try to execute after the activity has stopped. This
-     * flag allows them to gracefully avoid running.
-     */
-
-    this.destroying = true
-
-    /*
-     * Cancel downloads, shut down the player, and close the book.
-     */
-
-    if (this.playerInitialized) {
-      this.cancelAllDownloads()
-
-      try {
-        this.player.close()
-      } catch (e: Exception) {
-        this.log.error("error closing player: ", e)
-      }
-
-      this.bookSubscription.unsubscribe()
-      this.playerSubscription.unsubscribe()
-
-      try {
-        this.book.close()
-      } catch (e: Exception) {
-        this.log.error("error closing book: ", e)
-      }
-    }
-
-    this.downloadExecutor.shutdown()
-    this.playerScheduledExecutor.shutdown()
-  }
-
   private fun savePlayerPosition(event: PlayerEventCreateBookmark) {
     try {
 
@@ -617,17 +568,17 @@ class AudioBookPlayerActivity :
       )
 
     try {
-
-      val bookMarkLastReadPosition = bookmarks
+      val audiobookBookmarks = bookmarks
         .filterIsInstance<Bookmark.AudiobookBookmark>()
-        .find { bookmark ->
+
+      val bookMarkLastReadPosition = audiobookBookmarks.find { bookmark ->
           bookmark.kind == BookmarkKind.BookmarkLastReadLocation
         }
 
       currentBookmarks.addAll(
-        bookmarks
-          .filterIsInstance<Bookmark.AudiobookBookmark>()
-          .filter { bookmark -> bookmark.kind == BookmarkKind.BookmarkExplicit }
+        audiobookBookmarks.filter { bookmark -> bookmark.kind == BookmarkKind.BookmarkExplicit &&
+          bookmark.uri != null
+        }
       )
 
       val position =
@@ -960,10 +911,8 @@ class AudioBookPlayerActivity :
 
   override fun onPlayerShouldAddBookmark(playerBookmark: PlayerBookmark?) {
     if (playerBookmark == null) {
-
       Toast.makeText(this, R.string.audio_book_player_bookmark_error_adding, Toast.LENGTH_SHORT)
         .show()
-
       return
     }
 

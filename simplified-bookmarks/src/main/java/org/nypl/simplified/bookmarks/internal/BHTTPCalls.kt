@@ -67,16 +67,17 @@ class BHTTPCalls(
         .setMethod(Delete)
         .build()
 
-    return request.execute().use { response ->
+    request.execute().use { response ->
       when (val status = response.status) {
         is LSHTTPResponseStatus.Responded.OK -> {
-          this.deserializeBookmarksFromStream(status.bodyStream ?: this.emptyStream())
-          Unit
+          // do nothing
         }
-        is LSHTTPResponseStatus.Responded.Error ->
+        is LSHTTPResponseStatus.Responded.Error -> {
           this.logAndFail(bookmarkURI, status)
-        is LSHTTPResponseStatus.Failed ->
+        }
+        is LSHTTPResponseStatus.Failed -> {
           throw status.exception
+        }
       }
     }
   }
