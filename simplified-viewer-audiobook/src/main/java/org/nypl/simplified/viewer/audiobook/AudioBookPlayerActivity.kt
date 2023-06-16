@@ -572,12 +572,12 @@ class AudioBookPlayerActivity :
         .filterIsInstance<Bookmark.AudiobookBookmark>()
 
       val bookMarkLastReadPosition = audiobookBookmarks.find { bookmark ->
-          bookmark.kind == BookmarkKind.BookmarkLastReadLocation
-        }
+        bookmark.kind == BookmarkKind.BookmarkLastReadLocation
+      }
 
       currentBookmarks.addAll(
-        audiobookBookmarks.filter { bookmark -> bookmark.kind == BookmarkKind.BookmarkExplicit &&
-          bookmark.uri != null
+        audiobookBookmarks.filter { bookmark ->
+          bookmark.kind == BookmarkKind.BookmarkExplicit && bookmark.uri != null
         }
       )
 
