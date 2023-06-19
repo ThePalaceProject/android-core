@@ -481,7 +481,8 @@ internal class MainFragmentListenerDelegate(
         AccountListFragmentParameters(
           shouldShowLibraryRegistryMenu = this.settingsConfiguration.allowAccountsRegistryAccess,
           accountID = null,
-          barcode = null
+          barcode = null,
+          comingFromDeepLink = false
         )
       ),
       tab = R.id.tabSettings
@@ -549,7 +550,7 @@ internal class MainFragmentListenerDelegate(
   }
 
   private fun openSettingsAccount(accountID: AccountID, comingFromBookLoanRequest: Boolean, comingFromDeepLink: Boolean, barcode: String?) {
-    Log.d("DeepLinks", "openSettingsAccount called with comingFromDeepLink: $comingFromDeepLink")
+    this.logger.debug("openSettingsAccount called with comingFromDeepLink: $comingFromDeepLink")
     this.navigator.addFragment(
       fragment = AccountDetailFragment.create(
         AccountFragmentParameters(

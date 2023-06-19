@@ -11,7 +11,7 @@ sealed class DeepLinkEvent() {
    * The account ID for the library to be navigated to.
    */
 
-  abstract val accountID: AccountID
+  abstract val accountID: AccountID?
 
   /**
    * The screen ID for the screen to be navigated to.

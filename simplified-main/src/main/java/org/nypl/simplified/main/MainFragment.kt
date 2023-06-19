@@ -272,7 +272,8 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
           AccountListFragmentParameters(
             shouldShowLibraryRegistryMenu = false,
             accountID = event.accountID,
-            barcode = event.barcode
+            barcode = event.barcode,
+            comingFromDeepLink = true
           )
         ),
         tab = org.nypl.simplified.ui.navigation.tabs.R.id.tabSettings

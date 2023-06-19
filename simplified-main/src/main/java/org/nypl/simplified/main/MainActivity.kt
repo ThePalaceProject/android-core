@@ -104,7 +104,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
               accountID = result.result.id
             }
             is TaskResult.Failure -> {
-              Log.e("MainActivity", "Error: unable to create or return existing account for library $libraryID")
+              this.logger.error("MainActivity", "Error: unable to create or return existing account for library $libraryID")
             }
           }
 
@@ -112,7 +112,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
           if (deepLink?.getQueryParameter("screen") == "login") {
             screenID = ScreenID.LOGIN
           } else {
-            Log.e("MainActivity", "Error: screen ID not specified")
+            this.logger.error("MainActivity", "Error: screen ID not specified")
             screenID = ScreenID.UNSPECIFIED
           }
 
@@ -125,7 +125,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
         }
       }
       .addOnFailureListener(this) { e ->
-        Log.w("MainActivity", "getDynamicLink:onFailure", e)
+        this.logger.warn("MainActivity", "getDynamicLink:onFailure", e)
       }
   }
 
@@ -337,15 +337,6 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
         this.onProfileModificationCancelled()
       ProfileModificationEvent.Succeeded ->
         this.onProfileModificationSucceeded()
-    }
-  }
-
-  private fun handleAccountDetailEvent(event: AccountDetailEvent) {
-    this.logger.debug("handleAccountDetailEvent")
-    val accountDetailFragment = AccountDetailFragment()
-    this.supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-    this.supportFragmentManager.commit {
-      replace(R.id.mainFragmentHolder, accountDetailFragment, "ACCOUNT_DETAIL")
     }
   }
 

@@ -25,6 +25,13 @@ data class AccountListFragmentParameters(
    * The barcode to pre-populate on the library login screen.
    */
 
-  val barcode: String?
+  val barcode: String?,
+
+  /**
+   * If set to true, then handle as originating from an intercepted deep link.
+   */
+
+  val comingFromDeepLink: Boolean?
+
 
 ) : Serializable

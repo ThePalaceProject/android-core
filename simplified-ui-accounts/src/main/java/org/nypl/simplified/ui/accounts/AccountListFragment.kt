@@ -130,7 +130,7 @@ class AccountListFragment : Fragment(R.layout.account_list) {
       .subscribe(this::onAccountEvent)
       .let { subscriptions.add(it) }
 
-    if (this.parameters.accountID != null) {
+    if (this.parameters.comingFromDeepLink!!) {
       this.listener.post(AccountListEvent.AccountSelected(this.parameters.accountID!!, barcode = this.parameters.barcode, comingFromDeepLink = true))
     }
   }
