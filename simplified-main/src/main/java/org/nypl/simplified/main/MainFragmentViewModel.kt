@@ -10,7 +10,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.accounts.api.AccountEvent
-import org.nypl.simplified.accounts.registry.DeepLinkEvent
+import org.nypl.simplified.deeplinks.controller.api.DeepLinkEvent
 import org.nypl.simplified.accounts.api.AccountLoginState
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.books.book_registry.BookHoldsUpdateEvent
@@ -23,7 +23,7 @@ import org.nypl.simplified.feeds.api.FeedFacet
 import org.nypl.simplified.feeds.api.FeedFacetPseudoTitleProviderType
 import org.nypl.simplified.opds.core.OPDSAvailabilityHeldReady
 import org.nypl.simplified.profiles.api.ProfileEvent
-import org.nypl.simplified.accounts.registry.DeepLinksControllerType
+import org.nypl.simplified.deeplinks.controller.api.DeepLinksControllerType
 import org.nypl.simplified.profiles.controller.api.ProfileFeedRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.catalog.R
@@ -49,7 +49,7 @@ class MainFragmentViewModel(
     UnicastWorkSubject.create()
   val registryEvents: UnicastWorkSubject<BookStatusEvent> =
     UnicastWorkSubject.create()
-  val deepLinkEvents: UnicastWorkSubject<DeepLinkEvent> =
+  val deepLinkEvents: UnicastWorkSubject<org.nypl.simplified.deeplinks.controller.api.DeepLinkEvent> =
     UnicastWorkSubject.create()
   val bookHoldEvents: UnicastWorkSubject<BookHoldsUpdateEvent> =
     UnicastWorkSubject.create()
@@ -62,8 +62,8 @@ class MainFragmentViewModel(
     services.requireService(AccountProviderRegistryType::class.java)
   val bookRegistry: BookRegistryType =
     services.requireService(BookRegistryType::class.java)
-  val deepLinksController: DeepLinksControllerType =
-    services.requireService(DeepLinksControllerType::class.java)
+  val deepLinksController: org.nypl.simplified.deeplinks.controller.api.DeepLinksControllerType =
+    services.requireService(org.nypl.simplified.deeplinks.controller.api.DeepLinksControllerType::class.java)
   val buildConfig =
     services.requireService(BuildConfigurationServiceType::class.java)
   val showHoldsTab: Boolean
@@ -177,7 +177,7 @@ class MainFragmentViewModel(
       .let { subscriptions.add(it) }
   }
 
-  private fun onDeepLinkEvent(event: DeepLinkEvent) {
+  private fun onDeepLinkEvent(event: org.nypl.simplified.deeplinks.controller.api.DeepLinkEvent) {
     deepLinkEvents.onNext(event)
   }
 

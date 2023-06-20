@@ -34,7 +34,7 @@ import org.nypl.simplified.accounts.database.AccountBundledCredentialsEmpty
 import org.nypl.simplified.accounts.database.AccountsDatabases
 import org.nypl.simplified.accounts.json.AccountBundledCredentialsJSON
 import org.nypl.simplified.accounts.registry.AccountProviderRegistry
-import org.nypl.simplified.accounts.registry.DeepLinksControllerType
+import org.nypl.simplified.deeplinks.controller.api.DeepLinksControllerType
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryDebugging
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.accounts.source.spi.AccountProviderSourceResolutionStrings
@@ -933,7 +933,7 @@ internal object MainServices {
       )
       addService(
         message = strings.bootingGeneral("deep links controller"),
-        interfaceType = DeepLinksControllerType::class.java,
+        interfaceType = org.nypl.simplified.deeplinks.controller.api.DeepLinksControllerType::class.java,
         serviceConstructor = { controller }
       )
       addService(

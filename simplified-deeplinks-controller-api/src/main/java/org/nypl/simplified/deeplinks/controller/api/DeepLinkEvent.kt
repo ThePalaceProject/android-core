@@ -1,4 +1,4 @@
-package org.nypl.simplified.accounts.registry
+package org.nypl.simplified.deeplinks.controller.api
 
 import org.nypl.simplified.accounts.api.AccountID
 

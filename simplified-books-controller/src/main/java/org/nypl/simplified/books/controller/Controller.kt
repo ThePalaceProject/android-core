@@ -23,9 +23,9 @@ import org.nypl.simplified.accounts.api.AccountLogoutStringResourcesType
 import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.accounts.database.api.AccountsDatabaseNonexistentException
-import org.nypl.simplified.accounts.registry.DeepLinkEvent
-import org.nypl.simplified.accounts.registry.DeepLinksControllerType
-import org.nypl.simplified.accounts.registry.ScreenID
+import org.nypl.simplified.deeplinks.controller.api.DeepLinkEvent
+import org.nypl.simplified.deeplinks.controller.api.DeepLinksControllerType
+import org.nypl.simplified.deeplinks.controller.api.ScreenID
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryEvent
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.analytics.api.AnalyticsType
@@ -100,7 +100,7 @@ class Controller private constructor(
   ProfilesControllerType,
   DeepLinksControllerType {
 
-  private val deepLinkEventsObservable: BehaviorSubject<DeepLinkEvent> =
+  private val deepLinkEventsObservable: BehaviorSubject<org.nypl.simplified.deeplinks.controller.api.DeepLinkEvent> =
     BehaviorSubject.create()
 
   private val borrows: ConcurrentHashMap<BookID, BorrowTaskType>

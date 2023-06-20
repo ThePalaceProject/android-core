@@ -4,7 +4,6 @@ import android.app.ActionBar
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.FragmentManager
@@ -13,8 +12,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.accounts.api.AccountID
-import org.nypl.simplified.accounts.registry.DeepLinksControllerType
-import org.nypl.simplified.accounts.registry.ScreenID
+import org.nypl.simplified.deeplinks.controller.api.DeepLinksControllerType
+import org.nypl.simplified.deeplinks.controller.api.ScreenID
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.listeners.api.ListenerRepository
@@ -27,8 +26,6 @@ import org.nypl.simplified.profiles.api.ProfilesDatabaseType.AnonymousProfileEna
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.OAuthWithIntermediaryComplete
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.taskrecorder.api.TaskResult
-import org.nypl.simplified.ui.accounts.AccountDetailEvent
-import org.nypl.simplified.ui.accounts.AccountDetailFragment
 import org.nypl.simplified.ui.branding.BrandingSplashServiceType
 import org.nypl.simplified.ui.onboarding.OnboardingEvent
 import org.nypl.simplified.ui.onboarding.OnboardingFragment
@@ -108,19 +105,19 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
             }
           }
 
-          lateinit var screenID: ScreenID
+          lateinit var screenID: org.nypl.simplified.deeplinks.controller.api.ScreenID
           if (deepLink?.getQueryParameter("screen") == "login") {
-            screenID = ScreenID.LOGIN
+            screenID = org.nypl.simplified.deeplinks.controller.api.ScreenID.LOGIN
           } else {
             this.logger.error("MainActivity", "Error: screen ID not specified")
-            screenID = ScreenID.UNSPECIFIED
+            screenID = org.nypl.simplified.deeplinks.controller.api.ScreenID.UNSPECIFIED
           }
 
           val barcode = deepLink?.getQueryParameter("barcode")
 
           val deepLinksController =
             Services.serviceDirectory()
-              .requireService(DeepLinksControllerType::class.java)
+              .requireService(org.nypl.simplified.deeplinks.controller.api.DeepLinksControllerType::class.java)
           deepLinksController.publishDeepLinkEvent(accountID, screenID, barcode)
         }
       }

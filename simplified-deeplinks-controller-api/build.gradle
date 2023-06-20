@@ -1,0 +1,10 @@
+dependencies {
+
+  implementation libs.kotlin.stdlib
+  implementation libs.kotlin.reflect
+
+  api libs.rxjava2
+
+  compileOnly libs.google.auto.value
+  annotationProcessor libs.google.auto.value.processor
+}
