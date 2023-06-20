@@ -1,6 +1,5 @@
 package org.nypl.simplified.main
 
-import android.util.Log
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment

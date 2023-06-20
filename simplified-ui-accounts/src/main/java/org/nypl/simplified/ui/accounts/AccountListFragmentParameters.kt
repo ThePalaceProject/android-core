@@ -33,5 +33,4 @@ data class AccountListFragmentParameters(
 
   val comingFromDeepLink: Boolean?
 
-
 ) : Serializable
