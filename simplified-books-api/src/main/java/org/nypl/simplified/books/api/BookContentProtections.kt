@@ -17,7 +17,9 @@ object BookContentProtections {
   fun create(
     context: Context,
     contentProtectionProviders: List<ContentProtectionProvider>,
-    drmInfo: BookDRMInformation
+    drmInfo: BookDRMInformation,
+    isManualPassphraseEnabled: Boolean = false,
+    onLCPDialogDismissed: () -> Unit = {}
   ): List<ContentProtection> {
     return contentProtectionProviders.mapNotNull { provider ->
       this.logger.debug("instantiating content protection provider {}", provider.javaClass.canonicalName)
@@ -30,11 +32,13 @@ object BookContentProtections {
 
       if (provider is LCPContentProtectionProvider) {
         when (drmInfo) {
-          is BookDRMInformation.LCP ->
+          is BookDRMInformation.LCP -> {
             provider.passphrase = drmInfo.hashedPassphrase
+            provider.isManualPassphraseEnabled = isManualPassphraseEnabled
+            provider.onLcpDialogDismissed = onLCPDialogDismissed
+          }
         }
       }
-
       provider.create(context)
     }
   }

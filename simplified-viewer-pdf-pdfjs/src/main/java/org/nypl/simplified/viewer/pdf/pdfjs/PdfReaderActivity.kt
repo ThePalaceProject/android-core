@@ -16,11 +16,16 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.google.common.util.concurrent.MoreExecutors
+import kotlinx.coroutines.async
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.joda.time.DateTime
 import org.librarysimplified.services.api.Services
 import org.nypl.drm.core.ContentProtectionProvider
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.bookmarks.api.BookmarkServiceType
+import org.nypl.simplified.books.api.BookContentProtections
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.api.bookmark.Bookmark
@@ -118,14 +123,6 @@ class PdfReaderActivity : AppCompatActivity() {
     if (isSavedInstanceStateNull) {
       createWebView()
       createPdfServer(params.drmInfo, params.pdfFile)
-
-      this.pdfServer?.let {
-        it.start()
-
-        this.webView.loadUrl(
-          "http://localhost:${it.port}/assets/pdf-viewer/viewer.html?file=%2Fbook.pdf#page=${this.documentPageIndex}"
-        )
-      }
     }
   }
 
@@ -264,25 +261,52 @@ class PdfReaderActivity : AppCompatActivity() {
   }
 
   private fun createPdfServer(drmInfo: BookDRMInformation, pdfFile: File) {
+
+    val contentProtections = BookContentProtections.create(
+      context = this,
+      contentProtectionProviders = ServiceLoader.load(ContentProtectionProvider::class.java).toList(),
+      drmInfo = drmInfo,
+      isManualPassphraseEnabled =
+        profilesController.profileCurrent().preferences().isManualLCPPassphraseEnabled,
+      onLCPDialogDismissed = {
+        finish()
+      }
+    )
+
     // Create an immediately-closed socket to get a free port number.
     val ephemeralSocket = ServerSocket(0).apply { close() }
 
-    try {
-      this.pdfServer = PdfServer(
-        port = ephemeralSocket.localPort,
-        context = this,
-        contentProtectionProviders =
-          ServiceLoader.load(ContentProtectionProvider::class.java).toList(),
-        drmInfo = drmInfo,
-        pdfFile = pdfFile
-      )
-    } catch (exception: Exception) {
-      showErrorWithRunnable(
-        context = this,
-        title = exception.message ?: "",
-        failure = exception,
-        execute = this::finish
-      )
+    val createPdfOperation = GlobalScope.async {
+      try {
+        pdfServer = PdfServer.create(
+          contentProtections = contentProtections,
+          context = this@PdfReaderActivity,
+          drmInfo = drmInfo,
+          pdfFile = pdfFile,
+          port = ephemeralSocket.localPort
+        )
+      } catch (exception: Exception) {
+        showErrorWithRunnable(
+          context = this@PdfReaderActivity,
+          title = exception.message ?: "",
+          failure = exception,
+          execute = {
+            this@PdfReaderActivity.finish()
+          }
+        )
+      }
+    }
+
+    GlobalScope.launch(Dispatchers.Main) {
+      createPdfOperation.await()
+
+      pdfServer?.let {
+        it.start()
+
+        webView.loadUrl(
+          "http://localhost:${it.port}/assets/pdf-viewer/viewer.html?file=%2Fbook.pdf#page=$documentPageIndex"
+        )
+      }
     }
   }
 
@@ -323,11 +347,10 @@ class PdfReaderActivity : AppCompatActivity() {
   }
 
   override fun onDestroy() {
-    super.onDestroy()
-
     this.pdfServer?.stop()
     this.pdfReaderContainer.removeAllViews()
     this.webView.destroy()
+    super.onDestroy()
   }
 
   override fun onBackPressed() {
