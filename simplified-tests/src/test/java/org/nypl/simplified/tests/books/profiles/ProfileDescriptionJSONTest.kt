@@ -55,7 +55,8 @@ class ProfileDescriptionJSONTest {
           readerPreferences = ReaderPreferences.builder().build(),
           mostRecentAccount = AccountID.generate(),
           playbackRates = hashMapOf(),
-          sleepTimers = hashMapOf()
+          sleepTimers = hashMapOf(),
+          isManualLCPPassphraseEnabled = false
         ),
         attributes = ProfileAttributes(
           sortedMapOf(

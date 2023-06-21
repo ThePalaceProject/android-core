@@ -7,10 +7,9 @@ import org.nanohttpd.protocols.http.IHTTPSession
 import org.nanohttpd.protocols.http.response.Response
 import org.nanohttpd.protocols.http.response.Status
 import org.nanohttpd.router.RouterNanoHTTPD
-import org.nypl.drm.core.ContentProtectionProvider
-import org.nypl.simplified.books.api.BookContentProtections
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.readium.r2.shared.fetcher.Resource
+import org.readium.r2.shared.publication.ContentProtection
 import org.readium.r2.shared.publication.Publication
 import org.readium.r2.shared.publication.asset.FileAsset
 import org.readium.r2.shared.publication.services.isRestricted
@@ -30,40 +29,37 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
 
-class PdfServer(
+class PdfServer private constructor(
   val port: Int,
-  context: Context,
-  contentProtectionProviders: List<ContentProtectionProvider>,
-  drmInfo: BookDRMInformation,
-  pdfFile: File
+  private val context: Context,
+  private val publication: Publication
 ) : RouterNanoHTTPD("127.0.0.1", port) {
-  private val log: Logger = LoggerFactory.getLogger(PdfServer::class.java)
 
-  private var publication: Publication
-  private var pdfResource: Resource
+  companion object {
 
-  init {
-    val streamer = Streamer(
-      context = context,
-      parsers = listOf(
-        ReadiumWebPubParser(
-          httpClient = DefaultHttpClient(),
-          pdfFactory = null
-        ),
-        PdfParser(
-          context = context,
-        )
-      ),
-      contentProtections = BookContentProtections.create(
+    suspend fun create(
+      contentProtections: List<ContentProtection>,
+      context: Context,
+      drmInfo: BookDRMInformation,
+      pdfFile: File,
+      port: Int
+    ): PdfServer {
+      val streamer = Streamer(
         context = context,
-        contentProtectionProviders = contentProtectionProviders,
-        drmInfo = drmInfo
-      ),
-      ignoreDefaultParsers = true
-    )
+        parsers = listOf(
+          ReadiumWebPubParser(
+            httpClient = DefaultHttpClient(),
+            pdfFactory = null
+          ),
+          PdfParser(
+            context = context,
+          )
+        ),
+        contentProtections = contentProtections,
+        ignoreDefaultParsers = true
+      )
 
-    val publication = runBlocking {
-      streamer.open(
+      val publication = streamer.open(
         asset = FileAsset(
           file = pdfFile,
           mediaType = when (drmInfo) {
@@ -74,10 +70,21 @@ class PdfServer(
         allowUserInteraction = false,
         warnings = ConsoleWarningLogger()
       )
-    }.getOrElse {
-      throw IOException("Failed to open PDF", it)
-    }
+        .getOrElse {
+          throw IOException("Failed to open PDF", it)
+        }
 
+      return PdfServer(
+        port = port,
+        context = context,
+        publication = publication
+      )
+    }
+  }
+
+  private var pdfResource: Resource? = null
+
+  init {
     if (publication.isRestricted) {
       throw IOException("Failed to unlock PDF", publication.protectionError)
     }
@@ -90,14 +97,13 @@ class PdfServer(
     addRoute("/book.pdf", PdfHandler::class.java, pdfResource)
 
     this.pdfResource = pdfResource
-    this.publication = publication
   }
 
   override fun stop() {
     super.stop()
 
     runBlocking {
-      this@PdfServer.pdfResource.close()
+      this@PdfServer.pdfResource?.close()
     }
 
     this.publication.close()

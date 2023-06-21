@@ -1,11 +1,18 @@
 package org.nypl.simplified.lcp
 
+import android.app.AlertDialog
 import android.content.Context
+import android.view.LayoutInflater
+import android.widget.TextView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.nypl.drm.core.ContentProtectionProvider
 import org.readium.r2.lcp.LcpAuthenticating
 import org.readium.r2.lcp.LcpService
 import org.readium.r2.shared.publication.ContentProtection
 import org.slf4j.LoggerFactory
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * A content protection provider for LCP.
@@ -34,6 +41,16 @@ class LCPContentProtectionProvider : ContentProtectionProvider {
     }
 
   /**
+   * The current state (true/false) of the ability of writing a passphrase manually.
+   */
+  var isManualPassphraseEnabled: Boolean = false
+
+  /**
+   * The action to perform when the manual passphrase dialog is dismissed.
+   */
+  var onLcpDialogDismissed: () -> Unit = {}
+
+  /**
    * @return The hashed passphrase that will be used to open the next book, as a hex string (not
    * base-64 encoded).
    */
@@ -48,6 +65,42 @@ class LCPContentProtectionProvider : ContentProtectionProvider {
   private val logger =
     LoggerFactory.getLogger(LCPContentProtectionProvider::class.java)
 
+  private suspend fun askPassphrase(context: Context): String? {
+    val view = LayoutInflater.from(context).inflate(R.layout.view_manual_lcp_passphrase, null)
+    val inputPassphrase = view.findViewById<TextView>(R.id.inputPassphrase)
+
+    return suspendCoroutine { cont ->
+      AlertDialog.Builder(context).apply {
+        setTitle(R.string.dialog_manual_passphrase_title)
+        setMessage(R.string.dialog_manual_passphrase_message)
+        setPositiveButton(R.string.dialog_manual_passphrase_done) { dialog, _ ->
+          dialog.dismiss()
+          try {
+            passphrase = inputPassphrase.text.toString().trim()
+            cont.resume(passphrase())
+          } catch (exception: IllegalArgumentException) {
+            exception.printStackTrace()
+            cont.resume("")
+          }
+        }
+        setNegativeButton(R.string.dialog_manual_passphrase_cancel) { dialog, _ ->
+          dialog.dismiss()
+        }
+        setView(view)
+        setOnDismissListener {
+          try {
+            cont.resume(null)
+            onLcpDialogDismissed()
+          } catch (exception: IllegalStateException) {
+            exception.printStackTrace()
+          }
+        }
+      }
+        .create()
+        .show()
+    }
+  }
+
   override fun create(
     context: Context
   ): ContentProtection? {
@@ -56,16 +109,22 @@ class LCPContentProtectionProvider : ContentProtectionProvider {
       this.logger.debug("LCP service is unavailable")
       return null
     } else {
-      lcpService.contentProtection(object : LcpAuthenticating {
-        override suspend fun retrievePassphrase(
-          license: LcpAuthenticating.AuthenticatedLicense,
-          reason: LcpAuthenticating.AuthenticationReason,
-          allowUserInteraction: Boolean,
-          sender: Any?
-        ): String {
-          return this@LCPContentProtectionProvider.passphrase()
+      lcpService.contentProtection(
+        object : LcpAuthenticating {
+          override suspend fun retrievePassphrase(
+            license: LcpAuthenticating.AuthenticatedLicense,
+            reason: LcpAuthenticating.AuthenticationReason,
+            allowUserInteraction: Boolean,
+            sender: Any?
+          ): String? {
+            return if (!isManualPassphraseEnabled) {
+              this@LCPContentProtectionProvider.passphrase()
+            } else {
+              withContext(Dispatchers.Main) { askPassphrase(context) }
+            }
+          }
         }
-      })
+      )
     }
   }
 }

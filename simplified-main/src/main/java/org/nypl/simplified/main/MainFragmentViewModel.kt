@@ -2,6 +2,7 @@ package org.nypl.simplified.main
 
 import android.content.res.Resources
 import androidx.lifecycle.ViewModel
+import com.google.common.util.concurrent.FluentFuture
 import hu.akarnokd.rxjava2.subjects.UnicastWorkSubject
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -16,6 +17,7 @@ import org.nypl.simplified.books.book_registry.BookHoldsUpdateEvent
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatusEvent
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
+import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedBooksSelection
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedFacet
@@ -25,6 +27,7 @@ import org.nypl.simplified.profiles.api.ProfileEvent
 import org.nypl.simplified.profiles.controller.api.ProfileFeedRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.catalog.R
+import org.slf4j.LoggerFactory
 import java.net.URI
 import java.util.concurrent.TimeUnit
 
@@ -67,6 +70,11 @@ class MainFragmentViewModel(
   private val subscriptions: CompositeDisposable =
     CompositeDisposable()
 
+  private var getHoldsFuture: FluentFuture<Feed.FeedWithoutGroups>? = null
+
+  private val logger =
+    LoggerFactory.getLogger(MainFragmentViewModel::class.java)
+
   private var holdsCallSubscription: Disposable? = null
 
   init {
@@ -104,6 +112,7 @@ class MainFragmentViewModel(
   }
 
   private fun initializeHoldsCallTimer() {
+    getHoldsFuture?.cancel(true)
     holdsCallSubscription?.dispose()
     holdsCallSubscription = Observable.interval(
       0L, REQUEST_HOLDS_INTERVAL, TimeUnit.MILLISECONDS
@@ -134,9 +143,11 @@ class MainFragmentViewModel(
             uri = booksUri
           )
 
-        val numberOfHolds = this.profilesController.profileFeed(request)
-          .get()
-          .entriesInOrder
+        getHoldsFuture = this.profilesController.profileFeed(request)
+        val numberOfHolds = getHoldsFuture
+          ?.get()
+          ?.entriesInOrder
+          .orEmpty()
           .filter { feedEntry ->
             feedEntry is FeedEntry.FeedEntryOPDS &&
               feedEntry.feedEntry.availability is OPDSAvailabilityHeldReady
@@ -148,7 +159,10 @@ class MainFragmentViewModel(
         )
       }
       .subscribeOn(Schedulers.io())
-      .subscribe()
+      .subscribe(
+        { /* do nothing */ },
+        { error -> logger.debug(error.message.orEmpty()) }
+      )
 
     subscriptions.add(holdsCallSubscription!!)
   }

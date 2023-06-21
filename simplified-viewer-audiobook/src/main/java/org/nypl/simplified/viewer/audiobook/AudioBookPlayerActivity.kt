@@ -338,7 +338,12 @@ class AudioBookPlayerActivity :
     val contentProtections = BookContentProtections.create(
       context = this,
       contentProtectionProviders = this.contentProtectionProviders,
-      drmInfo = this.parameters.drmInfo
+      drmInfo = this.parameters.drmInfo,
+      isManualPassphraseEnabled =
+        profilesController.profileCurrent().preferences().isManualLCPPassphraseEnabled,
+      onLCPDialogDismissed = {
+        finish()
+      }
     )
 
     /*
@@ -352,7 +357,9 @@ class AudioBookPlayerActivity :
         filter = { true },
         downloadProvider = DownloadProvider.create(this.downloadExecutor),
         userAgent = PlayerUserAgent(this.parameters.userAgent),
-        contentProtections = contentProtections
+        contentProtections = contentProtections,
+        manualPassphrase =
+          profilesController.profileCurrent().preferences().isManualLCPPassphraseEnabled
       )
     )
 

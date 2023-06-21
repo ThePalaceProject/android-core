@@ -136,6 +136,18 @@ class SettingsDebugViewModel(application: Application) : AndroidViewModel(applic
       }
     }
 
+  var isManualLCPPassphraseEnabled: Boolean
+    get() =
+      this.profilesController
+        .profileCurrent()
+        .preferences()
+        .isManualLCPPassphraseEnabled
+    set(value) {
+      this.profilesController.profileUpdate { description ->
+        description.copy(preferences = description.preferences.copy(isManualLCPPassphraseEnabled = value))
+      }
+    }
+
   var isBootFailureEnabled: Boolean
     get() =
       BootFailureTesting.isBootFailureEnabled(getApplication())

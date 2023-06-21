@@ -158,6 +158,16 @@
       android:textStyle="bold" />
 
     <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/settingsVersionDevIsManualLCPPassphraseEnabled"
+        android:theme="@style/Enabled.Switch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:checked="false"
+        android:enabled="true"
+        android:text="@string/settingsDevEnableManualLCPPassphrase" />
+
+    <androidx.appcompat.widget.SwitchCompat
       android:id="@+id/settingsVersionDevProductionLibrariesSwitch"
       android:theme="@style/Enabled.Switch"
       android:layout_width="match_parent"
