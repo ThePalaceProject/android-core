@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<resources>
+  <string name="dialog_manual_passphrase_cancel">Cancel</string>
+  <string name="dialog_manual_passphrase_done">Done</string>
+  <string name="dialog_manual_passphrase_hint">Passphrase</string>
+  <string name="dialog_manual_passphrase_message">Please contact your administrator to restore the passphrase</string>
+  <string name="dialog_manual_passphrase_title">Enter LCP Passphrase</string>
+</resources>
