@@ -13,6 +13,7 @@ dependencies {
   implementation project(":simplified-books-preview")
   implementation project(":simplified-books-registry-api")
   implementation project(":simplified-crashlytics-api")
+  implementation project(":simplified-deeplinks-controller-api")
   implementation project(":simplified-metrics-api")
   implementation project(":simplified-feeds-api")
   implementation project(":simplified-files")
@@ -32,7 +33,6 @@ dependencies {
   implementation libs.palace.drm.core
   implementation libs.palace.http.api
   implementation libs.slf4j
-    implementation project(path: ':simplified-deeplinks-controller-api')
 
     compileOnly libs.google.auto.value
   annotationProcessor libs.google.auto.value.processor
