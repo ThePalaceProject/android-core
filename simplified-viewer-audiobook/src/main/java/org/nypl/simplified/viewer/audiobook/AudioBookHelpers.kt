@@ -105,7 +105,11 @@ internal object AudioBookHelpers {
     )
   }
 
-  fun fromPlayerBookmark(opdsId: String, deviceID: String, playerBookmark: PlayerBookmark): Bookmark.AudiobookBookmark {
+  fun fromPlayerBookmark(
+    opdsId: String,
+    deviceID: String,
+    playerBookmark: PlayerBookmark
+  ): Bookmark.AudiobookBookmark {
     return Bookmark.AudiobookBookmark(
       opdsId = opdsId,
       deviceID = deviceID,
