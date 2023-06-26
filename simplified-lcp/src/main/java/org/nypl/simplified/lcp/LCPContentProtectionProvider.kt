@@ -65,14 +65,14 @@ class LCPContentProtectionProvider : ContentProtectionProvider {
   private val logger =
     LoggerFactory.getLogger(LCPContentProtectionProvider::class.java)
 
-  private suspend fun askPassphrase(context: Context): String? {
+  private suspend fun askPassphrase(context: Context, hint: String): String? {
     val view = LayoutInflater.from(context).inflate(R.layout.view_manual_lcp_passphrase, null)
     val inputPassphrase = view.findViewById<TextView>(R.id.inputPassphrase)
 
     return suspendCoroutine { cont ->
       AlertDialog.Builder(context).apply {
         setTitle(R.string.dialog_manual_passphrase_title)
-        setMessage(R.string.dialog_manual_passphrase_message)
+        setMessage(hint)
         setPositiveButton(R.string.dialog_manual_passphrase_done) { dialog, _ ->
           dialog.dismiss()
           try {
@@ -120,7 +120,7 @@ class LCPContentProtectionProvider : ContentProtectionProvider {
             return if (!isManualPassphraseEnabled) {
               this@LCPContentProtectionProvider.passphrase()
             } else {
-              withContext(Dispatchers.Main) { askPassphrase(context) }
+              withContext(Dispatchers.Main) { askPassphrase(context, license.hint) }
             }
           }
         }
