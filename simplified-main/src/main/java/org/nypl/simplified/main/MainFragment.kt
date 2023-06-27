@@ -265,8 +265,8 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
     }
   }
 
-  private fun onDeepLinkEvent(event: org.nypl.simplified.deeplinks.controller.api.DeepLinkEvent) {
-    if (event.screenID == org.nypl.simplified.deeplinks.controller.api.ScreenID.LOGIN) {
+  private fun onDeepLinkEvent(event: DeepLinkEvent) {
+    if (event.screenID == ScreenID.LOGIN) {
       this.navigator.addFragment(
         fragment = AccountListFragment.create(
           AccountListFragmentParameters(
@@ -276,7 +276,7 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
             comingFromDeepLink = true
           )
         ),
-        tab = org.nypl.simplified.ui.navigation.tabs.R.id.tabSettings
+        tab = R.id.tabSettings
       )
     }
   }
