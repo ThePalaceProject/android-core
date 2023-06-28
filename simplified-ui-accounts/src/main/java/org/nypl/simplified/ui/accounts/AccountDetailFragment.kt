@@ -82,7 +82,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   private val viewModel: AccountDetailViewModel by viewModels(
     factoryProducer = {
       AccountDetailViewModelFactory(
-        account = this.parameters.accountId,
+        account = this.parameters.accountID,
         listener = this.listener
       )
     }
@@ -388,6 +388,29 @@ class AccountDetailFragment : Fragment(R.layout.account) {
      */
 
     this.configureReportIssue()
+
+    /*
+    * Populate the barcode if passed in (e.g. via deep link).
+    */
+
+    var barcode = this.parameters.barcode
+    if (barcode == null) {
+      this.authenticationViews.setBasicUserAndPass("", "")
+    } else {
+      this.authenticationViews.setBasicUserAndPass(
+        user = barcode,
+        password = ""
+      )
+    }
+
+    /*
+     * Hide the toolbar and back arrow if there is no page to return to (e.g. coming from a deep link).
+     */
+    if (this.parameters.hideToolbar) {
+      this.toolbar.visibility = View.GONE
+    } else {
+      this.toolbar.visibility = View.VISIBLE
+    }
   }
 
   private fun instantiateAlternativeAuthenticationViews() {
@@ -495,13 +518,13 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   ) {
     this.viewModel.tryLogin(
       ProfileAccountLoginRequest.SAML20Initiate(
-        accountId = this.parameters.accountId,
+        accountId = this.parameters.accountID,
         description = authenticationDescription
       )
     )
 
     this.listener.post(
-      AccountDetailEvent.OpenSAML20Login(this.parameters.accountId, authenticationDescription)
+      AccountDetailEvent.OpenSAML20Login(this.parameters.accountID, authenticationDescription)
     )
   }
 

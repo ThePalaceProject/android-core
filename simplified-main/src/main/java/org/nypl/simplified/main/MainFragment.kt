@@ -18,6 +18,8 @@ import org.librarysimplified.services.api.Services
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.accounts.api.AccountEventDeletion
 import org.nypl.simplified.accounts.api.AccountEventUpdated
+import org.nypl.simplified.deeplinks.controller.api.DeepLinkEvent
+import org.nypl.simplified.deeplinks.controller.api.ScreenID
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.book_registry.BookHoldsUpdateEvent
 import org.nypl.simplified.books.book_registry.BookStatus
@@ -32,6 +34,8 @@ import org.nypl.simplified.profiles.api.ProfilesDatabaseType.AnonymousProfileEna
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType.AnonymousProfileEnabled.ANONYMOUS_PROFILE_ENABLED
 import org.nypl.simplified.profiles.api.idle_timer.ProfileIdleTimeOutSoon
 import org.nypl.simplified.profiles.api.idle_timer.ProfileIdleTimedOut
+import org.nypl.simplified.ui.accounts.AccountListFragment
+import org.nypl.simplified.ui.accounts.AccountListFragmentParameters
 import org.nypl.simplified.ui.announcements.AnnouncementsDialog
 import org.nypl.simplified.ui.catalog.saml20.CatalogSAML20Fragment
 import org.nypl.simplified.ui.catalog.saml20.CatalogSAML20FragmentParameters
@@ -164,6 +168,10 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
       .subscribe(this::onBookStatusEvent)
       .let { subscriptions.add(it) }
 
+    viewModel.deepLinkEvents
+      .subscribe(this::onDeepLinkEvent)
+      .let { subscriptions.add(it) }
+
     viewModel.bookHoldEvents
       .subscribe(this::onBookHoldsUpdateEvent)
       .let { subscriptions.add(it) }
@@ -254,6 +262,22 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
       is BookStatus.DownloadWaitingForExternalAuthentication -> {
         this.openBookDownloadLogin(status.id, status.downloadURI)
       }
+    }
+  }
+
+  private fun onDeepLinkEvent(event: DeepLinkEvent) {
+    if (event.screenID == ScreenID.LOGIN) {
+      this.navigator.addFragment(
+        fragment = AccountListFragment.create(
+          AccountListFragmentParameters(
+            shouldShowLibraryRegistryMenu = false,
+            accountID = event.accountID,
+            barcode = event.barcode,
+            comingFromDeepLink = true
+          )
+        ),
+        tab = R.id.tabSettings
+      )
     }
   }
 

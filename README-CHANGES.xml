@@ -281,11 +281,12 @@
         <c:change date="2023-04-11T00:00:00+00:00" summary="Fixed WebView audiobook preview not pausing when earphones are unplugged."/>
         <c:change date="2023-04-26T00:00:00+00:00" summary="Added support for Bluetooth audio controls to play, pause, and skip tracks."/>
         <c:change date="2023-04-27T00:00:00+00:00" summary="Added support to audiobook bookmarks."/>
-        <c:change date="2023-05-02T00:00:00+00:00" summary="Added badge to holds tab with the number of available holds."/>
-        <c:change date="2023-05-09T00:00:00+00:00" summary="Always show audio controls on lock screen."/>
+        <c:change date="2023-05-02T22:31:26+00:00" summary="Added badge to holds tab with the number of available holds."/>
+        <c:change date="2023-05-09T22:31:26+00:00" summary="Always show audio controls on lock screen."/>
         <c:change date="2023-05-10T00:00:00+00:00" summary="Bluetooth media controls now support play/pause on more devices and now support fast forwarding and rewinding."/>
-        <c:change date="2023-05-11T00:00:00+00:00" summary="Removed old pdf reader."/>
-        <c:change date="2023-06-13T00:00:00+00:00" summary="Add option to manually insert a LCP passphrase."/>
+        <c:change date="2023-05-11T13:48:54+00:00" summary="Removed old pdf reader."/>
+        <c:change date="2023-05-23T22:31:26+00:00" summary="Support deep links to library login screen with automatic entry of barcode."/>
+        <c:change date="2023-06-13T10:16:17+00:00" summary="Add option to manually insert a LCP passphrase."/>
         <c:change date="2023-06-21T00:00:00+00:00" summary="Fixed audiobook bookmarks being incorrectly displayed and failing to be deleted."/>
         <c:change date="2023-06-26T10:23:13+00:00" summary="Removed hardcoded message from LCP passphrase dialog."/>
       </c:changes>

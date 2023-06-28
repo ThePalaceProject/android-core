@@ -10,7 +10,9 @@ sealed class AccountListEvent {
    */
 
   data class AccountSelected(
-    val account: AccountID
+    val accountID: AccountID,
+    val barcode: String?,
+    val comingFromDeepLink: Boolean
   ) : AccountListEvent()
 
   data class OpenErrorPage(

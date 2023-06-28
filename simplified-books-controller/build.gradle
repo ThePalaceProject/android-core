@@ -13,6 +13,7 @@ dependencies {
   implementation project(":simplified-books-preview")
   implementation project(":simplified-books-registry-api")
   implementation project(":simplified-crashlytics-api")
+  implementation project(":simplified-deeplinks-controller-api")
   implementation project(":simplified-metrics-api")
   implementation project(":simplified-feeds-api")
   implementation project(":simplified-files")
@@ -24,6 +25,7 @@ dependencies {
   implementation project(":simplified-profiles-api")
   implementation project(":simplified-services-api")
   implementation project(":simplified-taskrecorder-api")
+  implementation project(":simplified-accounts-registry")
 
   implementation libs.kotlin.reflect
   implementation libs.kotlin.stdlib
@@ -32,6 +34,6 @@ dependencies {
   implementation libs.palace.http.api
   implementation libs.slf4j
 
-  compileOnly libs.google.auto.value
+    compileOnly libs.google.auto.value
   annotationProcessor libs.google.auto.value.processor
 }

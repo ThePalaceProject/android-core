@@ -179,7 +179,7 @@ internal class MainFragmentListenerDelegate(
   ): MainFragmentState {
     return when (event) {
       is CatalogFeedEvent.LoginRequired -> {
-        this.openSettingsAccount(event.account, comingFromBookLoanRequest = true)
+        this.openSettingsAccount(event.account, comingFromBookLoanRequest = true, comingFromDeepLink = false, barcode = null)
         MainFragmentState.CatalogWaitingForLogin
       }
       is CatalogFeedEvent.OpenErrorPage -> {
@@ -211,7 +211,7 @@ internal class MainFragmentListenerDelegate(
   ): MainFragmentState {
     return when (event) {
       is CatalogBookDetailEvent.LoginRequired -> {
-        this.openSettingsAccount(event.account, comingFromBookLoanRequest = true)
+        this.openSettingsAccount(event.account, comingFromBookLoanRequest = true, comingFromDeepLink = false, barcode = null)
         MainFragmentState.BookDetailsWaitingForLogin
       }
       is CatalogBookDetailEvent.OpenErrorPage -> {
@@ -282,7 +282,7 @@ internal class MainFragmentListenerDelegate(
   ): MainFragmentState {
     return when (event) {
       is AccountListEvent.AccountSelected -> {
-        this.openSettingsAccount(event.account, comingFromBookLoanRequest = false)
+        this.openSettingsAccount(accountID = event.accountID, comingFromBookLoanRequest = false, comingFromDeepLink = event.comingFromDeepLink, barcode = event.barcode)
         state
       }
       AccountListEvent.AddAccount -> {
@@ -478,7 +478,10 @@ internal class MainFragmentListenerDelegate(
     this.navigator.addFragment(
       fragment = AccountListFragment.create(
         AccountListFragmentParameters(
-          shouldShowLibraryRegistryMenu = this.settingsConfiguration.allowAccountsRegistryAccess
+          shouldShowLibraryRegistryMenu = this.settingsConfiguration.allowAccountsRegistryAccess,
+          accountID = null,
+          barcode = null,
+          comingFromDeepLink = false
         )
       ),
       tab = R.id.tabSettings
@@ -545,12 +548,15 @@ internal class MainFragmentListenerDelegate(
     this.navigator.popBackStack()
   }
 
-  private fun openSettingsAccount(account: AccountID, comingFromBookLoanRequest: Boolean) {
+  private fun openSettingsAccount(accountID: AccountID, comingFromBookLoanRequest: Boolean, comingFromDeepLink: Boolean, barcode: String?) {
+    this.logger.debug("openSettingsAccount called with comingFromDeepLink: $comingFromDeepLink")
     this.navigator.addFragment(
       fragment = AccountDetailFragment.create(
         AccountFragmentParameters(
-          accountId = account,
-          showPleaseLogInTitle = comingFromBookLoanRequest
+          accountID = accountID,
+          showPleaseLogInTitle = comingFromBookLoanRequest,
+          hideToolbar = comingFromDeepLink,
+          barcode = barcode
         )
       ),
       tab = this.navigator.currentTab()
