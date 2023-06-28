@@ -5,6 +5,10 @@
   <string name="accountCancel">Cancel</string>
   <string name="accountCardCreatorLabel">Don\'t have a library card?</string>
   <string name="accountCardCreatorSignUp">Create Card</string>
+  <string name="accountCardCreatorSignUpMessage">The Palace App requires a one-time location check in order to verify your library service area. Once you choose "Create Card", please select "Allow Once" in the popup so we can verify this information.</string>
+  <string name="accountCardCreatorOpenSettings">Open Settings</string>
+  <string name="accountCardCreatorOpenSettingsMessage">The Palace App requires a one-time location check in order to verify your library service area. <b>You have disabled location services for this app. </b> To enable, please select the \'Open Settings\' button below then continue with card creation.</string>
+  <string name="accountCardCreatorLocationFailed">There was an error retrieving your location.</string>
   <string name="accountCOPPADeleteBooks">Delete books?</string>
   <string name="accountCOPPADeleteBooksConfirm">Changing your age will remove all books downloaded from the current account.</string>
   <string name="accountAgeVerification">Age Verification</string>

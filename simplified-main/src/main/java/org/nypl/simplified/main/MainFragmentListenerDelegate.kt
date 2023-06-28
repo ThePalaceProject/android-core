@@ -16,6 +16,8 @@ import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.ListenerRepository
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
+import org.nypl.simplified.ui.accounts.AccountCardCreatorFragment
+import org.nypl.simplified.ui.accounts.AccountCardCreatorParameters
 import org.nypl.simplified.ui.accounts.AccountDetailEvent
 import org.nypl.simplified.ui.accounts.AccountDetailFragment
 import org.nypl.simplified.ui.accounts.AccountFragmentParameters
@@ -328,6 +330,10 @@ internal class MainFragmentListenerDelegate(
         this.openDocViewer(event.title, event.url)
         state
       }
+      is AccountDetailEvent.OpenWebView -> {
+        this.openCardCreatorWebView(event.parameters)
+        state
+      }
       AccountDetailEvent.GoUpwards -> {
         this.goUpwards()
         state
@@ -537,6 +543,13 @@ internal class MainFragmentListenerDelegate(
   private fun openErrorPage(parameters: ErrorPageParameters) {
     this.navigator.addFragment(
       fragment = ErrorPageFragment.create(parameters),
+      tab = this.navigator.currentTab()
+    )
+  }
+
+  private fun openCardCreatorWebView(parameters: AccountCardCreatorParameters) {
+    this.navigator.addFragment(
+      fragment = AccountCardCreatorFragment.create(parameters),
       tab = this.navigator.currentTab()
     )
   }
