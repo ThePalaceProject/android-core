@@ -1140,8 +1140,9 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   }
 
   private fun setLayoutAccordingToLocationPermissions() {
-    if (isLocationPermissionGranted() || !wereLocationPermissionsRequestedBefore()
-      || shouldShowRationale()) {
+    if (isLocationPermissionGranted() || !wereLocationPermissionsRequestedBefore() ||
+      shouldShowRationale()
+    ) {
       showPermissionGrantedOrRequestLayout()
     } else {
       showPermissionDeniedLayout()
