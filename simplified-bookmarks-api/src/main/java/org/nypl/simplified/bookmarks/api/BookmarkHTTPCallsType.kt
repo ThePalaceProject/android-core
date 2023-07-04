@@ -54,7 +54,7 @@ interface BookmarkHTTPCallsType {
     annotationsURI: URI,
     credentials: AccountAuthenticationCredentials,
     bookmark: BookmarkAnnotation
-  )
+  ): URI?
 
   /**
    * Delete a bookmark for the given account. This call will fail with an exception if
@@ -68,5 +68,5 @@ interface BookmarkHTTPCallsType {
   fun bookmarkDelete(
     bookmarkURI: URI,
     credentials: AccountAuthenticationCredentials
-  )
+  ): Boolean
 }
