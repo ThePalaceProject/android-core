@@ -54,6 +54,7 @@ import org.nypl.simplified.bookmarks.api.BookmarkSyncEnableResult.SYNC_DISABLED
 import org.nypl.simplified.bookmarks.api.BookmarkSyncEnableResult.SYNC_ENABLED
 import org.nypl.simplified.bookmarks.api.BookmarkSyncEnableResult.SYNC_ENABLE_NOT_SUPPORTED
 import org.nypl.simplified.bookmarks.api.BookmarkSyncEnableStatus
+import org.nypl.simplified.cardcreator.utils.Cache
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsCancelButtonDisabled
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsCancelButtonEnabled
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsLoginButtonDisabled
@@ -119,6 +120,9 @@ class AccountDetailFragment : Fragment(R.layout.account) {
       } else {
         setLayoutAccordingToLocationPermissions()
       }
+
+      // the permissions were shown, so we can store that value
+      Cache(requireContext()).setLocationPermissionsAsked()
     }
 
   private lateinit var accountCustomOPDS: ViewGroup
@@ -389,7 +393,10 @@ class AccountDetailFragment : Fragment(R.layout.account) {
 
     this.signUpButton.setOnClickListener {
       if (!isLocationPermissionGranted()) {
-        if (shouldShowRationale()) {
+        // the "shouldShowRationale()" returns false even if the location permissions dialog hasn't
+        // been shown to the user, so we need to check if it was already displayed. If not,
+        // then we can show it despite the "shouldShowRationale()" method may return false
+        if (shouldShowRationale() || !wereLocationPermissionsRequestedBefore()) {
           requestLocationPermissions()
         } else {
           openAppSettings()
@@ -412,6 +419,10 @@ class AccountDetailFragment : Fragment(R.layout.account) {
      */
 
     this.configureReportIssue()
+  }
+
+  private fun wereLocationPermissionsRequestedBefore(): Boolean {
+    return Cache(requireContext()).getLocationPermissionsAsked()
   }
 
   private fun instantiateAlternativeAuthenticationViews() {
@@ -1129,7 +1140,8 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   }
 
   private fun setLayoutAccordingToLocationPermissions() {
-    if (isLocationPermissionGranted() || shouldShowRationale()) {
+    if (isLocationPermissionGranted() || !wereLocationPermissionsRequestedBefore()
+      || shouldShowRationale()) {
       showPermissionGrantedOrRequestLayout()
     } else {
       showPermissionDeniedLayout()
