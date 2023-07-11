@@ -9,6 +9,7 @@ import com.io7m.jfunctional.Some
 import com.io7m.junreachable.UnreachableCodeException
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
+import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.Subject
 import org.joda.time.Instant
 import org.librarysimplified.http.api.LSHTTPClientType
@@ -22,6 +23,9 @@ import org.nypl.simplified.accounts.api.AccountLogoutStringResourcesType
 import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.accounts.database.api.AccountsDatabaseNonexistentException
+import org.nypl.simplified.deeplinks.controller.api.DeepLinkEvent
+import org.nypl.simplified.deeplinks.controller.api.DeepLinksControllerType
+import org.nypl.simplified.deeplinks.controller.api.ScreenID
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryEvent
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.analytics.api.AnalyticsType
@@ -91,7 +95,13 @@ class Controller private constructor(
   private val profileEvents: Subject<ProfileEvent>,
   private val services: ServiceDirectoryType,
   private val taskExecutor: ListeningExecutorService
-) : BooksControllerType, BooksPreviewControllerType, ProfilesControllerType {
+) : BooksControllerType,
+  BooksPreviewControllerType,
+  ProfilesControllerType,
+  DeepLinksControllerType {
+
+  private val deepLinkEventsObservable: BehaviorSubject<org.nypl.simplified.deeplinks.controller.api.DeepLinkEvent> =
+    BehaviorSubject.create()
 
   private val borrows: ConcurrentHashMap<BookID, BorrowTaskType>
 
@@ -292,6 +302,20 @@ class Controller private constructor(
       }
     }
     return FluentFuture.from(future)
+  }
+
+  override fun deepLinkEvents(): Observable<DeepLinkEvent> {
+    return this.deepLinkEventsObservable
+  }
+
+  override fun publishDeepLinkEvent(accountID: AccountID, screenID: ScreenID, barcode: String?) {
+    this.deepLinkEventsObservable.onNext(
+      DeepLinkEvent.DeepLinkIntercepted(
+        accountID = accountID,
+        screenID = screenID,
+        barcode = barcode
+      )
+    )
   }
 
   override fun profiles(): SortedMap<ProfileID, ProfileReadableType> {

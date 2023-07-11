@@ -270,7 +270,7 @@
         <c:change date="2023-02-28T00:00:00+00:00" summary="Moved the 'Remove' button after the 'Get' button on the Reservations screen."/>
       </c:changes>
     </c:release>
-    <c:release date="2023-06-28T15:12:05+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.5.0">
+    <c:release date="2023-07-11T08:54:12+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.5.0">
       <c:changes>
         <c:change date="2023-03-30T00:00:00+00:00" summary="Save reading position of audiobooks on play, pause, and stop (which also includes when seeking and changing chapters)."/>
         <c:change date="2023-04-04T00:00:00+00:00" summary="Updated library logos loading source in registry feed."/>
@@ -285,10 +285,12 @@
         <c:change date="2023-05-09T00:00:00+00:00" summary="Always show audio controls on lock screen."/>
         <c:change date="2023-05-10T00:00:00+00:00" summary="Bluetooth media controls now support play/pause on more devices and now support fast forwarding and rewinding."/>
         <c:change date="2023-05-11T00:00:00+00:00" summary="Removed old pdf reader."/>
+        <c:change date="2023-05-23T00:00:00+00:00" summary="Support deep links to library login screen with automatic entry of barcode."/>
         <c:change date="2023-06-13T00:00:00+00:00" summary="Add option to manually insert a LCP passphrase."/>
         <c:change date="2023-06-21T00:00:00+00:00" summary="Fixed audiobook bookmarks being incorrectly displayed and failing to be deleted."/>
         <c:change date="2023-06-26T00:00:00+00:00" summary="Removed hardcoded message from LCP passphrase dialog."/>
-        <c:change date="2023-06-28T15:12:05+00:00" summary="Updated library card creation flow by requesting permissions and opening a WebView with the user's current location."/>
+        <c:change date="2023-07-04T00:00:00+00:00" summary="Fixed bug of bookmarks not being deleted."/>
+        <c:change date="2023-07-11T08:54:12+00:00" summary="Updated library card creation flow by requesting permissions and opening a WebView with the user's current location."/>
       </c:changes>
     </c:release>
   </c:releases>

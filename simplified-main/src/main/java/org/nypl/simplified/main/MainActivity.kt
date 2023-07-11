@@ -9,6 +9,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
@@ -22,6 +23,7 @@ import org.nypl.simplified.profiles.api.ProfilesDatabaseType.AnonymousProfileEna
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType.AnonymousProfileEnabled.ANONYMOUS_PROFILE_ENABLED
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.OAuthWithIntermediaryComplete
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
+import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.ui.branding.BrandingSplashServiceType
 import org.nypl.simplified.ui.onboarding.OnboardingEvent
 import org.nypl.simplified.ui.onboarding.OnboardingFragment
@@ -36,7 +38,9 @@ import org.nypl.simplified.ui.splash.SplashFragment
 import org.nypl.simplified.ui.tutorial.TutorialEvent
 import org.nypl.simplified.ui.tutorial.TutorialFragment
 import org.slf4j.LoggerFactory
+import java.net.URI
 import java.util.ServiceLoader
+import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity(R.layout.main_host) {
 
@@ -56,6 +60,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     super.onCreate(savedInstanceState)
     this.logger.debug("onCreate (super completed)")
 
+    interceptDeepLink()
     val toolbar = this.findViewById(R.id.mainToolbar) as Toolbar
     this.setSupportActionBar(toolbar)
     this.supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -71,6 +76,52 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
         this.supportActionBar?.hide()
       }
     }
+  }
+
+  private fun interceptDeepLink() {
+    FirebaseDynamicLinks.getInstance()
+      .getDynamicLink(intent)
+      .addOnSuccessListener(this) { pendingDynamicLinkData ->
+        // Get deep link from result (may be null if no link is found)
+        val deepLink: Uri? = pendingDynamicLinkData?.link
+
+        // Handle the deep link.
+        val libraryID = deepLink?.getQueryParameter("libraryid")
+        if (libraryID != null) {
+          val profilesController =
+            Services.serviceDirectory()
+              .requireService(ProfilesControllerType::class.java)
+          val result = profilesController.profileAccountCreateOrReturnExisting(URI("urn:uuid:" + libraryID)).get(3L, TimeUnit.MINUTES)
+
+          lateinit var accountID: AccountID
+          when (result) {
+            is TaskResult.Success -> {
+              accountID = result.result.id
+            }
+            is TaskResult.Failure -> {
+              this.logger.error("MainActivity", "Error: unable to create or return existing account for library $libraryID")
+            }
+          }
+
+          lateinit var screenID: org.nypl.simplified.deeplinks.controller.api.ScreenID
+          if (deepLink?.getQueryParameter("screen") == "login") {
+            screenID = org.nypl.simplified.deeplinks.controller.api.ScreenID.LOGIN
+          } else {
+            this.logger.error("MainActivity", "Error: screen ID not specified")
+            screenID = org.nypl.simplified.deeplinks.controller.api.ScreenID.UNSPECIFIED
+          }
+
+          val barcode = deepLink?.getQueryParameter("barcode")
+
+          val deepLinksController =
+            Services.serviceDirectory()
+              .requireService(org.nypl.simplified.deeplinks.controller.api.DeepLinksControllerType::class.java)
+          deepLinksController.publishDeepLinkEvent(accountID, screenID, barcode)
+        }
+      }
+      .addOnFailureListener(this) { e ->
+        this.logger.warn("MainActivity", "getDynamicLink:onFailure", e)
+      }
   }
 
   override fun getDefaultViewModelProviderFactory(): ViewModelProvider.Factory {
@@ -151,6 +202,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
   override fun onStart() {
     super.onStart()
     this.listenerRepo.registerHandler(this::handleEvent)
+    interceptDeepLink()
   }
 
   override fun onStop() {
@@ -163,14 +215,19 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     return when (event) {
       is MainActivityListenedEvent.SplashEvent ->
         this.handleSplashEvent(event.event)
+
       is MainActivityListenedEvent.TutorialEvent ->
         this.handleTutorialEvent(event.event)
+
       is MainActivityListenedEvent.OnboardingEvent ->
         this.handleOnboardingEvent(event.event)
+
       is MainActivityListenedEvent.MainFragmentEvent ->
         this.handleMainFragmentEvent(event.event)
+
       is MainActivityListenedEvent.ProfileSelectionEvent ->
         this.handleProfileSelectionEvent(event.event)
+
       is MainActivityListenedEvent.ProfileModificationEvent ->
         this.handleProfileModificationEvent(event.event)
     }

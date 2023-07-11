@@ -19,14 +19,14 @@ internal class BServiceOpCreateRemoteBookmark(
   private val profile: ProfileReadableType,
   private val accountID: AccountID,
   private val bookmark: Bookmark
-) : BServiceOp<Unit>(logger) {
+) : BServiceOp<Bookmark?>(logger) {
 
-  override fun runActual() {
-    this.remotelySendBookmark()
+  override fun runActual(): Bookmark? {
+    return this.remotelySendBookmark()
   }
 
-  private fun remotelySendBookmark() {
-    try {
+  private fun remotelySendBookmark(): Bookmark? {
+    return try {
       this.logger.debug(
         "[{}]: remote sending bookmark {}",
         this.profile.id.uuid,
@@ -40,27 +40,53 @@ internal class BServiceOpCreateRemoteBookmark(
           this.profile.id.uuid,
           this.bookmark.bookmarkId.value
         )
-        return
+        return null
       }
 
       val bookmarkAnnotation = when (this.bookmark) {
-        is Bookmark.ReaderBookmark ->
+        is Bookmark.ReaderBookmark -> {
           BookmarkAnnotations.fromReaderBookmark(this.objectMapper, this.bookmark)
-        is Bookmark.AudiobookBookmark ->
+        }
+        is Bookmark.AudiobookBookmark -> {
           BookmarkAnnotations.fromAudiobookBookmark(this.objectMapper, this.bookmark)
-        is Bookmark.PDFBookmark ->
+        }
+        is Bookmark.PDFBookmark -> {
           BookmarkAnnotations.fromPdfBookmark(this.objectMapper, this.bookmark)
-        else ->
+        }
+        else -> {
           throw IllegalStateException("Unsupported bookmark type: $bookmark")
+        }
       }
 
-      this.httpCalls.bookmarkAdd(
+      val bookmarkUri = this.httpCalls.bookmarkAdd(
         annotationsURI = syncInfo.annotationsURI,
         credentials = syncInfo.credentials,
         bookmark = bookmarkAnnotation
-      )
+      ) ?: return null
+
+      when (this.bookmark) {
+        is Bookmark.ReaderBookmark -> {
+          bookmark.copy(
+            uri = bookmarkUri
+          )
+        }
+        is Bookmark.AudiobookBookmark -> {
+          bookmark.copy(
+            uri = bookmarkUri
+          )
+        }
+        is Bookmark.PDFBookmark -> {
+          bookmark.copy(
+            uri = bookmarkUri
+          )
+        }
+        else -> {
+          throw IllegalStateException("Unsupported bookmark type: $bookmark")
+        }
+      }
     } catch (e: Exception) {
       this.logger.error("error sending bookmark: ", e)
+      null
     }
   }
 }

@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.common.util.concurrent.ListeningExecutorService
@@ -147,8 +148,6 @@ class AudioBookPlayerActivity :
   private val reloadingManifest = AtomicBoolean(false)
 
   private val currentBookmarks = arrayListOf<Bookmark.AudiobookBookmark>()
-
-  private var lastLocalBookmark: Bookmark? = null
 
   private val services =
     Services.serviceDirectory()
@@ -327,20 +326,28 @@ class AudioBookPlayerActivity :
         kind = BookmarkKind.BookmarkLastReadLocation,
         time = DateTime.now(),
         deviceID = AudioBookDevices.deviceId(this.profilesController, this.parameters.bookID),
+        // in this case, we can send the uri as null because this is a "last read" bookmark and
+        // also because the server will later set an uri, so the next we fetch it, it will have a
+        // uri
         uri = null
       )
 
       if (event.isLocalBookmark) {
-        lastLocalBookmark = bookmark
         this.bookmarkService.bookmarkCreateLocal(
           accountID = this.parameters.accountID,
           bookmark = bookmark
         )
       } else {
-        this.bookmarkService.bookmarkCreateRemote(
-          accountID = this.parameters.accountID,
-          bookmark = bookmark
-        )
+        val backgroundThread =
+          MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(1))
+
+        backgroundThread.execute {
+          AudioBookHelpers.addBookmarkRemotely(
+            bookmarkService = this.bookmarkService,
+            accountID = this.parameters.accountID,
+            bookmark = bookmark
+          )
+        }
       }
     } catch (e: Exception) {
       this.log.error("could not save player position: ", e)
@@ -940,25 +947,39 @@ class AudioBookPlayerActivity :
       }
   }
 
-  override fun onPlayerShouldDeleteBookmark(playerBookmark: PlayerBookmark) {
+  override fun onPlayerShouldDeleteBookmark(
+    playerBookmark: PlayerBookmark,
+    onDeleteOperationCompleted: (Boolean) -> Unit
+  ) {
     val bookmark = AudioBookHelpers.fromPlayerBookmark(
       opdsId = this.parameters.opdsEntry.id,
       deviceID = AudioBookDevices.deviceId(this.profilesController, this.parameters.bookID),
       playerBookmark = playerBookmark
     )
 
-    currentBookmarks.remove(bookmark)
+    val backgroundThread =
+      MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(1))
 
-    bookmarkService.bookmarkDelete(
-      accountID = this.parameters.accountID,
-      bookmark = bookmark
-    )
+    backgroundThread.execute {
+      val wasDeleted = AudioBookHelpers.deleteBookmark(
+        bookmarkService = this.bookmarkService,
+        accountID = this.parameters.accountID,
+        bookmark = bookmark
+      )
+
+      if (wasDeleted) {
+        currentBookmarks.remove(bookmark)
+      }
+
+      runOnUiThread {
+        onDeleteOperationCompleted(wasDeleted)
+      }
+    }
   }
 
   override fun onPlayerShouldAddBookmark(playerBookmark: PlayerBookmark?) {
     if (playerBookmark == null) {
-      Toast.makeText(this, R.string.audio_book_player_bookmark_error_adding, Toast.LENGTH_SHORT)
-        .show()
+      showToastMessage(R.string.audio_book_player_bookmark_error_adding)
       return
     }
 
@@ -970,31 +991,44 @@ class AudioBookPlayerActivity :
       )
 
       if (!currentBookmarks.any { it.location == bookmark.location }) {
-        this.bookmarkService.bookmarkCreateLocal(
-          accountID = this.parameters.accountID,
-          bookmark = bookmark
-        )
+        showToastMessage(R.string.audio_book_player_bookmark_adding)
 
-        this.bookmarkService.bookmarkCreateRemote(
-          accountID = this.parameters.accountID,
-          bookmark = bookmark
-        )
+        val backgroundThread =
+          MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(1))
 
-        currentBookmarks.add(bookmark)
+        backgroundThread.execute {
+          val createdBookmark = AudioBookHelpers.addBookmarkRemotely(
+            bookmarkService = bookmarkService,
+            accountID = this.parameters.accountID,
+            bookmark = bookmark
+          )
 
-        Toast.makeText(
-          this, R.string.audio_book_player_bookmark_added, Toast.LENGTH_SHORT
-        ).show()
+          // the bookmark was successfully created, so we can store it locally and update the list
+          if (createdBookmark != null) {
+            this.bookmarkService.bookmarkCreateLocal(
+              accountID = this.parameters.accountID,
+              bookmark = createdBookmark
+            )
+
+            currentBookmarks.add(createdBookmark as Bookmark.AudiobookBookmark)
+
+            showToastMessage(R.string.audio_book_player_bookmark_added)
+          } else {
+            showToastMessage(R.string.audio_book_player_bookmark_error_adding)
+          }
+        }
       } else {
-        Toast.makeText(
-          this, R.string.audio_book_player_bookmark_already_added, Toast.LENGTH_SHORT
-        ).show()
+        showToastMessage(R.string.audio_book_player_bookmark_already_added)
       }
     } catch (e: Exception) {
-      Toast.makeText(
-        this, R.string.audio_book_player_bookmark_error_adding, Toast.LENGTH_SHORT
-      ).show()
+      showToastMessage(R.string.audio_book_player_bookmark_error_adding)
       this.log.error("could not save bookmark: ", e)
+    }
+  }
+
+  private fun showToastMessage(@StringRes messageRes: Int) {
+    runOnUiThread {
+      Toast.makeText(this, messageRes, Toast.LENGTH_SHORT).show()
     }
   }
 

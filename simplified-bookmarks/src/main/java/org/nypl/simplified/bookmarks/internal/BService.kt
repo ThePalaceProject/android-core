@@ -344,7 +344,7 @@ class BService(
   override fun bookmarkCreateRemote(
     accountID: AccountID,
     bookmark: Bookmark
-  ): FluentFuture<Unit> {
+  ): FluentFuture<Bookmark?> {
     return try {
       FluentFuture.from(
         this.executor.submit(
@@ -367,7 +367,7 @@ class BService(
   override fun bookmarkDelete(
     accountID: AccountID,
     bookmark: Bookmark
-  ): FluentFuture<Unit> {
+  ): FluentFuture<Boolean> {
     return try {
       FluentFuture.from(
         this.executor.submit(

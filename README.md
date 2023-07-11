@@ -338,6 +338,7 @@ coupled as possible. New features should typically be implemented as new modules
 | [org.librarysimplified.content.api](simplified-content-api)                                   |Content resolver API|
 | [org.librarysimplified.crashlytics](simplified-crashlytics)                                   |Crashlytics|
 | [org.librarysimplified.crashlytics.api](simplified-crashlytics-api)                           |Crashlytics functionality|
+| [org.librarysimplified.deeplinks.controller.api](simplified-deeplinks-controller-api)         |Deep Links|
 | [org.librarysimplified.documents](simplified-documents)                                       |Documents|
 | [org.librarysimplified.feeds.api](simplified-feeds-api)                                       |Feed API|
 | [org.librarysimplified.files](simplified-files)                                               |File utilities|
