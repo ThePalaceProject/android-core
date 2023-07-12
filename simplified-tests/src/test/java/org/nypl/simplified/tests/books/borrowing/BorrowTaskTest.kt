@@ -285,7 +285,7 @@ class BorrowTaskTest {
     Mockito.`when`(this.profile.id)
       .thenReturn(profileId)
     Mockito.`when`(this.profiles.currentProfile())
-      .thenReturn(Option.some(null))
+      .thenReturn(Option.none())
     Mockito.`when`(this.profile.account(this.accountId))
       .thenReturn(this.account)
     Mockito.`when`(this.account.bookDatabase)
