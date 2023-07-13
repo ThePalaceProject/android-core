@@ -39,6 +39,32 @@ object Reader2Bookmarks {
   }
 
   /**
+   * Create a bookmark.
+   */
+
+  fun createBookmarkRemotely(
+    bookmarkService: BookmarkServiceUsableType,
+    accountID: AccountID,
+    bookmark: Bookmark
+  ): Bookmark? {
+    return bookmarkService.bookmarkCreateRemote(
+      accountID = accountID,
+      bookmark = bookmark
+    ).get(15L, TimeUnit.SECONDS)
+  }
+
+  fun deleteBookmarkRemotely(
+    bookmarkService: BookmarkServiceUsableType,
+    accountID: AccountID,
+    bookmark: Bookmark
+  ): Boolean {
+    return bookmarkService.bookmarkDelete(
+      accountID = accountID,
+      bookmark = bookmark
+    ).get(15L, TimeUnit.SECONDS)
+  }
+
+  /**
    * Load bookmarks from the given bookmark service.
    */
 
@@ -102,7 +128,7 @@ object Reader2Bookmarks {
       chapterTitle = source.title,
       bookProgress = source.bookProgress,
       deviceID = deviceId,
-      uri = null
+      uri = source.uri
     )
   }
 
@@ -141,6 +167,7 @@ object Reader2Bookmarks {
         chapterHref = location.progress.chapterHref,
         chapterProgress = location.progress.chapterProgress
       ),
-      bookProgress = source.bookProgress
+      bookProgress = source.bookProgress,
+      uri = source.uri
     )
 }

@@ -18,15 +18,21 @@ internal class BServiceOpDeleteBookmark(
   private val profile: ProfileReadableType,
   private val accountID: AccountID,
   private val bookmark: Bookmark
-) : BServiceOp<Unit>(logger) {
+) : BServiceOp<Boolean>(logger) {
 
-  override fun runActual() {
-    this.remotelyDeleteBookmark()
-    this.locallyDeleteBookmark()
+  override fun runActual(): Boolean {
+    val wasDeleted = this.remotelyDeleteBookmark()
+
+    // if the bookmark was successfully deleted on the server, we can delete it locally
+    if (wasDeleted) {
+      this.locallyDeleteBookmark()
+    }
+
+    return wasDeleted
   }
 
-  private fun remotelyDeleteBookmark() {
-    try {
+  private fun remotelyDeleteBookmark(): Boolean {
+    return try {
       this.logger.debug(
         "[{}]: remote deleting bookmark {}",
         this.profile.id.uuid,
@@ -40,7 +46,7 @@ internal class BServiceOpDeleteBookmark(
           this.profile.id.uuid,
           this.bookmark.bookmarkId.value
         )
-        return
+        return false
       }
 
       val syncInfo = BSyncableAccount.ofAccount(this.profile.account(this.accountID))
@@ -50,7 +56,7 @@ internal class BServiceOpDeleteBookmark(
           this.profile.id.uuid,
           this.bookmark.bookmarkId.value
         )
-        return
+        return false
       }
 
       this.httpCalls.bookmarkDelete(
@@ -59,6 +65,7 @@ internal class BServiceOpDeleteBookmark(
       )
     } catch (e: Exception) {
       this.logger.error("[{}]: error deleting bookmark: ", this.profile.id.uuid, e)
+      false
     }
   }
 

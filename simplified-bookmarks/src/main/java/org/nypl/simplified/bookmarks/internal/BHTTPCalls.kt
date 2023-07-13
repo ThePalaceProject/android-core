@@ -58,7 +58,7 @@ class BHTTPCalls(
   override fun bookmarkDelete(
     bookmarkURI: URI,
     credentials: AccountAuthenticationCredentials
-  ) {
+  ): Boolean {
     val auth =
       AccountAuthenticatedHTTP.createAuthorization(credentials)
     val request =
@@ -67,10 +67,10 @@ class BHTTPCalls(
         .setMethod(Delete)
         .build()
 
-    request.execute().use { response ->
+    return request.execute().use { response ->
       when (val status = response.status) {
         is LSHTTPResponseStatus.Responded.OK -> {
-          // do nothing
+          true
         }
         is LSHTTPResponseStatus.Responded.Error -> {
           this.logAndFail(bookmarkURI, status)
@@ -88,7 +88,7 @@ class BHTTPCalls(
     annotationsURI: URI,
     credentials: AccountAuthenticationCredentials,
     bookmark: BookmarkAnnotation
-  ) {
+  ): URI? {
     val data =
       BookmarkAnnotationsJSON.serializeBookmarkAnnotationToBytes(this.objectMapper, bookmark)
     val auth =
@@ -103,12 +103,21 @@ class BHTTPCalls(
 
     return request.execute().use { response ->
       when (val status = response.status) {
-        is LSHTTPResponseStatus.Responded.OK ->
-          Unit
-        is LSHTTPResponseStatus.Responded.Error ->
+        is LSHTTPResponseStatus.Responded.OK -> {
+          val receivedBookmark = objectMapper.readTree(status.bodyStream ?: this.emptyStream())
+          try {
+            URI.create(receivedBookmark.get("id").asText())
+          } catch (exception: Exception) {
+            this.logger.error(exception.message)
+            null
+          }
+        }
+        is LSHTTPResponseStatus.Responded.Error -> {
           this.logAndFail(annotationsURI, status)
-        is LSHTTPResponseStatus.Failed ->
+        }
+        is LSHTTPResponseStatus.Failed -> {
           throw status.exception
+        }
       }
     }
   }

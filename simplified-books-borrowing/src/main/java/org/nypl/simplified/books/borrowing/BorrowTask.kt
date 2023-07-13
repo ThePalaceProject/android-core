@@ -31,6 +31,7 @@ import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionPath
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
+import org.nypl.simplified.opds.core.getOrNull
 import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
@@ -193,6 +194,9 @@ class BorrowTask private constructor(
         contentResolver = this.requirements.contentResolver,
         currentOPDSAcquisitionPathElement = path.elements.first(),
         httpClient = this.requirements.httpClient,
+        isManualLCPPassphraseEnabled =
+          this.requirements.profiles.currentProfile().getOrNull()
+            ?.preferences()?.isManualLCPPassphraseEnabled ?: false,
         logger = this.logger,
         opdsAcquisitionPath = path,
         samlDownloadContext = samlDownloadContext,
@@ -403,6 +407,7 @@ class BorrowTask private constructor(
     override val bundledContent: BundledContentResolverType,
     override val bookDatabaseEntry: BookDatabaseEntryType,
     override val httpClient: LSHTTPClientType,
+    override val isManualLCPPassphraseEnabled: Boolean,
     override val taskRecorder: TaskRecorderType,
     override val opdsAcquisitionPath: OPDSAcquisitionPath,
     override val samlDownloadContext: SAMLDownloadContext? = null,

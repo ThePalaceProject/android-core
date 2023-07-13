@@ -43,6 +43,7 @@ class MockBorrowContext(
   override var bookDatabaseEntry: BookDatabaseEntryType,
   override var samlDownloadContext: SAMLDownloadContext? = null,
   override var lcpService: LcpService? = null,
+  override val isManualLCPPassphraseEnabled: Boolean = false,
   bookInitial: Book,
 ) : BorrowContextType {
 

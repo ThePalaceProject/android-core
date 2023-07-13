@@ -1,6 +1,7 @@
 package org.nypl.simplified.tests.books.borrowing
 
 import android.content.Context
+import com.io7m.jfunctional.Option
 import io.reactivex.disposables.Disposable
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -279,11 +280,12 @@ class BorrowTaskTest {
         .subtasks
 
     val profileId = ProfileID.generate()
-
     Mockito.`when`(this.profiles.profiles())
       .thenReturn(sortedMapOf(Pair(profileId, this.profile)))
     Mockito.`when`(this.profile.id)
       .thenReturn(profileId)
+    Mockito.`when`(this.profiles.currentProfile())
+      .thenReturn(Option.none())
     Mockito.`when`(this.profile.account(this.accountId))
       .thenReturn(this.account)
     Mockito.`when`(this.account.bookDatabase)

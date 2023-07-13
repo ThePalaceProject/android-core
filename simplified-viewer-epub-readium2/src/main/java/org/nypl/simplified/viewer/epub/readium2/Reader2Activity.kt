@@ -5,10 +5,13 @@ import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.os.Bundle
 import android.webkit.WebView
+import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.google.common.util.concurrent.MoreExecutors
 import io.reactivex.disposables.Disposable
 import org.joda.time.LocalDateTime
 import org.librarysimplified.r2.api.SR2Bookmark
@@ -55,6 +58,7 @@ import org.readium.r2.shared.publication.asset.FileAsset
 import org.slf4j.LoggerFactory
 import java.util.ServiceLoader
 import java.util.concurrent.ExecutionException
+import java.util.concurrent.Executors
 
 /**
  * The main reader activity for reading an EPUB using Readium 2.
@@ -418,8 +422,12 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
   private fun onControllerEvent(
     event: SR2Event
   ) {
-    return when (event) {
-      is SR2Event.SR2BookmarkEvent.SR2BookmarkCreated -> {
+
+    val backgroundThread =
+      MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(1))
+
+    when (event) {
+      is SR2Event.SR2BookmarkEvent.SR2BookmarkCreate -> {
         val bookmark =
           Reader2Bookmarks.fromSR2Bookmark(
             bookEntry = this.parameters.entry,
@@ -427,20 +435,28 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
             source = event.bookmark
           )
 
-        this.bookmarkService.bookmarkCreateLocal(
-          accountID = this.parameters.accountId,
-          bookmark = bookmark
-        )
+        showToastMessage(R.string.reader_bookmark_adding)
 
-        this.bookmarkService.bookmarkCreateRemote(
-          accountID = this.parameters.accountId,
-          bookmark = bookmark
-        )
+        backgroundThread.execute {
+          val createdBookmark = Reader2Bookmarks.createBookmarkRemotely(
+            bookmarkService = this.bookmarkService,
+            accountID = this.parameters.accountId,
+            bookmark = bookmark
+          )
 
-        Unit
+          if (createdBookmark != null) {
+            this.bookmarkService.bookmarkCreateLocal(
+              accountID = this.parameters.accountId,
+              bookmark = createdBookmark
+            )
+            event.onBookmarkCreationCompleted(Reader2Bookmarks.toSR2Bookmark(createdBookmark))
+          } else {
+            event.onBookmarkCreationCompleted(null)
+            showToastMessage(R.string.reader_bookmark_error_adding)
+          }
+        }
       }
-
-      is SR2Event.SR2BookmarkEvent.SR2BookmarkDeleted -> {
+      is SR2Event.SR2BookmarkEvent.SR2BookmarkTryToDelete -> {
         val bookmark =
           Reader2Bookmarks.fromSR2Bookmark(
             bookEntry = this.parameters.entry,
@@ -448,12 +464,16 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
             source = event.bookmark
           )
 
-        this.bookmarkService.bookmarkDelete(
-          accountID = this.account.id,
-          bookmark = bookmark
-        )
+        backgroundThread.execute {
 
-        Unit
+          val wasDeleted = Reader2Bookmarks.deleteBookmarkRemotely(
+            bookmarkService = this.bookmarkService,
+            accountID = this.account.id,
+            bookmark = bookmark
+          )
+
+          event.onDeleteOperationFinished(wasDeleted)
+        }
       }
 
       is SR2Event.SR2ThemeChanged -> {
@@ -470,6 +490,9 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       is SR2Event.SR2OnCenterTapped,
       is SR2Event.SR2ReadingPositionChanged,
       SR2Event.SR2BookmarkEvent.SR2BookmarksLoaded,
+      SR2Event.SR2BookmarkEvent.SR2BookmarkFailedToBeDeleted,
+      is SR2Event.SR2BookmarkEvent.SR2BookmarkDeleted,
+      is SR2Event.SR2BookmarkEvent.SR2BookmarkCreated,
       is SR2ChapterNonexistent,
       is SR2WebViewInaccessible,
       is SR2ExternalLinkSelected,
@@ -547,5 +570,11 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       .setOnDismissListener { this.finish() }
       .create()
       .show()
+  }
+
+  private fun showToastMessage(@StringRes messageRes: Int) {
+    runOnUiThread {
+      Toast.makeText(this, messageRes, Toast.LENGTH_SHORT).show()
+    }
   }
 }
