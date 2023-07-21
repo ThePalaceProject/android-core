@@ -11,7 +11,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.google.common.util.concurrent.MoreExecutors
 import io.reactivex.disposables.Disposable
 import org.joda.time.LocalDateTime
 import org.librarysimplified.r2.api.SR2Bookmark
@@ -52,13 +51,17 @@ import org.nypl.simplified.analytics.api.AnalyticsType
 import org.nypl.simplified.bookmarks.api.BookmarkServiceType
 import org.nypl.simplified.books.api.BookContentProtections
 import org.nypl.simplified.books.api.BookDRMInformation
+import org.nypl.simplified.books.api.bookmark.Bookmark
+import org.nypl.simplified.books.api.bookmark.BookmarkKind
+import org.nypl.simplified.futures.FluentFutureExtensions.map
+import org.nypl.simplified.futures.FluentFutureExtensions.mapNulllable
+import org.nypl.simplified.futures.FluentFutureExtensions.onAnyError
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.thread.api.UIThreadServiceType
 import org.readium.r2.shared.publication.asset.FileAsset
 import org.slf4j.LoggerFactory
 import java.util.ServiceLoader
 import java.util.concurrent.ExecutionException
-import java.util.concurrent.Executors
 
 /**
  * The main reader activity for reading an EPUB using Readium 2.
@@ -259,12 +262,14 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
             fileAsset = FileAsset(this.parameters.file),
             adobeRightsFile = drmInfo.rights?.first
           )
+
         is BookDRMInformation.AXIS ->
           AxisNowFileAsset(
             fileAsset = FileAsset(this.parameters.file),
             axisLicense = drmInfo.license,
             axisUserKey = drmInfo.userKey
           )
+
         else -> FileAsset(this.parameters.file)
       }
 
@@ -294,10 +299,13 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     return when (event) {
       SR2ReaderViewNavigationClose ->
         this.onBackPressed()
+
       SR2ReaderViewNavigationOpenTOC ->
         this.tocOpen()
+
       is SR2ControllerBecameAvailable ->
         this.onControllerBecameAvailable(event.reference)
+
       is SR2BookLoadingFailed ->
         this.onBookLoadingFailed(event.exception)
     }
@@ -422,40 +430,29 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
   private fun onControllerEvent(
     event: SR2Event
   ) {
-
-    val backgroundThread =
-      MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(1))
-
     when (event) {
       is SR2Event.SR2BookmarkEvent.SR2BookmarkCreate -> {
-        val bookmark =
+        val localBookmark =
           Reader2Bookmarks.fromSR2Bookmark(
             bookEntry = this.parameters.entry,
             deviceId = Reader2Devices.deviceId(this.profilesController, this.parameters.bookId),
             source = event.bookmark
           )
 
-        showToastMessage(R.string.reader_bookmark_adding)
-
-        backgroundThread.execute {
-          val createdBookmark = Reader2Bookmarks.createBookmarkRemotely(
-            bookmarkService = this.bookmarkService,
-            accountID = this.parameters.accountId,
-            bookmark = bookmark
-          )
-
-          if (createdBookmark != null) {
-            this.bookmarkService.bookmarkCreateLocal(
-              accountID = this.parameters.accountId,
-              bookmark = createdBookmark
-            )
-            event.onBookmarkCreationCompleted(Reader2Bookmarks.toSR2Bookmark(createdBookmark))
-          } else {
-            event.onBookmarkCreationCompleted(null)
-            showToastMessage(R.string.reader_bookmark_error_adding)
-          }
+        when (localBookmark.kind) {
+          BookmarkKind.BookmarkExplicit -> showToastMessage(R.string.reader_bookmark_adding)
+          BookmarkKind.BookmarkLastReadLocation -> Unit
         }
+
+        bookmarkService.bookmarkCreateRemote(
+          accountID = parameters.accountId,
+          bookmark = localBookmark
+        ).onAnyError { localBookmark }
+          .mapNulllable { possiblyRemoteBookmark ->
+            onBookmarkWasCreated(possiblyRemoteBookmark, localBookmark, event)
+          }
       }
+
       is SR2Event.SR2BookmarkEvent.SR2BookmarkTryToDelete -> {
         val bookmark =
           Reader2Bookmarks.fromSR2Bookmark(
@@ -464,16 +461,13 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
             source = event.bookmark
           )
 
-        backgroundThread.execute {
-
-          val wasDeleted = Reader2Bookmarks.deleteBookmarkRemotely(
-            bookmarkService = this.bookmarkService,
-            accountID = this.account.id,
-            bookmark = bookmark
-          )
-
-          event.onDeleteOperationFinished(wasDeleted)
-        }
+        bookmarkService.bookmarkDelete(
+          accountID = account.id,
+          bookmark = bookmark
+        ).onAnyError { false }
+          .map { wasDeleted ->
+            event.onDeleteOperationFinished(wasDeleted)
+          }
       }
 
       is SR2Event.SR2ThemeChanged -> {
@@ -502,6 +496,24 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       is SR2CommandExecutionFailed -> {
         // Nothing
       }
+    }
+  }
+
+  private fun onBookmarkWasCreated(
+    possiblyRemoteBookmark: Bookmark?,
+    localBookmark: Bookmark.ReaderBookmark,
+    event: SR2Event.SR2BookmarkEvent.SR2BookmarkCreate
+  ) {
+    val savedBookmark = possiblyRemoteBookmark ?: localBookmark
+    this.bookmarkService.bookmarkCreateLocal(
+      accountID = this.parameters.accountId,
+      bookmark = savedBookmark
+    )
+    event.onBookmarkCreationCompleted(Reader2Bookmarks.toSR2Bookmark(savedBookmark))
+
+    return when (savedBookmark.kind) {
+      BookmarkKind.BookmarkExplicit -> showToastMessage(R.string.reader_bookmark_added)
+      BookmarkKind.BookmarkLastReadLocation -> Unit
     }
   }
 
