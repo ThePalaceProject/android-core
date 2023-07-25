@@ -54,7 +54,7 @@ import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.bookmark.Bookmark
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.futures.FluentFutureExtensions.map
-import org.nypl.simplified.futures.FluentFutureExtensions.mapNulllable
+import org.nypl.simplified.futures.FluentFutureExtensions.mapNullable
 import org.nypl.simplified.futures.FluentFutureExtensions.onAnyError
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.thread.api.UIThreadServiceType
@@ -448,8 +448,8 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
           accountID = parameters.accountId,
           bookmark = localBookmark
         ).onAnyError { localBookmark }
-          .mapNulllable { possiblyRemoteBookmark ->
-            onBookmarkWasCreated(possiblyRemoteBookmark, localBookmark, event)
+          .mapNullable { possiblyRemoteBookmark ->
+            onBookmarkWasCreated(possiblyRemoteBookmark ?: localBookmark, event)
           }
       }
 
@@ -500,18 +500,16 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
   }
 
   private fun onBookmarkWasCreated(
-    possiblyRemoteBookmark: Bookmark?,
-    localBookmark: Bookmark.ReaderBookmark,
+    bookmark: Bookmark,
     event: SR2Event.SR2BookmarkEvent.SR2BookmarkCreate
   ) {
-    val savedBookmark = possiblyRemoteBookmark ?: localBookmark
     this.bookmarkService.bookmarkCreateLocal(
       accountID = this.parameters.accountId,
-      bookmark = savedBookmark
+      bookmark = bookmark
     )
-    event.onBookmarkCreationCompleted(Reader2Bookmarks.toSR2Bookmark(savedBookmark))
+    event.onBookmarkCreationCompleted(Reader2Bookmarks.toSR2Bookmark(bookmark))
 
-    return when (savedBookmark.kind) {
+    return when (bookmark.kind) {
       BookmarkKind.BookmarkExplicit -> showToastMessage(R.string.reader_bookmark_added)
       BookmarkKind.BookmarkLastReadLocation -> Unit
     }
