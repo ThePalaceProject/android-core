@@ -39,32 +39,6 @@ object Reader2Bookmarks {
   }
 
   /**
-   * Create a bookmark.
-   */
-
-  fun createBookmarkRemotely(
-    bookmarkService: BookmarkServiceUsableType,
-    accountID: AccountID,
-    bookmark: Bookmark
-  ): Bookmark? {
-    return bookmarkService.bookmarkCreateRemote(
-      accountID = accountID,
-      bookmark = bookmark
-    ).get(15L, TimeUnit.SECONDS)
-  }
-
-  fun deleteBookmarkRemotely(
-    bookmarkService: BookmarkServiceUsableType,
-    accountID: AccountID,
-    bookmark: Bookmark
-  ): Boolean {
-    return bookmarkService.bookmarkDelete(
-      accountID = accountID,
-      bookmark = bookmark
-    ).get(15L, TimeUnit.SECONDS)
-  }
-
-  /**
    * Load bookmarks from the given bookmark service.
    */
 
