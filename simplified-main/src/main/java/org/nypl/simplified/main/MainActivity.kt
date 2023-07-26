@@ -48,6 +48,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
   companion object {
     private const val STATE_ACTION_BAR_IS_SHOWING = "ACTION_BAR_IS_SHOWING"
+    private const val LOGIN_SCREEN_ID = "login"
   }
 
   private val logger = LoggerFactory.getLogger(MainActivity::class.java)
@@ -133,14 +134,14 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
       val screenRaw =
         deepLink.getQueryParameter("screen")
 
-      val screenId =
+      val screenId: ScreenID =
         when (screenRaw) {
-          null -> kotlin.run {
+          null -> {
             this.logger.warn("Deep link did not have a screen parameter.")
             ScreenID.UNSPECIFIED
           }
-          "login" -> ScreenID.LOGIN
-          else -> kotlin.run {
+          LOGIN_SCREEN_ID -> ScreenID.LOGIN
+          else -> {
             this.logger.warn("Deep link had an unrecognized screen parameter {}.", screenRaw)
             ScreenID.UNSPECIFIED
           }
