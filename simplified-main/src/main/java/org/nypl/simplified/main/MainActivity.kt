@@ -14,6 +14,8 @@ import org.librarysimplified.services.api.Services
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
+import org.nypl.simplified.deeplinks.controller.api.DeepLinksControllerType
+import org.nypl.simplified.deeplinks.controller.api.ScreenID
 import org.nypl.simplified.listeners.api.ListenerRepository
 import org.nypl.simplified.listeners.api.listenerRepositories
 import org.nypl.simplified.oauth.OAuthCallbackIntentParsing
@@ -79,49 +81,77 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
   }
 
   private fun interceptDeepLink() {
-    FirebaseDynamicLinks.getInstance()
-      .getDynamicLink(intent)
-      .addOnSuccessListener(this) { pendingDynamicLinkData ->
-        // Get deep link from result (may be null if no link is found)
-        val deepLink: Uri? = pendingDynamicLinkData?.link
+    val pendingLink =
+      FirebaseDynamicLinks.getInstance()
+        .getDynamicLink(intent)
 
-        // Handle the deep link.
-        val libraryID = deepLink?.getQueryParameter("libraryid")
-        if (libraryID != null) {
-          val profilesController =
-            Services.serviceDirectory()
-              .requireService(ProfilesControllerType::class.java)
-          val result = profilesController.profileAccountCreateOrReturnExisting(URI("urn:uuid:" + libraryID)).get(3L, TimeUnit.MINUTES)
+    pendingLink.addOnFailureListener(this) { e ->
+      this.logger.error("Failed to retrieve dynamic link: ", e)
+    }
 
-          lateinit var accountID: AccountID
-          when (result) {
-            is TaskResult.Success -> {
-              accountID = result.result.id
-            }
-            is TaskResult.Failure -> {
-              this.logger.error("MainActivity", "Error: unable to create or return existing account for library $libraryID")
-            }
+    pendingLink.addOnSuccessListener { linkData ->
+      val deepLink = linkData.link
+      if (deepLink == null) {
+        this.logger.error("Pending deep link had no link field")
+        return@addOnSuccessListener
+      }
+
+      val libraryID = deepLink.getQueryParameter("libraryid")
+      if (libraryID == null) {
+        this.logger.error("Pending deep link had no libraryid parameter.")
+        return@addOnSuccessListener
+      }
+
+      val barcode = deepLink.getQueryParameter("barcode")
+      if (barcode == null) {
+        this.logger.error("Pending deep link had no barcode parameter.")
+        return@addOnSuccessListener
+      }
+
+      val services =
+        Services.serviceDirectory()
+      val profiles =
+        services.requireService(ProfilesControllerType::class.java)
+      val deepLinksController =
+        services.requireService(DeepLinksControllerType::class.java)
+
+      val accountURI =
+        URI("urn:uuid" + libraryID)
+
+      val accountResult =
+        profiles.profileAccountCreate(accountURI)
+          .get(3L, TimeUnit.MINUTES)
+
+      // XXX: Creating an error report would be nice here.
+      if (accountResult is TaskResult.Failure) {
+        this.logger.error("Unable to create an account with ID {}: ", accountURI)
+        return@addOnSuccessListener
+      }
+
+      val accountID =
+        (accountResult as TaskResult.Success).result.id
+      val screenRaw =
+        deepLink.getQueryParameter("screen")
+
+      val screenId =
+        when (screenRaw) {
+          null -> kotlin.run {
+            this.logger.warn("Deep link did not have a screen parameter.")
+            ScreenID.UNSPECIFIED
           }
-
-          lateinit var screenID: org.nypl.simplified.deeplinks.controller.api.ScreenID
-          if (deepLink?.getQueryParameter("screen") == "login") {
-            screenID = org.nypl.simplified.deeplinks.controller.api.ScreenID.LOGIN
-          } else {
-            this.logger.error("MainActivity", "Error: screen ID not specified")
-            screenID = org.nypl.simplified.deeplinks.controller.api.ScreenID.UNSPECIFIED
+          "login" -> ScreenID.LOGIN
+          else -> kotlin.run {
+            this.logger.warn("Deep link had an unrecognized screen parameter {}.", screenRaw)
+            ScreenID.UNSPECIFIED
           }
-
-          val barcode = deepLink?.getQueryParameter("barcode")
-
-          val deepLinksController =
-            Services.serviceDirectory()
-              .requireService(org.nypl.simplified.deeplinks.controller.api.DeepLinksControllerType::class.java)
-          deepLinksController.publishDeepLinkEvent(accountID, screenID, barcode)
         }
-      }
-      .addOnFailureListener(this) { e ->
-        this.logger.warn("MainActivity", "getDynamicLink:onFailure", e)
-      }
+
+      deepLinksController.publishDeepLinkEvent(
+        accountID = accountID,
+        screenID = screenId,
+        barcode = barcode
+      )
+    }
   }
 
   override fun getDefaultViewModelProviderFactory(): ViewModelProvider.Factory {
@@ -291,6 +321,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
           this.onOnboardingFinished()
         }
       }
+
       ANONYMOUS_PROFILE_DISABLED -> {
         this.openProfileSelection()
       }
@@ -319,8 +350,10 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     return when (event) {
       ProfileSelectionEvent.OpenProfileCreation ->
         this.openProfileCreate()
+
       is ProfileSelectionEvent.OpenProfileModification ->
         this.openProfileModify(event.profile)
+
       ProfileSelectionEvent.ProfileSelected ->
         this.openMainBackStack()
     }
@@ -330,6 +363,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     return when (event) {
       ProfileModificationEvent.Cancelled ->
         this.onProfileModificationCancelled()
+
       ProfileModificationEvent.Succeeded ->
         this.onProfileModificationSucceeded()
     }
