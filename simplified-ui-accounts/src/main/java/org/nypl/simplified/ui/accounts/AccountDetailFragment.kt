@@ -118,7 +118,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
       if (results.values.all { it }) {
         openCardCreatorWebView()
       } else {
-        setLayoutAccordingToLocationPermissions()
+        showSettingsDialog()
       }
 
       // the permissions were shown, so we can store that value
@@ -151,7 +151,6 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   private lateinit var settingsCardCreator: ConstraintLayout
   private lateinit var signUpButton: Button
   private lateinit var signUpLabel: TextView
-  private lateinit var signUpMessage: TextView
   private lateinit var toolbar: NeutralToolbar
 
   private val imageButtonLoadingTag = "IMAGE_BUTTON_LOADING"
@@ -221,8 +220,6 @@ class AccountDetailFragment : Fragment(R.layout.account) {
       view.findViewById(R.id.accountCardCreatorSignUp)
     this.signUpLabel =
       view.findViewById(R.id.accountCardCreatorLabel)
-    this.signUpMessage =
-      view.findViewById(R.id.accountCardCreatorMessage)
     this.settingsCardCreator =
       view.findViewById(R.id.accountCardCreator)
 
@@ -268,14 +265,6 @@ class AccountDetailFragment : Fragment(R.layout.account) {
     this.viewModel.accountSyncingSwitchStatus.observe(this.viewLifecycleOwner) { status ->
       this.reconfigureBookmarkSyncingSwitch(status)
     }
-  }
-
-  override fun onResume() {
-    super.onResume()
-
-    // update the layout here because the user may have granted or denied the location permission
-    // outside the app
-    setLayoutAccordingToLocationPermissions()
   }
 
   private fun reconfigureBookmarkSyncingSwitch(status: BookmarkSyncEnableStatus) {
@@ -393,13 +382,10 @@ class AccountDetailFragment : Fragment(R.layout.account) {
 
     this.signUpButton.setOnClickListener {
       if (!isLocationPermissionGranted()) {
-        // the "shouldShowRationale()" returns false even if the location permissions dialog hasn't
-        // been shown to the user, so we need to check if it was already displayed. If not,
-        // then we can show it despite the "shouldShowRationale()" method may return false
-        if (shouldShowRationale() || !wereLocationPermissionsRequestedBefore()) {
-          requestLocationPermissions()
+        if (shouldShowRationale()) {
+          showLocationDisclaimerDialog()
         } else {
-          openAppSettings()
+          requestLocationPermissions()
         }
       } else {
         openCardCreatorWebView()
@@ -1129,10 +1115,12 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   }
 
   private fun openAppSettings() {
-    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-    val uri = Uri.fromParts("package", requireContext().packageName, null)
-    intent.data = uri
-    startActivity(intent)
+    startActivity(
+      Intent().apply {
+        action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+        data = Uri.fromParts("package", requireContext().packageName, null)
+      }
+    )
   }
 
   private fun openCardCreatorWebView() {
@@ -1158,27 +1146,29 @@ class AccountDetailFragment : Fragment(R.layout.account) {
       }
   }
 
+  private fun showLocationDisclaimerDialog() {
+    AlertDialog.Builder(requireContext())
+      .setMessage(R.string.accountCardCreatorDialogPermissionsMessage)
+      .setPositiveButton(android.R.string.ok) { _, _ -> requestLocationPermissions() }
+      .setNegativeButton(R.string.accountCardCreatorDialogCancel) { dialog, _ -> dialog?.dismiss() }
+      .create()
+      .show()
+  }
+
+  private fun showSettingsDialog() {
+    AlertDialog.Builder(requireContext())
+      .setMessage(R.string.accountCardCreatorDialogOpenSettingsMessage)
+      .setPositiveButton(R.string.accountCardCreatorDialogOpenSettings) { _, _ ->
+        openAppSettings()
+      }
+      .setNegativeButton(R.string.accountCardCreatorDialogCancel) { dialog, _ ->
+        dialog.dismiss()
+      }
+      .create()
+      .show()
+  }
+
   private fun requestLocationPermissions() {
     locationPermissionCallback.launch(locationPermissions)
-  }
-
-  private fun setLayoutAccordingToLocationPermissions() {
-    if (isLocationPermissionGranted() || !wereLocationPermissionsRequestedBefore() ||
-      shouldShowRationale()
-    ) {
-      showPermissionGrantedOrRequestLayout()
-    } else {
-      showPermissionDeniedLayout()
-    }
-  }
-
-  private fun showPermissionDeniedLayout() {
-    signUpButton.setText(R.string.accountCardCreatorOpenSettings)
-    signUpMessage.setText(R.string.accountCardCreatorOpenSettingsMessage)
-  }
-
-  private fun showPermissionGrantedOrRequestLayout() {
-    signUpButton.setText(R.string.accountCardCreatorSignUp)
-    signUpMessage.setText(R.string.accountCardCreatorSignUpMessage)
   }
 }
