@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
+import com.google.firebase.dynamiclinks.PendingDynamicLinkData
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
@@ -90,12 +91,8 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
       this.logger.error("Failed to retrieve dynamic link: ", e)
     }
 
-    pendingLink.addOnSuccessListener { linkData ->
-      if (linkData == null) {
-        return@addOnSuccessListener
-      }
-
-      val deepLink = linkData.link
+    pendingLink.addOnSuccessListener { linkData: PendingDynamicLinkData? ->
+      val deepLink = linkData?.link
       if (deepLink == null) {
         this.logger.error("Pending deep link had no link field")
         return@addOnSuccessListener
