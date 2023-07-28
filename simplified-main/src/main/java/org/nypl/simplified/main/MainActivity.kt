@@ -91,6 +91,10 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     }
 
     pendingLink.addOnSuccessListener { linkData ->
+      if (linkData == null) {
+        return@addOnSuccessListener
+      }
+
       val deepLink = linkData.link
       if (deepLink == null) {
         this.logger.error("Pending deep link had no link field")
