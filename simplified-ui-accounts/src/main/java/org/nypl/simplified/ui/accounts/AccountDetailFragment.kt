@@ -117,12 +117,9 @@ class AccountDetailFragment : Fragment(R.layout.account) {
     registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { results ->
       if (results.values.all { it }) {
         openCardCreatorWebView()
-      } else {
+      } else if (!shouldShowRationale()) {
         showSettingsDialog()
       }
-
-      // the permissions were shown, so we can store that value
-      Cache(requireContext()).setLocationPermissionsAsked()
     }
 
   private lateinit var accountCustomOPDS: ViewGroup
@@ -428,10 +425,6 @@ class AccountDetailFragment : Fragment(R.layout.account) {
     } else {
       this.toolbar.visibility = View.VISIBLE
     }
-  }
-
-  private fun wereLocationPermissionsRequestedBefore(): Boolean {
-    return Cache(requireContext()).getLocationPermissionsAsked()
   }
 
   private fun instantiateAlternativeAuthenticationViews() {

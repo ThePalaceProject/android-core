@@ -52,8 +52,6 @@ class Cache internal constructor(private val sharedPreferences: SharedPreference
     private const val KEY_PIN = "pin"
     private const val KEY_JUVENILE_CARD = "juvenile_card"
 
-    private const val KEY_LOCATION_PERMISSIONS_ASKED = "location_permissions"
-
     private const val EMPTY = ""
   }
 
@@ -196,23 +194,6 @@ class Cache internal constructor(private val sharedPreferences: SharedPreference
       putString(KEY_PIN, pin)
     }
   }
-
-  /**
-   * Gets cached value of location permissions already asked
-   */
-  fun getLocationPermissionsAsked(): Boolean {
-    return sharedPreferences.getBoolean(KEY_LOCATION_PERMISSIONS_ASKED, false)
-  }
-
-  /**
-   * Sets cached value of location permissions already asked
-   */
-  fun setLocationPermissionsAsked() {
-    sharedPreferences.edit {
-      putBoolean(KEY_LOCATION_PERMISSIONS_ASKED, true)
-    }
-  }
-
   /**
    * Getter/Setter of whether or not we are creating a juvenile card
    */
