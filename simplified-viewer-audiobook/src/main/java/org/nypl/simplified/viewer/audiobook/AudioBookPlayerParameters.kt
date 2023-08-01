@@ -21,7 +21,7 @@ import java.net.URI
  * Parameters for the audio book player.
  */
 
-data class AudioBookPlayerParameters(
+class AudioBookPlayerParameters(
 
   /**
    * The audio book file, if this is a packaged audio book. This must be null for unpackaged audio

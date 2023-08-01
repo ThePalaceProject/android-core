@@ -66,6 +66,7 @@ import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook
 import org.nypl.simplified.books.controller.api.BooksControllerType
 import org.nypl.simplified.books.covers.BookCoverProviderType
+import org.nypl.simplified.books.time.tracking.TimeTrackingServiceType
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.networkconnectivity.api.NetworkConnectivityType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
@@ -156,6 +157,8 @@ class AudioBookPlayerActivity :
     services.requireService(BookmarkServiceType::class.java)
   private val profilesController =
     services.requireService(ProfilesControllerType::class.java)
+  private val timeTrackingService =
+    services.requireService(TimeTrackingServiceType::class.java)
 
   @Volatile
   private var destroying: Boolean = false
@@ -262,6 +265,11 @@ class AudioBookPlayerActivity :
         this.restoreActionBarTitle()
       }
     }
+
+    this.timeTrackingService.startTimeTracking(
+      accountId = this.parameters.accountID,
+      bookId = this.parameters.bookID.value()
+    )
   }
 
   private fun findBookAuthor(entry: OPDSAcquisitionFeedEntry): String {
@@ -273,6 +281,7 @@ class AudioBookPlayerActivity :
 
   override fun onDestroy() {
     this.log.debug("onDestroy")
+    timeTrackingService.stopTracking()
     super.onDestroy()
 
     /*
@@ -658,6 +667,8 @@ class AudioBookPlayerActivity :
   }
 
   private fun onPlayerEvent(event: PlayerEvent) {
+    timeTrackingService.onPlayerEventReceived(event)
+
     return when (event) {
       is PlayerEventCreateBookmark -> {
         this.savePlayerPosition(event)

@@ -34,7 +34,6 @@ import org.nypl.simplified.accounts.database.AccountBundledCredentialsEmpty
 import org.nypl.simplified.accounts.database.AccountsDatabases
 import org.nypl.simplified.accounts.json.AccountBundledCredentialsJSON
 import org.nypl.simplified.accounts.registry.AccountProviderRegistry
-import org.nypl.simplified.deeplinks.controller.api.DeepLinksControllerType
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryDebugging
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.accounts.source.spi.AccountProviderSourceResolutionStrings
@@ -70,6 +69,9 @@ import org.nypl.simplified.bookmarks.internal.BHTTPCalls
 import org.nypl.simplified.books.book_registry.BookPreviewRegistry
 import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
 import org.nypl.simplified.books.controller.api.BooksPreviewControllerType
+import org.nypl.simplified.books.time.tracking.TimeTrackingHTTPCalls
+import org.nypl.simplified.books.time.tracking.TimeTrackingService
+import org.nypl.simplified.books.time.tracking.TimeTrackingServiceType
 import org.nypl.simplified.boot.api.BootEvent
 import org.nypl.simplified.boot.api.BootFailureTesting
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
@@ -78,6 +80,7 @@ import org.nypl.simplified.cardcreator.CardCreatorServiceType
 import org.nypl.simplified.content.api.ContentResolverSane
 import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.crashlytics.api.CrashlyticsServiceType
+import org.nypl.simplified.deeplinks.controller.api.DeepLinksControllerType
 import org.nypl.simplified.feeds.api.FeedHTTPTransport
 import org.nypl.simplified.feeds.api.FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderType
@@ -145,7 +148,8 @@ internal object MainServices {
     val directoryStorageBaseVersioned: File,
     val directoryStorageDownloads: File,
     val directoryStorageDocuments: File,
-    val directoryStorageProfiles: File
+    val directoryStorageProfiles: File,
+    val directoryStorageTimeTracking: File
   )
 
   private fun initializeDirectories(context: Context): Directories {
@@ -159,11 +163,14 @@ internal object MainServices {
       File(directoryStorageBaseVersioned, "documents")
     val directoryStorageProfiles =
       File(directoryStorageBaseVersioned, "profiles")
+    val directoryStorageTimeTracking =
+      File(directoryStorageBaseVersioned, "time_tracking")
 
     this.logger.debug("directoryStorageBaseVersioned: {}", directoryStorageBaseVersioned)
     this.logger.debug("directoryStorageDownloads:     {}", directoryStorageDownloads)
     this.logger.debug("directoryStorageDocuments:     {}", directoryStorageDocuments)
     this.logger.debug("directoryStorageProfiles:      {}", directoryStorageProfiles)
+    this.logger.debug("directoryStorageTimeTracking:      {}", directoryStorageTimeTracking)
 
     /*
      * Make sure the required directories exist. There is no sane way to
@@ -171,11 +178,12 @@ internal object MainServices {
      */
 
     val directories =
-      listOf<File>(
+      listOf(
         directoryStorageBaseVersioned,
         directoryStorageDownloads,
         directoryStorageDocuments,
-        directoryStorageProfiles
+        directoryStorageProfiles,
+        directoryStorageTimeTracking
       )
 
     var exception: Exception? = null
@@ -199,7 +207,8 @@ internal object MainServices {
       directoryStorageBaseVersioned = directoryStorageBaseVersioned,
       directoryStorageDownloads = directoryStorageDownloads,
       directoryStorageDocuments = directoryStorageDocuments,
-      directoryStorageProfiles = directoryStorageProfiles
+      directoryStorageProfiles = directoryStorageProfiles,
+      directoryStorageTimeTracking = directoryStorageTimeTracking
     )
   }
 
@@ -914,6 +923,8 @@ internal object MainServices {
       serviceConstructor = { createMetricService(context) }
     )
 
+    var profilesControllerTypeService: ProfilesControllerType
+
     val bookController = this.run {
       publishEvent(strings.bootingGeneral("books controller"))
       val execBooks =
@@ -926,14 +937,14 @@ internal object MainServices {
           profileEvents = profileEvents,
           cacheDirectory = context.cacheDir
         )
-      addService(
+      profilesControllerTypeService = addService(
         message = strings.bootingGeneral("profiles controller"),
         interfaceType = ProfilesControllerType::class.java,
         serviceConstructor = { controller }
       )
       addService(
         message = strings.bootingGeneral("deep links controller"),
-        interfaceType = org.nypl.simplified.deeplinks.controller.api.DeepLinksControllerType::class.java,
+        interfaceType = DeepLinksControllerType::class.java,
         serviceConstructor = { controller }
       )
       addService(
@@ -949,21 +960,20 @@ internal object MainServices {
       controller
     }
 
-    publishEvent(strings.bootingGeneral("bookmark service"))
-//    val readerBookmarksService =
-//      this.createBookmarksService(lsHTTP, bookController)
-//
-//    addService(
-//      message = strings.bootingGeneral("reader bookmark service"),
-//      interfaceType = ReaderBookmarkServiceType::class.java,
-//      serviceConstructor = { readerBookmarksService }
-//    )
-//    addService(
-//      message = strings.bootingGeneral("reader bookmark service"),
-//      interfaceType = ReaderBookmarkServiceUsableType::class.java,
-//      serviceConstructor = { readerBookmarksService }
-//    )
+    addService(
+      message = strings.bootingGeneral("audiobook time tracker registry"),
+      interfaceType = TimeTrackingServiceType::class.java,
+      serviceConstructor = {
+        TimeTrackingService(
+          context = context,
+          httpCalls = TimeTrackingHTTPCalls(ObjectMapper(), lsHTTP),
+          timeTrackingDirectory = directories.directoryStorageTimeTracking,
+          profilesController = profilesControllerTypeService
+        )
+      }
+    )
 
+    publishEvent(strings.bootingGeneral("bookmark service"))
     val bookmarksService =
       this.createBookmarksService(lsHTTP, bookController)
 
