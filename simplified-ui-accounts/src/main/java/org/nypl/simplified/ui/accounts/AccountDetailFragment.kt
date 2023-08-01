@@ -1128,22 +1128,30 @@ class AccountDetailFragment : Fragment(R.layout.account) {
 
     fusedLocationClient.lastLocation
       .addOnSuccessListener { location ->
-        listener.post(
-          AccountDetailEvent.OpenWebView(
-            AccountCardCreatorParameters(
-              url = cardCreatorURI.toString(),
-              lat = location.latitude,
-              long = location.longitude
+        if (location != null) {
+          listener.post(
+            AccountDetailEvent.OpenWebView(
+              AccountCardCreatorParameters(
+                url = cardCreatorURI.toString(),
+                lat = location.latitude,
+                long = location.longitude
+              )
             )
           )
-        )
+        } else {
+          showErrorGettingLocationDialog()
+        }
       }
       .addOnFailureListener {
-        AlertDialog.Builder(requireContext())
-          .setMessage(getString(R.string.accountCardCreatorLocationFailed))
-          .create()
-          .show()
+        showErrorGettingLocationDialog()
       }
+  }
+
+  private fun showErrorGettingLocationDialog() {
+    AlertDialog.Builder(requireContext())
+      .setMessage(getString(R.string.accountCardCreatorLocationFailed))
+      .create()
+      .show()
   }
 
   private fun showLocationDisclaimerDialog() {
