@@ -52,7 +52,7 @@ class MainFragmentViewModel(
     UnicastWorkSubject.create()
   val registryEvents: UnicastWorkSubject<BookStatusEvent> =
     UnicastWorkSubject.create()
-  val deepLinkEvents: UnicastWorkSubject<org.nypl.simplified.deeplinks.controller.api.DeepLinkEvent> =
+  val deepLinkEvents: UnicastWorkSubject<DeepLinkEvent> =
     UnicastWorkSubject.create()
   val bookHoldEvents: UnicastWorkSubject<BookHoldsUpdateEvent> =
     UnicastWorkSubject.create()
@@ -65,8 +65,8 @@ class MainFragmentViewModel(
     services.requireService(AccountProviderRegistryType::class.java)
   val bookRegistry: BookRegistryType =
     services.requireService(BookRegistryType::class.java)
-  val deepLinksController: org.nypl.simplified.deeplinks.controller.api.DeepLinksControllerType =
-    services.requireService(org.nypl.simplified.deeplinks.controller.api.DeepLinksControllerType::class.java)
+  val deepLinksController: DeepLinksControllerType =
+    services.requireService(DeepLinksControllerType::class.java)
   val buildConfig =
     services.requireService(BuildConfigurationServiceType::class.java)
   val showHoldsTab: Boolean
@@ -150,19 +150,25 @@ class MainFragmentViewModel(
           )
 
         getHoldsFuture = this.profilesController.profileFeed(request)
-        val numberOfHolds = getHoldsFuture
-          ?.get()
-          ?.entriesInOrder
-          .orEmpty()
-          .filter { feedEntry ->
-            feedEntry is FeedEntry.FeedEntryOPDS &&
-              feedEntry.feedEntry.availability is OPDSAvailabilityHeldReady
-          }
-          .size
 
-        bookRegistry.updateHolds(
-          numberOfHolds = numberOfHolds
-        )
+        try {
+          val numberOfHolds = getHoldsFuture
+            ?.get()
+            ?.entriesInOrder
+            .orEmpty()
+            .filter { feedEntry ->
+              feedEntry is FeedEntry.FeedEntryOPDS &&
+                feedEntry.feedEntry.availability is OPDSAvailabilityHeldReady
+            }
+            .size
+
+          bookRegistry.updateHolds(
+            numberOfHolds = numberOfHolds
+          )
+        } catch (exception: Exception) {
+          logger.debug(exception.message.orEmpty())
+        }
+
       }
       .subscribeOn(Schedulers.io())
       .subscribe(
@@ -191,7 +197,7 @@ class MainFragmentViewModel(
       .let { subscriptions.add(it) }
   }
 
-  private fun onDeepLinkEvent(event: org.nypl.simplified.deeplinks.controller.api.DeepLinkEvent) {
+  private fun onDeepLinkEvent(event: DeepLinkEvent) {
     deepLinkEvents.onNext(event)
   }
 
