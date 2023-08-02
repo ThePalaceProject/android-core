@@ -19,6 +19,8 @@ sealed class AccountDetailEvent {
 
   object GoUpwards : AccountDetailEvent()
 
+  data class OpenWebView(val parameters: AccountCardCreatorParameters) : AccountDetailEvent()
+
   /**
    * The patron wants to log in through SAML.
    */
