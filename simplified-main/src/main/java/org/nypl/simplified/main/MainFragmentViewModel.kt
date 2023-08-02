@@ -168,7 +168,6 @@ class MainFragmentViewModel(
         } catch (exception: Exception) {
           logger.debug(exception.message.orEmpty())
         }
-
       }
       .subscribeOn(Schedulers.io())
       .subscribe(
