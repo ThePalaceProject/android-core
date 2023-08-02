@@ -270,7 +270,7 @@
         <c:change date="2023-02-28T00:00:00+00:00" summary="Moved the 'Remove' button after the 'Get' button on the Reservations screen."/>
       </c:changes>
     </c:release>
-    <c:release date="2023-08-02T13:28:21+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.5.0">
+    <c:release date="2023-08-02T17:23:07+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.5.0">
       <c:changes>
         <c:change date="2023-03-30T00:00:00+00:00" summary="Save reading position of audiobooks on play, pause, and stop (which also includes when seeking and changing chapters)."/>
         <c:change date="2023-04-04T00:00:00+00:00" summary="Updated library logos loading source in registry feed."/>
@@ -292,7 +292,8 @@
         <c:change date="2023-07-04T00:00:00+00:00" summary="Fixed bug of bookmarks not being deleted."/>
         <c:change date="2023-07-11T00:00:00+00:00" summary="Added default LCP passphrase to be returned when the feed entry doesn't have one and the manual input is enabled."/>
         <c:change date="2023-07-13T00:00:00+00:00" summary="Updated library card creation flow by requesting permissions and opening a WebView with the user's current location."/>
-        <c:change date="2023-08-02T13:28:21+00:00" summary="Fixed crash after setting an audiobook timer more than once in a short time."/>
+        <c:change date="2023-08-02T00:00:00+00:00" summary="Fixed crash after setting an audiobook timer more than once in a short time."/>
+        <c:change date="2023-08-02T17:23:07+00:00" summary="Fixed crash when saving a bookmark on the server."/>
       </c:changes>
     </c:release>
   </c:releases>
