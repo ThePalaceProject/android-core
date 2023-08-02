@@ -194,7 +194,6 @@ class Cache internal constructor(private val sharedPreferences: SharedPreference
       putString(KEY_PIN, pin)
     }
   }
-
   /**
    * Getter/Setter of whether or not we are creating a juvenile card
    */
