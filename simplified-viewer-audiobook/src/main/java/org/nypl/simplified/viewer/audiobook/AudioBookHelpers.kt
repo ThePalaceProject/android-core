@@ -77,10 +77,15 @@ internal object AudioBookHelpers {
     accountID: AccountID,
     bookmark: Bookmark
   ): Bookmark? {
-    return bookmarkService.bookmarkCreateRemote(
-      accountID = accountID,
-      bookmark = bookmark
-    ).get(15L, TimeUnit.SECONDS)
+    return try {
+      bookmarkService.bookmarkCreateRemote(
+        accountID = accountID,
+        bookmark = bookmark
+      ).get(15L, TimeUnit.SECONDS)
+    } catch (exception: Exception) {
+      this.logger.error("could not add a bookmark remotely: ", exception)
+      null
+    }
   }
 
   /**
@@ -91,10 +96,15 @@ internal object AudioBookHelpers {
     accountID: AccountID,
     bookmark: Bookmark
   ): Boolean {
-    return bookmarkService.bookmarkDelete(
-      accountID = accountID,
-      bookmark = bookmark
-    ).get(15L, TimeUnit.SECONDS)
+    return try {
+      bookmarkService.bookmarkDelete(
+        accountID = accountID,
+        bookmark = bookmark
+      ).get(15L, TimeUnit.SECONDS)
+    } catch (exception: Exception) {
+      logger.error("could not delete the bookmark: ", exception)
+      false
+    }
   }
 
   /**
