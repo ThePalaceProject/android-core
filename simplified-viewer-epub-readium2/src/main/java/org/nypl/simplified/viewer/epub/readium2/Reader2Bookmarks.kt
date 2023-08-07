@@ -102,7 +102,7 @@ object Reader2Bookmarks {
       chapterTitle = source.title,
       bookProgress = source.bookProgress,
       deviceID = deviceId,
-      uri = null
+      uri = source.uri
     )
   }
 
@@ -141,6 +141,7 @@ object Reader2Bookmarks {
         chapterHref = location.progress.chapterHref,
         chapterProgress = location.progress.chapterProgress
       ),
-      bookProgress = source.bookProgress
+      bookProgress = source.bookProgress,
+      uri = source.uri
     )
 }

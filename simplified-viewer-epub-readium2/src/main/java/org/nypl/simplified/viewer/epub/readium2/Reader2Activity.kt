@@ -5,6 +5,8 @@ import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.os.Bundle
 import android.webkit.WebView
+import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -51,6 +53,11 @@ import org.nypl.simplified.analytics.api.AnalyticsType
 import org.nypl.simplified.bookmarks.api.BookmarkServiceType
 import org.nypl.simplified.books.api.BookContentProtections
 import org.nypl.simplified.books.api.BookDRMInformation
+import org.nypl.simplified.books.api.bookmark.Bookmark
+import org.nypl.simplified.books.api.bookmark.BookmarkKind
+import org.nypl.simplified.futures.FluentFutureExtensions.map
+import org.nypl.simplified.futures.FluentFutureExtensions.mapNullable
+import org.nypl.simplified.futures.FluentFutureExtensions.onAnyError
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.thread.api.UIThreadServiceType
 import org.readium.r2.shared.publication.asset.FileAsset
@@ -265,12 +272,14 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
             fileAsset = FileAsset(this.parameters.file),
             adobeRightsFile = drmInfo.rights?.first
           )
+
         is BookDRMInformation.AXIS ->
           AxisNowFileAsset(
             fileAsset = FileAsset(this.parameters.file),
             axisLicense = drmInfo.license,
             axisUserKey = drmInfo.userKey
           )
+
         else -> FileAsset(this.parameters.file)
       }
 
@@ -300,10 +309,13 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     return when (event) {
       SR2ReaderViewNavigationClose ->
         this.onBackPressed()
+
       SR2ReaderViewNavigationOpenTOC ->
         this.tocOpen()
+
       is SR2ControllerBecameAvailable ->
         this.onControllerBecameAvailable(event.reference)
+
       is SR2BookLoadingFailed ->
         this.onBookLoadingFailed(event.exception)
     }
@@ -428,29 +440,30 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
   private fun onControllerEvent(
     event: SR2Event
   ) {
-    return when (event) {
-      is SR2Event.SR2BookmarkEvent.SR2BookmarkCreated -> {
-        val bookmark =
+    when (event) {
+      is SR2Event.SR2BookmarkEvent.SR2BookmarkCreate -> {
+        val localBookmark =
           Reader2Bookmarks.fromSR2Bookmark(
             bookEntry = this.parameters.entry,
             deviceId = Reader2Devices.deviceId(this.profilesController, this.parameters.bookId),
             source = event.bookmark
           )
 
-        this.bookmarkService.bookmarkCreateLocal(
-          accountID = this.parameters.accountId,
-          bookmark = bookmark
-        )
+        when (localBookmark.kind) {
+          BookmarkKind.BookmarkExplicit -> showToastMessage(R.string.reader_bookmark_adding)
+          BookmarkKind.BookmarkLastReadLocation -> Unit
+        }
 
-        this.bookmarkService.bookmarkCreateRemote(
-          accountID = this.parameters.accountId,
-          bookmark = bookmark
-        )
-
-        Unit
+        bookmarkService.bookmarkCreateRemote(
+          accountID = parameters.accountId,
+          bookmark = localBookmark
+        ).onAnyError { localBookmark }
+          .mapNullable { possiblyRemoteBookmark ->
+            onBookmarkWasCreated(possiblyRemoteBookmark ?: localBookmark, event)
+          }
       }
 
-      is SR2Event.SR2BookmarkEvent.SR2BookmarkDeleted -> {
+      is SR2Event.SR2BookmarkEvent.SR2BookmarkTryToDelete -> {
         val bookmark =
           Reader2Bookmarks.fromSR2Bookmark(
             bookEntry = this.parameters.entry,
@@ -458,12 +471,13 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
             source = event.bookmark
           )
 
-        this.bookmarkService.bookmarkDelete(
-          accountID = this.account.id,
+        bookmarkService.bookmarkDelete(
+          accountID = account.id,
           bookmark = bookmark
-        )
-
-        Unit
+        ).onAnyError { false }
+          .map { wasDeleted ->
+            event.onDeleteOperationFinished(wasDeleted)
+          }
       }
 
       is SR2Event.SR2ThemeChanged -> {
@@ -480,6 +494,9 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       is SR2Event.SR2OnCenterTapped,
       is SR2Event.SR2ReadingPositionChanged,
       SR2Event.SR2BookmarkEvent.SR2BookmarksLoaded,
+      SR2Event.SR2BookmarkEvent.SR2BookmarkFailedToBeDeleted,
+      is SR2Event.SR2BookmarkEvent.SR2BookmarkDeleted,
+      is SR2Event.SR2BookmarkEvent.SR2BookmarkCreated,
       is SR2ChapterNonexistent,
       is SR2WebViewInaccessible,
       is SR2ExternalLinkSelected,
@@ -489,6 +506,22 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       is SR2CommandExecutionFailed -> {
         // Nothing
       }
+    }
+  }
+
+  private fun onBookmarkWasCreated(
+    bookmark: Bookmark,
+    event: SR2Event.SR2BookmarkEvent.SR2BookmarkCreate
+  ) {
+    this.bookmarkService.bookmarkCreateLocal(
+      accountID = this.parameters.accountId,
+      bookmark = bookmark
+    )
+    event.onBookmarkCreationCompleted(Reader2Bookmarks.toSR2Bookmark(bookmark))
+
+    return when (bookmark.kind) {
+      BookmarkKind.BookmarkExplicit -> showToastMessage(R.string.reader_bookmark_added)
+      BookmarkKind.BookmarkLastReadLocation -> Unit
     }
   }
 
@@ -557,5 +590,11 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       .setOnDismissListener { this.finish() }
       .create()
       .show()
+  }
+
+  private fun showToastMessage(@StringRes messageRes: Int) {
+    runOnUiThread {
+      Toast.makeText(this, messageRes, Toast.LENGTH_SHORT).show()
+    }
   }
 }

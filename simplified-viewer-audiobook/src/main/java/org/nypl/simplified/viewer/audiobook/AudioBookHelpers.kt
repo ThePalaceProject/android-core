@@ -70,6 +70,34 @@ internal object AudioBookHelpers {
   }
 
   /**
+   * Add a bookmark remotely.
+   */
+  fun addBookmarkRemotely(
+    bookmarkService: BookmarkServiceUsableType,
+    accountID: AccountID,
+    bookmark: Bookmark
+  ): Bookmark? {
+    return bookmarkService.bookmarkCreateRemote(
+      accountID = accountID,
+      bookmark = bookmark
+    ).get(15L, TimeUnit.SECONDS)
+  }
+
+  /**
+   * Delete a bookmark.
+   */
+  fun deleteBookmark(
+    bookmarkService: BookmarkServiceUsableType,
+    accountID: AccountID,
+    bookmark: Bookmark
+  ): Boolean {
+    return bookmarkService.bookmarkDelete(
+      accountID = accountID,
+      bookmark = bookmark
+    ).get(15L, TimeUnit.SECONDS)
+  }
+
+  /**
    * Load bookmarks from the given bookmark service.
    */
 

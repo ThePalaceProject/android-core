@@ -51,12 +51,15 @@ class NullBookmarkService(
     return FluentFuture.from(Futures.immediateFuture(Unit))
   }
 
-  override fun bookmarkCreateRemote(accountID: AccountID, bookmark: Bookmark): FluentFuture<Unit> {
-    return FluentFuture.from(Futures.immediateFuture(Unit))
+  override fun bookmarkCreateRemote(
+    accountID: AccountID,
+    bookmark: Bookmark
+  ): FluentFuture<Bookmark?> {
+    return FluentFuture.from(Futures.immediateFuture(bookmark))
   }
 
-  override fun bookmarkDelete(accountID: AccountID, bookmark: Bookmark): FluentFuture<Unit> {
-    return FluentFuture.from(Futures.immediateFuture(Unit))
+  override fun bookmarkDelete(accountID: AccountID, bookmark: Bookmark): FluentFuture<Boolean> {
+    return FluentFuture.from(Futures.immediateFuture(true))
   }
 
   override fun bookmarkLoad(

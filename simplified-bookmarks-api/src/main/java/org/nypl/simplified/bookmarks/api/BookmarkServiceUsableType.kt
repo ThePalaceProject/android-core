@@ -78,7 +78,7 @@ interface BookmarkServiceUsableType {
   fun bookmarkCreateRemote(
     accountID: AccountID,
     bookmark: Bookmark
-  ): FluentFuture<Unit>
+  ): FluentFuture<Bookmark?>
 
   /**
    * The user has requested that a bookmark be deleted.
@@ -87,5 +87,5 @@ interface BookmarkServiceUsableType {
   fun bookmarkDelete(
     accountID: AccountID,
     bookmark: Bookmark
-  ): FluentFuture<Unit>
+  ): FluentFuture<Boolean>
 }
