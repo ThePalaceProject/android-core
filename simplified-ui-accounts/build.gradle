@@ -24,6 +24,7 @@ dependencies {
   implementation libs.kotlin.stdlib
   implementation libs.kotlin.reflect
   implementation libs.nypl.theme
+  implementation libs.play.services.location
   implementation libs.rxjava2
   implementation libs.rxjava2.extensions
   implementation libs.rxandroid2
