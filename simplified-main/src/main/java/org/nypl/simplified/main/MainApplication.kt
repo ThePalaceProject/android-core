@@ -6,9 +6,6 @@ import android.os.Process
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import android.os.StrictMode.VmPolicy
-import com.transifex.txnative.LocaleState
-import com.transifex.txnative.TxNative
-import com.transifex.txnative.missingpolicy.WrappedStringPolicy
 import io.reactivex.Observable
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.nypl.simplified.boot.api.BootEvent
@@ -46,36 +43,9 @@ class MainApplication : Application() {
     this.configureHttpCache()
     this.configureStrictMode()
     this.logStartup()
-    this.configureTransifex()
+    MainTransifex.configure(this.applicationContext)
     this.boot.start(this)
     INSTANCE = this
-  }
-
-  private fun configureTransifex() {
-    // TODO: Move this into config/secrets (it's not really a secret)
-    val token = "1/e2e294cffdd79843a47f50bd1a2e913c77620e48"
-
-    val localeState = LocaleState(
-      getApplicationContext(),
-      "en",
-      arrayOf("en", "es"),
-      null
-    )
-
-    TxNative.init(
-      getApplicationContext(),
-      localeState,
-      token,
-      null,
-      null,
-      // Make it easy to see if a string hasn't been translated. Probably only want this for dev
-      // builds, not production?
-      WrappedStringPolicy("[[", "]]")
-    )
-
-    // TxNative.setTestMode(true)
-
-    TxNative.fetchTranslations(null, null)
   }
 
   private fun logStartup() {
