@@ -7,7 +7,7 @@ object TimeTrackingInfoFileUtils {
 
   fun saveTimeTrackingInfoOnFile(timeTrackingInfo: TimeTrackingInfo, file: File) {
     val json = TimeTrackingJSON.convertTimeTrackingToLocalJSON(
-      mapper = ObjectMapper(),
+      objectMapper = ObjectMapper(),
       timeTrackingInfo = timeTrackingInfo
     )
 

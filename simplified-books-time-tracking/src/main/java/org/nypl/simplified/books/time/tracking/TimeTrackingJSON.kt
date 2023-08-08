@@ -1,16 +1,16 @@
 package org.nypl.simplified.books.time.tracking
 
-import android.util.Log
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import org.nypl.simplified.json.core.JSONParserUtilities
+import org.slf4j.LoggerFactory
 import java.net.URI
 
 object TimeTrackingJSON {
 
-  private const val TAG = "TimeTrackingJSON"
+  private val logger = LoggerFactory.getLogger(TimeTrackingJSON::class.java)
 
   private const val NODE_ACCOUNT_ID = "accountId"
   private const val NODE_BOOK_ID = "bookId"
@@ -29,18 +29,18 @@ object TimeTrackingJSON {
   private const val NODE_URI = "uri"
 
   private fun convertTimeTrackingToJSON(
-    mapper: ObjectMapper,
+    objectMapper: ObjectMapper,
     node: ObjectNode,
     timeTrackingInfo: TimeTrackingInfo
   ): ObjectNode {
     node.put(NODE_BOOK_ID, timeTrackingInfo.bookId)
     node.put(NODE_LIBRARY_ID, timeTrackingInfo.libraryId)
 
-    val timeEntriesArray = mapper.createArrayNode()
+    val timeEntriesArray = objectMapper.createArrayNode()
 
     timeTrackingInfo.timeEntries.forEach { entry ->
       timeEntriesArray.add(
-        mapper.createObjectNode().apply {
+        objectMapper.createObjectNode().apply {
           put(NODE_ID, entry.id)
           put(NODE_DURING_MINUTE, entry.duringMinute)
           put(NODE_SECONDS_PLAYED, entry.secondsPlayed)
@@ -81,23 +81,20 @@ object TimeTrackingJSON {
         responses = responses
       )
     } catch (e: Exception) {
-      Log.d(
-        TAG,
-        "Error converting server response to time tracking response: " + e.message.orEmpty()
-      )
+      logger.error("Error converting server response to time tracking response: ", e)
       null
     }
   }
 
   fun convertTimeTrackingToLocalJSON(
-    mapper: ObjectMapper,
+    objectMapper: ObjectMapper,
     timeTrackingInfo: TimeTrackingInfo
   ): ObjectNode {
-    val node = mapper.createObjectNode()
+    val node = objectMapper.createObjectNode()
     node.put(NODE_ACCOUNT_ID, timeTrackingInfo.accountId)
     node.put(NODE_URI, timeTrackingInfo.timeTrackingUri.toString())
     return convertTimeTrackingToJSON(
-      mapper = mapper,
+      objectMapper = objectMapper,
       node = node,
       timeTrackingInfo = timeTrackingInfo
     )
@@ -111,7 +108,7 @@ object TimeTrackingJSON {
     objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true)
     return objectMapper.writeValueAsBytes(
       convertTimeTrackingToJSON(
-        mapper = objectMapper,
+        objectMapper = objectMapper,
         node = objectMapper.createObjectNode(),
         timeTrackingInfo = timeTrackingInfo
       )
@@ -141,7 +138,7 @@ object TimeTrackingJSON {
         timeTrackingUri = URI(node.get(NODE_URI).asText())
       )
     } catch (e: Exception) {
-      Log.d(TAG, "Error converting bytes from file: " + e.message.orEmpty())
+      logger.error("Error converting bytes from file: ", e)
       e.printStackTrace()
       null
     }
