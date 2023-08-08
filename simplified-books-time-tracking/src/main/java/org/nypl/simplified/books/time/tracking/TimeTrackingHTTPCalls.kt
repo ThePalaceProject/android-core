@@ -6,8 +6,10 @@ import one.irradia.mime.api.MIMEType
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType
 import org.librarysimplified.http.api.LSHTTPResponseStatus
+import org.librarysimplified.services.api.Services
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
+import org.nypl.simplified.crashlytics.api.CrashlyticsServiceType
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayInputStream
 import java.io.IOException
@@ -21,6 +23,12 @@ class TimeTrackingHTTPCalls(
   private val objectMapper: ObjectMapper,
   private val http: LSHTTPClientType
 ) : TimeTrackingHTTPCallsType {
+
+  private val services =
+    Services.serviceDirectory()
+
+  private val crashlytics =
+    this.services.optionalService(CrashlyticsServiceType::class.java)
 
   private val logger = LoggerFactory.getLogger(TimeTrackingHTTPCalls::class.java)
 
@@ -57,7 +65,12 @@ class TimeTrackingHTTPCalls(
           val summary = timeTrackingResponse?.summary
           val responses = timeTrackingResponse?.responses.orEmpty()
 
-          logger.debug("Received time tracking summary: {} successes + {} failures = {} total", summary?.successes, summary?.failures, summary?.total)
+          logger.debug(
+            "Received time tracking summary: {} successes + {} failures = {} total",
+            summary?.successes,
+            summary?.failures,
+            summary?.total
+          )
 
           if (responses.isNotEmpty()) {
             timeTrackingInfo.timeEntries.filter { timeEntry ->
@@ -65,7 +78,14 @@ class TimeTrackingHTTPCalls(
                 response.id == timeEntry.id
               } ?: return@filter false
 
-              !responseEntry.isStatusSuccess() && !responseEntry.isStatusGone()
+              val hasFailed = !responseEntry.isStatusSuccess() && !responseEntry.isStatusGone()
+
+              if (!hasFailed) {
+                crashlytics?.log("Failed entry received from server: [id: ${responseEntry.id}, " +
+                  "message: ${responseEntry.message}, status: ${responseEntry.status}]")
+              }
+
+              hasFailed
             }
           } else {
             // return the original time entries if the server response has no response entries
