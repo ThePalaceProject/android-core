@@ -64,6 +64,10 @@ class TimeTrackingService(
     libraryId: String,
     timeTrackingUri: URI?
   ) {
+    if (!isTimeTrackingEnabled()) {
+      return
+    }
+
     if (timeTrackingUri == null) {
       logger.debug(
         "Account {} and book {} has no time tracking uri",
@@ -193,7 +197,7 @@ class TimeTrackingService(
   private fun handleConnectivityState(hasInternet: Boolean) {
     // if the user is on an audiobook player screen, it means the entries will most likely be sent
     // to the server, so there's no need to do anything else
-    if (isOnAudiobookScreen) {
+    if (isOnAudiobookScreen || !isTimeTrackingEnabled()) {
       return
     }
 
@@ -387,5 +391,9 @@ class TimeTrackingService(
             it.printStackTrace()
           }
         )
+  }
+
+  private fun isTimeTrackingEnabled(): Boolean {
+    return profilesController.profileCurrent().preferences().isTimeTrackingEnabled
   }
 }
