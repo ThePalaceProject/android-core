@@ -2,10 +2,11 @@ dependencies {
 
   implementation project(":simplified-accounts-database-api")
   implementation project(":simplified-profiles-controller-api")
+  implementation project(":simplified-services-api")
 
   implementation libs.palace.audiobook.api
   implementation libs.rxandroid2
   implementation libs.rxjava2
   implementation libs.slf4j
-    implementation project(path: ':simplified-services-api')
+  implementation libs.ulid.generator
 }

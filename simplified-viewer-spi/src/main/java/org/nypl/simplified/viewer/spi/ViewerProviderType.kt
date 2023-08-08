@@ -4,6 +4,7 @@ import android.app.Activity
 import one.irradia.mime.api.MIMEType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
+import java.net.URI
 
 /**
  * The interface exposed by viewers.
@@ -59,6 +60,7 @@ interface ViewerProviderType {
     activity: Activity,
     preferences: ViewerPreferences,
     book: Book,
-    format: BookFormat
+    format: BookFormat,
+    accountProviderId: URI
   )
 }

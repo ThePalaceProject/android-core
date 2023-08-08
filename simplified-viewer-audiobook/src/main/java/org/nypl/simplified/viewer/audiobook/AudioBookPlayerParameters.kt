@@ -61,6 +61,12 @@ class AudioBookPlayerParameters(
   val accountID: AccountID,
 
   /**
+   * The account provider to which the book belongs.
+   */
+
+  val accountProviderID: URI,
+
+  /**
    * The book ID.
    */
 

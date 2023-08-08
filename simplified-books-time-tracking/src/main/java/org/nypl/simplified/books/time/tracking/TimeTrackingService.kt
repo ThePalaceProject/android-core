@@ -10,7 +10,9 @@ import org.librarysimplified.audiobook.api.PlayerEvent
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.slf4j.LoggerFactory
+import ulid.ULID
 import java.io.File
+import java.net.URI
 import java.util.concurrent.TimeUnit
 import java.util.UUID
 import kotlin.math.min
@@ -56,13 +58,27 @@ class TimeTrackingService(
     )
   }
 
-  override fun startTimeTracking(accountId: AccountID, bookId: String) {
+  override fun startTimeTracking(
+    accountID: AccountID,
+    bookId: String,
+    libraryId: String,
+    timeTrackingUri: URI?
+  ) {
+    if (timeTrackingUri == null) {
+      logger.debug(
+        "Account {} and book {} has no time tracking uri",
+        accountID,
+        bookId
+      )
+      return
+    }
+
     logger.debug(
       "Start tracking time for account {} and book {}",
-      accountId.uuid.toString(),
+      accountID.uuid.toString(),
       bookId
     )
-    val libraryFile = File(timeTrackingDirectory, accountId.uuid.toString())
+    val libraryFile = File(timeTrackingDirectory, accountID.uuid.toString())
 
     // create a directory for the library
     if (!libraryFile.exists()) {
@@ -86,11 +102,11 @@ class TimeTrackingService(
 
       TimeTrackingInfoFileUtils.saveTimeTrackingInfoOnFile(
         timeTrackingInfo = TimeTrackingInfo(
-          libraryId = accountId.uuid.toString(),
+          accountId = accountID.uuid.toString(),
           bookId = bookId,
+          libraryId = libraryId,
           timeEntries = listOf(),
-          //TODO update this
-          timeTrackingUri = null
+          timeTrackingUri = timeTrackingUri
         ),
         file = timeEntriesFile
       )
@@ -103,11 +119,11 @@ class TimeTrackingService(
 
       TimeTrackingInfoFileUtils.saveTimeTrackingInfoOnFile(
         timeTrackingInfo = TimeTrackingInfo(
-          libraryId = accountId.uuid.toString(),
+          accountId = accountID.uuid.toString(),
           bookId = bookId,
+          libraryId = libraryId,
           timeEntries = listOf(),
-          //TODO update this
-          timeTrackingUri = null
+          timeTrackingUri = timeTrackingUri
         ),
         file = timeEntriesFile
       )
@@ -162,14 +178,14 @@ class TimeTrackingService(
 
   private fun createTimeTrackingEntry() {
     currentTimeTrackingEntry = TimeTrackingEntry(
-      id = UUID.randomUUID().toString(),
+      id = ULID.randomULID(),
       duringMinute = dateFormatter.print(DateTime.now()),
       secondsPlayed = 0
     )
   }
 
-  private fun getTimeTrackingInfoLocallyStored(): TimeTrackingInfo {
-    return TimeTrackingJSON.deserializeBytesToTimeTrackingInfo(
+  private fun getTimeTrackingInfoLocallyStored(): TimeTrackingInfo? {
+    return TimeTrackingJSON.convertBytesToTimeTrackingInfo(
       bytes = timeEntriesFile.readBytes()
     )
   }
@@ -191,20 +207,44 @@ class TimeTrackingService(
 
     libraries.forEach { library ->
       val books = library.listFiles().orEmpty()
+
+      if (books.isEmpty()) {
+        library.deleteRecursively()
+        return@forEach
+      }
+
       books.forEach { book ->
-        book.listFiles()?.forEach { file ->
-          val timeTrackingInfo = saveTimeTrackingInfoRemotely(
-            timeTrackingInfo = TimeTrackingInfoFileUtils.getTimeTrackingInfoFromFile(
+        val bookFiles = book.listFiles().orEmpty()
+
+        if (bookFiles.isNotEmpty()) {
+          bookFiles.forEach { file ->
+            val fileTimeTrackingInfo = TimeTrackingInfoFileUtils.getTimeTrackingInfoFromFile(
               file = file
             )
-          )
 
-          // we need to update the file's time tracking info with the updated info obtained from the
-          // server's response
-          TimeTrackingInfoFileUtils.saveTimeTrackingInfoOnFile(
-            timeTrackingInfo = timeTrackingInfo,
-            file = file
-          )
+            val timeTrackingInfo = fileTimeTrackingInfo?.copy(
+              timeEntries = fileTimeTrackingInfo.timeEntries.filter { timeEntry ->
+                timeEntry.isValidTimeEntry()
+              }
+            )
+
+            if (!timeTrackingInfo?.timeEntries.isNullOrEmpty()) {
+              val updatedTimeTrackingInfo = saveTimeTrackingInfoRemotely(
+                timeTrackingInfo = timeTrackingInfo!!
+              )
+
+              // we need to update the file's time tracking info with the updated info obtained from
+              // the server's response
+              TimeTrackingInfoFileUtils.saveTimeTrackingInfoOnFile(
+                timeTrackingInfo = updatedTimeTrackingInfo,
+                file = file
+              )
+            } else {
+              file.delete()
+            }
+          }
+        } else {
+          book.deleteRecursively()
         }
       }
     }
@@ -215,55 +255,58 @@ class TimeTrackingService(
       secondsPlayed = min(currentTimeTrackingEntry!!.secondsPlayed, MAX_SECONDS_PLAYED)
     )
 
-    if (timeTrackingInfo != null && timeTrackingInfo.secondsPlayed > 0) {
+    if (timeTrackingInfo != null) {
       val currentBookInfo = getTimeTrackingInfoLocallyStored()
-      val currentEntries = currentBookInfo.timeEntries
-      val updatedTimeTrackingInfo = currentBookInfo.copy(
-        timeEntries = if (firstIterationOfService) {
-          // if it's the first iteration of this saving method, we can add the current time tracking
-          // info
-          ArrayList(currentEntries).apply {
-            add(timeTrackingInfo)
-          }
-        } else if (shouldSaveRemotely) {
-          // if the info should be remotely saved, we update the last entry one last time and add a
-          // new entry for future iterations
-          ArrayList(currentEntries).apply {
-            set(currentEntries.lastIndex, timeTrackingInfo)
-            createTimeTrackingEntry()
-            add(currentTimeTrackingEntry)
-          }
-        } else if (currentEntries.isNotEmpty()) {
-          // if there's no need to save the info remotely, we just update the last index's info
-          ArrayList(currentEntries).apply {
-            set(currentEntries.lastIndex, timeTrackingInfo)
-          }
-        } else {
-          // there are no current entries, so we can create a new list
-          listOf(timeTrackingInfo)
-        }
-      )
 
-      firstIterationOfService = false
+      if (currentBookInfo != null) {
+        val currentEntries = currentBookInfo.timeEntries
+        val updatedTimeTrackingInfo = currentBookInfo.copy(
+          timeEntries = if (firstIterationOfService) {
+            // if it's the first iteration of this saving method, we can add the current time tracking
+            // info
+            ArrayList(currentEntries).apply {
+              add(timeTrackingInfo)
+            }
+          } else if (shouldSaveRemotely) {
+            // if the info should be remotely saved, we update the last entry one last time and add a
+            // new entry for future iterations
+            ArrayList(currentEntries).apply {
+              set(currentEntries.lastIndex, timeTrackingInfo)
+              createTimeTrackingEntry()
+              add(currentTimeTrackingEntry)
+            }
+          } else if (currentEntries.isNotEmpty()) {
+            // if there's no need to save the info remotely, we just update the last index's info
+            ArrayList(currentEntries).apply {
+              set(currentEntries.lastIndex, timeTrackingInfo)
+            }
+          } else {
+            // there are no current entries, so we can create a new list
+            listOf(timeTrackingInfo)
+          }
+        )
 
-      TimeTrackingInfoFileUtils.saveTimeTrackingInfoOnFile(
-        timeTrackingInfo = updatedTimeTrackingInfo,
-        file = timeEntriesFile
-      )
+        firstIterationOfService = false
+
+        TimeTrackingInfoFileUtils.saveTimeTrackingInfoOnFile(
+          timeTrackingInfo = updatedTimeTrackingInfo,
+          file = timeEntriesFile
+        )
+      }
     }
   }
 
   private fun saveTimeTrackingInfoRemotely(timeTrackingInfo: TimeTrackingInfo): TimeTrackingInfo {
-    if (timeTrackingInfo.timeEntries.isEmpty()) {
-      return timeTrackingInfo
-    }
-
     val failedEntries = try {
       httpCalls.registerTimeTrackingInfo(
-        timeTrackingInfo = timeTrackingInfo,
+        timeTrackingInfo = timeTrackingInfo.copy(
+          timeEntries = timeTrackingInfo.timeEntries.filter { timeEntry ->
+            timeEntry.isValidTimeEntry()
+          }
+        ),
         credentials = profilesController
           .profileCurrent()
-          .account(AccountID(UUID.fromString(timeTrackingInfo.libraryId)))
+          .account(AccountID(UUID.fromString(timeTrackingInfo.accountId)))
           .loginState
           .credentials
       )
@@ -296,9 +339,33 @@ class TimeTrackingService(
 
             if (shouldSaveRemotely) {
               shouldSaveRemotely = false
-              saveTimeTrackingInfoRemotely(
-                timeTrackingInfo = getTimeTrackingInfoLocallyStored()
+
+              val localTimeTrackingInfo = getTimeTrackingInfoLocallyStored()
+              val timeTrackingInfo = localTimeTrackingInfo?.copy(
+                timeEntries = localTimeTrackingInfo.timeEntries.filter { timeEntry ->
+                  timeEntry.isValidTimeEntry()
+                }
               )
+
+              if (!timeTrackingInfo?.timeEntries.isNullOrEmpty()) {
+                val updatedTimeTrackingInfo = saveTimeTrackingInfoRemotely(
+                  timeTrackingInfo = timeTrackingInfo!!
+                )
+
+                // we can 'reset' the current time entries file
+                TimeTrackingInfoFileUtils.saveTimeTrackingInfoOnFile(
+                  timeTrackingInfo = timeTrackingInfo.copy(
+                    timeEntries = listOf()
+                  ),
+                  file = timeEntriesFile
+                )
+
+                // we need to add the failed entries to the 'retry' file
+                TimeTrackingInfoFileUtils.addEntriesToFile(
+                  entries = updatedTimeTrackingInfo.timeEntries,
+                  file = timeEntriesToRetryFile
+                )
+              }
             }
           },
           {
@@ -308,17 +375,17 @@ class TimeTrackingService(
         )
 
     // this timer will be responsible for updating the flag to save the entries on the server
-    remoteStorageDisposable = Observable.interval(60000L, TimeUnit.MILLISECONDS)
-      .subscribeOn(Schedulers.io())
-      .subscribe(
-        {
-          shouldSaveRemotely = true
-        },
-        {
-          logger.error("Error on remote storage timer")
-          it.printStackTrace()
-        }
-      )
+    remoteStorageDisposable =
+      Observable.interval(60000L, TimeUnit.MILLISECONDS)
+        .subscribeOn(Schedulers.io())
+        .subscribe(
+          {
+            shouldSaveRemotely = true
+          },
+          {
+            logger.error("Error on remote storage timer")
+            it.printStackTrace()
+          }
+        )
   }
-
 }

@@ -1,6 +1,7 @@
 package org.nypl.simplified.books.time.tracking
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.node.ObjectNode
 import one.irradia.mime.api.MIMEType
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType
@@ -29,15 +30,14 @@ class TimeTrackingHTTPCalls(
   ): List<TimeTrackingEntry> {
 
     credentials ?: throw(Exception("Invalid Credentials"))
-    timeTrackingInfo.timeTrackingUri ?: throw(Exception("Invalid URI"))
 
     val data =
-      TimeTrackingJSON.serializeTimeTrackingInfoToBytes(this.objectMapper, timeTrackingInfo)
+      TimeTrackingJSON.convertTimeTrackingInfoToBytes(this.objectMapper, timeTrackingInfo)
     val auth =
       AccountAuthenticatedHTTP.createAuthorization(credentials)
     val post =
       LSHTTPRequestBuilderType.Method.Post(
-        data, MIMEType("application", "ld+json", mapOf())
+        data, MIMEType("application", "json", mapOf())
       )
     val request =
       this.http.newRequest(timeTrackingInfo.timeTrackingUri)
@@ -48,10 +48,29 @@ class TimeTrackingHTTPCalls(
     return request.execute().use { response ->
       when (val status = response.status) {
         is LSHTTPResponseStatus.Responded.OK -> {
-          objectMapper.readTree(
-            status.bodyStream ?: ByteArrayInputStream(ByteArray(0))
+          val timeTrackingResponse = TimeTrackingJSON.convertServerResponseToTimeTrackingResponse(
+            objectNode = objectMapper.readTree(
+              status.bodyStream ?: ByteArrayInputStream(ByteArray(0))
+            ) as ObjectNode
           )
-          listOf()
+
+          val summary = timeTrackingResponse?.summary
+          val responses = timeTrackingResponse?.responses.orEmpty()
+
+          logger.debug("Received time tracking summary: {} successes + {} failures = {} total", summary?.successes, summary?.failures, summary?.total)
+
+          if (responses.isNotEmpty()) {
+            timeTrackingInfo.timeEntries.filter { timeEntry ->
+              val responseEntry = responses.firstOrNull { response ->
+                response.id == timeEntry.id
+              } ?: return@filter false
+
+              !responseEntry.isStatusSuccess() && !responseEntry.isStatusGone()
+            }
+          } else {
+            // return the original time entries if the server response has no response entries
+            timeTrackingInfo.timeEntries
+          }
         }
         is LSHTTPResponseStatus.Responded.Error -> {
           logAndFail(timeTrackingInfo.timeTrackingUri, status)

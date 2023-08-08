@@ -65,27 +65,24 @@ object Viewers {
           "[{}] viewer provider {} supports the book, using it!", index, viewerProvider.name
         )
 
-        /* Publish 'BookOpened' event. */
+        val profile = this.profilesController.profileCurrent()
+        val account = profile.account(book.account)
 
-        this.analyticsService?.let { service ->
-          val profile = this.profilesController.profileCurrent()
-          val account = profile.account(book.account)
-
-          service.publishEvent(
-            AnalyticsEvent.BookOpened(
-              timestamp = LocalDateTime.now(),
-              credentials = account.loginState.credentials,
-              profileUUID = profile.id.uuid,
-              profileDisplayName = profile.displayName,
-              accountProvider = account.provider.id,
-              accountUUID = account.id.uuid,
-              opdsEntry = book.entry,
-              targetURI = book.entry.analytics.getOrNull()
-            )
+        // Publish 'BookOpened' event.
+        this.analyticsService?.publishEvent(
+          AnalyticsEvent.BookOpened(
+            timestamp = LocalDateTime.now(),
+            credentials = account.loginState.credentials,
+            profileUUID = profile.id.uuid,
+            profileDisplayName = profile.displayName,
+            accountProvider = account.provider.id,
+            accountUUID = account.id.uuid,
+            opdsEntry = book.entry,
+            targetURI = book.entry.analytics.getOrNull()
           )
-        }
+        )
 
-        viewerProvider.open(activity, preferences, book, format)
+        viewerProvider.open(activity, preferences, book, format, account.provider.id)
         return
       } else {
         this.logger.debug(

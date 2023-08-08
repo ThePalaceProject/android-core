@@ -70,6 +70,7 @@ import org.nypl.simplified.books.time.tracking.TimeTrackingServiceType
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.networkconnectivity.api.NetworkConnectivityType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
+import org.nypl.simplified.opds.core.getOrNull
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.threads.NamedThreadPools
@@ -267,8 +268,10 @@ class AudioBookPlayerActivity :
     }
 
     this.timeTrackingService.startTimeTracking(
-      accountId = this.parameters.accountID,
-      bookId = this.parameters.bookID.value()
+      accountID = this.parameters.accountID,
+      bookId = this.parameters.opdsEntry.id,
+      libraryId = this.parameters.accountProviderID.toString(),
+      timeTrackingUri = this.parameters.opdsEntry.timeTrackingUri.getOrNull()
     )
   }
 

@@ -10,23 +10,31 @@ import java.net.URI
 
 object TimeTrackingJSON {
 
-  private const val NODE_BOOK_ID = "book_id"
+  private const val TAG = "TimeTrackingJSON"
+
+  private const val NODE_ACCOUNT_ID = "accountId"
+  private const val NODE_BOOK_ID = "bookId"
   private const val NODE_DURING_MINUTE = "duringMinute"
+  private const val NODE_FAILURES = "failures"
   private const val NODE_ID = "id"
-  private const val NODE_LIBRARY_ID = "library_id"
+  private const val NODE_LIBRARY_ID = "libraryId"
+  private const val NODE_MESSAGE = "message"
+  private const val NODE_RESPONSES = "responses"
   private const val NODE_SECONDS_PLAYED = "secondsPlayed"
+  private const val NODE_STATUS = "status"
+  private const val NODE_SUCCESSES = "successes"
+  private const val NODE_SUMMARY = "summary"
   private const val NODE_TIME_ENTRIES = "timeEntries"
+  private const val NODE_TOTAL = "total"
   private const val NODE_URI = "uri"
 
-  fun serializeTimeTrackingToJSON(
+  private fun convertTimeTrackingToJSON(
     mapper: ObjectMapper,
+    node: ObjectNode,
     timeTrackingInfo: TimeTrackingInfo
   ): ObjectNode {
-    val node = mapper.createObjectNode()
-
     node.put(NODE_BOOK_ID, timeTrackingInfo.bookId)
     node.put(NODE_LIBRARY_ID, timeTrackingInfo.libraryId)
-    node.put(NODE_URI, timeTrackingInfo.timeTrackingUri.toString())
 
     val timeEntriesArray = mapper.createArrayNode()
 
@@ -45,21 +53,72 @@ object TimeTrackingJSON {
     return node
   }
 
-  fun serializeTimeTrackingInfoToBytes(
+  fun convertServerResponseToTimeTrackingResponse(
+    objectNode: ObjectNode,
+  ): TimeTrackingResponse? {
+    return try {
+      val responsesNode = JSONParserUtilities.getArray(objectNode, NODE_RESPONSES)
+      val responses = arrayListOf<TimeTrackingResponseEntry>()
+      responsesNode.forEach { responseNode ->
+        responses.add(
+          TimeTrackingResponseEntry(
+            id = responseNode.get(NODE_ID).asText(),
+            message = responseNode.get(NODE_MESSAGE).asText(),
+            status = responseNode.get(NODE_STATUS).asInt()
+          )
+        )
+      }
+
+      val summaryNode = objectNode.get(NODE_SUMMARY)
+      val summary = TimeTrackingResponseSummary(
+        failures = summaryNode.get(NODE_FAILURES).asInt(),
+        successes = summaryNode.get(NODE_SUCCESSES).asInt(),
+        total = summaryNode.get(NODE_TOTAL).asInt()
+      )
+
+      TimeTrackingResponse(
+        summary = summary,
+        responses = responses
+      )
+    } catch (e: Exception) {
+      Log.d(
+        TAG,
+        "Error converting server response to time tracking response: " + e.message.orEmpty()
+      )
+      null
+    }
+  }
+
+  fun convertTimeTrackingToLocalJSON(
+    mapper: ObjectMapper,
+    timeTrackingInfo: TimeTrackingInfo
+  ): ObjectNode {
+    val node = mapper.createObjectNode()
+    node.put(NODE_ACCOUNT_ID, timeTrackingInfo.accountId)
+    node.put(NODE_URI, timeTrackingInfo.timeTrackingUri.toString())
+    return convertTimeTrackingToJSON(
+      mapper = mapper,
+      node = node,
+      timeTrackingInfo = timeTrackingInfo
+    )
+  }
+
+  fun convertTimeTrackingInfoToBytes(
     objectMapper: ObjectMapper,
     timeTrackingInfo: TimeTrackingInfo
   ): ByteArray {
     objectMapper.configure(SerializationFeature.INDENT_OUTPUT, false)
     objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true)
     return objectMapper.writeValueAsBytes(
-      serializeTimeTrackingToJSON(
-        objectMapper,
-        timeTrackingInfo
+      convertTimeTrackingToJSON(
+        mapper = objectMapper,
+        node = objectMapper.createObjectNode(),
+        timeTrackingInfo = timeTrackingInfo
       )
     )
   }
 
-  fun deserializeBytesToTimeTrackingInfo(bytes: ByteArray): TimeTrackingInfo {
+  fun convertBytesToTimeTrackingInfo(bytes: ByteArray): TimeTrackingInfo? {
     return try {
       val mapper = ObjectMapper()
       val node = mapper.readTree(bytes)
@@ -75,24 +134,16 @@ object TimeTrackingJSON {
       }
 
       TimeTrackingInfo(
-        libraryId = node.get(NODE_LIBRARY_ID).asText(),
+        accountId = node.get(NODE_ACCOUNT_ID).asText(),
         bookId = node.get(NODE_BOOK_ID).asText(),
+        libraryId = node.get(NODE_LIBRARY_ID).asText(),
         timeEntries = timeEntries,
-        timeTrackingUri = try {
-          URI(node.get(NODE_URI).asText())
-        } catch (exception: Exception) {
-          exception.printStackTrace()
-          null
-        }
+        timeTrackingUri = URI(node.get(NODE_URI).asText())
       )
     } catch (e: Exception) {
-      Log.d("TimeTrackingJSON", "Error converting bytes to TimeTrackingInfo")
-      TimeTrackingInfo(
-        libraryId = "",
-        bookId = "",
-        timeEntries = listOf(),
-        timeTrackingUri = null
-      )
+      Log.d(TAG, "Error converting bytes from file: " + e.message.orEmpty())
+      e.printStackTrace()
+      null
     }
   }
 }

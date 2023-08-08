@@ -10,6 +10,7 @@ import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.nypl.simplified.viewer.spi.ViewerPreferences
 import org.nypl.simplified.viewer.spi.ViewerProviderType
 import org.slf4j.LoggerFactory
+import java.net.URI
 
 /**
  * An audio book viewer service.
@@ -47,7 +48,8 @@ class AudioBookViewer : ViewerProviderType {
     activity: Activity,
     preferences: ViewerPreferences,
     book: Book,
-    format: BookFormat
+    format: BookFormat,
+    accountProviderId: URI
   ) {
     val formatAudio =
       format as BookFormat.BookFormatAudioBook
@@ -62,6 +64,7 @@ class AudioBookViewer : ViewerProviderType {
     val params =
       AudioBookPlayerParameters(
         accountID = book.account,
+        accountProviderID = accountProviderId,
         bookID = book.id,
         file = file,
         drmInfo = formatAudio.drmInformation,
