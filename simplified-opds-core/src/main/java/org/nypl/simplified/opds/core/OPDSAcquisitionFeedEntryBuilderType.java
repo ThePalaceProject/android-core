@@ -192,6 +192,15 @@ public interface OPDSAcquisitionFeedEntryBuilderType
     OptionType<URI> uri);
 
   /**
+   * Set the time tracking uri.
+   *
+   * @param uri The time tracking uri
+   */
+
+  OPDSAcquisitionFeedEntryBuilderType setTimeTrackingUriOption(
+    OptionType<URI> uri);
+
+  /**
    * @param licensor The Licensor
    */
 

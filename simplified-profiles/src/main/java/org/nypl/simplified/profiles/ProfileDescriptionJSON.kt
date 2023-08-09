@@ -207,6 +207,9 @@ object ProfileDescriptionJSON {
     val isManualLCPPassphraseEnabled =
       JSONParserUtilities.getBooleanDefault(objectNode, "isManualLCPPassphraseEnabled", false)
 
+    val isTimeTrackingEnabled =
+      JSONParserUtilities.getBooleanDefault(objectNode, "isTimeTrackingEnabled", false)
+
     val mostRecentAccount =
       JSONParserUtilities.getStringOrNull(objectNode, "mostRecentAccount")
         ?.let { AccountID(UUID.fromString(it)) }
@@ -221,7 +224,8 @@ object ProfileDescriptionJSON {
       showDebugSettings = showDebugSettings,
       playbackRates = playbackRates,
       sleepTimers = sleepTimers,
-      isManualLCPPassphraseEnabled = isManualLCPPassphraseEnabled
+      isManualLCPPassphraseEnabled = isManualLCPPassphraseEnabled,
+      isTimeTrackingEnabled = isTimeTrackingEnabled
     )
   }
 
@@ -255,7 +259,10 @@ object ProfileDescriptionJSON {
       deserializeSleepTimers(objectMapper, objectNode)
 
     val isManualLCPPassphraseEnabled =
-      JSONParserUtilities.getBoolean(objectNode, "isManualLCPPassphraseEnabled")
+      JSONParserUtilities.getBooleanDefault(objectNode, "isManualLCPPassphraseEnabled", false)
+
+    val isTimeTrackingEnabled =
+      JSONParserUtilities.getBooleanDefault(objectNode, "isTimeTrackingEnabled", false)
 
     val mostRecentAccount =
       JSONParserUtilities.getStringOrNull(objectNode, "mostRecentAccount")
@@ -270,7 +277,8 @@ object ProfileDescriptionJSON {
       hasSeenLibrarySelectionScreen = true,
       playbackRates = playbackRates,
       sleepTimers = sleepTimers,
-      isManualLCPPassphraseEnabled = isManualLCPPassphraseEnabled
+      isManualLCPPassphraseEnabled = isManualLCPPassphraseEnabled,
+      isTimeTrackingEnabled = isTimeTrackingEnabled
     )
   }
 
@@ -330,6 +338,9 @@ object ProfileDescriptionJSON {
     val isManualLCPPassphraseEnabled =
       JSONParserUtilities.getBooleanDefault(preferencesNode, "isManualLCPPassphraseEnabled", false)
 
+    val isTimeTrackingEnabled =
+      JSONParserUtilities.getBooleanDefault(preferencesNode, "isTimeTrackingEnabled", false)
+
     val preferences =
       ProfilePreferences(
         dateOfBirth = this.someOrNull(dateOfBirth),
@@ -339,7 +350,8 @@ object ProfileDescriptionJSON {
         hasSeenLibrarySelectionScreen = true,
         playbackRates = playbackRates,
         sleepTimers = sleepTimers,
-        isManualLCPPassphraseEnabled = isManualLCPPassphraseEnabled
+        isManualLCPPassphraseEnabled = isManualLCPPassphraseEnabled,
+        isTimeTrackingEnabled = isTimeTrackingEnabled,
       )
 
     val attributeMap = mutableMapOf<String, String>()
@@ -487,6 +499,7 @@ object ProfileDescriptionJSON {
     val output = objectMapper.createObjectNode()
     output.put("showTestingLibraries", preferences.showTestingLibraries)
     output.put("isManualLCPPassphraseEnabled", preferences.isManualLCPPassphraseEnabled)
+    output.put("isTimeTrackingEnabled", preferences.isTimeTrackingEnabled)
     output.put("hasSeenLibrarySelectionScreen", preferences.hasSeenLibrarySelectionScreen)
     output.put("showDebugSettings", preferences.showDebugSettings)
     output.put("mostRecentAccount", preferences.mostRecentAccount.uuid.toString())

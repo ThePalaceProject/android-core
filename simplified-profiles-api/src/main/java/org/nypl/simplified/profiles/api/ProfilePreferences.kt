@@ -50,6 +50,10 @@ data class ProfilePreferences(
 
   val isManualLCPPassphraseEnabled: Boolean = false,
 
+  /** @return `true` if the time tracking feature. */
+
+  val isTimeTrackingEnabled: Boolean = false,
+
   /** @return `true` if the debug settings should be visible. */
 
   val showDebugSettings: Boolean = false

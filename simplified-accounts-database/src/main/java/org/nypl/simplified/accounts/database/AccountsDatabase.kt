@@ -485,7 +485,7 @@ class AccountsDatabase private constructor(
         objectMapper = objectMapper
       )
 
-      if (!errors.isEmpty()) {
+      if (errors.isNotEmpty()) {
         for (e in errors) {
           this.logger.error("error during account database open: ", e)
         }

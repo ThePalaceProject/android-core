@@ -9,6 +9,7 @@ import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.viewer.spi.ViewerPreferences
 import org.nypl.simplified.viewer.spi.ViewerProviderType
 import org.slf4j.LoggerFactory
+import java.net.URI
 
 class PdfViewerProvider : ViewerProviderType {
 
@@ -43,7 +44,8 @@ class PdfViewerProvider : ViewerProviderType {
     activity: Activity,
     preferences: ViewerPreferences,
     book: Book,
-    format: BookFormat
+    format: BookFormat,
+    accountProviderId: URI
   ) {
     val formatPDF = format as BookFormat.BookFormatPDF
     val entry =
