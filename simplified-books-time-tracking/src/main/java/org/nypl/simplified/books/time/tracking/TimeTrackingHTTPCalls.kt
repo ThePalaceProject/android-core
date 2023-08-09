@@ -6,7 +6,6 @@ import one.irradia.mime.api.MIMEType
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType
 import org.librarysimplified.http.api.LSHTTPResponseStatus
-import org.librarysimplified.services.api.Services
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.crashlytics.api.CrashlyticsServiceType
@@ -21,14 +20,9 @@ import java.net.URI
 
 class TimeTrackingHTTPCalls(
   private val objectMapper: ObjectMapper,
-  private val http: LSHTTPClientType
+  private val http: LSHTTPClientType,
+  private val crashlytics: CrashlyticsServiceType?
 ) : TimeTrackingHTTPCallsType {
-
-  private val services =
-    Services.serviceDirectory()
-
-  private val crashlytics =
-    this.services.optionalService(CrashlyticsServiceType::class.java)
 
   private val logger = LoggerFactory.getLogger(TimeTrackingHTTPCalls::class.java)
 
@@ -81,8 +75,10 @@ class TimeTrackingHTTPCalls(
               val hasFailed = !responseEntry.isStatusSuccess() && !responseEntry.isStatusGone()
 
               if (!hasFailed) {
-                crashlytics?.log("Failed entry received from server: [id: ${responseEntry.id}, " +
-                  "message: ${responseEntry.message}, status: ${responseEntry.status}]")
+                crashlytics?.log(
+                  "Failed entry received from server: [id: ${responseEntry.id}, " +
+                    "message: ${responseEntry.message}, status: ${responseEntry.status}]"
+                )
               }
 
               hasFailed

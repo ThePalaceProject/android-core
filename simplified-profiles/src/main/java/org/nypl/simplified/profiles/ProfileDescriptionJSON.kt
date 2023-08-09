@@ -259,10 +259,10 @@ object ProfileDescriptionJSON {
       deserializeSleepTimers(objectMapper, objectNode)
 
     val isManualLCPPassphraseEnabled =
-      JSONParserUtilities.getBoolean(objectNode, "isManualLCPPassphraseEnabled")
+      JSONParserUtilities.getBooleanDefault(objectNode, "isManualLCPPassphraseEnabled", false)
 
     val isTimeTrackingEnabled =
-      JSONParserUtilities.getBoolean(objectNode, "isTimeTrackingEnabled")
+      JSONParserUtilities.getBooleanDefault(objectNode, "isTimeTrackingEnabled", false)
 
     val mostRecentAccount =
       JSONParserUtilities.getStringOrNull(objectNode, "mostRecentAccount")

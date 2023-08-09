@@ -139,7 +139,6 @@ object TimeTrackingJSON {
       )
     } catch (e: Exception) {
       logger.error("Error converting bytes from file: ", e)
-      e.printStackTrace()
       null
     }
   }

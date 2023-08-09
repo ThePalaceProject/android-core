@@ -21,6 +21,7 @@ import org.nypl.simplified.books.time.tracking.TimeTrackingInfo
 import org.nypl.simplified.books.time.tracking.TimeTrackingResponse
 import org.nypl.simplified.books.time.tracking.TimeTrackingResponseEntry
 import org.nypl.simplified.books.time.tracking.TimeTrackingResponseSummary
+import org.nypl.simplified.crashlytics.api.CrashlyticsServiceType
 import java.net.InetAddress
 import java.net.URI
 import java.util.concurrent.TimeUnit
@@ -28,6 +29,8 @@ import java.util.concurrent.TimeUnit
 class TimeTrackingHttpCallsTest {
   private lateinit var httpClient: LSHTTPClientType
   private lateinit var webServer: MockWebServer
+
+  private val crashlytics = Mockito.mock(CrashlyticsServiceType::class.java)
 
   @BeforeEach
   fun testSetup() {
@@ -63,7 +66,8 @@ class TimeTrackingHttpCallsTest {
 
     val httpCalls = TimeTrackingHTTPCalls(
       objectMapper = ObjectMapper(),
-      http = httpClient
+      http = httpClient,
+      crashlytics = crashlytics
     )
 
     val credentials =
@@ -121,7 +125,8 @@ class TimeTrackingHttpCallsTest {
 
     val httpCalls = TimeTrackingHTTPCalls(
       objectMapper = ObjectMapper(),
-      http = httpClient
+      http = httpClient,
+      crashlytics = crashlytics
     )
 
     val credentials =
@@ -193,7 +198,8 @@ class TimeTrackingHttpCallsTest {
 
     val httpCalls = TimeTrackingHTTPCalls(
       objectMapper = ObjectMapper(),
-      http = httpClient
+      http = httpClient,
+      crashlytics = crashlytics
     )
 
     val credentials =

@@ -2,6 +2,7 @@ package org.nypl.simplified.books.time.tracking
 
 import android.content.Context
 import io.reactivex.Observable
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import org.joda.time.DateTime
@@ -36,13 +37,14 @@ class TimeTrackingService(
   private val dateFormatter =
     DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm'Z'")
 
+  private val disposables = CompositeDisposable()
+
   private lateinit var timeEntriesFile: File
   private lateinit var timeEntriesToRetryFile: File
 
   private var audiobookPlayingDisposable: Disposable? = null
   private val connectivityListener: TimeTrackingConnectivityListener
   private var currentTimeTrackingEntry: TimeTrackingEntry? = null
-  private var remoteStorageDisposable: Disposable? = null
 
   private var firstIterationOfService = true
   private var isPlaying = false
@@ -85,16 +87,12 @@ class TimeTrackingService(
     val libraryFile = File(timeTrackingDirectory, accountID.uuid.toString())
 
     // create a directory for the library
-    if (!libraryFile.exists()) {
-      libraryFile.mkdirs()
-    }
+    libraryFile.mkdirs()
 
     val bookFile = File(libraryFile, bookId)
 
     // create a directory for the book inside the library
-    if (!bookFile.exists()) {
-      bookFile.mkdirs()
-    }
+    bookFile.mkdirs()
 
     timeEntriesFile = File(bookFile, FILE_NAME_TIME_ENTRIES)
     timeEntriesToRetryFile = File(bookFile, FILE_NAME_TIME_ENTRIES_RETRY)
@@ -167,8 +165,7 @@ class TimeTrackingService(
   override fun stopTracking() {
     logger.debug("Stop tracking playing time")
 
-    audiobookPlayingDisposable?.dispose()
-    remoteStorageDisposable?.dispose()
+    disposables.clear()
 
     // set this to null so it can work the next time
     audiobookPlayingDisposable = null
@@ -378,9 +375,11 @@ class TimeTrackingService(
           }
         )
 
-    // this timer will be responsible for updating the flag to save the entries on the server
-    remoteStorageDisposable =
-      Observable.interval(60000L, TimeUnit.MILLISECONDS)
+    disposables.add(audiobookPlayingDisposable!!)
+
+    disposables.add(
+      // this timer will be responsible for updating the flag to save the entries on the server
+      Observable.interval(1L, TimeUnit.MINUTES)
         .subscribeOn(Schedulers.io())
         .subscribe(
           {
@@ -391,6 +390,7 @@ class TimeTrackingService(
             it.printStackTrace()
           }
         )
+    )
   }
 
   private fun isTimeTrackingEnabled(): Boolean {
