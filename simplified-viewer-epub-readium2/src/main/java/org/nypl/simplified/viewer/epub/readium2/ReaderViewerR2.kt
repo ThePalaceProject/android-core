@@ -7,6 +7,7 @@ import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.viewer.spi.ViewerPreferences
 import org.nypl.simplified.viewer.spi.ViewerProviderType
+import java.net.URI
 
 class ReaderViewerR2 : ViewerProviderType {
 
@@ -35,7 +36,8 @@ class ReaderViewerR2 : ViewerProviderType {
     activity: Activity,
     preferences: ViewerPreferences,
     book: Book,
-    format: BookFormat
+    format: BookFormat,
+    accountProviderID: URI
   ) {
     val bookId =
       book.id

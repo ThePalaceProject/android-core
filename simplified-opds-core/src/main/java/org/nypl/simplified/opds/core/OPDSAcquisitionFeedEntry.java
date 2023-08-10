@@ -42,6 +42,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
   private final String summary;
   private final List<String> narrators;
   private final OptionType<URI> thumbnail;
+  private final OptionType<URI> timeTrackingUri;
   private final String title;
   private final DateTime updated;
   private final OptionType<URI> alternate;
@@ -62,6 +63,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     final OptionType<URI> in_related,
     final String in_title,
     final OptionType<URI> in_thumbnail,
+    final OptionType<URI> in_time_tracking_uri,
     final DateTime in_updated,
     final String in_summary,
     final List<String> in_narrators,
@@ -85,6 +87,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     this.related = NullCheck.notNull(in_related);
     this.title = NullCheck.notNull(in_title);
     this.thumbnail = NullCheck.notNull(in_thumbnail);
+    this.timeTrackingUri = NullCheck.notNull(in_time_tracking_uri);
     this.updated = NullCheck.notNull(in_updated);
     this.summary = NullCheck.notNull(in_summary);
     this.narrators = NullCheck.notNull(in_narrators);
@@ -361,6 +364,14 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
   }
 
   /**
+   * @return The time tracking uri, if any
+   */
+
+  public OptionType<URI> getTimeTrackingUri() {
+    return this.timeTrackingUri;
+  }
+
+  /**
    * @return The licensor
    */
   public OptionType<DRMLicensor> getLicensor() {
@@ -512,6 +523,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     private List<String> narrators;
     private OptionType<String> copyright;
     private OptionType<URI> thumbnail;
+    private OptionType<URI> timeTrackingUri;
     private OptionType<DRMLicensor> licensor;
 
     private Builder(
@@ -530,6 +542,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
       this.narrators = new ArrayList<String>();
       this.copyright = Option.none();
       this.thumbnail = Option.none();
+      this.timeTrackingUri = Option.none();
       this.cover = Option.none();
       this.previews = new ArrayList<OPDSPreviewAcquisition>(8);
       this.alternate = Option.none();
@@ -597,6 +610,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
         this.related,
         this.title,
         this.thumbnail,
+        this.timeTrackingUri,
         this.updated,
         this.summary,
         this.narrators,
@@ -713,6 +727,13 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     public OPDSAcquisitionFeedEntryBuilderType setThumbnailOption(
       final OptionType<URI> uri) {
       this.thumbnail = NullCheck.notNull(uri);
+      return this;
+    }
+
+    @Override
+    public OPDSAcquisitionFeedEntryBuilderType setTimeTrackingUriOption(
+      final OptionType<URI> uri) {
+      this.timeTrackingUri = NullCheck.notNull(uri);
       return this;
     }
 
