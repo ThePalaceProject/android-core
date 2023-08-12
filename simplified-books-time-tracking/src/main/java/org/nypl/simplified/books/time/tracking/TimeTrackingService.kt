@@ -135,6 +135,10 @@ class TimeTrackingService(
   }
 
   override fun onPlayerEventReceived(playerEvent: PlayerEvent) {
+    if (!isTimeTrackingEnabled()) {
+      return
+    }
+
     when (playerEvent) {
       is PlayerEvent.PlayerEventWithSpineElement.PlayerEventPlaybackProgressUpdate,
       is PlayerEvent.PlayerEventWithSpineElement.PlayerEventPlaybackStarted -> {
@@ -163,6 +167,10 @@ class TimeTrackingService(
   }
 
   override fun stopTracking() {
+    if (!isTimeTrackingEnabled()) {
+      return
+    }
+
     logger.debug("Stop tracking playing time")
 
     disposables.clear()
