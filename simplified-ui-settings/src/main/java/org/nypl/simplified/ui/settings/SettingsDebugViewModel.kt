@@ -148,6 +148,18 @@ class SettingsDebugViewModel(application: Application) : AndroidViewModel(applic
       }
     }
 
+  var isTimeTrackingEnabled: Boolean
+    get() =
+      this.profilesController
+        .profileCurrent()
+        .preferences()
+        .isTimeTrackingEnabled
+    set(value) {
+      this.profilesController.profileUpdate { description ->
+        description.copy(preferences = description.preferences.copy(isTimeTrackingEnabled = value))
+      }
+    }
+
   var isBootFailureEnabled: Boolean
     get() =
       BootFailureTesting.isBootFailureEnabled(getApplication())

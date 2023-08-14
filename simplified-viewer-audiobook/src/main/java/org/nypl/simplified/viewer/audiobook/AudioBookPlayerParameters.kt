@@ -21,7 +21,7 @@ import java.net.URI
  * Parameters for the audio book player.
  */
 
-data class AudioBookPlayerParameters(
+class AudioBookPlayerParameters(
 
   /**
    * The audio book file, if this is a packaged audio book. This must be null for unpackaged audio
@@ -59,6 +59,12 @@ data class AudioBookPlayerParameters(
    */
 
   val accountID: AccountID,
+
+  /**
+   * The account provider to which the book belongs.
+   */
+
+  val accountProviderID: URI,
 
   /**
    * The book ID.
