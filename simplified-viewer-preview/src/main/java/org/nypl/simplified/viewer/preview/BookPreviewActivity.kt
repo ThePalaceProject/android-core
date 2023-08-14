@@ -8,6 +8,8 @@ import android.widget.ProgressBar
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.app.TxContextWrappingDelegate
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import io.reactivex.disposables.Disposable
@@ -53,6 +55,10 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
 
   private val logger = LoggerFactory.getLogger(BookPreviewActivity::class.java)
 
+  private val appCompatDelegate: TxContextWrappingDelegate by lazy {
+    TxContextWrappingDelegate(super.getDelegate())
+  }
+
   private val services =
     Services.serviceDirectory()
   private val accessibilityService =
@@ -89,6 +95,10 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
     this.viewModel.previewStatusLive.observe(this, this::onNewBookPreviewStatus)
 
     handleFeedEntry()
+  }
+
+  override fun getDelegate(): AppCompatDelegate {
+    return this.appCompatDelegate
   }
 
   override fun onStop() {

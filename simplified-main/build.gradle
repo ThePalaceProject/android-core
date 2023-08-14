@@ -15,8 +15,6 @@ android {
 }
 
 dependencies {
-  implementation 'com.transifex.txnative:txsdk:1.2.1'
-
   api project(":simplified-accessibility")
   api project(":simplified-accounts-database")
   api project(":simplified-accounts-database-api")
@@ -91,5 +89,6 @@ dependencies {
   api libs.rxjava2.extensions
   api libs.slf4j
 
+  implementation libs.transifex.sdk
   implementation libs.firebase.dynamic.links
 }

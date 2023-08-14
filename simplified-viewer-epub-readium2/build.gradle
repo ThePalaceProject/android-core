@@ -8,8 +8,6 @@ dependencies {
   implementation project(":simplified-ui-thread-api")
   implementation project(":simplified-viewer-spi")
 
-  implementation 'com.transifex.txnative:txsdk:1.2.1'
-
   implementation libs.androidx.activity
   implementation libs.androidx.app.compat
   implementation libs.androidx.lifecycle
@@ -21,4 +19,5 @@ dependencies {
   implementation libs.palace.readium2.vanilla
   implementation libs.palace.readium2.views
   implementation libs.slf4j
+  implementation libs.transifex.sdk
 }
