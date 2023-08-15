@@ -208,7 +208,7 @@ object ProfileDescriptionJSON {
       JSONParserUtilities.getBooleanDefault(objectNode, "isManualLCPPassphraseEnabled", false)
 
     val isTimeTrackingEnabled =
-      JSONParserUtilities.getBooleanDefault(objectNode, "isTimeTrackingEnabled", false)
+      JSONParserUtilities.getBooleanDefault(objectNode, "isTimeTrackingEnabled", true)
 
     val mostRecentAccount =
       JSONParserUtilities.getStringOrNull(objectNode, "mostRecentAccount")
@@ -262,7 +262,7 @@ object ProfileDescriptionJSON {
       JSONParserUtilities.getBooleanDefault(objectNode, "isManualLCPPassphraseEnabled", false)
 
     val isTimeTrackingEnabled =
-      JSONParserUtilities.getBooleanDefault(objectNode, "isTimeTrackingEnabled", false)
+      JSONParserUtilities.getBooleanDefault(objectNode, "isTimeTrackingEnabled", true)
 
     val mostRecentAccount =
       JSONParserUtilities.getStringOrNull(objectNode, "mostRecentAccount")
