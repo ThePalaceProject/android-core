@@ -322,7 +322,7 @@ class BService(
   override fun bookmarkCreateLocal(
     accountID: AccountID,
     bookmark: Bookmark
-  ): FluentFuture<Unit> {
+  ): FluentFuture<Bookmark> {
     return try {
       FluentFuture.from(
         this.executor.submit(
@@ -344,7 +344,7 @@ class BService(
   override fun bookmarkCreateRemote(
     accountID: AccountID,
     bookmark: Bookmark
-  ): FluentFuture<Bookmark?> {
+  ): FluentFuture<Bookmark> {
     return try {
       FluentFuture.from(
         this.executor.submit(
@@ -364,10 +364,37 @@ class BService(
     }
   }
 
+  override fun bookmarkCreate(
+    accountID: AccountID,
+    bookmark: Bookmark,
+    ignoreRemoteFailures: Boolean
+  ): FluentFuture<Bookmark> {
+    return try {
+      FluentFuture.from(
+        this.executor.submit(
+          BServiceOpCreateBookmark(
+            logger = this.logger,
+            objectMapper = this.objectMapper,
+            httpCalls = this.httpCalls,
+            profile = profilesController.profileCurrent(),
+            accountID = accountID,
+            bookmarkEventsOut = this.bookmarkEventsOut,
+            bookmark = bookmark,
+            ignoreRemoteFailures = ignoreRemoteFailures
+          )
+        )
+      )
+    } catch (e: ProfileNoneCurrentException) {
+      this.logger.error("bookmarkCreate: no profile is current: ", e)
+      FluentFuture.from(Futures.immediateFailedFuture(e))
+    }
+  }
+
   override fun bookmarkDelete(
     accountID: AccountID,
-    bookmark: Bookmark
-  ): FluentFuture<Boolean> {
+    bookmark: Bookmark,
+    ignoreRemoteFailures: Boolean
+  ): FluentFuture<Unit> {
     return try {
       FluentFuture.from(
         this.executor.submit(
@@ -376,7 +403,8 @@ class BService(
             httpCalls = this.httpCalls,
             profile = profilesController.profileCurrent(),
             accountID = accountID,
-            bookmark = bookmark
+            bookmark = bookmark,
+            ignoreRemoteFailures = ignoreRemoteFailures
           )
         )
       )

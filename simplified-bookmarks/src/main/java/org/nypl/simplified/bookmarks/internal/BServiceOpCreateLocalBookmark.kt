@@ -20,14 +20,14 @@ internal class BServiceOpCreateLocalBookmark(
   private val profile: ProfileReadableType,
   private val accountID: AccountID,
   private val bookmark: Bookmark
-) : BServiceOp<Unit>(logger) {
+) : BServiceOp<Bookmark>(logger) {
 
-  override fun runActual() {
-    this.locallySaveBookmark()
+  override fun runActual(): Bookmark {
+    return this.locallySaveBookmark()
   }
 
-  private fun locallySaveBookmark() {
-    try {
+  private fun locallySaveBookmark(): Bookmark {
+    return try {
       this.logger.debug(
         "[{}]: locally saving bookmark {}",
         this.profile.id.uuid,
@@ -42,112 +42,99 @@ internal class BServiceOpCreateLocalBookmark(
         is Bookmark.ReaderBookmark -> {
           val handle =
             entry.findFormatHandle(BookDatabaseEntryFormatHandleEPUB::class.java)
+              ?: throw this.errorNoFormatHandle()
 
-          if (handle != null) {
-            when (this.bookmark.kind) {
-              BookmarkKind.BookmarkLastReadLocation ->
-                handle.setLastReadLocation(this.bookmark)
-              BookmarkKind.BookmarkExplicit ->
-                handle.setBookmarks(
-                  BServiceBookmarks.normalizeBookmarks(
-                    logger = this.logger,
-                    profileId = this.profile.id,
-                    handle = handle,
-                    bookmark = bookmark
-                  )
+          when (this.bookmark.kind) {
+            BookmarkKind.BookmarkLastReadLocation ->
+              handle.setLastReadLocation(this.bookmark)
+
+            BookmarkKind.BookmarkExplicit ->
+              handle.setBookmarks(
+                BServiceBookmarks.normalizeBookmarks(
+                  logger = this.logger,
+                  profileId = this.profile.id,
+                  handle = handle,
+                  bookmark = bookmark
                 )
-            }
-
-            this.bookmarkEventsOut.onNext(
-              BookmarkEvent.BookmarkSaved(
-                this.accountID,
-                this.bookmark
               )
-            )
-          } else {
-            this.logger.debug(
-              "[{}]: unable to save bookmark; no format handle",
-              this.profile.id.uuid
-            )
           }
+
+          this.publishSavedEvent(this.bookmark)
         }
+
         is Bookmark.PDFBookmark -> {
           val handle =
             entry.findFormatHandle(BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandlePDF::class.java)
+              ?: throw this.errorNoFormatHandle()
 
-          if (handle != null) {
-            when (this.bookmark.kind) {
-              BookmarkKind.BookmarkLastReadLocation ->
-                handle.setLastReadLocation(this.bookmark)
-              BookmarkKind.BookmarkExplicit -> {
-                handle.setBookmarks(
-                  BServiceBookmarks.normalizeBookmarks(
-                    logger = this.logger,
-                    profileId = this.profile.id,
-                    handle = handle,
-                    bookmark = bookmark
-                  )
+          when (this.bookmark.kind) {
+            BookmarkKind.BookmarkLastReadLocation ->
+              handle.setLastReadLocation(this.bookmark)
+
+            BookmarkKind.BookmarkExplicit -> {
+              handle.setBookmarks(
+                BServiceBookmarks.normalizeBookmarks(
+                  logger = this.logger,
+                  profileId = this.profile.id,
+                  handle = handle,
+                  bookmark = bookmark
                 )
-              }
-            }
-
-            this.bookmarkEventsOut.onNext(
-              BookmarkEvent.BookmarkSaved(
-                this.accountID,
-                this.bookmark
               )
-            )
-          } else {
-            this.logger.debug(
-              "[{}]: unable to save bookmark; no format handle",
-              this.profile.id.uuid
-            )
+            }
           }
+
+          this.publishSavedEvent(this.bookmark)
         }
+
         is Bookmark.AudiobookBookmark -> {
           val handle =
             entry.findFormatHandle(
               BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook::class.java
-            )
+            ) ?: throw this.errorNoFormatHandle()
 
-          if (handle != null) {
-            val updatedBookmark = bookmark.copy(
-              location = bookmark.location.copy(
-                currentOffset = bookmark.location.startOffset + bookmark.location.currentOffset
-              )
+          val updatedBookmark = bookmark.copy(
+            location = bookmark.location.copy(
+              currentOffset = bookmark.location.startOffset + bookmark.location.currentOffset
             )
-            when (this.bookmark.kind) {
-              BookmarkKind.BookmarkLastReadLocation ->
-                handle.setLastReadLocation(updatedBookmark)
-              BookmarkKind.BookmarkExplicit ->
-                handle.setBookmarks(
-                  BServiceBookmarks.normalizeBookmarks(
-                    logger = this.logger,
-                    profileId = this.profile.id,
-                    handle = handle,
-                    bookmark = updatedBookmark
-                  )
+          )
+
+          when (this.bookmark.kind) {
+            BookmarkKind.BookmarkLastReadLocation ->
+              handle.setLastReadLocation(updatedBookmark)
+
+            BookmarkKind.BookmarkExplicit ->
+              handle.setBookmarks(
+                BServiceBookmarks.normalizeBookmarks(
+                  logger = this.logger,
+                  profileId = this.profile.id,
+                  handle = handle,
+                  bookmark = updatedBookmark
                 )
-            }
-
-            this.bookmarkEventsOut.onNext(
-              BookmarkEvent.BookmarkSaved(
-                this.accountID,
-                updatedBookmark
               )
-            )
-          } else {
-            this.logger.debug(
-              "[{}]: unable to save bookmark; no format handle",
-              this.profile.id.uuid
-            )
           }
+
+          this.publishSavedEvent(updatedBookmark)
         }
+
         else ->
           throw IllegalStateException("Unsupported bookmark type: $bookmark")
       }
     } catch (e: Exception) {
       this.logger.error("error saving bookmark locally: ", e)
+      throw e
     }
+  }
+
+  private fun publishSavedEvent(updatedBookmark: Bookmark): Bookmark {
+    this.bookmarkEventsOut.onNext(BookmarkEvent.BookmarkSaved(this.accountID, updatedBookmark))
+    return updatedBookmark
+  }
+
+  private fun errorNoFormatHandle(): IllegalStateException {
+    this.logger.debug(
+      "[{}]: unable to save bookmark; no format handle",
+      this.profile.id.uuid
+    )
+    return IllegalStateException("No format handle")
   }
 }
