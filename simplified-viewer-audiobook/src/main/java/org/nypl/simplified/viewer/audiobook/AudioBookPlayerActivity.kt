@@ -68,6 +68,8 @@ import org.nypl.simplified.books.controller.api.BooksControllerType
 import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.books.time.tracking.TimeTrackingServiceType
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.futures.FluentFutureExtensions.map
+import org.nypl.simplified.futures.FluentFutureExtensions.onAnyError
 import org.nypl.simplified.networkconnectivity.api.NetworkConnectivityType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.getOrNull
@@ -80,6 +82,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import rx.Subscription
 import java.io.IOException
+import java.util.Collections
 import java.util.ServiceLoader
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
@@ -149,7 +152,8 @@ class AudioBookPlayerActivity :
   private var playerInitialized: Boolean = false
   private val reloadingManifest = AtomicBoolean(false)
 
-  private val currentBookmarks = arrayListOf<Bookmark.AudiobookBookmark>()
+  private val currentBookmarks =
+    Collections.synchronizedList(arrayListOf<Bookmark.AudiobookBookmark>())
 
   private val services =
     Services.serviceDirectory()
@@ -350,16 +354,10 @@ class AudioBookPlayerActivity :
           bookmark = bookmark
         )
       } else {
-        val backgroundThread =
-          MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(1))
-
-        backgroundThread.execute {
-          AudioBookHelpers.addBookmarkRemotely(
-            bookmarkService = this.bookmarkService,
-            accountID = this.parameters.accountID,
-            bookmark = bookmark
-          )
-        }
+        this.bookmarkService.bookmarkCreateRemote(
+          accountID = this.parameters.accountID,
+          bookmark = bookmark
+        )
       }
     } catch (e: Exception) {
       this.log.error("could not save player position: ", e)
@@ -526,6 +524,7 @@ class AudioBookPlayerActivity :
         )
         strategyResult.result
       }
+
       is TaskResult.Failure ->
         throw IOException(strategyResult.message)
     }
@@ -719,6 +718,7 @@ class AudioBookPlayerActivity :
       is PlayerEventPlaybackRateChanged -> {
         this.onPlaybackRateChanged(event.rate)
       }
+
       is PlayerEventError ->
         this.onLogPlayerError(event)
 
@@ -971,22 +971,18 @@ class AudioBookPlayerActivity :
       playerBookmark = playerBookmark
     )
 
-    val backgroundThread =
-      MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(1))
-
-    backgroundThread.execute {
-      val wasDeleted = AudioBookHelpers.deleteBookmark(
-        bookmarkService = this.bookmarkService,
-        accountID = this.parameters.accountID,
-        bookmark = bookmark
-      )
-
-      if (wasDeleted) {
-        currentBookmarks.remove(bookmark)
-      }
-
+    this.bookmarkService.bookmarkDelete(
+      accountID = this.parameters.accountID,
+      bookmark = bookmark,
+      ignoreRemoteFailures = true
+    ).map {
+      this.currentBookmarks.remove(bookmark)
       runOnUiThread {
-        onDeleteOperationCompleted(wasDeleted)
+        onDeleteOperationCompleted(true)
+      }
+    }.onAnyError {
+      runOnUiThread {
+        onDeleteOperationCompleted(false)
       }
     }
   }
@@ -1007,29 +1003,16 @@ class AudioBookPlayerActivity :
       if (!currentBookmarks.any { it.location == bookmark.location }) {
         showToastMessage(R.string.audio_book_player_bookmark_adding)
 
-        val backgroundThread =
-          MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(1))
-
-        backgroundThread.execute {
-          val createdBookmark = AudioBookHelpers.addBookmarkRemotely(
-            bookmarkService = bookmarkService,
-            accountID = this.parameters.accountID,
-            bookmark = bookmark
-          )
-
-          // the bookmark was successfully created, so we can store it locally and update the list
-          if (createdBookmark != null) {
-            this.bookmarkService.bookmarkCreateLocal(
-              accountID = this.parameters.accountID,
-              bookmark = createdBookmark
-            )
-
-            currentBookmarks.add(createdBookmark as Bookmark.AudiobookBookmark)
-
-            showToastMessage(R.string.audio_book_player_bookmark_added)
-          } else {
-            showToastMessage(R.string.audio_book_player_bookmark_error_adding)
-          }
+        this.bookmarkService.bookmarkCreate(
+          accountID = this.parameters.accountID,
+          bookmark = bookmark,
+          ignoreRemoteFailures = true
+        ).map { savedBookmark ->
+          this.currentBookmarks.add(savedBookmark as Bookmark.AudiobookBookmark)
+          showToastMessage(R.string.audio_book_player_bookmark_added)
+        }.onAnyError {
+          /* Otherwise, something in the chain failed. */
+          showToastMessage(R.string.audio_book_player_bookmark_error_adding)
         }
       } else {
         showToastMessage(R.string.audio_book_player_bookmark_already_added)

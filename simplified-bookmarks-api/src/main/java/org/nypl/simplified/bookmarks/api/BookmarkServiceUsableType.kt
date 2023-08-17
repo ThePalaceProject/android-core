@@ -69,7 +69,7 @@ interface BookmarkServiceUsableType {
   fun bookmarkCreateLocal(
     accountID: AccountID,
     bookmark: Bookmark
-  ): FluentFuture<Unit>
+  ): FluentFuture<Bookmark>
 
   /**
    * Create a remote bookmark.
@@ -78,7 +78,17 @@ interface BookmarkServiceUsableType {
   fun bookmarkCreateRemote(
     accountID: AccountID,
     bookmark: Bookmark
-  ): FluentFuture<Bookmark?>
+  ): FluentFuture<Bookmark>
+
+  /**
+   * Create a local bookmark, and then create a remote bookmark if necessary.
+   */
+
+  fun bookmarkCreate(
+    accountID: AccountID,
+    bookmark: Bookmark,
+    ignoreRemoteFailures: Boolean
+  ): FluentFuture<Bookmark>
 
   /**
    * The user has requested that a bookmark be deleted.
@@ -86,6 +96,7 @@ interface BookmarkServiceUsableType {
 
   fun bookmarkDelete(
     accountID: AccountID,
-    bookmark: Bookmark
-  ): FluentFuture<Boolean>
+    bookmark: Bookmark,
+    ignoreRemoteFailures: Boolean
+  ): FluentFuture<Unit>
 }
