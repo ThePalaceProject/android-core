@@ -15,6 +15,7 @@ android {
   defaultConfig {
     versionName = project.version
     versionCode = calculateVersionCode(project)
+    resConfigs "en", "es"
     setProperty("archivesBaseName", "palace")
   }
   applicationVariants.all { variant ->

@@ -9,6 +9,8 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.app.TxContextWrappingDelegate
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import io.reactivex.disposables.Disposable
@@ -121,6 +123,14 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
   private var controller: SR2ControllerType? = null
   private var controllerSubscription: Disposable? = null
   private var viewSubscription: Disposable? = null
+
+  private val appCompatDelegate: TxContextWrappingDelegate by lazy {
+    TxContextWrappingDelegate(super.getDelegate())
+  }
+
+  override fun getDelegate(): AppCompatDelegate {
+    return this.appCompatDelegate
+  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     this.logger.debug(

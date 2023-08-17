@@ -19,4 +19,5 @@ dependencies {
   implementation libs.palace.readium2.vanilla
   implementation libs.palace.readium2.views
   implementation libs.slf4j
+  implementation libs.transifex.sdk
 }
