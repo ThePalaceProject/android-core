@@ -50,6 +50,7 @@ class TimeTrackingService(
   private var isPlaying = false
   private var isOnAudiobookScreen = false
   private var shouldSaveRemotely = false
+  private var tracking = false
 
   init {
     connectivityListener = TimeTrackingConnectivityListener(
@@ -66,6 +67,7 @@ class TimeTrackingService(
     libraryId: String,
     timeTrackingUri: URI?
   ) {
+    this.tracking = timeTrackingUri != null
     if (timeTrackingUri == null) {
       logger.debug(
         "Account {} and book {} has no time tracking uri",
@@ -131,6 +133,10 @@ class TimeTrackingService(
   }
 
   override fun onPlayerEventReceived(playerEvent: PlayerEvent) {
+    if (!this.tracking) {
+      return
+    }
+
     when (playerEvent) {
       is PlayerEvent.PlayerEventWithSpineElement.PlayerEventPlaybackProgressUpdate,
       is PlayerEvent.PlayerEventWithSpineElement.PlayerEventPlaybackStarted -> {
@@ -159,6 +165,10 @@ class TimeTrackingService(
   }
 
   override fun stopTracking() {
+    if (!this.tracking) {
+      return
+    }
+
     logger.debug("Stop tracking playing time")
 
     disposables.clear()
