@@ -975,7 +975,7 @@ class AudioBookPlayerActivity :
       accountID = this.parameters.accountID,
       bookmark = bookmark,
       ignoreRemoteFailures = true
-    ).map { wasDeleted ->
+    ).map {
       this.currentBookmarks.remove(bookmark)
       runOnUiThread {
         onDeleteOperationCompleted(true)

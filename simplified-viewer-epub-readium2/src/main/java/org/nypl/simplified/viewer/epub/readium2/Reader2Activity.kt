@@ -467,7 +467,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
           accountID = account.id,
           bookmark = bookmark,
           ignoreRemoteFailures = true
-        ).map { wasDeleted ->
+        ).map {
           event.onDeleteOperationFinished(true)
         }.onAnyError {
           event.onDeleteOperationFinished(false)
