@@ -13,6 +13,9 @@ class MockAccountProviderResolutionStrings : AccountProviderResolutionStringsTyp
   override val resolvingAuthDocumentRetrievalFailed: String
     get() = "resolvingAuthDocumentRetrievalFailed"
 
+  override val resolvingAuthDocumentBasicTokenMalformed: String
+    get() = "resolvingAuthDocumentBasicTokenMalformed"
+
   override val resolvingAuthDocumentCOPPAAgeGateMalformed: String
     get() = "resolvingAuthDocumentCOPPAAgeGateMalformed"
 

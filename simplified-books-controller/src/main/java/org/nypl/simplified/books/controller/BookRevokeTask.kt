@@ -7,6 +7,7 @@ import org.joda.time.Duration
 import org.nypl.drm.core.AdobeAdeptExecutorType
 import org.nypl.drm.core.AdobeAdeptLoan
 import org.nypl.simplified.accounts.api.AccountAuthenticationAdobePostActivationCredentials
+import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.adobe.extensions.AdobeDRMExtensions
@@ -293,7 +294,7 @@ class BookRevokeTask(
    */
 
   private fun revokeNotifyServerURIFeed(targetURI: URI, account: AccountType): Feed {
-    val httpAuth = this.createHttpAuthIfRequired(account)
+    val credentials = this.getCredentialsFromAccount(account)
 
     /*
      * Hitting a revoke link yields a single OPDS entry indicating
@@ -303,10 +304,10 @@ class BookRevokeTask(
 
     val feedResult = try {
       this.feedLoader.fetchURI(
-        account.id,
-        targetURI,
-        httpAuth,
-        "PUT"
+        accountID = account.id,
+        uri = targetURI,
+        credentials = credentials,
+        method = "PUT"
       ).get(this.revokeServerTimeoutDuration.standardSeconds, TimeUnit.SECONDS)
     } catch (e: TimeoutException) {
       val message = this.revokeStrings.revokeServerNotifyFeedTimedOut
@@ -325,6 +326,13 @@ class BookRevokeTask(
 
     return when (feedResult) {
       is FeedLoaderSuccess -> {
+        account.updateCredentialsIfAvailable { currentCredentials ->
+          if (currentCredentials is AccountAuthenticationCredentials.BasicToken) {
+            currentCredentials.updateAccessToken(feedResult.accessToken)
+          } else {
+            currentCredentials
+          }
+        }
         this.taskRecorder.currentStepSucceeded(this.revokeStrings.revokeServerNotifyFeedOK)
         feedResult.feed
       }

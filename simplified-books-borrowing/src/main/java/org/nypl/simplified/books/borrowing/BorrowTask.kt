@@ -5,7 +5,6 @@ import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.nypl.drm.core.AdobeAdeptExecutorType
 import org.nypl.drm.core.AxisNowServiceType
-import org.nypl.simplified.accounts.api.AccountReadableType
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookID
@@ -400,7 +399,7 @@ class BorrowTask private constructor(
   }
 
   private class BorrowContext(
-    override val account: AccountReadableType,
+    override val account: AccountType,
     override val audioBookManifestStrategies: AudioBookManifestStrategiesType,
     override val clock: () -> Instant,
     override val contentResolver: ContentResolverType,

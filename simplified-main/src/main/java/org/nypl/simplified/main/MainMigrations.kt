@@ -85,6 +85,11 @@ internal object MainMigrations {
                 )
               ).get(3L, TimeUnit.MINUTES)
             }
+            is AccountAuthenticationCredentials.BasicToken -> {
+              val message = "Can't use Basic Token authentication during migrations."
+              taskRecorder.currentStepFailed(message, "missingInformation")
+              return taskRecorder.finishFailure()
+            }
             is AccountAuthenticationCredentials.OAuthWithIntermediary -> {
               val message = "Can't use OAuth authentication during migrations."
               taskRecorder.currentStepFailed(message, "missingInformation")
@@ -92,6 +97,25 @@ internal object MainMigrations {
             }
             is AccountAuthenticationCredentials.SAML2_0 -> {
               val message = "Can't use SAML 2.0 authentication during migrations."
+              taskRecorder.currentStepFailed(message, "missingInformation")
+              return taskRecorder.finishFailure()
+            }
+          }
+        }
+        is AccountProviderAuthenticationDescription.BasicToken -> {
+          when (credentials) {
+            is AccountAuthenticationCredentials.BasicToken -> {
+              return profilesController.profileAccountLogin(
+                ProfileAccountLoginRequest.BasicToken(
+                  account.id,
+                  description,
+                  credentials.userName,
+                  credentials.password
+                )
+              ).get(3L, TimeUnit.MINUTES)
+            }
+            else -> {
+              val message = "Can't use $credentials authentication during migrations."
               taskRecorder.currentStepFailed(message, "missingInformation")
               return taskRecorder.finishFailure()
             }

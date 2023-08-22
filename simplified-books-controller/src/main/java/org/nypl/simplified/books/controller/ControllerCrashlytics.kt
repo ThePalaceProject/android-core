@@ -31,6 +31,9 @@ internal object ControllerCrashlytics {
       is AccountAuthenticationCredentials.Basic -> {
         this.setCrashlyticsUserID(crashlytics, credentials.userName.value)
       }
+      is AccountAuthenticationCredentials.BasicToken -> {
+        this.setCrashlyticsUserID(crashlytics, credentials.userName.value)
+      }
       is AccountAuthenticationCredentials.OAuthWithIntermediary,
       is AccountAuthenticationCredentials.SAML2_0,
       null -> {

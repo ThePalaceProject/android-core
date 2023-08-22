@@ -714,11 +714,10 @@ class AccountsDatabase private constructor(
         val credentials =
           credentialsStore.get(accountId)
 
-        val loginState: AccountLoginState
-        if (credentials != null) {
-          loginState = AccountLoginState.AccountLoggedIn(credentials)
+        val loginState: AccountLoginState = if (credentials != null) {
+          AccountLoginState.AccountLoggedIn(credentials)
         } else {
-          loginState = AccountLoginState.AccountNotLoggedIn
+          AccountLoginState.AccountNotLoggedIn
         }
 
         val account =

@@ -3,7 +3,7 @@ package org.nypl.simplified.feeds.api
 import com.google.common.util.concurrent.FluentFuture
 import com.google.common.util.concurrent.ListeningExecutorService
 import com.io7m.jfunctional.Some
-import org.librarysimplified.http.api.LSHTTPAuthorizationType
+import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.bundled.api.BundledContentResolverType
 import org.nypl.simplified.books.bundled.api.BundledURIs
@@ -45,7 +45,7 @@ class FeedLoader private constructor(
   private val exec: ListeningExecutorService,
   private val parser: OPDSFeedParserType,
   private val searchParser: OPDSSearchParserType,
-  private val transport: OPDSFeedTransportType<LSHTTPAuthorizationType?>
+  private val transport: OPDSFeedTransportType<AccountAuthenticationCredentials?>
 ) : FeedLoaderType {
 
   private val log = LoggerFactory.getLogger(FeedLoader::class.java)
@@ -60,18 +60,18 @@ class FeedLoader private constructor(
     }
 
   override fun fetchURI(
-    account: AccountID,
+    accountID: AccountID,
     uri: URI,
-    auth: LSHTTPAuthorizationType?,
+    credentials: AccountAuthenticationCredentials?,
     method: String,
   ): FluentFuture<FeedLoaderResult> {
     return FluentFuture.from(
       this.exec.submit(
         Callable {
           this.fetchSynchronously(
-            accountId = account,
+            accountId = accountID,
             uri = uri,
-            auth = auth,
+            credentials = credentials,
             method = method
           )
         }
@@ -82,7 +82,7 @@ class FeedLoader private constructor(
   private fun fetchSynchronously(
     accountId: AccountID,
     uri: URI,
-    auth: LSHTTPAuthorizationType?,
+    credentials: AccountAuthenticationCredentials?,
     method: String
   ): FeedLoaderResult {
     try {
@@ -108,10 +108,10 @@ class FeedLoader private constructor(
        * Otherwise, parse the OPDS feed including any embedded search links.
        */
 
-      val opdsFeed =
-        this.transport.getStream(auth, uri, method).use { stream -> this.parser.parse(uri, stream) }
+      val opdsFeedResponse = this.transport.getStream(credentials, uri, method)
+      val opdsFeed = opdsFeedResponse.first.use { stream -> this.parser.parse(uri, stream) }
       val search =
-        this.fetchSearchLink(opdsFeed, auth, method)
+        this.fetchSearchLink(opdsFeed, credentials, method)
       val feed =
         Feed.fromAcquisitionFeed(
           accountId = accountId,
@@ -120,7 +120,7 @@ class FeedLoader private constructor(
           search = search
         )
 
-      return FeedLoaderSuccess(feed)
+      return FeedLoaderSuccess(feed, opdsFeedResponse.second)
     } catch (e: FeedHTTPTransportException) {
       this.log.error("feed transport exception: ", e)
 
@@ -190,12 +190,13 @@ class FeedLoader private constructor(
     return if (streamMaybe != null) {
       streamMaybe.use { stream ->
         FeedLoaderSuccess(
-          Feed.fromAcquisitionFeed(
+          feed = Feed.fromAcquisitionFeed(
             accountId = accountId,
             feed = this.parser.parse(uri, stream),
             search = null,
             filter = this::isEntrySupported
-          )
+          ),
+          accessToken = null
         )
       }
     } else {
@@ -226,25 +227,27 @@ class FeedLoader private constructor(
   ): FeedLoaderSuccess {
     return this.bundledContent.resolve(uri).use { stream ->
       FeedLoaderSuccess(
-        Feed.fromAcquisitionFeed(
+        feed = Feed.fromAcquisitionFeed(
           accountId = accountId,
           feed = this.parser.parse(uri, stream),
           filter = this::isEntrySupported,
           search = null
-        )
+        ),
+        accessToken = null
       )
     }
   }
 
   private fun fetchSearchLink(
     opdsFeed: OPDSAcquisitionFeed,
-    auth: LSHTTPAuthorizationType?,
+    credentials: AccountAuthenticationCredentials?,
     method: String
   ): OPDSOpenSearch1_1? {
     val searchLinkOpt = opdsFeed.feedSearchURI
     return if (searchLinkOpt is Some<OPDSSearchLink>) {
       val searchLink = searchLinkOpt.get()
-      this.transport.getStream(auth, searchLink.uri, method).use { stream ->
+      val response = this.transport.getStream(credentials, searchLink.uri, method)
+      response.first.use { stream ->
         return this.searchParser.parse(searchLink.uri, stream)
       }
     } else {
@@ -264,7 +267,7 @@ class FeedLoader private constructor(
       exec: ListeningExecutorService,
       parser: OPDSFeedParserType,
       searchParser: OPDSSearchParserType,
-      transport: OPDSFeedTransportType<LSHTTPAuthorizationType?>,
+      transport: OPDSFeedTransportType<AccountAuthenticationCredentials?>,
       bundledContent: BundledContentResolverType
     ): FeedLoaderType {
       return FeedLoader(

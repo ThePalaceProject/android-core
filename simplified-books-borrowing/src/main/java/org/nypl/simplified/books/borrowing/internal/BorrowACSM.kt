@@ -110,14 +110,18 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
           )
 
         when (val result = LSHTTPDownloads.download(downloadRequest)) {
-          DownloadCancelled ->
+          DownloadCancelled -> {
             throw BorrowSubtaskCancelled()
-          is DownloadFailedServer ->
+          }
+          is DownloadFailedServer -> {
             throw BorrowHTTP.onDownloadFailedServer(context, result)
-          is DownloadFailedUnacceptableMIME ->
+          }
+          is DownloadFailedUnacceptableMIME -> {
             throw BorrowSubtaskFailed()
-          is DownloadFailedExceptionally ->
+          }
+          is DownloadFailedExceptionally -> {
             throw BorrowHTTP.onDownloadFailedExceptionally(context, result)
+          }
           is DownloadCompletedSuccessfully -> {
             this.fulfillACSMFile(
               context = context,
@@ -144,7 +148,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
   ): RequiredCredentials {
     context.taskRecorder.beginNewStep("Checking for Adobe ACS credentials...")
 
-    val credentials = context.account.loginState.credentials
+    val credentials = context.credentialsStore.get(context.account.id)
     if (credentials == null) {
       context.taskRecorder.currentStepFailed(
         message = "The account has no credentials.",

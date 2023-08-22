@@ -90,17 +90,22 @@ internal class BServiceOpSyncOneAccount(
         )
 
         val bookmarkAnnotation = when (bookmark) {
-          is Bookmark.ReaderBookmark ->
+          is Bookmark.ReaderBookmark -> {
             BookmarkAnnotations.fromReaderBookmark(this.objectMapper, bookmark)
-          is Bookmark.AudiobookBookmark ->
+          }
+          is Bookmark.AudiobookBookmark -> {
             BookmarkAnnotations.fromAudiobookBookmark(this.objectMapper, bookmark)
-          is Bookmark.PDFBookmark ->
+          }
+          is Bookmark.PDFBookmark -> {
             BookmarkAnnotations.fromPdfBookmark(this.objectMapper, bookmark)
-          else ->
+          }
+          else -> {
             throw IllegalStateException("Unsupported bookmark type: $bookmark")
+          }
         }
 
         this.httpCalls.bookmarkAdd(
+          account = syncable.account,
           annotationsURI = syncable.annotationsURI,
           credentials = syncable.credentials,
           bookmark = bookmarkAnnotation
@@ -137,7 +142,11 @@ internal class BServiceOpSyncOneAccount(
 
     val bookmarks: List<Bookmark> =
       try {
-        val annotations = this.httpCalls.bookmarksGet(syncable.annotationsURI, syncable.credentials)
+        val annotations = this.httpCalls.bookmarksGet(
+          account = syncable.account,
+          annotationsURI = syncable.annotationsURI,
+          credentials = syncable.credentials
+        )
         annotations.mapNotNull(this::parseBookmarkOrNull)
       } catch (e: Exception) {
         this.logger.error(

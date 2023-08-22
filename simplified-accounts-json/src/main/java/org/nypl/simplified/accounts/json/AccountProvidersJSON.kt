@@ -14,9 +14,11 @@ import org.nypl.simplified.accounts.api.AccountProvider
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Anonymous
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Basic
+import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.BasicToken
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.COPPAAgeGate
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.ANONYMOUS_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.BASIC_TYPE
+import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.BASIC_TOKEN_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.COPPA_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.OAUTH_INTERMEDIARY_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.SAML_2_0_TYPE
@@ -145,6 +147,21 @@ object AccountProvidersJSON {
         val authObject = mapper.createObjectNode()
         authObject.put("type", BASIC_TYPE)
         this.putConditionally(authObject, "barcodeFormat", authentication.barcodeFormat?.toUpperCase(Locale.ROOT))
+        this.putConditionally(authObject, "description", authentication.description)
+        this.putConditionally(authObject, "keyboard", authentication.keyboard.name)
+        this.putConditionally(authObject, "passwordKeyboard", authentication.passwordKeyboard.name)
+        authObject.put("passwordMaximumLength", authentication.passwordMaximumLength)
+        authObject.set<ObjectNode>("labels", this.mapToObject(mapper, authentication.labels))
+        val logo = authentication.logoURI
+        if (logo != null) {
+          authObject.put("logo", logo.toString())
+        }
+        authObject
+      }
+      is BasicToken -> {
+        val authObject = mapper.createObjectNode()
+        authObject.put("type", BASIC_TOKEN_TYPE)
+        this.putConditionally(authObject, "barcodeFormat", authentication.barcodeFormat?.uppercase(Locale.ROOT))
         this.putConditionally(authObject, "description", authentication.description)
         this.putConditionally(authObject, "keyboard", authentication.keyboard.name)
         this.putConditionally(authObject, "passwordKeyboard", authentication.passwordKeyboard.name)

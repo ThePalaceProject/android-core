@@ -9,15 +9,18 @@ import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Anonymous
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Basic
+import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.BasicToken
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.COPPAAgeGate
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.OAuthWithIntermediary
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.SAML2_0
 import org.nypl.simplified.accounts.api.AccountUsername
-import org.nypl.simplified.ui.accounts.AccountAuthenticationViewBindings.ViewsForAnonymous
-import org.nypl.simplified.ui.accounts.AccountAuthenticationViewBindings.ViewsForBasic
-import org.nypl.simplified.ui.accounts.AccountAuthenticationViewBindings.ViewsForCOPPAAgeGate
-import org.nypl.simplified.ui.accounts.AccountAuthenticationViewBindings.ViewsForOAuthWithIntermediary
-import org.nypl.simplified.ui.accounts.AccountAuthenticationViewBindings.ViewsForSAML2_0
+import org.nypl.simplified.ui.accounts.view_bindings.AccountAuthenticationViewBindings
+import org.nypl.simplified.ui.accounts.view_bindings.ViewsForAnonymous
+import org.nypl.simplified.ui.accounts.view_bindings.ViewsForBasic
+import org.nypl.simplified.ui.accounts.view_bindings.ViewsForBasicToken
+import org.nypl.simplified.ui.accounts.view_bindings.ViewsForCOPPAAgeGate
+import org.nypl.simplified.ui.accounts.view_bindings.ViewsForOAuthWithIntermediary
+import org.nypl.simplified.ui.accounts.view_bindings.ViewsForSAML20
 
 /**
  * A class that handles the visibility for a set of overlapping views.
@@ -34,6 +37,12 @@ class AccountAuthenticationViews(
       onUsernamePasswordChangeListener = onUsernamePasswordChangeListener
     )
 
+  private val basicToken: ViewsForBasicToken =
+    ViewsForBasicToken.bind(
+      viewGroup = this.viewGroup.findViewById(R.id.authBasicToken),
+      onUsernamePasswordChangeListener = onUsernamePasswordChangeListener
+    )
+
   private val anonymous: ViewsForAnonymous =
     ViewsForAnonymous.bind(
       this.viewGroup.findViewById(R.id.authAnon)
@@ -42,8 +51,8 @@ class AccountAuthenticationViews(
     ViewsForOAuthWithIntermediary.bind(
       this.viewGroup.findViewById(R.id.authOAuthIntermediary)
     )
-  private val saml20: ViewsForSAML2_0 =
-    ViewsForSAML2_0.bind(
+  private val saml20: ViewsForSAML20 =
+    ViewsForSAML20.bind(
       this.viewGroup.findViewById(R.id.authSAML)
     )
   private val coppa: ViewsForCOPPAAgeGate =
@@ -54,6 +63,7 @@ class AccountAuthenticationViews(
   private val viewGroups =
     listOf<AccountAuthenticationViewBindings>(
       this.basic,
+      this.basicToken,
       this.anonymous,
       this.oAuthWithIntermediary,
       this.saml20,
@@ -141,8 +151,15 @@ class AccountAuthenticationViews(
         this.basic.viewGroup.visibility = VISIBLE
         this.basic.configureFor(description)
       }
-      is OAuthWithIntermediary ->
+      is BasicToken -> {
+        this.basicToken.viewGroup.visibility = VISIBLE
+        this.basicToken.configureFor(description)
+        this.basicToken.user.setText("01230000000027")
+        this.basicToken.pass.setText("WM9FxT7r")
+      }
+      is OAuthWithIntermediary -> {
         this.oAuthWithIntermediary.viewGroup.visibility = VISIBLE
+      }
       Anonymous ->
         this.anonymous.viewGroup.visibility = VISIBLE
       is SAML2_0 -> {
@@ -169,14 +186,15 @@ class AccountAuthenticationViews(
 
   fun isSatisfiedFor(description: AccountProviderAuthenticationDescription): Boolean {
     return when (description) {
-      is COPPAAgeGate ->
-        true
-      is Basic ->
+      is Basic -> {
         this.basic.isSatisfied(description)
-      is OAuthWithIntermediary ->
-        true
-      Anonymous ->
-        true
+      }
+      is BasicToken -> {
+        this.basicToken.isSatisfied(description)
+      }
+      is COPPAAgeGate,
+      is OAuthWithIntermediary,
+      Anonymous,
       is SAML2_0 ->
         true
     }
@@ -210,5 +228,21 @@ class AccountAuthenticationViews(
 
   fun getBasicUser(): AccountUsername {
     return this.basic.getUser()
+  }
+
+  /**
+   * @return The current Basic authentication password
+   */
+
+  fun getBasicTokenPassword(): AccountPassword {
+    return this.basicToken.getPassword()
+  }
+
+  /**
+   * @return The current Basic authentication username
+   */
+
+  fun getBasicTokenUser(): AccountUsername {
+    return this.basicToken.getUser()
   }
 }

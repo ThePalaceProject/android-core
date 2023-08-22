@@ -33,7 +33,8 @@ internal class BServiceOpCreateRemoteBookmark(
         this.bookmark.bookmarkId.value
       )
 
-      val syncInfo = BSyncableAccount.ofAccount(this.profile.account(this.accountID))
+      val account = this.profile.account(this.accountID)
+      val syncInfo = BSyncableAccount.ofAccount(account)
       if (syncInfo == null) {
         this.logger.debug(
           "[{}]: cannot remotely send bookmark {} because the account is not syncable",
@@ -59,6 +60,7 @@ internal class BServiceOpCreateRemoteBookmark(
       }
 
       val bookmarkUri = this.httpCalls.bookmarkAdd(
+        account = account,
         annotationsURI = syncInfo.annotationsURI,
         credentials = syncInfo.credentials,
         bookmark = bookmarkAnnotation

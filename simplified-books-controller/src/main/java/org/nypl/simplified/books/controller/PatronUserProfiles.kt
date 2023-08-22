@@ -5,6 +5,8 @@ import com.io7m.jfunctional.Some
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPResponseStatus
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addCredentialsToProperties
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.getAccessToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.parser.api.ParseError
@@ -45,29 +47,40 @@ internal object PatronUserProfiles {
     val request =
       http.newRequest(patronSettingsURI)
         .setAuthorization(AccountAuthenticatedHTTP.createAuthorization(credentials))
+        .addCredentialsToProperties(credentials)
         .build()
 
     val response = request.execute()
     return when (val status = response.status) {
-      is LSHTTPResponseStatus.Responded.OK ->
+      is LSHTTPResponseStatus.Responded.OK -> {
+        account.updateCredentialsIfAvailable { currentCredentials ->
+          if (currentCredentials is AccountAuthenticationCredentials.BasicToken) {
+            currentCredentials.updateAccessToken(status.getAccessToken())
+          } else {
+            currentCredentials
+          }
+        }
         this.onPatronProfileRequestOK(
           taskRecorder = taskRecorder,
           patronSettingsURI = patronSettingsURI,
           patronParsers = patronParsers,
           stream = status.bodyStream ?: ByteArrayInputStream(ByteArray(0))
         )
-      is LSHTTPResponseStatus.Responded.Error ->
+      }
+      is LSHTTPResponseStatus.Responded.Error -> {
         this.onPatronProfileRequestHTTPError(
           taskRecorder = taskRecorder,
           patronSettingsURI = patronSettingsURI,
           result = status
         )
-      is LSHTTPResponseStatus.Failed ->
+      }
+      is LSHTTPResponseStatus.Failed -> {
         this.onPatronProfileRequestHTTPException(
           taskRecorder = taskRecorder,
           patronSettingsURI = patronSettingsURI,
           result = status
         )
+      }
     }
   }
 

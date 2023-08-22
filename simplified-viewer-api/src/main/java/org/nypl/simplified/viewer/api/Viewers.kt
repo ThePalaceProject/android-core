@@ -3,6 +3,7 @@ package org.nypl.simplified.viewer.api
 import android.app.Activity
 import org.joda.time.LocalDateTime
 import org.librarysimplified.services.api.Services
+import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.analytics.api.AnalyticsEvent
 import org.nypl.simplified.analytics.api.AnalyticsType
 import org.nypl.simplified.books.api.Book
@@ -78,7 +79,16 @@ object Viewers {
             accountProvider = account.provider.id,
             accountUUID = account.id.uuid,
             opdsEntry = book.entry,
-            targetURI = book.entry.analytics.getOrNull()
+            targetURI = book.entry.analytics.getOrNull(),
+            onAccessTokenUpdated = { accessToken ->
+              account.updateCredentialsIfAvailable { currentCredentials ->
+                if (currentCredentials is AccountAuthenticationCredentials.BasicToken) {
+                  currentCredentials.updateAccessToken(accessToken)
+                } else {
+                  currentCredentials
+                }
+              }
+            }
           )
         )
 

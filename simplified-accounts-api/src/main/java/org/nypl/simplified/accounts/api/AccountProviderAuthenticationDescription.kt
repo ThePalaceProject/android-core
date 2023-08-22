@@ -47,6 +47,13 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
 
     const val SAML_2_0_TYPE =
       "http://librarysimplified.org/authtype/SAML-2.0"
+
+    /**
+     * The type used to identify basic token.
+     */
+
+    const val BASIC_TOKEN_TYPE =
+      "http://thepalaceproject.org/authtype/basic-token"
   }
 
   /**
@@ -60,6 +67,11 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
    */
 
   abstract val description: String
+
+  /**
+   * If the authentication can be used as an alternative
+   */
+  abstract val canBeAlternativeLoginMethod: Boolean
 
   /**
    * A COPPA age gate that redirects users that are thirteen or older to one URI, and under 13s
@@ -86,6 +98,9 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
         "URIs ${this.greaterEqual13} and ${this.under13} must differ"
       )
     }
+
+    override val canBeAlternativeLoginMethod: Boolean =
+      false
 
     override val isLoginPossible: Boolean =
       false
@@ -184,6 +199,83 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
     override val isLoginPossible: Boolean =
       true
 
+    override val canBeAlternativeLoginMethod: Boolean =
+      false
+
+    init {
+      Preconditions.checkArgument(
+        this.barcodeFormat?.all { c -> c.isUpperCase() || c.isWhitespace() } ?: true,
+        "Barcode format ${this.barcodeFormat} must be uppercase"
+      )
+    }
+  }
+
+  /**
+   * Basic token authentication is required.
+   */
+
+  data class BasicToken(
+    override val description: String,
+
+    /**
+     * The barcode format, if specified, such as "CODABAR". If this is unspecified, then
+     * barcode scanning and displaying is not supported.
+     */
+
+    val barcodeFormat: String?,
+
+    /**
+     * The keyboard type used for barcode entry, such as "DEFAULT".
+     *
+     * Note: If the keyboard extension is missing or null, the value assumed should be DEFAULT, not NO_INPUT.
+     */
+
+    val keyboard: KeyboardInput,
+
+    /**
+     * The maximum length of the password.
+     */
+
+    val passwordMaximumLength: Int,
+
+    /**
+     * The keyboard type used for password entry, such as "DEFAULT".
+     *
+     * Note: If the keyboard extension is missing or null, the value assumed should be DEFAULT, not NO_INPUT.
+     */
+
+    val passwordKeyboard: KeyboardInput,
+
+    /**
+     * The labels that should be used for login forms. This is typically a map such as:
+     *
+     * ```
+     * "login" -> "Barcode"
+     * "password" -> "PIN"
+     * ```
+     */
+
+    val labels: Map<String, String>,
+
+    /**
+     * The URI of the authentication logo.
+     */
+
+    val logoURI: URI?,
+
+    /**
+     * The authentication URI.
+     */
+
+    val authenticationURI: URI
+  ) : AccountProviderAuthenticationDescription() {
+
+    override val isLoginPossible: Boolean =
+      true
+
+    override val canBeAlternativeLoginMethod: Boolean =
+      false
+
     init {
       Preconditions.checkArgument(
         this.barcodeFormat?.all { c -> c.isUpperCase() || c.isWhitespace() } ?: true,
@@ -211,7 +303,11 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
 
     val logoURI: URI?
   ) : AccountProviderAuthenticationDescription() {
+
     override val isLoginPossible: Boolean =
+      true
+
+    override val canBeAlternativeLoginMethod: Boolean =
       true
   }
 
@@ -224,6 +320,8 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
       false
     override val description: String =
       ANONYMOUS_TYPE
+    override val canBeAlternativeLoginMethod: Boolean =
+      false
   }
 
   /**
@@ -247,5 +345,8 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
   ) : AccountProviderAuthenticationDescription() {
     override val isLoginPossible: Boolean =
       true
+
+    override val canBeAlternativeLoginMethod: Boolean =
+      false
   }
 }

@@ -12,7 +12,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
 import org.joda.time.DateTime
 import org.joda.time.LocalDateTime
-import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
+import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.accounts.api.AccountEventCreation
 import org.nypl.simplified.accounts.api.AccountEventDeletion
@@ -22,6 +22,7 @@ import org.nypl.simplified.accounts.api.AccountLoginState
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.api.AccountReadableType
+import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.analytics.api.AnalyticsEvent
 import org.nypl.simplified.analytics.api.AnalyticsType
 import org.nypl.simplified.books.api.Book
@@ -360,11 +361,15 @@ class CatalogFeedViewModel(
             }.size
           )
         }
-        FeedLoaderResult.FeedLoaderSuccess(feed) as FeedLoaderResult
+        FeedLoaderResult.FeedLoaderSuccess(
+          feed = feed,
+          accessToken = null
+        ) as FeedLoaderResult
       }
       .onAnyError { ex -> FeedLoaderResult.wrapException(booksUri, ex) }
 
     this.createNewStatus(
+      account = null,
       arguments = arguments,
       future = future
     )
@@ -398,18 +403,17 @@ class CatalogFeedViewModel(
 
     val loginState =
       account.loginState
-    val authentication =
-      AccountAuthenticatedHTTP.createAuthorizationIfPresent(loginState.credentials)
 
     val future =
       this.feedLoader.fetchURI(
-        account = account.id,
+        accountID = account.id,
         uri = arguments.feedURI,
-        auth = authentication,
+        credentials = loginState.credentials,
         method = "GET"
       )
 
     this.createNewStatus(
+      account = account,
       arguments = arguments,
       future = future
     )
@@ -429,6 +433,7 @@ class CatalogFeedViewModel(
    */
 
   private fun createNewStatus(
+    account: AccountType?,
     arguments: CatalogFeedArguments,
     future: FluentFuture<FeedLoaderResult>
   ) {
@@ -442,9 +447,26 @@ class CatalogFeedViewModel(
      */
 
     future.map { feedLoaderResult ->
+      updateBasicTokenCredentials(feedLoaderResult, account)
+
       synchronized(loaderResults) {
         val resultWithArguments = LoaderResultWithArguments(arguments, feedLoaderResult)
         this.loaderResults.onNext(resultWithArguments)
+      }
+    }
+  }
+
+  private fun updateBasicTokenCredentials(
+    feedLoaderResult: FeedLoaderResult,
+    account: AccountType?
+  ) {
+    if (feedLoaderResult is FeedLoaderResult.FeedLoaderSuccess) {
+      account?.updateCredentialsIfAvailable { currentCredentials ->
+        if (currentCredentials is AccountAuthenticationCredentials.BasicToken) {
+          currentCredentials.updateAccessToken(feedLoaderResult.accessToken)
+        } else {
+          currentCredentials
+        }
       }
     }
   }

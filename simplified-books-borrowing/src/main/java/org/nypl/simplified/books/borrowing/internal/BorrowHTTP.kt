@@ -3,9 +3,6 @@ package org.nypl.simplified.books.borrowing.internal
 import com.io7m.junreachable.UnreachableCodeException
 import one.irradia.mime.api.MIMECompatibility
 import one.irradia.mime.api.MIMEType
-import org.librarysimplified.http.api.LSHTTPAuthorizationBasic
-import org.librarysimplified.http.api.LSHTTPAuthorizationBearerToken
-import org.librarysimplified.http.api.LSHTTPAuthorizationType
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType.AllowRedirects.ALLOW_UNSAFE_REDIRECTS
 import org.librarysimplified.http.api.LSHTTPRequestProperties
 import org.librarysimplified.http.downloads.LSHTTPDownloadRequest
@@ -18,15 +15,9 @@ import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadRe
 import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedServer
 import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedUnacceptableMIME
 import org.librarysimplified.http.downloads.LSHTTPDownloads
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addCredentialsToProperties
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
-import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggedIn
-import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggingIn
-import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggingInWaitingForExternalAuthentication
-import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggingOut
-import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoginFailed
-import org.nypl.simplified.accounts.api.AccountLoginState.AccountLogoutFailed
-import org.nypl.simplified.accounts.api.AccountLoginState.AccountNotLoggedIn
-import org.nypl.simplified.accounts.api.AccountReadableType
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle
 import org.nypl.simplified.books.borrowing.BorrowContextType
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException
@@ -45,6 +36,8 @@ object BorrowHTTP {
    * Events will be delivered to the given borrow context.
    */
 
+  private var old = true
+
   fun createDownloadRequest(
     context: BorrowContextType,
     target: URI,
@@ -52,9 +45,15 @@ object BorrowHTTP {
     requestModifier: ((LSHTTPRequestProperties) -> LSHTTPRequestProperties)? = null,
     expectedTypes: Set<MIMEType> = hashSetOf(context.currentAcquisitionPathElement.mimeType)
   ): LSHTTPDownloadRequest {
+    val credentials = context.account.loginState.credentials
+
+    val auth =
+      AccountAuthenticatedHTTP.createAuthorizationIfPresent(credentials)
+
     val request =
       context.httpClient.newRequest(target)
-        .setAuthorization(authorizationOf(context.account))
+        .setAuthorization(auth)
+        .addCredentialsToProperties(credentials)
         .allowRedirects(ALLOW_UNSAFE_REDIRECTS)
         .apply {
           if (requestModifier != null) {
@@ -77,37 +76,6 @@ object BorrowHTTP {
       },
       clock = context.clock
     )
-  }
-
-  /**
-   * Create HTTP authorization values for the given account.
-   */
-
-  fun authorizationOf(
-    account: AccountReadableType
-  ): LSHTTPAuthorizationType? {
-    return when (val state = account.loginState) {
-      is AccountLoggedIn -> {
-        when (val creds = state.credentials) {
-          is AccountAuthenticationCredentials.Basic ->
-            LSHTTPAuthorizationBasic.ofUsernamePassword(
-              userName = creds.userName.value,
-              password = creds.password.value
-            )
-          is AccountAuthenticationCredentials.OAuthWithIntermediary ->
-            LSHTTPAuthorizationBearerToken.ofToken(creds.accessToken)
-          is AccountAuthenticationCredentials.SAML2_0 ->
-            LSHTTPAuthorizationBearerToken.ofToken(creds.accessToken)
-        }
-      }
-      AccountNotLoggedIn,
-      is AccountLoggingIn,
-      is AccountLoggingInWaitingForExternalAuthentication,
-      is AccountLoginFailed,
-      is AccountLoggingOut,
-      is AccountLogoutFailed ->
-        null
-    }
   }
 
   /**
@@ -208,6 +176,14 @@ object BorrowHTTP {
   ) {
     when (event) {
       is DownloadReceiving -> {
+        context.account.updateCredentialsIfAvailable { currentCredentials ->
+          if (currentCredentials is AccountAuthenticationCredentials.BasicToken) {
+            currentCredentials.updateAccessToken(event.accessToken)
+          } else {
+            currentCredentials
+          }
+        }
+
         context.bookDownloadIsRunning(
           message = this.downloadingMessage(
             expectedSize = event.expectedSize,

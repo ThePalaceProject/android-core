@@ -301,11 +301,9 @@ class TimeTrackingService(
             timeEntry.isValidTimeEntry()
           }
         ),
-        credentials = profilesController
+        account = profilesController
           .profileCurrent()
           .account(AccountID(UUID.fromString(timeTrackingInfo.accountId)))
-          .loginState
-          .credentials
       )
     } catch (exception: Exception) {
 

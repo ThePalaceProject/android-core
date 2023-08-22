@@ -38,6 +38,7 @@ internal class BServiceOpEnableSync(
 
     try {
       this.httpCalls.syncingEnable(
+        account = this.syncableAccount.account,
         settingsURI = this.syncableAccount.settingsURI,
         credentials = this.syncableAccount.credentials,
         enabled = this.enable

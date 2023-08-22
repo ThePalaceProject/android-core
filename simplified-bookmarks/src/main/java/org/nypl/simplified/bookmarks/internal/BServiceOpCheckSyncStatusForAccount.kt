@@ -43,7 +43,12 @@ internal class BServiceOpCheckSyncStatusForAccount(
         account.account.id
       )
 
-      if (this.httpCalls.syncingIsEnabled(account.settingsURI, account.credentials)) {
+      if (this.httpCalls.syncingIsEnabled(
+          account.account,
+          account.settingsURI,
+          account.credentials
+        )
+      ) {
         this.logger.debug(
           "[{}]: account {} has syncing enabled",
           profile.id.uuid,

@@ -4,6 +4,8 @@ import com.io7m.jfunctional.Some
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPResponseStatus
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addCredentialsToProperties
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.getAccessToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountLoginState
@@ -88,12 +90,18 @@ class BookSyncTask(
     val request =
       this.http.newRequest(loansURI)
         .setAuthorization(AccountAuthenticatedHTTP.createAuthorization(credentials))
+        .addCredentialsToProperties(credentials)
         .build()
 
     val response = request.execute()
     return when (val status = response.status) {
       is LSHTTPResponseStatus.Responded.OK -> {
-        this.onHTTPOK(status.bodyStream ?: ByteArrayInputStream(ByteArray(0)), provider, account)
+        this.onHTTPOK(
+          stream = status.bodyStream ?: ByteArrayInputStream(ByteArray(0)),
+          provider = provider,
+          account = account,
+          accessToken = status.getAccessToken()
+        )
         this.taskRecorder.finishSuccess(Unit)
       }
       is LSHTTPResponseStatus.Responded.Error -> {
@@ -146,6 +154,8 @@ class BookSyncTask(
     return when (currentCredentials) {
       is AccountAuthenticationCredentials.Basic ->
         currentCredentials.copy(annotationsURI = profile.annotationsURI)
+      is AccountAuthenticationCredentials.BasicToken ->
+        currentCredentials.copy(annotationsURI = profile.annotationsURI)
       is AccountAuthenticationCredentials.OAuthWithIntermediary ->
         currentCredentials.copy(annotationsURI = profile.annotationsURI)
       is AccountAuthenticationCredentials.SAML2_0 ->
@@ -195,9 +205,17 @@ class BookSyncTask(
   private fun onHTTPOK(
     stream: InputStream,
     provider: AccountProviderType,
-    account: AccountType
+    account: AccountType,
+    accessToken: String?
   ) {
-    return stream.use { ok ->
+    account.updateCredentialsIfAvailable { currentCredentials ->
+      if (currentCredentials is AccountAuthenticationCredentials.BasicToken) {
+        currentCredentials.updateAccessToken(accessToken)
+      } else {
+        currentCredentials
+      }
+    }
+    stream.use { ok ->
       this.parseFeed(ok, provider, account)
     }
   }
@@ -292,7 +310,6 @@ class BookSyncTask(
           accountID = this.accountID,
           uri = alternate,
           timeout = Pair(30L, TimeUnit.SECONDS),
-          httpAuth = null,
           method = "GET"
         )
 

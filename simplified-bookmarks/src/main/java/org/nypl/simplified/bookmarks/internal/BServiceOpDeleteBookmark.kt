@@ -49,7 +49,8 @@ internal class BServiceOpDeleteBookmark(
         return false
       }
 
-      val syncInfo = BSyncableAccount.ofAccount(this.profile.account(this.accountID))
+      val account = this.profile.account(this.accountID)
+      val syncInfo = BSyncableAccount.ofAccount(account)
       if (syncInfo == null) {
         this.logger.debug(
           "[{}]: cannot remotely delete bookmark {} because the account is not syncable",
@@ -60,6 +61,7 @@ internal class BServiceOpDeleteBookmark(
       }
 
       this.httpCalls.bookmarkDelete(
+        account = account,
         bookmarkURI = bookmarkURI,
         credentials = syncInfo.credentials
       )

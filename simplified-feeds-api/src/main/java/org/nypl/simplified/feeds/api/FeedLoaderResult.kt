@@ -16,7 +16,8 @@ sealed class FeedLoaderResult {
    */
 
   data class FeedLoaderSuccess(
-    val feed: Feed
+    val feed: Feed,
+    val accessToken: String?
   ) : FeedLoaderResult()
 
   /**
