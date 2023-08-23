@@ -9,6 +9,8 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.app.TxContextWrappingDelegate
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import io.reactivex.disposables.Disposable
@@ -51,10 +53,8 @@ import org.nypl.simplified.analytics.api.AnalyticsType
 import org.nypl.simplified.bookmarks.api.BookmarkServiceType
 import org.nypl.simplified.books.api.BookContentProtections
 import org.nypl.simplified.books.api.BookDRMInformation
-import org.nypl.simplified.books.api.bookmark.Bookmark
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.futures.FluentFutureExtensions.map
-import org.nypl.simplified.futures.FluentFutureExtensions.mapNullable
 import org.nypl.simplified.futures.FluentFutureExtensions.onAnyError
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.thread.api.UIThreadServiceType
@@ -123,6 +123,14 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
   private var controller: SR2ControllerType? = null
   private var controllerSubscription: Disposable? = null
   private var viewSubscription: Disposable? = null
+
+  private val appCompatDelegate: TxContextWrappingDelegate by lazy {
+    TxContextWrappingDelegate(super.getDelegate())
+  }
+
+  override fun getDelegate(): AppCompatDelegate {
+    return this.appCompatDelegate
+  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     this.logger.debug(
@@ -444,13 +452,17 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
           BookmarkKind.BookmarkLastReadLocation -> Unit
         }
 
-        bookmarkService.bookmarkCreateRemote(
+        this.bookmarkService.bookmarkCreate(
           accountID = parameters.accountId,
-          bookmark = localBookmark
-        ).onAnyError { localBookmark }
-          .mapNullable { possiblyRemoteBookmark ->
-            onBookmarkWasCreated(possiblyRemoteBookmark ?: localBookmark, event)
+          bookmark = localBookmark,
+          ignoreRemoteFailures = true
+        ).map { createdBookmark ->
+          event.onBookmarkCreationCompleted(Reader2Bookmarks.toSR2Bookmark(createdBookmark))
+          when (createdBookmark.kind) {
+            BookmarkKind.BookmarkExplicit -> showToastMessage(R.string.reader_bookmark_added)
+            BookmarkKind.BookmarkLastReadLocation -> Unit
           }
+        }
       }
 
       is SR2Event.SR2BookmarkEvent.SR2BookmarkTryToDelete -> {
@@ -463,11 +475,13 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
         bookmarkService.bookmarkDelete(
           accountID = account.id,
-          bookmark = bookmark
-        ).onAnyError { false }
-          .map { wasDeleted ->
-            event.onDeleteOperationFinished(wasDeleted)
-          }
+          bookmark = bookmark,
+          ignoreRemoteFailures = true
+        ).map {
+          event.onDeleteOperationFinished(true)
+        }.onAnyError {
+          event.onDeleteOperationFinished(false)
+        }
       }
 
       is SR2Event.SR2ThemeChanged -> {
@@ -496,22 +510,6 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       is SR2CommandExecutionFailed -> {
         // Nothing
       }
-    }
-  }
-
-  private fun onBookmarkWasCreated(
-    bookmark: Bookmark,
-    event: SR2Event.SR2BookmarkEvent.SR2BookmarkCreate
-  ) {
-    this.bookmarkService.bookmarkCreateLocal(
-      accountID = this.parameters.accountId,
-      bookmark = bookmark
-    )
-    event.onBookmarkCreationCompleted(Reader2Bookmarks.toSR2Bookmark(bookmark))
-
-    return when (bookmark.kind) {
-      BookmarkKind.BookmarkExplicit -> showToastMessage(R.string.reader_bookmark_added)
-      BookmarkKind.BookmarkLastReadLocation -> Unit
     }
   }
 

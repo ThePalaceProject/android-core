@@ -43,6 +43,7 @@ class MainApplication : Application() {
     this.configureHttpCache()
     this.configureStrictMode()
     this.logStartup()
+    MainTransifex.configure(this.applicationContext)
     this.boot.start(this)
     INSTANCE = this
   }

@@ -91,5 +91,6 @@ dependencies {
   api libs.rxjava2.extensions
   api libs.slf4j
 
+  implementation libs.transifex.sdk
   implementation libs.firebase.dynamic.links
 }

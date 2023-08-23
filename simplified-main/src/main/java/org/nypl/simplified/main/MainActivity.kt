@@ -5,6 +5,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.app.TxContextWrappingDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commit
@@ -54,6 +56,10 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
   private val logger = LoggerFactory.getLogger(MainActivity::class.java)
   private val listenerRepo: ListenerRepository<MainActivityListenedEvent, Unit> by listenerRepositories()
+
+  private val appCompatDelegate: TxContextWrappingDelegate by lazy {
+    TxContextWrappingDelegate(super.getDelegate())
+  }
 
   private val defaultViewModelFactory: ViewModelProvider.Factory by lazy {
     MainActivityDefaultViewModelFactory(super.getDefaultViewModelProviderFactory())
@@ -158,6 +164,10 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
   override fun getDefaultViewModelProviderFactory(): ViewModelProvider.Factory {
     return this.defaultViewModelFactory
+  }
+
+  override fun getDelegate(): AppCompatDelegate {
+    return this.appCompatDelegate
   }
 
   override fun onSaveInstanceState(outState: Bundle) {

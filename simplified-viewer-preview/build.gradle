@@ -14,4 +14,5 @@ dependencies {
   implementation libs.palace.readium2.views
   implementation libs.rxandroid2
   implementation libs.rxjava2
+  implementation libs.transifex.sdk
 }

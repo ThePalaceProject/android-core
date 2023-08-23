@@ -19,13 +19,13 @@ internal class BServiceOpCreateRemoteBookmark(
   private val profile: ProfileReadableType,
   private val accountID: AccountID,
   private val bookmark: Bookmark
-) : BServiceOp<Bookmark?>(logger) {
+) : BServiceOp<Bookmark>(logger) {
 
-  override fun runActual(): Bookmark? {
+  override fun runActual(): Bookmark {
     return this.remotelySendBookmark()
   }
 
-  private fun remotelySendBookmark(): Bookmark? {
+  private fun remotelySendBookmark(): Bookmark {
     return try {
       this.logger.debug(
         "[{}]: remote sending bookmark {}",
@@ -41,7 +41,7 @@ internal class BServiceOpCreateRemoteBookmark(
           this.profile.id.uuid,
           this.bookmark.bookmarkId.value
         )
-        return null
+        return this.bookmark
       }
 
       val bookmarkAnnotation = when (this.bookmark) {
@@ -64,7 +64,7 @@ internal class BServiceOpCreateRemoteBookmark(
         annotationsURI = syncInfo.annotationsURI,
         credentials = syncInfo.credentials,
         bookmark = bookmarkAnnotation
-      ) ?: return null
+      ) ?: throw IllegalStateException("Server HTTP call failed")
 
       when (this.bookmark) {
         is Bookmark.ReaderBookmark -> {
@@ -88,7 +88,7 @@ internal class BServiceOpCreateRemoteBookmark(
       }
     } catch (e: Exception) {
       this.logger.error("error sending bookmark: ", e)
-      null
+      throw e
     }
   }
 }
