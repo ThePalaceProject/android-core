@@ -154,14 +154,13 @@ class AccountAuthenticationViews(
       is BasicToken -> {
         this.basicToken.viewGroup.visibility = VISIBLE
         this.basicToken.configureFor(description)
-        this.basicToken.user.setText("01230000000027")
-        this.basicToken.pass.setText("WM9FxT7r")
       }
       is OAuthWithIntermediary -> {
         this.oAuthWithIntermediary.viewGroup.visibility = VISIBLE
       }
-      Anonymous ->
+      Anonymous -> {
         this.anonymous.viewGroup.visibility = VISIBLE
+      }
       is SAML2_0 -> {
         this.saml20.viewGroup.visibility = VISIBLE
         this.saml20.configureFor(description)

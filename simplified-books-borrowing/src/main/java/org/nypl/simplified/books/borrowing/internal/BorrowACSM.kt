@@ -148,7 +148,8 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
   ): RequiredCredentials {
     context.taskRecorder.beginNewStep("Checking for Adobe ACS credentials...")
 
-    val credentials = context.credentialsStore.get(context.account.id)
+    val credentials = context.account.loginState.credentials
+
     if (credentials == null) {
       context.taskRecorder.currentStepFailed(
         message = "The account has no credentials.",
