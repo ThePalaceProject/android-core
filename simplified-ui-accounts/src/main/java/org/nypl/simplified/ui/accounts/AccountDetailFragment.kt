@@ -818,7 +818,14 @@ class AccountDetailFragment : Fragment(R.layout.account) {
               password = creds.password.value
             )
           }
-          is AccountAuthenticationCredentials.OAuthWithIntermediary -> {
+          is AccountAuthenticationCredentials.BasicToken -> {
+            this.authenticationViews.setBasicTokenUserAndPass(
+              user = creds.userName.value,
+              password = creds.password.value
+            )
+          }
+          is AccountAuthenticationCredentials.OAuthWithIntermediary,
+          is AccountAuthenticationCredentials.SAML2_0 -> {
             // Nothing
           }
         }
@@ -843,7 +850,14 @@ class AccountDetailFragment : Fragment(R.layout.account) {
               password = creds.password.value
             )
           }
-          is AccountAuthenticationCredentials.OAuthWithIntermediary -> {
+          is AccountAuthenticationCredentials.BasicToken -> {
+            this.authenticationViews.setBasicTokenUserAndPass(
+              user = creds.userName.value,
+              password = creds.password.value
+            )
+          }
+          is AccountAuthenticationCredentials.OAuthWithIntermediary,
+          is AccountAuthenticationCredentials.SAML2_0 -> {
             // No UI
           }
         }
@@ -864,7 +878,14 @@ class AccountDetailFragment : Fragment(R.layout.account) {
               password = creds.password.value
             )
           }
-          is AccountAuthenticationCredentials.OAuthWithIntermediary -> {
+          is AccountAuthenticationCredentials.BasicToken -> {
+            this.authenticationViews.setBasicTokenUserAndPass(
+              user = creds.userName.value,
+              password = creds.password.value
+            )
+          }
+          is AccountAuthenticationCredentials.OAuthWithIntermediary,
+          is AccountAuthenticationCredentials.SAML2_0 -> {
             // No UI
           }
         }
@@ -1150,25 +1171,29 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   private fun openCardCreatorWebView() {
     val cardCreatorURI = this.viewModel.account.provider.cardCreatorURI
 
-    fusedLocationClient.lastLocation
-      .addOnSuccessListener { location ->
-        if (location != null) {
-          listener.post(
-            AccountDetailEvent.OpenWebView(
-              AccountCardCreatorParameters(
-                url = cardCreatorURI.toString(),
-                lat = location.latitude,
-                long = location.longitude
+    try {
+      fusedLocationClient.lastLocation
+        .addOnSuccessListener { location ->
+          if (location != null) {
+            listener.post(
+              AccountDetailEvent.OpenWebView(
+                AccountCardCreatorParameters(
+                  url = cardCreatorURI.toString(),
+                  lat = location.latitude,
+                  long = location.longitude
+                )
               )
             )
-          )
-        } else {
+          } else {
+            showErrorGettingLocationDialog()
+          }
+        }
+        .addOnFailureListener {
           showErrorGettingLocationDialog()
         }
-      }
-      .addOnFailureListener {
-        showErrorGettingLocationDialog()
-      }
+    } catch (exception: SecurityException) {
+      this.logger.error("Error handling fusedLocationClient permissions")
+    }
   }
 
   private fun showErrorGettingLocationDialog() {

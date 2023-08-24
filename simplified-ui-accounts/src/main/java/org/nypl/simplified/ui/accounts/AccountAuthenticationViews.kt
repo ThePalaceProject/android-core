@@ -178,6 +178,16 @@ class AccountAuthenticationViews(
     )
   }
 
+  fun setBasicTokenUserAndPass(
+    user: String,
+    password: String
+  ) {
+    this.basicToken.setUserAndPass(
+      user = user,
+      password = password
+    )
+  }
+
   /**
    * @return `true` if the views have all of the information required to attempt a login for the
    * given authentication description.
