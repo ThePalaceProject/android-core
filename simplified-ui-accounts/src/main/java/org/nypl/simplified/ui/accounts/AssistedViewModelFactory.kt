@@ -23,7 +23,7 @@ class AssistedViewModelFactory<T : ViewModel>(
     key: String,
     modelClass: Class<T>,
     handle: SavedStateHandle
-  ): T & Any = creator(handle) as (T & Any)
+  ): (T & Any) = creator(handle) as (T & Any)
 }
 
 /**

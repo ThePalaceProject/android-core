@@ -21,7 +21,7 @@ class CatalogSAML20ViewModelFactory(
   private val webViewDataDir: File
 ) : ViewModelProvider.Factory {
 
-  override fun <T : ViewModel?> create(modelClass: Class<T>): T & Any {
+  override fun <T : ViewModel?> create(modelClass: Class<T>): (T & Any) {
     if (modelClass == CatalogSAML20ViewModel::class.java) {
       val profilesController =
         services.requireService(ProfilesControllerType::class.java)

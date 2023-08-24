@@ -9,7 +9,7 @@ class CardCreatorViewModelFactory(
 ) : ViewModelProvider.Factory {
 
   @Suppress("UNCHECKED_CAST")
-  override fun <T : ViewModel?> create(modelClass: Class<T>): T & Any {
+  override fun <T : ViewModel?> create(modelClass: Class<T>): (T & Any) {
     return when (modelClass) {
       CardCreatorViewModel::class.java -> {
         CardCreatorViewModel(cardCreatorService) as (T & Any)
