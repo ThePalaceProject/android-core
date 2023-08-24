@@ -9,13 +9,13 @@ class AnnouncementsViewModelFactory(
   private val services: ServiceDirectoryType
 ) : ViewModelProvider.Factory {
 
-  override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+  override fun <T : ViewModel?> create(modelClass: Class<T>): T & Any {
     return when {
       modelClass.isAssignableFrom(AnnouncementsViewModel::class.java) -> {
         val profilesController: ProfilesControllerType =
           this.services.requireService(ProfilesControllerType::class.java)
 
-        AnnouncementsViewModel(profilesController) as T
+        AnnouncementsViewModel(profilesController) as (T & Any)
       }
       else ->
         throw IllegalArgumentException(

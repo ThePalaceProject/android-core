@@ -429,15 +429,18 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   private fun instantiateAlternativeAuthenticationViews() {
     for (alternative in this.viewModel.account.provider.authenticationAlternatives) {
       when (alternative) {
-        is AccountProviderAuthenticationDescription.COPPAAgeGate ->
+        is AccountProviderAuthenticationDescription.COPPAAgeGate -> {
           this.logger.warn("COPPA age gate is not currently supported as an alternative.")
-        is AccountProviderAuthenticationDescription.Basic ->
+        }
+        is AccountProviderAuthenticationDescription.Basic -> {
           this.logger.warn("Basic authentication is not currently supported as an alternative.")
-        AccountProviderAuthenticationDescription.Anonymous ->
+        }
+        AccountProviderAuthenticationDescription.Anonymous -> {
           this.logger.warn("Anonymous authentication makes no sense as an alternative.")
-        is AccountProviderAuthenticationDescription.SAML2_0 ->
+        }
+        is AccountProviderAuthenticationDescription.SAML2_0 -> {
           this.logger.warn("SAML 2.0 is not currently supported as an alternative.")
-
+        }
         is AccountProviderAuthenticationDescription.OAuthWithIntermediary -> {
           val layout =
             this.layoutInflater.inflate(
@@ -792,7 +795,8 @@ class AccountDetailFragment : Fragment(R.layout.account) {
               password = creds.password.value
             )
           }
-          is AccountAuthenticationCredentials.OAuthWithIntermediary -> {
+          is AccountAuthenticationCredentials.OAuthWithIntermediary,
+          is AccountAuthenticationCredentials.SAML2_0 -> {
             // Nothing
           }
         }
@@ -817,7 +821,8 @@ class AccountDetailFragment : Fragment(R.layout.account) {
               password = creds.password.value
             )
           }
-          is AccountAuthenticationCredentials.OAuthWithIntermediary -> {
+          is AccountAuthenticationCredentials.OAuthWithIntermediary,
+          is AccountAuthenticationCredentials.SAML2_0 -> {
             // No UI
           }
         }
@@ -838,7 +843,8 @@ class AccountDetailFragment : Fragment(R.layout.account) {
               password = creds.password.value
             )
           }
-          is AccountAuthenticationCredentials.OAuthWithIntermediary -> {
+          is AccountAuthenticationCredentials.OAuthWithIntermediary,
+          is AccountAuthenticationCredentials.SAML2_0 -> {
             // No UI
           }
         }
@@ -1118,25 +1124,29 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   private fun openCardCreatorWebView() {
     val cardCreatorURI = this.viewModel.account.provider.cardCreatorURI
 
-    fusedLocationClient.lastLocation
-      .addOnSuccessListener { location ->
-        if (location != null) {
-          listener.post(
-            AccountDetailEvent.OpenWebView(
-              AccountCardCreatorParameters(
-                url = cardCreatorURI.toString(),
-                lat = location.latitude,
-                long = location.longitude
+    try {
+      fusedLocationClient.lastLocation
+        .addOnSuccessListener { location ->
+          if (location != null) {
+            listener.post(
+              AccountDetailEvent.OpenWebView(
+                AccountCardCreatorParameters(
+                  url = cardCreatorURI.toString(),
+                  lat = location.latitude,
+                  long = location.longitude
+                )
               )
             )
-          )
-        } else {
+          } else {
+            showErrorGettingLocationDialog()
+          }
+        }
+        .addOnFailureListener {
           showErrorGettingLocationDialog()
         }
-      }
-      .addOnFailureListener {
-        showErrorGettingLocationDialog()
-      }
+    } catch (exception: SecurityException) {
+      this.logger.error("Error handling fusedLocationClient permissions")
+    }
   }
 
   private fun showErrorGettingLocationDialog() {

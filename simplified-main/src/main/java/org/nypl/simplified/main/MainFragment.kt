@@ -262,6 +262,9 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
       is BookStatus.DownloadWaitingForExternalAuthentication -> {
         this.openBookDownloadLogin(status.id, status.downloadURI)
       }
+      else -> {
+        // do nothing
+      }
     }
   }
 

@@ -4,5 +4,4 @@ dependencies {
   implementation libs.google.material
   implementation libs.kotlin.stdlib
   implementation libs.kotlin.reflect
-  implementation libs.nypl.theme
 }

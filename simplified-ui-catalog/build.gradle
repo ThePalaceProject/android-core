@@ -33,7 +33,6 @@ dependencies {
   implementation libs.google.material
   implementation libs.kotlin.stdlib
   implementation libs.kotlin.reflect
-  implementation libs.nypl.theme
   implementation libs.rxjava2
   implementation libs.rxjava2.extensions
   implementation libs.rxandroid2

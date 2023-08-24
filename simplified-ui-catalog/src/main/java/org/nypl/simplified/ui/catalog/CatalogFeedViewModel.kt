@@ -193,7 +193,13 @@ class CatalogFeedViewModel(
               onAgeUpdateSuccess(account, ownership, result)
             }
           }
+          else -> {
+            // do nothing
+          }
         }
+      }
+      else -> {
+        // do nothing
       }
     }
   }
@@ -230,10 +236,15 @@ class CatalogFeedViewModel(
       this.reloadFeed()
     } else {
       when (event.statusNow) {
-        is BookStatus.Held, is BookStatus.Loaned, is BookStatus.Revoked -> {
+        is BookStatus.Held,
+        is BookStatus.Loaned,
+        is BookStatus.Revoked -> {
           if (this.state.arguments.isLocallyGenerated) {
             this.reloadFeed()
           }
+        }
+        else -> {
+          // do nothing
         }
       }
     }
