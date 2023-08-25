@@ -27,7 +27,7 @@ class ListenerRepositoryLazy<E : Any, S : Any>(
         @Suppress("UNCHECKED_CAST")
         this.cached =
           ViewModelProvider(viewModelStoreOwner).get(ListenerRepository::class.java)
-          as ListenerRepository<E, S>
+            as ListenerRepository<E, S>
 
         this.cached
       }

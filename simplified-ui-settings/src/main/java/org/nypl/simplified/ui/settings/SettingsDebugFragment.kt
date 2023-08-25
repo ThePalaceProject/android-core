@@ -203,8 +203,8 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
     }
 
     /*
-    * Update the current profile's preferences whenever the testing switch is changed.
-    */
+     * Update the current profile's preferences whenever the testing switch is changed.
+     */
 
     this.showTesting.setOnCheckedChangeListener { _, checked ->
       this.viewModel.showTestingLibraries = checked

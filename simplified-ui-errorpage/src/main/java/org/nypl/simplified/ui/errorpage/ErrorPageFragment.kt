@@ -71,7 +71,7 @@ class ErrorPageFragment : Fragment(R.layout.error_page) {
 
     this.parameters =
       this.arguments!!.getSerializable(PARAMETERS_ID)
-      as ErrorPageParameters
+        as ErrorPageParameters
 
     if (parameters.attributes.isEmpty()) {
       this.errorDetails.visibility = View.GONE

@@ -109,7 +109,6 @@ class CatalogButtons(
     @StringRes res: Int,
     onClick: () -> Unit
   ): LinearLayout {
-
     val mainText = this.createCenteredTextForButtons(res).apply {
       this.layoutParams = wrapContentParameters()
       this.setTextColor(colorStateListForButtonItems())

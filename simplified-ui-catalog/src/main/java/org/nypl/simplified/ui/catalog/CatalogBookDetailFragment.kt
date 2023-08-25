@@ -523,7 +523,6 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
   private fun onCatalogFeedWithoutGroups(
     feedState: CatalogFeedState.CatalogFeedLoaded.CatalogFeedWithoutGroups
   ) {
-
     this.relatedBooksContainer.visibility = View.VISIBLE
     this.relatedBooksLoading.visibility = View.INVISIBLE
     this.relatedBooksList.visibility = View.VISIBLE
@@ -661,7 +660,6 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
   }
 
   private fun onBookStatusReachedLoanLimit() {
-
     AlertDialog.Builder(requireContext())
       .setTitle(R.string.bookReachedLoanLimitDialogTitle)
       .setMessage(R.string.bookReachedLoanLimitDialogMessage)
@@ -731,7 +729,6 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
 
     when (bookStatus) {
       is BookStatus.Held.HeldInQueue -> {
-
         if (createPreviewButton) {
           this.buttons.addView(
             this.buttonCreator.createReadPreviewButton(
@@ -811,7 +808,6 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
 
           this.buttons.addView(this.buttonCreator.createButtonSpace())
         } else if (!createPreviewButton) {
-
           // if the book is not revocable and there's no preview button, we need to add a dummy
           // button on the right
           this.buttons.addView(this.buttonCreator.createButtonSizedSpace())

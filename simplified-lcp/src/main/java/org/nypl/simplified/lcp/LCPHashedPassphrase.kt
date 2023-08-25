@@ -48,8 +48,9 @@ object LCPHashedPassphrase {
 
   @JvmStatic
   fun conditionallyBase64Decode(hashedPassphrase: String) =
-    if (isBase64Encoded(hashedPassphrase))
+    if (isBase64Encoded(hashedPassphrase)) {
       base64Decode(hashedPassphrase)
-    else
+    } else {
       hashedPassphrase
+    }
 }

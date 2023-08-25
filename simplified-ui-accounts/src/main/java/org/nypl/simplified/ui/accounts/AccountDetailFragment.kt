@@ -264,7 +264,6 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   }
 
   private fun reconfigureBookmarkSyncingSwitch(status: BookmarkSyncEnableStatus) {
-
     /*
      * Remove the checked-change listener, because setting `isChecked` will trigger the listener.
      */
@@ -403,8 +402,8 @@ class AccountDetailFragment : Fragment(R.layout.account) {
     this.configureReportIssue()
 
     /*
-    * Populate the barcode if passed in (e.g. via deep link).
-    */
+     * Populate the barcode if passed in (e.g. via deep link).
+     */
 
     var barcode = this.parameters.barcode
     if (barcode == null) {

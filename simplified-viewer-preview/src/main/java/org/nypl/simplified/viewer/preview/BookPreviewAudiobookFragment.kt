@@ -429,7 +429,6 @@ class BookPreviewAudiobookFragment : Fragment(), AudioManager.OnAudioFocusChange
     offsetMilliseconds: Long,
     duration: Long
   ): String {
-
     val remaining = Duration.millis(duration - offsetMilliseconds)
 
     return this.getString(

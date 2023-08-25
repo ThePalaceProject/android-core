@@ -435,7 +435,6 @@ class BorrowTaskTest {
 
   @Test
   fun testTwoAvailableAcquisitions() {
-
     this.webServer.enqueue(
       MockResponse()
         .setResponseCode(200)

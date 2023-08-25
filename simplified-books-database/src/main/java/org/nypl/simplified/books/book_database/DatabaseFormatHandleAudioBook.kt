@@ -316,7 +316,6 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
   }
 
   override fun setLastReadLocation(bookmark: Bookmark.AudiobookBookmark?) {
-
     val newFormat = synchronized(this.dataLock) {
       if (bookmark != null) {
         Preconditions.checkArgument(

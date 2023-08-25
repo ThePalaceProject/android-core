@@ -31,14 +31,12 @@ class TutorialFragment : Fragment(R.layout.fragment_tutorial) {
   private val pageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
 
     override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-
       if (!::tutorialViewPager.isInitialized || tutorialViewPager.adapter == null) {
         return
       }
 
       // check if the user is in the last page
       if (position == tutorialViewPager.adapter!!.itemCount - 1 && positionOffset == 0f) {
-
         // if the user is trying to swipe in the last page, we close the tutorial
         if (isSwipingLastPage) {
           closeTutorial()
@@ -75,7 +73,6 @@ class TutorialFragment : Fragment(R.layout.fragment_tutorial) {
   }
 
   private fun setupUI() {
-
     tutorialViewPager.adapter = TutorialPageAdapter()
 
     tutorialViewPager.registerOnPageChangeCallback(pageChangeCallback)
@@ -104,7 +101,6 @@ class TutorialFragment : Fragment(R.layout.fragment_tutorial) {
   }
 
   private fun adjustTabLayoutTabMargins() {
-
     // set the tab margins programmatically, since it's the only way of making them not be right next
     // to each other
     val tabs = tutorialTabLayout.getChildAt(0) as ViewGroup

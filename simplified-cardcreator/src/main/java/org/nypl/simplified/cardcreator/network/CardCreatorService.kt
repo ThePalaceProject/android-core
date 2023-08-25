@@ -73,15 +73,17 @@ class CardCreatorService(
       val response = nyplPlatformService.validateAddress(ValidateAddressRequest(address))
       return if (response.isSuccessful) {
         response.body()!!.validate()
-      } else try {
-        val errorBody = response.errorBody()!!.string()
-        logger.error("validateAddress call returned an error!\n$errorBody")
-        val adapter = moshi.adapter(ValidateAddressResponse.AlternateAddressesError::class.java)
-        adapter.fromJson(errorBody)!!.validate()
-      } catch (e: Exception) {
-        val errorBody = response.errorBody()!!.string()
-        val adapter = moshi.adapter(ValidateAddressResponse.ValidateAddressError::class.java)
-        adapter.fromJson(errorBody)!!.validate()
+      } else {
+        try {
+          val errorBody = response.errorBody()!!.string()
+          logger.error("validateAddress call returned an error!\n$errorBody")
+          val adapter = moshi.adapter(ValidateAddressResponse.AlternateAddressesError::class.java)
+          adapter.fromJson(errorBody)!!.validate()
+        } catch (e: Exception) {
+          val errorBody = response.errorBody()!!.string()
+          val adapter = moshi.adapter(ValidateAddressResponse.ValidateAddressError::class.java)
+          adapter.fromJson(errorBody)!!.validate()
+        }
       }
     } catch (e: Exception) {
       logger.error("an unexpected exception occurred while trying to validate address", e)
@@ -111,7 +113,6 @@ class CardCreatorService(
   suspend fun getDependentEligibility(
     identifier: String
   ): DependentEligibilityResponse {
-
     /**
      * Determines whether or not the user identifier is a barcode or username
      */

@@ -96,7 +96,6 @@ class TimeTrackingService(
     timeEntriesToRetryFile = File(bookFile, FILE_NAME_TIME_ENTRIES_RETRY)
 
     if (!timeEntriesFile.exists()) {
-
       // create an entries file for this book with an initial time tracking info
       timeEntriesFile.createNewFile()
 
@@ -113,7 +112,6 @@ class TimeTrackingService(
     }
 
     if (!timeEntriesToRetryFile.exists()) {
-
       // create a file for possible entries that weren't successfully saved on the server
       timeEntriesToRetryFile.createNewFile()
 
@@ -318,7 +316,6 @@ class TimeTrackingService(
           .credentials
       )
     } catch (exception: Exception) {
-
       // in case an exception occurs, we keep the original time entries
       timeTrackingInfo.timeEntries
     }

@@ -367,7 +367,6 @@ sealed class AccountAuthenticationViewBindings {
       isVisible: Boolean,
       onClick: () -> Unit
     ) {
-
       this.resetPasswordLabel.setOnClickListener {
         onClick()
       }
