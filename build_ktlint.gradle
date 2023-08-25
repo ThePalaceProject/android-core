@@ -5,7 +5,11 @@ configurations {
     ktlint
 }
 dependencies {
-    ktlint "com.pinterest:ktlint:0.39.0"
+  ktlint("com.pinterest:ktlint:0.50.0") {
+    attributes {
+      attribute(Bundling.BUNDLING_ATTRIBUTE, getObjects().named(Bundling, Bundling.EXTERNAL))
+    }
+  }
 }
 task ktlint(type: JavaExec, group: "quality") {
     description = "Check Kotlin code style."

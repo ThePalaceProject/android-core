@@ -90,12 +90,6 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
     }
   )
 
-  private val previewViewModel: CatalogBookPreviewViewModel by viewModels(
-    factoryProducer = {
-      CatalogBookPreviewViewModelFactory(services)
-    }
-  )
-
   private val viewModel: CatalogBookDetailViewModel by viewModels(
     factoryProducer = {
       CatalogBookDetailViewModelFactory(
@@ -186,9 +180,6 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
     this.viewModel.bookWithStatusLive.observe(this.viewLifecycleOwner) { info ->
       reconfigureUI(info.first, info.second)
     }
-//    this.viewModel.bookWithStatusLive.observe(this.viewLifecycleOwner, this::reconfigureUI)
-//    this.viewModel.bookPreviewLive.observe(this.viewLifecycleOwner, this::configurePreviewButton)
-
     this.cover =
       view.findViewById(R.id.bookDetailCoverImage)
     this.title =

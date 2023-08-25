@@ -9,7 +9,8 @@ class AnnouncementsViewModelFactory(
   private val services: ServiceDirectoryType
 ) : ViewModelProvider.Factory {
 
-  override fun <T : ViewModel?> create(modelClass: Class<T>): (T & Any) {
+  @Suppress("UNCHECKED_CAST")
+  override fun <T : ViewModel?> create(modelClass: Class<T>): T & Any {
     return when {
       modelClass.isAssignableFrom(AnnouncementsViewModel::class.java) -> {
         val profilesController: ProfilesControllerType =

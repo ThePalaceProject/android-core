@@ -14,6 +14,7 @@ import androidx.savedstate.SavedStateRegistryOwner
  * @param args initial arguments from parent. e.g: Fragment arguments
  * @param creator closure for creating ViewModel
  * */
+@Suppress("UNCHECKED_CAST")
 class AssistedViewModelFactory<T : ViewModel>(
   owner: SavedStateRegistryOwner,
   args: Bundle?,
@@ -23,7 +24,7 @@ class AssistedViewModelFactory<T : ViewModel>(
     key: String,
     modelClass: Class<T>,
     handle: SavedStateHandle
-  ): (T & Any) = creator(handle) as (T & Any)
+  ): T & Any = creator(handle) as (T & Any)
 }
 
 /**
