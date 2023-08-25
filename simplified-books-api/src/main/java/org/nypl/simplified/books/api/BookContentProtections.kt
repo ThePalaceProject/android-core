@@ -37,7 +37,10 @@ object BookContentProtections {
             provider.isManualPassphraseEnabled = isManualPassphraseEnabled
             provider.onLcpDialogDismissed = onLCPDialogDismissed
           }
-          else -> {
+
+          is BookDRMInformation.ACS,
+          is BookDRMInformation.AXIS,
+          BookDRMInformation.None -> {
             // do nothing
           }
         }

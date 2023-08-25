@@ -262,7 +262,24 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
       is BookStatus.DownloadWaitingForExternalAuthentication -> {
         this.openBookDownloadLogin(status.id, status.downloadURI)
       }
-      else -> {
+
+      is BookStatus.DownloadExternalAuthenticationInProgress,
+      is BookStatus.Downloading,
+      is BookStatus.FailedDownload,
+      is BookStatus.FailedLoan,
+      is BookStatus.FailedRevoke,
+      is BookStatus.Held.HeldInQueue,
+      is BookStatus.Held.HeldReady,
+      is BookStatus.Holdable,
+      is BookStatus.Loanable,
+      is BookStatus.Loaned.LoanedDownloaded,
+      is BookStatus.Loaned.LoanedNotDownloaded,
+      is BookStatus.ReachedLoanLimit,
+      is BookStatus.RequestingDownload,
+      is BookStatus.RequestingLoan,
+      is BookStatus.RequestingRevoke,
+      is BookStatus.Revoked,
+      null -> {
         // do nothing
       }
     }

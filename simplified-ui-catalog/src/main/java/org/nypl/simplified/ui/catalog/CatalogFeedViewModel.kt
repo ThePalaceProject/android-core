@@ -193,12 +193,13 @@ class CatalogFeedViewModel(
               onAgeUpdateSuccess(account, ownership, result)
             }
           }
-          else -> {
+
+          CatalogFeedOwnership.CollectedFromAccounts -> {
             // do nothing
           }
         }
       }
-      else -> {
+      is ProfileUpdated.Failed -> {
         // do nothing
       }
     }
@@ -243,7 +244,19 @@ class CatalogFeedViewModel(
             this.reloadFeed()
           }
         }
-        else -> {
+        is BookStatus.DownloadExternalAuthenticationInProgress,
+        is BookStatus.DownloadWaitingForExternalAuthentication,
+        is BookStatus.Downloading,
+        is BookStatus.FailedDownload,
+        is BookStatus.FailedLoan,
+        is BookStatus.FailedRevoke,
+        is BookStatus.Holdable,
+        is BookStatus.Loanable,
+        is BookStatus.ReachedLoanLimit,
+        is BookStatus.RequestingDownload,
+        is BookStatus.RequestingLoan,
+        is BookStatus.RequestingRevoke,
+        null -> {
           // do nothing
         }
       }

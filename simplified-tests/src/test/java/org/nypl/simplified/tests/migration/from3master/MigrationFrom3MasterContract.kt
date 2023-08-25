@@ -20,6 +20,7 @@ import org.nypl.simplified.books.book_database.api.BookDatabaseType
 import org.nypl.simplified.migration.from3master.EnvironmentQueriesType
 import org.nypl.simplified.migration.from3master.MigrationFrom3MasterProvider
 import org.nypl.simplified.migration.from3master.MigrationFrom3MasterStringResourcesType
+import org.nypl.simplified.migration.spi.MigrationEvent
 import org.nypl.simplified.migration.spi.MigrationEvent.MigrationStepError
 import org.nypl.simplified.migration.spi.MigrationEvent.MigrationStepSucceeded
 import org.nypl.simplified.migration.spi.MigrationReport
@@ -824,10 +825,15 @@ abstract class MigrationFrom3MasterContract {
   private fun showReport(report: MigrationReport) {
     for (notice in report.events) {
       when (notice) {
-        is MigrationStepSucceeded ->
+        is MigrationStepSucceeded -> {
           this.logger.debug("info: {}", notice)
-        is MigrationStepError ->
+        }
+        is MigrationStepError -> {
           this.logger.error("error: {}", notice)
+        }
+        is MigrationEvent.MigrationStepInProgress -> {
+          // do nothing
+        }
       }
     }
   }
