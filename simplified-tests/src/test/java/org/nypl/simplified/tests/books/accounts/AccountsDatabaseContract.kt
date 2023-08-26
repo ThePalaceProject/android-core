@@ -445,6 +445,8 @@ abstract class AccountsDatabaseContract {
       when (it) {
         is AccountAuthenticationCredentials.Basic ->
           creds.copy(annotationsURI = URI.create("https://www.example.com/annotations"))
+        is AccountAuthenticationCredentials.BasicToken ->
+          creds.copy(annotationsURI = URI.create("https://www.example.com/annotations"))
         is AccountAuthenticationCredentials.OAuthWithIntermediary ->
           creds.copy(annotationsURI = URI.create("https://www.example.com/annotations"))
         is AccountAuthenticationCredentials.SAML2_0 ->
