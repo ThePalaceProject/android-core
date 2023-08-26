@@ -16,7 +16,6 @@ import org.librarysimplified.http.downloads.LSHTTPDownloads
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addCredentialsToProperties
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.getAccessToken
-import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountReadableType
 import org.nypl.simplified.books.api.BookDRMKind
 import org.nypl.simplified.books.book_database.BookDRMInformationHandleLCP

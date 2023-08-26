@@ -3,8 +3,6 @@ package org.nypl.simplified.viewer.api
 import android.app.Activity
 import org.joda.time.LocalDateTime
 import org.librarysimplified.services.api.Services
-import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.getAccessToken
-import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.analytics.api.AnalyticsEvent
 import org.nypl.simplified.analytics.api.AnalyticsType
 import org.nypl.simplified.books.api.Book

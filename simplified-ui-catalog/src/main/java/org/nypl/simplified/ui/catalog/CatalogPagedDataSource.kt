@@ -2,7 +2,6 @@ package org.nypl.simplified.ui.catalog
 
 import androidx.paging.PageKeyedDataSource
 import com.google.common.base.Preconditions
-import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.getAccessToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.feeds.api.Feed
