@@ -1,7 +1,6 @@
 package org.nypl.simplified.tests.books
 
 import com.google.common.util.concurrent.ListeningExecutorService
-import org.librarysimplified.http.api.LSHTTPAuthorizationType
 import org.mockito.Mockito
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.books.book_registry.BookRegistry
