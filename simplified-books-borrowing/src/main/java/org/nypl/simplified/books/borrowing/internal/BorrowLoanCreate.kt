@@ -102,13 +102,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
       return request.execute().use { response ->
         when (val status = response.status) {
           is LSHTTPResponseStatus.Responded.OK -> {
-            context.account.updateCredentialsIfAvailable { currentCredentials ->
-              if (currentCredentials is AccountAuthenticationCredentials.BasicToken) {
-                currentCredentials.updateAccessToken(status.getAccessToken())
-              } else {
-                currentCredentials
-              }
-            }
+            context.account.updateBasicTokenCredentials(status.getAccessToken())
             this.handleOKRequest(context, currentURI, status)
           }
           is LSHTTPResponseStatus.Responded.Error -> {

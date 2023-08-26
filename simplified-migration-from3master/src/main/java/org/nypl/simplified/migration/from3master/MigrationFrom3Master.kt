@@ -275,6 +275,7 @@ class MigrationFrom3Master(
           return
         }
         is AccountProviderAuthenticationDescription.Basic,
+        is AccountProviderAuthenticationDescription.BasicToken,
         is AccountProviderAuthenticationDescription.OAuthWithIntermediary,
         is AccountProviderAuthenticationDescription.SAML2_0 -> {
           // do nothing

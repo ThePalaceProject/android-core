@@ -76,29 +76,4 @@ object AccountAuthenticatedHTTP {
   fun LSHTTPResponseStatus.getAccessToken(): String? {
     return properties?.header(LSHTTPRequestConstants.PROPERTY_KEY_ACCESS_TOKEN)
   }
-
-  fun LSHTTPResponseStatus.getUpdatedLoginState(
-    currentLoginState: AccountLoginState,
-    credentials: AccountAuthenticationCredentials?
-  ): AccountLoginState {
-    if (credentials !is AccountAuthenticationCredentials.BasicToken ||
-      currentLoginState !is AccountLoginState.AccountLoggedIn
-    ) {
-      return currentLoginState
-    }
-
-    val newAccessToken = getAccessToken()
-
-    return if (!newAccessToken.isNullOrBlank()) {
-      AccountLoginState.AccountLoggedIn(
-        credentials = credentials.copy(
-          authenticationTokenInfo = credentials.authenticationTokenInfo.copy(
-            accessToken = newAccessToken
-          )
-        )
-      )
-    } else {
-      currentLoginState
-    }
-  }
 }

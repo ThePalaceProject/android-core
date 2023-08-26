@@ -208,13 +208,7 @@ class BookSyncTask(
     account: AccountType,
     accessToken: String?
   ) {
-    account.updateCredentialsIfAvailable { currentCredentials ->
-      if (currentCredentials is AccountAuthenticationCredentials.BasicToken) {
-        currentCredentials.updateAccessToken(accessToken)
-      } else {
-        currentCredentials
-      }
-    }
+    account.updateBasicTokenCredentials(accessToken)
     stream.use { ok ->
       this.parseFeed(ok, provider, account)
     }

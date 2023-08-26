@@ -9,7 +9,6 @@ import org.librarysimplified.http.api.LSHTTPResponseStatus
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addCredentialsToProperties
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.getAccessToken
-import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.crashlytics.api.CrashlyticsServiceType
 import org.slf4j.LoggerFactory
@@ -33,7 +32,6 @@ class TimeTrackingHTTPCalls(
     timeTrackingInfo: TimeTrackingInfo,
     account: AccountType
   ): List<TimeTrackingEntry> {
-
     val credentials = account.loginState.credentials
 
     credentials ?: throw(Exception("Invalid Credentials"))
@@ -56,7 +54,7 @@ class TimeTrackingHTTPCalls(
     return request.execute().use { response ->
       when (val status = response.status) {
         is LSHTTPResponseStatus.Responded.OK -> {
-          updateAccessTokenIfNeeded(account, status.getAccessToken())
+          account.updateBasicTokenCredentials(status.getAccessToken())
 
           val timeTrackingResponse = TimeTrackingJSON.convertServerResponseToTimeTrackingResponse(
             objectNode = objectMapper.readTree(
@@ -118,15 +116,5 @@ class TimeTrackingHTTPCalls(
       this.logger.error("type:   {}", problemReport.type)
     }
     throw IOException("$uri received ${error.properties.status} ${error.properties.message}")
-  }
-
-  private fun updateAccessTokenIfNeeded(account: AccountType, accessToken: String?) {
-    account.updateCredentialsIfAvailable { currentCredentials ->
-      if (currentCredentials is AccountAuthenticationCredentials.BasicToken) {
-        currentCredentials.updateAccessToken(accessToken)
-      } else {
-        currentCredentials
-      }
-    }
   }
 }

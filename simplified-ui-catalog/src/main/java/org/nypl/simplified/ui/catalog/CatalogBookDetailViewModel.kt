@@ -9,6 +9,7 @@ import com.google.common.util.concurrent.FluentFuture
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.getAccessToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
@@ -408,13 +409,7 @@ class CatalogBookDetailViewModel(
     account: AccountType
   ) {
     if (feedLoaderResult is FeedLoaderResult.FeedLoaderSuccess) {
-      account.updateCredentialsIfAvailable { currentCredentials ->
-        if (currentCredentials is AccountAuthenticationCredentials.BasicToken) {
-          currentCredentials.updateAccessToken(feedLoaderResult.accessToken)
-        } else {
-          currentCredentials
-        }
-      }
+      account.updateBasicTokenCredentials(feedLoaderResult.accessToken)
     }
   }
 

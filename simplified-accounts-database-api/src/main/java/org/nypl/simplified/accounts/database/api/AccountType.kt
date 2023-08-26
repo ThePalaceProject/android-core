@@ -1,5 +1,6 @@
 package org.nypl.simplified.accounts.database.api
 
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.getAccessToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountLoginState
 import org.nypl.simplified.accounts.api.AccountPreferences
@@ -82,6 +83,26 @@ interface AccountType : AccountReadableType {
       is AccountLoginState.AccountLogoutFailed,
       AccountLoginState.AccountNotLoggedIn ->
         Unit
+    }
+  }
+
+  /**
+   * Update the account's access token if the current credentials are from the BasicToken type. This
+   * is needed because the access token may have been updated after a request, so we need to update
+   * the credentials.
+   *
+   * @throws AccountsDatabaseException On database errors
+   */
+  @Throws(AccountsDatabaseException::class)
+  fun updateBasicTokenCredentials(
+    accessToken: String?
+  ) {
+    updateCredentialsIfAvailable { currentCredentials ->
+      if (currentCredentials is AccountAuthenticationCredentials.BasicToken) {
+        currentCredentials.updateAccessToken(accessToken)
+      } else {
+        currentCredentials
+      }
     }
   }
 }

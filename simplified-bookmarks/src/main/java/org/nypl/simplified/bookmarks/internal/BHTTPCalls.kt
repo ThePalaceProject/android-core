@@ -51,7 +51,7 @@ class BHTTPCalls(
     return request.execute().use { response ->
       when (val status = response.status) {
         is LSHTTPResponseStatus.Responded.OK -> {
-          account.updateLoginStateFromStatus(status)
+          account.updateBasicTokenCredentials(status.getAccessToken())
           this.deserializeBookmarksFromStream(status.bodyStream ?: this.emptyStream())
         }
         is LSHTTPResponseStatus.Responded.Error -> {
@@ -81,7 +81,7 @@ class BHTTPCalls(
     return request.execute().use { response ->
       when (val status = response.status) {
         is LSHTTPResponseStatus.Responded.OK -> {
-          account.updateLoginStateFromStatus(status)
+          account.updateBasicTokenCredentials(status.getAccessToken())
           true
         }
         is LSHTTPResponseStatus.Responded.Error -> {
@@ -118,7 +118,7 @@ class BHTTPCalls(
     return request.execute().use { response ->
       when (val status = response.status) {
         is LSHTTPResponseStatus.Responded.OK -> {
-          account.updateLoginStateFromStatus(status)
+          account.updateBasicTokenCredentials(status.getAccessToken())
 
           val receivedBookmark = objectMapper.readTree(status.bodyStream ?: this.emptyStream())
           try {
@@ -160,7 +160,7 @@ class BHTTPCalls(
     return request.execute().use { response ->
       when (val status = response.status) {
         is LSHTTPResponseStatus.Responded.OK -> {
-          account.updateLoginStateFromStatus(status)
+          account.updateBasicTokenCredentials(status.getAccessToken())
         }
         is LSHTTPResponseStatus.Responded.Error -> {
           this.logAndFail(settingsURI, status)
@@ -187,7 +187,7 @@ class BHTTPCalls(
     return request.execute().use { response ->
       when (val status = response.status) {
         is LSHTTPResponseStatus.Responded.OK -> {
-          account.updateLoginStateFromStatus(status)
+          account.updateBasicTokenCredentials(status.getAccessToken())
           this.deserializeSyncingEnabledFromStream(status.bodyStream ?: emptyStream())
         }
         is LSHTTPResponseStatus.Responded.Error -> {
@@ -195,18 +195,6 @@ class BHTTPCalls(
         }
         is LSHTTPResponseStatus.Failed ->
           throw status.exception
-      }
-    }
-  }
-
-  private fun AccountType.updateLoginStateFromStatus(
-    status: LSHTTPResponseStatus
-  ) {
-    updateCredentialsIfAvailable { currentCredentials ->
-      if (currentCredentials is AccountAuthenticationCredentials.BasicToken) {
-        currentCredentials.updateAccessToken(status.getAccessToken())
-      } else {
-        currentCredentials
       }
     }
   }

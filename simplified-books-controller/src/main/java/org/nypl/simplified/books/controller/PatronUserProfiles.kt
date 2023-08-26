@@ -53,13 +53,7 @@ internal object PatronUserProfiles {
     val response = request.execute()
     return when (val status = response.status) {
       is LSHTTPResponseStatus.Responded.OK -> {
-        account.updateCredentialsIfAvailable { currentCredentials ->
-          if (currentCredentials is AccountAuthenticationCredentials.BasicToken) {
-            currentCredentials.updateAccessToken(status.getAccessToken())
-          } else {
-            currentCredentials
-          }
-        }
+        account.updateBasicTokenCredentials(status.getAccessToken())
         this.onPatronProfileRequestOK(
           taskRecorder = taskRecorder,
           patronSettingsURI = patronSettingsURI,

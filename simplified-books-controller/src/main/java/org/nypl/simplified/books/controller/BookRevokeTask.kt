@@ -6,6 +6,7 @@ import org.joda.time.DateTime
 import org.joda.time.Duration
 import org.nypl.drm.core.AdobeAdeptExecutorType
 import org.nypl.drm.core.AdobeAdeptLoan
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.getAccessToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationAdobePostActivationCredentials
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
@@ -326,13 +327,7 @@ class BookRevokeTask(
 
     return when (feedResult) {
       is FeedLoaderSuccess -> {
-        account.updateCredentialsIfAvailable { currentCredentials ->
-          if (currentCredentials is AccountAuthenticationCredentials.BasicToken) {
-            currentCredentials.updateAccessToken(feedResult.accessToken)
-          } else {
-            currentCredentials
-          }
-        }
+        account.updateBasicTokenCredentials(feedResult.accessToken)
         this.taskRecorder.currentStepSucceeded(this.revokeStrings.revokeServerNotifyFeedOK)
         feedResult.feed
       }

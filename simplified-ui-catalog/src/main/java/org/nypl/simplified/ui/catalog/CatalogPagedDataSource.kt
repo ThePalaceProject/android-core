@@ -2,6 +2,7 @@ package org.nypl.simplified.ui.catalog
 
 import androidx.paging.PageKeyedDataSource
 import com.google.common.base.Preconditions
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.getAccessToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.feeds.api.Feed
@@ -95,13 +96,7 @@ class CatalogPagedDataSource(
     ).map { result ->
       return@map when (result) {
         is FeedLoaderResult.FeedLoaderSuccess -> {
-          account.updateCredentialsIfAvailable { currentCredentials ->
-            if (currentCredentials is AccountAuthenticationCredentials.BasicToken) {
-              currentCredentials.updateAccessToken(result.accessToken)
-            } else {
-              currentCredentials
-            }
-          }
+          account.updateBasicTokenCredentials(result.accessToken)
 
           when (val feed = result.feed) {
             is Feed.FeedWithoutGroups -> {
@@ -154,13 +149,7 @@ class CatalogPagedDataSource(
     ).map { result ->
       return@map when (result) {
         is FeedLoaderResult.FeedLoaderSuccess -> {
-          account.updateCredentialsIfAvailable { currentCredentials ->
-            if (currentCredentials is AccountAuthenticationCredentials.BasicToken) {
-              currentCredentials.updateAccessToken(result.accessToken)
-            } else {
-              currentCredentials
-            }
-          }
+          account.updateBasicTokenCredentials(result.accessToken)
 
           when (val feed = result.feed) {
             is Feed.FeedWithoutGroups -> {
