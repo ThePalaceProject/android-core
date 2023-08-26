@@ -35,7 +35,6 @@ internal class BServiceOpLoadBookmarks(
         ?: entry.findFormatHandle(BookDatabaseEntryFormatHandlePDF::class.java)
 
       if (handle != null) {
-
         val bookmarks: List<Bookmark>
         val lastReadLocation: Bookmark?
 

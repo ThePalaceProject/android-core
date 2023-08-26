@@ -191,12 +191,12 @@ class BHTTPCallsTest {
     BookmarkAnnotation(
       context = null,
       body =
-        BookmarkAnnotationBodyNode(
-          timestamp = "2019-02-08T15:37:46+0000",
-          device = "urn:uuid:d8c5a487-646b-4c75-a83f-80599e8cf9d1",
-          chapterTitle = null,
-          bookProgress = null
-        ),
+      BookmarkAnnotationBodyNode(
+        timestamp = "2019-02-08T15:37:46+0000",
+        device = "urn:uuid:d8c5a487-646b-4c75-a83f-80599e8cf9d1",
+        chapterTitle = null,
+        bookProgress = null
+      ),
       id = "https://example.com/annotations/book0",
       type = "Annotation",
       motivation = "http://librarysimplified.org/terms/annotation/idling",
@@ -213,12 +213,12 @@ class BHTTPCallsTest {
     BookmarkAnnotation(
       context = null,
       body =
-        BookmarkAnnotationBodyNode(
-          timestamp = "2019-02-08T15:37:47+0000",
-          device = "urn:uuid:d8c5a487-646b-4c75-a83f-80599e8cf9d1",
-          chapterTitle = null,
-          bookProgress = null
-        ),
+      BookmarkAnnotationBodyNode(
+        timestamp = "2019-02-08T15:37:47+0000",
+        device = "urn:uuid:d8c5a487-646b-4c75-a83f-80599e8cf9d1",
+        chapterTitle = null,
+        bookProgress = null
+      ),
       id = "https://example.com/annotations/book0",
       type = "Annotation",
       motivation = "http://librarysimplified.org/terms/annotation/idling",

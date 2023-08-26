@@ -45,8 +45,8 @@ class OnboardingFragment :
     super.onCreate(savedInstanceState)
 
     /*
-    * Demand that onOptionsItemSelected be called.
-    */
+     * Demand that onOptionsItemSelected be called.
+     */
 
     setHasOptionsMenu(true)
 

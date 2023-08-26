@@ -291,7 +291,6 @@ internal class BServiceOpSyncOneAccount(
   private fun parseBookmarkOrNull(
     annotation: BookmarkAnnotation
   ): Bookmark? {
-
     return try {
       val bookmark = BookmarkAnnotations.toAudiobookBookmark(this.objectMapper, annotation)
       this.logger.debug("Audiobook bookmark successfully parsed")

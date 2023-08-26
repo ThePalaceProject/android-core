@@ -229,7 +229,6 @@ class BookPreviewTaskTest {
 
   @Test
   fun testNonSupportedBookFormat() {
-
     val task = createTask(
       entry = this.opdsFeedEntryPreviewPDF,
       format = BookFormats.BookFormatDefinition.BOOK_FORMAT_PDF

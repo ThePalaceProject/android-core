@@ -121,7 +121,6 @@ class BookmarkServiceSupportedEnableTest {
 
   @BeforeEach
   fun setup() {
-
     /*
      * MockWebServer doesn't handle IPv6 for some reason, but the tests executing on a local
      * machine will try to access the server over IPv6 first on some systems.
@@ -273,14 +272,13 @@ class BookmarkServiceSupportedEnableTest {
   }
 
   /*
- * Wait for the bookmark service to finish all of the requests.
- */
+   * Wait for the bookmark service to finish all of the requests.
+   */
 
   private fun waitForServiceQuiescence(
     service: BookmarkServiceType,
     profiles: MockProfilesController
   ) {
-
     Thread.sleep(1_000L)
 
     try {

@@ -147,7 +147,6 @@ class NeutralToolbar(
 
   fun setLogoOnClickListener(listener: () -> Unit) {
     this.iconView.setOnClickListener {
-
       // get the SearchView of the toolbar, if any
       val searchView = getSearchViewFromToolbar()
 

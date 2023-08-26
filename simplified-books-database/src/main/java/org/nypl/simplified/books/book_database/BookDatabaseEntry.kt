@@ -67,7 +67,7 @@ internal class BookDatabaseEntry internal constructor(
 
   private val formatHandleConstructors:
     EnumMap<BookFormats.BookFormatDefinition, DatabaseBookFormatHandleConstructor> =
-      EnumMap(BookFormats.BookFormatDefinition::class.java)
+    EnumMap(BookFormats.BookFormatDefinition::class.java)
 
   init {
     for (format in BookFormats.BookFormatDefinition.values()) {

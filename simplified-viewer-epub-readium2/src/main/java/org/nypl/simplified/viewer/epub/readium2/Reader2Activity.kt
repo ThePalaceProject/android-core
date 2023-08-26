@@ -246,7 +246,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       contentProtectionProviders = this.contentProtectionProviders,
       drmInfo = this.parameters.drmInfo,
       isManualPassphraseEnabled =
-        profilesController.profileCurrent().preferences().isManualLCPPassphraseEnabled,
+      profilesController.profileCurrent().preferences().isManualLCPPassphraseEnabled,
       onLCPDialogDismissed = {
         finish()
       }
@@ -345,7 +345,6 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
       // if there's more than one last read bookmark, we'll need to compare their dates
       if (lastReadBookmarks.size > 1) {
-
         val localLastReadBookmark = lastReadBookmarks.first()
         val serverLastReadBookmark = lastReadBookmarks.last()
 

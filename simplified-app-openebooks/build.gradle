@@ -36,10 +36,9 @@ dependencies {
   implementation project(":simplified-crashlytics")
   implementation libs.firebase.analytics
   implementation libs.firebase.crashlytics
+  implementation libs.nypl.findaway
   implementation libs.nypl.readium
   implementation libs.palace.drm.core
-  implementation libs.nypl.findaway
-  implementation libs.nypl.theme
 
   annotationProcessor libs.google.auto.value.processor
 }

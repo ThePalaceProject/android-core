@@ -65,6 +65,7 @@ internal class Profile internal constructor(
   private var deleted: Boolean = false
 
   private val descriptionLock: Any = Any()
+
   @GuardedBy("descriptionLock")
   private var descriptionCurrent: ProfileDescription = this.initialDescription
 

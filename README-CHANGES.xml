@@ -298,9 +298,9 @@
         <c:change date="2023-08-12T00:00:00+00:00" summary="Fixed crash when time tracking is not enabled."/>
       </c:changes>
     </c:release>
-    <c:release date="2023-08-23T10:32:22+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.6.0">
+    <c:release date="2023-08-24T16:09:29+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.6.0">
       <c:changes>
-        <c:change date="2023-08-23T10:32:22+00:00" summary="Added support to basic auth token login."/>
+        <c:change date="2023-08-24T16:09:29+00:00" summary="Updated Kotlin version to 1.9.0"/>
       </c:changes>
     </c:release>
   </c:releases>

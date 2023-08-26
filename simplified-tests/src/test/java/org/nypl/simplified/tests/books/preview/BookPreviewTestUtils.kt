@@ -16,7 +16,6 @@ object BookPreviewTestUtils {
     webServer: MockWebServer,
     mime: String
   ): OPDSAcquisitionFeedEntry {
-
     return opdsFeedEntryOf(
       """
     <entry xmlns="http://www.w3.org/2005/Atom" xmlns:opds="http://opds-spec.org/2010/catalog">
@@ -39,7 +38,6 @@ object BookPreviewTestUtils {
     mime1: String,
     mime2: String
   ): OPDSAcquisitionFeedEntry {
-
     return opdsFeedEntryOf(
       """
     <entry xmlns="http://www.w3.org/2005/Atom" xmlns:opds="http://opds-spec.org/2010/catalog">
@@ -62,7 +60,6 @@ object BookPreviewTestUtils {
     webServer: MockWebServer,
     mime: String
   ): OPDSAcquisitionFeedEntry {
-
     return opdsFeedEntryOf(
       """
     <entry xmlns="http://www.w3.org/2005/Atom" xmlns:opds="http://opds-spec.org/2010/catalog">

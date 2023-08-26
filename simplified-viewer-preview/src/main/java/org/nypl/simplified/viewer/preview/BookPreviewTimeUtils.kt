@@ -109,7 +109,6 @@ object BookPreviewTimeUtils {
     translations: SpokenTranslations,
     duration: Duration
   ): String {
-
     val builder = StringBuilder(64)
     var period = duration.toPeriod()
 

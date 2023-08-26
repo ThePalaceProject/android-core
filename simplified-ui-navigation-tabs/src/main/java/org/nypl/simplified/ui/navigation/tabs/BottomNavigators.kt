@@ -175,8 +175,11 @@ object BottomNavigators {
       }
 
     val ownership =
-      if (filterAccountId == null) CatalogFeedOwnership.CollectedFromAccounts
-      else CatalogFeedOwnership.OwnedByAccount(filterAccountId)
+      if (filterAccountId == null) {
+        CatalogFeedOwnership.CollectedFromAccounts
+      } else {
+        CatalogFeedOwnership.OwnedByAccount(filterAccountId)
+      }
 
     return CatalogFeedFragment.create(
       CatalogFeedArguments.CatalogFeedArgumentsLocalBooks(
@@ -212,8 +215,11 @@ object BottomNavigators {
       }
 
     val ownership =
-      if (filterAccountId == null) CatalogFeedOwnership.CollectedFromAccounts
-      else CatalogFeedOwnership.OwnedByAccount(filterAccountId)
+      if (filterAccountId == null) {
+        CatalogFeedOwnership.CollectedFromAccounts
+      } else {
+        CatalogFeedOwnership.OwnedByAccount(filterAccountId)
+      }
 
     return CatalogFeedFragment.create(
       CatalogFeedArguments.CatalogFeedArgumentsLocalBooks(

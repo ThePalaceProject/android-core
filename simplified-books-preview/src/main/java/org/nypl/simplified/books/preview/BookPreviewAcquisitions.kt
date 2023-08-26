@@ -14,7 +14,6 @@ object BookPreviewAcquisitions {
   fun pickBestPreviewAcquisition(
     entry: OPDSAcquisitionFeedEntry
   ): OPDSPreviewAcquisition? {
-
     // we try to see if there's a preview acquisition of the "text/html" MIME type and if there
     // isn't one, we return the first preview acquisition that is on the list of supported book
     // previews, if any, or null, if none.

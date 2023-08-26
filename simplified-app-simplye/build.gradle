@@ -39,11 +39,10 @@ dependencies {
   implementation project(":simplified-migration-from3master")
   implementation libs.firebase.analytics
   implementation libs.firebase.crashlytics
-  implementation libs.nypl.readium
-  implementation libs.palace.drm.core
   implementation libs.nypl.findaway
+  implementation libs.nypl.readium
   implementation libs.nypl.overdrive
-  implementation libs.nypl.theme
+  implementation libs.palace.drm.core
 
   annotationProcessor libs.google.auto.value.processor
 }

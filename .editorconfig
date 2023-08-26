@@ -1,7 +1,14 @@
-[*.kt]
+[*.{kt,kts}]
 indent_size=2
 insert_final_newline=true
-disabled_rules=import-ordering,experimental:package-name,experimental:argument-list-wrapping
+ktlint_standard_argument-list-wrapping = disabled
+ktlint_standard_class-naming = disabled
+ktlint_standard_enum-entry-name-case = disabled
+ktlint_standard_import-ordering = disabled
+ktlint_standard_package-name = disabled
+ktlint_standard_trailing-comma-on-call-site = disabled
+ktlint_standard_trailing-comma-on-declaration-site = disabled
+ktlint_standard_wrapping = disabled
 
 [*.gradle]
 indent_size=2
