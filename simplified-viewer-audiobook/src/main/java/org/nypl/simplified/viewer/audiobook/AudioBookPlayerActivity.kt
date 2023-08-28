@@ -114,7 +114,7 @@ class AudioBookPlayerActivity :
 
     fun startActivity(
       from: Activity,
-      parameters: AudioBookPlayerParameters
+      parameters: AudioBookPlayerParameters?
     ) {
       val b = Bundle()
       b.putSerializable(this.PARAMETER_ID, parameters)
@@ -171,7 +171,16 @@ class AudioBookPlayerActivity :
     val i = this.intent!!
     val a = i.extras!!
 
-    this.parameters = a.getSerializable(PARAMETER_ID) as AudioBookPlayerParameters
+    this.parameters = a.getSerializable(PARAMETER_ID) as? AudioBookPlayerParameters ?: kotlin.run {
+      val title = getString(R.string.audio_book_player_error_book_open)
+      this.showErrorWithRunnable(
+        context = this,
+        title = title,
+        failure = IllegalStateException(title),
+        execute = this::finish
+      )
+      return
+    }
 
     this.log.debug("manifest file: {}", this.parameters.manifestFile)
     this.log.debug("manifest uri:  {}", this.parameters.manifestURI)
@@ -216,8 +225,7 @@ class AudioBookPlayerActivity :
         .findFormatHandle(BookDatabaseEntryFormatHandleAudioBook::class.java)
 
     if (formatHandleOpt == null) {
-      val title =
-        this.resources.getString(R.string.audio_book_player_error_book_open)
+      val title = getString(R.string.audio_book_player_error_book_open)
       this.showErrorWithRunnable(
         context = this,
         title = title,
@@ -422,8 +430,7 @@ class AudioBookPlayerActivity :
     )
 
     if (engine == null) {
-      val title =
-        this.resources.getString(R.string.audio_book_player_error_engine_open)
+      val title = getString(R.string.audio_book_player_error_engine_open)
       this.showErrorWithRunnable(
         context = this,
         title = title,
@@ -457,8 +464,7 @@ class AudioBookPlayerActivity :
       )
 
     if (bookResult is PlayerResult.Failure) {
-      val title =
-        this.resources.getString(R.string.audio_book_player_error_book_open)
+      val title = getString(R.string.audio_book_player_error_book_open)
       this.showErrorWithRunnable(
         context = this,
         title = title,
