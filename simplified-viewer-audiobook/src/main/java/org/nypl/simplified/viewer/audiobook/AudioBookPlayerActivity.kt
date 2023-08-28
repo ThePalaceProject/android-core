@@ -437,8 +437,7 @@ class AudioBookPlayerActivity :
     )
 
     if (engine == null) {
-      val title =
-        this.resources.getString(R.string.audio_book_player_error_engine_open)
+      val title = getString(R.string.audio_book_player_error_engine_open)
       this.showErrorWithRunnable(
         context = this,
         title = title,
@@ -472,8 +471,7 @@ class AudioBookPlayerActivity :
       )
 
     if (bookResult is PlayerResult.Failure) {
-      val title =
-        this.resources.getString(R.string.audio_book_player_error_book_open)
+      val title = getString(R.string.audio_book_player_error_book_open)
       this.showErrorWithRunnable(
         context = this,
         title = title,
