@@ -55,6 +55,7 @@ class AccountAuthenticationCredentialsStore(
   }
 
   private val storeLock = Object()
+
   @GuardedBy("storeLock")
   private var store = initialCredentials.toMap()
 

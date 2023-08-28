@@ -193,7 +193,14 @@ class CatalogFeedViewModel(
               onAgeUpdateSuccess(account, ownership, result)
             }
           }
+
+          CatalogFeedOwnership.CollectedFromAccounts -> {
+            // do nothing
+          }
         }
+      }
+      is ProfileUpdated.Failed -> {
+        // do nothing
       }
     }
   }
@@ -230,10 +237,27 @@ class CatalogFeedViewModel(
       this.reloadFeed()
     } else {
       when (event.statusNow) {
-        is BookStatus.Held, is BookStatus.Loaned, is BookStatus.Revoked -> {
+        is BookStatus.Held,
+        is BookStatus.Loaned,
+        is BookStatus.Revoked -> {
           if (this.state.arguments.isLocallyGenerated) {
             this.reloadFeed()
           }
+        }
+        is BookStatus.DownloadExternalAuthenticationInProgress,
+        is BookStatus.DownloadWaitingForExternalAuthentication,
+        is BookStatus.Downloading,
+        is BookStatus.FailedDownload,
+        is BookStatus.FailedLoan,
+        is BookStatus.FailedRevoke,
+        is BookStatus.Holdable,
+        is BookStatus.Loanable,
+        is BookStatus.ReachedLoanLimit,
+        is BookStatus.RequestingDownload,
+        is BookStatus.RequestingLoan,
+        is BookStatus.RequestingRevoke,
+        null -> {
+          // do nothing
         }
       }
     }
@@ -484,9 +508,9 @@ class CatalogFeedViewModel(
     result: FeedLoaderResult.FeedLoaderFailure
   ): CatalogFeedState.CatalogFeedLoadFailed {
     /*
-    * If the feed can't be loaded due to an authentication failure, then open
-    * the account screen (if possible).
-    */
+     * If the feed can't be loaded due to an authentication failure, then open
+     * the account screen (if possible).
+     */
 
     when (result) {
       is FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedGeneral -> {
@@ -927,7 +951,6 @@ class CatalogFeedViewModel(
   }
 
   override fun resetInitialBookStatus(feedEntry: FeedEntry.FeedEntryOPDS) {
-
     val initialBookStatus = synthesizeBookWithStatus(feedEntry)
 
     this.bookModels[feedEntry.bookID]?.let { model ->

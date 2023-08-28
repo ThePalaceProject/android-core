@@ -195,8 +195,8 @@ class BorrowTask private constructor(
         currentOPDSAcquisitionPathElement = path.elements.first(),
         httpClient = this.requirements.httpClient,
         isManualLCPPassphraseEnabled =
-          this.requirements.profiles.currentProfile().getOrNull()
-            ?.preferences()?.isManualLCPPassphraseEnabled ?: false,
+        this.requirements.profiles.currentProfile().getOrNull()
+          ?.preferences()?.isManualLCPPassphraseEnabled ?: false,
         logger = this.logger,
         opdsAcquisitionPath = path,
         samlDownloadContext = samlDownloadContext,

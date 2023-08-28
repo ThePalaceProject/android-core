@@ -62,7 +62,6 @@ internal class BServiceOpEnableSync(
 
       return status
     } finally {
-
       /*
        * Redundantly ensure the account has been removed from the changing set.
        */

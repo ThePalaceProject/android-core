@@ -255,10 +255,10 @@ object BorrowHTTP {
   fun download(
     context: BorrowContextType,
     onDownloadFailedUnacceptableMIME:
-      (BorrowContextType, DownloadFailedUnacceptableMIME) -> Unit =
-        this::onDownloadFailedUnacceptableMimeDefault,
+    (BorrowContextType, DownloadFailedUnacceptableMIME) -> Unit =
+      this::onDownloadFailedUnacceptableMimeDefault,
     requestModifier:
-      ((LSHTTPRequestProperties) -> LSHTTPRequestProperties)? = null
+    ((LSHTTPRequestProperties) -> LSHTTPRequestProperties)? = null
   ) {
     return try {
       val currentURI = context.currentURICheck()

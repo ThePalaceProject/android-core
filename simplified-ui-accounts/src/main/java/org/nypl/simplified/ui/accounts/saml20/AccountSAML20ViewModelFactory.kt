@@ -17,13 +17,13 @@ class AccountSAML20ViewModelFactory(
 ) : ViewModelProvider.Factory {
 
   @Suppress("UNCHECKED_CAST")
-  override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+  override fun <T : ViewModel?> create(modelClass: Class<T>): (T & Any) {
     if (modelClass == AccountSAML20ViewModel::class.java) {
       return AccountSAML20ViewModel(
         application = this.application,
         account = this.account,
         description = this.description
-      ) as T
+      ) as (T & Any)
     }
     throw IllegalStateException("Can't create values of $modelClass")
   }

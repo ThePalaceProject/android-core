@@ -71,7 +71,6 @@ object BookmarkAnnotations {
     objectMapper: ObjectMapper,
     bookmark: Bookmark.ReaderBookmark
   ): BookmarkAnnotation {
-
     /*
      * Check for some values that were likely added by [toBookmark]. Write special values here
      * to ensure that [fromBookmark] is the exact inverse of [toBookmark].
@@ -128,7 +127,6 @@ object BookmarkAnnotations {
     objectMapper: ObjectMapper,
     annotation: BookmarkAnnotation
   ): Bookmark.ReaderBookmark {
-
     val locationJSON =
       BookmarkAnnotationsJSON.deserializeReaderLocation(
         objectMapper = objectMapper,
@@ -234,7 +232,6 @@ object BookmarkAnnotations {
     objectMapper: ObjectMapper,
     bookmark: Bookmark.PDFBookmark
   ): BookmarkAnnotation {
-
     /*
      * Check for some values that were likely added by [toBookmark]. Write special values here
      * to ensure that [fromBookmark] is the exact inverse of [toBookmark].
@@ -280,7 +277,6 @@ object BookmarkAnnotations {
     objectMapper: ObjectMapper,
     annotation: BookmarkAnnotation
   ): Bookmark.PDFBookmark {
-
     val locationJSON =
       BookmarkAnnotationsJSON.deserializePdfLocation(
         objectMapper = objectMapper,

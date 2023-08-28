@@ -338,7 +338,6 @@ class AudioBookPlayerActivity :
 
   private fun savePlayerPosition(event: PlayerEventCreateBookmark) {
     try {
-
       val bookmark = Bookmark.AudiobookBookmark.create(
         opdsId = this.parameters.opdsEntry.id,
         location = PlayerPosition(
@@ -406,7 +405,7 @@ class AudioBookPlayerActivity :
       contentProtectionProviders = this.contentProtectionProviders,
       drmInfo = this.parameters.drmInfo,
       isManualPassphraseEnabled =
-        profilesController.profileCurrent().preferences().isManualLCPPassphraseEnabled,
+      profilesController.profileCurrent().preferences().isManualLCPPassphraseEnabled,
       onLCPDialogDismissed = {
         finish()
       }
@@ -425,7 +424,7 @@ class AudioBookPlayerActivity :
         userAgent = PlayerUserAgent(this.parameters.userAgent),
         contentProtections = contentProtections,
         manualPassphrase =
-          profilesController.profileCurrent().preferences().isManualLCPPassphraseEnabled
+        profilesController.profileCurrent().preferences().isManualLCPPassphraseEnabled
       )
     )
 
@@ -633,7 +632,6 @@ class AudioBookPlayerActivity :
   }
 
   private fun restoreSavedPlayerPosition() {
-
     val bookmarks =
       AudioBookHelpers.loadBookmarks(
         bookmarkService = this.bookmarkService,

@@ -68,7 +68,6 @@ class BorrowLCP private constructor() : BorrowSubtaskType {
       )
 
       val passphrase = if (context.isManualLCPPassphraseEnabled) {
-
         // if the manual input for the LCP passphrase is enabled, we need to catch a possible
         // exception while fetching the current passphrase as it may be possible for the user to
         // manually input it and if the exception isn't caught, the download will immediately fail.

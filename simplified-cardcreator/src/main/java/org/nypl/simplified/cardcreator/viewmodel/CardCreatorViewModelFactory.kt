@@ -9,14 +9,26 @@ class CardCreatorViewModelFactory(
 ) : ViewModelProvider.Factory {
 
   @Suppress("UNCHECKED_CAST")
-  override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+  override fun <T : ViewModel?> create(modelClass: Class<T>): T & Any {
     return when (modelClass) {
-      CardCreatorViewModel::class.java -> CardCreatorViewModel(cardCreatorService) as T
-      AddressViewModel::class.java -> AddressViewModel(cardCreatorService) as T
-      DependentEligibilityViewModel::class.java -> DependentEligibilityViewModel(cardCreatorService) as T
-      PatronViewModel::class.java -> PatronViewModel(cardCreatorService) as T
-      UsernameViewModel::class.java -> UsernameViewModel(cardCreatorService) as T
-      else -> throw IllegalStateException("Can't create values of $modelClass")
+      CardCreatorViewModel::class.java -> {
+        CardCreatorViewModel(cardCreatorService) as (T & Any)
+      }
+      AddressViewModel::class.java -> {
+        AddressViewModel(cardCreatorService) as (T & Any)
+      }
+      DependentEligibilityViewModel::class.java -> {
+        DependentEligibilityViewModel(cardCreatorService) as (T & Any)
+      }
+      PatronViewModel::class.java -> {
+        PatronViewModel(cardCreatorService) as (T & Any)
+      }
+      UsernameViewModel::class.java -> {
+        UsernameViewModel(cardCreatorService) as (T & Any)
+      }
+      else -> {
+        throw IllegalStateException("Can't create values of $modelClass")
+      }
     }
   }
 }

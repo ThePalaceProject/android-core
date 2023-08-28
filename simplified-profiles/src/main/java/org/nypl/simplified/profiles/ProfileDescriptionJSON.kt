@@ -381,7 +381,6 @@ object ProfileDescriptionJSON {
     objectMapper: ObjectMapper,
     node: ObjectNode?
   ): Map<String, PlayerPlaybackRate> {
-
     val str = JSONParserUtilities.getObjectOrNull(
       node, "playbackRates"
     ) ?: return hashMapOf()
@@ -402,7 +401,6 @@ object ProfileDescriptionJSON {
     objectMapper: ObjectMapper,
     node: ObjectNode?
   ): Map<String, Long?> {
-
     val str = JSONParserUtilities.getObjectOrNull(
       node, "sleepTimers"
     ) ?: return hashMapOf()
@@ -521,7 +519,6 @@ object ProfileDescriptionJSON {
     objectMapper: ObjectMapper,
     playbackRates: Map<String, PlayerPlaybackRate>
   ): ObjectNode {
-
     val objectNode = objectMapper.createObjectNode()
     playbackRates.keys.forEach { key ->
       objectNode.put(key, playbackRates[key]?.name)

@@ -60,6 +60,7 @@ internal class ProfilesDatabase internal constructor(
 
   private val profilesReadOnly: SortedMap<ProfileID, ProfileType>
   private val profileCurrentLock: Any = Any()
+
   @GuardedBy("profileCurrentLock")
   private var profileCurrent: ProfileID? = null
 

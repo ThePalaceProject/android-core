@@ -130,7 +130,6 @@ class BookCoverProvider private constructor(
     onBitmapLoaded: (Bitmap) -> Unit,
     defaultResource: Int
   ) {
-
     this.picasso
       .load(coverURI?.toString())
       .error(defaultResource)

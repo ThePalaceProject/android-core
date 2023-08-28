@@ -361,7 +361,6 @@ class CatalogPagedViewHolder(
   }
 
   private fun onBookStatusReachedLoanLimit() {
-
     AlertDialog.Builder(context)
       .setTitle(R.string.bookReachedLoanLimitDialogTitle)
       .setMessage(R.string.bookReachedLoanLimitDialogMessage)
@@ -612,7 +611,6 @@ class CatalogPagedViewHolder(
     return if (status is BookStatus.Loaned.LoanedDownloaded ||
       status is BookStatus.Loaned.LoanedNotDownloaded
     ) {
-
       val endDate = (status as? BookStatus.Loaned.LoanedDownloaded)?.loanExpiryDate
         ?: (status as? BookStatus.Loaned.LoanedNotDownloaded)?.loanExpiryDate
 

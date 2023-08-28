@@ -34,7 +34,6 @@ data class BookPreviewStorage(
     mimeType: MIMEType,
     onBookSuccessfullySaved: (File) -> Unit
   ) {
-
     val previewFile = when (mimeType) {
       StandardFormatNames.mpegAudioBooks -> {
         audiobookMp3PreviewFile

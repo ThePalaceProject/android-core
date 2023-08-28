@@ -30,7 +30,6 @@ class TimeTrackingHTTPCalls(
     timeTrackingInfo: TimeTrackingInfo,
     credentials: AccountAuthenticationCredentials?
   ): List<TimeTrackingEntry> {
-
     credentials ?: throw(Exception("Invalid Credentials"))
 
     val data =

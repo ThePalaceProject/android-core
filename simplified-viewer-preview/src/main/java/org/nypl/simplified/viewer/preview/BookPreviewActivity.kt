@@ -110,7 +110,6 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
     if (::tocFragment.isInitialized && this.tocFragment.isVisible) {
       this.closeTOC()
     } else {
-
       if (file?.exists() == true) {
         file?.delete()
       }

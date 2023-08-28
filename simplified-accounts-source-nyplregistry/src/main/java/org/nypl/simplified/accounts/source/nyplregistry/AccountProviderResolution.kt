@@ -150,7 +150,7 @@ class AccountProviderResolution(
 
   private fun findAlternateLink(): URI? {
     return this.description.links.firstOrNull {
-      link ->
+        link ->
       link.relation == "alternate"
     }?.hrefURI
   }
