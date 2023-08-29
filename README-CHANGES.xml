@@ -270,7 +270,7 @@
         <c:change date="2023-02-28T00:00:00+00:00" summary="Moved the 'Remove' button after the 'Get' button on the Reservations screen."/>
       </c:changes>
     </c:release>
-    <c:release date="2023-08-18T18:10:45+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.5.0">
+    <c:release date="2023-08-18T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.5.0">
       <c:changes>
         <c:change date="2023-03-30T00:00:00+00:00" summary="Save reading position of audiobooks on play, pause, and stop (which also includes when seeking and changing chapters)."/>
         <c:change date="2023-04-04T00:00:00+00:00" summary="Updated library logos loading source in registry feed."/>
@@ -298,9 +298,9 @@
         <c:change date="2023-08-12T00:00:00+00:00" summary="Fixed crash when time tracking is not enabled."/>
       </c:changes>
     </c:release>
-    <c:release date="2023-08-28T15:28:36+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.5.1">
+    <c:release date="2023-08-29T16:17:13+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.5.1">
       <c:changes>
-        <c:change date="2023-08-28T15:28:36+00:00" summary="Fixed crash when opening an audiobook with a null manifest."/>
+        <c:change date="2023-08-28T00:00:00+00:00" summary="Fixed crash when opening an audiobook with a null manifest."/>
       </c:changes>
     </c:release>
   </c:releases>
