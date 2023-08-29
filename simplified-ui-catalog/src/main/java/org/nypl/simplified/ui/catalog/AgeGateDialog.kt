@@ -57,7 +57,7 @@ class AgeGateDialog : DialogFragment(), AdapterView.OnItemSelectedListener {
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     val dialog = AlertDialog.Builder(requireContext())
       .setTitle(getString(R.string.ageVerification))
-      .setPositiveButton(R.string.done) { _, _ ->
+      .setPositiveButton(R.string.catalogDone) { _, _ ->
         val selection = birthYearSpinner.selectedItem.toString()
         if (selection != getString(R.string.ageVerification)) {
           val birthYear = selection.toInt()

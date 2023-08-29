@@ -641,7 +641,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
         this@CatalogFeedFragment.viewModel.performSearch(search, query)
         dialog.dismiss()
       }
-      setNegativeButton(R.string.cancel) { dialog, _ ->
+      setNegativeButton(R.string.catalogCancel) { dialog, _ ->
         dialog.dismiss()
       }
       setView(view)

@@ -75,8 +75,6 @@ import org.nypl.simplified.books.time.tracking.TimeTrackingServiceType
 import org.nypl.simplified.boot.api.BootEvent
 import org.nypl.simplified.boot.api.BootFailureTesting
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
-import org.nypl.simplified.cardcreator.CardCreatorService
-import org.nypl.simplified.cardcreator.CardCreatorServiceType
 import org.nypl.simplified.content.api.ContentResolverSane
 import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.crashlytics.api.CrashlyticsServiceType
@@ -1032,12 +1030,6 @@ internal object MainServices {
       serviceConstructor = {
         this.createNotificationsService(context, profileEvents, bookRegistry)
       }
-    )
-
-    addServiceOptionally(
-      message = strings.bootingGeneral("card creator service"),
-      interfaceType = CardCreatorServiceType::class.java,
-      serviceConstructor = { CardCreatorService.createConditionally(context) }
     )
 
     addService(

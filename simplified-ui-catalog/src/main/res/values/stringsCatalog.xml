@@ -48,6 +48,7 @@
   <string name="catalogBookPreviewAudioBook">Play Sample</string>
   <string name="catalogBookPreviewBook">Read Sample</string>
   <string name="catalogCancel">Cancel</string>
+  <string name="catalogDone">Done</string>
   <string name="catalogCancelHold">Remove</string>
   <string name="catalogCancelling">Cancelling…</string>
   <string name="catalogCorrupted">The metadata for this book is damaged and cannot be displayed. Reloading the feed or syncing your account might fix the problem.</string>

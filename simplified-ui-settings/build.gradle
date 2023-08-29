@@ -12,7 +12,6 @@ dependencies {
   implementation project(":simplified-books-controller-api")
   implementation project(":simplified-boot-api")
   implementation project(":simplified-buildconfig-api")
-  implementation project(":simplified-cardcreator")
   implementation project(":simplified-crashlytics-api")
   implementation project(":simplified-documents")
   implementation project(":simplified-oauth")

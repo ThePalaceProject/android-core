@@ -13,7 +13,6 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SwitchCompat
@@ -41,8 +40,6 @@ import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountUsername
 import org.nypl.simplified.android.ktx.supportActionBar
-import org.nypl.simplified.cardcreator.CardCreatorContract
-import org.nypl.simplified.cardcreator.CardCreatorServiceType
 import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.fragmentListeners
 import org.nypl.simplified.oauth.OAuthCallbackIntentParsing
@@ -98,11 +95,6 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   private val fusedLocationClient by lazy {
     LocationServices.getFusedLocationProviderClient(requireActivity())
   }
-
-  private val cardCreatorLauncher: ActivityResultLauncher<CardCreatorContract.Input>? =
-    services.optionalService(CardCreatorServiceType::class.java)
-      ?.getCardCreatorContract()
-      ?.let { this.registerForActivityResult(it, this::onCardCreatorResult) }
 
   private val imageLoader: ImageLoaderType =
     services.requireService(ImageLoaderType::class.java)
@@ -335,25 +327,12 @@ class AccountDetailFragment : Fragment(R.layout.account) {
     }
   }
 
+  /**
+   * If there's any card creator URI, the button should be enabled...
+   */
+
   private fun shouldSignUpBeEnabled(): Boolean {
-    val cardCreatorURI = this.viewModel.account.provider.cardCreatorURI
-
-    /*
-     * If there's any card creator URI, the button should be enabled...
-     */
-    return if (cardCreatorURI != null) {
-      /*
-       * Unless the URI refers to the NYPL Card Creator and we don't have that enabled
-       * in this build.
-       */
-
-      if (cardCreatorURI.scheme == this.nyplCardCreatorScheme) {
-        return this.cardCreatorLauncher != null
-      }
-      true
-    } else {
-      false
-    }
+    return viewModel.account.provider.cardCreatorURI != null
   }
 
   override fun onStart() {
@@ -405,7 +384,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
      * Populate the barcode if passed in (e.g. via deep link).
      */
 
-    var barcode = this.parameters.barcode
+    val barcode = this.parameters.barcode
     if (barcode == null) {
       this.authenticationViews.setBasicUserAndPass("", "")
     } else {
@@ -431,15 +410,19 @@ class AccountDetailFragment : Fragment(R.layout.account) {
         is AccountProviderAuthenticationDescription.COPPAAgeGate -> {
           this.logger.warn("COPPA age gate is not currently supported as an alternative.")
         }
+
         is AccountProviderAuthenticationDescription.Basic -> {
           this.logger.warn("Basic authentication is not currently supported as an alternative.")
         }
+
         AccountProviderAuthenticationDescription.Anonymous -> {
           this.logger.warn("Anonymous authentication makes no sense as an alternative.")
         }
+
         is AccountProviderAuthenticationDescription.SAML2_0 -> {
           this.logger.warn("SAML 2.0 is not currently supported as an alternative.")
         }
+
         is AccountProviderAuthenticationDescription.OAuthWithIntermediary -> {
           val layout =
             this.layoutInflater.inflate(
@@ -629,7 +612,9 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   private fun reconfigureAccountUI() {
     this.authenticationViews.showFor(this.viewModel.account.provider.authentication)
 
-    this.hideCardCreatorForNonNYPL()
+    if (this.viewModel.account.provider.cardCreatorURI != null) {
+      this.settingsCardCreator.visibility = View.VISIBLE
+    }
 
     this.accountTitle.text =
       this.viewModel.account.provider.displayName
@@ -794,6 +779,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
               password = creds.password.value
             )
           }
+
           is AccountAuthenticationCredentials.OAuthWithIntermediary,
           is AccountAuthenticationCredentials.SAML2_0 -> {
             // Nothing
@@ -820,6 +806,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
               password = creds.password.value
             )
           }
+
           is AccountAuthenticationCredentials.OAuthWithIntermediary,
           is AccountAuthenticationCredentials.SAML2_0 -> {
             // No UI
@@ -842,6 +829,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
               password = creds.password.value
             )
           }
+
           is AccountAuthenticationCredentials.OAuthWithIntermediary,
           is AccountAuthenticationCredentials.SAML2_0 -> {
             // No UI
@@ -872,6 +860,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
     return when (loginState) {
       is AccountLoggedIn -> {
       }
+
       is AccountLoggingIn,
       is AccountLoggingInWaitingForExternalAuthentication,
       is AccountLoggingOut,
@@ -919,45 +908,29 @@ class AccountDetailFragment : Fragment(R.layout.account) {
       is AsLoginButtonEnabled -> {
         this.signUpLabel.setText(R.string.accountCardCreatorLabel)
       }
+
       is AsLoginButtonDisabled -> {
         this.signUpLabel.setText(R.string.accountCardCreatorLabel)
         this.signUpLabel.isEnabled = true
       }
+
       is AsLogoutButtonEnabled -> {
         this.signUpLabel.setText(R.string.accountWantChildCard)
         val enableSignup = shouldSignUpBeEnabled()
-        this.signUpLabel.isEnabled = isNypl() && enableSignup
-        this.signUpButton.isEnabled = isNypl() && enableSignup
-        if (isNypl()) {
-          this.signUpLabel.setText(R.string.accountWantChildCard)
-        } else {
-          this.signUpLabel.setText(R.string.accountCardCreatorLabel)
-        }
+        this.signUpLabel.isEnabled = false
+        this.signUpButton.isEnabled = false
+        this.signUpLabel.setText(R.string.accountCardCreatorLabel)
       }
+
       is AsLogoutButtonDisabled -> {
-        if (isNypl()) {
-          this.signUpLabel.setText(R.string.accountWantChildCard)
-        } else {
-          this.signUpLabel.setText(R.string.accountCardCreatorLabel)
-        }
+        this.signUpLabel.setText(R.string.accountCardCreatorLabel)
       }
+
       is AsCancelButtonEnabled,
       AsCancelButtonDisabled -> {
         // Nothing
       }
     }
-  }
-
-  /**
-   * Returns if the user is viewing the NYPL account
-   */
-  private fun isNypl(): Boolean {
-    var isNypl = false
-    val cardCreatorURI = this.viewModel.account.provider.cardCreatorURI
-    if (cardCreatorURI != null) {
-      isNypl = cardCreatorURI.scheme == this.nyplCardCreatorScheme
-    }
-    return isNypl
   }
 
   private fun loadAuthenticationLogoIfNecessary(
@@ -1040,23 +1013,16 @@ class AccountDetailFragment : Fragment(R.layout.account) {
     return when (val description = this.viewModel.account.provider.authentication) {
       is AccountProviderAuthenticationDescription.SAML2_0 ->
         this.onTrySAML2Login(description)
+
       is AccountProviderAuthenticationDescription.OAuthWithIntermediary ->
         this.onTryOAuthLogin(description)
+
       is AccountProviderAuthenticationDescription.Basic ->
         this.onTryBasicLogin(description)
 
       is AccountProviderAuthenticationDescription.Anonymous,
       is AccountProviderAuthenticationDescription.COPPAAgeGate ->
         throw UnreachableCodeException()
-    }
-  }
-
-  /**
-   * Hides or show sign up options if is user in accessing the NYPL
-   */
-  private fun hideCardCreatorForNonNYPL() {
-    if (this.viewModel.account.provider.cardCreatorURI != null) {
-      this.settingsCardCreator.visibility = View.VISIBLE
     }
   }
 
@@ -1083,19 +1049,6 @@ class AccountDetailFragment : Fragment(R.layout.account) {
       }
       .create()
       .show()
-  }
-
-  private fun onCardCreatorResult(result: CardCreatorContract.Output?) {
-    if (result == null) {
-      this.logger.debug("User has exited the card creator")
-      return
-    }
-
-    this.authenticationViews.setBasicUserAndPass(
-      user = result.barcode,
-      password = result.pin
-    )
-    this.tryLogin()
   }
 
   private fun isLocationPermissionGranted(): Boolean {

@@ -82,7 +82,7 @@ class AccountListFragment : Fragment(R.layout.account_list) {
           account.provider.displayName
         )
       )
-      .setNegativeButton(R.string.cancel) { dialog, _ ->
+      .setNegativeButton(R.string.accountCancel) { dialog, _ ->
         dialog.dismiss()
       }
       .setPositiveButton(R.string.accountsDelete) { dialog, _ ->
