@@ -35,8 +35,6 @@ object BorrowHTTP {
    * Events will be delivered to the given borrow context.
    */
 
-  private var old = true
-
   fun createDownloadRequest(
     context: BorrowContextType,
     target: URI,

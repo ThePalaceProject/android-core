@@ -9,6 +9,7 @@ import org.nypl.simplified.accounts.api.AccountAuthenticationAdobeClientToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationAdobePostActivationCredentials
 import org.nypl.simplified.accounts.api.AccountAuthenticationAdobePreActivationCredentials
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
+import org.nypl.simplified.accounts.api.AccountAuthenticationTokenInfo
 import org.nypl.simplified.accounts.api.AccountCookie
 import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountUsername
@@ -135,6 +136,87 @@ class AccountAuthenticationCredentialsJSONTest {
           AccountCookie("https://fake", "cookie1=24; Path=/; Secure"),
           AccountCookie("http://something", "cookie2=25; Path=/abc; Expires=Wed, 23 Dec 2020 07:28:00 GMT")
         )
+      )
+
+    val creds1 = deserializeFromJSON(serializeToJSON(creds0))
+    Assertions.assertEquals(creds0, creds1)
+  }
+
+  @Test
+  @Throws(Exception::class)
+  fun testRoundTrip5() {
+    val creds0: AccountAuthenticationCredentials =
+      AccountAuthenticationCredentials.BasicToken(
+        userName = AccountUsername("1234"),
+        password = AccountPassword("5678"),
+        authenticationTokenInfo = AccountAuthenticationTokenInfo(
+          accessToken = "abcd",
+          authURI = URI("https://www.authrefresh.com")
+        ),
+        adobeCredentials = null,
+        authenticationDescription = null,
+        annotationsURI = URI("https://www.example.com")
+      )
+
+    val creds1 = deserializeFromJSON(serializeToJSON(creds0))
+    Assertions.assertEquals(creds0, creds1)
+  }
+
+  @Test
+  @Throws(Exception::class)
+  fun testRoundTrip6() {
+    val adobe =
+      AccountAuthenticationAdobePreActivationCredentials(
+        vendorID = AdobeVendorID("vendor"),
+        clientToken = AccountAuthenticationAdobeClientToken.parse("NYNYPL|156|5e0cdf28-e3a2-11e7-ab18-0e26ed4612aa|LEcBeSV"),
+        deviceManagerURI = URI.create("http://example.com"),
+        postActivationCredentials = null
+      )
+
+    val creds0: AccountAuthenticationCredentials =
+      AccountAuthenticationCredentials.BasicToken(
+        userName = AccountUsername("1234"),
+        password = AccountPassword("5678"),
+        authenticationTokenInfo = AccountAuthenticationTokenInfo(
+          accessToken = "abcd",
+          authURI = URI("https://www.authrefresh.com")
+        ),
+        adobeCredentials = adobe,
+        authenticationDescription = null,
+        annotationsURI = URI("https://www.example.com")
+      )
+
+    val creds1 = deserializeFromJSON(serializeToJSON(creds0))
+    Assertions.assertEquals(creds0, creds1)
+  }
+
+  @Test
+  @Throws(Exception::class)
+  fun testRoundTrip7() {
+    val post =
+      AccountAuthenticationAdobePostActivationCredentials(
+        deviceID = AdobeDeviceID("device"),
+        userID = AdobeUserID("user")
+      )
+    val adobe =
+      AccountAuthenticationAdobePreActivationCredentials(
+        vendorID = AdobeVendorID("vendor"),
+        clientToken = AccountAuthenticationAdobeClientToken.parse("NYNYPL|156|5e0cdf28-e3a2-11e7-ab18-0e26ed4612aa|LEcBeSV"),
+        deviceManagerURI = URI.create("http://example.com"),
+        postActivationCredentials = post
+      )
+
+    val creds0: AccountAuthenticationCredentials =
+      AccountAuthenticationCredentials.BasicToken(
+        userName = AccountUsername("1234"),
+        password = AccountPassword("5678"),
+        authenticationTokenInfo = AccountAuthenticationTokenInfo(
+          accessToken = "abcd",
+          authURI = URI("https://www.authrefresh.com")
+        ),
+        adobeCredentials = adobe,
+        authenticationDescription = null,
+        annotationsURI = URI("https://www.example.com")
       )
 
     val creds1 = deserializeFromJSON(serializeToJSON(creds0))

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
+import org.nypl.simplified.accounts.api.AccountAuthenticationTokenInfo
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountUsername
@@ -192,6 +193,33 @@ class AccountAuthenticationCredentialsStoreTest {
       AccountAuthenticationCredentials.Basic(
         userName = AccountUsername("abcd"),
         password = AccountPassword("1234"),
+        adobeCredentials = null,
+        authenticationDescription = null,
+        annotationsURI = URI("https://www.example.com")
+      )
+
+    store.put(accountID, credentials)
+    Assertions.assertEquals(credentials, store.get(accountID))
+    Assertions.assertEquals(1, store.size())
+    store.delete(accountID)
+    Assertions.assertEquals(null, store.get(accountID))
+    Assertions.assertEquals(0, store.size())
+  }
+
+  @Test
+  fun testPutRemoveBasicToken() {
+    val store =
+      AccountAuthenticationCredentialsStore.open(this.file, this.fileTemp)
+
+    val accountID = AccountID.generate()
+    val credentials =
+      AccountAuthenticationCredentials.BasicToken(
+        userName = AccountUsername("1234"),
+        password = AccountPassword("5678"),
+        authenticationTokenInfo = AccountAuthenticationTokenInfo(
+          accessToken = "abcd",
+          authURI = URI("https://www.authrefresh.com")
+        ),
         adobeCredentials = null,
         authenticationDescription = null,
         annotationsURI = URI("https://www.example.com")

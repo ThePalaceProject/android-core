@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
+import org.nypl.simplified.accounts.api.AccountAuthenticationTokenInfo
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.accounts.api.AccountLoginState
 import org.nypl.simplified.accounts.api.AccountPassword
@@ -458,6 +459,56 @@ abstract class AccountsDatabaseContract {
       URI.create("https://www.example.com/annotations"),
       acc0.loginState.credentials?.annotationsURI
     )
+  }
+
+  @Test
+  @Throws(Exception::class)
+  fun testUpdateBasicTokenCredentials() {
+    val fileTemp = DirectoryUtilities.directoryCreateTemporary()
+    val fileProfiles = File(fileTemp, "profiles")
+    fileProfiles.mkdirs()
+    val f_p = File(fileProfiles, "0")
+    f_p.mkdirs()
+    val f_acc = File(f_p, "accounts")
+    val fAccGraveyard = File(f_p, "accounts-graveyard")
+
+    val db0 = AccountsDatabase.open(
+      context = this.context(),
+      accountEvents = this.accountEvents,
+      bookDatabases = this.bookDatabases(),
+      bookFormatSupport = BookFormatsTesting.supportsEverything,
+      accountCredentials = this.credentialStore,
+      accountProviders = this.accountProviders,
+      directory = f_acc,
+      directoryGraveyard = fAccGraveyard
+    )
+
+    val provider0 =
+      MockAccountProviders.fakeProvider("http://www.example.com/accounts0/")
+    val acc0 = db0.createAccount(provider0)
+
+    val creds =
+      AccountAuthenticationCredentials.BasicToken(
+        userName = AccountUsername("1234"),
+        password = AccountPassword("5678"),
+        authenticationTokenInfo = AccountAuthenticationTokenInfo(
+          accessToken = "abcd",
+          authURI = URI("https://www.authrefresh.com")
+        ),
+        adobeCredentials = null,
+        authenticationDescription = null,
+        annotationsURI = URI("https://www.example.com")
+      )
+
+    acc0.setLoginState(AccountLoginState.AccountLoggedIn(creds))
+    Assertions.assertEquals(AccountLoginState.AccountLoggedIn(creds), acc0.loginState)
+    Assertions.assertEquals(creds.authenticationTokenInfo.accessToken, "abcd")
+
+    acc0.updateBasicTokenCredentials("efgh")
+    Assertions.assertEquals(creds.authenticationTokenInfo.accessToken, "efgh")
+
+    acc0.updateBasicTokenCredentials(null)
+    Assertions.assertEquals(creds.authenticationTokenInfo.accessToken, "efgh")
   }
 
   @Test

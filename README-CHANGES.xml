@@ -298,10 +298,11 @@
         <c:change date="2023-08-12T00:00:00+00:00" summary="Fixed crash when time tracking is not enabled."/>
       </c:changes>
     </c:release>
-    <c:release date="2023-08-28T15:28:36+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.6.0">
+    <c:release date="2023-08-28T17:21:01+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.6.0">
       <c:changes>
         <c:change date="2023-08-24T00:00:00+00:00" summary="Updated Kotlin version to 1.9.0"/>
-        <c:change date="2023-08-28T15:28:36+00:00" summary="Fixed crash when opening an audiobook with a null manifest."/>
+        <c:change date="2023-08-28T00:00:00+00:00" summary="Fixed crash when opening an audiobook with a null manifest."/>
+        <c:change date="2023-08-28T17:21:01+00:00" summary="Added support to basic auth token login."/>
       </c:changes>
     </c:release>
   </c:releases>

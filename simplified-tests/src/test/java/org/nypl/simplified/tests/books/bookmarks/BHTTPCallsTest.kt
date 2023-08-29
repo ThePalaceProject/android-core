@@ -15,6 +15,7 @@ import org.librarysimplified.http.vanilla.LSHTTPClients
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
+import org.nypl.simplified.accounts.api.AccountAuthenticationTokenInfo
 import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountUsername
 import org.nypl.simplified.accounts.database.api.AccountType
@@ -43,9 +44,13 @@ class BHTTPCallsTest {
     val calls = BHTTPCalls(objectMapper, this.http)
 
     val credentials =
-      AccountAuthenticationCredentials.Basic(
-        userName = AccountUsername("abcd"),
-        password = AccountPassword("1234"),
+      AccountAuthenticationCredentials.BasicToken(
+        userName = AccountUsername("1234"),
+        password = AccountPassword("5678"),
+        authenticationTokenInfo = AccountAuthenticationTokenInfo(
+          accessToken = "abcd",
+          authURI = URI("https://www.authrefresh.com")
+        ),
         adobeCredentials = null,
         authenticationDescription = null,
         annotationsURI = URI("https://www.example.com")

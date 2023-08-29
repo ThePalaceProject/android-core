@@ -351,7 +351,7 @@ abstract class AuthenticationDocumentContract {
       Assertions.assertEquals(null, this.width)
     }
 
-    Assertions.assertEquals(2, document.authentication.size)
+    Assertions.assertEquals(3, document.authentication.size)
 
     document.authentication[0].apply {
       Assertions.assertEquals(URI("http://opds-spec.org/auth/basic"), this.type)
@@ -385,6 +385,13 @@ abstract class AuthenticationDocumentContract {
         Assertions.assertEquals("application/json", this.type!!.fullType)
         Assertions.assertEquals(null, this.width)
       }
+    }
+
+    document.authentication[2].apply {
+      Assertions.assertEquals(URI("http://thepalaceproject.org/authtype/basic-token"), this.type)
+      Assertions.assertEquals(2, this.labels.size)
+      Assertions.assertEquals("Library card", this.labels["LOGIN"])
+      Assertions.assertEquals("PIN", this.labels["PASSWORD"])
     }
   }
 

@@ -24,6 +24,7 @@ import org.nypl.simplified.accounts.api.AccountAuthenticationAdobeClientToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationAdobePostActivationCredentials
 import org.nypl.simplified.accounts.api.AccountAuthenticationAdobePreActivationCredentials
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
+import org.nypl.simplified.accounts.api.AccountAuthenticationTokenInfo
 import org.nypl.simplified.accounts.api.AccountCookie
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountLoginState
@@ -820,6 +821,156 @@ abstract class ProfileAccountLoginTaskContract {
       AccountAuthenticationCredentials.Basic(
         userName = request.username,
         password = request.password,
+        adobeCredentials = null,
+        authenticationDescription = "Library Login",
+        annotationsURI = URI("https://www.example.com")
+      )
+
+    val newCredentials =
+      originalCredentials.withAdobePreActivationCredentials(
+        AccountAuthenticationAdobePreActivationCredentials(
+          vendorID = AdobeVendorID("OmniConsumerProducts"),
+          clientToken = AccountAuthenticationAdobeClientToken.parse("NYNYPL|536818535|b54be3a5-385b-42eb-9496-3879cb3ac3cc|TWFuIHN1ZmZlcnMgb25seSBiZWNhdXNlIGhlIHRha2VzIHNlcmlvdXNseSB3aGF0IHRoZSBnb2RzIG1hZGUgZm9yIGZ1bi4K"),
+          deviceManagerURI = this.server.url("devices").toUri(),
+          postActivationCredentials = AccountAuthenticationAdobePostActivationCredentials(
+            deviceID = AdobeDeviceID("484799fb-d1aa-4b5d-8179-95e0b115ace4"),
+            userID = AdobeUserID("someone")
+          )
+        )
+      )
+
+    assertEquals(newCredentials, state.credentials)
+
+    val req0 = this.server.takeRequest()
+    assertEquals(this.server.url("patron"), req0.requestUrl)
+    val req1 = this.server.takeRequest()
+    assertEquals(this.server.url("devices"), req1.requestUrl)
+
+    assertEquals(2, this.server.requestCount)
+  }
+
+  /**
+   * If a patron user profile can be parsed and it advertises Adobe DRM, and Adobe DRM is supported,
+   * then logging in succeeds.
+   */
+
+  @Test
+  @Timeout(value = 5L, unit = TimeUnit.SECONDS)
+  fun testLoginBasicTokenAdobeDRM() {
+    val authDescription =
+      AccountProviderAuthenticationDescription.BasicToken(
+        authenticationURI = URI("https://auth.com"),
+        barcodeFormat = "CODABAR",
+        keyboard = KeyboardInput.DEFAULT,
+        passwordMaximumLength = 10,
+        passwordKeyboard = KeyboardInput.DEFAULT,
+        description = "Library Login",
+        labels = mapOf(),
+        logoURI = null
+      )
+
+    val request =
+      ProfileAccountLoginRequest.BasicToken(
+        accountId = this.accountID,
+        description = authDescription,
+        username = AccountUsername("user"),
+        password = AccountPassword("password")
+      )
+
+    val provider =
+      Mockito.mock(AccountProviderType::class.java)
+
+    Mockito.`when`(provider.patronSettingsURI)
+      .thenReturn(this.server.url("patron").toUri())
+
+    Mockito.`when`(provider.authentication)
+      .thenReturn(authDescription)
+
+    Mockito.`when`(this.profile.id)
+      .thenReturn(this.profileID)
+    Mockito.`when`(this.profile.accounts())
+      .thenReturn(sortedMapOf(Pair(this.accountID, this.account)))
+    Mockito.`when`(this.account.id)
+      .thenReturn(this.accountID)
+    Mockito.`when`(this.account.provider)
+      .thenReturn(provider)
+    Mockito.`when`(this.account.setLoginState(this.anyNonNull()))
+      .then {
+        val newState = it.getArgument<AccountLoginState>(0)
+        this.logger.debug("new state: {}", newState)
+        this.loginState = newState
+        this.loginState
+      }
+    Mockito.`when`(this.account.loginState)
+      .then { this.loginState }
+
+    this.server.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+        .setBody(this.profileWithDRM.trimIndent())
+    )
+
+    this.server.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+    )
+
+    /*
+     * When the code calls activateDevice(), it succeeds if the connector returns a single
+     * activation.
+     */
+
+    Mockito.`when`(
+      this.adeptConnector.activateDevice(
+        this.anyNonNull(),
+        this.anyNonNull(),
+        this.anyNonNull(),
+        this.anyNonNull()
+      )
+    ).then { invocation ->
+      val receiver = invocation.arguments[0] as AdobeAdeptActivationReceiverType
+      receiver.onActivationsCount(1)
+      receiver.onActivation(
+        0,
+        AdobeVendorID("OmniConsumerProducts"),
+        AdobeDeviceID("484799fb-d1aa-4b5d-8179-95e0b115ace4"),
+        "user",
+        AdobeUserID("someone"),
+        null
+      )
+    }
+
+    Mockito.`when`(this.adeptExecutor.execute(this.anyNonNull()))
+      .then { invocation ->
+        val procedure = invocation.arguments[0] as AdobeAdeptProcedureType
+        procedure.executeWith(this.adeptConnector)
+      }
+
+    val task =
+      ProfileAccountLoginTask(
+        adeptExecutor = this.adeptExecutor,
+        http = this.http,
+        profile = this.profile,
+        account = this.account,
+        loginStrings = this.loginStrings,
+        patronParsers = this.patronParserFactory,
+        request = request
+      )
+
+    val result = task.call()
+    TaskDumps.dump(this.logger, result)
+
+    val state =
+      this.account.loginState as AccountLoggedIn
+
+    val originalCredentials =
+      AccountAuthenticationCredentials.BasicToken(
+        userName = request.username,
+        password = request.password,
+        authenticationTokenInfo = AccountAuthenticationTokenInfo(
+          accessToken = anyNonNull(),
+          authURI = URI("https://auth.com")
+        ),
         adobeCredentials = null,
         authenticationDescription = "Library Login",
         annotationsURI = URI("https://www.example.com")
