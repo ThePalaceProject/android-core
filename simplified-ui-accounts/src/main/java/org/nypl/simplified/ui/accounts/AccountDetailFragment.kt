@@ -62,6 +62,7 @@ import org.nypl.simplified.ui.images.ImageLoaderType
 import org.nypl.simplified.ui.neutrality.NeutralToolbar
 import org.slf4j.LoggerFactory
 import java.net.URI
+import org.librarysimplified.ui.accounts.R
 
 /**
  * A fragment that shows settings for a single account.

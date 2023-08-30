@@ -1,0 +1,11 @@
+dependencies {
+    implementation(project(":simplified-services-api"))
+    implementation(project(":simplified-ui-listeners-api"))
+    implementation(project(":simplified-ui-screen"))
+
+    implementation(libs.androidx.app.compat)
+    implementation(libs.androidx.constraint.layout)
+    implementation(libs.androidx.fragment)
+    implementation(libs.google.material)
+    implementation(libs.kotlin.stdlib)
+}

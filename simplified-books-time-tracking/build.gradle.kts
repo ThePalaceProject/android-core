@@ -1,0 +1,21 @@
+dependencies {
+    implementation(project(":simplified-accounts-api"))
+    implementation(project(":simplified-accounts-database-api"))
+    implementation(project(":simplified-crashlytics-api"))
+    implementation(project(":simplified-json-core"))
+    implementation(project(":simplified-profiles-api"))
+    implementation(project(":simplified-profiles-controller-api"))
+    implementation(project(":simplified-services-api"))
+
+    implementation(libs.irradia.mime.api)
+    implementation(libs.jackson.core)
+    implementation(libs.jackson.databind)
+    implementation(libs.joda.time)
+    implementation(libs.kotlin.stdlib)
+    implementation(libs.palace.audiobook.api)
+    implementation(libs.palace.http.api)
+    implementation(libs.rxandroid2)
+    implementation(libs.rxjava2)
+    implementation(libs.slf4j)
+    implementation(libs.ulid.generator)
+}

@@ -1,0 +1,4 @@
+dependencies {
+    implementation(libs.google.guava)
+    implementation(libs.io7m.jnull)
+}

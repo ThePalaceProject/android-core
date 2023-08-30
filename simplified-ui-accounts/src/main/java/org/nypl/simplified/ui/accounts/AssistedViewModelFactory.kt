@@ -20,11 +20,11 @@ class AssistedViewModelFactory<T : ViewModel>(
   args: Bundle?,
   private val creator: (SavedStateHandle) -> T
 ) : AbstractSavedStateViewModelFactory(owner, args) {
-  override fun <T : ViewModel?> create(
+  override fun <T : ViewModel> create(
     key: String,
     modelClass: Class<T>,
     handle: SavedStateHandle
-  ): T & Any = creator(handle) as (T & Any)
+  ): T = creator(handle) as T
 }
 
 /**

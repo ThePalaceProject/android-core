@@ -18,6 +18,7 @@ import org.nypl.simplified.ui.accounts.AccountAuthenticationViewBindings.ViewsFo
 import org.nypl.simplified.ui.accounts.AccountAuthenticationViewBindings.ViewsForCOPPAAgeGate
 import org.nypl.simplified.ui.accounts.AccountAuthenticationViewBindings.ViewsForOAuthWithIntermediary
 import org.nypl.simplified.ui.accounts.AccountAuthenticationViewBindings.ViewsForSAML2_0
+import org.librarysimplified.ui.accounts.R
 
 /**
  * A class that handles the visibility for a set of overlapping views.

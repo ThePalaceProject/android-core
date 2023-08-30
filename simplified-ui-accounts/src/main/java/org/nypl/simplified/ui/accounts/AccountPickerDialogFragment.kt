@@ -23,6 +23,7 @@ import org.nypl.simplified.ui.accounts.AccountPickerAdapter.OnAccountClickListen
 import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.slf4j.LoggerFactory
+import org.librarysimplified.ui.accounts.R
 
 /**
  * Present a dialog that shows a list of all active accounts for the current profile.

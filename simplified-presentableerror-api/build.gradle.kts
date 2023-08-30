@@ -1,0 +1,4 @@
+dependencies {
+    api(libs.jcip.annotations)
+    api(libs.kotlin.stdlib)
+}

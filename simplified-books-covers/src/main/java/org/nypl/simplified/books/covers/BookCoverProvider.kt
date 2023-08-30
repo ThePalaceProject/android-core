@@ -13,6 +13,7 @@ import com.io7m.jfunctional.Some
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
+import org.librarysimplified.books.covers.R
 import org.nypl.simplified.books.book_registry.BookRegistryReadableType
 import org.nypl.simplified.books.bundled.api.BundledContentResolverType
 import org.nypl.simplified.feeds.api.FeedEntry

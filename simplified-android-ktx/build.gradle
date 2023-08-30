@@ -1,6 +1,0 @@
-dependencies {
-  implementation libs.kotlin.stdlib
-  implementation libs.kotlin.reflect
-
-  api libs.androidx.app.compat
-}

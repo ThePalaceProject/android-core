@@ -92,28 +92,28 @@ dependencies {
   api libs.palace.audiobook.rbdigital
   api libs.palace.audiobook.views
 
-  implementation libs.io7m.jfunctional
-  implementation libs.io7m.jnull
-  implementation libs.jackson.databind
-  implementation libs.junit
-  implementation libs.junit.jupiter.api
-  implementation libs.junit.jupiter.engine
-  implementation libs.kotlin.reflect
-  implementation libs.kotlin.stdlib
-  implementation libs.mockito.android
-  implementation libs.mockito.kotlin
-  implementation libs.nypl.theme
-  implementation libs.okhttp3.mockwebserver
-  implementation libs.palace.drm.core
-  implementation libs.palace.http.api
-  implementation libs.palace.http.bearer.token
-  implementation libs.palace.http.vanilla
-  implementation libs.r2.lcp
-  implementation libs.r2.shared
-  implementation libs.slf4j
+  implementation(libs.io7m.jfunctional)
+  implementation(libs.io7m.jnull)
+  implementation(libs.jackson.databind)
+  implementation(libs.junit)
+  implementation(libs.junit.jupiter.api)
+  implementation(libs.junit.jupiter.engine)
+  implementation(libs.kotlin.reflect)
+  implementation(libs.kotlin.stdlib)
+  implementation(libs.mockito.android)
+  implementation(libs.mockito.kotlin)
+  implementation(libs.nypl.theme)
+  implementation(libs.okhttp3.mockwebserver)
+  implementation(libs.palace.drm.core)
+  implementation(libs.palace.http.api)
+  implementation(libs.palace.http.bearer.token)
+  implementation(libs.palace.http.vanilla)
+  implementation(libs.r2.lcp)
+  implementation(libs.r2.shared)
+  implementation(libs.slf4j)
 
-  testImplementation libs.logback.classic
-  testImplementation libs.junit
-  testImplementation libs.org.json
-  testImplementation libs.robolectric
+  testimplementation(libs.logback.classic)
+  testimplementation(libs.junit)
+  testimplementation(libs.org.json)
+  testimplementation(libs.robolectric)
 }

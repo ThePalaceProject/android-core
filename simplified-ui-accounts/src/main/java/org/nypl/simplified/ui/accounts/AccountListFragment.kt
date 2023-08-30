@@ -26,6 +26,7 @@ import org.nypl.simplified.listeners.api.fragmentListeners
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.nypl.simplified.ui.neutrality.NeutralToolbar
+import org.librarysimplified.ui.accounts.R
 
 /**
  * A fragment that shows the set of accounts in the current profile.

@@ -1,10 +1,10 @@
 package org.nypl.simplified.books.book_database.api
 
+import net.jcip.annotations.ThreadSafe
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import java.util.SortedSet
-import javax.annotation.concurrent.ThreadSafe
 
 /**
  * The type of book databases.

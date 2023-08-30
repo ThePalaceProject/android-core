@@ -63,7 +63,7 @@ class FeedHTTPTransport(
   }
 
   private fun methodOfName(method: String): LSHTTPRequestBuilderType.Method {
-    return when (method.toUpperCase(Locale.ROOT)) {
+    return when (method.uppercase(Locale.ROOT)) {
       "GET" -> LSHTTPRequestBuilderType.Method.Get
       "HEAD" -> LSHTTPRequestBuilderType.Method.Head
       "POST" -> LSHTTPRequestBuilderType.Method.Post(ByteArray(0), MIMECompatibility.applicationOctetStream)

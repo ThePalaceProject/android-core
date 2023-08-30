@@ -14,9 +14,9 @@ import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.fragmentListeners
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskStep
-import org.nypl.simplified.ui.accounts.R
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.webview.WebViewUtilities
+import org.librarysimplified.ui.accounts.R
 
 /**
  * A fragment that performs the SAML 2.0 login workflow.

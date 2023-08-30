@@ -25,7 +25,7 @@ import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.profiles.api.ProfileEvent
 import org.nypl.simplified.profiles.api.ProfileUpdated
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
-import org.nypl.simplified.reports.Reports
+import org.librarysimplified.reports.Reports
 import org.slf4j.LoggerFactory
 import java.net.URI
 

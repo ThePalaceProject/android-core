@@ -2,6 +2,6 @@
 
 <androidx.fragment.app.FragmentContainerView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/splash_fragment_container"
-    android:name="org.nypl.simplified.ui.splash.BootFragment"
+    android:name="org.librarysimplified.ui.splash.BootFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"></androidx.fragment.app.FragmentContainerView>

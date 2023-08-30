@@ -1,0 +1,8 @@
+dependencies {
+    implementation(libs.androidx.app.compat)
+    implementation(libs.androidx.legacy.preference.v14)
+    implementation(libs.google.material)
+    implementation(libs.kotlin.stdlib)
+    implementation(libs.kotlin.reflect)
+    implementation(libs.nypl.theme)
+}

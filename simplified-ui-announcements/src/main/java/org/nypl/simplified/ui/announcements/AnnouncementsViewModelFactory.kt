@@ -10,13 +10,13 @@ class AnnouncementsViewModelFactory(
 ) : ViewModelProvider.Factory {
 
   @Suppress("UNCHECKED_CAST")
-  override fun <T : ViewModel?> create(modelClass: Class<T>): T & Any {
+  override fun <T : ViewModel> create(modelClass: Class<T>): T {
     return when {
       modelClass.isAssignableFrom(AnnouncementsViewModel::class.java) -> {
         val profilesController: ProfilesControllerType =
           this.services.requireService(ProfilesControllerType::class.java)
 
-        AnnouncementsViewModel(profilesController) as (T & Any)
+        AnnouncementsViewModel(profilesController) as T
       }
       else ->
         throw IllegalArgumentException(

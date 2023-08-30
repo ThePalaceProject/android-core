@@ -1,9 +1,0 @@
-dependencies {
-  api project(":simplified-profiles-api")
-
-  implementation libs.kotlin.stdlib
-  implementation libs.kotlin.reflect
-
-  compileOnly libs.google.auto.value
-  annotationProcessor libs.google.auto.value.processor
-}

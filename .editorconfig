@@ -1,4 +1,4 @@
-[*.{kt,kts}]
+[*.kt]
 indent_size=2
 insert_final_newline=true
 ktlint_standard_argument-list-wrapping = disabled
@@ -9,6 +9,9 @@ ktlint_standard_package-name = disabled
 ktlint_standard_trailing-comma-on-call-site = disabled
 ktlint_standard_trailing-comma-on-declaration-site = disabled
 ktlint_standard_wrapping = disabled
+
+[*.kts]
+indent_size=4
 
 [*.gradle]
 indent_size=2

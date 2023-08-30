@@ -1,11 +1,11 @@
 package org.nypl.simplified.accounts.api
 
+import net.jcip.annotations.ThreadSafe
 import org.joda.time.DateTime
 import org.nypl.simplified.announcements.Announcement
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSFeedConstants.AUTHENTICATION_DOCUMENT_RELATION_URI_TEXT
 import java.net.URI
-import javax.annotation.concurrent.ThreadSafe
 
 /**
  * A provider of accounts.

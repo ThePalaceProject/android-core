@@ -1,4 +1,0 @@
-dependencies {
-  api libs.google.guava
-  api libs.kotlin.stdlib
-}

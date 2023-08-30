@@ -1,0 +1,28 @@
+dependencies {
+    api(project(":simplified-boot-api"))
+    api(project(":simplified-documents"))
+    api(project(":simplified-migration-api"))
+    api(project(":simplified-presentableerror-api"))
+    api(project(":simplified-reports"))
+    api(project(":simplified-ui-branding"))
+    api(project(":simplified-ui-listeners-api"))
+    api(project(":simplified-services-api"))
+    api(project(":simplified-buildconfig-api"))
+    api(project(":simplified-ui-accounts"))
+
+    implementation(project(":simplified-webview"))
+
+    implementation(libs.androidx.app.compat)
+    implementation(libs.androidx.constraint.layout)
+    implementation(libs.androidx.lifecycle)
+    implementation(libs.androidx.fragment)
+    implementation(libs.google.material)
+    implementation(libs.io7m.jfunctional)
+    implementation(libs.io7m.junreachable)
+    implementation(libs.kotlin.stdlib)
+    implementation(libs.kotlin.reflect)
+    implementation(libs.rxjava2)
+    implementation(libs.rxjava2.extensions)
+    implementation(libs.rxandroid2)
+    implementation(libs.slf4j)
+}

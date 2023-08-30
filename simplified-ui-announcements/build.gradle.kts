@@ -1,0 +1,12 @@
+dependencies {
+    implementation(project(":simplified-announcements"))
+    implementation(project(":simplified-profiles-controller-api"))
+    implementation(project(":simplified-ui-thread-api"))
+    implementation(project(":simplified-services-api"))
+
+    implementation(libs.androidx.app.compat)
+    implementation(libs.androidx.constraint.layout)
+    implementation(libs.androidx.lifecycle)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.fragment)
+}

@@ -13,6 +13,7 @@ import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.fragmentListeners
 import org.nypl.simplified.ui.neutrality.NeutralToolbar
 import org.nypl.simplified.webview.WebViewUtilities
+import org.librarysimplified.ui.accounts.R
 
 /**
  * A fragment that shows a WebView

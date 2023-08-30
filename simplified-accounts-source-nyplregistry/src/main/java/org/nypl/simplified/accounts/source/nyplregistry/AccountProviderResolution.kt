@@ -149,8 +149,7 @@ class AccountProviderResolution(
   }
 
   private fun findAlternateLink(): URI? {
-    return this.description.links.firstOrNull {
-        link ->
+    return this.description.links.firstOrNull { link ->
       link.relation == "alternate"
     }?.hrefURI
   }
@@ -228,26 +227,31 @@ class AccountProviderResolution(
             this.extractAuthenticationDescriptionOAuthIntermediary(taskRecorder, authObject)
           )
         }
+
         BASIC_TYPE -> {
           authObjects.add(
             this.extractAuthenticationDescriptionBasic(authObject)
           )
         }
+
         COPPA_TYPE -> {
           authObjects.add(
             this.extractAuthenticationDescriptionCOPPA(taskRecorder, authObject)
           )
         }
+
         ANONYMOUS_TYPE -> {
           authObjects.clear()
           authObjects.add(AccountProviderAuthenticationDescription.Anonymous)
           break@accumulateAuthentications
         }
+
         SAML_2_0_TYPE -> {
           authObjects.add(
             this.extractAuthenticationDescriptionSAML20(taskRecorder, authObject)
           )
         }
+
         else -> {
           this.logger.warn("encountered unrecognized authentication type: {}", authType)
         }
@@ -341,7 +345,7 @@ class AccountProviderResolution(
 
     return try {
       KeyboardInput.valueOf(
-        text.toUpperCase(Locale.ROOT).replace(' ', '_')
+        text.uppercase(Locale.ROOT).replace(' ', '_')
       )
     } catch (e: Exception) {
       this.logger.error("unable to interpret keyboard type: {}", text)
@@ -406,7 +410,11 @@ class AccountProviderResolution(
           }
 
           is LSHTTPResponseStatus.Responded.Error -> {
-            if (MIMECompatibility.isCompatibleStrictWithoutAttributes(status.properties.contentType, authDocumentType)) {
+            if (MIMECompatibility.isCompatibleStrictWithoutAttributes(
+                status.properties.contentType,
+                authDocumentType
+              )
+            ) {
               this.parseAuthenticationDocument(
                 targetURI = targetLink.href,
                 stream = status.bodyStream ?: emptyStream(),
@@ -416,7 +424,11 @@ class AccountProviderResolution(
               val message = this.stringResources.resolvingAuthDocumentRetrievalFailed
               taskRecorder.currentStepFailed(
                 message,
-                httpRequestFailed(targetLink.hrefURI, status.properties.originalStatus, status.properties.message)
+                httpRequestFailed(
+                  targetLink.hrefURI,
+                  status.properties.originalStatus,
+                  status.properties.message
+                )
               )
               throw IOException(message)
             }
@@ -450,6 +462,7 @@ class AccountProviderResolution(
           parseResult.warnings.forEach { warning -> this.logger.warn("{}", warning.message) }
           parseResult.result
         }
+
         is ParseResult.Failure -> {
           parseResult.warnings.forEach { warning -> this.logger.warn("{}", warning.message) }
           parseResult.errors.forEach { error -> this.logger.error("{}", error.message) }
