@@ -2,7 +2,11 @@ package org.nypl.simplified.books.borrowing.internal
 
 import one.irradia.mime.api.MIMECompatibility
 import one.irradia.mime.api.MIMEType
-import org.librarysimplified.http.downloads.LSHTTPDownloadState
+import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadResult.DownloadCancelled
+import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadResult.DownloadCompletedSuccessfully
+import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedExceptionally
+import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedServer
+import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedUnacceptableMIME
 import org.librarysimplified.http.downloads.LSHTTPDownloads
 import org.nypl.drm.core.AxisNowFulfillment
 import org.nypl.simplified.accounts.api.AccountReadableType
@@ -73,15 +77,19 @@ class BorrowAxisNow private constructor() : BorrowSubtaskType {
           )
 
         when (val result = LSHTTPDownloads.download(downloadRequest)) {
-          LSHTTPDownloadState.LSHTTPDownloadResult.DownloadCancelled ->
+          DownloadCancelled -> {
             throw BorrowSubtaskException.BorrowSubtaskCancelled()
-          is LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedServer ->
+          }
+          is DownloadFailedServer -> {
             throw BorrowHTTP.onDownloadFailedServer(context, result)
-          is LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedUnacceptableMIME ->
+          }
+          is DownloadFailedUnacceptableMIME -> {
             throw BorrowSubtaskFailed()
-          is LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedExceptionally ->
+          }
+          is DownloadFailedExceptionally -> {
             throw BorrowHTTP.onDownloadFailedExceptionally(context, result)
-          is LSHTTPDownloadState.LSHTTPDownloadResult.DownloadCompletedSuccessfully -> {
+          }
+          is DownloadCompletedSuccessfully -> {
             this.fulfill(context, temporaryFile.readBytes())
           }
         }

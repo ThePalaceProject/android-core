@@ -141,11 +141,9 @@ class PdfReaderActivity : AppCompatActivity() {
       }
 
     this.uiThread.runOnUIThread {
-
       try {
         // if there's more than one last read bookmark, we'll need to compare their dates
         if (lastReadBookmarks.size > 1) {
-
           val localLastReadBookmark = lastReadBookmarks.first()
           val serverLastReadBookmark = lastReadBookmarks.last()
 
@@ -261,13 +259,12 @@ class PdfReaderActivity : AppCompatActivity() {
   }
 
   private fun createPdfServer(drmInfo: BookDRMInformation, pdfFile: File) {
-
     val contentProtections = BookContentProtections.create(
       context = this,
       contentProtectionProviders = ServiceLoader.load(ContentProtectionProvider::class.java).toList(),
       drmInfo = drmInfo,
       isManualPassphraseEnabled =
-        profilesController.profileCurrent().preferences().isManualLCPPassphraseEnabled,
+      profilesController.profileCurrent().preferences().isManualLCPPassphraseEnabled,
       onLCPDialogDismissed = {
         finish()
       }

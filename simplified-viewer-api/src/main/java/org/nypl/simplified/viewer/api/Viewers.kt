@@ -78,7 +78,10 @@ object Viewers {
             accountProvider = account.provider.id,
             accountUUID = account.id.uuid,
             opdsEntry = book.entry,
-            targetURI = book.entry.analytics.getOrNull()
+            targetURI = book.entry.analytics.getOrNull(),
+            onAccessTokenUpdated = { accessToken ->
+              account.updateBasicTokenCredentials(accessToken)
+            }
           )
         )
 

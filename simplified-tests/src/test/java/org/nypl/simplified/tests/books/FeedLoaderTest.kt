@@ -1,8 +1,8 @@
 package org.nypl.simplified.tests.books
 
 import com.google.common.util.concurrent.ListeningExecutorService
-import org.librarysimplified.http.api.LSHTTPAuthorizationType
 import org.mockito.Mockito
+import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.bundled.api.BundledContentResolverType
 import org.nypl.simplified.books.formats.BookFormatSupport
@@ -25,8 +25,8 @@ class FeedLoaderTest : FeedLoaderContract() {
     val parser =
       OPDSFeedParser.newParser(entryParser)
     val transport =
-      OPDSFeedTransportType<LSHTTPAuthorizationType?> { context, uri, method ->
-        uri.toURL().openStream()
+      OPDSFeedTransportType<AccountAuthenticationCredentials?> { context, uri, method ->
+        uri.toURL().openStream() to ""
       }
 
     val searchParser = OPDSSearchParser.newParser()

@@ -73,8 +73,8 @@ class AudioBookLoadingFragment : Fragment() {
     super.onCreate(state)
 
     this.loadingParameters =
-      this.arguments!!.getSerializable(parametersKey)
-      as AudioBookLoadingFragmentParameters
+      requireArguments().getSerializable(parametersKey)
+        as AudioBookLoadingFragmentParameters
 
     val services = Services.serviceDirectory()
 
@@ -149,8 +149,9 @@ class AudioBookLoadingFragment : Fragment() {
         )
         strategyResult.result
       }
-      is TaskResult.Failure ->
+      is TaskResult.Failure -> {
         throw IOException(strategyResult.message)
+      }
     }
   }
 }

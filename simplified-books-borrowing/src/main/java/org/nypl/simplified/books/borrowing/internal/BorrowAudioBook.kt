@@ -85,25 +85,40 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
   ): DownloadedManifest {
     context.taskRecorder.beginNewStep("Executing audio book manifest strategy...")
 
-    val audioBookCredentials: AudioBookCredentials? =
-      context.account.loginState.credentials?.let { credentials ->
-        when (credentials) {
-          is AccountAuthenticationCredentials.Basic -> {
-            if (credentials.password.value.isBlank()) {
-              AudioBookCredentials.UsernameOnly(
-                userName = credentials.userName.value
-              )
-            } else {
-              AudioBookCredentials.UsernamePassword(
-                userName = credentials.userName.value,
-                password = credentials.password.value
-              )
-            }
+    val audioBookCredentials =
+      when (val credentials = context.account.loginState.credentials) {
+        is AccountAuthenticationCredentials.Basic -> {
+          if (credentials.password.value.isBlank()) {
+            AudioBookCredentials.UsernameOnly(
+              userName = credentials.userName.value
+            )
+          } else {
+            AudioBookCredentials.UsernamePassword(
+              userName = credentials.userName.value,
+              password = credentials.password.value
+            )
           }
-          is AccountAuthenticationCredentials.OAuthWithIntermediary ->
-            AudioBookCredentials.BearerToken(accessToken = credentials.accessToken)
-          is AccountAuthenticationCredentials.SAML2_0 ->
-            AudioBookCredentials.BearerToken(accessToken = credentials.accessToken)
+        }
+        is AccountAuthenticationCredentials.BasicToken -> {
+          if (credentials.password.value.isBlank()) {
+            AudioBookCredentials.UsernameOnly(
+              userName = credentials.userName.value
+            )
+          } else {
+            AudioBookCredentials.UsernamePassword(
+              userName = credentials.userName.value,
+              password = credentials.password.value
+            )
+          }
+        }
+        is AccountAuthenticationCredentials.OAuthWithIntermediary -> {
+          AudioBookCredentials.BearerToken(accessToken = credentials.accessToken)
+        }
+        is AccountAuthenticationCredentials.SAML2_0 -> {
+          AudioBookCredentials.BearerToken(accessToken = credentials.accessToken)
+        }
+        null -> {
+          null
         }
       }
 
@@ -165,8 +180,11 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
     data: DownloadedManifest
   ) {
     context.taskRecorder.beginNewStep("Saving book...")
+    val formatHandle = context.bookDatabaseEntry.findFormatHandleForContentType(
+      contentType = context.currentAcquisitionPathElement.mimeType
+    )
 
-    return when (val formatHandle = context.bookDatabaseEntry.findFormatHandleForContentType(context.currentAcquisitionPathElement.mimeType)) {
+    return when (formatHandle) {
       is BookDatabaseEntryFormatHandleAudioBook -> {
         formatHandle.copyInManifestAndURI(
           data = data.file.readBytes(),
@@ -176,8 +194,9 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
       }
       is BookDatabaseEntryFormatHandlePDF,
       is BookDatabaseEntryFormatHandleEPUB,
-      null ->
+      null -> {
         throw UnreachableCodeException()
+      }
     }
   }
 }

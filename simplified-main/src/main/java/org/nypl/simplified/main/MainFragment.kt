@@ -86,9 +86,9 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
     super.onCreate(savedInstanceState)
 
     /*
-    * If named profiles are enabled, subscribe to profile timer events so that users are
-    * logged out after a period of inactivity.
-    */
+     * If named profiles are enabled, subscribe to profile timer events so that users are
+     * logged out after a period of inactivity.
+     */
 
     when (viewModel.profilesController.profileAnonymousEnabled()) {
       ANONYMOUS_PROFILE_ENABLED -> {
@@ -99,8 +99,8 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
     }
 
     /*
-    * Demand that onOptionsItemSelected be called.
-    */
+     * Demand that onOptionsItemSelected be called.
+     */
 
     setHasOptionsMenu(true)
 
@@ -262,6 +262,26 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
       is BookStatus.DownloadWaitingForExternalAuthentication -> {
         this.openBookDownloadLogin(status.id, status.downloadURI)
       }
+
+      is BookStatus.DownloadExternalAuthenticationInProgress,
+      is BookStatus.Downloading,
+      is BookStatus.FailedDownload,
+      is BookStatus.FailedLoan,
+      is BookStatus.FailedRevoke,
+      is BookStatus.Held.HeldInQueue,
+      is BookStatus.Held.HeldReady,
+      is BookStatus.Holdable,
+      is BookStatus.Loanable,
+      is BookStatus.Loaned.LoanedDownloaded,
+      is BookStatus.Loaned.LoanedNotDownloaded,
+      is BookStatus.ReachedLoanLimit,
+      is BookStatus.RequestingDownload,
+      is BookStatus.RequestingLoan,
+      is BookStatus.RequestingRevoke,
+      is BookStatus.Revoked,
+      null -> {
+        // do nothing
+      }
     }
   }
 
@@ -288,7 +308,6 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
       var badgeView = bottomNavigationItem.findViewById<View>(R.id.badgeView)
 
       if (numberOfHolds > 0) {
-
         if (badgeView == null) {
           badgeView = LayoutInflater.from(requireContext()).inflate(
             R.layout.layout_menu_item_badge, bottomNavigationItem, false

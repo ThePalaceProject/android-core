@@ -12,7 +12,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
 import org.joda.time.DateTime
 import org.joda.time.LocalDateTime
-import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.accounts.api.AccountEventCreation
 import org.nypl.simplified.accounts.api.AccountEventDeletion
@@ -22,6 +21,7 @@ import org.nypl.simplified.accounts.api.AccountLoginState
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.api.AccountReadableType
+import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.analytics.api.AnalyticsEvent
 import org.nypl.simplified.analytics.api.AnalyticsType
 import org.nypl.simplified.books.api.Book
@@ -193,7 +193,14 @@ class CatalogFeedViewModel(
               onAgeUpdateSuccess(account, ownership, result)
             }
           }
+
+          CatalogFeedOwnership.CollectedFromAccounts -> {
+            // do nothing
+          }
         }
+      }
+      is ProfileUpdated.Failed -> {
+        // do nothing
       }
     }
   }
@@ -230,10 +237,27 @@ class CatalogFeedViewModel(
       this.reloadFeed()
     } else {
       when (event.statusNow) {
-        is BookStatus.Held, is BookStatus.Loaned, is BookStatus.Revoked -> {
+        is BookStatus.Held,
+        is BookStatus.Loaned,
+        is BookStatus.Revoked -> {
           if (this.state.arguments.isLocallyGenerated) {
             this.reloadFeed()
           }
+        }
+        is BookStatus.DownloadExternalAuthenticationInProgress,
+        is BookStatus.DownloadWaitingForExternalAuthentication,
+        is BookStatus.Downloading,
+        is BookStatus.FailedDownload,
+        is BookStatus.FailedLoan,
+        is BookStatus.FailedRevoke,
+        is BookStatus.Holdable,
+        is BookStatus.Loanable,
+        is BookStatus.ReachedLoanLimit,
+        is BookStatus.RequestingDownload,
+        is BookStatus.RequestingLoan,
+        is BookStatus.RequestingRevoke,
+        null -> {
+          // do nothing
         }
       }
     }
@@ -360,11 +384,15 @@ class CatalogFeedViewModel(
             }.size
           )
         }
-        FeedLoaderResult.FeedLoaderSuccess(feed) as FeedLoaderResult
+        FeedLoaderResult.FeedLoaderSuccess(
+          feed = feed,
+          accessToken = null
+        ) as FeedLoaderResult
       }
       .onAnyError { ex -> FeedLoaderResult.wrapException(booksUri, ex) }
 
     this.createNewStatus(
+      account = null,
       arguments = arguments,
       future = future
     )
@@ -398,18 +426,17 @@ class CatalogFeedViewModel(
 
     val loginState =
       account.loginState
-    val authentication =
-      AccountAuthenticatedHTTP.createAuthorizationIfPresent(loginState.credentials)
 
     val future =
       this.feedLoader.fetchURI(
-        account = account.id,
+        accountID = account.id,
         uri = arguments.feedURI,
-        auth = authentication,
+        credentials = loginState.credentials,
         method = "GET"
       )
 
     this.createNewStatus(
+      account = account,
       arguments = arguments,
       future = future
     )
@@ -429,6 +456,7 @@ class CatalogFeedViewModel(
    */
 
   private fun createNewStatus(
+    account: AccountType?,
     arguments: CatalogFeedArguments,
     future: FluentFuture<FeedLoaderResult>
   ) {
@@ -442,10 +470,21 @@ class CatalogFeedViewModel(
      */
 
     future.map { feedLoaderResult ->
+      updateBasicTokenCredentials(feedLoaderResult, account)
+
       synchronized(loaderResults) {
         val resultWithArguments = LoaderResultWithArguments(arguments, feedLoaderResult)
         this.loaderResults.onNext(resultWithArguments)
       }
+    }
+  }
+
+  private fun updateBasicTokenCredentials(
+    feedLoaderResult: FeedLoaderResult,
+    account: AccountType?
+  ) {
+    if (feedLoaderResult is FeedLoaderResult.FeedLoaderSuccess) {
+      account?.updateBasicTokenCredentials(feedLoaderResult.accessToken)
     }
   }
 
@@ -484,9 +523,9 @@ class CatalogFeedViewModel(
     result: FeedLoaderResult.FeedLoaderFailure
   ): CatalogFeedState.CatalogFeedLoadFailed {
     /*
-    * If the feed can't be loaded due to an authentication failure, then open
-    * the account screen (if possible).
-    */
+     * If the feed can't be loaded due to an authentication failure, then open
+     * the account screen (if possible).
+     */
 
     when (result) {
       is FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedGeneral -> {
@@ -927,7 +966,6 @@ class CatalogFeedViewModel(
   }
 
   override fun resetInitialBookStatus(feedEntry: FeedEntry.FeedEntryOPDS) {
-
     val initialBookStatus = synthesizeBookWithStatus(feedEntry)
 
     this.bookModels[feedEntry.bookID]?.let { model ->

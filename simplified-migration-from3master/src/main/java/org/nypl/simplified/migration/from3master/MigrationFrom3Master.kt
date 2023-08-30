@@ -274,7 +274,11 @@ class MigrationFrom3Master(
           )
           return
         }
-        is AccountProviderAuthenticationDescription.Basic -> {
+        is AccountProviderAuthenticationDescription.Basic,
+        is AccountProviderAuthenticationDescription.BasicToken,
+        is AccountProviderAuthenticationDescription.OAuthWithIntermediary,
+        is AccountProviderAuthenticationDescription.SAML2_0 -> {
+          // do nothing
         }
       }
 
@@ -482,6 +486,7 @@ class MigrationFrom3Master(
       when (val drm = handle.drmInformationHandle) {
         is BookDRMInformationHandle.ACSHandle ->
           drm.setAdobeRightsInformation(book.epubAdobeLoan)
+        is BookDRMInformationHandle.AxisHandle,
         is BookDRMInformationHandle.LCPHandle,
         is BookDRMInformationHandle.NoneHandle -> {
           // Nothing required

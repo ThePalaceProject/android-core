@@ -50,6 +50,7 @@ class TimeTrackingService(
   private var isPlaying = false
   private var isOnAudiobookScreen = false
   private var shouldSaveRemotely = false
+  private var tracking = false
 
   init {
     connectivityListener = TimeTrackingConnectivityListener(
@@ -66,10 +67,7 @@ class TimeTrackingService(
     libraryId: String,
     timeTrackingUri: URI?
   ) {
-    if (!isTimeTrackingEnabled()) {
-      return
-    }
-
+    this.tracking = timeTrackingUri != null
     if (timeTrackingUri == null) {
       logger.debug(
         "Account {} and book {} has no time tracking uri",
@@ -98,7 +96,6 @@ class TimeTrackingService(
     timeEntriesToRetryFile = File(bookFile, FILE_NAME_TIME_ENTRIES_RETRY)
 
     if (!timeEntriesFile.exists()) {
-
       // create an entries file for this book with an initial time tracking info
       timeEntriesFile.createNewFile()
 
@@ -115,7 +112,6 @@ class TimeTrackingService(
     }
 
     if (!timeEntriesToRetryFile.exists()) {
-
       // create a file for possible entries that weren't successfully saved on the server
       timeEntriesToRetryFile.createNewFile()
 
@@ -135,6 +131,10 @@ class TimeTrackingService(
   }
 
   override fun onPlayerEventReceived(playerEvent: PlayerEvent) {
+    if (!this.tracking) {
+      return
+    }
+
     when (playerEvent) {
       is PlayerEvent.PlayerEventWithSpineElement.PlayerEventPlaybackProgressUpdate,
       is PlayerEvent.PlayerEventWithSpineElement.PlayerEventPlaybackStarted -> {
@@ -163,6 +163,10 @@ class TimeTrackingService(
   }
 
   override fun stopTracking() {
+    if (!this.tracking) {
+      return
+    }
+
     logger.debug("Stop tracking playing time")
 
     disposables.clear()
@@ -194,7 +198,7 @@ class TimeTrackingService(
   private fun handleConnectivityState(hasInternet: Boolean) {
     // if the user is on an audiobook player screen, it means the entries will most likely be sent
     // to the server, so there's no need to do anything else
-    if (isOnAudiobookScreen || !isTimeTrackingEnabled()) {
+    if (isOnAudiobookScreen) {
       return
     }
 
@@ -305,14 +309,11 @@ class TimeTrackingService(
             timeEntry.isValidTimeEntry()
           }
         ),
-        credentials = profilesController
+        account = profilesController
           .profileCurrent()
           .account(AccountID(UUID.fromString(timeTrackingInfo.accountId)))
-          .loginState
-          .credentials
       )
     } catch (exception: Exception) {
-
       // in case an exception occurs, we keep the original time entries
       timeTrackingInfo.timeEntries
     }
@@ -391,9 +392,5 @@ class TimeTrackingService(
           }
         )
     )
-  }
-
-  private fun isTimeTrackingEnabled(): Boolean {
-    return profilesController.profileCurrent().preferences().isTimeTrackingEnabled
   }
 }

@@ -22,8 +22,8 @@ class OnboardingStartScreenViewModel : ViewModel() {
       )
 
   /*
-  * Store the fact that we've seen the selection screen.
-  */
+   * Store the fact that we've seen the selection screen.
+   */
 
   fun setHasSeenOnboarding() {
     Services

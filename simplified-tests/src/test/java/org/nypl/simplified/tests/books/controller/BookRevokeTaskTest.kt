@@ -1147,13 +1147,13 @@ class BookRevokeTaskTest {
     feed.entriesInOrder.add(FeedEntry.FeedEntryOPDS(account.id, opdsEntry))
 
     val feedResult =
-      FeedLoaderResult.FeedLoaderSuccess(feed)
+      FeedLoaderResult.FeedLoaderSuccess(feed, null)
 
     Mockito.`when`(
       feedLoader.fetchURI(
-        account = this.anyNonNull(),
+        accountID = this.anyNonNull(),
         uri = this.anyNonNull(),
-        auth = this.anyNonNull(),
+        credentials = this.anyNonNull(),
         method = this.anyNonNull()
       )
     ).thenReturn(FluentFuture.from(Futures.immediateFuture(feedResult as FeedLoaderResult)))
@@ -1636,13 +1636,13 @@ class BookRevokeTaskTest {
     feed.entriesInOrder.add(FeedEntry.FeedEntryCorrupt(account.id, bookId, IOException()))
 
     val feedResult =
-      FeedLoaderResult.FeedLoaderSuccess(feed)
+      FeedLoaderResult.FeedLoaderSuccess(feed, null)
 
     Mockito.`when`(
       feedLoader.fetchURI(
-        account = this.anyNonNull(),
+        accountID = this.anyNonNull(),
         uri = this.anyNonNull(),
-        auth = this.anyNonNull(),
+        credentials = this.anyNonNull(),
         method = this.anyNonNull()
       )
     ).thenReturn(FluentFuture.from(Futures.immediateFuture(feedResult as FeedLoaderResult)))
@@ -1758,9 +1758,9 @@ class BookRevokeTaskTest {
 
     Mockito.`when`(
       feedLoader.fetchURI(
-        account = this.anyNonNull(),
+        accountID = this.anyNonNull(),
         uri = this.anyNonNull(),
-        auth = this.anyNonNull(),
+        credentials = this.anyNonNull(),
         method = this.anyNonNull()
       )
     ).thenReturn(FluentFuture.from(Futures.immediateFuture(feedResult as FeedLoaderResult)))
@@ -1868,9 +1868,9 @@ class BookRevokeTaskTest {
 
     Mockito.`when`(
       feedLoader.fetchURI(
-        account = this.anyNonNull(),
+        accountID = this.anyNonNull(),
         uri = this.anyNonNull(),
-        auth = this.anyNonNull(),
+        credentials = this.anyNonNull(),
         method = this.anyNonNull()
       )
     ).thenReturn(FluentFuture.from(SettableFuture.create()))
@@ -2194,9 +2194,9 @@ class BookRevokeTaskTest {
 
     Mockito.`when`(
       feedLoader.fetchURI(
-        account = this.anyNonNull(),
+        accountID = this.anyNonNull(),
         uri = this.anyNonNull(),
-        auth = this.anyNonNull(),
+        credentials = this.anyNonNull(),
         method = this.anyNonNull()
       )
     ).thenReturn(FluentFuture.from(Futures.immediateFailedFuture(UniqueException())))
@@ -2307,9 +2307,9 @@ class BookRevokeTaskTest {
 
     Mockito.`when`(
       feedLoader.fetchURI(
-        account = this.anyNonNull(),
+        accountID = this.anyNonNull(),
         uri = this.anyNonNull(),
-        auth = this.anyNonNull(),
+        credentials = this.anyNonNull(),
         method = this.anyNonNull()
       )
     ).thenReturn(FluentFuture.from(Futures.immediateFailedFuture(UniqueException())))

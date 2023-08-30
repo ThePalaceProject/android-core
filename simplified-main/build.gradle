@@ -83,6 +83,7 @@ dependencies {
   api libs.palace.drm.core
   api libs.palace.http.api
   api libs.palace.http.bearer.token
+  api libs.palace.http.refresh.token
   api libs.palace.http.vanilla
   api libs.r2.lcp
   api libs.rxandroid2
@@ -90,5 +91,6 @@ dependencies {
   api libs.rxjava2.extensions
   api libs.slf4j
 
+  implementation libs.transifex.sdk
   implementation libs.firebase.dynamic.links
 }

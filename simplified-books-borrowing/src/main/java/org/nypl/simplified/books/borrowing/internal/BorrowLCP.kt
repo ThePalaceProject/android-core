@@ -7,8 +7,15 @@ import net.java.truevfs.kernel.spec.FsAccessOption
 import one.irradia.mime.api.MIMECompatibility
 import one.irradia.mime.api.MIMEType
 import org.librarysimplified.http.api.LSHTTPResponseStatus
-import org.librarysimplified.http.downloads.LSHTTPDownloadState
+import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadResult.DownloadCancelled
+import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadResult.DownloadCompletedSuccessfully
+import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedExceptionally
+import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedServer
+import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedUnacceptableMIME
 import org.librarysimplified.http.downloads.LSHTTPDownloads
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addCredentialsToProperties
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.getAccessToken
 import org.nypl.simplified.accounts.api.AccountReadableType
 import org.nypl.simplified.books.api.BookDRMKind
 import org.nypl.simplified.books.book_database.BookDRMInformationHandleLCP
@@ -51,7 +58,10 @@ class BorrowLCP private constructor() : BorrowSubtaskType {
       target: URI?,
       account: AccountReadableType?
     ): Boolean {
-      return MIMECompatibility.isCompatibleStrictWithoutAttributes(type, StandardFormatNames.lcpLicenseFiles)
+      return MIMECompatibility.isCompatibleStrictWithoutAttributes(
+        type,
+        StandardFormatNames.lcpLicenseFiles
+      )
     }
   }
 
@@ -68,7 +78,6 @@ class BorrowLCP private constructor() : BorrowSubtaskType {
       )
 
       val passphrase = if (context.isManualLCPPassphraseEnabled) {
-
         // if the manual input for the LCP passphrase is enabled, we need to catch a possible
         // exception while fetching the current passphrase as it may be possible for the user to
         // manually input it and if the exception isn't caught, the download will immediately fail.
@@ -98,15 +107,19 @@ class BorrowLCP private constructor() : BorrowSubtaskType {
           )
 
         when (val result = LSHTTPDownloads.download(downloadRequest)) {
-          LSHTTPDownloadState.LSHTTPDownloadResult.DownloadCancelled ->
+          DownloadCancelled -> {
             throw BorrowSubtaskCancelled()
-          is LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedServer ->
+          }
+          is DownloadFailedServer -> {
             throw BorrowHTTP.onDownloadFailedServer(context, result)
-          is LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedUnacceptableMIME ->
+          }
+          is DownloadFailedUnacceptableMIME -> {
             throw BorrowSubtaskFailed()
-          is LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedExceptionally ->
+          }
+          is DownloadFailedExceptionally -> {
             throw BorrowHTTP.onDownloadFailedExceptionally(context, result)
-          is LSHTTPDownloadState.LSHTTPDownloadResult.DownloadCompletedSuccessfully -> {
+          }
+          is DownloadCompletedSuccessfully -> {
             this.fulfill(context, temporaryFile.readBytes(), passphrase)
           }
         }
@@ -131,19 +144,29 @@ class BorrowLCP private constructor() : BorrowSubtaskType {
       throw BorrowSubtaskFailed()
     }
 
+    val credentials = context.account.loginState.credentials
+
+    val auth =
+      AccountAuthenticatedHTTP.createAuthorizationIfPresent(credentials)
+
     val request =
       context.httpClient.newRequest(loansURI)
-        .setAuthorization(BorrowHTTP.authorizationOf(context.account))
+        .setAuthorization(auth)
+        .addCredentialsToProperties(credentials)
         .build()
 
     return request.execute().use { response ->
       when (val status = response.status) {
-        is LSHTTPResponseStatus.Responded.OK ->
+        is LSHTTPResponseStatus.Responded.OK -> {
+          context.account.updateBasicTokenCredentials(status.getAccessToken())
           this.findPassphraseHandleOK(context, loansURI, status)
-        is LSHTTPResponseStatus.Responded.Error ->
+        }
+        is LSHTTPResponseStatus.Responded.Error -> {
           this.findPassphraseHandleError(context, status)
-        is LSHTTPResponseStatus.Failed ->
+        }
+        is LSHTTPResponseStatus.Failed -> {
           this.findPassphraseHandleFailure(context, status)
+        }
       }
     }
   }
@@ -282,15 +305,15 @@ class BorrowLCP private constructor() : BorrowSubtaskType {
         )
 
       when (val result = LSHTTPDownloads.download(downloadRequest)) {
-        LSHTTPDownloadState.LSHTTPDownloadResult.DownloadCancelled ->
+        DownloadCancelled ->
           throw BorrowSubtaskCancelled()
-        is LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedServer ->
+        is DownloadFailedServer ->
           throw BorrowHTTP.onDownloadFailedServer(context, result)
-        is LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedUnacceptableMIME ->
+        is DownloadFailedUnacceptableMIME ->
           throw BorrowSubtaskFailed()
-        is LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedExceptionally ->
+        is DownloadFailedExceptionally ->
           throw BorrowHTTP.onDownloadFailedExceptionally(context, result)
-        is LSHTTPDownloadState.LSHTTPDownloadResult.DownloadCompletedSuccessfully -> {
+        is DownloadCompletedSuccessfully -> {
           this.installLicense(context, fulfillmentMimeType, temporaryFile, licenseBytes)
           this.saveFulfilledBook(context, temporaryFile, passphrase)
 

@@ -30,6 +30,17 @@ sealed class ProfileAccountLoginRequest {
   ) : ProfileAccountLoginRequest()
 
   /**
+   * A request to log in using basic token authentication.
+   */
+
+  data class BasicToken(
+    override val accountId: AccountID,
+    val description: AccountProviderAuthenticationDescription.BasicToken,
+    val username: AccountUsername,
+    val password: AccountPassword
+  ) : ProfileAccountLoginRequest()
+
+  /**
    * A request to begin a login using OAuth (with an intermediary) authentication.
    */
 

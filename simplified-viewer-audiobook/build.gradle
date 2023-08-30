@@ -8,6 +8,7 @@ dependencies {
   implementation project(":simplified-books-database-api")
   implementation project(":simplified-books-time-tracking")
   implementation project(":simplified-files")
+  implementation project(":simplified-futures")
   implementation project(":simplified-networkconnectivity-api")
   implementation project(":simplified-profiles-controller-api")
   implementation project(":simplified-services-api")
@@ -32,8 +33,9 @@ dependencies {
 
   implementation libs.androidx.activity
   implementation libs.androidx.app.compat
-  implementation libs.kotlin.stdlib
   implementation libs.kotlin.reflect
+  implementation libs.kotlin.stdlib
   implementation libs.palace.drm.core
   implementation libs.palace.readium2.api
+  implementation libs.transifex.sdk
 }

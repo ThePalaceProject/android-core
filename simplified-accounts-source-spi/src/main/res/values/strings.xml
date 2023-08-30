@@ -3,6 +3,7 @@
 <resources>
   <string name="resolving">Resolving the account provider…</string>
   <string name="resolvingAuthDocument">Resolving the authentication document…</string>
+  <string name="resolvingAuthDocumentBasicTokenMalformed">The description of a basic token system must contain an authentication URI.</string>
   <string name="resolvingAuthDocumentCOPPAAgeGateMalformed">The description of the COPPA age gate must specify Over-13 and Under-13 URIs.</string>
   <string name="resolvingAuthDocumentMissingURI">No URI was provided for an authentication document.</string>
   <string name="resolvingAuthDocumentNoStartURI">The authentication document did not provide a starting catalog URI.</string>

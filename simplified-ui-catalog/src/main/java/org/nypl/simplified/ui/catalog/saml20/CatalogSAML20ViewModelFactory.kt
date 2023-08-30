@@ -21,7 +21,8 @@ class CatalogSAML20ViewModelFactory(
   private val webViewDataDir: File
 ) : ViewModelProvider.Factory {
 
-  override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+  @Suppress("UNCHECKED_CAST")
+  override fun <T : ViewModel?> create(modelClass: Class<T>): T & Any {
     if (modelClass == CatalogSAML20ViewModel::class.java) {
       val profilesController =
         services.requireService(ProfilesControllerType::class.java)
@@ -40,7 +41,7 @@ class CatalogSAML20ViewModelFactory(
         listener = this.listener,
         parameters = this.parameters,
         webViewDataDir = this.webViewDataDir
-      ) as T
+      ) as (T & Any)
     }
     throw IllegalStateException("Can't create values of $modelClass")
   }

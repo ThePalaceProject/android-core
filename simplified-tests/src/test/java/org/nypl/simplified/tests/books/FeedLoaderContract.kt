@@ -41,9 +41,9 @@ abstract class FeedLoaderContract {
       this.createFeedLoader(this.exec)
     val future =
       loader.fetchURI(
-        account = AccountID(UUID.randomUUID()),
+        accountID = AccountID(UUID.randomUUID()),
         uri = resource("feed-no-usable-acquisitions.xml"),
-        auth = null,
+        credentials = null,
         method = "GET"
       )
     val result =
@@ -64,9 +64,9 @@ abstract class FeedLoaderContract {
       this.createFeedLoader(this.exec)
     val future =
       loader.fetchURI(
-        account = AccountID(UUID.randomUUID()),
+        accountID = AccountID(UUID.randomUUID()),
         uri = resource("feed-only-buy-acquisitions.xml"),
-        auth = null,
+        credentials = null,
         method = "GET"
       )
     val result =

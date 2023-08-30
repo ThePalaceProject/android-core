@@ -123,7 +123,6 @@ class CatalogBorrowViewModel(
   fun tryBorrowMaybeAuthenticated(
     book: Book
   ) {
-
     if (!this.isLoginRequired(book.account)) {
       this.onRequestLoanStarted(book)
       return this.tryBorrowAuthenticated(book)
@@ -206,7 +205,6 @@ class CatalogBorrowViewModel(
   fun tryReserveMaybeAuthenticated(
     book: Book
   ) {
-
     if (!this.isLoginRequired(book.account)) {
       this.onRequestLoanStarted(book)
       return this.tryReserveAuthenticated(book)

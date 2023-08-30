@@ -3,6 +3,8 @@ package org.nypl.simplified.opds.core;
 import java.io.InputStream;
 import java.net.URI;
 
+import kotlin.Pair;
+
 /**
  * A mapping from {@link URI} to {@link InputStream}.
  *
@@ -24,7 +26,7 @@ public interface OPDSFeedTransportType<A>
    * @throws OPDSFeedTransportException On errors
    */
 
-  InputStream getStream(
+  Pair<InputStream, String> getStream(
     final A context,
     final URI uri,
     final String method)

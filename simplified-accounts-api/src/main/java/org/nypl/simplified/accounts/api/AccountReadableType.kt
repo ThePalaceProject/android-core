@@ -32,13 +32,16 @@ interface AccountReadableType {
 
   fun feedIsRoot(feedURI: URI): Boolean {
     return when (val auth = this.provider.authentication) {
-      is AccountProviderAuthenticationDescription.COPPAAgeGate ->
+      is AccountProviderAuthenticationDescription.COPPAAgeGate -> {
         auth.greaterEqual13 == feedURI || auth.under13 == feedURI
+      }
       is AccountProviderAuthenticationDescription.SAML2_0,
       AccountProviderAuthenticationDescription.Anonymous,
       is AccountProviderAuthenticationDescription.Basic,
-      is AccountProviderAuthenticationDescription.OAuthWithIntermediary ->
+      is AccountProviderAuthenticationDescription.BasicToken,
+      is AccountProviderAuthenticationDescription.OAuthWithIntermediary -> {
         this.provider.catalogURI == feedURI || this.preferences.catalogURIOverride == feedURI
+      }
     }
   }
 
@@ -78,10 +81,15 @@ interface AccountReadableType {
 
   val requiresCredentials: Boolean
     get() = when (this.provider.authentication) {
-      is AccountProviderAuthenticationDescription.COPPAAgeGate -> false
-      is AccountProviderAuthenticationDescription.Basic -> true
-      is AccountProviderAuthenticationDescription.OAuthWithIntermediary -> true
-      is AccountProviderAuthenticationDescription.SAML2_0 -> true
-      is AccountProviderAuthenticationDescription.Anonymous -> false
+      is AccountProviderAuthenticationDescription.COPPAAgeGate,
+      is AccountProviderAuthenticationDescription.Anonymous -> {
+        false
+      }
+      is AccountProviderAuthenticationDescription.Basic,
+      is AccountProviderAuthenticationDescription.BasicToken,
+      is AccountProviderAuthenticationDescription.OAuthWithIntermediary,
+      is AccountProviderAuthenticationDescription.SAML2_0 -> {
+        true
+      }
     }
 }

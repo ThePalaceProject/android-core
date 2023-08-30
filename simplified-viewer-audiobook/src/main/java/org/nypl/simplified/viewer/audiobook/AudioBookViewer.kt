@@ -56,12 +56,12 @@ class AudioBookViewer : ViewerProviderType {
     val file =
       formatAudio.file
     val manifest =
-      formatAudio.manifest!!
+      formatAudio.manifest
     val httpClient =
       Services.serviceDirectory()
         .requireService(LSHTTPClientType::class.java)
 
-    val params =
+    val params = if (manifest != null) {
       AudioBookPlayerParameters(
         accountID = book.account,
         accountProviderID = accountProviderId,
@@ -74,6 +74,9 @@ class AudioBookViewer : ViewerProviderType {
         opdsEntry = book.entry,
         userAgent = httpClient.userAgent()
       )
+    } else {
+      null
+    }
 
     AudioBookPlayerActivity.startActivity(activity, params)
   }

@@ -65,7 +65,6 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
   private lateinit var enableOpenEBooksQA: Button
   private lateinit var toolbar: NeutralToolbar
   private lateinit var isManualLCPPassphraseEnabled: SwitchCompat
-  private lateinit var isTimeTrackingEnabled: SwitchCompat
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
@@ -98,8 +97,6 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
       view.findViewById(R.id.settingsVersionDevSeenLibrarySelectionScreen)
     this.isManualLCPPassphraseEnabled =
       view.findViewById(R.id.settingsVersionDevIsManualLCPPassphraseEnabled)
-    this.isTimeTrackingEnabled =
-      view.findViewById(R.id.settingsVersionDevIsTimeTrackingEnabled)
     this.cardCreatorFakeLocation =
       view.findViewById(R.id.settingsVersionDevCardCreatorLocationSwitch)
     this.showOnlySupportedBooks =
@@ -140,8 +137,6 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
       this.viewModel.cardCreatorFakeLocation
     this.isManualLCPPassphraseEnabled.isChecked =
       this.viewModel.isManualLCPPassphraseEnabled
-    this.isTimeTrackingEnabled.isChecked =
-      this.viewModel.isTimeTrackingEnabled
     this.showOnlySupportedBooks.isChecked =
       this.viewModel.showOnlySupportedBooks
     this.crashlyticsId.text =
@@ -208,8 +203,8 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
     }
 
     /*
-    * Update the current profile's preferences whenever the testing switch is changed.
-    */
+     * Update the current profile's preferences whenever the testing switch is changed.
+     */
 
     this.showTesting.setOnCheckedChangeListener { _, checked ->
       this.viewModel.showTestingLibraries = checked
@@ -244,9 +239,6 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
     }
     this.isManualLCPPassphraseEnabled.setOnCheckedChangeListener { _, isChecked ->
       this.viewModel.isManualLCPPassphraseEnabled = isChecked
-    }
-    this.isTimeTrackingEnabled.setOnCheckedChangeListener { _, isChecked ->
-      this.viewModel.isTimeTrackingEnabled = isChecked
     }
 
     /*

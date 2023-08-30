@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory
  * @see BottomNavigationView
  */
 
-class TabbedNavigator private constructor (private val navigator: BottomNavigator) {
+class TabbedNavigator private constructor(private val navigator: BottomNavigator) {
 
   companion object {
 

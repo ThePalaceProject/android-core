@@ -4,12 +4,14 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
+import org.nypl.simplified.accounts.api.AccountAuthenticationTokenInfo
 import org.nypl.simplified.accounts.api.AccountCookie
 import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountUsername
 import org.nypl.simplified.json.core.JSONParseException
 import org.nypl.simplified.json.core.JSONParserUtilities
 import org.slf4j.LoggerFactory
+import java.net.URI
 
 /**
  * JSON format version 20210512.
@@ -32,14 +34,21 @@ object AccountAuthenticationCredentialsJSON20210512 : AccountAuthenticationCrede
       JSONParserUtilities.checkObject(null, node)
 
     return when (val type = JSONParserUtilities.getString(obj, "@type")) {
-      "basic" ->
+      "basic" -> {
         deserializeBasic(obj)
-      "oauthWithIntermediary" ->
+      }
+      "basicToken" -> {
+        deserializeBasicToken(obj)
+      }
+      "oauthWithIntermediary" -> {
         deserializeOAuthWithIntermediary(obj)
-      "saml2_0" ->
+      }
+      "saml2_0" -> {
         deserializeSAML2_0(obj)
-      else ->
+      }
+      else -> {
         throw JSONParseException("Unrecognized type: $type")
+      }
     }
   }
 
@@ -68,6 +77,30 @@ object AccountAuthenticationCredentialsJSON20210512 : AccountAuthenticationCrede
     return AccountAuthenticationCredentials.Basic(
       userName = AccountUsername(JSONParserUtilities.getString(obj, "username")),
       password = AccountPassword(JSONParserUtilities.getString(obj, "password")),
+      adobeCredentials = adobeCredentials,
+      authenticationDescription = JSONParserUtilities.getStringOrNull(obj, "authenticationDescription"),
+      annotationsURI = JSONParserUtilities.getURIOrNull(obj, "annotationsURI")
+    )
+  }
+
+  private fun deserializeBasicToken(
+    obj: ObjectNode
+  ): AccountAuthenticationCredentials.BasicToken {
+    val adobeCredentials =
+      JSONParserUtilities.getObjectOrNull(obj, "adobe_credentials")
+        ?.let(AccountAuthenticationCredentialsAdobeJSON::deserializeAdobeCredentials)
+
+    val authenticationTokenInfo =
+      JSONParserUtilities.getObjectOrNull(obj, "authenticationTokenInfo")
+        ?: throw Exception("No authentication token info")
+
+    return AccountAuthenticationCredentials.BasicToken(
+      userName = AccountUsername(JSONParserUtilities.getString(obj, "username")),
+      password = AccountPassword(JSONParserUtilities.getString(obj, "password")),
+      authenticationTokenInfo = AccountAuthenticationTokenInfo(
+        accessToken = authenticationTokenInfo.get("accessToken").asText(),
+        authURI = URI.create(authenticationTokenInfo.get("authURI").asText()),
+      ),
       adobeCredentials = adobeCredentials,
       authenticationDescription = JSONParserUtilities.getStringOrNull(obj, "authenticationDescription"),
       annotationsURI = JSONParserUtilities.getURIOrNull(obj, "annotationsURI")

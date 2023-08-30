@@ -503,7 +503,6 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
   }
 
   private fun configureLogoHeader(feedState: CatalogFeedLoaded) {
-
     fun loadImageAndText(accountId: AccountID) {
       try {
         val account =

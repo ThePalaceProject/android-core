@@ -148,7 +148,6 @@ class BookPreviewEmbeddedFragment : Fragment() {
     }
 
     override fun onShowCustomView(view: View?, callback: CustomViewCallback?) {
-
       val decorView = requireActivity().window.decorView as? FrameLayout ?: return
       webView.isVisible = false
 
