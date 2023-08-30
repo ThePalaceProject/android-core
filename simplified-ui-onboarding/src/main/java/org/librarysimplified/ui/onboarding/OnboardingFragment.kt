@@ -34,7 +34,7 @@ class OnboardingFragment :
   private val listener: FragmentListenerType<OnboardingEvent> by fragmentListeners()
 
   private val defaultViewModelFactory: ViewModelProvider.Factory by lazy {
-    OnboardingDefaultViewModelFactory(super.getDefaultViewModelProviderFactory())
+    OnboardingDefaultViewModelFactory(super.defaultViewModelProviderFactory)
   }
 
   private val profilesController: ProfilesControllerType =
@@ -99,9 +99,8 @@ class OnboardingFragment :
     this.listenerRepo.unregisterHandler()
   }
 
-  override fun getDefaultViewModelProviderFactory(): ViewModelProvider.Factory {
-    return this.defaultViewModelFactory
-  }
+  override val defaultViewModelProviderFactory: ViewModelProvider.Factory
+    get() = this.defaultViewModelFactory
 
   private fun handleEvent(event: OnboardingListenedEvent, state: Unit) {
     return when (event) {

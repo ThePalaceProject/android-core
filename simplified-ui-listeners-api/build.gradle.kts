@@ -3,7 +3,7 @@ dependencies {
     implementation(libs.androidx.app.compat)
     implementation(libs.androidx.core)
     implementation(libs.androidx.fragment)
-    implementation(libs.androidx.lifecycle)
+    implementation(libs.androidx.lifecycle.extensions)
     implementation(libs.androidx.lifecycle.common)
     implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.androidx.savedstate)

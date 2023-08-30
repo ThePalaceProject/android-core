@@ -1,5 +1,5 @@
 dependencies {
     implementation(libs.kotlin.stdlib)
     implementation(libs.kotlin.reflect)
-    implementation(libs.androidx.app.compat)
+    implementation(libs.androidx.annotation)
 }

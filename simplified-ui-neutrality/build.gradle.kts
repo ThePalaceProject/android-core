@@ -1,8 +1,12 @@
 dependencies {
     implementation(libs.androidx.app.compat)
-    implementation(libs.androidx.legacy.preference.v14)
+    implementation(libs.androidx.cardview)
+    implementation(libs.androidx.coordinatorlayout)
+    implementation(libs.androidx.constraint.layout)
+    implementation(libs.androidx.core)
+    implementation(libs.androidx.drawerlayout)
+    implementation(libs.androidx.preference)
     implementation(libs.google.material)
-    implementation(libs.kotlin.stdlib)
     implementation(libs.kotlin.reflect)
-    implementation(libs.nypl.theme)
+    implementation(libs.kotlin.stdlib)
 }

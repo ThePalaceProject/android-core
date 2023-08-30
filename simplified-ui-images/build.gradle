@@ -1,9 +1,0 @@
-dependencies {
-  api(project(":simplified-accounts-api"))
-
-  api(libs.picasso)
-
-  implementation(libs.kotlin.stdlib)
-  implementation(libs.kotlin.reflect)
-  implementation(libs.slf4j)
-}

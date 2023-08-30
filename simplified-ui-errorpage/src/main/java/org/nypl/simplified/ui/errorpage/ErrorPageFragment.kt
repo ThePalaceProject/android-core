@@ -71,7 +71,7 @@ class ErrorPageFragment : Fragment(R.layout.error_page) {
       view.rootView.findViewWithTag(NeutralToolbar.neutralToolbarName)
 
     this.parameters =
-      this.arguments!!.getSerializable(PARAMETERS_ID)
+      this.requireArguments().getSerializable(PARAMETERS_ID)
         as ErrorPageParameters
 
     if (parameters.attributes.isEmpty()) {
