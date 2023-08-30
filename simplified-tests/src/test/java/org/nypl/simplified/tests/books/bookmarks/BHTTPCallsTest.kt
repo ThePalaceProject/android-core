@@ -12,10 +12,13 @@ import org.junit.jupiter.api.function.Executable
 import org.librarysimplified.http.api.LSHTTPClientConfiguration
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.vanilla.LSHTTPClients
+import org.mockito.Mock
 import org.mockito.Mockito
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
+import org.nypl.simplified.accounts.api.AccountAuthenticationTokenInfo
 import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountUsername
+import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotation
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotationBodyNode
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotationSelectorNode
@@ -30,6 +33,9 @@ class BHTTPCallsTest {
   private lateinit var http: LSHTTPClientType
   private lateinit var server: MockWebServer
 
+  @Mock
+  private val account = Mockito.mock(AccountType::class.java)
+
   private fun checkGetSyncing(
     expected: Boolean,
     serverResponseText: String
@@ -38,9 +44,13 @@ class BHTTPCallsTest {
     val calls = BHTTPCalls(objectMapper, this.http)
 
     val credentials =
-      AccountAuthenticationCredentials.Basic(
-        userName = AccountUsername("abcd"),
-        password = AccountPassword("1234"),
+      AccountAuthenticationCredentials.BasicToken(
+        userName = AccountUsername("1234"),
+        password = AccountPassword("5678"),
+        authenticationTokenInfo = AccountAuthenticationTokenInfo(
+          accessToken = "abcd",
+          authURI = URI("https://www.authrefresh.com")
+        ),
         adobeCredentials = null,
         authenticationDescription = null,
         annotationsURI = URI("https://www.example.com")
@@ -55,7 +65,7 @@ class BHTTPCallsTest {
         .setBody(serverResponseText)
     )
 
-    val enabled0 = calls.syncingIsEnabled(targetURI, credentials)
+    val enabled0 = calls.syncingIsEnabled(account, targetURI, credentials)
     Assertions.assertEquals(expected, enabled0)
   }
 
@@ -84,7 +94,7 @@ class BHTTPCallsTest {
         .setBody(serverResponseText)
     )
 
-    val receivedBookmarks = calls.bookmarksGet(targetURI, credentials)
+    val receivedBookmarks = calls.bookmarksGet(account, targetURI, credentials)
     Assertions.assertEquals(expectedBookmarks, receivedBookmarks)
   }
 
@@ -307,7 +317,7 @@ class BHTTPCallsTest {
     Assertions.assertThrows(
       IOException::class.java,
       Executable {
-        calls.syncingIsEnabled(targetURI, credentials)
+        calls.syncingIsEnabled(account, targetURI, credentials)
       }
     )
   }
@@ -335,7 +345,7 @@ class BHTTPCallsTest {
     Assertions.assertThrows(
       IOException::class.java,
       Executable {
-        calls.bookmarksGet(targetURI, credentials)
+        calls.bookmarksGet(account, targetURI, credentials)
       }
     )
   }
@@ -363,7 +373,7 @@ class BHTTPCallsTest {
     Assertions.assertThrows(
       IOException::class.java,
       Executable {
-        calls.bookmarkAdd(targetURI, credentials, this.bookmark0)
+        calls.bookmarkAdd(account, targetURI, credentials, this.bookmark0)
       }
     )
   }

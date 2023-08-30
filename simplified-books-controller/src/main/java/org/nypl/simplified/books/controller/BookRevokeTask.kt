@@ -293,7 +293,7 @@ class BookRevokeTask(
    */
 
   private fun revokeNotifyServerURIFeed(targetURI: URI, account: AccountType): Feed {
-    val httpAuth = this.createHttpAuthIfRequired(account)
+    val credentials = this.getCredentialsFromAccount(account)
 
     /*
      * Hitting a revoke link yields a single OPDS entry indicating
@@ -303,10 +303,10 @@ class BookRevokeTask(
 
     val feedResult = try {
       this.feedLoader.fetchURI(
-        account.id,
-        targetURI,
-        httpAuth,
-        "PUT"
+        accountID = account.id,
+        uri = targetURI,
+        credentials = credentials,
+        method = "PUT"
       ).get(this.revokeServerTimeoutDuration.standardSeconds, TimeUnit.SECONDS)
     } catch (e: TimeoutException) {
       val message = this.revokeStrings.revokeServerNotifyFeedTimedOut
@@ -325,6 +325,7 @@ class BookRevokeTask(
 
     return when (feedResult) {
       is FeedLoaderSuccess -> {
+        account.updateBasicTokenCredentials(feedResult.accessToken)
         this.taskRecorder.currentStepSucceeded(this.revokeStrings.revokeServerNotifyFeedOK)
         feedResult.feed
       }

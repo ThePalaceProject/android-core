@@ -7,7 +7,9 @@ import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType
 import org.librarysimplified.http.api.LSHTTPResponseStatus
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
-import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addCredentialsToProperties
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.getAccessToken
+import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.crashlytics.api.CrashlyticsServiceType
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayInputStream
@@ -28,8 +30,10 @@ class TimeTrackingHTTPCalls(
 
   override fun registerTimeTrackingInfo(
     timeTrackingInfo: TimeTrackingInfo,
-    credentials: AccountAuthenticationCredentials?
+    account: AccountType
   ): List<TimeTrackingEntry> {
+    val credentials = account.loginState.credentials
+
     credentials ?: throw(Exception("Invalid Credentials"))
 
     val data =
@@ -43,12 +47,15 @@ class TimeTrackingHTTPCalls(
     val request =
       this.http.newRequest(timeTrackingInfo.timeTrackingUri)
         .setAuthorization(auth)
+        .addCredentialsToProperties(credentials)
         .setMethod(post)
         .build()
 
     return request.execute().use { response ->
       when (val status = response.status) {
         is LSHTTPResponseStatus.Responded.OK -> {
+          account.updateBasicTokenCredentials(status.getAccessToken())
+
           val timeTrackingResponse = TimeTrackingJSON.convertServerResponseToTimeTrackingResponse(
             objectNode = objectMapper.readTree(
               status.bodyStream ?: ByteArrayInputStream(ByteArray(0))

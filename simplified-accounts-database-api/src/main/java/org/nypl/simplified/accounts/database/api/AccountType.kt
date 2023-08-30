@@ -84,4 +84,24 @@ interface AccountType : AccountReadableType {
         Unit
     }
   }
+
+  /**
+   * Update the account's access token if the current credentials are from the BasicToken type. This
+   * is needed because the access token may have been updated after a request, so we need to update
+   * the credentials.
+   *
+   * @throws AccountsDatabaseException On database errors
+   */
+  @Throws(AccountsDatabaseException::class)
+  fun updateBasicTokenCredentials(
+    accessToken: String?
+  ) {
+    updateCredentialsIfAvailable { currentCredentials ->
+      if (currentCredentials is AccountAuthenticationCredentials.BasicToken) {
+        currentCredentials.updateAccessToken(accessToken)
+      } else {
+        currentCredentials
+      }
+    }
+  }
 }

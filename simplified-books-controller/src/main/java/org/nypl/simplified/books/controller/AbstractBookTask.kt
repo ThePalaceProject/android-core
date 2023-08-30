@@ -1,7 +1,5 @@
 package org.nypl.simplified.books.controller
 
-import org.librarysimplified.http.api.LSHTTPAuthorizationType
-import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.database.api.AccountType
@@ -132,13 +130,13 @@ abstract class AbstractBookTask(
   }
 
   /**
-   * If the account requires credentials, create HTTP auth details. If no credentials
-   * are provided, throw an exception.
+   * If the account requires credentials, retrieve them. If no credentials are provided, throw an
+   * exception.
    */
 
-  protected fun createHttpAuthIfRequired(account: AccountType): LSHTTPAuthorizationType? {
+  protected fun getCredentialsFromAccount(account: AccountType): AccountAuthenticationCredentials? {
     return if (account.requiresCredentials) {
-      AccountAuthenticatedHTTP.createAuthorization(this.getRequiredAccountCredentials(account))
+      getRequiredAccountCredentials(account)
     } else {
       null
     }

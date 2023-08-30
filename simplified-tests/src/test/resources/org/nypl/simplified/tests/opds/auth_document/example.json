@@ -31,6 +31,13 @@
         {"rel": "authenticate", "href": "http://example.com/oauth", "type": "text/html"},
         {"rel": "refresh", "href": "http://example.com/oauth/refresh", "type": "application/json"}
       ]
+    },
+    {
+      "type": "http://thepalaceproject.org/authtype/basic-token",
+      "labels": {
+        "login": "Library card",
+        "password": "PIN"
+      }
     }
   ]
 }

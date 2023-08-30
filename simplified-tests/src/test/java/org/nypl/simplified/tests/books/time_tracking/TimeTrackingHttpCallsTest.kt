@@ -11,10 +11,13 @@ import org.junit.jupiter.api.Test
 import org.librarysimplified.http.api.LSHTTPClientConfiguration
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.vanilla.LSHTTPClients
+import org.mockito.Mock
 import org.mockito.Mockito
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
+import org.nypl.simplified.accounts.api.AccountLoginState
 import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountUsername
+import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.time.tracking.TimeTrackingEntry
 import org.nypl.simplified.books.time.tracking.TimeTrackingHTTPCalls
 import org.nypl.simplified.books.time.tracking.TimeTrackingInfo
@@ -32,10 +35,28 @@ class TimeTrackingHttpCallsTest {
 
   private val crashlytics = Mockito.mock(CrashlyticsServiceType::class.java)
 
+  @Mock
+  private val account: AccountType = Mockito.mock(AccountType::class.java)
+
+  @Mock
+  private val loginState: AccountLoginState = Mockito.mock(AccountLoginState::class.java)
+
   @BeforeEach
   fun testSetup() {
     this.webServer = MockWebServer()
     this.webServer.start(InetAddress.getByName("127.0.0.1"), 20000)
+
+    val credentials =
+      AccountAuthenticationCredentials.Basic(
+        userName = AccountUsername("abcd"),
+        password = AccountPassword("1234"),
+        adobeCredentials = null,
+        authenticationDescription = null,
+        annotationsURI = URI("https://www.example.com")
+      )
+
+    Mockito.`when`(account.loginState).thenReturn(loginState)
+    Mockito.`when`(loginState.credentials).thenReturn(credentials)
 
     val context =
       Mockito.mock(Context::class.java)
@@ -70,15 +91,6 @@ class TimeTrackingHttpCallsTest {
       crashlytics = crashlytics
     )
 
-    val credentials =
-      AccountAuthenticationCredentials.Basic(
-        userName = AccountUsername("abcd"),
-        password = AccountPassword("1234"),
-        adobeCredentials = null,
-        authenticationDescription = null,
-        annotationsURI = URI("https://www.example.com")
-      )
-
     val responseBody = TimeTrackingResponse(
       responses = listOf(
         TimeTrackingResponseEntry(
@@ -102,7 +114,7 @@ class TimeTrackingHttpCallsTest {
 
     val failedEntries = httpCalls.registerTimeTrackingInfo(
       timeTrackingInfo = timeTrackingInfo,
-      credentials = credentials
+      account = account
     )
 
     assertTrue(failedEntries.isEmpty())
@@ -128,15 +140,6 @@ class TimeTrackingHttpCallsTest {
       http = httpClient,
       crashlytics = crashlytics
     )
-
-    val credentials =
-      AccountAuthenticationCredentials.Basic(
-        userName = AccountUsername("abcd"),
-        password = AccountPassword("1234"),
-        adobeCredentials = null,
-        authenticationDescription = null,
-        annotationsURI = URI("https://www.example.com")
-      )
 
     val responseBody = TimeTrackingResponse(
       responses = listOf(
@@ -176,7 +179,7 @@ class TimeTrackingHttpCallsTest {
 
     val failedEntries = httpCalls.registerTimeTrackingInfo(
       timeTrackingInfo = timeTrackingInfo,
-      credentials = credentials
+      account = account
     )
 
     assertTrue(failedEntries.size == 2)
@@ -201,15 +204,6 @@ class TimeTrackingHttpCallsTest {
       http = httpClient,
       crashlytics = crashlytics
     )
-
-    val credentials =
-      AccountAuthenticationCredentials.Basic(
-        userName = AccountUsername("abcd"),
-        password = AccountPassword("1234"),
-        adobeCredentials = null,
-        authenticationDescription = null,
-        annotationsURI = URI("https://www.example.com")
-      )
 
     val responseBody = TimeTrackingResponse(
       responses = listOf(
@@ -244,7 +238,7 @@ class TimeTrackingHttpCallsTest {
 
     val failedEntries = httpCalls.registerTimeTrackingInfo(
       timeTrackingInfo = timeTrackingInfo,
-      credentials = credentials
+      account = account
     )
 
     assertTrue(failedEntries.size == 3)

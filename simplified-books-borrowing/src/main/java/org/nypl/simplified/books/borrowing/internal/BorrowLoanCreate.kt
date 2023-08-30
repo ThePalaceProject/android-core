@@ -6,6 +6,9 @@ import one.irradia.mime.api.MIMECompatibility.applicationOctetStream
 import one.irradia.mime.api.MIMEType
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType.Method.Put
 import org.librarysimplified.http.api.LSHTTPResponseStatus
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addCredentialsToProperties
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.getAccessToken
 import org.nypl.simplified.accounts.api.AccountReadableType
 import org.nypl.simplified.books.book_registry.BookStatus.Held.HeldInQueue
 import org.nypl.simplified.books.book_registry.BookStatus.Held.HeldReady
@@ -17,7 +20,6 @@ import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.opdsFeedEnt
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.opdsFeedEntryLoanable
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.opdsFeedEntryNoNext
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.opdsFeedEntryParseError
-import org.nypl.simplified.books.borrowing.internal.BorrowHTTP.authorizationOf
 import org.nypl.simplified.books.borrowing.internal.BorrowHTTP.isMimeTypeAcceptable
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowReachedLoanLimit
@@ -84,20 +86,30 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
       context.taskRecorder.addAttribute("Loan URI", currentURI.toString())
       context.checkCancelled()
 
+      val credentials = context.account.loginState.credentials
+
+      val auth =
+        AccountAuthenticatedHTTP.createAuthorizationIfPresent(credentials)
+
       val request =
         context.httpClient.newRequest(currentURI)
           .setMethod(Put(ByteArray(0), applicationOctetStream))
-          .setAuthorization(authorizationOf(context.account))
+          .setAuthorization(auth)
+          .addCredentialsToProperties(credentials)
           .build()
 
       return request.execute().use { response ->
         when (val status = response.status) {
-          is LSHTTPResponseStatus.Responded.OK ->
+          is LSHTTPResponseStatus.Responded.OK -> {
+            context.account.updateBasicTokenCredentials(status.getAccessToken())
             this.handleOKRequest(context, currentURI, status)
-          is LSHTTPResponseStatus.Responded.Error ->
+          }
+          is LSHTTPResponseStatus.Responded.Error -> {
             this.handleHTTPError(context, status)
-          is LSHTTPResponseStatus.Failed ->
+          }
+          is LSHTTPResponseStatus.Failed -> {
             this.handleHTTPFailure(context, status)
+          }
         }
       }
     } catch (e: BorrowSubtaskFailed) {
@@ -217,7 +229,10 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
          */
 
         override fun onHoldable(a: OPDSAvailabilityHoldable) {
-          context.taskRecorder.currentStepFailed("Book is unexpectedly holdable.", opdsFeedEntryHoldable)
+          context.taskRecorder.currentStepFailed(
+            "Book is unexpectedly holdable.",
+            opdsFeedEntryHoldable
+          )
           throw BorrowSubtaskFailed()
         }
 
@@ -242,7 +257,10 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
          */
 
         override fun onLoanable(a: OPDSAvailabilityLoanable) {
-          context.taskRecorder.currentStepFailed("Book is unexpectedly loanable.", opdsFeedEntryLoanable)
+          context.taskRecorder.currentStepFailed(
+            "Book is unexpectedly loanable.",
+            opdsFeedEntryLoanable
+          )
           throw BorrowSubtaskFailed()
         }
 

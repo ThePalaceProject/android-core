@@ -280,7 +280,12 @@ sealed class AnalyticsEvent {
      * A URI that should be used for submitting "book opened" events.
      */
 
-    val targetURI: URI?
+    val targetURI: URI?,
+
+    /**
+     * An operation to perform if the access token was updated.
+     */
+    val onAccessTokenUpdated: (String?) -> Unit
   ) : AnalyticsEvent()
 
   /**

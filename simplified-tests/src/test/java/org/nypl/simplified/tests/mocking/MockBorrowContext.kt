@@ -5,7 +5,7 @@ import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.nypl.drm.core.AdobeAdeptExecutorType
 import org.nypl.drm.core.AxisNowServiceType
-import org.nypl.simplified.accounts.api.AccountReadableType
+import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
@@ -34,7 +34,7 @@ class MockBorrowContext(
   val temporaryDirectory: File,
   val bookRegistry: BookRegistryType,
   override var bundledContent: BundledContentResolverType,
-  override var account: AccountReadableType,
+  override var account: AccountType,
   override var clock: () -> Instant,
   override var contentResolver: ContentResolverType,
   override var httpClient: LSHTTPClientType,

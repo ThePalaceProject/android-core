@@ -48,6 +48,7 @@ import org.nypl.simplified.listeners.api.fragmentListeners
 import org.nypl.simplified.oauth.OAuthCallbackIntentParsing
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.Basic
+import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.BasicToken
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.OAuthWithIntermediaryCancel
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.OAuthWithIntermediaryInitiate
 import org.nypl.simplified.bookmarks.api.BookmarkSyncEnableResult.SYNC_DISABLED
@@ -434,6 +435,9 @@ class AccountDetailFragment : Fragment(R.layout.account) {
         is AccountProviderAuthenticationDescription.Basic -> {
           this.logger.warn("Basic authentication is not currently supported as an alternative.")
         }
+        is AccountProviderAuthenticationDescription.BasicToken -> {
+          this.logger.warn("Basic token authentication is not currently supported as an alternative.")
+        }
         AccountProviderAuthenticationDescription.Anonymous -> {
           this.logger.warn("Anonymous authentication makes no sense as an alternative.")
         }
@@ -563,6 +567,25 @@ class AccountDetailFragment : Fragment(R.layout.account) {
 
     val request =
       Basic(
+        accountId = this.viewModel.account.id,
+        description = description,
+        password = accountPassword,
+        username = accountUsername
+      )
+
+    this.viewModel.tryLogin(request)
+  }
+
+  private fun onTryBasicTokenLogin(
+    description: AccountProviderAuthenticationDescription.BasicToken
+  ) {
+    val accountPassword: AccountPassword =
+      this.authenticationViews.getBasicTokenPassword()
+    val accountUsername: AccountUsername =
+      this.authenticationViews.getBasicTokenUser()
+
+    val request =
+      BasicToken(
         accountId = this.viewModel.account.id,
         description = description,
         password = accountPassword,
@@ -794,6 +817,12 @@ class AccountDetailFragment : Fragment(R.layout.account) {
               password = creds.password.value
             )
           }
+          is AccountAuthenticationCredentials.BasicToken -> {
+            this.authenticationViews.setBasicTokenUserAndPass(
+              user = creds.userName.value,
+              password = creds.password.value
+            )
+          }
           is AccountAuthenticationCredentials.OAuthWithIntermediary,
           is AccountAuthenticationCredentials.SAML2_0 -> {
             // Nothing
@@ -820,6 +849,12 @@ class AccountDetailFragment : Fragment(R.layout.account) {
               password = creds.password.value
             )
           }
+          is AccountAuthenticationCredentials.BasicToken -> {
+            this.authenticationViews.setBasicTokenUserAndPass(
+              user = creds.userName.value,
+              password = creds.password.value
+            )
+          }
           is AccountAuthenticationCredentials.OAuthWithIntermediary,
           is AccountAuthenticationCredentials.SAML2_0 -> {
             // No UI
@@ -838,6 +873,12 @@ class AccountDetailFragment : Fragment(R.layout.account) {
         when (val creds = loginState.credentials) {
           is AccountAuthenticationCredentials.Basic -> {
             this.authenticationViews.setBasicUserAndPass(
+              user = creds.userName.value,
+              password = creds.password.value
+            )
+          }
+          is AccountAuthenticationCredentials.BasicToken -> {
+            this.authenticationViews.setBasicTokenUserAndPass(
               user = creds.userName.value,
               password = creds.password.value
             )
@@ -1037,13 +1078,19 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   }
 
   private fun tryLogin() {
-    return when (val description = this.viewModel.account.provider.authentication) {
-      is AccountProviderAuthenticationDescription.SAML2_0 ->
+    when (val description = this.viewModel.account.provider.authentication) {
+      is AccountProviderAuthenticationDescription.SAML2_0 -> {
         this.onTrySAML2Login(description)
-      is AccountProviderAuthenticationDescription.OAuthWithIntermediary ->
+      }
+      is AccountProviderAuthenticationDescription.OAuthWithIntermediary -> {
         this.onTryOAuthLogin(description)
-      is AccountProviderAuthenticationDescription.Basic ->
+      }
+      is AccountProviderAuthenticationDescription.Basic -> {
         this.onTryBasicLogin(description)
+      }
+      is AccountProviderAuthenticationDescription.BasicToken -> {
+        this.onTryBasicTokenLogin(description)
+      }
 
       is AccountProviderAuthenticationDescription.Anonymous,
       is AccountProviderAuthenticationDescription.COPPAAgeGate ->

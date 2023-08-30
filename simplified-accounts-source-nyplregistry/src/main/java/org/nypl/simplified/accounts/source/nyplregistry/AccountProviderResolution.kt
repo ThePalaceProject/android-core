@@ -8,6 +8,7 @@ import org.librarysimplified.http.api.LSHTTPResponseStatus
 import org.nypl.simplified.accounts.api.AccountProvider
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.ANONYMOUS_TYPE
+import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.BASIC_TOKEN_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.BASIC_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.COPPA_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.OAUTH_INTERMEDIARY_TYPE
@@ -149,8 +150,7 @@ class AccountProviderResolution(
   }
 
   private fun findAlternateLink(): URI? {
-    return this.description.links.firstOrNull {
-        link ->
+    return this.description.links.firstOrNull { link ->
       link.relation == "alternate"
     }?.hrefURI
   }
@@ -248,15 +248,33 @@ class AccountProviderResolution(
             this.extractAuthenticationDescriptionSAML20(taskRecorder, authObject)
           )
         }
+        BASIC_TOKEN_TYPE -> {
+          authObjects.add(
+            extractAuthenticationDescriptionBasicToken(taskRecorder, authObject)
+          )
+        }
         else -> {
           this.logger.warn("encountered unrecognized authentication type: {}", authType)
         }
       }
     }
 
-    if (authObjects.size >= 1) {
-      val mainObject = authObjects.removeAt(0)
-      return Pair(mainObject, authObjects.toList())
+    if (authObjects.isNotEmpty()) {
+      val basicTokenAuthObject = authObjects.firstOrNull { authObject ->
+        authObject is AccountProviderAuthenticationDescription.BasicToken
+      }
+
+      // basic token has the highest priority amongst the auth methods
+      return if (basicTokenAuthObject != null) {
+        Pair(
+          basicTokenAuthObject,
+          authObjects.minus(basicTokenAuthObject)
+            .filter { it.canBeAlternativeLoginMethod }
+        )
+      } else {
+        val firstAuth = authObjects.first()
+        Pair(firstAuth, authObjects.minus(firstAuth).filter { it.canBeAlternativeLoginMethod })
+      }
     }
 
     val message = this.stringResources.resolvingAuthDocumentNoUsableAuthenticationTypes
@@ -322,6 +340,40 @@ class AccountProviderResolution(
         ?.hrefURI
 
     return AccountProviderAuthenticationDescription.Basic(
+      barcodeFormat = loginRestrictions?.barcodeFormat,
+      description = authObject.description,
+      keyboard = this.parseKeyboardType(loginRestrictions?.keyboardType),
+      labels = authObject.labels,
+      logoURI = logo,
+      passwordKeyboard = this.parseKeyboardType(passwordRestrictions?.keyboardType),
+      passwordMaximumLength = passwordRestrictions?.maximumLength ?: 0
+    )
+  }
+
+  private fun extractAuthenticationDescriptionBasicToken(
+    taskRecorder: TaskRecorderType,
+    authObject: AuthenticationObject
+  ): AccountProviderAuthenticationDescription.BasicToken {
+    val authenticate =
+      authObject.links.find { link -> link.relation == "authenticate" }
+
+    val authenticateURI = authenticate?.hrefURI
+    if (authenticateURI == null) {
+      val message = this.stringResources.resolvingAuthDocumentBasicTokenMalformed
+      taskRecorder.currentStepFailed(message, authDocumentUnusable(this.description))
+      throw IOException(message)
+    }
+
+    val loginRestrictions =
+      authObject.inputs[LABEL_LOGIN]
+    val passwordRestrictions =
+      authObject.inputs[LABEL_PASSWORD]
+    val logo =
+      authObject.links.find { link -> link.relation == "logo" }
+        ?.hrefURI
+
+    return AccountProviderAuthenticationDescription.BasicToken(
+      authenticationURI = authenticateURI,
       barcodeFormat = loginRestrictions?.barcodeFormat,
       description = authObject.description,
       keyboard = this.parseKeyboardType(loginRestrictions?.keyboardType),
@@ -406,7 +458,11 @@ class AccountProviderResolution(
           }
 
           is LSHTTPResponseStatus.Responded.Error -> {
-            if (MIMECompatibility.isCompatibleStrictWithoutAttributes(status.properties.contentType, authDocumentType)) {
+            if (MIMECompatibility.isCompatibleStrictWithoutAttributes(
+                status.properties.contentType,
+                authDocumentType
+              )
+            ) {
               this.parseAuthenticationDocument(
                 targetURI = targetLink.href,
                 stream = status.bodyStream ?: emptyStream(),
@@ -416,7 +472,11 @@ class AccountProviderResolution(
               val message = this.stringResources.resolvingAuthDocumentRetrievalFailed
               taskRecorder.currentStepFailed(
                 message,
-                httpRequestFailed(targetLink.hrefURI, status.properties.originalStatus, status.properties.message)
+                httpRequestFailed(
+                  targetLink.hrefURI,
+                  status.properties.originalStatus,
+                  status.properties.message
+                )
               )
               throw IOException(message)
             }

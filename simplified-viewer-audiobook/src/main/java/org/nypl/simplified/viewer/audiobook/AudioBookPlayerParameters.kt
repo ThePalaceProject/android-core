@@ -114,12 +114,27 @@ class AudioBookPlayerParameters(
             )
           }
         }
-        is AccountAuthenticationCredentials.OAuthWithIntermediary ->
+        is AccountAuthenticationCredentials.BasicToken -> {
+          if (credentials.password.value.isBlank()) {
+            AudioBookCredentials.UsernameOnly(
+              userName = credentials.userName.value
+            )
+          } else {
+            AudioBookCredentials.UsernamePassword(
+              userName = credentials.userName.value,
+              password = credentials.password.value
+            )
+          }
+        }
+        is AccountAuthenticationCredentials.OAuthWithIntermediary -> {
           AudioBookCredentials.BearerToken(credentials.accessToken)
-        is AccountAuthenticationCredentials.SAML2_0 ->
+        }
+        is AccountAuthenticationCredentials.SAML2_0 -> {
           AudioBookCredentials.BearerToken(credentials.accessToken)
-        null ->
+        }
+        null -> {
           null
+        }
       }
 
     val request =
