@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
   }
 
   private val defaultViewModelFactory: ViewModelProvider.Factory by lazy {
-    MainActivityDefaultViewModelFactory(super.getDefaultViewModelProviderFactory())
+    MainActivityDefaultViewModelFactory(super.defaultViewModelProviderFactory)
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -155,9 +155,8 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     }
   }
 
-  override fun getDefaultViewModelProviderFactory(): ViewModelProvider.Factory {
-    return this.defaultViewModelFactory
-  }
+  override val defaultViewModelProviderFactory: ViewModelProvider.Factory
+    get() = this.defaultViewModelFactory
 
   override fun getDelegate(): AppCompatDelegate {
     return this.appCompatDelegate

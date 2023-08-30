@@ -1,16 +1,16 @@
 package org.librarysimplified.main
 
 import androidx.lifecycle.ViewModelProvider
-import org.nypl.simplified.listeners.api.ListenerRepositoryFactory
+import org.librarysimplified.ui.catalog.CatalogBookDetailEvent
+import org.librarysimplified.ui.catalog.CatalogFeedEvent
+import org.librarysimplified.ui.catalog.saml20.CatalogSAML20Event
 import org.nypl.simplified.listeners.api.ListenerRepository
+import org.nypl.simplified.listeners.api.ListenerRepositoryFactory
 import org.nypl.simplified.ui.accounts.AccountDetailEvent
 import org.nypl.simplified.ui.accounts.AccountListEvent
 import org.nypl.simplified.ui.accounts.AccountListRegistryEvent
 import org.nypl.simplified.ui.accounts.AccountPickerEvent
 import org.nypl.simplified.ui.accounts.saml20.AccountSAML20Event
-import org.librarysimplified.ui.catalog.CatalogBookDetailEvent
-import org.librarysimplified.ui.catalog.CatalogFeedEvent
-import org.librarysimplified.ui.catalog.saml20.CatalogSAML20Event
 import org.nypl.simplified.ui.errorpage.ErrorPageEvent
 import org.nypl.simplified.ui.settings.SettingsDebugEvent
 import org.nypl.simplified.ui.settings.SettingsDocumentViewerEvent

@@ -1,11 +1,11 @@
 package org.librarysimplified.main
 
 import androidx.lifecycle.ViewModelProvider
-import org.nypl.simplified.listeners.api.ListenerRepositoryFactory
-import org.nypl.simplified.listeners.api.ListenerRepository
 import org.librarysimplified.ui.onboarding.OnboardingEvent
 import org.librarysimplified.ui.splash.SplashEvent
 import org.librarysimplified.ui.tutorial.TutorialEvent
+import org.nypl.simplified.listeners.api.ListenerRepository
+import org.nypl.simplified.listeners.api.ListenerRepositoryFactory
 
 class MainActivityDefaultViewModelFactory(fallbackFactory: ViewModelProvider.Factory) :
   ListenerRepositoryFactory<MainActivityListenedEvent, Unit>(fallbackFactory) {

@@ -15,15 +15,18 @@ import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import io.reactivex.disposables.CompositeDisposable
 import org.librarysimplified.services.api.Services
+import org.librarysimplified.ui.catalog.saml20.CatalogSAML20Fragment
+import org.librarysimplified.ui.catalog.saml20.CatalogSAML20FragmentParameters
+import org.librarysimplified.ui.navigation.tabs.TabbedNavigator
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.accounts.api.AccountEventDeletion
 import org.nypl.simplified.accounts.api.AccountEventUpdated
-import org.nypl.simplified.deeplinks.controller.api.DeepLinkEvent
-import org.nypl.simplified.deeplinks.controller.api.ScreenID
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.book_registry.BookHoldsUpdateEvent
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookStatusEvent
+import org.nypl.simplified.deeplinks.controller.api.DeepLinkEvent
+import org.nypl.simplified.deeplinks.controller.api.ScreenID
 import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.ListenerRepository
 import org.nypl.simplified.listeners.api.fragmentListeners
@@ -37,9 +40,6 @@ import org.nypl.simplified.profiles.api.idle_timer.ProfileIdleTimedOut
 import org.nypl.simplified.ui.accounts.AccountListFragment
 import org.nypl.simplified.ui.accounts.AccountListFragmentParameters
 import org.nypl.simplified.ui.announcements.AnnouncementsDialog
-import org.librarysimplified.ui.catalog.saml20.CatalogSAML20Fragment
-import org.librarysimplified.ui.catalog.saml20.CatalogSAML20FragmentParameters
-import org.librarysimplified.ui.navigation.tabs.TabbedNavigator
 import org.slf4j.LoggerFactory
 import java.net.URI
 
@@ -73,7 +73,7 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
   private val listenerRepo: ListenerRepository<MainFragmentListenedEvent, MainFragmentState> by listenerRepositories()
 
   private val defaultViewModelFactory: ViewModelProvider.Factory by lazy {
-    MainFragmentDefaultViewModelFactory(super.getDefaultViewModelProviderFactory())
+    MainFragmentDefaultViewModelFactory(super.defaultViewModelProviderFactory)
   }
 
   private lateinit var bottomView: BottomNavigationView
@@ -117,7 +117,7 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
      */
     this.setShowHoldsVisibility()
 
-    val settingsItem = this.bottomView.menu.findItem(R.id.tabSettings)
+    val settingsItem = this.bottomView.menu.findItem(org.librarysimplified.ui.tabs.R.id.tabSettings)
     settingsItem.isVisible = viewModel.buildConfig.showSettingsTab
     settingsItem.isEnabled = viewModel.buildConfig.showSettingsTab
 
@@ -224,7 +224,7 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
 
   private fun setShowHoldsVisibility() {
     val showHolds = viewModel.showHoldsTab
-    val holdsItem = this.bottomView.menu.findItem(R.id.tabHolds)
+    val holdsItem = this.bottomView.menu.findItem(org.librarysimplified.ui.tabs.R.id.tabHolds)
     holdsItem.isVisible = showHolds
     holdsItem.isEnabled = showHolds
   }
@@ -283,7 +283,7 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
             comingFromDeepLink = true
           )
         ),
-        tab = R.id.tabSettings
+        tab = org.librarysimplified.ui.tabs.R.id.tabSettings
       )
     }
   }
@@ -291,18 +291,21 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
   private fun onBookHoldsUpdateEvent(event: BookHoldsUpdateEvent) {
     val numberOfHolds = event.numberOfHolds
     if (viewModel.showHoldsTab) {
-      val bottomNavigationItem = this.bottomView.findViewById<BottomNavigationItemView>(R.id.tabHolds)
-      var badgeView = bottomNavigationItem.findViewById<View>(R.id.badgeView)
+      val bottomNavigationItem =
+        this.bottomView.findViewById<BottomNavigationItemView>(org.librarysimplified.ui.tabs.R.id.tabHolds)
+      var badgeView =
+        bottomNavigationItem.findViewById<View>(org.librarysimplified.ui.tabs.R.id.badgeView)
 
       if (numberOfHolds > 0) {
         if (badgeView == null) {
           badgeView = LayoutInflater.from(requireContext()).inflate(
-            R.layout.layout_menu_item_badge, bottomNavigationItem, false
+            org.librarysimplified.ui.tabs.R.layout.layout_menu_item_badge, bottomNavigationItem, false
           )
           bottomNavigationItem.addView(badgeView)
         }
 
-        val badgeNumber = (badgeView as? ViewGroup)?.findViewById<TextView>(R.id.badgeNumber)
+        val badgeNumber = (badgeView as? ViewGroup)?.findViewById<TextView>(
+          org.librarysimplified.ui.tabs.R.id.badgeNumber)
         badgeNumber?.text = numberOfHolds.toString()
       }
 
@@ -362,7 +365,6 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
     }
   }
 
-  override fun getDefaultViewModelProviderFactory(): ViewModelProvider.Factory {
-    return this.defaultViewModelFactory
-  }
+  override val defaultViewModelProviderFactory: ViewModelProvider.Factory
+    get() = this.defaultViewModelFactory
 }

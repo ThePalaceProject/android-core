@@ -7,7 +7,6 @@ import org.nypl.simplified.books.audio.AudioBookFeedbooksSecretServiceType
 import org.slf4j.LoggerFactory
 import java.io.FileNotFoundException
 import java.io.InputStream
-import java.lang.NullPointerException
 import java.util.Properties
 
 class MainFeedbooksSecretService private constructor(
