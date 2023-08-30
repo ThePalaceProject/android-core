@@ -10,6 +10,7 @@ import com.google.common.util.concurrent.FluentFuture
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
+import net.jcip.annotations.GuardedBy
 import org.joda.time.DateTime
 import org.joda.time.LocalDateTime
 import org.librarysimplified.ui.catalog.CatalogFeedArguments.CatalogFeedArgumentsLocalBooks
@@ -68,7 +69,6 @@ import org.nypl.simplified.ui.thread.api.UIExecutor
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.util.UUID
-import javax.annotation.concurrent.GuardedBy
 
 /**
  * A view model for the catalog feed fragment.

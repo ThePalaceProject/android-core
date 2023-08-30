@@ -829,7 +829,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
       button.setTextColor(
         ContextCompat.getColor(
           this.requireContext(),
-          org.nypl.simplified.ui.theme.R.color.simplified_button_text
+          org.librarysimplified.ui.neutrality.R.color.simplified_button_text
         )
       )
       button.setOnClickListener {

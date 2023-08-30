@@ -29,7 +29,7 @@ class CatalogButtons(
 ) {
 
   private fun colorStateListForButtonItems(): ColorStateList? {
-    return ContextCompat.getColorStateList(context, org.nypl.simplified.ui.theme.R.color.simplified_button_text)
+    return ContextCompat.getColorStateList(context, org.librarysimplified.ui.neutrality.R.color.simplified_button_text)
   }
 
   @UiThread

@@ -9,6 +9,7 @@ import com.google.common.util.concurrent.FluentFuture
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
+import net.jcip.annotations.GuardedBy
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.database.api.AccountType
@@ -42,7 +43,6 @@ import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.util.UUID
-import javax.annotation.concurrent.GuardedBy
 
 class CatalogBookDetailViewModel(
   private val feedLoader: FeedLoaderType,

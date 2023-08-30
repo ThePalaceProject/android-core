@@ -54,7 +54,6 @@ dependencies {
     implementation(libs.joda.time)
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlin.stdlib)
-    implementation(libs.nypl.theme)
     implementation(libs.picasso)
     implementation(libs.rxandroid2)
     implementation(libs.rxjava2)
