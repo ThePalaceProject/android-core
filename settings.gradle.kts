@@ -52,7 +52,7 @@ dependencyResolutionManagement {
          */
 
         maven {
-            url = uri("https://jitpack.io")
+            url = uri("https://jitpack.io/")
         }
 
         /*
@@ -159,7 +159,7 @@ include(":simplified-ui-tutorial")
 include(":simplified-viewer-api")
 //include(":simplified-viewer-audiobook")
 include(":simplified-viewer-epub-readium2")
-//include(":simplified-viewer-pdf-pdfjs")
+include(":simplified-viewer-pdf-pdfjs")
 include(":simplified-viewer-preview")
 include(":simplified-viewer-spi")
 include(":simplified-webview")
