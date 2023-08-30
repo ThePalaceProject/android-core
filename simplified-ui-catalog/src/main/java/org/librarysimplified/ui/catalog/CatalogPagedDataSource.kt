@@ -2,8 +2,7 @@ package org.librarysimplified.ui.catalog
 
 import androidx.paging.PageKeyedDataSource
 import com.google.common.base.Preconditions
-import org.librarysimplified.http.api.LSHTTPAuthorizationType
-import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
+import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedEntry
@@ -48,27 +47,28 @@ class CatalogPagedDataSource(
     )
   }
 
-  private fun findAuthenticatedHTTP(): LSHTTPAuthorizationType? {
+  private fun findCredentials(): AccountAuthenticationCredentials? {
     return when (val ownership = this.ownership) {
-      is CatalogFeedOwnership.OwnedByAccount ->
-        AccountAuthenticatedHTTP.createAuthorizationIfPresent(
-          profilesController.profileCurrent()
-            .account(ownership.accountId)
-            .loginState
-            .credentials
-        )
-
-      is CatalogFeedOwnership.CollectedFromAccounts ->
+      is CatalogFeedOwnership.OwnedByAccount -> {
+        profilesController.profileCurrent()
+          .account(ownership.accountId)
+          .loginState
+          .credentials
+      }
+      is CatalogFeedOwnership.CollectedFromAccounts -> {
         null
+      }
     }
   }
 
   private fun findAccountID(): AccountID? {
     return when (val ownership = this.ownership) {
-      is CatalogFeedOwnership.OwnedByAccount ->
+      is CatalogFeedOwnership.OwnedByAccount -> {
         ownership.accountId
-      is CatalogFeedOwnership.CollectedFromAccounts ->
+      }
+      is CatalogFeedOwnership.CollectedFromAccounts -> {
         null
+      }
     }
   }
 
@@ -85,14 +85,18 @@ class CatalogPagedDataSource(
       return
     }
 
+    val account = profilesController.profileCurrent().account(accountId)
+
     this.feedLoader.fetchURI(
-      account = accountId,
+      accountID = accountId,
       uri = params.key,
-      auth = this.findAuthenticatedHTTP(),
+      credentials = this.findCredentials(),
       method = "GET"
     ).map { result ->
       return@map when (result) {
         is FeedLoaderResult.FeedLoaderSuccess -> {
+          account.updateBasicTokenCredentials(result.accessToken)
+
           when (val feed = result.feed) {
             is Feed.FeedWithoutGroups -> {
               this.logger.debug("loadAfter: {}: received feed without groups", params.key)
@@ -134,14 +138,18 @@ class CatalogPagedDataSource(
       return
     }
 
+    val account = profilesController.profileCurrent().account(accountId)
+
     this.feedLoader.fetchURI(
-      account = accountId,
+      accountID = accountId,
       uri = params.key,
-      auth = this.findAuthenticatedHTTP(),
+      credentials = this.findCredentials(),
       method = "GET"
     ).map { result ->
       return@map when (result) {
         is FeedLoaderResult.FeedLoaderSuccess -> {
+          account.updateBasicTokenCredentials(result.accessToken)
+
           when (val feed = result.feed) {
             is Feed.FeedWithoutGroups -> {
               this.logger.debug("loadBefore: {}: received feed without groups", params.key)

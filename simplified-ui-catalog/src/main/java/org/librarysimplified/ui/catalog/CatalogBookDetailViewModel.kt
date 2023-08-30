@@ -9,9 +9,9 @@ import com.google.common.util.concurrent.FluentFuture
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
-import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
+import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.api.BookID
@@ -348,18 +348,17 @@ class CatalogBookDetailViewModel(
 
     val loginState =
       account.loginState
-    val authentication =
-      AccountAuthenticatedHTTP.createAuthorizationIfPresent(loginState.credentials)
 
     val future =
       this.feedLoader.fetchURI(
-        account = account.id,
+        accountID = account.id,
         uri = feedArguments.feedURI,
-        auth = authentication,
+        credentials = loginState.credentials,
         method = "GET"
       )
 
     this.createNewStatus(
+      account = account,
       arguments = feedArguments,
       future = future
     )
@@ -379,6 +378,7 @@ class CatalogBookDetailViewModel(
    */
 
   private fun createNewStatus(
+    account: AccountType,
     arguments: CatalogFeedArguments,
     future: FluentFuture<FeedLoaderResult>
   ) {
@@ -392,11 +392,22 @@ class CatalogBookDetailViewModel(
      */
 
     future.map { feedLoaderResult ->
+      updateBasicTokenCredentials(feedLoaderResult, account)
+
       synchronized(loaderResults) {
         val resultWithArguments =
           LoaderResultWithArguments(arguments, feedLoaderResult)
         this.loaderResults.onNext(resultWithArguments)
       }
+    }
+  }
+
+  private fun updateBasicTokenCredentials(
+    feedLoaderResult: FeedLoaderResult,
+    account: AccountType
+  ) {
+    if (feedLoaderResult is FeedLoaderResult.FeedLoaderSuccess) {
+      account.updateBasicTokenCredentials(feedLoaderResult.accessToken)
     }
   }
 

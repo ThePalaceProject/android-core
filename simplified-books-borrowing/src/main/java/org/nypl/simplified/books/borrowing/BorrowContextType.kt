@@ -5,7 +5,7 @@ import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.nypl.drm.core.AdobeAdeptExecutorType
 import org.nypl.drm.core.AxisNowServiceType
-import org.nypl.simplified.accounts.api.AccountReadableType
+import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
@@ -28,7 +28,7 @@ import java.net.URI
  */
 
 interface BorrowContextType {
-  val account: AccountReadableType
+  val account: AccountType
   val adobeExecutor: AdobeAdeptExecutorType?
   val axisNowService: AxisNowServiceType?
   val audioBookManifestStrategies: AudioBookManifestStrategiesType

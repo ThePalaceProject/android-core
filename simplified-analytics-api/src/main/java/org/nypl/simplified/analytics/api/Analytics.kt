@@ -30,8 +30,7 @@ class Analytics private constructor(
         LOG,
         ServiceLoader.load(AnalyticsSystemProvider::class.java)
           .toList()
-          .map { provider -> startProvider(provider, configuration) }
-          .filterNotNull()
+          .mapNotNull { provider -> startProvider(provider, configuration) }
           .map { system ->
             LOG.debug("created analytics system: ${system::class.java.canonicalName}")
             system

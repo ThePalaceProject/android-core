@@ -1,16 +1,16 @@
 dependencies {
-  implementation(project(":simplified-accounts-api"))
-  implementation(project(":simplified-taskrecorder-api"))
+    implementation(project(":simplified-accounts-api"))
+    implementation(project(":simplified-taskrecorder-api"))
 
-  implementation(libs.google.guava)
-  implementation(libs.io7m.jfunctional)
-  implementation(libs.jcip.annotations)
-  implementation(libs.joda.time)
-  implementation(libs.kotlin.reflect)
-  implementation(libs.kotlin.stdlib)
-  implementation(libs.rxjava2)
-  implementation(libs.slf4j)
+    implementation(libs.google.guava)
+    implementation(libs.io7m.jfunctional)
+    implementation(libs.jcip.annotations)
+    implementation(libs.joda.time)
+    implementation(libs.kotlin.reflect)
+    implementation(libs.kotlin.stdlib)
+    implementation(libs.rxjava2)
+    implementation(libs.slf4j)
 
-  compileOnly(libs.google.auto.value)
-  annotationProcessor(libs.google.auto.value.processor)
+    compileOnly(libs.google.auto.value)
+    annotationProcessor(libs.google.auto.value.processor)
 }

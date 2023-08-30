@@ -1,6 +1,6 @@
 package org.nypl.simplified.books.time.tracking
 
-import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
+import org.nypl.simplified.accounts.database.api.AccountType
 import java.io.IOException
 
 interface TimeTrackingHTTPCallsType {
@@ -8,6 +8,6 @@ interface TimeTrackingHTTPCallsType {
   @Throws(IOException::class)
   fun registerTimeTrackingInfo(
     timeTrackingInfo: TimeTrackingInfo,
-    credentials: AccountAuthenticationCredentials?
+    account: AccountType
   ): List<TimeTrackingEntry>
 }

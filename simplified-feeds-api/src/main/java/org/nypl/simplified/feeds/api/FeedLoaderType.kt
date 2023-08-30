@@ -1,7 +1,7 @@
 package org.nypl.simplified.feeds.api
 
 import com.google.common.util.concurrent.FluentFuture
-import org.librarysimplified.http.api.LSHTTPAuthorizationType
+import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
 import java.net.URI
 
@@ -20,16 +20,16 @@ interface FeedLoaderType {
   /**
    * Load a feed from the given URI.
    *
-   * @param uri      The URI
-   * @param auth     HTTP authentication details, if any
+   * @param uri           The URI
+   * @param credentials   HTTP credentials, if any
    *
    * @return A future that can be used to cancel the loading feed
    */
 
   fun fetchURI(
-    account: AccountID,
+    accountID: AccountID,
     uri: URI,
-    auth: LSHTTPAuthorizationType?,
+    credentials: AccountAuthenticationCredentials?,
     method: String
   ): FluentFuture<FeedLoaderResult>
 }

@@ -62,11 +62,26 @@ object AccountAuthenticationCredentialsJSON {
       authObject.put("annotationsURI", uri.toString())
     }
 
-    val ignored = when (credentials) {
+    when (credentials) {
       is AccountAuthenticationCredentials.Basic -> {
         authObject.put("@type", "basic")
         authObject.put("username", credentials.userName.value)
         authObject.put("password", credentials.password.value)
+      }
+      is AccountAuthenticationCredentials.BasicToken -> {
+        authObject.put("@type", "basicToken")
+        authObject.put("username", credentials.userName.value)
+        authObject.put("password", credentials.password.value)
+        val authenticationTokenInfo = objectMapper.createObjectNode()
+        authenticationTokenInfo.put(
+          "accessToken",
+          credentials.authenticationTokenInfo.accessToken
+        )
+        authenticationTokenInfo.put(
+          "authURI",
+          credentials.authenticationTokenInfo.authURI.toString()
+        )
+        authObject.set("authenticationTokenInfo", authenticationTokenInfo)
       }
       is AccountAuthenticationCredentials.OAuthWithIntermediary -> {
         authObject.put("@type", "oauthWithIntermediary")

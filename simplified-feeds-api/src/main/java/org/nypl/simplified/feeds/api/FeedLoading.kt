@@ -1,6 +1,5 @@
 package org.nypl.simplified.feeds.api
 
-import org.librarysimplified.http.api.LSHTTPAuthorizationType
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.feeds.api.Feed.FeedWithGroups
 import org.nypl.simplified.feeds.api.Feed.FeedWithoutGroups
@@ -26,7 +25,6 @@ object FeedLoading {
    * @param accountID The account that owns the feed
    * @param uri The target URI
    * @param timeout The timeout value
-   * @param httpAuth The authorization information
    * @param method The HTTP request method
    */
 
@@ -36,16 +34,15 @@ object FeedLoading {
     accountID: AccountID,
     uri: URI,
     timeout: Pair<Long, TimeUnit>,
-    httpAuth: LSHTTPAuthorizationType?,
     method: String = "GET"
   ): FeedEntryOPDS {
     taskRecorder.beginNewStep("Fetching OPDS feed...")
 
     val feedResult =
       feedLoader.fetchURI(
-        account = accountID,
+        accountID = accountID,
         uri = uri,
-        auth = httpAuth,
+        credentials = null,
         method = method
       ).get(timeout.first, timeout.second)
 

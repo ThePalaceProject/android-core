@@ -292,9 +292,9 @@ class ProfileAccountLogoutTask(
   private fun fetchOPDSEntry(uri: URI): OPDSAcquisitionFeedEntry {
     val feedResult = try {
       this.feedLoader.fetchURI(
-        account = this.account.id,
+        accountID = this.account.id,
         uri = uri,
-        auth = null,
+        credentials = null,
         method = "GET"
       ).get()
     } catch (e: TimeoutException) {

@@ -66,6 +66,43 @@ sealed class AccountAuthenticationCredentials {
   }
 
   /**
+   * The user used basic token authentication to authenticate.
+   */
+
+  data class BasicToken(
+    val userName: AccountUsername,
+    val password: AccountPassword,
+    val authenticationTokenInfo: AccountAuthenticationTokenInfo,
+    override val adobeCredentials: AccountAuthenticationAdobePreActivationCredentials?,
+    override val authenticationDescription: String?,
+    override val annotationsURI: URI?
+  ) : AccountAuthenticationCredentials() {
+    override fun withoutAdobePostActivationCredentials(): AccountAuthenticationCredentials {
+      return this.copy(
+        adobeCredentials = this.adobeCredentials?.copy(postActivationCredentials = null)
+      )
+    }
+
+    override fun withAdobePreActivationCredentials(
+      newCredentials: AccountAuthenticationAdobePreActivationCredentials
+    ): AccountAuthenticationCredentials {
+      return this.copy(adobeCredentials = newCredentials)
+    }
+
+    fun updateAccessToken(accessToken: String?): BasicToken {
+      return if (!accessToken.isNullOrBlank()) {
+        this.copy(
+          authenticationTokenInfo = authenticationTokenInfo.copy(
+            accessToken = accessToken
+          )
+        )
+      } else {
+        this
+      }
+    }
+  }
+
+  /**
    * The user used OAuth (with an intermediary) authentication to authenticate.
    */
 

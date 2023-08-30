@@ -19,6 +19,12 @@ interface AccountProviderResolutionStringsType {
   val resolvingAuthDocumentRetrievalFailed: String
 
   /**
+   * The description of a basic token is malformed.
+   */
+
+  val resolvingAuthDocumentBasicTokenMalformed: String
+
+  /**
    * The description of a COPPA age gate is malformed.
    */
 

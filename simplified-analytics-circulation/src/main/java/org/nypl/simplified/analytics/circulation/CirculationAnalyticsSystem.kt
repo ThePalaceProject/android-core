@@ -2,6 +2,8 @@ package org.nypl.simplified.analytics.circulation
 
 import org.librarysimplified.http.api.LSHTTPResponseStatus
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addCredentialsToProperties
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.getAccessToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.analytics.api.AnalyticsConfiguration
 import org.nypl.simplified.analytics.api.AnalyticsEvent
@@ -30,7 +32,7 @@ class CirculationAnalyticsSystem(
     when (event) {
       is AnalyticsEvent.BookOpened -> {
         event.targetURI?.let { target ->
-          postURI(target, event.credentials)
+          postURI(event.onAccessTokenUpdated, target, event.credentials)
         }
         this.logger.debug("consuming 'BookOpened' event for {}", event.targetURI)
       }
@@ -41,31 +43,37 @@ class CirculationAnalyticsSystem(
   }
 
   private fun postURI(
+    onAccessTokenUpdated: (String?) -> Unit,
     target: URI,
     credentials: AccountAuthenticationCredentials?
   ) {
     val request =
       this.configuration.http.newRequest(target)
         .setAuthorization(AccountAuthenticatedHTTP.createAuthorizationIfPresent(credentials))
+        .addCredentialsToProperties(credentials)
         .build()
 
     val response = request.execute()
-    return when (val status = response.status) {
-      is LSHTTPResponseStatus.Responded.OK ->
-        Unit
-      is LSHTTPResponseStatus.Responded.Error -> {
-        val problemReport = status.properties.problemReport
-        if (problemReport != null) {
-          this.logger.debug("status: {}", problemReport.status)
-          this.logger.debug("title:  {}", problemReport.title)
-          this.logger.debug("type:   {}", problemReport.type)
-          this.logger.debug("detail: {}", problemReport.detail)
-        } else {
-          Unit
-        }
+    when (val status = response.status) {
+      is LSHTTPResponseStatus.Responded.OK -> {
+        onAccessTokenUpdated(status.getAccessToken())
       }
-      is LSHTTPResponseStatus.Failed ->
+      is LSHTTPResponseStatus.Responded.Error -> {
+        logError(status)
+      }
+      is LSHTTPResponseStatus.Failed -> {
         this.logger.error("error sending event to {}: ", target, status.exception)
+      }
+    }
+  }
+
+  private fun logError(status: LSHTTPResponseStatus) {
+    val problemReport = status.properties?.problemReport
+    if (problemReport != null) {
+      this.logger.debug("status: {}", problemReport.status)
+      this.logger.debug("title:  {}", problemReport.title)
+      this.logger.debug("type:   {}", problemReport.type)
+      this.logger.debug("detail: {}", problemReport.detail)
     }
   }
 }

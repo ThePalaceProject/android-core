@@ -176,6 +176,7 @@ interface AccountProviderType : Comparable<AccountProviderType> {
       is AccountProviderAuthenticationDescription.SAML2_0,
       AccountProviderAuthenticationDescription.Anonymous,
       is AccountProviderAuthenticationDescription.Basic,
+      is AccountProviderAuthenticationDescription.BasicToken,
       is AccountProviderAuthenticationDescription.OAuthWithIntermediary ->
         this.catalogURI
     }
@@ -199,6 +200,12 @@ interface AccountProviderType : Comparable<AccountProviderType> {
       is AccountProviderAuthenticationDescription.COPPAAgeGate ->
         false
       is AccountProviderAuthenticationDescription.Basic -> {
+        when (auth.barcodeFormat) {
+          "Codabar" -> true
+          else -> false
+        }
+      }
+      is AccountProviderAuthenticationDescription.BasicToken -> {
         when (auth.barcodeFormat) {
           "Codabar" -> true
           else -> false
