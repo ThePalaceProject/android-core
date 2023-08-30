@@ -357,7 +357,7 @@ class ProfileAccountLoginTask(
               authURI = authenticationURI
             ),
             adobeCredentials = null,
-            authenticationDescription = null,
+            authenticationDescription = request.description.description,
             annotationsURI = null
           )
 

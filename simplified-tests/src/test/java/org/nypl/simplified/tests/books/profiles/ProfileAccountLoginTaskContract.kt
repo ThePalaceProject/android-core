@@ -859,7 +859,7 @@ abstract class ProfileAccountLoginTaskContract {
   fun testLoginBasicTokenAdobeDRM() {
     val authDescription =
       AccountProviderAuthenticationDescription.BasicToken(
-        authenticationURI = URI("https://auth.com"),
+        authenticationURI = this.server.url("patron").toUri(),
         barcodeFormat = "CODABAR",
         keyboard = KeyboardInput.DEFAULT,
         passwordMaximumLength = 10,
@@ -903,6 +903,12 @@ abstract class ProfileAccountLoginTaskContract {
       }
     Mockito.`when`(this.account.loginState)
       .then { this.loginState }
+
+    this.server.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+        .setBody("{\"accessToken\":\"abcd\"}")
+    )
 
     this.server.enqueue(
       MockResponse()
@@ -968,8 +974,8 @@ abstract class ProfileAccountLoginTaskContract {
         userName = request.username,
         password = request.password,
         authenticationTokenInfo = AccountAuthenticationTokenInfo(
-          accessToken = anyNonNull(),
-          authURI = URI("https://auth.com")
+          accessToken = "abcd",
+          authURI = this.server.url("patron").toUri()
         ),
         adobeCredentials = null,
         authenticationDescription = "Library Login",
@@ -994,9 +1000,11 @@ abstract class ProfileAccountLoginTaskContract {
     val req0 = this.server.takeRequest()
     assertEquals(this.server.url("patron"), req0.requestUrl)
     val req1 = this.server.takeRequest()
-    assertEquals(this.server.url("devices"), req1.requestUrl)
+    assertEquals(this.server.url("patron"), req1.requestUrl)
+    val req2 = this.server.takeRequest()
+    assertEquals(this.server.url("devices"), req2.requestUrl)
 
-    assertEquals(2, this.server.requestCount)
+    assertEquals(3, this.server.requestCount)
   }
 
   /**

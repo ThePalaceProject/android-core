@@ -446,10 +446,13 @@ abstract class AccountsDatabaseContract {
       when (it) {
         is AccountAuthenticationCredentials.Basic ->
           creds.copy(annotationsURI = URI.create("https://www.example.com/annotations"))
+
         is AccountAuthenticationCredentials.BasicToken ->
           creds.copy(annotationsURI = URI.create("https://www.example.com/annotations"))
+
         is AccountAuthenticationCredentials.OAuthWithIntermediary ->
           creds.copy(annotationsURI = URI.create("https://www.example.com/annotations"))
+
         is AccountAuthenticationCredentials.SAML2_0 ->
           creds.copy(annotationsURI = URI.create("https://www.example.com/annotations"))
       }
@@ -502,13 +505,22 @@ abstract class AccountsDatabaseContract {
 
     acc0.setLoginState(AccountLoginState.AccountLoggedIn(creds))
     Assertions.assertEquals(AccountLoginState.AccountLoggedIn(creds), acc0.loginState)
-    Assertions.assertEquals(creds.authenticationTokenInfo.accessToken, "abcd")
+    Assertions.assertEquals(
+      (acc0.loginState.credentials as AccountAuthenticationCredentials.BasicToken).authenticationTokenInfo.accessToken,
+      "abcd"
+    )
 
     acc0.updateBasicTokenCredentials("efgh")
-    Assertions.assertEquals(creds.authenticationTokenInfo.accessToken, "efgh")
+    Assertions.assertEquals(
+      (acc0.loginState.credentials as AccountAuthenticationCredentials.BasicToken).authenticationTokenInfo.accessToken,
+      "efgh"
+    )
 
     acc0.updateBasicTokenCredentials(null)
-    Assertions.assertEquals(creds.authenticationTokenInfo.accessToken, "efgh")
+    Assertions.assertEquals(
+      (acc0.loginState.credentials as AccountAuthenticationCredentials.BasicToken).authenticationTokenInfo.accessToken,
+      "efgh"
+    )
   }
 
   @Test
