@@ -63,7 +63,6 @@ dependencies {
     implementation(libs.androidx.preference)
     implementation(libs.androidx.recycler.view)
     implementation(libs.androidx.savedstate)
-    implementation(libs.androidx.savedstate)
     implementation(libs.google.failureaccess)
     implementation(libs.google.guava)
     implementation(libs.google.material)
