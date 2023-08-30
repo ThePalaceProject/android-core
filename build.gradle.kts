@@ -641,7 +641,9 @@ allprojects {
      */
 
     val transitiveConfigurations = setOf(
-        "mainSourceElements",
+        "annotationProcessor",
+        "debugAnnotationProcessor",
+        "debugAnnotationProcessorClasspath",
         "kotlinBuildToolsApiClasspath",
         "kotlinCompilerClasspath",
         "kotlinCompilerPluginClasspath",
@@ -656,6 +658,9 @@ allprojects {
         "kotlinNativeCompilerPluginClasspath",
         "kotlinScriptDef",
         "kotlinScriptDefExtensions",
+        "mainSourceElements",
+        "releaseAnnotationProcessor",
+        "releaseAnnotationProcessorClasspath",
     )
 
     val configurationsActual = mutableSetOf<String>()
