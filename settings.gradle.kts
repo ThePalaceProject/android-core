@@ -1,9 +1,24 @@
+import java.util.Properties
+
 pluginManagement {
     repositories {
         mavenCentral()
         gradlePluginPortal()
         google()
     }
+}
+
+fun property(name: String): String {
+    return settings.extra[name] as String
+}
+
+fun propertyOptional(name: String): String? {
+    return settings.extra.get(name) as String?
+}
+
+fun propertyBooleanOptional(name: String, defaultValue: Boolean): Boolean {
+    val value = propertyOptional(name) ?: return defaultValue
+    return value.toBooleanStrict()
 }
 
 dependencyResolutionManagement {
@@ -14,12 +29,72 @@ dependencyResolutionManagement {
     }
 
     /*
+     * Conditionally enable access to S3.
+     */
+
+    val s3RepositoryEnabled: Boolean =
+        propertyBooleanOptional("org.thepalaceproject.s3.depend", false)
+    val s3RepositoryAccessKey: String? =
+        propertyOptional("org.thepalaceproject.aws.access_key_id")
+    val s3RepositorySecretKey: String? =
+        propertyOptional("org.thepalaceproject.aws.secret_access_key")
+
+    if (s3RepositoryEnabled) {
+        if (s3RepositoryAccessKey == null) {
+            throw GradleException(
+                "If the org.thepalaceproject.s3.depend property is set to true, " +
+                    "the org.thepalaceproject.aws.access_key_id property must be defined."
+            )
+        }
+        if (s3RepositorySecretKey == null) {
+            throw GradleException(
+                "If the org.thepalaceproject.s3.depend property is set to true, " +
+                    "the org.thepalaceproject.aws.secret_access_key property must be defined."
+            )
+        }
+    }
+
+    /*
+     * Conditionally enable DRM.
+     */
+
+    val drmEnabled: Boolean =
+        propertyBooleanOptional("org.thepalaceproject.drm.enabled", false)
+
+    if (drmEnabled && !s3RepositoryEnabled) {
+        throw GradleException(
+            "If the org.thepalaceproject.drm.enabled property is set to true, " +
+                "the org.thepalaceproject.s3.depend property must be set to true."
+        )
+    }
+
+    val credentialsPath =
+        propertyOptional("org.thepalaceproject.app.credentials.palace")
+
+    /*
      * The set of repositories used to resolve library dependencies. The order is significant!
      */
 
     repositories {
+
+        /*
+         * Enable access to $HOME/.m2/repository.
+         */
+
         mavenLocal()
+
+        /*
+         * Enable access to Maven central.
+         */
+
         mavenCentral()
+
+        /*
+         * Enable access to Google's maven repository.
+         *
+         * See https://maven.google.com/web/index.html
+         */
+
         google()
 
         /*
@@ -27,7 +102,7 @@ dependencyResolutionManagement {
          */
 
         maven {
-            url  = uri("http://maven.findawayworld.com/artifactory/libs-release/")
+            url = uri("http://maven.findawayworld.com/artifactory/libs-release/")
             isAllowInsecureProtocol = true
         }
 
@@ -56,6 +131,66 @@ dependencyResolutionManagement {
         }
 
         /*
+         * If DRM is enabled, then enable access to the S3 repository.
+         */
+
+        if (drmEnabled) {
+            maven {
+                name = "S3 Snapshots"
+                url = uri("s3://se-maven-repo/snapshots/")
+                credentials(AwsCredentials::class) {
+                    accessKey = s3RepositoryAccessKey
+                    secretKey = s3RepositorySecretKey
+                }
+                mavenContent {
+                    snapshotsOnly()
+                }
+            }
+
+            maven {
+                name = "S3 Releases"
+                url = uri("s3://se-maven-repo/releases/")
+                credentials(AwsCredentials::class) {
+                    accessKey = s3RepositoryAccessKey
+                    secretKey = s3RepositorySecretKey
+                }
+                mavenContent {
+                    releasesOnly()
+                }
+            }
+        }
+
+        /*
+         * Enable access to various credentials-gated elements.
+         */
+
+        if (credentialsPath != null) {
+            val filePath: String =
+                when (val lcpProfile = property("org.thepalaceproject.lcp.profile")) {
+                    "prod", "test" -> {
+                        "${credentialsPath}/LCP/Android/build_lcp_${lcpProfile}.properties"
+                    }
+                    else -> {
+                        throw GradleException("Unrecognized LCP profile: $lcpProfile")
+                    }
+                }
+
+            val lcpProperties = Properties()
+            lcpProperties.load(File(filePath).inputStream())
+
+            ivy {
+                name = "LCP"
+                url = uri(lcpProperties.getProperty("org.thepalaceproject.lcp.repositoryURI"))
+                patternLayout {
+                    artifact(lcpProperties.getProperty("org.thepalaceproject.lcp.repositoryLayout"))
+                }
+                metadataSources {
+                    artifact()
+                }
+            }
+        }
+
+        /*
          * Obsolete dependencies.
          */
 
@@ -80,7 +215,7 @@ include(":simplified-analytics-api")
 include(":simplified-analytics-circulation")
 include(":simplified-android-ktx")
 include(":simplified-announcements")
-//include(":simplified-app-palace")
+include(":simplified-app-palace")
 include(":simplified-bookmarks")
 include(":simplified-bookmarks-api")
 include(":simplified-books-api")
