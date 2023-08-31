@@ -435,7 +435,7 @@ object AccountProvidersJSON {
           this.toStringMap(JSONParserUtilities.getObject(container, "labels"))
         val barcodeFormat =
           JSONParserUtilities.getStringOrNull(container, "barcodeFormat")
-            .uppercase(Locale.ROOT)
+            ?.uppercase(Locale.ROOT)
         val keyboard =
           this.parseKeyboardType(JSONParserUtilities.getStringOrNull(container, "keyboard"))
         val passwordMaximumLength =
