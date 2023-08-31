@@ -23,19 +23,15 @@ if (palaceAssetsDirectory != null) {
     }
 }
 
-val requiredAssetFiles = mapOf(
-    Pair(
-        "ReaderClientCert.sig",
-        "b064e68b96e258e42fe1ca66ae3fc4863dd802c46585462220907ed291e1217d",
-    ),
-    Pair(
-        "secrets.conf",
-        "5801d64987fb1eb2fb3e32a5bae1063aa2e444723bc89b8a1230117b631940b7",
-    ),
-)
-
-val requiredAssetsTask = task("CheckReleaseRequiredAssets") {
-    // Nothing yet
+fun createRequiredAssetsTask(file: File): Task {
+    return task("CheckReleaseRequiredAssets_${file.name}", Exec::class) {
+        commandLine = arrayListOf(
+            "java",
+            "$rootDir/org.thepalaceproject.android.platform/ZipCheck.java",
+            "$file",
+            "${project.projectDir}/required-assets.conf",
+        )
+    }
 }
 
 /*
@@ -143,8 +139,20 @@ android {
     applicationVariants.all {
         if (this.buildType.name == "release") {
             val preBuildTask = tasks.findByName("preReleaseBuild")
-            preBuildTask?.dependsOn?.add(requiredAssetsTask)
             preBuildTask?.dependsOn?.add(requiredSigningTask)
+
+            /*
+             * For each APK output, create a task that checks that the APK contains the
+             * required assets.
+             */
+
+            this.outputs.forEach {
+                val outputFile = it.outputFile
+                val checkTask = createRequiredAssetsTask(outputFile)
+                this.assembleProvider.configure {
+                    finalizedBy(checkTask)
+                }
+            }
         }
     }
 }
