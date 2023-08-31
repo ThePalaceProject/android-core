@@ -1,7 +1,8 @@
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
+
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.api.AccountReadableType
 import org.nypl.simplified.ui.accounts.AccountComparator
