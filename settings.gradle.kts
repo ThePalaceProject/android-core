@@ -25,6 +25,20 @@ fun propertyBooleanOptional(name: String, defaultValue: Boolean): Boolean {
     return value.toBooleanStrict()
 }
 
+val adobeDRM =
+    propertyBooleanOptional("org.thepalaceproject.adobeDRM.enabled", false)
+val lcpDRM =
+    propertyBooleanOptional("org.thepalaceproject.lcp.enabled", false)
+val findawayDRM =
+    propertyBooleanOptional("org.thepalaceproject.findaway.enabled", false)
+val overdriveDRM =
+    propertyBooleanOptional("org.thepalaceproject.overdrive.enabled", false)
+
+println("DRM: org.thepalaceproject.adobeDRM.enabled  : $adobeDRM")
+println("DRM: org.thepalaceproject.lcp.enabled       : $lcpDRM")
+println("DRM: org.thepalaceproject.findaway.enabled  : $findawayDRM")
+println("DRM: org.thepalaceproject.overdrive.enabled : $overdriveDRM")
+
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
@@ -112,9 +126,11 @@ dependencyResolutionManagement {
          * Findaway access.
          */
 
-        maven {
-            url = uri("http://maven.findawayworld.com/artifactory/libs-release/")
-            isAllowInsecureProtocol = true
+        if (propertyBooleanOptional("org.thepalaceproject.findaway.enabled", false)) {
+            maven {
+                url = uri("http://maven.findawayworld.com/artifactory/libs-release/")
+                isAllowInsecureProtocol = true
+            }
         }
 
         /*

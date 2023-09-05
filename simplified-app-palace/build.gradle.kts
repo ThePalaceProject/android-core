@@ -1,6 +1,7 @@
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
+import java.util.Properties
 
 fun calculateVersionCode(): Int {
     val now = LocalDateTime.now(ZoneId.of("UTC"))
@@ -16,6 +17,35 @@ apply(plugin = "com.google.firebase.crashlytics")
  * The asset files that are required to be present in order to build the app.
  */
 
+val palaceAssetsRequired = Properties()
+
+/*
+ * The various DRM schemes require that some extra assets be present.
+ */
+
+val adobeDRM =
+    project.findProperty("org.thepalaceproject.adobeDRM.enabled") == "true"
+val lcpDRM =
+    project.findProperty("org.thepalaceproject.lcp.enabled") == "true"
+val findawayDRM =
+    project.findProperty("org.thepalaceproject.findaway.enabled") == "true"
+val overdriveDRM =
+    project.findProperty("org.thepalaceproject.overdrive.enabled") == "true"
+
+if (adobeDRM) {
+    palaceAssetsRequired.setProperty(
+        "assets/ReaderClientCert.sig",
+        "b064e68b96e258e42fe1ca66ae3fc4863dd802c46585462220907ed291e1217d",
+    )
+}
+
+if (adobeDRM || lcpDRM || findawayDRM || overdriveDRM) {
+    palaceAssetsRequired.setProperty(
+        "assets/secrets.conf",
+        "5801d64987fb1eb2fb3e32a5bae1063aa2e444723bc89b8a1230117b631940b7",
+    )
+}
+
 val palaceAssetsDirectory =
     project.findProperty("org.thepalaceproject.app.assets.palace") as String?
 
@@ -26,13 +56,34 @@ if (palaceAssetsDirectory != null) {
     }
 }
 
-fun createRequiredAssetsTask(file: File): Task {
-    return task("CheckReleaseRequiredAssets_${file.name}", Exec::class) {
+/*
+ * A task that writes the required assets to a file in order to be used later by ZipCheck.
+ */
+
+fun createRequiredAssetsFile(file: File): Task {
+    return task("CheckReleaseRequiredAssetsCreate") {
+        doLast {
+            file.writer().use {
+                palaceAssetsRequired.store(it, "")
+            }
+        }
+    }
+}
+
+/*
+ * A task that executes ZipCheck against a given APK file and a list of required assets.
+ */
+
+fun createRequiredAssetsTask(
+    checkFile: File,
+    assetList: File,
+): Task {
+    return task("CheckReleaseRequiredAssets_${checkFile.name}", Exec::class) {
         commandLine = arrayListOf(
             "java",
             "$rootDir/org.thepalaceproject.android.platform/ZipCheck.java",
-            "$file",
-            "${project.projectDir}/required-assets.conf",
+            "$checkFile",
+            "$assetList",
         )
     }
 }
@@ -151,7 +202,13 @@ android {
 
             this.outputs.forEach {
                 val outputFile = it.outputFile
-                val checkTask = createRequiredAssetsTask(outputFile)
+                val assetFile = File("${project.buildDir}/required-assets.conf")
+                val fileTask =
+                    createRequiredAssetsFile(assetFile)
+                val checkTask =
+                    createRequiredAssetsTask(checkFile = outputFile, assetList = assetFile)
+
+                checkTask.dependsOn.add(fileTask)
                 this.assembleProvider.configure {
                     finalizedBy(checkTask)
                 }
@@ -270,7 +327,7 @@ dependencies {
      * Dependencies conditional upon Adobe DRM support.
      */
 
-    if (project.findProperty("org.thepalaceproject.adobeDRM.enabled") == "true") {
+    if (adobeDRM) {
         implementation(libs.palace.drm.adobe)
     }
 
@@ -278,12 +335,28 @@ dependencies {
      * Dependencies conditional upon LCP support.
      */
 
-    if (project.findProperty("org.thepalaceproject.lcp.enabled") == "true") {
+    if (lcpDRM) {
         implementation(libs.readium.lcp) {
             artifact {
                 type = "aar"
             }
         }
+    }
+
+    /*
+     * Dependencies conditional upon Findaway support.
+     */
+
+    if (findawayDRM) {
+        implementation(libs.palace.findaway)
+    }
+
+    /*
+     * Dependencies conditional upon Overdrive support.
+     */
+
+    if (overdriveDRM) {
+        implementation(libs.palace.overdrive)
     }
 
     implementation(libs.androidx.activity)
@@ -429,14 +502,12 @@ dependencies {
     implementation(libs.palace.audiobook.rbdigital)
     implementation(libs.palace.audiobook.views)
     implementation(libs.palace.drm.core)
-    implementation(libs.palace.findaway)
     implementation(libs.palace.http.api)
     implementation(libs.palace.http.bearer.token)
     implementation(libs.palace.http.downloads)
     implementation(libs.palace.http.refresh.token)
     implementation(libs.palace.http.uri)
     implementation(libs.palace.http.vanilla)
-    implementation(libs.palace.overdrive)
     implementation(libs.palace.readium2.api)
     implementation(libs.palace.readium2.ui.thread)
     implementation(libs.palace.readium2.vanilla)
