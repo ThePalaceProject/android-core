@@ -266,9 +266,23 @@ dependencies {
     implementation(project(":simplified-viewer-spi"))
     implementation(project(":simplified-webview"))
 
-    implementation(libs.readium.lcp) {
-        artifact {
-            type = "aar"
+    /*
+     * Dependencies conditional upon Adobe DRM support.
+     */
+
+    if (project.findProperty("org.thepalaceproject.adobeDRM.enabled") == "true") {
+        implementation(libs.palace.drm.adobe)
+    }
+
+    /*
+     * Dependencies conditional upon LCP support.
+     */
+
+    if (project.findProperty("org.thepalaceproject.lcp.enabled") == "true") {
+        implementation(libs.readium.lcp) {
+            artifact {
+                type = "aar"
+            }
         }
     }
 
@@ -414,7 +428,6 @@ dependencies {
     implementation(libs.palace.audiobook.open.access)
     implementation(libs.palace.audiobook.rbdigital)
     implementation(libs.palace.audiobook.views)
-    implementation(libs.palace.drm.adobe)
     implementation(libs.palace.drm.core)
     implementation(libs.palace.findaway)
     implementation(libs.palace.http.api)

@@ -750,6 +750,12 @@ allprojects {
         "testReleaseImplementationDependenciesMetadata",
     )
 
+    /*
+     * Write the set of available configurations to files, for debugging purposes. Plugins can
+     * add new configurations at any time, and so it's nice to have a list of the available
+     * configurations visible.
+     */
+
     val configurationsActual = mutableSetOf<String>()
     afterEvaluate {
         configurations.all {

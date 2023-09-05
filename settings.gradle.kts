@@ -59,18 +59,25 @@ dependencyResolutionManagement {
     }
 
     /*
-     * Conditionally enable DRM.
+     * Conditionally enable Adobe DRM.
      */
 
-    val drmEnabled: Boolean =
-        propertyBooleanOptional("org.thepalaceproject.drm.enabled", false)
+    val adobeDRMEnabled: Boolean =
+        propertyBooleanOptional("org.thepalaceproject.adobeDRM.enabled", false)
 
-    if (drmEnabled && !s3RepositoryEnabled) {
+    if (adobeDRMEnabled && !s3RepositoryEnabled) {
         throw GradleException(
-            "If the org.thepalaceproject.drm.enabled property is set to true, " +
+            "If the org.thepalaceproject.adobeDRM.enabled property is set to true, " +
                 "the org.thepalaceproject.s3.depend property must be set to true."
         )
     }
+
+    /*
+     * Conditionally enable LCP DRM.
+     */
+
+    val lcpDRMEnabled: Boolean =
+        propertyBooleanOptional("org.thepalaceproject.lcp.enabled", false)
 
     val credentialsPath =
         propertyOptional("org.thepalaceproject.app.credentials.palace")
@@ -138,7 +145,7 @@ dependencyResolutionManagement {
          * If DRM is enabled, then enable access to the S3 repository.
          */
 
-        if (drmEnabled) {
+        if (adobeDRMEnabled) {
             maven {
                 name = "S3 Snapshots"
                 url = uri("s3://se-maven-repo/snapshots/")
@@ -168,7 +175,7 @@ dependencyResolutionManagement {
          * Enable access to various credentials-gated elements.
          */
 
-        if (credentialsPath != null) {
+        if (lcpDRMEnabled) {
             val filePath: String =
                 when (val lcpProfile = property("org.thepalaceproject.lcp.profile")) {
                     "prod", "test" -> {
