@@ -6,7 +6,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -69,7 +68,6 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
     }
   )
 
-  private val listener: FragmentListenerType<MainFragmentEvent> by fragmentListeners()
   private val listenerRepo: ListenerRepository<MainFragmentListenedEvent, MainFragmentState> by listenerRepositories()
 
   private val defaultViewModelFactory: ViewModelProvider.Factory by lazy {
@@ -133,10 +131,9 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
       MainFragmentListenerDelegate(
         fragment = this,
         listenerRepository = listenerRepo,
-        listener = listener,
+        navigator = this.navigator,
         profilesController = viewModel.profilesController,
-        settingsConfiguration = viewModel.buildConfig,
-        navigator = this.navigator
+        settingsConfiguration = viewModel.buildConfig
       )
     )
   }

@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import org.librarysimplified.documents.DocumentStoreType
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.librarysimplified.services.api.Services
+import org.librarysimplified.ui.settings.BuildConfig
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 
@@ -46,7 +47,8 @@ class SettingsMainViewModel(application: Application) : AndroidViewModel(applica
       val context = this.getApplication<Application>()
       val pkgManager = context.packageManager
       val pkgInfo = pkgManager.getPackageInfo(context.packageName, 0)
-      "${pkgInfo.versionName} (Build ${pkgInfo.versionCode})"
+      val versionName = BuildConfig.SIMPLIFIED_VERSION
+      "$versionName (Build ${pkgInfo.versionCode})"
     } catch (e: PackageManager.NameNotFoundException) {
       "Unknown"
     }

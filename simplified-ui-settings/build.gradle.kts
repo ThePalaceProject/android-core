@@ -4,6 +4,11 @@ android {
     buildFeatures {
         dataBinding = true
         viewBinding = true
+        buildConfig = true
+    }
+
+    defaultConfig {
+        buildConfigField("String", "SIMPLIFIED_VERSION", "\"${rootProject.ext["VERSION_NAME"]}\"")
     }
 }
 

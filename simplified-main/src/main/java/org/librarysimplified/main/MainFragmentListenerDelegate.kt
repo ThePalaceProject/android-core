@@ -22,7 +22,6 @@ import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.feeds.api.FeedEntry
-import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.ListenerRepository
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.accounts.AccountCardCreatorFragment
@@ -57,7 +56,6 @@ internal class MainFragmentListenerDelegate(
   private val fragment: Fragment,
   private val listenerRepository: ListenerRepository<MainFragmentListenedEvent, MainFragmentState>,
   private val navigator: TabbedNavigator,
-  private val listener: FragmentListenerType<MainFragmentEvent>,
   private val profilesController: ProfilesControllerType,
   private val settingsConfiguration: BuildConfigurationServiceType
 ) : LifecycleObserver {
