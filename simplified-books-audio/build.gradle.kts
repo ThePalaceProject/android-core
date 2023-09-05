@@ -7,7 +7,7 @@ dependencies {
     implementation(libs.google.guava)
     implementation(libs.io7m.junreachable)
     implementation(libs.irradia.mime.api)
-    implementation(libs.kotlin.coroutines)
+    implementation(libs.kotlinx.coroutines)
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlin.stdlib)
     implementation(libs.palace.audiobook.api)

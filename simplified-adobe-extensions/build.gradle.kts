@@ -1,3 +1,13 @@
+android {
+    buildFeatures {
+        buildConfig = true
+    }
+
+    defaultConfig {
+        buildConfigField("String", "SIMPLIFIED_VERSION", "\"${rootProject.ext["VERSION_NAME"]}\"")
+    }
+}
+
 dependencies {
     implementation(project(":simplified-accounts-api"))
     implementation(project(":simplified-files"))

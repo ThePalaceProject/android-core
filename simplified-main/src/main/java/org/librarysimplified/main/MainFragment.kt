@@ -79,8 +79,6 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
   private lateinit var bottomView: BottomNavigationView
   private lateinit var navigator: TabbedNavigator
 
-  private var timeOutDialog: AlertDialog? = null
-
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 

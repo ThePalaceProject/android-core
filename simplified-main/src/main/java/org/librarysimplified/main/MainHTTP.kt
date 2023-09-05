@@ -16,7 +16,7 @@ object MainHTTP {
       try {
         val pkgManager = context.packageManager
         val pkgInfo = pkgManager.getPackageInfo(context.packageName, 0)
-        Pair(pkgInfo.packageName, pkgInfo.versionName)
+        Pair(pkgInfo.packageName, BuildConfig.SIMPLIFIED_VERSION)
       } catch (e: PackageManager.NameNotFoundException) {
         Pair("Unavailable", "0.0.0")
       }

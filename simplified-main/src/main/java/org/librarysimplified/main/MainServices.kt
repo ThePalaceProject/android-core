@@ -493,7 +493,7 @@ internal object MainServices {
           LocalDateTime.now(),
           null,
           packageInfo.packageName,
-          packageInfo.versionName,
+          BuildConfig.SIMPLIFIED_VERSION,
           packageInfo.versionCode
         )
 

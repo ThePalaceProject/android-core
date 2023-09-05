@@ -1,8 +1,8 @@
 dependencies {
-    implementation(libs.androidx.app.compat)
+    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.cardview)
     implementation(libs.androidx.coordinatorlayout)
-    implementation(libs.androidx.constraint.layout)
+    implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core)
     implementation(libs.androidx.drawerlayout)
     implementation(libs.androidx.preference)

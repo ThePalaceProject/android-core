@@ -1,6 +1,6 @@
 dependencies {
     implementation(libs.androidx.activity)
-    implementation(libs.androidx.app.compat)
+    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core)
     implementation(libs.androidx.customview)
     implementation(libs.androidx.drawerlayout)

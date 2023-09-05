@@ -61,6 +61,22 @@ plugins {
         .version("5.4.0")
         .apply(false)
 
+    /*
+     * https://developers.google.com/android/guides/google-services-plugin
+     */
+
+    id("com.google.gms.google-services")
+        .version("4.3.15")
+        .apply(false)
+
+    /*
+     * https://firebase.google.com/docs/crashlytics/get-started?platform=android
+     */
+
+    id("com.google.firebase.crashlytics")
+        .version("2.9.9")
+        .apply(false)
+
     id("maven-publish")
 }
 
@@ -496,6 +512,8 @@ allprojects {
 
             android.defaultConfig {
                 multiDexEnabled = true
+                targetSdk =
+                    propertyInt(this@allprojects, "org.thepalaceproject.build.androidSDKTarget")
                 minSdk =
                     propertyInt(this@allprojects, "org.thepalaceproject.build.androidSDKMinimum")
                 testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

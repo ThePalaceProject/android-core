@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:tools="http://schemas.android.com/tools"
-  package="org.thepalaceproject.palace">
+  xmlns:tools="http://schemas.android.com/tools">
 
   <uses-permission android:name="android.permission.INTERNET" />
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -10,7 +9,7 @@
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
   <application
-    android:name="org.nypl.simplified.main.MainApplication"
+    android:name="org.librarysimplified.main.MainApplication"
     android:allowBackup="true"
     android:contentDescription="@string/app_name"
     android:icon="@mipmap/ic_launcher"
@@ -21,7 +20,7 @@
 
     <!-- Main entry point for the application. -->
     <activity
-      android:name="org.nypl.simplified.main.MainActivity"
+      android:name="org.librarysimplified.main.MainActivity"
       android:contentDescription="@string/app_name"
       android:launchMode="singleTop"
       android:screenOrientation="portrait"
@@ -65,49 +64,35 @@
       android:required="false" />
 
     <activity
-        android:name="org.nypl.simplified.viewer.preview.BookPreviewActivity"
+        android:name="org.librarysimplified.viewer.preview.BookPreviewActivity"
         android:exported="false"
-        android:parentActivityName="org.nypl.simplified.main.MainActivity"
+        android:parentActivityName="org.librarysimplified.main.MainActivity"
         android:screenOrientation="portrait"
         android:theme="@style/PalaceTheme.NoActionBar" />
 
     <activity
-      android:name="org.nypl.simplified.viewer.epub.readium2.Reader2Activity"
+      android:name="org.librarysimplified.viewer.epub.readium2.Reader2Activity"
       android:configChanges="orientation|keyboardHidden"
       android:exported="false"
-      android:parentActivityName="org.nypl.simplified.main.MainActivity"
+      android:parentActivityName="org.librarysimplified.main.MainActivity"
       android:screenOrientation="portrait"
       android:theme="@style/PalaceTheme.NoActionBar" />
 
     <activity
-      android:name="org.nypl.simplified.viewer.pdf.PdfReaderActivity"
+      android:name="org.librarysimplified.viewer.pdf.pdfjs.PdfReaderActivity"
       android:contentDescription="@string/app_name"
       android:exported="false"
       android:screenOrientation="portrait"
       android:label="@string/app_name" />
 
     <activity
-      android:name="org.nypl.simplified.viewer.pdf.pdfjs.PdfReaderActivity"
-      android:contentDescription="@string/app_name"
-      android:exported="false"
-      android:screenOrientation="portrait"
-      android:label="@string/app_name" />
-
-    <activity
-      android:name="org.nypl.simplified.viewer.audiobook.AudioBookPlayerActivity"
+      android:name="org.librarysimplified.viewer.audiobook.AudioBookPlayerActivity"
       android:contentDescription="@string/app_name"
       android:exported="false"
       android:label="@string/app_name"
-      android:parentActivityName="org.nypl.simplified.main.MainActivity"
+      android:parentActivityName="org.librarysimplified.main.MainActivity"
       android:screenOrientation="portrait"
       android:theme="@style/PalaceTheme.NoActionBar" />
-
-    <activity
-      android:name="org.nypl.simplified.cardcreator.CardCreatorActivity"
-      android:contentDescription="@string/app_name"
-      android:exported="false"
-      android:screenOrientation="portrait"
-      android:label="@string/app_name" />
 
   </application>
 

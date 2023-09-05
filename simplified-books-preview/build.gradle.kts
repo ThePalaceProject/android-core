@@ -11,7 +11,7 @@ dependencies {
 
     implementation(libs.irradia.mime.api)
     implementation(libs.joda.time)
-    implementation(libs.kotlin.coroutines)
+    implementation(libs.kotlinx.coroutines)
     implementation(libs.kotlin.stdlib)
     implementation(libs.palace.drm.core)
     implementation(libs.palace.http.api)

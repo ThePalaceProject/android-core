@@ -1,6 +1,6 @@
 dependencies {
-    implementation(libs.androidx.constraint.layout)
-    implementation(libs.kotlin.coroutines)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.kotlinx.coroutines)
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlin.stdlib)
     implementation(libs.palace.drm.core)
