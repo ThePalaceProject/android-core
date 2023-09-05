@@ -237,7 +237,6 @@ val dependencyObjects = listOf(
     libs.palace.audiobook.parser.api,
     libs.palace.audiobook.rbdigital,
     libs.palace.audiobook.views,
-    libs.palace.drm.adobe,
     libs.palace.drm.core,
     libs.palace.findaway,
     libs.palace.http.api,
