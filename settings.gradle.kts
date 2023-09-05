@@ -8,12 +8,16 @@ pluginManagement {
     }
 }
 
-fun property(name: String): String {
-    return settings.extra[name] as String
+fun propertyOptional(name: String): String? {
+    val map = settings.extra
+    if (map.has(name)) {
+        return map[name] as String?
+    }
+    return null
 }
 
-fun propertyOptional(name: String): String? {
-    return settings.extra.get(name) as String?
+fun property(name: String): String {
+    return propertyOptional(name) ?: throw GradleException("Required property $name is not defined.")
 }
 
 fun propertyBooleanOptional(name: String, defaultValue: Boolean): Boolean {
