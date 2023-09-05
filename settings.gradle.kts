@@ -76,10 +76,7 @@ dependencyResolutionManagement {
      * Conditionally enable Adobe DRM.
      */
 
-    val adobeDRMEnabled: Boolean =
-        propertyBooleanOptional("org.thepalaceproject.adobeDRM.enabled", false)
-
-    if (adobeDRMEnabled && !s3RepositoryEnabled) {
+    if (adobeDRM && !s3RepositoryEnabled) {
         throw GradleException(
             "If the org.thepalaceproject.adobeDRM.enabled property is set to true, " +
                 "the org.thepalaceproject.s3.depend property must be set to true."
@@ -126,7 +123,7 @@ dependencyResolutionManagement {
          * Findaway access.
          */
 
-        if (propertyBooleanOptional("org.thepalaceproject.findaway.enabled", false)) {
+        if (findawayDRM) {
             maven {
                 url = uri("http://maven.findawayworld.com/artifactory/libs-release/")
                 isAllowInsecureProtocol = true
@@ -158,10 +155,10 @@ dependencyResolutionManagement {
         }
 
         /*
-         * If DRM is enabled, then enable access to the S3 repository.
+         * Optionally enable access to the S3 repository.
          */
 
-        if (adobeDRMEnabled) {
+        if (s3RepositoryEnabled) {
             maven {
                 name = "S3 Snapshots"
                 url = uri("s3://se-maven-repo/snapshots/")
