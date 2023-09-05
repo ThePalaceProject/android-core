@@ -349,6 +349,7 @@ dependencies {
 
     if (findawayDRM) {
         implementation(libs.palace.findaway)
+        implementation(libs.findaway)
     }
 
     /*
@@ -433,7 +434,6 @@ dependencies {
     implementation(libs.androidx.viewpager)
     implementation(libs.androidx.viewpager2)
     implementation(libs.androidx.webkit)
-    implementation(libs.findaway)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.annotations)
     implementation(libs.firebase.auth.interop)
