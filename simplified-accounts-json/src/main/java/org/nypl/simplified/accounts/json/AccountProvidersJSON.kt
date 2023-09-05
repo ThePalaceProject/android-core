@@ -516,7 +516,7 @@ object AccountProvidersJSON {
   private fun toStringMap(objectNode: ObjectNode): Map<String, String> {
     val map = mutableMapOf<String, String>()
     for (key in objectNode.fieldNames()) {
-      map[key.uppercase(Locale.getDefault())] = JSONParserUtilities.getString(objectNode, key)
+      map[key.uppercase(Locale.ROOT)] = JSONParserUtilities.getString(objectNode, key)
     }
     return map.toMap()
   }
