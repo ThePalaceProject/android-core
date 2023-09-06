@@ -22,6 +22,7 @@ import java.io.File
 import java.io.InputStream
 import java.net.URI
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 class DocumentStoreTest {
 
@@ -118,6 +119,7 @@ class DocumentStoreTest {
     )
 
     store.update(executor)
+      .get(5L, TimeUnit.SECONDS)
 
     Mockito.verify(http, Mockito.times(0)).newRequest(documentWithoutName.remoteURI)
   }
@@ -139,10 +141,7 @@ class DocumentStoreTest {
     )
 
     store.update(executor)
-
-    // this sleep is needed for some reason when this test and the 'testAllDocumentUpdates' test
-    // are both called in the test suite
-    Thread.sleep(50)
+      .get(5L, TimeUnit.SECONDS)
 
     Mockito.verify(http, Mockito.times(1)).newRequest(documentWithName.remoteURI)
   }
@@ -164,6 +163,7 @@ class DocumentStoreTest {
     )
 
     store.update(executor)
+      .get(5L, TimeUnit.SECONDS)
 
     // the faq document is not updated
     Mockito.verify(http, Mockito.times(5)).newRequest(documentWithName.remoteURI)
