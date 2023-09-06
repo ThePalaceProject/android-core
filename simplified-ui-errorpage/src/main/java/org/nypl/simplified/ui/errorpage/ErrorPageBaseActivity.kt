@@ -2,6 +2,7 @@ package org.nypl.simplified.ui.errorpage
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import org.librarysimplified.ui.errorpage.R
 
 /**
  * A convenient base activity used to show error pages.

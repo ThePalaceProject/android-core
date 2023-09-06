@@ -1,0 +1,62 @@
+import org.librarysimplified.gradle.RequiredAssetsTask
+
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
+
+// Fail the build if these assets aren't present
+//
+def requiredFiles = [:]
+requiredFiles["ReaderClientCert.sig"] =
+  "b064e68b96e258e42fe1ca66ae3fc4863dd802c46585462220907ed291e1217d"
+requiredFiles["secrets.conf"] =
+  "5801d64987fb1eb2fb3e32a5bae1063aa2e444723bc89b8a1230117b631940b7"
+
+android {
+  defaultConfig {
+    versionName = project.version
+    versionCode = calculateVersionCode(project)
+    resConfigs "en", "es"
+    setProperty("archivesBaseName", "palace")
+  }
+  applicationVariants.all { variant ->
+    def finalizerTask =
+      tasks.create(name: "requiredFiles${variant.name.capitalize()}", type: RequiredAssetsTask) {
+        required = requiredFiles
+        apkFiles = variant.outputs.collect { out ->
+          out.outputFile
+        }
+      }
+    variant.assembleProvider.configure {
+      finalizedBy finalizerTask
+    }
+  }
+}
+
+configurations.all {
+  exclude group: 'org.librarysimplified.drm'
+  exclude group: 'com.google.code.findbugs', module: 'annotations'
+}
+
+dependencies {
+  implementation(project(":simplified-main"))
+  implementation(project(":simplified-accounts-source-nyplregistry"))
+  implementation(project(":simplified-analytics-circulation"))
+  implementation(project(":simplified-crashlytics"))
+
+  implementation(libs.firebase.analytics)
+  implementation(libs.firebase.crashlytics)
+  implementation(libs.nypl.readium)
+  implementation(libs.palace.drm.adobe)
+  implementation(libs.palace.findaway)
+  implementation(libs.palace.overdrive)
+  implementation(libs.r2.lcp)
+  implementation(libs.r2.opds)
+  implementation(libs.r2.shared)
+  implementation(libs.r2.streamer)
+
+  implementation((libs.readium.lcp) {)
+    artifact {
+      type = "aar"
+    }
+  }
+}

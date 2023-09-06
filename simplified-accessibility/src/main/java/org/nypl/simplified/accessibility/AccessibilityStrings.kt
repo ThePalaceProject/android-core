@@ -1,6 +1,7 @@
 package org.nypl.simplified.accessibility
 
 import android.content.res.Resources
+import org.librarysimplified.accessibility.R
 
 /**
  * The default implementation of the [AccessibilityStringsType].

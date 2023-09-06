@@ -1,6 +1,7 @@
 package org.nypl.simplified.profiles
 
 import com.io7m.jfunctional.Option
+import net.jcip.annotations.GuardedBy
 import org.joda.time.LocalDateTime
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountProviderType
@@ -20,7 +21,6 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URI
 import java.util.SortedMap
-import javax.annotation.concurrent.GuardedBy
 
 /**
  * A single entry in the profiles database.

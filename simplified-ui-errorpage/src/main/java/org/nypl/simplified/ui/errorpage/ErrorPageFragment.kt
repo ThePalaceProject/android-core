@@ -12,10 +12,11 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import org.librarysimplified.reports.Reports
+import org.librarysimplified.ui.errorpage.R
 import org.nypl.simplified.android.ktx.supportActionBar
 import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.fragmentListeners
-import org.nypl.simplified.reports.Reports
 import org.nypl.simplified.ui.neutrality.NeutralToolbar
 import org.slf4j.LoggerFactory
 
@@ -70,7 +71,7 @@ class ErrorPageFragment : Fragment(R.layout.error_page) {
       view.rootView.findViewWithTag(NeutralToolbar.neutralToolbarName)
 
     this.parameters =
-      this.arguments!!.getSerializable(PARAMETERS_ID)
+      this.requireArguments().getSerializable(PARAMETERS_ID)
         as ErrorPageParameters
 
     if (parameters.attributes.isEmpty()) {

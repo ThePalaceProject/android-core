@@ -2,7 +2,6 @@ package org.nypl.simplified.tests.mocking
 
 import android.content.Context
 import com.google.common.base.Preconditions
-import com.nhaarman.mockitokotlin2.description
 import org.joda.time.DateTime
 import org.mockito.Mockito
 import org.nypl.simplified.accounts.api.AccountProvider

@@ -5,6 +5,7 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import org.librarysimplified.ui.accounts.R
 import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Anonymous
@@ -14,6 +15,7 @@ import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.OAuthWithIntermediary
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.SAML2_0
 import org.nypl.simplified.accounts.api.AccountUsername
+
 import org.nypl.simplified.ui.accounts.view_bindings.AccountAuthenticationViewBindings
 import org.nypl.simplified.ui.accounts.view_bindings.ViewsForAnonymous
 import org.nypl.simplified.ui.accounts.view_bindings.ViewsForBasic

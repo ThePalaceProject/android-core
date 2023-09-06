@@ -1,6 +1,0 @@
-dependencies {
-  api project(":simplified-books-api")
-
-  implementation libs.kotlin.stdlib
-  implementation libs.kotlin.reflect
-}

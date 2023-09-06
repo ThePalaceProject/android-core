@@ -57,7 +57,11 @@ cp "${CREDENTIALS_PATH}/PlayStore/play_store_api_key.json" "simplified-app-palac
   fatal "could not copy Play Store key"
 
 cat >> "${HOME}/.gradle/gradle.properties" <<EOF
-org.thepalaceproject.drm.enabled=true
+org.thepalaceproject.adobeDRM.enabled=true
+org.thepalaceproject.lcp.enabled=true
+org.thepalaceproject.lcp.profile=prod
+org.thepalaceproject.findaway.enabled=true
+org.thepalaceproject.overdrive.enabled=true
 
 org.thepalaceproject.s3.depend=true
 org.thepalaceproject.aws.access_key_id=${CI_AWS_ACCESS_ID}

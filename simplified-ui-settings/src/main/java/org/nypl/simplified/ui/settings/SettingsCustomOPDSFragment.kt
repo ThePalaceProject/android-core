@@ -1,5 +1,7 @@
 package org.nypl.simplified.ui.settings
 
+import org.librarysimplified.ui.settings.R
+
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher

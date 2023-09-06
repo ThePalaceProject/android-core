@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import org.librarysimplified.services.api.Services
+import org.librarysimplified.ui.announcements.R
 
 class AnnouncementsDialog : DialogFragment(R.layout.announcements_dialog) {
 

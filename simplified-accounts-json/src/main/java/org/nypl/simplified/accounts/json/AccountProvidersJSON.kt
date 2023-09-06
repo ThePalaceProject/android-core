@@ -146,7 +146,11 @@ object AccountProvidersJSON {
       is Basic -> {
         val authObject = mapper.createObjectNode()
         authObject.put("type", BASIC_TYPE)
-        this.putConditionally(authObject, "barcodeFormat", authentication.barcodeFormat?.toUpperCase(Locale.ROOT))
+        this.putConditionally(
+          authObject,
+          "barcodeFormat",
+          authentication.barcodeFormat?.uppercase(Locale.ROOT)
+        )
         this.putConditionally(authObject, "description", authentication.description)
         this.putConditionally(authObject, "keyboard", authentication.keyboard.name)
         this.putConditionally(authObject, "passwordKeyboard", authentication.passwordKeyboard.name)
@@ -431,7 +435,7 @@ object AccountProvidersJSON {
           this.toStringMap(JSONParserUtilities.getObject(container, "labels"))
         val barcodeFormat =
           JSONParserUtilities.getStringOrNull(container, "barcodeFormat")
-            ?.toUpperCase(Locale.ROOT)
+            ?.uppercase(Locale.ROOT)
         val keyboard =
           this.parseKeyboardType(JSONParserUtilities.getStringOrNull(container, "keyboard"))
         val passwordMaximumLength =
@@ -483,20 +487,25 @@ object AccountProvidersJSON {
   private fun parseKeyboardType(
     text: String?
   ): KeyboardInput {
-    return when (val keyboardText = text?.toUpperCase(Locale.ROOT)) {
+    return when (val keyboardText = text?.uppercase(Locale.ROOT)) {
       null ->
         KeyboardInput.DEFAULT
+
       "NO_INPUT",
       "NO INPUT" ->
         KeyboardInput.NO_INPUT
+
       "DEFAULT" ->
         KeyboardInput.DEFAULT
+
       "NUMBER_PAD",
       "NUMBER PAD" ->
         KeyboardInput.NUMBER_PAD
+
       "EMAIL_ADDRESS",
       "EMAIL ADDRESS" ->
         KeyboardInput.EMAIL_ADDRESS
+
       else -> {
         this.logger.warn("encountered unrecognized keyboard type: {}", keyboardText)
         return KeyboardInput.DEFAULT
@@ -507,7 +516,7 @@ object AccountProvidersJSON {
   private fun toStringMap(objectNode: ObjectNode): Map<String, String> {
     val map = mutableMapOf<String, String>()
     for (key in objectNode.fieldNames()) {
-      map[key.toUpperCase()] = JSONParserUtilities.getString(objectNode, key)
+      map[key.uppercase(Locale.ROOT)] = JSONParserUtilities.getString(objectNode, key)
     }
     return map.toMap()
   }

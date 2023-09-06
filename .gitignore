@@ -14,7 +14,7 @@
 # Ignore .so files
 **/jniLibs
 
-# Certificates and API Keys
+# Certificates and api(Keys)
 *.jks
 secrets.conf
 ReaderClientCert.sig

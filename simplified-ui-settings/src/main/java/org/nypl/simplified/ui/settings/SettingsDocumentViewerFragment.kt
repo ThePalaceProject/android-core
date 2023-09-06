@@ -12,7 +12,7 @@ import org.nypl.simplified.android.ktx.supportActionBar
 import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.fragmentListeners
 import org.nypl.simplified.ui.neutrality.NeutralToolbar
-import org.nypl.simplified.ui.settings.databinding.SettingsDocumentViewerBinding
+import org.librarysimplified.ui.settings.databinding.SettingsDocumentViewerBinding
 import org.nypl.simplified.webview.WebViewUtilities
 
 class SettingsDocumentViewerFragment : Fragment() {

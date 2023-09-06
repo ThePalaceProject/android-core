@@ -6,6 +6,7 @@ import com.io7m.jfunctional.Option
 import com.io7m.jfunctional.OptionType
 import com.io7m.junreachable.UnreachableCodeException
 import io.reactivex.subjects.Subject
+import net.jcip.annotations.GuardedBy
 import org.joda.time.LocalDateTime
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentialsStoreType
 import org.nypl.simplified.accounts.api.AccountBundledCredentialsType
@@ -36,7 +37,6 @@ import java.util.Collections
 import java.util.SortedMap
 import java.util.UUID
 import java.util.concurrent.ConcurrentSkipListMap
-import javax.annotation.concurrent.GuardedBy
 
 /**
  * The default implementation of the [ProfilesDatabaseType] interface.

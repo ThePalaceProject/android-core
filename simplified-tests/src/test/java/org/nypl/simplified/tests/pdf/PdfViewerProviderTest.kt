@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
-import org.nypl.simplified.viewer.pdf.pdfjs.PdfViewerProvider
+import org.librarysimplified.viewer.pdf.pdfjs.PdfViewerProvider
 import org.nypl.simplified.viewer.spi.ViewerPreferences
 
 class PdfViewerProviderTest {

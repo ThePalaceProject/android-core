@@ -19,6 +19,7 @@ import org.nypl.simplified.parser.api.ParseResult
 import org.nypl.simplified.parser.api.ParseWarning
 import java.io.InputStream
 import java.net.URI
+import java.util.Locale
 
 internal class AuthenticationDocumentParser(
   private val mapper: ObjectMapper,
@@ -251,11 +252,11 @@ internal class AuthenticationDocumentParser(
     }
   }
 
-  private fun parseInputs(root: ObjectNode): Map<String, AuthenticationObjectNYPLInput>? {
+  private fun parseInputs(root: ObjectNode): Map<String, AuthenticationObjectNYPLInput> {
     val values = mutableMapOf<String, AuthenticationObjectNYPLInput>()
     for (key in root.fieldNames()) {
       try {
-        val keyUpper = key.toUpperCase()
+        val keyUpper = key.uppercase(Locale.ROOT)
         val input = this.parseInput(keyUpper, JSONParserUtilities.getObject(root, key))
         if (input != null) {
           values[keyUpper] = input
@@ -275,11 +276,13 @@ internal class AuthenticationDocumentParser(
       AuthenticationObjectNYPLInput(
         fieldName = fieldName,
         keyboardType =
-        JSONParserUtilities.getStringOrNull(root, "keyboard")?.toUpperCase(),
+        JSONParserUtilities.getStringOrNull(root, "keyboard")
+          ?.uppercase(Locale.ROOT),
         maximumLength =
         JSONParserUtilities.getIntegerDefault(root, "maximum_length", 0),
         barcodeFormat =
-        JSONParserUtilities.getStringOrNull(root, "barcode_format")?.toUpperCase()
+        JSONParserUtilities.getStringOrNull(root, "barcode_format")
+          ?.uppercase(Locale.ROOT)
       )
     } catch (e: Exception) {
       this.publishErrorForException(e)
@@ -287,11 +290,11 @@ internal class AuthenticationDocumentParser(
     }
   }
 
-  private fun parseLabels(root: ObjectNode): Map<String, String>? {
+  private fun parseLabels(root: ObjectNode): Map<String, String> {
     val values = mutableMapOf<String, String>()
     for (key in root.fieldNames()) {
       try {
-        values[key.toUpperCase()] = JSONParserUtilities.getString(root, key)
+        values[key.uppercase(Locale.ROOT)] = JSONParserUtilities.getString(root, key)
       } catch (e: Exception) {
         this.publishErrorForException(e)
       }

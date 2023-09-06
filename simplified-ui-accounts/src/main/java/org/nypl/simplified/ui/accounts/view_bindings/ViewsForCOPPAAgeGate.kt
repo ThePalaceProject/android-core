@@ -4,7 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SwitchCompat
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus
-import org.nypl.simplified.ui.accounts.R
+import org.librarysimplified.ui.accounts.R
 
 class ViewsForCOPPAAgeGate(
   override val viewGroup: ViewGroup,

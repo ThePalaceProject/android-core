@@ -26,6 +26,7 @@ import org.nypl.simplified.listeners.api.fragmentListeners
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.nypl.simplified.ui.neutrality.NeutralToolbar
+import org.librarysimplified.ui.accounts.R
 
 /**
  * A fragment that shows the set of accounts in the current profile.
@@ -82,7 +83,7 @@ class AccountListFragment : Fragment(R.layout.account_list) {
           account.provider.displayName
         )
       )
-      .setNegativeButton(R.string.cancel) { dialog, _ ->
+      .setNegativeButton(R.string.accountCancel) { dialog, _ ->
         dialog.dismiss()
       }
       .setPositiveButton(R.string.accountsDelete) { dialog, _ ->

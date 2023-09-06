@@ -1,0 +1,82 @@
+apply(plugin = "androidx.navigation.safeargs.kotlin")
+
+android {
+    buildFeatures {
+        dataBinding = true
+        viewBinding = true
+        buildConfig = true
+    }
+
+    defaultConfig {
+        buildConfigField("String", "SIMPLIFIED_VERSION", "\"${rootProject.ext["VERSION_NAME"]}\"")
+    }
+}
+
+dependencies {
+    implementation(project(":simplified-accessibility"))
+    implementation(project(":simplified-accounts-api"))
+    implementation(project(":simplified-accounts-database-api"))
+    implementation(project(":simplified-accounts-registry-api"))
+    implementation(project(":simplified-adobe-extensions"))
+    implementation(project(":simplified-analytics-api"))
+    implementation(project(":simplified-android-ktx"))
+    implementation(project(":simplified-books-controller-api"))
+    implementation(project(":simplified-boot-api"))
+    implementation(project(":simplified-buildconfig-api"))
+    implementation(project(":simplified-crashlytics-api"))
+    implementation(project(":simplified-documents"))
+    implementation(project(":simplified-feeds-api"))
+    implementation(project(":simplified-oauth"))
+    implementation(project(":simplified-presentableerror-api"))
+    implementation(project(":simplified-profiles-api"))
+    implementation(project(":simplified-profiles-controller-api"))
+    implementation(project(":simplified-reader-api"))
+    implementation(project(":simplified-reports"))
+    implementation(project(":simplified-services-api"))
+    implementation(project(":simplified-taskrecorder-api"))
+    implementation(project(":simplified-threads"))
+    implementation(project(":simplified-ui-errorpage"))
+    implementation(project(":simplified-ui-images"))
+    implementation(project(":simplified-ui-listeners-api"))
+    implementation(project(":simplified-ui-neutrality"))
+    implementation(project(":simplified-webview"))
+
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.annotation)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.cardview)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.coordinatorlayout)
+    implementation(libs.androidx.core)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.customview)
+    implementation(libs.androidx.drawerlayout)
+    implementation(libs.androidx.fragment)
+    implementation(libs.androidx.fragment.ktx)
+    implementation(libs.androidx.lifecycle.common)
+    implementation(libs.androidx.lifecycle.extensions)
+    implementation(libs.androidx.lifecycle.livedata)
+    implementation(libs.androidx.lifecycle.livedata.core)
+    implementation(libs.androidx.lifecycle.livedata.core.ktx)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel)
+    implementation(libs.androidx.lifecycle.viewmodel.savedstate)
+    implementation(libs.androidx.paging.common)
+    implementation(libs.androidx.paging.common.ktx)
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.runtime.ktx)
+    implementation(libs.androidx.preference)
+    implementation(libs.androidx.recycler.view)
+    implementation(libs.androidx.savedstate)
+    implementation(libs.google.failureaccess)
+    implementation(libs.google.guava)
+    implementation(libs.google.material)
+    implementation(libs.joda.time)
+    implementation(libs.kotlin.reflect)
+    implementation(libs.kotlin.stdlib)
+    implementation(libs.palace.drm.core)
+    implementation(libs.rxandroid2)
+    implementation(libs.rxjava2)
+    implementation(libs.rxjava2.extensions)
+    implementation(libs.slf4j)
+}

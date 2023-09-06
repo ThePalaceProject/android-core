@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-
-<!-- Build-time feature flags. -->
-<resources>
-  <bool name="featureProfilesEnabled">true</bool>
-</resources>

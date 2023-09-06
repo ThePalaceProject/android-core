@@ -1,8 +1,0 @@
-dependencies {
-  api libs.google.guava
-
-  implementation libs.kotlin.stdlib
-  implementation libs.kotlin.reflect
-  implementation libs.palace.http.api
-  implementation libs.slf4j
-}

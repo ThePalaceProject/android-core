@@ -154,7 +154,7 @@ internal class ProfileFeedTask(
     val terms = search.split("\\s+".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
     val termsUpper = ArrayList<String>(8)
     for (term in terms) {
-      termsUpper.add(term.toUpperCase(Locale.ROOT))
+      termsUpper.add(term.uppercase(Locale.ROOT))
     }
     return termsUpper
   }
@@ -324,14 +324,14 @@ internal class ProfileFeedTask(
     for (index in termsUpper.indices) {
       val termUpper = termsUpper[index]
       val ee = book.book.entry
-      val eTitle = ee.title.toUpperCase(Locale.ROOT)
+      val eTitle = ee.title.uppercase(Locale.ROOT)
       if (eTitle.contains(termUpper)) {
         return true
       }
 
       val authors = ee.authors
       for (a in authors) {
-        if (a.toUpperCase(Locale.ROOT).contains(termUpper)) {
+        if (a.uppercase(Locale.ROOT).contains(termUpper)) {
           return true
         }
       }

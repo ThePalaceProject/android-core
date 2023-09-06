@@ -1,5 +1,7 @@
 package org.nypl.simplified.ui.settings
 
+import org.librarysimplified.ui.settings.R
+
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
