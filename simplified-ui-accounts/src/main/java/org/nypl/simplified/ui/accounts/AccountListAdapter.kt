@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
+import org.librarysimplified.ui.accounts.R
 
 /**
  * An adapter for a list of accounts.

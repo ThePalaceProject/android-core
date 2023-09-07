@@ -20,12 +20,12 @@ import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
-import org.nypl.simplified.ui.accounts.R
 import org.nypl.simplified.webview.WebViewUtilities
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.concurrent.atomic.AtomicReference
+import org.librarysimplified.ui.accounts.R
 
 /**
  * View state for the SAML 2.0 fragment.

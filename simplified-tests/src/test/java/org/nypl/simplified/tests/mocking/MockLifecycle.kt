@@ -13,7 +13,6 @@ class MockLifecycle : Lifecycle() {
   override fun removeObserver(observer: LifecycleObserver) {
   }
 
-  override fun getCurrentState(): State {
-    return this.state
-  }
+  override val currentState: State
+    get() = this.state
 }

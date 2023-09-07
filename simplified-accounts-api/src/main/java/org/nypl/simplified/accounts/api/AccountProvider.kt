@@ -6,6 +6,7 @@ import java.net.URI
 
 data class AccountProvider(
   override val id: URI,
+  @Deprecated("Use URI-based IDs")
   override val idNumeric: Int,
   override val isProduction: Boolean,
   override val displayName: String,

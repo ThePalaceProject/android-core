@@ -12,6 +12,7 @@ import org.nypl.simplified.accounts.api.AccountProviderDescription
 import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.slf4j.LoggerFactory
+import org.librarysimplified.ui.accounts.R
 
 /**
  * Adapter for showing a list of `AccountProviderDescription` items.

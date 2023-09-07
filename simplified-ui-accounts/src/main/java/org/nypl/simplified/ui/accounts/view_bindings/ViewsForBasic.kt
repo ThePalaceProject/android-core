@@ -9,12 +9,12 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import org.librarysimplified.ui.accounts.R
 import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountUsername
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus
 import org.nypl.simplified.ui.accounts.OnTextChangeListener
-import org.nypl.simplified.ui.accounts.R
 import org.slf4j.LoggerFactory
 
 class ViewsForBasic(

@@ -14,7 +14,7 @@ import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountUsername
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus
 import org.nypl.simplified.ui.accounts.OnTextChangeListener
-import org.nypl.simplified.ui.accounts.R
+import org.librarysimplified.ui.accounts.R
 import org.slf4j.LoggerFactory
 
 class ViewsForBasicToken(

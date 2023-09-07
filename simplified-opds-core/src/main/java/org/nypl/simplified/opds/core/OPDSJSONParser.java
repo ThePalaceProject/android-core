@@ -11,7 +11,6 @@ import com.io7m.jfunctional.PartialFunctionType;
 import com.io7m.jfunctional.Unit;
 import com.io7m.jnull.NullCheck;
 
-import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.nypl.simplified.json.core.JSONParseException;
 import org.nypl.simplified.json.core.JSONParserUtilities;
@@ -103,7 +102,6 @@ public final class OPDSJSONParser implements OPDSJSONParserType {
     }
   }
 
-  @NotNull
   private static Map<String, String> parseProperties(ObjectNode o) throws JSONParseException {
     Map<String, String> properties;
     if (o.has(PROPERTIES_FIELD)) {

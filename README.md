@@ -11,19 +11,11 @@ _Image by [Predrag Kezic](https://pixabay.com/users/PredragKezic-582203/?utm_sou
 
 ### What Is This?
 
-The contents of this repository provide the framework of an application used to build The Palace
-Project's Android client application, Palace. The framework provides a base application with
-numerous configuration switches and configurable branding.
-
-The repository contains multiple applications that are all built from the same core:
+The contents of this repository provide the The Palace Project's Android client application, Palace.
 
 |Application|Module|Description|
 |-----------|------|-----------|
-|Vanilla|[simplified-app-vanilla](simplified-app-vanilla)|DRM-free generic reading application|
 |Palace|[simplified-app-palace](simplified-app-palace)|The DRM-enabled application|
-
-The Vanilla application is currently not included in a build of the project. It can be included by
-uncommenting its `include` line in [settings.gradle](https://github.com/ThePalaceProject/android-core/blob/d718c83aac4d54ba79f8cafb538d8169fa7f0a06/settings.gradle#L31).
 
 ## Contents
 
@@ -67,12 +59,12 @@ support the use of any other IDE at the moment.
 
 #### JDK
 
-Install a reasonably modern JDK, at least JDK 11. We don't recommend building
+Install a reasonably modern JDK, at least JDK 17. We don't recommend building
 on anything newer than the current LTS JDK for everyday usage.
 
 Any of the following JDKs should work:
 
-  * [OpenJDK](https://jdk.java.net/java-se-ri/11)
+  * [OpenJDK](https://jdk.java.net/java-se-ri/17)
   * [Adoptium](https://adoptopenjdk.net/)
   * [Amazon Coretto](https://aws.amazon.com/corretto/)
   * [Zulu](https://www.azul.com/downloads/zulu-community/?package=jdk)
@@ -83,8 +75,8 @@ line to `$HOME/.profile` and then executing `source $HOME/.profile` or opening a
 should suffice:
 
 ~~~w
-# Replace NNN with your particular version of 11.
-export JAVA_HOME=/path/to/jdk-11+NNN
+# Replace NNN with your particular version of 17.
+export JAVA_HOME=/path/to/jdk-17+NNN
 ~~~
 
 You can verify that everything is set up correctly by inspecting the results of both
@@ -92,9 +84,9 @@ You can verify that everything is set up correctly by inspecting the results of 
 
 ~~~
 $ java -version
-openjdk version "11.0.8" 2020-07-14
-OpenJDK Runtime Environment (build 11.0.8+10)
-OpenJDK 64-Bit Server VM (build 11.0.8+10, mixed mode)
+openjdk version "17.0.8" 2023-07-18
+OpenJDK Runtime Environment (build 17.0.8+7)
+OpenJDK 64-Bit Server VM (build 17.0.8+7, mixed mode)
 ~~~
 
 #### S3 Credentials
@@ -150,7 +142,7 @@ correctly configured. Then, add the following property to your
 `$HOME/.gradle/gradle.properties` file:
 
 ```
-org.thepalaceproject.drm.enabled=true
+org.thepalaceproject.adobeDRM.enabled=true
 ```
 
 This will instruct the build system that you want to build with DRM enabled.
@@ -196,7 +188,7 @@ a Findaway license and want to produce a Findaway-enabled build.
 
 The project uses Readium's liblcp module to provide support for LCP
 content protection. This module must be available on the classpath
-when the `org.thepalaceproject.drm.enabled` property is true. Otherwise,
+when the `org.thepalaceproject.lcp.enabled` property is true. Otherwise,
 the project will not compile. Please get in touch with us if you have
 an LCP license and want to produce a DRM-enabled build.
 
@@ -315,10 +307,7 @@ coupled as possible. New features should typically be implemented as new modules
 | [org.librarysimplified.analytics.circulation](simplified-analytics-circulation)               |Circulation manager analytics implementation|
 | [org.librarysimplified.android.ktx](simplified-android-ktx)                                   |Kotlin Android Extensions|
 | [org.librarysimplified.announcements](simplified-announcements)                               |Announcements API|
-| [org.nypl.labs.OpenEbooks.app](simplified-app-openebooks)                                     |Open eBooks(Application|
 | [org.thepalaceproject.palace](simplified-app-palace)                                          |Palace|
-| [org.librarysimplified.simplye.app](simplified-app-simplye)                                   |SimplyE (Application|
-| [org.librarysimplified.app.vanilla](simplified-app-vanilla)                                   |Vanilla application|
 | [org.librarysimplified.books.api](simplified-books-api)                                       |Book types|
 | [org.librarysimplified.books.audio](simplified-books-audio)                                   |Audio book support code|
 | [org.librarysimplified.books.borrowing](simplified-books-borrowing)                           |Book borrowing|
@@ -351,8 +340,6 @@ coupled as possible. New features should typically be implemented as new modules
 | [org.librarysimplified.metrics](simplified-metrics)                                           |Metrics|
 | [org.librarysimplified.metrics](simplified-metrics-api)                                       |Metrics|
 | [org.librarysimplified.migration.api](simplified-migration-api)                               |Data migration API|
-| [org.librarysimplified.migration.fake](simplified-migration-fake)                             |Fake data migration for testing purposes|
-| [org.librarysimplified.migration.from3master](simplified-migration-from3master)               |Data migration from 3.0.0 master branch data|
 | [org.librarysimplified.migration.spi](simplified-migration-spi)                               |Data migration SPI|
 | [org.librarysimplified.networkconnectivity](simplified-networkconnectivity)                   |Network connectivity|
 | [org.librarysimplified.networkconnectivity.api](simplified-networkconnectivity-api)           |Network connectivity API|

@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.widget.TextView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.librarysimplified.lcp.R
 import org.nypl.drm.core.ContentProtectionProvider
 import org.readium.r2.lcp.LcpAuthenticating
 import org.readium.r2.lcp.LcpService

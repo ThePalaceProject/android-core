@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <color name="trans_black">#66000000</color>
-    <color name="trans_white">#80FFFFFF</color>
-    <color name="trans_grey">#FFCCCCCC</color>
-    <color name="red">#FF0000</color>
-    <color name="text_light">#66000000</color>
-    <color name="text_hint">#FFCCCCCC</color>
-</resources>

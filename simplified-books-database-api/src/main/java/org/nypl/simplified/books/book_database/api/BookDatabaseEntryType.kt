@@ -1,5 +1,6 @@
 package org.nypl.simplified.books.book_database.api
 
+import net.jcip.annotations.ThreadSafe
 import one.irradia.mime.api.MIMEType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookDRMKind
@@ -17,7 +18,6 @@ import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import java.io.File
 import java.io.IOException
 import java.net.URI
-import javax.annotation.concurrent.ThreadSafe
 
 /**
  * An entry in the book database.

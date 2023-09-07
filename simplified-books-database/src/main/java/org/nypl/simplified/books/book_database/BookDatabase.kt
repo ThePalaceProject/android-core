@@ -2,6 +2,7 @@ package org.nypl.simplified.books.book_database
 
 import android.content.Context
 import com.io7m.jnull.Nullable
+import net.jcip.annotations.GuardedBy
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookID
@@ -19,11 +20,9 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
-import java.util.ArrayList
 import java.util.SortedSet
 import java.util.TreeSet
 import java.util.concurrent.ConcurrentSkipListMap
-import javax.annotation.concurrent.GuardedBy
 
 /**
  * The default implementation of the [BookDatabaseType] interface.

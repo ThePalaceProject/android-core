@@ -28,7 +28,6 @@ import org.nypl.simplified.opds.core.OPDSAvailabilityLoanable
 import org.nypl.simplified.profiles.api.ProfileEvent
 import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfileSelection
-import org.nypl.simplified.tests.R
 import org.nypl.simplified.tests.books.book_database.BookDatabaseContract
 import org.slf4j.LoggerFactory
 import java.net.URI
@@ -208,7 +207,7 @@ class NotificationsServiceTest {
     override val titleReadyNotificationTitle: String
       get() = "notification title"
     override val smallIcon: Int
-      get() = R.drawable.simplified_button
+      get() = org.librarysimplified.ui.neutrality.R.drawable.simplified_button
   }
 
   @Test

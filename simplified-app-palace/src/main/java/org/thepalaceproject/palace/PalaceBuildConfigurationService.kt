@@ -3,7 +3,7 @@ package org.thepalaceproject.palace
 import org.nypl.simplified.buildconfig.api.BuildConfigOAuthScheme
 import org.nypl.simplified.buildconfig.api.BuildConfigurationAccountsRegistryURIs
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
-import org.nypl.simplified.main.BuildConfig
+import org.librarysimplified.main.BuildConfig
 import java.net.URI
 
 class PalaceBuildConfigurationService : BuildConfigurationServiceType {
@@ -29,7 +29,7 @@ class PalaceBuildConfigurationService : BuildConfigurationServiceType {
   override val showBooksFromAllAccounts: Boolean
     get() = false
   override val vcsCommit: String
-    get() = BuildConfig.GIT_COMMIT
+    get() = BuildConfig.SIMPLIFIED_GIT_COMMIT
   override val simplifiedVersion: String
     get() = BuildConfig.SIMPLIFIED_VERSION
   override val supportErrorReportEmailAddress: String

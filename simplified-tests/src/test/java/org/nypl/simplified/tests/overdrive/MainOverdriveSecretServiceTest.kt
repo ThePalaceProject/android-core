@@ -2,7 +2,7 @@ package org.nypl.simplified.tests.overdrive
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import org.nypl.simplified.main.MainOverdriveSecretService
+import org.librarysimplified.main.MainOverdriveSecretService
 
 class MainOverdriveSecretServiceTest {
 

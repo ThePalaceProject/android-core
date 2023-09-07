@@ -19,6 +19,7 @@ import com.io7m.junreachable.UnimplementedCodeException;
 import com.io7m.junreachable.UnreachableCodeException;
 
 import org.joda.time.Instant;
+import org.librarysimplified.adobe.extensions.BuildConfig;
 import org.nypl.drm.core.AdobeAdeptConnectorFactory;
 import org.nypl.drm.core.AdobeAdeptConnectorFactoryType;
 import org.nypl.drm.core.AdobeAdeptConnectorParameters;
@@ -144,7 +145,7 @@ public final class AdobeDRMServices {
       } else {
         package_name = pi.packageName;
       }
-      package_version = pi.versionName;
+      package_version = BuildConfig.SIMPLIFIED_VERSION;
     } catch (final PackageManager.NameNotFoundException e) {
       throw new UnreachableCodeException(e);
     }
@@ -239,7 +240,7 @@ public final class AdobeDRMServices {
       } else {
         package_name = pi.packageName;
       }
-      package_version = pi.versionName;
+      package_version = BuildConfig.SIMPLIFIED_VERSION;
     } catch (final PackageManager.NameNotFoundException e) {
       throw new UnreachableCodeException(e);
     }

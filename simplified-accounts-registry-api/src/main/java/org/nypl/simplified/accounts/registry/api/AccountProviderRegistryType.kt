@@ -1,13 +1,13 @@
 package org.nypl.simplified.accounts.registry.api
 
 import io.reactivex.Observable
+import net.jcip.annotations.ThreadSafe
 import org.nypl.simplified.accounts.api.AccountProviderDescription
 import org.nypl.simplified.accounts.api.AccountProviderResolutionListenerType
 import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.api.AccountSearchQuery
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import java.net.URI
-import javax.annotation.concurrent.ThreadSafe
 
 /**
  * The interface exposing a set of account providers.

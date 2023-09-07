@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <!-- Progress indicators -->
+
+  <style name="Simplified.ProgressBar" parent="Widget.AppCompat.ProgressBar">
+    <item name="android:progressBackgroundTint">@color/middle_gray</item>
+    <item name="android:progressBackgroundTintMode">src_over</item>
+    <item name="android:progressTint">?attr/simplifiedColorControlActivated</item>
+    <item name="android:progressTintMode">src_atop</item>
+  </style>
+
+  <style name="Simplified.ProgressBar.Horizontal" parent="Widget.AppCompat.ProgressBar.Horizontal">
+     <item name="android:progressBackgroundTint">@color/middle_gray</item>
+     <item name="android:progressBackgroundTintMode">src_over</item>
+     <item name="android:progressTint">?attr/simplifiedColorControlActivated</item>
+     <item name="android:progressTintMode">src_atop</item>
+  </style>
+
+</resources>

@@ -16,6 +16,7 @@ import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import org.librarysimplified.services.api.Services
+import org.librarysimplified.ui.settings.R
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryDebugging
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.adobe.extensions.AdobeDRMExtensions
