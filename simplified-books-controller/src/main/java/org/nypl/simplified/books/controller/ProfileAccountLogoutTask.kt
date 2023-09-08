@@ -1,6 +1,7 @@
 package org.nypl.simplified.books.controller
 
 import com.google.common.base.Preconditions
+import one.irradia.mime.api.MIMECompatibility
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType
 import org.nypl.drm.core.AdobeAdeptExecutorType
@@ -226,7 +227,7 @@ class ProfileAccountLogoutTask(
     val request =
       this.http.newRequest(deviceManagerURI)
         .setAuthorization(AccountAuthenticatedHTTP.createAuthorizationIfPresent(this.credentials))
-        .setMethod(LSHTTPRequestBuilderType.Method.Delete)
+        .setMethod(LSHTTPRequestBuilderType.Method.Delete(ByteArray(0), MIMECompatibility.applicationOctetStream))
         .addHeader("Content-Type", "vnd.librarysimplified/drm-device-id-list")
         .build()
 

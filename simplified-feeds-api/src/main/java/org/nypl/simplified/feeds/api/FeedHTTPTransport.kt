@@ -81,7 +81,7 @@ class FeedHTTPTransport(
         LSHTTPRequestBuilderType.Method.Put(ByteArray(0), MIMECompatibility.applicationOctetStream)
       }
       "DELETE" -> {
-        LSHTTPRequestBuilderType.Method.Delete
+        LSHTTPRequestBuilderType.Method.Delete(ByteArray(0), MIMECompatibility.applicationOctetStream)
       }
       else -> {
         throw IllegalArgumentException("Unsupported request method: $method")

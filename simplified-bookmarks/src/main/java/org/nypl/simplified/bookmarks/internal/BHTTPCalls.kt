@@ -3,6 +3,7 @@ package org.nypl.simplified.bookmarks.internal
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
+import one.irradia.mime.api.MIMECompatibility
 import one.irradia.mime.api.MIMEType
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType.Method.Delete
@@ -75,7 +76,7 @@ class BHTTPCalls(
       this.http.newRequest(bookmarkURI)
         .setAuthorization(auth)
         .addCredentialsToProperties(credentials)
-        .setMethod(Delete)
+        .setMethod(Delete(ByteArray(0), MIMECompatibility.applicationOctetStream))
         .build()
 
     return request.execute().use { response ->
