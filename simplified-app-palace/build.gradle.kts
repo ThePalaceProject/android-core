@@ -182,7 +182,7 @@ android {
                 abiFilters.add("arm64-v8a")
                 abiFilters.add("armeabi-v7a")
             }
-            signingConfigs.add(signingConfigs.getByName("release"))
+            this.signingConfig = signingConfigs.getByName("release")
         }
     }
 
