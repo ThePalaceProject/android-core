@@ -25,6 +25,8 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 17
+      - name: Show VM stats
+        run: vmstat -S M 2 &
       - name: Build
         env:
           MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
@@ -35,6 +37,8 @@ jobs:
           CI_AWS_ACCESS_ID: ${{ secrets.CI_AWS_ACCESS_ID }}
           CI_AWS_SECRET_KEY: ${{ secrets.CI_AWS_SECRET_KEY }}
         run: .ci/ci-main.sh normal
+      - name: Stop VM stats
+        run: killall vmstat
       - name: Upload test report
         uses: actions/upload-artifact@v3
         if: ${{ always() }}
