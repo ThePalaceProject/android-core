@@ -42,6 +42,8 @@ import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.controller.ProfileAccountLogoutTask
 import org.nypl.simplified.feeds.api.FeedLoaderType
+import org.nypl.simplified.notifications.NotificationTokenHTTPCalls
+import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
 import org.nypl.simplified.opds.core.OPDSAcquisition
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
@@ -74,6 +76,7 @@ abstract class ProfileAccountLogoutTaskContract {
   private lateinit var profile: ProfileReadableType
   private lateinit var profileID: ProfileID
   private lateinit var server: MockWebServer
+  private lateinit var tokenHttp: NotificationTokenHTTPCallsType
 
   private var loginState: AccountLoginState? = null
 
@@ -92,6 +95,11 @@ abstract class ProfileAccountLogoutTaskContract {
             timeout = Pair(5L, TimeUnit.SECONDS)
           )
         )
+
+    this.tokenHttp = NotificationTokenHTTPCalls(
+      http = http
+    )
+
     this.feedLoader =
       MockCrashingFeedLoader()
 
@@ -190,7 +198,8 @@ abstract class ProfileAccountLogoutTaskContract {
         http = this.http,
         patronParsers = PatronUserProfileParsers(),
         profile = this.profile,
-        logoutStrings = this.logoutStrings
+        logoutStrings = this.logoutStrings,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     val result = task.call()
@@ -254,7 +263,8 @@ abstract class ProfileAccountLogoutTaskContract {
         http = this.http,
         patronParsers = PatronUserProfileParsers(),
         profile = this.profile,
-        logoutStrings = this.logoutStrings
+        logoutStrings = this.logoutStrings,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     val result = task.call()
@@ -332,15 +342,13 @@ abstract class ProfileAccountLogoutTaskContract {
         http = this.http,
         patronParsers = PatronUserProfileParsers(),
         profile = this.profile,
-        logoutStrings = this.logoutStrings
+        logoutStrings = this.logoutStrings,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     val result = task.call()
     this.logger.debug("result: {}", result)
     result.steps.forEach { step -> this.logger.debug("step {}: {}", step, step.resolution) }
-
-    val state =
-      this.account.loginState as AccountNotLoggedIn
 
     Assertions.assertTrue(
       this.bookDatabase.entries.values.all(MockBookDatabaseEntry::deleted)
@@ -433,7 +441,8 @@ abstract class ProfileAccountLogoutTaskContract {
         http = this.http,
         patronParsers = PatronUserProfileParsers(),
         profile = this.profile,
-        logoutStrings = this.logoutStrings
+        logoutStrings = this.logoutStrings,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     val result = task.call()
@@ -550,7 +559,8 @@ abstract class ProfileAccountLogoutTaskContract {
         feedLoader = this.feedLoader,
         profile = this.profile,
         patronParsers = PatronUserProfileParsers(),
-        logoutStrings = this.logoutStrings
+        logoutStrings = this.logoutStrings,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     val result = task.call()

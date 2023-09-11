@@ -5,7 +5,7 @@ import org.nypl.simplified.accounts.api.AccountID
 /**
  * The type of deep link events.
  */
-sealed class DeepLinkEvent() {
+sealed class DeepLinkEvent {
 
   /**
    * The account ID for the library to be navigated to.

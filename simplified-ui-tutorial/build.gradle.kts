@@ -20,7 +20,7 @@ dependencies {
     implementation(libs.androidx.preference)
     implementation(libs.androidx.recycler.view)
     implementation(libs.androidx.savedstate)
-    implementation(libs.androidx.view.pager2)
+    implementation(libs.androidx.viewpager2)
     implementation(libs.google.failureaccess)
     implementation(libs.google.guava)
     implementation(libs.google.material)

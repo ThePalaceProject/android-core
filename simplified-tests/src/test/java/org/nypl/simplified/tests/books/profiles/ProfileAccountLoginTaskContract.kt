@@ -40,6 +40,8 @@ import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.api.AccountUsername
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.controller.ProfileAccountLoginTask
+import org.nypl.simplified.notifications.NotificationTokenHTTPCalls
+import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
 import org.nypl.simplified.patron.PatronUserProfileParsers
 import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfileReadableType
@@ -66,6 +68,7 @@ abstract class ProfileAccountLoginTaskContract {
   private lateinit var profileWithDRM: String
   private lateinit var profileWithoutDRM: String
   private lateinit var server: MockWebServer
+  private lateinit var tokenHttp: NotificationTokenHTTPCallsType
 
   private var loginState: AccountLoginState? = null
 
@@ -84,6 +87,10 @@ abstract class ProfileAccountLoginTaskContract {
             timeout = Pair(5L, TimeUnit.SECONDS)
           )
         )
+
+    this.tokenHttp = NotificationTokenHTTPCalls(
+      http = http
+    )
 
     this.profile =
       Mockito.mock(ProfileReadableType::class.java)
@@ -213,7 +220,8 @@ abstract class ProfileAccountLoginTaskContract {
         account = this.account,
         loginStrings = this.loginStrings,
         patronParsers = this.patronParserFactory,
-        request = request
+        request = request,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     val result = task.call()
@@ -291,7 +299,8 @@ abstract class ProfileAccountLoginTaskContract {
         account = this.account,
         loginStrings = this.loginStrings,
         patronParsers = this.patronParserFactory,
-        request = request
+        request = request,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     val result = task.call()
@@ -370,7 +379,8 @@ abstract class ProfileAccountLoginTaskContract {
         account = this.account,
         loginStrings = this.loginStrings,
         patronParsers = this.patronParserFactory,
-        request = request
+        request = request,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     val result = task.call()
@@ -445,7 +455,8 @@ abstract class ProfileAccountLoginTaskContract {
         account = this.account,
         loginStrings = this.loginStrings,
         patronParsers = this.patronParserFactory,
-        request = request
+        request = request,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     val result = task.call()
@@ -523,7 +534,8 @@ abstract class ProfileAccountLoginTaskContract {
         account = this.account,
         loginStrings = this.loginStrings,
         patronParsers = this.patronParserFactory,
-        request = request
+        request = request,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     val result = task.call()
@@ -600,7 +612,8 @@ abstract class ProfileAccountLoginTaskContract {
         account = this.account,
         loginStrings = this.loginStrings,
         patronParsers = this.patronParserFactory,
-        request = request
+        request = request,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     val result = task.call()
@@ -679,7 +692,8 @@ abstract class ProfileAccountLoginTaskContract {
         account = this.account,
         loginStrings = this.loginStrings,
         patronParsers = this.patronParserFactory,
-        request = request
+        request = request,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     val result = task.call()
@@ -808,7 +822,8 @@ abstract class ProfileAccountLoginTaskContract {
         account = this.account,
         loginStrings = this.loginStrings,
         patronParsers = this.patronParserFactory,
-        request = request
+        request = request,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     val result = task.call()
@@ -960,7 +975,8 @@ abstract class ProfileAccountLoginTaskContract {
         account = this.account,
         loginStrings = this.loginStrings,
         patronParsers = this.patronParserFactory,
-        request = request
+        request = request,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     val result = task.call()
@@ -1073,7 +1089,8 @@ abstract class ProfileAccountLoginTaskContract {
         account = this.account,
         loginStrings = this.loginStrings,
         patronParsers = this.patronParserFactory,
-        request = request
+        request = request,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     val result = task.call()
@@ -1206,7 +1223,8 @@ abstract class ProfileAccountLoginTaskContract {
         account = this.account,
         loginStrings = this.loginStrings,
         patronParsers = this.patronParserFactory,
-        request = request
+        request = request,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     val result = task.call()
@@ -1336,7 +1354,8 @@ abstract class ProfileAccountLoginTaskContract {
         account = this.account,
         loginStrings = this.loginStrings,
         patronParsers = this.patronParserFactory,
-        request = request
+        request = request,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     val result = task.call()
@@ -1465,7 +1484,8 @@ abstract class ProfileAccountLoginTaskContract {
         account = this.account,
         loginStrings = this.loginStrings,
         patronParsers = this.patronParserFactory,
-        request = request
+        request = request,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     val result = task.call()
@@ -1540,7 +1560,8 @@ abstract class ProfileAccountLoginTaskContract {
         account = this.account,
         loginStrings = this.loginStrings,
         patronParsers = this.patronParserFactory,
-        request = request
+        request = request,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     val result = task.call()
@@ -1612,7 +1633,8 @@ abstract class ProfileAccountLoginTaskContract {
         account = this.account,
         loginStrings = this.loginStrings,
         patronParsers = this.patronParserFactory,
-        request = request
+        request = request,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     val result = task.call()
@@ -1689,7 +1711,8 @@ abstract class ProfileAccountLoginTaskContract {
         account = this.account,
         loginStrings = this.loginStrings,
         patronParsers = this.patronParserFactory,
-        request = request0
+        request = request0,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     val result0 = task0.call()
@@ -1705,7 +1728,8 @@ abstract class ProfileAccountLoginTaskContract {
         account = this.account,
         loginStrings = this.loginStrings,
         patronParsers = this.patronParserFactory,
-        request = request1
+        request = request1,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     val result1 = task1.call()
@@ -1788,7 +1812,8 @@ abstract class ProfileAccountLoginTaskContract {
         account = this.account,
         loginStrings = this.loginStrings,
         patronParsers = this.patronParserFactory,
-        request = request0
+        request = request0,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     this.loginState = AccountNotLoggedIn
@@ -1860,7 +1885,8 @@ abstract class ProfileAccountLoginTaskContract {
         account = this.account,
         loginStrings = this.loginStrings,
         patronParsers = this.patronParserFactory,
-        request = request0
+        request = request0,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     this.loginState = AccountNotLoggedIn
@@ -1937,7 +1963,8 @@ abstract class ProfileAccountLoginTaskContract {
         account = this.account,
         loginStrings = this.loginStrings,
         patronParsers = this.patronParserFactory,
-        request = request0
+        request = request0,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     val result0 = task0.call()
@@ -1953,7 +1980,8 @@ abstract class ProfileAccountLoginTaskContract {
         account = this.account,
         loginStrings = this.loginStrings,
         patronParsers = this.patronParserFactory,
-        request = request1
+        request = request1,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     val result1 = task1.call()
@@ -2034,7 +2062,8 @@ abstract class ProfileAccountLoginTaskContract {
         account = this.account,
         loginStrings = this.loginStrings,
         patronParsers = this.patronParserFactory,
-        request = request0
+        request = request0,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     val result0 = task0.call()
@@ -2050,7 +2079,8 @@ abstract class ProfileAccountLoginTaskContract {
         account = this.account,
         loginStrings = this.loginStrings,
         patronParsers = this.patronParserFactory,
-        request = request1
+        request = request1,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     val result1 = task1.call()
@@ -2144,7 +2174,8 @@ abstract class ProfileAccountLoginTaskContract {
         account = this.account,
         loginStrings = this.loginStrings,
         patronParsers = this.patronParserFactory,
-        request = request0
+        request = request0,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     this.loginState = AccountNotLoggedIn
@@ -2215,7 +2246,8 @@ abstract class ProfileAccountLoginTaskContract {
         account = this.account,
         loginStrings = this.loginStrings,
         patronParsers = this.patronParserFactory,
-        request = request0
+        request = request0,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     this.loginState = AccountNotLoggedIn
@@ -2291,7 +2323,8 @@ abstract class ProfileAccountLoginTaskContract {
         account = this.account,
         loginStrings = this.loginStrings,
         patronParsers = this.patronParserFactory,
-        request = request0
+        request = request0,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     val result0 = task0.call()
@@ -2307,7 +2340,8 @@ abstract class ProfileAccountLoginTaskContract {
         account = this.account,
         loginStrings = this.loginStrings,
         patronParsers = this.patronParserFactory,
-        request = request1
+        request = request1,
+        notificationTokenHttpCalls = tokenHttp
       )
 
     val result1 = task1.call()

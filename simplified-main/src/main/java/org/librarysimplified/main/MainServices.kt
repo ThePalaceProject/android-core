@@ -89,8 +89,10 @@ import org.nypl.simplified.metrics.api.MetricServiceType
 import org.nypl.simplified.migration.api.MigrationsType
 import org.nypl.simplified.networkconnectivity.NetworkConnectivity
 import org.nypl.simplified.networkconnectivity.api.NetworkConnectivityType
+import org.nypl.simplified.notifications.NotificationTokenHTTPCalls
+import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
 import org.nypl.simplified.notifications.NotificationsService
-import org.nypl.simplified.notifications.NotificationsWrapper
+import org.nypl.simplified.notifications.NotificationsServiceType
 import org.nypl.simplified.opds.auth_document.AuthenticationDocumentParsers
 import org.nypl.simplified.opds.auth_document.api.AuthenticationDocumentParsersType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
@@ -459,24 +461,6 @@ internal object MainServices {
       context.resources,
       { Color.RED },
       screenSize
-    )
-  }
-
-  private fun createNotificationsService(
-    context: Context,
-    profileEvents: PublishSubject<ProfileEvent>,
-    bookRegistry: BookRegistryReadableType
-  ): NotificationsService {
-    val notificationsThreads =
-      NamedThreadPools.namedThreadPoolFactory("notifications", 19)
-
-    return NotificationsService(
-      context = context,
-      threadFactory = notificationsThreads,
-      profileEvents = profileEvents,
-      bookRegistry = bookRegistry,
-      notificationsWrapper = NotificationsWrapper(context),
-      notificationResourcesType = MainNotificationResources(context)
     )
   }
 
@@ -893,6 +877,17 @@ internal object MainServices {
       serviceConstructor = { AuthenticationDocumentParsers() }
     )
 
+    val notificationTokenHTTPCalls =
+      addService(
+        message = strings.bootingGeneral("Notification token http calls"),
+        interfaceType = NotificationTokenHTTPCallsType::class.java,
+        serviceConstructor = {
+          NotificationTokenHTTPCalls(
+            http = lsHTTP
+          )
+        }
+      )
+
     val profileEvents = PublishSubject.create<ProfileEvent>()
     addService(
       message = strings.bootingGeneral("profile idle timer"),
@@ -931,6 +926,20 @@ internal object MainServices {
         interfaceType = ProfilesControllerType::class.java,
         serviceConstructor = { controller }
       )
+
+      addService(
+        message = strings.bootingGeneral("notifications service"),
+        interfaceType = NotificationsServiceType::class.java,
+        serviceConstructor = {
+          NotificationsService(
+            context = context,
+            httpCalls = notificationTokenHTTPCalls,
+            notificationResources = MainNotificationResources(context),
+            profilesController = profilesControllerTypeService
+          )
+        }
+      )
+
       addService(
         message = strings.bootingGeneral("deep links controller"),
         interfaceType = DeepLinksControllerType::class.java,
@@ -1014,14 +1023,6 @@ internal object MainServices {
     val idleTimer = bookController.profileIdleTimer()
     idleTimer.setWarningIdleSecondsRemaining(idleTimerConfiguration.warningWhenSecondsRemaining)
     idleTimer.setMaximumIdleSeconds(idleTimerConfiguration.logOutAfterSeconds)
-
-    addService(
-      message = strings.bootingGeneral("notifications service"),
-      interfaceType = NotificationsService::class.java,
-      serviceConstructor = {
-        this.createNotificationsService(context, profileEvents, bookRegistry)
-      }
-    )
 
     addService(
       message = strings.bootingGeneral("migrations"),

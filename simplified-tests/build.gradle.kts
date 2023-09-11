@@ -149,7 +149,7 @@ val dependencyObjects = listOf(
     libs.androidx.savedstate,
     libs.androidx.swiperefreshlayout,
     libs.androidx.test.monitor,
-    libs.androidx.view.pager2,
+    libs.androidx.viewpager2,
     libs.androidx.webkit,
     libs.apiguardian,
     libs.bouncycastle.bcprov,

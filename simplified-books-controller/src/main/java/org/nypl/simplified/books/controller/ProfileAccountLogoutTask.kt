@@ -26,6 +26,7 @@ import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedLoaderResult
 import org.nypl.simplified.feeds.api.FeedLoaderType
+import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.getOrNull
 import org.nypl.simplified.patron.api.PatronDRMAdobe
@@ -52,6 +53,7 @@ class ProfileAccountLogoutTask(
   private val feedLoader: FeedLoaderType,
   private val http: LSHTTPClientType,
   private val logoutStrings: AccountLogoutStringResourcesType,
+  private val notificationTokenHttpCalls: NotificationTokenHTTPCallsType,
   private val patronParsers: PatronUserProfileParsersType,
   private val profile: ProfileReadableType
 ) : Callable<TaskResult<Unit>> {
@@ -101,6 +103,7 @@ class ProfileAccountLogoutTask(
       }
 
     return try {
+      this.runFCMTokenDeletion()
       this.runDeviceDeactivation()
       this.runUpdateOPDSEntries()
       this.runBookRegistryClear()
@@ -130,6 +133,12 @@ class ProfileAccountLogoutTask(
       this.runDeviceDeactivationAdobe(adobeCredentialsMaybe)
       return
     }
+  }
+
+  private fun runFCMTokenDeletion() {
+    this.debug("running fcm token deletion")
+
+    notificationTokenHttpCalls.deleteFCMTokenForProfileAccount(account)
   }
 
   private fun handlePatronUserProfile(): PatronDRMAdobe? {
@@ -227,7 +236,12 @@ class ProfileAccountLogoutTask(
     val request =
       this.http.newRequest(deviceManagerURI)
         .setAuthorization(AccountAuthenticatedHTTP.createAuthorizationIfPresent(this.credentials))
-        .setMethod(LSHTTPRequestBuilderType.Method.Delete(ByteArray(0), MIMECompatibility.applicationOctetStream))
+        .setMethod(
+          LSHTTPRequestBuilderType.Method.Delete(
+            ByteArray(0),
+            MIMECompatibility.applicationOctetStream
+          )
+        )
         .addHeader("Content-Type", "vnd.librarysimplified/drm-device-id-list")
         .build()
 
@@ -242,6 +256,7 @@ class ProfileAccountLogoutTask(
         val message = this.logoutStrings.logoutDeactivatingDeviceAdobeFailed(ex.errorCode, ex)
         this.steps.currentStepFailed(message, "Adobe ACS: ${ex.errorCode}", ex)
       }
+
       else -> {
         this.steps.currentStepFailed(
           this.logoutStrings.logoutDeactivatingDeviceAdobeFailed("UNKNOWN", ex),
@@ -310,11 +325,13 @@ class ProfileAccountLogoutTask(
       when (feedResult) {
         is FeedLoaderResult.FeedLoaderSuccess ->
           feedResult.feed
+
         is FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedAuthentication -> {
           this.debug(feedResult.message)
           // FIXME: Some servers require authentication
           throw feedResult.exception
         }
+
         is FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedGeneral -> {
           val message = this.logoutStrings.logoutOPDSFeedFailed
           this.steps.currentStepFailed(message, "feedLoaderFailed", feedResult.exception)
@@ -337,10 +354,12 @@ class ProfileAccountLogoutTask(
             this.steps.currentStepFailed(message, "feedCorrupted", feedEntry.error)
             throw StepFailedHandled(feedEntry.error)
           }
+
           is FeedEntry.FeedEntryOPDS ->
             feedEntry.feedEntry
         }
       }
+
       is Feed.FeedWithGroups -> {
         val message = this.logoutStrings.logoutOPDSFeedWithGroups
         val exception = Exception(message)
