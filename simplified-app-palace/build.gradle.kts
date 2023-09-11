@@ -431,6 +431,7 @@ dependencies {
     implementation(libs.androidx.transition.ktx)
     implementation(libs.androidx.vectordrawable)
     implementation(libs.androidx.versionedparcelable)
+    implementation(libs.androidx.viewbinding)
     implementation(libs.androidx.viewpager)
     implementation(libs.androidx.viewpager2)
     implementation(libs.androidx.webkit)
