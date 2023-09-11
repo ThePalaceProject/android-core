@@ -513,6 +513,7 @@ dependencies {
     implementation(libs.palace.readium2.vanilla)
     implementation(libs.palace.readium2.views)
     implementation(libs.pandora.bottom.navigator)
+    implementation(libs.pdfium.android)
     implementation(libs.picasso)
     implementation(libs.play.services.ads.identifier)
     implementation(libs.play.services.base)
