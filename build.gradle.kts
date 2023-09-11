@@ -511,12 +511,16 @@ allprojects {
                 propertyInt(this, "org.thepalaceproject.build.androidSDKCompile")
 
             android.defaultConfig {
-                multiDexEnabled = true
+                versionName =
+                    property(this@allprojects, "VERSION_NAME")
+                multiDexEnabled =
+                    true
                 targetSdk =
                     propertyInt(this@allprojects, "org.thepalaceproject.build.androidSDKTarget")
                 minSdk =
                     propertyInt(this@allprojects, "org.thepalaceproject.build.androidSDKMinimum")
-                testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+                testInstrumentationRunner =
+                    "androidx.test.runner.AndroidJUnitRunner"
             }
 
             /*
