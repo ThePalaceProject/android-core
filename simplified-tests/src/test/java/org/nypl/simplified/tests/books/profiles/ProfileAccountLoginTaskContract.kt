@@ -88,10 +88,8 @@ abstract class ProfileAccountLoginTaskContract {
           )
         )
 
-    this.tokenHttp = NotificationTokenHTTPCalls(
-      http = http
-    )
-
+    this.tokenHttp =
+      Mockito.mock(NotificationTokenHTTPCalls::class.java)
     this.profile =
       Mockito.mock(ProfileReadableType::class.java)
     this.account =
@@ -716,6 +714,8 @@ abstract class ProfileAccountLoginTaskContract {
     val req0 = this.server.takeRequest()
     assertEquals(this.server.url("patron"), req0.requestUrl)
     assertEquals(1, this.server.requestCount)
+
+    Mockito.verify(tokenHttp, Mockito.times(1)).registerFCMTokenForProfileAccount(account)
   }
 
   /**

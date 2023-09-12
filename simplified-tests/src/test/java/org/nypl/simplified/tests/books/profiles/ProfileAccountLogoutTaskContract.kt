@@ -96,9 +96,9 @@ abstract class ProfileAccountLogoutTaskContract {
           )
         )
 
-    this.tokenHttp = NotificationTokenHTTPCalls(
-      http = http
-    )
+
+    this.tokenHttp =
+      Mockito.mock(NotificationTokenHTTPCalls::class.java)
 
     this.feedLoader =
       MockCrashingFeedLoader()
@@ -280,6 +280,8 @@ abstract class ProfileAccountLogoutTaskContract {
     Assertions.assertTrue(
       this.bookRegistry.books().values.all { it.status is BookStatus.Loaned.LoanedNotDownloaded }
     )
+
+    Mockito.verify(tokenHttp, Mockito.times(1)).deleteFCMTokenForProfileAccount(account)
   }
 
   /**

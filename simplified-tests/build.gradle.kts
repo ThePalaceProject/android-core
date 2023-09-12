@@ -161,6 +161,7 @@ val dependencyObjects = listOf(
     libs.firebase.crashlytics,
     libs.firebase.dynamic.links,
     libs.firebase.dynamic.links.ktx,
+    libs.firebase.messaging,
     libs.google.failureaccess,
     libs.google.guava,
     libs.google.material,
