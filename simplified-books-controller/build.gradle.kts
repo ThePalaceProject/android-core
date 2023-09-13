@@ -22,6 +22,7 @@ dependencies {
     implementation(project(":simplified-futures"))
     implementation(project(":simplified-json-core"))
     implementation(project(":simplified-links"))
+    implementation(project(":simplified-mdc"))
     implementation(project(":simplified-metrics-api"))
     implementation(project(":simplified-opds-auth-document-api"))
     implementation(project(":simplified-opds-core"))

@@ -70,6 +70,8 @@ import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
 import org.nypl.simplified.taskrecorder.api.TaskResult
+import org.nypl.simplified.tests.books.controller.FakeAccounts.fakeAccount
+import org.nypl.simplified.tests.books.controller.FakeAccounts.fakeAccountProvider
 import org.nypl.simplified.tests.mocking.MockBookDatabaseEntry
 import org.nypl.simplified.tests.mocking.MockCrashingFeedLoader
 import org.nypl.simplified.tests.mocking.MockRevokeStringResources
@@ -196,9 +198,9 @@ class BookRevokeTaskTest {
   @Test
   fun testRevokeNothing() {
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
     val accountProvider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =
@@ -290,9 +292,9 @@ class BookRevokeTaskTest {
   @Test
   fun testRevokeNothingDatabaseCrash0() {
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
     val accountProvider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =
@@ -397,9 +399,9 @@ class BookRevokeTaskTest {
   @Test
   fun testRevokeNothingDatabaseCrash1() {
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
     val accountProvider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =
@@ -457,9 +459,9 @@ class BookRevokeTaskTest {
   @Test
   fun testRevokeDatabaseCrash2() {
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
     val accountProvider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =
@@ -580,9 +582,9 @@ class BookRevokeTaskTest {
   @Test
   fun testRevokeURIOpenAccess() {
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
     val accountProvider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =
@@ -697,9 +699,9 @@ class BookRevokeTaskTest {
   @Test
   fun testRevokeURIHeldReady() {
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
     val accountProvider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =
@@ -828,9 +830,9 @@ class BookRevokeTaskTest {
   @Test
   fun testRevokeURIHeldReadyWithoutURI() {
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
     val accountProvider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =
@@ -928,9 +930,9 @@ class BookRevokeTaskTest {
   @Test
   fun testRevokeURIHeld() {
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
     val accountProvider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =
@@ -1061,9 +1063,9 @@ class BookRevokeTaskTest {
   @Test
   fun testRevokeURIHeldNoURI() {
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
     val accountProvider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =
@@ -1188,9 +1190,9 @@ class BookRevokeTaskTest {
   @Timeout(value = 5L, unit = TimeUnit.SECONDS)
   fun testRevokeURILoaned() {
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
     val accountProvider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =
@@ -1322,9 +1324,9 @@ class BookRevokeTaskTest {
   @Timeout(value = 5L, unit = TimeUnit.SECONDS)
   fun testRevokeURILoanedNoURI() {
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
     val accountProvider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =
@@ -1424,9 +1426,9 @@ class BookRevokeTaskTest {
   @Timeout(value = 5L, unit = TimeUnit.SECONDS)
   fun testRevokeURIRevoked() {
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
     val accountProvider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =
@@ -1554,9 +1556,9 @@ class BookRevokeTaskTest {
   @Timeout(value = 5L, unit = TimeUnit.SECONDS)
   fun testRevokeURIFeedCorrupt() {
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
     val accountProvider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =
@@ -1679,9 +1681,9 @@ class BookRevokeTaskTest {
   @Timeout(value = 5L, unit = TimeUnit.SECONDS)
   fun testRevokeURIFeed401() {
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
     val accountProvider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =
@@ -1797,9 +1799,9 @@ class BookRevokeTaskTest {
   @Timeout(value = 5L, unit = TimeUnit.SECONDS)
   fun testRevokeURIFeedTimeout() {
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
     val accountProvider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =
@@ -1910,9 +1912,9 @@ class BookRevokeTaskTest {
   @Timeout(value = 5L, unit = TimeUnit.SECONDS)
   fun testRevokeURIFeedCrash() {
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
     val accountProvider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =
@@ -2017,9 +2019,9 @@ class BookRevokeTaskTest {
   @Timeout(value = 10L, unit = TimeUnit.SECONDS)
   fun testRevokeURIFeedWithGroups() {
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
     val accountProvider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =
@@ -2123,9 +2125,9 @@ class BookRevokeTaskTest {
   @Timeout(value = 5L, unit = TimeUnit.SECONDS)
   fun testRevokeHoldable() {
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
     val accountProvider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =
@@ -2236,9 +2238,9 @@ class BookRevokeTaskTest {
   @Timeout(value = 5L, unit = TimeUnit.SECONDS)
   fun testRevokeLoanable() {
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
     val accountProvider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =
@@ -2348,9 +2350,9 @@ class BookRevokeTaskTest {
   @Test
   fun testRevokeURIAudioBook() {
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
     val accountProvider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =
@@ -2482,9 +2484,9 @@ class BookRevokeTaskTest {
   @Test
   fun testRevokeURIPDF() {
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
     val accountProvider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =

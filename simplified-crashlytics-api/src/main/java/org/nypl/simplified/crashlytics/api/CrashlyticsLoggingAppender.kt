@@ -46,13 +46,14 @@ class CrashlyticsLoggingAppender(
     val proxy = event.throwableProxy as? ThrowableProxy
     val throwable = proxy?.throwable
 
-    // Crashlytics isn't really a valid target for a log appender. The service only associates
-    // metadata with an exception. Thus, this appender only cares about events with instances
-    // of a `Throwable`.
-
+    val srv = this.service ?: return
+    val mdcData = event.mdcPropertyMap
+    for (entry in mdcData) {
+      srv.setCustomKey(entry.key, entry.value)
+    }
+    srv.log(event.formattedMessage)
     if (throwable != null) {
-      this.service?.log(event.formattedMessage)
-      this.service?.recordException(throwable)
+      srv.recordException(throwable)
     }
   }
 }
