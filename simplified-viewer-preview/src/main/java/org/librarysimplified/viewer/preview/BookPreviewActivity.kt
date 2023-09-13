@@ -13,6 +13,7 @@ import androidx.appcompat.app.TxContextWrappingDelegate
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import io.reactivex.disposables.Disposable
+import org.librarysimplified.mdc.MDCKeys
 import org.librarysimplified.r2.api.SR2Command
 import org.librarysimplified.r2.api.SR2PageNumberingMode
 import org.librarysimplified.r2.api.SR2ScrollingMode
@@ -32,6 +33,7 @@ import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.ui.thread.api.UIThreadServiceType
 import org.readium.r2.shared.publication.asset.FileAsset
 import org.slf4j.LoggerFactory
+import org.slf4j.MDC
 import java.io.File
 
 class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
@@ -91,6 +93,11 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
     previewContainer = findViewById(R.id.preview_container)
 
     this.feedEntry = intent.getSerializableExtra(EXTRA_ENTRY) as FeedEntry.FeedEntryOPDS
+
+    MDC.put(MDCKeys.BOOK_TITLE, this.feedEntry.feedEntry.title)
+    MDCKeys.put(MDCKeys.BOOK_PUBLISHER, this.feedEntry.feedEntry.publisher)
+    MDC.remove(MDCKeys.BOOK_DRM)
+    MDC.remove(MDCKeys.BOOK_FORMAT)
 
     this.viewModel.previewStatusLive.observe(this, this::onNewBookPreviewStatus)
 

@@ -16,11 +16,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.google.common.util.concurrent.MoreExecutors
-import kotlinx.coroutines.async
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.joda.time.DateTime
+import org.librarysimplified.mdc.MDCKeys
 import org.librarysimplified.services.api.Services
 import org.nypl.drm.core.ContentProtectionProvider
 import org.nypl.simplified.accounts.api.AccountID
@@ -30,12 +31,12 @@ import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.api.bookmark.Bookmark
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
-import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.thread.api.UIThreadServiceType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.slf4j.MDC
 import java.io.File
 import java.net.ServerSocket
 import java.util.ServiceLoader
@@ -74,7 +75,6 @@ class PdfReaderActivity : AppCompatActivity() {
   private val profilesController =
     services.requireService(ProfilesControllerType::class.java)
 
-  private lateinit var handle: BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandlePDF
   private lateinit var uiThread: UIThreadServiceType
   private lateinit var pdfReaderContainer: FrameLayout
   private lateinit var accountId: AccountID
@@ -103,6 +103,13 @@ class PdfReaderActivity : AppCompatActivity() {
     this.accountId = params.accountId
     this.feedEntry = params.entry
     this.bookID = params.id
+
+    MDC.put(MDCKeys.ACCOUNT_INTERNAL_ID, this.accountId.uuid.toString())
+    MDC.put(MDCKeys.BOOK_INTERNAL_ID, this.bookID.value())
+    MDC.put(MDCKeys.BOOK_TITLE, this.feedEntry.feedEntry.title)
+    MDCKeys.put(MDCKeys.BOOK_PUBLISHER, this.feedEntry.feedEntry.publisher)
+    MDC.put(MDCKeys.BOOK_FORMAT, "application/pdf")
+    MDC.remove(MDCKeys.BOOK_DRM)
 
     this.uiThread =
       services.requireService(UIThreadServiceType::class.java)

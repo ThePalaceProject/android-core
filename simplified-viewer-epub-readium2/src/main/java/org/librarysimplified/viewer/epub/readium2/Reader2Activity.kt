@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import io.reactivex.disposables.Disposable
 import org.joda.time.LocalDateTime
+import org.librarysimplified.mdc.MDCKeys
 import org.librarysimplified.r2.api.SR2Bookmark
 import org.librarysimplified.r2.api.SR2Command
 import org.librarysimplified.r2.api.SR2ControllerType
@@ -60,6 +61,7 @@ import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.thread.api.UIThreadServiceType
 import org.readium.r2.shared.publication.asset.FileAsset
 import org.slf4j.LoggerFactory
+import org.slf4j.MDC
 import java.util.ServiceLoader
 import java.util.concurrent.ExecutionException
 
@@ -149,10 +151,18 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     this.parameters =
       extras.getSerializable(ARG_PARAMETERS) as Reader2ActivityParameters
 
+    MDC.put(MDCKeys.ACCOUNT_INTERNAL_ID, this.parameters.accountId.uuid.toString())
+    MDC.put(MDCKeys.BOOK_INTERNAL_ID, this.parameters.bookId.value())
+    MDC.put(MDCKeys.BOOK_TITLE, this.parameters.entry.feedEntry.title)
+    MDCKeys.put(MDCKeys.BOOK_PUBLISHER, this.parameters.entry.feedEntry.publisher)
+    MDC.put(MDCKeys.BOOK_DRM, this.parameters.drmInfo.kind.name)
+    MDC.remove(MDCKeys.BOOK_FORMAT)
+
     try {
       this.account =
         this.profilesController.profileCurrent()
           .account(this.parameters.accountId)
+      MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID, account.provider.id.toString())
     } catch (e: Exception) {
       this.logger.error("unable to locate account: ", e)
       this.finish()

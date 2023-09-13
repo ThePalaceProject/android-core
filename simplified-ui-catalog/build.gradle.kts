@@ -15,6 +15,7 @@ dependencies {
     implementation(project(":simplified-buildconfig-api"))
     implementation(project(":simplified-feeds-api"))
     implementation(project(":simplified-futures"))
+    implementation(project(":simplified-mdc"))
     implementation(project(":simplified-opds-core"))
     implementation(project(":simplified-presentableerror-api"))
     implementation(project(":simplified-profiles-api"))

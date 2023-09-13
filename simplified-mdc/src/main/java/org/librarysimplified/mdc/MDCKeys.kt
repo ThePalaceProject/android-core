@@ -55,6 +55,34 @@ object MDCKeys {
     "BookPublisher"
 
   /**
+   * The format of the current book.
+   */
+
+  const val BOOK_FORMAT =
+    "BookFormat"
+
+  /**
+   * The DRM of the current book.
+   */
+
+  const val BOOK_DRM =
+    "BookDRM"
+
+  /**
+   * The URI of the current feed.
+   */
+
+  const val FEED_URI =
+    "FeedURI"
+
+  /**
+   * The current search query.
+   */
+
+  const val FEED_SEARCH_QUERY =
+    "FeedSearchQuery"
+
+  /**
    * Convenience function to set optional values.
    */
 
