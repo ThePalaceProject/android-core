@@ -42,7 +42,7 @@ if (adobeDRM) {
 if (adobeDRM || lcpDRM || findawayDRM || overdriveDRM) {
     palaceAssetsRequired.setProperty(
         "assets/secrets.conf",
-        "5801d64987fb1eb2fb3e32a5bae1063aa2e444723bc89b8a1230117b631940b7",
+        "221db5c8c1ce1ddbc4f4c1a017f5b63271518d2adf6991010c2831a58b7f88ed",
     )
 }
 
