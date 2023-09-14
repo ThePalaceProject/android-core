@@ -1,13 +1,16 @@
 package org.librarysimplified.main
 
+import android.Manifest
 import android.app.ActionBar
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.TxContextWrappingDelegate
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
@@ -79,6 +82,8 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
         this.supportActionBar?.hide()
       }
     }
+
+    askForNotificationsPermission()
   }
 
   private fun interceptDeepLink() {
@@ -151,6 +156,16 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
         accountID = accountID,
         screenID = screenId,
         barcode = barcode
+      )
+    }
+  }
+
+  private fun askForNotificationsPermission() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      ActivityCompat.requestPermissions(
+        this,
+        arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+        100
       )
     }
   }

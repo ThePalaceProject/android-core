@@ -57,7 +57,7 @@ object FluentFutureExtensions {
     clazz: Class<E>,
     f: (E) -> A
   ): FluentFuture<A> {
-    return this.catching(clazz, Function<E, A> { x -> f.invoke(x!!) }, MoreExecutors.directExecutor())
+    return this.catching(clazz, Function<E, A> { x -> f.invoke(x) }, MoreExecutors.directExecutor())
   }
 
   /**

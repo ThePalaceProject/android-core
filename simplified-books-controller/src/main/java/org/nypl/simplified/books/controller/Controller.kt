@@ -53,6 +53,7 @@ import org.nypl.simplified.futures.FluentFutureExtensions
 import org.nypl.simplified.futures.FluentFutureExtensions.flatMap
 import org.nypl.simplified.futures.FluentFutureExtensions.map
 import org.nypl.simplified.metrics.api.MetricServiceType
+import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSFeedParserType
 import org.nypl.simplified.patron.api.PatronUserProfileParsersType
@@ -100,7 +101,7 @@ class Controller private constructor(
   ProfilesControllerType,
   DeepLinksControllerType {
 
-  private val deepLinkEventsObservable: BehaviorSubject<org.nypl.simplified.deeplinks.controller.api.DeepLinkEvent> =
+  private val deepLinkEventsObservable: BehaviorSubject<DeepLinkEvent> =
     BehaviorSubject.create()
 
   private val borrows: ConcurrentHashMap<BookID, BorrowTaskType>
@@ -128,6 +129,8 @@ class Controller private constructor(
     this.services.requireService(OPDSFeedParserType::class.java)
   private val lsHttp =
     this.services.requireService(LSHTTPClientType::class.java)
+  private val notificationTokenHttpCalls =
+    this.services.requireService(NotificationTokenHTTPCallsType::class.java)
   private val patronUserProfileParsers =
     this.services.requireService(PatronUserProfileParsersType::class.java)
   private val profileAccountCreationStringResources =
@@ -394,6 +397,7 @@ class Controller private constructor(
       http = this.lsHttp,
       profile = profile,
       account = account,
+      notificationTokenHttpCalls = notificationTokenHttpCalls,
       loginStrings = this.accountLoginStringResources,
       patronParsers = this.patronUserProfileParsers,
       request = request
@@ -512,6 +516,7 @@ class Controller private constructor(
         feedLoader = this.feedLoader,
         patronParsers = this.patronUserProfileParsers,
         http = this.lsHttp,
+        notificationTokenHttpCalls = this.notificationTokenHttpCalls,
         logoutStrings = this.accountLogoutStringResources,
         profile = profile
       ).call()

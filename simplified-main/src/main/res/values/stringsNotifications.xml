@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <resources>
-  <string name="notification_channel_description">Notifications related to items becoming available for checkout.</string>
-  <string name="notification_channel_name">Item Available</string>
-  <string name="notification_title_ready_content">The title you reserved is available.</string>
-  <string name="notification_title_ready_title">Your book is ready</string>
+  <string name="notification_channel_name_old">Item Available</string>
+
+  <string name="notification_channel_description_reservations">Notifications related to your reservations.</string>
+  <string name="notification_channel_id_reservations">channel_id_reservations</string>
+  <string name="notification_channel_name_reservations">Reservations</string>
+
+  <string name="notification_channel_description_loans">Notifications related to your loans.</string>
+  <string name="notification_channel_id_loans">channel_id_loans</string>
+  <string name="notification_channel_name_loans">Loans</string>
 </resources>

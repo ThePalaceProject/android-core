@@ -128,26 +128,37 @@ internal class MainFragmentListenerDelegate(
     return when (event) {
       is MainFragmentListenedEvent.CatalogSAML20Event ->
         this.handleCatalogSAML20Event(event.event, state)
+
       is MainFragmentListenedEvent.CatalogFeedEvent ->
         this.handleCatalogFeedEvent(event.event, state)
+
       is MainFragmentListenedEvent.CatalogBookDetailEvent ->
         this.handleCatalogBookDetailEvent(event.event, state)
+
       is MainFragmentListenedEvent.SettingsMainEvent ->
         this.handleSettingsMainEvent(event.event, state)
+
       is MainFragmentListenedEvent.SettingsDebugEvent ->
         this.handleSettingsDebugEvent(event.event, state)
+
       is MainFragmentListenedEvent.SettingsDocumentViewerEvent ->
         this.handleSettingsDocumentViewerEvent(event.event, state)
+
       is MainFragmentListenedEvent.AccountListRegistryEvent ->
         this.handleAccountListRegistryEvent(event.event, state)
+
       is MainFragmentListenedEvent.AccountListEvent ->
         this.handleAccountListEvent(event.event, state)
+
       is MainFragmentListenedEvent.AccountDetailEvent ->
         this.handleAccountEvent(event.event, state)
+
       is MainFragmentListenedEvent.AccountSAML20Event ->
         this.handleAccountSAML20Event(event.event, state)
+
       is MainFragmentListenedEvent.AccountPickerEvent ->
         this.handleAccountPickerEvent(event.event, state)
+
       is MainFragmentListenedEvent.ErrorPageEvent ->
         this.handleErrorPageEvent(event.event, state)
     }
@@ -162,6 +173,7 @@ internal class MainFragmentListenerDelegate(
         this.openErrorPage(event.parameters)
         state
       }
+
       CatalogSAML20Event.LoginSucceeded -> {
         this.popBackStack()
         state
@@ -175,25 +187,35 @@ internal class MainFragmentListenerDelegate(
   ): MainFragmentState {
     return when (event) {
       is CatalogFeedEvent.LoginRequired -> {
-        this.openSettingsAccount(event.account, comingFromBookLoanRequest = true, comingFromDeepLink = false, barcode = null)
+        this.openSettingsAccount(
+          event.account,
+          comingFromBookLoanRequest = true,
+          comingFromDeepLink = false,
+          barcode = null
+        )
         MainFragmentState.CatalogWaitingForLogin
       }
+
       is CatalogFeedEvent.OpenErrorPage -> {
         this.openErrorPage(event.parameters)
         state
       }
+
       is CatalogFeedEvent.OpenViewer -> {
         this.openViewer(event.book, event.format)
         state
       }
+
       is CatalogFeedEvent.OpenBookDetail -> {
         this.openBookDetail(event.feedArguments, event.opdsEntry)
         state
       }
+
       is CatalogFeedEvent.OpenFeed -> {
         this.openFeed(event.feedArguments)
         state
       }
+
       CatalogFeedEvent.GoUpwards -> {
         this.goUpwards()
         state
@@ -207,29 +229,40 @@ internal class MainFragmentListenerDelegate(
   ): MainFragmentState {
     return when (event) {
       is CatalogBookDetailEvent.LoginRequired -> {
-        this.openSettingsAccount(event.account, comingFromBookLoanRequest = true, comingFromDeepLink = false, barcode = null)
+        this.openSettingsAccount(
+          event.account,
+          comingFromBookLoanRequest = true,
+          comingFromDeepLink = false,
+          barcode = null
+        )
         MainFragmentState.BookDetailsWaitingForLogin
       }
+
       is CatalogBookDetailEvent.OpenErrorPage -> {
         this.openErrorPage(event.parameters)
         state
       }
+
       is CatalogBookDetailEvent.OpenViewer -> {
         this.openViewer(event.book, event.format)
         state
       }
+
       is CatalogBookDetailEvent.OpenFeed -> {
         this.openFeed(event.feedArguments)
         state
       }
+
       is CatalogBookDetailEvent.OpenBookDetail -> {
         this.openBookDetail(event.feedArguments, event.opdsEntry)
         state
       }
+
       is CatalogBookDetailEvent.OpenPreviewViewer -> {
         this.openPreviewViewer(event.feedEntry)
         state
       }
+
       CatalogBookDetailEvent.GoUpwards -> {
         this.goUpwards()
         state
@@ -255,10 +288,12 @@ internal class MainFragmentListenerDelegate(
         this.openCatalog()
         state
       }
+
       is AccountListRegistryEvent.OpenErrorPage -> {
         this.openErrorPage(event.parameters)
         state
       }
+
       is AccountListRegistryEvent.GoUpwards -> {
         this.goUpwards()
         state
@@ -278,17 +313,25 @@ internal class MainFragmentListenerDelegate(
   ): MainFragmentState {
     return when (event) {
       is AccountListEvent.AccountSelected -> {
-        this.openSettingsAccount(accountID = event.accountID, comingFromBookLoanRequest = false, comingFromDeepLink = event.comingFromDeepLink, barcode = event.barcode)
+        this.openSettingsAccount(
+          accountID = event.accountID,
+          comingFromBookLoanRequest = false,
+          comingFromDeepLink = event.comingFromDeepLink,
+          barcode = event.barcode
+        )
         state
       }
+
       AccountListEvent.AddAccount -> {
         this.openAccountRegistry(tab = org.librarysimplified.ui.tabs.R.id.tabSettings)
         state
       }
+
       is AccountListEvent.OpenErrorPage -> {
         this.openErrorPage(event.parameters)
         state
       }
+
       AccountListEvent.GoUpwards -> {
         this.goUpwards()
         state
@@ -308,26 +351,32 @@ internal class MainFragmentListenerDelegate(
             this.navigator.popBackStack()
             MainFragmentState.EmptyState
           }
+
           else -> {
             state
           }
         }
+
       is AccountDetailEvent.OpenErrorPage -> {
         this.openErrorPage(event.parameters)
         state
       }
+
       is AccountDetailEvent.OpenSAML20Login -> {
         this.openSAML20Login(event.account, event.authenticationDescription)
         state
       }
+
       is AccountDetailEvent.OpenDocViewer -> {
         this.openDocViewer(event.title, event.url)
         state
       }
+
       is AccountDetailEvent.OpenWebView -> {
         this.openCardCreatorWebView(event.parameters)
         state
       }
+
       AccountDetailEvent.GoUpwards -> {
         this.goUpwards()
         state
@@ -344,6 +393,7 @@ internal class MainFragmentListenerDelegate(
         this.popBackStack()
         state
       }
+
       is AccountSAML20Event.OpenErrorPage -> {
         this.openErrorPage(event.parameters)
         state
@@ -360,6 +410,7 @@ internal class MainFragmentListenerDelegate(
         // TODO: this should work without this for now
         state
       }
+
       AccountPickerEvent.AddAccount -> {
         this.openAccountRegistry(tab = org.librarysimplified.ui.tabs.R.id.tabCatalog)
         state
@@ -388,30 +439,37 @@ internal class MainFragmentListenerDelegate(
         this.openSettingsAbout(event.title, event.url)
         state
       }
+
       SettingsMainEvent.OpenAccountList -> {
         this.openSettingsAccounts()
         state
       }
+
       is SettingsMainEvent.OpenAcknowledgments -> {
         this.openSettingsAcknowledgements(event.title, event.url)
         state
       }
+
       SettingsMainEvent.OpenDebugOptions -> {
         this.openSettingsVersion()
         state
       }
+
       is SettingsMainEvent.OpenEULA -> {
         this.openSettingsEULA(event.title, event.url)
         state
       }
+
       is SettingsMainEvent.OpenFAQ -> {
         this.openSettingsFaq(event.title, event.url)
         state
       }
+
       is SettingsMainEvent.OpenLicense -> {
         this.openSettingsLicense(event.title, event.url)
         state
       }
+
       is SettingsMainEvent.OpenPrivacy -> {
         this.openSettingsPrivacy(event.title, event.url)
         state
@@ -428,10 +486,12 @@ internal class MainFragmentListenerDelegate(
         this.openSettingsCustomOPDS()
         state
       }
+
       is SettingsDebugEvent.OpenErrorPage -> {
         this.openErrorPage(event.parameters)
         state
       }
+
       SettingsDebugEvent.GoUpwards -> {
         this.goUpwards()
         state
@@ -543,7 +603,12 @@ internal class MainFragmentListenerDelegate(
     this.navigator.popBackStack()
   }
 
-  private fun openSettingsAccount(accountID: AccountID, comingFromBookLoanRequest: Boolean, comingFromDeepLink: Boolean, barcode: String?) {
+  private fun openSettingsAccount(
+    accountID: AccountID,
+    comingFromBookLoanRequest: Boolean,
+    comingFromDeepLink: Boolean,
+    barcode: String?
+  ) {
     this.logger.debug("openSettingsAccount called with comingFromDeepLink: $comingFromDeepLink")
     this.navigator.addFragment(
       fragment = AccountDetailFragment.create(

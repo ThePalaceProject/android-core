@@ -24,6 +24,7 @@ dependencies {
     implementation(project(":simplified-links"))
     implementation(project(":simplified-mdc"))
     implementation(project(":simplified-metrics-api"))
+    implementation(project(":simplified-notifications"))
     implementation(project(":simplified-opds-auth-document-api"))
     implementation(project(":simplified-opds-core"))
     implementation(project(":simplified-parser-api"))
