@@ -72,9 +72,8 @@ org.thepalaceproject.app.assets.palace=${ASSETS_PATH}
 EOF
 
 #------------------------------------------------------------------------
-# Addding slack webhook to environment
-#SLACK_WEBHOOK_URL=$(<.ci/credentials/SimplyE/slack-webhook.url) ||
-#  fatal "Slack Webhook url not found."
-#cat >> ".env" <<EOF
-#SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL}"
-#EOF
+# Handle transifex.
+#
+
+.ci-local/transifex.sh ||
+  fatal "Transifex failed"
