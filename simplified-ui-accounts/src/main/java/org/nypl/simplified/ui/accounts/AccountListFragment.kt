@@ -95,7 +95,13 @@ class AccountListFragment : Fragment(R.layout.account_list) {
   }
 
   private fun onAccountClicked(account: AccountType) {
-    this.listener.post(AccountListEvent.AccountSelected(accountID = account.id, comingFromDeepLink = false, barcode = null))
+    this.listener.post(
+      AccountListEvent.AccountSelected(
+        accountID = account.id,
+        comingFromDeepLink = false,
+        barcode = null
+      )
+    )
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -132,7 +138,13 @@ class AccountListFragment : Fragment(R.layout.account_list) {
       .let { subscriptions.add(it) }
 
     if (this.parameters.comingFromDeepLink!!) {
-      this.listener.post(AccountListEvent.AccountSelected(this.parameters.accountID!!, barcode = this.parameters.barcode, comingFromDeepLink = true))
+      this.listener.post(
+        AccountListEvent.AccountSelected(
+          accountID = this.parameters.accountID!!,
+          barcode = this.parameters.barcode,
+          comingFromDeepLink = true
+        )
+      )
     }
   }
 
@@ -149,6 +161,7 @@ class AccountListFragment : Fragment(R.layout.account_list) {
         this.listener.post(AccountListEvent.AddAccount)
         true
       }
+
       else -> super.onOptionsItemSelected(item)
     }
   }
@@ -174,6 +187,7 @@ class AccountListFragment : Fragment(R.layout.account_list) {
       is AccountEventDeletionFailed -> {
         this.showAccountDeletionFailedDialog(accountEvent)
       }
+
       is AccountEventCreation.AccountEventCreationSucceeded,
       is AccountEventDeletion.AccountEventDeletionSucceeded,
       is AccountEventUpdated -> {

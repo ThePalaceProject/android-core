@@ -42,7 +42,7 @@ if (adobeDRM) {
 if (adobeDRM || lcpDRM || findawayDRM || overdriveDRM) {
     palaceAssetsRequired.setProperty(
         "assets/secrets.conf",
-        "5801d64987fb1eb2fb3e32a5bae1063aa2e444723bc89b8a1230117b631940b7",
+        "221db5c8c1ce1ddbc4f4c1a017f5b63271518d2adf6991010c2831a58b7f88ed",
     )
 }
 
@@ -182,7 +182,7 @@ android {
                 abiFilters.add("arm64-v8a")
                 abiFilters.add("armeabi-v7a")
             }
-            signingConfigs.add(signingConfigs.getByName("release"))
+            this.signingConfig = signingConfigs.getByName("release")
         }
     }
 
@@ -272,6 +272,7 @@ dependencies {
     implementation(project(":simplified-links"))
     implementation(project(":simplified-links-json"))
     implementation(project(":simplified-main"))
+    implementation(project(":simplified-mdc"))
     implementation(project(":simplified-metrics"))
     implementation(project(":simplified-metrics-api"))
     implementation(project(":simplified-migration-api"))
@@ -280,13 +281,13 @@ dependencies {
     implementation(project(":simplified-networkconnectivity-api"))
     implementation(project(":simplified-notifications"))
     implementation(project(":simplified-oauth"))
+    implementation(project(":simplified-opds-auth-document"))
+    implementation(project(":simplified-opds-auth-document-api"))
+    implementation(project(":simplified-opds-core"))
     implementation(project(":simplified-opds2"))
     implementation(project(":simplified-opds2-irradia"))
     implementation(project(":simplified-opds2-parser-api"))
     implementation(project(":simplified-opds2-r2"))
-    implementation(project(":simplified-opds-auth-document"))
-    implementation(project(":simplified-opds-auth-document-api"))
-    implementation(project(":simplified-opds-core"))
     implementation(project(":simplified-parser-api"))
     implementation(project(":simplified-patron"))
     implementation(project(":simplified-patron-api"))
@@ -431,12 +432,12 @@ dependencies {
     implementation(libs.androidx.transition.ktx)
     implementation(libs.androidx.vectordrawable)
     implementation(libs.androidx.versionedparcelable)
+    implementation(libs.androidx.viewbinding)
     implementation(libs.androidx.viewpager)
     implementation(libs.androidx.viewpager2)
     implementation(libs.androidx.webkit)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.annotations)
-    implementation(libs.firebase.auth.interop)
     implementation(libs.firebase.common)
     implementation(libs.firebase.common.ktx)
     implementation(libs.firebase.components)
@@ -447,9 +448,12 @@ dependencies {
     implementation(libs.firebase.encoders)
     implementation(libs.firebase.encoders.json)
     implementation(libs.firebase.encoders.proto)
+    implementation(libs.firebase.iid.interop)
     implementation(libs.firebase.installations)
     implementation(libs.firebase.installations.interop)
     implementation(libs.firebase.measurement.connector)
+    implementation(libs.firebase.messaging)
+    implementation(libs.firebase.messaging.ktx)
     implementation(libs.firebase.sessions)
     implementation(libs.google.failureaccess)
     implementation(libs.google.gson)
@@ -513,10 +517,12 @@ dependencies {
     implementation(libs.palace.readium2.vanilla)
     implementation(libs.palace.readium2.views)
     implementation(libs.pandora.bottom.navigator)
+    implementation(libs.pdfium.android)
     implementation(libs.picasso)
     implementation(libs.play.services.ads.identifier)
     implementation(libs.play.services.base)
     implementation(libs.play.services.basement)
+    implementation(libs.play.services.cloud.messaging)
     implementation(libs.play.services.measurement)
     implementation(libs.play.services.measurement.api)
     implementation(libs.play.services.measurement.base)

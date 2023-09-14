@@ -68,6 +68,8 @@ import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
 import org.nypl.simplified.taskrecorder.api.TaskResult
+import org.nypl.simplified.tests.books.controller.FakeAccounts.fakeAccount
+import org.nypl.simplified.tests.books.controller.FakeAccounts.fakeAccountProvider
 import org.nypl.simplified.tests.mocking.MockRevokeStringResources
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -214,9 +216,9 @@ class BookRevokeTaskAdobeDRMTest {
   @Test
   fun testRevokeDRMNonReturnable() {
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
     val accountProvider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =
@@ -333,9 +335,9 @@ class BookRevokeTaskAdobeDRMTest {
   @Test
   fun testRevokeDRMUnsupported() {
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
     val accountProvider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =
@@ -450,9 +452,9 @@ class BookRevokeTaskAdobeDRMTest {
   @Test
   fun testRevokeDRMOK() {
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
     val accountProvider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =
@@ -610,9 +612,9 @@ class BookRevokeTaskAdobeDRMTest {
   @Test
   fun testRevokeDRMDidNothing() {
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
     val accountProvider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =
@@ -759,9 +761,9 @@ class BookRevokeTaskAdobeDRMTest {
   @Test
   fun testRevokeDRMRaisedException() {
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
     val accountProvider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =
@@ -907,9 +909,9 @@ class BookRevokeTaskAdobeDRMTest {
   @Test
   fun testRevokeDRMRaisedErrorCode() {
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
     val accountProvider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =
@@ -1064,9 +1066,9 @@ class BookRevokeTaskAdobeDRMTest {
   @Test
   fun testRevokeDRMNotActivated() {
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
     val accountProvider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =
@@ -1196,9 +1198,9 @@ class BookRevokeTaskAdobeDRMTest {
   @Test
   fun testRevokeDRMNotAuthenticated() {
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
     val accountProvider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =
@@ -1313,9 +1315,9 @@ class BookRevokeTaskAdobeDRMTest {
   @Test
   fun testRevokeDRMDeleteCredentials() {
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
     val accountProvider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =
@@ -1467,14 +1469,6 @@ class BookRevokeTaskAdobeDRMTest {
     Assertions.assertEquals(IOException::class.java, result.steps.last().resolution.exception!!::class.java)
 
     Mockito.verify(bookDatabaseEntry, Times(0)).delete()
-  }
-
-  private fun <T> optionUnsafe(opt: OptionType<T>): T {
-    return if (opt is Some<T>) {
-      opt.get()
-    } else {
-      throw IllegalStateException("Expected something, got nothing!")
-    }
   }
 
   private fun <T> anyNonNull(): T =

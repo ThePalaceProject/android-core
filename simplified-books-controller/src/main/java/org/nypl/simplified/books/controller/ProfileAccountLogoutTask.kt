@@ -1,8 +1,10 @@
 package org.nypl.simplified.books.controller
 
 import com.google.common.base.Preconditions
+import one.irradia.mime.api.MIMECompatibility
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType
+import org.librarysimplified.mdc.MDCKeys
 import org.nypl.drm.core.AdobeAdeptExecutorType
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
 import org.nypl.simplified.accounts.api.AccountAuthenticationAdobeClientToken
@@ -25,6 +27,7 @@ import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedLoaderResult
 import org.nypl.simplified.feeds.api.FeedLoaderType
+import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.getOrNull
 import org.nypl.simplified.patron.api.PatronDRMAdobe
@@ -33,6 +36,7 @@ import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.slf4j.LoggerFactory
+import org.slf4j.MDC
 import java.io.IOException
 import java.net.URI
 import java.util.concurrent.Callable
@@ -51,6 +55,7 @@ class ProfileAccountLogoutTask(
   private val feedLoader: FeedLoaderType,
   private val http: LSHTTPClientType,
   private val logoutStrings: AccountLogoutStringResourcesType,
+  private val notificationTokenHttpCalls: NotificationTokenHTTPCallsType,
   private val patronParsers: PatronUserProfileParsersType,
   private val profile: ProfileReadableType
 ) : Callable<TaskResult<Unit>> {
@@ -84,6 +89,10 @@ class ProfileAccountLogoutTask(
   override fun call(): TaskResult<Unit> {
     this.steps.beginNewStep(this.logoutStrings.logoutStarted)
 
+    MDC.put(MDCKeys.ACCOUNT_INTERNAL_ID, this.account.id.uuid.toString())
+    MDC.put(MDCKeys.ACCOUNT_PROVIDER_NAME, this.account.provider.displayName)
+    MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID, this.account.provider.id.toString())
+
     this.credentials =
       when (val state = this.account.loginState) {
         is AccountLoggedIn -> state.credentials
@@ -100,6 +109,7 @@ class ProfileAccountLogoutTask(
       }
 
     return try {
+      this.runFCMTokenDeletion()
       this.runDeviceDeactivation()
       this.runUpdateOPDSEntries()
       this.runBookRegistryClear()
@@ -129,6 +139,12 @@ class ProfileAccountLogoutTask(
       this.runDeviceDeactivationAdobe(adobeCredentialsMaybe)
       return
     }
+  }
+
+  private fun runFCMTokenDeletion() {
+    this.debug("running fcm token deletion")
+
+    notificationTokenHttpCalls.deleteFCMTokenForProfileAccount(account)
   }
 
   private fun handlePatronUserProfile(): PatronDRMAdobe? {
@@ -226,7 +242,12 @@ class ProfileAccountLogoutTask(
     val request =
       this.http.newRequest(deviceManagerURI)
         .setAuthorization(AccountAuthenticatedHTTP.createAuthorizationIfPresent(this.credentials))
-        .setMethod(LSHTTPRequestBuilderType.Method.Delete)
+        .setMethod(
+          LSHTTPRequestBuilderType.Method.Delete(
+            ByteArray(0),
+            MIMECompatibility.applicationOctetStream
+          )
+        )
         .addHeader("Content-Type", "vnd.librarysimplified/drm-device-id-list")
         .build()
 
@@ -241,6 +262,7 @@ class ProfileAccountLogoutTask(
         val message = this.logoutStrings.logoutDeactivatingDeviceAdobeFailed(ex.errorCode, ex)
         this.steps.currentStepFailed(message, "Adobe ACS: ${ex.errorCode}", ex)
       }
+
       else -> {
         this.steps.currentStepFailed(
           this.logoutStrings.logoutDeactivatingDeviceAdobeFailed("UNKNOWN", ex),
@@ -309,11 +331,13 @@ class ProfileAccountLogoutTask(
       when (feedResult) {
         is FeedLoaderResult.FeedLoaderSuccess ->
           feedResult.feed
+
         is FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedAuthentication -> {
           this.debug(feedResult.message)
           // FIXME: Some servers require authentication
           throw feedResult.exception
         }
+
         is FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedGeneral -> {
           val message = this.logoutStrings.logoutOPDSFeedFailed
           this.steps.currentStepFailed(message, "feedLoaderFailed", feedResult.exception)
@@ -336,10 +360,12 @@ class ProfileAccountLogoutTask(
             this.steps.currentStepFailed(message, "feedCorrupted", feedEntry.error)
             throw StepFailedHandled(feedEntry.error)
           }
+
           is FeedEntry.FeedEntryOPDS ->
             feedEntry.feedEntry
         }
       }
+
       is Feed.FeedWithGroups -> {
         val message = this.logoutStrings.logoutOPDSFeedWithGroups
         val exception = Exception(message)

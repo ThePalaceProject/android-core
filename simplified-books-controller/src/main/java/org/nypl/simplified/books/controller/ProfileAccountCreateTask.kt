@@ -1,6 +1,7 @@
 package org.nypl.simplified.books.controller
 
 import io.reactivex.subjects.Subject
+import org.librarysimplified.mdc.MDCKeys
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.accounts.api.AccountEventCreation.AccountEventCreationFailed
 import org.nypl.simplified.accounts.api.AccountEventCreation.AccountEventCreationInProgress
@@ -18,6 +19,7 @@ import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.taskrecorder.api.TaskStep
 import org.slf4j.LoggerFactory
+import org.slf4j.MDC
 import java.net.URI
 import java.util.concurrent.Callable
 
@@ -38,6 +40,11 @@ class ProfileAccountCreateTask(
       this.logger.debug("creating account for provider {}", this.accountProviderID)
       val accountProvider = this.resolveAccountProvider()
       val account = this.createAccount(accountProvider)
+
+      MDC.put(MDCKeys.ACCOUNT_INTERNAL_ID, account.id.uuid.toString())
+      MDC.put(MDCKeys.ACCOUNT_PROVIDER_NAME, account.provider.displayName)
+      MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID, account.provider.id.toString())
+
       metrics?.logMetric(MetricEvent.LibraryAdded(accountProvider.id.toString()))
       this.publishSuccessEvent(account)
       this.taskRecorder.finishSuccess(account)

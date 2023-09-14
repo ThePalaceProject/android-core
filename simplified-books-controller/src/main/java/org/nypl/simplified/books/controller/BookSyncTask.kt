@@ -3,6 +3,7 @@ package org.nypl.simplified.books.controller
 import com.io7m.jfunctional.Some
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPResponseStatus
+import org.librarysimplified.mdc.MDCKeys
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addCredentialsToProperties
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.getAccessToken
@@ -33,6 +34,7 @@ import org.nypl.simplified.profiles.api.ProfilesDatabaseType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.slf4j.LoggerFactory
+import org.slf4j.MDC
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
@@ -62,6 +64,10 @@ class BookSyncTask(
   override fun execute(account: AccountType): TaskResult.Success<Unit> {
     this.logger.debug("syncing account {}", account.id)
     this.taskRecorder.beginNewStep("Syncing...")
+
+    MDC.put(MDCKeys.ACCOUNT_INTERNAL_ID, account.id.uuid.toString())
+    MDC.put(MDCKeys.ACCOUNT_PROVIDER_NAME, account.provider.displayName)
+    MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID, account.provider.id.toString())
 
     val provider = this.updateAccountProvider(account)
     val providerAuth = provider.authentication
