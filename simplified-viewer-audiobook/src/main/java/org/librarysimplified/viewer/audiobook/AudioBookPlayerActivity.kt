@@ -54,6 +54,7 @@ import org.librarysimplified.audiobook.views.PlayerSleepTimerFragment
 import org.librarysimplified.audiobook.views.toc.PlayerTOCFragment
 import org.librarysimplified.http.api.LSHTTPAuthorizationType
 import org.librarysimplified.http.api.LSHTTPClientType
+import org.librarysimplified.mdc.MDCKeys
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.librarysimplified.services.api.Services
 import org.nypl.drm.core.ContentProtectionProvider
@@ -82,6 +83,7 @@ import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.nypl.simplified.ui.thread.api.UIThreadServiceType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.slf4j.MDC
 import rx.Subscription
 import java.io.IOException
 import java.util.Collections
@@ -193,6 +195,14 @@ class AudioBookPlayerActivity :
     this.log.debug("book id:       {}", this.parameters.bookID)
     this.log.debug("entry id:      {}", this.parameters.opdsEntry.id)
 
+    MDC.put(MDCKeys.ACCOUNT_INTERNAL_ID, this.parameters.accountID.uuid.toString())
+    MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID, this.parameters.accountProviderID.toString())
+    MDC.put(MDCKeys.BOOK_INTERNAL_ID, this.parameters.bookID.value())
+    MDC.put(MDCKeys.BOOK_TITLE, this.parameters.opdsEntry.title)
+    MDCKeys.put(MDCKeys.BOOK_PUBLISHER, this.parameters.opdsEntry.publisher)
+    MDC.remove(MDCKeys.BOOK_DRM)
+    MDC.remove(MDCKeys.BOOK_FORMAT)
+
     this.setContentView(R.layout.audio_book_player_base)
     this.playerScheduledExecutor = Executors.newSingleThreadScheduledExecutor()
 
@@ -242,6 +252,9 @@ class AudioBookPlayerActivity :
     }
 
     this.formatHandle = formatHandleOpt
+
+    MDC.put(MDCKeys.BOOK_DRM, formatHandle.format.drmInformation.kind.name)
+    MDC.put(MDCKeys.BOOK_FORMAT, formatHandle.format.contentType.toString())
 
     /*
      * Create a new downloader that is solely used to fetch audio book manifests.

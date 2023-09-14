@@ -13,6 +13,7 @@ import io.reactivex.subjects.PublishSubject
 import net.jcip.annotations.GuardedBy
 import org.joda.time.DateTime
 import org.joda.time.LocalDateTime
+import org.librarysimplified.mdc.MDCKeys
 import org.librarysimplified.ui.catalog.CatalogFeedArguments.CatalogFeedArgumentsLocalBooks
 import org.librarysimplified.ui.catalog.CatalogFeedArguments.CatalogFeedArgumentsRemote
 import org.librarysimplified.ui.catalog.CatalogFeedState.CatalogFeedLoaded
@@ -67,6 +68,7 @@ import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.thread.api.UIExecutor
 import org.slf4j.LoggerFactory
+import org.slf4j.MDC
 import java.net.URI
 import java.util.UUID
 
@@ -355,6 +357,11 @@ class CatalogFeedViewModel(
   ) {
     this.logger.debug("[{}]: loading local feed {}", this.instanceId, arguments.selection)
 
+    MDC.remove(MDCKeys.FEED_URI)
+    MDC.remove(MDCKeys.ACCOUNT_INTERNAL_ID)
+    MDC.remove(MDCKeys.ACCOUNT_PROVIDER_ID)
+    MDC.remove(MDCKeys.ACCOUNT_PROVIDER_NAME)
+
     val booksUri = URI.create("Books")
 
     val request =
@@ -407,10 +414,16 @@ class CatalogFeedViewModel(
   ) {
     this.logger.debug("[{}]: loading remote feed {}", this.instanceId, arguments.feedURI)
 
+    MDC.put(MDCKeys.FEED_URI, arguments.feedURI.toString())
+
     val profile =
       this.profilesController.profileCurrent()
     val account =
       profile.account(arguments.ownership.accountId)
+
+    MDC.put(MDCKeys.ACCOUNT_INTERNAL_ID, account.id.uuid.toString())
+    MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID, account.provider.id.toString())
+    MDC.put(MDCKeys.ACCOUNT_PROVIDER_NAME, account.provider.displayName)
 
     /*
      * If the remote feed has an age gate, and we haven't given an age, then display an
@@ -681,12 +694,6 @@ class CatalogFeedViewModel(
     return account.feedIsRoot(parameters.feedURI)
   }
 
-  fun showCurrentLibrary(): Boolean {
-    val ownedByAccount = this.feedArguments.ownership is CatalogFeedOwnership.OwnedByAccount
-    val showAll = buildConfiguration.showBooksFromAllAccounts
-    return !showAll && ownedByAccount
-  }
-
   /**
    * Set synthesized birthdate based on if user is over 13
    */
@@ -787,6 +794,8 @@ class CatalogFeedViewModel(
     search: FeedSearch,
     query: String
   ): CatalogFeedArguments {
+    MDC.put(MDCKeys.FEED_SEARCH_QUERY, query)
+
     return when (val currentArguments = this.feedArguments) {
       is CatalogFeedArgumentsRemote -> {
         when (search) {

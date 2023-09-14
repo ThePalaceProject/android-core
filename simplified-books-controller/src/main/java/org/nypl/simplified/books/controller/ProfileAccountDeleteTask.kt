@@ -1,6 +1,7 @@
 package org.nypl.simplified.books.controller
 
 import io.reactivex.subjects.Subject
+import org.librarysimplified.mdc.MDCKeys
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.accounts.api.AccountEventDeletion
 import org.nypl.simplified.accounts.api.AccountID
@@ -14,6 +15,7 @@ import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.taskrecorder.api.TaskStep
 import org.slf4j.LoggerFactory
+import org.slf4j.MDC
 import java.net.URI
 import java.util.concurrent.Callable
 
@@ -53,6 +55,9 @@ class ProfileAccountDeleteTask(
 
       val profile = this.profiles.currentProfileUnsafe()
       val account = profile.deleteAccountByProvider(this.accountProviderID)
+
+      MDC.put(MDCKeys.ACCOUNT_INTERNAL_ID, account.toString())
+      MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID, accountProviderID.toString())
 
       this.metrics?.logMetric(MetricEvent.LibraryRemoved(this.accountProviderID.toString()))
       this.publishSuccessEvent(account)
