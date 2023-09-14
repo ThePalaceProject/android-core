@@ -42,6 +42,7 @@ import org.nypl.simplified.opds.core.OPDSParseException
 import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
 import org.nypl.simplified.taskrecorder.api.TaskResult
+import org.nypl.simplified.tests.books.controller.FakeAccounts.fakeAccount
 import org.nypl.simplified.tests.mocking.MockAccountCreationStringResources
 import org.nypl.simplified.tests.mocking.MockAccountProviderRegistry
 import org.nypl.simplified.tests.mocking.MockAccountProviderResolutionStrings
@@ -256,7 +257,7 @@ class ProfileAccountCreateCustomOPDSTest {
     val profile =
       Mockito.mock(ProfileType::class.java)
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
 
     val preferences =
       AccountPreferences(
@@ -286,6 +287,9 @@ class ProfileAccountCreateCustomOPDSTest {
       MockAccountProviderRegistry.singleton(accountProvider)
 
     accountProviders.returnForNextResolution(accountProvider)
+
+    Mockito.`when`(account.provider)
+      .thenReturn(accountProvider)
 
     val task =
       ProfileAccountCreateCustomOPDSTask(
@@ -339,7 +343,7 @@ class ProfileAccountCreateCustomOPDSTest {
     val profile =
       Mockito.mock(ProfileType::class.java)
     val account =
-      Mockito.mock(AccountType::class.java)
+      fakeAccount()
 
     Mockito.`when`(this.profilesDatabase.currentProfileUnsafe())
       .thenReturn(profile)

@@ -16,35 +16,6 @@ import java.util.TreeMap
 
 object MockAccountProviders {
 
-  private val logger = LoggerFactory.getLogger(MockAccountProviders::class.java)
-
-  fun findAccountProviderDangerously(
-    registry: AccountProviderRegistryType,
-    id: URI
-  ): AccountProviderType {
-    val accountProviderDescription =
-      registry.findAccountProviderDescription(id)
-
-    Preconditions.checkState(
-      accountProviderDescription != null,
-      "Looking up provider $id must not fail"
-    )
-
-    val result =
-      registry.resolve(
-        { providerId, status -> logger.debug("status: {}: {}", providerId, status) },
-        accountProviderDescription!!
-      )
-
-    return (result as TaskResult.Success).result
-  }
-
-  fun findAccountProviderDangerously(
-    registry: AccountProviderRegistryType,
-    id: String
-  ): AccountProviderType =
-    findAccountProviderDangerously(registry, URI.create(id))
-
   fun fakeProvider(
     providerId: String,
     host: String = "example.com",
@@ -78,10 +49,6 @@ object MockAccountProviders {
       location = null,
       alternateURI = URI.create("https://www.example.com/alternate")
     )
-  }
-
-  fun fakeAccountProviderDefaultURI(): URI {
-    return URI.create("urn:fake:2")
   }
 
   fun fakeAccountProviderDefaultAutoURI(): URI {
@@ -129,72 +96,8 @@ object MockAccountProviders {
     )
   }
 
-  fun fakeAccountProvidersWithAutomatic(): AccountProviderRegistryType {
-    val fake0 = fakeProvider("urn:fake:0")
-    val fake1 = fakeProvider("urn:fake:1")
-    val fake2 = fakeProvider("urn:fake:2")
-    val fake3 = fakeAuthProvider("urn:fake-auth:0")
-    val fake4 = fakeProviderAuto("urn:fake:auto-4")
-
-    val providers = TreeMap<URI, AccountProviderType>()
-    providers[fake0.id] = fake0
-    providers[fake1.id] = fake1
-    providers[fake2.id] = fake2
-    providers[fake3.id] = fake3
-    providers[fake4.id] = fake4
-
-    val registry =
-      AccountProviderRegistry.createFrom(Mockito.mock(Context::class.java), listOf(), fake0)
-
-    for (provider in providers.values) {
-      registry.updateProvider(provider)
-    }
-
-    return registry
-  }
-
   fun fakeProviderAuto(id: String): AccountProvider {
     return fakeProvider(id).copy(addAutomatically = true)
-  }
-
-  fun fakeAccountProvidersMissing0(): AccountProviderRegistryType {
-    val fake1 = fakeProvider("urn:fake:1")
-    val fake2 = fakeProvider("urn:fake:2")
-    val fake3 = fakeAuthProvider("urn:fake-auth:0")
-
-    val providers = TreeMap<URI, AccountProviderType>()
-    providers[fake1.id] = fake1
-    providers[fake2.id] = fake2
-    providers[fake3.id] = fake3
-
-    val registry =
-      AccountProviderRegistry.createFrom(Mockito.mock(Context::class.java), listOf(), fake1)
-
-    for (provider in providers.values) {
-      registry.updateProvider(provider)
-    }
-
-    return registry
-  }
-
-  fun fakeAccountProvidersMissing1(): AccountProviderRegistryType {
-    val fake0 = fakeProvider("urn:fake:0")
-    val fake2 = fakeProvider("urn:fake:2")
-    val fake3 = fakeAuthProvider("urn:fake-auth:0")
-
-    val providers = TreeMap<URI, AccountProviderType>()
-    providers[fake0.id] = fake0
-    providers[fake2.id] = fake2
-    providers[fake3.id] = fake3
-
-    val registry =
-      AccountProviderRegistry.createFrom(Mockito.mock(Context::class.java), listOf(), fake0)
-
-    for (provider in providers.values) {
-      registry.updateProvider(provider)
-    }
-
-    return registry
   }
 
   fun fakeAuthProvider(

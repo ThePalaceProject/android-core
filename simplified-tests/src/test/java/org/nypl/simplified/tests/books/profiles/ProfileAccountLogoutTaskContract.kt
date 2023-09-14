@@ -51,6 +51,7 @@ import org.nypl.simplified.patron.PatronUserProfileParsers
 import org.nypl.simplified.patron.api.PatronUserProfileParsersType
 import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfileReadableType
+import org.nypl.simplified.tests.books.controller.FakeAccounts.fakeAccountProvider
 import org.nypl.simplified.tests.mocking.MockAccountLogoutStringResources
 import org.nypl.simplified.tests.mocking.MockBookDatabase
 import org.nypl.simplified.tests.mocking.MockBookDatabaseEntry
@@ -165,7 +166,7 @@ abstract class ProfileAccountLogoutTaskContract {
   @Test
   fun testLogoutNotRequired() {
     val provider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
 
     Mockito.`when`(provider.authentication)
       .thenReturn(null)
@@ -219,7 +220,7 @@ abstract class ProfileAccountLogoutTaskContract {
   @Test
   fun testLogoutNoDRM() {
     val provider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
 
     Mockito.`when`(provider.authentication)
       .thenReturn(null)
@@ -292,7 +293,7 @@ abstract class ProfileAccountLogoutTaskContract {
   @Test
   fun testLogoutDRMAdobeNoLongerSupported() {
     val provider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
 
     Mockito.`when`(provider.authentication)
       .thenReturn(null)
@@ -368,7 +369,7 @@ abstract class ProfileAccountLogoutTaskContract {
   @Test
   fun testLogoutDRMAdobeError() {
     val provider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
 
     Mockito.`when`(provider.authentication)
       .thenReturn(null)
@@ -467,7 +468,7 @@ abstract class ProfileAccountLogoutTaskContract {
   @Test
   fun testLogoutDRMAdobe() {
     val provider =
-      Mockito.mock(AccountProviderType::class.java)
+      fakeAccountProvider()
 
     Mockito.`when`(provider.patronSettingsURI)
       .thenReturn(this.server.url("patron").toUri())

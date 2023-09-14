@@ -42,7 +42,7 @@ if (adobeDRM) {
 if (adobeDRM || lcpDRM || findawayDRM || overdriveDRM) {
     palaceAssetsRequired.setProperty(
         "assets/secrets.conf",
-        "5801d64987fb1eb2fb3e32a5bae1063aa2e444723bc89b8a1230117b631940b7",
+        "221db5c8c1ce1ddbc4f4c1a017f5b63271518d2adf6991010c2831a58b7f88ed",
     )
 }
 
@@ -272,6 +272,7 @@ dependencies {
     implementation(project(":simplified-links"))
     implementation(project(":simplified-links-json"))
     implementation(project(":simplified-main"))
+    implementation(project(":simplified-mdc"))
     implementation(project(":simplified-metrics"))
     implementation(project(":simplified-metrics-api"))
     implementation(project(":simplified-migration-api"))
@@ -280,13 +281,13 @@ dependencies {
     implementation(project(":simplified-networkconnectivity-api"))
     implementation(project(":simplified-notifications"))
     implementation(project(":simplified-oauth"))
+    implementation(project(":simplified-opds-auth-document"))
+    implementation(project(":simplified-opds-auth-document-api"))
+    implementation(project(":simplified-opds-core"))
     implementation(project(":simplified-opds2"))
     implementation(project(":simplified-opds2-irradia"))
     implementation(project(":simplified-opds2-parser-api"))
     implementation(project(":simplified-opds2-r2"))
-    implementation(project(":simplified-opds-auth-document"))
-    implementation(project(":simplified-opds-auth-document-api"))
-    implementation(project(":simplified-opds-core"))
     implementation(project(":simplified-parser-api"))
     implementation(project(":simplified-patron"))
     implementation(project(":simplified-patron-api"))
