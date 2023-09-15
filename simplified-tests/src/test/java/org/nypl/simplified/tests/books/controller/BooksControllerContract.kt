@@ -58,6 +58,8 @@ import org.nypl.simplified.feeds.api.FeedHTTPTransport
 import org.nypl.simplified.feeds.api.FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.files.DirectoryUtilities
+import org.nypl.simplified.notifications.NotificationTokenHTTPCalls
+import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
 import org.nypl.simplified.opds.auth_document.api.AuthenticationDocumentParsersType
 import org.nypl.simplified.opds.core.OPDSAcquisition
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
@@ -208,6 +210,7 @@ abstract class BooksControllerContract {
     services.putService(ContentResolverType::class.java, this.contentResolver)
     services.putService(FeedLoaderType::class.java, feedLoader)
     services.putService(LSHTTPClientType::class.java, this.lsHTTP)
+    services.putService(NotificationTokenHTTPCallsType::class.java, NotificationTokenHTTPCalls(this.lsHTTP))
     services.putService(OPDSFeedParserType::class.java, parser)
     services.putService(PatronUserProfileParsersType::class.java, patronUserProfileParsers)
     services.putService(ProfileAccountCreationStringResourcesType::class.java, profileAccountCreationStringResources)
@@ -271,6 +274,7 @@ abstract class BooksControllerContract {
     services.putService(FeedLoaderType::class.java, feedLoader)
     services.putService(LSHTTPClientType::class.java, this.lsHTTP)
     services.putService(OPDSFeedParserType::class.java, parser)
+    services.putService(NotificationTokenHTTPCallsType::class.java, NotificationTokenHTTPCalls(this.lsHTTP))
     services.putService(PatronUserProfileParsersType::class.java, patronUserProfileParsers)
     services.putService(ProfileAccountCreationStringResourcesType::class.java, profileAccountCreationStringResources)
     services.putService(ProfileAccountDeletionStringResourcesType::class.java, profileAccountDeletionStringResources)

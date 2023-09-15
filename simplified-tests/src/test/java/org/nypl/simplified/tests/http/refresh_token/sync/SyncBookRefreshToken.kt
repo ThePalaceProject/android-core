@@ -47,6 +47,8 @@ import org.nypl.simplified.feeds.api.FeedHTTPTransport
 import org.nypl.simplified.feeds.api.FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.files.DirectoryUtilities
+import org.nypl.simplified.notifications.NotificationTokenHTTPCalls
+import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
 import org.nypl.simplified.opds.auth_document.api.AuthenticationDocumentParsersType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
 import org.nypl.simplified.opds.core.OPDSFeedParser
@@ -291,6 +293,7 @@ class SyncBookRefreshToken {
     services.putService(ContentResolverType::class.java, this.contentResolver)
     services.putService(FeedLoaderType::class.java, feedLoader)
     services.putService(LSHTTPClientType::class.java, this.httpClient)
+    services.putService(NotificationTokenHTTPCallsType::class.java, NotificationTokenHTTPCalls(this.httpClient))
     services.putService(OPDSFeedParserType::class.java, parser)
     services.putService(PatronUserProfileParsersType::class.java, patronUserProfileParsers)
     services.putService(ProfileAccountCreationStringResourcesType::class.java, profileAccountCreationStringResources)

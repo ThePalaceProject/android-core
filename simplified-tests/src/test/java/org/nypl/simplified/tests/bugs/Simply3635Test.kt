@@ -49,6 +49,8 @@ import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.feeds.api.FeedHTTPTransport
 import org.nypl.simplified.feeds.api.FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderType
+import org.nypl.simplified.notifications.NotificationTokenHTTPCalls
+import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
 import org.nypl.simplified.opds.auth_document.AuthenticationDocumentParsers
 import org.nypl.simplified.opds.auth_document.api.AuthenticationDocumentParsersType
 import org.nypl.simplified.opds.core.OPDSAcquisition
@@ -238,6 +240,7 @@ class Simply3635Test {
     b.addService(ContentResolverType::class.java, this.contentResolverSane)
     b.addService(FeedLoaderType::class.java, this.feedLoader)
     b.addService(LSHTTPClientType::class.java, this.http)
+    b.addService(NotificationTokenHTTPCallsType::class.java, NotificationTokenHTTPCalls(this.http))
     b.addService(OPDSFeedParserType::class.java, this.opdsParser)
     b.addService(PatronUserProfileParsersType::class.java, PatronUserProfileParsers())
     b.addService(ProfileIdleTimerType::class.java, this.profileIdleTimer)
