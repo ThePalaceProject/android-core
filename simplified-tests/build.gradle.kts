@@ -232,7 +232,6 @@ val dependencyObjects = listOf(
     libs.palace.audiobook.manifest.fulfill.basic,
     libs.palace.audiobook.manifest.fulfill.opa,
     libs.palace.audiobook.manifest.fulfill.spi,
-    libs.palace.audiobook.manifest.license.check.api,
     libs.palace.audiobook.manifest.parser.api,
     libs.palace.audiobook.manifest.parser.extension.spi,
     libs.palace.audiobook.manifest.parser.webpub,

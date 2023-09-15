@@ -349,8 +349,18 @@ dependencies {
      */
 
     if (findawayDRM) {
-        implementation(libs.palace.findaway)
         implementation(libs.findaway)
+        implementation(libs.findaway)
+        implementation(libs.findaway.common)
+        implementation(libs.findaway.listening)
+        implementation(libs.findaway.persistence)
+        implementation(libs.findaway.play.android)
+        implementation(libs.koin.android)
+        implementation(libs.koin.core)
+        implementation(libs.koin.core.jvm)
+        implementation(libs.palace.findaway)
+        implementation(libs.stately.common)
+        implementation(libs.stately.concurrency)
     }
 
     /*
@@ -360,6 +370,14 @@ dependencies {
     if (overdriveDRM) {
         implementation(libs.palace.overdrive)
     }
+
+    /*
+     * Dependencies needed for Feedbooks JWT handling. Always enabled.
+     */
+
+    implementation(libs.nimbus.jose.jwt)
+    implementation(libs.net.minidev.json.smart)
+    implementation(libs.net.minidev.accessors.smart)
 
     implementation(libs.androidx.activity)
     implementation(libs.androidx.activity.ktx)
@@ -393,7 +411,6 @@ dependencies {
     implementation(libs.androidx.emoji2.views)
     implementation(libs.androidx.emoji2.views.helper)
     implementation(libs.androidx.fragment)
-    implementation(libs.androidx.fragment)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.interpolator)
     implementation(libs.androidx.legacy.support.core.ui)
@@ -409,8 +426,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.androidx.lifecycle.viewmodel.savedstate)
     implementation(libs.androidx.loader)
-    implementation(libs.androidx.loader)
     implementation(libs.androidx.localbroadcastmanager)
+    implementation(libs.androidx.media)
     implementation(libs.androidx.paging.common)
     implementation(libs.androidx.paging.common.ktx)
     implementation(libs.androidx.paging.runtime)
@@ -420,7 +437,6 @@ dependencies {
     implementation(libs.androidx.recycler.view)
     implementation(libs.androidx.room.common)
     implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.savedstate)
     implementation(libs.androidx.savedstate)
     implementation(libs.androidx.slidingpanelayout)
     implementation(libs.androidx.sqlite)
@@ -455,6 +471,7 @@ dependencies {
     implementation(libs.firebase.messaging)
     implementation(libs.firebase.messaging.ktx)
     implementation(libs.firebase.sessions)
+    implementation(libs.google.exoplayer)
     implementation(libs.google.failureaccess)
     implementation(libs.google.gson)
     implementation(libs.google.guava)
@@ -494,15 +511,23 @@ dependencies {
     implementation(libs.palace.audiobook.api)
     implementation(libs.palace.audiobook.downloads)
     implementation(libs.palace.audiobook.feedbooks)
+    implementation(libs.palace.audiobook.http)
+    implementation(libs.palace.audiobook.json.canon)
+    implementation(libs.palace.audiobook.json.web.token)
     implementation(libs.palace.audiobook.lcp)
+    implementation(libs.palace.audiobook.lcp.license.status)
+    implementation(libs.palace.audiobook.license.check.api)
+    implementation(libs.palace.audiobook.license.check.spi)
     implementation(libs.palace.audiobook.manifest.api)
     implementation(libs.palace.audiobook.manifest.fulfill.api)
     implementation(libs.palace.audiobook.manifest.fulfill.basic)
+    implementation(libs.palace.audiobook.manifest.fulfill.opa)
     implementation(libs.palace.audiobook.manifest.fulfill.spi)
-    implementation(libs.palace.audiobook.manifest.license.check.api)
     implementation(libs.palace.audiobook.manifest.parser.api)
+    implementation(libs.palace.audiobook.manifest.parser.extension.spi)
     implementation(libs.palace.audiobook.manifest.parser.webpub)
     implementation(libs.palace.audiobook.open.access)
+    implementation(libs.palace.audiobook.parser.api)
     implementation(libs.palace.audiobook.rbdigital)
     implementation(libs.palace.audiobook.views)
     implementation(libs.palace.drm.core)
