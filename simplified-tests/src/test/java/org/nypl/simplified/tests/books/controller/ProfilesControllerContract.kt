@@ -65,6 +65,8 @@ import org.nypl.simplified.reader.api.ReaderPreferences
 import org.nypl.simplified.bookmarks.api.BookmarkEvent
 import org.nypl.simplified.books.book_registry.BookPreviewRegistry
 import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
+import org.nypl.simplified.notifications.NotificationTokenHTTPCalls
+import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
 import org.nypl.simplified.tests.EventAssertions
 import org.nypl.simplified.tests.MutableServiceDirectory
 import org.nypl.simplified.tests.books.BookFormatsTesting
@@ -172,6 +174,7 @@ abstract class ProfilesControllerContract {
     services.putService(FeedLoaderType::class.java, feedLoader)
     services.putService(LSHTTPClientType::class.java, this.lsHTTP)
     services.putService(OPDSFeedParserType::class.java, parser)
+    services.putService(NotificationTokenHTTPCallsType::class.java, NotificationTokenHTTPCalls(this.lsHTTP))
     services.putService(PatronUserProfileParsersType::class.java, this.patronUserProfileParsers)
     services.putService(ProfileAccountCreationStringResourcesType::class.java, this.profileAccountCreationStringResources)
     services.putService(ProfileAccountDeletionStringResourcesType::class.java, this.profileAccountDeletionStringResources)
