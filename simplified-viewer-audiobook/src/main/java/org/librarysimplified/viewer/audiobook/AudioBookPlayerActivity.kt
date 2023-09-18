@@ -53,7 +53,6 @@ import org.librarysimplified.audiobook.views.PlayerPlaybackRateFragment
 import org.librarysimplified.audiobook.views.PlayerSleepTimerFragment
 import org.librarysimplified.audiobook.views.toc.PlayerTOCFragment
 import org.librarysimplified.http.api.LSHTTPAuthorizationType
-import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.mdc.MDCKeys
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.librarysimplified.services.api.Services
@@ -79,7 +78,6 @@ import org.nypl.simplified.opds.core.getOrNull
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.threads.NamedThreadPools
-import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.nypl.simplified.ui.thread.api.UIThreadServiceType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -133,26 +131,18 @@ class AudioBookPlayerActivity :
 
   private lateinit var book: PlayerAudioBookType
   private lateinit var bookAuthor: String
-  private lateinit var books: BooksControllerType
   private lateinit var bookSubscription: Subscription
   private lateinit var bookTitle: String
-  private lateinit var covers: BookCoverProviderType
   private lateinit var downloadExecutor: ListeningExecutorService
   private lateinit var downloadProvider: PlayerDownloadProviderType
   private lateinit var formatHandle: BookDatabaseEntryFormatHandleAudioBook
-  private lateinit var http: LSHTTPClientType
   private lateinit var loadingFragment: AudioBookLoadingFragment
-  private lateinit var networkConnectivity: NetworkConnectivityType
   private lateinit var parameters: AudioBookPlayerParameters
   private lateinit var player: PlayerType
   private lateinit var playerFragment: PlayerFragment
   private lateinit var playerScheduledExecutor: ScheduledExecutorService
   private lateinit var playerSubscription: Subscription
-  private lateinit var profiles: ProfilesControllerType
-  private lateinit var screenSize: ScreenSizeInformationType
   private lateinit var sleepTimer: PlayerSleepTimerType
-  private lateinit var strategies: AudioBookManifestStrategiesType
-  private lateinit var uiThread: UIThreadServiceType
   private var playerInitialized: Boolean = false
   private val reloadingManifest = AtomicBoolean(false)
 
@@ -163,11 +153,23 @@ class AudioBookPlayerActivity :
     Services.serviceDirectory()
 
   private val bookmarkService =
-    services.requireService(BookmarkServiceType::class.java)
+    this.services.requireService(BookmarkServiceType::class.java)
   private val profilesController =
-    services.requireService(ProfilesControllerType::class.java)
+    this.services.requireService(ProfilesControllerType::class.java)
   private val timeTrackingService =
-    services.requireService(TimeTrackingServiceType::class.java)
+    this.services.requireService(TimeTrackingServiceType::class.java)
+  private val profiles =
+    this.services.requireService(ProfilesControllerType::class.java)
+  private val uiThread =
+    this.services.requireService(UIThreadServiceType::class.java)
+  private val books =
+    this.services.requireService(BooksControllerType::class.java)
+  private val covers =
+    this.services.requireService(BookCoverProviderType::class.java)
+  private val networkConnectivity =
+    this.services.requireService(NetworkConnectivityType::class.java)
+  private val strategies =
+    this.services.requireService(AudioBookManifestStrategiesType::class.java)
 
   @Volatile
   private var destroying: Boolean = false
@@ -210,25 +212,6 @@ class AudioBookPlayerActivity :
 
     this.bookTitle = this.parameters.opdsEntry.title
     this.bookAuthor = this.findBookAuthor(this.parameters.opdsEntry)
-
-    val services = Services.serviceDirectory()
-
-    this.profiles =
-      services.requireService(ProfilesControllerType::class.java)
-    this.http =
-      services.requireService(LSHTTPClientType::class.java)
-    this.uiThread =
-      services.requireService(UIThreadServiceType::class.java)
-    this.screenSize =
-      services.requireService(ScreenSizeInformationType::class.java)
-    this.books =
-      services.requireService(BooksControllerType::class.java)
-    this.covers =
-      services.requireService(BookCoverProviderType::class.java)
-    this.networkConnectivity =
-      services.requireService(NetworkConnectivityType::class.java)
-    this.strategies =
-      services.requireService(AudioBookManifestStrategiesType::class.java)
 
     /*
      * Open the database format handle.
