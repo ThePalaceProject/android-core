@@ -10,7 +10,7 @@ jobs:
           distribution: 'zulu'
           java-version: 17
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Checkout submodules
         run: git submodule update --init --recursive
       - name: Verify release branch
