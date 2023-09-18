@@ -165,6 +165,7 @@ object AccountProvidersJSON {
       is BasicToken -> {
         val authObject = mapper.createObjectNode()
         authObject.put("type", BASIC_TOKEN_TYPE)
+        this.putConditionally(authObject, "authenticationURI", authentication.authenticationURI.toString())
         this.putConditionally(authObject, "barcodeFormat", authentication.barcodeFormat?.uppercase(Locale.ROOT))
         this.putConditionally(authObject, "description", authentication.description)
         this.putConditionally(authObject, "keyboard", authentication.keyboard.name)
@@ -462,6 +463,43 @@ object AccountProvidersJSON {
           passwordMaximumLength = passwordMaximumLength
         )
       }
+
+      BASIC_TOKEN_TYPE -> {
+        val labels =
+          this.toStringMap(JSONParserUtilities.getObject(container, "labels"))
+        val barcodeFormat =
+          JSONParserUtilities.getStringOrNull(container, "barcodeFormat")
+            ?.uppercase(Locale.ROOT)
+        val keyboard =
+          this.parseKeyboardType(JSONParserUtilities.getStringOrNull(container, "keyboard"))
+        val passwordMaximumLength =
+          JSONParserUtilities.getIntegerDefault(container, "passwordMaximumLength", 0)
+        val passwordKeyboard =
+          this.parseKeyboardType(
+            JSONParserUtilities.getStringOrNull(
+              container,
+              "passwordKeyboard"
+            )
+          )
+        val description =
+          JSONParserUtilities.getString(container, "description")
+        val logoURI =
+          JSONParserUtilities.getURIOrNull(container, "logo")
+        val authenticationURI =
+          JSONParserUtilities.getURIOrNull(container, "authenticationURI")
+
+        BasicToken(
+          barcodeFormat = barcodeFormat,
+          description = description,
+          keyboard = keyboard,
+          labels = labels,
+          logoURI = logoURI,
+          passwordKeyboard = passwordKeyboard,
+          passwordMaximumLength = passwordMaximumLength,
+          authenticationURI = authenticationURI
+        )
+      }
+
       COPPA_TYPE -> {
         COPPAAgeGate(
           greaterEqual13 =

@@ -589,7 +589,6 @@ dependencies {
     implementation(libs.timber)
     implementation(libs.transifex.common)
     implementation(libs.transifex.sdk)
-    implementation(libs.transifex.sdk)
     implementation(libs.transport.api)
     implementation(libs.transport.backend.cct)
     implementation(libs.transport.runtime)
