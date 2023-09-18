@@ -27,7 +27,7 @@ class ViewsForBasicToken(
   val onUsernamePasswordChangeListener: (AccountUsername, AccountPassword) -> Unit,
   val loginButton: Button,
   val resetPasswordLabel: TextView
-) : Base() {
+) : AccountAuthenticationViewBindings() {
 
   private val logger = LoggerFactory.getLogger(ViewsForBasicToken::class.java)
 
@@ -145,9 +145,8 @@ class ViewsForBasicToken(
       )
   }
 
-  override fun clearActual() {
-    this.user.removeTextChangedListener(this.userTextListener)
-    this.pass.removeTextChangedListener(this.passTextListener)
+  override fun blank() {
+    this.setUserAndPass("", "")
   }
 
   fun setUserAndPass(

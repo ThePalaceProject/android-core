@@ -734,7 +734,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
         )
 
         if (this.viewModel.pendingLogout) {
-          this.authenticationViews.setBasicUserAndPass("", "")
+          this.authenticationViews.blank()
           this.viewModel.pendingLogout = false
         }
         this.loginFormUnlock()

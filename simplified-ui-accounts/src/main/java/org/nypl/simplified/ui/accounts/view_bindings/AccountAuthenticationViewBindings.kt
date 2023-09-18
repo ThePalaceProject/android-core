@@ -28,13 +28,6 @@ sealed class AccountAuthenticationViewBindings {
   abstract fun unlock()
 
   /**
-   * Clear the views. This method should be called exactly once, and all other methods
-   * will raise exceptions after this method has been called.
-   */
-
-  abstract fun clear()
-
-  /**
    * Set the status of any relevant login button.
    */
 
@@ -45,4 +38,10 @@ sealed class AccountAuthenticationViewBindings {
     isVisible: Boolean,
     onClick: () -> Unit
   )
+
+  /**
+   * Set all of the visible fields to a blank, empty state. Does not affect locking.
+   */
+
+  abstract fun blank()
 }

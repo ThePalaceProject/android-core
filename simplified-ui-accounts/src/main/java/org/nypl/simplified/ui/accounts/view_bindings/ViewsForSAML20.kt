@@ -12,7 +12,7 @@ class ViewsForSAML20(
   override val viewGroup: ViewGroup,
   private val loginButton: Button,
   private val resetPasswordLabel: TextView
-) : Base() {
+) : AccountAuthenticationViewBindings() {
 
   private var loginText =
     this.viewGroup.resources.getString(R.string.accountLogin)
@@ -73,7 +73,7 @@ class ViewsForSAML20(
       status is AccountLoginButtonStatus.AsLoginButtonEnabled
   }
 
-  override fun clearActual() {
+  override fun blank() {
     // Nothing
   }
 
