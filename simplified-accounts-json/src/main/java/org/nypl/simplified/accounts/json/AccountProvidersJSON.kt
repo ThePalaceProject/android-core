@@ -489,14 +489,14 @@ object AccountProvidersJSON {
           JSONParserUtilities.getURIOrNull(container, "authenticationURI")
 
         BasicToken(
+          authenticationURI = authenticationURI,
           barcodeFormat = barcodeFormat,
           description = description,
           keyboard = keyboard,
           labels = labels,
           logoURI = logoURI,
           passwordKeyboard = passwordKeyboard,
-          passwordMaximumLength = passwordMaximumLength,
-          authenticationURI = authenticationURI
+          passwordMaximumLength = passwordMaximumLength
         )
       }
 
