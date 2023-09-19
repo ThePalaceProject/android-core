@@ -5,7 +5,7 @@ import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus
 
 class ViewsForOAuthWithIntermediary(
   override val viewGroup: ViewGroup
-) : Base() {
+) : AccountAuthenticationViewBindings() {
 
   override fun lock() {
     // Nothing
@@ -27,7 +27,7 @@ class ViewsForOAuthWithIntermediary(
     // Nothing
   }
 
-  override fun clearActual() {
+  override fun blank() {
     // Nothing
   }
 
