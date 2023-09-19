@@ -68,15 +68,17 @@ public final class OPDSAcquisitionFeedEntryParser implements OPDSAcquisitionFeed
 
   private void findAcquisitionAuthors(
     final Element element,
-    final OPDSAcquisitionFeedEntryBuilderType eb)
-    throws OPDSParseException {
-
+    final OPDSAcquisitionFeedEntryBuilderType eb) {
     final List<Element> e_authors =
       OPDSXML.getChildElementsWithName(element, ATOM_URI, "author");
     for (final Element ea : e_authors) {
-      final String name =
-        OPDSXML.getFirstChildElementTextWithName(Objects.requireNonNull(ea), ATOM_URI, "name");
-      eb.addAuthor(name);
+      final OptionType<Element> name =
+        OPDSXML.getFirstChildElementWithNameOptional(
+          Objects.requireNonNull(ea), ATOM_URI, "name");
+
+      if (name instanceof Some) {
+        eb.addAuthor(((Some<Element>) name).get().getTextContent());
+      }
     }
   }
 
