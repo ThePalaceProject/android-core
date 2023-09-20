@@ -3,10 +3,10 @@ package org.nypl.simplified.books.controller
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.base.Preconditions
+import one.irradia.mime.api.MIMECompatibility
 import one.irradia.mime.api.MIMEType
 import org.librarysimplified.http.api.LSHTTPAuthorizationBasic
 import org.librarysimplified.http.api.LSHTTPClientType
-import org.librarysimplified.http.api.LSHTTPRequestBuilderType
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType.Method.Post
 import org.librarysimplified.http.api.LSHTTPResponseStatus
 import org.librarysimplified.mdc.MDCKeys
@@ -374,7 +374,7 @@ class ProfileAccountLoginTask(
           request.password.value
         )
       )
-      .setMethod(LSHTTPRequestBuilderType.Method.Get)
+      .setMethod(Post(ByteArray(0), MIMECompatibility.applicationOctetStream))
       .build()
 
     httpRequest.execute().use { response ->
