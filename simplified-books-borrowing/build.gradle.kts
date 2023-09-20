@@ -36,10 +36,12 @@ dependencies {
     implementation(libs.r2.lcp)
     implementation(libs.r2.shared)
     implementation(libs.rxjava)
+    implementation(libs.service.wight.core)
     implementation(libs.slf4j)
     implementation(libs.truecommons.key.disable)
     implementation(libs.truecommons.shed)
     implementation(libs.truevfs.access)
     implementation(libs.truevfs.driver.zip)
+    implementation(libs.truevfs.kernel.impl)
     implementation(libs.truevfs.kernel.spec)
 }
