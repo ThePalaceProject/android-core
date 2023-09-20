@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <resources>
+  <dimen name="catalogLaneCoverMaximumWidth">96dp</dimen>
+  <dimen name="catalogBookDetailCoverMaximumWidth">128dp</dimen>
+
   <dimen name="catalogBookDetailStatusHeight">64dp</dimen>
   <dimen name="catalogBookDetailButtonsHeight">64dp</dimen>
   <dimen name="catalogFeedCoversSpace">8dp</dimen>

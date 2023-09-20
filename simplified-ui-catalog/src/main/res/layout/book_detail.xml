@@ -32,6 +32,7 @@
                     android:id="@+id/bookDetailCoverImage"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
+                    android:maxWidth="@dimen/catalogBookDetailCoverMaximumWidth"
                     android:adjustViewBounds="true"
                     android:contentDescription="@null"
                     android:scaleType="fitXY"
