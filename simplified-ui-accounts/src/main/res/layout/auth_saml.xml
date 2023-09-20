@@ -1,27 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  android:id="@+id/authSAML"
-  android:layout_width="match_parent"
-  android:layout_height="wrap_content"
-  android:layout_margin="16dp"
-  android:orientation="vertical">
+    android:id="@+id/authSAML"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    android:orientation="vertical">
 
-  <Button
-    android:id="@+id/authSAMLLogin"
-    android:layout_width="256dp"
-    android:layout_height="48dp"
-    android:layout_gravity="center"
-    android:layout_marginTop="16dp"
-    android:layout_marginBottom="16dp"
-    android:text="@string/accountPlaceholder" />
+    <Button
+        android:id="@+id/authSAMLLogin"
+        android:layout_width="256dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:contentDescription="@string/accountSAML20LoginLabel"
+        android:text="@string/accountPlaceholder" />
 
-  <TextView
-      android:id="@+id/resetPasswordLabel"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_gravity="center"
-      android:layout_marginBottom="8dp"
-      android:padding="8dp"
-      android:text="@string/accountForgotPassword" />
+    <TextView
+        android:id="@+id/resetPasswordLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="8dp"
+        android:padding="8dp"
+        android:text="@string/accountForgotPassword" />
 
 </LinearLayout>
