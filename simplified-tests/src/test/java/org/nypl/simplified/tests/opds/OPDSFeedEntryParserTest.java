@@ -28,6 +28,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
 
 import one.irradia.mime.api.MIMEType;
 import one.irradia.mime.vanilla.MIMEParser;
@@ -462,6 +463,18 @@ public final class OPDSFeedEntryParserTest {
       URI.create("urn:test"),
       OPDSFeedEntryParserTest.getResource("date-bug.xml")
     );
+  }
+
+  @Test
+  public void testBugPP465()
+    throws Exception {
+    final OPDSAcquisitionFeedEntryParserType parser = this.getParser();
+    final OPDSAcquisitionFeedEntry e = parser.parseEntryStream(URI.create("urn:test"),
+      OPDSFeedEntryParserTest.getResource(
+        "bug-pp-465.xml"));
+
+    Assertions.assertEquals(1, e.getAcquisitions().size());
+    Assertions.assertEquals(List.of(), e.getAuthors());
   }
 
   private OPDSAcquisitionFeedEntryParserType getParser() {

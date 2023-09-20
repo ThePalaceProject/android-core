@@ -9,7 +9,7 @@ import org.librarysimplified.ui.accounts.R
 class ViewsForCOPPAAgeGate(
   override val viewGroup: ViewGroup,
   val over13: SwitchCompat
-) : Base() {
+) : AccountAuthenticationViewBindings() {
 
   override fun lock() {
     // Nothing
@@ -31,8 +31,8 @@ class ViewsForCOPPAAgeGate(
     // Nothing
   }
 
-  override fun clearActual() {
-    this.over13.setOnClickListener {}
+  override fun blank() {
+    // Nothing
   }
 
   fun setState(

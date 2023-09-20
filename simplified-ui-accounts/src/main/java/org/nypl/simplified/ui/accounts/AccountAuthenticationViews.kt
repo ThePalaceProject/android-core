@@ -100,13 +100,13 @@ class AccountAuthenticationViews(
   }
 
   /**
-   * Clear all of the views in the collection. Must only be called once.
+   * Blank all of the views in the collection.
    *
-   * @see [AccountAuthenticationViewBindings.clear]
+   * @see [AccountAuthenticationViewBindings.blank]
    */
 
-  fun clear() {
-    this.viewGroups.forEach(AccountAuthenticationViewBindings::clear)
+  fun blank() {
+    this.viewGroups.forEach(AccountAuthenticationViewBindings::blank)
   }
 
   /**
