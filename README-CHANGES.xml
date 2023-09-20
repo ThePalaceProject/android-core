@@ -298,7 +298,7 @@
         <c:change date="2023-08-12T00:00:00+00:00" summary="Fixed crash when time tracking is not enabled."/>
       </c:changes>
     </c:release>
-    <c:release date="2023-09-20T12:49:37+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.6.0">
+    <c:release date="2023-09-20T14:23:59+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.6.0">
       <c:changes>
         <c:change date="2023-08-24T00:00:00+00:00" summary="Updated Kotlin version to 1.9.0"/>
         <c:change date="2023-08-28T00:00:00+00:00" summary="Fixed crash when opening an audiobook with a null manifest."/>
@@ -315,7 +315,12 @@
             <c:ticket id="PP-418"/>
           </c:tickets>
         </c:change>
-        <c:change date="2023-09-20T12:49:37+00:00" summary="Changed BasicToken login request method to POST."/>
+        <c:change date="2023-09-20T00:00:00+00:00" summary="Changed BasicToken login request method to POST."/>
+        <c:change date="2023-09-20T14:23:59+00:00" summary="Very wide covers have their widths restricted to avoid breaking the UI.">
+          <c:tickets>
+            <c:ticket id="PP-443"/>
+          </c:tickets>
+        </c:change>
       </c:changes>
     </c:release>
   </c:releases>
