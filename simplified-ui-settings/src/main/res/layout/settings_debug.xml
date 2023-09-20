@@ -235,5 +235,11 @@
       android:text="@string/settingsDevToggleOpenEBooksQAAccount" />
 
     <include layout="@layout/settings_debug_library_registry" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="@string/settingsDebugTransifex"/>
   </LinearLayout>
 </ScrollView>
