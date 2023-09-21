@@ -388,12 +388,28 @@ class AccountDetailFragment : Fragment(R.layout.account) {
 
     val barcode = this.parameters.barcode
     if (barcode == null) {
-      this.authenticationViews.setBasicUserAndPass("", "")
+      this.authenticationViews.blank()
     } else {
-      this.authenticationViews.setBasicUserAndPass(
-        user = barcode,
-        password = ""
-      )
+      when (this.viewModel.account.provider.authentication) {
+        is AccountProviderAuthenticationDescription.Basic -> {
+          this.authenticationViews.setBasicUserAndPass(
+            user = barcode,
+            password = ""
+          )
+        }
+        is AccountProviderAuthenticationDescription.BasicToken -> {
+          this.authenticationViews.setBasicTokenUserAndPass(
+            user = barcode,
+            password = ""
+          )
+        }
+        AccountProviderAuthenticationDescription.Anonymous,
+        is AccountProviderAuthenticationDescription.COPPAAgeGate,
+        is AccountProviderAuthenticationDescription.OAuthWithIntermediary,
+        is AccountProviderAuthenticationDescription.SAML2_0 -> {
+          // Nothing to do.
+        }
+      }
     }
 
     /*
@@ -404,6 +420,12 @@ class AccountDetailFragment : Fragment(R.layout.account) {
     } else {
       this.toolbar.visibility = View.VISIBLE
     }
+
+    /*
+     * Eagerly reconfigure the UI to ensure an up-to-date view when resuming from sleep.
+     */
+
+    this.reconfigureAccountUI()
   }
 
   private fun instantiateAlternativeAuthenticationViews() {
