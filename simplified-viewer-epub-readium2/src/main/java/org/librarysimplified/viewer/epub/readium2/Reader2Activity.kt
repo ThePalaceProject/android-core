@@ -211,7 +211,6 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
     this.supportFragmentManager.beginTransaction()
       .add(R.id.reader2FragmentHost, this.readerFragment)
-      .hide(this.tocFragment)
       .commit()
   }
 
