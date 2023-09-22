@@ -153,6 +153,10 @@ abstract class ProfileAccountLogoutTaskContract {
 
     this.server = MockWebServer()
     this.server.start()
+
+    val preferences = Mockito.mock(ProfilePreferences::class.java)
+    Mockito.`when`(this.profile.preferences()).thenReturn(preferences)
+    Mockito.`when`(preferences.areNotificationsEnabled).thenReturn(true)
   }
 
   @AfterEach
@@ -227,10 +231,6 @@ abstract class ProfileAccountLogoutTaskContract {
       .thenReturn(null)
     Mockito.`when`(this.profile.id)
       .thenReturn(this.profileID)
-
-    val preferences = Mockito.mock(ProfilePreferences::class.java)
-    Mockito.`when`(this.profile.preferences()).thenReturn(preferences)
-    Mockito.`when`(preferences.areNotificationsEnabled).thenReturn(true)
 
     Mockito.`when`(this.profile.accounts())
       .thenReturn(sortedMapOf(Pair(this.accountID, this.account)))

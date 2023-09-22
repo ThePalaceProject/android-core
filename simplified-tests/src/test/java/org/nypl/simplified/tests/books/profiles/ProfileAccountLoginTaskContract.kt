@@ -114,6 +114,10 @@ abstract class ProfileAccountLoginTaskContract {
     this.server = MockWebServer()
     this.server.start()
 
+    val preferences = Mockito.mock(ProfilePreferences::class.java)
+    Mockito.`when`(this.profile.preferences()).thenReturn(preferences)
+    Mockito.`when`(preferences.areNotificationsEnabled).thenReturn(true)
+
     this.profileWithoutDRM = """
 {
   "simplified:authorization_identifier": "6120696828384",
@@ -665,10 +669,6 @@ abstract class ProfileAccountLoginTaskContract {
       .thenReturn(this.profileID)
     Mockito.`when`(this.profile.accounts())
       .thenReturn(sortedMapOf(Pair(this.accountID, this.account)))
-
-    val preferences = Mockito.mock(ProfilePreferences::class.java)
-    Mockito.`when`(this.profile.preferences()).thenReturn(preferences)
-    Mockito.`when`(preferences.areNotificationsEnabled).thenReturn(true)
 
     Mockito.`when`(this.account.id)
       .thenReturn(this.accountID)
