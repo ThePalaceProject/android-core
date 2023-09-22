@@ -50,6 +50,7 @@ import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
 import org.nypl.simplified.patron.PatronUserProfileParsers
 import org.nypl.simplified.patron.api.PatronUserProfileParsersType
 import org.nypl.simplified.profiles.api.ProfileID
+import org.nypl.simplified.profiles.api.ProfilePreferences
 import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.nypl.simplified.tests.books.controller.FakeAccounts.fakeAccountProvider
 import org.nypl.simplified.tests.mocking.MockAccountLogoutStringResources
@@ -226,6 +227,11 @@ abstract class ProfileAccountLogoutTaskContract {
       .thenReturn(null)
     Mockito.`when`(this.profile.id)
       .thenReturn(this.profileID)
+
+    val preferences = Mockito.mock(ProfilePreferences::class.java)
+    Mockito.`when`(this.profile.preferences()).thenReturn(preferences)
+    Mockito.`when`(preferences.areNotificationsEnabled).thenReturn(true)
+
     Mockito.`when`(this.profile.accounts())
       .thenReturn(sortedMapOf(Pair(this.accountID, this.account)))
     Mockito.`when`(this.account.id)
@@ -282,7 +288,7 @@ abstract class ProfileAccountLogoutTaskContract {
       this.bookRegistry.books().values.all { it.status is BookStatus.Loaned.LoanedNotDownloaded }
     )
 
-    Mockito.verify(tokenHttp, Mockito.times(1)).deleteFCMTokenForProfileAccount(account)
+    Mockito.verify(tokenHttp, Mockito.times(1)).deleteFCMTokenForProfileAccount(account, true)
   }
 
   /**

@@ -162,6 +162,16 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
   private fun askForNotificationsPermission() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      val services =
+        Services.serviceDirectory()
+      val profiles =
+        services.requireService(ProfilesControllerType::class.java)
+
+      if (!profiles.profileCurrent().preferences().areNotificationsEnabled) {
+        logger.debug("Notifications are currently disabled, so we won't be asking for permissions")
+        return
+      }
+
       ActivityCompat.requestPermissions(
         this,
         arrayOf(Manifest.permission.POST_NOTIFICATIONS),

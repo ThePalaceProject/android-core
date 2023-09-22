@@ -326,6 +326,10 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
       is SR2BookLoadingFailed ->
         this.onBookLoadingFailed(event.exception)
+
+      SR2ReaderViewEvent.SR2ReaderViewNavigationEvent.SR2ReaderViewNavigationOpenSearch -> {
+        //TODO
+      }
     }
   }
 
@@ -516,6 +520,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       is SR2CommandExecutionStarted,
       is SR2CommandExecutionRunningLong,
       is SR2CommandExecutionSucceeded,
+      is SR2Event.SR2CommandEvent.SR2CommandSearchResults,
       is SR2CommandExecutionFailed -> {
         // Nothing
       }

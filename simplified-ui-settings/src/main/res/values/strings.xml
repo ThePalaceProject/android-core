@@ -34,6 +34,7 @@
   <string name="settingsDevDrmSupport">DRM Support</string>
   <string name="settingsDevEnableHiddenLibraries">Enable Hidden Libraries</string>
   <string name="settingsDevEnableManualLCPPassphrase">Enable Manual LCP Passphrase</string>
+  <string name="settingsDevEnablePushNotifications">Enable Push Notifications</string>
   <string name="settingsDevEnableTimeTracking">Enable Time Tracking</string>
   <string name="settingsDevFailNextStartup">Cause the next application startup to fail</string>
   <string name="settingsDevForgetAllAnnouncements">Forget All Announcements</string>

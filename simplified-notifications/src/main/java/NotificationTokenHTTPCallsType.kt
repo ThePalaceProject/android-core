@@ -6,7 +6,7 @@ import org.nypl.simplified.profiles.api.ProfileReadableType
 interface NotificationTokenHTTPCallsType {
   fun registerFCMTokenForProfileAccounts(profile: ProfileReadableType)
 
-  fun registerFCMTokenForProfileAccount(account: AccountType)
+  fun registerFCMTokenForProfileAccount(account: AccountType, areNotificationsEnabled: Boolean)
 
-  fun deleteFCMTokenForProfileAccount(account: AccountType)
+  fun deleteFCMTokenForProfileAccount(account: AccountType, areNotificationsEnabled: Boolean)
 }

@@ -44,6 +44,7 @@ import org.nypl.simplified.notifications.NotificationTokenHTTPCalls
 import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
 import org.nypl.simplified.patron.PatronUserProfileParsers
 import org.nypl.simplified.profiles.api.ProfileID
+import org.nypl.simplified.profiles.api.ProfilePreferences
 import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest
 import org.nypl.simplified.taskrecorder.api.TaskResult
@@ -664,6 +665,11 @@ abstract class ProfileAccountLoginTaskContract {
       .thenReturn(this.profileID)
     Mockito.`when`(this.profile.accounts())
       .thenReturn(sortedMapOf(Pair(this.accountID, this.account)))
+
+    val preferences = Mockito.mock(ProfilePreferences::class.java)
+    Mockito.`when`(this.profile.preferences()).thenReturn(preferences)
+    Mockito.`when`(preferences.areNotificationsEnabled).thenReturn(true)
+
     Mockito.`when`(this.account.id)
       .thenReturn(this.accountID)
     Mockito.`when`(this.account.provider)
@@ -717,7 +723,8 @@ abstract class ProfileAccountLoginTaskContract {
     assertEquals(this.server.url("patron"), req0.requestUrl)
     assertEquals(1, this.server.requestCount)
 
-    Mockito.verify(tokenHttp, Mockito.times(1)).registerFCMTokenForProfileAccount(account)
+    Mockito.verify(tokenHttp, Mockito.times(1))
+      .registerFCMTokenForProfileAccount(account, true)
   }
 
   /**
