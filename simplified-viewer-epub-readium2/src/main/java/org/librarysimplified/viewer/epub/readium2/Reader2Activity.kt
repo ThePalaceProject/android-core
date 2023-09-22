@@ -24,6 +24,7 @@ import org.librarysimplified.r2.api.SR2Event.SR2CommandEvent.SR2CommandEventComp
 import org.librarysimplified.r2.api.SR2Event.SR2CommandEvent.SR2CommandEventCompleted.SR2CommandExecutionSucceeded
 import org.librarysimplified.r2.api.SR2Event.SR2CommandEvent.SR2CommandExecutionRunningLong
 import org.librarysimplified.r2.api.SR2Event.SR2CommandEvent.SR2CommandExecutionStarted
+import org.librarysimplified.r2.api.SR2Event.SR2CommandEvent.SR2CommandSearchResults
 import org.librarysimplified.r2.api.SR2Event.SR2Error.SR2ChapterNonexistent
 import org.librarysimplified.r2.api.SR2Event.SR2Error.SR2WebViewInaccessible
 import org.librarysimplified.r2.api.SR2Event.SR2ExternalLinkSelected
@@ -39,10 +40,12 @@ import org.librarysimplified.r2.views.SR2ReaderViewEvent
 import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewBookEvent.SR2BookLoadingFailed
 import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewControllerEvent.SR2ControllerBecameAvailable
 import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewNavigationEvent.SR2ReaderViewNavigationClose
+import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewNavigationEvent.SR2ReaderViewNavigationOpenSearch
 import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewNavigationEvent.SR2ReaderViewNavigationOpenTOC
 import org.librarysimplified.r2.views.SR2ReaderViewModel
 import org.librarysimplified.r2.views.SR2ReaderViewModelFactory
 import org.librarysimplified.r2.views.SR2TOCFragment
+import org.librarysimplified.r2.views.search.SR2SearchFragment
 import org.librarysimplified.services.api.Services
 import org.nypl.drm.core.AdobeAdeptFileAsset
 import org.nypl.drm.core.AxisNowFileAsset
@@ -121,6 +124,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
   private lateinit var parameters: Reader2ActivityParameters
   private lateinit var readerFragment: Fragment
   private lateinit var readerModel: SR2ReaderViewModel
+  private lateinit var searchFragment: Fragment
   private lateinit var tocFragment: Fragment
   private var controller: SR2ControllerType? = null
   private var controllerSubscription: Disposable? = null
@@ -189,29 +193,25 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       WebView.setWebContentsDebuggingEnabled(true)
     }
 
-    if (savedInstanceState == null) {
-      this.readerFragment =
-        this.supportFragmentManager.fragmentFactory.instantiate(
-          this.classLoader,
-          SR2ReaderFragment::class.java.name
-        )
-      this.tocFragment =
-        this.supportFragmentManager.fragmentFactory.instantiate(
-          this.classLoader,
-          SR2TOCFragment::class.java.name
-        )
+    this.readerFragment =
+      this.supportFragmentManager.fragmentFactory.instantiate(
+        this.classLoader,
+        SR2ReaderFragment::class.java.name
+      )
+    this.searchFragment =
+      this.supportFragmentManager.fragmentFactory.instantiate(
+        this.classLoader,
+        SR2SearchFragment::class.java.name
+      )
+    this.tocFragment =
+      this.supportFragmentManager.fragmentFactory.instantiate(
+        this.classLoader,
+        SR2TOCFragment::class.java.name
+      )
 
-      this.supportFragmentManager.beginTransaction()
-        .replace(R.id.reader2FragmentHost, this.readerFragment, READER_FRAGMENT_TAG)
-        .add(R.id.reader2FragmentHost, this.tocFragment, TOC_FRAGMENT_TAG)
-        .hide(this.tocFragment)
-        .commit()
-    } else {
-      this.readerFragment =
-        this.supportFragmentManager.findFragmentByTag(READER_FRAGMENT_TAG) as SR2ReaderFragment
-      this.tocFragment =
-        this.supportFragmentManager.findFragmentByTag(TOC_FRAGMENT_TAG) as SR2TOCFragment
-    }
+    this.supportFragmentManager.beginTransaction()
+      .add(R.id.reader2FragmentHost, this.readerFragment)
+      .commit()
   }
 
   override fun onStart() {
@@ -326,6 +326,10 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
       is SR2BookLoadingFailed ->
         this.onBookLoadingFailed(event.exception)
+
+      SR2ReaderViewNavigationOpenSearch -> {
+        this.openSearch()
+      }
     }
   }
 
@@ -435,6 +439,8 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
   override fun onBackPressed() {
     if (this.tocFragment.isVisible) {
       this.tocClose()
+    } else if (this.searchFragment.isVisible) {
+      this.searchClose()
     } else {
       super.onBackPressed()
     }
@@ -516,7 +522,8 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       is SR2CommandExecutionStarted,
       is SR2CommandExecutionRunningLong,
       is SR2CommandExecutionSucceeded,
-      is SR2CommandExecutionFailed -> {
+      is SR2CommandExecutionFailed,
+      is SR2CommandSearchResults -> {
         // Nothing
       }
     }
@@ -545,18 +552,51 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
     this.logger.debug("TOC opening")
 
-    val currentTocFragment = this.tocFragment
-    this.tocFragment =
-      this.supportFragmentManager.fragmentFactory.instantiate(
-        this.classLoader,
-        SR2TOCFragment::class.java.name
-      )
-    this.supportFragmentManager.beginTransaction()
-      .remove(currentTocFragment)
-      .add(R.id.reader2FragmentHost, this.tocFragment)
+    val transaction = this.supportFragmentManager.beginTransaction()
       .hide(this.readerFragment)
-      .show(this.tocFragment)
+
+    if (this.tocFragment.isAdded) {
+      transaction.show(tocFragment)
+    } else {
+      transaction.add(R.id.reader2FragmentHost, this.tocFragment)
+    }
+
+    transaction.commit()
+  }
+
+  /**
+   * Close the searching screen
+   */
+
+  private fun searchClose() {
+    this.uiThread.checkIsUIThread()
+
+    this.logger.debug("Search closing")
+    this.supportFragmentManager.beginTransaction()
+      .hide(this.searchFragment)
+      .show(this.readerFragment)
       .commit()
+  }
+
+  /**
+   * Open the searching screen
+   */
+
+  private fun openSearch() {
+    this.uiThread.checkIsUIThread()
+
+    this.logger.debug("Search opening")
+
+    val transaction = this.supportFragmentManager.beginTransaction()
+      .hide(this.readerFragment)
+
+    if (this.searchFragment.isAdded) {
+      transaction.show(searchFragment)
+    } else {
+      transaction.add(R.id.reader2FragmentHost, this.searchFragment)
+    }
+
+    transaction.commit()
   }
 
   /**

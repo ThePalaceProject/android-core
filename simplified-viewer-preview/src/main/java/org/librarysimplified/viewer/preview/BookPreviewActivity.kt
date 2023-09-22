@@ -23,9 +23,15 @@ import org.librarysimplified.r2.views.SR2ControllerReference
 import org.librarysimplified.r2.views.SR2ReaderFragment
 import org.librarysimplified.r2.views.SR2ReaderParameters
 import org.librarysimplified.r2.views.SR2ReaderViewEvent
+import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewBookEvent.SR2BookLoadingFailed
+import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewControllerEvent.SR2ControllerBecameAvailable
+import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewNavigationEvent.SR2ReaderViewNavigationClose
+import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewNavigationEvent.SR2ReaderViewNavigationOpenSearch
+import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewNavigationEvent.SR2ReaderViewNavigationOpenTOC
 import org.librarysimplified.r2.views.SR2ReaderViewModel
 import org.librarysimplified.r2.views.SR2ReaderViewModelFactory
 import org.librarysimplified.r2.views.SR2TOCFragment
+import org.librarysimplified.r2.views.search.SR2SearchFragment
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.accessibility.AccessibilityServiceType
 import org.nypl.simplified.books.book_registry.BookPreviewStatus
@@ -81,6 +87,7 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
   private lateinit var previewContainer: FrameLayout
   private lateinit var readerFragment: SR2ReaderFragment
   private lateinit var readerModel: SR2ReaderViewModel
+  private lateinit var searchFragment: SR2SearchFragment
   private lateinit var tocFragment: SR2TOCFragment
 
   private var file: File? = null
@@ -116,6 +123,8 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
   override fun onBackPressed() {
     if (::tocFragment.isInitialized && this.tocFragment.isVisible) {
       this.closeTOC()
+    } else if (::searchFragment.isInitialized && this.searchFragment.isVisible) {
+      this.closeSearch()
     } else {
       if (file?.exists() == true) {
         file?.delete()
@@ -132,20 +141,20 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
     this.uiThread.checkIsUIThread()
 
     return when (event) {
-      SR2ReaderViewEvent.SR2ReaderViewNavigationEvent.SR2ReaderViewNavigationClose -> {
+      SR2ReaderViewNavigationClose -> {
         onBackPressed()
       }
-      SR2ReaderViewEvent.SR2ReaderViewNavigationEvent.SR2ReaderViewNavigationOpenTOC -> {
+      SR2ReaderViewNavigationOpenTOC -> {
         openTOC()
       }
-      is SR2ReaderViewEvent.SR2ReaderViewControllerEvent.SR2ControllerBecameAvailable -> {
+      is SR2ControllerBecameAvailable -> {
         this.onControllerBecameAvailable(event.reference)
       }
-      is SR2ReaderViewEvent.SR2ReaderViewBookEvent.SR2BookLoadingFailed -> {
+      is SR2BookLoadingFailed -> {
         handlePreviewDownloadFailed()
       }
-      else -> {
-        // do nothing
+      SR2ReaderViewNavigationOpenSearch -> {
+        openSearch()
       }
     }
   }
@@ -232,6 +241,10 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
       parameters = parameters
     )
 
+    searchFragment = SR2SearchFragment.create(
+      parameters = parameters
+    )
+
     tocFragment = SR2TOCFragment.create(
       parameters = parameters
     )
@@ -264,6 +277,33 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
     this.logger.debug("TOC closing")
     this.supportFragmentManager.beginTransaction()
       .hide(this.tocFragment)
+      .show(this.readerFragment)
+      .commit()
+  }
+
+  private fun openSearch() {
+    this.uiThread.checkIsUIThread()
+
+    this.logger.debug("Search opening")
+
+    val transaction = this.supportFragmentManager.beginTransaction()
+      .hide(readerFragment)
+
+    if (searchFragment.isAdded) {
+      transaction.show(searchFragment)
+    } else {
+      transaction.add(R.id.preview_container, searchFragment)
+    }
+
+    transaction.commitAllowingStateLoss()
+  }
+
+  private fun closeSearch() {
+    this.uiThread.checkIsUIThread()
+
+    this.logger.debug("Search closing")
+    this.supportFragmentManager.beginTransaction()
+      .hide(this.searchFragment)
       .show(this.readerFragment)
       .commit()
   }
