@@ -65,6 +65,7 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
   private lateinit var syncAccountsButton: Button
   private lateinit var enableOpenEBooksQA: Button
   private lateinit var toolbar: NeutralToolbar
+  private lateinit var areNotificationsEnabled: SwitchCompat
   private lateinit var isManualLCPPassphraseEnabled: SwitchCompat
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -98,6 +99,8 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
       view.findViewById(R.id.settingsVersionDevSeenLibrarySelectionScreen)
     this.isManualLCPPassphraseEnabled =
       view.findViewById(R.id.settingsVersionDevIsManualLCPPassphraseEnabled)
+    this.areNotificationsEnabled =
+      view.findViewById(R.id.settingsVersionDevAreNotificationsEnabled)
     this.cardCreatorFakeLocation =
       view.findViewById(R.id.settingsVersionDevCardCreatorLocationSwitch)
     this.showOnlySupportedBooks =
@@ -138,6 +141,8 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
       this.viewModel.cardCreatorFakeLocation
     this.isManualLCPPassphraseEnabled.isChecked =
       this.viewModel.isManualLCPPassphraseEnabled
+    this.areNotificationsEnabled.isChecked =
+      this.viewModel.areNotificationsEnabled
     this.showOnlySupportedBooks.isChecked =
       this.viewModel.showOnlySupportedBooks
     this.crashlyticsId.text =
@@ -240,6 +245,9 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
     }
     this.isManualLCPPassphraseEnabled.setOnCheckedChangeListener { _, isChecked ->
       this.viewModel.isManualLCPPassphraseEnabled = isChecked
+    }
+    this.areNotificationsEnabled.setOnCheckedChangeListener { _, isChecked ->
+      this.viewModel.areNotificationsEnabled = isChecked
     }
 
     /*

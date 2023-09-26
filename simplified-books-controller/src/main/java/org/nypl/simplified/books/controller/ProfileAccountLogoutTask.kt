@@ -144,7 +144,10 @@ class ProfileAccountLogoutTask(
   private fun runFCMTokenDeletion() {
     this.debug("running fcm token deletion")
 
-    notificationTokenHttpCalls.deleteFCMTokenForProfileAccount(account)
+    notificationTokenHttpCalls.deleteFCMTokenForProfileAccount(
+      account = account,
+      areNotificationsEnabled = profile.preferences().areNotificationsEnabled
+    )
   }
 
   private fun handlePatronUserProfile(): PatronDRMAdobe? {
