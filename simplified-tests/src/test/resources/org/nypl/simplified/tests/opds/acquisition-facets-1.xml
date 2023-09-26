@@ -55,14 +55,14 @@
   <link
     href="http://circulation.alpha.librarysimplified.org/feed/Picture%20Books?order=title"
     opds:facetGroup="Sort by"
-    simplified:facetGroupType="Something"
+    facetGroupType="Something"
     rel="http://opds-spec.org/facet"
     title="Title" />
   <link
     opds:activeFacet="true"
     href="http://circulation.alpha.librarysimplified.org/feed/Picture%20Books?order=author"
     opds:facetGroup="Sort by"
-    simplified:facetGroupType="Something"
+    facetGroupType="Something"
     rel="http://opds-spec.org/facet"
     title="Author" />
   <link

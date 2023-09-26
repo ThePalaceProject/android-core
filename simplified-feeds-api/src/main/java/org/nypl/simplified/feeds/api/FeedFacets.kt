@@ -38,9 +38,9 @@ object FeedFacets {
     groups: Map<String, List<FeedFacet>>
   ): List<FeedFacet>? {
     for (groupName in groups.keys) {
-      val facets = groups[groupName]!!
-      if (!facets.isEmpty()) {
-        val facet = facets.get(0)
+      val facets = groups[groupName].orEmpty()
+      if (facets.isNotEmpty()) {
+        val facet = facets.first()
         if (facetIsEntryPointTyped(facet)) {
           return facets
         }
