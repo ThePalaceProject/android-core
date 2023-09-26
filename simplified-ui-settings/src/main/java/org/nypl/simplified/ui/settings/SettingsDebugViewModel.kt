@@ -141,6 +141,18 @@ class SettingsDebugViewModel(application: Application) : AndroidViewModel(applic
       }
     }
 
+  var areNotificationsEnabled: Boolean
+    get() =
+      this.profilesController
+        .profileCurrent()
+        .preferences()
+        .areNotificationsEnabled
+    set(value) {
+      this.profilesController.profileUpdate { description ->
+        description.copy(preferences = description.preferences.copy(areNotificationsEnabled = value))
+      }
+    }
+
   var isBootFailureEnabled: Boolean
     get() =
       BootFailureTesting.isBootFailureEnabled(getApplication())

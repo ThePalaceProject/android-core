@@ -243,7 +243,10 @@ class ProfileAccountLoginTask(
         this.handlePatronUserProfile()
         this.runDeviceActivation()
         this.account.setLoginState(AccountLoggedIn(this.credentials))
-        notificationTokenHttpCalls.registerFCMTokenForProfileAccount(account)
+        notificationTokenHttpCalls.registerFCMTokenForProfileAccount(
+          account = account,
+          areNotificationsEnabled = profile.preferences().areNotificationsEnabled
+        )
         this.steps.finishSuccess(Unit)
       }
 
@@ -314,7 +317,10 @@ class ProfileAccountLoginTask(
         this.handlePatronUserProfile()
         this.runDeviceActivation()
         this.account.setLoginState(AccountLoggedIn(this.credentials))
-        notificationTokenHttpCalls.registerFCMTokenForProfileAccount(account)
+        notificationTokenHttpCalls.registerFCMTokenForProfileAccount(
+          account = account,
+          areNotificationsEnabled = profile.preferences().areNotificationsEnabled
+        )
         this.steps.finishSuccess(Unit)
       }
 
@@ -358,7 +364,10 @@ class ProfileAccountLoginTask(
     this.handlePatronUserProfile()
     this.runDeviceActivation()
     this.account.setLoginState(AccountLoggedIn(this.credentials))
-    notificationTokenHttpCalls.registerFCMTokenForProfileAccount(account)
+    notificationTokenHttpCalls.registerFCMTokenForProfileAccount(
+      account = account,
+      areNotificationsEnabled = profile.preferences().areNotificationsEnabled
+    )
     return this.steps.finishSuccess(Unit)
   }
 
@@ -397,7 +406,10 @@ class ProfileAccountLoginTask(
           this.handlePatronUserProfile()
           this.runDeviceActivation()
           this.account.setLoginState(AccountLoggedIn(this.credentials))
-          notificationTokenHttpCalls.registerFCMTokenForProfileAccount(account)
+          notificationTokenHttpCalls.registerFCMTokenForProfileAccount(
+            account = account,
+            areNotificationsEnabled = profile.preferences().areNotificationsEnabled
+          )
           return this.steps.finishSuccess(Unit)
         }
 
