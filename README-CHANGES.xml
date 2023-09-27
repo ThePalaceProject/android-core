@@ -298,7 +298,7 @@
         <c:change date="2023-08-12T00:00:00+00:00" summary="Fixed crash when time tracking is not enabled."/>
       </c:changes>
     </c:release>
-    <c:release date="2023-09-26T14:26:10+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.6.0">
+    <c:release date="2023-09-26T13:54:16+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.6.0">
       <c:changes>
         <c:change date="2023-08-24T00:00:00+00:00" summary="Updated Kotlin version to 1.9.0"/>
         <c:change date="2023-08-28T00:00:00+00:00" summary="Fixed crash when opening an audiobook with a null manifest."/>
@@ -328,8 +328,7 @@
         </c:change>
         <c:change date="2023-09-21T00:00:00+00:00" summary="Added support to EPUB text searching."/>
         <c:change date="2023-09-22T00:00:00+00:00" summary="Added push notifications option to DEV settings."/>
-        <c:change date="2023-09-26T00:00:00+00:00" summary="Fixed bookmarks not being deleted."/>
-        <c:change date="2023-09-26T14:26:10+00:00" summary="Updated OPDS facet parsing by ignoring the content of facetGroupType."/>
+        <c:change date="2023-09-26T13:54:16+00:00" summary="Fixed bookmarks not being deleted."/>
       </c:changes>
     </c:release>
   </c:releases>

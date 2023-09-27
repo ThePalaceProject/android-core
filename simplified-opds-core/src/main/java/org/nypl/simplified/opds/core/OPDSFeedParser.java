@@ -34,6 +34,7 @@ import static org.nypl.simplified.opds.core.OPDSFeedConstants.AUTHENTICATION_DOC
 import static org.nypl.simplified.opds.core.OPDSFeedConstants.DRM_URI;
 import static org.nypl.simplified.opds.core.OPDSFeedConstants.FACET_URI_TEXT;
 import static org.nypl.simplified.opds.core.OPDSFeedConstants.OPDS_URI_TEXT;
+import static org.nypl.simplified.opds.core.OPDSFeedConstants.SIMPLIFIED_URI_TEXT;
 
 /**
  * <p>The default implementation of the {@link OPDSFeedParserType}.</p>
@@ -107,8 +108,8 @@ public final class OPDSFeedParser implements OPDSFeedParserType {
   }
 
   private static OptionType<String> parseFacetGroupType(Element e) {
-    if (e.hasAttribute("facetGroupType")) {
-      return Option.some(e.getAttribute("facetGroupType"));
+    if (e.hasAttributeNS(SIMPLIFIED_URI_TEXT, "facetGroupType")) {
+      return Option.some(e.getAttributeNS(SIMPLIFIED_URI_TEXT, "facetGroupType"));
     } else {
       return Option.none();
     }
