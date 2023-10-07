@@ -8,6 +8,7 @@ dependencies {
     implementation(project(":simplified-services-api"))
 
     implementation(libs.irradia.mime.api)
+    implementation(libs.kotlinx.datetime)
     implementation(libs.jackson.core)
     implementation(libs.jackson.databind)
     implementation(libs.joda.time)
@@ -17,5 +18,6 @@ dependencies {
     implementation(libs.rxandroid2)
     implementation(libs.rxjava2)
     implementation(libs.slf4j)
-    implementation(libs.ulid.generator)
+    implementation(libs.ulid.kotlin)
+    implementation(libs.ulid.kotlin.jvm)
 }
