@@ -201,9 +201,10 @@ val dependencyObjects = listOf(
     libs.junit.jupiter.vintage,
     libs.junit.platform.commons,
     libs.junit.platform.engine,
-    libs.kotlinx.coroutines,
     libs.kotlin.reflect,
     libs.kotlin.stdlib,
+    libs.kotlinx.coroutines,
+    libs.kotlinx.datetime,
     libs.logback.classic,
     libs.logback.core,
     libs.mockito.android,
@@ -293,7 +294,8 @@ val dependencyObjects = listOf(
     libs.truevfs.driver.zip,
     libs.truevfs.kernel.impl,
     libs.truevfs.kernel.spec,
-    libs.ulid.generator,
+    libs.ulid.kotlin,
+    libs.ulid.kotlin.jvm,
 )
 
 dependencies {

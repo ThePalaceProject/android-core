@@ -521,6 +521,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.core.jvm)
     implementation(libs.kotlinx.coroutines.play.services)
+    implementation(libs.kotlinx.datetime)
     implementation(libs.logback.android)
     implementation(libs.moznion.uribuildertiny)
     implementation(libs.nano.httpd)
@@ -608,4 +609,6 @@ dependencies {
     implementation(libs.truevfs.driver.zip)
     implementation(libs.truevfs.kernel.impl)
     implementation(libs.truevfs.kernel.spec)
+    implementation(libs.ulid.kotlin)
+    implementation(libs.ulid.kotlin.jvm)
 }

@@ -314,6 +314,8 @@ class TimeTrackingService(
           .account(AccountID(UUID.fromString(timeTrackingInfo.accountId)))
       )
     } catch (exception: Exception) {
+      logger.error("Error while saving time tracking info remotely: ", exception)
+
       // in case an exception occurs, we keep the original time entries
       timeTrackingInfo.timeEntries
     }
