@@ -13,8 +13,8 @@ import org.nypl.simplified.android.ktx.supportActionBar
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.fragmentListeners
-import org.nypl.simplified.ui.neutrality.NeutralToolbar
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.theme.core.PalaceToolbar
 
 /**
  * The main settings page containing links to other settings pages.
@@ -42,7 +42,7 @@ class SettingsMainFragment : PreferenceFragmentCompat() {
   private lateinit var settingsPrivacy: Preference
   private lateinit var settingsVersion: Preference
   private lateinit var settingsVersionCore: Preference
-  private lateinit var toolbar: NeutralToolbar
+  private lateinit var toolbar: PalaceToolbar
 
   private var toast: Toast? = null
   private var tapToDebugSettings = 7
@@ -117,7 +117,7 @@ class SettingsMainFragment : PreferenceFragmentCompat() {
     super.onViewCreated(view, savedInstanceState)
 
     this.toolbar =
-      view.rootView.findViewWithTag(NeutralToolbar.neutralToolbarName)
+      view.rootView.findViewWithTag(PalaceToolbar.palaceToolbarName)
   }
 
   private fun configureVersion(preference: Preference) {

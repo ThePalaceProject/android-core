@@ -11,7 +11,6 @@ dependencies {
     implementation(project(":simplified-ui-branding"))
     implementation(project(":simplified-ui-errorpage"))
     implementation(project(":simplified-ui-listeners-api"))
-    implementation(project(":simplified-ui-neutrality"))
     implementation(project(":simplified-webview"))
 
     implementation(libs.androidx.activity)
@@ -43,6 +42,7 @@ dependencies {
     implementation(libs.joda.time)
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlin.stdlib)
+    implementation(libs.palace.theme)
     implementation(libs.rxandroid2)
     implementation(libs.rxjava2)
     implementation(libs.rxjava2.extensions)

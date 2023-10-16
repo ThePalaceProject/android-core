@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -32,9 +33,9 @@
                     android:id="@+id/bookDetailCoverImage"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:maxWidth="@dimen/catalogBookDetailCoverMaximumWidth"
                     android:adjustViewBounds="true"
                     android:contentDescription="@null"
+                    android:maxWidth="@dimen/catalogBookDetailCoverMaximumWidth"
                     android:scaleType="fitXY"
                     app:srcCompat="@drawable/cover_loading" />
             </androidx.cardview.widget.CardView>

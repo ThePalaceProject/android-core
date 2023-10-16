@@ -11,9 +11,9 @@ import androidx.fragment.app.Fragment
 import org.nypl.simplified.android.ktx.supportActionBar
 import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.fragmentListeners
-import org.nypl.simplified.ui.neutrality.NeutralToolbar
 import org.nypl.simplified.webview.WebViewUtilities
 import org.librarysimplified.ui.accounts.R
+import org.thepalaceproject.theme.core.PalaceToolbar
 
 /**
  * A fragment that shows a WebView
@@ -23,7 +23,7 @@ class AccountCardCreatorFragment : Fragment(R.layout.fragment_account_card_creat
 
   private val listener: FragmentListenerType<AccountDetailEvent> by fragmentListeners()
 
-  private lateinit var toolbar: NeutralToolbar
+  private lateinit var toolbar: PalaceToolbar
   private lateinit var webView: WebView
 
   companion object {
@@ -46,7 +46,7 @@ class AccountCardCreatorFragment : Fragment(R.layout.fragment_account_card_creat
     super.onViewCreated(view, savedInstanceState)
 
     this.toolbar =
-      view.findViewById(R.id.toolbar)
+      view.findViewWithTag(PalaceToolbar.palaceToolbarName)
     this.webView =
       view.findViewById(R.id.web_view)
 

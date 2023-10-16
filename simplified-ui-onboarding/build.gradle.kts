@@ -9,7 +9,6 @@ dependencies {
     implementation(project(":simplified-ui-branding"))
     implementation(project(":simplified-ui-errorpage"))
     implementation(project(":simplified-ui-listeners-api"))
-    implementation(project(":simplified-ui-neutrality"))
 
     implementation(libs.androidx.activity)
     implementation(libs.androidx.appcompat)
@@ -21,8 +20,8 @@ dependencies {
     implementation(libs.androidx.drawerlayout)
     implementation(libs.androidx.fragment)
     implementation(libs.androidx.fragment.ktx)
-    implementation(libs.androidx.lifecycle.extensions)
     implementation(libs.androidx.lifecycle.common)
+    implementation(libs.androidx.lifecycle.extensions)
     implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.androidx.lifecycle.viewmodel.savedstate)
     implementation(libs.androidx.preference)
@@ -32,5 +31,6 @@ dependencies {
     implementation(libs.google.material)
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlin.stdlib)
+    implementation(libs.palace.theme)
     implementation(libs.slf4j)
 }

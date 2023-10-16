@@ -37,9 +37,9 @@ import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.fragmentListeners
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
-import org.nypl.simplified.ui.neutrality.NeutralToolbar
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.theme.core.PalaceToolbar
 import java.net.URI
 
 /**
@@ -129,7 +129,7 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
   private lateinit var statusInProgressText: TextView
   private lateinit var summary: TextView
   private lateinit var title: TextView
-  private lateinit var toolbar: NeutralToolbar
+  private lateinit var toolbar: PalaceToolbar
 
   private val dateFormatter =
     DateTimeFormatterBuilder()
@@ -175,7 +175,7 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
     super.onViewCreated(view, savedInstanceState)
 
     this.toolbar =
-      view.rootView.findViewWithTag(NeutralToolbar.neutralToolbarName)
+      view.rootView.findViewWithTag(PalaceToolbar.palaceToolbarName)
 
     this.viewModel.bookWithStatusLive.observe(this.viewLifecycleOwner) { info ->
       reconfigureUI(info.first, info.second)

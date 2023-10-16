@@ -17,8 +17,8 @@ import org.librarysimplified.ui.errorpage.R
 import org.nypl.simplified.android.ktx.supportActionBar
 import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.fragmentListeners
-import org.nypl.simplified.ui.neutrality.NeutralToolbar
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.theme.core.PalaceToolbar
 
 /**
  * A full-screen fragment for displaying presentable errors, and reporting those errors
@@ -54,7 +54,7 @@ class ErrorPageFragment : Fragment(R.layout.error_page) {
   private lateinit var errorStepsList: RecyclerView
   private lateinit var parameters: ErrorPageParameters
   private lateinit var sendButton: Button
-  private lateinit var toolbar: NeutralToolbar
+  private lateinit var toolbar: PalaceToolbar
 
   private val listener: FragmentListenerType<ErrorPageEvent> by fragmentListeners()
 
@@ -68,7 +68,7 @@ class ErrorPageFragment : Fragment(R.layout.error_page) {
     this.sendButton =
       view.findViewById(R.id.errorSendButton)
     this.toolbar =
-      view.rootView.findViewWithTag(NeutralToolbar.neutralToolbarName)
+      view.rootView.findViewWithTag(PalaceToolbar.palaceToolbarName)
 
     this.parameters =
       this.requireArguments().getSerializable(PARAMETERS_ID)

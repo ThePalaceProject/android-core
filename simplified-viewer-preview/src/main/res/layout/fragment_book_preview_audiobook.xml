@@ -8,14 +8,12 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="@dimen/PalaceToolbarHeight"
         android:layout_gravity="top"
-        android:background="?attr/simplifiedColorBackground"
-        android:minHeight="?attr/actionBarSize"
+        android:minHeight="@dimen/PalaceToolbarHeight"
         android:padding="0dp"
         android:theme="?android:attr/actionBarTheme"
         app:navigationIcon="@drawable/back"
-        app:titleTextColor="?attr/simplifiedColorText"
         tools:title="Placeholder" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -116,7 +114,6 @@
             app:layout_constraintEnd_toEndOf="@id/player_seekbar"
             app:layout_constraintStart_toStartOf="@id/player_seekbar"
             app:layout_constraintTop_toBottomOf="@id/player_remaining_time"
-            app:tint="?attr/simplifiedColorControlIcon"
             app:tintMode="src_in" />
 
         <ImageView
@@ -129,7 +126,6 @@
             app:layout_constraintEnd_toStartOf="@id/player_play_pause_button"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/player_play_pause_button"
-            app:tint="?attr/simplifiedColorControlIcon"
             app:tintMode="src_in" />
 
         <TextView
@@ -138,7 +134,6 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="@string/bookPreviewPlayerSeek30"
-            android:textColor="?attr/simplifiedColorControlIcon"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/player_jump_forwards"
@@ -156,7 +151,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/player_play_pause_button"
             app:layout_constraintTop_toTopOf="@id/player_play_pause_button"
-            app:tint="?attr/simplifiedColorControlIcon"
             app:tintMode="src_in" />
 
         <TextView
@@ -165,7 +159,6 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="@string/bookPreviewPlayerSeek30"
-            android:textColor="?attr/simplifiedColorControlIcon"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/player_jump_backwards"

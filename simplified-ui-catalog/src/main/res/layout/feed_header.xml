@@ -33,7 +33,7 @@
     <LinearLayout
       android:id="@+id/feedHeaderFacets"
       android:layout_width="wrap_content"
-      android:layout_height="32dp"
+      android:layout_height="48dp"
       android:layout_gravity="start"
       android:gravity="start|center_vertical"
       android:orientation="horizontal">

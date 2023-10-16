@@ -17,8 +17,8 @@ import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.android.ktx.supportActionBar
 import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.fragmentListeners
-import org.nypl.simplified.ui.neutrality.NeutralToolbar
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.theme.core.PalaceToolbar
 import java.net.URI
 
 /**
@@ -36,13 +36,13 @@ class SettingsCustomOPDSFragment : Fragment(R.layout.settings_custom_opds) {
   private lateinit var feedURL: EditText
   private lateinit var progress: ProgressBar
   private lateinit var progressText: TextView
-  private lateinit var toolbar: NeutralToolbar
+  private lateinit var toolbar: PalaceToolbar
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
     this.toolbar =
-      view.rootView.findViewWithTag(NeutralToolbar.neutralToolbarName)
+      view.rootView.findViewWithTag(PalaceToolbar.palaceToolbarName)
     this.feedURL =
       view.findViewById(R.id.settingsCustomOPDSURL)
     this.create =

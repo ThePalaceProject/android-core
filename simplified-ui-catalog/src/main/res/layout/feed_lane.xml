@@ -27,7 +27,6 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:text="@string/catalogPlaceholder"
-        android:textColor="?attr/simplifiedColorText"
         android:textSize="18sp"
         android:textStyle="bold" />
 
@@ -35,7 +34,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/catalogMore"
-        android:textColor="?attr/simplifiedColorText"
         android:textSize="14sp" />
 
   </LinearLayout>

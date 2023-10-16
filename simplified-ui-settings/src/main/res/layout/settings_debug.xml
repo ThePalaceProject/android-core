@@ -159,7 +159,6 @@
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/settingsVersionDevIsManualLCPPassphraseEnabled"
-        android:theme="@style/Enabled.Switch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
@@ -169,7 +168,6 @@
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/settingsVersionDevAreNotificationsEnabled"
-        android:theme="@style/Enabled.Switch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
@@ -179,7 +177,6 @@
 
     <androidx.appcompat.widget.SwitchCompat
       android:id="@+id/settingsVersionDevProductionLibrariesSwitch"
-      android:theme="@style/Enabled.Switch"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_marginBottom="16dp"
@@ -189,7 +186,6 @@
 
     <androidx.appcompat.widget.SwitchCompat
       android:id="@+id/settingsVersionDevFailNextBootSwitch"
-      android:theme="@style/Enabled.Switch"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_marginBottom="16dp"
@@ -199,7 +195,6 @@
 
     <androidx.appcompat.widget.SwitchCompat
       android:id="@+id/settingsVersionDevSeenLibrarySelectionScreen"
-      android:theme="@style/Enabled.Switch"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_marginBottom="16dp"
@@ -215,12 +210,10 @@
       android:checked="false"
       android:enabled="true"
       android:text="@string/settingsDevCardCreatorUserNewYork"
-      android:theme="@style/Enabled.Switch"
       android:visibility="gone" />
 
     <androidx.appcompat.widget.SwitchCompat
       android:id="@+id/settingsVersionDevShowOnlySupported"
-      android:theme="@style/Enabled.Switch"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_marginBottom="16dp"

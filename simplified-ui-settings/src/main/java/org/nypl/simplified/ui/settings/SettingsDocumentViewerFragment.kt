@@ -11,14 +11,14 @@ import androidx.fragment.app.Fragment
 import org.nypl.simplified.android.ktx.supportActionBar
 import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.fragmentListeners
-import org.nypl.simplified.ui.neutrality.NeutralToolbar
 import org.librarysimplified.ui.settings.databinding.SettingsDocumentViewerBinding
 import org.nypl.simplified.webview.WebViewUtilities
+import org.thepalaceproject.theme.core.PalaceToolbar
 
 class SettingsDocumentViewerFragment : Fragment() {
 
   private lateinit var binding: SettingsDocumentViewerBinding
-  private lateinit var toolbar: NeutralToolbar
+  private lateinit var toolbar: PalaceToolbar
 
   private val listener: FragmentListenerType<SettingsDocumentViewerEvent> by fragmentListeners()
   private val title by lazy { arguments?.getString(TITLE_ID) }
@@ -33,7 +33,7 @@ class SettingsDocumentViewerFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
 
     this.toolbar =
-      view.rootView.findViewWithTag(NeutralToolbar.neutralToolbarName)
+      view.rootView.findViewWithTag(PalaceToolbar.palaceToolbarName)
 
     if (!url.isNullOrBlank()) {
       binding.documentViewerWebView.let { webView ->

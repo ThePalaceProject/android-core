@@ -1,14 +1,11 @@
 package org.librarysimplified.ui.catalog
 
-import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
 import android.text.TextUtils
 import android.view.Gravity
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
@@ -23,13 +20,11 @@ import android.widget.RadioGroup
 import android.widget.Space
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.setPadding
-import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -37,6 +32,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.google.android.material.button.MaterialButton
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.catalog.CatalogFeedOwnership.CollectedFromAccounts
 import org.librarysimplified.ui.catalog.CatalogFeedOwnership.OwnedByAccount
@@ -56,16 +52,15 @@ import org.nypl.simplified.feeds.api.FeedBooksSelection
 import org.nypl.simplified.feeds.api.FeedFacet
 import org.nypl.simplified.feeds.api.FeedFacets
 import org.nypl.simplified.feeds.api.FeedGroup
-import org.nypl.simplified.feeds.api.FeedSearch
 import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.fragmentListeners
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.accounts.AccountPickerDialogFragment
 import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
-import org.nypl.simplified.ui.neutrality.NeutralToolbar
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.theme.core.PalaceToolbar
 
 /**
  * A fragment displaying an OPDS feed.
@@ -153,7 +148,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
   private lateinit var feedWithoutGroupsAdapter: CatalogPagedAdapter
   private lateinit var feedWithoutGroupsList: RecyclerView
   private lateinit var feedWithoutGroupsScrollListener: RecyclerView.OnScrollListener
-  private lateinit var toolbar: NeutralToolbar
+  private lateinit var toolbar: PalaceToolbar
 
   private var ageGateDialog: DialogFragment? = null
   private val feedWithGroupsData: MutableList<FeedGroup> = mutableListOf()
@@ -170,7 +165,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
     super.onViewCreated(view, savedInstanceState)
 
     this.toolbar =
-      view.rootView.findViewWithTag(NeutralToolbar.neutralToolbarName)
+      view.rootView.findViewWithTag(PalaceToolbar.palaceToolbarName)
 
     this.viewModel.stateLive.observe(this.viewLifecycleOwner, this::reconfigureUI)
 
@@ -627,48 +622,6 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
     }
   }
 
-  @SuppressLint("InflateParams")
-  private fun openSearchDialog(
-    context: Context,
-    search: FeedSearch
-  ) {
-    val view = LayoutInflater.from(context).inflate(R.layout.search_dialog, null)
-    val searchView = view.findViewById<TextView>(R.id.searchDialogText)!!
-
-    val builder = AlertDialog.Builder(context).apply {
-      setPositiveButton(R.string.catalogSearch) { dialog, _ ->
-        val query = searchView.text.toString().trim()
-        this@CatalogFeedFragment.viewModel.performSearch(search, query)
-        dialog.dismiss()
-      }
-      setNegativeButton(R.string.catalogCancel) { dialog, _ ->
-        dialog.dismiss()
-      }
-      setView(view)
-    }
-
-    val dialog = builder.create()
-    searchView.setOnEditorActionListener { _, actionId, _ ->
-      return@setOnEditorActionListener when (actionId) {
-        EditorInfo.IME_ACTION_SEARCH -> {
-          val query = searchView.text.toString().trim()
-          this@CatalogFeedFragment.viewModel.performSearch(search, query)
-          dialog.dismiss()
-          true
-        }
-        else -> false
-      }
-    }
-    dialog.show()
-
-    // disabling the positive button can only be called after the dialog is shown
-    val dialogPositiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-    dialogPositiveButton.isEnabled = false
-    searchView.doAfterTextChanged { text ->
-      dialogPositiveButton.isEnabled = !text.isNullOrBlank()
-    }
-  }
-
   private fun configureFacets(
     facetsByGroup: Map<String, List<FeedFacet>>,
     sortFacets: Boolean
@@ -745,7 +698,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
         return@forEach
       }
 
-      val button = AppCompatButton(context)
+      val button = MaterialButton(context)
       val buttonLabel = AppCompatTextView(context)
       val spaceStart = Space(context)
       val spaceMiddle = Space(context)
@@ -829,7 +782,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
       button.setTextColor(
         ContextCompat.getColor(
           this.requireContext(),
-          org.librarysimplified.ui.neutrality.R.color.simplified_button_text
+          org.thepalaceproject.theme.core.R.color.palace_button_text_color
         )
       )
       button.setOnClickListener {

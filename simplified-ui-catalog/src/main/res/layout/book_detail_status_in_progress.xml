@@ -7,7 +7,7 @@
   android:id="@+id/bookDetailStatusInProgress"
   android:layout_width="match_parent"
   android:layout_height="@dimen/catalogBookDetailStatusHeight"
-  tools:background="?attr/simplifiedColorBookStatus">
+  tools:background="@color/PalaceInvertedBackgroundColor">
 
   <TextView
     android:id="@+id/inProgressText"
@@ -16,7 +16,7 @@
     android:layout_marginStart="32dp"
     android:maxLength="4"
     android:maxLines="1"
-    android:textColor="@color/white"
+    android:textColor="@color/PalaceTextInvertedColor"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent"
@@ -30,10 +30,10 @@
     android:layout_marginStart="32dp"
     android:layout_marginEnd="32dp"
     android:indeterminate="true"
-    android:indeterminateTint="@color/white"
-    android:progressBackgroundTint="@color/middle_gray"
+    android:indeterminateTint="@color/PalaceTextInvertedColor"
+    android:progressBackgroundTint="@color/PalaceTextInvertedColor"
     android:progressBackgroundTintMode="src_over"
-    android:progressTint="@color/white"
+    android:progressTint="@color/PalaceTextInvertedColor"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toEndOf="@id/inProgressText"
