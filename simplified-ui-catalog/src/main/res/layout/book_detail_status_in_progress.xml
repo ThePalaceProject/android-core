@@ -1,42 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<androidx.constraintlayout.widget.ConstraintLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:app="http://schemas.android.com/apk/res-auto"
-  xmlns:tools="http://schemas.android.com/tools"
-  android:id="@+id/bookDetailStatusInProgress"
-  android:layout_width="match_parent"
-  android:layout_height="@dimen/catalogBookDetailStatusHeight"
-  tools:background="@color/PalaceInvertedBackgroundColor">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bookDetailStatusInProgress"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/catalogBookDetailStatusHeight"
+    tools:background="@color/PalaceInvertedBackgroundColor">
 
-  <TextView
-    android:id="@+id/inProgressText"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="32dp"
-    android:maxLength="4"
-    android:maxLines="1"
-    android:textColor="@color/PalaceTextInvertedColor"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent"
-    tools:text="@string/catalogPlaceholder" />
+    <TextView
+        android:id="@+id/inProgressText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:maxLength="4"
+        android:maxLines="1"
+        android:textColor="@color/PalaceTextInvertedColor"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@string/catalogPlaceholder" />
 
-  <ProgressBar
-    android:id="@+id/inProgressBar"
-    style="?android:attr/progressBarStyleHorizontal"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="32dp"
-    android:layout_marginEnd="32dp"
-    android:indeterminate="true"
-    android:indeterminateTint="@color/PalaceTextInvertedColor"
-    android:progressBackgroundTint="@color/PalaceTextInvertedColor"
-    android:progressBackgroundTintMode="src_over"
-    android:progressTint="@color/PalaceTextInvertedColor"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toEndOf="@id/inProgressText"
-    app:layout_constraintTop_toTopOf="parent" />
+    <ProgressBar
+        android:id="@+id/inProgressBar"
+        style="@style/Palace.Legacy.LinearProgressIndicator.Inverted"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:indeterminate="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/inProgressText"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
