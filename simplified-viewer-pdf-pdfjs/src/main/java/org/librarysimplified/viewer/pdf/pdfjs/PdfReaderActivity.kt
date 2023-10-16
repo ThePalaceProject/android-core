@@ -11,7 +11,6 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.widget.FrameLayout
 import android.widget.ProgressBar
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -81,7 +80,6 @@ class PdfReaderActivity : AppCompatActivity() {
   private lateinit var bookID: BookID
   private lateinit var feedEntry: FeedEntry.FeedEntryOPDS
   private lateinit var loadingBar: ProgressBar
-  private lateinit var pdfTitle: TextView
   private lateinit var webView: WebView
 
   private var pdfServer: PdfServer? = null
@@ -97,9 +95,6 @@ class PdfReaderActivity : AppCompatActivity() {
     createToolbar(params.documentTitle)
 
     this.loadingBar = findViewById(R.id.pdf_loading_progress)
-    this.pdfTitle = findViewById(R.id.pdf_title)
-    this.pdfTitle.text = params.documentTitle
-
     this.accountId = params.accountId
     this.feedEntry = params.entry
     this.bookID = params.id
@@ -233,7 +228,6 @@ class PdfReaderActivity : AppCompatActivity() {
 
     this.setSupportActionBar(toolbar)
     this.supportActionBar?.setHomeActionContentDescription(R.string.content_description_back)
-
     this.supportActionBar?.setDisplayHomeAsUpEnabled(true)
     this.supportActionBar?.setDisplayShowHomeEnabled(true)
     this.supportActionBar?.title = title
