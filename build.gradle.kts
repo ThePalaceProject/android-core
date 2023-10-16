@@ -15,6 +15,8 @@ if (gradleVersionRequired != gradleVersionReceived) {
 }
 
 plugins {
+    signing
+
     id("org.jetbrains.kotlin.jvm")
         .version("1.9.0")
         .apply(false)
@@ -104,6 +106,14 @@ fun property(
     return project.extra[name] as String
 }
 
+fun propertyOptional(project: Project, name: String): String? {
+    val map = project.extra
+    if (map.has(name)) {
+        return map[name] as String?
+    }
+    return null
+}
+
 fun propertyInt(
     project: Project,
     name: String,
@@ -118,6 +128,15 @@ fun propertyBoolean(
 ): Boolean {
     val text = property(project, name)
     return text.toBooleanStrict()
+}
+
+fun propertyBooleanOptional(
+    project: Project,
+    name: String,
+    defaultValue: Boolean,
+): Boolean {
+    val value = propertyOptional(project, name) ?: return defaultValue
+    return value.toBooleanStrict()
 }
 
 /**
@@ -138,6 +157,8 @@ fun configurePublishingFor(project: Project) {
 
     val publishSources =
         propertyBoolean(project, "org.thepalaceproject.build.publishSources")
+    val enableSigning =
+        propertyBooleanOptional(project, "org.thepalaceproject.build.enableSigning", true)
 
     /*
      * Create an empty JavaDoc jar. Required for Maven Central deployments.
@@ -148,26 +169,48 @@ fun configurePublishingFor(project: Project) {
             this.archiveClassifier = "javadoc"
         }
 
+    /*
+     * Create a publication. Note that the name of the publication must be unique across all
+     * modules, because the broken Gradle signing plugin will create a signing task for each
+     * one that, in the case of a name conflict, will silently overwrite the previous signing
+     * task.
+     */
+
     project.publishing {
         publications {
-            create<MavenPublication>("MavenPublication") {
+            create<MavenPublication>("_${project.name}_MavenPublication") {
                 groupId = property(project, "GROUP")
                 artifactId = property(project, "POM_ARTIFACT_ID")
                 version = versionName
+
+                /*
+                 * https://central.sonatype.org/publish/requirements/#sufficient-metadata
+                 */
 
                 pom {
                     name.set(property(project, "POM_NAME"))
                     description.set(property(project, "POM_DESCRIPTION"))
                     url.set(property(project, "POM_URL"))
+
                     scm {
                         connection.set(property(project, "POM_SCM_CONNECTION"))
                         developerConnection.set(property(project, "POM_SCM_DEV_CONNECTION"))
                         url.set(property(project, "POM_SCM_URL"))
                     }
+
                     licenses {
                         license {
                             name.set(property(project, "POM_LICENCE_NAME"))
                             url.set(property(project, "POM_LICENCE_URL"))
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            name.set("The Palace Project")
+                            email.set("info@thepalaceproject.org")
+                            organization.set("The Palace Project")
+                            organizationUrl.set("https://thepalaceproject.org/")
                         }
                     }
                 }
@@ -243,6 +286,17 @@ fun configurePublishingFor(project: Project) {
                 task.actions.clear()
                 task.dependsOn.add(taskSourcesEmpty)
             }
+    }
+
+    /*
+     * Configure signing.
+     */
+
+    if (enableSigning) {
+        signing {
+            useGpgCmd()
+            sign(project.publishing.publications)
+        }
     }
 }
 
@@ -511,16 +565,12 @@ allprojects {
                 propertyInt(this, "org.thepalaceproject.build.androidSDKCompile")
 
             android.defaultConfig {
-                versionName =
-                    property(this@allprojects, "VERSION_NAME")
-                multiDexEnabled =
-                    true
+                multiDexEnabled = true
                 targetSdk =
                     propertyInt(this@allprojects, "org.thepalaceproject.build.androidSDKTarget")
                 minSdk =
                     propertyInt(this@allprojects, "org.thepalaceproject.build.androidSDKMinimum")
-                testInstrumentationRunner =
-                    "androidx.test.runner.AndroidJUnitRunner"
+                testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
             }
 
             /*

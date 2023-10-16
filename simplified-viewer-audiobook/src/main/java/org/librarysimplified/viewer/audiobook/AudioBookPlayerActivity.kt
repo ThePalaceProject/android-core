@@ -848,8 +848,7 @@ class AudioBookPlayerActivity :
      */
 
     this.uiThread.runOnUIThread {
-      val fragment =
-        PlayerSleepTimerFragment.newInstance(PlayerFragmentParameters())
+      val fragment = PlayerSleepTimerFragment.newInstance()
       fragment.show(this.supportFragmentManager, "PLAYER_SLEEP_TIMER")
     }
   }
