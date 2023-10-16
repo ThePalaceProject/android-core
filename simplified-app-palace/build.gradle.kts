@@ -569,6 +569,7 @@ dependencies {
     implementation(libs.play.services.base)
     implementation(libs.play.services.basement)
     implementation(libs.play.services.cloud.messaging)
+    implementation(libs.play.services.location)
     implementation(libs.play.services.measurement)
     implementation(libs.play.services.measurement.api)
     implementation(libs.play.services.measurement.base)

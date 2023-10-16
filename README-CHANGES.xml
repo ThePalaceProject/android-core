@@ -298,7 +298,7 @@
         <c:change date="2023-08-12T00:00:00+00:00" summary="Fixed crash when time tracking is not enabled."/>
       </c:changes>
     </c:release>
-    <c:release date="2023-10-11T19:26:14+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.6.0">
+    <c:release date="2023-10-11T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.6.0">
       <c:changes>
         <c:change date="2023-08-24T00:00:00+00:00" summary="Updated Kotlin version to 1.9.0"/>
         <c:change date="2023-08-28T00:00:00+00:00" summary="Fixed crash when opening an audiobook with a null manifest."/>
@@ -330,6 +330,11 @@
         <c:change date="2023-09-22T00:00:00+00:00" summary="Added push notifications option to DEV settings."/>
         <c:change date="2023-09-26T00:00:00+00:00" summary="Fixed bookmarks not being deleted."/>
         <c:change date="2023-10-07T00:00:00+00:00" summary="Fixed Audiobook UI freezing after pressing 'play'."/>
+      </c:changes>
+    </c:release>
+    <c:release date="2023-10-16T11:36:56+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.6.1">
+      <c:changes>
+        <c:change date="2023-10-16T11:36:56+00:00" summary="Fixed crash when creating a library card."/>
       </c:changes>
     </c:release>
   </c:releases>
