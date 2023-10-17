@@ -22,9 +22,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
-import androidx.core.view.setPadding
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -60,6 +58,7 @@ import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.theme.core.PalaceTabButtons
 import org.thepalaceproject.theme.core.PalaceToolbar
 
 /**
@@ -747,50 +746,18 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
       return
     }
 
-    /*
-     * Add a set of radio buttons to the view.
-     */
-
     facetTabs.removeAllViews()
-    val size = facetGroup.size
-    for (index in 0 until size) {
+    PalaceTabButtons.configureGroup(
+      context = this.requireContext(),
+      group = facetTabs,
+      count = facetGroup.size
+    ) { index, button ->
       val facet = facetGroup[index]
-      val button = RadioButton(this.requireContext())
-      val buttonLayout =
-        LinearLayout.LayoutParams(
-          0,
-          ViewGroup.LayoutParams.MATCH_PARENT,
-          1.0f / size.toFloat()
-        )
-
-      button.layoutParams = buttonLayout
-      button.gravity = Gravity.CENTER
-      button.maxLines = 1
-      button.ellipsize = TextUtils.TruncateAt.END
-
-      /*
-       * The buttons need unique IDs so that they can be addressed within the parent
-       * radio group.
-       */
-
-      button.id = View.generateViewId()
-
-      button.setBackgroundResource(R.drawable.catalog_facet_tab_button_background)
-      button.setButtonDrawable(R.drawable.catalog_facet_tab_button_background)
-
       button.text = facet.title
-      button.setTextColor(
-        ContextCompat.getColor(
-          this.requireContext(),
-          org.thepalaceproject.theme.core.R.color.palace_button_text_color
-        )
-      )
       button.setOnClickListener {
         this.logger.debug("selected entry point facet: {}", facet.title)
         this.viewModel.openFacet(facet)
       }
-      button.setPadding(0)
-      facetTabs.addView(button)
     }
 
     /*
@@ -800,7 +767,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
 
     facetTabs.clearCheck()
 
-    for (index in 0 until size) {
+    for (index in 0 until facetGroup.size) {
       val facet = facetGroup[index]
       val button = facetTabs.getChildAt(index) as RadioButton
 
