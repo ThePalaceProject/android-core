@@ -835,6 +835,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
       button.setOnClickListener {
         this.logger.debug("selected entry point facet: {}", facet.title)
         this.viewModel.openFacet(facet)
+        updateSelectedFacet(facetTabs = facetTabs, index = index)
       }
       button.setPadding(0)
       facetTabs.addView(button)
@@ -856,6 +857,12 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
         facetTabs.check(button.id)
       }
     }
+  }
+
+  private fun updateSelectedFacet(facetTabs: RadioGroup, index: Int) {
+    facetTabs.clearCheck()
+    val button = facetTabs.getChildAt(index) as RadioButton
+    facetTabs.check(button.id)
   }
 
   private fun showFacetSelectDialog(

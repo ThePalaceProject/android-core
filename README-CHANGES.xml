@@ -332,9 +332,10 @@
         <c:change date="2023-10-07T00:00:00+00:00" summary="Fixed Audiobook UI freezing after pressing 'play'."/>
       </c:changes>
     </c:release>
-    <c:release date="2023-10-16T11:36:56+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.6.1">
+    <c:release date="2023-10-17T18:03:10+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.6.1">
       <c:changes>
-        <c:change date="2023-10-16T11:36:56+00:00" summary="Fixed crash when creating a library card."/>
+        <c:change date="2023-10-16T00:00:00+00:00" summary="Fixed crash when creating a library card."/>
+        <c:change date="2023-10-17T18:03:10+00:00" summary="Adjusted feed tabs navigation to keep the Catalog on the top of the screen."/>
       </c:changes>
     </c:release>
   </c:releases>
