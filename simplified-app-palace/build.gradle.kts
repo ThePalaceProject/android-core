@@ -527,6 +527,7 @@ dependencies {
     implementation(libs.nano.httpd)
     implementation(libs.nano.httpd.nanolets)
     implementation(libs.nypl.readium)
+    implementation(libs.nypl.theme)
     implementation(libs.okhttp3)
     implementation(libs.okio)
     implementation(libs.palace.audiobook.api)
