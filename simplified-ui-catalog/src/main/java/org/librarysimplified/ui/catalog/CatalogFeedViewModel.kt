@@ -887,9 +887,9 @@ class CatalogFeedViewModel(
 
   fun openFacet(facet: FeedFacet) {
     val feedArguments = this.resolveFacet(facet)
-    this.listener.post(
-      CatalogFeedEvent.OpenFeed(feedArguments)
-    )
+    val newState = CatalogFeedState.CatalogFeedLoading(feedArguments)
+    this.stateMutable.value = newState
+    reloadFeed()
   }
 
   /**
