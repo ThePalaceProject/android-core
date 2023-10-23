@@ -78,7 +78,7 @@
         android:layout_height="@dimen/catalogFeedCellButtonsHeight"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:weightSum="2"
+        android:weightSum="4"
         android:layout_marginBottom="8dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"

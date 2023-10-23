@@ -22,7 +22,7 @@
         android:background="@drawable/background_menu_item_badge"
         android:gravity="center"
         android:padding="2dp"
-        android:textColor="@color/white"
+        android:textColor="#ffffff"
         android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/guideline"

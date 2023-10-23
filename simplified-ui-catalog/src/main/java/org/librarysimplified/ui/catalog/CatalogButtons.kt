@@ -12,10 +12,10 @@ import android.widget.Space
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.annotation.UiThread
-import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
+import com.google.android.material.button.MaterialButton
 import org.nypl.simplified.books.book_database.api.BookFormats
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 
@@ -29,7 +29,10 @@ class CatalogButtons(
 ) {
 
   private fun colorStateListForButtonItems(): ColorStateList? {
-    return ContextCompat.getColorStateList(context, org.librarysimplified.ui.neutrality.R.color.simplified_button_text)
+    return ContextCompat.getColorStateList(
+      context,
+      org.thepalaceproject.theme.core.R.color.palace_button_text_color
+    )
   }
 
   @UiThread
@@ -61,15 +64,14 @@ class CatalogButtons(
 
   @UiThread
   fun createButton(
-    context: Context,
     text: Int,
     description: Int,
     heightMatchParent: Boolean = false,
     onClick: (Button) -> Unit
   ): Button {
-    val button = AppCompatButton(this.context)
-    button.text = context.getString(text)
-    button.contentDescription = context.getString(description)
+    val button = MaterialButton(this.context)
+    button.text = this.context.getString(text)
+    button.contentDescription = this.context.getString(description)
     button.layoutParams = this.buttonLayoutParameters(heightMatchParent)
     button.setOnClickListener {
       button.isEnabled = false
@@ -174,7 +176,6 @@ class CatalogButtons(
     heightMatchParent: Boolean = false
   ): Button {
     return this.createButton(
-      context = this.context,
       text = R.string.catalogRead,
       description = R.string.catalogAccessibilityBookRead,
       heightMatchParent = heightMatchParent,
@@ -188,7 +189,6 @@ class CatalogButtons(
     onClick: (Button) -> Unit
   ): Button {
     return this.createButton(
-      context = this.context,
       text = if (bookFormat == BookFormats.BookFormatDefinition.BOOK_FORMAT_AUDIO) {
         R.string.catalogBookPreviewAudioBook
       } else {
@@ -209,7 +209,6 @@ class CatalogButtons(
     heightMatchParent: Boolean = false
   ): Button {
     return this.createButton(
-      context = this.context,
       text = R.string.catalogListen,
       description = R.string.catalogAccessibilityBookListen,
       heightMatchParent = heightMatchParent,
@@ -223,7 +222,6 @@ class CatalogButtons(
     heightMatchParent: Boolean = false
   ): Button {
     return this.createButton(
-      context = this.context,
       text = R.string.catalogDownload,
       description = R.string.catalogAccessibilityBookDownload,
       heightMatchParent = heightMatchParent,
@@ -237,7 +235,6 @@ class CatalogButtons(
     heightMatchParent: Boolean = false
   ): Button {
     return this.createButton(
-      context = this.context,
       text = R.string.catalogCancelHold,
       description = R.string.catalogAccessibilityBookRevokeHold,
       heightMatchParent = heightMatchParent,
@@ -251,7 +248,6 @@ class CatalogButtons(
     heightMatchParent: Boolean = false
   ): Button {
     return this.createButton(
-      context = this.context,
       text = R.string.catalogReturn,
       description = R.string.catalogAccessibilityBookRevokeLoan,
       heightMatchParent = heightMatchParent,
@@ -264,7 +260,6 @@ class CatalogButtons(
     onClick: (Button) -> Unit
   ): Button {
     return this.createButton(
-      context = this.context,
       text = R.string.catalogCancel,
       description = R.string.catalogAccessibilityBookDownloadCancel,
       onClick = onClick
@@ -277,7 +272,6 @@ class CatalogButtons(
     heightMatchParent: Boolean = false
   ): Button {
     return this.createButton(
-      context = this.context,
       text = R.string.catalogReserve,
       description = R.string.catalogAccessibilityBookReserve,
       heightMatchParent = heightMatchParent,
@@ -291,7 +285,6 @@ class CatalogButtons(
     heightMatchParent: Boolean = false
   ): Button {
     return this.createButton(
-      context = this.context,
       text = R.string.catalogGet,
       description = R.string.catalogAccessibilityBookBorrow,
       heightMatchParent = heightMatchParent,
@@ -304,7 +297,6 @@ class CatalogButtons(
     onClick: (Button) -> Unit
   ): Button {
     return this.createButton(
-      context = this.context,
       text = R.string.catalogRetry,
       description = R.string.catalogAccessibilityBookErrorRetry,
       onClick = onClick
@@ -316,7 +308,6 @@ class CatalogButtons(
     onClick: (Button) -> Unit
   ): Button {
     return this.createButton(
-      context = this.context,
       text = R.string.catalogDetails,
       description = R.string.catalogAccessibilityBookErrorDetails,
       onClick = onClick
@@ -328,7 +319,6 @@ class CatalogButtons(
     onClick: (Button) -> Unit
   ): Button {
     return this.createButton(
-      context = this.context,
       text = R.string.catalogDismiss,
       description = R.string.catalogAccessibilityBookErrorDismiss,
       onClick = onClick

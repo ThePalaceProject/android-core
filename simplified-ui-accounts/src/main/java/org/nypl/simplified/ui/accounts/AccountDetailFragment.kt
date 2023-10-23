@@ -60,10 +60,10 @@ import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsLogoutButtonDi
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsLogoutButtonEnabled
 import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
-import org.nypl.simplified.ui.neutrality.NeutralToolbar
 import org.slf4j.LoggerFactory
 import java.net.URI
 import org.librarysimplified.ui.accounts.R
+import org.thepalaceproject.theme.core.PalaceToolbar
 
 /**
  * A fragment that shows settings for a single account.
@@ -141,7 +141,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   private lateinit var settingsCardCreator: ConstraintLayout
   private lateinit var signUpButton: Button
   private lateinit var signUpLabel: TextView
-  private lateinit var toolbar: NeutralToolbar
+  private lateinit var toolbar: PalaceToolbar
 
   private val imageButtonLoadingTag = "IMAGE_BUTTON_LOADING"
   private val nyplCardCreatorScheme = "nypl.card-creator"
@@ -174,7 +174,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
     this.accountIcon =
       view.findViewById(R.id.accountCellIcon)
     this.toolbar =
-      view.rootView.findViewWithTag(NeutralToolbar.neutralToolbarName)
+      view.rootView.findViewWithTag(PalaceToolbar.palaceToolbarName)
 
     this.authentication =
       view.findViewById(R.id.auth)

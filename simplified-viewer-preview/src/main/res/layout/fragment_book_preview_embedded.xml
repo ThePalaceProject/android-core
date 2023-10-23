@@ -9,13 +9,11 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/simplifiedColorBackground"
-        android:minHeight="?attr/actionBarSize"
+        android:layout_height="@dimen/PalaceToolbarHeight"
+        android:minHeight="@dimen/PalaceToolbarHeight"
         android:padding="0dp"
         android:theme="?android:attr/actionBarTheme"
         app:navigationIcon="@drawable/back"
-        app:titleTextColor="?attr/simplifiedColorText"
         tools:title="Placeholder" />
 
     <WebView

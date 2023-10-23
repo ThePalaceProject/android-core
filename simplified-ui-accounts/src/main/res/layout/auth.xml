@@ -8,9 +8,9 @@
 
     <View
         android:id="@+id/authTopDivider"
+        android:background="@color/PalaceDividerColor"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?attr/simplifiedColorDisabledAccessibility" />
+        android:layout_height="1dp" />
 
     <Space
         android:id="@+id/authSpace"
@@ -33,6 +33,6 @@
         android:id="@+id/authBottomDivider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="?android:attr/listDivider" />
+        android:background="@color/PalaceDividerColor" />
 
 </LinearLayout>

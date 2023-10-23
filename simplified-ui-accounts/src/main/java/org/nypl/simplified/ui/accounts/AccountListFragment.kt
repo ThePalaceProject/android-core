@@ -25,8 +25,8 @@ import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.fragmentListeners
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.images.ImageLoaderType
-import org.nypl.simplified.ui.neutrality.NeutralToolbar
 import org.librarysimplified.ui.accounts.R
+import org.thepalaceproject.theme.core.PalaceToolbar
 
 /**
  * A fragment that shows the set of accounts in the current profile.
@@ -61,7 +61,7 @@ class AccountListFragment : Fragment(R.layout.account_list) {
   private lateinit var accountList: RecyclerView
   private lateinit var accountListAdapter: AccountListAdapter
   private lateinit var imageLoader: ImageLoaderType
-  private lateinit var toolbar: NeutralToolbar
+  private lateinit var toolbar: PalaceToolbar
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -110,7 +110,7 @@ class AccountListFragment : Fragment(R.layout.account_list) {
     this.accountList =
       view.findViewById(R.id.accountList)
     this.toolbar =
-      view.rootView.findViewWithTag(NeutralToolbar.neutralToolbarName)
+      view.rootView.findViewWithTag(PalaceToolbar.palaceToolbarName)
 
     this.accountListAdapter =
       AccountListAdapter(

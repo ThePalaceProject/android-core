@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:tools="http://schemas.android.com/tools"
-  android:id="@+id/bookDetailStatusFailed"
-  android:layout_width="match_parent"
-  android:layout_height="@dimen/catalogBookDetailStatusHeight"
-  tools:background="?attr/simplifiedColorBookStatus">
 
-  <TextView
-    android:id="@+id/failedText"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bookDetailStatusFailed"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginStart="16dp"
-    android:layout_marginEnd="16dp"
-    android:ellipsize="end"
-    android:gravity="center"
-    android:maxLines="2"
-    android:textAlignment="center"
-    android:textColor="@color/white"
-    tools:text="@string/catalogPlaceholder" />
+    android:layout_height="@dimen/catalogBookDetailStatusHeight"
+    tools:background="@color/PalaceInvertedBackgroundColor">
+
+    <TextView
+        android:id="@+id/failedText"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxLines="2"
+        android:textAlignment="center"
+        android:textColor="@color/PalaceTextInvertedColor"
+        tools:text="@string/catalogPlaceholder" />
 </FrameLayout>
