@@ -337,9 +337,10 @@
         <c:change date="2023-10-16T00:00:00+00:00" summary="Fixed crash when creating a library card."/>
       </c:changes>
     </c:release>
-    <c:release date="2023-10-19T11:00:16+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.7.0">
+    <c:release date="2023-10-23T11:18:45+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.7.0">
       <c:changes>
-        <c:change date="2023-10-19T11:00:16+00:00" summary="Adjusted feed tabs navigation to keep the Catalog on the top of the screen."/>
+        <c:change date="2023-10-19T00:00:00+00:00" summary="Adjusted feed tabs navigation to keep the Catalog on the top of the screen."/>
+        <c:change date="2023-10-23T11:18:45+00:00" summary="Use a new Material 3 theme."/>
       </c:changes>
     </c:release>
   </c:releases>
