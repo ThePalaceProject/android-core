@@ -113,8 +113,12 @@ val requiredSigningTask = task("CheckReleaseSigningInformation") {
     }
 }
 
+val versionNameText =
+    project.findProperty("VERSION_NAME") as String
+
 android {
     defaultConfig {
+        versionName = versionNameText
         versionCode = calculateVersionCode()
         resourceConfigurations.add("en")
         resourceConfigurations.add("es")
