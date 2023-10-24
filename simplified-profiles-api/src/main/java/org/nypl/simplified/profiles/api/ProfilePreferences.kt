@@ -50,10 +50,6 @@ data class ProfilePreferences(
 
   val isManualLCPPassphraseEnabled: Boolean = false,
 
-  /** @return `true` if the push notifications are enabled. */
-
-  val areNotificationsEnabled: Boolean = false,
-
   /** @return `true` if the debug settings should be visible. */
 
   val showDebugSettings: Boolean = false

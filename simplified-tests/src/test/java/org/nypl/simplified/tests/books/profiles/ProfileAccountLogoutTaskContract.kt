@@ -153,10 +153,6 @@ abstract class ProfileAccountLogoutTaskContract {
 
     this.server = MockWebServer()
     this.server.start()
-
-    val preferences = Mockito.mock(ProfilePreferences::class.java)
-    Mockito.`when`(this.profile.preferences()).thenReturn(preferences)
-    Mockito.`when`(preferences.areNotificationsEnabled).thenReturn(true)
   }
 
   @AfterEach
@@ -288,7 +284,7 @@ abstract class ProfileAccountLogoutTaskContract {
       this.bookRegistry.books().values.all { it.status is BookStatus.Loaned.LoanedNotDownloaded }
     )
 
-    Mockito.verify(tokenHttp, Mockito.times(1)).deleteFCMTokenForProfileAccount(account, true)
+    Mockito.verify(tokenHttp, Mockito.times(1)).deleteFCMTokenForProfileAccount(account)
   }
 
   /**
