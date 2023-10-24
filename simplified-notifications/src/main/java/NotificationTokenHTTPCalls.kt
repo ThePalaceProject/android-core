@@ -27,21 +27,14 @@ class NotificationTokenHTTPCalls(
   override fun registerFCMTokenForProfileAccounts(profile: ProfileReadableType) {
     profile.accounts().values.forEach { account ->
       registerFCMTokenForProfileAccount(
-        account = account,
-        areNotificationsEnabled = profile.preferences().areNotificationsEnabled
+        account = account
       )
     }
   }
 
   override fun registerFCMTokenForProfileAccount(
-    account: AccountType,
-    areNotificationsEnabled: Boolean
+    account: AccountType
   ) {
-    if (!areNotificationsEnabled) {
-      logger.debug("Notifications are currently disabled, so we won't be registering a token")
-      return
-    }
-
     firebaseInstance.token
       .addOnSuccessListener { token ->
         logger.debug("Success fetching FCM Token: {}", token)
@@ -105,14 +98,8 @@ class NotificationTokenHTTPCalls(
   }
 
   override fun deleteFCMTokenForProfileAccount(
-    account: AccountType,
-    areNotificationsEnabled: Boolean
+    account: AccountType
   ) {
-    if (!areNotificationsEnabled) {
-      logger.debug("Notifications are currently disabled, so we won't be deleting the token")
-      return
-    }
-
     firebaseInstance.token
       .addOnSuccessListener { token ->
         logger.debug("Success fetching FCM Token: {}", token)

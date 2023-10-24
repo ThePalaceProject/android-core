@@ -502,7 +502,6 @@ object ProfilesDatabases {
               hasSeenLibrarySelectionScreen = false,
               playbackRates = hashMapOf(),
               sleepTimers = hashMapOf(),
-              areNotificationsEnabled = false,
               isManualLCPPassphraseEnabled = false
             ),
             attributes = ProfileAttributes(sortedMapOf())
