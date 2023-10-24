@@ -114,10 +114,6 @@ abstract class ProfileAccountLoginTaskContract {
     this.server = MockWebServer()
     this.server.start()
 
-    val preferences = Mockito.mock(ProfilePreferences::class.java)
-    Mockito.`when`(this.profile.preferences()).thenReturn(preferences)
-    Mockito.`when`(preferences.areNotificationsEnabled).thenReturn(true)
-
     this.profileWithoutDRM = """
 {
   "simplified:authorization_identifier": "6120696828384",
@@ -724,7 +720,7 @@ abstract class ProfileAccountLoginTaskContract {
     assertEquals(1, this.server.requestCount)
 
     Mockito.verify(tokenHttp, Mockito.times(1))
-      .registerFCMTokenForProfileAccount(account, true)
+      .registerFCMTokenForProfileAccount(account)
   }
 
   /**

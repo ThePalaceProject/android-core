@@ -244,8 +244,7 @@ class ProfileAccountLoginTask(
         this.runDeviceActivation()
         this.account.setLoginState(AccountLoggedIn(this.credentials))
         notificationTokenHttpCalls.registerFCMTokenForProfileAccount(
-          account = account,
-          areNotificationsEnabled = profile.preferences().areNotificationsEnabled
+          account = account
         )
         this.steps.finishSuccess(Unit)
       }
@@ -318,8 +317,7 @@ class ProfileAccountLoginTask(
         this.runDeviceActivation()
         this.account.setLoginState(AccountLoggedIn(this.credentials))
         notificationTokenHttpCalls.registerFCMTokenForProfileAccount(
-          account = account,
-          areNotificationsEnabled = profile.preferences().areNotificationsEnabled
+          account = account
         )
         this.steps.finishSuccess(Unit)
       }
@@ -365,8 +363,7 @@ class ProfileAccountLoginTask(
     this.runDeviceActivation()
     this.account.setLoginState(AccountLoggedIn(this.credentials))
     notificationTokenHttpCalls.registerFCMTokenForProfileAccount(
-      account = account,
-      areNotificationsEnabled = profile.preferences().areNotificationsEnabled
+      account = account
     )
     return this.steps.finishSuccess(Unit)
   }
@@ -407,8 +404,7 @@ class ProfileAccountLoginTask(
           this.runDeviceActivation()
           this.account.setLoginState(AccountLoggedIn(this.credentials))
           notificationTokenHttpCalls.registerFCMTokenForProfileAccount(
-            account = account,
-            areNotificationsEnabled = profile.preferences().areNotificationsEnabled
+            account = account
           )
           return this.steps.finishSuccess(Unit)
         }
