@@ -2,6 +2,7 @@ package org.librarysimplified.ui.catalog
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.text.TextUtils
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
@@ -73,6 +74,8 @@ class CatalogButtons(
     button.text = this.context.getString(text)
     button.contentDescription = this.context.getString(description)
     button.layoutParams = this.buttonLayoutParameters(heightMatchParent)
+    button.maxLines = 1
+    button.ellipsize = TextUtils.TruncateAt.END
     button.setOnClickListener {
       button.isEnabled = false
       onClick.invoke(button)
