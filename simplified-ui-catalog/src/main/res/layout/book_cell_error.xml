@@ -59,7 +59,8 @@
         android:layout_marginStart="32dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:weightSum="4"
+        android:weightSum="3"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -68,9 +69,9 @@
         <Button
             android:id="@+id/bookCellErrorButtonDismiss"
             style="@style/Palace.Button.Outlined.Small"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/catalogFeedCellButtonsHeight"
             android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/catalogFeedCellButtonsHeight"
             android:text="@string/catalogDismiss" />
 
         <Space
@@ -80,9 +81,9 @@
         <Button
             android:id="@+id/bookCellErrorButtonDetails"
             style="@style/Palace.Button.Outlined.Small"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/catalogFeedCellButtonsHeight"
             android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/catalogFeedCellButtonsHeight"
             android:text="@string/catalogDetails" />
 
         <Space
@@ -92,9 +93,9 @@
         <Button
             android:id="@+id/bookCellErrorButtonRetry"
             style="@style/Palace.Button.Outlined.Small"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/catalogFeedCellButtonsHeight"
             android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/catalogFeedCellButtonsHeight"
             android:text="@string/catalogRetry" />
     </LinearLayout>
 
