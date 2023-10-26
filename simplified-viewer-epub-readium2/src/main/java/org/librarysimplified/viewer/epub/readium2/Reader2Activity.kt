@@ -193,25 +193,27 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       WebView.setWebContentsDebuggingEnabled(true)
     }
 
-    this.readerFragment =
-      this.supportFragmentManager.fragmentFactory.instantiate(
-        this.classLoader,
-        SR2ReaderFragment::class.java.name
-      )
-    this.searchFragment =
-      this.supportFragmentManager.fragmentFactory.instantiate(
-        this.classLoader,
-        SR2SearchFragment::class.java.name
-      )
-    this.tocFragment =
-      this.supportFragmentManager.fragmentFactory.instantiate(
-        this.classLoader,
-        SR2TOCFragment::class.java.name
-      )
+    if (savedInstanceState == null) {
+      this.readerFragment =
+        this.supportFragmentManager.fragmentFactory.instantiate(
+          this.classLoader,
+          SR2ReaderFragment::class.java.name
+        )
+      this.searchFragment =
+        this.supportFragmentManager.fragmentFactory.instantiate(
+          this.classLoader,
+          SR2SearchFragment::class.java.name
+        )
+      this.tocFragment =
+        this.supportFragmentManager.fragmentFactory.instantiate(
+          this.classLoader,
+          SR2TOCFragment::class.java.name
+        )
 
-    this.supportFragmentManager.beginTransaction()
-      .add(R.id.reader2FragmentHost, this.readerFragment)
-      .commit()
+      this.supportFragmentManager.beginTransaction()
+        .add(R.id.reader2FragmentHost, this.readerFragment)
+        .commit()
+    }
   }
 
   override fun onStart() {
