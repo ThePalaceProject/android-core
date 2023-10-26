@@ -337,7 +337,7 @@
         <c:change date="2023-10-16T00:00:00+00:00" summary="Fixed crash when creating a library card."/>
       </c:changes>
     </c:release>
-    <c:release date="2023-10-24T09:32:44+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.7.0">
+    <c:release date="2023-10-25T17:53:40+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.7.0">
       <c:changes>
         <c:change date="2023-10-19T00:00:00+00:00" summary="Adjusted feed tabs navigation to keep the Catalog on the top of the screen."/>
         <c:change date="2023-10-23T00:00:00+00:00" summary="Use a new Material 3 theme."/>
@@ -346,7 +346,8 @@
             <c:ticket id="PP-610"/>
           </c:tickets>
         </c:change>
-        <c:change date="2023-10-24T09:32:44+00:00" summary="Enabled push notifications by default."/>
+        <c:change date="2023-10-24T00:00:00+00:00" summary="Enabled push notifications by default."/>
+        <c:change date="2023-10-25T17:53:40+00:00" summary="Fixed crash on Reader screen due to more than one Fragment instance."/>
       </c:changes>
     </c:release>
   </c:releases>
