@@ -1,9 +1,9 @@
 package org.nypl.simplified.lcp
 
-import android.app.AlertDialog
 import android.content.Context
 import android.view.LayoutInflater
 import android.widget.TextView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.librarysimplified.lcp.R
@@ -71,7 +71,7 @@ class LCPContentProtectionProvider : ContentProtectionProvider {
     val inputPassphrase = view.findViewById<TextView>(R.id.inputPassphrase)
 
     return suspendCoroutine { cont ->
-      AlertDialog.Builder(context).apply {
+      MaterialAlertDialogBuilder(context).apply {
         setTitle(R.string.dialog_manual_passphrase_title)
         setMessage(hint)
         setPositiveButton(R.string.dialog_manual_passphrase_done) { dialog, _ ->
