@@ -2,7 +2,7 @@ package org.librarysimplified.main
 
 import android.content.Context
 import androidx.annotation.UiThread
-import androidx.appcompat.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.nypl.drm.core.AdobeAdeptExecutorType
 import org.nypl.simplified.adobe.extensions.AdobeDRMServices
@@ -26,7 +26,7 @@ object MainAdobeWarnings {
         val drmService = services.optionalService(AdobeAdeptExecutorType::class.java)
         if (drmService == null) {
           if (AdobeDRMServices.isIntendedToBePresent(context)) {
-            AlertDialog.Builder(context)
+            MaterialAlertDialogBuilder(context)
               .setMessage(R.string.bootAdobeDRMFailed)
               .create()
               .show()

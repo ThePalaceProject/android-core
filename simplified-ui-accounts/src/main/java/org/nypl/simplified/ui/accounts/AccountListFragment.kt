@@ -5,7 +5,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import androidx.appcompat.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -75,7 +75,7 @@ class AccountListFragment : Fragment(R.layout.account_list) {
 
   private fun onAccountDeleteClicked(account: AccountType) {
     val context = this.requireContext()
-    AlertDialog.Builder(context)
+    MaterialAlertDialogBuilder(context)
       .setTitle(R.string.accountsDeleteConfirmTitle)
       .setMessage(
         context.getString(
@@ -197,7 +197,7 @@ class AccountListFragment : Fragment(R.layout.account_list) {
   }
 
   private fun showAccountDeletionFailedDialog(accountEvent: AccountEventDeletionFailed) {
-    AlertDialog.Builder(this.requireContext())
+    MaterialAlertDialogBuilder(this.requireContext())
       .setTitle(R.string.accountsDeletionFailed)
       .setMessage(R.string.accountsDeletionFailedMessage)
       .setPositiveButton(R.string.accountsDetails) { _, _ ->

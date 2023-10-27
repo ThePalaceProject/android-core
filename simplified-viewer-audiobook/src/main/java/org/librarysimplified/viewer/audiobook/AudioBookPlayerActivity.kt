@@ -8,7 +8,7 @@ import android.os.Bundle
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.annotation.StringRes
-import androidx.appcompat.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.TxContextWrappingDelegate
@@ -773,7 +773,7 @@ class AudioBookPlayerActivity :
   }
 
   private fun loanReturnShowDialog() {
-    val alert = AlertDialog.Builder(this)
+    val alert = MaterialAlertDialogBuilder(this)
     alert.setTitle(R.string.audio_book_player_return_title)
     alert.setMessage(R.string.audio_book_player_return_question)
     alert.setNegativeButton(R.string.audio_book_player_do_keep) { dialog, _ ->
@@ -875,9 +875,7 @@ class AudioBookPlayerActivity :
      */
 
     this.uiThread.runOnUIThread {
-      this.supportActionBar?.setTitle(
-        org.librarysimplified.audiobook.views.R.string.audiobook_player_toc_title
-      )
+      this.supportActionBar?.setTitle(R.string.audio_book_player_toc_title)
 
       val fragment = PlayerTOCFragment.newInstance()
 
@@ -1049,7 +1047,7 @@ class AudioBookPlayerActivity :
     this.log.error("error: {}: ", title, failure)
 
     this.uiThread.runOnUIThread {
-      AlertDialog.Builder(context)
+      MaterialAlertDialogBuilder(context)
         .setTitle(title)
         .setMessage(failure.localizedMessage)
         .setOnDismissListener {

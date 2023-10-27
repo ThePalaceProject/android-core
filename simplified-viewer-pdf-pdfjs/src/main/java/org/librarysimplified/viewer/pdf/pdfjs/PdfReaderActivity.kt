@@ -11,9 +11,9 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.widget.FrameLayout
 import android.widget.ProgressBar
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.util.concurrent.MoreExecutors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -194,7 +194,7 @@ class PdfReaderActivity : AppCompatActivity() {
     params: PdfReaderParameters,
     isSavedInstanceStateNull: Boolean
   ) {
-    AlertDialog.Builder(this)
+    MaterialAlertDialogBuilder(this)
       .setTitle(R.string.viewer_position_title)
       .setMessage(R.string.viewer_position_message)
       .setNegativeButton(R.string.viewer_position_move) { dialog, _ ->
@@ -421,7 +421,7 @@ class PdfReaderActivity : AppCompatActivity() {
     this.log.error("error: {}: ", title, failure)
 
     this.uiThread.runOnUIThread {
-      AlertDialog.Builder(context)
+      MaterialAlertDialogBuilder(context)
         .setTitle(title)
         .setMessage(failure.localizedMessage)
         .setOnDismissListener {

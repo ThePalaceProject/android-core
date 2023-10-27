@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.View
 import android.webkit.WebView
 import android.widget.ProgressBar
-import androidx.appcompat.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -122,7 +122,7 @@ class AccountSAML20Fragment : Fragment(R.layout.account_saml20) {
 
   private fun onSAMLEventFailed(event: AccountSAML20InternalEvent.Failed) {
     val newDialog =
-      AlertDialog.Builder(this.requireActivity())
+      MaterialAlertDialogBuilder(this.requireActivity())
         .setTitle(R.string.accountCreationFailed)
         .setMessage(R.string.accountCreationFailedMessage)
         .setPositiveButton(R.string.accountsDetails) { dialog, _ ->

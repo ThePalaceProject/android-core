@@ -1,6 +1,7 @@
 package org.librarysimplified.ui.catalog
 
 import android.app.Dialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -55,7 +56,7 @@ class AgeGateDialog : DialogFragment(), AdapterView.OnItemSelectedListener {
   }
 
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-    val dialog = AlertDialog.Builder(requireContext())
+    val dialog = MaterialAlertDialogBuilder(requireContext())
       .setTitle(getString(R.string.ageVerification))
       .setPositiveButton(R.string.catalogDone) { _, _ ->
         val selection = birthYearSpinner.selectedItem.toString()

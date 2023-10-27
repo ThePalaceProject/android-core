@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.widget.FrameLayout
 import android.widget.ProgressBar
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.TxContextWrappingDelegate
@@ -208,7 +208,7 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
   }
 
   private fun handlePreviewDownloadFailed() {
-    AlertDialog.Builder(this)
+    MaterialAlertDialogBuilder(this)
       .setTitle(R.string.bookPreviewFailedTitle)
       .setMessage(R.string.bookPreviewFailedMessage)
       .setOnDismissListener { this.onBackPressed() }

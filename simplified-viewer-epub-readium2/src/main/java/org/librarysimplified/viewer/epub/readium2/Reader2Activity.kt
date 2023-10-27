@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.webkit.WebView
 import android.widget.Toast
 import androidx.annotation.StringRes
-import androidx.appcompat.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.TxContextWrappingDelegate
@@ -392,7 +392,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     localLastReadBookmark: SR2Bookmark,
     serverLastReadBookmark: SR2Bookmark
   ) {
-    AlertDialog.Builder(this)
+    MaterialAlertDialogBuilder(this)
       .setTitle(R.string.reader_position_title)
       .setMessage(R.string.reader_position_message)
       .setNegativeButton(R.string.reader_position_move) { dialog, _ ->
@@ -617,7 +617,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
         exception
       }
 
-    AlertDialog.Builder(this)
+    MaterialAlertDialogBuilder(this)
       .setTitle(R.string.bookOpenFailedTitle)
       .setMessage(
         this.getString(
