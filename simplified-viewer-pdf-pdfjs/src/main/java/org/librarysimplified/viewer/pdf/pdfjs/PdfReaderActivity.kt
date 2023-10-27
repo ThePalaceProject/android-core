@@ -12,7 +12,6 @@ import android.webkit.WebView
 import android.widget.FrameLayout
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.util.concurrent.MoreExecutors
 import kotlinx.coroutines.Dispatchers
@@ -36,6 +35,7 @@ import org.nypl.simplified.ui.thread.api.UIThreadServiceType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
+import org.thepalaceproject.theme.core.PalaceToolbar
 import java.io.File
 import java.net.ServerSocket
 import java.util.ServiceLoader
@@ -224,12 +224,16 @@ class PdfReaderActivity : AppCompatActivity() {
   }
 
   private fun createToolbar(title: String) {
-    val toolbar = this.findViewById(R.id.pdf_toolbar) as Toolbar
+    val toolbar = this.findViewById(R.id.pdf_toolbar) as PalaceToolbar
+    toolbar.setLogoOnClickListener {
+      this.finish()
+    }
 
     this.setSupportActionBar(toolbar)
-    this.supportActionBar?.setHomeActionContentDescription(R.string.content_description_back)
     this.supportActionBar?.setDisplayHomeAsUpEnabled(true)
     this.supportActionBar?.setDisplayShowHomeEnabled(true)
+    this.supportActionBar?.setHomeActionContentDescription(R.string.content_description_back)
+    this.supportActionBar?.setHomeButtonEnabled(true)
     this.supportActionBar?.title = title
   }
 
