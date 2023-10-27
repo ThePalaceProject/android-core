@@ -16,7 +16,7 @@
     android:contentDescription="@string/app_name"
     android:icon="@mipmap/ic_launcher"
     android:label="@string/app_name"
-    android:theme="@style/PalaceTheme.WithoutActionBar"
+    android:theme="@style/PalaceTheme"
     android:usesCleartextTraffic="true"
     tools:replace="android:allowBackup">
 
