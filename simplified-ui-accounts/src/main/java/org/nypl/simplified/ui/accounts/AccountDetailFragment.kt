@@ -14,7 +14,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.appcompat.widget.SwitchCompat
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
@@ -503,7 +503,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
           } catch (e: Exception) {
             this.logger.error("unable to start activity: ", e)
             val context = this.requireContext()
-            AlertDialog.Builder(context)
+            MaterialAlertDialogBuilder(context)
               .setMessage(context.getString(R.string.accountReportFailed, supportUrl))
               .create()
               .show()
@@ -964,7 +964,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
         } catch (e: Exception) {
           this.logger.error("unable to start activity: ", e)
           val context = this.requireContext()
-          AlertDialog.Builder(context)
+          MaterialAlertDialogBuilder(context)
             .setMessage(context.getString(R.string.accountPasswordResetFailed, supportUrl))
             .create()
             .show()
@@ -1104,7 +1104,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
 
   private fun onAgeCheckboxClicked(): (View) -> Unit = {
     val isOver13 = this.viewModel.isOver13
-    AlertDialog.Builder(this.requireContext())
+    MaterialAlertDialogBuilder(this.requireContext())
       .setTitle(R.string.accountCOPPADeleteBooks)
       .setMessage(R.string.accountCOPPADeleteBooksConfirm)
       .setNegativeButton(R.string.accountCancel) { _, _ ->
@@ -1173,14 +1173,14 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   }
 
   private fun showErrorGettingLocationDialog() {
-    AlertDialog.Builder(requireContext())
+    MaterialAlertDialogBuilder(requireContext())
       .setMessage(getString(R.string.accountCardCreatorLocationFailed))
       .create()
       .show()
   }
 
   private fun showLocationDisclaimerDialog() {
-    AlertDialog.Builder(requireContext())
+    MaterialAlertDialogBuilder(requireContext())
       .setMessage(R.string.accountCardCreatorDialogPermissionsMessage)
       .setPositiveButton(android.R.string.ok) { _, _ -> requestLocationPermissions() }
       .setNegativeButton(R.string.accountCardCreatorDialogCancel) { dialog, _ -> dialog?.dismiss() }
@@ -1189,7 +1189,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   }
 
   private fun showSettingsDialog() {
-    AlertDialog.Builder(requireContext())
+    MaterialAlertDialogBuilder(requireContext())
       .setMessage(R.string.accountCardCreatorDialogOpenSettingsMessage)
       .setPositiveButton(R.string.accountCardCreatorDialogOpenSettings) { _, _ ->
         openAppSettings()

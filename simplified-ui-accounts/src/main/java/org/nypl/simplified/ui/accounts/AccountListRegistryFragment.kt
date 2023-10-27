@@ -1,5 +1,6 @@
 package org.nypl.simplified.ui.accounts
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import android.annotation.SuppressLint
 import android.content.Context
 import android.location.LocationManager
@@ -275,7 +276,7 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
 
     if (this.errorDialog == null) {
       val newDialog =
-        AlertDialog.Builder(this.requireActivity())
+        MaterialAlertDialogBuilder(this.requireActivity())
           .setTitle(R.string.accountCreationFailed)
           .setMessage(R.string.accountCreationFailedMessage)
           .setPositiveButton(R.string.accountsDetails) { dialog, _ ->

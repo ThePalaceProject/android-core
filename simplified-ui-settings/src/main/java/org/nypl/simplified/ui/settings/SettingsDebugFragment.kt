@@ -1,6 +1,6 @@
 package org.nypl.simplified.ui.settings
 
-import android.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
@@ -344,7 +344,7 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
     message.append(context.cacheDir?.isDirectory ?: false)
     message.append("\n")
 
-    AlertDialog.Builder(context)
+    MaterialAlertDialogBuilder(context)
       .setTitle("Cache Directory")
       .setMessage(message.toString())
       .show()

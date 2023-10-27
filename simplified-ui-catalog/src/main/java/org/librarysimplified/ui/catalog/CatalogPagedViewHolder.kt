@@ -7,7 +7,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.recyclerview.widget.RecyclerView
 import com.google.common.base.Preconditions
 import com.google.common.util.concurrent.FluentFuture
@@ -363,7 +363,7 @@ class CatalogPagedViewHolder(
   }
 
   private fun onBookStatusReachedLoanLimit() {
-    AlertDialog.Builder(context)
+    MaterialAlertDialogBuilder(context)
       .setTitle(R.string.bookReachedLoanLimitDialogTitle)
       .setMessage(R.string.bookReachedLoanLimitDialogMessage)
       .setPositiveButton(R.string.bookReachedLoanLimitDialogButton) { dialog, _ ->

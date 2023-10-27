@@ -9,7 +9,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -660,7 +660,7 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
   }
 
   private fun onBookStatusReachedLoanLimit() {
-    AlertDialog.Builder(requireContext())
+    MaterialAlertDialogBuilder(requireContext())
       .setTitle(R.string.bookReachedLoanLimitDialogTitle)
       .setMessage(R.string.bookReachedLoanLimitDialogMessage)
       .setPositiveButton(R.string.bookReachedLoanLimitDialogButton) { dialog, _ ->

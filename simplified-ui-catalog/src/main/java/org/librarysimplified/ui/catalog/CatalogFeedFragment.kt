@@ -19,7 +19,7 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.Space
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SearchView
 import androidx.core.os.bundleOf
@@ -794,7 +794,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
     val checkedItem = choices.indexOfFirst { it.isActive }
 
     // Build the dialog
-    val alertBuilder = AlertDialog.Builder(this.requireContext())
+    val alertBuilder = MaterialAlertDialogBuilder(this.requireContext())
     alertBuilder.setTitle(groupName)
     alertBuilder.setSingleChoiceItems(names, checkedItem) { dialog, checked ->
       val selected = choices[checked]
