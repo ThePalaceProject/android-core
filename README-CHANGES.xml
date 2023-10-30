@@ -337,7 +337,7 @@
         <c:change date="2023-10-16T00:00:00+00:00" summary="Fixed crash when creating a library card."/>
       </c:changes>
     </c:release>
-    <c:release date="2023-10-27T15:08:43+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.7.0">
+    <c:release date="2023-10-30T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.7.0">
       <c:changes>
         <c:change date="2023-10-19T00:00:00+00:00" summary="Adjusted feed tabs navigation to keep the Catalog on the top of the screen."/>
         <c:change date="2023-10-23T00:00:00+00:00" summary="Use a new Material 3 theme."/>
@@ -348,7 +348,11 @@
         </c:change>
         <c:change date="2023-10-24T00:00:00+00:00" summary="Enabled push notifications by default."/>
         <c:change date="2023-10-25T00:00:00+00:00" summary="Fixed crash on Reader screen due to more than one Fragment instance."/>
-        <c:change date="2023-10-27T15:08:43+00:00" summary="Removed the Android 12+ devices default splash screen."/>
+      </c:changes>
+    </c:release>
+    <c:release date="2023-10-30T14:34:27+00:00" is-open="true" ticket-system="org.nypl.jira" version="1.8.0">
+      <c:changes>
+        <c:change date="2023-10-30T14:34:27+00:00" summary="Removed the Android 12+ devices default splash screen."/>
       </c:changes>
     </c:release>
   </c:releases>
