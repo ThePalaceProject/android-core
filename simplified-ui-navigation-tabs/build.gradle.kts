@@ -22,6 +22,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.coordinatorlayout)
     implementation(libs.androidx.core)
+    implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.customview)
     implementation(libs.androidx.drawerlayout)
     implementation(libs.androidx.fragment)
