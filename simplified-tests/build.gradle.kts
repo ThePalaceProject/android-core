@@ -127,6 +127,7 @@ val dependencyObjects = listOf(
     libs.androidx.coordinatorlayout,
     libs.androidx.core,
     libs.androidx.core.ktx,
+    libs.androidx.core.splashscreen,
     libs.androidx.customview,
     libs.androidx.drawerlayout,
     libs.androidx.fragment,
