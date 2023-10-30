@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <style name="PalaceTheme" parent="PalaceTheme.WithoutActionBar">
-        <item name="android:windowIsTranslucent">true</item>
-
-        <!-- The theme to set after the default splash screen is dismissed-->
-        <item name="postSplashScreenTheme">@style/PalaceTheme.WithoutActionBar</item>
-    </style>
-</resources>
