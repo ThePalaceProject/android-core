@@ -32,6 +32,7 @@ dependencies {
     implementation(libs.androidx.coordinatorlayout)
     implementation(libs.androidx.core)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.customview.poolingcontainer)
     implementation(libs.androidx.drawerlayout)
     implementation(libs.androidx.emoji2)
