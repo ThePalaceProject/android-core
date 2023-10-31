@@ -45,9 +45,229 @@
         <c:change date="2021-09-02T00:00:00+00:00" summary="Use palaceproject.io library registry"/>
       </c:changes>
     </c:release>
+    <c:release date="2022-08-15T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.1.0">
+      <c:changes>
+        <c:change date="2022-05-05T00:00:00+00:00" summary="Fixed the labels of the filtering and sorting buttons in the catalog being cut off."/>
+        <c:change date="2022-05-05T00:00:00+00:00" summary="Disabled the Search button on the catalog search pop-up when the input is blank."/>
+        <c:change date="2022-05-05T00:00:00+00:00" summary="Added a &quot;No results found&quot; message when a search of the catalog has no results."/>
+        <c:change date="2022-05-13T00:00:00+00:00" summary="Fixed the title of the current catalog lane overlapping the back button."/>
+        <c:change date="2022-05-13T00:00:00+00:00" summary="Removed the title of the current catalog lane from book detail screen."/>
+        <c:change date="2022-05-13T00:00:00+00:00" summary="Changed &quot;This book is available for loan&quot; to &quot;This book is available to borrow&quot; on the book detail screen."/>
+        <c:change date="2022-05-13T00:00:00+00:00" summary="Moved the book format information (EPUB, PDF, audiobook) down to the Information block on the book detail screen."/>
+        <c:change date="2022-05-13T00:00:00+00:00" summary="Upgraded the Readium library used by the EPUB reader to version 2.2.0."/>
+        <c:change date="2022-05-17T00:00:00+00:00" summary="Added a loading indicator to the book detail screen while an LCP passphrase is being retrieved."/>
+        <c:change date="2022-05-17T00:00:00+00:00" summary="Fixed an error that occurred when downloading BiblioBoard audio books."/>
+        <c:change date="2022-05-18T00:00:00+00:00" summary="Added a &quot;Cancel&quot; button to the book detail screen to stop a download that is in progress."/>
+        <c:change date="2022-05-19T00:00:00+00:00" summary="Added a &quot;More&quot; button to reveal the entire book description on the book detail screen."/>
+        <c:change date="2022-06-03T00:00:00+00:00" summary="Added support for library support URLs (in addition to library support email addresses) on the account detail screen."/>
+        <c:change date="2022-06-10T00:00:00+00:00" summary="Fixed an error that occurred when playing audio books after switching libraries."/>
+        <c:change date="2022-06-15T00:00:00+00:00" summary="Fixed cropping of non-square audio book covers in the player."/>
+        <c:change date="2022-06-29T00:00:00+00:00" summary="Added a new PDF reader implementation that can be enabled for testing."/>
+        <c:change date="2022-06-30T00:00:00+00:00" summary="Added syncing of the current audio book position across devices."/>
+        <c:change date="2022-06-30T00:00:00+00:00" summary="Stopped automatically playing an audio book when the player is opened."/>
+        <c:change date="2022-07-12T00:00:00+00:00" summary="Added a &quot;Loan limit reached&quot; pop-up message instead of showing a generic &quot;The operation could not be completed&quot; error."/>
+        <c:change date="2022-07-15T00:00:00+00:00" summary="Added a &quot;Cancel&quot; option to the library selection menu."/>
+        <c:change date="2022-07-19T00:00:00+00:00" summary="Fixed the playback rate not being retained after closing and reopening an audio book."/>
+        <c:change date="2022-07-20T00:00:00+00:00" summary="Changed the audio book progress bar to require a drag on the handle instead of just a tap to jump to a new location."/>
+        <c:change date="2022-07-22T00:00:00+00:00" summary="Added a &quot;Cancel&quot; option to the sleep timer and playback rate menus in the audio book player."/>
+        <c:change date="2022-07-28T00:00:00+00:00" summary="Fixed the library name not being fully displayed on the account detail screen."/>
+        <c:change date="2022-07-29T00:00:00+00:00" summary="Added an option to reset the patron's password on the account detail screen."/>
+        <c:change date="2022-08-03T00:00:00+00:00" summary="Fixed the audio book position sometimes not being retained after exiting the player."/>
+        <c:change date="2022-08-05T00:00:00+00:00" summary="Fixed a &quot;Download&quot; button appearing after returning a book, that would lead to an error if tapped."/>
+      </c:changes>
+    </c:release>
+    <c:release date="2022-03-29T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.0.8">
+      <c:changes>
+        <c:change date="2022-03-15T00:00:00+00:00" summary="Added support for acquiring and playing audiobooks that use LCP DRM."/>
+        <c:change date="2022-03-22T00:00:00+00:00" summary="Changed the label of untitled audiobook files from &quot;Chapter&quot; to &quot;Track&quot;."/>
+      </c:changes>
+    </c:release>
+    <c:release date="2023-10-31T20:33:44+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.7.1">
+      <c:changes>
+        <c:change date="2023-10-30T00:00:00+00:00" summary="Removed the Android 12+ devices default splash screen."/>
+        <c:change date="2023-10-31T00:00:00+00:00" summary="Reduce audio book related crashes.">
+          <c:tickets>
+            <c:ticket id="PP-565"/>
+          </c:tickets>
+        </c:change>
+      </c:changes>
+    </c:release>
+    <c:release date="2022-04-27T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.0.9">
+      <c:changes>
+        <c:change date="2022-04-07T00:00:00+00:00" summary="Added support for PDF books with LCP DRM."/>
+        <c:change date="2022-04-08T00:00:00+00:00" summary="Added automatic loading and displaying of related books on the book details screen."/>
+        <c:change date="2022-04-12T00:00:00+00:00" summary="Removed the red icon from the audio book cover on the audiobook player screen."/>
+        <c:change date="2022-04-18T00:00:00+00:00" summary="Added messages to the My Books and Reservations tabs when there are no books."/>
+        <c:change date="2022-04-20T00:00:00+00:00" summary="Removed padding from the audio book cover image on the audio book player screen."/>
+        <c:change date="2022-04-21T00:00:00+00:00" summary="Improved the chapter titles displayed in the audio book player. The chapter titles from the table of contents are now used, when one is supplied in the manifest. Previously, a file name was displayed for some books."/>
+      </c:changes>
+    </c:release>
+    <c:release date="2022-01-26T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.0.6">
+      <c:changes>
+        <c:change date="2021-12-14T00:00:00+00:00" summary="Added audiobook player controls to the lock screen."/>
+        <c:change date="2021-12-15T00:00:00+00:00" summary="Disabled landscape mode for now. It was causing some problems."/>
+        <c:change date="2021-12-15T00:00:00+00:00" summary="Changed the title bar to show the name of the current lane when browsing the catalog."/>
+        <c:change date="2021-12-20T00:00:00+00:00" summary="Changed the sync bookmarks setting to be on by default after logging in to a library."/>
+        <c:change date="2021-12-27T00:00:00+00:00" summary="Added &quot;More...&quot; label back to catalog lanes."/>
+        <c:change date="2022-01-05T00:00:00+00:00" summary="Fixed the reading position from other devices not being remembered when opening a book."/>
+        <c:change date="2022-01-07T00:00:00+00:00" summary="Changed the button label for books that are checked out but not downloaded from &quot;Get&quot; to &quot;Download&quot;"/>
+        <c:change date="2022-01-11T00:00:00+00:00" summary="Fixed the &quot;Error code: 51000&quot; error that could occur when playing certain audiobooks."/>
+        <c:change date="2022-01-11T00:00:00+00:00" summary="Removed the EULA screen from initial startup."/>
+        <c:change date="2022-01-13T00:00:00+00:00" summary="Fixed books becoming stuck in the &quot;Requesting...&quot; state after cancelling a login while borrowing."/>
+        <c:change date="2022-01-13T00:00:00+00:00" summary="Fixed the app not returning to the correct book detail or catalog screen after cancelling a login while borrowing."/>
+        <c:change date="2022-01-17T00:00:00+00:00" summary="Added support for Overdrive audiobooks."/>
+        <c:change date="2022-01-20T00:00:00+00:00" summary="Fixed a crash when opening a chapter from the TOC on audiobooks."/>
+        <c:change date="2022-01-21T00:00:00+00:00" summary="Removed the &quot;Show&quot; filter from My Books. This wasn't useful."/>
+      </c:changes>
+    </c:release>
+    <c:release date="2023-10-11T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.6.0">
+      <c:changes>
+        <c:change date="2023-08-24T00:00:00+00:00" summary="Updated Kotlin version to 1.9.0"/>
+        <c:change date="2023-08-28T00:00:00+00:00" summary="Fixed crash when opening an audiobook with a null manifest."/>
+        <c:change date="2023-08-28T00:00:00+00:00" summary="Added support to basic auth token login."/>
+        <c:change date="2023-09-11T00:00:00+00:00" summary="Added support to push notifications and FCM token retrieval."/>
+        <c:change date="2023-09-18T00:00:00+00:00" summary="Fix an audio book player crash.">
+          <c:tickets>
+            <c:ticket id="PP-406"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2023-09-18T00:00:00+00:00" summary="Added missing auth type on authentication object parsing."/>
+        <c:change date="2023-09-20T00:00:00+00:00" summary="Fix SAML login button accessibility label.">
+          <c:tickets>
+            <c:ticket id="PP-418"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2023-09-20T00:00:00+00:00" summary="Changed BasicToken login request method to POST."/>
+        <c:change date="2023-09-20T00:00:00+00:00" summary="Very wide covers have their widths restricted to avoid breaking the UI.">
+          <c:tickets>
+            <c:ticket id="PP-443"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2023-09-21T00:00:00+00:00" summary="Correctly update the Accounts UI when resuming from the lock screen.">
+          <c:tickets>
+            <c:ticket id="PP-307"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2023-09-21T00:00:00+00:00" summary="Added support to EPUB text searching."/>
+        <c:change date="2023-09-22T00:00:00+00:00" summary="Added push notifications option to DEV settings."/>
+        <c:change date="2023-09-26T00:00:00+00:00" summary="Fixed bookmarks not being deleted."/>
+        <c:change date="2023-10-07T00:00:00+00:00" summary="Fixed Audiobook UI freezing after pressing 'play'."/>
+      </c:changes>
+    </c:release>
+    <c:release date="2022-03-09T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.0.7">
+      <c:changes>
+        <c:change date="2022-01-28T00:00:00+00:00" summary="Fixed the audiobook playback rate getting reset back to 1x after pausing."/>
+        <c:change date="2022-02-03T00:00:00+00:00" summary="Fixed a crash that could happen when exiting an audiobook while it's playing."/>
+        <c:change date="2022-02-03T00:00:00+00:00" summary="Removed the sync bookmarks option from libraries that don't require a login."/>
+        <c:change date="2022-02-04T00:00:00+00:00" summary="Fixed books remaining in My Books after they've been returned."/>
+        <c:change date="2022-02-08T00:00:00+00:00" summary="Fixed the reader toolbar not changing color to match the selected color scheme."/>
+        <c:change date="2022-02-08T00:00:00+00:00" summary="Fixed an error when tapping on Related Books on the book detail screen."/>
+        <c:change date="2022-02-15T00:00:00+00:00" summary="Fixed audiobook cover images appearing stretched."/>
+        <c:change date="2022-02-15T00:00:00+00:00" summary="Updated some text on the debug options screen."/>
+        <c:change date="2022-02-18T00:00:00+00:00" summary="Added a back button to the PDF reader."/>
+        <c:change date="2022-02-23T00:00:00+00:00" summary="Added narrators information to the book details screen."/>
+        <c:change date="2022-02-24T00:00:00+00:00" summary="Fixed book titles being cut off on the book details screen."/>
+        <c:change date="2022-02-25T00:00:00+00:00" summary="Fixed some book details information being cut off."/>
+        <c:change date="2022-03-01T00:00:00+00:00" summary="Removed Open Textbook Library from the featured libraries."/>
+      </c:changes>
+    </c:release>
+    <c:release date="2023-10-18T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.6.1">
+      <c:changes>
+        <c:change date="2023-10-16T00:00:00+00:00" summary="Fixed crash when creating a library card."/>
+      </c:changes>
+    </c:release>
+    <c:release date="2023-10-30T00:00:00+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.7.0">
+      <c:changes>
+        <c:change date="2023-10-19T00:00:00+00:00" summary="Adjusted feed tabs navigation to keep the Catalog on the top of the screen."/>
+        <c:change date="2023-10-23T00:00:00+00:00" summary="Use a new Material 3 theme."/>
+        <c:change date="2023-10-23T00:00:00+00:00" summary="Fix a missing version name.">
+          <c:tickets>
+            <c:ticket id="PP-610"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2023-10-24T00:00:00+00:00" summary="Enabled push notifications by default."/>
+        <c:change date="2023-10-25T00:00:00+00:00" summary="Fixed crash on Reader screen due to more than one Fragment instance."/>
+      </c:changes>
+    </c:release>
+    <c:release date="2021-11-11T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.0.4">
+      <c:changes>
+        <c:change date="2021-11-03T00:00:00+00:00" summary="Fix a startup crash involving malformed bookmarks"/>
+        <c:change date="2021-11-08T00:00:00+00:00" summary="Return to book details after logging in while borrowing a book"/>
+      </c:changes>
+    </c:release>
+    <c:release date="2023-03-14T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.4.0">
+      <c:changes>
+        <c:change date="2022-12-12T00:00:00+00:00" summary="Changed the color of enabled switches to green."/>
+        <c:change date="2022-12-15T00:00:00+00:00" summary="Added &quot;About Palace&quot; to the Documentation available on the Settings screen."/>
+        <c:change date="2023-01-11T00:00:00+00:00" summary="Added the ability to open the app by clicking on an audio book player notification."/>
+        <c:change date="2023-01-13T00:00:00+00:00" summary="Added the ability to toggle the toolbar and title when reading a PDF by clicking on the page."/>
+        <c:change date="2023-01-17T00:00:00+00:00" summary="Fixed audiobook sleep timers not being restored when exiting and restarting the app."/>
+        <c:change date="2023-01-18T00:00:00+00:00" summary="Added display of the search query on search result screens."/>
+        <c:change date="2023-02-13T00:00:00+00:00" summary="Added support for viewing book preview samples."/>
+        <c:change date="2023-02-20T00:00:00+00:00" summary="Fixed some audio books not appearing in the bookshelf when offline."/>
+        <c:change date="2023-02-23T00:00:00+00:00" summary="Added a prompt to move to the reading position saved from another device when opening a book."/>
+        <c:change date="2023-02-28T00:00:00+00:00" summary="Moved the 'Remove' button after the 'Get' button on the Reservations screen."/>
+      </c:changes>
+    </c:release>
+    <c:release date="2021-12-08T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.0.5">
+      <c:changes>
+        <c:change date="2021-11-16T00:00:00+00:00" summary="Added return option to all loaned books"/>
+        <c:change date="2021-11-16T00:00:00+00:00" summary="Fixed Palace books not being removed from My Books when returned"/>
+        <c:change date="2021-11-16T00:00:00+00:00" summary="Updated styling of catalog filtering tabs"/>
+        <c:change date="2021-11-17T00:00:00+00:00" summary="Enabled dark mode"/>
+        <c:change date="2021-11-22T00:00:00+00:00" summary="Fixed books with certain published dates preventing display of catalog in certain time zones"/>
+        <c:change date="2021-11-30T00:00:00+00:00" summary="Added tutorial to be shown when launching the app for the first time"/>
+        <c:change date="2021-12-06T00:00:00+00:00" summary="Fixed documentation failing to display"/>
+        <c:change date="2021-12-07T00:00:00+00:00" summary="Fixed back button not working on Error Details screen"/>
+      </c:changes>
+    </c:release>
+    <c:release date="2023-08-18T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.5.0">
+      <c:changes>
+        <c:change date="2023-03-30T00:00:00+00:00" summary="Save reading position of audiobooks on play, pause, and stop (which also includes when seeking and changing chapters)."/>
+        <c:change date="2023-04-04T00:00:00+00:00" summary="Updated library logos loading source in registry feed."/>
+        <c:change date="2023-04-06T00:00:00+00:00" summary="Hidden expired loans in offline mode."/>
+        <c:change date="2023-04-06T00:00:00+00:00" summary="Changed position and text of preview button."/>
+        <c:change date="2023-04-06T00:00:00+00:00" summary="Removed preview button when the user already have the full book."/>
+        <c:change date="2023-04-06T00:00:00+00:00" summary="Added support to the new Audible TOC."/>
+        <c:change date="2023-04-11T00:00:00+00:00" summary="Fixed WebView audiobook preview not pausing when earphones are unplugged."/>
+        <c:change date="2023-04-26T00:00:00+00:00" summary="Added support for Bluetooth audio controls to play, pause, and skip tracks."/>
+        <c:change date="2023-04-27T00:00:00+00:00" summary="Added support to audiobook bookmarks."/>
+        <c:change date="2023-05-02T00:00:00+00:00" summary="Added badge to holds tab with the number of available holds."/>
+        <c:change date="2023-05-09T00:00:00+00:00" summary="Always show audio controls on lock screen."/>
+        <c:change date="2023-05-10T00:00:00+00:00" summary="Bluetooth media controls now support play/pause on more devices and now support fast forwarding and rewinding."/>
+        <c:change date="2023-05-11T00:00:00+00:00" summary="Removed old pdf reader."/>
+        <c:change date="2023-05-23T00:00:00+00:00" summary="Support deep links to library login screen with automatic entry of barcode."/>
+        <c:change date="2023-06-13T00:00:00+00:00" summary="Add option to manually insert a LCP passphrase."/>
+        <c:change date="2023-06-21T00:00:00+00:00" summary="Fixed audiobook bookmarks being incorrectly displayed and failing to be deleted."/>
+        <c:change date="2023-06-26T00:00:00+00:00" summary="Removed hardcoded message from LCP passphrase dialog."/>
+        <c:change date="2023-07-04T00:00:00+00:00" summary="Fixed bug of bookmarks not being deleted."/>
+        <c:change date="2023-07-11T00:00:00+00:00" summary="Added default LCP passphrase to be returned when the feed entry doesn't have one and the manual input is enabled."/>
+        <c:change date="2023-07-13T00:00:00+00:00" summary="Updated library card creation flow by requesting permissions and opening a WebView with the user's current location."/>
+        <c:change date="2023-08-02T00:00:00+00:00" summary="Fixed crash after setting an audiobook timer more than once in a short time."/>
+        <c:change date="2023-08-02T00:00:00+00:00" summary="Fixed crash when saving a bookmark on the server."/>
+        <c:change date="2023-08-09T00:00:00+00:00" summary="Added feature to track playing time on audiobooks."/>
+        <c:change date="2023-08-12T00:00:00+00:00" summary="Fixed crash when time tracking is not enabled."/>
+      </c:changes>
+    </c:release>
     <c:release date="2021-09-10T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.0.2">
       <c:changes>
         <c:change date="2021-09-10T00:00:00+00:00" summary="Introduced a new color scheme for the application."/>
+      </c:changes>
+    </c:release>
+    <c:release date="2022-09-19T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.2.0">
+      <c:changes>
+        <c:change date="2022-08-09T00:00:00+00:00" summary="Fixed the reading position in PDF books not being synced across devices."/>
+        <c:change date="2022-08-10T00:00:00+00:00" summary="Improved announcement of controls when using TalkBack."/>
+        <c:change date="2022-08-12T00:00:00+00:00" summary="Added a back button when searching for a library."/>
+        <c:change date="2022-08-16T00:00:00+00:00" summary="Changed the chapter duration display in the audio book player to a running remaining time display."/>
+        <c:change date="2022-08-16T00:00:00+00:00" summary="Added the ability to show the password in the account details screen of any library that has been signed into."/>
+        <c:change date="2022-08-17T00:00:00+00:00" summary="Fixed books with preview links not opening."/>
+        <c:change date="2022-08-23T00:00:00+00:00" summary="Introduced a new PDF reader that is able to open many books that couldn't previously be opened."/>
+        <c:change date="2022-08-24T00:00:00+00:00" summary="Fixed searching field text overlapping back button."/>
+        <c:change date="2022-08-30T00:00:00+00:00" summary="Fixed the back button on the account detail screen not returning to the catalog when signing in while borrowing a book."/>
+        <c:change date="2022-08-31T00:00:00+00:00" summary="Added a remaining time display to the audio book player."/>
+        <c:change date="2022-09-01T00:00:00+00:00" summary="Fixed the back button on the account detail screen not working when opened from the onboarding screen."/>
+        <c:change date="2022-09-19T00:00:00+00:00" summary="Fixed a crash that occurred on some Samsung devices."/>
       </c:changes>
     </c:release>
     <c:release date="2021-11-01T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.0.3">
@@ -115,128 +335,6 @@
         <c:change date="2021-10-29T00:00:00+00:00" summary="Change 'Download' button label to 'Get'"/>
       </c:changes>
     </c:release>
-    <c:release date="2021-11-11T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.0.4">
-      <c:changes>
-        <c:change date="2021-11-03T00:00:00+00:00" summary="Fix a startup crash involving malformed bookmarks"/>
-        <c:change date="2021-11-08T00:00:00+00:00" summary="Return to book details after logging in while borrowing a book"/>
-      </c:changes>
-    </c:release>
-    <c:release date="2021-12-08T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.0.5">
-      <c:changes>
-        <c:change date="2021-11-16T00:00:00+00:00" summary="Added return option to all loaned books"/>
-        <c:change date="2021-11-16T00:00:00+00:00" summary="Fixed Palace books not being removed from My Books when returned"/>
-        <c:change date="2021-11-16T00:00:00+00:00" summary="Updated styling of catalog filtering tabs"/>
-        <c:change date="2021-11-17T00:00:00+00:00" summary="Enabled dark mode"/>
-        <c:change date="2021-11-22T00:00:00+00:00" summary="Fixed books with certain published dates preventing display of catalog in certain time zones"/>
-        <c:change date="2021-11-30T00:00:00+00:00" summary="Added tutorial to be shown when launching the app for the first time"/>
-        <c:change date="2021-12-06T00:00:00+00:00" summary="Fixed documentation failing to display"/>
-        <c:change date="2021-12-07T00:00:00+00:00" summary="Fixed back button not working on Error Details screen"/>
-      </c:changes>
-    </c:release>
-    <c:release date="2022-01-26T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.0.6">
-      <c:changes>
-        <c:change date="2021-12-14T00:00:00+00:00" summary="Added audiobook player controls to the lock screen."/>
-        <c:change date="2021-12-15T00:00:00+00:00" summary="Disabled landscape mode for now. It was causing some problems."/>
-        <c:change date="2021-12-15T00:00:00+00:00" summary="Changed the title bar to show the name of the current lane when browsing the catalog."/>
-        <c:change date="2021-12-20T00:00:00+00:00" summary="Changed the sync bookmarks setting to be on by default after logging in to a library."/>
-        <c:change date="2021-12-27T00:00:00+00:00" summary="Added &quot;More...&quot; label back to catalog lanes."/>
-        <c:change date="2022-01-05T00:00:00+00:00" summary="Fixed the reading position from other devices not being remembered when opening a book."/>
-        <c:change date="2022-01-07T00:00:00+00:00" summary="Changed the button label for books that are checked out but not downloaded from &quot;Get&quot; to &quot;Download&quot;"/>
-        <c:change date="2022-01-11T00:00:00+00:00" summary="Fixed the &quot;Error code: 51000&quot; error that could occur when playing certain audiobooks."/>
-        <c:change date="2022-01-11T00:00:00+00:00" summary="Removed the EULA screen from initial startup."/>
-        <c:change date="2022-01-13T00:00:00+00:00" summary="Fixed books becoming stuck in the &quot;Requesting...&quot; state after cancelling a login while borrowing."/>
-        <c:change date="2022-01-13T00:00:00+00:00" summary="Fixed the app not returning to the correct book detail or catalog screen after cancelling a login while borrowing."/>
-        <c:change date="2022-01-17T00:00:00+00:00" summary="Added support for Overdrive audiobooks."/>
-        <c:change date="2022-01-20T00:00:00+00:00" summary="Fixed a crash when opening a chapter from the TOC on audiobooks."/>
-        <c:change date="2022-01-21T00:00:00+00:00" summary="Removed the &quot;Show&quot; filter from My Books. This wasn't useful."/>
-      </c:changes>
-    </c:release>
-    <c:release date="2022-03-09T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.0.7">
-      <c:changes>
-        <c:change date="2022-01-28T00:00:00+00:00" summary="Fixed the audiobook playback rate getting reset back to 1x after pausing."/>
-        <c:change date="2022-02-03T00:00:00+00:00" summary="Fixed a crash that could happen when exiting an audiobook while it's playing."/>
-        <c:change date="2022-02-03T00:00:00+00:00" summary="Removed the sync bookmarks option from libraries that don't require a login."/>
-        <c:change date="2022-02-04T00:00:00+00:00" summary="Fixed books remaining in My Books after they've been returned."/>
-        <c:change date="2022-02-08T00:00:00+00:00" summary="Fixed the reader toolbar not changing color to match the selected color scheme."/>
-        <c:change date="2022-02-08T00:00:00+00:00" summary="Fixed an error when tapping on Related Books on the book detail screen."/>
-        <c:change date="2022-02-15T00:00:00+00:00" summary="Fixed audiobook cover images appearing stretched."/>
-        <c:change date="2022-02-15T00:00:00+00:00" summary="Updated some text on the debug options screen."/>
-        <c:change date="2022-02-18T00:00:00+00:00" summary="Added a back button to the PDF reader."/>
-        <c:change date="2022-02-23T00:00:00+00:00" summary="Added narrators information to the book details screen."/>
-        <c:change date="2022-02-24T00:00:00+00:00" summary="Fixed book titles being cut off on the book details screen."/>
-        <c:change date="2022-02-25T00:00:00+00:00" summary="Fixed some book details information being cut off."/>
-        <c:change date="2022-03-01T00:00:00+00:00" summary="Removed Open Textbook Library from the featured libraries."/>
-      </c:changes>
-    </c:release>
-    <c:release date="2022-03-29T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.0.8">
-      <c:changes>
-        <c:change date="2022-03-15T00:00:00+00:00" summary="Added support for acquiring and playing audiobooks that use LCP DRM."/>
-        <c:change date="2022-03-22T00:00:00+00:00" summary="Changed the label of untitled audiobook files from &quot;Chapter&quot; to &quot;Track&quot;."/>
-      </c:changes>
-    </c:release>
-    <c:release date="2022-04-27T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.0.9">
-      <c:changes>
-        <c:change date="2022-04-07T00:00:00+00:00" summary="Added support for PDF books with LCP DRM."/>
-        <c:change date="2022-04-08T00:00:00+00:00" summary="Added automatic loading and displaying of related books on the book details screen."/>
-        <c:change date="2022-04-12T00:00:00+00:00" summary="Removed the red icon from the audio book cover on the audiobook player screen."/>
-        <c:change date="2022-04-18T00:00:00+00:00" summary="Added messages to the My Books and Reservations tabs when there are no books."/>
-        <c:change date="2022-04-20T00:00:00+00:00" summary="Removed padding from the audio book cover image on the audio book player screen."/>
-        <c:change date="2022-04-21T00:00:00+00:00" summary="Improved the chapter titles displayed in the audio book player. The chapter titles from the table of contents are now used, when one is supplied in the manifest. Previously, a file name was displayed for some books."/>
-      </c:changes>
-    </c:release>
-    <c:release date="2022-04-29T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.0.10">
-      <c:changes>
-        <c:change date="2022-04-28T00:00:00+00:00" summary="Improved security of OverDrive audio book downloads."/>
-        <c:change date="2022-04-29T00:00:00+00:00" summary="Fixed &quot;Unable to initialize audio engine&quot; error playing some audio books."/>
-      </c:changes>
-    </c:release>
-    <c:release date="2022-08-15T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.1.0">
-      <c:changes>
-        <c:change date="2022-05-05T00:00:00+00:00" summary="Fixed the labels of the filtering and sorting buttons in the catalog being cut off."/>
-        <c:change date="2022-05-05T00:00:00+00:00" summary="Disabled the Search button on the catalog search pop-up when the input is blank."/>
-        <c:change date="2022-05-05T00:00:00+00:00" summary="Added a &quot;No results found&quot; message when a search of the catalog has no results."/>
-        <c:change date="2022-05-13T00:00:00+00:00" summary="Fixed the title of the current catalog lane overlapping the back button."/>
-        <c:change date="2022-05-13T00:00:00+00:00" summary="Removed the title of the current catalog lane from book detail screen."/>
-        <c:change date="2022-05-13T00:00:00+00:00" summary="Changed &quot;This book is available for loan&quot; to &quot;This book is available to borrow&quot; on the book detail screen."/>
-        <c:change date="2022-05-13T00:00:00+00:00" summary="Moved the book format information (EPUB, PDF, audiobook) down to the Information block on the book detail screen."/>
-        <c:change date="2022-05-13T00:00:00+00:00" summary="Upgraded the Readium library used by the EPUB reader to version 2.2.0."/>
-        <c:change date="2022-05-17T00:00:00+00:00" summary="Added a loading indicator to the book detail screen while an LCP passphrase is being retrieved."/>
-        <c:change date="2022-05-17T00:00:00+00:00" summary="Fixed an error that occurred when downloading BiblioBoard audio books."/>
-        <c:change date="2022-05-18T00:00:00+00:00" summary="Added a &quot;Cancel&quot; button to the book detail screen to stop a download that is in progress."/>
-        <c:change date="2022-05-19T00:00:00+00:00" summary="Added a &quot;More&quot; button to reveal the entire book description on the book detail screen."/>
-        <c:change date="2022-06-03T00:00:00+00:00" summary="Added support for library support URLs (in addition to library support email addresses) on the account detail screen."/>
-        <c:change date="2022-06-10T00:00:00+00:00" summary="Fixed an error that occurred when playing audio books after switching libraries."/>
-        <c:change date="2022-06-15T00:00:00+00:00" summary="Fixed cropping of non-square audio book covers in the player."/>
-        <c:change date="2022-06-29T00:00:00+00:00" summary="Added a new PDF reader implementation that can be enabled for testing."/>
-        <c:change date="2022-06-30T00:00:00+00:00" summary="Added syncing of the current audio book position across devices."/>
-        <c:change date="2022-06-30T00:00:00+00:00" summary="Stopped automatically playing an audio book when the player is opened."/>
-        <c:change date="2022-07-12T00:00:00+00:00" summary="Added a &quot;Loan limit reached&quot; pop-up message instead of showing a generic &quot;The operation could not be completed&quot; error."/>
-        <c:change date="2022-07-15T00:00:00+00:00" summary="Added a &quot;Cancel&quot; option to the library selection menu."/>
-        <c:change date="2022-07-19T00:00:00+00:00" summary="Fixed the playback rate not being retained after closing and reopening an audio book."/>
-        <c:change date="2022-07-20T00:00:00+00:00" summary="Changed the audio book progress bar to require a drag on the handle instead of just a tap to jump to a new location."/>
-        <c:change date="2022-07-22T00:00:00+00:00" summary="Added a &quot;Cancel&quot; option to the sleep timer and playback rate menus in the audio book player."/>
-        <c:change date="2022-07-28T00:00:00+00:00" summary="Fixed the library name not being fully displayed on the account detail screen."/>
-        <c:change date="2022-07-29T00:00:00+00:00" summary="Added an option to reset the patron's password on the account detail screen."/>
-        <c:change date="2022-08-03T00:00:00+00:00" summary="Fixed the audio book position sometimes not being retained after exiting the player."/>
-        <c:change date="2022-08-05T00:00:00+00:00" summary="Fixed a &quot;Download&quot; button appearing after returning a book, that would lead to an error if tapped."/>
-      </c:changes>
-    </c:release>
-    <c:release date="2022-09-19T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.2.0">
-      <c:changes>
-        <c:change date="2022-08-09T00:00:00+00:00" summary="Fixed the reading position in PDF books not being synced across devices."/>
-        <c:change date="2022-08-10T00:00:00+00:00" summary="Improved announcement of controls when using TalkBack."/>
-        <c:change date="2022-08-12T00:00:00+00:00" summary="Added a back button when searching for a library."/>
-        <c:change date="2022-08-16T00:00:00+00:00" summary="Changed the chapter duration display in the audio book player to a running remaining time display."/>
-        <c:change date="2022-08-16T00:00:00+00:00" summary="Added the ability to show the password in the account details screen of any library that has been signed into."/>
-        <c:change date="2022-08-17T00:00:00+00:00" summary="Fixed books with preview links not opening."/>
-        <c:change date="2022-08-23T00:00:00+00:00" summary="Introduced a new PDF reader that is able to open many books that couldn't previously be opened."/>
-        <c:change date="2022-08-24T00:00:00+00:00" summary="Fixed searching field text overlapping back button."/>
-        <c:change date="2022-08-30T00:00:00+00:00" summary="Fixed the back button on the account detail screen not returning to the catalog when signing in while borrowing a book."/>
-        <c:change date="2022-08-31T00:00:00+00:00" summary="Added a remaining time display to the audio book player."/>
-        <c:change date="2022-09-01T00:00:00+00:00" summary="Fixed the back button on the account detail screen not working when opened from the onboarding screen."/>
-        <c:change date="2022-09-19T00:00:00+00:00" summary="Fixed a crash that occurred on some Samsung devices."/>
-      </c:changes>
-    </c:release>
     <c:release date="2022-12-08T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.3.0">
       <c:changes>
         <c:change date="2022-09-21T00:00:00+00:00" summary="Removed the delete option from the book detail screen."/>
@@ -256,108 +354,10 @@
         <c:change date="2022-11-29T00:00:00+00:00" summary="Fixed audiobooks not pausing when headphones are unplugged."/>
       </c:changes>
     </c:release>
-    <c:release date="2023-03-14T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.4.0">
+    <c:release date="2022-04-29T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.0.10">
       <c:changes>
-        <c:change date="2022-12-12T00:00:00+00:00" summary="Changed the color of enabled switches to green."/>
-        <c:change date="2022-12-15T00:00:00+00:00" summary="Added &quot;About Palace&quot; to the Documentation available on the Settings screen."/>
-        <c:change date="2023-01-11T00:00:00+00:00" summary="Added the ability to open the app by clicking on an audio book player notification."/>
-        <c:change date="2023-01-13T00:00:00+00:00" summary="Added the ability to toggle the toolbar and title when reading a PDF by clicking on the page."/>
-        <c:change date="2023-01-17T00:00:00+00:00" summary="Fixed audiobook sleep timers not being restored when exiting and restarting the app."/>
-        <c:change date="2023-01-18T00:00:00+00:00" summary="Added display of the search query on search result screens."/>
-        <c:change date="2023-02-13T00:00:00+00:00" summary="Added support for viewing book preview samples."/>
-        <c:change date="2023-02-20T00:00:00+00:00" summary="Fixed some audio books not appearing in the bookshelf when offline."/>
-        <c:change date="2023-02-23T00:00:00+00:00" summary="Added a prompt to move to the reading position saved from another device when opening a book."/>
-        <c:change date="2023-02-28T00:00:00+00:00" summary="Moved the 'Remove' button after the 'Get' button on the Reservations screen."/>
-      </c:changes>
-    </c:release>
-    <c:release date="2023-08-18T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.5.0">
-      <c:changes>
-        <c:change date="2023-03-30T00:00:00+00:00" summary="Save reading position of audiobooks on play, pause, and stop (which also includes when seeking and changing chapters)."/>
-        <c:change date="2023-04-04T00:00:00+00:00" summary="Updated library logos loading source in registry feed."/>
-        <c:change date="2023-04-06T00:00:00+00:00" summary="Hidden expired loans in offline mode."/>
-        <c:change date="2023-04-06T00:00:00+00:00" summary="Changed position and text of preview button."/>
-        <c:change date="2023-04-06T00:00:00+00:00" summary="Removed preview button when the user already have the full book."/>
-        <c:change date="2023-04-06T00:00:00+00:00" summary="Added support to the new Audible TOC."/>
-        <c:change date="2023-04-11T00:00:00+00:00" summary="Fixed WebView audiobook preview not pausing when earphones are unplugged."/>
-        <c:change date="2023-04-26T00:00:00+00:00" summary="Added support for Bluetooth audio controls to play, pause, and skip tracks."/>
-        <c:change date="2023-04-27T00:00:00+00:00" summary="Added support to audiobook bookmarks."/>
-        <c:change date="2023-05-02T00:00:00+00:00" summary="Added badge to holds tab with the number of available holds."/>
-        <c:change date="2023-05-09T00:00:00+00:00" summary="Always show audio controls on lock screen."/>
-        <c:change date="2023-05-10T00:00:00+00:00" summary="Bluetooth media controls now support play/pause on more devices and now support fast forwarding and rewinding."/>
-        <c:change date="2023-05-11T00:00:00+00:00" summary="Removed old pdf reader."/>
-        <c:change date="2023-05-23T00:00:00+00:00" summary="Support deep links to library login screen with automatic entry of barcode."/>
-        <c:change date="2023-06-13T00:00:00+00:00" summary="Add option to manually insert a LCP passphrase."/>
-        <c:change date="2023-06-21T00:00:00+00:00" summary="Fixed audiobook bookmarks being incorrectly displayed and failing to be deleted."/>
-        <c:change date="2023-06-26T00:00:00+00:00" summary="Removed hardcoded message from LCP passphrase dialog."/>
-        <c:change date="2023-07-04T00:00:00+00:00" summary="Fixed bug of bookmarks not being deleted."/>
-        <c:change date="2023-07-11T00:00:00+00:00" summary="Added default LCP passphrase to be returned when the feed entry doesn't have one and the manual input is enabled."/>
-        <c:change date="2023-07-13T00:00:00+00:00" summary="Updated library card creation flow by requesting permissions and opening a WebView with the user's current location."/>
-        <c:change date="2023-08-02T00:00:00+00:00" summary="Fixed crash after setting an audiobook timer more than once in a short time."/>
-        <c:change date="2023-08-02T00:00:00+00:00" summary="Fixed crash when saving a bookmark on the server."/>
-        <c:change date="2023-08-09T00:00:00+00:00" summary="Added feature to track playing time on audiobooks."/>
-        <c:change date="2023-08-12T00:00:00+00:00" summary="Fixed crash when time tracking is not enabled."/>
-      </c:changes>
-    </c:release>
-    <c:release date="2023-10-11T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.6.0">
-      <c:changes>
-        <c:change date="2023-08-24T00:00:00+00:00" summary="Updated Kotlin version to 1.9.0"/>
-        <c:change date="2023-08-28T00:00:00+00:00" summary="Fixed crash when opening an audiobook with a null manifest."/>
-        <c:change date="2023-08-28T00:00:00+00:00" summary="Added support to basic auth token login."/>
-        <c:change date="2023-09-11T00:00:00+00:00" summary="Added support to push notifications and FCM token retrieval."/>
-        <c:change date="2023-09-18T00:00:00+00:00" summary="Fix an audio book player crash.">
-          <c:tickets>
-            <c:ticket id="PP-406"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2023-09-18T00:00:00+00:00" summary="Added missing auth type on authentication object parsing."/>
-        <c:change date="2023-09-20T00:00:00+00:00" summary="Fix SAML login button accessibility label.">
-          <c:tickets>
-            <c:ticket id="PP-418"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2023-09-20T00:00:00+00:00" summary="Changed BasicToken login request method to POST."/>
-        <c:change date="2023-09-20T00:00:00+00:00" summary="Very wide covers have their widths restricted to avoid breaking the UI.">
-          <c:tickets>
-            <c:ticket id="PP-443"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2023-09-21T00:00:00+00:00" summary="Correctly update the Accounts UI when resuming from the lock screen.">
-          <c:tickets>
-            <c:ticket id="PP-307"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2023-09-21T00:00:00+00:00" summary="Added support to EPUB text searching."/>
-        <c:change date="2023-09-22T00:00:00+00:00" summary="Added push notifications option to DEV settings."/>
-        <c:change date="2023-09-26T00:00:00+00:00" summary="Fixed bookmarks not being deleted."/>
-        <c:change date="2023-10-07T00:00:00+00:00" summary="Fixed Audiobook UI freezing after pressing 'play'."/>
-      </c:changes>
-    </c:release>
-    <c:release date="2023-10-18T00:00:00+00:00" is-open="false" ticket-system="org.nypl.jira" version="1.6.1">
-      <c:changes>
-        <c:change date="2023-10-16T00:00:00+00:00" summary="Fixed crash when creating a library card."/>
-      </c:changes>
-    </c:release>
-    <c:release date="2023-10-30T00:00:00+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.7.0">
-      <c:changes>
-        <c:change date="2023-10-19T00:00:00+00:00" summary="Adjusted feed tabs navigation to keep the Catalog on the top of the screen."/>
-        <c:change date="2023-10-23T00:00:00+00:00" summary="Use a new Material 3 theme."/>
-        <c:change date="2023-10-23T00:00:00+00:00" summary="Fix a missing version name.">
-          <c:tickets>
-            <c:ticket id="PP-610"/>
-          </c:tickets>
-        </c:change>
-        <c:change date="2023-10-24T00:00:00+00:00" summary="Enabled push notifications by default."/>
-        <c:change date="2023-10-25T00:00:00+00:00" summary="Fixed crash on Reader screen due to more than one Fragment instance."/>
-      </c:changes>
-    </c:release>
-    <c:release date="2023-10-31T11:45:34+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.8.0">
-      <c:changes>
-        <c:change date="2023-10-30T00:00:00+00:00" summary="Removed the Android 12+ devices default splash screen."/>
-        <c:change date="2023-10-31T11:45:34+00:00" summary="Reduce audio book related crashes.">
-          <c:tickets>
-            <c:ticket id="PP-565"/>
-          </c:tickets>
-        </c:change>
+        <c:change date="2022-04-28T00:00:00+00:00" summary="Improved security of OverDrive audio book downloads."/>
+        <c:change date="2022-04-29T00:00:00+00:00" summary="Fixed &quot;Unable to initialize audio engine&quot; error playing some audio books."/>
       </c:changes>
     </c:release>
   </c:releases>
