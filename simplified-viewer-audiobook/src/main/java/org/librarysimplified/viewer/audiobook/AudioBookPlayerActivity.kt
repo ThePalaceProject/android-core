@@ -8,10 +8,10 @@ import android.os.Bundle
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.annotation.StringRes
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.TxContextWrappingDelegate
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.util.concurrent.ListeningExecutorService
 import com.google.common.util.concurrent.MoreExecutors
 import org.joda.time.DateTime
@@ -85,7 +85,9 @@ import org.slf4j.MDC
 import rx.Subscription
 import java.io.IOException
 import java.util.Collections
+import java.util.Deque
 import java.util.ServiceLoader
+import java.util.concurrent.ConcurrentLinkedDeque
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
@@ -100,10 +102,8 @@ class AudioBookPlayerActivity :
   AudioBookLoadingFragmentListenerType,
   PlayerFragmentListenerType {
 
-  private val log: Logger = LoggerFactory.getLogger(AudioBookPlayerActivity::class.java)
-
-  private val contentProtectionProviders =
-    ServiceLoader.load(ContentProtectionProvider::class.java).toList()
+  private val log: Logger =
+    LoggerFactory.getLogger(AudioBookPlayerActivity::class.java)
 
   companion object {
 
@@ -122,54 +122,55 @@ class AudioBookPlayerActivity :
       parameters: AudioBookPlayerParameters?
     ) {
       val b = Bundle()
-      b.putSerializable(PARAMETER_ID, parameters)
+      b.putSerializable(this.PARAMETER_ID, parameters)
       val i = Intent(from, AudioBookPlayerActivity::class.java)
       i.putExtras(b)
       from.startActivity(i)
     }
   }
 
+  /*
+   * Services initialized once.
+   */
+
+  private lateinit var bookmarkService: BookmarkServiceType
+  private lateinit var books: BooksControllerType
+  private lateinit var covers: BookCoverProviderType
+  private lateinit var downloadExecutor: ListeningExecutorService
+  private lateinit var networkConnectivity: NetworkConnectivityType
+  private lateinit var playerScheduledExecutor: ScheduledExecutorService
+  private lateinit var profilesController: ProfilesControllerType
+  private lateinit var strategies: AudioBookManifestStrategiesType
+  private lateinit var timeTrackingService: TimeTrackingServiceType
+  private lateinit var uiThread: UIThreadServiceType
+  private lateinit var contentProtectionProviders: List<ContentProtectionProvider>
+
+  /*
+   * Per-book state.
+   */
+
   private lateinit var book: PlayerAudioBookType
   private lateinit var bookAuthor: String
   private lateinit var bookSubscription: Subscription
   private lateinit var bookTitle: String
-  private lateinit var downloadExecutor: ListeningExecutorService
   private lateinit var downloadProvider: PlayerDownloadProviderType
   private lateinit var formatHandle: BookDatabaseEntryFormatHandleAudioBook
   private lateinit var loadingFragment: AudioBookLoadingFragment
   private lateinit var parameters: AudioBookPlayerParameters
   private lateinit var player: PlayerType
   private lateinit var playerFragment: PlayerFragment
-  private lateinit var playerScheduledExecutor: ScheduledExecutorService
   private lateinit var playerSubscription: Subscription
   private lateinit var sleepTimer: PlayerSleepTimerType
-  private var playerInitialized: Boolean = false
+
+  /*
+   * Resources to be closed when the activity is destroyed.
+   */
+
+  private val closeOnActivityDestroy: Deque<AutoCloseable> = ConcurrentLinkedDeque()
   private val reloadingManifest = AtomicBoolean(false)
 
   private val currentBookmarks =
     Collections.synchronizedList(arrayListOf<Bookmark.AudiobookBookmark>())
-
-  private val services =
-    Services.serviceDirectory()
-
-  private val bookmarkService =
-    this.services.requireService(BookmarkServiceType::class.java)
-  private val profilesController =
-    this.services.requireService(ProfilesControllerType::class.java)
-  private val timeTrackingService =
-    this.services.requireService(TimeTrackingServiceType::class.java)
-  private val profiles =
-    this.services.requireService(ProfilesControllerType::class.java)
-  private val uiThread =
-    this.services.requireService(UIThreadServiceType::class.java)
-  private val books =
-    this.services.requireService(BooksControllerType::class.java)
-  private val covers =
-    this.services.requireService(BookCoverProviderType::class.java)
-  private val networkConnectivity =
-    this.services.requireService(NetworkConnectivityType::class.java)
-  private val strategies =
-    this.services.requireService(AudioBookManifestStrategiesType::class.java)
 
   @Volatile
   private var destroying: Boolean = false
@@ -182,7 +183,7 @@ class AudioBookPlayerActivity :
     val a = i.extras!!
 
     this.parameters = a.getSerializable(PARAMETER_ID) as? AudioBookPlayerParameters ?: kotlin.run {
-      val title = getString(R.string.audio_book_player_error_book_open)
+      val title = this.getString(R.string.audio_book_player_error_book_open)
       this.showErrorWithRunnable(
         context = this,
         title = title,
@@ -206,7 +207,49 @@ class AudioBookPlayerActivity :
     MDC.remove(MDCKeys.BOOK_FORMAT)
 
     this.setContentView(R.layout.audio_book_player_base)
-    this.playerScheduledExecutor = Executors.newSingleThreadScheduledExecutor()
+
+    /*
+     * Initialize all services.
+     */
+
+    val services =
+      Services.serviceDirectory()
+
+    this.bookmarkService =
+      services.requireService(BookmarkServiceType::class.java)
+    this.profilesController =
+      services.requireService(ProfilesControllerType::class.java)
+    this.timeTrackingService =
+      services.requireService(TimeTrackingServiceType::class.java)
+    this.uiThread =
+      services.requireService(UIThreadServiceType::class.java)
+    this.books =
+      services.requireService(BooksControllerType::class.java)
+    this.covers =
+      services.requireService(BookCoverProviderType::class.java)
+    this.networkConnectivity =
+      services.requireService(NetworkConnectivityType::class.java)
+    this.strategies =
+      services.requireService(AudioBookManifestStrategiesType::class.java)
+    this.contentProtectionProviders =
+      ServiceLoader.load(ContentProtectionProvider::class.java).toList()
+
+    this.playerScheduledExecutor =
+      Executors.newSingleThreadScheduledExecutor()
+    this.closeOnActivityDestroy.push {
+      this.playerScheduledExecutor.shutdown()
+    }
+
+    this.downloadExecutor =
+      MoreExecutors.listeningDecorator(
+        NamedThreadPools.namedThreadPool(1, "audiobook-player", 19)
+      )
+    this.closeOnActivityDestroy.push {
+      this.downloadExecutor.shutdown()
+    }
+
+    this.downloadProvider =
+      DownloadProvider.create(this.downloadExecutor)
 
     this.supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
@@ -218,13 +261,13 @@ class AudioBookPlayerActivity :
      */
 
     val formatHandleOpt =
-      this.profiles.profileAccountForBook(this.parameters.bookID)
+      this.profilesController.profileAccountForBook(this.parameters.bookID)
         .bookDatabase
         .entry(this.parameters.bookID)
         .findFormatHandle(BookDatabaseEntryFormatHandleAudioBook::class.java)
 
     if (formatHandleOpt == null) {
-      val title = getString(R.string.audio_book_player_error_book_open)
+      val title = this.getString(R.string.audio_book_player_error_book_open)
       this.showErrorWithRunnable(
         context = this,
         title = title,
@@ -236,25 +279,17 @@ class AudioBookPlayerActivity :
 
     this.formatHandle = formatHandleOpt
 
-    MDC.put(MDCKeys.BOOK_DRM, formatHandle.format.drmInformation.kind.name)
-    MDC.put(MDCKeys.BOOK_FORMAT, formatHandle.format.contentType.toString())
-
-    /*
-     * Create a new downloader that is solely used to fetch audio book manifests.
-     */
-
-    this.downloadExecutor =
-      MoreExecutors.listeningDecorator(
-        NamedThreadPools.namedThreadPool(1, "audiobook-player", 19)
-      )
-    this.downloadProvider =
-      DownloadProvider.create(this.downloadExecutor)
+    MDC.put(MDCKeys.BOOK_DRM, this.formatHandle.format.drmInformation.kind.name)
+    MDC.put(MDCKeys.BOOK_FORMAT, this.formatHandle.format.contentType.toString())
 
     /*
      * Create a sleep timer.
      */
 
     this.sleepTimer = PlayerSleepTimer.create()
+    this.closeOnActivityDestroy.push {
+      this.sleepTimer.close()
+    }
 
     /*
      * Show a loading fragment.
@@ -283,6 +318,9 @@ class AudioBookPlayerActivity :
       libraryId = this.parameters.accountProviderID.toString(),
       timeTrackingUri = this.parameters.opdsEntry.timeTrackingUri.getOrNull()
     )
+    this.closeOnActivityDestroy.push {
+      this.timeTrackingService.stopTracking()
+    }
   }
 
   private val appCompatDelegate: TxContextWrappingDelegate by lazy {
@@ -302,7 +340,6 @@ class AudioBookPlayerActivity :
 
   override fun onDestroy() {
     this.log.debug("onDestroy")
-    timeTrackingService.stopTracking()
     super.onDestroy()
 
     /*
@@ -313,31 +350,14 @@ class AudioBookPlayerActivity :
 
     this.destroying = true
 
-    /*
-     * Cancel downloads, shut down the player, and close the book.
-     */
-
-    if (this.playerInitialized) {
-      this.cancelAllDownloads()
-
+    while (!this.closeOnActivityDestroy.isEmpty()) {
       try {
-        this.player.close()
+        val closeable = this.closeOnActivityDestroy.pop()
+        closeable.close()
       } catch (e: Exception) {
-        this.log.error("error closing player: ", e)
-      }
-
-      this.bookSubscription.unsubscribe()
-      this.playerSubscription.unsubscribe()
-
-      try {
-        this.book.close()
-      } catch (e: Exception) {
-        this.log.error("error closing book: ", e)
+        this.log.debug("Close: ", e)
       }
     }
-
-    this.downloadExecutor.shutdown()
-    this.playerScheduledExecutor.shutdown()
   }
 
   private fun savePlayerPosition(event: PlayerEventCreateBookmark) {
@@ -402,16 +422,19 @@ class AudioBookPlayerActivity :
     manifest: PlayerManifest,
     authorization: LSHTTPAuthorizationType?
   ) {
-    this.log.debug("finished loading")
+    this.log.debug("Finished loading")
+    if (this.destroying) {
+      return
+    }
 
     val contentProtections = BookContentProtections.create(
       context = this,
       contentProtectionProviders = this.contentProtectionProviders,
       drmInfo = this.parameters.drmInfo,
       isManualPassphraseEnabled =
-      profilesController.profileCurrent().preferences().isManualLCPPassphraseEnabled,
+      this.profilesController.profileCurrent().preferences().isManualLCPPassphraseEnabled,
       onLCPDialogDismissed = {
-        finish()
+        this.finish()
       }
     )
 
@@ -428,12 +451,12 @@ class AudioBookPlayerActivity :
         userAgent = PlayerUserAgent(this.parameters.userAgent),
         contentProtections = contentProtections,
         manualPassphrase =
-        profilesController.profileCurrent().preferences().isManualLCPPassphraseEnabled
+        this.profilesController.profileCurrent().preferences().isManualLCPPassphraseEnabled
       )
     )
 
     if (engine == null) {
-      val title = getString(R.string.audio_book_player_error_engine_open)
+      val title = this.getString(R.string.audio_book_player_error_engine_open)
       this.showErrorWithRunnable(
         context = this,
         title = title,
@@ -467,7 +490,7 @@ class AudioBookPlayerActivity :
       )
 
     if (bookResult is PlayerResult.Failure) {
-      val title = getString(R.string.audio_book_player_error_book_open)
+      val title = this.getString(R.string.audio_book_player_error_book_open)
       this.showErrorWithRunnable(
         context = this,
         title = title,
@@ -478,15 +501,30 @@ class AudioBookPlayerActivity :
     }
 
     this.book = (bookResult as PlayerResult.Success).result
+    this.closeOnActivityDestroy.push {
+      this.book.close()
+    }
+    this.closeOnActivityDestroy.push {
+      this.book.wholeBookDownloadTask.cancel()
+    }
+
     this.player = this.book.createPlayer()
+    this.closeOnActivityDestroy.push {
+      this.player.close()
+    }
 
     this.bookSubscription =
       this.book.spineElementDownloadStatus.ofType(PlayerSpineElementDownloadExpired::class.java)
         .subscribe(this::onDownloadExpired)
+    this.closeOnActivityDestroy.push {
+      this.bookSubscription.unsubscribe()
+    }
+
     this.playerSubscription =
       this.player.events.subscribe(this::onPlayerEvent)
-
-    this.playerInitialized = true
+    this.closeOnActivityDestroy.push {
+      this.playerSubscription.unsubscribe()
+    }
 
     this.restoreSavedPlayerPosition()
     this.startAllPartsDownloading()
@@ -496,22 +534,50 @@ class AudioBookPlayerActivity :
      */
 
     this.uiThread.runOnUIThread {
-      // Sanity check; Verify the state of the lifecycle before continuing as it's possible the
-      // activity could be finishing.
-      if (!this.isFinishing && !this.supportFragmentManager.isDestroyed) {
-        this.playerFragment = PlayerFragment.newInstance(
-          PlayerFragmentParameters(
-            currentRate = getBookCurrentPlaybackRate(),
-            currentSleepTimerDuration = getBookSleepTimerRemainingDuration()
-          )
-        )
-
-        this.supportFragmentManager
-          .beginTransaction()
-          .replace(R.id.audio_book_player_fragment_holder, this.playerFragment, "PLAYER")
-          .commitAllowingStateLoss()
+      if (!this.isUISafe()) {
+        return@runOnUIThread
       }
+
+      this.playerFragment = PlayerFragment.newInstance(
+        PlayerFragmentParameters(
+          currentRate = this.getBookCurrentPlaybackRate(),
+          currentSleepTimerDuration = this.getBookSleepTimerRemainingDuration()
+        )
+      )
+
+      this.supportFragmentManager
+        .beginTransaction()
+        .replace(R.id.audio_book_player_fragment_holder, this.playerFragment, "PLAYER")
+        .commitAllowingStateLoss()
     }
+  }
+
+  /*
+   * Determine if the UI is in a state that means that it is safe to perform UI/fragment operations.
+   * This is used when a background thread schedules some form of delayed operation that might
+   * execute after the activity is in the process of being destroyed or stopped.
+   */
+
+  private fun isUISafe(): Boolean {
+    if (this.destroying) {
+      this.log.warn("Attempted to schedule operation after activity was destroyed: ",
+        IllegalStateException()
+      )
+      return false
+    }
+    if (this.isFinishing) {
+      this.log.warn("Attempted to schedule operation while activity was finishing: ",
+        IllegalStateException()
+      )
+      return false
+    }
+    if (this.supportFragmentManager.isDestroyed) {
+      this.log.warn("Attempted to schedule operation after fragment manager was destroyed:",
+        IllegalStateException()
+      )
+      return false
+    }
+    return true
   }
 
   private fun downloadAndSaveManifest(
@@ -528,7 +594,7 @@ class AudioBookPlayerActivity :
     return when (val strategyResult = strategy.execute()) {
       is TaskResult.Success -> {
         AudioBookHelpers.saveManifest(
-          profiles = this.profiles,
+          profiles = this.profilesController,
           bookId = this.parameters.bookID,
           manifestURI = this.parameters.manifestURI,
           manifest = strategyResult.result.fulfilled
@@ -549,7 +615,7 @@ class AudioBookPlayerActivity :
       this.downloadExecutor.execute {
         try {
           val manifestData = this.downloadAndSaveManifest(
-            this.profiles.profileAccountForBook(this.parameters.bookID)
+            this.profilesController.profileAccountForBook(this.parameters.bookID)
               .loginState
               .credentials
           )
@@ -649,7 +715,7 @@ class AudioBookPlayerActivity :
         bookmark.kind == BookmarkKind.BookmarkLastReadLocation
       }
 
-      currentBookmarks.addAll(
+      this.currentBookmarks.addAll(
         audiobookBookmarks.filter { bookmark ->
           bookmark.kind == BookmarkKind.BookmarkExplicit && bookmark.uri != null
         }
@@ -674,12 +740,8 @@ class AudioBookPlayerActivity :
     }
   }
 
-  private fun cancelAllDownloads() {
-    this.book.wholeBookDownloadTask.cancel()
-  }
-
   private fun onPlayerEvent(event: PlayerEvent) {
-    timeTrackingService.onPlayerEventReceived(event)
+    this.timeTrackingService.onPlayerEventReceived(event)
 
     return when (event) {
       is PlayerEventCreateBookmark -> {
@@ -831,11 +893,15 @@ class AudioBookPlayerActivity :
      */
 
     this.uiThread.runOnUIThread {
+      if (!this.isUISafe()) {
+        return@runOnUIThread
+      }
+
       val fragment =
         PlayerPlaybackRateFragment.newInstance(
           PlayerFragmentParameters(
-            currentRate = getBookCurrentPlaybackRate(),
-            currentSleepTimerDuration = getBookSleepTimerRemainingDuration()
+            currentRate = this.getBookCurrentPlaybackRate(),
+            currentSleepTimerDuration = this.getBookSleepTimerRemainingDuration()
           )
         )
       fragment.show(this.supportFragmentManager, "PLAYER_RATE")
@@ -848,6 +914,10 @@ class AudioBookPlayerActivity :
      */
 
     this.uiThread.runOnUIThread {
+      if (!this.isUISafe()) {
+        return@runOnUIThread
+      }
+
       val fragment = PlayerSleepTimerFragment.newInstance()
       fragment.show(this.supportFragmentManager, "PLAYER_SLEEP_TIMER")
     }
@@ -875,6 +945,10 @@ class AudioBookPlayerActivity :
      */
 
     this.uiThread.runOnUIThread {
+      if (!this.isUISafe()) {
+        return@runOnUIThread
+      }
+
       this.supportActionBar?.setTitle(R.string.audio_book_player_toc_title)
 
       val fragment = PlayerTOCFragment.newInstance()
@@ -889,7 +963,7 @@ class AudioBookPlayerActivity :
   }
 
   override fun onPlayerNotificationWantsIntent(): Intent {
-    return parentActivityIntent ?: intent
+    return this.parentActivityIntent ?: this.intent
   }
 
   override fun onPlayerTOCWantsBook(): PlayerAudioBookType {
@@ -897,7 +971,7 @@ class AudioBookPlayerActivity :
   }
 
   override fun onPlayerShouldBeClosed() {
-    onBackPressed()
+    this.onBackPressed()
   }
 
   override fun onPlayerTOCWantsClose() {
@@ -961,7 +1035,7 @@ class AudioBookPlayerActivity :
   }
 
   override fun onPlayerTOCWantsBookmarks(): List<PlayerBookmark> {
-    return currentBookmarks
+    return this.currentBookmarks
       .map { bookmark ->
         AudioBookHelpers.toPlayerBookmark(bookmark)
       }
@@ -986,11 +1060,17 @@ class AudioBookPlayerActivity :
       ignoreRemoteFailures = true
     ).map {
       this.currentBookmarks.remove(bookmark)
-      runOnUiThread {
+      this.runOnUiThread {
+        if (!this.isUISafe()) {
+          return@runOnUiThread
+        }
         onDeleteOperationCompleted(true)
       }
     }.onAnyError {
-      runOnUiThread {
+      this.runOnUiThread {
+        if (!this.isUISafe()) {
+          return@runOnUiThread
+        }
         onDeleteOperationCompleted(false)
       }
     }
@@ -998,7 +1078,7 @@ class AudioBookPlayerActivity :
 
   override fun onPlayerShouldAddBookmark(playerBookmark: PlayerBookmark?) {
     if (playerBookmark == null) {
-      showToastMessage(R.string.audio_book_player_bookmark_error_adding)
+      this.showToastMessage(R.string.audio_book_player_bookmark_error_adding)
       return
     }
 
@@ -1009,8 +1089,8 @@ class AudioBookPlayerActivity :
         playerBookmark = playerBookmark
       )
 
-      if (!currentBookmarks.any { it.location == bookmark.location }) {
-        showToastMessage(R.string.audio_book_player_bookmark_adding)
+      if (!this.currentBookmarks.any { it.location == bookmark.location }) {
+        this.showToastMessage(R.string.audio_book_player_bookmark_adding)
 
         this.bookmarkService.bookmarkCreate(
           accountID = this.parameters.accountID,
@@ -1018,22 +1098,25 @@ class AudioBookPlayerActivity :
           ignoreRemoteFailures = true
         ).map { savedBookmark ->
           this.currentBookmarks.add(savedBookmark as Bookmark.AudiobookBookmark)
-          showToastMessage(R.string.audio_book_player_bookmark_added)
+          this.showToastMessage(R.string.audio_book_player_bookmark_added)
         }.onAnyError {
           /* Otherwise, something in the chain failed. */
-          showToastMessage(R.string.audio_book_player_bookmark_error_adding)
+          this.showToastMessage(R.string.audio_book_player_bookmark_error_adding)
         }
       } else {
-        showToastMessage(R.string.audio_book_player_bookmark_already_added)
+        this.showToastMessage(R.string.audio_book_player_bookmark_already_added)
       }
     } catch (e: Exception) {
-      showToastMessage(R.string.audio_book_player_bookmark_error_adding)
+      this.showToastMessage(R.string.audio_book_player_bookmark_error_adding)
       this.log.error("could not save bookmark: ", e)
     }
   }
 
   private fun showToastMessage(@StringRes messageRes: Int) {
-    runOnUiThread {
+    this.runOnUiThread {
+      if (!this.isUISafe()) {
+        return@runOnUiThread
+      }
       Toast.makeText(this, messageRes, Toast.LENGTH_SHORT).show()
     }
   }
