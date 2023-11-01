@@ -606,18 +606,22 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
   }
 
   private fun openAccountPickerDialog() {
-    return when (val ownership = this.parameters.ownership) {
-      is OwnedByAccount -> {
-        val dialog =
-          AccountPickerDialogFragment.create(
-            currentId = ownership.accountId,
-            showAddAccount = this.configurationService.allowAccountsAccess
-          )
-        dialog.show(parentFragmentManager, dialog.tag)
+    try {
+      return when (val ownership = this.parameters.ownership) {
+        is OwnedByAccount -> {
+          val dialog =
+            AccountPickerDialogFragment.create(
+              currentId = ownership.accountId,
+              showAddAccount = this.configurationService.allowAccountsAccess
+            )
+          dialog.show(requireActivity().supportFragmentManager, dialog.tag)
+        }
+        CollectedFromAccounts -> {
+          throw IllegalStateException("Can't switch account from collected feed!")
+        }
       }
-      CollectedFromAccounts -> {
-        throw IllegalStateException("Can't switch account from collected feed!")
-      }
+    } catch (e: Exception) {
+      this.logger.error("Failed to open account picker dialog: ", e)
     }
   }
 
