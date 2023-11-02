@@ -614,7 +614,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
               currentId = ownership.accountId,
               showAddAccount = this.configurationService.allowAccountsAccess
             )
-          dialog.show(requireActivity().supportFragmentManager, dialog.tag)
+          dialog.show(parentFragmentManager, dialog.tag)
         }
         CollectedFromAccounts -> {
           throw IllegalStateException("Can't switch account from collected feed!")
