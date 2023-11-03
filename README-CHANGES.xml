@@ -350,7 +350,7 @@
         <c:change date="2023-10-25T00:00:00+00:00" summary="Fixed crash on Reader screen due to more than one Fragment instance."/>
       </c:changes>
     </c:release>
-    <c:release date="2023-11-03T10:24:54+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.8.0">
+    <c:release date="2023-11-03T14:15:29+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.8.0">
       <c:changes>
         <c:change date="2023-10-30T00:00:00+00:00" summary="Removed the Android 12+ devices default splash screen."/>
         <c:change date="2023-10-31T00:00:00+00:00" summary="Reduce audio book related crashes.">
@@ -358,9 +358,14 @@
             <c:ticket id="PP-565"/>
           </c:tickets>
         </c:change>
-        <c:change date="2023-11-03T10:24:54+00:00" summary="Fix a possible crash if an audio book fails to open.">
+        <c:change date="2023-11-03T00:00:00+00:00" summary="Fix a possible crash if an audio book fails to open.">
           <c:tickets>
             <c:ticket id="PP-672"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2023-11-03T14:15:29+00:00" summary="Address some R2 lifecycle issues.">
+          <c:tickets>
+            <c:ticket id="PP-676"/>
           </c:tickets>
         </c:change>
       </c:changes>

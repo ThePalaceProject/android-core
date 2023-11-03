@@ -438,14 +438,23 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     )
   }
 
+  @Deprecated("Deprecated in Java")
   override fun onBackPressed() {
-    if (this.tocFragment.isVisible) {
-      this.tocClose()
-    } else if (this.searchFragment.isVisible) {
-      this.searchClose()
-    } else {
-      super.onBackPressed()
+    if (this::tocFragment.isInitialized) {
+      if (this.tocFragment.isVisible) {
+        this.tocClose()
+        return
+      }
     }
+
+    if (this::searchFragment.isInitialized) {
+      if (this.searchFragment.isVisible) {
+        this.searchClose()
+        return
+      }
+    }
+
+    super.onBackPressed()
   }
 
   /**
