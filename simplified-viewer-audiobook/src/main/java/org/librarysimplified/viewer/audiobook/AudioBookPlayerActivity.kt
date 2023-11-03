@@ -179,6 +179,32 @@ class AudioBookPlayerActivity :
     this.log.debug("onCreate")
     super.onCreate(null)
 
+    /*
+     * Initialize all services.
+     */
+
+    val services =
+      Services.serviceDirectory()
+
+    this.bookmarkService =
+      services.requireService(BookmarkServiceType::class.java)
+    this.profilesController =
+      services.requireService(ProfilesControllerType::class.java)
+    this.timeTrackingService =
+      services.requireService(TimeTrackingServiceType::class.java)
+    this.uiThread =
+      services.requireService(UIThreadServiceType::class.java)
+    this.books =
+      services.requireService(BooksControllerType::class.java)
+    this.covers =
+      services.requireService(BookCoverProviderType::class.java)
+    this.networkConnectivity =
+      services.requireService(NetworkConnectivityType::class.java)
+    this.strategies =
+      services.requireService(AudioBookManifestStrategiesType::class.java)
+    this.contentProtectionProviders =
+      ServiceLoader.load(ContentProtectionProvider::class.java).toList()
+
     val i = this.intent!!
     val a = i.extras!!
 
@@ -207,32 +233,6 @@ class AudioBookPlayerActivity :
     MDC.remove(MDCKeys.BOOK_FORMAT)
 
     this.setContentView(R.layout.audio_book_player_base)
-
-    /*
-     * Initialize all services.
-     */
-
-    val services =
-      Services.serviceDirectory()
-
-    this.bookmarkService =
-      services.requireService(BookmarkServiceType::class.java)
-    this.profilesController =
-      services.requireService(ProfilesControllerType::class.java)
-    this.timeTrackingService =
-      services.requireService(TimeTrackingServiceType::class.java)
-    this.uiThread =
-      services.requireService(UIThreadServiceType::class.java)
-    this.books =
-      services.requireService(BooksControllerType::class.java)
-    this.covers =
-      services.requireService(BookCoverProviderType::class.java)
-    this.networkConnectivity =
-      services.requireService(NetworkConnectivityType::class.java)
-    this.strategies =
-      services.requireService(AudioBookManifestStrategiesType::class.java)
-    this.contentProtectionProviders =
-      ServiceLoader.load(ContentProtectionProvider::class.java).toList()
 
     this.playerScheduledExecutor =
       Executors.newSingleThreadScheduledExecutor()
