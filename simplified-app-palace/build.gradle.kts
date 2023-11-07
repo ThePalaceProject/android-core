@@ -475,6 +475,7 @@ dependencies {
     implementation(libs.androidx.viewpager)
     implementation(libs.androidx.viewpager2)
     implementation(libs.androidx.webkit)
+    implementation(libs.azam.ulidj)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.annotations)
     implementation(libs.firebase.common)
@@ -616,6 +617,4 @@ dependencies {
     implementation(libs.truevfs.driver.zip)
     implementation(libs.truevfs.kernel.impl)
     implementation(libs.truevfs.kernel.spec)
-    implementation(libs.ulid.kotlin)
-    implementation(libs.ulid.kotlin.jvm)
 }

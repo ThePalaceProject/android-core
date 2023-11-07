@@ -1,6 +1,7 @@
 package org.nypl.simplified.books.time.tracking
 
 import android.content.Context
+import io.azam.ulidj.ULID
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -11,7 +12,6 @@ import org.librarysimplified.audiobook.api.PlayerEvent
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.slf4j.LoggerFactory
-import ulid.ULID
 import java.io.File
 import java.net.URI
 import java.util.concurrent.TimeUnit
@@ -183,7 +183,7 @@ class TimeTrackingService(
 
   private fun createTimeTrackingEntry() {
     currentTimeTrackingEntry = TimeTrackingEntry(
-      id = ULID.randomULID(),
+      id = ULID.random(),
       duringMinute = dateFormatter.print(DateTime.now()),
       secondsPlayed = 0
     )
