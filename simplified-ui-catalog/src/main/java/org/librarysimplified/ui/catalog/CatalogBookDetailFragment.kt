@@ -453,7 +453,7 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
         this.onBookStatusHeld(status, bookPreviewStatus)
       }
       is BookStatus.Loaned -> {
-        this.onBookStatusLoaned(status, book.book, bookPreviewStatus)
+        this.onBookStatusLoaned(status, book.book)
       }
       is BookStatus.Holdable -> {
         this.onBookStatusHoldable(status, bookPreviewStatus)
@@ -825,8 +825,7 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
 
   private fun onBookStatusLoaned(
     bookStatus: BookStatus.Loaned,
-    book: Book,
-    bookPreviewStatus: BookPreviewStatus
+    book: Book
   ) {
     this.buttons.removeAllViews()
 
@@ -895,6 +894,9 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
           }
         )
       )
+    } else {
+      this.buttons.addView(this.buttonCreator.createButtonSizedSpace(), 0)
+      this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
     }
 
     this.checkButtonViewCount()
