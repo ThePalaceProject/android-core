@@ -127,8 +127,13 @@ class ErrorPageFragment : Fragment(R.layout.error_page) {
     actionBar.setDisplayHomeAsUpEnabled(true)
     actionBar.setHomeActionContentDescription(null)
     actionBar.setTitle(getString(R.string.errorDetailsTitle))
+
     this.toolbar.setLogoOnClickListener {
-      this.listener.post(ErrorPageEvent.GoUpwards)
+      try {
+        this.listener.post(ErrorPageEvent.GoUpwards)
+      } catch (e: Exception) {
+        this.logger.warn("Exception raised from logo click: ", e)
+      }
     }
   }
 }
