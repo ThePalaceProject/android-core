@@ -18,6 +18,5 @@ dependencies {
     implementation(libs.rxandroid2)
     implementation(libs.rxjava2)
     implementation(libs.slf4j)
-    implementation(libs.ulid.kotlin)
-    implementation(libs.ulid.kotlin.jvm)
+    implementation(libs.azam.ulidj)
 }

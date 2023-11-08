@@ -453,7 +453,7 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
         this.onBookStatusHeld(status, bookPreviewStatus)
       }
       is BookStatus.Loaned -> {
-        this.onBookStatusLoaned(status, book.book, bookPreviewStatus)
+        this.onBookStatusLoaned(status, book.book)
       }
       is BookStatus.Holdable -> {
         this.onBookStatusHoldable(status, bookPreviewStatus)
@@ -825,12 +825,9 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
 
   private fun onBookStatusLoaned(
     bookStatus: BookStatus.Loaned,
-    book: Book,
-    bookPreviewStatus: BookPreviewStatus
+    book: Book
   ) {
     this.buttons.removeAllViews()
-
-    var createPreviewButton = bookPreviewStatus != BookPreviewStatus.None
 
     when (bookStatus) {
       is BookStatus.Loaned.LoanedNotDownloaded -> {
@@ -849,23 +846,8 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
             )
           }
         )
-
-        if (createPreviewButton) {
-          this.buttons.addView(this.buttonCreator.createButtonSpace())
-          this.buttons.addView(
-            this.buttonCreator.createReadPreviewButton(
-              bookFormat = parameters.feedEntry.probableFormat,
-              onClick = {
-                viewModel.openBookPreview(parameters.feedEntry)
-              }
-            )
-          )
-        }
       }
       is BookStatus.Loaned.LoanedDownloaded -> {
-        // the book preview button can be ignored
-        createPreviewButton = false
-
         when (val format = book.findPreferredFormat()) {
           is BookFormat.BookFormatPDF,
           is BookFormat.BookFormatEPUB -> {
@@ -912,8 +894,7 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
           }
         )
       )
-    } else if (!createPreviewButton) {
-      // add spaces on both sides if there aren't any other buttons
+    } else {
       this.buttons.addView(this.buttonCreator.createButtonSizedSpace(), 0)
       this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
     }

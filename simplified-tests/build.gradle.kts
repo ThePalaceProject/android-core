@@ -295,8 +295,7 @@ val dependencyObjects = listOf(
     libs.truevfs.driver.zip,
     libs.truevfs.kernel.impl,
     libs.truevfs.kernel.spec,
-    libs.ulid.kotlin,
-    libs.ulid.kotlin.jvm,
+    libs.azam.ulidj,
 )
 
 dependencies {
