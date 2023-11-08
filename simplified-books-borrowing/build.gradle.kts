@@ -17,6 +17,7 @@ dependencies {
     implementation(project(":simplified-taskrecorder-api"))
 
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.commons.compress)
     implementation(libs.google.failureaccess)
     implementation(libs.google.guava)
     implementation(libs.io7m.jfunctional)

@@ -476,6 +476,7 @@ dependencies {
     implementation(libs.androidx.viewpager2)
     implementation(libs.androidx.webkit)
     implementation(libs.azam.ulidj)
+    implementation(libs.commons.compress)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.annotations)
     implementation(libs.firebase.common)
