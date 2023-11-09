@@ -289,13 +289,7 @@ abstract class BookmarkServiceContract {
       },
       "At least one request made to ${this.annotationsURI}"
     )
-    Assertions.assertTrue(
-      allRequests.any { request ->
-        request.requestUrl?.toUri() == this.deviceRegistrationURI
-      },
-      "At least one request made to ${this.deviceRegistrationURI}"
-    )
-    Assertions.assertEquals(3, allRequests.size)
+    Assertions.assertEquals(2, allRequests.size)
   }
 
   private fun takeAllRequests(): List<RecordedRequest> {
@@ -508,13 +502,7 @@ abstract class BookmarkServiceContract {
       },
       "At least one request made to ${this.annotationsURI}"
     )
-    Assertions.assertTrue(
-      allRequests.any { request ->
-        request.requestUrl?.toUri() == this.deviceRegistrationURI
-      },
-      "At least one request made to ${this.deviceRegistrationURI}"
-    )
-    Assertions.assertEquals(3, allRequests.size)
+    Assertions.assertEquals(2, allRequests.size)
   }
 
   /**
@@ -737,13 +725,7 @@ abstract class BookmarkServiceContract {
       },
       "At least one request made to ${this.annotationsURI}"
     )
-    Assertions.assertTrue(
-      allRequests.any { request ->
-        this.matchesEndpoint(request, "/deviceRegistration")
-      },
-      "At least one request made to ${this.deviceRegistrationURI}"
-    )
-    Assertions.assertEquals(3, allRequests.size)
+    Assertions.assertEquals(2, allRequests.size)
   }
 
   /**

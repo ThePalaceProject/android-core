@@ -127,6 +127,11 @@ abstract class ProfileAccountLoginTaskContract {
        "href" : "https://www.example.com",
        "rel" : "http://www.w3.org/ns/oa#annotationService",
        "type" : "application/ld+json; profile=\"http://www.w3.org/ns/anno.jsonld\""
+    },
+    {
+       "href" : "https://www.example.com",
+       "rel" : "http://palaceproject.io/terms/deviceRegistration",
+       "type" : "application/ld+json; profile=\"http://www.w3.org/ns/anno.jsonld\""
     }
   ]
 }
@@ -152,6 +157,11 @@ abstract class ProfileAccountLoginTaskContract {
     {
        "href" : "https://www.example.com",
        "rel" : "http://www.w3.org/ns/oa#annotationService",
+       "type" : "application/ld+json; profile=\"http://www.w3.org/ns/anno.jsonld\""
+    },
+    {
+       "href" : "https://www.example.com",
+       "rel" : "http://palaceproject.io/terms/deviceRegistration",
        "type" : "application/ld+json; profile=\"http://www.w3.org/ns/anno.jsonld\""
     }
   ],
@@ -541,9 +551,6 @@ abstract class ProfileAccountLoginTaskContract {
 
     val result = task.call()
     TaskDumps.dump(this.logger, result)
-
-    val state =
-      this.account.loginState as AccountLoginFailed
 
     assertEquals(0, this.server.requestCount)
   }
