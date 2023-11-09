@@ -53,7 +53,8 @@ class BHTTPCallsTest {
         ),
         adobeCredentials = null,
         authenticationDescription = null,
-        annotationsURI = URI("https://www.example.com")
+        annotationsURI = URI("https://www.example.com"),
+        deviceRegistrationURI = URI("https://www.example.com")
       )
 
     val targetURI =
@@ -82,7 +83,8 @@ class BHTTPCallsTest {
         password = AccountPassword("1234"),
         adobeCredentials = null,
         authenticationDescription = null,
-        annotationsURI = URI("https://www.example.com")
+        annotationsURI = URI("https://www.example.com"),
+        deviceRegistrationURI = URI("https://www.example.com")
       )
 
     val targetURI =
@@ -305,7 +307,8 @@ class BHTTPCallsTest {
         password = AccountPassword("1234"),
         adobeCredentials = null,
         authenticationDescription = null,
-        annotationsURI = URI("https://www.example.com")
+        annotationsURI = URI("https://www.example.com"),
+        deviceRegistrationURI = URI("https://www.example.com")
       )
 
     val targetURI = this.server.url("me").toUri()
@@ -333,7 +336,8 @@ class BHTTPCallsTest {
         password = AccountPassword("1234"),
         adobeCredentials = null,
         authenticationDescription = null,
-        annotationsURI = URI("https://www.example.com")
+        annotationsURI = URI("https://www.example.com"),
+        deviceRegistrationURI = URI("https://www.example.com")
       )
 
     val targetURI = this.server.url("annotations").toUri()
@@ -361,7 +365,8 @@ class BHTTPCallsTest {
         password = AccountPassword("1234"),
         adobeCredentials = null,
         authenticationDescription = null,
-        annotationsURI = URI("https://www.example.com")
+        annotationsURI = URI("https://www.example.com"),
+        deviceRegistrationURI = URI("https://www.example.com")
       )
 
     val targetURI = this.server.url("annotations").toUri()

@@ -33,7 +33,8 @@ class AccountAuthenticationCredentialsJSONTest {
         password = AccountPassword("5678"),
         adobeCredentials = null,
         authenticationDescription = null,
-        annotationsURI = URI("https://www.example.com")
+        annotationsURI = URI("https://www.example.com"),
+        deviceRegistrationURI = URI("https://www.example.com")
       )
 
     val creds1 = deserializeFromJSON(serializeToJSON(creds0))
@@ -48,7 +49,8 @@ class AccountAuthenticationCredentialsJSONTest {
         accessToken = "bm90IGFuIGFjY2VzcyB0b2tlbgo=",
         authenticationDescription = null,
         adobeCredentials = null,
-        annotationsURI = URI("https://www.example.com")
+        annotationsURI = URI("https://www.example.com"),
+        deviceRegistrationURI = URI("https://www.example.com")
       )
 
     val creds1 = deserializeFromJSON(serializeToJSON(creds0))
@@ -72,7 +74,8 @@ class AccountAuthenticationCredentialsJSONTest {
         password = AccountPassword("5678"),
         adobeCredentials = adobe,
         authenticationDescription = null,
-        annotationsURI = URI("https://www.example.com")
+        annotationsURI = URI("https://www.example.com"),
+        deviceRegistrationURI = URI("https://www.example.com")
       )
 
     val creds1 = deserializeFromJSON(serializeToJSON(creds0))
@@ -101,7 +104,8 @@ class AccountAuthenticationCredentialsJSONTest {
         password = AccountPassword("5678"),
         adobeCredentials = adobe,
         authenticationDescription = "fake",
-        annotationsURI = URI("https://www.example.com")
+        annotationsURI = URI("https://www.example.com"),
+        deviceRegistrationURI = URI("https://www.example.com")
       )
 
     val creds1 = deserializeFromJSON(serializeToJSON(creds0))
@@ -130,6 +134,7 @@ class AccountAuthenticationCredentialsJSONTest {
         adobeCredentials = adobe,
         authenticationDescription = "fake",
         annotationsURI = URI("https://www.example.com"),
+        deviceRegistrationURI = URI("https://www.example.com"),
         patronInfo = "{}",
         cookies = listOf(
           AccountCookie("https://example", "cookie0=23"),
@@ -155,7 +160,8 @@ class AccountAuthenticationCredentialsJSONTest {
         ),
         adobeCredentials = null,
         authenticationDescription = null,
-        annotationsURI = URI("https://www.example.com")
+        annotationsURI = URI("https://www.example.com"),
+        deviceRegistrationURI = URI("https://www.example.com")
       )
 
     val creds1 = deserializeFromJSON(serializeToJSON(creds0))
@@ -183,7 +189,8 @@ class AccountAuthenticationCredentialsJSONTest {
         ),
         adobeCredentials = adobe,
         authenticationDescription = null,
-        annotationsURI = URI("https://www.example.com")
+        annotationsURI = URI("https://www.example.com"),
+        deviceRegistrationURI = URI("https://www.example.com")
       )
 
     val creds1 = deserializeFromJSON(serializeToJSON(creds0))
@@ -216,7 +223,8 @@ class AccountAuthenticationCredentialsJSONTest {
         ),
         adobeCredentials = adobe,
         authenticationDescription = null,
-        annotationsURI = URI("https://www.example.com")
+        annotationsURI = URI("https://www.example.com"),
+        deviceRegistrationURI = URI("https://www.example.com")
       )
 
     val creds1 = deserializeFromJSON(serializeToJSON(creds0))

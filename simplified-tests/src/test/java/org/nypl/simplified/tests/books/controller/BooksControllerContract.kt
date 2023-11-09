@@ -159,7 +159,8 @@ abstract class BooksControllerContract {
       password = AccountPassword("1234"),
       adobeCredentials = null,
       authenticationDescription = null,
-      annotationsURI = URI("https://www.example.com")
+      annotationsURI = URI("https://www.example.com"),
+      deviceRegistrationURI = URI("https://www.example.com")
     )
   }
 

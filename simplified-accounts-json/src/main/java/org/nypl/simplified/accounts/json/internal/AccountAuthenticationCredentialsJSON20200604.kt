@@ -50,7 +50,8 @@ object AccountAuthenticationCredentialsJSON20200604 : AccountAuthenticationCrede
       accessToken = JSONParserUtilities.getString(obj, "accessToken"),
       adobeCredentials = adobeCredentials,
       authenticationDescription = JSONParserUtilities.getStringOrNull(obj, "authenticationDescription"),
-      annotationsURI = null
+      annotationsURI = null,
+      deviceRegistrationURI = null
     )
   }
 
@@ -66,7 +67,8 @@ object AccountAuthenticationCredentialsJSON20200604 : AccountAuthenticationCrede
       password = AccountPassword(JSONParserUtilities.getString(obj, "password")),
       adobeCredentials = adobeCredentials,
       authenticationDescription = JSONParserUtilities.getStringOrNull(obj, "authenticationDescription"),
-      annotationsURI = null
+      annotationsURI = null,
+      deviceRegistrationURI = null
     )
   }
 }

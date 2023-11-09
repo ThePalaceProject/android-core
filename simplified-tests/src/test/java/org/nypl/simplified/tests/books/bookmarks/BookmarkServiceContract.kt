@@ -74,6 +74,7 @@ abstract class BookmarkServiceContract {
   private lateinit var serverDispatcher: EndpointDispatcher
   private lateinit var http: LSHTTPClientType
   private lateinit var annotationsURI: URI
+  private lateinit var deviceRegistrationURI: URI
   private lateinit var patronURI: URI
 
   private val annotationsEmpty = """
@@ -118,7 +119,8 @@ abstract class BookmarkServiceContract {
       password = AccountPassword("1234"),
       adobeCredentials = null,
       authenticationDescription = null,
-      annotationsURI = null
+      annotationsURI = null,
+      deviceRegistrationURI = null
     )
 
   private fun addResponse(
@@ -162,6 +164,8 @@ abstract class BookmarkServiceContract {
     this.server.dispatcher = this.serverDispatcher
     this.annotationsURI =
       URI.create("http://localhost:10000/annotations")
+    this.deviceRegistrationURI =
+      URI.create("http://localhost:10000/deviceRegistration")
     this.patronURI =
       URI.create("http://localhost:10000/patron")
   }
@@ -218,7 +222,10 @@ abstract class BookmarkServiceContract {
     Mockito.`when`(account.loginState)
       .thenReturn(
         AccountLoggedIn(
-          this.accountCredentials.copy(annotationsURI = this.annotationsURI)
+          this.accountCredentials.copy(
+            annotationsURI = this.annotationsURI,
+            deviceRegistrationURI = deviceRegistrationURI
+          )
         )
       )
     Mockito.`when`(account.id)
@@ -282,7 +289,13 @@ abstract class BookmarkServiceContract {
       },
       "At least one request made to ${this.annotationsURI}"
     )
-    Assertions.assertEquals(2, allRequests.size)
+    Assertions.assertTrue(
+      allRequests.any { request ->
+        request.requestUrl?.toUri() == this.deviceRegistrationURI
+      },
+      "At least one request made to ${this.deviceRegistrationURI}"
+    )
+    Assertions.assertEquals(3, allRequests.size)
   }
 
   private fun takeAllRequests(): List<RecordedRequest> {
@@ -415,7 +428,10 @@ abstract class BookmarkServiceContract {
     Mockito.`when`(account.loginState)
       .thenReturn(
         AccountLoggedIn(
-          this.accountCredentials.copy(annotationsURI = this.annotationsURI)
+          this.accountCredentials.copy(
+            annotationsURI = this.annotationsURI,
+            deviceRegistrationURI = deviceRegistrationURI
+          )
         )
       )
     Mockito.`when`(account.id)
@@ -474,7 +490,10 @@ abstract class BookmarkServiceContract {
     )
 
     Assertions.assertEquals(1, receivedBookmarks.size)
-    Assertions.assertEquals("urn:example.com/terms/id/c083c0a6-54c6-4cc5-9d3a-425317da662a", receivedBookmarks[0].opdsId)
+    Assertions.assertEquals(
+      "urn:example.com/terms/id/c083c0a6-54c6-4cc5-9d3a-425317da662a",
+      receivedBookmarks[0].opdsId
+    )
 
     val allRequests = this.takeAllRequests()
     Assertions.assertTrue(
@@ -489,7 +508,13 @@ abstract class BookmarkServiceContract {
       },
       "At least one request made to ${this.annotationsURI}"
     )
-    Assertions.assertEquals(2, allRequests.size)
+    Assertions.assertTrue(
+      allRequests.any { request ->
+        request.requestUrl?.toUri() == this.deviceRegistrationURI
+      },
+      "At least one request made to ${this.deviceRegistrationURI}"
+    )
+    Assertions.assertEquals(3, allRequests.size)
   }
 
   /**
@@ -625,7 +650,10 @@ abstract class BookmarkServiceContract {
     Mockito.`when`(account.loginState)
       .thenReturn(
         AccountLoggedIn(
-          this.accountCredentials.copy(annotationsURI = this.annotationsURI)
+          this.accountCredentials.copy(
+            annotationsURI = this.annotationsURI,
+            deviceRegistrationURI = deviceRegistrationURI
+          )
         )
       )
     Mockito.`when`(account.id)
@@ -687,8 +715,14 @@ abstract class BookmarkServiceContract {
     )
 
     Assertions.assertEquals(2, receivedBookmarks.size)
-    Assertions.assertEquals("urn:example.com/terms/id/c083c0a6-54c6-4cc5-9d3a-425317da662a", receivedBookmarks[0].opdsId)
-    Assertions.assertEquals("urn:example.com/terms/id/c083c0a6-54c6-4cc5-9d3a-425317da662a", receivedBookmarks[1].opdsId)
+    Assertions.assertEquals(
+      "urn:example.com/terms/id/c083c0a6-54c6-4cc5-9d3a-425317da662a",
+      receivedBookmarks[0].opdsId
+    )
+    Assertions.assertEquals(
+      "urn:example.com/terms/id/c083c0a6-54c6-4cc5-9d3a-425317da662a",
+      receivedBookmarks[1].opdsId
+    )
 
     val allRequests = this.takeAllRequests()
     Assertions.assertTrue(
@@ -703,7 +737,13 @@ abstract class BookmarkServiceContract {
       },
       "At least one request made to ${this.annotationsURI}"
     )
-    Assertions.assertEquals(2, allRequests.size)
+    Assertions.assertTrue(
+      allRequests.any { request ->
+        this.matchesEndpoint(request, "/deviceRegistration")
+      },
+      "At least one request made to ${this.deviceRegistrationURI}"
+    )
+    Assertions.assertEquals(3, allRequests.size)
   }
 
   /**

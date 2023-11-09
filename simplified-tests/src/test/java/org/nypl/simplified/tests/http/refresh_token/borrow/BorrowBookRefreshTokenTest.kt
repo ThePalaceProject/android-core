@@ -135,7 +135,8 @@ class BorrowBookRefreshTokenTest {
         )
       ),
       authenticationDescription = "BasicToken",
-      annotationsURI = URI("https://www.example.com")
+      annotationsURI = URI("https://www.example.com"),
+      deviceRegistrationURI = URI("https://www.example.com")
     )
 
     this.account.setLoginState(AccountLoginState.AccountLoggedIn(credentials))

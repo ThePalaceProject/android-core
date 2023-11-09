@@ -35,21 +35,24 @@ class NotificationTokenHTTPCalls(
   override fun registerFCMTokenForProfileAccount(
     account: AccountType
   ) {
+    val credentials = account.loginState.credentials
+    val originalUrl = credentials?.deviceRegistrationURI
+
+    if (originalUrl == null) {
+      logger.debug("Account {} doesn't have a device registration uri", account.id)
+      return
+    }
+
     firebaseInstance.token
       .addOnSuccessListener { token ->
         logger.debug("Success fetching FCM Token: {}", token)
-        val originalUrl = buildString {
-          this.append(account.provider.catalogURI.toString())
-          this.append(URLEncoder.encode("patrons/me/devices", "utf-8"))
-        }
+
         val queryUrl = buildString {
           this.append(originalUrl)
           this.append("?")
           this.append("device_token=")
           this.append(URLEncoder.encode(token, "utf-8"))
         }
-
-        val credentials = account.loginState.credentials
 
         val request = this.http.newRequest(queryUrl)
           .setAuthorization(AccountAuthenticatedHTTP.createAuthorizationIfPresent(credentials))
@@ -73,7 +76,7 @@ class NotificationTokenHTTPCalls(
               setFCMTokenForAccount(
                 account = account,
                 token = token,
-                url = originalUrl
+                url = originalUrl.toString()
               )
             } else {
               logger.error(
@@ -100,13 +103,17 @@ class NotificationTokenHTTPCalls(
   override fun deleteFCMTokenForProfileAccount(
     account: AccountType
   ) {
+    val credentials = account.loginState.credentials
+    val url = credentials?.deviceRegistrationURI
+
+    if (url == null) {
+      logger.debug("Account {} doesn't have a device registration uri", account.id)
+      return
+    }
+
     firebaseInstance.token
       .addOnSuccessListener { token ->
         logger.debug("Success fetching FCM Token: {}", token)
-        val url = buildString {
-          this.append(account.provider.catalogURI.toString())
-          this.append(URLEncoder.encode("patrons/me/devices", "utf-8"))
-        }
 
         val credentials = account.loginState.credentials
 

@@ -237,7 +237,8 @@ class ProfileAccountLoginTask(
             authenticationDescription = this.findCurrentDescription().description,
             patronInfo = request.patronInfo,
             cookies = request.cookies,
-            annotationsURI = null
+            annotationsURI = null,
+            deviceRegistrationURI = null
           )
 
         this.handlePatronUserProfile()
@@ -310,7 +311,8 @@ class ProfileAccountLoginTask(
             accessToken = request.token,
             adobeCredentials = null,
             authenticationDescription = this.findCurrentDescription().description,
-            annotationsURI = null
+            annotationsURI = null,
+            deviceRegistrationURI = null
           )
 
         this.handlePatronUserProfile()
@@ -356,7 +358,8 @@ class ProfileAccountLoginTask(
         password = request.password,
         authenticationDescription = request.description.description,
         adobeCredentials = null,
-        annotationsURI = null
+        annotationsURI = null,
+        deviceRegistrationURI = null
       )
 
     this.handlePatronUserProfile()
@@ -397,7 +400,8 @@ class ProfileAccountLoginTask(
             ),
             adobeCredentials = null,
             authenticationDescription = request.description.description,
-            annotationsURI = null
+            annotationsURI = null,
+            deviceRegistrationURI = null
           )
 
           this.handlePatronUserProfile()
@@ -452,19 +456,31 @@ class ProfileAccountLoginTask(
 
     this.credentials = when (val currentCredentials = this.credentials) {
       is AccountAuthenticationCredentials.Basic -> {
-        currentCredentials.copy(annotationsURI = patronProfile.annotationsURI)
+        currentCredentials.copy(
+          annotationsURI = patronProfile.annotationsURI,
+          deviceRegistrationURI = patronProfile.deviceRegistrationURI
+        )
       }
 
       is AccountAuthenticationCredentials.BasicToken -> {
-        currentCredentials.copy(annotationsURI = patronProfile.annotationsURI)
+        currentCredentials.copy(
+          annotationsURI = patronProfile.annotationsURI,
+          deviceRegistrationURI = patronProfile.deviceRegistrationURI
+        )
       }
 
       is AccountAuthenticationCredentials.OAuthWithIntermediary -> {
-        currentCredentials.copy(annotationsURI = patronProfile.annotationsURI)
+        currentCredentials.copy(
+          annotationsURI = patronProfile.annotationsURI,
+          deviceRegistrationURI = patronProfile.deviceRegistrationURI
+        )
       }
 
       is AccountAuthenticationCredentials.SAML2_0 -> {
-        currentCredentials.copy(annotationsURI = patronProfile.annotationsURI)
+        currentCredentials.copy(
+          annotationsURI = patronProfile.annotationsURI,
+          deviceRegistrationURI = patronProfile.deviceRegistrationURI
+        )
       }
     }
   }

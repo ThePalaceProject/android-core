@@ -113,7 +113,8 @@ class BorrowLCPTest {
             password = AccountPassword("not a password"),
             adobeCredentials = null,
             authenticationDescription = "Basic",
-            annotationsURI = URI("https://www.example.com")
+            annotationsURI = URI("https://www.example.com"),
+            deviceRegistrationURI = URI("https://www.example.com")
           )
         )
       )

@@ -63,7 +63,8 @@ object AccountAuthenticationCredentialsJSON20210512 : AccountAuthenticationCrede
       accessToken = JSONParserUtilities.getString(obj, "accessToken"),
       adobeCredentials = adobeCredentials,
       authenticationDescription = JSONParserUtilities.getStringOrNull(obj, "authenticationDescription"),
-      annotationsURI = JSONParserUtilities.getURIOrNull(obj, "annotationsURI")
+      annotationsURI = JSONParserUtilities.getURIOrNull(obj, "annotationsURI"),
+      deviceRegistrationURI = JSONParserUtilities.getURIOrNull(obj, "deviceRegistrationURI")
     )
   }
 
@@ -79,7 +80,8 @@ object AccountAuthenticationCredentialsJSON20210512 : AccountAuthenticationCrede
       password = AccountPassword(JSONParserUtilities.getString(obj, "password")),
       adobeCredentials = adobeCredentials,
       authenticationDescription = JSONParserUtilities.getStringOrNull(obj, "authenticationDescription"),
-      annotationsURI = JSONParserUtilities.getURIOrNull(obj, "annotationsURI")
+      annotationsURI = JSONParserUtilities.getURIOrNull(obj, "annotationsURI"),
+      deviceRegistrationURI = JSONParserUtilities.getURIOrNull(obj, "deviceRegistrationURI")
     )
   }
 
@@ -103,7 +105,8 @@ object AccountAuthenticationCredentialsJSON20210512 : AccountAuthenticationCrede
       ),
       adobeCredentials = adobeCredentials,
       authenticationDescription = JSONParserUtilities.getStringOrNull(obj, "authenticationDescription"),
-      annotationsURI = JSONParserUtilities.getURIOrNull(obj, "annotationsURI")
+      annotationsURI = JSONParserUtilities.getURIOrNull(obj, "annotationsURI"),
+      deviceRegistrationURI = JSONParserUtilities.getURIOrNull(obj, "deviceRegistrationURI")
     )
   }
 
@@ -118,7 +121,8 @@ object AccountAuthenticationCredentialsJSON20210512 : AccountAuthenticationCrede
       authenticationDescription = JSONParserUtilities.getStringOrNull(obj, "authenticationDescription"),
       patronInfo = JSONParserUtilities.getString(obj, "patronInfo"),
       cookies = deserializeCookies(JSONParserUtilities.getArray(obj, "cookies")),
-      annotationsURI = JSONParserUtilities.getURIOrNull(obj, "annotationsURI")
+      annotationsURI = JSONParserUtilities.getURIOrNull(obj, "annotationsURI"),
+      deviceRegistrationURI = JSONParserUtilities.getURIOrNull(obj, "deviceRegistrationURI")
     )
   }
 

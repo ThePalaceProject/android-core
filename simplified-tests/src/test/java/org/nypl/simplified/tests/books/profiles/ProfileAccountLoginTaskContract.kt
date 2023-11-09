@@ -710,7 +710,8 @@ abstract class ProfileAccountLoginTaskContract {
         password = request.password,
         adobeCredentials = null,
         authenticationDescription = "Description",
-        annotationsURI = URI("https://www.example.com")
+        annotationsURI = URI("https://www.example.com"),
+        deviceRegistrationURI = URI("https://www.example.com")
       ),
       state.credentials
     )
@@ -843,7 +844,8 @@ abstract class ProfileAccountLoginTaskContract {
         password = request.password,
         adobeCredentials = null,
         authenticationDescription = "Library Login",
-        annotationsURI = URI("https://www.example.com")
+        annotationsURI = URI("https://www.example.com"),
+        deviceRegistrationURI = URI("https://www.example.com")
       )
 
     val newCredentials =
@@ -1000,7 +1002,8 @@ abstract class ProfileAccountLoginTaskContract {
         ),
         adobeCredentials = null,
         authenticationDescription = "Library Login",
-        annotationsURI = URI("https://www.example.com")
+        annotationsURI = URI("https://www.example.com"),
+        deviceRegistrationURI = URI("https://www.example.com")
       )
 
     val newCredentials =
@@ -1110,7 +1113,8 @@ abstract class ProfileAccountLoginTaskContract {
         password = request.password,
         adobeCredentials = null,
         authenticationDescription = "Description",
-        annotationsURI = URI("https://www.example.com")
+        annotationsURI = URI("https://www.example.com"),
+        deviceRegistrationURI = URI("https://www.example.com")
       )
 
     val newCredentials =
@@ -1375,7 +1379,8 @@ abstract class ProfileAccountLoginTaskContract {
         password = request.password,
         adobeCredentials = null,
         authenticationDescription = "Library Login",
-        annotationsURI = URI("https://www.example.com")
+        annotationsURI = URI("https://www.example.com"),
+        deviceRegistrationURI = URI("https://www.example.com")
       )
 
     val newCredentials =
@@ -1748,7 +1753,8 @@ abstract class ProfileAccountLoginTaskContract {
         adobeCredentials = null,
         authenticationDescription = "Description",
         accessToken = "A TOKEN!",
-        annotationsURI = URI("https://www.example.com")
+        annotationsURI = URI("https://www.example.com"),
+        deviceRegistrationURI = URI("https://www.example.com")
       ),
       state.credentials
     )
@@ -2105,7 +2111,8 @@ abstract class ProfileAccountLoginTaskContract {
           AccountCookie("https://example", "cookie0=23"),
           AccountCookie("https://fake", "cookie1=24; Path=/; Secure"),
           AccountCookie("http://something", "cookie2=25; Path=/abc; Expires=Wed, 23 Dec 2020 07:28:00 GMT")
-        )
+        ),
+        deviceRegistrationURI = URI("https://www.example.com")
       ),
       state.credentials
     )
@@ -2351,9 +2358,6 @@ abstract class ProfileAccountLoginTaskContract {
 
     val result1 = task1.call()
     TaskDumps.dump(logger, result1)
-
-    val state =
-      this.account.loginState as AccountNotLoggedIn
 
     assertEquals(0, this.server.requestCount)
   }

@@ -20,7 +20,7 @@ data class PatronUserProfile(
    * The annotations link, if one was present.
    */
 
-  val annotationsLink: Link? =
+  private val annotationsLink: Link? =
     this.links.find { link -> link.relation == "http://www.w3.org/ns/oa#annotationService" }
 
   /**
@@ -29,4 +29,18 @@ data class PatronUserProfile(
 
   val annotationsURI: URI? =
     this.annotationsLink?.hrefURI
+
+  /**
+   * The device registration link, if one was present.
+   */
+
+  private val deviceRegistrationLink: Link? =
+    this.links.find { link -> link.relation == "http://palaceproject.io/terms/deviceRegistration" }
+
+  /**
+   * The device registration URI, if one was present.
+   */
+
+  val deviceRegistrationURI: URI? =
+    this.deviceRegistrationLink?.hrefURI
 }
