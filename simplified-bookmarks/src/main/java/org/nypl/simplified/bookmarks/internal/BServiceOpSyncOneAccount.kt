@@ -170,6 +170,15 @@ internal class BServiceOpSyncOneAccount(
           bookmark.bookmarkId.value
         )
 
+        if (!syncable.account.bookDatabase.books().contains(bookmark.book)) {
+          this.logger.debug(
+            "[{}]: we no longer have book {}",
+            this.profile.id.uuid,
+            bookmark.bookmarkId.value
+          )
+          continue
+        }
+
         val entry = syncable.account.bookDatabase.entry(bookmark.book)
 
         when (bookmark) {
