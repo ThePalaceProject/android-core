@@ -30,10 +30,6 @@ import org.nypl.simplified.listeners.api.ListenerRepository
 import org.nypl.simplified.listeners.api.listenerRepositories
 import org.nypl.simplified.profiles.api.ProfileEvent
 import org.nypl.simplified.profiles.api.ProfileUpdated
-import org.nypl.simplified.profiles.api.ProfilesDatabaseType.AnonymousProfileEnabled.ANONYMOUS_PROFILE_DISABLED
-import org.nypl.simplified.profiles.api.ProfilesDatabaseType.AnonymousProfileEnabled.ANONYMOUS_PROFILE_ENABLED
-import org.nypl.simplified.profiles.api.idle_timer.ProfileIdleTimeOutSoon
-import org.nypl.simplified.profiles.api.idle_timer.ProfileIdleTimedOut
 import org.nypl.simplified.ui.accounts.AccountListFragment
 import org.nypl.simplified.ui.accounts.AccountListFragmentParameters
 import org.nypl.simplified.ui.announcements.AnnouncementsDialog
@@ -77,19 +73,6 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-
-    /*
-     * If named profiles are enabled, subscribe to profile timer events so that users are
-     * logged out after a period of inactivity.
-     */
-
-    when (viewModel.profilesController.profileAnonymousEnabled()) {
-      ANONYMOUS_PROFILE_ENABLED -> {
-      }
-      ANONYMOUS_PROFILE_DISABLED -> {
-        viewModel.profilesController.profileIdleTimer().start()
-      }
-    }
 
     /*
      * Demand that onOptionsItemSelected be called.
@@ -205,13 +188,6 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
     when (event) {
       is ProfileUpdated.Succeeded ->
         this.onProfileUpdateSucceeded(event)
-
-      is ProfileIdleTimeOutSoon -> {
-        // Unused
-      }
-      is ProfileIdleTimedOut -> {
-        // Unused
-      }
     }
   }
 
@@ -344,18 +320,6 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
   override fun onStop() {
     super.onStop()
     this.subscriptions.clear()
-  }
-
-  override fun onDestroy() {
-    super.onDestroy()
-
-    when (viewModel.profilesController.profileAnonymousEnabled()) {
-      ANONYMOUS_PROFILE_ENABLED -> {
-      }
-      ANONYMOUS_PROFILE_DISABLED -> {
-        viewModel.profilesController.profileIdleTimer().stop()
-      }
-    }
   }
 
   override val defaultViewModelProviderFactory: ViewModelProvider.Factory

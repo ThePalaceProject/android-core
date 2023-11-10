@@ -105,9 +105,6 @@ import org.nypl.simplified.profiles.ProfilesDatabases
 import org.nypl.simplified.profiles.api.ProfileDatabaseException
 import org.nypl.simplified.profiles.api.ProfileEvent
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
-import org.nypl.simplified.profiles.api.idle_timer.ProfileIdleTimer
-import org.nypl.simplified.profiles.api.idle_timer.ProfileIdleTimerConfigurationServiceType
-import org.nypl.simplified.profiles.api.idle_timer.ProfileIdleTimerType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountCreationStringResourcesType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountDeletionStringResourcesType
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
@@ -406,14 +403,6 @@ internal object MainServices {
       .firstOrNull()
   }
 
-  private fun createProfileIdleTimer(
-    profileEvents: PublishSubject<ProfileEvent>
-  ): ProfileIdleTimerType {
-    val execProfileTimer =
-      NamedThreadPools.namedThreadPool(1, "profile-timer", 19)
-    return ProfileIdleTimer.create(execProfileTimer, profileEvents)
-  }
-
   private fun createBookmarksService(
     http: LSHTTPClientType,
     bookController: ProfilesControllerType
@@ -496,23 +485,6 @@ internal object MainServices {
     }
 
     throw IllegalStateException("Missing build configuration service")
-  }
-
-  private fun findIdleTimerConfiguration(): ProfileIdleTimerConfigurationServiceType {
-    val existing =
-      this.optionalFromServiceLoader(ProfileIdleTimerConfigurationServiceType::class.java)
-
-    if (existing != null) {
-      return existing
-    }
-
-    this.logger.debug("returning fallback idle timer configuration service")
-    return object : ProfileIdleTimerConfigurationServiceType {
-      override val warningWhenSecondsRemaining: Int
-        get() = 60
-      override val logOutAfterSeconds: Int
-        get() = 10 * 60
-    }
   }
 
   fun setup(
@@ -890,11 +862,6 @@ internal object MainServices {
       )
 
     val profileEvents = PublishSubject.create<ProfileEvent>()
-    addService(
-      message = strings.bootingGeneral("profile idle timer"),
-      interfaceType = ProfileIdleTimerType::class.java,
-      serviceConstructor = { this.createProfileIdleTimer(profileEvents) }
-    )
 
     addService(
       message = strings.bootingGeneral("audio book manifest strategies"),
@@ -1013,17 +980,6 @@ internal object MainServices {
       interfaceType = NetworkConnectivityType::class.java,
       serviceConstructor = { NetworkConnectivity.create(context) }
     )
-
-    val idleTimerConfiguration =
-      addService(
-        message = strings.bootingGeneral("idle timer configuration service"),
-        interfaceType = ProfileIdleTimerConfigurationServiceType::class.java,
-        serviceConstructor = { this.findIdleTimerConfiguration() }
-      )
-
-    val idleTimer = bookController.profileIdleTimer()
-    idleTimer.setWarningIdleSecondsRemaining(idleTimerConfiguration.warningWhenSecondsRemaining)
-    idleTimer.setMaximumIdleSeconds(idleTimerConfiguration.logOutAfterSeconds)
 
     addService(
       message = strings.bootingGeneral("migrations"),
