@@ -70,12 +70,13 @@ class TabbedNavigator private constructor(private val navigator: BottomNavigator
   }
 
   fun popBackStack(): Boolean {
-    if (this.navigator.currentStackSize() < 1) {
-      return false
-    }
-
     return try {
-      this.navigator.pop()
+      if (this.navigator.currentStackSize() < 1) {
+        this.logger.warn("Trying to pop an empty stack!")
+        false
+      } else {
+        this.navigator.pop()
+      }
     } catch (e: Exception) {
       logger.warn("Failed to pop navigator stack: ", e)
       false
