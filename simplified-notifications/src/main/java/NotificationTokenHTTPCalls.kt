@@ -71,7 +71,7 @@ class NotificationTokenHTTPCalls(
 
             is LSHTTPResponseStatus.Responded.Error -> {
               if (status.properties.status == HttpURLConnection.HTTP_NOT_FOUND) {
-                logger.error(
+                logger.debug(
                   "The account {} doesn't have the FCM token {}. Let's send it...",
                   account.id,
                   token
