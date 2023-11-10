@@ -63,7 +63,6 @@ import org.nypl.simplified.profiles.controller.api.ProfileAccountCreationStringR
 import org.nypl.simplified.profiles.controller.api.ProfileAccountDeletionStringResourcesType
 import org.nypl.simplified.tests.MutableServiceDirectory
 import org.nypl.simplified.tests.books.controller.BooksControllerContract
-import org.nypl.simplified.tests.books.idle_timer.InoperableIdleTimer
 import org.nypl.simplified.tests.mocking.FakeAccountCredentialStorage
 import org.nypl.simplified.tests.mocking.MockAccount
 import org.nypl.simplified.tests.mocking.MockAccountCreationStringResources
@@ -300,7 +299,6 @@ class SyncBookRefreshToken {
     services.putService(PatronUserProfileParsersType::class.java, patronUserProfileParsers)
     services.putService(ProfileAccountCreationStringResourcesType::class.java, profileAccountCreationStringResources)
     services.putService(ProfileAccountDeletionStringResourcesType::class.java, profileAccountDeletionStringResources)
-    services.putService(ProfileIdleTimerType::class.java, InoperableIdleTimer())
     services.putService(ProfilesDatabaseType::class.java, profiles)
 
     return Controller.createFromServiceDirectory(

@@ -69,7 +69,6 @@ import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
 import org.nypl.simplified.tests.EventAssertions
 import org.nypl.simplified.tests.MutableServiceDirectory
 import org.nypl.simplified.tests.books.BookFormatsTesting
-import org.nypl.simplified.tests.books.idle_timer.InoperableIdleTimer
 import org.nypl.simplified.tests.mocking.FakeAccountCredentialStorage
 import org.nypl.simplified.tests.mocking.MockAccountCreationStringResources
 import org.nypl.simplified.tests.mocking.MockAccountDeletionStringResources
@@ -178,7 +177,6 @@ abstract class ProfilesControllerContract {
     services.putService(PatronUserProfileParsersType::class.java, this.patronUserProfileParsers)
     services.putService(ProfileAccountCreationStringResourcesType::class.java, this.profileAccountCreationStringResources)
     services.putService(ProfileAccountDeletionStringResourcesType::class.java, this.profileAccountDeletionStringResources)
-    services.putService(ProfileIdleTimerType::class.java, InoperableIdleTimer())
     services.putService(ProfilesDatabaseType::class.java, profiles)
 
     return Controller.createFromServiceDirectory(

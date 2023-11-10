@@ -151,8 +151,4 @@ class MockProfilesController(
   override fun profileDelete(profileID: ProfileID): FluentFuture<ProfileDeletionEvent> {
     return FluentFuture.from(SettableFuture.create())
   }
-
-  override fun profileIdleTimer(): ProfileIdleTimerType {
-    TODO()
-  }
 }
