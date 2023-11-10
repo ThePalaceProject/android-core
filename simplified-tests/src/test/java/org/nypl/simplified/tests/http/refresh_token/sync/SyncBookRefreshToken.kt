@@ -102,6 +102,7 @@ class SyncBookRefreshToken {
   private lateinit var executorBooks: ListeningExecutorService
   private lateinit var executorDownloads: ListeningExecutorService
   private lateinit var executorFeeds: ListeningExecutorService
+  private lateinit var executorNotifications: ListeningExecutorService
   private lateinit var httpClient: LSHTTPClientType
   private lateinit var patronUserProfileParsers: PatronUserProfileParsersType
   private lateinit var profileEvents: PublishSubject<ProfileEvent>
@@ -173,6 +174,7 @@ class SyncBookRefreshToken {
     this.executorBooks = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool())
     this.executorDownloads = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool())
     this.executorFeeds = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool())
+    this.executorNotifications = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool())
     this.patronUserProfileParsers = Mockito.mock(PatronUserProfileParsersType::class.java)
     this.profileEvents = PublishSubject.create()
     this.profileEventsReceived = Collections.synchronizedList(ArrayList())
@@ -294,7 +296,7 @@ class SyncBookRefreshToken {
     services.putService(ContentResolverType::class.java, this.contentResolver)
     services.putService(FeedLoaderType::class.java, feedLoader)
     services.putService(LSHTTPClientType::class.java, this.httpClient)
-    services.putService(NotificationTokenHTTPCallsType::class.java, NotificationTokenHTTPCalls(this.httpClient))
+    services.putService(NotificationTokenHTTPCallsType::class.java, NotificationTokenHTTPCalls(this.httpClient, this.executorNotifications))
     services.putService(OPDSFeedParserType::class.java, parser)
     services.putService(PatronUserProfileParsersType::class.java, patronUserProfileParsers)
     services.putService(ProfileAccountCreationStringResourcesType::class.java, profileAccountCreationStringResources)

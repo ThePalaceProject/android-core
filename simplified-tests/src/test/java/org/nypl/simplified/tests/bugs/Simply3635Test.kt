@@ -240,7 +240,10 @@ class Simply3635Test {
     b.addService(ContentResolverType::class.java, this.contentResolverSane)
     b.addService(FeedLoaderType::class.java, this.feedLoader)
     b.addService(LSHTTPClientType::class.java, this.http)
-    b.addService(NotificationTokenHTTPCallsType::class.java, NotificationTokenHTTPCalls(this.http))
+    b.addService(
+      NotificationTokenHTTPCallsType::class.java,
+      NotificationTokenHTTPCalls(this.http, this.executorService)
+    )
     b.addService(OPDSFeedParserType::class.java, this.opdsParser)
     b.addService(PatronUserProfileParsersType::class.java, PatronUserProfileParsers())
     b.addService(ProfileIdleTimerType::class.java, this.profileIdleTimer)
