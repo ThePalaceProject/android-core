@@ -14,9 +14,11 @@ import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.slf4j.LoggerFactory
 import java.net.HttpURLConnection
 import java.net.URLEncoder
+import java.util.concurrent.ExecutorService
 
 class NotificationTokenHTTPCalls(
-  private val http: LSHTTPClientType
+  private val http: LSHTTPClientType,
+  private val executor: ExecutorService
 ) : NotificationTokenHTTPCallsType {
 
   private val logger =
@@ -59,40 +61,42 @@ class NotificationTokenHTTPCalls(
           .addCredentialsToProperties(credentials)
           .build()
 
-        val response = request.execute()
-        when (val status = response.status) {
-          is LSHTTPResponseStatus.Responded.OK -> {
-            account.updateBasicTokenCredentials(status.getAccessToken())
-            logger.debug("The account {} has the FCM token {}", account.id, token)
-          }
-
-          is LSHTTPResponseStatus.Responded.Error -> {
-            if (status.properties.status == HttpURLConnection.HTTP_NOT_FOUND) {
-              logger.error(
-                "The account {} doesn't have the FCM token {}. Let's send it...",
-                account.id,
-                token
-              )
-              setFCMTokenForAccount(
-                account = account,
-                token = token,
-                url = originalUrl.toString()
-              )
-            } else {
-              logger.error(
-                "Failed to retrieve FCM Token for account {}: {}",
-                account.id,
-                status.properties.message
-              )
+        this.executor.execute {
+          val response = request.execute()
+          when (val status = response.status) {
+            is LSHTTPResponseStatus.Responded.OK -> {
+              account.updateBasicTokenCredentials(status.getAccessToken())
+              logger.debug("The account {} has the FCM token {}", account.id, token)
             }
-          }
 
-          is LSHTTPResponseStatus.Failed ->
-            logger.error(
-              "Failed to retrieve FCM Token for account {}",
-              account.id,
-              status.exception
-            )
+            is LSHTTPResponseStatus.Responded.Error -> {
+              if (status.properties.status == HttpURLConnection.HTTP_NOT_FOUND) {
+                logger.error(
+                  "The account {} doesn't have the FCM token {}. Let's send it...",
+                  account.id,
+                  token
+                )
+                setFCMTokenForAccount(
+                  account = account,
+                  token = token,
+                  url = originalUrl.toString()
+                )
+              } else {
+                logger.error(
+                  "Failed to retrieve FCM Token for account {}: {}",
+                  account.id,
+                  status.properties.message
+                )
+              }
+            }
+
+            is LSHTTPResponseStatus.Failed ->
+              logger.error(
+                "Failed to retrieve FCM Token for account {}",
+                account.id,
+                status.exception
+              )
+          }
         }
       }
       .addOnFailureListener { exception ->
@@ -115,8 +119,6 @@ class NotificationTokenHTTPCalls(
       .addOnSuccessListener { token ->
         logger.debug("Success fetching FCM Token: {}", token)
 
-        val credentials = account.loginState.credentials
-
         val request = this.http.newRequest(url)
           .setAuthorization(AccountAuthenticatedHTTP.createAuthorizationIfPresent(credentials))
           .addCredentialsToProperties(credentials)
@@ -130,27 +132,29 @@ class NotificationTokenHTTPCalls(
           )
           .build()
 
-        val response = request.execute()
-        when (val status = response.status) {
-          is LSHTTPResponseStatus.Responded.OK -> {
-            account.updateBasicTokenCredentials(status.getAccessToken())
-            logger.debug("Deleted FCM token for account {}", account.id)
-          }
+        this.executor.execute {
+          val response = request.execute()
+          when (val status = response.status) {
+            is LSHTTPResponseStatus.Responded.OK -> {
+              account.updateBasicTokenCredentials(status.getAccessToken())
+              logger.debug("Deleted FCM token for account {}", account.id)
+            }
 
-          is LSHTTPResponseStatus.Responded.Error -> {
-            logger.error(
-              "Failed to delete FCM Token for account {}: {}",
-              account.id,
-              status.properties.message
-            )
-          }
+            is LSHTTPResponseStatus.Responded.Error -> {
+              logger.error(
+                "Failed to delete FCM Token for account {}: {}",
+                account.id,
+                status.properties.message
+              )
+            }
 
-          is LSHTTPResponseStatus.Failed ->
-            logger.error(
-              "Failed to delete FCM Token for account {}",
-              account.id,
-              status.exception
-            )
+            is LSHTTPResponseStatus.Failed ->
+              logger.error(
+                "Failed to delete FCM Token for account {}",
+                account.id,
+                status.exception
+              )
+          }
         }
       }
       .addOnFailureListener { exception ->

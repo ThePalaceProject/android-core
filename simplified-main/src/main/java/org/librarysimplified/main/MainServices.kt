@@ -883,7 +883,8 @@ internal object MainServices {
         interfaceType = NotificationTokenHTTPCallsType::class.java,
         serviceConstructor = {
           NotificationTokenHTTPCalls(
-            http = lsHTTP
+            http = lsHTTP,
+            executor = NamedThreadPools.namedThreadPool(1, "http-notifications", 19)
           )
         }
       )
