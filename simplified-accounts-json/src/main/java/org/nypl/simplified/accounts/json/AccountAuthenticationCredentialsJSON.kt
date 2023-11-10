@@ -62,6 +62,10 @@ object AccountAuthenticationCredentialsJSON {
       authObject.put("annotationsURI", uri.toString())
     }
 
+    credentials.deviceRegistrationURI?.let { uri ->
+      authObject.put("deviceRegistrationURI", uri.toString())
+    }
+
     when (credentials) {
       is AccountAuthenticationCredentials.Basic -> {
         authObject.put("@type", "basic")

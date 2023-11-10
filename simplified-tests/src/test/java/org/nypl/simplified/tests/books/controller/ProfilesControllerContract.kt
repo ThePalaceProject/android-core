@@ -107,6 +107,7 @@ abstract class ProfilesControllerContract {
   private lateinit var directoryProfiles: File
   private lateinit var executorBooks: ExecutorService
   private lateinit var executorFeeds: ListeningExecutorService
+  private lateinit var executorNotifications: ExecutorService
   private lateinit var executorTimer: ExecutorService
   private lateinit var lsHTTP: LSHTTPClientType
   private lateinit var patronUserProfileParsers: PatronUserProfileParsersType
@@ -174,7 +175,7 @@ abstract class ProfilesControllerContract {
     services.putService(FeedLoaderType::class.java, feedLoader)
     services.putService(LSHTTPClientType::class.java, this.lsHTTP)
     services.putService(OPDSFeedParserType::class.java, parser)
-    services.putService(NotificationTokenHTTPCallsType::class.java, NotificationTokenHTTPCalls(this.lsHTTP))
+    services.putService(NotificationTokenHTTPCallsType::class.java, NotificationTokenHTTPCalls(this.lsHTTP, this.executorNotifications))
     services.putService(PatronUserProfileParsersType::class.java, this.patronUserProfileParsers)
     services.putService(ProfileAccountCreationStringResourcesType::class.java, this.profileAccountCreationStringResources)
     services.putService(ProfileAccountDeletionStringResourcesType::class.java, this.profileAccountDeletionStringResources)
@@ -199,6 +200,7 @@ abstract class ProfilesControllerContract {
     this.authDocumentParsers = Mockito.mock(AuthenticationDocumentParsersType::class.java)
     this.executorFeeds = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool())
     this.executorBooks = Executors.newCachedThreadPool()
+    this.executorNotifications = Executors.newCachedThreadPool()
     this.executorTimer = Executors.newCachedThreadPool()
     this.directoryDownloads = DirectoryUtilities.directoryCreateTemporary()
     this.directoryProfiles = DirectoryUtilities.directoryCreateTemporary()

@@ -436,7 +436,8 @@ abstract class AccountsDatabaseContract {
         password = AccountPassword("1234"),
         adobeCredentials = null,
         authenticationDescription = null,
-        annotationsURI = URI("https://www.example.com")
+        annotationsURI = URI("https://www.example.com"),
+        deviceRegistrationURI = URI("https://www.example.com")
       )
 
     acc0.setLoginState(AccountLoginState.AccountLoggedIn(creds))
@@ -445,22 +446,39 @@ abstract class AccountsDatabaseContract {
     acc0.updateCredentialsIfAvailable {
       when (it) {
         is AccountAuthenticationCredentials.Basic ->
-          creds.copy(annotationsURI = URI.create("https://www.example.com/annotations"))
+          creds.copy(
+            annotationsURI = URI.create("https://www.example.com/annotations"),
+            deviceRegistrationURI = URI.create("https://www.example.com/deviceRegistration")
+          )
 
         is AccountAuthenticationCredentials.BasicToken ->
-          creds.copy(annotationsURI = URI.create("https://www.example.com/annotations"))
+          creds.copy(
+            annotationsURI = URI.create("https://www.example.com/annotations"),
+            deviceRegistrationURI = URI.create("https://www.example.com/deviceRegistration")
+          )
 
         is AccountAuthenticationCredentials.OAuthWithIntermediary ->
-          creds.copy(annotationsURI = URI.create("https://www.example.com/annotations"))
+          creds.copy(
+            annotationsURI = URI.create("https://www.example.com/annotations"),
+            deviceRegistrationURI = URI.create("https://www.example.com/deviceRegistration")
+          )
 
         is AccountAuthenticationCredentials.SAML2_0 ->
-          creds.copy(annotationsURI = URI.create("https://www.example.com/annotations"))
+          creds.copy(
+            annotationsURI = URI.create("https://www.example.com/annotations"),
+            deviceRegistrationURI = URI.create("https://www.example.com/deviceRegistration")
+          )
       }
     }
 
     Assertions.assertEquals(
       URI.create("https://www.example.com/annotations"),
       acc0.loginState.credentials?.annotationsURI
+    )
+
+    Assertions.assertEquals(
+      URI.create("https://www.example.com/deviceRegistration"),
+      acc0.loginState.credentials?.deviceRegistrationURI
     )
   }
 
@@ -500,7 +518,8 @@ abstract class AccountsDatabaseContract {
         ),
         adobeCredentials = null,
         authenticationDescription = null,
-        annotationsURI = URI("https://www.example.com")
+        annotationsURI = URI("https://www.example.com"),
+        deviceRegistrationURI = URI("https://www.example.com")
       )
 
     acc0.setLoginState(AccountLoginState.AccountLoggedIn(creds))

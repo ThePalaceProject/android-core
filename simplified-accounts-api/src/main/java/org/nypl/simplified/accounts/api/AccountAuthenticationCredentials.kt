@@ -42,6 +42,13 @@ sealed class AccountAuthenticationCredentials {
   abstract val annotationsURI: URI?
 
   /**
+   * The device registration URI for the account. This is used to register or unregister a device
+   * to start/stop receiving push notifications.
+   */
+
+  abstract val deviceRegistrationURI: URI?
+
+  /**
    * The user used basic authentication to authenticate.
    */
 
@@ -50,7 +57,8 @@ sealed class AccountAuthenticationCredentials {
     val password: AccountPassword,
     override val adobeCredentials: AccountAuthenticationAdobePreActivationCredentials?,
     override val authenticationDescription: String?,
-    override val annotationsURI: URI?
+    override val annotationsURI: URI?,
+    override val deviceRegistrationURI: URI?
   ) : AccountAuthenticationCredentials() {
     override fun withoutAdobePostActivationCredentials(): AccountAuthenticationCredentials {
       return this.copy(
@@ -75,7 +83,8 @@ sealed class AccountAuthenticationCredentials {
     val authenticationTokenInfo: AccountAuthenticationTokenInfo,
     override val adobeCredentials: AccountAuthenticationAdobePreActivationCredentials?,
     override val authenticationDescription: String?,
-    override val annotationsURI: URI?
+    override val annotationsURI: URI?,
+    override val deviceRegistrationURI: URI?
   ) : AccountAuthenticationCredentials() {
     override fun withoutAdobePostActivationCredentials(): AccountAuthenticationCredentials {
       return this.copy(
@@ -110,7 +119,8 @@ sealed class AccountAuthenticationCredentials {
     val accessToken: String,
     override val adobeCredentials: AccountAuthenticationAdobePreActivationCredentials?,
     override val authenticationDescription: String?,
-    override val annotationsURI: URI?
+    override val annotationsURI: URI?,
+    override val deviceRegistrationURI: URI?
   ) : AccountAuthenticationCredentials() {
     override fun withoutAdobePostActivationCredentials(): AccountAuthenticationCredentials {
       return this.copy(
@@ -135,7 +145,8 @@ sealed class AccountAuthenticationCredentials {
     val cookies: List<AccountCookie>,
     override val adobeCredentials: AccountAuthenticationAdobePreActivationCredentials?,
     override val authenticationDescription: String?,
-    override val annotationsURI: URI?
+    override val annotationsURI: URI?,
+    override val deviceRegistrationURI: URI?
   ) : AccountAuthenticationCredentials() {
     override fun withoutAdobePostActivationCredentials(): AccountAuthenticationCredentials {
       return this.copy(

@@ -191,7 +191,8 @@ class BorrowACSMTest {
               )
             ),
             authenticationDescription = "Basic",
-            annotationsURI = URI("https://www.example.com")
+            annotationsURI = URI("https://www.example.com"),
+            deviceRegistrationURI = URI("https://www.example.com")
           )
         )
       )
@@ -394,7 +395,8 @@ class BorrowACSMTest {
             password = AccountPassword("password"),
             adobeCredentials = null,
             authenticationDescription = "Basic",
-            annotationsURI = URI("https://www.example.com")
+            annotationsURI = URI("https://www.example.com"),
+            deviceRegistrationURI = URI("https://www.example.com")
           )
         )
       )
@@ -439,7 +441,8 @@ class BorrowACSMTest {
               null
             ),
             authenticationDescription = "Basic",
-            annotationsURI = URI("https://www.example.com")
+            annotationsURI = URI("https://www.example.com"),
+            deviceRegistrationURI = URI("https://www.example.com")
           )
         )
       )

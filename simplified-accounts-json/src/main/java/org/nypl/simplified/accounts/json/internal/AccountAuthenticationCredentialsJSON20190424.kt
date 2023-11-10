@@ -39,7 +39,8 @@ object AccountAuthenticationCredentialsJSON20190424 : AccountAuthenticationCrede
       password = pass,
       adobeCredentials = adobeCredentials,
       authenticationDescription = null,
-      annotationsURI = null
+      annotationsURI = null,
+      deviceRegistrationURI = null
     )
   }
 }

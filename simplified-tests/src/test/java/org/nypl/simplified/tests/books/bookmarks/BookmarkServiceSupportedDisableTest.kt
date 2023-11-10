@@ -68,6 +68,7 @@ class BookmarkServiceSupportedDisableTest {
   private lateinit var server: MockWebServer
   private lateinit var http: LSHTTPClientType
   private lateinit var annotationsURI: URI
+  private lateinit var deviceRegistrationURI: URI
   private lateinit var patronURI: URI
   private lateinit var serverDispatcher: EndpointDispatcher
 
@@ -148,6 +149,8 @@ class BookmarkServiceSupportedDisableTest {
     this.server.dispatcher = this.serverDispatcher
     this.annotationsURI =
       URI.create("http://localhost:10000/annotations")
+    this.deviceRegistrationURI =
+      URI.create("http://localhost:10000/deviceRegistration")
     this.patronURI =
       URI.create("http://localhost:10000/patron")
   }
@@ -196,7 +199,8 @@ class BookmarkServiceSupportedDisableTest {
           password = AccountPassword("tycho"),
           adobeCredentials = null,
           authenticationDescription = null,
-          annotationsURI = this.annotationsURI
+          annotationsURI = this.annotationsURI,
+          deviceRegistrationURI = this.deviceRegistrationURI
         )
       )
     )

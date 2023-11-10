@@ -252,7 +252,8 @@ abstract class ProfileAccountLogoutTaskContract {
         password = AccountPassword("1234"),
         adobeCredentials = null,
         authenticationDescription = null,
-        annotationsURI = URI("https://www.example.com")
+        annotationsURI = URI("https://www.example.com"),
+        deviceRegistrationURI = URI("https://www.example.com")
       )
 
     this.account.setLoginState(AccountLoggedIn(credentials))
@@ -333,7 +334,8 @@ abstract class ProfileAccountLogoutTaskContract {
           )
         ),
         annotationsURI = URI("https://www.example.com"),
-        authenticationDescription = null
+        authenticationDescription = null,
+        deviceRegistrationURI = URI("https://www.example.com")
       )
 
     this.account.setLoginState(AccountLoggedIn(credentials))
@@ -432,7 +434,8 @@ abstract class ProfileAccountLogoutTaskContract {
           )
         ),
         annotationsURI = URI("https://www.example.com"),
-        authenticationDescription = null
+        authenticationDescription = null,
+        deviceRegistrationURI = URI("https://www.example.com")
       )
 
     this.account.setLoginState(AccountLoggedIn(credentials))
@@ -550,7 +553,8 @@ abstract class ProfileAccountLogoutTaskContract {
           )
         ),
         annotationsURI = URI("https://www.example.com"),
-        authenticationDescription = null
+        authenticationDescription = null,
+        deviceRegistrationURI = URI("https://www.example.com")
       )
 
     this.account.setLoginState(AccountLoggedIn(credentials))

@@ -59,7 +59,8 @@ class AccountAuthenticationCredentialsStoreTest {
         password = AccountPassword("1234"),
         adobeCredentials = null,
         authenticationDescription = null,
-        annotationsURI = URI("https://www.example.com")
+        annotationsURI = URI("https://www.example.com"),
+        deviceRegistrationURI = URI("https://www.example.com")
       )
 
     store0.put(accountID, credentials)
@@ -132,7 +133,8 @@ class AccountAuthenticationCredentialsStoreTest {
           password = AccountPassword("1234"),
           adobeCredentials = null,
           authenticationDescription = null,
-          annotationsURI = URI("https://www.example.com")
+          annotationsURI = URI("https://www.example.com"),
+          deviceRegistrationURI = URI("https://www.example.com")
         )
       )
     cred1.remove("username")
@@ -149,7 +151,8 @@ class AccountAuthenticationCredentialsStoreTest {
           password = AccountPassword("1234"),
           adobeCredentials = null,
           authenticationDescription = null,
-          annotationsURI = URI("https://www.example.com")
+          annotationsURI = URI("https://www.example.com"),
+          deviceRegistrationURI = URI("https://www.example.com")
         )
       )
     creds.set<ObjectNode>("not a uuid", cred2)
@@ -165,7 +168,8 @@ class AccountAuthenticationCredentialsStoreTest {
           password = AccountPassword("1234"),
           adobeCredentials = null,
           authenticationDescription = null,
-          annotationsURI = URI("https://www.example.com")
+          annotationsURI = URI("https://www.example.com"),
+          deviceRegistrationURI = URI("https://www.example.com")
         )
       )
     creds.set<ObjectNode>("37452e48-2235-4098-ad67-e72bce45ccb6", cred3)
@@ -195,7 +199,8 @@ class AccountAuthenticationCredentialsStoreTest {
         password = AccountPassword("1234"),
         adobeCredentials = null,
         authenticationDescription = null,
-        annotationsURI = URI("https://www.example.com")
+        annotationsURI = URI("https://www.example.com"),
+        deviceRegistrationURI = URI("https://www.example.com")
       )
 
     store.put(accountID, credentials)
@@ -222,7 +227,8 @@ class AccountAuthenticationCredentialsStoreTest {
         ),
         adobeCredentials = null,
         authenticationDescription = null,
-        annotationsURI = URI("https://www.example.com")
+        annotationsURI = URI("https://www.example.com"),
+        deviceRegistrationURI = URI("https://www.example.com")
       )
 
     store.put(accountID, credentials)

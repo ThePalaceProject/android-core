@@ -531,7 +531,8 @@ class BookRevokeTaskAdobeDRMTest {
               )
             ),
             authenticationDescription = null,
-            annotationsURI = URI("https://www.example.com")
+            annotationsURI = URI("https://www.example.com"),
+            deviceRegistrationURI = URI("https://www.example.com")
           )
         )
       )
@@ -689,7 +690,8 @@ class BookRevokeTaskAdobeDRMTest {
               )
             ),
             authenticationDescription = null,
-            annotationsURI = URI("https://www.example.com")
+            annotationsURI = URI("https://www.example.com"),
+            deviceRegistrationURI = URI("https://www.example.com")
           )
         )
       )
@@ -838,7 +840,8 @@ class BookRevokeTaskAdobeDRMTest {
               )
             ),
             authenticationDescription = null,
-            annotationsURI = URI("https://www.example.com")
+            annotationsURI = URI("https://www.example.com"),
+            deviceRegistrationURI = URI("https://www.example.com")
           )
         )
       )
@@ -988,7 +991,8 @@ class BookRevokeTaskAdobeDRMTest {
               )
             ),
             authenticationDescription = null,
-            annotationsURI = URI("https://www.example.com")
+            annotationsURI = URI("https://www.example.com"),
+            deviceRegistrationURI = URI("https://www.example.com")
           )
         )
       )
@@ -1142,7 +1146,8 @@ class BookRevokeTaskAdobeDRMTest {
               postActivationCredentials = null
             ),
             authenticationDescription = null,
-            annotationsURI = URI("https://www.example.com")
+            annotationsURI = URI("https://www.example.com"),
+            deviceRegistrationURI = URI("https://www.example.com")
           )
         )
       )
@@ -1394,7 +1399,8 @@ class BookRevokeTaskAdobeDRMTest {
               )
             ),
             authenticationDescription = null,
-            annotationsURI = URI("https://www.example.com")
+            annotationsURI = URI("https://www.example.com"),
+            deviceRegistrationURI = URI("https://www.example.com")
           )
         )
       )
