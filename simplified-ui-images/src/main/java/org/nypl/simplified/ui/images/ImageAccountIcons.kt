@@ -28,8 +28,6 @@ object ImageAccountIcons {
     iconView: ImageView,
   ) {
     val uri = account.logoURI?.hrefURI
-    this.logger.debug("configuring account logo: {}", uri)
-
     if (uri == null) {
       iconView.setImageResource(defaultIcon)
       return
