@@ -370,7 +370,7 @@
         <c:change date="2022-04-29T00:00:00+00:00" summary="Fixed &quot;Unable to initialize audio engine&quot; error playing some audio books."/>
       </c:changes>
     </c:release>
-    <c:release date="2023-11-10T10:00:46+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.8.0">
+    <c:release date="2023-11-10T14:25:49+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.8.0">
       <c:changes>
         <c:change date="2023-11-07T00:00:00+00:00" summary="Book sample buttons are no longer displayed for loaned books.">
           <c:tickets>
@@ -388,7 +388,12 @@
           </c:tickets>
         </c:change>
         <c:change date="2023-11-09T00:00:00+00:00" summary="Started using device registration URI from patron authentication document."/>
-        <c:change date="2023-11-10T10:00:46+00:00" summary="Updated notification calls to be run in a background thread."/>
+        <c:change date="2023-11-10T00:00:00+00:00" summary="Updated notification calls to be run in a background thread."/>
+        <c:change date="2023-11-10T14:25:49+00:00" summary="Prevent a crash caused by tabs and the back button.">
+          <c:tickets>
+            <c:ticket id="PP-714"/>
+          </c:tickets>
+        </c:change>
       </c:changes>
     </c:release>
   </c:releases>
