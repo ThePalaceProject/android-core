@@ -49,7 +49,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
   private final OptionType<URI> analytics;
   private final OptionType<DRMLicensor> licensor;
   private final ArrayList<ParseError> errors;
-
+  private OptionType<Double> duration;
   private OPDSAcquisitionFeedEntry(
     final List<String> in_authors,
     final List<OPDSAcquisition> in_acquisitions,
@@ -74,6 +74,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     final OptionType<URI> in_alternate,
     final OptionType<URI> in_analytics,
     final OptionType<DRMLicensor> in_licensor,
+    final OptionType<Double> in_duration,
     final ArrayList<ParseError> in_errors) {
     this.authors = NullCheck.notNull(Collections.unmodifiableList(in_authors));
     this.acquisitions = NullCheck.notNull(Collections.unmodifiableList(in_acquisitions));
@@ -98,6 +99,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     this.alternate = NullCheck.notNull(in_alternate);
     this.analytics = NullCheck.notNull(in_analytics);
     this.licensor = NullCheck.notNull(in_licensor);
+    this.duration = NullCheck.notNull(in_duration);
     this.errors = NullCheck.notNull(in_errors);
   }
 
@@ -175,6 +177,10 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
 
     b.setThumbnailOption(e.getThumbnail());
     return b;
+  }
+
+  public OptionType<Double> getDuration() {
+    return duration;
   }
 
   @Override
@@ -525,6 +531,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     private OptionType<URI> thumbnail;
     private OptionType<URI> timeTrackingUri;
     private OptionType<DRMLicensor> licensor;
+    private OptionType<Double> duration;
 
     private Builder(
       final String in_id,
@@ -556,6 +563,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
       this.categories = new ArrayList<OPDSCategory>(8);
       this.groups = new HashSet<Pair<String, URI>>(8);
       this.licensor = Option.none();
+      this.duration = Option.none();
     }
 
     @Override
@@ -621,6 +629,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
         this.alternate,
         this.analytics,
         this.licensor,
+        this.duration,
         this.errors);
     }
 
@@ -741,6 +750,12 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     public OPDSAcquisitionFeedEntryBuilderType setLicensorOption(
       final OptionType<DRMLicensor> lic) {
       this.licensor = NullCheck.notNull(lic);
+      return this;
+    }
+
+    @Override
+    public OPDSAcquisitionFeedEntryBuilderType setDurationOption(OptionType<Double> duration) {
+      this.duration = NullCheck.notNull(duration);
       return this;
     }
   }

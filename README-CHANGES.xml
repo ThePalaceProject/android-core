@@ -394,6 +394,11 @@
             <c:ticket id="PP-714"/>
           </c:tickets>
         </c:change>
+        <c:change date="2023-11-13T13:44:47+00:00" summary="Show audio book durations in book detail pages.">
+          <c:tickets>
+            <c:ticket id="PP-556"/>
+          </c:tickets>
+        </c:change>
         <c:change date="2023-11-10T16:44:59+00:00" summary="Removed profile idle timer."/>
       </c:changes>
     </c:release>
