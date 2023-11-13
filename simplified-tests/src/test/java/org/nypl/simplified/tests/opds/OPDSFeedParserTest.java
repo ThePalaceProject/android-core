@@ -1,5 +1,7 @@
 package org.nypl.simplified.tests.opds;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.io7m.jfunctional.Option;
 import com.io7m.jfunctional.OptionType;
 import com.io7m.jfunctional.Some;
@@ -34,6 +36,7 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import one.irradia.mime.api.MIMEType;
@@ -66,20 +69,20 @@ public final class OPDSFeedParserTest {
     final OPDSAcquisitionFeed f = p.parse(uri, d);
     d.close();
 
-    Assertions.assertEquals(
+    assertEquals(
       "https://d5v0j5lesri7q.cloudfront.net/NYBKLYN/groups/",
       f.getFeedID());
-    Assertions.assertEquals("All Books", f.getFeedTitle());
-    Assertions.assertEquals(0, f.getFeedEntries().size());
-    Assertions.assertEquals(9, f.getFeedGroups().size());
+    assertEquals("All Books", f.getFeedTitle());
+    assertEquals(0, f.getFeedEntries().size());
+    assertEquals(9, f.getFeedGroups().size());
 
     final Some<OPDSSearchLink> search_opt =
       (Some<OPDSSearchLink>) f.getFeedSearchURI();
     final OPDSSearchLink search = search_opt.get();
-    Assertions.assertEquals(
+    assertEquals(
       URI.create("https://bplsimplye.bklynlibrary.org/NYBKLYN/search/"),
       search.getURI());
-    Assertions.assertEquals(
+    assertEquals(
       "application/opensearchdescription+xml",
       search.getType());
 
@@ -154,12 +157,12 @@ public final class OPDSFeedParserTest {
 
     final Map<String, OPDSGroup> groups = f.getFeedGroups();
     Assertions.assertTrue(entries.isEmpty());
-    Assertions.assertEquals(24, groups.keySet().size());
+    assertEquals(24, groups.keySet().size());
 
     for (final String name : groups.keySet()) {
       System.out.println(name);
       final OPDSGroup group = groups.get(name);
-      Assertions.assertEquals(group.getGroupTitle(), name);
+      assertEquals(group.getGroupTitle(), name);
       Assertions.assertTrue(group.getGroupEntries().isEmpty() == false);
     }
   }
@@ -177,13 +180,13 @@ public final class OPDSFeedParserTest {
     final OPDSAcquisitionFeed f = p.parse(uri, d);
     d.close();
 
-    Assertions.assertEquals("/NYNYPL/feed/13", f.getFeedID());
-    Assertions.assertEquals("Historical Fiction", f.getFeedTitle());
-    Assertions.assertEquals(50, f.getFeedEntries().size());
+    assertEquals("/NYNYPL/feed/13", f.getFeedID());
+    assertEquals("Historical Fiction", f.getFeedTitle());
+    assertEquals(50, f.getFeedEntries().size());
 
     final Some<URI> next_opt = (Some<URI>) f.getFeedNext();
 
-    Assertions.assertEquals(
+    assertEquals(
       "https://d2txvnljjb5oij.cloudfront.net/NYNYPL/feed/13?available=now&collection=full&entrypoint=Book&key=%5B%22%5Cu1516%5Cu1693%5Cu49c7%5Cu2443%5Cu5152%5Cu1011%5Cu1098%5Cu4646%5Cu1a03%5Cu0114%5Cu0706%5Cu2011%5Cu480e%5Cu72f3%5Cu3981%5Cu5c06%5Cu0000%5Cu0001%22%2C+%22%5Cu2b1c%5Cu0e94%5Cu0640%5Cu6043%5Cu6192%5Cu1111%5Cu3402%5Cu1001%5Cu7060%5Cu3702%5Cu0000%5Cu0001%22%2C+264205%5D&order=title&size=50",
       next_opt.get().toString());
   }
@@ -234,7 +237,7 @@ public final class OPDSFeedParserTest {
     final InputStream d = OPDSFeedParserTest.getResource("entry-0.xml");
     final OPDSAcquisitionFeed f = NullCheck.notNull(p.parse(uri, d));
 
-    Assertions.assertEquals(f.getFeedEntries().size(), 1);
+    assertEquals(f.getFeedEntries().size(), 1);
 
     d.close();
   }
@@ -270,8 +273,8 @@ public final class OPDSFeedParserTest {
     final List<ParseError> errors =
       result.getErrors();
 
-    Assertions.assertEquals(1, errors.size());
-    Assertions.assertEquals(URISyntaxException.class, errors.get(0).getException().getClass());
+    assertEquals(1, errors.size());
+    assertEquals(URISyntaxException.class, errors.get(0).getException().getClass());
   }
 
   @Test
@@ -310,20 +313,20 @@ public final class OPDSFeedParserTest {
     final OPDSAcquisitionFeedEntry e = f.getFeedEntries().get(0);
     final List<OPDSCategory> ec = e.getCategories();
 
-    Assertions.assertEquals(3, ec.size());
+    assertEquals(3, ec.size());
 
     final OPDSCategory ec0 = ec.get(0);
-    Assertions.assertEquals(ec0.getTerm(), "Children");
-    Assertions.assertEquals(ec0.getScheme(), "http://schema.org/audience");
+    assertEquals(ec0.getTerm(), "Children");
+    assertEquals(ec0.getScheme(), "http://schema.org/audience");
 
     final OPDSCategory ec1 = ec.get(1);
-    Assertions.assertEquals(ec1.getTerm(), "3");
-    Assertions.assertEquals(
+    assertEquals(ec1.getTerm(), "3");
+    assertEquals(
       ec1.getScheme(), "http://schema.org/typicalAgeRange");
 
     final OPDSCategory ec2 = ec.get(2);
-    Assertions.assertEquals(ec2.getTerm(), "Nonfiction");
-    Assertions.assertEquals(
+    assertEquals(ec2.getTerm(), "Nonfiction");
+    assertEquals(
       ec2.getScheme(), "http://librarysimplified.org/terms/genres/Simplified/");
   }
 
@@ -342,19 +345,19 @@ public final class OPDSFeedParserTest {
     final Map<String, List<OPDSFacet>> fbg = f.getFeedFacetsByGroup();
     final List<OPDSFacet> fo = f.getFeedFacetsOrder();
 
-    Assertions.assertEquals(2, fo.size());
-    Assertions.assertEquals(1, fbg.size());
+    assertEquals(2, fo.size());
+    assertEquals(1, fbg.size());
     Assertions.assertTrue(fbg.containsKey("Sort by"));
 
     final List<OPDSFacet> sorted = fbg.get("Sort by");
-    Assertions.assertEquals(2, sorted.size());
+    assertEquals(2, sorted.size());
 
     {
       final OPDSFacet fi = sorted.get(0);
-      Assertions.assertEquals("Sort by", fi.getGroup());
-      Assertions.assertEquals("Title", fi.getTitle());
+      assertEquals("Sort by", fi.getGroup());
+      assertEquals("Title", fi.getTitle());
       Assertions.assertTrue(!fi.isActive());
-      Assertions.assertEquals(
+      assertEquals(
         URI.create(
           "http://circulation.alpha.librarysimplified"
             + ".org/feed/Picture%20Books?order=title"), fi.getUri());
@@ -362,10 +365,10 @@ public final class OPDSFeedParserTest {
 
     {
       final OPDSFacet fi = sorted.get(1);
-      Assertions.assertEquals("Sort by", fi.getGroup());
-      Assertions.assertEquals("Author", fi.getTitle());
+      assertEquals("Sort by", fi.getGroup());
+      assertEquals("Author", fi.getTitle());
       Assertions.assertTrue(fi.isActive());
-      Assertions.assertEquals(
+      assertEquals(
         URI.create(
           "http://circulation.alpha.librarysimplified"
             + ".org/feed/Picture%20Books?order=author"), fi.getUri());
@@ -387,20 +390,20 @@ public final class OPDSFeedParserTest {
     final Map<String, List<OPDSFacet>> fbg = f.getFeedFacetsByGroup();
     final List<OPDSFacet> fo = f.getFeedFacetsOrder();
 
-    Assertions.assertEquals(2, fo.size());
-    Assertions.assertEquals(1, fbg.size());
+    assertEquals(2, fo.size());
+    assertEquals(1, fbg.size());
     Assertions.assertTrue(fbg.containsKey("Sort by"));
 
     final List<OPDSFacet> sorted = fbg.get("Sort by");
-    Assertions.assertEquals(2, sorted.size());
+    assertEquals(2, sorted.size());
 
     {
       final OPDSFacet fi = sorted.get(0);
-      Assertions.assertEquals("Sort by", fi.getGroup());
-      Assertions.assertEquals(Option.some("Something"), fi.getGroupType());
-      Assertions.assertEquals("Title", fi.getTitle());
+      assertEquals("Sort by", fi.getGroup());
+      assertEquals(Option.some("Something"), fi.getGroupType());
+      assertEquals("Title", fi.getTitle());
       Assertions.assertTrue(!fi.isActive());
-      Assertions.assertEquals(
+      assertEquals(
         URI.create(
           "http://circulation.alpha.librarysimplified"
             + ".org/feed/Picture%20Books?order=title"), fi.getUri());
@@ -408,11 +411,11 @@ public final class OPDSFeedParserTest {
 
     {
       final OPDSFacet fi = sorted.get(1);
-      Assertions.assertEquals("Sort by", fi.getGroup());
-      Assertions.assertEquals(Option.some("Something"), fi.getGroupType());
-      Assertions.assertEquals("Author", fi.getTitle());
+      assertEquals("Sort by", fi.getGroup());
+      assertEquals(Option.some("Something"), fi.getGroupType());
+      assertEquals("Author", fi.getTitle());
       Assertions.assertTrue(fi.isActive());
-      Assertions.assertEquals(
+      assertEquals(
         URI.create(
           "http://circulation.alpha.librarysimplified"
             + ".org/feed/Picture%20Books?order=author"), fi.getUri());
@@ -454,7 +457,7 @@ public final class OPDSFeedParserTest {
     final OPDSAcquisitionFeed f = p.parse(uri, d);
     d.close();
 
-    Assertions.assertEquals(
+    assertEquals(
       Option.some(URI.create("http://www.example.com/opensearch.xml")),
       f.getFeedSearchURI().map(OPDSSearchLink::getURI));
   }
@@ -480,15 +483,38 @@ public final class OPDSFeedParserTest {
     final OPDSAcquisition acquisition =
       acquisitions.get(0);
 
-    Assertions.assertEquals(1, acquisition.availableFinalContentTypes().size());
+    assertEquals(1, acquisition.availableFinalContentTypes().size());
     final MIMEType finalType = acquisition.availableFinalContentTypes().iterator().next();
-    Assertions.assertEquals("application", finalType.getType());
-    Assertions.assertEquals("audiobook+json", finalType.getSubtype());
-    Assertions.assertEquals(
+    assertEquals("application", finalType.getType());
+    assertEquals("audiobook+json", finalType.getSubtype());
+    assertEquals(
       "http://www.feedbooks.com/audiobooks/access-restriction",
       finalType.getParameters().get("profile"));
 
-    Assertions.assertEquals(1, acquisitions.size());
+    assertEquals(1, acquisitions.size());
+    d.close();
+  }
+
+  @Test
+  public void testMinotaur20231113Durations()
+    throws Exception {
+    final URI uri = URI.create("http://www.example.com/");
+    final OPDSFeedParserType p =
+      OPDSFeedParser.newParser(OPDSAcquisitionFeedEntryParser.newParser());
+    final InputStream d =
+      OPDSFeedParserTest.getResource("minotaur-20231113.xml");
+
+    final OPDSAcquisitionFeed f = p.parse(uri, d);
+
+    var group = f.getFeedGroups().get("Palace Marketplace");
+    var entry =
+      group.getGroupEntries()
+        .stream()
+        .filter(e -> Objects.equals(e.getID(), "urn:isbn:9781442370289"))
+        .findFirst()
+        .orElseThrow();
+
+    assertEquals(Option.some(36914.0), entry.getDuration());
     d.close();
   }
 }

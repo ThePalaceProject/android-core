@@ -20,6 +20,7 @@ import com.google.common.base.Preconditions
 import com.google.common.util.concurrent.FluentFuture
 import com.io7m.jfunctional.Some
 import org.joda.time.DateTime
+import org.joda.time.Duration
 import org.joda.time.format.DateTimeFormatterBuilder
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.android.ktx.supportActionBar
@@ -365,6 +366,18 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
   private val genreUriScheme =
     "http://librarysimplified.org/terms/genres/Simplified/"
 
+  private fun formatDuration(seconds: Double): String {
+    val duration = Duration.standardSeconds(seconds.toLong())
+    val minutes = Duration.standardMinutes(duration.standardMinutes)
+    val remaining = duration.minus(minutes)
+
+    return getString(
+      R.string.catalogDurationFormat,
+      minutes.standardMinutes.toString(),
+      remaining.standardSeconds.toString()
+    )
+  }
+
   private fun configureMetadataTable(
     probableFormat: BookFormats.BookFormatDefinition?,
     entry: OPDSAcquisitionFeedEntry
@@ -434,6 +447,15 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
       val (row, rowKey, rowVal) = this.bookInfoViewOf()
       rowKey.text = this.getString(R.string.catalogMetaUpdatedDate)
       rowVal.text = this.dateTimeFormatter.print(entry.updated)
+      this.metadata.addView(row)
+    }
+
+    val duration = entry.duration
+    if (duration.isSome) {
+      val durationValue = (duration as Some<Double>).get()
+      val (row, rowKey, rowVal) = this.bookInfoViewOf()
+      rowKey.text = this.getString(R.string.catalogMetaDuration)
+      rowVal.text = formatDuration(durationValue)
       this.metadata.addView(row)
     }
   }

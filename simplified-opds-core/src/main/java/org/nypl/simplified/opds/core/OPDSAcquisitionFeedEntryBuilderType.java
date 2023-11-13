@@ -12,8 +12,7 @@ import java.util.List;
  * The type of mutable builders for {@link OPDSAcquisitionFeedEntry} values.
  */
 
-public interface OPDSAcquisitionFeedEntryBuilderType
-{
+public interface OPDSAcquisitionFeedEntryBuilderType {
   /**
    * Add a parse error.
    *
@@ -206,5 +205,11 @@ public interface OPDSAcquisitionFeedEntryBuilderType
 
   OPDSAcquisitionFeedEntryBuilderType setLicensorOption(
     OptionType<DRMLicensor> licensor);
+
+  /**
+   * @param duration The duration in seconds
+   */
+  OPDSAcquisitionFeedEntryBuilderType setDurationOption(
+    OptionType<Double> duration);
 
 }

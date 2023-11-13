@@ -200,6 +200,7 @@ public final class OPDSAcquisitionFeedEntryParser implements OPDSAcquisitionFeed
     parseCategories(element, entry_builder);
     findAcquisitionAuthors(element, entry_builder);
     findNarrators(element, entry_builder);
+    entry_builder.setDurationOption(findDuration(element));
     entry_builder.setPublisherOption(findPublisher(element));
     entry_builder.setDistribution(findDistribution(element));
     entry_builder.setPublishedOption(OPDSAtom.findPublished(element));
@@ -207,6 +208,16 @@ public final class OPDSAcquisitionFeedEntryParser implements OPDSAcquisitionFeed
       OPDSXML.getFirstChildElementTextWithNameOptional(element, ATOM_URI, "summary"));
 
     return entry_builder.build();
+  }
+
+  private OptionType<Double> findDuration(Element element) {
+    try {
+      return OPDSXML.getFirstChildElementTextWithNameOptional(
+        element, DUBLIN_CORE_TERMS_URI, "duration")
+        .map(Double::parseDouble);
+    } catch (Exception e) {
+      return Option.none();
+    }
   }
 
   private void tryConsumeDRMLicensorInformation(
