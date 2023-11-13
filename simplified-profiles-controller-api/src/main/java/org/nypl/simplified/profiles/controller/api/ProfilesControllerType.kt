@@ -20,7 +20,6 @@ import org.nypl.simplified.profiles.api.ProfileNonexistentAccountProviderExcepti
 import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.nypl.simplified.profiles.api.ProfileUpdated
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
-import org.nypl.simplified.profiles.api.idle_timer.ProfileIdleTimerType
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import java.net.URI
 import java.util.SortedMap
@@ -265,10 +264,4 @@ interface ProfilesControllerType {
 
   @Throws(ProfileNoneCurrentException::class, AccountsDatabaseNonexistentException::class)
   fun profileAccountForBook(bookID: BookID): AccountType
-
-  /**
-   * @return The global profile idle timer
-   */
-
-  fun profileIdleTimer(): ProfileIdleTimerType
 }

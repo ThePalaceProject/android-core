@@ -233,21 +233,6 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     return true
   }
 
-  override fun onUserInteraction() {
-    super.onUserInteraction()
-
-    /*
-     * Each time the user interacts with something onscreen, reset the timer.
-     */
-
-    if (Services.isInitialized()) {
-      Services.serviceDirectory()
-        .requireService(ProfilesControllerType::class.java)
-        .profileIdleTimer()
-        .reset()
-    }
-  }
-
   override fun onStart() {
     super.onStart()
     this.listenerRepo.registerHandler(this::handleEvent)

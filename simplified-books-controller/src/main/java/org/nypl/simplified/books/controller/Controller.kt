@@ -71,7 +71,6 @@ import org.nypl.simplified.profiles.api.ProfileUpdated
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType.AnonymousProfileEnabled
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType.AnonymousProfileEnabled.ANONYMOUS_PROFILE_ENABLED
-import org.nypl.simplified.profiles.api.idle_timer.ProfileIdleTimerType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountCreationStringResourcesType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountDeletionStringResourcesType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest
@@ -141,8 +140,6 @@ class Controller private constructor(
     this.services.requireService(ProfilesDatabaseType::class.java)
   private val revokeStrings =
     this.services.requireService(BookRevokeStringResourcesType::class.java)
-  private val profileIdleTimer =
-    this.services.requireService(ProfileIdleTimerType::class.java)
   private val crashlytics =
     this.services.optionalService(CrashlyticsServiceType::class.java)
   private val metrics =
@@ -573,10 +570,6 @@ class Controller private constructor(
       return this.profileCurrent().account(bookWithStatus.book.account)
     }
     throw UnreachableCodeException()
-  }
-
-  override fun profileIdleTimer(): ProfileIdleTimerType {
-    return this.profileIdleTimer
   }
 
   override fun bookBorrow(
