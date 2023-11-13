@@ -82,7 +82,7 @@
   <string name="catalogRetry">Retry</string>
   <string name="catalogReturn">Return</string>
   <string name="catalogSearch">Search</string>
-  <string name="catalogDurationFormat">%1$s minutes, %2$s seconds</string>
+  <string name="catalogDurationFormat">%1$s hours, %2$s minutes</string>
 
   <string name="bookReachedLoanLimitDialogMessage">You have reached your loan limit. You cannot borrow anything further until you return something.</string>
   <string name="bookReachedLoanLimitDialogTitle">Loan limit reached.</string>

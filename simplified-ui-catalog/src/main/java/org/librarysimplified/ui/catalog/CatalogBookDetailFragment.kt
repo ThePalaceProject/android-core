@@ -368,13 +368,13 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
 
   private fun formatDuration(seconds: Double): String {
     val duration = Duration.standardSeconds(seconds.toLong())
-    val minutes = Duration.standardMinutes(duration.standardMinutes)
-    val remaining = duration.minus(minutes)
+    val hours = Duration.standardHours(duration.standardHours)
+    val remaining = duration.minus(hours)
 
     return getString(
       R.string.catalogDurationFormat,
-      minutes.standardMinutes.toString(),
-      remaining.standardSeconds.toString()
+      hours.standardHours.toString(),
+      remaining.standardMinutes.toString()
     )
   }
 
