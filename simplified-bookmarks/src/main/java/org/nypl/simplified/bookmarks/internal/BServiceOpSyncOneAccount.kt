@@ -174,7 +174,7 @@ internal class BServiceOpSyncOneAccount(
           this.logger.debug(
             "[{}]: we no longer have book {}",
             this.profile.id.uuid,
-            bookmark.bookmarkId.value
+            bookmark.book.value()
           )
           continue
         }

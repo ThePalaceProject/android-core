@@ -25,7 +25,7 @@ internal class BServiceOpLoadBookmarks(
 
   override fun runActual(): Bookmarks {
     try {
-      this.logger.debug("[{}]: loading bookmarks", this.profile.id.uuid)
+      this.logger.debug("[{}]: loading bookmarks for book {}", this.profile.id.uuid, this.book.brief())
 
       val account = this.profile.account(this.accountID)
       val books = account.bookDatabase

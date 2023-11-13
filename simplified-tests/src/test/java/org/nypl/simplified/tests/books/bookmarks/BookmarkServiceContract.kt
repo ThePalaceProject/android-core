@@ -399,7 +399,7 @@ abstract class BookmarkServiceContract {
       Mockito.mock(BookDatabaseType::class.java)
 
     Mockito.`when`(books.books())
-      .thenReturn(sortedSetOf())
+      .thenReturn(sortedSetOf(bookID))
     Mockito.`when`(books.entry(bookID))
       .thenReturn(bookEntry)
 
@@ -573,7 +573,7 @@ abstract class BookmarkServiceContract {
       listOf(
         Bookmark.ReaderBookmark.create(
           opdsId = "urn:example.com/terms/id/c083c0a6-54c6-4cc5-9d3a-425317da662a",
-          location = BookLocation.BookLocationR1(0.5, null, "x"),
+          location = BookLocation.BookLocationR1(0.5, null, bookID.value()),
           kind = BookmarkKind.BookmarkLastReadLocation,
           time = DateTime.now(DateTimeZone.UTC),
           chapterTitle = "A Title",
@@ -615,7 +615,7 @@ abstract class BookmarkServiceContract {
       Mockito.mock(BookDatabaseType::class.java)
 
     Mockito.`when`(books.books())
-      .thenReturn(sortedSetOf())
+      .thenReturn(sortedSetOf(bookID))
     Mockito.`when`(books.entry(bookID))
       .thenReturn(bookEntry)
 
@@ -768,6 +768,7 @@ abstract class BookmarkServiceContract {
     service: BookmarkServiceType,
     profiles: MockProfilesController
   ) {
+    this.logger.debug("Waiting for bookmark service to settle.")
     Thread.sleep(1_000L)
 
     try {
