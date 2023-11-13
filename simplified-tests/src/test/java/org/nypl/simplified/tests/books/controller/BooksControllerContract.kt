@@ -75,7 +75,6 @@ import org.nypl.simplified.profiles.ProfilesDatabases
 import org.nypl.simplified.profiles.api.ProfileDatabaseException
 import org.nypl.simplified.profiles.api.ProfileEvent
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
-import org.nypl.simplified.profiles.api.idle_timer.ProfileIdleTimerType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountCreationStringResourcesType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountDeletionStringResourcesType
 import org.nypl.simplified.taskrecorder.api.TaskResult
@@ -83,7 +82,6 @@ import org.nypl.simplified.tests.EventAssertions
 import org.nypl.simplified.tests.ExtraAssertions.assertInstanceOf
 import org.nypl.simplified.tests.MutableServiceDirectory
 import org.nypl.simplified.tests.books.BookFormatsTesting
-import org.nypl.simplified.tests.books.idle_timer.InoperableIdleTimer
 import org.nypl.simplified.tests.mocking.FakeAccountCredentialStorage
 import org.nypl.simplified.tests.mocking.MockAccountCreationStringResources
 import org.nypl.simplified.tests.mocking.MockAccountDeletionStringResources
@@ -217,7 +215,6 @@ abstract class BooksControllerContract {
     services.putService(PatronUserProfileParsersType::class.java, patronUserProfileParsers)
     services.putService(ProfileAccountCreationStringResourcesType::class.java, profileAccountCreationStringResources)
     services.putService(ProfileAccountDeletionStringResourcesType::class.java, profileAccountDeletionStringResources)
-    services.putService(ProfileIdleTimerType::class.java, InoperableIdleTimer())
     services.putService(ProfilesDatabaseType::class.java, profiles)
 
     return Controller.createFromServiceDirectory(
@@ -280,7 +277,6 @@ abstract class BooksControllerContract {
     services.putService(PatronUserProfileParsersType::class.java, patronUserProfileParsers)
     services.putService(ProfileAccountCreationStringResourcesType::class.java, profileAccountCreationStringResources)
     services.putService(ProfileAccountDeletionStringResourcesType::class.java, profileAccountDeletionStringResources)
-    services.putService(ProfileIdleTimerType::class.java, InoperableIdleTimer())
     services.putService(ProfilesDatabaseType::class.java, profiles)
 
     return Controller.createFromServiceDirectory(

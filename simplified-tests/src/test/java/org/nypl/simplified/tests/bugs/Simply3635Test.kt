@@ -66,8 +66,6 @@ import org.nypl.simplified.profiles.ProfilesDatabases
 import org.nypl.simplified.profiles.api.ProfileCreationEvent
 import org.nypl.simplified.profiles.api.ProfileEvent
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
-import org.nypl.simplified.profiles.api.idle_timer.ProfileIdleTimer
-import org.nypl.simplified.profiles.api.idle_timer.ProfileIdleTimerType
 import org.nypl.simplified.tests.TestDirectories
 import org.nypl.simplified.tests.books.BookFormatsTesting
 import org.nypl.simplified.tests.mocking.MockAccountProviders
@@ -108,7 +106,6 @@ class Simply3635Test {
   private lateinit var idleExecutorService: ExecutorService
   private lateinit var opdsParser: OPDSFeedParserType
   private lateinit var profileEvents: PublishSubject<ProfileEvent>
-  private lateinit var profileIdleTimer: ProfileIdleTimerType
   private lateinit var controller: Controller
   private lateinit var profilesDatabase: ProfilesDatabaseType
   private lateinit var profilesDirectory: File
@@ -220,8 +217,6 @@ class Simply3635Test {
         bundledContent = this.bundledContent
       )
 
-    this.profileIdleTimer =
-      ProfileIdleTimer.create(this.idleExecutorService, this.profileEvents)
     this.borrowSubtasks =
       BorrowSubtaskDirectory()
 
@@ -246,7 +241,6 @@ class Simply3635Test {
     )
     b.addService(OPDSFeedParserType::class.java, this.opdsParser)
     b.addService(PatronUserProfileParsersType::class.java, PatronUserProfileParsers())
-    b.addService(ProfileIdleTimerType::class.java, this.profileIdleTimer)
     b.addService(ProfilesDatabaseType::class.java, this.profilesDatabase)
 
     this.services = b.build()
