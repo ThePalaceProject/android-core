@@ -1,7 +1,6 @@
 package org.librarysimplified.viewer.audiobook
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
@@ -1122,7 +1121,7 @@ class AudioBookPlayerActivity :
   }
 
   private fun showErrorWithRunnable(
-    context: Context,
+    context: Activity,
     title: String,
     failure: Exception,
     execute: () -> Unit
@@ -1130,6 +1129,10 @@ class AudioBookPlayerActivity :
     this.log.error("error: {}: ", title, failure)
 
     this.uiThread.runOnUIThread {
+      if (context.isDestroyed || context.isFinishing) {
+        return@runOnUIThread
+      }
+
       MaterialAlertDialogBuilder(context)
         .setTitle(title)
         .setMessage(failure.localizedMessage)
