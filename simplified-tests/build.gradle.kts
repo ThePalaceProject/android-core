@@ -204,8 +204,6 @@ val dependencyObjects = listOf(
     libs.mockito.android,
     libs.mockito.core,
     libs.mockito.kotlin,
-    libs.nano.httpd,
-    libs.nano.httpd.nanolets,
     libs.nypl.readium,
     libs.objenesis,
     libs.okhttp3,
