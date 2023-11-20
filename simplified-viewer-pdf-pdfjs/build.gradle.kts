@@ -54,8 +54,6 @@ dependencies {
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlin.stdlib)
     implementation(libs.kotlinx.coroutines)
-    implementation(libs.nano.httpd)
-    implementation(libs.nano.httpd.nanolets)
     implementation(libs.palace.drm.core)
     implementation(libs.palace.theme)
     implementation(libs.pdfium.android)

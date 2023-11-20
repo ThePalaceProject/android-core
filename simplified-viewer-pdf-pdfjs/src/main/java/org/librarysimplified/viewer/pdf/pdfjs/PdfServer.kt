@@ -3,6 +3,7 @@ package org.librarysimplified.viewer.pdf.pdfjs
 import android.content.Context
 import android.net.Uri
 import kotlinx.coroutines.runBlocking
+import org.librarysimplified.viewer.pdf.pdfjs.factory.PdfDocumentFactory
 import org.nanohttpd.protocols.http.IHTTPSession
 import org.nanohttpd.protocols.http.response.Response
 import org.nanohttpd.protocols.http.response.Status
@@ -53,6 +54,7 @@ class PdfServer private constructor(
           ),
           PdfParser(
             context = context,
+            pdfFactory = PdfDocumentFactory(context)
           )
         ),
         contentProtections = contentProtections,
