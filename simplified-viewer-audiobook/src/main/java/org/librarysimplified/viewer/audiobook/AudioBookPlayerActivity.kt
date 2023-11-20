@@ -226,6 +226,7 @@ class AudioBookPlayerActivity :
     MDC.put(MDCKeys.ACCOUNT_INTERNAL_ID, this.parameters.accountID.uuid.toString())
     MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID, this.parameters.accountProviderID.toString())
     MDC.put(MDCKeys.BOOK_INTERNAL_ID, this.parameters.bookID.value())
+    MDC.put(MDCKeys.BOOK_ID, this.parameters.opdsEntry.id)
     MDC.put(MDCKeys.BOOK_TITLE, this.parameters.opdsEntry.title)
     MDCKeys.put(MDCKeys.BOOK_PUBLISHER, this.parameters.opdsEntry.publisher)
     MDC.remove(MDCKeys.BOOK_DRM)

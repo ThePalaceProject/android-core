@@ -102,6 +102,7 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
     this.feedEntry = intent.getSerializableExtra(EXTRA_ENTRY) as FeedEntry.FeedEntryOPDS
 
     MDC.put(MDCKeys.BOOK_TITLE, this.feedEntry.feedEntry.title)
+    MDC.put(MDCKeys.BOOK_ID, this.feedEntry.feedEntry.id)
     MDCKeys.put(MDCKeys.BOOK_PUBLISHER, this.feedEntry.feedEntry.publisher)
     MDC.remove(MDCKeys.BOOK_DRM)
     MDC.remove(MDCKeys.BOOK_FORMAT)

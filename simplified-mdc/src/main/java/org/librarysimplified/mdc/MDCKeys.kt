@@ -34,6 +34,13 @@ object MDCKeys {
     "BookInternalID"
 
   /**
+   * The OPDS feed entry ID of the current book.
+   */
+
+  const val BOOK_ID =
+    "BookID"
+
+  /**
    * The internal application ID of the current account.
    */
 
