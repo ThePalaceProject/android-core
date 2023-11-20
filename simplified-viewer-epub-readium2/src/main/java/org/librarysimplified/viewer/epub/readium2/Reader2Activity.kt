@@ -158,6 +158,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     MDC.put(MDCKeys.ACCOUNT_INTERNAL_ID, this.parameters.accountId.uuid.toString())
     MDC.put(MDCKeys.BOOK_INTERNAL_ID, this.parameters.bookId.value())
     MDC.put(MDCKeys.BOOK_TITLE, this.parameters.entry.feedEntry.title)
+    MDC.put(MDCKeys.BOOK_ID, this.parameters.entry.feedEntry.id)
     MDCKeys.put(MDCKeys.BOOK_PUBLISHER, this.parameters.entry.feedEntry.publisher)
     MDC.put(MDCKeys.BOOK_DRM, this.parameters.drmInfo.kind.name)
     MDC.remove(MDCKeys.BOOK_FORMAT)

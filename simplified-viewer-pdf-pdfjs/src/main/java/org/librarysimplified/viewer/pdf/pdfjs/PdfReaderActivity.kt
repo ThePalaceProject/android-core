@@ -102,6 +102,7 @@ class PdfReaderActivity : AppCompatActivity() {
     MDC.put(MDCKeys.ACCOUNT_INTERNAL_ID, this.accountId.uuid.toString())
     MDC.put(MDCKeys.BOOK_INTERNAL_ID, this.bookID.value())
     MDC.put(MDCKeys.BOOK_TITLE, this.feedEntry.feedEntry.title)
+    MDC.put(MDCKeys.BOOK_ID, this.feedEntry.feedEntry.id)
     MDCKeys.put(MDCKeys.BOOK_PUBLISHER, this.feedEntry.feedEntry.publisher)
     MDC.put(MDCKeys.BOOK_FORMAT, "application/pdf")
     MDC.remove(MDCKeys.BOOK_DRM)

@@ -49,6 +49,7 @@ object Viewers {
     MDC.put(MDCKeys.BOOK_DRM, format.drmInformation.kind.name)
     MDC.put(MDCKeys.BOOK_FORMAT, format.contentType.toString())
     MDC.put(MDCKeys.BOOK_INTERNAL_ID, book.id.value())
+    MDC.put(MDCKeys.BOOK_ID, book.entry.id)
     MDC.put(MDCKeys.BOOK_TITLE, book.entry.title)
     MDCKeys.put(MDCKeys.BOOK_PUBLISHER, book.entry.publisher)
 
