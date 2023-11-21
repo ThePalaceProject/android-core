@@ -407,12 +407,17 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2023-11-20T20:21:57+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.9.0">
+    <c:release date="2023-11-21T15:13:27+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.9.0">
       <c:changes>
         <c:change date="2023-11-17T00:00:00+00:00" summary="Updated Readium version."/>
-        <c:change date="2023-11-20T20:21:57+00:00" summary="Fix an LCP audiobook crash.">
+        <c:change date="2023-11-20T00:00:00+00:00" summary="Fix an LCP audiobook crash.">
           <c:tickets>
             <c:ticket id="PP-737"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2023-11-21T15:13:27+00:00" summary="Make account deletion icon visible.">
+          <c:tickets>
+            <c:ticket id="PP-738"/>
           </c:tickets>
         </c:change>
       </c:changes>
