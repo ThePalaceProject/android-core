@@ -43,7 +43,6 @@ import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.bookmarks.api.BookmarkEvent
 import org.nypl.simplified.bookmarks.api.BookmarkHTTPCallsType
 import org.nypl.simplified.bookmarks.api.BookmarkServiceType
-import org.nypl.simplified.bookmarks.api.BookmarkSyncEnableResult.SYNC_ENABLE_NOT_SUPPORTED
 import org.nypl.simplified.bookmarks.internal.BHTTPCalls
 import org.nypl.simplified.tests.EventAssertions
 import org.nypl.simplified.tests.EventLogging
@@ -75,7 +74,6 @@ abstract class BookmarkServiceContract {
   private lateinit var http: LSHTTPClientType
   private lateinit var annotationsURI: URI
   private lateinit var deviceRegistrationURI: URI
-  private lateinit var patronURI: URI
 
   private val annotationsEmpty = """
 {
@@ -166,8 +164,6 @@ abstract class BookmarkServiceContract {
       URI.create("http://localhost:10000/annotations")
     this.deviceRegistrationURI =
       URI.create("http://localhost:10000/deviceRegistration")
-    this.patronURI =
-      URI.create("http://localhost:10000/patron")
   }
 
   @AfterEach
@@ -185,7 +181,6 @@ abstract class BookmarkServiceContract {
   @Test
   @Timeout(value = 10L, unit = TimeUnit.SECONDS)
   fun testInitializeEmpty() {
-    this.addResponse("/patron", this.patronSettingsWithAnnotationsEnabled)
     this.addResponse("/annotations", this.annotationsEmpty)
 
     val httpCalls = BHTTPCalls(this.objectMapper, this.http)
@@ -205,9 +200,6 @@ abstract class BookmarkServiceContract {
 
     val accountProvider =
       Mockito.mock(AccountProviderType::class.java)
-
-    Mockito.`when`(accountProvider.patronSettingsURI)
-      .thenReturn(this.patronURI)
 
     val accountPreferences =
       AccountPreferences(
@@ -279,17 +271,11 @@ abstract class BookmarkServiceContract {
     val allRequests = this.takeAllRequests()
     Assertions.assertTrue(
       allRequests.any { request ->
-        request.requestUrl?.toUri() == this.patronURI
-      },
-      "At least one request made to ${this.patronURI}"
-    )
-    Assertions.assertTrue(
-      allRequests.any { request ->
         request.requestUrl?.toUri() == this.annotationsURI
       },
       "At least one request made to ${this.annotationsURI}"
     )
-    Assertions.assertEquals(2, allRequests.size)
+    Assertions.assertEquals(1, allRequests.size)
   }
 
   private fun takeAllRequests(): List<RecordedRequest> {
@@ -310,8 +296,6 @@ abstract class BookmarkServiceContract {
   @Test
   @Timeout(value = 5L, unit = TimeUnit.SECONDS)
   fun testInitializeReceive() {
-    this.addResponse("/patron", this.patronSettingsWithAnnotationsEnabled)
-
     this.addResponse(
       "/annotations",
       """
@@ -406,9 +390,6 @@ abstract class BookmarkServiceContract {
     val accountProvider =
       Mockito.mock(AccountProviderType::class.java)
 
-    Mockito.`when`(accountProvider.patronSettingsURI)
-      .thenReturn(this.patronURI)
-
     val accountPreferences =
       AccountPreferences(
         bookmarkSyncingPermitted = true,
@@ -492,17 +473,11 @@ abstract class BookmarkServiceContract {
     val allRequests = this.takeAllRequests()
     Assertions.assertTrue(
       allRequests.any { request ->
-        request.requestUrl?.toUri() == this.patronURI
-      },
-      "At least one request made to ${this.patronURI}"
-    )
-    Assertions.assertTrue(
-      allRequests.any { request ->
         request.requestUrl?.toUri() == this.annotationsURI
       },
       "At least one request made to ${this.annotationsURI}"
     )
-    Assertions.assertEquals(2, allRequests.size)
+    Assertions.assertEquals(1, allRequests.size)
   }
 
   /**
@@ -622,9 +597,6 @@ abstract class BookmarkServiceContract {
     val accountProvider =
       Mockito.mock(AccountProviderType::class.java)
 
-    Mockito.`when`(accountProvider.patronSettingsURI)
-      .thenReturn(this.patronURI)
-
     val accountPreferences =
       AccountPreferences(
         bookmarkSyncingPermitted = true,
@@ -715,49 +687,11 @@ abstract class BookmarkServiceContract {
     val allRequests = this.takeAllRequests()
     Assertions.assertTrue(
       allRequests.any { request ->
-        this.matchesEndpoint(request, "/patron")
-      },
-      "At least one request made to ${this.patronURI}"
-    )
-    Assertions.assertTrue(
-      allRequests.any { request ->
         this.matchesEndpoint(request, "/annotations")
       },
       "At least one request made to ${this.annotationsURI}"
     )
-    Assertions.assertEquals(2, allRequests.size)
-  }
-
-  /**
-   * Trying to enable syncing on an account that doesn't support it, returns an appropriate status
-   * code.
-   */
-
-  @Test
-  @Timeout(value = 10L, unit = TimeUnit.SECONDS)
-  fun testEnableBookmarkSyncingNotSupported() {
-    val httpCalls =
-      BHTTPCalls(this.objectMapper, this.http)
-    val bookmarkEvents =
-      EventLogging.create<BookmarkEvent>(this.logger, 3)
-    val profiles =
-      MockProfilesController(1, 1)
-
-    this.readerBookmarkService =
-      this.bookmarkService(
-        threads = ::Thread,
-        events = bookmarkEvents.events,
-        httpCalls = httpCalls,
-        profilesController = profiles
-      )
-
-    val service =
-      this.readerBookmarkService!!
-    val result =
-      service.bookmarkSyncEnable(profiles.profileList[0].accountList[0].id, true).get()
-
-    this.waitForServiceQuiescence(service, profiles)
-    Assertions.assertEquals(SYNC_ENABLE_NOT_SUPPORTED, result)
+    Assertions.assertEquals(1, allRequests.size)
   }
 
   /*

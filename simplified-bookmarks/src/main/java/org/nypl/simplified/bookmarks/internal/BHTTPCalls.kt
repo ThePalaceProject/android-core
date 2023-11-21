@@ -1,14 +1,11 @@
 package org.nypl.simplified.bookmarks.internal
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.node.ObjectNode
 import one.irradia.mime.api.MIMECompatibility
 import one.irradia.mime.api.MIMEType
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType.Method.Delete
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType.Method.Post
-import org.librarysimplified.http.api.LSHTTPRequestBuilderType.Method.Put
 import org.librarysimplified.http.api.LSHTTPResponseStatus
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addCredentialsToProperties
@@ -18,7 +15,6 @@ import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotation
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotationsJSON
 import org.nypl.simplified.bookmarks.api.BookmarkHTTPCallsType
-import org.nypl.simplified.json.core.JSONParserUtilities
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayInputStream
 import java.io.IOException
@@ -139,67 +135,6 @@ class BHTTPCalls(
     }
   }
 
-  override fun syncingEnable(
-    account: AccountType,
-    settingsURI: URI,
-    credentials: AccountAuthenticationCredentials,
-    enabled: Boolean
-  ) {
-    val data =
-      this.serializeSynchronizeEnableData(enabled)
-    val auth =
-      AccountAuthenticatedHTTP.createAuthorization(credentials)
-    val put =
-      Put(data, MIMEType("vnd.librarysimplified", "user-profile+json", mapOf()))
-    val request =
-      this.http.newRequest(settingsURI)
-        .setAuthorization(auth)
-        .addCredentialsToProperties(credentials)
-        .setMethod(put)
-        .build()
-
-    return request.execute().use { response ->
-      when (val status = response.status) {
-        is LSHTTPResponseStatus.Responded.OK -> {
-          account.updateBasicTokenCredentials(status.getAccessToken())
-        }
-        is LSHTTPResponseStatus.Responded.Error -> {
-          this.logAndFail(settingsURI, status)
-        }
-        is LSHTTPResponseStatus.Failed ->
-          throw status.exception
-      }
-    }
-  }
-
-  override fun syncingIsEnabled(
-    account: AccountType,
-    settingsURI: URI,
-    credentials: AccountAuthenticationCredentials
-  ): Boolean {
-    val auth =
-      AccountAuthenticatedHTTP.createAuthorization(credentials)
-    val request =
-      this.http.newRequest(settingsURI)
-        .setAuthorization(auth)
-        .addCredentialsToProperties(credentials)
-        .build()
-
-    return request.execute().use { response ->
-      when (val status = response.status) {
-        is LSHTTPResponseStatus.Responded.OK -> {
-          account.updateBasicTokenCredentials(status.getAccessToken())
-          this.deserializeSyncingEnabledFromStream(status.bodyStream ?: emptyStream())
-        }
-        is LSHTTPResponseStatus.Responded.Error -> {
-          this.logAndFail(settingsURI, status)
-        }
-        is LSHTTPResponseStatus.Failed ->
-          throw status.exception
-      }
-    }
-  }
-
   private fun <T> logAndFail(
     uri: URI,
     error: LSHTTPResponseStatus.Responded.Error
@@ -223,35 +158,5 @@ class BHTTPCalls(
         node = node
       )
     return response.first.items
-  }
-
-  private fun deserializeSyncingEnabledFromStream(value: InputStream): Boolean {
-    return this.deserializeSyncingEnabledFromJSON(this.objectMapper.readTree(value))
-  }
-
-  private fun deserializeSyncingEnabledFromJSON(node: JsonNode): Boolean {
-    return this.deserializeSyncingEnabledFromJSONObject(JSONParserUtilities.checkObject(null, node))
-  }
-
-  private fun deserializeSyncingEnabledFromJSONObject(node: ObjectNode): Boolean {
-    val settings = JSONParserUtilities.getObjectOrNull(node, "settings")
-    return if (settings != null) {
-      if (settings.has("simplified:synchronize_annotations")) {
-        val text: String? = settings.get("simplified:synchronize_annotations").asText()
-        text == "true"
-      } else {
-        true
-      }
-    } else {
-      true
-    }
-  }
-
-  private fun serializeSynchronizeEnableData(enabled: Boolean): ByteArray {
-    val settingsNode = this.objectMapper.createObjectNode()
-    settingsNode.put("simplified:synchronize_annotations", enabled)
-    val node = this.objectMapper.createObjectNode()
-    node.put("settings", settingsNode)
-    return this.objectMapper.writeValueAsBytes(node)
   }
 }

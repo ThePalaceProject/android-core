@@ -104,4 +104,12 @@ interface AccountType : AccountReadableType {
       }
     }
   }
+
+  /**
+   * @return `true` if the current account has the credentials and support for bookmark syncing
+   */
+
+  fun isBookmarkSyncable(): Boolean {
+    return this.loginState.credentials?.annotationsURI != null
+  }
 }

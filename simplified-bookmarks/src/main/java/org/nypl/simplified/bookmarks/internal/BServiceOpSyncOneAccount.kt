@@ -45,17 +45,6 @@ internal class BServiceOpSyncOneAccount(
       return null
     }
 
-    try {
-      BServiceOpCheckSyncStatusForAccount(
-        logger = this.logger,
-        httpCalls = this.httpCalls,
-        profile = this.profile,
-        syncableAccount = syncable
-      ).runActual()
-    } catch (e: Exception) {
-      this.logger.error("[{}]: failed to check sync status: ", this.accountID.uuid, e)
-    }
-
     if (!syncable.account.preferences.bookmarkSyncingPermitted) {
       this.logger.debug("[{}]: syncing not permitted", this.accountID.uuid)
       return null

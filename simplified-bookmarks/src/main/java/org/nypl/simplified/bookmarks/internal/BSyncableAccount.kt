@@ -6,7 +6,6 @@ import java.net.URI
 
 internal data class BSyncableAccount(
   val account: AccountType,
-  val settingsURI: URI,
   val annotationsURI: URI,
   val credentials: AccountAuthenticationCredentials
 ) {
@@ -21,21 +20,14 @@ internal data class BSyncableAccount(
     fun ofAccount(
       account: AccountType
     ): BSyncableAccount? {
-      val annotationsURI = account.loginState.credentials?.annotationsURI
-
+      val credentials = account.loginState.credentials
+      val annotationsURI = credentials?.annotationsURI
       return if (annotationsURI != null) {
-        val settingsOpt = account.provider.patronSettingsURI
-        val credentials = account.loginState.credentials
-        if (credentials != null && settingsOpt != null) {
-          return BSyncableAccount(
-            account = account,
-            settingsURI = settingsOpt,
-            annotationsURI = annotationsURI,
-            credentials = credentials
-          )
-        } else {
-          null
-        }
+        return BSyncableAccount(
+          account = account,
+          annotationsURI = annotationsURI,
+          credentials = credentials
+        )
       } else {
         null
       }

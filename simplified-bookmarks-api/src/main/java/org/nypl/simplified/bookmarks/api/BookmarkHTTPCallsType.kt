@@ -8,29 +8,6 @@ import java.net.URI
 interface BookmarkHTTPCallsType {
 
   /**
-   * @return `true` if annotation syncing is enabled for the given account
-   */
-
-  @Throws(IOException::class)
-  fun syncingIsEnabled(
-    account: AccountType,
-    settingsURI: URI,
-    credentials: AccountAuthenticationCredentials
-  ): Boolean
-
-  /**
-   * Enable or disable annotation syncing for the given account.
-   */
-
-  @Throws(IOException::class)
-  fun syncingEnable(
-    account: AccountType,
-    settingsURI: URI,
-    credentials: AccountAuthenticationCredentials,
-    enabled: Boolean
-  )
-
-  /**
    * Retrieve the list of bookmarks for the given account. This call will fail
    * with an exception if syncing is not enabled.
    *

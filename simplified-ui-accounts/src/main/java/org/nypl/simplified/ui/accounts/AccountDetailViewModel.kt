@@ -15,14 +15,12 @@ import org.nypl.simplified.accounts.api.AccountEventUpdated
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountLoginState
 import org.nypl.simplified.accounts.database.api.AccountType
+import org.nypl.simplified.bookmarks.api.BookmarkServiceType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.profiles.api.ProfileDateOfBirth
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
-import org.nypl.simplified.bookmarks.api.BookmarkEvent.BookmarkSyncSettingChanged
-import org.nypl.simplified.bookmarks.api.BookmarkServiceType
-import org.nypl.simplified.bookmarks.api.BookmarkSyncEnableStatus
 import org.nypl.simplified.taskrecorder.api.TaskStep
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 
@@ -67,34 +65,12 @@ class AccountDetailViewModel(
   val account: AccountType =
     this.accountLive.value!!
 
-  /**
-   * A live data element that tracks the status of the bookmark syncing switch for the
-   * current account.
-   */
-
-  private val accountSyncingSwitchStatusMutable: MutableLiveData<BookmarkSyncEnableStatus> =
-    MutableLiveData(this.bookmarkService.bookmarkSyncStatus(account.id))
-
-  val accountSyncingSwitchStatus: LiveData<BookmarkSyncEnableStatus> =
-    this.accountSyncingSwitchStatusMutable
-
   init {
     this.subscriptions.add(
       this.profilesController.accountEvents()
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(this::onAccountEvent)
     )
-    this.subscriptions.add(
-      this.bookmarkService.bookmarkEvents
-        .ofType(BookmarkSyncSettingChanged::class.java)
-        .filter { event -> event.accountID == this.accountId }
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(this::onBookmarkEvent)
-    )
-  }
-
-  private fun onBookmarkEvent(event: BookmarkSyncSettingChanged) {
-    this.accountSyncingSwitchStatusMutable.postValue(event.status)
   }
 
   private fun onAccountEvent(accountEvent: AccountEvent) {
@@ -114,18 +90,6 @@ class AccountDetailViewModel(
 
   private fun handleAccountUpdated(event: AccountEventUpdated) {
     this.accountLiveMutable.value = this.account
-
-    /*
-     * Synthesize a bookmark event so that we fetch up-to-date values if the account
-     * logs in or out.
-     */
-
-    this.onBookmarkEvent(
-      BookmarkSyncSettingChanged(
-        accountID = event.accountID,
-        status = this.bookmarkService.bookmarkSyncStatus(event.accountID)
-      )
-    )
   }
 
   private fun handleLoginStateChanged(event: AccountEventLoginStateChanged) {
@@ -171,14 +135,6 @@ class AccountDetailViewModel(
    */
 
   var pendingLogout: Boolean = false
-
-  /**
-   * Enable/disable bookmark syncing.
-   */
-
-  fun enableBookmarkSyncing(enabled: Boolean) {
-    this.bookmarkService.bookmarkSyncEnable(this.accountId, enabled)
-  }
 
   var isOver13: Boolean
     get() {
@@ -248,5 +204,9 @@ class AccountDetailViewModel(
       )
 
     this.listener.post(AccountDetailEvent.OpenErrorPage(parameters))
+  }
+
+  fun enableBookmarkSyncing(enabled: Boolean) {
+    this.account.setPreferences(this.account.preferences.copy(bookmarkSyncingPermitted = enabled))
   }
 }

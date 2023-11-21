@@ -48,10 +48,6 @@ import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.Ba
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.BasicToken
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.OAuthWithIntermediaryCancel
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.OAuthWithIntermediaryInitiate
-import org.nypl.simplified.bookmarks.api.BookmarkSyncEnableResult.SYNC_DISABLED
-import org.nypl.simplified.bookmarks.api.BookmarkSyncEnableResult.SYNC_ENABLED
-import org.nypl.simplified.bookmarks.api.BookmarkSyncEnableResult.SYNC_ENABLE_NOT_SUPPORTED
-import org.nypl.simplified.bookmarks.api.BookmarkSyncEnableStatus
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsCancelButtonDisabled
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsCancelButtonEnabled
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsLoginButtonDisabled
@@ -129,7 +125,6 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   private lateinit var authenticationViews: AccountAuthenticationViews
   private lateinit var bookmarkSync: ViewGroup
   private lateinit var bookmarkSyncCheck: SwitchCompat
-  private lateinit var bookmarkSyncProgress: ProgressBar
   private lateinit var loginButtonErrorDetails: Button
   private lateinit var loginProgress: ViewGroup
   private lateinit var loginProgressBar: ProgressBar
@@ -144,7 +139,6 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   private lateinit var toolbar: PalaceToolbar
 
   private val imageButtonLoadingTag = "IMAGE_BUTTON_LOADING"
-  private val nyplCardCreatorScheme = "nypl.card-creator"
 
   companion object {
 
@@ -189,8 +183,6 @@ class AccountDetailFragment : Fragment(R.layout.account) {
     this.authenticationAlternativesButtons =
       view.findViewById(R.id.accountAuthAlternativesButtons)
 
-    this.bookmarkSyncProgress =
-      view.findViewById(R.id.accountSyncProgress)
     this.bookmarkSync =
       view.findViewById(R.id.accountSyncBookmarks)
     this.bookmarkSyncCheck =
@@ -250,54 +242,6 @@ class AccountDetailFragment : Fragment(R.layout.account) {
 
     this.viewModel.accountLive.observe(this.viewLifecycleOwner) {
       this.reconfigureAccountUI()
-    }
-
-    this.viewModel.accountSyncingSwitchStatus.observe(this.viewLifecycleOwner) { status ->
-      this.reconfigureBookmarkSyncingSwitch(status)
-    }
-  }
-
-  private fun reconfigureBookmarkSyncingSwitch(status: BookmarkSyncEnableStatus) {
-    /*
-     * Remove the checked-change listener, because setting `isChecked` will trigger the listener.
-     */
-
-    this.bookmarkSyncCheck.setOnCheckedChangeListener(null)
-
-    /*
-     * Otherwise, the switch is doing something that interests us...
-     */
-
-    val account = this.viewModel.account
-    return when (status) {
-      is BookmarkSyncEnableStatus.Changing -> {
-        this.bookmarkSyncProgress.visibility = View.VISIBLE
-        this.bookmarkSyncCheck.isEnabled = false
-      }
-
-      is BookmarkSyncEnableStatus.Idle -> {
-        this.bookmarkSyncProgress.visibility = View.INVISIBLE
-
-        when (status.status) {
-          SYNC_ENABLE_NOT_SUPPORTED -> {
-            this.bookmarkSyncCheck.isChecked = false
-            this.bookmarkSyncCheck.isEnabled = false
-          }
-
-          SYNC_ENABLED,
-          SYNC_DISABLED -> {
-            val isPermitted = account.preferences.bookmarkSyncingPermitted
-            val isSupported = account.loginState.credentials?.annotationsURI != null
-
-            this.bookmarkSyncCheck.isChecked = isPermitted
-            this.bookmarkSyncCheck.isEnabled = isSupported
-
-            this.bookmarkSyncCheck.setOnCheckedChangeListener { _, isChecked ->
-              this.viewModel.enableBookmarkSyncing(isChecked)
-            }
-          }
-        }
-      }
     }
   }
 
@@ -372,8 +316,8 @@ class AccountDetailFragment : Fragment(R.layout.account) {
      * Configure the bookmark syncing switch to enable/disable syncing permissions.
      */
 
-    this.bookmarkSyncCheck.setOnCheckedChangeListener { _, isChecked ->
-      this.viewModel.enableBookmarkSyncing(isChecked)
+    this.bookmarkSyncCheck.setOnClickListener {
+      this.viewModel.enableBookmarkSyncing(this.bookmarkSyncCheck.isChecked)
     }
 
     /*
@@ -673,6 +617,9 @@ class AccountDetailFragment : Fragment(R.layout.account) {
     } else {
       View.GONE
     }
+
+    this.bookmarkSyncCheck.isEnabled = this.viewModel.account.isBookmarkSyncable()
+    this.bookmarkSyncCheck.isChecked = this.viewModel.account.preferences.bookmarkSyncingPermitted
 
     /*
      * Only show a EULA if there's actually a EULA.
