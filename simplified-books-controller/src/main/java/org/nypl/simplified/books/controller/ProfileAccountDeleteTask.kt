@@ -63,9 +63,19 @@ class ProfileAccountDeleteTask(
       this.publishSuccessEvent(account)
       this.taskRecorder.finishSuccess(Unit)
     } catch (e: AccountsDatabaseLastAccountException) {
+      this.taskRecorder.currentStepFailed(
+        e.message ?: e.javaClass.name,
+        "oneAccountMustExist",
+        e
+      )
       this.publishFailureEvent()
       this.taskRecorder.finishFailure()
     } catch (e: Throwable) {
+      this.taskRecorder.currentStepFailed(
+        e.message ?: e.javaClass.name,
+        "deletionFailed",
+        e
+      )
       this.publishFailureEvent()
       this.taskRecorder.finishFailure()
     }

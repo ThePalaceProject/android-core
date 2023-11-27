@@ -194,7 +194,7 @@ class AccountsDatabase private constructor(
 
       if (this.accounts.size == 1) {
         throw AccountsDatabaseLastAccountException(
-          "At least one account must exist at any given time"
+          "At least one account must exist at any given time."
         )
       }
 
