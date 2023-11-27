@@ -7,10 +7,10 @@
   <string name="profileAccountCreationResolvingAccountProvider">Resolving account provider…</string>
   <string name="profileAccountCreationResolvingAccountProviderFailed">Resolving an account provider failed.</string>
   <string name="profileAccountCreationSucceeded">Creating the account succeeded.</string>
-  <string name="profileAccountDeleting">Deleting account…</string>
-  <string name="profileAccountDeletionFailed">Deleting an account failed.</string>
-  <string name="profileAccountDeletionOnlyOneAccountRemaining">Cannot delete the one remaining account; at least one account must be present.</string>
-  <string name="profileAccountDeletionSucceeded">Deleting an account succeeded.</string>
+  <string name="profileAccountDeleting">Removing account…</string>
+  <string name="profileAccountDeletionFailed">Removing an account failed.</string>
+  <string name="profileAccountDeletionOnlyOneAccountRemaining">Cannot remove the one remaining account; at least one account must be present.</string>
+  <string name="profileAccountDeletionSucceeded">Removing an account succeeded.</string>
   <string name="profileAccountFetchingOPDSFeed">Fetching an OPDS feed…</string>
   <string name="profileAccountFetchingOPDSFeedFailed">Fetching an OPDS feed failed!</string>
   <string name="profileAccountFindingAuthDocumentURI">Finding an authentication document URI…</string>
