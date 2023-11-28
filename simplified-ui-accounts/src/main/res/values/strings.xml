@@ -42,7 +42,7 @@
   <string name="accountsDeleteConfirm">Are you sure you want to remove \"%1$s\" from this device?</string>
   <string name="accountsDeleteConfirmTitle">Remove library</string>
   <string name="accountsDeletionFailed">Library removal failed</string>
-  <string name="accountsDeletionFailedMessage">The library could not be deleted.</string>
+  <string name="accountsDeletionFailedMessage">The library could not be removed.</string>
   <string name="accountsDetails">Details</string>
   <string name="accountSyncBookmarks">Sync bookmarks</string>
   <string name="accountUserName">User Name</string>
