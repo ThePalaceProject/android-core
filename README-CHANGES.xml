@@ -415,7 +415,12 @@
             <c:ticket id="PP-737"/>
           </c:tickets>
         </c:change>
-        <c:change date="2023-11-21T00:00:00+00:00" summary="Make account deletion icon visible.">
+        <c:change date="2023-11-21T15:15:20+00:00" summary="Bookmark syncing is now a purely client-side setting.">
+          <c:tickets>
+            <c:ticket id="PP-747"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2023-11-21T15:13:27+00:00" summary="Make account deletion icon visible.">
           <c:tickets>
             <c:ticket id="PP-738"/>
           </c:tickets>

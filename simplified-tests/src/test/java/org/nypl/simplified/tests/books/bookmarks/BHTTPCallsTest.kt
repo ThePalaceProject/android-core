@@ -36,40 +36,6 @@ class BHTTPCallsTest {
   @Mock
   private val account = Mockito.mock(AccountType::class.java)
 
-  private fun checkGetSyncing(
-    expected: Boolean,
-    serverResponseText: String
-  ) {
-    val objectMapper = ObjectMapper()
-    val calls = BHTTPCalls(objectMapper, this.http)
-
-    val credentials =
-      AccountAuthenticationCredentials.BasicToken(
-        userName = AccountUsername("1234"),
-        password = AccountPassword("5678"),
-        authenticationTokenInfo = AccountAuthenticationTokenInfo(
-          accessToken = "abcd",
-          authURI = URI("https://www.authrefresh.com")
-        ),
-        adobeCredentials = null,
-        authenticationDescription = null,
-        annotationsURI = URI("https://www.example.com"),
-        deviceRegistrationURI = URI("https://www.example.com")
-      )
-
-    val targetURI =
-      this.server.url("me").toUri()
-
-    this.server.enqueue(
-      MockResponse()
-        .setResponseCode(200)
-        .setBody(serverResponseText)
-    )
-
-    val enabled0 = calls.syncingIsEnabled(account, targetURI, credentials)
-    Assertions.assertEquals(expected, enabled0)
-  }
-
   private fun checkGetBookmarks(
     expectedBookmarks: List<BookmarkAnnotation>,
     serverResponseText: String
@@ -121,62 +87,6 @@ class BHTTPCallsTest {
   @AfterEach
   fun tearDown() {
     this.server.close()
-  }
-
-  @Test
-  fun testGetSyncingFalse0() {
-    this.checkGetSyncing(
-      expected = false,
-      serverResponseText = """
-        {
-          "settings": {
-            "simplified:synchronize_annotations": "false"
-          }
-        }
-      """.trimIndent()
-    )
-  }
-
-  @Test
-  fun testGetSyncingFalse1() {
-    this.checkGetSyncing(
-      expected = false,
-      serverResponseText = """
-        {
-          "settings": {
-            "simplified:synchronize_annotations": null
-          }
-        }
-      """.trimIndent()
-    )
-  }
-
-  @Test
-  fun testGetSyncingFalse2() {
-    this.checkGetSyncing(
-      expected = true,
-      serverResponseText = """
-        {
-          "settings": {
-
-          }
-        }
-      """.trimIndent()
-    )
-  }
-
-  @Test
-  fun testGetSyncingTrue0() {
-    this.checkGetSyncing(
-      expected = true,
-      serverResponseText = """
-        {
-          "settings": {
-            "simplified:synchronize_annotations": true
-          }
-        }
-      """.trimIndent()
-    )
   }
 
   @Test
@@ -293,35 +203,6 @@ class BHTTPCallsTest {
           }
         }
       """.trimIndent()
-    )
-  }
-
-  @Test
-  fun testGetSyncingFailure0() {
-    val objectMapper = ObjectMapper()
-    val calls = BHTTPCalls(objectMapper, this.http)
-
-    val credentials =
-      AccountAuthenticationCredentials.Basic(
-        userName = AccountUsername("abcd"),
-        password = AccountPassword("1234"),
-        adobeCredentials = null,
-        authenticationDescription = null,
-        annotationsURI = URI("https://www.example.com"),
-        deviceRegistrationURI = URI("https://www.example.com")
-      )
-
-    val targetURI = this.server.url("me").toUri()
-    this.server.enqueue(
-      MockResponse()
-        .setResponseCode(401)
-    )
-
-    Assertions.assertThrows(
-      IOException::class.java,
-      Executable {
-        calls.syncingIsEnabled(account, targetURI, credentials)
-      }
     )
   }
 

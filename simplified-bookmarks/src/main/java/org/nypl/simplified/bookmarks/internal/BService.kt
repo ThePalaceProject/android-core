@@ -23,11 +23,6 @@ import org.nypl.simplified.bookmarks.api.BookmarkEvent
 import org.nypl.simplified.bookmarks.api.BookmarkHTTPCallsType
 import org.nypl.simplified.bookmarks.api.Bookmarks
 import org.nypl.simplified.bookmarks.api.BookmarkServiceType
-import org.nypl.simplified.bookmarks.api.BookmarkSyncEnableResult
-import org.nypl.simplified.bookmarks.api.BookmarkSyncEnableResult.SYNC_DISABLED
-import org.nypl.simplified.bookmarks.api.BookmarkSyncEnableResult.SYNC_ENABLE_NOT_SUPPORTED
-import org.nypl.simplified.bookmarks.api.BookmarkSyncEnableResult.SYNC_ENABLED
-import org.nypl.simplified.bookmarks.api.BookmarkSyncEnableStatus
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.api.bookmark.Bookmark
 import org.nypl.simplified.profiles.api.ProfileEvent
@@ -35,7 +30,6 @@ import org.nypl.simplified.profiles.api.ProfileNoneCurrentException
 import org.nypl.simplified.profiles.api.ProfileSelection
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.slf4j.LoggerFactory
-import java.util.Collections
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -60,8 +54,6 @@ class BService(
     LoggerFactory.getLogger(BService::class.java)
   private val objectMapper =
     ObjectMapper()
-  private val accountsSyncChanging =
-    Collections.synchronizedSet(hashSetOf<AccountID>())
 
   init {
     this.disposables.add(
@@ -130,10 +122,6 @@ class BService(
     }
   }
 
-  private fun onAccountEnabledSyncing() {
-    this.sync()
-  }
-
   private fun onAccountLoggedIn() {
     this.sync()
   }
@@ -153,103 +141,6 @@ class BService(
 
   override val bookmarkEvents: Observable<BookmarkEvent>
     get() = this.bookmarkEventsOut
-
-  override fun bookmarkSyncStatus(
-    accountID: AccountID
-  ): BookmarkSyncEnableStatus {
-    val profile =
-      this.profilesController.profileCurrent()
-    val syncable =
-      BSyncableAccount.ofAccount(profile.account(accountID))
-
-    if (syncable == null) {
-      this.logger.error("bookmarkSyncEnable: account does not support syncing")
-      return BookmarkSyncEnableStatus.Idle(accountID, SYNC_ENABLE_NOT_SUPPORTED)
-    }
-
-    val changing = this.accountsSyncChanging.contains(accountID)
-    if (changing) {
-      return BookmarkSyncEnableStatus.Changing(accountID)
-    }
-
-    return BookmarkSyncEnableStatus.Idle(
-      accountID = accountID,
-      status = if (syncable.account.preferences.bookmarkSyncingPermitted) {
-        SYNC_ENABLED
-      } else {
-        SYNC_DISABLED
-      }
-    )
-  }
-
-  override fun bookmarkSyncEnable(
-    accountID: AccountID,
-    enabled: Boolean
-  ): FluentFuture<BookmarkSyncEnableResult> {
-    return try {
-      this.bookmarkEventsOut.onNext(
-        BookmarkEvent.BookmarkSyncSettingChanged(
-          accountID = accountID,
-          status = BookmarkSyncEnableStatus.Changing(accountID)
-        )
-      )
-
-      val profile =
-        this.profilesController.profileCurrent()
-      val syncable =
-        BSyncableAccount.ofAccount(profile.account(accountID))
-
-      if (syncable == null) {
-        this.logger.error("bookmarkSyncEnable: account does not support syncing")
-        val status = SYNC_ENABLE_NOT_SUPPORTED
-
-        this.bookmarkEventsOut.onNext(
-          BookmarkEvent.BookmarkSyncSettingChanged(
-            accountID = accountID,
-            status = BookmarkSyncEnableStatus.Idle(accountID, status)
-          )
-        )
-
-        return FluentFuture.from(Futures.immediateFuture(status))
-      }
-
-      this.accountsSyncChanging.add(accountID)
-
-      val opEnableSync =
-        BServiceOpEnableSync(
-          logger = this.logger,
-          accountsSyncChanging = this.accountsSyncChanging,
-          bookmarkEventsOut = this.bookmarkEventsOut,
-          httpCalls = this.httpCalls,
-          profile = profile,
-          syncableAccount = syncable,
-          enable = enabled
-        )
-
-      val opCheck =
-        BServiceOpCheckSyncStatusForProfile(
-          logger = this.logger,
-          httpCalls = this.httpCalls,
-          profile = profile
-        )
-
-      val enableFuture =
-        FluentFuture.from(this.executor.submit(opEnableSync))
-          .transform(
-            { result ->
-              opCheck.call()
-              result
-            },
-            this.executor
-          )
-
-      enableFuture.addListener({ this.onAccountEnabledSyncing() }, this.executor)
-      enableFuture
-    } catch (e: ProfileNoneCurrentException) {
-      this.logger.error("bookmarkSyncEnable: no profile is current: ", e)
-      FluentFuture.from(Futures.immediateFailedFuture(e))
-    }
-  }
 
   override fun bookmarkSyncAccount(
     accountID: AccountID,
