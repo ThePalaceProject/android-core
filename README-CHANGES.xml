@@ -407,7 +407,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2023-11-27T10:20:36+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.9.0">
+    <c:release date="2023-12-05T14:01:48+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.9.0">
       <c:changes>
         <c:change date="2023-11-17T00:00:00+00:00" summary="Updated Readium version."/>
         <c:change date="2023-11-20T00:00:00+00:00" summary="Fix an LCP audiobook crash.">
@@ -415,19 +415,24 @@
             <c:ticket id="PP-737"/>
           </c:tickets>
         </c:change>
-        <c:change date="2023-11-21T15:15:20+00:00" summary="Bookmark syncing is now a purely client-side setting.">
+        <c:change date="2023-11-21T00:00:00+00:00" summary="Bookmark syncing is now a purely client-side setting.">
           <c:tickets>
             <c:ticket id="PP-747"/>
           </c:tickets>
         </c:change>
-        <c:change date="2023-11-21T15:13:27+00:00" summary="Make account deletion icon visible.">
+        <c:change date="2023-11-21T00:00:00+00:00" summary="Make account deletion icon visible.">
           <c:tickets>
             <c:ticket id="PP-738"/>
           </c:tickets>
         </c:change>
-        <c:change date="2023-11-27T10:20:36+00:00" summary="Adjust account deletion UI for consistency.">
+        <c:change date="2023-11-27T00:00:00+00:00" summary="Adjust account deletion UI for consistency.">
           <c:tickets>
             <c:ticket id="PP-756"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2023-12-05T14:01:48+00:00" summary="Update Transifex to 1.2.3">
+          <c:tickets>
+            <c:ticket id="PP-760"/>
           </c:tickets>
         </c:change>
       </c:changes>
