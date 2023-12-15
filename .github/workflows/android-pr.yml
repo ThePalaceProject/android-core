@@ -20,7 +20,7 @@ jobs:
       - name: Build PR
         run: .ci/ci-main.sh pull-request
       - name: Upload test report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
           name: junit-test-report
