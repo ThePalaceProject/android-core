@@ -398,6 +398,14 @@ dependencies {
     implementation(libs.net.minidev.json.smart)
     implementation(libs.net.minidev.accessors.smart)
 
+    implementation(libs.media3.common)
+    implementation(libs.media3.container)
+    implementation(libs.media3.datasource)
+    implementation(libs.media3.decoder)
+    implementation(libs.media3.exoplayer)
+    implementation(libs.media3.extractor)
+    implementation(libs.media3.session)
+
     implementation(libs.androidx.activity)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.annotation)
