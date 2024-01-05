@@ -407,7 +407,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2023-12-05T14:01:48+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.9.0">
+    <c:release date="2024-01-05T17:00:51+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.9.0">
       <c:changes>
         <c:change date="2023-11-17T00:00:00+00:00" summary="Updated Readium version."/>
         <c:change date="2023-11-20T00:00:00+00:00" summary="Fix an LCP audiobook crash.">
@@ -430,9 +430,14 @@
             <c:ticket id="PP-756"/>
           </c:tickets>
         </c:change>
-        <c:change date="2023-12-05T14:01:48+00:00" summary="Update Transifex to 1.2.3">
+        <c:change date="2023-12-05T00:00:00+00:00" summary="Update Transifex to 1.2.3">
           <c:tickets>
             <c:ticket id="PP-760"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2024-01-05T17:00:51+00:00" summary="Fix numerous thread-related issues.">
+          <c:tickets>
+            <c:ticket id="PP-815"/>
           </c:tickets>
         </c:change>
       </c:changes>
