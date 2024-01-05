@@ -78,6 +78,7 @@ object StandardFormatNames {
       types.add(this.findawayAudioBooks)
       types.add(this.overdriveAudioBooks)
       types.add(this.dplaAudioBooks)
+      types.add(this.lcpAudioBooks)
       types.addAll(this.genericAudioBooks)
       types.toSet()
     }

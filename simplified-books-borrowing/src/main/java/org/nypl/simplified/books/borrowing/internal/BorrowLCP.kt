@@ -36,6 +36,7 @@ import org.nypl.simplified.opds.core.OPDSFeedParserType
 import org.readium.r2.lcp.LcpException
 import org.readium.r2.lcp.license.model.LicenseDocument
 import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.net.URI
 
@@ -44,6 +45,8 @@ import java.net.URI
  */
 
 class BorrowLCP private constructor() : BorrowSubtaskType {
+
+  private val manifestFileName = "manifest.json"
 
   companion object : BorrowSubtaskFactoryType {
     override val name: String
@@ -110,15 +113,19 @@ class BorrowLCP private constructor() : BorrowSubtaskType {
           DownloadCancelled -> {
             throw BorrowSubtaskCancelled()
           }
+
           is DownloadFailedServer -> {
             throw BorrowHTTP.onDownloadFailedServer(context, result)
           }
+
           is DownloadFailedUnacceptableMIME -> {
             throw BorrowSubtaskFailed()
           }
+
           is DownloadFailedExceptionally -> {
             throw BorrowHTTP.onDownloadFailedExceptionally(context, result)
           }
+
           is DownloadCompletedSuccessfully -> {
             this.fulfill(context, temporaryFile.readBytes(), passphrase)
           }
@@ -161,9 +168,11 @@ class BorrowLCP private constructor() : BorrowSubtaskType {
           context.account.updateBasicTokenCredentials(status.getAccessToken())
           this.findPassphraseHandleOK(context, loansURI, status)
         }
+
         is LSHTTPResponseStatus.Responded.Error -> {
           this.findPassphraseHandleError(context, status)
         }
+
         is LSHTTPResponseStatus.Failed -> {
           this.findPassphraseHandleFailure(context, status)
         }
@@ -307,16 +316,19 @@ class BorrowLCP private constructor() : BorrowSubtaskType {
       when (val result = LSHTTPDownloads.download(downloadRequest)) {
         DownloadCancelled ->
           throw BorrowSubtaskCancelled()
+
         is DownloadFailedServer ->
           throw BorrowHTTP.onDownloadFailedServer(context, result)
+
         is DownloadFailedUnacceptableMIME ->
           throw BorrowSubtaskFailed()
+
         is DownloadFailedExceptionally ->
           throw BorrowHTTP.onDownloadFailedExceptionally(context, result)
+
         is DownloadCompletedSuccessfully -> {
           this.installLicense(context, fulfillmentMimeType, temporaryFile, licenseBytes)
           this.saveFulfilledBook(context, temporaryFile, passphrase)
-
           context.bookDownloadSucceeded()
         }
       }
@@ -377,6 +389,23 @@ class BorrowLCP private constructor() : BorrowSubtaskType {
     context.taskRecorder.currentStepSucceeded("License installed.")
   }
 
+  private fun extractManifest(
+    context: BorrowContextType,
+    bookFile: File
+  ): ByteArray {
+    context.taskRecorder.beginNewStep("Extracting manifest...")
+
+    val byteArrayOutputStream = ByteArrayOutputStream()
+    TFile.cp(
+      TFile(bookFile, this.manifestFileName),
+      byteArrayOutputStream
+    )
+    TVFS.umount()
+
+    context.taskRecorder.currentStepSucceeded("Extracted manifest.")
+    return byteArrayOutputStream.toByteArray()
+  }
+
   private fun saveFulfilledBook(
     context: BorrowContextType,
     bookFile: File,
@@ -394,9 +423,15 @@ class BorrowLCP private constructor() : BorrowSubtaskType {
       is BookDatabaseEntryFormatHandleEPUB -> {
         formatHandle.copyInBook(bookFile)
       }
+
       is BookDatabaseEntryFormatHandleAudioBook -> {
         formatHandle.moveInBook(bookFile)
+        formatHandle.copyInManifestAndURI(
+          this.extractManifest(context, formatHandle.format.file!!),
+          URI.create(this.manifestFileName)
+        )
       }
+
       is BookDatabaseEntryFormatHandlePDF ->
         formatHandle.copyInBook(bookFile)
     }
