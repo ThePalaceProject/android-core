@@ -40,8 +40,6 @@ class CatalogPagedDataSource(
 
     callback.onResult(
       this.initialFeed.entriesInOrder,
-      0,
-      this.initialFeed.entriesInOrder.size,
       null,
       this.initialFeed.feedNext
     )

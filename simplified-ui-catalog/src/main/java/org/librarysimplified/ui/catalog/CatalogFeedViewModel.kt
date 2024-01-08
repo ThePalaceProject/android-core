@@ -621,7 +621,7 @@ class CatalogFeedViewModel(
     val pagedListConfig =
       PagedList.Config.Builder()
         .setEnablePlaceholders(true)
-        .setPageSize(50)
+        .setPageSize(100)
         .setMaxSize(250)
         .setPrefetchDistance(25)
         .build()
