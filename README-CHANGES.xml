@@ -407,7 +407,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2024-01-09T11:59:41+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.9.0">
+    <c:release date="2024-01-09T12:22:33+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.9.0">
       <c:changes>
         <c:change date="2023-11-17T00:00:00+00:00" summary="Updated Readium version."/>
         <c:change date="2023-11-20T00:00:00+00:00" summary="Fix an LCP audiobook crash.">
@@ -445,7 +445,7 @@
             <c:ticket id="PP-796"/>
           </c:tickets>
         </c:change>
-        <c:change date="2024-01-09T11:59:41+00:00" summary="Fix infinitely scrolling feeds.">
+        <c:change date="2024-01-09T00:00:00+00:00" summary="Fix infinitely scrolling feeds.">
           <c:tickets>
             <c:ticket id="PP-796"/>
           </c:tickets>
