@@ -224,6 +224,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "simplified"
 
+include(":palace-ui")
 include(":simplified-accessibility")
 include(":simplified-accounts-api")
 include(":simplified-accounts-database")

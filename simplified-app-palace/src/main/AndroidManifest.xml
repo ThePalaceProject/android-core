@@ -96,6 +96,10 @@
       android:screenOrientation="portrait"
       android:theme="@style/PalaceTheme.WithoutActionBar" />
 
+    <activity
+        android:name="org.thepalaceproject.ui.UIMainActivity"
+        android:exported="false"
+        android:theme="@style/PalaceTheme.WithoutActionBar" />
   </application>
 
 </manifest>

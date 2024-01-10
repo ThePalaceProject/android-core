@@ -43,6 +43,7 @@
   <string name="settingsDevShowErrorPage">Show Error Page</string>
   <string name="settingsDevShowSupportedBooks">Only show supported books (Uncheck to show unsupported books)</string>
   <string name="settingsDevSyncAccounts">Sync Accounts</string>
+  <string name="settingsDevRebootNewUI">Reboot In New UI Mode</string>
   <string name="settingsDevTestingFeatures">Testing Features</string>
   <string name="settingsDevToggleOpenEBooksQAAccount">Toggle OpenEBooks QA Account</string>
   <string name="settingsDevUserSeenLibrarySelection">User has seen library selection screen?</string>

@@ -39,6 +39,8 @@ import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.ui.branding.BrandingSplashServiceType
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.ui.UIMainActivity
+import org.thepalaceproject.ui.UIMigration
 import java.net.URI
 import java.util.ServiceLoader
 import java.util.concurrent.TimeUnit
@@ -65,6 +67,18 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     this.logger.debug("onCreate (recreating {})", savedInstanceState != null)
     super.onCreate(savedInstanceState)
     this.logger.debug("onCreate (super completed)")
+
+    /*
+     * We might need to go to the new UI activity instead.
+     */
+
+    if (UIMigration.isRunningNewUI(this.applicationContext)) {
+      val intent = Intent(this, UIMainActivity::class.java)
+      intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_TASK_ON_HOME)
+      this.startActivity(intent)
+      this.finish()
+      return
+    }
 
     interceptDeepLink()
     val toolbar = this.findViewById(R.id.mainToolbar) as Toolbar

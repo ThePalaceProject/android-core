@@ -28,6 +28,7 @@ import org.nypl.simplified.taskrecorder.api.TaskStepResolution
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.slf4j.LoggerFactory
 import org.thepalaceproject.theme.core.PalaceToolbar
+import org.thepalaceproject.ui.UIMigration
 
 /**
  * A fragment that shows various debug options for testing app functionality at runtime.
@@ -43,6 +44,7 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
   private val viewModel: SettingsDebugViewModel by viewModels()
   private val listener: FragmentListenerType<SettingsDebugEvent> by fragmentListeners()
 
+  private lateinit var rebootNewUI: Button
   private lateinit var accountRegistry: AccountProviderRegistryType
   private lateinit var adobeDRMActivationTable: TableLayout
   private lateinit var cacheButton: Button
@@ -114,6 +116,8 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
       view.findViewById(R.id.libraryRegistryOverrideSet)
     this.enableOpenEBooksQA =
       view.findViewById(R.id.settingsVersionDevEnableOpenEBooksQA)
+    this.rebootNewUI =
+      view.findViewById(R.id.settingsRebootNewUI)
 
     this.drmTable.addView(
       this.createDrmSupportRow("Adobe Acs", this.viewModel.adeptSupported)
@@ -157,6 +161,27 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
 
     this.crashButton.setOnClickListener {
       throw OutOfMemoryError("Pretending to have run out of memory!")
+    }
+
+    this.rebootNewUI.setOnClickListener {
+      val context = this.requireContext()
+      MaterialAlertDialogBuilder(context)
+        .setTitle("Really?")
+        .setMessage(
+          "Really switch to the new UI? The application will need to be restarted."
+        )
+        .setNegativeButton(R.string.settingsCancel) { dialog, _ ->
+          dialog.dismiss()
+        }
+        .setPositiveButton(R.string.settingsCommit) { dialog, _ ->
+          UIMigration.setRunningNewUI(
+            this.requireContext(),
+            running = !UIMigration.isRunningNewUI(this.requireContext())
+          )
+          System.exit(0)
+        }
+        .create()
+        .show()
     }
 
     this.cacheButton.setOnClickListener {
