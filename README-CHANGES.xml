@@ -452,11 +452,16 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2024-01-17T12:49:33+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.10.0">
+    <c:release date="2024-01-17T13:28:24+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.10.0">
       <c:changes>
-        <c:change date="2024-01-17T12:49:33+00:00" summary="Attempt to fix a lifecycle related R2 TOC crash.">
+        <c:change date="2024-01-17T00:00:00+00:00" summary="Attempt to fix a lifecycle related R2 TOC crash.">
           <c:tickets>
             <c:ticket id="PP-858"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2024-01-17T13:28:24+00:00" summary="Upgrade to Transifex 1.3.0">
+          <c:tickets>
+            <c:ticket id="PP-859"/>
           </c:tickets>
         </c:change>
       </c:changes>
