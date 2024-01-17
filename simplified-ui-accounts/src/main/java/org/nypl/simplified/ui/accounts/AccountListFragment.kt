@@ -1,5 +1,6 @@
 package org.nypl.simplified.ui.accounts
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
@@ -75,7 +76,7 @@ class AccountListFragment : Fragment(R.layout.account_list) {
 
   private fun onAccountDeleteClicked(account: AccountType) {
     val context = this.requireContext()
-    MaterialAlertDialogBuilder(context)
+    val dialog = MaterialAlertDialogBuilder(context)
       .setTitle(R.string.accountsDeleteConfirmTitle)
       .setMessage(
         context.getString(
@@ -91,7 +92,18 @@ class AccountListFragment : Fragment(R.layout.account_list) {
         dialog.dismiss()
       }
       .create()
-      .show()
+
+    /*
+     * Set content descriptions for buttons to improve accessibility and automated retrieval
+     * by unit tests. Note that this has to be done after `show()` otherwise `getButton` often
+     * returns `null`.
+     */
+
+    dialog.show()
+    dialog.getButton(AlertDialog.BUTTON_NEGATIVE).contentDescription =
+      context.getString(R.string.accountCancel)
+    dialog.getButton(AlertDialog.BUTTON_POSITIVE).contentDescription =
+      context.getString(R.string.accountsDelete)
   }
 
   private fun onAccountClicked(account: AccountType) {

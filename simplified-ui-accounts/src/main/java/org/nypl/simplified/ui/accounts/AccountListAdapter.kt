@@ -57,7 +57,7 @@ class AccountListAdapter(
     private val accountCaptionView =
       itemView.findViewById<TextView>(R.id.accountCaption)
     private val deleteIcon =
-      itemView.findViewById<View>(R.id.popupMenuIcon)
+      itemView.findViewById<View>(R.id.accountDeleteButton)
 
     private var accountItem: AccountType? = null
 
