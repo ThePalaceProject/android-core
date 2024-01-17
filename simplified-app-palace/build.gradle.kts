@@ -407,6 +407,11 @@ dependencies {
     implementation(libs.media3.extractor)
     implementation(libs.media3.session)
 
+    // Transifex
+    implementation(libs.transifex.common)
+    implementation(libs.transifex.sdk)
+    implementation(libs.b3nedikt.viewpump)
+
     implementation(libs.androidx.activity)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.annotation)
@@ -510,7 +515,6 @@ dependencies {
     implementation(libs.google.gson)
     implementation(libs.google.guava)
     implementation(libs.google.material)
-    implementation(libs.inflationx.viewpump)
     implementation(libs.io7m.jfunctional)
     implementation(libs.io7m.jnull)
     implementation(libs.irradia.fieldrush.api)
@@ -606,8 +610,6 @@ dependencies {
     implementation(libs.service.wight.core)
     implementation(libs.slf4j)
     implementation(libs.timber)
-    implementation(libs.transifex.common)
-    implementation(libs.transifex.sdk)
     implementation(libs.transport.api)
     implementation(libs.transport.backend.cct)
     implementation(libs.transport.runtime)
