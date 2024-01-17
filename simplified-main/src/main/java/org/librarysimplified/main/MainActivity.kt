@@ -8,7 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.app.TxContextWrappingDelegate
+import androidx.appcompat.app.TxContextWrappingDelegate2
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.FragmentManager
@@ -55,8 +55,8 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
   private val logger = LoggerFactory.getLogger(MainActivity::class.java)
   private val listenerRepo: ListenerRepository<MainActivityListenedEvent, Unit> by listenerRepositories()
 
-  private val appCompatDelegate: TxContextWrappingDelegate by lazy {
-    TxContextWrappingDelegate(super.getDelegate())
+  private val appCompatDelegate: TxContextWrappingDelegate2 by lazy {
+    TxContextWrappingDelegate2(super.getDelegate())
   }
 
   private val defaultViewModelFactory: ViewModelProvider.Factory by lazy {

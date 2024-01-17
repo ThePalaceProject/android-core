@@ -9,7 +9,7 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.app.TxContextWrappingDelegate
+import androidx.appcompat.app.TxContextWrappingDelegate2
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.util.concurrent.ListeningExecutorService
 import com.google.common.util.concurrent.MoreExecutors
@@ -323,8 +323,8 @@ class AudioBookPlayerActivity :
     }
   }
 
-  private val appCompatDelegate: TxContextWrappingDelegate by lazy {
-    TxContextWrappingDelegate(super.getDelegate())
+  private val appCompatDelegate: TxContextWrappingDelegate2 by lazy {
+    TxContextWrappingDelegate2(super.getDelegate())
   }
 
   private fun findBookAuthor(entry: OPDSAcquisitionFeedEntry): String {

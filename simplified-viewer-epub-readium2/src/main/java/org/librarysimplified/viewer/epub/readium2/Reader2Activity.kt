@@ -10,7 +10,7 @@ import androidx.annotation.StringRes
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.app.TxContextWrappingDelegate
+import androidx.appcompat.app.TxContextWrappingDelegate2
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import io.reactivex.disposables.Disposable
@@ -130,8 +130,8 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
   private var controllerSubscription: Disposable? = null
   private var viewSubscription: Disposable? = null
 
-  private val appCompatDelegate: TxContextWrappingDelegate by lazy {
-    TxContextWrappingDelegate(super.getDelegate())
+  private val appCompatDelegate: TxContextWrappingDelegate2 by lazy {
+    TxContextWrappingDelegate2(super.getDelegate())
   }
 
   override fun getDelegate(): AppCompatDelegate {

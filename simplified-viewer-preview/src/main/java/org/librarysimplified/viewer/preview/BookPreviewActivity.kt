@@ -9,7 +9,7 @@ import androidx.activity.viewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.app.TxContextWrappingDelegate
+import androidx.appcompat.app.TxContextWrappingDelegate2
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import io.reactivex.disposables.Disposable
@@ -63,8 +63,8 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
 
   private val logger = LoggerFactory.getLogger(BookPreviewActivity::class.java)
 
-  private val appCompatDelegate: TxContextWrappingDelegate by lazy {
-    TxContextWrappingDelegate(super.getDelegate())
+  private val appCompatDelegate: TxContextWrappingDelegate2 by lazy {
+    TxContextWrappingDelegate2(super.getDelegate())
   }
 
   private val services =
