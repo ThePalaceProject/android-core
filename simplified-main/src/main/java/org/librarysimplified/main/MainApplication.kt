@@ -12,6 +12,7 @@ import org.nypl.simplified.boot.api.BootEvent
 import org.nypl.simplified.boot.api.BootLoader
 import org.nypl.simplified.boot.api.BootProcessType
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.ui.UIMigration
 import java.io.File
 import java.io.IOException
 
@@ -44,8 +45,13 @@ class MainApplication : Application() {
     this.configureStrictMode()
     this.logStartup()
     MainTransifex.configure(this.applicationContext)
-    this.boot.start(this)
+
     INSTANCE = this
+    if (UIMigration.isRunningNewUI(this.applicationContext)) {
+      // Nothing to do, currently
+    } else {
+      this.boot.start(this)
+    }
   }
 
   private fun logStartup() {
