@@ -564,8 +564,14 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
     this.logger.debug("TOC opening")
 
-    val transaction = this.supportFragmentManager.beginTransaction()
-      .hide(this.readerFragment)
+    // Work around a lifecycle related crash.
+    if (!this::readerFragment.isInitialized) {
+      return
+    }
+
+    val transaction =
+      this.supportFragmentManager.beginTransaction()
+        .hide(this.readerFragment)
 
     if (this.tocFragment.isAdded) {
       transaction.show(tocFragment)
