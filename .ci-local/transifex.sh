@@ -40,17 +40,13 @@ sha256sum -c .ci-local/transifex.sha256 ||
 # Apply transifex to the project's string resources.
 #
 
-STRING_FILES=$(find . -name strings.xml -type f) ||
-  fatal "could not list string files"
+java .ci-local/TransifexFindResources.java */src ||
+  fatal "could not merge string resources"
 
 TRANSIFEX_PUSH_ARGS="--verbose"
 TRANSIFEX_PUSH_ARGS="${TRANSIFEX_PUSH_ARGS} --token=${TRANSIFEX_TOKEN}"
 TRANSIFEX_PUSH_ARGS="${TRANSIFEX_PUSH_ARGS} --secret=${TRANSIFEX_SECRET}"
-
-for FILE in ${STRING_FILES}
-do
-  TRANSIFEX_PUSH_ARGS="${TRANSIFEX_PUSH_ARGS} --file=${FILE}"
-done
+TRANSIFEX_PUSH_ARGS="${TRANSIFEX_PUSH_ARGS} --file=Transifex.xml"
 
 info "Uploading Transifex strings"
 
