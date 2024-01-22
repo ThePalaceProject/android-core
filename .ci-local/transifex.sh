@@ -57,6 +57,9 @@ TRANSIFEX_PULL_ARGS="--token=${TRANSIFEX_TOKEN}"
 TRANSIFEX_PULL_ARGS="${TRANSIFEX_PULL_ARGS} --dir=simplified-app-palace/src/main/assets"
 TRANSIFEX_PULL_ARGS="${TRANSIFEX_PULL_ARGS} --locales=en"
 TRANSIFEX_PULL_ARGS="${TRANSIFEX_PULL_ARGS} --locales=es"
+TRANSIFEX_PULL_ARGS="${TRANSIFEX_PULL_ARGS} --locales=fr"
+TRANSIFEX_PULL_ARGS="${TRANSIFEX_PULL_ARGS} --locales=de"
+TRANSIFEX_PULL_ARGS="${TRANSIFEX_PULL_ARGS} --locales=it"
 
 info "Downloading Transifex strings"
 
