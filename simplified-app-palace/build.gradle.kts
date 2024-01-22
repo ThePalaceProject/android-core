@@ -121,7 +121,10 @@ android {
         versionName = versionNameText
         versionCode = calculateVersionCode()
         resourceConfigurations.add("en")
+        resourceConfigurations.add("de")
         resourceConfigurations.add("es")
+        resourceConfigurations.add("fr")
+        resourceConfigurations.add("it")
         setProperty("archivesBaseName", "palace")
     }
 
