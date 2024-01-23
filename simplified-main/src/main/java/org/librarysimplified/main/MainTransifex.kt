@@ -47,7 +47,7 @@ object MainTransifex {
       LocaleState(
         applicationContext,
         "en",
-        arrayOf("en", "es"),
+        arrayOf("en", "es", "fr", "de", "it"),
         null
       )
 
