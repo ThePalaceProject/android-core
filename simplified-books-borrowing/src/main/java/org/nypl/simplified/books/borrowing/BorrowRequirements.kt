@@ -1,5 +1,6 @@
 package org.nypl.simplified.books.borrowing
 
+import android.app.Application
 import org.joda.time.Instant
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.services.api.ServiceDirectoryType
@@ -20,6 +21,7 @@ import java.io.File
  */
 
 data class BorrowRequirements(
+  val application: Application,
   val adobeExecutor: AdobeAdeptExecutorType?,
   val audioBookManifestStrategies: AudioBookManifestStrategiesType,
   val axisNowService: AxisNowServiceType?,
@@ -40,11 +42,13 @@ data class BorrowRequirements(
   companion object {
     fun create(
       services: ServiceDirectoryType,
+      application: Application,
       clock: () -> Instant,
       cacheDirectory: File,
       temporaryDirectory: File
     ): BorrowRequirements {
       return BorrowRequirements(
+        application = application,
         adobeExecutor = services.optionalService(AdobeAdeptExecutorType::class.java),
         audioBookManifestStrategies = services.requireService(AudioBookManifestStrategiesType::class.java),
         axisNowService = services.optionalService(AxisNowServiceType::class.java),

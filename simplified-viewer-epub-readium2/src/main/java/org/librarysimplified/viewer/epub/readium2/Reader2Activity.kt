@@ -7,49 +7,37 @@ import android.os.Bundle
 import android.webkit.WebView
 import android.widget.Toast
 import androidx.annotation.StringRes
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import androidx.annotation.UiThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.TxContextWrappingDelegate2
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import io.reactivex.disposables.Disposable
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.runBlocking
 import org.joda.time.LocalDateTime
 import org.librarysimplified.mdc.MDCKeys
 import org.librarysimplified.r2.api.SR2Bookmark
 import org.librarysimplified.r2.api.SR2Command
 import org.librarysimplified.r2.api.SR2ControllerType
 import org.librarysimplified.r2.api.SR2Event
-import org.librarysimplified.r2.api.SR2Event.SR2CommandEvent.SR2CommandEventCompleted.SR2CommandExecutionFailed
-import org.librarysimplified.r2.api.SR2Event.SR2CommandEvent.SR2CommandEventCompleted.SR2CommandExecutionSucceeded
-import org.librarysimplified.r2.api.SR2Event.SR2CommandEvent.SR2CommandExecutionRunningLong
-import org.librarysimplified.r2.api.SR2Event.SR2CommandEvent.SR2CommandExecutionStarted
-import org.librarysimplified.r2.api.SR2Event.SR2CommandEvent.SR2CommandSearchResults
-import org.librarysimplified.r2.api.SR2Event.SR2Error.SR2ChapterNonexistent
-import org.librarysimplified.r2.api.SR2Event.SR2Error.SR2WebViewInaccessible
-import org.librarysimplified.r2.api.SR2Event.SR2ExternalLinkSelected
-import org.librarysimplified.r2.api.SR2PageNumberingMode
-import org.librarysimplified.r2.api.SR2ScrollingMode.SCROLLING_MODE_CONTINUOUS
-import org.librarysimplified.r2.api.SR2ScrollingMode.SCROLLING_MODE_PAGINATED
 import org.librarysimplified.r2.vanilla.SR2Controllers
 import org.librarysimplified.r2.views.SR2ControllerReference
+import org.librarysimplified.r2.views.SR2Fragment
 import org.librarysimplified.r2.views.SR2ReaderFragment
-import org.librarysimplified.r2.views.SR2ReaderFragmentFactory
-import org.librarysimplified.r2.views.SR2ReaderParameters
+import org.librarysimplified.r2.views.SR2ReaderModel
+import org.librarysimplified.r2.views.SR2ReaderViewCommand
+import org.librarysimplified.r2.views.SR2ReaderViewCommand.SR2ReaderViewNavigationReaderClose
+import org.librarysimplified.r2.views.SR2ReaderViewCommand.SR2ReaderViewNavigationSearchClose
+import org.librarysimplified.r2.views.SR2ReaderViewCommand.SR2ReaderViewNavigationSearchOpen
+import org.librarysimplified.r2.views.SR2ReaderViewCommand.SR2ReaderViewNavigationTOCClose
+import org.librarysimplified.r2.views.SR2ReaderViewCommand.SR2ReaderViewNavigationTOCOpen
 import org.librarysimplified.r2.views.SR2ReaderViewEvent
 import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewBookEvent.SR2BookLoadingFailed
 import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewControllerEvent.SR2ControllerBecameAvailable
-import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewNavigationEvent.SR2ReaderViewNavigationClose
-import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewNavigationEvent.SR2ReaderViewNavigationOpenSearch
-import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewNavigationEvent.SR2ReaderViewNavigationOpenTOC
-import org.librarysimplified.r2.views.SR2ReaderViewModel
-import org.librarysimplified.r2.views.SR2ReaderViewModelFactory
+import org.librarysimplified.r2.views.SR2SearchFragment
 import org.librarysimplified.r2.views.SR2TOCFragment
-import org.librarysimplified.r2.views.search.SR2SearchFragment
 import org.librarysimplified.services.api.Services
-import org.nypl.drm.core.AdobeAdeptFileAsset
-import org.nypl.drm.core.AxisNowFileAsset
-import org.nypl.drm.core.ContentProtectionProvider
 import org.nypl.simplified.accessibility.AccessibilityServiceType
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.analytics.api.AnalyticsEvent
@@ -57,33 +45,35 @@ import org.nypl.simplified.analytics.api.AnalyticsType
 import org.nypl.simplified.bookmarks.api.BookmarkServiceType
 import org.nypl.simplified.books.api.BookContentProtections
 import org.nypl.simplified.books.api.BookDRMInformation
-import org.nypl.simplified.books.api.bookmark.BookmarkKind
-import org.nypl.simplified.futures.FluentFutureExtensions.map
-import org.nypl.simplified.futures.FluentFutureExtensions.onAnyError
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.thread.api.UIThreadServiceType
-import org.readium.r2.shared.publication.asset.FileAsset
+import org.readium.r2.shared.util.Try
+import org.readium.r2.shared.util.asset.Asset
+import org.readium.r2.shared.util.asset.AssetRetriever
+import org.readium.r2.shared.util.asset.ContainerAsset
+import org.readium.r2.shared.util.http.DefaultHttpClient
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
+import org.nypl.drm.core.AdobeAdeptAssets
+import org.nypl.drm.core.AdobeAdeptLoan
+import org.nypl.drm.core.ContentProtectionProvider
+import org.nypl.simplified.books.api.bookmark.BookmarkKind
+import java.io.File
+import java.io.IOException
 import java.util.ServiceLoader
 import java.util.concurrent.ExecutionException
-
-/**
- * The main reader activity for reading an EPUB using Readium 2.
- */
+import org.nypl.simplified.futures.FluentFutureExtensions.map
+import org.nypl.simplified.futures.FluentFutureExtensions.onAnyError
 
 class Reader2Activity : AppCompatActivity(R.layout.reader2) {
+
+  private val logger =
+    LoggerFactory.getLogger(Reader2Activity::class.java)
 
   companion object {
 
     private const val ARG_PARAMETERS =
-      "org.nypl.simplified.viewer.epub.readium2.ReaderActivity2.parameters"
-
-    private const val READER_FRAGMENT_TAG =
-      "org.librarysimplified.r2.views.SR2ReaderFragment"
-
-    private const val TOC_FRAGMENT_TAG =
-      "org.librarysimplified.r2.views.SR2TOCFragment"
+      "org.librarysimplified.viewer.epub.readium2.Reader2Activity2.parameters"
 
     /**
      * Start a new reader for the given book.
@@ -95,40 +85,23 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     ) {
       val intent = Intent(context, Reader2Activity::class.java)
       val bundle = Bundle().apply {
-        this.putSerializable(ARG_PARAMETERS, parameters)
+        this.putSerializable(this@Companion.ARG_PARAMETERS, parameters)
       }
       intent.putExtras(bundle)
       context.startActivity(intent)
     }
   }
 
-  private val logger =
-    LoggerFactory.getLogger(Reader2Activity::class.java)
+  private var fragmentNow: Fragment? = null
+  private var subscriptions: CompositeDisposable = CompositeDisposable()
 
-  private val services =
-    Services.serviceDirectory()
-  private val accessibilityService =
-    services.requireService(AccessibilityServiceType::class.java)
-  private val analyticsService =
-    services.requireService(AnalyticsType::class.java)
-  private val bookmarkService =
-    services.requireService(BookmarkServiceType::class.java)
-  private val profilesController =
-    services.requireService(ProfilesControllerType::class.java)
-  private val uiThread =
-    services.requireService(UIThreadServiceType::class.java)
-  private val contentProtectionProviders =
-    ServiceLoader.load(ContentProtectionProvider::class.java).toList()
-
-  private lateinit var account: AccountType
+  private lateinit var accessibilityService: AccessibilityServiceType
+  private lateinit var analyticsService: AnalyticsType
+  private lateinit var bookmarkService: BookmarkServiceType
   private lateinit var parameters: Reader2ActivityParameters
-  private lateinit var readerFragment: Fragment
-  private lateinit var readerModel: SR2ReaderViewModel
-  private lateinit var searchFragment: Fragment
-  private lateinit var tocFragment: Fragment
-  private var controller: SR2ControllerType? = null
-  private var controllerSubscription: Disposable? = null
-  private var viewSubscription: Disposable? = null
+  private lateinit var profilesController: ProfilesControllerType
+  private lateinit var uiThread: UIThreadServiceType
+  private lateinit var account: AccountType
 
   private val appCompatDelegate: TxContextWrappingDelegate2 by lazy {
     TxContextWrappingDelegate2(super.getDelegate())
@@ -139,19 +112,27 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
-    this.logger.debug(
-      "loaded {} content protection providers",
-      this.contentProtectionProviders.size
-    )
-    this.contentProtectionProviders.forEachIndexed { index, provider ->
-      this.logger.debug("[{}] available provider {}", index, provider.javaClass.canonicalName)
-    }
+    super.onCreate(savedInstanceState)
 
+    val services = Services.serviceDirectory()
+
+    this.accessibilityService =
+      services.requireService(AccessibilityServiceType::class.java)
+    this.analyticsService =
+      services.requireService(AnalyticsType::class.java)
+    this.bookmarkService =
+      services.requireService(BookmarkServiceType::class.java)
+    this.profilesController =
+      services.requireService(ProfilesControllerType::class.java)
+    this.uiThread =
+      services.requireService(UIThreadServiceType::class.java)
+
+    this.subscriptions =
+      CompositeDisposable()
     val intent =
       this.intent ?: throw IllegalStateException("ReaderActivity2 requires an intent")
     val extras =
       intent.extras ?: throw IllegalStateException("ReaderActivity2 Intent lacks parameters")
-
     this.parameters =
       extras.getSerializable(ARG_PARAMETERS) as Reader2ActivityParameters
 
@@ -167,24 +148,12 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       this.account =
         this.profilesController.profileCurrent()
           .account(this.parameters.accountId)
-      MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID, account.provider.id.toString())
+      MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID, this.account.provider.id.toString())
     } catch (e: Exception) {
-      this.logger.error("unable to locate account: ", e)
+      this.logger.error("Unable to locate account: ", e)
       this.finish()
       return
     }
-
-    val readerParameters =
-      this.computeReaderParameters()
-
-    this.supportFragmentManager.fragmentFactory =
-      SR2ReaderFragmentFactory(readerParameters)
-
-    super.onCreate(savedInstanceState)
-
-    this.readerModel =
-      ViewModelProvider(this, SR2ReaderViewModelFactory(readerParameters))
-        .get(SR2ReaderViewModel::class.java)
 
     /*
      * Enable webview debugging for debug builds
@@ -194,40 +163,30 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       WebView.setWebContentsDebuggingEnabled(true)
     }
 
-    if (savedInstanceState == null) {
-      this.readerFragment =
-        this.supportFragmentManager.fragmentFactory.instantiate(
-          this.classLoader,
-          SR2ReaderFragment::class.java.name
-        )
-      this.searchFragment =
-        this.supportFragmentManager.fragmentFactory.instantiate(
-          this.classLoader,
-          SR2SearchFragment::class.java.name
-        )
-      this.tocFragment =
-        this.supportFragmentManager.fragmentFactory.instantiate(
-          this.classLoader,
-          SR2TOCFragment::class.java.name
-        )
-
-      this.supportFragmentManager.beginTransaction()
-        .add(R.id.reader2FragmentHost, this.readerFragment)
-        .commit()
-    }
+    this.switchFragment(Reader2LoadingFragment())
+    this.startReader()
   }
 
   override fun onStart() {
     super.onStart()
 
-    this.viewSubscription =
-      this.readerModel.viewEvents.subscribe(this::onViewEvent)
+    this.subscriptions = CompositeDisposable()
+    this.subscriptions.add(SR2ReaderModel.controllerEvents.subscribe(this::onControllerEvent))
+    this.subscriptions.add(SR2ReaderModel.viewCommands.subscribe(this::onViewCommandReceived))
+    this.subscriptions.add(SR2ReaderModel.viewEvents.subscribe(this::onViewEventReceived))
   }
 
   override fun onStop() {
     super.onStop()
-    this.controllerSubscription?.dispose()
-    this.viewSubscription?.dispose()
+
+    val fragment = this.fragmentNow
+    if (fragment != null) {
+      this.supportFragmentManager.beginTransaction()
+        .remove(fragment)
+        .commitAllowingStateLoss()
+    }
+
+    this.subscriptions.dispose()
 
     /*
      * If the activity is finishing, send an analytics event.
@@ -249,378 +208,332 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     }
   }
 
-  private fun computeReaderParameters(): SR2ReaderParameters {
-    /*
-     * Instantiate any content protections that might be needed for DRM...
-     */
+  /**
+   * Start the reader with the given EPUB.
+   */
 
-    val contentProtections = BookContentProtections.create(
-      context = this,
-      contentProtectionProviders = this.contentProtectionProviders,
-      drmInfo = this.parameters.drmInfo,
-      isManualPassphraseEnabled =
-      profilesController.profileCurrent().preferences().isManualLCPPassphraseEnabled,
-      onLCPDialogDismissed = {
-        finish()
-      }
-    )
+  @UiThread
+  private fun startReader() {
+    this.uiThread.checkIsUIThread()
 
-    /*
-     * Load the most recently configured theme from the profile's preferences.
-     */
-
-    val initialTheme =
-      Reader2Themes.toSR2(
+    try {
+      val profileCurrent =
         this.profilesController.profileCurrent()
-          .preferences()
-          .readerPreferences
-      )
 
-    val bookFile =
-      when (val drmInfo = this.parameters.drmInfo) {
-        is BookDRMInformation.ACS ->
-          AdobeAdeptFileAsset(
-            fileAsset = FileAsset(this.parameters.file),
-            adobeRightsFile = drmInfo.rights?.first
-          )
+      /*
+       * Load the most recently configured theme from the profile's preferences.
+       */
 
-        is BookDRMInformation.AXIS ->
-          AxisNowFileAsset(
-            fileAsset = FileAsset(this.parameters.file),
-            axisLicense = drmInfo.license,
-            axisUserKey = drmInfo.userKey
-          )
+      val initialTheme =
+        Reader2Themes.toSR2(profileCurrent.preferences().readerPreferences)
 
-        else -> FileAsset(this.parameters.file)
+      /*
+       * Instantiate any content protections that might be needed for DRM...
+       */
+
+      val contentProtectionProviders =
+        ServiceLoader.load(ContentProtectionProvider::class.java)
+          .toList()
+
+      contentProtectionProviders.forEachIndexed { index, contentProtectionProvider ->
+        this.logger.debug("[{}]: Content protection: {}", index, contentProtectionProvider)
       }
 
-    return SR2ReaderParameters(
-      contentProtections = contentProtections,
-      bookFile = bookFile,
-      bookId = this.parameters.entry.feedEntry.id,
-      isPreview = false,
-      theme = initialTheme,
-      controllers = SR2Controllers(),
-      scrollingMode = if (this.accessibilityService.spokenFeedbackEnabled) {
-        SCROLLING_MODE_CONTINUOUS
-      } else {
-        SCROLLING_MODE_PAGINATED
-      },
-      pageNumberingMode = SR2PageNumberingMode.WHOLE_BOOK
+      val contentProtections =
+        BookContentProtections.create(
+          context = this.application,
+          contentProtectionProviders = contentProtectionProviders,
+          drmInfo = this.parameters.drmInfo,
+          isManualPassphraseEnabled = profileCurrent.preferences().isManualLCPPassphraseEnabled,
+          onLCPDialogDismissed = {
+            this.logger.debug("Dismissed LCP dialog. Shutting down...")
+            this.finish()
+          }
+        )
+
+      this.logger.debug("Opening asset...")
+      val assetRetriever =
+        AssetRetriever(
+          contentResolver = this.contentResolver,
+          httpClient = DefaultHttpClient(),
+        )
+
+      val rawBookAsset =
+        when (val a =
+          runBlocking { assetRetriever.retrieve(this@Reader2Activity.parameters.file) }) {
+          is Try.Failure -> throw IOException(a.value.message)
+          is Try.Success -> a.value
+        }
+
+      this.logger.debug("DRM info: {}", this.parameters.drmInfo)
+      val bookAsset =
+        when (val drmInfo = this.parameters.drmInfo) {
+          is BookDRMInformation.LCP ->
+            rawBookAsset
+          is BookDRMInformation.ACS ->
+            this.openWithAdobe(rawBookAsset, drmInfo.rights)
+          is BookDRMInformation.AXIS ->
+            rawBookAsset
+          is BookDRMInformation.None ->
+            rawBookAsset
+        }
+
+      SR2ReaderModel.controllerCreate(
+        contentProtections = contentProtections,
+        bookFile = bookAsset,
+        bookId = this.parameters.bookId.value(),
+        theme = initialTheme,
+        context = this.application,
+        controllers = SR2Controllers(),
+      )
+    } catch (e: Exception) {
+      this.onBookLoadingFailed(e)
+    }
+  }
+
+  @Throws(IOException::class)
+  private fun openWithAdobe(
+    rawBookAsset: Asset,
+    rights: Pair<File, AdobeAdeptLoan>?
+  ): Asset {
+    if (rawBookAsset !is ContainerAsset) {
+      throw IOException("Attempted to open something that is not an EPUB file.")
+    }
+    if (rights == null) {
+      throw IOException("Missing Adobe rights information.")
+    }
+    return AdobeAdeptAssets.openAsset(
+      epubAsset = rawBookAsset,
+      rightsFile = rights.first
     )
   }
 
-  /**
-   * Handle incoming messages from the view fragments.
-   */
+  private fun switchFragment(fragment: Fragment) {
+    this.fragmentNow = fragment
+    this.supportFragmentManager.beginTransaction()
+      .replace(R.id.reader2FragmentHost, fragment)
+      .commit()
+  }
 
-  private fun onViewEvent(event: SR2ReaderViewEvent) {
+  @UiThread
+  private fun onViewEventReceived(event: SR2ReaderViewEvent) {
     this.uiThread.checkIsUIThread()
 
     return when (event) {
-      SR2ReaderViewNavigationClose ->
-        this.onBackPressed()
-
-      SR2ReaderViewNavigationOpenTOC ->
-        this.tocOpen()
-
-      is SR2ControllerBecameAvailable ->
-        this.onControllerBecameAvailable(event.reference)
-
-      is SR2BookLoadingFailed ->
+      is SR2BookLoadingFailed -> {
         this.onBookLoadingFailed(event.exception)
-
-      SR2ReaderViewNavigationOpenSearch -> {
-        this.openSearch()
+      }
+      is SR2ControllerBecameAvailable -> {
+        this.onControllerBecameAvailable(event.reference)
       }
     }
   }
 
-  private fun onControllerBecameAvailable(reference: SR2ControllerReference) {
-    this.controller = reference.controller
+  @UiThread
+  private fun onViewCommandReceived(command: SR2ReaderViewCommand) {
+    this.uiThread.checkIsUIThread()
 
-    /*
-     * Subscribe to messages from the controller.
-     */
-
-    this.controllerSubscription =
-      reference.controller.events.subscribe(this::onControllerEvent)
-
-    if (reference.isFirstStartup) {
-      val bookmarks =
-        Reader2Bookmarks.loadBookmarks(
-          bookmarkService = this.bookmarkService,
-          accountID = this.parameters.accountId,
-          bookID = this.parameters.bookId
-        )
-
-      reference.controller.submitCommand(SR2Command.BookmarksLoad(bookmarks))
-
-      val lastReadBookmarks = bookmarks.filter { bookmark ->
-        bookmark.type == SR2Bookmark.Type.LAST_READ
+    return when (command) {
+      SR2ReaderViewNavigationReaderClose -> {
+        this.finish()
       }
-
-      // if there's more than one last read bookmark, we'll need to compare their dates
-      if (lastReadBookmarks.size > 1) {
-        val localLastReadBookmark = lastReadBookmarks.first()
-        val serverLastReadBookmark = lastReadBookmarks.last()
-
-        if (serverLastReadBookmark.date.isAfter(localLastReadBookmark.date) &&
-          localLastReadBookmark.locator != serverLastReadBookmark.locator
-        ) {
-          showBookmarkPrompt(reference.controller, localLastReadBookmark, serverLastReadBookmark)
-        } else {
-          reference.controller.submitCommand(SR2Command.OpenChapter(localLastReadBookmark.locator))
-        }
-      } else if (lastReadBookmarks.isNotEmpty()) {
-        reference.controller.submitCommand(
-          SR2Command.OpenChapter(
-            lastReadBookmarks.first().locator
-          )
-        )
-      } else {
-        val startLocator = reference.controller.bookMetadata.start
-        reference.controller.submitCommand(SR2Command.OpenChapter(startLocator))
+      SR2ReaderViewNavigationSearchClose -> {
+        this.switchFragment(SR2ReaderFragment())
       }
-    } else {
-      // Refresh whatever the controller was looking at previously.
-      reference.controller.submitCommand(SR2Command.Refresh)
+      SR2ReaderViewNavigationSearchOpen -> {
+        this.switchFragment(SR2SearchFragment())
+      }
+      SR2ReaderViewNavigationTOCClose -> {
+        this.switchFragment(SR2ReaderFragment())
+      }
+      SR2ReaderViewNavigationTOCOpen -> {
+        this.switchFragment(SR2TOCFragment())
+      }
     }
   }
 
-  private fun showBookmarkPrompt(
-    controller: SR2ControllerType,
-    localLastReadBookmark: SR2Bookmark,
-    serverLastReadBookmark: SR2Bookmark
-  ) {
-    MaterialAlertDialogBuilder(this)
-      .setTitle(R.string.reader_position_title)
-      .setMessage(R.string.reader_position_message)
-      .setNegativeButton(R.string.reader_position_move) { dialog, _ ->
-        dialog.dismiss()
-        createLocalBookmarkFromPromptAction(
-          bookmark = serverLastReadBookmark
-        )
-        controller.submitCommand(
-          SR2Command.OpenChapter(
-            serverLastReadBookmark.locator
-          )
-        )
+  @UiThread
+  private fun onControllerEvent(event: SR2Event) {
+    this.uiThread.checkIsUIThread()
+
+    return when (event) {
+      is SR2Event.SR2BookmarkEvent.SR2BookmarkCreate -> {
+        this.onControllerEventBookmarkCreate(event)
       }
-      .setPositiveButton(R.string.reader_position_stay) { dialog, _ ->
-        dialog.dismiss()
-        createLocalBookmarkFromPromptAction(
-          bookmark = localLastReadBookmark
-        )
-        controller.submitCommand(
-          SR2Command.OpenChapter(
-            localLastReadBookmark.locator
-          )
-        )
+      is SR2Event.SR2BookmarkEvent.SR2BookmarkTryToDelete -> {
+        this.onControllerEventBookmarkTryDelete(event)
       }
-      .create()
-      .show()
+      is SR2Event.SR2ThemeChanged -> {
+        this.onControllerEventThemeChanged(event)
+      }
+
+      is SR2Event.SR2BookmarkEvent.SR2BookmarkCreated,
+      is SR2Event.SR2BookmarkEvent.SR2BookmarkDeleted,
+      SR2Event.SR2BookmarkEvent.SR2BookmarkFailedToBeDeleted,
+      SR2Event.SR2BookmarkEvent.SR2BookmarksLoaded,
+      is SR2Event.SR2CommandEvent.SR2CommandEventCompleted.SR2CommandExecutionFailed,
+      is SR2Event.SR2CommandEvent.SR2CommandEventCompleted.SR2CommandExecutionSucceeded,
+      is SR2Event.SR2CommandEvent.SR2CommandSearchResults,
+      is SR2Event.SR2CommandEvent.SR2CommandExecutionRunningLong,
+      is SR2Event.SR2CommandEvent.SR2CommandExecutionStarted,
+      is SR2Event.SR2Error.SR2ChapterNonexistent,
+      is SR2Event.SR2Error.SR2WebViewInaccessible,
+      is SR2Event.SR2ExternalLinkSelected,
+      is SR2Event.SR2OnCenterTapped,
+      is SR2Event.SR2ReadingPositionChanged -> {
+        // Ignored.
+      }
+    }
   }
 
-  private fun createLocalBookmarkFromPromptAction(bookmark: SR2Bookmark) {
-    // we need to create a local bookmark after choosing an option from the prompt because the local
-    // bookmark is no longer created when syncing from the server returns a last read location
-    // bookmark
-    this.bookmarkService.bookmarkCreateLocal(
-      accountID = this.parameters.accountId,
-      bookmark = Reader2Bookmarks.fromSR2Bookmark(
-        bookEntry = this.parameters.entry,
-        deviceId = Reader2Devices.deviceId(
-          this.profilesController,
-          this.parameters.bookId
-        ),
-        source = bookmark
+  @UiThread
+  private fun onControllerEventThemeChanged(event: SR2Event.SR2ThemeChanged) {
+    this.uiThread.checkIsUIThread()
+
+    this.profilesController.profileUpdate { current ->
+      current.copy(
+        preferences = current.preferences.copy(
+          readerPreferences = Reader2Themes.fromSR2(event.theme)
+        )
       )
-    )
+    }
+  }
+
+  @UiThread
+  private fun onControllerEventBookmarkTryDelete(
+    event: SR2Event.SR2BookmarkEvent.SR2BookmarkTryToDelete
+  ) {
+    this.uiThread.checkIsUIThread()
+
+    val bookmark =
+      Reader2Bookmarks.fromSR2Bookmark(
+        bookEntry = this.parameters.entry,
+        deviceId = Reader2Devices.deviceId(this.profilesController, this.parameters.bookId),
+        source = event.bookmark
+      )
+
+    this.bookmarkService.bookmarkDelete(
+      accountID = this.account.id,
+      bookmark = bookmark,
+      ignoreRemoteFailures = true
+    ).map {
+      event.onDeleteOperationFinished(true)
+    }.onAnyError {
+      event.onDeleteOperationFinished(false)
+    }
+  }
+
+  @UiThread
+  private fun onControllerEventBookmarkCreate(
+    event: SR2Event.SR2BookmarkEvent.SR2BookmarkCreate
+  ) {
+    this.uiThread.checkIsUIThread()
+
+    val localBookmark =
+      Reader2Bookmarks.fromSR2Bookmark(
+        bookEntry = this.parameters.entry,
+        deviceId = Reader2Devices.deviceId(this.profilesController, this.parameters.bookId),
+        source = event.bookmark
+      )
+
+    when (localBookmark.kind) {
+      BookmarkKind.BookmarkExplicit -> this.showToastMessage(R.string.reader_bookmark_adding)
+      BookmarkKind.BookmarkLastReadLocation -> Unit
+    }
+
+    this.bookmarkService.bookmarkCreate(
+      accountID = this.parameters.accountId,
+      bookmark = localBookmark,
+      ignoreRemoteFailures = true
+    ).map { createdBookmark ->
+      event.onBookmarkCreationCompleted(Reader2Bookmarks.toSR2Bookmark(createdBookmark))
+      when (createdBookmark.kind) {
+        BookmarkKind.BookmarkExplicit -> this.showToastMessage(R.string.reader_bookmark_added)
+        BookmarkKind.BookmarkLastReadLocation -> Unit
+      }
+    }
   }
 
   @Deprecated("Deprecated in Java")
   override fun onBackPressed() {
-    if (this::tocFragment.isInitialized) {
-      if (this.tocFragment.isVisible) {
-        this.tocClose()
-        return
-      }
-    }
+    return when (val f = this.fragmentNow) {
+      is SR2Fragment -> {
+        when (f) {
+          is SR2ReaderFragment -> {
+            super.onBackPressed()
+          }
 
-    if (this::searchFragment.isInitialized) {
-      if (this.searchFragment.isVisible) {
-        this.searchClose()
-        return
-      }
-    }
+          is SR2SearchFragment -> {
+            this.switchFragment(SR2ReaderFragment())
+          }
 
-    super.onBackPressed()
-  }
-
-  /**
-   * Handle incoming messages from the controller.
-   */
-
-  private fun onControllerEvent(
-    event: SR2Event
-  ) {
-    when (event) {
-      is SR2Event.SR2BookmarkEvent.SR2BookmarkCreate -> {
-        val localBookmark =
-          Reader2Bookmarks.fromSR2Bookmark(
-            bookEntry = this.parameters.entry,
-            deviceId = Reader2Devices.deviceId(this.profilesController, this.parameters.bookId),
-            source = event.bookmark
-          )
-
-        when (localBookmark.kind) {
-          BookmarkKind.BookmarkExplicit -> showToastMessage(R.string.reader_bookmark_adding)
-          BookmarkKind.BookmarkLastReadLocation -> Unit
-        }
-
-        this.bookmarkService.bookmarkCreate(
-          accountID = parameters.accountId,
-          bookmark = localBookmark,
-          ignoreRemoteFailures = true
-        ).map { createdBookmark ->
-          event.onBookmarkCreationCompleted(Reader2Bookmarks.toSR2Bookmark(createdBookmark))
-          when (createdBookmark.kind) {
-            BookmarkKind.BookmarkExplicit -> showToastMessage(R.string.reader_bookmark_added)
-            BookmarkKind.BookmarkLastReadLocation -> Unit
+          is SR2TOCFragment -> {
+            this.switchFragment(SR2ReaderFragment())
           }
         }
       }
-
-      is SR2Event.SR2BookmarkEvent.SR2BookmarkTryToDelete -> {
-        val bookmark =
-          Reader2Bookmarks.fromSR2Bookmark(
-            bookEntry = this.parameters.entry,
-            deviceId = Reader2Devices.deviceId(this.profilesController, this.parameters.bookId),
-            source = event.bookmark
-          )
-
-        bookmarkService.bookmarkDelete(
-          accountID = account.id,
-          bookmark = bookmark,
-          ignoreRemoteFailures = true
-        ).map {
-          event.onDeleteOperationFinished(true)
-        }.onAnyError {
-          event.onDeleteOperationFinished(false)
-        }
+      is Reader2LoadingFragment -> {
+        super.onBackPressed()
       }
-
-      is SR2Event.SR2ThemeChanged -> {
-        this.profilesController.profileUpdate { current ->
-          current.copy(
-            preferences = current.preferences.copy(
-              readerPreferences = Reader2Themes.fromSR2(event.theme)
-            )
-          )
-        }
-        Unit
+      null -> {
+        super.onBackPressed()
       }
-
-      is SR2Event.SR2OnCenterTapped,
-      is SR2Event.SR2ReadingPositionChanged,
-      SR2Event.SR2BookmarkEvent.SR2BookmarksLoaded,
-      SR2Event.SR2BookmarkEvent.SR2BookmarkFailedToBeDeleted,
-      is SR2Event.SR2BookmarkEvent.SR2BookmarkDeleted,
-      is SR2Event.SR2BookmarkEvent.SR2BookmarkCreated,
-      is SR2ChapterNonexistent,
-      is SR2WebViewInaccessible,
-      is SR2ExternalLinkSelected,
-      is SR2CommandExecutionStarted,
-      is SR2CommandExecutionRunningLong,
-      is SR2CommandExecutionSucceeded,
-      is SR2CommandExecutionFailed,
-      is SR2CommandSearchResults -> {
-        // Nothing
+      else -> {
+        throw IllegalStateException("Unrecognized fragment: $f")
       }
     }
   }
 
-  /**
-   * Close the table of contents.
-   */
-
-  private fun tocClose() {
+  @UiThread
+  private fun onControllerBecameAvailable(
+    reference: SR2ControllerReference
+  ) {
     this.uiThread.checkIsUIThread()
 
-    this.logger.debug("TOC closing")
-    this.supportFragmentManager.beginTransaction()
-      .hide(this.tocFragment)
-      .show(this.readerFragment)
-      .commit()
-  }
+    val bookmarks =
+      Reader2Bookmarks.loadBookmarks(
+        bookmarkService = this.bookmarkService,
+        accountID = this.parameters.accountId,
+        bookID = this.parameters.bookId
+      )
 
-  /**
-   * Open the table of contents.
-   */
+    reference.controller.submitCommand(SR2Command.BookmarksLoad(bookmarks))
 
-  private fun tocOpen() {
-    this.uiThread.checkIsUIThread()
-
-    this.logger.debug("TOC opening")
-
-    // Work around a lifecycle related crash.
-    if (!this::readerFragment.isInitialized) {
-      return
+    val lastReadBookmarks = bookmarks.filter { bookmark ->
+      bookmark.type == SR2Bookmark.Type.LAST_READ
     }
 
-    val transaction =
-      this.supportFragmentManager.beginTransaction()
-        .hide(this.readerFragment)
+    // If there's more than one last read bookmark, we'll need to compare their dates
+    if (lastReadBookmarks.size > 1) {
+      val localLastReadBookmark = lastReadBookmarks.first()
+      val serverLastReadBookmark = lastReadBookmarks.last()
 
-    if (this.tocFragment.isAdded) {
-      transaction.show(tocFragment)
+      if (serverLastReadBookmark.date.isAfter(localLastReadBookmark.date) &&
+        localLastReadBookmark.locator != serverLastReadBookmark.locator
+      ) {
+        this.showBookmarkPrompt(reference.controller, localLastReadBookmark, serverLastReadBookmark)
+      } else {
+        reference.controller.submitCommand(SR2Command.OpenChapter(localLastReadBookmark.locator))
+      }
+    } else if (lastReadBookmarks.isNotEmpty()) {
+      reference.controller.submitCommand(
+        SR2Command.OpenChapter(
+          lastReadBookmarks.first().locator
+        )
+      )
     } else {
-      transaction.add(R.id.reader2FragmentHost, this.tocFragment)
+      val startLocator = reference.controller.bookMetadata.start
+      reference.controller.submitCommand(SR2Command.OpenChapter(startLocator))
     }
 
-    transaction.commit()
-  }
-
-  /**
-   * Close the searching screen
-   */
-
-  private fun searchClose() {
-    this.uiThread.checkIsUIThread()
-
-    this.logger.debug("Search closing")
-    this.supportFragmentManager.beginTransaction()
-      .hide(this.searchFragment)
-      .show(this.readerFragment)
-      .commit()
-  }
-
-  /**
-   * Open the searching screen
-   */
-
-  private fun openSearch() {
-    this.uiThread.checkIsUIThread()
-
-    this.logger.debug("Search opening")
-
-    val transaction = this.supportFragmentManager.beginTransaction()
-      .hide(this.readerFragment)
-
-    if (this.searchFragment.isAdded) {
-      transaction.show(searchFragment)
-    } else {
-      transaction.add(R.id.reader2FragmentHost, this.searchFragment)
-    }
-
-    transaction.commit()
+    this.switchFragment(SR2ReaderFragment())
   }
 
   /**
    * Loading a book failed.
    */
 
+  @UiThread
   private fun onBookLoadingFailed(
     exception: Throwable
   ) {
@@ -647,8 +560,46 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       .show()
   }
 
+  @UiThread
+  private fun showBookmarkPrompt(
+    controller: SR2ControllerType,
+    localLastReadBookmark: SR2Bookmark,
+    serverLastReadBookmark: SR2Bookmark
+  ) {
+    this.uiThread.checkIsUIThread()
+
+    MaterialAlertDialogBuilder(this)
+      .setTitle(R.string.reader_position_title)
+      .setMessage(R.string.reader_position_message)
+      .setNegativeButton(R.string.reader_position_move) { dialog, _ ->
+        dialog.dismiss()
+        this.createLocalBookmarkFromPromptAction(bookmark = serverLastReadBookmark)
+        controller.submitCommand(SR2Command.OpenChapter(serverLastReadBookmark.locator))
+      }
+      .setPositiveButton(R.string.reader_position_stay) { dialog, _ ->
+        dialog.dismiss()
+        this.createLocalBookmarkFromPromptAction(bookmark = localLastReadBookmark)
+        controller.submitCommand(SR2Command.OpenChapter(localLastReadBookmark.locator))
+      }
+      .create()
+      .show()
+  }
+
+  private fun createLocalBookmarkFromPromptAction(
+    bookmark: SR2Bookmark
+  ) {
+    this.bookmarkService.bookmarkCreateLocal(
+      accountID = this.parameters.accountId,
+      bookmark = Reader2Bookmarks.fromSR2Bookmark(
+        bookEntry = this.parameters.entry,
+        deviceId = Reader2Devices.deviceId(this.profilesController, this.parameters.bookId),
+        source = bookmark
+      )
+    )
+  }
+
   private fun showToastMessage(@StringRes messageRes: Int) {
-    runOnUiThread {
+    this.uiThread.runOnUIThread {
       Toast.makeText(this, messageRes, Toast.LENGTH_SHORT).show()
     }
   }

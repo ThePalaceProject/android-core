@@ -1,5 +1,7 @@
 package org.nypl.simplified.books.audio
 
+import android.app.Application
+
 /**
  * A provider of strategies to fulfill/parse/license check manifests.
  */
@@ -13,6 +15,7 @@ interface AudioBookManifestStrategiesType {
    */
 
   fun createStrategy(
+    context: Application,
     request: AudioBookManifestRequest
   ): AudioBookManifestStrategyType
 }

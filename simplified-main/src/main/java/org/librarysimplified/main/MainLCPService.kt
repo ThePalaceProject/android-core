@@ -1,7 +1,10 @@
 package org.librarysimplified.main
 
-import android.content.Context
+import android.app.Application
 import org.readium.r2.lcp.LcpService
+import org.readium.r2.shared.util.asset.AssetRetriever
+import org.readium.r2.shared.util.downloads.android.AndroidDownloadManager
+import org.readium.r2.shared.util.http.DefaultHttpClient
 
 /**
  * The main LCP service.
@@ -15,8 +18,18 @@ object MainLCPService {
    */
 
   fun createConditionally(
-    context: Context
+    context: Application
   ): LcpService? {
-    return LcpService(context)
+    val assetRetriever =
+      AssetRetriever(
+        contentResolver = context.contentResolver,
+        httpClient = DefaultHttpClient()
+      )
+
+    return LcpService(
+      context = context,
+      assetRetriever = assetRetriever,
+      downloadManager = AndroidDownloadManager(context)
+    )
   }
 }

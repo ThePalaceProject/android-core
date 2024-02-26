@@ -1,5 +1,6 @@
 package org.nypl.simplified.tests.books.book_database
 
+import android.app.Application
 import android.content.Context
 import com.io7m.jfunctional.Option
 import org.joda.time.DateTime
@@ -33,7 +34,7 @@ abstract class BookDatabaseAudioBookContract {
   private val accountID =
     AccountID(UUID.fromString("46d17029-14ba-4e34-bcaa-def02713575a"))
 
-  protected abstract fun context(): Context
+  protected abstract fun context(): Application
 
   /**
    * Setting and unsetting DRM works.

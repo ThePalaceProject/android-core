@@ -1,5 +1,6 @@
 package org.nypl.simplified.tests.books.borrowing
 
+import android.app.Application
 import android.content.Context
 import io.reactivex.disposables.Disposable
 import okhttp3.mockwebserver.MockResponse
@@ -105,7 +106,7 @@ class BorrowLimitLoanTest {
       )
 
     val androidContext =
-      Mockito.mock(Context::class.java)
+      Mockito.mock(Application::class.java)
 
     this.httpClient =
       LSHTTPClients()
@@ -137,6 +138,7 @@ class BorrowLimitLoanTest {
 
     this.context =
       MockBorrowContext(
+        application = androidContext,
         logger = this.logger,
         bookRegistry = this.bookRegistry,
         bundledContent = this.bundledContent,

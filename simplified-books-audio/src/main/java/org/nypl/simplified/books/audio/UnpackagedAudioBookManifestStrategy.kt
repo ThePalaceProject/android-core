@@ -1,5 +1,6 @@
 package org.nypl.simplified.books.audio
 
+import android.app.Application
 import com.io7m.junreachable.UnimplementedCodeException
 import org.librarysimplified.audiobook.api.PlayerResult
 import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentBasicCredentials
@@ -24,8 +25,9 @@ import org.slf4j.LoggerFactory
  */
 
 class UnpackagedAudioBookManifestStrategy(
+  context: Application,
   private val request: AudioBookManifestRequest
-) : AbstractAudioBookManifestStrategy(request) {
+) : AbstractAudioBookManifestStrategy(context, request) {
 
   private val logger =
     LoggerFactory.getLogger(UnpackagedAudioBookManifestStrategy::class.java)

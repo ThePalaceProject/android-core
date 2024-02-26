@@ -1,6 +1,6 @@
 package org.nypl.simplified.books.book_database
 
-import android.content.Context
+import android.app.Application
 import com.fasterxml.jackson.databind.ObjectMapper
 import one.irradia.mime.api.MIMEType
 import org.nypl.simplified.books.api.BookFormat
@@ -19,7 +19,7 @@ internal data class DatabaseFormatHandleParameters(
    * An Android context.
    */
 
-  val context: Context,
+  val context: Application,
 
   /**
    * The ID of the book to which the owning database entry belongs.

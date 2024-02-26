@@ -1,5 +1,6 @@
 package org.nypl.simplified.tests.books.profiles
 
+import android.app.Application
 import android.content.Context
 import com.io7m.jfunctional.Option
 import io.reactivex.subjects.PublishSubject
@@ -47,7 +48,7 @@ abstract class ProfilesDatabaseContract {
   private lateinit var credentialStore: FakeAccountCredentialStorage
   private lateinit var profileEvents: PublishSubject<ProfileEvent>
 
-  protected abstract fun context(): Context
+  protected abstract fun context(): Application
 
   @BeforeEach
   open fun setup() {

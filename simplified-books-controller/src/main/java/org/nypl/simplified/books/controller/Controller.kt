@@ -1,5 +1,6 @@
 package org.nypl.simplified.books.controller
 
+import android.app.Application
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.FluentFuture
 import com.google.common.util.concurrent.ListeningExecutorService
@@ -90,6 +91,7 @@ import java.util.concurrent.ExecutorService
  */
 
 class Controller private constructor(
+  private val application: Application,
   private val cacheDirectory: File,
   private val accountEvents: Subject<AccountEvent>,
   private val profileEvents: Subject<ProfileEvent>,
@@ -159,6 +161,7 @@ class Controller private constructor(
   init {
     this.borrowRequirements =
       BorrowRequirements.create(
+        application = this.application,
         services = this.services,
         clock = { Instant.now() },
         cacheDirectory = this.cacheDirectory,
@@ -746,12 +749,14 @@ class Controller private constructor(
 
     fun createFromServiceDirectory(
       services: ServiceDirectoryType,
+      application: Application,
       executorService: ExecutorService,
       accountEvents: Subject<AccountEvent>,
       profileEvents: Subject<ProfileEvent>,
       cacheDirectory: File
     ): Controller {
       return Controller(
+        application = application,
         cacheDirectory = cacheDirectory,
         accountEvents = accountEvents,
         profileEvents = profileEvents,

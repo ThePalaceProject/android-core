@@ -1,5 +1,6 @@
 package org.nypl.simplified.tests.books.audio
 
+import android.app.Application
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -30,6 +31,7 @@ class AudioBookManifestStrategyTest {
   private val logger =
     LoggerFactory.getLogger(AudioBookManifestStrategyTest::class.java)
 
+  private lateinit var context: Application
   private lateinit var basicStrategies: ManifestFulfillmentBasicType
   private lateinit var basicStrategy: ManifestFulfillmentStrategyType
   private lateinit var fulfillError: ManifestFulfillmentErrorType
@@ -41,6 +43,8 @@ class AudioBookManifestStrategyTest {
 
   @BeforeEach
   fun testSetup() {
+    this.context =
+      Mockito.mock(Application::class.java)
     this.basicStrategy =
       Mockito.mock(ManifestFulfillmentStrategyType::class.java)
     this.basicStrategies =
@@ -70,7 +74,8 @@ class AudioBookManifestStrategyTest {
   fun testNoBasicStrategyAvailable() {
     val strategy =
       UnpackagedAudioBookManifestStrategy(
-        AudioBookManifestRequest(
+        context = this.context,
+        request = AudioBookManifestRequest(
           targetURI = URI.create("http://www.example.com"),
           contentType = BookFormats.audioBookGenericMimeTypes().first(),
           userAgent = PlayerUserAgent("test"),
@@ -111,7 +116,8 @@ class AudioBookManifestStrategyTest {
 
     val strategy =
       UnpackagedAudioBookManifestStrategy(
-        AudioBookManifestRequest(
+        context = this.context,
+        request = AudioBookManifestRequest(
           targetURI = URI.create("http://www.example.com"),
           contentType = BookFormats.audioBookGenericMimeTypes().first(),
           userAgent = PlayerUserAgent("test"),
@@ -159,7 +165,8 @@ class AudioBookManifestStrategyTest {
 
     val strategy =
       UnpackagedAudioBookManifestStrategy(
-        AudioBookManifestRequest(
+        context = this.context,
+        request = AudioBookManifestRequest(
           targetURI = URI.create("http://www.example.com"),
           contentType = BookFormats.audioBookGenericMimeTypes().first(),
           userAgent = PlayerUserAgent("test"),
@@ -210,7 +217,8 @@ class AudioBookManifestStrategyTest {
 
     val strategy =
       UnpackagedAudioBookManifestStrategy(
-        AudioBookManifestRequest(
+        context = this.context,
+        request = AudioBookManifestRequest(
           targetURI = URI.create("http://www.example.com"),
           contentType = BookFormats.audioBookGenericMimeTypes().first(),
           userAgent = PlayerUserAgent("test"),
@@ -262,7 +270,8 @@ class AudioBookManifestStrategyTest {
 
     val strategy =
       UnpackagedAudioBookManifestStrategy(
-        AudioBookManifestRequest(
+        context = this.context,
+        request = AudioBookManifestRequest(
           targetURI = URI.create("http://www.example.com"),
           contentType = BookFormats.audioBookGenericMimeTypes().first(),
           userAgent = PlayerUserAgent("test"),
@@ -285,7 +294,8 @@ class AudioBookManifestStrategyTest {
   fun testNoNetworkLoadFails() {
     val strategy =
       UnpackagedAudioBookManifestStrategy(
-        AudioBookManifestRequest(
+        context = this.context,
+        request = AudioBookManifestRequest(
           targetURI = URI.create("http://www.example.com"),
           contentType = BookFormats.audioBookGenericMimeTypes().first(),
           userAgent = PlayerUserAgent("test"),
@@ -305,7 +315,8 @@ class AudioBookManifestStrategyTest {
   fun testNoNetworkLoadSucceeds() {
     val strategy =
       UnpackagedAudioBookManifestStrategy(
-        AudioBookManifestRequest(
+        context = this.context,
+        request = AudioBookManifestRequest(
           targetURI = URI.create("http://www.example.com"),
           contentType = BookFormats.audioBookGenericMimeTypes().first(),
           userAgent = PlayerUserAgent("test"),

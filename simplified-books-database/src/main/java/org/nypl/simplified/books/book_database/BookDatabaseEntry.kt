@@ -1,6 +1,6 @@
 package org.nypl.simplified.books.book_database
 
-import android.content.Context
+import android.app.Application
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.base.Preconditions
 import net.jcip.annotations.GuardedBy
@@ -30,7 +30,7 @@ import java.util.EnumMap
  */
 
 internal class BookDatabaseEntry internal constructor(
-  private val context: Context,
+  private val context: Application,
   private val bookDir: File,
   private val serializer: OPDSJSONSerializerType,
   private val formats: BookFormatSupportType,
@@ -254,7 +254,7 @@ internal class BookDatabaseEntry internal constructor(
      */
 
     private fun createFormatHandleIfRequired(
-      context: Context,
+      context: Application,
       logger: Logger,
       objectMapper: ObjectMapper,
       constructors: EnumMap<BookFormats.BookFormatDefinition, DatabaseBookFormatHandleConstructor>,

@@ -1,6 +1,6 @@
 package org.nypl.simplified.accounts.database.api
 
-import android.content.Context
+import android.app.Application
 import io.reactivex.subjects.Subject
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentialsStoreType
 import org.nypl.simplified.accounts.api.AccountEvent
@@ -36,7 +36,7 @@ interface AccountsDatabaseFactoryType {
     accountProviders: AccountProviderRegistryType,
     bookDatabases: BookDatabaseFactoryType,
     bookFormatSupport: BookFormatSupportType,
-    context: Context,
+    context: Application,
     directory: File,
     directoryGraveyard: File
   ): AccountsDatabaseType
@@ -60,7 +60,7 @@ interface AccountsDatabaseFactoryType {
     accountEvents: Subject<AccountEvent>,
     accountProviders: AccountProviderRegistryType,
     bookFormatSupport: BookFormatSupportType,
-    context: Context,
+    context: Application,
     directory: File,
     directoryGraveyard: File
   ): AccountsDatabaseType

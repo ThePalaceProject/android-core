@@ -1,5 +1,6 @@
 package org.librarysimplified.viewer.audiobook
 
+import android.app.Application
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -108,9 +109,12 @@ class AudioBookLoadingFragment : Fragment() {
           this.progress.progress = 0
         }
 
-        val manifestData = this.downloadAndSaveManifest(credentials)
-        val authorization = manifestData.fulfilled.authorization
-        val manifest = manifestData.manifest
+        val manifestData =
+          this.downloadAndSaveManifest(this.requireActivity().application, credentials)
+        val authorization =
+          manifestData.fulfilled.authorization
+        val manifest =
+          manifestData.manifest
 
         this.uiThread.runOnUIThread {
           this.progress.isIndeterminate = false
@@ -130,14 +134,16 @@ class AudioBookLoadingFragment : Fragment() {
   }
 
   private fun downloadAndSaveManifest(
+    application: Application,
     credentials: AccountAuthenticationCredentials?
   ): AudioBookManifestData {
     val strategy =
       this.playerParameters.toManifestStrategy(
-        this.strategies,
-        this.listener::onLoadingFragmentIsNetworkConnectivityAvailable,
-        credentials,
-        this.requireContext().cacheDir
+        application = application,
+        strategies = this.strategies,
+        isNetworkAvailable = this.listener::onLoadingFragmentIsNetworkConnectivityAvailable,
+        credentials = credentials,
+        cacheDirectory = application.cacheDir
       )
     return when (val strategyResult = strategy.execute()) {
       is TaskResult.Success -> {

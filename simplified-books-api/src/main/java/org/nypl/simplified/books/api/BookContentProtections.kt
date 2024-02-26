@@ -1,12 +1,13 @@
 package org.nypl.simplified.books.api
 
-import android.content.Context
-import org.nypl.drm.core.ContentProtectionProvider
+import android.app.Application
 import org.nypl.simplified.lcp.LCPContentProtectionProvider
-import org.readium.r2.shared.publication.ContentProtection
+import org.readium.r2.shared.publication.protection.ContentProtection
 import org.slf4j.LoggerFactory
+import org.nypl.drm.core.ContentProtectionProvider
 
 object BookContentProtections {
+
   private val logger =
     LoggerFactory.getLogger(BookContentProtections::class.java)
 
@@ -15,7 +16,7 @@ object BookContentProtections {
    */
 
   fun create(
-    context: Context,
+    context: Application,
     contentProtectionProviders: List<ContentProtectionProvider>,
     drmInfo: BookDRMInformation,
     isManualPassphraseEnabled: Boolean = false,

@@ -153,6 +153,7 @@ dependencies {
     implementation(libs.picasso)
     implementation(libs.play.services.basement)
     implementation(libs.play.services.tasks)
+    implementation(libs.r2.shared)
     implementation(libs.r2.lcp)
     implementation(libs.rxandroid2)
     implementation(libs.rxjava2)

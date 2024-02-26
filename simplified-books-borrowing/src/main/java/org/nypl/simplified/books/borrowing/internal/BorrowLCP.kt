@@ -33,11 +33,13 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskType
 import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.nypl.simplified.opds.core.OPDSAcquisitionPaths
 import org.nypl.simplified.opds.core.OPDSFeedParserType
-import org.readium.r2.lcp.LcpException
 import org.readium.r2.lcp.license.model.LicenseDocument
+import org.readium.r2.shared.util.ErrorException
+import org.readium.r2.shared.util.Try
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.IOException
 import java.net.URI
 
 /**
@@ -289,15 +291,26 @@ class BorrowLCP private constructor() : BorrowSubtaskType {
     val temporaryFile = context.temporaryFile("zip")
 
     try {
-      val license = LicenseDocument(licenseBytes)
-      val link = license.link(LicenseDocument.Rel.publication)
-      val url = link?.url
-        ?: throw LcpException.Parsing.Url(rel = LicenseDocument.Rel.publication.rawValue)
+      val license =
+        when (val r = LicenseDocument.fromBytes(licenseBytes)) {
+          is Try.Failure -> throw ErrorException(r.value)
+          is Try.Success -> r.value
+        }
+
+      val link =
+        license.link(LicenseDocument.Rel.Publication)
+      val url =
+        URI.create(
+          link
+            ?.url()
+            ?.toString()
+            ?: throw IOException("Unparseable license link ($link)")
+        )
 
       val downloadRequest =
         BorrowHTTP.createDownloadRequest(
           context = context,
-          target = url.toURI(),
+          target = url,
           outputFile = temporaryFile,
           requestModifier = { properties ->
             properties.copy(

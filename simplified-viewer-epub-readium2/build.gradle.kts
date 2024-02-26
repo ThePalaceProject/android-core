@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.jsoup)
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlin.stdlib)
+    implementation(libs.kotlinx.coroutines)
     implementation(libs.palace.drm.core)
     implementation(libs.palace.readium2.api)
     implementation(libs.palace.readium2.vanilla)

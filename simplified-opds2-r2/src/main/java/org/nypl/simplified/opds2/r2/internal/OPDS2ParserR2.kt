@@ -5,6 +5,7 @@ import org.nypl.simplified.parser.api.ParseError
 import org.nypl.simplified.parser.api.ParseResult
 import org.nypl.simplified.parser.api.ParserType
 import org.readium.r2.opds.OPDS2Parser
+import org.readium.r2.shared.util.Url
 import java.io.InputStream
 import java.net.URI
 
@@ -16,7 +17,7 @@ class OPDS2ParserR2(
 
   override fun parse(): ParseResult<OPDS2Feed> {
     return try {
-      val data = OPDS2Parser.parse(stream.readBytes(), uri.toURL())
+      val data = OPDS2Parser.parse(stream.readBytes(), Url.Companion.invoke(uri.toString())!!)
       ParseResult.Failure(
         warnings = listOf(),
         errors = listOf(

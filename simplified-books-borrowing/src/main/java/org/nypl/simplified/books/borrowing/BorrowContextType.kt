@@ -1,5 +1,6 @@
 package org.nypl.simplified.books.borrowing
 
+import android.app.Application
 import org.joda.time.Instant
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.services.api.ServiceDirectoryType
@@ -28,6 +29,7 @@ import java.net.URI
  */
 
 interface BorrowContextType {
+  val application: Application
   val account: AccountType
   val adobeExecutor: AdobeAdeptExecutorType?
   val axisNowService: AxisNowServiceType?

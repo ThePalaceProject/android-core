@@ -1,12 +1,10 @@
 package org.nypl.simplified.accounts.database
 
-import android.content.Context
-
+import android.app.Application
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.base.Preconditions
 import com.io7m.jfunctional.FunctionType
 import io.reactivex.subjects.Subject
-
 import net.jcip.annotations.GuardedBy
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentialsStoreType
 import org.nypl.simplified.accounts.api.AccountDescription
@@ -39,11 +37,9 @@ import org.nypl.simplified.files.FileLocking
 import org.nypl.simplified.files.FileUtilities
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.slf4j.LoggerFactory
-
 import java.io.File
 import java.io.IOException
 import java.net.URI
-import java.util.ArrayList
 import java.util.Collections
 import java.util.Objects
 import java.util.SortedMap
@@ -55,7 +51,7 @@ import java.util.concurrent.ConcurrentSkipListMap
  */
 
 class AccountsDatabase private constructor(
-  private val context: Context,
+  private val context: Application,
   private val directory: File,
   private val directoryGraveyard: File,
   private val accountEvents: Subject<AccountEvent>,
@@ -443,7 +439,7 @@ class AccountsDatabase private constructor(
 
     @Throws(AccountsDatabaseException::class)
     fun open(
-      context: Context,
+      context: Application,
       accountEvents: Subject<AccountEvent>,
       bookDatabases: BookDatabaseFactoryType,
       bookFormatSupport: BookFormatSupportType,
@@ -538,7 +534,7 @@ class AccountsDatabase private constructor(
       accountEvents: Subject<AccountEvent>,
       bookDatabases: BookDatabaseFactoryType,
       bookFormatSupport: BookFormatSupportType,
-      context: Context,
+      context: Application,
       directory: File,
       directoryGraveyard: File,
       errors: MutableList<Exception>,
@@ -676,7 +672,7 @@ class AccountsDatabase private constructor(
       accountProviderResolver: (String) -> AccountProviderType?,
       bookDatabases: BookDatabaseFactoryType,
       bookFormatSupport: BookFormatSupportType,
-      context: Context,
+      context: Application,
       credentialsStore: AccountAuthenticationCredentialsStoreType,
       directory: File,
       directoryGraveyard: File,

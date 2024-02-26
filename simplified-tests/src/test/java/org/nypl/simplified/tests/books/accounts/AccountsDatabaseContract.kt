@@ -1,5 +1,6 @@
 package org.nypl.simplified.tests.books.accounts
 
+import android.app.Application
 import android.content.Context
 import io.reactivex.subjects.PublishSubject
 import org.hamcrest.BaseMatcher
@@ -39,7 +40,7 @@ abstract class AccountsDatabaseContract {
   private lateinit var credentialStore: FakeAccountCredentialStorage
   private lateinit var profileEvents: PublishSubject<ProfileEvent>
 
-  protected abstract fun context(): Context
+  protected abstract fun context(): Application
 
   @BeforeEach
   open fun setup() {

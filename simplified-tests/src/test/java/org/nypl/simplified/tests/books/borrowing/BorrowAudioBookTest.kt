@@ -1,5 +1,6 @@
 package org.nypl.simplified.tests.books.borrowing
 
+import android.app.Application
 import android.content.Context
 import io.reactivex.disposables.Disposable
 import org.joda.time.Instant
@@ -137,7 +138,7 @@ class BorrowAudioBookTest {
       )
 
     val androidContext =
-      Mockito.mock(Context::class.java)
+      Mockito.mock(Application::class.java)
 
     this.httpClient =
       LSHTTPClients()
@@ -181,6 +182,7 @@ class BorrowAudioBookTest {
 
     this.context =
       MockBorrowContext(
+        application = androidContext,
         account = this.account,
         bookDatabaseEntry = this.bookDatabaseEntry,
         bookInitial = bookInitial,

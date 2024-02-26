@@ -1,5 +1,6 @@
 package org.nypl.simplified.tests.http.refresh_token.sync
 
+import android.app.Application
 import android.content.Context
 import com.google.common.util.concurrent.ListeningExecutorService
 import com.google.common.util.concurrent.MoreExecutors
@@ -84,6 +85,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 class SyncBookRefreshToken {
+  private lateinit var androidContext: Application
   private lateinit var account: MockAccount
   private lateinit var accountEvents: PublishSubject<AccountEvent>
   private lateinit var accountID: AccountID
@@ -155,12 +157,12 @@ class SyncBookRefreshToken {
     )
 
     this.account.setLoginState(AccountLoginState.AccountLoggedIn(credentials))
+    this.androidContext = Mockito.mock(Application::class.java)
     this.accountEvents = PublishSubject.create()
     this.audioBookManifestStrategies = Mockito.mock(AudioBookManifestStrategiesType::class.java)
     this.authDocumentParsers = Mockito.mock(AuthenticationDocumentParsersType::class.java)
     this.bookFormatSupport = MockBookFormatSupport()
-    this.bookRegistry =
-      BookRegistry.create()
+    this.bookRegistry = BookRegistry.create()
     this.bookPreviewRegistry = BookPreviewRegistry(DirectoryUtilities.directoryCreateTemporary())
     this.borrowSubtasks = BorrowSubtasks.directory()
     this.cacheDirectory = File.createTempFile("book-borrow-tmp", "dir")
@@ -302,6 +304,7 @@ class SyncBookRefreshToken {
     services.putService(ProfilesDatabaseType::class.java, profiles)
 
     return Controller.createFromServiceDirectory(
+      application = this.androidContext,
       services = services,
       executorService = exec,
       accountEvents = accountEvents,

@@ -1,5 +1,6 @@
 package org.nypl.simplified.tests.books.borrowing
 
+import android.app.Application
 import android.content.Context
 import io.reactivex.disposables.Disposable
 import okhttp3.mockwebserver.Dispatcher
@@ -138,7 +139,7 @@ class BorrowSAMLDownloadTest {
       MockAccountProviders.fakeProvider("urn:uuid:ea9480d4-5479-4ef1-b1d1-84ccbedb680f")
 
     val androidContext =
-      Mockito.mock(Context::class.java)
+      Mockito.mock(Application::class.java)
 
     this.httpClient =
       LSHTTPClients()
@@ -181,6 +182,7 @@ class BorrowSAMLDownloadTest {
 
     this.context =
       MockBorrowContext(
+        application = androidContext,
         logger = this.logger,
         bookRegistry = this.bookRegistry,
         bundledContent = this.bundledContent,

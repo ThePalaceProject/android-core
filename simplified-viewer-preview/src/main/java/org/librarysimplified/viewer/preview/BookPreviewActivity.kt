@@ -5,48 +5,59 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.FrameLayout
 import android.widget.ProgressBar
-import androidx.activity.viewModels
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import androidx.annotation.UiThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.TxContextWrappingDelegate2
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
-import io.reactivex.disposables.Disposable
+import androidx.fragment.app.Fragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.runBlocking
 import org.librarysimplified.mdc.MDCKeys
-import org.librarysimplified.r2.api.SR2Command
-import org.librarysimplified.r2.api.SR2PageNumberingMode
-import org.librarysimplified.r2.api.SR2ScrollingMode
-import org.librarysimplified.r2.api.SR2Theme
+import org.librarysimplified.r2.api.SR2Event
 import org.librarysimplified.r2.vanilla.SR2Controllers
 import org.librarysimplified.r2.views.SR2ControllerReference
+import org.librarysimplified.r2.views.SR2Fragment
 import org.librarysimplified.r2.views.SR2ReaderFragment
-import org.librarysimplified.r2.views.SR2ReaderParameters
+import org.librarysimplified.r2.views.SR2ReaderModel
+import org.librarysimplified.r2.views.SR2ReaderViewCommand
 import org.librarysimplified.r2.views.SR2ReaderViewEvent
-import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewBookEvent.SR2BookLoadingFailed
-import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewControllerEvent.SR2ControllerBecameAvailable
-import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewNavigationEvent.SR2ReaderViewNavigationClose
-import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewNavigationEvent.SR2ReaderViewNavigationOpenSearch
-import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewNavigationEvent.SR2ReaderViewNavigationOpenTOC
-import org.librarysimplified.r2.views.SR2ReaderViewModel
-import org.librarysimplified.r2.views.SR2ReaderViewModelFactory
+import org.librarysimplified.r2.views.SR2SearchFragment
 import org.librarysimplified.r2.views.SR2TOCFragment
-import org.librarysimplified.r2.views.search.SR2SearchFragment
 import org.librarysimplified.services.api.Services
+import org.librarysimplified.viewer.epub.readium2.Reader2Themes
+import org.nypl.drm.core.ContentProtectionProvider
 import org.nypl.simplified.accessibility.AccessibilityServiceType
+import org.nypl.simplified.books.api.BookContentProtections
+import org.nypl.simplified.books.api.BookDRMInformation
+import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
 import org.nypl.simplified.books.book_registry.BookPreviewStatus
+import org.nypl.simplified.books.controller.api.BooksPreviewControllerType
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.thread.api.UIThreadServiceType
-import org.readium.r2.shared.publication.asset.FileAsset
+import org.readium.r2.shared.util.Try
+import org.readium.r2.shared.util.asset.AssetRetriever
+import org.readium.r2.shared.util.http.DefaultHttpClient
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import java.io.File
+import java.io.IOException
+import java.util.ServiceLoader
+import java.util.UUID
+import java.util.concurrent.ExecutionException
 
 class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
 
+  private val logger =
+    LoggerFactory.getLogger(BookPreviewActivity::class.java)
+
   companion object {
 
-    private const val EXTRA_ENTRY = "org.nypl.simplified.viewer.preview.BookPreviewActivity.entry"
+    private const val EXTRA_ENTRY =
+      "org.nypl.simplified.viewer.preview.BookPreviewActivity.entry"
 
     fun startActivity(
       context: Activity,
@@ -54,52 +65,56 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
     ) {
       val intent = Intent(context, BookPreviewActivity::class.java)
       val bundle = Bundle().apply {
-        this.putSerializable(EXTRA_ENTRY, feedEntry)
+        this.putSerializable(this@Companion.EXTRA_ENTRY, feedEntry)
       }
       intent.putExtras(bundle)
       context.startActivity(intent)
     }
   }
 
-  private val logger = LoggerFactory.getLogger(BookPreviewActivity::class.java)
-
   private val appCompatDelegate: TxContextWrappingDelegate2 by lazy {
     TxContextWrappingDelegate2(super.getDelegate())
   }
 
-  private val services =
-    Services.serviceDirectory()
-  private val accessibilityService =
-    services.requireService(AccessibilityServiceType::class.java)
-  private val uiThread =
-    services.requireService(UIThreadServiceType::class.java)
-
-  private val viewModel: BookPreviewViewModel by viewModels(
-    factoryProducer = {
-      BookPreviewViewModelFactory(
-        services
-      )
-    }
-  )
-
+  private lateinit var profilesController: ProfilesControllerType
+  private lateinit var previewController: BooksPreviewControllerType
+  private lateinit var previewRegistry: BookPreviewRegistryType
+  private lateinit var accessibilityService: AccessibilityServiceType
   private lateinit var feedEntry: FeedEntry.FeedEntryOPDS
   private lateinit var loadingProgress: ProgressBar
   private lateinit var previewContainer: FrameLayout
-  private lateinit var readerFragment: SR2ReaderFragment
-  private lateinit var readerModel: SR2ReaderViewModel
-  private lateinit var searchFragment: SR2SearchFragment
-  private lateinit var tocFragment: SR2TOCFragment
+  private lateinit var uiThread: UIThreadServiceType
 
+  private var fragmentNow: Fragment? = null
+  private var subscriptions: CompositeDisposable = CompositeDisposable()
   private var file: File? = null
-  private var viewSubscription: Disposable? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    loadingProgress = findViewById(R.id.loading_progress)
-    previewContainer = findViewById(R.id.preview_container)
+    val services =
+      Services.serviceDirectory()
 
-    this.feedEntry = intent.getSerializableExtra(EXTRA_ENTRY) as FeedEntry.FeedEntryOPDS
+    this.profilesController =
+      services.requireService(ProfilesControllerType::class.java)
+    this.accessibilityService =
+      services.requireService(AccessibilityServiceType::class.java)
+    this.uiThread =
+      services.requireService(UIThreadServiceType::class.java)
+    this.previewRegistry =
+      services.requireService(BookPreviewRegistryType::class.java)
+    this.previewController =
+      services.requireService(BooksPreviewControllerType::class.java)
+
+    this.loadingProgress =
+      this.findViewById(R.id.loading_progress)
+    this.previewContainer =
+      this.findViewById(R.id.preview_container)
+
+    this.loadingProgress.max = 100
+
+    this.feedEntry =
+      this.intent.getSerializableExtra(EXTRA_ENTRY) as FeedEntry.FeedEntryOPDS
 
     MDC.put(MDCKeys.BOOK_TITLE, this.feedEntry.feedEntry.title)
     MDC.put(MDCKeys.BOOK_ID, this.feedEntry.feedEntry.id)
@@ -107,101 +122,152 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
     MDC.remove(MDCKeys.BOOK_DRM)
     MDC.remove(MDCKeys.BOOK_FORMAT)
 
-    this.viewModel.previewStatusLive.observe(this, this::onNewBookPreviewStatus)
+    this.previewController.handleBookPreviewStatus(this.feedEntry)
+  }
 
-    handleFeedEntry()
+  private fun switchFragment(fragment: Fragment) {
+    this.fragmentNow = fragment
+    this.supportFragmentManager.beginTransaction()
+      .replace(R.id.preview_container, fragment)
+      .commitAllowingStateLoss()
   }
 
   override fun getDelegate(): AppCompatDelegate {
     return this.appCompatDelegate
   }
 
-  override fun onStop() {
-    super.onStop()
-    this.viewSubscription?.dispose()
+  override fun onStart() {
+    super.onStart()
+    this.subscriptions = CompositeDisposable()
+    this.subscriptions.add(
+      this.previewRegistry.observeBookPreviewStatus()
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(this::onNewBookPreviewStatus)
+    )
+    this.subscriptions.add(SR2ReaderModel.controllerEvents.subscribe(this::onControllerEvent))
+    this.subscriptions.add(SR2ReaderModel.viewCommands.subscribe(this::onViewCommandReceived))
+    this.subscriptions.add(SR2ReaderModel.viewEvents.subscribe(this::onViewEventReceived))
   }
 
+  override fun onStop() {
+    super.onStop()
+    this.subscriptions.dispose()
+  }
+
+  @Deprecated("Deprecated in Java")
   override fun onBackPressed() {
-    if (::tocFragment.isInitialized && this.tocFragment.isVisible) {
-      this.closeTOC()
-    } else if (::searchFragment.isInitialized && this.searchFragment.isVisible) {
-      this.closeSearch()
-    } else {
-      if (file?.exists() == true) {
-        file?.delete()
+    return when (val f = this.fragmentNow) {
+      is SR2Fragment -> {
+        when (f) {
+          is SR2ReaderFragment -> {
+            super.onBackPressed()
+          }
+          is SR2SearchFragment -> {
+            this.switchFragment(SR2ReaderFragment())
+          }
+          is SR2TOCFragment -> {
+            this.switchFragment(SR2ReaderFragment())
+          }
+        }
       }
-      super.onBackPressed()
+      null -> {
+        super.onBackPressed()
+      }
+      else -> {
+        super.onBackPressed()
+      }
     }
   }
 
-  private fun handleFeedEntry() {
-    viewModel.handlePreviewStatus(feedEntry)
-  }
-
-  private fun onViewEvent(event: SR2ReaderViewEvent) {
+  @UiThread
+  private fun onViewEventReceived(event: SR2ReaderViewEvent) {
     this.uiThread.checkIsUIThread()
 
     return when (event) {
-      SR2ReaderViewNavigationClose -> {
-        onBackPressed()
+      is SR2ReaderViewEvent.SR2ReaderViewBookEvent.SR2BookLoadingFailed -> {
+        this.onBookLoadingFailed(event.exception)
       }
-      SR2ReaderViewNavigationOpenTOC -> {
-        openTOC()
-      }
-      is SR2ControllerBecameAvailable -> {
+      is SR2ReaderViewEvent.SR2ReaderViewControllerEvent.SR2ControllerBecameAvailable -> {
         this.onControllerBecameAvailable(event.reference)
-      }
-      is SR2BookLoadingFailed -> {
-        handlePreviewDownloadFailed()
-      }
-      SR2ReaderViewNavigationOpenSearch -> {
-        openSearch()
       }
     }
   }
 
   private fun onControllerBecameAvailable(reference: SR2ControllerReference) {
-    if (reference.isFirstStartup) {
-      val startLocator = reference.controller.bookMetadata.start
-      reference.controller.submitCommand(SR2Command.OpenChapter(startLocator))
-    } else {
-      // Refresh whatever the controller was looking at previously.
-      reference.controller.submitCommand(SR2Command.Refresh)
+    this.switchFragment(SR2ReaderFragment())
+  }
+
+  @UiThread
+  private fun onViewCommandReceived(command: SR2ReaderViewCommand) {
+    this.uiThread.checkIsUIThread()
+
+    return when (command) {
+      SR2ReaderViewCommand.SR2ReaderViewNavigationReaderClose -> {
+        this.finish()
+      }
+      SR2ReaderViewCommand.SR2ReaderViewNavigationSearchClose -> {
+        this.switchFragment(SR2ReaderFragment())
+      }
+      SR2ReaderViewCommand.SR2ReaderViewNavigationSearchOpen -> {
+        this.switchFragment(SR2SearchFragment())
+      }
+      SR2ReaderViewCommand.SR2ReaderViewNavigationTOCClose -> {
+        this.switchFragment(SR2ReaderFragment())
+      }
+      SR2ReaderViewCommand.SR2ReaderViewNavigationTOCOpen -> {
+        this.switchFragment(SR2TOCFragment())
+      }
     }
+  }
+
+  @UiThread
+  private fun onControllerEvent(event: SR2Event) {
+    this.uiThread.checkIsUIThread()
   }
 
   private fun onNewBookPreviewStatus(previewStatus: BookPreviewStatus) {
     when (previewStatus) {
       is BookPreviewStatus.HasPreview.Downloading -> {
+        val received = previewStatus.currentTotalBytes
+        val expected = previewStatus.expectedTotalBytes
+
         this.logger.debug(
-          "book preview downloading: {} {} {}", previewStatus.currentTotalBytes,
-          previewStatus.expectedTotalBytes, previewStatus.bytesPerSecond
+          "Book preview downloading: {} {} {}", received,
+          expected, previewStatus.bytesPerSecond
         )
+
+        if (received != null && expected != null) {
+          val percent = (received.toDouble() / expected.toDouble()) * 100.0
+          this.loadingProgress.isIndeterminate = false
+          this.loadingProgress.setProgress(percent.toInt())
+        } else {
+          this.loadingProgress.isIndeterminate = true
+        }
       }
+
       is BookPreviewStatus.HasPreview.DownloadFailed -> {
-        this.logger.debug("book preview download failed")
-        handlePreviewDownloadFailed()
+        this.logger.debug("Book preview download failed")
+        this.handlePreviewDownloadFailed()
       }
+
       is BookPreviewStatus.HasPreview.Ready.Embedded -> {
-        this.logger.debug("embedded book preview")
+        this.logger.debug("Embedded book preview")
         this.loadingProgress.isVisible = false
-        supportFragmentManager.beginTransaction()
-          .add(
-            R.id.preview_container,
-            BookPreviewEmbeddedFragment.newInstance(previewStatus.url.toString())
-          )
-          .commitAllowingStateLoss()
+        this.switchFragment(BookPreviewEmbeddedFragment.newInstance(previewStatus.url.toString()))
       }
+
       is BookPreviewStatus.HasPreview.Ready.BookPreview -> {
-        this.logger.debug("book preview")
+        this.logger.debug("Book preview")
         this.loadingProgress.isVisible = false
-        openReader(previewStatus.file)
+        this.openReader(previewStatus.file)
       }
+
       is BookPreviewStatus.HasPreview.Ready.AudiobookPreview -> {
-        this.logger.debug("audiobook preview")
+        this.logger.debug("Audiobook preview")
         this.loadingProgress.isVisible = false
-        openPlayer(previewStatus.file)
+        this.openPlayer(previewStatus.file)
       }
+
       else -> {
         // do nothing
       }
@@ -218,111 +284,107 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
   }
 
   private fun openPlayer(file: File) {
+    this.logger.debug("openPlayer: {}", file)
     this.file = file
 
-    val audiobookPreviewPlayer = BookPreviewAudiobookFragment.newInstance(file, feedEntry)
+    val audiobookPreviewPlayer = BookPreviewAudiobookFragment.newInstance(file, this.feedEntry)
     this.supportFragmentManager.beginTransaction()
       .add(R.id.preview_container, audiobookPreviewPlayer)
       .commitAllowingStateLoss()
   }
 
   private fun openReader(file: File) {
+    this.logger.debug("openReader: {}", file)
     this.file = file
 
-    val parameters = getReaderParameters(file)
-
-    this.readerModel =
-      ViewModelProvider(this, SR2ReaderViewModelFactory(parameters))
-        .get(SR2ReaderViewModel::class.java)
-
-    this.viewSubscription =
-      this.readerModel.viewEvents.subscribe(this::onViewEvent)
-
-    readerFragment = SR2ReaderFragment.create(
-      parameters = parameters
-    )
-
-    searchFragment = SR2SearchFragment.create(
-      parameters = parameters
-    )
-
-    tocFragment = SR2TOCFragment.create(
-      parameters = parameters
-    )
-
-    this.supportFragmentManager.beginTransaction()
-      .add(R.id.preview_container, readerFragment)
-      .commitAllowingStateLoss()
-  }
-
-  private fun openTOC() {
     this.uiThread.checkIsUIThread()
 
-    this.logger.debug("TOC opening")
+    try {
+      val profileCurrent =
+        this.profilesController.profileCurrent()
 
-    val transaction = this.supportFragmentManager.beginTransaction()
-      .hide(readerFragment)
+      /*
+       * Load the most recently configured theme from the profile's preferences.
+       */
 
-    if (tocFragment.isAdded) {
-      transaction.show(tocFragment)
-    } else {
-      transaction.add(R.id.preview_container, tocFragment)
+      val initialTheme =
+        Reader2Themes.toSR2(profileCurrent.preferences().readerPreferences)
+
+      /*
+       * Instantiate any content protections that might be needed for DRM...
+       */
+
+      val contentProtectionProviders =
+        ServiceLoader.load(ContentProtectionProvider::class.java)
+          .toList()
+
+      val contentProtections =
+        BookContentProtections.create(
+          context = this.application,
+          contentProtectionProviders = contentProtectionProviders,
+          drmInfo = BookDRMInformation.None,
+          isManualPassphraseEnabled = false,
+          onLCPDialogDismissed = {
+            this.logger.debug("Dismissed LCP dialog. Shutting down...")
+            this.finish()
+          }
+        )
+
+      this.logger.debug("Opening asset...")
+      val assetRetriever =
+        AssetRetriever(
+          contentResolver = this.contentResolver,
+          httpClient = DefaultHttpClient(),
+        )
+
+      val rawBookAsset =
+        when (val a =
+          runBlocking { assetRetriever.retrieve(file) }) {
+          is Try.Failure -> throw IOException(a.value.message)
+          is Try.Success -> a.value
+        }
+
+      SR2ReaderModel.controllerCreate(
+        contentProtections = contentProtections,
+        bookFile = rawBookAsset,
+        bookId = UUID.randomUUID().toString(),
+        theme = initialTheme,
+        context = this.application,
+        controllers = SR2Controllers(),
+      )
+    } catch (e: Exception) {
+      this.onBookLoadingFailed(e)
     }
-
-    transaction.commitAllowingStateLoss()
   }
 
-  private fun closeTOC() {
+  /**
+   * Loading a book failed.
+   */
+
+  @UiThread
+  private fun onBookLoadingFailed(
+    exception: Throwable
+  ) {
     this.uiThread.checkIsUIThread()
 
-    this.logger.debug("TOC closing")
-    this.supportFragmentManager.beginTransaction()
-      .hide(this.tocFragment)
-      .show(this.readerFragment)
-      .commit()
-  }
-
-  private fun openSearch() {
-    this.uiThread.checkIsUIThread()
-
-    this.logger.debug("Search opening")
-
-    val transaction = this.supportFragmentManager.beginTransaction()
-      .hide(readerFragment)
-
-    if (searchFragment.isAdded) {
-      transaction.show(searchFragment)
-    } else {
-      transaction.add(R.id.preview_container, searchFragment)
-    }
-
-    transaction.commitAllowingStateLoss()
-  }
-
-  private fun closeSearch() {
-    this.uiThread.checkIsUIThread()
-
-    this.logger.debug("Search closing")
-    this.supportFragmentManager.beginTransaction()
-      .hide(this.searchFragment)
-      .show(this.readerFragment)
-      .commit()
-  }
-
-  private fun getReaderParameters(file: File): SR2ReaderParameters {
-    return SR2ReaderParameters(
-      contentProtections = listOf(),
-      controllers = SR2Controllers(),
-      bookFile = FileAsset(file),
-      bookId = feedEntry.feedEntry.id,
-      isPreview = true,
-      pageNumberingMode = SR2PageNumberingMode.WHOLE_BOOK,
-      scrollingMode = if (this.accessibilityService.spokenFeedbackEnabled) {
-        SR2ScrollingMode.SCROLLING_MODE_CONTINUOUS
+    val actualException =
+      if (exception is ExecutionException) {
+        exception.cause ?: exception
       } else {
-        SR2ScrollingMode.SCROLLING_MODE_PAGINATED
-      },
-      theme = SR2Theme()
-    )
+        exception
+      }
+
+    MaterialAlertDialogBuilder(this)
+      .setTitle(org.librarysimplified.viewer.epub.readium2.R.string.bookOpenFailedTitle)
+      .setMessage(
+        this.getString(
+          org.librarysimplified.viewer.epub.readium2.R.string.bookOpenFailedMessage,
+          actualException.javaClass.name,
+          actualException.message
+        )
+      )
+      .setOnDismissListener { this.finish() }
+      .create()
+      .show()
   }
 }

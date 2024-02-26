@@ -1,5 +1,7 @@
 package org.nypl.simplified.tests.books.borrowing
 
+import android.app.Application
+import android.content.ContentResolver
 import android.content.Context
 import com.io7m.jfunctional.Option
 import io.reactivex.disposables.Disposable
@@ -93,6 +95,9 @@ import org.nypl.simplified.tests.mocking.MockBorrowSubtaskDirectory
 import org.nypl.simplified.tests.mocking.MockBundledContentResolver
 import org.nypl.simplified.tests.mocking.MockContentResolver
 import org.nypl.simplified.tests.mocking.MockLCPService
+import org.readium.r2.shared.util.asset.AssetRetriever
+import org.readium.r2.shared.util.downloads.foreground.ForegroundDownloadManager
+import org.readium.r2.shared.util.http.DefaultHttpClient
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URI
@@ -112,6 +117,7 @@ class BorrowTaskTest {
 </fulfillmentToken>
   """
 
+  private lateinit var androidContentResolver: ContentResolver
   private lateinit var account: AccountType
   private lateinit var accountId: AccountID
   private lateinit var accountProvider: AccountProvider
@@ -142,6 +148,8 @@ class BorrowTaskTest {
   private lateinit var subtasks: MockBorrowSubtaskDirectory
   private lateinit var temporaryDirectory: File
   private lateinit var webServer: MockWebServer
+  private lateinit var androidContext: Application
+
   private var bookRegistrySub: Disposable? = null
 
   private val logger = LoggerFactory.getLogger(BorrowTaskTest::class.java)
@@ -159,6 +167,7 @@ class BorrowTaskTest {
 
     return BorrowTask.createBorrowTask(
       requirements = BorrowRequirements(
+        application = this.androidContext,
         adobeExecutor = this.adobeExecutor,
         audioBookManifestStrategies = this.audioBookManifestStrategies,
         axisNowService = this.axisNowService,
@@ -215,8 +224,10 @@ class BorrowTaskTest {
     this.bookID =
       BookIDs.newFromOPDSEntry(this.opdsOpenEPUBFeedEntry)
 
-    val androidContext =
-      Mockito.mock(Context::class.java)
+    this.androidContext =
+      Mockito.mock(Application::class.java)
+    this.androidContentResolver =
+      Mockito.mock(ContentResolver::class.java)
 
     this.bookDatabase =
       BookDatabase.open(
@@ -332,7 +343,17 @@ class BorrowTaskTest {
     this.axisNowService =
       MockAxisNowService()
     this.lcpService =
-      MockLCPService()
+      MockLCPService(
+        context = this.androidContext,
+        downloadManager = ForegroundDownloadManager(
+          httpClient = DefaultHttpClient(),
+          downloadsDirectory = this.temporaryDirectory
+        ),
+        assetRetriever = AssetRetriever(
+          contentResolver = this.androidContentResolver,
+          httpClient = DefaultHttpClient()
+        )
+      )
   }
 
   @AfterEach
