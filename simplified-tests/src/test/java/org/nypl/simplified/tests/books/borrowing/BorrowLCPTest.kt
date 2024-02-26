@@ -1,5 +1,7 @@
 package org.nypl.simplified.tests.books.borrowing
 
+import android.app.Application
+import android.content.ContentResolver
 import android.content.Context
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.mockwebserver.MockResponse
@@ -9,6 +11,7 @@ import org.joda.time.Instant
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.librarysimplified.http.api.LSHTTPClientConfiguration
@@ -59,6 +62,9 @@ import org.nypl.simplified.tests.mocking.MockBundledContentResolver
 import org.nypl.simplified.tests.mocking.MockContentResolver
 import org.nypl.simplified.tests.mocking.MockLCPService
 import org.readium.r2.lcp.LcpService
+import org.readium.r2.shared.util.asset.AssetRetriever
+import org.readium.r2.shared.util.downloads.foreground.ForegroundDownloadManager
+import org.readium.r2.shared.util.http.DefaultHttpClient
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileOutputStream
@@ -70,6 +76,9 @@ import java.util.zip.ZipFile
 
 class BorrowLCPTest {
 
+  private lateinit var androidContentResolver: ContentResolver
+  private lateinit var downloadsDirectory: File
+  private lateinit var androidContext: Application
   private lateinit var account: AccountType
   private lateinit var accountId: AccountID
   private lateinit var accountProvider: AccountProvider
@@ -89,9 +98,16 @@ class BorrowLCPTest {
   var tempDir: File? = null
 
   @BeforeEach
-  fun testSetup() {
+  fun testSetup(@TempDir directory: File) {
     this.webServer = MockWebServer()
     this.webServer.start(20000)
+
+    this.androidContext =
+      Mockito.mock(Application::class.java)
+    this.androidContentResolver =
+      Mockito.mock(ContentResolver::class.java)
+    this.downloadsDirectory =
+      directory
 
     this.taskRecorder =
       TaskRecorder.create()
@@ -214,6 +230,7 @@ class BorrowLCPTest {
     )
 
     val context = MockBorrowContext(
+      application = this.androidContext,
       logger = this.logger,
       bookRegistry = this.bookRegistry,
       bundledContent = this.bundledContent,
@@ -232,6 +249,15 @@ class BorrowLCPTest {
     context.currentAcquisitionPathElement = acquisitionPath.elements.first()
     context.services = this.services
     context.lcpService = MockLCPService(
+      context = this.androidContext,
+      downloadManager = ForegroundDownloadManager(
+        httpClient = DefaultHttpClient(),
+        downloadsDirectory = this.downloadsDirectory,
+      ),
+      assetRetriever = AssetRetriever(
+        contentResolver = this.androidContentResolver,
+        httpClient = DefaultHttpClient()
+      ),
       publication = if (downloadedFile == null) {
         null
       } else {
@@ -250,6 +276,7 @@ class BorrowLCPTest {
   }
 
   @Test
+  @Disabled("This test now requires an actually valid LCP license.")
   fun epubDownload_succeeds() {
     val feedEntry = BorrowTestFeeds.opdsLCPFeedEntryOfType(
       webServer = this.webServer,
@@ -451,6 +478,7 @@ class BorrowLCPTest {
   }
 
   @Test
+  @Disabled("This test now requires an actually valid LCP license.")
   fun audioBookDownload_succeeds() {
     val feedEntry = BorrowTestFeeds.opdsLCPFeedEntryOfType(
       webServer = this.webServer,

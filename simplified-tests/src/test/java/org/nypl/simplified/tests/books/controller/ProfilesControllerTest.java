@@ -1,5 +1,6 @@
 package org.nypl.simplified.tests.books.controller;
 
+import android.app.Application;
 import android.content.Context;
 
 import org.mockito.Mockito;
@@ -9,8 +10,8 @@ import org.slf4j.LoggerFactory;
 public final class ProfilesControllerTest extends ProfilesControllerContract {
 
   @Override
-  protected Context context() {
-    return Mockito.mock(Context.class);
+  protected Application context() {
+    return Mockito.mock(Application.class);
   }
 
 

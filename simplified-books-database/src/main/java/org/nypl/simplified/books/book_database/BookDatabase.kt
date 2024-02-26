@@ -1,6 +1,6 @@
 package org.nypl.simplified.books.book_database
 
-import android.content.Context
+import android.app.Application
 import com.io7m.jnull.Nullable
 import net.jcip.annotations.GuardedBy
 import org.nypl.simplified.accounts.api.AccountID
@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentSkipListMap
  */
 
 class BookDatabase private constructor(
-  private val context: Context,
+  private val context: Application,
   private val owner: AccountID,
   private val directory: File,
   private val maps: BookMaps,
@@ -169,7 +169,7 @@ class BookDatabase private constructor(
 
     @Throws(BookDatabaseException::class)
     fun open(
-      context: Context,
+      context: Application,
       parser: OPDSJSONParserType,
       serializer: OPDSJSONSerializerType,
       formats: BookFormatSupportType,
@@ -209,7 +209,7 @@ class BookDatabase private constructor(
     }
 
     private fun openAllBooks(
-      context: Context,
+      context: Application,
       parser: OPDSJSONParserType,
       serializer: OPDSJSONSerializerType,
       formats: BookFormatSupportType,
@@ -249,7 +249,7 @@ class BookDatabase private constructor(
 
     @Nullable
     private fun openOneEntry(
-      context: Context,
+      context: Application,
       parser: OPDSJSONParserType,
       serializer: OPDSJSONSerializerType,
       formats: BookFormatSupportType,

@@ -32,6 +32,9 @@ import java.util.concurrent.TimeUnit
 
 class BookPreviewAudiobookFragment : Fragment(), AudioManager.OnAudioFocusChangeListener {
 
+  private val logger =
+    LoggerFactory.getLogger(BookPreviewAudiobookFragment::class.java)
+
   companion object {
     private const val BUNDLE_EXTRA_FILE =
       "org.librarysimplified.viewer.preview.BookPreviewAudiobookFragment.file"
@@ -43,30 +46,28 @@ class BookPreviewAudiobookFragment : Fragment(), AudioManager.OnAudioFocusChange
 
     fun newInstance(file: File, feedEntry: FeedEntry.FeedEntryOPDS): BookPreviewAudiobookFragment {
       return BookPreviewAudiobookFragment().apply {
-        arguments = Bundle().apply {
-          putSerializable(BUNDLE_EXTRA_FILE, file)
-          putSerializable(BUNDLE_EXTRA_FEED_ENTRY, feedEntry)
+        this.arguments = Bundle().apply {
+          this.putSerializable(this@Companion.BUNDLE_EXTRA_FILE, file)
+          this.putSerializable(this@Companion.BUNDLE_EXTRA_FEED_ENTRY, feedEntry)
         }
       }
     }
   }
 
-  private val logger = LoggerFactory.getLogger(BookPreviewAudiobookFragment::class.java)
-
   private val services = Services.serviceDirectory()
 
   private val covers =
-    services.requireService(BookCoverProviderType::class.java)
+    this.services.requireService(BookCoverProviderType::class.java)
 
   private val audioManager by lazy {
-    requireActivity().getSystemService(Context.AUDIO_SERVICE) as AudioManager
+    this.requireActivity().getSystemService(Context.AUDIO_SERVICE) as AudioManager
   }
   private var audioRequest: AudioFocusRequest? = null
 
   private val playerMediaReceiver by lazy {
     BookPreviewPlayerMediaReceiver(
       onAudioBecomingNoisy = {
-        onPauseButtonPressed(
+        this.onPauseButtonPressed(
           abandonAudioFocus = false
         )
       }
@@ -110,9 +111,11 @@ class BookPreviewAudiobookFragment : Fragment(), AudioManager.OnAudioFocusChange
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    this.audioFile = requireArguments().getSerializable(BUNDLE_EXTRA_FILE)
+    this.audioFile = this.requireArguments()
+      .getSerializable(BUNDLE_EXTRA_FILE)
       as? File ?: throw RuntimeException("Invalid file")
-    this.feedEntry = requireArguments().getSerializable(BUNDLE_EXTRA_FEED_ENTRY)
+    this.feedEntry = this.requireArguments()
+      .getSerializable(BUNDLE_EXTRA_FEED_ENTRY)
       as? FeedEntry.FeedEntryOPDS ?: throw RuntimeException("Invalid entry")
 
     this.previewAuthor = view.findViewById(R.id.player_author)
@@ -126,62 +129,64 @@ class BookPreviewAudiobookFragment : Fragment(), AudioManager.OnAudioFocusChange
     this.previewTitle = view.findViewById(R.id.player_title)
     this.toolbar = view.findViewById(R.id.toolbar)
 
-    requireActivity().registerReceiver(
-      playerMediaReceiver,
+    this.requireActivity().registerReceiver(
+      this.playerMediaReceiver,
       IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
     )
 
-    configureToolbar()
-    configurePlayer()
+    this.configureToolbar()
+    this.configurePlayer()
   }
 
   override fun onPause() {
-    playWhenResuming = mediaPlayer.isPlaying
-    if (mediaPlayer.isPlaying) {
-      previewPlayPauseButton.performClick()
+    this.playWhenResuming = this.mediaPlayer.isPlaying
+    if (this.mediaPlayer.isPlaying) {
+      this.previewPlayPauseButton.performClick()
     }
     super.onPause()
   }
 
   override fun onResume() {
     super.onResume()
-    if (playWhenResuming) {
-      previewPlayPauseButton.performClick()
+    if (this.playWhenResuming) {
+      this.previewPlayPauseButton.performClick()
     }
   }
 
   override fun onDestroyView() {
-    mediaPlayer.stop()
-    mediaPlayer.release()
-    disposables.clear()
-    abandonAudioFocus()
-    requireActivity().unregisterReceiver(playerMediaReceiver)
+    this.mediaPlayer.stop()
+    this.mediaPlayer.release()
+    this.disposables.clear()
+    this.abandonAudioFocus()
+    this.requireActivity().unregisterReceiver(this.playerMediaReceiver)
     super.onDestroyView()
   }
 
   override fun onAudioFocusChange(focusChange: Int) {
     when (focusChange) {
       AudioManager.AUDIOFOCUS_GAIN -> {
-        if ((playOnAudioFocus || audioFocusDelayed) && !mediaPlayer.isPlaying) {
-          audioFocusDelayed = false
-          playOnAudioFocus = false
-          startPlaying()
+        if ((this.playOnAudioFocus || this.audioFocusDelayed) && !this.mediaPlayer.isPlaying) {
+          this.audioFocusDelayed = false
+          this.playOnAudioFocus = false
+          this.startPlaying()
         }
       }
+
       AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK,
       AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
-        if (mediaPlayer.isPlaying) {
-          playOnAudioFocus = true
-          audioFocusDelayed = false
-          onPauseButtonPressed(
+        if (this.mediaPlayer.isPlaying) {
+          this.playOnAudioFocus = true
+          this.audioFocusDelayed = false
+          this.onPauseButtonPressed(
             abandonAudioFocus = false
           )
         }
       }
+
       AudioManager.AUDIOFOCUS_LOSS -> {
-        audioFocusDelayed = false
-        playOnAudioFocus = false
-        onPauseButtonPressed(
+        this.audioFocusDelayed = false
+        this.playOnAudioFocus = false
+        this.onPauseButtonPressed(
           abandonAudioFocus = true
         )
       }
@@ -189,102 +194,104 @@ class BookPreviewAudiobookFragment : Fragment(), AudioManager.OnAudioFocusChange
   }
 
   private fun configureToolbar() {
-    this.toolbar.setNavigationOnClickListener { requireActivity().finish() }
+    this.toolbar.setNavigationOnClickListener { this.requireActivity().finish() }
   }
 
   private fun configurePlayer() {
     this.covers.loadCoverInto(
-      entry = feedEntry,
+      entry = this.feedEntry,
       hasBadge = false,
-      imageView = previewCover,
+      imageView = this.previewCover,
       width = 0,
       height = 0
     )
 
-    previewAuthor.text = feedEntry.feedEntry.authorsCommaSeparated
-    previewTitle.text = feedEntry.feedEntry.title
+    this.previewAuthor.text = this.feedEntry.feedEntry.authorsCommaSeparated
+    this.previewTitle.text = this.feedEntry.feedEntry.title
 
-    mediaPlayer = MediaPlayer()
-    mediaPlayer.setDataSource(requireContext(), Uri.fromFile(audioFile))
-    mediaPlayer.prepare()
-    mediaPlayer.setOnPreparedListener {
-      mediaPlayer.seekTo(0)
-      previewSeekbar.max = mediaPlayer.duration
-      previewSeekbar.setOnTouchListener { _, event -> handleTouchOnSeekbar(event) }
-      updateRemainingTime(0)
-      configurePlayerButtons()
-      startTimer()
+    this.mediaPlayer = MediaPlayer()
+    this.mediaPlayer.setDataSource(this.requireContext(), Uri.fromFile(this.audioFile))
+    this.mediaPlayer.prepare()
+    this.mediaPlayer.setOnPreparedListener {
+      this.mediaPlayer.seekTo(0)
+      this.previewSeekbar.max = this.mediaPlayer.duration
+      this.previewSeekbar.setOnTouchListener { _, event -> this.handleTouchOnSeekbar(event) }
+      this.updateRemainingTime(0)
+      this.configurePlayerButtons()
+      this.startTimer()
     }
-    mediaPlayer.setOnCompletionListener {
-      mediaPlayer.seekTo(0)
-      onPauseButtonPressed(
+    this.mediaPlayer.setOnCompletionListener {
+      this.mediaPlayer.seekTo(0)
+      this.onPauseButtonPressed(
         abandonAudioFocus = false
       )
     }
   }
 
   private fun startTimer() {
-    disposables.add(
+    this.disposables.add(
       Observable.interval(1000L, TimeUnit.MILLISECONDS)
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe {
-          updatePlayerUI()
+          this.updatePlayerUI()
         }
     )
   }
 
   private fun updatePlayerUI() {
     if (!this.playerPositionDragging) {
-      previewSeekbar.progress = mediaPlayer.currentPosition
+      this.previewSeekbar.progress = this.mediaPlayer.currentPosition
     }
 
-    val currentPosition = mediaPlayer.currentPosition.toLong()
-    updateCurrentTime(currentPosition)
-    updateRemainingTime(currentPosition)
+    val currentPosition = this.mediaPlayer.currentPosition.toLong()
+    this.updateCurrentTime(currentPosition)
+    this.updateRemainingTime(currentPosition)
   }
 
   private fun updateCurrentTime(currentPosition: Long) {
-    previewCurrentTime.text =
+    this.previewCurrentTime.text =
       BookPreviewTimeUtils.hourMinuteSecondTextFromDuration(
         Duration.millis(currentPosition)
       )
-    previewCurrentTime.contentDescription =
+    this.previewCurrentTime.contentDescription =
       this.playerTimeCurrentSpoken(currentPosition)
   }
 
   private fun updateRemainingTime(currentPosition: Long) {
-    val duration = mediaPlayer.duration.toLong()
+    val duration = this.mediaPlayer.duration.toLong()
 
-    previewRemainingTime.text =
+    this.previewRemainingTime.text =
       BookPreviewTimeUtils.hourMinuteSecondTextFromDuration(
         Duration.millis(duration - currentPosition)
       )
-    previewRemainingTime.contentDescription =
+    this.previewRemainingTime.contentDescription =
       this.playerTimeRemainingSpoken(currentPosition, duration)
   }
 
   private fun onPauseButtonPressed(abandonAudioFocus: Boolean) {
     if (abandonAudioFocus) {
-      abandonAudioFocus()
+      this.abandonAudioFocus()
     }
 
-    previewPlayPauseButton.setImageResource(R.drawable.play_icon)
-    previewPlayPauseButton.contentDescription =
-      getString(R.string.bookPreviewAccessibilityPlay)
-    mediaPlayer.pause()
+    this.previewPlayPauseButton.setImageResource(R.drawable.play_icon)
+    this.previewPlayPauseButton.contentDescription =
+      this.getString(R.string.bookPreviewAccessibilityPlay)
+    this.mediaPlayer.pause()
   }
 
   private fun onPlayButtonPressed() {
-    when (requestAudioFocus()) {
+    when (this.requestAudioFocus()) {
       AudioManager.AUDIOFOCUS_REQUEST_GRANTED -> {
         this.logger.debug("Audio focus request granted")
-        startPlaying()
+        this.startPlaying()
       }
+
       AudioManager.AUDIOFOCUS_REQUEST_DELAYED -> {
         this.logger.debug("Audio focus request delayed")
-        audioFocusDelayed = true
+        this.audioFocusDelayed = true
       }
+
       AudioManager.AUDIOFOCUS_REQUEST_FAILED -> {
         // the system denied access to the audio focus, so we do nothing
         this.logger.debug("Audio focus request failed")
@@ -296,11 +303,11 @@ class BookPreviewAudiobookFragment : Fragment(), AudioManager.OnAudioFocusChange
     this.logger.debug("Abandoning audio focus")
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      if (audioRequest != null) {
-        audioManager.abandonAudioFocusRequest(audioRequest!!)
+      if (this.audioRequest != null) {
+        this.audioManager.abandonAudioFocusRequest(this.audioRequest!!)
       }
     } else {
-      audioManager.abandonAudioFocus(this)
+      this.audioManager.abandonAudioFocus(this)
     }
   }
 
@@ -312,16 +319,16 @@ class BookPreviewAudiobookFragment : Fragment(), AudioManager.OnAudioFocusChange
       .build()
 
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      audioRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+      this.audioRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
         .setAudioAttributes(playbackAttributes)
         .setWillPauseWhenDucked(true)
         .setAcceptsDelayedFocusGain(true)
         .setOnAudioFocusChangeListener(this)
         .build()
 
-      audioManager.requestAudioFocus(audioRequest!!)
+      this.audioManager.requestAudioFocus(this.audioRequest!!)
     } else {
-      audioManager.requestAudioFocus(
+      this.audioManager.requestAudioFocus(
         this, AudioManager.STREAM_MUSIC,
         AudioManager.AUDIOFOCUS_GAIN
       )
@@ -329,27 +336,27 @@ class BookPreviewAudiobookFragment : Fragment(), AudioManager.OnAudioFocusChange
   }
 
   private fun startPlaying() {
-    previewPlayPauseButton.setImageResource(R.drawable.pause_icon)
-    previewPlayPauseButton.contentDescription =
+    this.previewPlayPauseButton.setImageResource(R.drawable.pause_icon)
+    this.previewPlayPauseButton.contentDescription =
       this.getString(R.string.bookPreviewAccessibilityPause)
-    mediaPlayer.start()
+    this.mediaPlayer.start()
   }
 
   private fun configurePlayerButtons() {
-    previewPlayPauseButton.setOnClickListener {
-      if (mediaPlayer.isPlaying) {
-        onPauseButtonPressed(
+    this.previewPlayPauseButton.setOnClickListener {
+      if (this.mediaPlayer.isPlaying) {
+        this.onPauseButtonPressed(
           abandonAudioFocus = true
         )
       } else {
-        onPlayButtonPressed()
+        this.onPlayButtonPressed()
       }
     }
 
-    previewForwardButton.setOnClickListener {
-      val duration = mediaPlayer.duration
-      val position = mediaPlayer.currentPosition + PLAYER_MOVE_THRESHOLD
-      mediaPlayer.seekTo(
+    this.previewForwardButton.setOnClickListener {
+      val duration = this.mediaPlayer.duration
+      val position = this.mediaPlayer.currentPosition + PLAYER_MOVE_THRESHOLD
+      this.mediaPlayer.seekTo(
         if (position <= duration) {
           position.toInt()
         } else {
@@ -358,9 +365,9 @@ class BookPreviewAudiobookFragment : Fragment(), AudioManager.OnAudioFocusChange
       )
     }
 
-    previewBackwardButton.setOnClickListener {
-      val position = mediaPlayer.currentPosition - PLAYER_MOVE_THRESHOLD
-      mediaPlayer.seekTo(
+    this.previewBackwardButton.setOnClickListener {
+      val position = this.mediaPlayer.currentPosition - PLAYER_MOVE_THRESHOLD
+      this.mediaPlayer.seekTo(
         if (position >= 0) {
           position.toInt()
         } else {
@@ -373,46 +380,49 @@ class BookPreviewAudiobookFragment : Fragment(), AudioManager.OnAudioFocusChange
   private fun handleTouchOnSeekbar(event: MotionEvent?): Boolean {
     when (event?.action) {
       MotionEvent.ACTION_DOWN -> {
-        clickedOnThumb = wasSeekbarThumbClicked(event)
-        if (!clickedOnThumb) {
+        this.clickedOnThumb = this.wasSeekbarThumbClicked(event)
+        if (!this.clickedOnThumb) {
           return true
         }
       }
+
       MotionEvent.ACTION_UP -> {
-        if (clickedOnThumb && playerPositionDragging) {
-          playerPositionDragging = false
-          clickedOnThumb = false
-          updateUIOnProgressBarDragging()
+        if (this.clickedOnThumb && this.playerPositionDragging) {
+          this.playerPositionDragging = false
+          this.clickedOnThumb = false
+          this.updateUIOnProgressBarDragging()
         } else {
-          playerPositionDragging = false
-          clickedOnThumb = false
+          this.playerPositionDragging = false
+          this.clickedOnThumb = false
           return true
         }
       }
+
       MotionEvent.ACTION_MOVE -> {
-        if (!clickedOnThumb) {
+        if (!this.clickedOnThumb) {
           return true
         }
-        playerPositionDragging = true
-        updateUIOnProgressBarDragging()
+        this.playerPositionDragging = true
+        this.updateUIOnProgressBarDragging()
       }
+
       MotionEvent.ACTION_CANCEL -> {
-        playerPositionDragging = false
-        clickedOnThumb = false
+        this.playerPositionDragging = false
+        this.clickedOnThumb = false
       }
     }
 
-    return previewSeekbar.onTouchEvent(event)
+    return this.previewSeekbar.onTouchEvent(event)
   }
 
   private fun wasSeekbarThumbClicked(event: MotionEvent): Boolean {
-    return previewSeekbar.thumb.bounds.contains(event.x.toInt(), event.y.toInt())
+    return this.previewSeekbar.thumb.bounds.contains(event.x.toInt(), event.y.toInt())
   }
 
   private fun updateUIOnProgressBarDragging() {
     this.logger.debug("updateUIOnProgressBarDragging")
 
-    mediaPlayer.seekTo(previewSeekbar.progress)
+    this.mediaPlayer.seekTo(this.previewSeekbar.progress)
   }
 
   private fun playerTimeCurrentSpoken(offsetMilliseconds: Long): String {

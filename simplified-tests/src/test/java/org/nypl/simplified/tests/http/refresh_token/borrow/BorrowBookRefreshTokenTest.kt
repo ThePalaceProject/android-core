@@ -1,5 +1,7 @@
 package org.nypl.simplified.tests.http.refresh_token.borrow
 
+import android.app.Application
+import android.content.ContentResolver
 import android.content.Context
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -8,6 +10,7 @@ import org.joda.time.Instant
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.librarysimplified.http.api.LSHTTPClientConfiguration
@@ -75,6 +78,9 @@ import org.nypl.simplified.tests.mocking.MockContentResolver
 import org.nypl.simplified.tests.mocking.MockDRMInformationACSHandle
 import org.nypl.simplified.tests.mocking.MockDRMInformationAxisHandle
 import org.nypl.simplified.tests.mocking.MockLCPService
+import org.readium.r2.shared.util.asset.AssetRetriever
+import org.readium.r2.shared.util.downloads.foreground.ForegroundDownloadManager
+import org.readium.r2.shared.util.http.DefaultHttpClient
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayInputStream
 import java.io.File
@@ -85,12 +91,17 @@ import java.util.concurrent.TimeUnit
 
 class BorrowBookRefreshTokenTest {
 
+  private val logger =
+    LoggerFactory.getLogger(BorrowBookRefreshTokenTest::class.java)
+
   @TempDir
   @JvmField
   var tempDir: File? = null
 
   private lateinit var account: MockAccount
   private lateinit var accountID: AccountID
+  private lateinit var androidContentResolver: ContentResolver
+  private lateinit var androidContext: Application
   private lateinit var bookDatabase: BookDatabaseType
   private lateinit var bookDatabaseEntry: MockBookDatabaseEntry
   private lateinit var bookEvents: MutableList<BookStatusEvent>
@@ -101,15 +112,14 @@ class BorrowBookRefreshTokenTest {
   private lateinit var bundledContent: MockBundledContentResolver
   private lateinit var contentResolver: MockContentResolver
   private lateinit var context: MockBorrowContext
+  private lateinit var downloadsDirectory: File
   private lateinit var httpClient: LSHTTPClientType
   private lateinit var services: MutableServiceDirectory
   private lateinit var taskRecorder: TaskRecorderType
   private lateinit var webServer: MockWebServer
 
-  private val logger = LoggerFactory.getLogger(BorrowBookRefreshTokenTest::class.java)
-
   @BeforeEach
-  fun testSetup() {
+  fun testSetup(@TempDir downloadDirectory: File) {
     this.accountID =
       AccountID.generate()
     this.account = MockAccount(this.accountID)
@@ -144,6 +154,8 @@ class BorrowBookRefreshTokenTest {
     this.webServer = MockWebServer()
     this.webServer.start(20000)
 
+    this.downloadsDirectory =
+      downloadDirectory
     this.taskRecorder =
       TaskRecorder.create()
     this.contentResolver =
@@ -165,8 +177,10 @@ class BorrowBookRefreshTokenTest {
       )
     }
 
-    val androidContext =
-      Mockito.mock(Context::class.java)
+    this.androidContext =
+      Mockito.mock(Application::class.java)
+    this.androidContentResolver =
+      Mockito.mock(ContentResolver::class.java)
 
     this.httpClient =
       LSHTTPClients()
@@ -205,6 +219,7 @@ class BorrowBookRefreshTokenTest {
 
     this.context =
       MockBorrowContext(
+        application = androidContext,
         logger = this.logger,
         bookRegistry = this.bookRegistry,
         bundledContent = this.bundledContent,
@@ -216,7 +231,7 @@ class BorrowBookRefreshTokenTest {
         isCancelled = false,
         bookDatabaseEntry = this.bookDatabaseEntry,
         bookInitial = bookInitial,
-        contentResolver = this.contentResolver
+        contentResolver = this.contentResolver,
       )
 
     this.context.services = this.services
@@ -351,6 +366,7 @@ class BorrowBookRefreshTokenTest {
   }
 
   @Test
+  @Disabled("This test now requires an actually valid LCP license.")
   fun testUpdateCredentialsBorrowLCP() {
     val tempDirPath = this.tempDir!!.toPath()
 
@@ -367,7 +383,15 @@ class BorrowBookRefreshTokenTest {
       }
     )
     context.lcpService = MockLCPService(
-      publication = null
+      context = this.androidContext,
+      downloadManager = ForegroundDownloadManager(
+        httpClient = DefaultHttpClient(),
+        downloadsDirectory = this.downloadsDirectory
+      ),
+      assetRetriever = AssetRetriever(
+        contentResolver = this.androidContentResolver,
+        httpClient = DefaultHttpClient()
+      )
     )
     this.account.setAccountProvider(
       MockAccountProviders.fakeProvider(

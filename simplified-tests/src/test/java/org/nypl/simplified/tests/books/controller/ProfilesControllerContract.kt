@@ -1,5 +1,6 @@
 package org.nypl.simplified.tests.books.controller
 
+import android.app.Application
 import android.content.Context
 import com.google.common.util.concurrent.ListeningExecutorService
 import com.google.common.util.concurrent.MoreExecutors
@@ -115,7 +116,7 @@ abstract class ProfilesControllerContract {
 
   protected abstract val logger: Logger
 
-  protected abstract fun context(): Context
+  protected abstract fun context(): Application
 
   private val accountProviderResolutionStrings =
     MockAccountProviderResolutionStrings()
@@ -180,6 +181,7 @@ abstract class ProfilesControllerContract {
     services.putService(ProfilesDatabaseType::class.java, profiles)
 
     return Controller.createFromServiceDirectory(
+      application = this.context(),
       services = services,
       executorService = this.executorBooks,
       accountEvents = this.accountEvents,

@@ -1,6 +1,6 @@
 package org.librarysimplified.main
 
-import android.content.Context
+import android.app.Application
 import android.content.pm.PackageManager
 import android.content.res.AssetManager
 import android.content.res.Resources
@@ -148,7 +148,7 @@ internal object MainServices {
     val directoryStorageTimeTracking: File
   )
 
-  private fun initializeDirectories(context: Context): Directories {
+  private fun initializeDirectories(context: Application): Directories {
     this.logger.debug("initializing directories")
 
     val directoryStorageBaseVersioned =
@@ -237,11 +237,11 @@ internal object MainServices {
       ?.create(httpClient)
   }
 
-  private fun createMetricService(context: Context): MetricServiceType? {
+  private fun createMetricService(context: Application): MetricServiceType? {
     return optionalFromServiceLoader(MetricServiceFactoryType::class.java)?.create(context)
   }
 
-  private fun createLocalImageLoader(context: Context): ImageLoaderType {
+  private fun createLocalImageLoader(context: Application): ImageLoaderType {
     val localImageLoader =
       Picasso.Builder(context)
         .indicatorsEnabled(false)
@@ -268,7 +268,7 @@ internal object MainServices {
   }
 
   private fun createAccountProviderRegistry(
-    context: Context,
+    context: Application,
     http: LSHTTPClientType
   ): AccountProviderRegistryType {
     val defaultAccountProvider =
@@ -308,7 +308,7 @@ internal object MainServices {
   }
 
   private fun createAccountBundledCredentials(
-    context: Context
+    context: Application
   ): AccountBundledCredentialsType {
     return try {
       this.createBundledCredentials(context.assets)
@@ -323,7 +323,7 @@ internal object MainServices {
 
   @Throws(ProfileDatabaseException::class)
   private fun createProfileDatabase(
-    context: Context,
+    context: Application,
     resources: Resources,
     analytics: AnalyticsType,
     accountEvents: PublishSubject<AccountEvent>,
@@ -422,7 +422,7 @@ internal object MainServices {
   }
 
   private fun createCoverProvider(
-    context: Context,
+    context: Application,
     bookRegistry: BookRegistryReadableType,
     bundledContentResolver: BundledContentResolverType,
     coverGenerator: BookCoverGeneratorType,
@@ -443,7 +443,7 @@ internal object MainServices {
   }
 
   private fun createBookCoverBadgeLookup(
-    context: Context,
+    context: Application,
     screenSize: ScreenSizeInformationType
   ): BookCoverBadgeLookupType {
     return CatalogCoverBadgeImages.create(
@@ -454,7 +454,7 @@ internal object MainServices {
   }
 
   private fun publishApplicationStartupEvent(
-    context: Context,
+    context: Application,
     analytics: AnalyticsType
   ) {
     try {
@@ -488,7 +488,7 @@ internal object MainServices {
   }
 
   fun setup(
-    context: Context,
+    context: Application,
     onProgress: (BootEvent) -> Unit
   ): ServiceDirectoryType {
     fun publishEvent(message: String) {
@@ -883,6 +883,7 @@ internal object MainServices {
         NamedThreadPools.namedThreadPool(1, "books", 19)
       val controller =
         Controller.createFromServiceDirectory(
+          application = context,
           services = services.build(),
           executorService = execBooks,
           accountEvents = accountEvents,
@@ -998,7 +999,7 @@ internal object MainServices {
   }
 
   private fun createAdobeExecutor(
-    context: Context,
+    context: Application,
     adobeConfiguration: AdobeConfigurationServiceType
   ): AdobeAdeptExecutorType? {
     return if (AdobeDRMServices.isIntendedToBePresent(context)) {

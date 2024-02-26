@@ -1,5 +1,6 @@
 package org.nypl.simplified.tests.books
 
+import android.app.Application
 import android.content.Context
 import io.reactivex.subjects.PublishSubject
 import org.junit.jupiter.api.BeforeEach
@@ -79,7 +80,7 @@ class AccountBug0613d7f6 {
   @Test
   fun testBrokenAccount() {
     val context =
-      Mockito.mock(Context::class.java)
+      Mockito.mock(Application::class.java)
 
     AccountsDatabases.openDatabase(
       AccountAuthenticationCredentialsStore.open(authStore, authStoreTmp),

@@ -1,5 +1,6 @@
 package org.nypl.simplified.tests.bugs
 
+import android.app.Application
 import android.content.ContentResolver
 import android.content.Context
 import com.google.common.util.concurrent.ListeningExecutorService
@@ -96,7 +97,7 @@ class Simply3635Test {
   private lateinit var cacheDirectory: File
   private lateinit var contentResolver: ContentResolver
   private lateinit var contentResolverSane: ContentResolverSane
-  private lateinit var context: Context
+  private lateinit var context: Application
   private lateinit var credentialsFile: File
   private lateinit var credentialsFileTmp: File
   private lateinit var executorService: ExecutorService
@@ -120,7 +121,7 @@ class Simply3635Test {
     this.contentResolver =
       Mockito.mock(ContentResolver::class.java)
     this.context =
-      Mockito.mock(Context::class.java)
+      Mockito.mock(Application::class.java)
 
     this.accountProvider =
       MockAccountProviders.fakeProvider(
@@ -247,6 +248,7 @@ class Simply3635Test {
 
     this.controller =
       Controller.createFromServiceDirectory(
+        application = this.context,
         services = this.services,
         executorService = this.executorService,
         accountEvents = this.accountEvents,

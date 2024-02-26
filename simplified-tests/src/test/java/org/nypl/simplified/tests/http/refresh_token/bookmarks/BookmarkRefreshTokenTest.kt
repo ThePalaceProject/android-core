@@ -1,5 +1,6 @@
 package org.nypl.simplified.tests.http.refresh_token.bookmarks
 
+import android.app.Application
 import android.content.Context
 import com.fasterxml.jackson.databind.ObjectMapper
 import okhttp3.mockwebserver.MockResponse
@@ -114,7 +115,7 @@ class BookmarkRefreshTokenTest {
     this.services = MutableServiceDirectory()
 
     val androidContext =
-      Mockito.mock(Context::class.java)
+      Mockito.mock(Application::class.java)
 
     this.http =
       LSHTTPClients()
@@ -155,6 +156,7 @@ class BookmarkRefreshTokenTest {
 
     this.context =
       MockBorrowContext(
+        application = androidContext,
         logger = this.logger,
         bookRegistry = this.bookRegistry,
         bundledContent = this.bundledContent,

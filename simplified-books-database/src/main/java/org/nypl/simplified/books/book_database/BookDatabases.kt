@@ -1,6 +1,6 @@
 package org.nypl.simplified.books.book_database
 
-import android.content.Context
+import android.app.Application
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.book_database.api.BookDatabaseException
 import org.nypl.simplified.books.book_database.api.BookDatabaseFactoryType
@@ -16,7 +16,7 @@ object BookDatabases : BookDatabaseFactoryType {
 
   @Throws(BookDatabaseException::class)
   override fun openDatabase(
-    context: Context,
+    context: Application,
     parser: OPDSJSONParserType,
     serializer: OPDSJSONSerializerType,
     formats: BookFormatSupportType,
@@ -35,7 +35,7 @@ object BookDatabases : BookDatabaseFactoryType {
 
   @Throws(BookDatabaseException::class)
   override fun openDatabase(
-    context: Context,
+    context: Application,
     formats: BookFormatSupportType,
     owner: AccountID,
     directory: File

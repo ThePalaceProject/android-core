@@ -5,7 +5,6 @@ import android.graphics.Bitmap
 import com.shockwave.pdfium.PdfiumCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.readium.r2.shared.PdfSupport
 import org.readium.r2.shared.util.pdf.PdfDocument
 import org.slf4j.LoggerFactory
 import com.shockwave.pdfium.PdfDocument as PdfiumDocument
@@ -62,7 +61,6 @@ class PdfReaderDocument(
     // do nothing
   }
 
-  @OptIn(PdfSupport::class)
   private fun PdfiumDocument.Bookmark.toOutlineNode(): PdfDocument.OutlineNode {
     return PdfDocument.OutlineNode(
       title = title,

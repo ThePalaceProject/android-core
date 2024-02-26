@@ -10,9 +10,6 @@ import java.net.URI
  * These are received in OPDS feeds as licensor information. They are used to activate a device
  * and obtain a full set of credentials (such as the user ID and device ID). The device manager
  * URI is contacted after activation.
- *
- * @see org.nypl.drm.core.AdobeUserID
- * @see org.nypl.drm.core.AdobeDeviceID
  */
 
 data class AccountAuthenticationAdobePreActivationCredentials(

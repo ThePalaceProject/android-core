@@ -428,7 +428,7 @@ class AudioBookPlayerActivity :
     }
 
     val contentProtections = BookContentProtections.create(
-      context = this,
+      context = this.application,
       contentProtectionProviders = this.contentProtectionProviders,
       drmInfo = this.parameters.drmInfo,
       isManualPassphraseEnabled =
@@ -485,7 +485,7 @@ class AudioBookPlayerActivity :
 
     val bookResult =
       engine.bookProvider.create(
-        context = this,
+        context = this.application,
         extensions = extensions
       )
 
@@ -586,6 +586,7 @@ class AudioBookPlayerActivity :
     this.log.debug("downloading and saving manifest")
     val strategy =
       this.parameters.toManifestStrategy(
+        application = this.application,
         strategies = this.strategies,
         isNetworkAvailable = { this.networkConnectivity.isNetworkAvailable },
         credentials = credentials,

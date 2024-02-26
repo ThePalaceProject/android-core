@@ -124,6 +124,7 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
 
     val strategy =
       context.audioBookManifestStrategies.createStrategy(
+        context = context.application,
         AudioBookManifestRequest(
           targetURI = currentURI,
           contentType = context.currentAcquisitionPathElement.mimeType,

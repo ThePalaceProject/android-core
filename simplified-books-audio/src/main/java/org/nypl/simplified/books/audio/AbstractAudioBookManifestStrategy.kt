@@ -1,5 +1,6 @@
 package org.nypl.simplified.books.audio
 
+import android.app.Application
 import one.irradia.mime.api.MIMEType
 import org.librarysimplified.audiobook.api.PlayerResult
 import org.librarysimplified.audiobook.license_check.api.LicenseCheckParameters
@@ -31,6 +32,7 @@ import java.net.URI
  */
 
 abstract class AbstractAudioBookManifestStrategy(
+  private val context: Application,
   private val request: AudioBookManifestRequest
 ) : AudioBookManifestStrategyType {
 

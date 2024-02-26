@@ -1,5 +1,6 @@
 package org.librarysimplified.viewer.audiobook
 
+import android.app.Application
 import one.irradia.mime.vanilla.MIMEParser
 import org.librarysimplified.audiobook.api.PlayerUserAgent
 import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfilled
@@ -90,6 +91,7 @@ class AudioBookPlayerParameters(
    */
 
   fun toManifestStrategy(
+    application: Application,
     strategies: AudioBookManifestStrategiesType,
     isNetworkAvailable: () -> Boolean,
     credentials: AccountAuthenticationCredentials?,
@@ -152,6 +154,9 @@ class AudioBookPlayerParameters(
         cacheDirectory = cacheDirectory
       )
 
-    return strategies.createStrategy(request)
+    return strategies.createStrategy(
+      context = application,
+      request = request
+    )
   }
 }

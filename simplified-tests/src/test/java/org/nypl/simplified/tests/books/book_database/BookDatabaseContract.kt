@@ -1,5 +1,6 @@
 package org.nypl.simplified.tests.books.book_database
 
+import android.app.Application
 import android.content.Context
 import com.io7m.jfunctional.Option
 import one.irradia.mime.api.MIMEType
@@ -48,7 +49,7 @@ abstract class BookDatabaseContract {
   private val accountID =
     org.nypl.simplified.accounts.api.AccountID(UUID.fromString("46d17029-14ba-4e34-bcaa-def02713575a"))
 
-  protected abstract fun context(): Context
+  protected abstract fun context(): Application
 
   /**
    * Opening an empty database works.

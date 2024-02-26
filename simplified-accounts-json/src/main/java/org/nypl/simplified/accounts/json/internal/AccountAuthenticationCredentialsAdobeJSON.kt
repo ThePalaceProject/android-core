@@ -2,13 +2,13 @@ package org.nypl.simplified.accounts.json.internal
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.io7m.jfunctional.Some
-import org.nypl.drm.core.AdobeDeviceID
-import org.nypl.drm.core.AdobeUserID
-import org.nypl.drm.core.AdobeVendorID
 import org.nypl.simplified.accounts.api.AccountAuthenticationAdobeClientToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationAdobePostActivationCredentials
 import org.nypl.simplified.accounts.api.AccountAuthenticationAdobePreActivationCredentials
 import org.nypl.simplified.json.core.JSONParserUtilities
+import org.nypl.drm.core.AdobeDeviceID
+import org.nypl.drm.core.AdobeUserID
+import org.nypl.drm.core.AdobeVendorID
 
 object AccountAuthenticationCredentialsAdobeJSON {
 

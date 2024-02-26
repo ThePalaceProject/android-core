@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<manifest package="org.librarysimplified.sandbox"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <activity
+            android:name="org.librarysimplified.sandbox.SandboxActivity"
+            android:contentDescription="Sandbox"
+            android:launchMode="singleTop"
+            android:exported="true"
+            android:theme="@style/PalaceTheme.WithActionBar"
+            android:label="Sandbox">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

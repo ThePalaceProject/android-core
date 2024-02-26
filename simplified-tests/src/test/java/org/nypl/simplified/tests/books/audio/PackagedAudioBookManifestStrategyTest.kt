@@ -1,7 +1,9 @@
 package org.nypl.simplified.tests.books.audio
 
+import android.app.Application
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.librarysimplified.audiobook.api.PlayerUserAgent
@@ -17,6 +19,7 @@ import java.io.FileNotFoundException
 import java.net.URI
 
 class PackagedAudioBookManifestStrategyTest {
+  private lateinit var context: Application
   private lateinit var services: MutableServiceDirectory
   private lateinit var strategies: ManifestFulfillmentStrategyRegistryType
 
@@ -26,6 +29,8 @@ class PackagedAudioBookManifestStrategyTest {
 
   @BeforeEach
   fun testSetup() {
+    this.context =
+      Mockito.mock(Application::class.java)
     this.strategies =
       Mockito.mock(ManifestFulfillmentStrategyRegistryType::class.java)
 
@@ -34,10 +39,12 @@ class PackagedAudioBookManifestStrategyTest {
   }
 
   @Test
+  @Disabled("This test can no longer be run locally due to Readium's internal use of Android's Url class.")
   fun succeeds_whenTargetURIExistsInPackage() {
     val strategy =
       PackagedAudioBookManifestStrategy(
-        AudioBookManifestRequest(
+        context = this.context,
+        request = AudioBookManifestRequest(
           file = getResource("bestnewhorror.zip"),
           targetURI = URI.create("manifest.json"),
           contentType = StandardFormatNames.lcpAudioBooks,
@@ -55,10 +62,12 @@ class PackagedAudioBookManifestStrategyTest {
   }
 
   @Test
+  @Disabled("This test can no longer be run locally due to Readium's internal use of Android's Url class.")
   fun fails_whenTargetURIDoesNotExistInPackage() {
     val strategy =
       PackagedAudioBookManifestStrategy(
-        AudioBookManifestRequest(
+        context = this.context,
+        request = AudioBookManifestRequest(
           file = getResource("bestnewhorror.zip"),
           targetURI = URI.create("wrongfile.json"),
           contentType = StandardFormatNames.lcpAudioBooks,
@@ -83,7 +92,8 @@ class PackagedAudioBookManifestStrategyTest {
   fun fails_whenFileIsNull() {
     val strategy =
       PackagedAudioBookManifestStrategy(
-        AudioBookManifestRequest(
+        context = this.context,
+        request = AudioBookManifestRequest(
           file = null,
           targetURI = URI.create("manifest.json"),
           contentType = StandardFormatNames.lcpAudioBooks,

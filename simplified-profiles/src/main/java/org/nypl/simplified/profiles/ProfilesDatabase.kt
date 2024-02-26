@@ -1,6 +1,6 @@
 package org.nypl.simplified.profiles
 
-import android.content.Context
+import android.app.Application
 import com.google.common.base.Preconditions
 import com.io7m.jfunctional.Option
 import com.io7m.jfunctional.OptionType
@@ -51,7 +51,7 @@ internal class ProfilesDatabase internal constructor(
   private val bookFormatSupport: BookFormatSupportType,
   private val analytics: AnalyticsType,
   private val anonymousProfileEnabled: ProfilesDatabaseType.AnonymousProfileEnabled,
-  private val context: Context,
+  private val context: Application,
   private val directory: File,
   private val profiles: ConcurrentSkipListMap<ProfileID, Profile>
 ) : ProfilesDatabaseType {

@@ -1,5 +1,6 @@
 package org.nypl.simplified.books.borrowing
 
+import android.app.Application
 import org.joda.time.Instant
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.services.api.ServiceDirectoryType
@@ -178,6 +179,7 @@ class BorrowTask private constructor(
   ) {
     val context =
       BorrowContext(
+        application = this.requirements.application,
         account = this.account,
         adobeExecutor = this.requirements.adobeExecutor,
         axisNowService = this.requirements.axisNowService,
@@ -399,6 +401,7 @@ class BorrowTask private constructor(
   }
 
   private class BorrowContext(
+    override val application: Application,
     override val account: AccountType,
     override val audioBookManifestStrategies: AudioBookManifestStrategiesType,
     override val clock: () -> Instant,

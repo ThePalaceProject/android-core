@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.annotation.UiThread
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.librarysimplified.services.api.ServiceDirectoryType
-import org.nypl.drm.core.AdobeAdeptExecutorType
 import org.nypl.simplified.adobe.extensions.AdobeDRMServices
+import org.nypl.drm.core.AdobeAdeptExecutorType
 
 /**
  * Functions to display Adobe DRM related warnings.

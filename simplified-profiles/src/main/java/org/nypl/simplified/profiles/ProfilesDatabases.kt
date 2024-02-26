@@ -1,6 +1,6 @@
 package org.nypl.simplified.profiles
 
-import android.content.Context
+import android.app.Application
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.base.Preconditions
 import io.reactivex.subjects.Subject
@@ -35,7 +35,6 @@ import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
-import java.util.ArrayList
 import java.util.SortedMap
 import java.util.UUID
 import java.util.concurrent.ConcurrentSkipListMap
@@ -63,7 +62,7 @@ object ProfilesDatabases {
 
   @Throws(ProfileDatabaseException::class)
   fun openWithAnonymousProfileDisabled(
-    context: Context,
+    context: Application,
     analytics: AnalyticsType,
     accountEvents: Subject<AccountEvent>,
     accountProviders: AccountProviderRegistryType,
@@ -122,7 +121,7 @@ object ProfilesDatabases {
   }
 
   private fun openAllProfiles(
-    context: Context,
+    context: Application,
     analytics: AnalyticsType,
     accountEvents: Subject<AccountEvent>,
     accountProviders: AccountProviderRegistryType,
@@ -176,7 +175,7 @@ object ProfilesDatabases {
 
   @Throws(ProfileDatabaseException::class)
   fun openWithAnonymousProfileEnabled(
-    context: Context,
+    context: Application,
     analytics: AnalyticsType,
     accountEvents: Subject<AccountEvent>,
     accountProviders: AccountProviderRegistryType,
@@ -332,7 +331,7 @@ object ProfilesDatabases {
   }
 
   private fun openOneProfile(
-    context: Context,
+    context: Application,
     analytics: AnalyticsType,
     accountEvents: Subject<AccountEvent>,
     accountProviders: AccountProviderRegistryType,
@@ -442,7 +441,7 @@ object ProfilesDatabases {
 
   @Throws(ProfileDatabaseException::class)
   internal fun createProfileActual(
-    context: Context,
+    context: Application,
     analytics: AnalyticsType,
     accountBundledCredentials: AccountBundledCredentialsType,
     accountEvents: Subject<AccountEvent>,

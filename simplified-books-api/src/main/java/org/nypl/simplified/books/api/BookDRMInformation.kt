@@ -80,7 +80,7 @@ sealed class BookDRMInformation : Serializable {
    * doesn't know about (such as proprietary AudioBook DRM).
    */
 
-  object None : BookDRMInformation() {
+  data object None : BookDRMInformation() {
     override val kind: BookDRMKind = BookDRMKind.NONE
   }
 }

@@ -266,7 +266,7 @@ class PdfReaderActivity : AppCompatActivity() {
 
   private fun createPdfServer(drmInfo: BookDRMInformation, pdfFile: File) {
     val contentProtections = BookContentProtections.create(
-      context = this,
+      context = this.application,
       contentProtectionProviders = ServiceLoader.load(ContentProtectionProvider::class.java).toList(),
       drmInfo = drmInfo,
       isManualPassphraseEnabled =
@@ -283,7 +283,7 @@ class PdfReaderActivity : AppCompatActivity() {
       try {
         pdfServer = PdfServer.create(
           contentProtections = contentProtections,
-          context = this@PdfReaderActivity,
+          context = this@PdfReaderActivity.application,
           drmInfo = drmInfo,
           pdfFile = pdfFile,
           port = ephemeralSocket.localPort

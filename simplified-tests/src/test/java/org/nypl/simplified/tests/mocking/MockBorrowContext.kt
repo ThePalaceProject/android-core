@@ -1,5 +1,6 @@
 package org.nypl.simplified.tests.mocking
 
+import android.app.Application
 import org.joda.time.Instant
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.services.api.ServiceDirectoryType
@@ -30,6 +31,7 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 class MockBorrowContext(
+  override val application: Application,
   val logger: Logger,
   val temporaryDirectory: File,
   val bookRegistry: BookRegistryType,

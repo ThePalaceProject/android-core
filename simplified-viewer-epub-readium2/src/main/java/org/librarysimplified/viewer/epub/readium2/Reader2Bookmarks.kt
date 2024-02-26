@@ -11,6 +11,7 @@ import org.nypl.simplified.books.api.BookLocation
 import org.nypl.simplified.books.api.bookmark.Bookmark
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.readium.r2.shared.publication.Href
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 
@@ -77,7 +78,7 @@ object Reader2Bookmarks {
     source: SR2Bookmark
   ): Bookmark.ReaderBookmark {
     val progress = BookChapterProgress(
-      chapterHref = source.locator.chapterHref,
+      chapterHref = source.locator.chapterHref.toString(),
       chapterProgress = when (val locator = source.locator) {
         is SR2Locator.SR2LocatorPercent -> locator.chapterProgress
         is SR2Locator.SR2LocatorChapterEnd -> 1.0
@@ -127,21 +128,23 @@ object Reader2Bookmarks {
   private fun r2ToSR2Bookmark(
     source: Bookmark.ReaderBookmark,
     location: BookLocation.BookLocationR2
-  ): SR2Bookmark =
-    SR2Bookmark(
+  ): SR2Bookmark {
+    return SR2Bookmark(
       date = source.time.toDateTime(),
       type = when (source.kind) {
         BookmarkKind.BookmarkLastReadLocation ->
           SR2Bookmark.Type.LAST_READ
+
         BookmarkKind.BookmarkExplicit ->
           SR2Bookmark.Type.EXPLICIT
       },
       title = source.chapterTitle,
       locator = SR2Locator.SR2LocatorPercent(
-        chapterHref = location.progress.chapterHref,
+        chapterHref = Href(location.progress.chapterHref)!!,
         chapterProgress = location.progress.chapterProgress
       ),
       bookProgress = source.bookProgress,
       uri = source.uri
     )
+  }
 }
