@@ -499,6 +499,7 @@ dependencies {
     implementation(libs.firebase.common)
     implementation(libs.firebase.common.ktx)
     implementation(libs.firebase.components)
+    implementation(libs.firebase.config.interop)
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.datatransport)
     implementation(libs.firebase.dynamic.links)
