@@ -500,7 +500,6 @@ object ProfilesDatabases {
               mostRecentAccount = account.id,
               hasSeenLibrarySelectionScreen = false,
               playbackRates = hashMapOf(),
-              sleepTimers = hashMapOf(),
               isManualLCPPassphraseEnabled = false
             ),
             attributes = ProfileAttributes(sortedMapOf())

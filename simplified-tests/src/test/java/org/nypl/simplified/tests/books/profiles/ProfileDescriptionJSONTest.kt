@@ -55,7 +55,6 @@ class ProfileDescriptionJSONTest {
           readerPreferences = ReaderPreferences.builder().build(),
           mostRecentAccount = AccountID.generate(),
           playbackRates = hashMapOf(),
-          sleepTimers = hashMapOf(),
           isManualLCPPassphraseEnabled = false
         ),
         attributes = ProfileAttributes(
@@ -142,7 +141,6 @@ class ProfileDescriptionJSONTest {
 
     assertEquals("", description.displayName)
     assertEquals(0, description.preferences.playbackRates.size)
-    assertEquals(0, description.preferences.sleepTimers.size)
     assertEquals(1.0, description.preferences.readerPreferences.brightness())
     assertEquals(100.0, description.preferences.readerPreferences.fontScale())
     assertEquals(ReaderFontSelection.READER_FONT_OPEN_DYSLEXIC, description.preferences.readerPreferences.fontFamily())
@@ -166,24 +164,6 @@ class ProfileDescriptionJSONTest {
     assertEquals("bookid2", description.preferences.playbackRates.keys.last())
     assertEquals(1.0, description.preferences.playbackRates["bookid1"]?.speed)
     assertEquals(1.25, description.preferences.playbackRates["bookid2"]?.speed)
-  }
-
-  @Test
-  fun testSleepTimers() {
-    val mapper = ObjectMapper()
-    val mostRecentAccountFallback = AccountID.generate()
-    val description =
-      ProfileDescriptionJSON.deserializeFromText(
-        mapper,
-        this.ofResource("profile-sleep-timers.json"),
-        mostRecentAccountFallback
-      )
-
-    assertEquals(2, description.preferences.sleepTimers.size)
-    assertEquals("bookid1", description.preferences.sleepTimers.keys.first())
-    assertEquals("bookid2", description.preferences.sleepTimers.keys.last())
-    assertEquals(Duration.standardMinutes(15L).millis, description.preferences.sleepTimers["bookid1"])
-    assertEquals(Duration.standardMinutes(30L).millis, description.preferences.sleepTimers["bookid2"])
   }
 
   /**

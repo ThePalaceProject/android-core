@@ -35,7 +35,6 @@ import org.librarysimplified.audiobook.api.PlayerPlaybackRate
 import org.librarysimplified.audiobook.api.PlayerPosition
 import org.librarysimplified.audiobook.api.PlayerResult
 import org.librarysimplified.audiobook.api.PlayerSleepTimer
-import org.librarysimplified.audiobook.api.PlayerSleepTimerType
 import org.librarysimplified.audiobook.api.PlayerSpineElementDownloadStatus.PlayerSpineElementDownloadExpired
 import org.librarysimplified.audiobook.api.PlayerType
 import org.librarysimplified.audiobook.api.PlayerUserAgent
@@ -159,7 +158,6 @@ class AudioBookPlayerActivity :
   private lateinit var player: PlayerType
   private lateinit var playerFragment: PlayerFragment
   private lateinit var playerSubscription: Subscription
-  private lateinit var sleepTimer: PlayerSleepTimerType
 
   /*
    * Resources to be closed when the activity is destroyed.
@@ -282,14 +280,7 @@ class AudioBookPlayerActivity :
     MDC.put(MDCKeys.BOOK_DRM, this.formatHandle.format.drmInformation.kind.name)
     MDC.put(MDCKeys.BOOK_FORMAT, this.formatHandle.format.contentType.toString())
 
-    /*
-     * Create a sleep timer.
-     */
-
-    this.sleepTimer = PlayerSleepTimer.create()
-    this.closeOnActivityDestroy.push {
-      this.sleepTimer.close()
-    }
+    PlayerSleepTimer.cancel()
 
     /*
      * Show a loading fragment.
@@ -540,8 +531,7 @@ class AudioBookPlayerActivity :
 
       this.playerFragment = PlayerFragment.newInstance(
         PlayerFragmentParameters(
-          currentRate = this.getBookCurrentPlaybackRate(),
-          currentSleepTimerDuration = this.getBookSleepTimerRemainingDuration()
+          currentRate = this.getBookCurrentPlaybackRate()
         )
       )
 
@@ -635,16 +625,6 @@ class AudioBookPlayerActivity :
     val playbackRates = this.profilesController.profileCurrent().preferences().playbackRates
     val bookID = this.parameters.bookID.value()
     return playbackRates[bookID]
-  }
-
-  private fun getBookSleepTimerRemainingDuration(): Long? {
-    val sleepTimers = this.profilesController.profileCurrent().preferences().sleepTimers
-    val bookID = this.parameters.bookID.value()
-    return if (sleepTimers.containsKey(bookID)) {
-      sleepTimers[bookID]
-    } else {
-      0L
-    }
   }
 
   private fun loadAndConfigureExtensions(
@@ -901,8 +881,7 @@ class AudioBookPlayerActivity :
       val fragment =
         PlayerPlaybackRateFragment.newInstance(
           PlayerFragmentParameters(
-            currentRate = this.getBookCurrentPlaybackRate(),
-            currentSleepTimerDuration = this.getBookSleepTimerRemainingDuration()
+            currentRate = this.getBookCurrentPlaybackRate()
           )
         )
       fragment.show(this.supportFragmentManager, "PLAYER_RATE")
@@ -921,21 +900,6 @@ class AudioBookPlayerActivity :
 
       val fragment = PlayerSleepTimerFragment.newInstance()
       fragment.show(this.supportFragmentManager, "PLAYER_SLEEP_TIMER")
-    }
-  }
-
-  override fun onPlayerSleepTimerUpdated(remainingDuration: Long?) {
-    val sleepTimers =
-      HashMap(this.profilesController.profileCurrent().preferences().sleepTimers)
-    val bookID = this.parameters.bookID.value()
-    sleepTimers[bookID] = remainingDuration
-
-    this.profilesController.profileUpdate { current ->
-      current.copy(
-        preferences = current.preferences.copy(
-          sleepTimers = sleepTimers
-        )
-      )
     }
   }
 
@@ -1017,10 +981,6 @@ class AudioBookPlayerActivity :
 
   override fun onPlayerWantsPlayer(): PlayerType {
     return this.player
-  }
-
-  override fun onPlayerWantsSleepTimer(): PlayerSleepTimerType {
-    return this.sleepTimer
   }
 
   override fun onPlayerWantsTitle(): String {

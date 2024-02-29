@@ -201,9 +201,6 @@ object ProfileDescriptionJSON {
     val playbackRates =
       deserializePlaybackRates(objectMapper, objectNode)
 
-    val sleepTimers =
-      deserializeSleepTimers(objectMapper, objectNode)
-
     val isManualLCPPassphraseEnabled =
       JSONParserUtilities.getBooleanDefault(objectNode, "isManualLCPPassphraseEnabled", false)
 
@@ -220,7 +217,6 @@ object ProfileDescriptionJSON {
       hasSeenLibrarySelectionScreen = hasSeenLibrarySelectionScreen,
       showDebugSettings = showDebugSettings,
       playbackRates = playbackRates,
-      sleepTimers = sleepTimers,
       isManualLCPPassphraseEnabled = isManualLCPPassphraseEnabled
     )
   }
@@ -251,9 +247,6 @@ object ProfileDescriptionJSON {
     val playbackRates =
       deserializePlaybackRates(objectMapper, objectNode)
 
-    val sleepTimers =
-      deserializeSleepTimers(objectMapper, objectNode)
-
     val isManualLCPPassphraseEnabled =
       JSONParserUtilities.getBooleanDefault(objectNode, "isManualLCPPassphraseEnabled", false)
 
@@ -269,7 +262,6 @@ object ProfileDescriptionJSON {
       mostRecentAccount = mostRecentAccount,
       hasSeenLibrarySelectionScreen = true,
       playbackRates = playbackRates,
-      sleepTimers = sleepTimers,
       isManualLCPPassphraseEnabled = isManualLCPPassphraseEnabled
     )
   }
@@ -321,9 +313,6 @@ object ProfileDescriptionJSON {
     val playbackRates =
       deserializePlaybackRates(objectMapper, preferencesNode)
 
-    val sleepTimers =
-      deserializeSleepTimers(objectMapper, preferencesNode)
-
     val readerPrefs =
       deserializeReaderPreferences(objectMapper, preferencesNode)
 
@@ -338,7 +327,6 @@ object ProfileDescriptionJSON {
         mostRecentAccount = mostRecentAccountFallback,
         hasSeenLibrarySelectionScreen = true,
         playbackRates = playbackRates,
-        sleepTimers = sleepTimers,
         isManualLCPPassphraseEnabled = isManualLCPPassphraseEnabled
       )
 
@@ -495,11 +483,6 @@ object ProfileDescriptionJSON {
     )
 
     output.set<ObjectNode>(
-      "sleepTimers",
-      serializeSleepTimersToJSON(objectMapper, preferences.sleepTimers)
-    )
-
-    output.set<ObjectNode>(
       "readerPreferences",
       ReaderPreferencesJSON.serializeToJSON(objectMapper, preferences.readerPreferences)
     )
@@ -522,17 +505,6 @@ object ProfileDescriptionJSON {
     val objectNode = objectMapper.createObjectNode()
     playbackRates.keys.forEach { key ->
       objectNode.put(key, playbackRates[key]?.name)
-    }
-    return objectNode
-  }
-
-  fun serializeSleepTimersToJSON(
-    objectMapper: ObjectMapper,
-    sleepTimers: Map<String, Long?>
-  ): ObjectNode {
-    val objectNode = objectMapper.createObjectNode()
-    sleepTimers.keys.forEach { key ->
-      objectNode.put(key, sleepTimers[key])
     }
     return objectNode
   }

@@ -38,10 +38,6 @@ data class ProfilePreferences(
 
   val playbackRates: Map<String, PlayerPlaybackRate>,
 
-  /** @return The sleep timer for every audiobook */
-
-  val sleepTimers: Map<String, Long?>,
-
   /** The most recently used account provider. */
 
   val mostRecentAccount: AccountID,
