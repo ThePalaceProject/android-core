@@ -452,7 +452,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2024-02-29T16:51:02+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.10.0">
+    <c:release date="2024-03-01T12:56:21+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.10.0">
       <c:changes>
         <c:change date="2024-01-17T00:00:00+00:00" summary="Attempt to fix a lifecycle related R2 TOC crash.">
           <c:tickets>
@@ -480,9 +480,14 @@
             <c:ticket id="PP-1014"/>
           </c:tickets>
         </c:change>
-        <c:change date="2024-02-29T16:51:02+00:00" summary="Correct slashes in LCP audio book manifests.">
+        <c:change date="2024-02-29T00:00:00+00:00" summary="Correct slashes in LCP audio book manifests.">
           <c:tickets>
             <c:ticket id="PP-1018"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2024-03-01T12:56:21+00:00" summary="Fix broken Findaway audio books.">
+          <c:tickets>
+            <c:ticket id="PP-1019"/>
           </c:tickets>
         </c:change>
       </c:changes>
