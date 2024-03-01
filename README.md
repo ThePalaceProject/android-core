@@ -5,9 +5,7 @@ The Palace Project Android Client
 
 Lyrasis fork of the NYPL's [Library Simplified](http://www.librarysimplified.org/) Android client.
 
-![simplified](./src/site/resources/simplified.jpg?raw=true)
-
-_Image by [Predrag Kezic](https://pixabay.com/users/PredragKezic-582203/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=581229) from [Pixabay](https://pixabay.com/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=581229)_
+![Palace](./src/site/resources/palace.jpg?raw=true)
 
 ### What Is This?
 
