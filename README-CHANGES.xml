@@ -452,7 +452,7 @@
         <c:change date="2022-04-29T00:00:00+00:00" summary="Fixed &quot;Unable to initialize audio engine&quot; error playing some audio books."/>
       </c:changes>
     </c:release>
-    <c:release date="2024-03-14T15:49:10+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.11.0">
+    <c:release date="2024-03-14T15:50:22+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.11.0">
       <c:changes>
         <c:change date="2024-01-17T00:00:00+00:00" summary="Attempt to fix a lifecycle related R2 TOC crash.">
           <c:tickets>
