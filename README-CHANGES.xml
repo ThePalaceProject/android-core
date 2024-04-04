@@ -497,7 +497,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2024-04-04T12:38:12+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.11.1">
+    <c:release date="2024-04-04T17:53:09+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.11.1">
       <c:changes>
         <c:change date="2024-04-04T00:00:00+00:00" summary="Fix lifecycle issues in the R2 reader.">
           <c:tickets>
@@ -509,11 +509,12 @@
             <c:ticket id="PP-1120"/>
           </c:tickets>
         </c:change>
-        <c:change date="2024-04-04T12:38:12+00:00" summary="Correct chapter numbering.">
+        <c:change date="2024-04-04T00:00:00+00:00" summary="Correct chapter numbering.">
           <c:tickets>
             <c:ticket id="PP-1126"/>
           </c:tickets>
         </c:change>
+        <c:change date="2024-04-04T17:53:09+00:00" summary="Add logging around bookmarks and navigation in EPUB reader."/>
       </c:changes>
     </c:release>
   </c:releases>
