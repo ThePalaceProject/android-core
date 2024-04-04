@@ -452,7 +452,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2024-04-04T09:11:56+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.11.0">
+    <c:release date="2024-04-04T00:00:00+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.11.0">
       <c:changes>
         <c:change date="2024-01-17T00:00:00+00:00" summary="Attempt to fix a lifecycle related R2 TOC crash.">
           <c:tickets>
@@ -497,16 +497,21 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2024-04-04T00:00:00+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.11.1">
+    <c:release date="2024-04-04T12:38:12+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.11.1">
       <c:changes>
         <c:change date="2024-04-04T00:00:00+00:00" summary="Fix lifecycle issues in the R2 reader.">
           <c:tickets>
             <c:ticket id="PP-1119"/>
           </c:tickets>
         </c:change>
-        <c:change date="2024-04-04T09:11:56+00:00" summary="Refactor bookmark handling for reliability.">
+        <c:change date="2024-04-04T00:00:00+00:00" summary="Refactor bookmark handling for reliability.">
           <c:tickets>
             <c:ticket id="PP-1120"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2024-04-04T12:38:12+00:00" summary="Correct chapter numbering.">
+          <c:tickets>
+            <c:ticket id="PP-1126"/>
           </c:tickets>
         </c:change>
       </c:changes>
