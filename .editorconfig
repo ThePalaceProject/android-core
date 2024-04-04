@@ -9,6 +9,7 @@ ktlint_standard_package-name = disabled
 ktlint_standard_trailing-comma-on-call-site = disabled
 ktlint_standard_trailing-comma-on-declaration-site = disabled
 ktlint_standard_wrapping = disabled
+ij_kotlin_name_count_to_use_star_import = 999999
 
 [*.kts]
 indent_size=4

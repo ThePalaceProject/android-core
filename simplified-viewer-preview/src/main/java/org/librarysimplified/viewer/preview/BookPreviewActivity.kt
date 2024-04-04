@@ -351,6 +351,7 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
         theme = initialTheme,
         context = this.application,
         controllers = SR2Controllers(),
+        bookmarks = listOf()
       )
     } catch (e: Exception) {
       this.onBookLoadingFailed(e)
