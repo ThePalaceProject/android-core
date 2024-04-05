@@ -18,15 +18,18 @@ import kotlinx.coroutines.runBlocking
 import org.librarysimplified.mdc.MDCKeys
 import org.librarysimplified.r2.api.SR2Event
 import org.librarysimplified.r2.vanilla.SR2Controllers
-import org.librarysimplified.r2.views.SR2ControllerReference
 import org.librarysimplified.r2.views.SR2Fragment
 import org.librarysimplified.r2.views.SR2ReaderFragment
 import org.librarysimplified.r2.views.SR2ReaderModel
 import org.librarysimplified.r2.views.SR2ReaderViewCommand
 import org.librarysimplified.r2.views.SR2ReaderViewEvent
+import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewBookEvent.SR2BookLoadingFailed
+import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewControllerEvent.SR2ControllerBecameAvailable
+import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewControllerEvent.SR2ControllerBecameUnavailable
 import org.librarysimplified.r2.views.SR2SearchFragment
 import org.librarysimplified.r2.views.SR2TOCFragment
 import org.librarysimplified.services.api.Services
+import org.librarysimplified.viewer.epub.readium2.Reader2LoadingFragment
 import org.librarysimplified.viewer.epub.readium2.Reader2Themes
 import org.nypl.drm.core.ContentProtectionProvider
 import org.nypl.simplified.accessibility.AccessibilityServiceType
@@ -138,6 +141,9 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
 
   override fun onStart() {
     super.onStart()
+
+    this.switchFragment(Reader2LoadingFragment())
+
     this.subscriptions = CompositeDisposable()
     this.subscriptions.add(
       this.previewRegistry.observeBookPreviewStatus()
@@ -184,16 +190,19 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
     this.uiThread.checkIsUIThread()
 
     return when (event) {
-      is SR2ReaderViewEvent.SR2ReaderViewBookEvent.SR2BookLoadingFailed -> {
+      is SR2BookLoadingFailed -> {
         this.onBookLoadingFailed(event.exception)
       }
-      is SR2ReaderViewEvent.SR2ReaderViewControllerEvent.SR2ControllerBecameAvailable -> {
-        this.onControllerBecameAvailable(event.reference)
+      is SR2ControllerBecameAvailable -> {
+        this.onControllerBecameAvailable()
+      }
+      is SR2ControllerBecameUnavailable -> {
+        // Nothing to do
       }
     }
   }
 
-  private fun onControllerBecameAvailable(reference: SR2ControllerReference) {
+  private fun onControllerBecameAvailable() {
     this.switchFragment(SR2ReaderFragment())
   }
 

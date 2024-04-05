@@ -28,19 +28,22 @@ internal class BServiceOpCreateBookmark(
 
   override fun runActual(): Bookmark {
     return try {
-      val remoteBookmark = BServiceOpCreateRemoteBookmark(
-        this.logger,
-        this.objectMapper,
-        this.httpCalls,
-        this.profile,
-        this.accountID,
-        bookmark
-      ).runActual()
+      this.createLocalBookmarkFrom(this.bookmark)
 
-      createLocalBookmarkFrom(remoteBookmark)
+      val remoteBookmark =
+        BServiceOpCreateRemoteBookmark(
+          this.logger,
+          this.objectMapper,
+          this.httpCalls,
+          this.profile,
+          this.accountID,
+          this.bookmark
+        ).runActual()
+
+      this.createLocalBookmarkFrom(remoteBookmark)
     } catch (e: Exception) {
       return if (this.ignoreRemoteFailures) {
-        createLocalBookmarkFrom(this.bookmark)
+        this.createLocalBookmarkFrom(this.bookmark)
       } else {
         throw e
       }

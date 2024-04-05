@@ -822,6 +822,7 @@ allprojects {
         configurations.all {
             isTransitive = transitiveConfigurations.contains(name)
             // resolutionStrategy.failOnVersionConflict()
+            resolutionStrategy.cacheChangingModulesFor(30, TimeUnit.SECONDS)
         }
     }
 

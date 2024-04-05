@@ -23,7 +23,6 @@ import org.librarysimplified.r2.api.SR2ControllerType
 import org.librarysimplified.r2.api.SR2Event
 import org.librarysimplified.r2.api.SR2Event.SR2BookmarkEvent.SR2BookmarkCreated
 import org.librarysimplified.r2.vanilla.SR2Controllers
-import org.librarysimplified.r2.views.SR2ControllerReference
 import org.librarysimplified.r2.views.SR2Fragment
 import org.librarysimplified.r2.views.SR2ReaderFragment
 import org.librarysimplified.r2.views.SR2ReaderModel
@@ -36,6 +35,7 @@ import org.librarysimplified.r2.views.SR2ReaderViewCommand.SR2ReaderViewNavigati
 import org.librarysimplified.r2.views.SR2ReaderViewEvent
 import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewBookEvent.SR2BookLoadingFailed
 import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewControllerEvent.SR2ControllerBecameAvailable
+import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewControllerEvent.SR2ControllerBecameUnavailable
 import org.librarysimplified.r2.views.SR2SearchFragment
 import org.librarysimplified.r2.views.SR2TOCFragment
 import org.librarysimplified.services.api.Services
@@ -161,9 +161,6 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     if ((this.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
       WebView.setWebContentsDebuggingEnabled(true)
     }
-
-    this.switchFragment(Reader2LoadingFragment())
-    this.startReader()
   }
 
   override fun onStart() {
@@ -173,6 +170,9 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     this.subscriptions.add(SR2ReaderModel.controllerEvents.subscribe(this::onControllerEvent))
     this.subscriptions.add(SR2ReaderModel.viewCommands.subscribe(this::onViewCommandReceived))
     this.subscriptions.add(SR2ReaderModel.viewEvents.subscribe(this::onViewEventReceived))
+
+    this.switchFragment(Reader2LoadingFragment())
+    this.startReader()
   }
 
   override fun onStop() {
@@ -326,7 +326,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     this.fragmentNow = fragment
     this.supportFragmentManager.beginTransaction()
       .replace(R.id.reader2FragmentHost, fragment)
-      .commit()
+      .commitAllowingStateLoss()
   }
 
   @UiThread
@@ -339,7 +339,11 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       }
 
       is SR2ControllerBecameAvailable -> {
-        this.onControllerBecameAvailable(event.reference)
+        this.onControllerBecameAvailable(event.controller)
+      }
+
+      is SR2ControllerBecameUnavailable -> {
+        // Nothing to do
       }
     }
   }
@@ -495,9 +499,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
   }
 
   @UiThread
-  private fun onControllerBecameAvailable(
-    reference: SR2ControllerReference
-  ) {
+  private fun onControllerBecameAvailable(controller: SR2ControllerType) {
     this.uiThread.checkIsUIThread()
     this.switchFragment(SR2ReaderFragment())
   }
