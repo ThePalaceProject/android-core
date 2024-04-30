@@ -5,7 +5,7 @@ import io.reactivex.subjects.Subject
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.bookmarks.api.BookmarkEvent
 import org.nypl.simplified.bookmarks.api.BookmarkHTTPCallsType
-import org.nypl.simplified.books.api.bookmark.Bookmark
+import org.nypl.simplified.books.api.bookmark.SerializedBookmark
 import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.slf4j.Logger
 
@@ -22,11 +22,11 @@ internal class BServiceOpCreateBookmark(
   private val httpCalls: BookmarkHTTPCallsType,
   private val profile: ProfileReadableType,
   private val accountID: AccountID,
-  private val bookmark: Bookmark,
+  private val bookmark: SerializedBookmark,
   private val ignoreRemoteFailures: Boolean
-) : BServiceOp<Bookmark>(logger) {
+) : BServiceOp<SerializedBookmark>(logger) {
 
-  override fun runActual(): Bookmark {
+  override fun runActual(): SerializedBookmark {
     return try {
       this.createLocalBookmarkFrom(this.bookmark)
 
@@ -50,7 +50,9 @@ internal class BServiceOpCreateBookmark(
     }
   }
 
-  private fun createLocalBookmarkFrom(bookmark: Bookmark): Bookmark {
+  private fun createLocalBookmarkFrom(
+    bookmark: SerializedBookmark
+  ): SerializedBookmark {
     return BServiceOpCreateLocalBookmark(
       this.logger,
       this.bookmarkEventsOut,

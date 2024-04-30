@@ -1,13 +1,13 @@
 package org.librarysimplified.ui.splash
 
 import android.app.Activity
-import android.webkit.WebViewClient
-import android.webkit.WebView
 import android.content.Intent
 import android.net.MailTo
 import android.net.Uri
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import org.slf4j.LoggerFactory
 
 /**

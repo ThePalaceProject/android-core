@@ -1,6 +1,5 @@
 package org.nypl.simplified.ui.accounts
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import android.annotation.SuppressLint
 import android.content.Context
 import android.location.LocationManager
@@ -21,8 +20,10 @@ import androidx.core.widget.ContentLoadingProgressBar
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.reactivex.disposables.CompositeDisposable
 import org.librarysimplified.services.api.Services
+import org.librarysimplified.ui.accounts.R
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.accounts.api.AccountEventCreation
 import org.nypl.simplified.accounts.api.AccountProviderDescription
@@ -33,7 +34,6 @@ import org.nypl.simplified.listeners.api.fragmentListeners
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.slf4j.LoggerFactory
-import org.librarysimplified.ui.accounts.R
 import org.thepalaceproject.theme.core.PalaceToolbar
 
 /**

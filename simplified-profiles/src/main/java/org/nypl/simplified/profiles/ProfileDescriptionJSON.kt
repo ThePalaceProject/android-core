@@ -348,7 +348,7 @@ object ProfileDescriptionJSON {
 
   private fun deserializeReaderPreferences(
     objectMapper: ObjectMapper,
-    node: ObjectNode?
+    node: ObjectNode
   ): ReaderPreferences {
     return JSONParserUtilities.getObjectOptional(node, "readerPreferences")
       .mapPartial<ReaderPreferences, JSONParseException> { prefsNode ->
@@ -367,11 +367,10 @@ object ProfileDescriptionJSON {
 
   private fun deserializePlaybackRates(
     objectMapper: ObjectMapper,
-    node: ObjectNode?
+    node: ObjectNode
   ): Map<String, PlayerPlaybackRate> {
-    val str = JSONParserUtilities.getObjectOrNull(
-      node, "playbackRates"
-    ) ?: return hashMapOf()
+    val str = JSONParserUtilities.getObjectOrNull(node, "playbackRates")
+      ?: return hashMapOf()
 
     val map = objectMapper.readValue(
       str.toString(),
@@ -382,34 +381,6 @@ object ProfileDescriptionJSON {
 
     return map.mapValues { entry ->
       PlayerPlaybackRate.valueOf(entry.value)
-    }
-  }
-
-  private fun deserializeSleepTimers(
-    objectMapper: ObjectMapper,
-    node: ObjectNode?
-  ): Map<String, Long?> {
-    val str = JSONParserUtilities.getObjectOrNull(
-      node, "sleepTimers"
-    ) ?: return hashMapOf()
-
-    val map = objectMapper.readValue(
-      str.toString(),
-      object : TypeReference<Map<String, String?>>() {
-        // Do nothing
-      }
-    )
-
-    return map.mapValues { entry ->
-      if (entry.value != null) {
-        try {
-          entry.value?.toLong()
-        } catch (exception: NumberFormatException) {
-          0L
-        }
-      } else {
-        null
-      }
     }
   }
 

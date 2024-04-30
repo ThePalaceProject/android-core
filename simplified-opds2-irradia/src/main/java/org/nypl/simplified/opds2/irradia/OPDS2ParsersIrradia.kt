@@ -1,9 +1,9 @@
 package org.nypl.simplified.opds2.irradia
 
 import one.irradia.opds2_0.parser.extension.library_simplified.OPDS20CatalogExtension
+import one.irradia.opds2_0.parser.extension.spi.OPDS20ExtensionType
 import one.irradia.opds2_0.parser.vanilla.OPDS20FeedParsers
 import org.nypl.simplified.opds2.OPDS2Feed
-import one.irradia.opds2_0.parser.extension.spi.OPDS20ExtensionType
 import org.nypl.simplified.opds2.irradia.internal.OPDS2ParserIrradia
 import org.nypl.simplified.opds2.parser.api.OPDS2ParsersType
 import org.nypl.simplified.parser.api.ParserType

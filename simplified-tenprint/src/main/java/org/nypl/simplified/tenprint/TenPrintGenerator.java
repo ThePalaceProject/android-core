@@ -14,6 +14,7 @@ import android.graphics.Typeface;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
+
 import com.io7m.jnull.NullCheck;
 
 import java.util.ArrayList;

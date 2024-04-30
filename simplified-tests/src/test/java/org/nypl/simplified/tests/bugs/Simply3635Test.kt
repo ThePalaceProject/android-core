@@ -2,7 +2,6 @@ package org.nypl.simplified.tests.bugs
 
 import android.app.Application
 import android.content.ContentResolver
-import android.content.Context
 import com.google.common.util.concurrent.ListeningExecutorService
 import com.google.common.util.concurrent.MoreExecutors
 import com.io7m.jfunctional.Option

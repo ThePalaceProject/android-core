@@ -2,7 +2,6 @@ package org.nypl.simplified.tests.http.refresh_token.borrow
 
 import android.app.Application
 import android.content.ContentResolver
-import android.content.Context
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okio.Buffer

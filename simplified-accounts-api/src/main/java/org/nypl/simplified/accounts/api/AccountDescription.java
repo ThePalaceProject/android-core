@@ -2,8 +2,6 @@ package org.nypl.simplified.accounts.api;
 
 import com.google.auto.value.AutoValue;
 
-import java.net.URI;
-
 /**
  * A description of an account.
  */

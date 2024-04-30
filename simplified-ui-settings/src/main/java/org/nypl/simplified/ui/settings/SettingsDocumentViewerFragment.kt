@@ -8,10 +8,10 @@ import android.webkit.WebChromeClient
 import android.webkit.WebViewClient
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import org.librarysimplified.ui.settings.databinding.SettingsDocumentViewerBinding
 import org.nypl.simplified.android.ktx.supportActionBar
 import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.fragmentListeners
-import org.librarysimplified.ui.settings.databinding.SettingsDocumentViewerBinding
 import org.nypl.simplified.webview.WebViewUtilities
 import org.thepalaceproject.theme.core.PalaceToolbar
 

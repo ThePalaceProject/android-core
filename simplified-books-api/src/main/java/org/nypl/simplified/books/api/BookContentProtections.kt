@@ -1,10 +1,10 @@
 package org.nypl.simplified.books.api
 
 import android.app.Application
+import org.nypl.drm.core.ContentProtectionProvider
 import org.nypl.simplified.lcp.LCPContentProtectionProvider
 import org.readium.r2.shared.publication.protection.ContentProtection
 import org.slf4j.LoggerFactory
-import org.nypl.drm.core.ContentProtectionProvider
 
 object BookContentProtections {
 

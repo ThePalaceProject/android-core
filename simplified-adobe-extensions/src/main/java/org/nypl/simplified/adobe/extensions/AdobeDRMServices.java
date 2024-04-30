@@ -20,10 +20,6 @@ import com.io7m.junreachable.UnreachableCodeException;
 
 import org.joda.time.Instant;
 import org.librarysimplified.adobe.extensions.BuildConfig;
-import org.nypl.simplified.files.DirectoryUtilities;
-import org.nypl.simplified.json.core.JSONParserUtilities;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.nypl.drm.core.AdobeAdeptConnectorFactory;
 import org.nypl.drm.core.AdobeAdeptConnectorFactoryType;
 import org.nypl.drm.core.AdobeAdeptConnectorParameters;
@@ -38,6 +34,10 @@ import org.nypl.drm.core.AdobeAdeptResourceProvider;
 import org.nypl.drm.core.AdobeAdeptResourceProviderType;
 import org.nypl.drm.core.DRMException;
 import org.nypl.drm.core.DRMUnsupportedException;
+import org.nypl.simplified.files.DirectoryUtilities;
+import org.nypl.simplified.json.core.JSONParserUtilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

@@ -5,7 +5,6 @@ import com.io7m.jfunctional.PartialFunctionType;
 import com.io7m.junreachable.UnreachableCodeException;
 
 import org.joda.time.DateTime;
-import org.joda.time.format.ISODateTimeFormat;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Element;
 

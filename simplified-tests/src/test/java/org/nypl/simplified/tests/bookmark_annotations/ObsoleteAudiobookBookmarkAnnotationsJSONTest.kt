@@ -9,18 +9,21 @@ import org.nypl.simplified.bookmarks.api.BookmarkAnnotationBodyNode
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotationFirstNode
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotationResponse
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotationSelectorNode
+import org.nypl.simplified.bookmarks.api.BookmarkAnnotationTargetNode
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotations
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotationsJSON
-import org.nypl.simplified.bookmarks.api.BookmarkAnnotationTargetNode
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
+import org.nypl.simplified.books.api.bookmark.SerializedLocatorAudioBookTime1
+import org.nypl.simplified.books.api.bookmark.SerializedLocatorAudioBookTime2
+import org.nypl.simplified.books.api.bookmark.SerializedLocators
 import org.slf4j.LoggerFactory
 import java.io.FileNotFoundException
 import java.io.InputStream
 
-class AudiobookBookmarkAnnotationsJSONTest {
+class ObsoleteAudiobookBookmarkAnnotationsJSONTest {
 
   private val logger =
-    LoggerFactory.getLogger(AudiobookBookmarkAnnotationsJSONTest::class.java)
+    LoggerFactory.getLogger(ObsoleteAudiobookBookmarkAnnotationsJSONTest::class.java)
 
   private val objectMapper: ObjectMapper = ObjectMapper()
   private val targetValue0 =
@@ -38,7 +41,7 @@ class AudiobookBookmarkAnnotationsJSONTest {
       timestamp = "2022-06-27T12:39:37+0000",
       device = "cca80416-3168-4e58-b621-7964b9265ac9",
       chapterTitle = "A Title",
-      bookProgress = null
+      bookProgress = 0.0f
     )
 
   private val bookmarkBody1 =
@@ -46,7 +49,7 @@ class AudiobookBookmarkAnnotationsJSONTest {
       timestamp = "2022-06-27T12:39:37+0000",
       device = "cca80416-3168-4e58-b621-7964b9265ac9",
       chapterTitle = "A Title",
-      bookProgress = null
+      bookProgress = 0.0f
     )
 
   private val bookmarkBody2 =
@@ -54,7 +57,7 @@ class AudiobookBookmarkAnnotationsJSONTest {
       timestamp = "2022-06-27T12:39:37+0000",
       device = "cca80416-3168-4e58-b621-7964b9265ac9",
       chapterTitle = "A Title",
-      bookProgress = null
+      bookProgress = 0.0f
     )
 
   private val bookmarkBodyBadDate =
@@ -62,7 +65,7 @@ class AudiobookBookmarkAnnotationsJSONTest {
       timestamp = "2022-06-27T20:00:37Z",
       device = "cca80416-3168-4e58-b621-7964b9265ac9",
       chapterTitle = "A Title",
-      bookProgress = null
+      bookProgress = 0.0f
     )
 
   private val bookmark0 =
@@ -177,31 +180,27 @@ class AudiobookBookmarkAnnotationsJSONTest {
   @Test
   fun testSpecValidLocator() {
     val location =
-      BookmarkAnnotationsJSON.deserializeAudiobookLocation(
-        objectMapper = this.objectMapper,
-        value = this.resourceText("valid-locator-3.json")
-      )
+      SerializedLocators.parseLocatorFromString(this.resourceText("valid-locator-3.json"))
+        as SerializedLocatorAudioBookTime1
 
     assertEquals(32, location.chapter)
     assertEquals(3, location.part)
     assertEquals("Chapter title", location.title)
-    assertEquals(0, location.startOffset)
-    assertEquals(78000, location.currentOffset)
+    assertEquals(0, location.startOffsetMilliseconds)
+    assertEquals(78000, location.timeWithoutOffset)
   }
 
   @Test
   fun testSpecValidLocatorTwoOffsets() {
     val location =
-      BookmarkAnnotationsJSON.deserializeAudiobookLocation(
-        objectMapper = this.objectMapper,
-        value = this.resourceText("valid-locator-4.json")
-      )
+      SerializedLocators.parseLocatorFromString(this.resourceText("valid-locator-4.json"))
+        as SerializedLocatorAudioBookTime1
 
     assertEquals(32, location.chapter)
     assertEquals(3, location.part)
     assertEquals("Chapter title", location.title)
-    assertEquals(15000, location.startOffset)
-    assertEquals(63000, location.currentOffset)
+    assertEquals(15000, location.startOffsetMilliseconds)
+    assertEquals(63000, location.timeWithoutOffset)
   }
 
   @Test
@@ -303,18 +302,18 @@ class AudiobookBookmarkAnnotationsJSONTest {
         node = this.resourceNode("valid-bookmark-4.json")
       )
 
-    val bookmark = BookmarkAnnotations.toAudiobookBookmark(this.objectMapper, annotation)
+    val bookmark = BookmarkAnnotations.toSerializedBookmark(this.objectMapper, annotation)
     assertEquals("urn:uuid:1daa8de6-94e8-4711-b7d1-e43b572aa6e0", bookmark.opdsId)
     assertEquals("urn:uuid:c83db5b1-9130-4b86-93ea-634b00235c7c", bookmark.deviceID)
     assertEquals(BookmarkKind.BookmarkLastReadLocation, bookmark.kind)
     assertEquals("2022-06-27T12:47:49.000Z", bookmark.time.toString())
 
-    val location = bookmark.location
+    val location = bookmark.location as SerializedLocatorAudioBookTime1
     assertEquals("Chapter title", location.title)
     assertEquals(32, location.chapter)
     assertEquals(3, location.part)
-    assertEquals(0, location.startOffset)
-    assertEquals(78000, location.currentOffset)
+    assertEquals(0, location.startOffsetMilliseconds)
+    assertEquals(78000, location.timeMilliseconds)
 
     this.checkRoundTrip(annotation)
   }
@@ -327,18 +326,18 @@ class AudiobookBookmarkAnnotationsJSONTest {
         node = this.resourceNode("valid-bookmark-6.json")
       )
 
-    val bookmark = BookmarkAnnotations.toAudiobookBookmark(this.objectMapper, annotation)
+    val bookmark = BookmarkAnnotations.toSerializedBookmark(this.objectMapper, annotation)
     assertEquals("urn:uuid:1daa8de6-94e8-4711-b7d1-e43b572aa6e0", bookmark.opdsId)
     assertEquals("urn:uuid:c83db5b1-9130-4b86-93ea-634b00235c7c", bookmark.deviceID)
     assertEquals(BookmarkKind.BookmarkLastReadLocation, bookmark.kind)
     assertEquals("2022-06-27T12:47:49.000Z", bookmark.time.toString())
 
-    val location = bookmark.location
+    val location = bookmark.location as SerializedLocatorAudioBookTime1
     assertEquals("Chapter title", location.title)
     assertEquals(32, location.chapter)
     assertEquals(3, location.part)
-    assertEquals(15000, location.startOffset)
-    assertEquals(63000, location.currentOffset)
+    assertEquals(15000, location.startOffsetMilliseconds)
+    assertEquals(63000, location.timeWithoutOffset)
 
     this.checkRoundTrip(annotation)
   }
@@ -375,11 +374,11 @@ class AudiobookBookmarkAnnotationsJSONTest {
     this.compareAnnotations(bookmarkAnnotation, deserialized)
 
     val toBookmark =
-      BookmarkAnnotations.toAudiobookBookmark(this.objectMapper, deserialized)
+      BookmarkAnnotations.toSerializedBookmark(this.objectMapper, deserialized)
     val fromBookmark =
-      BookmarkAnnotations.fromAudiobookBookmark(this.objectMapper, toBookmark)
+      BookmarkAnnotations.fromSerializedBookmark(this.objectMapper, toBookmark)
     val toBookmarkAgain =
-      BookmarkAnnotations.toAudiobookBookmark(this.objectMapper, fromBookmark)
+      BookmarkAnnotations.toSerializedBookmark(this.objectMapper, fromBookmark)
 
     this.compareAnnotations(bookmarkAnnotation, deserialized)
     this.compareAnnotations(bookmarkAnnotation, fromBookmark)
@@ -404,15 +403,9 @@ class AudiobookBookmarkAnnotationsJSONTest {
     assertEquals(x.target.selector.type, y.target.selector.type)
 
     val xSelectorValue =
-      BookmarkAnnotationsJSON.deserializeAudiobookLocation(
-        this.objectMapper,
-        x.target.selector.value
-      )
+      SerializedLocators.parseLocatorFromString(x.target.selector.value)
     val ySelectorValue =
-      BookmarkAnnotationsJSON.deserializeAudiobookLocation(
-        this.objectMapper,
-        y.target.selector.value
-      )
+      SerializedLocators.parseLocatorFromString(y.target.selector.value)
 
     assertEquals(xSelectorValue, ySelectorValue)
     assertEquals(x.target.source, y.target.source)
@@ -425,7 +418,7 @@ class AudiobookBookmarkAnnotationsJSONTest {
     val fileName =
       "/org/nypl/simplified/tests/bookmark_annotations/spec/bookmarks/$name"
     val url =
-      AudiobookBookmarkAnnotationsJSONTest::class.java.getResource(fileName)
+      ObsoleteAudiobookBookmarkAnnotationsJSONTest::class.java.getResource(fileName)
         ?: throw FileNotFoundException("No such resource: $fileName")
     return url.openStream()
   }

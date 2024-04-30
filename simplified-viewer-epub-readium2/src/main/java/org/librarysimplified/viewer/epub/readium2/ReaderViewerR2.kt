@@ -1,6 +1,6 @@
 package org.librarysimplified.viewer.epub.readium2
 
-import android.app.Activity
+import android.app.Application
 import one.irradia.mime.api.MIMEType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
@@ -33,7 +33,7 @@ class ReaderViewerR2 : ViewerProviderType {
   }
 
   override fun open(
-    activity: Activity,
+    context: Application,
     preferences: ViewerPreferences,
     book: Book,
     format: BookFormat,
@@ -56,7 +56,7 @@ class ReaderViewerR2 : ViewerProviderType {
       )
 
     Reader2Activity.startActivity(
-      context = activity,
+      context = context,
       parameters = parameters
     )
   }

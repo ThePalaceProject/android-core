@@ -1,4 +1,4 @@
-package org.librarysimplified.viewer.pdf.pdfjs.factory
+package org.librarysimplified.viewer.pdf.pdfjs
 
 import android.app.Application
 import com.shockwave.pdfium.PdfiumCore

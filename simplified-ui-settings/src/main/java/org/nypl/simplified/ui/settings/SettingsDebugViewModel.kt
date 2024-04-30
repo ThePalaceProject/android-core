@@ -8,6 +8,7 @@ import com.google.common.util.concurrent.MoreExecutors
 import io.reactivex.disposables.CompositeDisposable
 import org.joda.time.DateTime
 import org.joda.time.LocalDateTime
+import org.librarysimplified.reports.Reports
 import org.librarysimplified.services.api.Services
 import org.nypl.drm.core.AdobeAdeptExecutorType
 import org.nypl.drm.core.AxisNowServiceType
@@ -25,7 +26,6 @@ import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.profiles.api.ProfileEvent
 import org.nypl.simplified.profiles.api.ProfileUpdated
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
-import org.librarysimplified.reports.Reports
 import org.slf4j.LoggerFactory
 import java.net.URI
 

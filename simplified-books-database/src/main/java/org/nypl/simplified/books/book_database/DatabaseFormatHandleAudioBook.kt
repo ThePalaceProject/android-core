@@ -6,18 +6,18 @@ import net.jcip.annotations.GuardedBy
 import one.irradia.mime.api.MIMEType
 import org.librarysimplified.audiobook.api.PlayerAudioEngineRequest
 import org.librarysimplified.audiobook.api.PlayerAudioEngines
-import org.librarysimplified.audiobook.api.PlayerPositions
 import org.librarysimplified.audiobook.api.PlayerResult
 import org.librarysimplified.audiobook.api.PlayerUserAgent
 import org.librarysimplified.audiobook.manifest.api.PlayerManifest
 import org.librarysimplified.audiobook.manifest_parser.api.ManifestParsers
 import org.librarysimplified.audiobook.parser.api.ParseResult
-import org.nypl.simplified.books.api.BookDRMKind
 import org.nypl.simplified.books.api.BookDRMInformation
+import org.nypl.simplified.books.api.BookDRMKind
 import org.nypl.simplified.books.api.BookFormat
-import org.nypl.simplified.books.api.bookmark.Bookmark
-import org.nypl.simplified.books.api.bookmark.BookmarkJSON
+import org.nypl.simplified.books.api.bookmark.BookmarkID
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
+import org.nypl.simplified.books.api.bookmark.SerializedBookmark
+import org.nypl.simplified.books.api.bookmark.SerializedBookmarks
 import org.nypl.simplified.books.book_database.api.BookDRMInformationHandle
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook
 import org.nypl.simplified.files.DirectoryUtilities
@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
-import java.lang.IllegalStateException
 import java.net.URI
 
 /**
@@ -238,6 +237,26 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
     this.parameters.onUpdated.invoke(newFormat)
   }
 
+  override fun deleteBookmark(bookmarkId: BookmarkID) {
+    val newFormat = synchronized(this.dataLock) {
+      val serialized = this.formatRef.bookmarks.filter { bookmark ->
+        bookmark.bookmarkId != bookmarkId
+      }
+
+      FileUtilities.fileWriteUTF8Atomically(
+        this.fileBookmarks,
+        this.fileBookmarksTmp,
+        JSONSerializerUtilities.serializeToString(
+          serialized.map { x -> x.toJSON(this.parameters.objectMapper) }
+        )
+      )
+      this.formatRef = this.formatRef.copy(bookmarks = serialized)
+      this.formatRef
+    }
+
+    this.parameters.onUpdated.invoke(newFormat)
+  }
+
   override fun copyInManifestAndURI(
     data: ByteArray,
     manifestURI: URI
@@ -301,21 +320,7 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
     this.parameters.onUpdated.invoke(newFormat)
   }
 
-  override fun setBookmarks(bookmarks: List<Bookmark.AudiobookBookmark>) {
-    val newFormat = synchronized(this.dataLock) {
-      FileUtilities.fileWriteUTF8Atomically(
-        this.fileBookmarks,
-        this.fileBookmarksTmp,
-        BookmarkJSON.serializeAudiobookBookmarksToString(this.parameters.objectMapper, bookmarks)
-      )
-      this.formatRef = this.formatRef.copy(bookmarks = bookmarks)
-      this.formatRef
-    }
-
-    this.parameters.onUpdated.invoke(newFormat)
-  }
-
-  override fun setLastReadLocation(bookmark: Bookmark.AudiobookBookmark?) {
+  override fun setLastReadLocation(bookmark: SerializedBookmark?) {
     val newFormat = synchronized(this.dataLock) {
       if (bookmark != null) {
         Preconditions.checkArgument(
@@ -326,15 +331,36 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
         FileUtilities.fileWriteUTF8Atomically(
           this.filePosition,
           this.filePositionTmp,
-          JSONSerializerUtilities.serializeToString(
-            PlayerPositions.serializeToObjectNode(bookmark.location)
-          )
+          JSONSerializerUtilities.serializeToString(bookmark.toJSON(this.parameters.objectMapper))
         )
       } else {
         FileUtilities.fileDelete(this.filePosition)
       }
 
       this.formatRef = this.formatRef.copy(lastReadLocation = bookmark)
+      this.formatRef
+    }
+
+    this.parameters.onUpdated.invoke(newFormat)
+  }
+
+  override fun addBookmark(
+    bookmark: SerializedBookmark
+  ) {
+    val newFormat = synchronized(this.dataLock) {
+      val newBookmarks = arrayListOf<SerializedBookmark>()
+      newBookmarks.addAll(this.formatRef.bookmarks)
+      newBookmarks.removeIf { b -> b.bookmarkId == bookmark.bookmarkId }
+      newBookmarks.add(bookmark)
+
+      FileUtilities.fileWriteUTF8Atomically(
+        this.fileBookmarks,
+        this.fileBookmarksTmp,
+        JSONSerializerUtilities.serializeToString(
+          newBookmarks.map { x -> x.toJSON(this.parameters.objectMapper) }
+        )
+      )
+      this.formatRef = this.formatRef.copy(bookmarks = newBookmarks)
       this.formatRef
     }
 
@@ -361,8 +387,8 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
         manifest = this.loadManifestIfNecessary(fileManifest, fileManifestURI),
         contentType = contentType,
         drmInformation = drmInfo,
-        bookmarks = loadBookmarksIfPresent(objectMapper, fileBookmarks),
-        lastReadLocation = loadLastReadLocationIfPresent(objectMapper, filePosition),
+        bookmarks = this.loadBookmarksIfPresent(objectMapper, fileBookmarks),
+        lastReadLocation = this.loadLastReadLocationIfPresent(filePosition),
       )
     }
 
@@ -370,9 +396,9 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
     private fun loadBookmarksIfPresent(
       objectMapper: ObjectMapper,
       fileBookmarks: File
-    ): List<Bookmark.AudiobookBookmark> {
+    ): List<SerializedBookmark> {
       return if (fileBookmarks.isFile) {
-        loadBookmarks(
+        this.loadBookmarks(
           objectMapper = objectMapper,
           fileBookmarks = fileBookmarks
         )
@@ -384,41 +410,33 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
     private fun loadBookmarks(
       objectMapper: ObjectMapper,
       fileBookmarks: File
-    ): List<Bookmark.AudiobookBookmark> {
-      val tree = objectMapper.readTree(fileBookmarks)
-      val array = JSONParserUtilities.checkArray(null, tree)
-
-      val bookmarks = arrayListOf<Bookmark.AudiobookBookmark>()
+    ): List<SerializedBookmark> {
+      val tree =
+        objectMapper.readTree(fileBookmarks)
+      val array =
+        JSONParserUtilities.checkArray(null, tree)
+      val bookmarks =
+        arrayListOf<SerializedBookmark>()
 
       array.forEach { node ->
         try {
-          val bookmark = BookmarkJSON.deserializeAudiobookBookmarkFromJSON(
-            kind = BookmarkKind.BookmarkExplicit,
-            node = node
-          )
-
-          bookmarks.add(bookmark)
+          bookmarks.add(SerializedBookmarks.parseBookmark(node))
         } catch (exception: JSONParseException) {
-          this.logger.debug("Failed to parse an audiobook bookmark from the bookmarks file")
+          this.logger.debug("Failed to parse bookmark: ", exception)
         }
       }
-
       return bookmarks
     }
 
     @Throws(IOException::class)
     private fun loadLastReadLocationIfPresent(
-      objectMapper: ObjectMapper,
       fileLastRead: File
-    ): Bookmark.AudiobookBookmark? {
+    ): SerializedBookmark? {
       return if (fileLastRead.isFile) {
         try {
-          loadLastReadLocation(
-            objectMapper = objectMapper,
-            fileLastRead = fileLastRead
-          )
+          this.loadLastReadLocation(fileLastRead = fileLastRead)
         } catch (e: Exception) {
-          logger.error("failed to read the last-read location: ", e)
+          this.logger.error("Failed to read the last-read location: ", e)
           null
         }
       } else {
@@ -428,15 +446,9 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
 
     @Throws(IOException::class)
     private fun loadLastReadLocation(
-      objectMapper: ObjectMapper,
       fileLastRead: File
-    ): Bookmark.AudiobookBookmark {
-      val serialized = FileUtilities.fileReadUTF8(fileLastRead)
-      return BookmarkJSON.deserializeAudiobookBookmarkFromString(
-        objectMapper = objectMapper,
-        kind = BookmarkKind.BookmarkLastReadLocation,
-        serialized = serialized
-      )
+    ): SerializedBookmark {
+      return SerializedBookmarks.parseBookmarkFromString(FileUtilities.fileReadUTF8(fileLastRead))
     }
 
     private fun loadManifestIfNecessary(

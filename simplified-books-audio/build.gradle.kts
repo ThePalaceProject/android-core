@@ -26,6 +26,6 @@ dependencies {
     implementation(libs.palace.audiobook.parser.api)
     implementation(libs.palace.http.api)
     implementation(libs.r2.shared)
-    implementation(libs.rxjava)
+    implementation(libs.rxjava2)
     implementation(libs.slf4j)
 }

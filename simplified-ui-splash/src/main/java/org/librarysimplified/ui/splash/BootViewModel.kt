@@ -5,9 +5,9 @@ import androidx.lifecycle.AndroidViewModel
 import hu.akarnokd.rxjava2.subjects.UnicastWorkSubject
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import org.librarysimplified.reports.Reports
 import org.nypl.simplified.boot.api.BootEvent
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
-import org.librarysimplified.reports.Reports
 import org.nypl.simplified.ui.branding.BrandingSplashServiceType
 import java.util.ServiceLoader
 

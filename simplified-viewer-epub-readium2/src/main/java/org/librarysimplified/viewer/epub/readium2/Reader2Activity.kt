@@ -1,6 +1,6 @@
 package org.librarysimplified.viewer.epub.readium2
 
-import android.app.Activity
+import android.app.Application
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.os.Bundle
@@ -79,7 +79,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
      */
 
     fun startActivity(
-      context: Activity,
+      context: Application,
       parameters: Reader2ActivityParameters
     ) {
       val intent = Intent(context, Reader2Activity::class.java)

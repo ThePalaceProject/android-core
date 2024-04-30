@@ -17,8 +17,8 @@ import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.BasicToken
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.COPPAAgeGate
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.ANONYMOUS_TYPE
-import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.BASIC_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.BASIC_TOKEN_TYPE
+import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.BASIC_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.COPPA_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.OAUTH_INTERMEDIARY_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.SAML_2_0_TYPE
@@ -486,7 +486,7 @@ object AccountProvidersJSON {
         val logoURI =
           JSONParserUtilities.getURIOrNull(container, "logo")
         val authenticationURI =
-          JSONParserUtilities.getURIOrNull(container, "authenticationURI")
+          JSONParserUtilities.getURI(container, "authenticationURI")
 
         BasicToken(
           authenticationURI = authenticationURI,
@@ -503,9 +503,9 @@ object AccountProvidersJSON {
       COPPA_TYPE -> {
         COPPAAgeGate(
           greaterEqual13 =
-          JSONParserUtilities.getURIOrNull(container, "greaterEqual13"),
+          JSONParserUtilities.getURI(container, "greaterEqual13"),
           under13 =
-          JSONParserUtilities.getURIOrNull(container, "under13")
+          JSONParserUtilities.getURI(container, "under13")
         )
       }
       else -> {

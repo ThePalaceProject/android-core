@@ -1,10 +1,10 @@
 package org.nypl.simplified.bookmarks.internal
 
 import org.nypl.simplified.accounts.api.AccountID
-import org.nypl.simplified.bookmarks.api.Bookmarks
+import org.nypl.simplified.bookmarks.api.BookmarksForBook
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.api.BookID
-import org.nypl.simplified.books.api.bookmark.Bookmark
+import org.nypl.simplified.books.api.bookmark.SerializedBookmark
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleEPUB
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandlePDF
@@ -19,11 +19,10 @@ internal class BServiceOpLoadBookmarks(
   logger: Logger,
   private val profile: ProfileReadableType,
   private val accountID: AccountID,
-  private val book: BookID,
-  private val lastReadBookmarkServer: Bookmark?
-) : BServiceOp<Bookmarks>(logger) {
+  private val book: BookID
+) : BServiceOp<BookmarksForBook>(logger) {
 
-  override fun runActual(): Bookmarks {
+  override fun runActual(): BookmarksForBook {
     try {
       this.logger.debug("[{}]: loading bookmarks for book {}", this.profile.id.uuid, this.book.brief())
 
@@ -35,8 +34,8 @@ internal class BServiceOpLoadBookmarks(
         ?: entry.findFormatHandle(BookDatabaseEntryFormatHandlePDF::class.java)
 
       if (handle != null) {
-        val bookmarks: List<Bookmark>
-        val lastReadLocation: Bookmark?
+        val bookmarks: List<SerializedBookmark>
+        val lastReadLocation: SerializedBookmark?
 
         when (handle.format) {
           is BookFormat.BookFormatEPUB -> {
@@ -66,9 +65,9 @@ internal class BServiceOpLoadBookmarks(
           bookmarks.size
         )
 
-        return Bookmarks(
-          lastReadLocal = lastReadLocation,
-          lastReadServer = lastReadBookmarkServer,
+        return BookmarksForBook(
+          bookId = this.book,
+          lastRead = lastReadLocation,
           bookmarks = bookmarks
         )
       }
@@ -77,6 +76,6 @@ internal class BServiceOpLoadBookmarks(
     }
 
     this.logger.debug("[{}]: returning empty bookmarks", this.profile.id.uuid)
-    return Bookmarks(null, null, listOf())
+    return BookmarksForBook(this.book, null, listOf())
   }
 }

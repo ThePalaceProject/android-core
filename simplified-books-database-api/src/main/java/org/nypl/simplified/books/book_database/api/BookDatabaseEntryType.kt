@@ -8,7 +8,8 @@ import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.api.BookFormat.BookFormatAudioBook
 import org.nypl.simplified.books.api.BookFormat.BookFormatEPUB
 import org.nypl.simplified.books.api.BookFormat.BookFormatPDF
-import org.nypl.simplified.books.api.bookmark.Bookmark
+import org.nypl.simplified.books.api.bookmark.BookmarkID
+import org.nypl.simplified.books.api.bookmark.SerializedBookmark
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleEPUB
 import org.nypl.simplified.books.book_database.api.BookFormats.BookFormatDefinition.BOOK_FORMAT_AUDIO
@@ -169,6 +170,35 @@ sealed class BookDatabaseEntryFormatHandle {
   abstract fun deleteBookData()
 
   /**
+   * Delete the bookmark with the given ID.
+   */
+
+  @Throws(IOException::class)
+  abstract fun deleteBookmark(bookmarkId: BookmarkID)
+
+  /**
+   * Set the last read location for the book.
+   *
+   * @param bookmark The location
+   *
+   * @throws IOException On I/O errors
+   */
+
+  @Throws(IOException::class)
+  abstract fun setLastReadLocation(bookmark: SerializedBookmark?)
+
+  /**
+   * Add a bookmark to the book, replacing any existing bookmark with the same ID.
+   *
+   * @param bookmark The location
+   *
+   * @throws IOException On I/O errors
+   */
+
+  @Throws(IOException::class)
+  abstract fun addBookmark(bookmark: SerializedBookmark)
+
+  /**
    * The interface exposed by the EPUB format in database entries.
    */
 
@@ -189,28 +219,6 @@ sealed class BookDatabaseEntryFormatHandle {
 
     @Throws(IOException::class)
     abstract fun copyInBook(file: File)
-
-    /**
-     * Set the last read location for the book.
-     *
-     * @param bookmark The location
-     *
-     * @throws IOException On I/O errors
-     */
-
-    @Throws(IOException::class)
-    abstract fun setLastReadLocation(bookmark: Bookmark.ReaderBookmark?)
-
-    /**
-     * Set the bookmarks for the book.
-     *
-     * @param bookmarks The list of bookmarks
-     *
-     * @throws IOException On I/O errors
-     */
-
-    @Throws(IOException::class)
-    abstract fun setBookmarks(bookmarks: List<Bookmark.ReaderBookmark>)
   }
 
   /**
@@ -234,27 +242,6 @@ sealed class BookDatabaseEntryFormatHandle {
 
     @Throws(IOException::class)
     abstract fun copyInBook(file: File)
-
-    /**
-     * Set the last read location for the PDF book.
-     *
-     * @param bookmark The bookmark of the PDF book
-     *
-     * @throws IOException On I/O errors
-     */
-    @Throws(IOException::class)
-    abstract fun setLastReadLocation(bookmark: Bookmark.PDFBookmark?)
-
-    /**
-     * Set the bookmarks for the book.
-     *
-     * @param bookmarks The list of bookmarks
-     *
-     * @throws IOException On I/O errors
-     */
-
-    @Throws(IOException::class)
-    abstract fun setBookmarks(bookmarks: List<Bookmark.PDFBookmark>)
   }
 
   /**
@@ -302,27 +289,5 @@ sealed class BookDatabaseEntryFormatHandle {
 
     @Throws(IOException::class)
     abstract fun moveInBook(file: File)
-
-    /**
-     * Set the last read location for the book.
-     *
-     * @param bookmark The location
-     *
-     * @throws IOException On I/O errors
-     */
-
-    @Throws(IOException::class)
-    abstract fun setLastReadLocation(bookmark: Bookmark.AudiobookBookmark?)
-
-    /**
-     * Set the bookmarks for the book.
-     *
-     * @param bookmarks The list of bookmarks
-     *
-     * @throws IOException On I/O errors
-     */
-
-    @Throws(IOException::class)
-    abstract fun setBookmarks(bookmarks: List<Bookmark.AudiobookBookmark>)
   }
 }

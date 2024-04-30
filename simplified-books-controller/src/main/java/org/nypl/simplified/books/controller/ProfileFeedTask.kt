@@ -17,7 +17,6 @@ import org.nypl.simplified.feeds.api.FeedSearch
 import org.nypl.simplified.profiles.controller.api.ProfileFeedRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.slf4j.LoggerFactory
-import java.util.ArrayList
 import java.util.Collections
 import java.util.Locale
 import java.util.concurrent.Callable

@@ -15,7 +15,6 @@ import org.librarysimplified.http.vanilla.LSHTTPClients
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
-import org.nypl.simplified.accounts.api.AccountAuthenticationTokenInfo
 import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountUsername
 import org.nypl.simplified.accounts.database.api.AccountType
@@ -116,8 +115,8 @@ class BHTTPCallsTest {
       BookmarkAnnotationBodyNode(
         timestamp = "2019-02-08T15:37:46+0000",
         device = "urn:uuid:d8c5a487-646b-4c75-a83f-80599e8cf9d1",
-        chapterTitle = null,
-        bookProgress = null
+        chapterTitle = "",
+        bookProgress = 0.0f
       ),
       id = "https://example.com/annotations/book0",
       type = "Annotation",
@@ -138,8 +137,8 @@ class BHTTPCallsTest {
       BookmarkAnnotationBodyNode(
         timestamp = "2019-02-08T15:37:47+0000",
         device = "urn:uuid:d8c5a487-646b-4c75-a83f-80599e8cf9d1",
-        chapterTitle = null,
-        bookProgress = null
+        chapterTitle = "",
+        bookProgress = 0.0f
       ),
       id = "https://example.com/annotations/book0",
       type = "Annotation",

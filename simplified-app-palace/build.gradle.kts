@@ -356,6 +356,9 @@ dependencies {
      */
 
     if (findawayDRM) {
+        implementation(libs.palace.audiobook.audioengine)
+
+        // Findaway transitive dependencies.
         implementation(libs.dagger)
         implementation(libs.exoplayer2.core)
         implementation(libs.findaway)
@@ -373,12 +376,12 @@ dependencies {
         implementation(libs.moshi.kotlin)
         implementation(libs.okhttp3)
         implementation(libs.okhttp3.logging.interceptor)
-        implementation(libs.palace.findaway)
         implementation(libs.retrofit2)
         implementation(libs.retrofit2.adapter.rxjava)
         implementation(libs.retrofit2.converter.gson)
         implementation(libs.retrofit2.converter.moshi)
         implementation(libs.rxandroid)
+        implementation(libs.rxjava)
         implementation(libs.rxrelay)
         implementation(libs.sqlbrite)
         implementation(libs.stately.common)
@@ -492,6 +495,7 @@ dependencies {
     implementation(libs.androidx.viewpager)
     implementation(libs.androidx.viewpager2)
     implementation(libs.androidx.webkit)
+
     implementation(libs.azam.ulidj)
     implementation(libs.commons.compress)
     implementation(libs.firebase.analytics)
@@ -538,6 +542,7 @@ dependencies {
     implementation(libs.javax.inject)
     implementation(libs.joda.time)
     implementation(libs.jsoup)
+    implementation(libs.kabstand)
     implementation(libs.koi.core)
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlin.stdlib)
@@ -557,7 +562,6 @@ dependencies {
     implementation(libs.palace.audiobook.http)
     implementation(libs.palace.audiobook.json.canon)
     implementation(libs.palace.audiobook.json.web.token)
-    implementation(libs.palace.audiobook.lcp)
     implementation(libs.palace.audiobook.lcp.license.status)
     implementation(libs.palace.audiobook.license.check.api)
     implementation(libs.palace.audiobook.license.check.spi)
@@ -569,9 +573,8 @@ dependencies {
     implementation(libs.palace.audiobook.manifest.parser.api)
     implementation(libs.palace.audiobook.manifest.parser.extension.spi)
     implementation(libs.palace.audiobook.manifest.parser.webpub)
-    implementation(libs.palace.audiobook.open.access)
+    implementation(libs.palace.audiobook.media3)
     implementation(libs.palace.audiobook.parser.api)
-    implementation(libs.palace.audiobook.rbdigital)
     implementation(libs.palace.audiobook.views)
     implementation(libs.palace.drm.core)
     implementation(libs.palace.http.api)

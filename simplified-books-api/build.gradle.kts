@@ -15,6 +15,7 @@ dependencies {
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlin.stdlib)
     implementation(libs.palace.audiobook.api)
+    implementation(libs.palace.audiobook.manifest.api)
     implementation(libs.palace.drm.core)
     implementation(libs.palace.readium2.api)
     implementation(libs.r2.shared)

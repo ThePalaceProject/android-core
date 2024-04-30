@@ -1,7 +1,6 @@
 package org.nypl.simplified.parser.api
 
 import java.io.Serializable
-import java.lang.Exception
 import java.net.URI
 
 /**

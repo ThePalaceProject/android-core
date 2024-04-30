@@ -4,11 +4,12 @@ import android.os.Bundle
 import android.view.View
 import android.webkit.WebView
 import android.widget.ProgressBar
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.reactivex.disposables.CompositeDisposable
+import org.librarysimplified.ui.accounts.R
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.fragmentListeners
@@ -16,7 +17,6 @@ import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskStep
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.webview.WebViewUtilities
-import org.librarysimplified.ui.accounts.R
 
 /**
  * A fragment that performs the SAML 2.0 login workflow.

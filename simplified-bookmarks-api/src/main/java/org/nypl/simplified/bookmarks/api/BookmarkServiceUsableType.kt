@@ -1,10 +1,10 @@
 package org.nypl.simplified.bookmarks.api
 
-import com.google.common.util.concurrent.FluentFuture
 import io.reactivex.Observable
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookID
-import org.nypl.simplified.books.api.bookmark.Bookmark
+import org.nypl.simplified.books.api.bookmark.SerializedBookmark
+import java.util.concurrent.CompletableFuture
 
 /**
  * The "usable" bookmark service interface. Usable, in this sense, refers to the
@@ -20,20 +20,19 @@ interface BookmarkServiceUsableType {
   val bookmarkEvents: Observable<BookmarkEvent>
 
   /**
-   * Sync the bookmarks for the given account.
-   */
-  fun bookmarkSyncAccount(
-    accountID: AccountID,
-    bookID: BookID
-  ): FluentFuture<Bookmark?>
-
-  /**
    * Sync the bookmarks for the given account, and load bookmarks for the given book.
    */
   fun bookmarkSyncAndLoad(
     accountID: AccountID,
     book: BookID
-  ): FluentFuture<Bookmarks>
+  ): CompletableFuture<BookmarksForBook>
+
+  /**
+   * Sync the bookmarks for the given account.
+   */
+  fun bookmarkSyncAccount(
+    accountID: AccountID
+  ): CompletableFuture<List<SerializedBookmark>>
 
   /**
    * The user wants their current bookmarks.
@@ -41,9 +40,8 @@ interface BookmarkServiceUsableType {
 
   fun bookmarkLoad(
     accountID: AccountID,
-    book: BookID,
-    lastReadBookmarkServer: Bookmark?
-  ): FluentFuture<Bookmarks>
+    book: BookID
+  ): CompletableFuture<BookmarksForBook>
 
   /**
    * Create a local bookmark.
@@ -51,8 +49,8 @@ interface BookmarkServiceUsableType {
 
   fun bookmarkCreateLocal(
     accountID: AccountID,
-    bookmark: Bookmark
-  ): FluentFuture<Bookmark>
+    bookmark: SerializedBookmark
+  ): CompletableFuture<SerializedBookmark>
 
   /**
    * Create a remote bookmark.
@@ -60,8 +58,8 @@ interface BookmarkServiceUsableType {
 
   fun bookmarkCreateRemote(
     accountID: AccountID,
-    bookmark: Bookmark
-  ): FluentFuture<Bookmark>
+    bookmark: SerializedBookmark
+  ): CompletableFuture<SerializedBookmark>
 
   /**
    * Create a local bookmark, and then create a remote bookmark if necessary.
@@ -69,9 +67,9 @@ interface BookmarkServiceUsableType {
 
   fun bookmarkCreate(
     accountID: AccountID,
-    bookmark: Bookmark,
+    bookmark: SerializedBookmark,
     ignoreRemoteFailures: Boolean
-  ): FluentFuture<Bookmark>
+  ): CompletableFuture<SerializedBookmark>
 
   /**
    * The user has requested that a bookmark be deleted.
@@ -79,7 +77,7 @@ interface BookmarkServiceUsableType {
 
   fun bookmarkDelete(
     accountID: AccountID,
-    bookmark: Bookmark,
+    bookmark: SerializedBookmark,
     ignoreRemoteFailures: Boolean
-  ): FluentFuture<Unit>
+  ): CompletableFuture<Unit>
 }

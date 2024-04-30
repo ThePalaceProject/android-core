@@ -1,4 +1,5 @@
-<feed xmlns:simplified="http://librarysimplified.org/terms/" xmlns:app="http://www.w3.org/2007/app" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:opds="http://opds-spec.org/2010/catalog" xmlns:schema="http://schema.org/" xmlns="http://www.w3.org/2005/Atom">
+<feed xmlns:simplified="http://librarysimplified.org/terms/" xmlns:dcterms="http://purl.org/dc/terms/"
+    xmlns:schema="http://schema.org/" xmlns="http://www.w3.org/2005/Atom">
   <id>https://d3frcbs0h4wafj.cloudfront.net/groups/</id>
   <title>Featured</title>
   <updated>2015-05-19T18:22:36Z</updated>

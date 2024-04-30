@@ -1,4 +1,4 @@
-package org.librarysimplified.viewer.pdf.pdfjs.factory
+package org.librarysimplified.viewer.pdf.pdfjs
 
 import android.content.Context
 import android.graphics.Bitmap

@@ -8,10 +8,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.io7m.jfunctional.OptionType
 import com.io7m.jfunctional.Some
-import org.librarysimplified.audiobook.api.PlayerPosition
-import org.nypl.simplified.books.api.BookChapterProgress
-import org.nypl.simplified.books.api.BookLocation
-import org.nypl.simplified.books.api.bookmark.Bookmark
+import org.nypl.simplified.books.api.bookmark.SerializedLocators
 import org.nypl.simplified.json.core.JSONParseException
 import org.nypl.simplified.json.core.JSONParserUtilities
 
@@ -33,22 +30,8 @@ object BookmarkAnnotationsJSON {
      */
 
     try {
-      val selectorNode =
-        objectMapper.readTree(value)
-      val selectorObj =
-        JSONParserUtilities.checkObject(null, selectorNode)
-
-      when (JSONParserUtilities.getStringOrNull(selectorObj, "@type")) {
-        "LocatorAudioBookTime" -> {
-          deserializeAudiobookLocation(objectMapper, value)
-        }
-        "LocatorPage" -> {
-          deserializePdfLocation(objectMapper, value)
-        }
-        else -> {
-          deserializeReaderLocation(objectMapper, value)
-        }
-      }
+      val selectorNode = objectMapper.readTree(value)
+      SerializedLocators.parseLocator(selectorNode)
     } catch (e: Exception) {
       throw JSONParseException(e)
     }
@@ -137,14 +120,16 @@ object BookmarkAnnotationsJSON {
       device =
       JSONParserUtilities.getString(node, "http://librarysimplified.org/terms/device"),
       chapterTitle =
-      JSONParserUtilities.getStringOrNull(node, "http://librarysimplified.org/terms/chapter"),
-      bookProgress = mapOptionNull(
-        JSONParserUtilities.getDoubleOptional(
-          node,
-          "http://librarysimplified.org/terms/progressWithinBook"
-        )
-          .map { x -> x.toFloat() }
-      )
+      JSONParserUtilities.getStringDefault(
+        node,
+        "http://librarysimplified.org/terms/chapter",
+        ""
+      ),
+      bookProgress = JSONParserUtilities.getDoubleDefault(
+        node,
+        "http://librarysimplified.org/terms/progressWithinBook",
+        0.0
+      ).toFloat()
     )
   }
 
@@ -308,184 +293,5 @@ object BookmarkAnnotationsJSON {
       objectMapper = objectMapper,
       node = JSONParserUtilities.checkObject(null, node),
     )
-  }
-
-  @Throws(JSONParseException::class)
-  fun serializeBookmarkLocation(
-    objectMapper: ObjectMapper,
-    bookmark: Bookmark
-  ): String {
-    objectMapper.configure(SerializationFeature.INDENT_OUTPUT, false)
-    objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true)
-    return when (bookmark) {
-      is Bookmark.AudiobookBookmark ->
-        objectMapper.writeValueAsString(serializeLocationToNode(objectMapper, bookmark))
-      is Bookmark.ReaderBookmark ->
-        objectMapper.writeValueAsString(
-          serializeLocationToNode(
-            objectMapper,
-            bookmark.location
-          )
-        )
-      is Bookmark.PDFBookmark -> {
-        objectMapper.writeValueAsString(serializeIndexToNode(objectMapper, bookmark.pageNumber))
-      }
-      else ->
-        throw IllegalArgumentException("Unsupported bookmark type: $bookmark")
-    }
-  }
-
-  @Throws(JSONParseException::class)
-  private fun serializeIndexToNode(
-    objectMapper: ObjectMapper,
-    pageIndex: Int
-  ): ObjectNode {
-    val objectNode = objectMapper.createObjectNode()
-    objectNode.put("@type", "LocatorPage")
-    objectNode.put("page", pageIndex)
-    return objectNode
-  }
-
-  @Throws(JSONParseException::class)
-  private fun serializeLocationToNode(
-    objectMapper: ObjectMapper,
-    location: BookLocation
-  ): ObjectNode {
-    val objectNode = objectMapper.createObjectNode()
-    return when (location) {
-      is BookLocation.BookLocationR2 -> {
-        objectNode.put("@type", "LocatorHrefProgression")
-        objectNode.put("href", location.progress.chapterHref)
-        objectNode.put("progressWithinChapter", location.progress.chapterProgress)
-        objectNode
-      }
-      is BookLocation.BookLocationR1 -> {
-        objectNode.put("@type", "LocatorLegacyCFI")
-        location.idRef?.let {
-          objectNode.put("idref", it)
-        }
-        location.contentCFI?.let {
-          objectNode.put("contentCFI", it)
-        }
-        objectNode.put("progressWithinChapter", location.progress ?: 0.0)
-        objectNode
-      }
-    }
-  }
-
-  @Throws(JSONParseException::class)
-  private fun serializeLocationToNode(
-    objectMapper: ObjectMapper,
-    bookmark: Bookmark.AudiobookBookmark
-  ): ObjectNode {
-    val objectNode = objectMapper.createObjectNode()
-    objectNode.put("@type", "LocatorAudioBookTime")
-    objectNode.put("chapter", bookmark.location.chapter)
-    objectNode.put("startOffset", bookmark.location.startOffset)
-    objectNode.put(
-      "time",
-      bookmark.location.startOffset + bookmark.location.currentOffset
-    )
-    objectNode.put("part", bookmark.location.part)
-    objectNode.put("title", bookmark.location.title.orEmpty())
-
-    // these fields are required by the iOS app, so we're sending them but since we don't need them
-    // in the Android app, there's no need to parsing them back
-    objectNode.put("audiobookID", bookmark.opdsId)
-    objectNode.put("duration", bookmark.duration)
-
-    return objectNode
-  }
-
-  @Throws(JSONParseException::class)
-  fun deserializeAudiobookLocation(
-    objectMapper: ObjectMapper,
-    value: String
-  ): PlayerPosition {
-    val node =
-      objectMapper.readTree(value)
-    val obj =
-      JSONParserUtilities.checkObject(null, node)
-
-    val startOffset = JSONParserUtilities.getIntegerDefault(obj, "startOffset", 0).toLong()
-
-    return PlayerPosition(
-      chapter = JSONParserUtilities.getIntegerDefault(obj, "chapter", 0),
-      startOffset = startOffset,
-      currentOffset = JSONParserUtilities.getInteger(obj, "time").toLong() - startOffset,
-      part = JSONParserUtilities.getIntegerDefault(obj, "part", 0),
-      title = JSONParserUtilities.getStringOrNull(obj, "title")
-    )
-  }
-
-  @Throws(JSONParseException::class)
-  fun deserializeAudiobookDuration(
-    objectMapper: ObjectMapper,
-    value: String
-  ): Long {
-    val node =
-      objectMapper.readTree(value)
-    val obj =
-      JSONParserUtilities.checkObject(null, node)
-
-    return JSONParserUtilities.getInteger(obj, "duration").toLong()
-  }
-
-  @Throws(JSONParseException::class)
-  fun deserializePdfLocation(
-    objectMapper: ObjectMapper,
-    value: String
-  ): Int {
-    val node =
-      objectMapper.readTree(value)
-    val obj =
-      JSONParserUtilities.checkObject(null, node)
-
-    return JSONParserUtilities.getInteger(obj, "page")
-  }
-
-  @Throws(JSONParseException::class)
-  fun deserializeReaderLocation(
-    objectMapper: ObjectMapper,
-    value: String
-  ): BookLocation {
-    val node =
-      objectMapper.readTree(value)
-    val obj =
-      JSONParserUtilities.checkObject(null, node)
-    val type =
-      JSONParserUtilities.getStringOrNull(obj, "@type")
-
-    return when (type) {
-      "LocatorHrefProgression" ->
-        deserializeLocationR2(obj)
-      "LocatorLegacyCFI" ->
-        deserializeLocationLegacyCFI(obj)
-      null ->
-        deserializeLocationLegacyCFI(obj)
-      else ->
-        throw JSONParseException("Unsupported locator type: $type")
-    }
-  }
-
-  private fun deserializeLocationLegacyCFI(
-    obj: ObjectNode
-  ): BookLocation.BookLocationR1 {
-    return BookLocation.BookLocationR1(
-      progress = JSONParserUtilities.getDoubleDefault(obj, "progressWithinChapter", 0.0),
-      contentCFI = JSONParserUtilities.getStringOrNull(obj, "contentCFI"),
-      idRef = JSONParserUtilities.getStringOrNull(obj, "idref"),
-    )
-  }
-
-  private fun deserializeLocationR2(
-    obj: ObjectNode
-  ): BookLocation.BookLocationR2 {
-    val progress =
-      BookChapterProgress(
-        chapterHref = JSONParserUtilities.getString(obj, "href"),
-        chapterProgress = JSONParserUtilities.getDouble(obj, "progressWithinChapter")
-      )
-    return BookLocation.BookLocationR2(progress)
   }
 }

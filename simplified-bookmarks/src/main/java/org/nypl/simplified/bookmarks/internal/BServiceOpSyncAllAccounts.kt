@@ -29,8 +29,7 @@ internal class BServiceOpSyncAllAccounts(
           this.bookmarkEventsOut,
           this.objectMapper,
           this.profile,
-          account,
-          bookID = null
+          account
         ).runActual()
       } catch (e: Exception) {
         this.logger.debug("failed to sync account {}: ", account.uuid, e)

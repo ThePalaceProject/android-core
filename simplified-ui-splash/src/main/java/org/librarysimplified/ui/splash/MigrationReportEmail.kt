@@ -1,10 +1,10 @@
 package org.librarysimplified.ui.splash
 
 import android.content.Context
+import org.librarysimplified.reports.Reports
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.migration.spi.MigrationEvent
 import org.nypl.simplified.migration.spi.MigrationReport
-import org.librarysimplified.reports.Reports
 import java.util.ServiceLoader
 
 internal data class MigrationReportEmail(

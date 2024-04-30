@@ -7,11 +7,8 @@ import org.nypl.simplified.bookmarks.api.BookmarkAnnotation
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotations
 import org.nypl.simplified.bookmarks.api.BookmarkEvent
 import org.nypl.simplified.bookmarks.api.BookmarkHTTPCallsType
-import org.nypl.simplified.bookmarks.api.Bookmarks
-import org.nypl.simplified.books.api.BookID
-import org.nypl.simplified.books.api.bookmark.Bookmark
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
-import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle
+import org.nypl.simplified.books.api.bookmark.SerializedBookmark
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleEPUB
 import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.slf4j.Logger
@@ -26,11 +23,10 @@ internal class BServiceOpSyncOneAccount(
   private val bookmarkEventsOut: Subject<BookmarkEvent>,
   private val objectMapper: ObjectMapper,
   private val profile: ProfileReadableType,
-  private val accountID: AccountID,
-  private val bookID: BookID?
-) : BServiceOp<Bookmark?>(logger) {
+  private val accountID: AccountID
+) : BServiceOp<List<SerializedBookmark>>(logger) {
 
-  override fun runActual(): Bookmark? {
+  override fun runActual(): List<SerializedBookmark> {
     this.logger.debug(
       "[{}]: syncing account {}",
       this.profile.id.uuid,
@@ -42,30 +38,29 @@ internal class BServiceOpSyncOneAccount(
 
     if (syncable == null) {
       this.logger.error("[{}]: account no longer syncable", this.accountID.uuid)
-      return null
+      return listOf()
     }
 
     if (!syncable.account.preferences.bookmarkSyncingPermitted) {
       this.logger.debug("[{}]: syncing not permitted", this.accountID.uuid)
-      return null
+      return listOf()
     }
 
-    val received = this.readBookmarksFromServer(syncable, bookID)
-    this.sendBookmarksToServer(syncable, received.bookmarks)
+    val received = this.readBookmarksFromServer(syncable)
+    this.sendBookmarksToServer(syncable, received)
     this.bookmarkEventsOut.onNext(BookmarkEvent.BookmarkSyncFinished(syncable.account.id))
-
-    return received.lastReadServer
+    return received
   }
 
   private fun sendBookmarksToServer(
     syncable: BSyncableAccount,
-    received: List<Bookmark>
+    received: List<SerializedBookmark>
   ) {
     val localExtras =
       this.determineExtraLocalBookmarks(received, syncable)
 
     this.logger.debug(
-      "[{}]: we have {} bookmarks the server did not have",
+      "[{}]: We have {} bookmarks the server did not have",
       this.accountID.uuid,
       localExtras.size
     )
@@ -73,25 +68,13 @@ internal class BServiceOpSyncOneAccount(
     for (bookmark in localExtras) {
       try {
         this.logger.debug(
-          "[{}]: sending bookmark {}",
+          "[{}]: Sending bookmark {}",
           this.accountID.uuid,
           bookmark.bookmarkId.value
         )
 
-        val bookmarkAnnotation = when (bookmark) {
-          is Bookmark.ReaderBookmark -> {
-            BookmarkAnnotations.fromReaderBookmark(this.objectMapper, bookmark)
-          }
-          is Bookmark.AudiobookBookmark -> {
-            BookmarkAnnotations.fromAudiobookBookmark(this.objectMapper, bookmark)
-          }
-          is Bookmark.PDFBookmark -> {
-            BookmarkAnnotations.fromPdfBookmark(this.objectMapper, bookmark)
-          }
-          else -> {
-            throw IllegalStateException("Unsupported bookmark type: $bookmark")
-          }
-        }
+        val bookmarkAnnotation =
+          BookmarkAnnotations.fromSerializedBookmark(this.objectMapper, bookmark)
 
         this.httpCalls.bookmarkAdd(
           account = syncable.account,
@@ -100,7 +83,7 @@ internal class BServiceOpSyncOneAccount(
           bookmark = bookmarkAnnotation
         )
       } catch (e: Exception) {
-        this.logger.error("[{}]: error sending bookmark: ", this.accountID.uuid, e)
+        this.logger.error("[{}]: Error sending bookmark: ", this.accountID.uuid, e)
       }
     }
   }
@@ -111,9 +94,9 @@ internal class BServiceOpSyncOneAccount(
    */
 
   private fun determineExtraLocalBookmarks(
-    received: List<Bookmark>,
+    received: List<SerializedBookmark>,
     syncable: BSyncableAccount
-  ): Set<Bookmark> {
+  ): Set<SerializedBookmark> {
     return syncable.account.bookDatabase.books()
       .map { id -> syncable.account.bookDatabase.entry(id) }
       .mapNotNull { entry -> entry.findFormatHandle(BookDatabaseEntryFormatHandleEPUB::class.java) }
@@ -124,22 +107,20 @@ internal class BServiceOpSyncOneAccount(
   }
 
   private fun readBookmarksFromServer(
-    syncable: BSyncableAccount,
-    bookID: BookID?
-  ): Bookmarks {
+    syncable: BSyncableAccount
+  ): List<SerializedBookmark> {
     this.bookmarkEventsOut.onNext(BookmarkEvent.BookmarkSyncStarted(syncable.account.id))
 
-    val bookmarks: List<Bookmark> =
+    val bookmarkAnnotations: List<BookmarkAnnotation> =
       try {
-        val annotations = this.httpCalls.bookmarksGet(
+        this.httpCalls.bookmarksGet(
           account = syncable.account,
           annotationsURI = syncable.annotationsURI,
           credentials = syncable.credentials
         )
-        annotations.mapNotNull(this::parseBookmarkOrNull)
       } catch (e: Exception) {
         this.logger.error(
-          "[{}]: could not receive bookmarks for account {}: ",
+          "[{}]: Could not receive bookmarks for account {}: ",
           this.profile.id.uuid,
           syncable.account.id,
           e
@@ -147,21 +128,28 @@ internal class BServiceOpSyncOneAccount(
         listOf()
       }
 
-    this.logger.debug("[{}]: received {} bookmarks", this.profile.id.uuid, bookmarks.size)
+    this.logger.debug(
+      "[{}]: Received {} bookmarks",
+      this.profile.id.uuid,
+      bookmarkAnnotations.size
+    )
 
-    var serverLastReadBookmark: Bookmark? = null
+    val results = arrayListOf<SerializedBookmark>()
 
-    for (bookmark in bookmarks) {
+    for (bookmarkAnnotation in bookmarkAnnotations) {
       try {
+        val bookmark =
+          BookmarkAnnotations.toSerializedBookmark(this.objectMapper, bookmarkAnnotation)
+
         this.logger.debug(
-          "[{}]: received bookmark {}",
+          "[{}]: Received bookmark {}",
           this.profile.id.uuid,
           bookmark.bookmarkId.value
         )
 
         if (!syncable.account.bookDatabase.books().contains(bookmark.book)) {
           this.logger.debug(
-            "[{}]: we no longer have book {}",
+            "[{}]: We no longer have book {}",
             this.profile.id.uuid,
             bookmark.book.value()
           )
@@ -169,106 +157,17 @@ internal class BServiceOpSyncOneAccount(
         }
 
         val entry = syncable.account.bookDatabase.entry(bookmark.book)
-
-        when (bookmark) {
-          is Bookmark.ReaderBookmark -> {
-            val handle = entry.findFormatHandle(BookDatabaseEntryFormatHandleEPUB::class.java)
-            if (handle != null) {
-              when (bookmark.kind) {
-                BookmarkKind.BookmarkLastReadLocation -> {
-                  // check if it's the last read bookmark for the given book ID
-                  if (bookID != null && bookmark.book == bookID) {
-                    serverLastReadBookmark = bookmark
-                  } else {
-                    handle.setLastReadLocation(bookmark)
-                  }
-                }
-                BookmarkKind.BookmarkExplicit -> {
-                  handle.setBookmarks(
-                    BServiceBookmarks.normalizeBookmarks(
-                      logger = this.logger,
-                      profileId = this.profile.id,
-                      handle = handle,
-                      bookmark = bookmark
-                    )
-                  )
-                }
-              }
-
-              this.bookmarkEventsOut.onNext(
-                BookmarkEvent.BookmarkSaved(
-                  syncable.account.id,
-                  bookmark
-                )
-              )
-            }
-          }
-          is Bookmark.PDFBookmark -> {
-            val handle = entry.findFormatHandle(
-              BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandlePDF::class.java
+        for (handle in entry.formatHandles) {
+          handle.addBookmark(bookmark)
+          this.bookmarkEventsOut.onNext(
+            BookmarkEvent.BookmarkSaved(
+              syncable.account.id,
+              bookmark
             )
-            if (handle != null) {
-              when (bookmark.kind) {
-                BookmarkKind.BookmarkLastReadLocation -> {
-                  // check if it's the last read bookmark for the given book ID
-                  if (bookID != null && bookmark.book == bookID) {
-                    serverLastReadBookmark = bookmark
-                  } else {
-                    handle.setLastReadLocation(bookmark)
-                  }
-                }
-                BookmarkKind.BookmarkExplicit -> {
-                  handle.setBookmarks(
-                    BServiceBookmarks.normalizeBookmarks(
-                      logger = this.logger,
-                      profileId = this.profile.id,
-                      handle = handle,
-                      bookmark = bookmark
-                    )
-                  )
-                }
-              }
-
-              this.bookmarkEventsOut.onNext(
-                BookmarkEvent.BookmarkSaved(
-                  syncable.account.id,
-                  bookmark
-                )
-              )
-            }
-          }
-          is Bookmark.AudiobookBookmark -> {
-            val handle =
-              entry.findFormatHandle(
-                BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook::class.java
-              )
-            if (handle != null) {
-              when (bookmark.kind) {
-                BookmarkKind.BookmarkLastReadLocation -> {
-                  handle.setLastReadLocation(bookmark)
-                }
-                BookmarkKind.BookmarkExplicit -> {
-                  handle.setBookmarks(
-                    BServiceBookmarks.normalizeBookmarks(
-                      logger = this.logger,
-                      profileId = this.profile.id,
-                      handle = handle,
-                      bookmark = bookmark
-                    )
-                  )
-                }
-              }
-              this.bookmarkEventsOut.onNext(
-                BookmarkEvent.BookmarkSaved(
-                  syncable.account.id,
-                  bookmark
-                )
-              )
-            }
-          }
-          else ->
-            throw IllegalStateException("Unsupported bookmark type: $bookmark")
+          )
         }
+
+        results.add(bookmark)
       } catch (e: Exception) {
         this.logger.error(
           "[{}]: could not store bookmark for account {}: ",
@@ -279,35 +178,6 @@ internal class BServiceOpSyncOneAccount(
       }
     }
 
-    return Bookmarks(
-      lastReadLocal = null,
-      lastReadServer = serverLastReadBookmark,
-      bookmarks = bookmarks
-    )
-  }
-
-  private fun parseBookmarkOrNull(
-    annotation: BookmarkAnnotation
-  ): Bookmark? {
-    return try {
-      val bookmark = BookmarkAnnotations.toAudiobookBookmark(this.objectMapper, annotation)
-      this.logger.debug("Audiobook bookmark successfully parsed")
-      bookmark
-    } catch (e: Exception) {
-      try {
-        val bookmark = BookmarkAnnotations.toReaderBookmark(this.objectMapper, annotation)
-        this.logger.debug("Reader bookmark successfully parsed")
-        bookmark
-      } catch (e: Exception) {
-        try {
-          val bookmark = BookmarkAnnotations.toPdfBookmark(this.objectMapper, annotation)
-          this.logger.debug("PDF bookmark successfully parsed")
-          bookmark
-        } catch (e: Exception) {
-          this.logger.error("unable to parse bookmark: ", e)
-          null
-        }
-      }
-    }
+    return results.toList()
   }
 }

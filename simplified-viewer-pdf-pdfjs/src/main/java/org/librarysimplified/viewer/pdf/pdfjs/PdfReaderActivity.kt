@@ -1,6 +1,6 @@
 package org.librarysimplified.viewer.pdf.pdfjs
 
-import android.app.Activity
+import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -27,8 +27,9 @@ import org.nypl.simplified.bookmarks.api.BookmarkServiceType
 import org.nypl.simplified.books.api.BookContentProtections
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookID
-import org.nypl.simplified.books.api.bookmark.Bookmark
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
+import org.nypl.simplified.books.api.bookmark.SerializedBookmarks
+import org.nypl.simplified.books.api.bookmark.SerializedLocatorPage1
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.thread.api.UIThreadServiceType
@@ -50,18 +51,18 @@ class PdfReaderActivity : AppCompatActivity() {
      * Factory method to start a [PdfReaderActivity]
      */
     fun startActivity(
-      from: Activity,
+      context: Application,
       parameters: PdfReaderParameters
     ) {
       val bundle = Bundle().apply {
-        putSerializable(PARAMS_ID, parameters)
+        this.putSerializable(this@Companion.PARAMS_ID, parameters)
       }
 
-      val intent = Intent(from, PdfReaderActivity::class.java).apply {
-        putExtras(bundle)
+      val intent = Intent(context, PdfReaderActivity::class.java).apply {
+        this.putExtras(bundle)
       }
 
-      from.startActivity(intent)
+      context.startActivity(intent)
     }
   }
 
@@ -70,9 +71,9 @@ class PdfReaderActivity : AppCompatActivity() {
   private val services =
     Services.serviceDirectory()
   private val bookmarkService =
-    services.requireService(BookmarkServiceType::class.java)
+    this.services.requireService(BookmarkServiceType::class.java)
   private val profilesController =
-    services.requireService(ProfilesControllerType::class.java)
+    this.services.requireService(ProfilesControllerType::class.java)
 
   private lateinit var uiThread: UIThreadServiceType
   private lateinit var pdfReaderContainer: FrameLayout
@@ -89,12 +90,12 @@ class PdfReaderActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    val params = intent?.getSerializableExtra(PARAMS_ID) as PdfReaderParameters
+    val params = this.intent?.getSerializableExtra(PARAMS_ID) as PdfReaderParameters
 
-    setContentView(R.layout.pdfjs_reader)
-    createToolbar(params.documentTitle)
+    this.setContentView(R.layout.pdfjs_reader)
+    this.createToolbar(params.documentTitle)
 
-    this.loadingBar = findViewById(R.id.pdf_loading_progress)
+    this.loadingBar = this.findViewById(R.id.pdf_loading_progress)
     this.accountId = params.accountId
     this.feedEntry = params.entry
     this.bookID = params.id
@@ -108,28 +109,34 @@ class PdfReaderActivity : AppCompatActivity() {
     MDC.remove(MDCKeys.BOOK_DRM)
 
     this.uiThread =
-      services.requireService(UIThreadServiceType::class.java)
+      this.services.requireService(UIThreadServiceType::class.java)
 
     val backgroundThread = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(1))
 
     backgroundThread.execute {
-      restoreSavedPosition(
+      this.restoreSavedPosition(
         params = params,
         isSavedInstanceStateNull = savedInstanceState == null
       )
     }
   }
 
-  private fun completeReaderSetup(params: PdfReaderParameters, isSavedInstanceStateNull: Boolean) {
+  private fun completeReaderSetup(
+    params: PdfReaderParameters,
+    isSavedInstanceStateNull: Boolean
+  ) {
     this.loadingBar.visibility = View.GONE
 
     if (isSavedInstanceStateNull) {
-      createWebView()
-      createPdfServer(params.drmInfo, params.pdfFile)
+      this.createWebView()
+      this.createPdfServer(params.drmInfo, params.pdfFile)
     }
   }
 
-  private fun restoreSavedPosition(params: PdfReaderParameters, isSavedInstanceStateNull: Boolean) {
+  private fun restoreSavedPosition(
+    params: PdfReaderParameters,
+    isSavedInstanceStateNull: Boolean
+  ) {
     val bookmarks =
       PdfReaderBookmarks.loadBookmarks(
         bookmarkService = this.bookmarkService,
@@ -137,91 +144,26 @@ class PdfReaderActivity : AppCompatActivity() {
         bookID = this.bookID
       )
 
-    val lastReadBookmarks = bookmarks
-      .filterIsInstance<Bookmark.PDFBookmark>()
-      .filter { bookmark ->
-        bookmark.kind == BookmarkKind.BookmarkLastReadLocation
-      }
+    val lastReadBookmark =
+      bookmarks.filter { bookmark -> bookmark.kind == PdfBookmarkKind.LAST_READ }
+        .firstOrNull()
 
     this.uiThread.runOnUIThread {
       try {
-        // if there's more than one last read bookmark, we'll need to compare their dates
-        if (lastReadBookmarks.size > 1) {
-          val localLastReadBookmark = lastReadBookmarks.first()
-          val serverLastReadBookmark = lastReadBookmarks.last()
-
-          if (serverLastReadBookmark.time.isAfter(localLastReadBookmark.time) &&
-            localLastReadBookmark.pageNumber != serverLastReadBookmark.pageNumber
-          ) {
-            showBookmarkPrompt(
-              localLastReadBookmark = localLastReadBookmark,
-              serverLastReadBookmark = serverLastReadBookmark,
-              params = params,
-              isSavedInstanceStateNull = isSavedInstanceStateNull
-            )
-          } else {
-            this.documentPageIndex = lastReadBookmarks.first().pageNumber
-            completeReaderSetup(
-              params = params,
-              isSavedInstanceStateNull = isSavedInstanceStateNull
-            )
-          }
-        } else if (lastReadBookmarks.isNotEmpty()) {
-          this.documentPageIndex = lastReadBookmarks.first().pageNumber
-
-          completeReaderSetup(
-            params = params,
-            isSavedInstanceStateNull = isSavedInstanceStateNull
-          )
+        if (lastReadBookmark != null) {
+          this.documentPageIndex = lastReadBookmark.pageNumber
         } else {
-          completeReaderSetup(
-            params = params,
-            isSavedInstanceStateNull = isSavedInstanceStateNull
-          )
+          this.documentPageIndex = 1
         }
       } catch (e: Exception) {
-        log.error("Could not get lastReadLocation, defaulting to the 1st page", e)
-        completeReaderSetup(
+        this.log.error("Could not get lastReadLocation, defaulting to the 1st page", e)
+      } finally {
+        this.completeReaderSetup(
           params = params,
           isSavedInstanceStateNull = isSavedInstanceStateNull
         )
       }
     }
-  }
-
-  private fun showBookmarkPrompt(
-    localLastReadBookmark: Bookmark.PDFBookmark,
-    serverLastReadBookmark: Bookmark.PDFBookmark,
-    params: PdfReaderParameters,
-    isSavedInstanceStateNull: Boolean
-  ) {
-    MaterialAlertDialogBuilder(this)
-      .setTitle(R.string.viewer_position_title)
-      .setMessage(R.string.viewer_position_message)
-      .setNegativeButton(R.string.viewer_position_move) { dialog, _ ->
-        this.documentPageIndex = serverLastReadBookmark.pageNumber
-        dialog.dismiss()
-        createLocalBookmarkFromPromptAction(
-          bookmark = serverLastReadBookmark
-        )
-        completeReaderSetup(
-          params = params,
-          isSavedInstanceStateNull = isSavedInstanceStateNull
-        )
-      }
-      .setPositiveButton(R.string.viewer_position_stay) { dialog, _ ->
-        this.documentPageIndex = localLastReadBookmark.pageNumber
-        dialog.dismiss()
-        createLocalBookmarkFromPromptAction(
-          bookmark = localLastReadBookmark
-        )
-        completeReaderSetup(
-          params = params,
-          isSavedInstanceStateNull = isSavedInstanceStateNull
-        )
-      }
-      .create()
-      .show()
   }
 
   private fun createToolbar(title: String) {
@@ -242,7 +184,7 @@ class PdfReaderActivity : AppCompatActivity() {
     WebView.setWebContentsDebuggingEnabled(true)
 
     this.webView = WebView(this).apply {
-      settings.javaScriptEnabled = true
+      this.settings.javaScriptEnabled = true
     }
 
     this.webView.addJavascriptInterface(
@@ -260,28 +202,29 @@ class PdfReaderActivity : AppCompatActivity() {
       "PDFListener"
     )
 
-    this.pdfReaderContainer = findViewById(R.id.pdf_reader_container)
+    this.pdfReaderContainer = this.findViewById(R.id.pdf_reader_container)
     this.pdfReaderContainer.addView(this.webView)
   }
 
   private fun createPdfServer(drmInfo: BookDRMInformation, pdfFile: File) {
     val contentProtections = BookContentProtections.create(
       context = this.application,
-      contentProtectionProviders = ServiceLoader.load(ContentProtectionProvider::class.java).toList(),
+      contentProtectionProviders = ServiceLoader.load(ContentProtectionProvider::class.java)
+        .toList(),
       drmInfo = drmInfo,
       isManualPassphraseEnabled =
-      profilesController.profileCurrent().preferences().isManualLCPPassphraseEnabled,
+      this.profilesController.profileCurrent().preferences().isManualLCPPassphraseEnabled,
       onLCPDialogDismissed = {
-        finish()
+        this.finish()
       }
     )
 
     // Create an immediately-closed socket to get a free port number.
-    val ephemeralSocket = ServerSocket(0).apply { close() }
+    val ephemeralSocket = ServerSocket(0).apply { this.close() }
 
     val createPdfOperation = GlobalScope.async {
       try {
-        pdfServer = PdfServer.create(
+        this@PdfReaderActivity.pdfServer = PdfServer.create(
           contentProtections = contentProtections,
           context = this@PdfReaderActivity.application,
           drmInfo = drmInfo,
@@ -289,7 +232,7 @@ class PdfReaderActivity : AppCompatActivity() {
           port = ephemeralSocket.localPort
         )
       } catch (exception: Exception) {
-        showErrorWithRunnable(
+        this@PdfReaderActivity.showErrorWithRunnable(
           context = this@PdfReaderActivity,
           title = exception.message ?: "",
           failure = exception,
@@ -303,18 +246,18 @@ class PdfReaderActivity : AppCompatActivity() {
     GlobalScope.launch(Dispatchers.Main) {
       createPdfOperation.await()
 
-      pdfServer?.let {
+      this@PdfReaderActivity.pdfServer?.let {
         it.start()
 
-        webView.loadUrl(
-          "http://localhost:${it.port}/assets/pdf-viewer/viewer.html?file=%2Fbook.pdf#page=$documentPageIndex"
+        this@PdfReaderActivity.webView.loadUrl(
+          "http://localhost:${it.port}/assets/pdf-viewer/viewer.html?file=%2Fbook.pdf#page=${this@PdfReaderActivity.documentPageIndex}"
         )
       }
     }
   }
 
   override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-    menuInflater.inflate(R.menu.pdf_reader_menu, menu)
+    this.menuInflater.inflate(R.menu.pdf_reader_menu, menu)
 
     menu?.findItem(R.id.readerMenuTOC)?.setOnMenuItemClickListener {
       this.onReaderMenuTOCSelected()
@@ -366,7 +309,7 @@ class PdfReaderActivity : AppCompatActivity() {
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     if (item.itemId == android.R.id.home) {
-      onBackPressed()
+      this.onBackPressed()
     }
 
     return super.onOptionsItemSelected(item)
@@ -383,37 +326,28 @@ class PdfReaderActivity : AppCompatActivity() {
   }
 
   private fun onReaderPageChanged(pageIndex: Int) {
-    log.debug("onReaderPageChanged {}", pageIndex)
+    this.log.debug("onReaderPageChanged {}", pageIndex)
 
     this.documentPageIndex = pageIndex
 
-    val bookmark = Bookmark.PDFBookmark.create(
-      opdsId = this.feedEntry.feedEntry.id,
-      time = DateTime.now(),
-      kind = BookmarkKind.BookmarkLastReadLocation,
-      pageNumber = pageIndex,
-      deviceID = PdfReaderDevices.deviceId(this.profilesController, this.bookID),
-      uri = null
-    )
+    val bookmark =
+      SerializedBookmarks.createWithCurrentFormat(
+        bookChapterProgress = 0.0,
+        bookChapterTitle = "",
+        bookProgress = 0.0,
+        bookTitle = this.feedEntry.feedEntry.title,
+        deviceID = PdfReaderDevices.deviceId(this.profilesController, this.bookID),
+        kind = BookmarkKind.BookmarkLastReadLocation,
+        location = SerializedLocatorPage1(pageIndex),
+        opdsId = this.feedEntry.feedEntry.id,
+        time = DateTime.now(),
+        uri = null
+      )
 
-    this.bookmarkService.bookmarkCreateLocal(
+    this.bookmarkService.bookmarkCreate(
       accountID = this.accountId,
-      bookmark = bookmark
-    )
-
-    this.bookmarkService.bookmarkCreateRemote(
-      accountID = this.accountId,
-      bookmark = bookmark
-    )
-  }
-
-  private fun createLocalBookmarkFromPromptAction(bookmark: Bookmark.PDFBookmark) {
-    // we need to create a local bookmark after choosing an option from the prompt because the local
-    // bookmark is no longer created when syncing from the server returns a last read location
-    // bookmark
-    this.bookmarkService.bookmarkCreateLocal(
-      accountID = this.accountId,
-      bookmark = bookmark
+      bookmark = bookmark,
+      ignoreRemoteFailures = true
     )
   }
 

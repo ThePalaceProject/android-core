@@ -1,7 +1,6 @@
 package org.nypl.simplified.tests.books.borrowing
 
 import android.app.Application
-import android.content.Context
 import io.reactivex.disposables.Disposable
 import org.joda.time.Instant
 import org.junit.jupiter.api.Assertions

@@ -18,9 +18,7 @@ import org.nypl.simplified.opds.core.OPDSAcquisitionFeed
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSOpenSearch1_1
 import java.net.URI
-import java.util.ArrayList
 import java.util.Collections
-import java.util.HashMap
 
 /**
  * The type of mutable feeds.

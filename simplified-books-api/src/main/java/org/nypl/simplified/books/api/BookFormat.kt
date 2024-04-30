@@ -1,7 +1,7 @@
 package org.nypl.simplified.books.api
 
 import one.irradia.mime.api.MIMEType
-import org.nypl.simplified.books.api.bookmark.Bookmark
+import org.nypl.simplified.books.api.bookmark.SerializedBookmark
 import java.io.File
 import java.net.URI
 
@@ -31,6 +31,18 @@ sealed class BookFormat {
   abstract val isDownloaded: Boolean
 
   /**
+   * The last read location of the book, if any.
+   */
+
+  abstract val lastReadLocation: SerializedBookmark?
+
+  /**
+   * The list of bookmarks.
+   */
+
+  abstract val bookmarks: List<SerializedBookmark>
+
+  /**
    * An EPUB format.
    */
 
@@ -47,13 +59,13 @@ sealed class BookFormat {
      * The last read location of the book, if any.
      */
 
-    val lastReadLocation: Bookmark.ReaderBookmark?,
+    override val lastReadLocation: SerializedBookmark?,
 
     /**
      * The list of bookmarks.
      */
 
-    val bookmarks: List<Bookmark.ReaderBookmark>,
+    override val bookmarks: List<SerializedBookmark>,
 
     override val contentType: MIMEType
   ) : BookFormat() {
@@ -105,12 +117,12 @@ sealed class BookFormat {
     /**
      * The last read location of the audiobook, if any.
      */
-    val lastReadLocation: Bookmark.AudiobookBookmark?,
+    override val lastReadLocation: SerializedBookmark?,
 
     /**
      * The list of bookmarks.
      */
-    val bookmarks: List<Bookmark.AudiobookBookmark>,
+    override val bookmarks: List<SerializedBookmark>,
 
     override val contentType: MIMEType
   ) : BookFormat() {
@@ -134,12 +146,13 @@ sealed class BookFormat {
      * The last read location of the PDF book, if any.
      */
 
-    val lastReadLocation: Bookmark.PDFBookmark?,
+    override val lastReadLocation: SerializedBookmark?,
 
     /**
      * The list of bookmarks.
      */
-    val bookmarks: List<Bookmark.PDFBookmark>,
+
+    override val bookmarks: List<SerializedBookmark>,
 
     /**
      * The PDF file on disk, if one has been downloaded.

@@ -1,4 +1,6 @@
-<feed xmlns:app="http://www.w3.org/2007/app" xmlns:bibframe="http://bibframe.org/vocab/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:drm="http://librarysimplified.org/terms/drm" xmlns:opds="http://opds-spec.org/2010/catalog" xmlns:schema="http://schema.org/" xmlns:simplified="http://librarysimplified.org/terms/" xmlns="http://www.w3.org/2005/Atom">
+<feed xmlns:bibframe="http://bibframe.org/vocab/" xmlns:dcterms="http://purl.org/dc/terms/"
+    xmlns:opds="http://opds-spec.org/2010/catalog" xmlns:schema="http://schema.org/"
+    xmlns:simplified="http://librarysimplified.org/terms/" xmlns="http://www.w3.org/2005/Atom">
   <id>https://d5v0j5lesri7q.cloudfront.net/NYBKLYN/groups/</id>
   <title>All Books</title>
   <updated>2017-12-18T20:00:27Z</updated>

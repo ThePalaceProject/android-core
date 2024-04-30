@@ -1,5 +1,12 @@
 package org.nypl.simplified.opds.core;
 
+import static org.nypl.simplified.opds.core.OPDSFeedConstants.ATOM_URI;
+import static org.nypl.simplified.opds.core.OPDSFeedConstants.AUTHENTICATION_DOCUMENT_RELATION_URI_TEXT;
+import static org.nypl.simplified.opds.core.OPDSFeedConstants.DRM_URI;
+import static org.nypl.simplified.opds.core.OPDSFeedConstants.FACET_URI_TEXT;
+import static org.nypl.simplified.opds.core.OPDSFeedConstants.OPDS_URI_TEXT;
+import static org.nypl.simplified.opds.core.OPDSFeedConstants.SIMPLIFIED_URI_TEXT;
+
 import com.google.common.base.Preconditions;
 import com.io7m.jfunctional.Option;
 import com.io7m.jfunctional.OptionType;
@@ -28,13 +35,6 @@ import java.util.concurrent.TimeUnit;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
-import static org.nypl.simplified.opds.core.OPDSFeedConstants.ATOM_URI;
-import static org.nypl.simplified.opds.core.OPDSFeedConstants.AUTHENTICATION_DOCUMENT_RELATION_URI_TEXT;
-import static org.nypl.simplified.opds.core.OPDSFeedConstants.DRM_URI;
-import static org.nypl.simplified.opds.core.OPDSFeedConstants.FACET_URI_TEXT;
-import static org.nypl.simplified.opds.core.OPDSFeedConstants.OPDS_URI_TEXT;
-import static org.nypl.simplified.opds.core.OPDSFeedConstants.SIMPLIFIED_URI_TEXT;
 
 /**
  * <p>The default implementation of the {@link OPDSFeedParserType}.</p>

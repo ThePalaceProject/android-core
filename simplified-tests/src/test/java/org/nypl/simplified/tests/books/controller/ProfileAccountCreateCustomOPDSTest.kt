@@ -19,7 +19,6 @@ import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountPreferences
 import org.nypl.simplified.accounts.api.AccountProvider
-import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.accounts.database.api.AccountsDatabaseIOException
 import org.nypl.simplified.accounts.registry.AccountProviderRegistry
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
@@ -54,7 +53,6 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InputStream
-import java.util.ArrayList
 import java.util.Collections
 import java.util.UUID
 import java.util.concurrent.Executors

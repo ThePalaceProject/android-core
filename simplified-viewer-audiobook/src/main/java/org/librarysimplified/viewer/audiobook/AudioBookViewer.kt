@@ -1,6 +1,7 @@
 package org.librarysimplified.viewer.audiobook
 
-import android.app.Activity
+import android.app.Application
+import android.content.Intent
 import one.irradia.mime.api.MIMEType
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.services.api.Services
@@ -45,7 +46,7 @@ class AudioBookViewer : ViewerProviderType {
   }
 
   override fun open(
-    activity: Activity,
+    context: Application,
     preferences: ViewerPreferences,
     book: Book,
     format: BookFormat,
@@ -78,6 +79,6 @@ class AudioBookViewer : ViewerProviderType {
       null
     }
 
-    AudioBookPlayerActivity.startActivity(activity, params)
+    context.startActivity(Intent(context, AudioBookPlayerActivity2::class.java))
   }
 }

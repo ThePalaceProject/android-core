@@ -1,6 +1,6 @@
 package org.librarysimplified.viewer.pdf.pdfjs
 
-import android.app.Activity
+import android.app.Application
 import one.irradia.mime.api.MIMEType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
@@ -41,7 +41,7 @@ class PdfViewerProvider : ViewerProviderType {
   }
 
   override fun open(
-    activity: Activity,
+    context: Application,
     preferences: ViewerPreferences,
     book: Book,
     format: BookFormat,
@@ -52,7 +52,7 @@ class PdfViewerProvider : ViewerProviderType {
       FeedEntry.FeedEntryOPDS(book.account, book.entry)
 
     PdfReaderActivity.startActivity(
-      from = activity,
+      context = context,
       parameters = PdfReaderParameters(
         accountId = book.account,
         documentTitle = book.entry.title,

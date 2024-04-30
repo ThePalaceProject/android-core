@@ -1,12 +1,12 @@
 package org.nypl.simplified.bookmarks.api
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.ISODateTimeFormat
-import org.nypl.simplified.books.api.bookmark.Bookmark
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
+import org.nypl.simplified.books.api.bookmark.SerializedBookmark
+import org.nypl.simplified.books.api.bookmark.SerializedBookmark20210828
+import org.nypl.simplified.books.api.bookmark.SerializedLocators
 import java.net.URI
 
 data class BookmarkAnnotationSelectorNode(
@@ -22,8 +22,8 @@ data class BookmarkAnnotationTargetNode(
 data class BookmarkAnnotationBodyNode(
   val timestamp: String,
   val device: String,
-  val chapterTitle: String?,
-  val bookProgress: Float?
+  val chapterTitle: String = "",
+  val bookProgress: Float = 0.0f
 )
 
 data class BookmarkAnnotation(
@@ -67,236 +67,58 @@ object BookmarkAnnotations {
   private val dateFormatter =
     DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
 
-  fun fromReaderBookmark(
+  fun fromSerializedBookmark(
     objectMapper: ObjectMapper,
-    bookmark: Bookmark.ReaderBookmark
+    serializedBookmark: SerializedBookmark
   ): BookmarkAnnotation {
-    /*
-     * Check for some values that were likely added by [toBookmark]. Write special values here
-     * to ensure that [fromBookmark] is the exact inverse of [toBookmark].
-     */
-
-    val chapterTitle =
-      if (bookmark.chapterTitle == "") {
-        null
-      } else {
-        bookmark.chapterTitle
-      }
-
-    val bookProgress =
-      if (bookmark.bookProgress == 0.0) {
-        null
-      } else {
-        bookmark.bookProgress?.toFloat()
-      }
-
     val timestamp =
-      dateFormatter.print(bookmark.time)
+      this.dateFormatter.print(serializedBookmark.time)
 
     val bodyAnnotation =
       BookmarkAnnotationBodyNode(
         timestamp = timestamp,
-        device = bookmark.deviceID,
-        chapterTitle = chapterTitle,
-        bookProgress = bookProgress
+        device = serializedBookmark.deviceID,
+        chapterTitle = serializedBookmark.bookChapterTitle,
+        bookProgress = serializedBookmark.bookProgress.toFloat()
       )
 
     val locationJSON =
-      BookmarkAnnotationsJSON.serializeBookmarkLocation(
-        objectMapper = objectMapper,
-        bookmark = bookmark
-      )
+      serializedBookmark.location.toJSONString(objectMapper)
 
     val target =
       BookmarkAnnotationTargetNode(
-        bookmark.opdsId,
+        serializedBookmark.opdsId,
         BookmarkAnnotationSelectorNode("oa:FragmentSelector", locationJSON)
       )
 
     return BookmarkAnnotation(
       context = "http://www.w3.org/ns/anno.jsonld",
       body = bodyAnnotation,
-      id = bookmark.uri?.toString(),
+      id = serializedBookmark.uri?.toString(),
       type = "Annotation",
-      motivation = bookmark.kind.motivationURI,
+      motivation = serializedBookmark.kind.motivationURI,
       target = target
     )
   }
 
-  fun toReaderBookmark(
+  fun toSerializedBookmark(
     objectMapper: ObjectMapper,
     annotation: BookmarkAnnotation
-  ): Bookmark.ReaderBookmark {
-    val locationJSON =
-      BookmarkAnnotationsJSON.deserializeReaderLocation(
-        objectMapper = objectMapper,
-        value = annotation.target.selector.value
-      )
+  ): SerializedBookmark {
+    val location =
+      SerializedLocators.parseLocator(objectMapper.readTree(annotation.target.selector.value))
 
-    val time =
-      if (annotation.body.timestamp != null) {
-        dateParser.parseDateTime(annotation.body.timestamp)
-      } else {
-        DateTime.now(DateTimeZone.UTC)
-      }
-
-    return Bookmark.ReaderBookmark.create(
+    return SerializedBookmark20210828(
+      deviceID = annotation.body.device,
+      kind = annotation.kind,
+      location = location,
       opdsId = annotation.target.source,
-      location = locationJSON,
-      kind = BookmarkKind.ofMotivation(annotation.motivation),
-      time = time,
-      chapterTitle = annotation.body.chapterTitle ?: "",
-      bookProgress = annotation.body.bookProgress?.toDouble(),
+      time = this.dateParser.parseDateTime(annotation.body.timestamp),
       uri = if (annotation.id != null) URI.create(annotation.id) else null,
-      deviceID = annotation.body.device
-    )
-  }
-
-  fun fromAudiobookBookmark(
-    objectMapper: ObjectMapper,
-    bookmark: Bookmark.AudiobookBookmark
-  ): BookmarkAnnotation {
-    /*
-     * Check for some values that were likely added by [toBookmark]. Write special values here
-     * to ensure that [fromBookmark] is the exact inverse of [toBookmark].
-     */
-
-    val timestamp =
-      this.dateFormatter.print(bookmark.time)
-
-    val bodyAnnotation =
-      BookmarkAnnotationBodyNode(
-        timestamp = timestamp,
-        device = bookmark.deviceID,
-        chapterTitle = bookmark.location.title.orEmpty(),
-        bookProgress = null
-      )
-
-    val locationJSON =
-      BookmarkAnnotationsJSON.serializeBookmarkLocation(
-        objectMapper = objectMapper,
-        bookmark = bookmark
-      )
-
-    val target =
-      BookmarkAnnotationTargetNode(
-        bookmark.opdsId,
-        BookmarkAnnotationSelectorNode("oa:FragmentSelector", locationJSON)
-      )
-
-    return BookmarkAnnotation(
-      context = "http://www.w3.org/ns/anno.jsonld",
-      body = bodyAnnotation,
-      id = bookmark.uri?.toString(),
-      type = "Annotation",
-      motivation = bookmark.kind.motivationURI,
-      target = target
-    )
-  }
-
-  fun toAudiobookBookmark(
-    objectMapper: ObjectMapper,
-    annotation: BookmarkAnnotation
-  ): Bookmark.AudiobookBookmark {
-    val locationJSON =
-      BookmarkAnnotationsJSON.deserializeAudiobookLocation(
-        objectMapper = objectMapper,
-        value = annotation.target.selector.value
-      )
-
-    val duration =
-      BookmarkAnnotationsJSON.deserializeAudiobookDuration(
-        objectMapper = objectMapper,
-        value = annotation.target.selector.value
-      )
-
-    val time =
-      if (annotation.body.timestamp != null) {
-        this.dateParser.parseDateTime(annotation.body.timestamp)
-      } else {
-        DateTime.now(DateTimeZone.UTC)
-      }
-
-    return Bookmark.AudiobookBookmark.create(
-      opdsId = annotation.target.source,
-      location = locationJSON,
-      duration = duration,
-      kind = BookmarkKind.ofMotivation(annotation.motivation),
-      time = time,
-      uri = if (annotation.id != null) URI.create(annotation.id) else null,
-      deviceID = annotation.body.device
-    )
-  }
-
-  fun fromPdfBookmark(
-    objectMapper: ObjectMapper,
-    bookmark: Bookmark.PDFBookmark
-  ): BookmarkAnnotation {
-    /*
-     * Check for some values that were likely added by [toBookmark]. Write special values here
-     * to ensure that [fromBookmark] is the exact inverse of [toBookmark].
-     */
-
-    val chapterTitle = null
-    val bookProgress = null
-
-    val timestamp =
-      dateFormatter.print(bookmark.time)
-
-    val bodyAnnotation =
-      BookmarkAnnotationBodyNode(
-        timestamp = timestamp,
-        device = bookmark.deviceID,
-        chapterTitle = chapterTitle,
-        bookProgress = bookProgress
-      )
-
-    val locationJSON =
-      BookmarkAnnotationsJSON.serializeBookmarkLocation(
-        objectMapper = objectMapper,
-        bookmark = bookmark
-      )
-
-    val target =
-      BookmarkAnnotationTargetNode(
-        bookmark.opdsId,
-        BookmarkAnnotationSelectorNode("oa:FragmentSelector", locationJSON)
-      )
-
-    return BookmarkAnnotation(
-      context = "http://www.w3.org/ns/anno.jsonld",
-      body = bodyAnnotation,
-      id = bookmark.uri?.toString(),
-      type = "Annotation",
-      motivation = bookmark.kind.motivationURI,
-      target = target
-    )
-  }
-
-  fun toPdfBookmark(
-    objectMapper: ObjectMapper,
-    annotation: BookmarkAnnotation
-  ): Bookmark.PDFBookmark {
-    val locationJSON =
-      BookmarkAnnotationsJSON.deserializePdfLocation(
-        objectMapper = objectMapper,
-        value = annotation.target.selector.value
-      )
-
-    val time =
-      if (annotation.body.timestamp != null) {
-        dateParser.parseDateTime(annotation.body.timestamp)
-      } else {
-        DateTime.now(DateTimeZone.UTC)
-      }
-
-    return Bookmark.PDFBookmark.create(
-      opdsId = annotation.target.source,
-      kind = BookmarkKind.ofMotivation(annotation.motivation),
-      time = time,
-      pageNumber = locationJSON,
-      uri = if (annotation.id != null) URI.create(annotation.id) else null,
-      deviceID = annotation.body.device
+      bookProgress = annotation.body.bookProgress.toDouble(),
+      bookChapterProgress = 0.0,
+      bookChapterTitle = annotation.body.chapterTitle,
+      bookTitle = ""
     )
   }
 }

@@ -1,7 +1,6 @@
 package org.nypl.simplified.tests.books.book_database
 
 import android.app.Application
-import android.content.Context
 import com.io7m.jfunctional.Option
 import one.irradia.mime.api.MIMEType
 import one.irradia.mime.vanilla.MIMEParser
@@ -17,8 +16,9 @@ import org.nypl.simplified.books.api.BookFormat.BookFormatAudioBook
 import org.nypl.simplified.books.api.BookFormat.BookFormatEPUB
 import org.nypl.simplified.books.api.BookFormat.BookFormatPDF
 import org.nypl.simplified.books.api.BookID
-import org.nypl.simplified.books.api.bookmark.Bookmark
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
+import org.nypl.simplified.books.api.bookmark.SerializedBookmark20210828
+import org.nypl.simplified.books.api.bookmark.SerializedLocatorAudioBookTime1
 import org.nypl.simplified.books.book_database.BookDRMInformationHandleACS
 import org.nypl.simplified.books.book_database.BookDRMInformationHandleNone
 import org.nypl.simplified.books.book_database.BookDatabase
@@ -632,14 +632,25 @@ abstract class BookDatabaseContract {
     val format = databaseEntry.findFormatHandle(BookDatabaseEntryFormatHandleAudioBook::class.java)
     format!!
     format.setLastReadLocation(
-      Bookmark.AudiobookBookmark.create(
+      SerializedBookmark20210828(
         opdsId = feedEntry.id,
         kind = BookmarkKind.BookmarkLastReadLocation,
-        location = PlayerPosition(title = "Title", part = 0, chapter = 1, startOffset = 1000L, currentOffset = 230000L),
+        location = SerializedLocatorAudioBookTime1(
+          audioBookId = "X",
+          chapter = 1,
+          part = 0,
+          startOffsetMilliseconds = 1000L,
+          timeMilliseconds = 230000L,
+          duration = 500000L,
+          title = "Title"
+        ),
         deviceID = "",
         time = DateTime.now(),
         uri = null,
-        duration = 500000L
+        bookChapterProgress = 0.5,
+        bookChapterTitle = "Chapter",
+        bookTitle = "Title",
+        bookProgress = 0.25
       )
     )
 
@@ -647,33 +658,46 @@ abstract class BookDatabaseContract {
       val book = databaseEntry.book
       val bookFormat = book.findFormat(BookFormatAudioBook::class.java)
       val lastReadLocation = bookFormat!!.lastReadLocation!!
-      Assertions.assertEquals("Title", lastReadLocation.location.title)
-      Assertions.assertEquals(0, lastReadLocation.location.part)
-      Assertions.assertEquals(1, lastReadLocation.location.chapter)
-      Assertions.assertEquals(1000, lastReadLocation.location.startOffset)
-      Assertions.assertEquals(230000, lastReadLocation.location.currentOffset)
+      val location = lastReadLocation.location as SerializedLocatorAudioBookTime1
+      Assertions.assertEquals("Title", location.title)
+      Assertions.assertEquals(0, location.part)
+      Assertions.assertEquals(1, location.chapter)
+      Assertions.assertEquals(1000, location.startOffsetMilliseconds)
+      Assertions.assertEquals(230000, location.timeMilliseconds)
     }
 
     format.setLastReadLocation(
-      Bookmark.AudiobookBookmark.create(
+      SerializedBookmark20210828(
         opdsId = feedEntry.id,
         kind = BookmarkKind.BookmarkLastReadLocation,
-        location = PlayerPosition(title = "Title 2", part = 2, chapter = 3, currentOffset = 46000, startOffset = 0),
+        location = SerializedLocatorAudioBookTime1(
+          audioBookId = "X",
+          chapter = 3,
+          part = 2,
+          title = "Title 2",
+          timeMilliseconds = 46000L,
+          startOffsetMilliseconds = 0L,
+          duration = 80000L
+        ),
         deviceID = "",
         time = DateTime.now(),
         uri = null,
-        duration = 80000
+        bookChapterProgress = 0.5,
+        bookChapterTitle = "Chapter",
+        bookTitle = "Title",
+        bookProgress = 0.25
       )
     )
     run {
       val book = databaseEntry.book
       val bookFormat = book.findFormat(BookFormatAudioBook::class.java)
       val lastReadLocation = bookFormat!!.lastReadLocation!!
-      Assertions.assertEquals("Title 2", lastReadLocation.location.title)
-      Assertions.assertEquals(2, lastReadLocation.location.part)
-      Assertions.assertEquals(3, lastReadLocation.location.chapter)
-      Assertions.assertEquals(0, lastReadLocation.location.startOffset)
-      Assertions.assertEquals(46000, lastReadLocation.location.currentOffset)
+      val location = lastReadLocation.location as SerializedLocatorAudioBookTime1
+      Assertions.assertEquals("Title 2", location.title)
+      Assertions.assertEquals(2, location.part)
+      Assertions.assertEquals(3, location.chapter)
+      Assertions.assertEquals(0, location.startOffsetMilliseconds)
+      Assertions.assertEquals(46000, location.timeMilliseconds)
     }
 
     format.setLastReadLocation(null)

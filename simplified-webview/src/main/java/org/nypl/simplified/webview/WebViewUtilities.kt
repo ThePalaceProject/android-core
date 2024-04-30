@@ -4,8 +4,8 @@ import android.content.res.Configuration
 import android.webkit.CookieManager
 import android.webkit.WebSettings
 import androidx.webkit.WebSettingsCompat
-import androidx.webkit.WebSettingsCompat.FORCE_DARK_ON
 import androidx.webkit.WebSettingsCompat.FORCE_DARK_OFF
+import androidx.webkit.WebSettingsCompat.FORCE_DARK_ON
 import androidx.webkit.WebViewFeature
 import org.nypl.simplified.accounts.api.AccountCookie
 import org.nypl.simplified.android.ktx.isNightModeYes

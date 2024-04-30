@@ -270,7 +270,7 @@ internal class AuthenticationDocumentParser(
 
   private fun parseInput(
     fieldName: String,
-    root: ObjectNode?
+    root: ObjectNode
   ): AuthenticationObjectNYPLInput? {
     return try {
       AuthenticationObjectNYPLInput(

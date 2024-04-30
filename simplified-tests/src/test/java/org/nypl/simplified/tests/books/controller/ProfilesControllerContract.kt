@@ -1,7 +1,6 @@
 package org.nypl.simplified.tests.books.controller
 
 import android.app.Application
-import android.content.Context
 import com.google.common.util.concurrent.ListeningExecutorService
 import com.google.common.util.concurrent.MoreExecutors
 import io.reactivex.subjects.PublishSubject
@@ -22,7 +21,10 @@ import org.nypl.simplified.accounts.database.AccountBundledCredentialsEmpty
 import org.nypl.simplified.accounts.database.AccountsDatabases
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.analytics.api.AnalyticsType
+import org.nypl.simplified.bookmarks.api.BookmarkEvent
 import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
+import org.nypl.simplified.books.book_registry.BookPreviewRegistry
+import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
 import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.borrowing.BorrowSubtasks
@@ -37,6 +39,8 @@ import org.nypl.simplified.feeds.api.FeedHTTPTransport
 import org.nypl.simplified.feeds.api.FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.files.DirectoryUtilities
+import org.nypl.simplified.notifications.NotificationTokenHTTPCalls
+import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
 import org.nypl.simplified.opds.auth_document.api.AuthenticationDocumentParsersType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
 import org.nypl.simplified.opds.core.OPDSFeedParser
@@ -62,11 +66,6 @@ import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.reader.api.ReaderColorScheme
 import org.nypl.simplified.reader.api.ReaderFontSelection
 import org.nypl.simplified.reader.api.ReaderPreferences
-import org.nypl.simplified.bookmarks.api.BookmarkEvent
-import org.nypl.simplified.books.book_registry.BookPreviewRegistry
-import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
-import org.nypl.simplified.notifications.NotificationTokenHTTPCalls
-import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
 import org.nypl.simplified.tests.EventAssertions
 import org.nypl.simplified.tests.MutableServiceDirectory
 import org.nypl.simplified.tests.books.BookFormatsTesting
@@ -84,7 +83,6 @@ import org.slf4j.Logger
 import java.io.File
 import java.io.FileNotFoundException
 import java.net.URI
-import java.util.ArrayList
 import java.util.Collections
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors

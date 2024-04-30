@@ -167,7 +167,7 @@ class AudioBookPlayerActivity :
   private val reloadingManifest = AtomicBoolean(false)
 
   private val currentBookmarks =
-    Collections.synchronizedList(arrayListOf<Bookmark.AudiobookBookmark>())
+    Collections.synchronizedList(arrayListOf<Bookmark.ObsoleteAudiobookBookmark>())
 
   @Volatile
   private var destroying: Boolean = false
@@ -353,7 +353,7 @@ class AudioBookPlayerActivity :
 
   private fun savePlayerPosition(event: PlayerEventCreateBookmark) {
     try {
-      val bookmark = Bookmark.AudiobookBookmark.create(
+      val bookmark = Bookmark.ObsoleteAudiobookBookmark.create(
         opdsId = this.parameters.opdsEntry.id,
         location = PlayerPosition(
           title = event.spineElement.position.title,
@@ -690,7 +690,7 @@ class AudioBookPlayerActivity :
 
     try {
       val audiobookBookmarks = bookmarks
-        .filterIsInstance<Bookmark.AudiobookBookmark>()
+        .filterIsInstance<Bookmark.ObsoleteAudiobookBookmark>()
 
       val bookMarkLastReadPosition = audiobookBookmarks.find { bookmark ->
         bookmark.kind == BookmarkKind.BookmarkLastReadLocation
@@ -1058,7 +1058,7 @@ class AudioBookPlayerActivity :
           bookmark = bookmark,
           ignoreRemoteFailures = true
         ).map { savedBookmark ->
-          this.currentBookmarks.add(savedBookmark as Bookmark.AudiobookBookmark)
+          this.currentBookmarks.add(savedBookmark as Bookmark.ObsoleteAudiobookBookmark)
           this.showToastMessage(R.string.audio_book_player_bookmark_added)
         }.onAnyError {
           /* Otherwise, something in the chain failed. */

@@ -1,7 +1,6 @@
 package org.nypl.simplified.tests.books.book_database
 
 import android.app.Application
-import android.content.Context
 import com.io7m.jfunctional.Option
 import org.joda.time.DateTime
 import org.junit.jupiter.api.Assertions
@@ -10,8 +9,9 @@ import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookDRMKind
 import org.nypl.simplified.books.api.BookIDs
-import org.nypl.simplified.books.api.bookmark.Bookmark
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
+import org.nypl.simplified.books.api.bookmark.SerializedBookmark20210828
+import org.nypl.simplified.books.api.bookmark.SerializedLocatorPage1
 import org.nypl.simplified.books.book_database.BookDRMInformationHandleACS
 import org.nypl.simplified.books.book_database.BookDRMInformationHandleLCP
 import org.nypl.simplified.books.book_database.BookDRMInformationHandleNone
@@ -52,7 +52,14 @@ abstract class BookDatabasePDFContract {
     val parser = OPDSJSONParser.newParser()
     val serializer = OPDSJSONSerializer.newSerializer()
     val directory = DirectoryUtilities.directoryCreateTemporary()
-    val bookDatabase = BookDatabase.open(context(), parser, serializer, BookFormatsTesting.supportsEverything, accountID, directory)
+    val bookDatabase = BookDatabase.open(
+      context(),
+      parser,
+      serializer,
+      BookFormatsTesting.supportsEverything,
+      accountID,
+      directory
+    )
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithPDF()
     val bookID = BookIDs.newFromText("abcd")
@@ -68,14 +75,19 @@ abstract class BookDatabasePDFContract {
       formatHandle!!
       Assertions.assertEquals(null, formatHandle.format.lastReadLocation)
 
-      val bookmark = Bookmark.PDFBookmark.create(
-        opdsId = "",
-        kind = BookmarkKind.BookmarkLastReadLocation,
-        time = DateTime.now(),
-        pageNumber = 25,
-        deviceID = "",
-        uri = null
-      )
+      val bookmark =
+        SerializedBookmark20210828(
+          opdsId = "",
+          kind = BookmarkKind.BookmarkLastReadLocation,
+          time = DateTime.now(),
+          bookChapterProgress = 0.0,
+          bookProgress = 0.0,
+          bookChapterTitle = "C",
+          bookTitle = "A",
+          location = SerializedLocatorPage1(25),
+          deviceID = "",
+          uri = null
+        )
 
       formatHandle.setLastReadLocation(bookmark)
       Assertions.assertEquals(bookmark, formatHandle.format.lastReadLocation)
@@ -96,7 +108,14 @@ abstract class BookDatabasePDFContract {
     val parser = OPDSJSONParser.newParser()
     val serializer = OPDSJSONSerializer.newSerializer()
     val directory = DirectoryUtilities.directoryCreateTemporary()
-    val database0 = BookDatabase.open(context(), parser, serializer, BookFormatsTesting.supportsEverything, accountID, directory)
+    val database0 = BookDatabase.open(
+      context(),
+      parser,
+      serializer,
+      BookFormatsTesting.supportsEverything,
+      accountID,
+      directory
+    )
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithPDF()
     val bookID = BookIDs.newFromText("abcd")

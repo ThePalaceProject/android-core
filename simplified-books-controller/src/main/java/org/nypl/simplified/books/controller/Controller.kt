@@ -24,9 +24,6 @@ import org.nypl.simplified.accounts.api.AccountLogoutStringResourcesType
 import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.accounts.database.api.AccountsDatabaseNonexistentException
-import org.nypl.simplified.deeplinks.controller.api.DeepLinkEvent
-import org.nypl.simplified.deeplinks.controller.api.DeepLinksControllerType
-import org.nypl.simplified.deeplinks.controller.api.ScreenID
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryEvent
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.analytics.api.AnalyticsType
@@ -47,6 +44,9 @@ import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.books.preview.BookPreviewRequirements
 import org.nypl.simplified.books.preview.BookPreviewTask
 import org.nypl.simplified.crashlytics.api.CrashlyticsServiceType
+import org.nypl.simplified.deeplinks.controller.api.DeepLinkEvent
+import org.nypl.simplified.deeplinks.controller.api.DeepLinksControllerType
+import org.nypl.simplified.deeplinks.controller.api.ScreenID
 import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedLoaderType
