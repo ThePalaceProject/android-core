@@ -1,6 +1,6 @@
 package org.nypl.simplified.viewer.api
 
-import android.app.Application
+import android.app.Activity
 import org.joda.time.LocalDateTime
 import org.librarysimplified.mdc.MDCKeys
 import org.librarysimplified.services.api.Services
@@ -41,7 +41,7 @@ object Viewers {
    */
 
   fun openViewer(
-    context: Application,
+    context: Activity,
     preferences: ViewerPreferences,
     book: Book,
     format: BookFormat

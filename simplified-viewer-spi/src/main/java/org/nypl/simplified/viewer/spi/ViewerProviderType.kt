@@ -1,6 +1,6 @@
 package org.nypl.simplified.viewer.spi
 
-import android.app.Application
+import android.app.Activity
 import one.irradia.mime.api.MIMEType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
@@ -57,7 +57,7 @@ interface ViewerProviderType {
    */
 
   fun open(
-    context: Application,
+    activity: Activity,
     preferences: ViewerPreferences,
     book: Book,
     format: BookFormat,

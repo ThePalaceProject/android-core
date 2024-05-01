@@ -692,7 +692,7 @@ internal class MainFragmentListenerDelegate(
       )
 
     Viewers.openViewer(
-      context = MainApplication.application,
+      context = this.fragment.requireActivity(),
       preferences = viewerPreferences,
       book = book,
       format = format

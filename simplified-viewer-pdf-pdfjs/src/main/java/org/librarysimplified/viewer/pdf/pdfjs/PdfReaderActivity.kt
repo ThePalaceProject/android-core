@@ -1,6 +1,6 @@
 package org.librarysimplified.viewer.pdf.pdfjs
 
-import android.app.Application
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -51,7 +51,7 @@ class PdfReaderActivity : AppCompatActivity() {
      * Factory method to start a [PdfReaderActivity]
      */
     fun startActivity(
-      context: Application,
+      context: Activity,
       parameters: PdfReaderParameters
     ) {
       val bundle = Bundle().apply {
