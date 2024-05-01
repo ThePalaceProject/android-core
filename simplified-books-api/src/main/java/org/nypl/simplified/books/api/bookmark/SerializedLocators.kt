@@ -57,7 +57,11 @@ object SerializedLocators {
           this.parseLocatorAudioBookTime(node)
         }
 
-        "BookLocationR2", "LocatorHrefProgression" -> {
+        "BookLocationR2" -> {
+          this.parseLocatorLegacyR2(node)
+        }
+
+        "LocatorHrefProgression" -> {
           this.parseLocatorHrefProgression(node)
         }
 
@@ -72,6 +76,18 @@ object SerializedLocators {
     } else {
       this.parseLocatorGuess(node)
     }
+  }
+
+  @JvmStatic
+  @Throws(JSONParseException::class)
+  private fun parseLocatorLegacyR2(
+    node: ObjectNode
+  ): SerializedLocator {
+    val progress = JSONParserUtilities.getObject(node, "progress")
+    return SerializedLocatorHrefProgression20210317(
+      chapterHref = JSONParserUtilities.getString(progress, "chapterHref"),
+      chapterProgress = JSONParserUtilities.getDouble(progress, "chapterProgress")
+    )
   }
 
   @JvmStatic

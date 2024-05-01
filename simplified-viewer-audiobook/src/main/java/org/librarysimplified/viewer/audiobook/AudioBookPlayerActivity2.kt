@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.TxContextWrappingDelegate2
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import com.io7m.jfunctional.Some
 import io.reactivex.disposables.CompositeDisposable
 import org.librarysimplified.audiobook.api.PlayerBookmark
 import org.librarysimplified.audiobook.api.PlayerEvent
@@ -44,7 +45,9 @@ import org.librarysimplified.audiobook.views.PlayerTOCFragment
 import org.librarysimplified.audiobook.views.PlayerViewCommand
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.bookmarks.api.BookmarkServiceType
+import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.slf4j.LoggerFactory
+import java.net.URI
 
 class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_base) {
 
@@ -52,6 +55,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     LoggerFactory.getLogger(AudioBookPlayerActivity2::class.java)
 
   private lateinit var bookmarkService: BookmarkServiceType
+  private lateinit var coverService: BookCoverProviderType
 
   private val playerExtensions: List<PlayerExtensionType> = listOf()
   private var fragmentNow: Fragment = AudioBookLoadingFragment2()
@@ -75,6 +79,8 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
 
     this.bookmarkService =
       services.requireService(BookmarkServiceType::class.java)
+    this.coverService =
+      services.requireService(BookCoverProviderType::class.java)
   }
 
   override fun onStart() {
@@ -98,7 +104,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
         when (f) {
           is PlayerFragment -> {
             PlayerModel.closeBookOrDismissError()
-            Unit
+            super.onBackPressed()
           }
 
           is PlayerTOCFragment -> {
@@ -238,6 +244,21 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       }
 
       is PlayerModelState.PlayerOpen -> {
+        val parameters = AudioBookViewerModel.parameters ?: return
+
+        /*
+         * Set the cover image (loading it asynchronously).
+         */
+
+        val coverURI = parameters.opdsEntry.cover
+        if (coverURI is Some<URI>) {
+          this.coverService.loadCoverAsBitmap(
+            source = coverURI.get(),
+            onBitmapLoaded = PlayerModel::setCoverImage,
+            defaultResource = R.drawable.empty
+          )
+        }
+
         /*
          * XXX: This shouldn't really be a blocking call to get()
          * The bookmarks service should expose an always-up-to-date readable set of bookmarks.
@@ -260,6 +281,20 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
         }
 
         this.switchFragment(PlayerFragment())
+
+        /*
+         * Tell the downloader to download every chapter.
+         *
+         * XXX: This is probably something we don't want to do unconditionally anymore. It's
+         * here for backwards compatibility until we support streaming and have a refurbished
+         * TOC that allows for good control over downloads.
+         */
+
+        PlayerUIThread.runOnUIThreadDelayed({
+          PlayerModel.book()
+            .wholeBookDownloadTask
+            .fetch()
+        }, 2000L)
       }
 
       PlayerModelState.PlayerManifestInProgress -> {

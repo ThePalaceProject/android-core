@@ -143,6 +143,9 @@ class AudioBookViewer : ViewerProviderType {
     val manifest =
       formatAudio.manifest
 
+    PlayerModel.bookAuthor = book.entry.authorsCommaSeparated
+    PlayerModel.bookTitle = book.entry.title
+
     if (manifest != null) {
       val parameters =
         AudioBookPlayerParameters(

@@ -17,6 +17,7 @@ import org.nypl.simplified.books.api.bookmark.SerializedLocatorPage1
 import org.nypl.simplified.books.api.bookmark.SerializedLocators
 import org.slf4j.LoggerFactory
 import java.net.URI
+import java.nio.charset.StandardCharsets
 
 class BookmarksSerializationTest {
 
@@ -316,5 +317,64 @@ class BookmarksSerializationTest {
         as SerializedLocatorHrefProgression20210317
 
     assertEquals(locatorOut, locatorIn)
+  }
+
+  @Test
+  fun testParseLegacyBookmarks0() {
+    val bookmark =
+      SerializedBookmarks.parseBookmarkFromString(
+        textOf("bookmark-20210317-r1-0.json")
+      )
+
+    assertEquals("urn:isbn:9781683607144", bookmark.opdsId)
+  }
+
+  @Test
+  fun testParseLegacyBookmarks1() {
+    val bookmark =
+      SerializedBookmarks.parseBookmarkFromString(
+        textOf("bookmark-20210317-r2-0.json")
+      )
+
+    assertEquals("urn:isbn:9781683607144", bookmark.opdsId)
+  }
+
+  @Test
+  fun testParseLegacyBookmarks2() {
+    val bookmark =
+      SerializedBookmarks.parseBookmarkFromString(
+        textOf("bookmark-20210317-r2-1.json")
+      )
+
+    assertEquals("urn:uuid:808b2d99-c286-499a-91a1-580afc4c563f", bookmark.opdsId)
+  }
+
+  @Test
+  fun testParseLegacyBookmarks3() {
+    val bookmark =
+      SerializedBookmarks.parseBookmarkFromString(
+        textOf("bookmark-legacy-r1-0.json")
+      )
+
+    assertEquals("urn:isbn:9781683607144", bookmark.opdsId)
+  }
+
+  @Test
+  fun testParseLegacyBookmarks4() {
+    val bookmark =
+      SerializedBookmarks.parseBookmarkFromString(
+        textOf("bookmark-legacy-r1-1.json")
+      )
+
+    assertEquals("urn:isbn:9781683606123", bookmark.opdsId)
+  }
+
+  private fun textOf(
+    name: String
+  ): String {
+    return BookmarksSerializationTest::class.java.getResourceAsStream(
+      "/org/nypl/simplified/tests/bookmarks/$name"
+    ).readAllBytes()
+      .toString(StandardCharsets.UTF_8)
   }
 }
