@@ -146,7 +146,7 @@ class AccountSAML20Fragment : Fragment(R.layout.account_saml20) {
       ErrorPageParameters(
         emailAddress = this.viewModel.supportEmailAddress,
         body = "",
-        subject = "[simplye-error-report]",
+        subject = "[palace-error-report]",
         attributes = sortedMapOf(),
         taskSteps = taskSteps
       )

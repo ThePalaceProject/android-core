@@ -350,7 +350,7 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
       ErrorPageParameters(
         emailAddress = this.viewModel.supportEmailAddress,
         body = "",
-        subject = "[simplye-error-report] ${this.viewModel.appVersion}",
+        subject = "[palace-error-report] ${this.viewModel.appVersion}",
         attributes = attributes,
         taskSteps = taskSteps
       )

@@ -224,7 +224,7 @@ class AccountListFragment : Fragment(R.layout.account_list) {
       ErrorPageParameters(
         emailAddress = this.viewModel.supportEmailAddress,
         body = "",
-        subject = "[simplye-error-report]",
+        subject = "[palace-error-report]",
         attributes = accountEvent.attributes.toSortedMap(),
         taskSteps = accountEvent.taskResult.steps
       )

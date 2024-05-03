@@ -149,7 +149,7 @@ class CatalogSAML20ViewModel(
       ErrorPageParameters(
         emailAddress = this.buildConfig.supportErrorReportEmailAddress,
         body = "",
-        subject = "[simplye-error-report]",
+        subject = "[palace-error-report]",
         attributes = sortedMapOf(),
         taskSteps = taskSteps
       )

@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.TxContextWrappingDelegate2
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.io7m.jfunctional.Some
 import io.reactivex.disposables.CompositeDisposable
 import org.librarysimplified.audiobook.api.PlayerBookmark
@@ -46,6 +47,11 @@ import org.librarysimplified.audiobook.views.PlayerViewCommand
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.bookmarks.api.BookmarkServiceType
 import org.nypl.simplified.books.covers.BookCoverProviderType
+import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
+import org.nypl.simplified.taskrecorder.api.TaskRecorder
+import org.nypl.simplified.taskrecorder.api.TaskResult
+import org.nypl.simplified.ui.errorpage.ErrorPageFragment
+import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.slf4j.LoggerFactory
 import java.net.URI
 
@@ -55,6 +61,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     LoggerFactory.getLogger(AudioBookPlayerActivity2::class.java)
 
   private lateinit var bookmarkService: BookmarkServiceType
+  private lateinit var buildConfig: BuildConfigurationServiceType
   private lateinit var coverService: BookCoverProviderType
 
   private val playerExtensions: List<PlayerExtensionType> = listOf()
@@ -77,6 +84,8 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     val services =
       Services.serviceDirectory()
 
+    this.buildConfig =
+      services.requireService(BuildConfigurationServiceType::class.java)
     this.bookmarkService =
       services.requireService(BookmarkServiceType::class.java)
     this.coverService =
@@ -113,18 +122,9 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
         }
       }
 
-      is AudioBookLoadingFragment2 -> {
-        PlayerModel.closeBookOrDismissError()
-        super.onBackPressed()
-      }
-
-      null -> {
-        PlayerModel.closeBookOrDismissError()
-        super.onBackPressed()
-      }
-
       else -> {
-        throw IllegalStateException("Unrecognized fragment: $f")
+        PlayerModel.closeBookOrDismissError()
+        super.onBackPressed()
       }
     }
   }
@@ -307,24 +307,115 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     state: PlayerModelState.PlayerManifestParseFailed
   ) {
     this.logger.error("onManifestParseFailed: {}", state)
+
+    val task = TaskRecorder.create()
+    task.beginNewStep("Parsing manifest…")
+    state.failure.mapIndexed { index, error ->
+      this.logger.error("{}:{}: {}", error.line, error.column, error.message)
+      task.addAttribute(
+        "Parse Error [${index}]",
+        "${error.line}:${error.column}: ${error.message}"
+      )
+    }
+    task.currentStepFailed("Parsing failed.", "error-manifest-parse")
+
+    val alert = MaterialAlertDialogBuilder(this)
+    alert.setTitle(R.string.audio_book_player_error_book_open)
+    alert.setMessage(R.string.audio_book_manifest_parse_error)
+    alert.setNeutralButton(R.string.audio_book_player_details) { dialog, _ ->
+      openErrorPage(task.finishFailure<String>())
+    }
+    alert.setPositiveButton(R.string.audio_book_player_ok) { dialog, _ ->
+      dialog.dismiss()
+      this.finish()
+    }
+    alert.show()
+  }
+
+  private fun openErrorPage(result: TaskResult.Failure<*>) {
+    this.switchFragment(
+      ErrorPageFragment.create(
+        ErrorPageParameters(
+          emailAddress = this.buildConfig.supportErrorReportEmailAddress,
+          body = "",
+          subject = "[palace-audiobook-error-report]",
+          attributes = sortedMapOf(),
+          taskSteps = result.steps
+        )
+      )
+    )
   }
 
   private fun onBookOpenFailed(
     state: PlayerModelState.PlayerBookOpenFailed
   ) {
     this.logger.error("onBookOpenFailed: {}", state)
+
+    val task = TaskRecorder.create()
+    task.beginNewStep("Opening book…")
+    task.currentStepFailed(state.message, "error-book-open")
+
+    val alert = MaterialAlertDialogBuilder(this)
+    alert.setTitle(R.string.audio_book_player_error_book_open)
+    alert.setMessage(state.message)
+    alert.setNeutralButton(R.string.audio_book_player_details) { dialog, _ ->
+      openErrorPage(task.finishFailure<String>())
+    }
+    alert.setPositiveButton(R.string.audio_book_player_ok) { dialog, _ ->
+      dialog.dismiss()
+      this.finish()
+    }
+    alert.show()
   }
 
   private fun onManifestDownloadFailed(
     state: PlayerModelState.PlayerManifestDownloadFailed
   ) {
     this.logger.error("onManifestDownloadFailed: {}", state)
+
+    val task = TaskRecorder.create()
+    task.beginNewStep("Downloading manifest…")
+    val serverData = state.failure.serverData
+    if (serverData != null) {
+      task.addAttribute("URI", serverData.uri.toString())
+      task.addAttribute("Code", serverData.code.toString())
+      task.addAttribute("ContentType", serverData.receivedContentType)
+    }
+    task.currentStepFailed(state.failure.message, "error-manifest-download")
+
+    val alert = MaterialAlertDialogBuilder(this)
+    alert.setTitle(R.string.audio_book_player_error_book_open)
+    alert.setMessage(R.string.audio_book_manifest_download_error)
+    alert.setNeutralButton(R.string.audio_book_player_details) { dialog, _ ->
+      openErrorPage(task.finishFailure<String>())
+    }
+    alert.setPositiveButton(R.string.audio_book_player_ok) { dialog, _ ->
+      dialog.dismiss()
+      this.finish()
+    }
+    alert.show()
   }
 
   private fun onManifestLicenseChecksFailed(
     state: PlayerModelState.PlayerManifestLicenseChecksFailed
   ) {
     this.logger.error("onManifestLicenseChecksFailed: {}", state)
+
+    val task = TaskRecorder.create()
+    task.beginNewStep("Checking license…")
+    task.currentStepFailed("License checks failed.", "error-manifest-license")
+
+    val alert = MaterialAlertDialogBuilder(this)
+    alert.setTitle(R.string.audio_book_player_error_book_open)
+    alert.setMessage(R.string.audio_book_manifest_license_error)
+    alert.setNeutralButton(R.string.audio_book_player_details) { dialog, _ ->
+      openErrorPage(task.finishFailure<String>())
+    }
+    alert.setPositiveButton(R.string.audio_book_player_ok) { dialog, _ ->
+      dialog.dismiss()
+      this.finish()
+    }
+    alert.show()
   }
 
   @UiThread

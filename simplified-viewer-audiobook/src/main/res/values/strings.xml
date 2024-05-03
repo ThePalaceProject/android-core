@@ -13,4 +13,9 @@
   <string name="audio_book_player_return_question">Would you like to return it?</string>
   <string name="audio_book_player_return_title">Your Audiobook Has Finished</string>
   <string name="audio_book_player_toc_title">Table Of Contents</string>
+  <string name="audio_book_player_ok">OK</string>
+  <string name="audio_book_player_details">Details</string>
+  <string name="audio_book_manifest_parse_error">The audiobook manifest could not be parsed.</string>
+  <string name="audio_book_manifest_download_error">The audiobook manifest could not be downloaded.</string>
+  <string name="audio_book_manifest_license_error">The audiobook manifest license checks failed.</string>
 </resources>
