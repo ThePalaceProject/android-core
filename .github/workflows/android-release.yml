@@ -16,7 +16,7 @@ jobs:
       - name: Verify release branch
         run: .ci/ci-verify-release-branch.sh
       - name: Finish release
-        run: .ci/ci-release-finish.sh --tag
+        run: .ci/ci-release-finish.sh
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         env:
