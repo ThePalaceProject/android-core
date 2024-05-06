@@ -522,8 +522,17 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2024-04-09T09:52:40+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.12.0">
-      <c:changes/>
+    <c:release date="2024-05-03T11:05:31+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.13.0">
+      <c:changes>
+        <c:change date="2024-05-03T11:05:31+00:00" summary="Integrate the new audiobook player components.">
+          <c:tickets>
+            <c:ticket id="PP-1074"/>
+            <c:ticket id="PP-1075"/>
+            <c:ticket id="PP-1076"/>
+            <c:ticket id="PP-1082"/>
+          </c:tickets>
+        </c:change>
+      </c:changes>
     </c:release>
   </c:releases>
   <c:ticket-systems>

@@ -33,7 +33,6 @@ import org.nypl.simplified.accounts.api.AccountLoginState.AccountLogoutFailed
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountNotLoggedIn
 import org.nypl.simplified.accounts.api.AccountLogoutStringResourcesType
 import org.nypl.simplified.accounts.api.AccountPassword
-import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.api.AccountUsername
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.api.BookID
@@ -50,7 +49,6 @@ import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
 import org.nypl.simplified.patron.PatronUserProfileParsers
 import org.nypl.simplified.patron.api.PatronUserProfileParsersType
 import org.nypl.simplified.profiles.api.ProfileID
-import org.nypl.simplified.profiles.api.ProfilePreferences
 import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.nypl.simplified.tests.books.controller.FakeAccounts.fakeAccountProvider
 import org.nypl.simplified.tests.mocking.MockAccountLogoutStringResources

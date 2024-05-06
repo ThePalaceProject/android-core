@@ -91,7 +91,7 @@ class UnpackagedAudioBookManifestStrategy(
     try {
       return strategy.execute()
     } finally {
-      fulfillSubscription.unsubscribe()
+      fulfillSubscription.dispose()
     }
   }
 

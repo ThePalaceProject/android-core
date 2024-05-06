@@ -1,11 +1,6 @@
 package org.nypl.simplified.bookmarks.internal
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.google.common.util.concurrent.FluentFuture
-import com.google.common.util.concurrent.Futures
-import com.google.common.util.concurrent.ListenableFuture
-import com.google.common.util.concurrent.ListeningScheduledExecutorService
-import com.google.common.util.concurrent.MoreExecutors
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.Subject
@@ -14,23 +9,25 @@ import org.nypl.simplified.accounts.api.AccountEventLoginStateChanged
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggedIn
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggingIn
-import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoginFailed
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggingInWaitingForExternalAuthentication
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggingOut
+import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoginFailed
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLogoutFailed
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountNotLoggedIn
 import org.nypl.simplified.bookmarks.api.BookmarkEvent
 import org.nypl.simplified.bookmarks.api.BookmarkHTTPCallsType
-import org.nypl.simplified.bookmarks.api.Bookmarks
 import org.nypl.simplified.bookmarks.api.BookmarkServiceType
+import org.nypl.simplified.bookmarks.api.BookmarksForBook
 import org.nypl.simplified.books.api.BookID
-import org.nypl.simplified.books.api.bookmark.Bookmark
+import org.nypl.simplified.books.api.bookmark.SerializedBookmark
 import org.nypl.simplified.profiles.api.ProfileEvent
 import org.nypl.simplified.profiles.api.ProfileNoneCurrentException
 import org.nypl.simplified.profiles.api.ProfileSelection
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.slf4j.LoggerFactory
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 
 class BService(
@@ -43,12 +40,10 @@ class BService(
   private val disposables =
     CompositeDisposable()
 
-  private val executor: ListeningScheduledExecutorService =
-    MoreExecutors.listeningDecorator(
-      Executors.newScheduledThreadPool(1) { runnable ->
-        BServiceThread(this.threads.invoke(runnable))
-      }
-    )
+  private val executor: ScheduledExecutorService =
+    Executors.newScheduledThreadPool(1) { runnable ->
+      BServiceThread(this.threads.invoke(runnable))
+    }
 
   private val logger =
     LoggerFactory.getLogger(BService::class.java)
@@ -69,7 +64,12 @@ class BService(
      * Sync bookmarks hourly.
      */
 
-    this.executor.scheduleAtFixedRate({ this.onRegularSyncTimeElapsed() }, 0L, 1L, TimeUnit.HOURS)
+    this.executor.scheduleAtFixedRate(
+      { this.onRegularSyncTimeElapsed() },
+      0L,
+      1L,
+      TimeUnit.HOURS
+    )
   }
 
   private fun onProfileEvent(event: ProfileEvent) {
@@ -101,13 +101,27 @@ class BService(
     }
   }
 
+  private fun <T> submitOp(
+    op: BServiceOp<T>
+  ): CompletableFuture<T> {
+    val f = CompletableFuture<T>()
+    this.executor.execute {
+      try {
+        f.complete(op.runActual())
+      } catch (e: Throwable) {
+        f.completeExceptionally(e)
+      }
+    }
+    return f
+  }
+
   /**
    * Asynchronously send and receive all bookmarks.
    */
 
-  private fun sync(): ListenableFuture<*> {
+  private fun sync(): CompletableFuture<*> {
     return try {
-      this.executor.submit(
+      this.submitOp(
         BServiceOpSyncAllAccounts(
           this.logger,
           this.httpCalls,
@@ -116,10 +130,18 @@ class BService(
           this.profilesController.profileCurrent()
         )
       )
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       this.logger.error("sync: unable to sync profile: ", e)
-      FluentFuture.from(Futures.immediateFailedFuture<Unit>(e))
+      this.failedFuture<Void>(e)
     }
+  }
+
+  private fun <T> failedFuture(
+    e: Throwable
+  ): CompletableFuture<T> {
+    val f = CompletableFuture<T>()
+    f.completeExceptionally(e)
+    return f
   }
 
   private fun onAccountLoggedIn() {
@@ -143,165 +165,137 @@ class BService(
     get() = this.bookmarkEventsOut
 
   override fun bookmarkSyncAccount(
-    accountID: AccountID,
-    bookID: BookID
-  ): FluentFuture<Bookmark?> {
+    accountID: AccountID
+  ): CompletableFuture<List<SerializedBookmark>> {
     return try {
-      FluentFuture.from(
-        this.executor.submit(
-          BServiceOpSyncOneAccount(
-            this.logger,
-            this.httpCalls,
-            this.bookmarkEventsOut,
-            this.objectMapper,
-            this.profilesController.profileCurrent(),
-            accountID,
-            bookID
-          )
+      this.submitOp(
+        BServiceOpSyncOneAccount(
+          this.logger,
+          this.httpCalls,
+          this.bookmarkEventsOut,
+          this.objectMapper,
+          this.profilesController.profileCurrent(),
+          accountID
         )
       )
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       this.logger.error("sync: unable to sync account: ", e)
-      FluentFuture.from(Futures.immediateFailedFuture(e))
+      this.failedFuture(e)
     }
   }
 
   override fun bookmarkSyncAndLoad(
     accountID: AccountID,
     book: BookID
-  ): FluentFuture<Bookmarks> {
-    return this.bookmarkSyncAccount(accountID, book)
-      .transformAsync(
-        { lastReadServer ->
-          this.bookmarkLoad(accountID, book, lastReadServer)
-        },
-        this.executor
-      )
-      .catchingAsync(
-        Exception::class.java,
-        {
-          // If sync fails, continue to load the local bookmarks.
-          this.bookmarkLoad(accountID, book, null)
-        },
-        this.executor
-      )
+  ): CompletableFuture<BookmarksForBook> {
+    return this.bookmarkSyncAccount(accountID)
+      .exceptionally { listOf() }
+      .thenCompose { this.bookmarkLoad(accountID, book) }
   }
 
   override fun bookmarkLoad(
     accountID: AccountID,
-    book: BookID,
-    lastReadBookmarkServer: Bookmark?
-  ): FluentFuture<Bookmarks> {
+    book: BookID
+  ): CompletableFuture<BookmarksForBook> {
     return try {
-      FluentFuture.from(
-        this.executor.submit(
-          BServiceOpLoadBookmarks(
-            logger = this.logger,
-            accountID = accountID,
-            profile = profilesController.profileCurrent(),
-            book = book,
-            lastReadBookmarkServer = lastReadBookmarkServer
-          )
+      this.submitOp(
+        BServiceOpLoadBookmarks(
+          logger = this.logger,
+          accountID = accountID,
+          profile = this.profilesController.profileCurrent(),
+          book = book
         )
       )
-    } catch (e: ProfileNoneCurrentException) {
-      this.logger.error("bookmarkLoad: no profile is current: ", e)
-      FluentFuture.from(Futures.immediateFailedFuture(e))
+    } catch (e: Throwable) {
+      this.logger.error("bookmarkLoad: ", e)
+      this.failedFuture(e)
     }
   }
 
   override fun bookmarkCreateLocal(
     accountID: AccountID,
-    bookmark: Bookmark
-  ): FluentFuture<Bookmark> {
+    bookmark: SerializedBookmark
+  ): CompletableFuture<SerializedBookmark> {
     return try {
-      FluentFuture.from(
-        this.executor.submit(
-          BServiceOpCreateLocalBookmark(
-            logger = this.logger,
-            bookmarkEventsOut = this.bookmarkEventsOut,
-            profile = profilesController.profileCurrent(),
-            accountID = accountID,
-            bookmark = bookmark
-          )
+      this.submitOp(
+        BServiceOpCreateLocalBookmark(
+          logger = this.logger,
+          bookmarkEventsOut = this.bookmarkEventsOut,
+          profile = this.profilesController.profileCurrent(),
+          accountID = accountID,
+          bookmark = bookmark
         )
       )
-    } catch (e: ProfileNoneCurrentException) {
-      this.logger.error("bookmarkCreateLocal: no profile is current: ", e)
-      FluentFuture.from(Futures.immediateFailedFuture(e))
+    } catch (e: Throwable) {
+      this.logger.error("bookmarkCreateLocal: ", e)
+      this.failedFuture(e)
     }
   }
 
   override fun bookmarkCreateRemote(
     accountID: AccountID,
-    bookmark: Bookmark
-  ): FluentFuture<Bookmark> {
+    bookmark: SerializedBookmark
+  ): CompletableFuture<SerializedBookmark> {
     return try {
-      FluentFuture.from(
-        this.executor.submit(
-          BServiceOpCreateRemoteBookmark(
-            logger = this.logger,
-            objectMapper = this.objectMapper,
-            httpCalls = this.httpCalls,
-            profile = profilesController.profileCurrent(),
-            accountID = accountID,
-            bookmark = bookmark
-          )
+      this.submitOp(
+        BServiceOpCreateRemoteBookmark(
+          logger = this.logger,
+          objectMapper = this.objectMapper,
+          httpCalls = this.httpCalls,
+          profile = this.profilesController.profileCurrent(),
+          accountID = accountID,
+          bookmark = bookmark
         )
       )
-    } catch (e: ProfileNoneCurrentException) {
-      this.logger.error("bookmarkCreateRemote: no profile is current: ", e)
-      FluentFuture.from(Futures.immediateFailedFuture(e))
+    } catch (e: Throwable) {
+      this.logger.error("bookmarkCreateRemote: ", e)
+      this.failedFuture(e)
     }
   }
 
   override fun bookmarkCreate(
     accountID: AccountID,
-    bookmark: Bookmark,
+    bookmark: SerializedBookmark,
     ignoreRemoteFailures: Boolean
-  ): FluentFuture<Bookmark> {
+  ): CompletableFuture<SerializedBookmark> {
     return try {
-      FluentFuture.from(
-        this.executor.submit(
-          BServiceOpCreateBookmark(
-            logger = this.logger,
-            objectMapper = this.objectMapper,
-            httpCalls = this.httpCalls,
-            profile = profilesController.profileCurrent(),
-            accountID = accountID,
-            bookmarkEventsOut = this.bookmarkEventsOut,
-            bookmark = bookmark,
-            ignoreRemoteFailures = ignoreRemoteFailures
-          )
+      this.submitOp(
+        BServiceOpCreateBookmark(
+          logger = this.logger,
+          objectMapper = this.objectMapper,
+          httpCalls = this.httpCalls,
+          profile = this.profilesController.profileCurrent(),
+          accountID = accountID,
+          bookmarkEventsOut = this.bookmarkEventsOut,
+          bookmark = bookmark,
+          ignoreRemoteFailures = ignoreRemoteFailures
         )
       )
-    } catch (e: ProfileNoneCurrentException) {
-      this.logger.error("bookmarkCreate: no profile is current: ", e)
-      FluentFuture.from(Futures.immediateFailedFuture(e))
+    } catch (e: Throwable) {
+      this.logger.error("bookmarkCreate: ", e)
+      this.failedFuture(e)
     }
   }
 
   override fun bookmarkDelete(
     accountID: AccountID,
-    bookmark: Bookmark,
+    bookmark: SerializedBookmark,
     ignoreRemoteFailures: Boolean
-  ): FluentFuture<Unit> {
+  ): CompletableFuture<Unit> {
     return try {
-      FluentFuture.from(
-        this.executor.submit(
-          BServiceOpDeleteBookmark(
-            logger = this.logger,
-            httpCalls = this.httpCalls,
-            profile = profilesController.profileCurrent(),
-            accountID = accountID,
-            bookmark = bookmark,
-            ignoreRemoteFailures = ignoreRemoteFailures
-          )
+      this.submitOp(
+        BServiceOpDeleteBookmark(
+          logger = this.logger,
+          httpCalls = this.httpCalls,
+          profile = this.profilesController.profileCurrent(),
+          accountID = accountID,
+          bookmark = bookmark,
+          ignoreRemoteFailures = ignoreRemoteFailures
         )
       )
-    } catch (e: ProfileNoneCurrentException) {
-      this.logger.error("bookmarkLoad: no profile is current: ", e)
-      FluentFuture.from(Futures.immediateFailedFuture(e))
+    } catch (e: Throwable) {
+      this.logger.error("bookmarkLoad: ", e)
+      this.failedFuture(e)
     }
   }
 }

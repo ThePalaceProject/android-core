@@ -4,6 +4,7 @@ import com.io7m.jfunctional.PartialFunctionType;
 import com.io7m.jfunctional.Unit;
 import com.io7m.jnull.NullCheck;
 import com.io7m.junreachable.UnreachableCodeException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

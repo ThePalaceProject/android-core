@@ -8,11 +8,11 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import org.librarysimplified.ui.accounts.R
 import org.nypl.simplified.android.ktx.supportActionBar
 import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.fragmentListeners
 import org.nypl.simplified.webview.WebViewUtilities
-import org.librarysimplified.ui.accounts.R
 import org.thepalaceproject.theme.core.PalaceToolbar
 
 /**

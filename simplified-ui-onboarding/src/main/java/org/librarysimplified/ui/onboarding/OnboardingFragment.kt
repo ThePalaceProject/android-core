@@ -17,8 +17,8 @@ import org.nypl.simplified.listeners.api.ListenerRepository
 import org.nypl.simplified.listeners.api.fragmentListeners
 import org.nypl.simplified.listeners.api.listenerRepositories
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
-import org.nypl.simplified.ui.accounts.AccountListRegistryFragment
 import org.nypl.simplified.ui.accounts.AccountListRegistryEvent
+import org.nypl.simplified.ui.accounts.AccountListRegistryFragment
 import org.nypl.simplified.ui.errorpage.ErrorPageFragment
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.slf4j.Logger

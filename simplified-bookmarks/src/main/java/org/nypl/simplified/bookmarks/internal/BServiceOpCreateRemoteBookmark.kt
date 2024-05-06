@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotations
 import org.nypl.simplified.bookmarks.api.BookmarkHTTPCallsType
-import org.nypl.simplified.books.api.bookmark.Bookmark
+import org.nypl.simplified.books.api.bookmark.SerializedBookmark
 import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.slf4j.Logger
 
@@ -18,14 +18,14 @@ internal class BServiceOpCreateRemoteBookmark(
   private val httpCalls: BookmarkHTTPCallsType,
   private val profile: ProfileReadableType,
   private val accountID: AccountID,
-  private val bookmark: Bookmark
-) : BServiceOp<Bookmark>(logger) {
+  private val bookmark: SerializedBookmark
+) : BServiceOp<SerializedBookmark>(logger) {
 
-  override fun runActual(): Bookmark {
+  override fun runActual(): SerializedBookmark {
     return this.remotelySendBookmark()
   }
 
-  private fun remotelySendBookmark(): Bookmark {
+  private fun remotelySendBookmark(): SerializedBookmark {
     return try {
       this.logger.debug(
         "[{}]: remote sending bookmark {}",
@@ -44,48 +44,18 @@ internal class BServiceOpCreateRemoteBookmark(
         return this.bookmark
       }
 
-      val bookmarkAnnotation = when (this.bookmark) {
-        is Bookmark.ReaderBookmark -> {
-          BookmarkAnnotations.fromReaderBookmark(this.objectMapper, this.bookmark)
-        }
-        is Bookmark.AudiobookBookmark -> {
-          BookmarkAnnotations.fromAudiobookBookmark(this.objectMapper, this.bookmark)
-        }
-        is Bookmark.PDFBookmark -> {
-          BookmarkAnnotations.fromPdfBookmark(this.objectMapper, this.bookmark)
-        }
-        else -> {
-          throw IllegalStateException("Unsupported bookmark type: $bookmark")
-        }
-      }
+      val bookmarkAnnotation =
+        BookmarkAnnotations.fromSerializedBookmark(this.objectMapper, this.bookmark)
 
-      val bookmarkUri = this.httpCalls.bookmarkAdd(
-        account = account,
-        annotationsURI = syncInfo.annotationsURI,
-        credentials = syncInfo.credentials,
-        bookmark = bookmarkAnnotation
-      ) ?: throw IllegalStateException("Server HTTP call failed")
+      val bookmarkUri =
+        this.httpCalls.bookmarkAdd(
+          account = account,
+          annotationsURI = syncInfo.annotationsURI,
+          credentials = syncInfo.credentials,
+          bookmark = bookmarkAnnotation
+        ) ?: throw IllegalStateException("Server HTTP call failed")
 
-      when (this.bookmark) {
-        is Bookmark.ReaderBookmark -> {
-          bookmark.copy(
-            uri = bookmarkUri
-          )
-        }
-        is Bookmark.AudiobookBookmark -> {
-          bookmark.copy(
-            uri = bookmarkUri
-          )
-        }
-        is Bookmark.PDFBookmark -> {
-          bookmark.copy(
-            uri = bookmarkUri
-          )
-        }
-        else -> {
-          throw IllegalStateException("Unsupported bookmark type: $bookmark")
-        }
-      }
+      return this.bookmark.withURI(bookmarkUri)
     } catch (e: Exception) {
       this.logger.error("error sending bookmark: ", e)
       throw e

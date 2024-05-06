@@ -79,15 +79,15 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
      */
 
     fun startActivity(
-      context: Activity,
+      activity: Activity,
       parameters: Reader2ActivityParameters
     ) {
-      val intent = Intent(context, Reader2Activity::class.java)
+      val intent = Intent(activity, Reader2Activity::class.java)
       val bundle = Bundle().apply {
         this.putSerializable(this@Companion.ARG_PARAMETERS, parameters)
       }
       intent.putExtras(bundle)
-      context.startActivity(intent)
+      activity.startActivity(intent)
     }
   }
 

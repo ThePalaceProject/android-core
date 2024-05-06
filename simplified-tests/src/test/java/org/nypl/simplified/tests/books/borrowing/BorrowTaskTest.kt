@@ -2,7 +2,6 @@ package org.nypl.simplified.tests.books.borrowing
 
 import android.app.Application
 import android.content.ContentResolver
-import android.content.Context
 import com.io7m.jfunctional.Option
 import io.reactivex.disposables.Disposable
 import okhttp3.mockwebserver.MockResponse

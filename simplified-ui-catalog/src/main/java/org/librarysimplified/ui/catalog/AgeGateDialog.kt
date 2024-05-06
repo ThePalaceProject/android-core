@@ -1,7 +1,6 @@
 package org.librarysimplified.ui.catalog
 
 import android.app.Dialog
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +11,7 @@ import android.widget.Button
 import android.widget.Spinner
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.slf4j.LoggerFactory
 import java.util.Calendar
 

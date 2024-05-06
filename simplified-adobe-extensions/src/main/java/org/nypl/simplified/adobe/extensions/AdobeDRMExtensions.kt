@@ -2,9 +2,6 @@ package org.nypl.simplified.adobe.extensions
 
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.SettableFuture
-import org.nypl.simplified.accounts.api.AccountAuthenticationAdobeClientToken
-import org.nypl.simplified.accounts.api.AccountAuthenticationAdobePostActivationCredentials
-import org.nypl.simplified.files.FileUtilities
 import org.nypl.drm.core.AdobeAdeptActivationReceiverType
 import org.nypl.drm.core.AdobeAdeptConnectorType
 import org.nypl.drm.core.AdobeAdeptDeactivationReceiverType
@@ -15,6 +12,9 @@ import org.nypl.drm.core.AdobeAdeptLoanReturnListenerType
 import org.nypl.drm.core.AdobeDeviceID
 import org.nypl.drm.core.AdobeUserID
 import org.nypl.drm.core.AdobeVendorID
+import org.nypl.simplified.accounts.api.AccountAuthenticationAdobeClientToken
+import org.nypl.simplified.accounts.api.AccountAuthenticationAdobePostActivationCredentials
+import org.nypl.simplified.files.FileUtilities
 import java.io.File
 import java.util.concurrent.CancellationException
 

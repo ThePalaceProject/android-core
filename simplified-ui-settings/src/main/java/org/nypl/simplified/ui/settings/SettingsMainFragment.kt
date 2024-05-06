@@ -1,7 +1,5 @@
 package org.nypl.simplified.ui.settings
 
-import org.librarysimplified.ui.settings.R
-
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -9,6 +7,7 @@ import androidx.fragment.app.viewModels
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import org.librarysimplified.services.api.Services
+import org.librarysimplified.ui.settings.R
 import org.nypl.simplified.android.ktx.supportActionBar
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.listeners.api.FragmentListenerType

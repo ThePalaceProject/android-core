@@ -1,7 +1,6 @@
 package org.nypl.simplified.tests.books.accounts
 
 import android.app.Application
-import android.content.Context
 import io.reactivex.subjects.PublishSubject
 import org.hamcrest.BaseMatcher
 import org.hamcrest.Description

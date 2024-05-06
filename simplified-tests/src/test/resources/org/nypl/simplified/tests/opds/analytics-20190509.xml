@@ -1,4 +1,6 @@
-<feed xmlns:app="http://www.w3.org/2007/app" xmlns:bib="http://bib.schema.org/" xmlns:bibframe="http://bibframe.org/vocab/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:drm="http://librarysimplified.org/terms/drm" xmlns:opds="http://opds-spec.org/2010/catalog" xmlns:opf="http://www.idpf.org/2007/opf" xmlns:schema="http://schema.org/" xmlns:simplified="http://librarysimplified.org/terms/" xmlns="http://www.w3.org/2005/Atom">
+<feed xmlns:bibframe="http://bibframe.org/vocab/" xmlns:dcterms="http://purl.org/dc/terms/"
+    xmlns:opds="http://opds-spec.org/2010/catalog" xmlns:schema="http://schema.org/"
+    xmlns:simplified="http://librarysimplified.org/terms/" xmlns="http://www.w3.org/2005/Atom">
   <id>https://circulation.librarysimplified.org/CLASSICS/search/1831?q=corner&amp;entrypoint=Book</id>
   <title>Search</title>
   <updated>2019-05-09T17:14:04Z</updated>

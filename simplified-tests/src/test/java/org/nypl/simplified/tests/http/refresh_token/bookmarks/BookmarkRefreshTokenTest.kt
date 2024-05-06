@@ -1,7 +1,6 @@
 package org.nypl.simplified.tests.http.refresh_token.bookmarks
 
 import android.app.Application
-import android.content.Context
 import com.fasterxml.jackson.databind.ObjectMapper
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer

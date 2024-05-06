@@ -3,23 +3,21 @@ package org.nypl.simplified.books.book_database
 import com.fasterxml.jackson.databind.ObjectMapper
 import net.jcip.annotations.GuardedBy
 import one.irradia.mime.api.MIMEType
-import org.joda.time.DateTime
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookDRMKind
 import org.nypl.simplified.books.api.BookFormat
-import org.nypl.simplified.books.api.bookmark.Bookmark
-import org.nypl.simplified.books.api.bookmark.BookmarkJSON
-import org.nypl.simplified.books.api.bookmark.BookmarkKind
+import org.nypl.simplified.books.api.bookmark.BookmarkID
+import org.nypl.simplified.books.api.bookmark.SerializedBookmark
+import org.nypl.simplified.books.api.bookmark.SerializedBookmarks
 import org.nypl.simplified.books.book_database.api.BookDRMInformationHandle
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandlePDF
 import org.nypl.simplified.files.FileUtilities
 import org.nypl.simplified.json.core.JSONParseException
 import org.nypl.simplified.json.core.JSONParserUtilities
+import org.nypl.simplified.json.core.JSONSerializerUtilities
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
-import java.lang.IllegalStateException
-import java.lang.NumberFormatException
 
 /**
  * Operations on PDF formats in database entries.
@@ -129,6 +127,26 @@ internal class DatabaseFormatHandlePDF internal constructor(
     this.parameters.onUpdated.invoke(newFormat)
   }
 
+  override fun deleteBookmark(bookmarkId: BookmarkID) {
+    val newFormat = synchronized(this.dataLock) {
+      val serialized = this.formatRef.bookmarks.filter {
+          bookmark -> bookmark.bookmarkId != bookmarkId
+      }
+
+      FileUtilities.fileWriteUTF8Atomically(
+        this.fileBookmarks,
+        this.fileBookmarksTmp,
+        JSONSerializerUtilities.serializeToString(
+          serialized.map { x -> x.toJSON(this.parameters.objectMapper) }
+        )
+      )
+      this.formatRef = this.formatRef.copy(bookmarks = serialized)
+      this.formatRef
+    }
+
+    this.parameters.onUpdated.invoke(newFormat)
+  }
+
   override fun copyInBook(file: File) {
     val newFormat = synchronized(this.dataLock) {
       FileUtilities.fileCopy(file, this.fileBook)
@@ -139,13 +157,13 @@ internal class DatabaseFormatHandlePDF internal constructor(
     this.parameters.onUpdated.invoke(newFormat)
   }
 
-  override fun setLastReadLocation(bookmark: Bookmark.PDFBookmark?) {
+  override fun setLastReadLocation(bookmark: SerializedBookmark?) {
     val newFormat = synchronized(this.dataLock) {
       if (bookmark != null) {
         FileUtilities.fileWriteUTF8Atomically(
           this.fileLastRead,
           this.fileLastReadTmp,
-          BookmarkJSON.serializePdfBookmarkToString(this.parameters.objectMapper, bookmark)
+          JSONSerializerUtilities.serializeToString(bookmark.toJSON(this.parameters.objectMapper))
         )
       } else {
         FileUtilities.fileDelete(this.fileLastRead)
@@ -158,14 +176,23 @@ internal class DatabaseFormatHandlePDF internal constructor(
     this.parameters.onUpdated.invoke(newFormat)
   }
 
-  override fun setBookmarks(bookmarks: List<Bookmark.PDFBookmark>) {
+  override fun addBookmark(
+    bookmark: SerializedBookmark
+  ) {
     val newFormat = synchronized(this.dataLock) {
+      val newBookmarks = arrayListOf<SerializedBookmark>()
+      newBookmarks.addAll(this.formatRef.bookmarks)
+      newBookmarks.removeIf { b -> b.bookmarkId == bookmark.bookmarkId }
+      newBookmarks.add(bookmark)
+
       FileUtilities.fileWriteUTF8Atomically(
         this.fileBookmarks,
         this.fileBookmarksTmp,
-        BookmarkJSON.serializePdfBookmarksToString(this.parameters.objectMapper, bookmarks)
+        JSONSerializerUtilities.serializeToString(
+          newBookmarks.map { x -> x.toJSON(this.parameters.objectMapper) }
+        )
       )
-      this.formatRef = this.formatRef.copy(bookmarks = bookmarks)
+      this.formatRef = this.formatRef.copy(bookmarks = newBookmarks)
       this.formatRef
     }
 
@@ -189,7 +216,7 @@ internal class DatabaseFormatHandlePDF internal constructor(
       return BookFormat.BookFormatPDF(
         bookmarks = loadBookmarksIfPresent(objectMapper, fileBookmarks),
         file = if (fileBook.isFile) fileBook else null,
-        lastReadLocation = loadLastReadLocationIfPresent(objectMapper, fileLastRead),
+        lastReadLocation = loadLastReadLocationIfPresent(fileLastRead),
         contentType = contentType,
         drmInformation = drmInfo
       )
@@ -199,7 +226,7 @@ internal class DatabaseFormatHandlePDF internal constructor(
     private fun loadBookmarksIfPresent(
       objectMapper: ObjectMapper,
       fileBookmarks: File
-    ): List<Bookmark.PDFBookmark> {
+    ): List<SerializedBookmark> {
       return if (fileBookmarks.isFile) {
         loadBookmarks(
           objectMapper = objectMapper,
@@ -213,59 +240,42 @@ internal class DatabaseFormatHandlePDF internal constructor(
     private fun loadBookmarks(
       objectMapper: ObjectMapper,
       fileBookmarks: File
-    ): List<Bookmark.PDFBookmark> {
-      val tree = objectMapper.readTree(fileBookmarks)
-      val array = JSONParserUtilities.checkArray(null, tree)
-
-      val bookmarks = arrayListOf<Bookmark.PDFBookmark>()
+    ): List<SerializedBookmark> {
+      val tree =
+        objectMapper.readTree(fileBookmarks)
+      val array =
+        JSONParserUtilities.checkArray(null, tree)
+      val bookmarks =
+        arrayListOf<SerializedBookmark>()
 
       array.forEach { node ->
         try {
-          val bookmark = BookmarkJSON.deserializePdfBookmarkFromJSON(
-            kind = BookmarkKind.BookmarkExplicit,
-            node = node
-          )
-          bookmarks.add(bookmark)
-        } catch (exception: JSONParseException) {
-          this.logger.debug("There was an error parsing the pdf bookmark from bookmarks file")
+          bookmarks.add(SerializedBookmarks.parseBookmark(node))
+        } catch (e: JSONParseException) {
+          this.logger.debug("Failed to parse bookmark: ", e)
         }
       }
-
       return bookmarks
     }
 
     @Throws(IOException::class)
     private fun loadLastReadLocation(
-      objectMapper: ObjectMapper,
       fileLastRead: File
-    ): Bookmark.PDFBookmark {
+    ): SerializedBookmark? {
       val serialized = FileUtilities.fileReadUTF8(fileLastRead)
       return try {
-        Bookmark.PDFBookmark.create(
-          opdsId = "",
-          kind = BookmarkKind.BookmarkLastReadLocation,
-          time = DateTime.now(),
-          pageNumber = serialized.toInt(),
-          deviceID = "",
-          uri = null
-        )
+        SerializedBookmarks.parseBookmarkFromString(serialized)
       } catch (exception: NumberFormatException) {
-        this.logger.debug("The stored bookmark is not from the older version")
-        BookmarkJSON.deserializePdfBookmarkFromString(
-          objectMapper = objectMapper,
-          kind = BookmarkKind.BookmarkLastReadLocation,
-          serialized = serialized
-        )
+        null
       }
     }
 
     @Throws(IOException::class)
     private fun loadLastReadLocationIfPresent(
-      objectMapper: ObjectMapper,
       fileLastRead: File
-    ): Bookmark.PDFBookmark? {
+    ): SerializedBookmark? {
       return if (fileLastRead.isFile) {
-        loadLastReadLocation(objectMapper, fileLastRead)
+        loadLastReadLocation(fileLastRead)
       } else {
         null
       }

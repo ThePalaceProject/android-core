@@ -1,6 +1,5 @@
 package org.nypl.simplified.ui.settings
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
@@ -15,6 +14,7 @@ import android.widget.Toast.LENGTH_LONG
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.settings.R
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryDebugging
@@ -350,7 +350,7 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
       ErrorPageParameters(
         emailAddress = this.viewModel.supportEmailAddress,
         body = "",
-        subject = "[simplye-error-report] ${this.viewModel.appVersion}",
+        subject = "[palace-error-report] ${this.viewModel.appVersion}",
         attributes = attributes,
         taskSteps = taskSteps
       )

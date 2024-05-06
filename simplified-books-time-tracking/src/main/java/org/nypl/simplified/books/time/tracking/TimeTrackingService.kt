@@ -14,8 +14,8 @@ import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URI
-import java.util.concurrent.TimeUnit
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 import kotlin.math.min
 
 class TimeTrackingService(
@@ -136,8 +136,8 @@ class TimeTrackingService(
     }
 
     when (playerEvent) {
-      is PlayerEvent.PlayerEventWithSpineElement.PlayerEventPlaybackProgressUpdate,
-      is PlayerEvent.PlayerEventWithSpineElement.PlayerEventPlaybackStarted -> {
+      is PlayerEvent.PlayerEventWithPosition.PlayerEventPlaybackProgressUpdate,
+      is PlayerEvent.PlayerEventWithPosition.PlayerEventPlaybackStarted -> {
         isPlaying = true
         if (audiobookPlayingDisposable == null) {
           createTimeTrackingEntry()
@@ -145,18 +145,29 @@ class TimeTrackingService(
         }
       }
 
-      is PlayerEvent.PlayerEventWithSpineElement.PlayerEventPlaybackBuffering,
-      is PlayerEvent.PlayerEventWithSpineElement.PlayerEventPlaybackWaitingForAction,
-      is PlayerEvent.PlayerEventWithSpineElement.PlayerEventChapterWaiting,
-      is PlayerEvent.PlayerEventWithSpineElement.PlayerEventPlaybackPaused,
-      is PlayerEvent.PlayerEventWithSpineElement.PlayerEventPlaybackStopped,
-      is PlayerEvent.PlayerEventWithSpineElement.PlayerEventChapterCompleted -> {
+      is PlayerEvent.PlayerEventWithPosition.PlayerEventPlaybackBuffering,
+      is PlayerEvent.PlayerEventWithPosition.PlayerEventPlaybackWaitingForAction,
+      is PlayerEvent.PlayerEventWithPosition.PlayerEventChapterWaiting,
+      is PlayerEvent.PlayerEventWithPosition.PlayerEventPlaybackPaused,
+      is PlayerEvent.PlayerEventWithPosition.PlayerEventPlaybackStopped,
+      is PlayerEvent.PlayerEventWithPosition.PlayerEventChapterCompleted -> {
         isPlaying = false
       }
-      is PlayerEvent.PlayerEventWithSpineElement.PlayerEventCreateBookmark,
+      is PlayerEvent.PlayerEventWithPosition.PlayerEventCreateBookmark,
       is PlayerEvent.PlayerEventPlaybackRateChanged,
       is PlayerEvent.PlayerEventError,
       PlayerEvent.PlayerEventManifestUpdated -> {
+        // do nothing
+      }
+
+      is PlayerEvent.PlayerAccessibilityEvent.PlayerAccessibilityChapterSelected,
+      is PlayerEvent.PlayerAccessibilityEvent.PlayerAccessibilityErrorOccurred,
+      is PlayerEvent.PlayerAccessibilityEvent.PlayerAccessibilityIsBuffering,
+      is PlayerEvent.PlayerAccessibilityEvent.PlayerAccessibilityIsWaitingForChapter,
+      is PlayerEvent.PlayerAccessibilityEvent.PlayerAccessibilityPlaybackRateChanged,
+      is PlayerEvent.PlayerAccessibilityEvent.PlayerAccessibilitySleepTimerSettingChanged,
+      is PlayerEvent.PlayerEventDeleteBookmark,
+      is PlayerEvent.PlayerEventWithPosition.PlayerEventPlaybackPreparing -> {
         // do nothing
       }
     }

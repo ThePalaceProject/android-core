@@ -1,7 +1,6 @@
 package org.nypl.simplified.tests.books.book_database
 
 import android.app.Application
-import android.content.Context
 import com.io7m.jfunctional.Option
 import org.joda.time.DateTime
 import org.junit.jupiter.api.Test

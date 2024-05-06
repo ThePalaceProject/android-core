@@ -4,8 +4,6 @@ import android.content.Context
 import com.google.common.util.concurrent.ListeningExecutorService
 import com.google.common.util.concurrent.MoreExecutors
 import com.io7m.jfunctional.Option
-import com.io7m.jfunctional.OptionType
-import com.io7m.jfunctional.Some
 import one.irradia.mime.api.MIMEType
 import one.irradia.mime.vanilla.MIMEParser
 import org.joda.time.DateTime
@@ -35,9 +33,7 @@ import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountLoginState
 import org.nypl.simplified.accounts.api.AccountPassword
-import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.api.AccountUsername
-import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookEvent
@@ -78,7 +74,6 @@ import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InputStream
 import java.net.URI
-import java.util.ArrayList
 import java.util.Collections
 import java.util.UUID
 import java.util.concurrent.ConcurrentSkipListMap

@@ -8,7 +8,7 @@ import org.librarysimplified.ui.errorpage.R
  * A convenient base activity used to show error pages.
  */
 
-abstract class ErrorPageBaseActivity : AppCompatActivity(R.layout.error_host) {
+class ErrorPageActivity : AppCompatActivity(R.layout.error_host) {
 
   companion object {
     const val PARAMETER_ID =

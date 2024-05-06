@@ -1,7 +1,6 @@
 package org.nypl.simplified.tests.books
 
 import android.app.Application
-import android.content.Context
 import io.reactivex.subjects.PublishSubject
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

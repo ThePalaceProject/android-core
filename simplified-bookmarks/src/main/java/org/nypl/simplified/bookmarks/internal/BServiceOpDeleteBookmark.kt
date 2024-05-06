@@ -2,9 +2,8 @@ package org.nypl.simplified.bookmarks.internal
 
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.bookmarks.api.BookmarkHTTPCallsType
-import org.nypl.simplified.books.api.bookmark.Bookmark
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
-import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle
+import org.nypl.simplified.books.api.bookmark.SerializedBookmark
 import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.slf4j.Logger
 
@@ -17,7 +16,7 @@ internal class BServiceOpDeleteBookmark(
   private val httpCalls: BookmarkHTTPCallsType,
   private val profile: ProfileReadableType,
   private val accountID: AccountID,
-  private val bookmark: Bookmark,
+  private val bookmark: SerializedBookmark,
   private val ignoreRemoteFailures: Boolean
 ) : BServiceOp<Unit>(logger) {
 
@@ -92,58 +91,17 @@ internal class BServiceOpDeleteBookmark(
       val books = account.bookDatabase
       val entry = books.entry(this.bookmark.book)
 
-      when (this.bookmark) {
-        is Bookmark.ReaderBookmark -> {
-          val handle =
-            entry.findFormatHandle(BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleEPUB::class.java)
-              ?: throw this.errorNoFormatHandle()
-
-          when (this.bookmark.kind) {
-            BookmarkKind.BookmarkLastReadLocation ->
-              handle.setLastReadLocation(null)
-            BookmarkKind.BookmarkExplicit ->
-              handle.setBookmarks(handle.format.bookmarks.minus(this.bookmark))
-          }
+      for (handle in entry.formatHandles) {
+        when (this.bookmark.kind) {
+          BookmarkKind.BookmarkLastReadLocation ->
+            handle.setLastReadLocation(null)
+          BookmarkKind.BookmarkExplicit ->
+            handle.deleteBookmark(this.bookmark.bookmarkId)
         }
-        is Bookmark.PDFBookmark -> {
-          val handle =
-            entry.findFormatHandle(BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandlePDF::class.java)
-              ?: throw this.errorNoFormatHandle()
-
-          when (this.bookmark.kind) {
-            BookmarkKind.BookmarkLastReadLocation ->
-              handle.setLastReadLocation(null)
-            BookmarkKind.BookmarkExplicit -> {
-              handle.setBookmarks(handle.format.bookmarks.minus(this.bookmark))
-            }
-          }
-        }
-        is Bookmark.AudiobookBookmark -> {
-          val handle =
-            entry.findFormatHandle(BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook::class.java)
-              ?: throw this.errorNoFormatHandle()
-
-          when (this.bookmark.kind) {
-            BookmarkKind.BookmarkLastReadLocation ->
-              handle.setLastReadLocation(null)
-            BookmarkKind.BookmarkExplicit ->
-              handle.setBookmarks(handle.format.bookmarks.minus(this.bookmark))
-          }
-        }
-        else ->
-          throw IllegalStateException("Unsupported bookmark type: ${this.bookmark}")
       }
     } catch (e: Exception) {
-      this.logger.error("[{}]: error deleting bookmark locally: ", this.profile.id.uuid, e)
+      this.logger.error("[{}]: Error deleting bookmark locally: ", this.profile.id.uuid, e)
       throw e
     }
-  }
-
-  private fun errorNoFormatHandle(): IllegalStateException {
-    this.logger.debug(
-      "[{}]: unable to delete bookmark; no format handle",
-      this.profile.id.uuid
-    )
-    return IllegalStateException("No format handle")
   }
 }

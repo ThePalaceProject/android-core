@@ -236,6 +236,18 @@ class BookCoverProvider private constructor(
     )
   }
 
+  override fun loadCoverAsBitmap(
+    source: URI,
+    onBitmapLoaded: (Bitmap) -> Unit,
+    defaultResource: Int
+  ) {
+    doLoadCoverAsBitmap(
+      coverURI = source,
+      onBitmapLoaded = onBitmapLoaded,
+      defaultResource = defaultResource
+    )
+  }
+
   private fun <T> mapOptionToNull(option: OptionType<T>): T? {
     if (option is Some<T>) {
       return option.get()

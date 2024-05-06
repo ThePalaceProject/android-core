@@ -8,11 +8,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import org.librarysimplified.ui.accounts.R
 import org.nypl.simplified.accounts.api.AccountProviderDescription
 import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.slf4j.LoggerFactory
-import org.librarysimplified.ui.accounts.R
 
 /**
  * Adapter for showing a list of `AccountProviderDescription` items.

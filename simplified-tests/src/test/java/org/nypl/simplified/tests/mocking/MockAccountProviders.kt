@@ -1,7 +1,6 @@
 package org.nypl.simplified.tests.mocking
 
 import android.content.Context
-import com.google.common.base.Preconditions
 import org.joda.time.DateTime
 import org.mockito.Mockito
 import org.nypl.simplified.accounts.api.AccountProvider
@@ -9,8 +8,6 @@ import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.registry.AccountProviderRegistry
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
-import org.nypl.simplified.taskrecorder.api.TaskResult
-import org.slf4j.LoggerFactory
 import java.net.URI
 import java.util.TreeMap
 

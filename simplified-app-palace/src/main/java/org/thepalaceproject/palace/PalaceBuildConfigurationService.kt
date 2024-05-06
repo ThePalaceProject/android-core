@@ -1,9 +1,9 @@
 package org.thepalaceproject.palace
 
+import org.librarysimplified.main.BuildConfig
 import org.nypl.simplified.buildconfig.api.BuildConfigOAuthScheme
 import org.nypl.simplified.buildconfig.api.BuildConfigurationAccountsRegistryURIs
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
-import org.librarysimplified.main.BuildConfig
 import java.net.URI
 
 class PalaceBuildConfigurationService : BuildConfigurationServiceType {

@@ -6,7 +6,6 @@ import com.io7m.jnull.NullCheck;
 import com.io7m.junreachable.UnreachableCodeException;
 
 import org.joda.time.DateTime;
-import org.joda.time.format.ISODateTimeFormat;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

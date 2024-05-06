@@ -1,7 +1,7 @@
 package org.nypl.simplified.bookmarks.api
 
 import org.nypl.simplified.accounts.api.AccountID
-import org.nypl.simplified.books.api.bookmark.Bookmark
+import org.nypl.simplified.books.api.bookmark.SerializedBookmark
 
 /**
  * The type of events published by the bookmark controller.
@@ -31,6 +31,6 @@ sealed class BookmarkEvent {
 
   data class BookmarkSaved(
     val accountID: AccountID,
-    val bookmark: Bookmark
+    val bookmark: SerializedBookmark
   ) : BookmarkEvent()
 }

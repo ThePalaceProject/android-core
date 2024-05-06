@@ -1,4 +1,7 @@
-<feed xmlns="http://www.w3.org/2005/Atom" xmlns:app="http://www.w3.org/2007/app" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:opds="http://opds-spec.org/2010/catalog" xmlns:opf="http://www.idpf.org/2007/opf" xmlns:drm="http://librarysimplified.org/terms/drm" xmlns:schema="http://schema.org/" xmlns:simplified="http://librarysimplified.org/terms/" xmlns:bibframe="http://bibframe.org/vocab/" xmlns:bib="http://bib.schema.org/" xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:lcp="http://readium.org/lcp-specs/ns" simplified:entrypoint="http://bib.schema.org/Audiobook">
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:opds="http://opds-spec.org/2010/catalog" xmlns:opf="http://www.idpf.org/2007/opf"
+    xmlns:schema="http://schema.org/" xmlns:simplified="http://librarysimplified.org/terms/"
+    xmlns:bibframe="http://bibframe.org/vocab/" xmlns:bib="http://bib.schema.org/"
+    simplified:entrypoint="http://bib.schema.org/Audiobook">
   <title>Minotaur Test Library</title>
   <id>https://minotaur.dev.palaceproject.io/minotaur-test-library/groups/</id>
   <updated>2023-11-13T13:10:28+00:00</updated>

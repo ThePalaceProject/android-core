@@ -1,7 +1,5 @@
 package org.nypl.simplified.ui.settings
 
-import org.librarysimplified.ui.settings.R
-
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -13,6 +11,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import io.reactivex.disposables.CompositeDisposable
+import org.librarysimplified.ui.settings.R
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.android.ktx.supportActionBar
 import org.nypl.simplified.listeners.api.FragmentListenerType

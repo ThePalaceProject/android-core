@@ -2,11 +2,11 @@ package org.nypl.simplified.tests.books.bookmarks
 
 import io.reactivex.subjects.Subject
 import org.nypl.simplified.bookmarks.BookmarkService
-import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.bookmarks.api.BookmarkEvent
 import org.nypl.simplified.bookmarks.api.BookmarkHTTPCallsType
 import org.nypl.simplified.bookmarks.api.BookmarkServiceProviderType
 import org.nypl.simplified.bookmarks.api.BookmarkServiceType
+import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 

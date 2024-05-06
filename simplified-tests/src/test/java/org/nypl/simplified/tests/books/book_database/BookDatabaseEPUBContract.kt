@@ -1,20 +1,22 @@
 package org.nypl.simplified.tests.books.book_database
 
 import android.app.Application
-import android.content.Context
 import com.io7m.jfunctional.Option
 import one.irradia.mime.vanilla.MIMEParser
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookDRMKind
 import org.nypl.simplified.books.api.BookIDs
-import org.nypl.simplified.books.api.BookLocation
-import org.nypl.simplified.books.api.bookmark.Bookmark
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
+import org.nypl.simplified.books.api.bookmark.SerializedBookmark
+import org.nypl.simplified.books.api.bookmark.SerializedBookmark20210828
+import org.nypl.simplified.books.api.bookmark.SerializedBookmarks
+import org.nypl.simplified.books.api.bookmark.SerializedLocatorLegacyCFI
 import org.nypl.simplified.books.book_database.BookDRMInformationHandleACS
 import org.nypl.simplified.books.book_database.BookDRMInformationHandleLCP
 import org.nypl.simplified.books.book_database.BookDRMInformationHandleNone
@@ -62,20 +64,22 @@ abstract class BookDatabaseEPUBContract {
       val formatHandle =
         databaseEntry0.findFormatHandle(BookDatabaseEntryFormatHandleEPUB::class.java)
 
-      Assertions.assertTrue(formatHandle != null, "Format is present")
+      assertTrue(formatHandle != null, "Format is present")
       formatHandle!!
-      Assertions.assertEquals(null, formatHandle.format.lastReadLocation)
+      assertEquals(null, formatHandle.format.lastReadLocation)
 
       val bookmark =
-        Bookmark.ReaderBookmark.create(
+        SerializedBookmark20210828(
+          bookTitle = "Title",
           opdsId = "abcd",
-          location = BookLocation.BookLocationR1(
-            progress = 0.5,
+          location = SerializedLocatorLegacyCFI(
+            chapterProgression = 0.5,
             contentCFI = "xyz",
             idRef = "abc"
           ),
           time = DateTime.now(DateTimeZone.UTC),
-          chapterTitle = "A title",
+          bookChapterProgress = 0.5,
+          bookChapterTitle = "A title",
           kind = BookmarkKind.BookmarkLastReadLocation,
           bookProgress = 0.25,
           uri = null,
@@ -83,10 +87,10 @@ abstract class BookDatabaseEPUBContract {
         )
 
       formatHandle.setLastReadLocation(bookmark)
-      Assertions.assertEquals(bookmark, formatHandle.format.lastReadLocation)
+      assertEquals(bookmark, formatHandle.format.lastReadLocation)
 
       formatHandle.setLastReadLocation(null)
-      Assertions.assertEquals(null, formatHandle.format.lastReadLocation)
+      assertEquals(null, formatHandle.format.lastReadLocation)
     }
   }
 
@@ -108,49 +112,55 @@ abstract class BookDatabaseEPUBContract {
     val databaseEntry0 = database0.createOrUpdate(bookID, feedEntry)
 
     val bookmark0 =
-      Bookmark.ReaderBookmark.create(
+      SerializedBookmarks.createWithCurrentFormat(
+        bookTitle = "Title",
         opdsId = "abcd",
-        location = BookLocation.BookLocationR1(
-          progress = 0.5,
+        location = SerializedLocatorLegacyCFI(
+          chapterProgression = 0.5,
           contentCFI = "xyz",
           idRef = "abc"
         ),
         time = DateTime.now(DateTimeZone.UTC),
         kind = BookmarkKind.BookmarkExplicit,
-        chapterTitle = "A title",
+        bookChapterTitle = "A title",
         bookProgress = 0.25,
+        bookChapterProgress = 0.5,
         uri = null,
         deviceID = "3475fa24-25ca-4ddb-9d7b-762358d5f83a"
       )
 
     val bookmark1 =
-      Bookmark.ReaderBookmark.create(
+      SerializedBookmarks.createWithCurrentFormat(
+        bookTitle = "Title",
         opdsId = "abcd",
-        location = BookLocation.BookLocationR1(
-          progress = 0.6,
+        location = SerializedLocatorLegacyCFI(
+          chapterProgression = 0.6,
           contentCFI = "xyz",
           idRef = "abc"
         ),
         time = DateTime.now(DateTimeZone.UTC),
         kind = BookmarkKind.BookmarkExplicit,
-        chapterTitle = "A title",
+        bookChapterTitle = "A title",
         bookProgress = 0.25,
+        bookChapterProgress = 0.6,
         uri = null,
         deviceID = "3475fa24-25ca-4ddb-9d7b-762358d5f83a"
       )
 
     val bookmark2 =
-      Bookmark.ReaderBookmark.create(
+      SerializedBookmarks.createWithCurrentFormat(
+        bookTitle = "Title",
         opdsId = "abcd",
-        location = BookLocation.BookLocationR1(
-          progress = 0.7,
+        location = SerializedLocatorLegacyCFI(
+          chapterProgression = 0.7,
           contentCFI = "xyz",
           idRef = "abc"
         ),
         time = DateTime.now(DateTimeZone.UTC),
         kind = BookmarkKind.BookmarkExplicit,
-        chapterTitle = "A title",
+        bookChapterTitle = "A title",
         bookProgress = 0.25,
+        bookChapterProgress = 0.7,
         uri = null,
         deviceID = "3475fa24-25ca-4ddb-9d7b-762358d5f83a"
       )
@@ -162,15 +172,16 @@ abstract class BookDatabaseEPUBContract {
       val formatHandle =
         databaseEntry0.findFormatHandle(BookDatabaseEntryFormatHandleEPUB::class.java)
 
-      Assertions.assertTrue(formatHandle != null, "Format is present")
+      assertTrue(formatHandle != null, "Format is present")
       formatHandle!!
-      Assertions.assertEquals(listOf<Bookmark>(), formatHandle.format.bookmarks)
+      assertEquals(listOf<SerializedBookmark>(), formatHandle.format.bookmarks)
 
-      formatHandle.setBookmarks(bookmarks0)
-      Assertions.assertEquals(bookmarks0, formatHandle.format.bookmarks)
+      formatHandle.addBookmark(bookmark0)
+      assertEquals(bookmarks0, formatHandle.format.bookmarks)
 
-      formatHandle.setBookmarks(bookmarks1)
-      Assertions.assertEquals(bookmarks1, formatHandle.format.bookmarks)
+      formatHandle.addBookmark(bookmark1)
+      formatHandle.addBookmark(bookmark2)
+      assertEquals(bookmarks1, formatHandle.format.bookmarks)
     }
 
     val database1 =
@@ -182,10 +193,17 @@ abstract class BookDatabaseEPUBContract {
       val formatHandle =
         databaseEntry1.findFormatHandle(BookDatabaseEntryFormatHandleEPUB::class.java)
 
-      Assertions.assertTrue(formatHandle != null, "Format is present")
+      assertTrue(formatHandle != null, "Format is present")
 
       formatHandle!!
-      Assertions.assertEquals(bookmarks1, formatHandle.format.bookmarks)
+
+      val expectedBookmarks = bookmarks1.sortedBy { b -> b.bookmarkId.value }
+      val receivedBookmarks = formatHandle.format.bookmarks.sortedBy { b -> b.bookmarkId.value }
+
+      assertEquals(expectedBookmarks[0], receivedBookmarks[0].withoutURI())
+      assertEquals(expectedBookmarks[1], receivedBookmarks[1].withoutURI())
+      assertEquals(expectedBookmarks[2], receivedBookmarks[2].withoutURI())
+      assertEquals(expectedBookmarks.size, receivedBookmarks.size)
     }
   }
 

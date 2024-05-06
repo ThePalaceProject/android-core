@@ -1,5 +1,24 @@
 package org.nypl.simplified.opds.core;
 
+import static org.nypl.simplified.opds.core.OPDSFeedConstants.ACQUISITION_URI_PREFIX_TEXT;
+import static org.nypl.simplified.opds.core.OPDSFeedConstants.ALTERNATE_REL_TEXT;
+import static org.nypl.simplified.opds.core.OPDSFeedConstants.ANNOTATION_URI_TEXT;
+import static org.nypl.simplified.opds.core.OPDSFeedConstants.ATOM_URI;
+import static org.nypl.simplified.opds.core.OPDSFeedConstants.BIBFRAME_URI;
+import static org.nypl.simplified.opds.core.OPDSFeedConstants.CIRCULATION_ANALYTICS_OPEN_BOOK_REL_TEXT;
+import static org.nypl.simplified.opds.core.OPDSFeedConstants.DUBLIN_CORE_TERMS_URI;
+import static org.nypl.simplified.opds.core.OPDSFeedConstants.GROUP_REL_TEXT;
+import static org.nypl.simplified.opds.core.OPDSFeedConstants.IMAGE_URI_TEXT;
+import static org.nypl.simplified.opds.core.OPDSFeedConstants.ISSUES_REL_TEXT;
+import static org.nypl.simplified.opds.core.OPDSFeedConstants.LCP_URI;
+import static org.nypl.simplified.opds.core.OPDSFeedConstants.OPDS_URI;
+import static org.nypl.simplified.opds.core.OPDSFeedConstants.PREVIEW_TEXT;
+import static org.nypl.simplified.opds.core.OPDSFeedConstants.RELATED_REL_TEXT;
+import static org.nypl.simplified.opds.core.OPDSFeedConstants.REVOKE_URI_TEXT;
+import static org.nypl.simplified.opds.core.OPDSFeedConstants.SAMPLE_TEXT;
+import static org.nypl.simplified.opds.core.OPDSFeedConstants.THUMBNAIL_URI_TEXT;
+import static org.nypl.simplified.opds.core.OPDSFeedConstants.TIME_TRACKING_URI_TEXT;
+
 import com.io7m.jfunctional.Option;
 import com.io7m.jfunctional.OptionType;
 import com.io7m.jfunctional.Some;
@@ -33,25 +52,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import one.irradia.mime.api.MIMEType;
 import one.irradia.mime.vanilla.MIMEParser;
-
-import static org.nypl.simplified.opds.core.OPDSFeedConstants.ACQUISITION_URI_PREFIX_TEXT;
-import static org.nypl.simplified.opds.core.OPDSFeedConstants.ALTERNATE_REL_TEXT;
-import static org.nypl.simplified.opds.core.OPDSFeedConstants.ANNOTATION_URI_TEXT;
-import static org.nypl.simplified.opds.core.OPDSFeedConstants.ATOM_URI;
-import static org.nypl.simplified.opds.core.OPDSFeedConstants.BIBFRAME_URI;
-import static org.nypl.simplified.opds.core.OPDSFeedConstants.CIRCULATION_ANALYTICS_OPEN_BOOK_REL_TEXT;
-import static org.nypl.simplified.opds.core.OPDSFeedConstants.DUBLIN_CORE_TERMS_URI;
-import static org.nypl.simplified.opds.core.OPDSFeedConstants.GROUP_REL_TEXT;
-import static org.nypl.simplified.opds.core.OPDSFeedConstants.IMAGE_URI_TEXT;
-import static org.nypl.simplified.opds.core.OPDSFeedConstants.ISSUES_REL_TEXT;
-import static org.nypl.simplified.opds.core.OPDSFeedConstants.LCP_URI;
-import static org.nypl.simplified.opds.core.OPDSFeedConstants.OPDS_URI;
-import static org.nypl.simplified.opds.core.OPDSFeedConstants.PREVIEW_TEXT;
-import static org.nypl.simplified.opds.core.OPDSFeedConstants.RELATED_REL_TEXT;
-import static org.nypl.simplified.opds.core.OPDSFeedConstants.REVOKE_URI_TEXT;
-import static org.nypl.simplified.opds.core.OPDSFeedConstants.SAMPLE_TEXT;
-import static org.nypl.simplified.opds.core.OPDSFeedConstants.THUMBNAIL_URI_TEXT;
-import static org.nypl.simplified.opds.core.OPDSFeedConstants.TIME_TRACKING_URI_TEXT;
 
 /**
  * The default implementation of the {@link OPDSAcquisitionFeedEntryParserType}

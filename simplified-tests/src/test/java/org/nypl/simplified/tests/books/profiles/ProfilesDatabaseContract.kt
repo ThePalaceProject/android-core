@@ -1,7 +1,6 @@
 package org.nypl.simplified.tests.books.profiles
 
 import android.app.Application
-import android.content.Context
 import com.io7m.jfunctional.Option
 import io.reactivex.subjects.PublishSubject
 import org.joda.time.DateTime

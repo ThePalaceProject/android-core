@@ -1,0 +1,16 @@
+{
+  "@version" : 20210828,
+  "opdsId" : "urn:uuid:808b2d99-c286-499a-91a1-580afc4c563f",
+  "location" : {
+    "@type" : "BookLocationR2",
+    "@version" : 20210317,
+    "progress" : {
+      "chapterHref" : "63389/@tmp@gitberg-share-books@Homestead-Ranch_63389@63389-h@63389-h-0.htm.html",
+      "chapterProgress" : 0.2653061894548496
+    }
+  },
+  "time" : "2024-04-05T11:12:43.032Z",
+  "chapterTitle" : "",
+  "bookProgress" : 0.2517006877172055,
+  "deviceID" : "null"
+}

@@ -56,7 +56,7 @@ class ReaderViewerR2 : ViewerProviderType {
       )
 
     Reader2Activity.startActivity(
-      context = activity,
+      activity = activity,
       parameters = parameters
     )
   }

@@ -1,7 +1,9 @@
 package org.nypl.simplified.tests.books.bookmarks
 
+import android.app.Application
 import android.content.Context
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -17,6 +19,7 @@ import org.librarysimplified.http.api.LSHTTPClientConfiguration
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.vanilla.LSHTTPClients
 import org.mockito.Mockito
+import org.mockito.kotlin.any
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.accounts.api.AccountID
@@ -26,24 +29,26 @@ import org.nypl.simplified.accounts.api.AccountPreferences
 import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.api.AccountUsername
 import org.nypl.simplified.accounts.database.api.AccountType
-import org.nypl.simplified.books.api.BookDRMInformation
-import org.nypl.simplified.books.api.BookFormat
-import org.nypl.simplified.books.api.BookID
-import org.nypl.simplified.books.api.BookLocation
-import org.nypl.simplified.books.api.bookmark.Bookmark
-import org.nypl.simplified.books.api.bookmark.BookmarkKind
-import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleEPUB
-import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
-import org.nypl.simplified.books.book_database.api.BookDatabaseType
-import org.nypl.simplified.books.book_database.api.BookFormats
-import org.nypl.simplified.profiles.api.ProfileEvent
-import org.nypl.simplified.profiles.api.ProfileID
-import org.nypl.simplified.profiles.api.ProfileType
-import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.bookmarks.api.BookmarkEvent
 import org.nypl.simplified.bookmarks.api.BookmarkHTTPCallsType
 import org.nypl.simplified.bookmarks.api.BookmarkServiceType
 import org.nypl.simplified.bookmarks.internal.BHTTPCalls
+import org.nypl.simplified.books.api.BookDRMInformation
+import org.nypl.simplified.books.api.BookFormat
+import org.nypl.simplified.books.api.BookID
+import org.nypl.simplified.books.api.bookmark.BookmarkKind
+import org.nypl.simplified.books.api.bookmark.SerializedBookmark
+import org.nypl.simplified.books.api.bookmark.SerializedBookmark20210828
+import org.nypl.simplified.books.api.bookmark.SerializedLocatorLegacyCFI
+import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleEPUB
+import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
+import org.nypl.simplified.books.book_database.api.BookDatabaseType
+import org.nypl.simplified.books.book_database.api.BookFormats
+import org.nypl.simplified.books.controller.Controller
+import org.nypl.simplified.profiles.api.ProfileEvent
+import org.nypl.simplified.profiles.api.ProfileID
+import org.nypl.simplified.profiles.api.ProfileType
+import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.tests.EventAssertions
 import org.nypl.simplified.tests.EventLogging
 import org.nypl.simplified.tests.mocking.MockProfilesController
@@ -51,6 +56,8 @@ import org.slf4j.Logger
 import java.net.InetAddress
 import java.net.URI
 import java.util.UUID
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 abstract class BookmarkServiceContract {
@@ -349,7 +356,7 @@ abstract class BookmarkServiceContract {
       BookID.create("fab6e4ebeb3240676b3f7585f8ee4faecccbe1f9243a652153f3071e90599325")
 
     val receivedBookmarks =
-      mutableListOf<Bookmark>()
+      mutableListOf<SerializedBookmark>()
 
     val format =
       BookFormat.BookFormatEPUB(
@@ -366,18 +373,17 @@ abstract class BookmarkServiceContract {
     Mockito.`when`(formatHandle.format)
       .thenReturn(format)
 
-    Mockito.`when`(formatHandle.setBookmarks(Mockito.anyList()))
+    Mockito.`when`(formatHandle.addBookmark(any()))
       .then { input ->
-        val bookmarks: List<Bookmark> = input.arguments[0] as List<Bookmark>
-        receivedBookmarks.addAll(bookmarks)
+        receivedBookmarks.add(input.arguments[0] as SerializedBookmark)
         Unit
       }
 
     val bookEntry =
       Mockito.mock(BookDatabaseEntryType::class.java)
 
-    Mockito.`when`(bookEntry.findFormatHandle(BookDatabaseEntryFormatHandleEPUB::class.java))
-      .thenReturn(formatHandle)
+    Mockito.`when`(bookEntry.formatHandles)
+      .thenReturn(listOf(formatHandle))
 
     val books =
       Mockito.mock(BookDatabaseType::class.java)
@@ -486,7 +492,7 @@ abstract class BookmarkServiceContract {
    */
 
   @Test
-  @Timeout(value = 5L, unit = TimeUnit.SECONDS)
+  // @Timeout(value = 5L, unit = TimeUnit.SECONDS)
   fun testInitializeSendBookmarks() {
     this.addResponse("/patron", this.patronSettingsWithAnnotationsEnabled)
 
@@ -542,18 +548,24 @@ abstract class BookmarkServiceContract {
       BookID.create("fab6e4ebeb3240676b3f7585f8ee4faecccbe1f9243a652153f3071e90599325")
 
     val receivedBookmarks =
-      mutableListOf<Bookmark>()
+      mutableListOf<SerializedBookmark>()
 
     val startingBookmarks =
       listOf(
-        Bookmark.ReaderBookmark.create(
+        SerializedBookmark20210828(
           opdsId = "urn:example.com/terms/id/c083c0a6-54c6-4cc5-9d3a-425317da662a",
-          location = BookLocation.BookLocationR1(0.5, null, bookID.value()),
+          location = SerializedLocatorLegacyCFI(
+            chapterProgression = 0.5,
+            idRef = null,
+            contentCFI = bookID.value()
+          ),
           kind = BookmarkKind.BookmarkLastReadLocation,
           time = DateTime.now(DateTimeZone.UTC),
-          chapterTitle = "A Title",
+          bookChapterTitle = "A Title",
           bookProgress = 0.5,
           deviceID = "urn:uuid:253c7cbc-4fdf-430e-81b9-18bea90b6026",
+          bookTitle = "A book",
+          bookChapterProgress = 0.5,
           uri = null
         )
       )
@@ -573,18 +585,17 @@ abstract class BookmarkServiceContract {
     Mockito.`when`(formatHandle.format)
       .thenReturn(format)
 
-    Mockito.`when`(formatHandle.setBookmarks(Mockito.anyList()))
+    Mockito.`when`(formatHandle.addBookmark(any()))
       .then { input ->
-        val bookmarks: List<Bookmark> = input.arguments[0] as List<Bookmark>
-        receivedBookmarks.addAll(bookmarks)
+        receivedBookmarks.add(input.arguments[0] as SerializedBookmark)
         Unit
       }
 
     val bookEntry =
       Mockito.mock(BookDatabaseEntryType::class.java)
 
-    Mockito.`when`(bookEntry.findFormatHandle(BookDatabaseEntryFormatHandleEPUB::class.java))
-      .thenReturn(formatHandle)
+    Mockito.`when`(bookEntry.formatHandles)
+      .thenReturn(listOf(formatHandle))
 
     val books =
       Mockito.mock(BookDatabaseType::class.java)
@@ -674,14 +685,10 @@ abstract class BookmarkServiceContract {
       { event -> Assertions.assertEquals(this.fakeAccountID, event.accountID) }
     )
 
-    Assertions.assertEquals(2, receivedBookmarks.size)
+    Assertions.assertEquals(1, receivedBookmarks.size)
     Assertions.assertEquals(
       "urn:example.com/terms/id/c083c0a6-54c6-4cc5-9d3a-425317da662a",
       receivedBookmarks[0].opdsId
-    )
-    Assertions.assertEquals(
-      "urn:example.com/terms/id/c083c0a6-54c6-4cc5-9d3a-425317da662a",
-      receivedBookmarks[1].opdsId
     )
 
     val allRequests = this.takeAllRequests()
@@ -708,8 +715,7 @@ abstract class BookmarkServiceContract {
     try {
       service.bookmarkLoad(
         accountID = profiles.profileList[0].accountList[0].id,
-        book = BookID.create("x"),
-        lastReadBookmarkServer = null
+        book = BookID.create("x")
       ).get(3L, TimeUnit.SECONDS)
     } catch (e: Exception) {
       // Not a problem

@@ -19,7 +19,6 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.Space
 import android.widget.TextView
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SearchView
 import androidx.core.os.bundleOf
@@ -31,6 +30,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.catalog.CatalogFeedOwnership.CollectedFromAccounts
 import org.librarysimplified.ui.catalog.CatalogFeedOwnership.OwnedByAccount

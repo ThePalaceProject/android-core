@@ -8,7 +8,6 @@ import org.nypl.simplified.accounts.api.AccountPreferences
 import org.nypl.simplified.json.core.JSONParseException
 import org.nypl.simplified.json.core.JSONParserUtilities
 import org.slf4j.LoggerFactory
-import java.lang.Exception
 import java.util.UUID
 
 /**

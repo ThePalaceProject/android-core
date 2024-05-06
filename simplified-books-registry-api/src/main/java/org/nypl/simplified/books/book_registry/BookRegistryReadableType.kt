@@ -5,10 +5,7 @@ import com.io7m.jfunctional.OptionType
 import com.io7m.jfunctional.OptionVisitorType
 import com.io7m.jfunctional.Some
 import io.reactivex.Observable
-
 import org.nypl.simplified.books.api.BookID
-
-import java.util.NoSuchElementException
 import java.util.SortedMap
 
 /**

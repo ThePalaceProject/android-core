@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.librarysimplified.services.api.Services
+import org.librarysimplified.ui.accounts.R
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.listeners.api.FragmentListenerType
@@ -23,7 +24,6 @@ import org.nypl.simplified.ui.accounts.AccountPickerAdapter.OnAccountClickListen
 import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.slf4j.LoggerFactory
-import org.librarysimplified.ui.accounts.R
 
 /**
  * Present a dialog that shows a list of all active accounts for the current profile.

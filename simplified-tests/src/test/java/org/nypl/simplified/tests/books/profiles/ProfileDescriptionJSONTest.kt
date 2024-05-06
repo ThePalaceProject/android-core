@@ -4,13 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.joda.time.DateTime
 import org.joda.time.DateTimeUtils
 import org.joda.time.DateTimeZone
-import org.joda.time.Duration
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.nypl.simplified.accounts.api.AccountID
-
 import org.nypl.simplified.profiles.ProfileDescriptionJSON
 import org.nypl.simplified.profiles.api.ProfileAttributes
 import org.nypl.simplified.profiles.api.ProfileDateOfBirth

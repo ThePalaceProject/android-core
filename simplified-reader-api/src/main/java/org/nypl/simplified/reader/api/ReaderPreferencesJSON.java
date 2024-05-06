@@ -1,14 +1,13 @@
 package org.nypl.simplified.reader.api;
 
+import static org.nypl.simplified.reader.api.ReaderColorScheme.SCHEME_BLACK_ON_WHITE;
+import static org.nypl.simplified.reader.api.ReaderFontSelection.READER_FONT_SANS_SERIF;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.io7m.jnull.NullCheck;
 import com.io7m.junreachable.UnreachableCodeException;
 
-import org.nypl.simplified.reader.api.ReaderColorScheme;
-import org.nypl.simplified.reader.api.ReaderFontSelection;
-import org.nypl.simplified.reader.api.ReaderPreferences;
 import org.nypl.simplified.json.core.JSONParseException;
 import org.nypl.simplified.json.core.JSONParserUtilities;
 import org.nypl.simplified.json.core.JSONSerializerUtilities;
@@ -16,9 +15,6 @@ import org.nypl.simplified.json.core.JSONSerializerUtilities;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Objects;
-
-import static org.nypl.simplified.reader.api.ReaderColorScheme.SCHEME_BLACK_ON_WHITE;
-import static org.nypl.simplified.reader.api.ReaderFontSelection.READER_FONT_SANS_SERIF;
 
 /**
  * Functions to serialize and reader preferences to/from JSON.

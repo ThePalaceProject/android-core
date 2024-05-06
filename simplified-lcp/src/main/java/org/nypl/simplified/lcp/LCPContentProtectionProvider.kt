@@ -8,6 +8,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.librarysimplified.lcp.R
+import org.nypl.drm.core.ContentProtectionProvider
 import org.readium.r2.lcp.LcpAuthenticating
 import org.readium.r2.lcp.LcpService
 import org.readium.r2.shared.publication.protection.ContentProtection
@@ -15,7 +16,6 @@ import org.readium.r2.shared.util.asset.AssetRetriever
 import org.readium.r2.shared.util.downloads.foreground.ForegroundDownloadManager
 import org.readium.r2.shared.util.http.DefaultHttpClient
 import org.slf4j.LoggerFactory
-import org.nypl.drm.core.ContentProtectionProvider
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 

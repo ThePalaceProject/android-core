@@ -28,8 +28,6 @@ import org.librarysimplified.http.vanilla.LSHTTPClients
 import org.mockito.Mockito
 import org.mockito.internal.verification.Times
 import org.nypl.simplified.accounts.api.AccountID
-import org.nypl.simplified.accounts.api.AccountProviderType
-import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookEvent
@@ -81,7 +79,6 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.net.URI
-import java.util.ArrayList
 import java.util.Collections
 import java.util.UUID
 import java.util.concurrent.ConcurrentSkipListMap

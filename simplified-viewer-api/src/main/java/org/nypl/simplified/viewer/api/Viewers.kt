@@ -41,7 +41,7 @@ object Viewers {
    */
 
   fun openViewer(
-    activity: Activity,
+    context: Activity,
     preferences: ViewerPreferences,
     book: Book,
     format: BookFormat
@@ -94,7 +94,7 @@ object Viewers {
           )
         )
 
-        viewerProvider.open(activity, preferences, book, format, account.provider.id)
+        viewerProvider.open(context, preferences, book, format, account.provider.id)
         return
       } else {
         this.logger.debug(

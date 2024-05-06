@@ -1,7 +1,6 @@
 package org.nypl.simplified.tests.books.borrowing
 
 import android.app.Application
-import android.content.Context
 import io.reactivex.disposables.Disposable
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse

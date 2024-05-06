@@ -36,7 +36,6 @@ import org.nypl.simplified.accounts.api.AccountLoginStringResourcesType
 import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.KeyboardInput
-import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.api.AccountUsername
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.controller.ProfileAccountLoginTask
@@ -44,7 +43,6 @@ import org.nypl.simplified.notifications.NotificationTokenHTTPCalls
 import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
 import org.nypl.simplified.patron.PatronUserProfileParsers
 import org.nypl.simplified.profiles.api.ProfileID
-import org.nypl.simplified.profiles.api.ProfilePreferences
 import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest
 import org.nypl.simplified.taskrecorder.api.TaskResult

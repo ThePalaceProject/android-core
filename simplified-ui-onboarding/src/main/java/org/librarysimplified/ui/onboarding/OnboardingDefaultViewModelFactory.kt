@@ -1,8 +1,8 @@
 package org.librarysimplified.ui.onboarding
 
 import androidx.lifecycle.ViewModelProvider
-import org.nypl.simplified.listeners.api.ListenerRepositoryFactory
 import org.nypl.simplified.listeners.api.ListenerRepository
+import org.nypl.simplified.listeners.api.ListenerRepositoryFactory
 import org.nypl.simplified.ui.accounts.AccountListRegistryEvent
 
 class OnboardingDefaultViewModelFactory(fallbackFactory: ViewModelProvider.Factory) :

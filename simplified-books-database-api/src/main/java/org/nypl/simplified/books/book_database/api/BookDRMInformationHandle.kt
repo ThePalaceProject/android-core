@@ -1,8 +1,8 @@
 package org.nypl.simplified.books.book_database.api
 
 import net.jcip.annotations.ThreadSafe
-import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.drm.core.AdobeAdeptLoan
+import org.nypl.simplified.books.api.BookDRMInformation
 import java.io.File
 import java.io.IOException
 

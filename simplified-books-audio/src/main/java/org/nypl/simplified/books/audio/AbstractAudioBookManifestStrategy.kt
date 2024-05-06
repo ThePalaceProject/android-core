@@ -1,6 +1,8 @@
 package org.nypl.simplified.books.audio
 
 import android.app.Application
+import io.reactivex.Observable
+import io.reactivex.subjects.PublishSubject
 import one.irradia.mime.api.MIMEType
 import org.librarysimplified.audiobook.api.PlayerResult
 import org.librarysimplified.audiobook.license_check.api.LicenseCheckParameters
@@ -19,8 +21,6 @@ import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.slf4j.LoggerFactory
-import rx.Observable
-import rx.subjects.PublishSubject
 import java.net.URI
 
 /**
@@ -271,7 +271,7 @@ abstract class AbstractAudioBookManifestStrategy(
     try {
       return check.execute()
     } finally {
-      checkSubscription.unsubscribe()
+      checkSubscription.dispose()
     }
   }
 

@@ -4,9 +4,9 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.core.view.isVisible
+import org.librarysimplified.ui.accounts.R
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus
-import org.librarysimplified.ui.accounts.R
 
 class ViewsForSAML20(
   override val viewGroup: ViewGroup,

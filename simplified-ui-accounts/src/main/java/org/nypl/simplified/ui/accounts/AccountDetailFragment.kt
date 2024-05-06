@@ -14,7 +14,6 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.appcompat.widget.SwitchCompat
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
@@ -23,10 +22,12 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.gms.location.LocationServices
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.io7m.junreachable.UnimplementedCodeException
 import com.io7m.junreachable.UnreachableCodeException
 import io.reactivex.disposables.CompositeDisposable
 import org.librarysimplified.services.api.Services
+import org.librarysimplified.ui.accounts.R
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountLoginState
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggedIn
@@ -57,9 +58,8 @@ import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsLogoutButtonEn
 import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.slf4j.LoggerFactory
-import java.net.URI
-import org.librarysimplified.ui.accounts.R
 import org.thepalaceproject.theme.core.PalaceToolbar
+import java.net.URI
 
 /**
  * A fragment that shows settings for a single account.

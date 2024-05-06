@@ -47,12 +47,13 @@ class PdfViewerProvider : ViewerProviderType {
     format: BookFormat,
     accountProviderId: URI
   ) {
-    val formatPDF = format as BookFormat.BookFormatPDF
+    val formatPDF =
+      format as BookFormat.BookFormatPDF
     val entry =
       FeedEntry.FeedEntryOPDS(book.account, book.entry)
 
     PdfReaderActivity.startActivity(
-      from = activity,
+      context = activity,
       parameters = PdfReaderParameters(
         accountId = book.account,
         documentTitle = book.entry.title,

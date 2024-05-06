@@ -3,7 +3,6 @@ package org.nypl.simplified.tests.lcp
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.nypl.simplified.lcp.LCPContentProtectionProvider
-import java.lang.IllegalStateException
 
 class LCPContentProtectionProviderTest {
 

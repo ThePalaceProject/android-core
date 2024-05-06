@@ -1,7 +1,6 @@
 package org.nypl.simplified.tests.books.controller;
 
 import android.app.Application;
-import android.content.Context;
 
 import org.mockito.Mockito;
 

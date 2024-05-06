@@ -1,6 +1,5 @@
 package org.nypl.simplified.books.api.bookmark
 
-import java.io.Serializable
 import java.util.regex.Pattern
 
 /**
@@ -11,7 +10,9 @@ import java.util.regex.Pattern
  * that serialized values of this class will be compatible with future releases.</p>
  */
 
-data class BookmarkID(val value: String) : Serializable {
+data class BookmarkID(
+  val value: String
+) {
 
   init {
     if (!VALID_BOOKMARK_ID.matcher(value).matches()) {

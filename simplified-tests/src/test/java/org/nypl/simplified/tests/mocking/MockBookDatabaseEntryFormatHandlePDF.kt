@@ -5,7 +5,8 @@ import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookDRMKind
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.api.BookID
-import org.nypl.simplified.books.api.bookmark.Bookmark
+import org.nypl.simplified.books.api.bookmark.BookmarkID
+import org.nypl.simplified.books.api.bookmark.SerializedBookmark
 import org.nypl.simplified.books.book_database.api.BookDRMInformationHandle
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandlePDF
 import org.nypl.simplified.books.formats.api.StandardFormatNames
@@ -43,12 +44,22 @@ class MockBookDatabaseEntryFormatHandlePDF(
     check(this.formatField.isDownloaded)
   }
 
-  override fun setLastReadLocation(bookmark: Bookmark.PDFBookmark?) {
+  override fun setLastReadLocation(bookmark: SerializedBookmark?) {
     this.formatField = this.formatField.copy(lastReadLocation = bookmark)
   }
 
-  override fun setBookmarks(bookmarks: List<Bookmark.PDFBookmark>) {
-    this.formatField = this.formatField.copy(bookmarks = bookmarks)
+  override fun addBookmark(bookmark: SerializedBookmark) {
+    val newList = arrayListOf<SerializedBookmark>()
+    newList.addAll(this.formatField.bookmarks)
+    newList.add(bookmark)
+    this.formatField = this.formatField.copy(bookmarks = newList.toList())
+  }
+
+  override fun deleteBookmark(bookmarkId: BookmarkID) {
+    val newList = arrayListOf<SerializedBookmark>()
+    newList.addAll(this.formatField.bookmarks)
+    newList.removeIf { b -> b.bookmarkId == bookmarkId }
+    this.formatField = this.formatField.copy(bookmarks = newList.toList())
   }
 
   override val drmInformationHandle: BookDRMInformationHandle

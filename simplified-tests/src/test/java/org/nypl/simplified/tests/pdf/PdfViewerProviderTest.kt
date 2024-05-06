@@ -3,10 +3,10 @@ package org.nypl.simplified.tests.pdf
 import one.irradia.mime.vanilla.MIMEParser
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import org.librarysimplified.viewer.pdf.pdfjs.PdfViewerProvider
 import org.mockito.Mockito
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
-import org.librarysimplified.viewer.pdf.pdfjs.PdfViewerProvider
 import org.nypl.simplified.viewer.spi.ViewerPreferences
 
 class PdfViewerProviderTest {
