@@ -47,7 +47,9 @@ import org.librarysimplified.audiobook.views.PlayerViewCommand
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.bookmarks.api.BookmarkServiceType
 import org.nypl.simplified.books.covers.BookCoverProviderType
+import org.nypl.simplified.books.time.tracking.TimeTrackingServiceType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
+import org.nypl.simplified.opds.core.getOrNull
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.ui.errorpage.ErrorPageFragment
@@ -63,6 +65,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
   private lateinit var bookmarkService: BookmarkServiceType
   private lateinit var buildConfig: BuildConfigurationServiceType
   private lateinit var coverService: BookCoverProviderType
+  private lateinit var timeTrackingService: TimeTrackingServiceType
 
   private val playerExtensions: List<PlayerExtensionType> = listOf()
   private var fragmentNow: Fragment = AudioBookLoadingFragment2()
@@ -90,6 +93,8 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       services.requireService(BookmarkServiceType::class.java)
     this.coverService =
       services.requireService(BookCoverProviderType::class.java)
+    this.timeTrackingService =
+      services.requireService(TimeTrackingServiceType::class.java)
   }
 
   override fun onStart() {
@@ -112,7 +117,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       is PlayerBaseFragment -> {
         when (f) {
           is PlayerFragment -> {
-            PlayerModel.closeBookOrDismissError()
+            this.close()
             super.onBackPressed()
           }
 
@@ -123,9 +128,23 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       }
 
       else -> {
-        PlayerModel.closeBookOrDismissError()
+        this.close()
         super.onBackPressed()
       }
+    }
+  }
+
+  private fun close() {
+    try {
+      PlayerModel.closeBookOrDismissError()
+    } catch (e: Exception) {
+      this.logger.error("Failed to close book: ", e)
+    }
+
+    try {
+      this.timeTrackingService.stopTracking()
+    } catch (e: Exception) {
+      this.logger.error("Failed to stop time tracking: ", e)
     }
   }
 
@@ -219,6 +238,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       }
 
       PlayerModelState.PlayerClosed -> {
+        this.timeTrackingService.stopTracking()
         this.switchFragment(AudioBookLoadingFragment2())
       }
 
@@ -231,6 +251,13 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       }
 
       is PlayerModelState.PlayerManifestOK -> {
+        this.timeTrackingService.startTimeTracking(
+          accountID = bookParameters.accountID,
+          bookId = bookParameters.opdsEntry.id,
+          libraryId = bookParameters.accountProviderID.toString(),
+          timeTrackingUri = bookParameters.opdsEntry.timeTrackingUri.getOrNull()
+        )
+
         PlayerModel.openPlayerForManifest(
           context = this.application,
           userAgent = PlayerUserAgent(bookParameters.userAgent),
@@ -313,7 +340,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     state.failure.mapIndexed { index, error ->
       this.logger.error("{}:{}: {}", error.line, error.column, error.message)
       task.addAttribute(
-        "Parse Error [${index}]",
+        "Parse Error [$index]",
         "${error.line}:${error.column}: ${error.message}"
       )
     }
@@ -323,7 +350,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     alert.setTitle(R.string.audio_book_player_error_book_open)
     alert.setMessage(R.string.audio_book_manifest_parse_error)
     alert.setNeutralButton(R.string.audio_book_player_details) { dialog, _ ->
-      openErrorPage(task.finishFailure<String>())
+      this.openErrorPage(task.finishFailure<String>())
     }
     alert.setPositiveButton(R.string.audio_book_player_ok) { dialog, _ ->
       dialog.dismiss()
@@ -359,7 +386,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     alert.setTitle(R.string.audio_book_player_error_book_open)
     alert.setMessage(state.message)
     alert.setNeutralButton(R.string.audio_book_player_details) { dialog, _ ->
-      openErrorPage(task.finishFailure<String>())
+      this.openErrorPage(task.finishFailure<String>())
     }
     alert.setPositiveButton(R.string.audio_book_player_ok) { dialog, _ ->
       dialog.dismiss()
@@ -387,7 +414,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     alert.setTitle(R.string.audio_book_player_error_book_open)
     alert.setMessage(R.string.audio_book_manifest_download_error)
     alert.setNeutralButton(R.string.audio_book_player_details) { dialog, _ ->
-      openErrorPage(task.finishFailure<String>())
+      this.openErrorPage(task.finishFailure<String>())
     }
     alert.setPositiveButton(R.string.audio_book_player_ok) { dialog, _ ->
       dialog.dismiss()
@@ -409,7 +436,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     alert.setTitle(R.string.audio_book_player_error_book_open)
     alert.setMessage(R.string.audio_book_manifest_license_error)
     alert.setNeutralButton(R.string.audio_book_player_details) { dialog, _ ->
-      openErrorPage(task.finishFailure<String>())
+      this.openErrorPage(task.finishFailure<String>())
     }
     alert.setPositiveButton(R.string.audio_book_player_ok) { dialog, _ ->
       dialog.dismiss()
