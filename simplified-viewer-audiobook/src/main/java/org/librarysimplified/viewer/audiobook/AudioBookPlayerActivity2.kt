@@ -34,7 +34,6 @@ import org.librarysimplified.audiobook.api.PlayerEvent.PlayerEventWithPosition.P
 import org.librarysimplified.audiobook.api.PlayerEvent.PlayerEventWithPosition.PlayerEventPlaybackWaitingForAction
 import org.librarysimplified.audiobook.api.PlayerUIThread
 import org.librarysimplified.audiobook.api.PlayerUserAgent
-import org.librarysimplified.audiobook.api.extensions.PlayerExtensionType
 import org.librarysimplified.audiobook.views.PlayerBaseFragment
 import org.librarysimplified.audiobook.views.PlayerBookmarkModel
 import org.librarysimplified.audiobook.views.PlayerFragment
@@ -67,7 +66,6 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
   private lateinit var coverService: BookCoverProviderType
   private lateinit var timeTrackingService: TimeTrackingServiceType
 
-  private val playerExtensions: List<PlayerExtensionType> = listOf()
   private var fragmentNow: Fragment = AudioBookLoadingFragment2()
   private var subscriptions: CompositeDisposable = CompositeDisposable()
 
@@ -261,7 +259,6 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
         PlayerModel.openPlayerForManifest(
           context = this.application,
           userAgent = PlayerUserAgent(bookParameters.userAgent),
-          extensions = this.playerExtensions,
           manifest = state.manifest
         )
       }

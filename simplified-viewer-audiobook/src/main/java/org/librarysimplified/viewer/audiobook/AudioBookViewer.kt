@@ -4,13 +4,10 @@ import android.app.Activity
 import android.content.Intent
 import one.irradia.mime.api.MIMEType
 import org.librarysimplified.audiobook.api.PlayerUserAgent
-import org.librarysimplified.audiobook.api.extensions.PlayerExtensionType
 import org.librarysimplified.audiobook.feedbooks.FeedbooksPlayerExtension
 import org.librarysimplified.audiobook.license_check.spi.SingleLicenseCheckProviderType
 import org.librarysimplified.audiobook.manifest_parser.extension_spi.ManifestParserExtensionType
-import org.librarysimplified.audiobook.media3.BearerTokenExtension
 import org.librarysimplified.audiobook.views.PlayerModel
-import org.librarysimplified.http.api.LSHTTPAuthorizationType
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.librarysimplified.services.api.Services
@@ -61,30 +58,15 @@ class AudioBookViewer : ViewerProviderType {
     return StandardFormatNames.allAudioBooks.contains(type)
   }
 
-  private fun loadAndConfigureExtensions(
-    authorization: LSHTTPAuthorizationType?
-  ): List<PlayerExtensionType> {
-    val extensions =
-      ServiceLoader.load(PlayerExtensionType::class.java)
-        .toList()
-
-    val services = Services.serviceDirectory()
-    this.loadAndConfigureBearerToken(extensions, authorization)
-    this.loadAndConfigureFeedbooks(services, extensions)
-    return extensions
-  }
-
-  private fun loadAndConfigureFeedbooks(
-    services: ServiceDirectoryType,
-    extensions: List<PlayerExtensionType>
-  ) {
+  private fun loadAndConfigureFeedbooks(services: ServiceDirectoryType) {
     val feedbooksConfigService =
       services.optionalService(AudioBookFeedbooksSecretServiceType::class.java)
 
     if (feedbooksConfigService != null) {
       this.logger.debug("Feedbooks configuration service is available; configuring extension")
       val extension =
-        extensions.filterIsInstance<FeedbooksPlayerExtension>()
+        PlayerModel.playerExtensions
+          .filterIsInstance<FeedbooksPlayerExtension>()
           .firstOrNull()
       if (extension != null) {
         this.logger.debug("Feedbooks extension is available")
@@ -92,25 +74,6 @@ class AudioBookViewer : ViewerProviderType {
       } else {
         this.logger.debug("Feedbooks extension is not available")
       }
-    }
-  }
-
-  private fun loadAndConfigureBearerToken(
-    extensions: List<PlayerExtensionType>,
-    authorization: LSHTTPAuthorizationType?
-  ) {
-    this.logger.debug(
-      "Configuring bearer token extension with authorization: {}",
-      authorization?.toHeaderValue()
-    )
-    val extension =
-      extensions.filterIsInstance<BearerTokenExtension>()
-        .firstOrNull()
-    if (extension != null) {
-      this.logger.debug("Bearer token extension is available")
-      extension.authorization = authorization
-    } else {
-      this.logger.debug("Bearer token extension is not available")
     }
   }
 
@@ -145,6 +108,8 @@ class AudioBookViewer : ViewerProviderType {
 
     PlayerModel.bookAuthor = book.entry.authorsCommaSeparated
     PlayerModel.bookTitle = book.entry.title
+
+    this.loadAndConfigureFeedbooks(services)
 
     if (manifest != null) {
       val parameters =
