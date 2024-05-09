@@ -25,6 +25,15 @@ data class SerializedLocatorHrefProgression20210317(
   val chapterProgress: Double,
 ) : SerializedLocator() {
 
+  init {
+    check(this.chapterProgress >= 0.0) {
+      "Chapter progress ${this.chapterProgress} must be in [0.0, 1.0]"
+    }
+    check(this.chapterProgress <= 1.0) {
+      "Chapter progress ${this.chapterProgress} must be in [0.0, 1.0]"
+    }
+  }
+
   override val typeName: String
     get() = "LocatorHrefProgression"
 

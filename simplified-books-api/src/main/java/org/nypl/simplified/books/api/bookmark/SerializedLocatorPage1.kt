@@ -19,6 +19,12 @@ data class SerializedLocatorPage1(
   val page: Int,
 ) : SerializedLocator() {
 
+  init {
+    check(this.page >= 0) {
+      "Page number ${this.page} must be non-negative."
+    }
+  }
+
   override val typeName: String
     get() = "LocatorPage"
 

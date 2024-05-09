@@ -180,8 +180,8 @@ class BookmarksSerializationTest {
   fun testLocatorAudioBookTime2() {
     val locatorOut =
       SerializedLocatorAudioBookTime2(
-        chapterHref = "urn:org.thepalaceproject:readingOrderItem:23",
-        chapterOffsetMilliseconds = 25000L
+        readingOrderItem = "urn:org.thepalaceproject:readingOrderItem:23",
+        readingOrderItemOffsetMilliseconds = 25000L
       )
 
     val locatorText =

@@ -115,9 +115,13 @@ object SerializedLocators {
   private fun parseLocatorPage(
     node: ObjectNode
   ): SerializedLocatorPage1 {
-    return SerializedLocatorPage1(
-      page = JSONParserUtilities.getInteger(node, "page"),
-    )
+    try {
+      return SerializedLocatorPage1(
+        page = JSONParserUtilities.getInteger(node, "page"),
+      )
+    } catch (e: Exception) {
+      throw JSONParseException(e)
+    }
   }
 
   @JvmStatic
@@ -125,10 +129,14 @@ object SerializedLocators {
   private fun parseLocatorHrefProgression(
     node: ObjectNode
   ): SerializedLocatorHrefProgression20210317 {
-    return SerializedLocatorHrefProgression20210317(
-      chapterHref = JSONParserUtilities.getString(node, "href"),
-      chapterProgress = JSONParserUtilities.getDouble(node, "progressWithinChapter")
-    )
+    try {
+      return SerializedLocatorHrefProgression20210317(
+        chapterHref = JSONParserUtilities.getString(node, "href"),
+        chapterProgress = JSONParserUtilities.getDouble(node, "progressWithinChapter")
+      )
+    } catch (e: IllegalStateException) {
+      throw JSONParseException(e)
+    }
   }
 
   @JvmStatic
@@ -155,10 +163,10 @@ object SerializedLocators {
     node: ObjectNode
   ): SerializedLocatorAudioBookTime2 {
     return SerializedLocatorAudioBookTime2(
-      chapterHref =
-      JSONParserUtilities.getString(node, "chapterHref"),
-      chapterOffsetMilliseconds =
-      JSONParserUtilities.getBigInteger(node, "chapterOffsetMilliseconds").toLong()
+      readingOrderItem =
+      JSONParserUtilities.getString(node, "readingOrderItem"),
+      readingOrderItemOffsetMilliseconds =
+      JSONParserUtilities.getBigInteger(node, "readingOrderItemOffsetMilliseconds").toLong()
     )
   }
 
@@ -172,14 +180,18 @@ object SerializedLocators {
       JSONParserUtilities.getBigInteger(node, "time")
         .toLong()
 
-    return SerializedLocatorAudioBookTime1(
-      part = JSONParserUtilities.getInteger(node, "part"),
-      chapter = JSONParserUtilities.getInteger(node, "chapter"),
-      title = JSONParserUtilities.getString(node, "title"),
-      audioBookId = JSONParserUtilities.getString(node, "audiobookID"),
-      duration = JSONParserUtilities.getBigInteger(node, "duration").toLong(),
-      startOffsetMilliseconds = startOffset,
-      timeMilliseconds = timeMillisecondsRaw,
-    )
+    try {
+      return SerializedLocatorAudioBookTime1(
+        part = JSONParserUtilities.getInteger(node, "part"),
+        chapter = JSONParserUtilities.getInteger(node, "chapter"),
+        title = JSONParserUtilities.getString(node, "title"),
+        audioBookId = JSONParserUtilities.getString(node, "audiobookID"),
+        duration = JSONParserUtilities.getBigInteger(node, "duration").toLong(),
+        startOffsetMilliseconds = startOffset,
+        timeMilliseconds = timeMillisecondsRaw,
+      )
+    } catch (e: IllegalStateException) {
+      throw JSONParseException(e)
+    }
   }
 }

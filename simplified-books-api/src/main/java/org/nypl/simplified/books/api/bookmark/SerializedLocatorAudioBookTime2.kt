@@ -12,8 +12,8 @@ import java.security.MessageDigest
  */
 
 data class SerializedLocatorAudioBookTime2(
-  val chapterHref: String,
-  val chapterOffsetMilliseconds: Long
+  val readingOrderItem: String,
+  val readingOrderItemOffsetMilliseconds: Long
 ) : SerializedLocator() {
 
   override val typeName: String
@@ -29,15 +29,15 @@ data class SerializedLocatorAudioBookTime2(
     root.put("@type", this.typeName)
     root.put("@version", this.typeVersion)
 
-    root.put("chapterHref", this.chapterHref)
-    root.put("chapterOffsetMilliseconds", this.chapterOffsetMilliseconds)
+    root.put("readingOrderItem", this.readingOrderItem)
+    root.put("readingOrderItemOffsetMilliseconds", this.readingOrderItemOffsetMilliseconds)
     return root
   }
 
   override fun addToDigest(
     digest: MessageDigest
   ) {
-    digest.update(this.chapterHref.toByteArray(UTF_8))
-    digest.update(this.chapterOffsetMilliseconds.toString().toByteArray(UTF_8))
+    digest.update(this.readingOrderItem.toByteArray(UTF_8))
+    digest.update(this.readingOrderItemOffsetMilliseconds.toString().toByteArray(UTF_8))
   }
 }

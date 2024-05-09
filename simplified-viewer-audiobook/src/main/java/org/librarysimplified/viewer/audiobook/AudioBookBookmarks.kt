@@ -97,8 +97,8 @@ object AudioBookBookmarks {
       bookChapterTitle = source.metadata.chapterTitle,
       bookProgress = source.metadata.bookProgressEstimate,
       location = SerializedLocatorAudioBookTime2(
-        chapterHref = source.readingOrderID.text,
-        chapterOffsetMilliseconds = source.offsetMilliseconds
+        readingOrderItem = source.readingOrderID.text,
+        readingOrderItemOffsetMilliseconds = source.offsetMilliseconds
       ),
       uri = null
     )
@@ -124,8 +124,8 @@ object AudioBookBookmarks {
           }
         PlayerBookmark(
           kind = kind,
-          readingOrderID = PlayerManifestReadingOrderID(location.chapterHref),
-          offsetMilliseconds = location.chapterOffsetMilliseconds,
+          readingOrderID = PlayerManifestReadingOrderID(location.readingOrderItem),
+          offsetMilliseconds = location.readingOrderItemOffsetMilliseconds,
           metadata = PlayerBookmarkMetadata(
             creationTime = source.time,
             chapterTitle = source.bookChapterTitle,

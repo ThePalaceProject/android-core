@@ -17,8 +17,11 @@ import org.nypl.simplified.bookmarks.api.BookmarkAnnotationTargetNode
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotations
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotationsJSON
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
+import org.nypl.simplified.books.api.bookmark.SerializedLocatorAudioBookTime1
+import org.nypl.simplified.books.api.bookmark.SerializedLocatorAudioBookTime2
 import org.nypl.simplified.books.api.bookmark.SerializedLocatorHrefProgression20210317
 import org.nypl.simplified.books.api.bookmark.SerializedLocatorLegacyCFI
+import org.nypl.simplified.books.api.bookmark.SerializedLocatorPage1
 import org.nypl.simplified.books.api.bookmark.SerializedLocators
 import org.nypl.simplified.json.core.JSONParseException
 import org.slf4j.LoggerFactory
@@ -369,6 +372,132 @@ class ReaderBookmarkAnnotationsJSONTest {
     assertEquals(0.25, locationR1.chapterProgression, 0.0)
     assertEquals("xyz-html", locationR1.idRef)
     assertEquals("/4/2/2/2", locationR1.contentCFI)
+  }
+
+  @Test
+  fun testSpecValidLocator2() {
+    val location =
+      SerializedLocators.parseLocatorFromString(this.resourceText("valid-locator-2.json"))
+
+    val locationR1 = location as SerializedLocatorPage1
+    assertEquals(23, locationR1.page)
+  }
+
+  @Test
+  fun testSpecValidLocator3() {
+    val location =
+      SerializedLocators.parseLocatorFromString(this.resourceText("valid-locator-3.json"))
+
+    val locationR1 = location as SerializedLocatorAudioBookTime1
+    assertEquals(78000, locationR1.timeMilliseconds)
+  }
+
+  @Test
+  fun testSpecValidLocator4() {
+    val location =
+      SerializedLocators.parseLocatorFromString(this.resourceText("valid-locator-4.json"))
+
+    val locationR1 = location as SerializedLocatorAudioBookTime1
+    assertEquals(63000, locationR1.timeWithoutOffset)
+  }
+
+  @Test
+  fun testSpecValidLocator5() {
+    val location =
+      SerializedLocators.parseLocatorFromString(this.resourceText("valid-locator-5.json"))
+
+    val locationR1 = location as SerializedLocatorAudioBookTime1
+    assertEquals(78000, locationR1.timeMilliseconds)
+  }
+
+  @Test
+  fun testSpecValidLocator6() {
+    val location =
+      SerializedLocators.parseLocatorFromString(this.resourceText("valid-locator-6.json"))
+
+    val locationR1 = location as SerializedLocatorAudioBookTime2
+    assertEquals(25000, locationR1.readingOrderItemOffsetMilliseconds)
+  }
+
+  @Test
+  fun testSpecInvalidLocator1() {
+    val ex = assertThrows(JSONParseException::class.java) {
+      SerializedLocators.parseLocatorFromString(this.resourceText("invalid-locator-1.json"))
+    }
+    this.logger.debug("Message: {}", ex.message)
+    assertTrue(ex.message!!.contains("Expected: A key 'href'"))
+  }
+
+  @Test
+  fun testSpecInvalidLocator2() {
+    val ex = assertThrows(JSONParseException::class.java) {
+      SerializedLocators.parseLocatorFromString(this.resourceText("invalid-locator-2.json"))
+    }
+    this.logger.debug("Message: {}", ex.message)
+    assertTrue(ex.message!!.contains("Expected: A key 'progressWithinChapter'"))
+  }
+
+  @Test
+  fun testSpecInvalidLocator3() {
+    val ex = assertThrows(JSONParseException::class.java) {
+      SerializedLocators.parseLocatorFromString(this.resourceText("invalid-locator-3.json"))
+    }
+    this.logger.debug("Message: {}", ex.message)
+    assertTrue(ex.message!!.contains("Chapter progress -1.0 must be in [0.0, 1.0]"))
+  }
+
+  @Test
+  fun testSpecInvalidLocator4() {
+    val ex = assertThrows(JSONParseException::class.java) {
+      SerializedLocators.parseLocatorFromString(this.resourceText("invalid-locator-4.json"))
+    }
+    this.logger.debug("Message: {}", ex.message)
+    assertTrue(ex.message!!.contains("Chapter progress 2.0 must be in [0.0, 1.0]"))
+  }
+
+  @Test
+  fun testSpecInvalidLocator5() {
+    val ex = assertThrows(JSONParseException::class.java) {
+      SerializedLocators.parseLocatorFromString(this.resourceText("invalid-locator-5.json"))
+    }
+    this.logger.debug("Message: {}", ex.message)
+    assertTrue(ex.message!!.contains("Chapter -5 must be non-negative."))
+  }
+
+  @Test
+  fun testSpecInvalidLocator6() {
+    val ex = assertThrows(JSONParseException::class.java) {
+      SerializedLocators.parseLocatorFromString(this.resourceText("invalid-locator-6.json"))
+    }
+    this.logger.debug("Message: {}", ex.message)
+    assertTrue(ex.message!!.contains("Page number -3 must be non-negative."))
+  }
+
+  @Test
+  fun testSpecInvalidLocator7() {
+    val ex = assertThrows(JSONParseException::class.java) {
+      SerializedLocators.parseLocatorFromString(this.resourceText("invalid-locator-7.json"))
+    }
+    this.logger.debug("Message: {}", ex.message)
+    assertTrue(ex.message!!.contains("Expected: A key 'time'"))
+  }
+
+  @Test
+  fun testSpecInvalidLocator8() {
+    val ex = assertThrows(JSONParseException::class.java) {
+      SerializedLocators.parseLocatorFromString(this.resourceText("invalid-locator-8.json"))
+    }
+    this.logger.debug("Message: {}", ex.message)
+    assertTrue(ex.message!!.contains("Expected: A key 'readingOrderItem'"))
+  }
+
+  @Test
+  fun testSpecInvalidLocator9() {
+    val ex = assertThrows(JSONParseException::class.java) {
+      SerializedLocators.parseLocatorFromString(this.resourceText("invalid-locator-9.json"))
+    }
+    this.logger.debug("Message: {}", ex.message)
+    assertTrue(ex.message!!.contains("Expected: A key 'readingOrderItemOffsetMilliseconds'"))
   }
 
   @Test

@@ -21,6 +21,15 @@ data class SerializedLocatorAudioBookTime1(
   val title: String,
 ) : SerializedLocator() {
 
+  init {
+    check(this.chapter >= 0) {
+      "Chapter ${this.chapter} must be non-negative."
+    }
+    check(this.part >= 0) {
+      "Chapter ${this.part} must be non-negative."
+    }
+  }
+
   val timeWithoutOffset: Long
     get() = this.timeMilliseconds - this.startOffsetMilliseconds
 
