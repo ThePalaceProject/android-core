@@ -7,7 +7,6 @@ import org.joda.time.format.ISODateTimeFormat
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.api.BookIDs
 import java.net.URI
-import java.nio.charset.StandardCharsets.UTF_8
 import java.security.MessageDigest
 
 data class SerializedBookmarkLegacy(
@@ -98,7 +97,6 @@ data class SerializedBookmarkLegacy(
   ) {
     BookmarkDigests.addToDigest(digest, this.opdsId)
     this.location.addToDigest(digest)
-    digest.update(this.dateFormatter.print(this.time).toByteArray(UTF_8))
   }
 
   override fun withURI(uri: URI): SerializedBookmark {

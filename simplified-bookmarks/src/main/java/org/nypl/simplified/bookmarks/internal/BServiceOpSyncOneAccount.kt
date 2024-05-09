@@ -158,7 +158,15 @@ internal class BServiceOpSyncOneAccount(
 
         val entry = syncable.account.bookDatabase.entry(bookmark.book)
         for (handle in entry.formatHandles) {
-          handle.addBookmark(bookmark)
+          when (bookmark.kind) {
+            BookmarkKind.BookmarkExplicit -> {
+              handle.addBookmark(bookmark)
+            }
+            BookmarkKind.BookmarkLastReadLocation -> {
+              handle.setLastReadLocation(bookmark)
+            }
+          }
+
           this.bookmarkEventsOut.onNext(
             BookmarkEvent.BookmarkSaved(
               syncable.account.id,

@@ -102,6 +102,8 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     this.subscriptions.add(PlayerModel.stateEvents.subscribe(this::onModelStateEvent))
     this.subscriptions.add(PlayerModel.viewCommands.subscribe(this::onPlayerViewCommand))
     this.subscriptions.add(PlayerModel.playerEvents.subscribe(this::onPlayerEvent))
+
+    this.loadCoverImage()
   }
 
   override fun onStop() {
@@ -116,7 +118,6 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
         when (f) {
           is PlayerFragment -> {
             this.close()
-            super.onBackPressed()
           }
 
           is PlayerTOCFragment -> {
@@ -127,7 +128,6 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
 
       else -> {
         this.close()
-        super.onBackPressed()
       }
     }
   }
@@ -143,6 +143,12 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       this.timeTrackingService.stopTracking()
     } catch (e: Exception) {
       this.logger.error("Failed to stop time tracking: ", e)
+    }
+
+    try {
+      this.finish()
+    } catch (e: Exception) {
+      this.logger.error("Failed to finish activity: ", e)
     }
   }
 
@@ -256,33 +262,6 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
           timeTrackingUri = bookParameters.opdsEntry.timeTrackingUri.getOrNull()
         )
 
-        PlayerModel.openPlayerForManifest(
-          context = this.application,
-          userAgent = PlayerUserAgent(bookParameters.userAgent),
-          manifest = state.manifest
-        )
-      }
-
-      is PlayerModelState.PlayerManifestParseFailed -> {
-        this.onManifestParseFailed(state)
-      }
-
-      is PlayerModelState.PlayerOpen -> {
-        val parameters = AudioBookViewerModel.parameters ?: return
-
-        /*
-         * Set the cover image (loading it asynchronously).
-         */
-
-        val coverURI = parameters.opdsEntry.cover
-        if (coverURI is Some<URI>) {
-          this.coverService.loadCoverAsBitmap(
-            source = coverURI.get(),
-            onBitmapLoaded = PlayerModel::setCoverImage,
-            defaultResource = R.drawable.empty
-          )
-        }
-
         /*
          * XXX: This shouldn't really be a blocking call to get()
          * The bookmarks service should expose an always-up-to-date readable set of bookmarks.
@@ -300,30 +279,53 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
           bookmarks.lastRead?.let { b -> AudioBookBookmarks.toPlayerBookmark(b) }
 
         PlayerBookmarkModel.setBookmarks(bookmarksConverted)
-        if (bookmarkLastRead != null) {
-          PlayerModel.movePlayheadTo(bookmarkLastRead.position)
-        }
 
+        val initialPosition =
+          if (bookmarkLastRead != null) {
+            this.logger.debug("Restoring last-read position: {}", bookmarkLastRead.position)
+            bookmarkLastRead.position
+          } else {
+            null
+          }
+
+        PlayerModel.openPlayerForManifest(
+          context = this.application,
+          userAgent = PlayerUserAgent(bookParameters.userAgent),
+          manifest = state.manifest,
+          fetchAll = true,
+          initialPosition = initialPosition
+        )
+      }
+
+      is PlayerModelState.PlayerManifestParseFailed -> {
+        this.onManifestParseFailed(state)
+      }
+
+      is PlayerModelState.PlayerOpen -> {
+        this.loadCoverImage()
         this.switchFragment(PlayerFragment())
-
-        /*
-         * Tell the downloader to download every chapter.
-         *
-         * XXX: This is probably something we don't want to do unconditionally anymore. It's
-         * here for backwards compatibility until we support streaming and have a refurbished
-         * TOC that allows for good control over downloads.
-         */
-
-        PlayerUIThread.runOnUIThreadDelayed({
-          PlayerModel.book()
-            .wholeBookDownloadTask
-            .fetch()
-        }, 2000L)
       }
 
       PlayerModelState.PlayerManifestInProgress -> {
         this.switchFragment(AudioBookLoadingFragment2())
       }
+    }
+  }
+
+  private fun loadCoverImage() {
+    val parameters = AudioBookViewerModel.parameters ?: return
+
+    /*
+     * Set the cover image (loading it asynchronously).
+     */
+
+    val coverURI = parameters.opdsEntry.cover
+    if (coverURI is Some<URI>) {
+      this.coverService.loadCoverAsBitmap(
+        source = coverURI.get(),
+        onBitmapLoaded = PlayerModel::setCoverImage,
+        defaultResource = R.drawable.empty
+      )
     }
   }
 
@@ -351,7 +353,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     }
     alert.setPositiveButton(R.string.audio_book_player_ok) { dialog, _ ->
       dialog.dismiss()
-      this.finish()
+      this.close()
     }
     alert.show()
   }
@@ -387,7 +389,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     }
     alert.setPositiveButton(R.string.audio_book_player_ok) { dialog, _ ->
       dialog.dismiss()
-      this.finish()
+      this.close()
     }
     alert.show()
   }
@@ -415,7 +417,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     }
     alert.setPositiveButton(R.string.audio_book_player_ok) { dialog, _ ->
       dialog.dismiss()
-      this.finish()
+      this.close()
     }
     alert.show()
   }
@@ -437,7 +439,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     }
     alert.setPositiveButton(R.string.audio_book_player_ok) { dialog, _ ->
       dialog.dismiss()
-      this.finish()
+      this.close()
     }
     alert.show()
   }
@@ -467,6 +469,10 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
 
       PlayerViewCommand.PlayerViewNavigationTOCOpen -> {
         this.switchFragment(PlayerTOCFragment())
+      }
+
+      PlayerViewCommand.PlayerViewNavigationCloseAll -> {
+        this.close()
       }
     }
   }

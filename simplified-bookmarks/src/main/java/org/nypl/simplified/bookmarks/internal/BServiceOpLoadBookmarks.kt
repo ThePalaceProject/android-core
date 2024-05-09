@@ -4,6 +4,7 @@ import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.bookmarks.api.BookmarksForBook
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.api.BookID
+import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.books.api.bookmark.SerializedBookmark
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleEPUB
@@ -68,7 +69,7 @@ internal class BServiceOpLoadBookmarks(
         return BookmarksForBook(
           bookId = this.book,
           lastRead = lastReadLocation,
-          bookmarks = bookmarks
+          bookmarks = bookmarks.filter { b -> b.kind == BookmarkKind.BookmarkExplicit }
         )
       }
     } catch (e: Exception) {

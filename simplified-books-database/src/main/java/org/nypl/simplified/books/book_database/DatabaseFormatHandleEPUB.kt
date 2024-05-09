@@ -10,6 +10,7 @@ import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.api.bookmark.BookmarkID
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.books.api.bookmark.SerializedBookmark
+import org.nypl.simplified.books.api.bookmark.SerializedBookmarkFallbackValues
 import org.nypl.simplified.books.api.bookmark.SerializedBookmarks
 import org.nypl.simplified.books.book_database.api.BookDRMInformationHandle
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleEPUB
@@ -174,13 +175,15 @@ internal class DatabaseFormatHandleEPUB internal constructor(
   }
 
   override fun setLastReadLocation(bookmark: SerializedBookmark?) {
+    if (bookmark != null) {
+      Preconditions.checkArgument(
+        bookmark.kind == BookmarkKind.BookmarkLastReadLocation,
+        "Must use a last-read location bookmark"
+      )
+    }
+
     val newFormat = synchronized(this.dataLock) {
       if (bookmark != null) {
-        Preconditions.checkArgument(
-          bookmark.kind == BookmarkKind.BookmarkLastReadLocation,
-          "Must use a last-read-location bookmark"
-        )
-
         FileUtilities.fileWriteUTF8Atomically(
           this.fileLastRead,
           this.fileLastReadTmp,
@@ -200,10 +203,16 @@ internal class DatabaseFormatHandleEPUB internal constructor(
   override fun addBookmark(
     bookmark: SerializedBookmark
   ) {
+    Preconditions.checkArgument(
+      bookmark.kind == BookmarkKind.BookmarkExplicit,
+      "Must use an explicit bookmark"
+    )
+
     val newFormat = synchronized(this.dataLock) {
       val newBookmarks = arrayListOf<SerializedBookmark>()
       newBookmarks.addAll(this.formatRef.bookmarks)
       newBookmarks.removeIf { b -> b.bookmarkId == bookmark.bookmarkId }
+      newBookmarks.removeIf { b -> b.kind == BookmarkKind.BookmarkLastReadLocation }
       newBookmarks.add(bookmark)
 
       FileUtilities.fileWriteUTF8Atomically(
@@ -271,7 +280,10 @@ internal class DatabaseFormatHandleEPUB internal constructor(
 
       array.forEach { node ->
         try {
-          bookmarks.add(SerializedBookmarks.parseBookmark(node))
+          val fallbackValues = SerializedBookmarkFallbackValues(
+            kind = BookmarkKind.BookmarkExplicit,
+          )
+          bookmarks.add(SerializedBookmarks.parseBookmark(node, fallbackValues))
         } catch (exception: JSONParseException) {
           this.logger.debug("Failed to parse bookmark: ", exception)
         }
@@ -299,7 +311,13 @@ internal class DatabaseFormatHandleEPUB internal constructor(
     private fun loadLastReadLocation(
       fileLastRead: File
     ): SerializedBookmark {
-      return SerializedBookmarks.parseBookmarkFromString(FileUtilities.fileReadUTF8(fileLastRead))
+      val fallbackValues = SerializedBookmarkFallbackValues(
+        kind = BookmarkKind.BookmarkLastReadLocation,
+      )
+      return SerializedBookmarks.parseBookmarkFromString(
+        text = FileUtilities.fileReadUTF8(fileLastRead),
+        fallbackValues = fallbackValues,
+      )
     }
   }
 }

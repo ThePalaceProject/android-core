@@ -8,6 +8,7 @@ import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.books.api.bookmark.SerializedBookmark20210317
 import org.nypl.simplified.books.api.bookmark.SerializedBookmark20210828
 import org.nypl.simplified.books.api.bookmark.SerializedBookmark20240424
+import org.nypl.simplified.books.api.bookmark.SerializedBookmarkFallbackValues
 import org.nypl.simplified.books.api.bookmark.SerializedBookmarks
 import org.nypl.simplified.books.api.bookmark.SerializedLocatorAudioBookTime1
 import org.nypl.simplified.books.api.bookmark.SerializedLocatorAudioBookTime2
@@ -65,8 +66,10 @@ class BookmarksSerializationTest {
     this.logger.debug("{}", bookmarkText)
 
     val bookmarkIn =
-      SerializedBookmarks.parseBookmarkFromString(bookmarkText)
-        as SerializedBookmark20210317
+      SerializedBookmarks.parseBookmarkFromString(
+        text = bookmarkText,
+        fallbackValues = SerializedBookmarkFallbackValues(kind = BookmarkKind.BookmarkLastReadLocation)
+      ) as SerializedBookmark20210317
 
     assertEquals(bookmarkLimited, bookmarkIn)
   }
@@ -110,8 +113,10 @@ class BookmarksSerializationTest {
     this.logger.debug("{}", bookmarkText)
 
     val bookmarkIn =
-      SerializedBookmarks.parseBookmarkFromString(bookmarkText)
-        as SerializedBookmark20210828
+      SerializedBookmarks.parseBookmarkFromString(
+        text = bookmarkText,
+        fallbackValues = SerializedBookmarkFallbackValues(kind = BookmarkKind.BookmarkLastReadLocation)
+      ) as SerializedBookmark20210828
 
     assertEquals(bookmarkLimited, bookmarkIn)
   }
@@ -145,8 +150,10 @@ class BookmarksSerializationTest {
     this.logger.debug("{}", bookmarkText)
 
     val bookmarkIn =
-      SerializedBookmarks.parseBookmarkFromString(bookmarkText)
-        as SerializedBookmark20240424
+      SerializedBookmarks.parseBookmarkFromString(
+        text = bookmarkText,
+        fallbackValues = SerializedBookmarkFallbackValues(kind = BookmarkKind.BookmarkLastReadLocation)
+      ) as SerializedBookmark20240424
 
     assertEquals(bookmarkLimited, bookmarkIn)
   }
@@ -323,7 +330,8 @@ class BookmarksSerializationTest {
   fun testParseLegacyBookmarks0() {
     val bookmark =
       SerializedBookmarks.parseBookmarkFromString(
-        textOf("bookmark-20210317-r1-0.json")
+        textOf("bookmark-20210317-r1-0.json"),
+        fallbackValues = SerializedBookmarkFallbackValues(kind = BookmarkKind.BookmarkLastReadLocation)
       )
 
     assertEquals("urn:isbn:9781683607144", bookmark.opdsId)
@@ -333,7 +341,8 @@ class BookmarksSerializationTest {
   fun testParseLegacyBookmarks1() {
     val bookmark =
       SerializedBookmarks.parseBookmarkFromString(
-        textOf("bookmark-20210317-r2-0.json")
+        textOf("bookmark-20210317-r2-0.json"),
+        fallbackValues = SerializedBookmarkFallbackValues(kind = BookmarkKind.BookmarkLastReadLocation)
       )
 
     assertEquals("urn:isbn:9781683607144", bookmark.opdsId)
@@ -343,7 +352,8 @@ class BookmarksSerializationTest {
   fun testParseLegacyBookmarks2() {
     val bookmark =
       SerializedBookmarks.parseBookmarkFromString(
-        textOf("bookmark-20210317-r2-1.json")
+        textOf("bookmark-20210317-r2-1.json"),
+        fallbackValues = SerializedBookmarkFallbackValues(kind = BookmarkKind.BookmarkLastReadLocation)
       )
 
     assertEquals("urn:uuid:808b2d99-c286-499a-91a1-580afc4c563f", bookmark.opdsId)
@@ -353,7 +363,8 @@ class BookmarksSerializationTest {
   fun testParseLegacyBookmarks3() {
     val bookmark =
       SerializedBookmarks.parseBookmarkFromString(
-        textOf("bookmark-legacy-r1-0.json")
+        textOf("bookmark-legacy-r1-0.json"),
+        fallbackValues = SerializedBookmarkFallbackValues(kind = BookmarkKind.BookmarkLastReadLocation)
       )
 
     assertEquals("urn:isbn:9781683607144", bookmark.opdsId)
@@ -363,7 +374,8 @@ class BookmarksSerializationTest {
   fun testParseLegacyBookmarks4() {
     val bookmark =
       SerializedBookmarks.parseBookmarkFromString(
-        textOf("bookmark-legacy-r1-1.json")
+        textOf("bookmark-legacy-r1-1.json"),
+        fallbackValues = SerializedBookmarkFallbackValues(kind = BookmarkKind.BookmarkLastReadLocation)
       )
 
     assertEquals("urn:isbn:9781683606123", bookmark.opdsId)

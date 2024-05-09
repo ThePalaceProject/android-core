@@ -3,6 +3,7 @@ package org.nypl.simplified.bookmarks.internal
 import io.reactivex.subjects.Subject
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.bookmarks.api.BookmarkEvent
+import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.books.api.bookmark.SerializedBookmark
 import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.slf4j.Logger
@@ -39,7 +40,14 @@ internal class BServiceOpCreateLocalBookmark(
         books.entry(this.bookmark.book)
 
       for (handle in entry.formatHandles) {
-        handle.addBookmark(this.bookmark)
+        when (this.bookmark.kind) {
+          BookmarkKind.BookmarkExplicit -> {
+            handle.addBookmark(this.bookmark)
+          }
+          BookmarkKind.BookmarkLastReadLocation -> {
+            handle.setLastReadLocation(this.bookmark)
+          }
+        }
         this.publishSavedEvent(this.bookmark)
       }
 
@@ -53,13 +61,5 @@ internal class BServiceOpCreateLocalBookmark(
   private fun publishSavedEvent(updatedBookmark: SerializedBookmark): SerializedBookmark {
     this.bookmarkEventsOut.onNext(BookmarkEvent.BookmarkSaved(this.accountID, updatedBookmark))
     return updatedBookmark
-  }
-
-  private fun errorNoFormatHandle(): IllegalStateException {
-    this.logger.debug(
-      "[{}]: unable to save bookmark; no format handle",
-      this.profile.id.uuid
-    )
-    return IllegalStateException("No format handle")
   }
 }
