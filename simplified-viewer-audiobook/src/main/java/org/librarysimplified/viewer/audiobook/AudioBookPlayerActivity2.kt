@@ -1,6 +1,7 @@
 package org.librarysimplified.viewer.audiobook
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.annotation.UiThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -11,6 +12,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.io7m.jfunctional.Some
 import io.reactivex.disposables.CompositeDisposable
 import org.librarysimplified.audiobook.api.PlayerBookmark
+import org.librarysimplified.audiobook.api.PlayerBookmarkKind
 import org.librarysimplified.audiobook.api.PlayerEvent
 import org.librarysimplified.audiobook.api.PlayerEvent.PlayerAccessibilityEvent.PlayerAccessibilityChapterSelected
 import org.librarysimplified.audiobook.api.PlayerEvent.PlayerAccessibilityEvent.PlayerAccessibilityErrorOccurred
@@ -199,6 +201,38 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
           ),
           ignoreRemoteFailures = true,
         )
+
+        /*
+         * Tell the bookmark model about the new bookmark.
+         */
+
+        when (event.kind) {
+          PlayerBookmarkKind.EXPLICIT -> {
+            val newBookmarks = arrayListOf<PlayerBookmark>()
+            newBookmarks.addAll(PlayerBookmarkModel.bookmarks())
+            newBookmarks.removeIf { b -> b.position == playerBookmark.position }
+            newBookmarks.add(0, playerBookmark)
+
+            PlayerBookmarkModel.setBookmarks(newBookmarks.toList())
+          }
+          PlayerBookmarkKind.LAST_READ -> {
+            // Nothing to do here.
+          }
+        }
+
+        /*
+         * Show a toast message for explicit bookmarks.
+         */
+
+        when (event.kind) {
+          PlayerBookmarkKind.EXPLICIT -> {
+            Toast.makeText(this, R.string.audio_book_player_bookmark_added, Toast.LENGTH_SHORT)
+              .show()
+          }
+          PlayerBookmarkKind.LAST_READ -> {
+            // Nothing to do here.
+          }
+        }
       }
 
       is PlayerEventDeleteBookmark -> {
