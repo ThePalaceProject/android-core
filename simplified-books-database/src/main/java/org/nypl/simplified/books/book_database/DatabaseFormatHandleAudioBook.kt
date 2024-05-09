@@ -106,7 +106,12 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
         fileBookmarks = this.fileBookmarks,
         filePosition = this.filePosition,
         contentType = this.parameters.contentType,
-        drmInfo = this.drmInformationHandle.info
+        drmInfo = this.drmInformationHandle.info,
+        bookmarkFallbackValues = SerializedBookmarkFallbackValues(
+          kind = BookmarkKind.BookmarkExplicit,
+          bookOPDSId = this.parameters.entry.book.entry.id,
+          bookTitle = this.parameters.entry.book.entry.title
+        )
       )
     }
 
@@ -389,27 +394,30 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
       fileBookmarks: File,
       filePosition: File,
       contentType: MIMEType,
-      drmInfo: BookDRMInformation
+      drmInfo: BookDRMInformation,
+      bookmarkFallbackValues: SerializedBookmarkFallbackValues
     ): BookFormat.BookFormatAudioBook {
       return BookFormat.BookFormatAudioBook(
         file = if (fileBook.exists()) fileBook else null,
         manifest = this.loadManifestIfNecessary(fileManifest, fileManifestURI),
         contentType = contentType,
         drmInformation = drmInfo,
-        bookmarks = this.loadBookmarksIfPresent(objectMapper, fileBookmarks),
-        lastReadLocation = this.loadLastReadLocationIfPresent(filePosition),
+        bookmarks = this.loadBookmarksIfPresent(objectMapper, fileBookmarks, bookmarkFallbackValues),
+        lastReadLocation = this.loadLastReadLocationIfPresent(filePosition, bookmarkFallbackValues),
       )
     }
 
     @Throws(IOException::class)
     private fun loadBookmarksIfPresent(
       objectMapper: ObjectMapper,
-      fileBookmarks: File
+      fileBookmarks: File,
+      bookmarkFallbackValues: SerializedBookmarkFallbackValues
     ): List<SerializedBookmark> {
       return if (fileBookmarks.isFile) {
         this.loadBookmarks(
           objectMapper = objectMapper,
-          fileBookmarks = fileBookmarks
+          fileBookmarks = fileBookmarks,
+          bookmarkFallbackValues = bookmarkFallbackValues
         )
       } else {
         listOf()
@@ -418,7 +426,8 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
 
     private fun loadBookmarks(
       objectMapper: ObjectMapper,
-      fileBookmarks: File
+      fileBookmarks: File,
+      bookmarkFallbackValues: SerializedBookmarkFallbackValues
     ): List<SerializedBookmark> {
       val tree =
         objectMapper.readTree(fileBookmarks)
@@ -429,9 +438,8 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
 
       array.forEach { node ->
         try {
-          val fallbackValues = SerializedBookmarkFallbackValues(
-            kind = BookmarkKind.BookmarkExplicit,
-          )
+          val fallbackValues =
+            bookmarkFallbackValues.copy(kind = BookmarkKind.BookmarkExplicit)
           bookmarks.add(SerializedBookmarks.parseBookmark(node, fallbackValues))
         } catch (exception: JSONParseException) {
           this.logger.debug("Failed to parse bookmark: ", exception)
@@ -442,11 +450,12 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
 
     @Throws(IOException::class)
     private fun loadLastReadLocationIfPresent(
-      fileLastRead: File
+      fileLastRead: File,
+      bookmarkFallbackValues: SerializedBookmarkFallbackValues
     ): SerializedBookmark? {
       return if (fileLastRead.isFile) {
         try {
-          this.loadLastReadLocation(fileLastRead = fileLastRead)
+          this.loadLastReadLocation(fileLastRead = fileLastRead, bookmarkFallbackValues)
         } catch (e: Exception) {
           this.logger.error("Failed to read the last-read location: ", e)
           null
@@ -458,11 +467,11 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
 
     @Throws(IOException::class)
     private fun loadLastReadLocation(
-      fileLastRead: File
+      fileLastRead: File,
+      bookmarkFallbackValues: SerializedBookmarkFallbackValues
     ): SerializedBookmark {
-      val fallbackValues = SerializedBookmarkFallbackValues(
-        kind = BookmarkKind.BookmarkLastReadLocation,
-      )
+      val fallbackValues =
+        bookmarkFallbackValues.copy(kind = BookmarkKind.BookmarkLastReadLocation)
       return SerializedBookmarks.parseBookmarkFromString(
         text = FileUtilities.fileReadUTF8(fileLastRead),
         fallbackValues = fallbackValues,

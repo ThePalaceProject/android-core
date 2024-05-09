@@ -57,7 +57,7 @@ class BookmarksSerializationTest {
         bookChapterProgress = 0.0,
         bookChapterTitle = "",
         bookProgress = 0.0,
-        bookTitle = "",
+        bookTitle = "Nonexistent",
       )
 
     val bookmarkText =
@@ -68,7 +68,11 @@ class BookmarksSerializationTest {
     val bookmarkIn =
       SerializedBookmarks.parseBookmarkFromString(
         text = bookmarkText,
-        fallbackValues = SerializedBookmarkFallbackValues(kind = BookmarkKind.BookmarkLastReadLocation)
+        fallbackValues = SerializedBookmarkFallbackValues(
+          kind = BookmarkKind.BookmarkLastReadLocation,
+          bookOPDSId = "opdsIdOther",
+          bookTitle = "Nonexistent"
+        )
       ) as SerializedBookmark20210317
 
     assertEquals(bookmarkLimited, bookmarkIn)
@@ -104,7 +108,7 @@ class BookmarksSerializationTest {
         bookChapterProgress = 0.0,
         bookChapterTitle = "",
         bookProgress = 0.0,
-        bookTitle = "",
+        bookTitle = "Nonexistent",
       )
 
     val bookmarkText =
@@ -115,7 +119,11 @@ class BookmarksSerializationTest {
     val bookmarkIn =
       SerializedBookmarks.parseBookmarkFromString(
         text = bookmarkText,
-        fallbackValues = SerializedBookmarkFallbackValues(kind = BookmarkKind.BookmarkLastReadLocation)
+        fallbackValues = SerializedBookmarkFallbackValues(
+          kind = BookmarkKind.BookmarkLastReadLocation,
+          bookOPDSId = "opdsIdOther",
+          bookTitle = "Nonexistent"
+        )
       ) as SerializedBookmark20210828
 
     assertEquals(bookmarkLimited, bookmarkIn)
@@ -152,7 +160,11 @@ class BookmarksSerializationTest {
     val bookmarkIn =
       SerializedBookmarks.parseBookmarkFromString(
         text = bookmarkText,
-        fallbackValues = SerializedBookmarkFallbackValues(kind = BookmarkKind.BookmarkLastReadLocation)
+        fallbackValues = SerializedBookmarkFallbackValues(
+          kind = BookmarkKind.BookmarkLastReadLocation,
+          bookOPDSId = "opdsIdOther",
+          bookTitle = "Nonexistent"
+        )
       ) as SerializedBookmark20240424
 
     assertEquals(bookmarkLimited, bookmarkIn)
@@ -331,7 +343,11 @@ class BookmarksSerializationTest {
     val bookmark =
       SerializedBookmarks.parseBookmarkFromString(
         textOf("bookmark-20210317-r1-0.json"),
-        fallbackValues = SerializedBookmarkFallbackValues(kind = BookmarkKind.BookmarkLastReadLocation)
+        fallbackValues = SerializedBookmarkFallbackValues(
+          kind = BookmarkKind.BookmarkLastReadLocation,
+          bookOPDSId = "opdsIdOther",
+          bookTitle = "Nonexistent"
+        )
       )
 
     assertEquals("urn:isbn:9781683607144", bookmark.opdsId)
@@ -342,7 +358,11 @@ class BookmarksSerializationTest {
     val bookmark =
       SerializedBookmarks.parseBookmarkFromString(
         textOf("bookmark-20210317-r2-0.json"),
-        fallbackValues = SerializedBookmarkFallbackValues(kind = BookmarkKind.BookmarkLastReadLocation)
+        fallbackValues = SerializedBookmarkFallbackValues(
+          kind = BookmarkKind.BookmarkLastReadLocation,
+          bookOPDSId = "opdsIdOther",
+          bookTitle = "Nonexistent"
+        )
       )
 
     assertEquals("urn:isbn:9781683607144", bookmark.opdsId)
@@ -353,7 +373,11 @@ class BookmarksSerializationTest {
     val bookmark =
       SerializedBookmarks.parseBookmarkFromString(
         textOf("bookmark-20210317-r2-1.json"),
-        fallbackValues = SerializedBookmarkFallbackValues(kind = BookmarkKind.BookmarkLastReadLocation)
+        fallbackValues = SerializedBookmarkFallbackValues(
+          kind = BookmarkKind.BookmarkLastReadLocation,
+          bookOPDSId = "opdsIdOther",
+          bookTitle = "Nonexistent"
+        )
       )
 
     assertEquals("urn:uuid:808b2d99-c286-499a-91a1-580afc4c563f", bookmark.opdsId)
@@ -364,7 +388,11 @@ class BookmarksSerializationTest {
     val bookmark =
       SerializedBookmarks.parseBookmarkFromString(
         textOf("bookmark-legacy-r1-0.json"),
-        fallbackValues = SerializedBookmarkFallbackValues(kind = BookmarkKind.BookmarkLastReadLocation)
+        fallbackValues = SerializedBookmarkFallbackValues(
+          kind = BookmarkKind.BookmarkLastReadLocation,
+          bookOPDSId = "opdsIdOther",
+          bookTitle = "Nonexistent"
+        )
       )
 
     assertEquals("urn:isbn:9781683607144", bookmark.opdsId)
@@ -375,10 +403,59 @@ class BookmarksSerializationTest {
     val bookmark =
       SerializedBookmarks.parseBookmarkFromString(
         textOf("bookmark-legacy-r1-1.json"),
-        fallbackValues = SerializedBookmarkFallbackValues(kind = BookmarkKind.BookmarkLastReadLocation)
+        fallbackValues = SerializedBookmarkFallbackValues(
+          kind = BookmarkKind.BookmarkLastReadLocation,
+          bookOPDSId = "opdsIdOther",
+          bookTitle = "Nonexistent"
+        )
       )
 
     assertEquals("urn:isbn:9781683606123", bookmark.opdsId)
+  }
+
+  @Test
+  fun testParseLegacyAudiobookLocator1() {
+    val bookmark =
+      SerializedBookmarks.parseBookmarkFromString(
+        textOf("last-read-location-20240508-1.json"),
+        fallbackValues = SerializedBookmarkFallbackValues(
+          kind = BookmarkKind.BookmarkLastReadLocation,
+          bookOPDSId = "opdsIdOther",
+          bookTitle = "Nonexistent"
+        )
+      )
+
+    assertEquals("opdsIdOther", bookmark.opdsId)
+  }
+
+  @Test
+  fun testParseLegacyAudiobookLocator2() {
+    val bookmark =
+      SerializedBookmarks.parseBookmarkFromString(
+        textOf("last-read-location-20240508-2.json"),
+        fallbackValues = SerializedBookmarkFallbackValues(
+          kind = BookmarkKind.BookmarkLastReadLocation,
+          bookOPDSId = "opdsIdOther",
+          bookTitle = "Nonexistent"
+        )
+      )
+
+    assertEquals("opdsIdOther", bookmark.opdsId)
+  }
+
+  @Test
+  fun testParseLegacyAudiobookLocator3() {
+    val bookmark =
+      SerializedBookmarks.parseBookmarkFromString(
+        textOf("last-read-location-20240508-3.json"),
+        fallbackValues = SerializedBookmarkFallbackValues(
+          kind = BookmarkKind.BookmarkLastReadLocation,
+          bookOPDSId = "opdsIdOther",
+          bookTitle = "Nonexistent"
+        )
+      )
+
+    assertEquals("opdsIdOther", bookmark.opdsId)
   }
 
   private fun textOf(

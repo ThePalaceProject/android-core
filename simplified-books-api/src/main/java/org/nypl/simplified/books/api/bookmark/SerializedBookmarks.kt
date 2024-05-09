@@ -31,19 +31,7 @@ object SerializedBookmarks {
     node: JsonNode,
     fallbackValues: SerializedBookmarkFallbackValues
   ): SerializedBookmark {
-    val type = node["@type"]
-    return if (type != null) {
-      when (type.asText()) {
-        "Bookmark" -> {
-          this.parseBookmarkGuess(node, fallbackValues)
-        }
-        else -> {
-          this.parseBookmarkGuess(node, fallbackValues)
-        }
-      }
-    } else {
-      this.parseBookmarkGuess(node, fallbackValues)
-    }
+    return this.parseBookmarkGuess(node, fallbackValues)
   }
 
   @JvmStatic
@@ -55,6 +43,24 @@ object SerializedBookmarks {
     val version = node["@version"]
     return if (version != null) {
       when (version.asText()) {
+        /*
+         * Old versions of the app serialized raw audiobook locators directly to files instead
+         * of wrapping them in bookmarks. We therefore need to be able to cope with finding them
+         * in book databases.
+         */
+
+        "1",
+        "2",
+        "3" -> {
+          this.parseLegacyAudioBookLocator(node, fallbackValues)
+        }
+
+        /*
+         * Bookmark formats were versioned, and developers ignored the versioning and made
+         * backwards-incompatible changes to the formats without changing version numbers or
+         * documenting the changes in any way. Thanks.
+         */
+
         "20210317" -> {
           this.parseBookmark20210317(node, fallbackValues)
         }
@@ -70,6 +76,41 @@ object SerializedBookmarks {
       }
     } else {
       this.parseBookmarkLegacy(node, fallbackValues)
+    }
+  }
+
+  @JvmStatic
+  @Throws(JSONParseException::class)
+  private fun parseLegacyAudioBookLocator(
+    node: JsonNode,
+    fallbackValues: SerializedBookmarkFallbackValues
+  ): SerializedBookmark {
+    return when (node) {
+      is ObjectNode -> {
+        val locator =
+          LegacyPlayerPositions.parseFromObjectNode(node, fallbackValues)
+
+        SerializedBookmark20240424(
+          bookProgress = 0.0,
+          bookChapterProgress = 0.0,
+          bookChapterTitle = locator.title,
+          bookTitle = fallbackValues.bookTitle,
+          deviceID = "null",
+          kind = fallbackValues.kind,
+          location = locator,
+          opdsId = fallbackValues.bookOPDSId,
+          time = DateTime.now(),
+          uri = null
+        )
+      }
+      else -> {
+        throw JSONParseException(
+          String.format(
+            "Bookmarks can only be parsed from JSON object nodes (received %s)",
+            node.nodeType
+          )
+        )
+      }
     }
   }
 
@@ -154,7 +195,7 @@ object SerializedBookmarks {
           bookChapterProgress = 0.0,
           bookChapterTitle = bookChapterTitle,
           bookProgress = bookProgress,
-          bookTitle = "",
+          bookTitle = fallbackValues.bookTitle,
           deviceID = deviceID,
           kind = BookmarkKind.BookmarkExplicit,
           location = SerializedLocators.parseLocator(node.get("location")),
@@ -204,7 +245,7 @@ object SerializedBookmarks {
           bookChapterProgress = 0.0,
           bookChapterTitle = bookChapterTitle,
           bookProgress = bookProgress,
-          bookTitle = "",
+          bookTitle = fallbackValues.bookTitle,
           deviceID = deviceID,
           kind = kind,
           location = SerializedLocators.parseLocator(node.get("location")),
@@ -269,7 +310,7 @@ object SerializedBookmarks {
           bookChapterProgress = 0.0,
           bookChapterTitle = bookChapterTitle,
           bookProgress = bookProgress,
-          bookTitle = "",
+          bookTitle = fallbackValues.bookTitle,
           deviceID = deviceID,
           kind = kind,
           location = SerializedLocators.parseLocator(node.get("location")),
@@ -345,5 +386,119 @@ object SerializedBookmarks {
       time = time,
       uri = uri
     )
+  }
+
+  /*
+   * Legacy player position handling of old locators that were haphazardly used as bookmarks.
+   */
+
+  private object LegacyPlayerPositions {
+
+    @Throws(JSONParseException::class)
+    fun parseFromObjectNode(
+      node: ObjectNode,
+      fallbackValues: SerializedBookmarkFallbackValues
+    ): SerializedLocatorAudioBookTime1 {
+      try {
+        val version = JSONParserUtilities.getInteger(node, "@version")
+        when (version) {
+          1 -> {
+            return parseFromObjectNodeV1(node, fallbackValues)
+          }
+          2 -> {
+            return parseFromObjectNodeV2(node, fallbackValues)
+          }
+          3 -> {
+            return parseFromObjectNodeV3(node, fallbackValues)
+          }
+        }
+        throw JSONParseException("Unsupported format version: $version")
+      } catch (e: Exception) {
+        throw JSONParseException(e)
+      }
+    }
+
+    @Throws(JSONParseException::class)
+    private fun parseFromObjectNodeV1(
+      node: ObjectNode,
+      fallbackValues: SerializedBookmarkFallbackValues
+    ): SerializedLocatorAudioBookTime1 {
+      val positionNode =
+        JSONParserUtilities.getObject(node, "position")
+      val chapter =
+        JSONParserUtilities.getInteger(positionNode, "chapter")
+      val part =
+        JSONParserUtilities.getInteger(positionNode, "part")
+      val offsetMilliseconds =
+        JSONParserUtilities.getBigInteger(positionNode, "offsetMilliseconds").toLong()
+      val title =
+        JSONParserUtilities.getStringDefault(positionNode, "title", "")
+
+      return SerializedLocatorAudioBookTime1(
+        title = title,
+        part = part,
+        chapter = chapter,
+        audioBookId = fallbackValues.bookOPDSId,
+        duration = 0L,
+        startOffsetMilliseconds = offsetMilliseconds,
+        timeMilliseconds = offsetMilliseconds
+      )
+    }
+
+    @Throws(JSONParseException::class)
+    private fun parseFromObjectNodeV2(
+      node: ObjectNode,
+      fallbackValues: SerializedBookmarkFallbackValues
+    ): SerializedLocatorAudioBookTime1 {
+      val locationNode =
+        JSONParserUtilities.getObject(node, "location")
+      val chapter =
+        JSONParserUtilities.getInteger(locationNode, "chapter")
+      val part =
+        JSONParserUtilities.getInteger(locationNode, "part")
+      val offsetMilliseconds =
+        JSONParserUtilities.getBigInteger(locationNode, "time").toLong()
+      val title =
+        JSONParserUtilities.getStringDefault(locationNode, "title", "")
+
+      return SerializedLocatorAudioBookTime1(
+        title = title,
+        part = part,
+        chapter = chapter,
+        audioBookId = fallbackValues.bookOPDSId,
+        duration = 0L,
+        startOffsetMilliseconds = offsetMilliseconds,
+        timeMilliseconds = offsetMilliseconds
+      )
+    }
+
+    @Throws(JSONParseException::class)
+    private fun parseFromObjectNodeV3(
+      node: ObjectNode,
+      fallbackValues: SerializedBookmarkFallbackValues
+    ): SerializedLocatorAudioBookTime1 {
+      val locationNode =
+        JSONParserUtilities.getObject(node, "location")
+      val chapter =
+        JSONParserUtilities.getInteger(locationNode, "chapter")
+      val part =
+        JSONParserUtilities.getInteger(locationNode, "part")
+      val startOffset =
+        JSONParserUtilities.getBigInteger(locationNode, "startOffset").toLong()
+      val currentOffset =
+        JSONParserUtilities.getBigInteger(locationNode, "time").toLong()
+      val title =
+        JSONParserUtilities.getStringDefault(locationNode, "title", "")
+
+      return SerializedLocatorAudioBookTime1(
+        title = title,
+        part = part,
+        chapter = chapter,
+        audioBookId = fallbackValues.bookOPDSId,
+        duration = 0L,
+        startOffsetMilliseconds = startOffset,
+        timeMilliseconds = currentOffset
+      )
+    }
   }
 }

@@ -1,0 +1,10 @@
+{
+  "@version": 2,
+  "location": {
+    "chapter": 10,
+    "part": 23,
+    "startOffset": 1000,
+    "time": 3000,
+    "title": "A title"
+  }
+}

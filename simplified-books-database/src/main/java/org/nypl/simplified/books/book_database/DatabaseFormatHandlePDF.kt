@@ -85,7 +85,12 @@ internal class DatabaseFormatHandlePDF internal constructor(
         fileBookmarks = this.fileBookmarks,
         fileLastRead = this.fileLastRead,
         contentType = this.parameters.contentType,
-        drmInfo = this.drmInformationHandle.info
+        drmInfo = this.drmInformationHandle.info,
+        bookmarkFallbackValues = SerializedBookmarkFallbackValues(
+          kind = BookmarkKind.BookmarkExplicit,
+          bookOPDSId = this.parameters.entry.book.entry.id,
+          bookTitle = this.parameters.entry.book.entry.title
+        )
       )
     }
 
@@ -227,12 +232,13 @@ internal class DatabaseFormatHandlePDF internal constructor(
       fileBookmarks: File,
       fileLastRead: File,
       contentType: MIMEType,
-      drmInfo: BookDRMInformation
+      drmInfo: BookDRMInformation,
+      bookmarkFallbackValues: SerializedBookmarkFallbackValues
     ): BookFormat.BookFormatPDF {
       return BookFormat.BookFormatPDF(
-        bookmarks = loadBookmarksIfPresent(objectMapper, fileBookmarks),
+        bookmarks = loadBookmarksIfPresent(objectMapper, fileBookmarks, bookmarkFallbackValues),
         file = if (fileBook.isFile) fileBook else null,
-        lastReadLocation = loadLastReadLocationIfPresent(fileLastRead),
+        lastReadLocation = loadLastReadLocationIfPresent(fileLastRead, bookmarkFallbackValues),
         contentType = contentType,
         drmInformation = drmInfo
       )
@@ -241,12 +247,14 @@ internal class DatabaseFormatHandlePDF internal constructor(
     @Throws(IOException::class)
     private fun loadBookmarksIfPresent(
       objectMapper: ObjectMapper,
-      fileBookmarks: File
+      fileBookmarks: File,
+      bookmarkFallbackValues: SerializedBookmarkFallbackValues
     ): List<SerializedBookmark> {
       return if (fileBookmarks.isFile) {
         loadBookmarks(
           objectMapper = objectMapper,
-          fileBookmarks = fileBookmarks
+          fileBookmarks = fileBookmarks,
+          bookmarkFallbackValues = bookmarkFallbackValues
         )
       } else {
         listOf()
@@ -255,7 +263,8 @@ internal class DatabaseFormatHandlePDF internal constructor(
 
     private fun loadBookmarks(
       objectMapper: ObjectMapper,
-      fileBookmarks: File
+      fileBookmarks: File,
+      bookmarkFallbackValues: SerializedBookmarkFallbackValues
     ): List<SerializedBookmark> {
       val tree =
         objectMapper.readTree(fileBookmarks)
@@ -266,9 +275,8 @@ internal class DatabaseFormatHandlePDF internal constructor(
 
       array.forEach { node ->
         try {
-          val fallbackValues = SerializedBookmarkFallbackValues(
-            kind = BookmarkKind.BookmarkExplicit,
-          )
+          val fallbackValues =
+            bookmarkFallbackValues.copy(kind = BookmarkKind.BookmarkExplicit)
           bookmarks.add(SerializedBookmarks.parseBookmark(node, fallbackValues))
         } catch (exception: JSONParseException) {
           this.logger.debug("Failed to parse bookmark: ", exception)
@@ -279,12 +287,12 @@ internal class DatabaseFormatHandlePDF internal constructor(
 
     @Throws(IOException::class)
     private fun loadLastReadLocation(
-      fileLastRead: File
+      fileLastRead: File,
+      bookmarkFallbackValues: SerializedBookmarkFallbackValues
     ): SerializedBookmark? {
       return try {
-        val fallbackValues = SerializedBookmarkFallbackValues(
-          kind = BookmarkKind.BookmarkLastReadLocation,
-        )
+        val fallbackValues =
+          bookmarkFallbackValues.copy(kind = BookmarkKind.BookmarkLastReadLocation)
         return SerializedBookmarks.parseBookmarkFromString(
           text = FileUtilities.fileReadUTF8(fileLastRead),
           fallbackValues = fallbackValues,
@@ -297,10 +305,11 @@ internal class DatabaseFormatHandlePDF internal constructor(
 
     @Throws(IOException::class)
     private fun loadLastReadLocationIfPresent(
-      fileLastRead: File
+      fileLastRead: File,
+      bookmarkFallbackValues: SerializedBookmarkFallbackValues
     ): SerializedBookmark? {
       return if (fileLastRead.isFile) {
-        loadLastReadLocation(fileLastRead)
+        loadLastReadLocation(fileLastRead, bookmarkFallbackValues)
       } else {
         null
       }
