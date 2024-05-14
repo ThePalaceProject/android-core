@@ -259,6 +259,12 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
         // Nothing yet...
       }
     }
+
+    try {
+      this.timeTrackingService.onPlayerEventReceived(event)
+    } catch (e: Exception) {
+      this.logger.error("Failed to submit event to time tracking service: ", e)
+    }
   }
 
   @UiThread

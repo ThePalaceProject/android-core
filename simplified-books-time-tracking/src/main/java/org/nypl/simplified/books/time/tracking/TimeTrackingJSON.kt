@@ -3,6 +3,7 @@ package org.nypl.simplified.books.time.tracking
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.node.ArrayNode
+import com.fasterxml.jackson.databind.node.MissingNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import org.nypl.simplified.json.core.JSONParserUtilities
 import org.slf4j.LoggerFactory
@@ -115,12 +116,19 @@ object TimeTrackingJSON {
     )
   }
 
-  fun convertBytesToTimeTrackingInfo(bytes: ByteArray): TimeTrackingInfo? {
+  fun convertBytesToTimeTrackingInfo(
+    bytes: ByteArray
+  ): TimeTrackingInfo? {
     return try {
       val mapper = ObjectMapper()
       val node = mapper.readTree(bytes)
 
-      val timeEntriesJSON = JSONParserUtilities.getArray(node as ObjectNode, NODE_TIME_ENTRIES)
+      if (node is MissingNode) {
+        return null
+      }
+
+      val timeEntriesJSON =
+        JSONParserUtilities.getArray(node as ObjectNode, NODE_TIME_ENTRIES)
 
       val timeEntries = timeEntriesJSON.map { entry ->
         TimeTrackingEntry(
