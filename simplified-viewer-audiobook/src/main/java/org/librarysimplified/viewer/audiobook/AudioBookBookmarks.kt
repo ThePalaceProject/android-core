@@ -5,6 +5,7 @@ import org.librarysimplified.audiobook.api.PlayerBookmark
 import org.librarysimplified.audiobook.api.PlayerBookmarkKind
 import org.librarysimplified.audiobook.api.PlayerBookmarkMetadata
 import org.librarysimplified.audiobook.manifest.api.PlayerManifestReadingOrderID
+import org.librarysimplified.audiobook.manifest.api.PlayerMillisecondsReadingOrderItem
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.bookmarks.api.BookmarkServiceUsableType
 import org.nypl.simplified.bookmarks.api.BookmarksForBook
@@ -98,7 +99,7 @@ object AudioBookBookmarks {
       bookProgress = source.metadata.bookProgressEstimate,
       location = SerializedLocatorAudioBookTime2(
         readingOrderItem = source.readingOrderID.text,
-        readingOrderItemOffsetMilliseconds = source.offsetMilliseconds
+        readingOrderItemOffsetMilliseconds = source.offsetMilliseconds.value
       ),
       uri = null
     )
@@ -122,10 +123,16 @@ object AudioBookBookmarks {
             BookmarkKind.BookmarkExplicit -> PlayerBookmarkKind.EXPLICIT
             BookmarkKind.BookmarkLastReadLocation -> PlayerBookmarkKind.LAST_READ
           }
+
+        val readingOrderID =
+          PlayerManifestReadingOrderID(location.readingOrderItem)
+        val offsetMilliseconds =
+          PlayerMillisecondsReadingOrderItem(location.readingOrderItemOffsetMilliseconds)
+
         PlayerBookmark(
           kind = kind,
-          readingOrderID = PlayerManifestReadingOrderID(location.readingOrderItem),
-          offsetMilliseconds = location.readingOrderItemOffsetMilliseconds,
+          readingOrderID = readingOrderID,
+          offsetMilliseconds = offsetMilliseconds,
           metadata = PlayerBookmarkMetadata(
             creationTime = source.time,
             chapterTitle = source.bookChapterTitle,
