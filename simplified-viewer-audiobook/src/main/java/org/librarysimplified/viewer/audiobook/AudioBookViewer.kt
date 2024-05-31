@@ -152,7 +152,8 @@ class AudioBookViewer : ViewerProviderType {
         cacheDir = activity.cacheDir,
         licenseChecks = licenseChecks,
         parserExtensions = parserExtensions,
-        strategy = strategyAdapted
+        strategy = strategyAdapted,
+        bookCredentials = formatAudio.drmInformation.playerCredentials()
       )
     } else {
       AudioBookViewerModel.parameters = null

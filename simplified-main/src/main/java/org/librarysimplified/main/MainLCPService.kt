@@ -3,7 +3,6 @@ package org.librarysimplified.main
 import android.app.Application
 import org.readium.r2.lcp.LcpService
 import org.readium.r2.shared.util.asset.AssetRetriever
-import org.readium.r2.shared.util.downloads.android.AndroidDownloadManager
 import org.readium.r2.shared.util.http.DefaultHttpClient
 
 /**
@@ -29,7 +28,6 @@ object MainLCPService {
     return LcpService(
       context = context,
       assetRetriever = assetRetriever,
-      downloadManager = AndroidDownloadManager(context)
     )
   }
 }

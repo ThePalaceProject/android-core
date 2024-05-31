@@ -62,9 +62,6 @@ import org.nypl.simplified.tests.mocking.MockBundledContentResolver
 import org.nypl.simplified.tests.mocking.MockContentResolver
 import org.nypl.simplified.tests.mocking.MockLCPService
 import org.readium.r2.lcp.LcpService
-import org.readium.r2.shared.util.asset.AssetRetriever
-import org.readium.r2.shared.util.downloads.foreground.ForegroundDownloadManager
-import org.readium.r2.shared.util.http.DefaultHttpClient
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileOutputStream
@@ -250,14 +247,6 @@ class BorrowLCPTest {
     context.services = this.services
     context.lcpService = MockLCPService(
       context = this.androidContext,
-      downloadManager = ForegroundDownloadManager(
-        httpClient = DefaultHttpClient(),
-        downloadsDirectory = this.downloadsDirectory,
-      ),
-      assetRetriever = AssetRetriever(
-        contentResolver = this.androidContentResolver,
-        httpClient = DefaultHttpClient()
-      ),
       publication = if (downloadedFile == null) {
         null
       } else {

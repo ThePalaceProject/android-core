@@ -333,7 +333,9 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
           userAgent = PlayerUserAgent(bookParameters.userAgent),
           manifest = state.manifest,
           fetchAll = true,
-          initialPosition = initialPosition
+          initialPosition = initialPosition,
+          bookFile = bookParameters.file,
+          bookCredentials = bookParameters.drmInfo.playerCredentials()
         )
       }
 

@@ -6,19 +6,15 @@ import org.mockito.Mockito
 import org.readium.r2.lcp.LcpAuthenticating
 import org.readium.r2.lcp.LcpError
 import org.readium.r2.lcp.LcpLicense
-import org.readium.r2.lcp.LcpPublicationRetriever
 import org.readium.r2.lcp.LcpService
+import org.readium.r2.lcp.license.model.LicenseDocument
 import org.readium.r2.shared.publication.protection.ContentProtection
 import org.readium.r2.shared.util.Try
 import org.readium.r2.shared.util.asset.Asset
-import org.readium.r2.shared.util.asset.AssetRetriever
-import org.readium.r2.shared.util.downloads.foreground.ForegroundDownloadManager
 import java.io.File
 
 class MockLCPService(
   val context: Application,
-  val downloadManager: ForegroundDownloadManager,
-  val assetRetriever: AssetRetriever,
   val publication: LcpService.AcquiredPublication? = null
 ) : LcpService {
 
@@ -38,10 +34,24 @@ class MockLCPService(
     }
   }
 
+  override suspend fun acquirePublication(
+    lcpl: ByteArray,
+    onProgress: (Double) -> Unit
+  ): Try<LcpService.AcquiredPublication, LcpError> {
+    TODO()
+  }
+
   override fun contentProtection(
     authentication: LcpAuthenticating
   ): ContentProtection {
     return Mockito.mock(ContentProtection::class.java)
+  }
+
+  override suspend fun injectLicenseDocument(
+    licenseDocument: LicenseDocument,
+    publicationFile: File
+  ): Try<Unit, LcpError> {
+    return Try.success(Unit)
   }
 
   @Deprecated(
@@ -74,13 +84,5 @@ class MockLCPService(
     file: File
   ): Boolean {
     return false
-  }
-
-  override fun publicationRetriever(): LcpPublicationRetriever {
-    return LcpPublicationRetriever(
-      context = this.context,
-      downloadManager = this.downloadManager,
-      assetRetriever = this.assetRetriever
-    )
   }
 }

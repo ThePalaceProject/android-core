@@ -94,9 +94,6 @@ import org.nypl.simplified.tests.mocking.MockBorrowSubtaskDirectory
 import org.nypl.simplified.tests.mocking.MockBundledContentResolver
 import org.nypl.simplified.tests.mocking.MockContentResolver
 import org.nypl.simplified.tests.mocking.MockLCPService
-import org.readium.r2.shared.util.asset.AssetRetriever
-import org.readium.r2.shared.util.downloads.foreground.ForegroundDownloadManager
-import org.readium.r2.shared.util.http.DefaultHttpClient
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URI
@@ -343,15 +340,7 @@ class BorrowTaskTest {
       MockAxisNowService()
     this.lcpService =
       MockLCPService(
-        context = this.androidContext,
-        downloadManager = ForegroundDownloadManager(
-          httpClient = DefaultHttpClient(),
-          downloadsDirectory = this.temporaryDirectory
-        ),
-        assetRetriever = AssetRetriever(
-          contentResolver = this.androidContentResolver,
-          httpClient = DefaultHttpClient()
-        )
+        context = this.androidContext
       )
   }
 

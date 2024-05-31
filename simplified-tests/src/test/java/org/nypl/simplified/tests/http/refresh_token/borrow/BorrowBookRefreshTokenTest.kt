@@ -77,9 +77,6 @@ import org.nypl.simplified.tests.mocking.MockContentResolver
 import org.nypl.simplified.tests.mocking.MockDRMInformationACSHandle
 import org.nypl.simplified.tests.mocking.MockDRMInformationAxisHandle
 import org.nypl.simplified.tests.mocking.MockLCPService
-import org.readium.r2.shared.util.asset.AssetRetriever
-import org.readium.r2.shared.util.downloads.foreground.ForegroundDownloadManager
-import org.readium.r2.shared.util.http.DefaultHttpClient
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayInputStream
 import java.io.File
@@ -170,9 +167,9 @@ class BorrowBookRefreshTokenTest {
     this.bookEvents =
       mutableListOf()
     this.services = MutableServiceDirectory().apply {
-      putService(
-        OPDSFeedParserType::class.java,
-        OPDSFeedParser.newParser(OPDSAcquisitionFeedEntryParser.newParser())
+      this.putService(
+          OPDSFeedParserType::class.java,
+          OPDSFeedParser.newParser(OPDSAcquisitionFeedEntryParser.newParser())
       )
     }
 
@@ -184,7 +181,7 @@ class BorrowBookRefreshTokenTest {
     this.httpClient =
       LSHTTPClients()
         .create(
-          context = androidContext,
+          context = this.androidContext,
           configuration = LSHTTPClientConfiguration(
             applicationName = "simplified-tests",
             applicationVersion = "999.999.0",
@@ -218,7 +215,7 @@ class BorrowBookRefreshTokenTest {
 
     this.context =
       MockBorrowContext(
-        application = androidContext,
+        application = this.androidContext,
         logger = this.logger,
         bookRegistry = this.bookRegistry,
         bundledContent = this.bundledContent,
@@ -334,7 +331,7 @@ class BorrowBookRefreshTokenTest {
 
     Assertions.assertEquals(
       "ghij",
-      (account.loginState.credentials as AccountAuthenticationCredentials.BasicToken)
+      (this.account.loginState.credentials as AccountAuthenticationCredentials.BasicToken)
         .authenticationTokenInfo.accessToken
     )
   }
@@ -343,9 +340,9 @@ class BorrowBookRefreshTokenTest {
   fun testUpdateCredentialsBorrowAxisNow() {
     val axisNowService = MockAxisNowService()
     axisNowService.onFulfill = { token, tempFactory ->
-      val fakeBook = context.temporaryFile().apply { createNewFile() }
-      val fakeLicense = context.temporaryFile().apply { createNewFile() }
-      val fakeUserKey = context.temporaryFile().apply { createNewFile() }
+      val fakeBook = this.context.temporaryFile().apply { this.createNewFile() }
+      val fakeLicense = this.context.temporaryFile().apply { this.createNewFile() }
+      val fakeUserKey = this.context.temporaryFile().apply { this.createNewFile() }
       AxisNowFulfillment(fakeBook, fakeLicense, fakeUserKey)
     }
 
@@ -356,12 +353,12 @@ class BorrowBookRefreshTokenTest {
     bookDatabaseEPUBHandle.drmInformationHandleField = MockDRMInformationAxisHandle()
 
     this.context.axisNowService = axisNowService
-    executeTask(task = BorrowAxisNow.createSubtask())
+    this.executeTask(task = BorrowAxisNow.createSubtask())
   }
 
   @Test
   fun testUpdateCredentialsBorrowDirectDownload() {
-    executeTask(task = BorrowDirectDownload.createSubtask())
+    this.executeTask(task = BorrowDirectDownload.createSubtask())
   }
 
   @Test
@@ -369,34 +366,26 @@ class BorrowBookRefreshTokenTest {
   fun testUpdateCredentialsBorrowLCP() {
     val tempDirPath = this.tempDir!!.toPath()
 
-    bookDatabaseEntry.formatHandlesField.add(
+    this.bookDatabaseEntry.formatHandlesField.add(
       MockBookDatabaseEntryFormatHandleEPUB(
-        bookID,
+        this.bookID,
         Files.createTempDirectory(tempDirPath, "lcpFormatHandleEPUB").toFile()
       ).apply {
-        drmInformationHandleField = BookDRMInformationHandleLCP(
+        this.drmInformationHandleField = BookDRMInformationHandleLCP(
           directory = Files.createTempDirectory(tempDirPath, "lcpDRMInfoEPUB").toFile(),
-          format = formatDefinition,
+          format = this.formatDefinition,
           onUpdate = {}
         )
       }
     )
-    context.lcpService = MockLCPService(
-      context = this.androidContext,
-      downloadManager = ForegroundDownloadManager(
-        httpClient = DefaultHttpClient(),
-        downloadsDirectory = this.downloadsDirectory
-      ),
-      assetRetriever = AssetRetriever(
-        contentResolver = this.androidContentResolver,
-        httpClient = DefaultHttpClient()
-      )
+    this.context.lcpService = MockLCPService(
+      context = this.androidContext
     )
     this.account.setAccountProvider(
       MockAccountProviders.fakeProvider(
         "urn:uuid:ea9480d4-5479-4ef1-b1d1-84ccbedb680f",
-        webServer.hostName,
-        webServer.port
+        this.webServer.hostName,
+        this.webServer.port
       )
     )
 
@@ -414,7 +403,7 @@ class BorrowBookRefreshTokenTest {
       elements = listOf(
         OPDSAcquisitionPathElement(
           mimeType = StandardFormatNames.lcpLicenseFiles,
-          target = webServer.url(licenseTargetPath).toUri(),
+          target = this.webServer.url(licenseTargetPath).toUri(),
           properties = mapOf()
         ),
         OPDSAcquisitionPathElement(
@@ -427,7 +416,7 @@ class BorrowBookRefreshTokenTest {
 
     val book = Book(
       id = BookIDs.newFromOPDSEntry(feedEntry),
-      account = accountID,
+      account = this.accountID,
       cover = null,
       thumbnail = null,
       entry = feedEntry,
@@ -435,24 +424,24 @@ class BorrowBookRefreshTokenTest {
     )
 
     val databaseEntry = MockBookDatabaseEntry(book).apply {
-      formatHandlesField.clear()
-      formatHandlesField.add(
+      this.formatHandlesField.clear()
+      this.formatHandlesField.add(
         MockBookDatabaseEntryFormatHandleEPUB(
           book.id,
           Files.createTempDirectory(tempDirPath, "lcpFormatHandleEPUB").toFile()
         ).apply {
-          drmInformationHandleField = BookDRMInformationHandleLCP(
+          this.drmInformationHandleField = BookDRMInformationHandleLCP(
             directory = Files.createTempDirectory(tempDirPath, "lcpDRMInfoEPUB").toFile(),
-            format = formatDefinition,
+            format = this.formatDefinition,
             onUpdate = {}
           )
         }
       )
     }
 
-    context.bookDatabaseEntry = databaseEntry
-    context.opdsAcquisitionPath = acquisitionPath
-    context.currentAcquisitionPathElement = acquisitionPath.elements.first()
+    this.context.bookDatabaseEntry = databaseEntry
+    this.context.opdsAcquisitionPath = acquisitionPath
+    this.context.currentAcquisitionPathElement = acquisitionPath.elements.first()
 
     // Expect a request for the loans feed to obtain the hashed passphrase for the book.
     val newHashedPassphrase = "b9e3323fb715306bd89fa311b4bc988cce0042fb1d9079d13f41acc10c6ef37a"
@@ -484,7 +473,7 @@ class BorrowBookRefreshTokenTest {
     // Expect a request to the acquisition URL to get the LCP license.
 
     val licensePublicationPath = "/publication/12345"
-    val licensePublicationURL = webServer.url(licensePublicationPath)
+    val licensePublicationURL = this.webServer.url(licensePublicationPath)
 
     val licenseResponse =
       MockResponse()
@@ -564,7 +553,7 @@ class BorrowBookRefreshTokenTest {
     this.webServer.enqueue(downloadResponse)
 
     try {
-      BorrowLCP.createSubtask().execute(context)
+      BorrowLCP.createSubtask().execute(this.context)
       Assertions.fail()
     } catch (e: BorrowSubtaskException.BorrowSubtaskHaltedEarly) {
       this.logger.debug("correctly halted early: ", e)
@@ -572,7 +561,7 @@ class BorrowBookRefreshTokenTest {
 
     Assertions.assertEquals(
       "ghij",
-      (account.loginState.credentials as AccountAuthenticationCredentials.BasicToken)
+      (this.account.loginState.credentials as AccountAuthenticationCredentials.BasicToken)
         .authenticationTokenInfo.accessToken
     )
   }
@@ -612,7 +601,7 @@ class BorrowBookRefreshTokenTest {
 
     Assertions.assertEquals(
       "ghij",
-      (account.loginState.credentials as AccountAuthenticationCredentials.BasicToken)
+      (this.account.loginState.credentials as AccountAuthenticationCredentials.BasicToken)
         .authenticationTokenInfo.accessToken
     )
   }
@@ -636,7 +625,7 @@ class BorrowBookRefreshTokenTest {
 
     Assertions.assertEquals(
       "ghij",
-      (account.loginState.credentials as AccountAuthenticationCredentials.BasicToken)
+      (this.account.loginState.credentials as AccountAuthenticationCredentials.BasicToken)
         .authenticationTokenInfo.accessToken
     )
   }

@@ -1,5 +1,8 @@
 package org.nypl.simplified.books.api
 
+import org.librarysimplified.audiobook.api.PlayerBookCredentialsLCP
+import org.librarysimplified.audiobook.api.PlayerBookCredentialsNone
+import org.librarysimplified.audiobook.api.PlayerBookCredentialsType
 import org.nypl.drm.core.AdobeAdeptLoan
 import java.io.File
 import java.io.Serializable
@@ -10,6 +13,12 @@ import java.io.Serializable
  */
 
 sealed class BookDRMInformation : Serializable {
+
+  /**
+   * Derive audiobook player credentials from this DRM information.
+   */
+
+  abstract fun playerCredentials(): PlayerBookCredentialsType
 
   /**
    * The kind of DRM
@@ -35,6 +44,10 @@ sealed class BookDRMInformation : Serializable {
 
     val rights: Pair<File, AdobeAdeptLoan>?
   ) : BookDRMInformation() {
+    override fun playerCredentials(): PlayerBookCredentialsType {
+      return PlayerBookCredentialsNone
+    }
+
     override val kind: BookDRMKind = BookDRMKind.ACS
   }
 
@@ -50,6 +63,14 @@ sealed class BookDRMInformation : Serializable {
 
     val hashedPassphrase: String?
   ) : BookDRMInformation() {
+    override fun playerCredentials(): PlayerBookCredentialsType {
+      return if (this.hashedPassphrase != null) {
+        PlayerBookCredentialsLCP(this.hashedPassphrase)
+      } else {
+        PlayerBookCredentialsNone
+      }
+    }
+
     override val kind: BookDRMKind = BookDRMKind.LCP
   }
 
@@ -72,6 +93,10 @@ sealed class BookDRMInformation : Serializable {
 
     val userKey: File?
   ) : BookDRMInformation() {
+    override fun playerCredentials(): PlayerBookCredentialsType {
+      return PlayerBookCredentialsNone
+    }
+
     override val kind: BookDRMKind = BookDRMKind.AXIS
   }
 
@@ -81,6 +106,10 @@ sealed class BookDRMInformation : Serializable {
    */
 
   data object None : BookDRMInformation() {
+    override fun playerCredentials(): PlayerBookCredentialsType {
+      return PlayerBookCredentialsNone
+    }
+
     override val kind: BookDRMKind = BookDRMKind.NONE
   }
 }

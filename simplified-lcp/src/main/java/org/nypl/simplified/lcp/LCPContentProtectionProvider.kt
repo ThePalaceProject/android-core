@@ -13,7 +13,6 @@ import org.readium.r2.lcp.LcpAuthenticating
 import org.readium.r2.lcp.LcpService
 import org.readium.r2.shared.publication.protection.ContentProtection
 import org.readium.r2.shared.util.asset.AssetRetriever
-import org.readium.r2.shared.util.downloads.foreground.ForegroundDownloadManager
 import org.readium.r2.shared.util.http.DefaultHttpClient
 import org.slf4j.LoggerFactory
 import kotlin.coroutines.resume
@@ -118,17 +117,10 @@ class LCPContentProtectionProvider : ContentProtectionProvider {
         httpClient = httpClient,
       )
 
-    val downloadManager =
-      ForegroundDownloadManager(
-        httpClient = httpClient,
-        downloadsDirectory = context.cacheDir
-      )
-
     val lcpService =
       LcpService(
         context = context,
-        assetRetriever = assetRetriever,
-        downloadManager = downloadManager
+        assetRetriever = assetRetriever
       )
 
     return if (lcpService == null) {
