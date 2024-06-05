@@ -13,6 +13,7 @@ import com.io7m.jfunctional.Some
 import io.reactivex.disposables.CompositeDisposable
 import org.librarysimplified.audiobook.api.PlayerBookmark
 import org.librarysimplified.audiobook.api.PlayerBookmarkKind
+import org.librarysimplified.audiobook.api.PlayerDownloadTaskStatus
 import org.librarysimplified.audiobook.api.PlayerEvent
 import org.librarysimplified.audiobook.api.PlayerEvent.PlayerAccessibilityEvent.PlayerAccessibilityChapterSelected
 import org.librarysimplified.audiobook.api.PlayerEvent.PlayerAccessibilityEvent.PlayerAccessibilityErrorOccurred
@@ -126,6 +127,10 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
             this.switchFragment(PlayerFragment())
           }
         }
+      }
+
+      is ErrorPageFragment -> {
+        this.switchFragment(PlayerTOCFragment())
       }
 
       else -> {
@@ -516,7 +521,31 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       PlayerViewCommand.PlayerViewNavigationCloseAll -> {
         this.close()
       }
+
+      PlayerViewCommand.PlayerViewErrorsDownloadOpen -> {
+        this.onOpenDownloadErrors()
+      }
     }
+  }
+
+  private fun onOpenDownloadErrors() {
+    val task = TaskRecorder.create()
+    task.beginNewStep("Downloading book chapters…")
+
+    try {
+      val book = PlayerModel.book()
+      for (e in book.downloadTasks) {
+        val status = e.status
+        if (status is PlayerDownloadTaskStatus.Failed) {
+          task.beginNewStep("Downloading ${e.playbackURI}...")
+          task.currentStepFailed(status.message, "error-download", status.exception)
+        }
+      }
+    } catch (e: Exception) {
+      // Nothing to do
+    }
+
+    this.openErrorPage(task.finishFailure<String>())
   }
 
   private fun switchFragment(

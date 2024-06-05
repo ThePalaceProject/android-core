@@ -54,7 +54,7 @@ class ErrorPageFragment : Fragment(R.layout.error_page) {
   private lateinit var errorStepsList: RecyclerView
   private lateinit var parameters: ErrorPageParameters
   private lateinit var sendButton: Button
-  private lateinit var toolbar: PalaceToolbar
+  private var toolbar: PalaceToolbar? = null
 
   private val listener: FragmentListenerType<ErrorPageEvent> by fragmentListeners()
 
@@ -122,13 +122,12 @@ class ErrorPageFragment : Fragment(R.layout.error_page) {
 
   private fun configureToolbar() {
     val actionBar = this.supportActionBar ?: return
-
     actionBar.show()
     actionBar.setDisplayHomeAsUpEnabled(true)
     actionBar.setHomeActionContentDescription(null)
     actionBar.setTitle(getString(R.string.errorDetailsTitle))
 
-    this.toolbar.setLogoOnClickListener {
+    this.toolbar?.setLogoOnClickListener {
       try {
         this.listener.post(ErrorPageEvent.GoUpwards)
       } catch (e: Exception) {

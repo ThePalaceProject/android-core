@@ -522,7 +522,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2024-05-31T09:28:32+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.13.0">
+    <c:release date="2024-06-05T19:03:47+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.13.0">
       <c:changes>
         <c:change date="2024-05-03T00:00:00+00:00" summary="Integrate the new audiobook player components.">
           <c:tickets>
@@ -534,7 +534,12 @@
         </c:change>
         <c:change date="2024-05-31T00:00:00+00:00" summary="Require APK 26 (Android 8.0)"/>
         <c:change date="2024-05-31T00:00:00+00:00" summary="Upgrade to R2 3.0.0-beta.1."/>
-        <c:change date="2024-05-31T09:28:32+00:00" summary="Upgrade to liblcp-4.1.0."/>
+        <c:change date="2024-05-31T00:00:00+00:00" summary="Upgrade to liblcp-4.1.0."/>
+        <c:change date="2024-06-05T19:03:47+00:00" summary="Implement the new audiobooks TOC.">
+          <c:tickets>
+            <c:ticket id="PP-1301"/>
+          </c:tickets>
+        </c:change>
       </c:changes>
     </c:release>
   </c:releases>
