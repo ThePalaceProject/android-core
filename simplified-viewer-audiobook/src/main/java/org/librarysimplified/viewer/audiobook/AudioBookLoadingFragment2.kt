@@ -32,6 +32,7 @@ class AudioBookLoadingFragment2 : Fragment(R.layout.audio_book_player_loading) {
       layout.findViewById(R.id.progressBar)
 
     this.progressBar.isIndeterminate = true
+    this.progressText.visibility = View.INVISIBLE
     return layout
   }
 
