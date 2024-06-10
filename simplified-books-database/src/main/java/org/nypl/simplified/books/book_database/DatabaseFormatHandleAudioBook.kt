@@ -147,23 +147,6 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
   }
 
   override fun deleteBookData() {
-    val newFormat = synchronized(this.dataLock) {
-      FileUtilities.fileDelete(this.filePosition)
-
-      if (this.fileBook.isDirectory) {
-        DirectoryUtilities.directoryDelete(this.fileBook)
-      } else {
-        FileUtilities.fileDelete(this.fileBook)
-      }
-
-      this.formatRef = this.formatRef.copy(
-        file = null,
-        lastReadLocation = null
-      )
-
-      this.formatRef
-    }
-
     val briefID = this.parameters.bookID.brief()
 
     this.log.debug("[{}]: deleting audio book data", briefID)
@@ -237,11 +220,25 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
         }
       }
     } catch (ex: Exception) {
-      this.log.error("[{}]: failed to delete audio book: ", briefID, ex)
-      throw ex
+      this.log.error("[{}]: Problem deleting audio book: ", briefID, ex)
     }
 
-    this.parameters.onUpdated.invoke(newFormat)
+    this.parameters.onUpdated.invoke(synchronized(dataLock) {
+      FileUtilities.fileDelete(filePosition)
+
+      if (fileBook.isDirectory) {
+        DirectoryUtilities.directoryDelete(fileBook)
+      } else {
+        FileUtilities.fileDelete(fileBook)
+      }
+
+      formatRef = formatRef.copy(
+        file = null,
+        lastReadLocation = null
+      )
+
+      formatRef
+    })
   }
 
   override fun deleteBookmark(bookmarkId: BookmarkID) {
