@@ -7,6 +7,7 @@ import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import android.os.StrictMode.VmPolicy
 import io.reactivex.Observable
+import org.librarysimplified.audiobook.views.PlayerModel
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.nypl.simplified.boot.api.BootEvent
 import org.nypl.simplified.boot.api.BootLoader
@@ -45,6 +46,7 @@ class MainApplication : Application() {
     this.configureStrictMode()
     this.logStartup()
     MainTransifex.configure(this.applicationContext)
+    PlayerModel.start(this)
 
     INSTANCE = this
     if (UIMigration.isRunningNewUI(this.applicationContext)) {
