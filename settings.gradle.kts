@@ -25,6 +25,9 @@ fun propertyBooleanOptional(name: String, defaultValue: Boolean): Boolean {
     return value.toBooleanStrict()
 }
 
+val sandbox =
+    propertyBooleanOptional("org.thepalaceproject.build.sandboxEnabled", false)
+
 val adobeDRM =
     propertyBooleanOptional("org.thepalaceproject.adobeDRM.enabled", false)
 val lcpDRM =
@@ -323,3 +326,7 @@ include(":simplified-viewer-pdf-pdfjs")
 include(":simplified-viewer-preview")
 include(":simplified-viewer-spi")
 include(":simplified-webview")
+
+if (sandbox) {
+    include(":simplified-sandbox")
+}

@@ -17,6 +17,7 @@ dependencies {
     implementation(libs.androidx.core.common)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.core.runtime)
+    implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.cursoradapter)
     implementation(libs.androidx.customview)
     implementation(libs.androidx.customview.poolingcontainer)
@@ -77,4 +78,10 @@ dependencies {
     implementation(libs.google.material)
     implementation(libs.kotlin.stdlib)
     implementation(libs.palace.theme)
+    implementation(libs.io7m.jfunctional)
+
+    implementation(project(":simplified-books-covers"))
+    implementation(project(":simplified-feeds-api"))
+    implementation(project(":simplified-opds-core"))
+    implementation(project(":simplified-ui-catalog"))
 }

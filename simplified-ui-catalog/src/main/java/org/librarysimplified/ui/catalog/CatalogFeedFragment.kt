@@ -19,6 +19,7 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.Space
 import android.widget.TextView
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SearchView
 import androidx.core.os.bundleOf
@@ -30,6 +31,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.catalog.CatalogFeedOwnership.CollectedFromAccounts
@@ -60,6 +63,7 @@ import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.slf4j.LoggerFactory
 import org.thepalaceproject.theme.core.PalaceTabButtons
 import org.thepalaceproject.theme.core.PalaceToolbar
+import java.util.Locale
 
 /**
  * A fragment displaying an OPDS feed.
@@ -81,7 +85,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
 
     fun create(parameters: CatalogFeedArguments): CatalogFeedFragment {
       val fragment = CatalogFeedFragment()
-      fragment.arguments = bundleOf(PARAMETERS_ID to parameters)
+      fragment.arguments = bundleOf(this.PARAMETERS_ID to parameters)
       return fragment
     }
   }
@@ -89,26 +93,26 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
   private val logger = LoggerFactory.getLogger(CatalogFeedFragment::class.java)
 
   private val parameters: CatalogFeedArguments by lazy {
-    this.requireArguments()[PARAMETERS_ID] as CatalogFeedArguments
+    this.requireArguments()[org.librarysimplified.ui.catalog.CatalogFeedFragment.Companion.PARAMETERS_ID] as CatalogFeedArguments
   }
 
   private val services =
     Services.serviceDirectory()
 
-  private val listener: FragmentListenerType<CatalogFeedEvent> by fragmentListeners()
+  private val listener: FragmentListenerType<CatalogFeedEvent> by this.fragmentListeners()
 
-  private val borrowViewModel: CatalogBorrowViewModel by viewModels(
+  private val borrowViewModel: CatalogBorrowViewModel by this.viewModels(
     factoryProducer = {
-      CatalogBorrowViewModelFactory(services)
+      CatalogBorrowViewModelFactory(this.services)
     }
   )
 
-  private val viewModel: CatalogFeedViewModel by viewModels(
+  private val viewModel: CatalogFeedViewModel by this.viewModels(
     factoryProducer = {
       CatalogFeedViewModelFactory(
         application = this.requireActivity().application,
         services = Services.serviceDirectory(),
-        borrowViewModel = borrowViewModel,
+        borrowViewModel = this.borrowViewModel,
         feedArguments = this.parameters,
         listener = this.listener
       )
@@ -116,32 +120,32 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
   )
 
   private val bookCovers =
-    services.requireService(BookCoverProviderType::class.java)
+    this.services.requireService(BookCoverProviderType::class.java)
   private val screenInformation =
-    services.requireService(ScreenSizeInformationType::class.java)
+    this.services.requireService(ScreenSizeInformationType::class.java)
   private val configurationService =
-    services.requireService(BuildConfigurationServiceType::class.java)
+    this.services.requireService(BuildConfigurationServiceType::class.java)
   private val profilesController =
-    services.requireService(ProfilesControllerType::class.java)
+    this.services.requireService(ProfilesControllerType::class.java)
   private val imageLoader =
-    services.requireService(ImageLoaderType::class.java)
+    this.services.requireService(ImageLoaderType::class.java)
 
   private lateinit var buttonCreator: CatalogButtons
   private lateinit var feedContent: ViewGroup
+  private lateinit var feedContentFacetDialogOpen: Chip
+  private lateinit var feedContentFacetsChipGroup: ChipGroup
+  private lateinit var feedContentHeader: ViewGroup
+  private lateinit var feedContentLogoHeader: ViewGroup
+  private lateinit var feedContentLogoImage: ImageView
+  private lateinit var feedContentLogoText: TextView
+  private lateinit var feedContentRefresh: SwipeRefreshLayout
+  private lateinit var feedContentTabs: RadioGroup
+  private lateinit var feedEmptyMessage: TextView
   private lateinit var feedError: ViewGroup
   private lateinit var feedErrorDetails: Button
   private lateinit var feedErrorRetry: Button
   private lateinit var feedLoading: ViewGroup
   private lateinit var feedNavigation: ViewGroup
-  private lateinit var feedContentFacets: LinearLayout
-  private lateinit var feedContentFacetsScroll: ViewGroup
-  private lateinit var feedContentHeader: ViewGroup
-  private lateinit var feedContentLogoHeader: ViewGroup
-  private lateinit var feedContentLogoImage: ImageView
-  private lateinit var feedContentLogoText: TextView
-  private lateinit var feedEmptyMessage: TextView
-  private lateinit var feedContentTabs: RadioGroup
-  private lateinit var feedContentRefresh: SwipeRefreshLayout
   private lateinit var feedWithGroupsAdapter: CatalogFeedWithGroupsAdapter
   private lateinit var feedWithGroupsList: RecyclerView
   private lateinit var feedWithoutGroupsAdapter: CatalogPagedAdapter
@@ -154,10 +158,10 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setHasOptionsMenu(true)
+    this.setHasOptionsMenu(true)
 
     this.ageGateDialog =
-      childFragmentManager.findFragmentByTag(AGE_GATE_DIALOG_TAG) as? DialogFragment
+      this.childFragmentManager.findFragmentByTag(org.librarysimplified.ui.catalog.CatalogFeedFragment.Companion.AGE_GATE_DIALOG_TAG) as? DialogFragment
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -184,15 +188,15 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
       view.findViewById(R.id.feedContentHeader)
     this.feedContentRefresh =
       view.findViewById(R.id.feedContentRefresh)
-    this.feedContentFacetsScroll =
-      this.feedContentHeader.findViewById(R.id.feedHeaderFacetsScroll)
+    this.feedContentFacetsChipGroup =
+      this.feedContentHeader.findViewById(R.id.feedHeaderFacetsChipGroup)
     this.feedEmptyMessage =
       this.feedContent.findViewById(R.id.feedEmptyMessage)
 
-    if (parameters is CatalogFeedArguments.CatalogFeedArgumentsLocalBooks) {
+    if (this.parameters is CatalogFeedArguments.CatalogFeedArgumentsLocalBooks) {
       this.feedEmptyMessage.setText(
         if (
-          (parameters as CatalogFeedArguments.CatalogFeedArgumentsLocalBooks).selection ==
+          (this.parameters as CatalogFeedArguments.CatalogFeedArgumentsLocalBooks).selection ==
           FeedBooksSelection.BOOKS_FEED_HOLDS
         ) {
           R.string.feedWithGroupsEmptyHolds
@@ -202,8 +206,11 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
       )
     }
 
-    this.feedContentFacets =
-      this.feedContentHeader.findViewById(R.id.feedHeaderFacets)
+    this.feedContentFacetDialogOpen =
+      this.feedContentHeader.findViewById(R.id.feedHeaderFacetsChipDialogOpen)
+
+    this.feedContentFacetsChipGroup =
+      this.feedContentHeader.findViewById(R.id.feedHeaderFacetsChipGroup)
     this.feedContentTabs =
       this.feedContentHeader.findViewById(R.id.feedHeaderTabs)
 
@@ -296,17 +303,17 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
 
     searchView.imeOptions = EditorInfo.IME_ACTION_DONE
     searchView.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_WORDS
-    searchView.queryHint = getString(R.string.catalogSearch)
-    searchView.maxWidth = toolbar.getAvailableWidthForSearchView()
+    searchView.queryHint = this.getString(R.string.catalogSearch)
+    searchView.maxWidth = this.toolbar.getAvailableWidthForSearchView()
 
-    val currentQuery = when (parameters) {
+    val currentQuery = when (this.parameters) {
       is CatalogFeedArguments.CatalogFeedArgumentsLocalBooks -> {
-        (parameters as CatalogFeedArguments.CatalogFeedArgumentsLocalBooks).searchTerms.orEmpty()
+        (this.parameters as CatalogFeedArguments.CatalogFeedArgumentsLocalBooks).searchTerms.orEmpty()
       }
       is CatalogFeedArguments.CatalogFeedArgumentsRemote -> {
         val uri =
           Uri.parse(
-            (parameters as CatalogFeedArguments.CatalogFeedArgumentsRemote).feedURI.toString()
+            (this.parameters as CatalogFeedArguments.CatalogFeedArgumentsRemote).feedURI.toString()
           )
         uri.getQueryParameter("q").orEmpty()
       }
@@ -458,7 +465,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
 
     this.feedWithoutGroupsAdapter =
       CatalogPagedAdapter(
-        context = requireActivity(),
+        context = this.requireActivity(),
         listener = this.viewModel,
         buttonCreator = this.buttonCreator,
         bookCovers = this.bookCovers,
@@ -507,10 +514,10 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
           loader = this.imageLoader.loader,
           account = account.provider.toDescription(),
           defaultIcon = R.drawable.account_default,
-          iconView = feedContentLogoImage
+          iconView = this.feedContentLogoImage
         )
 
-        feedContentLogoText.text = account.provider.displayName
+        this.feedContentLogoText.text = account.provider.displayName
       } catch (e: Exception) {
         this.logger.debug("error configuring header: ", e)
       }
@@ -614,7 +621,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
               currentId = ownership.accountId,
               showAddAccount = this.configurationService.allowAccountsAccess
             )
-          dialog.show(parentFragmentManager, dialog.tag)
+          dialog.show(this.parentFragmentManager, dialog.tag)
         }
         CollectedFromAccounts -> {
           throw IllegalStateException("Can't switch account from collected feed!")
@@ -625,16 +632,26 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
     }
   }
 
+  private val ignoredFacets =
+    setOf("COLLECTION", "COLLECTION NAME")
+
   private fun configureFacets(
     facetsByGroup: Map<String, List<FeedFacet>>,
     sortFacets: Boolean
   ) {
+    CatalogFacetModel.setFacets(facetsByGroup, this.viewModel::openFacet)
+
+    this.feedContentFacetDialogOpen.setOnClickListener {
+      val dialog = CatalogFacetDialog()
+      dialog.show(this.parentFragmentManager, "FACET_SELECTION")
+    }
+
     /*
      * If the facet groups are empty, hide the header entirely.
      */
 
     if (facetsByGroup.isEmpty()) {
-      feedContentHeader.visibility = View.GONE
+      this.feedContentHeader.visibility = View.GONE
       return
     }
 
@@ -643,7 +660,9 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
      * the tab layout entirely.
      */
 
-    this.configureFacetTabs(FeedFacets.findEntryPointFacetGroup(facetsByGroup), feedContentTabs)
+    this.configureFacetTabs(FeedFacets.findEntryPointFacetGroup(facetsByGroup),
+      this.feedContentTabs
+    )
 
     /*
      * Otherwise, for each remaining non-entrypoint facet group, show a drop-down menu allowing
@@ -652,93 +671,26 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
      */
 
     val remainingGroups = facetsByGroup
-      .filter { entry ->
-        /*
-         * SIMPLY-2923: Hide the 'Collection' Facet until approved by UX.
-         */
-        entry.key != "Collection"
-      }
-      .filter { entry ->
-        !FeedFacets.facetGroupIsEntryPointTyped(entry.value)
-      }
+      .filter { entry -> !this.ignoredFacets.contains(entry.key.uppercase(Locale.ROOT)) }
+      .filter { entry -> !FeedFacets.facetGroupIsEntryPointTyped(entry.value) }
 
     if (remainingGroups.isEmpty()) {
-      feedContentFacetsScroll.visibility = View.GONE
+      this.feedContentFacetsChipGroup.visibility = View.GONE
       return
     }
 
-    val buttonLayoutParams =
-      LinearLayout.LayoutParams(
-        LinearLayout.LayoutParams.WRAP_CONTENT,
-        LinearLayout.LayoutParams.WRAP_CONTENT
+    for (facet in remainingGroups.keys) {
+      val chip = Chip(this.context)
+      chip.text = facet
+      chip.isCloseIconVisible = false
+      chip.isCheckable = false
+      chip.chipIconSize = this.screenInformation.dpToPixels(12).toFloat()
+      chip.chipIcon = AppCompatResources.getDrawable(
+        this.requireContext(),
+        org.thepalaceproject.theme.core.R.drawable.palace_facet_chip_select
       )
-
-    val textLayoutParams =
-      LinearLayout.LayoutParams(
-        LinearLayout.LayoutParams.WRAP_CONTENT,
-        LinearLayout.LayoutParams.WRAP_CONTENT
-      )
-
-    textLayoutParams.gravity = Gravity.END or Gravity.CENTER_VERTICAL
-
-    val spacerLayoutParams =
-      LinearLayout.LayoutParams(
-        this.screenInformation.dpToPixels(8).toInt(),
-        LinearLayout.LayoutParams.MATCH_PARENT
-      )
-
-    val sortedNames = if (sortFacets) {
-      remainingGroups.keys.sorted()
-    } else {
-      remainingGroups.keys
+      this.feedContentFacetsChipGroup.addView(chip)
     }
-    val context = this.requireContext()
-
-    feedContentFacets.removeAllViews()
-    sortedNames.forEach { groupName ->
-      val group = remainingGroups.getValue(groupName)
-      if (FeedFacets.facetGroupIsEntryPointTyped(group)) {
-        return@forEach
-      }
-
-      val button = MaterialButton(context)
-      val buttonLabel = AppCompatTextView(context)
-      val spaceStart = Space(context)
-      val spaceMiddle = Space(context)
-      val spaceEnd = Space(context)
-
-      val active =
-        group.find { facet -> facet.isActive }
-          ?: group.firstOrNull()
-
-      button.id = View.generateViewId()
-      button.layoutParams = buttonLayoutParams
-      button.text = active?.title
-      button.ellipsize = TextUtils.TruncateAt.END
-      button.setOnClickListener {
-        this.showFacetSelectDialog(groupName, group)
-      }
-
-      spaceStart.layoutParams = spacerLayoutParams
-      spaceMiddle.layoutParams = spacerLayoutParams
-      spaceEnd.layoutParams = spacerLayoutParams
-
-      buttonLabel.layoutParams = textLayoutParams
-      buttonLabel.text = "$groupName: "
-      buttonLabel.labelFor = button.id
-      buttonLabel.maxLines = 1
-      buttonLabel.ellipsize = TextUtils.TruncateAt.END
-      buttonLabel.textAlignment = TEXT_ALIGNMENT_TEXT_END
-      buttonLabel.gravity = Gravity.END or Gravity.CENTER_VERTICAL
-
-      feedContentFacets.addView(spaceStart)
-      feedContentFacets.addView(buttonLabel)
-      feedContentFacets.addView(spaceMiddle)
-      feedContentFacets.addView(button)
-      feedContentFacets.addView(spaceEnd)
-    }
-
-    feedContentFacetsScroll.scrollTo(0, 0)
   }
 
   private fun configureFacetTabs(
@@ -761,7 +713,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
       button.setOnClickListener {
         this.logger.debug("selected entry point facet: {}", facet.title)
         this.viewModel.openFacet(facet)
-        updateSelectedFacet(facetTabs = facetTabs, index = index)
+        this.updateSelectedFacet(facetTabs = facetTabs, index = index)
       }
     }
 
@@ -819,7 +771,10 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
     }
 
     val ageGate = AgeGateDialog.create()
-    ageGate.show(childFragmentManager, AGE_GATE_DIALOG_TAG)
+    ageGate.show(
+      this.childFragmentManager,
+      org.librarysimplified.ui.catalog.CatalogFeedFragment.Companion.AGE_GATE_DIALOG_TAG
+    )
     this.ageGateDialog = ageGate
   }
 

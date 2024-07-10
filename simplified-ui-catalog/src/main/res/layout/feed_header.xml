@@ -17,70 +17,31 @@
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent" />
 
-  <HorizontalScrollView
-    android:id="@+id/feedHeaderFacetsScroll"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="16dp"
-    android:scrollbarAlwaysDrawHorizontalTrack="false"
-    android:scrollbarAlwaysDrawVerticalTrack="false"
-    android:scrollbars="none"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/feedHeaderTabs">
+  <com.google.android.material.chip.ChipGroup
+      android:id="@+id/feedHeaderFacetsChipGroup"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:isScrollContainer="true"
+      android:layout_marginStart="16dp"
+      android:layout_marginTop="16dp"
+      android:layout_marginEnd="16dp"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/feedHeaderTabs">
 
-    <LinearLayout
-      android:id="@+id/feedHeaderFacets"
-      android:layout_width="wrap_content"
-      android:layout_height="48dp"
-      android:layout_gravity="start"
-      android:gravity="start|center_vertical"
-      android:orientation="horizontal">
+    <com.google.android.material.chip.Chip
+        android:id="@+id/feedHeaderFacetsChipDialogOpen"
+        app:chipIconEnabled="true"
+        app:chipIcon="@drawable/palace_facet_chip_select"
+        app:chipIconSize="12dp"
+        app:checkedIconEnabled="false"
+        app:closeIconEnabled="false"
+        app:textStartPadding="0dp"
+        app:textEndPadding="0dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp" />
 
-      <!-- These views are removed at runtime and are just present for the sake of the UI editor preview -->
-
-      <Space
-        android:layout_width="16dp"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        tools:visibility="visible" />
-
-      <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        tools:text="Placeholder"
-        tools:visibility="visible" />
-
-      <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        tools:text="Placeholder"
-        tools:visibility="visible" />
-
-      <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        tools:text="Placeholder"
-        tools:visibility="visible" />
-
-      <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        tools:text="Placeholder"
-        tools:visibility="visible" />
-
-      <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        tools:text="Placeholder"
-        tools:visibility="visible" />
-    </LinearLayout>
-  </HorizontalScrollView>
+  </com.google.android.material.chip.ChipGroup>
 
   <View
     android:id="@+id/feedDivider"
@@ -90,6 +51,6 @@
     android:background="?android:attr/listDivider"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/feedHeaderFacetsScroll" />
+    app:layout_constraintTop_toBottomOf="@id/feedHeaderFacetsChipGroup" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
