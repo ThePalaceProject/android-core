@@ -132,8 +132,9 @@ $ ./gradlew clean assemble test
 
 #### Enabling DRM
 
-The application contains optional support for various DRM systems, and these
-must be enabled explicitly in order to build [Palace](simplified-app-palace).
+The application contains optional support for various DRM systems. These are all disabled by
+default, and must be enabled explicitly in order to build a version of the [Palace](simplified-app-palace)
+application equivalent to the Play Store version.
 
 Firstly, make sure you have your [S3](#s3-credentials) credentials
 correctly configured. Then, add the following property to your
