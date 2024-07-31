@@ -118,6 +118,7 @@ class CatalogSAML20ViewModel(
     return when (event) {
       is WebClientEvent.WebViewClientReady ->
         this.onWebViewClientReady()
+
       is WebClientEvent.Succeeded ->
         this.onSAMLEventSucceeded()
     }
@@ -140,7 +141,11 @@ class CatalogSAML20ViewModel(
   ): List<TaskStep> {
     val taskRecorder = TaskRecorder.create()
     taskRecorder.beginNewStep("Started SAML 2.0 book download login...")
-    taskRecorder.currentStepFailed(message, "samlBookDownloadLoginFailed")
+    taskRecorder.currentStepFailed(
+      message = message,
+      errorCode = "samlBookDownloadLoginFailed",
+      extraMessages = listOf()
+    )
     return taskRecorder.finishFailure<Unit>().steps
   }
 

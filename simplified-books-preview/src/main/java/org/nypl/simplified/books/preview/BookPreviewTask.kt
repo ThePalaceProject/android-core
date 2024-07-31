@@ -74,7 +74,8 @@ class BookPreviewTask(
       step.resolution = TaskStepResolution.TaskStepFailed(
         message = "Subtask $taskName raised an unexpected exception",
         exception = e,
-        errorCode = "subtaskFailed"
+        errorCode = "subtaskFailed",
+        extraMessages = listOf()
       )
       this.taskRecorder.finishFailure<Unit>()
     }
@@ -126,10 +127,12 @@ class BookPreviewTask(
           previewAcquisition = previewAcquisition
         )
       }
+
       else -> {
         this.taskRecorder.currentStepFailed(
-          "Non supported book format.",
-          BookPreviewErrorCodes.nonSupportedBookFormat
+          message = "Non supported book format.",
+          errorCode = BookPreviewErrorCodes.nonSupportedBookFormat,
+          extraMessages = listOf()
         )
         this.taskRecorder.finishFailure<Unit>()
       }
@@ -165,8 +168,9 @@ class BookPreviewTask(
         BookPreviewStatus.None
       )
       this.taskRecorder.currentStepFailed(
-        "No preview acquisitions.",
-        BookPreviewErrorCodes.noPreviewAcquisitions
+        message = "No preview acquisitions.",
+        errorCode = BookPreviewErrorCodes.noPreviewAcquisitions,
+        extraMessages = listOf()
       )
       this.taskRecorder.finishFailure<Unit>()
       throw BookPreviewException(null)
@@ -175,8 +179,9 @@ class BookPreviewTask(
     val previewAcquisition = BookPreviewAcquisitions.pickBestPreviewAcquisition(feedEntry)
     if (previewAcquisition == null) {
       this.taskRecorder.currentStepFailed(
-        "No supported preview acquisitions.",
-        BookPreviewErrorCodes.noSupportedPreviewAcquisitions
+        message = "No supported preview acquisitions.",
+        errorCode = BookPreviewErrorCodes.noSupportedPreviewAcquisitions,
+        extraMessages = listOf()
       )
       throw BookPreviewException(null)
     }
@@ -196,7 +201,12 @@ class BookPreviewTask(
       this.taskRecorder.finishFailure<Unit>()
     } catch (e: Throwable) {
       this.error("unhandled exception during book preview handling: ", e)
-      this.taskRecorder.currentStepFailedAppending(this.messageOrName(e), "unexpected exception", e)
+      this.taskRecorder.currentStepFailedAppending(
+        message = this.messageOrName(e),
+        errorCode = "unexpected exception",
+        exception = e,
+        extraMessages = listOf()
+      )
       this.taskRecorder.finishFailure<Unit>()
     }
   }

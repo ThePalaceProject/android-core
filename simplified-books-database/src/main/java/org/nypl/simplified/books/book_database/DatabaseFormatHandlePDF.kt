@@ -1,5 +1,6 @@
 package org.nypl.simplified.books.book_database
 
+import android.app.Application
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.base.Preconditions
 import net.jcip.annotations.GuardedBy
@@ -125,7 +126,7 @@ internal class DatabaseFormatHandlePDF internal constructor(
     }
   }
 
-  override fun deleteBookData() {
+  override fun deleteBookData(context: Application) {
     val newFormat = synchronized(this.dataLock) {
       FileUtilities.fileDelete(this.fileBook)
       this.formatRef = this.formatRef.copy(file = null)

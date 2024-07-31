@@ -37,6 +37,7 @@ sealed class TaskStepResolution : Serializable {
   data class TaskStepFailed(
     override val message: String,
     override val exception: Throwable?,
-    val errorCode: String
+    val errorCode: String,
+    val extraMessages: List<String>
   ) : TaskStepResolution()
 }

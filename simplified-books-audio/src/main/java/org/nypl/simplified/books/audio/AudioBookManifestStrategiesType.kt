@@ -17,5 +17,5 @@ interface AudioBookManifestStrategiesType {
   fun createStrategy(
     context: Application,
     request: AudioBookManifestRequest
-  ): AudioBookManifestStrategyType
+  ): AudioBookStrategyType
 }

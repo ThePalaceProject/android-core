@@ -37,10 +37,11 @@ class BorrowSAMLDownload private constructor() : BorrowSubtaskType {
     override fun isApplicableFor(
       type: MIMEType,
       target: URI?,
-      account: AccountReadableType?
+      account: AccountReadableType?,
+      remaining: List<MIMEType>
     ): Boolean =
       account?.loginState?.credentials is AccountAuthenticationCredentials.SAML2_0 &&
-        BorrowDirectDownload.isApplicableFor(type, target, account)
+        BorrowDirectDownload.isApplicableFor(type, target, account, remaining)
   }
 
   override fun execute(

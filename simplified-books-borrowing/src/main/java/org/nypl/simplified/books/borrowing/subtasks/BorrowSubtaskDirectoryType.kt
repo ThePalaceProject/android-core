@@ -23,10 +23,11 @@ interface BorrowSubtaskDirectoryType {
   fun findSubtaskFor(
     mimeType: MIMEType,
     target: URI?,
-    account: AccountReadableType?
+    account: AccountReadableType?,
+    remainingTypes: List<MIMEType>
   ): BorrowSubtaskFactoryType? {
     return this.subtasks.firstOrNull { factory ->
-      factory.isApplicableFor(mimeType, target, account)
+      factory.isApplicableFor(mimeType, target, account, remainingTypes)
     }
   }
 }

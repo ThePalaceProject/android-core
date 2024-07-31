@@ -113,10 +113,10 @@ object BorrowHTTP {
       true
     } else {
       val expectedTypesDesc = expectedTypes.map { it.fullType }.joinToString(" or ")
-
       context.taskRecorder.currentStepFailed(
         message = "The server returned an incompatible context type: We wanted something compatible with $expectedTypesDesc but received ${receivedType.fullType}.",
-        errorCode = BorrowErrorCodes.httpContentTypeIncompatible
+        errorCode = BorrowErrorCodes.httpContentTypeIncompatible,
+        extraMessages = listOf()
       )
       false
     }
@@ -135,7 +135,8 @@ object BorrowHTTP {
     context.taskRecorder.currentStepFailed(
       message = "HTTP request failed: ${status.properties.originalStatus} ${status.properties.message}",
       errorCode = BorrowErrorCodes.httpRequestFailed,
-      exception = null
+      exception = null,
+      extraMessages = listOf()
     )
     return BorrowSubtaskFailed()
   }
@@ -151,7 +152,8 @@ object BorrowHTTP {
     context.taskRecorder.currentStepFailed(
       message = result.exception.message ?: "Exception raised during connection attempt.",
       errorCode = BorrowErrorCodes.httpConnectionFailed,
-      exception = result.exception
+      exception = result.exception,
+      extraMessages = listOf()
     )
     return BorrowSubtaskFailed()
   }

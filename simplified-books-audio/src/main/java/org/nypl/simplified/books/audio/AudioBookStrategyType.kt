@@ -1,6 +1,7 @@
 package org.nypl.simplified.books.audio
 
 import io.reactivex.Observable
+import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfillmentStrategyType
 import org.nypl.simplified.taskrecorder.api.TaskResult
 
 /**
@@ -9,7 +10,7 @@ import org.nypl.simplified.taskrecorder.api.TaskResult
  * the same result each time it is executed.
  */
 
-interface AudioBookManifestStrategyType {
+interface AudioBookStrategyType {
 
   /**
    * An observable source of events published during fulfillment.
@@ -22,4 +23,10 @@ interface AudioBookManifestStrategyType {
    */
 
   fun execute(): TaskResult<AudioBookManifestData>
+
+  /**
+   * Adapt this strategy to a manifest fulfillment strategy.
+   */
+
+  fun toManifestStrategy(): ManifestFulfillmentStrategyType
 }

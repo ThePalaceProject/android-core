@@ -52,9 +52,10 @@ class ProfileAccountCreateTask(
       this.logger.error("account creation failed: ", e)
 
       this.taskRecorder.currentStepFailedAppending(
-        this.strings.unexpectedException,
-        "unexpectedException",
-        e
+        message = this.strings.unexpectedException,
+        errorCode = "unexpectedException",
+        exception = e,
+        extraMessages = listOf()
       )
 
       this.publishFailureEvent()
@@ -71,7 +72,12 @@ class ProfileAccountCreateTask(
       val profile = this.profiles.currentProfileUnsafe()
       profile.createAccount(accountProvider)
     } catch (e: Exception) {
-      this.taskRecorder.currentStepFailed(e.message ?: e.javaClass.name, "creatingAccountFailed")
+      this.taskRecorder.currentStepFailed(
+        message = e.message ?: e.javaClass.name,
+        errorCode = "creatingAccountFailed",
+        exception = e,
+        extraMessages = listOf()
+      )
       this.publishFailureEvent()
       throw e
     }
@@ -115,7 +121,11 @@ class ProfileAccountCreateTask(
         is TaskResult.Failure -> {
           this.taskRecorder.addAll(resolution.steps)
           this.taskRecorder.addAttributes(resolution.attributes)
-          this.taskRecorder.currentStepFailed(resolution.message, "resolutionFailed")
+          this.taskRecorder.currentStepFailed(
+            message = resolution.message,
+            errorCode = "resolutionFailed",
+            extraMessages = listOf()
+          )
           throw AccountUnresolvableProviderException(resolution.message)
         }
       }

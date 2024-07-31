@@ -740,7 +740,9 @@ class BorrowTaskTest {
       taskRecorder.finishSuccess(
         AudioBookManifestData(
           manifest = playerManifest,
+          licenseBytes = null,
           fulfilled = ManifestFulfilled(
+            source = URI.create("urn:example.json"),
             contentType = genericAudioBooks.first(),
             data = playerManifest.originalBytes
           )

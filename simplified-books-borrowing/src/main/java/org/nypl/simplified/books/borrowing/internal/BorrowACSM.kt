@@ -63,7 +63,8 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
     override fun isApplicableFor(
       type: MIMEType,
       target: URI?,
-      account: AccountReadableType?
+      account: AccountReadableType?,
+      remaining: List<MIMEType>
     ): Boolean {
       return MIMECompatibility.isCompatibleStrictWithoutAttributes(type, adobeACSMFiles)
     }
@@ -153,7 +154,8 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
     if (credentials == null) {
       context.taskRecorder.currentStepFailed(
         message = "The account has no credentials.",
-        errorCode = accountCredentialsRequired
+        errorCode = accountCredentialsRequired,
+        extraMessages = listOf()
       )
       throw BorrowSubtaskFailed()
     }
@@ -162,7 +164,8 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
     if (preActivation == null) {
       context.taskRecorder.currentStepFailed(
         message = "The account has no pre-activation ACS credentials.",
-        errorCode = acsNoCredentialsPre
+        errorCode = acsNoCredentialsPre,
+        extraMessages = listOf()
       )
       throw BorrowSubtaskFailed()
     }
@@ -171,7 +174,8 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
     if (postActivation == null) {
       context.taskRecorder.currentStepFailed(
         message = "The account's ACS device is not activated.",
-        errorCode = acsNoCredentialsPost
+        errorCode = acsNoCredentialsPost,
+        extraMessages = listOf()
       )
       throw BorrowSubtaskFailed()
     }
@@ -191,7 +195,8 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
     if (context.adobeExecutor == null) {
       context.taskRecorder.currentStepFailed(
         message = "This build of the application does not support Adobe ACS.",
-        errorCode = acsNotSupported
+        errorCode = acsNotSupported,
+        extraMessages = listOf()
       )
       throw BorrowSubtaskFailed()
     }
@@ -267,7 +272,8 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
       context.taskRecorder.currentStepFailed(
         message = "Unparseable ACSM file: ${e.message}",
         errorCode = acsUnparseableACSM,
-        exception = e
+        exception = e,
+        extraMessages = listOf()
       )
       throw BorrowSubtaskFailed()
     }
@@ -342,7 +348,8 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
         context.taskRecorder.currentStepFailed(
           message = "Adobe ACS fulfillment timed out.",
           errorCode = acsTimedOut,
-          exception = e
+          exception = e,
+          extraMessages = listOf()
         )
         throw BorrowSubtaskFailed()
       } catch (e: ExecutionException) {
@@ -354,7 +361,8 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
             context.taskRecorder.currentStepFailed(
               message = "Adobe ACS fulfillment failed (${cause.errorCode})",
               errorCode = "ACS: ${cause.errorCode}",
-              exception = cause
+              exception = cause,
+              extraMessages = listOf()
             )
             BorrowSubtaskFailed()
           }
@@ -362,7 +370,8 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
             context.taskRecorder.currentStepFailed(
               message = "Adobe ACS fulfillment failed (${cause.javaClass})",
               errorCode = "ACS: ${cause.javaClass}",
-              exception = cause
+              exception = cause,
+              extraMessages = listOf()
             )
             BorrowSubtaskFailed()
           }
@@ -431,7 +440,8 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
     if (formatHandle == null) {
       context.taskRecorder.currentStepFailed(
         message = "No format handle available for ${eventualType.fullType}",
-        errorCode = noFormatHandle
+        errorCode = noFormatHandle,
+        extraMessages = listOf()
       )
       throw BorrowSubtaskFailed()
     }

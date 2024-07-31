@@ -18,7 +18,6 @@ import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus.I
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus.Refreshing
 import org.nypl.simplified.accounts.source.spi.AccountProviderSourceType
 import org.nypl.simplified.accounts.source.spi.AccountProviderSourceType.SourceResult
-import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.tests.mocking.MockAccountProviders
 import org.slf4j.Logger
@@ -405,17 +404,6 @@ abstract class AccountProviderDescriptionRegistryContract {
         isProduction = true,
         location = null
       )
-
-    private fun fail(): TaskResult.Failure<AccountProviderType> {
-      val taskRecorder = TaskRecorder.create()
-      val exception = Exception()
-      taskRecorder.currentStepFailed(
-        message = "x",
-        errorCode = "unexpectedException",
-        exception = exception
-      )
-      return taskRecorder.finishFailure()
-    }
 
     val description1 =
       AccountProviderDescription(

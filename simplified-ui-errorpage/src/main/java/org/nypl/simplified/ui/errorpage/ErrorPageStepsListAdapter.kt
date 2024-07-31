@@ -32,15 +32,25 @@ class ErrorPageStepsListAdapter(private val steps: List<TaskStep>) :
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     val step = this.steps[position]
 
-    if (step.resolution is TaskStepResolution.TaskStepFailed) {
+    val resolution = step.resolution
+    if (resolution is TaskStepResolution.TaskStepFailed) {
       holder.icon.setImageResource(R.drawable.error_small)
+
+      val multiline = StringBuilder()
+      multiline.append(resolution.message)
+      for (extra in resolution.extraMessages) {
+        multiline.append('\n')
+        multiline.append(extra)
+      }
+
+      holder.resolution.text = multiline.toString()
     } else {
       holder.icon.setImageResource(R.drawable.ok_small)
+      holder.resolution.text = resolution.message
     }
 
     holder.stepNumber.text = String.format("%d.", position + 1)
     holder.description.text = step.description
-    holder.resolution.text = step.resolution.message
   }
 
   inner class ViewHolder(parent: View) : RecyclerView.ViewHolder(parent) {

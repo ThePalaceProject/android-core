@@ -120,7 +120,8 @@ class BookSyncTask(
           this.taskRecorder.currentStepFailed(
             message = message,
             errorCode = "syncFailed",
-            exception = exception
+            exception = exception,
+            extraMessages = listOf()
           )
           throw TaskFailedHandled(exception)
         }

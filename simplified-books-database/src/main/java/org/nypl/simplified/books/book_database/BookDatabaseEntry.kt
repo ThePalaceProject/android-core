@@ -175,7 +175,7 @@ internal class BookDatabaseEntry internal constructor(
       val failures = mutableListOf<Exception>()
       for (handle in this.formatHandles) {
         try {
-          handle.deleteBookData()
+          handle.deleteBookData(this.context)
         } catch (e: Exception) {
           failures.add(e)
         }

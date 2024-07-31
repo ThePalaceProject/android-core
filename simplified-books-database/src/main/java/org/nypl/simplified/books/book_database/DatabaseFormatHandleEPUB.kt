@@ -1,5 +1,6 @@
 package org.nypl.simplified.books.book_database
 
+import android.app.Application
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.base.Preconditions
 import net.jcip.annotations.GuardedBy
@@ -130,7 +131,7 @@ internal class DatabaseFormatHandleEPUB internal constructor(
     }
   }
 
-  override fun deleteBookData() {
+  override fun deleteBookData(context: Application) {
     val newFormat = synchronized(this.dataLock) {
       if (this.fileBook.isDirectory) {
         DirectoryUtilities.directoryDelete(this.fileBook)

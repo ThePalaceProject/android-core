@@ -84,7 +84,7 @@ sealed class BookFormat {
      * The URI that can be used to fetch a more recent copy of the manifest.
      */
 
-    val manifestURI: URI,
+    val manifestURI: URI?,
 
     /**
      * The most recent copy of the audio book manifest, if any has been fetched.
@@ -112,6 +112,7 @@ sealed class BookFormat {
      * only the manifest is downloaded, this will always be null.
      */
 
+    @Deprecated("Packaged audiobooks are no longer handled by the application directly.")
     val file: File?,
 
     /**

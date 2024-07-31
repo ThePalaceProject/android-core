@@ -146,6 +146,7 @@ class CatalogFeedViewModel(
           this.reloadFeed()
         }
       }
+
       is AccountEventLoginStateChanged ->
         this.onLoginStateChanged(event.accountID, event.state)
     }
@@ -171,6 +172,7 @@ class CatalogFeedViewModel(
           this.reloadFeed()
         }
       }
+
       CatalogFeedOwnership.CollectedFromAccounts -> {
         if (
           accountState is AccountLoginState.AccountLoggedIn ||
@@ -201,6 +203,7 @@ class CatalogFeedViewModel(
           }
         }
       }
+
       is ProfileUpdated.Failed -> {
         // do nothing
       }
@@ -246,6 +249,7 @@ class CatalogFeedViewModel(
             this.reloadFeed()
           }
         }
+
         is BookStatus.DownloadExternalAuthenticationInProgress,
         is BookStatus.DownloadWaitingForExternalAuthentication,
         is BookStatus.Downloading,
@@ -307,6 +311,7 @@ class CatalogFeedViewModel(
       is CatalogFeedArgumentsLocalBooks -> {
         this.syncAccounts(arguments)
       }
+
       is CatalogFeedArgumentsRemote -> {
       }
     }
@@ -343,6 +348,7 @@ class CatalogFeedViewModel(
     return when (arguments) {
       is CatalogFeedArgumentsRemote ->
         this.doLoadRemoteFeed(arguments)
+
       is CatalogFeedArgumentsLocalBooks ->
         this.doLoadLocalFeed(arguments)
     }
@@ -523,9 +529,11 @@ class CatalogFeedViewModel(
         when (val feed = result.feed) {
           is Feed.FeedWithoutGroups ->
             this.onReceivedFeedWithoutGroups(arguments, feed)
+
           is Feed.FeedWithGroups ->
             this.onReceivedFeedWithGroups(arguments, feed)
         }
+
       is FeedLoaderResult.FeedLoaderFailure ->
         this.onReceivedFeedFailure(arguments, result)
     }
@@ -544,6 +552,7 @@ class CatalogFeedViewModel(
       is FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedGeneral -> {
         // Display the error.
       }
+
       is FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedAuthentication -> {
         when (val ownership = this.state.arguments.ownership) {
           is CatalogFeedOwnership.OwnedByAccount -> {
@@ -563,6 +572,7 @@ class CatalogFeedViewModel(
               this.listener.post(CatalogFeedEvent.LoginRequired(ownership.accountId))
             }
           }
+
           CatalogFeedOwnership.CollectedFromAccounts -> {
             // Nothing we can do here! We don't know which account owns the feed.
           }
@@ -669,6 +679,7 @@ class CatalogFeedViewModel(
             this.profilesController.profileCurrent()
               .account(ownership.accountId)
               .provider
+
           is CatalogFeedOwnership.CollectedFromAccounts ->
             null
         }
@@ -739,7 +750,12 @@ class CatalogFeedViewModel(
     val taskRecorder = TaskRecorder.create()
     taskRecorder.beginNewStep(this.resources.getString(R.string.catalogFeedLoading))
     taskRecorder.addAttributes(failure.attributes)
-    taskRecorder.currentStepFailed(failure.message, "feedLoadingFailed", failure.exception)
+    taskRecorder.currentStepFailed(
+      failure.message,
+      "feedLoadingFailed",
+      exception = failure.exception,
+      extraMessages = listOf()
+    )
     val taskFailure = taskRecorder.finishFailure<Unit>()
 
     return ErrorPageParameters(
@@ -807,6 +823,7 @@ class CatalogFeedViewModel(
               title = currentArguments.title
             )
           }
+
           is FeedSearch.FeedSearchOpen1_1 -> {
             CatalogFeedArgumentsRemote(
               feedURI = search.search.getQueryURIForTerms(query),
@@ -831,6 +848,7 @@ class CatalogFeedViewModel(
               updateHolds = currentArguments.updateHolds
             )
           }
+
           is FeedSearch.FeedSearchOpen1_1 -> {
             CatalogFeedArgumentsLocalBooks(
               filterAccount = currentArguments.filterAccount,

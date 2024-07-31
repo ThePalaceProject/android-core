@@ -33,7 +33,8 @@ class ErrorPageParametersTest {
           resolution = TaskStepResolution.TaskStepFailed(
             message = "Oh no, it failed.",
             errorCode = "FAIL",
-            exception = Exception()
+            exception = Exception(),
+            extraMessages = listOf()
           )
         )
       )
@@ -68,7 +69,8 @@ class ErrorPageParametersTest {
           resolution = TaskStepResolution.TaskStepFailed(
             message = "Nooooooo!",
             errorCode = "FAIL",
-            exception = Exception()
+            exception = Exception(),
+            extraMessages = listOf()
           )
         )
       )
@@ -188,7 +190,8 @@ class ErrorPageParametersTest {
           resolution = TaskStepResolution.TaskStepFailed(
             message = "Nooooooo!",
             errorCode = "FAIL",
-            exception = Exception()
+            exception = Exception(),
+            extraMessages = listOf()
           )
         )
       )
@@ -222,7 +225,8 @@ class ErrorPageParametersTest {
           resolution = TaskStepResolution.TaskStepFailed(
             message = "Nooooooo!",
             errorCode = "FAIL",
-            exception = Exception()
+            exception = Exception(),
+            extraMessages = listOf()
           )
         )
       )

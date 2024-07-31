@@ -456,7 +456,7 @@ abstract class BookDatabaseContract {
 
       val file = copyToTempFile("/org/nypl/simplified/tests/books/basic-manifest.json")
       format.copyInManifestAndURI(file.readBytes(), URI.create("urn:invalid"))
-      format.deleteBookData()
+      format.deleteBookData(this.context())
     }
 
     val format = databaseEntry.findFormatHandle(BookDatabaseEntryFormatHandleAudioBook::class.java)
@@ -516,7 +516,7 @@ abstract class BookDatabaseContract {
 
       val file = copyToTempFile("/org/nypl/simplified/tests/books/empty.epub")
       format.copyInBook(file)
-      format.deleteBookData()
+      format.deleteBookData(this.context())
     }
 
     val format = databaseEntry.findFormatHandle(BookDatabaseEntryFormatHandleEPUB::class.java)
@@ -576,7 +576,7 @@ abstract class BookDatabaseContract {
 
       val file = copyToTempFile("/org/nypl/simplified/tests/books/empty.pdf")
       format.copyInBook(file)
-      format.deleteBookData()
+      format.deleteBookData(this.context())
     }
 
     val format = databaseEntry.findFormatHandle(BookDatabaseEntryFormatHandlePDF::class.java)

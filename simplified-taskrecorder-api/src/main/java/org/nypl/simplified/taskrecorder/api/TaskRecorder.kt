@@ -59,7 +59,8 @@ class TaskRecorder private constructor() : TaskRecorderType {
   override fun currentStepFailed(
     message: String,
     errorCode: String,
-    exception: Throwable?
+    exception: Throwable?,
+    extraMessages: List<String>
   ): TaskStep {
     Preconditions.checkState(this.steps.isNotEmpty(), "A step must be active")
 
@@ -69,7 +70,8 @@ class TaskRecorder private constructor() : TaskRecorderType {
       TaskStepResolution.TaskStepFailed(
         message = message,
         errorCode = errorCode,
-        exception = exception
+        exception = exception,
+        extraMessages = extraMessages
       )
     return step
   }
@@ -77,7 +79,8 @@ class TaskRecorder private constructor() : TaskRecorderType {
   override fun currentStepFailedAppending(
     message: String,
     errorCode: String,
-    exception: Throwable
+    exception: Throwable,
+    extraMessages: List<String>
   ): TaskStep {
     Preconditions.checkState(this.steps.isNotEmpty(), "A step must be active")
 
@@ -88,7 +91,8 @@ class TaskRecorder private constructor() : TaskRecorderType {
         step.resolution = TaskStepResolution.TaskStepFailed(
           message = message,
           exception = exception,
-          errorCode = errorCode
+          errorCode = errorCode,
+          extraMessages = extraMessages
         )
         step
       }

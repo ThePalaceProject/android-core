@@ -3,16 +3,16 @@ package org.nypl.simplified.tests.mocking
 import android.app.Application
 import org.nypl.simplified.books.audio.AudioBookManifestRequest
 import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
-import org.nypl.simplified.books.audio.AudioBookManifestStrategyType
+import org.nypl.simplified.books.audio.AudioBookStrategyType
 
 class MockAudioBookManifestStrategies : AudioBookManifestStrategiesType {
 
-  var strategy = MockAudioBookManifestStrategy()
+  var strategy = MockAudioBookStrategy()
 
   override fun createStrategy(
     context: Application,
     request: AudioBookManifestRequest
-  ): AudioBookManifestStrategyType {
+  ): AudioBookStrategyType {
     return this.strategy
   }
 }

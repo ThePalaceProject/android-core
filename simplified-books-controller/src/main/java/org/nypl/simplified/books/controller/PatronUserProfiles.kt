@@ -1,7 +1,5 @@
 package org.nypl.simplified.books.controller
 
-import com.io7m.jfunctional.OptionType
-import com.io7m.jfunctional.Some
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPResponseStatus
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
@@ -40,7 +38,12 @@ internal object PatronUserProfiles {
     val patronSettingsURI = account.provider.patronSettingsURI
     if (patronSettingsURI == null) {
       val exception = Exception()
-      taskRecorder.currentStepFailed("No available patron user profile URI", "noPatronURI", exception)
+      taskRecorder.currentStepFailed(
+        message = "No available patron user profile URI",
+        errorCode = "noPatronURI",
+        exception = exception,
+        extraMessages = listOf()
+      )
       throw exception
     }
 
@@ -61,6 +64,7 @@ internal object PatronUserProfiles {
           stream = status.bodyStream ?: ByteArrayInputStream(ByteArray(0))
         )
       }
+
       is LSHTTPResponseStatus.Responded.Error -> {
         this.onPatronProfileRequestHTTPError(
           taskRecorder = taskRecorder,
@@ -68,6 +72,7 @@ internal object PatronUserProfiles {
           result = status
         )
       }
+
       is LSHTTPResponseStatus.Failed -> {
         this.onPatronProfileRequestHTTPException(
           taskRecorder = taskRecorder,
@@ -97,13 +102,19 @@ internal object PatronUserProfiles {
           taskRecorder.currentStepSucceeded("Parsed patron user profile")
           parseResult.result
         }
+
         is ParseResult.Failure -> {
           this.logger.error("failed to parse patron profile")
           val message: String =
             parseResult.errors.map(this::showParseError)
               .joinToString("\n")
           val exception = Exception()
-          taskRecorder.currentStepFailed(message, "parseErrorPatronSettings", exception)
+          taskRecorder.currentStepFailed(
+            message = message,
+            errorCode = "parseErrorPatronSettings",
+            exception = exception,
+            extraMessages = listOf()
+          )
           throw exception
         }
       }
@@ -157,7 +168,12 @@ internal object PatronUserProfiles {
     patronSettingsURI: URI,
     result: LSHTTPResponseStatus.Failed
   ): T {
-    taskRecorder.currentStepFailed("Connection failed when fetching patron user profile.", "connectionFailed", result.exception)
+    taskRecorder.currentStepFailed(
+      message = "Connection failed when fetching patron user profile.",
+      errorCode = "connectionFailed",
+      exception = result.exception,
+      extraMessages = listOf()
+    )
     throw result.exception
   }
 
@@ -166,27 +182,35 @@ internal object PatronUserProfiles {
     patronSettingsURI: URI,
     result: LSHTTPResponseStatus.Responded.Error
   ): T {
-    this.logger.error("received http error: {}: {}: {}", patronSettingsURI, result.properties.message, result.properties.status)
+    this.logger.error(
+      "received http error: {}: {}: {}",
+      patronSettingsURI,
+      result.properties.message,
+      result.properties.status
+    )
 
     val exception = Exception()
     when (result.properties.status) {
       HttpURLConnection.HTTP_UNAUTHORIZED -> {
-        taskRecorder.currentStepFailed("Invalid credentials!", "invalidCredentials", exception)
+        taskRecorder.currentStepFailed(
+          message = "Invalid credentials!",
+          errorCode = "invalidCredentials",
+          exception = exception,
+          extraMessages = listOf()
+        )
         throw exception
       }
+
       else -> {
         taskRecorder.addAttributesIfPresent(result.properties.problemReport?.toMap())
-        taskRecorder.currentStepFailed("Server error: ${result.properties.status} ${result.properties.message}", "httpError ${result.properties.status} $patronSettingsURI", exception)
+        taskRecorder.currentStepFailed(
+          message = "Server error: ${result.properties.status} ${result.properties.message}",
+          errorCode = "httpError ${result.properties.status} $patronSettingsURI",
+          exception = exception,
+          extraMessages = listOf()
+        )
         throw exception
       }
-    }
-  }
-
-  private fun <T> someOrNull(option: OptionType<T>): T? {
-    return if (option is Some<T>) {
-      option.get()
-    } else {
-      null
     }
   }
 }

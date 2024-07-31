@@ -109,7 +109,11 @@ class MockAccountProviderRegistry(
     val provider = this.resolvedProviders[description.id]
     return if (provider == null) {
       this.logger.debug("no provider in map")
-      taskRecorder.currentStepFailed("Failed", "unexpectedException")
+      taskRecorder.currentStepFailed(
+        message = "Failed",
+        errorCode = "unexpectedException",
+        extraMessages = listOf()
+      )
       taskRecorder.finishFailure()
     } else {
       this.logger.debug("took provider from map")

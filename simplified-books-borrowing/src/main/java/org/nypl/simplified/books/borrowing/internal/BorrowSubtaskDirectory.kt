@@ -17,7 +17,8 @@ class BorrowSubtaskDirectory : BorrowSubtaskDirectoryType {
       // BorrowSAMLDownload must precede BorrowDirectDownload in precedence.
       BorrowSAMLDownload,
       BorrowDirectDownload,
-      BorrowLCP,
+      BorrowLCPAudiobook,
+      BorrowLCPEpub,
       BorrowLoanCreate
     )
 }

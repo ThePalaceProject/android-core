@@ -1,5 +1,6 @@
 package org.nypl.simplified.tests.mocking
 
+import android.app.Application
 import com.io7m.junreachable.UnimplementedCodeException
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookDRMKind
@@ -69,7 +70,7 @@ class MockBookDatabaseEntryFormatHandlePDF(
     throw UnimplementedCodeException()
   }
 
-  override fun deleteBookData() {
+  override fun deleteBookData(context: Application) {
     this.bookData = null
     this.bookFile = null
     this.formatField = this.formatField.copy(file = this.bookFile)

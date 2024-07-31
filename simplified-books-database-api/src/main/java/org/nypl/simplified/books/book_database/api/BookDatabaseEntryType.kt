@@ -1,5 +1,6 @@
 package org.nypl.simplified.books.book_database.api
 
+import android.app.Application
 import net.jcip.annotations.ThreadSafe
 import one.irradia.mime.api.MIMEType
 import org.nypl.simplified.books.api.Book
@@ -167,7 +168,7 @@ sealed class BookDatabaseEntryFormatHandle {
    */
 
   @Throws(IOException::class)
-  abstract fun deleteBookData()
+  abstract fun deleteBookData(context: Application)
 
   /**
    * Delete the bookmark with the given ID.
@@ -257,7 +258,7 @@ sealed class BookDatabaseEntryFormatHandle {
 
     /**
      * Save the manifest and the URI that can be used to fetch more up-to-date copies of it
-     * later.
+     * later (assuming that such a URI is available).
      *
      * @throws IOException On I/O errors or lock acquisition failures
      */
@@ -265,29 +266,7 @@ sealed class BookDatabaseEntryFormatHandle {
     @Throws(IOException::class)
     abstract fun copyInManifestAndURI(
       data: ByteArray,
-      manifestURI: URI
+      manifestURI: URI?
     )
-
-    /**
-     * Copy the given audio book file into the directory as the book data.
-     *
-     * @param file The file to be copied
-     *
-     * @throws IOException On I/O errors
-     */
-
-    @Throws(IOException::class)
-    abstract fun copyInBook(file: File)
-
-    /**
-     * Move the given audio book file into the directory as the book data.
-     *
-     * @param file The file to be copied
-     *
-     * @throws IOException On I/O errors
-     */
-
-    @Throws(IOException::class)
-    abstract fun moveInBook(file: File)
   }
 }

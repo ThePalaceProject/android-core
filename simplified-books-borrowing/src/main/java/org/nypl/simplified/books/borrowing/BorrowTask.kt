@@ -1,6 +1,7 @@
 package org.nypl.simplified.books.borrowing
 
 import android.app.Application
+import one.irradia.mime.api.MIMEType
 import org.joda.time.Instant
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.services.api.ServiceDirectoryType
@@ -111,8 +112,13 @@ class BorrowTask private constructor(
       this.warn("handled: ", e)
       this.taskRecorder.finishFailure<Unit>()
     } catch (e: Throwable) {
-      this.error("unhandled exception during borrowing: ", e)
-      this.taskRecorder.currentStepFailedAppending(this.messageOrName(e), unexpectedException, e)
+      this.error("Unhandled exception during borrowing: ", e)
+      this.taskRecorder.currentStepFailedAppending(
+        message = this.messageOrName(e),
+        errorCode = unexpectedException,
+        exception = e,
+        extraMessages = listOf()
+      )
       this.taskRecorder.finishFailure<Unit>()
     }
   }
@@ -213,7 +219,13 @@ class BorrowTask private constructor(
         elementQueue.removeAt(0)
         context.currentOPDSAcquisitionPathElement = pathElement
         context.currentRemainingOPDSPathElements = elementQueue.toList()
-        val subtaskFactory = this.subtaskFindForPathElement(context, pathElement, book)
+        val subtaskFactory =
+          this.subtaskFindForPathElement(
+            context = context,
+            pathElement = pathElement,
+            book = book,
+            remaining = elementQueue.toList().map(OPDSAcquisitionPathElement::mimeType)
+          )
         this.subtaskExecute(subtaskFactory, context, book)
       } catch (e: BorrowSubtaskHaltedEarly) {
         this.logger.debug("subtask halted early: ", e)
@@ -247,14 +259,16 @@ class BorrowTask private constructor(
       step.resolution = TaskStepFailed(
         message = "Subtask '$name' raised an unexpected exception",
         exception = e,
-        errorCode = subtaskFailed
+        errorCode = subtaskFailed,
+        extraMessages = listOf()
       )
       throw e
     } catch (e: Exception) {
       step.resolution = TaskStepFailed(
         message = "Subtask '$name' raised an unexpected exception",
         exception = e,
-        errorCode = subtaskFailed
+        errorCode = subtaskFailed,
+        extraMessages = listOf()
       )
       this.publishBookFailure(book)
       throw BorrowFailedHandled(e)
@@ -268,19 +282,22 @@ class BorrowTask private constructor(
   private fun subtaskFindForPathElement(
     context: BorrowContext,
     pathElement: OPDSAcquisitionPathElement,
-    book: Book
+    book: Book,
+    remaining: List<MIMEType>
   ): BorrowSubtaskFactoryType {
-    this.taskRecorder.beginNewStep("Finding subtask for acquisition path element...")
+    this.taskRecorder.beginNewStep("Finding subtask for acquisition path element ${pathElement.mimeType}...")
     val subtaskFactory =
       this.requirements.subtasks.findSubtaskFor(
-        pathElement.mimeType,
-        context.currentURI(),
-        context.account
+        mimeType = pathElement.mimeType,
+        target = context.currentURI(),
+        account = context.account,
+        remainingTypes = remaining
       )
     if (subtaskFactory == null) {
       this.taskRecorder.currentStepFailed(
         message = "We don't know how to handle this kind of acquisition.",
-        errorCode = noSubtaskAvailable
+        errorCode = noSubtaskAvailable,
+        extraMessages = listOf()
       )
       this.publishBookFailure(book)
       throw BorrowFailedHandled(null)
@@ -311,7 +328,8 @@ class BorrowTask private constructor(
       this.taskRecorder.currentStepFailed(
         message = "Could not set up the book database entry.",
         errorCode = bookDatabaseFailed,
-        exception = e
+        exception = e,
+        extraMessages = listOf()
       )
       this.publishBookFailure(book)
       throw BorrowFailedHandled(e)
@@ -334,7 +352,8 @@ class BorrowTask private constructor(
       this.taskRecorder.currentStepFailed(
         message = "Failed to find profile.",
         errorCode = profileNotFound,
-        exception = IllegalArgumentException()
+        exception = IllegalArgumentException(),
+        extraMessages = listOf()
       )
       this.publishBookFailure(book)
       throw BorrowFailedHandled(null)
@@ -362,7 +381,8 @@ class BorrowTask private constructor(
       this.taskRecorder.currentStepFailedAppending(
         message = "An unexpected exception was raised.",
         errorCode = accountsDatabaseException,
-        exception = e
+        exception = e,
+        extraMessages = listOf()
       )
 
       this.publishBookFailure(book)
@@ -384,9 +404,14 @@ class BorrowTask private constructor(
   ): OPDSAcquisitionPath {
     this.taskRecorder.beginNewStep("Planning the borrow operation…")
 
-    val path = BorrowAcquisitions.pickBestAcquisitionPath(this.requirements.bookFormatSupport, entry)
+    val path =
+      BorrowAcquisitions.pickBestAcquisitionPath(this.requirements.bookFormatSupport, entry)
     if (path == null) {
-      this.taskRecorder.currentStepFailed("No supported acquisitions.", noSupportedAcquisitions)
+      this.taskRecorder.currentStepFailed(
+        message = "No supported acquisitions.",
+        errorCode = noSupportedAcquisitions,
+        extraMessages = listOf()
+      )
       this.publishBookFailure(book)
       throw BorrowFailedHandled(null)
     }
@@ -397,7 +422,12 @@ class BorrowTask private constructor(
 
   private fun publishBookFailure(book: Book) {
     val failure = this.taskRecorder.finishFailure<Unit>()
-    this.requirements.bookRegistry.update(BookWithStatus(book, BookStatus.FailedLoan(book.id, failure)))
+    this.requirements.bookRegistry.update(
+      BookWithStatus(
+        book,
+        BookStatus.FailedLoan(book.id, failure)
+      )
+    )
   }
 
   private class BorrowContext(

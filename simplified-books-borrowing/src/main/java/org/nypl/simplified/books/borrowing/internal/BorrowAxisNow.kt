@@ -39,7 +39,8 @@ class BorrowAxisNow private constructor() : BorrowSubtaskType {
     override fun isApplicableFor(
       type: MIMEType,
       target: URI?,
-      account: AccountReadableType?
+      account: AccountReadableType?,
+      remaining: List<MIMEType>
     ): Boolean {
       return MIMECompatibility.isCompatibleStrictWithoutAttributes(type, StandardFormatNames.axisNow)
     }
@@ -113,7 +114,8 @@ class BorrowAxisNow private constructor() : BorrowSubtaskType {
     if (context.axisNowService == null) {
       context.taskRecorder.currentStepFailed(
         message = "This build of the application does not support AxisNow DRM.",
-        errorCode = axisNowNotSupported
+        errorCode = axisNowNotSupported,
+        extraMessages = listOf()
       )
       throw BorrowSubtaskFailed()
     }
@@ -133,7 +135,8 @@ class BorrowAxisNow private constructor() : BorrowSubtaskType {
       context.taskRecorder.currentStepFailed(
         message = "AxisNow fulfillment error: ${e.message}",
         errorCode = BorrowErrorCodes.axisNowFulfillmentFailed,
-        exception = e
+        exception = e,
+        extraMessages = listOf()
       )
       throw BorrowSubtaskFailed()
     } finally {

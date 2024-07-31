@@ -31,6 +31,7 @@ interface BorrowSubtaskFactoryType {
   fun isApplicableFor(
     type: MIMEType,
     target: URI?,
-    account: AccountReadableType?
+    account: AccountReadableType?,
+    remaining: List<MIMEType>
   ): Boolean
 }

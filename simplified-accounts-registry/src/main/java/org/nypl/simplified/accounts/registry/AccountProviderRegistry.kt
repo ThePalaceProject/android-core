@@ -44,7 +44,8 @@ class AccountProviderRegistry private constructor(
   @Volatile
   private var statusRef: AccountProviderRegistryStatus = Idle
 
-  private val descriptions = Collections.synchronizedMap(LinkedHashMap<URI, AccountProviderDescription>())
+  private val descriptions =
+    Collections.synchronizedMap(LinkedHashMap<URI, AccountProviderDescription>())
   private val descriptionsReadOnly = Collections.unmodifiableMap(this.descriptions)
   private val resolved = ConcurrentHashMap<URI, AccountProviderType>()
   private val resolvedReadOnly = Collections.unmodifiableMap(this.resolved)
@@ -87,6 +88,7 @@ class AccountProviderRegistry private constructor(
                 this.updateDescription(newDescriptions[key]!!)
               }
             }
+
             is AccountProviderSourceType.SourceResult.SourceFailed -> {
               this.eventsActual.onNext(SourceFailed(source.javaClass, result.exception))
             }
@@ -118,6 +120,7 @@ class AccountProviderRegistry private constructor(
                 this.updateDescription(newDescriptions[key]!!)
               }
             }
+
             is AccountProviderSourceType.SourceResult.SourceFailed -> {
               this.eventsActual.onNext(SourceFailed(source.javaClass, result.exception))
             }
@@ -202,20 +205,27 @@ class AccountProviderRegistry private constructor(
               this.updateDescription(result.result.toDescription())
               taskRecorder.finishSuccess(result.result)
             }
+
             is TaskResult.Failure -> taskRecorder.finishFailure()
           }
         }
       }
 
       taskRecorder.currentStepFailed(
-        "No sources can resolve the given description.",
-        "noApplicableSource ${description.id} ${description.title}"
+        message = "No sources can resolve the given description.",
+        errorCode = "noApplicableSource ${description.id} ${description.title}",
+        extraMessages = listOf()
       )
       return taskRecorder.finishFailure()
     } catch (e: Exception) {
       this.logger.error("resolution exception: ", e)
       val message = e.message ?: e.javaClass.canonicalName ?: "unknown"
-      taskRecorder.currentStepFailedAppending(message, "unexpectedException", e)
+      taskRecorder.currentStepFailedAppending(
+        message = message,
+        errorCode = "unexpectedException",
+        exception = e,
+        extraMessages = listOf()
+      )
       return taskRecorder.finishFailure()
     }
   }

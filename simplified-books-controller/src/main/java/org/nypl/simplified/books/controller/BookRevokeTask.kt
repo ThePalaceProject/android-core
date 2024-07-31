@@ -196,7 +196,12 @@ class BookRevokeTask(
         val exception = BookRevokeExceptionNotRevocable()
         val message =
           this.revokeStrings.revokeServerNotifyNotRevocable(availability.javaClass.simpleName)
-        this.taskRecorder.currentStepFailed(message, "notRevocable", exception)
+        this.taskRecorder.currentStepFailed(
+          message = message,
+          errorCode = "notRevocable",
+          exception = exception,
+          extraMessages = listOf()
+        )
         throw TaskFailedHandled(exception)
       }
 
@@ -215,7 +220,12 @@ class BookRevokeTask(
         val exception = BookRevokeExceptionNotRevocable()
         val message =
           this.revokeStrings.revokeServerNotifyNotRevocable(availability.javaClass.simpleName)
-        this.taskRecorder.currentStepFailed(message, "notRevocable", exception)
+        this.taskRecorder.currentStepFailed(
+          message = message,
+          errorCode = "notRevocable",
+          exception = exception,
+          extraMessages = listOf()
+        )
         throw TaskFailedHandled(exception)
       }
 
@@ -280,7 +290,10 @@ class BookRevokeTask(
       this.databaseEntry.writeOPDSEntry(entry.feedEntry)
     } catch (e: Exception) {
       this.taskRecorder.currentStepFailed(
-        this.revokeStrings.revokeServerNotifySavingEntryFailed, "unexpectedException", e
+        message = this.revokeStrings.revokeServerNotifySavingEntryFailed,
+        errorCode = "unexpectedException",
+        exception = e,
+        extraMessages = listOf()
       )
       throw TaskFailedHandled(e)
     }
@@ -316,7 +329,12 @@ class BookRevokeTask(
       ).get(this.revokeServerTimeoutDuration.standardSeconds, TimeUnit.SECONDS)
     } catch (e: TimeoutException) {
       val message = this.revokeStrings.revokeServerNotifyFeedTimedOut
-      this.taskRecorder.currentStepFailed(message, "timedOut", e)
+      this.taskRecorder.currentStepFailed(
+        message = message,
+        errorCode = "timedOut",
+        exception = e,
+        extraMessages = listOf()
+      )
       throw TaskFailedHandled(e)
     } catch (e: ExecutionException) {
       val ex = e.cause!!
@@ -325,7 +343,12 @@ class BookRevokeTask(
       }
 
       val message = this.revokeStrings.revokeServerNotifyFeedTimedOut
-      this.taskRecorder.currentStepFailed(message, "feedLoaderFailed", ex)
+      this.taskRecorder.currentStepFailed(
+        message = message,
+        errorCode = "feedLoaderFailed",
+        exception = ex,
+        extraMessages = listOf()
+      )
       throw TaskFailedHandled(ex)
     }
 
@@ -339,14 +362,24 @@ class BookRevokeTask(
       is FeedLoaderFailedGeneral -> {
         val message = this.revokeStrings.revokeServerNotifyFeedFailed
         this.taskRecorder.addAttributesIfPresent(feedResult.problemReport?.toMap())
-        this.taskRecorder.currentStepFailed(message, "feedLoaderFailed", feedResult.exception)
+        this.taskRecorder.currentStepFailed(
+          message = message,
+          errorCode = "feedLoaderFailed",
+          exception = feedResult.exception,
+          extraMessages = listOf()
+        )
         throw TaskFailedHandled(feedResult.exception)
       }
 
       is FeedLoaderFailedAuthentication -> {
         val message = this.revokeStrings.revokeServerNotifyFeedFailed
         this.taskRecorder.addAttributesIfPresent(feedResult.problemReport?.toMap())
-        this.taskRecorder.currentStepFailed(message, "feedLoaderFailed", feedResult.exception)
+        this.taskRecorder.currentStepFailed(
+          message = message,
+          errorCode = "feedLoaderFailed",
+          exception = feedResult.exception,
+          extraMessages = listOf()
+        )
         throw TaskFailedHandled(feedResult.exception)
       }
     }
@@ -360,7 +393,12 @@ class BookRevokeTask(
     if (feed.size == 0) {
       val exception = BookRevokeExceptionBadFeed()
       val message = this.revokeStrings.revokeServerNotifyFeedEmpty
-      this.taskRecorder.currentStepFailed(message, "feedLoaderFailed", exception)
+      this.taskRecorder.currentStepFailed(
+        message = message,
+        errorCode = "feedLoaderFailed",
+        exception = exception,
+        extraMessages = listOf()
+      )
       throw TaskFailedHandled(exception)
     }
 
@@ -370,17 +408,29 @@ class BookRevokeTask(
           is FeedEntryCorrupt -> {
             val exception = BookRevokeExceptionBadFeed()
             val message = this.revokeStrings.revokeServerNotifyFeedCorrupt
-            this.taskRecorder.currentStepFailed(message, "feedCorrupted", feedEntry.error)
+            this.taskRecorder.currentStepFailed(
+              message = message,
+              errorCode = "feedCorrupted",
+              exception = feedEntry.error,
+              extraMessages = listOf()
+            )
             throw TaskFailedHandled(exception)
           }
+
           is FeedEntryOPDS ->
             feedEntry
         }
       }
+
       is Feed.FeedWithGroups -> {
         val exception = BookRevokeExceptionBadFeed()
         val message = this.revokeStrings.revokeServerNotifyFeedWithGroups
-        this.taskRecorder.currentStepFailed(message, "feedUnusable", exception)
+        this.taskRecorder.currentStepFailed(
+          message = message,
+          errorCode = "feedUnusable",
+          exception = exception,
+          extraMessages = listOf()
+        )
         throw TaskFailedHandled(exception)
       }
     }
@@ -394,10 +444,13 @@ class BookRevokeTask(
     return when (val handle = this.databaseEntry.findPreferredFormatHandle()) {
       is BookDatabaseEntryFormatHandleEPUB ->
         this.revokeFormatHandleEPUB(handle, account)
+
       is BookDatabaseEntryFormatHandlePDF ->
         this.revokeFormatHandlePDF(handle)
+
       is BookDatabaseEntryFormatHandleAudioBook ->
         this.revokeFormatHandleAudioBook(handle)
+
       null -> {
         this.debug("no format handle available, nothing to do!")
         this.taskRecorder.currentStepSucceeded(this.revokeStrings.revokeFormatNothingToDo)
@@ -406,7 +459,10 @@ class BookRevokeTask(
     }
   }
 
-  private fun revokeFormatHandleEPUB(handle: BookDatabaseEntryFormatHandleEPUB, account: AccountType) {
+  private fun revokeFormatHandleEPUB(
+    handle: BookDatabaseEntryFormatHandleEPUB,
+    account: AccountType
+  ) {
     this.debug("revoking via EPUB format handle")
     this.taskRecorder.beginNewStep(this.revokeStrings.revokeFormatSpecific("EPUB"))
     this.publishRequestingRevokeStatus()
@@ -420,6 +476,7 @@ class BookRevokeTask(
           this.debug("no Adobe rights, nothing to do!")
         }
       }
+
       is BookDRMInformationHandle.LCPHandle,
       is BookDRMInformationHandle.AxisHandle,
       is BookDRMInformationHandle.NoneHandle -> {
@@ -488,27 +545,54 @@ class BookRevokeTask(
       adeptFuture.get(this.revokeACSTimeoutDuration.standardSeconds, TimeUnit.SECONDS)
     } catch (e: TimeoutException) {
       val message = this.revokeStrings.revokeACSTimedOut
-      this.taskRecorder.currentStepFailed(message, "timedOut", e)
+      this.taskRecorder.currentStepFailed(
+        message,
+        errorCode = "timedOut",
+        exception = e,
+        extraMessages = listOf()
+      )
       throw TaskFailedHandled(e)
     } catch (e: ExecutionException) {
       throw when (val cause = e.cause!!) {
         is CancellationException -> {
           val message = this.revokeStrings.revokeBookCancelled
-          this.taskRecorder.currentStepFailed(message, "cancelled", cause)
+          this.taskRecorder.currentStepFailed(
+            message = message,
+            errorCode = "cancelled",
+            exception = cause,
+            extraMessages = listOf()
+          )
           TaskFailedHandled(cause)
         }
+
         is AdobeDRMExtensions.AdobeDRMRevokeException -> {
           val message = this.revokeStrings.revokeBookACSConnectorFailed(cause.errorCode)
-          this.taskRecorder.currentStepFailed(message, "${this.adobeACS}: ${cause.errorCode}", cause)
+          this.taskRecorder.currentStepFailed(
+            message = message,
+            errorCode = "${this.adobeACS}: ${cause.errorCode}",
+            exception = cause,
+            extraMessages = listOf()
+          )
           TaskFailedHandled(cause)
         }
+
         else -> {
-          this.taskRecorder.currentStepFailed(this.revokeStrings.revokeBookACSFailed, "unexpectedException", cause)
+          this.taskRecorder.currentStepFailed(
+            message = this.revokeStrings.revokeBookACSFailed,
+            errorCode = "unexpectedException",
+            exception = cause,
+            extraMessages = listOf()
+          )
           TaskFailedHandled(cause)
         }
       }
     } catch (e: Throwable) {
-      this.taskRecorder.currentStepFailed(this.revokeStrings.revokeBookACSFailed, "unexpectedException", e)
+      this.taskRecorder.currentStepFailed(
+        message = this.revokeStrings.revokeBookACSFailed,
+        errorCode = "unexpectedException",
+        exception = e,
+        extraMessages = listOf()
+      )
       throw TaskFailedHandled(e)
     }
 
@@ -531,7 +615,12 @@ class BookRevokeTask(
     if (credentials == null) {
       val exception = BookRevokeExceptionDeviceNotActivated()
       val message = this.revokeStrings.revokeACSGettingDeviceCredentialsNotActivated
-      this.taskRecorder.currentStepFailed(message, "${this.adobeACS}: drmDeviceNotActive", exception)
+      this.taskRecorder.currentStepFailed(
+        message = message,
+        errorCode = "${this.adobeACS}: drmDeviceNotActive",
+        exception = exception,
+        extraMessages = listOf()
+      )
       throw TaskFailedHandled(exception)
     }
 
@@ -548,6 +637,7 @@ class BookRevokeTask(
       when (val drm = handle.drmInformationHandle) {
         is BookDRMInformationHandle.ACSHandle ->
           drm.setAdobeRightsInformation(null)
+
         is BookDRMInformationHandle.AxisHandle,
         is BookDRMInformationHandle.LCPHandle,
         is BookDRMInformationHandle.NoneHandle -> {
@@ -556,7 +646,10 @@ class BookRevokeTask(
       }
     } catch (e: Exception) {
       this.taskRecorder.currentStepFailed(
-        this.revokeStrings.revokeACSDeleteRightsFailed, "unexpectedException", e
+        message = this.revokeStrings.revokeACSDeleteRightsFailed,
+        errorCode = "unexpectedException",
+        exception = e,
+        extraMessages = listOf()
       )
       throw TaskFailedHandled(e)
     }
@@ -596,7 +689,10 @@ class BookRevokeTask(
     } catch (e: Exception) {
       this.error("failed to set up book database entry: ", e)
       this.taskRecorder.currentStepFailed(
-        this.revokeStrings.revokeBookDatabaseLookupFailed, "unexpectedException", e
+        message = this.revokeStrings.revokeBookDatabaseLookupFailed,
+        errorCode = "unexpectedException",
+        exception = e,
+        extraMessages = listOf()
       )
       throw TaskFailedHandled(e)
     }

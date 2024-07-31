@@ -61,8 +61,15 @@ sealed class BookDRMInformation : Serializable {
      * The hashed LCP passphrase for the book.
      */
 
-    val hashedPassphrase: String?
+    val hashedPassphrase: String?,
+
+    /**
+     * The bytes of the LCP license.
+     */
+
+    val licenseBytes: ByteArray?
   ) : BookDRMInformation() {
+
     override fun playerCredentials(): PlayerBookCredentialsType {
       return if (this.hashedPassphrase != null) {
         PlayerBookCredentialsLCP(this.hashedPassphrase)

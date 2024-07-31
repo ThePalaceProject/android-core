@@ -35,7 +35,8 @@ class BorrowCopy private constructor() : BorrowSubtaskType {
     override fun isApplicableFor(
       type: MIMEType,
       target: URI?,
-      account: AccountReadableType?
+      account: AccountReadableType?,
+      remaining: List<MIMEType>
     ): Boolean {
       return if (target != null) {
         target.scheme == "content"
@@ -86,7 +87,8 @@ class BorrowCopy private constructor() : BorrowSubtaskType {
       context.taskRecorder.currentStepFailed(
         message = "File not found.",
         errorCode = contentFileNotFound,
-        exception = e
+        exception = e,
+        extraMessages = listOf()
       )
       throw BorrowSubtaskFailed()
     }

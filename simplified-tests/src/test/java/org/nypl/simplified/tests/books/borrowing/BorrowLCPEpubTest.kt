@@ -34,7 +34,7 @@ import org.nypl.simplified.books.book_database.api.BookDatabaseType
 import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.borrowing.BorrowContextType
-import org.nypl.simplified.books.borrowing.internal.BorrowLCP
+import org.nypl.simplified.books.borrowing.internal.BorrowLCPEpub
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException
 import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFiles
@@ -71,7 +71,7 @@ import java.nio.file.Files
 import java.util.concurrent.TimeUnit
 import java.util.zip.ZipFile
 
-class BorrowLCPTest {
+class BorrowLCPEpubTest {
 
   private lateinit var androidContentResolver: ContentResolver
   private lateinit var downloadsDirectory: File
@@ -88,7 +88,7 @@ class BorrowLCPTest {
   private lateinit var taskRecorder: TaskRecorderType
   private lateinit var webServer: MockWebServer
 
-  private val logger = LoggerFactory.getLogger(BorrowLCPTest::class.java)
+  private val logger = LoggerFactory.getLogger(BorrowLCPEpubTest::class.java)
 
   @TempDir
   @JvmField
@@ -393,7 +393,7 @@ class BorrowLCPTest {
         .setHeader("Content-Type", "application/epub+zip")
         .setBody(
           Buffer().readFrom(
-            BorrowLCPTest::class.java.getResourceAsStream(
+            BorrowLCPEpubTest::class.java.getResourceAsStream(
               "/org/nypl/simplified/tests/books/minimal.epub"
             )
           )
@@ -410,7 +410,7 @@ class BorrowLCPTest {
 
     // Execute the task. It is expected to halt early.
 
-    val task = BorrowLCP.createSubtask()
+    val task = BorrowLCPEpub.createSubtask()
 
     Assertions.assertThrows(BorrowSubtaskException.BorrowSubtaskHaltedEarly::class.java) {
       task.execute(context)
@@ -595,7 +595,7 @@ class BorrowLCPTest {
         .setHeader("Content-Type", "application/audiobook+lcp")
         .setBody(
           Buffer().readFrom(
-            BorrowLCPTest::class.java.getResourceAsStream(
+            BorrowLCPEpubTest::class.java.getResourceAsStream(
               "/org/nypl/simplified/tests/books/minimal.lcpa"
             )
           )
@@ -612,7 +612,7 @@ class BorrowLCPTest {
 
     // Execute the task. It is expected to halt early.
 
-    val task = BorrowLCP.createSubtask()
+    val task = BorrowLCPEpub.createSubtask()
 
     Assertions.assertThrows(BorrowSubtaskException.BorrowSubtaskHaltedEarly::class.java) {
       task.execute(context)
@@ -709,7 +709,7 @@ class BorrowLCPTest {
 
     // Execute the task. It is expected to halt early.
 
-    val task = BorrowLCP.createSubtask()
+    val task = BorrowLCPEpub.createSubtask()
 
     Assertions.assertThrows(BorrowSubtaskException.BorrowSubtaskFailed::class.java) {
       task.execute(context)
@@ -783,7 +783,7 @@ class BorrowLCPTest {
       acquisitionPath,
     )
 
-    val task = BorrowLCP.createSubtask()
+    val task = BorrowLCPEpub.createSubtask()
 
     Assertions.assertThrows(BorrowSubtaskException.BorrowSubtaskFailed::class.java) {
       task.execute(context)
@@ -868,7 +868,7 @@ class BorrowLCPTest {
       acquisitionPath,
     )
 
-    val task = BorrowLCP.createSubtask()
+    val task = BorrowLCPEpub.createSubtask()
 
     Assertions.assertThrows(BorrowSubtaskException.BorrowSubtaskFailed::class.java) {
       task.execute(context)
@@ -900,7 +900,7 @@ class BorrowLCPTest {
     logger.debug("copyToTempFile: {} -> {}", name, file)
 
     FileOutputStream(file).use { output ->
-      BorrowLCPTest::class.java.getResourceAsStream(name)!!.use { input ->
+      BorrowLCPEpubTest::class.java.getResourceAsStream(name)!!.use { input ->
         val buffer = ByteArray(4096)
 
         while (true) {

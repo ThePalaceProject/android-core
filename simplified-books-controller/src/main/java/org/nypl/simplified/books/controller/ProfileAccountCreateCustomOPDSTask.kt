@@ -70,12 +70,18 @@ class ProfileAccountCreateCustomOPDSTask(
       when (resolutionResult) {
         is TaskResult.Success ->
           this.createAccount(accountProviderDescription)
+
         is TaskResult.Failure ->
           this.accountResolutionFailed(resolutionResult)
       }
     } catch (e: Throwable) {
       this.logger.error("account creation failed: ", e)
-      this.taskRecorder.currentStepFailedAppending(this.strings.unexpectedException, "unexpectedException", e)
+      this.taskRecorder.currentStepFailedAppending(
+        message = this.strings.unexpectedException,
+        errorCode = "unexpectedException",
+        exception = e,
+        extraMessages = listOf()
+      )
       this.publishFailureEvent()
       this.taskRecorder.finishFailure()
     }
@@ -88,7 +94,9 @@ class ProfileAccountCreateCustomOPDSTask(
     this.taskRecorder.addAll(resolutionResult.steps)
     this.taskRecorder.addAttributes(resolutionResult.attributes)
     this.taskRecorder.currentStepFailed(
-      this.strings.resolvingAccountProviderFailed, "resolvingAccountProviderFailed"
+      message = this.strings.resolvingAccountProviderFailed,
+      errorCode = "resolvingAccountProviderFailed",
+      extraMessages = listOf()
     )
     return this.taskRecorder.finishFailure()
   }
@@ -114,6 +122,7 @@ class ProfileAccountCreateCustomOPDSTask(
         this.publishProgressEvent(this.taskRecorder.currentStepSucceeded(this.strings.creatingAccountSucceeded))
         this.taskRecorder.finishSuccess(createResult.result)
       }
+
       is TaskResult.Failure<AccountType> -> {
         this.taskRecorder.addAll(createResult.steps)
         this.taskRecorder.finishFailure()
@@ -188,7 +197,9 @@ class ProfileAccountCreateCustomOPDSTask(
         .build()
 
     return request.execute().use { response ->
-      this.taskRecorder.addAttributes(response.status.properties?.problemReport?.toMap() ?: emptyMap())
+      this.taskRecorder.addAttributes(
+        response.status.properties?.problemReport?.toMap() ?: emptyMap()
+      )
 
       when (val status = response.status) {
         is LSHTTPResponseStatus.Responded.OK -> {
@@ -206,9 +217,9 @@ class ProfileAccountCreateCustomOPDSTask(
             this.findAuthenticationDocumentLink(feed)
           } catch (e: Exception) {
             this.taskRecorder.currentStepFailed(
-              e.message
-                ?: e.javaClass.name,
-              "parsingOPDSFeedFailed"
+              message = e.message ?: e.javaClass.name,
+              errorCode = "parsingOPDSFeedFailed",
+              extraMessages = listOf()
             )
             this.publishFailureEvent()
             throw e
@@ -235,7 +246,11 @@ class ProfileAccountCreateCustomOPDSTask(
            * Any other error is fatal.
            */
 
-          this.taskRecorder.currentStepFailed(this.strings.fetchingOPDSFeedFailed, "fetchingOPDSFeedFailed")
+          this.taskRecorder.currentStepFailed(
+            message = this.strings.fetchingOPDSFeedFailed,
+            errorCode = "fetchingOPDSFeedFailed",
+            extraMessages = listOf()
+          )
           this.publishFailureEvent()
           throw IOException()
         }
@@ -248,9 +263,10 @@ class ProfileAccountCreateCustomOPDSTask(
            */
 
           this.taskRecorder.currentStepFailed(
-            this.strings.fetchingOPDSFeedFailed,
-            "httpRequestFailed",
-            status.exception
+            message = this.strings.fetchingOPDSFeedFailed,
+            errorCode = "httpRequestFailed",
+            exception = status.exception,
+            extraMessages = listOf()
           )
 
           this.publishFailureEvent()

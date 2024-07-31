@@ -117,9 +117,10 @@ class ProfileAccountLogoutTask(
       return this.steps.finishSuccess(Unit)
     } catch (e: Throwable) {
       this.steps.currentStepFailedAppending(
-        this.logoutStrings.logoutUnexpectedException,
-        "unexpectedException",
-        e
+        message = this.logoutStrings.logoutUnexpectedException,
+        errorCode = "unexpectedException",
+        exception = e,
+        extraMessages = listOf()
       )
 
       val failure = this.steps.finishFailure<Unit>()
@@ -192,7 +193,11 @@ class ProfileAccountLogoutTask(
     if (token == null) {
       this.warn("Patron user profile contained no Adobe DRM client token")
       val message = "Patron user profile is missing DRM information."
-      this.steps.currentStepFailed(message, "patronUserProfileNoDRM")
+      this.steps.currentStepFailed(
+        message = message,
+        errorCode = "patronUserProfileNoDRM",
+        extraMessages = listOf()
+      )
       throw IOException(message)
     }
 
@@ -262,14 +267,20 @@ class ProfileAccountLogoutTask(
     when (ex) {
       is AdobeDRMExtensions.AdobeDRMLogoutConnectorException -> {
         val message = this.logoutStrings.logoutDeactivatingDeviceAdobeFailed(ex.errorCode, ex)
-        this.steps.currentStepFailed(message, "Adobe ACS: ${ex.errorCode}", ex)
+        this.steps.currentStepFailed(
+          message,
+          errorCode = "Adobe ACS: ${ex.errorCode}",
+          exception = ex,
+          extraMessages = listOf()
+        )
       }
 
       else -> {
         this.steps.currentStepFailed(
-          this.logoutStrings.logoutDeactivatingDeviceAdobeFailed("UNKNOWN", ex),
-          "unexpectedException",
-          ex
+          message = this.logoutStrings.logoutDeactivatingDeviceAdobeFailed("UNKNOWN", ex),
+          errorCode = "unexpectedException",
+          exception = ex,
+          extraMessages = listOf()
         )
       }
     }
@@ -298,7 +309,11 @@ class ProfileAccountLogoutTask(
         if (alternate == null) {
           this.error("no alternate link available for book $book. skipping...")
           val message = this.logoutStrings.logoutNoAlternateLinkInDatabase
-          this.steps.currentStepFailed(message, "noAlternateLink")
+          this.steps.currentStepFailed(
+            message = message,
+            errorCode = "noAlternateLink",
+            extraMessages = listOf()
+          )
         } else {
           val newFeedEntry = this.fetchOPDSEntry(alternate)
           entry.writeOPDSEntry(newFeedEntry)
@@ -308,7 +323,12 @@ class ProfileAccountLogoutTask(
       } catch (e: Exception) {
         this.error("step failed with unexpected exception", e)
         val message = this.logoutStrings.logoutUnexpectedException
-        this.steps.currentStepFailed(message, "unexpectedException", e)
+        this.steps.currentStepFailed(
+          message,
+          errorCode = "unexpectedException",
+          exception = e,
+          extraMessages = listOf()
+        )
       }
     }
   }
@@ -323,7 +343,12 @@ class ProfileAccountLogoutTask(
       ).get()
     } catch (e: TimeoutException) {
       val message = this.logoutStrings.logoutOPDSFeedTimedOut
-      this.steps.currentStepFailed(message, "timedOut", e)
+      this.steps.currentStepFailed(
+        message = message,
+        "timedOut",
+        exception = e,
+        extraMessages = listOf()
+      )
       throw StepFailedHandled(e)
     } catch (e: ExecutionException) {
       throw e.cause!!
@@ -342,7 +367,12 @@ class ProfileAccountLogoutTask(
 
         is FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedGeneral -> {
           val message = this.logoutStrings.logoutOPDSFeedFailed
-          this.steps.currentStepFailed(message, "feedLoaderFailed", feedResult.exception)
+          this.steps.currentStepFailed(
+            message = message,
+            errorCode = "feedLoaderFailed",
+            exception = feedResult.exception,
+            extraMessages = listOf()
+          )
           throw StepFailedHandled(feedResult.exception)
         }
       }
@@ -350,7 +380,12 @@ class ProfileAccountLogoutTask(
     if (feed.size == 0) {
       val message = this.logoutStrings.logoutOPDSFeedEmpty
       val exception = Exception(message)
-      this.steps.currentStepFailed(message, "feedEmpty")
+      this.steps.currentStepFailed(
+        message = message,
+        errorCode = "feedEmpty",
+        exception = exception,
+        extraMessages = listOf()
+      )
       throw StepFailedHandled(exception)
     }
 
@@ -359,7 +394,12 @@ class ProfileAccountLogoutTask(
         when (val feedEntry = feed.entriesInOrder[0]) {
           is FeedEntry.FeedEntryCorrupt -> {
             val message = this.logoutStrings.logoutOPDSFeedCorrupt
-            this.steps.currentStepFailed(message, "feedCorrupted", feedEntry.error)
+            this.steps.currentStepFailed(
+              message = message,
+              errorCode = "feedCorrupted",
+              exception = feedEntry.error,
+              extraMessages = listOf()
+            )
             throw StepFailedHandled(feedEntry.error)
           }
 
@@ -371,7 +411,12 @@ class ProfileAccountLogoutTask(
       is Feed.FeedWithGroups -> {
         val message = this.logoutStrings.logoutOPDSFeedWithGroups
         val exception = Exception(message)
-        this.steps.currentStepFailed(message, "feedUnusable")
+        this.steps.currentStepFailed(
+          message = message,
+          errorCode = "feedUnusable",
+          exception = exception,
+          extraMessages = listOf()
+        )
         throw StepFailedHandled(exception)
       }
     }
@@ -393,7 +438,9 @@ class ProfileAccountLogoutTask(
     } catch (e: Throwable) {
       this.error("could not clear book database: ", e)
       this.steps.currentStepFailed(
-        this.logoutStrings.logoutClearingBookDatabaseFailed, "unexpectedException"
+        message = this.logoutStrings.logoutClearingBookDatabaseFailed,
+        errorCode = "unexpectedException",
+        extraMessages = listOf()
       )
     }
   }

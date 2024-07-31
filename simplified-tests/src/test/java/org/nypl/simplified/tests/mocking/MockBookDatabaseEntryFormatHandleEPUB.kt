@@ -1,5 +1,6 @@
 package org.nypl.simplified.tests.mocking
 
+import android.app.Application
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookDRMKind
 import org.nypl.simplified.books.api.BookFormat
@@ -73,7 +74,7 @@ class MockBookDatabaseEntryFormatHandleEPUB(
   override fun setDRMKind(kind: BookDRMKind) {
   }
 
-  override fun deleteBookData() {
+  override fun deleteBookData(context: Application) {
     this.bookData = null
     this.bookFile = null
     this.formatField = this.formatField.copy(file = this.bookFile)

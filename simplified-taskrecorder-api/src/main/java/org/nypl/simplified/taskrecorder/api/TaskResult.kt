@@ -137,7 +137,8 @@ sealed class TaskResult<A> : PresentableType {
             resolution = TaskStepFailed(
               message = resolution,
               errorCode = errorCode,
-              exception = null
+              exception = null,
+              extraMessages = listOf()
             )
           )
         )
