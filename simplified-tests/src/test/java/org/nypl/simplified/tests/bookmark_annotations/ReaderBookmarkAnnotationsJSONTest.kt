@@ -24,7 +24,9 @@ import org.nypl.simplified.books.api.bookmark.SerializedLocatorLegacyCFI
 import org.nypl.simplified.books.api.bookmark.SerializedLocatorPage1
 import org.nypl.simplified.books.api.bookmark.SerializedLocators
 import org.nypl.simplified.json.core.JSONParseException
+import org.nypl.simplified.json.core.JSONParserUtilities
 import org.slf4j.LoggerFactory
+import java.io.File
 import java.io.FileNotFoundException
 import java.io.InputStream
 
@@ -136,13 +138,19 @@ class ReaderBookmarkAnnotationsJSONTest {
     assertEquals("oa:FragmentSelector", node["type"].textValue())
     assertEquals(this.targetValue0, node["value"].textValue())
 
-    assertEquals(input, BookmarkAnnotationsJSON.deserializeSelectorNodeFromJSON(this.objectMapper, node))
+    assertEquals(
+      input,
+      BookmarkAnnotationsJSON.deserializeSelectorNodeFromJSON(this.objectMapper, node)
+    )
   }
 
   @Test
   fun testTarget() {
     val input =
-      BookmarkAnnotationTargetNode("z", BookmarkAnnotationSelectorNode("oa:FragmentSelector", this.targetValue0))
+      BookmarkAnnotationTargetNode(
+        "z",
+        BookmarkAnnotationSelectorNode("oa:FragmentSelector", this.targetValue0)
+      )
     val node =
       BookmarkAnnotationsJSON.serializeTargetNodeToJSON(this.objectMapper, input)
 
@@ -150,7 +158,10 @@ class ReaderBookmarkAnnotationsJSONTest {
     assertEquals("oa:FragmentSelector", node["selector"]["type"].textValue())
     assertEquals(this.targetValue0, node["selector"]["value"].textValue())
 
-    assertEquals(input, BookmarkAnnotationsJSON.deserializeTargetNodeFromJSON(this.objectMapper, node))
+    assertEquals(
+      input,
+      BookmarkAnnotationsJSON.deserializeTargetNodeFromJSON(this.objectMapper, node)
+    )
   }
 
   @Test
@@ -186,7 +197,10 @@ class ReaderBookmarkAnnotationsJSONTest {
   @Test
   fun testBookmark() {
     val target =
-      BookmarkAnnotationTargetNode("z", BookmarkAnnotationSelectorNode("oa:FragmentSelector", this.targetValue0))
+      BookmarkAnnotationTargetNode(
+        "z",
+        BookmarkAnnotationSelectorNode("oa:FragmentSelector", this.targetValue0)
+      )
 
     val input =
       BookmarkAnnotation(
@@ -201,7 +215,10 @@ class ReaderBookmarkAnnotationsJSONTest {
     val node =
       BookmarkAnnotationsJSON.serializeBookmarkAnnotationToJSON(this.objectMapper, input)
 
-    this.compareAnnotations(input, BookmarkAnnotationsJSON.deserializeBookmarkAnnotationFromJSON(this.objectMapper, node))
+    this.compareAnnotations(
+      input,
+      BookmarkAnnotationsJSON.deserializeBookmarkAnnotationFromJSON(this.objectMapper, node)
+    )
   }
 
   @Test
@@ -218,7 +235,10 @@ class ReaderBookmarkAnnotationsJSONTest {
 
     assertEquals(
       input,
-      BookmarkAnnotationsJSON.deserializeBookmarkAnnotationFirstNodeFromJSON(this.objectMapper, node)
+      BookmarkAnnotationsJSON.deserializeBookmarkAnnotationFirstNodeFromJSON(
+        this.objectMapper,
+        node
+      )
     )
   }
 
@@ -241,7 +261,10 @@ class ReaderBookmarkAnnotationsJSONTest {
   @Test
   fun testBookmarkBadDateSIMPLY_1938() {
     val target =
-      BookmarkAnnotationTargetNode("z", BookmarkAnnotationSelectorNode("oa:FragmentSelector", this.targetValue0))
+      BookmarkAnnotationTargetNode(
+        "z",
+        BookmarkAnnotationSelectorNode("oa:FragmentSelector", this.targetValue0)
+      )
 
     val input =
       BookmarkAnnotation(
@@ -256,7 +279,10 @@ class ReaderBookmarkAnnotationsJSONTest {
     val node =
       BookmarkAnnotationsJSON.serializeBookmarkAnnotationToJSON(this.objectMapper, input)
 
-    this.compareAnnotations(input, BookmarkAnnotationsJSON.deserializeBookmarkAnnotationFromJSON(this.objectMapper, node))
+    this.compareAnnotations(
+      input,
+      BookmarkAnnotationsJSON.deserializeBookmarkAnnotationFromJSON(this.objectMapper, node)
+    )
   }
 
   @Test
@@ -577,6 +603,45 @@ class ReaderBookmarkAnnotationsJSONTest {
     assertTrue(ex.message!!.contains("Expected: A key 'http://librarysimplified.org/terms/time'"))
   }
 
+  @Test
+  fun testAnnotationsDump20240805() {
+    val node =
+      this.resourceBookmarksNode("annotations-dump-20240805.json")
+    val first =
+      JSONParserUtilities.getObject(node, "first")
+    val items =
+      JSONParserUtilities.getArray(first, "items")
+
+    val outputArray =
+      this.objectMapper.createArrayNode()
+
+    var index = 0
+    for (item in items) {
+      val itemObject =
+        item as ObjectNode
+      val target =
+        JSONParserUtilities.getObject(itemObject, "target")
+      val selector =
+        JSONParserUtilities.getObject(target, "selector")
+      val value =
+        JSONParserUtilities.getString(selector, "value")
+
+      outputArray.add(value)
+      this.logger.debug("[{}]: {}", index, value)
+      ++index
+    }
+
+    /*
+     * Write the escaped locators to a temporary file for inspection.
+     */
+
+    val outputFile = File("/tmp/output.json")
+    outputFile.outputStream().use { stream ->
+      objectMapper.writeValue(stream, outputArray)
+      stream.flush()
+    }
+  }
+
   private fun resourceText(
     name: String
   ): String {
@@ -591,7 +656,10 @@ class ReaderBookmarkAnnotationsJSONTest {
 
   private fun checkRoundTrip(bookmarkAnnotation: BookmarkAnnotation) {
     val serialized =
-      BookmarkAnnotationsJSON.serializeBookmarkAnnotationToBytes(this.objectMapper, bookmarkAnnotation)
+      BookmarkAnnotationsJSON.serializeBookmarkAnnotationToBytes(
+        this.objectMapper,
+        bookmarkAnnotation
+      )
     val serializedText =
       serialized.decodeToString()
 
@@ -653,5 +721,22 @@ class ReaderBookmarkAnnotationsJSONTest {
       ReaderBookmarkAnnotationsJSONTest::class.java.getResource(fileName)
         ?: throw FileNotFoundException("No such resource: $fileName")
     return url.openStream()
+  }
+
+  private fun resourceBookmarks(
+    name: String
+  ): InputStream {
+    val fileName =
+      "/org/nypl/simplified/tests/bookmarks/$name"
+    val url =
+      ReaderBookmarkAnnotationsJSONTest::class.java.getResource(fileName)
+        ?: throw FileNotFoundException("No such resource: $fileName")
+    return url.openStream()
+  }
+
+  private fun resourceBookmarksNode(
+    name: String
+  ): ObjectNode {
+    return this.objectMapper.readTree(this.resourceBookmarks(name)) as ObjectNode
   }
 }
