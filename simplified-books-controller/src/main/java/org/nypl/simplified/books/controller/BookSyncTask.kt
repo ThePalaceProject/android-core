@@ -9,7 +9,6 @@ import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addCredentialsT
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.getAccessToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
-import org.nypl.simplified.accounts.api.AccountLoginState
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.database.api.AccountType
@@ -110,20 +109,19 @@ class BookSyncTask(
         this.taskRecorder.finishSuccess(Unit)
       }
       is LSHTTPResponseStatus.Responded.Error -> {
-        val recovered = this.onHTTPError(status, account)
-
-        if (recovered) {
-          this.taskRecorder.finishSuccess(Unit)
-        } else {
-          val message = String.format("%s: %d: %s", provider.loansURI, status.properties.status, status.properties.message)
-          val exception = IOException(message)
-          this.taskRecorder.currentStepFailed(
-            message = message,
-            errorCode = "syncFailed",
-            exception = exception
-          )
-          throw TaskFailedHandled(exception)
-        }
+        val message = String.format(
+          "%s: %d: %s",
+          provider.loansURI,
+          status.properties.status,
+          status.properties.message
+        )
+        val exception = IOException(message)
+        this.taskRecorder.currentStepFailed(
+          message = message,
+          errorCode = "syncFailed",
+          exception = exception
+        )
+        throw TaskFailedHandled(exception)
       }
       is LSHTTPResponseStatus.Failed ->
         throw IOException(status.exception)
@@ -328,21 +326,5 @@ class BookSyncTask(
     } else {
       throw IOException("No alternate link is available")
     }
-  }
-
-  /**
-   * Returns whether we recovered from the error.
-   */
-
-  private fun onHTTPError(
-    result: LSHTTPResponseStatus.Responded.Error,
-    account: AccountType
-  ): Boolean {
-    if (result.properties.status == 401) {
-      this.logger.debug("removing credentials due to 401 server response")
-      account.setLoginState(AccountLoginState.AccountNotLoggedIn)
-      return true
-    }
-    return false
   }
 }
