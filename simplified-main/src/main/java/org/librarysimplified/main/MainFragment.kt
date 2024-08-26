@@ -1,5 +1,6 @@
 package org.librarysimplified.main
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -13,10 +14,13 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import io.reactivex.disposables.CompositeDisposable
+import org.librarysimplified.audiobook.views.PlayerModel
+import org.librarysimplified.audiobook.views.PlayerModelState
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.catalog.saml20.CatalogSAML20Fragment
 import org.librarysimplified.ui.catalog.saml20.CatalogSAML20FragmentParameters
 import org.librarysimplified.ui.navigation.tabs.TabbedNavigator
+import org.librarysimplified.viewer.audiobook.AudioBookPlayerActivity2
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.accounts.api.AccountEventDeletion
 import org.nypl.simplified.accounts.api.AccountEventUpdated
@@ -124,6 +128,7 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
       android.R.id.home -> {
         this.navigator.popToRoot()
       }
+
       else -> super.onOptionsItemSelected(item)
     }
   }
@@ -159,6 +164,34 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
       this.requireActivity(),
       Services.serviceDirectory()
     )
+
+    this.showAudioBookPlayerIfNecessary()
+  }
+
+  /**
+   * XXX: This is really not what we want to be doing, but for PP-1612, we don't have enough
+   * of a UI yet to cope with the fact that an audiobook might be playing in the background
+   * when the application is resumed. When the MainFragment is resumed, we need to check to
+   * see if a player is playing and, if it is, open the player activity.
+   *
+   * This can be obliterated when the catalog is rewritten and we move to having a single
+   * activity for the entire application.
+   */
+
+  private fun showAudioBookPlayerIfNecessary() {
+    when (PlayerModel.state) {
+      is PlayerModelState.PlayerOpen -> {
+        if (PlayerModel.isPlaying) {
+          this.activity?.startActivity(
+            Intent(activity, AudioBookPlayerActivity2::class.java)
+          )
+        }
+      }
+
+      else -> {
+        // Ignore
+      }
+    }
   }
 
   private fun onAccountEvent(event: AccountEvent) {
@@ -268,13 +301,16 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
       if (numberOfHolds > 0) {
         if (badgeView == null) {
           badgeView = LayoutInflater.from(requireContext()).inflate(
-            org.librarysimplified.ui.tabs.R.layout.layout_menu_item_badge, bottomNavigationItem, false
+            org.librarysimplified.ui.tabs.R.layout.layout_menu_item_badge,
+            bottomNavigationItem,
+            false
           )
           bottomNavigationItem.addView(badgeView)
         }
 
         val badgeNumber = (badgeView as? ViewGroup)?.findViewById<TextView>(
-          org.librarysimplified.ui.tabs.R.id.badgeNumber)
+          org.librarysimplified.ui.tabs.R.id.badgeNumber
+        )
         badgeNumber?.text = numberOfHolds.toString()
       }
 
