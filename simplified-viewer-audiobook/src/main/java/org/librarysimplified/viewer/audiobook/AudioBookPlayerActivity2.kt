@@ -217,9 +217,9 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
             newBookmarks.addAll(PlayerBookmarkModel.bookmarks())
             newBookmarks.removeIf { b -> b.position == playerBookmark.position }
             newBookmarks.add(0, playerBookmark)
-
             PlayerBookmarkModel.setBookmarks(newBookmarks.toList())
           }
+
           PlayerBookmarkKind.LAST_READ -> {
             // Nothing to do here.
           }
@@ -234,6 +234,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
             Toast.makeText(this, R.string.audio_book_player_bookmark_added, Toast.LENGTH_SHORT)
               .show()
           }
+
           PlayerBookmarkKind.LAST_READ -> {
             // Nothing to do here.
           }
@@ -244,16 +245,24 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
         val parameters =
           AudioBookViewerModel.parameters ?: return
 
-        val playerBookmark = event.bookmark
-        this.bookmarkService.bookmarkDelete(
-          accountID = parameters.accountID,
-          bookmark = AudioBookBookmarks.fromPlayerBookmark(
+        val playerBookmark =
+          event.bookmark
+        val appBookmark =
+          AudioBookBookmarks.fromPlayerBookmark(
             feedEntry = parameters.opdsEntry,
             deviceId = "null",
             source = playerBookmark
-          ),
+          )
+        this.bookmarkService.bookmarkDelete(
+          accountID = parameters.accountID,
+          bookmark = appBookmark,
           ignoreRemoteFailures = true,
         )
+
+        val newBookmarks = arrayListOf<PlayerBookmark>()
+        newBookmarks.addAll(PlayerBookmarkModel.bookmarks())
+        newBookmarks.remove(playerBookmark)
+        PlayerBookmarkModel.setBookmarks(newBookmarks.toList())
       }
 
       is PlayerEventError -> {
