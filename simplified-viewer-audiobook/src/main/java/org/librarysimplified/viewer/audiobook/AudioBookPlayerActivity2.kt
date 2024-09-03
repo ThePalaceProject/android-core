@@ -48,6 +48,7 @@ import org.librarysimplified.audiobook.views.PlayerTOCFragment
 import org.librarysimplified.audiobook.views.PlayerViewCommand
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.bookmarks.api.BookmarkServiceType
+import org.nypl.simplified.bookmarks.api.BookmarksForBook
 import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.books.time.tracking.TimeTrackingServiceType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
@@ -327,12 +328,25 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
             book = bookParameters.bookID
           ).get()
 
-        val bookmarksConverted =
-          bookmarks.bookmarks.mapNotNull(AudioBookBookmarks::toPlayerBookmark)
-        val bookmarkLastRead =
-          bookmarks.lastRead?.let { b -> AudioBookBookmarks.toPlayerBookmark(b) }
+        /*
+         * Again, the bookmark service should already have an up-to-date list, but it won't
+         * until we refactor the whole bookmark system.
+         */
 
-        PlayerBookmarkModel.setBookmarks(bookmarksConverted)
+        this.bookmarkService.bookmarkSyncAndLoad(
+          accountID = bookParameters.accountID,
+          book = bookParameters.bookID
+        ).thenApply { arrivedBookmarks ->
+          PlayerUIThread.runOnUIThread {
+            this.logger.debug(
+              "{} bookmarks arrived from the server.", arrivedBookmarks.bookmarks.size
+            )
+            this.assignBookmarks(arrivedBookmarks)
+          }
+        }
+
+        val bookmarkLastRead =
+          this.assignBookmarks(bookmarks)
 
         val initialPosition =
           if (bookmarkLastRead != null) {
@@ -366,6 +380,18 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
         this.switchFragment(AudioBookLoadingFragment2())
       }
     }
+  }
+
+  private fun assignBookmarks(
+    bookmarks: BookmarksForBook
+  ): PlayerBookmark? {
+    val bookmarksConverted =
+      bookmarks.bookmarks.mapNotNull(AudioBookBookmarks::toPlayerBookmark)
+    val bookmarkLastRead =
+      bookmarks.lastRead?.let { b -> AudioBookBookmarks.toPlayerBookmark(b) }
+
+    PlayerBookmarkModel.setBookmarks(bookmarksConverted)
+    return bookmarkLastRead
   }
 
   private fun loadCoverImage() {
