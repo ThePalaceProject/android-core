@@ -162,6 +162,7 @@ val dependencyObjects = listOf(
     libs.bytebuddy,
     libs.bytebuddy.agent,
     libs.commons.compress,
+    libs.commons.io,
     libs.conscrypt,
     libs.firebase.analytics,
     libs.firebase.crashlytics,

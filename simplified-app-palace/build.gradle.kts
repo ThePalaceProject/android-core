@@ -498,6 +498,7 @@ dependencies {
 
     implementation(libs.azam.ulidj)
     implementation(libs.commons.compress)
+    implementation(libs.commons.io)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.annotations)
     implementation(libs.firebase.common)

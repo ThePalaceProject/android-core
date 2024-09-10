@@ -22,7 +22,8 @@ class TimeTrackingService(
   context: Context,
   private val httpCalls: TimeTrackingHTTPCallsType,
   private val profilesController: ProfilesControllerType,
-  private val timeTrackingDirectory: File
+  private val timeTrackingDirectory: File,
+  private val timeTrackingDebugDirectory: File
 ) : TimeTrackingServiceType {
 
   companion object {
@@ -31,6 +32,9 @@ class TimeTrackingService(
 
     private const val MAX_SECONDS_PLAYED = 60
   }
+
+  private var mostRecentLibraryId: String? = null
+  private var mostRecentBookId: String? = null
 
   private val logger = LoggerFactory.getLogger(TimeTrackingServiceType::class.java)
 
@@ -82,6 +86,16 @@ class TimeTrackingService(
       accountID.uuid.toString(),
       bookId
     )
+
+    TimeTrackingDebugging.onTimeTrackingStarted(
+      timeTrackingDebugDirectory = timeTrackingDebugDirectory,
+      libraryId = libraryId,
+      bookId = bookId
+    )
+
+    this.mostRecentLibraryId = libraryId
+    this.mostRecentBookId = bookId
+
     val libraryFile = File(timeTrackingDirectory, accountID.uuid.toString())
 
     // create a directory for the library
@@ -153,6 +167,7 @@ class TimeTrackingService(
       is PlayerEvent.PlayerEventWithPosition.PlayerEventChapterCompleted -> {
         isPlaying = false
       }
+
       is PlayerEvent.PlayerEventWithPosition.PlayerEventCreateBookmark,
       is PlayerEvent.PlayerEventPlaybackRateChanged,
       is PlayerEvent.PlayerEventError,
@@ -179,6 +194,12 @@ class TimeTrackingService(
     }
 
     logger.debug("Stop tracking playing time")
+
+    TimeTrackingDebugging.onTimeTrackingStopped(
+      timeTrackingDebugDirectory = timeTrackingDebugDirectory,
+      libraryId = this.mostRecentLibraryId ?: "Missing library ID!",
+      bookId = this.mostRecentBookId ?: "Missing book ID!"
+    )
 
     disposables.clear()
 
@@ -312,13 +333,33 @@ class TimeTrackingService(
     }
   }
 
-  private fun saveTimeTrackingInfoRemotely(timeTrackingInfo: TimeTrackingInfo): TimeTrackingInfo {
+  private fun saveTimeTrackingInfoRemotely(
+    timeTrackingInfo: TimeTrackingInfo
+  ): TimeTrackingInfo {
+    val timeEntriesToSend =
+      timeTrackingInfo.timeEntries.filter { timeEntry -> timeEntry.isValidTimeEntry() }
+
+    val timeEntryMap = mutableMapOf<String, TimeTrackingEntry>()
+    timeEntriesToSend.forEach { e -> timeEntryMap[e.id] = e }
+
+    /*
+     * Record the fact that we made an attempt to send each entry.
+     */
+
+    timeEntriesToSend.forEach { entry ->
+      TimeTrackingDebugging.onTimeTrackingSendAttempt(
+        timeTrackingDebugDirectory = this.timeTrackingDebugDirectory,
+        libraryId = timeTrackingInfo.libraryId,
+        bookId = timeTrackingInfo.bookId,
+        entryId = entry.id,
+        seconds = entry.secondsPlayed
+      )
+    }
+
     val failedEntries = try {
       httpCalls.registerTimeTrackingInfo(
         timeTrackingInfo = timeTrackingInfo.copy(
-          timeEntries = timeTrackingInfo.timeEntries.filter { timeEntry ->
-            timeEntry.isValidTimeEntry()
-          }
+          timeEntries = timeEntriesToSend
         ),
         account = profilesController
           .profileCurrent()
@@ -327,13 +368,53 @@ class TimeTrackingService(
     } catch (exception: Exception) {
       logger.error("Error while saving time tracking info remotely: ", exception)
 
+      /*
+       * There was an exception sending, so we record the fact that every single entry
+       * failed and include the exception for each.
+       */
+
+      timeEntriesToSend.forEach { entry ->
+        TimeTrackingDebugging.onTimeTrackingSendAttemptFailedExceptionally(
+          timeTrackingDebugDirectory = this.timeTrackingDebugDirectory,
+          libraryId = timeTrackingInfo.libraryId,
+          bookId = timeTrackingInfo.bookId,
+          entryId = entry.id,
+          exception = exception
+        )
+      }
+
       // in case an exception occurs, we keep the original time entries
-      timeTrackingInfo.timeEntries
+      return timeTrackingInfo.copy(timeEntries = timeTrackingInfo.timeEntries)
     }
 
-    return timeTrackingInfo.copy(
-      timeEntries = failedEntries
-    )
+    /*
+     * Record the fact that each failed entry has failed.
+     */
+
+    for (e in failedEntries) {
+      timeEntryMap.remove(e.id)
+      TimeTrackingDebugging.onTimeTrackingSendAttemptFailed(
+        timeTrackingDebugDirectory = this.timeTrackingDebugDirectory,
+        libraryId = timeTrackingInfo.libraryId,
+        bookId = timeTrackingInfo.bookId,
+        entryId = e.id
+      )
+    }
+
+    /*
+     * Every entry that didn't fail is recorded as having succeeded.
+     */
+
+    timeEntryMap.forEach { p ->
+      TimeTrackingDebugging.onTimeTrackingSendAttemptSucceeded(
+        timeTrackingDebugDirectory = this.timeTrackingDebugDirectory,
+        libraryId = timeTrackingInfo.libraryId,
+        bookId = timeTrackingInfo.bookId,
+        entryId = p.value.id
+      )
+    }
+
+    return timeTrackingInfo.copy(timeEntries = failedEntries)
   }
 
   private fun startEventDisposables() {

@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
-  <cache-path
-    name="reports"
-    path="." />
+    <files-path
+        name="time_tracking_debug"
+        path="v4.0/time_tracking_debug" />
+    <cache-path
+        name="reports"
+        path="." />
 </paths>

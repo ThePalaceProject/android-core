@@ -145,7 +145,8 @@ internal object MainServices {
     val directoryStorageDownloads: File,
     val directoryStorageDocuments: File,
     val directoryStorageProfiles: File,
-    val directoryStorageTimeTracking: File
+    val directoryStorageTimeTracking: File,
+    val directoryStorageTimeTrackingDebug: File
   )
 
   private fun initializeDirectories(context: Application): Directories {
@@ -161,12 +162,15 @@ internal object MainServices {
       File(directoryStorageBaseVersioned, "profiles")
     val directoryStorageTimeTracking =
       File(directoryStorageBaseVersioned, "time_tracking")
+    val directoryStorageTimeTrackingDebug =
+      File(directoryStorageBaseVersioned, "time_tracking_debug")
 
-    this.logger.debug("directoryStorageBaseVersioned: {}", directoryStorageBaseVersioned)
-    this.logger.debug("directoryStorageDownloads:     {}", directoryStorageDownloads)
-    this.logger.debug("directoryStorageDocuments:     {}", directoryStorageDocuments)
-    this.logger.debug("directoryStorageProfiles:      {}", directoryStorageProfiles)
+    this.logger.debug("directoryStorageBaseVersioned:     {}", directoryStorageBaseVersioned)
+    this.logger.debug("directoryStorageDownloads:         {}", directoryStorageDownloads)
+    this.logger.debug("directoryStorageDocuments:         {}", directoryStorageDocuments)
+    this.logger.debug("directoryStorageProfiles:          {}", directoryStorageProfiles)
     this.logger.debug("directoryStorageTimeTracking:      {}", directoryStorageTimeTracking)
+    this.logger.debug("directoryStorageTimeTrackingDebug: {}", directoryStorageTimeTrackingDebug)
 
     /*
      * Make sure the required directories exist. There is no sane way to
@@ -179,7 +183,8 @@ internal object MainServices {
         directoryStorageDownloads,
         directoryStorageDocuments,
         directoryStorageProfiles,
-        directoryStorageTimeTracking
+        directoryStorageTimeTracking,
+        directoryStorageTimeTrackingDebug
       )
 
     var exception: Exception? = null
@@ -204,7 +209,8 @@ internal object MainServices {
       directoryStorageDownloads = directoryStorageDownloads,
       directoryStorageDocuments = directoryStorageDocuments,
       directoryStorageProfiles = directoryStorageProfiles,
-      directoryStorageTimeTracking = directoryStorageTimeTracking
+      directoryStorageTimeTracking = directoryStorageTimeTracking,
+      directoryStorageTimeTrackingDebug = directoryStorageTimeTrackingDebug
     )
   }
 
@@ -935,6 +941,7 @@ internal object MainServices {
           context = context,
           httpCalls = TimeTrackingHTTPCalls(ObjectMapper(), lsHTTP, crashlyticsService),
           timeTrackingDirectory = directories.directoryStorageTimeTracking,
+          timeTrackingDebugDirectory = directories.directoryStorageTimeTrackingDebug,
           profilesController = profilesControllerTypeService
         )
       }
