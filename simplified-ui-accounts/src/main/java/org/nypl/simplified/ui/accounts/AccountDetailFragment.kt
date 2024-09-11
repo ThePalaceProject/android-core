@@ -445,7 +445,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
           try {
             this.startActivity(chosenIntent)
           } catch (e: Exception) {
-            this.logger.error("unable to start activity: ", e)
+            this.logger.debug("unable to start activity: ", e)
             val context = this.requireContext()
             MaterialAlertDialogBuilder(context)
               .setMessage(context.getString(R.string.accountReportFailed, supportUrl))
@@ -909,7 +909,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
           val intent = Intent(Intent.ACTION_VIEW, Uri.parse(resetPasswordURI.toString()))
           this.startActivity(intent)
         } catch (e: Exception) {
-          this.logger.error("unable to start activity: ", e)
+          this.logger.debug("unable to start activity: ", e)
           val context = this.requireContext()
           MaterialAlertDialogBuilder(context)
             .setMessage(context.getString(R.string.accountPasswordResetFailed, supportUrl))
@@ -967,7 +967,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
             }
 
             override fun onError(e: Exception) {
-              this@AccountDetailFragment.logger.error("failed to load authentication logo: ", e)
+              this@AccountDetailFragment.logger.debug("failed to load authentication logo: ", e)
               view.visibility = View.GONE
             }
           }

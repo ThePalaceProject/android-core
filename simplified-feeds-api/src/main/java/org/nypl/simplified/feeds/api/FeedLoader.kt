@@ -122,7 +122,7 @@ class FeedLoader private constructor(
 
       return FeedLoaderSuccess(feed, opdsFeedResponse.second)
     } catch (e: FeedHTTPTransportException) {
-      this.log.error("feed transport exception: ", e)
+      this.log.debug("feed transport exception: ", e)
 
       if (e.code == 401) {
         return FeedLoaderFailure.FeedLoaderFailedAuthentication(
@@ -139,7 +139,7 @@ class FeedLoader private constructor(
         message = e.localizedMessage ?: ""
       )
     } catch (e: Exception) {
-      this.log.error("feed exception: ", e)
+      this.log.debug("feed exception: ", e)
 
       return FeedLoaderFailure.FeedLoaderFailedGeneral(
         problemReport = null,

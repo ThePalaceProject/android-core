@@ -44,10 +44,10 @@ class PdfReaderDocument(
         core.renderPageBitmap(document, bitmap, 0, 0, 0, width, height, false)
         bitmap
       } catch (e: Exception) {
-        logger.error("Error rendering page: ", e)
+        logger.debug("Error rendering page: ", e)
         null
       } catch (e: OutOfMemoryError) {
-        logger.error("Error rendering page: ", e)
+        logger.debug("Error rendering page: ", e)
         null
       }
     }

@@ -144,19 +144,19 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     try {
       PlayerModel.closeBookOrDismissError()
     } catch (e: Exception) {
-      this.logger.error("Failed to close book: ", e)
+      this.logger.debug("Failed to close book: ", e)
     }
 
     try {
       this.timeTrackingService.stopTracking()
     } catch (e: Exception) {
-      this.logger.error("Failed to stop time tracking: ", e)
+      this.logger.debug("Failed to stop time tracking: ", e)
     }
 
     try {
       this.finish()
     } catch (e: Exception) {
-      this.logger.error("Failed to finish activity: ", e)
+      this.logger.debug("Failed to finish activity: ", e)
     }
   }
 
@@ -278,7 +278,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     try {
       this.timeTrackingService.onPlayerEventReceived(event)
     } catch (e: Exception) {
-      this.logger.error("Failed to submit event to time tracking service: ", e)
+      this.logger.debug("Failed to submit event to time tracking service: ", e)
     }
   }
 

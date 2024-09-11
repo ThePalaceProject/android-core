@@ -130,7 +130,7 @@ object AccountAuthenticationCredentialsStoreJSON {
         result[accountID] =
           AccountAuthenticationCredentialsJSON.deserializeFromJSON(credentials.get(key))
       } catch (e: Exception) {
-        this.logger.error("error deserializing credential: ", e)
+        this.logger.debug("error deserializing credential: ", e)
       }
     }
 

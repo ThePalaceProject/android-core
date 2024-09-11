@@ -52,7 +52,7 @@ internal object MainMigrations {
 
       "${packageInfo.packageName} ${packageInfo.versionName} (${packageInfo.versionCode})"
     } catch (e: Exception) {
-      this.logger.error("could not get package info: ", e)
+      this.logger.debug("could not get package info: ", e)
       "unknown"
     }
   }

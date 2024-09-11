@@ -149,7 +149,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
           .account(this.parameters.accountId)
       MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID, this.account.provider.id.toString())
     } catch (e: Exception) {
-      this.logger.error("Unable to locate account: ", e)
+      this.logger.debug("Unable to locate account: ", e)
       this.finish()
       return
     }

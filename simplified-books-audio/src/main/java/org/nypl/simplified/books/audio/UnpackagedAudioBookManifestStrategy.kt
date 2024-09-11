@@ -60,7 +60,7 @@ class UnpackagedAudioBookManifestStrategy(
         PlayerResult.unit(data)
       }
     } catch (e: Exception) {
-      this.logger.error("loadFallbackManifest: ", e)
+      this.logger.debug("loadFallbackManifest: ", e)
       PlayerResult.Failure(DataLoadFailed(e.message ?: e.javaClass.name, e))
     }
   }

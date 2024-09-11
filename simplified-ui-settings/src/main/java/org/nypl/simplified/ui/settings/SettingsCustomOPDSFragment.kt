@@ -121,7 +121,7 @@ class SettingsCustomOPDSFragment : Fragment(R.layout.settings_custom_opds) {
         this.feedURL.setError(null, null)
         true
       } catch (e: Exception) {
-        this.logger.error("not a valid URI: ", e)
+        this.logger.debug("not a valid URI: ", e)
         this.feedURL.error = this.resources.getString(R.string.settingsCustomOPDSInvalidURI)
         false
       }

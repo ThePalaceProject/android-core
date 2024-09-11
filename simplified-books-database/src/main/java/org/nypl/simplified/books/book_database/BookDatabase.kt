@@ -192,7 +192,7 @@ class BookDatabase private constructor(
       )
 
       if (errors.isNotEmpty()) {
-        errors.forEach { exception -> LOG.error("error opening book database: ", exception) }
+        errors.forEach { exception -> LOG.debug("error opening book database: ", exception) }
         throw BookDatabaseException(
           "One or more errors occurred whilst trying to open a book database.", errors
         )

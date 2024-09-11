@@ -156,7 +156,7 @@ class PdfReaderActivity : AppCompatActivity() {
           this.documentPageIndex = 1
         }
       } catch (e: Exception) {
-        this.log.error("Could not get lastReadLocation, defaulting to the 1st page", e)
+        this.log.debug("Could not get lastReadLocation, defaulting to the 1st page", e)
       } finally {
         this.completeReaderSetup(
           params = params,

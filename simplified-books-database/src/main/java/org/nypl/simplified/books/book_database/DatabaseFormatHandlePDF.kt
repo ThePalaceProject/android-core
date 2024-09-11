@@ -298,7 +298,7 @@ internal class DatabaseFormatHandlePDF internal constructor(
           fallbackValues = fallbackValues,
         )
       } catch (e: Exception) {
-        this.logger.error("Failed to read the last-read location: ", e)
+        this.logger.debug("Failed to read the last-read location: ", e)
         null
       }
     }

@@ -42,7 +42,7 @@ class Migrations(
         provider.create(this.serviceDependencies)
       }
     } catch (e: Exception) {
-      this.logger.error("could not setup migration service provider: ", e)
+      this.logger.debug("could not setup migration service provider: ", e)
       this.migrationServices = listOf()
     }
   }

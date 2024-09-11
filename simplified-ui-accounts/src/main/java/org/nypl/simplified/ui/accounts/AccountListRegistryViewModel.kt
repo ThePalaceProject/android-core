@@ -118,7 +118,7 @@ class AccountListRegistryViewModel(private val locationManager: LocationManager)
             .showTestingLibraries
         )
       } catch (e: Exception) {
-        this.logger.error("failed to refresh registry: ", e)
+        this.logger.debug("failed to refresh registry: ", e)
       }
     }
   }

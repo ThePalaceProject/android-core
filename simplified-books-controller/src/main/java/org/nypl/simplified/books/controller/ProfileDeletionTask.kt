@@ -31,7 +31,7 @@ class ProfileDeletionTask(
       profile.delete()
       ProfileDeletionEvent.ProfileDeletionSucceeded(this.profileID)
     } catch (e: Exception) {
-      this.logger.error("failed to delete profile: ", e)
+      this.logger.debug("failed to delete profile: ", e)
       ProfileDeletionEvent.ProfileDeletionFailed(this.profileID, e)
     }
   }

@@ -73,7 +73,7 @@ object OAuthCallbackIntentParsing {
         )
       }
     } catch (e: Exception) {
-      this.logger.error("failure parsing intent: ", e)
+      this.logger.debug("failure parsing intent: ", e)
       OAuthParseResult.Failed("Failed to parse intent: " + e.message)
     }
   }

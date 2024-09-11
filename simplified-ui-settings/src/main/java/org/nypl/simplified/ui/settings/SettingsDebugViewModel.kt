@@ -190,7 +190,7 @@ class SettingsDebugViewModel(application: Application) : AndroidViewModel(applic
           this.booksController.booksSync(account)
         }
     } catch (e: Exception) {
-      this.logger.error("ouch: ", e)
+      this.logger.debug("ouch: ", e)
     }
   }
 
@@ -202,7 +202,7 @@ class SettingsDebugViewModel(application: Application) : AndroidViewModel(applic
         account.setPreferences(account.preferences.copy(announcementsAcknowledged = listOf()))
       }
     } catch (e: Exception) {
-      this.logger.error("could not forget announcements: ", e)
+      this.logger.debug("could not forget announcements: ", e)
     }
   }
 
@@ -225,7 +225,7 @@ class SettingsDebugViewModel(application: Application) : AndroidViewModel(applic
         val activations = try {
           adeptFuture.get()
         } catch (e: Exception) {
-          this.logger.error("could not retrieve activations: ", e)
+          this.logger.debug("could not retrieve activations: ", e)
           emptyList()
         }
         activationsLive.postValue(activations)

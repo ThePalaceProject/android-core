@@ -54,7 +54,7 @@ object BookDRMInformationHandles {
       try {
         FileUtilities.fileDelete(drmInfoFile)
       } catch (e: Exception) {
-        this.logger.error("unable to delete DRM file: ", e)
+        this.logger.debug("unable to delete DRM file: ", e)
       }
 
       when (createInitial) {

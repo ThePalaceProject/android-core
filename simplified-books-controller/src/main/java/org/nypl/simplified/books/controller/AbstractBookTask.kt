@@ -61,12 +61,12 @@ abstract class AbstractBookTask(
       this.logger.debug("task succeeded")
       result
     } catch (e: TaskFailedHandled) {
-      this.logger.error("task failed with handled exception: ", e.cause)
+      this.logger.debug("task failed with handled exception: ", e.cause)
       val result = this.taskRecorder.finishFailure<Unit>()
       this.onFailure(result)
       result
     } catch (e: Exception) {
-      this.logger.error("task failed with unhandled exception: ", e)
+      this.logger.debug("task failed with unhandled exception: ", e)
       val msg = e.message ?: e.javaClass.name
       this.taskRecorder.currentStepFailedAppending(msg, BorrowErrorCodes.unexpectedException, e)
       val result = this.taskRecorder.finishFailure<Unit>()
@@ -114,7 +114,7 @@ abstract class AbstractBookTask(
     val account = try {
       profile.account(accountID)
     } catch (e: Exception) {
-      this.logger.error("failed to find account: $accountID", e)
+      this.logger.debug("failed to find account: $accountID", e)
       this.taskRecorder.currentStepFailedAppending(
         message = "Failed to find account.",
         errorCode = BorrowErrorCodes.accountsDatabaseException,

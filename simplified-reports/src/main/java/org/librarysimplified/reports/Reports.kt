@@ -128,7 +128,7 @@ object Reports {
         NoFiles
       }
     } catch (e: Exception) {
-      this.logger.error("failed to send report: ", e)
+      this.logger.debug("failed to send report: ", e)
       return RaisedException(e)
     }
   }
@@ -155,7 +155,7 @@ object Reports {
     val pkgInfo = try {
       pkgManager.getPackageInfo(context.packageName, 0)
     } catch (e: PackageManager.NameNotFoundException) {
-      this.logger.error("unable to retrieve package information: ", e)
+      this.logger.debug("unable to retrieve package information: ", e)
       return subject
     }
 

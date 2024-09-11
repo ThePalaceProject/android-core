@@ -106,7 +106,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
         .getDynamicLink(intent)
 
     pendingLink.addOnFailureListener(this) { e ->
-      this.logger.error("Failed to retrieve dynamic link: ", e)
+      this.logger.debug("Failed to retrieve dynamic link: ", e)
     }
 
     pendingLink.addOnSuccessListener { linkData: PendingDynamicLinkData? ->

@@ -74,7 +74,7 @@ class ProfileAccountCreateCustomOPDSTask(
           this.accountResolutionFailed(resolutionResult)
       }
     } catch (e: Throwable) {
-      this.logger.error("account creation failed: ", e)
+      this.logger.debug("account creation failed: ", e)
       this.taskRecorder.currentStepFailedAppending(this.strings.unexpectedException, "unexpectedException", e)
       this.publishFailureEvent()
       this.taskRecorder.finishFailure()

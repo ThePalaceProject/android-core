@@ -131,7 +131,7 @@ class BService(
         )
       )
     } catch (e: Throwable) {
-      this.logger.error("sync: unable to sync profile: ", e)
+      this.logger.debug("sync: unable to sync profile: ", e)
       this.failedFuture<Void>(e)
     }
   }
@@ -179,7 +179,7 @@ class BService(
         )
       )
     } catch (e: Throwable) {
-      this.logger.error("sync: unable to sync account: ", e)
+      this.logger.debug("sync: unable to sync account: ", e)
       this.failedFuture(e)
     }
   }
@@ -207,7 +207,7 @@ class BService(
         )
       )
     } catch (e: Throwable) {
-      this.logger.error("bookmarkLoad: ", e)
+      this.logger.debug("bookmarkLoad: ", e)
       this.failedFuture(e)
     }
   }
@@ -227,7 +227,7 @@ class BService(
         )
       )
     } catch (e: Throwable) {
-      this.logger.error("bookmarkCreateLocal: ", e)
+      this.logger.debug("bookmarkCreateLocal: ", e)
       this.failedFuture(e)
     }
   }
@@ -248,7 +248,7 @@ class BService(
         )
       )
     } catch (e: Throwable) {
-      this.logger.error("bookmarkCreateRemote: ", e)
+      this.logger.debug("bookmarkCreateRemote: ", e)
       this.failedFuture(e)
     }
   }
@@ -272,7 +272,7 @@ class BService(
         )
       )
     } catch (e: Throwable) {
-      this.logger.error("bookmarkCreate: ", e)
+      this.logger.debug("bookmarkCreate: ", e)
       this.failedFuture(e)
     }
   }
@@ -294,7 +294,7 @@ class BService(
         )
       )
     } catch (e: Throwable) {
-      this.logger.error("bookmarkLoad: ", e)
+      this.logger.debug("bookmarkLoad: ", e)
       this.failedFuture(e)
     }
   }

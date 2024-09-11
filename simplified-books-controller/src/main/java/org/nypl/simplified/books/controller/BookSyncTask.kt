@@ -146,7 +146,7 @@ class BookSyncTask(
         this.withNewAnnotationsURI(it, profile)
       }
     } catch (e: Exception) {
-      this.logger.error("patron user profile: ", e)
+      this.logger.debug("patron user profile: ", e)
     }
   }
 
@@ -198,7 +198,7 @@ class BookSyncTask(
         newProviderResult.result
       }
       is TaskResult.Failure -> {
-        this.logger.error("failed to resolve account provider: ", newProviderResult.exception)
+        this.logger.debug("failed to resolve account provider: ", newProviderResult.exception)
         oldProvider
       }
     }

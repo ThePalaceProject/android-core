@@ -211,7 +211,7 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
         try {
           this.navigator.clearHistory()
         } catch (e: Throwable) {
-          this.logger.error("could not clear history: ", e)
+          this.logger.debug("could not clear history: ", e)
         }
       }
     }

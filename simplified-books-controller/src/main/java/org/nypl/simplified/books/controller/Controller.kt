@@ -223,7 +223,7 @@ class Controller private constructor(
         .keys
         .forEach { this.booksSync(it) }
     } catch (e: Exception) {
-      this.logger.error("failed to trigger book syncing: ", e)
+      this.logger.debug("failed to trigger book syncing: ", e)
     }
 
     this.updateCrashlytics()
@@ -285,7 +285,7 @@ class Controller private constructor(
       try {
         future.set(task.invoke())
       } catch (e: Throwable) {
-        this.logger.error("exception raised during task execution: ", e)
+        this.logger.debug("exception raised during task execution: ", e)
         future.setException(e)
         throw e
       }
@@ -299,7 +299,7 @@ class Controller private constructor(
       try {
         future.set(task.call())
       } catch (e: Throwable) {
-        this.logger.error("exception raised during task execution: ", e)
+        this.logger.debug("exception raised during task execution: ", e)
         future.setException(e)
         throw e
       }

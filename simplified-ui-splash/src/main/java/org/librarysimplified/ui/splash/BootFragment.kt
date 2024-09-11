@@ -91,7 +91,7 @@ class BootFragment : Fragment(R.layout.splash_boot) {
   }
 
   private fun onBootFailed(event: BootEvent.BootFailed) {
-    this.logger.error("boot failed: ", event.exception)
+    this.logger.debug("boot failed: ", event.exception)
     if (image.alpha > 0.0) {
       this.popImageView()
     }

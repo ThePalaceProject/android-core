@@ -110,7 +110,7 @@ class AccountProviderSourceNYPLRegistry(
       this.cacheServerResults(files, mergedResults)
       SourceResult.SourceSucceeded(mergedResults)
     } catch (e: Exception) {
-      this.logger.error("failed to fetch providers: ", e)
+      this.logger.debug("failed to fetch providers: ", e)
       SourceResult.SourceFailed(diskResults, e)
     }
   }

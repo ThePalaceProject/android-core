@@ -31,7 +31,7 @@ class ProfileAccountProviderUpdatedTask(
         }
       }
     } catch (e: Exception) {
-      this.logger.error("could not update account provider: ", e)
+      this.logger.debug("could not update account provider: ", e)
     }
   }
 }

@@ -184,7 +184,7 @@ class CatalogBookDetailViewModel(
         false
       }
     } catch (e: Exception) {
-      this.logger.error("could not determine if the book could be revoked: ", e)
+      this.logger.debug("could not determine if the book could be revoked: ", e)
       false
     }
 
@@ -232,7 +232,7 @@ class CatalogBookDetailViewModel(
           false
         }
       } catch (e: Exception) {
-        this.logger.error("could not determine if the book could be deleted: ", e)
+        this.logger.debug("could not determine if the book could be deleted: ", e)
         false
       }
     }

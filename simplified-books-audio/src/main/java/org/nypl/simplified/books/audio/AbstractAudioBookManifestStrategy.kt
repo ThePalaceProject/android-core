@@ -100,7 +100,7 @@ abstract class AbstractAudioBookManifestStrategy(
         taskRecorder = taskRecorder
       )
     } catch (e: Exception) {
-      this.logger.error("error during fulfillment: ", e)
+      this.logger.debug("error during fulfillment: ", e)
       val message = e.message ?: e.javaClass.name
       taskRecorder.currentStepFailedAppending(message, message, e)
       return taskRecorder.finishFailure()
@@ -202,7 +202,7 @@ abstract class AbstractAudioBookManifestStrategy(
             logger.error("title:  {}", report.title)
             logger.error("detail: {}", report.detail)
           } catch (e: Exception) {
-            logger.error("unparseable problem report: ", e)
+            logger.debug("unparseable problem report: ", e)
           }
         }
       }

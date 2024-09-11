@@ -48,7 +48,7 @@ class ProfileAccountCreateOrReturnExistingTask(
         metrics = this.metrics
       ).call()
     } catch (e: Throwable) {
-      this.logger.error("account creation failed: ", e)
+      this.logger.debug("account creation failed: ", e)
 
       this.taskRecorder.currentStepFailedAppending(
         this.strings.unexpectedException,

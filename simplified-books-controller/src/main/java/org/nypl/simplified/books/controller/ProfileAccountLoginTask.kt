@@ -159,7 +159,7 @@ class ProfileAccountLoginTask(
         }
       }
     } catch (e: Throwable) {
-      this.logger.error("error during login process: ", e)
+      this.logger.debug("error during login process: ", e)
       this.steps.currentStepFailedAppending(
         this.loginStrings.loginUnexpectedException, "unexpectedException", e
       )
@@ -434,7 +434,7 @@ class ProfileAccountLoginTask(
     return try {
       node.get("accessToken").asText()
     } catch (e: Exception) {
-      this.logger.error("Error getting access token from basic token response: ", e)
+      this.logger.debug("Error getting access token from basic token response: ", e)
       throw e
     }
   }
@@ -597,11 +597,11 @@ class ProfileAccountLoginTask(
       this.steps.currentStepSucceeded(this.loginStrings.loginDeviceActivated)
     } catch (e: ExecutionException) {
       val ex = e.cause!!
-      this.logger.error("exception raised waiting for adept future: ", ex)
+      this.logger.debug("exception raised waiting for adept future: ", ex)
       this.handleAdobeDRMConnectorException(ex)
       throw ex
     } catch (e: Throwable) {
-      this.logger.error("exception raised waiting for adept future: ", e)
+      this.logger.debug("exception raised waiting for adept future: ", e)
       this.handleAdobeDRMConnectorException(e)
       throw e
     }

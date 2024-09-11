@@ -59,7 +59,7 @@ class Analytics private constructor(
       try {
         system.onAnalyticsEvent(event)
       } catch (e: Exception) {
-        this.logger.error("failed to publish analytics event: ", e)
+        this.logger.debug("failed to publish analytics event: ", e)
       }
     }
 }

@@ -47,7 +47,7 @@ class ProfileUpdateTask(
       this.events.onNext(event)
       return event
     } catch (e: Exception) {
-      this.logger.error("could not update profile: ", e)
+      this.logger.debug("could not update profile: ", e)
       val event =
         ProfileUpdated.Failed(
           profileID = this.requestedProfileId ?: ProfileID(UUID(0L, 0L)),

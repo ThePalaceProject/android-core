@@ -96,7 +96,7 @@ object ProfilesDatabases {
 
     if (errors.isNotEmpty()) {
       for (e in errors) {
-        this.logger.error("error during profile database open: ", e)
+        this.logger.debug("error during profile database open: ", e)
       }
 
       throw ProfileDatabaseOpenException(
