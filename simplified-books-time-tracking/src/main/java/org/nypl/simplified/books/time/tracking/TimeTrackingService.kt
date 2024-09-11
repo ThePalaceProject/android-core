@@ -366,7 +366,7 @@ class TimeTrackingService(
           .account(AccountID(UUID.fromString(timeTrackingInfo.accountId)))
       )
     } catch (exception: Exception) {
-      logger.error("Error while saving time tracking info remotely: ", exception)
+      logger.debug("Error while saving time tracking info remotely: ", exception)
 
       /*
        * There was an exception sending, so we record the fact that every single entry
@@ -465,8 +465,7 @@ class TimeTrackingService(
             }
           },
           {
-            logger.error("Error on audiobook playing timer")
-            it.printStackTrace()
+            logger.debug("Error on audiobook playing timer: ", it)
           }
         )
 
@@ -481,8 +480,7 @@ class TimeTrackingService(
             shouldSaveRemotely = true
           },
           {
-            logger.error("Error on remote storage timer")
-            it.printStackTrace()
+            logger.debug("Error on remote storage timer: ", it)
           }
         )
     )
