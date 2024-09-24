@@ -19,6 +19,10 @@ class PdfReaderDocument(
   override val title: String?
     get() = metadata.title
 
+  override fun close() {
+    // Nothing required
+  }
+
   override val author: String?
     get() = metadata.author
 
@@ -55,10 +59,6 @@ class PdfReaderDocument(
 
   override val outline: List<PdfDocument.OutlineNode> by lazy {
     core.getTableOfContents(document).map { it.toOutlineNode() }
-  }
-
-  override suspend fun close() {
-    // do nothing
   }
 
   private fun PdfiumDocument.Bookmark.toOutlineNode(): PdfDocument.OutlineNode {
