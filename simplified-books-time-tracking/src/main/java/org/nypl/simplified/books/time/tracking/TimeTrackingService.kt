@@ -12,6 +12,7 @@ import org.librarysimplified.audiobook.api.PlayerEvent
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.slf4j.LoggerFactory
+import org.slf4j.MDC
 import java.io.File
 import java.net.URI
 import java.util.UUID
@@ -23,7 +24,8 @@ class TimeTrackingService(
   private val httpCalls: TimeTrackingHTTPCallsType,
   private val profilesController: ProfilesControllerType,
   private val timeTrackingDirectory: File,
-  private val timeTrackingDebugDirectory: File
+  private val timeTrackingDebugDirectory: File,
+  private val isPlayerPlayingCheck: () -> Boolean
 ) : TimeTrackingServiceType {
 
   companion object {
@@ -33,27 +35,45 @@ class TimeTrackingService(
     private const val MAX_SECONDS_PLAYED = 60
   }
 
-  private var mostRecentLibraryId: String? = null
-  private var mostRecentBookId: String? = null
-
-  private val logger = LoggerFactory.getLogger(TimeTrackingServiceType::class.java)
-
+  private val logger =
+    LoggerFactory.getLogger(TimeTrackingServiceType::class.java)
   private val dateFormatter =
     DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm'Z'")
+  private val disposables =
+    CompositeDisposable()
+  private val connectivityListener: TimeTrackingConnectivityListener
 
-  private val disposables = CompositeDisposable()
+  @Volatile
+  private var mostRecentLibraryId: String? = null
 
+  @Volatile
+  private var mostRecentBookId: String? = null
+
+  @Volatile
   private lateinit var timeEntriesFile: File
+
+  @Volatile
   private lateinit var timeEntriesToRetryFile: File
 
+  @Volatile
   private var audiobookPlayingDisposable: Disposable? = null
-  private val connectivityListener: TimeTrackingConnectivityListener
+
+  @Volatile
   private var currentTimeTrackingEntry: TimeTrackingEntry? = null
 
+  @Volatile
   private var firstIterationOfService = true
+
+  @Volatile
   private var isPlaying = false
+
+  @Volatile
   private var isOnAudiobookScreen = false
+
+  @Volatile
   private var shouldSaveRemotely = false
+
+  @Volatile
   private var tracking = false
 
   init {
@@ -426,6 +446,18 @@ class TimeTrackingService(
         .subscribe(
           {
             if (isPlaying) {
+              if (!this.isPlayerPlayingCheck()) {
+                try {
+                  MDC.put("Ticket", "PP-1736")
+                  logger.warn(
+                    "Time tracking service and isPlayerPlayingCheck disagree!",
+                    IllegalStateException()
+                  )
+                } finally {
+                  MDC.remove("Ticket")
+                }
+              }
+
               currentTimeTrackingEntry = currentTimeTrackingEntry?.copy(
                 secondsPlayed = currentTimeTrackingEntry!!.secondsPlayed + 1
               )

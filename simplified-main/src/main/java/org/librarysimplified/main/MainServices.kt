@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.squareup.picasso.Picasso
 import io.reactivex.subjects.PublishSubject
 import org.joda.time.LocalDateTime
+import org.librarysimplified.audiobook.views.PlayerModel
 import org.librarysimplified.documents.DocumentConfigurationServiceType
 import org.librarysimplified.documents.DocumentStoreType
 import org.librarysimplified.documents.DocumentStores
@@ -942,7 +943,8 @@ internal object MainServices {
           httpCalls = TimeTrackingHTTPCalls(ObjectMapper(), lsHTTP, crashlyticsService),
           timeTrackingDirectory = directories.directoryStorageTimeTracking,
           timeTrackingDebugDirectory = directories.directoryStorageTimeTrackingDebug,
-          profilesController = profilesControllerTypeService
+          profilesController = profilesControllerTypeService,
+          isPlayerPlayingCheck = { PlayerModel.isPlaying }
         )
       }
     )
