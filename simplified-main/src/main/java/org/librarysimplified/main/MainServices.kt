@@ -80,7 +80,6 @@ import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.content.api.ContentResolverSane
 import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.crashlytics.api.CrashlyticsServiceType
-import org.nypl.simplified.deeplinks.controller.api.DeepLinksControllerType
 import org.nypl.simplified.feeds.api.FeedHTTPTransport
 import org.nypl.simplified.feeds.api.FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderType
@@ -916,11 +915,6 @@ internal object MainServices {
         }
       )
 
-      addService(
-        message = strings.bootingGeneral("deep links controller"),
-        interfaceType = DeepLinksControllerType::class.java,
-        serviceConstructor = { controller }
-      )
       addService(
         message = strings.bootingGeneral("books controller"),
         interfaceType = BooksControllerType::class.java,

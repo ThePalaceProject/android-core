@@ -28,14 +28,10 @@ import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.book_registry.BookHoldsUpdateEvent
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookStatusEvent
-import org.nypl.simplified.deeplinks.controller.api.DeepLinkEvent
-import org.nypl.simplified.deeplinks.controller.api.ScreenID
 import org.nypl.simplified.listeners.api.ListenerRepository
 import org.nypl.simplified.listeners.api.listenerRepositories
 import org.nypl.simplified.profiles.api.ProfileEvent
 import org.nypl.simplified.profiles.api.ProfileUpdated
-import org.nypl.simplified.ui.accounts.AccountListFragment
-import org.nypl.simplified.ui.accounts.AccountListFragmentParameters
 import org.nypl.simplified.ui.announcements.AnnouncementsDialog
 import org.slf4j.LoggerFactory
 import java.net.URI
@@ -146,10 +142,6 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
 
     viewModel.registryEvents
       .subscribe(this::onBookStatusEvent)
-      .let { subscriptions.add(it) }
-
-    viewModel.deepLinkEvents
-      .subscribe(this::onDeepLinkEvent)
       .let { subscriptions.add(it) }
 
     viewModel.bookHoldEvents
@@ -271,22 +263,6 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
       null -> {
         // do nothing
       }
-    }
-  }
-
-  private fun onDeepLinkEvent(event: DeepLinkEvent) {
-    if (event.screenID == ScreenID.LOGIN) {
-      this.navigator.addFragment(
-        fragment = AccountListFragment.create(
-          AccountListFragmentParameters(
-            shouldShowLibraryRegistryMenu = false,
-            accountID = event.accountID,
-            barcode = event.barcode,
-            comingFromDeepLink = true
-          )
-        ),
-        tab = org.librarysimplified.ui.tabs.R.id.tabSettings
-      )
     }
   }
 

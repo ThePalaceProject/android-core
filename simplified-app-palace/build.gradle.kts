@@ -270,7 +270,6 @@ dependencies {
     implementation(project(":simplified-content-api"))
     implementation(project(":simplified-crashlytics"))
     implementation(project(":simplified-crashlytics-api"))
-    implementation(project(":simplified-deeplinks-controller-api"))
     implementation(project(":simplified-documents"))
     implementation(project(":simplified-feeds-api"))
     implementation(project(":simplified-files"))
