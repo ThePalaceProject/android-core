@@ -522,7 +522,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2024-09-24T10:46:30+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.13.0">
+    <c:release date="2024-09-26T17:05:29+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.13.0">
       <c:changes>
         <c:change date="2024-05-03T00:00:00+00:00" summary="Integrate the new audiobook player components.">
           <c:tickets>
@@ -540,7 +540,7 @@
             <c:ticket id="PP-1301"/>
           </c:tickets>
         </c:change>
-        <c:change date="2024-09-24T10:46:30+00:00" summary="Upgrade to Readium 2 3.0.0.">
+        <c:change date="2024-09-24T00:00:00+00:00" summary="Upgrade to Readium 2 3.0.0.">
           <c:tickets>
             <c:ticket id="PP-1731"/>
           </c:tickets>
