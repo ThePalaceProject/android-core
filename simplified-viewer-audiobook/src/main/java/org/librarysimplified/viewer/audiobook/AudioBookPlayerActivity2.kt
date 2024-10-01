@@ -569,7 +569,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
 
     try {
       val book = PlayerModel.book()
-      for (e in book.downloadTasks) {
+      for (e in book?.downloadTasks ?: listOf()) {
         val status = e.status
         if (status is PlayerDownloadTaskStatus.Failed) {
           task.beginNewStep("Downloading ${e.playbackURI}...")
