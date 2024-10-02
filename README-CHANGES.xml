@@ -547,7 +547,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2024-10-02T15:41:42+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.13.1">
+    <c:release date="2024-10-02T15:53:52+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.13.1">
       <c:changes>
         <c:change date="2024-10-01T00:00:00+00:00" summary="Fix a lifecycle crash in the audiobook TOC.">
           <c:tickets>
