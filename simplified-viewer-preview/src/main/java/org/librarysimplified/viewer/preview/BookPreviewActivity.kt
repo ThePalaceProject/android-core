@@ -29,7 +29,6 @@ import org.librarysimplified.r2.views.SR2ReaderViewEvent.SR2ReaderViewController
 import org.librarysimplified.r2.views.SR2SearchFragment
 import org.librarysimplified.r2.views.SR2TOCFragment
 import org.librarysimplified.services.api.Services
-import org.librarysimplified.viewer.epub.readium2.Reader2LoadingFragment
 import org.librarysimplified.viewer.epub.readium2.Reader2Themes
 import org.nypl.drm.core.ContentProtectionProvider
 import org.nypl.simplified.accessibility.AccessibilityServiceType
@@ -142,7 +141,13 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
   override fun onStart() {
     super.onStart()
 
-    this.switchFragment(Reader2LoadingFragment())
+    this.switchFragment(BookPreviewNullFragment())
+
+    /*
+     * The book preview status observable is a BehaviorSubject, so subscribing to it will
+     * immediately cause the current views to be reconfigured to whatever is the most recent
+     * preview status.
+     */
 
     this.subscriptions = CompositeDisposable()
     this.subscriptions.add(
@@ -150,9 +155,6 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(this::onNewBookPreviewStatus)
     )
-    this.subscriptions.add(SR2ReaderModel.controllerEvents.subscribe(this::onControllerEvent))
-    this.subscriptions.add(SR2ReaderModel.viewCommands.subscribe(this::onViewCommandReceived))
-    this.subscriptions.add(SR2ReaderModel.viewEvents.subscribe(this::onViewEventReceived))
   }
 
   override fun onStop() {
@@ -234,8 +236,10 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
     this.uiThread.checkIsUIThread()
   }
 
-  private fun onNewBookPreviewStatus(previewStatus: BookPreviewStatus) {
-    when (previewStatus) {
+  private fun onNewBookPreviewStatus(
+    previewStatus: BookPreviewStatus
+  ) {
+    return when (previewStatus) {
       is BookPreviewStatus.HasPreview.Downloading -> {
         val received = previewStatus.currentTotalBytes
         val expected = previewStatus.expectedTotalBytes
@@ -268,6 +272,9 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
       is BookPreviewStatus.HasPreview.Ready.BookPreview -> {
         this.logger.debug("Book preview")
         this.loadingProgress.isVisible = false
+        this.subscriptions.add(SR2ReaderModel.controllerEvents.subscribe(this::onControllerEvent))
+        this.subscriptions.add(SR2ReaderModel.viewCommands.subscribe(this::onViewCommandReceived))
+        this.subscriptions.add(SR2ReaderModel.viewEvents.subscribe(this::onViewEventReceived))
         this.openReader(previewStatus.file)
       }
 
@@ -298,7 +305,7 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
 
     val audiobookPreviewPlayer = BookPreviewAudiobookFragment.newInstance(file, this.feedEntry)
     this.supportFragmentManager.beginTransaction()
-      .add(R.id.preview_container, audiobookPreviewPlayer)
+      .replace(R.id.preview_container, audiobookPreviewPlayer)
       .commitAllowingStateLoss()
   }
 
