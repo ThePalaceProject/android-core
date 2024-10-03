@@ -556,11 +556,16 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2024-10-03T10:34:07+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.14.0">
+    <c:release date="2024-10-03T11:19:53+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.14.0">
       <c:changes>
-        <c:change date="2024-10-03T10:34:07+00:00" summary="Repair book previews.">
+        <c:change date="2024-10-03T00:00:00+00:00" summary="Repair book previews.">
           <c:tickets>
             <c:ticket id="PP-1765"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2024-10-03T11:19:53+00:00" summary="Fix an unlikely crash in the audiobooks toolbar.">
+          <c:tickets>
+            <c:ticket id="PP-1789"/>
           </c:tickets>
         </c:change>
       </c:changes>
