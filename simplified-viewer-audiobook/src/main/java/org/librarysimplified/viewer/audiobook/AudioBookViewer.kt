@@ -6,6 +6,7 @@ import one.irradia.mime.api.MIMEType
 import org.librarysimplified.audiobook.api.PlayerUserAgent
 import org.librarysimplified.audiobook.feedbooks.FeedbooksPlayerExtension
 import org.librarysimplified.audiobook.license_check.spi.SingleLicenseCheckProviderType
+import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.librarysimplified.audiobook.manifest_parser.extension_spi.ManifestParserExtensionType
 import org.librarysimplified.audiobook.views.PlayerModel
 import org.librarysimplified.http.api.LSHTTPClientType
@@ -153,7 +154,8 @@ class AudioBookViewer : ViewerProviderType {
         licenseChecks = licenseChecks,
         parserExtensions = parserExtensions,
         strategy = strategyAdapted,
-        bookCredentials = formatAudio.drmInformation.playerCredentials()
+        bookCredentials = formatAudio.drmInformation.playerCredentials(),
+        palaceID = PlayerPalaceID(book.entry.id)
       )
     } else {
       AudioBookViewerModel.parameters = null

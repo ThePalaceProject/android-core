@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.librarysimplified.audiobook.api.PlayerUserAgent
+import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.librarysimplified.audiobook.manifest_fulfill.api.ManifestFulfillmentStrategyRegistryType
 import org.mockito.Mockito
 import org.nypl.simplified.books.audio.AudioBookManifestRequest
@@ -53,7 +54,8 @@ class PackagedAudioBookManifestStrategyTest {
           services = this.services,
           isNetworkAvailable = { true },
           strategyRegistry = this.strategies,
-          cacheDirectory = File(tempDir, "cache")
+          cacheDirectory = File(tempDir, "cache"),
+          palaceID = PlayerPalaceID("6c15709a-b9cd-4eb8-815a-309f5d738a11")
         )
       )
 
@@ -76,7 +78,8 @@ class PackagedAudioBookManifestStrategyTest {
           services = this.services,
           isNetworkAvailable = { true },
           strategyRegistry = this.strategies,
-          cacheDirectory = File(tempDir, "cache")
+          cacheDirectory = File(tempDir, "cache"),
+          palaceID = PlayerPalaceID("6c15709a-b9cd-4eb8-815a-309f5d738a11")
         )
       )
 
@@ -102,7 +105,8 @@ class PackagedAudioBookManifestStrategyTest {
           services = this.services,
           isNetworkAvailable = { true },
           strategyRegistry = this.strategies,
-          cacheDirectory = File(tempDir, "cache")
+          cacheDirectory = File(tempDir, "cache"),
+          palaceID = PlayerPalaceID("6c15709a-b9cd-4eb8-815a-309f5d738a11")
         )
       )
 

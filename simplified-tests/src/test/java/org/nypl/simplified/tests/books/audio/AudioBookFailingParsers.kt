@@ -2,6 +2,7 @@ package org.nypl.simplified.tests.books.audio
 
 import org.librarysimplified.audiobook.manifest.api.PlayerManifest
 import org.librarysimplified.audiobook.manifest_parser.api.ManifestParsersType
+import org.librarysimplified.audiobook.manifest_parser.api.ManifestUnparsed
 import org.librarysimplified.audiobook.manifest_parser.extension_spi.ManifestParserExtensionType
 import org.librarysimplified.audiobook.parser.api.ParseError
 import org.librarysimplified.audiobook.parser.api.ParseResult
@@ -13,7 +14,7 @@ object AudioBookFailingParsers : ManifestParsersType {
 
   override fun parse(
     uri: URI,
-    streams: ByteArray
+    input: ManifestUnparsed
   ): ParseResult<PlayerManifest> {
     return ParseResult.Failure(
       warnings = listOf(
@@ -32,7 +33,7 @@ object AudioBookFailingParsers : ManifestParsersType {
 
   override fun parse(
     uri: URI,
-    streams: ByteArray,
+    input: ManifestUnparsed,
     extensions: List<ManifestParserExtensionType>
   ): ParseResult<PlayerManifest> {
     return ParseResult.Failure(

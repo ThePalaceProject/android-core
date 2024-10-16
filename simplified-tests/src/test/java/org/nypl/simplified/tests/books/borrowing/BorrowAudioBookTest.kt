@@ -8,8 +8,10 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfilled
 import org.librarysimplified.audiobook.manifest_parser.api.ManifestParsers
+import org.librarysimplified.audiobook.manifest_parser.api.ManifestUnparsed
 import org.librarysimplified.audiobook.parser.api.ParseResult
 import org.librarysimplified.http.api.LSHTTPClientConfiguration
 import org.librarysimplified.http.api.LSHTTPClientType
@@ -211,7 +213,9 @@ class BorrowAudioBookTest {
       )!!
         .readBytes()
     val manifestResult =
-      ManifestParsers.parse(URI.create("urn:basic-manifest.json"), data)
+      ManifestParsers.parse(
+        URI.create("urn:basic-manifest.json"),
+        ManifestUnparsed(PlayerPalaceID("6c15709a-b9cd-4eb8-815a-309f5d738a11"), data))
         as ParseResult.Success
     val manifest =
       manifestResult.result

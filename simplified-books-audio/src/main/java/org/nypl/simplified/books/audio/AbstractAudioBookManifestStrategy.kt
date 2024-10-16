@@ -13,6 +13,7 @@ import org.librarysimplified.audiobook.license_check.spi.SingleLicenseCheckStatu
 import org.librarysimplified.audiobook.manifest.api.PlayerManifest
 import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfilled
 import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfillmentErrorType
+import org.librarysimplified.audiobook.manifest_parser.api.ManifestUnparsed
 import org.librarysimplified.audiobook.parser.api.ParseError
 import org.librarysimplified.audiobook.parser.api.ParseResult
 import org.librarysimplified.audiobook.parser.api.ParseWarning
@@ -239,7 +240,7 @@ abstract class AbstractAudioBookManifestStrategy(
     this.logger.debug("parseManifest")
     return this.request.manifestParsers.parse(
       uri = source,
-      streams = data,
+      input = ManifestUnparsed(request.palaceID, data),
       extensions = this.request.extensions
     )
   }

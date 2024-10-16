@@ -3,6 +3,7 @@ package org.librarysimplified.viewer.audiobook
 import android.app.Application
 import one.irradia.mime.vanilla.MIMEParser
 import org.librarysimplified.audiobook.api.PlayerUserAgent
+import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfilled
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
@@ -151,7 +152,8 @@ class AudioBookPlayerParameters(
         loadFallbackData = {
           ManifestFulfilled(manifestContentType, null, this.manifestFile.readBytes())
         },
-        cacheDirectory = cacheDirectory
+        cacheDirectory = cacheDirectory,
+        palaceID = PlayerPalaceID(this.opdsEntry.id)
       )
 
     return strategies.createStrategy(

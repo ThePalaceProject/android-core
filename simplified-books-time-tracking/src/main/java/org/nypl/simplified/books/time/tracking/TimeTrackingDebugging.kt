@@ -114,7 +114,7 @@ object TimeTrackingDebugging {
     libraryId: String,
     bookId: String,
     entryId: String,
-    exception: Exception
+    exception: Throwable
   ) {
     val p = Properties()
     p.setProperty("Operation", "TimeTrackingSendAttemptFailedExceptionally")
@@ -127,7 +127,7 @@ object TimeTrackingDebugging {
   }
 
   private fun exceptionTextOf(
-    exception: Exception
+    exception: Throwable
   ): String {
     return StringWriter().use { stringWriter ->
       PrintWriter(stringWriter).use { printWriter ->

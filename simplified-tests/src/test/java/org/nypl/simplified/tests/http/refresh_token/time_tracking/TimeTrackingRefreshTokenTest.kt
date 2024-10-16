@@ -27,11 +27,13 @@ import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountUsername
 import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
+import org.nypl.simplified.books.time.tracking.TimeTrackingEntry
 import org.nypl.simplified.books.time.tracking.TimeTrackingHTTPCalls
 import org.nypl.simplified.books.time.tracking.TimeTrackingInfo
-import org.nypl.simplified.books.time.tracking.TimeTrackingResponse
-import org.nypl.simplified.books.time.tracking.TimeTrackingResponseEntry
-import org.nypl.simplified.books.time.tracking.TimeTrackingResponseSummary
+import org.nypl.simplified.books.time.tracking.TimeTrackingRequest
+import org.nypl.simplified.books.time.tracking.TimeTrackingServerResponse
+import org.nypl.simplified.books.time.tracking.TimeTrackingServerResponseEntry
+import org.nypl.simplified.books.time.tracking.TimeTrackingServerResponseSummary
 import org.nypl.simplified.crashlytics.api.CrashlyticsServiceType
 import org.nypl.simplified.tests.mocking.MockAccount
 import java.net.URI
@@ -43,8 +45,6 @@ class TimeTrackingRefreshTokenTest {
   private lateinit var bookRegistry: BookRegistryType
   private lateinit var httpClient: LSHTTPClientType
   private lateinit var webServer: MockWebServer
-
-  private val crashlytics = Mockito.mock(CrashlyticsServiceType::class.java)
 
   @BeforeEach
   fun testSetup() {
@@ -107,25 +107,32 @@ class TimeTrackingRefreshTokenTest {
 
   @Test
   fun testSendEntriesUpdateToken() {
-    val timeTrackingInfo = Mockito.mock(TimeTrackingInfo::class.java)
-    Mockito.`when`(timeTrackingInfo.timeTrackingUri)
-      .thenReturn(this.webServer.url("/timeTracking").toUri())
-
-    val httpCalls = TimeTrackingHTTPCalls(
-      objectMapper = ObjectMapper(),
-      http = httpClient,
-      crashlytics = crashlytics
+    val timeTrackingInfo = TimeTrackingRequest(
+      bookId = "book-id",
+      libraryId = URI.create("urn:uuid:f8f6b138-02ba-4624-802b-0556278228d5"),
+      timeTrackingUri = this.webServer.url("/timeTracking").toUri(),
+      timeEntries = listOf(
+        TimeTrackingEntry(
+          id = "id",
+          duringMinute = "2024-10-16T00:00:00",
+          secondsPlayed = 60
+        )
+      )
     )
 
-    val responseBody = TimeTrackingResponse(
+    val httpCalls = TimeTrackingHTTPCalls(
+      http = httpClient
+    )
+
+    val responseBody = TimeTrackingServerResponse(
       responses = listOf(
-        TimeTrackingResponseEntry(
+        TimeTrackingServerResponseEntry(
           id = "id",
           message = "success",
           status = 201
         )
       ),
-      summary = TimeTrackingResponseSummary(
+      summary = TimeTrackingServerResponseSummary(
         successes = 1,
         failures = 0,
         total = 1
@@ -140,11 +147,10 @@ class TimeTrackingRefreshTokenTest {
     )
 
     val failedEntries = httpCalls.registerTimeTrackingInfo(
-      timeTrackingInfo = timeTrackingInfo,
+      request = timeTrackingInfo,
       account = account
     )
 
-    Assertions.assertTrue(failedEntries.isEmpty())
     Assertions.assertEquals(
       "ghij",
       (account.loginState.credentials as AccountAuthenticationCredentials.BasicToken)

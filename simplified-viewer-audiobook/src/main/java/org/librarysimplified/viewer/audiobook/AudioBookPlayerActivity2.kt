@@ -37,6 +37,7 @@ import org.librarysimplified.audiobook.api.PlayerEvent.PlayerEventWithPosition.P
 import org.librarysimplified.audiobook.api.PlayerEvent.PlayerEventWithPosition.PlayerEventPlaybackWaitingForAction
 import org.librarysimplified.audiobook.api.PlayerUIThread
 import org.librarysimplified.audiobook.api.PlayerUserAgent
+import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.librarysimplified.audiobook.views.PlayerBaseFragment
 import org.librarysimplified.audiobook.views.PlayerBookmarkModel
 import org.librarysimplified.audiobook.views.PlayerFragment
@@ -148,7 +149,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     }
 
     try {
-      this.timeTrackingService.stopTracking()
+      this.timeTrackingService.onBookClosed()
     } catch (e: Exception) {
       this.logger.debug("Failed to stop time tracking: ", e)
     }
@@ -270,15 +271,9 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
         // Nothing yet...
       }
 
-      PlayerEventManifestUpdated -> {
+      is PlayerEventManifestUpdated -> {
         // Nothing yet...
       }
-    }
-
-    try {
-      this.timeTrackingService.onPlayerEventReceived(event)
-    } catch (e: Exception) {
-      this.logger.debug("Failed to submit event to time tracking service: ", e)
     }
   }
 
@@ -297,7 +292,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       }
 
       PlayerModelState.PlayerClosed -> {
-        this.timeTrackingService.stopTracking()
+        this.timeTrackingService.onBookClosed()
         this.switchFragment(AudioBookLoadingFragment2())
       }
 
@@ -310,12 +305,15 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       }
 
       is PlayerModelState.PlayerManifestOK -> {
-        this.timeTrackingService.startTimeTracking(
-          accountID = bookParameters.accountID,
-          bookId = bookParameters.opdsEntry.id,
-          libraryId = bookParameters.accountProviderID.toString(),
-          timeTrackingUri = bookParameters.opdsEntry.timeTrackingUri.getOrNull()
-        )
+        val timeTrackingUri = bookParameters.opdsEntry.timeTrackingUri.getOrNull()
+        if (timeTrackingUri != null) {
+          this.timeTrackingService.onBookOpenedForTracking(
+            accountID = bookParameters.accountID,
+            bookId = PlayerPalaceID(bookParameters.opdsEntry.id),
+            libraryId = bookParameters.accountProviderID.toString(),
+            timeTrackingUri = timeTrackingUri
+          )
+        }
 
         /*
          * XXX: This shouldn't really be a blocking call to get()
