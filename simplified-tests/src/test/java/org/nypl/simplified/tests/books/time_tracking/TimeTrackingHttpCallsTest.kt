@@ -21,7 +21,6 @@ import org.nypl.simplified.accounts.api.AccountUsername
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.time.tracking.TimeTrackingEntry
 import org.nypl.simplified.books.time.tracking.TimeTrackingHTTPCalls
-import org.nypl.simplified.books.time.tracking.TimeTrackingInfo
 import org.nypl.simplified.books.time.tracking.TimeTrackingRequest
 import org.nypl.simplified.books.time.tracking.TimeTrackingServerResponse
 import org.nypl.simplified.books.time.tracking.TimeTrackingServerResponseEntry

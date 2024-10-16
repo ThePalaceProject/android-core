@@ -29,7 +29,6 @@ import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.time.tracking.TimeTrackingEntry
 import org.nypl.simplified.books.time.tracking.TimeTrackingHTTPCalls
-import org.nypl.simplified.books.time.tracking.TimeTrackingInfo
 import org.nypl.simplified.books.time.tracking.TimeTrackingRequest
 import org.nypl.simplified.books.time.tracking.TimeTrackingServerResponse
 import org.nypl.simplified.books.time.tracking.TimeTrackingServerResponseEntry
