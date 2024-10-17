@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.librarysimplified.audiobook.api.PlayerResult
 import org.librarysimplified.audiobook.api.PlayerUserAgent
+import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.librarysimplified.audiobook.manifest_fulfill.api.ManifestFulfillmentStrategyRegistryType
 import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentBasicParameters
 import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentBasicType
@@ -83,6 +84,7 @@ class AudioBookManifestStrategyTest {
           services = this.services,
           isNetworkAvailable = { true },
           strategyRegistry = this.strategies,
+          palaceID = PlayerPalaceID("6c15709a-b9cd-4eb8-815a-309f5d738a11"),
           cacheDirectory = File(tempFolder, "cache")
         )
       )
@@ -125,6 +127,7 @@ class AudioBookManifestStrategyTest {
           services = this.services,
           isNetworkAvailable = { true },
           strategyRegistry = this.strategies,
+          palaceID = PlayerPalaceID("6c15709a-b9cd-4eb8-815a-309f5d738a11"),
           cacheDirectory = File(tempFolder, "cache")
         )
       )
@@ -176,6 +179,7 @@ class AudioBookManifestStrategyTest {
           strategyRegistry = this.strategies,
           manifestParsers = AudioBookFailingParsers,
           extensions = emptyList(),
+          palaceID = PlayerPalaceID("6c15709a-b9cd-4eb8-815a-309f5d738a11"),
           cacheDirectory = File(tempFolder, "cache")
         )
       )
@@ -229,6 +233,7 @@ class AudioBookManifestStrategyTest {
           manifestParsers = AudioBookSucceedingParsers,
           extensions = emptyList(),
           licenseChecks = listOf(AudioBookFailingLicenseChecks),
+          palaceID = PlayerPalaceID("6c15709a-b9cd-4eb8-815a-309f5d738a11"),
           cacheDirectory = File(tempFolder, "cache")
         )
       )
@@ -282,6 +287,7 @@ class AudioBookManifestStrategyTest {
           manifestParsers = AudioBookSucceedingParsers,
           extensions = emptyList(),
           licenseChecks = listOf(),
+          palaceID = PlayerPalaceID("6c15709a-b9cd-4eb8-815a-309f5d738a11"),
           cacheDirectory = File(tempFolder, "cache")
         )
       )
@@ -302,6 +308,7 @@ class AudioBookManifestStrategyTest {
           credentials = null,
           services = this.services,
           isNetworkAvailable = { false },
+          palaceID = PlayerPalaceID("6c15709a-b9cd-4eb8-815a-309f5d738a11"),
           cacheDirectory = File(tempFolder, "cache")
         )
       )
@@ -333,6 +340,7 @@ class AudioBookManifestStrategyTest {
           isNetworkAvailable = { false },
           strategyRegistry = this.strategies,
           licenseChecks = listOf(),
+          palaceID = PlayerPalaceID("6c15709a-b9cd-4eb8-815a-309f5d738a11"),
           cacheDirectory = File(tempFolder, "cache")
         )
       )

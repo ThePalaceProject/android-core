@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -20,11 +21,10 @@ import org.nypl.simplified.accounts.api.AccountUsername
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.time.tracking.TimeTrackingEntry
 import org.nypl.simplified.books.time.tracking.TimeTrackingHTTPCalls
-import org.nypl.simplified.books.time.tracking.TimeTrackingInfo
-import org.nypl.simplified.books.time.tracking.TimeTrackingResponse
-import org.nypl.simplified.books.time.tracking.TimeTrackingResponseEntry
-import org.nypl.simplified.books.time.tracking.TimeTrackingResponseSummary
-import org.nypl.simplified.crashlytics.api.CrashlyticsServiceType
+import org.nypl.simplified.books.time.tracking.TimeTrackingRequest
+import org.nypl.simplified.books.time.tracking.TimeTrackingServerResponse
+import org.nypl.simplified.books.time.tracking.TimeTrackingServerResponseEntry
+import org.nypl.simplified.books.time.tracking.TimeTrackingServerResponseSummary
 import java.net.InetAddress
 import java.net.URI
 import java.util.concurrent.TimeUnit
@@ -32,8 +32,6 @@ import java.util.concurrent.TimeUnit
 class TimeTrackingHttpCallsTest {
   private lateinit var httpClient: LSHTTPClientType
   private lateinit var webServer: MockWebServer
-
-  private val crashlytics = Mockito.mock(CrashlyticsServiceType::class.java)
 
   @Mock
   private val account: AccountType = Mockito.mock(AccountType::class.java)
@@ -82,25 +80,31 @@ class TimeTrackingHttpCallsTest {
 
   @Test
   fun testAllEntriesWithSuccess() {
-    val timeTrackingInfo = Mockito.mock(TimeTrackingInfo::class.java)
-    Mockito.`when`(timeTrackingInfo.timeTrackingUri)
-      .thenReturn(this.webServer.url("/timeTracking").toUri())
-
-    val httpCalls = TimeTrackingHTTPCalls(
-      objectMapper = ObjectMapper(),
-      http = httpClient,
-      crashlytics = crashlytics
+    val timeTrackingInfo = TimeTrackingRequest(
+      bookId = "book-id",
+      libraryId = URI.create("urn:uuid:f8f6b138-02ba-4624-802b-0556278228d5"),
+      timeTrackingUri = this.webServer.url("/timeTracking").toUri(),
+      timeEntries = listOf(
+        TimeTrackingEntry(
+          id = "id",
+          duringMinute = "2024-10-16T00:00:00",
+          secondsPlayed = 60
+        )
+      )
     )
 
-    val responseBody = TimeTrackingResponse(
+    val httpCalls =
+      TimeTrackingHTTPCalls(http = httpClient)
+
+    val responseBody = TimeTrackingServerResponse(
       responses = listOf(
-        TimeTrackingResponseEntry(
+        TimeTrackingServerResponseEntry(
           id = "id",
           message = "success",
           status = 201
         )
       ),
-      summary = TimeTrackingResponseSummary(
+      summary = TimeTrackingServerResponseSummary(
         successes = 1,
         failures = 0,
         total = 1
@@ -113,59 +117,57 @@ class TimeTrackingHttpCallsTest {
         .setBody(ObjectMapper().writeValueAsString(responseBody))
     )
 
-    val failedEntries = httpCalls.registerTimeTrackingInfo(
-      timeTrackingInfo = timeTrackingInfo,
+    val response = httpCalls.registerTimeTrackingInfo(
+      request = timeTrackingInfo,
       account = account
     )
 
-    assertTrue(failedEntries.isEmpty())
+    assertEquals(1, response.responses.size)
+    assertEquals("success", response.responses[0].message)
   }
 
   @Test
   fun testSomeEntriesWithSuccess() {
-    val timeTrackingInfo = Mockito.mock(TimeTrackingInfo::class.java)
-    Mockito.`when`(timeTrackingInfo.timeEntries)
-      .thenReturn(
-        listOf(
+    val timeTrackingInfo =
+      TimeTrackingRequest(
+        bookId = "book-id",
+        libraryId = URI.create("urn:uuid:f8f6b138-02ba-4624-802b-0556278228d5"),
+        timeTrackingUri = this.webServer.url("/timeTracking").toUri(),
+        timeEntries = listOf(
           TimeTrackingEntry(id = "id", duringMinute = "", 10),
           TimeTrackingEntry(id = "id2", duringMinute = "", 10),
           TimeTrackingEntry(id = "id3", duringMinute = "", 10),
           TimeTrackingEntry(id = "id4", duringMinute = "", 10)
         )
       )
-    Mockito.`when`(timeTrackingInfo.timeTrackingUri)
-      .thenReturn(this.webServer.url("/timeTracking").toUri())
 
-    val httpCalls = TimeTrackingHTTPCalls(
-      objectMapper = ObjectMapper(),
-      http = httpClient,
-      crashlytics = crashlytics
-    )
+    val httpCalls =
+      TimeTrackingHTTPCalls(http = httpClient)
 
-    val responseBody = TimeTrackingResponse(
+    val responseBody = TimeTrackingServerResponse(
       responses = listOf(
-        TimeTrackingResponseEntry(
+        TimeTrackingServerResponseEntry(
           id = "id",
           message = "success",
           status = 201
         ),
-        TimeTrackingResponseEntry(
+        TimeTrackingServerResponseEntry(
           id = "id2",
           message = "gone",
           status = 410
         ),
-        TimeTrackingResponseEntry(
+        TimeTrackingServerResponseEntry(
           id = "id3",
           message = "error",
           status = 400
         ),
-        TimeTrackingResponseEntry(
+        TimeTrackingServerResponseEntry(
           id = "id4",
           message = "another error",
           status = 400
         )
       ),
-      summary = TimeTrackingResponseSummary(
+      summary = TimeTrackingServerResponseSummary(
         successes = 1,
         failures = 3,
         total = 4
@@ -178,53 +180,51 @@ class TimeTrackingHttpCallsTest {
         .setBody(ObjectMapper().writeValueAsString(responseBody))
     )
 
-    val failedEntries = httpCalls.registerTimeTrackingInfo(
-      timeTrackingInfo = timeTrackingInfo,
+    val response = httpCalls.registerTimeTrackingInfo(
+      request = timeTrackingInfo,
       account = account
     )
 
-    assertTrue(failedEntries.size == 2)
+    assertEquals(3, response.responses.filter { t -> !t.isStatusSuccess() }.size)
   }
 
   @Test
   fun testNoEntriesWithSuccess() {
-    val timeTrackingInfo = Mockito.mock(TimeTrackingInfo::class.java)
-    Mockito.`when`(timeTrackingInfo.timeEntries)
-      .thenReturn(
-        listOf(
+    val timeTrackingInfo =
+      TimeTrackingRequest(
+        bookId = "book-id",
+        libraryId = URI.create("urn:uuid:f8f6b138-02ba-4624-802b-0556278228d5"),
+        timeTrackingUri = this.webServer.url("/timeTracking").toUri(),
+        timeEntries = listOf(
           TimeTrackingEntry(id = "id", duringMinute = "", 10),
           TimeTrackingEntry(id = "id2", duringMinute = "", 10),
           TimeTrackingEntry(id = "id3", duringMinute = "", 10)
         )
       )
-    Mockito.`when`(timeTrackingInfo.timeTrackingUri)
-      .thenReturn(this.webServer.url("/timeTracking").toUri())
 
     val httpCalls = TimeTrackingHTTPCalls(
-      objectMapper = ObjectMapper(),
-      http = httpClient,
-      crashlytics = crashlytics
+      http = httpClient
     )
 
-    val responseBody = TimeTrackingResponse(
+    val responseBody = TimeTrackingServerResponse(
       responses = listOf(
-        TimeTrackingResponseEntry(
+        TimeTrackingServerResponseEntry(
           id = "id",
           message = "error",
           status = 400
         ),
-        TimeTrackingResponseEntry(
+        TimeTrackingServerResponseEntry(
           id = "id2",
           message = "another error",
           status = 400
         ),
-        TimeTrackingResponseEntry(
+        TimeTrackingServerResponseEntry(
           id = "id3",
           message = "and another error",
           status = 400
         )
       ),
-      summary = TimeTrackingResponseSummary(
+      summary = TimeTrackingServerResponseSummary(
         successes = 0,
         failures = 3,
         total = 3
@@ -237,11 +237,11 @@ class TimeTrackingHttpCallsTest {
         .setBody(ObjectMapper().writeValueAsString(responseBody))
     )
 
-    val failedEntries = httpCalls.registerTimeTrackingInfo(
-      timeTrackingInfo = timeTrackingInfo,
+    val response = httpCalls.registerTimeTrackingInfo(
+      request = timeTrackingInfo,
       account = account
     )
 
-    assertTrue(failedEntries.size == 3)
+    assertEquals(3, response.responses.filter { t -> !t.isStatusSuccess() }.size)
   }
 }

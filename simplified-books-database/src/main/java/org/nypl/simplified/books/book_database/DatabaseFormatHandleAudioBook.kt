@@ -9,7 +9,9 @@ import org.librarysimplified.audiobook.api.PlayerAudioEngines
 import org.librarysimplified.audiobook.api.PlayerResult
 import org.librarysimplified.audiobook.api.PlayerUserAgent
 import org.librarysimplified.audiobook.manifest.api.PlayerManifest
+import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.librarysimplified.audiobook.manifest_parser.api.ManifestParsers
+import org.librarysimplified.audiobook.manifest_parser.api.ManifestUnparsed
 import org.librarysimplified.audiobook.parser.api.ParseResult
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookDRMKind
@@ -166,7 +168,13 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
         this.log.debug("[{}]: parsing audio book manifest", briefID)
 
         val manifestResult: ParseResult<PlayerManifest> =
-          ManifestParsers.parse(this.fileManifest.toURI(), stream.readBytes())
+          ManifestParsers.parse(
+            uri = this.fileManifest.toURI(),
+            input = ManifestUnparsed(
+              palaceId = PlayerPalaceID(this.parameters.entry.book.entry.id),
+              data = stream.readBytes()
+            )
+          )
 
         when (manifestResult) {
           is ParseResult.Failure -> {

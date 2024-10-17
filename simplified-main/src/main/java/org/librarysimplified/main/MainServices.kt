@@ -121,6 +121,8 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
+import java.time.OffsetDateTime
+import java.time.ZoneOffset.UTC
 import java.util.ServiceLoader
 
 internal object MainServices {
@@ -145,7 +147,8 @@ internal object MainServices {
     val directoryStorageDownloads: File,
     val directoryStorageDocuments: File,
     val directoryStorageProfiles: File,
-    val directoryStorageTimeTracking: File,
+    val directoryStorageTimeTrackingSender: File,
+    val directoryStorageTimeTrackingCollector: File,
     val directoryStorageTimeTrackingDebug: File
   )
 
@@ -163,14 +166,20 @@ internal object MainServices {
     val directoryStorageTimeTracking =
       File(directoryStorageBaseVersioned, "time_tracking")
     val directoryStorageTimeTrackingDebug =
-      File(directoryStorageBaseVersioned, "time_tracking_debug")
+      File(directoryStorageTimeTracking, "debug")
+    val directoryStorageTimeTrackingSender =
+      File(directoryStorageTimeTracking, "sender")
+    val directoryStorageTimeTrackingCollector =
+      File(directoryStorageTimeTracking, "collector")
 
-    this.logger.debug("directoryStorageBaseVersioned:     {}", directoryStorageBaseVersioned)
-    this.logger.debug("directoryStorageDownloads:         {}", directoryStorageDownloads)
-    this.logger.debug("directoryStorageDocuments:         {}", directoryStorageDocuments)
-    this.logger.debug("directoryStorageProfiles:          {}", directoryStorageProfiles)
-    this.logger.debug("directoryStorageTimeTracking:      {}", directoryStorageTimeTracking)
-    this.logger.debug("directoryStorageTimeTrackingDebug: {}", directoryStorageTimeTrackingDebug)
+    this.logger.debug("directoryStorageBaseVersioned:         {}", directoryStorageBaseVersioned)
+    this.logger.debug("directoryStorageDownloads:             {}", directoryStorageDownloads)
+    this.logger.debug("directoryStorageDocuments:             {}", directoryStorageDocuments)
+    this.logger.debug("directoryStorageProfiles:              {}", directoryStorageProfiles)
+    this.logger.debug("directoryStorageTimeTracking:          {}", directoryStorageTimeTracking)
+    this.logger.debug("directoryStorageTimeTrackingDebug:     {}", directoryStorageTimeTrackingDebug)
+    this.logger.debug("directoryStorageTimeTrackingSender:    {}", directoryStorageTimeTrackingSender)
+    this.logger.debug("directoryStorageTimeTrackingCollector: {}", directoryStorageTimeTrackingCollector)
 
     /*
      * Make sure the required directories exist. There is no sane way to
@@ -184,6 +193,8 @@ internal object MainServices {
         directoryStorageDocuments,
         directoryStorageProfiles,
         directoryStorageTimeTracking,
+        directoryStorageTimeTrackingSender,
+        directoryStorageTimeTrackingCollector,
         directoryStorageTimeTrackingDebug
       )
 
@@ -209,8 +220,9 @@ internal object MainServices {
       directoryStorageDownloads = directoryStorageDownloads,
       directoryStorageDocuments = directoryStorageDocuments,
       directoryStorageProfiles = directoryStorageProfiles,
-      directoryStorageTimeTracking = directoryStorageTimeTracking,
-      directoryStorageTimeTrackingDebug = directoryStorageTimeTrackingDebug
+      directoryStorageTimeTrackingDebug = directoryStorageTimeTrackingDebug,
+      directoryStorageTimeTrackingSender = directoryStorageTimeTrackingSender,
+      directoryStorageTimeTrackingCollector = directoryStorageTimeTrackingCollector
     )
   }
 
@@ -932,13 +944,14 @@ internal object MainServices {
       message = strings.bootingGeneral("audiobook time tracker registry"),
       interfaceType = TimeTrackingServiceType::class.java,
       serviceConstructor = {
-        TimeTrackingService(
-          context = context,
-          httpCalls = TimeTrackingHTTPCalls(ObjectMapper(), lsHTTP, crashlyticsService),
-          timeTrackingDirectory = directories.directoryStorageTimeTracking,
-          timeTrackingDebugDirectory = directories.directoryStorageTimeTrackingDebug,
-          profilesController = profilesControllerTypeService,
-          isPlayerPlayingCheck = { PlayerModel.isPlaying }
+        TimeTrackingService.create(
+          profiles = profilesControllerTypeService,
+          httpCalls = TimeTrackingHTTPCalls(lsHTTP),
+          clock = { OffsetDateTime.now(UTC) },
+          timeSegments = PlayerModel.timeTracker.timeSegments,
+          debugDirectory = directories.directoryStorageTimeTrackingDebug.toPath(),
+          collectorDirectory = directories.directoryStorageTimeTrackingCollector.toPath(),
+          senderDirectory = directories.directoryStorageTimeTrackingSender.toPath()
         )
       }
     )

@@ -1,6 +1,6 @@
 package org.nypl.simplified.books.time.tracking
 
-class TimeTrackingResponseSummary(
+data class TimeTrackingServerResponseSummary(
   val failures: Int,
   val successes: Int,
   val total: Int

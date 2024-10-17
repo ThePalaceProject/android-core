@@ -28,6 +28,7 @@ dependencies {
     implementation(libs.kotlin.stdlib)
     implementation(libs.kotlinx.coroutines)
     implementation(libs.palace.audiobook.api)
+    implementation(libs.palace.audiobook.manifest.api)
     implementation(libs.palace.audiobook.manifest.fulfill.api)
     implementation(libs.palace.audiobook.manifest.fulfill.spi)
     implementation(libs.palace.audiobook.manifest.parser.api)

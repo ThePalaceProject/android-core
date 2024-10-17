@@ -1,6 +1,6 @@
 package org.nypl.simplified.books.time.tracking
 
-class TimeTrackingResponseEntry(
+data class TimeTrackingServerResponseEntry(
   val id: String,
   val message: String,
   val status: Int
