@@ -122,6 +122,7 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.time.OffsetDateTime
+import java.time.ZoneOffset.UTC
 import java.util.ServiceLoader
 
 internal object MainServices {
@@ -946,7 +947,7 @@ internal object MainServices {
         TimeTrackingService.create(
           profiles = profilesControllerTypeService,
           httpCalls = TimeTrackingHTTPCalls(lsHTTP),
-          clock = { OffsetDateTime.now() },
+          clock = { OffsetDateTime.now(UTC) },
           timeSegments = PlayerModel.timeTracker.timeSegments,
           debugDirectory = directories.directoryStorageTimeTrackingDebug.toPath(),
           collectorDirectory = directories.directoryStorageTimeTrackingCollector.toPath(),

@@ -14,6 +14,7 @@ import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 import java.nio.file.StandardOpenOption.CREATE
 import java.nio.file.StandardOpenOption.TRUNCATE_EXISTING
 import java.nio.file.StandardOpenOption.WRITE
+import java.time.ZoneOffset
 import java.util.concurrent.Executors
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
@@ -99,14 +100,19 @@ class TimeTrackingCollector private constructor(
           val outFileTmp =
             this.outputDirectory.resolve("${time.id}.ttspan.tmp")
 
+          val utcStart =
+            time.timeStarted.withOffsetSameInstant(ZoneOffset.UTC)
+          val utcEnd =
+            time.timeEnded.withOffsetSameInstant(ZoneOffset.UTC)
+
           val span =
             TimeTrackingReceivedSpan(
               id = time.id,
               accountID = statusNow.accountID,
               libraryID = account.provider.id,
               bookID = statusNow.bookId,
-              timeStarted = time.timeStarted,
-              timeEnded = time.timeEnded,
+              timeStarted = utcStart,
+              timeEnded = utcEnd,
               targetURI = statusNow.timeTrackingUri
             )
 

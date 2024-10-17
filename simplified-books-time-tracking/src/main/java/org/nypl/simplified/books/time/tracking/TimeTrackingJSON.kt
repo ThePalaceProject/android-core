@@ -20,7 +20,6 @@ object TimeTrackingJSON {
   private const val NODE_SUMMARY = "summary"
   private const val NODE_TIME_ENTRIES = "timeEntries"
   private const val NODE_TOTAL = "total"
-  private const val NODE_URI = "uri"
 
   private val objectMapper = ObjectMapper()
 
@@ -31,7 +30,7 @@ object TimeTrackingJSON {
     node.put(this.NODE_BOOK_ID, request.bookId)
     node.put(this.NODE_LIBRARY_ID, request.libraryId.toString())
 
-    val timeEntriesArray = this.objectMapper.createArrayNode()
+    val timeEntriesArray = node.putArray(this.NODE_TIME_ENTRIES)
     request.timeEntries.forEach { entry ->
       val entryNode = this.objectMapper.createObjectNode()
       entryNode.put(this.NODE_ID, entry.id)

@@ -307,12 +307,15 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       is PlayerModelState.PlayerManifestOK -> {
         val timeTrackingUri = bookParameters.opdsEntry.timeTrackingUri.getOrNull()
         if (timeTrackingUri != null) {
+          this.logger.debug("Time tracking info will be sent to {}", timeTrackingUri)
           this.timeTrackingService.onBookOpenedForTracking(
             accountID = bookParameters.accountID,
             bookId = PlayerPalaceID(bookParameters.opdsEntry.id),
             libraryId = bookParameters.accountProviderID.toString(),
             timeTrackingUri = timeTrackingUri
           )
+        } else {
+          this.logger.debug("Book has no time tracking URI. No time tracking will occur.")
         }
 
         /*

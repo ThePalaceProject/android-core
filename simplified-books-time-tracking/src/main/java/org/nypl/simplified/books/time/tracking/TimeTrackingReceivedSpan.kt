@@ -7,6 +7,7 @@ import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Path
 import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import java.util.Properties
 import java.util.UUID
 
@@ -19,6 +20,15 @@ data class TimeTrackingReceivedSpan(
   val timeEnded: OffsetDateTime,
   val targetURI: URI
 ) {
+
+  init {
+    require(this.timeStarted.offset == ZoneOffset.UTC) {
+      "Times must be in UTC"
+    }
+    require(this.timeEnded.offset == ZoneOffset.UTC) {
+      "Times must be in UTC"
+    }
+  }
 
   fun toBytes(): ByteArray {
     return ByteArrayOutputStream().use { s ->
