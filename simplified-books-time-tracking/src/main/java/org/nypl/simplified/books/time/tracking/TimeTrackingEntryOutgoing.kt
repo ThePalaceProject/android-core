@@ -51,7 +51,7 @@ data class TimeTrackingEntryOutgoing(
           targetURI = entry.targetURI
         )
         var existing = results[key]
-        existing = existing?.plus(entry) ?: listOf()
+        existing = existing?.plus(entry) ?: listOf(entry)
         results[key] = existing
       }
       return results.toMap()

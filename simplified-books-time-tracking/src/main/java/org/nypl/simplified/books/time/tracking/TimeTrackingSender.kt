@@ -8,6 +8,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.time.Duration
 import java.util.concurrent.Executors
+import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import java.util.stream.Collectors
 
@@ -32,6 +33,8 @@ class TimeTrackingSender private constructor(
   private val logger =
     LoggerFactory.getLogger(TimeTrackingSender::class.java)
 
+  private val tickWrite =
+    LinkedBlockingQueue<Unit>()
   private val resources =
     CloseableCollection.create()
 
@@ -52,9 +55,12 @@ class TimeTrackingSender private constructor(
     this.executor.scheduleWithFixedDelay(
       this::onTrySend,
       0L,
-      this.frequency.toMillis() / 1000L,
-      TimeUnit.SECONDS
+      this.frequency.toMillis(),
+      TimeUnit.MILLISECONDS
     )
+    this.resources.add(AutoCloseable {
+      this.tickWrite.offer(Unit)
+    })
   }
 
   private fun isFileSuitable(
@@ -89,6 +95,9 @@ class TimeTrackingSender private constructor(
 
       val grouped = TimeTrackingEntryOutgoing.group(entries)
       for ((key, outgoingEntries) in grouped) {
+        check(outgoingEntries.isNotEmpty()) {
+          "Outgoing entries cannot be empty"
+        }
         this.sendOneBatch(key, outgoingEntries)
       }
     } catch (e: Throwable) {
@@ -100,17 +109,20 @@ class TimeTrackingSender private constructor(
     key: TimeTrackingEntryOutgoing.Key,
     outgoingEntries: List<TimeTrackingEntryOutgoing>
   ) {
-    outgoingEntries.forEach { e ->
-      TimeTrackingDebugging.onTimeTrackingSendAttempt(
-        timeTrackingDebugDirectory = this.debugDirectory.toFile(),
-        libraryId = key.libraryID.toString(),
-        bookId = key.bookID.value,
-        entryId = e.timeEntry.id,
-        seconds = e.timeEntry.secondsPlayed
-      )
-    }
-
     try {
+      Files.createDirectories(this.debugDirectory)
+      Files.createDirectories(this.inputDirectory)
+
+      outgoingEntries.forEach { e ->
+        TimeTrackingDebugging.onTimeTrackingSendAttempt(
+          timeTrackingDebugDirectory = this.debugDirectory.toFile(),
+          libraryId = key.libraryID.toString(),
+          bookId = key.bookID.value,
+          entryId = e.timeEntry.id,
+          seconds = e.timeEntry.secondsPlayed
+        )
+      }
+
       val account =
         this.profiles.profileCurrent().account(key.accountID)
 
@@ -125,12 +137,37 @@ class TimeTrackingSender private constructor(
           )
         )
 
+      /*
+       * If the responses list is empty, and the count suggests that all entries succeeded, we
+       * log success and delete the entry. Unfortunately, the spec leaves open the possibility
+       * that there will be a non-zero number of failures, and nothing in the responses list. In
+       * that edge case, we won't know _which_ entries failed and so we can do nothing other than
+       * send every entry again. The server is responsible for rejecting any entry that it has
+       * already received, so this should be safe.
+       */
+
       if (response.responses.isEmpty()) {
         if (response.summary.successes == outgoingEntries.size && response.summary.failures == 0) {
           outgoingEntries.forEach { e -> this.entrySentSuccessfully(e) }
           return
         }
+
+        check(response.summary.failures != 0)
+        outgoingEntries.forEach { e ->
+          TimeTrackingDebugging.onTimeTrackingSendAttemptFailed(
+            timeTrackingDebugDirectory = this.debugDirectory.toFile(),
+            libraryId = key.libraryID.toString(),
+            bookId = key.bookID.value,
+            entryId = e.timeEntry.id
+          )
+        }
+        return
       }
+
+      /*
+       * For each successful response, we need to log the successful send attempt and then delete
+       * the entry so that it isn't sent again. For each failed attempt, we simply log the failure.
+       */
 
       for (r in response.responses) {
         val e = outgoingEntries.firstOrNull { entry -> entry.timeEntry.id == r.id }
@@ -160,6 +197,8 @@ class TimeTrackingSender private constructor(
           exception = e
         )
       }
+    } finally {
+      this.tickWrite.offer(Unit)
     }
   }
 
@@ -174,7 +213,7 @@ class TimeTrackingSender private constructor(
     )
 
     Files.deleteIfExists(
-      this.inputDirectory.resolve("${entry.timeEntry.id}.tto")
+      this.inputDirectory.resolve("${entry.timeEntry.id}.tteo")
     )
   }
 
@@ -194,6 +233,13 @@ class TimeTrackingSender private constructor(
         frequency = frequency
       )
     }
+  }
+
+  override fun awaitWrite(
+    timeout: Long,
+    unit: TimeUnit
+  ) {
+    this.tickWrite.poll(timeout, unit)
   }
 
   override fun close() {
