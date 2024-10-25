@@ -556,7 +556,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2024-10-17T16:11:02+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.14.0">
+    <c:release date="2024-10-25T00:00:00+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.14.0">
       <c:changes>
         <c:change date="2024-10-03T00:00:00+00:00" summary="Repair book previews.">
           <c:tickets>
@@ -568,9 +568,18 @@
             <c:ticket id="PP-1789"/>
           </c:tickets>
         </c:change>
-        <c:change date="2024-10-17T16:11:02+00:00" summary="Rewrite time tracking.">
+        <c:change date="2024-10-17T00:00:00+00:00" summary="Rewrite time tracking.">
           <c:tickets>
             <c:ticket id="PP-1704"/>
+          </c:tickets>
+        </c:change>
+      </c:changes>
+    </c:release>
+    <c:release date="2024-10-25T16:02:50+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.15.0">
+      <c:changes>
+        <c:change date="2024-10-25T16:02:50+00:00" summary="Support streaming for LCP audiobooks.">
+          <c:tickets>
+            <c:ticket id="PP-1768"/>
           </c:tickets>
         </c:change>
       </c:changes>
