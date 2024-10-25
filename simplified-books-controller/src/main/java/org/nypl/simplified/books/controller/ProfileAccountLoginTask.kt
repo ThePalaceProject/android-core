@@ -118,7 +118,11 @@ class ProfileAccountLoginTask(
 
       if (!this.validateRequest()) {
         this.debug("account does not support the given authentication")
-        this.steps.currentStepFailed(this.loginStrings.loginAuthNotRequired, "loginAuthNotRequired")
+        this.steps.currentStepFailed(
+          message = this.loginStrings.loginAuthNotRequired,
+          errorCode = "loginAuthNotRequired",
+          extraMessages = listOf()
+        )
         this.account.setLoginState(AccountLoginFailed(this.steps.finishFailure<Unit>()))
         return this.steps.finishFailure()
       }
@@ -161,7 +165,10 @@ class ProfileAccountLoginTask(
     } catch (e: Throwable) {
       this.logger.debug("error during login process: ", e)
       this.steps.currentStepFailedAppending(
-        this.loginStrings.loginUnexpectedException, "unexpectedException", e
+        message = this.loginStrings.loginUnexpectedException,
+        errorCode = "unexpectedException",
+        exception = e,
+        extraMessages = listOf()
       )
       val failure = this.steps.finishFailure<Unit>()
       this.account.setLoginState(AccountLoginFailed(failure))
@@ -183,16 +190,22 @@ class ProfileAccountLoginTask(
     val exception = Exception()
     when (result.properties.status) {
       HttpURLConnection.HTTP_UNAUTHORIZED -> {
-        this.steps.currentStepFailed("Invalid credentials!", "invalidCredentials", exception)
+        this.steps.currentStepFailed(
+          message = "Invalid credentials!",
+          errorCode = "invalidCredentials",
+          exception = exception,
+          extraMessages = listOf()
+        )
         throw exception
       }
 
       else -> {
         this.steps.addAttributesIfPresent(result.properties.problemReport?.toMap())
         this.steps.currentStepFailed(
-          "Server error: ${result.properties.status} ${result.properties.message}",
-          "httpError ${result.properties.status} $uri",
-          exception
+          message = "Server error: ${result.properties.status} ${result.properties.message}",
+          errorCode = "httpError ${result.properties.status} $uri",
+          exception = exception,
+          extraMessages = listOf()
         )
         throw exception
       }
@@ -420,9 +433,10 @@ class ProfileAccountLoginTask(
 
         is LSHTTPResponseStatus.Failed -> {
           this.steps.currentStepFailed(
-            "Connection failed when fetching authentication token.",
-            "connectionFailed",
-            status.exception
+            message = "Connection failed when fetching authentication token.",
+            errorCode = "connectionFailed",
+            exception = status.exception,
+            extraMessages = listOf()
           )
           throw status.exception
         }
@@ -615,15 +629,30 @@ class ProfileAccountLoginTask(
     val text = this.loginStrings.loginDeviceActivationFailed(ex)
     return when (ex) {
       is AdobeDRMExtensions.AdobeDRMLoginNoActivationsException -> {
-        this.steps.currentStepFailed(text, "Adobe ACS: drmNoAvailableActivations", ex)
+        this.steps.currentStepFailed(
+          message = text,
+          errorCode = "Adobe ACS: drmNoAvailableActivations",
+          exception = ex,
+          extraMessages = listOf()
+        )
       }
 
       is AdobeDRMExtensions.AdobeDRMLoginConnectorException -> {
-        this.steps.currentStepFailed(text, "Adobe ACS: ${ex.errorCode}", ex)
+        this.steps.currentStepFailed(
+          message = text,
+          errorCode = "Adobe ACS: ${ex.errorCode}",
+          exception = ex,
+          extraMessages = listOf()
+        )
       }
 
       else -> {
-        this.steps.currentStepFailed(text, "Adobe ACS: drmUnspecifiedError", ex)
+        this.steps.currentStepFailed(
+          message = text,
+          errorCode = "Adobe ACS: drmUnspecifiedError",
+          exception = ex,
+          extraMessages = listOf()
+        )
       }
     }
   }

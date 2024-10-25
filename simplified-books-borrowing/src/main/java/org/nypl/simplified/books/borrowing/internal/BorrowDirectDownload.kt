@@ -29,7 +29,8 @@ class BorrowDirectDownload private constructor() : BorrowSubtaskType {
     override fun isApplicableFor(
       type: MIMEType,
       target: URI?,
-      account: AccountReadableType?
+      account: AccountReadableType?,
+      remaining: List<MIMEType>
     ): Boolean {
       if (MIMECompatibility.isCompatibleStrictWithoutAttributes(type, genericEPUBFiles)) {
         return true

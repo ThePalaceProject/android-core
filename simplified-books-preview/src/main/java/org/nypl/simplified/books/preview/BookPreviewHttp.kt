@@ -117,7 +117,8 @@ class BookPreviewHttp {
     taskRecorder.currentStepFailed(
       message = "HTTP request failed: ${status?.properties?.originalStatus} ${status?.properties?.message}",
       errorCode = "httpRequestFailed",
-      exception = null
+      exception = null,
+      extraMessages = listOf()
     )
   }
 

@@ -91,7 +91,11 @@ interface BorrowContextType {
     val uri = this.currentURI()
     if (uri == null) {
       this.logError("no current URI")
-      this.taskRecorder.currentStepFailed("A required URI is missing.", BorrowErrorCodes.requiredURIMissing)
+      this.taskRecorder.currentStepFailed(
+        message = "A required URI is missing.",
+        errorCode = BorrowErrorCodes.requiredURIMissing,
+        extraMessages = listOf()
+      )
       throw BorrowSubtaskFailed()
     }
     return uri

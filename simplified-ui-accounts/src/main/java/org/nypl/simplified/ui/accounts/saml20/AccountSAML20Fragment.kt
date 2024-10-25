@@ -105,8 +105,10 @@ class AccountSAML20Fragment : Fragment(R.layout.account_saml20) {
     return when (event) {
       is AccountSAML20InternalEvent.WebViewClientReady ->
         this.onWebViewClientReady()
+
       is AccountSAML20InternalEvent.Failed ->
         this.onSAMLEventFailed(event)
+
       is AccountSAML20InternalEvent.AccessTokenObtained ->
         this.onSAMLEventAccessTokenObtained()
     }
@@ -137,7 +139,11 @@ class AccountSAML20Fragment : Fragment(R.layout.account_saml20) {
   ): List<TaskStep> {
     val taskRecorder = TaskRecorder.create()
     taskRecorder.beginNewStep("Started SAML 2.0 login...")
-    taskRecorder.currentStepFailed(message, "samlAccountCreationFailed")
+    taskRecorder.currentStepFailed(
+      message = message,
+      errorCode = "samlAccountCreationFailed",
+      extraMessages = listOf()
+    )
     return taskRecorder.finishFailure<AccountType>().steps
   }
 

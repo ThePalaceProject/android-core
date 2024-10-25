@@ -10,11 +10,14 @@ import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfilled
 import org.librarysimplified.audiobook.manifest_parser.api.ManifestParsers
 import org.librarysimplified.audiobook.manifest_parser.api.ManifestParsersType
 import org.librarysimplified.audiobook.manifest_parser.extension_spi.ManifestParserExtensionType
+import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPProblemReportParserFactoryType
 import org.librarysimplified.services.api.ServiceDirectoryType
+import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import java.io.File
-import java.net.URI
+import java.io.IOException
 import java.util.ServiceLoader
+import java.util.UUID
 
 /**
  * A request to fulfill, parse, and license check an audio book manifest.
@@ -23,6 +26,7 @@ import java.util.ServiceLoader
 data class AudioBookManifestRequest(
 
   /**
+   * The HTTP client.
    * The book's Palace ID for time tracking. This is essentially delivered as the book's ID
    * value in the OPDS feed in which it was delivered.
    */
@@ -35,16 +39,13 @@ data class AudioBookManifestRequest(
    * only the manifest is downloaded, this will always be null.
    */
 
-  val file: File? = null,
+  val httpClient: LSHTTPClientType,
 
   /**
-   * The target URI of the manifest. This must be a stable URI that can be accessed repeatedly
-   * in an idempotent manner. In practice, this will be either:
-   * - The "fulfill" URI provided by the Circulation Manager, for unpackaged audio books.
-   * - The path to the manifest file in the archive, for packaged audio books.
+   * The target link
    */
 
-  val targetURI: URI,
+  val target: AudioBookLink,
 
   /**
    * The content type of the target manifest.
@@ -59,10 +60,10 @@ data class AudioBookManifestRequest(
   val userAgent: PlayerUserAgent,
 
   /**
-   * The credentials used for any requests.
+   * The credentials used for license and manifest requests.
    */
 
-  val credentials: AudioBookCredentials?,
+  val credentials: AccountAuthenticationCredentials?,
 
   /**
    * A service directory used to locate any required application services.
@@ -130,4 +131,19 @@ data class AudioBookManifestRequest(
   val problemReportParsers: LSHTTPProblemReportParserFactoryType =
     ServiceLoader.load(LSHTTPProblemReportParserFactoryType::class.java)
       .first()
-)
+) {
+
+  fun temporaryFile(
+    extension: String
+  ): File {
+    val ext = if (extension.isNotEmpty()) ".$extension" else ""
+    this.cacheDirectory.mkdirs()
+    for (i in 0..100) {
+      val file = File(this.cacheDirectory, "${UUID.randomUUID()}$ext")
+      if (!file.exists()) {
+        return file
+      }
+    }
+    throw IOException("Could not create a temporary file within 100 attempts!")
+  }
+}

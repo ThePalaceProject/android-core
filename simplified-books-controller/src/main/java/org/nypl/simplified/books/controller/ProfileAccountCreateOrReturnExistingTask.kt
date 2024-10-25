@@ -51,9 +51,10 @@ class ProfileAccountCreateOrReturnExistingTask(
       this.logger.debug("account creation failed: ", e)
 
       this.taskRecorder.currentStepFailedAppending(
-        this.strings.unexpectedException,
-        "unexpectedException",
-        e
+        message = this.strings.unexpectedException,
+        errorCode = "unexpectedException",
+        exception = e,
+        extraMessages = listOf()
       )
 
       this.publishFailureEvent()

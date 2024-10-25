@@ -86,7 +86,6 @@ import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.files.DirectoryUtilities
 import org.nypl.simplified.metrics.api.MetricServiceFactoryType
 import org.nypl.simplified.metrics.api.MetricServiceType
-import org.nypl.simplified.migration.api.MigrationsType
 import org.nypl.simplified.networkconnectivity.NetworkConnectivity
 import org.nypl.simplified.networkconnectivity.api.NetworkConnectivityType
 import org.nypl.simplified.notifications.NotificationTokenHTTPCalls
@@ -996,12 +995,6 @@ internal object MainServices {
       message = strings.bootingGeneral("network connectivity service"),
       interfaceType = NetworkConnectivityType::class.java,
       serviceConstructor = { NetworkConnectivity.create(context) }
-    )
-
-    addService(
-      message = strings.bootingGeneral("migrations"),
-      interfaceType = MigrationsType::class.java,
-      serviceConstructor = { MainMigrations.create(context, bookController) }
     )
 
     this.showThreads()

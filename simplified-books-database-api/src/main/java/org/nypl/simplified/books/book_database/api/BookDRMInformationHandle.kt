@@ -62,16 +62,18 @@ sealed class BookDRMInformationHandle {
     abstract override val info: BookDRMInformation.LCP
 
     /**
-     * Set the LCP hashed passphrase.
+     * Set the LCP hashed passphrase and license.
      *
      * @param passphrase The passphrase
+     * @param licenseBytes The bytes of the license
      *
      * @throws IOException On I/O errors
      */
 
     @Throws(IOException::class)
-    abstract fun setHashedPassphrase(
-      passphrase: String
+    abstract fun setInfo(
+      passphrase: String,
+      licenseBytes: ByteArray
     ): BookDRMInformation.LCP
   }
 

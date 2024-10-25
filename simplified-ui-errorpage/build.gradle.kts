@@ -9,6 +9,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.cardview)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.constraintlayout.core)
     implementation(libs.androidx.coordinatorlayout)
     implementation(libs.androidx.core)
     implementation(libs.androidx.core.splashscreen)

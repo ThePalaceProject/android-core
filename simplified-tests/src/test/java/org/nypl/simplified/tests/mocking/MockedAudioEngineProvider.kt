@@ -1,9 +1,11 @@
 package org.nypl.simplified.tests.mocking
 
+import android.app.Application
 import org.librarysimplified.audiobook.api.PlayerAudioBookProviderType
 import org.librarysimplified.audiobook.api.PlayerAudioEngineProviderType
 import org.librarysimplified.audiobook.api.PlayerAudioEngineRequest
 import org.librarysimplified.audiobook.api.PlayerVersion
+import org.librarysimplified.audiobook.api.extensions.PlayerExtensionType
 import org.slf4j.LoggerFactory
 
 /**
@@ -22,8 +24,17 @@ class MockedAudioEngineProvider : PlayerAudioEngineProviderType {
     return "mocked"
   }
 
+  override fun tryDeleteRequest(
+    context: Application,
+    extensions: List<PlayerExtensionType>,
+    request: PlayerAudioEngineRequest
+  ): Boolean {
+    this.logger.debug("Trying deletion request: {}", request)
+    return true
+  }
+
   override fun tryRequest(request: PlayerAudioEngineRequest): PlayerAudioBookProviderType? {
-    this.logger.debug("trying request: {}", request)
+    this.logger.debug("Trying request: {}", request)
 
     val next = onNextRequest
     if (next != null) {
@@ -37,7 +48,6 @@ class MockedAudioEngineProvider : PlayerAudioEngineProviderType {
   }
 
   companion object {
-
     var onNextRequest: ((PlayerAudioEngineRequest) -> PlayerAudioBookProviderType?)? = null
   }
 }

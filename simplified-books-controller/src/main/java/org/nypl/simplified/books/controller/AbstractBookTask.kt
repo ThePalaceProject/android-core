@@ -52,23 +52,28 @@ abstract class AbstractBookTask(
   protected abstract fun onFailure(result: TaskResult.Failure<Unit>)
 
   override fun call(): TaskResult<Unit> {
-    this.logger.debug("starting task")
+    this.logger.debug("Starting task")
 
     return try {
       val profile = this.findProfile(profileID)
       val account = this.findAccount(accountID, profile)
       val result = this.execute(account)
-      this.logger.debug("task succeeded")
+      this.logger.debug("Task succeeded")
       result
     } catch (e: TaskFailedHandled) {
-      this.logger.debug("task failed with handled exception: ", e.cause)
+      this.logger.error("Task failed with handled exception: ", e.cause)
       val result = this.taskRecorder.finishFailure<Unit>()
       this.onFailure(result)
       result
-    } catch (e: Exception) {
-      this.logger.debug("task failed with unhandled exception: ", e)
+    } catch (e: Throwable) {
+      this.logger.error("Task failed with unhandled exception: ", e)
       val msg = e.message ?: e.javaClass.name
-      this.taskRecorder.currentStepFailedAppending(msg, BorrowErrorCodes.unexpectedException, e)
+      this.taskRecorder.currentStepFailedAppending(
+        message = msg,
+        errorCode = BorrowErrorCodes.unexpectedException,
+        exception = e,
+        extraMessages = listOf()
+      )
       val result = this.taskRecorder.finishFailure<Unit>()
       this.onFailure(result)
       result
@@ -91,7 +96,8 @@ abstract class AbstractBookTask(
       this.taskRecorder.currentStepFailedAppending(
         message = "Failed to find profile.",
         errorCode = BorrowErrorCodes.profileNotFound,
-        exception = exception
+        exception = exception,
+        extraMessages = listOf()
       )
       throw TaskFailedHandled(exception)
     } else {
@@ -118,7 +124,8 @@ abstract class AbstractBookTask(
       this.taskRecorder.currentStepFailedAppending(
         message = "Failed to find account.",
         errorCode = BorrowErrorCodes.accountsDatabaseException,
-        exception = e
+        exception = e,
+        extraMessages = listOf()
       )
 
       throw TaskFailedHandled(e)
@@ -157,7 +164,12 @@ abstract class AbstractBookTask(
     } else {
       this.logger.debug("credentials required but none are available")
       val exception = BookRevokeExceptionNoCredentials()
-      this.taskRecorder.currentStepFailed("Credentials required, but none are available.", "credentialsRequired", exception)
+      this.taskRecorder.currentStepFailed(
+        message = "Credentials required, but none are available.",
+        errorCode = "credentialsRequired",
+        exception = exception,
+        extraMessages = listOf()
+      )
       throw TaskFailedHandled(exception)
     }
   }

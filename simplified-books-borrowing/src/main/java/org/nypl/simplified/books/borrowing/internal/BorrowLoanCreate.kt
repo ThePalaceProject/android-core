@@ -64,7 +64,8 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
     override fun isApplicableFor(
       type: MIMEType,
       target: URI?,
-      account: AccountReadableType?
+      account: AccountReadableType?,
+      remaining: List<MIMEType>
     ): Boolean {
       for (opdsType in allOPDSFeeds) {
         if (MIMECompatibility.isCompatibleStrictWithoutAttributes(opdsType, type)) {
@@ -128,7 +129,8 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
     context.taskRecorder.currentStepFailed(
       message = status.exception.message ?: "Exception raised during connection attempt.",
       errorCode = httpConnectionFailed,
-      exception = status.exception
+      exception = status.exception,
+      extraMessages = listOf()
     )
     throw BorrowSubtaskFailed()
   }
@@ -158,7 +160,8 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
     context.taskRecorder.currentStepFailed(
       message = "HTTP request failed: ${status.properties.originalStatus} ${status.properties.message}",
       errorCode = httpRequestFailed,
-      exception = null
+      exception = null,
+      extraMessages = listOf()
     )
 
     if (report?.type == "http://librarysimplified.org/terms/problem/loan-limit-reached") {
@@ -230,8 +233,9 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
 
         override fun onHoldable(a: OPDSAvailabilityHoldable) {
           context.taskRecorder.currentStepFailed(
-            "Book is unexpectedly holdable.",
-            opdsFeedEntryHoldable
+            message = "Book is unexpectedly holdable.",
+            errorCode = opdsFeedEntryHoldable,
+            extraMessages = listOf()
           )
           throw BorrowSubtaskFailed()
         }
@@ -258,8 +262,9 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
 
         override fun onLoanable(a: OPDSAvailabilityLoanable) {
           context.taskRecorder.currentStepFailed(
-            "Book is unexpectedly loanable.",
-            opdsFeedEntryLoanable
+            message = "Book is unexpectedly loanable.",
+            errorCode = opdsFeedEntryLoanable,
+            extraMessages = listOf()
           )
           throw BorrowSubtaskFailed()
         }
@@ -304,7 +309,8 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
       context.taskRecorder.currentStepFailed(
         message = "Failed to parse the OPDS feed entry (${e.message}).",
         errorCode = opdsFeedEntryParseError,
-        exception = e
+        exception = e,
+        extraMessages = listOf()
       )
       throw BorrowSubtaskFailed()
     }
@@ -333,7 +339,8 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
 
     context.taskRecorder.currentStepFailed(
       message = "The OPDS feed entry did not provide a 'next' URI.",
-      errorCode = opdsFeedEntryNoNext
+      errorCode = opdsFeedEntryNoNext,
+      extraMessages = listOf()
     )
     throw BorrowSubtaskFailed()
   }

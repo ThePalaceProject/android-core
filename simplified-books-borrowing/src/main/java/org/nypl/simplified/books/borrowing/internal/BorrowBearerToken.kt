@@ -28,7 +28,8 @@ class BorrowBearerToken : BorrowSubtaskType {
     override fun isApplicableFor(
       type: MIMEType,
       target: URI?,
-      account: AccountReadableType?
+      account: AccountReadableType?,
+      remaining: List<MIMEType>
     ): Boolean {
       return MIMECompatibility.isCompatibleStrictWithoutAttributes(
         type,

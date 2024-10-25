@@ -1,13 +1,15 @@
 package org.nypl.simplified.books.book_database
 
+import android.app.Application
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.base.Preconditions
 import net.jcip.annotations.GuardedBy
 import one.irradia.mime.api.MIMEType
 import org.librarysimplified.audiobook.api.PlayerAudioEngineRequest
 import org.librarysimplified.audiobook.api.PlayerAudioEngines
-import org.librarysimplified.audiobook.api.PlayerResult
+import org.librarysimplified.audiobook.api.PlayerBookSource
 import org.librarysimplified.audiobook.api.PlayerUserAgent
+import org.librarysimplified.audiobook.api.extensions.PlayerExtensionType
 import org.librarysimplified.audiobook.manifest.api.PlayerManifest
 import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.librarysimplified.audiobook.manifest_parser.api.ManifestParsers
@@ -33,6 +35,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
 import java.net.URI
+import java.util.ServiceLoader
 
 /**
  * Operations on audio book formats in database entries.
@@ -148,7 +151,7 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
     }
   }
 
-  override fun deleteBookData() {
+  override fun deleteBookData(context: Application) {
     val briefID = this.parameters.bookID.brief()
 
     this.log.debug("[{}]: deleting audio book data", briefID)
@@ -193,35 +196,18 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
           is ParseResult.Success -> {
             this.log.debug("[{}]: selecting audio engine", briefID)
 
-            val engine =
-              PlayerAudioEngines.findBestFor(
-                PlayerAudioEngineRequest(
-                  bookFile = this.fileBook,
-                  manifest = manifestResult.result,
-                  filter = { true },
-                  downloadProvider = NullDownloadProvider(),
-                  userAgent = PlayerUserAgent("unused"),
-                  bookCredentials = this.drmHandleRef.info.playerCredentials()
-                )
+            PlayerAudioEngines.delete(
+              context = context,
+              extensions = ServiceLoader.load(PlayerExtensionType::class.java).toList(),
+              request = PlayerAudioEngineRequest(
+                bookSource = PlayerBookSource.PlayerBookSourceManifestOnly,
+                manifest = manifestResult.result,
+                filter = { true },
+                downloadProvider = NullDownloadProvider(),
+                userAgent = PlayerUserAgent("unused"),
+                bookCredentials = this.drmHandleRef.info.playerCredentials()
               )
-
-            if (engine == null) {
-              throw UnsupportedOperationException(
-                "No audio engine is available to process the given request"
-              )
-            }
-
-            this.log.debug(
-              "[{}]: selected audio engine: {} {}",
-              briefID,
-              engine.engineProvider.name(),
-              engine.engineProvider.version()
             )
-
-            when (val bookResult = engine.bookProvider.create(this.parameters.context)) {
-              is PlayerResult.Success -> bookResult.result.wholeBookDownloadTask.delete()
-              is PlayerResult.Failure -> throw bookResult.failure
-            }
 
             this.log.debug("[{}]: deleted audio book data", briefID)
           }
@@ -271,15 +257,18 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
 
   override fun copyInManifestAndURI(
     data: ByteArray,
-    manifestURI: URI
+    manifestURI: URI?
   ) {
     val newFormat = synchronized(this.dataLock) {
-      FileUtilities.fileWriteBytes(
-        data, this.fileManifest
-      )
-      FileUtilities.fileWriteUTF8Atomically(
-        this.fileManifestURI, this.fileManifestURITmp, manifestURI.toString()
-      )
+      FileUtilities.fileWriteBytes(data, this.fileManifest)
+
+      if (manifestURI != null) {
+        FileUtilities.fileWriteUTF8Atomically(
+          this.fileManifestURI, this.fileManifestURITmp, manifestURI.toString()
+        )
+      } else {
+        FileUtilities.fileDelete(this.fileManifestURI)
+      }
 
       this.formatRef =
         this.formatRef.copy(
@@ -288,44 +277,6 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
             manifestFile = this.fileManifest
           )
         )
-      this.formatRef
-    }
-
-    this.parameters.onUpdated.invoke(newFormat)
-  }
-
-  override fun copyInBook(file: File) {
-    val newFormat = synchronized(this.dataLock) {
-      if (file.isDirectory) {
-        DirectoryUtilities.directoryCopy(file, this.fileBook)
-      } else {
-        FileUtilities.fileCopy(file, this.fileBook)
-      }
-
-      this.formatRef = this.formatRef.copy(
-        file = this.fileBook,
-        manifest = BookFormat.AudioBookManifestReference(
-          manifestURI = URI("manifest.json"),
-          manifestFile = this.fileManifest
-        )
-      )
-      this.formatRef
-    }
-
-    this.parameters.onUpdated.invoke(newFormat)
-  }
-
-  override fun moveInBook(file: File) {
-    val newFormat = synchronized(this.dataLock) {
-      FileUtilities.fileRename(file, this.fileBook)
-
-      this.formatRef = this.formatRef.copy(
-        file = this.fileBook,
-        manifest = BookFormat.AudioBookManifestReference(
-          manifestURI = URI("manifest.json"),
-          manifestFile = this.fileManifest
-        )
-      )
       this.formatRef
     }
 

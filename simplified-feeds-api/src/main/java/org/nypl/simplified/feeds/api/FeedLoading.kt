@@ -48,13 +48,25 @@ object FeedLoading {
 
     return when (feedResult) {
       is FeedLoaderFailedAuthentication -> {
-        taskRecorder.currentStepFailed(feedResult.message, "feedAuthentication", feedResult.exception)
+        taskRecorder.currentStepFailed(
+          message = feedResult.message,
+          errorCode = "feedAuthentication",
+          exception = feedResult.exception,
+          extraMessages = listOf()
+        )
         throw feedResult.exception
       }
+
       is FeedLoaderFailedGeneral -> {
-        taskRecorder.currentStepFailed(feedResult.message, "feedFailed", feedResult.exception)
+        taskRecorder.currentStepFailed(
+          message = feedResult.message,
+          errorCode = "feedFailed",
+          exception = feedResult.exception,
+          extraMessages = listOf()
+        )
         throw feedResult.exception
       }
+
       is FeedLoaderSuccess -> {
         taskRecorder.currentStepSucceeded("Feed retrieved and parsed.")
         taskRecorder.beginNewStep("Finding OPDS feed entry...")
@@ -62,6 +74,7 @@ object FeedLoading {
         when (val feed = feedResult.feed) {
           is FeedWithGroups ->
             this.checkEntry(taskRecorder, findFirstInGroups(feed.feedGroupsInOrder))
+
           is FeedWithoutGroups ->
             this.checkEntry(taskRecorder, findFirst(feed.entriesInOrder))
         }
@@ -79,7 +92,12 @@ object FeedLoading {
     } else {
       val message = "Expected a feed containing at least one OPDS entry"
       val exception = IllegalArgumentException(message)
-      taskRecorder.currentStepFailed(message, "feedUnsuitable", exception)
+      taskRecorder.currentStepFailed(
+        message = message,
+        errorCode = "feedUnsuitable",
+        exception = exception,
+        extraMessages = listOf()
+      )
       throw exception
     }
 
@@ -90,6 +108,7 @@ object FeedLoading {
       when (entry) {
         is FeedEntry.FeedEntryCorrupt ->
           Unit
+
         is FeedEntryOPDS ->
           return entry
       }
@@ -105,6 +124,7 @@ object FeedLoading {
         when (entry) {
           is FeedEntry.FeedEntryCorrupt ->
             Unit
+
           is FeedEntryOPDS ->
             return entry
         }

@@ -5,9 +5,8 @@ import one.irradia.mime.api.MIMECompatibility
 import one.irradia.mime.api.MIMEType
 import org.librarysimplified.audiobook.api.PlayerUserAgent
 import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
-import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountReadableType
-import org.nypl.simplified.books.audio.AudioBookCredentials
+import org.nypl.simplified.books.audio.AudioBookLink
 import org.nypl.simplified.books.audio.AudioBookManifestRequest
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleEPUB
@@ -39,7 +38,8 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
     override fun isApplicableFor(
       type: MIMEType,
       target: URI?,
-      account: AccountReadableType?
+      account: AccountReadableType?,
+      remaining: List<MIMEType>
     ): Boolean {
       for (audioType in StandardFormatNames.allAudioBooks) {
         if (MIMECompatibility.isCompatibleStrictWithoutAttributes(type, audioType)) {
@@ -86,54 +86,18 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
   ): DownloadedManifest {
     context.taskRecorder.beginNewStep("Executing audio book manifest strategy...")
 
-    val audioBookCredentials =
-      when (val credentials = context.account.loginState.credentials) {
-        is AccountAuthenticationCredentials.Basic -> {
-          if (credentials.password.value.isBlank()) {
-            AudioBookCredentials.UsernameOnly(
-              userName = credentials.userName.value
-            )
-          } else {
-            AudioBookCredentials.UsernamePassword(
-              userName = credentials.userName.value,
-              password = credentials.password.value
-            )
-          }
-        }
-        is AccountAuthenticationCredentials.BasicToken -> {
-          if (credentials.password.value.isBlank()) {
-            AudioBookCredentials.UsernameOnly(
-              userName = credentials.userName.value
-            )
-          } else {
-            AudioBookCredentials.UsernamePassword(
-              userName = credentials.userName.value,
-              password = credentials.password.value
-            )
-          }
-        }
-        is AccountAuthenticationCredentials.OAuthWithIntermediary -> {
-          AudioBookCredentials.BearerToken(accessToken = credentials.accessToken)
-        }
-        is AccountAuthenticationCredentials.SAML2_0 -> {
-          AudioBookCredentials.BearerToken(accessToken = credentials.accessToken)
-        }
-        null -> {
-          null
-        }
-      }
-
     val strategy =
       context.audioBookManifestStrategies.createStrategy(
         context = context.application,
         AudioBookManifestRequest(
-          targetURI = currentURI,
-          contentType = context.currentAcquisitionPathElement.mimeType,
-          userAgent = PlayerUserAgent(context.httpClient.userAgent()),
-          credentials = audioBookCredentials,
-          services = context.services,
           cacheDirectory = context.cacheDirectory(),
-          palaceID = PlayerPalaceID(context.bookCurrent.entry.id)
+          contentType = context.currentAcquisitionPathElement.mimeType,
+          credentials = context.account.loginState.credentials,
+          httpClient = context.httpClient,
+          palaceID = PlayerPalaceID(context.bookCurrent.entry.id),
+          services = context.services,
+          target = AudioBookLink.Manifest(currentURI),
+          userAgent = PlayerUserAgent(context.httpClient.userAgent()),
         )
       )
 
@@ -162,14 +126,17 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
             sourceURI = currentURI
           )
         }
+
         is TaskResult.Failure -> {
-          context.taskRecorder.currentStepFailed("Strategy failed.", audioStrategyFailed)
+          val exception = BorrowSubtaskFailed()
+          context.taskRecorder.currentStepFailed(
+            message = "Strategy failed.",
+            errorCode = audioStrategyFailed,
+            exception = exception,
+            extraMessages = listOf()
+          )
           context.taskRecorder.addAll(result.steps)
           context.taskRecorder.addAttributes(result.attributes)
-          context.taskRecorder.beginNewStep("Checking AudioBook strategy result…")
-
-          val exception = BorrowSubtaskFailed()
-          context.taskRecorder.currentStepFailed("Failed", audioStrategyFailed, exception)
           throw exception
         }
       }
@@ -195,6 +162,7 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
         )
         context.bookDownloadSucceeded()
       }
+
       is BookDatabaseEntryFormatHandlePDF,
       is BookDatabaseEntryFormatHandleEPUB,
       null -> {

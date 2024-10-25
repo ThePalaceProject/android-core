@@ -51,7 +51,8 @@ class BookDeleteTask(
       this.taskRecorder.currentStepFailed(
         message = e.message ?: e.javaClass.canonicalName ?: "unknown",
         errorCode = "deleteFailed",
-        exception = e
+        exception = e,
+        extraMessages = listOf()
       )
       throw TaskFailedHandled(e)
     }

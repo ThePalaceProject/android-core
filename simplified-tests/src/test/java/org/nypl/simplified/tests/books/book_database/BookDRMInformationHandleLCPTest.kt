@@ -10,18 +10,21 @@ import org.nypl.simplified.books.book_database.api.BookFormats.BookFormatDefinit
 import org.nypl.simplified.files.DirectoryUtilities
 import org.nypl.simplified.tests.TestDirectories
 import java.io.File
+import java.security.SecureRandom
 
 class BookDRMInformationHandleLCPTest {
 
-  private var updates: Int = 0
-  private lateinit var directory1: File
   private lateinit var directory0: File
+  private lateinit var directory1: File
+  private lateinit var rng: SecureRandom
+  private var updates: Int = 0
 
   @BeforeEach
   fun testSetup() {
     this.directory0 = TestDirectories.temporaryDirectory()
     this.directory1 = TestDirectories.temporaryDirectory()
     this.updates = 0
+    this.rng = SecureRandom.getInstanceStrong()
   }
 
   @AfterEach
@@ -83,8 +86,12 @@ class BookDRMInformationHandleLCPTest {
         onUpdate = this::countUpdateCalls
       )
 
-    handle0.setHashedPassphrase("VGhlIFNpeHRlZW4gTWVuIE9mIFRhaW4K")
+    val licenseBytes = ByteArray(100)
+    this.rng.nextBytes(licenseBytes)
+
+    handle0.setInfo("VGhlIFNpeHRlZW4gTWVuIE9mIFRhaW4K", licenseBytes)
     assertEquals("VGhlIFNpeHRlZW4gTWVuIE9mIFRhaW4K", handle0.info.hashedPassphrase)
+    assertEquals(licenseBytes, handle0.info.licenseBytes)
     assertEquals(1, this.updates)
 
     val handle1 =

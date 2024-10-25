@@ -48,7 +48,8 @@ interface TaskRecorderType {
   fun currentStepFailed(
     message: String,
     errorCode: String,
-    exception: Throwable? = null
+    exception: Throwable? = null,
+    extraMessages: List<String>
   ): TaskStep
 
   /**
@@ -60,7 +61,8 @@ interface TaskRecorderType {
   fun currentStepFailedAppending(
     message: String,
     errorCode: String,
-    exception: Throwable
+    exception: Throwable,
+    extraMessages: List<String>
   ): TaskStep
 
   /**

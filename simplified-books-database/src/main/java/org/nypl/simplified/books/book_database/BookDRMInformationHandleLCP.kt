@@ -32,6 +32,10 @@ class BookDRMInformationHandleLCP(
     File(this.directory, "${format.shortName}-passphrase")
   private val filePassphraseTmp =
     File(this.directory, "${format.shortName}-passphrase.tmp")
+  private val fileLicense =
+    File(this.directory, "${format.shortName}-license")
+  private val fileLicenseTmp =
+    File(this.directory, "${format.shortName}-license.tmp")
 
   private val infoLock: Any = Any()
   private var infoRef: BookDRMInformation.LCP =
@@ -45,6 +49,11 @@ class BookDRMInformationHandleLCP(
         this.filePassphrase.readText().trim()
       } else {
         null
+      },
+      licenseBytes = if (this.fileLicense.isFile) {
+        this.fileLicense.readBytes()
+      } else {
+        null
       }
     )
   }
@@ -55,10 +64,25 @@ class BookDRMInformationHandleLCP(
       return synchronized(this.infoLock) { this.infoRef }
     }
 
-  override fun setHashedPassphrase(passphrase: String): BookDRMInformation.LCP {
+  override fun setInfo(
+    passphrase: String,
+    licenseBytes: ByteArray
+  ): BookDRMInformation.LCP {
     synchronized(this.infoLock) {
-      FileUtilities.fileWriteUTF8Atomically(this.filePassphrase, this.filePassphraseTmp, passphrase)
-      this.infoRef = this.infoRef.copy(hashedPassphrase = passphrase)
+      FileUtilities.fileWriteUTF8Atomically(
+        this.filePassphrase,
+        this.filePassphraseTmp,
+        passphrase
+      )
+      FileUtilities.fileWriteBytesAtomically(
+        this.fileLicense,
+        this.fileLicenseTmp,
+        licenseBytes
+      )
+      this.infoRef = this.infoRef.copy(
+        hashedPassphrase = passphrase,
+        licenseBytes = licenseBytes
+      )
     }
 
     this.onUpdate.invoke()

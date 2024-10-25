@@ -143,7 +143,8 @@ class AccountProviderResolution(
       taskRecorder.currentStepFailedAppending(
         message = this.stringResources.resolvingUnexpectedException,
         errorCode = unexpectedException(this.description),
-        exception = e
+        exception = e,
+        extraMessages = listOf()
       )
       taskRecorder.finishFailure()
     }
@@ -201,7 +202,11 @@ class AccountProviderResolution(
     }
 
     val message = this.stringResources.resolvingAuthDocumentNoStartURI
-    taskRecorder.currentStepFailed(message, authDocumentUnusable(this.description))
+    taskRecorder.currentStepFailed(
+      message = message,
+      errorCode = authDocumentUnusable(this.description),
+      extraMessages = listOf()
+    )
     onProgress.invoke(this.description.id, message)
     throw IOException()
   }
@@ -252,6 +257,7 @@ class AccountProviderResolution(
             this.extractAuthenticationDescriptionSAML20(taskRecorder, authObject)
           )
         }
+
         BASIC_TOKEN_TYPE -> {
           authObjects.add(
             extractAuthenticationDescriptionBasicToken(taskRecorder, authObject)
@@ -279,7 +285,11 @@ class AccountProviderResolution(
     }
 
     val message = this.stringResources.resolvingAuthDocumentNoUsableAuthenticationTypes
-    taskRecorder.currentStepFailed(message, authDocumentUnusable(this.description))
+    taskRecorder.currentStepFailed(
+      message = message,
+      errorCode = authDocumentUnusable(this.description),
+      extraMessages = listOf()
+    )
     throw IOException(message)
   }
 
@@ -295,7 +305,11 @@ class AccountProviderResolution(
     val authenticateURI = authenticate?.hrefURI
     if (authenticateURI == null) {
       val message = this.stringResources.resolvingAuthDocumentSAML20Malformed
-      taskRecorder.currentStepFailed(message, authDocumentUnusable(this.description))
+      taskRecorder.currentStepFailed(
+        message = message,
+        errorCode = authDocumentUnusable(this.description),
+        extraMessages = listOf()
+      )
       throw IOException(message)
     }
 
@@ -318,7 +332,11 @@ class AccountProviderResolution(
     val authenticateURI = authenticate?.hrefURI
     if (authenticateURI == null) {
       val message = this.stringResources.resolvingAuthDocumentOAuthMalformed
-      taskRecorder.currentStepFailed(message, authDocumentUnusable(this.description))
+      taskRecorder.currentStepFailed(
+        message = message,
+        errorCode = authDocumentUnusable(this.description),
+        extraMessages = listOf()
+      )
       throw IOException(message)
     }
 
@@ -361,7 +379,11 @@ class AccountProviderResolution(
     val authenticateURI = authenticate?.hrefURI
     if (authenticateURI == null) {
       val message = this.stringResources.resolvingAuthDocumentBasicTokenMalformed
-      taskRecorder.currentStepFailed(message, authDocumentUnusable(this.description))
+      taskRecorder.currentStepFailed(
+        message = message,
+        errorCode = authDocumentUnusable(this.description),
+        extraMessages = listOf()
+      )
       throw IOException(message)
     }
 
@@ -420,7 +442,11 @@ class AccountProviderResolution(
       )
     } else {
       val message = this.stringResources.resolvingAuthDocumentCOPPAAgeGateMalformed
-      taskRecorder.currentStepFailed(message, authDocumentUnusable(this.description))
+      taskRecorder.currentStepFailed(
+        message = message,
+        errorCode = authDocumentUnusable(this.description),
+        extraMessages = listOf()
+      )
       throw IOException(message)
     }
   }
@@ -472,12 +498,13 @@ class AccountProviderResolution(
             } else {
               val message = this.stringResources.resolvingAuthDocumentRetrievalFailed
               taskRecorder.currentStepFailed(
-                message,
-                httpRequestFailed(
+                message = message,
+                errorCode = httpRequestFailed(
                   targetLink.hrefURI,
                   status.properties.originalStatus,
                   status.properties.message
-                )
+                ),
+                extraMessages = listOf()
               )
               throw IOException(message)
             }
@@ -491,7 +518,11 @@ class AccountProviderResolution(
 
       is Link.LinkTemplated -> {
         val message = this.stringResources.resolvingAuthDocumentUnusableLink
-        taskRecorder.currentStepFailed(message, authDocumentUnusableLink(this.description))
+        taskRecorder.currentStepFailed(
+          message = message,
+          errorCode = authDocumentUnusableLink(this.description),
+          extraMessages = listOf()
+        )
         throw IOException(message)
       }
     }
@@ -516,7 +547,11 @@ class AccountProviderResolution(
           parseResult.warnings.forEach { warning -> this.logger.warn("{}", warning.message) }
           parseResult.errors.forEach { error -> this.logger.error("{}", error.message) }
           val message = this.stringResources.resolvingAuthDocumentParseFailed
-          taskRecorder.currentStepFailed(message, authDocumentParseFailed(this.description))
+          taskRecorder.currentStepFailed(
+            message = message,
+            errorCode = authDocumentParseFailed(this.description),
+            extraMessages = listOf()
+          )
           throw IOException(message)
         }
       }

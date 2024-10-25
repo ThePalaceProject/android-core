@@ -222,7 +222,12 @@ class BorrowAudioBookTest {
 
     return AudioBookManifestData(
       manifest = manifest,
-      fulfilled = ManifestFulfilled(genericAudioBooks.first(), null, data)
+      licenseBytes = null,
+      fulfilled = ManifestFulfilled(
+        source = URI.create("urn:basic-manifest.json"),
+        contentType = genericAudioBooks.first(),
+        data = data
+      )
     )
   }
 

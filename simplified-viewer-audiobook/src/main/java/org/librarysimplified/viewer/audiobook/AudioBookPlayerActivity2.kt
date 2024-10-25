@@ -363,7 +363,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
           manifest = state.manifest,
           fetchAll = true,
           initialPosition = initialPosition,
-          bookFile = bookParameters.file,
+          bookSource = state.bookSource,
           bookCredentials = bookParameters.drmInfo.playerCredentials()
         )
       }
@@ -419,14 +419,15 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
 
     val task = TaskRecorder.create()
     task.beginNewStep("Parsing manifest…")
-    state.failure.mapIndexed { index, error ->
-      this.logger.error("{}:{}: {}", error.line, error.column, error.message)
-      task.addAttribute(
-        "Parse Error [$index]",
-        "${error.line}:${error.column}: ${error.message}"
-      )
-    }
-    task.currentStepFailed("Parsing failed.", "error-manifest-parse")
+
+    val extraMessages =
+      state.failure.map { error -> "${error.line}:${error.column}: ${error.message}" }
+
+    task.currentStepFailed(
+      message = "Parsing failed.",
+      errorCode = "error-manifest-parse",
+      extraMessages = extraMessages
+    )
 
     val alert = MaterialAlertDialogBuilder(this)
     alert.setTitle(R.string.audio_book_player_error_book_open)
@@ -462,7 +463,12 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
 
     val task = TaskRecorder.create()
     task.beginNewStep("Opening book…")
-    task.currentStepFailed(state.message, "error-book-open")
+    task.currentStepFailed(
+      message = state.message,
+      errorCode = "error-book-open",
+      exception = state.exception,
+      extraMessages = listOf()
+    )
 
     val alert = MaterialAlertDialogBuilder(this)
     alert.setTitle(R.string.audio_book_player_error_book_open)
@@ -486,11 +492,16 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     task.beginNewStep("Downloading manifest…")
     val serverData = state.failure.serverData
     if (serverData != null) {
+      task.addAttributes(serverData.problemReport?.toMap() ?: mapOf())
       task.addAttribute("URI", serverData.uri.toString())
       task.addAttribute("Code", serverData.code.toString())
       task.addAttribute("ContentType", serverData.receivedContentType)
     }
-    task.currentStepFailed(state.failure.message, "error-manifest-download")
+    task.currentStepFailed(
+      message = state.failure.message,
+      errorCode = "error-manifest-download",
+      extraMessages = listOf()
+    )
 
     val alert = MaterialAlertDialogBuilder(this)
     alert.setTitle(R.string.audio_book_player_error_book_open)
@@ -512,7 +523,11 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
 
     val task = TaskRecorder.create()
     task.beginNewStep("Checking license…")
-    task.currentStepFailed("License checks failed.", "error-manifest-license")
+    task.currentStepFailed(
+      message = "License checks failed.",
+      errorCode = "error-manifest-license",
+      extraMessages = state.messages
+    )
 
     val alert = MaterialAlertDialogBuilder(this)
     alert.setTitle(R.string.audio_book_player_error_book_open)
@@ -573,8 +588,15 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       for (e in book?.downloadTasks ?: listOf()) {
         val status = e.status
         if (status is PlayerDownloadTaskStatus.Failed) {
+          val tasks = book?.downloadTasks ?: listOf()
           task.beginNewStep("Downloading ${e.playbackURI}...")
-          task.currentStepFailed(status.message, "error-download", status.exception)
+          task.currentStepFailed(
+            message = status.message,
+            errorCode = "error-download",
+            exception = status.exception,
+            extraMessages =
+            tasks.filterIsInstance<PlayerDownloadTaskStatus.Failed>()
+              .map { s -> s.message })
         }
       }
     } catch (e: Exception) {

@@ -343,7 +343,7 @@ dependencies {
      */
 
     if (lcpDRM) {
-        implementation(libs.readium.lcp) {
+        implementation(libs.palace.liblcp) {
             artifact {
                 type = "aar"
             }
@@ -523,10 +523,10 @@ dependencies {
     implementation(libs.google.gson)
     implementation(libs.google.guava)
     implementation(libs.google.material)
-    implementation(libs.io7m.jfunctional)
-    implementation(libs.io7m.jnull)
     implementation(libs.io7m.jattribute.core)
+    implementation(libs.io7m.jfunctional)
     implementation(libs.io7m.jmulticlose)
+    implementation(libs.io7m.jnull)
     implementation(libs.irradia.fieldrush.api)
     implementation(libs.irradia.fieldrush.vanilla)
     implementation(libs.irradia.mime.api)
@@ -564,6 +564,7 @@ dependencies {
     implementation(libs.palace.audiobook.http)
     implementation(libs.palace.audiobook.json.canon)
     implementation(libs.palace.audiobook.json.web.token)
+    implementation(libs.palace.audiobook.lcp.downloads)
     implementation(libs.palace.audiobook.lcp.license.status)
     implementation(libs.palace.audiobook.license.check.api)
     implementation(libs.palace.audiobook.license.check.spi)
@@ -616,25 +617,9 @@ dependencies {
     implementation(libs.rxjava)
     implementation(libs.rxjava2)
     implementation(libs.rxjava2.extensions)
-    implementation(libs.service.wight.annotation)
-    implementation(libs.service.wight.core)
     implementation(libs.slf4j)
     implementation(libs.timber)
     implementation(libs.transport.api)
     implementation(libs.transport.backend.cct)
     implementation(libs.transport.runtime)
-    implementation(libs.truecommons.cio)
-    implementation(libs.truecommons.io)
-    implementation(libs.truecommons.key.disable)
-    implementation(libs.truecommons.key.spec)
-    implementation(libs.truecommons.logging)
-    implementation(libs.truecommons.services)
-    implementation(libs.truecommons.shed)
-    implementation(libs.truevfs.access)
-    implementation(libs.truevfs.comp.zip)
-    implementation(libs.truevfs.comp.zipdriver)
-    implementation(libs.truevfs.driver.file)
-    implementation(libs.truevfs.driver.zip)
-    implementation(libs.truevfs.kernel.impl)
-    implementation(libs.truevfs.kernel.spec)
 }

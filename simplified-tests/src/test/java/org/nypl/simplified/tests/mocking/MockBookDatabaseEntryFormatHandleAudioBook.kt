@@ -1,5 +1,6 @@
 package org.nypl.simplified.tests.mocking
 
+import android.app.Application
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookDRMKind
 import org.nypl.simplified.books.api.BookFormat
@@ -41,33 +42,13 @@ class MockBookDatabaseEntryFormatHandleAudioBook(
   override val format: BookFormat.BookFormatAudioBook
     get() = this.formatField
 
-  override fun copyInManifestAndURI(data: ByteArray, manifestURI: URI) {
+  override fun copyInManifestAndURI(data: ByteArray, manifestURI: URI?) {
     this.formatField = this.formatField.copy(
       manifest = BookFormat.AudioBookManifestReference(
         manifestURI,
         File("whatever")
       )
     )
-  }
-
-  override fun copyInBook(file: File) {
-    this.bookData = file.readText()
-    this.bookFile = File(this.directory, "book.epub")
-
-    Files.copy(file.toPath(), this.bookFile!!.toPath(), StandardCopyOption.REPLACE_EXISTING)
-
-    this.formatField = this.formatField.copy(file = this.bookFile)
-    check(this.formatField.isDownloaded)
-  }
-
-  override fun moveInBook(file: File) {
-    this.bookData = file.readText()
-    this.bookFile = File(this.directory, "book.zip")
-
-    file.renameTo(this.bookFile)
-
-    this.formatField = this.formatField.copy(file = this.bookFile)
-    check(this.formatField.isDownloaded)
   }
 
   override fun setLastReadLocation(bookmark: SerializedBookmark?) {
@@ -96,7 +77,9 @@ class MockBookDatabaseEntryFormatHandleAudioBook(
   override fun setDRMKind(kind: BookDRMKind) {
   }
 
-  override fun deleteBookData() {
+  override fun deleteBookData(
+    context: Application
+  ) {
     this.bookData = null
     this.bookFile = null
     this.formatField = this.formatField.copy(manifest = null)
