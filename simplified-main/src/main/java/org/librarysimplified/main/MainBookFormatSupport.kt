@@ -63,7 +63,7 @@ object MainBookFormatSupport {
       }
       return false
     } catch (e: Exception) {
-      this.logger.error("one or more viewer providers raised an exception: ", e)
+      this.logger.debug("one or more viewer providers raised an exception: ", e)
       return false
     }
   }

@@ -66,7 +66,7 @@ abstract class AccountsDatabaseContract {
     override fun matches(item: Any): Boolean {
       if (item is AccountsDatabaseException) {
         for (c in item.causes()) {
-          this.logger.error("Cause: ", c)
+          this.logger.debug("Cause: ", c)
           if (this.exception_type.isAssignableFrom(c.javaClass) && c.message!!.contains(this.message)) {
             return true
           }

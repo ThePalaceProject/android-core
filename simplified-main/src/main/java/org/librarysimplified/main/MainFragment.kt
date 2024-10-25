@@ -1,5 +1,6 @@
 package org.librarysimplified.main
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -13,10 +14,13 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import io.reactivex.disposables.CompositeDisposable
+import org.librarysimplified.audiobook.views.PlayerModel
+import org.librarysimplified.audiobook.views.PlayerModelState
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.catalog.saml20.CatalogSAML20Fragment
 import org.librarysimplified.ui.catalog.saml20.CatalogSAML20FragmentParameters
 import org.librarysimplified.ui.navigation.tabs.TabbedNavigator
+import org.librarysimplified.viewer.audiobook.AudioBookPlayerActivity2
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.accounts.api.AccountEventDeletion
 import org.nypl.simplified.accounts.api.AccountEventUpdated
@@ -24,14 +28,10 @@ import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.book_registry.BookHoldsUpdateEvent
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookStatusEvent
-import org.nypl.simplified.deeplinks.controller.api.DeepLinkEvent
-import org.nypl.simplified.deeplinks.controller.api.ScreenID
 import org.nypl.simplified.listeners.api.ListenerRepository
 import org.nypl.simplified.listeners.api.listenerRepositories
 import org.nypl.simplified.profiles.api.ProfileEvent
 import org.nypl.simplified.profiles.api.ProfileUpdated
-import org.nypl.simplified.ui.accounts.AccountListFragment
-import org.nypl.simplified.ui.accounts.AccountListFragmentParameters
 import org.nypl.simplified.ui.announcements.AnnouncementsDialog
 import org.slf4j.LoggerFactory
 import java.net.URI
@@ -124,6 +124,7 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
       android.R.id.home -> {
         this.navigator.popToRoot()
       }
+
       else -> super.onOptionsItemSelected(item)
     }
   }
@@ -143,10 +144,6 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
       .subscribe(this::onBookStatusEvent)
       .let { subscriptions.add(it) }
 
-    viewModel.deepLinkEvents
-      .subscribe(this::onDeepLinkEvent)
-      .let { subscriptions.add(it) }
-
     viewModel.bookHoldEvents
       .subscribe(this::onBookHoldsUpdateEvent)
       .let { subscriptions.add(it) }
@@ -159,6 +156,34 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
       this.requireActivity(),
       Services.serviceDirectory()
     )
+
+    this.showAudioBookPlayerIfNecessary()
+  }
+
+  /**
+   * XXX: This is really not what we want to be doing, but for PP-1612, we don't have enough
+   * of a UI yet to cope with the fact that an audiobook might be playing in the background
+   * when the application is resumed. When the MainFragment is resumed, we need to check to
+   * see if a player is playing and, if it is, open the player activity.
+   *
+   * This can be obliterated when the catalog is rewritten and we move to having a single
+   * activity for the entire application.
+   */
+
+  private fun showAudioBookPlayerIfNecessary() {
+    when (PlayerModel.state) {
+      is PlayerModelState.PlayerOpen -> {
+        if (PlayerModel.isPlaying) {
+          this.activity?.startActivity(
+            Intent(activity, AudioBookPlayerActivity2::class.java)
+          )
+        }
+      }
+
+      else -> {
+        // Ignore
+      }
+    }
   }
 
   private fun onAccountEvent(event: AccountEvent) {
@@ -178,7 +203,7 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
         try {
           this.navigator.clearHistory()
         } catch (e: Throwable) {
-          this.logger.error("could not clear history: ", e)
+          this.logger.debug("could not clear history: ", e)
         }
       }
     }
@@ -241,22 +266,6 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
     }
   }
 
-  private fun onDeepLinkEvent(event: DeepLinkEvent) {
-    if (event.screenID == ScreenID.LOGIN) {
-      this.navigator.addFragment(
-        fragment = AccountListFragment.create(
-          AccountListFragmentParameters(
-            shouldShowLibraryRegistryMenu = false,
-            accountID = event.accountID,
-            barcode = event.barcode,
-            comingFromDeepLink = true
-          )
-        ),
-        tab = org.librarysimplified.ui.tabs.R.id.tabSettings
-      )
-    }
-  }
-
   private fun onBookHoldsUpdateEvent(event: BookHoldsUpdateEvent) {
     val numberOfHolds = event.numberOfHolds
     if (viewModel.showHoldsTab) {
@@ -268,13 +277,16 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
       if (numberOfHolds > 0) {
         if (badgeView == null) {
           badgeView = LayoutInflater.from(requireContext()).inflate(
-            org.librarysimplified.ui.tabs.R.layout.layout_menu_item_badge, bottomNavigationItem, false
+            org.librarysimplified.ui.tabs.R.layout.layout_menu_item_badge,
+            bottomNavigationItem,
+            false
           )
           bottomNavigationItem.addView(badgeView)
         }
 
         val badgeNumber = (badgeView as? ViewGroup)?.findViewById<TextView>(
-          org.librarysimplified.ui.tabs.R.id.badgeNumber)
+          org.librarysimplified.ui.tabs.R.id.badgeNumber
+        )
         badgeNumber?.text = numberOfHolds.toString()
       }
 

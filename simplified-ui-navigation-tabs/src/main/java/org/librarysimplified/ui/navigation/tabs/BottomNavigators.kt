@@ -99,7 +99,7 @@ object BottomNavigators {
       val profile = profilesController.profileCurrent()
       profile.preferences().dateOfBirth?.yearsOld(DateTime.now()) ?: 1
     } catch (e: Exception) {
-      logger.error("could not retrieve profile age: ", e)
+      logger.debug("could not retrieve profile age: ", e)
       1
     }
   }
@@ -114,7 +114,7 @@ object BottomNavigators {
       try {
         return profile.account(mostRecentId)
       } catch (e: Exception) {
-        logger.error("stale account: ", e)
+        logger.debug("stale account: ", e)
       }
     }
 

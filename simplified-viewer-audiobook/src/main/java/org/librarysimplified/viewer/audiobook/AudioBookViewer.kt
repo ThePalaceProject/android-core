@@ -6,7 +6,9 @@ import one.irradia.mime.api.MIMEType
 import org.librarysimplified.audiobook.api.PlayerUserAgent
 import org.librarysimplified.audiobook.feedbooks.FeedbooksPlayerExtension
 import org.librarysimplified.audiobook.license_check.spi.SingleLicenseCheckProviderType
+import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfilled
+import org.librarysimplified.audiobook.manifest_parser.api.ManifestUnparsed
 import org.librarysimplified.audiobook.manifest_parser.extension_spi.ManifestParserExtensionType
 import org.librarysimplified.audiobook.views.PlayerModel
 import org.librarysimplified.http.api.LSHTTPClientType
@@ -20,7 +22,6 @@ import org.nypl.simplified.books.audio.AudioBookLink
 import org.nypl.simplified.books.audio.AudioBookManifestRequest
 import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
 import org.nypl.simplified.books.formats.api.StandardFormatNames
-import org.nypl.simplified.networkconnectivity.api.NetworkConnectivityType
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.viewer.spi.ViewerPreferences
 import org.nypl.simplified.viewer.spi.ViewerProviderType
@@ -91,8 +92,6 @@ class AudioBookViewer : ViewerProviderType {
       Services.serviceDirectory()
     val httpClient =
       services.requireService(LSHTTPClientType::class.java)
-    val networkConnectivity =
-      services.requireService(NetworkConnectivityType::class.java)
     val strategies =
       services.requireService(AudioBookManifestStrategiesType::class.java)
     val profiles =
@@ -113,6 +112,8 @@ class AudioBookViewer : ViewerProviderType {
     PlayerModel.bookAuthor = book.entry.authorsCommaSeparated
     PlayerModel.bookTitle = book.entry.title
 
+    val palaceID =
+      PlayerPalaceID(book.entry.id)
     val account =
       profiles.profileCurrent()
         .account(book.account)
@@ -157,6 +158,7 @@ class AudioBookViewer : ViewerProviderType {
         cacheDir = activity.cacheDir,
         context = activity.application,
         licenseChecks = licenseChecks,
+        palaceID = palaceID,
         parserExtensions = parserExtensions,
         userAgent = userAgent,
       )
@@ -177,10 +179,10 @@ class AudioBookViewer : ViewerProviderType {
       if (licenseBytes != null && manifest != null) {
         PlayerModel.parseAndCheckLCPLicense(
           bookCredentials = bookCredentials,
-          licenseBytes = licenseBytes,
-          manifestBytes = manifest.manifestFile.readBytes(),
           cacheDir = activity.cacheDir,
+          licenseBytes = licenseBytes,
           licenseChecks = licenseChecks,
+          manifestUnparsed = ManifestUnparsed(palaceID, manifest.manifestFile.readBytes()),
           parserExtensions = parserExtensions,
           userAgent = userAgent,
         )
@@ -200,43 +202,46 @@ class AudioBookViewer : ViewerProviderType {
     if (manifestURI != null && manifestURI.isAbsolute) {
       val manifestRequest =
         AudioBookManifestRequest(
-          httpClient = httpClient,
-          target = AudioBookLink.Manifest(manifestURI),
-          contentType = format.contentType,
-          userAgent = userAgent,
           cacheDirectory = activity.cacheDir,
+          contentType = format.contentType,
           credentials = accountCredentials,
-          services = services
+          httpClient = httpClient,
+          palaceID = palaceID,
+          services = services,
+          target = AudioBookLink.Manifest(manifestURI),
+          userAgent = userAgent,
         )
 
       PlayerModel.downloadParseAndCheckManifest(
         sourceURI = manifestURI,
-        userAgent = userAgent,
+        bookCredentials = bookCredentials,
         cacheDir = activity.cacheDir,
         licenseChecks = licenseChecks,
+        palaceID = palaceID,
         parserExtensions = parserExtensions,
         strategy = strategies.createStrategy(
           context = activity.application,
           request = manifestRequest
         ).toManifestStrategy(),
-        bookCredentials = bookCredentials
+        userAgent = userAgent,
       )
       this.openActivity(activity)
       return
     }
 
     PlayerModel.parseAndCheckManifest(
+      bookCredentials = bookCredentials,
       cacheDir = activity.cacheDir,
+      licenseChecks = licenseChecks,
       manifest = ManifestFulfilled(
         source = null,
         contentType = format.contentType,
         authorization = null,
         data = manifest.manifestFile.readBytes()
       ),
-      licenseChecks = licenseChecks,
-      userAgent = userAgent,
+      palaceID = palaceID,
       parserExtensions = parserExtensions,
-      bookCredentials = bookCredentials
+      userAgent = userAgent,
     )
     this.openActivity(activity)
   }

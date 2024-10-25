@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.librarysimplified.audiobook.api.PlayerResult
 import org.librarysimplified.audiobook.api.PlayerUserAgent
+import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.librarysimplified.audiobook.manifest_fulfill.api.ManifestFulfillmentStrategyRegistryType
 import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentBasicParameters
 import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentBasicType
@@ -83,6 +84,7 @@ class AudioBookManifestStrategyTest {
           credentials = null,
           httpClient = this.httpClient,
           isNetworkAvailable = { true },
+          palaceID = PlayerPalaceID("6c15709a-b9cd-4eb8-815a-309f5d738a11"),
           services = this.services,
           strategyRegistry = this.strategies,
           target = AudioBookLink.Manifest(URI.create("http://www.example.com")),
@@ -129,6 +131,7 @@ class AudioBookManifestStrategyTest {
           services = this.services,
           isNetworkAvailable = { true },
           strategyRegistry = this.strategies,
+          palaceID = PlayerPalaceID("6c15709a-b9cd-4eb8-815a-309f5d738a11"),
           cacheDirectory = File(tempFolder, "cache")
         )
       )
@@ -182,6 +185,7 @@ class AudioBookManifestStrategyTest {
           manifestParsers = AudioBookFailingParsers,
           extensions = emptyList(),
           httpClient = this.httpClient,
+          palaceID = PlayerPalaceID("6c15709a-b9cd-4eb8-815a-309f5d738a11"),
           cacheDirectory = File(tempFolder, "cache")
         )
       )
@@ -226,18 +230,19 @@ class AudioBookManifestStrategyTest {
       AudioBookStrategy(
         context = this.context,
         request = AudioBookManifestRequest(
-          target = AudioBookLink.Manifest(URI.create("http://www.example.com")),
+          cacheDirectory = File(tempFolder, "cache"),
           contentType = BookFormats.audioBookGenericMimeTypes().first(),
-          userAgent = PlayerUserAgent("test"),
           credentials = null,
-          services = this.services,
-          isNetworkAvailable = { true },
-          strategyRegistry = this.strategies,
-          manifestParsers = AudioBookSucceedingParsers,
           extensions = emptyList(),
-          licenseChecks = listOf(),
           httpClient = this.httpClient,
-          cacheDirectory = File(tempFolder, "cache")
+          isNetworkAvailable = { true },
+          licenseChecks = listOf(),
+          manifestParsers = AudioBookSucceedingParsers,
+          palaceID = PlayerPalaceID("6c15709a-b9cd-4eb8-815a-309f5d738a11"),
+          services = this.services,
+          strategyRegistry = this.strategies,
+          target = AudioBookLink.Manifest(URI.create("http://www.example.com")),
+          userAgent = PlayerUserAgent("test"),
         )
       )
 
@@ -251,14 +256,15 @@ class AudioBookManifestStrategyTest {
       AudioBookStrategy(
         context = this.context,
         request = AudioBookManifestRequest(
-          target = AudioBookLink.Manifest(URI.create("http://www.example.com")),
+          cacheDirectory = File(tempFolder, "cache"),
           contentType = BookFormats.audioBookGenericMimeTypes().first(),
-          userAgent = PlayerUserAgent("test"),
           credentials = null,
-          services = this.services,
-          isNetworkAvailable = { false },
           httpClient = this.httpClient,
-          cacheDirectory = File(tempFolder, "cache")
+          isNetworkAvailable = { false },
+          palaceID = PlayerPalaceID("6c15709a-b9cd-4eb8-815a-309f5d738a11"),
+          services = this.services,
+          target = AudioBookLink.Manifest(URI.create("http://www.example.com")),
+          userAgent = PlayerUserAgent("test"),
         )
       )
 
@@ -291,6 +297,7 @@ class AudioBookManifestStrategyTest {
           strategyRegistry = this.strategies,
           licenseChecks = listOf(),
           httpClient = this.httpClient,
+          palaceID = PlayerPalaceID("6c15709a-b9cd-4eb8-815a-309f5d738a11"),
           cacheDirectory = File(tempFolder, "cache")
         )
       )

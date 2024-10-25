@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.squareup.picasso.Picasso
 import io.reactivex.subjects.PublishSubject
 import org.joda.time.LocalDateTime
+import org.librarysimplified.audiobook.views.PlayerModel
 import org.librarysimplified.documents.DocumentConfigurationServiceType
 import org.librarysimplified.documents.DocumentStoreType
 import org.librarysimplified.documents.DocumentStores
@@ -79,7 +80,6 @@ import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.content.api.ContentResolverSane
 import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.crashlytics.api.CrashlyticsServiceType
-import org.nypl.simplified.deeplinks.controller.api.DeepLinksControllerType
 import org.nypl.simplified.feeds.api.FeedHTTPTransport
 import org.nypl.simplified.feeds.api.FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderType
@@ -120,6 +120,8 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
+import java.time.OffsetDateTime
+import java.time.ZoneOffset.UTC
 import java.util.ServiceLoader
 
 internal object MainServices {
@@ -144,7 +146,9 @@ internal object MainServices {
     val directoryStorageDownloads: File,
     val directoryStorageDocuments: File,
     val directoryStorageProfiles: File,
-    val directoryStorageTimeTracking: File
+    val directoryStorageTimeTrackingSender: File,
+    val directoryStorageTimeTrackingCollector: File,
+    val directoryStorageTimeTrackingDebug: File
   )
 
   private fun initializeDirectories(context: Application): Directories {
@@ -160,12 +164,21 @@ internal object MainServices {
       File(directoryStorageBaseVersioned, "profiles")
     val directoryStorageTimeTracking =
       File(directoryStorageBaseVersioned, "time_tracking")
+    val directoryStorageTimeTrackingDebug =
+      File(directoryStorageTimeTracking, "debug")
+    val directoryStorageTimeTrackingSender =
+      File(directoryStorageTimeTracking, "sender")
+    val directoryStorageTimeTrackingCollector =
+      File(directoryStorageTimeTracking, "collector")
 
-    this.logger.debug("directoryStorageBaseVersioned: {}", directoryStorageBaseVersioned)
-    this.logger.debug("directoryStorageDownloads:     {}", directoryStorageDownloads)
-    this.logger.debug("directoryStorageDocuments:     {}", directoryStorageDocuments)
-    this.logger.debug("directoryStorageProfiles:      {}", directoryStorageProfiles)
-    this.logger.debug("directoryStorageTimeTracking:      {}", directoryStorageTimeTracking)
+    this.logger.debug("directoryStorageBaseVersioned:         {}", directoryStorageBaseVersioned)
+    this.logger.debug("directoryStorageDownloads:             {}", directoryStorageDownloads)
+    this.logger.debug("directoryStorageDocuments:             {}", directoryStorageDocuments)
+    this.logger.debug("directoryStorageProfiles:              {}", directoryStorageProfiles)
+    this.logger.debug("directoryStorageTimeTracking:          {}", directoryStorageTimeTracking)
+    this.logger.debug("directoryStorageTimeTrackingDebug:     {}", directoryStorageTimeTrackingDebug)
+    this.logger.debug("directoryStorageTimeTrackingSender:    {}", directoryStorageTimeTrackingSender)
+    this.logger.debug("directoryStorageTimeTrackingCollector: {}", directoryStorageTimeTrackingCollector)
 
     /*
      * Make sure the required directories exist. There is no sane way to
@@ -178,7 +191,10 @@ internal object MainServices {
         directoryStorageDownloads,
         directoryStorageDocuments,
         directoryStorageProfiles,
-        directoryStorageTimeTracking
+        directoryStorageTimeTracking,
+        directoryStorageTimeTrackingSender,
+        directoryStorageTimeTrackingCollector,
+        directoryStorageTimeTrackingDebug
       )
 
     var exception: Exception? = null
@@ -203,7 +219,9 @@ internal object MainServices {
       directoryStorageDownloads = directoryStorageDownloads,
       directoryStorageDocuments = directoryStorageDocuments,
       directoryStorageProfiles = directoryStorageProfiles,
-      directoryStorageTimeTracking = directoryStorageTimeTracking
+      directoryStorageTimeTrackingDebug = directoryStorageTimeTrackingDebug,
+      directoryStorageTimeTrackingSender = directoryStorageTimeTrackingSender,
+      directoryStorageTimeTrackingCollector = directoryStorageTimeTrackingCollector
     )
   }
 
@@ -909,11 +927,6 @@ internal object MainServices {
       )
 
       addService(
-        message = strings.bootingGeneral("deep links controller"),
-        interfaceType = DeepLinksControllerType::class.java,
-        serviceConstructor = { controller }
-      )
-      addService(
         message = strings.bootingGeneral("books controller"),
         interfaceType = BooksControllerType::class.java,
         serviceConstructor = { controller }
@@ -930,11 +943,14 @@ internal object MainServices {
       message = strings.bootingGeneral("audiobook time tracker registry"),
       interfaceType = TimeTrackingServiceType::class.java,
       serviceConstructor = {
-        TimeTrackingService(
-          context = context,
-          httpCalls = TimeTrackingHTTPCalls(ObjectMapper(), lsHTTP, crashlyticsService),
-          timeTrackingDirectory = directories.directoryStorageTimeTracking,
-          profilesController = profilesControllerTypeService
+        TimeTrackingService.create(
+          profiles = profilesControllerTypeService,
+          httpCalls = TimeTrackingHTTPCalls(lsHTTP),
+          clock = { OffsetDateTime.now(UTC) },
+          timeSegments = PlayerModel.timeTracker.timeSegments,
+          debugDirectory = directories.directoryStorageTimeTrackingDebug.toPath(),
+          collectorDirectory = directories.directoryStorageTimeTrackingCollector.toPath(),
+          senderDirectory = directories.directoryStorageTimeTrackingSender.toPath()
         )
       }
     )

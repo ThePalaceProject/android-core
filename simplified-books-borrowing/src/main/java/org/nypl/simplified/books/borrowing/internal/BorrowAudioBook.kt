@@ -4,6 +4,7 @@ import com.io7m.junreachable.UnreachableCodeException
 import one.irradia.mime.api.MIMECompatibility
 import one.irradia.mime.api.MIMEType
 import org.librarysimplified.audiobook.api.PlayerUserAgent
+import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.nypl.simplified.accounts.api.AccountReadableType
 import org.nypl.simplified.books.audio.AudioBookLink
 import org.nypl.simplified.books.audio.AudioBookManifestRequest
@@ -93,6 +94,7 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
           contentType = context.currentAcquisitionPathElement.mimeType,
           credentials = context.account.loginState.credentials,
           httpClient = context.httpClient,
+          palaceID = PlayerPalaceID(context.bookCurrent.entry.id),
           services = context.services,
           target = AudioBookLink.Manifest(currentURI),
           userAgent = PlayerUserAgent(context.httpClient.userAgent()),

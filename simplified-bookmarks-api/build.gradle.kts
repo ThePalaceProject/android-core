@@ -16,6 +16,7 @@ dependencies {
     implementation(libs.kotlin.stdlib)
     implementation(libs.palace.audiobook.api)
     implementation(libs.rxjava2)
+    implementation(libs.slf4j)
 
     compileOnly(libs.google.auto.value)
     annotationProcessor(libs.google.auto.value.processor)

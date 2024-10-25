@@ -100,7 +100,7 @@ class MockAccountProviderRegistry(
     if (this.resolveNext.peek() != null) {
       this.logger.debug("took provider from queue")
       val queued = this.resolveNext.poll()
-      val copy = AccountProvider.copy(queued).copy(id = description.id)
+      val copy = AccountProvider.copy(queued!!).copy(id = description.id)
       this.resolvedProviders[copy.id] = copy
       return taskRecorder.finishSuccess(copy)
     }

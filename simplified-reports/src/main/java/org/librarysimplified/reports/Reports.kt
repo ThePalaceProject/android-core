@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.core.content.FileProvider
+import org.apache.commons.io.FileUtils
 import org.librarysimplified.reports.Reports.Result.NoFiles
 import org.librarysimplified.reports.Reports.Result.RaisedException
 import org.librarysimplified.reports.Reports.Result.Sent
@@ -60,26 +61,30 @@ object Reports {
     subject: String,
     body: String
   ): Result {
-    val directories: List<File> = context.cacheDir?.let { cacheDir ->
-      arrayListOf(cacheDir, File(cacheDir, "migrations"))
-    } ?: emptyList()
-
-    return sendReport(
+    return this.sendReport(
       context = context,
-      baseDirectories = directories,
+      baseDirectories = listOf(context.filesDir, context.cacheDir),
       address = address,
       subject = subject,
       body = body,
-      includeFile = this::isLogFileOrMigrationReport
+      includeFile = this::isSuitableForSending
     )
   }
 
   @JvmStatic
-  private fun isLogFileOrMigrationReport(name: String): Boolean {
+  private fun isSuitableForSending(
+    name: String
+  ): Boolean {
+    if (name.startsWith("log.txt")) {
+      return true
+    }
+    if (name.equals("time_tracking_debug.dat")) {
+      return true
+    }
     if (name.startsWith("report-") && name.endsWith(".xml")) {
       return true
     }
-    return name.startsWith("log.txt")
+    return false
   }
 
   /**
@@ -95,24 +100,24 @@ object Reports {
     body: String,
     includeFile: (String) -> Boolean
   ): Result {
-    logger.debug("preparing report")
+    this.logger.debug("preparing report")
 
     try {
       val files =
-        collectFiles(baseDirectories, includeFile)
+        this.collectFiles(baseDirectories, includeFile)
       val compressedFiles =
         files.mapNotNull(this::compressFile)
       val contentUris =
-        compressedFiles.toSet().map { file -> mapFileToContentURI(context, file) }
+        compressedFiles.toSet().map { file -> this.mapFileToContentURI(context, file) }
 
-      logger.debug("attaching {} files", compressedFiles.size)
+      this.logger.debug("attaching {} files", compressedFiles.size)
 
       return if (compressedFiles.isNotEmpty()) {
         val intent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
           this.type = "text/plain"
           this.putExtra(Intent.EXTRA_EMAIL, arrayOf(address))
-          this.putExtra(Intent.EXTRA_SUBJECT, extendSubject(context, subject))
-          this.putExtra(Intent.EXTRA_TEXT, extendBody(body))
+          this.putExtra(Intent.EXTRA_SUBJECT, this@Reports.extendSubject(context, subject))
+          this.putExtra(Intent.EXTRA_TEXT, this@Reports.extendBody(body))
           this.putExtra(Intent.EXTRA_STREAM, ArrayList(contentUris))
           this.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
           this.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -123,7 +128,7 @@ object Reports {
         NoFiles
       }
     } catch (e: Exception) {
-      logger.error("failed to send report: ", e)
+      this.logger.debug("failed to send report: ", e)
       return RaisedException(e)
     }
   }
@@ -150,7 +155,7 @@ object Reports {
     val pkgInfo = try {
       pkgManager.getPackageInfo(context.packageName, 0)
     } catch (e: PackageManager.NameNotFoundException) {
-      logger.error("unable to retrieve package information: ", e)
+      this.logger.debug("unable to retrieve package information: ", e)
       return subject
     }
 
@@ -174,19 +179,24 @@ object Reports {
   ): MutableList<File> {
     val files = mutableListOf<File>()
     for (baseDirectory in baseDirectories) {
-      val list = baseDirectory.absoluteFile.list() ?: emptyArray()
+      val list = FileUtils.listFiles(
+        baseDirectory.absoluteFile,
+        null,
+        true
+      )
+
       for (file in list) {
-        val filePath = File(baseDirectory, file)
-        if (includeFile.invoke(file) && filePath.isFile) {
-          logger.debug("including {}", file)
+        val filePath = file.absoluteFile
+        if (includeFile.invoke(file.name) && filePath.isFile) {
+          this.logger.debug("including {}", file)
           files.add(filePath)
         } else {
-          logger.debug("excluding {}", file)
+          this.logger.debug("excluding {}", file)
         }
       }
     }
 
-    logger.debug("collected {} files", files.size)
+    this.logger.debug("collected {} files", files.size)
     return files
   }
 
@@ -205,14 +215,14 @@ object Reports {
               inputStream.copyTo(zStream)
               zStream.finish()
               zStream.flush()
-              logger.debug("compressed {}", file)
+              this.logger.debug("compressed {}", file)
               fileGz
             }
           }
         }
       }
     } catch (e: Exception) {
-      logger.error("could not compress: {}: ", file, e)
+      this.logger.error("could not compress: {}: ", file, e)
       null
     }
   }

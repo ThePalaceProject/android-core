@@ -100,7 +100,7 @@ class NotificationTokenHTTPCalls(
         }
       }
       .addOnFailureListener { exception ->
-        logger.error("Failed to fetch Firebase token: ", exception)
+        logger.debug("Failed to fetch Firebase token: ", exception)
       }
   }
 
@@ -158,7 +158,7 @@ class NotificationTokenHTTPCalls(
         }
       }
       .addOnFailureListener { exception ->
-        logger.error("Failed to fetch Firebase token: ", exception)
+        logger.debug("Failed to fetch Firebase token: ", exception)
       }
   }
 

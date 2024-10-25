@@ -22,6 +22,7 @@ import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfilled
 import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfillmentError
 import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfillmentEvent
 import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfillmentStrategyType
+import org.librarysimplified.audiobook.manifest_parser.api.ManifestUnparsed
 import org.librarysimplified.audiobook.parser.api.ParseError
 import org.librarysimplified.audiobook.parser.api.ParseResult
 import org.librarysimplified.audiobook.parser.api.ParseWarning
@@ -370,7 +371,7 @@ class AudioBookStrategy(
     this.taskRecorder.beginNewStep("Parsing manifest.")
     return when (val result = this.request.manifestParsers.parse(
       uri = source ?: URI.create("urn:unavailable"),
-      streams = manifestBytes,
+      input = ManifestUnparsed(this.request.palaceID, manifestBytes),
       extensions = this.request.extensions
     )) {
       is ParseResult.Failure -> {

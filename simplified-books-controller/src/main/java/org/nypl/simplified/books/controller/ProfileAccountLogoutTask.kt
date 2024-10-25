@@ -215,11 +215,11 @@ class ProfileAccountLogoutTask(
       adeptFuture.get(1L, TimeUnit.MINUTES)
     } catch (e: ExecutionException) {
       val ex = e.cause!!
-      this.logger.error("exception raised waiting for adept future: ", ex)
+      this.logger.debug("exception raised waiting for adept future: ", ex)
       this.handleAdobeDRMConnectorException(ex)
       throw ex
     } catch (e: Throwable) {
-      this.logger.error("exception raised waiting for adept future: ", e)
+      this.logger.debug("exception raised waiting for adept future: ", e)
       this.handleAdobeDRMConnectorException(e)
       throw e
     }

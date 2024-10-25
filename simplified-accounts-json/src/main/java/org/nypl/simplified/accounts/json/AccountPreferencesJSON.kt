@@ -50,12 +50,12 @@ object AccountPreferencesJSON {
         try {
           results.add(UUID.fromString(JSONParserUtilities.checkString(item)))
         } catch (e: Exception) {
-          this.logger.error("unable to parse acknowledgement: ", e)
+          this.logger.debug("unable to parse acknowledgement: ", e)
         }
       }
       return results.toList()
     } catch (e: Exception) {
-      this.logger.error("unable to parse acknowledgements: ", e)
+      this.logger.debug("unable to parse acknowledgements: ", e)
       return emptyList()
     }
   }

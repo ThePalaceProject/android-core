@@ -49,7 +49,7 @@ class ProfileAccountCreateTask(
       this.publishSuccessEvent(account)
       this.taskRecorder.finishSuccess(account)
     } catch (e: Throwable) {
-      this.logger.error("account creation failed: ", e)
+      this.logger.debug("account creation failed: ", e)
 
       this.taskRecorder.currentStepFailedAppending(
         message = this.strings.unexpectedException,

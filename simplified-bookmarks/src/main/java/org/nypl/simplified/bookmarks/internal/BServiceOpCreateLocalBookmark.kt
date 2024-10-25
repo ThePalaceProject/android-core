@@ -53,7 +53,7 @@ internal class BServiceOpCreateLocalBookmark(
 
       this.bookmark
     } catch (e: Exception) {
-      this.logger.error("error saving bookmark locally: ", e)
+      this.logger.debug("error saving bookmark locally: ", e)
       throw e
     }
   }

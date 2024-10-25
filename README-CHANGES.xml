@@ -522,7 +522,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2024-06-05T19:03:47+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.13.0">
+    <c:release date="2024-09-27T00:00:00+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.13.0">
       <c:changes>
         <c:change date="2024-05-03T00:00:00+00:00" summary="Integrate the new audiobook player components.">
           <c:tickets>
@@ -535,9 +535,42 @@
         <c:change date="2024-05-31T00:00:00+00:00" summary="Require APK 26 (Android 8.0)"/>
         <c:change date="2024-05-31T00:00:00+00:00" summary="Upgrade to R2 3.0.0-beta.1."/>
         <c:change date="2024-05-31T00:00:00+00:00" summary="Upgrade to liblcp-4.1.0."/>
-        <c:change date="2024-06-05T19:03:47+00:00" summary="Implement the new audiobooks TOC.">
+        <c:change date="2024-06-05T00:00:00+00:00" summary="Implement the new audiobooks TOC.">
           <c:tickets>
             <c:ticket id="PP-1301"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2024-09-24T00:00:00+00:00" summary="Upgrade to Readium 2 3.0.0.">
+          <c:tickets>
+            <c:ticket id="PP-1731"/>
+          </c:tickets>
+        </c:change>
+      </c:changes>
+    </c:release>
+    <c:release date="2024-10-03T00:00:00+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.13.1">
+      <c:changes>
+        <c:change date="2024-10-01T00:00:00+00:00" summary="Fix a lifecycle crash in the audiobook TOC.">
+          <c:tickets>
+            <c:ticket id="PP-1772"/>
+          </c:tickets>
+        </c:change>
+      </c:changes>
+    </c:release>
+    <c:release date="2024-10-17T16:11:02+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.14.0">
+      <c:changes>
+        <c:change date="2024-10-03T00:00:00+00:00" summary="Repair book previews.">
+          <c:tickets>
+            <c:ticket id="PP-1765"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2024-10-03T00:00:00+00:00" summary="Fix an unlikely crash in the audiobooks toolbar.">
+          <c:tickets>
+            <c:ticket id="PP-1789"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2024-10-17T16:11:02+00:00" summary="Rewrite time tracking.">
+          <c:tickets>
+            <c:ticket id="PP-1704"/>
           </c:tickets>
         </c:change>
       </c:changes>

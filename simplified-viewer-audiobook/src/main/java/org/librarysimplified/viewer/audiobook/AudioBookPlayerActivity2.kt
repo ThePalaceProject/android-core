@@ -37,6 +37,7 @@ import org.librarysimplified.audiobook.api.PlayerEvent.PlayerEventWithPosition.P
 import org.librarysimplified.audiobook.api.PlayerEvent.PlayerEventWithPosition.PlayerEventPlaybackWaitingForAction
 import org.librarysimplified.audiobook.api.PlayerUIThread
 import org.librarysimplified.audiobook.api.PlayerUserAgent
+import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.librarysimplified.audiobook.views.PlayerBaseFragment
 import org.librarysimplified.audiobook.views.PlayerBookmarkModel
 import org.librarysimplified.audiobook.views.PlayerFragment
@@ -48,6 +49,7 @@ import org.librarysimplified.audiobook.views.PlayerTOCFragment
 import org.librarysimplified.audiobook.views.PlayerViewCommand
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.bookmarks.api.BookmarkServiceType
+import org.nypl.simplified.bookmarks.api.BookmarksForBook
 import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.books.time.tracking.TimeTrackingServiceType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
@@ -143,19 +145,19 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     try {
       PlayerModel.closeBookOrDismissError()
     } catch (e: Exception) {
-      this.logger.error("Failed to close book: ", e)
+      this.logger.debug("Failed to close book: ", e)
     }
 
     try {
-      this.timeTrackingService.stopTracking()
+      this.timeTrackingService.onBookClosed()
     } catch (e: Exception) {
-      this.logger.error("Failed to stop time tracking: ", e)
+      this.logger.debug("Failed to stop time tracking: ", e)
     }
 
     try {
       this.finish()
     } catch (e: Exception) {
-      this.logger.error("Failed to finish activity: ", e)
+      this.logger.debug("Failed to finish activity: ", e)
     }
   }
 
@@ -217,7 +219,6 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
             newBookmarks.addAll(PlayerBookmarkModel.bookmarks())
             newBookmarks.removeIf { b -> b.position == playerBookmark.position }
             newBookmarks.add(0, playerBookmark)
-
             PlayerBookmarkModel.setBookmarks(newBookmarks.toList())
           }
 
@@ -246,31 +247,33 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
         val parameters =
           AudioBookViewerModel.parameters ?: return
 
-        val playerBookmark = event.bookmark
-        this.bookmarkService.bookmarkDelete(
-          accountID = parameters.accountID,
-          bookmark = AudioBookBookmarks.fromPlayerBookmark(
+        val playerBookmark =
+          event.bookmark
+        val appBookmark =
+          AudioBookBookmarks.fromPlayerBookmark(
             feedEntry = parameters.opdsEntry,
             deviceId = "null",
             source = playerBookmark
-          ),
+          )
+        this.bookmarkService.bookmarkDelete(
+          accountID = parameters.accountID,
+          bookmark = appBookmark,
           ignoreRemoteFailures = true,
         )
+
+        val newBookmarks = arrayListOf<PlayerBookmark>()
+        newBookmarks.addAll(PlayerBookmarkModel.bookmarks())
+        newBookmarks.remove(playerBookmark)
+        PlayerBookmarkModel.setBookmarks(newBookmarks.toList())
       }
 
       is PlayerEventError -> {
         // Nothing yet...
       }
 
-      PlayerEventManifestUpdated -> {
+      is PlayerEventManifestUpdated -> {
         // Nothing yet...
       }
-    }
-
-    try {
-      this.timeTrackingService.onPlayerEventReceived(event)
-    } catch (e: Exception) {
-      this.logger.error("Failed to submit event to time tracking service: ", e)
     }
   }
 
@@ -289,7 +292,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       }
 
       PlayerModelState.PlayerClosed -> {
-        this.timeTrackingService.stopTracking()
+        this.timeTrackingService.onBookClosed()
         this.switchFragment(AudioBookLoadingFragment2())
       }
 
@@ -302,12 +305,18 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       }
 
       is PlayerModelState.PlayerManifestOK -> {
-        this.timeTrackingService.startTimeTracking(
-          accountID = bookParameters.accountID,
-          bookId = bookParameters.opdsEntry.id,
-          libraryId = bookParameters.accountProviderID.toString(),
-          timeTrackingUri = bookParameters.opdsEntry.timeTrackingUri.getOrNull()
-        )
+        val timeTrackingUri = bookParameters.opdsEntry.timeTrackingUri.getOrNull()
+        if (timeTrackingUri != null) {
+          this.logger.debug("Time tracking info will be sent to {}", timeTrackingUri)
+          this.timeTrackingService.onBookOpenedForTracking(
+            accountID = bookParameters.accountID,
+            bookId = PlayerPalaceID(bookParameters.opdsEntry.id),
+            libraryId = bookParameters.accountProviderID.toString(),
+            timeTrackingUri = timeTrackingUri
+          )
+        } else {
+          this.logger.debug("Book has no time tracking URI. No time tracking will occur.")
+        }
 
         /*
          * XXX: This shouldn't really be a blocking call to get()
@@ -320,12 +329,25 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
             book = bookParameters.bookID
           ).get()
 
-        val bookmarksConverted =
-          bookmarks.bookmarks.mapNotNull(AudioBookBookmarks::toPlayerBookmark)
-        val bookmarkLastRead =
-          bookmarks.lastRead?.let { b -> AudioBookBookmarks.toPlayerBookmark(b) }
+        /*
+         * Again, the bookmark service should already have an up-to-date list, but it won't
+         * until we refactor the whole bookmark system.
+         */
 
-        PlayerBookmarkModel.setBookmarks(bookmarksConverted)
+        this.bookmarkService.bookmarkSyncAndLoad(
+          accountID = bookParameters.accountID,
+          book = bookParameters.bookID
+        ).thenApply { arrivedBookmarks ->
+          PlayerUIThread.runOnUIThread {
+            this.logger.debug(
+              "{} bookmarks arrived from the server.", arrivedBookmarks.bookmarks.size
+            )
+            this.assignBookmarks(arrivedBookmarks)
+          }
+        }
+
+        val bookmarkLastRead =
+          this.assignBookmarks(bookmarks)
 
         val initialPosition =
           if (bookmarkLastRead != null) {
@@ -359,6 +381,18 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
         this.switchFragment(AudioBookLoadingFragment2())
       }
     }
+  }
+
+  private fun assignBookmarks(
+    bookmarks: BookmarksForBook
+  ): PlayerBookmark? {
+    val bookmarksConverted =
+      bookmarks.bookmarks.mapNotNull(AudioBookBookmarks::toPlayerBookmark)
+    val bookmarkLastRead =
+      bookmarks.lastRead?.let { b -> AudioBookBookmarks.toPlayerBookmark(b) }
+
+    PlayerBookmarkModel.setBookmarks(bookmarksConverted)
+    return bookmarkLastRead
   }
 
   private fun loadCoverImage() {
@@ -551,16 +585,17 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
 
     try {
       val book = PlayerModel.book()
-      for (e in book.downloadTasks) {
+      for (e in book?.downloadTasks ?: listOf()) {
         val status = e.status
         if (status is PlayerDownloadTaskStatus.Failed) {
+          val tasks = book?.downloadTasks ?: listOf()
           task.beginNewStep("Downloading ${e.playbackURI}...")
           task.currentStepFailed(
             message = status.message,
             errorCode = "error-download",
             exception = status.exception,
             extraMessages =
-            book.downloadTasks.filterIsInstance<PlayerDownloadTaskStatus.Failed>()
+            tasks.filterIsInstance<PlayerDownloadTaskStatus.Failed>()
               .map { s -> s.message })
         }
       }

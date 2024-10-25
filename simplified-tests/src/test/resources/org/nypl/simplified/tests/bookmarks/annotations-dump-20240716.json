@@ -1,0 +1,259 @@
+{
+  "@context": [
+    "http://www.w3.org/ns/anno.jsonld",
+    "http://www.w3.org/ns/ldp.jsonld"
+  ],
+  "id": "https://gorgon.staging.palaceproject.io/a1qa-test/annotations/",
+  "type": [
+    "BasicContainer",
+    "AnnotationCollection"
+  ],
+  "total": 14,
+  "first": {
+    "id": "https://gorgon.staging.palaceproject.io/a1qa-test/annotations/",
+    "type": "AnnotationPage",
+    "items": [
+      {
+        "id": "https://gorgon.staging.palaceproject.io/a1qa-test/annotations/17420",
+        "type": "Annotation",
+        "motivation": "http://librarysimplified.org/terms/annotation/idling",
+        "body": {
+          "http://librarysimplified.org/terms/chapter": "",
+          "http://librarysimplified.org/terms/device": "urn:uuid:78057c89-c905-458e-ad2e-9e3c93d2ac2e",
+          "http://librarysimplified.org/terms/time": "2024-07-15T18:43:38Z"
+        },
+        "target": {
+          "selector": {
+            "type": "FragmentSelector",
+            "value": "{\"@type\":\"LocatorAudioBookTime\",\"timeStamp\":\"2024-07-15T18:43:38Z\",\"locator\":{\"@version\":2,\"readingOrderItemOffsetMilliseconds\":1494666,\"readingOrderItem\":\"3ba5bacd-43bb-40e7-a7a6-6d76ac9e11b1.MP3.mp3\",\"@type\":\"LocatorAudioBookTime\"},\"annotationId\":\"\"}"
+          },
+          "source": "urn:isbn:9798350414066"
+        }
+      },
+      {
+        "id": "https://gorgon.staging.palaceproject.io/a1qa-test/annotations/17422",
+        "type": "Annotation",
+        "motivation": "http://www.w3.org/ns/oa#bookmarking",
+        "body": {
+          "http://librarysimplified.org/terms/chapter": "",
+          "http://librarysimplified.org/terms/device": "urn:uuid:78057c89-c905-458e-ad2e-9e3c93d2ac2e",
+          "http://librarysimplified.org/terms/time": "2024-07-15T18:42:49Z"
+        },
+        "target": {
+          "selector": {
+            "type": "FragmentSelector",
+            "value": "{\"annotationId\":\"\",\"timeStamp\":\"2024-07-15T18:42:49Z\",\"@type\":\"LocatorAudioBookTime\",\"locator\":{\"@type\":\"LocatorAudioBookTime\",\"readingOrderItemOffsetMilliseconds\":1493621,\"readingOrderItem\":\"3ba5bacd-43bb-40e7-a7a6-6d76ac9e11b1.MP3.mp3\",\"@version\":2}}"
+          },
+          "source": "urn:isbn:9798350414066"
+        }
+      },
+      {
+        "id": "https://gorgon.staging.palaceproject.io/a1qa-test/annotations/17421",
+        "type": "Annotation",
+        "motivation": "http://www.w3.org/ns/oa#bookmarking",
+        "body": {
+          "http://librarysimplified.org/terms/chapter": "",
+          "http://librarysimplified.org/terms/device": "urn:uuid:78057c89-c905-458e-ad2e-9e3c93d2ac2e",
+          "http://librarysimplified.org/terms/time": "2024-07-15T18:42:43Z"
+        },
+        "target": {
+          "selector": {
+            "type": "FragmentSelector",
+            "value": "{\"@type\":\"LocatorAudioBookTime\",\"timeStamp\":\"2024-07-15T18:42:43Z\",\"annotationId\":\"\",\"locator\":{\"readingOrderItem\":\"3ba5bacd-43bb-40e7-a7a6-6d76ac9e11b1.MP3.mp3\",\"@type\":\"LocatorAudioBookTime\",\"readingOrderItemOffsetMilliseconds\":578206,\"@version\":2}}"
+          },
+          "source": "urn:isbn:9798350414066"
+        }
+      },
+      {
+        "id": "https://gorgon.staging.palaceproject.io/a1qa-test/annotations/17419",
+        "type": "Annotation",
+        "motivation": "http://www.w3.org/ns/oa#bookmarking",
+        "body": {
+          "http://librarysimplified.org/terms/chapter": "",
+          "http://librarysimplified.org/terms/device": "urn:uuid:78057c89-c905-458e-ad2e-9e3c93d2ac2e",
+          "http://librarysimplified.org/terms/time": "2024-07-15T18:42:35Z"
+        },
+        "target": {
+          "selector": {
+            "type": "FragmentSelector",
+            "value": "{\"@type\":\"LocatorAudioBookTime\",\"timeStamp\":\"2024-07-15T18:42:35Z\",\"locator\":{\"@type\":\"LocatorAudioBookTime\",\"readingOrderItem\":\"3ba5bacd-43bb-40e7-a7a6-6d76ac9e11b1.MP3.mp3\",\"@version\":2,\"readingOrderItemOffsetMilliseconds\":3647},\"annotationId\":\"\"}"
+          },
+          "source": "urn:isbn:9798350414066"
+        }
+      },
+      {
+        "id": "https://gorgon.staging.palaceproject.io/a1qa-test/annotations/17122",
+        "type": "Annotation",
+        "motivation": "http://librarysimplified.org/terms/annotation/idling",
+        "body": {
+          "http://librarysimplified.org/terms/chapter": "Prologue",
+          "http://librarysimplified.org/terms/device": "null",
+          "http://librarysimplified.org/terms/progressWithinBook": 0.0033661465,
+          "http://librarysimplified.org/terms/time": "2024-07-10T15:23:11Z"
+        },
+        "target": {
+          "selector": {
+            "type": "FragmentSelector",
+            "value": "{\"@type\":\"LocatorAudioBookTime\",\"@version\":2,\"readingOrderItem\":\"eb2836dc-2269-4c3b-81ea-41a9e2b8933a.MP3.mp3\",\"readingOrderItemOffsetMilliseconds\":98756}"
+          },
+          "source": "urn:isbn:9798350407525"
+        }
+      },
+      {
+        "id": "https://gorgon.staging.palaceproject.io/a1qa-test/annotations/17179",
+        "type": "Annotation",
+        "motivation": "http://librarysimplified.org/terms/annotation/idling",
+        "body": {
+          "http://librarysimplified.org/terms/chapter": "Opening Credits",
+          "http://librarysimplified.org/terms/device": "null",
+          "http://librarysimplified.org/terms/progressWithinBook": 0.000029573761,
+          "http://librarysimplified.org/terms/time": "2024-06-27T16:08:18Z"
+        },
+        "target": {
+          "selector": {
+            "type": "FragmentSelector",
+            "value": "{\"@type\":\"LocatorAudioBookTime\",\"@version\":2,\"readingOrderItem\":\"446034af-03f8-44a2-bbfb-9b603fb938d5.MP3.mp3\",\"readingOrderItemOffsetMilliseconds\":3329}"
+          },
+          "source": "urn:isbn:9798350400656"
+        }
+      },
+      {
+        "id": "https://gorgon.staging.palaceproject.io/a1qa-test/annotations/17177",
+        "type": "Annotation",
+        "motivation": "http://librarysimplified.org/terms/annotation/idling",
+        "body": {
+          "http://librarysimplified.org/terms/chapter": "",
+          "http://librarysimplified.org/terms/device": "urn:uuid:f9f09cc7-7355-494f-8390-abd23de794fc",
+          "http://librarysimplified.org/terms/progressWithinBook": 0.0,
+          "http://librarysimplified.org/terms/time": "2024-06-27T12:03:48Z"
+        },
+        "target": {
+          "selector": {
+            "type": "FragmentSelector",
+            "value": "{\"@type\":\"LocatorPage\",\"@version\":1,\"page\":5}"
+          },
+          "source": "urn:uuid:fd53d6d1-da9c-437b-8f15-acd035c14220"
+        }
+      },
+      {
+        "id": "https://gorgon.staging.palaceproject.io/a1qa-test/annotations/17057",
+        "type": "Annotation",
+        "motivation": "http://librarysimplified.org/terms/annotation/idling",
+        "body": {
+          "http://librarysimplified.org/terms/chapter": "003_UnderAWhiteSky_Epigraph",
+          "http://librarysimplified.org/terms/device": "null",
+          "http://librarysimplified.org/terms/progressWithinBook": 0.0019163245,
+          "http://librarysimplified.org/terms/time": "2024-06-24T14:14:03Z"
+        },
+        "target": {
+          "selector": {
+            "type": "FragmentSelector",
+            "value": "{\"@type\":\"LocatorAudioBookTime\",\"@version\":2,\"readingOrderItem\":\"https://listen.audio.prod-northamerica.cantookaudio.com/item/bc8dac33-102e-4776-8d44-80c4d0f1e109/cdc041b5-ee3e-4e2d-ab90-fa17f17f803a.mp4\",\"readingOrderItemOffsetMilliseconds\":12857}"
+          },
+          "source": "urn:isbn:9781508255277"
+        }
+      },
+      {
+        "id": "https://gorgon.staging.palaceproject.io/a1qa-test/annotations/17056",
+        "type": "Annotation",
+        "motivation": "http://librarysimplified.org/terms/annotation/idling",
+        "body": {
+          "http://librarysimplified.org/terms/chapter": "Introduction",
+          "http://librarysimplified.org/terms/device": "urn:uuid:f9f09cc7-7355-494f-8390-abd23de794fc",
+          "http://librarysimplified.org/terms/time": "2024-06-20T13:14:05Z"
+        },
+        "target": {
+          "selector": {
+            "type": "FragmentSelector",
+            "value": "{\"@type\":\"LocatorAudioBookTime\",\"chapter\":0,\"startOffset\":0,\"time\":872,\"part\":0,\"title\":\"Introduction\",\"audiobookID\":\"urn:librarysimplified.org/terms/id/Bibliotheca%20ID/76y7789\",\"duration\":12000}"
+          },
+          "source": "urn:librarysimplified.org/terms/id/Bibliotheca%20ID/76y7789"
+        }
+      },
+      {
+        "id": "https://gorgon.staging.palaceproject.io/a1qa-test/annotations/17055",
+        "type": "Annotation",
+        "motivation": "http://librarysimplified.org/terms/annotation/idling",
+        "body": {
+          "http://librarysimplified.org/terms/chapter": "Track 1",
+          "http://librarysimplified.org/terms/device": "urn:uuid:f9f09cc7-7355-494f-8390-abd23de794fc",
+          "http://librarysimplified.org/terms/time": "2024-06-20T13:12:40Z"
+        },
+        "target": {
+          "selector": {
+            "type": "FragmentSelector",
+            "value": "{\"@type\":\"LocatorAudioBookTime\",\"chapter\":0,\"startOffset\":0,\"time\":764,\"part\":0,\"title\":\"Track 1\",\"audiobookID\":\"urn:librarysimplified.org/terms/id/Overdrive%20ID/ebff8d7b-c9a0-4478-a1ed-63b64e8386c5\",\"duration\":4546664}"
+          },
+          "source": "urn:librarysimplified.org/terms/id/Overdrive%20ID/ebff8d7b-c9a0-4478-a1ed-63b64e8386c5"
+        }
+      },
+      {
+        "id": "https://gorgon.staging.palaceproject.io/a1qa-test/annotations/17054",
+        "type": "Annotation",
+        "motivation": "http://librarysimplified.org/terms/annotation/idling",
+        "body": {
+          "http://librarysimplified.org/terms/device": "urn:uuid:f9f09cc7-7355-494f-8390-abd23de794fc",
+          "http://librarysimplified.org/terms/time": "2024-06-20T13:12:10Z"
+        },
+        "target": {
+          "selector": {
+            "type": "FragmentSelector",
+            "value": "{\"@type\":\"LocatorPage\",\"page\":2}"
+          },
+          "source": "urn:uuid:4853f8c5-6412-4abe-a29d-6dd9710f90ce"
+        }
+      },
+      {
+        "id": "https://gorgon.staging.palaceproject.io/a1qa-test/annotations/17053",
+        "type": "Annotation",
+        "motivation": "http://librarysimplified.org/terms/annotation/idling",
+        "body": {
+          "http://librarysimplified.org/terms/chapter": "Intro Credits",
+          "http://librarysimplified.org/terms/device": "urn:uuid:f9f09cc7-7355-494f-8390-abd23de794fc",
+          "http://librarysimplified.org/terms/time": "2024-06-20T13:11:38Z"
+        },
+        "target": {
+          "selector": {
+            "type": "FragmentSelector",
+            "value": "{\"@type\":\"LocatorAudioBookTime\",\"chapter\":0,\"startOffset\":0,\"time\":1751,\"part\":0,\"title\":\"Intro Credits\",\"audiobookID\":\"urn:uuid:4535e34b-ae23-47ed-9778-880389d50d33\",\"duration\":14038}"
+          },
+          "source": "urn:uuid:4535e34b-ae23-47ed-9778-880389d50d33"
+        }
+      },
+      {
+        "id": "https://gorgon.staging.palaceproject.io/a1qa-test/annotations/17052",
+        "type": "Annotation",
+        "motivation": "http://librarysimplified.org/terms/annotation/idling",
+        "body": {
+          "http://librarysimplified.org/terms/chapter": "Chapter: 1",
+          "http://librarysimplified.org/terms/device": "urn:uuid:f9f09cc7-7355-494f-8390-abd23de794fc",
+          "http://librarysimplified.org/terms/time": "2024-06-20T13:11:22Z"
+        },
+        "target": {
+          "selector": {
+            "type": "FragmentSelector",
+            "value": "{\"@type\":\"LocatorAudioBookTime\",\"chapter\":0,\"startOffset\":0,\"time\":1751,\"part\":0,\"title\":\"Chapter: 1\",\"audiobookID\":\"urn:uuid:18efd9db-fae4-479f-ad4a-13b15b430317\",\"duration\":3211180}"
+          },
+          "source": "urn:uuid:18efd9db-fae4-479f-ad4a-13b15b430317"
+        }
+      },
+      {
+        "id": "https://gorgon.staging.palaceproject.io/a1qa-test/annotations/17051",
+        "type": "Annotation",
+        "motivation": "http://librarysimplified.org/terms/annotation/idling",
+        "body": {
+          "http://librarysimplified.org/terms/chapter": "Chapter 1",
+          "http://librarysimplified.org/terms/device": "urn:uuid:f9f09cc7-7355-494f-8390-abd23de794fc",
+          "http://librarysimplified.org/terms/time": "2024-06-20T13:11:00Z"
+        },
+        "target": {
+          "selector": {
+            "type": "FragmentSelector",
+            "value": "{\"@type\":\"LocatorAudioBookTime\",\"chapter\":0,\"startOffset\":0,\"time\":2000,\"part\":0,\"title\":\"Chapter 1\",\"audiobookID\":\"urn:isbn:9781603937368\",\"duration\":266000}"
+          },
+          "source": "urn:isbn:9781603937368"
+        }
+      }
+    ]
+  }
+}

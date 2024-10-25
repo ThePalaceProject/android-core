@@ -11,6 +11,7 @@ import org.readium.r2.lcp.license.model.LicenseDocument
 import org.readium.r2.shared.publication.protection.ContentProtection
 import org.readium.r2.shared.util.Try
 import org.readium.r2.shared.util.asset.Asset
+import org.readium.r2.shared.util.asset.ContainerAsset
 import java.io.File
 
 class MockLCPService(
@@ -73,6 +74,12 @@ class MockLCPService(
     authentication: LcpAuthenticating,
     allowUserInteraction: Boolean
   ): Try<LcpLicense, LcpError> {
+    return Try.failure(LcpError.LicenseProfileNotSupported)
+  }
+
+  override suspend fun retrieveLicenseDocument(
+    asset: ContainerAsset
+  ): Try<LicenseDocument, LcpError> {
     return Try.failure(LcpError.LicenseProfileNotSupported)
   }
 

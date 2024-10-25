@@ -7,7 +7,7 @@ interface TimeTrackingHTTPCallsType {
 
   @Throws(IOException::class)
   fun registerTimeTrackingInfo(
-    timeTrackingInfo: TimeTrackingInfo,
+    request: TimeTrackingRequest,
     account: AccountType
-  ): List<TimeTrackingEntry>
+  ): TimeTrackingServerResponse
 }

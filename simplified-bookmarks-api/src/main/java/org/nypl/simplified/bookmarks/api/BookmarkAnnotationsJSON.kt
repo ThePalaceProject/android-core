@@ -1,6 +1,5 @@
 package org.nypl.simplified.bookmarks.api
 
-import android.util.Log
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
@@ -11,8 +10,12 @@ import com.io7m.jfunctional.Some
 import org.nypl.simplified.books.api.bookmark.SerializedLocators
 import org.nypl.simplified.json.core.JSONParseException
 import org.nypl.simplified.json.core.JSONParserUtilities
+import org.slf4j.LoggerFactory
 
 object BookmarkAnnotationsJSON {
+
+  private val logger =
+    LoggerFactory.getLogger(BookmarkAnnotationsJSON::class.java)
 
   @Throws(JSONParseException::class)
   fun deserializeSelectorNodeFromJSON(
@@ -224,7 +227,7 @@ object BookmarkAnnotationsJSON {
         )
         bookmarkAnnotations.add(bookmarkAnnotation)
       } catch (exception: JSONParseException) {
-        Log.d("BookmarkAnnotationsJSON", "Error deserializing bookmark annotation")
+        this.logger.debug("Error deserializing bookmark annotation: ", exception)
       }
     }
 

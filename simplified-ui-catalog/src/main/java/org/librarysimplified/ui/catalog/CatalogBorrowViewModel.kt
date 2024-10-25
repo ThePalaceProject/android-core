@@ -64,7 +64,7 @@ class CatalogBorrowViewModel(
       val isNotLoggedIn = account.loginState !is AccountLoggedIn
       requiresLogin && isNotLoggedIn
     } catch (e: Exception) {
-      this.logger.error("could not retrieve account: ", e)
+      this.logger.debug("could not retrieve account: ", e)
       false
     }
   }

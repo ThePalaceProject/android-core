@@ -309,7 +309,7 @@ internal class DatabaseFormatHandleEPUB internal constructor(
         try {
           this.loadLastReadLocation(fileLastRead = fileLastRead, bookmarkFallbackValues)
         } catch (e: Exception) {
-          this.logger.error("Failed to read the last-read location: ", e)
+          this.logger.debug("Failed to read the last-read location: ", e)
           null
         }
       } else {

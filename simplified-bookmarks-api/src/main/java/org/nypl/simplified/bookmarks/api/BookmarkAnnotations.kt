@@ -5,7 +5,7 @@ import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.ISODateTimeFormat
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.books.api.bookmark.SerializedBookmark
-import org.nypl.simplified.books.api.bookmark.SerializedBookmark20210828
+import org.nypl.simplified.books.api.bookmark.SerializedBookmark20240424
 import org.nypl.simplified.books.api.bookmark.SerializedLocators
 import java.net.URI
 
@@ -108,7 +108,7 @@ object BookmarkAnnotations {
     val location =
       SerializedLocators.parseLocator(objectMapper.readTree(annotation.target.selector.value))
 
-    return SerializedBookmark20210828(
+    return SerializedBookmark20240424(
       deviceID = annotation.body.device,
       kind = annotation.kind,
       location = location,

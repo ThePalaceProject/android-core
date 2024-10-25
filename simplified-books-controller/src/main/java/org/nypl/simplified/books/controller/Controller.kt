@@ -10,7 +10,6 @@ import com.io7m.jfunctional.Some
 import com.io7m.junreachable.UnreachableCodeException
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
-import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.Subject
 import org.joda.time.Instant
 import org.librarysimplified.http.api.LSHTTPClientType
@@ -44,9 +43,6 @@ import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.books.preview.BookPreviewRequirements
 import org.nypl.simplified.books.preview.BookPreviewTask
 import org.nypl.simplified.crashlytics.api.CrashlyticsServiceType
-import org.nypl.simplified.deeplinks.controller.api.DeepLinkEvent
-import org.nypl.simplified.deeplinks.controller.api.DeepLinksControllerType
-import org.nypl.simplified.deeplinks.controller.api.ScreenID
 import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedLoaderType
@@ -99,11 +95,7 @@ class Controller private constructor(
   private val taskExecutor: ListeningExecutorService
 ) : BooksControllerType,
   BooksPreviewControllerType,
-  ProfilesControllerType,
-  DeepLinksControllerType {
-
-  private val deepLinkEventsObservable: BehaviorSubject<DeepLinkEvent> =
-    BehaviorSubject.create()
+  ProfilesControllerType {
 
   private val borrows: ConcurrentHashMap<BookID, BorrowTaskType>
 
@@ -223,7 +215,7 @@ class Controller private constructor(
         .keys
         .forEach { this.booksSync(it) }
     } catch (e: Exception) {
-      this.logger.error("failed to trigger book syncing: ", e)
+      this.logger.debug("failed to trigger book syncing: ", e)
     }
 
     this.updateCrashlytics()
@@ -285,7 +277,7 @@ class Controller private constructor(
       try {
         future.set(task.invoke())
       } catch (e: Throwable) {
-        this.logger.error("exception raised during task execution: ", e)
+        this.logger.debug("exception raised during task execution: ", e)
         future.setException(e)
         throw e
       }
@@ -299,26 +291,12 @@ class Controller private constructor(
       try {
         future.set(task.call())
       } catch (e: Throwable) {
-        this.logger.error("exception raised during task execution: ", e)
+        this.logger.debug("exception raised during task execution: ", e)
         future.setException(e)
         throw e
       }
     }
     return FluentFuture.from(future)
-  }
-
-  override fun deepLinkEvents(): Observable<DeepLinkEvent> {
-    return this.deepLinkEventsObservable
-  }
-
-  override fun publishDeepLinkEvent(accountID: AccountID, screenID: ScreenID, barcode: String?) {
-    this.deepLinkEventsObservable.onNext(
-      DeepLinkEvent.DeepLinkIntercepted(
-        accountID = accountID,
-        screenID = screenID,
-        barcode = barcode
-      )
-    )
   }
 
   override fun profiles(): SortedMap<ProfileID, ProfileReadableType> {

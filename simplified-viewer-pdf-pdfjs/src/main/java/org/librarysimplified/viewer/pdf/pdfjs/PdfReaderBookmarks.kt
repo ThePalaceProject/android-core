@@ -32,7 +32,7 @@ internal object PdfReaderBookmarks {
         .bookmarkSyncAndLoad(accountID, bookID)
         .get(15L, TimeUnit.SECONDS)
     } catch (e: Exception) {
-      this.logger.error("Could not load bookmarks: ", e)
+      this.logger.debug("Could not load bookmarks: ", e)
       BookmarksForBook(bookID, null, emptyList())
     }
   }

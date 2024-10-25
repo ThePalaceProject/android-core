@@ -1,11 +1,11 @@
 package org.librarysimplified.viewer.audiobook
 
+import java.io.Serializable
+import java.net.URI
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
-import java.io.Serializable
-import java.net.URI
 
 /**
  * Parameters for the audio book player.
@@ -47,5 +47,5 @@ class AudioBookPlayerParameters(
    * The DRM information for the book.
    */
 
-  val drmInfo: BookDRMInformation
+  val drmInfo: BookDRMInformation,
 ) : Serializable

@@ -3,6 +3,7 @@ package org.nypl.simplified.books.audio
 import one.irradia.mime.api.MIMEType
 import org.librarysimplified.audiobook.api.PlayerUserAgent
 import org.librarysimplified.audiobook.license_check.spi.SingleLicenseCheckProviderType
+import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.librarysimplified.audiobook.manifest_fulfill.api.ManifestFulfillmentStrategies
 import org.librarysimplified.audiobook.manifest_fulfill.api.ManifestFulfillmentStrategyRegistryType
 import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfilled
@@ -26,6 +27,16 @@ data class AudioBookManifestRequest(
 
   /**
    * The HTTP client.
+   * The book's Palace ID for time tracking. This is essentially delivered as the book's ID
+   * value in the OPDS feed in which it was delivered.
+   */
+
+  val palaceID: PlayerPalaceID,
+
+  /**
+   * The audio book file on disk, if one has been downloaded. This is used for packaged audio
+   * books, where the entire book is downloaded in one file. For unpackaged audio books, where
+   * only the manifest is downloaded, this will always be null.
    */
 
   val httpClient: LSHTTPClientType,

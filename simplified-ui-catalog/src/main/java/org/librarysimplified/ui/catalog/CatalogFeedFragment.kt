@@ -277,7 +277,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
         this.logger.debug("logo: account provider was null")
       }
     } catch (e: Exception) {
-      this.logger.error("logo: unable to handle alternate link: ", e)
+      this.logger.debug("logo: unable to handle alternate link: ", e)
     }
   }
 
@@ -621,7 +621,7 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
         }
       }
     } catch (e: Exception) {
-      this.logger.error("Failed to open account picker dialog: ", e)
+      this.logger.debug("Failed to open account picker dialog: ", e)
     }
   }
 

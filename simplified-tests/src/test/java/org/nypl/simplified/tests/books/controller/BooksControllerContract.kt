@@ -397,55 +397,6 @@ abstract class BooksControllerContract {
   }
 
   /**
-   * If the remote side returns a 401 error code, the current credentials should be thrown away.
-   */
-
-  @Test
-  @Timeout(value = 3L, unit = TimeUnit.SECONDS)
-  @Throws(Exception::class)
-  fun testBooksSyncRemote401() {
-    val controller =
-      createController(
-        exec = this.executorBooks,
-        feedExecutor = this.executorFeeds,
-        accountEvents = this.accountEvents,
-        profileEvents = this.profileEvents,
-        http = this.lsHTTP,
-        books = this.bookRegistry,
-        profiles = this.profiles,
-        accountProviders = MockAccountProviders.fakeAccountProviders(),
-        patronUserProfileParsers = this.patronUserProfileParsers
-      )
-
-    val provider =
-      MockAccountProviders.fakeAuthProvider(
-        uri = "urn:fake-auth:0",
-        host = this.server.hostName,
-        port = this.server.port
-      )
-
-    val profile = this.profiles.createProfile(provider, "Kermit")
-    this.profiles.setProfileCurrent(profile.id)
-    val account = profile.accountsByProvider()[provider.id]!!
-    account.setLoginState(AccountLoggedIn(correctCredentials()))
-
-    this.server.enqueue(
-      MockResponse()
-        .setResponseCode(200)
-        .setBody(this.simpleUserProfile())
-    )
-
-    this.server.enqueue(
-      MockResponse()
-        .setResponseCode(401)
-        .setBody("")
-    )
-
-    controller.booksSync(account.id).get()
-    Assertions.assertEquals(AccountNotLoggedIn, account.loginState)
-  }
-
-  /**
    * If the provider does not support authentication, then syncing is impossible and does nothing.
    *
    * @throws Exception On errors

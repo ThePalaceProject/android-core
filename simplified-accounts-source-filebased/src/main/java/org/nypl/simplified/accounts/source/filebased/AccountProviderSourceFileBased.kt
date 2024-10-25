@@ -47,7 +47,7 @@ class AccountProviderSourceFileBased(
         SourceResult.SourceSucceeded(this.mapResult(newResult))
       }
     } catch (e: Exception) {
-      this.logger.error("failed to load providers from file: ", e)
+      this.logger.debug("failed to load providers from file: ", e)
       SourceResult.SourceFailed(mapOf(), e)
     }
   }

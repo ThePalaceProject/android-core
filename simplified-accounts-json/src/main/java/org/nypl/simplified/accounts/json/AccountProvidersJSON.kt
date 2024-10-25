@@ -361,7 +361,7 @@ object AccountProvidersJSON {
         try {
           items.add(AnnouncementJSON.deserializeFromJSON(node))
         } catch (e: Exception) {
-          this.logger.error("unable to parse announcement: ", e)
+          this.logger.debug("unable to parse announcement: ", e)
         }
       }
       items.toList()

@@ -120,7 +120,7 @@ abstract class AbstractBookTask(
     val account = try {
       profile.account(accountID)
     } catch (e: Exception) {
-      this.logger.error("failed to find account: $accountID", e)
+      this.logger.debug("failed to find account: $accountID", e)
       this.taskRecorder.currentStepFailedAppending(
         message = "Failed to find account.",
         errorCode = BorrowErrorCodes.accountsDatabaseException,

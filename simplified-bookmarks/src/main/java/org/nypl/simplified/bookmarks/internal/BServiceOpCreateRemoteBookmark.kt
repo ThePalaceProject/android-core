@@ -57,7 +57,7 @@ internal class BServiceOpCreateRemoteBookmark(
 
       return this.bookmark.withURI(bookmarkUri)
     } catch (e: Exception) {
-      this.logger.error("error sending bookmark: ", e)
+      this.logger.debug("error sending bookmark: ", e)
       throw e
     }
   }

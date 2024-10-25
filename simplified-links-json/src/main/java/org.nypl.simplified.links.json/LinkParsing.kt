@@ -77,7 +77,7 @@ object LinkParsing {
         }
       )
     } catch (e: JSONParseException) {
-      this.logger.error("error parsing link object: ", e)
+      this.logger.debug("error parsing link object: ", e)
       ParseResult.Failure(
         warnings = listOf(),
         errors = listOf(
@@ -89,7 +89,7 @@ object LinkParsing {
         )
       )
     } catch (e: Exception) {
-      this.logger.error("error parsing link object: ", e)
+      this.logger.debug("error parsing link object: ", e)
       ParseResult.Failure(
         warnings = listOf(),
         errors = listOf(

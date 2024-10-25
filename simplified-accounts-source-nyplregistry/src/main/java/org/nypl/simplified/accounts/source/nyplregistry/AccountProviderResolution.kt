@@ -139,7 +139,7 @@ class AccountProviderResolution(
 
       taskRecorder.finishSuccess(accountProvider)
     } catch (e: Exception) {
-      this.logger.error("failed to resolve account provider: ", e)
+      this.logger.debug("failed to resolve account provider: ", e)
       taskRecorder.currentStepFailedAppending(
         message = this.stringResources.resolvingUnexpectedException,
         errorCode = unexpectedException(this.description),

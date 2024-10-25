@@ -218,7 +218,7 @@ class AccountProviderRegistry private constructor(
       )
       return taskRecorder.finishFailure()
     } catch (e: Exception) {
-      this.logger.error("resolution exception: ", e)
+      this.logger.debug("resolution exception: ", e)
       val message = e.message ?: e.javaClass.canonicalName ?: "unknown"
       taskRecorder.currentStepFailedAppending(
         message = message,

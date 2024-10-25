@@ -1,7 +1,7 @@
 package org.nypl.simplified.books.book_registry
 
 import io.reactivex.Observable
-import io.reactivex.subjects.PublishSubject
+import io.reactivex.subjects.BehaviorSubject
 import org.slf4j.LoggerFactory
 import java.io.File
 
@@ -11,8 +11,8 @@ class BookPreviewRegistry(
 
   private val logger =
     LoggerFactory.getLogger(BookPreviewRegistry::class.java)
-  private val bookPreviewStatusSubject: PublishSubject<BookPreviewStatus> =
-    PublishSubject.create()
+  private val bookPreviewStatusSubject: BehaviorSubject<BookPreviewStatus> =
+    BehaviorSubject.create()
 
   override fun observeBookPreviewStatus(): Observable<BookPreviewStatus> {
     return this.bookPreviewStatusSubject

@@ -16,7 +16,7 @@ object Services : ServiceDirectoryProviderType {
     try {
       return this.servicesFuture.get(30L, TimeUnit.SECONDS)
     } catch (e: Exception) {
-      this.logger.error("unable to fetch service directory: ", e)
+      this.logger.debug("unable to fetch service directory: ", e)
       throw e
     }
   }

@@ -798,7 +798,7 @@ class CatalogFeedViewModel(
         )
       }
     } catch (e: Exception) {
-      this.logger.error("could not log to analytics: ", e)
+      this.logger.debug("could not log to analytics: ", e)
     }
   }
 

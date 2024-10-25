@@ -16,7 +16,6 @@ dependencies {
     implementation(project(":simplified-books-preview"))
     implementation(project(":simplified-books-registry-api"))
     implementation(project(":simplified-crashlytics-api"))
-    implementation(project(":simplified-deeplinks-controller-api"))
     implementation(project(":simplified-feeds-api"))
     implementation(project(":simplified-files"))
     implementation(project(":simplified-futures"))
