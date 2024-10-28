@@ -295,18 +295,26 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
   }
 
   private fun checkForAnnouncements() {
-    val currentProfile = this.viewModel.profilesController.profileCurrent()
-    val mostRecentAccountId = currentProfile.preferences().mostRecentAccount
-    val mostRecentAccount = currentProfile.account(mostRecentAccountId)
-    val acknowledged =
-      mostRecentAccount.preferences.announcementsAcknowledged.toSet()
-    val notYetAcknowledged =
-      mostRecentAccount.provider.announcements.filter { !acknowledged.contains(it.id) }
+    try {
+      val currentProfile = this.viewModel.profilesController.profileCurrent()
+      val mostRecentAccountId = currentProfile.preferences().mostRecentAccount
+      val mostRecentAccount = currentProfile.account(mostRecentAccountId)
+      val acknowledged =
+        mostRecentAccount.preferences.announcementsAcknowledged.toSet()
+      val notYetAcknowledged =
+        mostRecentAccount.provider.announcements.filter { !acknowledged.contains(it.id) }
 
-    if (notYetAcknowledged.isNotEmpty() &&
-      this.childFragmentManager.findFragmentByTag(ANNOUNCEMENT_DIALOG_TAG) == null
-    ) {
-      this.showAnnouncementsDialog()
+      if (notYetAcknowledged.isNotEmpty() &&
+        this.childFragmentManager.findFragmentByTag(ANNOUNCEMENT_DIALOG_TAG) == null
+      ) {
+        this.showAnnouncementsDialog()
+      }
+    } catch (e: Throwable) {
+      /*
+       * XXX: This can fail for numerous lifecycle-related issues. We've chosen to
+       * make it non-fatal in lieu of a catalog rewrite. PP-1822.
+       */
+      this.logger.debug("Failed to check for announcements: ", e)
     }
   }
 
