@@ -293,9 +293,24 @@ class PdfReaderActivity : AppCompatActivity() {
   }
 
   override fun onDestroy() {
-    this.pdfServer?.stop()
-    this.pdfReaderContainer.removeAllViews()
-    this.webView.destroy()
+    try {
+      this.pdfServer?.stop()
+    } catch (e: Throwable) {
+      this.log.debug("Failed to stop PDF server: ", e)
+    }
+
+    try {
+      this.pdfReaderContainer.removeAllViews()
+    } catch (e: Throwable) {
+      this.log.debug("Failed to remove PDF views: ", e)
+    }
+
+    try {
+      this.webView.destroy()
+    } catch (e: Throwable) {
+      this.log.debug("Failed to destroy web view: ", e)
+    }
+
     super.onDestroy()
   }
 
