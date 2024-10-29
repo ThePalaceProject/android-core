@@ -36,6 +36,7 @@ dependencies {
     implementation(project(":simplified-services-api"))
     implementation(project(":simplified-taskrecorder-api"))
     implementation(project(":simplified-threads"))
+    implementation(project(":simplified-ui-accounts"))
     implementation(project(":simplified-ui-errorpage"))
     implementation(project(":simplified-ui-images"))
     implementation(project(":simplified-ui-listeners-api"))

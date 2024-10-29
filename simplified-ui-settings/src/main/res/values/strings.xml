@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <resources>
+  <string name="settingsSelectThisAccount">Select Account %1$s</string>
   <string name="settingsMoreInformation">More Information</string>
   <string name="settingsAddLibrary">+ Add Library</string>
   <string name="settingsMyLibraries">My Libraries</string>

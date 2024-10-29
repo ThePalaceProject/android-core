@@ -1,5 +1,7 @@
 package org.nypl.simplified.ui.settings
 
+import android.content.res.ColorStateList
+import android.graphics.PorterDuff
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +14,11 @@ import org.librarysimplified.ui.settings.R
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.ui.images.ImageAccountIcons
 
-class SettingsAccountAdapter : ListAdapter<AccountType, RecyclerView.ViewHolder>(diffCallback) {
+class SettingsAccountAdapter(
+  private val isAccountSelected: (AccountType) -> Boolean,
+  private val onSelectAccount: (AccountType) -> Unit,
+  private val onOpenAccountSettings: (AccountType) -> Unit
+) : ListAdapter<AccountType, RecyclerView.ViewHolder>(diffCallback) {
 
   companion object {
     private val diffCallback =
@@ -61,8 +67,29 @@ class SettingsAccountAdapter : ListAdapter<AccountType, RecyclerView.ViewHolder>
       this.view.findViewById(R.id.settingsLibraryTitle)
     private val subtitle: TextView =
       this.view.findViewById(R.id.settingsLibrarySubtitle)
+    private val selected: ImageView =
+      this.view.findViewById(R.id.settingsLibrarySelected)
 
     fun bind(item: AccountType) {
+      this.selected.imageTintMode = PorterDuff.Mode.MULTIPLY
+      this.selected.contentDescription =
+        this.view.context.getString(R.string.settingsSelectThisAccount, item.provider.displayName)
+
+      if (isAccountSelected(item)) {
+        this.selected.setImageResource(R.drawable.ic_settings_library_selected)
+        this.selected.imageTintList =
+          ColorStateList.valueOf(
+            this.view.context.getColor(org.thepalaceproject.theme.core.R.color.PalaceGreen1))
+      } else {
+        this.selected.setImageResource(R.drawable.ic_settings_library_unselected)
+        this.selected.imageTintList =
+          ColorStateList.valueOf(
+            this.view.context.getColor(org.thepalaceproject.theme.core.R.color.PalaceGrey1))
+      }
+
+      this.selected.setOnClickListener { onSelectAccount.invoke(item) }
+      this.view.setOnClickListener { onOpenAccountSettings.invoke(item) }
+
       ImageAccountIcons.loadAccountLogoIntoView(
         loader = SettingsModel.imageLoader.loader,
         account = item.provider.toDescription(),

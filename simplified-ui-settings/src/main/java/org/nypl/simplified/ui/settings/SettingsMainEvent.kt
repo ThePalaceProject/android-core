@@ -18,15 +18,6 @@ sealed class SettingsMainEvent {
   object OpenAccountList : SettingsMainEvent()
 
   /**
-   * The settings screen wants to open the "acknowledgements" screen.
-   */
-
-  data class OpenAcknowledgments(
-    val title: String,
-    val url: String,
-  ) : SettingsMainEvent()
-
-  /**
    * The settings screen wants to open debug options.
    */
 
