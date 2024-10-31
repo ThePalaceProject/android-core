@@ -1,4 +1,6 @@
 dependencies {
+    coreLibraryDesugaring(libs.android.desugaring)
+
     implementation(project(":simplified-books-audio"))
     implementation(project(":simplified-books-database-api"))
     implementation(project(":simplified-books-formats-api"))

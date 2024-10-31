@@ -1,4 +1,6 @@
 dependencies {
+    coreLibraryDesugaring(libs.android.desugaring)
+
     implementation(project(":simplified-accessibility"))
     implementation(project(":simplified-books-api"))
     implementation(project(":simplified-books-controller-api"))

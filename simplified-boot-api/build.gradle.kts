@@ -1,4 +1,6 @@
 dependencies {
+    coreLibraryDesugaring(libs.android.desugaring)
+
     implementation(project(":simplified-presentableerror-api"))
 
     implementation(libs.google.failureaccess)

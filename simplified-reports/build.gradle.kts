@@ -19,6 +19,8 @@ android {
 }
 
 dependencies {
+    coreLibraryDesugaring(libs.android.desugaring)
+
     implementation(libs.androidx.core)
     implementation(libs.commons.io)
     implementation(libs.kotlin.stdlib)

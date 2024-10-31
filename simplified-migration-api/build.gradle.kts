@@ -1,4 +1,6 @@
 dependencies {
+    coreLibraryDesugaring(libs.android.desugaring)
+
     implementation(project(":simplified-migration-spi"))
     implementation(project(":simplified-presentableerror-api"))
     implementation(project(":simplified-threads"))

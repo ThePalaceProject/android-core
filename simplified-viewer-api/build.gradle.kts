@@ -1,4 +1,6 @@
 dependencies {
+    coreLibraryDesugaring(libs.android.desugaring)
+
     implementation(project(":simplified-accounts-api"))
     implementation(project(":simplified-accounts-database-api"))
     implementation(project(":simplified-analytics-api"))

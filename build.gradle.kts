@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.de.undercouch.gradle.tasks.download.Verify
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 
-val gradleVersionRequired = "8.2.1"
+val gradleVersionRequired = "8.10.2"
 val gradleVersionReceived = gradle.gradleVersion
 
 if (gradleVersionRequired != gradleVersionReceived) {
@@ -25,6 +25,10 @@ plugins {
         .version("1.9.0")
         .apply(false)
 
+    id("com.github.ben-manes.versions")
+        .version("0.51.0")
+        .apply(true)
+
     /*
      * The AndroidX plugin for navigation (including view binding generation).
      *
@@ -36,11 +40,11 @@ plugins {
         .apply(false)
 
     id("com.android.library")
-        .version("8.1.0")
+        .version("8.5.0")
         .apply(false)
 
     id("com.android.application")
-        .version("8.1.0")
+        .version("8.5.0")
         .apply(false)
 
     /*
@@ -587,6 +591,7 @@ allprojects {
                 encoding = "UTF-8"
                 sourceCompatibility = JavaVersion.toVersion(jdkBytecodeTarget)
                 targetCompatibility = JavaVersion.toVersion(jdkBytecodeTarget)
+                isCoreLibraryDesugaringEnabled = true
             }
         }
 
@@ -642,6 +647,7 @@ allprojects {
                 encoding = "UTF-8"
                 sourceCompatibility = JavaVersion.toVersion(jdkBytecodeTarget)
                 targetCompatibility = JavaVersion.toVersion(jdkBytecodeTarget)
+                isCoreLibraryDesugaringEnabled = true
             }
 
             android.testOptions {
@@ -762,6 +768,7 @@ allprojects {
         "androidTestReleaseImplementation",
         "androidTestReleaseImplementationDependenciesMetadata",
         "annotationProcessor",
+        "coreLibraryDesugaring",
         "debugAndroidTestCompilationImplementation",
         "debugAndroidTestImplementation",
         "debugAndroidTestImplementationDependenciesMetadata",
@@ -822,7 +829,6 @@ allprojects {
         configurations.all {
             isTransitive = transitiveConfigurations.contains(name)
             // resolutionStrategy.failOnVersionConflict()
-            resolutionStrategy.cacheChangingModulesFor(30, TimeUnit.SECONDS)
         }
     }
 

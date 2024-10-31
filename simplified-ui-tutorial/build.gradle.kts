@@ -1,4 +1,6 @@
 dependencies {
+    coreLibraryDesugaring(libs.android.desugaring)
+
     implementation(project(":simplified-services-api"))
     implementation(project(":simplified-ui-listeners-api"))
     implementation(project(":simplified-ui-screen"))

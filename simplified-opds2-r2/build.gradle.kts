@@ -1,4 +1,6 @@
 dependencies {
+    coreLibraryDesugaring(libs.android.desugaring)
+
     implementation(project(":simplified-opds2"))
     implementation(project(":simplified-opds2-parser-api"))
     implementation(project(":simplified-parser-api"))

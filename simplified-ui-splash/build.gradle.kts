@@ -1,4 +1,6 @@
 dependencies {
+    coreLibraryDesugaring(libs.android.desugaring)
+
     implementation(project(":simplified-boot-api"))
     implementation(project(":simplified-buildconfig-api"))
     implementation(project(":simplified-documents"))

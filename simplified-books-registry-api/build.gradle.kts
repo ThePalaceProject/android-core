@@ -1,4 +1,6 @@
 dependencies {
+    coreLibraryDesugaring(libs.android.desugaring)
+
     implementation(project(":simplified-books-api"))
     implementation(project(":simplified-opds-core"))
     implementation(project(":simplified-presentableerror-api"))

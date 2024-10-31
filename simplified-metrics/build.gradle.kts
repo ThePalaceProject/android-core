@@ -1,4 +1,6 @@
 dependencies {
+    coreLibraryDesugaring(libs.android.desugaring)
+
     implementation(project(":simplified-metrics-api"))
 
     implementation(libs.firebase.analytics)

@@ -9,6 +9,8 @@ android {
 }
 
 dependencies {
+    coreLibraryDesugaring(libs.android.desugaring)
+
     implementation(project(":simplified-accounts-api"))
     implementation(project(":simplified-files"))
     implementation(project(":simplified-json-core"))

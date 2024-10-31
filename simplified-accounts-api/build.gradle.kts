@@ -1,4 +1,6 @@
 dependencies {
+    coreLibraryDesugaring(libs.android.desugaring)
+
     implementation(project(":simplified-announcements"))
     implementation(project(":simplified-links"))
     implementation(project(":simplified-opds-core"))

@@ -1,4 +1,6 @@
 dependencies {
+    coreLibraryDesugaring(libs.android.desugaring)
+
     implementation(project(":simplified-android-ktx"))
     implementation(project(":simplified-presentableerror-api"))
     implementation(project(":simplified-reports"))

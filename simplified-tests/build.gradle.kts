@@ -1,3 +1,4 @@
+
 android {
     packaging {
         jniLibs {
@@ -289,6 +290,8 @@ val dependencyObjects = listOf(
 )
 
 dependencies {
+    coreLibraryDesugaring(libs.android.desugaring)
+
     for (dep in dependencyObjects) {
         implementation(dep)
         testImplementation(dep)
