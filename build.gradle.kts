@@ -80,7 +80,7 @@ plugins {
      */
 
     id("com.google.firebase.crashlytics")
-        .version("2.9.9")
+        .version("3.0.2")
         .apply(false)
 
     id("maven-publish")
