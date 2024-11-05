@@ -97,6 +97,7 @@ object BorrowLCPSupport {
   fun findPassphraseOrManual(
     context: BorrowContextType
   ): String {
+    context.bookDownloadIsRunning("Locating passphrase…")
     return if (context.isManualLCPPassphraseEnabled) {
       // if the manual input for the LCP passphrase is enabled, we need to catch a possible
       // exception while fetching the current passphrase as it may be possible for the user to
@@ -119,6 +120,7 @@ object BorrowLCPSupport {
     context: BorrowContextType
   ): String {
     context.taskRecorder.beginNewStep("Retrieving LCP hashed passphrase…")
+    context.bookDownloadIsRunning("Locating passphrase…")
 
     val loansURI = context.account.provider.loansURI
     if (loansURI == null) {
@@ -142,6 +144,8 @@ object BorrowLCPSupport {
         .build()
 
     return request.execute().use { response ->
+      context.bookDownloadIsRunning("Locating passphrase…")
+
       when (val status = response.status) {
         is LSHTTPResponseStatus.Responded.OK -> {
           context.account.updateBasicTokenCredentials(status.getAccessToken())
