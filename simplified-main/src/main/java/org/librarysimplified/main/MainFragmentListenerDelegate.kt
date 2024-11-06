@@ -445,11 +445,6 @@ internal class MainFragmentListenerDelegate(
         state
       }
 
-      is SettingsMainEvent.OpenAcknowledgments -> {
-        this.openSettingsAcknowledgements(event.title, event.url)
-        state
-      }
-
       SettingsMainEvent.OpenDebugOptions -> {
         this.openSettingsVersion()
         state
