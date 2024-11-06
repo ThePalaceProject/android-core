@@ -66,6 +66,12 @@
       android:required="false" />
 
     <activity
+        android:name="org.nypl.simplified.ui.accounts.saml20.AccountSAML20Activity"
+        android:exported="false"
+        android:parentActivityName="org.librarysimplified.main.MainActivity"
+        android:theme="@style/PalaceTheme.WithoutActionBar" />
+
+    <activity
         android:name="org.librarysimplified.viewer.preview.BookPreviewActivity"
         android:exported="false"
         android:parentActivityName="org.librarysimplified.main.MainActivity"

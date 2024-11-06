@@ -1,6 +1,7 @@
 package org.nypl.simplified.ui.accounts
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -55,10 +56,13 @@ import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsLoginButtonDis
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsLoginButtonEnabled
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsLogoutButtonDisabled
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsLogoutButtonEnabled
+import org.nypl.simplified.ui.accounts.saml20.AccountSAML20Activity
+import org.nypl.simplified.ui.accounts.saml20.AccountSAML20Model
 import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.slf4j.LoggerFactory
 import org.thepalaceproject.theme.core.PalaceToolbar
+import java.io.File
 import java.net.URI
 
 /**
@@ -66,6 +70,8 @@ import java.net.URI
  */
 
 class AccountDetailFragment : Fragment(R.layout.account) {
+
+  private lateinit var webViewDataDir: File
 
   private val logger =
     LoggerFactory.getLogger(AccountDetailFragment::class.java)
@@ -284,6 +290,9 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   override fun onStart() {
     super.onStart()
 
+    this.webViewDataDir =
+      this.requireContext().getDir("webview", Context.MODE_PRIVATE)
+
     this.configureToolbar()
 
     /*
@@ -493,9 +502,15 @@ class AccountDetailFragment : Fragment(R.layout.account) {
       )
     )
 
-    this.listener.post(
-      AccountDetailEvent.OpenSAML20Login(this.parameters.accountID, authenticationDescription)
+    AccountSAML20Model.startAuthenticationProcess(
+      resources = this.resources,
+      accountID = this.parameters.accountID,
+      authenticationDescription = authenticationDescription,
+      webViewDataDirectory = this.webViewDataDir
     )
+
+    val intent = Intent(this.requireContext(), AccountSAML20Activity::class.java)
+    this.requireActivity().startActivity(intent)
   }
 
   private fun onTryOAuthLogin(
@@ -736,12 +751,30 @@ class AccountDetailFragment : Fragment(R.layout.account) {
         this.loginFormLock()
         this.setLoginButtonStatus(
           AsCancelButtonEnabled {
-            this.viewModel.tryLogin(
-              OAuthWithIntermediaryCancel(
-                accountId = this.viewModel.account.id,
-                description = loginState.description as AccountProviderAuthenticationDescription.OAuthWithIntermediary
-              )
-            )
+            when (val desc = loginState.description) {
+              AccountProviderAuthenticationDescription.Anonymous,
+              is AccountProviderAuthenticationDescription.Basic,
+              is AccountProviderAuthenticationDescription.BasicToken,
+              is AccountProviderAuthenticationDescription.COPPAAgeGate -> {
+                throw UnreachableCodeException()
+              }
+              is AccountProviderAuthenticationDescription.OAuthWithIntermediary -> {
+                this.viewModel.tryLogin(
+                  OAuthWithIntermediaryCancel(
+                    accountId = this.viewModel.account.id,
+                    description = desc
+                  )
+                )
+              }
+              is AccountProviderAuthenticationDescription.SAML2_0 -> {
+                this.viewModel.tryLogin(
+                  ProfileAccountLoginRequest.SAML20Cancel(
+                    accountId = this.viewModel.account.id,
+                    description = desc
+                  )
+                )
+              }
+            }
           }
         )
       }
