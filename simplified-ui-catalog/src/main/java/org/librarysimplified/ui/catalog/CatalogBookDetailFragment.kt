@@ -964,7 +964,6 @@ class CatalogBookDetailFragment : Fragment(R.layout.book_detail) {
     } else {
       this.statusInProgressText.visibility = View.GONE
       this.statusInProgressBar.isIndeterminate = true
-      this.buttons.addView(this.buttonCreator.createCenteredTextForButtons(R.string.catalogDownloading))
       this.checkButtonViewCount()
     }
   }
