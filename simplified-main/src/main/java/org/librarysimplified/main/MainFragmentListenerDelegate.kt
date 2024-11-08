@@ -17,7 +17,6 @@ import org.librarysimplified.ui.catalog.saml20.CatalogSAML20Event
 import org.librarysimplified.ui.navigation.tabs.TabbedNavigator
 import org.librarysimplified.viewer.preview.BookPreviewActivity
 import org.nypl.simplified.accounts.api.AccountID
-import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
@@ -36,8 +35,6 @@ import org.nypl.simplified.ui.accounts.AccountListRegistryEvent
 import org.nypl.simplified.ui.accounts.AccountListRegistryFragment
 import org.nypl.simplified.ui.accounts.AccountPickerEvent
 import org.nypl.simplified.ui.accounts.saml20.AccountSAML20Event
-import org.nypl.simplified.ui.accounts.saml20.AccountSAML20Fragment
-import org.nypl.simplified.ui.accounts.saml20.AccountSAML20FragmentParameters
 import org.nypl.simplified.ui.errorpage.ErrorPageEvent
 import org.nypl.simplified.ui.errorpage.ErrorPageFragment
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
@@ -363,7 +360,7 @@ internal class MainFragmentListenerDelegate(
       }
 
       is AccountDetailEvent.OpenSAML20Login -> {
-        this.openSAML20Login(event.account, event.authenticationDescription)
+        this.openSAML20Login()
         state
       }
 
@@ -618,19 +615,8 @@ internal class MainFragmentListenerDelegate(
     )
   }
 
-  private fun openSAML20Login(
-    account: AccountID,
-    authenticationDescription: AccountProviderAuthenticationDescription.SAML2_0
-  ) {
-    this.navigator.addFragment(
-      fragment = AccountSAML20Fragment.create(
-        AccountSAML20FragmentParameters(
-          accountID = account,
-          authenticationDescription = authenticationDescription
-        )
-      ),
-      tab = this.navigator.currentTab()
-    )
+  private fun openSAML20Login() {
+    // No longer used
   }
 
   private fun openDocViewer(
