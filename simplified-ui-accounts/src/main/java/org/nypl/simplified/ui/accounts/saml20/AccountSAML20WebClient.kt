@@ -72,7 +72,8 @@ class AccountSAML20WebClient(
           AccountSAML20State.Failed(
             accountID = this.account,
             description = this.description,
-            message = message
+            message = message,
+            webView = view
           )
         )
         return true
@@ -86,7 +87,8 @@ class AccountSAML20WebClient(
           AccountSAML20State.Failed(
             accountID = this.account,
             description = this.description,
-            message = message
+            message = message,
+            webView = view
           )
         )
         return true
@@ -102,7 +104,8 @@ class AccountSAML20WebClient(
         accountID = this.account,
         token = accessToken,
         patronInfo = patronInfo,
-        cookies = cookies
+        cookies = cookies,
+        webView = view
       ))
       return true
     }

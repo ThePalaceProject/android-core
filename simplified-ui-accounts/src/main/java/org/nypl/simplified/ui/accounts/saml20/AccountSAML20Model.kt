@@ -1,8 +1,8 @@
 package org.nypl.simplified.ui.accounts.saml20
 
-import android.content.res.Resources
-import android.os.Bundle
+import android.app.Application
 import android.webkit.CookieManager
+import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.annotation.UiThread
 import com.io7m.jattribute.core.AttributeReadableType
@@ -56,6 +56,12 @@ object AccountSAML20Model {
   val supportEmailAddress: String
     get() = this.buildConfig.supportErrorReportEmailAddress
 
+  /**
+   * Yes, we really are storing a global reference to a web view.
+   */
+
+  private val webView: AtomicReference<WebView> = AtomicReference()
+
   fun setState(newState: AccountSAML20State) {
     this.uiThread.runOnUIThread {
       this.stateAttribute.set(newState)
@@ -92,15 +98,15 @@ object AccountSAML20Model {
         )
       }
 
-      AccountSAML20State.WebViewInitialized -> {
+      is AccountSAML20State.WebViewInitialized -> {
         // Nothing to do
       }
 
-      AccountSAML20State.WebViewInitializing -> {
+      is AccountSAML20State.WebViewInitializing -> {
         // Nothing to do
       }
 
-      AccountSAML20State.WebViewRequestSent -> {
+      is AccountSAML20State.WebViewRequestSent -> {
         // Nothing to do
       }
     }
@@ -108,7 +114,7 @@ object AccountSAML20Model {
 
   @UiThread
   fun startAuthenticationProcess(
-    resources: Resources,
+    application: Application,
     accountID: AccountID,
     authenticationDescription: AccountProviderAuthenticationDescription.SAML2_0,
     webViewDataDirectory: File
@@ -119,12 +125,17 @@ object AccountSAML20Model {
       authenticationDescription
     this.webClient =
       AccountSAML20WebClient(
-        resources = resources,
+        resources = application.resources,
         account = accountID,
         description = authenticationDescription,
         webViewDataDir = webViewDataDirectory
       )
 
+    val view = WebView(application)
+    view.webViewClient = this.webClient
+    view.settings.javaScriptEnabled = true
+
+    this.webView.set(view)
     this.setState(AccountSAML20State.WebViewInitializing)
 
     /*
@@ -135,7 +146,7 @@ object AccountSAML20Model {
      */
 
     CookieManager.getInstance().removeAllCookies {
-      this.setState(AccountSAML20State.WebViewInitialized)
+      this.setState(AccountSAML20State.WebViewInitialized(this.webView.get()))
     }
   }
 

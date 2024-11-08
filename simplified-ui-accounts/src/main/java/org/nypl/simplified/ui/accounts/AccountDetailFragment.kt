@@ -503,7 +503,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
     )
 
     AccountSAML20Model.startAuthenticationProcess(
-      resources = this.resources,
+      application = this.requireActivity().application,
       accountID = this.parameters.accountID,
       authenticationDescription = authenticationDescription,
       webViewDataDirectory = this.webViewDataDir
