@@ -575,7 +575,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2024-11-06T11:27:15+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.15.0">
+    <c:release date="2024-11-08T15:12:35+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.15.0">
       <c:changes>
         <c:change date="2024-10-25T00:00:00+00:00" summary="Support streaming for LCP audiobooks.">
           <c:tickets>
@@ -587,10 +587,15 @@
             <c:ticket id="PP-1822"/>
           </c:tickets>
         </c:change>
-        <c:change date="2024-11-06T11:27:15+00:00" summary="Implement new account switcher in settings screen.">
+        <c:change date="2024-11-06T00:00:00+00:00" summary="Implement new account switcher in settings screen.">
           <c:tickets>
             <c:ticket id="PP-1881"/>
             <c:ticket id="PP-918"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2024-11-08T15:12:35+00:00" summary="Fix SAML logins when using DUO.">
+          <c:tickets>
+            <c:ticket id="PP-1864"/>
           </c:tickets>
         </c:change>
       </c:changes>
