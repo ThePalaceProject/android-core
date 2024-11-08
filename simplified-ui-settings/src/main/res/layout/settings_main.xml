@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -9,16 +9,23 @@
     android:orientation="vertical">
 
     <View
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="1dp"
-        android:background="?android:attr/listDivider" />
+        android:background="?android:attr/listDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:id="@+id/settingsLibrariesHeader"
+        android:layout_width="0dp"
         android:layout_height="48dp"
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:layout_width="wrap_content"
@@ -46,36 +53,53 @@
     </LinearLayout>
 
     <View
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="1dp"
-        android:background="?android:attr/listDivider" />
+        android:background="?android:attr/listDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/settingsLibrariesHeader" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/settingsLibraryList"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/PalaceScreenBackgroundColor" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?android:attr/listDivider" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="24dp"
-        android:text="@string/settingsMoreInformation"
-        android:textAllCaps="true" />
+        android:layout_height="0dp"
+        android:layout_marginTop="1dp"
+        android:background="@color/PalaceScreenBackgroundColor"
+        android:fadeScrollbars="false"
+        android:scrollbarAlwaysDrawVerticalTrack="true"
+        android:scrollbars="vertical"
+        app:layout_constraintBottom_toTopOf="@id/settingsMoreInformationGroup"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/settingsLibrariesHeader" />
 
     <LinearLayout
+        android:id="@+id/settingsMoreInformationGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginBottom="48dp"
         android:background="@color/PalaceScreenBackgroundColor"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/settingsVersion"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/settingsLibraryList">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@color/PalacePaleGrey0"
+            android:gravity="center_vertical"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:text="@string/settingsMoreInformation"
+            android:textAllCaps="true" />
 
         <View
             android:layout_width="match_parent"
@@ -303,13 +327,14 @@
         android:id="@+id/settingsVersion"
         android:layout_width="match_parent"
         android:layout_height="48dp"
+        android:layout_weight="1"
         android:alpha="0.5"
         android:background="?android:attr/selectableItemBackground"
         android:clickable="true"
         android:gravity="center_horizontal|bottom"
-        android:textSize="12sp"
         android:paddingBottom="16dp"
-        android:layout_weight="1"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
         tools:text="Palace version 1.15.0 (114333021)" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
