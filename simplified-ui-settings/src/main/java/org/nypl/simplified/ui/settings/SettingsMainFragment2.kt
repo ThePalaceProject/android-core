@@ -215,13 +215,16 @@ class SettingsMainFragment2 : Fragment() {
 
   private fun formatVersion(): String {
     return try {
-      val context = this.requireContext()
-      val pkgManager = context.packageManager
-      val pkgInfo = pkgManager.getPackageInfo(context.packageName, 0)
+      val context =
+        this.requireContext()
+      val pkgManager =
+        context.packageManager
+      val pkgInfo =
+        pkgManager.getPackageInfo(context.packageName, 0)
       val versionName =
         SettingsModel.buildConfig.simplifiedVersion
       val commit =
-        SettingsModel.buildConfig.vcsCommit.substring(IntRange(0, 7))
+        SettingsModel.buildConfig.vcsCommit
 
       "Palace $versionName (${pkgInfo.versionCode}) [$commit]"
     } catch (e: Throwable) {
