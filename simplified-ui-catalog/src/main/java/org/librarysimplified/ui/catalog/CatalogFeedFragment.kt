@@ -618,12 +618,6 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
 
     val remainingGroups = facetsByGroup
       .filter { entry ->
-        /*
-         * SIMPLY-2923: Hide the 'Collection' Facet until approved by UX.
-         */
-        entry.key != "Collection"
-      }
-      .filter { entry ->
         !FeedFacets.facetGroupIsEntryPointTyped(entry.value)
       }
 
