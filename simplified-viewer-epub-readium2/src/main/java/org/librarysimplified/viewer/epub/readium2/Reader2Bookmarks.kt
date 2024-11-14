@@ -36,10 +36,21 @@ object Reader2Bookmarks {
     return try {
       bookmarkService
         .bookmarkSyncAndLoad(accountID, bookID)
-        .get(15L, TimeUnit.SECONDS)
+        .get(10L, TimeUnit.SECONDS)
     } catch (e: Exception) {
-      this.logger.debug("could not load bookmarks: ", e)
-      BookmarksForBook(bookID, null, emptyList())
+      this.logger.debug("Could not load bookmarks: ", e)
+      try {
+        bookmarkService.bookmarkLoad(
+          accountID, bookID
+        ).get(10L, TimeUnit.SECONDS)
+      } catch (e: Exception) {
+        this.logger.debug("Could not load bookmarks: ", e)
+        BookmarksForBook(
+          bookId = bookID,
+          lastRead = null,
+          bookmarks = listOf()
+        )
+      }
     }
   }
 
@@ -141,7 +152,7 @@ object Reader2Bookmarks {
                 SR2Bookmark.Type.EXPLICIT
             },
             title = source.bookChapterTitle,
-            locator = SR2Locator.SR2LocatorPercent(
+            locator = SR2Locator.SR2LocatorPercent.create(
               chapterHref = href,
               chapterProgress = location.chapterProgress
             ),
