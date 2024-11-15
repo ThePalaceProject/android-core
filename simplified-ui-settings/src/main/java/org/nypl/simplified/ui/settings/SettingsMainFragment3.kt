@@ -79,10 +79,27 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
     this.configureVersionCore(this.settingsVersionCore)
   }
 
+  private fun formatVersion(): String {
+    return try {
+      val context =
+        this.requireContext()
+      val pkgManager =
+        context.packageManager
+      val pkgInfo =
+        pkgManager.getPackageInfo(context.packageName, 0)
+      val versionName =
+        SettingsModel.buildConfig.simplifiedVersion
+
+      "$versionName (${pkgInfo.versionCode})"
+    } catch (e: Throwable) {
+      "Unknown"
+    }
+  }
+
   private fun configureVersion(
     preference: Preference
   ) {
-    preference.setSummaryProvider { SettingsModel.buildConfig.simplifiedVersion }
+    preference.setSummaryProvider { this.formatVersion() }
   }
 
   private fun configureVersionCore(
