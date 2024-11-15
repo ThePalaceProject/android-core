@@ -53,6 +53,7 @@ import org.nypl.simplified.feeds.api.FeedGroup
 import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.fragmentListeners
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
+import org.nypl.simplified.ui.accounts.AccountPickerDialogFragment
 import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
@@ -576,6 +577,20 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
       }
 
       /*
+       * If we're at the root of a feed and the app is configured such that the user should
+       * be allowed to change accounts, then display the current account's logo in the toolbar.
+       */
+
+      if (this.configurationService.showChangeAccountsUi) {
+        actionBar.setHomeActionContentDescription(R.string.catalogAccounts)
+        actionBar.setLogo(this.configurationService.brandingAppIcon)
+        this.toolbar.setLogoOnClickListener {
+          this.openAccountPickerDialog()
+        }
+        return
+      }
+
+      /*
        * Otherwise, show nothing.
        */
 
@@ -587,6 +602,26 @@ class CatalogFeedFragment : Fragment(R.layout.feed), AgeGateDialog.BirthYearSele
       }
     } catch (e: Exception) {
       // Nothing to do
+    }
+  }
+
+  private fun openAccountPickerDialog() {
+    try {
+      return when (val ownership = this.parameters.ownership) {
+        is OwnedByAccount -> {
+          val dialog =
+            AccountPickerDialogFragment.create(
+              currentId = ownership.accountId,
+              showAddAccount = this.configurationService.allowAccountsAccess
+            )
+          dialog.show(parentFragmentManager, dialog.tag)
+        }
+        CollectedFromAccounts -> {
+          throw IllegalStateException("Can't switch account from collected feed!")
+        }
+      }
+    } catch (e: Exception) {
+      this.logger.debug("Failed to open account picker dialog: ", e)
     }
   }
 
