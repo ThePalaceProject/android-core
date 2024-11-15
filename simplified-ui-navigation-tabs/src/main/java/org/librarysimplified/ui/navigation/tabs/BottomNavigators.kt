@@ -19,7 +19,7 @@ import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.feeds.api.FeedBooksSelection
 import org.nypl.simplified.feeds.api.FeedFacet
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
-import org.nypl.simplified.ui.settings.SettingsMainFragment2
+import org.nypl.simplified.ui.settings.SettingsMainFragment3
 import org.slf4j.LoggerFactory
 
 object BottomNavigators {
@@ -152,7 +152,7 @@ object BottomNavigators {
 
   private fun createSettingsFragment(id: Int): Fragment {
     logger.debug("[{}]: creating settings fragment", id)
-    return SettingsMainFragment2()
+    return SettingsMainFragment3()
   }
 
   private fun createHoldsFragment(

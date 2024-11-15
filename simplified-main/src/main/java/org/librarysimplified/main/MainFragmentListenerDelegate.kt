@@ -466,6 +466,11 @@ internal class MainFragmentListenerDelegate(
         this.openSettingsPrivacy(event.title, event.url)
         state
       }
+
+      is SettingsMainEvent.OpenAcknowledgments -> {
+        this.openSettingsAcknowledgements(event.title, event.url)
+        state
+      }
     }
   }
 

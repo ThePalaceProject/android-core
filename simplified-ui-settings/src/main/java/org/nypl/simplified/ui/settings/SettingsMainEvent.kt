@@ -12,6 +12,15 @@ sealed class SettingsMainEvent {
   ) : SettingsMainEvent()
 
   /**
+   * The settings screen wants to open the "acknowledgements" screen.
+   */
+
+  data class OpenAcknowledgments(
+    val title: String,
+    val url: String,
+  ) : SettingsMainEvent()
+
+  /**
    * The settings screen wants to open the list of added accounts.
    */
 
