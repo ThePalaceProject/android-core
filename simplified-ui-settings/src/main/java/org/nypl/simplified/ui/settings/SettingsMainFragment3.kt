@@ -7,6 +7,8 @@ import io.reactivex.disposables.CompositeDisposable
 import org.librarysimplified.ui.settings.R
 import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.fragmentListeners
+import org.nypl.simplified.profiles.api.ProfileEvent
+import org.nypl.simplified.profiles.api.ProfileUpdated
 import org.slf4j.LoggerFactory
 
 class SettingsMainFragment3 : PreferenceFragmentCompat() {
@@ -35,10 +37,21 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
   override fun onStart() {
     super.onStart()
 
+    this.subscriptions = CompositeDisposable()
+    this.subscriptions.add(
+      SettingsModel.profileEvents.subscribe(this::onProfileEvent)
+    )
+
     try {
       this.configureDebug(this.settingsDebug)
     } catch (e: Throwable) {
       this.logger.debug("Error configuring debug menu: ", e)
+    }
+  }
+
+  private fun onProfileEvent(e: ProfileEvent) {
+    if (e is ProfileUpdated) {
+      this.configureDebug(this.settingsDebug)
     }
   }
 
