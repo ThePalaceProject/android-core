@@ -8,6 +8,7 @@ import com.io7m.jnull.NullCheck;
 import com.io7m.jnull.Nullable;
 
 import org.joda.time.DateTime;
+import org.jsoup.Jsoup;
 import org.nypl.simplified.parser.api.ParseError;
 
 import java.io.Serializable;
@@ -721,7 +722,12 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
       if (text.isNone()) {
         this.summary = "";
       } else {
-        this.summary = ((Some<String>) text).get();
+        final String s = ((Some<String>) text).get();
+        try {
+          this.summary = Jsoup.parse(s).text();
+        } catch (final Exception e) {
+          this.summary = s;
+        }
       }
       return this;
     }

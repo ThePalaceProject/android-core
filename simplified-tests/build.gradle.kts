@@ -193,6 +193,7 @@ val dependencyObjects = listOf(
     libs.javax.inject,
     libs.jcip.annotations,
     libs.joda.time,
+    libs.jsoup,
     libs.junit,
     libs.junit.jupiter.api,
     libs.junit.jupiter.engine,
