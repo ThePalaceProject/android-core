@@ -26,6 +26,7 @@ import org.librarysimplified.audiobook.manifest_parser.api.ManifestUnparsed
 import org.librarysimplified.audiobook.parser.api.ParseError
 import org.librarysimplified.audiobook.parser.api.ParseResult
 import org.librarysimplified.audiobook.parser.api.ParseWarning
+import org.librarysimplified.http.api.LSHTTPAuthorizationType
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPProblemReport
 import org.librarysimplified.http.downloads.LSHTTPDownloadRequest
@@ -139,6 +140,7 @@ class AudioBookStrategy(
     return this.parseManifest(
       source = data.source,
       licenseBytes = null,
+      authorization = data.authorization,
       manifestBytes = data.data
     )
   }
@@ -174,6 +176,7 @@ class AudioBookStrategy(
         this.parseManifest(
           source = target.target,
           licenseBytes = null,
+          authorization = result.result.authorization,
           manifestBytes = result.result.data
         )
       }
@@ -353,6 +356,7 @@ class AudioBookStrategy(
         return this.parseManifest(
           source = result.result.source,
           licenseBytes = licenseBytes,
+          authorization = result.result.authorization,
           manifestBytes = result.result.data
         )
       }
@@ -365,6 +369,7 @@ class AudioBookStrategy(
 
   private fun parseManifest(
     source: URI?,
+    authorization: LSHTTPAuthorizationType?,
     licenseBytes: ByteArray?,
     manifestBytes: ByteArray
   ): TaskResult<AudioBookManifestData> {
@@ -394,7 +399,7 @@ class AudioBookStrategy(
             fulfilled = ManifestFulfilled(
               source = source,
               contentType = MIMEType("text", "json", mapOf()),
-              authorization = null,
+              authorization = authorization,
               data = manifestBytes
             )
           )
