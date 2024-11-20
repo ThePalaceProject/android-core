@@ -19,6 +19,7 @@ class BorrowSubtaskDirectory : BorrowSubtaskDirectoryType {
       BorrowDirectDownload,
       BorrowLCPAudiobook,
       BorrowLCPEpub,
+      BorrowLCPPDF,
       BorrowLoanCreate
     )
 }
