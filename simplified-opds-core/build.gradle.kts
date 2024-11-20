@@ -12,6 +12,7 @@ dependencies {
     implementation(libs.jackson.databind)
     implementation(libs.javax.annotation.api)
     implementation(libs.joda.time)
+    implementation(libs.jsoup)
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlin.stdlib)
     implementation(libs.slf4j)
