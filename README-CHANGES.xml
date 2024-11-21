@@ -575,7 +575,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2024-11-20T14:16:55+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.15.0">
+    <c:release date="2024-11-21T15:21:12+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.15.0">
       <c:changes>
         <c:change date="2024-10-25T00:00:00+00:00" summary="Support streaming for LCP audiobooks.">
           <c:tickets>
@@ -598,9 +598,14 @@
             <c:ticket id="PP-1913"/>
           </c:tickets>
         </c:change>
-        <c:change date="2024-11-20T14:16:55+00:00" summary="Strip HTML tags from book summaries.">
+        <c:change date="2024-11-20T00:00:00+00:00" summary="Strip HTML tags from book summaries.">
           <c:tickets>
             <c:ticket id="PP-1901"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2024-11-21T15:21:12+00:00" summary="Restore saving of book playback rates.">
+          <c:tickets>
+            <c:ticket id="PP-1950"/>
           </c:tickets>
         </c:change>
       </c:changes>

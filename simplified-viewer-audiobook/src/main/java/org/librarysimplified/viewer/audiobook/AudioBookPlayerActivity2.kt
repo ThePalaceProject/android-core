@@ -54,6 +54,7 @@ import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.books.time.tracking.TimeTrackingServiceType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.opds.core.getOrNull
+import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.ui.errorpage.ErrorPageFragment
@@ -69,6 +70,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
   private lateinit var bookmarkService: BookmarkServiceType
   private lateinit var buildConfig: BuildConfigurationServiceType
   private lateinit var coverService: BookCoverProviderType
+  private lateinit var profiles: ProfilesControllerType
   private lateinit var timeTrackingService: TimeTrackingServiceType
 
   private var fragmentNow: Fragment = AudioBookLoadingFragment2()
@@ -98,6 +100,8 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       services.requireService(BookCoverProviderType::class.java)
     this.timeTrackingService =
       services.requireService(TimeTrackingServiceType::class.java)
+    this.profiles =
+      services.requireService(ProfilesControllerType::class.java)
   }
 
   override fun onStart() {
@@ -174,7 +178,6 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       is PlayerAccessibilityIsWaitingForChapter,
       is PlayerAccessibilityPlaybackRateChanged,
       is PlayerAccessibilitySleepTimerSettingChanged,
-      is PlayerEventPlaybackRateChanged,
       is PlayerEventChapterCompleted,
       is PlayerEventChapterWaiting,
       is PlayerEventPlaybackBuffering,
@@ -273,6 +276,21 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
 
       is PlayerEventManifestUpdated -> {
         // Nothing yet...
+      }
+
+      is PlayerEventPlaybackRateChanged -> {
+        val parameters =
+          AudioBookViewerModel.parameters ?: return
+
+        this.profiles.profileUpdate { description ->
+          description.copy(
+            preferences = description.preferences.copy(
+              playbackRates = description.preferences.playbackRates.plus(
+                Pair(parameters.bookID.value(), event.rate)
+              )
+            )
+          )
+        }
       }
     }
   }
@@ -374,12 +392,31 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
 
       is PlayerModelState.PlayerOpen -> {
         this.loadCoverImage()
+        this.setPlaybackRateFromPreferencesIfRequired()
         this.switchFragment(PlayerFragment())
       }
 
       PlayerModelState.PlayerManifestInProgress -> {
         this.switchFragment(AudioBookLoadingFragment2())
       }
+    }
+  }
+
+  private fun setPlaybackRateFromPreferencesIfRequired() {
+    val bookParameters =
+      AudioBookViewerModel.parameters ?: return
+    val preferencesRate =
+      this.profiles.profileCurrent()
+        .preferences()
+        .playbackRates
+        .get(bookParameters.bookID.value())
+
+    if (preferencesRate == null) {
+      return
+    }
+
+    if (preferencesRate != PlayerModel.playbackRate) {
+      PlayerModel.setPlaybackRate(preferencesRate)
     }
   }
 
