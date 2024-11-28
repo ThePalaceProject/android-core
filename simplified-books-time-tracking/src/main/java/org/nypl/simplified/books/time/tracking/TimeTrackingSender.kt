@@ -79,9 +79,10 @@ class TimeTrackingSender private constructor(
       MDC.put("TimeLoss", "false")
 
       val entryFiles: List<Path> =
-        Files.list(this.inputDirectory)
-          .filter { p -> this.isFileSuitable(p) }
-          .collect(Collectors.toList())
+        Files.list(this.inputDirectory).use { inputStream ->
+          inputStream.filter { p -> this.isFileSuitable(p) }
+            .collect(Collectors.toList())
+        }
 
       val entries = mutableListOf<TimeTrackingEntryOutgoing>()
       for (entryFile in entryFiles) {

@@ -6,7 +6,8 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.PrintWriter
 import java.io.StringWriter
-import java.time.OffsetTime
+import java.time.OffsetDateTime
+import java.time.ZoneOffset.UTC
 import java.util.Properties
 import java.util.concurrent.locks.ReentrantLock
 
@@ -58,7 +59,7 @@ object TimeTrackingDebugging {
   ) {
     val p = Properties()
     p.setProperty("Operation", "TimeTrackingStarted")
-    p.setProperty("Time", OffsetTime.now().toString())
+    p.setProperty("Time", OffsetDateTime.now(UTC).toString())
     p.setProperty("LibraryID", libraryId)
     p.setProperty("BookID", bookId)
     this.writeLocked(timeTrackingDebugDirectory, p)
@@ -71,9 +72,28 @@ object TimeTrackingDebugging {
   ) {
     val p = Properties()
     p.setProperty("Operation", "TimeTrackingStopped")
-    p.setProperty("Time", OffsetTime.now().toString())
+    p.setProperty("Time", OffsetDateTime.now(UTC).toString())
     p.setProperty("LibraryID", libraryId)
     p.setProperty("BookID", bookId)
+    this.writeLocked(timeTrackingDebugDirectory, p)
+  }
+
+  fun onTimeTrackingEntryCreated(
+    timeTrackingDebugDirectory: File,
+    libraryId: String,
+    bookId: String,
+    entryId: String,
+    duringMinute: String,
+    seconds: Int,
+  ) {
+    val p = Properties()
+    p.setProperty("Operation", "TimeTrackingEntryCreated")
+    p.setProperty("Time", OffsetDateTime.now(UTC).toString())
+    p.setProperty("EntryID", entryId)
+    p.setProperty("LibraryID", libraryId)
+    p.setProperty("BookID", bookId)
+    p.setProperty("DuringMinute", duringMinute)
+    p.setProperty("Seconds", seconds.toString())
     this.writeLocked(timeTrackingDebugDirectory, p)
   }
 
@@ -86,7 +106,7 @@ object TimeTrackingDebugging {
   ) {
     val p = Properties()
     p.setProperty("Operation", "TimeTrackingSendAttempt")
-    p.setProperty("Time", OffsetTime.now().toString())
+    p.setProperty("Time", OffsetDateTime.now(UTC).toString())
     p.setProperty("LibraryID", libraryId)
     p.setProperty("BookID", bookId)
     p.setProperty("EntryID", entryId)
@@ -102,7 +122,7 @@ object TimeTrackingDebugging {
   ) {
     val p = Properties()
     p.setProperty("Operation", "TimeTrackingSendAttemptSucceeded")
-    p.setProperty("Time", OffsetTime.now().toString())
+    p.setProperty("Time", OffsetDateTime.now(UTC).toString())
     p.setProperty("LibraryID", libraryId)
     p.setProperty("BookID", bookId)
     p.setProperty("EntryID", entryId)
@@ -118,7 +138,7 @@ object TimeTrackingDebugging {
   ) {
     val p = Properties()
     p.setProperty("Operation", "TimeTrackingSendAttemptFailedExceptionally")
-    p.setProperty("Time", OffsetTime.now().toString())
+    p.setProperty("Time", OffsetDateTime.now(UTC).toString())
     p.setProperty("LibraryID", libraryId)
     p.setProperty("BookID", bookId)
     p.setProperty("EntryID", entryId)
@@ -146,7 +166,7 @@ object TimeTrackingDebugging {
   ) {
     val p = Properties()
     p.setProperty("Operation", "TimeTrackingSendAttemptFailed")
-    p.setProperty("Time", OffsetTime.now().toString())
+    p.setProperty("Time", OffsetDateTime.now(UTC).toString())
     p.setProperty("LibraryID", libraryId)
     p.setProperty("BookID", bookId)
     p.setProperty("EntryID", entryId)

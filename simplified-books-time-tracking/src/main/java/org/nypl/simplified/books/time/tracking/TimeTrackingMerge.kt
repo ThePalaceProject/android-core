@@ -32,6 +32,7 @@ import java.util.stream.Collectors
 
 class TimeTrackingMerge private constructor(
   private val clock: () -> OffsetDateTime,
+  private val debugDirectory: Path,
   private val inboxDirectory: Path,
   private val outboxDirectory: Path,
   private val frequency: Duration,
@@ -104,9 +105,10 @@ class TimeTrackingMerge private constructor(
        */
 
       val spanFiles: List<Path> =
-        Files.list(this.inboxDirectory)
-          .filter { p -> isSpanFileSuitable(timeOldest, p) }
-          .collect(Collectors.toList())
+        Files.list(this.inboxDirectory).use { inboxStream ->
+          inboxStream.filter { p -> isSpanFileSuitable(timeOldest, p) }
+            .collect(Collectors.toList())
+        }
 
       val spans = mutableListOf<TimeTrackingReceivedSpan>()
       for (file in spanFiles) {
@@ -164,6 +166,15 @@ class TimeTrackingMerge private constructor(
       file,
       StandardCopyOption.ATOMIC_MOVE,
       StandardCopyOption.REPLACE_EXISTING
+    )
+
+    TimeTrackingDebugging.onTimeTrackingEntryCreated(
+      timeTrackingDebugDirectory = this.debugDirectory.toFile(),
+      libraryId = entry.libraryID.toString(),
+      bookId = entry.bookID.value,
+      entryId = entry.timeEntry.id,
+      duringMinute = entry.timeEntry.duringMinute,
+      seconds = entry.timeEntry.secondsPlayed
     )
   }
 
@@ -262,12 +273,14 @@ class TimeTrackingMerge private constructor(
       clock: () -> OffsetDateTime,
       frequency: Duration,
       inputDirectory: Path,
+      debugDirectory: Path,
       outputDirectory: Path,
     ): TimeTrackingMergeServiceType {
       return TimeTrackingMerge(
         clock = clock,
         frequency = frequency,
         inboxDirectory = inputDirectory,
+        debugDirectory = debugDirectory,
         outboxDirectory = outputDirectory
       )
     }

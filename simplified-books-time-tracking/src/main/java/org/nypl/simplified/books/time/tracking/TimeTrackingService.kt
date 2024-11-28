@@ -60,6 +60,7 @@ class TimeTrackingService private constructor(
           clock = clock,
           frequency = Duration.ofSeconds(30L),
           inputDirectory = collectorDirectory,
+          debugDirectory = debugDirectory,
           outputDirectory = senderDirectory
         ),
         sender = TimeTrackingSender.create(

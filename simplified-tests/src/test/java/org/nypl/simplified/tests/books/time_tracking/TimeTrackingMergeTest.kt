@@ -53,6 +53,7 @@ class TimeTrackingMergeTest {
   @BeforeEach
   fun setup(
     @TempDir outboxDirectory: Path,
+    @TempDir debugDirectory: Path,
     @TempDir inboxDirectory: Path
   ) {
     this.timeNow = OffsetDateTime.now()
@@ -65,6 +66,7 @@ class TimeTrackingMergeTest {
     this.merge =
       TimeTrackingMerge.create(
         outputDirectory = outboxDirectory,
+        debugDirectory = debugDirectory,
         inputDirectory = inboxDirectory,
         clock = this.clock,
         frequency = Duration.ofMillis(100L)
