@@ -83,7 +83,7 @@ object MainLogging {
       RollingFileAppender<ILoggingEvent>().apply {
         this.context = loggerContext
         this.encoder = encoder
-        this.file = File(cacheDirectory, filename).absolutePath
+        this.file = File(File(cacheDirectory, "logs"), filename).absolutePath
         this.name = "FILE"
         this.rollingPolicy = rollingPolicy
       }

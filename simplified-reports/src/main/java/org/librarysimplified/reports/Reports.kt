@@ -3,17 +3,18 @@ package org.librarysimplified.reports
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import androidx.core.content.FileProvider
-import org.apache.commons.io.FileUtils
-import org.librarysimplified.reports.Reports.Result.NoFiles
+import org.apache.commons.io.IOUtils
 import org.librarysimplified.reports.Reports.Result.RaisedException
 import org.librarysimplified.reports.Reports.Result.Sent
 import org.slf4j.LoggerFactory
-import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.util.zip.GZIPOutputStream
+import java.io.IOException
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 
 /**
  * Functions to send reports.
@@ -63,11 +64,9 @@ object Reports {
   ): Result {
     return this.sendReport(
       context = context,
-      baseDirectories = listOf(context.filesDir, context.cacheDir),
       address = address,
       subject = subject,
-      body = body,
-      includeFile = this::isSuitableForSending
+      body = body
     )
   }
 
@@ -94,39 +93,36 @@ object Reports {
   @JvmStatic
   fun sendReport(
     context: Context,
-    baseDirectories: List<File>,
     address: String,
     subject: String,
-    body: String,
-    includeFile: (String) -> Boolean
+    body: String
   ): Result {
     this.logger.debug("preparing report")
 
     try {
-      val files =
-        this.collectFiles(baseDirectories, includeFile)
-      val compressedFiles =
-        files.mapNotNull(this::compressFile)
-      val contentUris =
-        compressedFiles.toSet().map { file -> this.mapFileToContentURI(context, file) }
+      val files = listOf(
+        File(File(context.filesDir, "v4.0"), "time_tracking"),
+        File(context.cacheDir, "logs")
+      )
 
-      this.logger.debug("attaching {} files", compressedFiles.size)
+      val reportZip = File(context.cacheDir, "report.zip")
+      reportZip.delete()
+      compressZipfile(files, reportZip)
 
-      return if (compressedFiles.isNotEmpty()) {
-        val intent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
-          this.type = "text/plain"
-          this.putExtra(Intent.EXTRA_EMAIL, arrayOf(address))
-          this.putExtra(Intent.EXTRA_SUBJECT, this@Reports.extendSubject(context, subject))
-          this.putExtra(Intent.EXTRA_TEXT, this@Reports.extendBody(body))
-          this.putExtra(Intent.EXTRA_STREAM, ArrayList(contentUris))
-          this.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-          this.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-        context.startActivity(intent)
-        Sent
-      } else {
-        NoFiles
+      val contentURIs: ArrayList<Uri> = ArrayList()
+      contentURIs.add(this.mapFileToContentURI(context, reportZip))
+
+      val intent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
+        this.type = "text/plain"
+        this.putExtra(Intent.EXTRA_EMAIL, arrayOf(address))
+        this.putExtra(Intent.EXTRA_SUBJECT, this@Reports.extendSubject(context, subject))
+        this.putExtra(Intent.EXTRA_TEXT, this@Reports.extendBody(body))
+        this.putExtra(Intent.EXTRA_STREAM, contentURIs)
+        this.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        this.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
       }
+      context.startActivity(intent)
+      return Sent
     } catch (e: Exception) {
       this.logger.debug("failed to send report: ", e)
       return RaisedException(e)
@@ -135,8 +131,9 @@ object Reports {
 
   private fun extendBody(
     body: String
-  ): String {
-    return buildString {
+  ): ArrayList<String> {
+    val bodyLines = ArrayList<String>()
+    bodyLines.add(buildString {
       this.append(body)
       this.append("\n")
       this.append("--")
@@ -144,7 +141,8 @@ object Reports {
       this.append("Commit: ")
       this.append(BuildConfig.SIMPLIFIED_GIT_COMMIT)
       this.append("\n")
-    }
+    })
+    return bodyLines
   }
 
   private fun extendSubject(
@@ -173,57 +171,37 @@ object Reports {
     FileProvider.getUriForFile(context, context.packageName + ".fileProvider", file)
 
   @JvmStatic
-  private fun collectFiles(
-    baseDirectories: List<File>,
-    includeFile: (String) -> Boolean
-  ): MutableList<File> {
-    val files = mutableListOf<File>()
-    for (baseDirectory in baseDirectories) {
-      val list = FileUtils.listFiles(
-        baseDirectory.absoluteFile,
-        null,
-        true
-      )
-
-      for (file in list) {
-        val filePath = file.absoluteFile
-        if (includeFile.invoke(file.name) && filePath.isFile) {
-          this.logger.debug("including {}", file)
-          files.add(filePath)
-        } else {
-          this.logger.debug("excluding {}", file)
-        }
+  @Throws(IOException::class)
+  private fun compressZipfile(
+    sources: List<File>,
+    outputFile: File
+  ) {
+    ZipOutputStream(FileOutputStream(outputFile)).use { zipFile ->
+      for (file in sources) {
+        compressToZipFile(file, zipFile)
       }
     }
-
-    this.logger.debug("collected {} files", files.size)
-    return files
   }
 
   @JvmStatic
-  private fun compressFile(file: File): File? {
-    if (file.name.endsWith(".gz")) return file
+  @Throws(IOException::class)
+  private fun compressToZipFile(
+    source: File,
+    zipFile: ZipOutputStream
+  ) {
+    if (source.isFile) {
+      this.logger.debug("Compress {}", source)
 
-    return try {
-      val parent = file.parentFile
-      val fileGz = File(parent, file.name + ".gz")
-
-      FileInputStream(file).use { inputStream ->
-        FileOutputStream(fileGz, false).use { stream ->
-          BufferedOutputStream(stream).use { bStream ->
-            GZIPOutputStream(bStream).use { zStream ->
-              inputStream.copyTo(zStream)
-              zStream.finish()
-              zStream.flush()
-              this.logger.debug("compressed {}", file)
-              fileGz
-            }
-          }
-        }
+      val entry = ZipEntry(source.name)
+      zipFile.putNextEntry(entry)
+      FileInputStream(source).use { input ->
+        IOUtils.copy(input, zipFile)
       }
-    } catch (e: Exception) {
-      this.logger.error("could not compress: {}: ", file, e)
-      null
+      return
+    }
+
+    for (file in source.listFiles() ?: arrayOf()) {
+      compressToZipFile(file, zipFile)
     }
   }
 }

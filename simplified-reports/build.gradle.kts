@@ -22,6 +22,7 @@ dependencies {
     coreLibraryDesugaring(libs.android.desugaring)
 
     implementation(libs.androidx.core)
+    implementation(libs.commons.compress)
     implementation(libs.commons.io)
     implementation(libs.kotlin.stdlib)
     implementation(libs.slf4j)
