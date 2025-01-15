@@ -34,6 +34,7 @@
   <string name="catalogBookAvailabilityRevoked">This book is waiting to be returned.</string>
   <string name="catalogBookCoverDescription">Book cover image</string>
 
+  <string name="catalogBookDetailsAlsoAvailableAudiobook">Also available as an audiobook.</string>
   <string name="catalogBookFormatAudioBook">Audiobook</string>
   <string name="catalogBookFormatEPUB">eBook</string>
   <string name="catalogBookFormatPDF">PDF</string>

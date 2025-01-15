@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideBackgroundTop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.42" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideCoverTop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.15" />
+
+    <View
+        android:id="@+id/backgroundGradient"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/book_detail_gradient"
+        app:layout_constraintBottom_toTopOf="@id/guideBackgroundTop"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/bookDetailToolbar"
+        android:orientation="horizontal"
+        android:layout_margin="16dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/bookDetailToolbarBack"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            tools:src="@drawable/back" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/bookExpandedCover"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.36"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/guideCoverTop"
+        app:layout_constraintWidth_percent="0.5"
+        app:srcCompat="@drawable/cover_loading" />
+
+    <LinearLayout
+        android:id="@+id/bookExpandedTitleAndButtons"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/bookExpandedCover">
+
+        <TextView
+            android:id="@+id/bookExpandedTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            tools:text="In the Company of Witches" />
+
+        <TextView
+            android:id="@+id/bookExpandedAuthor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            tools:text="Auralee Wallace" />
+
+        <LinearLayout
+            android:id="@+id/bookExpandedButtons"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/bookExpandedAuthor">
+
+            <Button
+                android:id="@+id/bookExpandedGet"
+                android:layout_width="128dp"
+                android:layout_height="wrap_content"
+                android:text="@string/catalogGet" />
+
+            <View
+                android:layout_width="16dp"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/bookExpandedPreview"
+                android:layout_width="128dp"
+                android:layout_height="wrap_content"
+                android:text="@string/catalogBookPreviewBook" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/bookExpandedDetailsAudiobook"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/bookExpandedButtons">
+
+            <FrameLayout
+                android:layout_width="32dp"
+                android:layout_height="32dp">
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center"
+                    android:clickable="false"
+                    android:focusable="false"
+                    app:srcCompat="@drawable/circle" />
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_gravity="center"
+                    android:clickable="false"
+                    android:focusable="false"
+                    app:srcCompat="@drawable/headphones" />
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="8dp"
+                android:text="@string/catalogBookDetailsAlsoAvailableAudiobook" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/bookDetailExpansionBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierAllowsGoneWidgets="true"
+        app:constraint_referenced_ids="bookExpandedTitleAndButtons,guideBackgroundTop"
+        app:barrierDirection="bottom" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="32dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/bookDetailExpansionBarrier"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:textAllCaps="true"
+            android:textStyle="bold"
+            android:text="@string/catalogDescription" />
+
+        <TextView
+            android:id="@+id/bookDetailDescriptionText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/catalogPlaceholder" />
+
+        <TextView
+            android:id="@+id/seeMoreText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:padding="8dp"
+            android:text="@string/catalogMore"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/bookDetailMetadataTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:ellipsize="end"
+            android:textAllCaps="true"
+            android:maxLines="1"
+            android:text="@string/catalogInformation"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:id="@+id/bookDetailMetadataTable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <FrameLayout
+            android:id="@+id/bookDetailRelatedBooksContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp">
+
+            <include
+                layout="@layout/feed_loading"
+                tools:visibility="visible" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/relatedBooksList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:overScrollMode="never" />
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
