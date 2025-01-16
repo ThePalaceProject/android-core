@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.motion.widget.MotionLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    app:layoutDescription="@xml/book_detail2_scene">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideBackgroundTop"
@@ -18,7 +19,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.15" />
+        app:layout_constraintGuide_percent="0.12" />
 
     <View
         android:id="@+id/backgroundGradient"
@@ -32,10 +33,10 @@
 
     <LinearLayout
         android:id="@+id/bookDetailToolbar"
-        android:orientation="horizontal"
-        android:layout_margin="16dp"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -47,6 +48,59 @@
             tools:src="@drawable/back" />
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/bookDetailContractedTitleAndButtons"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/bookContractedTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLines="1"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#ffffff"
+                tools:text="In the Company of Witches" />
+
+            <TextView
+                android:id="@+id/bookContractedAuthor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLines="1"
+                android:textColor="#ffffff"
+                tools:text="Auralee Wallace" />
+        </LinearLayout>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/bookContractedGet"
+            android:layout_width="128dp"
+            android:layout_height="wrap_content"
+            android:text="@string/catalogGet" />
+    </LinearLayout>
+
     <ImageView
         android:id="@+id/bookExpandedCover"
         android:layout_width="0dp"
@@ -56,14 +110,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/guideCoverTop"
         app:layout_constraintWidth_percent="0.5"
-        app:srcCompat="@drawable/cover_loading" />
+        app:srcCompat="@drawable/cover_loading"
+        tools:srcCompat="@drawable/cover" />
 
     <LinearLayout
         android:id="@+id/bookExpandedTitleAndButtons"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:gravity="center"
+        android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/bookExpandedCover">
@@ -164,27 +219,28 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierAllowsGoneWidgets="true"
-        app:constraint_referenced_ids="bookExpandedTitleAndButtons,guideBackgroundTop"
-        app:barrierDirection="bottom" />
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="bookExpandedTitleAndButtons,guideBackgroundTop" />
 
     <LinearLayout
+        android:id="@+id/bookDetailDescriptionContainer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
         android:layout_marginTop="32dp"
+        android:layout_marginEnd="16dp"
         android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@id/bookDetailExpansionBarrier"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/bookDetailExpansionBarrier">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
+            android:text="@string/catalogDescription"
             android:textAllCaps="true"
-            android:textStyle="bold"
-            android:text="@string/catalogDescription" />
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/bookDetailDescriptionText"
@@ -207,9 +263,9 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:ellipsize="end"
-            android:textAllCaps="true"
             android:maxLines="1"
             android:text="@string/catalogInformation"
+            android:textAllCaps="true"
             android:textStyle="bold" />
 
         <LinearLayout
@@ -240,4 +296,4 @@
 
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.motion.widget.MotionLayout>
