@@ -1,4 +1,50 @@
+android {
+    defaultConfig {
+        versionName = "1.0.0"
+        versionCode = 1000
+        setProperty("archivesBaseName", "sandbox")
+    }
+
+    packaging {
+        jniLibs {
+            keepDebugSymbols.add("lib/**/*.so")
+
+            /*
+             * Various components (R2, the PDF library, LCP, etc) include this shared library.
+             */
+
+            pickFirsts.add("lib/arm64-v8a/libc++_shared.so")
+            pickFirsts.add("lib/armeabi-v7a/libc++_shared.so")
+            pickFirsts.add("lib/x86/libc++_shared.so")
+            pickFirsts.add("lib/x86_64/libc++_shared.so")
+        }
+    }
+
+    /*
+     * Ensure that the right NDK ABIs are declared.
+     */
+
+    buildTypes {
+        debug {
+            ndk {
+                abiFilters.add("x86")
+                abiFilters.add("arm64-v8a")
+                abiFilters.add("armeabi-v7a")
+            }
+            versionNameSuffix = "-debug"
+        }
+        release {
+            ndk {
+                abiFilters.add("arm64-v8a")
+                abiFilters.add("armeabi-v7a")
+            }
+        }
+    }
+}
+
 dependencies {
+    coreLibraryDesugaring(libs.android.desugaring)
+
     implementation(libs.androidx.activity)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.annotation)
@@ -17,6 +63,7 @@ dependencies {
     implementation(libs.androidx.core.common)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.core.runtime)
+    implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.cursoradapter)
     implementation(libs.androidx.customview)
     implementation(libs.androidx.customview.poolingcontainer)
@@ -74,6 +121,7 @@ dependencies {
     implementation(libs.androidx.viewpager)
     implementation(libs.androidx.viewpager2)
     implementation(libs.androidx.webkit)
+
     implementation(libs.google.material)
     implementation(libs.kotlin.stdlib)
     implementation(libs.palace.theme)
