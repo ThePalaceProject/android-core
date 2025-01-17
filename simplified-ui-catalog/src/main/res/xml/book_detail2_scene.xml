@@ -9,12 +9,16 @@
         <KeyFrameSet>
             <KeyAttribute
                 android:alpha="0"
-                motion:framePosition="250"
+                motion:framePosition="50"
                 motion:motionTarget="@id/bookExpandedCover" />
             <KeyAttribute
                 android:alpha="0"
-                motion:framePosition="250"
+                motion:framePosition="50"
                 motion:motionTarget="@id/bookExpandedTitleAndButtons" />
+            <KeyAttribute
+                android:alpha="0"
+                motion:framePosition="1"
+                motion:motionTarget="@+id/bookDetailToolbar" />
         </KeyFrameSet>
     </Transition>
 
@@ -50,9 +54,9 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
             android:alpha="0"
-            android:visibility="invisible"
             android:gravity="center"
             android:orientation="horizontal"
+            android:visibility="invisible"
             motion:layout_constraintEnd_toEndOf="parent"
             motion:layout_constraintStart_toStartOf="parent"
             motion:layout_constraintTop_toTopOf="parent" />
@@ -129,9 +133,9 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
             android:alpha="1"
-            android:visibility="visible"
             android:gravity="center"
             android:orientation="horizontal"
+            android:visibility="visible"
             motion:layout_constraintEnd_toEndOf="parent"
             motion:layout_constraintStart_toStartOf="parent"
             motion:layout_constraintTop_toTopOf="parent" />
@@ -167,6 +171,7 @@
             android:id="@id/bookExpandedTitleAndButtons"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:alpha="0"
             android:gravity="center"
             android:orientation="vertical"
             android:visibility="invisible"
