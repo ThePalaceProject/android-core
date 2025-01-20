@@ -115,9 +115,28 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
 
     this.loadingProgress.max = 100
 
-    this.feedEntry =
-      this.intent.getSerializableExtra(EXTRA_ENTRY) as FeedEntry.FeedEntryOPDS
+    val intent = this.intent
+    if (intent == null) {
+      this.logger.warn("BookPreviewActivity lacks an intent!")
+      this.finish()
+      return
+    }
 
+    val extras = intent.extras
+    if (extras == null) {
+      this.logger.warn("BookPreviewActivity intent lacks extras!")
+      this.finish()
+      return
+    }
+
+    val entry = extras.getSerializable(EXTRA_ENTRY) as FeedEntry.FeedEntryOPDS?
+    if (entry == null) {
+      this.logger.warn("BookPreviewActivity intent lacks OPDS entry!")
+      this.finish()
+      return
+    }
+
+    this.feedEntry = entry
     MDC.put(MDCKeys.BOOK_TITLE, this.feedEntry.feedEntry.title)
     MDC.put(MDCKeys.BOOK_ID, this.feedEntry.feedEntry.id)
     MDCKeys.put(MDCKeys.BOOK_PUBLISHER, this.feedEntry.feedEntry.publisher)

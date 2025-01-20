@@ -128,13 +128,29 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
     this.subscriptions =
       CompositeDisposable()
-    val intent =
-      this.intent ?: throw IllegalStateException("ReaderActivity2 requires an intent")
-    val extras =
-      intent.extras ?: throw IllegalStateException("ReaderActivity2 Intent lacks parameters")
-    this.parameters =
-      extras.getSerializable(ARG_PARAMETERS) as Reader2ActivityParameters
 
+    val intent = this.intent
+    if (intent == null) {
+      this.logger.warn("ReaderActivity2 lacks an intent!")
+      this.finish()
+      return
+    }
+
+    val extras = intent.extras
+    if (extras == null) {
+      this.logger.warn("ReaderActivity2 intent lacks extras!")
+      this.finish()
+      return
+    }
+
+    val params = extras.getSerializable(ARG_PARAMETERS) as Reader2ActivityParameters?
+    if (params == null) {
+      this.logger.warn("ReaderActivity2 intent lacks parameters!")
+      this.finish()
+      return
+    }
+
+    this.parameters = params
     MDC.put(MDCKeys.ACCOUNT_INTERNAL_ID, this.parameters.accountId.uuid.toString())
     MDC.put(MDCKeys.BOOK_INTERNAL_ID, this.parameters.bookId.value())
     MDC.put(MDCKeys.BOOK_TITLE, this.parameters.entry.feedEntry.title)
