@@ -299,3 +299,5 @@ include(":simplified-viewer-pdf-pdfjs")
 include(":simplified-viewer-preview")
 include(":simplified-viewer-spi")
 include(":simplified-webview")
+
+include(":simplified-sandbox")

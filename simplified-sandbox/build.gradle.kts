@@ -1,4 +1,6 @@
 dependencies {
+    coreLibraryDesugaring(libs.android.desugaring)
+
     implementation(libs.androidx.activity)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.annotation)
@@ -17,6 +19,7 @@ dependencies {
     implementation(libs.androidx.core.common)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.core.runtime)
+    implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.cursoradapter)
     implementation(libs.androidx.customview)
     implementation(libs.androidx.customview.poolingcontainer)
