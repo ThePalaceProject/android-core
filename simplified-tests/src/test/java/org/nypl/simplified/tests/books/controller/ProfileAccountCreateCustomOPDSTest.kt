@@ -32,7 +32,6 @@ import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.files.DirectoryUtilities
-import org.nypl.simplified.metrics.api.MetricServiceType
 import org.nypl.simplified.opds.auth_document.api.AuthenticationDocumentParsersType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
 import org.nypl.simplified.opds.core.OPDSFeedParser
@@ -94,7 +93,6 @@ class ProfileAccountCreateCustomOPDSTest {
   private lateinit var profileAccountCreationStrings: MockAccountCreationStringResources
   private lateinit var profilesDatabase: ProfilesDatabaseType
   private lateinit var server: MockWebServer
-  private lateinit var mockMetricService: MetricServiceType
 
   @BeforeEach
   @Throws(Exception::class)
@@ -134,7 +132,6 @@ class ProfileAccountCreateCustomOPDSTest {
     this.profilesDatabase = Mockito.mock(ProfilesDatabaseType::class.java)
     this.accountProviderResolutionStrings = MockAccountProviderResolutionStrings()
     this.profileAccountCreationStrings = MockAccountCreationStringResources()
-    this.mockMetricService = Mockito.mock(MetricServiceType::class.java)
     this.clock = { Instant.now() }
     this.server = MockWebServer()
     this.server.start()
@@ -169,7 +166,6 @@ class ProfileAccountCreateCustomOPDSTest {
         opdsFeedParser = this.opdsFeedParser,
         profiles = this.profilesDatabase,
         strings = this.profileAccountCreationStrings,
-        metrics = mockMetricService,
       )
 
     val result = task.call()
@@ -190,7 +186,6 @@ class ProfileAccountCreateCustomOPDSTest {
         opdsFeedParser = this.opdsFeedParser,
         profiles = this.profilesDatabase,
         strings = this.profileAccountCreationStrings,
-        metrics = mockMetricService
       )
 
     val result = task.call()
@@ -222,7 +217,6 @@ class ProfileAccountCreateCustomOPDSTest {
         opdsFeedParser = this.opdsFeedParser,
         profiles = this.profilesDatabase,
         strings = this.profileAccountCreationStrings,
-        metrics = mockMetricService
       )
 
     val result = task.call()
@@ -298,7 +292,6 @@ class ProfileAccountCreateCustomOPDSTest {
         opdsFeedParser = this.opdsFeedParser,
         profiles = this.profilesDatabase,
         strings = this.profileAccountCreationStrings,
-        metrics = mockMetricService
       )
 
     val result = task.call()
@@ -359,7 +352,6 @@ class ProfileAccountCreateCustomOPDSTest {
         opdsFeedParser = this.opdsFeedParser,
         profiles = this.profilesDatabase,
         strings = this.profileAccountCreationStrings,
-        metrics = mockMetricService
       )
 
     val result = task.call()
@@ -413,13 +405,11 @@ class ProfileAccountCreateCustomOPDSTest {
         opdsFeedParser = this.opdsFeedParser,
         profiles = this.profilesDatabase,
         strings = this.profileAccountCreationStrings,
-        metrics = mockMetricService
       )
 
     val result = task.call()
     val failure = result as TaskResult.Failure
     Assertions.assertEquals("creatingAccountFailed", failure.lastErrorCode)
-    Mockito.verify(mockMetricService, Mockito.never()).logMetric(anyNonNull())
   }
 
   private fun <T> anyNonNull(): T =

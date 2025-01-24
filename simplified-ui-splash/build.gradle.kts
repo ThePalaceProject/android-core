@@ -4,8 +4,6 @@ dependencies {
     implementation(project(":simplified-boot-api"))
     implementation(project(":simplified-buildconfig-api"))
     implementation(project(":simplified-documents"))
-    implementation(project(":simplified-migration-api"))
-    implementation(project(":simplified-migration-spi"))
     implementation(project(":simplified-presentableerror-api"))
     implementation(project(":simplified-reports"))
     implementation(project(":simplified-services-api"))

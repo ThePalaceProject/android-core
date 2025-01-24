@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<feed xmlns="http://www.w3.org/2005/Atom"
+      xmlns:opds="http://opds-spec.org/2010/catalog">
+
+  <id>urn:uuid:44833939-c9a7-4aa3-99dd-a98f2a953f2c</id>
+  <title>Next 1</title>
+  <updated>2000-01-01T00:00:00+00:00</updated>
+
+  <entry>
+    <id>urn:uuid:95d8c0db-2085-44f3-af9c-4130b0de51d4</id>
+    <title>Book 3</title>
+    <updated>2000-01-01T00:00:00+00:00</updated>
+    <summary type="html">A book.</summary>
+    <link href="strawberries.png"
+          type="image/png"
+          rel="http://opds-spec.org/image"/>
+    <link href="strawberriesThumb.png"
+          type="image/png"
+          rel="http://opds-spec.org/image/thumbnail"/>
+    <link href="nonexistent"
+          rel="http://opds-spec.org/acquisition/borrow"
+          type="application/atom+xml;type=entry;profile=opds-catalog">
+      <opds:indirectAcquisition type="application/epub+zip"/>
+      <opds:availability status="available"/>
+      <opds:holds total="0"/>
+      <opds:copies available="1" total="1"/>
+    </link>
+  </entry>
+
+  <entry>
+    <id>urn:uuid:e6c1c92a-586e-4d4f-be55-ef407f9c914c</id>
+    <title>Book 4</title>
+    <updated>2000-01-01T00:00:00+00:00</updated>
+    <summary type="html">A book.</summary>
+    <link href="strawberries.png"
+        type="image/png"
+        rel="http://opds-spec.org/image"/>
+    <link href="strawberriesThumb.png"
+        type="image/png"
+        rel="http://opds-spec.org/image/thumbnail"/>
+    <link href="nonexistent"
+        rel="http://opds-spec.org/acquisition/borrow"
+        type="application/atom+xml;type=entry;profile=opds-catalog">
+      <opds:indirectAcquisition type="application/epub+zip"/>
+      <opds:availability status="available"/>
+      <opds:holds total="0"/>
+      <opds:copies available="1" total="1"/>
+    </link>
+  </entry>
+
+  <entry>
+    <id>urn:uuid:29087eb3-534e-4c88-94c2-e9a36e99b915</id>
+    <title>Book 5</title>
+    <updated>2000-01-01T00:00:00+00:00</updated>
+    <summary type="html">A book.</summary>
+    <link href="strawberries.png"
+        type="image/png"
+        rel="http://opds-spec.org/image"/>
+    <link href="strawberriesThumb.png"
+        type="image/png"
+        rel="http://opds-spec.org/image/thumbnail"/>
+    <link href="nonexistent"
+        rel="http://opds-spec.org/acquisition/borrow"
+        type="application/atom+xml;type=entry;profile=opds-catalog">
+      <opds:indirectAcquisition type="application/epub+zip"/>
+      <opds:availability status="available"/>
+      <opds:holds total="0"/>
+      <opds:copies available="1" total="1"/>
+    </link>
+  </entry>
+
+  <link href="/next-2.xml" rel="next"/>
+
+</feed>

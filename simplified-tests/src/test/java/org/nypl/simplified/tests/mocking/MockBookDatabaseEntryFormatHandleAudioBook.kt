@@ -12,8 +12,6 @@ import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle
 import org.nypl.simplified.books.formats.api.StandardFormatNames
 import java.io.File
 import java.net.URI
-import java.nio.file.Files
-import java.nio.file.StandardCopyOption
 
 class MockBookDatabaseEntryFormatHandleAudioBook(
   val bookID: BookID,

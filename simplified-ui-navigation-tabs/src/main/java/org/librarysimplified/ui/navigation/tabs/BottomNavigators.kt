@@ -8,16 +8,11 @@ import com.google.android.material.bottomnavigation.LabelVisibilityMode
 import com.io7m.junreachable.UnreachableCodeException
 import com.pandora.bottomnavigator.BottomNavigator
 import org.joda.time.DateTime
-import org.librarysimplified.ui.catalog.CatalogFeedArguments
-import org.librarysimplified.ui.catalog.CatalogFeedFragment
-import org.librarysimplified.ui.catalog.CatalogFeedOwnership
 import org.librarysimplified.ui.tabs.R
 import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
-import org.nypl.simplified.feeds.api.FeedBooksSelection
-import org.nypl.simplified.feeds.api.FeedFacet
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.settings.SettingsMainFragment3
 import org.slf4j.LoggerFactory
@@ -52,12 +47,7 @@ object BottomNavigators {
         rootFragmentsFactory = mapOf(
           R.id.tabCatalog to {
             createCatalogFragment(
-              id = R.id.tabCatalog,
-              feedArguments = catalogFeedArguments(
-                context,
-                profilesController,
-                accountProviders.defaultProvider
-              )
+              id = R.id.tabCatalog
             )
           },
           R.id.tabBooks to {
@@ -88,7 +78,6 @@ object BottomNavigators {
       )
 
     navigationView.labelVisibilityMode = LabelVisibilityMode.LABEL_VISIBILITY_LABELED
-
     return navigator
   }
 
@@ -135,21 +124,6 @@ object BottomNavigators {
     }
   }
 
-  private fun catalogFeedArguments(
-    context: Context,
-    profilesController: ProfilesControllerType,
-    defaultProvider: AccountProviderType
-  ): CatalogFeedArguments.CatalogFeedArgumentsRemote {
-    val age = currentAge(profilesController)
-    val account = pickDefaultAccount(profilesController, defaultProvider)
-    return CatalogFeedArguments.CatalogFeedArgumentsRemote(
-      ownership = CatalogFeedOwnership.OwnedByAccount(account.id),
-      feedURI = account.catalogURIForAge(age),
-      isSearchResults = false,
-      title = context.getString(R.string.tabCatalog)
-    )
-  }
-
   private fun createSettingsFragment(id: Int): Fragment {
     logger.debug("[{}]: creating settings fragment", id)
     return SettingsMainFragment3()
@@ -163,36 +137,7 @@ object BottomNavigators {
     defaultProvider: AccountProviderType
   ): Fragment {
     logger.debug("[{}]: creating holds fragment", id)
-
-    /*
-     * SIMPLY-2923: Filter by the default account until 'All' view is approved by UX.
-     */
-
-    val filterAccountId =
-      if (settingsConfiguration.showBooksFromAllAccounts) {
-        null
-      } else {
-        pickDefaultAccount(profilesController, defaultProvider).id
-      }
-
-    val ownership =
-      if (filterAccountId == null) {
-        CatalogFeedOwnership.CollectedFromAccounts
-      } else {
-        CatalogFeedOwnership.OwnedByAccount(filterAccountId)
-      }
-
-    return CatalogFeedFragment.create(
-      CatalogFeedArguments.CatalogFeedArgumentsLocalBooks(
-        filterAccount = filterAccountId,
-        ownership = ownership,
-        searchTerms = null,
-        selection = FeedBooksSelection.BOOKS_FEED_HOLDS,
-        sortBy = FeedFacet.FeedFacetPseudo.Sorting.SortBy.SORT_BY_TITLE,
-        title = context.getString(R.string.tabHolds),
-        updateHolds = true
-      )
-    )
+    return Fragment()
   }
 
   private fun createBooksFragment(
@@ -203,43 +148,13 @@ object BottomNavigators {
     defaultProvider: AccountProviderType
   ): Fragment {
     logger.debug("[{}]: creating books fragment", id)
-
-    /*
-     * SIMPLY-2923: Filter by the default account until 'All' view is approved by UX.
-     */
-
-    val filterAccountId =
-      if (settingsConfiguration.showBooksFromAllAccounts) {
-        null
-      } else {
-        pickDefaultAccount(profilesController, defaultProvider).id
-      }
-
-    val ownership =
-      if (filterAccountId == null) {
-        CatalogFeedOwnership.CollectedFromAccounts
-      } else {
-        CatalogFeedOwnership.OwnedByAccount(filterAccountId)
-      }
-
-    return CatalogFeedFragment.create(
-      CatalogFeedArguments.CatalogFeedArgumentsLocalBooks(
-        filterAccount = filterAccountId,
-        ownership = ownership,
-        searchTerms = null,
-        selection = FeedBooksSelection.BOOKS_FEED_LOANED,
-        sortBy = FeedFacet.FeedFacetPseudo.Sorting.SortBy.SORT_BY_TITLE,
-        title = context.getString(R.string.tabBooks),
-        updateHolds = false
-      )
-    )
+    return Fragment()
   }
 
   private fun createCatalogFragment(
-    id: Int,
-    feedArguments: CatalogFeedArguments.CatalogFeedArgumentsRemote
+    id: Int
   ): Fragment {
     logger.debug("[{}]: creating catalog fragment", id)
-    return CatalogFeedFragment.create(feedArguments)
+    return Fragment()
   }
 }

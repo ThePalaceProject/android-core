@@ -7,7 +7,6 @@ import one.irradia.mime.vanilla.MIMEParser
 import org.joda.time.DateTime
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import org.librarysimplified.audiobook.api.PlayerPosition
 import org.nypl.drm.core.AdobeAdeptLoan
 import org.nypl.drm.core.AdobeLoanID
 import org.nypl.simplified.books.api.Book

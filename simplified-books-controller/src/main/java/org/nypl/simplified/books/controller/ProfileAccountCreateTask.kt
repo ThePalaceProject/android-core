@@ -11,8 +11,6 @@ import org.nypl.simplified.accounts.api.AccountUnknownProviderException
 import org.nypl.simplified.accounts.api.AccountUnresolvableProviderException
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
-import org.nypl.simplified.metrics.api.MetricEvent
-import org.nypl.simplified.metrics.api.MetricServiceType
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountCreationStringResourcesType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
@@ -28,8 +26,7 @@ class ProfileAccountCreateTask(
   private val accountProviderID: URI,
   private val accountProviders: AccountProviderRegistryType,
   private val profiles: ProfilesDatabaseType,
-  private val strings: ProfileAccountCreationStringResourcesType,
-  private val metrics: MetricServiceType?
+  private val strings: ProfileAccountCreationStringResourcesType
 ) : Callable<TaskResult<AccountType>> {
 
   private val logger = LoggerFactory.getLogger(ProfileAccountCreateTask::class.java)
@@ -45,7 +42,6 @@ class ProfileAccountCreateTask(
       MDC.put(MDCKeys.ACCOUNT_PROVIDER_NAME, account.provider.displayName)
       MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID, account.provider.id.toString())
 
-      metrics?.logMetric(MetricEvent.LibraryAdded(accountProvider.id.toString()))
       this.publishSuccessEvent(account)
       this.taskRecorder.finishSuccess(account)
     } catch (e: Throwable) {

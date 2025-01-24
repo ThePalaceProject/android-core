@@ -1,8 +1,6 @@
 package org.librarysimplified.main
 
 import androidx.lifecycle.ViewModelProvider
-import org.librarysimplified.ui.catalog.CatalogBookDetailEvent
-import org.librarysimplified.ui.catalog.CatalogFeedEvent
 import org.librarysimplified.ui.catalog.saml20.CatalogSAML20Event
 import org.nypl.simplified.listeners.api.ListenerRepository
 import org.nypl.simplified.listeners.api.ListenerRepositoryFactory
@@ -23,8 +21,6 @@ class MainFragmentDefaultViewModelFactory(fallbackFactory: ViewModelProvider.Fac
 
   override fun onListenerRepositoryCreated(repository: ListenerRepository<MainFragmentListenedEvent, MainFragmentState>) {
     repository.registerListener(CatalogSAML20Event::class, MainFragmentListenedEvent::CatalogSAML20Event)
-    repository.registerListener(CatalogFeedEvent::class, MainFragmentListenedEvent::CatalogFeedEvent)
-    repository.registerListener(CatalogBookDetailEvent::class, MainFragmentListenedEvent::CatalogBookDetailEvent)
     repository.registerListener(AccountSAML20Event::class, MainFragmentListenedEvent::AccountSAML20Event)
     repository.registerListener(AccountDetailEvent::class, MainFragmentListenedEvent::AccountDetailEvent)
     repository.registerListener(AccountListRegistryEvent::class, MainFragmentListenedEvent::AccountListRegistryEvent)

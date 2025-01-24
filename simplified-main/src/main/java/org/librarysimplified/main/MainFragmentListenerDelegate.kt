@@ -7,12 +7,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import io.reactivex.disposables.CompositeDisposable
-import org.librarysimplified.ui.catalog.CatalogBookDetailEvent
-import org.librarysimplified.ui.catalog.CatalogBookDetailFragment
-import org.librarysimplified.ui.catalog.CatalogBookDetailFragmentParameters
-import org.librarysimplified.ui.catalog.CatalogFeedArguments
-import org.librarysimplified.ui.catalog.CatalogFeedEvent
-import org.librarysimplified.ui.catalog.CatalogFeedFragment
 import org.librarysimplified.ui.catalog.saml20.CatalogSAML20Event
 import org.librarysimplified.ui.navigation.tabs.TabbedNavigator
 import org.librarysimplified.viewer.preview.BookPreviewActivity
@@ -126,12 +120,6 @@ internal class MainFragmentListenerDelegate(
       is MainFragmentListenedEvent.CatalogSAML20Event ->
         this.handleCatalogSAML20Event(event.event, state)
 
-      is MainFragmentListenedEvent.CatalogFeedEvent ->
-        this.handleCatalogFeedEvent(event.event, state)
-
-      is MainFragmentListenedEvent.CatalogBookDetailEvent ->
-        this.handleCatalogBookDetailEvent(event.event, state)
-
       is MainFragmentListenedEvent.SettingsMainEvent ->
         this.handleSettingsMainEvent(event.event, state)
 
@@ -173,95 +161,6 @@ internal class MainFragmentListenerDelegate(
 
       CatalogSAML20Event.LoginSucceeded -> {
         this.popBackStack()
-        state
-      }
-    }
-  }
-
-  private fun handleCatalogFeedEvent(
-    event: CatalogFeedEvent,
-    state: MainFragmentState
-  ): MainFragmentState {
-    return when (event) {
-      is CatalogFeedEvent.LoginRequired -> {
-        this.openSettingsAccount(
-          event.account,
-          comingFromBookLoanRequest = true,
-          comingFromDeepLink = false,
-          barcode = null
-        )
-        MainFragmentState.CatalogWaitingForLogin
-      }
-
-      is CatalogFeedEvent.OpenErrorPage -> {
-        this.openErrorPage(event.parameters)
-        state
-      }
-
-      is CatalogFeedEvent.OpenViewer -> {
-        this.openViewer(event.book, event.format)
-        state
-      }
-
-      is CatalogFeedEvent.OpenBookDetail -> {
-        this.openBookDetail(event.feedArguments, event.opdsEntry)
-        state
-      }
-
-      is CatalogFeedEvent.OpenFeed -> {
-        this.openFeed(event.feedArguments)
-        state
-      }
-
-      CatalogFeedEvent.GoUpwards -> {
-        this.goUpwards()
-        state
-      }
-    }
-  }
-
-  private fun handleCatalogBookDetailEvent(
-    event: CatalogBookDetailEvent,
-    state: MainFragmentState
-  ): MainFragmentState {
-    return when (event) {
-      is CatalogBookDetailEvent.LoginRequired -> {
-        this.openSettingsAccount(
-          event.account,
-          comingFromBookLoanRequest = true,
-          comingFromDeepLink = false,
-          barcode = null
-        )
-        MainFragmentState.BookDetailsWaitingForLogin
-      }
-
-      is CatalogBookDetailEvent.OpenErrorPage -> {
-        this.openErrorPage(event.parameters)
-        state
-      }
-
-      is CatalogBookDetailEvent.OpenViewer -> {
-        this.openViewer(event.book, event.format)
-        state
-      }
-
-      is CatalogBookDetailEvent.OpenFeed -> {
-        this.openFeed(event.feedArguments)
-        state
-      }
-
-      is CatalogBookDetailEvent.OpenBookDetail -> {
-        this.openBookDetail(event.feedArguments, event.opdsEntry)
-        state
-      }
-
-      is CatalogBookDetailEvent.OpenPreviewViewer -> {
-        this.openPreviewViewer(event.feedEntry)
-        state
-      }
-
-      CatalogBookDetailEvent.GoUpwards -> {
-        this.goUpwards()
         state
       }
     }
@@ -630,28 +529,6 @@ internal class MainFragmentListenerDelegate(
   ) {
     this.navigator.addFragment(
       fragment = SettingsDocumentViewerFragment.create(title, url.toString()),
-      tab = this.navigator.currentTab()
-    )
-  }
-
-  private fun openBookDetail(
-    feedArguments: CatalogFeedArguments,
-    entry: FeedEntry.FeedEntryOPDS
-  ) {
-    this.navigator.addFragment(
-      fragment = CatalogBookDetailFragment.create(
-        CatalogBookDetailFragmentParameters(
-          feedEntry = entry,
-          feedArguments = feedArguments
-        )
-      ),
-      tab = this.navigator.currentTab()
-    )
-  }
-
-  private fun openFeed(feedArguments: CatalogFeedArguments) {
-    this.navigator.addFragment(
-      fragment = CatalogFeedFragment.create(feedArguments),
       tab = this.navigator.currentTab()
     )
   }

@@ -33,7 +33,6 @@ import org.nypl.simplified.books.time.tracking.TimeTrackingRequest
 import org.nypl.simplified.books.time.tracking.TimeTrackingServerResponse
 import org.nypl.simplified.books.time.tracking.TimeTrackingServerResponseEntry
 import org.nypl.simplified.books.time.tracking.TimeTrackingServerResponseSummary
-import org.nypl.simplified.crashlytics.api.CrashlyticsServiceType
 import org.nypl.simplified.tests.mocking.MockAccount
 import java.net.URI
 import java.util.concurrent.TimeUnit

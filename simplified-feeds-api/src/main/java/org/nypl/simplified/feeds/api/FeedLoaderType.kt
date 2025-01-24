@@ -1,9 +1,9 @@
 package org.nypl.simplified.feeds.api
 
-import com.google.common.util.concurrent.FluentFuture
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
 import java.net.URI
+import java.util.concurrent.CompletableFuture
 
 /**
  * The type of feed loaders.
@@ -31,5 +31,5 @@ interface FeedLoaderType {
     uri: URI,
     credentials: AccountAuthenticationCredentials?,
     method: String
-  ): FluentFuture<FeedLoaderResult>
+  ): CompletableFuture<FeedLoaderResult>
 }

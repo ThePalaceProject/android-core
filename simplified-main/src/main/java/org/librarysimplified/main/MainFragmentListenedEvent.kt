@@ -6,14 +6,6 @@ sealed class MainFragmentListenedEvent {
     val event: org.librarysimplified.ui.catalog.saml20.CatalogSAML20Event
   ) : MainFragmentListenedEvent()
 
-  data class CatalogFeedEvent(
-    val event: org.librarysimplified.ui.catalog.CatalogFeedEvent
-  ) : MainFragmentListenedEvent()
-
-  data class CatalogBookDetailEvent(
-    val event: org.librarysimplified.ui.catalog.CatalogBookDetailEvent
-  ) : MainFragmentListenedEvent()
-
   data class AccountSAML20Event(
     val event: org.nypl.simplified.ui.accounts.saml20.AccountSAML20Event
   ) : MainFragmentListenedEvent()

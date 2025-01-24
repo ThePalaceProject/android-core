@@ -14,7 +14,6 @@ import org.nypl.simplified.bookmarks.api.BookmarkAnnotations
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotationsJSON
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.books.api.bookmark.SerializedLocatorAudioBookTime1
-import org.nypl.simplified.books.api.bookmark.SerializedLocatorAudioBookTime2
 import org.nypl.simplified.books.api.bookmark.SerializedLocators
 import org.slf4j.LoggerFactory
 import java.io.FileNotFoundException

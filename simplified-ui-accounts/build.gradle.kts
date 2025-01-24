@@ -9,7 +9,6 @@ dependencies {
     implementation(project(":simplified-buildconfig-api"))
     implementation(project(":simplified-documents"))
     implementation(project(":simplified-links"))
-    implementation(project(":simplified-metrics-api"))
     implementation(project(":simplified-oauth"))
     implementation(project(":simplified-presentableerror-api"))
     implementation(project(":simplified-profiles-api"))

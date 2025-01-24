@@ -1,5 +1,3 @@
-import java.util.Properties
-
 pluginManagement {
     repositories {
         mavenCentral()
@@ -249,10 +247,6 @@ include(":simplified-links")
 include(":simplified-links-json")
 include(":simplified-main")
 include(":simplified-mdc")
-include(":simplified-metrics")
-include(":simplified-metrics-api")
-include(":simplified-migration-api")
-include(":simplified-migration-spi")
 include(":simplified-networkconnectivity")
 include(":simplified-networkconnectivity-api")
 include(":simplified-notifications")
@@ -260,6 +254,7 @@ include(":simplified-oauth")
 include(":simplified-opds-auth-document")
 include(":simplified-opds-auth-document-api")
 include(":simplified-opds-core")
+include(":simplified-opds-client")
 include(":simplified-opds2")
 include(":simplified-opds2-irradia")
 include(":simplified-opds2-parser-api")
