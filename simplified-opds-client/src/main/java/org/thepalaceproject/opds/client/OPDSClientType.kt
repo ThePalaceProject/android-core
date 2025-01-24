@@ -2,6 +2,7 @@ package org.thepalaceproject.opds.client
 
 import com.io7m.jattribute.core.AttributeReadableType
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedGroup
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -21,6 +22,12 @@ interface OPDSClientType : AutoCloseable {
    */
 
   val entriesUngrouped: AttributeReadableType<List<FeedEntry>>
+
+  /**
+   * The grouped entries in the current feed state, or an empty list if the current state is not a grouped feed.
+   */
+
+  val entriesGrouped: AttributeReadableType<List<FeedGroup>>
 
   /**
    * The selected in the current feed state, or an empty list if the current state is not an entry.

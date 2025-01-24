@@ -18,8 +18,6 @@ internal class OPDSCmdLoadMore : OPDSCmd() {
   override fun execute(
     context: OPDSCmdContextType
   ) {
-    this.logger.debug("Loading more feed.")
-
     return when (val state = context.state) {
       is OPDSState.Error,
       OPDSState.Initial,
@@ -47,7 +45,6 @@ internal class OPDSCmdLoadMore : OPDSCmd() {
       return
     }
 
-    this.logger.debug("Loading feed {}", next)
     val future0 =
       context.feedLoader.fetchURI(
         accountID = state.request.accountID,
@@ -110,11 +107,8 @@ internal class OPDSCmdLoadMore : OPDSCmd() {
               val newList = mutableListOf<FeedEntry>()
               newList.addAll(context.entriesUngrouped())
               newList.addAll(feed.entriesInOrder)
-
               val newFeed = state.feed.copy(feedNext = feed.feedNext)
-              this.logger.debug("Constructed new list of {} entries", newList.size)
-              this.logger.debug("Next feed is now: {}", newFeed.feedNext)
-              context.setEntriesUngroupedSource(newList.toList())
+              context.setEntriesUngrouped(newList.toList())
               context.setState(state.copy(feed = newFeed))
               Unit
             }

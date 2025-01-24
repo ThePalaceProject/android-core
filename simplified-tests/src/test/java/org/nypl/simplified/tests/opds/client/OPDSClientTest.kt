@@ -91,10 +91,10 @@ class OPDSClientTest {
         bookFormatSupport = BookFormatSupport.create(
           BookFormatSupportParameters(
             supportsPDF = true,
-            supportsAdobeDRM = false,
-            supportsAxisNow = false,
+            supportsAdobeDRM = true,
+            supportsAxisNow = true,
             supportsAudioBooks = null,
-            supportsLCP = false
+            supportsLCP = true
           )
         ),
         contentResolver = MockContentResolver(),
@@ -169,6 +169,7 @@ class OPDSClientTest {
     assertInstanceOf(OPDSState.LoadedFeedWithoutGroups::class.java, this.client.state.get())
     assertFalse(this.client.hasHistory)
     assertEquals(1, this.webServer.requestCount)
+    assertEquals(0, this.client.entriesGrouped.get().size)
   }
 
   @Test
@@ -196,6 +197,8 @@ class OPDSClientTest {
     assertInstanceOf(OPDSState.LoadedFeedWithGroups::class.java, this.client.state.get())
     assertFalse(this.client.hasHistory)
     assertEquals(1, this.webServer.requestCount)
+    assertEquals(0, this.client.entriesUngrouped.get().size)
+    assertEquals(9, this.client.entriesGrouped.get().size)
   }
 
   @Test
@@ -234,6 +237,7 @@ class OPDSClientTest {
     assertFalse(this.client.hasHistory)
     assertEquals(1, this.webServer.requestCount)
     assertEquals(3, this.client.entriesUngrouped.get().size)
+    assertEquals(0, this.client.entriesGrouped.get().size)
 
     val f1 = this.client.loadMore()
     f1.get(5L, TimeUnit.SECONDS)
@@ -242,6 +246,7 @@ class OPDSClientTest {
     assertFalse(this.client.hasHistory)
     assertEquals(2, this.webServer.requestCount)
     assertEquals(6, this.client.entriesUngrouped.get().size)
+    assertEquals(0, this.client.entriesGrouped.get().size)
 
     val f2 = this.client.loadMore()
     f2.get(5L, TimeUnit.SECONDS)
@@ -250,6 +255,7 @@ class OPDSClientTest {
     assertFalse(this.client.hasHistory)
     assertEquals(3, this.webServer.requestCount)
     assertEquals(9, this.client.entriesUngrouped.get().size)
+    assertEquals(0, this.client.entriesGrouped.get().size)
 
     val f3 = this.client.loadMore()
     f3.get(5L, TimeUnit.SECONDS)
@@ -258,6 +264,7 @@ class OPDSClientTest {
     assertFalse(this.client.hasHistory)
     assertEquals(3, this.webServer.requestCount)
     assertEquals(9, this.client.entriesUngrouped.get().size)
+    assertEquals(0, this.client.entriesGrouped.get().size)
   }
 
   private fun textOf(

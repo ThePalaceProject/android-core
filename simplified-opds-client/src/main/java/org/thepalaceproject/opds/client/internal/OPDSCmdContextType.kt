@@ -1,13 +1,18 @@
 package org.thepalaceproject.opds.client.internal
 
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedGroup
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.thepalaceproject.opds.client.OPDSState
 
 internal interface OPDSCmdContextType {
 
-  fun setEntriesUngroupedSource(
+  fun setEntriesUngrouped(
     entries: List<FeedEntry>
+  )
+
+  fun setEntriesGrouped(
+    groups: List<FeedGroup>
   )
 
   fun setState(

@@ -126,12 +126,14 @@ internal class OPDSCmdExecuteRequest(
         val newState: OPDSStateHistoryParticipant =
           when (val feed = result.feed) {
             is Feed.FeedWithGroups -> {
-              context.setEntriesUngroupedSource(listOf())
+              context.setEntriesUngrouped(listOf())
+              context.setEntriesGrouped(feed.feedGroupsInOrder.toList())
               OPDSState.LoadedFeedWithGroups(request, feed)
             }
 
             is Feed.FeedWithoutGroups -> {
-              context.setEntriesUngroupedSource(feed.entriesInOrder.toList())
+              context.setEntriesUngrouped(feed.entriesInOrder.toList())
+              context.setEntriesGrouped(listOf())
               OPDSState.LoadedFeedWithoutGroups(request, feed)
             }
           }

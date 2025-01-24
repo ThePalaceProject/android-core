@@ -5,6 +5,7 @@ import com.io7m.jattribute.core.AttributeType
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookIDs
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedGroup
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.slf4j.LoggerFactory
 import org.thepalaceproject.opds.client.OPDSState.Initial
@@ -51,12 +52,16 @@ class OPDSClient private constructor(
     OPDSClientAttributes.attributes.withValue(Initial)
   private val entriesUngroupedSource: AttributeType<List<FeedEntry>> =
     OPDSClientAttributes.attributes.withValue(listOf())
+  private val entriesGroupedSource: AttributeType<List<FeedGroup>> =
+    OPDSClientAttributes.attributes.withValue(listOf())
   private val entrySource: AttributeType<FeedEntry> =
     OPDSClientAttributes.attributes.withValue(this.feedEntryCorrupt)
 
   private val stateUI: AttributeType<OPDSState> =
     OPDSClientAttributes.attributes.withValue(Initial)
   private val entriesUngroupedUI: AttributeType<List<FeedEntry>> =
+    OPDSClientAttributes.attributes.withValue(listOf())
+  private val entriesGroupedUI: AttributeType<List<FeedGroup>> =
     OPDSClientAttributes.attributes.withValue(listOf())
   private val entryUI: AttributeType<FeedEntry> =
     OPDSClientAttributes.attributes.withValue(this.feedEntryCorrupt)
@@ -68,6 +73,10 @@ class OPDSClient private constructor(
   private val entriesUngroupedUISub =
     this.entriesUngroupedSource.subscribe { _, e ->
       this.parameters.runOnUI(Runnable { this.entriesUngroupedUI.set(e) })
+    }
+  private val entriesGroupedUISub =
+    this.entriesGroupedSource.subscribe { _, e ->
+      this.parameters.runOnUI(Runnable { this.entriesGroupedUI.set(e) })
     }
   private val entryUISub =
     this.entrySource.subscribe { _, newValue ->
@@ -125,9 +134,12 @@ class OPDSClient private constructor(
       }
     }
 
-    override fun setEntriesUngroupedSource(entries: List<FeedEntry>) {
-      this.client.logger.debug("Entry count now: {}", entries.size)
+    override fun setEntriesUngrouped(entries: List<FeedEntry>) {
       this.client.entriesUngroupedSource.set(entries)
+    }
+
+    override fun setEntriesGrouped(groups: List<FeedGroup>) {
+      this.client.entriesGroupedSource.set(groups)
     }
 
     override fun setState(newState: OPDSState) {
@@ -171,6 +183,8 @@ class OPDSClient private constructor(
     this.stateUI
   override val entriesUngrouped: AttributeReadableType<List<FeedEntry>> =
     this.entriesUngroupedUI
+  override val entriesGrouped: AttributeReadableType<List<FeedGroup>> =
+    this.entriesGroupedUI
   override val entry: AttributeReadableType<FeedEntry> =
     this.entryUI
 
