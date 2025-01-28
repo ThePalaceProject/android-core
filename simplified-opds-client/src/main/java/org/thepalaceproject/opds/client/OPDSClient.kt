@@ -2,6 +2,9 @@ package org.thepalaceproject.opds.client
 
 import com.io7m.jattribute.core.AttributeReadableType
 import com.io7m.jattribute.core.AttributeType
+import com.io7m.jmulticlose.core.CloseableCollection
+import com.io7m.jmulticlose.core.CloseableCollectionType
+import com.io7m.jmulticlose.core.ClosingResourceFailedException
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookIDs
 import org.nypl.simplified.feeds.api.FeedEntry
@@ -48,6 +51,9 @@ class OPDSClient private constructor(
       IllegalStateException("Nonexistent book!")
     )
 
+  private val resources: CloseableCollectionType<ClosingResourceFailedException> =
+    CloseableCollection.create()
+
   private val stateSource: AttributeType<OPDSState> =
     OPDSClientAttributes.attributes.withValue(Initial)
   private val entriesUngroupedSource: AttributeType<List<FeedEntry>> =
@@ -67,21 +73,29 @@ class OPDSClient private constructor(
     OPDSClientAttributes.attributes.withValue(this.feedEntryCorrupt)
 
   private val stateUISub =
-    this.stateSource.subscribe { _, newValue ->
-      this.parameters.runOnUI(Runnable { this.stateUI.set(newValue) })
-    }
+    this.resources.add(
+      this.stateSource.subscribe { _, newValue ->
+        this.parameters.runOnUI(Runnable { this.stateUI.set(newValue) })
+      }
+    )
   private val entriesUngroupedUISub =
-    this.entriesUngroupedSource.subscribe { _, e ->
-      this.parameters.runOnUI(Runnable { this.entriesUngroupedUI.set(e) })
-    }
+    this.resources.add(
+      this.entriesUngroupedSource.subscribe { _, e ->
+        this.parameters.runOnUI(Runnable { this.entriesUngroupedUI.set(e) })
+      }
+    )
   private val entriesGroupedUISub =
-    this.entriesGroupedSource.subscribe { _, e ->
-      this.parameters.runOnUI(Runnable { this.entriesGroupedUI.set(e) })
-    }
+    this.resources.add(
+      this.entriesGroupedSource.subscribe { _, e ->
+        this.parameters.runOnUI(Runnable { this.entriesGroupedUI.set(e) })
+      }
+    )
   private val entryUISub =
-    this.entrySource.subscribe { _, newValue ->
-      this.parameters.runOnUI(Runnable { this.entryUI.set(newValue) })
-    }
+    this.resources.add(
+      this.entrySource.subscribe { _, newValue ->
+        this.parameters.runOnUI(Runnable { this.entryUI.set(newValue) })
+      }
+    )
 
   private val historyStack: ConcurrentLinkedDeque<OPDSStateHistoryParticipant> =
     ConcurrentLinkedDeque()
@@ -135,11 +149,11 @@ class OPDSClient private constructor(
     }
 
     override fun setState(newState: OPDSState) {
-      this.client.stateSource.set(newState)
+      this.client.stateSet(newState)
     }
 
-    override fun setStateSavingHistory(newState: OPDSStateHistoryParticipant) {
-      this.client.stateSetSavingHistory(newState)
+    override fun setStateReplaceTop(newState: OPDSState) {
+      this.client.stateSource.set(newState)
     }
 
     override fun shutDown() {
@@ -155,6 +169,10 @@ class OPDSClient private constructor(
       this.client.entriesUngroupedSource.set(entries.toList())
     }
 
+    override fun operationCancelled() {
+      this.client.operationCancelled()
+    }
+
     override val feedLoader: FeedLoaderType =
       this.client.parameters.feedLoader
 
@@ -163,6 +181,23 @@ class OPDSClient private constructor(
   }
 
   init {
+    /*
+     * Note: Resources are essentially pushed onto a stack and are therefore closed in reverse order. Therefore,
+     * the order of resource registrations is significant: The last resource to be pushed will be closed _first_.
+     */
+    this.resources.add(AutoCloseable {
+      this.taskExecutor.awaitTermination(5L, TimeUnit.SECONDS)
+    })
+    this.resources.add(AutoCloseable {
+      this.taskExecutor.shutdown()
+    })
+    this.resources.add(AutoCloseable {
+      this.mainTask.enqueue(OPDSCmdShutdown())
+    })
+    this.resources.add(AutoCloseable {
+      this.mainTask.cancel()
+    })
+
     this.taskExecutor.execute(this.mainTask)
   }
 
@@ -189,61 +224,156 @@ class OPDSClient private constructor(
 
   override fun goBack(): CompletableFuture<Unit> {
     this.parameters.checkOnUI()
+
+    val f = this.checkClosed()
+    if (f != null) {
+      return f
+    }
+
     this.mainTask.cancel()
 
-    val future = CompletableFuture<Unit>()
-    future.completeExceptionally(IllegalStateException("Unimplemented code!"))
-    return future
+    if (this.historyStack.isEmpty()) {
+      return CompletableFuture.completedFuture(Unit)
+    }
+
+    this.historyPop()
+    return CompletableFuture.completedFuture(Unit)
+  }
+
+  private fun historyPop() {
+    val oldState = this.historyStack.pop()
+    this.historyTrace()
+    this.updateAttributesForState(oldState)
+    this.stateSource.set(oldState)
+  }
+
+  private fun historyTrace() {
+    if (this.logger.isDebugEnabled) {
+      this.logger.debug("History stack now: {}", this.historyStack.map { e -> e.javaClass.simpleName })
+    }
   }
 
   override fun goTo(
     request: OPDSClientRequest
   ): CompletableFuture<Unit> {
     this.parameters.checkOnUI()
+
+    val f = this.checkClosed()
+    if (f != null) {
+      return f
+    }
+
     this.mainTask.cancel()
     return this.mainTask.enqueue(OPDSCmdExecuteRequest(request))
   }
 
+  private fun checkClosed(): CompletableFuture<Unit>? {
+    if (this.closed.get()) {
+      val future = CompletableFuture<Unit>()
+      future.completeExceptionally(IllegalStateException("Client is closed."))
+      return future
+    }
+    return null
+  }
+
   override fun loadMore(): CompletableFuture<Unit> {
     this.parameters.checkOnUI()
+
+    val f = this.checkClosed()
+    if (f != null) {
+      return f
+    }
+
     return this.mainTask.enqueue(OPDSCmdLoadMore())
   }
 
   override fun close() {
     if (this.closed.compareAndSet(false, true)) {
-      this.mainTask.cancel()
-      this.mainTask.enqueue(OPDSCmdShutdown())
-      this.taskExecutor.shutdown()
-      this.taskExecutor.awaitTermination(5L, TimeUnit.SECONDS)
+      this.resources.close()
     }
   }
 
-  private fun stateSetSavingHistory(
-    newState: OPDSStateHistoryParticipant
+  private fun stateSet(
+    newState: OPDSState
   ) {
     val oldState = this.state.get()
     if (oldState is OPDSStateHistoryParticipant) {
       this.historyStack.push(oldState)
+      this.historyTrace()
     }
 
+    this.updateAttributesForState(newState)
+    this.stateSource.set(newState)
+  }
+
+  private fun updateAttributesForState(
+    newState: OPDSState
+  ) {
     when (newState) {
       is OPDSState.LoadedFeedEntry -> {
         this.entrySource.set(newState.request.entry)
         this.entriesGroupedSource.set(listOf())
         this.entriesUngroupedSource.set(listOf())
       }
+
       is OPDSState.LoadedFeedWithGroups -> {
         this.entrySource.set(this.feedEntryCorrupt)
         this.entriesGroupedSource.set(newState.feed.feedGroupsInOrder.toList())
         this.entriesUngroupedSource.set(listOf())
       }
+
       is OPDSState.LoadedFeedWithoutGroups -> {
         this.entrySource.set(this.feedEntryCorrupt)
         this.entriesGroupedSource.set(listOf())
         this.entriesUngroupedSource.set(newState.feed.entriesInOrder.toList())
       }
+      is OPDSState.Error -> {
+        this.entrySource.set(this.feedEntryCorrupt)
+        this.entriesGroupedSource.set(listOf())
+        this.entriesUngroupedSource.set(listOf())
+      }
+      Initial -> {
+        this.entrySource.set(this.feedEntryCorrupt)
+        this.entriesGroupedSource.set(listOf())
+        this.entriesUngroupedSource.set(listOf())
+      }
+      is OPDSState.Loading -> {
+        this.entrySource.set(this.feedEntryCorrupt)
+        this.entriesGroupedSource.set(listOf())
+        this.entriesUngroupedSource.set(listOf())
+      }
     }
+  }
 
-    this.stateSource.set(newState)
+  private fun operationCancelled() {
+    when (this.state.get()) {
+      is OPDSState.Error -> {
+        // Nothing to do.
+      }
+
+      Initial -> {
+        // Nothing to do.
+      }
+
+      is OPDSState.Loading -> {
+        if (this.historyStack.isEmpty()) {
+          this.stateSource.set(Initial)
+        } else {
+          this.historyPop()
+        }
+      }
+
+      is OPDSState.LoadedFeedEntry -> {
+        // Nothing to do.
+      }
+
+      is OPDSState.LoadedFeedWithGroups -> {
+        // Nothing to do.
+      }
+
+      is OPDSState.LoadedFeedWithoutGroups -> {
+        // Nothing to do.
+      }
+    }
   }
 }

@@ -8,6 +8,7 @@ dependencies {
     implementation(project(":simplified-presentableerror-api"))
 
     implementation(libs.io7m.jattribute.core)
+    implementation(libs.io7m.jmulticlose)
     implementation(libs.joda.time)
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlin.stdlib)

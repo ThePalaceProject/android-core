@@ -10,8 +10,8 @@ internal interface OPDSCmdContextType {
     newState: OPDSState
   )
 
-  fun setStateSavingHistory(
-    newState: OPDSState.OPDSStateHistoryParticipant
+  fun setStateReplaceTop(
+    newState: OPDSState
   )
 
   fun shutDown()
@@ -21,6 +21,8 @@ internal interface OPDSCmdContextType {
   fun setEntriesUngrouped(
     entries: List<FeedEntry>
   )
+
+  fun operationCancelled()
 
   val feedLoader: FeedLoaderType
 

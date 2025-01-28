@@ -20,6 +20,7 @@ internal class OPDSCmdExecuteRequest(
 
   override fun execute(context: OPDSCmdContextType) {
     if (this.taskFuture.isCancelled) {
+      context.operationCancelled()
       return
     }
 
@@ -37,6 +38,8 @@ internal class OPDSCmdExecuteRequest(
     context: OPDSCmdContextType,
     request: OPDSClientRequest.NewFeed
   ) {
+    context.setState(OPDSState.Loading(request))
+
     val future0 =
       context.feedLoader.fetchURI(
         accountID = request.accountID,
@@ -75,6 +78,7 @@ internal class OPDSCmdExecuteRequest(
     result: FeedLoaderResult?
   ) {
     if (this.taskFuture.isCancelled) {
+      context.operationCancelled()
       return
     }
 
@@ -134,7 +138,7 @@ internal class OPDSCmdExecuteRequest(
             }
           }
 
-        context.setStateSavingHistory(newState)
+        context.setState(newState)
         Unit
       }
     }
@@ -145,7 +149,7 @@ internal class OPDSCmdExecuteRequest(
     request: OPDSClientRequest.ExistingEntry
   ) {
     try {
-      context.setStateSavingHistory(OPDSState.LoadedFeedEntry(request))
+      context.setState(OPDSState.LoadedFeedEntry(request))
     } catch (e: Throwable) {
       this.taskFuture.completeExceptionally(e)
     } finally {

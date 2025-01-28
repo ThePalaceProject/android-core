@@ -70,6 +70,7 @@ internal class OPDSCmdLoadMore : OPDSCmd() {
     result: FeedLoaderResult?
   ) {
     if (this.taskFuture.isCancelled) {
+      context.operationCancelled()
       return
     }
 
@@ -109,7 +110,7 @@ internal class OPDSCmdLoadMore : OPDSCmd() {
               newList.addAll(feed.entriesInOrder)
               val newFeed = state.feed.copy(feedNext = feed.feedNext)
               context.setEntriesUngrouped(newList.toList())
-              context.setState(state.copy(feed = newFeed))
+              context.setStateReplaceTop(state.copy(feed = newFeed))
               Unit
             }
           }
