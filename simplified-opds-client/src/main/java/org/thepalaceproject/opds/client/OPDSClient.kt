@@ -134,14 +134,6 @@ class OPDSClient private constructor(
       }
     }
 
-    override fun setEntriesUngrouped(entries: List<FeedEntry>) {
-      this.client.entriesUngroupedSource.set(entries)
-    }
-
-    override fun setEntriesGrouped(groups: List<FeedGroup>) {
-      this.client.entriesGroupedSource.set(groups)
-    }
-
     override fun setState(newState: OPDSState) {
       this.client.stateSource.set(newState)
     }
@@ -157,6 +149,10 @@ class OPDSClient private constructor(
 
     override fun entriesUngrouped(): List<FeedEntry> {
       return this.client.entriesUngroupedSource.get()
+    }
+
+    override fun setEntriesUngrouped(entries: List<FeedEntry>) {
+      this.client.entriesUngroupedSource.set(entries.toList())
     }
 
     override val feedLoader: FeedLoaderType =
@@ -229,6 +225,25 @@ class OPDSClient private constructor(
     if (oldState is OPDSStateHistoryParticipant) {
       this.historyStack.push(oldState)
     }
+
+    when (newState) {
+      is OPDSState.LoadedFeedEntry -> {
+        this.entrySource.set(newState.request.entry)
+        this.entriesGroupedSource.set(listOf())
+        this.entriesUngroupedSource.set(listOf())
+      }
+      is OPDSState.LoadedFeedWithGroups -> {
+        this.entrySource.set(this.feedEntryCorrupt)
+        this.entriesGroupedSource.set(newState.feed.feedGroupsInOrder.toList())
+        this.entriesUngroupedSource.set(listOf())
+      }
+      is OPDSState.LoadedFeedWithoutGroups -> {
+        this.entrySource.set(this.feedEntryCorrupt)
+        this.entriesGroupedSource.set(listOf())
+        this.entriesUngroupedSource.set(newState.feed.entriesInOrder.toList())
+      }
+    }
+
     this.stateSource.set(newState)
   }
 }

@@ -3,12 +3,11 @@ package org.nypl.simplified.tests.opds.client
 import android.content.Context
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
-import okhttp3.mockwebserver.RecordedRequest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertInstanceOf
-import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.librarysimplified.http.api.LSHTTPClientConfiguration
@@ -34,11 +33,8 @@ import org.thepalaceproject.opds.client.OPDSClientParameters
 import org.thepalaceproject.opds.client.OPDSClientRequest
 import org.thepalaceproject.opds.client.OPDSClientType
 import org.thepalaceproject.opds.client.OPDSState
-import java.net.Socket
 import java.net.URI
 import java.nio.charset.StandardCharsets.UTF_8
-import java.util.concurrent.CancellationException
-import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -379,6 +375,47 @@ class OPDSClientTest {
     assertEquals(3, this.webServer.requestCount)
     assertEquals(9, this.client.entriesUngrouped.get().size)
     assertEquals(0, this.client.entriesGrouped.get().size)
+  }
+
+  @Test
+  fun testFeedEntry() {
+    this.webServer.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+        .setBody(this.textOf("/org/nypl/simplified/tests/opds/client/errorsBorrowing.xml"))
+    )
+
+    assertInstanceOf(OPDSState.Initial::class.java, this.client.state.get())
+    assertFalse(this.client.hasHistory)
+
+    val f0 =
+      this.client.goTo(
+        OPDSClientRequest.NewFeed(
+          accountID = this.account0,
+          uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
+          credentials = null,
+          method = "GET"
+        )
+      )
+
+    f0.get(5L, TimeUnit.SECONDS)
+    assertInstanceOf(OPDSState.LoadedFeedWithoutGroups::class.java, this.client.state.get())
+    assertFalse(this.client.hasHistory)
+    assertEquals(1, this.webServer.requestCount)
+    assertEquals(0, this.client.entriesGrouped.get().size)
+    assertEquals(2, this.client.entriesUngrouped.get().size)
+
+    val f1 =
+      this.client.goTo(
+        OPDSClientRequest.ExistingEntry(this.client.entriesUngrouped.get()[0])
+      )
+
+    f1.get(5L, TimeUnit.SECONDS)
+    assertInstanceOf(OPDSState.LoadedFeedEntry::class.java, this.client.state.get())
+    assertTrue(this.client.hasHistory)
+    assertEquals(1, this.webServer.requestCount)
+    assertEquals(0, this.client.entriesGrouped.get().size)
+    assertEquals(0, this.client.entriesUngrouped.get().size)
   }
 
   private fun textOf(

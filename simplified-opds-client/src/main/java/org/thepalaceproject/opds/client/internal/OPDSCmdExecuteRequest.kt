@@ -126,14 +126,10 @@ internal class OPDSCmdExecuteRequest(
         val newState: OPDSStateHistoryParticipant =
           when (val feed = result.feed) {
             is Feed.FeedWithGroups -> {
-              context.setEntriesUngrouped(listOf())
-              context.setEntriesGrouped(feed.feedGroupsInOrder.toList())
               OPDSState.LoadedFeedWithGroups(request, feed)
             }
 
             is Feed.FeedWithoutGroups -> {
-              context.setEntriesUngrouped(feed.entriesInOrder.toList())
-              context.setEntriesGrouped(listOf())
               OPDSState.LoadedFeedWithoutGroups(request, feed)
             }
           }
@@ -148,6 +144,12 @@ internal class OPDSCmdExecuteRequest(
     context: OPDSCmdContextType,
     request: OPDSClientRequest.ExistingEntry
   ) {
-    this.taskFuture.completeExceptionally(IllegalStateException("Unimplemented code!"))
+    try {
+      context.setStateSavingHistory(OPDSState.LoadedFeedEntry(request))
+    } catch (e: Throwable) {
+      this.taskFuture.completeExceptionally(e)
+    } finally {
+      this.taskFuture.complete(Unit)
+    }
   }
 }
