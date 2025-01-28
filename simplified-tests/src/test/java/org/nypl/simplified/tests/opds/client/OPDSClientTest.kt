@@ -8,6 +8,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertInstanceOf
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.librarysimplified.http.api.LSHTTPClientConfiguration
@@ -36,6 +37,8 @@ import org.thepalaceproject.opds.client.OPDSState
 import java.net.Socket
 import java.net.URI
 import java.nio.charset.StandardCharsets.UTF_8
+import java.util.concurrent.CancellationException
+import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -119,6 +122,7 @@ class OPDSClientTest {
   @AfterEach
   fun tearDown() {
     this.logger.info("Shutting down webserver...")
+    this.client.close()
     this.webServer.shutdown()
     this.exec.shutdown()
     this.exec.awaitTermination(5L, TimeUnit.SECONDS)
@@ -142,6 +146,35 @@ class OPDSClientTest {
     f.get(5L, TimeUnit.SECONDS)
     assertInstanceOf(OPDSState.Error::class.java, this.client.state.get())
     assertFalse(this.client.hasHistory)
+  }
+
+  @Test
+  fun testFeedUnparseable() {
+    this.webServer.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+        .setBody("Does this look like some kind of feed to you?")
+    )
+
+    assertInstanceOf(OPDSState.Initial::class.java, this.client.state.get())
+    assertFalse(this.client.hasHistory)
+
+    val f =
+      this.client.goTo(
+        OPDSClientRequest.NewFeed(
+          accountID = this.account0,
+          uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
+          credentials = null,
+          method = "GET"
+        )
+      )
+
+    f.get(5L, TimeUnit.SECONDS)
+    assertInstanceOf(OPDSState.Error::class.java, this.client.state.get())
+    assertFalse(this.client.hasHistory)
+    assertEquals(1, this.webServer.requestCount)
+    assertEquals(0, this.client.entriesGrouped.get().size)
+    assertEquals(0, this.client.entriesUngrouped.get().size)
   }
 
   @Test
@@ -170,6 +203,47 @@ class OPDSClientTest {
     assertFalse(this.client.hasHistory)
     assertEquals(1, this.webServer.requestCount)
     assertEquals(0, this.client.entriesGrouped.get().size)
+    assertEquals(2, this.client.entriesUngrouped.get().size)
+  }
+
+  @Test
+  fun testFeedWithoutGroupsCancel() {
+    this.webServer.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+        .setBody(this.textOf("/org/nypl/simplified/tests/opds/client/errorsBorrowing.xml"))
+    )
+
+    assertInstanceOf(OPDSState.Initial::class.java, this.client.state.get())
+    assertFalse(this.client.hasHistory)
+
+    val f =
+      this.client.goTo(
+        OPDSClientRequest.NewFeed(
+          accountID = this.account0,
+          uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
+          credentials = null,
+          method = "GET"
+        )
+      )
+
+    this.logger.debug("Cancelling task...")
+    f.cancel(true)
+
+    this.logger.debug("Checking if task is cancelled...")
+    try {
+      f.get(5L, TimeUnit.SECONDS)
+    } catch (e : Throwable) {
+      this.logger.debug("Get raised exception: ", e)
+    } finally {
+      Thread.sleep(1_000L)
+    }
+
+    this.logger.debug("Checking state...")
+    assertInstanceOf(OPDSState.Initial::class.java, this.client.state.get())
+    assertFalse(this.client.hasHistory)
+    assertEquals(0, this.client.entriesGrouped.get().size)
+    assertEquals(0, this.client.entriesUngrouped.get().size)
   }
 
   @Test
@@ -199,6 +273,46 @@ class OPDSClientTest {
     assertEquals(1, this.webServer.requestCount)
     assertEquals(0, this.client.entriesUngrouped.get().size)
     assertEquals(9, this.client.entriesGrouped.get().size)
+  }
+
+  @Test
+  fun testFeedWithGroupsCancel() {
+    this.webServer.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+        .setBody(this.textOf("/org/nypl/simplified/tests/opds/client/acquisition-fiction-0.xml"))
+    )
+
+    assertInstanceOf(OPDSState.Initial::class.java, this.client.state.get())
+    assertFalse(this.client.hasHistory)
+
+    val f =
+      this.client.goTo(
+        OPDSClientRequest.NewFeed(
+          accountID = this.account0,
+          uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
+          credentials = null,
+          method = "GET"
+        )
+      )
+
+    this.logger.debug("Cancelling task...")
+    f.cancel(true)
+
+    this.logger.debug("Checking if task is cancelled...")
+    try {
+      f.get(5L, TimeUnit.SECONDS)
+    } catch (e : Throwable) {
+      this.logger.debug("Get raised exception: ", e)
+    } finally {
+      Thread.sleep(1_000L)
+    }
+
+    this.logger.debug("Checking state...")
+    assertInstanceOf(OPDSState.Initial::class.java, this.client.state.get())
+    assertFalse(this.client.hasHistory)
+    assertEquals(0, this.client.entriesGrouped.get().size)
+    assertEquals(0, this.client.entriesUngrouped.get().size)
   }
 
   @Test
