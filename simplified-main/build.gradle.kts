@@ -62,6 +62,7 @@ dependencies {
     implementation(project(":simplified-oauth"))
     implementation(project(":simplified-opds-auth-document"))
     implementation(project(":simplified-opds-auth-document-api"))
+    implementation(project(":simplified-opds-client"))
     implementation(project(":simplified-opds-core"))
     implementation(project(":simplified-patron"))
     implementation(project(":simplified-patron-api"))

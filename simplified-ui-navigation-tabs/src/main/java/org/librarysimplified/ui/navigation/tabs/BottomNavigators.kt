@@ -1,6 +1,5 @@
 package org.librarysimplified.ui.navigation.tabs
 
-import android.content.Context
 import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -8,6 +7,9 @@ import com.google.android.material.bottomnavigation.LabelVisibilityMode
 import com.io7m.junreachable.UnreachableCodeException
 import com.pandora.bottomnavigator.BottomNavigator
 import org.joda.time.DateTime
+import org.librarysimplified.ui.catalog.CatalogFragmentHolds
+import org.librarysimplified.ui.catalog.CatalogFragmentMain
+import org.librarysimplified.ui.catalog.CatalogFragmentMyBooks
 import org.librarysimplified.ui.tabs.R
 import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.database.api.AccountType
@@ -52,20 +54,12 @@ object BottomNavigators {
           },
           R.id.tabBooks to {
             createBooksFragment(
-              context = context,
-              id = R.id.tabBooks,
-              profilesController = profilesController,
-              settingsConfiguration = settingsConfiguration,
-              defaultProvider = accountProviders.defaultProvider
+              id = R.id.tabBooks
             )
           },
           R.id.tabHolds to {
             createHoldsFragment(
-              context = context,
-              id = R.id.tabHolds,
-              profilesController = profilesController,
-              settingsConfiguration = settingsConfiguration,
-              defaultProvider = accountProviders.defaultProvider
+              id = R.id.tabHolds
             )
           },
           R.id.tabSettings to {
@@ -130,31 +124,23 @@ object BottomNavigators {
   }
 
   private fun createHoldsFragment(
-    context: Context,
-    id: Int,
-    profilesController: ProfilesControllerType,
-    settingsConfiguration: BuildConfigurationServiceType,
-    defaultProvider: AccountProviderType
+    id: Int
   ): Fragment {
     logger.debug("[{}]: creating holds fragment", id)
-    return Fragment()
+    return CatalogFragmentHolds()
   }
 
   private fun createBooksFragment(
-    context: Context,
-    id: Int,
-    profilesController: ProfilesControllerType,
-    settingsConfiguration: BuildConfigurationServiceType,
-    defaultProvider: AccountProviderType
+    id: Int
   ): Fragment {
     logger.debug("[{}]: creating books fragment", id)
-    return Fragment()
+    return CatalogFragmentMyBooks()
   }
 
   private fun createCatalogFragment(
     id: Int
   ): Fragment {
     logger.debug("[{}]: creating catalog fragment", id)
-    return Fragment()
+    return CatalogFragmentMain()
   }
 }

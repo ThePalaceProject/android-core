@@ -2,7 +2,8 @@ package org.librarysimplified.ui.catalog
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.feeds.api.FeedEntry
 
@@ -12,23 +13,51 @@ import org.nypl.simplified.feeds.api.FeedEntry
  * @see CatalogLaneItemViewHolder
  */
 class CatalogLaneAdapter(
-  private val items: List<FeedEntry.FeedEntryOPDS>,
   private val coverLoader: BookCoverProviderType,
   private val onBookSelected: (FeedEntry.FeedEntryOPDS) -> Unit
-) : RecyclerView.Adapter<CatalogLaneItemViewHolder>() {
+) : ListAdapter<FeedEntry.FeedEntryOPDS, CatalogLaneItemViewHolder>(diffCallback) {
 
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CatalogLaneItemViewHolder {
-    val view = LayoutInflater.from(parent.context).inflate(R.layout.feed_lane_item, parent, false)
+  companion object {
+    private val diffCallback =
+      object : DiffUtil.ItemCallback<FeedEntry.FeedEntryOPDS>() {
+        override fun areContentsTheSame(
+          oldItem: FeedEntry.FeedEntryOPDS,
+          newItem: FeedEntry.FeedEntryOPDS
+        ): Boolean {
+          return oldItem == newItem
+        }
+
+        override fun areItemsTheSame(
+          oldItem: FeedEntry.FeedEntryOPDS,
+          newItem: FeedEntry.FeedEntryOPDS
+        ): Boolean {
+          return oldItem.feedEntry.id == newItem.feedEntry.id
+        }
+      }
+  }
+
+  override fun onCreateViewHolder(
+    parent: ViewGroup,
+    viewType: Int
+  ): CatalogLaneItemViewHolder {
+    val inflater =
+      LayoutInflater.from(parent.context)
+    val view =
+      inflater.inflate(R.layout.feed_lane_item, parent, false)
+
     return CatalogLaneItemViewHolder(view, coverLoader, onBookSelected)
   }
 
-  override fun getItemCount() = items.size
-
-  override fun onBindViewHolder(holder: CatalogLaneItemViewHolder, position: Int) {
-    holder.bindTo(items[position])
+  override fun onBindViewHolder(
+    holder: CatalogLaneItemViewHolder,
+    position: Int
+  ) {
+    holder.bindTo(this.getItem(position))
   }
 
-  override fun onViewRecycled(holder: CatalogLaneItemViewHolder) {
+  override fun onViewRecycled(
+    holder: CatalogLaneItemViewHolder
+  ) {
     super.onViewRecycled(holder)
     holder.unbind()
   }

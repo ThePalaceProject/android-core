@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <resources>
-  <dimen name="catalogLaneCoverMaximumWidth">96dp</dimen>
-  <dimen name="catalogBookDetailCoverMaximumWidth">128dp</dimen>
-
-  <dimen name="catalogBookDetailStatusHeight">64dp</dimen>
   <dimen name="catalogBookDetailButtonsHeight">64dp</dimen>
-  <dimen name="catalogFeedCoversSpace">8dp</dimen>
-  <dimen name="catalogFeedCellImageWidth">80dp</dimen>
-  <dimen name="catalogFeedCellHeight">128dp</dimen>
-  <dimen name="catalogFeedCellButtonsHeight">45dp</dimen>
-  <dimen name="catalogFacetTabStroke">4dp</dimen>
+  <dimen name="catalogBookDetailCoverMaximumWidth">128dp</dimen>
+  <dimen name="catalogBookDetailStatusHeight">64dp</dimen>
+  <dimen name="catalogBookThumbnailHeight">120dp</dimen>
   <dimen name="catalogFacetTabCornerRadius">8dp</dimen>
   <dimen name="catalogFacetTabStandardHeight">36dp</dimen>
+  <dimen name="catalogFacetTabStroke">4dp</dimen>
+  <dimen name="catalogFeedCellButtonsHeight">45dp</dimen>
+  <dimen name="catalogFeedCellHeight">128dp</dimen>
+  <dimen name="catalogFeedCellImageWidth">80dp</dimen>
+  <dimen name="catalogFeedCoversSpace">8dp</dimen>
+  <dimen name="catalogLaneCoverMaximumWidth">96dp</dimen>
 </resources>

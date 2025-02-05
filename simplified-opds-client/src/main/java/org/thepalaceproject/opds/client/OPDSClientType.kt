@@ -59,4 +59,10 @@ interface OPDSClientType : AutoCloseable {
    */
 
   fun loadMore(): CompletableFuture<Unit>
+
+  /**
+   * Refresh the current feed or entry.
+   */
+
+  fun refresh(): CompletableFuture<Unit>
 }

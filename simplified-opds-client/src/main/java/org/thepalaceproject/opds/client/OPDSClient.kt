@@ -11,13 +11,19 @@ import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedGroup
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.opds.client.OPDSState.Error
 import org.thepalaceproject.opds.client.OPDSState.Initial
+import org.thepalaceproject.opds.client.OPDSState.LoadedFeedEntry
+import org.thepalaceproject.opds.client.OPDSState.LoadedFeedWithGroups
+import org.thepalaceproject.opds.client.OPDSState.LoadedFeedWithoutGroups
+import org.thepalaceproject.opds.client.OPDSState.Loading
 import org.thepalaceproject.opds.client.OPDSState.OPDSStateHistoryParticipant
 import org.thepalaceproject.opds.client.internal.OPDSCmd
 import org.thepalaceproject.opds.client.internal.OPDSCmdContextType
 import org.thepalaceproject.opds.client.internal.OPDSCmdExecuteRequest
 import org.thepalaceproject.opds.client.internal.OPDSCmdLoadMore
 import org.thepalaceproject.opds.client.internal.OPDSCmdShutdown
+import java.util.UUID
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentLinkedDeque
@@ -55,7 +61,7 @@ class OPDSClient private constructor(
     CloseableCollection.create()
 
   private val stateSource: AttributeType<OPDSState> =
-    OPDSClientAttributes.attributes.withValue(Initial)
+    OPDSClientAttributes.attributes.withValue(Initial(UUID.randomUUID()))
   private val entriesUngroupedSource: AttributeType<List<FeedEntry>> =
     OPDSClientAttributes.attributes.withValue(listOf())
   private val entriesGroupedSource: AttributeType<List<FeedGroup>> =
@@ -64,7 +70,7 @@ class OPDSClient private constructor(
     OPDSClientAttributes.attributes.withValue(this.feedEntryCorrupt)
 
   private val stateUI: AttributeType<OPDSState> =
-    OPDSClientAttributes.attributes.withValue(Initial)
+    OPDSClientAttributes.attributes.withValue(Initial(UUID.randomUUID()))
   private val entriesUngroupedUI: AttributeType<List<FeedEntry>> =
     OPDSClientAttributes.attributes.withValue(listOf())
   private val entriesGroupedUI: AttributeType<List<FeedGroup>> =
@@ -113,7 +119,7 @@ class OPDSClient private constructor(
     override fun run() {
       while (this.shouldBeRunning()) {
         try {
-          val c = this.commands.poll(100L, TimeUnit.MILLISECONDS) ?: continue
+          val c = this.commands.poll(1000L, TimeUnit.MILLISECONDS) ?: continue
           if (c.taskFuture.isCancelled) {
             continue
           }
@@ -287,6 +293,17 @@ class OPDSClient private constructor(
     return this.mainTask.enqueue(OPDSCmdLoadMore())
   }
 
+  override fun refresh(): CompletableFuture<Unit> {
+    this.parameters.checkOnUI()
+
+    val f = this.checkClosed()
+    if (f != null) {
+      return f
+    }
+
+    return CompletableFuture.completedFuture(Unit)
+  }
+
   override fun close() {
     if (this.closed.compareAndSet(false, true)) {
       this.resources.close()
@@ -310,34 +327,34 @@ class OPDSClient private constructor(
     newState: OPDSState
   ) {
     when (newState) {
-      is OPDSState.LoadedFeedEntry -> {
+      is LoadedFeedEntry -> {
         this.entrySource.set(newState.request.entry)
         this.entriesGroupedSource.set(listOf())
         this.entriesUngroupedSource.set(listOf())
       }
 
-      is OPDSState.LoadedFeedWithGroups -> {
+      is LoadedFeedWithGroups -> {
         this.entrySource.set(this.feedEntryCorrupt)
         this.entriesGroupedSource.set(newState.feed.feedGroupsInOrder.toList())
         this.entriesUngroupedSource.set(listOf())
       }
 
-      is OPDSState.LoadedFeedWithoutGroups -> {
+      is LoadedFeedWithoutGroups -> {
         this.entrySource.set(this.feedEntryCorrupt)
         this.entriesGroupedSource.set(listOf())
         this.entriesUngroupedSource.set(newState.feed.entriesInOrder.toList())
       }
-      is OPDSState.Error -> {
+      is Error -> {
         this.entrySource.set(this.feedEntryCorrupt)
         this.entriesGroupedSource.set(listOf())
         this.entriesUngroupedSource.set(listOf())
       }
-      Initial -> {
+      is Initial -> {
         this.entrySource.set(this.feedEntryCorrupt)
         this.entriesGroupedSource.set(listOf())
         this.entriesUngroupedSource.set(listOf())
       }
-      is OPDSState.Loading -> {
+      is Loading -> {
         this.entrySource.set(this.feedEntryCorrupt)
         this.entriesGroupedSource.set(listOf())
         this.entriesUngroupedSource.set(listOf())
@@ -347,31 +364,31 @@ class OPDSClient private constructor(
 
   private fun operationCancelled() {
     when (this.state.get()) {
-      is OPDSState.Error -> {
+      is Error -> {
         // Nothing to do.
       }
 
-      Initial -> {
+      is Initial -> {
         // Nothing to do.
       }
 
-      is OPDSState.Loading -> {
+      is Loading -> {
         if (this.historyStack.isEmpty()) {
-          this.stateSource.set(Initial)
+          this.stateSource.set(Initial(UUID.randomUUID()))
         } else {
           this.historyPop()
         }
       }
 
-      is OPDSState.LoadedFeedEntry -> {
+      is LoadedFeedEntry -> {
         // Nothing to do.
       }
 
-      is OPDSState.LoadedFeedWithGroups -> {
+      is LoadedFeedWithGroups -> {
         // Nothing to do.
       }
 
-      is OPDSState.LoadedFeedWithoutGroups -> {
+      is LoadedFeedWithoutGroups -> {
         // Nothing to do.
       }
     }

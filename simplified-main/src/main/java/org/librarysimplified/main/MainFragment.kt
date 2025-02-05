@@ -92,11 +92,8 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
     /*
      * Hide various tabs based on build configuration and other settings.
      */
-    this.setShowHoldsVisibility()
 
-    val settingsItem = this.bottomView.menu.findItem(org.librarysimplified.ui.tabs.R.id.tabSettings)
-    settingsItem.isVisible = viewModel.buildConfig.showSettingsTab
-    settingsItem.isEnabled = viewModel.buildConfig.showSettingsTab
+    this.setShowHoldsVisibility()
 
     this.navigator =
       TabbedNavigator.create(

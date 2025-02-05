@@ -150,7 +150,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
-            android:text="@string/catalogPlaceholder" />
+            tools:text="@string/catalogPlaceholder" />
 
         <TextView
             android:id="@+id/seeMoreText"
@@ -199,8 +199,7 @@
         <FrameLayout
             android:id="@+id/bookDetailRelatedBooksContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp">
+            android:layout_height="wrap_content">
 
             <include
                 layout="@layout/feed_loading"
@@ -210,18 +209,18 @@
                 android:id="@+id/relatedBooksList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 android:clipChildren="false"
                 android:clipToPadding="false"
                 android:overScrollMode="never" />
 
-        </FrameLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider"
+                android:visibility="gone" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginBottom="16dp"
-            android:background="?android:attr/listDivider"
-            android:visibility="gone" />
+        </FrameLayout>
 
         <TextView
             android:id="@+id/bookDetailReport"
@@ -235,22 +234,6 @@
             android:textSize="18sp"
             android:textStyle="bold"
             android:visibility="gone" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginBottom="16dp"
-            android:background="?android:attr/listDivider" />
-
-        <TextView
-            android:id="@+id/bookDetailDebugStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:text="@string/catalogPlaceholder"
-            android:typeface="monospace" />
 
     </LinearLayout>
 

@@ -22,10 +22,6 @@ class PalaceBuildConfigurationService : BuildConfigurationServiceType {
     )
   override val showDebugBookDetailStatus: Boolean
     get() = false
-  override val showSettingsTab: Boolean
-    get() = true
-  override val showHoldsTab: Boolean
-    get() = true
   override val showBooksFromAllAccounts: Boolean
     get() = false
   override val vcsCommit: String

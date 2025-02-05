@@ -59,10 +59,14 @@ class CatalogFeedWithGroupsLaneViewHolder(
      * Populate our feed with our book covers
      */
 
-    val filtered = group.groupEntries.filterIsInstance<FeedEntry.FeedEntryOPDS>()
-    this.scrollView.adapter = CatalogLaneAdapter(
-      filtered, coverLoader, onBookSelected
-    )
+    val catalogLaneAdapter =
+      CatalogLaneAdapter(
+        coverLoader = this.coverLoader,
+        onBookSelected = this.onBookSelected
+      )
+
+    catalogLaneAdapter.submitList(group.groupEntries.filterIsInstance<FeedEntry.FeedEntryOPDS>())
+    this.scrollView.adapter = catalogLaneAdapter
   }
 
   fun unbind() {

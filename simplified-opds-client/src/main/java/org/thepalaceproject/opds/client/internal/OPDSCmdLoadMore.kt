@@ -7,7 +7,12 @@ import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoad
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedGeneral
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderSuccess
 import org.slf4j.LoggerFactory
-import org.thepalaceproject.opds.client.OPDSState
+import org.thepalaceproject.opds.client.OPDSState.Error
+import org.thepalaceproject.opds.client.OPDSState.Initial
+import org.thepalaceproject.opds.client.OPDSState.LoadedFeedEntry
+import org.thepalaceproject.opds.client.OPDSState.LoadedFeedWithGroups
+import org.thepalaceproject.opds.client.OPDSState.LoadedFeedWithoutGroups
+import org.thepalaceproject.opds.client.OPDSState.Loading
 import java.net.URI
 
 internal class OPDSCmdLoadMore : OPDSCmd() {
@@ -19,16 +24,16 @@ internal class OPDSCmdLoadMore : OPDSCmd() {
     context: OPDSCmdContextType
   ) {
     return when (val state = context.state) {
-      is OPDSState.Error,
-      OPDSState.Initial,
-      is OPDSState.Loading,
-      is OPDSState.LoadedFeedEntry,
-      is OPDSState.LoadedFeedWithGroups -> {
+      is Error,
+      is Initial,
+      is Loading,
+      is LoadedFeedEntry,
+      is LoadedFeedWithGroups -> {
         this.taskFuture.complete(Unit)
         Unit
       }
 
-      is OPDSState.LoadedFeedWithoutGroups -> {
+      is LoadedFeedWithoutGroups -> {
         this.fetchNextFeed(context, state)
       }
     }
@@ -36,7 +41,7 @@ internal class OPDSCmdLoadMore : OPDSCmd() {
 
   private fun fetchNextFeed(
     context: OPDSCmdContextType,
-    state: OPDSState.LoadedFeedWithoutGroups
+    state: LoadedFeedWithoutGroups
   ) {
     val next = state.feed.feedNext
     if (next == null) {
@@ -64,7 +69,7 @@ internal class OPDSCmdLoadMore : OPDSCmd() {
 
   private fun processFeed(
     context: OPDSCmdContextType,
-    state: OPDSState.LoadedFeedWithoutGroups,
+    state: LoadedFeedWithoutGroups,
     uri: URI,
     throwable: Throwable?,
     result: FeedLoaderResult?

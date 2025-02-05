@@ -2,11 +2,12 @@ package org.librarysimplified.ui.catalog
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedGroup
-import org.slf4j.LoggerFactory
 import java.net.URI
 
 /**
@@ -14,24 +15,42 @@ import java.net.URI
  */
 
 class CatalogFeedWithGroupsAdapter(
-  private val groups: List<FeedGroup>,
-  private val coverLoader: BookCoverProviderType,
+  private val covers: BookCoverProviderType,
   private val onFeedSelected: (title: String, uri: URI) -> Unit,
   private val onBookSelected: (FeedEntry.FeedEntryOPDS) -> Unit
-) : RecyclerView.Adapter<CatalogFeedWithGroupsLaneViewHolder>() {
+) : ListAdapter<FeedGroup, CatalogFeedWithGroupsLaneViewHolder>(diffCallback) {
 
-  private val logger =
-    LoggerFactory.getLogger(CatalogFeedWithGroupsAdapter::class.java)
+  companion object {
+    private val diffCallback =
+      object : DiffUtil.ItemCallback<FeedGroup>() {
+        override fun areContentsTheSame(
+          oldItem: FeedGroup,
+          newItem: FeedGroup
+        ): Boolean {
+          if (oldItem.groupEntries.size == newItem.groupEntries.size) {
+            for (index in 0 until oldItem.groupEntries.size) {
+              if (oldItem.groupEntries[index] != newItem.groupEntries[index]) {
+                return false
+              }
+            }
+            return true
+          }
+          return false
+        }
 
-  private var viewHolders = 0
+        override fun areItemsTheSame(
+          oldItem: FeedGroup,
+          newItem: FeedGroup
+        ): Boolean {
+          return oldItem.groupURI == newItem.groupURI
+        }
+      }
+  }
 
   override fun onCreateViewHolder(
     parent: ViewGroup,
     viewType: Int
   ): CatalogFeedWithGroupsLaneViewHolder {
-    ++this.viewHolders
-    this.logger.trace("creating view holder ($viewHolders)")
-
     val inflater =
       LayoutInflater.from(parent.context)
     val item =
@@ -39,24 +58,28 @@ class CatalogFeedWithGroupsAdapter(
 
     return CatalogFeedWithGroupsLaneViewHolder(
       parent = item,
-      coverLoader = this.coverLoader,
+      coverLoader = this.covers,
       onFeedSelected = this.onFeedSelected,
       onBookSelected = this.onBookSelected
     )
   }
 
-  override fun onViewRecycled(holder: CatalogFeedWithGroupsLaneViewHolder) {
-    super.onViewRecycled(holder)
-    holder.unbind()
-  }
-
-  override fun getItemCount(): Int =
-    this.groups.size
-
   override fun onBindViewHolder(
     holder: CatalogFeedWithGroupsLaneViewHolder,
     position: Int
   ) {
-    holder.bindTo(this.groups[position])
+    holder.bindTo(this.getItem(position))
+  }
+
+  override fun onViewRecycled(
+    holder: CatalogFeedWithGroupsLaneViewHolder
+  ) {
+    holder.unbind()
+  }
+
+  override fun onDetachedFromRecyclerView(
+    recyclerView: RecyclerView
+  ) {
+    // Nothing yet.
   }
 }

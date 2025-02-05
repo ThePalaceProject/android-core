@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory
 import org.thepalaceproject.opds.client.OPDSClientRequest
 import org.thepalaceproject.opds.client.OPDSState
 import org.thepalaceproject.opds.client.OPDSState.OPDSStateHistoryParticipant
+import java.util.UUID
 
 internal class OPDSCmdExecuteRequest(
   private val request: OPDSClientRequest
@@ -38,7 +39,12 @@ internal class OPDSCmdExecuteRequest(
     context: OPDSCmdContextType,
     request: OPDSClientRequest.NewFeed
   ) {
-    context.setState(OPDSState.Loading(request))
+    context.setState(
+      OPDSState.Loading(
+        id = UUID.randomUUID(),
+        request = request
+      )
+    )
 
     val future0 =
       context.feedLoader.fetchURI(
@@ -86,6 +92,7 @@ internal class OPDSCmdExecuteRequest(
       this.logger.warn("Task failure: ", throwable)
       context.setState(
         OPDSState.Error(
+          id = UUID.randomUUID(),
           message = this.feedException(request, throwable),
           request = request
         )
@@ -98,6 +105,7 @@ internal class OPDSCmdExecuteRequest(
       null -> {
         context.setState(
           OPDSState.Error(
+            id = UUID.randomUUID(),
             message = this.feedException(request, NullPointerException()),
             request = request
           )
@@ -109,6 +117,7 @@ internal class OPDSCmdExecuteRequest(
       is FeedLoaderFailedAuthentication -> {
         context.setState(
           OPDSState.Error(
+            id = UUID.randomUUID(),
             message = result,
             request = request
           )
@@ -119,6 +128,7 @@ internal class OPDSCmdExecuteRequest(
       is FeedLoaderFailedGeneral -> {
         context.setState(
           OPDSState.Error(
+            id = UUID.randomUUID(),
             message = result,
             request = request
           )
@@ -130,11 +140,19 @@ internal class OPDSCmdExecuteRequest(
         val newState: OPDSStateHistoryParticipant =
           when (val feed = result.feed) {
             is Feed.FeedWithGroups -> {
-              OPDSState.LoadedFeedWithGroups(request, feed)
+              OPDSState.LoadedFeedWithGroups(
+                id = UUID.randomUUID(),
+                request = request,
+                feed = feed
+              )
             }
 
             is Feed.FeedWithoutGroups -> {
-              OPDSState.LoadedFeedWithoutGroups(request, feed)
+              OPDSState.LoadedFeedWithoutGroups(
+                id = UUID.randomUUID(),
+                request = request,
+                feed = feed
+              )
             }
           }
 
@@ -149,7 +167,12 @@ internal class OPDSCmdExecuteRequest(
     request: OPDSClientRequest.ExistingEntry
   ) {
     try {
-      context.setState(OPDSState.LoadedFeedEntry(request))
+      context.setState(
+        OPDSState.LoadedFeedEntry(
+          id = UUID.randomUUID(),
+          request = request
+        )
+      )
     } catch (e: Throwable) {
       this.taskFuture.completeExceptionally(e)
     } finally {

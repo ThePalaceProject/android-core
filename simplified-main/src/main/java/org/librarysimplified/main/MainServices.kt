@@ -18,6 +18,7 @@ import org.librarysimplified.services.api.ServiceDirectory
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.catalog.CatalogCoverBadgeImages
+import org.librarysimplified.ui.catalog.CatalogOPDSClients
 import org.nypl.drm.core.AdobeAdeptExecutorType
 import org.nypl.drm.core.AxisNowServiceFactoryType
 import org.nypl.drm.core.AxisNowServiceType
@@ -115,6 +116,8 @@ import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.nypl.simplified.ui.thread.api.UIThreadServiceType
 import org.readium.r2.lcp.LcpService
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.opds.client.OPDSClient
+import org.thepalaceproject.opds.client.OPDSClientParameters
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -174,9 +177,18 @@ internal object MainServices {
     this.logger.debug("directoryStorageDocuments:             {}", directoryStorageDocuments)
     this.logger.debug("directoryStorageProfiles:              {}", directoryStorageProfiles)
     this.logger.debug("directoryStorageTimeTracking:          {}", directoryStorageTimeTracking)
-    this.logger.debug("directoryStorageTimeTrackingDebug:     {}", directoryStorageTimeTrackingDebug)
-    this.logger.debug("directoryStorageTimeTrackingSender:    {}", directoryStorageTimeTrackingSender)
-    this.logger.debug("directoryStorageTimeTrackingCollector: {}", directoryStorageTimeTrackingCollector)
+    this.logger.debug(
+      "directoryStorageTimeTrackingDebug:     {}",
+      directoryStorageTimeTrackingDebug
+    )
+    this.logger.debug(
+      "directoryStorageTimeTrackingSender:    {}",
+      directoryStorageTimeTrackingSender
+    )
+    this.logger.debug(
+      "directoryStorageTimeTrackingCollector: {}",
+      directoryStorageTimeTrackingCollector
+    )
 
     /*
      * Make sure the required directories exist. There is no sane way to
@@ -382,7 +394,6 @@ internal object MainServices {
     http: LSHTTPClientType,
     opdsFeedParser: OPDSFeedParserType,
     bookFormatSupport: BookFormatSupportType,
-    bookRegistry: BookRegistryType,
     bundledContent: BundledContentResolverType,
     contentResolver: ContentResolverType
   ): FeedLoaderType {
@@ -633,11 +644,12 @@ internal object MainServices {
         serviceConstructor = { ScreenSizeInformation(context.resources) }
       )
 
-    addService(
-      message = strings.bootingGeneral("UI thread"),
-      interfaceType = UIThreadServiceType::class.java,
-      serviceConstructor = { MainUIThreadService() }
-    )
+    val uiThread =
+      addService(
+        message = strings.bootingGeneral("UI thread"),
+        interfaceType = UIThreadServiceType::class.java,
+        serviceConstructor = { MainUIThreadService() }
+      )
 
     val bookRegistry =
       addService(
@@ -833,20 +845,20 @@ internal object MainServices {
         }
       )
 
-    addService(
-      message = strings.bootingGeneral("feed loader"),
-      interfaceType = FeedLoaderType::class.java,
-      serviceConstructor = {
-        this.createFeedLoader(
-          bookFormatSupport = bookFormatService,
-          bookRegistry = bookRegistry,
-          bundledContent = bundledContent,
-          contentResolver = contentResolver,
-          http = lsHTTP,
-          opdsFeedParser = opdsFeedParser
-        )
-      }
-    )
+    val feedLoader =
+      addService(
+        message = strings.bootingGeneral("feed loader"),
+        interfaceType = FeedLoaderType::class.java,
+        serviceConstructor = {
+          this.createFeedLoader(
+            http = lsHTTP,
+            opdsFeedParser = opdsFeedParser,
+            bookFormatSupport = bookFormatService,
+            bundledContent = bundledContent,
+            contentResolver = contentResolver
+          )
+        }
+      )
 
     addService(
       message = strings.bootingGeneral("patron user profile parsers"),
@@ -985,6 +997,17 @@ internal object MainServices {
       serviceConstructor = { NetworkConnectivity.create(context) }
     )
 
+    addService(
+      message = strings.bootingGeneral("book cover provider"),
+      interfaceType = CatalogOPDSClients::class.java,
+      serviceConstructor = {
+        createCatalogOPDSClients(
+          uiThread = uiThread,
+          feedLoader = feedLoader
+        )
+      }
+    )
+
     this.showThreads()
 
     this.publishApplicationStartupEvent(context, analytics)
@@ -993,6 +1016,47 @@ internal object MainServices {
     this.logger.debug("boot completed")
     onProgress.invoke(BootEvent.BootCompleted(strings.bootCompleted))
     return finalServices
+  }
+
+  private fun createCatalogOPDSClients(
+    uiThread: UIThreadServiceType,
+    feedLoader: FeedLoaderType
+  ): CatalogOPDSClients {
+    val mainClient =
+      OPDSClient.create(
+        OPDSClientParameters(
+          name = "Main",
+          runOnUI = uiThread::runOnUIThread,
+          checkOnUI = uiThread::checkIsUIThread,
+          feedLoader = feedLoader
+        )
+      )
+
+    val booksClient =
+      OPDSClient.create(
+        OPDSClientParameters(
+          name = "Books",
+          runOnUI = uiThread::runOnUIThread,
+          checkOnUI = uiThread::checkIsUIThread,
+          feedLoader = feedLoader
+        )
+      )
+
+    val holdsClient =
+      OPDSClient.create(
+        OPDSClientParameters(
+          name = "Holds",
+          runOnUI = uiThread::runOnUIThread,
+          checkOnUI = uiThread::checkIsUIThread,
+          feedLoader = feedLoader
+        )
+      )
+
+    return CatalogOPDSClients(
+      mainClient = mainClient,
+      booksClient = booksClient,
+      holdsClient = holdsClient
+    )
   }
 
   private fun createAdobeExecutor(
