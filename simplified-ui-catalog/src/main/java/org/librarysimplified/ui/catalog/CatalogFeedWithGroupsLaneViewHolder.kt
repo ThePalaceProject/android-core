@@ -4,6 +4,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedGroup
@@ -15,7 +16,7 @@ import java.net.URI
 class CatalogFeedWithGroupsLaneViewHolder(
   private val parent: View,
   private val coverLoader: BookCoverProviderType,
-  private val onFeedSelected: (title: String, uri: URI) -> Unit,
+  private val onFeedSelected: (accountID: AccountID, title: String, uri: URI) -> Unit,
   private val onBookSelected: (FeedEntry.FeedEntryOPDS) -> Unit
 ) : RecyclerView.ViewHolder(parent) {
 
@@ -23,6 +24,8 @@ class CatalogFeedWithGroupsLaneViewHolder(
     this.parent.findViewById<View>(R.id.feedLaneTitleContainer)
   private val title =
     this.parent.findViewById<TextView>(R.id.feedLaneTitle)
+  private val more =
+    this.parent.findViewById<TextView>(R.id.feedLaneMore)
   private val scrollView =
     this.parent.findViewById<RecyclerView>(R.id.feedLaneCoversScroll)
 
@@ -40,10 +43,15 @@ class CatalogFeedWithGroupsLaneViewHolder(
     }
   }
 
-  fun bindTo(group: FeedGroup) {
+  fun bindTo(
+    group: FeedGroup
+  ) {
     this.title.text = group.groupTitle
     this.titleContainer.setOnClickListener {
-      this.onFeedSelected.invoke(group.groupTitle, group.groupURI)
+      this.onFeedSelected.invoke(group.account, group.groupTitle, group.groupURI)
+    }
+    this.more.setOnClickListener {
+      this.onFeedSelected.invoke(group.account, group.groupTitle, group.groupURI)
     }
 
     /*

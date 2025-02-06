@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedGroup
@@ -16,7 +17,7 @@ import java.net.URI
 
 class CatalogFeedWithGroupsAdapter(
   private val covers: BookCoverProviderType,
-  private val onFeedSelected: (title: String, uri: URI) -> Unit,
+  private val onFeedSelected: (accountID: AccountID, title: String, uri: URI) -> Unit,
   private val onBookSelected: (FeedEntry.FeedEntryOPDS) -> Unit
 ) : ListAdapter<FeedGroup, CatalogFeedWithGroupsLaneViewHolder>(diffCallback) {
 

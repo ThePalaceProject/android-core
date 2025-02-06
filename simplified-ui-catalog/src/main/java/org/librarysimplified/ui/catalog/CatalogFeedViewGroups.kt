@@ -14,11 +14,13 @@ import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedFacet
 import org.nypl.simplified.feeds.api.FeedFacets
 import org.nypl.simplified.feeds.api.FeedSearch
+import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.thepalaceproject.theme.core.PalaceTabButtons
 
 class CatalogFeedViewGroups(
   private val window: Window,
   override val root: ViewGroup,
+  private val screenSize: ScreenSizeInformationType,
   private val onFacetSelected: (FeedFacet) -> Unit,
   private val onSearchSubmitted: (FeedSearch, String) -> Unit
 ) : CatalogFeedView() {
@@ -50,6 +52,9 @@ class CatalogFeedViewGroups(
     this.listView.setHasFixedSize(true)
     (this.listView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
     this.listView.setItemViewCacheSize(8)
+    this.listView.addItemDecoration(
+      CatalogFeedWithGroupsDecorator(this.screenSize.dpToPixels(16).toInt())
+    )
   }
 
   fun configureTabs(
@@ -73,7 +78,7 @@ class CatalogFeedViewGroups(
       button.text = facet.title
       button.setOnClickListener {
         this.onFacetSelected(facet)
-        updateSelectedFacet(facetTabs = this.tabs, index = index)
+        this.updateSelectedFacet(facetTabs = this.tabs, index = index)
       }
     }
 
@@ -108,12 +113,14 @@ class CatalogFeedViewGroups(
       window: Window,
       layoutInflater: LayoutInflater,
       container: ViewGroup,
+      screenSize: ScreenSizeInformationType,
       onFacetSelected: (FeedFacet) -> Unit,
       onSearchSubmitted: (FeedSearch, String) -> Unit
     ): CatalogFeedViewGroups {
       return CatalogFeedViewGroups(
         window = window,
         root = layoutInflater.inflate(R.layout.catalog_feed_groups, container, true) as ViewGroup,
+        screenSize = screenSize,
         onFacetSelected = onFacetSelected,
         onSearchSubmitted = onSearchSubmitted,
       )

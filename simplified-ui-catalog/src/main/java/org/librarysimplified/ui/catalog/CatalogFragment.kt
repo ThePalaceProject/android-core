@@ -10,6 +10,7 @@ import com.io7m.jfunctional.Some
 import com.io7m.jmulticlose.core.CloseableCollection
 import io.reactivex.android.schedulers.AndroidSchedulers
 import org.librarysimplified.services.api.Services
+import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
@@ -161,10 +162,28 @@ sealed class CatalogFragment : Fragment() {
   }
 
   private fun onFeedSelected(
+    accountID: AccountID,
     title: String,
     address: URI
   ) {
-    // Nothing yet.
+    this.logger.debug("onFeedSelected: \"{}\" {}", title, address)
+
+    try {
+      val account =
+        this.profiles.profileCurrent()
+          .account(accountID)
+
+      this.opdsClient.goTo(
+        OPDSClientRequest.NewFeed(
+          accountID = accountID,
+          uri = address,
+          credentials = account.loginState.credentials,
+          method = "GET"
+        )
+      )
+    } catch (e: Throwable) {
+      this.logger.warn("Error fetching account/feed: ", e)
+    }
   }
 
   private fun onInfiniteFeedReachedNearEnd() {
@@ -440,11 +459,12 @@ sealed class CatalogFragment : Fragment() {
   ) {
     val view =
       CatalogFeedViewGroups.create(
-        window = this.requireActivity().window,
-        layoutInflater = this.layoutInflater,
         container = this.contentContainer,
+        layoutInflater = this.layoutInflater,
+        onFacetSelected = this::onFacetSelected,
         onSearchSubmitted = this::onSearchSubmitted,
-        onFacetSelected = this::onFacetSelected
+        screenSize = this.screenSize,
+        window = this.requireActivity().window,
       )
 
     view.listView.adapter = this.entriesGroupedAdapter

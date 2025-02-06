@@ -4,6 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="@dimen/cover_thumbnail_height"
+    android:foreground="?attr/selectableItemBackground"
+    android:clickable="true"
     app:cardCornerRadius="@dimen/cover_corner_radius"
     app:cardElevation="2dp">
 
@@ -16,4 +18,5 @@
         android:maxWidth="@dimen/catalogLaneCoverMaximumWidth"
         android:scaleType="fitXY"
         app:srcCompat="@drawable/cover_loading" />
+
 </androidx.cardview.widget.CardView>
