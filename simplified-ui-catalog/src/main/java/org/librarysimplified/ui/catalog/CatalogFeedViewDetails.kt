@@ -9,11 +9,15 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.io7m.jfunctional.Some
 import org.joda.time.DateTime
 import org.joda.time.Duration
 import org.joda.time.format.DateTimeFormatterBuilder
+import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.api.BookFormat.BookFormatAudioBook
 import org.nypl.simplified.books.api.BookFormat.BookFormatEPUB
@@ -48,12 +52,17 @@ import org.nypl.simplified.feeds.api.FeedLoaderResult
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedAuthentication
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedGeneral
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderSuccess
+import org.nypl.simplified.ui.screen.ScreenSizeInformationType
+import java.net.URI
 
 class CatalogFeedViewDetails(
   override val root: ViewGroup,
+  private val screenSize: ScreenSizeInformationType,
   private val buttonCreator: CatalogButtons,
   private val layoutInflater: LayoutInflater,
   private val covers: BookCoverProviderType,
+  private val onFeedSelected: (accountID: AccountID, title: String, uri: URI) -> Unit,
+  private val onBookSelected: (FeedEntry.FeedEntryOPDS) -> Unit,
   private val onBookPreviewOpenRequested: (CatalogBookStatus<*>) -> Unit,
   private val onBookBorrowRequested: (CatalogBorrowParameters) -> Unit,
   private val onBookReserveRequested: (CatalogBorrowParameters) -> Unit,
@@ -92,37 +101,59 @@ class CatalogFeedViewDetails(
       .appendSecondOfMinute(2)
       .toFormatter()
 
-  val title: TextView =
+  private val title: TextView =
     this.root.findViewById(R.id.bookDetailTitle)
-  val authors: TextView =
+  private val authors: TextView =
     this.root.findViewById(R.id.bookDetailAuthors)
-  val buttons: LinearLayout =
+  private val buttons: LinearLayout =
     this.root.findViewById(R.id.bookDetailButtons)
-  val cover: ImageView =
+  private val cover: ImageView =
     this.root.findViewById(R.id.bookDetailCoverImage)
-  val description: TextView =
+  private val description: TextView =
     this.root.findViewById(R.id.bookDetailDescriptionText)
-  val seeMore: TextView =
+  private val seeMore: TextView =
     this.root.findViewById(R.id.seeMoreText)
-  val metadata: LinearLayout =
+  private val metadata: LinearLayout =
     this.root.findViewById(R.id.bookDetailMetadataTable)
-  val relatedLayout: FrameLayout =
-    this.root.findViewById(R.id.bookDetailRelatedBooksContainer)
 
-  val statusIdle: ViewGroup =
+  private val statusIdle: ViewGroup =
     this.root.findViewById(R.id.bookDetailStatusIdle)
-  val statusFailed: ViewGroup =
+  private val statusFailed: ViewGroup =
     this.root.findViewById(R.id.bookDetailStatusFailed)
-  val statusInProgress: ViewGroup =
+  private val statusInProgress: ViewGroup =
     this.root.findViewById(R.id.bookDetailStatusInProgress)
 
-  val statusIdleText: TextView =
+  private val statusIdleText: TextView =
     this.statusIdle.findViewById(R.id.idleText)
 
-  val statusInProgressText: TextView =
+  private val statusInProgressText: TextView =
     this.statusInProgress.findViewById(R.id.inProgressText)
-  val statusInProgressBar: ProgressBar =
+  private val statusInProgressBar: ProgressBar =
     this.statusInProgress.findViewById(R.id.inProgressBar)
+
+  private val relatedLayout: FrameLayout =
+    this.root.findViewById(R.id.bookDetailRelatedBooksContainer)
+  private val relatedListView: RecyclerView =
+    this.root.findViewById(R.id.relatedBooksList)
+  private val relatedLoading: ProgressBar =
+    this.root.findViewById(R.id.feedLoadProgress)
+  private val relatedAdapter =
+    CatalogFeedWithGroupsAdapter(
+      covers = this.covers,
+      onFeedSelected = this.onFeedSelected,
+      onBookSelected = this.onBookSelected
+    )
+
+  init {
+    this.relatedListView.layoutManager = LinearLayoutManager(this.root.context)
+    this.relatedListView.setHasFixedSize(true)
+    (this.relatedListView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+    this.relatedListView.setItemViewCacheSize(8)
+    this.relatedListView.addItemDecoration(
+      CatalogFeedWithGroupsDecorator(this.screenSize.dpToPixels(16).toInt())
+    )
+    this.relatedListView.adapter = this.relatedAdapter
+  }
 
   private fun configureDescription(
     newEntry: FeedEntry.FeedEntryOPDS
@@ -268,6 +299,8 @@ class CatalogFeedViewDetails(
   fun bind(
     newEntry: FeedEntry.FeedEntryOPDS
   ) {
+    this.relatedLoading.visibility =
+      View.VISIBLE
     this.statusFailed.visibility =
       View.INVISIBLE
     this.statusInProgress.visibility =
@@ -314,9 +347,12 @@ class CatalogFeedViewDetails(
       }
 
       is FeedLoaderSuccess -> {
-        when (feedResult.feed) {
+        when (val feed = feedResult.feed) {
           is FeedWithGroups -> {
-            this.relatedLayout.visibility = View.GONE
+            this.relatedAdapter.submitList(feed.feedGroupsInOrder)
+            this.relatedLayout.visibility = View.VISIBLE
+            this.relatedLoading.visibility = View.INVISIBLE
+            this.relatedListView.visibility = View.VISIBLE
           }
 
           is FeedWithoutGroups -> {
@@ -831,6 +867,9 @@ class CatalogFeedViewDetails(
       container: ViewGroup,
       covers: BookCoverProviderType,
       buttonCreator: CatalogButtons,
+      screenSize: ScreenSizeInformationType,
+      onFeedSelected: (accountID: AccountID, title: String, uri: URI) -> Unit,
+      onBookSelected: (FeedEntry.FeedEntryOPDS) -> Unit,
       onBookPreviewOpenRequested: (CatalogBookStatus<*>) -> Unit,
       onBookBorrowRequested: (CatalogBorrowParameters) -> Unit,
       onBookReserveRequested: (CatalogBorrowParameters) -> Unit,
@@ -842,19 +881,22 @@ class CatalogFeedViewDetails(
       onBookCanBeDeleted: (CatalogBookStatus<*>) -> Boolean
     ): CatalogFeedViewDetails {
       return CatalogFeedViewDetails(
-        layoutInflater = layoutInflater,
-        root = layoutInflater.inflate(R.layout.book_detail, container, true) as ViewGroup,
-        covers = covers,
         buttonCreator = buttonCreator,
-        onBookPreviewOpenRequested = onBookPreviewOpenRequested,
+        covers = covers,
+        layoutInflater = layoutInflater,
         onBookBorrowRequested = onBookBorrowRequested,
+        onBookCanBeDeleted = onBookCanBeDeleted,
+        onBookCanBeRevoked = onBookCanBeRevoked,
+        onBookDeleteRequested = onBookDeleteRequested,
+        onBookPreviewOpenRequested = onBookPreviewOpenRequested,
         onBookReserveRequested = onBookReserveRequested,
-        onBookViewerOpen = onBookViewerOpen,
         onBookResetStatusInitial = onBookResetStatusInitial,
         onBookRevokeRequested = onBookRevokeRequested,
-        onBookDeleteRequested = onBookDeleteRequested,
-        onBookCanBeRevoked = onBookCanBeRevoked,
-        onBookCanBeDeleted = onBookCanBeDeleted
+        onBookSelected = onBookSelected,
+        onBookViewerOpen = onBookViewerOpen,
+        onFeedSelected = onFeedSelected,
+        root = layoutInflater.inflate(R.layout.book_detail, container, true) as ViewGroup,
+        screenSize = screenSize,
       )
     }
   }

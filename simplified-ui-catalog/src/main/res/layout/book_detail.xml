@@ -199,7 +199,7 @@
         <FrameLayout
             android:id="@+id/bookDetailRelatedBooksContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="192dp">
 
             <include
                 layout="@layout/feed_loading"
@@ -208,11 +208,8 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/relatedBooksList"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:clipChildren="false"
-                android:clipToPadding="false"
-                android:overScrollMode="never" />
+                android:layout_height="192dp"
+                android:layout_marginBottom="16dp" />
 
             <View
                 android:layout_width="match_parent"

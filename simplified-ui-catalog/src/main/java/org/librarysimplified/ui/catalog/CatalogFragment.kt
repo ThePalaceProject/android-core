@@ -322,19 +322,22 @@ sealed class CatalogFragment : Fragment() {
   ) {
     val view =
       CatalogFeedViewDetails.create(
-        layoutInflater = this.layoutInflater,
+        buttonCreator = this.buttonCreator,
         container = this.contentContainer,
         covers = this.covers,
-        buttonCreator = this.buttonCreator,
-        onBookPreviewOpenRequested = this::onBookPreviewOpenRequested,
+        layoutInflater = this.layoutInflater,
         onBookBorrowRequested = this::onBookBorrowRequested,
+        onBookCanBeDeleted = this::onBookCanBeDeleted,
+        onBookCanBeRevoked = this::onBookCanBeRevoked,
+        onBookDeleteRequested = this::onBookDeleteRequested,
+        onBookPreviewOpenRequested = this::onBookPreviewOpenRequested,
         onBookReserveRequested = this::onBookReserveRequested,
-        onBookViewerOpen = this::onBookViewerOpen,
         onBookResetStatusInitial = this::onBookResetStatusInitial,
         onBookRevokeRequested = this::onBookRevokeRequested,
-        onBookDeleteRequested = this::onBookDeleteRequested,
-        onBookCanBeRevoked = this::onBookCanBeRevoked,
-        onBookCanBeDeleted = this::onBookCanBeDeleted
+        onBookSelected = this::onBookSelected,
+        onBookViewerOpen = this::onBookViewerOpen,
+        onFeedSelected = this::onFeedSelected,
+        screenSize = this.screenSize,
       )
 
     when (val entry = this.opdsClient.entry.get()) {
