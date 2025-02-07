@@ -18,11 +18,13 @@ import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.thepalaceproject.theme.core.PalaceTabButtons
 
 class CatalogFeedViewGroups(
-  private val window: Window,
   override val root: ViewGroup,
-  private val screenSize: ScreenSizeInformationType,
   private val onFacetSelected: (FeedFacet) -> Unit,
-  private val onSearchSubmitted: (FeedSearch, String) -> Unit
+  private val onSearchSubmitted: (FeedSearch, String) -> Unit,
+  private val onToolbarBackPressed: () -> Unit,
+  private val onToolbarLogoPressed: () -> Unit,
+  private val screenSize: ScreenSizeInformationType,
+  private val window: Window,
 ) : CatalogFeedView() {
 
   val swipeRefresh =
@@ -40,6 +42,8 @@ class CatalogFeedViewGroups(
       logo = this.root.findViewById(R.id.catalogGroupsToolbarLogo),
       logoTouch = this.root.findViewById(R.id.catalogGroupsToolbarLogoTouch),
       onSearchSubmitted = this.onSearchSubmitted,
+      onToolbarBackPressed = this.onToolbarBackPressed,
+      onToolbarLogoPressed = this.onToolbarLogoPressed,
       searchIcon = this.root.findViewById(R.id.catalogGroupsToolbarSearchIcon),
       searchText = this.root.findViewById(R.id.catalogGroupsToolbarSearchText),
       searchTouch = this.root.findViewById(R.id.catalogGroupsToolbarSearchIconTouch),
@@ -110,19 +114,23 @@ class CatalogFeedViewGroups(
 
   companion object {
     fun create(
-      window: Window,
-      layoutInflater: LayoutInflater,
       container: ViewGroup,
-      screenSize: ScreenSizeInformationType,
+      layoutInflater: LayoutInflater,
       onFacetSelected: (FeedFacet) -> Unit,
-      onSearchSubmitted: (FeedSearch, String) -> Unit
+      onSearchSubmitted: (FeedSearch, String) -> Unit,
+      onToolbarBackPressed: () -> Unit,
+      onToolbarLogoPressed: () -> Unit,
+      screenSize: ScreenSizeInformationType,
+      window: Window,
     ): CatalogFeedViewGroups {
       return CatalogFeedViewGroups(
-        window = window,
-        root = layoutInflater.inflate(R.layout.catalog_feed_groups, container, true) as ViewGroup,
-        screenSize = screenSize,
         onFacetSelected = onFacetSelected,
         onSearchSubmitted = onSearchSubmitted,
+        onToolbarBackPressed = onToolbarBackPressed,
+        onToolbarLogoPressed = onToolbarLogoPressed,
+        root = layoutInflater.inflate(R.layout.catalog_feed_groups, container, true) as ViewGroup,
+        screenSize = screenSize,
+        window = window,
       )
     }
   }

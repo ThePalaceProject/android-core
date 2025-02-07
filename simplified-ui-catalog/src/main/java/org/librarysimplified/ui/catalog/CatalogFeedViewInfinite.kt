@@ -29,10 +29,12 @@ import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.thepalaceproject.theme.core.PalaceTabButtons
 
 class CatalogFeedViewInfinite(
-  private val window: Window,
   override val root: ViewGroup,
   private val onFacetSelected: (FeedFacet) -> Unit,
-  private val onSearchSubmitted: (FeedSearch, String) -> Unit
+  private val onSearchSubmitted: (FeedSearch, String) -> Unit,
+  private val onToolbarBackPressed: () -> Unit,
+  private val onToolbarLogoPressed: () -> Unit,
+  private val window: Window,
 ) : CatalogFeedView() {
 
   val swipeRefresh =
@@ -61,6 +63,8 @@ class CatalogFeedViewInfinite(
       logo = this.root.findViewById(R.id.catalogFeedToolbarLogo),
       logoTouch = this.root.findViewById(R.id.catalogFeedToolbarLogoTouch),
       onSearchSubmitted = this.onSearchSubmitted,
+      onToolbarBackPressed = this.onToolbarBackPressed,
+      onToolbarLogoPressed = this.onToolbarLogoPressed,
       searchIcon = this.root.findViewById(R.id.catalogFeedToolbarSearchIcon),
       searchText = this.root.findViewById(R.id.catalogFeedToolbarSearchText),
       searchTouch = this.root.findViewById(R.id.catalogFeedToolbarSearchIconTouch),
@@ -83,13 +87,17 @@ class CatalogFeedViewInfinite(
       layoutInflater: LayoutInflater,
       container: ViewGroup,
       onFacetSelected: (FeedFacet) -> Unit,
-      onSearchSubmitted: (FeedSearch, String) -> Unit
+      onSearchSubmitted: (FeedSearch, String) -> Unit,
+      onToolbarBackPressed: () -> Unit,
+      onToolbarLogoPressed: () -> Unit,
     ): CatalogFeedViewInfinite {
       return CatalogFeedViewInfinite(
-        window = window,
-        root = layoutInflater.inflate(R.layout.catalog_feed_infinite, container, true) as ViewGroup,
         onFacetSelected = onFacetSelected,
-        onSearchSubmitted = onSearchSubmitted
+        onSearchSubmitted = onSearchSubmitted,
+        onToolbarBackPressed = onToolbarBackPressed,
+        onToolbarLogoPressed = onToolbarLogoPressed,
+        root = layoutInflater.inflate(R.layout.catalog_feed_infinite, container, true) as ViewGroup,
+        window = window,
       )
     }
   }

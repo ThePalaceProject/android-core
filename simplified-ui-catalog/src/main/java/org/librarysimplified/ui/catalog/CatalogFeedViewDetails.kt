@@ -4,6 +4,7 @@ import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -57,21 +58,24 @@ import java.net.URI
 
 class CatalogFeedViewDetails(
   override val root: ViewGroup,
-  private val screenSize: ScreenSizeInformationType,
   private val buttonCreator: CatalogButtons,
-  private val layoutInflater: LayoutInflater,
   private val covers: BookCoverProviderType,
-  private val onFeedSelected: (accountID: AccountID, title: String, uri: URI) -> Unit,
-  private val onBookSelected: (FeedEntry.FeedEntryOPDS) -> Unit,
-  private val onBookPreviewOpenRequested: (CatalogBookStatus<*>) -> Unit,
+  private val layoutInflater: LayoutInflater,
   private val onBookBorrowRequested: (CatalogBorrowParameters) -> Unit,
+  private val onBookCanBeDeleted: (CatalogBookStatus<*>) -> Boolean,
+  private val onBookCanBeRevoked: (CatalogBookStatus<*>) -> Boolean,
+  private val onBookDeleteRequested: (CatalogBookStatus<*>) -> Unit,
+  private val onBookPreviewOpenRequested: (CatalogBookStatus<*>) -> Unit,
   private val onBookReserveRequested: (CatalogBorrowParameters) -> Unit,
-  private val onBookViewerOpen: (BookFormat) -> Unit,
   private val onBookResetStatusInitial: (CatalogBookStatus<*>) -> Unit,
   private val onBookRevokeRequested: (CatalogBookStatus<*>) -> Unit,
-  private val onBookDeleteRequested: (CatalogBookStatus<*>) -> Unit,
-  private val onBookCanBeRevoked: (CatalogBookStatus<*>) -> Boolean,
-  private val onBookCanBeDeleted: (CatalogBookStatus<*>) -> Boolean,
+  private val onBookSelected: (FeedEntry.FeedEntryOPDS) -> Unit,
+  private val onBookViewerOpen: (BookFormat) -> Unit,
+  private val onFeedSelected: (accountID: AccountID, title: String, uri: URI) -> Unit,
+  private val onToolbarBackPressed: () -> Unit,
+  private val onToolbarLogoPressed: () -> Unit,
+  private val screenSize: ScreenSizeInformationType,
+  private val window: Window,
 ) : CatalogFeedView() {
 
   private val genreUriScheme =
@@ -142,6 +146,20 @@ class CatalogFeedViewDetails(
       covers = this.covers,
       onFeedSelected = this.onFeedSelected,
       onBookSelected = this.onBookSelected
+    )
+
+  val toolbar: CatalogToolbar =
+    CatalogToolbar(
+      logo = this.root.findViewById(R.id.catalogDetailToolbarLogo),
+      logoTouch = this.root.findViewById(R.id.catalogDetailToolbarLogoTouch),
+      onToolbarBackPressed = this.onToolbarBackPressed,
+      onToolbarLogoPressed = this.onToolbarLogoPressed,
+      onSearchSubmitted = { _, _ -> },
+      searchIcon = this.root.findViewById(R.id.catalogDetailToolbarSearchIcon),
+      searchText = this.root.findViewById(R.id.catalogDetailToolbarSearchText),
+      searchTouch = this.root.findViewById(R.id.catalogDetailToolbarSearchIconTouch),
+      text = this.root.findViewById(R.id.catalogDetailToolbarText),
+      window = this.window
     )
 
   init {
@@ -863,24 +881,28 @@ class CatalogFeedViewDetails(
 
   companion object {
     fun create(
-      layoutInflater: LayoutInflater,
+      buttonCreator: CatalogButtons,
       container: ViewGroup,
       covers: BookCoverProviderType,
-      buttonCreator: CatalogButtons,
-      screenSize: ScreenSizeInformationType,
-      onFeedSelected: (accountID: AccountID, title: String, uri: URI) -> Unit,
-      onBookSelected: (FeedEntry.FeedEntryOPDS) -> Unit,
-      onBookPreviewOpenRequested: (CatalogBookStatus<*>) -> Unit,
+      layoutInflater: LayoutInflater,
       onBookBorrowRequested: (CatalogBorrowParameters) -> Unit,
+      onBookCanBeDeleted: (CatalogBookStatus<*>) -> Boolean,
+      onBookCanBeRevoked: (CatalogBookStatus<*>) -> Boolean,
+      onBookDeleteRequested: (CatalogBookStatus<*>) -> Unit,
+      onBookPreviewOpenRequested: (CatalogBookStatus<*>) -> Unit,
       onBookReserveRequested: (CatalogBorrowParameters) -> Unit,
-      onBookViewerOpen: (BookFormat) -> Unit,
       onBookResetStatusInitial: (CatalogBookStatus<*>) -> Unit,
       onBookRevokeRequested: (CatalogBookStatus<*>) -> Unit,
-      onBookDeleteRequested: (CatalogBookStatus<*>) -> Unit,
-      onBookCanBeRevoked: (CatalogBookStatus<*>) -> Boolean,
-      onBookCanBeDeleted: (CatalogBookStatus<*>) -> Boolean
+      onBookSelected: (FeedEntry.FeedEntryOPDS) -> Unit,
+      onBookViewerOpen: (BookFormat) -> Unit,
+      onFeedSelected: (accountID: AccountID, title: String, uri: URI) -> Unit,
+      onToolbarBackPressed: () -> Unit,
+      onToolbarLogoPressed: () -> Unit,
+      screenSize: ScreenSizeInformationType,
+      window: Window,
     ): CatalogFeedViewDetails {
       return CatalogFeedViewDetails(
+        window = window,
         buttonCreator = buttonCreator,
         covers = covers,
         layoutInflater = layoutInflater,
@@ -895,6 +917,8 @@ class CatalogFeedViewDetails(
         onBookSelected = onBookSelected,
         onBookViewerOpen = onBookViewerOpen,
         onFeedSelected = onFeedSelected,
+        onToolbarBackPressed = onToolbarBackPressed,
+        onToolbarLogoPressed = onToolbarLogoPressed,
         root = layoutInflater.inflate(R.layout.book_detail, container, true) as ViewGroup,
         screenSize = screenSize,
       )

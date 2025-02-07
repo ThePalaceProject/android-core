@@ -187,6 +187,7 @@ sealed class CatalogFragment : Fragment() {
   }
 
   private fun onInfiniteFeedReachedNearEnd() {
+    this.uiThread.checkIsUIThread()
     this.opdsClient.loadMore()
   }
 
@@ -337,7 +338,10 @@ sealed class CatalogFragment : Fragment() {
         onBookSelected = this::onBookSelected,
         onBookViewerOpen = this::onBookViewerOpen,
         onFeedSelected = this::onFeedSelected,
+        onToolbarBackPressed = this::onToolbarBackPressed,
+        onToolbarLogoPressed = this::onToolbarLogoPressed,
         screenSize = this.screenSize,
+        window = this.requireActivity().window,
       )
 
     when (val entry = this.opdsClient.entry.get()) {
@@ -388,6 +392,28 @@ sealed class CatalogFragment : Fragment() {
           AutoCloseable { statusSubscription.dispose() }
         )
       }
+    }
+
+    try {
+      val account =
+        this.profiles.profileCurrent()
+          .account(newState.request.entry.accountID)
+
+      val title =
+        when (val e = newState.request.entry) {
+          is FeedEntry.FeedEntryCorrupt -> ""
+          is FeedEntry.FeedEntryOPDS -> e.feedEntry.title
+        }
+
+      view.toolbar.configure(
+        imageLoader = this.imageLoader,
+        accountProvider = account.provider.toDescription(),
+        title = title,
+        search = null,
+        canGoBack = this.opdsClient.hasHistory
+      )
+    } catch (e: Throwable) {
+      // Nothing sensible we can do about this.
     }
 
     this.viewNow = view
@@ -466,6 +492,8 @@ sealed class CatalogFragment : Fragment() {
         layoutInflater = this.layoutInflater,
         onFacetSelected = this::onFacetSelected,
         onSearchSubmitted = this::onSearchSubmitted,
+        onToolbarBackPressed = this::onToolbarBackPressed,
+        onToolbarLogoPressed = this::onToolbarLogoPressed,
         screenSize = this.screenSize,
         window = this.requireActivity().window,
       )
@@ -481,7 +509,8 @@ sealed class CatalogFragment : Fragment() {
       view.toolbar.configure(
         imageLoader = this.imageLoader,
         accountProvider = account.provider.toDescription(),
-        feed = newState.feed,
+        title = newState.feed.feedTitle,
+        search = newState.feed.feedSearch,
         canGoBack = this.opdsClient.hasHistory
       )
     } catch (e: Throwable) {
@@ -505,16 +534,27 @@ sealed class CatalogFragment : Fragment() {
     this.viewNow = view
   }
 
+  private fun onToolbarBackPressed() {
+    this.uiThread.checkIsUIThread()
+    this.opdsClient.goBack()
+  }
+
+  private fun onToolbarLogoPressed() {
+    this.uiThread.checkIsUIThread()
+  }
+
   private fun onStateChangedToInfinite(
     newState: LoadedFeedWithoutGroups
   ) {
     val view =
       CatalogFeedViewInfinite.create(
-        window = this.requireActivity().window,
-        layoutInflater = this.layoutInflater,
         container = this.contentContainer,
+        layoutInflater = this.layoutInflater,
         onFacetSelected = this::onFacetSelected,
-        onSearchSubmitted = this::onSearchSubmitted
+        onSearchSubmitted = this::onSearchSubmitted,
+        onToolbarBackPressed = this::onToolbarBackPressed,
+        onToolbarLogoPressed = this::onToolbarLogoPressed,
+        window = this.requireActivity().window,
       )
 
     try {
@@ -540,7 +580,8 @@ sealed class CatalogFragment : Fragment() {
       view.toolbar.configure(
         imageLoader = this.imageLoader,
         accountProvider = account.provider.toDescription(),
-        feed = newState.feed,
+        title = newState.feed.feedTitle,
+        search = newState.feed.feedSearch,
         canGoBack = this.opdsClient.hasHistory
       )
     } catch (e: Throwable) {
@@ -570,13 +611,14 @@ sealed class CatalogFragment : Fragment() {
     feedSearch: FeedSearch,
     queryText: String
   ) {
+    this.uiThread.checkIsUIThread()
     this.logger.debug("onSearchSubmitted: {}", queryText)
   }
 
   private fun onFacetSelected(
     feedFacet: FeedFacet
   ) {
-    // Nothing yet.
+    this.uiThread.checkIsUIThread()
   }
 
   private fun onStateChangedToError(

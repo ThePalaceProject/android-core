@@ -47,7 +47,7 @@ class CatalogFeedWithGroupsLaneViewHolder(
     group: FeedGroup
   ) {
     this.title.text = group.groupTitle
-    this.titleContainer.setOnClickListener {
+    this.title.setOnClickListener {
       this.onFeedSelected.invoke(group.account, group.groupTitle, group.groupURI)
     }
     this.more.setOnClickListener {

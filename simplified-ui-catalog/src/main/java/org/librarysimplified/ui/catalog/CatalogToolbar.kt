@@ -11,20 +11,21 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import org.nypl.simplified.accounts.api.AccountProviderDescription
-import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedSearch
 import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
 
 class CatalogToolbar(
-  private val window: Window,
-  private val logoTouch: ViewGroup,
   private val logo: ImageView,
-  private val text: TextView,
-  private val searchTouch: ViewGroup,
+  private val logoTouch: ViewGroup,
+  private val onToolbarBackPressed: () -> Unit,
+  private val onToolbarLogoPressed: () -> Unit,
+  private val onSearchSubmitted: (FeedSearch, String) -> Unit,
   private val searchIcon: ImageView,
   private val searchText: EditText,
-  private val onSearchSubmitted: (FeedSearch, String) -> Unit
+  private val searchTouch: ViewGroup,
+  private val text: TextView,
+  private val window: Window,
 ) {
 
   /**
@@ -34,15 +35,15 @@ class CatalogToolbar(
   fun configure(
     imageLoader: ImageLoaderType,
     accountProvider: AccountProviderDescription,
-    feed: Feed,
+    title: String,
+    search: FeedSearch?,
     canGoBack: Boolean
   ) {
     try {
-      this.text.text = feed.feedTitle
+      this.text.text = title
       this.searchIcon.setImageResource(R.drawable.magnifying_glass)
       this.searchText.visibility = View.INVISIBLE
 
-      val search = feed.feedSearch
       if (search != null) {
         this.searchIcon.visibility = View.VISIBLE
         this.searchTouch.setOnClickListener {
@@ -72,6 +73,7 @@ class CatalogToolbar(
 
       if (canGoBack) {
         this.logo.setImageResource(org.thepalaceproject.theme.core.R.drawable.palace_arrow_back_24)
+        this.logoTouch.setOnClickListener { this.onToolbarBackPressed.invoke() }
         return
       }
 
@@ -79,6 +81,7 @@ class CatalogToolbar(
        * If we're at the root of a feed, then display the current account's logo in the toolbar.
        */
 
+      this.logoTouch.setOnClickListener { this.onToolbarLogoPressed.invoke() }
       ImageAccountIcons.loadAccountLogoIntoView(
         loader = imageLoader.loader,
         account = accountProvider,
