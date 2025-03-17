@@ -7,7 +7,7 @@ dependencies {
     implementation(project(":simplified-profiles-controller-api"))
     implementation(project(":simplified-reader-api"))
     implementation(project(":simplified-services-api"))
-    implementation(project(":simplified-ui-accounts"))
+    implementation(project(":simplified-ui"))
     implementation(project(":simplified-ui-branding"))
     implementation(project(":simplified-ui-errorpage"))
     implementation(project(":simplified-ui-listeners-api"))

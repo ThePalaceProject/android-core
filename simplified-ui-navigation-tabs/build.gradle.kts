@@ -9,11 +9,10 @@ dependencies {
     implementation(project(":simplified-feeds-api"))
     implementation(project(":simplified-profiles-api"))
     implementation(project(":simplified-profiles-controller-api"))
-    implementation(project(":simplified-ui-accounts"))
+    implementation(project(":simplified-ui"))
     implementation(project(":simplified-ui-catalog"))
     implementation(project(":simplified-ui-errorpage"))
     implementation(project(":simplified-ui-listeners-api"))
-    implementation(project(":simplified-ui-settings"))
     implementation(project(":simplified-viewer-api"))
     implementation(project(":simplified-viewer-spi"))
 
