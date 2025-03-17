@@ -2,23 +2,16 @@ package org.nypl.simplified.feeds.api
 
 import com.io7m.jfunctional.OptionType
 import com.io7m.jfunctional.Some
-import com.io7m.jnull.NullCheck
 import org.joda.time.DateTime
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.feeds.api.FeedSearch.FeedSearchOpen1_1
-import org.nypl.simplified.opds.core.OPDSAcquisition
-import org.nypl.simplified.opds.core.OPDSAcquisition.Relation.ACQUISITION_BORROW
-import org.nypl.simplified.opds.core.OPDSAcquisition.Relation.ACQUISITION_BUY
-import org.nypl.simplified.opds.core.OPDSAcquisition.Relation.ACQUISITION_GENERIC
-import org.nypl.simplified.opds.core.OPDSAcquisition.Relation.ACQUISITION_OPEN_ACCESS
-import org.nypl.simplified.opds.core.OPDSAcquisition.Relation.ACQUISITION_SAMPLE
-import org.nypl.simplified.opds.core.OPDSAcquisition.Relation.ACQUISITION_SUBSCRIBE
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeed
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSOpenSearch1_1
 import java.net.URI
 import java.util.Collections
+import java.util.Objects
 
 /**
  * The type of mutable feeds.
@@ -310,9 +303,9 @@ sealed class Feed {
       search: OPDSOpenSearch1_1?
     ): FeedWithoutGroups {
       val facetsByGroup =
-        this.constructFacetGroups(feed)
+        this.constructFacetGroups(accountId, feed)
       val facetsOrder =
-        this.constructFacetsOrdered(feed)
+        this.constructFacetsOrdered(accountId, feed)
       val actualSearch =
         if (search != null) {
           FeedSearchOpen1_1(search)
@@ -357,9 +350,9 @@ sealed class Feed {
       search: OPDSOpenSearch1_1?
     ): FeedWithGroups {
       val facetsByGroup =
-        this.constructFacetGroups(feed)
+        this.constructFacetGroups(accountId, feed)
       val facetsOrder =
-        this.constructFacetsOrdered(feed)
+        this.constructFacetsOrdered(accountId, feed)
 
       val actualSearch =
         if (search != null) {
@@ -386,37 +379,32 @@ sealed class Feed {
       )
     }
 
-    private fun constructFacetsOrdered(f: OPDSAcquisitionFeed): MutableList<FeedFacet> {
+    private fun constructFacetsOrdered(
+      accountId: AccountID,
+      f: OPDSAcquisitionFeed
+    ): MutableList<FeedFacet> {
       val facetsOrder = ArrayList<FeedFacet>(4)
       for (ff in f.feedFacetsOrder) {
-        facetsOrder.add(FeedFacet.FeedFacetOPDS(NullCheck.notNull(ff)))
+        facetsOrder.add(FeedFacet.FeedFacetOPDS(accountId, Objects.requireNonNull(ff)))
       }
       return facetsOrder
     }
 
-    private fun constructFacetGroups(feed: OPDSAcquisitionFeed): MutableMap<String, MutableList<FeedFacet>> {
+    private fun constructFacetGroups(
+      accountId: AccountID,
+      feed: OPDSAcquisitionFeed
+    ): MutableMap<String, MutableList<FeedFacet>> {
       val facetsByGroup = HashMap<String, MutableList<FeedFacet>>(4)
       val fMap = feed.feedFacetsByGroup
       for (k in fMap.keys) {
         val fs = fMap[k]!!
         val rs = ArrayList<FeedFacet>(4)
         for (ff in fs) {
-          rs.add(FeedFacet.FeedFacetOPDS(NullCheck.notNull(ff)))
+          rs.add(FeedFacet.FeedFacetOPDS(accountId, Objects.requireNonNull(ff)))
         }
         facetsByGroup[k] = rs
       }
       return facetsByGroup
-    }
-
-    private fun priority(acquisition: OPDSAcquisition): Int {
-      return when (acquisition.relation) {
-        ACQUISITION_BORROW -> 6
-        ACQUISITION_OPEN_ACCESS -> 5
-        ACQUISITION_GENERIC -> 4
-        ACQUISITION_SAMPLE -> 3
-        ACQUISITION_BUY -> 2
-        ACQUISITION_SUBSCRIBE -> 1
-      }
     }
   }
 }

@@ -10,7 +10,9 @@ import com.io7m.jfunctional.Some
 import com.io7m.jmulticlose.core.CloseableCollection
 import io.reactivex.android.schedulers.AndroidSchedulers
 import org.librarysimplified.services.api.Services
+import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
+import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
@@ -541,6 +543,7 @@ sealed class CatalogFragment : Fragment() {
 
   private fun onToolbarLogoPressed() {
     this.uiThread.checkIsUIThread()
+    TODO()
   }
 
   private fun onStateChangedToInfinite(
@@ -613,12 +616,37 @@ sealed class CatalogFragment : Fragment() {
   ) {
     this.uiThread.checkIsUIThread()
     this.logger.debug("onSearchSubmitted: {}", queryText)
+    TODO()
   }
 
   private fun onFacetSelected(
     feedFacet: FeedFacet
   ) {
     this.uiThread.checkIsUIThread()
+
+    when (feedFacet) {
+      is FeedFacet.FeedFacetOPDS -> {
+        val credentials =
+          this.credentialsOf(feedFacet.accountID)
+
+        this.opdsClient.goTo(
+          OPDSClientRequest.NewFeed(
+            accountID = feedFacet.accountID,
+            uri = feedFacet.opdsFacet.uri,
+            credentials = credentials,
+            method = "GET"
+          )
+        )
+      }
+
+      is FeedFacet.FeedFacetPseudo.FilteringForAccount -> {
+        TODO()
+      }
+
+      is FeedFacet.FeedFacetPseudo.Sorting -> {
+        TODO()
+      }
+    }
   }
 
   private fun onStateChangedToError(
@@ -637,16 +665,39 @@ sealed class CatalogFragment : Fragment() {
     val view = CatalogFeedViewEmpty.create(this.layoutInflater, this.contentContainer)
     this.viewNow = view
 
+    val account =
+      this.currentAccount()
+
     this.opdsClient.goTo(
       OPDSClientRequest.NewFeed(
-        accountID = this.profiles.profileCurrent()
-          .preferences()
-          .mostRecentAccount,
+        accountID = account.id,
         uri = URI.create("https://ct.thepalaceproject.org/CT0186/groups/"),
-        credentials = null,
+        credentials = account.loginState.credentials,
         method = "GET"
       )
     )
+  }
+
+  private fun credentialsOf(
+    id: AccountID
+  ): AccountAuthenticationCredentials? {
+    return try {
+      val profile = this.profiles.profileCurrent()
+      profile.account(id).loginState.credentials
+    } catch (e: Exception) {
+      this.logger.warn("Error fetching credentials: ", e)
+      null
+    }
+  }
+
+  private fun currentAccount(): AccountType {
+    val profile =
+      this.profiles.profileCurrent()
+    val id =
+      profile.preferences()
+        .mostRecentAccount
+
+    return profile.account(id)
   }
 
   final override fun onStop() {

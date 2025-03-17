@@ -9,7 +9,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.TxContextWrappingDelegate2
-import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commit
@@ -34,8 +33,6 @@ import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.OA
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.branding.BrandingSplashServiceType
 import org.slf4j.LoggerFactory
-import org.thepalaceproject.ui.UIMainActivity
-import org.thepalaceproject.ui.UIMigration
 import java.util.ServiceLoader
 
 class MainActivity : AppCompatActivity(R.layout.main_host) {
@@ -61,35 +58,11 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     super.onCreate(savedInstanceState)
     this.logger.debug("onCreate (super completed)")
 
-    /*
-     * We might need to go to the new UI activity instead.
-     */
-
-    if (UIMigration.isRunningNewUI(this.applicationContext)) {
-      val intent = Intent(this, UIMainActivity::class.java)
-      intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_TASK_ON_HOME)
-      this.startActivity(intent)
-      this.finish()
-      return
-    }
-
-    val toolbar = this.findViewById(R.id.mainToolbar) as Toolbar
-    this.setSupportActionBar(toolbar)
-    this.supportActionBar?.setDisplayHomeAsUpEnabled(true)
-    this.supportActionBar?.setDisplayShowHomeEnabled(true)
-    this.supportActionBar?.hide() // Hide toolbar until requested
-
     if (savedInstanceState == null) {
       this.openSplashScreen()
-    } else {
-      if (savedInstanceState.getBoolean(STATE_ACTION_BAR_IS_SHOWING)) {
-        this.supportActionBar?.show()
-      } else {
-        this.supportActionBar?.hide()
-      }
     }
 
-    askForNotificationsPermission()
+    this.askForNotificationsPermission()
   }
 
   private fun askForNotificationsPermission() {

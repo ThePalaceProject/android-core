@@ -15,7 +15,6 @@ android {
 dependencies {
     coreLibraryDesugaring(libs.android.desugaring)
 
-    implementation(project(":palace-ui"))
     implementation(project(":simplified-accessibility"))
     implementation(project(":simplified-accounts-api"))
     implementation(project(":simplified-accounts-database-api"))
