@@ -10,7 +10,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import org.librarysimplified.services.api.Services
-import org.librarysimplified.ui.catalog.R
+import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.accounts.api.AccountLoginState
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType

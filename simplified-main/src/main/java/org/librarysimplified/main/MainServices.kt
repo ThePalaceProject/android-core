@@ -17,8 +17,8 @@ import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.services.api.ServiceDirectory
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.librarysimplified.services.api.Services
-import org.librarysimplified.ui.catalog.CatalogCoverBadgeImages
-import org.librarysimplified.ui.catalog.CatalogOPDSClients
+import org.nypl.simplified.ui.catalog.CatalogCoverBadgeImages
+import org.nypl.simplified.ui.catalog.CatalogOPDSClients
 import org.nypl.drm.core.AdobeAdeptExecutorType
 import org.nypl.drm.core.AxisNowServiceFactoryType
 import org.nypl.drm.core.AxisNowServiceType

@@ -1,7 +1,7 @@
 package org.librarysimplified.main
 
 import androidx.lifecycle.ViewModelProvider
-import org.librarysimplified.ui.catalog.saml20.CatalogSAML20Event
+import org.nypl.simplified.ui.catalog.saml20.CatalogSAML20Event
 import org.nypl.simplified.listeners.api.ListenerRepository
 import org.nypl.simplified.listeners.api.ListenerRepositoryFactory
 import org.nypl.simplified.ui.accounts.AccountDetailEvent

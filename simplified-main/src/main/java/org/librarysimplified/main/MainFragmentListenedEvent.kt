@@ -3,7 +3,7 @@ package org.librarysimplified.main
 sealed class MainFragmentListenedEvent {
 
   data class CatalogSAML20Event(
-    val event: org.librarysimplified.ui.catalog.saml20.CatalogSAML20Event
+    val event: org.nypl.simplified.ui.catalog.saml20.CatalogSAML20Event
   ) : MainFragmentListenedEvent()
 
   data class AccountSAML20Event(

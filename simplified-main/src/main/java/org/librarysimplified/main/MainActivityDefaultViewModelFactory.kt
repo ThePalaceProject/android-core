@@ -1,9 +1,9 @@
 package org.librarysimplified.main
 
 import androidx.lifecycle.ViewModelProvider
-import org.librarysimplified.ui.onboarding.OnboardingEvent
-import org.librarysimplified.ui.splash.SplashEvent
-import org.librarysimplified.ui.tutorial.TutorialEvent
+import org.nypl.simplified.ui.onboarding.OnboardingEvent
+import org.nypl.simplified.ui.splash.SplashEvent
+import org.nypl.simplified.ui.tutorial.TutorialEvent
 import org.nypl.simplified.listeners.api.ListenerRepository
 import org.nypl.simplified.listeners.api.ListenerRepositoryFactory
 

@@ -7,8 +7,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import io.reactivex.disposables.CompositeDisposable
-import org.librarysimplified.ui.catalog.saml20.CatalogSAML20Event
-import org.librarysimplified.ui.navigation.tabs.TabbedNavigator
+import org.nypl.simplified.ui.navigation.tabs.TabbedNavigator
 import org.librarysimplified.viewer.preview.BookPreviewActivity
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.Book
@@ -29,6 +28,7 @@ import org.nypl.simplified.ui.accounts.AccountListRegistryEvent
 import org.nypl.simplified.ui.accounts.AccountListRegistryFragment
 import org.nypl.simplified.ui.accounts.AccountPickerEvent
 import org.nypl.simplified.ui.accounts.saml20.AccountSAML20Event
+import org.nypl.simplified.ui.catalog.saml20.CatalogSAML20Event
 import org.nypl.simplified.ui.errorpage.ErrorPageEvent
 import org.nypl.simplified.ui.errorpage.ErrorPageFragment
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
@@ -219,7 +219,7 @@ internal class MainFragmentListenerDelegate(
       }
 
       AccountListEvent.AddAccount -> {
-        this.openAccountRegistry(tab = org.librarysimplified.ui.tabs.R.id.tabSettings)
+        this.openAccountRegistry(tab = org.librarysimplified.ui.R.id.tabSettings)
         state
       }
 
@@ -308,7 +308,7 @@ internal class MainFragmentListenerDelegate(
       }
 
       AccountPickerEvent.AddAccount -> {
-        this.openAccountRegistry(tab = org.librarysimplified.ui.tabs.R.id.tabCatalog)
+        this.openAccountRegistry(tab = org.librarysimplified.ui.R.id.tabCatalog)
         state
       }
     }
@@ -414,7 +414,7 @@ internal class MainFragmentListenerDelegate(
   private fun openSettingsAbout(title: String, url: String) {
     this.navigator.addFragment(
       fragment = SettingsDocumentViewerFragment.create(title, url),
-      tab = org.librarysimplified.ui.tabs.R.id.tabSettings
+      tab = org.librarysimplified.ui.R.id.tabSettings
     )
   }
 
@@ -428,56 +428,56 @@ internal class MainFragmentListenerDelegate(
           comingFromDeepLink = false
         )
       ),
-      tab = org.librarysimplified.ui.tabs.R.id.tabSettings
+      tab = org.librarysimplified.ui.R.id.tabSettings
     )
   }
 
   private fun openSettingsAcknowledgements(title: String, url: String) {
     this.navigator.addFragment(
       fragment = SettingsDocumentViewerFragment.create(title, url),
-      tab = org.librarysimplified.ui.tabs.R.id.tabSettings
+      tab = org.librarysimplified.ui.R.id.tabSettings
     )
   }
 
   private fun openSettingsEULA(title: String, url: String) {
     this.navigator.addFragment(
       fragment = SettingsDocumentViewerFragment.create(title, url),
-      tab = org.librarysimplified.ui.tabs.R.id.tabSettings
+      tab = org.librarysimplified.ui.R.id.tabSettings
     )
   }
 
   private fun openSettingsFaq(title: String, url: String) {
     this.navigator.addFragment(
       fragment = SettingsDocumentViewerFragment.create(title, url),
-      tab = org.librarysimplified.ui.tabs.R.id.tabSettings
+      tab = org.librarysimplified.ui.R.id.tabSettings
     )
   }
 
   private fun openSettingsLicense(title: String, url: String) {
     this.navigator.addFragment(
       fragment = SettingsDocumentViewerFragment.create(title, url),
-      tab = org.librarysimplified.ui.tabs.R.id.tabSettings
+      tab = org.librarysimplified.ui.R.id.tabSettings
     )
   }
 
   private fun openSettingsPrivacy(title: String, url: String) {
     this.navigator.addFragment(
       fragment = SettingsDocumentViewerFragment.create(title, url),
-      tab = org.librarysimplified.ui.tabs.R.id.tabSettings
+      tab = org.librarysimplified.ui.R.id.tabSettings
     )
   }
 
   private fun openSettingsVersion() {
     this.navigator.addFragment(
       fragment = SettingsDebugFragment(),
-      tab = org.librarysimplified.ui.tabs.R.id.tabSettings
+      tab = org.librarysimplified.ui.R.id.tabSettings
     )
   }
 
   private fun openSettingsCustomOPDS() {
     this.navigator.addFragment(
       fragment = SettingsCustomOPDSFragment(),
-      tab = org.librarysimplified.ui.tabs.R.id.tabSettings
+      tab = org.librarysimplified.ui.R.id.tabSettings
     )
   }
 
@@ -542,7 +542,7 @@ internal class MainFragmentListenerDelegate(
 
   private fun openCatalog() {
     this.navigator.popBackStack()
-    this.navigator.reset(org.librarysimplified.ui.tabs.R.id.tabCatalog, false)
+    this.navigator.reset(org.librarysimplified.ui.R.id.tabCatalog, false)
   }
 
   private fun openViewer(

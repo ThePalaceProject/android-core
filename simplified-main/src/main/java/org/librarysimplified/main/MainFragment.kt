@@ -17,9 +17,9 @@ import io.reactivex.disposables.CompositeDisposable
 import org.librarysimplified.audiobook.views.PlayerModel
 import org.librarysimplified.audiobook.views.PlayerModelState
 import org.librarysimplified.services.api.Services
-import org.librarysimplified.ui.catalog.saml20.CatalogSAML20Fragment
-import org.librarysimplified.ui.catalog.saml20.CatalogSAML20FragmentParameters
-import org.librarysimplified.ui.navigation.tabs.TabbedNavigator
+import org.nypl.simplified.ui.catalog.saml20.CatalogSAML20Fragment
+import org.nypl.simplified.ui.catalog.saml20.CatalogSAML20FragmentParameters
+import org.nypl.simplified.ui.navigation.tabs.TabbedNavigator
 import org.librarysimplified.viewer.audiobook.AudioBookPlayerActivity2
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.accounts.api.AccountEventDeletion
@@ -215,7 +215,7 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
 
   private fun setShowHoldsVisibility() {
     val showHolds = viewModel.showHoldsTab
-    val holdsItem = this.bottomView.menu.findItem(org.librarysimplified.ui.tabs.R.id.tabHolds)
+    val holdsItem = this.bottomView.menu.findItem(org.librarysimplified.ui.R.id.tabHolds)
     holdsItem.isVisible = showHolds
     holdsItem.isEnabled = showHolds
   }
@@ -267,14 +267,14 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
     val numberOfHolds = event.numberOfHolds
     if (viewModel.showHoldsTab) {
       val bottomNavigationItem =
-        this.bottomView.findViewById<BottomNavigationItemView>(org.librarysimplified.ui.tabs.R.id.tabHolds)
+        this.bottomView.findViewById<BottomNavigationItemView>(org.librarysimplified.ui.R.id.tabHolds)
       var badgeView =
-        bottomNavigationItem.findViewById<View>(org.librarysimplified.ui.tabs.R.id.badgeView)
+        bottomNavigationItem.findViewById<View>(org.librarysimplified.ui.R.id.badgeView)
 
       if (numberOfHolds > 0) {
         if (badgeView == null) {
           badgeView = LayoutInflater.from(requireContext()).inflate(
-            org.librarysimplified.ui.tabs.R.layout.layout_menu_item_badge,
+            org.librarysimplified.ui.R.layout.layout_menu_item_badge,
             bottomNavigationItem,
             false
           )
@@ -282,7 +282,7 @@ class MainFragment : Fragment(R.layout.main_tabbed_host) {
         }
 
         val badgeNumber = (badgeView as? ViewGroup)?.findViewById<TextView>(
-          org.librarysimplified.ui.tabs.R.id.badgeNumber
+          org.librarysimplified.ui.R.id.badgeNumber
         )
         badgeNumber?.text = numberOfHolds.toString()
       }
