@@ -32,7 +32,7 @@ import org.nypl.simplified.books.api.bookmark.SerializedBookmarks
 import org.nypl.simplified.books.api.bookmark.SerializedLocatorPage1
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
-import org.nypl.simplified.ui.thread.api.UIThreadServiceType
+import org.nypl.simplified.threads.UIThread
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
@@ -75,7 +75,6 @@ class PdfReaderActivity : AppCompatActivity() {
   private val profilesController =
     this.services.requireService(ProfilesControllerType::class.java)
 
-  private lateinit var uiThread: UIThreadServiceType
   private lateinit var pdfReaderContainer: FrameLayout
   private lateinit var accountId: AccountID
   private lateinit var bookID: BookID
@@ -108,10 +107,8 @@ class PdfReaderActivity : AppCompatActivity() {
     MDC.put(MDCKeys.BOOK_FORMAT, "application/pdf")
     MDC.remove(MDCKeys.BOOK_DRM)
 
-    this.uiThread =
-      this.services.requireService(UIThreadServiceType::class.java)
-
-    val backgroundThread = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(1))
+    val backgroundThread =
+      MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(1))
 
     backgroundThread.execute {
       this.restoreSavedPosition(
@@ -148,7 +145,7 @@ class PdfReaderActivity : AppCompatActivity() {
       bookmarks.filter { bookmark -> bookmark.kind == PdfBookmarkKind.LAST_READ }
         .firstOrNull()
 
-    this.uiThread.runOnUIThread {
+    UIThread.runOnUIThread {
       try {
         if (lastReadBookmark != null) {
           this.documentPageIndex = lastReadBookmark.pageNumber
@@ -331,7 +328,7 @@ class PdfReaderActivity : AppCompatActivity() {
   }
 
   private fun onReaderPageClick() {
-    this.uiThread.runOnUIThread {
+    UIThread.runOnUIThread {
       if (this.supportActionBar?.isShowing == true) {
         this.supportActionBar?.hide()
       } else {
@@ -374,7 +371,7 @@ class PdfReaderActivity : AppCompatActivity() {
   ) {
     this.log.error("error: {}: ", title, failure)
 
-    this.uiThread.runOnUIThread {
+    UIThread.runOnUIThread {
       MaterialAlertDialogBuilder(context)
         .setTitle(title)
         .setMessage(failure.localizedMessage)

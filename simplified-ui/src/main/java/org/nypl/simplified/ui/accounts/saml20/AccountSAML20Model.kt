@@ -14,7 +14,7 @@ import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
-import org.nypl.simplified.ui.thread.api.UIThreadServiceType
+import org.nypl.simplified.threads.UIThread
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URI
@@ -43,9 +43,6 @@ object AccountSAML20Model {
   private val profilesController =
     services.requireService(ProfilesControllerType::class.java)
 
-  private val uiThread =
-    services.requireService(UIThreadServiceType::class.java)
-
   private val stateAttribute: AttributeType<AccountSAML20State> =
     Attributes.create { e -> logger.debug("Attribute exception: ", e) }
       .withValue(AccountSAML20State.WebViewInitializing)
@@ -63,7 +60,7 @@ object AccountSAML20Model {
   private val webView: AtomicReference<WebView> = AtomicReference()
 
   fun setState(newState: AccountSAML20State) {
-    uiThread.runOnUIThread {
+    UIThread.runOnUIThread {
       stateAttribute.set(newState)
     }
   }

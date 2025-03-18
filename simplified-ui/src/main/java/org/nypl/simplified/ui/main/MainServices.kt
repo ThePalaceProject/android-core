@@ -17,8 +17,6 @@ import org.librarysimplified.services.api.ServiceDirectory
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.BuildConfig
-import org.nypl.simplified.ui.catalog.CatalogCoverBadgeImages
-import org.nypl.simplified.ui.catalog.CatalogOPDSClients
 import org.nypl.drm.core.AdobeAdeptExecutorType
 import org.nypl.drm.core.AxisNowServiceFactoryType
 import org.nypl.drm.core.AxisNowServiceType
@@ -109,11 +107,13 @@ import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.tenprint.TenPrintGenerator
 import org.nypl.simplified.tenprint.TenPrintGeneratorType
 import org.nypl.simplified.threads.NamedThreadPools
+import org.nypl.simplified.threads.UIThread
+import org.nypl.simplified.ui.catalog.CatalogCoverBadgeImages
+import org.nypl.simplified.ui.catalog.CatalogOPDSClients
 import org.nypl.simplified.ui.images.ImageAccountIconRequestHandler
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.nypl.simplified.ui.screen.ScreenSizeInformation
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
-import org.nypl.simplified.ui.thread.api.UIThreadServiceType
 import org.readium.r2.lcp.LcpService
 import org.slf4j.LoggerFactory
 import org.thepalaceproject.opds.client.OPDSClient
@@ -614,13 +614,6 @@ internal object MainServices {
         serviceConstructor = { ScreenSizeInformation(context.resources) }
       )
 
-    val uiThread =
-      addService(
-        message = strings.bootingGeneral("UI thread"),
-        interfaceType = UIThreadServiceType::class.java,
-        serviceConstructor = { MainUIThreadService() }
-      )
-
     val bookRegistry =
       addService(
         message = strings.bootingGeneral("book registry"),
@@ -971,7 +964,6 @@ internal object MainServices {
       interfaceType = CatalogOPDSClients::class.java,
       serviceConstructor = {
         createCatalogOPDSClients(
-          uiThread = uiThread,
           feedLoader = feedLoader
         )
       }
@@ -988,15 +980,14 @@ internal object MainServices {
   }
 
   private fun createCatalogOPDSClients(
-    uiThread: UIThreadServiceType,
     feedLoader: FeedLoaderType
   ): CatalogOPDSClients {
     val mainClient =
       OPDSClient.create(
         OPDSClientParameters(
           name = "Main",
-          runOnUI = uiThread::runOnUIThread,
-          checkOnUI = uiThread::checkIsUIThread,
+          runOnUI = UIThread::runOnUIThread,
+          checkOnUI = UIThread::checkIsUIThread,
           feedLoader = feedLoader
         )
       )
@@ -1005,8 +996,8 @@ internal object MainServices {
       OPDSClient.create(
         OPDSClientParameters(
           name = "Books",
-          runOnUI = uiThread::runOnUIThread,
-          checkOnUI = uiThread::checkIsUIThread,
+          runOnUI = UIThread::runOnUIThread,
+          checkOnUI = UIThread::checkIsUIThread,
           feedLoader = feedLoader
         )
       )
@@ -1015,8 +1006,8 @@ internal object MainServices {
       OPDSClient.create(
         OPDSClientParameters(
           name = "Holds",
-          runOnUI = uiThread::runOnUIThread,
-          checkOnUI = uiThread::checkIsUIThread,
+          runOnUI = UIThread::runOnUIThread,
+          checkOnUI = UIThread::checkIsUIThread,
           feedLoader = feedLoader
         )
       )

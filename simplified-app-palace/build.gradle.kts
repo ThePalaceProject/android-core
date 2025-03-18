@@ -312,7 +312,6 @@ dependencies {
     implementation(project(":simplified-ui-images"))
     implementation(project(":simplified-ui-listeners-api"))
     implementation(project(":simplified-ui-screen"))
-    implementation(project(":simplified-ui-thread-api"))
     implementation(project(":simplified-viewer-api"))
     implementation(project(":simplified-viewer-audiobook"))
     implementation(project(":simplified-viewer-epub-readium2"))

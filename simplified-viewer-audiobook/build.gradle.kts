@@ -27,7 +27,6 @@ dependencies {
     implementation(project(":simplified-threads"))
     implementation(project(":simplified-ui-errorpage"))
     implementation(project(":simplified-ui-screen"))
-    implementation(project(":simplified-ui-thread-api"))
     implementation(project(":simplified-viewer-spi"))
 
     implementation(libs.androidx.activity)

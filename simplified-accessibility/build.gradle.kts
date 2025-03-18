@@ -5,7 +5,6 @@ dependencies {
     implementation(project(":simplified-books-registry-api"))
     implementation(project(":simplified-opds-core"))
     implementation(project(":simplified-presentableerror-api"))
-    implementation(project(":simplified-ui-thread-api"))
 
     implementation(libs.androidx.lifecycle.extensions)
     implementation(libs.kotlin.reflect)

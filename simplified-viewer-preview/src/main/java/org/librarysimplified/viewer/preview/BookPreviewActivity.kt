@@ -39,7 +39,7 @@ import org.nypl.simplified.books.book_registry.BookPreviewStatus
 import org.nypl.simplified.books.controller.api.BooksPreviewControllerType
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
-import org.nypl.simplified.ui.thread.api.UIThreadServiceType
+import org.nypl.simplified.threads.UIThread
 import org.readium.r2.shared.util.Try
 import org.readium.r2.shared.util.asset.AssetRetriever
 import org.readium.r2.shared.util.http.DefaultHttpClient
@@ -85,7 +85,6 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
   private lateinit var feedEntry: FeedEntry.FeedEntryOPDS
   private lateinit var loadingProgress: ProgressBar
   private lateinit var previewContainer: FrameLayout
-  private lateinit var uiThread: UIThreadServiceType
 
   private var fragmentNow: Fragment? = null
   private var subscriptions: CompositeDisposable = CompositeDisposable()
@@ -101,8 +100,6 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
       services.requireService(ProfilesControllerType::class.java)
     this.accessibilityService =
       services.requireService(AccessibilityServiceType::class.java)
-    this.uiThread =
-      services.requireService(UIThreadServiceType::class.java)
     this.previewRegistry =
       services.requireService(BookPreviewRegistryType::class.java)
     this.previewController =
@@ -208,7 +205,7 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
 
   @UiThread
   private fun onViewEventReceived(event: SR2ReaderViewEvent) {
-    this.uiThread.checkIsUIThread()
+    UIThread.checkIsUIThread()
 
     return when (event) {
       is SR2BookLoadingFailed -> {
@@ -229,7 +226,7 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
 
   @UiThread
   private fun onViewCommandReceived(command: SR2ReaderViewCommand) {
-    this.uiThread.checkIsUIThread()
+    UIThread.checkIsUIThread()
 
     return when (command) {
       SR2ReaderViewCommand.SR2ReaderViewNavigationReaderClose -> {
@@ -252,7 +249,7 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
 
   @UiThread
   private fun onControllerEvent(event: SR2Event) {
-    this.uiThread.checkIsUIThread()
+    UIThread.checkIsUIThread()
   }
 
   private fun onNewBookPreviewStatus(
@@ -332,7 +329,7 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
     this.logger.debug("openReader: {}", file)
     this.file = file
 
-    this.uiThread.checkIsUIThread()
+    UIThread.checkIsUIThread()
 
     try {
       val profileCurrent =
@@ -401,7 +398,7 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
   private fun onBookLoadingFailed(
     exception: Throwable
   ) {
-    this.uiThread.checkIsUIThread()
+    UIThread.checkIsUIThread()
 
     val actualException =
       if (exception is ExecutionException) {

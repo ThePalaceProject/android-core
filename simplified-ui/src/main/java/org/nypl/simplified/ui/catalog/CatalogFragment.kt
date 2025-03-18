@@ -28,10 +28,10 @@ import org.nypl.simplified.feeds.api.FeedGroup
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.feeds.api.FeedSearch
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
+import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
-import org.nypl.simplified.ui.thread.api.UIThreadServiceType
 import org.slf4j.LoggerFactory
 import org.thepalaceproject.opds.client.OPDSClientRequest
 import org.thepalaceproject.opds.client.OPDSClientType
@@ -81,7 +81,6 @@ sealed class CatalogFragment : Fragment() {
   private lateinit var opdsClient: OPDSClientType
   private lateinit var profiles: ProfilesControllerType
   private lateinit var screenSize: ScreenSizeInformationType
-  private lateinit var uiThread: UIThreadServiceType
   private lateinit var viewNow: CatalogFeedView
 
   final override fun onCreateView(
@@ -112,8 +111,6 @@ sealed class CatalogFragment : Fragment() {
       Services.serviceDirectory()
     val opdsClients =
       services.requireService(CatalogOPDSClients::class.java)
-    this.uiThread =
-      services.requireService(UIThreadServiceType::class.java)
     this.profiles =
       services.requireService(ProfilesControllerType::class.java)
     this.images =
@@ -189,14 +186,14 @@ sealed class CatalogFragment : Fragment() {
   }
 
   private fun onInfiniteFeedReachedNearEnd() {
-    this.uiThread.checkIsUIThread()
+    UIThread.checkIsUIThread()
     this.opdsClient.loadMore()
   }
 
   private fun onBookSelected(
     entry: FeedEntry.FeedEntryOPDS
   ) {
-    this.uiThread.checkIsUIThread()
+    UIThread.checkIsUIThread()
     this.opdsClient.goTo(OPDSClientRequest.ExistingEntry(entry))
   }
 
@@ -204,7 +201,7 @@ sealed class CatalogFragment : Fragment() {
     oldEntry: FeedEntry,
     newEntry: FeedEntry
   ) {
-    this.uiThread.checkIsUIThread()
+    UIThread.checkIsUIThread()
 
     if (newEntry is FeedEntry.FeedEntryOPDS) {
       val view = this.viewNow
@@ -247,7 +244,7 @@ sealed class CatalogFragment : Fragment() {
     oldGroups: List<FeedGroup>,
     newGroups: List<FeedGroup>
   ) {
-    this.uiThread.checkIsUIThread()
+    UIThread.checkIsUIThread()
     this.entriesGroupedAdapter.submitList(newGroups)
   }
 
@@ -255,7 +252,7 @@ sealed class CatalogFragment : Fragment() {
     oldEntries: List<FeedEntry>,
     newEntries: List<FeedEntry>
   ) {
-    this.uiThread.checkIsUIThread()
+    UIThread.checkIsUIThread()
     this.entriesUngroupedAdapter.submitList(newEntries)
   }
 
@@ -263,7 +260,7 @@ sealed class CatalogFragment : Fragment() {
     oldState: OPDSState,
     newState: OPDSState
   ) {
-    this.uiThread.checkIsUIThread()
+    UIThread.checkIsUIThread()
 
     this.resetPerViewSubscriptions()
 
@@ -537,12 +534,12 @@ sealed class CatalogFragment : Fragment() {
   }
 
   private fun onToolbarBackPressed() {
-    this.uiThread.checkIsUIThread()
+    UIThread.checkIsUIThread()
     this.opdsClient.goBack()
   }
 
   private fun onToolbarLogoPressed() {
-    this.uiThread.checkIsUIThread()
+    UIThread.checkIsUIThread()
     TODO()
   }
 
@@ -600,7 +597,7 @@ sealed class CatalogFragment : Fragment() {
     view.swipeRefresh.setOnRefreshListener {
       val future = this.opdsClient.refresh()
       future.thenAccept {
-        this.uiThread.runOnUIThread {
+        UIThread.runOnUIThread {
           view.swipeRefresh.post { view.swipeRefresh.isRefreshing = false }
         }
       }
@@ -614,7 +611,7 @@ sealed class CatalogFragment : Fragment() {
     feedSearch: FeedSearch,
     queryText: String
   ) {
-    this.uiThread.checkIsUIThread()
+    UIThread.checkIsUIThread()
     this.logger.debug("onSearchSubmitted: {}", queryText)
     TODO()
   }
@@ -622,7 +619,7 @@ sealed class CatalogFragment : Fragment() {
   private fun onFacetSelected(
     feedFacet: FeedFacet
   ) {
-    this.uiThread.checkIsUIThread()
+    UIThread.checkIsUIThread()
 
     when (feedFacet) {
       is FeedFacet.FeedFacetOPDS -> {

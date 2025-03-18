@@ -17,6 +17,7 @@ import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.listeners.api.FragmentListenerType
 import org.nypl.simplified.listeners.api.fragmentListeners
 import org.nypl.simplified.profiles.api.ProfileUpdated
+import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.accounts.AccountListEvent
 
 class SettingsMainFragment2 : Fragment() {
@@ -197,7 +198,7 @@ class SettingsMainFragment2 : Fragment() {
 
   @UiThread
   private fun onProfileUpdated() {
-    SettingsModel.uiThread.checkIsUIThread()
+    UIThread.checkIsUIThread()
 
     this.showOrHideDebug()
   }
@@ -234,7 +235,7 @@ class SettingsMainFragment2 : Fragment() {
 
   @UiThread
   private fun onAccountEvent() {
-    SettingsModel.uiThread.checkIsUIThread()
+    UIThread.checkIsUIThread()
 
     this.reloadAccountList()
   }

@@ -6,13 +6,17 @@ import android.os.Process
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import android.os.StrictMode.VmPolicy
-import io.reactivex.Observable
+import com.io7m.jattribute.core.AttributeReadableType
+import com.io7m.jattribute.core.AttributeSubscriptionType
+import com.io7m.jattribute.core.AttributeType
+import com.io7m.jattribute.core.Attributes
 import org.librarysimplified.audiobook.views.PlayerModel
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.librarysimplified.ui.BuildConfig
 import org.nypl.simplified.boot.api.BootEvent
 import org.nypl.simplified.boot.api.BootLoader
 import org.nypl.simplified.boot.api.BootProcessType
+import org.nypl.simplified.threads.UIThread
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
@@ -24,7 +28,7 @@ class MainApplication : Application() {
 
     @JvmStatic
     val application: MainApplication
-      get() = INSTANCE
+      get() = this.INSTANCE
   }
 
   private val logger =
@@ -40,24 +44,48 @@ class MainApplication : Application() {
       bootStringResources = ::MainServicesStrings
     )
 
+  private val attributes =
+    Attributes.create { ex ->
+      this.logger.error("Uncaught exception in attribute handling: ", ex)
+    }
+
+  /**
+   * Read events from the given readable attribute, and republish them to the target attribute
+   * such that all updates will be observed on the Android UI thread.
+   */
+
+  private fun <T> wrapAttribute(
+    source: AttributeReadableType<T>,
+    target: AttributeType<T>
+  ): AttributeSubscriptionType {
+    return source.subscribe { _, newValue -> UIThread.runOnUIThread { target.set(newValue) } }
+  }
+
+  private val bootEventsUI: AttributeType<BootEvent> =
+    this.attributes.withValue(BootEvent.BootInProgress("Booting..."))
+
+  init {
+    this.wrapAttribute(this.boot.events, this.bootEventsUI)
+  }
+
   override fun onCreate() {
     super.onCreate()
 
-    MainLogging.configure(cacheDir)
+    MainLogging.configure(this.cacheDir)
     this.configureHttpCache()
     this.configureStrictMode()
     this.logStartup()
     MainTransifex.configure(this.applicationContext)
     PlayerModel.start(this)
 
-    INSTANCE = this
+    org.nypl.simplified.ui.main.MainApplication.Companion.INSTANCE = this
     this.boot.start(this)
   }
 
   private fun logStartup() {
     this.logger.debug("starting app: pid {}", Process.myPid())
     this.logger.debug("app version: {}", BuildConfig.SIMPLIFIED_VERSION)
-    this.logger.debug("app build:   {}", versionCode())
+    this.logger.debug("app build:   {}", this.versionCode())
     this.logger.debug("app commit:  {}", BuildConfig.SIMPLIFIED_GIT_COMMIT)
   }
 
@@ -77,7 +105,7 @@ class MainApplication : Application() {
 
   private fun configureHttpCache() {
     if (BuildConfig.DEBUG) {
-      val httpCacheDir = File(cacheDir, "http")
+      val httpCacheDir = File(this.cacheDir, "http")
       val httpCacheSize = 10 * 1024 * 1024.toLong() // 10 MiB
       try {
         HttpResponseCache.install(httpCacheDir, httpCacheSize)
@@ -117,9 +145,10 @@ class MainApplication : Application() {
   }
 
   /**
-   * An observable value that publishes events as the application is booting.
+   * An observable value that publishes events as the application is booting. Events
+   * are guaranteed to be observed on the Android UI thread.
    */
 
-  val servicesBootEvents: Observable<BootEvent>
-    get() = this.boot.events
+  val servicesBootEvents: AttributeReadableType<BootEvent>
+    get() = this.bootEventsUI
 }

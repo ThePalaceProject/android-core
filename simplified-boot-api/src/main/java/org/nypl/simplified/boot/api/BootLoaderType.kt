@@ -1,8 +1,8 @@
 package org.nypl.simplified.boot.api
 
 import android.content.Context
-import com.google.common.util.concurrent.FluentFuture
-import io.reactivex.Observable
+import com.io7m.jattribute.core.AttributeReadableType
+import java.util.concurrent.CompletableFuture
 
 /**
  * The type of boot loaders.
@@ -17,12 +17,12 @@ interface BootLoaderType<T> {
    * An observable that publishes events during the boot process.
    */
 
-  val events: Observable<BootEvent>
+  val events: AttributeReadableType<BootEvent>
 
   /**
    * Start the boot process if it has not already started, and return a future representing
    * the boot in progress.
    */
 
-  fun start(context: Context): FluentFuture<T>
+  fun start(context: Context): CompletableFuture<T>
 }

@@ -12,16 +12,13 @@ import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.profiles.api.ProfileEvent
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
+import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.images.ImageLoaderType
-import org.nypl.simplified.ui.thread.api.UIThreadServiceType
 
 object SettingsModel {
 
   private val services: ServiceDirectoryType =
     Services.serviceDirectory()
-
-  val uiThread =
-    this.services.requireService(UIThreadServiceType::class.java)
 
   val buildConfig =
     this.services.requireService(BuildConfigurationServiceType::class.java)
@@ -82,13 +79,13 @@ object SettingsModel {
   init {
     this.profilesController.accountEvents()
       .subscribe { e ->
-        this.uiThread.runOnUIThread {
+        UIThread.runOnUIThread {
           this.accountEventSource.onNext(e)
         }
       }
     this.profilesController.profileEvents()
       .subscribe { e ->
-        this.uiThread.runOnUIThread {
+        UIThread.runOnUIThread {
           this.profileEventSource.onNext(e)
         }
       }
