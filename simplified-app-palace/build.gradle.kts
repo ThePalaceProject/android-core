@@ -279,7 +279,6 @@ dependencies {
     implementation(project(":simplified-lcp"))
     implementation(project(":simplified-links"))
     implementation(project(":simplified-links-json"))
-    implementation(project(":simplified-main"))
     implementation(project(":simplified-mdc"))
     implementation(project(":simplified-networkconnectivity"))
     implementation(project(":simplified-networkconnectivity-api"))

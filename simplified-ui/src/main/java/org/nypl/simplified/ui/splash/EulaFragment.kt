@@ -35,41 +35,41 @@ class EulaFragment : Fragment(R.layout.splash_eula) {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    agreeButton = view.findViewById(R.id.splashEulaAgree)
-    disagreeButton = view.findViewById(R.id.splashEulaDisagree)
-    webview = view.findViewById(R.id.splashEulaWebView)
+    this.agreeButton = view.findViewById(R.id.splashEulaAgree)
+    this.disagreeButton = view.findViewById(R.id.splashEulaDisagree)
+    this.webview = view.findViewById(R.id.splashEulaWebView)
 
-    with(webview.settings) {
-      allowFileAccessFromFileURLs = true
-      allowFileAccess = true
-      allowContentAccess = true
-      setSupportMultipleWindows(false)
-      allowUniversalAccessFromFileURLs = false
-      javaScriptEnabled = false
-      WebViewUtilities.setForcedDark(this, resources.configuration)
+    with(this.webview.settings) {
+      this.allowFileAccessFromFileURLs = true
+      this.allowFileAccess = true
+      this.allowContentAccess = true
+      this.setSupportMultipleWindows(false)
+      this.allowUniversalAccessFromFileURLs = false
+      this.javaScriptEnabled = false
+      WebViewUtilities.setForcedDark(this, this@EulaFragment.resources.configuration)
     }
 
-    webview.webViewClient = MailtoWebViewClient(requireActivity())
+    this.webview.webViewClient = MailtoWebViewClient(this.requireActivity())
 
-    val url = eula.readableURL
-    this.logger.debug("eula:     {}", eula)
+    val url = this.eula.readableURL
+    this.logger.debug("eula:     {}", this.eula)
     this.logger.debug("eula URL: {}", url)
-    webview.loadUrl(url.toString())
+    this.webview.loadUrl(url.toString())
   }
 
   override fun onStart() {
     super.onStart()
-    agreeButton.setOnClickListener {
-      eula.hasAgreed = true
-      setResult()
+    this.agreeButton.setOnClickListener {
+      this.eula.hasAgreed = true
+      this.setResult()
     }
-    disagreeButton.setOnClickListener {
-      eula.hasAgreed = false
-      setResult()
+    this.disagreeButton.setOnClickListener {
+      this.eula.hasAgreed = false
+      this.setResult()
     }
   }
 
   private fun setResult() {
-    setFragmentResult("", Bundle())
+    this.setFragmentResult("", Bundle())
   }
 }

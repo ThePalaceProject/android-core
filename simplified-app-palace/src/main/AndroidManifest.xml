@@ -1,111 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools">
 
-  <uses-permission android:name="android.permission.INTERNET" />
-  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-  <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove"/>
+    <uses-permission
+        android:name="com.google.android.gms.permission.AD_ID"
+        tools:node="remove" />
 
-  <application
-    android:name="org.librarysimplified.main.MainApplication"
-    android:allowBackup="true"
-    android:contentDescription="@string/app_name"
-    android:icon="@mipmap/ic_launcher"
-    android:label="@string/app_name"
-    android:theme="@style/PalaceTheme.Splash"
-    android:usesCleartextTraffic="true"
-    tools:replace="android:allowBackup">
+    <application
+        android:name="org.nypl.simplified.ui.main.MainApplication"
+        android:allowBackup="true"
+        android:contentDescription="@string/app_name"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/PalaceTheme.WithoutActionBar"
+        android:usesCleartextTraffic="true"
+        tools:replace="android:allowBackup">
 
-    <!-- Main entry point for the application. -->
-    <activity
-      android:name="org.librarysimplified.main.MainActivity"
-      android:contentDescription="@string/app_name"
-      android:launchMode="singleTop"
-      android:screenOrientation="portrait"
-      android:exported="true"
-      android:label="@string/app_name">
-      <intent-filter>
-        <action android:name="android.intent.action.MAIN" />
-        <category android:name="android.intent.category.LAUNCHER" />
-      </intent-filter>
-      <intent-filter>
-        <action android:name="android.intent.action.VIEW" />
-        <category android:name="android.intent.category.DEFAULT" />
-        <category android:name="android.intent.category.BROWSABLE" />
-        <data android:scheme="palace-oauth" />
-      </intent-filter>
-      <intent-filter>
-        <action android:name="android.intent.action.VIEW"/>
-        <category android:name="android.intent.category.DEFAULT"/>
-        <category android:name="android.intent.category.BROWSABLE"/>
-        <data
-            android:host="thepalaceproject.org"
-            android:scheme="https"
-            android:pathPattern=".*" />
-      </intent-filter>
-    </activity>
+        <!-- Main entry point for the application. -->
+        <activity
+            android:name="org.nypl.simplified.ui.main.MainActivity"
+            android:contentDescription="@string/app_name"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:launchMode="singleInstance">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
 
-    <!-- A file provider that exposes everything in the app. -->
-    <!-- The purpose of this is for sending error reports. -->
-    <provider
-      android:name="androidx.core.content.FileProvider"
-      android:authorities="${applicationId}.fileProvider"
-      android:exported="false"
-      android:grantUriPermissions="true">
-      <meta-data
-        android:name="android.support.FILE_PROVIDER_PATHS"
-        android:resource="@xml/provider_paths" />
-    </provider>
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
 
-    <uses-library
-      android:name="org.apache.http.legacy"
-      android:required="false" />
+                <data android:scheme="palace-oauth" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
 
-    <activity
-        android:name="org.nypl.simplified.ui.accounts.saml20.AccountSAML20Activity"
-        android:exported="false"
-        android:parentActivityName="org.librarysimplified.main.MainActivity"
-        android:theme="@style/PalaceTheme.WithoutActionBar" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
 
-    <activity
-        android:name="org.librarysimplified.viewer.preview.BookPreviewActivity"
-        android:exported="false"
-        android:parentActivityName="org.librarysimplified.main.MainActivity"
-        android:screenOrientation="portrait"
-        android:theme="@style/PalaceTheme.WithoutActionBar" />
+                <data
+                    android:host="thepalaceproject.org"
+                    android:pathPattern=".*"
+                    android:scheme="https" />
+            </intent-filter>
+        </activity>
 
-    <activity
-      android:name="org.librarysimplified.viewer.epub.readium2.Reader2Activity"
-      android:configChanges="orientation|keyboardHidden"
-      android:exported="false"
-      android:parentActivityName="org.librarysimplified.main.MainActivity"
-      android:screenOrientation="portrait"
-      android:theme="@style/PalaceTheme.WithoutActionBar" />
+        <!-- A file provider that exposes everything in the app. -->
+        <!-- The purpose of this is for sending error reports. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
 
-    <activity
-      android:name="org.librarysimplified.viewer.pdf.pdfjs.PdfReaderActivity"
-      android:contentDescription="@string/app_name"
-      android:exported="false"
-      android:screenOrientation="portrait"
-      android:label="@string/app_name" />
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
 
-    <activity
-      android:name="org.librarysimplified.viewer.audiobook.AudioBookPlayerActivity2"
-      android:contentDescription="@string/app_name"
-      android:exported="false"
-      android:label="@string/app_name"
-      android:parentActivityName="org.librarysimplified.main.MainActivity"
-      android:screenOrientation="portrait"
-      android:theme="@style/PalaceTheme.WithoutActionBar" />
+        <activity
+            android:name="org.nypl.simplified.ui.accounts.saml20.AccountSAML20Activity"
+            android:exported="false" />
 
-    <activity
-        android:name="org.thepalaceproject.ui.UIMainActivity"
-        android:exported="false"
-        android:theme="@style/PalaceTheme.WithoutActionBar" />
-  </application>
+        <activity
+            android:name="org.librarysimplified.viewer.preview.BookPreviewActivity"
+            android:exported="false" />
+
+        <activity
+            android:name="org.librarysimplified.viewer.epub.readium2.Reader2Activity"
+            android:configChanges="orientation|keyboardHidden"
+            android:exported="false" />
+
+        <activity
+            android:name="org.librarysimplified.viewer.pdf.pdfjs.PdfReaderActivity"
+            android:contentDescription="@string/app_name"
+            android:exported="false"
+            android:label="@string/app_name" />
+
+        <activity
+            android:name="org.librarysimplified.viewer.audiobook.AudioBookPlayerActivity2"
+            android:contentDescription="@string/app_name"
+            android:exported="false"
+            android:label="@string/app_name" />
+    </application>
 
 </manifest>

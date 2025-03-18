@@ -66,7 +66,6 @@ val dependencyObjects = listOf(
     project(":simplified-lcp"),
     project(":simplified-links"),
     project(":simplified-links-json"),
-    project(":simplified-main"),
     project(":simplified-mdc"),
     project(":simplified-networkconnectivity"),
     project(":simplified-networkconnectivity-api"),
