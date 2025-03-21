@@ -2,6 +2,9 @@ package org.nypl.simplified.accounts.registry
 
 import android.content.Context
 import com.google.common.base.Preconditions
+import com.io7m.jattribute.core.AttributeReadableType
+import com.io7m.jattribute.core.AttributeType
+import com.io7m.jattribute.core.Attributes
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import org.librarysimplified.http.api.LSHTTPClientType
@@ -41,9 +44,6 @@ class AccountProviderRegistry private constructor(
   @Volatile
   private var initialized = false
 
-  @Volatile
-  private var statusRef: AccountProviderRegistryStatus = Idle
-
   private val descriptions =
     Collections.synchronizedMap(LinkedHashMap<URI, AccountProviderDescription>())
   private val descriptionsReadOnly = Collections.unmodifiableMap(this.descriptions)
@@ -53,14 +53,18 @@ class AccountProviderRegistry private constructor(
   private val logger =
     LoggerFactory.getLogger(AccountProviderRegistry::class.java)
 
+  private val attributes =
+    Attributes.create { ex -> this.logger.error("Uncaught exception in attribute: ", ex) }
+
+  private val statusAttributeActual: AttributeType<AccountProviderRegistryStatus> =
+    attributes.withValue(Idle)
+
   private val eventsActual: PublishSubject<AccountProviderRegistryEvent> =
     PublishSubject.create()
 
+  @Deprecated("Use the status attribute instead.")
   override val events: Observable<AccountProviderRegistryEvent> =
     this.eventsActual
-
-  override val status: AccountProviderRegistryStatus
-    get() = this.statusRef
 
   override fun accountProviderDescriptions(): Map<URI, AccountProviderDescription> {
     if (!this.initialized) {
@@ -72,10 +76,13 @@ class AccountProviderRegistry private constructor(
   override val resolvedProviders: Map<URI, AccountProviderType>
     get() = this.resolvedReadOnly
 
+  override val statusAttribute: AttributeReadableType<AccountProviderRegistryStatus>
+    get() = this.statusAttributeActual
+
   override fun refresh(includeTestingLibraries: Boolean) {
     this.logger.debug("refreshing account provider descriptions")
 
-    this.statusRef = Refreshing
+    this.statusAttributeActual.set(Refreshing)
     this.eventsActual.onNext(StatusChanged)
 
     try {
@@ -99,7 +106,7 @@ class AccountProviderRegistry private constructor(
       }
     } finally {
       this.initialized = true
-      this.statusRef = Idle
+      this.statusAttributeActual.set(Idle)
       this.eventsActual.onNext(StatusChanged)
     }
   }
@@ -107,7 +114,7 @@ class AccountProviderRegistry private constructor(
   override fun query(query: AccountSearchQuery) {
     this.logger.debug("refreshing account provider descriptions")
 
-    this.statusRef = Refreshing
+    this.statusAttributeActual.set(Refreshing)
     this.eventsActual.onNext(StatusChanged)
 
     try {
@@ -131,7 +138,7 @@ class AccountProviderRegistry private constructor(
       }
     } finally {
       this.initialized = true
-      this.statusRef = Idle
+      this.statusAttributeActual.set(Idle)
       this.eventsActual.onNext(StatusChanged)
     }
   }

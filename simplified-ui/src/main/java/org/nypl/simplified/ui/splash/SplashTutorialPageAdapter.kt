@@ -1,4 +1,4 @@
-package org.nypl.simplified.ui.tutorial
+package org.nypl.simplified.ui.splash
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,7 +7,7 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import org.librarysimplified.ui.R
 
-class TutorialPageAdapter : RecyclerView.Adapter<TutorialPageAdapter.TutorialPageViewHolder>() {
+class SplashTutorialPageAdapter : RecyclerView.Adapter<SplashTutorialPageAdapter.TutorialPageViewHolder>() {
 
   private val images = arrayOf(
     R.drawable.background_image_tutorial1,

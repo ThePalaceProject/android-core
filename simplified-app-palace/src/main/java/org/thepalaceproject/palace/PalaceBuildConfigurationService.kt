@@ -41,5 +41,5 @@ class PalaceBuildConfigurationService : BuildConfigurationServiceType {
   override val showAgeGateUi: Boolean
     get() = true
   override val brandingAppIcon: Int
-    get() = R.drawable.main_icon
+    get() = org.librarysimplified.ui.R.drawable.main_icon
 }

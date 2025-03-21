@@ -6,12 +6,12 @@
     android:layout_height="match_parent">
 
     <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/tutorial_view_pager"
+        android:id="@+id/tutorialViewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
     <ImageView
-        android:id="@+id/skip_button"
+        android:id="@+id/tutorialSkip"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_gravity="top|end"
@@ -19,7 +19,7 @@
         android:src="@drawable/ic_close" />
 
     <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tutorial_tab_layout"
+        android:id="@+id/tutorialTabLayout"
         android:layout_width="wrap_content"
         android:layout_height="16dp"
         android:layout_gravity="bottom|center_horizontal"

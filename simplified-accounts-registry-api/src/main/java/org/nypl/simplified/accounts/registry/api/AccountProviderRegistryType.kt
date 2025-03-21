@@ -1,5 +1,6 @@
 package org.nypl.simplified.accounts.registry.api
 
+import com.io7m.jattribute.core.AttributeReadableType
 import io.reactivex.Observable
 import net.jcip.annotations.ThreadSafe
 import org.nypl.simplified.accounts.api.AccountProviderDescription
@@ -22,6 +23,7 @@ interface AccountProviderRegistryType {
    * A source of registry events.
    */
 
+  @Deprecated("Use the status attribute instead.")
   val events: Observable<AccountProviderRegistryEvent>
 
   /**
@@ -40,7 +42,14 @@ interface AccountProviderRegistryType {
    * The status of the account registry.
    */
 
+  val statusAttribute: AttributeReadableType<AccountProviderRegistryStatus>
+
+  /**
+   * The status of the account registry.
+   */
+
   val status: AccountProviderRegistryStatus
+    get() = this.statusAttribute.get()
 
   /**
    * Refresh the available account providers from all sources.

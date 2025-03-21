@@ -1,20 +1,45 @@
 package org.nypl.simplified.ui.main
 
-import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.jmulticlose.core.CloseableCollectionType
 import com.io7m.jmulticlose.core.ClosingResourceFailedException
 import org.librarysimplified.ui.R
+import org.nypl.simplified.ui.navigation.Navigation
+import org.nypl.simplified.ui.splash.SplashFragment
 
-class MainActivity : ComponentActivity(R.layout.main_host) {
+class MainActivity : AppCompatActivity(R.layout.main_host) {
 
+  private var fragmentNow: Fragment? = null
   private var subscriptions: CloseableCollectionType<ClosingResourceFailedException> =
     CloseableCollection.create()
 
   override fun onStart() {
     super.onStart()
 
-    this.subscriptions = CloseableCollection.create()
+    this.subscriptions =
+      CloseableCollection.create()
+    this.subscriptions.add(
+      Navigation.splashScreenStatus.subscribe { _, newValue ->
+        this.onSplashScreenStatusChanged(newValue)
+      }
+    )
+
+    this.switchFragment(SplashFragment())
+  }
+
+  private fun onSplashScreenStatusChanged(
+    status: Navigation.SplashScreenStatus
+  ) {
+    when (status) {
+      Navigation.SplashScreenStatus.SPLASH_SCREEN_IN_PROGRESS -> {
+        // No need to do anything.
+      }
+      Navigation.SplashScreenStatus.SPLASH_SCREEN_COMPLETED -> {
+        this.switchFragment(MainTabsFragment())
+      }
+    }
   }
 
   @Deprecated("This method has been deprecated by clueless \"engineers\".")
@@ -26,5 +51,14 @@ class MainActivity : ComponentActivity(R.layout.main_host) {
     super.onStop()
 
     this.subscriptions.close()
+  }
+
+  private fun switchFragment(
+    fragment: Fragment
+  ) {
+    this.fragmentNow = fragment
+    this.supportFragmentManager.beginTransaction()
+      .replace(R.id.mainFragmentHolder, fragment)
+      .commit()
   }
 }

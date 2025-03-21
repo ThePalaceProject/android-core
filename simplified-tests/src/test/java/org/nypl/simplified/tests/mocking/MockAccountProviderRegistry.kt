@@ -1,5 +1,8 @@
 package org.nypl.simplified.tests.mocking
 
+import com.io7m.jattribute.core.AttributeReadableType
+import com.io7m.jattribute.core.AttributeType
+import com.io7m.jattribute.core.Attributes
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import org.nypl.simplified.accounts.api.AccountProvider
@@ -9,6 +12,7 @@ import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.api.AccountSearchQuery
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryEvent
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus
+import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus.Idle
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskResult
@@ -25,6 +29,12 @@ class MockAccountProviderRegistry(
 
   private val logger =
     LoggerFactory.getLogger(MockAccountProviderRegistry::class.java)
+
+  private val attributes =
+    Attributes.create { ex -> this.logger.error("Uncaught exception in attribute: ", ex) }
+
+  private val statusAttributeActual: AttributeType<AccountProviderRegistryStatus> =
+    attributes.withValue(Idle)
 
   val resolveNext: Queue<AccountProviderType> =
     LinkedList<AccountProviderType>()
@@ -59,6 +69,9 @@ class MockAccountProviderRegistry(
 
   override val events: Observable<AccountProviderRegistryEvent>
     get() = eventSource
+
+  override val statusAttribute: AttributeReadableType<AccountProviderRegistryStatus>
+    get() = this.statusAttributeActual
 
   override val status: AccountProviderRegistryStatus
     get() = AccountProviderRegistryStatus.Idle

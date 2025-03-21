@@ -5,6 +5,7 @@ dependencies {
     implementation(project(":simplified-taskrecorder-api"))
 
     implementation(libs.google.guava)
+    implementation(libs.io7m.jattribute.core)
     implementation(libs.io7m.jfunctional)
     implementation(libs.jcip.annotations)
     implementation(libs.joda.time)

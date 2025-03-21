@@ -59,7 +59,7 @@
         app:layout_constraintBottom_toTopOf="@id/splashProgress"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/migration_error" />
+        app:srcCompat="@drawable/error" />
 
     <Button
         android:id="@+id/splashSendError"
