@@ -11,16 +11,13 @@ import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Anonymous
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Basic
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.BasicToken
-import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.COPPAAgeGate
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.OAuthWithIntermediary
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.SAML2_0
 import org.nypl.simplified.accounts.api.AccountUsername
-
 import org.nypl.simplified.ui.accounts.view_bindings.AccountAuthenticationViewBindings
 import org.nypl.simplified.ui.accounts.view_bindings.ViewsForAnonymous
 import org.nypl.simplified.ui.accounts.view_bindings.ViewsForBasic
 import org.nypl.simplified.ui.accounts.view_bindings.ViewsForBasicToken
-import org.nypl.simplified.ui.accounts.view_bindings.ViewsForCOPPAAgeGate
 import org.nypl.simplified.ui.accounts.view_bindings.ViewsForOAuthWithIntermediary
 import org.nypl.simplified.ui.accounts.view_bindings.ViewsForSAML20
 
@@ -57,19 +54,14 @@ class AccountAuthenticationViews(
     ViewsForSAML20.bind(
       this.viewGroup.findViewById(R.id.authSAML)
     )
-  private val coppa: ViewsForCOPPAAgeGate =
-    ViewsForCOPPAAgeGate.bind(
-      this.viewGroup.findViewById(R.id.authCOPPA)
-    )
 
   private val viewGroups =
-    listOf<AccountAuthenticationViewBindings>(
+    listOf(
       this.basic,
       this.basicToken,
       this.anonymous,
       this.oAuthWithIntermediary,
-      this.saml20,
-      this.coppa
+      this.saml20
     )
 
   private val dividers =
@@ -147,9 +139,6 @@ class AccountAuthenticationViews(
     this.viewGroups.forEach { it.viewGroup.visibility = GONE }
 
     return when (description) {
-      is COPPAAgeGate ->
-        this.coppa.viewGroup.visibility = VISIBLE
-
       is Basic -> {
         this.basic.viewGroup.visibility = VISIBLE
         this.basic.configureFor(description)
@@ -210,26 +199,11 @@ class AccountAuthenticationViews(
         this.basicToken.isSatisfied(description)
       }
 
-      is COPPAAgeGate,
       is OAuthWithIntermediary,
       Anonymous,
       is SAML2_0 ->
         true
     }
-  }
-
-  /**
-   * Set the state of any COPPA gate related fields.
-   */
-
-  fun setCOPPAState(
-    isOver13: Boolean,
-    onAgeCheckboxClicked: (View) -> Unit
-  ) {
-    this.coppa.setState(
-      isOver13 = isOver13,
-      onAgeCheckboxClicked = onAgeCheckboxClicked
-    )
   }
 
   /**

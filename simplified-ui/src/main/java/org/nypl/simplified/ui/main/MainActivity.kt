@@ -6,8 +6,8 @@ import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.jmulticlose.core.CloseableCollectionType
 import com.io7m.jmulticlose.core.ClosingResourceFailedException
 import org.librarysimplified.ui.R
-import org.nypl.simplified.ui.navigation.Navigation
 import org.nypl.simplified.ui.splash.SplashFragment
+import org.nypl.simplified.ui.splash.SplashModel
 
 class MainActivity : AppCompatActivity(R.layout.main_host) {
 
@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     this.subscriptions =
       CloseableCollection.create()
     this.subscriptions.add(
-      Navigation.splashScreenStatus.subscribe { _, newValue ->
+      SplashModel.splashScreenStatus.subscribe { _, newValue ->
         this.onSplashScreenStatusChanged(newValue)
       }
     )
@@ -30,13 +30,13 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
   }
 
   private fun onSplashScreenStatusChanged(
-    status: Navigation.SplashScreenStatus
+    status: SplashModel.SplashScreenStatus
   ) {
     when (status) {
-      Navigation.SplashScreenStatus.SPLASH_SCREEN_IN_PROGRESS -> {
+      SplashModel.SplashScreenStatus.SPLASH_SCREEN_IN_PROGRESS -> {
         // No need to do anything.
       }
-      Navigation.SplashScreenStatus.SPLASH_SCREEN_COMPLETED -> {
+      SplashModel.SplashScreenStatus.SPLASH_SCREEN_COMPLETED -> {
         this.switchFragment(MainTabsFragment())
       }
     }

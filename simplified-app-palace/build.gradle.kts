@@ -310,7 +310,6 @@ dependencies {
     implementation(project(":simplified-ui-branding"))
     implementation(project(":simplified-ui-errorpage"))
     implementation(project(":simplified-ui-images"))
-    implementation(project(":simplified-ui-listeners-api"))
     implementation(project(":simplified-ui-screen"))
     implementation(project(":simplified-viewer-api"))
     implementation(project(":simplified-viewer-audiobook"))

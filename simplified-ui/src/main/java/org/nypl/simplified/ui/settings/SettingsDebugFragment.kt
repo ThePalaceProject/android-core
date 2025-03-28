@@ -13,19 +13,18 @@ import android.widget.Toast
 import android.widget.Toast.LENGTH_LONG
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.io7m.jmulticlose.core.CloseableCollection
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryDebugging
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.adobe.extensions.AdobeDRMExtensions
-import org.nypl.simplified.android.ktx.supportActionBar
-import org.nypl.simplified.listeners.api.FragmentListenerType
-import org.nypl.simplified.listeners.api.fragmentListeners
+import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.taskrecorder.api.TaskStep
 import org.nypl.simplified.taskrecorder.api.TaskStepResolution
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
+import org.nypl.simplified.ui.main.MainNavigation
 import org.slf4j.LoggerFactory
 import org.thepalaceproject.theme.core.PalaceToolbar
 
@@ -40,13 +39,8 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
   private val logger =
     LoggerFactory.getLogger(SettingsDebugFragment::class.java)
 
-  private val viewModel: SettingsDebugViewModel by viewModels()
-  private val listener: FragmentListenerType<SettingsDebugEvent> by fragmentListeners()
-
-  private lateinit var accountRegistry: AccountProviderRegistryType
   private lateinit var adobeDRMActivationTable: TableLayout
   private lateinit var cacheButton: Button
-  private lateinit var cardCreatorFakeLocation: SwitchCompat
   private lateinit var crashButton: Button
   private lateinit var crashlyticsId: TextView
   private lateinit var customOPDS: Button
@@ -63,11 +57,20 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
   private lateinit var showOnlySupportedBooks: SwitchCompat
   private lateinit var showTesting: SwitchCompat
   private lateinit var syncAccountsButton: Button
-  private lateinit var enableOpenEBooksQA: Button
   private lateinit var toolbar: PalaceToolbar
   private lateinit var isManualLCPPassphraseEnabled: SwitchCompat
 
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+  /**
+   * Subscriptions that will be closed when the fragment is detached (ie. when the app is backgrounded).
+   */
+
+  private var subscriptions =
+    CloseableCollection.create()
+
+  override fun onViewCreated(
+    view: View,
+    savedInstanceState: Bundle?
+  ) {
     super.onViewCreated(view, savedInstanceState)
 
     this.toolbar =
@@ -98,8 +101,6 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
       view.findViewById(R.id.settingsVersionDevSeenLibrarySelectionScreen)
     this.isManualLCPPassphraseEnabled =
       view.findViewById(R.id.settingsVersionDevIsManualLCPPassphraseEnabled)
-    this.cardCreatorFakeLocation =
-      view.findViewById(R.id.settingsVersionDevCardCreatorLocationSwitch)
     this.showOnlySupportedBooks =
       view.findViewById(R.id.settingsVersionDevShowOnlySupported)
     this.customOPDS =
@@ -112,48 +113,33 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
       view.findViewById(R.id.libraryRegistryOverrideBase)
     this.libraryRegistrySet =
       view.findViewById(R.id.libraryRegistryOverrideSet)
-    this.enableOpenEBooksQA =
-      view.findViewById(R.id.settingsVersionDevEnableOpenEBooksQA)
 
     this.drmTable.addView(
-      this.createDrmSupportRow("Adobe Acs", this.viewModel.adeptSupported)
+      this.createDrmSupportRow("Adobe Acs", SettingsDebugModel.adeptSupported())
     )
     this.drmTable.addView(
-      this.createDrmSupportRow("AxisNow", this.viewModel.axisNowSupported)
+      this.createDrmSupportRow("AxisNow", SettingsDebugModel.axisNowSupported())
     )
-
-    this.viewModel.adeptActivations.observe(this.viewLifecycleOwner) { activations ->
-      if (activations.isNotEmpty()) {
-        this.onAdobeDRMReceivedActivations(activations)
-      }
-    }
 
     this.showTesting.isChecked =
-      this.viewModel.showTestingLibraries
+      SettingsDebugModel.showTestingLibraries()
     this.failNextBoot.isChecked =
-      this.viewModel.isBootFailureEnabled
+      SettingsDebugModel.isBootFailureEnabled
     this.hasSeenLibrarySelection.isChecked =
-      this.viewModel.hasSeenLibrarySelection
-    this.cardCreatorFakeLocation.isChecked =
-      this.viewModel.cardCreatorFakeLocation
+      SettingsDebugModel.hasSeenLibrarySelection()
     this.isManualLCPPassphraseEnabled.isChecked =
-      this.viewModel.isManualLCPPassphraseEnabled
+      SettingsDebugModel.isManualLCPPassphraseEnabled()
     this.showOnlySupportedBooks.isChecked =
-      this.viewModel.showOnlySupportedBooks
+      SettingsDebugModel.showOnlySupportedBooks()
     this.crashlyticsId.text =
-      this.viewModel.crashlyticsId
-  }
-
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-
-    this.accountRegistry =
-      Services.serviceDirectory().requireService(AccountProviderRegistryType::class.java)
+      SettingsDebugModel.crashlyticsId()
   }
 
   override fun onStart() {
     super.onStart()
-    this.configureToolbar()
+
+    this.subscriptions =
+      CloseableCollection.create()
 
     this.crashButton.setOnClickListener {
       throw OutOfMemoryError("Pretending to have run out of memory!")
@@ -164,7 +150,7 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
     }
 
     this.sendReportButton.setOnClickListener {
-      this.viewModel.sendErrorLogs()
+      SettingsDebugModel.sendErrorLogs()
     }
 
     this.showErrorButton.setOnClickListener {
@@ -178,7 +164,7 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
      */
 
     this.sendAnalyticsButton.setOnClickListener {
-      this.viewModel.sendAnalytics()
+      SettingsDebugModel.sendAnalytics()
       Toast.makeText(
         this.requireContext(),
         "Triggered analytics send",
@@ -187,7 +173,7 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
     }
 
     this.syncAccountsButton.setOnClickListener {
-      this.viewModel.syncAccounts()
+      SettingsDebugModel.syncAccounts()
       Toast.makeText(
         this.requireContext(),
         "Triggered sync of all accounts",
@@ -200,7 +186,7 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
      */
 
     this.forgetAnnouncementsButton.setOnClickListener {
-      this.viewModel.forgetAllAnnouncements()
+      SettingsDebugModel.forgetAllAnnouncements()
     }
 
     /*
@@ -208,7 +194,7 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
      */
 
     this.showTesting.setOnCheckedChangeListener { _, checked ->
-      this.viewModel.showTestingLibraries = checked
+      SettingsDebugModel.updatePreferences { p -> p.copy(showTestingLibraries = checked) }
     }
 
     /*
@@ -216,7 +202,7 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
      */
 
     this.failNextBoot.setOnCheckedChangeListener { _, checked ->
-      this.viewModel.isBootFailureEnabled = checked
+      SettingsDebugModel.isBootFailureEnabled = checked
     }
 
     /*
@@ -224,11 +210,7 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
      */
 
     this.hasSeenLibrarySelection.setOnCheckedChangeListener { _, checked ->
-      this.viewModel.hasSeenLibrarySelection = checked
-    }
-
-    this.cardCreatorFakeLocation.setOnCheckedChangeListener { _, checked ->
-      this.viewModel.cardCreatorFakeLocation = checked
+      SettingsDebugModel.updatePreferences { p -> p.copy(hasSeenLibrarySelectionScreen = checked) }
     }
 
     /*
@@ -236,10 +218,10 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
      */
 
     this.showOnlySupportedBooks.setOnCheckedChangeListener { _, isChecked ->
-      this.viewModel.showOnlySupportedBooks = isChecked
+      SettingsDebugModel.setShowOnlySupportedBooks(showOnlySupported = isChecked)
     }
     this.isManualLCPPassphraseEnabled.setOnCheckedChangeListener { _, isChecked ->
-      this.viewModel.isManualLCPPassphraseEnabled = isChecked
+      SettingsDebugModel.updatePreferences { p -> p.copy(isManualLCPPassphraseEnabled = isChecked) }
     }
 
     /*
@@ -247,10 +229,25 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
      */
 
     this.customOPDS.setOnClickListener {
-      this.listener.post(SettingsDebugEvent.OpenCustomOPDS)
+      // XXX: TODO
+      TODO()
     }
 
     this.configureLibraryRegistryCustomUI()
+
+    this.subscriptions.add(
+      SettingsDebugModel.adeptActivations.subscribe { _, activations ->
+        this.onAdobeDRMReceivedActivations(activations)
+      }
+    )
+
+    SettingsDebugModel.fetchAdobeActivations()
+  }
+
+  override fun onStop() {
+    super.onStop()
+
+    this.subscriptions.close()
   }
 
   /**
@@ -272,7 +269,9 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
         value = target
       )
 
-      this.accountRegistry.clear()
+      Services.serviceDirectory()
+        .requireService(AccountProviderRegistryType::class.java)
+        .clear()
 
       Toast.makeText(
         this.requireContext(),
@@ -285,30 +284,13 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
     if (customServer != null) {
       this.libraryRegistryEntry.setText(customServer, EDITABLE)
     }
-
-    /*
-     * Configure the Open EBooks QA button.
-     */
-
-    this.enableOpenEBooksQA.setOnClickListener {
-      this.viewModel.openEbooksQAToggle()
-    }
-  }
-
-  private fun configureToolbar() {
-    val actionBar = this.supportActionBar ?: return
-    actionBar.show()
-    actionBar.setDisplayHomeAsUpEnabled(true)
-    actionBar.setHomeActionContentDescription(null)
-    actionBar.setTitle(R.string.settingsDebug)
-    this.toolbar.setLogoOnClickListener {
-      this.listener.post(SettingsDebugEvent.GoUpwards)
-    }
   }
 
   private fun showErrorPage() {
+    val appVersion =
+      SettingsDebugModel.appVersion()
     val attributes = sortedMapOf(
-      Pair("Version", this.viewModel.appVersion)
+      Pair("Version", appVersion)
     )
 
     val taskSteps =
@@ -321,16 +303,20 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
       )
     )
 
-    val parameters =
+    val supportEmail =
+      Services.serviceDirectory()
+        .requireService(BuildConfigurationServiceType::class.java)
+        .supportErrorReportEmailAddress
+
+    MainNavigation.openErrorPage(
       ErrorPageParameters(
-        emailAddress = this.viewModel.supportEmailAddress,
+        emailAddress = supportEmail,
         body = "",
-        subject = "[palace-error-report] ${this.viewModel.appVersion}",
+        subject = "[palace-error-report] $appVersion",
         attributes = attributes,
         taskSteps = taskSteps
       )
-
-    this.listener.post(SettingsDebugEvent.OpenErrorPage(parameters))
+    )
   }
 
   private fun showCacheAlert() {
@@ -373,7 +359,9 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
     return row
   }
 
-  private fun onAdobeDRMReceivedActivations(activations: List<AdobeDRMExtensions.Activation>) {
+  private fun onAdobeDRMReceivedActivations(
+    activations: List<AdobeDRMExtensions.Activation>
+  ) {
     this.adobeDRMActivationTable.removeAllViews()
 
     this.run {

@@ -23,8 +23,6 @@
 
     <include layout="@layout/auth_basic_token" />
 
-    <include layout="@layout/auth_coppa" />
-
     <include layout="@layout/auth_oauth" />
 
     <include layout="@layout/auth_saml" />

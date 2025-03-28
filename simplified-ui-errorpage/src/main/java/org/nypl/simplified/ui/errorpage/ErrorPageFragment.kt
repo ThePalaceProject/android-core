@@ -14,11 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import org.librarysimplified.reports.Reports
 import org.librarysimplified.ui.errorpage.R
-import org.nypl.simplified.android.ktx.supportActionBar
-import org.nypl.simplified.listeners.api.FragmentListenerType
-import org.nypl.simplified.listeners.api.fragmentListeners
 import org.slf4j.LoggerFactory
-import org.thepalaceproject.theme.core.PalaceToolbar
 
 /**
  * A full-screen fragment for displaying presentable errors, and reporting those errors
@@ -54,9 +50,6 @@ class ErrorPageFragment : Fragment(R.layout.error_page) {
   private lateinit var errorStepsList: RecyclerView
   private lateinit var parameters: ErrorPageParameters
   private lateinit var sendButton: Button
-  private var toolbar: PalaceToolbar? = null
-
-  private val listener: FragmentListenerType<ErrorPageEvent> by fragmentListeners()
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
@@ -67,8 +60,6 @@ class ErrorPageFragment : Fragment(R.layout.error_page) {
       view.findViewById(R.id.errorSteps)
     this.sendButton =
       view.findViewById(R.id.errorSendButton)
-    this.toolbar =
-      view.rootView.findViewWithTag(PalaceToolbar.palaceToolbarName)
 
     this.parameters =
       this.requireArguments().getSerializable(PARAMETERS_ID)
@@ -105,7 +96,6 @@ class ErrorPageFragment : Fragment(R.layout.error_page) {
 
   override fun onStart() {
     super.onStart()
-    this.configureToolbar()
 
     this.sendButton.isEnabled = true
     this.sendButton.setOnClickListener {
@@ -117,22 +107,6 @@ class ErrorPageFragment : Fragment(R.layout.error_page) {
         subject = parameters.subject,
         body = parameters.report
       )
-    }
-  }
-
-  private fun configureToolbar() {
-    val actionBar = this.supportActionBar ?: return
-    actionBar.show()
-    actionBar.setDisplayHomeAsUpEnabled(true)
-    actionBar.setHomeActionContentDescription(null)
-    actionBar.setTitle(getString(R.string.errorDetailsTitle))
-
-    this.toolbar?.setLogoOnClickListener {
-      try {
-        this.listener.post(ErrorPageEvent.GoUpwards)
-      } catch (e: Exception) {
-        this.logger.warn("Exception raised from logo click: ", e)
-      }
     }
   }
 }

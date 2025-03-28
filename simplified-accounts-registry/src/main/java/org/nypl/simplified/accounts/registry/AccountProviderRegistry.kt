@@ -57,7 +57,7 @@ class AccountProviderRegistry private constructor(
     Attributes.create { ex -> this.logger.error("Uncaught exception in attribute: ", ex) }
 
   private val statusAttributeActual: AttributeType<AccountProviderRegistryStatus> =
-    attributes.withValue(Idle)
+    this.attributes.withValue(Idle)
 
   private val eventsActual: PublishSubject<AccountProviderRegistryEvent> =
     PublishSubject.create()

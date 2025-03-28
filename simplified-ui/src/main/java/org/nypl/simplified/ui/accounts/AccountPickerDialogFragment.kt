@@ -17,8 +17,6 @@ import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.database.api.AccountType
-import org.nypl.simplified.listeners.api.FragmentListenerType
-import org.nypl.simplified.listeners.api.fragmentListeners
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.accounts.AccountPickerAdapter.OnAccountClickListener
 import org.nypl.simplified.ui.images.ImageAccountIcons
@@ -31,8 +29,8 @@ import org.slf4j.LoggerFactory
 
 class AccountPickerDialogFragment : BottomSheetDialogFragment(), OnAccountClickListener {
 
-  private val logger = LoggerFactory.getLogger(AccountPickerDialogFragment::class.java)
-  private val listener: FragmentListenerType<AccountPickerEvent> by fragmentListeners()
+  private val logger =
+    LoggerFactory.getLogger(AccountPickerDialogFragment::class.java)
 
   private lateinit var recyclerView: RecyclerView
   private lateinit var imageLoader: ImageLoaderType
@@ -48,24 +46,30 @@ class AccountPickerDialogFragment : BottomSheetDialogFragment(), OnAccountClickL
       showAddAccount: Boolean
     ): AccountPickerDialogFragment {
       return AccountPickerDialogFragment().apply {
-        arguments = Bundle().apply {
-          putSerializable(ARG_CURRENT_ID, currentId)
-          putBoolean(ARG_ADD_ACCOUNT, showAddAccount)
+        this.arguments = Bundle().apply {
+          this.putSerializable(this@Companion.ARG_CURRENT_ID, currentId)
+          this.putBoolean(this@Companion.ARG_ADD_ACCOUNT, showAddAccount)
         }
       }
     }
   }
 
-  override fun onCreate(savedInstanceState: Bundle?) {
+  override fun onCreate(
+    savedInstanceState: Bundle?
+  ) {
     super.onCreate(savedInstanceState)
-    val services = Services.serviceDirectory()
-    imageLoader = services.requireService(ImageLoaderType::class.java)
-    profilesController = services.requireService(ProfilesControllerType::class.java)
+
+    val services =
+      Services.serviceDirectory()
+    this.imageLoader =
+      services.requireService(ImageLoaderType::class.java)
+    this.profilesController =
+      services.requireService(ProfilesControllerType::class.java)
 
     val accountsMap =
-      profilesController.profileCurrent().accounts()
+      this.profilesController.profileCurrent().accounts()
 
-    accounts = accountsMap.values.toList()
+    this.accounts = accountsMap.values.toList()
       .sortedWith(AccountComparator())
   }
 
@@ -77,18 +81,23 @@ class AccountPickerDialogFragment : BottomSheetDialogFragment(), OnAccountClickL
     return inflater.inflate(R.layout.account_picker, container, false)
   }
 
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    val currentId = requireArguments().getSerializable(ARG_CURRENT_ID) as AccountID
-    val showAddAccount = requireArguments().getBoolean(ARG_ADD_ACCOUNT, false)
+  override fun onViewCreated(
+    view: View,
+    savedInstanceState: Bundle?
+  ) {
+    val currentId = this.requireArguments()
+      .getSerializable(ARG_CURRENT_ID) as AccountID
+    val showAddAccount = this.requireArguments()
+      .getBoolean(ARG_ADD_ACCOUNT, false)
 
-    recyclerView = view.findViewById(R.id.recyclerView)
-    recyclerView.apply {
-      setHasFixedSize(true)
-      layoutManager = LinearLayoutManager(requireContext())
-      adapter = AccountPickerAdapter(
-        accounts,
+    this.recyclerView = view.findViewById(R.id.recyclerView)
+    this.recyclerView.apply {
+      this.setHasFixedSize(true)
+      this.layoutManager = LinearLayoutManager(this@AccountPickerDialogFragment.requireContext())
+      this.adapter = AccountPickerAdapter(
+        this@AccountPickerDialogFragment.accounts,
         currentId,
-        imageLoader,
+        this@AccountPickerDialogFragment.imageLoader,
         showAddAccount,
         this@AccountPickerDialogFragment
       )
@@ -100,23 +109,23 @@ class AccountPickerDialogFragment : BottomSheetDialogFragment(), OnAccountClickL
 
     // Note: In the future consider refactoring this dialog to return a result via
     //       setFragmentResultListener to decouple it from the profiles logic.
-    val profile = profilesController.profileCurrent()
+    val profile = this.profilesController.profileCurrent()
     val newPreferences = profile
       .preferences()
       .copy(
         mostRecentAccount = account.id
       )
-    profilesController.profileUpdate { it.copy(preferences = newPreferences) }
-    dismiss()
+    this.profilesController.profileUpdate { it.copy(preferences = newPreferences) }
+    this.dismiss()
   }
 
   override fun onAddAccountClick() {
-    this.listener.post(AccountPickerEvent.AddAccount)
-    dismiss()
+    TODO()
+    this.dismiss()
   }
 
   override fun onCancelClick() {
-    dismiss()
+    this.dismiss()
   }
 }
 
@@ -133,28 +142,28 @@ class AccountPickerViewHolder(
 
   init {
     view.setOnClickListener {
-      account?.let { listener.onAccountClick(it) }
+      this.account?.let { this.listener.onAccountClick(it) }
     }
   }
 
   fun bind(account: AccountType, isCurrent: Boolean) {
     this.account = account
 
-    titleView.text = account.provider.displayName
+    this.titleView.text = account.provider.displayName
 
     if (isCurrent) {
-      titleView.typeface = Typeface.DEFAULT_BOLD
-      activeView.visibility = View.VISIBLE
+      this.titleView.typeface = Typeface.DEFAULT_BOLD
+      this.activeView.visibility = View.VISIBLE
     } else {
-      titleView.typeface = Typeface.DEFAULT
-      activeView.visibility = View.GONE
+      this.titleView.typeface = Typeface.DEFAULT
+      this.activeView.visibility = View.GONE
     }
 
     ImageAccountIcons.loadAccountLogoIntoView(
       loader = this.imageLoader.loader,
       account = account.provider.toDescription(),
       defaultIcon = R.drawable.account_default,
-      iconView = iconView
+      iconView = this.iconView
     )
   }
 }
@@ -174,7 +183,7 @@ class AddAccountViewHolder(
     iconView.setImageResource(R.drawable.ic_add)
 
     view.setOnClickListener {
-      listener.onAddAccountClick()
+      this.listener.onAddAccountClick()
     }
   }
 }
@@ -192,7 +201,7 @@ class CancelViewHolder(
     iconView.visibility = View.GONE
 
     view.setOnClickListener {
-      listener.onCancelClick()
+      this.listener.onCancelClick()
     }
   }
 }
@@ -215,22 +224,26 @@ class AccountPickerAdapter(
     val inflater = LayoutInflater.from(parent.context)
     val view = inflater.inflate(R.layout.account_picker_item, parent, false)
     return when (viewType) {
-      LIST_CANCEL -> CancelViewHolder(view, listener)
-      LIST_ADD_ACCOUNT -> AddAccountViewHolder(view, listener)
-      else -> AccountPickerViewHolder(view, imageLoader, listener)
+      LIST_CANCEL -> CancelViewHolder(view,
+        this.listener
+      )
+      LIST_ADD_ACCOUNT -> AddAccountViewHolder(view,
+        this.listener
+      )
+      else -> AccountPickerViewHolder(view, this.imageLoader, this.listener)
     }
   }
 
-  override fun getItemCount() = accounts.size + if (showAddAccount) {
+  override fun getItemCount() = this.accounts.size + if (this.showAddAccount) {
     2 // Show the 'add account' and 'cancel' options
   } else {
     1 // Show 'cancel' option
   }
 
   override fun getItemViewType(position: Int) = when (position) {
-    accounts.size + 1 -> LIST_CANCEL
-    accounts.size ->
-      if (showAddAccount) {
+    this.accounts.size + 1 -> LIST_CANCEL
+    this.accounts.size ->
+      if (this.showAddAccount) {
         LIST_ADD_ACCOUNT
       } else {
         LIST_CANCEL
@@ -242,12 +255,13 @@ class AccountPickerAdapter(
   override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
     when (holder.itemViewType) {
       LIST_ITEM -> {
-        val item = accounts[position]
-        (holder as AccountPickerViewHolder).bind(item, item.id == currentId)
+        val item = this.accounts[position]
+        (holder as AccountPickerViewHolder).bind(item, item.id == this.currentId)
       }
     }
   }
 
+  @Deprecated(message = "Make direct calls to a model.")
   interface OnAccountClickListener {
     fun onAccountClick(account: AccountType)
     fun onAddAccountClick()

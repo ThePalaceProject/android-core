@@ -192,16 +192,6 @@
       android:text="@string/settingsDevUserSeenLibrarySelection" />
 
     <androidx.appcompat.widget.SwitchCompat
-      android:id="@+id/settingsVersionDevCardCreatorLocationSwitch"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginBottom="16dp"
-      android:checked="false"
-      android:enabled="true"
-      android:text="@string/settingsDevCardCreatorUserNewYork"
-      android:visibility="gone" />
-
-    <androidx.appcompat.widget.SwitchCompat
       android:id="@+id/settingsVersionDevShowOnlySupported"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
@@ -216,15 +206,6 @@
       android:layout_height="wrap_content"
       android:layout_marginBottom="16dp"
       android:text="@string/settingsDevAddCustomOpdsFeed" />
-
-    <Button
-      android:id="@+id/settingsVersionDevEnableOpenEBooksQA"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginBottom="16dp"
-      android:checked="false"
-      android:enabled="true"
-      android:text="@string/settingsDevToggleOpenEBooksQAAccount" />
 
     <include layout="@layout/settings_debug_library_registry" />
 

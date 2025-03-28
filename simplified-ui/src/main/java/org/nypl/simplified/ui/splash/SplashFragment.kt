@@ -42,7 +42,6 @@ import org.nypl.simplified.ui.accounts.SpaceItemDecoration
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.nypl.simplified.ui.main.MainApplication
 import org.nypl.simplified.ui.main.MainAttributes
-import org.nypl.simplified.ui.navigation.Navigation
 import java.util.concurrent.Executors
 import kotlin.math.max
 
@@ -422,7 +421,7 @@ class SplashFragment : Fragment() {
 
   private fun splashScreenFinishNow() {
     this.splashScreenRecordCompletion()
-    Navigation.splashScreenCompleted()
+    SplashModel.splashScreenCompleted()
   }
 
   private fun splashScreenRecordCompletion() {

@@ -139,6 +139,7 @@
   <string name="accountsDeletionFailedMessage">The library could not be removed.</string>
   <string name="accountsDetails">Details</string>
   <string name="currentlyBrowsing">You\'re currently browsing</string>
+  <string name="accountGoBack">Go Back</string>
 
   <string name="tabBooks">My Books</string>
   <string name="tabCatalog">Catalog</string>

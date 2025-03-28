@@ -9,7 +9,6 @@ dependencies {
     implementation(project(":simplified-opds-core"))
     implementation(project(":simplified-presentableerror-api"))
     implementation(project(":simplified-taskrecorder-api"))
-    implementation(project(":simplified-ui-listeners-api"))
 
     implementation(libs.irradia.mime.api)
     implementation(libs.joda.time)

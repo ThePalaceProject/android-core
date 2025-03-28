@@ -9,15 +9,13 @@ import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import io.reactivex.disposables.CompositeDisposable
+import com.io7m.jmulticlose.core.CloseableCollection
+import io.reactivex.android.schedulers.AndroidSchedulers
+import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountEvent
-import org.nypl.simplified.android.ktx.supportActionBar
-import org.nypl.simplified.listeners.api.FragmentListenerType
-import org.nypl.simplified.listeners.api.fragmentListeners
+import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.slf4j.LoggerFactory
-import org.thepalaceproject.theme.core.PalaceToolbar
 import java.net.URI
 
 /**
@@ -26,22 +24,23 @@ import java.net.URI
 
 class SettingsCustomOPDSFragment : Fragment(R.layout.settings_custom_opds) {
 
-  private val logger = LoggerFactory.getLogger(SettingsCustomOPDSFragment::class.java)
-  private val viewModel: SettingsCustomOPDSViewModel by viewModels()
-  private val subscriptions: CompositeDisposable = CompositeDisposable()
-  private val listener: FragmentListenerType<SettingsDebugEvent> by fragmentListeners()
+  private val logger =
+    LoggerFactory.getLogger(SettingsCustomOPDSFragment::class.java)
+
+  private var subscriptions =
+    CloseableCollection.create()
 
   private lateinit var create: Button
   private lateinit var feedURL: EditText
   private lateinit var progress: ProgressBar
   private lateinit var progressText: TextView
-  private lateinit var toolbar: PalaceToolbar
 
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+  override fun onViewCreated(
+    view: View,
+    savedInstanceState: Bundle?
+  ) {
     super.onViewCreated(view, savedInstanceState)
 
-    this.toolbar =
-      view.rootView.findViewWithTag(PalaceToolbar.palaceToolbarName)
     this.feedURL =
       view.findViewById(R.id.settingsCustomOPDSURL)
     this.create =
@@ -54,39 +53,39 @@ class SettingsCustomOPDSFragment : Fragment(R.layout.settings_custom_opds) {
     if (savedInstanceState == null) {
       this.progressText.text = ""
     }
-
-    this.viewModel.taskRunning.observe(viewLifecycleOwner, this::onTaskRunningChanged)
   }
 
   override fun onStart() {
     super.onStart()
-    this.configureToolbar()
 
     this.feedURL.addTextChangedListener(this.URITextWatcher())
 
-    this.viewModel.accountEvents
-      .subscribe(this::onAccountEvent)
-      .let { subscriptions.add(it) }
+    this.subscriptions =
+      CloseableCollection.create()
+
+    val uiObservable =
+      Services.serviceDirectory()
+        .requireService(ProfilesControllerType::class.java)
+        .accountEvents()
+        .observeOn(AndroidSchedulers.mainThread())
+
+    this.subscriptions.add(AutoCloseable {
+      uiObservable.subscribe(this::onAccountEvent)
+    })
+    this.subscriptions.add(
+      SettingsCustomOPDSModel.taskRunning.subscribe { _, status ->
+        this.onTaskRunningChanged(status)
+      }
+    )
 
     this.create.setOnClickListener {
-      this.viewModel.createCustomOPDSFeed(this.feedURL.text.toString())
+      SettingsCustomOPDSModel.createCustomOPDSFeed(this.feedURL.text.trim().toString())
     }
   }
 
   override fun onStop() {
     super.onStop()
-    subscriptions.clear()
-  }
-
-  private fun configureToolbar() {
-    val actionBar = this.supportActionBar ?: return
-    actionBar.show()
-    actionBar.setDisplayHomeAsUpEnabled(true)
-    actionBar.setHomeActionContentDescription(null)
-    actionBar.setTitle(R.string.settingsCustomOPDS)
-    this.toolbar.setLogoOnClickListener {
-      this.listener.post(SettingsDebugEvent.GoUpwards)
-    }
+    this.subscriptions.close()
   }
 
   private fun onTaskRunningChanged(running: Boolean) {

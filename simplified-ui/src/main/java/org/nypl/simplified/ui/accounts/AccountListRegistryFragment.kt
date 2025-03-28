@@ -1,39 +1,32 @@
 package org.nypl.simplified.ui.accounts
 
-import android.annotation.SuppressLint
-import android.content.Context
-import android.location.LocationManager
 import android.os.Bundle
-import android.text.InputType
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
-import android.view.inputmethod.EditorInfo
+import android.view.ViewGroup
 import android.widget.TextView
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.SearchView
-import androidx.appcompat.widget.SearchView.OnQueryTextListener
 import androidx.core.widget.ContentLoadingProgressBar
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import io.reactivex.disposables.CompositeDisposable
+import com.io7m.jattribute.core.AttributeType
+import com.io7m.jmulticlose.core.CloseableCollection
+import io.reactivex.android.schedulers.AndroidSchedulers
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.accounts.api.AccountEventCreation
 import org.nypl.simplified.accounts.api.AccountProviderDescription
-import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryEvent
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus
-import org.nypl.simplified.listeners.api.FragmentListenerType
-import org.nypl.simplified.listeners.api.fragmentListeners
+import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
+import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
+import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.images.ImageLoaderType
+import org.nypl.simplified.ui.main.MainAttributes
+import org.nypl.simplified.ui.main.MainNavigation
 import org.slf4j.LoggerFactory
-import org.thepalaceproject.theme.core.PalaceToolbar
 
 /**
  * A fragment that shows the account registry and allows for account creation.
@@ -41,41 +34,23 @@ import org.thepalaceproject.theme.core.PalaceToolbar
 
 class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
 
-  private val logger = LoggerFactory.getLogger(AccountListRegistryFragment::class.java)
-  private val subscriptions = CompositeDisposable()
-  private val listener: FragmentListenerType<AccountListRegistryEvent> by fragmentListeners()
+  private val logger =
+    LoggerFactory.getLogger(AccountListRegistryFragment::class.java)
 
-  private val requestLocationPermission = registerForActivityResult(
-    ActivityResultContracts.RequestPermission(),
-    ::getLocation
-  )
-  private val viewModel: AccountListRegistryViewModel by assistedViewModels {
-    val locationManager =
-      requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-    AccountListRegistryViewModel(locationManager)
-  }
+  private var subscriptions =
+    CloseableCollection.create()
 
+  private lateinit var toolbar: ViewGroup
   private lateinit var accountList: RecyclerView
   private lateinit var accountListAdapter: FilterableAccountListAdapter
-  private lateinit var imageLoader: ImageLoaderType
   private lateinit var progress: ContentLoadingProgressBar
   private lateinit var title: TextView
-  private lateinit var toolbar: PalaceToolbar
-  private var reload: MenuItem? = null
   private var errorDialog: AlertDialog? = null
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    setHasOptionsMenu(true)
-
-    val services =
-      Services.serviceDirectory()
-
-    this.imageLoader =
-      services.requireService(ImageLoaderType::class.java)
-  }
-
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+  override fun onViewCreated(
+    view: View,
+    savedInstanceState: Bundle?
+  ) {
     super.onViewCreated(view, savedInstanceState)
 
     this.title =
@@ -85,70 +60,89 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
     this.accountList =
       view.findViewById(R.id.accountRegistryList)
     this.toolbar =
-      view.rootView.findViewWithTag(PalaceToolbar.palaceToolbarName)
+      view.findViewById(R.id.accountListToolbar)
+
+    val imageLoader =
+      Services.serviceDirectory()
+        .requireService(ImageLoaderType::class.java)
 
     this.accountListAdapter =
       FilterableAccountListAdapter(
-        this.imageLoader,
+        imageLoader,
         this::onAccountClicked
       )
 
     with(this.accountList) {
-      setHasFixedSize(true)
-      layoutManager = LinearLayoutManager(this.context)
-      adapter = this@AccountListRegistryFragment.accountListAdapter
-      addItemDecoration(SpaceItemDecoration(RecyclerView.VERTICAL, requireContext()))
+      this.setHasFixedSize(true)
+      this.layoutManager = LinearLayoutManager(this.context)
+      this.adapter = this@AccountListRegistryFragment.accountListAdapter
+      this.addItemDecoration(
+        SpaceItemDecoration(
+          RecyclerView.VERTICAL,
+          this@AccountListRegistryFragment.requireContext()
+        )
+      )
     }
-    /**
-     * Disabling until we roll out Library Finder
-     */
-    // requestLocationPermission.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
   }
 
-  private fun onAccountClicked(account: AccountProviderDescription) {
+  private fun onAccountClicked(
+    account: AccountProviderDescription
+  ) {
     this.logger.debug("selected account: {} ({})", account.id, account.title)
 
     this.accountList.visibility = View.INVISIBLE
     this.title.setText(R.string.accountRegistryCreating)
     this.progress.show()
 
-    this.viewModel.createAccount(account.id)
+    val services =
+      Services.serviceDirectory()
+    val profiles =
+      services.requireService(ProfilesControllerType::class.java)
+
+    profiles.profileAccountCreate(account.id)
   }
 
   override fun onStart() {
     super.onStart()
-    this.configureToolbar()
 
-    this.viewModel.accountRegistryEvents
-      .subscribe(this::onAccountRegistryEvent)
-      .let { subscriptions.add(it) }
+    this.subscriptions =
+      CloseableCollection.create()
 
-    this.viewModel.accountCreationEvents
-      .subscribe(this::onAccountEvent)
-      .let { subscriptions.add(it) }
+    val services =
+      Services.serviceDirectory()
+    val registry =
+      services.requireService(AccountProviderRegistryType::class.java)
+    val profiles =
+      services.requireService(ProfilesControllerType::class.java)
 
-    this.viewModel.accountProvidersList
-      .subscribe(this::onAccountProvidersListUpdated)
-      .let { subscriptions.add(it) }
+    val registryStatusUI: AttributeType<AccountProviderRegistryStatus> =
+      MainAttributes.attributes.withValue(AccountProviderRegistryStatus.Idle)
 
-    this.reconfigureViewForRegistryStatus(this.viewModel.accountRegistryStatus)
-
-    this.viewModel.determineAvailableAccountProviderDescriptions()
-  }
-
-  private fun onAccountProvidersListUpdated(availableDescriptions: List<AccountProviderDescription?>) {
-    this.title.setText(
-      if (availableDescriptions.isEmpty()) {
-        R.string.accountRegistryEmpty
-      } else {
-        R.string.accountRegistrySelect
+    this.subscriptions.add(
+      MainAttributes.wrapAttribute(
+        source = registry.statusAttribute,
+        target = registryStatusUI
+      )
+    )
+    this.subscriptions.add(
+      registryStatusUI.subscribe { _, status ->
+        this.reconfigureViewForRegistryStatus(status)
       }
     )
 
-    this.accountListAdapter.submitList(availableDescriptions)
+    val accountSub =
+      profiles.accountEvents()
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(this::onAccountEvent)
+
+    this.subscriptions.add(AutoCloseable {
+      accountSub.dispose()
+    })
   }
 
-  private fun onAccountEvent(event: AccountEvent) {
+  private fun onAccountEvent(
+    event: AccountEvent
+  ) {
     when (event) {
       is AccountEventCreation.AccountEventCreationInProgress -> {
         this.accountList.visibility = View.INVISIBLE
@@ -157,100 +151,23 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
       }
 
       is AccountEventCreation.AccountEventCreationSucceeded -> {
-        this.listener.post(AccountListRegistryEvent.AccountCreated(event.id))
+        TODO()
       }
 
       is AccountEventCreation.AccountEventCreationFailed -> {
         this.showAccountCreationFailedDialog(event)
-        this.reconfigureViewForRegistryStatus(this.viewModel.accountRegistryStatus)
       }
     }
   }
 
-  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-    inflater.inflate(R.menu.account_list_registry, menu)
-    this.reload = menu.findItem(R.id.accountMenuActionReload)
-
-    val search = menu.findItem(R.id.accountMenuActionSearch)
-    val searchView = search.actionView as SearchView
-
-    searchView.imeOptions = EditorInfo.IME_ACTION_DONE
-    searchView.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_WORDS
-    searchView.queryHint = getString(R.string.accountSearchHint)
-    searchView.maxWidth = toolbar.getAvailableWidthForSearchView()
-
-    searchView.setOnQueryTextListener(object : OnQueryTextListener {
-      override fun onQueryTextSubmit(query: String): Boolean {
-        search.collapseActionView()
-        return true
-      }
-
-      override fun onQueryTextChange(newText: String): Boolean {
-        when {
-          newText.isEmpty() -> {
-            this@AccountListRegistryFragment.accountListAdapter.resetFilter()
-          }
-
-          newText.equals("NYPL", ignoreCase = true) -> {
-            this@AccountListRegistryFragment.accountListAdapter.filterList { account ->
-              account != null &&
-                account.title.contains("New York Public Library", ignoreCase = true)
-            }
-          }
-
-          else -> {
-            this@AccountListRegistryFragment.accountListAdapter.filterList { account ->
-              account != null &&
-                account.title.contains(newText, ignoreCase = true)
-            }
-          }
-        }
-        return true
-      }
-    })
-  }
-
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    return when (item.itemId) {
-      R.id.accountMenuActionReload -> {
-        this.reload()
-        true
-      }
-
-      else -> super.onOptionsItemSelected(item)
-    }
-  }
-
-  private fun configureToolbar() {
-    this.toolbar.title = getString(R.string.accountAdd)
-  }
-
-  private fun reload() {
-    this.reload?.isEnabled = false
-    this.viewModel.refreshAccountRegistry()
-  }
-
-  private fun onAccountRegistryEvent(event: AccountProviderRegistryEvent) {
-    return when (event) {
-      AccountProviderRegistryEvent.StatusChanged -> {
-        this.reconfigureViewForRegistryStatus(this.viewModel.accountRegistryStatus)
-      }
-
-      is AccountProviderRegistryEvent.Updated -> {
-      }
-
-      is AccountProviderRegistryEvent.SourceFailed -> {
-      }
-    }
-  }
-
-  private fun reconfigureViewForRegistryStatus(status: AccountProviderRegistryStatus) {
+  private fun reconfigureViewForRegistryStatus(
+    status: AccountProviderRegistryStatus
+  ) {
     return when (status) {
       AccountProviderRegistryStatus.Idle -> {
         this.title.setText(R.string.accountRegistrySelect)
         this.accountList.visibility = View.VISIBLE
         this.progress.hide()
-        this.reload?.isEnabled = true
       }
 
       AccountProviderRegistryStatus.Refreshing -> {
@@ -258,17 +175,18 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
         this.accountList.visibility = View.INVISIBLE
         this.progress.show()
         this.title.setText(R.string.accountRegistryRetrieving)
-        this.reload?.isEnabled = false
       }
     }
   }
 
   override fun onStop() {
     super.onStop()
-    this.subscriptions.clear()
+    this.subscriptions.close()
   }
 
-  private fun showAccountCreationFailedDialog(accountEvent: AccountEventCreation.AccountEventCreationFailed) {
+  private fun showAccountCreationFailedDialog(
+    accountEvent: AccountEventCreation.AccountEventCreationFailed
+  ) {
     this.logger.debug("showAccountCreationFailedDialog")
 
     if (this.errorDialog == null) {
@@ -286,19 +204,22 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
     }
   }
 
-  private fun showErrorPage(accountEvent: AccountEventCreation.AccountEventCreationFailed) {
+  private fun showErrorPage(
+    accountEvent: AccountEventCreation.AccountEventCreationFailed
+  ) {
+    val buildConfig =
+      Services.serviceDirectory()
+        .requireService(BuildConfigurationServiceType::class.java)
+
     val parameters =
       ErrorPageParameters(
-        emailAddress = this.viewModel.supportEmailAddress,
+        emailAddress = buildConfig.supportErrorReportEmailAddress,
         body = "",
         subject = "[palace-error-report]",
         attributes = accountEvent.attributes.toSortedMap(),
         taskSteps = accountEvent.taskResult.steps
       )
 
-    this.listener.post(AccountListRegistryEvent.OpenErrorPage(parameters))
+    MainNavigation.openErrorPage(parameters)
   }
-
-  @SuppressLint("MissingPermission")
-  private fun getLocation(isPermissionGranted: Boolean) = viewModel.getLocation(isPermissionGranted)
 }

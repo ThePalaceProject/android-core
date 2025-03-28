@@ -5,20 +5,15 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import io.reactivex.disposables.CompositeDisposable
 import org.librarysimplified.ui.R
-import org.nypl.simplified.listeners.api.FragmentListenerType
-import org.nypl.simplified.listeners.api.fragmentListeners
 import org.nypl.simplified.profiles.api.ProfileEvent
 import org.nypl.simplified.profiles.api.ProfileUpdated
+import org.nypl.simplified.ui.main.MainNavigation
 import org.slf4j.LoggerFactory
 
 class SettingsMainFragment3 : PreferenceFragmentCompat() {
 
   private val logger =
     LoggerFactory.getLogger(SettingsMainFragment3::class.java)
-
-  // XXX: Remove event based navigation when the catalog is rewritten
-  private val settingsEventListener: FragmentListenerType<SettingsMainEvent>
-    by this.fragmentListeners()
 
   private lateinit var settingsAbout: Preference
   private lateinit var settingsAccounts: Preference
@@ -130,11 +125,9 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
     if (doc != null) {
       preference.onPreferenceClickListener =
         Preference.OnPreferenceClickListener {
-          this.settingsEventListener.post(
-            SettingsMainEvent.OpenPrivacy(
-              title = it.title.toString(),
-              url = doc.readableURL.toString()
-            )
+          MainNavigation.Settings.openDocument(
+            title = it.title.toString(),
+            documentURL = doc.readableURL
           )
           true
         }
@@ -149,11 +142,9 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
     if (doc != null) {
       preference.onPreferenceClickListener =
         Preference.OnPreferenceClickListener {
-          this.settingsEventListener.post(
-            SettingsMainEvent.OpenLicense(
-              title = it.title.toString(),
-              url = doc.readableURL.toString()
-            )
+          MainNavigation.Settings.openDocument(
+            title = it.title.toString(),
+            documentURL = doc.readableURL
           )
           true
         }
@@ -168,11 +159,9 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
     if (doc != null) {
       preference.onPreferenceClickListener =
         Preference.OnPreferenceClickListener {
-          this.settingsEventListener.post(
-            SettingsMainEvent.OpenFAQ(
-              title = it.title.toString(),
-              url = doc.readableURL.toString()
-            )
+          MainNavigation.Settings.openDocument(
+            title = it.title.toString(),
+            documentURL = doc.readableURL
           )
           true
         }
@@ -187,11 +176,9 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
     if (doc != null) {
       preference.onPreferenceClickListener =
         Preference.OnPreferenceClickListener {
-          this.settingsEventListener.post(
-            SettingsMainEvent.OpenEULA(
-              title = it.title.toString(),
-              url = doc.readableURL.toString()
-            )
+          MainNavigation.Settings.openDocument(
+            title = it.title.toString(),
+            documentURL = doc.readableURL
           )
           true
         }
@@ -202,7 +189,7 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
     preference: Preference
   ) {
     preference.setOnPreferenceClickListener {
-      this.settingsEventListener.post(SettingsMainEvent.OpenDebugOptions)
+      MainNavigation.Settings.openDebugSettings()
       true
     }
 
@@ -229,7 +216,7 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
       preference.isEnabled = true
       preference.onPreferenceClickListener =
         Preference.OnPreferenceClickListener {
-          this.settingsEventListener.post(SettingsMainEvent.OpenAccountList)
+          MainNavigation.Settings.openAccountList()
           true
         }
     } else {
@@ -246,11 +233,9 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
     if (doc != null) {
       preference.onPreferenceClickListener =
         Preference.OnPreferenceClickListener {
-          this.settingsEventListener.post(
-            SettingsMainEvent.OpenAcknowledgments(
-              title = it.title.toString(),
-              url = doc.readableURL.toString()
-            )
+          MainNavigation.Settings.openDocument(
+            title = it.title.toString(),
+            documentURL = doc.readableURL
           )
           true
         }
@@ -265,11 +250,9 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
     if (doc != null) {
       preference.onPreferenceClickListener =
         Preference.OnPreferenceClickListener {
-          this.settingsEventListener.post(
-            SettingsMainEvent.OpenAbout(
-              title = it.title.toString(),
-              url = doc.readableURL.toString()
-            )
+          MainNavigation.Settings.openDocument(
+            title = it.title.toString(),
+            documentURL = doc.readableURL
           )
           true
         }

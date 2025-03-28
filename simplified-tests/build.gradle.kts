@@ -97,7 +97,6 @@ val dependencyObjects = listOf(
     project(":simplified-ui-branding"),
     project(":simplified-ui-errorpage"),
     project(":simplified-ui-images"),
-    project(":simplified-ui-listeners-api"),
     project(":simplified-ui-screen"),
     project(":simplified-viewer-api"),
     project(":simplified-viewer-audiobook"),

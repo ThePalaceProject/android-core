@@ -19,14 +19,12 @@ import androidx.appcompat.widget.SwitchCompat
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.junreachable.UnimplementedCodeException
 import com.io7m.junreachable.UnreachableCodeException
-import io.reactivex.disposables.CompositeDisposable
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
@@ -41,9 +39,7 @@ import org.nypl.simplified.accounts.api.AccountLoginState.AccountNotLoggedIn
 import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountUsername
-import org.nypl.simplified.android.ktx.supportActionBar
-import org.nypl.simplified.listeners.api.FragmentListenerType
-import org.nypl.simplified.listeners.api.fragmentListeners
+import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.oauth.OAuthCallbackIntentParsing
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.Basic
@@ -60,8 +56,9 @@ import org.nypl.simplified.ui.accounts.saml20.AccountSAML20Activity
 import org.nypl.simplified.ui.accounts.saml20.AccountSAML20Model
 import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
+import org.nypl.simplified.ui.main.MainApplication
+import org.nypl.simplified.ui.main.MainNavigation
 import org.slf4j.LoggerFactory
-import org.thepalaceproject.theme.core.PalaceToolbar
 import java.io.File
 import java.net.URI
 
@@ -76,32 +73,12 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   private val logger =
     LoggerFactory.getLogger(AccountDetailFragment::class.java)
 
-  private val subscriptions: CompositeDisposable =
-    CompositeDisposable()
-
-  private val listener: FragmentListenerType<AccountDetailEvent> by fragmentListeners()
-
-  private val parameters: AccountFragmentParameters by lazy {
-    this.requireArguments()[PARAMETERS_ID] as AccountFragmentParameters
-  }
-
-  private val services = Services.serviceDirectory()
-
-  private val viewModel: AccountDetailViewModel by viewModels(
-    factoryProducer = {
-      AccountDetailViewModelFactory(
-        account = this.parameters.accountID,
-        listener = this.listener
-      )
-    }
-  )
+  private var subscriptions =
+    CloseableCollection.create()
 
   private val fusedLocationClient by lazy {
-    LocationServices.getFusedLocationProviderClient(requireActivity())
+    LocationServices.getFusedLocationProviderClient(this.requireActivity())
   }
-
-  private val imageLoader: ImageLoaderType =
-    services.requireService(ImageLoaderType::class.java)
 
   private val locationPermissions = arrayOf(
     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -109,11 +86,11 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   )
 
   private val locationPermissionCallback =
-    registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { results ->
+    this.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { results ->
       if (results.values.all { it }) {
-        openCardCreatorWebView()
-      } else if (!shouldShowRationale()) {
-        showSettingsDialog()
+        this.openCardCreatorWebView()
+      } else if (!this.shouldShowRationale()) {
+        this.showSettingsDialog()
       }
     }
 
@@ -142,27 +119,13 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   private lateinit var settingsCardCreator: ConstraintLayout
   private lateinit var signUpButton: Button
   private lateinit var signUpLabel: TextView
-  private lateinit var toolbar: PalaceToolbar
 
   private val imageButtonLoadingTag = "IMAGE_BUTTON_LOADING"
 
-  companion object {
-
-    private const val PARAMETERS_ID =
-      "org.nypl.simplified.ui.accounts.AccountFragment.parameters"
-
-    /**
-     * Create a new account fragment for the given parameters.
-     */
-
-    fun create(parameters: AccountFragmentParameters): AccountDetailFragment {
-      val fragment = AccountDetailFragment()
-      fragment.arguments = bundleOf(PARAMETERS_ID to parameters)
-      return fragment
-    }
-  }
-
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+  override fun onViewCreated(
+    view: View,
+    savedInstanceState: Bundle?
+  ) {
     super.onViewCreated(view, savedInstanceState)
 
     this.accountEULA =
@@ -173,8 +136,6 @@ class AccountDetailFragment : Fragment(R.layout.account) {
       view.findViewById(R.id.accountCellSubtitle)
     this.accountIcon =
       view.findViewById(R.id.accountCellIcon)
-    this.toolbar =
-      view.rootView.findViewWithTag(PalaceToolbar.palaceToolbarName)
 
     this.authentication =
       view.findViewById(R.id.auth)
@@ -227,7 +188,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
     this.reportIssueEmail =
       this.reportIssueGroup.findViewById(R.id.accountReportIssueEmail)
 
-    if (this.parameters.showPleaseLogInTitle) {
+    if (AccountDetailModel.showPleaseLoginTitle) {
       this.loginTitle.visibility = View.VISIBLE
     } else {
       this.loginTitle.visibility = View.GONE
@@ -238,23 +199,6 @@ class AccountDetailFragment : Fragment(R.layout.account) {
      */
 
     this.authenticationAlternativesMake()
-
-    ImageAccountIcons.loadAccountLogoIntoView(
-      this.imageLoader.loader,
-      this.viewModel.account.provider.toDescription(),
-      R.drawable.account_default,
-      this.accountIcon
-    )
-
-    this.viewModel.accountLive.observe(this.viewLifecycleOwner) {
-      this.reconfigureAccountUI()
-    }
-  }
-
-  override fun onDestroyView() {
-    super.onDestroyView()
-    this.cancelImageButtonLoading()
-    this.imageLoader.loader.cancelRequest(this.accountIcon)
   }
 
   private fun onBasicUserPasswordChanged(
@@ -265,7 +209,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   }
 
   private fun determineLoginIsSatisfied(): AccountLoginButtonStatus {
-    val authDescription = this.viewModel.account.provider.authentication
+    val authDescription = AccountDetailModel.account.provider.authentication
     val loginPossible = authDescription.isLoginPossible
     val satisfiedFor = this.authenticationViews.isSatisfiedFor(authDescription)
 
@@ -284,25 +228,27 @@ class AccountDetailFragment : Fragment(R.layout.account) {
    */
 
   private fun shouldSignUpBeEnabled(): Boolean {
-    return viewModel.account.provider.cardCreatorURI != null
+    return AccountDetailModel.account.provider.cardCreatorURI != null
   }
 
   override fun onStart() {
     super.onStart()
 
+    this.subscriptions =
+      CloseableCollection.create()
+
     this.webViewDataDir =
       this.requireContext().getDir("webview", Context.MODE_PRIVATE)
 
-    this.configureToolbar()
+    val imageLoader =
+      Services.serviceDirectory()
+        .requireService(ImageLoaderType::class.java)
 
-    /*
-     * Configure the COPPA age gate switch. If the user changes their age, a log out
-     * is required.
-     */
-
-    this.authenticationViews.setCOPPAState(
-      isOver13 = this.viewModel.isOver13,
-      onAgeCheckboxClicked = this.onAgeCheckboxClicked()
+    ImageAccountIcons.loadAccountLogoIntoView(
+      imageLoader.loader,
+      AccountDetailModel.account.provider.toDescription(),
+      R.drawable.account_default,
+      this.accountIcon
     )
 
     /*
@@ -310,14 +256,14 @@ class AccountDetailFragment : Fragment(R.layout.account) {
      */
 
     this.signUpButton.setOnClickListener {
-      if (!isLocationPermissionGranted()) {
-        if (shouldShowRationale()) {
-          showLocationDisclaimerDialog()
+      if (!this.isLocationPermissionGranted()) {
+        if (this.shouldShowRationale()) {
+          this.showLocationDisclaimerDialog()
         } else {
-          requestLocationPermissions()
+          this.requestLocationPermissions()
         }
       } else {
-        openCardCreatorWebView()
+        this.openCardCreatorWebView()
       }
     }
 
@@ -326,7 +272,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
      */
 
     this.bookmarkSyncCheck.setOnClickListener {
-      this.viewModel.enableBookmarkSyncing(this.bookmarkSyncCheck.isChecked)
+      AccountDetailModel.enableBookmarkSyncing(this.bookmarkSyncCheck.isChecked)
     }
 
     /*
@@ -339,11 +285,11 @@ class AccountDetailFragment : Fragment(R.layout.account) {
      * Populate the barcode if passed in (e.g. via deep link).
      */
 
-    val barcode = this.parameters.barcode
+    val barcode = AccountDetailModel.barcode
     if (barcode == null) {
       this.authenticationViews.blank()
     } else {
-      when (this.viewModel.account.provider.authentication) {
+      when (AccountDetailModel.account.provider.authentication) {
         is AccountProviderAuthenticationDescription.Basic -> {
           this.authenticationViews.setBasicUserAndPass(
             user = barcode,
@@ -359,21 +305,11 @@ class AccountDetailFragment : Fragment(R.layout.account) {
         }
 
         AccountProviderAuthenticationDescription.Anonymous,
-        is AccountProviderAuthenticationDescription.COPPAAgeGate,
         is AccountProviderAuthenticationDescription.OAuthWithIntermediary,
         is AccountProviderAuthenticationDescription.SAML2_0 -> {
           // Nothing to do.
         }
       }
-    }
-
-    /*
-     * Hide the toolbar and back arrow if there is no page to return to (e.g. coming from a deep link).
-     */
-    if (this.parameters.hideToolbar) {
-      this.toolbar.visibility = View.GONE
-    } else {
-      this.toolbar.visibility = View.VISIBLE
     }
 
     /*
@@ -384,12 +320,9 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   }
 
   private fun instantiateAlternativeAuthenticationViews() {
-    for (alternative in this.viewModel.account.provider.authenticationAlternatives) {
+    val account = AccountDetailModel.account
+    for (alternative in account.provider.authenticationAlternatives) {
       when (alternative) {
-        is AccountProviderAuthenticationDescription.COPPAAgeGate -> {
-          this.logger.warn("COPPA age gate is not currently supported as an alternative.")
-        }
-
         is AccountProviderAuthenticationDescription.Basic -> {
           this.logger.warn("Basic authentication is not currently supported as an alternative.")
         }
@@ -435,8 +368,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
    */
 
   private fun configureReportIssue() {
-    val supportUrl = this.viewModel.account.provider.supportEmail
-
+    val supportUrl = AccountDetailModel.account.provider.supportEmail
     if (supportUrl != null) {
       this.reportIssueGroup.visibility = View.VISIBLE
       this.reportIssueEmail.text = supportUrl.replace("mailto:", "")
@@ -497,16 +429,16 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   private fun onTrySAML2Login(
     authenticationDescription: AccountProviderAuthenticationDescription.SAML2_0
   ) {
-    this.viewModel.tryLogin(
+    AccountDetailModel.tryLogin(
       ProfileAccountLoginRequest.SAML20Initiate(
-        accountId = this.parameters.accountID,
+        accountId = AccountDetailModel.account.id,
         description = authenticationDescription
       )
     )
 
     AccountSAML20Model.startAuthenticationProcess(
-      application = this.requireActivity().application,
-      accountID = this.parameters.accountID,
+      application = MainApplication.application,
+      accountID = AccountDetailModel.account.id,
       authenticationDescription = authenticationDescription,
       webViewDataDirectory = this.webViewDataDir
     )
@@ -518,16 +450,18 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   private fun onTryOAuthLogin(
     authenticationDescription: AccountProviderAuthenticationDescription.OAuthWithIntermediary
   ) {
-    this.viewModel.tryLogin(
+    AccountDetailModel.tryLogin(
       OAuthWithIntermediaryInitiate(
-        accountId = this.viewModel.account.id,
+        accountId = AccountDetailModel.account.id,
         description = authenticationDescription
       )
     )
     this.sendOAuthIntent(authenticationDescription)
   }
 
-  private fun onTryBasicLogin(description: AccountProviderAuthenticationDescription.Basic) {
+  private fun onTryBasicLogin(
+    description: AccountProviderAuthenticationDescription.Basic
+  ) {
     val accountPassword: AccountPassword =
       this.authenticationViews.getBasicPassword()
     val accountUsername: AccountUsername =
@@ -535,13 +469,13 @@ class AccountDetailFragment : Fragment(R.layout.account) {
 
     val request =
       Basic(
-        accountId = this.viewModel.account.id,
+        accountId = AccountDetailModel.account.id,
         description = description,
         password = accountPassword,
         username = accountUsername
       )
 
-    this.viewModel.tryLogin(request)
+    AccountDetailModel.tryLogin(request)
   }
 
   private fun onTryBasicTokenLogin(
@@ -554,24 +488,28 @@ class AccountDetailFragment : Fragment(R.layout.account) {
 
     val request =
       BasicToken(
-        accountId = this.viewModel.account.id,
+        accountId = AccountDetailModel.account.id,
         description = description,
         password = accountPassword,
         username = accountUsername
       )
 
-    this.viewModel.tryLogin(request)
+    AccountDetailModel.tryLogin(request)
   }
 
   private fun sendOAuthIntent(
     authenticationDescription: AccountProviderAuthenticationDescription.OAuthWithIntermediary
   ) {
+    val services =
+      Services.serviceDirectory()
+    val buildConfig =
+      services.requireService(BuildConfigurationServiceType::class.java)
     val callbackScheme =
-      this.viewModel.buildConfig.oauthCallbackScheme.scheme
+      buildConfig.oauthCallbackScheme.scheme
     val callbackUrl =
       OAuthCallbackIntentParsing.createUri(
         requiredScheme = callbackScheme,
-        accountId = this.viewModel.account.id.uuid
+        accountId = AccountDetailModel.account.id.uuid
       )
 
     /*
@@ -588,98 +526,72 @@ class AccountDetailFragment : Fragment(R.layout.account) {
     this.startActivity(i)
   }
 
-  private fun configureToolbar() {
-    val providerName = this.viewModel.account.provider.displayName
-    val actionBar = this.supportActionBar ?: return
-    actionBar.show()
-    actionBar.setDisplayHomeAsUpEnabled(true)
-    actionBar.setHomeActionContentDescription(null)
-    actionBar.setTitle(providerName)
-    this.toolbar.setLogoOnClickListener {
-      this.listener.post(AccountDetailEvent.GoUpwards)
-    }
-  }
-
   override fun onStop() {
     super.onStop()
 
-    /*
-     * Broadcast the login state. The reason for doing this is that consumers might be subscribed
-     * to the account so that they can perform actions when the user has either attempted to log
-     * in, or has cancelled without attempting it. The consumers have no way to detect the fact
-     * that the user didn't even try to log in unless we tell the account to broadcast its current
-     * state.
-     */
-
-    this.logger.debug("broadcasting login state")
-    this.viewModel.account.setLoginState(this.viewModel.account.loginState)
-
-    this.subscriptions.clear()
+    this.subscriptions.close()
   }
 
   private fun reconfigureAccountUI() {
-    this.authenticationViews.showFor(this.viewModel.account.provider.authentication)
+    val account = AccountDetailModel.account
 
-    if (this.viewModel.account.provider.cardCreatorURI != null) {
+    this.authenticationViews.showFor(account.provider.authentication)
+
+    if (account.provider.cardCreatorURI != null) {
       this.settingsCardCreator.visibility = View.VISIBLE
     }
 
     this.accountTitle.text =
-      this.viewModel.account.provider.displayName
+      account.provider.displayName
     this.accountSubtitle.text =
-      this.viewModel.account.provider.subtitle
+      account.provider.subtitle
 
-    this.bookmarkSync.visibility = if (this.viewModel.account.requiresCredentials) {
+    this.bookmarkSync.visibility = if (account.requiresCredentials) {
       View.VISIBLE
     } else {
       View.GONE
     }
 
-    this.bookmarkSyncCheck.isEnabled = this.viewModel.account.isBookmarkSyncable()
-    this.bookmarkSyncCheck.isChecked = this.viewModel.account.preferences.bookmarkSyncingPermitted
+    this.bookmarkSyncCheck.isEnabled = account.isBookmarkSyncable()
+    this.bookmarkSyncCheck.isChecked = account.preferences.bookmarkSyncingPermitted
 
     /*
      * Only show a EULA if there's actually a EULA.
      */
-    val eula = this.viewModel.eula
+
+    val eula = account.provider.eula
     if (eula != null) {
       this.accountEULA.visibility = View.VISIBLE
       this.accountEULA.setOnClickListener {
-        this.listener.post(
-          AccountDetailEvent.OpenDocViewer(
-            getString(R.string.accountEULA),
-            eula.readableURL
-          )
+        MainNavigation.Settings.openDocument(
+          this.getString(R.string.accountEULA),
+          eula.toURL()
         )
       }
     } else {
       this.accountEULA.visibility = View.GONE
     }
 
-    val privacyPolicy = this.viewModel.privacyPolicy
+    val privacyPolicy = account.provider.privacyPolicy
     if (privacyPolicy != null) {
       this.accountPrivacyPolicy.visibility = View.VISIBLE
       this.accountPrivacyPolicy.setOnClickListener {
-        this.listener.post(
-          AccountDetailEvent.OpenDocViewer(
-            getString(R.string.accountPrivacyPolicy),
-            privacyPolicy.readableURL
-          )
+        MainNavigation.Settings.openDocument(
+          this.getString(R.string.accountPrivacyPolicy),
+          privacyPolicy.toURL()
         )
       }
     } else {
       this.accountPrivacyPolicy.visibility = View.GONE
     }
 
-    val licenses = this.viewModel.licenses
+    val licenses = account.provider.license
     if (licenses != null) {
       this.accountLicenses.visibility = View.VISIBLE
       this.accountLicenses.setOnClickListener {
-        this.listener.post(
-          AccountDetailEvent.OpenDocViewer(
-            getString(R.string.accountLicenses),
-            licenses.readableURL
-          )
+        MainNavigation.Settings.openDocument(
+          this.getString(R.string.accountLicenses),
+          licenses.toURL()
         )
       }
     } else {
@@ -698,7 +610,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
      * Show/hide the custom OPDS feed section.
      */
 
-    val catalogURIOverride = this.viewModel.account.preferences.catalogURIOverride
+    val catalogURIOverride = account.preferences.catalogURIOverride
     this.accountCustomOPDSField.text = catalogURIOverride?.toString() ?: ""
     this.accountCustomOPDS.visibility =
       if (catalogURIOverride != null) {
@@ -707,9 +619,9 @@ class AccountDetailFragment : Fragment(R.layout.account) {
         View.GONE
       }
 
-    this.disableSyncSwitchForLoginState(this.viewModel.account.loginState)
+    this.disableSyncSwitchForLoginState(account.loginState)
 
-    return when (val loginState = this.viewModel.account.loginState) {
+    return when (val loginState = account.loginState) {
       AccountNotLoggedIn -> {
         this.loginProgress.visibility = View.GONE
         this.setLoginButtonStatus(
@@ -719,10 +631,6 @@ class AccountDetailFragment : Fragment(R.layout.account) {
           }
         )
 
-        if (this.viewModel.pendingLogout) {
-          this.authenticationViews.blank()
-          this.viewModel.pendingLogout = false
-        }
         this.loginFormUnlock()
       }
 
@@ -756,24 +664,23 @@ class AccountDetailFragment : Fragment(R.layout.account) {
             when (val desc = loginState.description) {
               AccountProviderAuthenticationDescription.Anonymous,
               is AccountProviderAuthenticationDescription.Basic,
-              is AccountProviderAuthenticationDescription.BasicToken,
-              is AccountProviderAuthenticationDescription.COPPAAgeGate -> {
+              is AccountProviderAuthenticationDescription.BasicToken -> {
                 throw UnreachableCodeException()
               }
 
               is AccountProviderAuthenticationDescription.OAuthWithIntermediary -> {
-                this.viewModel.tryLogin(
+                AccountDetailModel.tryLogin(
                   OAuthWithIntermediaryCancel(
-                    accountId = this.viewModel.account.id,
+                    accountId = account.id,
                     description = desc
                   )
                 )
               }
 
               is AccountProviderAuthenticationDescription.SAML2_0 -> {
-                this.viewModel.tryLogin(
+                AccountDetailModel.tryLogin(
                   ProfileAccountLoginRequest.SAML20Cancel(
-                    accountId = this.viewModel.account.id,
+                    accountId = account.id,
                     description = desc
                   )
                 )
@@ -797,7 +704,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
         )
         this.loginButtonErrorDetails.visibility = View.VISIBLE
         this.loginButtonErrorDetails.setOnClickListener {
-          this.viewModel.openErrorPage(loginState.taskResult.steps)
+          AccountDetailModel.openErrorPage(loginState.taskResult.steps)
         }
         this.authenticationAlternativesShow()
       }
@@ -830,7 +737,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
         this.setLoginButtonStatus(
           AsLogoutButtonEnabled {
             this.loginFormLock()
-            this.viewModel.tryLogout()
+            AccountDetailModel.tryLogout()
           }
         )
         this.authenticationAlternativesHide()
@@ -896,13 +803,13 @@ class AccountDetailFragment : Fragment(R.layout.account) {
         this.setLoginButtonStatus(
           AsLogoutButtonEnabled {
             this.loginFormLock()
-            this.viewModel.tryLogout()
+            AccountDetailModel.tryLogout()
           }
         )
 
         this.loginButtonErrorDetails.visibility = View.VISIBLE
         this.loginButtonErrorDetails.setOnClickListener {
-          this.viewModel.openErrorPage(loginState.taskResult.steps)
+          AccountDetailModel.openErrorPage(loginState.taskResult.steps)
         }
       }
     }
@@ -927,7 +834,12 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   }
 
   private fun cancelImageButtonLoading() {
-    this.imageLoader.loader.cancelTag(this.imageButtonLoadingTag)
+    val services =
+      Services.serviceDirectory()
+    val imageLoader =
+      services.requireService(ImageLoaderType::class.java)
+
+    imageLoader.loader.cancelTag(this.imageButtonLoadingTag)
   }
 
   private fun setLoginButtonStatus(
@@ -935,8 +847,12 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   ) {
     this.authenticationViews.setLoginButtonStatus(status)
 
-    val supportUrl = this.viewModel.account.provider.supportEmail
-    val resetPasswordURI = this.viewModel.account.provider.resetPasswordURI
+    val account =
+      AccountDetailModel.account
+    val supportUrl =
+      account.provider.supportEmail
+    val resetPasswordURI =
+      account.provider.resetPasswordURI
 
     this.authenticationViews.setResetPasswordLabelStatus(
       status,
@@ -968,7 +884,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
 
       is AsLogoutButtonEnabled -> {
         this.signUpLabel.setText(R.string.accountWantChildCard)
-        val enableSignup = shouldSignUpBeEnabled()
+        val enableSignup = this.shouldSignUpBeEnabled()
         this.signUpLabel.isEnabled = false
         this.signUpButton.isEnabled = false
         this.signUpLabel.setText(R.string.accountCardCreatorLabel)
@@ -991,9 +907,14 @@ class AccountDetailFragment : Fragment(R.layout.account) {
     onSuccess: () -> Unit
   ) {
     if (uri != null) {
+      val services =
+        Services.serviceDirectory()
+      val imageLoader =
+        services.requireService(ImageLoaderType::class.java)
+
       view.setImageDrawable(null)
       view.visibility = View.VISIBLE
-      this.imageLoader.loader.load(uri.toString())
+      imageLoader.loader.load(uri.toString())
         .fit()
         .tag(this.imageButtonLoadingTag)
         .into(
@@ -1013,11 +934,6 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   }
 
   private fun loginFormLock() {
-    this.authenticationViews.setCOPPAState(
-      isOver13 = this.viewModel.isOver13,
-      onAgeCheckboxClicked = this.onAgeCheckboxClicked()
-    )
-
     this.authenticationViews.lock()
 
     this.setLoginButtonStatus(AsLoginButtonDisabled)
@@ -1025,25 +941,21 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   }
 
   private fun loginFormUnlock() {
-    this.authenticationViews.setCOPPAState(
-      isOver13 = this.viewModel.isOver13,
-      onAgeCheckboxClicked = this.onAgeCheckboxClicked()
-    )
-
     this.authenticationViews.unlock()
 
     val loginSatisfied = this.determineLoginIsSatisfied()
     this.setLoginButtonStatus(loginSatisfied)
     this.authenticationAlternativesShow()
-    if (shouldSignUpBeEnabled()) {
+    if (this.shouldSignUpBeEnabled()) {
       this.signUpButton.isEnabled = true
       this.signUpLabel.isEnabled = true
     }
   }
 
   private fun authenticationAlternativesMake() {
+    val account = AccountDetailModel.account
     this.authenticationAlternativesButtons.removeAllViews()
-    if (this.viewModel.account.provider.authenticationAlternatives.isEmpty()) {
+    if (account.provider.authenticationAlternatives.isEmpty()) {
       this.authenticationAlternativesHide()
     } else {
       this.instantiateAlternativeAuthenticationViews()
@@ -1052,7 +964,8 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   }
 
   private fun authenticationAlternativesShow() {
-    if (this.viewModel.account.provider.authenticationAlternatives.isNotEmpty()) {
+    val account = AccountDetailModel.account
+    if (account.provider.authenticationAlternatives.isNotEmpty()) {
       this.authenticationAlternatives.visibility = View.VISIBLE
     }
   }
@@ -1062,7 +975,8 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   }
 
   private fun tryLogin() {
-    when (val description = this.viewModel.account.provider.authentication) {
+    val account = AccountDetailModel.account
+    when (val description = account.provider.authentication) {
       is AccountProviderAuthenticationDescription.SAML2_0 ->
         this.onTrySAML2Login(description)
 
@@ -1075,81 +989,57 @@ class AccountDetailFragment : Fragment(R.layout.account) {
       is AccountProviderAuthenticationDescription.BasicToken ->
         this.onTryBasicTokenLogin(description)
 
-      is AccountProviderAuthenticationDescription.Anonymous,
-      is AccountProviderAuthenticationDescription.COPPAAgeGate ->
+      is AccountProviderAuthenticationDescription.Anonymous ->
         throw UnreachableCodeException()
     }
   }
 
-  /**
-   * A click listener for the age checkbox. If the user wants to change their age, then
-   * this must trigger an account logout.
-   */
-
-  private fun onAgeCheckboxClicked(): (View) -> Unit = {
-    val isOver13 = this.viewModel.isOver13
-    MaterialAlertDialogBuilder(this.requireContext())
-      .setTitle(R.string.accountCOPPADeleteBooks)
-      .setMessage(R.string.accountCOPPADeleteBooksConfirm)
-      .setNegativeButton(R.string.accountCancel) { _, _ ->
-        this.authenticationViews.setCOPPAState(
-          isOver13 = isOver13,
-          onAgeCheckboxClicked = this.onAgeCheckboxClicked()
-        )
-      }
-      .setPositiveButton(R.string.accountDelete) { _, _ ->
-        this.loginFormLock()
-        this.viewModel.isOver13 = !isOver13
-        this.viewModel.tryLogout()
-      }
-      .create()
-      .show()
-  }
-
   private fun isLocationPermissionGranted(): Boolean {
-    return locationPermissions.all { permission ->
-      ContextCompat.checkSelfPermission(requireContext(), permission) ==
+    return this.locationPermissions.all { permission ->
+      ContextCompat.checkSelfPermission(this.requireContext(), permission) ==
         PackageManager.PERMISSION_GRANTED
     }
   }
 
   private fun shouldShowRationale(): Boolean {
-    return locationPermissions.all { permission ->
-      ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), permission)
+    return this.locationPermissions.all { permission ->
+      ActivityCompat.shouldShowRequestPermissionRationale(this.requireActivity(), permission)
     }
   }
 
   private fun openAppSettings() {
-    startActivity(
+    this.startActivity(
       Intent().apply {
-        action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-        data = Uri.fromParts("package", requireContext().packageName, null)
+        this.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+        this.data =
+          Uri.fromParts("package", this@AccountDetailFragment.requireContext().packageName, null)
       }
     )
   }
 
   private fun openCardCreatorWebView() {
-    val cardCreatorURI = this.viewModel.account.provider.cardCreatorURI
+    val account =
+      AccountDetailModel.account
+    val cardCreatorURI =
+      account.provider.cardCreatorURI
 
     try {
-      fusedLocationClient.lastLocation
+      this.fusedLocationClient.lastLocation
         .addOnSuccessListener { location ->
           if (location != null) {
-            listener.post(
-              AccountDetailEvent.OpenWebView(
-                AccountCardCreatorParameters(
-                  url = cardCreatorURI.toString(),
-                  lat = location.latitude,
-                  long = location.longitude
-                )
+            MainNavigation.Settings.openCardCreator(
+              AccountCardCreatorParameters(
+                url = cardCreatorURI.toString(),
+                lat = location.latitude,
+                long = location.longitude
               )
             )
           } else {
-            showErrorGettingLocationDialog()
+            this.showErrorGettingLocationDialog()
           }
         }
         .addOnFailureListener {
-          showErrorGettingLocationDialog()
+          this.showErrorGettingLocationDialog()
         }
     } catch (exception: SecurityException) {
       this.logger.error("Error handling fusedLocationClient permissions")
@@ -1157,26 +1047,26 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   }
 
   private fun showErrorGettingLocationDialog() {
-    MaterialAlertDialogBuilder(requireContext())
-      .setMessage(getString(R.string.accountCardCreatorLocationFailed))
+    MaterialAlertDialogBuilder(this.requireContext())
+      .setMessage(this.getString(R.string.accountCardCreatorLocationFailed))
       .create()
       .show()
   }
 
   private fun showLocationDisclaimerDialog() {
-    MaterialAlertDialogBuilder(requireContext())
+    MaterialAlertDialogBuilder(this.requireContext())
       .setMessage(R.string.accountCardCreatorDialogPermissionsMessage)
-      .setPositiveButton(android.R.string.ok) { _, _ -> requestLocationPermissions() }
+      .setPositiveButton(android.R.string.ok) { _, _ -> this.requestLocationPermissions() }
       .setNegativeButton(R.string.accountCardCreatorDialogCancel) { dialog, _ -> dialog?.dismiss() }
       .create()
       .show()
   }
 
   private fun showSettingsDialog() {
-    MaterialAlertDialogBuilder(requireContext())
+    MaterialAlertDialogBuilder(this.requireContext())
       .setMessage(R.string.accountCardCreatorDialogOpenSettingsMessage)
       .setPositiveButton(R.string.accountCardCreatorDialogOpenSettings) { _, _ ->
-        openAppSettings()
+        this.openAppSettings()
       }
       .setNegativeButton(R.string.accountCardCreatorDialogCancel) { dialog, _ ->
         dialog.dismiss()
@@ -1186,6 +1076,6 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   }
 
   private fun requestLocationPermissions() {
-    locationPermissionCallback.launch(locationPermissions)
+    this.locationPermissionCallback.launch(this.locationPermissions)
   }
 }
