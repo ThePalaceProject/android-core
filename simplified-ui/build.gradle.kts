@@ -83,7 +83,6 @@ dependencies {
     implementation(project(":simplified-taskrecorder-api"))
     implementation(project(":simplified-tenprint"))
     implementation(project(":simplified-threads"))
-    implementation(project(":simplified-ui-branding"))
     implementation(project(":simplified-ui-errorpage"))
     implementation(project(":simplified-ui-images"))
     implementation(project(":simplified-ui-screen"))
