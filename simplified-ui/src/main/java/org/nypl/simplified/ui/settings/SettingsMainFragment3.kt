@@ -3,11 +3,18 @@ package org.nypl.simplified.ui.settings
 import android.os.Bundle
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import org.librarysimplified.documents.DocumentStoreType
+import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
+import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.profiles.api.ProfileEvent
 import org.nypl.simplified.profiles.api.ProfileUpdated
+import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.main.MainNavigation
+import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
+import org.nypl.simplified.ui.screens.ScreenDefinitionType
 import org.slf4j.LoggerFactory
 
 class SettingsMainFragment3 : PreferenceFragmentCompat() {
@@ -29,12 +36,41 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
 
   private var subscriptions = CompositeDisposable()
 
+  companion object : ScreenDefinitionFactoryType<Unit, SettingsMainFragment3> {
+    private class ScreenSettingsMain : ScreenDefinitionType<Unit, SettingsMainFragment3> {
+      override fun setup() {
+        // No setup required
+      }
+
+      override fun parameters() {
+        return Unit
+      }
+
+      override fun fragment(): SettingsMainFragment3 {
+        return SettingsMainFragment3()
+      }
+    }
+
+    override fun createScreenDefinition(
+      p: Unit
+    ): ScreenDefinitionType<Unit, SettingsMainFragment3> {
+      return ScreenSettingsMain()
+    }
+  }
+
   override fun onStart() {
     super.onStart()
 
+    val services =
+      Services.serviceDirectory()
+    val profiles =
+      services.requireService(ProfilesControllerType::class.java)
+
     this.subscriptions = CompositeDisposable()
     this.subscriptions.add(
-      SettingsModel.profileEvents.subscribe(this::onProfileEvent)
+      profiles.profileEvents()
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(this::onProfileEvent)
     )
 
     try {
@@ -89,6 +125,11 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
 
   private fun formatVersion(): String {
     return try {
+      val services =
+        Services.serviceDirectory()
+      val buildConfig =
+        services.requireService(BuildConfigurationServiceType::class.java)
+
       val context =
         this.requireContext()
       val pkgManager =
@@ -96,7 +137,7 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
       val pkgInfo =
         pkgManager.getPackageInfo(context.packageName, 0)
       val versionName =
-        SettingsModel.buildConfig.simplifiedVersion
+        buildConfig.simplifiedVersion
 
       "$versionName (${pkgInfo.versionCode})"
     } catch (e: Throwable) {
@@ -120,14 +161,21 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
   private fun configurePrivacy(
     preference: Preference
   ) {
-    val doc = SettingsModel.documents.privacyPolicy
+    val services =
+      Services.serviceDirectory()
+    val documents =
+      services.requireService(DocumentStoreType::class.java)
+
+    val doc = documents.privacyPolicy
     preference.isVisible = doc != null
     if (doc != null) {
       preference.onPreferenceClickListener =
         Preference.OnPreferenceClickListener {
           MainNavigation.Settings.openDocument(
-            title = it.title.toString(),
-            documentURL = doc.readableURL
+            SettingsDocumentViewerModel.DocumentTarget(
+              title = it.title.toString(),
+              url = doc.readableURL.toExternalForm()
+            )
           )
           true
         }
@@ -137,14 +185,21 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
   private fun configureLicense(
     preference: Preference
   ) {
-    val doc = SettingsModel.documents.licenses
+    val services =
+      Services.serviceDirectory()
+    val documents =
+      services.requireService(DocumentStoreType::class.java)
+
+    val doc = documents.licenses
     preference.isVisible = doc != null
     if (doc != null) {
       preference.onPreferenceClickListener =
         Preference.OnPreferenceClickListener {
           MainNavigation.Settings.openDocument(
-            title = it.title.toString(),
-            documentURL = doc.readableURL
+            SettingsDocumentViewerModel.DocumentTarget(
+              title = it.title.toString(),
+              url = doc.readableURL.toExternalForm()
+            )
           )
           true
         }
@@ -154,14 +209,21 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
   private fun configureFaq(
     preference: Preference
   ) {
-    val doc = SettingsModel.documents.faq
+    val services =
+      Services.serviceDirectory()
+    val documents =
+      services.requireService(DocumentStoreType::class.java)
+
+    val doc = documents.faq
     preference.isVisible = doc != null
     if (doc != null) {
       preference.onPreferenceClickListener =
         Preference.OnPreferenceClickListener {
           MainNavigation.Settings.openDocument(
-            title = it.title.toString(),
-            documentURL = doc.readableURL
+            SettingsDocumentViewerModel.DocumentTarget(
+              title = it.title.toString(),
+              url = doc.readableURL.toExternalForm()
+            )
           )
           true
         }
@@ -171,14 +233,21 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
   private fun configureEULA(
     preference: Preference
   ) {
-    val doc = SettingsModel.documents.eula
+    val services =
+      Services.serviceDirectory()
+    val documents =
+      services.requireService(DocumentStoreType::class.java)
+
+    val doc = documents.eula
     preference.isVisible = doc != null
     if (doc != null) {
       preference.onPreferenceClickListener =
         Preference.OnPreferenceClickListener {
           MainNavigation.Settings.openDocument(
-            title = it.title.toString(),
-            documentURL = doc.readableURL
+            SettingsDocumentViewerModel.DocumentTarget(
+              title = it.title.toString(),
+              url = doc.readableURL.toExternalForm()
+            )
           )
           true
         }
@@ -193,18 +262,29 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
       true
     }
 
+    val profiles =
+      Services.serviceDirectory()
+        .requireService(ProfilesControllerType::class.java)
+
     // Show the debug settings menu, if enabled
-    preference.isVisible = SettingsModel.showDebugSettings
+    preference.isVisible = SettingsModel.showDebugSettings(profiles)
   }
 
   private fun configureBuild(
     preference: Preference
   ) {
+    val services =
+      Services.serviceDirectory()
+    val profiles =
+      services.requireService(ProfilesControllerType::class.java)
+    val buildConfig =
+      services.requireService(BuildConfigurationServiceType::class.java)
+
     preference.setSummaryProvider {
-      SettingsModel.buildConfig.vcsCommit
+      buildConfig.vcsCommit
     }
     preference.setOnPreferenceClickListener {
-      SettingsModel.onClickVersion()
+      SettingsModel.onClickVersion(profiles)
       true
     }
   }
@@ -212,7 +292,12 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
   private fun configureAccounts(
     preference: Preference
   ) {
-    if (SettingsModel.buildConfig.allowAccountsAccess) {
+    val services =
+      Services.serviceDirectory()
+    val buildConfig =
+      services.requireService(BuildConfigurationServiceType::class.java)
+
+    if (buildConfig.allowAccountsAccess) {
       preference.isEnabled = true
       preference.onPreferenceClickListener =
         Preference.OnPreferenceClickListener {
@@ -228,14 +313,21 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
   private fun configureAcknowledgements(
     preference: Preference
   ) {
-    val doc = SettingsModel.documents.acknowledgements
+    val services =
+      Services.serviceDirectory()
+    val documents =
+      services.requireService(DocumentStoreType::class.java)
+
+    val doc = documents.acknowledgements
     preference.isVisible = doc != null
     if (doc != null) {
       preference.onPreferenceClickListener =
         Preference.OnPreferenceClickListener {
           MainNavigation.Settings.openDocument(
-            title = it.title.toString(),
-            documentURL = doc.readableURL
+            SettingsDocumentViewerModel.DocumentTarget(
+              title = it.title.toString(),
+              url = doc.readableURL.toExternalForm()
+            )
           )
           true
         }
@@ -245,14 +337,21 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
   private fun configureAbout(
     preference: Preference
   ) {
-    val doc = SettingsModel.documents.about
+    val services =
+      Services.serviceDirectory()
+    val documents =
+      services.requireService(DocumentStoreType::class.java)
+
+    val doc = documents.about
     preference.isVisible = doc != null
     if (doc != null) {
       preference.onPreferenceClickListener =
         Preference.OnPreferenceClickListener {
           MainNavigation.Settings.openDocument(
-            title = it.title.toString(),
-            documentURL = doc.readableURL
+            SettingsDocumentViewerModel.DocumentTarget(
+              title = it.title.toString(),
+              url = doc.readableURL.toExternalForm()
+            )
           )
           true
         }

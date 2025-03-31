@@ -14,7 +14,6 @@ import org.librarysimplified.ui.R
 import org.nypl.simplified.ui.catalog.CatalogFragmentHolds
 import org.nypl.simplified.ui.catalog.CatalogFragmentMain
 import org.nypl.simplified.ui.catalog.CatalogFragmentMyBooks
-import org.nypl.simplified.ui.settings.SettingsMainFragment3
 
 /**
  * The main fragment that handles the tabbed view. The fragment is responsible for attaching
@@ -83,7 +82,20 @@ class MainTabsFragment : Fragment() {
      */
 
     this.switchToTab(MainTabModel.tabSelected ?: 0)
+
     this.subscriptions = CloseableCollection.create()
+    this.subscriptions.add(
+      MainNavigation.Settings.navigationStack.subscribe { _, newValue ->
+        this.onSettingsTabChanged()
+      }
+    )
+  }
+
+  private fun onSettingsTabChanged() {
+    val index = MainTabModel.tabSelected
+    if (index != null) {
+      this.setTabFragment(index)
+    }
   }
 
   private fun switchToTab(
@@ -100,7 +112,7 @@ class MainTabsFragment : Fragment() {
       0 -> this.switchFragment(CatalogFragmentMain())
       1 -> this.switchFragment(CatalogFragmentMyBooks())
       2 -> this.switchFragment(CatalogFragmentHolds())
-      3 -> this.switchFragment(SettingsMainFragment3())
+      3 -> this.switchFragment(MainNavigation.Settings.currentScreen().fragment())
       else -> throw IllegalStateException("Unexpected tab index: $tabIndex")
     }
   }

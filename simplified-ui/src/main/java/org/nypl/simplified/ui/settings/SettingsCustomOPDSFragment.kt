@@ -15,6 +15,8 @@ import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
+import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
+import org.nypl.simplified.ui.screens.ScreenDefinitionType
 import org.slf4j.LoggerFactory
 import java.net.URI
 
@@ -34,6 +36,29 @@ class SettingsCustomOPDSFragment : Fragment(R.layout.settings_custom_opds) {
   private lateinit var feedURL: EditText
   private lateinit var progress: ProgressBar
   private lateinit var progressText: TextView
+
+  companion object : ScreenDefinitionFactoryType<Unit, SettingsCustomOPDSFragment> {
+    private class ScreenSettingsCustomOPDS :
+      ScreenDefinitionType<Unit, SettingsCustomOPDSFragment> {
+      override fun setup() {
+        // No setup required
+      }
+
+      override fun parameters() {
+        return Unit
+      }
+
+      override fun fragment(): SettingsCustomOPDSFragment {
+        return SettingsCustomOPDSFragment()
+      }
+    }
+
+    override fun createScreenDefinition(
+      p: Unit
+    ): ScreenDefinitionType<Unit, SettingsCustomOPDSFragment> {
+      return ScreenSettingsCustomOPDS()
+    }
+  }
 
   override fun onViewCreated(
     view: View,

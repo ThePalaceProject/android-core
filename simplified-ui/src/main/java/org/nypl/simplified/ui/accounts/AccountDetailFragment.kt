@@ -58,6 +58,7 @@ import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.nypl.simplified.ui.main.MainApplication
 import org.nypl.simplified.ui.main.MainNavigation
+import org.nypl.simplified.ui.settings.SettingsDocumentViewerModel
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URI
@@ -564,8 +565,10 @@ class AccountDetailFragment : Fragment(R.layout.account) {
       this.accountEULA.visibility = View.VISIBLE
       this.accountEULA.setOnClickListener {
         MainNavigation.Settings.openDocument(
-          this.getString(R.string.accountEULA),
-          eula.toURL()
+          SettingsDocumentViewerModel.DocumentTarget(
+            title = this.getString(R.string.accountEULA),
+            url = eula.toString()
+          )
         )
       }
     } else {
@@ -577,8 +580,10 @@ class AccountDetailFragment : Fragment(R.layout.account) {
       this.accountPrivacyPolicy.visibility = View.VISIBLE
       this.accountPrivacyPolicy.setOnClickListener {
         MainNavigation.Settings.openDocument(
-          this.getString(R.string.accountPrivacyPolicy),
-          privacyPolicy.toURL()
+          SettingsDocumentViewerModel.DocumentTarget(
+            title = this.getString(R.string.accountPrivacyPolicy),
+            url = privacyPolicy.toString()
+          )
         )
       }
     } else {
@@ -590,8 +595,10 @@ class AccountDetailFragment : Fragment(R.layout.account) {
       this.accountLicenses.visibility = View.VISIBLE
       this.accountLicenses.setOnClickListener {
         MainNavigation.Settings.openDocument(
-          this.getString(R.string.accountLicenses),
-          licenses.toURL()
+          SettingsDocumentViewerModel.DocumentTarget(
+            title = this.getString(R.string.accountLicenses),
+            url = licenses.toString()
+          )
         )
       }
     } else {

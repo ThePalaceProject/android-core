@@ -25,8 +25,9 @@ import org.nypl.simplified.taskrecorder.api.TaskStep
 import org.nypl.simplified.taskrecorder.api.TaskStepResolution
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.main.MainNavigation
+import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
+import org.nypl.simplified.ui.screens.ScreenDefinitionType
 import org.slf4j.LoggerFactory
-import org.thepalaceproject.theme.core.PalaceToolbar
 
 /**
  * A fragment that shows various debug options for testing app functionality at runtime.
@@ -48,6 +49,7 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
   private lateinit var failNextBoot: SwitchCompat
   private lateinit var forgetAnnouncementsButton: Button
   private lateinit var hasSeenLibrarySelection: SwitchCompat
+  private lateinit var isManualLCPPassphraseEnabled: SwitchCompat
   private lateinit var libraryRegistryClear: Button
   private lateinit var libraryRegistryEntry: EditText
   private lateinit var libraryRegistrySet: Button
@@ -57,8 +59,28 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
   private lateinit var showOnlySupportedBooks: SwitchCompat
   private lateinit var showTesting: SwitchCompat
   private lateinit var syncAccountsButton: Button
-  private lateinit var toolbar: PalaceToolbar
-  private lateinit var isManualLCPPassphraseEnabled: SwitchCompat
+  private lateinit var toolbarBack: View
+
+  companion object : ScreenDefinitionFactoryType<Unit, SettingsDebugFragment> {
+    private class ScreenSettingsDebug :
+      ScreenDefinitionType<Unit, SettingsDebugFragment> {
+      override fun setup() {
+        // No setup required
+      }
+
+      override fun parameters() {
+        return Unit
+      }
+
+      override fun fragment(): SettingsDebugFragment {
+        return SettingsDebugFragment()
+      }
+    }
+
+    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugFragment> {
+      return ScreenSettingsDebug()
+    }
+  }
 
   /**
    * Subscriptions that will be closed when the fragment is detached (ie. when the app is backgrounded).
@@ -73,8 +95,8 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
   ) {
     super.onViewCreated(view, savedInstanceState)
 
-    this.toolbar =
-      view.rootView.findViewWithTag(PalaceToolbar.palaceToolbarName)
+    this.toolbarBack =
+      view.findViewById(R.id.settingsDebugToolbarBackIconTouch)
     this.crashButton =
       view.findViewById(R.id.settingsVersionDevCrash)
     this.cacheButton =
@@ -140,6 +162,10 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
 
     this.subscriptions =
       CloseableCollection.create()
+
+    this.toolbarBack.setOnClickListener {
+      this.toolbarBack.postDelayed(MainNavigation.Settings::goUp, 500)
+    }
 
     this.crashButton.setOnClickListener {
       throw OutOfMemoryError("Pretending to have run out of memory!")
