@@ -8,6 +8,7 @@ import org.nypl.simplified.ui.accounts.AccountCardCreatorModel
 import org.nypl.simplified.ui.accounts.AccountCardCreatorParameters
 import org.nypl.simplified.ui.accounts.AccountDetailFragment
 import org.nypl.simplified.ui.accounts.AccountListFragment
+import org.nypl.simplified.ui.accounts.AccountListRegistryFragment
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.screens.ScreenDefinitionType
 import org.nypl.simplified.ui.settings.SettingsDebugFragment
@@ -91,7 +92,7 @@ object MainNavigation {
     }
 
     fun openAccountCreationList() {
-      TODO()
+      this.stackPush(AccountListRegistryFragment.createScreenDefinition(Unit))
     }
 
     fun openAccountDetail(

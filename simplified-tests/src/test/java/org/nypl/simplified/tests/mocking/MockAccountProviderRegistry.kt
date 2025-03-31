@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory
 import java.net.URI
 import java.util.LinkedList
 import java.util.Queue
+import java.util.concurrent.CompletableFuture
 
 class MockAccountProviderRegistry(
   override val defaultProvider: AccountProviderType = MockAccountProviders.fakeAuthProvider("urn:0"),
@@ -34,7 +35,10 @@ class MockAccountProviderRegistry(
     Attributes.create { ex -> this.logger.error("Uncaught exception in attribute: ", ex) }
 
   private val statusAttributeActual: AttributeType<AccountProviderRegistryStatus> =
-    attributes.withValue(Idle)
+    this.attributes.withValue(Idle)
+
+  private val accountProviderDescriptionsAttributeActual: AttributeType<Map<URI, AccountProviderDescription>> =
+    this.attributes.withValue(mapOf())
 
   val resolveNext: Queue<AccountProviderType> =
     LinkedList<AccountProviderType>()
@@ -61,22 +65,31 @@ class MockAccountProviderRegistry(
     }
 
     fun singleton(accountProvider: AccountProviderType): MockAccountProviderRegistry {
-      return withProviders(accountProvider)
+      return this.withProviders(accountProvider)
     }
   }
 
   val eventSource = PublishSubject.create<AccountProviderRegistryEvent>()
 
   override val events: Observable<AccountProviderRegistryEvent>
-    get() = eventSource
+    get() = this.eventSource
 
   override val statusAttribute: AttributeReadableType<AccountProviderRegistryStatus>
     get() = this.statusAttributeActual
+
+  override val accountProviderDescriptionsAttribute: AttributeReadableType<Map<URI, AccountProviderDescription>>
+    get() = this.accountProviderDescriptionsAttributeActual
 
   override val status: AccountProviderRegistryStatus
     get() = AccountProviderRegistryStatus.Idle
 
   override fun refresh(includeTestingLibraries: Boolean) {
+  }
+
+  override fun refreshAsync(includeTestingLibraries: Boolean): CompletableFuture<Unit> {
+    val future = CompletableFuture<Unit>()
+    future.complete(Unit)
+    return future
   }
 
   override fun query(query: AccountSearchQuery) {
@@ -132,5 +145,9 @@ class MockAccountProviderRegistry(
       this.logger.debug("took provider from map")
       taskRecorder.finishSuccess(provider)
     }
+  }
+
+  override fun close() {
+    TODO("Not yet implemented")
   }
 }

@@ -23,6 +23,7 @@ import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
+import org.nypl.simplified.ui.errorpage.ErrorStrings
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.nypl.simplified.ui.main.MainNavigation
 import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
@@ -213,7 +214,7 @@ class AccountListFragment : Fragment(R.layout.account_list) {
     MaterialAlertDialogBuilder(this.requireContext())
       .setTitle(R.string.accountsDeletionFailed)
       .setMessage(R.string.accountsDeletionFailedMessage)
-      .setPositiveButton(R.string.accountsDetails) { _, _ ->
+      .setPositiveButton(ErrorStrings.errorDetails) { _, _ ->
         this.showErrorPage(accountEvent)
       }
       .create()

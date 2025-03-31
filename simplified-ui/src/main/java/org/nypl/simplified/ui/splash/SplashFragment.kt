@@ -94,21 +94,27 @@ class SplashFragment : Fragment() {
     private val root: ViewGroup
   ) {
     val accountToolBar: ViewGroup =
-      this.root.findViewById(R.id.accountListToolbar)
+      this.root.findViewById(R.id.accountRegistryToolbar)
     val accountRegistryList: RecyclerView =
       this.root.findViewById(R.id.accountRegistryList)
     val accountRegistryProgress: ContentLoadingProgressBar =
       this.root.findViewById(R.id.accountRegistryProgress)
     val searchIcon: ImageView =
-      this.root.findViewById(R.id.accountListToolbarSearchIcon)
+      this.root.findViewById(R.id.accountRegistryToolbarSearchIcon)
     val searchTouch: ViewGroup =
-      this.root.findViewById(R.id.accountListToolbarSearchIconTouch)
+      this.root.findViewById(R.id.accountRegistryToolbarSearchIconTouch)
     val searchText: EditText =
-      this.root.findViewById(R.id.accountListToolbarSearchText)
+      this.root.findViewById(R.id.accountRegistryToolbarSearchText)
+    val title: TextView =
+      this.root.findViewById(R.id.accountRegistryToolbarTitle)
+    val backButton: View =
+      this.root.findViewById(R.id.accountRegistryToolbarBackIconTouch)
 
     var onSearchChanged: (String) -> Unit = {}
 
     init {
+      this.backButton.visibility = View.GONE
+
       this.searchTouch.setOnClickListener {
         if (this.searchText.isVisible) {
           this.searchBoxClose()
@@ -135,6 +141,7 @@ class SplashFragment : Fragment() {
     private fun searchBoxOpen() {
       this.searchIcon.setImageResource(R.drawable.xmark)
       this.searchText.visibility = View.VISIBLE
+      this.title.visibility = View.INVISIBLE
 
       this.searchText.postDelayed({ this.searchText.requestFocus() }, 100)
       this.searchText.postDelayed({ this.keyboardShow() }, 100)
@@ -143,6 +150,7 @@ class SplashFragment : Fragment() {
     private fun searchBoxClose() {
       this.searchIcon.setImageResource(R.drawable.magnifying_glass)
       this.searchText.visibility = View.INVISIBLE
+      this.title.visibility = View.VISIBLE
 
       this.searchText.postDelayed({ this.keyboardHide() }, 100)
     }

@@ -17,6 +17,7 @@ import org.nypl.simplified.taskrecorder.api.TaskStep
 import org.nypl.simplified.ui.errorpage.ErrorPageActivity
 import org.nypl.simplified.ui.errorpage.ErrorPageActivity.Companion.PARAMETER_ID
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
+import org.nypl.simplified.ui.errorpage.ErrorStrings
 
 class AccountSAML20Activity : AppCompatActivity(R.layout.saml20_activity) {
 
@@ -100,7 +101,7 @@ class AccountSAML20Activity : AppCompatActivity(R.layout.saml20_activity) {
       MaterialAlertDialogBuilder(this)
         .setTitle(R.string.accountCreationFailed)
         .setMessage(R.string.accountCreationFailedMessage)
-        .setPositiveButton(R.string.accountsDetails) { dialog, _ ->
+        .setPositiveButton(ErrorStrings.errorDetails) { dialog, _ ->
           this.showErrorPage(this.makeLoginTaskSteps(failed.message))
           dialog.dismiss()
           this.finish()

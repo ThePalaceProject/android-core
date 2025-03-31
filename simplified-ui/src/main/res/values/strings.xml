@@ -94,6 +94,7 @@
   <string name="accountCardCreatorSignUp">Create Card</string>
   <string name="accountCardCreatorSignUpMessage">The Palace App will use your location one time to verify your library service area.</string>
   <string name="accountCreateCard">Create Card</string>
+  <string name="accountCreation">Library Account Creation</string>
   <string name="accountCreationFailed">Library creation failed</string>
   <string name="accountCreationFailedMessage">The library could not be created.</string>
   <string name="accountCustomOPDS">Custom OPDS Feed URL</string>
@@ -101,6 +102,7 @@
   <string name="accountEULA">End User License Agreement</string>
   <string name="accountEULAStatement">By signing in, you agree to the End User License Agreement.</string>
   <string name="accountForgotPassword">Forgot your password?</string>
+  <string name="accountGoBack">Go Back</string>
   <string name="accountLicenses">Content Licenses</string>
   <string name="accountLogin">Sign in</string>
   <string name="accountLoginAlternatives">Alternative Login Methods</string>
@@ -120,7 +122,7 @@
   <string name="accountRegistryEmpty">No libraries are available.</string>
   <string name="accountRegistryNoLocation">You can search for your library by name, branch location, or your own location.</string>
   <string name="accountRegistryRefresh">Refresh</string>
-  <string name="accountRegistryRetrieving">Retrieving libraries from registry…</string>
+  <string name="accountRegistryRetrieving">Retrieving libraries from the registry…</string>
   <string name="accountRegistrySelect">Please select a library…</string>
   <string name="accountReportFailed">Sorry, we weren\'t able to find a usable app to contact support. Please send email to %1$s if you need to report an issue.</string>
   <string name="accountReportIssue">Report an issue…</string>
@@ -139,7 +141,6 @@
   <string name="accountsDeletionFailedMessage">The library could not be removed.</string>
   <string name="accountsDetails">Library Details</string>
   <string name="currentlyBrowsing">You\'re currently browsing</string>
-  <string name="accountGoBack">Go Back</string>
 
   <string name="tabBooks">My Books</string>
   <string name="tabCatalog">Catalog</string>
