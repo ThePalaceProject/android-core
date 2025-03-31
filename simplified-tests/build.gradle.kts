@@ -29,7 +29,6 @@ val dependencyObjects = listOf(
     project(":simplified-accounts-json"),
     project(":simplified-accounts-registry"),
     project(":simplified-accounts-registry-api"),
-    project(":simplified-accounts-source-filebased"),
     project(":simplified-accounts-source-nyplregistry"),
     project(":simplified-accounts-source-spi"),
     project(":simplified-adobe-extensions"),
