@@ -25,6 +25,8 @@ import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.nypl.simplified.ui.main.MainNavigation
+import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
+import org.nypl.simplified.ui.screens.ScreenDefinitionType
 import java.net.URI
 
 /**
@@ -36,8 +38,30 @@ class AccountListFragment : Fragment(R.layout.account_list) {
   private var subscriptions =
     CloseableCollection.create()
 
+  private lateinit var addButton: View
+  private lateinit var backButton: View
   private lateinit var accountList: RecyclerView
   private lateinit var accountListAdapter: AccountListAdapter
+
+  companion object : ScreenDefinitionFactoryType<Unit, AccountListFragment> {
+    private class ScreenAccountList : ScreenDefinitionType<Unit, AccountListFragment> {
+      override fun setup() {
+        // No setup required
+      }
+
+      override fun parameters() {
+        return Unit
+      }
+
+      override fun fragment(): AccountListFragment {
+        return AccountListFragment()
+      }
+    }
+
+    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, AccountListFragment> {
+      return ScreenAccountList()
+    }
+  }
 
   private fun onAccountDeleteClicked(
     account: AccountType
@@ -87,8 +111,7 @@ class AccountListFragment : Fragment(R.layout.account_list) {
   private fun onAccountClicked(
     account: AccountType
   ) {
-    AccountDetailModel.account = account
-    TODO()
+    MainNavigation.Settings.openAccountDetail(account)
   }
 
   override fun onViewCreated(
@@ -99,6 +122,10 @@ class AccountListFragment : Fragment(R.layout.account_list) {
 
     this.accountList =
       view.findViewById(R.id.accountList)
+    this.backButton =
+      view.findViewById(R.id.accountListToolbarBackIconTouch)
+    this.addButton =
+      view.findViewById(R.id.accountListToolbarAddIconTouch)
   }
 
   override fun onStart() {
@@ -106,6 +133,13 @@ class AccountListFragment : Fragment(R.layout.account_list) {
 
     this.subscriptions =
       CloseableCollection.create()
+
+    this.backButton.setOnClickListener {
+      this.backButton.postDelayed(MainNavigation.Settings::goUp, 500)
+    }
+    this.addButton.setOnClickListener {
+      this.addButton.postDelayed(MainNavigation.Settings::openAccountCreationList, 500)
+    }
 
     val services =
       Services.serviceDirectory()

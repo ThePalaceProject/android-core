@@ -39,6 +39,7 @@ import org.nypl.simplified.accounts.api.AccountLoginState.AccountNotLoggedIn
 import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountUsername
+import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.oauth.OAuthCallbackIntentParsing
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest
@@ -58,6 +59,8 @@ import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.nypl.simplified.ui.main.MainApplication
 import org.nypl.simplified.ui.main.MainNavigation
+import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
+import org.nypl.simplified.ui.screens.ScreenDefinitionType
 import org.nypl.simplified.ui.settings.SettingsDocumentViewerModel
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -68,8 +71,6 @@ import java.net.URI
  */
 
 class AccountDetailFragment : Fragment(R.layout.account) {
-
-  private lateinit var webViewDataDir: File
 
   private val logger =
     LoggerFactory.getLogger(AccountDetailFragment::class.java)
@@ -107,6 +108,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   private lateinit var authenticationAlternatives: ViewGroup
   private lateinit var authenticationAlternativesButtons: ViewGroup
   private lateinit var authenticationViews: AccountAuthenticationViews
+  private lateinit var backButton: View
   private lateinit var bookmarkSync: ViewGroup
   private lateinit var bookmarkSyncCheck: SwitchCompat
   private lateinit var loginButtonErrorDetails: Button
@@ -120,8 +122,33 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   private lateinit var settingsCardCreator: ConstraintLayout
   private lateinit var signUpButton: Button
   private lateinit var signUpLabel: TextView
+  private lateinit var webViewDataDir: File
 
   private val imageButtonLoadingTag = "IMAGE_BUTTON_LOADING"
+
+  companion object : ScreenDefinitionFactoryType<AccountType, AccountDetailFragment> {
+    private class ScreenAccountDetail(
+      private val account: AccountType
+    ) : ScreenDefinitionType<AccountType, AccountDetailFragment> {
+      override fun setup() {
+        AccountDetailModel.account = this.account
+      }
+
+      override fun parameters(): AccountType {
+        return this.account
+      }
+
+      override fun fragment(): AccountDetailFragment {
+        return AccountDetailFragment()
+      }
+    }
+
+    override fun createScreenDefinition(
+      p: AccountType
+    ): ScreenDefinitionType<AccountType, AccountDetailFragment> {
+      return ScreenAccountDetail(p)
+    }
+  }
 
   override fun onViewCreated(
     view: View,
@@ -129,6 +156,8 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   ) {
     super.onViewCreated(view, savedInstanceState)
 
+    this.backButton =
+      view.findViewById(R.id.accountToolbarBackIconTouch)
     this.accountEULA =
       view.findViewById(R.id.accountEULA)
     this.accountTitle =
@@ -237,6 +266,10 @@ class AccountDetailFragment : Fragment(R.layout.account) {
 
     this.subscriptions =
       CloseableCollection.create()
+
+    this.backButton.setOnClickListener {
+      this.backButton.postDelayed(MainNavigation.Settings::goUp, 500)
+    }
 
     this.webViewDataDir =
       this.requireContext().getDir("webview", Context.MODE_PRIVATE)

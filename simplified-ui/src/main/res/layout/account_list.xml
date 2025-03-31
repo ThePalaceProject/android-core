@@ -16,7 +16,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <FrameLayout
-            android:id="@+id/toolbarBackIconTouch"
+            android:id="@+id/accountListToolbarBackIconTouch"
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:background="?attr/selectableItemBackground"
@@ -28,7 +28,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                android:id="@+id/toolbarBackIcon"
+                android:id="@+id/accountListToolbarBackIcon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_gravity="center"
@@ -39,8 +39,24 @@
                 app:tint="@color/PalacePrimaryForegroundColor" />
         </FrameLayout>
 
+        <TextView
+            android:id="@+id/accountListToolbarTitle"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:gravity="center"
+            android:maxLines="1"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:text="@string/settingsAccounts"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/accountListToolbarAddIconTouch"
+            app:layout_constraintStart_toEndOf="@id/accountListToolbarBackIconTouch"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <FrameLayout
-            android:id="@+id/toolbarAddIconTouch"
+            android:id="@+id/accountListToolbarAddIconTouch"
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:contentDescription="@string/accountAdd"
@@ -52,7 +68,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                android:id="@+id/toolbarAddIcon"
+                android:id="@+id/accountListToolbarAddIcon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_gravity="center"

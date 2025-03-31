@@ -137,7 +137,7 @@
   <string name="accountsDeleteConfirmTitle">Remove library</string>
   <string name="accountsDeletionFailed">Library removal failed</string>
   <string name="accountsDeletionFailedMessage">The library could not be removed.</string>
-  <string name="accountsDetails">Details</string>
+  <string name="accountsDetails">Library Details</string>
   <string name="currentlyBrowsing">You\'re currently browsing</string>
   <string name="accountGoBack">Go Back</string>
 

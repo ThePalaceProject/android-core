@@ -2,9 +2,12 @@ package org.nypl.simplified.ui.main
 
 import com.io7m.jattribute.core.AttributeReadableType
 import com.io7m.jattribute.core.AttributeType
+import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.accounts.AccountCardCreatorModel
 import org.nypl.simplified.ui.accounts.AccountCardCreatorParameters
+import org.nypl.simplified.ui.accounts.AccountDetailFragment
+import org.nypl.simplified.ui.accounts.AccountListFragment
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.screens.ScreenDefinitionType
 import org.nypl.simplified.ui.settings.SettingsDebugFragment
@@ -72,21 +75,29 @@ object MainNavigation {
     fun openDocument(
       documentTarget: SettingsDocumentViewerModel.DocumentTarget
     ) {
-      val screen = SettingsDocumentViewerFragment.createScreenDefinition(documentTarget)
-      this.stackPush(screen)
+      this.stackPush(SettingsDocumentViewerFragment.createScreenDefinition(documentTarget))
     }
 
     fun openAccountList() {
-      TODO()
+      this.stackPush(AccountListFragment.createScreenDefinition(Unit))
     }
 
     fun openDebugSettings() {
-      val screen = SettingsDebugFragment.createScreenDefinition(Unit)
-      this.stackPush(screen)
+      this.stackPush(SettingsDebugFragment.createScreenDefinition(Unit))
     }
 
     fun goUp() {
       this.stackPop()
+    }
+
+    fun openAccountCreationList() {
+      TODO()
+    }
+
+    fun openAccountDetail(
+      account: AccountType
+    ) {
+      this.stackPush(AccountDetailFragment.createScreenDefinition(account))
     }
   }
 }
