@@ -83,8 +83,6 @@ import org.nypl.simplified.feeds.api.FeedHTTPTransport
 import org.nypl.simplified.feeds.api.FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.files.DirectoryUtilities
-import org.nypl.simplified.networkconnectivity.NetworkConnectivity
-import org.nypl.simplified.networkconnectivity.api.NetworkConnectivityType
 import org.nypl.simplified.notifications.NotificationTokenHTTPCalls
 import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
 import org.nypl.simplified.notifications.NotificationsService
@@ -951,12 +949,6 @@ internal object MainServices {
           badgeLookup = badgeLookup
         )
       }
-    )
-
-    addService(
-      message = strings.bootingGeneral("network connectivity service"),
-      interfaceType = NetworkConnectivityType::class.java,
-      serviceConstructor = { NetworkConnectivity.create(context) }
     )
 
     addService(

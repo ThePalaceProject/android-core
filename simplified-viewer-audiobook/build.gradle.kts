@@ -16,7 +16,6 @@ dependencies {
     implementation(project(":simplified-files"))
     implementation(project(":simplified-futures"))
     implementation(project(":simplified-mdc"))
-    implementation(project(":simplified-networkconnectivity-api"))
     implementation(project(":simplified-opds-core"))
     implementation(project(":simplified-presentableerror-api"))
     implementation(project(":simplified-profiles-api"))

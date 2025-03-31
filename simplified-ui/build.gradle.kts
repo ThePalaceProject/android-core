@@ -62,8 +62,6 @@ dependencies {
     implementation(project(":simplified-lcp"))
     implementation(project(":simplified-links"))
     implementation(project(":simplified-mdc"))
-    implementation(project(":simplified-networkconnectivity"))
-    implementation(project(":simplified-networkconnectivity-api"))
     implementation(project(":simplified-notifications"))
     implementation(project(":simplified-oauth"))
     implementation(project(":simplified-opds-auth-document"))
