@@ -170,7 +170,6 @@ dependencies {
     implementation(libs.palace.http.bearer.token)
     implementation(libs.palace.http.vanilla)
     implementation(libs.palace.theme)
-    implementation(libs.pandora.bottom.navigator)
     implementation(libs.picasso)
     implementation(libs.play.services.base)
     implementation(libs.play.services.basement)

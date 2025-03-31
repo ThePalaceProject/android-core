@@ -245,7 +245,6 @@ val dependencyObjects = listOf(
     libs.palace.readium2.vanilla,
     libs.palace.readium2.views,
     libs.palace.theme,
-    libs.pandora.bottom.navigator,
     libs.picasso,
     libs.play.services.base,
     libs.play.services.basement,
