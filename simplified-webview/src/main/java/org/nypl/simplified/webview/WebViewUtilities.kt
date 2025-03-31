@@ -8,7 +8,6 @@ import androidx.webkit.WebSettingsCompat.FORCE_DARK_OFF
 import androidx.webkit.WebSettingsCompat.FORCE_DARK_ON
 import androidx.webkit.WebViewFeature
 import org.nypl.simplified.accounts.api.AccountCookie
-import org.nypl.simplified.android.ktx.isNightModeYes
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.text.SimpleDateFormat
@@ -77,7 +76,8 @@ object WebViewUtilities {
 
   fun setForcedDark(settings: WebSettings, configuration: Configuration) {
     if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
-      val forceDarkMode = if (configuration.isNightModeYes) FORCE_DARK_ON else FORCE_DARK_OFF
+      val forceDarkMode =
+        if (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES) FORCE_DARK_ON else FORCE_DARK_OFF
       WebSettingsCompat.setForceDark(settings, forceDarkMode)
     }
   }

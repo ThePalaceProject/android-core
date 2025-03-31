@@ -248,7 +248,6 @@ dependencies {
     implementation(project(":simplified-adobe-extensions"))
     implementation(project(":simplified-analytics-api"))
     implementation(project(":simplified-analytics-circulation"))
-    implementation(project(":simplified-android-ktx"))
     implementation(project(":simplified-announcements"))
     implementation(project(":simplified-bookmarks"))
     implementation(project(":simplified-bookmarks-api"))

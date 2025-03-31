@@ -35,7 +35,6 @@ val dependencyObjects = listOf(
     project(":simplified-adobe-extensions"),
     project(":simplified-analytics-api"),
     project(":simplified-analytics-circulation"),
-    project(":simplified-android-ktx"),
     project(":simplified-announcements"),
     project(":simplified-bookmarks"),
     project(":simplified-bookmarks-api"),

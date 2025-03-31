@@ -36,7 +36,6 @@ dependencies {
     implementation(project(":simplified-accounts-source-spi"))
     implementation(project(":simplified-adobe-extensions"))
     implementation(project(":simplified-analytics-api"))
-    implementation(project(":simplified-android-ktx"))
     implementation(project(":simplified-announcements"))
     implementation(project(":simplified-bookmarks"))
     implementation(project(":simplified-bookmarks-api"))
