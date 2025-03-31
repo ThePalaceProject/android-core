@@ -126,7 +126,7 @@ class MainTabsFragment : Fragment() {
     fragment: Fragment
   ) {
     this.fragmentNow = fragment
-    this.parentFragmentManager.beginTransaction()
+    this.childFragmentManager.beginTransaction()
       .replace(R.id.mainTabsContent, fragment)
       .commit()
   }

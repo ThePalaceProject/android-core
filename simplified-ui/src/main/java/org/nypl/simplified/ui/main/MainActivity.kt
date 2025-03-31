@@ -1,5 +1,6 @@
 package org.nypl.simplified.ui.main
 
+import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.io7m.jmulticlose.core.CloseableCollection
@@ -14,6 +15,12 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
   private var fragmentNow: Fragment? = null
   private var subscriptions: CloseableCollectionType<ClosingResourceFailedException> =
     CloseableCollection.create()
+
+  override fun onCreate(
+    savedInstanceState: Bundle?
+  ) {
+    super.onCreate(Bundle())
+  }
 
   override fun onStart() {
     super.onStart()
@@ -36,6 +43,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
       SplashModel.SplashScreenStatus.SPLASH_SCREEN_IN_PROGRESS -> {
         // No need to do anything.
       }
+
       SplashModel.SplashScreenStatus.SPLASH_SCREEN_COMPLETED -> {
         this.switchFragment(MainTabsFragment())
       }
