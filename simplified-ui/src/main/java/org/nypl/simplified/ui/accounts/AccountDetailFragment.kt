@@ -25,6 +25,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.junreachable.UnimplementedCodeException
 import com.io7m.junreachable.UnreachableCodeException
+import io.reactivex.android.schedulers.AndroidSchedulers
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
@@ -47,6 +48,7 @@ import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.Ba
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.BasicToken
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.OAuthWithIntermediaryCancel
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.OAuthWithIntermediaryInitiate
+import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsCancelButtonDisabled
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsCancelButtonEnabled
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsLoginButtonDisabled
@@ -274,9 +276,10 @@ class AccountDetailFragment : Fragment(R.layout.account) {
     this.webViewDataDir =
       this.requireContext().getDir("webview", Context.MODE_PRIVATE)
 
-    val imageLoader =
+    val services =
       Services.serviceDirectory()
-        .requireService(ImageLoaderType::class.java)
+    val imageLoader =
+      services.requireService(ImageLoaderType::class.java)
 
     ImageAccountIcons.loadAccountLogoIntoView(
       imageLoader.loader,
@@ -351,6 +354,16 @@ class AccountDetailFragment : Fragment(R.layout.account) {
      */
 
     this.reconfigureAccountUI()
+
+    val profiles =
+      services.requireService(ProfilesControllerType::class.java)
+
+    val eventSub =
+      profiles.accountEvents()
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe { _ -> this.reconfigureAccountUI() }
+
+    this.subscriptions.add(AutoCloseable { eventSub.dispose() })
   }
 
   private fun instantiateAlternativeAuthenticationViews() {

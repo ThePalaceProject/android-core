@@ -22,7 +22,9 @@ object AccountDetailModel {
   fun enableBookmarkSyncing(
     enabled: Boolean
   ) {
-    TODO()
+    this.account.setPreferences(
+      this.account.preferences.copy(bookmarkSyncingPermitted = enabled)
+    )
   }
 
   fun tryLogout() {
