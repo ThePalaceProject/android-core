@@ -81,7 +81,7 @@ class SettingsDocumentViewerFragment : Fragment() {
       WebViewUtilities.setForcedDark(this.documentWebView.settings, resources.configuration)
       this.documentWebView.loadUrl(target.url)
     } else {
-      TODO()
+      this.toolbarBack.post(MainNavigation.Settings::goUp)
     }
   }
 }
