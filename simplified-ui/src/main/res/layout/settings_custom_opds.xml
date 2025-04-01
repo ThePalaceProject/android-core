@@ -1,64 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:app="http://schemas.android.com/apk/res-auto"
-  android:layout_width="match_parent"
-  android:layout_height="match_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-  <EditText
-    android:id="@+id/settingsCustomOPDSURL"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="16dp"
-    android:layout_marginTop="16dp"
-    android:layout_marginEnd="16dp"
-    android:hint="@string/settingsCustomOPDSURL"
-    android:inputType="textUri"
-    android:singleLine="true"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/settingsCustomOPDSToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-  <Button
-    android:id="@+id/settingsCustomOPDSCreate"
-    android:layout_width="128dp"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="16dp"
-    android:text="@string/settingsCustomOPDSCreate"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/settingsCustomOPDSURL" />
+        <FrameLayout
+            android:id="@+id/settingsCustomOPDSToolbarBackIconTouch"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:contentDescription="@string/accountGoBack"
+            android:focusable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-  <ProgressBar
-    android:id="@+id/settingsCustomOPDSProgressBar"
-    style="?android:attr/progressBarStyleHorizontal"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="16dp"
-    android:layout_marginTop="16dp"
-    android:layout_marginEnd="16dp"
-    android:indeterminate="true"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/settingsCustomOPDSCreate" />
+            <ImageView
+                android:id="@+id/settingsCustomOPDSToolbarBackIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:clickable="false"
+                android:focusable="false"
+                android:src="@drawable/arrow_left"
+                app:tint="@color/PalacePrimaryForegroundColor"
+                app:tintMode="multiply" />
+        </FrameLayout>
 
-  <TextView
-    android:id="@+id/settingsCustomOPDSProgressText"
-    android:layout_width="0dp"
-    android:layout_height="0dp"
-    android:layout_marginStart="16dp"
-    android:layout_marginTop="16dp"
-    android:layout_marginEnd="16dp"
-    android:layout_marginBottom="16dp"
-    android:textSize="12sp"
-    android:fontFamily="monospace"
-    android:gravity="start|top"
-    android:scrollbarAlwaysDrawVerticalTrack="true"
-    android:text="@string/settingsPlaceholder"
-    android:freezesText="true"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/settingsCustomOPDSProgressBar" />
+        <TextView
+            android:id="@+id/settingsCustomOPDSToolbarTitle"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:text="@string/settingsCustomOPDS"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/settingsCustomOPDSToolbarBackIconTouch"
+            app:layout_constraintTop_toTopOf="parent" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider" />
+
+    <EditText
+        android:id="@+id/settingsCustomOPDSURL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:hint="@string/settingsCustomOPDSURL"
+        android:inputType="textUri"
+        android:singleLine="true" />
+
+    <Button
+        android:id="@+id/settingsCustomOPDSCreate"
+        android:layout_width="128dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_gravity="center"
+        android:text="@string/settingsCustomOPDSCreate"
+         />
+
+    <ProgressBar
+        android:id="@+id/settingsCustomOPDSProgressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:indeterminate="true" />
+
+    <TextView
+        android:id="@+id/settingsCustomOPDSProgressText"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_weight="1"
+        android:fontFamily="monospace"
+        android:freezesText="true"
+        android:gravity="start|top"
+        android:scrollbarAlwaysDrawVerticalTrack="true"
+        android:text="@string/settingsPlaceholder"
+        android:textSize="12sp" />
+
+</LinearLayout>

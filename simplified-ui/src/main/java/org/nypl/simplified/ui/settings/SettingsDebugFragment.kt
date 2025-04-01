@@ -255,8 +255,7 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
      */
 
     this.customOPDS.setOnClickListener {
-      // XXX: TODO
-      TODO()
+      MainNavigation.Settings.openCustomOPDS()
     }
 
     this.configureLibraryRegistryCustomUI()

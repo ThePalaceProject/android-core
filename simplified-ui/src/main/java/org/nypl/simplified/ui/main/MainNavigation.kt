@@ -11,6 +11,7 @@ import org.nypl.simplified.ui.accounts.AccountListFragment
 import org.nypl.simplified.ui.accounts.AccountListRegistryFragment
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.screens.ScreenDefinitionType
+import org.nypl.simplified.ui.settings.SettingsCustomOPDSFragment
 import org.nypl.simplified.ui.settings.SettingsDebugFragment
 import org.nypl.simplified.ui.settings.SettingsDocumentViewerFragment
 import org.nypl.simplified.ui.settings.SettingsDocumentViewerModel
@@ -99,6 +100,10 @@ object MainNavigation {
       account: AccountType
     ) {
       this.stackPush(AccountDetailFragment.createScreenDefinition(account))
+    }
+
+    fun openCustomOPDS() {
+      this.stackPush(SettingsCustomOPDSFragment.createScreenDefinition(Unit))
     }
   }
 }

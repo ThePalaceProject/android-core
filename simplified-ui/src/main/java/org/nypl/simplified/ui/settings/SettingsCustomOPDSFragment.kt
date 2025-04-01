@@ -8,13 +8,12 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.annotation.UiThread
 import androidx.fragment.app.Fragment
 import com.io7m.jmulticlose.core.CloseableCollection
-import io.reactivex.android.schedulers.AndroidSchedulers
-import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
-import org.nypl.simplified.accounts.api.AccountEvent
-import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
+import org.nypl.simplified.threads.UIThread
+import org.nypl.simplified.ui.main.MainNavigation
 import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
 import org.nypl.simplified.ui.screens.ScreenDefinitionType
 import org.slf4j.LoggerFactory
@@ -32,6 +31,7 @@ class SettingsCustomOPDSFragment : Fragment(R.layout.settings_custom_opds) {
   private var subscriptions =
     CloseableCollection.create()
 
+  private lateinit var toolbarBack: View
   private lateinit var create: Button
   private lateinit var feedURL: EditText
   private lateinit var progress: ProgressBar
@@ -66,6 +66,8 @@ class SettingsCustomOPDSFragment : Fragment(R.layout.settings_custom_opds) {
   ) {
     super.onViewCreated(view, savedInstanceState)
 
+    this.toolbarBack =
+      view.findViewById(R.id.settingsCustomOPDSToolbarBackIconTouch)
     this.feedURL =
       view.findViewById(R.id.settingsCustomOPDSURL)
     this.create =
@@ -88,23 +90,35 @@ class SettingsCustomOPDSFragment : Fragment(R.layout.settings_custom_opds) {
     this.subscriptions =
       CloseableCollection.create()
 
-    val uiObservable =
-      Services.serviceDirectory()
-        .requireService(ProfilesControllerType::class.java)
-        .accountEvents()
-        .observeOn(AndroidSchedulers.mainThread())
-
-    this.subscriptions.add(AutoCloseable {
-      uiObservable.subscribe(this::onAccountEvent)
-    })
     this.subscriptions.add(
-      SettingsCustomOPDSModel.taskRunning.subscribe { _, status ->
+      SettingsCustomOPDSModel.taskRunningUI.subscribe { _, status ->
         this.onTaskRunningChanged(status)
       }
     )
+    this.subscriptions.add(
+      SettingsCustomOPDSModel.taskUI.subscribe { _, status ->
+        this.onTaskMessages(status)
+      }
+    )
+
+    this.toolbarBack.setOnClickListener {
+      this.toolbarBack.postDelayed(MainNavigation.Settings::goUp, 500)
+    }
 
     this.create.setOnClickListener {
       SettingsCustomOPDSModel.createCustomOPDSFeed(this.feedURL.text.trim().toString())
+    }
+  }
+
+  @UiThread
+  private fun onTaskMessages(
+    status: List<String>
+  ) {
+    UIThread.checkIsUIThread()
+
+    for (s in status) {
+      this.progressText.append(s)
+      this.progressText.append("\n")
     }
   }
 
@@ -113,7 +127,10 @@ class SettingsCustomOPDSFragment : Fragment(R.layout.settings_custom_opds) {
     this.subscriptions.close()
   }
 
+  @UiThread
   private fun onTaskRunningChanged(running: Boolean) {
+    UIThread.checkIsUIThread()
+
     if (running) {
       this.create.isEnabled = false
       this.progress.visibility = View.VISIBLE
@@ -124,20 +141,10 @@ class SettingsCustomOPDSFragment : Fragment(R.layout.settings_custom_opds) {
     }
   }
 
-  private fun onAccountEvent(event: AccountEvent) {
-    this.progressText.append(event.message)
-    this.progressText.append("\n")
-
-    for (name in event.attributes.keys) {
-      this.progressText.append("    ")
-      this.progressText.append(name)
-      this.progressText.append(": ")
-      this.progressText.append(event.attributes[name])
-      this.progressText.append("\n")
-    }
-  }
-
+  @UiThread
   private fun isValidURI(): Boolean {
+    UIThread.checkIsUIThread()
+
     val text = this.feedURL.text
     return if (text.isNotEmpty()) {
       try {
