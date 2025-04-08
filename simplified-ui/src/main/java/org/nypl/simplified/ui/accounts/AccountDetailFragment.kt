@@ -241,9 +241,12 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   }
 
   private fun determineLoginIsSatisfied(): AccountLoginButtonStatus {
-    val authDescription = AccountDetailModel.account.provider.authentication
-    val loginPossible = authDescription.isLoginPossible
-    val satisfiedFor = this.authenticationViews.isSatisfiedFor(authDescription)
+    val authDescription =
+      AccountDetailModel.account.provider.authentication
+    val loginPossible =
+      authDescription.isLoginPossible
+    val satisfiedFor =
+      this.authenticationViews.isSatisfiedFor(authDescription)
 
     return if (loginPossible && satisfiedFor) {
       AsLoginButtonEnabled {

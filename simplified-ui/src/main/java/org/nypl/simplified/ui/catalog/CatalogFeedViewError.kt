@@ -22,4 +22,8 @@ class CatalogFeedViewError(
       )
     }
   }
+
+  override fun clear() {
+    this.root.isEnabled = false
+  }
 }

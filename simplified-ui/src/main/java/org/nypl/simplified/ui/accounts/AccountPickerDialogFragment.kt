@@ -19,6 +19,8 @@ import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.accounts.AccountPickerAdapter.OnAccountClickListener
+import org.nypl.simplified.ui.catalog.CatalogOPDSClients
+import org.nypl.simplified.ui.catalog.CatalogPart
 import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.slf4j.LoggerFactory
@@ -27,11 +29,13 @@ import org.slf4j.LoggerFactory
  * Present a dialog that shows a list of all active accounts for the current profile.
  */
 
+@Deprecated("Accounts will be chosen via the settings screen soon.")
 class AccountPickerDialogFragment : BottomSheetDialogFragment(), OnAccountClickListener {
 
   private val logger =
     LoggerFactory.getLogger(AccountPickerDialogFragment::class.java)
 
+  private var catalogPart: CatalogPart = CatalogPart.CATALOG
   private lateinit var recyclerView: RecyclerView
   private lateinit var imageLoader: ImageLoaderType
   private lateinit var profilesController: ProfilesControllerType
@@ -40,13 +44,16 @@ class AccountPickerDialogFragment : BottomSheetDialogFragment(), OnAccountClickL
   companion object {
     private const val ARG_CURRENT_ID = "org.nypl.simplified.ui.accounts.CURRENT_ID"
     private const val ARG_ADD_ACCOUNT = "org.nypl.simplified.ui.accounts.ADD_ACCOUNT"
+    private const val ARG_CATALOG_PART = "org.nypl.simplified.ui.accounts.CATALOG_PART"
 
     fun create(
       currentId: AccountID,
+      catalogPart: CatalogPart,
       showAddAccount: Boolean
     ): AccountPickerDialogFragment {
       return AccountPickerDialogFragment().apply {
         this.arguments = Bundle().apply {
+          this.putSerializable(this@Companion.ARG_CATALOG_PART, catalogPart)
           this.putSerializable(this@Companion.ARG_CURRENT_ID, currentId)
           this.putBoolean(this@Companion.ARG_ADD_ACCOUNT, showAddAccount)
         }
@@ -69,8 +76,9 @@ class AccountPickerDialogFragment : BottomSheetDialogFragment(), OnAccountClickL
     val accountsMap =
       this.profilesController.profileCurrent().accounts()
 
-    this.accounts = accountsMap.values.toList()
-      .sortedWith(AccountComparator())
+    this.accounts =
+      accountsMap.values.toList()
+        .sortedWith(AccountComparator())
   }
 
   override fun onCreateView(
@@ -85,37 +93,56 @@ class AccountPickerDialogFragment : BottomSheetDialogFragment(), OnAccountClickL
     view: View,
     savedInstanceState: Bundle?
   ) {
-    val currentId = this.requireArguments()
-      .getSerializable(ARG_CURRENT_ID) as AccountID
-    val showAddAccount = this.requireArguments()
-      .getBoolean(ARG_ADD_ACCOUNT, false)
+    val arguments =
+      this.requireArguments()
+    val currentId =
+      arguments.getSerializable(ARG_CURRENT_ID) as AccountID
+    val showAddAccount =
+      arguments.getBoolean(ARG_ADD_ACCOUNT, false)
+    this.catalogPart =
+      arguments.getSerializable(ARG_CATALOG_PART) as CatalogPart
 
     this.recyclerView = view.findViewById(R.id.recyclerView)
     this.recyclerView.apply {
       this.setHasFixedSize(true)
-      this.layoutManager = LinearLayoutManager(this@AccountPickerDialogFragment.requireContext())
-      this.adapter = AccountPickerAdapter(
-        this@AccountPickerDialogFragment.accounts,
-        currentId,
-        this@AccountPickerDialogFragment.imageLoader,
-        showAddAccount,
-        this@AccountPickerDialogFragment
-      )
+      this.layoutManager =
+        LinearLayoutManager(this@AccountPickerDialogFragment.requireContext())
+      this.adapter =
+        AccountPickerAdapter(
+          this@AccountPickerDialogFragment.accounts,
+          currentId,
+          this@AccountPickerDialogFragment.imageLoader,
+          showAddAccount,
+          this@AccountPickerDialogFragment
+        )
     }
   }
 
-  override fun onAccountClick(account: AccountType) {
+  override fun onAccountClick(
+    account: AccountType
+  ) {
     this.logger.debug("selected account id={}, name={}", account.id, account.provider.displayName)
 
     // Note: In the future consider refactoring this dialog to return a result via
     //       setFragmentResultListener to decouple it from the profiles logic.
-    val profile = this.profilesController.profileCurrent()
+    val profile =
+      this.profilesController.profileCurrent()
+
     val newPreferences = profile
       .preferences()
-      .copy(
-        mostRecentAccount = account.id
-      )
+      .copy(mostRecentAccount = account.id)
     this.profilesController.profileUpdate { it.copy(preferences = newPreferences) }
+
+    val services =
+      Services.serviceDirectory()
+    val opdsClients =
+      services.requireService(CatalogOPDSClients::class.java)
+
+    opdsClients.goToRootFeedFor(
+      profiles = this.profilesController,
+      catalogPart = this.catalogPart,
+      account = account
+    )
     this.dismiss()
   }
 
@@ -224,12 +251,16 @@ class AccountPickerAdapter(
     val inflater = LayoutInflater.from(parent.context)
     val view = inflater.inflate(R.layout.account_picker_item, parent, false)
     return when (viewType) {
-      LIST_CANCEL -> CancelViewHolder(view,
+      LIST_CANCEL -> CancelViewHolder(
+        view,
         this.listener
       )
-      LIST_ADD_ACCOUNT -> AddAccountViewHolder(view,
+
+      LIST_ADD_ACCOUNT -> AddAccountViewHolder(
+        view,
         this.listener
       )
+
       else -> AccountPickerViewHolder(view, this.imageLoader, this.listener)
     }
   }

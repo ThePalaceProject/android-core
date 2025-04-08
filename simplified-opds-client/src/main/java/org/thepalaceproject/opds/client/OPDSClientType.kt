@@ -36,7 +36,8 @@ interface OPDSClientType : AutoCloseable {
   val entry: AttributeReadableType<FeedEntry>
 
   /**
-   * `true` if the current history is non-empty.
+   * `true` if there is more than one item in the current history. In other words, whether a
+   * meaningful "go back" operation can be performed.
    */
 
   val hasHistory: Boolean
@@ -52,17 +53,4 @@ interface OPDSClientType : AutoCloseable {
    */
 
   fun goTo(request: OPDSClientRequest): CompletableFuture<Unit>
-
-  /**
-   * Load more of the current feed. This is a no-op if the current state is not an ungrouped feed, or if the
-   * current ungrouped feed does not have any more entries.
-   */
-
-  fun loadMore(): CompletableFuture<Unit>
-
-  /**
-   * Refresh the current feed or entry.
-   */
-
-  fun refresh(): CompletableFuture<Unit>
 }

@@ -13,6 +13,7 @@ import androidx.core.view.isVisible
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountProviderDescription
 import org.nypl.simplified.feeds.api.FeedSearch
+import org.nypl.simplified.ui.catalog.CatalogPart.*
 import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
 
@@ -38,7 +39,8 @@ class CatalogToolbar(
     accountProvider: AccountProviderDescription,
     title: String,
     search: FeedSearch?,
-    canGoBack: Boolean
+    canGoBack: Boolean,
+    catalogPart: CatalogPart
   ) {
     try {
       this.text.text = title
@@ -79,16 +81,26 @@ class CatalogToolbar(
       }
 
       /*
-       * If we're at the root of a feed, then display the current account's logo in the toolbar.
+       * If we're at the root of a feed in the Catalog part, then display the current account's
+       * logo in the toolbar. Clicking it will open an account selection dialog. If we're in the
+       * Books or Reservations part, however, the icon does nothing.
        */
 
-      this.logoTouch.setOnClickListener { this.onToolbarLogoPressed.invoke() }
-      ImageAccountIcons.loadAccountLogoIntoView(
-        loader = imageLoader.loader,
-        account = accountProvider,
-        defaultIcon = R.drawable.account_default,
-        iconView = this.logo
-      )
+      when (catalogPart) {
+        CATALOG -> {
+          this.logoTouch.isEnabled = true
+          this.logoTouch.setOnClickListener { this.onToolbarLogoPressed.invoke() }
+          ImageAccountIcons.loadAccountLogoIntoView(
+            loader = imageLoader.loader,
+            account = accountProvider,
+            defaultIcon = R.drawable.account_default,
+            iconView = this.logo
+          )
+        }
+        BOOKS, HOLDS -> {
+          this.logoTouch.isEnabled = false
+        }
+      }
     } catch (e: Throwable) {
       // Nothing to do
     }

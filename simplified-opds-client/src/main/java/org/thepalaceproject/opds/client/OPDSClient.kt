@@ -7,9 +7,13 @@ import com.io7m.jmulticlose.core.CloseableCollectionType
 import com.io7m.jmulticlose.core.ClosingResourceFailedException
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookIDs
+import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedGroup
-import org.nypl.simplified.feeds.api.FeedLoaderType
+import org.nypl.simplified.feeds.api.FeedLoaderResult
+import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedAuthentication
+import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedGeneral
+import org.nypl.simplified.presentableerror.api.PresentableErrorType
 import org.slf4j.LoggerFactory
 import org.thepalaceproject.opds.client.OPDSState.Error
 import org.thepalaceproject.opds.client.OPDSState.Initial
@@ -17,14 +21,6 @@ import org.thepalaceproject.opds.client.OPDSState.LoadedFeedEntry
 import org.thepalaceproject.opds.client.OPDSState.LoadedFeedWithGroups
 import org.thepalaceproject.opds.client.OPDSState.LoadedFeedWithoutGroups
 import org.thepalaceproject.opds.client.OPDSState.Loading
-import org.thepalaceproject.opds.client.OPDSState.OPDSStateHistoryParticipant
-import org.thepalaceproject.opds.client.internal.OPDSCmd
-import org.thepalaceproject.opds.client.internal.OPDSCmdContextType
-import org.thepalaceproject.opds.client.internal.OPDSCmdExecuteRequest
-import org.thepalaceproject.opds.client.internal.OPDSCmdLoadMore
-import org.thepalaceproject.opds.client.internal.OPDSCmdShutdown
-import java.util.UUID
-import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentLinkedDeque
 import java.util.concurrent.ExecutorService
@@ -36,6 +32,9 @@ class OPDSClient private constructor(
   private val parameters: OPDSClientParameters
 ) : OPDSClientType {
 
+  private var topmostHandlerSubscriptions: CloseableCollectionType<ClosingResourceFailedException> =
+    CloseableCollection.create()
+
   private val logger =
     LoggerFactory.getLogger(OPDSClient::class.java)
 
@@ -43,7 +42,7 @@ class OPDSClient private constructor(
     AtomicBoolean(false)
 
   private val taskExecutor: ExecutorService =
-    Executors.newSingleThreadExecutor { r ->
+    Executors.newCachedThreadPool { r ->
       val thread = Thread(r)
       thread.name = "org.thepalaceproject.opds.client.${this.parameters.name}"
       thread.priority = Thread.MIN_PRIORITY
@@ -61,7 +60,7 @@ class OPDSClient private constructor(
     CloseableCollection.create()
 
   private val stateSource: AttributeType<OPDSState> =
-    OPDSClientAttributes.attributes.withValue(Initial(UUID.randomUUID()))
+    OPDSClientAttributes.attributes.withValue(Initial)
   private val entriesUngroupedSource: AttributeType<List<FeedEntry>> =
     OPDSClientAttributes.attributes.withValue(listOf())
   private val entriesGroupedSource: AttributeType<List<FeedGroup>> =
@@ -70,7 +69,7 @@ class OPDSClient private constructor(
     OPDSClientAttributes.attributes.withValue(this.feedEntryCorrupt)
 
   private val stateUI: AttributeType<OPDSState> =
-    OPDSClientAttributes.attributes.withValue(Initial(UUID.randomUUID()))
+    OPDSClientAttributes.attributes.withValue(Initial)
   private val entriesUngroupedUI: AttributeType<List<FeedEntry>> =
     OPDSClientAttributes.attributes.withValue(listOf())
   private val entriesGroupedUI: AttributeType<List<FeedGroup>> =
@@ -103,88 +102,8 @@ class OPDSClient private constructor(
       }
     )
 
-  private val historyStack: ConcurrentLinkedDeque<OPDSStateHistoryParticipant> =
+  private val requestStack: ConcurrentLinkedDeque<RequestHandler> =
     ConcurrentLinkedDeque()
-
-  private val mainTask =
-    MainFeedTask(this)
-
-  private class MainFeedTask(
-    private val client: OPDSClient
-  ) : Runnable, OPDSCmdContextType {
-
-    private val commands =
-      ArrayBlockingQueue<OPDSCmd>(10)
-
-    override fun run() {
-      while (this.shouldBeRunning()) {
-        try {
-          val c = this.commands.poll(1000L, TimeUnit.MILLISECONDS) ?: continue
-          if (c.taskFuture.isCancelled) {
-            continue
-          }
-          c.execute(this)
-        } catch (e: Throwable) {
-          this.client.logger.warn("Exception in feed task: ", e)
-        }
-      }
-    }
-
-    fun cancel() {
-      this.commands.forEach { task ->
-        try {
-          task.taskFuture.cancel(true)
-        } catch (e: Throwable) {
-          this.client.logger.warn("Cancellation failed: ", e)
-        }
-      }
-    }
-
-    private fun shouldBeRunning(): Boolean {
-      return !this.client.closed.get()
-    }
-
-    fun enqueue(command: OPDSCmd): CompletableFuture<Unit> {
-      try {
-        this.commands.add(command)
-        return command.taskFuture
-      } catch (e: Throwable) {
-        command.taskFuture.completeExceptionally(e)
-        return command.taskFuture
-      }
-    }
-
-    override fun setState(newState: OPDSState) {
-      this.client.stateSet(newState)
-    }
-
-    override fun setStateReplaceTop(newState: OPDSState) {
-      this.client.stateSource.set(newState)
-    }
-
-    override fun shutDown() {
-      this.cancel()
-      this.commands.clear()
-    }
-
-    override fun entriesUngrouped(): List<FeedEntry> {
-      return this.client.entriesUngroupedSource.get()
-    }
-
-    override fun setEntriesUngrouped(entries: List<FeedEntry>) {
-      this.client.entriesUngroupedSource.set(entries.toList())
-    }
-
-    override fun operationCancelled() {
-      this.client.operationCancelled()
-    }
-
-    override val feedLoader: FeedLoaderType =
-      this.client.parameters.feedLoader
-
-    override val state: OPDSState
-      get() = this.client.stateSource.get()
-  }
 
   init {
     /*
@@ -198,17 +117,11 @@ class OPDSClient private constructor(
       this.taskExecutor.shutdown()
     })
     this.resources.add(AutoCloseable {
-      this.mainTask.enqueue(OPDSCmdShutdown())
+      this.requestStack.forEach(RequestHandler::close)
     })
-    this.resources.add(AutoCloseable {
-      this.mainTask.cancel()
-    })
-
-    this.taskExecutor.execute(this.mainTask)
   }
 
   companion object {
-
     fun create(
       parameters: OPDSClientParameters
     ): OPDSClientType {
@@ -225,8 +138,224 @@ class OPDSClient private constructor(
   override val entry: AttributeReadableType<FeedEntry> =
     this.entryUI
 
+  /**
+   * A request handler is created for each incoming client request. The system maintains a
+   * stack of requests and subscribes to (and re-publishes) the state of the topmost handler.
+   */
+
+  private inner class RequestHandler(
+    val request: OPDSClientRequest
+  ) : Runnable, AutoCloseable {
+    val state: AttributeType<OPDSState> =
+      OPDSClientAttributes.attributes.withValue(Loading(this.request))
+
+    private inner class OPDSFeedHandleSingleEntry : OPDSFeedHandleSingleEntryType {
+      @Volatile
+      lateinit var entry: FeedEntry
+    }
+
+    private inner class OPDSFeedHandleWithGroups : OPDSFeedHandleWithGroupsType {
+      @Volatile
+      lateinit var feed: Feed.FeedWithGroups
+
+      override fun feed(): Feed.FeedWithGroups {
+        return this.feed
+      }
+
+      override fun refresh(): CompletableFuture<Unit> {
+        return this@OPDSClient.executeWithFuture(this@RequestHandler)
+      }
+    }
+
+    private inner class OPDSFeedHandleWithoutGroups : OPDSFeedHandleWithoutGroupsType {
+      @Volatile
+      lateinit var feed: Feed.FeedWithoutGroups
+
+      override fun feed(): Feed.FeedWithoutGroups {
+        return this.feed
+      }
+
+      override fun loadMore(): CompletableFuture<Unit> {
+        return this@OPDSClient.executeWithFuture {
+
+        }
+      }
+
+      override fun refresh(): CompletableFuture<Unit> {
+        return this@OPDSClient.executeWithFuture(this@RequestHandler)
+      }
+    }
+
+    private val handleEntry: OPDSFeedHandleSingleEntry =
+      this.OPDSFeedHandleSingleEntry()
+    private val handleUngrouped: OPDSFeedHandleWithoutGroups =
+      this.OPDSFeedHandleWithoutGroups()
+    private val handleGrouped: OPDSFeedHandleWithGroups =
+      this.OPDSFeedHandleWithGroups()
+
+    val entriesUngrouped: AttributeType<List<FeedEntry>> =
+      OPDSClientAttributes.attributes.withValue(listOf())
+    val entriesGrouped: AttributeType<List<FeedGroup>> =
+      OPDSClientAttributes.attributes.withValue(listOf())
+
+    private val closed =
+      AtomicBoolean(false)
+
+    override fun run() {
+      try {
+        if (this.closed.get()) {
+          return
+        }
+        this.runActual()
+      } catch (e: Throwable) {
+        this@OPDSClient.logger.warn("Task failure: ", e)
+        throw e
+      }
+    }
+
+    private fun runActual() {
+      return when (this.request) {
+        is OPDSClientRequest.ExistingEntry -> {
+          this.runExistingEntry(this.request)
+        }
+
+        is OPDSClientRequest.GeneratedFeed -> {
+          this.runGeneratedFeed(this.request)
+        }
+
+        is OPDSClientRequest.NewFeed -> {
+          this.runRemoteFeed(this.request)
+        }
+      }
+    }
+
+    private fun runRemoteFeed(
+      request: OPDSClientRequest.NewFeed
+    ) {
+      val future0 =
+        this@OPDSClient.parameters.feedLoader.fetchURI(
+          accountID = request.accountID,
+          uri = request.uri,
+          credentials = request.credentials,
+          method = request.method
+        )
+
+      when (val result = future0.get()) {
+        is FeedLoaderFailedAuthentication -> {
+          this.state.set(
+            Error(
+              message = result,
+              request = request
+            )
+          )
+        }
+
+        is FeedLoaderFailedGeneral -> {
+          this.state.set(
+            Error(
+              message = result,
+              request = request
+            )
+          )
+        }
+
+        is FeedLoaderResult.FeedLoaderSuccess -> {
+          when (val feed = result.feed) {
+            is Feed.FeedWithGroups -> {
+              this.handleGrouped.feed = feed
+              this.state.set(LoadedFeedWithGroups(request, this.handleGrouped))
+              this.entriesGrouped.set(feed.feedGroupsInOrder)
+            }
+
+            is Feed.FeedWithoutGroups -> {
+              this.handleUngrouped.feed = feed
+              this.state.set(LoadedFeedWithoutGroups(request, this.handleUngrouped))
+              this.entriesUngrouped.set(feed.entriesInOrder)
+            }
+          }
+        }
+      }
+    }
+
+    private fun runGeneratedFeed(
+      request: OPDSClientRequest.GeneratedFeed
+    ) {
+      try {
+        when (val feed = request.generator.invoke()) {
+          is Feed.FeedWithGroups -> {
+            this.handleGrouped.feed = feed
+            this.state.set(LoadedFeedWithGroups(request, this.handleGrouped))
+            this.entriesGrouped.set(feed.feedGroupsInOrder)
+          }
+
+          is Feed.FeedWithoutGroups -> {
+            this.handleUngrouped.feed = feed
+            this.state.set(LoadedFeedWithoutGroups(request, this.handleUngrouped))
+            this.entriesUngrouped.set(feed.entriesInOrder)
+          }
+        }
+      } catch (e: Throwable) {
+        this.state.set(
+          Error(
+            message = this@OPDSClient.generatedFeedException(request, e),
+            request = request
+          )
+        )
+        throw e
+      }
+    }
+
+    private fun runExistingEntry(
+      request: OPDSClientRequest.ExistingEntry
+    ) {
+      this.handleEntry.entry = request.entry
+
+      this.state.set(
+        LoadedFeedEntry(
+          request = request,
+          handle = this.handleEntry
+        )
+      )
+    }
+
+    override fun close() {
+      if (this.closed.compareAndSet(false, true)) {
+        // Nothing
+      }
+    }
+  }
+
+  private fun feedException(
+    request: OPDSClientRequest.NewFeed,
+    throwable: Throwable
+  ): PresentableErrorType {
+    return FeedLoaderFailedGeneral(
+      problemReport = null,
+      exception = Exception(throwable),
+      message = throwable.message ?: "Unexpected error occurred.",
+      attributesInitial = mapOf(
+        Pair("AccountID", request.accountID.toString()),
+        Pair("URI", request.uri.toString())
+      )
+    )
+  }
+
+  private fun generatedFeedException(
+    request: OPDSClientRequest.GeneratedFeed,
+    throwable: Throwable
+  ): PresentableErrorType {
+    return FeedLoaderFailedGeneral(
+      problemReport = null,
+      exception = Exception(throwable),
+      message = throwable.message ?: "Unexpected error occurred.",
+      attributesInitial = mapOf(
+        Pair("AccountID", request.accountID.toString())
+      )
+    )
+  }
+
   override val hasHistory: Boolean
-    get() = this.historyStack.isNotEmpty()
+    get() = this.requestStack.size > 1
 
   override fun goBack(): CompletableFuture<Unit> {
     this.parameters.checkOnUI()
@@ -236,27 +365,12 @@ class OPDSClient private constructor(
       return f
     }
 
-    this.mainTask.cancel()
-
-    if (this.historyStack.isEmpty()) {
+    if (this.requestStack.isEmpty()) {
       return CompletableFuture.completedFuture(Unit)
     }
 
-    this.historyPop()
+    this.requestPop()
     return CompletableFuture.completedFuture(Unit)
-  }
-
-  private fun historyPop() {
-    val oldState = this.historyStack.pop()
-    this.historyTrace()
-    this.updateAttributesForState(oldState)
-    this.stateSource.set(oldState)
-  }
-
-  private fun historyTrace() {
-    if (this.logger.isDebugEnabled) {
-      this.logger.debug("History stack now: {}", this.historyStack.map { e -> e.javaClass.simpleName })
-    }
   }
 
   override fun goTo(
@@ -268,9 +382,122 @@ class OPDSClient private constructor(
     if (f != null) {
       return f
     }
+    return this.requestPush(this.RequestHandler(request))
+  }
 
-    this.mainTask.cancel()
-    return this.mainTask.enqueue(OPDSCmdExecuteRequest(request))
+  private fun requestPop() {
+    if (this.requestStack.size < 2) {
+      return
+    }
+
+    this.topmostHandlerSubscriptions.close()
+    this.topmostHandlerSubscriptions = CloseableCollection.create()
+
+    this.requestStack.pop()
+
+    val newTopmost = this.requestStack.peek()!!
+    this.topmostHandlerSubscriptions.add(
+      newTopmost.state.subscribe { _, newState ->
+        this.onHandlerPublishedStateUpdate(newTopmost, newState)
+      }
+    )
+    this.traceStack()
+  }
+
+  private fun traceStack() {
+    this.logger.trace("Stack is now:")
+    this.requestStack.forEachIndexed { index, handler ->
+      this.logger.trace("  Stack [{}]: {}", index, handler.request.uri)
+    }
+  }
+
+  private fun requestPush(
+    handler: RequestHandler
+  ): CompletableFuture<Unit> {
+    this.topmostHandlerSubscriptions.close()
+    this.topmostHandlerSubscriptions = CloseableCollection.create()
+
+    this.requestStack.push(handler)
+    this.topmostHandlerSubscriptions.add(
+      handler.state.subscribe { _, newState ->
+        this.onHandlerPublishedStateUpdate(handler, newState)
+      }
+    )
+
+    this.traceStack()
+    return this.executeWithFuture(handler)
+  }
+
+  private fun executeWithFuture(
+    task: Runnable
+  ): CompletableFuture<Unit> {
+    val future = CompletableFuture<Unit>()
+    try {
+      this.taskExecutor.execute {
+        try {
+          future.complete(task.run())
+        } catch (e: Throwable) {
+          future.completeExceptionally(e)
+        }
+      }
+    } catch (e: Throwable) {
+      future.completeExceptionally(e)
+    }
+    return future
+  }
+
+  private fun onHandlerPublishedStateUpdate(
+    handler: RequestHandler,
+    newState: OPDSState
+  ) {
+    when (newState) {
+      is Error -> {
+        this.entrySource.set(this.feedEntryCorrupt)
+        this.entriesGroupedSource.set(listOf())
+        this.entriesUngroupedSource.set(listOf())
+      }
+
+      Initial -> {
+        this.entrySource.set(this.feedEntryCorrupt)
+        this.entriesGroupedSource.set(listOf())
+        this.entriesUngroupedSource.set(listOf())
+      }
+
+      is Loading -> {
+        this.entrySource.set(this.feedEntryCorrupt)
+        this.entriesGroupedSource.set(listOf())
+        this.entriesUngroupedSource.set(listOf())
+      }
+
+      is LoadedFeedEntry -> {
+        this.entrySource.set(newState.request.entry)
+        this.entriesGroupedSource.set(listOf())
+        this.entriesUngroupedSource.set(listOf())
+      }
+
+      is LoadedFeedWithGroups -> {
+        this.entrySource.set(this.feedEntryCorrupt)
+        this.entriesUngroupedSource.set(listOf())
+        this.topmostHandlerSubscriptions.add(
+          handler.entriesGrouped.subscribe { _, groups ->
+            this.entriesGroupedSource.set(groups)
+          }
+        )
+      }
+
+      is LoadedFeedWithoutGroups -> {
+        this.entrySource.set(this.feedEntryCorrupt)
+        this.entriesGroupedSource.set(listOf())
+        this.topmostHandlerSubscriptions.add(
+          handler.entriesUngrouped.subscribe { _, entries ->
+            this.entriesUngroupedSource.set(entries)
+          }
+        )
+      }
+    }
+
+    this.logger.trace("State: {}", newState.javaClass.simpleName)
+    this.stateSource.set(newState)
   }
 
   private fun checkClosed(): CompletableFuture<Unit>? {
@@ -282,115 +509,10 @@ class OPDSClient private constructor(
     return null
   }
 
-  override fun loadMore(): CompletableFuture<Unit> {
-    this.parameters.checkOnUI()
-
-    val f = this.checkClosed()
-    if (f != null) {
-      return f
-    }
-
-    return this.mainTask.enqueue(OPDSCmdLoadMore())
-  }
-
-  override fun refresh(): CompletableFuture<Unit> {
-    this.parameters.checkOnUI()
-
-    val f = this.checkClosed()
-    if (f != null) {
-      return f
-    }
-
-    return CompletableFuture.completedFuture(Unit)
-  }
-
   override fun close() {
     if (this.closed.compareAndSet(false, true)) {
+      this.resources.add(this.topmostHandlerSubscriptions)
       this.resources.close()
-    }
-  }
-
-  private fun stateSet(
-    newState: OPDSState
-  ) {
-    val oldState = this.state.get()
-    if (oldState is OPDSStateHistoryParticipant) {
-      this.historyStack.push(oldState)
-      this.historyTrace()
-    }
-
-    this.updateAttributesForState(newState)
-    this.stateSource.set(newState)
-  }
-
-  private fun updateAttributesForState(
-    newState: OPDSState
-  ) {
-    when (newState) {
-      is LoadedFeedEntry -> {
-        this.entrySource.set(newState.request.entry)
-        this.entriesGroupedSource.set(listOf())
-        this.entriesUngroupedSource.set(listOf())
-      }
-
-      is LoadedFeedWithGroups -> {
-        this.entrySource.set(this.feedEntryCorrupt)
-        this.entriesGroupedSource.set(newState.feed.feedGroupsInOrder.toList())
-        this.entriesUngroupedSource.set(listOf())
-      }
-
-      is LoadedFeedWithoutGroups -> {
-        this.entrySource.set(this.feedEntryCorrupt)
-        this.entriesGroupedSource.set(listOf())
-        this.entriesUngroupedSource.set(newState.feed.entriesInOrder.toList())
-      }
-      is Error -> {
-        this.entrySource.set(this.feedEntryCorrupt)
-        this.entriesGroupedSource.set(listOf())
-        this.entriesUngroupedSource.set(listOf())
-      }
-      is Initial -> {
-        this.entrySource.set(this.feedEntryCorrupt)
-        this.entriesGroupedSource.set(listOf())
-        this.entriesUngroupedSource.set(listOf())
-      }
-      is Loading -> {
-        this.entrySource.set(this.feedEntryCorrupt)
-        this.entriesGroupedSource.set(listOf())
-        this.entriesUngroupedSource.set(listOf())
-      }
-    }
-  }
-
-  private fun operationCancelled() {
-    when (this.state.get()) {
-      is Error -> {
-        // Nothing to do.
-      }
-
-      is Initial -> {
-        // Nothing to do.
-      }
-
-      is Loading -> {
-        if (this.historyStack.isEmpty()) {
-          this.stateSource.set(Initial(UUID.randomUUID()))
-        } else {
-          this.historyPop()
-        }
-      }
-
-      is LoadedFeedEntry -> {
-        // Nothing to do.
-      }
-
-      is LoadedFeedWithGroups -> {
-        // Nothing to do.
-      }
-
-      is LoadedFeedWithoutGroups -> {
-        // Nothing to do.
-      }
     }
   }
 }

@@ -925,4 +925,8 @@ class CatalogFeedViewDetails(
       )
     }
   }
+
+  override fun clear() {
+    this.root.isEnabled = false
+  }
 }

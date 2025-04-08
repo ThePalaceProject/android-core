@@ -135,4 +135,9 @@ class CatalogFeedViewGroups(
       )
     }
   }
+
+  override fun clear() {
+    this.root.isEnabled = false
+    this.listView.adapter = null
+  }
 }

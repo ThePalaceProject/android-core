@@ -1,11 +1,14 @@
 package org.nypl.simplified.ui.catalog
 
+import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.dialog.MaterialDialogs
 import com.io7m.jfunctional.Some
 import com.io7m.jmulticlose.core.CloseableCollection
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -13,6 +16,7 @@ import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
+import org.nypl.simplified.accounts.api.AccountLoginState
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
@@ -21,16 +25,28 @@ import org.nypl.simplified.books.book_registry.BookPreviewStatus
 import org.nypl.simplified.books.book_registry.BookRegistryReadableType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookWithStatus
+import org.nypl.simplified.books.controller.api.BooksControllerType
 import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedFacet
-import org.nypl.simplified.feeds.api.FeedGroup
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.feeds.api.FeedSearch
+import org.nypl.simplified.opds.core.OPDSAvailabilityHeld
+import org.nypl.simplified.opds.core.OPDSAvailabilityHeldReady
+import org.nypl.simplified.opds.core.OPDSAvailabilityHoldable
+import org.nypl.simplified.opds.core.OPDSAvailabilityLoanable
+import org.nypl.simplified.opds.core.OPDSAvailabilityLoaned
+import org.nypl.simplified.opds.core.OPDSAvailabilityMatcherType
+import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
+import org.nypl.simplified.opds.core.OPDSAvailabilityRevoked
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.threads.UIThread
+import org.nypl.simplified.ui.accounts.AccountDetailFragment
+import org.nypl.simplified.ui.accounts.AccountDetailModel
+import org.nypl.simplified.ui.accounts.AccountPickerDialogFragment
 import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
+import org.nypl.simplified.ui.main.MainNavigation
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.slf4j.LoggerFactory
 import org.thepalaceproject.opds.client.OPDSClientRequest
@@ -73,8 +89,6 @@ sealed class CatalogFragment : Fragment() {
   private lateinit var buttonCreator: CatalogButtons
   private lateinit var contentContainer: FrameLayout
   private lateinit var covers: BookCoverProviderType
-  private lateinit var entriesGroupedAdapter: CatalogFeedWithGroupsAdapter
-  private lateinit var entriesUngroupedAdapter: CatalogFeedAdapter
   private lateinit var feedLoader: FeedLoaderType
   private lateinit var imageLoader: ImageLoaderType
   private lateinit var images: ImageLoaderType
@@ -133,27 +147,8 @@ sealed class CatalogFragment : Fragment() {
     this.opdsClient =
       opdsClients.clientFor(this.catalogPart)
 
-    this.entriesUngroupedAdapter =
-      CatalogFeedAdapter(
-        covers = this.covers,
-        onBookSelected = this::onBookSelected,
-        onReachedNearEnd = this::onInfiniteFeedReachedNearEnd
-      )
-    this.entriesGroupedAdapter =
-      CatalogFeedWithGroupsAdapter(
-        covers = this.covers,
-        onFeedSelected = this::onFeedSelected,
-        onBookSelected = this::onBookSelected,
-      )
-
     this.subscriptions.add(
       this.opdsClient.state.subscribe(this::onStateChanged)
-    )
-    this.subscriptions.add(
-      this.opdsClient.entriesUngrouped.subscribe(this::onEntriesUngroupedChanged)
-    )
-    this.subscriptions.add(
-      this.opdsClient.entriesGrouped.subscribe(this::onEntriesGroupedChanged)
     )
     this.subscriptions.add(
       this.opdsClient.entry.subscribe(this::onEntryChanged)
@@ -183,11 +178,6 @@ sealed class CatalogFragment : Fragment() {
     } catch (e: Throwable) {
       this.logger.warn("Error fetching account/feed: ", e)
     }
-  }
-
-  private fun onInfiniteFeedReachedNearEnd() {
-    UIThread.checkIsUIThread()
-    this.opdsClient.loadMore()
   }
 
   private fun onBookSelected(
@@ -240,22 +230,6 @@ sealed class CatalogFragment : Fragment() {
     }
   }
 
-  private fun onEntriesGroupedChanged(
-    oldGroups: List<FeedGroup>,
-    newGroups: List<FeedGroup>
-  ) {
-    UIThread.checkIsUIThread()
-    this.entriesGroupedAdapter.submitList(newGroups)
-  }
-
-  private fun onEntriesUngroupedChanged(
-    oldEntries: List<FeedEntry>,
-    newEntries: List<FeedEntry>
-  ) {
-    UIThread.checkIsUIThread()
-    this.entriesUngroupedAdapter.submitList(newEntries)
-  }
-
   private fun onStateChanged(
     oldState: OPDSState,
     newState: OPDSState
@@ -263,8 +237,8 @@ sealed class CatalogFragment : Fragment() {
     UIThread.checkIsUIThread()
 
     this.resetPerViewSubscriptions()
-
     this.contentContainer.removeAllViews()
+
     when (newState) {
       is OPDSState.Error -> {
         this.onStateChangedToError(newState)
@@ -338,7 +312,7 @@ sealed class CatalogFragment : Fragment() {
         onBookViewerOpen = this::onBookViewerOpen,
         onFeedSelected = this::onFeedSelected,
         onToolbarBackPressed = this::onToolbarBackPressed,
-        onToolbarLogoPressed = this::onToolbarLogoPressed,
+        onToolbarLogoPressed = { this.onToolbarLogoPressed(newState.request.entry.accountID) },
         screenSize = this.screenSize,
         window = this.requireActivity().window,
       )
@@ -352,18 +326,6 @@ sealed class CatalogFragment : Fragment() {
         view.bind(entry)
         this.onLoadRelatedFeed(view, entry)
 
-        val synthBook =
-          this.synthesizeBookWithStatus(entry)
-
-        val catalogStatus =
-          CatalogBookStatus(
-            status = synthBook.status,
-            book = synthBook.book,
-            previewStatus = this.bookPreviewStatusOf(entry)
-          )
-
-        view.onStatusUpdate(catalogStatus)
-
         /*
          * Subscribe to book status events for this book. We'll route status events to the view
          * itself so that it can update the UI appropriately.
@@ -375,14 +337,15 @@ sealed class CatalogFragment : Fragment() {
             .filter { e -> e.statusNow != null }
             .subscribeOn(AndroidSchedulers.mainThread())
             .subscribe { e ->
-              val book =
-                this.synthesizeBookWithStatus(entry)
+              val bookWithStatus =
+                this.bookRegistry.bookOrNull(e.bookId)
+                  ?: this.synthesizeBookWithStatus(entry)
 
               view.onStatusUpdate(
                 CatalogBookStatus(
-                  status = e.statusNow!!,
+                  status = bookWithStatus.status,
                   previewStatus = this.bookPreviewStatusOf(entry),
-                  book = book.book
+                  book = bookWithStatus.book
                 )
               )
             }
@@ -390,9 +353,47 @@ sealed class CatalogFragment : Fragment() {
         this.perViewSubscriptions.add(
           AutoCloseable { statusSubscription.dispose() }
         )
+
+        val bookWithStatus =
+          this.bookRegistry.bookOrNull(entry.bookID)
+            ?: this.synthesizeBookWithStatus(entry)
+
+        view.onStatusUpdate(
+          CatalogBookStatus(
+            status = bookWithStatus.status,
+            previewStatus = this.bookPreviewStatusOf(entry),
+            book = bookWithStatus.book
+          )
+        )
       }
     }
 
+    this.onStateChangeToDetailsConfigureToolbar(newState, view)
+
+    /*
+     * Subscribe to the entry on the OPDS client. We'll receive the initial
+     * entry on subscription.
+     */
+
+    this.perViewSubscriptions.add(
+      this.opdsClient.entry.subscribe { _, item ->
+        when (item) {
+          is FeedEntry.FeedEntryCorrupt -> {
+            // Nothing sensible to do here.
+          }
+
+          is FeedEntry.FeedEntryOPDS -> view.bind(item)
+        }
+      }
+    )
+
+    this.switchView(view)
+  }
+
+  private fun onStateChangeToDetailsConfigureToolbar(
+    newState: LoadedFeedEntry,
+    view: CatalogFeedViewDetails
+  ) {
     try {
       val account =
         this.profiles.profileCurrent()
@@ -409,67 +410,199 @@ sealed class CatalogFragment : Fragment() {
         accountProvider = account.provider.toDescription(),
         title = title,
         search = null,
-        canGoBack = this.opdsClient.hasHistory
+        canGoBack = this.opdsClient.hasHistory,
+        catalogPart = this.catalogPart
       )
     } catch (e: Throwable) {
       // Nothing sensible we can do about this.
     }
-
-    this.viewNow = view
   }
 
   private fun onBookBorrowRequested(
     parameters: CatalogBorrowParameters
   ) {
-    // Nothing yet.
+    val services =
+      Services.serviceDirectory()
+    val books =
+      services.requireService(BooksControllerType::class.java)
+
+    if (isLoginRequired(parameters.accountID)) {
+      this.subscriptions.add(
+        AccountDetailModel.executeAfterLogin(
+          accountID = parameters.accountID,
+          runOnSuccess = {
+            books.bookBorrow(
+              accountID = parameters.accountID,
+              bookID = parameters.bookID,
+              entry = parameters.entry,
+              samlDownloadContext = parameters.samlDownloadContext
+            )
+          },
+          runOnFailure = {
+            // Nothing to do
+          }
+        )
+      )
+
+      MainNavigation.showLoginDialog(parameters.accountID)
+    } else {
+      books.bookBorrow(
+        accountID = parameters.accountID,
+        bookID = parameters.bookID,
+        entry = parameters.entry,
+        samlDownloadContext = parameters.samlDownloadContext
+      )
+    }
   }
+
+  /**
+   * @return `true` if a login is required on the given account
+   */
+
+  private fun isLoginRequired(
+    accountID: AccountID
+  ): Boolean {
+    return try {
+      val services = Services.serviceDirectory()
+      val profiles = services.requireService(ProfilesControllerType::class.java)
+      val profile = profiles.profileCurrent()
+      val account = profile.account(accountID)
+      val requiresLogin = account.requiresCredentials
+      val isNotLoggedIn = account.loginState !is AccountLoginState.AccountLoggedIn
+      requiresLogin && isNotLoggedIn
+    } catch (e: Exception) {
+      this.logger.debug("could not retrieve account: ", e)
+      false
+    }
+  }
+
 
   private fun onBookPreviewOpenRequested(
     status: CatalogBookStatus<*>
   ) {
-    // Nothing yet.
+    TODO()
   }
+
+  /**
+   * Determine whether or not a book can be "deleted".
+   *
+   * A book can be deleted if:
+   *
+   * * It is loaned, downloaded, and not revocable (because otherwise, a revocation is needed).
+   * * It is loanable, but there is a book database entry for it
+   * * It is open access but there is a book database entry for it
+   */
 
   private fun onBookCanBeDeleted(
     status: CatalogBookStatus<*>
   ): Boolean {
-    return false
+    return try {
+      val services =
+        Services.serviceDirectory()
+      val profiles =
+        services.requireService(ProfilesControllerType::class.java)
+      val book =
+        status.book
+      val profile =
+        profiles.profileCurrent()
+      val account =
+        profile.account(book.account)
+
+      return if (account.bookDatabase.books().contains(book.id)) {
+        book.entry.availability.matchAvailability(
+          object : OPDSAvailabilityMatcherType<Boolean, Exception> {
+            override fun onHeldReady(availability: OPDSAvailabilityHeldReady): Boolean =
+              false
+
+            override fun onHeld(availability: OPDSAvailabilityHeld): Boolean =
+              false
+
+            override fun onHoldable(availability: OPDSAvailabilityHoldable): Boolean =
+              false
+
+            override fun onLoaned(availability: OPDSAvailabilityLoaned): Boolean =
+              availability.revoke.isNone && book.isDownloaded
+
+            override fun onLoanable(availability: OPDSAvailabilityLoanable): Boolean =
+              true
+
+            override fun onOpenAccess(availability: OPDSAvailabilityOpenAccess): Boolean =
+              true
+
+            override fun onRevoked(availability: OPDSAvailabilityRevoked): Boolean =
+              false
+          })
+      } else {
+        false
+      }
+    } catch (e: Throwable) {
+      this.logger.debug("could not determine if the book could be deleted: ", e)
+      false
+    }
   }
 
   private fun onBookCanBeRevoked(
     status: CatalogBookStatus<*>
   ): Boolean {
-    return false
+    return try {
+      val services =
+        Services.serviceDirectory()
+      val profiles =
+        services.requireService(ProfilesControllerType::class.java)
+
+      val book =
+        status.book
+      val profile =
+        profiles.profileCurrent()
+      val account =
+        profile.account(book.account)
+
+      if (account.bookDatabase.books().contains(book.id)) {
+        when (val s = status.status) {
+          is BookStatus.Loaned.LoanedDownloaded ->
+            s.returnable
+          is BookStatus.Loaned.LoanedNotDownloaded ->
+            true
+          else ->
+            false
+        }
+      } else {
+        false
+      }
+    } catch (e: Throwable) {
+      this.logger.debug("Could not determine if the book could be revoked: ", e)
+      false
+    }
   }
 
   private fun onBookDeleteRequested(
     status: CatalogBookStatus<*>
   ) {
-    // Nothing yet.
+    TODO()
   }
 
   private fun onBookRevokeRequested(
     status: CatalogBookStatus<*>
   ) {
-    // Nothing yet.
+    TODO()
   }
 
   private fun onBookResetStatusInitial(
     status: CatalogBookStatus<*>
   ) {
-    // Nothing yet.
+    TODO()
   }
 
   private fun onBookViewerOpen(
     bookFormat: BookFormat
   ) {
-    // Nothing yet.
+    TODO()
   }
 
   private fun onBookReserveRequested(
     parameters: CatalogBorrowParameters
   ) {
-    // Nothing yet.
+    TODO()
   }
 
   private fun bookPreviewStatusOf(
@@ -485,6 +618,11 @@ sealed class CatalogFragment : Fragment() {
   private fun onStateChangedToGroups(
     newState: LoadedFeedWithGroups
   ) {
+    val feedHandle =
+      newState.handle
+    val feed =
+      feedHandle.feed()
+
     val view =
       CatalogFeedViewGroups.create(
         container = this.contentContainer,
@@ -492,13 +630,24 @@ sealed class CatalogFragment : Fragment() {
         onFacetSelected = this::onFacetSelected,
         onSearchSubmitted = this::onSearchSubmitted,
         onToolbarBackPressed = this::onToolbarBackPressed,
-        onToolbarLogoPressed = this::onToolbarLogoPressed,
+        onToolbarLogoPressed = { this.onToolbarLogoPressed(newState.request.accountID) },
         screenSize = this.screenSize,
         window = this.requireActivity().window,
       )
 
-    view.listView.adapter = this.entriesGroupedAdapter
-    view.configureTabs(newState.feed)
+    val entriesGroupedAdapter =
+      CatalogFeedWithGroupsAdapter(
+        covers = this.covers,
+        onFeedSelected = this::onFeedSelected,
+        onBookSelected = this::onBookSelected,
+      )
+
+    view.listView.adapter = entriesGroupedAdapter
+    view.configureTabs(feed)
+
+    /*
+     * Configure the toolbar.
+     */
 
     try {
       val account =
@@ -508,9 +657,10 @@ sealed class CatalogFragment : Fragment() {
       view.toolbar.configure(
         imageLoader = this.imageLoader,
         accountProvider = account.provider.toDescription(),
-        title = newState.feed.feedTitle,
-        search = newState.feed.feedSearch,
-        canGoBack = this.opdsClient.hasHistory
+        title = feed.feedTitle,
+        search = feed.feedSearch,
+        canGoBack = this.opdsClient.hasHistory,
+        catalogPart = this.catalogPart
       )
     } catch (e: Throwable) {
       // Nothing sensible we can do about this.
@@ -519,18 +669,28 @@ sealed class CatalogFragment : Fragment() {
     /*
      * The swipe refresh view simply calls the OPDS client, and marks the view as "no longer
      * refreshing" when the returned future completes. This may, of course, be after the
-     * fragment is detached and so we just ignore any exceptions that might becaused by this.
+     * fragment is detached and so we just ignore any exceptions that might be caused by this.
      */
 
     view.swipeRefresh.setOnRefreshListener {
-      val future = this.opdsClient.refresh()
+      val future = feedHandle.refresh()
       future.thenAccept {
         view.swipeRefresh.post { view.swipeRefresh.isRefreshing = false }
       }
     }
 
-    this.entriesGroupedAdapter.submitList(newState.feed.feedGroupsInOrder)
-    this.viewNow = view
+    /*
+     * Subscribe to the list of grouped items on the OPDS client. We'll receive the initial
+     * list on subscription.
+     */
+
+    this.perViewSubscriptions.add(
+      this.opdsClient.entriesGrouped.subscribe { _, items ->
+        entriesGroupedAdapter.submitList(items)
+      }
+    )
+
+    this.switchView(view)
   }
 
   private fun onToolbarBackPressed() {
@@ -538,14 +698,31 @@ sealed class CatalogFragment : Fragment() {
     this.opdsClient.goBack()
   }
 
-  private fun onToolbarLogoPressed() {
+  private fun onToolbarLogoPressed(
+    currentAccount: AccountID
+  ) {
     UIThread.checkIsUIThread()
-    TODO()
+
+    val dialog =
+      AccountPickerDialogFragment.create(
+        currentId = currentAccount,
+        showAddAccount = true,
+        catalogPart = this.catalogPart
+      )
+    dialog.show(this.childFragmentManager, dialog.tag)
   }
 
   private fun onStateChangedToInfinite(
     newState: LoadedFeedWithoutGroups
   ) {
+    val context =
+      this.requireContext()
+
+    val feedHandle =
+      newState.handle
+    val feed =
+      feedHandle.feed()
+
     val view =
       CatalogFeedViewInfinite.create(
         container = this.contentContainer,
@@ -553,15 +730,24 @@ sealed class CatalogFragment : Fragment() {
         onFacetSelected = this::onFacetSelected,
         onSearchSubmitted = this::onSearchSubmitted,
         onToolbarBackPressed = this::onToolbarBackPressed,
-        onToolbarLogoPressed = this::onToolbarLogoPressed,
+        onToolbarLogoPressed = { this.onToolbarLogoPressed(newState.request.accountID) },
         window = this.requireActivity().window,
       )
 
+    val entriesUngroupedAdapter =
+      CatalogFeedAdapter(
+        covers = this.covers,
+        onBookSelected = this::onBookSelected,
+        onReachedNearEnd = {
+          feedHandle.loadMore()
+        }
+      )
+
     try {
-      view.listView.adapter = this.entriesUngroupedAdapter
+      view.listView.adapter = entriesUngroupedAdapter
       view.configureFacets(
         screen = this.screenSize,
-        feed = newState.feed,
+        feed = feed,
         sortFacets = true
       )
 
@@ -580,9 +766,10 @@ sealed class CatalogFragment : Fragment() {
       view.toolbar.configure(
         imageLoader = this.imageLoader,
         accountProvider = account.provider.toDescription(),
-        title = newState.feed.feedTitle,
-        search = newState.feed.feedSearch,
-        canGoBack = this.opdsClient.hasHistory
+        title = feed.feedTitle,
+        search = feed.feedSearch,
+        canGoBack = this.opdsClient.hasHistory,
+        catalogPart = this.catalogPart
       )
     } catch (e: Throwable) {
       // Nothing sensible we can do about this.
@@ -591,20 +778,42 @@ sealed class CatalogFragment : Fragment() {
     /*
      * The swipe refresh view simply calls the OPDS client, and marks the view as "no longer
      * refreshing" when the returned future completes. This may, of course, be after the
-     * fragment is detached and so we just ignore any exceptions that might becaused by this.
+     * fragment is detached and so we just ignore any exceptions that might be caused by this.
      */
 
     view.swipeRefresh.setOnRefreshListener {
-      val future = this.opdsClient.refresh()
+      val future = feedHandle.refresh()
       future.thenAccept {
-        UIThread.runOnUIThread {
-          view.swipeRefresh.post { view.swipeRefresh.isRefreshing = false }
-        }
+        view.swipeRefresh.post { view.swipeRefresh.isRefreshing = false }
       }
     }
 
-    this.entriesUngroupedAdapter.submitList(this.opdsClient.entriesUngrouped.get())
-    this.viewNow = view
+    /*
+     * Subscribe to the list of feed items in the OPDS client. We'll receive the initial
+     * list on subscription.
+     */
+
+    this.perViewSubscriptions.add(
+      this.opdsClient.entriesUngrouped.subscribe { _, items ->
+        entriesUngroupedAdapter.submitList(items)
+
+        /*
+         * Show or hide the list with an appropriate message, based on the content of the feed
+         * and the current catalog part.
+         */
+
+        view.configureListVisibility(
+          itemCount = items.size,
+          onEmptyMessage = when (this.catalogPart) {
+            CatalogPart.CATALOG -> context.getString(R.string.feedEmpty)
+            CatalogPart.BOOKS -> context.getString(R.string.feedWithGroupsEmptyLoaned)
+            CatalogPart.HOLDS -> context.getString(R.string.feedWithGroupsEmptyHolds)
+          }
+        )
+      }
+    )
+
+    this.switchView(view)
   }
 
   private fun onSearchSubmitted(
@@ -649,29 +858,30 @@ sealed class CatalogFragment : Fragment() {
   private fun onStateChangedToError(
     newState: OPDSState.Error
   ) {
-    val view = CatalogFeedViewError.create(this.layoutInflater, this.contentContainer)
-    this.viewNow = view
+    this.switchView(CatalogFeedViewError.create(this.layoutInflater, this.contentContainer))
   }
 
   private fun onStateChangedToLoading() {
-    val view = CatalogFeedViewLoading.create(this.layoutInflater, this.contentContainer)
-    this.viewNow = view
+    this.switchView(CatalogFeedViewLoading.create(this.layoutInflater, this.contentContainer))
   }
 
   private fun onStateChangedToInitial() {
-    val view = CatalogFeedViewEmpty.create(this.layoutInflater, this.contentContainer)
-    this.viewNow = view
+    this.switchView(CatalogFeedViewEmpty.create(this.layoutInflater, this.contentContainer))
 
     val account =
       this.currentAccount()
 
-    this.opdsClient.goTo(
-      OPDSClientRequest.NewFeed(
-        accountID = account.id,
-        uri = URI.create("https://ct.thepalaceproject.org/CT0186/groups/"),
-        credentials = account.loginState.credentials,
-        method = "GET"
-      )
+    val services =
+      Services.serviceDirectory()
+    val opdsClients =
+      services.requireService(CatalogOPDSClients::class.java)
+    val profiles =
+      services.requireService(ProfilesControllerType::class.java)
+
+    opdsClients.goToRootFeedFor(
+      profiles = profiles,
+      catalogPart = this.catalogPart,
+      account = account
     )
   }
 
@@ -705,5 +915,13 @@ sealed class CatalogFragment : Fragment() {
     }
 
     super.onStop()
+  }
+
+  private fun switchView(
+    view: CatalogFeedView
+  ) {
+    val viewExisting = this.viewNow
+    this.viewNow = view
+    viewExisting.clear()
   }
 }

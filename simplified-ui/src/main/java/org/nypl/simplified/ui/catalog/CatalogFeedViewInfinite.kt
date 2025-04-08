@@ -59,6 +59,9 @@ class CatalogFeedViewInfinite(
   val catalogFeedHeaderFacets: LinearLayout =
     this.root.findViewById(R.id.catalogFeedHeaderFacets)
 
+  val catalogFeedEmptyMessage: TextView =
+    this.root.findViewById(R.id.catalogFeedEmptyMessage)
+
   val toolbar: CatalogToolbar =
     CatalogToolbar(
       logo = this.root.findViewById(R.id.catalogFeedToolbarLogo),
@@ -90,7 +93,7 @@ class CatalogFeedViewInfinite(
       onFacetSelected: (FeedFacet) -> Unit,
       onSearchSubmitted: (FeedSearch, String) -> Unit,
       onToolbarBackPressed: () -> Unit,
-      onToolbarLogoPressed: () -> Unit,
+      onToolbarLogoPressed: () -> Unit
     ): CatalogFeedViewInfinite {
       return CatalogFeedViewInfinite(
         onFacetSelected = onFacetSelected,
@@ -283,5 +286,24 @@ class CatalogFeedViewInfinite(
       dialog.dismiss()
     }
     alertBuilder.create().show()
+  }
+
+  fun configureListVisibility(
+    itemCount: Int,
+    onEmptyMessage: String
+  ) {
+    if (itemCount == 0) {
+      this.listView.visibility = View.INVISIBLE
+      this.catalogFeedEmptyMessage.visibility = View.VISIBLE
+      this.catalogFeedEmptyMessage.text = onEmptyMessage
+    } else {
+      this.listView.visibility = View.VISIBLE
+      this.catalogFeedEmptyMessage.visibility = View.INVISIBLE
+    }
+  }
+
+  override fun clear() {
+    this.root.isEnabled = false
+    this.listView.adapter = null
   }
 }
