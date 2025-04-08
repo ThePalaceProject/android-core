@@ -185,6 +185,7 @@ class BorrowTask private constructor(
   ) {
     val context =
       BorrowContext(
+        borrowTask = this,
         application = this.requirements.application,
         account = this.account,
         adobeExecutor = this.requirements.adobeExecutor,
@@ -212,19 +213,26 @@ class BorrowTask private constructor(
         temporaryDirectory = this.requirements.temporaryDirectory
       )
 
-    val elementQueue = path.elements.toMutableList()
-    while (elementQueue.isNotEmpty()) {
+    while (true) {
       try {
-        val pathElement = elementQueue[0]
-        elementQueue.removeAt(0)
+        if (context.opdsAcquisitionPath.elements.isEmpty()) {
+          break
+        }
+
+        val pathElement = context.opdsAcquisitionPath.elements[0]
         context.currentOPDSAcquisitionPathElement = pathElement
-        context.currentRemainingOPDSPathElements = elementQueue.toList()
+
+        val queue: MutableList<OPDSAcquisitionPathElement> = context.opdsAcquisitionPath.elements.toMutableList()
+        queue.removeAt(0)
+        context.opdsAcquisitionPath = context.opdsAcquisitionPath.copy(elements = queue.toList())
+        context.currentRemainingOPDSPathElements = context.opdsAcquisitionPath.elements
+
         val subtaskFactory =
           this.subtaskFindForPathElement(
             context = context,
             pathElement = pathElement,
             book = book,
-            remaining = elementQueue.toList().map(OPDSAcquisitionPathElement::mimeType)
+            remaining = queue.toList().map(OPDSAcquisitionPathElement::mimeType)
           )
         this.subtaskExecute(subtaskFactory, context, book)
       } catch (e: BorrowSubtaskHaltedEarly) {
@@ -431,6 +439,7 @@ class BorrowTask private constructor(
   }
 
   private class BorrowContext(
+    private val borrowTask: BorrowTask,
     override val application: Application,
     override val account: AccountType,
     override val audioBookManifestStrategies: AudioBookManifestStrategiesType,
@@ -441,7 +450,8 @@ class BorrowTask private constructor(
     override val httpClient: LSHTTPClientType,
     override val isManualLCPPassphraseEnabled: Boolean,
     override val taskRecorder: TaskRecorderType,
-    override val opdsAcquisitionPath: OPDSAcquisitionPath,
+    @Volatile
+    override var opdsAcquisitionPath: OPDSAcquisitionPath,
     override val samlDownloadContext: SAMLDownloadContext? = null,
     bookInitial: Book,
     private val bookRegistry: BookRegistryType,
@@ -532,6 +542,25 @@ class BorrowTask private constructor(
           result = this.taskRecorder.finishFailure()
         )
       )
+    }
+
+    override fun chooseNewAcquisitionPath(
+      entry: OPDSAcquisitionFeedEntry
+    ): URI {
+      val path = this.borrowTask.pickAcquisitionPath(this.bookCurrent, entry)
+      this.logDebug("Selected a new acquisition path.")
+      check(path.elements.isNotEmpty()) { "Selected acquisition path cannot be empty!" }
+      this.logDebug(
+        "Path now starts with {} (type {})",
+        path.elements[0].target,
+        path.elements[0].mimeType
+      )
+      this.opdsAcquisitionPath = path
+      this.currentRemainingOPDSPathElements = this.opdsAcquisitionPath.elements
+
+      val target = path.elements[0].target
+      check(target != null) { "Chosen path must start with a usable URI!" }
+      return target
     }
 
     override fun bookDownloadFailed() {
