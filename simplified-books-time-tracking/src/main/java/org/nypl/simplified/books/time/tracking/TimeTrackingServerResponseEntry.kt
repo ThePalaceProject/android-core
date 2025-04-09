@@ -9,13 +9,14 @@ data class TimeTrackingServerResponseEntry(
     private const val STATUS_SUCCESS_MIN = 200
     private const val STATUS_SUCCESS_MAX = 299
     private const val STATUS_GONE = 410
+    private const val STATUS_NOT_FOUND = 404
   }
 
   fun isStatusSuccess(): Boolean {
-    return status in STATUS_SUCCESS_MIN..STATUS_SUCCESS_MAX
+    return this.status in STATUS_SUCCESS_MIN..STATUS_SUCCESS_MAX
   }
 
-  fun isStatusGone(): Boolean {
-    return status == STATUS_GONE
+  fun isStatusFailedPermanently(): Boolean {
+    return this.status == STATUS_GONE || this.status == STATUS_NOT_FOUND
   }
 }

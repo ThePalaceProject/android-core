@@ -244,4 +244,108 @@ class TimeTrackingHttpCallsTest {
 
     assertEquals(3, response.responses.filter { t -> !t.isStatusSuccess() }.size)
   }
+
+  @Test
+  fun testAllEntriesWith404() {
+    val timeTrackingInfo = TimeTrackingRequest(
+      bookId = "book-id",
+      libraryId = URI.create("urn:uuid:f8f6b138-02ba-4624-802b-0556278228d5"),
+      timeTrackingUri = this.webServer.url("/timeTracking").toUri(),
+      timeEntries = listOf(
+        TimeTrackingEntry(
+          id = "id0",
+          duringMinute = "2024-10-16T00:00:00",
+          secondsPlayed = 60
+        ),
+        TimeTrackingEntry(
+          id = "id1",
+          duringMinute = "2024-10-16T00:00:00",
+          secondsPlayed = 60
+        ),
+        TimeTrackingEntry(
+          id = "id2",
+          duringMinute = "2024-10-16T00:00:00",
+          secondsPlayed = 60
+        )
+      )
+    )
+
+    val httpCalls =
+      TimeTrackingHTTPCalls(http = httpClient)
+
+    this.webServer.enqueue(
+      MockResponse()
+        .setResponseCode(404)
+    )
+
+    val response = httpCalls.registerTimeTrackingInfo(
+      request = timeTrackingInfo,
+      account = account
+    )
+
+    assertEquals(3, response.responses.size)
+    assertEquals("Server returned a 404 value. This is a synthesized message.", response.responses[0].message)
+    assertEquals("Server returned a 404 value. This is a synthesized message.", response.responses[1].message)
+    assertEquals("Server returned a 404 value. This is a synthesized message.", response.responses[2].message)
+  }
+
+  @Test
+  fun testAllSubEntriesWith404() {
+    val timeTrackingInfo =
+      TimeTrackingRequest(
+        bookId = "book-id",
+        libraryId = URI.create("urn:uuid:f8f6b138-02ba-4624-802b-0556278228d5"),
+        timeTrackingUri = this.webServer.url("/timeTracking").toUri(),
+        timeEntries = listOf(
+          TimeTrackingEntry(id = "id", duringMinute = "", 10),
+          TimeTrackingEntry(id = "id2", duringMinute = "", 10),
+          TimeTrackingEntry(id = "id3", duringMinute = "", 10)
+        )
+      )
+
+    val httpCalls = TimeTrackingHTTPCalls(
+      http = httpClient
+    )
+
+    val responseBody = TimeTrackingServerResponse(
+      responses = listOf(
+        TimeTrackingServerResponseEntry(
+          id = "id",
+          message = "error",
+          status = 404
+        ),
+        TimeTrackingServerResponseEntry(
+          id = "id2",
+          message = "another error",
+          status = 404
+        ),
+        TimeTrackingServerResponseEntry(
+          id = "id3",
+          message = "and another error",
+          status = 404
+        )
+      ),
+      summary = TimeTrackingServerResponseSummary(
+        successes = 0,
+        failures = 3,
+        total = 3
+      )
+    )
+
+    this.webServer.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+        .setBody(ObjectMapper().writeValueAsString(responseBody))
+    )
+
+    val response = httpCalls.registerTimeTrackingInfo(
+      request = timeTrackingInfo,
+      account = account
+    )
+
+    assertEquals(
+      3,
+      response.responses.filter(TimeTrackingServerResponseEntry::isStatusFailedPermanently).size
+    )
+  }
 }
