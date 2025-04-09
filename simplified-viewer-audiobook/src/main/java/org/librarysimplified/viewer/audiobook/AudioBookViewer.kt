@@ -11,6 +11,7 @@ import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfilled
 import org.librarysimplified.audiobook.manifest_parser.api.ManifestUnparsed
 import org.librarysimplified.audiobook.manifest_parser.extension_spi.ManifestParserExtensionType
 import org.librarysimplified.audiobook.views.PlayerModel
+import org.librarysimplified.audiobook.views.PlayerModelState
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.librarysimplified.services.api.Services
@@ -29,6 +30,7 @@ import org.nypl.simplified.viewer.spi.ViewerProviderType
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.util.ServiceLoader
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -222,7 +224,7 @@ class AudioBookViewer : ViewerProviderType {
        * Thanks.
        */
 
-      val future =
+      val downloadFuture =
         PlayerModel.downloadParseAndCheckManifest(
           sourceURI = manifestURI,
           bookCredentials = bookCredentials,
@@ -239,15 +241,36 @@ class AudioBookViewer : ViewerProviderType {
 
       val openAttempted =
         AtomicBoolean(false)
+      val openFuture =
+        CompletableFuture<Unit>()
 
-      /*
-       * If the download fails, then try just parsing what we have locally. When parsing
-       * completes (either successfully or not), open the player activity so that we can
-       * either see a player or an error.
-       */
+      openFuture.whenComplete { _, _ ->
+        uiThread.runOnUIThread {
+          if (openAttempted.compareAndSet(false, true)) {
+            this.openActivity(activity)
+          }
+        }
+      }
 
-      future.exceptionally {
-        val nextFuture =
+      downloadFuture.whenComplete { t, _ ->
+
+        /*
+         * If the download doesn't fail, then open the player.
+         */
+
+        if (PlayerModel.state !is PlayerModelState.PlayerManifestDownloadFailed) {
+          this.logger.debug("Download completed, opening player...")
+          openFuture.complete(Unit)
+          return@whenComplete
+        }
+
+        /*
+         * If the download fails, then try just parsing what we have locally. When parsing
+         * completes (either successfully or not), open the player activity so that we can
+         * either see a player or an error.
+         */
+
+        val parseFuture =
           PlayerModel.parseAndCheckManifest(
             bookCredentials = bookCredentials,
             cacheDir = activity.cacheDir,
@@ -262,26 +285,10 @@ class AudioBookViewer : ViewerProviderType {
             parserExtensions = parserExtensions,
             userAgent = userAgent,
           )
-        nextFuture.whenComplete { _, _ ->
-          uiThread.runOnUIThread {
-            if (openAttempted.compareAndSet(false, true)) {
-              this.openActivity(activity)
-            }
-          }
-        }
-      }
 
-      /*
-       * If the download doesn't fail, then open the player.
-       */
-
-      future.whenComplete { t, u ->
-        if (t == null) {
-          uiThread.runOnUIThread {
-            if (openAttempted.compareAndSet(false, true)) {
-              this.openActivity(activity)
-            }
-          }
+        parseFuture.whenComplete { _, _ ->
+          this.logger.debug("Parsing completed, opening player...")
+          openFuture.complete(Unit)
         }
       }
       return
