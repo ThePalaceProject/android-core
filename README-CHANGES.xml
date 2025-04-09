@@ -625,9 +625,25 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2025-01-20T11:18:19+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.15.1">
+    <c:release date="2025-04-09T16:01:29+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.15.1">
       <c:changes>
-        <c:change date="2025-01-20T11:18:19+00:00" summary="Work around a couple of low-frequency crashes."/>
+        <c:change date="2025-01-20T00:00:00+00:00" summary="Work around a couple of low-frequency crashes."/>
+        <c:change date="2025-04-09T00:00:00+00:00" summary="Delete time tracking entries on 404 status codes.">
+          <c:tickets>
+            <c:ticket id="PP-2137"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2025-04-09T00:00:00+00:00" summary="Work around acquisition type changes during borrowing.">
+          <c:tickets>
+            <c:ticket id="PP-2325"/>
+            <c:ticket id="PP-2326"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2025-04-09T16:01:29+00:00" summary="Stop failing to open audio books when networking is unavailable.">
+          <c:tickets>
+            <c:ticket id="PP-2137"/>
+          </c:tickets>
+        </c:change>
       </c:changes>
     </c:release>
   </c:releases>
