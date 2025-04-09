@@ -23,11 +23,13 @@ import org.nypl.simplified.books.audio.AudioBookManifestRequest
 import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
 import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
+import org.nypl.simplified.ui.thread.api.UIThreadServiceType
 import org.nypl.simplified.viewer.spi.ViewerPreferences
 import org.nypl.simplified.viewer.spi.ViewerProviderType
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.util.ServiceLoader
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * An audio book viewer service.
@@ -100,6 +102,8 @@ class AudioBookViewer : ViewerProviderType {
       ServiceLoader.load(ManifestParserExtensionType::class.java).toList()
     val licenseChecks =
       ServiceLoader.load(SingleLicenseCheckProviderType::class.java).toList()
+    val uiThread =
+      services.requireService(UIThreadServiceType::class.java)
 
     val formatAudio =
       format as BookFormat.BookFormatAudioBook
@@ -212,20 +216,74 @@ class AudioBookViewer : ViewerProviderType {
           userAgent = userAgent,
         )
 
-      PlayerModel.downloadParseAndCheckManifest(
-        sourceURI = manifestURI,
-        bookCredentials = bookCredentials,
-        cacheDir = activity.cacheDir,
-        licenseChecks = licenseChecks,
-        palaceID = palaceID,
-        parserExtensions = parserExtensions,
-        strategy = strategies.createStrategy(
-          context = activity.application,
-          request = manifestRequest
-        ).toManifestStrategy(),
-        userAgent = userAgent,
-      )
-      this.openActivity(activity)
+      /*
+       * The following series of future compositions is slightly unpleasant because Android
+       * doesn't expose all of the CompletableFuture methods until you get up to about API 34.
+       * Thanks.
+       */
+
+      val future =
+        PlayerModel.downloadParseAndCheckManifest(
+          sourceURI = manifestURI,
+          bookCredentials = bookCredentials,
+          cacheDir = activity.cacheDir,
+          licenseChecks = licenseChecks,
+          palaceID = palaceID,
+          parserExtensions = parserExtensions,
+          strategy = strategies.createStrategy(
+            context = activity.application,
+            request = manifestRequest
+          ).toManifestStrategy(),
+          userAgent = userAgent,
+        )
+
+      val openAttempted =
+        AtomicBoolean(false)
+
+      /*
+       * If the download fails, then try just parsing what we have locally. When parsing
+       * completes (either successfully or not), open the player activity so that we can
+       * either see a player or an error.
+       */
+
+      future.exceptionally {
+        val nextFuture =
+          PlayerModel.parseAndCheckManifest(
+            bookCredentials = bookCredentials,
+            cacheDir = activity.cacheDir,
+            licenseChecks = licenseChecks,
+            manifest = ManifestFulfilled(
+              source = null,
+              contentType = format.contentType,
+              authorization = null,
+              data = manifest.manifestFile.readBytes()
+            ),
+            palaceID = palaceID,
+            parserExtensions = parserExtensions,
+            userAgent = userAgent,
+          )
+        nextFuture.whenComplete { _, _ ->
+          uiThread.runOnUIThread {
+            if (openAttempted.compareAndSet(false, true)) {
+              this.openActivity(activity)
+            }
+          }
+        }
+      }
+
+      /*
+       * If the download doesn't fail, then open the player.
+       */
+
+      future.whenComplete { t, u ->
+        if (t == null) {
+          uiThread.runOnUIThread {
+            if (openAttempted.compareAndSet(false, true)) {
+              this.openActivity(activity)
+            }
+          }
+        }
+      }
       return
     }
 
