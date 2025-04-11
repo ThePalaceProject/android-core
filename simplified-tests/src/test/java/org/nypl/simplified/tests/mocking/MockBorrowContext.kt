@@ -18,6 +18,7 @@ import org.nypl.simplified.books.borrowing.BorrowTimeoutConfiguration
 import org.nypl.simplified.books.borrowing.SAMLDownloadContext
 import org.nypl.simplified.books.bundled.api.BundledContentResolverType
 import org.nypl.simplified.content.api.ContentResolverType
+import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionPath
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
@@ -123,6 +124,12 @@ class MockBorrowContext(
         result = this.taskRecorder.finishFailure()
       )
     )
+  }
+
+  override fun chooseNewAcquisitionPath(
+    entry: OPDSAcquisitionFeedEntry
+  ): URI {
+    TODO("Not yet implemented")
   }
 
   override fun bookLoanIsRequesting(message: String) {

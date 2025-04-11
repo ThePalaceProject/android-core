@@ -54,7 +54,11 @@ class TimeTrackingHTTPCalls(
           )
         }
         is LSHTTPResponseStatus.Responded.Error -> {
-          logAndFail(request.timeTrackingUri, status)
+          if (status.properties.status == 404) {
+            this.fakeSynthesized404Response(request)
+          } else {
+            this.logAndFail(request.timeTrackingUri, status)
+          }
         }
         is LSHTTPResponseStatus.Failed -> {
           throw status.exception
@@ -62,6 +66,22 @@ class TimeTrackingHTTPCalls(
       }
     }
   }
+
+  private fun fakeSynthesized404Response(request: TimeTrackingRequest) =
+    TimeTrackingServerResponse(
+      responses = request.timeEntries.map { e ->
+        TimeTrackingServerResponseEntry(
+          e.id,
+          "Server returned a 404 value. This is a synthesized message.",
+          404
+        )
+      },
+      summary = TimeTrackingServerResponseSummary(
+        failures = request.timeEntries.size,
+        successes = 0,
+        total = request.timeEntries.size
+      )
+    )
 
   private fun <T> logAndFail(
     uri: URI,

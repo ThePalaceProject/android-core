@@ -91,6 +91,7 @@ class TimeTrackingSender private constructor(
         } catch (e: Throwable) {
           MDC.put("TimeLoss", "true")
           this.logger.warn("Unable to parse local time tracking entry: ", e)
+          MDC.remove("TimeLoss")
         }
       }
 
@@ -172,9 +173,13 @@ class TimeTrackingSender private constructor(
 
       for (r in response.responses) {
         val e = outgoingEntries.firstOrNull { entry -> entry.timeEntry.id == r.id }
-        if (r.isStatusSuccess() || r.isStatusGone()) {
+        if (r.isStatusSuccess()) {
           if (e != null) {
             this.entrySentSuccessfully(e)
+          }
+        } else if (r.isStatusFailedPermanently()) {
+          if (e != null) {
+            this.entryFailedPermanently(e)
           }
         } else {
           if (e != null) {
@@ -201,6 +206,21 @@ class TimeTrackingSender private constructor(
     } finally {
       this.tickWrite.offer(Unit)
     }
+  }
+
+  private fun entryFailedPermanently(
+    entry: TimeTrackingEntryOutgoing
+  ) {
+    TimeTrackingDebugging.onTimeTrackingSendAttemptFailedPermanently(
+      timeTrackingDebugDirectory = this.debugDirectory.toFile(),
+      libraryId = entry.libraryID.toString(),
+      bookId = entry.bookID.value,
+      entryId = entry.timeEntry.id
+    )
+
+    Files.deleteIfExists(
+      this.inputDirectory.resolve("${entry.timeEntry.id}.tteo")
+    )
   }
 
   private fun entrySentSuccessfully(

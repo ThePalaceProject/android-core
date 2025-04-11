@@ -16,6 +16,7 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.Borro
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskFailed
 import org.nypl.simplified.books.bundled.api.BundledContentResolverType
 import org.nypl.simplified.content.api.ContentResolverType
+import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionPath
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
@@ -232,6 +233,12 @@ interface BorrowContextType {
    */
 
   fun bookReachedLoanLimit()
+
+  /**
+   * Choose a new acquisition path to follow based on the given received entry.
+   */
+
+  fun chooseNewAcquisitionPath(entry: OPDSAcquisitionFeedEntry): URI
 
   /**
    * Information about the current SAML download, if one is in progress.

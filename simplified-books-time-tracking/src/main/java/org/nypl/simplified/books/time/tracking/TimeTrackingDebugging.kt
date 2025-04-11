@@ -172,4 +172,19 @@ object TimeTrackingDebugging {
     p.setProperty("EntryID", entryId)
     this.writeLocked(timeTrackingDebugDirectory, p)
   }
+
+  fun onTimeTrackingSendAttemptFailedPermanently(
+    timeTrackingDebugDirectory: File,
+    libraryId: String,
+    bookId: String,
+    entryId: String
+  ) {
+    val p = Properties()
+    p.setProperty("Operation", "TimeTrackingSendAttemptFailedPermanently")
+    p.setProperty("Time", OffsetDateTime.now(UTC).toString())
+    p.setProperty("LibraryID", libraryId)
+    p.setProperty("BookID", bookId)
+    p.setProperty("EntryID", entryId)
+    this.writeLocked(timeTrackingDebugDirectory, p)
+  }
 }

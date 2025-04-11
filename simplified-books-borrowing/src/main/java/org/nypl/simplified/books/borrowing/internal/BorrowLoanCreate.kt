@@ -18,7 +18,6 @@ import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.httpConnect
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.httpRequestFailed
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.opdsFeedEntryHoldable
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.opdsFeedEntryLoanable
-import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.opdsFeedEntryNoNext
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.opdsFeedEntryParseError
 import org.nypl.simplified.books.borrowing.internal.BorrowHTTP.isMimeTypeAcceptable
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException
@@ -337,12 +336,15 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
       }
     }
 
-    context.taskRecorder.currentStepFailed(
-      message = "The OPDS feed entry did not provide a 'next' URI.",
-      errorCode = opdsFeedEntryNoNext,
-      extraMessages = listOf()
-    )
-    throw BorrowSubtaskFailed()
+    /*
+     * PP-2325: There exist books that will advertise one series of acquisitions at the
+     * start of borrowing, but will change their mind as to which formats are available
+     * upon the creation of a loan. To work around this, we check to see if there's
+     * a link that will get us directly to the final acquisition that we want and, if there is,
+     * reconfigure the borrow tasks to follow that path instead.
+     */
+
+    return context.chooseNewAcquisitionPath(entry)
   }
 
   private fun typesAreCompatible(pair: Pair<OPDSAcquisitionPathElement, OPDSAcquisitionPathElement>) =
