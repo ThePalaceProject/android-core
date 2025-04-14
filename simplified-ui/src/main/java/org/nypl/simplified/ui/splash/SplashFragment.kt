@@ -118,6 +118,7 @@ class SplashFragment : Fragment() {
       this.searchTouch.setOnClickListener {
         if (this.searchText.isVisible) {
           this.searchBoxClose()
+          this.searchText.setText("")
         } else {
           this.searchBoxOpen()
         }

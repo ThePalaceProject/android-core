@@ -21,7 +21,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.io7m.jattribute.core.AttributeType
 import com.io7m.jmulticlose.core.CloseableCollection
-import io.reactivex.android.schedulers.AndroidSchedulers
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountEvent
@@ -283,10 +282,10 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
       }
     )
 
+    val accountEvents =
+      services.requireService(AccountEvents::class.java)
     val accountSub =
-      profiles.accountEvents()
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(this::onAccountEvent)
+      accountEvents.events.subscribe(this::onAccountEvent)
 
     this.subscriptions.add(AutoCloseable {
       accountSub.dispose()

@@ -54,6 +54,7 @@ import org.nypl.simplified.feeds.api.FeedLoaderResult
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedAuthentication
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedGeneral
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderSuccess
+import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import java.net.URI
 
@@ -385,6 +386,8 @@ class CatalogFeedViewDetails(
   fun <S : BookStatus> onStatusUpdate(
     status: CatalogBookStatus<S>
   ) {
+    UIThread.checkIsUIThread()
+
     when (status.status) {
       is Held -> {
         this.onStatusHeld(status as CatalogBookStatus<Held>)

@@ -14,6 +14,10 @@ import org.librarysimplified.ui.R
 import org.nypl.simplified.ui.catalog.CatalogFragmentHolds
 import org.nypl.simplified.ui.catalog.CatalogFragmentMain
 import org.nypl.simplified.ui.catalog.CatalogFragmentMyBooks
+import org.nypl.simplified.ui.main.MainTabCategory.TAB_BOOKS
+import org.nypl.simplified.ui.main.MainTabCategory.TAB_CATALOG
+import org.nypl.simplified.ui.main.MainTabCategory.TAB_RESERVATIONS
+import org.nypl.simplified.ui.main.MainTabCategory.TAB_SETTINGS
 
 /**
  * The main fragment that handles the tabbed view. The fragment is responsible for attaching
@@ -23,10 +27,15 @@ import org.nypl.simplified.ui.catalog.CatalogFragmentMyBooks
 
 class MainTabsFragment : Fragment() {
 
-  private var fragmentNow: Fragment? = null
   private lateinit var root: ViewGroup
+  private lateinit var tabBooks: TabLayout.Tab
+  private lateinit var tabCatalog: TabLayout.Tab
   private lateinit var tabContent: FrameLayout
   private lateinit var tabLayout: TabLayout
+  private lateinit var tabReservations: TabLayout.Tab
+  private lateinit var tabSettings: TabLayout.Tab
+
+  private var fragmentNow: Fragment? = null
 
   private var subscriptions: CloseableCollectionType<ClosingResourceFailedException> =
     CloseableCollection.create()
@@ -43,11 +52,20 @@ class MainTabsFragment : Fragment() {
     this.tabContent =
       this.root.findViewById(R.id.mainTabsContent)
 
+    this.tabCatalog =
+      this.tabLayout.getTabAt(0)!!
+    this.tabBooks =
+      this.tabLayout.getTabAt(1)!!
+    this.tabReservations =
+      this.tabLayout.getTabAt(2)!!
+    this.tabSettings =
+      this.tabLayout.getTabAt(3)!!
+
     /*
      * Naturally, because even the simplest things on Android are completely broken, it's
      * not enough to just track the index of the selected tab: Android will screw up that
      * approach by always calling `onTabSelected` with `0` whenever the view is created. Instead,
-     * what you have to do is track whether a tab has been _unselected_, and then if and only
+     * what you have to do is track whether a tab has been _unselected_ and then, if and only
      * if one has, track the selected tab. Otherwise, you'll always set the tab to `0` whenever
      * the view is recreated.
      */
@@ -89,6 +107,35 @@ class MainTabsFragment : Fragment() {
         this.onSettingsTabChanged()
       }
     )
+    this.subscriptions.add(
+      MainNavigation.tab.subscribe { _, newValue ->
+        this.onTabRequested(newValue)
+      }
+    )
+  }
+
+  /**
+   * A tab request arrived from the navigation system.
+   */
+
+  private fun onTabRequested(
+    newValue: MainTabRequest
+  ) {
+    when (newValue) {
+      MainTabRequest.TabAny -> {
+        // Do nothing.
+      }
+      is MainTabRequest.TabForCategory -> {
+        this.tabLayout.selectTab(
+          when (newValue.category) {
+            TAB_CATALOG -> this.tabCatalog
+            TAB_BOOKS -> this.tabBooks
+            TAB_RESERVATIONS -> this.tabReservations
+            TAB_SETTINGS -> this.tabSettings
+          }
+        )
+      }
+    }
   }
 
   private fun onSettingsTabChanged() {

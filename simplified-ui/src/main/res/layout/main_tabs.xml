@@ -35,24 +35,28 @@
         app:tabMode="fixed">
 
         <com.google.android.material.tabs.TabItem
+            android:id="@+id/tabItemCatalog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:icon="@drawable/tab_catalog"
             android:text="@string/tabCatalog" />
 
         <com.google.android.material.tabs.TabItem
+            android:id="@+id/tabItemBooks"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:icon="@drawable/tab_books"
             android:text="@string/tabBooks" />
 
         <com.google.android.material.tabs.TabItem
+            android:id="@+id/tabItemReservations"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:icon="@drawable/tab_holds"
             android:text="@string/tabHolds" />
 
         <com.google.android.material.tabs.TabItem
+            android:id="@+id/tabItemSettings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:icon="@drawable/tab_settings"

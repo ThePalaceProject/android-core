@@ -25,7 +25,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.junreachable.UnimplementedCodeException
 import com.io7m.junreachable.UnreachableCodeException
-import io.reactivex.android.schedulers.AndroidSchedulers
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
@@ -48,7 +47,6 @@ import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.Ba
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.BasicToken
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.OAuthWithIntermediaryCancel
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.OAuthWithIntermediaryInitiate
-import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsCancelButtonDisabled
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsCancelButtonEnabled
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsLoginButtonDisabled
@@ -128,16 +126,24 @@ class AccountDetailFragment : Fragment(R.layout.account) {
 
   private val imageButtonLoadingTag = "IMAGE_BUTTON_LOADING"
 
-  companion object : ScreenDefinitionFactoryType<AccountType, AccountDetailFragment> {
+  data class AccountDetailScreenParameters(
+    val account: AccountType,
+    val showLoginTitle: Boolean
+  )
+
+  companion object :
+    ScreenDefinitionFactoryType<AccountDetailScreenParameters, AccountDetailFragment> {
     private class ScreenAccountDetail(
-      private val account: AccountType
-    ) : ScreenDefinitionType<AccountType, AccountDetailFragment> {
+      private val parameters: AccountDetailScreenParameters
+    ) : ScreenDefinitionType<AccountDetailScreenParameters, AccountDetailFragment> {
       override fun setup() {
-        AccountDetailModel.account = this.account
+        AccountDetailModel.account = this.parameters.account
+        AccountDetailModel.showPleaseLoginTitle = this.parameters.showLoginTitle
+        AccountDetailModel.clearPendingAfterLoginTask()
       }
 
-      override fun parameters(): AccountType {
-        return this.account
+      override fun parameters(): AccountDetailScreenParameters {
+        return this.parameters
       }
 
       override fun fragment(): AccountDetailFragment {
@@ -146,8 +152,8 @@ class AccountDetailFragment : Fragment(R.layout.account) {
     }
 
     override fun createScreenDefinition(
-      p: AccountType
-    ): ScreenDefinitionType<AccountType, AccountDetailFragment> {
+      p: AccountDetailScreenParameters
+    ): ScreenDefinitionType<AccountDetailScreenParameters, AccountDetailFragment> {
       return ScreenAccountDetail(p)
     }
   }
@@ -358,13 +364,11 @@ class AccountDetailFragment : Fragment(R.layout.account) {
 
     this.reconfigureAccountUI()
 
-    val profiles =
-      services.requireService(ProfilesControllerType::class.java)
+    val accountEvents =
+      services.requireService(AccountEvents::class.java)
 
     val eventSub =
-      profiles.accountEvents()
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe { _ -> this.reconfigureAccountUI() }
+      accountEvents.events.subscribe { _ -> this.reconfigureAccountUI() }
 
     this.subscriptions.add(AutoCloseable { eventSub.dispose() })
   }

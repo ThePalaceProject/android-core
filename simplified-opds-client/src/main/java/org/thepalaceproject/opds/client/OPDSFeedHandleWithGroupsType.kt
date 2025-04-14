@@ -9,5 +9,4 @@ interface OPDSFeedHandleWithGroupsType : OPDSFeedHandleType {
    */
 
   fun feed(): Feed.FeedWithGroups
-
 }

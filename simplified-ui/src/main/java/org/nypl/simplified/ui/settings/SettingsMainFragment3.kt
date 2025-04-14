@@ -3,7 +3,6 @@ package org.nypl.simplified.ui.settings
 import android.os.Bundle
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import org.librarysimplified.documents.DocumentStoreType
 import org.librarysimplified.services.api.Services
@@ -63,14 +62,12 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
 
     val services =
       Services.serviceDirectory()
-    val profiles =
-      services.requireService(ProfilesControllerType::class.java)
+    val profileEvents =
+      services.requireService(SettingsProfileEvents::class.java)
 
     this.subscriptions = CompositeDisposable()
     this.subscriptions.add(
-      profiles.profileEvents()
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(this::onProfileEvent)
+      profileEvents.events.subscribe(this::onProfileEvent)
     )
 
     try {

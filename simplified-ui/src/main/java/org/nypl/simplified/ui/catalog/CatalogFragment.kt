@@ -1,17 +1,13 @@
 package org.nypl.simplified.ui.catalog
 
-import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.dialog.MaterialDialogs
 import com.io7m.jfunctional.Some
 import com.io7m.jmulticlose.core.CloseableCollection
-import io.reactivex.android.schedulers.AndroidSchedulers
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
@@ -41,7 +37,6 @@ import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
 import org.nypl.simplified.opds.core.OPDSAvailabilityRevoked
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.threads.UIThread
-import org.nypl.simplified.ui.accounts.AccountDetailFragment
 import org.nypl.simplified.ui.accounts.AccountDetailModel
 import org.nypl.simplified.ui.accounts.AccountPickerDialogFragment
 import org.nypl.simplified.ui.images.ImageAccountIcons
@@ -331,12 +326,18 @@ sealed class CatalogFragment : Fragment() {
          * itself so that it can update the UI appropriately.
          */
 
+        val services =
+          Services.serviceDirectory()
+        val catalogBookRegistry =
+          services.requireService(CatalogBookRegistryEvents::class.java)
+
         val statusSubscription =
-          this.bookRegistry.bookEvents()
+          catalogBookRegistry.events
             .filter { e -> e.bookId == entry.bookID }
             .filter { e -> e.statusNow != null }
-            .subscribeOn(AndroidSchedulers.mainThread())
             .subscribe { e ->
+              UIThread.checkIsUIThread()
+
               val bookWithStatus =
                 this.bookRegistry.bookOrNull(e.bookId)
                   ?: this.synthesizeBookWithStatus(entry)
@@ -425,26 +426,32 @@ sealed class CatalogFragment : Fragment() {
       Services.serviceDirectory()
     val books =
       services.requireService(BooksControllerType::class.java)
+    val profiles =
+      services.requireService(ProfilesControllerType::class.java)
+    val account =
+      profiles.profileCurrent()
+        .account(parameters.accountID)
 
     if (isLoginRequired(parameters.accountID)) {
-      this.subscriptions.add(
-        AccountDetailModel.executeAfterLogin(
-          accountID = parameters.accountID,
-          runOnSuccess = {
-            books.bookBorrow(
-              accountID = parameters.accountID,
-              bookID = parameters.bookID,
-              entry = parameters.entry,
-              samlDownloadContext = parameters.samlDownloadContext
-            )
-          },
-          runOnFailure = {
-            // Nothing to do
-          }
-        )
-      )
+      MainNavigation.showLoginDialog(account)
 
-      MainNavigation.showLoginDialog(parameters.accountID)
+      AccountDetailModel.executeAfterLogin(
+        accountID = parameters.accountID,
+        runOnLogin = {
+          this.logger.debug("User logged in. Continuing borrow.")
+          books.bookBorrow(
+            accountID = parameters.accountID,
+            bookID = parameters.bookID,
+            entry = parameters.entry,
+            samlDownloadContext = parameters.samlDownloadContext
+          )
+
+          UIThread.runOnUIThread {
+            MainNavigation.requestTabChangeForPart(this.catalogPart)
+            MainNavigation.Settings.goUp()
+          }
+        }
+      )
     } else {
       books.bookBorrow(
         accountID = parameters.accountID,
@@ -475,7 +482,6 @@ sealed class CatalogFragment : Fragment() {
       false
     }
   }
-
 
   private fun onBookPreviewOpenRequested(
     status: CatalogBookStatus<*>
@@ -584,7 +590,18 @@ sealed class CatalogFragment : Fragment() {
   private fun onBookRevokeRequested(
     status: CatalogBookStatus<*>
   ) {
-    TODO()
+    val services =
+      Services.serviceDirectory()
+    val books =
+      services.requireService(BooksControllerType::class.java)
+
+    books.bookRevoke(
+      accountID = status.book.account,
+      bookId = status.book.id,
+      onNewBookEntry = {
+        // XXX: What's the correct place to handle this?
+      }
+    )
   }
 
   private fun onBookResetStatusInitial(

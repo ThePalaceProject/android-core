@@ -21,6 +21,7 @@ import org.thepalaceproject.opds.client.OPDSState.LoadedFeedEntry
 import org.thepalaceproject.opds.client.OPDSState.LoadedFeedWithGroups
 import org.thepalaceproject.opds.client.OPDSState.LoadedFeedWithoutGroups
 import org.thepalaceproject.opds.client.OPDSState.Loading
+import java.net.URI
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentLinkedDeque
 import java.util.concurrent.ExecutorService
@@ -149,6 +150,10 @@ class OPDSClient private constructor(
     val state: AttributeType<OPDSState> =
       OPDSClientAttributes.attributes.withValue(Loading(this.request))
 
+    @Volatile
+    private var feedURINext: URI? =
+      this.request.uri
+
     private inner class OPDSFeedHandleSingleEntry : OPDSFeedHandleSingleEntryType {
       @Volatile
       lateinit var entry: FeedEntry
@@ -177,11 +182,14 @@ class OPDSClient private constructor(
 
       override fun loadMore(): CompletableFuture<Unit> {
         return this@OPDSClient.executeWithFuture {
-
+          if (this@RequestHandler.feedURINext != null) {
+            this@RequestHandler.run()
+          }
         }
       }
 
       override fun refresh(): CompletableFuture<Unit> {
+        this@RequestHandler.feedURINext = this@RequestHandler.request.uri
         return this@OPDSClient.executeWithFuture(this@RequestHandler)
       }
     }
@@ -265,12 +273,14 @@ class OPDSClient private constructor(
               this.handleGrouped.feed = feed
               this.state.set(LoadedFeedWithGroups(request, this.handleGrouped))
               this.entriesGrouped.set(feed.feedGroupsInOrder)
+              this.feedURINext = feed.feedNext
             }
 
             is Feed.FeedWithoutGroups -> {
               this.handleUngrouped.feed = feed
               this.state.set(LoadedFeedWithoutGroups(request, this.handleUngrouped))
-              this.entriesUngrouped.set(feed.entriesInOrder)
+              this.entriesUngrouped.set(this.entriesUngrouped.get().plus(feed.entriesInOrder))
+              this.feedURINext = feed.feedNext
             }
           }
         }
@@ -286,12 +296,14 @@ class OPDSClient private constructor(
             this.handleGrouped.feed = feed
             this.state.set(LoadedFeedWithGroups(request, this.handleGrouped))
             this.entriesGrouped.set(feed.feedGroupsInOrder)
+            this.feedURINext = feed.feedNext
           }
 
           is Feed.FeedWithoutGroups -> {
             this.handleUngrouped.feed = feed
             this.state.set(LoadedFeedWithoutGroups(request, this.handleUngrouped))
-            this.entriesUngrouped.set(feed.entriesInOrder)
+            this.entriesUngrouped.set(this.entriesUngrouped.get().plus(feed.entriesInOrder))
+            this.feedURINext = feed.feedNext
           }
         }
       } catch (e: Throwable) {
@@ -323,21 +335,6 @@ class OPDSClient private constructor(
         // Nothing
       }
     }
-  }
-
-  private fun feedException(
-    request: OPDSClientRequest.NewFeed,
-    throwable: Throwable
-  ): PresentableErrorType {
-    return FeedLoaderFailedGeneral(
-      problemReport = null,
-      exception = Exception(throwable),
-      message = throwable.message ?: "Unexpected error occurred.",
-      attributesInitial = mapOf(
-        Pair("AccountID", request.accountID.toString()),
-        Pair("URI", request.uri.toString())
-      )
-    )
   }
 
   private fun generatedFeedException(

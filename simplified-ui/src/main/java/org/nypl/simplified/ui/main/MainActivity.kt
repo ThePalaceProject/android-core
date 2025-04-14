@@ -32,7 +32,6 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
         this.onSplashScreenStatusChanged(newValue)
       }
     )
-
     this.switchFragment(SplashFragment())
   }
 

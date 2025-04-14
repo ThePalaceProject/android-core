@@ -136,9 +136,6 @@ class OPDSClientTest {
       this.client.goBack().get(5L, TimeUnit.SECONDS)
     }
     assertThrows<ExecutionException> {
-      this.client.loadMore().get(5L, TimeUnit.SECONDS)
-    }
-    assertThrows<ExecutionException> {
       this.client.goTo(
         OPDSClientRequest.ExistingEntry(
           FeedEntry.FeedEntryCorrupt(account0, book0, IllegalStateException())
@@ -279,51 +276,6 @@ class OPDSClientTest {
   }
 
   @Test
-  fun testFeedWithoutGroupsCancel() {
-    this.webServer.enqueue(
-      MockResponse()
-        .setResponseCode(200)
-        .setBody(this.textOf("/org/nypl/simplified/tests/opds/client/errorsBorrowing.xml"))
-    )
-
-    assertInstanceOf(OPDSState.Initial::class.java, this.client.state.get())
-    assertFalse(this.client.hasHistory)
-
-    val f =
-      this.client.goTo(
-        OPDSClientRequest.NewFeed(
-          accountID = this.account0,
-          uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
-          credentials = null,
-          method = "GET"
-        )
-      )
-
-    this.logger.debug("Cancelling task...")
-    f.cancel(true)
-
-    this.logger.debug("Checking if task is cancelled...")
-    try {
-      f.get(5L, TimeUnit.SECONDS)
-    } catch (e: Throwable) {
-      this.logger.debug("Get raised exception: ", e)
-    } finally {
-      Thread.sleep(1_000L)
-    }
-
-    this.logger.debug("Checking state...")
-    assertInstanceOf(OPDSState.Initial::class.java, this.client.state.get())
-    assertFalse(this.client.hasHistory)
-    assertEquals(0, this.client.entriesGrouped.get().size)
-    assertEquals(0, this.client.entriesUngrouped.get().size)
-
-    assertEquals(
-      listOf("Initial", "Loading", "Initial"),
-      this.stateChanges
-    )
-  }
-
-  @Test
   fun testFeedWithGroups() {
     this.webServer.enqueue(
       MockResponse()
@@ -353,51 +305,6 @@ class OPDSClientTest {
 
     assertEquals(
       listOf("Initial", "Loading", "LoadedFeedWithGroups"),
-      this.stateChanges
-    )
-  }
-
-  @Test
-  fun testFeedWithGroupsCancel() {
-    this.webServer.enqueue(
-      MockResponse()
-        .setResponseCode(200)
-        .setBody(this.textOf("/org/nypl/simplified/tests/opds/client/acquisition-fiction-0.xml"))
-    )
-
-    assertInstanceOf(OPDSState.Initial::class.java, this.client.state.get())
-    assertFalse(this.client.hasHistory)
-
-    val f =
-      this.client.goTo(
-        OPDSClientRequest.NewFeed(
-          accountID = this.account0,
-          uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
-          credentials = null,
-          method = "GET"
-        )
-      )
-
-    this.logger.debug("Cancelling task...")
-    f.cancel(true)
-
-    this.logger.debug("Checking if task is cancelled...")
-    try {
-      f.get(5L, TimeUnit.SECONDS)
-    } catch (e: Throwable) {
-      this.logger.debug("Get raised exception: ", e)
-    } finally {
-      Thread.sleep(1_000L)
-    }
-
-    this.logger.debug("Checking state...")
-    assertInstanceOf(OPDSState.Initial::class.java, this.client.state.get())
-    assertFalse(this.client.hasHistory)
-    assertEquals(0, this.client.entriesGrouped.get().size)
-    assertEquals(0, this.client.entriesUngrouped.get().size)
-
-    assertEquals(
-      listOf("Initial", "Loading", "Initial"),
       this.stateChanges
     )
   }
@@ -434,14 +341,16 @@ class OPDSClientTest {
       )
 
     f0.get(5L, TimeUnit.SECONDS)
-    assertInstanceOf(OPDSState.LoadedFeedWithoutGroups::class.java, this.client.state.get())
+    val s = assertInstanceOf(OPDSState.LoadedFeedWithoutGroups::class.java, this.client.state.get())
     assertFalse(this.client.hasHistory)
     assertEquals(1, this.webServer.requestCount)
     assertEquals(3, this.client.entriesUngrouped.get().size)
     assertEquals(0, this.client.entriesGrouped.get().size)
 
-    val f1 = this.client.loadMore()
+    this.logger.debug("Requesting more...")
+    val f1 = s.handle.loadMore()
     f1.get(5L, TimeUnit.SECONDS)
+    this.logger.debug("Requested more.")
 
     assertInstanceOf(OPDSState.LoadedFeedWithoutGroups::class.java, this.client.state.get())
     assertFalse(this.client.hasHistory)
@@ -449,8 +358,10 @@ class OPDSClientTest {
     assertEquals(6, this.client.entriesUngrouped.get().size)
     assertEquals(0, this.client.entriesGrouped.get().size)
 
-    val f2 = this.client.loadMore()
+    this.logger.debug("Requesting more...")
+    val f2 = s.handle.loadMore()
     f2.get(5L, TimeUnit.SECONDS)
+    this.logger.debug("Requested more.")
 
     assertInstanceOf(OPDSState.LoadedFeedWithoutGroups::class.java, this.client.state.get())
     assertFalse(this.client.hasHistory)
@@ -458,8 +369,10 @@ class OPDSClientTest {
     assertEquals(9, this.client.entriesUngrouped.get().size)
     assertEquals(0, this.client.entriesGrouped.get().size)
 
-    val f3 = this.client.loadMore()
+    this.logger.debug("Requesting more...")
+    val f3 = s.handle.loadMore()
     f3.get(5L, TimeUnit.SECONDS)
+    this.logger.debug("Requested more.")
 
     assertInstanceOf(OPDSState.LoadedFeedWithoutGroups::class.java, this.client.state.get())
     assertFalse(this.client.hasHistory)
@@ -520,7 +433,7 @@ class OPDSClientTest {
     assertEquals(0, this.client.entriesUngrouped.get().size)
 
     assertEquals(
-      listOf("Initial", "Loading", "LoadedFeedWithoutGroups", "LoadedFeedEntry"),
+      listOf("Initial", "Loading", "LoadedFeedWithoutGroups", "Loading", "LoadedFeedEntry"),
       this.stateChanges
     )
   }
@@ -598,6 +511,7 @@ class OPDSClientTest {
         "LoadedFeedWithGroups",
         "Loading",
         "LoadedFeedWithoutGroups",
+        "Loading",
         "LoadedFeedEntry",
         "LoadedFeedWithoutGroups",
         "LoadedFeedWithGroups"

@@ -17,5 +17,4 @@ interface OPDSFeedHandleWithoutGroupsType : OPDSFeedHandleType {
    */
 
   fun loadMore(): CompletableFuture<Unit>
-
 }

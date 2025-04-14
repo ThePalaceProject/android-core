@@ -1,8 +1,8 @@
 package org.nypl.simplified.ui.main
 
+import androidx.annotation.UiThread
 import com.io7m.jattribute.core.AttributeReadableType
 import com.io7m.jattribute.core.AttributeType
-import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.accounts.AccountCardCreatorModel
@@ -12,6 +12,9 @@ import org.nypl.simplified.ui.accounts.AccountListFragment
 import org.nypl.simplified.ui.accounts.AccountListRegistryFragment
 import org.nypl.simplified.ui.catalog.CatalogPart
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
+import org.nypl.simplified.ui.main.MainTabCategory.TAB_SETTINGS
+import org.nypl.simplified.ui.main.MainTabRequest.TabAny
+import org.nypl.simplified.ui.main.MainTabRequest.TabForCategory
 import org.nypl.simplified.ui.screens.ScreenDefinitionType
 import org.nypl.simplified.ui.settings.SettingsCustomOPDSFragment
 import org.nypl.simplified.ui.settings.SettingsDebugFragment
@@ -22,16 +25,55 @@ import java.util.LinkedList
 
 object MainNavigation {
 
+  private val tabAttribute: AttributeType<MainTabRequest> =
+    MainAttributes.attributes.withValue(TabAny)
+  private val tabAttributeUI: AttributeType<MainTabRequest> =
+    MainAttributes.attributes.withValue(TabAny)
+
+  init {
+    this.tabAttribute.subscribe { _, x ->
+      UIThread.runOnUIThread {
+        this.tabAttributeUI.set(x)
+      }
+    }
+  }
+
+  val tab: AttributeReadableType<MainTabRequest> =
+    this.tabAttributeUI
+
+  @UiThread
   fun openErrorPage(
     parameters: ErrorPageParameters
   ) {
+    UIThread.checkIsUIThread()
     TODO()
   }
 
+  @UiThread
   fun showLoginDialog(
-    accountID: AccountID
+    account: AccountType
   ) {
-    TODO()
+    UIThread.checkIsUIThread()
+    this.tabAttribute.set(TabForCategory(TAB_SETTINGS))
+    Settings.openAccountDetail(account, showLoginTitle = true)
+    this.tabAttribute.set(TabAny)
+  }
+
+  @UiThread
+  fun requestTabChange(
+    category: MainTabCategory
+  ) {
+    UIThread.checkIsUIThread()
+    this.tabAttribute.set(TabForCategory(category))
+    this.tabAttribute.set(TabAny)
+  }
+
+  @UiThread
+  fun requestTabChangeForPart(
+    catalogPart: CatalogPart
+  ) {
+    UIThread.checkIsUIThread()
+    this.requestTabChange(MainTabCategory.forPart(catalogPart))
   }
 
   object Settings {
@@ -105,9 +147,17 @@ object MainNavigation {
     }
 
     fun openAccountDetail(
-      account: AccountType
+      account: AccountType,
+      showLoginTitle: Boolean
     ) {
-      this.stackPush(AccountDetailFragment.createScreenDefinition(account))
+      this.stackPush(
+        AccountDetailFragment.createScreenDefinition(
+          AccountDetailFragment.AccountDetailScreenParameters(
+            account = account,
+            showLoginTitle = showLoginTitle
+          )
+        )
+      )
     }
 
     fun openCustomOPDS() {

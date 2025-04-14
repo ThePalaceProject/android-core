@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.io7m.jmulticlose.core.CloseableCollection
-import io.reactivex.android.schedulers.AndroidSchedulers
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountEvent
@@ -112,7 +111,7 @@ class AccountListFragment : Fragment(R.layout.account_list) {
   private fun onAccountClicked(
     account: AccountType
   ) {
-    MainNavigation.Settings.openAccountDetail(account)
+    MainNavigation.Settings.openAccountDetail(account, showLoginTitle = false)
   }
 
   override fun onViewCreated(
@@ -165,10 +164,10 @@ class AccountListFragment : Fragment(R.layout.account_list) {
       this.adapter = this@AccountListFragment.accountListAdapter
     }
 
+    val accountEvents =
+      services.requireService(AccountEvents::class.java)
     val accountSub =
-      profiles.accountEvents()
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(this::onAccountEvent)
+      accountEvents.events.subscribe(this::onAccountEvent)
 
     this.subscriptions.add(AutoCloseable { accountSub.dispose() })
   }

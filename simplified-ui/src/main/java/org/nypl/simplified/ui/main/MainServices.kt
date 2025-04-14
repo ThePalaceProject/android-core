@@ -106,12 +106,15 @@ import org.nypl.simplified.tenprint.TenPrintGenerator
 import org.nypl.simplified.tenprint.TenPrintGeneratorType
 import org.nypl.simplified.threads.NamedThreadPools
 import org.nypl.simplified.threads.UIThread
+import org.nypl.simplified.ui.accounts.AccountEvents
+import org.nypl.simplified.ui.catalog.CatalogBookRegistryEvents
 import org.nypl.simplified.ui.catalog.CatalogCoverBadgeImages
 import org.nypl.simplified.ui.catalog.CatalogOPDSClients
 import org.nypl.simplified.ui.images.ImageAccountIconRequestHandler
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.nypl.simplified.ui.screen.ScreenSizeInformation
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
+import org.nypl.simplified.ui.settings.SettingsProfileEvents
 import org.readium.r2.lcp.LcpService
 import org.slf4j.LoggerFactory
 import org.thepalaceproject.opds.client.OPDSClient
@@ -568,7 +571,7 @@ internal object MainServices {
       serviceConstructor = { MainCatalogBookRevokeStrings(context.resources) }
     )
 
-    val crashlyticsService = addServiceFromServiceLoaderOptionally(
+    addServiceFromServiceLoaderOptionally(
       message = strings.bootingGeneral("Crashlytics"),
       interfaceType = CrashlyticsServiceType::class.java
     )
@@ -618,6 +621,11 @@ internal object MainServices {
         interfaceType = BookRegistryType::class.java,
         serviceConstructor = { BookRegistry.create() }
       )
+    addService(
+      message = strings.bootingGeneral("catalog book registry"),
+      interfaceType = CatalogBookRegistryEvents::class.java,
+      serviceConstructor = { CatalogBookRegistryEvents.create(bookRegistry) }
+    )
     addService(
       message = strings.bootingGeneral("book registry"),
       interfaceType = BookRegistryReadableType::class.java,
@@ -771,23 +779,22 @@ internal object MainServices {
         }
       )
 
-    val profilesDatabase =
-      addService(
-        message = strings.bootingGeneral("profiles database"),
-        interfaceType = ProfilesDatabaseType::class.java,
-        serviceConstructor = {
-          createProfileDatabase(
-            context,
-            analytics,
-            accountEvents,
-            accountProviderRegistry,
-            accountBundledCredentials,
-            accountCredentials,
-            bookFormatService,
-            directories.directoryStorageProfiles
-          )
-        }
-      )
+    addService(
+      message = strings.bootingGeneral("profiles database"),
+      interfaceType = ProfilesDatabaseType::class.java,
+      serviceConstructor = {
+        createProfileDatabase(
+          context,
+          analytics,
+          accountEvents,
+          accountProviderRegistry,
+          accountBundledCredentials,
+          accountCredentials,
+          bookFormatService,
+          directories.directoryStorageProfiles
+        )
+      }
+    )
 
     val bundledContent =
       addService(
@@ -898,6 +905,17 @@ internal object MainServices {
       )
       controller
     }
+
+    addService(
+      message = strings.bootingGeneral("account events"),
+      interfaceType = AccountEvents::class.java,
+      serviceConstructor = { AccountEvents.create(profilesControllerTypeService) }
+    )
+    addService(
+      message = strings.bootingGeneral("profile events"),
+      interfaceType = SettingsProfileEvents::class.java,
+      serviceConstructor = { SettingsProfileEvents.create(profilesControllerTypeService) }
+    )
 
     addService(
       message = strings.bootingGeneral("audiobook time tracker registry"),

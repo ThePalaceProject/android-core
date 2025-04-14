@@ -13,7 +13,9 @@ import androidx.core.view.isVisible
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountProviderDescription
 import org.nypl.simplified.feeds.api.FeedSearch
-import org.nypl.simplified.ui.catalog.CatalogPart.*
+import org.nypl.simplified.ui.catalog.CatalogPart.BOOKS
+import org.nypl.simplified.ui.catalog.CatalogPart.CATALOG
+import org.nypl.simplified.ui.catalog.CatalogPart.HOLDS
 import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
 
