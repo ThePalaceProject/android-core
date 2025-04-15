@@ -49,6 +49,7 @@ dependencies {
     implementation(project(":simplified-books-database-api"))
     implementation(project(":simplified-books-formats"))
     implementation(project(":simplified-books-formats-api"))
+    implementation(project(":simplified-books-preview"))
     implementation(project(":simplified-books-registry-api"))
     implementation(project(":simplified-books-time-tracking"))
     implementation(project(":simplified-boot-api"))
@@ -84,6 +85,7 @@ dependencies {
     implementation(project(":simplified-ui-images"))
     implementation(project(":simplified-ui-screen"))
     implementation(project(":simplified-viewer-api"))
+    implementation(project(":simplified-viewer-preview"))
     implementation(project(":simplified-viewer-spi"))
     implementation(project(":simplified-webview"))
 

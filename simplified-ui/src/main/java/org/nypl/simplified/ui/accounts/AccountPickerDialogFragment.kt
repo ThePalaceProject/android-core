@@ -23,6 +23,7 @@ import org.nypl.simplified.ui.catalog.CatalogOPDSClients
 import org.nypl.simplified.ui.catalog.CatalogPart
 import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
+import org.nypl.simplified.ui.main.MainNavigation
 import org.slf4j.LoggerFactory
 
 /**
@@ -147,7 +148,7 @@ class AccountPickerDialogFragment : BottomSheetDialogFragment(), OnAccountClickL
   }
 
   override fun onAddAccountClick() {
-    TODO()
+    MainNavigation.openAccountCreation()
     this.dismiss()
   }
 

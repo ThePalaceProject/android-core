@@ -76,6 +76,14 @@ object MainNavigation {
     this.requestTabChange(MainTabCategory.forPart(catalogPart))
   }
 
+  @UiThread
+  fun openAccountCreation() {
+    UIThread.checkIsUIThread()
+    this.tabAttribute.set(TabForCategory(TAB_SETTINGS))
+    Settings.openAccountCreationList()
+    this.tabAttribute.set(TabAny)
+  }
+
   object Settings {
 
     private val navigationStackAttribute: AttributeType<List<ScreenDefinitionType<*, *>>> =

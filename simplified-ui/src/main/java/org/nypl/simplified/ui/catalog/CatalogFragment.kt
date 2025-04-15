@@ -10,6 +10,7 @@ import com.io7m.jfunctional.Some
 import com.io7m.jmulticlose.core.CloseableCollection
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
+import org.librarysimplified.viewer.preview.BookPreviewActivity
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountLoginState
@@ -43,6 +44,8 @@ import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.nypl.simplified.ui.main.MainNavigation
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
+import org.nypl.simplified.viewer.api.Viewers
+import org.nypl.simplified.viewer.spi.ViewerPreferences
 import org.slf4j.LoggerFactory
 import org.thepalaceproject.opds.client.OPDSClientRequest
 import org.thepalaceproject.opds.client.OPDSClientType
@@ -486,7 +489,13 @@ sealed class CatalogFragment : Fragment() {
   private fun onBookPreviewOpenRequested(
     status: CatalogBookStatus<*>
   ) {
-    TODO()
+    BookPreviewActivity.startActivity(
+      this.requireActivity(),
+      FeedEntry.FeedEntryOPDS(
+        status.book.account,
+        status.book.entry
+      )
+    )
   }
 
   /**
@@ -584,7 +593,15 @@ sealed class CatalogFragment : Fragment() {
   private fun onBookDeleteRequested(
     status: CatalogBookStatus<*>
   ) {
-    TODO()
+    val services =
+      Services.serviceDirectory()
+    val books =
+      services.requireService(BooksControllerType::class.java)
+
+    books.bookDelete(
+      accountID = status.book.account,
+      bookId = status.book.id
+    )
   }
 
   private fun onBookRevokeRequested(
@@ -607,19 +624,30 @@ sealed class CatalogFragment : Fragment() {
   private fun onBookResetStatusInitial(
     status: CatalogBookStatus<*>
   ) {
-    TODO()
+    // XXX: Unclear what the point of this method ever was...
   }
 
   private fun onBookViewerOpen(
+    book: Book,
     bookFormat: BookFormat
   ) {
-    TODO()
+    val viewerPreferences =
+      ViewerPreferences(
+        flags = mapOf()
+      )
+
+    Viewers.openViewer(
+      context = this.requireActivity(),
+      preferences = viewerPreferences,
+      book = book,
+      format = bookFormat
+    )
   }
 
   private fun onBookReserveRequested(
     parameters: CatalogBorrowParameters
   ) {
-    TODO()
+    this.onBookBorrowRequested(parameters)
   }
 
   private fun bookPreviewStatusOf(

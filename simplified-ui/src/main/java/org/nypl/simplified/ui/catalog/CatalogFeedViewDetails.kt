@@ -20,6 +20,7 @@ import org.joda.time.Duration
 import org.joda.time.format.DateTimeFormatterBuilder
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountID
+import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.api.BookFormat.BookFormatAudioBook
 import org.nypl.simplified.books.api.BookFormat.BookFormatEPUB
@@ -72,7 +73,7 @@ class CatalogFeedViewDetails(
   private val onBookResetStatusInitial: (CatalogBookStatus<*>) -> Unit,
   private val onBookRevokeRequested: (CatalogBookStatus<*>) -> Unit,
   private val onBookSelected: (FeedEntry.FeedEntryOPDS) -> Unit,
-  private val onBookViewerOpen: (BookFormat) -> Unit,
+  private val onBookViewerOpen: (Book, BookFormat) -> Unit,
   private val onFeedSelected: (accountID: AccountID, title: String, uri: URI) -> Unit,
   private val onToolbarBackPressed: () -> Unit,
   private val onToolbarLogoPressed: () -> Unit,
@@ -495,7 +496,7 @@ class CatalogFeedViewDetails(
           is BookFormatEPUB -> {
             this.buttons.addView(
               this.buttonCreator.createReadButton(
-                onClick = { this.onBookViewerOpen(format) }
+                onClick = { this.onBookViewerOpen(status.book, format) }
               )
             )
           }
@@ -503,7 +504,7 @@ class CatalogFeedViewDetails(
           is BookFormatAudioBook -> {
             this.buttons.addView(
               this.buttonCreator.createListenButton(
-                onClick = { this.onBookViewerOpen(format) }
+                onClick = { this.onBookViewerOpen(status.book, format) }
               )
             )
           }
@@ -898,7 +899,7 @@ class CatalogFeedViewDetails(
       onBookResetStatusInitial: (CatalogBookStatus<*>) -> Unit,
       onBookRevokeRequested: (CatalogBookStatus<*>) -> Unit,
       onBookSelected: (FeedEntry.FeedEntryOPDS) -> Unit,
-      onBookViewerOpen: (BookFormat) -> Unit,
+      onBookViewerOpen: (Book, BookFormat) -> Unit,
       onFeedSelected: (accountID: AccountID, title: String, uri: URI) -> Unit,
       onToolbarBackPressed: () -> Unit,
       onToolbarLogoPressed: () -> Unit,
