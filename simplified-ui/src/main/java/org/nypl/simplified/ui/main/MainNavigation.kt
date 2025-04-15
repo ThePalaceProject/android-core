@@ -5,7 +5,7 @@ import com.io7m.jattribute.core.AttributeReadableType
 import com.io7m.jattribute.core.AttributeType
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.threads.UIThread
-import org.nypl.simplified.ui.accounts.AccountCardCreatorModel
+import org.nypl.simplified.ui.accounts.AccountCardCreatorFragment
 import org.nypl.simplified.ui.accounts.AccountCardCreatorParameters
 import org.nypl.simplified.ui.accounts.AccountDetailFragment
 import org.nypl.simplified.ui.accounts.AccountListFragment
@@ -128,8 +128,7 @@ object MainNavigation {
     fun openCardCreator(
       parameters: AccountCardCreatorParameters
     ) {
-      AccountCardCreatorModel.parameters = parameters
-      TODO()
+      this.stackPush(AccountCardCreatorFragment.createScreenDefinition(parameters))
     }
 
     fun openDocument(

@@ -8,6 +8,8 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.fragment.app.Fragment
 import org.librarysimplified.ui.R
+import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
+import org.nypl.simplified.ui.screens.ScreenDefinitionType
 import org.nypl.simplified.webview.WebViewUtilities
 
 /**
@@ -17,6 +19,31 @@ import org.nypl.simplified.webview.WebViewUtilities
 class AccountCardCreatorFragment : Fragment(R.layout.fragment_account_card_creator) {
 
   private lateinit var webView: WebView
+
+  companion object :
+    ScreenDefinitionFactoryType<AccountCardCreatorParameters, AccountCardCreatorFragment> {
+    private class ScreenSettingsCardCreator(
+      private val parameters: AccountCardCreatorParameters
+    ) : ScreenDefinitionType<AccountCardCreatorParameters, AccountCardCreatorFragment> {
+      override fun setup() {
+        AccountCardCreatorModel.parameters = this.parameters
+      }
+
+      override fun parameters(): AccountCardCreatorParameters {
+        return this.parameters
+      }
+
+      override fun fragment(): AccountCardCreatorFragment {
+        return AccountCardCreatorFragment()
+      }
+    }
+
+    override fun createScreenDefinition(
+      p: AccountCardCreatorParameters
+    ): ScreenDefinitionType<AccountCardCreatorParameters, AccountCardCreatorFragment> {
+      return ScreenSettingsCardCreator(p)
+    }
+  }
 
   override fun onViewCreated(
     view: View,
