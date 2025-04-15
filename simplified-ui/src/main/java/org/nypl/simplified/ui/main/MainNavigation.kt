@@ -1,7 +1,10 @@
 package org.nypl.simplified.ui.main
 
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import androidx.annotation.UiThread
+import androidx.fragment.app.FragmentActivity
 import com.io7m.jattribute.core.AttributeReadableType
 import com.io7m.jattribute.core.AttributeType
 import org.nypl.simplified.accounts.database.api.AccountType
@@ -23,6 +26,7 @@ import org.nypl.simplified.ui.settings.SettingsDebugFragment
 import org.nypl.simplified.ui.settings.SettingsDocumentViewerFragment
 import org.nypl.simplified.ui.settings.SettingsDocumentViewerModel
 import org.nypl.simplified.ui.settings.SettingsMainFragment3
+import java.net.URI
 import java.util.LinkedList
 
 object MainNavigation {
@@ -85,6 +89,17 @@ object MainNavigation {
     this.tabAttribute.set(TabForCategory(TAB_SETTINGS))
     Settings.openAccountCreationList()
     this.tabAttribute.set(TabAny)
+  }
+
+  @UiThread
+  fun openExternalBrowser(
+    activity: FragmentActivity,
+    target: URI
+  ) {
+    UIThread.checkIsUIThread()
+    val i = Intent(Intent.ACTION_VIEW)
+    i.setData(Uri.parse(target.toString()))
+    activity.startActivity(i)
   }
 
   object Settings {

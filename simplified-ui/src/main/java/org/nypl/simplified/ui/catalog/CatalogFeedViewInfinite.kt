@@ -34,6 +34,7 @@ class CatalogFeedViewInfinite(
   override val root: ViewGroup,
   private val onFacetSelected: (FeedFacet) -> Unit,
   private val onSearchSubmitted: (AccountID, FeedSearch, String) -> Unit,
+  private val onCatalogLogoClicked: () -> Unit,
   private val onToolbarBackPressed: () -> Unit,
   private val onToolbarLogoPressed: () -> Unit,
   private val window: Window,
@@ -44,12 +45,12 @@ class CatalogFeedViewInfinite(
   val listView: RecyclerView =
     this.root.findViewById(R.id.catalogFeedEntries)
 
-  val catalogFeedLayout: ViewGroup =
+  val catalogFeedLogoContainer: ViewGroup =
     this.root.findViewById(R.id.catalogFeedLogoContainer)
   val catalogFeedLibraryLogo: ImageView =
-    this.catalogFeedLayout.findViewById(R.id.catalogFeedLibraryLogo)
+    this.catalogFeedLogoContainer.findViewById(R.id.catalogFeedLibraryLogo)
   val catalogFeedLibraryText: TextView =
-    this.catalogFeedLayout.findViewById(R.id.catalogFeedLibraryText)
+    this.catalogFeedLogoContainer.findViewById(R.id.catalogFeedLibraryText)
 
   val catalogFeedContentHeader: ViewGroup =
     this.root.findViewById(R.id.catalogFeedContentHeader)
@@ -84,6 +85,7 @@ class CatalogFeedViewInfinite(
     this.listView.setItemViewCacheSize(8)
 
     this.catalogFeedHeaderFacets.removeAllViews()
+    this.catalogFeedLogoContainer.setOnClickListener { this.onCatalogLogoClicked.invoke() }
   }
 
   companion object {
@@ -94,7 +96,8 @@ class CatalogFeedViewInfinite(
       onFacetSelected: (FeedFacet) -> Unit,
       onSearchSubmitted: (AccountID, FeedSearch, String) -> Unit,
       onToolbarBackPressed: () -> Unit,
-      onToolbarLogoPressed: () -> Unit
+      onToolbarLogoPressed: () -> Unit,
+      onCatalogLogoClicked: () -> Unit
     ): CatalogFeedViewInfinite {
       return CatalogFeedViewInfinite(
         onFacetSelected = onFacetSelected,
@@ -103,6 +106,7 @@ class CatalogFeedViewInfinite(
         onToolbarLogoPressed = onToolbarLogoPressed,
         root = layoutInflater.inflate(R.layout.catalog_feed_infinite, container, true) as ViewGroup,
         window = window,
+        onCatalogLogoClicked = onCatalogLogoClicked
       )
     }
   }

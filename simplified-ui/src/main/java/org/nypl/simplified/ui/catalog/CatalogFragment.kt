@@ -773,6 +773,10 @@ sealed class CatalogFragment : Fragment() {
     val feed =
       feedHandle.feed()
 
+    val account =
+      this.profiles.profileCurrent()
+        .account(newState.request.accountID)
+
     val view =
       CatalogFeedViewInfinite.create(
         container = this.contentContainer,
@@ -781,6 +785,7 @@ sealed class CatalogFragment : Fragment() {
         onSearchSubmitted = this::onSearchSubmitted,
         onToolbarBackPressed = this::onToolbarBackPressed,
         onToolbarLogoPressed = { this.onToolbarLogoPressed(newState.request.accountID) },
+        onCatalogLogoClicked = { this.onCatalogLogoClicked(account.provider.alternateURI) },
         window = this.requireActivity().window,
       )
 
@@ -800,10 +805,6 @@ sealed class CatalogFragment : Fragment() {
         feed = feed,
         sortFacets = true
       )
-
-      val account =
-        this.profiles.profileCurrent()
-          .account(newState.request.accountID)
 
       ImageAccountIcons.loadAccountLogoIntoView(
         loader = this.imageLoader.loader,
@@ -865,6 +866,14 @@ sealed class CatalogFragment : Fragment() {
     )
 
     this.switchView(view)
+  }
+
+  private fun onCatalogLogoClicked(
+    alternateURI: URI?
+  ) {
+    if (alternateURI != null) {
+      MainNavigation.openExternalBrowser(this.requireActivity(), alternateURI)
+    }
   }
 
   private fun onSearchSubmitted(

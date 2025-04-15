@@ -106,10 +106,13 @@
 
     <LinearLayout
         android:id="@+id/catalogFeedLogoContainer"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="horizontal"
+        android:focusable="false"
+        android:clickable="true"
+        android:background="?attr/selectableItemBackground"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/catalogFeedContentHeader">
@@ -120,6 +123,8 @@
             android:layout_height="64dp"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
+            android:focusable="false"
+            android:clickable="false"
             app:srcCompat="@drawable/account_default" />
 
         <TextView
@@ -128,6 +133,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
+            android:focusable="false"
+            android:clickable="false"
             android:ellipsize="end"
             android:gravity="center|left"
             android:maxLines="2"
