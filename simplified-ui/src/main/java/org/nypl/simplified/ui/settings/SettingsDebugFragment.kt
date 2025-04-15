@@ -334,7 +334,8 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
         .supportErrorReportEmailAddress
 
     MainNavigation.openErrorPage(
-      ErrorPageParameters(
+      activity = this.requireActivity(),
+      parameters = ErrorPageParameters(
         emailAddress = supportEmail,
         body = "",
         subject = "[palace-error-report] $appVersion",

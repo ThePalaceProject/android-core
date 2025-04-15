@@ -1,5 +1,6 @@
 package org.nypl.simplified.ui.accounts
 
+import android.app.Activity
 import androidx.annotation.UiThread
 import io.reactivex.disposables.Disposable
 import org.librarysimplified.services.api.Services
@@ -60,6 +61,7 @@ object AccountDetailModel {
 
   @UiThread
   fun openErrorPage(
+    activity: Activity,
     taskSteps: List<TaskStep>
   ) {
     UIThread.checkIsUIThread()
@@ -70,7 +72,8 @@ object AccountDetailModel {
       services.requireService(BuildConfigurationServiceType::class.java)
 
     MainNavigation.openErrorPage(
-      ErrorPageParameters(
+      activity = activity,
+      parameters = ErrorPageParameters(
         emailAddress = buildConfig.supportErrorReportEmailAddress,
         body = "",
         subject = "[palace-error-report]",

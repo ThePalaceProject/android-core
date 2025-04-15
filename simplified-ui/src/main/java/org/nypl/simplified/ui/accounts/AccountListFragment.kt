@@ -229,7 +229,8 @@ class AccountListFragment : Fragment(R.layout.account_list) {
       services.requireService(BuildConfigurationServiceType::class.java)
 
     MainNavigation.openErrorPage(
-      ErrorPageParameters(
+      activity = this.requireActivity(),
+      parameters = ErrorPageParameters(
         emailAddress = buildConfig.supportErrorReportEmailAddress,
         body = "",
         subject = "[palace-error-report]",

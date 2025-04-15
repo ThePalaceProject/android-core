@@ -1,5 +1,6 @@
 package org.nypl.simplified.ui.main
 
+import android.app.Activity
 import androidx.annotation.UiThread
 import com.io7m.jattribute.core.AttributeReadableType
 import com.io7m.jattribute.core.AttributeType
@@ -11,6 +12,7 @@ import org.nypl.simplified.ui.accounts.AccountDetailFragment
 import org.nypl.simplified.ui.accounts.AccountListFragment
 import org.nypl.simplified.ui.accounts.AccountListRegistryFragment
 import org.nypl.simplified.ui.catalog.CatalogPart
+import org.nypl.simplified.ui.errorpage.ErrorPageActivity
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.main.MainTabCategory.TAB_SETTINGS
 import org.nypl.simplified.ui.main.MainTabRequest.TabAny
@@ -43,10 +45,11 @@ object MainNavigation {
 
   @UiThread
   fun openErrorPage(
+    activity: Activity,
     parameters: ErrorPageParameters
   ) {
     UIThread.checkIsUIThread()
-    TODO()
+    ErrorPageActivity.show(activity, parameters)
   }
 
   @UiThread

@@ -384,6 +384,9 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
         taskSteps = accountEvent.taskResult.steps
       )
 
-    MainNavigation.openErrorPage(parameters)
+    MainNavigation.openErrorPage(
+      activity = this.requireActivity(),
+      parameters = parameters
+    )
   }
 }

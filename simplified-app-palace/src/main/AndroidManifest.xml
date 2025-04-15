@@ -71,6 +71,10 @@
             android:required="false" />
 
         <activity
+            android:name="org.nypl.simplified.ui.errorpage.ErrorPageActivity"
+            android:exported="false"/>
+
+        <activity
             android:name="org.nypl.simplified.ui.accounts.saml20.AccountSAML20Activity"
             android:exported="false" />
 
