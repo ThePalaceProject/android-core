@@ -157,7 +157,7 @@ class CatalogFeedViewDetails(
       logoTouch = this.root.findViewById(R.id.catalogDetailToolbarLogoTouch),
       onToolbarBackPressed = this.onToolbarBackPressed,
       onToolbarLogoPressed = this.onToolbarLogoPressed,
-      onSearchSubmitted = { _, _ -> },
+      onSearchSubmitted = { _, _, _ -> },
       searchIcon = this.root.findViewById(R.id.catalogDetailToolbarSearchIcon),
       searchText = this.root.findViewById(R.id.catalogDetailToolbarSearchText),
       searchTouch = this.root.findViewById(R.id.catalogDetailToolbarSearchIconTouch),

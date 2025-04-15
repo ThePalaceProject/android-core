@@ -11,6 +11,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import org.librarysimplified.ui.R
+import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountProviderDescription
 import org.nypl.simplified.feeds.api.FeedSearch
 import org.nypl.simplified.ui.catalog.CatalogPart.BOOKS
@@ -24,7 +25,7 @@ class CatalogToolbar(
   private val logoTouch: ViewGroup,
   private val onToolbarBackPressed: () -> Unit,
   private val onToolbarLogoPressed: () -> Unit,
-  private val onSearchSubmitted: (FeedSearch, String) -> Unit,
+  private val onSearchSubmitted: (AccountID, FeedSearch, String) -> Unit,
   private val searchIcon: ImageView,
   private val searchText: EditText,
   private val searchTouch: ViewGroup,
@@ -38,6 +39,7 @@ class CatalogToolbar(
 
   fun configure(
     imageLoader: ImageLoaderType,
+    accountID: AccountID,
     accountProvider: AccountProviderDescription,
     title: String,
     search: FeedSearch?,
@@ -62,7 +64,7 @@ class CatalogToolbar(
         this.searchText.setOnEditorActionListener { v, actionId, event ->
           return@setOnEditorActionListener if (actionId == EditorInfo.IME_ACTION_DONE) {
             this.keyboardHide()
-            this.onSearchSubmitted(search, this.searchText.text.trim().toString())
+            this.onSearchSubmitted(accountID, search, this.searchText.text.trim().toString())
             true
           } else {
             false

@@ -36,12 +36,14 @@ import org.nypl.simplified.opds.core.OPDSAvailabilityLoaned
 import org.nypl.simplified.opds.core.OPDSAvailabilityMatcherType
 import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
 import org.nypl.simplified.opds.core.OPDSAvailabilityRevoked
+import org.nypl.simplified.profiles.controller.api.ProfileFeedRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.accounts.AccountDetailModel
 import org.nypl.simplified.ui.accounts.AccountPickerDialogFragment
 import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
+import org.nypl.simplified.ui.main.MainApplication
 import org.nypl.simplified.ui.main.MainNavigation
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.nypl.simplified.viewer.api.Viewers
@@ -56,6 +58,7 @@ import org.thepalaceproject.opds.client.OPDSState.LoadedFeedWithGroups
 import org.thepalaceproject.opds.client.OPDSState.LoadedFeedWithoutGroups
 import org.thepalaceproject.opds.client.OPDSState.Loading
 import java.net.URI
+import java.util.concurrent.TimeUnit
 
 /**
  * The fragment used for the catalog.
@@ -411,6 +414,7 @@ sealed class CatalogFragment : Fragment() {
 
       view.toolbar.configure(
         imageLoader = this.imageLoader,
+        accountID = account.id,
         accountProvider = account.provider.toDescription(),
         title = title,
         search = null,
@@ -435,7 +439,7 @@ sealed class CatalogFragment : Fragment() {
       profiles.profileCurrent()
         .account(parameters.accountID)
 
-    if (isLoginRequired(parameters.accountID)) {
+    if (this.isLoginRequired(parameters.accountID)) {
       MainNavigation.showLoginDialog(account)
 
       AccountDetailModel.executeAfterLogin(
@@ -701,6 +705,7 @@ sealed class CatalogFragment : Fragment() {
 
       view.toolbar.configure(
         imageLoader = this.imageLoader,
+        accountID = account.id,
         accountProvider = account.provider.toDescription(),
         title = feed.feedTitle,
         search = feed.feedSearch,
@@ -810,6 +815,7 @@ sealed class CatalogFragment : Fragment() {
       view.catalogFeedLibraryText.text = account.provider.displayName
       view.toolbar.configure(
         imageLoader = this.imageLoader,
+        accountID = account.id,
         accountProvider = account.provider.toDescription(),
         title = feed.feedTitle,
         search = feed.feedSearch,
@@ -862,12 +868,52 @@ sealed class CatalogFragment : Fragment() {
   }
 
   private fun onSearchSubmitted(
+    accountID: AccountID,
     feedSearch: FeedSearch,
     queryText: String
   ) {
     UIThread.checkIsUIThread()
     this.logger.debug("onSearchSubmitted: {}", queryText)
-    TODO()
+
+    val services =
+      Services.serviceDirectory()
+    val profiles =
+      services.requireService(ProfilesControllerType::class.java)
+    val resources =
+      MainApplication.application.resources
+
+    val credentials =
+      this.credentialsOf(accountID)
+
+    when (feedSearch) {
+      FeedSearch.FeedSearchLocal -> {
+        this.opdsClient.goTo(
+          OPDSClientRequest.GeneratedFeed(
+            accountID = accountID,
+            generator = {
+              profiles.profileFeed(
+                ProfileFeedRequest(
+                  uri = URI.create("Books"),
+                  title = resources.getString(R.string.catalogSearch),
+                  search = queryText,
+                  facetTitleProvider = CatalogOPDSClients.facetTitleProvider
+                )
+              ).get(10L, TimeUnit.SECONDS)
+            }
+          )
+        )
+      }
+      is FeedSearch.FeedSearchOpen1_1 -> {
+        this.opdsClient.goTo(
+          OPDSClientRequest.NewFeed(
+            accountID = accountID,
+            uri = feedSearch.search.getQueryURIForTerms(queryText),
+            credentials = credentials,
+            method = "GET"
+          )
+        )
+      }
+    }
   }
 
   private fun onFacetSelected(
@@ -891,11 +937,39 @@ sealed class CatalogFragment : Fragment() {
       }
 
       is FeedFacet.FeedFacetPseudo.FilteringForAccount -> {
-        TODO()
+        this.opdsClient.goTo(
+          OPDSClientRequest.GeneratedFeed(
+            accountID = this.currentAccount().id,
+            generator = {
+              this.profiles.profileFeed(
+                ProfileFeedRequest(
+                  uri = URI.create("Books"),
+                  title = "",
+                  facetTitleProvider = CatalogOPDSClients.facetTitleProvider,
+                  filterByAccountID = feedFacet.account
+                )
+              ).get(10L, TimeUnit.SECONDS)
+            }
+          )
+        )
       }
 
       is FeedFacet.FeedFacetPseudo.Sorting -> {
-        TODO()
+        this.opdsClient.goTo(
+          OPDSClientRequest.GeneratedFeed(
+            accountID = this.currentAccount().id,
+            generator = {
+              this.profiles.profileFeed(
+                ProfileFeedRequest(
+                  uri = URI.create("Books"),
+                  title = "",
+                  facetTitleProvider = CatalogOPDSClients.facetTitleProvider,
+                  sortBy = feedFacet.sortBy
+                )
+              ).get(10L, TimeUnit.SECONDS)
+            }
+          )
+        )
       }
     }
   }

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import org.librarysimplified.ui.R
+import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedFacet
 import org.nypl.simplified.feeds.api.FeedFacets
@@ -21,7 +22,7 @@ import org.thepalaceproject.theme.core.PalaceTabButtons
 class CatalogFeedViewGroups(
   override val root: ViewGroup,
   private val onFacetSelected: (FeedFacet) -> Unit,
-  private val onSearchSubmitted: (FeedSearch, String) -> Unit,
+  private val onSearchSubmitted: (AccountID, FeedSearch, String) -> Unit,
   private val onToolbarBackPressed: () -> Unit,
   private val onToolbarLogoPressed: () -> Unit,
   private val screenSize: ScreenSizeInformationType,
@@ -118,7 +119,7 @@ class CatalogFeedViewGroups(
       container: ViewGroup,
       layoutInflater: LayoutInflater,
       onFacetSelected: (FeedFacet) -> Unit,
-      onSearchSubmitted: (FeedSearch, String) -> Unit,
+      onSearchSubmitted: (AccountID, FeedSearch, String) -> Unit,
       onToolbarBackPressed: () -> Unit,
       onToolbarLogoPressed: () -> Unit,
       screenSize: ScreenSizeInformationType,

@@ -62,7 +62,7 @@ data class CatalogOPDSClients(
                 ProfileFeedRequest(
                   uri = URI.create("Books"),
                   title = "",
-                  facetTitleProvider = facetTitles,
+                  facetTitleProvider = facetTitleProvider,
                   feedSelection = FeedBooksSelection.BOOKS_FEED_LOANED,
                   filterByAccountID = account.id
                 )
@@ -81,7 +81,7 @@ data class CatalogOPDSClients(
                 ProfileFeedRequest(
                   uri = URI.create("Books"),
                   title = "",
-                  facetTitleProvider = facetTitles,
+                  facetTitleProvider = facetTitleProvider,
                   feedSelection = FeedBooksSelection.BOOKS_FEED_HOLDS,
                   filterByAccountID = account.id
                 )
@@ -93,8 +93,10 @@ data class CatalogOPDSClients(
     }
   }
 
-  private val facetTitles =
-    CatalogFacetPseudoTitleProvider(MainApplication.application.resources)
+  companion object {
+    val facetTitleProvider: FeedFacetPseudoTitleProviderType =
+      CatalogFacetPseudoTitleProvider(MainApplication.application.resources)
+  }
 
   private class CatalogFacetPseudoTitleProvider(
     val resources: Resources

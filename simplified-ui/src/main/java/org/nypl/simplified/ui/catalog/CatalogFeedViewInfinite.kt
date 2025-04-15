@@ -22,6 +22,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.librarysimplified.ui.R
+import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedFacet
 import org.nypl.simplified.feeds.api.FeedFacets
@@ -32,7 +33,7 @@ import org.thepalaceproject.theme.core.PalaceTabButtons
 class CatalogFeedViewInfinite(
   override val root: ViewGroup,
   private val onFacetSelected: (FeedFacet) -> Unit,
-  private val onSearchSubmitted: (FeedSearch, String) -> Unit,
+  private val onSearchSubmitted: (AccountID, FeedSearch, String) -> Unit,
   private val onToolbarBackPressed: () -> Unit,
   private val onToolbarLogoPressed: () -> Unit,
   private val window: Window,
@@ -91,7 +92,7 @@ class CatalogFeedViewInfinite(
       layoutInflater: LayoutInflater,
       container: ViewGroup,
       onFacetSelected: (FeedFacet) -> Unit,
-      onSearchSubmitted: (FeedSearch, String) -> Unit,
+      onSearchSubmitted: (AccountID, FeedSearch, String) -> Unit,
       onToolbarBackPressed: () -> Unit,
       onToolbarLogoPressed: () -> Unit
     ): CatalogFeedViewInfinite {
