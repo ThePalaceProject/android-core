@@ -53,4 +53,10 @@ interface OPDSClientType : AutoCloseable {
    */
 
   fun goTo(request: OPDSClientRequest): CompletableFuture<Unit>
+
+  /**
+   * Completely clear the history back to the initial state.
+   */
+
+  fun clearHistory()
 }

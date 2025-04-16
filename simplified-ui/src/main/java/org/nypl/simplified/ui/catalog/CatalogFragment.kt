@@ -1038,11 +1038,8 @@ sealed class CatalogFragment : Fragment() {
       Services.serviceDirectory()
     val opdsClients =
       services.requireService(CatalogOPDSClients::class.java)
-    val profiles =
-      services.requireService(ProfilesControllerType::class.java)
 
     opdsClients.goToRootFeedFor(
-      profiles = profiles,
       catalogPart = this.catalogPart,
       account = account
     )

@@ -974,6 +974,7 @@ internal object MainServices {
       interfaceType = CatalogOPDSClients::class.java,
       serviceConstructor = {
         createCatalogOPDSClients(
+          profiles = profilesControllerTypeService,
           feedLoader = feedLoader
         )
       }
@@ -990,6 +991,7 @@ internal object MainServices {
   }
 
   private fun createCatalogOPDSClients(
+    profiles: ProfilesControllerType,
     feedLoader: FeedLoaderType
   ): CatalogOPDSClients {
     val mainClient =
@@ -1023,6 +1025,7 @@ internal object MainServices {
       )
 
     return CatalogOPDSClients(
+      profiles = profiles,
       mainClient = mainClient,
       booksClient = booksClient,
       holdsClient = holdsClient

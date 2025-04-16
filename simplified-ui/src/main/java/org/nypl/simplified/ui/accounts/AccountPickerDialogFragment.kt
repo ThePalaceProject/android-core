@@ -140,7 +140,6 @@ class AccountPickerDialogFragment : BottomSheetDialogFragment(), OnAccountClickL
       services.requireService(CatalogOPDSClients::class.java)
 
     opdsClients.goToRootFeedFor(
-      profiles = this.profilesController,
       catalogPart = this.catalogPart,
       account = account
     )

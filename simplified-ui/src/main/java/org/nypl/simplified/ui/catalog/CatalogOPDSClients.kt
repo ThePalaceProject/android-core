@@ -1,23 +1,74 @@
 package org.nypl.simplified.ui.catalog
 
 import android.content.res.Resources
+import com.io7m.jmulticlose.core.CloseableCollection
 import org.librarysimplified.ui.R
+import org.nypl.simplified.accounts.api.AccountEventDeletion
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.feeds.api.FeedBooksSelection
 import org.nypl.simplified.feeds.api.FeedFacetPseudoTitleProviderType
 import org.nypl.simplified.profiles.controller.api.ProfileFeedRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
+import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.main.MainApplication
+import org.slf4j.LoggerFactory
 import org.thepalaceproject.opds.client.OPDSClientRequest
 import org.thepalaceproject.opds.client.OPDSClientRequest.HistoryBehavior.CLEAR_HISTORY
 import org.thepalaceproject.opds.client.OPDSClientType
 import java.net.URI
 
-data class CatalogOPDSClients(
+class CatalogOPDSClients(
+  val profiles: ProfilesControllerType,
   val mainClient: OPDSClientType,
   val booksClient: OPDSClientType,
   val holdsClient: OPDSClientType
 ) : AutoCloseable {
+
+  private val logger =
+    LoggerFactory.getLogger(CatalogOPDSClients::class.java)
+
+  private val resources =
+    CloseableCollection.create()
+
+  init {
+    this.resources.add(this.mainClient)
+    this.resources.add(this.booksClient)
+    this.resources.add(this.holdsClient)
+
+    /*
+     * When an account is deleted, we need to clear the histories of the OPDS clients so that
+     * the catalog can never observe a deleted account.
+     */
+
+    val subscription =
+      this.profiles.accountEvents()
+        .filter { e -> e is AccountEventDeletion.AccountEventDeletionSucceeded }
+        .subscribe {
+          this.onAccountDeleted()
+        }
+
+    this.resources.add(AutoCloseable { subscription.dispose() })
+  }
+
+  private fun onAccountDeleted() {
+    this.logger.debug("An account has been deleted. Clearing history.")
+
+    UIThread.runOnUIThread {
+      this.clearHistory(this.mainClient)
+      this.clearHistory(this.booksClient)
+      this.clearHistory(this.holdsClient)
+    }
+  }
+
+  private fun clearHistory(
+    client: OPDSClientType
+  ) {
+    try {
+      client.clearHistory()
+    } catch (e: Throwable) {
+      this.logger.debug("Failed to clear history: ", e)
+    }
+  }
 
   fun clientFor(
     part: CatalogPart
@@ -30,13 +81,10 @@ data class CatalogOPDSClients(
   }
 
   override fun close() {
-    this.mainClient.close()
-    this.booksClient.close()
-    this.holdsClient.close()
+    this.resources.close()
   }
 
   fun goToRootFeedFor(
-    profiles: ProfilesControllerType,
     catalogPart: CatalogPart,
     account: AccountType
   ) {
@@ -61,7 +109,7 @@ data class CatalogOPDSClients(
             accountID = account.id,
             historyBehavior = CLEAR_HISTORY,
             generator = {
-              profiles.profileFeed(
+              this.profiles.profileFeed(
                 ProfileFeedRequest(
                   uri = URI.create("Books"),
                   title = "",
@@ -81,7 +129,7 @@ data class CatalogOPDSClients(
             accountID = account.id,
             historyBehavior = CLEAR_HISTORY,
             generator = {
-              profiles.profileFeed(
+              this.profiles.profileFeed(
                 ProfileFeedRequest(
                   uri = URI.create("Books"),
                   title = "",

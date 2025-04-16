@@ -400,6 +400,20 @@ class OPDSClient private constructor(
     }
   }
 
+  override fun clearHistory() {
+    this.parameters.checkOnUI()
+
+    val f = this.checkClosed()
+    if (f != null) {
+      return
+    }
+
+    this.topmostHandlerSubscriptions.close()
+    this.topmostHandlerSubscriptions = CloseableCollection.create()
+    this.requestStack.clear()
+    this.stateSource.set(Initial)
+  }
+
   private fun requestPop() {
     if (this.requestStack.size < 2) {
       return
