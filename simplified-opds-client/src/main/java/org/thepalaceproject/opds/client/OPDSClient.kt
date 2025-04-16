@@ -15,6 +15,9 @@ import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoad
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedGeneral
 import org.nypl.simplified.presentableerror.api.PresentableErrorType
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.opds.client.OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY
+import org.thepalaceproject.opds.client.OPDSClientRequest.HistoryBehavior.CLEAR_HISTORY
+import org.thepalaceproject.opds.client.OPDSClientRequest.HistoryBehavior.REPLACE_TIP
 import org.thepalaceproject.opds.client.OPDSState.Error
 import org.thepalaceproject.opds.client.OPDSState.Initial
 import org.thepalaceproject.opds.client.OPDSState.LoadedFeedEntry
@@ -189,8 +192,11 @@ class OPDSClient private constructor(
       }
 
       override fun refresh(): CompletableFuture<Unit> {
-        this@RequestHandler.feedURINext = this@RequestHandler.request.uri
-        return this@OPDSClient.executeWithFuture(this@RequestHandler)
+        val handler = this@RequestHandler
+        handler.feedURINext = handler.request.uri
+        handler.publishedEntriesUngrouped.set(listOf())
+        handler.publishedEntriesGrouped.set(listOf())
+        return this@OPDSClient.executeWithFuture(handler)
       }
     }
 
@@ -201,9 +207,9 @@ class OPDSClient private constructor(
     private val handleGrouped: OPDSFeedHandleWithGroups =
       this.OPDSFeedHandleWithGroups()
 
-    val entriesUngrouped: AttributeType<List<FeedEntry>> =
+    val publishedEntriesUngrouped: AttributeType<List<FeedEntry>> =
       OPDSClientAttributes.attributes.withValue(listOf())
-    val entriesGrouped: AttributeType<List<FeedGroup>> =
+    val publishedEntriesGrouped: AttributeType<List<FeedGroup>> =
       OPDSClientAttributes.attributes.withValue(listOf())
 
     private val closed =
@@ -272,14 +278,14 @@ class OPDSClient private constructor(
             is Feed.FeedWithGroups -> {
               this.handleGrouped.feed = feed
               this.state.set(LoadedFeedWithGroups(request, this.handleGrouped))
-              this.entriesGrouped.set(feed.feedGroupsInOrder)
+              this.publishedEntriesGrouped.set(feed.feedGroupsInOrder)
               this.feedURINext = feed.feedNext
             }
 
             is Feed.FeedWithoutGroups -> {
               this.handleUngrouped.feed = feed
               this.state.set(LoadedFeedWithoutGroups(request, this.handleUngrouped))
-              this.entriesUngrouped.set(this.entriesUngrouped.get().plus(feed.entriesInOrder))
+              this.publishedEntriesUngrouped.set(this.publishedEntriesUngrouped.get().plus(feed.entriesInOrder))
               this.feedURINext = feed.feedNext
             }
           }
@@ -295,14 +301,14 @@ class OPDSClient private constructor(
           is Feed.FeedWithGroups -> {
             this.handleGrouped.feed = feed
             this.state.set(LoadedFeedWithGroups(request, this.handleGrouped))
-            this.entriesGrouped.set(feed.feedGroupsInOrder)
+            this.publishedEntriesGrouped.set(feed.feedGroupsInOrder)
             this.feedURINext = feed.feedNext
           }
 
           is Feed.FeedWithoutGroups -> {
             this.handleUngrouped.feed = feed
             this.state.set(LoadedFeedWithoutGroups(request, this.handleUngrouped))
-            this.entriesUngrouped.set(this.entriesUngrouped.get().plus(feed.entriesInOrder))
+            this.publishedEntriesUngrouped.set(this.publishedEntriesUngrouped.get().plus(feed.entriesInOrder))
             this.feedURINext = feed.feedNext
           }
         }
@@ -379,7 +385,19 @@ class OPDSClient private constructor(
     if (f != null) {
       return f
     }
-    return this.requestPush(this.RequestHandler(request))
+
+    return when (request.historyBehavior) {
+      ADD_TO_HISTORY -> {
+        this.requestPush(this.RequestHandler(request))
+      }
+      REPLACE_TIP -> {
+        this.requestPushReplacingTip(this.RequestHandler(request))
+      }
+      CLEAR_HISTORY -> {
+        this.requestStack.clear()
+        this.requestPush(this.RequestHandler(request))
+      }
+    }
   }
 
   private fun requestPop() {
@@ -406,6 +424,25 @@ class OPDSClient private constructor(
     this.requestStack.forEachIndexed { index, handler ->
       this.logger.trace("  Stack [{}]: {}", index, handler.request.uri)
     }
+  }
+
+  private fun requestPushReplacingTip(
+    handler: RequestHandler
+  ): CompletableFuture<Unit> {
+    this.topmostHandlerSubscriptions.close()
+    this.topmostHandlerSubscriptions = CloseableCollection.create()
+
+    this.requestStack.removeFirst()
+    this.requestStack.push(handler)
+
+    this.topmostHandlerSubscriptions.add(
+      handler.state.subscribe { _, newState ->
+        this.onHandlerPublishedStateUpdate(handler, newState)
+      }
+    )
+
+    this.traceStack()
+    return this.executeWithFuture(handler)
   }
 
   private fun requestPush(
@@ -476,7 +513,7 @@ class OPDSClient private constructor(
         this.entrySource.set(this.feedEntryCorrupt)
         this.entriesUngroupedSource.set(listOf())
         this.topmostHandlerSubscriptions.add(
-          handler.entriesGrouped.subscribe { _, groups ->
+          handler.publishedEntriesGrouped.subscribe { _, groups ->
             this.entriesGroupedSource.set(groups)
           }
         )
@@ -486,7 +523,7 @@ class OPDSClient private constructor(
         this.entrySource.set(this.feedEntryCorrupt)
         this.entriesGroupedSource.set(listOf())
         this.topmostHandlerSubscriptions.add(
-          handler.entriesUngrouped.subscribe { _, entries ->
+          handler.publishedEntriesUngrouped.subscribe { _, entries ->
             this.entriesUngroupedSource.set(entries)
           }
         )

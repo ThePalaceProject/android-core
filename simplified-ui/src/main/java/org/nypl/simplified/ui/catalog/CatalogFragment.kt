@@ -24,6 +24,7 @@ import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookWithStatus
 import org.nypl.simplified.books.controller.api.BooksControllerType
 import org.nypl.simplified.books.covers.BookCoverProviderType
+import org.nypl.simplified.feeds.api.FeedBooksSelection
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedFacet
 import org.nypl.simplified.feeds.api.FeedLoaderType
@@ -41,6 +42,9 @@ import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.accounts.AccountDetailModel
 import org.nypl.simplified.ui.accounts.AccountPickerDialogFragment
+import org.nypl.simplified.ui.catalog.CatalogPart.BOOKS
+import org.nypl.simplified.ui.catalog.CatalogPart.CATALOG
+import org.nypl.simplified.ui.catalog.CatalogPart.HOLDS
 import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.nypl.simplified.ui.main.MainApplication
@@ -50,6 +54,8 @@ import org.nypl.simplified.viewer.api.Viewers
 import org.nypl.simplified.viewer.spi.ViewerPreferences
 import org.slf4j.LoggerFactory
 import org.thepalaceproject.opds.client.OPDSClientRequest
+import org.thepalaceproject.opds.client.OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY
+import org.thepalaceproject.opds.client.OPDSClientRequest.HistoryBehavior.CLEAR_HISTORY
 import org.thepalaceproject.opds.client.OPDSClientType
 import org.thepalaceproject.opds.client.OPDSState
 import org.thepalaceproject.opds.client.OPDSState.Initial
@@ -173,6 +179,7 @@ sealed class CatalogFragment : Fragment() {
           accountID = accountID,
           uri = address,
           credentials = account.loginState.credentials,
+          historyBehavior = ADD_TO_HISTORY,
           method = "GET"
         )
       )
@@ -185,7 +192,12 @@ sealed class CatalogFragment : Fragment() {
     entry: FeedEntry.FeedEntryOPDS
   ) {
     UIThread.checkIsUIThread()
-    this.opdsClient.goTo(OPDSClientRequest.ExistingEntry(entry))
+    this.opdsClient.goTo(
+      OPDSClientRequest.ExistingEntry(
+        entry = entry,
+        historyBehavior = ADD_TO_HISTORY
+      )
+    )
   }
 
   private fun onEntryChanged(
@@ -781,6 +793,7 @@ sealed class CatalogFragment : Fragment() {
       CatalogFeedViewInfinite.create(
         container = this.contentContainer,
         layoutInflater = this.layoutInflater,
+        catalogPart = this.catalogPart,
         onFacetSelected = this::onFacetSelected,
         onSearchSubmitted = this::onSearchSubmitted,
         onToolbarBackPressed = this::onToolbarBackPressed,
@@ -857,9 +870,9 @@ sealed class CatalogFragment : Fragment() {
         view.configureListVisibility(
           itemCount = items.size,
           onEmptyMessage = when (this.catalogPart) {
-            CatalogPart.CATALOG -> context.getString(R.string.feedEmpty)
-            CatalogPart.BOOKS -> context.getString(R.string.feedWithGroupsEmptyLoaned)
-            CatalogPart.HOLDS -> context.getString(R.string.feedWithGroupsEmptyHolds)
+            CATALOG -> context.getString(R.string.feedEmpty)
+            BOOKS -> context.getString(R.string.feedWithGroupsEmptyLoaned)
+            HOLDS -> context.getString(R.string.feedWithGroupsEmptyHolds)
           }
         )
       }
@@ -894,17 +907,26 @@ sealed class CatalogFragment : Fragment() {
     val credentials =
       this.credentialsOf(accountID)
 
+    val feedSelection =
+      when (this.catalogPart) {
+        CATALOG -> FeedBooksSelection.BOOKS_FEED_LOANED
+        BOOKS -> FeedBooksSelection.BOOKS_FEED_LOANED
+        HOLDS -> FeedBooksSelection.BOOKS_FEED_HOLDS
+      }
+
     when (feedSearch) {
       FeedSearch.FeedSearchLocal -> {
         this.opdsClient.goTo(
           OPDSClientRequest.GeneratedFeed(
             accountID = accountID,
+            historyBehavior = CLEAR_HISTORY,
             generator = {
               profiles.profileFeed(
                 ProfileFeedRequest(
                   uri = URI.create("Books"),
                   title = resources.getString(R.string.catalogSearch),
                   search = queryText,
+                  feedSelection = feedSelection,
                   facetTitleProvider = CatalogOPDSClients.facetTitleProvider
                 )
               ).get(10L, TimeUnit.SECONDS)
@@ -918,6 +940,7 @@ sealed class CatalogFragment : Fragment() {
             accountID = accountID,
             uri = feedSearch.search.getQueryURIForTerms(queryText),
             credentials = credentials,
+            historyBehavior = ADD_TO_HISTORY,
             method = "GET"
           )
         )
@@ -930,6 +953,13 @@ sealed class CatalogFragment : Fragment() {
   ) {
     UIThread.checkIsUIThread()
 
+    val feedSelection =
+      when (this.catalogPart) {
+        CATALOG -> FeedBooksSelection.BOOKS_FEED_LOANED
+        BOOKS -> FeedBooksSelection.BOOKS_FEED_LOANED
+        HOLDS -> FeedBooksSelection.BOOKS_FEED_HOLDS
+      }
+
     when (feedFacet) {
       is FeedFacet.FeedFacetOPDS -> {
         val credentials =
@@ -940,6 +970,7 @@ sealed class CatalogFragment : Fragment() {
             accountID = feedFacet.accountID,
             uri = feedFacet.opdsFacet.uri,
             credentials = credentials,
+            historyBehavior = ADD_TO_HISTORY,
             method = "GET"
           )
         )
@@ -949,11 +980,13 @@ sealed class CatalogFragment : Fragment() {
         this.opdsClient.goTo(
           OPDSClientRequest.GeneratedFeed(
             accountID = this.currentAccount().id,
+            historyBehavior = CLEAR_HISTORY,
             generator = {
               this.profiles.profileFeed(
                 ProfileFeedRequest(
                   uri = URI.create("Books"),
                   title = "",
+                  feedSelection = feedSelection,
                   facetTitleProvider = CatalogOPDSClients.facetTitleProvider,
                   filterByAccountID = feedFacet.account
                 )
@@ -967,11 +1000,13 @@ sealed class CatalogFragment : Fragment() {
         this.opdsClient.goTo(
           OPDSClientRequest.GeneratedFeed(
             accountID = this.currentAccount().id,
+            historyBehavior = CLEAR_HISTORY,
             generator = {
               this.profiles.profileFeed(
                 ProfileFeedRequest(
                   uri = URI.create("Books"),
                   title = "",
+                  feedSelection = feedSelection,
                   facetTitleProvider = CatalogOPDSClients.facetTitleProvider,
                   sortBy = feedFacet.sortBy
                 )

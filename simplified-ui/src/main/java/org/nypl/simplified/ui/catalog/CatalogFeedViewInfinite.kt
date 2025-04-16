@@ -27,11 +27,15 @@ import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedFacet
 import org.nypl.simplified.feeds.api.FeedFacets
 import org.nypl.simplified.feeds.api.FeedSearch
+import org.nypl.simplified.ui.catalog.CatalogPart.BOOKS
+import org.nypl.simplified.ui.catalog.CatalogPart.CATALOG
+import org.nypl.simplified.ui.catalog.CatalogPart.HOLDS
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.thepalaceproject.theme.core.PalaceTabButtons
 
 class CatalogFeedViewInfinite(
   override val root: ViewGroup,
+  private val catalogPart: CatalogPart,
   private val onFacetSelected: (FeedFacet) -> Unit,
   private val onSearchSubmitted: (AccountID, FeedSearch, String) -> Unit,
   private val onCatalogLogoClicked: () -> Unit,
@@ -85,7 +89,23 @@ class CatalogFeedViewInfinite(
     this.listView.setItemViewCacheSize(8)
 
     this.catalogFeedHeaderFacets.removeAllViews()
-    this.catalogFeedLogoContainer.setOnClickListener { this.onCatalogLogoClicked.invoke() }
+
+    /*
+     * The clickable library logo is only shown in the catalog. Not the "Books" and "Holds"
+     * part.
+     */
+
+    when (this.catalogPart) {
+      CATALOG -> {
+        this.catalogFeedLogoContainer.setOnClickListener { this.onCatalogLogoClicked.invoke() }
+      }
+      BOOKS -> {
+        this.catalogFeedLogoContainer.visibility = View.GONE
+      }
+      HOLDS -> {
+        this.catalogFeedLogoContainer.visibility = View.GONE
+      }
+    }
   }
 
   companion object {
@@ -93,6 +113,7 @@ class CatalogFeedViewInfinite(
       window: Window,
       layoutInflater: LayoutInflater,
       container: ViewGroup,
+      catalogPart: CatalogPart,
       onFacetSelected: (FeedFacet) -> Unit,
       onSearchSubmitted: (AccountID, FeedSearch, String) -> Unit,
       onToolbarBackPressed: () -> Unit,
@@ -100,6 +121,7 @@ class CatalogFeedViewInfinite(
       onCatalogLogoClicked: () -> Unit
     ): CatalogFeedViewInfinite {
       return CatalogFeedViewInfinite(
+        catalogPart = catalogPart,
         onFacetSelected = onFacetSelected,
         onSearchSubmitted = onSearchSubmitted,
         onToolbarBackPressed = onToolbarBackPressed,

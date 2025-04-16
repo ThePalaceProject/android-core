@@ -138,6 +138,7 @@ class OPDSClientTest {
     assertThrows<ExecutionException> {
       this.client.goTo(
         OPDSClientRequest.ExistingEntry(
+          historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY,
           FeedEntry.FeedEntryCorrupt(account0, book0, IllegalStateException())
         )
       ).get(5L, TimeUnit.SECONDS)
@@ -159,6 +160,7 @@ class OPDSClientTest {
           accountID = this.account0,
           uri = URI.create("urn:nonexistent"),
           credentials = null,
+          historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY,
           method = "GET"
         )
       )
@@ -190,6 +192,7 @@ class OPDSClientTest {
           accountID = this.account0,
           uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
           credentials = null,
+          historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY,
           method = "GET"
         )
       )
@@ -224,6 +227,7 @@ class OPDSClientTest {
           accountID = this.account0,
           uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
           credentials = null,
+          historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY,
           method = "GET"
         )
       )
@@ -258,6 +262,7 @@ class OPDSClientTest {
           accountID = this.account0,
           uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
           credentials = null,
+          historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY,
           method = "GET"
         )
       )
@@ -292,6 +297,7 @@ class OPDSClientTest {
           accountID = this.account0,
           uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
           credentials = null,
+          historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY,
           method = "GET"
         )
       )
@@ -336,6 +342,7 @@ class OPDSClientTest {
           accountID = this.account0,
           uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
           credentials = null,
+          historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY,
           method = "GET"
         )
       )
@@ -409,6 +416,7 @@ class OPDSClientTest {
           accountID = this.account0,
           uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
           credentials = null,
+          historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY,
           method = "GET"
         )
       )
@@ -422,7 +430,10 @@ class OPDSClientTest {
 
     val f1 =
       this.client.goTo(
-        OPDSClientRequest.ExistingEntry(this.client.entriesUngrouped.get()[0])
+        OPDSClientRequest.ExistingEntry(
+          entry = this.client.entriesUngrouped.get()[0],
+          historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY
+        )
       )
 
     f1.get(5L, TimeUnit.SECONDS)
@@ -460,6 +471,7 @@ class OPDSClientTest {
           accountID = this.account0,
           uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
           credentials = null,
+          historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY,
           method = "GET"
         )
       )
@@ -472,6 +484,7 @@ class OPDSClientTest {
           accountID = this.account0,
           uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
           credentials = null,
+          historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY,
           method = "GET"
         )
       )
@@ -480,7 +493,10 @@ class OPDSClientTest {
 
     val f2 =
       this.client.goTo(
-        OPDSClientRequest.ExistingEntry(this.client.entriesUngrouped.get()[0])
+        OPDSClientRequest.ExistingEntry(
+          entry = this.client.entriesUngrouped.get()[0],
+          historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY,
+        )
       )
 
     f2.get(5L, TimeUnit.SECONDS)

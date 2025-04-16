@@ -9,6 +9,7 @@ import org.nypl.simplified.profiles.controller.api.ProfileFeedRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.main.MainApplication
 import org.thepalaceproject.opds.client.OPDSClientRequest
+import org.thepalaceproject.opds.client.OPDSClientRequest.HistoryBehavior.CLEAR_HISTORY
 import org.thepalaceproject.opds.client.OPDSClientType
 import java.net.URI
 
@@ -48,6 +49,7 @@ data class CatalogOPDSClients(
             accountID = account.id,
             uri = account.catalogURIForAge(18),
             credentials = account.loginState.credentials,
+            historyBehavior = CLEAR_HISTORY,
             method = "GET"
           )
         )
@@ -57,6 +59,7 @@ data class CatalogOPDSClients(
         client.goTo(
           OPDSClientRequest.GeneratedFeed(
             accountID = account.id,
+            historyBehavior = CLEAR_HISTORY,
             generator = {
               profiles.profileFeed(
                 ProfileFeedRequest(
@@ -76,6 +79,7 @@ data class CatalogOPDSClients(
         client.goTo(
           OPDSClientRequest.GeneratedFeed(
             accountID = account.id,
+            historyBehavior = CLEAR_HISTORY,
             generator = {
               profiles.profileFeed(
                 ProfileFeedRequest(
