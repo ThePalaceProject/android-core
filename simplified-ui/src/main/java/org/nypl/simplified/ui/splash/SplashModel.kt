@@ -6,15 +6,13 @@ import com.io7m.jattribute.core.AttributeType
 import org.nypl.simplified.accounts.api.AccountProviderDescription
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
+import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.threads.UIThread
+import org.nypl.simplified.ui.accounts.AccountProviderDescriptionComparator
 import org.nypl.simplified.ui.main.MainAttributes
-import org.slf4j.LoggerFactory
 import java.util.concurrent.ExecutorService
 
 object SplashModel {
-
-  private val logger =
-    LoggerFactory.getLogger(SplashModel::class.java)
 
   private val accountProvidersActual: AttributeType<List<AccountProviderDescription>> =
     MainAttributes.attributes.withValue(listOf())
@@ -67,6 +65,7 @@ object SplashModel {
 
   fun accountProvidersLoad(
     executor: ExecutorService,
+    buildConfig: BuildConfigurationServiceType,
     registry: AccountProviderRegistryType
   ): AttributeSubscriptionType {
     executor.execute { registry.refresh(false) }
@@ -75,7 +74,7 @@ object SplashModel {
         AccountProviderRegistryStatus.Idle -> {
           this.accountProvidersActual.set(
             registry.accountProviderDescriptions().values
-              .sortedBy { d -> d.title }
+              .sortedWith(AccountProviderDescriptionComparator(buildConfig))
           )
         }
 

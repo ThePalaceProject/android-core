@@ -35,6 +35,7 @@ import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus.I
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus.Refreshing
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.boot.api.BootEvent
+import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.accounts.FilterableAccountListAdapter
@@ -334,6 +335,7 @@ class SplashFragment : Fragment() {
 
     val services =
       Services.serviceDirectory()
+
     val adapter = FilterableAccountListAdapter(
       imageLoader = services.requireService(ImageLoaderType::class.java),
       onItemClicked = { description ->
@@ -350,12 +352,16 @@ class SplashFragment : Fragment() {
 
     val registry =
       services.requireService(AccountProviderRegistryType::class.java)
+    val buildConfig =
+      services.requireService(BuildConfigurationServiceType::class.java)
     val registryBackground =
       Executors.newFixedThreadPool(1)
 
     this.subscriptions.add(AutoCloseable { registryBackground.shutdown() })
     this.subscriptions.add(
-      SplashModel.accountProviders.subscribe { _, providers -> adapter.submitList(providers) }
+      SplashModel.accountProviders.subscribe { _, providers ->
+        adapter.submitList(providers)
+      }
     )
 
     /*
@@ -383,6 +389,7 @@ class SplashFragment : Fragment() {
     this.subscriptions.add(
       SplashModel.accountProvidersLoad(
         executor = registryBackground,
+        buildConfig = buildConfig,
         registry = registry
       )
     )

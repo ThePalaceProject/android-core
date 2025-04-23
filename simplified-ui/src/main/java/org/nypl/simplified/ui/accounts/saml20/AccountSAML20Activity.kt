@@ -18,6 +18,7 @@ import org.nypl.simplified.ui.errorpage.ErrorPageActivity
 import org.nypl.simplified.ui.errorpage.ErrorPageActivity.Companion.PARAMETER_ID
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.errorpage.ErrorStrings
+import java.net.URLEncoder
 
 class AccountSAML20Activity : AppCompatActivity(R.layout.saml20_activity) {
 
@@ -126,9 +127,14 @@ class AccountSAML20Activity : AppCompatActivity(R.layout.saml20_activity) {
 
   private fun constructLoginURI(): String {
     return buildString {
-      this.append(AccountSAML20Model.authenticationURI())
-      this.append("&redirect_uri=")
-      this.append(AccountSAML20.callbackURI)
+      val authenticationURI = AccountSAML20Model.authenticationURI()
+      this.append(authenticationURI)
+      if (authenticationURI.toString().contains('?')) {
+        this.append("&redirect_uri=")
+      } else {
+        this.append("?redirect_uri=")
+      }
+      this.append(URLEncoder.encode(AccountSAML20.callbackURI, "UTF-8"))
     }
   }
 

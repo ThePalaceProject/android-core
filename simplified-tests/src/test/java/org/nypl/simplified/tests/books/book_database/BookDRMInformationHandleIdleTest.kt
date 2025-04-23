@@ -11,7 +11,7 @@ import org.nypl.simplified.files.DirectoryUtilities
 import org.nypl.simplified.tests.TestDirectories
 import java.io.File
 
-class BookDRMInformationHandleNoneTest {
+class BookDRMInformationHandleIdleTest {
 
   private lateinit var directory1: File
   private lateinit var directory0: File

@@ -64,6 +64,7 @@ class CatalogFeedViewDetails(
   private val buttonCreator: CatalogButtons,
   private val covers: BookCoverProviderType,
   private val layoutInflater: LayoutInflater,
+  private val onBookSAMLDownloadRequested: (CatalogBookStatus<DownloadWaitingForExternalAuthentication>) -> Unit,
   private val onBookBorrowRequested: (CatalogBorrowParameters) -> Unit,
   private val onBookCanBeDeleted: (CatalogBookStatus<*>) -> Boolean,
   private val onBookCanBeRevoked: (CatalogBookStatus<*>) -> Boolean,
@@ -399,7 +400,9 @@ class CatalogFeedViewDetails(
       }
 
       is DownloadWaitingForExternalAuthentication -> {
-        this.onStatusDownloadWaitingForExternalAuthentication()
+        this.onStatusDownloadWaitingForExternalAuthentication(
+          status as CatalogBookStatus<DownloadWaitingForExternalAuthentication>
+        )
       }
 
       is Downloading -> {
@@ -862,7 +865,9 @@ class CatalogFeedViewDetails(
     }
   }
 
-  private fun onStatusDownloadWaitingForExternalAuthentication() {
+  private fun onStatusDownloadWaitingForExternalAuthentication(
+    status: CatalogBookStatus<DownloadWaitingForExternalAuthentication>
+  ) {
     this.buttons.removeAllViews()
     this.buttons.addView(this.buttonCreator.createCenteredTextForButtons(R.string.catalogLoginRequired))
 
@@ -871,6 +876,8 @@ class CatalogFeedViewDetails(
     this.statusFailed.visibility = View.INVISIBLE
     this.statusInProgressText.visibility = View.GONE
     this.statusInProgressBar.isIndeterminate = true
+
+    this.onBookSAMLDownloadRequested(status)
   }
 
   private fun onStatusDownloadExternalAuthenticationInProgress() {
@@ -890,6 +897,7 @@ class CatalogFeedViewDetails(
       container: ViewGroup,
       covers: BookCoverProviderType,
       layoutInflater: LayoutInflater,
+      onBookSAMLDownloadRequested: (CatalogBookStatus<DownloadWaitingForExternalAuthentication>) -> Unit,
       onBookBorrowRequested: (CatalogBorrowParameters) -> Unit,
       onBookCanBeDeleted: (CatalogBookStatus<*>) -> Boolean,
       onBookCanBeRevoked: (CatalogBookStatus<*>) -> Boolean,
@@ -911,6 +919,7 @@ class CatalogFeedViewDetails(
         buttonCreator = buttonCreator,
         covers = covers,
         layoutInflater = layoutInflater,
+        onBookSAMLDownloadRequested = onBookSAMLDownloadRequested,
         onBookBorrowRequested = onBookBorrowRequested,
         onBookCanBeDeleted = onBookCanBeDeleted,
         onBookCanBeRevoked = onBookCanBeRevoked,

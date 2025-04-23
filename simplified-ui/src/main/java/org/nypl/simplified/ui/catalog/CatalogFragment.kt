@@ -1,5 +1,6 @@
 package org.nypl.simplified.ui.catalog
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -45,6 +46,8 @@ import org.nypl.simplified.ui.accounts.AccountPickerDialogFragment
 import org.nypl.simplified.ui.catalog.CatalogPart.BOOKS
 import org.nypl.simplified.ui.catalog.CatalogPart.CATALOG
 import org.nypl.simplified.ui.catalog.CatalogPart.HOLDS
+import org.nypl.simplified.ui.catalog.saml20.CatalogSAML20Activity
+import org.nypl.simplified.ui.catalog.saml20.CatalogSAML20Model
 import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.nypl.simplified.ui.main.MainApplication
@@ -313,6 +316,7 @@ sealed class CatalogFragment : Fragment() {
         container = this.contentContainer,
         covers = this.covers,
         layoutInflater = this.layoutInflater,
+        onBookSAMLDownloadRequested = this::onBookSAMLDownloadRequested,
         onBookBorrowRequested = this::onBookBorrowRequested,
         onBookCanBeDeleted = this::onBookCanBeDeleted,
         onBookCanBeRevoked = this::onBookCanBeRevoked,
@@ -407,6 +411,23 @@ sealed class CatalogFragment : Fragment() {
     )
 
     this.switchView(view)
+  }
+
+  private fun onBookSAMLDownloadRequested(
+    status: CatalogBookStatus<BookStatus.DownloadWaitingForExternalAuthentication>
+  ) {
+    val account =
+      this.profiles.profileCurrent()
+        .account(status.book.account)
+
+    CatalogSAML20Model.start(
+      account = account,
+      book = status.book.id,
+      downloadURI = status.status.downloadURI
+    )
+
+    val intent = Intent(this.requireContext(), CatalogSAML20Activity::class.java)
+    this.requireActivity().startActivity(intent)
   }
 
   private fun onStateChangeToDetailsConfigureToolbar(

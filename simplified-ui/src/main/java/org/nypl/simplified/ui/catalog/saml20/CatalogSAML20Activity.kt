@@ -1,35 +1,21 @@
 package org.nypl.simplified.ui.catalog.saml20
 
-import android.os.Bundle
-import android.view.View
 import android.webkit.WebView
 import android.widget.ProgressBar
-import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AppCompatActivity
 import com.io7m.jmulticlose.core.CloseableCollection
 import org.librarysimplified.ui.R
 import org.nypl.simplified.webview.WebViewUtilities
 
 /**
- * A fragment that performs the SAML 2.0 borrowing login workflow.
+ * An activity that performs the SAML 2.0 borrowing login workflow.
  */
 
-class CatalogSAML20Fragment : Fragment(R.layout.book_saml20) {
+class CatalogSAML20Activity : AppCompatActivity(R.layout.book_saml20) {
 
   private var subscriptions = CloseableCollection.create()
   private lateinit var progress: ProgressBar
   private lateinit var webView: WebView
-
-  override fun onViewCreated(
-    view: View,
-    savedInstanceState: Bundle?
-  ) {
-    super.onViewCreated(view, savedInstanceState)
-
-    this.progress =
-      view.findViewById(R.id.saml20progressBar)
-    this.webView =
-      view.findViewById(R.id.saml20WebView)
-  }
 
   override fun onStop() {
     super.onStop()
@@ -39,6 +25,11 @@ class CatalogSAML20Fragment : Fragment(R.layout.book_saml20) {
 
   override fun onStart() {
     super.onStart()
+
+    this.progress =
+      this.findViewById(R.id.saml20progressBar)
+    this.webView =
+      this.findViewById(R.id.saml20WebView)
 
     this.subscriptions =
       CloseableCollection.create()
@@ -58,14 +49,19 @@ class CatalogSAML20Fragment : Fragment(R.layout.book_saml20) {
       }
 
       this.subscriptions.add(
-        CatalogSAML20Model.request.subscribe { _, request ->
-          when (request) {
-            CatalogSAML20Model.WebViewRequest.None -> {
+        CatalogSAML20Model.borrowState.subscribe { _, state ->
+          when (state) {
+            is CatalogSAML20BorrowState.MakeRequest -> {
+              this.webView.loadUrl(state.url, state.headers)
+            }
+            CatalogSAML20BorrowState.Finished -> {
+              this.finish()
+            }
+            is CatalogSAML20BorrowState.Idle -> {
               // Nothing to do.
             }
-
-            is CatalogSAML20Model.WebViewRequest.Request -> {
-              this.webView.loadUrl(request.url, request.headers)
+            is CatalogSAML20BorrowState.WebViewReady -> {
+              // Nothing to do.
             }
           }
         }

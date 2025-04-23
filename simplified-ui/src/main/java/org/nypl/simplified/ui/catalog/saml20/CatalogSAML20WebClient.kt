@@ -4,7 +4,7 @@ import android.net.Uri
 import android.webkit.CookieManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import io.reactivex.subjects.PublishSubject
+import com.io7m.jattribute.core.AttributeType
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountLoginState
 import org.nypl.simplified.accounts.database.api.AccountType
@@ -17,21 +17,20 @@ import org.nypl.simplified.webview.WebViewUtilities
 import org.slf4j.Logger
 import java.io.File
 import java.net.URI
-import java.util.concurrent.atomic.AtomicReference
 
 class CatalogSAML20WebClient(
   private val logger: Logger,
   private val booksController: BooksControllerType,
-  private val eventSubject: PublishSubject<CatalogSAML20WebClientEvent>,
+  private val borrowStateAttribute: AttributeType<CatalogSAML20BorrowState>,
   private val bookRegistry: BookRegistryType,
   private val bookID: BookID,
   private val downloadURI: URI,
-  private val downloadInfo: AtomicReference<CatalogSAML20DownloadInfo>,
   private val account: AccountType,
-  private val webViewDataDir: File
+  private val webViewDataDir: File,
+  private val startURL: String,
 ) : WebViewClient() {
 
-  var isReady = false
+  private var isReady = false
 
   init {
     /*
@@ -39,10 +38,11 @@ class CatalogSAML20WebClient(
      * account.
      */
 
-    val cookieManager = CookieManager.getInstance()
+    val cookieManager =
+      CookieManager.getInstance()
 
     cookieManager.removeAllCookies {
-      val credentials = account.loginState.credentials
+      val credentials = this.account.loginState.credentials
 
       if (credentials is AccountAuthenticationCredentials.SAML2_0) {
         credentials.cookies.forEach { accountCookie ->
@@ -50,11 +50,9 @@ class CatalogSAML20WebClient(
         }
       }
 
-      isReady = true
-
-      this.eventSubject.onNext(
-        CatalogSAML20WebClientEvent.WebViewClientReady
-      )
+      this.isReady = true
+      this.borrowStateAttribute.set(CatalogSAML20BorrowState.WebViewReady(startURL))
+      this.borrowStateAttribute.set(CatalogSAML20BorrowState.MakeRequest(startURL, mapOf()))
     }
   }
 
@@ -63,60 +61,54 @@ class CatalogSAML20WebClient(
     url: String
   ) {
     if (url.startsWith(AccountSAML20.callbackURI)) {
-      val parsed = Uri.parse(url)
+      try {
+        this.logger.debug("Callback URI received ({}).", url)
 
-      val downloadURL = parsed.getQueryParameter(("url"))!!
-      val mimeType = parsed.getQueryParameter("mimeType")!!
+        val parsed =
+          Uri.parse(url)
+        val downloadURL =
+          parsed.getQueryParameter(("url"))!!
 
-      this.logger.debug("obtained download info")
-      this.downloadInfo.set(
-        CatalogSAML20DownloadInfo(
-          url = downloadURL,
-          mimeType = mimeType
-        )
-      )
+        val cookies =
+          WebViewUtilities.dumpCookiesAsAccountCookies(
+            CookieManager.getInstance(),
+            this.webViewDataDir
+          )
 
-      val cookies = WebViewUtilities.dumpCookiesAsAccountCookies(
-        CookieManager.getInstance(),
-        this.webViewDataDir
-      )
+        val loginState = this.account.loginState
+        if (loginState is AccountLoginState.AccountLoggedIn) {
+          val credentials = loginState.credentials
 
-      val loginState = account.loginState
-
-      if (loginState is AccountLoginState.AccountLoggedIn) {
-        val credentials = loginState.credentials
-
-        if (credentials is AccountAuthenticationCredentials.SAML2_0) {
-          account.setLoginState(
-            loginState.copy(
-              credentials = credentials.copy(
-                cookies = cookies
+          if (credentials is AccountAuthenticationCredentials.SAML2_0) {
+            this.account.setLoginState(
+              loginState.copy(
+                credentials = credentials.copy(
+                  cookies = cookies
+                )
               )
+            )
+          }
+        }
+
+        val bookWithStatus = this.bookRegistry.bookOrNull(this.bookID)
+        if (bookWithStatus != null) {
+          val book = bookWithStatus.book
+
+          this.booksController.bookBorrow(
+            accountID = book.account,
+            bookID = book.id,
+            entry = book.entry,
+            samlDownloadContext = SAMLDownloadContext(
+              isSAMLAuthComplete = true,
+              downloadURI = this.downloadURI,
+              authCompleteDownloadURI = URI(downloadURL)
             )
           )
         }
+      } finally {
+        this.borrowStateAttribute.set(CatalogSAML20BorrowState.Finished)
+        this.borrowStateAttribute.set(CatalogSAML20BorrowState.Idle)
       }
-
-      val bookWithStatus = this.bookRegistry.bookOrNull(this.bookID)
-
-      if (bookWithStatus != null) {
-        val book = bookWithStatus.book
-
-        this.booksController.bookBorrow(
-          accountID = book.account,
-          bookID = book.id,
-          entry = book.entry,
-          samlDownloadContext = SAMLDownloadContext(
-            isSAMLAuthComplete = true,
-            downloadURI = this.downloadURI,
-            authCompleteDownloadURI = URI(downloadURL)
-          )
-        )
-      }
-
-      this.eventSubject.onNext(
-        CatalogSAML20WebClientEvent.Succeeded
-      )
     }
   }
 }

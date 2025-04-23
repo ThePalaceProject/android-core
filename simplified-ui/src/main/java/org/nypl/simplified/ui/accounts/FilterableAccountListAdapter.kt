@@ -35,6 +35,20 @@ class FilterableAccountListAdapter(
   private var listCopy =
     mutableListOf<AccountProviderDescription?>()
 
+  override fun submitList(
+    list: List<AccountProviderDescription?>?,
+    commitCallback: Runnable?
+  ) {
+    this.listCopy.clear()
+    super.submitList(list, commitCallback)
+  }
+
+  override fun submitList(
+    list: List<AccountProviderDescription?>?
+  ) {
+    this.submitList(list, {})
+  }
+
   override fun getItemViewType(position: Int): Int {
     return if (
       currentList.isEmpty() ||
@@ -69,19 +83,6 @@ class FilterableAccountListAdapter(
     val item = getItem(position)
     item ?: return
     (holder as? AccountItemViewHolder)?.bind(item)
-  }
-
-  override fun submitList(list: List<AccountProviderDescription?>?) {
-    this.listCopy.clear()
-    super.submitList(list)
-  }
-
-  override fun submitList(
-    list: List<AccountProviderDescription?>?,
-    commitCallback: Runnable?
-  ) {
-    this.listCopy.clear()
-    super.submitList(list, commitCallback)
   }
 
   /** Returns true if the adapter is currently filtered. */

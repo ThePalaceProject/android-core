@@ -66,7 +66,7 @@ class AccountSAML20WebClient(
       val parsed = Uri.parse(url)
       val accessToken = parsed.getQueryParameter("access_token")
       if (accessToken == null) {
-        val message = this.resources.getString(R.string.accountSAML20NoAccessToken)
+        val message = this.resources.getString(R.string.accountSAML20NoAccessToken, url)
         this.logger.error("{}", message)
         AccountSAML20Model.setState(
           AccountSAML20State.Failed(
@@ -81,7 +81,7 @@ class AccountSAML20WebClient(
 
       val patronInfo = parsed.getQueryParameter("patron_info")
       if (patronInfo == null) {
-        val message = this.resources.getString(R.string.accountSAML20NoPatronInfo)
+        val message = this.resources.getString(R.string.accountSAML20NoPatronInfo, url)
         this.logger.error("{}", message)
         AccountSAML20Model.setState(
           AccountSAML20State.Failed(

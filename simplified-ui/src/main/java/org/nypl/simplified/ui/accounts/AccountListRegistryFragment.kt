@@ -117,9 +117,10 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
     this.backButton =
       view.findViewById(R.id.accountRegistryToolbarBackIconTouch)
 
-    val imageLoader =
+    val services =
       Services.serviceDirectory()
-        .requireService(ImageLoaderType::class.java)
+    val imageLoader =
+      services.requireService(ImageLoaderType::class.java)
 
     this.accountListAdapter =
       FilterableAccountListAdapter(
@@ -247,6 +248,8 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
       services.requireService(AccountProviderRegistryType::class.java)
     val profiles =
       services.requireService(ProfilesControllerType::class.java)
+    val buildConfig =
+      services.requireService(BuildConfigurationServiceType::class.java)
 
     /*
      * The account registry doesn't guarantee event delivery on the UI thread, so we wrap the
@@ -278,7 +281,10 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
     )
     this.subscriptions.add(
       accountProvidersUI.subscribe { _, providers ->
-        this.accountListAdapter.submitList(providers.values.toList())
+        this.accountListAdapter.submitList(
+          providers.values.toList()
+            .sortedWith(AccountProviderDescriptionComparator(buildConfig))
+        )
       }
     )
 

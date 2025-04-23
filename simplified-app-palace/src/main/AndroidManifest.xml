@@ -79,6 +79,10 @@
             android:exported="false" />
 
         <activity
+            android:name="org.nypl.simplified.ui.catalog.saml20.CatalogSAML20Activity"
+            android:exported="false" />
+
+        <activity
             android:name="org.librarysimplified.viewer.preview.BookPreviewActivity"
             android:exported="false" />
 

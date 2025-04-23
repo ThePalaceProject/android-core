@@ -145,8 +145,6 @@ class AccountListFragment : Fragment(R.layout.account_list) {
       Services.serviceDirectory()
     val imageLoader =
       services.requireService(ImageLoaderType::class.java)
-    val profiles =
-      services.requireService(ProfilesControllerType::class.java)
 
     this.accountListAdapter =
       AccountListAdapter(
