@@ -10,13 +10,15 @@ import android.webkit.WebViewClient
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import org.librarysimplified.ui.R
+import org.nypl.simplified.ui.main.MainBackButtonConsumerType
+import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_NOT_CONSUMED
 import org.nypl.simplified.ui.main.MainNavigation
 import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
 import org.nypl.simplified.ui.screens.ScreenDefinitionType
 import org.nypl.simplified.ui.settings.SettingsDocumentViewerModel.DocumentTarget
 import org.nypl.simplified.webview.WebViewUtilities
 
-class SettingsDocumentViewerFragment : Fragment() {
+class SettingsDocumentViewerFragment : Fragment(), MainBackButtonConsumerType {
 
   private lateinit var toolbarBack: View
   private lateinit var toolbarTitle: TextView
@@ -83,5 +85,9 @@ class SettingsDocumentViewerFragment : Fragment() {
     } else {
       this.toolbarBack.post(MainNavigation.Settings::goUp)
     }
+  }
+
+  override fun onBackButtonPressed(): MainBackButtonConsumerType.Result {
+    return BACK_BUTTON_NOT_CONSUMED
   }
 }

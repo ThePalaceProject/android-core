@@ -14,6 +14,7 @@ import org.librarysimplified.ui.R
 import org.nypl.simplified.ui.catalog.CatalogFragmentHolds
 import org.nypl.simplified.ui.catalog.CatalogFragmentMain
 import org.nypl.simplified.ui.catalog.CatalogFragmentMyBooks
+import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_NOT_CONSUMED
 import org.nypl.simplified.ui.main.MainTabCategory.TAB_BOOKS
 import org.nypl.simplified.ui.main.MainTabCategory.TAB_CATALOG
 import org.nypl.simplified.ui.main.MainTabCategory.TAB_RESERVATIONS
@@ -25,7 +26,7 @@ import org.nypl.simplified.ui.main.MainTabCategory.TAB_SETTINGS
  * correct places.
  */
 
-class MainTabsFragment : Fragment() {
+class MainTabsFragment : Fragment(), MainBackButtonConsumerType {
 
   private lateinit var root: ViewGroup
   private lateinit var tabBooks: TabLayout.Tab
@@ -125,6 +126,7 @@ class MainTabsFragment : Fragment() {
       MainTabRequest.TabAny -> {
         // Do nothing.
       }
+
       is MainTabRequest.TabForCategory -> {
         this.tabLayout.selectTab(
           when (newValue.category) {
@@ -176,5 +178,13 @@ class MainTabsFragment : Fragment() {
     this.childFragmentManager.beginTransaction()
       .replace(R.id.mainTabsContent, fragment)
       .commit()
+  }
+
+  override fun onBackButtonPressed(): MainBackButtonConsumerType.Result {
+    val current = this.fragmentNow
+    if (current is MainBackButtonConsumerType) {
+      return current.onBackButtonPressed()
+    }
+    return BACK_BUTTON_NOT_CONSUMED
   }
 }

@@ -7,10 +7,16 @@ import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.jmulticlose.core.CloseableCollectionType
 import com.io7m.jmulticlose.core.ClosingResourceFailedException
 import org.librarysimplified.ui.R
+import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_CONSUMED
+import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_NOT_CONSUMED
 import org.nypl.simplified.ui.splash.SplashFragment
 import org.nypl.simplified.ui.splash.SplashModel
+import org.slf4j.LoggerFactory
 
 class MainActivity : AppCompatActivity(R.layout.main_host) {
+
+  private val logger =
+    LoggerFactory.getLogger(MainActivity::class.java)
 
   private var fragmentNow: Fragment? = null
   private var subscriptions: CloseableCollectionType<ClosingResourceFailedException> =
@@ -51,7 +57,24 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
   @Deprecated("This method has been deprecated by clueless \"engineers\".")
   override fun onBackPressed() {
-    // Do nothing, currently
+    this.logger.debug("onBackPressed: Pressed")
+
+    val current = this.fragmentNow
+    if (current is MainBackButtonConsumerType) {
+      val result = current.onBackButtonPressed()
+      this.logger.debug("onBackPressed: Result {}", result)
+      return when (result) {
+        BACK_BUTTON_CONSUMED -> {
+          // Fragment consumed the back button, so do nothing.
+        }
+        BACK_BUTTON_NOT_CONSUMED -> {
+          this.finish()
+        }
+      }
+    }
+
+    this.logger.debug("onBackPressed: Fragment is not a back button consumer")
+    return this.finish()
   }
 
   override fun onStop() {

@@ -56,6 +56,10 @@ import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.nypl.simplified.ui.main.MainApplication
+import org.nypl.simplified.ui.main.MainBackButtonConsumerType
+import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result
+import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_CONSUMED
+import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_NOT_CONSUMED
 import org.nypl.simplified.ui.main.MainNavigation
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.nypl.simplified.viewer.api.Viewers
@@ -79,7 +83,7 @@ import java.util.concurrent.TimeUnit
  * The fragment used for the catalog.
  */
 
-sealed class CatalogFragment : Fragment() {
+sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
 
   abstract val catalogPart: CatalogPart
 
@@ -1207,6 +1211,15 @@ sealed class CatalogFragment : Fragment() {
     }
 
     super.onStop()
+  }
+
+  final override fun onBackButtonPressed(): Result {
+    if (!this.opdsClient.hasHistory) {
+      return BACK_BUTTON_NOT_CONSUMED
+    }
+
+    this.onToolbarBackPressed()
+    return BACK_BUTTON_CONSUMED
   }
 
   private fun switchView(

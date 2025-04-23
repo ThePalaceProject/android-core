@@ -43,10 +43,12 @@ import org.nypl.simplified.ui.accounts.SpaceItemDecoration
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.nypl.simplified.ui.main.MainApplication
 import org.nypl.simplified.ui.main.MainAttributes
+import org.nypl.simplified.ui.main.MainBackButtonConsumerType
+import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_NOT_CONSUMED
 import java.util.concurrent.Executors
 import kotlin.math.max
 
-class SplashFragment : Fragment() {
+class SplashFragment : Fragment(), MainBackButtonConsumerType {
 
   private lateinit var selectionListViewRoot: ViewGroup
   private lateinit var selectionListViews: LibrarySelectionViews
@@ -495,5 +497,9 @@ class SplashFragment : Fragment() {
     this.splashViews.splashProgress.visibility = View.VISIBLE
     this.splashViews.splashText.visibility = View.VISIBLE
     this.splashViews.splashVersion.visibility = View.VISIBLE
+  }
+
+  override fun onBackButtonPressed(): MainBackButtonConsumerType.Result {
+    return BACK_BUTTON_NOT_CONSUMED
   }
 }
