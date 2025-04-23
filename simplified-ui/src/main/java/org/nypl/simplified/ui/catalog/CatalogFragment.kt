@@ -42,6 +42,8 @@ import org.nypl.simplified.opds.core.OPDSAvailabilityRevoked
 import org.nypl.simplified.profiles.controller.api.ProfileFeedRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.taskrecorder.api.TaskResult
+import org.nypl.simplified.taskrecorder.api.TaskStep
+import org.nypl.simplified.taskrecorder.api.TaskStepResolution
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.accounts.AccountDetailModel
 import org.nypl.simplified.ui.accounts.AccountPickerDialogFragment
@@ -62,6 +64,7 @@ import org.slf4j.LoggerFactory
 import org.thepalaceproject.opds.client.OPDSClientRequest
 import org.thepalaceproject.opds.client.OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY
 import org.thepalaceproject.opds.client.OPDSClientRequest.HistoryBehavior.CLEAR_HISTORY
+import org.thepalaceproject.opds.client.OPDSClientRequest.HistoryBehavior.REPLACE_TIP
 import org.thepalaceproject.opds.client.OPDSClientType
 import org.thepalaceproject.opds.client.OPDSState
 import org.thepalaceproject.opds.client.OPDSState.Initial
@@ -680,8 +683,10 @@ sealed class CatalogFragment : Fragment() {
         when (val s = status.status) {
           is BookStatus.Loaned.LoanedDownloaded ->
             s.returnable
+
           is BookStatus.Loaned.LoanedNotDownloaded ->
             true
+
           else ->
             false
         }
@@ -1022,6 +1027,7 @@ sealed class CatalogFragment : Fragment() {
           )
         )
       }
+
       is FeedSearch.FeedSearchOpen1_1 -> {
         this.opdsClient.goTo(
           OPDSClientRequest.NewFeed(
@@ -1109,7 +1115,45 @@ sealed class CatalogFragment : Fragment() {
   private fun onStateChangedToError(
     newState: OPDSState.Error
   ) {
-    this.switchView(CatalogFeedViewError.create(this.layoutInflater, this.contentContainer))
+    val services =
+      Services.serviceDirectory()
+    val buildConfig =
+      services.requireService(BuildConfigurationServiceType::class.java)
+
+    val errorPageParameters =
+      ErrorPageParameters(
+        emailAddress = buildConfig.supportErrorReportEmailAddress,
+        body = "",
+        subject = "[palace-error-report]",
+        attributes = newState.message.attributes.toSortedMap(),
+        taskSteps = listOf(
+          TaskStep(
+            description = "Attempted to load feed.",
+            resolution = TaskStepResolution.TaskStepFailed(
+              newState.message.message,
+              newState.message.exception,
+              "?",
+              listOf()
+            )
+          )
+        )
+      )
+
+    this.switchView(
+      CatalogFeedViewError.create(
+        layoutInflater = this.layoutInflater,
+        this.contentContainer,
+        onShowErrorDetails = {
+          MainNavigation.openErrorPage(
+            activity = this.requireActivity(),
+            parameters = errorPageParameters
+          )
+        },
+        onRetry = {
+          this.opdsClient.goTo(newState.request.withHistoryBehaviour(REPLACE_TIP))
+        }
+      )
+    )
   }
 
   private fun onStateChangedToLoading() {

@@ -17,6 +17,10 @@ sealed class OPDSClientRequest {
 
   abstract val historyBehavior: HistoryBehavior
 
+  abstract fun withHistoryBehaviour(
+    historyBehavior: HistoryBehavior
+  ): OPDSClientRequest
+
   enum class HistoryBehavior {
     /**
      * The new item will added to the history, becoming the new tip.
@@ -47,6 +51,12 @@ sealed class OPDSClientRequest {
   ) : OPDSClientRequest() {
     override val requestID: UUID =
       UUID.randomUUID()
+
+    override fun withHistoryBehaviour(
+      historyBehavior: HistoryBehavior
+    ): NewFeed {
+      return this.copy(historyBehavior = historyBehavior)
+    }
   }
 
   data class GeneratedFeed(
@@ -58,6 +68,12 @@ sealed class OPDSClientRequest {
       URI.create("urn:generated:account:${this.accountID}")
     override val requestID: UUID =
       UUID.randomUUID()
+
+    override fun withHistoryBehaviour(
+      historyBehavior: HistoryBehavior
+    ): GeneratedFeed {
+      return this.copy(historyBehavior = historyBehavior)
+    }
   }
 
   data class ExistingEntry(
@@ -70,5 +86,11 @@ sealed class OPDSClientRequest {
       URI.create("urn:entry:${this.accountID}:${this.entry.bookID}")
     override val requestID: UUID =
       UUID.randomUUID()
+
+    override fun withHistoryBehaviour(
+      historyBehavior: HistoryBehavior
+    ): ExistingEntry {
+      return this.copy(historyBehavior = historyBehavior)
+    }
   }
 }
