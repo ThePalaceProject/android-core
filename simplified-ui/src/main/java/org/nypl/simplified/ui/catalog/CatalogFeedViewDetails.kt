@@ -55,6 +55,7 @@ import org.nypl.simplified.feeds.api.FeedLoaderResult
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedAuthentication
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedGeneral
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderSuccess
+import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import java.net.URI
@@ -64,8 +65,11 @@ class CatalogFeedViewDetails(
   private val buttonCreator: CatalogButtons,
   private val covers: BookCoverProviderType,
   private val layoutInflater: LayoutInflater,
+  private val onShowErrorDetails: (TaskResult.Failure<*>) -> Unit,
+  private val onBookDismissError: (CatalogBookStatus<*>) -> Unit,
   private val onBookSAMLDownloadRequested: (CatalogBookStatus<DownloadWaitingForExternalAuthentication>) -> Unit,
   private val onBookBorrowRequested: (CatalogBorrowParameters) -> Unit,
+  private val onBookBorrowCancelRequested: (CatalogBookStatus<*>) -> Unit,
   private val onBookCanBeDeleted: (CatalogBookStatus<*>) -> Boolean,
   private val onBookCanBeRevoked: (CatalogBookStatus<*>) -> Boolean,
   private val onBookDeleteRequested: (CatalogBookStatus<*>) -> Unit,
@@ -396,7 +400,8 @@ class CatalogFeedViewDetails(
       }
 
       is DownloadExternalAuthenticationInProgress -> {
-        this.onStatusDownloadExternalAuthenticationInProgress()
+        this.onStatusDownloadExternalAuthenticationInProgress(
+          status as CatalogBookStatus<DownloadExternalAuthenticationInProgress>)
       }
 
       is DownloadWaitingForExternalAuthentication -> {
@@ -829,19 +834,96 @@ class CatalogFeedViewDetails(
   private fun onStatusFailedRevoke(
     status: CatalogBookStatus<FailedRevoke>
   ) {
-    // Nothing yet.
+    this.buttons.removeAllViews()
+    this.buttons.addView(
+      this.buttonCreator.createDismissButton {
+        this.onBookDismissError.invoke(status)
+      }
+    )
+    this.buttons.addView(this.buttonCreator.createButtonSpace())
+    this.buttons.addView(
+      this.buttonCreator.createDetailsButton {
+        this.onShowErrorDetails.invoke(status.status.result)
+      }
+    )
+    this.buttons.addView(this.buttonCreator.createButtonSpace())
+    this.buttons.addView(
+      this.buttonCreator.createRetryButton {
+        this.onBookRevokeRequested.invoke(status)
+      }
+    )
+
+    this.statusInProgress.visibility = View.INVISIBLE
+    this.statusIdle.visibility = View.INVISIBLE
+    this.statusFailed.visibility = View.VISIBLE
   }
 
   private fun onStatusFailedLoan(
     status: CatalogBookStatus<FailedLoan>
   ) {
-    // Nothing yet.
+    this.buttons.removeAllViews()
+    this.buttons.addView(
+      this.buttonCreator.createDismissButton {
+        this.onBookDismissError.invoke(status)
+      }
+    )
+    this.buttons.addView(this.buttonCreator.createButtonSpace())
+    this.buttons.addView(
+      this.buttonCreator.createDetailsButton {
+        this.onShowErrorDetails.invoke(status.status.result)
+      }
+    )
+    this.buttons.addView(this.buttonCreator.createButtonSpace())
+    this.buttons.addView(
+      this.buttonCreator.createRetryButton {
+        this.onBookBorrowRequested.invoke(
+          CatalogBorrowParameters(
+            accountID = status.book.account,
+            bookID = status.book.id,
+            entry = status.book.entry,
+            samlDownloadContext = null
+          )
+        )
+      }
+    )
+
+    this.statusInProgress.visibility = View.INVISIBLE
+    this.statusIdle.visibility = View.INVISIBLE
+    this.statusFailed.visibility = View.VISIBLE
   }
 
   private fun onStatusFailedDownload(
     status: CatalogBookStatus<FailedDownload>
   ) {
-    // Nothing yet.
+    this.buttons.removeAllViews()
+    this.buttons.addView(
+      this.buttonCreator.createDismissButton {
+        this.onBookDismissError.invoke(status)
+      }
+    )
+    this.buttons.addView(this.buttonCreator.createButtonSpace())
+    this.buttons.addView(
+      this.buttonCreator.createDetailsButton {
+        this.onShowErrorDetails.invoke(status.status.result)
+      }
+    )
+    this.buttons.addView(this.buttonCreator.createButtonSpace())
+    this.buttons.addView(
+      this.buttonCreator.createRetryButton {
+        this.onBookBorrowRequested.invoke(
+          CatalogBorrowParameters(
+            accountID = status.book.account,
+            bookID = status.book.id,
+            entry = status.book.entry,
+            samlDownloadContext = null
+          )
+        )
+      }
+    )
+
+    this.statusInProgress.visibility = View.INVISIBLE
+    this.statusIdle.visibility = View.INVISIBLE
+    this.statusFailed.visibility = View.VISIBLE
   }
 
   private fun onStatusDownloading(
@@ -869,26 +951,34 @@ class CatalogFeedViewDetails(
     status: CatalogBookStatus<DownloadWaitingForExternalAuthentication>
   ) {
     this.buttons.removeAllViews()
-    this.buttons.addView(this.buttonCreator.createCenteredTextForButtons(R.string.catalogLoginRequired))
+    this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
+    this.buttons.addView(this.buttonCreator.createCancelDownloadButton {
+      this.onBookBorrowCancelRequested.invoke(status)
+    })
+    this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
 
-    this.statusInProgress.visibility = View.VISIBLE
-    this.statusIdle.visibility = View.INVISIBLE
+    this.statusInProgress.visibility = View.INVISIBLE
+    this.statusIdle.visibility = View.VISIBLE
     this.statusFailed.visibility = View.INVISIBLE
-    this.statusInProgressText.visibility = View.GONE
-    this.statusInProgressBar.isIndeterminate = true
+    this.statusIdleText.setText(R.string.catalogLoginRequired)
 
     this.onBookSAMLDownloadRequested(status)
   }
 
-  private fun onStatusDownloadExternalAuthenticationInProgress() {
+  private fun onStatusDownloadExternalAuthenticationInProgress(
+    status: CatalogBookStatus<DownloadExternalAuthenticationInProgress>
+  ) {
     this.buttons.removeAllViews()
-    this.buttons.addView(this.buttonCreator.createCenteredTextForButtons(R.string.catalogLoginRequired))
+    this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
+    this.buttons.addView(this.buttonCreator.createCancelDownloadButton {
+      this.onBookBorrowCancelRequested.invoke(status)
+    })
+    this.buttons.addView(this.buttonCreator.createButtonSizedSpace())
 
-    this.statusInProgress.visibility = View.VISIBLE
-    this.statusIdle.visibility = View.INVISIBLE
+    this.statusInProgress.visibility = View.INVISIBLE
+    this.statusIdle.visibility = View.VISIBLE
     this.statusFailed.visibility = View.INVISIBLE
-    this.statusInProgressText.visibility = View.GONE
-    this.statusInProgressBar.isIndeterminate = true
+    this.statusIdleText.setText(R.string.catalogLoginRequired)
   }
 
   companion object {
@@ -897,8 +987,11 @@ class CatalogFeedViewDetails(
       container: ViewGroup,
       covers: BookCoverProviderType,
       layoutInflater: LayoutInflater,
+      onShowErrorDetails: (TaskResult.Failure<*>) -> Unit,
       onBookSAMLDownloadRequested: (CatalogBookStatus<DownloadWaitingForExternalAuthentication>) -> Unit,
+      onBookDismissError: (CatalogBookStatus<*>) -> Unit,
       onBookBorrowRequested: (CatalogBorrowParameters) -> Unit,
+      onBookBorrowCancelRequested: (CatalogBookStatus<*>) -> Unit,
       onBookCanBeDeleted: (CatalogBookStatus<*>) -> Boolean,
       onBookCanBeRevoked: (CatalogBookStatus<*>) -> Boolean,
       onBookDeleteRequested: (CatalogBookStatus<*>) -> Unit,
@@ -919,8 +1012,11 @@ class CatalogFeedViewDetails(
         buttonCreator = buttonCreator,
         covers = covers,
         layoutInflater = layoutInflater,
+        onShowErrorDetails = onShowErrorDetails,
+        onBookDismissError = onBookDismissError,
         onBookSAMLDownloadRequested = onBookSAMLDownloadRequested,
         onBookBorrowRequested = onBookBorrowRequested,
+        onBookBorrowCancelRequested = onBookBorrowCancelRequested,
         onBookCanBeDeleted = onBookCanBeDeleted,
         onBookCanBeRevoked = onBookCanBeRevoked,
         onBookDeleteRequested = onBookDeleteRequested,

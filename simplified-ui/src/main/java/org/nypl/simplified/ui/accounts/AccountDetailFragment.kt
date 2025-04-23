@@ -441,7 +441,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
 
           try {
             this.startActivity(chosenIntent)
-          } catch (e: Exception) {
+          } catch (e: Throwable) {
             this.logger.debug("unable to start activity: ", e)
             val context = this.requireContext()
             MaterialAlertDialogBuilder(context)
@@ -497,8 +497,13 @@ class AccountDetailFragment : Fragment(R.layout.account) {
       webViewDataDirectory = this.webViewDataDir
     )
 
-    val intent = Intent(this.requireContext(), AccountSAML20Activity::class.java)
-    this.requireActivity().startActivity(intent)
+    try {
+      val activity = this.requireActivity()
+      val intent = Intent(activity, AccountSAML20Activity::class.java)
+      activity.startActivity(intent)
+    } catch (e: Throwable) {
+      this.logger.error("Failed to start activity: ", e)
+    }
   }
 
   private fun onTryOAuthLogin(
@@ -921,7 +926,7 @@ class AccountDetailFragment : Fragment(R.layout.account) {
         try {
           val intent = Intent(Intent.ACTION_VIEW, Uri.parse(resetPasswordURI.toString()))
           this.startActivity(intent)
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
           this.logger.debug("unable to start activity: ", e)
           val context = this.requireContext()
           MaterialAlertDialogBuilder(context)
@@ -1068,13 +1073,17 @@ class AccountDetailFragment : Fragment(R.layout.account) {
   }
 
   private fun openAppSettings() {
-    this.startActivity(
-      Intent().apply {
-        this.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-        this.data =
-          Uri.fromParts("package", this@AccountDetailFragment.requireContext().packageName, null)
-      }
-    )
+    try {
+      this.startActivity(
+        Intent().apply {
+          this.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+          this.data =
+            Uri.fromParts("package", this@AccountDetailFragment.requireContext().packageName, null)
+        }
+      )
+    } catch (e: Throwable) {
+      this.logger.error("Failed to start activity: ", e)
+    }
   }
 
   private fun openCardCreatorWebView() {

@@ -18,5 +18,6 @@
         android:maxLines="2"
         android:textAlignment="center"
         android:textColor="@color/PalaceTextInvertedColor"
+        android:text="@string/catalogOperationFailed"
         tools:text="@string/catalogPlaceholder" />
 </FrameLayout>

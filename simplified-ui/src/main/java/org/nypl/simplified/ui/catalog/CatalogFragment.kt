@@ -25,6 +25,7 @@ import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookWithStatus
 import org.nypl.simplified.books.controller.api.BooksControllerType
 import org.nypl.simplified.books.covers.BookCoverProviderType
+import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.feeds.api.FeedBooksSelection
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedFacet
@@ -40,6 +41,7 @@ import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
 import org.nypl.simplified.opds.core.OPDSAvailabilityRevoked
 import org.nypl.simplified.profiles.controller.api.ProfileFeedRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
+import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.accounts.AccountDetailModel
 import org.nypl.simplified.ui.accounts.AccountPickerDialogFragment
@@ -48,6 +50,7 @@ import org.nypl.simplified.ui.catalog.CatalogPart.CATALOG
 import org.nypl.simplified.ui.catalog.CatalogPart.HOLDS
 import org.nypl.simplified.ui.catalog.saml20.CatalogSAML20Activity
 import org.nypl.simplified.ui.catalog.saml20.CatalogSAML20Model
+import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.nypl.simplified.ui.main.MainApplication
@@ -316,7 +319,10 @@ sealed class CatalogFragment : Fragment() {
         container = this.contentContainer,
         covers = this.covers,
         layoutInflater = this.layoutInflater,
+        onShowErrorDetails = this::onShowErrorDetails,
+        onBookDismissError = this::onBookDismissError,
         onBookSAMLDownloadRequested = this::onBookSAMLDownloadRequested,
+        onBookBorrowCancelRequested = this::onBookBorrowCancelRequested,
         onBookBorrowRequested = this::onBookBorrowRequested,
         onBookCanBeDeleted = this::onBookCanBeDeleted,
         onBookCanBeRevoked = this::onBookCanBeRevoked,
@@ -413,6 +419,58 @@ sealed class CatalogFragment : Fragment() {
     this.switchView(view)
   }
 
+  private fun onShowErrorDetails(
+    error: TaskResult.Failure<*>
+  ) {
+    try {
+      val services =
+        Services.serviceDirectory()
+      val buildConfig =
+        services.requireService(BuildConfigurationServiceType::class.java)
+
+      MainNavigation.openErrorPage(
+        activity = this.requireActivity(),
+        parameters = ErrorPageParameters(
+          emailAddress = buildConfig.supportErrorReportEmailAddress,
+          body = "",
+          subject = "[palace-error-report]",
+          attributes = error.attributes.toSortedMap(),
+          taskSteps = error.steps
+        )
+      )
+    } catch (e: Throwable) {
+      this.logger.error("Failed to open error page: ", e)
+    }
+  }
+
+  private fun onBookDismissError(
+    status: CatalogBookStatus<*>
+  ) {
+    val services =
+      Services.serviceDirectory()
+    val books =
+      services.requireService(BooksControllerType::class.java)
+
+    books.bookBorrowFailedDismiss(
+      accountID = status.book.account,
+      bookID = status.book.id
+    )
+  }
+
+  private fun onBookBorrowCancelRequested(
+    status: CatalogBookStatus<*>
+  ) {
+    val services =
+      Services.serviceDirectory()
+    val books =
+      services.requireService(BooksControllerType::class.java)
+
+    books.bookBorrowFailedDismiss(
+      accountID = status.book.account,
+      bookID = status.book.id
+    )
+  }
+
   private fun onBookSAMLDownloadRequested(
     status: CatalogBookStatus<BookStatus.DownloadWaitingForExternalAuthentication>
   ) {
@@ -426,8 +484,13 @@ sealed class CatalogFragment : Fragment() {
       downloadURI = status.status.downloadURI
     )
 
-    val intent = Intent(this.requireContext(), CatalogSAML20Activity::class.java)
-    this.requireActivity().startActivity(intent)
+    try {
+      val activity = this.requireActivity()
+      val intent = Intent(activity, CatalogSAML20Activity::class.java)
+      activity.startActivity(intent)
+    } catch (e: Throwable) {
+      this.logger.error("Failed to start activity: ", e)
+    }
   }
 
   private fun onStateChangeToDetailsConfigureToolbar(
@@ -526,13 +589,17 @@ sealed class CatalogFragment : Fragment() {
   private fun onBookPreviewOpenRequested(
     status: CatalogBookStatus<*>
   ) {
-    BookPreviewActivity.startActivity(
-      this.requireActivity(),
-      FeedEntry.FeedEntryOPDS(
-        status.book.account,
-        status.book.entry
+    try {
+      BookPreviewActivity.startActivity(
+        this.requireActivity(),
+        FeedEntry.FeedEntryOPDS(
+          status.book.account,
+          status.book.entry
+        )
       )
-    )
+    } catch (e: Throwable) {
+      this.logger.error("Failed to start activity: ", e)
+    }
   }
 
   /**
