@@ -89,7 +89,6 @@ val dependencyObjects = listOf(
     project(":simplified-tenprint"),
     project(":simplified-threads"),
     project(":simplified-ui"),
-    project(":simplified-ui-announcements"),
     project(":simplified-ui-errorpage"),
     project(":simplified-ui-images"),
     project(":simplified-ui-screen"),

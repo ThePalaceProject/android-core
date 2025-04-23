@@ -303,7 +303,6 @@ dependencies {
     implementation(project(":simplified-tenprint"))
     implementation(project(":simplified-threads"))
     implementation(project(":simplified-ui"))
-    implementation(project(":simplified-ui-announcements"))
     implementation(project(":simplified-ui-errorpage"))
     implementation(project(":simplified-ui-images"))
     implementation(project(":simplified-ui-screen"))

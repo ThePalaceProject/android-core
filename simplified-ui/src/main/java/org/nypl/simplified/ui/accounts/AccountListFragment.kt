@@ -24,6 +24,9 @@ import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.errorpage.ErrorStrings
 import org.nypl.simplified.ui.images.ImageLoaderType
+import org.nypl.simplified.ui.main.MainBackButtonConsumerType
+import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result
+import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_CONSUMED
 import org.nypl.simplified.ui.main.MainNavigation
 import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
 import org.nypl.simplified.ui.screens.ScreenDefinitionType
@@ -33,7 +36,7 @@ import java.net.URI
  * A fragment that shows the set of accounts in the current profile.
  */
 
-class AccountListFragment : Fragment(R.layout.account_list) {
+class AccountListFragment : Fragment(R.layout.account_list), MainBackButtonConsumerType {
 
   private var subscriptions =
     CloseableCollection.create()
@@ -242,5 +245,10 @@ class AccountListFragment : Fragment(R.layout.account_list) {
     super.onStop()
 
     this.subscriptions.close()
+  }
+
+  override fun onBackButtonPressed(): Result {
+    MainNavigation.Settings.goUp()
+    return BACK_BUTTON_CONSUMED
   }
 }

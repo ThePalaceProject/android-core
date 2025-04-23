@@ -35,6 +35,9 @@ import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.errorpage.ErrorStrings
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.nypl.simplified.ui.main.MainAttributes
+import org.nypl.simplified.ui.main.MainBackButtonConsumerType
+import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result
+import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_CONSUMED
 import org.nypl.simplified.ui.main.MainNavigation
 import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
 import org.nypl.simplified.ui.screens.ScreenDefinitionType
@@ -45,7 +48,7 @@ import java.net.URI
  * A fragment that shows the account registry and allows for account creation.
  */
 
-class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
+class AccountListRegistryFragment : Fragment(R.layout.account_list_registry), MainBackButtonConsumerType {
 
   private val logger =
     LoggerFactory.getLogger(AccountListRegistryFragment::class.java)
@@ -394,5 +397,10 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry) {
       activity = this.requireActivity(),
       parameters = parameters
     )
+  }
+
+  override fun onBackButtonPressed(): Result {
+    MainNavigation.Settings.goUp()
+    return BACK_BUTTON_CONSUMED
   }
 }

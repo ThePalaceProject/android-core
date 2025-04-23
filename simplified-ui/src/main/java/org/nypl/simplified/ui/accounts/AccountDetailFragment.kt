@@ -58,6 +58,9 @@ import org.nypl.simplified.ui.accounts.saml20.AccountSAML20Model
 import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.nypl.simplified.ui.main.MainApplication
+import org.nypl.simplified.ui.main.MainBackButtonConsumerType
+import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result
+import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_CONSUMED
 import org.nypl.simplified.ui.main.MainNavigation
 import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
 import org.nypl.simplified.ui.screens.ScreenDefinitionType
@@ -70,7 +73,7 @@ import java.net.URI
  * A fragment that shows settings for a single account.
  */
 
-class AccountDetailFragment : Fragment(R.layout.account) {
+class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumerType {
 
   private val logger =
     LoggerFactory.getLogger(AccountDetailFragment::class.java)
@@ -1146,5 +1149,10 @@ class AccountDetailFragment : Fragment(R.layout.account) {
 
   private fun requestLocationPermissions() {
     this.locationPermissionCallback.launch(this.locationPermissions)
+  }
+
+  override fun onBackButtonPressed(): Result {
+    MainNavigation.Settings.goUp()
+    return BACK_BUTTON_CONSUMED
   }
 }

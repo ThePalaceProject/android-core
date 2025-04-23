@@ -7,11 +7,14 @@ import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.jmulticlose.core.CloseableCollectionType
 import com.io7m.jmulticlose.core.ClosingResourceFailedException
 import org.librarysimplified.ui.R
+import org.nypl.simplified.ui.announcements.AnnouncementsDialog
+import org.nypl.simplified.ui.announcements.AnnouncementsModel
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_CONSUMED
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_NOT_CONSUMED
 import org.nypl.simplified.ui.splash.SplashFragment
 import org.nypl.simplified.ui.splash.SplashModel
 import org.slf4j.LoggerFactory
+import java.util.UUID
 
 class MainActivity : AppCompatActivity(R.layout.main_host) {
 
@@ -51,6 +54,25 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
       SplashModel.SplashScreenStatus.SPLASH_SCREEN_COMPLETED -> {
         this.switchFragment(MainTabsFragment())
+
+        AnnouncementsModel.start()
+        AnnouncementsModel.announcements.subscribe { _, newValue ->
+          this.onAnnouncementsChanged(newValue)
+        }
+      }
+    }
+  }
+
+  private fun onAnnouncementsChanged(
+    announcementsToAcknowledge: Map<UUID, AnnouncementsModel.EnumeratedAnnouncement>
+  ) {
+    if (announcementsToAcknowledge.isNotEmpty()) {
+      val tag = "ANNOUNCEMENT"
+      val existing = this.supportFragmentManager.findFragmentByTag(tag)
+      if (existing == null) {
+        val dialog = AnnouncementsDialog()
+        dialog.isCancelable = false
+        dialog.show(this.supportFragmentManager, tag)
       }
     }
   }

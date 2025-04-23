@@ -87,4 +87,7 @@
   <string name="bookReachedLoanLimitDialogMessage">You have reached your loan limit. You cannot borrow anything further until you return something.</string>
   <string name="bookReachedLoanLimitDialogTitle">Loan limit reached.</string>
   <string name="bookReachedLoanLimitDialogButton">OK</string>
+
+  <string name="announcementTitle">%1$s (%2$d of %3$d)</string>
+  <string name="announcementOK">OK</string>
 </resources>
