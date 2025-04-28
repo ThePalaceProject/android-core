@@ -625,7 +625,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2025-04-10T14:58:50+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.15.1">
+    <c:release date="2025-04-28T00:00:00+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.15.1">
       <c:changes>
         <c:change date="2025-01-20T00:00:00+00:00" summary="Work around a couple of low-frequency crashes."/>
         <c:change date="2025-04-09T00:00:00+00:00" summary="Delete time tracking entries on 404 status codes.">
@@ -644,9 +644,18 @@
             <c:ticket id="PP-2137"/>
           </c:tickets>
         </c:change>
-        <c:change date="2025-04-10T14:58:50+00:00" summary="Fix bottom sheet account picker in night mode.">
+        <c:change date="2025-04-10T00:00:00+00:00" summary="Fix bottom sheet account picker in night mode.">
           <c:tickets>
             <c:ticket id="PP-2374"/>
+          </c:tickets>
+        </c:change>
+      </c:changes>
+    </c:release>
+    <c:release date="2025-04-28T17:09:57+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.16.0">
+      <c:changes>
+        <c:change date="2025-04-28T17:09:57+00:00" summary="Completely rewrite all catalog views.">
+          <c:tickets>
+            <c:ticket id="PP-2088"/>
           </c:tickets>
         </c:change>
       </c:changes>
