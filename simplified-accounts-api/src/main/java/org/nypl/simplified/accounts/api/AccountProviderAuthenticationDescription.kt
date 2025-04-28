@@ -20,13 +20,6 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
       "http://opds-spec.org/auth/basic"
 
     /**
-     * The type used to identify COPPA age gate authentication.
-     */
-
-    const val COPPA_TYPE =
-      "http://librarysimplified.org/terms/authentication/gate/coppa"
-
-    /**
      * The type used to identify anonymous access (no authentication).
      */
 
@@ -71,43 +64,8 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
   /**
    * If the authentication can be used as an alternative
    */
+
   abstract val canBeAlternativeLoginMethod: Boolean
-
-  /**
-   * A COPPA age gate that redirects users that are thirteen or older to one URI, and under 13s
-   * to a different URI.
-   */
-
-  data class COPPAAgeGate(
-
-    /**
-     * The feed URI for >= 13.
-     */
-
-    val greaterEqual13: URI,
-
-    /**
-     * The feed URI for < 13.
-     */
-
-    val under13: URI
-  ) : AccountProviderAuthenticationDescription() {
-    init {
-      Preconditions.checkState(
-        this.greaterEqual13 != this.under13,
-        "URIs ${this.greaterEqual13} and ${this.under13} must differ"
-      )
-    }
-
-    override val canBeAlternativeLoginMethod: Boolean =
-      false
-
-    override val isLoginPossible: Boolean =
-      false
-
-    override val description: String =
-      COPPA_TYPE
-  }
 
   /**
    * Values used in the NYPL's "input" extension.

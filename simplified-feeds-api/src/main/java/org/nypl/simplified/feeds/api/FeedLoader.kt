@@ -1,7 +1,5 @@
 package org.nypl.simplified.feeds.api
 
-import com.google.common.util.concurrent.FluentFuture
-import com.google.common.util.concurrent.ListeningExecutorService
 import com.io7m.jfunctional.Some
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
@@ -31,7 +29,8 @@ import org.slf4j.LoggerFactory
 import java.io.FileNotFoundException
 import java.net.URI
 import java.util.SortedMap
-import java.util.concurrent.Callable
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -42,7 +41,7 @@ class FeedLoader private constructor(
   private val bookFormatSupport: BookFormatSupportType,
   private val bundledContent: BundledContentResolverType,
   private val contentResolver: ContentResolverType,
-  private val exec: ListeningExecutorService,
+  private val exec: ExecutorService,
   private val parser: OPDSFeedParserType,
   private val searchParser: OPDSSearchParserType,
   private val transport: OPDSFeedTransportType<AccountAuthenticationCredentials?>
@@ -64,19 +63,21 @@ class FeedLoader private constructor(
     uri: URI,
     credentials: AccountAuthenticationCredentials?,
     method: String,
-  ): FluentFuture<FeedLoaderResult> {
-    return FluentFuture.from(
-      this.exec.submit(
-        Callable {
-          this.fetchSynchronously(
-            accountId = accountID,
-            uri = uri,
-            credentials = credentials,
-            method = method
-          )
-        }
-      )
-    )
+  ): CompletableFuture<FeedLoaderResult> {
+    val future = CompletableFuture<FeedLoaderResult>()
+    this.exec.execute {
+      try {
+        future.complete(this.fetchSynchronously(
+          accountId = accountID,
+          uri = uri,
+          credentials = credentials,
+          method = method
+        ))
+      } catch (e: Throwable) {
+        future.completeExceptionally(e)
+      }
+    }
+    return future
   }
 
   private fun fetchSynchronously(
@@ -264,7 +265,7 @@ class FeedLoader private constructor(
     fun create(
       bookFormatSupport: BookFormatSupportType,
       contentResolver: ContentResolverType,
-      exec: ListeningExecutorService,
+      exec: ExecutorService,
       parser: OPDSFeedParserType,
       searchParser: OPDSSearchParserType,
       transport: OPDSFeedTransportType<AccountAuthenticationCredentials?>,

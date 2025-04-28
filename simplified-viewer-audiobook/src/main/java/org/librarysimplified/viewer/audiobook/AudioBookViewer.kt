@@ -24,7 +24,7 @@ import org.nypl.simplified.books.audio.AudioBookManifestRequest
 import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
 import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
-import org.nypl.simplified.ui.thread.api.UIThreadServiceType
+import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.viewer.spi.ViewerPreferences
 import org.nypl.simplified.viewer.spi.ViewerProviderType
 import org.slf4j.LoggerFactory
@@ -104,8 +104,6 @@ class AudioBookViewer : ViewerProviderType {
       ServiceLoader.load(ManifestParserExtensionType::class.java).toList()
     val licenseChecks =
       ServiceLoader.load(SingleLicenseCheckProviderType::class.java).toList()
-    val uiThread =
-      services.requireService(UIThreadServiceType::class.java)
 
     val formatAudio =
       format as BookFormat.BookFormatAudioBook
@@ -245,7 +243,7 @@ class AudioBookViewer : ViewerProviderType {
         CompletableFuture<Unit>()
 
       openFuture.whenComplete { _, _ ->
-        uiThread.runOnUIThread {
+        UIThread.runOnUIThread {
           if (openAttempted.compareAndSet(false, true)) {
             this.openActivity(activity)
           }

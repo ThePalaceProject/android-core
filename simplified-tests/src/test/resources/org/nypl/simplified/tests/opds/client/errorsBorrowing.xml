@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<feed xmlns="http://www.w3.org/2005/Atom"
+      xmlns:opds="http://opds-spec.org/2010/catalog">
+
+  <id>urn:uuid:0c144221-7d33-479f-9763-d934ca695cbb</id>
+  <title>Commonfields OPDS Suite: Errors Borrowing</title>
+  <updated>2000-01-01T00:00:00+00:00</updated>
+
+  <entry>
+    <id>urn:uuid:c66ce979-fa32-4733-aa9f-62bfe921098e</id>
+    <title>Not Available</title>
+    <updated>2000-01-01T00:00:00+00:00</updated>
+
+    <summary type="html">
+      An entry that isn't available. There are no acquisition links. Clients
+      should either not display this entry, or display the entry with no
+      controls available to borrow the book.
+    </summary>
+
+    <link href="/image/strawberries.png"
+          type="image/png"
+          rel="http://opds-spec.org/image"/>
+
+    <link href="/image/strawberriesThumb.png"
+          type="image/png"
+          rel="http://opds-spec.org/image/thumbnail"/>
+  </entry>
+
+  <entry>
+    <id>urn:uuid:1f5055a5-e1b9-40dd-9eed-059eb6a70b0b</id>
+    <title>Open Access - 404</title>
+    <updated>2000-01-01T00:00:00+00:00</updated>
+
+    <summary type="html">
+      An open access book that can't be downloaded due to the epub file being
+      nonexistent. Clients should fail to borrow the book, indicating that the
+      actual book file does not exist.
+    </summary>
+
+    <link href="/image/strawberries.png"
+          type="image/png"
+          rel="http://opds-spec.org/image"/>
+
+    <link href="/image/strawberriesThumb.png"
+          type="image/png"
+          rel="http://opds-spec.org/image/thumbnail"/>
+
+    <link href="nonexistent.epub"
+          type="application/epub+zip"
+          rel="http://opds-spec.org/acquisition/open-access"/>
+  </entry>
+
+  <entry>
+    <id>urn:uuid:251e02b1-0fb5-4580-b90a-3ec7f9bca8be</id>
+    <title>Indirect - Feed 404</title>
+    <updated>2000-01-01T00:00:00+00:00</updated>
+
+    <summary type="html">
+      An indirectly accessible book that can't be downloaded due to the feed
+      being nonexistent. Clients should fail to borrow this book with an
+      appropriate error.
+    </summary>
+
+    <link href="strawberries.png"
+          type="image/png"
+          rel="http://opds-spec.org/image"/>
+    <link href="strawberriesThumb.png"
+          type="image/png"
+          rel="http://opds-spec.org/image/thumbnail"/>
+
+    <link href="nonexistent"
+          rel="http://opds-spec.org/acquisition/borrow"
+          type="application/atom+xml;type=entry;profile=opds-catalog">
+      <opds:indirectAcquisition type="application/epub+zip"/>
+      <opds:availability status="available"/>
+      <opds:holds total="0"/>
+      <opds:copies available="1"
+                   total="1"/>
+    </link>
+  </entry>
+
+</feed>

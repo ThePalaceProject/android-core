@@ -1,5 +1,6 @@
 package org.nypl.simplified.accounts.registry.api
 
+import com.io7m.jattribute.core.AttributeReadableType
 import io.reactivex.Observable
 import net.jcip.annotations.ThreadSafe
 import org.nypl.simplified.accounts.api.AccountProviderDescription
@@ -8,6 +9,7 @@ import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.api.AccountSearchQuery
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import java.net.URI
+import java.util.concurrent.CompletableFuture
 
 /**
  * The interface exposing a set of account providers.
@@ -16,12 +18,13 @@ import java.net.URI
  */
 
 @ThreadSafe
-interface AccountProviderRegistryType {
+interface AccountProviderRegistryType : AutoCloseable {
 
   /**
    * A source of registry events.
    */
 
+  @Deprecated("Use the status attribute instead.")
   val events: Observable<AccountProviderRegistryEvent>
 
   /**
@@ -40,7 +43,20 @@ interface AccountProviderRegistryType {
    * The status of the account registry.
    */
 
+  val statusAttribute: AttributeReadableType<AccountProviderRegistryStatus>
+
+  /**
+   * The status of the account registry.
+   */
+
+  val accountProviderDescriptionsAttribute: AttributeReadableType<Map<URI, AccountProviderDescription>>
+
+  /**
+   * The status of the account registry.
+   */
+
   val status: AccountProviderRegistryStatus
+    get() = this.statusAttribute.get()
 
   /**
    * Refresh the available account providers from all sources.
@@ -50,6 +66,15 @@ interface AccountProviderRegistryType {
    */
 
   fun refresh(includeTestingLibraries: Boolean)
+
+  /**
+   * Refresh the available account providers from all sources.
+   *
+   * @param includeTestingLibraries A hint for providers indicating whether
+   * testing libraries should be loaded. May be ignored by some providers.
+   */
+
+  fun refreshAsync(includeTestingLibraries: Boolean): CompletableFuture<Unit>
 
   /**
    * Execute a search query on the registry.

@@ -165,14 +165,7 @@ interface AccountProviderType : Comparable<AccountProviderType> {
    */
 
   fun catalogURIForAge(age: Int): URI {
-    return when (val auth = this.authentication) {
-      is AccountProviderAuthenticationDescription.COPPAAgeGate ->
-        if (age >= 13) {
-          auth.greaterEqual13
-        } else {
-          auth.under13
-        }
-
+    return when (this.authentication) {
       is AccountProviderAuthenticationDescription.SAML2_0,
       AccountProviderAuthenticationDescription.Anonymous,
       is AccountProviderAuthenticationDescription.Basic,
@@ -196,8 +189,7 @@ interface AccountProviderType : Comparable<AccountProviderType> {
     get() = when (val auth = this.authentication) {
       is AccountProviderAuthenticationDescription.SAML2_0,
       AccountProviderAuthenticationDescription.Anonymous,
-      is AccountProviderAuthenticationDescription.OAuthWithIntermediary,
-      is AccountProviderAuthenticationDescription.COPPAAgeGate ->
+      is AccountProviderAuthenticationDescription.OAuthWithIntermediary ->
         false
       is AccountProviderAuthenticationDescription.Basic -> {
         when (auth.barcodeFormat) {

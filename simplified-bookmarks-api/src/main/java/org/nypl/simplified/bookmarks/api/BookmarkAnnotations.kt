@@ -64,8 +64,11 @@ object BookmarkAnnotations {
 
   private val dateParser =
     ISODateTimeFormat.dateTimeParser()
+      .withZoneUTC()
+
   private val dateFormatter =
     DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+      .withZoneUTC()
 
   fun fromSerializedBookmark(
     objectMapper: ObjectMapper,

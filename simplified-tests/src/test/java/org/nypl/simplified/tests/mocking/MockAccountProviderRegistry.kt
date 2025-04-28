@@ -1,5 +1,8 @@
 package org.nypl.simplified.tests.mocking
 
+import com.io7m.jattribute.core.AttributeReadableType
+import com.io7m.jattribute.core.AttributeType
+import com.io7m.jattribute.core.Attributes
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import org.nypl.simplified.accounts.api.AccountProvider
@@ -9,6 +12,7 @@ import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.api.AccountSearchQuery
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryEvent
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus
+import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus.Idle
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskResult
@@ -16,6 +20,7 @@ import org.slf4j.LoggerFactory
 import java.net.URI
 import java.util.LinkedList
 import java.util.Queue
+import java.util.concurrent.CompletableFuture
 
 class MockAccountProviderRegistry(
   override val defaultProvider: AccountProviderType = MockAccountProviders.fakeAuthProvider("urn:0"),
@@ -25,6 +30,15 @@ class MockAccountProviderRegistry(
 
   private val logger =
     LoggerFactory.getLogger(MockAccountProviderRegistry::class.java)
+
+  private val attributes =
+    Attributes.create { ex -> this.logger.error("Uncaught exception in attribute: ", ex) }
+
+  private val statusAttributeActual: AttributeType<AccountProviderRegistryStatus> =
+    this.attributes.withValue(Idle)
+
+  private val accountProviderDescriptionsAttributeActual: AttributeType<Map<URI, AccountProviderDescription>> =
+    this.attributes.withValue(mapOf())
 
   val resolveNext: Queue<AccountProviderType> =
     LinkedList<AccountProviderType>()
@@ -51,19 +65,31 @@ class MockAccountProviderRegistry(
     }
 
     fun singleton(accountProvider: AccountProviderType): MockAccountProviderRegistry {
-      return withProviders(accountProvider)
+      return this.withProviders(accountProvider)
     }
   }
 
   val eventSource = PublishSubject.create<AccountProviderRegistryEvent>()
 
   override val events: Observable<AccountProviderRegistryEvent>
-    get() = eventSource
+    get() = this.eventSource
+
+  override val statusAttribute: AttributeReadableType<AccountProviderRegistryStatus>
+    get() = this.statusAttributeActual
+
+  override val accountProviderDescriptionsAttribute: AttributeReadableType<Map<URI, AccountProviderDescription>>
+    get() = this.accountProviderDescriptionsAttributeActual
 
   override val status: AccountProviderRegistryStatus
     get() = AccountProviderRegistryStatus.Idle
 
   override fun refresh(includeTestingLibraries: Boolean) {
+  }
+
+  override fun refreshAsync(includeTestingLibraries: Boolean): CompletableFuture<Unit> {
+    val future = CompletableFuture<Unit>()
+    future.complete(Unit)
+    return future
   }
 
   override fun query(query: AccountSearchQuery) {
@@ -119,5 +145,9 @@ class MockAccountProviderRegistry(
       this.logger.debug("took provider from map")
       taskRecorder.finishSuccess(provider)
     }
+  }
+
+  override fun close() {
+    TODO("Not yet implemented")
   }
 }

@@ -8,7 +8,6 @@ dependencies {
     implementation(project(":simplified-books-database-api"))
     implementation(project(":simplified-books-formats-api"))
     implementation(project(":simplified-feeds-api"))
-    implementation(project(":simplified-futures"))
     implementation(project(":simplified-mdc"))
     implementation(project(":simplified-opds-core"))
     implementation(project(":simplified-presentableerror-api"))
@@ -16,7 +15,7 @@ dependencies {
     implementation(project(":simplified-profiles-controller-api"))
     implementation(project(":simplified-services-api"))
     implementation(project(":simplified-taskrecorder-api"))
-    implementation(project(":simplified-ui-thread-api"))
+    implementation(project(":simplified-threads"))
     implementation(project(":simplified-viewer-spi"))
 
     implementation(libs.androidx.activity)

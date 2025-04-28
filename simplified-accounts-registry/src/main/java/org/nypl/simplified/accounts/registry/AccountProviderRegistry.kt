@@ -2,6 +2,10 @@ package org.nypl.simplified.accounts.registry
 
 import android.content.Context
 import com.google.common.base.Preconditions
+import com.io7m.jattribute.core.AttributeReadableType
+import com.io7m.jattribute.core.AttributeType
+import com.io7m.jattribute.core.Attributes
+import com.io7m.jmulticlose.core.CloseableCollection
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import org.librarysimplified.http.api.LSHTTPClientType
@@ -22,10 +26,12 @@ import org.nypl.simplified.accounts.source.spi.AccountProviderSourceType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskResult
+import org.nypl.simplified.threads.NamedThreadPools
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.util.Collections
 import java.util.ServiceLoader
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -38,44 +44,67 @@ class AccountProviderRegistry private constructor(
   override val defaultProvider: AccountProviderType
 ) : AccountProviderRegistryType {
 
+  private val logger =
+    LoggerFactory.getLogger(AccountProviderRegistry::class.java)
+
   @Volatile
   private var initialized = false
 
-  @Volatile
-  private var statusRef: AccountProviderRegistryStatus = Idle
+  private val resolved =
+    ConcurrentHashMap<URI, AccountProviderType>()
+  private val resolvedReadOnly =
+    Collections.unmodifiableMap(this.resolved)
 
-  private val descriptions =
-    Collections.synchronizedMap(LinkedHashMap<URI, AccountProviderDescription>())
-  private val descriptionsReadOnly = Collections.unmodifiableMap(this.descriptions)
-  private val resolved = ConcurrentHashMap<URI, AccountProviderType>()
-  private val resolvedReadOnly = Collections.unmodifiableMap(this.resolved)
+  private val resources =
+    CloseableCollection.create()
 
-  private val logger =
-    LoggerFactory.getLogger(AccountProviderRegistry::class.java)
+  private val exec =
+    NamedThreadPools.namedThreadPool(1, "registry", 19)
+
+  init {
+    this.resources.add(AutoCloseable { this.exec.shutdown() })
+  }
+
+  private val attributes =
+    Attributes.create { ex -> this.logger.error("Uncaught exception in attribute: ", ex) }
+
+  private val statusAttributeActual: AttributeType<AccountProviderRegistryStatus> =
+    this.attributes.withValue(Idle)
+
+  private val accountProviderDescriptionsAttributeActual: AttributeType<Map<URI, AccountProviderDescription>> =
+    this.attributes.withValue(mapOf())
 
   private val eventsActual: PublishSubject<AccountProviderRegistryEvent> =
     PublishSubject.create()
 
+  init {
+    this.resources.add(AutoCloseable { this.eventsActual.onComplete() })
+  }
+
+  @Deprecated("Use the status attribute instead.")
   override val events: Observable<AccountProviderRegistryEvent> =
     this.eventsActual
-
-  override val status: AccountProviderRegistryStatus
-    get() = this.statusRef
 
   override fun accountProviderDescriptions(): Map<URI, AccountProviderDescription> {
     if (!this.initialized) {
       this.refresh(false)
     }
-    return this.descriptionsReadOnly
+    return this.accountProviderDescriptionsAttributeActual.get()
   }
 
   override val resolvedProviders: Map<URI, AccountProviderType>
     get() = this.resolvedReadOnly
 
+  override val statusAttribute: AttributeReadableType<AccountProviderRegistryStatus>
+    get() = this.statusAttributeActual
+
+  override val accountProviderDescriptionsAttribute: AttributeReadableType<Map<URI, AccountProviderDescription>>
+    get() = this.accountProviderDescriptionsAttributeActual
+
   override fun refresh(includeTestingLibraries: Boolean) {
     this.logger.debug("refreshing account provider descriptions")
 
-    this.statusRef = Refreshing
+    this.statusAttributeActual.set(Refreshing)
     this.eventsActual.onNext(StatusChanged)
 
     try {
@@ -99,15 +128,33 @@ class AccountProviderRegistry private constructor(
       }
     } finally {
       this.initialized = true
-      this.statusRef = Idle
+      this.statusAttributeActual.set(Idle)
       this.eventsActual.onNext(StatusChanged)
     }
+  }
+
+  override fun refreshAsync(
+    includeTestingLibraries: Boolean
+  ): CompletableFuture<Unit> {
+    val future = CompletableFuture<Unit>()
+    try {
+      this.exec.execute {
+        try {
+          future.complete(this.refresh(includeTestingLibraries))
+        } catch (e: Throwable) {
+          future.completeExceptionally(e)
+        }
+      }
+    } catch (e: Throwable) {
+      future.completeExceptionally(e)
+    }
+    return future
   }
 
   override fun query(query: AccountSearchQuery) {
     this.logger.debug("refreshing account provider descriptions")
 
-    this.statusRef = Refreshing
+    this.statusAttributeActual.set(Refreshing)
     this.eventsActual.onNext(StatusChanged)
 
     try {
@@ -131,13 +178,13 @@ class AccountProviderRegistry private constructor(
       }
     } finally {
       this.initialized = true
-      this.statusRef = Idle
+      this.statusAttributeActual.set(Idle)
       this.eventsActual.onNext(StatusChanged)
     }
   }
 
   override fun clear() {
-    this.descriptions.clear()
+    this.accountProviderDescriptionsAttributeActual.set(mapOf())
     this.resolved.clear()
     for (source in this.sources) {
       source.clear(this.context)
@@ -169,7 +216,8 @@ class AccountProviderRegistry private constructor(
     description: AccountProviderDescription
   ): AccountProviderDescription {
     val id = description.id
-    val existing = this.descriptions[id]
+    val descriptions = this.accountProviderDescriptionsAttributeActual.get()
+    val existing = descriptions[id]
     if (existing != null) {
       Preconditions.checkState(
         id == existing.id,
@@ -181,7 +229,7 @@ class AccountProviderRegistry private constructor(
     }
 
     this.logger.debug("received updated version of description {}", id)
-    this.descriptions[id] = description
+    this.accountProviderDescriptionsAttributeActual.set(descriptions.plus(Pair(id, description)))
     this.eventsActual.onNext(Updated(id))
     return description
   }
@@ -228,6 +276,10 @@ class AccountProviderRegistry private constructor(
       )
       return taskRecorder.finishFailure()
     }
+  }
+
+  override fun close() {
+    this.resources.close()
   }
 
   companion object {

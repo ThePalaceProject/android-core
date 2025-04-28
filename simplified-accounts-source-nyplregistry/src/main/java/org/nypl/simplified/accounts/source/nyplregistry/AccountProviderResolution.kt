@@ -10,7 +10,6 @@ import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.ANONYMOUS_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.BASIC_TOKEN_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.BASIC_TYPE
-import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.COPPA_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.OAUTH_INTERMEDIARY_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.SAML_2_0_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.KeyboardInput
@@ -240,12 +239,6 @@ class AccountProviderResolution(
           )
         }
 
-        COPPA_TYPE -> {
-          authObjects.add(
-            this.extractAuthenticationDescriptionCOPPA(taskRecorder, authObject)
-          )
-        }
-
         ANONYMOUS_TYPE -> {
           authObjects.clear()
           authObjects.add(AccountProviderAuthenticationDescription.Anonymous)
@@ -421,33 +414,6 @@ class AccountProviderResolution(
     } catch (e: Exception) {
       this.logger.error("unable to interpret keyboard type: {}", text)
       KeyboardInput.DEFAULT
-    }
-  }
-
-  private fun extractAuthenticationDescriptionCOPPA(
-    taskRecorder: TaskRecorderType,
-    authObject: AuthenticationObject
-  ): AccountProviderAuthenticationDescription.COPPAAgeGate {
-    val under13 = authObject.links.find { link ->
-      link.relation == "http://librarysimplified.org/terms/rel/authentication/restriction-not-met"
-    }?.hrefURI
-    val over13 = authObject.links.find { link ->
-      link.relation == "http://librarysimplified.org/terms/rel/authentication/restriction-met"
-    }?.hrefURI
-
-    return if (under13 != null && over13 != null) {
-      AccountProviderAuthenticationDescription.COPPAAgeGate(
-        greaterEqual13 = over13,
-        under13 = under13
-      )
-    } else {
-      val message = this.stringResources.resolvingAuthDocumentCOPPAAgeGateMalformed
-      taskRecorder.currentStepFailed(
-        message = message,
-        errorCode = authDocumentUnusable(this.description),
-        extraMessages = listOf()
-      )
-      throw IOException(message)
     }
   }
 

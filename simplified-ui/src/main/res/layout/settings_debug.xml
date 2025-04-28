@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/settingsDebugToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <FrameLayout
+            android:id="@+id/settingsDebugToolbarBackIconTouch"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:contentDescription="@string/accountGoBack"
+            android:focusable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/settingsDebugToolbarBackIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:clickable="false"
+                android:focusable="false"
+                android:src="@drawable/arrow_left"
+                app:tint="@color/PalacePrimaryForegroundColor"
+                app:tintMode="multiply" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/settingsDebugToolbarTitle"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:text="@string/settingsDebug"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/settingsDebugToolbarBackIconTouch"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbarAlwaysDrawHorizontalTrack="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <Button
+                android:id="@+id/settingsVersionDevCrash"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/settingsDevCrash" />
+
+            <Button
+                android:id="@+id/settingsVersionDevShowCacheDir"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/settingsDevCacheDir" />
+
+            <Button
+                android:id="@+id/settingsVersionDevSendReports"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/settingsDevSendErrorLogs" />
+
+            <Button
+                android:id="@+id/settingsVersionDevShowError"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/settingsDevShowErrorPage" />
+
+            <Button
+                android:id="@+id/settingsVersionDevSyncAnalytics"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/settingsDevSendAnalytics" />
+
+            <Button
+                android:id="@+id/settingsVersionDevSyncAccounts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/settingsDevSyncAccounts" />
+
+            <Button
+                android:id="@+id/settingsVersionDevUnacknowledgeAnnouncements"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/settingsDevForgetAllAnnouncements" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/settingsDevDrmSupport"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TableLayout
+                android:id="@+id/settingsVersionDrmSupport"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/settingsDevAdobeDrmActivations"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:scrollbarAlwaysDrawHorizontalTrack="true"
+                android:scrollbarAlwaysDrawVerticalTrack="true"
+                android:scrollbars="vertical|horizontal">
+
+                <TableLayout
+                    android:id="@+id/settingsVersionDrmAdobeActivations"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TableRow>
+
+                        <TextView android:text="@string/settingsDevPlaceholder" />
+
+                        <TextView android:text="@string/settingsDevPlaceholder" />
+
+                        <TextView android:text="@string/settingsDevPlaceholder" />
+
+                        <TextView android:text="@string/settingsDevPlaceholder" />
+
+                        <TextView android:text="@string/settingsDevPlaceholder" />
+                    </TableRow>
+                </TableLayout>
+            </HorizontalScrollView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/settingsDevCrashlytics"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/settingsDevCrashlyticsCurrentUserId"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/settingsVersionCrashlyticsID"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:fontFamily="monospace"
+                android:text="@string/settingsDevPlaceholder"
+                android:textAllCaps="true"
+                android:textIsSelectable="true"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/settingsDevTestingFeatures"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/settingsVersionDevIsManualLCPPassphraseEnabled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:checked="false"
+                android:enabled="true"
+                android:text="@string/settingsDevEnableManualLCPPassphrase" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/settingsVersionDevProductionLibrariesSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:checked="false"
+                android:enabled="true"
+                android:text="@string/settingsDevEnableHiddenLibraries" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/settingsVersionDevFailNextBootSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:checked="false"
+                android:enabled="true"
+                android:text="@string/settingsDevFailNextStartup" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/settingsVersionDevSeenLibrarySelectionScreen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:checked="false"
+                android:enabled="true"
+                android:text="@string/settingsDevUserSeenLibrarySelection" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/settingsVersionDevShowOnlySupported"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:checked="false"
+                android:enabled="true"
+                android:text="@string/settingsDevShowSupportedBooks" />
+
+            <Button
+                android:id="@+id/settingsVersionDevCustomOPDS"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/settingsDevAddCustomOpdsFeed" />
+
+            <include layout="@layout/settings_debug_library_registry" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="@string/settingsDebugTransifex" />
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
+

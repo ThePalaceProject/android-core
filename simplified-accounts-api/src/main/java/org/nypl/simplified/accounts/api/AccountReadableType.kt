@@ -31,10 +31,7 @@ interface AccountReadableType {
    */
 
   fun feedIsRoot(feedURI: URI): Boolean {
-    return when (val auth = this.provider.authentication) {
-      is AccountProviderAuthenticationDescription.COPPAAgeGate -> {
-        auth.greaterEqual13 == feedURI || auth.under13 == feedURI
-      }
+    return when (this.provider.authentication) {
       is AccountProviderAuthenticationDescription.SAML2_0,
       AccountProviderAuthenticationDescription.Anonymous,
       is AccountProviderAuthenticationDescription.Basic,
@@ -81,7 +78,6 @@ interface AccountReadableType {
 
   val requiresCredentials: Boolean
     get() = when (this.provider.authentication) {
-      is AccountProviderAuthenticationDescription.COPPAAgeGate,
       is AccountProviderAuthenticationDescription.Anonymous -> {
         false
       }

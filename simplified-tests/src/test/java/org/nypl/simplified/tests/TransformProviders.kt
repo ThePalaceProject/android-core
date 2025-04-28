@@ -44,14 +44,7 @@ class TransformProviders {
               logoURI = null
             )
           } else {
-            if (entry.catalogUrl13 != null) {
-              AccountProviderAuthenticationDescription.COPPAAgeGate(
-                greaterEqual13 = URI.create(entry.catalogUrl13),
-                under13 = URI.create(entry.catalogUrlUnder13)
-              )
-            } else {
-              AccountProviderAuthenticationDescription.Anonymous
-            }
+            AccountProviderAuthenticationDescription.Anonymous
           }
 
         val provider =

@@ -16,7 +16,6 @@ dependencies {
     implementation(project(":simplified-files"))
     implementation(project(":simplified-futures"))
     implementation(project(":simplified-mdc"))
-    implementation(project(":simplified-networkconnectivity-api"))
     implementation(project(":simplified-opds-core"))
     implementation(project(":simplified-presentableerror-api"))
     implementation(project(":simplified-profiles-api"))
@@ -27,7 +26,6 @@ dependencies {
     implementation(project(":simplified-threads"))
     implementation(project(":simplified-ui-errorpage"))
     implementation(project(":simplified-ui-screen"))
-    implementation(project(":simplified-ui-thread-api"))
     implementation(project(":simplified-viewer-spi"))
 
     implementation(libs.androidx.activity)

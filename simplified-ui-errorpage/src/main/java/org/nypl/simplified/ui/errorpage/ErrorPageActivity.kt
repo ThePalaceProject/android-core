@@ -1,5 +1,7 @@
 package org.nypl.simplified.ui.errorpage
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import org.librarysimplified.ui.errorpage.R
@@ -13,6 +15,18 @@ class ErrorPageActivity : AppCompatActivity(R.layout.error_host) {
   companion object {
     const val PARAMETER_ID =
       "org.nypl.simplified.ui.errorpage.ErrorPageBaseActivity.parameters"
+
+    fun show(
+      context: Activity,
+      parameters: ErrorPageParameters
+    ) {
+      val intent = Intent(context, ErrorPageActivity::class.java)
+      val bundle = Bundle().apply {
+        this.putSerializable(PARAMETER_ID, parameters)
+      }
+      intent.putExtras(bundle)
+      context.startActivity(intent)
+    }
   }
 
   private lateinit var parameters: ErrorPageParameters

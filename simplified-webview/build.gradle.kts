@@ -2,7 +2,6 @@ dependencies {
     coreLibraryDesugaring(libs.android.desugaring)
 
     implementation(project(":simplified-accounts-api"))
-    implementation(project(":simplified-android-ktx"))
 
     implementation(libs.androidx.webkit)
     implementation(libs.kotlin.reflect)

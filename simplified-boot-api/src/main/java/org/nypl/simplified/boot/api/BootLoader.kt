@@ -2,14 +2,13 @@ package org.nypl.simplified.boot.api
 
 import android.content.Context
 import android.content.res.Resources
-import com.google.common.util.concurrent.FluentFuture
-import com.google.common.util.concurrent.MoreExecutors
-import com.google.common.util.concurrent.SettableFuture
-import io.reactivex.Observable
-import io.reactivex.subjects.BehaviorSubject
+import com.io7m.jattribute.core.AttributeReadableType
+import com.io7m.jattribute.core.AttributeType
+import com.io7m.jattribute.core.Attributes
 import org.nypl.simplified.presentableerror.api.PresentableErrorType
 import org.slf4j.LoggerFactory
 import java.util.ServiceLoader
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 
 /**
@@ -32,28 +31,32 @@ class BootLoader<T>(
   private val bootProcess: BootProcessType<T>
 ) : BootLoaderType<T> {
 
-  private val logger = LoggerFactory.getLogger(BootLoader::class.java)
+  private val logger =
+    LoggerFactory.getLogger(BootLoader::class.java)
+
+  private val attributes =
+    Attributes.create { ex ->
+      this.logger.error("Uncaught exception in attribute handling: ", ex)
+    }
 
   private val executor =
-    MoreExecutors.listeningDecorator(
-      Executors.newFixedThreadPool(1) { runnable ->
-        val thread = Thread(runnable)
-        thread.name = "simplified-boot-${thread.id}"
-        thread
-      }
-    )
+    Executors.newFixedThreadPool(1) { runnable ->
+      val thread = Thread(runnable)
+      thread.priority = Thread.MIN_PRIORITY
+      thread.name = "simplified-boot-${thread.id}"
+      thread
+    }
 
-  private val eventsActual =
-    BehaviorSubject.create<BootEvent>()
-      .toSerialized()
+  private val eventsActual: AttributeType<BootEvent> =
+    this.attributes.withValue(BootEvent.BootInProgress("Booting..."))
 
   private val bootLock: Any = Any()
-  private var boot: FluentFuture<T>? = null
+  private var boot: CompletableFuture<T>? = null
 
-  override val events: Observable<BootEvent> =
+  override val events: AttributeReadableType<BootEvent> =
     this.eventsActual
 
-  override fun start(context: Context): FluentFuture<T> {
+  override fun start(context: Context): CompletableFuture<T> {
     return synchronized(this.bootLock) {
       if (this.boot == null) {
         this.boot = this.runBoot(context)
@@ -67,15 +70,15 @@ class BootLoader<T>(
     override val cause: Throwable
   ) : Exception(message, cause), PresentableErrorType
 
-  private fun runBoot(context: Context): FluentFuture<T> {
-    val future = SettableFuture.create<T>()
+  private fun runBoot(context: Context): CompletableFuture<T> {
+    val future = CompletableFuture<T>()
     this.executor.execute {
       val strings = this.bootStringResources.invoke(context.resources)
 
       this.executeBootPreHooks(context)
 
       try {
-        future.set(this.bootProcess.execute { event -> this.eventsActual.onNext(event) })
+        future.complete(this.bootProcess.execute { event -> this.eventsActual.set(event) })
         this.logger.debug("finished executing boot")
       } catch (e: Throwable) {
         this.logger.error("boot failed: ", e)
@@ -92,11 +95,11 @@ class BootLoader<T>(
           )
         }
 
-        this.eventsActual.onNext(event)
-        future.setException(event.exception)
+        this.eventsActual.set(event)
+        future.completeExceptionally(event.exception)
       }
     }
-    return FluentFuture.from(future)
+    return future
   }
 
   private fun executeBootPreHooks(context: Context) {

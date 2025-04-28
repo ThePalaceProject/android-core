@@ -15,10 +15,13 @@ sealed class FeedFacet : Serializable {
    */
 
   data class FeedFacetOPDS(
+    val accountID: AccountID,
     val opdsFacet: OPDSFacet
   ) : FeedFacet() {
-    override val title: String = this.opdsFacet.title
-    override val isActive: Boolean = this.opdsFacet.isActive
+    override val title: String =
+      this.opdsFacet.title
+    override val isActive: Boolean =
+      this.opdsFacet.isActive
 
     companion object {
       const val ENTRYPOINT_FACET_GROUP_TYPE = "http://librarysimplified.org/terms/rel/entrypoint"

@@ -1,13 +1,12 @@
 package org.nypl.simplified.tests.mocking
 
-import com.google.common.util.concurrent.FluentFuture
-import com.google.common.util.concurrent.Futures
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.feeds.api.FeedLoaderResult
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import java.io.IOException
 import java.net.URI
+import java.util.concurrent.CompletableFuture
 
 class MockCrashingFeedLoader : FeedLoaderType {
 
@@ -19,7 +18,9 @@ class MockCrashingFeedLoader : FeedLoaderType {
     uri: URI,
     credentials: AccountAuthenticationCredentials?,
     method: String
-  ): FluentFuture<FeedLoaderResult> {
-    return FluentFuture.from(Futures.immediateFailedFuture(IOException("Ouch!")))
+  ): CompletableFuture<FeedLoaderResult> {
+    val future = CompletableFuture<FeedLoaderResult>()
+    future.completeExceptionally(IOException("Ouch!"))
+    return future
   }
 }

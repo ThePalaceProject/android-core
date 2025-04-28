@@ -1,11 +1,8 @@
 package org.nypl.simplified.tests.books.controller
 
 import android.content.Context
-import com.google.common.util.concurrent.FluentFuture
-import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListeningExecutorService
 import com.google.common.util.concurrent.MoreExecutors
-import com.google.common.util.concurrent.SettableFuture
 import com.io7m.jfunctional.Option
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -81,6 +78,7 @@ import java.io.IOException
 import java.net.URI
 import java.util.Collections
 import java.util.UUID
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentSkipListMap
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -161,6 +159,18 @@ class BookRevokeTaskTest {
     this.executorFeeds.shutdown()
     this.executorTimer.shutdown()
     this.server.close()
+  }
+
+  private  fun <T> immediateFuture(x : T): CompletableFuture<T> {
+    val future = CompletableFuture<T>()
+    future.complete(x)
+    return future
+  }
+
+  private  fun <T> failedFuture(x : Throwable): CompletableFuture<T> {
+    val future = CompletableFuture<T>()
+    future.completeExceptionally(x)
+    return future
   }
 
   private fun createFeedLoader(executorFeeds: ListeningExecutorService): FeedLoaderType {
@@ -1155,7 +1165,7 @@ class BookRevokeTaskTest {
         credentials = this.anyNonNull(),
         method = this.anyNonNull()
       )
-    ).thenReturn(FluentFuture.from(Futures.immediateFuture(feedResult as FeedLoaderResult)))
+    ).thenReturn(immediateFuture(feedResult as FeedLoaderResult))
 
     val task =
       BookRevokeTask(
@@ -1644,7 +1654,7 @@ class BookRevokeTaskTest {
         credentials = this.anyNonNull(),
         method = this.anyNonNull()
       )
-    ).thenReturn(FluentFuture.from(Futures.immediateFuture(feedResult as FeedLoaderResult)))
+    ).thenReturn(immediateFuture(feedResult as FeedLoaderResult))
 
     val task =
       BookRevokeTask(
@@ -1762,7 +1772,7 @@ class BookRevokeTaskTest {
         credentials = this.anyNonNull(),
         method = this.anyNonNull()
       )
-    ).thenReturn(FluentFuture.from(Futures.immediateFuture(feedResult as FeedLoaderResult)))
+    ).thenReturn(immediateFuture(feedResult as FeedLoaderResult))
 
     val task =
       BookRevokeTask(
@@ -1872,7 +1882,7 @@ class BookRevokeTaskTest {
         credentials = this.anyNonNull(),
         method = this.anyNonNull()
       )
-    ).thenReturn(FluentFuture.from(SettableFuture.create()))
+    ).thenReturn(CompletableFuture())
 
     val task =
       BookRevokeTask(
@@ -2198,7 +2208,7 @@ class BookRevokeTaskTest {
         credentials = this.anyNonNull(),
         method = this.anyNonNull()
       )
-    ).thenReturn(FluentFuture.from(Futures.immediateFailedFuture(UniqueException())))
+    ).thenReturn(failedFuture(UniqueException()))
 
     val task =
       BookRevokeTask(
@@ -2311,7 +2321,7 @@ class BookRevokeTaskTest {
         credentials = this.anyNonNull(),
         method = this.anyNonNull()
       )
-    ).thenReturn(FluentFuture.from(Futures.immediateFailedFuture(UniqueException())))
+    ).thenReturn(failedFuture(UniqueException()))
 
     val task =
       BookRevokeTask(

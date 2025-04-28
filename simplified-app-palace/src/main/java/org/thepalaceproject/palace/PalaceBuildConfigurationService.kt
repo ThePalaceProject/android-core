@@ -1,6 +1,6 @@
 package org.thepalaceproject.palace
 
-import org.librarysimplified.main.BuildConfig
+import org.librarysimplified.ui.BuildConfig
 import org.nypl.simplified.buildconfig.api.BuildConfigOAuthScheme
 import org.nypl.simplified.buildconfig.api.BuildConfigurationAccountsRegistryURIs
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
@@ -22,10 +22,6 @@ class PalaceBuildConfigurationService : BuildConfigurationServiceType {
     )
   override val showDebugBookDetailStatus: Boolean
     get() = false
-  override val showSettingsTab: Boolean
-    get() = true
-  override val showHoldsTab: Boolean
-    get() = true
   override val showBooksFromAllAccounts: Boolean
     get() = false
   override val vcsCommit: String
@@ -45,5 +41,5 @@ class PalaceBuildConfigurationService : BuildConfigurationServiceType {
   override val showAgeGateUi: Boolean
     get() = true
   override val brandingAppIcon: Int
-    get() = R.drawable.main_icon
+    get() = org.librarysimplified.ui.R.drawable.main_icon
 }

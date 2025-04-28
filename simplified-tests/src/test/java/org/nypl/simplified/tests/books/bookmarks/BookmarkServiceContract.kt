@@ -1,9 +1,7 @@
 package org.nypl.simplified.tests.books.bookmarks
 
-import android.app.Application
 import android.content.Context
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -44,7 +42,6 @@ import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
 import org.nypl.simplified.books.book_database.api.BookDatabaseType
 import org.nypl.simplified.books.book_database.api.BookFormats
-import org.nypl.simplified.books.controller.Controller
 import org.nypl.simplified.profiles.api.ProfileEvent
 import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfileType
@@ -56,8 +53,6 @@ import org.slf4j.Logger
 import java.net.InetAddress
 import java.net.URI
 import java.util.UUID
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 abstract class BookmarkServiceContract {

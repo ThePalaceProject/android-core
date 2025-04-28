@@ -16,7 +16,6 @@ import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.links.Link
-import org.nypl.simplified.metrics.api.MetricServiceType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeed
 import org.nypl.simplified.opds.core.OPDSFeedConstants
 import org.nypl.simplified.opds.core.OPDSFeedParserType
@@ -43,7 +42,6 @@ class ProfileAccountCreateCustomOPDSTask(
   private val opdsFeedParser: OPDSFeedParserType,
   private val profiles: ProfilesDatabaseType,
   private val strings: ProfileAccountCreationStringResourcesType,
-  private val metrics: MetricServiceType?
 ) : Callable<TaskResult<AccountType>> {
 
   private var title: String = ""
@@ -110,8 +108,7 @@ class ProfileAccountCreateCustomOPDSTask(
         accountProviderID = accountProviderDescription.id,
         accountProviders = this.accountProviderRegistry,
         profiles = this.profiles,
-        strings = this.strings,
-        metrics = this.metrics
+        strings = this.strings
       ).call()
 
     return when (createResult) {

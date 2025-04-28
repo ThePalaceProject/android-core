@@ -49,7 +49,6 @@ import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.futures.FluentFutureExtensions
 import org.nypl.simplified.futures.FluentFutureExtensions.flatMap
 import org.nypl.simplified.futures.FluentFutureExtensions.map
-import org.nypl.simplified.metrics.api.MetricServiceType
 import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSFeedParserType
@@ -136,8 +135,6 @@ class Controller private constructor(
     this.services.requireService(BookRevokeStringResourcesType::class.java)
   private val crashlytics =
     this.services.optionalService(CrashlyticsServiceType::class.java)
-  private val metrics =
-    this.services.optionalService(MetricServiceType::class.java)
 
   private val temporaryDirectory =
     File(this.cacheDirectory, "tmp")
@@ -407,8 +404,7 @@ class Controller private constructor(
         accountProviderID = provider,
         accountProviders = this.accountProviders,
         profiles = this.profiles,
-        strings = this.profileAccountCreationStringResources,
-        metrics = this.metrics
+        strings = this.profileAccountCreationStringResources
       )
     )
   }
@@ -424,8 +420,7 @@ class Controller private constructor(
         opdsURI = opdsFeed,
         opdsFeedParser = this.feedParser,
         profiles = this.profiles,
-        strings = this.profileAccountCreationStringResources,
-        metrics = this.metrics
+        strings = this.profileAccountCreationStringResources
       )
     )
   }
@@ -439,8 +434,7 @@ class Controller private constructor(
         accountProviderID = provider,
         accountProviders = this.accountProviders,
         profiles = this.profiles,
-        strings = this.profileAccountCreationStringResources,
-        metrics = this.metrics
+        strings = this.profileAccountCreationStringResources
       )
     )
   }
@@ -454,8 +448,7 @@ class Controller private constructor(
         accountProviderID = provider,
         profiles = this.profiles,
         profileEvents = this.profileEvents,
-        strings = this.profileAccountDeletionStringResources,
-        metrics = this.metrics
+        strings = this.profileAccountDeletionStringResources
       )
     )
   }

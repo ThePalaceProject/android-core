@@ -51,7 +51,7 @@ import org.nypl.simplified.books.api.BookContentProtections
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
-import org.nypl.simplified.ui.thread.api.UIThreadServiceType
+import org.nypl.simplified.threads.UIThread
 import org.readium.r2.shared.util.Try
 import org.readium.r2.shared.util.asset.Asset
 import org.readium.r2.shared.util.asset.AssetRetriever
@@ -99,7 +99,6 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
   private lateinit var bookmarkService: BookmarkServiceType
   private lateinit var parameters: Reader2ActivityParameters
   private lateinit var profilesController: ProfilesControllerType
-  private lateinit var uiThread: UIThreadServiceType
   private lateinit var account: AccountType
 
   private val appCompatDelegate: TxContextWrappingDelegate2 by lazy {
@@ -123,8 +122,6 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       services.requireService(BookmarkServiceType::class.java)
     this.profilesController =
       services.requireService(ProfilesControllerType::class.java)
-    this.uiThread =
-      services.requireService(UIThreadServiceType::class.java)
 
     this.subscriptions =
       CompositeDisposable()
@@ -229,7 +226,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
   @UiThread
   private fun startReader() {
-    this.uiThread.checkIsUIThread()
+    UIThread.checkIsUIThread()
 
     try {
       val profileCurrent =
@@ -347,7 +344,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
   @UiThread
   private fun onViewEventReceived(event: SR2ReaderViewEvent) {
-    this.uiThread.checkIsUIThread()
+    UIThread.checkIsUIThread()
 
     return when (event) {
       is SR2BookLoadingFailed -> {
@@ -366,7 +363,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
   @UiThread
   private fun onViewCommandReceived(command: SR2ReaderViewCommand) {
-    this.uiThread.checkIsUIThread()
+    UIThread.checkIsUIThread()
 
     return when (command) {
       SR2ReaderViewNavigationReaderClose -> {
@@ -393,7 +390,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
   @UiThread
   private fun onControllerEvent(event: SR2Event) {
-    this.uiThread.checkIsUIThread()
+    UIThread.checkIsUIThread()
 
     return when (event) {
       is SR2Event.SR2ThemeChanged -> {
@@ -425,7 +422,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
   @UiThread
   private fun onControllerEventThemeChanged(event: SR2Event.SR2ThemeChanged) {
-    this.uiThread.checkIsUIThread()
+    UIThread.checkIsUIThread()
 
     this.profilesController.profileUpdate { current ->
       current.copy(
@@ -440,7 +437,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
   private fun onControllerEventBookmarkDelete(
     event: SR2Event.SR2BookmarkEvent.SR2BookmarkDeleted
   ) {
-    this.uiThread.checkIsUIThread()
+    UIThread.checkIsUIThread()
 
     val bookmark =
       Reader2Bookmarks.fromSR2Bookmark(
@@ -460,7 +457,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
   private fun onControllerEventBookmarkCreate(
     event: SR2BookmarkCreated
   ) {
-    this.uiThread.checkIsUIThread()
+    UIThread.checkIsUIThread()
 
     val localBookmark =
       Reader2Bookmarks.fromSR2Bookmark(
@@ -516,7 +513,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
   @UiThread
   private fun onControllerBecameAvailable(controller: SR2ControllerType) {
-    this.uiThread.checkIsUIThread()
+    UIThread.checkIsUIThread()
     this.switchFragment(SR2ReaderFragment())
   }
 
@@ -528,7 +525,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
   private fun onBookLoadingFailed(
     exception: Throwable
   ) {
-    this.uiThread.checkIsUIThread()
+    UIThread.checkIsUIThread()
 
     val actualException =
       if (exception is ExecutionException) {
@@ -557,7 +554,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     localLastReadBookmark: SR2Bookmark,
     serverLastReadBookmark: SR2Bookmark
   ) {
-    this.uiThread.checkIsUIThread()
+    UIThread.checkIsUIThread()
 
     MaterialAlertDialogBuilder(this)
       .setTitle(R.string.reader_position_title)
@@ -590,7 +587,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
   }
 
   private fun showToastMessage(@StringRes messageRes: Int) {
-    this.uiThread.runOnUIThread {
+    UIThread.runOnUIThread {
       Toast.makeText(this, messageRes, Toast.LENGTH_SHORT).show()
     }
   }
