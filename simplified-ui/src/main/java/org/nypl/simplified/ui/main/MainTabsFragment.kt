@@ -10,10 +10,14 @@ import com.google.android.material.tabs.TabLayout
 import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.jmulticlose.core.CloseableCollectionType
 import com.io7m.jmulticlose.core.ClosingResourceFailedException
+import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
+import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.catalog.CatalogFragmentHolds
 import org.nypl.simplified.ui.catalog.CatalogFragmentMain
 import org.nypl.simplified.ui.catalog.CatalogFragmentMyBooks
+import org.nypl.simplified.ui.catalog.CatalogOPDSClients
+import org.nypl.simplified.ui.catalog.CatalogPart
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_NOT_CONSUMED
 import org.nypl.simplified.ui.main.MainTabCategory.TAB_BOOKS
 import org.nypl.simplified.ui.main.MainTabCategory.TAB_CATALOG
@@ -87,7 +91,9 @@ class MainTabsFragment : Fragment(), MainBackButtonConsumerType {
       }
 
       override fun onTabReselected(tab: TabLayout.Tab?) {
-        // Nothing
+        if (tab != null) {
+          this@MainTabsFragment.reselectForTab(tab.position)
+        }
       }
     })
     return this.root
@@ -137,6 +143,32 @@ class MainTabsFragment : Fragment(), MainBackButtonConsumerType {
           }
         )
       }
+    }
+  }
+
+  private fun reselectForTab(
+    tabIndex: Int
+  ) {
+    val services =
+      Services.serviceDirectory()
+    val opdsClients =
+      services.requireService(CatalogOPDSClients::class.java)
+    val profiles =
+      services.requireService(ProfilesControllerType::class.java)
+    val account =
+      profiles.profileCurrent()
+        .account(
+          profiles.profileCurrent()
+            .preferences()
+            .mostRecentAccount
+        )
+
+    when (tabIndex) {
+      0 -> opdsClients.goToRootFeedFor(CatalogPart.CATALOG, account)
+      1 -> opdsClients.goToRootFeedFor(CatalogPart.BOOKS, account)
+      2 -> opdsClients.goToRootFeedFor(CatalogPart.HOLDS, account)
+      3 -> MainNavigation.Settings.goToRoot()
+      else -> throw IllegalStateException("Unexpected tab index: $tabIndex")
     }
   }
 

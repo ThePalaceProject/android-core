@@ -188,5 +188,11 @@ object MainNavigation {
     fun openCustomOPDS() {
       this.stackPush(SettingsCustomOPDSFragment.createScreenDefinition(Unit))
     }
+
+    fun goToRoot() {
+      this.navigationStackAttribute.set(
+        listOf(SettingsMainFragment3.createScreenDefinition(Unit))
+      )
+    }
   }
 }
