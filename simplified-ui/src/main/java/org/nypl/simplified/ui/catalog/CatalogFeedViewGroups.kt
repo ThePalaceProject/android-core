@@ -4,8 +4,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.widget.ImageView
 import android.widget.RadioButton
 import android.widget.RadioGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -38,6 +40,13 @@ class CatalogFeedViewGroups(
     this.root.findViewById(R.id.catalogGroupsTabsContainer)
   val tabs: RadioGroup =
     this.root.findViewById(R.id.catalogGroupsTabs)
+
+  val catalogGroupsLogoContainer: ViewGroup =
+    this.root.findViewById(R.id.catalogGroupsLogoContainer)
+  val catalogGroupsLibraryLogo: ImageView =
+    this.catalogGroupsLogoContainer.findViewById(R.id.catalogGroupsLibraryLogo)
+  val catalogGroupsLibraryText: TextView =
+    this.catalogGroupsLogoContainer.findViewById(R.id.catalogGroupsLibraryText)
 
   val toolbar: CatalogToolbar =
     CatalogToolbar(

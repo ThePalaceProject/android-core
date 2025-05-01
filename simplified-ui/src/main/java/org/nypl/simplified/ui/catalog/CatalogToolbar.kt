@@ -12,13 +12,10 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountID
-import org.nypl.simplified.accounts.api.AccountProviderDescription
 import org.nypl.simplified.feeds.api.FeedSearch
 import org.nypl.simplified.ui.catalog.CatalogPart.BOOKS
 import org.nypl.simplified.ui.catalog.CatalogPart.CATALOG
 import org.nypl.simplified.ui.catalog.CatalogPart.HOLDS
-import org.nypl.simplified.ui.images.ImageAccountIcons
-import org.nypl.simplified.ui.images.ImageLoaderType
 
 class CatalogToolbar(
   private val logo: ImageView,
@@ -38,9 +35,7 @@ class CatalogToolbar(
    */
 
   fun configure(
-    imageLoader: ImageLoaderType,
     accountID: AccountID,
-    accountProvider: AccountProviderDescription,
     title: String,
     search: FeedSearch?,
     canGoBack: Boolean,
@@ -94,12 +89,7 @@ class CatalogToolbar(
         CATALOG -> {
           this.logoTouch.isEnabled = true
           this.logoTouch.setOnClickListener { this.onToolbarLogoPressed.invoke() }
-          ImageAccountIcons.loadAccountLogoIntoView(
-            loader = imageLoader.loader,
-            account = accountProvider,
-            defaultIcon = R.drawable.account_default,
-            iconView = this.logo
-          )
+          this.logo.setImageResource(R.drawable.main_icon)
         }
         BOOKS, HOLDS -> {
           this.logoTouch.isEnabled = false

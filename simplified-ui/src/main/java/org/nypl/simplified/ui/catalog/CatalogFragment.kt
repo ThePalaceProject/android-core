@@ -516,9 +516,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
         }
 
       view.toolbar.configure(
-        imageLoader = this.imageLoader,
         accountID = account.id,
-        accountProvider = account.provider.toDescription(),
         title = title,
         search = null,
         canGoBack = this.opdsClient.hasHistory,
@@ -781,6 +779,10 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     val feed =
       feedHandle.feed()
 
+    val account =
+      this.profiles.profileCurrent()
+        .account(newState.request.accountID)
+
     val view =
       CatalogFeedViewGroups.create(
         container = this.contentContainer,
@@ -813,9 +815,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
           .account(newState.request.accountID)
 
       view.toolbar.configure(
-        imageLoader = this.imageLoader,
         accountID = account.id,
-        accountProvider = account.provider.toDescription(),
         title = feed.feedTitle,
         search = feed.feedSearch,
         canGoBack = this.opdsClient.hasHistory,
@@ -824,6 +824,18 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     } catch (e: Throwable) {
       // Nothing sensible we can do about this.
     }
+
+    /*
+     * Configure the library logo and text.
+     */
+
+    ImageAccountIcons.loadAccountLogoIntoView(
+      loader = this.imageLoader.loader,
+      account = account.provider.toDescription(),
+      defaultIcon = R.drawable.account_default,
+      iconView = view.catalogGroupsLibraryLogo
+    )
+    view.catalogGroupsLibraryText.text = account.provider.displayName
 
     /*
      * The swipe refresh view simply calls the OPDS client, and marks the view as "no longer
@@ -925,9 +937,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
 
       view.catalogFeedLibraryText.text = account.provider.displayName
       view.toolbar.configure(
-        imageLoader = this.imageLoader,
         accountID = account.id,
-        accountProvider = account.provider.toDescription(),
         title = feed.feedTitle,
         search = feed.feedSearch,
         canGoBack = this.opdsClient.hasHistory,
