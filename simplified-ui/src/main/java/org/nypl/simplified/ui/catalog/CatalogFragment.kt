@@ -7,8 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
 import com.io7m.jfunctional.Some
 import com.io7m.jmulticlose.core.CloseableCollection
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
 import org.librarysimplified.viewer.preview.BookPreviewActivity
@@ -911,17 +916,31 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
         window = this.requireActivity().window,
       )
 
-    val entriesUngroupedAdapter =
-      CatalogFeedAdapter(
+    val feedSource =
+      CatalogFeedPagingSource(feedHandle)
+
+    val feedAdapter =
+      CatalogFeedPagingDataAdapter(
         covers = this.covers,
-        onBookSelected = this::onBookSelected,
-        onReachedNearEnd = {
-          feedHandle.loadMore()
-        }
+        onBookSelected = this::onBookSelected
       )
 
+    val feedScope =
+      CoroutineScope(Dispatchers.Main)
+
+    val job = feedScope.launch {
+      val pager =
+        Pager(
+          config = PagingConfig(pageSize = 50),
+          pagingSourceFactory = { feedSource }
+        )
+      pager.flow.collect { data -> feedAdapter.submitData(data) }
+    }
+
+    this.perViewSubscriptions.add(AutoCloseable { job.cancel() })
+
     try {
-      view.listView.adapter = entriesUngroupedAdapter
+      view.listView.adapter = feedAdapter
       view.configureFacets(
         screen = this.screenSize,
         feed = feed,
@@ -959,31 +978,6 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
         view.swipeRefresh.post { view.swipeRefresh.isRefreshing = false }
       }
     }
-
-    /*
-     * Subscribe to the list of feed items in the OPDS client. We'll receive the initial
-     * list on subscription.
-     */
-
-    this.perViewSubscriptions.add(
-      this.opdsClient.entriesUngrouped.subscribe { _, items ->
-        entriesUngroupedAdapter.submitList(items)
-
-        /*
-         * Show or hide the list with an appropriate message, based on the content of the feed
-         * and the current catalog part.
-         */
-
-        view.configureListVisibility(
-          itemCount = items.size,
-          onEmptyMessage = when (this.catalogPart) {
-            CATALOG -> context.getString(R.string.feedEmpty)
-            BOOKS -> context.getString(R.string.feedWithGroupsEmptyLoaned)
-            HOLDS -> context.getString(R.string.feedWithGroupsEmptyHolds)
-          }
-        )
-      }
-    )
 
     this.switchView(view)
   }

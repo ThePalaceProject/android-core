@@ -18,12 +18,6 @@ interface OPDSClientType : AutoCloseable {
   val state: AttributeReadableType<OPDSState>
 
   /**
-   * The ungrouped entries in the current feed state, or an empty list if the current state is not an ungrouped feed.
-   */
-
-  val entriesUngrouped: AttributeReadableType<List<FeedEntry>>
-
-  /**
    * The grouped entries in the current feed state, or an empty list if the current state is not a grouped feed.
    */
 

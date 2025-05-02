@@ -159,6 +159,8 @@ dependencies {
     implementation(libs.joda.time)
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlin.stdlib)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.core.jvm)
     implementation(libs.logback.android)
     implementation(libs.palace.audiobook.feedbooks)
     implementation(libs.palace.audiobook.time.tracking)

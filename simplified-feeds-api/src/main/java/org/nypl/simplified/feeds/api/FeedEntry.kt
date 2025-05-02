@@ -47,8 +47,8 @@ sealed class FeedEntry : Serializable {
     val feedEntry: OPDSAcquisitionFeedEntry
   ) : FeedEntry() {
 
-    override val bookID: BookID
-      get() = newFromText(feedEntry.id)
+    override val bookID: BookID =
+      newFromText(feedEntry.id)
 
     val probableFormat: BookFormats.BookFormatDefinition? =
       BookFormats.inferFormat(feedEntry)

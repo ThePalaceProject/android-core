@@ -36,6 +36,7 @@ import org.thepalaceproject.opds.client.OPDSClientParameters
 import org.thepalaceproject.opds.client.OPDSClientRequest
 import org.thepalaceproject.opds.client.OPDSClientType
 import org.thepalaceproject.opds.client.OPDSState
+import java.io.IOException
 import java.net.URI
 import java.nio.charset.StandardCharsets.UTF_8
 import java.util.concurrent.ExecutionException
@@ -202,7 +203,6 @@ class OPDSClientTest {
     assertFalse(this.client.hasHistory)
     assertEquals(1, this.webServer.requestCount)
     assertEquals(0, this.client.entriesGrouped.get().size)
-    assertEquals(0, this.client.entriesUngrouped.get().size)
 
     assertEquals(
       listOf("Initial", "Loading", "Error"),
@@ -237,7 +237,6 @@ class OPDSClientTest {
     assertFalse(this.client.hasHistory)
     assertEquals(1, this.webServer.requestCount)
     assertEquals(0, this.client.entriesGrouped.get().size)
-    assertEquals(0, this.client.entriesUngrouped.get().size)
 
     assertEquals(
       listOf("Initial", "Loading", "Error"),
@@ -272,7 +271,6 @@ class OPDSClientTest {
     assertFalse(this.client.hasHistory)
     assertEquals(1, this.webServer.requestCount)
     assertEquals(0, this.client.entriesGrouped.get().size)
-    assertEquals(2, this.client.entriesUngrouped.get().size)
 
     assertEquals(
       listOf("Initial", "Loading", "LoadedFeedWithoutGroups"),
@@ -306,7 +304,6 @@ class OPDSClientTest {
     assertInstanceOf(OPDSState.LoadedFeedWithGroups::class.java, this.client.state.get())
     assertFalse(this.client.hasHistory)
     assertEquals(1, this.webServer.requestCount)
-    assertEquals(0, this.client.entriesUngrouped.get().size)
     assertEquals(9, this.client.entriesGrouped.get().size)
 
     assertEquals(
@@ -351,48 +348,41 @@ class OPDSClientTest {
     val s = assertInstanceOf(OPDSState.LoadedFeedWithoutGroups::class.java, this.client.state.get())
     assertFalse(this.client.hasHistory)
     assertEquals(1, this.webServer.requestCount)
-    assertEquals(3, this.client.entriesUngrouped.get().size)
     assertEquals(0, this.client.entriesGrouped.get().size)
 
     this.logger.debug("Requesting more...")
-    val f1 = s.handle.loadMore()
+    val f1 = s.handle.page(1)
     f1.get(5L, TimeUnit.SECONDS)
     this.logger.debug("Requested more.")
 
     assertInstanceOf(OPDSState.LoadedFeedWithoutGroups::class.java, this.client.state.get())
     assertFalse(this.client.hasHistory)
     assertEquals(2, this.webServer.requestCount)
-    assertEquals(6, this.client.entriesUngrouped.get().size)
     assertEquals(0, this.client.entriesGrouped.get().size)
 
     this.logger.debug("Requesting more...")
-    val f2 = s.handle.loadMore()
+    val f2 = s.handle.page(2)
     f2.get(5L, TimeUnit.SECONDS)
     this.logger.debug("Requested more.")
 
     assertInstanceOf(OPDSState.LoadedFeedWithoutGroups::class.java, this.client.state.get())
     assertFalse(this.client.hasHistory)
     assertEquals(3, this.webServer.requestCount)
-    assertEquals(9, this.client.entriesUngrouped.get().size)
     assertEquals(0, this.client.entriesGrouped.get().size)
 
     this.logger.debug("Requesting more...")
-    val f3 = s.handle.loadMore()
-    f3.get(5L, TimeUnit.SECONDS)
+    assertThrows<Exception> { s.handle.page(3).get(5L, TimeUnit.SECONDS) }
     this.logger.debug("Requested more.")
 
     assertInstanceOf(OPDSState.LoadedFeedWithoutGroups::class.java, this.client.state.get())
     assertFalse(this.client.hasHistory)
     assertEquals(3, this.webServer.requestCount)
-    assertEquals(9, this.client.entriesUngrouped.get().size)
     assertEquals(0, this.client.entriesGrouped.get().size)
 
     assertEquals(
       listOf(
         "Initial",
         "Loading",
-        "LoadedFeedWithoutGroups",
-        "LoadedFeedWithoutGroups",
         "LoadedFeedWithoutGroups"
       ),
       this.stateChanges
@@ -422,16 +412,15 @@ class OPDSClientTest {
       )
 
     f0.get(5L, TimeUnit.SECONDS)
-    assertInstanceOf(OPDSState.LoadedFeedWithoutGroups::class.java, this.client.state.get())
+    val h = this.client.state.get() as OPDSState.LoadedFeedWithoutGroups
     assertFalse(this.client.hasHistory)
     assertEquals(1, this.webServer.requestCount)
     assertEquals(0, this.client.entriesGrouped.get().size)
-    assertEquals(2, this.client.entriesUngrouped.get().size)
 
     val f1 =
       this.client.goTo(
         OPDSClientRequest.ExistingEntry(
-          entry = this.client.entriesUngrouped.get()[0],
+          entry = h.handle.feed().entriesInOrder[0],
           historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY
         )
       )
@@ -441,7 +430,6 @@ class OPDSClientTest {
     assertTrue(this.client.hasHistory)
     assertEquals(1, this.webServer.requestCount)
     assertEquals(0, this.client.entriesGrouped.get().size)
-    assertEquals(0, this.client.entriesUngrouped.get().size)
 
     assertEquals(
       listOf("Initial", "Loading", "LoadedFeedWithoutGroups", "Loading", "LoadedFeedEntry"),
@@ -491,10 +479,12 @@ class OPDSClientTest {
 
     f1.get(5L, TimeUnit.SECONDS)
 
+    val h = this.client.state.get() as OPDSState.LoadedFeedWithoutGroups
+
     val f2 =
       this.client.goTo(
         OPDSClientRequest.ExistingEntry(
-          entry = this.client.entriesUngrouped.get()[0],
+          entry = h.handle.feed().entriesInOrder[0],
           historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY,
         )
       )
@@ -504,21 +494,18 @@ class OPDSClientTest {
     assertTrue(this.client.hasHistory)
     assertEquals(2, this.webServer.requestCount)
     assertEquals(0, this.client.entriesGrouped.get().size)
-    assertEquals(0, this.client.entriesUngrouped.get().size)
 
     this.client.goBack().get(5L, TimeUnit.SECONDS)
 
     assertTrue(this.client.hasHistory)
     assertEquals(2, this.webServer.requestCount)
     assertEquals(0, this.client.entriesGrouped.get().size)
-    assertEquals(2, this.client.entriesUngrouped.get().size)
 
     this.client.goBack().get(5L, TimeUnit.SECONDS)
 
     assertFalse(this.client.hasHistory)
     assertEquals(2, this.webServer.requestCount)
     assertEquals(9, this.client.entriesGrouped.get().size)
-    assertEquals(0, this.client.entriesUngrouped.get().size)
 
     assertEquals(
       listOf(

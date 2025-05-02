@@ -6,22 +6,22 @@ import android.view.View.GONE
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.common.util.concurrent.MoreExecutors
 import org.librarysimplified.ui.R
 import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.feeds.api.FeedEntry
 
-class CatalogFeedAdapter(
+class CatalogFeedPagingDataAdapter(
   private val covers: BookCoverProviderType,
-  private val onBookSelected: (FeedEntry.FeedEntryOPDS) -> Unit,
-  private val onReachedNearEnd: () -> Unit
-) : ListAdapter<FeedEntry, CatalogFeedAdapter.ViewHolder>(diffCallback) {
+  private val onBookSelected: (FeedEntry.FeedEntryOPDS) -> Unit
+) : PagingDataAdapter<FeedEntry, CatalogFeedPagingDataAdapter.ViewHolder>(diffCallback) {
 
   companion object {
     private val diffCallback =
@@ -46,23 +46,41 @@ class CatalogFeedAdapter(
     private val view: View
   ) : RecyclerView.ViewHolder(view) {
 
-    private val progress: ViewGroup =
-      this.view.findViewById(R.id.bookCellInProgress)
-    private val idle: ViewGroup =
-      this.view.findViewById(R.id.bookCellIdle)
-    private val error: ViewGroup =
-      this.view.findViewById(R.id.bookCellError)
-    private val corrupt: ViewGroup =
-      this.view.findViewById(R.id.bookCellCorrupt)
+    private val idle =
+      this.view.findViewById<ViewGroup>(R.id.bookCellIdle)
+    private val corrupt =
+      this.view.findViewById<ViewGroup>(R.id.bookCellCorrupt)
+    private val error =
+      this.view.findViewById<ViewGroup>(R.id.bookCellError)
+    private val progress =
+      this.view.findViewById<ViewGroup>(R.id.bookCellInProgress)
 
     private val idleCover =
-      this.idle.findViewById<ImageView>(R.id.bookCellIdleCover)
+      this.view.findViewById<ImageView>(R.id.bookCellIdleCover)
     private val idleCoverProgress =
-      this.idle.findViewById<ProgressBar>(R.id.bookCellIdleCoverProgress)
+      this.view.findViewById<ProgressBar>(R.id.bookCellIdleCoverProgress)
     private val idleTitle =
       this.idle.findViewById<TextView>(R.id.bookCellIdleTitle)
+    private val idleMeta =
+      this.idle.findViewById<TextView>(R.id.bookCellIdleMeta)
     private val idleAuthor =
       this.idle.findViewById<TextView>(R.id.bookCellIdleAuthor)
+    private val idleButtons =
+      this.idle.findViewById<ViewGroup>(R.id.bookCellIdleButtons)
+
+    private val progressProgress =
+      this.view.findViewById<ProgressBar>(R.id.bookCellInProgressBar)
+    private val progressText =
+      this.view.findViewById<TextView>(R.id.bookCellInProgressTitle)
+
+    private val errorTitle =
+      this.error.findViewById<TextView>(R.id.bookCellErrorTitle)
+    private val errorDismiss =
+      this.error.findViewById<Button>(R.id.bookCellErrorButtonDismiss)
+    private val errorDetails =
+      this.error.findViewById<Button>(R.id.bookCellErrorButtonDetails)
+    private val errorRetry =
+      this.error.findViewById<Button>(R.id.bookCellErrorButtonRetry)
 
     fun bind(
       item: FeedEntry
@@ -85,7 +103,7 @@ class CatalogFeedAdapter(
 
         is FeedEntry.FeedEntryOPDS -> {
           this.view.setOnClickListener {
-            this@CatalogFeedAdapter.onBookSelected(item)
+            this@CatalogFeedPagingDataAdapter.onBookSelected(item)
           }
 
           this.setVisible(this.idleCover, false)
@@ -95,7 +113,7 @@ class CatalogFeedAdapter(
           this.idleAuthor.text = item.feedEntry.authorsCommaSeparated
 
           val f =
-            this@CatalogFeedAdapter.covers.loadThumbnailInto(
+            this@CatalogFeedPagingDataAdapter.covers.loadThumbnailInto(
               entry = item,
               imageView = this.idleCover,
               width = targetWidth,
@@ -168,10 +186,9 @@ class CatalogFeedAdapter(
     holder: ViewHolder,
     position: Int
   ) {
-    (holder as? ViewHolder)?.bind(this.getItem(position))
-
-    if (isNearEnd(position)) {
-      this.onReachedNearEnd.invoke()
+    val item = this.getItem(position)
+    if (item != null) {
+      (holder as? ViewHolder)?.bind(item)
     }
   }
 

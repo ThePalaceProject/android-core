@@ -5,16 +5,16 @@ import java.util.concurrent.CompletableFuture
 
 interface OPDSFeedHandleWithoutGroupsType : OPDSFeedHandleType {
 
-  /**
-   * The current feed.
-   */
+  data class Page(
+    val pageIndex: Int,
+    val pagePrevious: Int?,
+    val pageNext: Int?,
+    val data: Feed.FeedWithoutGroups
+  )
+
+  fun pages(): Int
+
+  fun page(index: Int): CompletableFuture<Page>
 
   fun feed(): Feed.FeedWithoutGroups
-
-  /**
-   * Load more of the current feed. This is a no-op if the current state is not an ungrouped feed, or if the
-   * current ungrouped feed does not have any more entries.
-   */
-
-  fun loadMore(): CompletableFuture<Unit>
 }

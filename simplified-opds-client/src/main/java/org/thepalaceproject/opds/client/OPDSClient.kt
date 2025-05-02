@@ -5,6 +5,7 @@ import com.io7m.jattribute.core.AttributeType
 import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.jmulticlose.core.CloseableCollectionType
 import com.io7m.jmulticlose.core.ClosingResourceFailedException
+import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookIDs
 import org.nypl.simplified.feeds.api.Feed
@@ -18,15 +19,19 @@ import org.slf4j.LoggerFactory
 import org.thepalaceproject.opds.client.OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY
 import org.thepalaceproject.opds.client.OPDSClientRequest.HistoryBehavior.CLEAR_HISTORY
 import org.thepalaceproject.opds.client.OPDSClientRequest.HistoryBehavior.REPLACE_TIP
+import org.thepalaceproject.opds.client.OPDSFeedHandleWithoutGroupsType.Page
 import org.thepalaceproject.opds.client.OPDSState.Error
 import org.thepalaceproject.opds.client.OPDSState.Initial
 import org.thepalaceproject.opds.client.OPDSState.LoadedFeedEntry
 import org.thepalaceproject.opds.client.OPDSState.LoadedFeedWithGroups
 import org.thepalaceproject.opds.client.OPDSState.LoadedFeedWithoutGroups
 import org.thepalaceproject.opds.client.OPDSState.Loading
+import java.io.IOException
 import java.net.URI
+import java.util.SortedMap
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentLinkedDeque
+import java.util.concurrent.ConcurrentSkipListMap
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -65,8 +70,6 @@ class OPDSClient private constructor(
 
   private val stateSource: AttributeType<OPDSState> =
     OPDSClientAttributes.attributes.withValue(Initial)
-  private val entriesUngroupedSource: AttributeType<List<FeedEntry>> =
-    OPDSClientAttributes.attributes.withValue(listOf())
   private val entriesGroupedSource: AttributeType<List<FeedGroup>> =
     OPDSClientAttributes.attributes.withValue(listOf())
   private val entrySource: AttributeType<FeedEntry> =
@@ -74,8 +77,6 @@ class OPDSClient private constructor(
 
   private val stateUI: AttributeType<OPDSState> =
     OPDSClientAttributes.attributes.withValue(Initial)
-  private val entriesUngroupedUI: AttributeType<List<FeedEntry>> =
-    OPDSClientAttributes.attributes.withValue(listOf())
   private val entriesGroupedUI: AttributeType<List<FeedGroup>> =
     OPDSClientAttributes.attributes.withValue(listOf())
   private val entryUI: AttributeType<FeedEntry> =
@@ -85,12 +86,6 @@ class OPDSClient private constructor(
     this.resources.add(
       this.stateSource.subscribe { _, newValue ->
         this.parameters.runOnUI(Runnable { this.stateUI.set(newValue) })
-      }
-    )
-  private val entriesUngroupedUISub =
-    this.resources.add(
-      this.entriesUngroupedSource.subscribe { _, e ->
-        this.parameters.runOnUI(Runnable { this.entriesUngroupedUI.set(e) })
       }
     )
   private val entriesGroupedUISub =
@@ -135,8 +130,6 @@ class OPDSClient private constructor(
 
   override val state: AttributeReadableType<OPDSState> =
     this.stateUI
-  override val entriesUngrouped: AttributeReadableType<List<FeedEntry>> =
-    this.entriesUngroupedUI
   override val entriesGrouped: AttributeReadableType<List<FeedGroup>> =
     this.entriesGroupedUI
   override val entry: AttributeReadableType<FeedEntry> =
@@ -176,25 +169,102 @@ class OPDSClient private constructor(
     }
 
     private inner class OPDSFeedHandleWithoutGroups : OPDSFeedHandleWithoutGroupsType {
-      @Volatile
-      lateinit var feed: Feed.FeedWithoutGroups
 
-      override fun feed(): Feed.FeedWithoutGroups {
-        return this.feed
+      @Volatile
+      var credentials: AccountAuthenticationCredentials? = null
+
+      @Volatile
+      lateinit var method: String
+
+      @Volatile
+      lateinit var feedInitial: Feed.FeedWithoutGroups
+
+      val pages: SortedMap<Int, Page> =
+        ConcurrentSkipListMap()
+
+      override fun pages(): Int {
+        return this.pages.size
       }
 
-      override fun loadMore(): CompletableFuture<Unit> {
-        return this@OPDSClient.executeWithFuture {
-          if (this@RequestHandler.feedURINext != null) {
-            this@RequestHandler.run()
+      override fun page(
+        index: Int
+      ): CompletableFuture<Page> {
+        val pageFuture = CompletableFuture<Page>()
+        val page = this.pages[index]
+        if (page != null) {
+          pageFuture.complete(page)
+          return pageFuture
+        }
+
+        val previous = this.pages[index - 1]
+        if (previous == null) {
+          pageFuture.completeExceptionally(IOException("No previous page (${index - 1})"))
+          return pageFuture
+        }
+
+        val previousNext = previous.data.feedNext
+        if (previousNext == null) {
+          pageFuture.completeExceptionally(IOException("No next page (${index - 1})"))
+          return pageFuture
+        }
+
+        val future0 =
+          this@OPDSClient.parameters.feedLoader.fetchURI(
+            accountID = this@RequestHandler.request.accountID,
+            uri = previousNext,
+            credentials = this.credentials,
+            method = this.method
+          )
+
+        future0.whenComplete { loaderResult, exception ->
+          if (exception != null) {
+            pageFuture.completeExceptionally(exception)
+            return@whenComplete
+          }
+
+          when (loaderResult) {
+            is FeedLoaderFailedAuthentication -> {
+              pageFuture.completeExceptionally(loaderResult.exception)
+            }
+
+            is FeedLoaderFailedGeneral -> {
+              pageFuture.completeExceptionally(loaderResult.exception)
+            }
+
+            is FeedLoaderResult.FeedLoaderSuccess -> {
+              when (val feed = loaderResult.feed) {
+                is Feed.FeedWithGroups -> {
+                  pageFuture.completeExceptionally(
+                    IOException(
+                      "Received a feed with groups, but was expecting a feed without groups ($previousNext)"
+                    )
+                  )
+                }
+
+                is Feed.FeedWithoutGroups -> {
+                  val newPage = Page(
+                    pageIndex = index,
+                    pagePrevious = if (index > 0) index - 1 else null,
+                    pageNext = if (feed.feedNext != null) index + 1 else null,
+                    data = feed
+                  )
+                  this.pages[index] = newPage
+                  pageFuture.complete(newPage)
+                }
+              }
+            }
           }
         }
+        return pageFuture
+      }
+
+      override fun feed(): Feed.FeedWithoutGroups {
+        return this.feedInitial
       }
 
       override fun refresh(): CompletableFuture<Unit> {
         val handler = this@RequestHandler
         handler.feedURINext = handler.request.uri
-        handler.publishedEntriesUngrouped.set(listOf())
         handler.publishedEntriesGrouped.set(listOf())
         return this@OPDSClient.executeWithFuture(handler)
       }
@@ -207,8 +277,6 @@ class OPDSClient private constructor(
     private val handleGrouped: OPDSFeedHandleWithGroups =
       this.OPDSFeedHandleWithGroups()
 
-    val publishedEntriesUngrouped: AttributeType<List<FeedEntry>> =
-      OPDSClientAttributes.attributes.withValue(listOf())
     val publishedEntriesGrouped: AttributeType<List<FeedGroup>> =
       OPDSClientAttributes.attributes.withValue(listOf())
 
@@ -283,10 +351,18 @@ class OPDSClient private constructor(
             }
 
             is Feed.FeedWithoutGroups -> {
-              this.handleUngrouped.feed = feed
+              this.handleUngrouped.feedInitial = feed
+              this.handleUngrouped.credentials = request.credentials
+              this.handleUngrouped.method = request.method
+              this.handleUngrouped.pages.clear()
+              this.handleUngrouped.pages[0] = Page(
+                pageIndex = 0,
+                pagePrevious = null,
+                pageNext = if (feed.feedNext != null) 1 else null,
+                data = feed
+              )
               this.state.set(LoadedFeedWithoutGroups(request, this.handleUngrouped))
-              this.publishedEntriesUngrouped.set(this.publishedEntriesUngrouped.get().plus(feed.entriesInOrder))
-              this.feedURINext = feed.feedNext
+              this.publishedEntriesGrouped.set(listOf())
             }
           }
         }
@@ -306,10 +382,17 @@ class OPDSClient private constructor(
           }
 
           is Feed.FeedWithoutGroups -> {
-            this.handleUngrouped.feed = feed
+            this.handleUngrouped.feedInitial = feed
+            this.handleUngrouped.credentials = null
+            this.handleUngrouped.method = "GET"
+            this.handleUngrouped.pages[0] = Page(
+              pageIndex = 0,
+              pagePrevious = null,
+              pageNext = null,
+              data = feed
+            )
             this.state.set(LoadedFeedWithoutGroups(request, this.handleUngrouped))
-            this.publishedEntriesUngrouped.set(this.publishedEntriesUngrouped.get().plus(feed.entriesInOrder))
-            this.feedURINext = feed.feedNext
+            this.publishedEntriesGrouped.set(listOf())
           }
         }
       } catch (e: Throwable) {
@@ -390,9 +473,11 @@ class OPDSClient private constructor(
       ADD_TO_HISTORY -> {
         this.requestPush(this.RequestHandler(request))
       }
+
       REPLACE_TIP -> {
         this.requestPushReplacingTip(this.RequestHandler(request))
       }
+
       CLEAR_HISTORY -> {
         this.requestStack.clear()
         this.requestPush(this.RequestHandler(request))
@@ -502,30 +587,25 @@ class OPDSClient private constructor(
       is Error -> {
         this.entrySource.set(this.feedEntryCorrupt)
         this.entriesGroupedSource.set(listOf())
-        this.entriesUngroupedSource.set(listOf())
       }
 
       Initial -> {
         this.entrySource.set(this.feedEntryCorrupt)
         this.entriesGroupedSource.set(listOf())
-        this.entriesUngroupedSource.set(listOf())
       }
 
       is Loading -> {
         this.entrySource.set(this.feedEntryCorrupt)
         this.entriesGroupedSource.set(listOf())
-        this.entriesUngroupedSource.set(listOf())
       }
 
       is LoadedFeedEntry -> {
         this.entrySource.set(newState.request.entry)
         this.entriesGroupedSource.set(listOf())
-        this.entriesUngroupedSource.set(listOf())
       }
 
       is LoadedFeedWithGroups -> {
         this.entrySource.set(this.feedEntryCorrupt)
-        this.entriesUngroupedSource.set(listOf())
         this.topmostHandlerSubscriptions.add(
           handler.publishedEntriesGrouped.subscribe { _, groups ->
             this.entriesGroupedSource.set(groups)
@@ -536,11 +616,6 @@ class OPDSClient private constructor(
       is LoadedFeedWithoutGroups -> {
         this.entrySource.set(this.feedEntryCorrupt)
         this.entriesGroupedSource.set(listOf())
-        this.topmostHandlerSubscriptions.add(
-          handler.publishedEntriesUngrouped.subscribe { _, entries ->
-            this.entriesUngroupedSource.set(entries)
-          }
-        )
       }
     }
 
