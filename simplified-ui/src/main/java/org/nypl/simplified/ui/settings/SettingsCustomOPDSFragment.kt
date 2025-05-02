@@ -13,6 +13,9 @@ import androidx.fragment.app.Fragment
 import com.io7m.jmulticlose.core.CloseableCollection
 import org.librarysimplified.ui.R
 import org.nypl.simplified.threads.UIThread
+import org.nypl.simplified.ui.main.MainBackButtonConsumerType
+import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result
+import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_CONSUMED
 import org.nypl.simplified.ui.main.MainNavigation
 import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
 import org.nypl.simplified.ui.screens.ScreenDefinitionType
@@ -23,7 +26,8 @@ import java.net.URI
  * A fragment that allows to add a custom OPDS feed.
  */
 
-class SettingsCustomOPDSFragment : Fragment(R.layout.settings_custom_opds) {
+class SettingsCustomOPDSFragment : Fragment(R.layout.settings_custom_opds),
+  MainBackButtonConsumerType {
 
   private val logger =
     LoggerFactory.getLogger(SettingsCustomOPDSFragment::class.java)
@@ -172,5 +176,10 @@ class SettingsCustomOPDSFragment : Fragment(R.layout.settings_custom_opds) {
       this@SettingsCustomOPDSFragment.create.isEnabled =
         this@SettingsCustomOPDSFragment.isValidURI()
     }
+  }
+
+  override fun onBackButtonPressed(): Result {
+    MainNavigation.Settings.goUp()
+    return BACK_BUTTON_CONSUMED
   }
 }

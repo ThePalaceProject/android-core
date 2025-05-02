@@ -24,6 +24,9 @@ import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.taskrecorder.api.TaskStep
 import org.nypl.simplified.taskrecorder.api.TaskStepResolution
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
+import org.nypl.simplified.ui.main.MainBackButtonConsumerType
+import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result
+import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_CONSUMED
 import org.nypl.simplified.ui.main.MainNavigation
 import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
 import org.nypl.simplified.ui.screens.ScreenDefinitionType
@@ -33,7 +36,7 @@ import org.slf4j.LoggerFactory
  * A fragment that shows various debug options for testing app functionality at runtime.
  */
 
-class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
+class SettingsDebugFragment : Fragment(R.layout.settings_debug), MainBackButtonConsumerType {
 
   private val LIBRARY_REGISTRY_DEBUG_PROPERTY =
     "org.nypl.simplified.accounts.source.nyplregistry.baseServerOverride"
@@ -437,5 +440,10 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug) {
 
       this.adobeDRMActivationTable.addView(row)
     }
+  }
+
+  override fun onBackButtonPressed(): Result {
+    MainNavigation.Settings.goUp()
+    return BACK_BUTTON_CONSUMED
   }
 }

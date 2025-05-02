@@ -891,13 +891,15 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
   private fun onStateChangedToInfinite(
     newState: LoadedFeedWithoutGroups
   ) {
-    val context =
-      this.requireContext()
-
     val feedHandle =
       newState.handle
     val feed =
       feedHandle.feed()
+
+    val services =
+      Services.serviceDirectory()
+    val registry =
+      services.requireService(CatalogBookRegistryEvents::class.java)
 
     val account =
       this.profiles.profileCurrent()
@@ -922,7 +924,16 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     val feedAdapter =
       CatalogFeedPagingDataAdapter(
         covers = this.covers,
-        onBookSelected = this::onBookSelected
+        profiles = this.profiles,
+        buttonCreator = this.buttonCreator,
+        registryEvents = registry,
+        onBookSelected = this::onBookSelected,
+        onBookErrorDismiss = this::onBookDismissError,
+        onBookBorrow = this::onBookBorrowRequested,
+        onBookRevoke = this::onBookRevokeRequested,
+        onBookViewerOpen = this::onBookViewerOpen,
+        onBookDelete = this::onBookDeleteRequested,
+        onShowTaskError = this::onShowErrorDetails
       )
 
     val feedScope =
@@ -978,6 +989,23 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
         view.swipeRefresh.post { view.swipeRefresh.isRefreshing = false }
       }
     }
+
+    /*
+     * Show or hide the list with an appropriate message, based on the content of the feed
+     * and the current catalog part.
+     */
+
+    val context =
+      this.requireContext()
+
+    view.configureListVisibility(
+      itemCount = feed.size,
+      onEmptyMessage = when (this.catalogPart) {
+        CATALOG -> context.getString(R.string.feedEmpty)
+        BOOKS -> context.getString(R.string.feedWithGroupsEmptyLoaned)
+        HOLDS -> context.getString(R.string.feedWithGroupsEmptyHolds)
+      }
+    )
 
     this.switchView(view)
   }
