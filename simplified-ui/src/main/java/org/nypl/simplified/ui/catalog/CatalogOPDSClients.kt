@@ -3,7 +3,9 @@ package org.nypl.simplified.ui.catalog
 import android.content.res.Resources
 import com.io7m.jmulticlose.core.CloseableCollection
 import org.librarysimplified.ui.R
+import org.nypl.simplified.accounts.api.AccountEventCreation
 import org.nypl.simplified.accounts.api.AccountEventDeletion
+import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.feeds.api.FeedBooksSelection
 import org.nypl.simplified.feeds.api.FeedFacetPseudoTitleProviderType
@@ -40,14 +42,39 @@ class CatalogOPDSClients(
      * the catalog can never observe a deleted account.
      */
 
-    val subscription =
+    val subscriptionDeletion =
       this.profiles.accountEvents()
-        .filter { e -> e is AccountEventDeletion.AccountEventDeletionSucceeded }
-        .subscribe {
-          this.onAccountDeleted()
-        }
+        .ofType(AccountEventDeletion.AccountEventDeletionSucceeded::class.java)
+        .subscribe { this.onAccountDeleted() }
 
-    this.resources.add(AutoCloseable { subscription.dispose() })
+    this.resources.add(AutoCloseable { subscriptionDeletion.dispose() })
+
+    /*
+     * When an account is created, we reset the OPDS clients to the most recent account.
+     */
+
+    val subscriptionCreation =
+      this.profiles.accountEvents()
+        .ofType(AccountEventCreation.AccountEventCreationSucceeded::class.java)
+        .subscribe { e -> this.onAccountCreated(e.id) }
+
+    this.resources.add(AutoCloseable { subscriptionCreation.dispose() })
+  }
+
+  private fun onAccountCreated(
+    id: AccountID
+  ) {
+    this.logger.debug("An account has been created. Pointing clients at it.")
+
+    val account =
+      this.profiles.profileCurrent()
+        .account(id)
+
+    UIThread.runOnUIThread {
+      this.goToRootFeedFor(CatalogPart.CATALOG, account)
+      this.goToRootFeedFor(CatalogPart.BOOKS, account)
+      this.goToRootFeedFor(CatalogPart.HOLDS, account)
+    }
   }
 
   private fun onAccountDeleted() {
@@ -88,60 +115,64 @@ class CatalogOPDSClients(
     catalogPart: CatalogPart,
     account: AccountType
   ) {
-    val client = this.clientFor(catalogPart)
+    try {
+      val client = this.clientFor(catalogPart)
 
-    when (catalogPart) {
-      CatalogPart.CATALOG -> {
-        client.goTo(
-          OPDSClientRequest.NewFeed(
-            accountID = account.id,
-            uri = account.catalogURIForAge(18),
-            credentials = account.loginState.credentials,
-            historyBehavior = CLEAR_HISTORY,
-            method = "GET"
+      when (catalogPart) {
+        CatalogPart.CATALOG -> {
+          client.goTo(
+            OPDSClientRequest.NewFeed(
+              accountID = account.id,
+              uri = account.catalogURIForAge(18),
+              credentials = account.loginState.credentials,
+              historyBehavior = CLEAR_HISTORY,
+              method = "GET"
+            )
           )
-        )
-      }
+        }
 
-      CatalogPart.BOOKS -> {
-        client.goTo(
-          OPDSClientRequest.GeneratedFeed(
-            accountID = account.id,
-            historyBehavior = CLEAR_HISTORY,
-            generator = {
-              this.profiles.profileFeed(
-                ProfileFeedRequest(
-                  uri = URI.create("Books"),
-                  title = "",
-                  facetTitleProvider = facetTitleProvider,
-                  feedSelection = FeedBooksSelection.BOOKS_FEED_LOANED,
-                  filterByAccountID = account.id
-                )
-              ).get()
-            }
+        CatalogPart.BOOKS -> {
+          client.goTo(
+            OPDSClientRequest.GeneratedFeed(
+              accountID = account.id,
+              historyBehavior = CLEAR_HISTORY,
+              generator = {
+                this.profiles.profileFeed(
+                  ProfileFeedRequest(
+                    uri = URI.create("Books"),
+                    title = "",
+                    facetTitleProvider = facetTitleProvider,
+                    feedSelection = FeedBooksSelection.BOOKS_FEED_LOANED,
+                    filterByAccountID = account.id
+                  )
+                ).get()
+              }
+            )
           )
-        )
-      }
+        }
 
-      CatalogPart.HOLDS -> {
-        client.goTo(
-          OPDSClientRequest.GeneratedFeed(
-            accountID = account.id,
-            historyBehavior = CLEAR_HISTORY,
-            generator = {
-              this.profiles.profileFeed(
-                ProfileFeedRequest(
-                  uri = URI.create("Books"),
-                  title = "",
-                  facetTitleProvider = facetTitleProvider,
-                  feedSelection = FeedBooksSelection.BOOKS_FEED_HOLDS,
-                  filterByAccountID = account.id
-                )
-              ).get()
-            }
+        CatalogPart.HOLDS -> {
+          client.goTo(
+            OPDSClientRequest.GeneratedFeed(
+              accountID = account.id,
+              historyBehavior = CLEAR_HISTORY,
+              generator = {
+                this.profiles.profileFeed(
+                  ProfileFeedRequest(
+                    uri = URI.create("Books"),
+                    title = "",
+                    facetTitleProvider = facetTitleProvider,
+                    feedSelection = FeedBooksSelection.BOOKS_FEED_HOLDS,
+                    filterByAccountID = account.id
+                  )
+                ).get()
+              }
+            )
           )
-        )
+        }
       }
+    } catch (e: Throwable) {
+      this.logger.error("Failed to go to root feed: ", e)
     }
   }
 
