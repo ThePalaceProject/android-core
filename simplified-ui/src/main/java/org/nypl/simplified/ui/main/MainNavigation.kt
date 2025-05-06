@@ -28,6 +28,7 @@ import org.nypl.simplified.ui.settings.SettingsDocumentViewerModel
 import org.nypl.simplified.ui.settings.SettingsMainFragment3
 import java.net.URI
 import java.util.LinkedList
+import java.util.concurrent.atomic.AtomicReference
 
 object MainNavigation {
 
@@ -141,6 +142,7 @@ object MainNavigation {
       val screen = existing.pop()
       screen.setup()
       this.navigationStackAttribute.set(existing.toList())
+      this.takeAndExecuteOnClose()
     }
 
     fun openCardCreator(
@@ -193,6 +195,27 @@ object MainNavigation {
       this.navigationStackAttribute.set(
         listOf(SettingsMainFragment3.createScreenDefinition(Unit))
       )
+    }
+
+    private val onClose =
+      AtomicReference<Runnable>(Runnable { })
+
+    /**
+     * Set a runnable that will be executed when the current settings screen is closed.
+     */
+
+    fun setOnClose(runnable: Runnable) {
+      this.onClose.set(runnable)
+    }
+
+    /**
+     * Take any existing "on close" runnable and set the new runnable to a no-op expression,
+     * and then run the existing runnable.
+     */
+
+    private fun takeAndExecuteOnClose() {
+      val task = this.onClose.getAndSet(Runnable { })
+      UIThread.runOnUIThread(task)
     }
   }
 }

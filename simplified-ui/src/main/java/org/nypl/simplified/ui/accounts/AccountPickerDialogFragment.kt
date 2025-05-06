@@ -24,6 +24,7 @@ import org.nypl.simplified.ui.catalog.CatalogPart
 import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.nypl.simplified.ui.main.MainNavigation
+import org.nypl.simplified.ui.main.MainTabCategory.TAB_CATALOG
 import org.slf4j.LoggerFactory
 
 /**
@@ -148,6 +149,9 @@ class AccountPickerDialogFragment : BottomSheetDialogFragment(), OnAccountClickL
 
   override fun onAddAccountClick() {
     MainNavigation.openAccountCreation()
+    MainNavigation.Settings.setOnClose {
+      MainNavigation.requestTabChange(TAB_CATALOG)
+    }
     this.dismiss()
   }
 
