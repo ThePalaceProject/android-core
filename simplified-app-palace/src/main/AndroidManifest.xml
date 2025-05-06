@@ -28,6 +28,7 @@
             android:contentDescription="@string/app_name"
             android:exported="true"
             android:label="@string/app_name"
+            android:configChanges="orientation"
             android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -72,18 +73,22 @@
 
         <activity
             android:name="org.nypl.simplified.ui.errorpage.ErrorPageActivity"
+            android:configChanges="orientation"
             android:exported="false"/>
 
         <activity
             android:name="org.nypl.simplified.ui.accounts.saml20.AccountSAML20Activity"
+            android:configChanges="orientation"
             android:exported="false" />
 
         <activity
             android:name="org.nypl.simplified.ui.catalog.saml20.CatalogSAML20Activity"
+            android:configChanges="orientation"
             android:exported="false" />
 
         <activity
             android:name="org.librarysimplified.viewer.preview.BookPreviewActivity"
+            android:configChanges="orientation"
             android:exported="false" />
 
         <activity
@@ -93,12 +98,14 @@
 
         <activity
             android:name="org.librarysimplified.viewer.pdf.pdfjs.PdfReaderActivity"
+            android:configChanges="orientation"
             android:contentDescription="@string/app_name"
             android:exported="false"
             android:label="@string/app_name" />
 
         <activity
             android:name="org.librarysimplified.viewer.audiobook.AudioBookPlayerActivity2"
+            android:configChanges="orientation"
             android:contentDescription="@string/app_name"
             android:exported="false"
             android:label="@string/app_name" />
