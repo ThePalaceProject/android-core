@@ -25,6 +25,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.junreachable.UnimplementedCodeException
 import com.io7m.junreachable.UnreachableCodeException
+import org.librarysimplified.reports.Reports
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
@@ -431,7 +432,19 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
       this.reportIssueEmail.text = supportUrl.replace("mailto:", "")
       this.reportIssueGroup.setOnClickListener {
         val intent = if (supportUrl.startsWith("mailto:")) {
-          Intent(Intent.ACTION_SENDTO, Uri.parse(supportUrl))
+          try {
+            Reports.reportLibrary = AccountDetailModel.account.provider.displayName
+            val uri = URI.create(supportUrl)
+            val email = uri.schemeSpecificPart
+            Intent(Intent.ACTION_SEND)
+              .setType("message/rfc822")
+              .putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
+              .putExtra(Intent.EXTRA_SUBJECT, "Issue Report from The Palace Project App")
+              .putExtra(Intent.EXTRA_TEXT, Reports.decorateBodyText(""))
+          } catch (e: Throwable) {
+            this.logger.debug("Unparseable URL: ", e)
+            null
+          }
         } else if (URLUtil.isValidUrl(supportUrl)) {
           Intent(Intent.ACTION_VIEW, Uri.parse(supportUrl))
         } else {

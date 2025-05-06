@@ -117,7 +117,7 @@ object Reports {
         this.type = "message/rfc822"
         this.putExtra(Intent.EXTRA_EMAIL, arrayOf(address))
         this.putExtra(Intent.EXTRA_SUBJECT, "Issue Report from The Palace Project App")
-        this.putExtra(Intent.EXTRA_TEXT, this@Reports.extendBody(body))
+        this.putExtra(Intent.EXTRA_TEXT, this@Reports.decorateBodyText(body))
         this.putExtra(Intent.EXTRA_STREAM, zipContentURI)
         this.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         this.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -130,12 +130,11 @@ object Reports {
     }
   }
 
-  private fun extendBody(
+  fun decorateBodyText(
     body: String
   ): String {
     val bodyLines = ArrayList<String>()
     bodyLines.add("Please describe your issue:")
-    bodyLines.add("\n")
     bodyLines.add("\n")
     bodyLines.add("\n")
     bodyLines.add(body)
