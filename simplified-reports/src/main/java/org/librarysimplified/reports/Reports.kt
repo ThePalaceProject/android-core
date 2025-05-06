@@ -3,7 +3,7 @@ package org.librarysimplified.reports
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
+import android.os.Build
 import androidx.core.content.FileProvider
 import org.apache.commons.io.IOUtils
 import org.librarysimplified.reports.Reports.Result.RaisedException
@@ -22,7 +22,28 @@ import java.util.zip.ZipOutputStream
 
 object Reports {
 
-  private val logger = LoggerFactory.getLogger(Reports::class.java)
+  @Volatile
+  var reportLibrary: String = "Unknown"
+
+  @Volatile
+  var reportScreenDPI: Int = 0
+
+  @Volatile
+  var reportScreenHeight: Int = 0
+
+  @Volatile
+  var reportAppCommit: String =
+    "Unknown"
+
+  @Volatile
+  var reportAppVersion: String =
+    "Unknown"
+
+  val reportPlatform: String =
+    "Android"
+
+  private val logger =
+    LoggerFactory.getLogger(Reports::class.java)
 
   /**
    * The result of trying to send.
@@ -70,22 +91,6 @@ object Reports {
     )
   }
 
-  @JvmStatic
-  private fun isSuitableForSending(
-    name: String
-  ): Boolean {
-    if (name.startsWith("log.txt")) {
-      return true
-    }
-    if (name.equals("time_tracking_debug.dat")) {
-      return true
-    }
-    if (name.startsWith("report-") && name.endsWith(".xml")) {
-      return true
-    }
-    return false
-  }
-
   /**
    * Try to send a report.
    */
@@ -109,15 +114,15 @@ object Reports {
       reportZip.delete()
       compressZipfile(files, reportZip)
 
-      val contentURIs: ArrayList<Uri> = ArrayList()
-      contentURIs.add(this.mapFileToContentURI(context, reportZip))
+      val zipContentURI =
+        this.mapFileToContentURI(context, reportZip)
 
-      val intent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
-        this.type = "text/plain"
+      val intent = Intent(Intent.ACTION_SEND).apply {
+        this.type = "message/rfc822"
         this.putExtra(Intent.EXTRA_EMAIL, arrayOf(address))
         this.putExtra(Intent.EXTRA_SUBJECT, this@Reports.extendSubject(context, subject))
         this.putExtra(Intent.EXTRA_TEXT, this@Reports.extendBody(body))
-        this.putExtra(Intent.EXTRA_STREAM, contentURIs)
+        this.putExtra(Intent.EXTRA_STREAM, zipContentURI)
         this.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         this.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
       }
@@ -131,18 +136,27 @@ object Reports {
 
   private fun extendBody(
     body: String
-  ): ArrayList<String> {
+  ): String {
     val bodyLines = ArrayList<String>()
-    bodyLines.add(buildString {
-      this.append(body)
-      this.append("\n")
-      this.append("--")
-      this.append("\n")
-      this.append("Commit: ")
-      this.append(BuildConfig.SIMPLIFIED_GIT_COMMIT)
-      this.append("\n")
-    })
-    return bodyLines
+    bodyLines.add("Please describe your issue:")
+    bodyLines.add("\n")
+    bodyLines.add("\n")
+    bodyLines.add("\n")
+    bodyLines.add(body)
+    bodyLines.add("\n")
+    bodyLines.add("\n")
+    bodyLines.add("--")
+    bodyLines.add("Platform: ${this.reportPlatform}")
+    bodyLines.add("OS: Android")
+    bodyLines.add("Height: ${this.reportScreenHeight} (${this.reportScreenDPI} DPI)")
+    bodyLines.add("Palace Version: ${this.reportAppVersion}")
+    bodyLines.add("Palace Commit: ${this.reportAppCommit}")
+    bodyLines.add("Library: ${this.reportLibrary}")
+    bodyLines.add("Device Manufacturer: ${Build.MANUFACTURER}")
+    bodyLines.add("Device Brand: ${Build.BRAND}")
+    bodyLines.add("Device Model: ${Build.MODEL} (${Build.DEVICE})")
+    bodyLines.add("Device FP: ${Build.FINGERPRINT}")
+    return bodyLines.joinToString("\n")
   }
 
   private fun extendSubject(

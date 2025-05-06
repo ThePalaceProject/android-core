@@ -13,6 +13,7 @@ import org.librarysimplified.documents.DocumentConfigurationServiceType
 import org.librarysimplified.documents.DocumentStoreType
 import org.librarysimplified.documents.DocumentStores
 import org.librarysimplified.http.api.LSHTTPClientType
+import org.librarysimplified.reports.Reports
 import org.librarysimplified.services.api.ServiceDirectory
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.librarysimplified.services.api.Services
@@ -98,6 +99,7 @@ import org.nypl.simplified.patron.api.PatronUserProfileParsersType
 import org.nypl.simplified.profiles.ProfilesDatabases
 import org.nypl.simplified.profiles.api.ProfileDatabaseException
 import org.nypl.simplified.profiles.api.ProfileEvent
+import org.nypl.simplified.profiles.api.ProfileUpdated
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountCreationStringResourcesType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountDeletionStringResourcesType
@@ -494,6 +496,9 @@ internal object MainServices {
     val services = ServiceDirectory.builder()
     val assets = context.assets
     val strings = MainServicesStrings(context.resources)
+
+    Reports.reportAppVersion = BuildConfig.SIMPLIFIED_VERSION
+    Reports.reportAppCommit = BuildConfig.SIMPLIFIED_GIT_COMMIT
 
     fun <T : Any> addService(
       message: String,
@@ -980,6 +985,13 @@ internal object MainServices {
       }
     )
 
+    val subscription =
+      profilesControllerTypeService.profileEvents()
+        .ofType(ProfileUpdated::class.java)
+        .subscribe {
+          onProfileUpdated(profilesControllerTypeService)
+        }
+
     showThreads()
 
     publishApplicationStartupEvent(context, analytics)
@@ -988,6 +1000,22 @@ internal object MainServices {
     logger.debug("boot completed")
     onProgress.invoke(BootEvent.BootCompleted(strings.bootCompleted))
     return finalServices
+  }
+
+  private fun onProfileUpdated(
+    profiles: ProfilesControllerType
+  ) {
+    this.updateReportsLibrary(profiles)
+  }
+
+  private fun updateReportsLibrary(profiles: ProfilesControllerType) {
+    try {
+      val profile = profiles.profileCurrent()
+      val account = profile.account(profile.preferences().mostRecentAccount)
+      Reports.reportLibrary = account.provider.displayName
+    } catch (e: Throwable) {
+      this.logger.debug("Failed to handle report update: ", e)
+    }
   }
 
   private fun createCatalogOPDSClients(

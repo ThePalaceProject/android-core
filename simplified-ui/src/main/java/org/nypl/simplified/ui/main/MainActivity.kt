@@ -1,11 +1,13 @@
 package org.nypl.simplified.ui.main
 
 import android.os.Bundle
+import android.util.DisplayMetrics
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.jmulticlose.core.CloseableCollectionType
 import com.io7m.jmulticlose.core.ClosingResourceFailedException
+import org.librarysimplified.reports.Reports
 import org.librarysimplified.ui.R
 import org.nypl.simplified.ui.announcements.AnnouncementsDialog
 import org.nypl.simplified.ui.announcements.AnnouncementsModel
@@ -29,6 +31,18 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     savedInstanceState: Bundle?
   ) {
     super.onCreate(Bundle())
+
+    val metrics = this.screenMetrics()
+    Reports.reportScreenHeight = metrics.heightPixels
+    Reports.reportScreenDPI = metrics.densityDpi
+  }
+
+  private fun screenMetrics(): DisplayMetrics {
+    val metrics = DisplayMetrics()
+    val wm = this.windowManager
+    val display = wm.getDefaultDisplay()
+    display.getMetrics(metrics)
+    return metrics
   }
 
   override fun onStart() {
@@ -89,6 +103,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
         BACK_BUTTON_CONSUMED -> {
           // Fragment consumed the back button, so do nothing.
         }
+
         BACK_BUTTON_NOT_CONSUMED -> {
           this.finish()
         }
