@@ -80,13 +80,11 @@ object Reports {
   fun sendReportsDefault(
     context: Context,
     address: String,
-    subject: String,
     body: String
   ): Result {
     return this.sendReport(
       context = context,
       address = address,
-      subject = subject,
       body = body
     )
   }
@@ -99,7 +97,6 @@ object Reports {
   fun sendReport(
     context: Context,
     address: String,
-    subject: String,
     body: String
   ): Result {
     this.logger.debug("preparing report")
@@ -120,7 +117,7 @@ object Reports {
       val intent = Intent(Intent.ACTION_SEND).apply {
         this.type = "message/rfc822"
         this.putExtra(Intent.EXTRA_EMAIL, arrayOf(address))
-        this.putExtra(Intent.EXTRA_SUBJECT, this@Reports.extendSubject(context, subject))
+        this.putExtra(Intent.EXTRA_SUBJECT, "Issue Report from The Palace Project App")
         this.putExtra(Intent.EXTRA_TEXT, this@Reports.extendBody(body))
         this.putExtra(Intent.EXTRA_STREAM, zipContentURI)
         this.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -157,28 +154,6 @@ object Reports {
     bodyLines.add("Device Model: ${Build.MODEL} (${Build.DEVICE})")
     bodyLines.add("Device FP: ${Build.FINGERPRINT}")
     return bodyLines.joinToString("\n")
-  }
-
-  private fun extendSubject(
-    context: Context,
-    subject: String
-  ): String {
-    val pkgManager = context.packageManager
-    val pkgInfo = try {
-      pkgManager.getPackageInfo(context.packageName, 0)
-    } catch (e: PackageManager.NameNotFoundException) {
-      this.logger.debug("unable to retrieve package information: ", e)
-      return subject
-    }
-
-    return buildString {
-      this.append(subject)
-      this.append(' ')
-      this.append(pkgInfo.versionName)
-      this.append(" (")
-      this.append(pkgInfo.versionCode)
-      this.append(")")
-    }
   }
 
   private fun mapFileToContentURI(context: Context, file: File) =
