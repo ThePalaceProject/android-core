@@ -63,7 +63,6 @@ object SettingsDebugModel {
     Reports.sendReportsDefault(
       context = MainApplication.application,
       address = buildConfig.supportErrorReportEmailAddress,
-      subject = "[error-report]",
       body = ""
     )
   }

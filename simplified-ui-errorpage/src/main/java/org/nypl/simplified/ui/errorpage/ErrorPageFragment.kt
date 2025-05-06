@@ -104,7 +104,6 @@ class ErrorPageFragment : Fragment(R.layout.error_page) {
       Reports.sendReportsDefault(
         context = requireContext(),
         address = parameters.emailAddress,
-        subject = parameters.subject,
         body = parameters.report
       )
     }
