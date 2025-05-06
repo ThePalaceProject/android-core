@@ -521,6 +521,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
         }
 
       view.toolbar.configure(
+        resources = this.resources,
         accountID = account.id,
         title = title,
         search = null,
@@ -819,9 +820,19 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
         this.profiles.profileCurrent()
           .account(newState.request.accountID)
 
+      val canGoBack =
+        this.opdsClient.hasHistory
+      val title =
+        if (canGoBack) {
+          feed.feedTitle
+        } else {
+          resources.getString(R.string.catalog)
+        }
+
       view.toolbar.configure(
+        resources = this.resources,
         accountID = account.id,
-        title = feed.feedTitle,
+        title = title,
         search = feed.feedSearch,
         canGoBack = this.opdsClient.hasHistory,
         catalogPart = this.catalogPart
@@ -967,6 +978,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
 
       view.catalogFeedLibraryText.text = account.provider.displayName
       view.toolbar.configure(
+        resources = this.resources,
         accountID = account.id,
         title = feed.feedTitle,
         search = feed.feedSearch,

@@ -1,5 +1,6 @@
 package org.nypl.simplified.ui.catalog
 
+import android.content.res.Resources
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
@@ -35,6 +36,7 @@ class CatalogToolbar(
    */
 
   fun configure(
+    resources: Resources,
     accountID: AccountID,
     title: String,
     search: FeedSearch?,
@@ -48,6 +50,7 @@ class CatalogToolbar(
 
       if (search != null) {
         this.searchIcon.visibility = View.VISIBLE
+        this.searchTouch.contentDescription = resources.getString(R.string.catalogAccessibilitySearch)
         this.searchTouch.setOnClickListener {
           if (this.searchText.isVisible) {
             this.searchBoxClose()
@@ -76,6 +79,7 @@ class CatalogToolbar(
       if (canGoBack) {
         this.logo.setImageResource(org.thepalaceproject.theme.core.R.drawable.palace_arrow_back_24)
         this.logoTouch.setOnClickListener { this.onToolbarBackPressed.invoke() }
+        this.logoTouch.contentDescription = resources.getString(R.string.catalogAccessibilityGoBack)
         return
       }
 
@@ -90,6 +94,8 @@ class CatalogToolbar(
           this.logoTouch.isEnabled = true
           this.logoTouch.setOnClickListener { this.onToolbarLogoPressed.invoke() }
           this.logo.setImageResource(R.drawable.main_icon)
+          this.logoTouch.contentDescription =
+            resources.getString(R.string.catalogAccessibilityAccountSelection)
         }
         BOOKS, HOLDS -> {
           this.logoTouch.isEnabled = false
