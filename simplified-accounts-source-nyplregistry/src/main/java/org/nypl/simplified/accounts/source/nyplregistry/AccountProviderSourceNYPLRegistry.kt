@@ -25,6 +25,7 @@ import org.nypl.simplified.accounts.source.spi.AccountProviderSourceResolutionSt
 import org.nypl.simplified.accounts.source.spi.AccountProviderSourceType
 import org.nypl.simplified.accounts.source.spi.AccountProviderSourceType.SourceResult
 import org.nypl.simplified.files.FileUtilities
+import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.auth_document.api.AuthenticationDocumentParsersType
 import org.nypl.simplified.parser.api.ParseResult
 import org.nypl.simplified.taskrecorder.api.TaskResult
@@ -35,6 +36,7 @@ import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InputStream
 import java.net.URI
+import java.time.OffsetDateTime
 
 /**
  * A server-based account provider.
@@ -106,8 +108,10 @@ class AccountProviderSourceNYPLRegistry(
         this.fetchServerResults(includeTestingLibraries)
       val mergedResults =
         this.mergeResults(diskResults, serverResults)
+      val target =
+        this.decideRegistryURI(includeTestingLibraries)
 
-      this.cacheServerResults(files, mergedResults)
+      this.cacheServerResults(files, target, mergedResults)
       SourceResult.SourceSucceeded(mergedResults)
     } catch (e: Exception) {
       this.logger.debug("failed to fetch providers: ", e)
@@ -191,6 +195,7 @@ class AccountProviderSourceNYPLRegistry(
 
   private fun cacheServerResults(
     cacheFiles: CacheFiles,
+    target: URI,
     mergedResults: Map<URI, AccountProviderDescription>
   ) {
     try {
@@ -203,7 +208,7 @@ class AccountProviderSourceNYPLRegistry(
           val collection =
             AccountProviderDescriptionCollection(
               providers = mergedResults.values.toList(),
-              links = listOf(),
+              links = listOf(Link.LinkBasic(href = target, relation = "self")),
               metadata = meta
             )
           val serializer =
@@ -230,6 +235,8 @@ class AccountProviderSourceNYPLRegistry(
 
   private fun fetchDiskResults(cacheFiles: CacheFiles): Map<URI, AccountProviderDescription> {
     this.logger.debug("fetching disk cache: {}", cacheFiles.file)
+
+    val timeThen = OffsetDateTime.now()
 
     return try {
       cacheFiles.file.inputStream().use { stream ->
@@ -266,6 +273,11 @@ class AccountProviderSourceNYPLRegistry(
     } catch (e: Exception) {
       this.logger.debug("could not load cache file: ", e)
       emptyMap()
+    } finally {
+      val timeNow = OffsetDateTime.now()
+      this.logger.debug(
+        "processed cached providers in {}", java.time.Duration.between(timeThen, timeNow)
+      )
     }
   }
 
