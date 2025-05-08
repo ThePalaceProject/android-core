@@ -150,7 +150,6 @@ object Reports {
     bodyLines.add("Device Manufacturer: ${Build.MANUFACTURER}")
     bodyLines.add("Device Brand: ${Build.BRAND}")
     bodyLines.add("Device Model: ${Build.MODEL} (${Build.DEVICE})")
-    bodyLines.add("Device FP: ${Build.FINGERPRINT}")
     return bodyLines.joinToString("\n")
   }
 
