@@ -343,9 +343,7 @@ class CatalogFeedViewDetails(
     this.configureMetadataTable(newEntry)
 
     val targetHeight =
-      this.root.resources.getDimensionPixelSize(
-        org.librarysimplified.books.covers.R.dimen.cover_detail_height
-      )
+      this.root.resources.getDimensionPixelSize(R.dimen.catalogBookDetailCoverHeight)
 
     this.covers.loadCoverInto(
       entry = newEntry,

@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bookD2Root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/bookD2AppBar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/catalogBookDetailToolbarExpandedHeight"
+        android:background="#00000000"
+        app:elevation="0dp">
+
+        <View
+            android:id="@+id/bookD2CustomToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#00000000"
+            android:fitsSystemWindows="true"
+            android:minHeight="@dimen/catalogBookDetailToolbarCollapsedHeight"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            tools:background="#ff0000" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- The main scrollview that contains all of the page content below the toolbar. -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/bookD2ScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#ffffffff"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <View
+                android:id="@+id/bookD2Spacer"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/catalogBookDetailSpacerHeight" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginEnd="32dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/catalogDescription"
+                android:textAllCaps="true"
+                android:textAppearance="@android:style/TextAppearance.Material.Body1"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginEnd="32dp"
+                android:layout_marginBottom="8dp"
+                android:background="?android:attr/listDivider" />
+
+            <TextView
+                android:id="@+id/bookD2Text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="32dp"
+                android:layout_marginEnd="32dp"
+                android:textAppearance="@android:style/TextAppearance.Material.Body1"
+                tools:text="@string/catalogPlaceholder" />
+
+            <TextView
+                android:id="@+id/bookD2seeMoreText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginEnd="32dp"
+                android:layout_marginBottom="16dp"
+                android:padding="8dp"
+                android:text="@string/catalogMore"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginEnd="32dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/catalogInformation"
+                android:textAllCaps="true"
+                android:textAppearance="@android:style/TextAppearance.Material.Body1"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginEnd="32dp"
+                android:layout_marginBottom="8dp"
+                android:background="?android:attr/listDivider" />
+
+            <TableLayout
+                android:id="@+id/bookD2InformationTable"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginEnd="32dp">
+
+            </TableLayout>
+
+            <FrameLayout
+                android:id="@+id/bookD2RelatedBooksContainer"
+                android:layout_width="match_parent"
+                android:layout_height="192dp">
+
+                <include
+                    layout="@layout/feed_loading"
+                    tools:visibility="visible" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/bookD2RelatedBooksList"
+                    android:layout_width="match_parent"
+                    android:layout_height="192dp"
+                    android:layout_marginBottom="16dp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?android:attr/listDivider"
+                    android:visibility="gone" />
+
+            </FrameLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- A blurred background image that can be seen through the transparent toolbar. -->
+    <ImageView
+        android:id="@+id/bookD2ImageUnderlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="false"
+        android:contentDescription="@string/catalogAccessibilityBackgroundImage"
+        android:elevation="-10dp"
+        android:focusable="false" />
+
+    <!-- The items that appear in the toolbar when the toolbar is "collapsed" -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/bookD2ToolbarItemsWhenCollapsed"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/catalogBookDetailToolbarCollapsedHeight"
+        android:elevation="10dp">
+
+        <TextView
+            android:id="@+id/bookD2ToolbarItemTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="@android:style/TextAppearance.Material.Medium"
+            android:textColor="?android:attr/colorBackground"
+            app:layout_constraintEnd_toStartOf="@id/bookD2ToolbarItemBorrow"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/bookD2ToolbarItemBorrow"
+            tools:text="@string/catalogPlaceholder" />
+
+        <TextView
+            android:id="@+id/bookD2ToolbarItemSubtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="@android:style/TextAppearance.Material.Small"
+            android:textColor="?android:attr/colorBackground"
+            app:layout_constraintEnd_toStartOf="@id/bookD2ToolbarItemBorrow"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/bookD2ToolbarItemTitle"
+            tools:text="@string/catalogPlaceholder" />
+
+        <Button
+            android:id="@+id/bookD2ToolbarItemBorrow"
+            android:layout_width="128dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/catalogGet"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- The items that appear in the toolbar when the toolbar is "expanded". -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/bookD2ToolbarOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/catalogBookDetailToolbarItemsHeight"
+        android:elevation="10dp">
+
+        <FrameLayout
+            android:id="@+id/toolbarBackButton"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:clickable="true"
+            android:contentDescription="@string/catalogAccessibilityGoBack"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <!-- The tint of this view is adjusted programmatically. -->
+            <ImageView
+                android:id="@+id/toolbarBackButtonImage"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:clickable="false"
+                android:contentDescription="@string/catalogAccessibilityGoBack"
+                android:focusable="false"
+                android:src="@drawable/arrow_left"
+                android:tintMode="multiply"
+                app:tint="#ffffffff" />
+
+        </FrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- The "overlay" containing the book cover and buttons that's visible when the toolbar
+         is fully expanded. -->
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/book2DImageOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:elevation="10dp">
+
+        <ImageView
+            android:id="@+id/book2DOverlayCover"
+            android:layout_width="@dimen/catalogBookDetailCoverWidth"
+            android:layout_height="@dimen/catalogBookDetailCoverHeight"
+            android:background="@drawable/shadow_rect"
+            android:contentDescription="@string/catalogBookCoverDescription"
+            android:elevation="10dp"
+            android:scaleType="fitXY"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/cover" />
+
+        <TextView
+            android:id="@+id/book2DOverlayTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:textAppearance="@android:style/TextAppearance.Material.Title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/book2DOverlayCover"
+            tools:text="@string/catalogPlaceholder" />
+
+        <TextView
+            android:id="@+id/book2DOverlaySubtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:textAppearance="@android:style/TextAppearance.Material.Small"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/book2DOverlayTitle"
+            tools:text="@string/catalogPlaceholder" />
+
+        <LinearLayout
+            android:id="@+id/book2DOverlayButtons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/book2DOverlaySubtitle">
+
+            <Button
+                android:id="@+id/book2DOverlayButtonGet"
+                android:layout_width="128dp"
+                android:layout_height="wrap_content"
+                android:text="@string/catalogGet" />
+
+            <Button
+                android:id="@+id/book2DOverlayButtonPreview"
+                android:layout_width="128dp"
+                android:layout_height="wrap_content"
+                android:text="@string/catalogPreview" />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

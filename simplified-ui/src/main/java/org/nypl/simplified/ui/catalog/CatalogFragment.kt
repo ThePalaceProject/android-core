@@ -226,7 +226,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
 
     if (newEntry is FeedEntry.FeedEntryOPDS) {
       val view = this.viewNow
-      if (view is CatalogFeedViewDetails) {
+      if (view is CatalogFeedViewDetails2) {
         view.bind(newEntry)
         this.onLoadRelatedFeed(view, newEntry)
       }
@@ -234,7 +234,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
   }
 
   private fun onLoadRelatedFeed(
-    view: CatalogFeedViewDetails,
+    view: CatalogFeedViewDetails2,
     newEntry: FeedEntry.FeedEntryOPDS
   ) {
     val relatedOpt = newEntry.feedEntry.related
@@ -326,30 +326,13 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     newState: LoadedFeedEntry
   ) {
     val view =
-      CatalogFeedViewDetails.create(
-        buttonCreator = this.buttonCreator,
+      CatalogFeedViewDetails2.create(
         container = this.contentContainer,
-        covers = this.covers,
         layoutInflater = this.layoutInflater,
-        onShowErrorDetails = this::onShowErrorDetails,
-        onBookDismissError = this::onBookDismissError,
-        onBookSAMLDownloadRequested = this::onBookSAMLDownloadRequested,
-        onBookBorrowCancelRequested = this::onBookBorrowCancelRequested,
-        onBookBorrowRequested = this::onBookBorrowRequested,
-        onBookCanBeDeleted = this::onBookCanBeDeleted,
-        onBookCanBeRevoked = this::onBookCanBeRevoked,
-        onBookDeleteRequested = this::onBookDeleteRequested,
-        onBookPreviewOpenRequested = this::onBookPreviewOpenRequested,
-        onBookReserveRequested = this::onBookReserveRequested,
-        onBookResetStatusInitial = this::onBookResetStatusInitial,
-        onBookRevokeRequested = this::onBookRevokeRequested,
+        covers = this.covers,
         onBookSelected = this::onBookSelected,
-        onBookViewerOpen = this::onBookViewerOpen,
         onFeedSelected = this::onFeedSelected,
-        onToolbarBackPressed = this::onToolbarBackPressed,
-        onToolbarLogoPressed = { this.onToolbarLogoPressed(newState.request.entry.accountID) },
-        screenSize = this.screenSize,
-        window = this.requireActivity().window,
+        onToolbarBackPressed = this::onToolbarBackPressed
       )
 
     when (val entry = this.opdsClient.entry.get()) {
@@ -507,7 +490,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
 
   private fun onStateChangeToDetailsConfigureToolbar(
     newState: LoadedFeedEntry,
-    view: CatalogFeedViewDetails
+    view: CatalogFeedViewDetails2
   ) {
     try {
       val account =
@@ -519,15 +502,6 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
           is FeedEntry.FeedEntryCorrupt -> ""
           is FeedEntry.FeedEntryOPDS -> e.feedEntry.title
         }
-
-      view.toolbar.configure(
-        resources = this.resources,
-        accountID = account.id,
-        title = title,
-        search = null,
-        canGoBack = this.opdsClient.hasHistory,
-        catalogPart = this.catalogPart
-      )
     } catch (e: Throwable) {
       // Nothing sensible we can do about this.
     }

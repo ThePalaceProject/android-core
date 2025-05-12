@@ -2,8 +2,7 @@
 
 <resources>
   <string name="catalogAccessibilityAccountSelection">Account Selection Button</string>
-  <string name="catalogAccessibilitySearch">Search Button</string>
-  <string name="catalogAccessibilityGoBack">Go Back Button</string>
+  <string name="catalogAccessibilityBackgroundImage">A background image.</string>
   <string name="catalogAccessibilityBookBorrow">Get Button</string>
   <string name="catalogAccessibilityBookDelete">Delete Button</string>
   <string name="catalogAccessibilityBookDownload">Download Button</string>
@@ -23,6 +22,8 @@
   <string name="catalogAccessibilityCoverEpub">%1$s, ebook, by %2$s</string>
   <string name="catalogAccessibilityCoverPdf">%1$s, pdf, by %2$s</string>
   <string name="catalogAccessibilityCoverUnknownFormat">%1$s, by %2$s</string>
+  <string name="catalogAccessibilityGoBack">Go Back Button</string>
+  <string name="catalogAccessibilitySearch">Search Button</string>
   <string name="catalogAccounts">Choose another library catalog…</string>
   <string name="catalogBookAvailabilityHeldIndefinite">You have this book on hold.</string>
   <string name="catalogBookAvailabilityHeldQueue">You are at position %1$d in the queue for this book.</string>
@@ -38,6 +39,7 @@
   <string name="catalogBookCoverDescription">Book cover image</string>
 
   <string name="catalog">Catalog</string>
+  <string name="catalogPreview">Preview</string>
   <string name="catalogBookFormatAudioBook">Audiobook</string>
   <string name="catalogBookFormatEPUB">eBook</string>
   <string name="catalogBookFormatPDF">PDF</string>
