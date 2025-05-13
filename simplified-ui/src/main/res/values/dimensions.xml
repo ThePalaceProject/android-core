@@ -8,6 +8,9 @@
   <dimen name="catalogBookDetailCoverHeight">240dp</dimen>
   <dimen name="catalogBookDetailCoverWidth">160dp</dimen>
 
+  <dimen name="catalogBookDetailScrollMarginTopMax">192dp</dimen>
+  <dimen name="catalogBookDetailScrollMarginTopMin">32dp</dimen>
+
   <dimen name="catalogBookDetailButtonsHeight">64dp</dimen>
   <dimen name="catalogBookDetailCoverMaximumWidth">128dp</dimen>
   <dimen name="catalogBookDetailStatusHeight">64dp</dimen>

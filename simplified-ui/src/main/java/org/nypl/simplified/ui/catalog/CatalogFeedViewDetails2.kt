@@ -8,8 +8,10 @@ import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TableLayout
 import android.widget.TextView
@@ -90,6 +92,10 @@ class CatalogFeedViewDetails2(
 
   private val scrollView =
     this.root.findViewById<NestedScrollView>(R.id.bookD2ScrollView)
+  private val scrollLinear =
+    this.scrollView.findViewById<LinearLayout>(R.id.bookD2ScrollLinear)
+  private val spacer =
+    this.scrollLinear.findViewById<View>(R.id.bookD2Spacer)
   private val descriptionText =
     this.scrollView.findViewById<TextView>(R.id.bookD2Text)
   private val seeMore =
@@ -136,10 +142,21 @@ class CatalogFeedViewDetails2(
   private val bookButtons =
     this.imageOverlay.findViewById<ViewGroup>(R.id.book2DOverlayButtons)
 
+  private var spacerSize: Int
+  private val spacerSizeMax: Int
+  private val spacerSizeMin: Int
+
   init {
     this.scrollView.isSaveEnabled = false
     this.cover.bringToFront()
     this.backButton.setOnClickListener { this.onToolbarBackPressed() }
+
+    this.spacerSize =
+      this.spacer.height
+    this.spacerSizeMax =
+      this.root.resources.getDimensionPixelSize(R.dimen.catalogBookDetailScrollMarginTopMax)
+    this.spacerSizeMin =
+      this.root.resources.getDimensionPixelSize(R.dimen.catalogBookDetailScrollMarginTopMin)
 
     this.imageOverlay.y = this.adjustImageY(this.appBar, this.cover)
     this.appBar.addOnOffsetChangedListener { _, verticalOffset ->
@@ -179,6 +196,17 @@ class CatalogFeedViewDetails2(
       this.cover.scaleX = offsetInv.toFloat()
       this.cover.scaleY = offsetInv.toFloat()
       this.cover.alpha = offsetInv.toFloat()
+
+      /*
+       * Expand and contract the spacer in the scroll view. This is used
+       * to move the contents of the scroll view up and down in order to follow the cover as
+       * it expands and contracts.
+       */
+
+      val newSpacerSize = this.interpolate(this.spacerSizeMin, this.spacerSizeMax, offset)
+      if (newSpacerSize != this.spacerSize) {
+        this.spacer.layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, newSpacerSize)
+      }
     }
 
     /*
@@ -188,6 +216,14 @@ class CatalogFeedViewDetails2(
      */
 
     this.root.post(root::requestLayout)
+  }
+
+  private fun interpolate(
+    minimum: Int,
+    maximum: Int,
+    position: Double
+  ): Int {
+    return ((maximum.toDouble() * (1.0 - position)) + (minimum.toDouble() * position)).toInt()
   }
 
   private fun adjustImageY(
@@ -347,7 +383,7 @@ class CatalogFeedViewDetails2(
       val durationValue = (duration as Some<Double>).get()
       val (row, rowKey, rowVal) = this.bookInfoViewOf()
       rowKey.text = this.root.resources.getString(R.string.catalogMetaDuration)
-      rowVal.text = formatDuration(durationValue)
+      rowVal.text = this.formatDuration(durationValue)
       this.metadata.addView(row)
     }
   }
@@ -416,8 +452,12 @@ class CatalogFeedViewDetails2(
       this.cover.drawable
     val rawBitmap =
       rawDrawable.toBitmap()
+
+    val bgWidth = 8
+    val bgHeight = 8
+
     val scaledBitmap =
-      Bitmap.createScaledBitmap(rawBitmap, 2, 2, true)
+      Bitmap.createScaledBitmap(rawBitmap, bgWidth, bgHeight, true)
 
     /*
      * Calculate the average color in the top row of the bitmap. We'll use the result to determine
@@ -428,16 +468,16 @@ class CatalogFeedViewDetails2(
     var g = 0
     var b = 0
 
-    for (x in 0 until 2) {
+    for (x in 0 until bgWidth) {
       val c = scaledBitmap.get(x, 0)
       r += Color.red(c)
       g += Color.green(c)
       b += Color.blue(c)
     }
 
-    r /= 2
-    g /= 2
-    b /= 2
+    r /= bgWidth
+    g /= bgWidth
+    b /= bgWidth
 
     val color =
       Color.argb(255, r, g, b)

@@ -35,14 +35,16 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
+            android:id="@+id/bookD2ScrollLinear"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
+            <!-- This view is resized programmatically. -->
             <View
                 android:id="@+id/bookD2Spacer"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/catalogBookDetailSpacerHeight" />
+                android:layout_height="@dimen/catalogBookDetailScrollMarginTopMax"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -264,7 +266,7 @@
             android:layout_marginTop="16dp"
             android:ellipsize="end"
             android:gravity="center"
-            android:maxLines="1"
+            android:maxLines="2"
             android:textAppearance="@android:style/TextAppearance.Material.Title"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -299,12 +301,18 @@
                 android:id="@+id/book2DOverlayButtonGet"
                 android:layout_width="128dp"
                 android:layout_height="wrap_content"
+                style="@style/Palace.Button.Contained.Medium"
                 android:text="@string/catalogGet" />
+
+            <View
+                android:layout_width="8dp"
+                android:layout_height="8dp"/>
 
             <Button
                 android:id="@+id/book2DOverlayButtonPreview"
                 android:layout_width="128dp"
                 android:layout_height="wrap_content"
+                style="@style/Palace.Button.Outlined.Medium"
                 android:text="@string/catalogPreview" />
         </LinearLayout>
 
