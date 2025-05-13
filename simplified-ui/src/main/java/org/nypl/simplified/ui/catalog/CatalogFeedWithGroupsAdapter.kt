@@ -10,6 +10,8 @@ import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedGroup
+import org.nypl.simplified.ui.catalog.CatalogFeedWithGroupsLaneViewHolder.LaneStyle
+import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import java.net.URI
 
 /**
@@ -18,6 +20,8 @@ import java.net.URI
 
 class CatalogFeedWithGroupsAdapter(
   private val covers: BookCoverProviderType,
+  private val laneStyle: LaneStyle,
+  private val screenSize: ScreenSizeInformationType,
   private val onFeedSelected: (accountID: AccountID, title: String, uri: URI) -> Unit,
   private val onBookSelected: (FeedEntry.FeedEntryOPDS) -> Unit
 ) : ListAdapter<FeedGroup, CatalogFeedWithGroupsLaneViewHolder>(diffCallback) {
@@ -60,7 +64,9 @@ class CatalogFeedWithGroupsAdapter(
 
     return CatalogFeedWithGroupsLaneViewHolder(
       parent = item,
+      laneStyle = this.laneStyle,
       coverLoader = this.covers,
+      screenSize = this.screenSize,
       onFeedSelected = this.onFeedSelected,
       onBookSelected = this.onBookSelected
     )

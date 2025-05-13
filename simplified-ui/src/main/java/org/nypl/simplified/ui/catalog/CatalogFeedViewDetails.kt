@@ -152,6 +152,8 @@ class CatalogFeedViewDetails(
   private val relatedAdapter =
     CatalogFeedWithGroupsAdapter(
       covers = this.covers,
+      screenSize = this.screenSize,
+      laneStyle = CatalogFeedWithGroupsLaneViewHolder.LaneStyle.RELATED_BOOKS_LANE,
       onFeedSelected = this.onFeedSelected,
       onBookSelected = this.onBookSelected
     )

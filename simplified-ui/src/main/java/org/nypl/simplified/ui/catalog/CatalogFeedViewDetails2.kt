@@ -20,8 +20,12 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.get
 import androidx.core.math.MathUtils.clamp
 import androidx.core.widget.NestedScrollView
+import androidx.fragment.app.FragmentManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.common.util.concurrent.MoreExecutors
 import com.io7m.jfunctional.Some
 import org.joda.time.DateTime
@@ -40,12 +44,15 @@ import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoad
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedGeneral
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderSuccess
 import org.nypl.simplified.threads.UIThread
+import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.slf4j.LoggerFactory
 import java.net.URI
 
 class CatalogFeedViewDetails2(
   override val root: ViewGroup,
+  private val screenSize: ScreenSizeInformationType,
   private val layoutInflater: LayoutInflater,
+  private val childFragmentManager: FragmentManager,
   private val covers: BookCoverProviderType,
   private val onToolbarBackPressed: () -> Unit,
   private val onBookSelected: (FeedEntry.FeedEntryOPDS) -> Unit,
@@ -108,17 +115,21 @@ class CatalogFeedViewDetails2(
     this.relatedLayout.findViewById<RecyclerView>(R.id.bookD2RelatedBooksList)
   private val relatedLoading =
     this.relatedLayout.findViewById<ProgressBar>(R.id.feedLoadProgress)
+  private val relatedTitle =
+    this.scrollView.findViewById<TextView>(R.id.bookD2RelatedBooksTitle)
+  private val relatedDivider =
+    this.scrollView.findViewById<View>(R.id.bookD2RelatedBooksDivider)
   private val relatedAdapter =
     CatalogFeedWithGroupsAdapter(
       covers = this.covers,
+      screenSize = this.screenSize,
+      laneStyle = CatalogFeedWithGroupsLaneViewHolder.LaneStyle.RELATED_BOOKS_LANE,
       onFeedSelected = this.onFeedSelected,
       onBookSelected = this.onBookSelected
     )
 
   private val toolbarItemsWhenCollapsed =
     this.root.findViewById<ViewGroup>(R.id.bookD2ToolbarItemsWhenCollapsed)
-  private val toolbarBorrowButton =
-    this.toolbarItemsWhenCollapsed.findViewById<Button>(R.id.bookD2ToolbarItemBorrow)
   private val toolbarTitle =
     this.toolbarItemsWhenCollapsed.findViewById<TextView>(R.id.bookD2ToolbarItemTitle)
   private val toolbarSubtitle =
@@ -142,6 +153,13 @@ class CatalogFeedViewDetails2(
   private val bookButtons =
     this.imageOverlay.findViewById<ViewGroup>(R.id.book2DOverlayButtons)
 
+  private val bookButtonGet =
+    this.imageOverlay.findViewById<Button>(R.id.book2DOverlayButtonGet)
+  private val bookButtonPreview =
+    this.imageOverlay.findViewById<Button>(R.id.book2DOverlayButtonPreview)
+  private val bookToolbarButtonGet =
+    this.toolbarItemsWhenCollapsed.findViewById<Button>(R.id.bookD2ToolbarItemBorrow)
+
   private var spacerSize: Int
   private val spacerSizeMax: Int
   private val spacerSizeMin: Int
@@ -150,6 +168,15 @@ class CatalogFeedViewDetails2(
     this.scrollView.isSaveEnabled = false
     this.cover.bringToFront()
     this.backButton.setOnClickListener { this.onToolbarBackPressed() }
+
+    this.relatedListView.layoutManager = LinearLayoutManager(this.root.context)
+    this.relatedListView.setHasFixedSize(true)
+    (this.relatedListView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+    this.relatedListView.setItemViewCacheSize(8)
+    this.relatedListView.addItemDecoration(
+      CatalogFeedWithGroupsDecorator(this.screenSize.dpToPixels(16).toInt())
+    )
+    this.relatedListView.adapter = this.relatedAdapter
 
     this.spacerSize =
       this.spacer.height
@@ -176,8 +203,10 @@ class CatalogFeedViewDetails2(
       val offsetInvExpExp =
         (Math.pow(offsetInv, 8.0)).toFloat()
 
-      this.toolbarBorrowButton.isEnabled = offsetExp >= 1.0
+      this.bookToolbarButtonGet.isEnabled = offsetExp >= 1.0
       this.toolbarItemsWhenCollapsed.alpha = offsetExp
+      this.bookButtonGet.isEnabled = offsetInv >= 1.0
+      this.bookButtonPreview.isEnabled = offsetInv >= 1.0
 
       this.backButton.isEnabled = offsetExp < 0.01
       this.backButton.alpha =
@@ -216,6 +245,18 @@ class CatalogFeedViewDetails2(
      */
 
     this.root.post(root::requestLayout)
+
+    this.bookButtonGet.setOnClickListener {
+      this.onBookButtonGetClicked()
+    }
+    this.bookToolbarButtonGet.setOnClickListener {
+      this.onBookButtonGetClicked()
+    }
+  }
+
+  private fun onBookButtonGetClicked() {
+    val popup = GetPopup()
+    popup.show(this.childFragmentManager, "BORROW_GET")
   }
 
   private fun interpolate(
@@ -389,7 +430,10 @@ class CatalogFeedViewDetails2(
   }
 
   fun setNoRelatedFeed() {
+    this.logger.debug("Received no related feed.")
     this.relatedLayout.visibility = View.GONE
+    this.relatedTitle.visibility = View.GONE
+    this.relatedDivider.visibility = View.GONE
   }
 
   fun bindRelatedFeedResult(
@@ -397,24 +441,31 @@ class CatalogFeedViewDetails2(
   ) {
     when (feedResult) {
       is FeedLoaderFailedAuthentication -> {
-        this.relatedLayout.visibility = View.GONE
+        this.setNoRelatedFeed()
       }
 
       is FeedLoaderFailedGeneral -> {
-        this.relatedLayout.visibility = View.GONE
+        this.setNoRelatedFeed()
       }
 
       is FeedLoaderSuccess -> {
         when (val feed = feedResult.feed) {
           is FeedWithGroups -> {
+            this.logger.debug("Received a grouped related feed.")
             this.relatedAdapter.submitList(feed.feedGroupsInOrder)
+
+            val laneCount = feed.feedGroupsInOrder.size
+            val laneSize = this.screenSize.dpToPixels(128)
+            val totalSize = (laneCount * laneSize).toInt()
+
+            this.relatedListView.minimumHeight = totalSize
             this.relatedLayout.visibility = View.VISIBLE
             this.relatedLoading.visibility = View.INVISIBLE
             this.relatedListView.visibility = View.VISIBLE
           }
 
           is FeedWithoutGroups -> {
-            this.relatedLayout.visibility = View.GONE
+            this.setNoRelatedFeed()
           }
         }
       }
@@ -503,6 +554,8 @@ class CatalogFeedViewDetails2(
   companion object {
     fun create(
       layoutInflater: LayoutInflater,
+      childFragmentManager: FragmentManager,
+      screenSize: ScreenSizeInformationType,
       container: ViewGroup,
       covers: BookCoverProviderType,
       onToolbarBackPressed: () -> Unit,
@@ -511,6 +564,8 @@ class CatalogFeedViewDetails2(
     ): CatalogFeedViewDetails2 {
       return CatalogFeedViewDetails2(
         root = layoutInflater.inflate(R.layout.book_detail2, container, true) as ViewGroup,
+        childFragmentManager = childFragmentManager,
+        screenSize = screenSize,
         layoutInflater = layoutInflater,
         covers = covers,
         onToolbarBackPressed = onToolbarBackPressed,
@@ -527,6 +582,76 @@ class CatalogFeedViewDetails2(
   fun onStatusUpdate(
     catalogBookStatus: CatalogBookStatus<BookStatus>
   ) {
-    // XXX: TODO
+    return when (catalogBookStatus.status) {
+      is BookStatus.DownloadExternalAuthenticationInProgress -> {
+        // XXX: TODO
+      }
+
+      is BookStatus.DownloadWaitingForExternalAuthentication -> {
+        // XXX: TODO
+      }
+
+      is BookStatus.Downloading -> {
+        // XXX: TODO
+      }
+
+      is BookStatus.FailedDownload -> {
+        // XXX: TODO
+      }
+
+      is BookStatus.FailedLoan -> {
+        // XXX: TODO
+      }
+
+      is BookStatus.FailedRevoke -> {
+        // XXX: TODO
+      }
+
+      is BookStatus.Held.HeldInQueue -> {
+        // XXX: TODO
+      }
+
+      is BookStatus.Held.HeldReady -> {
+        // XXX: TODO
+      }
+
+      is BookStatus.Holdable -> {
+        // XXX: TODO
+      }
+
+      is BookStatus.Loanable -> {
+        // XXX: TODO
+      }
+
+      is BookStatus.Loaned.LoanedDownloaded -> {
+        // XXX: TODO
+      }
+
+      is BookStatus.Loaned.LoanedNotDownloaded -> {
+        // XXX: TODO
+      }
+
+      is BookStatus.ReachedLoanLimit -> {
+        // XXX: TODO
+      }
+
+      is BookStatus.RequestingDownload -> {
+        // XXX: TODO
+      }
+
+      is BookStatus.RequestingLoan -> {
+        // XXX: TODO
+      }
+
+      is BookStatus.RequestingRevoke -> {
+        // XXX: TODO
+      }
+
+      is BookStatus.Revoked -> {
+        // XXX: TODO
+      }
+    }
   }
+
+  class GetPopup : BottomSheetDialogFragment()
 }

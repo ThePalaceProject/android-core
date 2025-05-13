@@ -52,6 +52,7 @@ import org.nypl.simplified.taskrecorder.api.TaskStepResolution
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.accounts.AccountDetailModel
 import org.nypl.simplified.ui.accounts.AccountPickerDialogFragment
+import org.nypl.simplified.ui.catalog.CatalogFeedWithGroupsLaneViewHolder.LaneStyle
 import org.nypl.simplified.ui.catalog.CatalogPart.BOOKS
 import org.nypl.simplified.ui.catalog.CatalogPart.CATALOG
 import org.nypl.simplified.ui.catalog.CatalogPart.HOLDS
@@ -328,7 +329,9 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     val view =
       CatalogFeedViewDetails2.create(
         container = this.contentContainer,
+        childFragmentManager = this.childFragmentManager,
         layoutInflater = this.layoutInflater,
+        screenSize = this.screenSize,
         covers = this.covers,
         onBookSelected = this::onBookSelected,
         onFeedSelected = this::onFeedSelected,
@@ -778,6 +781,8 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     val entriesGroupedAdapter =
       CatalogFeedWithGroupsAdapter(
         covers = this.covers,
+        screenSize = this.screenSize,
+        laneStyle = LaneStyle.MAIN_GROUPED_FEED_LANE,
         onFeedSelected = this::onFeedSelected,
         onBookSelected = this::onBookSelected,
       )

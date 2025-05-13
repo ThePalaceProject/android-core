@@ -114,10 +114,32 @@
 
             </TableLayout>
 
+            <TextView
+                android:id="@+id/bookD2RelatedBooksTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginEnd="32dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/catalogRelatedBooks"
+                android:textAllCaps="true"
+                android:textAppearance="@android:style/TextAppearance.Material.Body1"
+                android:textStyle="bold" />
+
+            <View
+                android:id="@+id/bookD2RelatedBooksDivider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginEnd="32dp"
+                android:layout_marginBottom="8dp"
+                android:background="?android:attr/listDivider" />
+
             <FrameLayout
                 android:id="@+id/bookD2RelatedBooksContainer"
                 android:layout_width="match_parent"
-                android:layout_height="192dp">
+                android:layout_height="wrap_content">
 
                 <include
                     layout="@layout/feed_loading"
@@ -126,14 +148,8 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/bookD2RelatedBooksList"
                     android:layout_width="match_parent"
-                    android:layout_height="192dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="?android:attr/listDivider"
-                    android:visibility="gone" />
 
             </FrameLayout>
 
@@ -161,8 +177,8 @@
             android:id="@+id/bookD2ToolbarItemTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
             android:ellipsize="end"
             android:maxLines="1"
             android:textAppearance="@android:style/TextAppearance.Material.Medium"
@@ -176,8 +192,8 @@
             android:id="@+id/bookD2ToolbarItemSubtitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
             android:ellipsize="end"
             android:maxLines="1"
             android:textAppearance="@android:style/TextAppearance.Material.Small"
@@ -191,7 +207,7 @@
             android:id="@+id/bookD2ToolbarItemBorrow"
             android:layout_width="128dp"
             android:layout_height="48dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="32dp"
             android:layout_marginBottom="16dp"
             android:text="@string/catalogGet"
             app:layout_constraintBottom_toBottomOf="parent"
