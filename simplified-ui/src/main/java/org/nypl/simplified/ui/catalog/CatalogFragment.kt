@@ -228,7 +228,11 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     if (newEntry is FeedEntry.FeedEntryOPDS) {
       val view = this.viewNow
       if (view is CatalogFeedViewDetails2) {
-        view.bind(newEntry)
+        val account =
+          this.profiles.profileCurrent()
+            .account(newEntry.accountID)
+
+        view.bind(account.provider, newEntry)
         this.onLoadRelatedFeed(view, newEntry)
       }
     }
@@ -344,7 +348,14 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
       }
 
       is FeedEntry.FeedEntryOPDS -> {
-        view.bind(entry)
+        val services =
+          Services.serviceDirectory()
+        val account =
+          services.requireService(ProfilesControllerType::class.java)
+            .profileCurrent()
+            .account(entry.accountID)
+
+        view.bind(account.provider, entry)
         this.onLoadRelatedFeed(view, entry)
 
         /*
@@ -352,8 +363,6 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
          * itself so that it can update the UI appropriately.
          */
 
-        val services =
-          Services.serviceDirectory()
         val catalogBookRegistry =
           services.requireService(CatalogBookRegistryEvents::class.java)
 
@@ -409,7 +418,16 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
             // Nothing sensible to do here.
           }
 
-          is FeedEntry.FeedEntryOPDS -> view.bind(item)
+          is FeedEntry.FeedEntryOPDS -> {
+            val services =
+              Services.serviceDirectory()
+            val account =
+              services.requireService(ProfilesControllerType::class.java)
+                .profileCurrent()
+                .account(item.accountID)
+
+            view.bind(account.provider, item)
+          }
         }
       }
     )
