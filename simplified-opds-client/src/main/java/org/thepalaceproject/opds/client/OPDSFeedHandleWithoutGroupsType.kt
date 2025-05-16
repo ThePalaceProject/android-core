@@ -17,4 +17,8 @@ interface OPDSFeedHandleWithoutGroupsType : OPDSFeedHandleType {
   fun page(index: Int): CompletableFuture<Page>
 
   fun feed(): Feed.FeedWithoutGroups
+
+  fun scrollPositionSave(position: Int)
+
+  fun scrollPositionGet(): Int
 }

@@ -1,6 +1,7 @@
 package org.nypl.simplified.ui.catalog
 
 import io.reactivex.Observable
+import org.nypl.simplified.books.book_registry.BookRegistryReadableType
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatusEvent
 import org.nypl.simplified.ui.events.UISubjectRelay
@@ -11,13 +12,17 @@ import org.nypl.simplified.ui.events.UISubjectRelay
  */
 
 class CatalogBookRegistryEvents private constructor(
+  val registry: BookRegistryReadableType,
   private val relay: UISubjectRelay<BookStatusEvent>
 ) {
   companion object {
     fun create(
       bookRegistry: BookRegistryType
     ): CatalogBookRegistryEvents {
-      return CatalogBookRegistryEvents(UISubjectRelay.create(bookRegistry.bookEvents()))
+      return CatalogBookRegistryEvents(
+        bookRegistry,
+        UISubjectRelay.create(bookRegistry.bookEvents())
+      )
     }
   }
 

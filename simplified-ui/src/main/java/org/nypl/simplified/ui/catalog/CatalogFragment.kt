@@ -9,6 +9,8 @@ import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.io7m.jfunctional.Some
 import com.io7m.jmulticlose.core.CloseableCollection
 import kotlinx.coroutines.CoroutineScope
@@ -24,10 +26,8 @@ import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
-import org.nypl.simplified.books.book_registry.BookPreviewStatus
 import org.nypl.simplified.books.book_registry.BookRegistryReadableType
 import org.nypl.simplified.books.book_registry.BookStatus
-import org.nypl.simplified.books.book_registry.BookWithStatus
 import org.nypl.simplified.books.controller.api.BooksControllerType
 import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
@@ -311,22 +311,6 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     this.perViewSubscriptions = CloseableCollection.create()
   }
 
-  private fun synthesizeBookWithStatus(
-    item: FeedEntry.FeedEntryOPDS
-  ): BookWithStatus {
-    val book = Book(
-      id = item.bookID,
-      account = item.accountID,
-      cover = null,
-      thumbnail = null,
-      entry = item.feedEntry,
-      formats = listOf()
-    )
-    val status = BookStatus.fromBook(book)
-    this.logger.debug("Synthesizing {} with status {}", book.id, status)
-    return BookWithStatus(book, status)
-  }
-
   private fun onStateChangedToDetails(
     newState: LoadedFeedEntry
   ) {
@@ -339,7 +323,20 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
         covers = this.covers,
         onBookSelected = this::onBookSelected,
         onFeedSelected = this::onFeedSelected,
-        onToolbarBackPressed = this::onToolbarBackPressed
+        onToolbarBackPressed = this::onToolbarBackPressed,
+        onBookViewerOpen = this::onBookViewerOpen,
+        onShowErrorDetails = this::onShowErrorDetails,
+        onBookDismissError = this::onBookDismissError,
+        onBookBorrowCancelRequested = this::onBookBorrowCancelRequested,
+        onBookSAMLDownloadRequested = this::onBookSAMLDownloadRequested,
+        onBookPreviewOpenRequested = this::onBookPreviewOpenRequested,
+        onBookBorrowRequested = this::onBookBorrowRequested,
+        onBookCanBeDeleted = this::onBookCanBeDeleted,
+        onBookCanBeRevoked = this::onBookCanBeRevoked,
+        onBookDeleteRequested = this::onBookDeleteRequested,
+        onBookReserveRequested = this::onBookReserveRequested,
+        onBookResetStatusInitial = this::onBookResetStatusInitial,
+        onBookRevokeRequested = this::onBookRevokeRequested
       )
 
     when (val entry = this.opdsClient.entry.get()) {
@@ -372,35 +369,14 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
             .filter { e -> e.statusNow != null }
             .subscribe { e ->
               UIThread.checkIsUIThread()
-
-              val bookWithStatus =
-                this.bookRegistry.bookOrNull(e.bookId)
-                  ?: this.synthesizeBookWithStatus(entry)
-
-              view.onStatusUpdate(
-                CatalogBookStatus(
-                  status = bookWithStatus.status,
-                  previewStatus = this.bookPreviewStatusOf(entry),
-                  book = bookWithStatus.book
-                )
-              )
+              view.onStatusUpdate(CatalogBookStatus.create(this.bookRegistry, entry))
             }
 
         this.perViewSubscriptions.add(
           AutoCloseable { statusSubscription.dispose() }
         )
 
-        val bookWithStatus =
-          this.bookRegistry.bookOrNull(entry.bookID)
-            ?: this.synthesizeBookWithStatus(entry)
-
-        view.onStatusUpdate(
-          CatalogBookStatus(
-            status = bookWithStatus.status,
-            previewStatus = this.bookPreviewStatusOf(entry),
-            book = bookWithStatus.book
-          )
-        )
+        view.onStatusUpdate(CatalogBookStatus.create(this.bookRegistry, entry))
       }
     }
 
@@ -762,16 +738,6 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     this.onBookBorrowRequested(parameters)
   }
 
-  private fun bookPreviewStatusOf(
-    entry: FeedEntry.FeedEntryOPDS
-  ): BookPreviewStatus {
-    return if (!entry.feedEntry.previewAcquisitions.isNullOrEmpty()) {
-      BookPreviewStatus.HasPreview()
-    } else {
-      BookPreviewStatus.None
-    }
-  }
-
   private fun onStateChangedToGroups(
     newState: LoadedFeedWithGroups
   ) {
@@ -901,6 +867,8 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
   ) {
     val feedHandle =
       newState.handle
+    val feedPosition =
+      feedHandle.scrollPositionGet()
     val feed =
       feedHandle.feed()
 
@@ -959,6 +927,22 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     this.perViewSubscriptions.add(AutoCloseable { job.cancel() })
 
     try {
+      /*
+       * Add a scroll listener that saves the scroll position.
+       */
+
+      view.listView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+          val linearLayoutManager =
+            recyclerView.layoutManager as LinearLayoutManager
+          val position =
+            linearLayoutManager.findFirstVisibleItemPosition()
+
+          // logger.trace("Saving scroll position {}", position)
+          feedHandle.scrollPositionSave(position)
+        }
+      })
+
       view.listView.adapter = feedAdapter
       view.configureFacets(
         screen = this.screenSize,
@@ -1015,8 +999,16 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
         HOLDS -> context.getString(R.string.feedWithGroupsEmptyHolds)
       }
     )
-
     this.switchView(view)
+
+    /*
+     * Set up a listener to restore the scroll position.
+     */
+
+    feedAdapter.addOnPagesUpdatedListener {
+      // this.logger.trace("Restoring scroll position {}", feedPosition)
+      view.listView.scrollToPosition(feedPosition)
+    }
   }
 
   private fun onCatalogLogoClicked(

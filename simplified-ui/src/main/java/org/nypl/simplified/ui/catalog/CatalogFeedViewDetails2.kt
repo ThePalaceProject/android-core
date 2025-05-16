@@ -15,6 +15,7 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TableLayout
 import android.widget.TextView
+import androidx.annotation.StringRes
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.get
@@ -25,7 +26,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
+import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
+import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_DRAGGING
+import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
+import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HALF_EXPANDED
+import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN
+import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_SETTLING
+import com.google.android.material.bottomsheet.BottomSheetBehavior.from
 import com.google.common.util.concurrent.MoreExecutors
 import com.io7m.jfunctional.Some
 import org.joda.time.DateTime
@@ -34,7 +42,10 @@ import org.joda.time.format.DateTimeFormatterBuilder
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountProviderType
+import org.nypl.simplified.books.api.Book
+import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.book_database.api.BookFormats
+import org.nypl.simplified.books.book_registry.BookPreviewStatus
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookStatus.DownloadExternalAuthenticationInProgress
 import org.nypl.simplified.books.book_registry.BookStatus.DownloadWaitingForExternalAuthentication
@@ -61,6 +72,7 @@ import org.nypl.simplified.feeds.api.FeedLoaderResult
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedAuthentication
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedGeneral
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderSuccess
+import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.slf4j.LoggerFactory
@@ -73,6 +85,15 @@ class CatalogFeedViewDetails2(
   private val childFragmentManager: FragmentManager,
   private val covers: BookCoverProviderType,
   private val onToolbarBackPressed: () -> Unit,
+  private val onShowErrorDetails: (TaskResult.Failure<*>) -> Unit,
+  private val onBookDismissError: (CatalogBookStatus<*>) -> Unit,
+  private val onBookSAMLDownloadRequested: (CatalogBookStatus<DownloadWaitingForExternalAuthentication>) -> Unit,
+  private val onBookBorrowRequested: (CatalogBorrowParameters) -> Unit,
+  private val onBookBorrowCancelRequested: (CatalogBookStatus<*>) -> Unit,
+  private val onBookCanBeRevoked: (CatalogBookStatus<*>) -> Boolean,
+  private val onBookPreviewOpenRequested: (CatalogBookStatus<*>) -> Unit,
+  private val onBookRevokeRequested: (CatalogBookStatus<*>) -> Unit,
+  private val onBookViewerOpen: (Book, BookFormat) -> Unit,
   private val onBookSelected: (FeedEntry.FeedEntryOPDS) -> Unit,
   private val onFeedSelected: (accountID: AccountID, title: String, uri: URI) -> Unit,
 ) : CatalogFeedView() {
@@ -183,10 +204,22 @@ class CatalogFeedViewDetails2(
     this.bottomSheet.findViewById<TextView>(R.id.book2DBottomSheetAuthors)
   private val bottomSheetLibrary =
     this.bottomSheet.findViewById<TextView>(R.id.book2DBottomSheetLibrary)
-  private val bottomSheetProgress =
+  private val bottomSheetInfoProgress =
     this.bottomSheet.findViewById<ProgressBar>(R.id.book2DBottomSheetProgress)
   private val bottomSheetBehavior =
-    BottomSheetBehavior.from(this.bottomSheet)
+    from(this.bottomSheet)
+  private val bottomSheetInfoContainer =
+    this.bottomSheet.findViewById<ViewGroup>(R.id.book2DBottomSheetInfoContainer)
+  private val bottomSheetInfoBorrowingLayout =
+    this.bottomSheetInfoContainer.findViewById<ViewGroup>(R.id.book2DBottomSheetInfoBorrowingLayout)
+  private val bottomSheetInfoBorrowingText =
+    this.bottomSheetInfoBorrowingLayout.findViewById<TextView>(R.id.book2DBottomSheetInfoBorrowingText)
+  private val bottomSheetInfoBorrowingTime =
+    this.bottomSheetInfoBorrowingLayout.findViewById<TextView>(R.id.book2DBottomSheetInfoBorrowingTime)
+  private val bottomSheetInfoGenericLayout =
+    this.bottomSheetInfoContainer.findViewById<ViewGroup>(R.id.book2DBottomSheetInfoGenericLayout)
+  private val bottomSheetInfoGenericText =
+    this.bottomSheetInfoGenericLayout.findViewById<TextView>(R.id.book2DBottomSheetInfoGenericText)
 
   private val bookButton0 =
     this.imageOverlay.findViewById<Button>(R.id.book2DOverlayButton0)
@@ -209,10 +242,43 @@ class CatalogFeedViewDetails2(
    * view OR the current book status suggests they should be disabled.
    */
 
-  private var enableButtonsOnOverlayStatus = false
-  private var enableButtonsOnOverlayView = false
-  private var enableButtonsOnToolbarStatus = false
+  private var enableButtonsOnOverlayView = true
   private var enableButtonsOnToolbarView = false
+  private var enableButton0Status = false
+  private var enableButton1Status = false
+
+  private fun isToolbarButtonsEnabled(): Boolean {
+    return this.enableButton0Status && this.enableButtonsOnToolbarView
+  }
+
+  private fun isOverlayButton0Enabled(): Boolean {
+    return this.enableButton0Status && this.enableButtonsOnOverlayView
+  }
+
+  private fun isOverlayButton1Enabled(): Boolean {
+    return this.enableButton1Status && this.enableButtonsOnOverlayView
+  }
+
+  private fun reconfigureButtonsEnabledDisabled() {
+    val toolbarEnabled =
+      this.isToolbarButtonsEnabled()
+    this.bookToolbarButton.isEnabled =
+      toolbarEnabled
+    this.bookButton0.isEnabled =
+      this.isOverlayButton0Enabled()
+    this.bookButton1.isEnabled =
+      this.isOverlayButton1Enabled()
+
+    /*
+     * Because the bottom sheet is explicitly shown and hidden, the enabled/disabled state of
+     * the buttons is purely based on the book status.
+     */
+
+    this.bookBottomSheetButton0.isEnabled =
+      this.enableButton0Status
+    this.bookBottomSheetButton1.isEnabled =
+      this.enableButton1Status
+  }
 
   private var spacerSize: Int
   private val spacerSizeMax: Int
@@ -220,36 +286,49 @@ class CatalogFeedViewDetails2(
 
   private val bottomSheetDarkenOpacityMax = 1.0f
 
+  private val debugText =
+    this.root.findViewById<TextView>(R.id.bookD2TextDebug)
+
   init {
+    this.setVisibility(this.debugText, View.INVISIBLE)
+
+    /*
+     * Control the opacity of a full-screen darkening view based on the bottom sheet. When the
+     * bottom sheet is fully expanded, the darkening view is mostly opaque. When the bottom sheet
+     * is fully collapsed, the darkening view is transparent.
+     */
+
+    this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
     this.bottomSheetDarken.alpha = 0.0f
     this.bottomSheetBehavior.addBottomSheetCallback(object :
-      BottomSheetBehavior.BottomSheetCallback() {
+      BottomSheetCallback() {
       override fun onStateChanged(
         bottomSheet: View,
         newState: Int
       ) {
+        val c = this@CatalogFeedViewDetails2
         when (newState) {
-          BottomSheetBehavior.STATE_EXPANDED -> {
-            this@CatalogFeedViewDetails2.bottomSheetDarken.alpha = bottomSheetDarkenOpacityMax
+          STATE_EXPANDED -> {
+            c.bottomSheetDarken.alpha = c.bottomSheetDarkenOpacityMax
           }
 
-          BottomSheetBehavior.STATE_COLLAPSED -> {
-            this@CatalogFeedViewDetails2.bottomSheetDarken.alpha = 0.0f
+          STATE_COLLAPSED -> {
+            c.bottomSheetDarken.alpha = 0.0f
           }
 
-          BottomSheetBehavior.STATE_HIDDEN -> {
+          STATE_HIDDEN -> {
             // Nothing required
           }
 
-          BottomSheetBehavior.STATE_DRAGGING -> {
+          STATE_DRAGGING -> {
             // Nothing required
           }
 
-          BottomSheetBehavior.STATE_HALF_EXPANDED -> {
+          STATE_HALF_EXPANDED -> {
             // Nothing required
           }
 
-          BottomSheetBehavior.STATE_SETTLING -> {
+          STATE_SETTLING -> {
             // Nothing required
           }
         }
@@ -259,8 +338,9 @@ class CatalogFeedViewDetails2(
         bottomSheet: View,
         slideOffset: Float
       ) {
-        this@CatalogFeedViewDetails2.bottomSheetDarken.alpha =
-          clamp(slideOffset, 0.0f, 1.0f) * bottomSheetDarkenOpacityMax
+        val c = this@CatalogFeedViewDetails2
+        c.bottomSheetDarken.alpha =
+          clamp(slideOffset, 0.0f, 1.0f) * c.bottomSheetDarkenOpacityMax
       }
     })
 
@@ -312,9 +392,9 @@ class CatalogFeedViewDetails2(
       this.bookToolbarButton.isEnabled =
         this.isToolbarButtonsEnabled()
       this.bookButton0.isEnabled =
-        this.isOverlayButtonsEnabled()
+        this.isOverlayButton0Enabled()
       this.bookButton1.isEnabled =
-        this.isOverlayButtonsEnabled()
+        this.isOverlayButton1Enabled()
 
       this.backButton.isEnabled = offsetExp < 0.01
       this.backButton.alpha =
@@ -357,14 +437,6 @@ class CatalogFeedViewDetails2(
     this.backButton.setOnClickListener {
       this.onToolbarBackPressed()
     }
-  }
-
-  private fun isOverlayButtonsEnabled(): Boolean {
-    return this.enableButtonsOnOverlayStatus && this.enableButtonsOnOverlayView
-  }
-
-  private fun isToolbarButtonsEnabled(): Boolean {
-    return this.enableButtonsOnToolbarStatus && this.enableButtonsOnToolbarView
   }
 
   private fun interpolate(
@@ -555,9 +627,9 @@ class CatalogFeedViewDetails2(
 
   fun setNoRelatedFeed() {
     this.logger.debug("Received no related feed.")
-    this.relatedLayout.visibility = View.GONE
-    this.relatedTitle.visibility = View.GONE
-    this.relatedDivider.visibility = View.GONE
+    this.setVisibility(this.relatedLayout, View.GONE)
+    this.setVisibility(this.relatedTitle, View.GONE)
+    this.setVisibility(this.relatedDivider, View.GONE)
   }
 
   fun bindRelatedFeedResult(
@@ -583,9 +655,9 @@ class CatalogFeedViewDetails2(
             val totalSize = (laneCount * laneSize).toInt()
 
             this.relatedListView.minimumHeight = totalSize
-            this.relatedLayout.visibility = View.VISIBLE
-            this.relatedLoading.visibility = View.INVISIBLE
-            this.relatedListView.visibility = View.VISIBLE
+            this.setVisibility(this.relatedLayout, View.VISIBLE)
+            this.setVisibility(this.relatedLoading, View.INVISIBLE)
+            this.setVisibility(this.relatedListView, View.VISIBLE)
           }
 
           is FeedWithoutGroups -> {
@@ -613,7 +685,7 @@ class CatalogFeedViewDetails2(
         this.descriptionText.maxLines = 6
         this.seeMore.setOnClickListener {
           this.descriptionText.maxLines = Integer.MAX_VALUE
-          this.seeMore.visibility = View.GONE
+          this.setVisibility(this.seeMore, View.GONE)
         }
         View.VISIBLE
       } else {
@@ -682,19 +754,41 @@ class CatalogFeedViewDetails2(
       screenSize: ScreenSizeInformationType,
       container: ViewGroup,
       covers: BookCoverProviderType,
+      onShowErrorDetails: (TaskResult.Failure<*>) -> Unit,
+      onBookSAMLDownloadRequested: (CatalogBookStatus<DownloadWaitingForExternalAuthentication>) -> Unit,
+      onBookDismissError: (CatalogBookStatus<*>) -> Unit,
+      onBookBorrowRequested: (CatalogBorrowParameters) -> Unit,
+      onBookBorrowCancelRequested: (CatalogBookStatus<*>) -> Unit,
+      onBookCanBeDeleted: (CatalogBookStatus<*>) -> Boolean,
+      onBookCanBeRevoked: (CatalogBookStatus<*>) -> Boolean,
+      onBookDeleteRequested: (CatalogBookStatus<*>) -> Unit,
+      onBookPreviewOpenRequested: (CatalogBookStatus<*>) -> Unit,
+      onBookReserveRequested: (CatalogBorrowParameters) -> Unit,
+      onBookResetStatusInitial: (CatalogBookStatus<*>) -> Unit,
+      onBookRevokeRequested: (CatalogBookStatus<*>) -> Unit,
+      onBookViewerOpen: (Book, BookFormat) -> Unit,
       onToolbarBackPressed: () -> Unit,
       onFeedSelected: (accountID: AccountID, title: String, uri: URI) -> Unit,
       onBookSelected: (FeedEntry.FeedEntryOPDS) -> Unit,
     ): CatalogFeedViewDetails2 {
       return CatalogFeedViewDetails2(
         root = layoutInflater.inflate(R.layout.book_detail2, container, true) as ViewGroup,
-        childFragmentManager = childFragmentManager,
         screenSize = screenSize,
         layoutInflater = layoutInflater,
+        childFragmentManager = childFragmentManager,
         covers = covers,
         onToolbarBackPressed = onToolbarBackPressed,
-        onFeedSelected = onFeedSelected,
+        onShowErrorDetails = onShowErrorDetails,
+        onBookDismissError = onBookDismissError,
+        onBookSAMLDownloadRequested = onBookSAMLDownloadRequested,
+        onBookBorrowRequested = onBookBorrowRequested,
+        onBookBorrowCancelRequested = onBookBorrowCancelRequested,
+        onBookCanBeRevoked = onBookCanBeRevoked,
+        onBookPreviewOpenRequested = onBookPreviewOpenRequested,
+        onBookRevokeRequested = onBookRevokeRequested,
+        onBookViewerOpen = onBookViewerOpen,
         onBookSelected = onBookSelected,
+        onFeedSelected = onFeedSelected,
       )
     }
   }
@@ -706,7 +800,9 @@ class CatalogFeedViewDetails2(
   fun onStatusUpdate(
     status: CatalogBookStatus<BookStatus>
   ) {
-    return when (status.status) {
+    this.debugText.text = status.status.javaClass.simpleName
+
+    when (status.status) {
       is DownloadExternalAuthenticationInProgress -> {
         this.onBookStatusDownloadExternalAuthenticationInProgress(
           status as CatalogBookStatus<DownloadExternalAuthenticationInProgress>
@@ -720,209 +816,522 @@ class CatalogFeedViewDetails2(
       }
 
       is Downloading -> {
-        this.onBookStatusDownloading(
-          status as CatalogBookStatus<Downloading>
-        )
+        this.onBookStatusDownloading(status as CatalogBookStatus<Downloading>)
       }
 
       is FailedDownload -> {
-        this.onBookStatusFailedDownload(
-          status as CatalogBookStatus<FailedDownload>
-        )
+        this.onBookStatusFailedDownload(status as CatalogBookStatus<FailedDownload>)
       }
 
       is FailedLoan -> {
-        this.onBookStatusFailedLoan(
-          status as CatalogBookStatus<FailedLoan>
-        )
+        this.onBookStatusFailedLoan(status as CatalogBookStatus<FailedLoan>)
       }
 
       is FailedRevoke -> {
-        this.onBookStatusFailedRevoke(
-          status as CatalogBookStatus<FailedRevoke>
-        )
+        this.onBookStatusFailedRevoke(status as CatalogBookStatus<FailedRevoke>)
       }
 
       is HeldInQueue -> {
-        this.onBookStatusHeldInQueue(
-          status as CatalogBookStatus<HeldInQueue>
-        )
+        this.onBookStatusHeldInQueue(status as CatalogBookStatus<HeldInQueue>)
       }
 
       is HeldReady -> {
-        this.onBookStatusHeldReady(
-          status as CatalogBookStatus<HeldReady>
-        )
+        this.onBookStatusHeldReady(status as CatalogBookStatus<HeldReady>)
       }
 
       is Holdable -> {
-        this.onBookStatusHoldable(
-          status as CatalogBookStatus<Holdable>
-        )
+        this.onBookStatusHoldable(status as CatalogBookStatus<Holdable>)
       }
 
       is Loanable -> {
-        this.onBookStatusLoanable(
-          status as CatalogBookStatus<Loanable>
-        )
+        this.onBookStatusLoanable(status as CatalogBookStatus<Loanable>)
       }
 
       is LoanedDownloaded -> {
-        this.onBookStatusLoanedDownloaded(
-          status as CatalogBookStatus<LoanedDownloaded>
-        )
+        this.onBookStatusLoanedDownloaded(status as CatalogBookStatus<LoanedDownloaded>)
       }
 
       is LoanedNotDownloaded -> {
-        this.onBookStatusLoanedNotDownloaded(
-          status as CatalogBookStatus<LoanedNotDownloaded>
-        )
+        this.onBookStatusLoanedNotDownloaded(status as CatalogBookStatus<LoanedNotDownloaded>)
       }
 
       is ReachedLoanLimit -> {
-        this.onBookStatusReachedLoanLimit(
-          status as CatalogBookStatus<ReachedLoanLimit>
-        )
+        this.onBookStatusReachedLoanLimit(status as CatalogBookStatus<ReachedLoanLimit>)
       }
 
       is RequestingDownload -> {
-        this.onBookStatusRequestingDownload(
-          status as CatalogBookStatus<RequestingDownload>
-        )
+        this.onBookStatusRequestingDownload(status as CatalogBookStatus<RequestingDownload>)
       }
 
       is RequestingLoan -> {
-        this.onBookStatusRequestingLoan(
-          status as CatalogBookStatus<RequestingLoan>
-        )
+        this.onBookStatusRequestingLoan(status as CatalogBookStatus<RequestingLoan>)
       }
 
       is RequestingRevoke -> {
-        this.onBookStatusRequestingRevoke(
-          status as CatalogBookStatus<RequestingRevoke>
-        )
+        this.onBookStatusRequestingRevoke(status as CatalogBookStatus<RequestingRevoke>)
       }
 
       is Revoked -> {
-        this.onBookStatusRevoked(
-          status as CatalogBookStatus<Revoked>
-        )
+        this.onBookStatusRevoked(status as CatalogBookStatus<Revoked>)
       }
     }
+
+    this.reconfigureButtonsEnabledDisabled()
   }
 
   private fun onBookStatusFailedLoan(
     status: CatalogBookStatus<FailedLoan>
   ) {
-    this.reconfigureButtonsEnabledDisabled()
+    this.enableButton0Status = true
+    this.enableButton1Status = true
+
+    this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
+    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
+    this.setVisibility(this.bottomSheetInfoGenericLayout, View.VISIBLE)
+    this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
+    this.bottomSheetInfoGenericText.setText(R.string.catalogOperationFailed)
+
+    this.reconfigureButton0(
+      text = R.string.catalogRetry,
+      actionInPage = { this.bottomSheetBehavior.state = STATE_EXPANDED },
+      actionInBottomSheet = { this.onBookBorrowRequested(status.toBorrowParameters()) }
+    )
+    this.reconfigureButton1(
+      text = R.string.catalogDetails,
+      actionInPage = { this.bottomSheetBehavior.state = STATE_EXPANDED },
+      actionInBottomSheet = { this.onShowErrorDetails(status.status.result) }
+    )
   }
 
   private fun onBookStatusFailedRevoke(
     status: CatalogBookStatus<FailedRevoke>
   ) {
-    this.reconfigureButtonsEnabledDisabled()
-  }
+    this.enableButton0Status = true
+    this.enableButton1Status = true
 
-  private fun onBookStatusHeldInQueue(
-    status: CatalogBookStatus<HeldInQueue>
-  ) {
-    this.reconfigureButtonsEnabledDisabled()
-  }
+    this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
+    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
+    this.setVisibility(this.bottomSheetInfoGenericLayout, View.VISIBLE)
+    this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
+    this.bottomSheetInfoGenericText.setText(R.string.catalogOperationFailed)
 
-  private fun onBookStatusHeldReady(
-    status: CatalogBookStatus<HeldReady>
-  ) {
-    this.reconfigureButtonsEnabledDisabled()
-  }
-
-  private fun onBookStatusHoldable(
-    status: CatalogBookStatus<Holdable>
-  ) {
-    this.reconfigureButtonsEnabledDisabled()
-  }
-
-  private fun onBookStatusLoanable(
-    status: CatalogBookStatus<Loanable>
-  ) {
-    this.reconfigureButtonsEnabledDisabled()
-  }
-
-  private fun onBookStatusLoanedDownloaded(
-    status: CatalogBookStatus<LoanedDownloaded>
-  ) {
-    this.reconfigureButtonsEnabledDisabled()
-  }
-
-  private fun onBookStatusLoanedNotDownloaded(
-    status: CatalogBookStatus<LoanedNotDownloaded>
-  ) {
-    this.reconfigureButtonsEnabledDisabled()
-  }
-
-  private fun onBookStatusReachedLoanLimit(
-    status: CatalogBookStatus<ReachedLoanLimit>
-  ) {
-    this.reconfigureButtonsEnabledDisabled()
-  }
-
-  private fun onBookStatusRequestingDownload(
-    status: CatalogBookStatus<RequestingDownload>
-  ) {
-    this.reconfigureButtonsEnabledDisabled()
-  }
-
-  private fun onBookStatusRequestingLoan(
-    status: CatalogBookStatus<RequestingLoan>
-  ) {
-    this.reconfigureButtonsEnabledDisabled()
-  }
-
-  private fun onBookStatusRequestingRevoke(
-    status: CatalogBookStatus<RequestingRevoke>
-  ) {
-    this.reconfigureButtonsEnabledDisabled()
-  }
-
-  private fun onBookStatusRevoked(
-    status: CatalogBookStatus<Revoked>
-  ) {
-    this.reconfigureButtonsEnabledDisabled()
+    this.reconfigureButton0(
+      text = R.string.catalogRetry,
+      actionInPage = { this.bottomSheetBehavior.state = STATE_EXPANDED },
+      actionInBottomSheet = { this.onBookRevokeRequested(status) }
+    )
+    this.reconfigureButton1(
+      text = R.string.catalogDetails,
+      actionInPage = { this.bottomSheetBehavior.state = STATE_EXPANDED },
+      actionInBottomSheet = { this.onShowErrorDetails(status.status.result) }
+    )
   }
 
   private fun onBookStatusFailedDownload(
     status: CatalogBookStatus<FailedDownload>
   ) {
-    this.reconfigureButtonsEnabledDisabled()
+    this.enableButton0Status = true
+    this.enableButton1Status = true
+
+    this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
+    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
+    this.setVisibility(this.bottomSheetInfoGenericLayout, View.VISIBLE)
+    this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
+    this.bottomSheetInfoGenericText.setText(R.string.catalogOperationFailed)
+
+    this.reconfigureButton0(
+      text = R.string.catalogRetry,
+      actionInPage = { this.bottomSheetBehavior.state = STATE_EXPANDED },
+      actionInBottomSheet = { this.onBookBorrowRequested(status.toBorrowParameters()) }
+    )
+    this.reconfigureButton1(
+      text = R.string.catalogDetails,
+      actionInPage = { this.bottomSheetBehavior.state = STATE_EXPANDED },
+      actionInBottomSheet = { this.onShowErrorDetails(status.status.result) }
+    )
+  }
+
+  private fun onBookStatusHeldInQueue(
+    status: CatalogBookStatus<HeldInQueue>
+  ) {
+    val held = status.status
+    this.enableButton0Status = held.isRevocable
+
+    this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
+    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
+    this.setVisibility(this.bottomSheetInfoGenericLayout, View.VISIBLE)
+    this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
+
+    /*
+     * We currently ignore date information for holds. The hold end date would usually be
+     * an estimate of when the hold will become available, but we don't reliably have this
+     * information so currently we don't do anything with the date information that may
+     * have been provided.
+     */
+
+    val queue = held.queuePosition
+    if (queue != null) {
+      this.bottomSheetInfoGenericText.text =
+        this.bottomSheetInfoGenericText.resources.getString(
+          R.string.catalogBookAvailabilityHeldQueue,
+          queue
+        )
+    } else {
+      this.bottomSheetInfoGenericText.text =
+        this.bottomSheetInfoGenericText.resources.getString(
+          R.string.catalogBookAvailabilityHeldIndefinite
+        )
+    }
+
+    this.reconfigureButton0(
+      text = R.string.catalogCancelHold,
+      actionInPage = { this.bottomSheetBehavior.state = STATE_EXPANDED },
+      actionInBottomSheet = { this.onBookRevokeRequested(status) }
+    )
+
+    if (held.isRevocable) {
+      this.enableButton0Status = true
+    }
+
+    this.reconfigurePreviewButton(status)
+  }
+
+  private fun onBookStatusHeldReady(
+    status: CatalogBookStatus<HeldReady>
+  ) {
+    this.enableButton0Status = true
+
+    this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
+    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
+    this.setVisibility(this.bottomSheetInfoGenericLayout, View.VISIBLE)
+    this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
+
+    this.bottomSheetInfoGenericText.text =
+      this.bottomSheetInfoBorrowingText.resources.getString(R.string.catalogBookAvailabilityLoanable)
+
+    this.reconfigureButton0(
+      text = R.string.catalogGet,
+      actionInPage = { this.bottomSheetBehavior.state = STATE_EXPANDED },
+      actionInBottomSheet = { this.onBookBorrowRequested(status.toBorrowParameters()) }
+    )
+
+    this.reconfigurePreviewButton(status)
+  }
+
+  private fun onBookStatusHoldable(
+    status: CatalogBookStatus<Holdable>
+  ) {
+    this.enableButton0Status = true
+    this.enableButton1Status = false
+
+    this.setVisibility(this.bottomSheetInfoContainer, View.INVISIBLE)
+    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
+    this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
+    this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
+
+    this.reconfigureButton0(
+      text = R.string.catalogReserve,
+      actionInPage = { this.bottomSheetBehavior.state = STATE_EXPANDED },
+      actionInBottomSheet = { this.onBookBorrowRequested(status.toBorrowParameters()) }
+    )
+    this.reconfigurePreviewButton(status)
+  }
+
+  private fun onBookStatusLoanable(
+    status: CatalogBookStatus<Loanable>
+  ) {
+    this.enableButton0Status = true
+    this.enableButton1Status = false
+
+    this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
+    this.setVisibility(this.bottomSheetInfoGenericLayout, View.VISIBLE)
+    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
+    this.bottomSheetInfoGenericText.setText(R.string.catalogBookAvailabilityLoanable)
+
+    this.reconfigureButton0(
+      text = R.string.catalogGet,
+      actionInPage = { this.bottomSheetBehavior.state = STATE_EXPANDED },
+      actionInBottomSheet = { this.onBookBorrowRequested(status.toBorrowParameters()) }
+    )
+    this.reconfigurePreviewButton(status)
+  }
+
+  private fun reconfigurePreviewButton(
+    status: CatalogBookStatus<*>
+  ) {
+    when (status.previewStatus) {
+      is BookPreviewStatus.HasPreview -> {
+        this.enableButton1Status = true
+        this.reconfigureButton1(
+          text = R.string.catalogPreview,
+          actionInPage = { this.onBookPreviewOpenRequested(status) },
+          actionInBottomSheet = { this.onBookPreviewOpenRequested(status) }
+        )
+      }
+
+      BookPreviewStatus.None -> {
+        this.enableButton1Status = false
+      }
+    }
+  }
+
+  private fun onBookStatusLoanedDownloaded(
+    status: CatalogBookStatus<LoanedDownloaded>
+  ) {
+    this.enableButton0Status = true
+    this.enableButton1Status = false
+
+    this.setVisibility(this.bottomSheetInfoContainer, View.INVISIBLE)
+    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
+    this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
+    this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
+
+    val loanExpiryDate = status.status.loanExpiryDate
+    if (loanExpiryDate != null) {
+      this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
+      this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
+      this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.VISIBLE)
+      this.bottomSheetInfoBorrowingText.setText(R.string.catalogBookDetailBorrowedUntil)
+      this.bottomSheetInfoBorrowingTime.text = this.dateFormatter.print(loanExpiryDate)
+    } else {
+      this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
+      this.setVisibility(this.bottomSheetInfoGenericLayout, View.VISIBLE)
+      this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
+      this.bottomSheetInfoGenericText.setText(R.string.catalogBookAvailabilityLoanedIndefinite)
+    }
+
+    val format = status.book.findPreferredFormat()
+    if (format != null) {
+      this.reconfigureButton0(
+        text = this.readButtonString(status.book),
+        actionInPage = { this.onBookViewerOpen(status.book, format) },
+        actionInBottomSheet = { this.onBookViewerOpen(status.book, format) }
+      )
+    }
+
+    if (this.onBookCanBeRevoked.invoke(status)) {
+      this.enableButton1Status = true
+      this.reconfigureButton1(
+        text = R.string.catalogReturn,
+        actionInPage = { this.bottomSheetBehavior.state = STATE_EXPANDED },
+        actionInBottomSheet = { this.onBookRevokeRequested(status) }
+      )
+    } else {
+      this.reconfigurePreviewButton(status)
+    }
+  }
+
+  private fun readButtonString(
+    book: Book
+  ): Int {
+    return when (book.findPreferredFormat()) {
+      is BookFormat.BookFormatAudioBook -> R.string.catalogListen
+      is BookFormat.BookFormatEPUB -> R.string.catalogRead
+      is BookFormat.BookFormatPDF -> R.string.catalogRead
+      null -> R.string.catalogRead
+    }
+  }
+
+  private fun onBookStatusLoanedNotDownloaded(
+    status: CatalogBookStatus<LoanedNotDownloaded>
+  ) {
+    this.enableButton0Status = true
+    this.enableButton1Status = true
+
+    this.setVisibility(this.bottomSheetInfoContainer, View.INVISIBLE)
+    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
+    this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
+    this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
+
+    val loanExpiryDate = status.status.loanExpiryDate
+    if (loanExpiryDate != null) {
+      this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
+      this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
+      this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.VISIBLE)
+      this.bottomSheetInfoBorrowingText.setText(R.string.catalogBookDetailBorrowedUntil)
+      this.bottomSheetInfoBorrowingTime.text = this.dateFormatter.print(loanExpiryDate)
+    } else {
+      this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
+      this.setVisibility(this.bottomSheetInfoGenericLayout, View.VISIBLE)
+      this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
+      this.bottomSheetInfoGenericText.setText(R.string.catalogBookAvailabilityLoanedIndefinite)
+    }
+
+    this.reconfigureButton0(
+      text = R.string.catalogGet,
+      actionInPage = { this.bottomSheetBehavior.state = STATE_EXPANDED },
+      actionInBottomSheet = { this.onBookBorrowRequested(status.toBorrowParameters()) }
+    )
+
+    if (this.onBookCanBeRevoked.invoke(status)) {
+      this.enableButton1Status = true
+      this.reconfigureButton1(
+        text = R.string.catalogReturn,
+        actionInPage = { this.bottomSheetBehavior.state = STATE_EXPANDED },
+        actionInBottomSheet = { this.onBookRevokeRequested(status) }
+      )
+    } else {
+      this.reconfigurePreviewButton(status)
+    }
+  }
+
+  private fun onBookStatusReachedLoanLimit(
+    status: CatalogBookStatus<ReachedLoanLimit>
+  ) {
+    this.enableButton0Status = false
+    this.enableButton1Status = false
+
+    this.setVisibility(this.bottomSheetInfoContainer, View.INVISIBLE)
+    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
+    this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
+    this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
+
+    this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
+    this.setVisibility(this.bottomSheetInfoGenericLayout, View.VISIBLE)
+    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
+    this.bottomSheetInfoGenericText.setText(R.string.bookReachedLoanLimitDialogMessage)
+  }
+
+  private fun onBookStatusRequestingDownload(
+    status: CatalogBookStatus<RequestingDownload>
+  ) {
+    this.enableButton0Status = false
+    this.enableButton1Status = false
+
+    this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
+    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
+    this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
+    this.setVisibility(this.bottomSheetInfoProgress, View.VISIBLE)
+    this.setProgress(0.0)
+  }
+
+  private fun onBookStatusRequestingLoan(
+    status: CatalogBookStatus<RequestingLoan>
+  ) {
+    this.enableButton0Status = false
+    this.enableButton1Status = false
+
+    this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
+    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
+    this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
+    this.setVisibility(this.bottomSheetInfoProgress, View.VISIBLE)
+    this.setProgress(0.0)
+  }
+
+  private fun onBookStatusRequestingRevoke(
+    status: CatalogBookStatus<RequestingRevoke>
+  ) {
+    this.enableButton0Status = false
+    this.enableButton1Status = false
+
+    this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
+    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
+    this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
+    this.setVisibility(this.bottomSheetInfoProgress, View.VISIBLE)
+    this.setProgress(0.0)
+  }
+
+  private fun onBookStatusRevoked(
+    status: CatalogBookStatus<Revoked>
+  ) {
+    this.enableButton0Status = false
+    this.enableButton1Status = false
+
+    this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
   }
 
   private fun onBookStatusDownloading(
     status: CatalogBookStatus<Downloading>
   ) {
-    this.reconfigureButtonsEnabledDisabled()
+    this.enableButton0Status = true
+    this.enableButton1Status = false
+
+    this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
+    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
+    this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
+    this.setVisibility(this.bottomSheetInfoProgress, View.VISIBLE)
+    this.setProgress(status.status.progressPercent)
+
+    this.reconfigureButton0(
+      text = R.string.catalogCancel,
+      actionInPage = { this.bottomSheetBehavior.state = STATE_EXPANDED },
+      actionInBottomSheet = { this.onBookBorrowCancelRequested(status) }
+    )
+  }
+
+  private fun setProgress(
+    percent: Double?
+  ) {
+    this.bottomSheetInfoProgress.setProgress((percent ?: 0.0).toInt(), true)
   }
 
   private fun onBookStatusDownloadWaitingForExternalAuthentication(
     status: CatalogBookStatus<DownloadWaitingForExternalAuthentication>
   ) {
-    this.reconfigureButtonsEnabledDisabled()
+    this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
+    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
+    this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
+    this.setVisibility(this.bottomSheetInfoProgress, View.VISIBLE)
+    this.setProgress(0.0)
   }
 
   private fun onBookStatusDownloadExternalAuthenticationInProgress(
     status: CatalogBookStatus<DownloadExternalAuthenticationInProgress>
   ) {
-    this.reconfigureButtonsEnabledDisabled()
+    this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
+    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
+    this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
+    this.setVisibility(this.bottomSheetInfoProgress, View.VISIBLE)
+    this.setProgress(0.0)
   }
 
-  private fun reconfigureButtonsEnabledDisabled() {
-    this.bookToolbarButton.isEnabled =
-      this.isToolbarButtonsEnabled()
-    this.bookButton0.isEnabled =
-      this.isOverlayButtonsEnabled()
-    this.bookButton1.isEnabled =
-      this.isOverlayButtonsEnabled()
-    this.bookBottomSheetButton0.isEnabled =
-      this.isOverlayButtonsEnabled()
-    this.bookBottomSheetButton1.isEnabled =
-      this.isOverlayButtonsEnabled()
+  /**
+   * Reconfigure "button 0" in all the various views. The button is configured to execute
+   * the [actionInPage] in page action if it is clicked in the toolbar or overlay, and the
+   * [actionInBottomSheet] if it is clicked in the bottom sheet.
+   */
+
+  private fun reconfigureButton0(
+    @StringRes text: Int,
+    actionInPage: () -> Unit,
+    actionInBottomSheet: () -> Unit
+  ) {
+    this.bookButton0.setText(text)
+    this.bookButton0.setOnClickListener { actionInPage() }
+    this.bookBottomSheetButton0.setText(text)
+    this.bookBottomSheetButton0.setOnClickListener { actionInBottomSheet() }
+    this.bookToolbarButton.setText(text)
+    this.bookToolbarButton.setOnClickListener { actionInPage() }
+  }
+
+  /**
+   * Reconfigure "button 1" in all the various views. The button is configured to execute
+   * the [actionInPage] in page action if it is clicked in the overlay, and the
+   * [actionInBottomSheet] if it is clicked in the bottom sheet.
+   */
+
+  private fun reconfigureButton1(
+    @StringRes text: Int,
+    actionInPage: () -> Unit,
+    actionInBottomSheet: () -> Unit
+  ) {
+    this.bookButton1.setText(text)
+    this.bookButton1.setOnClickListener { actionInPage() }
+    this.bookBottomSheetButton1.setText(text)
+    this.bookBottomSheetButton1.setOnClickListener { actionInBottomSheet() }
+  }
+
+  /**
+   * Absurdly, there is a cost to setting the visibility of a view in Android, even if the
+   * visibility value being set is already the visibility value of the given view.
+   */
+
+  private fun setVisibility(
+    view: View,
+    visibility: Int
+  ) {
+    if (view.visibility != visibility) {
+      view.visibility = visibility
+    }
   }
 }

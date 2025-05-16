@@ -26,6 +26,19 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
+    <TextView
+        android:id="@+id/bookD2TextDebug"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="false"
+        android:elevation="30dp"
+        android:focusable="false"
+        android:textColor="#ff00ff"
+        android:textSize="24sp"
+        android:visibility="invisible"
+        tools:text="DEBUGGING"
+        tools:visibility="visible" />
+
     <!-- The main scrollview that contains all of the page content below the toolbar. -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/bookD2ScrollView"
@@ -336,16 +349,16 @@
 
     <View
         android:id="@+id/book2DBottomSheetDarken"
-        android:background="#7f000000"
-        android:elevation="10dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:background="#7f000000"
+        android:elevation="10dp" />
 
     <!-- Bottom sheet. -->
     <LinearLayout
         android:id="@+id/book2DBottomSheet"
         android:layout_width="match_parent"
-        android:layout_height="360dp"
+        android:layout_height="376dp"
         android:background="@drawable/bottom_sheet_drawable"
         android:elevation="20dp"
         android:orientation="vertical"
@@ -357,11 +370,11 @@
             android:id="@+id/book2DBottomSheetHandle"
             android:layout_width="80dp"
             android:layout_height="8dp"
-            android:focusable="false"
-            android:clickable="false"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="20dp"
             android:background="@drawable/bottom_handle"
+            android:clickable="false"
+            android:focusable="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -424,8 +437,8 @@
                     android:id="@+id/book2DBottomSheetAuthors"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:maxLines="1"
                     android:ellipsize="end"
+                    android:maxLines="1"
                     tools:text="@string/catalogPlaceholder" />
 
             </LinearLayout>
@@ -440,51 +453,12 @@
             android:layout_marginBottom="16dp"
             android:background="?android:attr/listDivider" />
 
-        <LinearLayout
-            android:layout_marginStart="32dp"
-            android:layout_marginEnd="32dp"
-            android:layout_width="wrap_content"
+        <include
+            layout="@layout/book_detail2_borrowing"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/book2DBottomSheetBorrowingFor"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.5"
-                android:layout_gravity="left"
-                android:maxLines="1"
-                android:ellipsize="end"
-                tools:text="@string/catalogPlaceholder" />
-
-            <TextView
-                android:id="@+id/book2DBottomSheetTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.5"
-                android:layout_gravity="right"
-                android:maxLines="1"
-                android:ellipsize="end"
-                tools:text="@string/catalogPlaceholder" />
-
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="32dp"
             android:layout_marginBottom="16dp"
-            android:background="?android:attr/listDivider" />
-
-        <ProgressBar
-            android:id="@+id/book2DBottomSheetProgress"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_marginStart="32dp"
-            android:layout_marginEnd="32dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            tools:visibility="visible" />
 
         <LinearLayout
             android:id="@+id/book2DBottomSheetButtons"

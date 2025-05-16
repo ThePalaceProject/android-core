@@ -55,7 +55,7 @@
   <string name="catalogBookPreviewBook">Read Sample</string>
   <string name="catalogCancel">Cancel</string>
   <string name="catalogDone">Done</string>
-  <string name="catalogCancelHold">Remove</string>
+  <string name="catalogCancelHold">Cancel Hold</string>
   <string name="catalogCancelling">Cancelling…</string>
   <string name="catalogCorrupted">The metadata for this book is damaged and cannot be displayed. Reloading the feed or syncing your account might fix the problem.</string>
   <string name="catalogDescription">Description</string>
@@ -89,6 +89,9 @@
   <string name="catalogReturn">Return</string>
   <string name="catalogSearch">Search</string>
   <string name="catalogDurationFormat">%1$s hours, %2$s minutes</string>
+
+  <string name="catalogBookDetailBorrowingFor">Borrowing for</string>
+  <string name="catalogBookDetailBorrowedUntil">Borrowed until</string>
 
   <string name="bookReachedLoanLimitDialogMessage">You have reached your loan limit. You cannot borrow anything further until you return something.</string>
   <string name="bookReachedLoanLimitDialogTitle">Loan limit reached.</string>

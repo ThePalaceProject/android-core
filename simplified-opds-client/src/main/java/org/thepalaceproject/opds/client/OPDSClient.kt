@@ -171,6 +171,9 @@ class OPDSClient private constructor(
     private inner class OPDSFeedHandleWithoutGroups : OPDSFeedHandleWithoutGroupsType {
 
       @Volatile
+      private var positionSaved: Int = 0
+
+      @Volatile
       var credentials: AccountAuthenticationCredentials? = null
 
       @Volatile
@@ -262,10 +265,19 @@ class OPDSClient private constructor(
         return this.feedInitial
       }
 
+      override fun scrollPositionSave(position: Int) {
+        this.positionSaved = position
+      }
+
+      override fun scrollPositionGet(): Int {
+        return this.positionSaved
+      }
+
       override fun refresh(): CompletableFuture<Unit> {
         val handler = this@RequestHandler
         handler.feedURINext = handler.request.uri
         handler.publishedEntriesGrouped.set(listOf())
+        this.positionSaved = 0
         return this@OPDSClient.executeWithFuture(handler)
       }
     }
