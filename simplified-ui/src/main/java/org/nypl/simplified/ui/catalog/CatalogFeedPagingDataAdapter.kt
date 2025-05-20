@@ -213,17 +213,13 @@ class CatalogFeedPagingDataAdapter(
     private fun onStatusChangedForFeedEntry(
       item: FeedEntry.FeedEntryOPDS
     ) {
-      val book =
-        Book(
-          id = item.bookID,
-          account = item.accountID,
-          cover = null,
-          thumbnail = null,
-          entry = item.feedEntry,
-          formats = listOf()
+      val status =
+        CatalogBookStatus.create(
+          this@CatalogFeedPagingDataAdapter.registryEvents.registry,
+          item
         )
-      val status = BookStatus.fromBook(book)
-      this.onStatusChanged(BookWithStatus(book, status))
+
+      this.onStatusChanged(BookWithStatus(status.book, status.status))
     }
 
     private fun setVisible(

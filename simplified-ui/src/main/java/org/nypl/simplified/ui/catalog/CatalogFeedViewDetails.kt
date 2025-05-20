@@ -152,6 +152,8 @@ class CatalogFeedViewDetails(
   private val relatedAdapter =
     CatalogFeedWithGroupsAdapter(
       covers = this.covers,
+      screenSize = this.screenSize,
+      laneStyle = CatalogFeedWithGroupsLaneViewHolder.LaneStyle.RELATED_BOOKS_LANE,
       onFeedSelected = this.onFeedSelected,
       onBookSelected = this.onBookSelected
     )
@@ -343,9 +345,7 @@ class CatalogFeedViewDetails(
     this.configureMetadataTable(newEntry)
 
     val targetHeight =
-      this.root.resources.getDimensionPixelSize(
-        org.librarysimplified.books.covers.R.dimen.cover_detail_height
-      )
+      this.root.resources.getDimensionPixelSize(R.dimen.catalogBookDetailCoverHeight)
 
     this.covers.loadCoverInto(
       entry = newEntry,

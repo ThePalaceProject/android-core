@@ -9,6 +9,8 @@ import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.io7m.jfunctional.Some
 import com.io7m.jmulticlose.core.CloseableCollection
 import kotlinx.coroutines.CoroutineScope
@@ -24,10 +26,8 @@ import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
-import org.nypl.simplified.books.book_registry.BookPreviewStatus
 import org.nypl.simplified.books.book_registry.BookRegistryReadableType
 import org.nypl.simplified.books.book_registry.BookStatus
-import org.nypl.simplified.books.book_registry.BookWithStatus
 import org.nypl.simplified.books.controller.api.BooksControllerType
 import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
@@ -52,6 +52,7 @@ import org.nypl.simplified.taskrecorder.api.TaskStepResolution
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.accounts.AccountDetailModel
 import org.nypl.simplified.ui.accounts.AccountPickerDialogFragment
+import org.nypl.simplified.ui.catalog.CatalogFeedWithGroupsLaneViewHolder.LaneStyle
 import org.nypl.simplified.ui.catalog.CatalogPart.BOOKS
 import org.nypl.simplified.ui.catalog.CatalogPart.CATALOG
 import org.nypl.simplified.ui.catalog.CatalogPart.HOLDS
@@ -226,15 +227,19 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
 
     if (newEntry is FeedEntry.FeedEntryOPDS) {
       val view = this.viewNow
-      if (view is CatalogFeedViewDetails) {
-        view.bind(newEntry)
+      if (view is CatalogFeedViewDetails2) {
+        val account =
+          this.profiles.profileCurrent()
+            .account(newEntry.accountID)
+
+        view.bind(account.provider, newEntry)
         this.onLoadRelatedFeed(view, newEntry)
       }
     }
   }
 
   private fun onLoadRelatedFeed(
-    view: CatalogFeedViewDetails,
+    view: CatalogFeedViewDetails2,
     newEntry: FeedEntry.FeedEntryOPDS
   ) {
     val relatedOpt = newEntry.feedEntry.related
@@ -306,50 +311,32 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     this.perViewSubscriptions = CloseableCollection.create()
   }
 
-  private fun synthesizeBookWithStatus(
-    item: FeedEntry.FeedEntryOPDS
-  ): BookWithStatus {
-    val book = Book(
-      id = item.bookID,
-      account = item.accountID,
-      cover = null,
-      thumbnail = null,
-      entry = item.feedEntry,
-      formats = listOf()
-    )
-    val status = BookStatus.fromBook(book)
-    this.logger.debug("Synthesizing {} with status {}", book.id, status)
-    return BookWithStatus(book, status)
-  }
-
   private fun onStateChangedToDetails(
     newState: LoadedFeedEntry
   ) {
     val view =
-      CatalogFeedViewDetails.create(
-        buttonCreator = this.buttonCreator,
+      CatalogFeedViewDetails2.create(
         container = this.contentContainer,
-        covers = this.covers,
+        childFragmentManager = this.childFragmentManager,
         layoutInflater = this.layoutInflater,
+        screenSize = this.screenSize,
+        covers = this.covers,
+        onBookSelected = this::onBookSelected,
+        onFeedSelected = this::onFeedSelected,
+        onToolbarBackPressed = this::onToolbarBackPressed,
+        onBookViewerOpen = this::onBookViewerOpen,
         onShowErrorDetails = this::onShowErrorDetails,
         onBookDismissError = this::onBookDismissError,
-        onBookSAMLDownloadRequested = this::onBookSAMLDownloadRequested,
         onBookBorrowCancelRequested = this::onBookBorrowCancelRequested,
+        onBookSAMLDownloadRequested = this::onBookSAMLDownloadRequested,
+        onBookPreviewOpenRequested = this::onBookPreviewOpenRequested,
         onBookBorrowRequested = this::onBookBorrowRequested,
         onBookCanBeDeleted = this::onBookCanBeDeleted,
         onBookCanBeRevoked = this::onBookCanBeRevoked,
         onBookDeleteRequested = this::onBookDeleteRequested,
-        onBookPreviewOpenRequested = this::onBookPreviewOpenRequested,
         onBookReserveRequested = this::onBookReserveRequested,
         onBookResetStatusInitial = this::onBookResetStatusInitial,
-        onBookRevokeRequested = this::onBookRevokeRequested,
-        onBookSelected = this::onBookSelected,
-        onBookViewerOpen = this::onBookViewerOpen,
-        onFeedSelected = this::onFeedSelected,
-        onToolbarBackPressed = this::onToolbarBackPressed,
-        onToolbarLogoPressed = { this.onToolbarLogoPressed(newState.request.entry.accountID) },
-        screenSize = this.screenSize,
-        window = this.requireActivity().window,
+        onBookRevokeRequested = this::onBookRevokeRequested
       )
 
     when (val entry = this.opdsClient.entry.get()) {
@@ -358,7 +345,14 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
       }
 
       is FeedEntry.FeedEntryOPDS -> {
-        view.bind(entry)
+        val services =
+          Services.serviceDirectory()
+        val account =
+          services.requireService(ProfilesControllerType::class.java)
+            .profileCurrent()
+            .account(entry.accountID)
+
+        view.bind(account.provider, entry)
         this.onLoadRelatedFeed(view, entry)
 
         /*
@@ -366,8 +360,6 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
          * itself so that it can update the UI appropriately.
          */
 
-        val services =
-          Services.serviceDirectory()
         val catalogBookRegistry =
           services.requireService(CatalogBookRegistryEvents::class.java)
 
@@ -377,35 +369,14 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
             .filter { e -> e.statusNow != null }
             .subscribe { e ->
               UIThread.checkIsUIThread()
-
-              val bookWithStatus =
-                this.bookRegistry.bookOrNull(e.bookId)
-                  ?: this.synthesizeBookWithStatus(entry)
-
-              view.onStatusUpdate(
-                CatalogBookStatus(
-                  status = bookWithStatus.status,
-                  previewStatus = this.bookPreviewStatusOf(entry),
-                  book = bookWithStatus.book
-                )
-              )
+              view.onStatusUpdate(CatalogBookStatus.create(this.bookRegistry, entry))
             }
 
         this.perViewSubscriptions.add(
           AutoCloseable { statusSubscription.dispose() }
         )
 
-        val bookWithStatus =
-          this.bookRegistry.bookOrNull(entry.bookID)
-            ?: this.synthesizeBookWithStatus(entry)
-
-        view.onStatusUpdate(
-          CatalogBookStatus(
-            status = bookWithStatus.status,
-            previewStatus = this.bookPreviewStatusOf(entry),
-            book = bookWithStatus.book
-          )
-        )
+        view.onStatusUpdate(CatalogBookStatus.create(this.bookRegistry, entry))
       }
     }
 
@@ -423,7 +394,16 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
             // Nothing sensible to do here.
           }
 
-          is FeedEntry.FeedEntryOPDS -> view.bind(item)
+          is FeedEntry.FeedEntryOPDS -> {
+            val services =
+              Services.serviceDirectory()
+            val account =
+              services.requireService(ProfilesControllerType::class.java)
+                .profileCurrent()
+                .account(item.accountID)
+
+            view.bind(account.provider, item)
+          }
         }
       }
     )
@@ -507,7 +487,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
 
   private fun onStateChangeToDetailsConfigureToolbar(
     newState: LoadedFeedEntry,
-    view: CatalogFeedViewDetails
+    view: CatalogFeedViewDetails2
   ) {
     try {
       val account =
@@ -519,15 +499,6 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
           is FeedEntry.FeedEntryCorrupt -> ""
           is FeedEntry.FeedEntryOPDS -> e.feedEntry.title
         }
-
-      view.toolbar.configure(
-        resources = this.resources,
-        accountID = account.id,
-        title = title,
-        search = null,
-        canGoBack = this.opdsClient.hasHistory,
-        catalogPart = this.catalogPart
-      )
     } catch (e: Throwable) {
       // Nothing sensible we can do about this.
     }
@@ -767,16 +738,6 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     this.onBookBorrowRequested(parameters)
   }
 
-  private fun bookPreviewStatusOf(
-    entry: FeedEntry.FeedEntryOPDS
-  ): BookPreviewStatus {
-    return if (!entry.feedEntry.previewAcquisitions.isNullOrEmpty()) {
-      BookPreviewStatus.HasPreview()
-    } else {
-      BookPreviewStatus.None
-    }
-  }
-
   private fun onStateChangedToGroups(
     newState: LoadedFeedWithGroups
   ) {
@@ -804,6 +765,8 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     val entriesGroupedAdapter =
       CatalogFeedWithGroupsAdapter(
         covers = this.covers,
+        screenSize = this.screenSize,
+        laneStyle = LaneStyle.MAIN_GROUPED_FEED_LANE,
         onFeedSelected = this::onFeedSelected,
         onBookSelected = this::onBookSelected,
       )
@@ -904,6 +867,8 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
   ) {
     val feedHandle =
       newState.handle
+    val feedPosition =
+      feedHandle.scrollPositionGet()
     val feed =
       feedHandle.feed()
 
@@ -962,6 +927,22 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     this.perViewSubscriptions.add(AutoCloseable { job.cancel() })
 
     try {
+      /*
+       * Add a scroll listener that saves the scroll position.
+       */
+
+      view.listView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+          val linearLayoutManager =
+            recyclerView.layoutManager as LinearLayoutManager
+          val position =
+            linearLayoutManager.findFirstVisibleItemPosition()
+
+          // logger.trace("Saving scroll position {}", position)
+          feedHandle.scrollPositionSave(position)
+        }
+      })
+
       view.listView.adapter = feedAdapter
       view.configureFacets(
         screen = this.screenSize,
@@ -1018,8 +999,16 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
         HOLDS -> context.getString(R.string.feedWithGroupsEmptyHolds)
       }
     )
-
     this.switchView(view)
+
+    /*
+     * Set up a listener to restore the scroll position.
+     */
+
+    feedAdapter.addOnPagesUpdatedListener {
+      // this.logger.trace("Restoring scroll position {}", feedPosition)
+      view.listView.scrollToPosition(feedPosition)
+    }
   }
 
   private fun onCatalogLogoClicked(

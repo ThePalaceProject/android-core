@@ -91,9 +91,10 @@ class MainTabsFragment : Fragment(), MainBackButtonConsumerType {
       }
 
       override fun onTabReselected(tab: TabLayout.Tab?) {
-        if (tab != null) {
-          this@MainTabsFragment.reselectForTab(tab.position)
-        }
+        /*
+         * This method cannot be used due to Android brokenness. It will be called on device
+         * orientation changes; not just in response to actual user input.
+         */
       }
     })
     return this.root

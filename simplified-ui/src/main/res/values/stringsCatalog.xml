@@ -2,8 +2,7 @@
 
 <resources>
   <string name="catalogAccessibilityAccountSelection">Account Selection Button</string>
-  <string name="catalogAccessibilitySearch">Search Button</string>
-  <string name="catalogAccessibilityGoBack">Go Back Button</string>
+  <string name="catalogAccessibilityBackgroundImage">A background image.</string>
   <string name="catalogAccessibilityBookBorrow">Get Button</string>
   <string name="catalogAccessibilityBookDelete">Delete Button</string>
   <string name="catalogAccessibilityBookDownload">Download Button</string>
@@ -23,6 +22,8 @@
   <string name="catalogAccessibilityCoverEpub">%1$s, ebook, by %2$s</string>
   <string name="catalogAccessibilityCoverPdf">%1$s, pdf, by %2$s</string>
   <string name="catalogAccessibilityCoverUnknownFormat">%1$s, by %2$s</string>
+  <string name="catalogAccessibilityGoBack">Go Back Button</string>
+  <string name="catalogAccessibilitySearch">Search Button</string>
   <string name="catalogAccounts">Choose another library catalog…</string>
   <string name="catalogBookAvailabilityHeldIndefinite">You have this book on hold.</string>
   <string name="catalogBookAvailabilityHeldQueue">You are at position %1$d in the queue for this book.</string>
@@ -38,6 +39,7 @@
   <string name="catalogBookCoverDescription">Book cover image</string>
 
   <string name="catalog">Catalog</string>
+  <string name="catalogPreview">Preview</string>
   <string name="catalogBookFormatAudioBook">Audiobook</string>
   <string name="catalogBookFormatEPUB">eBook</string>
   <string name="catalogBookFormatPDF">PDF</string>
@@ -53,7 +55,7 @@
   <string name="catalogBookPreviewBook">Read Sample</string>
   <string name="catalogCancel">Cancel</string>
   <string name="catalogDone">Done</string>
-  <string name="catalogCancelHold">Remove</string>
+  <string name="catalogCancelHold">Cancel Hold</string>
   <string name="catalogCancelling">Cancelling…</string>
   <string name="catalogCorrupted">The metadata for this book is damaged and cannot be displayed. Reloading the feed or syncing your account might fix the problem.</string>
   <string name="catalogDescription">Description</string>
@@ -77,7 +79,7 @@
   <string name="catalogOperationFailed">The operation could not be completed.</string>
   <string name="catalogPlaceholder">Lorem ipsum dolor sit amet, probatus volutpat has at, vis adhuc iuvaret omittantur an, sadipscing conclusionemque his ad. Eam ut simul tempor. Primis consetetur appellantur vim eu, eum an iudico dolorum. Ad vis utamur honestatis, sanctus debitis referrentur an eam.</string>
   <string name="catalogRead">Read</string>
-  <string name="catalogRelatedBooks">Related books…</string>
+  <string name="catalogRelatedBooks">Other books by this author</string>
   <string name="catalogReload">Reload</string>
   <string name="catalogReportIssue">Report issue…</string>
   <string name="catalogRequesting">Requesting…</string>
@@ -87,6 +89,9 @@
   <string name="catalogReturn">Return</string>
   <string name="catalogSearch">Search</string>
   <string name="catalogDurationFormat">%1$s hours, %2$s minutes</string>
+
+  <string name="catalogBookDetailBorrowingFor">Borrowing for</string>
+  <string name="catalogBookDetailBorrowedUntil">Borrowed until</string>
 
   <string name="bookReachedLoanLimitDialogMessage">You have reached your loan limit. You cannot borrow anything further until you return something.</string>
   <string name="bookReachedLoanLimitDialogTitle">Loan limit reached.</string>

@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <resources>
+  <dimen name="catalogBookDetailToolbarCollapsedHeight">96dp</dimen>
+  <dimen name="catalogBookDetailToolbarExpandedHeight">288dp</dimen>
+  <dimen name="catalogBookDetailToolbarItemsHeight">64dp</dimen>
+  <dimen name="catalogBookDetailSpacerHeight">160dp</dimen>
+  <dimen name="catalogBookDetailCoverHeight">240dp</dimen>
+  <dimen name="catalogBookDetailCoverWidth">160dp</dimen>
+
+  <dimen name="catalogBookDetailScrollMarginTopMax">192dp</dimen>
+  <dimen name="catalogBookDetailScrollMarginTopMin">32dp</dimen>
+
   <dimen name="catalogBookDetailButtonsHeight">64dp</dimen>
   <dimen name="catalogBookDetailCoverMaximumWidth">128dp</dimen>
   <dimen name="catalogBookDetailStatusHeight">64dp</dimen>
