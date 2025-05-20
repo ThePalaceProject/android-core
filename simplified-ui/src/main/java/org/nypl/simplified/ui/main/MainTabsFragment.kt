@@ -32,6 +32,17 @@ import org.nypl.simplified.ui.main.MainTabCategory.TAB_SETTINGS
 
 class MainTabsFragment : Fragment(), MainBackButtonConsumerType {
 
+  companion object {
+    private const val TAB_INDEX_CATALOG = 0
+    private const val TAB_INDEX_BOOKS = 1
+    private const val TAB_INDEX_RESERVATIONS = 2
+    private const val TAB_INDEX_SETTINGS = 3
+  }
+
+  private lateinit var tabSettingsView: View
+  private lateinit var tabReservationsView: View
+  private lateinit var tabBooksView: View
+  private lateinit var tabCatalogView: View
   private lateinit var root: ViewGroup
   private lateinit var tabBooks: TabLayout.Tab
   private lateinit var tabCatalog: TabLayout.Tab
@@ -57,14 +68,23 @@ class MainTabsFragment : Fragment(), MainBackButtonConsumerType {
     this.tabContent =
       this.root.findViewById(R.id.mainTabsContent)
 
-    this.tabCatalog =
-      this.tabLayout.getTabAt(0)!!
-    this.tabBooks =
-      this.tabLayout.getTabAt(1)!!
-    this.tabReservations =
-      this.tabLayout.getTabAt(2)!!
-    this.tabSettings =
-      this.tabLayout.getTabAt(3)!!
+    /*
+     * Work around the complete brokenness of the Android tab view; if you want to use the
+     * `onTabReselected()` method, too bad, you can't. The method will be called when screen
+     * orientations change, meaning that listeners that have side effects will invoke those
+     * side effects every time the orientation changes. Instead, you must reach inside the
+     * internal views and manually set on-click listeners.
+     */
+
+    val tabStrip = (this.tabLayout.getChildAt(0) as ViewGroup)
+    this.tabCatalog = this.tabLayout.getTabAt(TAB_INDEX_CATALOG)!!
+    this.tabCatalogView = tabStrip.getChildAt(TAB_INDEX_CATALOG)!!
+    this.tabBooks = this.tabLayout.getTabAt(TAB_INDEX_BOOKS)!!
+    this.tabBooksView = tabStrip.getChildAt(TAB_INDEX_BOOKS)!!
+    this.tabReservations = this.tabLayout.getTabAt(TAB_INDEX_RESERVATIONS)!!
+    this.tabReservationsView = tabStrip.getChildAt(TAB_INDEX_RESERVATIONS)!!
+    this.tabSettings = this.tabLayout.getTabAt(TAB_INDEX_SETTINGS)!!
+    this.tabSettingsView = tabStrip.getChildAt(TAB_INDEX_SETTINGS)!!
 
     /*
      * Naturally, because even the simplest things on Android are completely broken, it's
@@ -97,6 +117,27 @@ class MainTabsFragment : Fragment(), MainBackButtonConsumerType {
          */
       }
     })
+
+    this.tabCatalogView.setOnClickListener {
+      if (MainTabModel.tabSelected == TAB_INDEX_CATALOG) {
+        this.reselectForTab(TAB_INDEX_CATALOG)
+      }
+    }
+    this.tabBooksView.setOnClickListener {
+      if (MainTabModel.tabSelected == TAB_INDEX_BOOKS) {
+        this.reselectForTab(TAB_INDEX_BOOKS)
+      }
+    }
+    this.tabReservationsView.setOnClickListener {
+      if (MainTabModel.tabSelected == TAB_INDEX_RESERVATIONS) {
+        this.reselectForTab(TAB_INDEX_RESERVATIONS)
+      }
+    }
+    this.tabSettingsView.setOnClickListener {
+      if (MainTabModel.tabSelected == TAB_INDEX_SETTINGS) {
+        this.reselectForTab(TAB_INDEX_SETTINGS)
+      }
+    }
     return this.root
   }
 
@@ -107,7 +148,7 @@ class MainTabsFragment : Fragment(), MainBackButtonConsumerType {
      * Restore the selected tab.
      */
 
-    this.switchToTab(MainTabModel.tabSelected ?: 0)
+    this.switchToTab(MainTabModel.tabSelected ?: TAB_INDEX_CATALOG)
 
     this.subscriptions = CloseableCollection.create()
     this.subscriptions.add(
@@ -165,10 +206,10 @@ class MainTabsFragment : Fragment(), MainBackButtonConsumerType {
         )
 
     when (tabIndex) {
-      0 -> opdsClients.goToRootFeedFor(CatalogPart.CATALOG, account)
-      1 -> opdsClients.goToRootFeedFor(CatalogPart.BOOKS, account)
-      2 -> opdsClients.goToRootFeedFor(CatalogPart.HOLDS, account)
-      3 -> MainNavigation.Settings.goToRoot()
+      TAB_INDEX_CATALOG -> opdsClients.goToRootFeedFor(CatalogPart.CATALOG, account)
+      TAB_INDEX_BOOKS -> opdsClients.goToRootFeedFor(CatalogPart.BOOKS, account)
+      TAB_INDEX_RESERVATIONS -> opdsClients.goToRootFeedFor(CatalogPart.HOLDS, account)
+      TAB_INDEX_SETTINGS -> MainNavigation.Settings.goToRoot()
       else -> throw IllegalStateException("Unexpected tab index: $tabIndex")
     }
   }
@@ -191,10 +232,10 @@ class MainTabsFragment : Fragment(), MainBackButtonConsumerType {
     tabIndex: Int
   ) {
     when (tabIndex) {
-      0 -> this.switchFragment(CatalogFragmentMain())
-      1 -> this.switchFragment(CatalogFragmentMyBooks())
-      2 -> this.switchFragment(CatalogFragmentHolds())
-      3 -> this.switchFragment(MainNavigation.Settings.currentScreen().fragment())
+      TAB_INDEX_CATALOG -> this.switchFragment(CatalogFragmentMain())
+      TAB_INDEX_BOOKS -> this.switchFragment(CatalogFragmentMyBooks())
+      TAB_INDEX_RESERVATIONS -> this.switchFragment(CatalogFragmentHolds())
+      TAB_INDEX_SETTINGS -> this.switchFragment(MainNavigation.Settings.currentScreen().fragment())
       else -> throw IllegalStateException("Unexpected tab index: $tabIndex")
     }
   }
