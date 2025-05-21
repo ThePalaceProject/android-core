@@ -182,8 +182,8 @@ class CatalogFeedPagingDataAdapter(
               .filter { event -> event.bookId == item.bookID }
               .subscribe { event -> this.onStatusChangedForFeedEntry(item) }
 
-          this.view.setOnClickListener {
-            this@CatalogFeedPagingDataAdapter.onBookSelected(item)
+          for (v in listOf(view, this.idle, this.error, this.corrupt, this.progress)) {
+            v.setOnClickListener { this@CatalogFeedPagingDataAdapter.onBookSelected(item) }
           }
 
           this.setVisible(this.idleCover, false)
