@@ -759,12 +759,8 @@ class CatalogFeedViewDetails2(
       onBookDismissError: (CatalogBookStatus<*>) -> Unit,
       onBookBorrowRequested: (CatalogBorrowParameters) -> Unit,
       onBookBorrowCancelRequested: (CatalogBookStatus<*>) -> Unit,
-      onBookCanBeDeleted: (CatalogBookStatus<*>) -> Boolean,
       onBookCanBeRevoked: (CatalogBookStatus<*>) -> Boolean,
-      onBookDeleteRequested: (CatalogBookStatus<*>) -> Unit,
       onBookPreviewOpenRequested: (CatalogBookStatus<*>) -> Unit,
-      onBookReserveRequested: (CatalogBorrowParameters) -> Unit,
-      onBookResetStatusInitial: (CatalogBookStatus<*>) -> Unit,
       onBookRevokeRequested: (CatalogBookStatus<*>) -> Unit,
       onBookViewerOpen: (Book, BookFormat) -> Unit,
       onToolbarBackPressed: () -> Unit,
@@ -893,8 +889,13 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogRetry,
-      actionInPage = { this.bottomSheetBehavior.state = STATE_EXPANDED },
-      actionInBottomSheet = { this.onBookBorrowRequested(status.toBorrowParameters()) }
+      actionInPage = {
+        this.bottomSheetBehavior.state = STATE_EXPANDED
+        this.onBookBorrowRequested(status.toBorrowParameters())
+      },
+      actionInBottomSheet = {
+        this.onBookBorrowRequested(status.toBorrowParameters())
+      }
     )
     this.reconfigureButton1(
       text = R.string.catalogDetails,
@@ -917,8 +918,13 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogRetry,
-      actionInPage = { this.bottomSheetBehavior.state = STATE_EXPANDED },
-      actionInBottomSheet = { this.onBookRevokeRequested(status) }
+      actionInPage = {
+        this.bottomSheetBehavior.state = STATE_EXPANDED
+        this.onBookRevokeRequested(status)
+      },
+      actionInBottomSheet = {
+        this.onBookRevokeRequested(status)
+      }
     )
     this.reconfigureButton1(
       text = R.string.catalogDetails,
@@ -941,8 +947,13 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogRetry,
-      actionInPage = { this.bottomSheetBehavior.state = STATE_EXPANDED },
-      actionInBottomSheet = { this.onBookBorrowRequested(status.toBorrowParameters()) }
+      actionInPage = {
+        this.bottomSheetBehavior.state = STATE_EXPANDED
+        this.onBookBorrowRequested(status.toBorrowParameters())
+      },
+      actionInBottomSheet = {
+        this.onBookBorrowRequested(status.toBorrowParameters())
+      }
     )
     this.reconfigureButton1(
       text = R.string.catalogDetails,
@@ -985,8 +996,13 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogCancelHold,
-      actionInPage = { this.bottomSheetBehavior.state = STATE_EXPANDED },
-      actionInBottomSheet = { this.onBookRevokeRequested(status) }
+      actionInPage = {
+        this.bottomSheetBehavior.state = STATE_EXPANDED
+        this.onBookRevokeRequested(status)
+      },
+      actionInBottomSheet = {
+        this.onBookRevokeRequested(status)
+      }
     )
 
     if (held.isRevocable) {
@@ -1011,8 +1027,13 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogGet,
-      actionInPage = { this.bottomSheetBehavior.state = STATE_EXPANDED },
-      actionInBottomSheet = { this.onBookBorrowRequested(status.toBorrowParameters()) }
+      actionInPage = {
+        this.bottomSheetBehavior.state = STATE_EXPANDED
+        this.onBookBorrowRequested(status.toBorrowParameters())
+      },
+      actionInBottomSheet = {
+        this.onBookBorrowRequested(status.toBorrowParameters())
+      }
     )
 
     this.reconfigurePreviewButton(status)
@@ -1031,8 +1052,13 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogReserve,
-      actionInPage = { this.bottomSheetBehavior.state = STATE_EXPANDED },
-      actionInBottomSheet = { this.onBookBorrowRequested(status.toBorrowParameters()) }
+      actionInPage = {
+        this.bottomSheetBehavior.state = STATE_EXPANDED
+        this.onBookBorrowRequested(status.toBorrowParameters())
+      },
+      actionInBottomSheet = {
+        this.onBookBorrowRequested(status.toBorrowParameters())
+      }
     )
     this.reconfigurePreviewButton(status)
   }
@@ -1050,8 +1076,13 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogGet,
-      actionInPage = { this.bottomSheetBehavior.state = STATE_EXPANDED },
-      actionInBottomSheet = { this.onBookBorrowRequested(status.toBorrowParameters()) }
+      actionInPage = {
+        this.bottomSheetBehavior.state = STATE_EXPANDED
+        this.onBookBorrowRequested(status.toBorrowParameters())
+      },
+      actionInBottomSheet = {
+        this.onBookBorrowRequested(status.toBorrowParameters())
+      }
     )
     this.reconfigurePreviewButton(status)
   }
@@ -1071,6 +1102,8 @@ class CatalogFeedViewDetails2(
 
       BookPreviewStatus.None -> {
         this.enableButton1Status = false
+        this.bookButton1.visibility = View.GONE
+        this.bookBottomSheetButton1.visibility = View.GONE
       }
     }
   }
@@ -1113,8 +1146,13 @@ class CatalogFeedViewDetails2(
       this.enableButton1Status = true
       this.reconfigureButton1(
         text = R.string.catalogReturn,
-        actionInPage = { this.bottomSheetBehavior.state = STATE_EXPANDED },
-        actionInBottomSheet = { this.onBookRevokeRequested(status) }
+        actionInPage = {
+          this.bottomSheetBehavior.state = STATE_EXPANDED
+          this.onBookRevokeRequested(status)
+        },
+        actionInBottomSheet = {
+          this.onBookRevokeRequested(status)
+        }
       )
     } else {
       this.reconfigurePreviewButton(status)
@@ -1159,16 +1197,26 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogGet,
-      actionInPage = { this.bottomSheetBehavior.state = STATE_EXPANDED },
-      actionInBottomSheet = { this.onBookBorrowRequested(status.toBorrowParameters()) }
+      actionInPage = {
+        this.bottomSheetBehavior.state = STATE_EXPANDED
+        this.onBookBorrowRequested(status.toBorrowParameters())
+      },
+      actionInBottomSheet = {
+        this.onBookBorrowRequested(status.toBorrowParameters())
+      }
     )
 
     if (this.onBookCanBeRevoked.invoke(status)) {
       this.enableButton1Status = true
       this.reconfigureButton1(
         text = R.string.catalogReturn,
-        actionInPage = { this.bottomSheetBehavior.state = STATE_EXPANDED },
-        actionInBottomSheet = { this.onBookRevokeRequested(status) }
+        actionInPage = {
+          this.bottomSheetBehavior.state = STATE_EXPANDED
+          this.onBookRevokeRequested(status)
+        },
+        actionInBottomSheet = {
+          this.onBookRevokeRequested(status)
+        }
       )
     } else {
       this.reconfigurePreviewButton(status)
@@ -1254,8 +1302,13 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogCancel,
-      actionInPage = { this.bottomSheetBehavior.state = STATE_EXPANDED },
-      actionInBottomSheet = { this.onBookBorrowCancelRequested(status) }
+      actionInPage = {
+        this.bottomSheetBehavior.state = STATE_EXPANDED
+        this.onBookBorrowCancelRequested(status)
+      },
+      actionInBottomSheet = {
+        this.onBookBorrowCancelRequested(status)
+      }
     )
   }
 
@@ -1315,8 +1368,10 @@ class CatalogFeedViewDetails2(
     actionInPage: () -> Unit,
     actionInBottomSheet: () -> Unit
   ) {
+    this.bookButton1.visibility = View.VISIBLE
     this.bookButton1.setText(text)
     this.bookButton1.setOnClickListener { actionInPage() }
+    this.bookBottomSheetButton1.visibility = View.VISIBLE
     this.bookBottomSheetButton1.setText(text)
     this.bookBottomSheetButton1.setOnClickListener { actionInBottomSheet() }
   }

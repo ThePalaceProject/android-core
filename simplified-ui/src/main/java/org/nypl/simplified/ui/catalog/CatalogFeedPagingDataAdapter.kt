@@ -189,6 +189,7 @@ class CatalogFeedPagingDataAdapter(
           this.setVisible(this.idleCover, false)
           this.setVisible(this.idleCoverProgress, true)
 
+          this.errorTitle.text = item.feedEntry.title
           this.idleTitle.text = item.feedEntry.title
           this.idleAuthor.text = item.feedEntry.authorsCommaSeparated
 
@@ -446,6 +447,7 @@ class CatalogFeedPagingDataAdapter(
       this.setVisible(this.idle, false)
       this.setVisible(this.progress, false)
 
+      this.errorTitle.visibility = View.VISIBLE
       this.errorDismiss.setOnClickListener {
         this.onBookErrorDismiss(book, status)
       }
@@ -466,6 +468,7 @@ class CatalogFeedPagingDataAdapter(
       this.setVisible(this.idle, false)
       this.setVisible(this.progress, false)
 
+      this.errorTitle.visibility = View.VISIBLE
       this.errorDismiss.setOnClickListener {
         this.onBookErrorDismiss(book, status)
       }

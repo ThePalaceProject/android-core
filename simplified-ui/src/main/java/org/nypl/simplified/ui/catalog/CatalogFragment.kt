@@ -316,27 +316,23 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
   ) {
     val view =
       CatalogFeedViewDetails2.create(
-        container = this.contentContainer,
-        childFragmentManager = this.childFragmentManager,
         layoutInflater = this.layoutInflater,
+        childFragmentManager = this.childFragmentManager,
         screenSize = this.screenSize,
+        container = this.contentContainer,
         covers = this.covers,
-        onBookSelected = this::onBookSelected,
-        onFeedSelected = this::onFeedSelected,
-        onToolbarBackPressed = this::onToolbarBackPressed,
-        onBookViewerOpen = this::onBookViewerOpen,
         onShowErrorDetails = this::onShowErrorDetails,
-        onBookDismissError = this::onBookDismissError,
-        onBookBorrowCancelRequested = this::onBookBorrowCancelRequested,
         onBookSAMLDownloadRequested = this::onBookSAMLDownloadRequested,
-        onBookPreviewOpenRequested = this::onBookPreviewOpenRequested,
+        onBookDismissError = this::onBookDismissError,
         onBookBorrowRequested = this::onBookBorrowRequested,
-        onBookCanBeDeleted = this::onBookCanBeDeleted,
+        onBookBorrowCancelRequested = this::onBookBorrowCancelRequested,
         onBookCanBeRevoked = this::onBookCanBeRevoked,
-        onBookDeleteRequested = this::onBookDeleteRequested,
-        onBookReserveRequested = this::onBookReserveRequested,
-        onBookResetStatusInitial = this::onBookResetStatusInitial,
-        onBookRevokeRequested = this::onBookRevokeRequested
+        onBookPreviewOpenRequested = this::onBookPreviewOpenRequested,
+        onBookRevokeRequested = this::onBookRevokeRequested,
+        onBookViewerOpen = this::onBookViewerOpen,
+        onToolbarBackPressed = this::onToolbarBackPressed,
+        onFeedSelected = this::onFeedSelected,
+        onBookSelected = this::onBookSelected
       )
 
     when (val entry = this.opdsClient.entry.get()) {
