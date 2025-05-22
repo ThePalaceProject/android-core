@@ -317,13 +317,10 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     val view =
       CatalogFeedViewDetails2.create(
         layoutInflater = this.layoutInflater,
-        childFragmentManager = this.childFragmentManager,
         screenSize = this.screenSize,
         container = this.contentContainer,
         covers = this.covers,
         onShowErrorDetails = this::onShowErrorDetails,
-        onBookSAMLDownloadRequested = this::onBookSAMLDownloadRequested,
-        onBookDismissError = this::onBookDismissError,
         onBookBorrowRequested = this::onBookBorrowRequested,
         onBookBorrowCancelRequested = this::onBookBorrowCancelRequested,
         onBookCanBeRevoked = this::onBookCanBeRevoked,

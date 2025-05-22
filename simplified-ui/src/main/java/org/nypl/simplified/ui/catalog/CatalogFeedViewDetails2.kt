@@ -21,7 +21,6 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.get
 import androidx.core.math.MathUtils.clamp
 import androidx.core.widget.NestedScrollView
-import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -39,6 +38,7 @@ import com.io7m.jfunctional.Some
 import org.joda.time.DateTime
 import org.joda.time.Days
 import org.joda.time.Duration
+import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatterBuilder
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountID
@@ -88,12 +88,9 @@ class CatalogFeedViewDetails2(
   override val root: ViewGroup,
   private val screenSize: ScreenSizeInformationType,
   private val layoutInflater: LayoutInflater,
-  private val childFragmentManager: FragmentManager,
   private val covers: BookCoverProviderType,
   private val onToolbarBackPressed: () -> Unit,
   private val onShowErrorDetails: (TaskResult.Failure<*>) -> Unit,
-  private val onBookDismissError: (CatalogBookStatus<*>) -> Unit,
-  private val onBookSAMLDownloadRequested: (CatalogBookStatus<DownloadWaitingForExternalAuthentication>) -> Unit,
   private val onBookBorrowRequested: (CatalogBorrowParameters) -> Unit,
   private val onBookBorrowCancelRequested: (CatalogBookStatus<*>) -> Unit,
   private val onBookCanBeRevoked: (CatalogBookStatus<*>) -> Boolean,
@@ -110,6 +107,9 @@ class CatalogFeedViewDetails2(
 
   private val genreUriScheme =
     "http://librarysimplified.org/terms/genres/Simplified/"
+
+  private val loanEndFormatter =
+    DateTimeFormat.forPattern("MMM d, yyyy")
 
   private val dateFormatter =
     DateTimeFormatterBuilder()
@@ -757,13 +757,10 @@ class CatalogFeedViewDetails2(
   companion object {
     fun create(
       layoutInflater: LayoutInflater,
-      childFragmentManager: FragmentManager,
       screenSize: ScreenSizeInformationType,
       container: ViewGroup,
       covers: BookCoverProviderType,
       onShowErrorDetails: (TaskResult.Failure<*>) -> Unit,
-      onBookSAMLDownloadRequested: (CatalogBookStatus<DownloadWaitingForExternalAuthentication>) -> Unit,
-      onBookDismissError: (CatalogBookStatus<*>) -> Unit,
       onBookBorrowRequested: (CatalogBorrowParameters) -> Unit,
       onBookBorrowCancelRequested: (CatalogBookStatus<*>) -> Unit,
       onBookCanBeRevoked: (CatalogBookStatus<*>) -> Boolean,
@@ -778,12 +775,9 @@ class CatalogFeedViewDetails2(
         root = layoutInflater.inflate(R.layout.book_detail2, container, true) as ViewGroup,
         screenSize = screenSize,
         layoutInflater = layoutInflater,
-        childFragmentManager = childFragmentManager,
         covers = covers,
         onToolbarBackPressed = onToolbarBackPressed,
         onShowErrorDetails = onShowErrorDetails,
-        onBookDismissError = onBookDismissError,
-        onBookSAMLDownloadRequested = onBookSAMLDownloadRequested,
         onBookBorrowRequested = onBookBorrowRequested,
         onBookBorrowCancelRequested = onBookBorrowCancelRequested,
         onBookCanBeRevoked = onBookCanBeRevoked,
@@ -1164,7 +1158,7 @@ class CatalogFeedViewDetails2(
     if (this.loanExpiryDate != null) {
       this.configureInfoContainer(BORROWING) {
         this.bottomSheetInfoBorrowingText.setText(R.string.catalogBookDetailBorrowedUntil)
-        this.bottomSheetInfoBorrowingTime.text = this.dateFormatter.print(this.loanExpiryDate)
+        this.bottomSheetInfoBorrowingTime.text = this.loanEndFormatter.print(this.loanExpiryDate)
       }
     } else {
       this.configureInfoContainer(GENERIC) {
@@ -1219,7 +1213,7 @@ class CatalogFeedViewDetails2(
     if (this.loanExpiryDate != null) {
       this.configureInfoContainer(BORROWING) {
         this.bottomSheetInfoBorrowingText.setText(R.string.catalogBookDetailBorrowedUntil)
-        this.bottomSheetInfoBorrowingTime.text = this.dateFormatter.print(this.loanExpiryDate)
+        this.bottomSheetInfoBorrowingTime.text = this.loanEndFormatter.print(this.loanExpiryDate)
       }
     } else {
       this.configureInfoContainer(GENERIC) {
