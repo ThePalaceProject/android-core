@@ -37,6 +37,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior.from
 import com.google.common.util.concurrent.MoreExecutors
 import com.io7m.jfunctional.Some
 import org.joda.time.DateTime
+import org.joda.time.Days
 import org.joda.time.Duration
 import org.joda.time.format.DateTimeFormatterBuilder
 import org.librarysimplified.ui.R
@@ -74,6 +75,11 @@ import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoad
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderSuccess
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.threads.UIThread
+import org.nypl.simplified.ui.catalog.CatalogFeedViewDetails2.InfoState.BORROWING
+import org.nypl.simplified.ui.catalog.CatalogFeedViewDetails2.InfoState.BORROWING_AND_PROGRESS
+import org.nypl.simplified.ui.catalog.CatalogFeedViewDetails2.InfoState.GENERIC
+import org.nypl.simplified.ui.catalog.CatalogFeedViewDetails2.InfoState.NONE
+import org.nypl.simplified.ui.catalog.CatalogFeedViewDetails2.InfoState.PROGRESS
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.slf4j.LoggerFactory
 import java.net.URI
@@ -98,6 +104,7 @@ class CatalogFeedViewDetails2(
   private val onFeedSelected: (accountID: AccountID, title: String, uri: URI) -> Unit,
 ) : CatalogFeedView() {
 
+  private var loanExpiryDate: DateTime? = null
   private val logger =
     LoggerFactory.getLogger(CatalogFeedViewDetails2::class.java)
 
@@ -881,11 +888,9 @@ class CatalogFeedViewDetails2(
     this.enableButton0Status = true
     this.enableButton1Status = true
 
-    this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
-    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
-    this.setVisibility(this.bottomSheetInfoGenericLayout, View.VISIBLE)
-    this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
-    this.bottomSheetInfoGenericText.setText(R.string.catalogOperationFailed)
+    this.configureInfoContainer(GENERIC) {
+      this.bottomSheetInfoGenericText.setText(R.string.catalogOperationFailed)
+    }
 
     this.reconfigureButton0(
       text = R.string.catalogRetry,
@@ -910,11 +915,9 @@ class CatalogFeedViewDetails2(
     this.enableButton0Status = true
     this.enableButton1Status = true
 
-    this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
-    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
-    this.setVisibility(this.bottomSheetInfoGenericLayout, View.VISIBLE)
-    this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
-    this.bottomSheetInfoGenericText.setText(R.string.catalogOperationFailed)
+    this.configureInfoContainer(GENERIC) {
+      this.bottomSheetInfoGenericText.setText(R.string.catalogOperationFailed)
+    }
 
     this.reconfigureButton0(
       text = R.string.catalogRetry,
@@ -939,11 +942,9 @@ class CatalogFeedViewDetails2(
     this.enableButton0Status = true
     this.enableButton1Status = true
 
-    this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
-    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
-    this.setVisibility(this.bottomSheetInfoGenericLayout, View.VISIBLE)
-    this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
-    this.bottomSheetInfoGenericText.setText(R.string.catalogOperationFailed)
+    this.configureInfoContainer(GENERIC) {
+      this.bottomSheetInfoGenericText.setText(R.string.catalogOperationFailed)
+    }
 
     this.reconfigureButton0(
       text = R.string.catalogRetry,
@@ -968,11 +969,6 @@ class CatalogFeedViewDetails2(
     val held = status.status
     this.enableButton0Status = held.isRevocable
 
-    this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
-    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
-    this.setVisibility(this.bottomSheetInfoGenericLayout, View.VISIBLE)
-    this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
-
     /*
      * We currently ignore date information for holds. The hold end date would usually be
      * an estimate of when the hold will become available, but we don't reliably have this
@@ -980,18 +976,20 @@ class CatalogFeedViewDetails2(
      * have been provided.
      */
 
-    val queue = held.queuePosition
-    if (queue != null) {
-      this.bottomSheetInfoGenericText.text =
-        this.bottomSheetInfoGenericText.resources.getString(
-          R.string.catalogBookAvailabilityHeldQueue,
-          queue
-        )
-    } else {
-      this.bottomSheetInfoGenericText.text =
-        this.bottomSheetInfoGenericText.resources.getString(
-          R.string.catalogBookAvailabilityHeldIndefinite
-        )
+    this.configureInfoContainer(GENERIC) {
+      val queue = held.queuePosition
+      if (queue != null) {
+        this.bottomSheetInfoGenericText.text =
+          this.bottomSheetInfoGenericText.resources.getString(
+            R.string.catalogBookAvailabilityHeldQueue,
+            queue
+          )
+      } else {
+        this.bottomSheetInfoGenericText.text =
+          this.bottomSheetInfoGenericText.resources.getString(
+            R.string.catalogBookAvailabilityHeldIndefinite
+          )
+      }
     }
 
     this.reconfigureButton0(
@@ -1012,18 +1010,70 @@ class CatalogFeedViewDetails2(
     this.reconfigurePreviewButton(status)
   }
 
+  enum class InfoState {
+    NONE,
+    BORROWING,
+    GENERIC,
+    PROGRESS,
+    BORROWING_AND_PROGRESS
+  }
+
+  /**
+   * Show or hide various parts of the info container based on the desired view state.
+   */
+
+  private fun configureInfoContainer(
+    setState: InfoState,
+    andThen: () -> Unit
+  ) {
+    return when (setState) {
+      NONE -> {
+        this.setVisibility(this.bottomSheetInfoContainer, View.INVISIBLE)
+        this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
+        this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
+        this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
+        andThen()
+      }
+      BORROWING -> {
+        this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
+        this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.VISIBLE)
+        this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
+        this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
+        andThen()
+      }
+      GENERIC -> {
+        this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
+        this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
+        this.setVisibility(this.bottomSheetInfoGenericLayout, View.VISIBLE)
+        this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
+        andThen()
+      }
+      PROGRESS -> {
+        this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
+        this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
+        this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
+        this.setVisibility(this.bottomSheetInfoProgress, View.VISIBLE)
+        andThen()
+      }
+      BORROWING_AND_PROGRESS -> {
+        this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
+        this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.VISIBLE)
+        this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
+        this.setVisibility(this.bottomSheetInfoProgress, View.VISIBLE)
+        andThen()
+      }
+    }
+  }
+
   private fun onBookStatusHeldReady(
     status: CatalogBookStatus<HeldReady>
   ) {
     this.enableButton0Status = true
 
-    this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
-    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
-    this.setVisibility(this.bottomSheetInfoGenericLayout, View.VISIBLE)
-    this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
-
-    this.bottomSheetInfoGenericText.text =
-      this.bottomSheetInfoBorrowingText.resources.getString(R.string.catalogBookAvailabilityLoanable)
+    this.configureInfoContainer(GENERIC) {
+      this.bottomSheetInfoGenericText.text =
+        this.bottomSheetInfoBorrowingText.resources.getString(R.string.catalogBookAvailabilityLoanable)
+    }
 
     this.reconfigureButton0(
       text = R.string.catalogGet,
@@ -1045,10 +1095,7 @@ class CatalogFeedViewDetails2(
     this.enableButton0Status = true
     this.enableButton1Status = false
 
-    this.setVisibility(this.bottomSheetInfoContainer, View.INVISIBLE)
-    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
-    this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
-    this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
+    this.configureInfoContainer(NONE) {}
 
     this.reconfigureButton0(
       text = R.string.catalogReserve,
@@ -1069,10 +1116,9 @@ class CatalogFeedViewDetails2(
     this.enableButton0Status = true
     this.enableButton1Status = false
 
-    this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
-    this.setVisibility(this.bottomSheetInfoGenericLayout, View.VISIBLE)
-    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
-    this.bottomSheetInfoGenericText.setText(R.string.catalogBookAvailabilityLoanable)
+    this.configureInfoContainer(GENERIC) {
+      this.bottomSheetInfoGenericText.setText(R.string.catalogBookAvailabilityLoanable)
+    }
 
     this.reconfigureButton0(
       text = R.string.catalogGet,
@@ -1114,23 +1160,16 @@ class CatalogFeedViewDetails2(
     this.enableButton0Status = true
     this.enableButton1Status = false
 
-    this.setVisibility(this.bottomSheetInfoContainer, View.INVISIBLE)
-    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
-    this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
-    this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
-
-    val loanExpiryDate = status.status.loanExpiryDate
-    if (loanExpiryDate != null) {
-      this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
-      this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
-      this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.VISIBLE)
-      this.bottomSheetInfoBorrowingText.setText(R.string.catalogBookDetailBorrowedUntil)
-      this.bottomSheetInfoBorrowingTime.text = this.dateFormatter.print(loanExpiryDate)
+    this.loanExpiryDate = status.status.loanExpiryDate
+    if (this.loanExpiryDate != null) {
+      this.configureInfoContainer(BORROWING) {
+        this.bottomSheetInfoBorrowingText.setText(R.string.catalogBookDetailBorrowedUntil)
+        this.bottomSheetInfoBorrowingTime.text = this.dateFormatter.print(this.loanExpiryDate)
+      }
     } else {
-      this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
-      this.setVisibility(this.bottomSheetInfoGenericLayout, View.VISIBLE)
-      this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
-      this.bottomSheetInfoGenericText.setText(R.string.catalogBookAvailabilityLoanedIndefinite)
+      this.configureInfoContainer(GENERIC) {
+        this.bottomSheetInfoGenericText.setText(R.string.catalogBookAvailabilityLoanedIndefinite)
+      }
     }
 
     val format = status.book.findPreferredFormat()
@@ -1176,23 +1215,16 @@ class CatalogFeedViewDetails2(
     this.enableButton0Status = true
     this.enableButton1Status = true
 
-    this.setVisibility(this.bottomSheetInfoContainer, View.INVISIBLE)
-    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
-    this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
-    this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
-
-    val loanExpiryDate = status.status.loanExpiryDate
-    if (loanExpiryDate != null) {
-      this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
-      this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
-      this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.VISIBLE)
-      this.bottomSheetInfoBorrowingText.setText(R.string.catalogBookDetailBorrowedUntil)
-      this.bottomSheetInfoBorrowingTime.text = this.dateFormatter.print(loanExpiryDate)
+    this.loanExpiryDate = status.status.loanExpiryDate
+    if (this.loanExpiryDate != null) {
+      this.configureInfoContainer(BORROWING) {
+        this.bottomSheetInfoBorrowingText.setText(R.string.catalogBookDetailBorrowedUntil)
+        this.bottomSheetInfoBorrowingTime.text = this.dateFormatter.print(this.loanExpiryDate)
+      }
     } else {
-      this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
-      this.setVisibility(this.bottomSheetInfoGenericLayout, View.VISIBLE)
-      this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
-      this.bottomSheetInfoGenericText.setText(R.string.catalogBookAvailabilityLoanedIndefinite)
+      this.configureInfoContainer(GENERIC) {
+        this.bottomSheetInfoGenericText.setText(R.string.catalogBookAvailabilityLoanedIndefinite)
+      }
     }
 
     this.reconfigureButton0(
@@ -1229,15 +1261,9 @@ class CatalogFeedViewDetails2(
     this.enableButton0Status = false
     this.enableButton1Status = false
 
-    this.setVisibility(this.bottomSheetInfoContainer, View.INVISIBLE)
-    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
-    this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
-    this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
-
-    this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
-    this.setVisibility(this.bottomSheetInfoGenericLayout, View.VISIBLE)
-    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
-    this.bottomSheetInfoGenericText.setText(R.string.bookReachedLoanLimitDialogMessage)
+    this.configureInfoContainer(GENERIC) {
+      this.bottomSheetInfoGenericText.setText(R.string.bookReachedLoanLimitDialogMessage)
+    }
   }
 
   private fun onBookStatusRequestingDownload(
@@ -1246,11 +1272,33 @@ class CatalogFeedViewDetails2(
     this.enableButton0Status = false
     this.enableButton1Status = false
 
-    this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
-    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
-    this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
-    this.setVisibility(this.bottomSheetInfoProgress, View.VISIBLE)
-    this.setProgress(0.0)
+    val expires = this.loanExpiryDate
+    if (expires != null) {
+      this.configureInfoContainer(BORROWING_AND_PROGRESS) {
+        this.setBorrowingTimeDays(expires)
+        this.setProgress(0.0)
+      }
+    } else {
+      this.configureInfoContainer(PROGRESS) {
+        this.setProgress(0.0)
+      }
+    }
+  }
+
+  private fun setBorrowingTimeDays(
+    expires: DateTime?
+  ) {
+    if (expires == null) {
+      return
+    }
+    val today = DateTime.now()
+    val days = Days.daysBetween(today, expires)
+    this.bottomSheetInfoBorrowingText.setText(R.string.catalogBookDetailBorrowingFor)
+    this.bottomSheetInfoBorrowingTime.text =
+      this.bottomSheetInfoBorrowingTime.resources.getString(
+        R.string.catalogBookDaysRemaining,
+        days.days.toString()
+      )
   }
 
   private fun onBookStatusRequestingLoan(
@@ -1259,11 +1307,9 @@ class CatalogFeedViewDetails2(
     this.enableButton0Status = false
     this.enableButton1Status = false
 
-    this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
-    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
-    this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
-    this.setVisibility(this.bottomSheetInfoProgress, View.VISIBLE)
-    this.setProgress(0.0)
+    this.configureInfoContainer(PROGRESS) {
+      this.setProgress(0.0)
+    }
   }
 
   private fun onBookStatusRequestingRevoke(
@@ -1272,11 +1318,9 @@ class CatalogFeedViewDetails2(
     this.enableButton0Status = false
     this.enableButton1Status = false
 
-    this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
-    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
-    this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
-    this.setVisibility(this.bottomSheetInfoProgress, View.VISIBLE)
-    this.setProgress(0.0)
+    this.configureInfoContainer(PROGRESS) {
+      this.setProgress(0.0)
+    }
   }
 
   private fun onBookStatusRevoked(
@@ -1285,7 +1329,7 @@ class CatalogFeedViewDetails2(
     this.enableButton0Status = false
     this.enableButton1Status = false
 
-    this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
+    this.configureInfoContainer(NONE) {}
   }
 
   private fun onBookStatusDownloading(
@@ -1294,11 +1338,17 @@ class CatalogFeedViewDetails2(
     this.enableButton0Status = true
     this.enableButton1Status = false
 
-    this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
-    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
-    this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
-    this.setVisibility(this.bottomSheetInfoProgress, View.VISIBLE)
-    this.setProgress(status.status.progressPercent)
+    val expires = this.loanExpiryDate
+    if (expires != null) {
+      this.configureInfoContainer(BORROWING_AND_PROGRESS) {
+        this.setBorrowingTimeDays(expires)
+        this.setProgress(status.status.progressPercent)
+      }
+    } else {
+      this.configureInfoContainer(PROGRESS) {
+        this.setProgress(status.status.progressPercent)
+      }
+    }
 
     this.reconfigureButton0(
       text = R.string.catalogCancel,
@@ -1321,21 +1371,33 @@ class CatalogFeedViewDetails2(
   private fun onBookStatusDownloadWaitingForExternalAuthentication(
     status: CatalogBookStatus<DownloadWaitingForExternalAuthentication>
   ) {
-    this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
-    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
-    this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
-    this.setVisibility(this.bottomSheetInfoProgress, View.VISIBLE)
-    this.setProgress(0.0)
+    val expires = this.loanExpiryDate
+    if (expires != null) {
+      this.configureInfoContainer(BORROWING_AND_PROGRESS) {
+        this.setBorrowingTimeDays(expires)
+        this.setProgress(0.0)
+      }
+    } else {
+      this.configureInfoContainer(PROGRESS) {
+        this.setProgress(0.0)
+      }
+    }
   }
 
   private fun onBookStatusDownloadExternalAuthenticationInProgress(
     status: CatalogBookStatus<DownloadExternalAuthenticationInProgress>
   ) {
-    this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
-    this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
-    this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
-    this.setVisibility(this.bottomSheetInfoProgress, View.VISIBLE)
-    this.setProgress(0.0)
+    val expires = this.loanExpiryDate
+    if (expires != null) {
+      this.configureInfoContainer(BORROWING_AND_PROGRESS) {
+        this.setBorrowingTimeDays(expires)
+        this.setProgress(0.0)
+      }
+    } else {
+      this.configureInfoContainer(PROGRESS) {
+        this.setProgress(0.0)
+      }
+    }
   }
 
   /**

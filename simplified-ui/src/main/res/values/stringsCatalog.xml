@@ -43,6 +43,7 @@
   <string name="catalogBookFormatAudioBook">Audiobook</string>
   <string name="catalogBookFormatEPUB">eBook</string>
   <string name="catalogBookFormatPDF">PDF</string>
+  <string name="catalogBookDaysRemaining">%1$s days</string>
   <string name="catalogBookIntervalDays">days</string>
   <string name="catalogBookIntervalDaysShort">d</string>
   <string name="catalogBookIntervalHours">hours</string>
