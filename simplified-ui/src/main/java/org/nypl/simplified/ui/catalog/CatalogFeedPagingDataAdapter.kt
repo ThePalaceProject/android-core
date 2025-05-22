@@ -503,12 +503,15 @@ class CatalogFeedPagingDataAdapter(
             }
           )
         )
-      } else {
-        this.idleButtons.addView(
-          this.buttonCreator.createCenteredTextForButtons(
-            R.string.catalogHoldCannotCancel
+      }
+
+      val position = status.queuePosition
+      if (position != null) {
+        this.idleTime.text =
+          this.idleTime.resources.getString(
+            R.string.catalogBookAvailabilityHeldQueue,
+            position
           )
-        )
       }
     }
 
@@ -608,7 +611,6 @@ class CatalogFeedPagingDataAdapter(
         }
 
         is BookFormat.BookFormatAudioBook -> {
-          val loanDuration = this.getLoanDurationText(book)
           this.idleButtons.addView(
             this.buttonCreator.createListenButton(
               onClick = {

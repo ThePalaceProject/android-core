@@ -2,15 +2,11 @@ package org.nypl.simplified.ui.catalog
 
 import android.content.Context
 import android.text.TextUtils
-import android.view.Gravity
 import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Space
-import android.widget.TextView
-import androidx.annotation.StringRes
 import androidx.annotation.UiThread
-import androidx.appcompat.widget.AppCompatTextView
 import com.google.android.material.button.MaterialButton
 import org.librarysimplified.ui.R
 import org.nypl.simplified.books.book_database.api.BookFormats
@@ -30,16 +26,6 @@ class CatalogButtons(
     val space = Space(this.context)
     space.layoutParams = this.buttonSpaceLayoutParameters()
     return space
-  }
-
-  @UiThread
-  fun createCenteredTextForButtons(
-    @StringRes res: Int
-  ): TextView {
-    val text = AppCompatTextView(this.context)
-    text.gravity = Gravity.CENTER
-    text.text = this.context.getString(res)
-    return text
   }
 
   @UiThread
