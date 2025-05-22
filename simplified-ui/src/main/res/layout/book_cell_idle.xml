@@ -14,7 +14,6 @@
         android:layout_height="@dimen/catalogFeedCellHeight"
         android:layout_marginStart="16dp"
         android:contentDescription="@null"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -58,21 +57,6 @@
         app:layout_constraintTop_toBottomOf="@id/bookCellIdleTitle"
         tools:text="Mary Shelley" />
 
-    <TextView
-        android:id="@+id/bookCellIdleMeta"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:textSize="12sp"
-        android:textStyle="italic"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/bookCellIdleCover"
-        app:layout_constraintTop_toBottomOf="@id/bookCellIdleAuthor"
-        tools:text="eBook - The New York Public Library" />
-
     <LinearLayout
         android:id="@+id/bookCellIdleButtons"
         android:layout_width="0dp"
@@ -82,7 +66,7 @@
         android:layout_marginBottom="8dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bookCellIdleTime"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/bookCellIdleCover">
 
@@ -124,4 +108,21 @@
             tools:text="@string/catalogRetry"
             tools:visibility="visible" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/bookCellIdleTime"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textSize="12sp"
+        android:alpha="0.75"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/bookCellIdleCover"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:text="Borrowed until 31st February 1976" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

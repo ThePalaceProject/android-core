@@ -43,16 +43,6 @@ class CatalogButtons(
   }
 
   @UiThread
-  fun createCenteredTextForButtons(
-    centeredText: String
-  ): TextView {
-    return AppCompatTextView(this.context).apply {
-      gravity = Gravity.CENTER
-      text = centeredText
-    }
-  }
-
-  @UiThread
   fun createButton(
     text: Int,
     description: Int,
@@ -70,56 +60,6 @@ class CatalogButtons(
       onClick.invoke(button)
       button.isEnabled = true
     }
-    return button
-  }
-
-  @UiThread
-  fun createReadButtonWithLoanDuration(
-    loanDuration: String,
-    onClick: () -> Unit
-  ): View {
-    return createButtonWithDuration(loanDuration, R.string.catalogRead, onClick)
-  }
-
-  @UiThread
-  fun createDownloadButtonWithLoanDuration(
-    loanDuration: String,
-    onClick: () -> Unit
-  ): View {
-    return createButtonWithDuration(loanDuration, R.string.catalogDownload, onClick)
-  }
-
-  @UiThread
-  fun createListenButtonWithLoanDuration(
-    loanDuration: String,
-    onClick: () -> Unit
-  ): View {
-    return createButtonWithDuration(loanDuration, R.string.catalogListen, onClick)
-  }
-
-  @UiThread
-  fun createButtonWithDuration(
-    loanDuration: String,
-    @StringRes res: Int,
-    onClick: () -> Unit
-  ): View {
-    val button = MaterialButton(this.context)
-    button.text = this.context.getString(res)
-    button.contentDescription = this.context.getString(res)
-    button.layoutParams = this.buttonLayoutParameters(true)
-    button.maxLines = 1
-    button.ellipsize = TextUtils.TruncateAt.END
-    button.setOnClickListener {
-      button.isEnabled = false
-      onClick.invoke()
-      button.isEnabled = true
-    }
-    button.iconSize = this.screenSizeInformation.dpToPixels(24).toInt()
-    button.icon = CatalogTimedLoanDrawable(
-      context = this.context,
-      screenSizeInformation = this.screenSizeInformation,
-      durationText = loanDuration
-    )
     return button
   }
 
@@ -306,13 +246,5 @@ class CatalogButtons(
     }
     buttonLayoutParams.width = 0
     return buttonLayoutParams
-  }
-
-  @UiThread
-  fun wrapContentParameters(): LinearLayout.LayoutParams {
-    return LinearLayout.LayoutParams(
-      LinearLayout.LayoutParams.WRAP_CONTENT,
-      LinearLayout.LayoutParams.WRAP_CONTENT
-    )
   }
 }

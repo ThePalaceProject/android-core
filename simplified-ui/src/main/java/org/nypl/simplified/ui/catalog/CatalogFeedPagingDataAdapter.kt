@@ -17,6 +17,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.util.concurrent.MoreExecutors
 import io.reactivex.disposables.Disposable
 import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
 import org.librarysimplified.ui.R
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
@@ -64,9 +65,12 @@ class CatalogFeedPagingDataAdapter(
   private val onBookViewerOpen: (Book, BookFormat) -> Unit,
   private val onBookDelete: (CatalogBookStatus<*>) -> Unit,
   private val onShowTaskError: (TaskResult.Failure<*>) -> Unit,
-) : PagingDataAdapter<FeedEntry, CatalogFeedPagingDataAdapter.ViewHolder>(diffCallback) {
+) : PagingDataAdapter<FeedEntry, CatalogFeedPagingDataAdapter.ViewHolder>(org.nypl.simplified.ui.catalog.CatalogFeedPagingDataAdapter.Companion.diffCallback) {
 
   companion object {
+    private val loanEndFormatter =
+      DateTimeFormat.forPattern("MMM d, yyyy")
+
     private val diffCallback =
       object : DiffUtil.ItemCallback<FeedEntry>() {
         override fun areContentsTheSame(
@@ -110,8 +114,8 @@ class CatalogFeedPagingDataAdapter(
       this.view.findViewById<ProgressBar>(R.id.bookCellIdleCoverProgress)
     private val idleTitle =
       this.idle.findViewById<TextView>(R.id.bookCellIdleTitle)
-    private val idleMeta =
-      this.idle.findViewById<TextView>(R.id.bookCellIdleMeta)
+    private val idleTime =
+      this.idle.findViewById<TextView>(R.id.bookCellIdleTime)
     private val idleAuthor =
       this.idle.findViewById<TextView>(R.id.bookCellIdleAuthor)
     private val idleButtons =
@@ -182,7 +186,7 @@ class CatalogFeedPagingDataAdapter(
               .filter { event -> event.bookId == item.bookID }
               .subscribe { event -> this.onStatusChangedForFeedEntry(item) }
 
-          for (v in listOf(view, this.idle, this.error, this.corrupt, this.progress)) {
+          for (v in listOf(this.view, this.idle, this.error, this.corrupt, this.progress)) {
             v.setOnClickListener { this@CatalogFeedPagingDataAdapter.onBookSelected(item) }
           }
 
@@ -192,6 +196,7 @@ class CatalogFeedPagingDataAdapter(
           this.errorTitle.text = item.feedEntry.title
           this.idleTitle.text = item.feedEntry.title
           this.idleAuthor.text = item.feedEntry.authorsCommaSeparated
+          this.idleTime.text = ""
 
           val f =
             this@CatalogFeedPagingDataAdapter.covers.loadThumbnailInto(
@@ -587,42 +592,30 @@ class CatalogFeedPagingDataAdapter(
       this.setVisible(this.progress, false)
 
       this.idleButtons.removeAllViews()
+      this.setIdleTime(this.getLoanDuration(book))
 
       when (val format = book.findPreferredFormat()) {
         is BookFormat.BookFormatPDF,
         is BookFormat.BookFormatEPUB -> {
-          val loanDuration = getLoanDuration(book)
           this.idleButtons.addView(
-            if (loanDuration.isNotEmpty()) {
-              this.buttonCreator.createReadButtonWithLoanDuration(loanDuration) {
+            this.buttonCreator.createReadButton(
+              onClick = {
                 this.onBookViewerOpen(book, format)
-              }
-            } else {
-              this.buttonCreator.createReadButton(
-                onClick = {
-                  this.onBookViewerOpen(book, format)
-                },
-                heightMatchParent = true
-              )
-            }
+              },
+              heightMatchParent = true
+            )
           )
         }
 
         is BookFormat.BookFormatAudioBook -> {
-          val loanDuration = getLoanDuration(book)
+          val loanDuration = this.getLoanDurationText(book)
           this.idleButtons.addView(
-            if (loanDuration.isNotEmpty()) {
-              this.buttonCreator.createListenButtonWithLoanDuration(loanDuration) {
+            this.buttonCreator.createListenButton(
+              onClick = {
                 this.onBookViewerOpen(book, format)
-              }
-            } else {
-              this.buttonCreator.createListenButton(
-                onClick = {
-                  this.onBookViewerOpen(book, format)
-                },
-                heightMatchParent = true
-              )
-            }
+              },
+              heightMatchParent = true
+            )
           )
         }
 
@@ -631,7 +624,7 @@ class CatalogFeedPagingDataAdapter(
         }
       }
 
-      if (isBookReturnable(book)) {
+      if (this.isBookReturnable(book)) {
         this.idleButtons.addView(this.buttonCreator.createButtonSpace())
         this.idleButtons.addView(
           this.buttonCreator.createRevokeLoanButton(
@@ -641,7 +634,7 @@ class CatalogFeedPagingDataAdapter(
             heightMatchParent = true
           )
         )
-      } else if (isBookDeletable(book)) {
+      } else if (this.isBookDeletable(book)) {
         this.idleButtons.addView(this.buttonCreator.createButtonSpace())
         this.idleButtons.addView(
           this.buttonCreator.createRevokeLoanButton(
@@ -651,6 +644,20 @@ class CatalogFeedPagingDataAdapter(
             heightMatchParent = true
           )
         )
+      }
+    }
+
+    private fun setIdleTime(
+      loanDuration: DateTime?
+    ) {
+      if (loanDuration != null) {
+        this.idleTime.text =
+          this.idleTime.resources.getString(
+            R.string.catalogBookCellBorrowingUntil,
+            loanEndFormatter.print(loanDuration)
+          )
+      } else {
+        this.idleTime.text = ""
       }
     }
 
@@ -664,17 +671,10 @@ class CatalogFeedPagingDataAdapter(
       this.setVisible(this.progress, false)
 
       this.idleButtons.removeAllViews()
-
-      val loanDuration = getLoanDuration(book)
+      this.setIdleTime(this.getLoanDuration(book))
 
       this.idleButtons.addView(
         when {
-          loanDuration.isNotEmpty() -> {
-            this.buttonCreator.createDownloadButtonWithLoanDuration(loanDuration) {
-              this.onBookBorrow(book)
-            }
-          }
-
           status.isOpenAccess -> {
             this.buttonCreator.createGetButton(
               onClick = {
@@ -695,7 +695,7 @@ class CatalogFeedPagingDataAdapter(
         }
       )
 
-      if (isBookReturnable(book)) {
+      if (this.isBookReturnable(book)) {
         this.idleButtons.addView(this.buttonCreator.createButtonSpace())
         this.idleButtons.addView(
           this.buttonCreator.createRevokeLoanButton(
@@ -705,7 +705,7 @@ class CatalogFeedPagingDataAdapter(
             heightMatchParent = true
           )
         )
-      } else if (isBookDeletable(book)) {
+      } else if (this.isBookDeletable(book)) {
         this.idleButtons.addView(this.buttonCreator.createButtonSpace())
         this.idleButtons.addView(
           this.buttonCreator.createRevokeLoanButton(
@@ -788,7 +788,24 @@ class CatalogFeedPagingDataAdapter(
      * existing code.
      */
 
-    private fun getLoanDuration(book: Book): String {
+    private fun getLoanDurationText(
+      book: Book
+    ): String {
+      val endDate = this.getLoanDuration(book)
+      return if (endDate != null) {
+        CatalogBookAvailabilityStrings.intervalStringLoanDuration(
+          this.view.context.resources,
+          DateTime.now(),
+          endDate
+        )
+      } else {
+        ""
+      }
+    }
+
+    private fun getLoanDuration(
+      book: Book
+    ): DateTime? {
       val status = BookStatus.fromBook(book)
       return if (status is Loaned.LoanedDownloaded ||
         status is Loaned.LoanedNotDownloaded
@@ -796,19 +813,9 @@ class CatalogFeedPagingDataAdapter(
         val endDate = (status as? Loaned.LoanedDownloaded)?.loanExpiryDate
           ?: (status as? Loaned.LoanedNotDownloaded)?.loanExpiryDate
 
-        if (
-          endDate != null
-        ) {
-          CatalogBookAvailabilityStrings.intervalStringLoanDuration(
-            this.view.context.resources,
-            DateTime.now(),
-            endDate
-          )
-        } else {
-          ""
-        }
+        endDate
       } else {
-        ""
+        null
       }
     }
 
