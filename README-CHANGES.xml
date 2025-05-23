@@ -651,7 +651,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2025-05-20T08:40:27+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.16.0">
+    <c:release date="2025-05-23T15:01:46+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.16.0">
       <c:changes>
         <c:change date="2025-04-28T00:00:00+00:00" summary="Completely rewrite all catalog views.">
           <c:tickets>
@@ -668,7 +668,7 @@
             <c:ticket id="PP-1855"/>
           </c:tickets>
         </c:change>
-        <c:change date="2025-05-20T08:40:27+00:00" summary="New book details page.">
+        <c:change date="2025-05-20T00:00:00+00:00" summary="New book details page.">
           <c:tickets>
             <c:ticket id="PP-1087"/>
           </c:tickets>
