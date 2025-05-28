@@ -76,6 +76,7 @@ import org.thepalaceproject.opds.client.OPDSState.LoadedFeedWithoutGroups
 import org.thepalaceproject.opds.client.OPDSState.Loading
 import java.net.URI
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicReference
 
 /**
  * The fragment used for the catalog.
@@ -762,8 +763,8 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
   ) {
     val feedHandle =
       newState.handle
-    val feedPosition =
-      feedHandle.scrollPositionGet()
+    val feedPositionInitial =
+      AtomicReference(feedHandle.scrollPositionGet())
     val feed =
       feedHandle.feed()
 
@@ -833,7 +834,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
           val position =
             linearLayoutManager.findFirstVisibleItemPosition()
 
-          // logger.trace("Saving scroll position {}", position)
+          logger.trace("Saving scroll position {}", position)
           feedHandle.scrollPositionSave(position)
         }
       })
@@ -897,11 +898,24 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     this.switchView(view)
 
     /*
-     * Set up a listener to restore the scroll position.
+     * Set up a listener to restore the scroll position. This works around multiple pieces of
+     * Android brokenness: Restoring the scroll position when we navigate to a book detail page
+     * and back again, and also properly handling scrolling when new feed pages come in. With
+     * the current RecyclerView, not explicitly storing and restoring the scroll position results
+     * in all kinds of scroll issues when new pages are loaded.
      */
 
     feedAdapter.addOnPagesUpdatedListener {
-      // this.logger.trace("Restoring scroll position {}", feedPosition)
+      val feedPosition: Int
+      val initial = feedPositionInitial.get()
+      if (initial == null) {
+        feedPosition = feedHandle.scrollPositionGet()
+        // this.logger.trace("Restoring scroll position {}", feedPosition)
+      } else {
+        feedPositionInitial.set(null)
+        feedPosition = initial
+        // this.logger.trace("Restoring scroll position (initial) {}", feedPosition)
+      }
       view.listView.scrollToPosition(feedPosition)
     }
   }
