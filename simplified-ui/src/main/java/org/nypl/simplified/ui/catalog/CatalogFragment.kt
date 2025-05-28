@@ -36,14 +36,6 @@ import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedFacet
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.feeds.api.FeedSearch
-import org.nypl.simplified.opds.core.OPDSAvailabilityHeld
-import org.nypl.simplified.opds.core.OPDSAvailabilityHeldReady
-import org.nypl.simplified.opds.core.OPDSAvailabilityHoldable
-import org.nypl.simplified.opds.core.OPDSAvailabilityLoanable
-import org.nypl.simplified.opds.core.OPDSAvailabilityLoaned
-import org.nypl.simplified.opds.core.OPDSAvailabilityMatcherType
-import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
-import org.nypl.simplified.opds.core.OPDSAvailabilityRevoked
 import org.nypl.simplified.profiles.controller.api.ProfileFeedRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.taskrecorder.api.TaskResult
@@ -320,6 +312,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
         screenSize = this.screenSize,
         container = this.contentContainer,
         covers = this.covers,
+        onBookSAMLDownloadRequested = this::onBookSAMLDownloadRequested,
         onShowErrorDetails = this::onShowErrorDetails,
         onBookBorrowRequested = this::onBookBorrowRequested,
         onBookBorrowCancelRequested = this::onBookBorrowCancelRequested,
@@ -372,8 +365,6 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
         view.onStatusUpdate(CatalogBookStatus.create(this.bookRegistry, entry))
       }
     }
-
-    this.onStateChangeToDetailsConfigureToolbar(newState, view)
 
     /*
      * Subscribe to the entry on the OPDS client. We'll receive the initial
@@ -478,25 +469,6 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     }
   }
 
-  private fun onStateChangeToDetailsConfigureToolbar(
-    newState: LoadedFeedEntry,
-    view: CatalogFeedViewDetails2
-  ) {
-    try {
-      val account =
-        this.profiles.profileCurrent()
-          .account(newState.request.entry.accountID)
-
-      val title =
-        when (val e = newState.request.entry) {
-          is FeedEntry.FeedEntryCorrupt -> ""
-          is FeedEntry.FeedEntryOPDS -> e.feedEntry.title
-        }
-    } catch (e: Throwable) {
-      // Nothing sensible we can do about this.
-    }
-  }
-
   private fun onBookBorrowRequested(
     parameters: CatalogBorrowParameters
   ) {
@@ -577,64 +549,6 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     }
   }
 
-  /**
-   * Determine whether or not a book can be "deleted".
-   *
-   * A book can be deleted if:
-   *
-   * * It is loaned, downloaded, and not revocable (because otherwise, a revocation is needed).
-   * * It is loanable, but there is a book database entry for it
-   * * It is open access but there is a book database entry for it
-   */
-
-  private fun onBookCanBeDeleted(
-    status: CatalogBookStatus<*>
-  ): Boolean {
-    return try {
-      val services =
-        Services.serviceDirectory()
-      val profiles =
-        services.requireService(ProfilesControllerType::class.java)
-      val book =
-        status.book
-      val profile =
-        profiles.profileCurrent()
-      val account =
-        profile.account(book.account)
-
-      return if (account.bookDatabase.books().contains(book.id)) {
-        book.entry.availability.matchAvailability(
-          object : OPDSAvailabilityMatcherType<Boolean, Exception> {
-            override fun onHeldReady(availability: OPDSAvailabilityHeldReady): Boolean =
-              false
-
-            override fun onHeld(availability: OPDSAvailabilityHeld): Boolean =
-              false
-
-            override fun onHoldable(availability: OPDSAvailabilityHoldable): Boolean =
-              false
-
-            override fun onLoaned(availability: OPDSAvailabilityLoaned): Boolean =
-              availability.revoke.isNone && book.isDownloaded
-
-            override fun onLoanable(availability: OPDSAvailabilityLoanable): Boolean =
-              true
-
-            override fun onOpenAccess(availability: OPDSAvailabilityOpenAccess): Boolean =
-              true
-
-            override fun onRevoked(availability: OPDSAvailabilityRevoked): Boolean =
-              false
-          })
-      } else {
-        false
-      }
-    } catch (e: Throwable) {
-      this.logger.debug("could not determine if the book could be deleted: ", e)
-      false
-    }
-  }
-
   private fun onBookCanBeRevoked(
     status: CatalogBookStatus<*>
   ): Boolean {
@@ -702,12 +616,6 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     )
   }
 
-  private fun onBookResetStatusInitial(
-    status: CatalogBookStatus<*>
-  ) {
-    // XXX: Unclear what the point of this method ever was...
-  }
-
   private fun onBookViewerOpen(
     book: Book,
     bookFormat: BookFormat
@@ -723,12 +631,6 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
       book = book,
       format = bookFormat
     )
-  }
-
-  private fun onBookReserveRequested(
-    parameters: CatalogBorrowParameters
-  ) {
-    this.onBookBorrowRequested(parameters)
   }
 
   private fun onStateChangedToGroups(

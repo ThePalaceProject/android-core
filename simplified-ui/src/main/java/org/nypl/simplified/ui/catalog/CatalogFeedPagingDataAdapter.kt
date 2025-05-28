@@ -65,7 +65,7 @@ class CatalogFeedPagingDataAdapter(
   private val onBookViewerOpen: (Book, BookFormat) -> Unit,
   private val onBookDelete: (CatalogBookStatus<*>) -> Unit,
   private val onShowTaskError: (TaskResult.Failure<*>) -> Unit,
-) : PagingDataAdapter<FeedEntry, CatalogFeedPagingDataAdapter.ViewHolder>(org.nypl.simplified.ui.catalog.CatalogFeedPagingDataAdapter.Companion.diffCallback) {
+) : PagingDataAdapter<FeedEntry, CatalogFeedPagingDataAdapter.ViewHolder>(diffCallback) {
 
   companion object {
     private val loanEndFormatter =
@@ -783,26 +783,6 @@ class CatalogFeedPagingDataAdapter(
       this.setVisible(this.progress, false)
 
       this.idleButtons.removeAllViews()
-    }
-
-    /**
-     * XXX: This information really should be available somewhere else. This was ported from
-     * existing code.
-     */
-
-    private fun getLoanDurationText(
-      book: Book
-    ): String {
-      val endDate = this.getLoanDuration(book)
-      return if (endDate != null) {
-        CatalogBookAvailabilityStrings.intervalStringLoanDuration(
-          this.view.context.resources,
-          DateTime.now(),
-          endDate
-        )
-      } else {
-        ""
-      }
     }
 
     private fun getLoanDuration(
