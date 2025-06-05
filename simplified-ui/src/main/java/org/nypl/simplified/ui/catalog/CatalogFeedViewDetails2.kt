@@ -91,6 +91,7 @@ class CatalogFeedViewDetails2(
   private val covers: BookCoverProviderType,
   private val onToolbarBackPressed: () -> Unit,
   private val onShowErrorDetails: (TaskResult.Failure<*>) -> Unit,
+  private val onBookSAMLDownloadRequested: (CatalogBookStatus<DownloadWaitingForExternalAuthentication>) -> Unit,
   private val onBookBorrowRequested: (CatalogBorrowParameters) -> Unit,
   private val onBookBorrowCancelRequested: (CatalogBookStatus<*>) -> Unit,
   private val onBookCanBeRevoked: (CatalogBookStatus<*>) -> Boolean,
@@ -761,6 +762,7 @@ class CatalogFeedViewDetails2(
       container: ViewGroup,
       covers: BookCoverProviderType,
       onShowErrorDetails: (TaskResult.Failure<*>) -> Unit,
+      onBookSAMLDownloadRequested: (CatalogBookStatus<DownloadWaitingForExternalAuthentication>) -> Unit,
       onBookBorrowRequested: (CatalogBorrowParameters) -> Unit,
       onBookBorrowCancelRequested: (CatalogBookStatus<*>) -> Unit,
       onBookCanBeRevoked: (CatalogBookStatus<*>) -> Boolean,
@@ -777,6 +779,7 @@ class CatalogFeedViewDetails2(
         layoutInflater = layoutInflater,
         covers = covers,
         onToolbarBackPressed = onToolbarBackPressed,
+        onBookSAMLDownloadRequested = onBookSAMLDownloadRequested,
         onShowErrorDetails = onShowErrorDetails,
         onBookBorrowRequested = onBookBorrowRequested,
         onBookBorrowCancelRequested = onBookBorrowCancelRequested,
@@ -1376,6 +1379,8 @@ class CatalogFeedViewDetails2(
         this.setProgress(0.0)
       }
     }
+
+    this.onBookSAMLDownloadRequested(status)
   }
 
   private fun onBookStatusDownloadExternalAuthenticationInProgress(

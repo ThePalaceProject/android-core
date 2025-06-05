@@ -111,7 +111,7 @@ class CatalogToolbar(
     this.searchText.visibility = View.VISIBLE
     this.text.visibility = View.INVISIBLE
 
-    this.text.postDelayed({ this.text.requestFocus() }, 100)
+    this.text.postDelayed({ this.searchText.requestFocus() }, 100)
     this.text.postDelayed({ this.keyboardShow() }, 100)
   }
 
