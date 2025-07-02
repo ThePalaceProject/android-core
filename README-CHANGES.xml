@@ -675,8 +675,14 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2025-06-26T11:22:48+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.17.0">
-      <c:changes/>
+    <c:release date="2025-07-02T15:53:58+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.17.0">
+      <c:changes>
+        <c:change date="2025-07-02T15:53:58+00:00" summary="Target SDK 35.">
+          <c:tickets>
+            <c:ticket id="PP-2693"/>
+          </c:tickets>
+        </c:change>
+      </c:changes>
     </c:release>
   </c:releases>
   <c:ticket-systems>
