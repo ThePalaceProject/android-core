@@ -33,6 +33,7 @@ import org.nypl.simplified.books.api.bookmark.SerializedLocatorPage1
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.threads.UIThread
+import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
@@ -66,7 +67,8 @@ class PdfReaderActivity : AppCompatActivity() {
     }
   }
 
-  private val log: Logger = LoggerFactory.getLogger(PdfReaderActivity::class.java)
+  private val log: Logger =
+    LoggerFactory.getLogger(PdfReaderActivity::class.java)
 
   private val services =
     Services.serviceDirectory()
@@ -75,6 +77,7 @@ class PdfReaderActivity : AppCompatActivity() {
   private val profilesController =
     this.services.requireService(ProfilesControllerType::class.java)
 
+  private lateinit var root: View
   private lateinit var pdfReaderContainer: FrameLayout
   private lateinit var accountId: AccountID
   private lateinit var bookID: BookID
@@ -116,6 +119,9 @@ class PdfReaderActivity : AppCompatActivity() {
         isSavedInstanceStateNull = savedInstanceState == null
       )
     }
+
+    this.root = this.findViewById(R.id.pdf_root)
+    ScreenEdgeToEdgeFix.edgeToEdge(this.root)
   }
 
   private fun completeReaderSetup(

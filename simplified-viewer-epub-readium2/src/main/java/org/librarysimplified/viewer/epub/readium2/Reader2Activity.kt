@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.os.Bundle
+import android.view.View
 import android.webkit.WebView
 import android.widget.Toast
 import androidx.annotation.StringRes
@@ -52,6 +53,7 @@ import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.threads.UIThread
+import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
 import org.readium.r2.shared.util.Try
 import org.readium.r2.shared.util.asset.Asset
 import org.readium.r2.shared.util.asset.AssetRetriever
@@ -66,6 +68,7 @@ import java.util.concurrent.ExecutionException
 
 class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
+  private lateinit var root: View
   private val logger =
     LoggerFactory.getLogger(Reader2Activity::class.java)
 
@@ -174,6 +177,9 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     if ((this.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
       WebView.setWebContentsDebuggingEnabled(true)
     }
+
+    this.root = this.findViewById(R.id.reader2FragmentRoot)
+    ScreenEdgeToEdgeFix.edgeToEdge(this.root)
   }
 
   override fun onStart() {
