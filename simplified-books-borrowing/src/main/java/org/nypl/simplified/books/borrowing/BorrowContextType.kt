@@ -5,7 +5,7 @@ import org.joda.time.Instant
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.nypl.drm.core.AdobeAdeptExecutorType
-import org.nypl.drm.core.AxisNowServiceType
+import org.nypl.drm.core.BoundlessServiceType
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
@@ -16,6 +16,7 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.Borro
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskFailed
 import org.nypl.simplified.books.bundled.api.BundledContentResolverType
 import org.nypl.simplified.content.api.ContentResolverType
+import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionPath
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
@@ -33,7 +34,7 @@ interface BorrowContextType {
   val application: Application
   val account: AccountType
   val adobeExecutor: AdobeAdeptExecutorType?
-  val axisNowService: AxisNowServiceType?
+  val boundlessService: BoundlessServiceType?
   val audioBookManifestStrategies: AudioBookManifestStrategiesType
   val bundledContent: BundledContentResolverType
   val clock: () -> Instant
@@ -80,7 +81,7 @@ interface BorrowContextType {
    * The current acquisition path element. This will be updated once for each subtask.
    */
 
-  fun currentURI(): URI?
+  fun currentURI(): Link?
 
   /**
    * Check that the current URI is non-null. If the current URI is null, log an error
@@ -88,7 +89,7 @@ interface BorrowContextType {
    */
 
   @Throws(BorrowSubtaskFailed::class)
-  fun currentURICheck(): URI {
+  fun currentLinkCheck(): Link {
     val uri = this.currentURI()
     if (uri == null) {
       this.logError("no current URI")
@@ -103,10 +104,30 @@ interface BorrowContextType {
   }
 
   /**
+   * Perform all of the checks of [currentLinkCheck] and additionally check that the link
+   * has a valid non-null URI.
+   */
+
+  @Throws(BorrowSubtaskFailed::class)
+  fun currentURICheck(): URI {
+    val link = this.currentLinkCheck()
+    if (link.hrefURI == null) {
+      this.logError("no current URI")
+      this.taskRecorder.currentStepFailed(
+        message = "A required URI is missing.",
+        errorCode = BorrowErrorCodes.requiredURIMissing,
+        extraMessages = listOf()
+      )
+      throw BorrowSubtaskFailed()
+    }
+    return link.hrefURI!!
+  }
+
+  /**
    * The current subtask has received a new URI that can be used by the next subtask.
    */
 
-  fun receivedNewURI(uri: URI)
+  fun receivedNewURI(uri: Link)
 
   /**
    * The current acquisition path element. This will be updated once for each subtask.
@@ -238,7 +259,7 @@ interface BorrowContextType {
    * Choose a new acquisition path to follow based on the given received entry.
    */
 
-  fun chooseNewAcquisitionPath(entry: OPDSAcquisitionFeedEntry): URI
+  fun chooseNewAcquisitionPath(entry: OPDSAcquisitionFeedEntry): Link
 
   /**
    * Information about the current SAML download, if one is in progress.

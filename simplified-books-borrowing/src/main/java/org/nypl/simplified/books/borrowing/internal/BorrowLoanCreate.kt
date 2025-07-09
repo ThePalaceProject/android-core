@@ -27,6 +27,7 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.Borro
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskFactoryType
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskType
 import org.nypl.simplified.books.formats.api.StandardFormatNames.allOPDSFeeds
+import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
@@ -62,7 +63,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
 
     override fun isApplicableFor(
       type: MIMEType,
-      target: URI?,
+      target: Link?,
       account: AccountReadableType?,
       remaining: List<MIMEType>
     ): Boolean {
@@ -184,7 +185,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
     context.bookDatabaseEntry.writeOPDSEntry(entry)
 
     this.checkAvailability(context, entry)
-    val nextURI = this.findNextURI(context, entry)
+    val nextURI = this.findNextLink(context, entry)
     context.receivedNewURI(nextURI)
   }
 
@@ -315,10 +316,10 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
     }
   }
 
-  private fun findNextURI(
+  private fun findNextLink(
     context: BorrowContextType,
     entry: OPDSAcquisitionFeedEntry
-  ): URI {
+  ): Link {
     context.taskRecorder.beginNewStep("Finding the next URI in the OPDS feed entry...")
 
     val remaining = context.opdsAcquisitionPathRemaining()

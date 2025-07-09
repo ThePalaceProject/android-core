@@ -8,7 +8,7 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskFactoryType
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskType
 import org.nypl.simplified.books.formats.api.StandardFormatNames
-import java.net.URI
+import org.nypl.simplified.links.Link
 
 /**
  * A task that pretends to negotiate a Simplified bearer token. Bearer token handling is
@@ -27,7 +27,7 @@ class BorrowBearerToken : BorrowSubtaskType {
 
     override fun isApplicableFor(
       type: MIMEType,
-      target: URI?,
+      target: Link?,
       account: AccountReadableType?,
       remaining: List<MIMEType>
     ): Boolean {
@@ -43,7 +43,7 @@ class BorrowBearerToken : BorrowSubtaskType {
     context.bookDownloadIsRunning("Requesting download...", receivedSize = 0L)
 
     return try {
-      val currentURI = context.currentURICheck()
+      val currentURI = context.currentLinkCheck()
       context.receivedNewURI(currentURI)
       context.taskRecorder.currentStepSucceeded("Bearer token negotiation is transparent.")
       Unit

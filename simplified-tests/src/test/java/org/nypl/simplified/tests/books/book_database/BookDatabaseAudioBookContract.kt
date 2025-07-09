@@ -15,6 +15,7 @@ import org.nypl.simplified.books.book_database.BookDatabase
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook
 import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.nypl.simplified.files.DirectoryUtilities
+import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisition
 import org.nypl.simplified.opds.core.OPDSAcquisition.Relation.ACQUISITION_BORROW
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
@@ -83,7 +84,7 @@ abstract class BookDatabaseAudioBookContract {
     eb.addAcquisition(
       OPDSAcquisition(
         ACQUISITION_BORROW,
-        URI.create("http://example.com"),
+        Link.LinkBasic(URI.create("http://example.com")),
         StandardFormatNames.genericAudioBooks.first(),
         emptyList(),
         emptyMap()

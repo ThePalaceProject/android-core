@@ -6,7 +6,7 @@ import org.joda.time.Instant
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.nypl.drm.core.AdobeAdeptExecutorType
-import org.nypl.drm.core.AxisNowServiceType
+import org.nypl.drm.core.BoundlessServiceType
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookID
@@ -29,6 +29,7 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.Borro
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskFactoryType
 import org.nypl.simplified.books.bundled.api.BundledContentResolverType
 import org.nypl.simplified.content.api.ContentResolverType
+import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionPath
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
@@ -45,7 +46,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
-import java.net.URI
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
@@ -189,7 +189,7 @@ class BorrowTask private constructor(
         application = this.requirements.application,
         account = this.account,
         adobeExecutor = this.requirements.adobeExecutor,
-        axisNowService = this.requirements.axisNowService,
+        boundlessService = this.requirements.boundlessService,
         lcpService = this.requirements.lcpService,
         audioBookManifestStrategies = this.requirements.audioBookManifestStrategies,
         bookDatabaseEntry = this.databaseEntry!!,
@@ -459,7 +459,7 @@ class BorrowTask private constructor(
     private val temporaryDirectory: File,
     var currentOPDSAcquisitionPathElement: OPDSAcquisitionPathElement,
     override val adobeExecutor: AdobeAdeptExecutorType?,
-    override val axisNowService: AxisNowServiceType?,
+    override val boundlessService: BoundlessServiceType?,
     override val lcpService: LcpService?,
     override val services: ServiceDirectoryType,
     private val cacheDirectory: File,
@@ -546,7 +546,7 @@ class BorrowTask private constructor(
 
     override fun chooseNewAcquisitionPath(
       entry: OPDSAcquisitionFeedEntry
-    ): URI {
+    ): Link {
       val path = this.borrowTask.pickAcquisitionPath(this.bookCurrent, entry)
       this.logDebug("Selected a new acquisition path.")
       check(path.elements.isNotEmpty()) { "Selected acquisition path cannot be empty!" }
@@ -572,14 +572,14 @@ class BorrowTask private constructor(
       )
     }
 
-    var currentURIField: URI? =
+    var currentURIField: Link? =
       null
 
-    override fun currentURI(): URI? {
+    override fun currentURI(): Link? {
       return this.currentURIField ?: return this.currentAcquisitionPathElement.target
     }
 
-    override fun receivedNewURI(uri: URI) {
+    override fun receivedNewURI(uri: Link) {
       this.logDebug("received new URI: {}", uri)
       this.currentURIField = uri
     }

@@ -1,7 +1,7 @@
 package org.nypl.simplified.opds.core
 
 import one.irradia.mime.api.MIMEType
-import java.net.URI
+import org.nypl.simplified.links.Link
 
 /**
  * An element of a linearized OPDS acquisition path.
@@ -11,6 +11,6 @@ import java.net.URI
 
 data class OPDSAcquisitionPathElement(
   val mimeType: MIMEType,
-  val target: URI?,
+  val target: Link?,
   val properties: Map<String, String>
 )

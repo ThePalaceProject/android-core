@@ -36,7 +36,6 @@ import org.thepalaceproject.opds.client.OPDSClientParameters
 import org.thepalaceproject.opds.client.OPDSClientRequest
 import org.thepalaceproject.opds.client.OPDSClientType
 import org.thepalaceproject.opds.client.OPDSState
-import java.io.IOException
 import java.net.URI
 import java.nio.charset.StandardCharsets.UTF_8
 import java.util.concurrent.ExecutionException
@@ -99,7 +98,7 @@ class OPDSClientTest {
           BookFormatSupportParameters(
             supportsPDF = true,
             supportsAdobeDRM = true,
-            supportsAxisNow = true,
+            supportsBoundless = true,
             supportsAudioBooks = null,
             supportsLCP = true
           )

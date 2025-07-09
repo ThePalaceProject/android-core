@@ -59,6 +59,7 @@ import org.nypl.simplified.feeds.api.FeedHTTPTransport
 import org.nypl.simplified.feeds.api.FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.files.DirectoryUtilities
+import org.nypl.simplified.links.Link
 import org.nypl.simplified.notifications.NotificationTokenHTTPCalls
 import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
 import org.nypl.simplified.opds.auth_document.api.AuthenticationDocumentParsersType
@@ -845,7 +846,7 @@ abstract class BooksControllerContract {
     val bookAcquisition =
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_OPEN_ACCESS,
-        this.server.url("/book.epub").toUri(),
+        Link.LinkBasic(this.server.url("/book.epub").toUri()),
         StandardFormatNames.genericEPUBFiles,
         listOf(),
         mapOf()
@@ -958,7 +959,7 @@ abstract class BooksControllerContract {
     val acquisition =
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_OPEN_ACCESS,
-        this.server.url("/book.epub").toUri(),
+        Link.LinkBasic(this.server.url("/book.epub").toUri()),
         StandardFormatNames.genericEPUBFiles,
         listOf(),
         mapOf()
@@ -1027,7 +1028,7 @@ abstract class BooksControllerContract {
     val acquisition =
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_OPEN_ACCESS,
-        this.server.url("/book.epub").toUri(),
+        Link.LinkBasic(this.server.url("/book.epub").toUri()),
         StandardFormatNames.genericEPUBFiles,
         listOf(),
         mapOf()

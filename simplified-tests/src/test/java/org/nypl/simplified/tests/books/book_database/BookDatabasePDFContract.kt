@@ -20,6 +20,7 @@ import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
 import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.nypl.simplified.files.DirectoryUtilities
+import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisition
 import org.nypl.simplified.opds.core.OPDSAcquisition.Relation.ACQUISITION_BORROW
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
@@ -152,7 +153,7 @@ abstract class BookDatabasePDFContract {
     eb.addAcquisition(
       OPDSAcquisition(
         ACQUISITION_BORROW,
-        URI.create("http://example.com"),
+        Link.LinkBasic(URI.create("http://example.com")),
         StandardFormatNames.genericPDFFiles,
         emptyList(),
         emptyMap()

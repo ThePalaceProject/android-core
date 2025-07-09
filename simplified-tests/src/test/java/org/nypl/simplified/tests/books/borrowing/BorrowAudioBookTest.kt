@@ -41,6 +41,7 @@ import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.audioStrate
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.requiredURIMissing
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericAudioBooks
+import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
 import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
@@ -276,7 +277,7 @@ class BorrowAudioBookTest {
     val task = BorrowAudioBook.createSubtask()
 
     this.context.currentURIField =
-      URI.create("urn:whatever")
+      Link.LinkBasic(URI.create("urn:whatever"))
     this.context.currentAcquisitionPathElement =
       OPDSAcquisitionPathElement(genericAudioBooks.first(), null, emptyMap())
 
@@ -310,7 +311,7 @@ class BorrowAudioBookTest {
     val task = BorrowAudioBook.createSubtask()
 
     this.context.currentURIField =
-      URI.create("urn:whatever")
+      Link.LinkBasic(URI.create("urn:whatever"))
     this.context.currentAcquisitionPathElement =
       OPDSAcquisitionPathElement(genericAudioBooks.first(), null, emptyMap())
 

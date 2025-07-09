@@ -78,14 +78,14 @@ sealed class BookDRMInformationHandle {
   }
 
   /**
-   * The handle used to read/write AxisNow information.
+   * The handle used to read/write Boundless information.
    */
 
-  abstract class AxisHandle : BookDRMInformationHandle() {
-    abstract override val info: BookDRMInformation.AXIS
+  abstract class BoundlessHandle : BookDRMInformationHandle() {
+    abstract override val info: BookDRMInformation.Boundless
 
     /**
-     * Copy the given file into the directory as the Axis license.
+     * Copy the given file into the directory as the Boundless license.
      *
      * @param file The file to be copied
      *
@@ -93,22 +93,9 @@ sealed class BookDRMInformationHandle {
      */
 
     @Throws(IOException::class)
-    abstract fun copyInAxisLicense(
+    abstract fun copyInBoundlessLicense(
       file: File
-    ): BookDRMInformation.AXIS
-
-    /**
-     * Copy the given file into the directory as the Axis user key.
-     *
-     * @param file The file to be copied
-     *
-     * @throws IOException On I/O errors
-     */
-
-    @Throws(IOException::class)
-    abstract fun copyInAxisUserKey(
-      file: File
-    ): BookDRMInformation.AXIS
+    ): BookDRMInformation.Boundless
   }
 
   /**

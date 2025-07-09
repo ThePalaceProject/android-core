@@ -46,6 +46,7 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.Borro
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFiles
 import org.nypl.simplified.books.formats.api.StandardFormatNames.opdsAcquisitionFeedEntry
+import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
 import org.nypl.simplified.opds.core.OPDSAvailabilityLoanable
@@ -239,7 +240,7 @@ class BorrowLoanCreateTest {
     val task = BorrowLoanCreate.createSubtask()
 
     this.context.currentURIField =
-      this.webServer.url("/book.epub").toUri()
+      Link.LinkBasic(this.webServer.url("/book.epub").toUri())
 
     try {
       task.execute(this.context)
@@ -266,7 +267,7 @@ class BorrowLoanCreateTest {
     val task = BorrowLoanCreate.createSubtask()
 
     this.context.currentURIField =
-      this.webServer.url("/book.epub").toUri()
+      Link.LinkBasic(this.webServer.url("/book.epub").toUri())
 
     this.webServer.enqueue(MockResponse().setResponseCode(404))
 
@@ -295,7 +296,7 @@ class BorrowLoanCreateTest {
     val task = BorrowLoanCreate.createSubtask()
 
     this.context.currentURIField =
-      this.webServer.url("/book.epub").toUri()
+      Link.LinkBasic(this.webServer.url("/book.epub").toUri())
 
     val response =
       MockResponse()
@@ -329,7 +330,7 @@ class BorrowLoanCreateTest {
     val task = BorrowLoanCreate.createSubtask()
 
     this.context.currentURIField =
-      this.webServer.url("/book.epub").toUri()
+      Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
       OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
 
@@ -366,7 +367,7 @@ class BorrowLoanCreateTest {
     val task = BorrowLoanCreate.createSubtask()
 
     this.context.currentURIField =
-      this.webServer.url("/book.epub").toUri()
+      Link.LinkBasic(this.webServer.url("/book.epub").toUri(), type = genericEPUBFiles)
     this.context.currentAcquisitionPathElement =
       OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
     this.context.currentRemainingOPDSPathElements =
@@ -395,7 +396,10 @@ class BorrowLoanCreateTest {
 
     task.execute(this.context)
 
-    assertEquals(this.webServer.url("/next").toUri(), this.context.receivedURIs[0])
+    assertEquals(
+      Link.LinkBasic(this.webServer.url("/next").toUri(), type = genericEPUBFiles),
+      this.context.receivedURIs[0]
+    )
     assertEquals(1, this.context.receivedURIs.size)
 
     this.verifyBookRegistryHasStatus(LoanedNotDownloaded::class.java)
@@ -422,7 +426,7 @@ class BorrowLoanCreateTest {
     val task = BorrowLoanCreate.createSubtask()
 
     this.context.currentURIField =
-      this.webServer.url("/book.epub").toUri()
+      Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
       OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
     this.context.currentRemainingOPDSPathElements =
@@ -487,7 +491,7 @@ class BorrowLoanCreateTest {
     val task = BorrowLoanCreate.createSubtask()
 
     this.context.currentURIField =
-      this.webServer.url("/book.epub").toUri()
+      Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
       OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
     this.context.currentRemainingOPDSPathElements =
@@ -516,7 +520,10 @@ class BorrowLoanCreateTest {
 
     task.execute(this.context)
 
-    assertEquals(this.webServer.url("/next").toUri(), this.context.receivedURIs[0])
+    assertEquals(
+      Link.LinkBasic(this.webServer.url("/next").toUri(), type = genericEPUBFiles),
+      this.context.receivedURIs[0]
+    )
     assertEquals(1, this.context.receivedURIs.size)
 
     this.verifyBookRegistryHasStatus(LoanedNotDownloaded::class.java)
@@ -540,7 +547,7 @@ class BorrowLoanCreateTest {
     val task = BorrowLoanCreate.createSubtask()
 
     this.context.currentURIField =
-      this.webServer.url("/book.epub").toUri()
+      Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
       OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
     this.context.currentRemainingOPDSPathElements =
@@ -594,7 +601,7 @@ class BorrowLoanCreateTest {
     val task = BorrowLoanCreate.createSubtask()
 
     this.context.currentURIField =
-      this.webServer.url("/book.epub").toUri()
+      Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
       OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
     this.context.currentRemainingOPDSPathElements =
@@ -647,7 +654,7 @@ class BorrowLoanCreateTest {
     val task = BorrowLoanCreate.createSubtask()
 
     this.context.currentURIField =
-      this.webServer.url("/book.epub").toUri()
+      Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
       OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
     this.context.currentRemainingOPDSPathElements =
@@ -700,7 +707,7 @@ class BorrowLoanCreateTest {
     val task = BorrowLoanCreate.createSubtask()
 
     this.context.currentURIField =
-      this.webServer.url("/book.epub").toUri()
+      Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
       OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
     this.context.currentRemainingOPDSPathElements =

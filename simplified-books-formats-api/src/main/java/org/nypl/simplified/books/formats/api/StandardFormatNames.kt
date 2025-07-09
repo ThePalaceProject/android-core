@@ -26,13 +26,6 @@ object StandardFormatNames {
     mimeOf("application/vnd.librarysimplified.bearer-token+json")
 
   /**
-   * The standard format name for AxisNow fulfillment tokens..
-   */
-
-  val axisNow: MIMEType =
-    mimeOf("application/vnd.librarysimplified.axisnow+json")
-
-  /**
    * The standard format name for Findaway audio books.
    *
    * @see "https://findaway.com"
@@ -89,6 +82,13 @@ object StandardFormatNames {
 
   val lcpLicenseFiles =
     this.mimeOf("application/vnd.readium.lcp.license.v1.0+json")
+
+  /**
+   * The MIME type used for Boundless licenses.
+   */
+
+  val boundlessLicenseFiles =
+    this.mimeOf("application/vnd.thepalaceproject.baker-taylor.kdrm+json")
 
   /**
    * The MIME type used for Adobe ACSM files.

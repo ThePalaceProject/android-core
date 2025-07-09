@@ -90,7 +90,7 @@ class AccountBug0613d7f6 {
         BookFormatSupportParameters(
           supportsPDF = false,
           supportsAdobeDRM = false,
-          supportsAxisNow = false,
+          supportsBoundless  = false,
           supportsAudioBooks = null,
           supportsLCP = false
         )

@@ -4,6 +4,7 @@ import one.irradia.mime.api.MIMEType
 import one.irradia.mime.vanilla.MIMEParser.Companion.parseRaisingException
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisition
 import org.nypl.simplified.opds.core.OPDSAcquisitionPath
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
@@ -28,7 +29,7 @@ class OPDSAcquisitionPathsTest {
   ): OPDSAcquisitionPathElement {
     return OPDSAcquisitionPathElement(
       mimeType = this.mimeOf(mime),
-      target = uri?.let { URI.create(it) },
+      target = uri?.let { Link.LinkBasic(URI.create(it)) },
       properties = properties
     )
   }
@@ -43,7 +44,7 @@ class OPDSAcquisitionPathsTest {
     val acquisition =
       OPDSAcquisition(
         relation = OPDSAcquisition.Relation.ACQUISITION_GENERIC,
-        uri = URI.create("http://www.example.com"),
+        uri = Link.LinkBasic(URI.create("http://www.example.com")),
         type = this.mimeOf("application/epub+zip"),
         indirectAcquisitions = listOf(),
         properties = emptyMap()
@@ -66,7 +67,7 @@ class OPDSAcquisitionPathsTest {
     val acquisition =
       OPDSAcquisition(
         relation = OPDSAcquisition.Relation.ACQUISITION_GENERIC,
-        uri = URI.create("http://www.example.com"),
+        uri = Link.LinkBasic(URI.create("http://www.example.com")),
         type = this.mimeOf("application/vnd.adobe.adept+xml"),
         indirectAcquisitions = listOf(
           OPDSIndirectAcquisition(this.mimeOf("application/epub+zip"), listOf(), emptyMap()),
@@ -100,7 +101,7 @@ class OPDSAcquisitionPathsTest {
     val acquisition =
       OPDSAcquisition(
         relation = OPDSAcquisition.Relation.ACQUISITION_GENERIC,
-        uri = URI.create("http://cm.se-community-lcp-test.lyrtech.org/LCP/works/10/fulfill/31"),
+        uri = Link.LinkBasic(URI.create("http://cm.se-community-lcp-test.lyrtech.org/LCP/works/10/fulfill/31")),
         type = this.mimeOf("application/vnd.readium.lcp.license.v1.0+json"),
         indirectAcquisitions = listOf(
           OPDSIndirectAcquisition(this.mimeOf("application/epub+zip"), listOf(), emptyMap()),

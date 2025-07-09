@@ -22,7 +22,6 @@ import org.nypl.drm.core.AdobeDeviceID
 import org.nypl.drm.core.AdobeLoanID
 import org.nypl.drm.core.AdobeUserID
 import org.nypl.drm.core.AdobeVendorID
-import org.nypl.drm.core.AxisNowFulfillment
 import org.nypl.simplified.accounts.api.AccountAuthenticationAdobeClientToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationAdobePostActivationCredentials
 import org.nypl.simplified.accounts.api.AccountAuthenticationAdobePreActivationCredentials
@@ -42,7 +41,6 @@ import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookStatusEvent
 import org.nypl.simplified.books.borrowing.internal.BorrowACSM
-import org.nypl.simplified.books.borrowing.internal.BorrowAxisNow
 import org.nypl.simplified.books.borrowing.internal.BorrowDirectDownload
 import org.nypl.simplified.books.borrowing.internal.BorrowLCPEpub
 import org.nypl.simplified.books.borrowing.internal.BorrowLoanCreate
@@ -50,6 +48,7 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskType
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.books.formats.api.StandardFormatNames
+import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisition
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
 import org.nypl.simplified.opds.core.OPDSAcquisitionPath
@@ -67,7 +66,6 @@ import org.nypl.simplified.tests.mocking.MockAdobeAdeptConnector
 import org.nypl.simplified.tests.mocking.MockAdobeAdeptExecutor
 import org.nypl.simplified.tests.mocking.MockAdobeAdeptNetProvider
 import org.nypl.simplified.tests.mocking.MockAdobeAdeptResourceProvider
-import org.nypl.simplified.tests.mocking.MockAxisNowService
 import org.nypl.simplified.tests.mocking.MockBookDatabase
 import org.nypl.simplified.tests.mocking.MockBookDatabaseEntry
 import org.nypl.simplified.tests.mocking.MockBookDatabaseEntryFormatHandleEPUB
@@ -75,7 +73,6 @@ import org.nypl.simplified.tests.mocking.MockBorrowContext
 import org.nypl.simplified.tests.mocking.MockBundledContentResolver
 import org.nypl.simplified.tests.mocking.MockContentResolver
 import org.nypl.simplified.tests.mocking.MockDRMInformationACSHandle
-import org.nypl.simplified.tests.mocking.MockDRMInformationAxisHandle
 import org.nypl.simplified.tests.mocking.MockLCPService
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayInputStream
@@ -289,7 +286,7 @@ class BorrowBookRefreshTokenTest {
       OPDSAcquisitionPath(
         OPDSAcquisition(
           OPDSAcquisition.Relation.ACQUISITION_GENERIC,
-          this.webServer.url("/book.acsm").toUri(),
+          Link.LinkBasic(this.webServer.url("/book.acsm").toUri()),
           StandardFormatNames.adobeACSMFiles,
           listOf(),
           emptyMap()
@@ -297,12 +294,12 @@ class BorrowBookRefreshTokenTest {
         listOf(
           OPDSAcquisitionPathElement(
             StandardFormatNames.adobeACSMFiles,
-            this.webServer.url("/book.acsm").toUri(),
+            Link.LinkBasic(this.webServer.url("/book.acsm").toUri()),
             emptyMap()
           ),
           OPDSAcquisitionPathElement(
             StandardFormatNames.genericEPUBFiles,
-            this.webServer.url("/book.epub").toUri(),
+            Link.LinkBasic(this.webServer.url("/book.epub").toUri()),
             emptyMap()
           )
         )
@@ -318,7 +315,7 @@ class BorrowBookRefreshTokenTest {
     val task = BorrowACSM.createSubtask()
 
     this.context.currentURIField =
-      this.webServer.url("/book.acsm").toUri()
+      Link.LinkBasic(this.webServer.url("/book.acsm").toUri())
 
     this.webServer.enqueue(validACSMResponse)
 
@@ -334,26 +331,6 @@ class BorrowBookRefreshTokenTest {
       (this.account.loginState.credentials as AccountAuthenticationCredentials.BasicToken)
         .authenticationTokenInfo.accessToken
     )
-  }
-
-  @Test
-  fun testUpdateCredentialsBorrowAxisNow() {
-    val axisNowService = MockAxisNowService()
-    axisNowService.onFulfill = { token, tempFactory ->
-      val fakeBook = this.context.temporaryFile().apply { this.createNewFile() }
-      val fakeLicense = this.context.temporaryFile().apply { this.createNewFile() }
-      val fakeUserKey = this.context.temporaryFile().apply { this.createNewFile() }
-      AxisNowFulfillment(fakeBook, fakeLicense, fakeUserKey)
-    }
-
-    val bookDatabaseEPUBHandle =
-      MockBookDatabaseEntryFormatHandleEPUB(this.bookID)
-    this.bookDatabaseEntry.formatHandlesField.clear()
-    this.bookDatabaseEntry.formatHandlesField.add(bookDatabaseEPUBHandle)
-    bookDatabaseEPUBHandle.drmInformationHandleField = MockDRMInformationAxisHandle()
-
-    this.context.axisNowService = axisNowService
-    this.executeTask(task = BorrowAxisNow.createSubtask())
   }
 
   @Test
@@ -403,7 +380,7 @@ class BorrowBookRefreshTokenTest {
       elements = listOf(
         OPDSAcquisitionPathElement(
           mimeType = StandardFormatNames.lcpLicenseFiles,
-          target = this.webServer.url(licenseTargetPath).toUri(),
+          target = Link.LinkBasic(this.webServer.url(licenseTargetPath).toUri()),
           properties = mapOf()
         ),
         OPDSAcquisitionPathElement(
@@ -569,7 +546,7 @@ class BorrowBookRefreshTokenTest {
   @Test
   fun testUpdateCredentialsBorrowLoanCreate() {
     this.context.currentURIField =
-      this.webServer.url("/book.epub").toUri()
+      Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
       OPDSAcquisitionPathElement(StandardFormatNames.opdsAcquisitionFeedEntry, null, emptyMap())
     this.context.currentRemainingOPDSPathElements =
@@ -608,7 +585,7 @@ class BorrowBookRefreshTokenTest {
 
   private fun executeTask(task: BorrowSubtaskType) {
     this.context.currentURIField =
-      this.webServer.url("/book.epub").toUri()
+      Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
       OPDSAcquisitionPathElement(StandardFormatNames.genericEPUBFiles, null, emptyMap())
 

@@ -24,6 +24,7 @@ import com.io7m.jfunctional.OptionType;
 import com.io7m.jfunctional.Some;
 
 import org.joda.time.DateTime;
+import org.nypl.simplified.links.Link;
 import org.nypl.simplified.opds.core.OPDSAcquisition.Relation;
 import org.nypl.simplified.parser.api.ParseError;
 import org.slf4j.Logger;
@@ -329,8 +330,19 @@ public final class OPDSAcquisitionFeedEntryParser implements OPDSAcquisitionFeed
             final Map<String, String> extraProperties =
               consumeExtraAcquisitionProperties(link);
             final MIMEType type = ((Some<MIMEType>) typeOpt).get();
+            final Link.LinkBasic linkBasic =
+              new Link.LinkBasic(
+                href,
+                type,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+              );
             final OPDSAcquisition acquisition =
-              new OPDSAcquisition(v, href, type, indirects, extraProperties);
+              new OPDSAcquisition(v, linkBasic, type, indirects, extraProperties);
             entry_builder.addAcquisition(acquisition);
 
             if (v == Relation.ACQUISITION_OPEN_ACCESS) {

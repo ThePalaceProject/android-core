@@ -11,9 +11,8 @@ class BorrowSubtaskDirectory : BorrowSubtaskDirectoryType {
     listOf(
       BorrowACSM,
       BorrowAudioBook,
-      BorrowAxisNow,
+      BorrowBoundless,
       BorrowBearerToken,
-      BorrowCopy,
       // BorrowSAMLDownload must precede BorrowDirectDownload in precedence.
       BorrowSAMLDownload,
       BorrowDirectDownload,

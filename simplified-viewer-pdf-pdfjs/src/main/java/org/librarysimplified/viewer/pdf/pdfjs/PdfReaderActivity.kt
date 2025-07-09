@@ -23,9 +23,11 @@ import org.librarysimplified.mdc.MDCKeys
 import org.librarysimplified.services.api.Services
 import org.nypl.drm.core.ContentProtectionProvider
 import org.nypl.simplified.accounts.api.AccountID
+import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.bookmarks.api.BookmarkServiceType
 import org.nypl.simplified.books.api.BookContentProtections
 import org.nypl.simplified.books.api.BookDRMInformation
+import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.books.api.bookmark.SerializedBookmarks
@@ -66,7 +68,8 @@ class PdfReaderActivity : AppCompatActivity() {
     }
   }
 
-  private val log: Logger = LoggerFactory.getLogger(PdfReaderActivity::class.java)
+  private val log: Logger =
+    LoggerFactory.getLogger(PdfReaderActivity::class.java)
 
   private val services =
     Services.serviceDirectory()
@@ -75,11 +78,13 @@ class PdfReaderActivity : AppCompatActivity() {
   private val profilesController =
     this.services.requireService(ProfilesControllerType::class.java)
 
-  private lateinit var pdfReaderContainer: FrameLayout
+  private lateinit var account: AccountType
   private lateinit var accountId: AccountID
+  private lateinit var bookFormat: BookFormat.BookFormatPDF
   private lateinit var bookID: BookID
   private lateinit var feedEntry: FeedEntry.FeedEntryOPDS
   private lateinit var loadingBar: ProgressBar
+  private lateinit var pdfReaderContainer: FrameLayout
   private lateinit var webView: WebView
 
   private var pdfServer: PdfServer? = null
@@ -106,6 +111,28 @@ class PdfReaderActivity : AppCompatActivity() {
     MDCKeys.put(MDCKeys.BOOK_PUBLISHER, this.feedEntry.feedEntry.publisher)
     MDC.put(MDCKeys.BOOK_FORMAT, "application/pdf")
     MDC.remove(MDCKeys.BOOK_DRM)
+
+    try {
+      this.account =
+        this.profilesController.profileCurrent()
+          .account(this.accountId)
+      MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID, this.account.provider.id.toString())
+    } catch (e: Exception) {
+      this.log.debug("Unable to locate account: ", e)
+      this.finish()
+      return
+    }
+
+    try {
+      this.bookFormat =
+        this.account.bookDatabase.entry(this.bookID)
+          .book
+          .findFormat(BookFormat.BookFormatPDF::class.java)!!
+    } catch (e: Throwable) {
+      this.log.debug("Unable to locate book format: ", e)
+      this.finish()
+      return
+    }
 
     val backgroundThread =
       MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(1))
@@ -204,17 +231,23 @@ class PdfReaderActivity : AppCompatActivity() {
   }
 
   private fun createPdfServer(drmInfo: BookDRMInformation, pdfFile: File) {
-    val contentProtections = BookContentProtections.create(
-      context = this.application,
-      contentProtectionProviders = ServiceLoader.load(ContentProtectionProvider::class.java)
-        .toList(),
-      drmInfo = drmInfo,
-      isManualPassphraseEnabled =
-      this.profilesController.profileCurrent().preferences().isManualLCPPassphraseEnabled,
-      onLCPDialogDismissed = {
-        this.finish()
-      }
-    )
+    val providers =
+      ServiceLoader.load(ContentProtectionProvider::class.java)
+        .toList()
+
+    val contentProtections =
+      BookContentProtections.create(
+        context = this.application,
+        contentProtectionProviders = providers,
+        boundless = null,
+        drmInfo = drmInfo,
+        format = this.bookFormat,
+        isManualPassphraseEnabled =
+        this.profilesController.profileCurrent().preferences().isManualLCPPassphraseEnabled,
+        onLCPDialogDismissed = {
+          this.finish()
+        }
+      )
 
     // Create an immediately-closed socket to get a free port number.
     val ephemeralSocket = ServerSocket(0).apply { this.close() }

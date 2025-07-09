@@ -23,6 +23,7 @@ import org.nypl.simplified.books.book_database.BookDRMInformationHandleNone
 import org.nypl.simplified.books.book_database.BookDatabase
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleEPUB
 import org.nypl.simplified.files.DirectoryUtilities
+import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisition
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
@@ -255,7 +256,7 @@ abstract class BookDatabaseEPUBContract {
     eb.addAcquisition(
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
-        URI.create("http://example.com"),
+        Link.LinkBasic(URI.create("http://example.com")),
         MIMEParser.parseRaisingException("application/epub+zip"),
         emptyList(),
         emptyMap()

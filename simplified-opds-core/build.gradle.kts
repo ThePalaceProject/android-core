@@ -1,6 +1,8 @@
 dependencies {
-    implementation(project(":simplified-parser-api"))
     implementation(project(":simplified-json-core"))
+    implementation(project(":simplified-links"))
+    implementation(project(":simplified-links-json"))
+    implementation(project(":simplified-parser-api"))
 
     implementation(libs.google.guava)
     implementation(libs.io7m.jfunctional)

@@ -3,7 +3,7 @@ package org.nypl.simplified.books.formats
 import one.irradia.mime.api.MIMEType
 import org.nypl.simplified.books.api.BookDRMKind
 import org.nypl.simplified.books.api.BookDRMKind.ACS
-import org.nypl.simplified.books.api.BookDRMKind.AXIS
+import org.nypl.simplified.books.api.BookDRMKind.BOUNDLESS
 import org.nypl.simplified.books.api.BookDRMKind.LCP
 import org.nypl.simplified.books.api.BookDRMKind.NONE
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
@@ -43,8 +43,8 @@ class BookFormatSupport private constructor(
     if (this.parameters.supportsPDF) {
       types.add(StandardFormatNames.genericPDFFiles)
     }
-    if (this.parameters.supportsAxisNow) {
-      types.add(StandardFormatNames.axisNow)
+    if (this.parameters.supportsBoundless) {
+      types.add(StandardFormatNames.boundlessLicenseFiles)
     }
     if (this.parameters.supportsLCP) {
       types.add(StandardFormatNames.lcpLicenseFiles)
@@ -60,9 +60,6 @@ class BookFormatSupport private constructor(
 
     if (this.parameters.supportsPDF) {
       types.add(StandardFormatNames.genericPDFFiles)
-    }
-    if (this.parameters.supportsAxisNow) {
-      types.add(StandardFormatNames.axisNow)
     }
     return types.toSet()
   }
@@ -157,7 +154,7 @@ class BookFormatSupport private constructor(
       NONE -> true
       LCP -> this.parameters.supportsLCP
       ACS -> this.parameters.supportsAdobeDRM
-      AXIS -> this.parameters.supportsAxisNow
+      BOUNDLESS -> this.parameters.supportsBoundless
     }
   }
 }

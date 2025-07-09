@@ -21,13 +21,11 @@ class BookCoverBadgePainter(
   }
 
   override fun transform(source: Bitmap): Bitmap {
-    val badge = this.badges.badgeForEntry(this.entry)
-    if (badge == null) {
-      return source
-    }
+    val badge = this.badges.badgeForEntry(this.entry) ?: return source
+    val sourceConfig = source.config ?: return source
 
     val workingBitmap = Bitmap.createBitmap(source)
-    val result = workingBitmap.copy(source.config, true)
+    val result = workingBitmap.copy(sourceConfig, true)
     val canvas = Canvas(result)
 
     val left = source.width - badge.width

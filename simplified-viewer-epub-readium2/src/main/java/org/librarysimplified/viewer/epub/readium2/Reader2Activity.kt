@@ -41,6 +41,7 @@ import org.librarysimplified.r2.views.SR2TOCFragment
 import org.librarysimplified.services.api.Services
 import org.nypl.drm.core.AdobeAdeptAssets
 import org.nypl.drm.core.AdobeAdeptLoan
+import org.nypl.drm.core.BoundlessServiceType
 import org.nypl.drm.core.ContentProtectionProvider
 import org.nypl.simplified.accessibility.AccessibilityServiceType
 import org.nypl.simplified.accounts.database.api.AccountType
@@ -49,6 +50,7 @@ import org.nypl.simplified.analytics.api.AnalyticsType
 import org.nypl.simplified.bookmarks.api.BookmarkServiceType
 import org.nypl.simplified.books.api.BookContentProtections
 import org.nypl.simplified.books.api.BookDRMInformation
+import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.threads.UIThread
@@ -93,7 +95,8 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
   private var fragmentNow: Fragment? = null
   private var subscriptions: CompositeDisposable = CompositeDisposable()
-
+  private var boundless: BoundlessServiceType? = null
+  private lateinit var bookFormat: BookFormat.BookFormatEPUB
   private lateinit var accessibilityService: AccessibilityServiceType
   private lateinit var analyticsService: AnalyticsType
   private lateinit var bookmarkService: BookmarkServiceType
@@ -122,6 +125,8 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       services.requireService(BookmarkServiceType::class.java)
     this.profilesController =
       services.requireService(ProfilesControllerType::class.java)
+    this.boundless =
+      services.optionalService(BoundlessServiceType::class.java)
 
     this.subscriptions =
       CompositeDisposable()
@@ -163,6 +168,17 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID, this.account.provider.id.toString())
     } catch (e: Exception) {
       this.logger.debug("Unable to locate account: ", e)
+      this.finish()
+      return
+    }
+
+    try {
+      this.bookFormat =
+        this.account.bookDatabase.entry(this.parameters.bookId)
+          .book
+          .findFormat(BookFormat.BookFormatEPUB::class.java)!!
+    } catch (e: Throwable) {
+      this.logger.debug("Unable to locate book format: ", e)
       this.finish()
       return
     }
@@ -266,7 +282,9 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
         BookContentProtections.create(
           context = this.application,
           contentProtectionProviders = contentProtectionProviders,
+          boundless = this.boundless,
           drmInfo = this.parameters.drmInfo,
+          format = this.bookFormat,
           isManualPassphraseEnabled = profileCurrent.preferences().isManualLCPPassphraseEnabled,
           onLCPDialogDismissed = {
             this.logger.debug("Dismissed LCP dialog. Shutting down...")
@@ -297,7 +315,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
           is BookDRMInformation.ACS ->
             this.openWithAdobe(rawBookAsset, drmInfo.rights)
 
-          is BookDRMInformation.AXIS ->
+          is BookDRMInformation.Boundless ->
             rawBookAsset
 
           is BookDRMInformation.None ->

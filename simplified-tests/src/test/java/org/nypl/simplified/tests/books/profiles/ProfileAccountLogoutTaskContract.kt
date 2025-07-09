@@ -41,6 +41,7 @@ import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.controller.ProfileAccountLogoutTask
 import org.nypl.simplified.feeds.api.FeedLoaderType
+import org.nypl.simplified.links.Link
 import org.nypl.simplified.notifications.NotificationTokenHTTPCalls
 import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
 import org.nypl.simplified.opds.core.OPDSAcquisition
@@ -116,7 +117,7 @@ abstract class ProfileAccountLogoutTaskContract {
     val acquisition =
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
-        URI.create("http://www.example.com/0.feed"),
+        Link.LinkBasic(URI.create("http://www.example.com/0.feed")),
         MIMEParser.parseRaisingException("application/epub+zip"),
         listOf(),
         mapOf()
