@@ -14,7 +14,9 @@ import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadRe
 import org.nypl.drm.core.BoundlessCMTemplatedLink
 import org.nypl.drm.core.BoundlessFulfilledCMEPUB
 import org.nypl.drm.core.BoundlessServiceType
-import org.nypl.drm.core.DRMTaskResult
+import org.nypl.drm.core.DRMTaskResult.DRMTaskCancelled
+import org.nypl.drm.core.DRMTaskResult.DRMTaskFailure
+import org.nypl.drm.core.DRMTaskResult.DRMTaskSuccess
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
 import org.nypl.simplified.accounts.api.AccountReadableType
 import org.nypl.simplified.books.api.BookDRMKind
@@ -25,11 +27,13 @@ import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandlePDF
 import org.nypl.simplified.books.borrowing.BorrowContextType
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.acsNotSupported
+import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskFailed
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskFactoryType
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskType
 import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.nypl.simplified.links.Link
+import java.net.URI
 
 class BorrowBoundless private constructor() : BorrowSubtaskType {
 
@@ -73,7 +77,19 @@ class BorrowBoundless private constructor() : BorrowSubtaskType {
         null
       }
 
-    val link: BoundlessCMTemplatedLink = TODO()
+    /*
+     * We require that the CM link be a templated link, and we handle it by stripping off the
+     * query and parameters. The Boundless library will substitute in its own parameters as
+     * necessary.
+     */
+
+    val templatedLink =
+      context.currentLinkCheck()
+        .toTemplated()
+    val strippedLink =
+      templatedLink.href.takeWhile { c -> c != '?' }
+    val link =
+      BoundlessCMTemplatedLink(URI.create(strippedLink))
 
     val result = boundless.fulfillEPUB(
       httpClient = context.httpClient,
@@ -90,12 +106,36 @@ class BorrowBoundless private constructor() : BorrowSubtaskType {
     )
 
     return when (result) {
-      is DRMTaskResult.DRMTaskCancelled -> TODO()
-      is DRMTaskResult.DRMTaskFailure -> TODO()
-      is DRMTaskResult.DRMTaskSuccess -> {
+      is DRMTaskCancelled ->
+        throw BorrowSubtaskException.BorrowSubtaskCancelled()
+      is DRMTaskFailure ->
+        throw this.drmFailed(context, result)
+      is DRMTaskSuccess -> {
         this.saveFulfilledBook(context, result.value)
       }
     }
+  }
+
+  private fun drmFailed(
+    context: BorrowContextType,
+    result: DRMTaskFailure<BoundlessFulfilledCMEPUB>
+  ): BorrowSubtaskException {
+    for (entry in result.attributes) {
+      context.taskRecorder.addAttribute(entry.key, entry.value)
+    }
+    for (step in result.steps) {
+      context.taskRecorder.beginNewStep(step.message)
+      val failure = step.failed
+      if (failure != null) {
+        context.taskRecorder.currentStepFailed(
+          message = failure.message ?: failure.javaClass.name,
+          errorCode = "drm-exception",
+          exception = failure,
+          extraMessages = listOf()
+        )
+      }
+    }
+    return BorrowSubtaskFailed()
   }
 
   private fun saveFulfilledBook(
