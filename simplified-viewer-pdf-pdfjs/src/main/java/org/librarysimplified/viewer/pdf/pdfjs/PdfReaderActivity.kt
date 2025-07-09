@@ -35,6 +35,7 @@ import org.nypl.simplified.books.api.bookmark.SerializedLocatorPage1
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.threads.UIThread
+import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
@@ -85,6 +86,7 @@ class PdfReaderActivity : AppCompatActivity() {
   private lateinit var feedEntry: FeedEntry.FeedEntryOPDS
   private lateinit var loadingBar: ProgressBar
   private lateinit var pdfReaderContainer: FrameLayout
+  private lateinit var root: View
   private lateinit var webView: WebView
 
   private var pdfServer: PdfServer? = null
@@ -143,6 +145,9 @@ class PdfReaderActivity : AppCompatActivity() {
         isSavedInstanceStateNull = savedInstanceState == null
       )
     }
+
+    this.root = this.findViewById(R.id.pdf_root)
+    ScreenEdgeToEdgeFix.edgeToEdge(this.root)
   }
 
   private fun completeReaderSetup(

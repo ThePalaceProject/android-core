@@ -1,10 +1,12 @@
 package org.nypl.simplified.ui.catalog.saml20
 
+import android.view.View
 import android.webkit.WebView
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import com.io7m.jmulticlose.core.CloseableCollection
 import org.librarysimplified.ui.R
+import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
 import org.nypl.simplified.webview.WebViewUtilities
 
 /**
@@ -13,9 +15,10 @@ import org.nypl.simplified.webview.WebViewUtilities
 
 class CatalogSAML20Activity : AppCompatActivity(R.layout.book_saml20) {
 
-  private var subscriptions = CloseableCollection.create()
   private lateinit var progress: ProgressBar
+  private lateinit var root: View
   private lateinit var webView: WebView
+  private var subscriptions = CloseableCollection.create()
 
   override fun onStop() {
     super.onStop()
@@ -25,6 +28,9 @@ class CatalogSAML20Activity : AppCompatActivity(R.layout.book_saml20) {
 
   override fun onStart() {
     super.onStart()
+
+    this.root = this.findViewById(R.id.bookSAML20Root)
+    ScreenEdgeToEdgeFix.edgeToEdge(this.root)
 
     this.progress =
       this.findViewById(R.id.saml20progressBar)

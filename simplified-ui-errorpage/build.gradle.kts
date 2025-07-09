@@ -4,6 +4,7 @@ dependencies {
     implementation(project(":simplified-presentableerror-api"))
     implementation(project(":simplified-reports"))
     implementation(project(":simplified-taskrecorder-api"))
+    implementation(project(":simplified-ui-screen"))
 
     implementation(libs.androidx.activity)
     implementation(libs.androidx.appcompat)

@@ -675,7 +675,26 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2025-06-26T11:22:48+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.17.0">
+    <c:release date="2025-07-09T00:00:00+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.16.3">
+      <c:changes>
+        <c:change date="2025-07-02T00:00:00+00:00" summary="Target SDK 35.">
+          <c:tickets>
+            <c:ticket id="PP-2693"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2025-07-07T00:00:00+00:00" summary="Add a missing night version of the search icon.">
+          <c:tickets>
+            <c:ticket id="PP-2706"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2025-07-08T00:00:00+00:00" summary="Correct night mode background in book details page.">
+          <c:tickets>
+            <c:ticket id="PP-2708"/>
+          </c:tickets>
+        </c:change>
+      </c:changes>
+    </c:release>
+    <c:release date="2025-07-09T08:12:48+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.17.0">
       <c:changes/>
     </c:release>
   </c:releases>

@@ -1,6 +1,7 @@
 package org.librarysimplified.viewer.audiobook
 
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.annotation.UiThread
 import androidx.appcompat.app.AppCompatActivity
@@ -59,6 +60,7 @@ import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.ui.errorpage.ErrorPageFragment
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
+import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
 import org.slf4j.LoggerFactory
 import java.net.URI
 
@@ -67,6 +69,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
   private val logger =
     LoggerFactory.getLogger(AudioBookPlayerActivity2::class.java)
 
+  private lateinit var root: View
   private lateinit var bookmarkService: BookmarkServiceType
   private lateinit var buildConfig: BuildConfigurationServiceType
   private lateinit var coverService: BookCoverProviderType
@@ -102,6 +105,9 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       services.requireService(TimeTrackingServiceType::class.java)
     this.profiles =
       services.requireService(ProfilesControllerType::class.java)
+
+    this.root = this.findViewById(R.id.audio_book_player_fragment_root)
+    ScreenEdgeToEdgeFix.edgeToEdge(this.root)
   }
 
   override fun onStart() {

@@ -3,8 +3,10 @@ package org.nypl.simplified.ui.errorpage
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import org.librarysimplified.ui.errorpage.R
+import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
 
 /**
  * A convenient base activity used to show error pages.
@@ -29,6 +31,7 @@ class ErrorPageActivity : AppCompatActivity(R.layout.error_host) {
     }
   }
 
+  private lateinit var root: View
   private lateinit var parameters: ErrorPageParameters
   private lateinit var errorFragment: ErrorPageFragment
 
@@ -57,5 +60,8 @@ class ErrorPageActivity : AppCompatActivity(R.layout.error_host) {
     this.supportFragmentManager.beginTransaction()
       .replace(R.id.errorHolder, this.errorFragment, "ERROR_MAIN")
       .commit()
+
+    this.root = this.findViewById(R.id.errorHolderRoot)
+    ScreenEdgeToEdgeFix.edgeToEdge(this.root)
   }
 }

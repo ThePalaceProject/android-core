@@ -2,6 +2,7 @@ package org.nypl.simplified.ui.main
 
 import android.os.Bundle
 import android.util.DisplayMetrics
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.io7m.jmulticlose.core.CloseableCollection
@@ -13,6 +14,7 @@ import org.nypl.simplified.ui.announcements.AnnouncementsDialog
 import org.nypl.simplified.ui.announcements.AnnouncementsModel
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_CONSUMED
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_NOT_CONSUMED
+import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
 import org.nypl.simplified.ui.splash.SplashFragment
 import org.nypl.simplified.ui.splash.SplashModel
 import org.slf4j.LoggerFactory
@@ -23,6 +25,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
   private val logger =
     LoggerFactory.getLogger(MainActivity::class.java)
 
+  private lateinit var rootContainer: View
   private var fragmentNow: Fragment? = null
   private var subscriptions: CloseableCollectionType<ClosingResourceFailedException> =
     CloseableCollection.create()
@@ -35,6 +38,9 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     val metrics = this.screenMetrics()
     Reports.reportScreenHeight = metrics.heightPixels
     Reports.reportScreenDPI = metrics.densityDpi
+
+    this.rootContainer = this.findViewById(R.id.mainFragmentRoot)
+    ScreenEdgeToEdgeFix.edgeToEdge(this.rootContainer)
   }
 
   private fun screenMetrics(): DisplayMetrics {

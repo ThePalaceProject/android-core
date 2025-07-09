@@ -18,6 +18,7 @@ import org.nypl.simplified.ui.errorpage.ErrorPageActivity
 import org.nypl.simplified.ui.errorpage.ErrorPageActivity.Companion.PARAMETER_ID
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.errorpage.ErrorStrings
+import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
 import java.net.URLEncoder
 
 class AccountSAML20Activity : AppCompatActivity(R.layout.saml20_activity) {
@@ -31,8 +32,9 @@ class AccountSAML20Activity : AppCompatActivity(R.layout.saml20_activity) {
   override fun onStart() {
     super.onStart()
 
-    this.root =
-      this.findViewById(R.id.saml20Root)
+    this.root = this.findViewById(R.id.saml20Root)
+    ScreenEdgeToEdgeFix.edgeToEdge(this.root)
+
     this.progress =
       this.findViewById(R.id.saml20progressBar)
 

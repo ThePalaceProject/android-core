@@ -16,6 +16,7 @@ dependencies {
     implementation(project(":simplified-services-api"))
     implementation(project(":simplified-taskrecorder-api"))
     implementation(project(":simplified-threads"))
+    implementation(project(":simplified-ui-screen"))
     implementation(project(":simplified-viewer-spi"))
 
     implementation(libs.androidx.activity)

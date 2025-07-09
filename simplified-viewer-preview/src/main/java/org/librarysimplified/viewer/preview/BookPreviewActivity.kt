@@ -3,6 +3,7 @@ package org.librarysimplified.viewer.preview
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.ProgressBar
 import androidx.annotation.UiThread
@@ -43,6 +44,7 @@ import org.nypl.simplified.books.controller.api.BooksPreviewControllerType
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.threads.UIThread
+import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
 import org.readium.r2.shared.util.Try
 import org.readium.r2.shared.util.asset.AssetRetriever
 import org.readium.r2.shared.util.http.DefaultHttpClient
@@ -90,7 +92,9 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
   private lateinit var previewController: BooksPreviewControllerType
   private lateinit var previewRegistry: BookPreviewRegistryType
   private lateinit var profilesController: ProfilesControllerType
+
   private var boundless: BoundlessServiceType? = null
+  private lateinit var root: View
   private var fragmentNow: Fragment? = null
   private var subscriptions: CompositeDisposable = CompositeDisposable()
   private var file: File? = null
@@ -170,6 +174,9 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
     }
 
     this.previewController.handleBookPreviewStatus(this.feedEntry)
+
+    this.root = this.findViewById(R.id.preview_root)
+    ScreenEdgeToEdgeFix.edgeToEdge(this.root)
   }
 
   private fun switchFragment(fragment: Fragment) {
