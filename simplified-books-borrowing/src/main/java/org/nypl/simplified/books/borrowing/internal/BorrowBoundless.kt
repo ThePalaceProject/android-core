@@ -33,7 +33,6 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskFactoryType
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskType
 import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.nypl.simplified.links.Link
-import java.net.URI
 
 class BorrowBoundless private constructor() : BorrowSubtaskType {
 
@@ -86,10 +85,8 @@ class BorrowBoundless private constructor() : BorrowSubtaskType {
     val templatedLink =
       context.currentLinkCheck()
         .toTemplated()
-    val strippedLink =
-      templatedLink.href.takeWhile { c -> c != '?' }
     val link =
-      BoundlessCMTemplatedLink(URI.create(strippedLink))
+      BoundlessCMTemplatedLink(templatedLink.href)
 
     val result = boundless.fulfillEPUB(
       httpClient = context.httpClient,
@@ -112,6 +109,7 @@ class BorrowBoundless private constructor() : BorrowSubtaskType {
         throw this.drmFailed(context, result)
       is DRMTaskSuccess -> {
         this.saveFulfilledBook(context, result.value)
+        throw BorrowSubtaskException.BorrowSubtaskHaltedEarly()
       }
     }
   }

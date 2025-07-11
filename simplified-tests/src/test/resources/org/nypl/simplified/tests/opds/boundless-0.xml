@@ -1,0 +1,305 @@
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:app="http://www.w3.org/2007/app" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:opds="http://opds-spec.org/2010/catalog" xmlns:opf="http://www.idpf.org/2007/opf" xmlns:drm="http://librarysimplified.org/terms/drm" xmlns:schema="http://schema.org/" xmlns:simplified="http://librarysimplified.org/terms/" xmlns:bibframe="http://bibframe.org/vocab/" xmlns:bib="http://bib.schema.org/" xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:lcp="http://readium.org/lcp-specs/ns" xmlns:palaceproperties="http://palaceproject.io/terms/properties/" xmlns:odl="http://drafts.opds.io/odl-1.0#">
+    <title>Search</title>
+    <id>https://minotaur.dev.palaceproject.io/minotaur-test-library/search/?entrypoint=All&amp;order=relevance&amp;available=all&amp;search_type=default&amp;q=If+You+Lived+Here</id>
+    <updated>2025-07-10T13:10:09+00:00</updated>
+    <entry schema:additionalType="http://schema.org/EBook">
+        <title>If You Lived Here</title>
+        <simplified:pwid>465a34b8-84bd-faed-5d30-0066c100b9ad</simplified:pwid>
+        <dcterms:language>en</dcterms:language>
+        <dcterms:publisher>Houghton Mifflin</dcterms:publisher>
+        <bib:publisherImprint>Harcourt Childrens Books</bib:publisherImprint>
+        <dcterms:issued>2011-10-25</dcterms:issued>
+        <id>urn:librarysimplified.org/terms/id/Axis%20360%20ID/0012441921</id>
+        <bibframe:distribution bibframe:ProviderName="Boundless"/>
+        <published>2022-12-16T00:00:00Z</published>
+        <updated>2025-06-28T08:01:32+00:00</updated>
+        <category scheme="http://librarysimplified.org/terms/fiction/" term="http://librarysimplified.org/terms/fiction/Nonfiction" label="Nonfiction"/>
+        <category scheme="http://librarysimplified.org/terms/genres/Simplified/" term="http://librarysimplified.org/terms/genres/Simplified/Architecture" label="Architecture"/>
+        <category scheme="http://librarysimplified.org/terms/genres/Simplified/" term="http://librarysimplified.org/terms/genres/Simplified/Social%20Sciences" label="Social Sciences"/>
+        <category scheme="http://schema.org/audience" term="Children" label="Children"/>
+        <category scheme="http://schema.org/typicalAgeRange" term="7-8" label="7-8"/>
+        <author>
+            <name>Laroche, Giles</name>
+            <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/contributor/Laroche,%20Giles/eng/Children" rel="contributor" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Laroche, Giles"/>
+        </author>
+        <link href="https://contentcafecloud.baker-taylor.com/Jacket.svc/D65D0665-050A-487B-9908-16E6D8FF5C3E/9780547677347/Large/Logo" rel="http://opds-spec.org/image" type="image/png"/>
+        <link href="https://contentcafecloud.baker-taylor.com/Jacket.svc/D65D0665-050A-487B-9908-16E6D8FF5C3E/9780547677347/Medium/Logo" rel="http://opds-spec.org/image/thumbnail" type="image/png"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/Axis%20360%20ID/0012441921/borrow/30" rel="http://opds-spec.org/acquisition/borrow" type="application/atom+xml;type=entry;profile=opds-catalog">
+            <opds:indirectAcquisition type="application/vnd.thepalaceproject.baker-taylor.kdrm+json">
+                <opds:indirectAcquisition type="application/epub+zip"/>
+            </opds:indirectAcquisition>
+            <opds:availability status="available"/>
+            <opds:holds total="0"/>
+            <opds:copies total="1" available="1"/>
+        </link>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/Axis%20360%20ID/0012441921" rel="alternate" type="application/atom+xml;type=entry;profile=opds-catalog"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/Axis%20360%20ID/0012441921/related_books" rel="related" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Recommended Works"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/annotations/Axis%20360%20ID/0012441921" rel="http://www.w3.org/ns/oa#annotationService" type="application/ld+json; profile=&quot;http://www.w3.org/ns/anno.jsonld&quot;"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/analytics/Axis%20360%20ID/0012441921/open_book" rel="http://librarysimplified.org/terms/rel/analytics/open-book"/>
+    </entry>
+    <entry schema:additionalType="http://bib.schema.org/Audiobook">
+        <title>You Shouldn’t Have Come Here</title>
+        <summary>&lt;p&gt;AN INSTANT NEW YORK TIMES BESTSELLER&lt;/p&gt;&lt;p&gt;“Everything I want in a thriller. Sexy, shocking, and tense with an ending I never saw coming. Jeneva Rose is the queen of twists.”—Colleen Hoover, #1 New York Times bestselling author&lt;/p&gt;&lt;p&gt;The highly anticipated new thriller from the New York Times bestselling author of The Perfect Marriage and One of Us Is Dead&lt;/p&gt;&lt;p&gt;You’ve opened up your house and your heart to a total stranger … What could possibly go wrong?&lt;/p&gt;&lt;p&gt;Grace Evans, an overworked New Yorker looking for a total escape from her busy life, books an Airbnb on a ranch in the middle of Wyoming. When she arrives at the idyllic getaway, she’s pleased to find that the owner is a handsome man by the name of Calvin Wells—and he’s eager to introduce her to his easygoing way of life. But there are things Grace discovers that she’s not too pleased about: A lack of cell phone service. A missing woman. And a feeling that something isn’t right with the ranch.&lt;/p&gt;&lt;p&gt;Despite her uneasiness, the two bond and start to fall for one another. However, as her departure date nears, things change for the worse. What began as a playful romance soon turns into a complicated web of lies. Grace grows wary of Calvin as his infatuation for her seems to have morphed to obsession. Calvin fears that Grace is hiding something from him—including her reason for staying at his ranch to begin with. Vacation flings typically end in heartbreak, but for Grace and Calvin, it’ll be far more destructive.&lt;/p&gt;&lt;p&gt;Book discussion questions are available here: https://s3.us-west-2.amazonaws.com/www.blackstoneaudio.com/docs/You%20Shouldnt%20Have%20Come%20Here_Discussion%20Guide.pdf&lt;/p&gt;</summary>
+        <simplified:pwid>171286d2-9558-56a6-0cea-d3a89df4b285</simplified:pwid>
+        <dcterms:language>en</dcterms:language>
+        <dcterms:publisher>Blackstone Publishing</dcterms:publisher>
+        <dcterms:issued>2023-01-01</dcterms:issued>
+        <id>urn:uuid:379286e7-f479-43d3-9eb5-ca2896f04175</id>
+        <bibframe:distribution bibframe:ProviderName="Blackstone Unlimited"/>
+        <published>2025-04-17T00:00:00Z</published>
+        <updated>2025-04-17T09:38:02+00:00</updated>
+        <category scheme="http://librarysimplified.org/terms/fiction/" term="http://librarysimplified.org/terms/fiction/Fiction" label="Fiction"/>
+        <category scheme="http://librarysimplified.org/terms/genres/Simplified/" term="http://librarysimplified.org/terms/genres/Simplified/Suspense/Thriller" label="Suspense/Thriller"/>
+        <category scheme="http://librarysimplified.org/terms/genres/Simplified/" term="http://librarysimplified.org/terms/genres/Simplified/Romantic%20Suspense" label="Romantic Suspense"/>
+        <category scheme="http://schema.org/audience" term="Adult" label="Adult"/>
+        <author>
+            <name>Jeneva Rose</name>
+            <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/contributor/Jeneva%20Rose/eng/Adult,Adults+Only,All+Ages,Children,Young+Adult" rel="contributor" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Jeneva Rose"/>
+        </author>
+        <link href="https://library.biblioboard.com/ext/api/media/379286e7-f479-43d3-9eb5-ca2896f04175/assets/thumbnail_full.jpg" rel="http://opds-spec.org/image" type="image/jpeg"/>
+        <link href="https://library.biblioboard.com/ext/api/media/379286e7-f479-43d3-9eb5-ca2896f04175/assets/thumbnail.jpg" rel="http://opds-spec.org/image/thumbnail" type="image/jpeg"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:379286e7-f479-43d3-9eb5-ca2896f04175/borrow" rel="http://opds-spec.org/acquisition/borrow" type="application/atom+xml;type=entry;profile=opds-catalog">
+            <opds:indirectAcquisition type="application/vnd.librarysimplified.bearer-token+json">
+                <opds:indirectAcquisition type="application/audiobook+json"/>
+            </opds:indirectAcquisition>
+            <opds:availability status="available"/>
+        </link>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:379286e7-f479-43d3-9eb5-ca2896f04175" rel="alternate" type="application/atom+xml;type=entry;profile=opds-catalog"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:379286e7-f479-43d3-9eb5-ca2896f04175/related_books" rel="related" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Recommended Works"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/annotations/URI/urn:uuid:379286e7-f479-43d3-9eb5-ca2896f04175" rel="http://www.w3.org/ns/oa#annotationService" type="application/ld+json; profile=&quot;http://www.w3.org/ns/anno.jsonld&quot;"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/analytics/URI/urn:uuid:379286e7-f479-43d3-9eb5-ca2896f04175/open_book" rel="http://librarysimplified.org/terms/rel/analytics/open-book"/>
+    </entry>
+    <entry schema:additionalType="http://schema.org/EBook">
+        <title>The Skin You Live In</title>
+        <summary>With the ease and simplicity of a nursery rhyme, this lively story delivers an important message of social acceptance to young readers. Themes associated with child development and social harmony, such as friendship, acceptance, self-esteem, and diversity are promoted in simple and straightforward prose. Vivid illustrations of children's activities for all cultures, such as swimming in the ocean, hugging, catching butterflies, and eating birthday cake are also provided. This delightful picturebook offers a wonderful venue through which parents and teachers can discuss important social concepts with their children.</summary>
+        <simplified:pwid>1db50084-7a26-70c1-2a40-013b3c84ba84</simplified:pwid>
+        <dcterms:language>en</dcterms:language>
+        <dcterms:publisher>Chicago Children's Museum</dcterms:publisher>
+        <dcterms:issued>2013-04-01</dcterms:issued>
+        <id>urn:uuid:39d8396a-5b39-4f30-b9e4-6d583ce15c66</id>
+        <bibframe:distribution bibframe:ProviderName="BiblioBoard"/>
+        <published>2023-05-03T00:00:00Z</published>
+        <updated>2023-05-03T22:28:48+00:00</updated>
+        <category scheme="http://librarysimplified.org/terms/fiction/" term="http://librarysimplified.org/terms/fiction/Fiction" label="Fiction"/>
+        <category scheme="http://schema.org/audience" term="Children" label="Children"/>
+        <category scheme="http://schema.org/typicalAgeRange" term="0-4" label="0-4"/>
+        <author>
+            <name>Michael Tyler</name>
+            <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/contributor/Michael%20Tyler/eng/Children" rel="contributor" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Michael Tyler"/>
+        </author>
+        <link href="https://library.biblioboard.com/ext/api/media/39d8396a-5b39-4f30-b9e4-6d583ce15c66/assets/thumbnail_full.jpg" rel="http://opds-spec.org/image" type="image/jpeg"/>
+        <link href="https://library.biblioboard.com/ext/api/media/39d8396a-5b39-4f30-b9e4-6d583ce15c66/assets/thumbnail.jpg" rel="http://opds-spec.org/image/thumbnail" type="image/jpeg"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:39d8396a-5b39-4f30-b9e4-6d583ce15c66/borrow" rel="http://opds-spec.org/acquisition/borrow" type="application/atom+xml;type=entry;profile=opds-catalog">
+            <opds:indirectAcquisition type="application/vnd.librarysimplified.bearer-token+json">
+                <opds:indirectAcquisition type="application/epub+zip"/>
+            </opds:indirectAcquisition>
+            <opds:availability status="available"/>
+        </link>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:39d8396a-5b39-4f30-b9e4-6d583ce15c66" rel="alternate" type="application/atom+xml;type=entry;profile=opds-catalog"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:39d8396a-5b39-4f30-b9e4-6d583ce15c66/related_books" rel="related" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Recommended Works"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/annotations/URI/urn:uuid:39d8396a-5b39-4f30-b9e4-6d583ce15c66" rel="http://www.w3.org/ns/oa#annotationService" type="application/ld+json; profile=&quot;http://www.w3.org/ns/anno.jsonld&quot;"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/analytics/URI/urn:uuid:39d8396a-5b39-4f30-b9e4-6d583ce15c66/open_book" rel="http://librarysimplified.org/terms/rel/analytics/open-book"/>
+    </entry>
+    <entry schema:additionalType="http://bib.schema.org/Audiobook">
+        <title>Wake Up! : A Handbook for Living in the Here and Now</title>
+        <summary>&lt;p&gt;&lt;b&gt;DON’T WASTE A MINUTE OF YOUR EXTRAORDINARY LIFE!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;You have an unlimited capacity to have fun, meet amazing people, and feel truly awake every single day. But do you? When you’re living on autopilot (and most people are—80 percent of the time), those opportunities pass you by.&lt;/p&gt;&lt;p&gt;Snap out of it! Any one of the fifty-four playful strategies in&lt;i&gt; Wake Up!&lt;/i&gt; will bring your brain back to life. Chris Baréz-Brown spells out the Insight, Plan, and Payoff of every strategy. For example, Steal Back Time:&lt;/p&gt;&lt;p&gt;&lt;b&gt;The Insight:&lt;/b&gt; If you’re not in control of your time, you are not in control of your life.&lt;/p&gt;&lt;p&gt;&lt;b&gt;The Plan:&lt;/b&gt; Steal some back! Schedule a meeting that doesn’t exist, or skip a commitment that fills you with dread and instead do something that fills you with joy.&lt;/p&gt;&lt;p&gt;&lt;b&gt;The Payoff:&lt;/b&gt; When we act more consciously to decide how we spend our time, we naturally create space to wake up more and more every day.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Stop sleepwalking through life and make every day count! &lt;/b&gt;&lt;/p&gt;</summary>
+        <simplified:pwid>c24dd5a6-ee88-88a5-ee9d-152f8a15cd44</simplified:pwid>
+        <dcterms:language>en</dcterms:language>
+        <dcterms:publisher>Blackstone Publishing</dcterms:publisher>
+        <dcterms:issued>2017-01-01</dcterms:issued>
+        <id>urn:uuid:a84cec5e-5f79-42c3-83f2-6bc414c297ed</id>
+        <bibframe:distribution bibframe:ProviderName="BiblioBoard"/>
+        <published>2024-08-17T00:00:00Z</published>
+        <updated>2025-04-17T08:16:15+00:00</updated>
+        <category scheme="http://librarysimplified.org/terms/fiction/" term="http://librarysimplified.org/terms/fiction/Nonfiction" label="Nonfiction"/>
+        <category scheme="http://librarysimplified.org/terms/genres/Simplified/" term="http://librarysimplified.org/terms/genres/Simplified/Self-Help" label="Self-Help"/>
+        <category scheme="http://schema.org/audience" term="Adult" label="Adult"/>
+        <author>
+            <name>Chris Baréz-Brown</name>
+            <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/contributor/Chris%20Bar%C3%A9z-Brown/eng/Adult,Adults+Only,All+Ages,Children,Young+Adult" rel="contributor" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Chris Baréz-Brown"/>
+        </author>
+        <link href="https://library.biblioboard.com/ext/api/media/a84cec5e-5f79-42c3-83f2-6bc414c297ed/assets/thumbnail_full.jpg" rel="http://opds-spec.org/image" type="image/jpeg"/>
+        <link href="https://library.biblioboard.com/ext/api/media/a84cec5e-5f79-42c3-83f2-6bc414c297ed/assets/thumbnail.jpg" rel="http://opds-spec.org/image/thumbnail" type="image/jpeg"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:a84cec5e-5f79-42c3-83f2-6bc414c297ed/borrow" rel="http://opds-spec.org/acquisition/borrow" type="application/atom+xml;type=entry;profile=opds-catalog">
+            <opds:indirectAcquisition type="application/vnd.librarysimplified.bearer-token+json">
+                <opds:indirectAcquisition type="application/audiobook+json"/>
+            </opds:indirectAcquisition>
+            <opds:availability status="available"/>
+        </link>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:a84cec5e-5f79-42c3-83f2-6bc414c297ed" rel="alternate" type="application/atom+xml;type=entry;profile=opds-catalog"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:a84cec5e-5f79-42c3-83f2-6bc414c297ed/related_books" rel="related" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Recommended Works"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/annotations/URI/urn:uuid:a84cec5e-5f79-42c3-83f2-6bc414c297ed" rel="http://www.w3.org/ns/oa#annotationService" type="application/ld+json; profile=&quot;http://www.w3.org/ns/anno.jsonld&quot;"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/analytics/URI/urn:uuid:a84cec5e-5f79-42c3-83f2-6bc414c297ed/open_book" rel="http://librarysimplified.org/terms/rel/analytics/open-book"/>
+    </entry>
+    <entry schema:additionalType="http://bib.schema.org/Audiobook">
+        <title>Things You Would Know If You Grew Up Around Here</title>
+        <summary>&lt;p&gt;Set during the devastating Memorial Day floods in Texas, a surreal, empathetic novel for readers of Station Eleven and The Age of Miracles.&lt;/p&gt;&lt;p&gt;2015. Eighteen-year-old Boyd Montgomery returns from her grandfather’s wedding to find her friend Isaac missing. Drought-ravaged central Texas has been newly inundated with rain, and flash floods across the state have begun to sweep away people, cars, and entire houses as every river breaks its banks.&lt;/p&gt;&lt;p&gt;In the midst of the rising waters, Boyd sets out across the ravaged back country. She is determined to rescue her missing friend, and she’s not alone in her quest: her neighbor Carla spots Boyd’s boot prints leading away from the safety of home and follows in her path. Hours later, her mother returns to find Boyd missing, and she, too, joins the search.&lt;/p&gt;&lt;p&gt;Boyd, Carla, and Lucy Maud know the land well. They’ve lived in central Texas for their entire lives. But they have no way of knowing the fissure the storm has opened along the back roads, no way of knowing what has been erased—and what has resurfaced. As they each travel through the newly unfamiliar landscape, they discover the ghosts of Texas past and present.&lt;/p&gt;&lt;p&gt;Haunting and timely, Things You Would Know if You Grew Up Around Here considers questions of history and empathy and brings a pre-apocalyptic landscape both foreign and familiar to shockingly vivid life.&lt;/p&gt;</summary>
+        <simplified:pwid>0558114b-8ae6-3433-e193-8ed5a4ed3877</simplified:pwid>
+        <dcterms:language>en</dcterms:language>
+        <dcterms:publisher>Blackstone Publishing</dcterms:publisher>
+        <dcterms:issued>2020-01-01</dcterms:issued>
+        <id>urn:uuid:e37c0dd8-23a2-4026-aa6b-54ea89ecb7aa</id>
+        <bibframe:distribution bibframe:ProviderName="Blackstone Unlimited"/>
+        <published>2025-04-17T00:00:00Z</published>
+        <updated>2025-04-17T08:54:31+00:00</updated>
+        <category scheme="http://librarysimplified.org/terms/fiction/" term="http://librarysimplified.org/terms/fiction/Fiction" label="Fiction"/>
+        <category scheme="http://librarysimplified.org/terms/genres/Simplified/" term="http://librarysimplified.org/terms/genres/Simplified/Literary%20Fiction" label="Literary Fiction"/>
+        <category scheme="http://schema.org/audience" term="Adult" label="Adult"/>
+        <author>
+            <name>Nancy Wayson Dinan</name>
+            <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/contributor/Nancy%20Wayson%20Dinan/eng/Adult,Adults+Only,All+Ages,Children,Young+Adult" rel="contributor" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Nancy Wayson Dinan"/>
+        </author>
+        <link href="https://library.biblioboard.com/ext/api/media/e37c0dd8-23a2-4026-aa6b-54ea89ecb7aa/assets/thumbnail_full.jpg" rel="http://opds-spec.org/image" type="image/jpeg"/>
+        <link href="https://library.biblioboard.com/ext/api/media/e37c0dd8-23a2-4026-aa6b-54ea89ecb7aa/assets/thumbnail.jpg" rel="http://opds-spec.org/image/thumbnail" type="image/jpeg"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:e37c0dd8-23a2-4026-aa6b-54ea89ecb7aa/borrow" rel="http://opds-spec.org/acquisition/borrow" type="application/atom+xml;type=entry;profile=opds-catalog">
+            <opds:indirectAcquisition type="application/vnd.librarysimplified.bearer-token+json">
+                <opds:indirectAcquisition type="application/audiobook+json"/>
+            </opds:indirectAcquisition>
+            <opds:availability status="available"/>
+        </link>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:e37c0dd8-23a2-4026-aa6b-54ea89ecb7aa" rel="alternate" type="application/atom+xml;type=entry;profile=opds-catalog"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:e37c0dd8-23a2-4026-aa6b-54ea89ecb7aa/related_books" rel="related" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Recommended Works"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/annotations/URI/urn:uuid:e37c0dd8-23a2-4026-aa6b-54ea89ecb7aa" rel="http://www.w3.org/ns/oa#annotationService" type="application/ld+json; profile=&quot;http://www.w3.org/ns/anno.jsonld&quot;"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/analytics/URI/urn:uuid:e37c0dd8-23a2-4026-aa6b-54ea89ecb7aa/open_book" rel="http://librarysimplified.org/terms/rel/analytics/open-book"/>
+    </entry>
+    <entry schema:additionalType="http://schema.org/EBook">
+        <title>How Do You Live?</title>
+        <summary>&lt;b&gt;As featured in the Oscar-nominated Hayao Miyazaki film &lt;i&gt;The Boy and the Heron&lt;/i&gt;: the coming-of-age novel &lt;i&gt;How Do You Live?&lt;/i&gt; is a Japanese classic that became a &lt;i&gt;New York Times&lt;/i&gt; bestseller. &lt;/b&gt; After the death of his father, fifteen-year-old Copper must confront inevitable and enormous change, including the aftermath of his own betrayal of his best friend. Between episodes of Copper’s emerging story, letters from his uncle share knowledge and offer advice on life’s big questions. Like his namesake Copernicus, Copper looks to the stars and uses his discoveries about the heavens, earth, and human nature to answer the question of how he will live. First published in 1937 in Japan, Genzaburo Yoshino’s &lt;i&gt;How Do You Live?&lt;/i&gt; has long been an important book for Academy Award-winning animator Hayao Miyazaki (&lt;i&gt;Spirited Away, Howl's Moving Castle&lt;/i&gt;). Perfect for readers of philosophical fiction like &lt;i&gt;The Alchemist &lt;/i&gt;and &lt;i&gt;The Little Prince&lt;/i&gt;, &lt;i&gt;How Do You Live? &lt;/i&gt;serves as a thought-provoking guide for young readers as they grow up in a world both infinitely large and unimaginably small.</summary>
+        <simplified:pwid>c3633d3a-710e-eb9f-4b9d-cbad0c882b30</simplified:pwid>
+        <dcterms:language>en</dcterms:language>
+        <dcterms:publisher>Little, Brown Books for Young Readers</dcterms:publisher>
+        <dcterms:issued>2021-10-26</dcterms:issued>
+        <id>urn:librarysimplified.org/terms/id/Bibliotheca%20ID/365yn89</id>
+        <bibframe:distribution bibframe:ProviderName="Bibliotheca"/>
+        <published>2022-12-16T00:00:00Z</published>
+        <updated>2025-07-10T09:00:48+00:00</updated>
+        <category scheme="http://librarysimplified.org/terms/fiction/" term="http://librarysimplified.org/terms/fiction/Fiction" label="Fiction"/>
+        <category scheme="http://librarysimplified.org/terms/genres/Simplified/" term="http://librarysimplified.org/terms/genres/Simplified/Religious%20Fiction" label="Religious Fiction"/>
+        <category scheme="http://schema.org/audience" term="Children" label="Children"/>
+        <category scheme="http://schema.org/typicalAgeRange" term="9-13" label="9-13"/>
+        <author>
+            <name>Genzaburo Yoshino</name>
+            <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/contributor/Genzaburo%20Yoshino/eng/Children" rel="contributor" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Genzaburo Yoshino"/>
+        </author>
+        <link href="https://images.yourcloudlibrary.com/delivery/img?type=DOCUMENTIMAGE&amp;documentID=365yn89&amp;token=nobody" rel="http://opds-spec.org/image" type="image/png"/>
+        <link href="https://images.yourcloudlibrary.com/delivery/img?type=DOCUMENTIMAGE&amp;documentID=365yn89&amp;token=nobody&amp;size=NORMAL" rel="http://opds-spec.org/image/thumbnail" type="image/png"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/Bibliotheca%20ID/365yn89/borrow" rel="http://opds-spec.org/acquisition/borrow" type="application/atom+xml;type=entry;profile=opds-catalog">
+            <opds:indirectAcquisition type="application/vnd.adobe.adept+xml">
+                <opds:indirectAcquisition type="application/epub+zip"/>
+            </opds:indirectAcquisition>
+            <opds:availability status="available"/>
+            <opds:holds total="0"/>
+            <opds:copies total="1" available="1"/>
+        </link>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/Bibliotheca%20ID/365yn89" rel="alternate" type="application/atom+xml;type=entry;profile=opds-catalog"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/Bibliotheca%20ID/365yn89/related_books" rel="related" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Recommended Works"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/annotations/Bibliotheca%20ID/365yn89" rel="http://www.w3.org/ns/oa#annotationService" type="application/ld+json; profile=&quot;http://www.w3.org/ns/anno.jsonld&quot;"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/analytics/Bibliotheca%20ID/365yn89/open_book" rel="http://librarysimplified.org/terms/rel/analytics/open-book"/>
+    </entry>
+    <entry schema:additionalType="http://schema.org/EBook">
+        <title>Are You Living? : A Song About Living and Nonliving Things</title>
+        <summary>Sing a song of science! You know the song Are You Sleeping? Sing along with new words that explain the differences between living and nonliving things.</summary>
+        <simplified:pwid>5bc0c877-87fc-16ea-b48f-a3e02705ac74</simplified:pwid>
+        <dcterms:language>en</dcterms:language>
+        <dcterms:publisher>Capstone</dcterms:publisher>
+        <dcterms:issued>2009-01-01</dcterms:issued>
+        <id>urn:uuid:c7a2fa20-d268-43f1-8889-97f6ba4a0010</id>
+        <bibframe:distribution bibframe:ProviderName="BiblioBoard"/>
+        <published>2024-08-17T00:00:00Z</published>
+        <updated>2024-08-17T09:46:07+00:00</updated>
+        <category scheme="http://librarysimplified.org/terms/fiction/" term="http://librarysimplified.org/terms/fiction/Nonfiction" label="Nonfiction"/>
+        <category scheme="http://librarysimplified.org/terms/genres/Simplified/" term="http://librarysimplified.org/terms/genres/Simplified/Nature" label="Nature"/>
+        <category scheme="http://librarysimplified.org/terms/genres/Simplified/" term="http://librarysimplified.org/terms/genres/Simplified/Music" label="Music"/>
+        <category scheme="http://schema.org/audience" term="Children" label="Children"/>
+        <author>
+            <name>Laura Purdie Salas</name>
+            <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/contributor/Laura%20Purdie%20Salas/eng/Children" rel="contributor" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Laura Purdie Salas"/>
+        </author>
+        <link href="https://library.biblioboard.com/ext/api/media/c7a2fa20-d268-43f1-8889-97f6ba4a0010/assets/thumbnail_full.jpg" rel="http://opds-spec.org/image" type="image/jpeg"/>
+        <link href="https://library.biblioboard.com/ext/api/media/c7a2fa20-d268-43f1-8889-97f6ba4a0010/assets/thumbnail.jpg" rel="http://opds-spec.org/image/thumbnail" type="image/jpeg"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:c7a2fa20-d268-43f1-8889-97f6ba4a0010/borrow" rel="http://opds-spec.org/acquisition/borrow" type="application/atom+xml;type=entry;profile=opds-catalog">
+            <opds:indirectAcquisition type="application/vnd.librarysimplified.bearer-token+json">
+                <opds:indirectAcquisition type="application/pdf"/>
+            </opds:indirectAcquisition>
+            <opds:availability status="available"/>
+        </link>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:c7a2fa20-d268-43f1-8889-97f6ba4a0010" rel="alternate" type="application/atom+xml;type=entry;profile=opds-catalog"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:c7a2fa20-d268-43f1-8889-97f6ba4a0010/related_books" rel="related" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Recommended Works"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/annotations/URI/urn:uuid:c7a2fa20-d268-43f1-8889-97f6ba4a0010" rel="http://www.w3.org/ns/oa#annotationService" type="application/ld+json; profile=&quot;http://www.w3.org/ns/anno.jsonld&quot;"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/analytics/URI/urn:uuid:c7a2fa20-d268-43f1-8889-97f6ba4a0010/open_book" rel="http://librarysimplified.org/terms/rel/analytics/open-book"/>
+    </entry>
+    <entry schema:additionalType="http://schema.org/EBook">
+        <title>You're Not from Around Here, Are You?: A Lesbian in Small-Town America</title>
+        <summary>This is a funny, moving story about life in a small town, from the point of view of a pregnant lesbian. Louise A. Blum, author of the critically acclaimed novel Amnesty, now tells the story of her own life and her decision to be out, loud, and pregnant. Mixing humor with memorable prose, Blum recounts how a quiet, conservative town in an impoverished stretch of Appalachia reacts as she and a local woman, Connie, fall in love, move in together, and determine to live their life together openly and truthfully.</summary>
+        <simplified:pwid>398fe045-5f82-1fbd-93b7-790419a7c78d</simplified:pwid>
+        <dcterms:language>en</dcterms:language>
+        <dcterms:publisher>The University of Wisconsin Press</dcterms:publisher>
+        <dcterms:issued>2001-01-01</dcterms:issued>
+        <id>urn:uuid:3500db30-3eb0-4be3-af3c-bdfb378eb7be</id>
+        <bibframe:distribution bibframe:ProviderName="Palace Bookshelf"/>
+        <published>2023-11-06T00:00:00Z</published>
+        <updated>2023-12-22T14:51:20+00:00</updated>
+        <category scheme="http://librarysimplified.org/terms/fiction/" term="http://librarysimplified.org/terms/fiction/Nonfiction" label="Nonfiction"/>
+        <category scheme="http://librarysimplified.org/terms/genres/Simplified/" term="http://librarysimplified.org/terms/genres/Simplified/Biography%20%26%20Memoir" label="Biography &amp; Memoir"/>
+        <category scheme="http://librarysimplified.org/terms/genres/Simplified/" term="http://librarysimplified.org/terms/genres/Simplified/Social%20Sciences" label="Social Sciences"/>
+        <category scheme="http://schema.org/audience" term="Adult" label="Adult"/>
+        <author>
+            <name>Blum, Louise A.</name>
+            <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/contributor/Blum,%20Louise%20A./eng/Adult,Adults+Only,All+Ages,Children,Young+Adult" rel="contributor" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Blum, Louise A."/>
+        </author>
+        <link href="https://www.fulcrum.org//image-service/zs25xc079/full/800,/0/default.jpg" rel="http://opds-spec.org/image" type="image/jpeg"/>
+        <link href="https://www.fulcrum.org//image-service/zs25xc079/full/400,/0/default.jpg" rel="http://opds-spec.org/image/thumbnail" type="image/jpeg"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:3500db30-3eb0-4be3-af3c-bdfb378eb7be/borrow" rel="http://opds-spec.org/acquisition/borrow" type="application/atom+xml;type=entry;profile=opds-catalog">
+            <opds:indirectAcquisition type="application/epub+zip"/>
+            <opds:indirectAcquisition type="application/pdf"/>
+            <opds:availability status="available"/>
+        </link>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:3500db30-3eb0-4be3-af3c-bdfb378eb7be" rel="alternate" type="application/atom+xml;type=entry;profile=opds-catalog"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:3500db30-3eb0-4be3-af3c-bdfb378eb7be/related_books" rel="related" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Recommended Works"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/annotations/URI/urn:uuid:3500db30-3eb0-4be3-af3c-bdfb378eb7be" rel="http://www.w3.org/ns/oa#annotationService" type="application/ld+json; profile=&quot;http://www.w3.org/ns/anno.jsonld&quot;"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/analytics/URI/urn:uuid:3500db30-3eb0-4be3-af3c-bdfb378eb7be/open_book" rel="http://librarysimplified.org/terms/rel/analytics/open-book"/>
+    </entry>
+    <entry schema:additionalType="http://schema.org/EBook">
+        <title>We Live Here Too! : Kids Talk About Good Citizenship</title>
+        <summary>An award-winning introduction to good citizenship. Using real-life experiences and advice column-style writing, this nonfiction picture book defines citizenship and explains how it can be demonstrated or used in daily situations "Does it really matter if I throw my gum on the ground?" through fun, creative, and responsible ways! Written by Minnesota Book Award finalist Nancy Loewen.</summary>
+        <simplified:pwid>3383cd56-466d-ad71-68d1-56825df49bba</simplified:pwid>
+        <dcterms:language>en</dcterms:language>
+        <dcterms:publisher>Capstone</dcterms:publisher>
+        <dcterms:issued>2002-01-01</dcterms:issued>
+        <id>urn:uuid:30d18a64-fa18-4e95-8eae-462c191aa743</id>
+        <bibframe:distribution bibframe:ProviderName="BiblioBoard"/>
+        <published>2024-08-17T00:00:00Z</published>
+        <updated>2024-08-17T08:41:39+00:00</updated>
+        <category scheme="http://librarysimplified.org/terms/fiction/" term="http://librarysimplified.org/terms/fiction/Nonfiction" label="Nonfiction"/>
+        <category scheme="http://librarysimplified.org/terms/genres/Simplified/" term="http://librarysimplified.org/terms/genres/Simplified/Life%20Strategies" label="Life Strategies"/>
+        <category scheme="http://schema.org/audience" term="Children" label="Children"/>
+        <author>
+            <name>Nancy Loewen</name>
+            <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/contributor/Nancy%20Loewen/eng/Children" rel="contributor" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Nancy Loewen"/>
+        </author>
+        <link href="https://library.biblioboard.com/ext/api/media/30d18a64-fa18-4e95-8eae-462c191aa743/assets/thumbnail_full.jpg" rel="http://opds-spec.org/image" type="image/jpeg"/>
+        <link href="https://library.biblioboard.com/ext/api/media/30d18a64-fa18-4e95-8eae-462c191aa743/assets/thumbnail.jpg" rel="http://opds-spec.org/image/thumbnail" type="image/jpeg"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:30d18a64-fa18-4e95-8eae-462c191aa743/borrow" rel="http://opds-spec.org/acquisition/borrow" type="application/atom+xml;type=entry;profile=opds-catalog">
+            <opds:indirectAcquisition type="application/vnd.librarysimplified.bearer-token+json">
+                <opds:indirectAcquisition type="application/pdf"/>
+            </opds:indirectAcquisition>
+            <opds:availability status="available"/>
+        </link>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:30d18a64-fa18-4e95-8eae-462c191aa743" rel="alternate" type="application/atom+xml;type=entry;profile=opds-catalog"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:30d18a64-fa18-4e95-8eae-462c191aa743/related_books" rel="related" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Recommended Works"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/annotations/URI/urn:uuid:30d18a64-fa18-4e95-8eae-462c191aa743" rel="http://www.w3.org/ns/oa#annotationService" type="application/ld+json; profile=&quot;http://www.w3.org/ns/anno.jsonld&quot;"/>
+        <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/analytics/URI/urn:uuid:30d18a64-fa18-4e95-8eae-462c191aa743/open_book" rel="http://librarysimplified.org/terms/rel/analytics/open-book"/>
+    </entry>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/search/?entrypoint=All&amp;order=relevance&amp;available=all&amp;search_type=default&amp;q=If+You+Lived+Here" rel="self"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/authentication_document" rel="http://opds-spec.org/auth/document"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/search/?entrypoint=All&amp;order=relevance&amp;available=all&amp;search_type=default" rel="search" type="application/opensearchdescription+xml"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/loans/" rel="http://opds-spec.org/shelf" type="application/atom+xml;profile=opds-catalog;kind=acquisition"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/annotations/" rel="http://www.w3.org/ns/oa#annotationService" type="application/ld+json; profile=&quot;http://www.w3.org/ns/anno.jsonld&quot;"/>
+    <link href="mailto:support@thepalaceproject.org" rel="help"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/groups/" rel="start" title="All Books"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/search/?q=If+You+Lived+Here&amp;entrypoint=All&amp;order=relevance&amp;available=all&amp;search_type=default" rel="http://opds-spec.org/facet" title="All" opds:facetGroup="Formats" opds:activeFacet="true" defaultFacet="true" simplified:facetGroupType="http://librarysimplified.org/terms/rel/entrypoint"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/search/?q=If+You+Lived+Here&amp;entrypoint=Book&amp;order=relevance&amp;available=all&amp;search_type=default" rel="http://opds-spec.org/facet" title="eBooks" opds:facetGroup="Formats" simplified:facetGroupType="http://librarysimplified.org/terms/rel/entrypoint"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/search/?q=If+You+Lived+Here&amp;entrypoint=Audio&amp;order=relevance&amp;available=all&amp;search_type=default" rel="http://opds-spec.org/facet" title="Audiobooks" opds:facetGroup="Formats" simplified:facetGroupType="http://librarysimplified.org/terms/rel/entrypoint"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/search/?q=If+You+Lived+Here&amp;entrypoint=All&amp;order=relevance&amp;available=all&amp;search_type=default&amp;after=10&amp;size=10" rel="next"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/groups/" rel="up" title="Minotaur Test Library"/>
+</feed>

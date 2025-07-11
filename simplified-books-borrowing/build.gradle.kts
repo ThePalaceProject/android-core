@@ -45,4 +45,5 @@ dependencies {
     implementation(libs.rxjava)
     implementation(libs.rxjava2)
     implementation(libs.slf4j)
+    implementation(libs.stduritemplate)
 }

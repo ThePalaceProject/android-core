@@ -11,6 +11,7 @@ import static org.nypl.simplified.opds.core.OPDSFeedConstants.GROUP_REL_TEXT;
 import static org.nypl.simplified.opds.core.OPDSFeedConstants.IMAGE_URI_TEXT;
 import static org.nypl.simplified.opds.core.OPDSFeedConstants.ISSUES_REL_TEXT;
 import static org.nypl.simplified.opds.core.OPDSFeedConstants.LCP_URI;
+import static org.nypl.simplified.opds.core.OPDSFeedConstants.ODL_URI;
 import static org.nypl.simplified.opds.core.OPDSFeedConstants.OPDS_URI;
 import static org.nypl.simplified.opds.core.OPDSFeedConstants.PREVIEW_TEXT;
 import static org.nypl.simplified.opds.core.OPDSFeedConstants.RELATED_REL_TEXT;
@@ -42,6 +43,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -62,6 +64,7 @@ import one.irradia.mime.vanilla.MIMEParser;
 public final class OPDSAcquisitionFeedEntryParser implements OPDSAcquisitionFeedEntryParserType {
 
   private static final Logger LOG = LoggerFactory.getLogger(OPDSAcquisitionFeedEntryParser.class);
+  private static final String ODL_TEMPLATED_LINK = "tlink";
 
   private OPDSAcquisitionFeedEntryParser() {
 
@@ -121,6 +124,14 @@ public final class OPDSAcquisitionFeedEntryParser implements OPDSAcquisitionFeed
     return new OPDSAcquisitionFeedEntryParser();
   }
 
+  private static final HashSet<Map.Entry<URI, String>> LINK_NAMES;
+
+  static {
+    LINK_NAMES = new HashSet<>();
+    LINK_NAMES.add(Map.entry(ATOM_URI, "link"));
+    LINK_NAMES.add(Map.entry(ODL_URI, ODL_TEMPLATED_LINK));
+  }
+
   private OPDSAcquisitionFeedEntry parseAcquisitionEntry(
     final URI source,
     final Element element)
@@ -137,7 +148,7 @@ public final class OPDSAcquisitionFeedEntryParser implements OPDSAcquisitionFeed
       OPDSAcquisitionFeedEntry.newBuilder(id, title, updated, OPDSAvailabilityLoanable.get());
 
     final List<Element> e_links =
-      OPDSXML.getChildElementsWithNameNonEmpty(element, ATOM_URI, "link");
+      OPDSXML.getChildElementsWithNamesNonEmpty(element, LINK_NAMES);
 
     /*
      * First, locate a revocation link, if any. This is required to be found
@@ -214,7 +225,7 @@ public final class OPDSAcquisitionFeedEntryParser implements OPDSAcquisitionFeed
   private OptionType<Double> findDuration(Element element) {
     try {
       return OPDSXML.getFirstChildElementTextWithNameOptional(
-        element, DUBLIN_CORE_TERMS_URI, "duration")
+          element, DUBLIN_CORE_TERMS_URI, "duration")
         .map(Double::parseDouble);
     } catch (Exception e) {
       return Option.none();
@@ -308,50 +319,74 @@ public final class OPDSAcquisitionFeedEntryParser implements OPDSAcquisitionFeed
     final String rel_text)
     throws OPDSParseException {
 
+    final var linkIsTemplated =
+      Objects.equals(link.getLocalName(), ODL_TEMPLATED_LINK);
+
     if (rel_text.startsWith(ACQUISITION_URI_PREFIX_TEXT)) {
       for (final Relation v : Relation.values()) {
         final String uri_text = v.getUri().toString();
         if (rel_text.equals(uri_text)) {
-          final URI href;
-          try {
-            href = scrubURI(source, link.getAttribute("href"));
-          } catch (URISyntaxException e) {
-            entry_builder.addParseError(
-              this.invalidURI(source, "'href' attribute of element with relation " + v, e));
-            continue;
-          }
-
           final List<OPDSIndirectAcquisition> indirects =
             parseIndirectAcquisitions(link);
           final OptionType<MIMEType> typeOpt =
             typeAttributeWithSupportedValue(link);
 
-          if (typeOpt.isSome()) {
-            final Map<String, String> extraProperties =
-              consumeExtraAcquisitionProperties(link);
-            final MIMEType type = ((Some<MIMEType>) typeOpt).get();
-            final Link.LinkBasic linkBasic =
-              new Link.LinkBasic(
-                href,
-                type,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null
-              );
-            final OPDSAcquisition acquisition =
-              new OPDSAcquisition(v, linkBasic, type, indirects, extraProperties);
-            entry_builder.addAcquisition(acquisition);
+          /*
+           * Links without types are ignored.
+           */
 
-            if (v == Relation.ACQUISITION_OPEN_ACCESS) {
-              entry_builder.setAvailability(OPDSAvailabilityOpenAccess.get(revoke));
-            } else {
-              tryAvailability(entry_builder, link, revoke);
-            }
-            break;
+          final MIMEType type;
+          if (!typeOpt.isSome()) {
+            continue;
           }
+          type = ((Some<MIMEType>) typeOpt).get();
+          final Map<String, String> extraProperties =
+            consumeExtraAcquisitionProperties(link);
+
+          final Link resultingLink;
+          if (!linkIsTemplated) {
+            final URI href;
+            try {
+              href = scrubURI(source, link.getAttribute("href"));
+            } catch (URISyntaxException e) {
+              entry_builder.addParseError(
+                this.invalidURI(source, "'href' attribute of element with relation " + v, e));
+              continue;
+            }
+
+            resultingLink = new Link.LinkBasic(
+              href,
+              type,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            );
+          } else {
+            resultingLink = new Link.LinkTemplated(
+              link.getAttribute("href"),
+              type,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            );
+          }
+
+          final OPDSAcquisition acquisition =
+            new OPDSAcquisition(v, resultingLink, type, indirects, extraProperties);
+          entry_builder.addAcquisition(acquisition);
+
+          if (v == Relation.ACQUISITION_OPEN_ACCESS) {
+            entry_builder.setAvailability(OPDSAvailabilityOpenAccess.get(revoke));
+          } else {
+            tryAvailability(entry_builder, link, revoke);
+          }
+          break;
         }
       }
 

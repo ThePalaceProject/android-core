@@ -9,6 +9,8 @@ public final class OPDSFeedConstants {
 
   public static final String ACQUISITION_URI_PREFIX_TEXT;
   public static final URI ATOM_URI;
+  public static final URI ODL_URI;
+  public static final String ODL_URI_TEXT;
   public static final URI DUBLIN_CORE_TERMS_URI;
   public static final URI BIBFRAME_URI;
   public static final String FACET_URI_TEXT;
@@ -73,6 +75,11 @@ public final class OPDSFeedConstants {
       NullCheck.notNull(URI.create("http://opds-spec.org/2010/catalog"));
     OPDS_URI_TEXT =
       NullCheck.notNull(OPDSFeedConstants.OPDS_URI.toString());
+
+    ODL_URI =
+      NullCheck.notNull(URI.create("http://drafts.opds.io/odl-1.0#"));
+    ODL_URI_TEXT =
+      NullCheck.notNull(ODL_URI.toString());
 
     DRM_URI =
       NullCheck.notNull(URI.create("http://librarysimplified.org/terms/drm"));
