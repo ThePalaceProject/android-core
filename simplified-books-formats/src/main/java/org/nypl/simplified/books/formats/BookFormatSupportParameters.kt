@@ -20,10 +20,10 @@ data class BookFormatSupportParameters(
   val supportsAdobeDRM: Boolean,
 
   /**
-   * The application has a working AxisNow service.
+   * The application has a working Boundless service.
    */
 
-  val supportsAxisNow: Boolean,
+  val supportsBoundless: Boolean,
 
   /**
    * The application is configured to support audio books. That is, there is a [org.nypl.simplified.viewer.spi.ViewerProviderType]

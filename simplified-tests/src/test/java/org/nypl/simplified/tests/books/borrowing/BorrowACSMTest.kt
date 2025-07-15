@@ -58,6 +58,7 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.Borro
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.books.formats.api.StandardFormatNames.adobeACSMFiles
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFiles
+import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisition
 import org.nypl.simplified.opds.core.OPDSAcquisitionPath
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
@@ -272,7 +273,7 @@ class BorrowACSMTest {
       OPDSAcquisitionPath(
         OPDSAcquisition(
           OPDSAcquisition.Relation.ACQUISITION_GENERIC,
-          this.webServer.url("/book.acsm").toUri(),
+          Link.LinkBasic(this.webServer.url("/book.acsm").toUri()),
           adobeACSMFiles,
           listOf(),
           emptyMap()
@@ -280,12 +281,12 @@ class BorrowACSMTest {
         listOf(
           OPDSAcquisitionPathElement(
             adobeACSMFiles,
-            this.webServer.url("/book.acsm").toUri(),
+            Link.LinkBasic(this.webServer.url("/book.acsm").toUri()),
             emptyMap()
           ),
           OPDSAcquisitionPathElement(
             genericEPUBFiles,
-            this.webServer.url("/book.epub").toUri(),
+            Link.LinkBasic(this.webServer.url("/book.epub").toUri()),
             emptyMap()
           )
         )
@@ -295,7 +296,7 @@ class BorrowACSMTest {
       listOf(
         OPDSAcquisitionPathElement(
           genericEPUBFiles,
-          this.webServer.url("/book.epub").toUri(),
+          Link.LinkBasic(this.webServer.url("/book.epub").toUri()),
           emptyMap()
         )
       )
@@ -476,7 +477,7 @@ class BorrowACSMTest {
     val task = BorrowACSM.createSubtask()
 
     this.context.currentURIField =
-      this.webServer.url("/book.acsm").toUri()
+      Link.LinkBasic(this.webServer.url("/book.acsm").toUri())
 
     this.webServer.enqueue(
       MockResponse()
@@ -511,7 +512,7 @@ class BorrowACSMTest {
     val task = BorrowACSM.createSubtask()
 
     this.context.currentURIField =
-      this.webServer.url("/book.acsm").toUri()
+      Link.LinkBasic(this.webServer.url("/book.acsm").toUri())
     this.context.isCancelled = true
 
     try {
@@ -542,7 +543,7 @@ class BorrowACSMTest {
     val task = BorrowACSM.createSubtask()
 
     this.context.currentURIField =
-      this.webServer.url("/book.acsm").toUri()
+      Link.LinkBasic(this.webServer.url("/book.acsm").toUri())
 
     this.webServer.enqueue(
       MockResponse()
@@ -587,7 +588,7 @@ class BorrowACSMTest {
     val task = BorrowACSM.createSubtask()
 
     this.context.currentURIField =
-      this.webServer.url("/book.acsm").toUri()
+      Link.LinkBasic(this.webServer.url("/book.acsm").toUri())
 
     this.webServer.enqueue(
       MockResponse()
@@ -624,7 +625,7 @@ class BorrowACSMTest {
     val task = BorrowACSM.createSubtask()
 
     this.context.currentURIField =
-      this.webServer.url("/book.acsm").toUri()
+      Link.LinkBasic(this.webServer.url("/book.acsm").toUri())
 
     this.webServer.enqueue(
       MockResponse()
@@ -664,18 +665,18 @@ class BorrowACSMTest {
     val task = BorrowACSM.createSubtask()
 
     this.context.currentURIField =
-      this.webServer.url("/book.acsm").toUri()
+      Link.LinkBasic(this.webServer.url("/book.acsm").toUri())
     this.context.opdsAcquisitionPath =
       this.context.opdsAcquisitionPath.copy(
         elements = listOf(
           OPDSAcquisitionPathElement(
             adobeACSMFiles,
-            this.webServer.url("/book.acsm").toUri(),
+            Link.LinkBasic(this.webServer.url("/book.acsm").toUri()),
             emptyMap()
           ),
           OPDSAcquisitionPathElement(
             MIMEType("text", "plain", mapOf()),
-            this.webServer.url("/book.epub").toUri(),
+            Link.LinkBasic(this.webServer.url("/book.epub").toUri()),
             emptyMap()
           )
         )
@@ -684,7 +685,7 @@ class BorrowACSMTest {
       listOf(
         OPDSAcquisitionPathElement(
           MIMEType("text", "plain", mapOf()),
-          this.webServer.url("/book.epub").toUri(),
+          Link.LinkBasic(this.webServer.url("/book.epub").toUri()),
           emptyMap()
         )
       )
@@ -721,7 +722,7 @@ class BorrowACSMTest {
     val task = BorrowACSM.createSubtask()
 
     this.context.currentURIField =
-      this.webServer.url("/book.acsm").toUri()
+      Link.LinkBasic(this.webServer.url("/book.acsm").toUri())
 
     this.webServer.enqueue(this.validACSMResponse)
 
@@ -760,7 +761,7 @@ class BorrowACSMTest {
     val task = BorrowACSM.createSubtask()
 
     this.context.currentURIField =
-      this.webServer.url("/book.acsm").toUri()
+      Link.LinkBasic(this.webServer.url("/book.acsm").toUri())
     this.context.adobeExecutorTimeout =
       BorrowTimeoutConfiguration(10L, TimeUnit.MILLISECONDS)
 
@@ -805,7 +806,7 @@ class BorrowACSMTest {
     val task = BorrowACSM.createSubtask()
 
     this.context.currentURIField =
-      this.webServer.url("/book.acsm").toUri()
+      Link.LinkBasic(this.webServer.url("/book.acsm").toUri())
 
     this.webServer.enqueue(this.validACSMResponse)
 
@@ -844,7 +845,7 @@ class BorrowACSMTest {
     val task = BorrowACSM.createSubtask()
 
     this.context.currentURIField =
-      this.webServer.url("/book.acsm").toUri()
+      Link.LinkBasic(this.webServer.url("/book.acsm").toUri())
 
     this.webServer.enqueue(this.validACSMResponse)
 
@@ -894,7 +895,7 @@ class BorrowACSMTest {
     val task = BorrowACSM.createSubtask()
 
     this.context.currentURIField =
-      this.webServer.url("/book.acsm").toUri()
+      Link.LinkBasic(this.webServer.url("/book.acsm").toUri())
     this.context.adobeExecutorTimeout =
       BorrowTimeoutConfiguration(10L, TimeUnit.SECONDS)
 

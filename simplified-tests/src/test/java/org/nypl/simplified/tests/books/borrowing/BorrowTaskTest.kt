@@ -88,9 +88,9 @@ import org.nypl.simplified.tests.mocking.MockAdobeAdeptExecutor
 import org.nypl.simplified.tests.mocking.MockAdobeAdeptNetProvider
 import org.nypl.simplified.tests.mocking.MockAdobeAdeptResourceProvider
 import org.nypl.simplified.tests.mocking.MockAudioBookManifestStrategies
-import org.nypl.simplified.tests.mocking.MockAxisNowService
 import org.nypl.simplified.tests.mocking.MockBookFormatSupport
 import org.nypl.simplified.tests.mocking.MockBorrowSubtaskDirectory
+import org.nypl.simplified.tests.mocking.MockBoundlessService
 import org.nypl.simplified.tests.mocking.MockBundledContentResolver
 import org.nypl.simplified.tests.mocking.MockContentResolver
 import org.nypl.simplified.tests.mocking.MockLCPService
@@ -122,7 +122,7 @@ class BorrowTaskTest {
   private lateinit var adobeExecutorService: ExecutorService
   private lateinit var adobeNetProvider: MockAdobeAdeptNetProvider
   private lateinit var adobeResourceProvider: MockAdobeAdeptResourceProvider
-  private lateinit var axisNowService: MockAxisNowService
+  private lateinit var boundlessService: MockBoundlessService
   private lateinit var audioBookManifestStrategies: MockAudioBookManifestStrategies
   private lateinit var book: Book
   private lateinit var bookDatabase: BookDatabaseType
@@ -166,7 +166,7 @@ class BorrowTaskTest {
         application = this.androidContext,
         adobeExecutor = this.adobeExecutor,
         audioBookManifestStrategies = this.audioBookManifestStrategies,
-        axisNowService = this.axisNowService,
+        boundlessService = this.boundlessService,
         bookFormatSupport = this.bookFormatSupport,
         bookRegistry = this.bookRegistry,
         bundledContent = this.bundledContent,
@@ -336,8 +336,8 @@ class BorrowTaskTest {
       Executors.newSingleThreadExecutor()
     this.adobeExecutor =
       MockAdobeAdeptExecutor(this.adobeExecutorService, this.adobeConnector)
-    this.axisNowService =
-      MockAxisNowService()
+    this.boundlessService =
+      MockBoundlessService()
     this.lcpService =
       MockLCPService(
         context = this.androidContext

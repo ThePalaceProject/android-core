@@ -31,10 +31,13 @@ val findawayDRM =
     propertyBooleanOptional("org.thepalaceproject.findaway.enabled", false)
 val overdriveDRM =
     propertyBooleanOptional("org.thepalaceproject.overdrive.enabled", false)
+val boundlessDRM =
+    propertyBooleanOptional("org.thepalaceproject.boundless.enabled", false)
 
 println("DRM: org.thepalaceproject.adobeDRM.enabled  : $adobeDRM")
-println("DRM: org.thepalaceproject.lcp.enabled       : $lcpDRM")
+println("DRM: org.thepalaceproject.boundless.enabled : $boundlessDRM")
 println("DRM: org.thepalaceproject.findaway.enabled  : $findawayDRM")
+println("DRM: org.thepalaceproject.lcp.enabled       : $lcpDRM")
 println("DRM: org.thepalaceproject.overdrive.enabled : $overdriveDRM")
 
 dependencyResolutionManagement {
@@ -95,6 +98,17 @@ dependencyResolutionManagement {
         throw GradleException(
             "If the org.thepalaceproject.lcp.enabled property is set to true, " +
                 "the org.thepalaceproject.s3.depend property must also be set to true."
+        )
+    }
+
+    /*
+     * Conditionally enable Boundless DRM.
+     */
+
+    if (boundlessDRM && !s3RepositoryEnabled) {
+        throw GradleException(
+            "If the org.thepalaceproject.boundlessDRM.enabled property is set to true, " +
+                "the org.thepalaceproject.s3.depend property must be set to true."
         )
     }
 

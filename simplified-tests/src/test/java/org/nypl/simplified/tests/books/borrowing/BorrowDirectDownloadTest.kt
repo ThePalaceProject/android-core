@@ -42,6 +42,7 @@ import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.requiredURI
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFiles
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericPDFFiles
+import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
 import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
@@ -240,7 +241,7 @@ class BorrowDirectDownloadTest {
     val task = BorrowDirectDownload.createSubtask()
 
     this.context.currentURIField =
-      this.webServer.url("/book.epub").toUri()
+      Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
       OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
 
@@ -268,7 +269,7 @@ class BorrowDirectDownloadTest {
     val task = BorrowDirectDownload.createSubtask()
 
     this.context.currentURIField =
-      this.webServer.url("/book.epub").toUri()
+      Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
       OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
 
@@ -298,7 +299,7 @@ class BorrowDirectDownloadTest {
     val task = BorrowDirectDownload.createSubtask()
 
     this.context.currentURIField =
-      this.webServer.url("/book.epub").toUri()
+      Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
       OPDSAcquisitionPathElement(genericPDFFiles, null, emptyMap())
 
@@ -333,7 +334,7 @@ class BorrowDirectDownloadTest {
     val task = BorrowDirectDownload.createSubtask()
 
     this.context.currentURIField =
-      this.webServer.url("/book.epub").toUri()
+      Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
       OPDSAcquisitionPathElement(genericPDFFiles, null, emptyMap())
 
@@ -376,7 +377,7 @@ class BorrowDirectDownloadTest {
     val task = BorrowDirectDownload.createSubtask()
 
     this.context.currentURIField =
-      this.webServer.url("/book.epub").toUri()
+      Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
       OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
 
@@ -415,7 +416,7 @@ class BorrowDirectDownloadTest {
     val task = BorrowDirectDownload.createSubtask()
 
     this.context.currentURIField =
-      this.webServer.url("/book.epub").toUri()
+      Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
       OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
 

@@ -1,0 +1,67 @@
+<entry xmlns:bib="http://bib.schema.org/" xmlns:bibframe="http://bibframe.org/vocab/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:odl="http://drafts.opds.io/odl-1.0#"
+    xmlns:opds="http://opds-spec.org/2010/catalog" xmlns:schema="http://schema.org/"
+    xmlns:simplified="http://librarysimplified.org/terms/" xmlns="http://www.w3.org/2005/Atom"
+    schema:additionalType="http://schema.org/EBook">
+    <title>If You Lived Here</title>
+    <simplified:pwid>465a34b8-84bd-faed-5d30-0066c100b9ad</simplified:pwid>
+    <dcterms:language>en</dcterms:language>
+    <dcterms:publisher>Houghton Mifflin</dcterms:publisher>
+    <bib:publisherImprint>Harcourt Childrens Books</bib:publisherImprint>
+    <dcterms:issued>2011-10-25</dcterms:issued>
+    <id>urn:librarysimplified.org/terms/id/Axis%20360%20ID/0012441921</id>
+    <bibframe:distribution bibframe:ProviderName="Boundless" />
+    <published>2022-12-16T00:00:00Z</published>
+    <updated>2025-06-28T08:01:32+00:00</updated>
+    <category label="Nonfiction"
+        scheme="http://librarysimplified.org/terms/fiction/" term="http://librarysimplified.org/terms/fiction/Nonfiction" />
+    <category label="Architecture"
+        scheme="http://librarysimplified.org/terms/genres/Simplified/"
+        term="http://librarysimplified.org/terms/genres/Simplified/Architecture" />
+    <category label="Social Sciences"
+        scheme="http://librarysimplified.org/terms/genres/Simplified/"
+        term="http://librarysimplified.org/terms/genres/Simplified/Social%20Sciences" />
+    <category label="Children" scheme="http://schema.org/audience" term="Children" />
+    <category label="7-8" scheme="http://schema.org/typicalAgeRange" term="7-8" />
+    <author>
+        <name>Laroche, Giles</name>
+        <link
+            href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/contributor/Laroche,%20Giles/eng/Children"
+            rel="contributor" title="Laroche, Giles"
+            type="application/atom+xml;profile=opds-catalog;kind=acquisition" />
+    </author>
+    <link
+        href="https://contentcafecloud.baker-taylor.com/Jacket.svc/D65D0665-050A-487B-9908-16E6D8FF5C3E/9780547677347/Large/Logo"
+        rel="http://opds-spec.org/image" type="image/png" />
+    <link
+        href="https://contentcafecloud.baker-taylor.com/Jacket.svc/D65D0665-050A-487B-9908-16E6D8FF5C3E/9780547677347/Medium/Logo"
+        rel="http://opds-spec.org/image/thumbnail" type="image/png" />
+    <odl:tlink
+        href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/796/fulfill/30{?modulus,exponent,device_id}"
+        rel="http://opds-spec.org/acquisition"
+        type="application/vnd.thepalaceproject.baker-taylor.kdrm+json">
+        <opds:indirectAcquisition type="application/epub+zip" />
+        <opds:availability since="2025-07-10T13:11:23+00:00" status="available"
+            until="2025-07-13T13:11:00+00:00" />
+        <opds:holds total="0" />
+        <opds:copies available="1" total="1" />
+    </odl:tlink>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/loans/796/revoke"
+        rel="http://librarysimplified.org/terms/rel/revoke" />
+    <link
+        href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/Axis%20360%20ID/0012441921"
+        rel="alternate" type="application/atom+xml;type=entry;profile=opds-catalog" />
+    <link
+        href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/Axis%20360%20ID/0012441921"
+        rel="self" type="application/atom+xml;type=entry;profile=opds-catalog" />
+    <link
+        href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/Axis%20360%20ID/0012441921/related_books"
+        rel="related" title="Recommended Works"
+        type="application/atom+xml;profile=opds-catalog;kind=acquisition" />
+    <link
+        href="https://minotaur.dev.palaceproject.io/minotaur-test-library/annotations/Axis%20360%20ID/0012441921"
+        rel="http://www.w3.org/ns/oa#annotationService"
+        type="application/ld+json; profile=&quot;http://www.w3.org/ns/anno.jsonld&quot;" />
+    <link
+        href="https://minotaur.dev.palaceproject.io/minotaur-test-library/analytics/Axis%20360%20ID/0012441921/open_book"
+        rel="http://librarysimplified.org/terms/rel/analytics/open-book" />
+</entry>

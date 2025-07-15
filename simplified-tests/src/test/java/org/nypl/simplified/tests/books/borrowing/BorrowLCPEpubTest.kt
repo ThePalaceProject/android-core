@@ -40,6 +40,7 @@ import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFiles
 import org.nypl.simplified.books.formats.api.StandardFormatNames.lcpAudioBooks
 import org.nypl.simplified.books.formats.api.StandardFormatNames.lcpLicenseFiles
+import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisition
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
@@ -281,7 +282,7 @@ class BorrowLCPEpubTest {
       elements = listOf(
         OPDSAcquisitionPathElement(
           mimeType = lcpLicenseFiles,
-          target = webServer.url(licenseTargetPath).toUri(),
+          target = Link.LinkBasic(webServer.url(licenseTargetPath).toUri()),
           properties = mapOf()
         ),
         OPDSAcquisitionPathElement(
@@ -483,7 +484,7 @@ class BorrowLCPEpubTest {
       elements = listOf(
         OPDSAcquisitionPathElement(
           mimeType = lcpLicenseFiles,
-          target = webServer.url(licenseTargetPath).toUri(),
+          target = Link.LinkBasic(webServer.url(licenseTargetPath).toUri()),
           properties = mapOf()
         ),
         OPDSAcquisitionPathElement(
@@ -684,7 +685,7 @@ class BorrowLCPEpubTest {
       elements = listOf(
         OPDSAcquisitionPathElement(
           mimeType = lcpLicenseFiles,
-          target = webServer.url(licenseTargetPath).toUri(),
+          target = Link.LinkBasic(webServer.url(licenseTargetPath).toUri()),
           properties = mapOf()
         ),
         OPDSAcquisitionPathElement(
@@ -741,7 +742,7 @@ class BorrowLCPEpubTest {
       elements = listOf(
         OPDSAcquisitionPathElement(
           mimeType = lcpLicenseFiles,
-          target = webServer.url(licenseTargetPath).toUri(),
+          target = Link.LinkBasic(webServer.url(licenseTargetPath).toUri()),
           properties = mapOf()
         ),
         OPDSAcquisitionPathElement(
@@ -815,7 +816,7 @@ class BorrowLCPEpubTest {
       elements = listOf(
         OPDSAcquisitionPathElement(
           mimeType = lcpLicenseFiles,
-          target = webServer.url(licenseTargetPath).toUri(),
+          target = Link.LinkBasic(webServer.url(licenseTargetPath).toUri()),
           properties = mapOf()
         ),
         OPDSAcquisitionPathElement(

@@ -49,6 +49,7 @@ import org.nypl.simplified.feeds.api.FeedLoaderResult
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedAuthentication
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.files.DirectoryUtilities
+import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisition
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
@@ -220,7 +221,7 @@ class BookRevokeTaskTest {
     val acquisition =
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
-        URI.create("http://www.example.com/0.feed"),
+        Link.LinkBasic(URI.create("http://www.example.com/0.feed")),
         this.mimeOf("application/epub+zip"),
         listOf(),
         emptyMap()
@@ -316,7 +317,7 @@ class BookRevokeTaskTest {
     val acquisition =
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
-        URI.create("http://www.example.com/0.feed"),
+        Link.LinkBasic(URI.create("http://www.example.com/0.feed")),
         this.mimeOf("application/epub+zip"),
         listOf(),
         emptyMap()
@@ -483,7 +484,7 @@ class BookRevokeTaskTest {
     val acquisition =
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
-        URI.create("http://www.example.com/0.feed"),
+        Link.LinkBasic(URI.create("http://www.example.com/0.feed")),
         this.mimeOf("application/epub+zip"),
         listOf(),
         emptyMap()
@@ -606,7 +607,7 @@ class BookRevokeTaskTest {
     val acquisition =
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
-        URI.create("http://www.example.com/0.feed"),
+        Link.LinkBasic(URI.create("http://www.example.com/0.feed")),
         this.mimeOf("application/epub+zip"),
         listOf(),
         emptyMap()
@@ -721,7 +722,7 @@ class BookRevokeTaskTest {
     val acquisition =
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
-        URI.create("http://www.example.com/0.feed"),
+        Link.LinkBasic(URI.create("http://www.example.com/0.feed")),
         this.mimeOf("application/epub+zip"),
         listOf(),
         emptyMap()
@@ -854,7 +855,7 @@ class BookRevokeTaskTest {
     val acquisition =
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
-        URI.create("http://www.example.com/0.feed"),
+        Link.LinkBasic(URI.create("http://www.example.com/0.feed")),
         this.mimeOf("application/epub+zip"),
         listOf(),
         emptyMap()
@@ -952,7 +953,7 @@ class BookRevokeTaskTest {
     val acquisition =
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
-        URI.create("http://www.example.com/0.feed"),
+        Link.LinkBasic(URI.create("http://www.example.com/0.feed")),
         this.mimeOf("application/epub+zip"),
         listOf(),
         emptyMap()
@@ -1085,7 +1086,7 @@ class BookRevokeTaskTest {
     val acquisition =
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
-        URI.create("http://www.example.com/0.feed"),
+        Link.LinkBasic(URI.create("http://www.example.com/0.feed")),
         this.mimeOf("application/epub+zip"),
         listOf(),
         emptyMap()
@@ -1212,7 +1213,7 @@ class BookRevokeTaskTest {
     val acquisition =
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
-        URI.create("http://www.example.com/0.feed"),
+        Link.LinkBasic(URI.create("http://www.example.com/0.feed")),
         this.mimeOf("application/epub+zip"),
         listOf(),
         emptyMap()
@@ -1346,7 +1347,7 @@ class BookRevokeTaskTest {
     val acquisition =
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
-        URI.create("http://www.example.com/0.feed"),
+        Link.LinkBasic(URI.create("http://www.example.com/0.feed")),
         this.mimeOf("application/epub+zip"),
         listOf(),
         emptyMap()
@@ -1448,7 +1449,7 @@ class BookRevokeTaskTest {
     val acquisition =
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
-        URI.create("http://www.example.com/0.feed"),
+        Link.LinkBasic(URI.create("http://www.example.com/0.feed")),
         this.mimeOf("application/epub+zip"),
         listOf(),
         emptyMap()
@@ -1580,7 +1581,7 @@ class BookRevokeTaskTest {
     val acquisition =
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
-        URI.create("http://www.example.com/0.feed"),
+        Link.LinkBasic(URI.create("http://www.example.com/0.feed")),
         this.mimeOf("application/epub+zip"),
         listOf(),
         emptyMap()
@@ -1705,7 +1706,7 @@ class BookRevokeTaskTest {
     val acquisition =
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
-        URI.create("http://www.example.com/0.feed"),
+        Link.LinkBasic(URI.create("http://www.example.com/0.feed")),
         this.mimeOf("application/epub+zip"),
         listOf(),
         emptyMap()
@@ -1823,7 +1824,7 @@ class BookRevokeTaskTest {
     val acquisition =
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
-        URI.create("http://www.example.com/0.feed"),
+        Link.LinkBasic(URI.create("http://www.example.com/0.feed")),
         this.mimeOf("application/epub+zip"),
         listOf(),
         emptyMap()
@@ -1936,7 +1937,7 @@ class BookRevokeTaskTest {
     val acquisition =
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
-        URI.create("http://www.example.com/0.feed"),
+        Link.LinkBasic(URI.create("http://www.example.com/0.feed")),
         this.mimeOf("application/epub+zip"),
         listOf(),
         emptyMap()
@@ -2043,7 +2044,7 @@ class BookRevokeTaskTest {
     val acquisition =
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
-        this.server.url("0.feed").toUri(),
+        Link.LinkBasic(this.server.url("0.feed").toUri()),
         this.mimeOf("application/epub+zip"),
         listOf(),
         emptyMap()
@@ -2149,7 +2150,7 @@ class BookRevokeTaskTest {
     val acquisition =
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
-        URI.create("http://www.example.com/0.feed"),
+        Link.LinkBasic(URI.create("http://www.example.com/0.feed")),
         this.mimeOf("application/epub+zip"),
         listOf(),
         emptyMap()
@@ -2262,7 +2263,7 @@ class BookRevokeTaskTest {
     val acquisition =
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
-        URI.create("http://www.example.com/0.feed"),
+        Link.LinkBasic(URI.create("http://www.example.com/0.feed")),
         this.mimeOf("application/epub+zip"),
         listOf(),
         emptyMap()
@@ -2387,7 +2388,7 @@ class BookRevokeTaskTest {
     val acquisition =
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
-        URI.create("http://www.example.com/0.feed"),
+        Link.LinkBasic(URI.create("http://www.example.com/0.feed")),
         this.mimeOf("application/audiobook+json"),
         listOf(),
         emptyMap()
@@ -2516,7 +2517,7 @@ class BookRevokeTaskTest {
     val acquisition =
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
-        URI.create("http://www.example.com/0.feed"),
+        Link.LinkBasic(URI.create("http://www.example.com/0.feed")),
         this.mimeOf("application/pdf"),
         listOf(),
         emptyMap()

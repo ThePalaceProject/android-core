@@ -5,7 +5,7 @@ import org.joda.time.Instant
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.nypl.drm.core.AdobeAdeptExecutorType
-import org.nypl.drm.core.AxisNowServiceType
+import org.nypl.drm.core.BoundlessServiceType
 import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskDirectoryType
@@ -24,7 +24,7 @@ data class BorrowRequirements(
   val application: Application,
   val adobeExecutor: AdobeAdeptExecutorType?,
   val audioBookManifestStrategies: AudioBookManifestStrategiesType,
-  val axisNowService: AxisNowServiceType?,
+  val boundlessService: BoundlessServiceType?,
   val bookFormatSupport: BookFormatSupportType,
   val bookRegistry: BookRegistryType,
   val bundledContent: BundledContentResolverType,
@@ -51,7 +51,7 @@ data class BorrowRequirements(
         application = application,
         adobeExecutor = services.optionalService(AdobeAdeptExecutorType::class.java),
         audioBookManifestStrategies = services.requireService(AudioBookManifestStrategiesType::class.java),
-        axisNowService = services.optionalService(AxisNowServiceType::class.java),
+        boundlessService = services.optionalService(BoundlessServiceType::class.java),
         bookFormatSupport = services.requireService(BookFormatSupportType::class.java),
         bookRegistry = services.requireService(BookRegistryType::class.java),
         bundledContent = services.requireService(BundledContentResolverType::class.java),

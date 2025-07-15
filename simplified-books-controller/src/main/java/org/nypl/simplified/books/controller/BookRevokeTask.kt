@@ -478,7 +478,7 @@ class BookRevokeTask(
       }
 
       is BookDRMInformationHandle.LCPHandle,
-      is BookDRMInformationHandle.AxisHandle,
+      is BookDRMInformationHandle.BoundlessHandle,
       is BookDRMInformationHandle.NoneHandle -> {
         // Nothing required
       }
@@ -638,7 +638,7 @@ class BookRevokeTask(
         is BookDRMInformationHandle.ACSHandle ->
           drm.setAdobeRightsInformation(null)
 
-        is BookDRMInformationHandle.AxisHandle,
+        is BookDRMInformationHandle.BoundlessHandle,
         is BookDRMInformationHandle.LCPHandle,
         is BookDRMInformationHandle.NoneHandle -> {
           // Nothing required

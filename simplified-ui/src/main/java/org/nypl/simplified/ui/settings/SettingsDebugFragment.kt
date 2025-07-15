@@ -143,7 +143,7 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug), MainBackButtonC
       this.createDrmSupportRow("Adobe Acs", SettingsDebugModel.adeptSupported())
     )
     this.drmTable.addView(
-      this.createDrmSupportRow("AxisNow", SettingsDebugModel.axisNowSupported())
+      this.createDrmSupportRow("Boundless", SettingsDebugModel.boundlessSupported())
     )
 
     this.showTesting.isChecked =

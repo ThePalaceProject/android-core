@@ -12,6 +12,7 @@ dependencies {
     implementation(project(":simplified-books-formats-api"))
     implementation(project(":simplified-books-registry-api"))
     implementation(project(":simplified-content-api"))
+    implementation(project(":simplified-links"))
     implementation(project(":simplified-opds-core"))
     implementation(project(":simplified-presentableerror-api"))
     implementation(project(":simplified-profiles-api"))
@@ -44,4 +45,5 @@ dependencies {
     implementation(libs.rxjava)
     implementation(libs.rxjava2)
     implementation(libs.slf4j)
+    implementation(libs.stduritemplate)
 }

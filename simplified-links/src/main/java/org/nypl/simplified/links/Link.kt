@@ -58,6 +58,20 @@ sealed class Link {
   abstract val hrefURI: URI?
 
   /**
+   * Cast the current link to a basic link, failing with an appropriate error message if this
+   * link is not a basic link.
+   */
+
+  abstract fun toBasic(): LinkBasic
+
+  /**
+   * Cast the current link to a templated link, failing with an appropriate error message if this
+   * link is not a templated link.
+   */
+
+  abstract fun toTemplated(): LinkTemplated
+
+  /**
    * A non-templated, basic link.
    */
 
@@ -73,6 +87,14 @@ sealed class Link {
   ) : Link() {
     override val hrefURI: URI
       get() = this.href
+
+    override fun toBasic(): LinkBasic {
+      return this
+    }
+
+    override fun toTemplated(): LinkTemplated {
+      throw IllegalArgumentException("Expected a templated link, but this link is a basic link.")
+    }
   }
 
   /**
@@ -91,5 +113,13 @@ sealed class Link {
   ) : Link() {
     override val hrefURI: URI?
       get() = null
+
+    override fun toBasic(): LinkBasic {
+      throw IllegalArgumentException("Expected a basic link, but this link is a templated link.")
+    }
+
+    override fun toTemplated(): LinkTemplated {
+      return this
+    }
   }
 }

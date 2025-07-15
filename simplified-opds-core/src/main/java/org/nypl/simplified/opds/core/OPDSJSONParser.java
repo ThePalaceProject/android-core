@@ -14,6 +14,8 @@ import com.io7m.jnull.NullCheck;
 import org.joda.time.DateTime;
 import org.nypl.simplified.json.core.JSONParseException;
 import org.nypl.simplified.json.core.JSONParserUtilities;
+import org.nypl.simplified.links.Link;
+import org.nypl.simplified.links.json.LinkParsing;
 import org.nypl.simplified.opds.core.OPDSAcquisition.Relation;
 
 import java.io.IOException;
@@ -70,8 +72,8 @@ public final class OPDSJSONParser implements OPDSJSONParserType {
       final Relation relation =
         Relation.valueOf(JSONParserUtilities.getString(o, "type"));
 
-      final URI uri =
-        JSONParserUtilities.getURI(o, "uri");
+      final Link link =
+        findLink(o);
 
       final List<OPDSIndirectAcquisition> indirects;
       if (o.has(INDIRECT_ACQUISITIONS_FIELD)) {
@@ -96,10 +98,45 @@ public final class OPDSJSONParser implements OPDSJSONParserType {
       }
 
       final Map<String, String> properties = parseProperties(o);
-      return new OPDSAcquisition(relation, uri, type, indirects, properties);
+      return new OPDSAcquisition(relation, link, type, indirects, properties);
     } catch (final Exception e) {
       throw new OPDSParseException(e);
     }
+  }
+
+  private static Link findLink(ObjectNode o) throws JSONParseException {
+    /*
+     * In current versions of the application, we separately store templated and non-templated
+     * links.
+     */
+
+    if (o.has("linkBasic")) {
+      return LinkParsing.INSTANCE.parseLinkExceptionally(
+        URI.create("urn:embedded-link"),
+        o.get("linkBasic")
+      );
+    }
+    if (o.has("linkTemplated")) {
+      return LinkParsing.INSTANCE.parseLinkExceptionally(
+        URI.create("urn:embedded-link"),
+        o.get("linkTemplated")
+      );
+    }
+
+    /*
+     * In older versions of the application, we only ever stored links that do not have templates.
+     */
+
+    return new Link.LinkBasic(
+      JSONParserUtilities.getURI(o, "uri"),
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    );
   }
 
   private static Map<String, String> parseProperties(ObjectNode o) throws JSONParseException {

@@ -694,8 +694,10 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2025-07-09T08:12:48+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.17.0">
-      <c:changes/>
+    <c:release date="2025-07-15T08:09:56+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.17.0">
+      <c:changes>
+        <c:change date="2025-07-15T08:09:56+00:00" summary="Add support for Boundless DRM."/>
+      </c:changes>
     </c:release>
   </c:releases>
   <c:ticket-systems>

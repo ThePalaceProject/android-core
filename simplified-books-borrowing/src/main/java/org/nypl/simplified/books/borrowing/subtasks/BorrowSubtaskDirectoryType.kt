@@ -2,7 +2,7 @@ package org.nypl.simplified.books.borrowing.subtasks
 
 import one.irradia.mime.api.MIMEType
 import org.nypl.simplified.accounts.api.AccountReadableType
-import java.net.URI
+import org.nypl.simplified.links.Link
 
 /**
  * A directory of subtasks.
@@ -22,7 +22,7 @@ interface BorrowSubtaskDirectoryType {
 
   fun findSubtaskFor(
     mimeType: MIMEType,
-    target: URI?,
+    target: Link?,
     account: AccountReadableType?,
     remainingTypes: List<MIMEType>
   ): BorrowSubtaskFactoryType? {

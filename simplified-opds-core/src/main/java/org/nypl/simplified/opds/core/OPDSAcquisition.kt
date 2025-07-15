@@ -1,6 +1,7 @@
 package org.nypl.simplified.opds.core
 
 import one.irradia.mime.api.MIMEType
+import org.nypl.simplified.links.Link
 import java.io.Serializable
 import java.net.URI
 
@@ -22,7 +23,7 @@ data class OPDSAcquisition(
    * The URI of the acquisition
    */
 
-  val uri: URI,
+  val uri: Link,
 
   /**
    * The MIME type of immediately retrievable content, if any.

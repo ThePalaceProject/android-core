@@ -102,4 +102,26 @@ object LinkParsing {
       )
     }
   }
+
+  /**
+   * Parse a link from the given source and JSON object.
+   */
+
+  fun parseLinkExceptionally(
+    source: URI,
+    element: JsonNode
+  ): Link {
+    return when (val result = this.parseLink(source, element)) {
+      is ParseResult.Failure -> {
+        val exception = IllegalArgumentException("Could not parse a link")
+        for (error in result.errors) {
+          if (error.exception != null) {
+            exception.addSuppressed(error.exception)
+          }
+        }
+        throw exception
+      }
+      is ParseResult.Success -> result.result
+    }
+  }
 }

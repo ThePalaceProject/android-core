@@ -5,7 +5,7 @@ import org.joda.time.Instant
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.nypl.drm.core.AdobeAdeptExecutorType
-import org.nypl.drm.core.AxisNowServiceType
+import org.nypl.drm.core.BoundlessServiceType
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
@@ -18,6 +18,7 @@ import org.nypl.simplified.books.borrowing.BorrowTimeoutConfiguration
 import org.nypl.simplified.books.borrowing.SAMLDownloadContext
 import org.nypl.simplified.books.bundled.api.BundledContentResolverType
 import org.nypl.simplified.content.api.ContentResolverType
+import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionPath
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
@@ -27,7 +28,6 @@ import org.readium.r2.lcp.LcpService
 import org.slf4j.Logger
 import java.io.File
 import java.io.IOException
-import java.net.URI
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
@@ -63,7 +63,7 @@ class MockBorrowContext(
     BorrowTimeoutConfiguration(2L, TimeUnit.SECONDS)
 
   override var adobeExecutor: AdobeAdeptExecutorType? = null
-  override var axisNowService: AxisNowServiceType? = null
+  override var boundlessService: BoundlessServiceType? = null
   override lateinit var currentAcquisitionPathElement: OPDSAcquisitionPathElement
   override lateinit var opdsAcquisitionPath: OPDSAcquisitionPath
   override var bookCurrent: Book = bookInitial
@@ -128,7 +128,7 @@ class MockBorrowContext(
 
   override fun chooseNewAcquisitionPath(
     entry: OPDSAcquisitionFeedEntry
-  ): URI {
+  ): Link {
     TODO("Not yet implemented")
   }
 
@@ -153,20 +153,20 @@ class MockBorrowContext(
   var currentRemainingOPDSPathElements: List<OPDSAcquisitionPathElement> =
     listOf()
 
-  var currentURIField: URI? =
+  var currentURIField: Link? =
     null
 
-  override fun currentURI(): URI? {
+  override fun currentURI(): Link? {
     return this.currentURIField ?: return this.currentAcquisitionPathElement.target
   }
 
   private val receivedURIsData =
-    mutableListOf<URI>()
+    mutableListOf<Link>()
 
-  val receivedURIs: List<URI>
+  val receivedURIs: List<Link>
     get() = this.receivedURIsData
 
-  override fun receivedNewURI(uri: URI) {
+  override fun receivedNewURI(uri: Link) {
     this.logDebug("received new URI: {}", uri)
     this.receivedURIsData.add(uri)
     this.currentURIField = uri

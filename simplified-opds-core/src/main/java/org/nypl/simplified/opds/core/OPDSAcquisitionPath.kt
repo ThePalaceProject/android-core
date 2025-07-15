@@ -1,7 +1,7 @@
 package org.nypl.simplified.opds.core
 
 import one.irradia.mime.api.MIMEType
-import java.net.URI
+import org.nypl.simplified.links.Link
 
 /**
  * A linearized OPDS acquisition path.
@@ -20,7 +20,7 @@ data class OPDSAcquisitionPath(
 
   fun prefixWith(
     mime: MIMEType,
-    target: URI?,
+    target: Link?,
     properties: Map<String, String>
   ): OPDSAcquisitionPath {
     val newElements = mutableListOf<OPDSAcquisitionPathElement>()

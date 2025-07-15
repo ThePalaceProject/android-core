@@ -31,6 +31,8 @@ val findawayDRM =
     project.findProperty("org.thepalaceproject.findaway.enabled") == "true"
 val overdriveDRM =
     project.findProperty("org.thepalaceproject.overdrive.enabled") == "true"
+val boundlessDRM =
+    project.findProperty("org.thepalaceproject.boundless.enabled") == "true"
 
 if (adobeDRM) {
     palaceAssetsRequired.setProperty(
@@ -39,7 +41,7 @@ if (adobeDRM) {
     )
 }
 
-if (adobeDRM || lcpDRM || findawayDRM || overdriveDRM) {
+if (adobeDRM || lcpDRM || findawayDRM || overdriveDRM || boundlessDRM) {
     palaceAssetsRequired.setProperty(
         "assets/secrets.conf",
         "221db5c8c1ce1ddbc4f4c1a017f5b63271518d2adf6991010c2831a58b7f88ed",
@@ -378,6 +380,16 @@ dependencies {
 
     if (overdriveDRM) {
         implementation(libs.palace.overdrive)
+    }
+
+    /*
+     * Dependencies conditional upon Boundless DRM support.
+     */
+
+    if (boundlessDRM) {
+        implementation(libs.palace.drm.boundless.core)
+        implementation(libs.palace.drm.boundless.readium)
+        implementation(libs.palace.drm.boundless.service)
     }
 
     /*

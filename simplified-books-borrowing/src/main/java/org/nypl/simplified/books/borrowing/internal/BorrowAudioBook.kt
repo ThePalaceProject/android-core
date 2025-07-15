@@ -17,6 +17,7 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.Borro
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskFactoryType
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskType
 import org.nypl.simplified.books.formats.api.StandardFormatNames
+import org.nypl.simplified.links.Link
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import java.io.File
 import java.net.URI
@@ -37,7 +38,7 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
 
     override fun isApplicableFor(
       type: MIMEType,
-      target: URI?,
+      target: Link?,
       account: AccountReadableType?,
       remaining: List<MIMEType>
     ): Boolean {

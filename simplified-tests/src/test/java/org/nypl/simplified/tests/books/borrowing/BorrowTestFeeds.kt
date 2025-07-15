@@ -263,6 +263,31 @@ object BorrowTestFeeds {
     return parsedEntry
   }
 
+  fun opdsBoundlessFeedEntryOfType(
+    webServer: MockWebServer,
+    mime: String,
+    id: String,
+  ): OPDSAcquisitionFeedEntry {
+    val parsedEntry = this.opdsFeedEntryOf(
+      """
+      <entry xmlns="http://www.w3.org/2005/Atom" 
+             xmlns:opds="http://opds-spec.org/2010/catalog" 
+             xmlns:odl="http://drafts.opds.io/odl-1.0#">
+        <title>Example</title>
+        <updated>2020-09-17T16:48:51+0000</updated>
+        <id>$id</id>
+        <odl:tlink 
+          type="application/vnd.thepalaceproject.baker-taylor.kdrm+json" 
+          rel="http://opds-spec.org/acquisition" 
+          href="${webServer.url("/next{?modulus,exponent,device_id}")}">
+          <opds:indirectAcquisition type="$mime"/>
+        </odl:tlink>
+      </entry>
+      """
+    )
+    return parsedEntry
+  }
+
   fun opdsFeedEntryOf(text: String): OPDSAcquisitionFeedEntry {
     return OPDSAcquisitionFeedEntryParser.newParser()
       .parseEntryStream(URI.create("urn:stdin"), text.byteInputStream())

@@ -4,18 +4,15 @@ import android.app.Application
 import io.reactivex.subjects.PublishSubject
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
-import okio.Buffer
 import org.joda.time.Instant
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.librarysimplified.http.api.LSHTTPClientConfiguration
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.vanilla.LSHTTPClients
-import org.librarysimplified.http.vanilla.internal.LSHTTPClient
 import org.librarysimplified.services.api.ServiceDirectory
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.mockito.Mockito
@@ -25,7 +22,6 @@ import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.database.AccountAuthenticationCredentialsStore
 import org.nypl.simplified.accounts.database.AccountBundledCredentialsEmpty
 import org.nypl.simplified.accounts.database.AccountsDatabases
-import org.nypl.simplified.accounts.registry.AccountProviderRegistry
 import org.nypl.simplified.books.audio.AudioBookManifests
 import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
@@ -180,7 +176,7 @@ class BugPP2325Test {
           application = this.androidContext,
           adobeExecutor = this.adobeExecutor,
           audioBookManifestStrategies = AudioBookManifests,
-          axisNowService = null,
+          boundlessService = null,
           bookFormatSupport = this.bookFormatSupport,
           bookRegistry = this.bookRegistry,
           bundledContent = this.bundledContent,

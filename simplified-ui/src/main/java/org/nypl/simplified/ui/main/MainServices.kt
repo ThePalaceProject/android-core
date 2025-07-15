@@ -19,8 +19,7 @@ import org.librarysimplified.services.api.ServiceDirectoryType
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.BuildConfig
 import org.nypl.drm.core.AdobeAdeptExecutorType
-import org.nypl.drm.core.AxisNowServiceFactoryType
-import org.nypl.drm.core.AxisNowServiceType
+import org.nypl.drm.core.BoundlessServiceType
 import org.nypl.simplified.accessibility.AccessibilityService
 import org.nypl.simplified.accessibility.AccessibilityServiceType
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentialsStoreType
@@ -152,7 +151,8 @@ internal object MainServices {
     val directoryStorageProfiles: File,
     val directoryStorageTimeTrackingSender: File,
     val directoryStorageTimeTrackingCollector: File,
-    val directoryStorageTimeTrackingDebug: File
+    val directoryStorageTimeTrackingDebug: File,
+    val directoryStorageBoundless: File,
   )
 
   private fun initializeDirectories(context: Application): Directories {
@@ -174,6 +174,8 @@ internal object MainServices {
       File(directoryStorageTimeTracking, "sender")
     val directoryStorageTimeTrackingCollector =
       File(directoryStorageTimeTracking, "collector")
+    val directoryStorageBoundless =
+      File(directoryStorageBaseVersioned, "boundless")
 
     logger.debug("directoryStorageBaseVersioned:         {}", directoryStorageBaseVersioned)
     logger.debug("directoryStorageDownloads:             {}", directoryStorageDownloads)
@@ -192,6 +194,7 @@ internal object MainServices {
       "directoryStorageTimeTrackingCollector: {}",
       directoryStorageTimeTrackingCollector
     )
+    logger.debug("directoryStorageBoundless:  {}", directoryStorageBoundless)
 
     /*
      * Make sure the required directories exist. There is no sane way to
@@ -207,7 +210,8 @@ internal object MainServices {
         directoryStorageTimeTracking,
         directoryStorageTimeTrackingSender,
         directoryStorageTimeTrackingCollector,
-        directoryStorageTimeTrackingDebug
+        directoryStorageTimeTrackingDebug,
+        directoryStorageBoundless
       )
 
     var exception: Exception? = null
@@ -234,7 +238,8 @@ internal object MainServices {
       directoryStorageProfiles = directoryStorageProfiles,
       directoryStorageTimeTrackingDebug = directoryStorageTimeTrackingDebug,
       directoryStorageTimeTrackingSender = directoryStorageTimeTrackingSender,
-      directoryStorageTimeTrackingCollector = directoryStorageTimeTrackingCollector
+      directoryStorageTimeTrackingCollector = directoryStorageTimeTrackingCollector,
+      directoryStorageBoundless = directoryStorageBoundless
     )
   }
 
@@ -249,13 +254,6 @@ internal object MainServices {
       override val dataDirectoryName: String
         get() = CURRENT_DATA_VERSION
     }
-  }
-
-  private fun createAxisNowService(
-    httpClient: LSHTTPClientType
-  ): AxisNowServiceType? {
-    return optionalFromServiceLoader(AxisNowServiceFactoryType::class.java)
-      ?.create(httpClient)
   }
 
   private fun createLocalImageLoader(context: Application): ImageLoaderType {
@@ -606,11 +604,13 @@ internal object MainServices {
         }
       )
 
-    val axisNowDRM =
+    val boundlessDRM =
       addServiceOptionally(
-        message = strings.bootingGeneral("AxisNow DRM"),
-        interfaceType = AxisNowServiceType::class.java,
-        serviceConstructor = { createAxisNowService(lsHTTP) }
+        message = strings.bootingGeneral("Boundless DRM"),
+        interfaceType = BoundlessServiceType::class.java,
+        serviceConstructor = {
+          MainBoundless.createBoundless(directories.directoryStorageBoundless)
+        }
       )
 
     val screenSize =
@@ -776,7 +776,7 @@ internal object MainServices {
         serviceConstructor = {
           MainBookFormatSupport.createBookFormatSupport(
             adobeDRM = adobeDRM,
-            axisNowService = axisNowDRM,
+            boundless = boundlessDRM,
             feedbooksSecretService = feedbooksSecretService,
             lcpService = lcpService,
             overdriveSecretService = overdriveSecretService

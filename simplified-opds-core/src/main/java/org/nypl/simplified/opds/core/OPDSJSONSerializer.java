@@ -13,6 +13,8 @@ import com.io7m.junreachable.UnreachableCodeException;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.nypl.simplified.json.core.JSONSerializerUtilities;
+import org.nypl.simplified.links.Link;
+import org.nypl.simplified.links.json.LinkSerialization;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -49,7 +51,15 @@ public final class OPDSJSONSerializer implements OPDSJSONSerializerType {
     final ObjectMapper jom = new ObjectMapper();
     final ObjectNode node = jom.createObjectNode();
     node.put("type", a.getRelation().toString());
-    node.put("uri", a.getUri().toString());
+
+    if (a.getUri() instanceof Link.LinkBasic) {
+      node.set("linkBasic", LinkSerialization.INSTANCE.serializeLink(a.getUri()));
+    } else if (a.getUri() instanceof Link.LinkTemplated) {
+      node.set("linkTemplated", LinkSerialization.INSTANCE.serializeLink(a.getUri()));
+    } else {
+      throw new IllegalStateException();
+    }
+
     node.put("content_type", serializeContentType(a.getType()));
     node.put("properties", serializeProperties(a.getProperties()));
     node.set("indirect_acquisitions", serializeIndirectAcquisitions(a.getIndirectAcquisitions()));

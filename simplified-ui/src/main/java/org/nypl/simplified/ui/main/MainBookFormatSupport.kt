@@ -1,7 +1,7 @@
 package org.nypl.simplified.ui.main
 
 import org.nypl.drm.core.AdobeAdeptExecutorType
-import org.nypl.drm.core.AxisNowServiceType
+import org.nypl.drm.core.BoundlessServiceType
 import org.nypl.simplified.books.audio.AudioBookFeedbooksSecretServiceType
 import org.nypl.simplified.books.audio.AudioBookOverdriveSecretServiceType
 import org.nypl.simplified.books.formats.BookFormatAudioSupportParameters
@@ -21,8 +21,8 @@ object MainBookFormatSupport {
 
   fun createBookFormatSupport(
     adobeDRM: AdobeAdeptExecutorType?,
-    axisNowService: AxisNowServiceType?,
     lcpService: LcpService?,
+    boundless: BoundlessServiceType?,
     feedbooksSecretService: AudioBookFeedbooksSecretServiceType?,
     overdriveSecretService: AudioBookOverdriveSecretServiceType?
   ): BookFormatSupportType {
@@ -30,7 +30,7 @@ object MainBookFormatSupport {
       BookFormatSupportParameters(
         supportsPDF = isPDFSupported(),
         supportsAdobeDRM = adobeDRM != null,
-        supportsAxisNow = axisNowService != null,
+        supportsBoundless = boundless != null,
         supportsAudioBooks = BookFormatAudioSupportParameters(
           supportsFindawayAudioBooks = isFindawaySupported(),
           supportsOverdriveAudioBooks = overdriveSecretService != null,

@@ -2,6 +2,7 @@ package org.nypl.simplified.tests.opds;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.nypl.simplified.links.Link;
 import org.nypl.simplified.opds.core.OPDSAcquisition;
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeed;
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry;
@@ -66,7 +67,16 @@ public final class OPDSJSONSerializerTest {
         final OPDSAcquisition a1 = e1a.get(index);
         Assertions.assertEquals(a0.getRelation(), a1.getRelation());
         Assertions.assertEquals(a0.getType(), a1.getType());
-        Assertions.assertEquals(a0.getUri(), a1.getUri());
+        final Link u0 = a0.getUri();
+        final Link u1 = a1.getUri();
+        Assertions.assertEquals(u0.getBitrate(), u1.getBitrate());
+        Assertions.assertEquals(u0.getDuration(), u1.getDuration());
+        Assertions.assertEquals(u0.getHeight(), u1.getHeight());
+        Assertions.assertEquals(u0.getHrefURI(), u1.getHrefURI());
+        Assertions.assertEquals(u0.getRelation(), u1.getRelation());
+        Assertions.assertEquals(u0.getTitle(), u1.getTitle());
+        Assertions.assertEquals(u0.getType().toString(), u1.getType().toString());
+        Assertions.assertEquals(u0.getWidth(), u1.getWidth());
         Assertions.assertEquals(a0.getIndirectAcquisitions(), a1.getIndirectAcquisitions());
       }
 

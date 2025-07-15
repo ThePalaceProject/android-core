@@ -31,10 +31,13 @@ import org.librarysimplified.r2.views.SR2SearchFragment
 import org.librarysimplified.r2.views.SR2TOCFragment
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.viewer.epub.readium2.Reader2Themes
+import org.nypl.drm.core.BoundlessServiceType
 import org.nypl.drm.core.ContentProtectionProvider
 import org.nypl.simplified.accessibility.AccessibilityServiceType
+import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.api.BookContentProtections
 import org.nypl.simplified.books.api.BookDRMInformation
+import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
 import org.nypl.simplified.books.book_registry.BookPreviewStatus
 import org.nypl.simplified.books.controller.api.BooksPreviewControllerType
@@ -81,14 +84,17 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
   }
 
   private lateinit var accessibilityService: AccessibilityServiceType
+  private lateinit var account: AccountType
+  private lateinit var bookFormat: BookFormat
   private lateinit var feedEntry: FeedEntry.FeedEntryOPDS
   private lateinit var loadingProgress: ProgressBar
   private lateinit var previewContainer: FrameLayout
   private lateinit var previewController: BooksPreviewControllerType
   private lateinit var previewRegistry: BookPreviewRegistryType
   private lateinit var profilesController: ProfilesControllerType
-  private lateinit var root: View
 
+  private var boundless: BoundlessServiceType? = null
+  private lateinit var root: View
   private var fragmentNow: Fragment? = null
   private var subscriptions: CompositeDisposable = CompositeDisposable()
   private var file: File? = null
@@ -107,6 +113,8 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
       services.requireService(BookPreviewRegistryType::class.java)
     this.previewController =
       services.requireService(BooksPreviewControllerType::class.java)
+    this.boundless =
+      services.optionalService(BoundlessServiceType::class.java)
 
     this.loadingProgress =
       this.findViewById(R.id.loading_progress)
@@ -142,6 +150,28 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
     MDCKeys.put(MDCKeys.BOOK_PUBLISHER, this.feedEntry.feedEntry.publisher)
     MDC.remove(MDCKeys.BOOK_DRM)
     MDC.remove(MDCKeys.BOOK_FORMAT)
+
+    try {
+      this.account =
+        this.profilesController.profileCurrent()
+          .account(this.feedEntry.accountID)
+      MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID, this.account.provider.id.toString())
+    } catch (e: Exception) {
+      this.logger.debug("Unable to locate account: ", e)
+      this.finish()
+      return
+    }
+
+    try {
+      this.bookFormat =
+        this.account.bookDatabase.entry(this.feedEntry.bookID)
+          .book
+          .findPreferredFormat()!!
+    } catch (e: Throwable) {
+      this.logger.debug("Unable to locate book format: ", e)
+      this.finish()
+      return
+    }
 
     this.previewController.handleBookPreviewStatus(this.feedEntry)
 
@@ -358,9 +388,11 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
 
       val contentProtections =
         BookContentProtections.create(
+          boundless = this.boundless,
           context = this.application,
           contentProtectionProviders = contentProtectionProviders,
           drmInfo = BookDRMInformation.None,
+          format = this.bookFormat,
           isManualPassphraseEnabled = false,
           onLCPDialogDismissed = {
             this.logger.debug("Dismissed LCP dialog. Shutting down...")

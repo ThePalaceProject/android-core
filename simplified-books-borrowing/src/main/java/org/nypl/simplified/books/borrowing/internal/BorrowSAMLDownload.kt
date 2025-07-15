@@ -10,6 +10,7 @@ import org.nypl.simplified.books.borrowing.BorrowContextType
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskFailed
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskFactoryType
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskType
+import org.nypl.simplified.links.Link
 import java.net.CookieManager
 import java.net.CookieStore
 import java.net.HttpCookie
@@ -36,7 +37,7 @@ class BorrowSAMLDownload private constructor() : BorrowSubtaskType {
 
     override fun isApplicableFor(
       type: MIMEType,
-      target: URI?,
+      target: Link?,
       account: AccountReadableType?,
       remaining: List<MIMEType>
     ): Boolean =
@@ -64,13 +65,10 @@ class BorrowSAMLDownload private constructor() : BorrowSubtaskType {
     if (
       samlDownloadContext != null &&
       samlDownloadContext.isSAMLAuthComplete &&
-      samlDownloadContext.downloadURI == context.currentURI()
+      samlDownloadContext.downloadURI == context.currentURICheck()
     ) {
       val actualDownloadURI = samlDownloadContext.authCompleteDownloadURI
-
-      if (actualDownloadURI != null) {
-        context.receivedNewURI(actualDownloadURI)
-      }
+      context.receivedNewURI(Link.LinkBasic(actualDownloadURI))
     }
 
     val cookieStore = createAccountCookieStore(context.account)

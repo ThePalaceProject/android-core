@@ -18,7 +18,7 @@ import org.nypl.simplified.adobe.extensions.AdobeDRMExtensions
 import org.nypl.simplified.adobe.extensions.AdobeDRMExtensions.AdobeDRMFulfillmentException
 import org.nypl.simplified.books.api.BookDRMKind.ACS
 import org.nypl.simplified.books.book_database.api.BookDRMInformationHandle.ACSHandle
-import org.nypl.simplified.books.book_database.api.BookDRMInformationHandle.AxisHandle
+import org.nypl.simplified.books.book_database.api.BookDRMInformationHandle.BoundlessHandle
 import org.nypl.simplified.books.book_database.api.BookDRMInformationHandle.LCPHandle
 import org.nypl.simplified.books.book_database.api.BookDRMInformationHandle.NoneHandle
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle
@@ -39,8 +39,8 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.Borro
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskFactoryType
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskType
 import org.nypl.simplified.books.formats.api.StandardFormatNames.adobeACSMFiles
+import org.nypl.simplified.links.Link
 import java.io.File
-import java.net.URI
 import java.util.concurrent.CancellationException
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeoutException
@@ -62,7 +62,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
 
     override fun isApplicableFor(
       type: MIMEType,
-      target: URI?,
+      target: Link?,
       account: AccountReadableType?,
       remaining: List<MIMEType>
     ): Boolean {
@@ -251,7 +251,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
         )
       }
       is LCPHandle,
-      is AxisHandle,
+      is BoundlessHandle,
       is NoneHandle ->
         throw UnreachableCodeException()
     }
@@ -422,7 +422,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
         }
       }
       is LCPHandle,
-      is AxisHandle,
+      is BoundlessHandle,
       is NoneHandle ->
         throw UnreachableCodeException()
     }

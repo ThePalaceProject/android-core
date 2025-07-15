@@ -26,6 +26,7 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskFactoryType
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskType
 import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.nypl.simplified.books.formats.api.StandardFormatNames.lcpLicenseFiles
+import org.nypl.simplified.links.Link
 import org.readium.r2.lcp.license.model.LicenseDocument
 import org.readium.r2.shared.util.ErrorException
 import org.readium.r2.shared.util.Try
@@ -45,7 +46,7 @@ class BorrowLCPPDF : BorrowSubtaskType {
 
     override fun isApplicableFor(
       type: MIMEType,
-      target: URI?,
+      target: Link?,
       account: AccountReadableType?,
       remaining: List<MIMEType>
     ): Boolean {

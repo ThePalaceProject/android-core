@@ -49,6 +49,7 @@ import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.feeds.api.FeedHTTPTransport
 import org.nypl.simplified.feeds.api.FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderType
+import org.nypl.simplified.links.Link
 import org.nypl.simplified.notifications.NotificationTokenHTTPCalls
 import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
 import org.nypl.simplified.opds.auth_document.AuthenticationDocumentParsers
@@ -199,7 +200,7 @@ class Simply3635Test {
           supportsAdobeDRM = false,
           supportsLCP = false,
           supportsAudioBooks = null,
-          supportsAxisNow = false
+          supportsBoundless = false
         )
       )
 
@@ -309,7 +310,7 @@ class Simply3635Test {
     val bookAcquisition0 =
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_OPEN_ACCESS,
-        this.server.url("/book.epub").toUri(),
+        Link.LinkBasic(this.server.url("/book.epub").toUri()),
         StandardFormatNames.genericEPUBFiles,
         listOf(),
         mapOf()

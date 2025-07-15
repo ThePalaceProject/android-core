@@ -8,7 +8,7 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskFactoryType
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskType
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFiles
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericPDFFiles
-import java.net.URI
+import org.nypl.simplified.links.Link
 
 /**
  * A task that downloads a file directly and saves it to the book database. It _does not_
@@ -28,7 +28,7 @@ class BorrowDirectDownload private constructor() : BorrowSubtaskType {
 
     override fun isApplicableFor(
       type: MIMEType,
-      target: URI?,
+      target: Link?,
       account: AccountReadableType?,
       remaining: List<MIMEType>
     ): Boolean {

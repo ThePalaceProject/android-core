@@ -27,6 +27,7 @@ import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandlePDF
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
 import org.nypl.simplified.files.DirectoryUtilities
+import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisition
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
@@ -842,7 +843,7 @@ abstract class BookDatabaseContract {
     eb.addAcquisition(
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
-        URI.create("http://example.com"),
+        Link.LinkBasic(URI.create("http://example.com")),
         mimeOf("application/pdf"),
         emptyList(),
         emptyMap()
@@ -862,7 +863,7 @@ abstract class BookDatabaseContract {
     eb.addAcquisition(
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
-        URI.create("http://example.com"),
+        Link.LinkBasic(URI.create("http://example.com")),
         mimeOf("application/audiobook+json"),
         emptyList(),
         emptyMap()
@@ -883,7 +884,7 @@ abstract class BookDatabaseContract {
     eb.addAcquisition(
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
-        URI.create("http://example.com"),
+        Link.LinkBasic(URI.create("http://example.com")),
         mimeOf("application/vnd.adobe.adept+xml"),
         listOf(
           OPDSIndirectAcquisition(
@@ -910,7 +911,7 @@ abstract class BookDatabaseContract {
     eb.addAcquisition(
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
-        URI.create("http://example.com"),
+        Link.LinkBasic(URI.create("http://example.com")),
         mimeOf("application/epub+zip"),
         emptyList(),
         emptyMap()

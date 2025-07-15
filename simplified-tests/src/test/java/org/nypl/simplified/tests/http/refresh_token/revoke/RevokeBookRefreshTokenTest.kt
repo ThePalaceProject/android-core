@@ -41,6 +41,7 @@ import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.feeds.api.FeedHTTPTransport
 import org.nypl.simplified.feeds.api.FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderType
+import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisition
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
@@ -161,7 +162,7 @@ class RevokeBookRefreshTokenTest {
     val acquisition =
       OPDSAcquisition(
         OPDSAcquisition.Relation.ACQUISITION_BORROW,
-        URI.create("http://www.example.com/0.feed"),
+        Link.LinkBasic(URI.create("http://www.example.com/0.feed")),
         MIMEParser.parseRaisingException("application/epub+zip"),
         listOf(),
         emptyMap()

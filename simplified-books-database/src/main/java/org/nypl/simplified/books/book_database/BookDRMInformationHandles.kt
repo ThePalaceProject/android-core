@@ -63,7 +63,7 @@ object BookDRMInformationHandles {
           createInitial.setAdobeRightsInformation(null)
           null
         }
-        is BookDRMInformationHandle.AxisHandle -> null
+        is BookDRMInformationHandle.BoundlessHandle -> null
         is BookDRMInformationHandle.LCPHandle -> null
         is BookDRMInformationHandle.NoneHandle -> null
       }
@@ -102,8 +102,8 @@ object BookDRMInformationHandles {
         BookDRMInformationHandleLCP(directory, format, onUpdate)
       BookDRMKind.ACS ->
         BookDRMInformationHandleACS(directory, format, onUpdate)
-      BookDRMKind.AXIS ->
-        BookDRMInformationHandleAxis(directory, format, onUpdate)
+      BookDRMKind.BOUNDLESS ->
+        BookDRMInformationHandleBoundless(directory, format, onUpdate)
     }
   }
 

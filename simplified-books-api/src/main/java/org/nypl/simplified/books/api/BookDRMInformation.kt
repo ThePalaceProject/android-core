@@ -81,30 +81,18 @@ sealed class BookDRMInformation : Serializable {
     override val kind: BookDRMKind = BookDRMKind.LCP
   }
 
-  /**
-   * The AXIS information associated with a book.
-   */
-
-  data class AXIS(
-
+  data class Boundless(
     /**
      * The license file. This is only present if an attempt has been made to fulfill the book.
      */
 
-    val license: File?,
-
-    /**
-     * The file containing the key used to fulfill the book. This is only present
-     * if an attempt has been made to fulfill the book.
-     */
-
-    val userKey: File?
+    val license: File?
   ) : BookDRMInformation() {
     override fun playerCredentials(): PlayerBookCredentialsType {
       return PlayerBookCredentialsNone
     }
 
-    override val kind: BookDRMKind = BookDRMKind.AXIS
+    override val kind: BookDRMKind = BookDRMKind.BOUNDLESS
   }
 
   /**

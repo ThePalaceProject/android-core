@@ -33,6 +33,7 @@ import org.nypl.simplified.books.book_registry.BookStatusEvent
 import org.nypl.simplified.books.borrowing.internal.BorrowLoanCreate
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFiles
 import org.nypl.simplified.books.formats.api.StandardFormatNames.opdsAcquisitionFeedEntry
+import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
 import org.nypl.simplified.opds.core.OPDSAvailabilityLoanable
@@ -182,7 +183,7 @@ class BorrowLimitLoanTest {
     val task = BorrowLoanCreate.createSubtask()
 
     this.context.currentURIField =
-      this.webServer.url("/book.epub").toUri()
+      Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
       OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
     this.context.currentRemainingOPDSPathElements =

@@ -1,5 +1,7 @@
 package org.nypl.simplified.tests.opds;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.io7m.jfunctional.Option;
 import com.io7m.jfunctional.OptionType;
 import com.io7m.jfunctional.Some;
@@ -64,9 +66,9 @@ public final class OPDSFeedEntryParserTest {
 
     final OPDSAvailabilityType availability = e.getAvailability();
     final OPDSAvailabilityLoanable expected = OPDSAvailabilityLoanable.get();
-    Assertions.assertEquals(expected, availability);
+    assertEquals(expected, availability);
 
-    Assertions.assertEquals(1, e.getAcquisitions().size());
+    assertEquals(1, e.getAcquisitions().size());
   }
 
   @Test
@@ -87,9 +89,9 @@ public final class OPDSFeedEntryParserTest {
     final OPDSAvailabilityLoaned expected = OPDSAvailabilityLoaned.get(
       expected_start_date, expected_end_date, expected_revoke);
 
-    Assertions.assertEquals(expected, availability);
+    assertEquals(expected, availability);
 
-    Assertions.assertEquals(1, e.getAcquisitions().size());
+    assertEquals(1, e.getAcquisitions().size());
     final OPDSAcquisition acquisition = e.getAcquisitions().get(0);
     Assertions.assertTrue(
       OPDSIndirectAcquisition.Companion.findTypeInOptional(
@@ -117,10 +119,10 @@ public final class OPDSFeedEntryParserTest {
     final OPDSAvailabilityLoaned expected = OPDSAvailabilityLoaned.get(
       expected_start_date, expected_end_date, expected_revoke);
 
-    Assertions.assertEquals(expected, availability);
+    assertEquals(expected, availability);
 
-    Assertions.assertEquals(1, e.getNarrators().size());
-    Assertions.assertEquals(1, e.getAcquisitions().size());
+    assertEquals(1, e.getNarrators().size());
+    assertEquals(1, e.getAcquisitions().size());
     final OPDSAcquisition acquisition = e.getAcquisitions().get(0);
     Assertions.assertTrue(
       OPDSIndirectAcquisition.Companion.findTypeInOptional(
@@ -140,8 +142,8 @@ public final class OPDSFeedEntryParserTest {
     final OPDSAvailabilityType availability = e.getAvailability();
     final OPDSAvailabilityHoldable expected = OPDSAvailabilityHoldable.get();
 
-    Assertions.assertEquals(expected, availability);
-    Assertions.assertEquals(1, e.getAcquisitions().size());
+    assertEquals(expected, availability);
+    assertEquals(1, e.getAcquisitions().size());
 
     final OPDSAcquisition acquisition = e.getAcquisitions().get(0);
     Assertions.assertTrue(
@@ -170,8 +172,8 @@ public final class OPDSFeedEntryParserTest {
     final OPDSAvailabilityHeld expected = OPDSAvailabilityHeld.get(
       expected_start_date, queue_position, expected_end_date, expected_revoke);
 
-    Assertions.assertEquals(expected, availability);
-    Assertions.assertEquals(1, e.getAcquisitions().size());
+    assertEquals(expected, availability);
+    assertEquals(1, e.getAcquisitions().size());
 
     final OPDSAcquisition acquisition = e.getAcquisitions().get(0);
     Assertions.assertTrue(
@@ -201,8 +203,8 @@ public final class OPDSFeedEntryParserTest {
     final OPDSAvailabilityHeld expected = OPDSAvailabilityHeld.get(
       expected_start_date, queue_position, expected_end_date, expected_revoke);
 
-    Assertions.assertEquals(expected, availability);
-    Assertions.assertEquals(1, e.getAcquisitions().size());
+    assertEquals(expected, availability);
+    assertEquals(1, e.getAcquisitions().size());
 
     final OPDSAcquisition acquisition = e.getAcquisitions().get(0);
     Assertions.assertTrue(
@@ -231,8 +233,8 @@ public final class OPDSFeedEntryParserTest {
     final OPDSAvailabilityHeld expected = OPDSAvailabilityHeld.get(
       expected_start_date, queue_position, expected_end_date, expected_revoke);
 
-    Assertions.assertEquals(expected, availability);
-    Assertions.assertEquals(1, e.getAcquisitions().size());
+    assertEquals(expected, availability);
+    assertEquals(1, e.getAcquisitions().size());
 
     final OPDSAcquisition acquisition = e.getAcquisitions().get(0);
     Assertions.assertTrue(
@@ -262,8 +264,8 @@ public final class OPDSFeedEntryParserTest {
     final OPDSAvailabilityHeld expected = OPDSAvailabilityHeld.get(
       expected_start_date, queue_position, expected_end_date, expected_revoke);
 
-    Assertions.assertEquals(expected, availability);
-    Assertions.assertEquals(1, e.getAcquisitions().size());
+    assertEquals(expected, availability);
+    assertEquals(1, e.getAcquisitions().size());
 
     final OPDSAcquisition acquisition = e.getAcquisitions().get(0);
     Assertions.assertTrue(
@@ -289,8 +291,8 @@ public final class OPDSFeedEntryParserTest {
     final OPDSAvailabilityHeldReady expected =
       OPDSAvailabilityHeldReady.get(expected_end_date, expected_revoke);
 
-    Assertions.assertEquals(expected, availability);
-    Assertions.assertEquals(1, e.getAcquisitions().size());
+    assertEquals(expected, availability);
+    assertEquals(1, e.getAcquisitions().size());
 
     final OPDSAcquisition acquisition = e.getAcquisitions().get(0);
     Assertions.assertTrue(
@@ -317,8 +319,8 @@ public final class OPDSFeedEntryParserTest {
     final OPDSAvailabilityHeldReady expected =
       OPDSAvailabilityHeldReady.get(expected_end_date, expected_revoke);
 
-    Assertions.assertEquals(expected, availability);
-    Assertions.assertEquals(1, e.getAcquisitions().size());
+    assertEquals(expected, availability);
+    assertEquals(1, e.getAcquisitions().size());
 
     final OPDSAcquisition acquisition = e.getAcquisitions().get(0);
     Assertions.assertTrue(
@@ -343,12 +345,12 @@ public final class OPDSFeedEntryParserTest {
     final OPDSAvailabilityOpenAccess expected =
       OPDSAvailabilityOpenAccess.get(expected_revoke);
 
-    Assertions.assertEquals(expected, availability);
-    Assertions.assertEquals(1, e.getAcquisitions().size());
+    assertEquals(expected, availability);
+    assertEquals(1, e.getAcquisitions().size());
 
     final OPDSAcquisition acquisition = e.getAcquisitions().get(0);
-    Assertions.assertEquals(0, acquisition.getIndirectAcquisitions().size());
-    Assertions.assertEquals(mimeOf("application/epub+zip"), acquisition.getType());
+    assertEquals(0, acquisition.getIndirectAcquisitions().size());
+    assertEquals(mimeOf("application/epub+zip"), acquisition.getType());
   }
 
   @Test
@@ -368,8 +370,8 @@ public final class OPDSFeedEntryParserTest {
     final OPDSAvailabilityHeldReady expected =
       OPDSAvailabilityHeldReady.get(expected_end_date, expected_revoke);
 
-    Assertions.assertEquals(expected, availability);
-    Assertions.assertEquals(1, e.getAcquisitions().size());
+    assertEquals(expected, availability);
+    assertEquals(1, e.getAcquisitions().size());
 
     final OPDSAcquisition acquisition = e.getAcquisitions().get(0);
     Assertions.assertTrue(
@@ -386,7 +388,7 @@ public final class OPDSFeedEntryParserTest {
     final OPDSAcquisitionFeedEntry e = parser.parseEntryStream(URI.create("urn:test"),
       OPDSFeedEntryParserTest.getResource("entry-with-formats-0.xml"));
 
-    Assertions.assertEquals(3, e.getAcquisitions().size());
+    assertEquals(3, e.getAcquisitions().size());
 
     {
       final OPDSAcquisition acquisition = e.getAcquisitions().get(0);
@@ -423,7 +425,7 @@ public final class OPDSFeedEntryParserTest {
     final OPDSAcquisitionFeedEntry e = parser.parseEntryStream(URI.create("urn:test"),
       OPDSFeedEntryParserTest.getResource("entry-with-formats-1.xml"));
 
-    Assertions.assertEquals(1, e.getAcquisitions().size());
+    assertEquals(1, e.getAcquisitions().size());
 
     final OPDSAcquisition acquisition = e.getAcquisitions().get(0);
     Assertions.assertTrue(
@@ -444,13 +446,13 @@ public final class OPDSFeedEntryParserTest {
     Assertions.assertTrue(licensor_opt.isSome());
 
     DRMLicensor licensor = ((Some<DRMLicensor>) licensor_opt).get();
-    Assertions.assertEquals(
+    assertEquals(
       "NYPL",
       licensor.getVendor());
-    Assertions.assertEquals(
+    assertEquals(
       "NYNYPL|0000000000|XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX|XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
       licensor.getClientToken());
-    Assertions.assertEquals(
+    assertEquals(
       Option.some("http://qa.circulation.librarysimplified.org/NYNYPL/AdobeAuth/devices"),
       licensor.getDeviceManager());
   }
@@ -473,8 +475,8 @@ public final class OPDSFeedEntryParserTest {
       OPDSFeedEntryParserTest.getResource(
         "bug-pp-465.xml"));
 
-    Assertions.assertEquals(1, e.getAcquisitions().size());
-    Assertions.assertEquals(List.of(), e.getAuthors());
+    assertEquals(1, e.getAcquisitions().size());
+    assertEquals(List.of(), e.getAuthors());
   }
 
   private OPDSAcquisitionFeedEntryParserType getParser() {
@@ -487,5 +489,20 @@ public final class OPDSFeedEntryParserTest {
     } catch (final Exception e) {
       throw new IllegalStateException(e);
     }
+  }
+
+  @Test
+  public void testEntryBoundless1()
+    throws Exception {
+    final OPDSAcquisitionFeedEntryParserType parser = this.getParser();
+    final OPDSAcquisitionFeedEntry e = parser.parseEntryStream(URI.create("urn:test"),
+      OPDSFeedEntryParserTest.getResource("boundless-1.xml"));
+
+    var a = e.getAcquisitions();
+    assertEquals(1, a.size());
+    assertEquals(
+      "https://minotaur.dev.palaceproject.io/minotaur-test-library/works/796/fulfill/30{?modulus,exponent,device_id}",
+      a.get(0).getUri().toTemplated().getHref()
+    );
   }
 }

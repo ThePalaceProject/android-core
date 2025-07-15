@@ -2,7 +2,7 @@ package org.nypl.simplified.books.borrowing.subtasks
 
 import one.irradia.mime.api.MIMEType
 import org.nypl.simplified.accounts.api.AccountReadableType
-import java.net.URI
+import org.nypl.simplified.links.Link
 
 /**
  * A factory interface for subtasks.
@@ -30,7 +30,7 @@ interface BorrowSubtaskFactoryType {
 
   fun isApplicableFor(
     type: MIMEType,
-    target: URI?,
+    target: Link?,
     account: AccountReadableType?,
     remaining: List<MIMEType>
   ): Boolean

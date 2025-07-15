@@ -13,8 +13,12 @@ import org.w3c.dom.NodeList;
 
 import java.io.OutputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -29,11 +33,9 @@ import javax.xml.transform.stream.StreamResult;
  * Convenient XML handling functions.
  */
 
-public final class OPDSXML
-{
+public final class OPDSXML {
 
-  private OPDSXML()
-  {
+  private OPDSXML() {
     throw new UnreachableCodeException();
   }
 
@@ -44,15 +46,13 @@ public final class OPDSXML
    * @param node      The parent node
    * @param namespace The namespace
    * @param name      The element name
-   *
    * @return A list of elements
    */
 
   public static List<Element> getChildElementsWithName(
     final Element node,
     final URI namespace,
-    final String name)
-  {
+    final String name) {
     NullCheck.notNull(node);
     NullCheck.notNull(namespace);
     NullCheck.notNull(name);
@@ -82,9 +82,7 @@ public final class OPDSXML
    * @param node      The parent node
    * @param namespace The namespace
    * @param name      The element name
-   *
    * @return A list of elements
-   *
    * @throws OPDSParseException If there are no matching elements
    */
 
@@ -92,8 +90,7 @@ public final class OPDSXML
     final Element node,
     final URI namespace,
     final String name)
-    throws OPDSParseException
-  {
+    throws OPDSParseException {
     NullCheck.notNull(node);
     NullCheck.notNull(namespace);
     NullCheck.notNull(name);
@@ -115,15 +112,73 @@ public final class OPDSXML
   }
 
   /**
+   * Return all child elements of {@code node} that have any of the names {@code names}.
+   *
+   * @param node  The parent node
+   * @param names The names
+   * @return A list of elements
+   */
+
+  public static List<Element> getChildElementsWithNames(
+    final Element node,
+    final Set<Map.Entry<URI, String>> names) {
+    final NodeList children = node.getChildNodes();
+    final List<Element> xs = new ArrayList<Element>(children.getLength());
+    for (int index = 0; index < children.getLength(); ++index) {
+      final Node child = children.item(index);
+      if (child instanceof Element) {
+        final Element child_element = (Element) child;
+        final URI child_namespace;
+        try {
+          child_namespace = new URI(child_element.getNamespaceURI());
+        } catch (URISyntaxException e) {
+          continue;
+        }
+        final String child_name =
+          child_element.getLocalName();
+
+        for (var requested : names) {
+          if (Objects.equals(requested.getKey(), child_namespace)
+            && Objects.equals(requested.getValue(), child_name)) {
+            xs.add(child_element);
+          }
+        }
+      }
+    }
+    return xs;
+  }
+
+  /**
+   * Return all child elements of {@code node} that have any of the names {@code names}.
+   *
+   * @param node  The parent node
+   * @param names The names
+   * @return A list of elements
+   */
+
+  public static List<Element> getChildElementsWithNamesNonEmpty(
+    final Element node,
+    final Set<Map.Entry<URI, String>> names) throws OPDSParseException {
+    var elements = getChildElementsWithNames(node, names);
+    if (!elements.isEmpty()) {
+      return elements;
+    }
+    final StringBuilder m = new StringBuilder(128);
+    m.append("Missing at least one required element.\n");
+    m.append("Expected: ");
+    m.append(names);
+    m.append("\n");
+    throw new OPDSParseException(NullCheck.notNull(m.toString()));
+  }
+
+  /**
    * Return the text of the first child element of {@code node} that has name
    * {@code name} in namespace {@code namespace}.
    *
    * @param node      The node
    * @param namespace The child namespace
    * @param name      The child name
-   *
    * @return The text of the child element
-   *
    * @throws OPDSParseException If there are no matching child elements
    */
 
@@ -131,8 +186,7 @@ public final class OPDSXML
     final Element node,
     final URI namespace,
     final String name)
-    throws OPDSParseException
-  {
+    throws OPDSParseException {
     final Element e = OPDSXML.getFirstChildElementWithName(node, namespace, name);
     return NullCheck.notNull(e.getTextContent().trim());
   }
@@ -144,15 +198,13 @@ public final class OPDSXML
    * @param node      The node
    * @param namespace The child namespace
    * @param name      The child name
-   *
    * @return The text of the child element, if any
    */
 
   public static OptionType<String> getFirstChildElementTextWithNameOptional(
     final Element node,
     final URI namespace,
-    final String name)
-  {
+    final String name) {
     NullCheck.notNull(node);
     NullCheck.notNull(namespace);
     NullCheck.notNull(name);
@@ -178,8 +230,7 @@ public final class OPDSXML
    * @param node      The node
    * @param namespace The child namespace
    * @param name      The child name
-   * @param attribute      The child name
-   *
+   * @param attribute The child name
    * @return The text of the child element, if any
    */
 
@@ -187,8 +238,7 @@ public final class OPDSXML
     final Element node,
     final URI namespace,
     final String name,
-    final String attribute)
-  {
+    final String attribute) {
     NullCheck.notNull(node);
     NullCheck.notNull(namespace);
     NullCheck.notNull(name);
@@ -215,9 +265,7 @@ public final class OPDSXML
    * @param node      The node
    * @param namespace The child namespace
    * @param name      The child name
-   *
    * @return The child element
-   *
    * @throws OPDSParseException If no matching element exists
    */
 
@@ -225,8 +273,7 @@ public final class OPDSXML
     final Element node,
     final URI namespace,
     final String name)
-    throws OPDSParseException
-  {
+    throws OPDSParseException {
     NullCheck.notNull(node);
     NullCheck.notNull(namespace);
     NullCheck.notNull(name);
@@ -259,15 +306,13 @@ public final class OPDSXML
    * @param node      The node
    * @param namespace The child namespace
    * @param name      The child name
-   *
    * @return The child element, if any
    */
 
   public static OptionType<Element> getFirstChildElementWithNameOptional(
     final Element node,
     final URI namespace,
-    final String name)
-  {
+    final String name) {
     NullCheck.notNull(node);
     NullCheck.notNull(namespace);
     NullCheck.notNull(name);
@@ -287,13 +332,11 @@ public final class OPDSXML
 
   /**
    * @param e The element
-   *
    * @return The namespace of the given element, if any
    */
 
   public static OptionType<String> getNodeNamespace(
-    final Element e)
-  {
+    final Element e) {
     NullCheck.notNull(e);
 
     final String ns = e.getNamespaceURI();
@@ -308,16 +351,13 @@ public final class OPDSXML
    * not an element.
    *
    * @param node The node
-   *
    * @return The node as an element
-   *
    * @throws OPDSParseException If the node is not an {@link Element}
    */
 
   public static Element nodeAsElement(
     final Node node)
-    throws OPDSParseException
-  {
+    throws OPDSParseException {
     NullCheck.notNull(node);
 
     if ((node instanceof Element) == false) {
@@ -337,9 +377,7 @@ public final class OPDSXML
    * @param node      The node
    * @param name      The expected element name
    * @param namespace The expected element namespace
-   *
    * @return The node as an element
-   *
    * @throws OPDSParseException If the node is not an {@link Element} or has the
    *                            wrong name
    */
@@ -348,8 +386,7 @@ public final class OPDSXML
     final Node node,
     final URI namespace,
     final String name)
-    throws OPDSParseException
-  {
+    throws OPDSParseException {
     NullCheck.notNull(node);
     NullCheck.notNull(namespace);
     NullCheck.notNull(name);
@@ -380,15 +417,13 @@ public final class OPDSXML
    * @param node      The element
    * @param namespace The namespace
    * @param name      The name
-   *
    * @return {@code true} if the given element has the given name and namespace
    */
 
   public static boolean nodeHasName(
     final Element node,
     final URI namespace,
-    final String name)
-  {
+    final String name) {
     final String node_local = node.getLocalName();
     if (node_local.equals(name)) {
       return namespace.toString().equals(node.getNamespaceURI());
@@ -402,17 +437,14 @@ public final class OPDSXML
    *
    * @param e    The element
    * @param name The attribute name
-   *
    * @return A date, if any
-   *
    * @throws OPDSParseException On parse errors
    */
 
   public static OptionType<DateTime> getAttributeRFC3339Optional(
     final Element e,
     final String name)
-    throws OPDSParseException
-  {
+    throws OPDSParseException {
     NullCheck.notNull(e);
     NullCheck.notNull(name);
 
@@ -437,17 +469,14 @@ public final class OPDSXML
    *
    * @param e    The element
    * @param name The attribute name
-   *
    * @return A date
-   *
    * @throws OPDSParseException On parse errors
    */
 
   public static DateTime getAttributeRFC3339(
     final Element e,
     final String name)
-    throws OPDSParseException
-  {
+    throws OPDSParseException {
     NullCheck.notNull(e);
     NullCheck.notNull(name);
 
@@ -474,15 +503,13 @@ public final class OPDSXML
    *
    * @param d The document
    * @param o The output stream
-   *
    * @throws OPDSSerializationException If any errors occur on serialization
    */
 
   public static void serializeDocumentToStream(
     final Document d,
     final OutputStream o)
-    throws OPDSSerializationException
-  {
+    throws OPDSSerializationException {
     NullCheck.notNull(d);
     NullCheck.notNull(o);
 
@@ -512,17 +539,14 @@ public final class OPDSXML
    *
    * @param e    The element
    * @param name The attribute name
-   *
    * @return An integer, if any
-   *
    * @throws OPDSParseException On parse errors
    */
 
   public static OptionType<Integer> getAttributeIntegerOptional(
     final Element e,
     final String name)
-    throws OPDSParseException
-  {
+    throws OPDSParseException {
     NullCheck.notNull(e);
     NullCheck.notNull(name);
 
@@ -543,17 +567,14 @@ public final class OPDSXML
    *
    * @param e    The element
    * @param name The attribute name
-   *
    * @return An integer
-   *
    * @throws OPDSParseException On parse errors
    */
 
   public static int getAttributeInteger(
     final Element e,
     final String name)
-    throws OPDSParseException
-  {
+    throws OPDSParseException {
     NullCheck.notNull(e);
     NullCheck.notNull(name);
 

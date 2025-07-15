@@ -508,10 +508,10 @@ sealed class BookStatus {
             info.acsmFile != null
           is BookDRMInformation.LCP ->
             true
-          is BookDRMInformation.AXIS ->
-            false
           BookDRMInformation.None ->
             false
+          is BookDRMInformation.Boundless ->
+            true
         }
       } ?: false
     }
