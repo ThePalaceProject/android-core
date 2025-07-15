@@ -571,7 +571,7 @@ class CatalogFeedViewDetails2(
 
     if (bookFormatText.isNotEmpty()) {
       val (row, rowKey, rowVal) = this.bookInfoViewOf()
-      rowKey.text = this.root.resources.getString(R.string.catalogMetaFormat).uppercase(Locale.getDefault())
+      rowKey.text = this.root.resources.getString(R.string.catalogMetaFormat)
       rowVal.text = bookFormatText
       this.metadata.addView(row)
     }
@@ -580,7 +580,7 @@ class CatalogFeedViewDetails2(
     val publishedOpt = entry.published
     if (publishedOpt is Some<DateTime>) {
       val (row, rowKey, rowVal) = this.bookInfoViewOf()
-      rowKey.text = this.root.resources.getString(R.string.catalogMetaPublicationDate).uppercase(Locale.getDefault())
+      rowKey.text = this.root.resources.getString(R.string.catalogMetaPublicationDate)
       rowVal.text = this.dateFormatter.print(publishedOpt.get())
       this.metadata.addView(row)
     }
@@ -588,14 +588,14 @@ class CatalogFeedViewDetails2(
     val publisherOpt = entry.publisher
     if (publisherOpt is Some<String>) {
       val (row, rowKey, rowVal) = this.bookInfoViewOf()
-      rowKey.text = this.root.resources.getString(R.string.catalogMetaPublisher).uppercase(Locale.getDefault())
+      rowKey.text = this.root.resources.getString(R.string.catalogMetaPublisher)
       rowVal.text = publisherOpt.get()
       this.metadata.addView(row)
     }
 
     if (entry.distribution.isNotBlank()) {
       val (row, rowKey, rowVal) = this.bookInfoViewOf()
-      rowKey.text = this.root.resources.getString(R.string.catalogMetaDistributor).uppercase(Locale.getDefault())
+      rowKey.text = this.root.resources.getString(R.string.catalogMetaDistributor)
       rowVal.text = entry.distribution
       this.metadata.addView(row)
     }
@@ -605,7 +605,6 @@ class CatalogFeedViewDetails2(
     if (categories.isNotEmpty()) {
       val (row, rowKey, rowVal) = this.bookInfoViewOf()
       rowKey.text = this.root.resources.getString(R.string.catalogMetaCategories)
-        .uppercase(Locale.getDefault())
       rowVal.text = categories.joinToString(", ") { opdsCategory -> opdsCategory.effectiveLabel }
       this.metadata.addView(row)
     }
@@ -613,14 +612,14 @@ class CatalogFeedViewDetails2(
     val narrators = entry.narrators.filterNot { it.isBlank() }
     if (narrators.isNotEmpty()) {
       val (row, rowKey, rowVal) = this.bookInfoViewOf()
-      rowKey.text = this.root.resources.getString(R.string.catalogMetaNarrators).uppercase(Locale.getDefault())
+      rowKey.text = this.root.resources.getString(R.string.catalogMetaNarrators)
       rowVal.text = narrators.joinToString(", ")
       this.metadata.addView(row)
     }
 
     this.run {
       val (row, rowKey, rowVal) = this.bookInfoViewOf()
-      rowKey.text = this.root.resources.getString(R.string.catalogMetaUpdatedDate).uppercase(Locale.getDefault())
+      rowKey.text = this.root.resources.getString(R.string.catalogMetaUpdatedDate)
       rowVal.text = this.dateTimeFormatter.print(entry.updated)
       this.metadata.addView(row)
     }
@@ -629,7 +628,7 @@ class CatalogFeedViewDetails2(
     if (duration.isSome) {
       val durationValue = (duration as Some<Double>).get()
       val (row, rowKey, rowVal) = this.bookInfoViewOf()
-      rowKey.text = this.root.resources.getString(R.string.catalogMetaDuration).uppercase(Locale.getDefault())
+      rowKey.text = this.root.resources.getString(R.string.catalogMetaDuration)
       rowVal.text = this.formatDuration(durationValue)
       this.metadata.addView(row)
     }
