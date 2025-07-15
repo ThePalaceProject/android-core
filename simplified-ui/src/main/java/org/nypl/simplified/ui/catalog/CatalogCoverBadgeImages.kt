@@ -18,7 +18,6 @@ import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 
 class CatalogCoverBadgeImages private constructor(
   private val screenSize: ScreenSizeInformationType,
-  private val backgroundColorRGBA: () -> Int,
   private val audioBookIcon: Bitmap
 ) : BookCoverBadgeLookupType {
 
@@ -35,7 +34,6 @@ class CatalogCoverBadgeImages private constructor(
           bitmap = this.audioBookIcon,
           width = this.screenSize.dpToPixels(24).toInt(),
           height = this.screenSize.dpToPixels(24).toInt(),
-          backgroundColorRGBA = { this.backgroundColorRGBA() }
         )
       }
 
@@ -57,13 +55,11 @@ class CatalogCoverBadgeImages private constructor(
 
     fun create(
       resources: Resources,
-      backgroundColorRGBA: () -> Int,
       screenSize: ScreenSizeInformationType
     ): BookCoverBadgeLookupType {
       val audioBookIcon = BitmapFactory.decodeResource(resources, R.drawable.audiobook_icon)
       return CatalogCoverBadgeImages(
         audioBookIcon = audioBookIcon,
-        backgroundColorRGBA = backgroundColorRGBA,
         screenSize = screenSize
       )
     }

@@ -275,9 +275,9 @@
         android:layout_marginEnd="32dp"
         android:elevation="10dp">
 
-        <ImageView
+        <org.nypl.simplified.ui.images.ImageFlexibleWidthView
             android:id="@+id/book2DOverlayCover"
-            android:layout_width="@dimen/catalogBookDetailCoverWidth"
+            android:layout_width="wrap_content"
             android:layout_height="@dimen/catalogBookDetailCoverHeight"
             android:background="@drawable/shadow_rect"
             android:contentDescription="@string/catalogBookCoverDescription"

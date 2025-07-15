@@ -9,11 +9,5 @@ import android.graphics.Bitmap
 data class BookCoverBadge(
   val bitmap: Bitmap,
   val width: Int,
-  val height: Int,
-
-  /**
-   * A function that, when evaluated, returns an RGB color.
-   */
-
-  val backgroundColorRGBA: () -> Int
+  val height: Int
 )

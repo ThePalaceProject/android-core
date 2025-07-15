@@ -9,7 +9,7 @@
     app:cardCornerRadius="@dimen/cover_corner_radius"
     app:cardElevation="2dp">
 
-    <ImageView
+    <org.nypl.simplified.ui.images.ImageFlexibleWidthView
         android:id="@+id/coverImage"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
