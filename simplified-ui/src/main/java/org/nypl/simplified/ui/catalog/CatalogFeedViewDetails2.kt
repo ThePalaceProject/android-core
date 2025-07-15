@@ -471,7 +471,7 @@ class CatalogFeedViewDetails2(
 
     // Nudge the cover downwards slightly so that the bottom of the cover overhangs the
     // white area in the background.
-    return withoutImage + 32.0f
+    return withoutImage + 64.0f
   }
 
   fun bind(
