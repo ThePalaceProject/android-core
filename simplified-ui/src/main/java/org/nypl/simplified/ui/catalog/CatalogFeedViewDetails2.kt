@@ -83,7 +83,6 @@ import org.nypl.simplified.ui.catalog.CatalogFeedViewDetails2.InfoState.PROGRESS
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.slf4j.LoggerFactory
 import java.net.URI
-import java.util.Locale
 
 class CatalogFeedViewDetails2(
   override val root: ViewGroup,
