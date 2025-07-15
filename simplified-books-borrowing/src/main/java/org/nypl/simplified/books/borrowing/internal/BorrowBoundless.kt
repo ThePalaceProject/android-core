@@ -26,7 +26,7 @@ import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleEPUB
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandlePDF
 import org.nypl.simplified.books.borrowing.BorrowContextType
-import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.acsNotSupported
+import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.boundlessNotSupported
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskFailed
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskFactoryType
@@ -171,11 +171,13 @@ class BorrowBoundless private constructor() : BorrowSubtaskType {
     if (boundless == null) {
       context.taskRecorder.currentStepFailed(
         message = "This build of the application does not support Boundless DRM.",
-        errorCode = acsNotSupported,
+        errorCode = boundlessNotSupported,
         extraMessages = listOf()
       )
       throw BorrowSubtaskFailed()
     }
+
+    context.taskRecorder.currentStepSucceeded("Boundless DRM is supported.")
     return boundless
   }
 
