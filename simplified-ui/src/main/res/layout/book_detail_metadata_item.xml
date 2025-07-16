@@ -3,6 +3,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginBottom="4dp"
     android:orientation="horizontal">
 
     <TextView
@@ -10,7 +11,11 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="0.3"
-        android:text="@string/catalogPlaceholder" />
+        android:fontFamily="@font/open_sans_regular"
+        android:text="@string/catalogPlaceholder"
+        android:textAllCaps="true"
+        android:textSize="10sp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/value"
@@ -18,6 +23,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_weight="0.7"
+        android:textSize="10sp"
+        android:fontFamily="@font/open_sans_regular"
         android:text="@string/catalogPlaceholder" />
 
 </LinearLayout>

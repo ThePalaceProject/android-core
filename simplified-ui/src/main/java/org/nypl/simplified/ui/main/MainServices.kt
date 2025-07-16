@@ -3,7 +3,6 @@ package org.nypl.simplified.ui.main
 import android.app.Application
 import android.content.pm.PackageManager
 import android.content.res.AssetManager
-import android.graphics.Color
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.squareup.picasso.Picasso
 import io.reactivex.subjects.PublishSubject
@@ -439,11 +438,7 @@ internal object MainServices {
     context: Application,
     screenSize: ScreenSizeInformationType
   ): BookCoverBadgeLookupType {
-    return CatalogCoverBadgeImages.create(
-      context.resources,
-      { Color.RED },
-      screenSize
-    )
+    return CatalogCoverBadgeImages.create(context.resources, screenSize)
   }
 
   private fun publishApplicationStartupEvent(

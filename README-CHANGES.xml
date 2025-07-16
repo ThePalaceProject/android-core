@@ -694,9 +694,19 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2025-07-15T08:09:56+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.17.0">
+    <c:release date="2025-07-15T12:20:55+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.17.0">
       <c:changes>
-        <c:change date="2025-07-15T08:09:56+00:00" summary="Add support for Boundless DRM."/>
+        <c:change date="2025-07-15T00:00:00+00:00" summary="Add support for Boundless DRM."/>
+        <c:change date="2025-07-15T00:00:00+00:00" summary="Respect book cover aspect ratios.">
+          <c:tickets>
+            <c:ticket id="PP-2736"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2025-07-15T12:20:55+00:00" summary="Change audiobook badges.">
+          <c:tickets>
+            <c:ticket id="PP-2736"/>
+          </c:tickets>
+        </c:change>
       </c:changes>
     </c:release>
   </c:releases>

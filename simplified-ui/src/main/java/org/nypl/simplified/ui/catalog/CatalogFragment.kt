@@ -842,8 +842,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
       view.listView.adapter = feedAdapter
       view.configureFacets(
         screen = this.screenSize,
-        feed = feed,
-        sortFacets = true
+        feed = feed
       )
 
       ImageAccountIcons.loadAccountLogoIntoView(

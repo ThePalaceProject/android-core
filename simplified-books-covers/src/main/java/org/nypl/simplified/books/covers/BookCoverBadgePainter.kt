@@ -2,6 +2,7 @@ package org.nypl.simplified.books.covers
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
 import com.squareup.picasso.Transformation
@@ -28,19 +29,22 @@ class BookCoverBadgePainter(
     val result = workingBitmap.copy(sourceConfig, true)
     val canvas = Canvas(result)
 
-    val left = source.width - badge.width
-    val right = source.width
-    val top = source.height - badge.height
-    val bottom = source.height
+    val margin = 8
+    val left = (source.width - badge.width) - margin
+    val right = source.width - margin
+    val top = (source.height - badge.height) - margin
+    val bottom = source.height - margin
     val targetRect = Rect(left, top, right, bottom)
 
-    val colorBackground = badge.backgroundColorRGBA()
-    if (colorBackground != 0x00_00_00_00) {
-      val backgroundPaint = Paint()
-      backgroundPaint.color = colorBackground
-      backgroundPaint.isAntiAlias = true
-      canvas.drawRect(targetRect, backgroundPaint)
-    }
+    val backgroundPaint = Paint()
+    backgroundPaint.color = Color.parseColor("#43BAE6")
+    backgroundPaint.isAntiAlias = true
+    canvas.drawCircle(
+      targetRect.exactCenterX(),
+      targetRect.exactCenterY(),
+      targetRect.width() / 2.0f,
+      backgroundPaint
+    )
 
     val imagePaint = Paint()
     imagePaint.isAntiAlias = true

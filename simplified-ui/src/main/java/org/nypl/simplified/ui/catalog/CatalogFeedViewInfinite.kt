@@ -135,8 +135,7 @@ class CatalogFeedViewInfinite(
 
   fun configureFacets(
     screen: ScreenSizeInformationType,
-    feed: Feed.FeedWithoutGroups,
-    sortFacets: Boolean
+    feed: Feed.FeedWithoutGroups
   ) {
     /*
      * If the facet groups are empty, hide the header entirely.
@@ -167,6 +166,7 @@ class CatalogFeedViewInfinite(
     val remainingGroups =
       facetsByGroup
         .filter { entry -> !FeedFacets.facetGroupIsEntryPointTyped(entry.value) }
+        .filter { entry -> !FeedFacets.isIgnoredFacet(entry) }
 
     if (remainingGroups.isEmpty()) {
       this.catalogFeedHeaderFacetsScroll.visibility = View.GONE
@@ -193,11 +193,8 @@ class CatalogFeedViewInfinite(
         LinearLayout.LayoutParams.MATCH_PARENT
       )
 
-    val sortedNames = if (sortFacets) {
-      remainingGroups.keys.sorted()
-    } else {
-      remainingGroups.keys
-    }
+    val sortedNames =
+      remainingGroups.keys.sortedWith(FeedFacets.facetComparator)
 
     val context = this.root.context
     this.catalogFeedHeaderFacets.removeAllViews()

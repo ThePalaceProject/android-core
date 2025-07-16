@@ -51,6 +51,7 @@
             android:id="@+id/bookD2ScrollLinear"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginBottom="64dp"
             android:orientation="vertical">
 
             <!-- This view is resized programmatically. -->
@@ -194,7 +195,7 @@
             android:layout_marginEnd="32dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textAppearance="@android:style/TextAppearance.Material.Medium"
+            android:textSize="15sp"
             android:textColor="?android:attr/colorBackground"
             app:layout_constraintEnd_toStartOf="@id/bookD2ToolbarItemButton"
             app:layout_constraintStart_toStartOf="parent"
@@ -209,7 +210,7 @@
             android:layout_marginEnd="32dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textAppearance="@android:style/TextAppearance.Material.Small"
+            android:textSize="11sp"
             android:textColor="?android:attr/colorBackground"
             app:layout_constraintEnd_toStartOf="@id/bookD2ToolbarItemButton"
             app:layout_constraintStart_toStartOf="parent"
@@ -275,9 +276,9 @@
         android:layout_marginEnd="32dp"
         android:elevation="10dp">
 
-        <ImageView
+        <org.nypl.simplified.ui.images.ImageFlexibleWidthView
             android:id="@+id/book2DOverlayCover"
-            android:layout_width="@dimen/catalogBookDetailCoverWidth"
+            android:layout_width="wrap_content"
             android:layout_height="@dimen/catalogBookDetailCoverHeight"
             android:background="@drawable/shadow_rect"
             android:contentDescription="@string/catalogBookCoverDescription"

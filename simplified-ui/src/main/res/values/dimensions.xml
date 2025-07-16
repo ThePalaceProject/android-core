@@ -22,5 +22,5 @@
   <dimen name="catalogFeedCellHeight">160dp</dimen>
   <dimen name="catalogFeedCellImageWidth">80dp</dimen>
   <dimen name="catalogFeedCoversSpace">8dp</dimen>
-  <dimen name="catalogLaneCoverMaximumWidth">96dp</dimen>
+  <dimen name="catalogLaneCoverMaximumWidth">128dp</dimen>
 </resources>
