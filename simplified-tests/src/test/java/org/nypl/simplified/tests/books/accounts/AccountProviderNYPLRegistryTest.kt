@@ -107,7 +107,7 @@ class AccountProviderNYPLRegistryTest {
         uriQA = this.server.url("qa").toUri()
       )
 
-    val result = provider.load(this.context, false)
+    val result = provider.load(this.context, false, true)
     this.logger.debug("status: {}", result)
     val success = result as SourceSucceeded
 
@@ -142,7 +142,7 @@ class AccountProviderNYPLRegistryTest {
         uriQA = this.server.url("qa").toUri()
       )
 
-    val result = provider.load(this.context, true)
+    val result = provider.load(this.context, true, true)
     this.logger.debug("status: {}", result)
     val success = result as SourceSucceeded
 
@@ -170,7 +170,7 @@ class AccountProviderNYPLRegistryTest {
         uriQA = this.server.url("qa").toUri()
       )
 
-    val result = provider.load(this.context, true)
+    val result = provider.load(this.context, true, true)
     this.logger.debug("status: {}", result)
     val success = result as SourceSucceeded
 
@@ -203,7 +203,7 @@ class AccountProviderNYPLRegistryTest {
         uriQA = this.server.url("qa").toUri()
       )
 
-    val result = provider.load(this.context, true)
+    val result = provider.load(this.context, true, true)
     this.logger.debug("status: {}", result)
     val success = result as SourceSucceeded
 
@@ -233,7 +233,7 @@ class AccountProviderNYPLRegistryTest {
         uriQA = this.server.url("qa").toUri()
       )
 
-    val result = provider.load(this.context, true)
+    val result = provider.load(this.context, true, true)
     this.logger.debug("status: {}", result)
     val failed = result as AccountProviderSourceType.SourceResult.SourceFailed
 
@@ -262,7 +262,7 @@ class AccountProviderNYPLRegistryTest {
       )
 
     this.run {
-      val result = provider.load(this.context, true)
+      val result = provider.load(this.context, true, true)
       this.logger.debug("status: {}", result)
       val success = result as SourceSucceeded
 
@@ -285,7 +285,7 @@ class AccountProviderNYPLRegistryTest {
     DateTimeUtils.setCurrentMillisOffset(1000 * 43200)
 
     this.run {
-      val result = provider.load(this.context, true)
+      val result = provider.load(this.context, true, true)
       this.logger.debug("status: {}", result)
       val success = result as SourceSucceeded
 
@@ -318,7 +318,7 @@ class AccountProviderNYPLRegistryTest {
       )
 
     this.run {
-      val result1 = provider.load(this.context, true)
+      val result1 = provider.load(this.context, true, true)
       this.logger.debug("status: {}", result1)
       val success1 = result1 as SourceSucceeded
       Assertions.assertEquals(43, success1.results.size)

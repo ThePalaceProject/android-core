@@ -63,18 +63,28 @@ interface AccountProviderRegistryType : AutoCloseable {
    *
    * @param includeTestingLibraries A hint for providers indicating whether
    * testing libraries should be loaded. May be ignored by some providers.
+   * @param useCache A hint for providers indicating that they should use any cache they have
+   * in order to speed up loading.
    */
 
-  fun refresh(includeTestingLibraries: Boolean)
+  fun refresh(
+    includeTestingLibraries: Boolean,
+    useCache: Boolean = true
+  )
 
   /**
    * Refresh the available account providers from all sources.
    *
    * @param includeTestingLibraries A hint for providers indicating whether
    * testing libraries should be loaded. May be ignored by some providers.
+   * @param useCache A hint for providers indicating that they should use any cache they have
+   * in order to speed up loading.
    */
 
-  fun refreshAsync(includeTestingLibraries: Boolean): CompletableFuture<Unit>
+  fun refreshAsync(
+    includeTestingLibraries: Boolean,
+    useCache: Boolean = true
+  ): CompletableFuture<Unit>
 
   /**
    * Execute a search query on the registry.

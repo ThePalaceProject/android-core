@@ -472,7 +472,7 @@ abstract class AccountProviderDescriptionRegistryContract {
   }
 
   class OKAncientSource : AccountProviderSourceType {
-    override fun load(context: Context, includeTestingLibraries: Boolean): SourceResult {
+    override fun load(context: Context, includeTestingLibraries: Boolean, useCache: Boolean): SourceResult {
       return SourceResult.SourceSucceeded(
         mapOf(
           Pair(descriptionOld0.id, descriptionOld0),
@@ -483,7 +483,7 @@ abstract class AccountProviderDescriptionRegistryContract {
     }
 
     override fun query(context: Context, query: AccountSearchQuery): SourceResult {
-      return this.load(context, query.includeTestingLibraries)
+      return this.load(context, query.includeTestingLibraries, query.useCache)
     }
 
     override fun clear(context: Context) {}
@@ -501,7 +501,7 @@ abstract class AccountProviderDescriptionRegistryContract {
   }
 
   class OKSource : AccountProviderSourceType {
-    override fun load(context: Context, includeTestingLibraries: Boolean): SourceResult {
+    override fun load(context: Context, includeTestingLibraries: Boolean, useCache: Boolean): SourceResult {
       return SourceResult.SourceSucceeded(
         mapOf(
           Pair(description0.id, description0),
@@ -512,7 +512,7 @@ abstract class AccountProviderDescriptionRegistryContract {
     }
 
     override fun query(context: Context, query: AccountSearchQuery): SourceResult {
-      return load(context, query.includeTestingLibraries)
+      return load(context, query.includeTestingLibraries, query.useCache)
     }
 
     override fun clear(context: Context) {}
@@ -530,7 +530,7 @@ abstract class AccountProviderDescriptionRegistryContract {
   }
 
   class CrashingSource : AccountProviderSourceType {
-    override fun load(context: Context, includeTestingLibraries: Boolean): SourceResult {
+    override fun load(context: Context, includeTestingLibraries: Boolean, useCache: Boolean): SourceResult {
       throw Exception()
     }
 
@@ -553,12 +553,12 @@ abstract class AccountProviderDescriptionRegistryContract {
   }
 
   class FailingSource : AccountProviderSourceType {
-    override fun load(context: Context, includeTestingLibraries: Boolean): SourceResult {
+    override fun load(context: Context, includeTestingLibraries: Boolean, useCache: Boolean): SourceResult {
       return SourceResult.SourceFailed(mapOf(), java.lang.Exception())
     }
 
     override fun query(context: Context, query: AccountSearchQuery): SourceResult {
-      return this.load(context, query.includeTestingLibraries)
+      return this.load(context, query.includeTestingLibraries, query.useCache)
     }
 
     override fun clear(context: Context) {}

@@ -48,9 +48,15 @@ interface AccountProviderSourceType {
    *
    * @param includeTestingLibraries A hint for the provider indicating whether
    * testing libraries should be loaded. May be ignored by some providers.
+   * @param useCache A hint for the provider indicating that it should use any cache it has
+   * in order to speed up loading.
    */
 
-  fun load(context: Context, includeTestingLibraries: Boolean): SourceResult
+  fun load(
+    context: Context,
+    includeTestingLibraries: Boolean,
+    useCache: Boolean
+  ): SourceResult
 
   /**
    * Retrieve everything the source provides.
@@ -59,7 +65,10 @@ interface AccountProviderSourceType {
    * testing libraries should be loaded. May be ignored by some providers.
    */
 
-  fun query(context: Context, query: AccountSearchQuery): SourceResult
+  fun query(
+    context: Context,
+    query: AccountSearchQuery
+  ): SourceResult
 
   /**
    * Clear any cached providers.

@@ -83,10 +83,10 @@ class MockAccountProviderRegistry(
   override val status: AccountProviderRegistryStatus
     get() = AccountProviderRegistryStatus.Idle
 
-  override fun refresh(includeTestingLibraries: Boolean) {
+  override fun refresh(includeTestingLibraries: Boolean, useCache: Boolean) {
   }
 
-  override fun refreshAsync(includeTestingLibraries: Boolean): CompletableFuture<Unit> {
+  override fun refreshAsync(includeTestingLibraries: Boolean, useCache: Boolean): CompletableFuture<Unit> {
     val future = CompletableFuture<Unit>()
     future.complete(Unit)
     return future

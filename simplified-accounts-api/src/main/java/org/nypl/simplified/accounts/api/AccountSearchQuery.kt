@@ -7,5 +7,6 @@ package org.nypl.simplified.accounts.api
 data class AccountSearchQuery(
   val location: AccountGeoLocation?,
   val searchQuery: String,
-  val includeTestingLibraries: Boolean
+  val includeTestingLibraries: Boolean,
+  val useCache: Boolean = true
 )

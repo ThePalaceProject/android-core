@@ -74,7 +74,8 @@ class AccountProviderSourceNYPLRegistry(
 
   override fun load(
     context: Context,
-    includeTestingLibraries: Boolean
+    includeTestingLibraries: Boolean,
+    useCache: Boolean
   ): SourceResult {
     if (this.stringResources == null) {
       this.stringResources =
@@ -84,7 +85,12 @@ class AccountProviderSourceNYPLRegistry(
     }
 
     val files = this.cacheFiles(context)
-    val diskResults = this.fetchDiskResults(files)
+    val diskResults =
+      if (useCache) {
+        this.fetchDiskResults(files)
+      } else {
+        mutableMapOf()
+      }
 
     return try {
       /*
@@ -125,7 +131,8 @@ class AccountProviderSourceNYPLRegistry(
   ): SourceResult {
     val result = this.load(
       context = context,
-      includeTestingLibraries = query.includeTestingLibraries
+      includeTestingLibraries = query.includeTestingLibraries,
+      useCache = query.useCache
     )
 
     /*

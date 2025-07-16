@@ -101,7 +101,10 @@ class AccountProviderRegistry private constructor(
   override val accountProviderDescriptionsAttribute: AttributeReadableType<Map<URI, AccountProviderDescription>>
     get() = this.accountProviderDescriptionsAttributeActual
 
-  override fun refresh(includeTestingLibraries: Boolean) {
+  override fun refresh(
+    includeTestingLibraries: Boolean,
+    useCache: Boolean
+  ) {
     this.logger.debug("refreshing account provider descriptions")
 
     this.statusAttributeActual.set(Refreshing)
@@ -110,7 +113,10 @@ class AccountProviderRegistry private constructor(
     try {
       for (source in this.sources) {
         try {
-          when (val result = source.load(this.context, includeTestingLibraries)) {
+          when (val result = source.load(
+            context = this.context,
+            includeTestingLibraries = includeTestingLibraries,
+            useCache = useCache)) {
             is AccountProviderSourceType.SourceResult.SourceSucceeded -> {
               val newDescriptions = result.results
               for (key in newDescriptions.keys) {
@@ -134,13 +140,17 @@ class AccountProviderRegistry private constructor(
   }
 
   override fun refreshAsync(
-    includeTestingLibraries: Boolean
+    includeTestingLibraries: Boolean,
+    useCache: Boolean
   ): CompletableFuture<Unit> {
     val future = CompletableFuture<Unit>()
     try {
       this.exec.execute {
         try {
-          future.complete(this.refresh(includeTestingLibraries))
+          future.complete(this.refresh(
+            includeTestingLibraries = includeTestingLibraries,
+            useCache = useCache
+          ))
         } catch (e: Throwable) {
           future.completeExceptionally(e)
         }

@@ -43,6 +43,7 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug), MainBackButtonC
   private val logger =
     LoggerFactory.getLogger(SettingsDebugFragment::class.java)
 
+  private lateinit var accountProviders: AccountProviderRegistryType
   private lateinit var adobeDRMActivationTable: TableLayout
   private lateinit var cacheButton: Button
   private lateinit var crashButton: Button
@@ -166,6 +167,10 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug), MainBackButtonC
     this.subscriptions =
       CloseableCollection.create()
 
+    this.accountProviders =
+      Services.serviceDirectory()
+        .requireService(AccountProviderRegistryType::class.java)
+
     this.toolbarBack.setOnClickListener {
       this.toolbarBack.postDelayed(MainNavigation.Settings::goUp, 500)
     }
@@ -224,6 +229,10 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug), MainBackButtonC
 
     this.showTesting.setOnCheckedChangeListener { _, checked ->
       SettingsDebugModel.updatePreferences { p -> p.copy(showTestingLibraries = checked) }
+      this.accountProviders.refreshAsync(
+        includeTestingLibraries = checked,
+        useCache = false
+      )
     }
 
     /*
