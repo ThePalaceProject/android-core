@@ -161,6 +161,7 @@ class BorrowBoundless private constructor() : BorrowSubtaskType {
     fulfilledItems.epubFile.delete()
     fulfilledItems.licenseFile.delete()
     context.taskRecorder.currentStepSucceeded("Saved book.")
+    context.bookDownloadSucceeded()
   }
 
   private fun checkDRMSupport(

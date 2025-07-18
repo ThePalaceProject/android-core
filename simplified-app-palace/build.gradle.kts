@@ -613,6 +613,7 @@ dependencies {
     implementation(libs.rxjava2)
     implementation(libs.rxjava2.extensions)
     implementation(libs.slf4j)
+    implementation(libs.stduritemplate)
     implementation(libs.timber)
     implementation(libs.transport.api)
     implementation(libs.transport.backend.cct)

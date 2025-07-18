@@ -1,13 +1,14 @@
 package org.nypl.simplified.links
 
 import one.irradia.mime.api.MIMEType
+import java.io.Serializable
 import java.net.URI
 
 /**
  * A link.
  */
 
-sealed class Link {
+sealed class Link : Serializable {
 
   /**
    * The MIME type of the link content.
@@ -84,7 +85,7 @@ sealed class Link {
     override val width: Int? = null,
     override val duration: Double? = null,
     override val bitrate: Double? = null
-  ) : Link() {
+  ) : Link(), Serializable {
     override val hrefURI: URI
       get() = this.href
 
@@ -110,7 +111,7 @@ sealed class Link {
     override val width: Int? = null,
     override val duration: Double? = null,
     override val bitrate: Double? = null
-  ) : Link() {
+  ) : Link(), Serializable {
     override val hrefURI: URI?
       get() = null
 
