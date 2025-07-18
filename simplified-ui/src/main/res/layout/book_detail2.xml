@@ -223,6 +223,9 @@
             android:layout_height="48dp"
             android:layout_marginEnd="32dp"
             android:layout_marginBottom="16dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="@android:color/white"
+            style="@style/Palace.Button.Contained.Medium"
             android:text="@string/catalogGet"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -387,6 +390,7 @@
             android:layout_marginStart="32dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="32dp"
+            android:textSize="15sp"
             android:ellipsize="end"
             android:maxLines="1"
             android:textAppearance="@android:style/TextAppearance.Material.Title"
@@ -431,6 +435,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
+                    android:textSize="11sp"
                     android:textAppearance="@android:style/TextAppearance.Material.Title"
                     tools:text="@string/catalogPlaceholder" />
 
@@ -440,6 +445,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
+                    android:textSize="10sp"
                     tools:text="@string/catalogPlaceholder" />
 
             </LinearLayout>

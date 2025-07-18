@@ -308,6 +308,7 @@ class CatalogFeedViewDetails2(
 
     this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
     this.bottomSheetDarken.alpha = 0.0f
+    this.setVisibility(this.bottomSheet, View.INVISIBLE)
     this.bottomSheetBehavior.addBottomSheetCallback(object :
       BottomSheetCallback() {
       override fun onStateChanged(
@@ -317,6 +318,7 @@ class CatalogFeedViewDetails2(
         val c = this@CatalogFeedViewDetails2
         when (newState) {
           STATE_EXPANDED -> {
+            c.setVisibility(c.bottomSheet, View.VISIBLE)
             c.bottomSheetDarken.alpha = c.bottomSheetDarkenOpacityMax
           }
 
