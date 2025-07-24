@@ -370,23 +370,11 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
           }
         }
 
-        val bookmarkLastRead =
-          this.assignBookmarks(bookmarks)
-
-        val initialPosition =
-          if (bookmarkLastRead != null) {
-            this.logger.debug("Restoring last-read position: {}", bookmarkLastRead.position)
-            bookmarkLastRead.position
-          } else {
-            null
-          }
-
         PlayerModel.openPlayerForManifest(
           context = this.application,
           userAgent = PlayerUserAgent(bookParameters.userAgent),
           manifest = state.manifest,
           fetchAll = true,
-          initialPosition = initialPosition,
           bookSource = state.bookSource,
           bookCredentials = bookParameters.drmInfo.playerCredentials()
         )

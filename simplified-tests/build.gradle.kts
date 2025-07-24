@@ -196,7 +196,6 @@ val dependencyObjects = listOf(
     libs.media3.session,
     libs.mockito.android,
     libs.mockito.core,
-    libs.mockito.kotlin,
     libs.nypl.readium,
     libs.objenesis,
     libs.okhttp3,
@@ -226,6 +225,7 @@ val dependencyObjects = listOf(
     libs.palace.audiobook.manifest.parser.webpub,
     libs.palace.audiobook.media3,
     libs.palace.audiobook.parser.api,
+    libs.palace.audiobook.persistence,
     libs.palace.audiobook.time.tracking,
     libs.palace.audiobook.views,
     libs.palace.drm.core,
@@ -269,6 +269,23 @@ val dependencyObjects = listOf(
     libs.rxjava2.extensions,
     libs.slf4j,
     libs.transifex.sdk,
+
+    // SQLite
+    libs.io7m.anethum.api,
+    libs.io7m.blackthorne.core,
+    libs.io7m.blackthorne.jxe,
+    libs.io7m.jaffirm.core,
+    libs.io7m.jattribute.core,
+    libs.io7m.jlexing.core,
+    libs.io7m.junreachable,
+    libs.io7m.jxe.core,
+    libs.io7m.seltzer.api,
+    libs.io7m.trasco.api,
+    libs.io7m.trasco.vanilla,
+    libs.io7m.trasco.xml.schemas,
+    libs.io7m.xyloid.natives,
+    libs.xerces,
+    libs.xerial.sqlite,
 )
 
 dependencies {

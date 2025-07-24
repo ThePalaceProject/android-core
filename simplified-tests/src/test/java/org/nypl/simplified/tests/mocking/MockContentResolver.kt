@@ -1,11 +1,12 @@
 package org.nypl.simplified.tests.mocking
 
+import android.content.ContentResolver
 import org.nypl.simplified.content.api.ContentResolverType
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.net.URI
 
-class MockContentResolver : ContentResolverType {
+class MockContentResolver : ContentResolverType, ContentResolver(MockContext()) {
 
   var queue = mutableListOf<ByteArray>()
 

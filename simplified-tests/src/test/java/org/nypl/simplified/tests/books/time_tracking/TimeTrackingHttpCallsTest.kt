@@ -1,6 +1,5 @@
 package org.nypl.simplified.tests.books.time_tracking
 
-import android.content.Context
 import com.fasterxml.jackson.databind.ObjectMapper
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -11,32 +10,28 @@ import org.junit.jupiter.api.Test
 import org.librarysimplified.http.api.LSHTTPClientConfiguration
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.vanilla.LSHTTPClients
-import org.mockito.Mock
-import org.mockito.Mockito
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountLoginState
 import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountUsername
-import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.time.tracking.TimeTrackingEntry
 import org.nypl.simplified.books.time.tracking.TimeTrackingHTTPCalls
 import org.nypl.simplified.books.time.tracking.TimeTrackingRequest
 import org.nypl.simplified.books.time.tracking.TimeTrackingServerResponse
 import org.nypl.simplified.books.time.tracking.TimeTrackingServerResponseEntry
 import org.nypl.simplified.books.time.tracking.TimeTrackingServerResponseSummary
+import org.nypl.simplified.tests.mocking.MockAccount
+import org.nypl.simplified.tests.mocking.MockContext
+import org.nypl.simplified.tests.mocking.MockProfilesController
 import java.net.InetAddress
 import java.net.URI
 import java.util.concurrent.TimeUnit
 
 class TimeTrackingHttpCallsTest {
+  private lateinit var account: MockAccount
+  private lateinit var profiles: MockProfilesController
   private lateinit var httpClient: LSHTTPClientType
   private lateinit var webServer: MockWebServer
-
-  @Mock
-  private val account: AccountType = Mockito.mock(AccountType::class.java)
-
-  @Mock
-  private val loginState: AccountLoginState = Mockito.mock(AccountLoginState::class.java)
 
   @BeforeEach
   fun testSetup() {
@@ -53,16 +48,19 @@ class TimeTrackingHttpCallsTest {
         deviceRegistrationURI = URI("https://www.example.com")
       )
 
-    Mockito.`when`(account.loginState).thenReturn(loginState)
-    Mockito.`when`(loginState.credentials).thenReturn(credentials)
+    this.profiles =
+      MockProfilesController(1, 1)
+    this.account =
+      profiles.profileList[0].accountList[0]
 
-    val context =
-      Mockito.mock(Context::class.java)
+    this.account.setLoginState(
+      AccountLoginState.AccountLoggedIn(credentials)
+    )
 
     this.httpClient =
       LSHTTPClients()
         .create(
-          context = context,
+          context = MockContext(),
           configuration = LSHTTPClientConfiguration(
             applicationName = "simplified-tests",
             applicationVersion = "999.999.0",

@@ -1,8 +1,6 @@
-
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
+import org.mockito.Mockito
 import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.api.AccountReadableType
 import org.nypl.simplified.ui.accounts.AccountComparator
@@ -30,11 +28,17 @@ class AccountComparatorTest {
 private fun mockAccount(
   displayName: String
 ): AccountReadableType {
-  val mockProvider = mock<AccountProviderType> {
-    on { this.displayName } doReturn displayName
-  }
-  return mock<AccountReadableType> {
-    on { this.provider } doReturn mockProvider
-    on { toString() } doReturn displayName
-  }
+  val mockProvider =
+    Mockito.mock(AccountProviderType::class.java)
+  Mockito.`when`(mockProvider.displayName)
+    .thenReturn(displayName)
+
+  val mockAccount =
+    Mockito.mock(AccountReadableType::class.java)
+  Mockito.`when`(mockAccount.provider)
+    .thenReturn(mockProvider)
+  Mockito.`when`(mockAccount.toString())
+    .thenReturn(displayName)
+
+  return mockAccount
 }
