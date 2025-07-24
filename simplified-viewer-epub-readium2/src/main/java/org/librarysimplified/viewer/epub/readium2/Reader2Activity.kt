@@ -558,6 +558,10 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
         exception
       }
 
+    MDC.put("DRMFailure", actualException.message)
+    this.logger.error("Failed to open book: ", actualException)
+    MDC.remove("DRMFailure")
+
     MaterialAlertDialogBuilder(this)
       .setTitle(R.string.bookOpenFailedTitle)
       .setMessage(
