@@ -50,6 +50,7 @@ import org.nypl.simplified.tests.books.controller.FakeAccounts.fakeAccount
 import org.nypl.simplified.tests.books.controller.FakeAccounts.fakeAccountProvider
 import org.nypl.simplified.tests.books.controller.TaskDumps
 import org.nypl.simplified.tests.mocking.MockAccountLoginStringResources
+import org.nypl.simplified.tests.mocking.MockProfilesController
 import org.slf4j.Logger
 import java.net.URI
 import java.util.UUID
@@ -1257,12 +1258,33 @@ abstract class ProfileAccountLoginTaskContract {
   @Test
   @Timeout(value = 5L, unit = TimeUnit.SECONDS)
   fun testLoginAdobeDRMMultipleActivations() {
-    val previouslyLoggedInAccountId = AccountID(UUID.randomUUID())
-    val previouslyLoggedInAccount = Mockito.mock(AccountType::class.java, Mockito.RETURNS_DEEP_STUBS)
+    val profiles = MockProfilesController(1, 2)
+    val profile = profiles.profileList[0]
+    val previouslyLoggedInAccountId = profile.accountList[0].id
+    val previouslyLoggedInAccount = profile.accountList[0]
 
-    Mockito.`when`(
-      previouslyLoggedInAccount.loginState.credentials?.adobeCredentials?.postActivationCredentials?.userID
-    ).thenReturn(AdobeUserID("someone"))
+    previouslyLoggedInAccount.setLoginState(
+      AccountLoggedIn(
+        AccountAuthenticationCredentials.Basic(
+          userName = AccountUsername("x"),
+          password = AccountPassword("y"),
+          adobeCredentials = AccountAuthenticationAdobePreActivationCredentials(
+            vendorID = AdobeVendorID("OmniConsumerProducts"),
+            clientToken = AccountAuthenticationAdobeClientToken(
+              "x", "y", "r"
+            ),
+            deviceManagerURI = null,
+            postActivationCredentials = AccountAuthenticationAdobePostActivationCredentials(
+              deviceID = AdobeDeviceID("484799fb-d1aa-4b5d-8179-95e0b115ace4"),
+              userID = AdobeUserID("someone")
+            )
+          ),
+          authenticationDescription = null,
+          annotationsURI = null,
+          deviceRegistrationURI = null
+        )
+      )
+    )
 
     val authDescription =
       AccountProviderAuthenticationDescription.Basic(

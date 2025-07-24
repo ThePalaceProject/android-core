@@ -14,24 +14,21 @@ import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.api.io.TempDir
 import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.librarysimplified.audiobook.time_tracking.PlayerTimeTracked
-import org.mockito.Mockito
-import org.mockito.internal.verification.Times
-import org.mockito.kotlin.any
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountProviderType
-import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.time.tracking.TimeTrackingEntry
 import org.nypl.simplified.books.time.tracking.TimeTrackingEntryOutgoing
-import org.nypl.simplified.books.time.tracking.TimeTrackingHTTPCallsType
 import org.nypl.simplified.books.time.tracking.TimeTrackingRequest
 import org.nypl.simplified.books.time.tracking.TimeTrackingSender
 import org.nypl.simplified.books.time.tracking.TimeTrackingSenderServiceType
 import org.nypl.simplified.books.time.tracking.TimeTrackingServerResponse
 import org.nypl.simplified.books.time.tracking.TimeTrackingServerResponseEntry
 import org.nypl.simplified.books.time.tracking.TimeTrackingServerResponseSummary
-import org.nypl.simplified.profiles.api.ProfileType
-import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
-import org.slf4j.LoggerFactory
+import org.nypl.simplified.tests.mocking.FakeTimeTrackingHTTPCalls
+import org.nypl.simplified.tests.mocking.MockAccount
+import org.nypl.simplified.tests.mocking.MockProfile
+import org.nypl.simplified.tests.mocking.MockProfilesController
+import java.io.IOException
 import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Path
@@ -40,32 +37,27 @@ import java.nio.file.StandardOpenOption.CREATE
 import java.nio.file.StandardOpenOption.TRUNCATE_EXISTING
 import java.nio.file.StandardOpenOption.WRITE
 import java.time.Duration
-import java.util.UUID
 import java.util.concurrent.TimeUnit
 import java.util.stream.Collectors
 
 class TimeTrackingSenderTest {
 
-  private val logger =
-    LoggerFactory.getLogger(TimeTrackingSenderTest::class.java)
-
-  private val accountID =
-    AccountID(UUID.randomUUID())
   private val palaceID =
     PlayerPalaceID("cbd92367-f3e1-4310-a767-a07058271c2b")
   private val palaceIDWrong =
     PlayerPalaceID("e1cc010f-e88d-4c16-a12e-ab7b9f5c2065")
 
-  private lateinit var profiles: ProfilesControllerType
+  private lateinit var accountProviderRef: AccountProviderType
+  private lateinit var accountID: AccountID
+  private lateinit var account: MockAccount
+  private lateinit var profile: MockProfile
+  private lateinit var profiles: MockProfilesController
   private lateinit var resources: CloseableCollectionType<ClosingResourceFailedException>
   private lateinit var sender: TimeTrackingSenderServiceType
   private lateinit var inboxDirectory: Path
   private lateinit var debugDirectory: Path
   private lateinit var timeSegments: PublishSubject<PlayerTimeTracked>
-  private lateinit var accountRef: AccountType
-  private lateinit var profileRef: ProfileType
-  private lateinit var accountProviderRef: AccountProviderType
-  private lateinit var httpCalls: TimeTrackingHTTPCallsType
+  private lateinit var httpCalls: FakeTimeTrackingHTTPCalls
 
   @BeforeEach
   fun setup(
@@ -77,26 +69,18 @@ class TimeTrackingSenderTest {
     this.inboxDirectory = inboxDirectory
 
     this.profiles =
-      Mockito.mock(ProfilesControllerType::class.java)
-    this.accountRef =
-      Mockito.mock(AccountType::class.java)
-    this.profileRef =
-      Mockito.mock(ProfileType::class.java)
+      MockProfilesController(1, 1)
+    this.profile =
+      this.profiles.profileList[0]
+    this.account =
+      this.profile.accountList[0]
+    this.accountID =
+      this.account.id
     this.accountProviderRef =
-      Mockito.mock(AccountProviderType::class.java)
-
-    Mockito.`when`(this.profiles.profileCurrent())
-      .thenReturn(this.profileRef)
-    Mockito.`when`(this.profileRef.account(any()))
-      .thenReturn(this.accountRef)
-    Mockito.`when`(this.accountRef.provider)
-      .thenReturn(this.accountProviderRef)
-    Mockito.`when`(this.accountProviderRef.id)
-      .thenReturn(URI.create("urn:uuid:d36a27ab-acd4-4e49-b2cc-19086c780cfb"))
+      this.account.provider
 
     this.httpCalls =
-      Mockito.mock(TimeTrackingHTTPCallsType::class.java)
-
+      FakeTimeTrackingHTTPCalls()
     this.timeSegments =
       PublishSubject.create()
 
@@ -126,7 +110,7 @@ class TimeTrackingSenderTest {
     this.sender.awaitWrite(1L, TimeUnit.SECONDS)
     this.sender.awaitWrite(1L, TimeUnit.SECONDS)
 
-    Mockito.verifyNoInteractions(this.httpCalls)
+    assertEquals(0, this.httpCalls.requests.size)
   }
 
   @Test
@@ -136,7 +120,7 @@ class TimeTrackingSenderTest {
 
     this.sender.awaitWrite(1L, TimeUnit.SECONDS)
 
-    Mockito.verifyNoInteractions(this.httpCalls)
+    assertEquals(0, this.httpCalls.requests.size)
 
     assertEquals(
       listOf<Path>(),
@@ -164,8 +148,8 @@ class TimeTrackingSenderTest {
         )
       )
 
-    Mockito.`when`(this.httpCalls.registerTimeTrackingInfo(any(), any()))
-      .thenReturn(TimeTrackingServerResponse(
+    this.httpCalls.responses.add(
+      TimeTrackingServerResponse(
         responses = listOf(
           TimeTrackingServerResponseEntry(
             id = "01JAD2H8Y8DY3K0WZVBXZH3MBM",
@@ -178,7 +162,8 @@ class TimeTrackingSenderTest {
           successes = 1,
           total = 1
         )
-      ))
+      )
+    )
 
     val file =
       this.inboxDirectory.resolve("01JAD2H8Y8DY3K0WZVBXZH3MBM.tteo")
@@ -198,16 +183,16 @@ class TimeTrackingSenderTest {
 
     this.sender.awaitWrite(1L, TimeUnit.SECONDS)
 
-    Mockito.verify(this.httpCalls, Times(1))
-      .registerTimeTrackingInfo(
-        request = TimeTrackingRequest(
-          bookId = this.palaceID.value,
-          libraryId = this.accountProviderRef.id,
-          timeTrackingUri = URI.create("https://www.example.com"),
-          timeEntries = listOf(entry.timeEntry)
-        ),
-        account = this.accountRef
-      )
+    assertEquals(
+      TimeTrackingRequest(
+        bookId = this.palaceID.value,
+        libraryId = this.accountProviderRef.id,
+        timeTrackingUri = URI.create("https://www.example.com"),
+        timeEntries = listOf(entry.timeEntry)
+      ),
+      this.httpCalls.requests[0]
+    )
+    assertEquals(1, this.httpCalls.requests.size)
 
     assertNotEquals(
       listOf<Path>(),
@@ -236,15 +221,16 @@ class TimeTrackingSenderTest {
         )
       )
 
-    Mockito.`when`(this.httpCalls.registerTimeTrackingInfo(any(), any()))
-      .thenReturn(TimeTrackingServerResponse(
+    this.httpCalls.responses.add(
+      TimeTrackingServerResponse(
         responses = listOf(),
         summary = TimeTrackingServerResponseSummary(
           failures = 0,
           successes = 1,
           total = 1
         )
-      ))
+      )
+    )
 
     val file =
       this.inboxDirectory.resolve("01JAD2H8Y8DY3K0WZVBXZH3MBM.tteo")
@@ -264,16 +250,16 @@ class TimeTrackingSenderTest {
 
     this.sender.awaitWrite(1L, TimeUnit.SECONDS)
 
-    Mockito.verify(this.httpCalls, Times(1))
-      .registerTimeTrackingInfo(
-        request = TimeTrackingRequest(
-          bookId = this.palaceID.value,
-          libraryId = this.accountProviderRef.id,
-          timeTrackingUri = URI.create("https://www.example.com"),
-          timeEntries = listOf(entry.timeEntry)
-        ),
-        account = this.accountRef
-      )
+    assertEquals(
+      TimeTrackingRequest(
+        bookId = this.palaceID.value,
+        libraryId = this.accountProviderRef.id,
+        timeTrackingUri = URI.create("https://www.example.com"),
+        timeEntries = listOf(entry.timeEntry)
+      ),
+      this.httpCalls.requests[0]
+    )
+    assertEquals(1, this.httpCalls.requests.size)
 
     assertNotEquals(
       listOf<Path>(),
@@ -306,8 +292,8 @@ class TimeTrackingSenderTest {
      * The server returns an error twice, and then returns success on the third attempt.
      */
 
-    Mockito.`when`(this.httpCalls.registerTimeTrackingInfo(any(), any()))
-      .thenReturn(TimeTrackingServerResponse(
+    this.httpCalls.responses.add(
+      TimeTrackingServerResponse(
         responses = listOf(
           TimeTrackingServerResponseEntry(
             id = "01JAD2H8Y8DY3K0WZVBXZH3MBM",
@@ -320,8 +306,10 @@ class TimeTrackingSenderTest {
           successes = 0,
           total = 1
         )
-      ))
-      .thenReturn(TimeTrackingServerResponse(
+      ),
+    )
+    this.httpCalls.responses.add(
+      TimeTrackingServerResponse(
         responses = listOf(
           TimeTrackingServerResponseEntry(
             id = "01JAD2H8Y8DY3K0WZVBXZH3MBM",
@@ -334,15 +322,18 @@ class TimeTrackingSenderTest {
           successes = 0,
           total = 1
         )
-      ))
-      .thenReturn(TimeTrackingServerResponse(
+      )
+    )
+    this.httpCalls.responses.add(
+      TimeTrackingServerResponse(
         responses = listOf(),
         summary = TimeTrackingServerResponseSummary(
           failures = 0,
           successes = 1,
           total = 1
         )
-      ))
+      )
+    )
 
     val file =
       this.inboxDirectory.resolve("01JAD2H8Y8DY3K0WZVBXZH3MBM.tteo")
@@ -364,16 +355,34 @@ class TimeTrackingSenderTest {
     this.sender.awaitWrite(1L, TimeUnit.SECONDS)
     this.sender.awaitWrite(1L, TimeUnit.SECONDS)
 
-    Mockito.verify(this.httpCalls, Times(3))
-      .registerTimeTrackingInfo(
-        request = TimeTrackingRequest(
-          bookId = this.palaceID.value,
-          libraryId = this.accountProviderRef.id,
-          timeTrackingUri = URI.create("https://www.example.com"),
-          timeEntries = listOf(entry.timeEntry)
-        ),
-        account = this.accountRef
-      )
+    assertEquals(
+      TimeTrackingRequest(
+        bookId = this.palaceID.value,
+        libraryId = this.accountProviderRef.id,
+        timeTrackingUri = URI.create("https://www.example.com"),
+        timeEntries = listOf(entry.timeEntry)
+      ),
+      this.httpCalls.requests[0]
+    )
+    assertEquals(
+      TimeTrackingRequest(
+        bookId = this.palaceID.value,
+        libraryId = this.accountProviderRef.id,
+        timeTrackingUri = URI.create("https://www.example.com"),
+        timeEntries = listOf(entry.timeEntry)
+      ),
+      this.httpCalls.requests[1]
+    )
+    assertEquals(
+      TimeTrackingRequest(
+        bookId = this.palaceID.value,
+        libraryId = this.accountProviderRef.id,
+        timeTrackingUri = URI.create("https://www.example.com"),
+        timeEntries = listOf(entry.timeEntry)
+      ),
+      this.httpCalls.requests[2]
+    )
+    assertEquals(3, this.httpCalls.requests.size)
 
     assertNotEquals(
       listOf<Path>(),
@@ -406,31 +415,36 @@ class TimeTrackingSenderTest {
      * The server returns an error twice, and then returns success on the third attempt.
      */
 
-    Mockito.`when`(this.httpCalls.registerTimeTrackingInfo(any(), any()))
-      .thenReturn(TimeTrackingServerResponse(
+    this.httpCalls.responses.add(
+      TimeTrackingServerResponse(
         responses = listOf(),
         summary = TimeTrackingServerResponseSummary(
           failures = 1,
           successes = 0,
           total = 1
         )
-      ))
-      .thenReturn(TimeTrackingServerResponse(
+      )
+    )
+    this.httpCalls.responses.add(
+      TimeTrackingServerResponse(
         responses = listOf(),
         summary = TimeTrackingServerResponseSummary(
           failures = 1,
           successes = 0,
           total = 1
         )
-      ))
-      .thenReturn(TimeTrackingServerResponse(
+      )
+    )
+    this.httpCalls.responses.add(
+      TimeTrackingServerResponse(
         responses = listOf(),
         summary = TimeTrackingServerResponseSummary(
           failures = 0,
           successes = 1,
           total = 1
         )
-      ))
+      )
+    )
 
     val file =
       this.inboxDirectory.resolve("01JAD2H8Y8DY3K0WZVBXZH3MBM.tteo")
@@ -452,16 +466,34 @@ class TimeTrackingSenderTest {
     this.sender.awaitWrite(1L, TimeUnit.SECONDS)
     this.sender.awaitWrite(1L, TimeUnit.SECONDS)
 
-    Mockito.verify(this.httpCalls, Times(3))
-      .registerTimeTrackingInfo(
-        request = TimeTrackingRequest(
-          bookId = this.palaceID.value,
-          libraryId = this.accountProviderRef.id,
-          timeTrackingUri = URI.create("https://www.example.com"),
-          timeEntries = listOf(entry.timeEntry)
-        ),
-        account = this.accountRef
-      )
+    assertEquals(
+      TimeTrackingRequest(
+        bookId = this.palaceID.value,
+        libraryId = this.accountProviderRef.id,
+        timeTrackingUri = URI.create("https://www.example.com"),
+        timeEntries = listOf(entry.timeEntry)
+      ),
+      this.httpCalls.requests[0]
+    )
+    assertEquals(
+      TimeTrackingRequest(
+        bookId = this.palaceID.value,
+        libraryId = this.accountProviderRef.id,
+        timeTrackingUri = URI.create("https://www.example.com"),
+        timeEntries = listOf(entry.timeEntry)
+      ),
+      this.httpCalls.requests[1]
+    )
+    assertEquals(
+      TimeTrackingRequest(
+        bookId = this.palaceID.value,
+        libraryId = this.accountProviderRef.id,
+        timeTrackingUri = URI.create("https://www.example.com"),
+        timeEntries = listOf(entry.timeEntry)
+      ),
+      this.httpCalls.requests[2]
+    )
+    assertEquals(3, this.httpCalls.requests.size)
 
     assertNotEquals(
       listOf<Path>(),
@@ -494,17 +526,18 @@ class TimeTrackingSenderTest {
      * The HTTP call raises twice, and then returns success on the third attempt.
      */
 
-    Mockito.`when`(this.httpCalls.registerTimeTrackingInfo(any(), any()))
-      .thenThrow(java.io.IOException("Ouch!"))
-      .thenThrow(java.io.IOException("Ouch!"))
-      .thenReturn(TimeTrackingServerResponse(
+    this.httpCalls.crashes.add(IOException("Ouch!"))
+    this.httpCalls.crashes.add(IOException("Ouch!"))
+    this.httpCalls.responses.add(
+      TimeTrackingServerResponse(
         responses = listOf(),
         summary = TimeTrackingServerResponseSummary(
           failures = 0,
           successes = 1,
           total = 1
         )
-      ))
+      )
+    )
 
     val file =
       this.inboxDirectory.resolve("01JAD2H8Y8DY3K0WZVBXZH3MBM.tteo")
@@ -526,16 +559,34 @@ class TimeTrackingSenderTest {
     this.sender.awaitWrite(1L, TimeUnit.SECONDS)
     this.sender.awaitWrite(1L, TimeUnit.SECONDS)
 
-    Mockito.verify(this.httpCalls, Times(3))
-      .registerTimeTrackingInfo(
-        request = TimeTrackingRequest(
-          bookId = this.palaceID.value,
-          libraryId = this.accountProviderRef.id,
-          timeTrackingUri = URI.create("https://www.example.com"),
-          timeEntries = listOf(entry.timeEntry)
-        ),
-        account = this.accountRef
-      )
+    assertEquals(
+      TimeTrackingRequest(
+        bookId = this.palaceID.value,
+        libraryId = this.accountProviderRef.id,
+        timeTrackingUri = URI.create("https://www.example.com"),
+        timeEntries = listOf(entry.timeEntry)
+      ),
+      this.httpCalls.requests[0]
+    )
+    assertEquals(
+      TimeTrackingRequest(
+        bookId = this.palaceID.value,
+        libraryId = this.accountProviderRef.id,
+        timeTrackingUri = URI.create("https://www.example.com"),
+        timeEntries = listOf(entry.timeEntry)
+      ),
+      this.httpCalls.requests[1]
+    )
+    assertEquals(
+      TimeTrackingRequest(
+        bookId = this.palaceID.value,
+        libraryId = this.accountProviderRef.id,
+        timeTrackingUri = URI.create("https://www.example.com"),
+        timeEntries = listOf(entry.timeEntry)
+      ),
+      this.httpCalls.requests[2]
+    )
+    assertEquals(3, this.httpCalls.requests.size)
 
     assertNotEquals(
       listOf<Path>(),

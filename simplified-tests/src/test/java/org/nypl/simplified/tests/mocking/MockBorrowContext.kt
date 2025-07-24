@@ -63,7 +63,7 @@ class MockBorrowContext(
     BorrowTimeoutConfiguration(2L, TimeUnit.SECONDS)
 
   override var adobeExecutor: AdobeAdeptExecutorType? = null
-  override var boundlessService: BoundlessServiceType? = null
+  override var boundlessService: MockBoundless? = MockBoundless()
   override lateinit var currentAcquisitionPathElement: OPDSAcquisitionPathElement
   override lateinit var opdsAcquisitionPath: OPDSAcquisitionPath
   override var bookCurrent: Book = bookInitial

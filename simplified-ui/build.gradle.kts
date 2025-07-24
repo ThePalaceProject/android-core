@@ -1,5 +1,3 @@
-apply(plugin = "androidx.navigation.safeargs.kotlin")
-
 fun getGitHash(): String {
     val proc = ProcessBuilder("git", "rev-parse", "--short", "HEAD")
         .redirectOutput(ProcessBuilder.Redirect.PIPE)
@@ -12,8 +10,6 @@ fun getGitHash(): String {
 
 android {
     buildFeatures {
-        dataBinding = true
-        viewBinding = true
         buildConfig = true
     }
 

@@ -15,16 +15,15 @@ import org.junit.jupiter.api.io.TempDir
 import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.librarysimplified.audiobook.time_tracking.PlayerTimeTracked
 import org.mockito.Mockito
-import org.mockito.kotlin.any
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountProviderType
-import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.time.tracking.TimeTrackingCollector
 import org.nypl.simplified.books.time.tracking.TimeTrackingCollectorServiceType
 import org.nypl.simplified.books.time.tracking.TimeTrackingReceivedSpan
 import org.nypl.simplified.books.time.tracking.TimeTrackingStatus
-import org.nypl.simplified.profiles.api.ProfileType
-import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
+import org.nypl.simplified.tests.mocking.MockAccount
+import org.nypl.simplified.tests.mocking.MockProfile
+import org.nypl.simplified.tests.mocking.MockProfilesController
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.nio.file.Files
@@ -39,22 +38,20 @@ class TimeTrackingCollectorTest {
   private val logger =
     LoggerFactory.getLogger(TimeTrackingCollectorTest::class.java)
 
-  private val accountID =
-    AccountID(UUID.randomUUID())
   private val palaceID =
     PlayerPalaceID("cbd92367-f3e1-4310-a767-a07058271c2b")
   private val palaceIDWrong =
     PlayerPalaceID("e1cc010f-e88d-4c16-a12e-ab7b9f5c2065")
 
-  private lateinit var profiles: ProfilesControllerType
+  private lateinit var profiles: MockProfilesController
   private lateinit var resources: CloseableCollectionType<ClosingResourceFailedException>
   private lateinit var collector: TimeTrackingCollectorServiceType
   private lateinit var inboxDirectory: Path
   private lateinit var debugDirectory: Path
   private lateinit var timeSegments: PublishSubject<PlayerTimeTracked>
   private lateinit var status: AttributeType<TimeTrackingStatus>
-  private lateinit var accountRef: AccountType
-  private lateinit var profileRef: ProfileType
+  private lateinit var accountRef: MockAccount
+  private lateinit var profileRef: MockProfile
   private lateinit var accountProviderRef: AccountProviderType
 
   @BeforeEach
@@ -67,22 +64,13 @@ class TimeTrackingCollectorTest {
     this.inboxDirectory = inboxDirectory
 
     this.profiles =
-      Mockito.mock(ProfilesControllerType::class.java)
-    this.accountRef =
-      Mockito.mock(AccountType::class.java)
+      MockProfilesController(1, 1)
     this.profileRef =
-      Mockito.mock(ProfileType::class.java)
+      this.profiles.profileList[0]
+    this.accountRef =
+      this.profileRef.accountList[0]
     this.accountProviderRef =
       Mockito.mock(AccountProviderType::class.java)
-
-    Mockito.`when`(this.profiles.profileCurrent())
-      .thenReturn(this.profileRef)
-    Mockito.`when`(this.profileRef.account(any()))
-      .thenReturn(this.accountRef)
-    Mockito.`when`(this.accountRef.provider)
-      .thenReturn(this.accountProviderRef)
-    Mockito.`when`(this.accountProviderRef.id)
-      .thenReturn(URI.create("urn:uuid:d36a27ab-acd4-4e49-b2cc-19086c780cfb"))
 
     this.status =
       Attributes.create { _ -> }
@@ -115,7 +103,7 @@ class TimeTrackingCollectorTest {
   @Timeout(value = 5L, unit = TimeUnit.SECONDS)
   fun testCollectorRecordsSpans() {
     this.status.set(TimeTrackingStatus.Active(
-      accountID = this.accountID,
+      accountID = this.accountRef.id,
       bookId = this.palaceID,
       libraryId = "1014c482-0629-4a57-87ae-f9cc6e933397",
       timeTrackingUri = URI.create("http://www.example.com")
@@ -160,7 +148,7 @@ class TimeTrackingCollectorTest {
       o.bookID
     )
     assertEquals(
-      this.accountID,
+      this.accountRef.id,
       o.accountID
     )
     assertEquals(
@@ -195,7 +183,7 @@ class TimeTrackingCollectorTest {
   @Timeout(value = 5L, unit = TimeUnit.SECONDS)
   fun testCollectorIgnoresInactiveSpansAfterActivity() {
     this.status.set(TimeTrackingStatus.Active(
-      accountID = this.accountID,
+      accountID = this.accountRef.id,
       bookId = this.palaceID,
       libraryId = "1014c482-0629-4a57-87ae-f9cc6e933397",
       timeTrackingUri = URI.create("http://www.example.com")
@@ -225,7 +213,7 @@ class TimeTrackingCollectorTest {
   @Timeout(value = 5L, unit = TimeUnit.SECONDS)
   fun testCollectorIgnoresSpansForWrongBook() {
     this.status.set(TimeTrackingStatus.Active(
-      accountID = this.accountID,
+      accountID = this.accountRef.id,
       bookId = this.palaceID,
       libraryId = "1014c482-0629-4a57-87ae-f9cc6e933397",
       timeTrackingUri = URI.create("http://www.example.com")

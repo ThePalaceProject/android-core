@@ -2,8 +2,6 @@ package org.nypl.simplified.tests.books.borrowing
 
 import android.app.Application
 import android.content.ContentResolver
-import android.content.Context
-import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.joda.time.Instant
@@ -17,16 +15,11 @@ import org.librarysimplified.http.api.LSHTTPClientConfiguration
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.vanilla.LSHTTPClients
 import org.librarysimplified.services.api.ServiceDirectoryType
-import org.mockito.Mockito
-import org.mockito.kotlin.any
 import org.nypl.drm.core.BoundlessFulfilledCMEPUB
-import org.nypl.drm.core.BoundlessServiceType
 import org.nypl.drm.core.DRMTaskResult
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
-import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountLoginState
 import org.nypl.simplified.accounts.api.AccountPassword
-import org.nypl.simplified.accounts.api.AccountProvider
 import org.nypl.simplified.accounts.api.AccountUsername
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.api.Book
@@ -38,7 +31,6 @@ import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.borrowing.internal.BorrowBoundless
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException
-import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.nypl.simplified.books.formats.api.StandardFormatNames.boundlessLicenseFiles
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFiles
 import org.nypl.simplified.links.Link
@@ -53,8 +45,7 @@ import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import org.nypl.simplified.tests.MutableServiceDirectory
 import org.nypl.simplified.tests.TestDirectories
-import org.nypl.simplified.tests.mocking.MockAccountProviders
-import org.nypl.simplified.tests.mocking.MockBookDatabase
+import org.nypl.simplified.tests.mocking.MockApplication
 import org.nypl.simplified.tests.mocking.MockBookDatabaseEntry
 import org.nypl.simplified.tests.mocking.MockBookDatabaseEntryFormatHandleAudioBook
 import org.nypl.simplified.tests.mocking.MockBookDatabaseEntryFormatHandleEPUB
@@ -62,23 +53,31 @@ import org.nypl.simplified.tests.mocking.MockBookDatabaseEntryFormatHandlePDF
 import org.nypl.simplified.tests.mocking.MockBorrowContext
 import org.nypl.simplified.tests.mocking.MockBundledContentResolver
 import org.nypl.simplified.tests.mocking.MockContentResolver
+import org.nypl.simplified.tests.mocking.MockProfile
+import org.nypl.simplified.tests.mocking.MockProfilesController
 import org.slf4j.LoggerFactory
 import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
 import java.net.URI
 import java.nio.file.Files
 import java.util.concurrent.TimeUnit
-import java.util.zip.ZipFile
 
 class BorrowBoundlessEpubTest {
 
+  private val fakeAcquisition: OPDSAcquisition =
+    OPDSAcquisition(
+      relation = OPDSAcquisition.Relation.ACQUISITION_BORROW,
+      uri = Link.LinkBasic(URI.create("http://www.example.com")),
+      type = genericEPUBFiles,
+      indirectAcquisitions = listOf(),
+      properties = mapOf()
+    )
+
+  private lateinit var profile: MockProfile
+  private lateinit var profiles: MockProfilesController
   private lateinit var androidContentResolver: ContentResolver
   private lateinit var downloadsDirectory: File
   private lateinit var androidContext: Application
   private lateinit var account: AccountType
-  private lateinit var accountId: AccountID
-  private lateinit var accountProvider: AccountProvider
   private lateinit var bookDatabase: BookDatabaseType
   private lateinit var bookRegistry: BookRegistryType
   private lateinit var bundledContent: MockBundledContentResolver
@@ -100,9 +99,9 @@ class BorrowBoundlessEpubTest {
     this.webServer.start(20000)
 
     this.androidContext =
-      Mockito.mock(Application::class.java)
+      MockApplication()
     this.androidContentResolver =
-      Mockito.mock(ContentResolver::class.java)
+      MockContentResolver()
     this.downloadsDirectory =
       directory
 
@@ -115,35 +114,25 @@ class BorrowBoundlessEpubTest {
     this.bookRegistry =
       BookRegistry.create()
 
+    this.profiles =
+      MockProfilesController(1, 1)
+    this.profile =
+      this.profiles.profileList[0]
     this.account =
-      Mockito.mock(AccountType::class.java)
+      this.profile.accountList[0]
 
-    Mockito.`when`(this.account.loginState)
-      .thenReturn(
-        AccountLoginState.AccountLoggedIn(
-          AccountAuthenticationCredentials.Basic(
-            userName = AccountUsername("someone"),
-            password = AccountPassword("not a password"),
-            adobeCredentials = null,
-            authenticationDescription = "Basic",
-            annotationsURI = URI("https://www.example.com"),
-            deviceRegistrationURI = URI("https://www.example.com")
-          )
+    this.account.setLoginState(
+      AccountLoginState.AccountLoggedIn(
+        AccountAuthenticationCredentials.Basic(
+          userName = AccountUsername("someone"),
+          password = AccountPassword("not a password"),
+          adobeCredentials = null,
+          authenticationDescription = "Basic",
+          annotationsURI = URI("https://www.example.com"),
+          deviceRegistrationURI = URI("https://www.example.com")
         )
       )
-
-    this.accountProvider =
-      MockAccountProviders.fakeProvider(
-        "urn:uuid:ea9480d4-5479-4ef1-b1d1-84ccbedb680f",
-        this.webServer.hostName,
-        this.webServer.port
-      )
-
-    Mockito.`when`(this.account.provider)
-      .thenReturn(this.accountProvider)
-
-    val androidContext =
-      Mockito.mock(Context::class.java)
+    )
 
     this.httpClient =
       LSHTTPClients()
@@ -157,11 +146,8 @@ class BorrowBoundlessEpubTest {
           )
         )
 
-    this.accountId =
-      AccountID.generate()
-
     this.bookDatabase =
-      MockBookDatabase(this.accountId)
+      this.account.bookDatabase
 
     this.services = MutableServiceDirectory().apply {
       this.putService(
@@ -178,7 +164,7 @@ class BorrowBoundlessEpubTest {
   ): MockBorrowContext {
     val book = Book(
       id = BookIDs.newFromOPDSEntry(feedEntry),
-      account = this.accountId,
+      account = this.account.id,
       cover = null,
       thumbnail = null,
       entry = feedEntry,
@@ -245,8 +231,6 @@ class BorrowBoundlessEpubTest {
     context.opdsAcquisitionPath = acquisitionPath
     context.currentAcquisitionPathElement = acquisitionPath.elements.first()
     context.services = this.services
-    context.boundlessService = Mockito.mock(BoundlessServiceType::class.java)
-
     return context
   }
 
@@ -266,7 +250,7 @@ class BorrowBoundlessEpubTest {
     val licenseTargetPath = "/library/works/38859/fulfill/13"
 
     val acquisitionPath = OPDSAcquisitionPath(
-      source = Mockito.mock(OPDSAcquisition::class.java),
+      source = this.fakeAcquisition,
       elements = listOf(
         OPDSAcquisitionPathElement(
           mimeType = boundlessLicenseFiles,
@@ -290,16 +274,11 @@ class BorrowBoundlessEpubTest {
     licenseFile.writeText("License!")
 
     val context = this.createContext(feedEntry, acquisitionPath)
-    Mockito.`when`(
-      context.boundlessService!!
-        .fulfillEPUB(any(), any(), any(), any(), any(), any(), any())
-    )
-      .thenReturn(
-        DRMTaskResult.DRMTaskSuccess(
-          mapOf(), listOf(), BoundlessFulfilledCMEPUB(
-            epubFile,
-            licenseFile
-          )
+    context.boundlessService!!.fulfillProperty =
+      DRMTaskResult.DRMTaskSuccess(
+        mapOf(), listOf(), BoundlessFulfilledCMEPUB(
+          epubFile,
+          licenseFile
         )
       )
 
@@ -332,7 +311,7 @@ class BorrowBoundlessEpubTest {
     val licenseTargetPath = "/library/works/38859/fulfill/13"
 
     val acquisitionPath = OPDSAcquisitionPath(
-      source = Mockito.mock(OPDSAcquisition::class.java),
+      source = this.fakeAcquisition,
       elements = listOf(
         OPDSAcquisitionPathElement(
           mimeType = boundlessLicenseFiles,
@@ -360,11 +339,8 @@ class BorrowBoundlessEpubTest {
      * Set up the boundless DRM service. The download fails.
      */
 
-    Mockito.`when`(
-      context.boundlessService!!
-        .fulfillEPUB(any(), any(), any(), any(), any(), any(), any())
-    )
-      .thenReturn(DRMTaskResult.DRMTaskFailure(mapOf(), listOf()))
+    context.boundlessService!!.fulfillProperty =
+      DRMTaskResult.DRMTaskFailure(mapOf(), listOf())
 
     // Execute the task. It is expected to halt early.
     val task = BorrowBoundless.createSubtask()
@@ -386,7 +362,7 @@ class BorrowBoundlessEpubTest {
     val licenseTargetPath = "/library/works/38859/fulfill/13"
 
     val acquisitionPath = OPDSAcquisitionPath(
-      source = Mockito.mock(OPDSAcquisition::class.java),
+      source = this.fakeAcquisition,
       elements = listOf(
         OPDSAcquisitionPathElement(
           mimeType = boundlessLicenseFiles,
@@ -418,32 +394,5 @@ class BorrowBoundlessEpubTest {
     }
 
     assertEquals(0, this.webServer.requestCount)
-  }
-
-  @Throws(IOException::class)
-  private fun copyToTempFile(
-    name: String
-  ): File {
-    val file = File.createTempFile(name, "", this.tempDir)
-
-    this.logger.debug("copyToTempFile: {} -> {}", name, file)
-
-    FileOutputStream(file).use { output ->
-      BorrowBoundlessEpubTest::class.java.getResourceAsStream(name)!!.use { input ->
-        val buffer = ByteArray(4096)
-
-        while (true) {
-          val r = input.read(buffer)
-
-          if (r == -1) {
-            break
-          }
-
-          output.write(buffer, 0, r)
-        }
-
-        return file
-      }
-    }
   }
 }
