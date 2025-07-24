@@ -517,4 +517,25 @@ public final class OPDSFeedParserTest {
     assertEquals(Option.some(36914.0), entry.getDuration());
     d.close();
   }
+
+  @Test
+  public void testBoundless20250724Entries()
+    throws Exception {
+    final URI uri = URI.create("http://www.example.com/");
+    final OPDSFeedParserType p =
+      OPDSFeedParser.newParser(OPDSAcquisitionFeedEntryParser.newParser());
+    final InputStream d =
+      OPDSFeedParserTest.getResource("search-boundless-20250724.xml");
+
+    final OPDSAcquisitionFeed f = p.parse(uri, d);
+    final var entries = f.getFeedEntries();
+
+    {
+      var entry = entries.get(0);
+      assertEquals("Myp Chemistry", entry.getTitle());
+    }
+
+    assertEquals(10, entries.size());
+    d.close();
+  }
 }

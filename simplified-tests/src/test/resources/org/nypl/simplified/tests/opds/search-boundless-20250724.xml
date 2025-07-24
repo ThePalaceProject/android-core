@@ -1,0 +1,345 @@
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:app="http://www.w3.org/2007/app" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:opds="http://opds-spec.org/2010/catalog" xmlns:opf="http://www.idpf.org/2007/opf" xmlns:drm="http://librarysimplified.org/terms/drm" xmlns:schema="http://schema.org/" xmlns:simplified="http://librarysimplified.org/terms/" xmlns:bibframe="http://bibframe.org/vocab/" xmlns:bib="http://bib.schema.org/" xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:lcp="http://readium.org/lcp-specs/ns" xmlns:palaceproperties="http://palaceproject.io/terms/properties/" xmlns:odl="http://drafts.opds.io/odl-1.0#">
+  <title>Search</title>
+  <id>https://minotaur.dev.palaceproject.io/minotaur-test-library/search/?entrypoint=All&amp;order=relevance&amp;available=all&amp;search_type=default&amp;q=Myp+Chemistry</id>
+  <updated>2025-07-24T07:17:30+00:00</updated>
+  <entry schema:additionalType="http://schema.org/EBook">
+    <title>Myp Chemistry</title>
+    <simplified:pwid>839757ce-66cc-c656-7077-52e5931d3c50</simplified:pwid>
+    <dcterms:language>en</dcterms:language>
+    <dcterms:publisher>Oxford Univ Pr</dcterms:publisher>
+    <bib:publisherImprint>Oxford Univ Pr</bib:publisherImprint>
+    <dcterms:issued>2018-06-01</dcterms:issued>
+    <id>urn:librarysimplified.org/terms/id/Axis%20360%20ID/0012461749</id>
+    <bibframe:distribution bibframe:ProviderName="Boundless"/>
+    <published>2022-12-16T00:00:00Z</published>
+    <updated>2025-07-13T13:16:14+00:00</updated>
+    <category scheme="http://librarysimplified.org/terms/fiction/" term="http://librarysimplified.org/terms/fiction/Nonfiction" label="Nonfiction"/>
+    <category scheme="http://schema.org/audience" term="Young Adult" label="Young Adult"/>
+    <category scheme="http://schema.org/typicalAgeRange" term="15-18" label="15-18"/>
+    <author>
+      <name>Horner, Gary</name>
+      <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/contributor/Horner,%20Gary/eng/All+Ages,Children,Young+Adult" rel="contributor" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Horner, Gary"/>
+    </author>
+    <link href="https://contentcafecloud.baker-taylor.com/Jacket.svc/D65D0665-050A-487B-9908-16E6D8FF5C3E/9780198397977/Large/Logo" rel="http://opds-spec.org/image" type="image/png"/>
+    <link href="https://contentcafecloud.baker-taylor.com/Jacket.svc/D65D0665-050A-487B-9908-16E6D8FF5C3E/9780198397977/Medium/Logo" rel="http://opds-spec.org/image/thumbnail" type="image/png"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/Axis%20360%20ID/0012461749/borrow/30" rel="http://opds-spec.org/acquisition/borrow" type="application/atom+xml;type=entry;profile=opds-catalog">
+      <opds:indirectAcquisition type="application/vnd.thepalaceproject.baker-taylor.kdrm+json">
+        <opds:indirectAcquisition type="application/epub+zip"/>
+      </opds:indirectAcquisition>
+      <opds:availability status="available"/>
+      <opds:holds total="0"/>
+      <opds:copies total="1" available="1"/>
+    </link>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/Axis%20360%20ID/0012461749" rel="alternate" type="application/atom+xml;type=entry;profile=opds-catalog"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/Axis%20360%20ID/0012461749/related_books" rel="related" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Recommended Works"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/annotations/Axis%20360%20ID/0012461749" rel="http://www.w3.org/ns/oa#annotationService" type="application/ld+json; profile=&quot;http://www.w3.org/ns/anno.jsonld&quot;"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/analytics/Axis%20360%20ID/0012461749/open_book" rel="http://librarysimplified.org/terms/rel/analytics/open-book"/>
+  </entry>
+  <entry schema:additionalType="http://schema.org/EBook">
+    <title>Chemistry II For Dummies (Edition 1)</title>
+    <summary>College success for virtually all science, computing, engineering and premedical majors depends in part on passing chemistry. The skills learned in chemistry courses are applicable to a number of fields, and chemistry courses are essential to students who are studying to become nurses, doctors, pharmacists, clinical technicians, engineers and many more among the fastest-growing professions. But if you're like a lot of students who are confused by chemistry, it can seem like a daunting task to tackle the subject. That's where Chemistry II For Dummies can help! Here, you'll get plain-English, easy-to-understand explanations of everything you'll encounter in your Chemistry II class. Whether chemistry is your chosen area of study, a degree requirement or an elective, you'll get the skills and confidence to score high and enhance your understanding of this often-intimidating subject. So what are you waiting for?
+
+* Presents straightforward information on complex concepts
+* Tracks to a typical Chemistry II course
+* Serves as an excellent supplement to classroom learning
+* Helps you understand difficult subject matter with confidence and ease
+ 
+Packed with approachable information and plenty of practice opportunities, Chemistry II For Dummies is just what you need to make the grade.</summary>
+    <simplified:pwid>d6718f5a-0507-2c4f-5a1c-022d70be8aac</simplified:pwid>
+    <dcterms:language>en</dcterms:language>
+    <dcterms:publisher>Wiley</dcterms:publisher>
+    <dcterms:issued>2012-01-01</dcterms:issued>
+    <id>urn:uuid:ee7c3892-a101-40f7-a084-768336dca81b</id>
+    <bibframe:distribution bibframe:ProviderName="BiblioBoard"/>
+    <published>2023-05-03T00:00:00Z</published>
+    <updated>2023-05-03T10:41:01+00:00</updated>
+    <category scheme="http://librarysimplified.org/terms/fiction/" term="http://librarysimplified.org/terms/fiction/Nonfiction" label="Nonfiction"/>
+    <category scheme="http://librarysimplified.org/terms/genres/Simplified/" term="http://librarysimplified.org/terms/genres/Simplified/Science" label="Science"/>
+    <category scheme="http://schema.org/audience" term="Adult" label="Adult"/>
+    <author>
+      <name>John T. Moore</name>
+      <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/contributor/John%20T.%20Moore/eng/Adult,Adults+Only,All+Ages,Children,Young+Adult" rel="contributor" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="John T. Moore"/>
+    </author>
+    <link href="https://library.biblioboard.com/ext/api/media/ee7c3892-a101-40f7-a084-768336dca81b/assets/thumbnail_full.jpg" rel="http://opds-spec.org/image" type="image/jpeg"/>
+    <link href="https://library.biblioboard.com/ext/api/media/ee7c3892-a101-40f7-a084-768336dca81b/assets/thumbnail.jpg" rel="http://opds-spec.org/image/thumbnail" type="image/jpeg"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:ee7c3892-a101-40f7-a084-768336dca81b/borrow" rel="http://opds-spec.org/acquisition/borrow" type="application/atom+xml;type=entry;profile=opds-catalog">
+      <opds:indirectAcquisition type="application/vnd.librarysimplified.bearer-token+json">
+        <opds:indirectAcquisition type="application/epub+zip"/>
+      </opds:indirectAcquisition>
+      <opds:availability status="available"/>
+    </link>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:ee7c3892-a101-40f7-a084-768336dca81b" rel="alternate" type="application/atom+xml;type=entry;profile=opds-catalog"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:ee7c3892-a101-40f7-a084-768336dca81b/related_books" rel="related" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Recommended Works"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/annotations/URI/urn:uuid:ee7c3892-a101-40f7-a084-768336dca81b" rel="http://www.w3.org/ns/oa#annotationService" type="application/ld+json; profile=&quot;http://www.w3.org/ns/anno.jsonld&quot;"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/analytics/URI/urn:uuid:ee7c3892-a101-40f7-a084-768336dca81b/open_book" rel="http://librarysimplified.org/terms/rel/analytics/open-book"/>
+  </entry>
+  <entry schema:additionalType="http://schema.org/EBook">
+    <title>Organic Chemistry II For Dummies (Edition 1)</title>
+    <summary>A plain-English guide to one of the toughest courses around So, you survived the first semester of Organic Chemistry (maybe even by the skin of your teeth) and now it's time to get back to the classroom and lab! Organic Chemistry II For Dummies is an easy-to-understand reference to this often challenging subject. Thanks to this book, you'll get friendly and comprehensible guidance on everything you can expect to encounter in your Organic Chemistry II course.
+
+* An extension of the successful Organic Chemistry I For Dummies
+* Covers topics in a straightforward and effective manner
+* Explains concepts and terms in a fast and easy-to-understand way
+ 
+Whether you're confused by composites, baffled by biomolecules, or anything in between, Organic Chemistry II For Dummies gives you the help you need—in plain English!</summary>
+    <simplified:pwid>56253974-195c-0513-ebda-4f933afa9744</simplified:pwid>
+    <dcterms:language>en</dcterms:language>
+    <dcterms:publisher>Wiley</dcterms:publisher>
+    <dcterms:issued>2010-01-01</dcterms:issued>
+    <id>urn:uuid:533c7005-d6c5-4e8e-9d22-0cc16a0645fe</id>
+    <bibframe:distribution bibframe:ProviderName="BiblioBoard"/>
+    <published>2023-05-03T00:00:00Z</published>
+    <updated>2023-05-03T10:20:51+00:00</updated>
+    <category scheme="http://librarysimplified.org/terms/fiction/" term="http://librarysimplified.org/terms/fiction/Nonfiction" label="Nonfiction"/>
+    <category scheme="http://librarysimplified.org/terms/genres/Simplified/" term="http://librarysimplified.org/terms/genres/Simplified/Science" label="Science"/>
+    <category scheme="http://schema.org/audience" term="Adult" label="Adult"/>
+    <author>
+      <name>John T. Moore</name>
+      <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/contributor/John%20T.%20Moore/eng/Adult,Adults+Only,All+Ages,Children,Young+Adult" rel="contributor" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="John T. Moore"/>
+    </author>
+    <author>
+      <name>Richard H. Langley</name>
+      <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/contributor/Richard%20H.%20Langley/eng/Adult,Adults+Only,All+Ages,Children,Young+Adult" rel="contributor" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Richard H. Langley"/>
+    </author>
+    <link href="https://library.biblioboard.com/ext/api/media/533c7005-d6c5-4e8e-9d22-0cc16a0645fe/assets/thumbnail_full.jpg" rel="http://opds-spec.org/image" type="image/jpeg"/>
+    <link href="https://library.biblioboard.com/ext/api/media/533c7005-d6c5-4e8e-9d22-0cc16a0645fe/assets/thumbnail.jpg" rel="http://opds-spec.org/image/thumbnail" type="image/jpeg"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:533c7005-d6c5-4e8e-9d22-0cc16a0645fe/borrow" rel="http://opds-spec.org/acquisition/borrow" type="application/atom+xml;type=entry;profile=opds-catalog">
+      <opds:indirectAcquisition type="application/vnd.librarysimplified.bearer-token+json">
+        <opds:indirectAcquisition type="application/epub+zip"/>
+      </opds:indirectAcquisition>
+      <opds:availability status="available"/>
+    </link>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:533c7005-d6c5-4e8e-9d22-0cc16a0645fe" rel="alternate" type="application/atom+xml;type=entry;profile=opds-catalog"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:533c7005-d6c5-4e8e-9d22-0cc16a0645fe/related_books" rel="related" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Recommended Works"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/annotations/URI/urn:uuid:533c7005-d6c5-4e8e-9d22-0cc16a0645fe" rel="http://www.w3.org/ns/oa#annotationService" type="application/ld+json; profile=&quot;http://www.w3.org/ns/anno.jsonld&quot;"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/analytics/URI/urn:uuid:533c7005-d6c5-4e8e-9d22-0cc16a0645fe/open_book" rel="http://librarysimplified.org/terms/rel/analytics/open-book"/>
+  </entry>
+  <entry schema:additionalType="http://schema.org/EBook">
+    <title>Chemistry Essentials For Dummies (Edition 1)</title>
+    <summary>Whether studying chemistry as part of a degree requirement or as part of a core curriculum, students will find Chemistry Essentials For Dummies to be an invaluable quick reference guide to the fundamentals of this often challenging course. Chemistry Essentials For Dummies contains content focused on key topics only, with discrete explanations of critical concepts taught in a typical two-semester high school chemistry class or a college level Chemistry I course, from bonds and reactions to acids, bases and the mole. This guide is also a perfect reference for parents who need to review critical chemistry concepts as they help high school students with homework assignments, as well as for adult learners headed back into the classroom who just need to a refresher of the core concepts.  
+
+The Essentials For Dummies Series
+ Dummies is proud to present our new series, The Essentials For Dummies. Now students who are prepping for exams, preparing to study new material, or who just need a refresher can have a concise, easy-to-understand review guide that covers an entire course by concentrating solely on the most important concepts. From algebra and chemistry to grammar and Spanish, our expert authors focus on the skills students most need to succeed in a subject.</summary>
+    <simplified:pwid>726a7228-c6aa-423b-4ebc-897741868096</simplified:pwid>
+    <dcterms:language>en</dcterms:language>
+    <dcterms:publisher>Wiley</dcterms:publisher>
+    <dcterms:issued>2010-01-01</dcterms:issued>
+    <id>urn:uuid:526c0f31-8256-4c5e-afc5-fec0b13d874b</id>
+    <bibframe:distribution bibframe:ProviderName="BiblioBoard"/>
+    <published>2023-05-03T00:00:00Z</published>
+    <updated>2023-05-03T10:20:57+00:00</updated>
+    <category scheme="http://librarysimplified.org/terms/fiction/" term="http://librarysimplified.org/terms/fiction/Nonfiction" label="Nonfiction"/>
+    <category scheme="http://librarysimplified.org/terms/genres/Simplified/" term="http://librarysimplified.org/terms/genres/Simplified/Science" label="Science"/>
+    <category scheme="http://schema.org/audience" term="Adult" label="Adult"/>
+    <author>
+      <name>John T. Moore</name>
+      <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/contributor/John%20T.%20Moore/eng/Adult,Adults+Only,All+Ages,Children,Young+Adult" rel="contributor" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="John T. Moore"/>
+    </author>
+    <link href="https://library.biblioboard.com/ext/api/media/526c0f31-8256-4c5e-afc5-fec0b13d874b/assets/thumbnail_full.jpg" rel="http://opds-spec.org/image" type="image/jpeg"/>
+    <link href="https://library.biblioboard.com/ext/api/media/526c0f31-8256-4c5e-afc5-fec0b13d874b/assets/thumbnail.jpg" rel="http://opds-spec.org/image/thumbnail" type="image/jpeg"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:526c0f31-8256-4c5e-afc5-fec0b13d874b/borrow" rel="http://opds-spec.org/acquisition/borrow" type="application/atom+xml;type=entry;profile=opds-catalog">
+      <opds:indirectAcquisition type="application/vnd.librarysimplified.bearer-token+json">
+        <opds:indirectAcquisition type="application/epub+zip"/>
+      </opds:indirectAcquisition>
+      <opds:availability status="available"/>
+    </link>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:526c0f31-8256-4c5e-afc5-fec0b13d874b" rel="alternate" type="application/atom+xml;type=entry;profile=opds-catalog"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:526c0f31-8256-4c5e-afc5-fec0b13d874b/related_books" rel="related" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Recommended Works"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/annotations/URI/urn:uuid:526c0f31-8256-4c5e-afc5-fec0b13d874b" rel="http://www.w3.org/ns/oa#annotationService" type="application/ld+json; profile=&quot;http://www.w3.org/ns/anno.jsonld&quot;"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/analytics/URI/urn:uuid:526c0f31-8256-4c5e-afc5-fec0b13d874b/open_book" rel="http://librarysimplified.org/terms/rel/analytics/open-book"/>
+  </entry>
+  <entry schema:additionalType="http://schema.org/EBook">
+    <title>Cool Chemistry Activities for Girls</title>
+    <summary>Get your science groove on, and check out these awesome chemistry projects:  Fountains of flowing fun, Ooey, gooey, stress-relieving putty, Super sweet candy necklaces.  Chemistry is easy when you’re having this much fun!</summary>
+    <simplified:pwid>489b1bca-7d98-1d3d-b4e5-35235d4416e7</simplified:pwid>
+    <dcterms:language>en</dcterms:language>
+    <dcterms:publisher>Capstone</dcterms:publisher>
+    <dcterms:issued>2012-01-01</dcterms:issued>
+    <id>urn:uuid:1e224cf6-d01e-467a-9a18-e2592a989d33</id>
+    <bibframe:distribution bibframe:ProviderName="BiblioBoard"/>
+    <published>2024-08-17T00:00:00Z</published>
+    <updated>2024-08-17T08:34:12+00:00</updated>
+    <category scheme="http://librarysimplified.org/terms/fiction/" term="http://librarysimplified.org/terms/fiction/Nonfiction" label="Nonfiction"/>
+    <category scheme="http://librarysimplified.org/terms/genres/Simplified/" term="http://librarysimplified.org/terms/genres/Simplified/Science" label="Science"/>
+    <category scheme="http://librarysimplified.org/terms/genres/Simplified/" term="http://librarysimplified.org/terms/genres/Simplified/Nature" label="Nature"/>
+    <category scheme="http://schema.org/audience" term="Children" label="Children"/>
+    <author>
+      <name>Jodi Wheeler-Toppen</name>
+      <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/contributor/Jodi%20Wheeler-Toppen/eng/Children" rel="contributor" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Jodi Wheeler-Toppen"/>
+    </author>
+    <link href="https://library.biblioboard.com/ext/api/media/1e224cf6-d01e-467a-9a18-e2592a989d33/assets/thumbnail_full.jpg" rel="http://opds-spec.org/image" type="image/jpeg"/>
+    <link href="https://library.biblioboard.com/ext/api/media/1e224cf6-d01e-467a-9a18-e2592a989d33/assets/thumbnail.jpg" rel="http://opds-spec.org/image/thumbnail" type="image/jpeg"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:1e224cf6-d01e-467a-9a18-e2592a989d33/borrow" rel="http://opds-spec.org/acquisition/borrow" type="application/atom+xml;type=entry;profile=opds-catalog">
+      <opds:indirectAcquisition type="application/vnd.librarysimplified.bearer-token+json">
+        <opds:indirectAcquisition type="application/pdf"/>
+      </opds:indirectAcquisition>
+      <opds:availability status="available"/>
+    </link>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:1e224cf6-d01e-467a-9a18-e2592a989d33" rel="alternate" type="application/atom+xml;type=entry;profile=opds-catalog"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:1e224cf6-d01e-467a-9a18-e2592a989d33/related_books" rel="related" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Recommended Works"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/annotations/URI/urn:uuid:1e224cf6-d01e-467a-9a18-e2592a989d33" rel="http://www.w3.org/ns/oa#annotationService" type="application/ld+json; profile=&quot;http://www.w3.org/ns/anno.jsonld&quot;"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/analytics/URI/urn:uuid:1e224cf6-d01e-467a-9a18-e2592a989d33/open_book" rel="http://librarysimplified.org/terms/rel/analytics/open-book"/>
+  </entry>
+  <entry schema:additionalType="http://schema.org/EBook">
+    <title>From Vitamins to Baked Goods: Real Applications of Organic Chemistry</title>
+    <summary>This stand-alone textbook module intends to provide some motivation for studying organic chemistry. The topics touch briefly on some basic organic chemistry topics and focus on various organic compounds that readers would encounter in everyday life. For grades 9-12. &lt;br /&gt;&lt;br /&gt; Customize this book at &lt;a href="http://www.ck12.org/book/From-Vitamins-to-Baked-Goods%3A-Real-Applications-of-Organic-Chemistry/"&gt;CK-12&lt;/a&gt;.</summary>
+    <simplified:pwid>99c9a0f3-2ac1-77b1-2335-f0b5b6356d70</simplified:pwid>
+    <dcterms:language>en</dcterms:language>
+    <dcterms:publisher>CK-12 Foundation</dcterms:publisher>
+    <dcterms:issued>2014-01-01</dcterms:issued>
+    <id>urn:uuid:8b999731-6c5e-408f-bb3e-804a7302eb00</id>
+    <bibframe:distribution bibframe:ProviderName="Palace Bookshelf"/>
+    <published>2023-10-05T00:00:00Z</published>
+    <updated>2023-10-21T05:30:42+00:00</updated>
+    <category scheme="http://librarysimplified.org/terms/genres/Simplified/" term="http://librarysimplified.org/terms/genres/Simplified/Science" label="Science"/>
+    <category scheme="http://schema.org/audience" term="Adult" label="Adult"/>
+    <author>
+      <name>Kieran Gallagher</name>
+      <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/contributor/Kieran%20Gallagher/eng/Adult,Adults+Only,All+Ages,Children,Young+Adult" rel="contributor" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Kieran Gallagher"/>
+    </author>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:8b999731-6c5e-408f-bb3e-804a7302eb00/borrow" rel="http://opds-spec.org/acquisition/borrow" type="application/atom+xml;type=entry;profile=opds-catalog">
+      <opds:indirectAcquisition type="application/epub+zip"/>
+      <opds:availability status="available"/>
+    </link>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:8b999731-6c5e-408f-bb3e-804a7302eb00" rel="alternate" type="application/atom+xml;type=entry;profile=opds-catalog"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:8b999731-6c5e-408f-bb3e-804a7302eb00/related_books" rel="related" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Recommended Works"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/annotations/URI/urn:uuid:8b999731-6c5e-408f-bb3e-804a7302eb00" rel="http://www.w3.org/ns/oa#annotationService" type="application/ld+json; profile=&quot;http://www.w3.org/ns/anno.jsonld&quot;"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/analytics/URI/urn:uuid:8b999731-6c5e-408f-bb3e-804a7302eb00/open_book" rel="http://librarysimplified.org/terms/rel/analytics/open-book"/>
+  </entry>
+  <entry schema:additionalType="http://schema.org/EBook">
+    <title>Encyclopedia of Diet, Vol. 4 (of 5) A Treatise on the Food Question</title>
+    <summary>Excerpt:
+THE PURPOSE OF THIS WORK
+When we compare man's longevity with other forms of life, and consider that he breathes the same air, drinks the same water, lives under the same sunshine, and that he differs from them chiefly in his habits of eating, the conviction is forced upon us that in his food is found the secret, or the causes of most of his physical ills and his shortened life. All elements composing the human body are well known. Its daily needs are matters of common knowledge. Science has separated the human body into all its various chemical elements or parts, and weighed and named them; it has also analyzed and separated his food or fuel into its various chemical elements or parts, and named these. It would seem, therefore, a most logical step to unite these two branches of science, and to give to the world the dual science of Physio-food Chemistry, or, what I have named Applied Food Chemistry.
+The sciences of physiological chemistry and of food chemistry can be made useful only by uniting them—putting them together—fitting one into the other for the betterment of the human species. These two branches of science can be of use in no other possible way except by ascertaining the demands of the human body through physiological chemistry, and by learning how to supply these demands through the science of food chemistry. In the union of these hitherto separate branches of science I can see the most useful, the most important, and the most powerful department of human knowledge. It is this union that these volumes are designed to make.</summary>
+    <simplified:pwid>6c07e688-e4e3-6f72-f41f-3a2d257a9026</simplified:pwid>
+    <dcterms:language>en</dcterms:language>
+    <dcterms:publisher>NEW YORK CITY CORRECTIVE EATING SOCIETY, Inc.</dcterms:publisher>
+    <dcterms:issued>1917-01-01</dcterms:issued>
+    <id>urn:uuid:8c7ed289-d9db-445c-bd5b-b78fb67c1bea</id>
+    <bibframe:distribution bibframe:ProviderName="Palace Bookshelf"/>
+    <published>2022-12-17T00:00:00Z</published>
+    <updated>2023-05-03T11:41:49+00:00</updated>
+    <category scheme="http://librarysimplified.org/terms/genres/Simplified/" term="http://librarysimplified.org/terms/genres/Simplified/Science" label="Science"/>
+    <category scheme="http://schema.org/audience" term="Adult" label="Adult"/>
+    <author>
+      <name>Eugene Christian</name>
+      <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/contributor/Eugene%20Christian/eng/Adult,Adults+Only,All+Ages,Children,Young+Adult" rel="contributor" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Eugene Christian"/>
+    </author>
+    <link href="https://palace-bookshelf-downloads.dp.la/assets/46b0d3e5-f155-4ba2-8a28-4dfaa8c8fd3b?fit=inside&amp;width=10000&amp;height=560" rel="http://opds-spec.org/image" type="image/png"/>
+    <link href="https://palace-bookshelf-downloads.dp.la/46b0d3e5-f155-4ba2-8a28-4dfaa8c8fd3b.jpeg" rel="http://opds-spec.org/image/thumbnail" type="image/jpeg"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:8c7ed289-d9db-445c-bd5b-b78fb67c1bea/borrow" rel="http://opds-spec.org/acquisition/borrow" type="application/atom+xml;type=entry;profile=opds-catalog">
+      <opds:indirectAcquisition type="application/epub+zip"/>
+      <opds:availability status="available"/>
+    </link>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:8c7ed289-d9db-445c-bd5b-b78fb67c1bea" rel="alternate" type="application/atom+xml;type=entry;profile=opds-catalog"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:8c7ed289-d9db-445c-bd5b-b78fb67c1bea/related_books" rel="related" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Recommended Works"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/annotations/URI/urn:uuid:8c7ed289-d9db-445c-bd5b-b78fb67c1bea" rel="http://www.w3.org/ns/oa#annotationService" type="application/ld+json; profile=&quot;http://www.w3.org/ns/anno.jsonld&quot;"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/analytics/URI/urn:uuid:8c7ed289-d9db-445c-bd5b-b78fb67c1bea/open_book" rel="http://librarysimplified.org/terms/rel/analytics/open-book"/>
+  </entry>
+  <entry schema:additionalType="http://schema.org/EBook">
+    <title>Encyclopedia of Diet Vol. 2 (of 5)</title>
+    <summary>Excerpt:
+THE PURPOSE OF THIS WORK
+When we compare man's longevity with other forms of life, and consider that he breathes the same air, drinks the same water, lives under the same sunshine, and that he differs from them chiefly in his habits of eating, the conviction is forced upon us that in his food is found the secret, or the causes of most of his physical ills and his shortened life. All elements composing the human body are well known. Its daily needs are matters of common knowledge. Science has separated the human body into all its various chemical elements or parts, and weighed and named them; it has also analyzed and separated his food or fuel into its various chemical elements or parts, and named these. It would seem, therefore, a most logical step to unite these two branches of science, and to give to the world the dual science of Physio-food Chemistry, or, what I have named Applied Food Chemistry.
+The sciences of physiological chemistry and of food chemistry can be made useful only by uniting them—putting them together—fitting one into the other for the betterment of the human species. These two branches of science can be of use in no other possible way except by ascertaining the demands of the human body through physiological chemistry, and by learning how to supply these demands through the science of food chemistry. In the union of these hitherto separate branches of science I can see the most useful, the most important, and the most powerful department of human knowledge. It is this union that these volumes are designed to make.</summary>
+    <simplified:pwid>978be70c-3792-e08f-583a-02a7fa861d8d</simplified:pwid>
+    <dcterms:language>en</dcterms:language>
+    <dcterms:publisher>NEW YORK CITY CORRECTIVE EATING SOCIETY, Inc.</dcterms:publisher>
+    <dcterms:issued>1917-01-01</dcterms:issued>
+    <id>urn:uuid:7109499b-7c75-4344-8542-a23891949cc3</id>
+    <bibframe:distribution bibframe:ProviderName="Palace Bookshelf"/>
+    <published>2022-12-17T00:00:00Z</published>
+    <updated>2023-05-03T11:41:49+00:00</updated>
+    <category scheme="http://librarysimplified.org/terms/genres/Simplified/" term="http://librarysimplified.org/terms/genres/Simplified/Science" label="Science"/>
+    <category scheme="http://schema.org/audience" term="Adult" label="Adult"/>
+    <author>
+      <name>Eugene Christian</name>
+      <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/contributor/Eugene%20Christian/eng/Adult,Adults+Only,All+Ages,Children,Young+Adult" rel="contributor" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Eugene Christian"/>
+    </author>
+    <link href="https://palace-bookshelf-downloads.dp.la/assets/d25ac7a8-6290-4369-9a18-806a304b0dd0?fit=inside&amp;width=10000&amp;height=560" rel="http://opds-spec.org/image" type="image/png"/>
+    <link href="https://palace-bookshelf-downloads.dp.la/d25ac7a8-6290-4369-9a18-806a304b0dd0.jpeg" rel="http://opds-spec.org/image/thumbnail" type="image/jpeg"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:7109499b-7c75-4344-8542-a23891949cc3/borrow" rel="http://opds-spec.org/acquisition/borrow" type="application/atom+xml;type=entry;profile=opds-catalog">
+      <opds:indirectAcquisition type="application/epub+zip"/>
+      <opds:availability status="available"/>
+    </link>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:7109499b-7c75-4344-8542-a23891949cc3" rel="alternate" type="application/atom+xml;type=entry;profile=opds-catalog"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:7109499b-7c75-4344-8542-a23891949cc3/related_books" rel="related" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Recommended Works"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/annotations/URI/urn:uuid:7109499b-7c75-4344-8542-a23891949cc3" rel="http://www.w3.org/ns/oa#annotationService" type="application/ld+json; profile=&quot;http://www.w3.org/ns/anno.jsonld&quot;"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/analytics/URI/urn:uuid:7109499b-7c75-4344-8542-a23891949cc3/open_book" rel="http://librarysimplified.org/terms/rel/analytics/open-book"/>
+  </entry>
+  <entry schema:additionalType="http://schema.org/EBook">
+    <title>Encyclopedia of Diet, Vol. 5 (of 5)</title>
+    <summary>Excerpt:
+THE PURPOSE OF THIS WORK
+When we compare man's longevity with other forms of life, and consider that he breathes the same air, drinks the same water, lives under the same sunshine, and that he differs from them chiefly in his habits of eating, the conviction is forced upon us that in his food is found the secret, or the causes of most of his physical ills and his shortened life. All elements composing the human body are well known. Its daily needs are matters of common knowledge. Science has separated the human body into all its various chemical elements or parts, and weighed and named them; it has also analyzed and separated his food or fuel into its various chemical elements or parts, and named these. It would seem, therefore, a most logical step to unite these two branches of science, and to give to the world the dual science of Physio-food Chemistry, or, what I have named Applied Food Chemistry.
+The sciences of physiological chemistry and of food chemistry can be made useful only by uniting them—putting them together—fitting one into the other for the betterment of the human species. These two branches of science can be of use in no other possible way except by ascertaining the demands of the human body through physiological chemistry, and by learning how to supply these demands through the science of food chemistry. In the union of these hitherto separate branches of science I can see the most useful, the most important, and the most powerful department of human knowledge. It is this union that these volumes are designed to make.</summary>
+    <simplified:pwid>9347cfd5-4027-675b-9ddb-6231a4f3ae6f</simplified:pwid>
+    <dcterms:language>en</dcterms:language>
+    <dcterms:publisher>NEW YORK CITY CORRECTIVE EATING SOCIETY, Inc.</dcterms:publisher>
+    <dcterms:issued>1917-01-01</dcterms:issued>
+    <id>urn:uuid:50049880-ec7b-4bd3-b9f7-7adb937bfb9d</id>
+    <bibframe:distribution bibframe:ProviderName="Palace Bookshelf"/>
+    <published>2022-12-17T00:00:00Z</published>
+    <updated>2023-05-03T11:41:49+00:00</updated>
+    <category scheme="http://librarysimplified.org/terms/genres/Simplified/" term="http://librarysimplified.org/terms/genres/Simplified/Science" label="Science"/>
+    <category scheme="http://schema.org/audience" term="Adult" label="Adult"/>
+    <author>
+      <name>Eugene Christian</name>
+      <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/contributor/Eugene%20Christian/eng/Adult,Adults+Only,All+Ages,Children,Young+Adult" rel="contributor" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Eugene Christian"/>
+    </author>
+    <link href="https://palace-bookshelf-downloads.dp.la/assets/5a972f4d-42fe-4d2b-94f9-9019cb1d67a2?fit=inside&amp;width=10000&amp;height=560" rel="http://opds-spec.org/image" type="image/png"/>
+    <link href="https://palace-bookshelf-downloads.dp.la/5a972f4d-42fe-4d2b-94f9-9019cb1d67a2.jpeg" rel="http://opds-spec.org/image/thumbnail" type="image/jpeg"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:50049880-ec7b-4bd3-b9f7-7adb937bfb9d/borrow" rel="http://opds-spec.org/acquisition/borrow" type="application/atom+xml;type=entry;profile=opds-catalog">
+      <opds:indirectAcquisition type="application/epub+zip"/>
+      <opds:availability status="available"/>
+    </link>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:50049880-ec7b-4bd3-b9f7-7adb937bfb9d" rel="alternate" type="application/atom+xml;type=entry;profile=opds-catalog"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:50049880-ec7b-4bd3-b9f7-7adb937bfb9d/related_books" rel="related" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Recommended Works"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/annotations/URI/urn:uuid:50049880-ec7b-4bd3-b9f7-7adb937bfb9d" rel="http://www.w3.org/ns/oa#annotationService" type="application/ld+json; profile=&quot;http://www.w3.org/ns/anno.jsonld&quot;"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/analytics/URI/urn:uuid:50049880-ec7b-4bd3-b9f7-7adb937bfb9d/open_book" rel="http://librarysimplified.org/terms/rel/analytics/open-book"/>
+  </entry>
+  <entry schema:additionalType="http://schema.org/EBook">
+    <title>Encyclopedia of Diet, Vol. 3 (of 5) A Treatise on the Food Question</title>
+    <summary>Excerpt:
+THE PURPOSE OF THIS WORK
+When we compare man's longevity with other forms of life, and consider that he breathes the same air, drinks the same water, lives under the same sunshine, and that he differs from them chiefly in his habits of eating, the conviction is forced upon us that in his food is found the secret, or the causes of most of his physical ills and his shortened life. All elements composing the human body are well known. Its daily needs are matters of common knowledge. Science has separated the human body into all its various chemical elements or parts, and weighed and named them; it has also analyzed and separated his food or fuel into its various chemical elements or parts, and named these. It would seem, therefore, a most logical step to unite these two branches of science, and to give to the world the dual science of Physio-food Chemistry, or, what I have named Applied Food Chemistry.
+The sciences of physiological chemistry and of food chemistry can be made useful only by uniting them—putting them together—fitting one into the other for the betterment of the human species. These two branches of science can be of use in no other possible way except by ascertaining the demands of the human body through physiological chemistry, and by learning how to supply these demands through the science of food chemistry. In the union of these hitherto separate branches of science I can see the most useful, the most important, and the most powerful department of human knowledge. It is this union that these volumes are designed to make.</summary>
+    <simplified:pwid>d1438401-b151-df6c-74b4-c0cf613a75f1</simplified:pwid>
+    <dcterms:language>en</dcterms:language>
+    <dcterms:publisher>NEW YORK CITY CORRECTIVE EATING SOCIETY, Inc.</dcterms:publisher>
+    <dcterms:issued>1917-01-01</dcterms:issued>
+    <id>urn:uuid:49105a4a-b649-4e65-a257-b869ba000a32</id>
+    <bibframe:distribution bibframe:ProviderName="Palace Bookshelf"/>
+    <published>2022-12-17T00:00:00Z</published>
+    <updated>2023-05-03T11:41:49+00:00</updated>
+    <category scheme="http://librarysimplified.org/terms/genres/Simplified/" term="http://librarysimplified.org/terms/genres/Simplified/Science" label="Science"/>
+    <category scheme="http://schema.org/audience" term="Adult" label="Adult"/>
+    <author>
+      <name>Eugene Christian</name>
+      <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/contributor/Eugene%20Christian/eng/Adult,Adults+Only,All+Ages,Children,Young+Adult" rel="contributor" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Eugene Christian"/>
+    </author>
+    <link href="https://palace-bookshelf-downloads.dp.la/assets/73ed922c-99de-45f2-b1f2-587aec5750c5?fit=inside&amp;width=10000&amp;height=560" rel="http://opds-spec.org/image" type="image/png"/>
+    <link href="https://palace-bookshelf-downloads.dp.la/73ed922c-99de-45f2-b1f2-587aec5750c5.jpeg" rel="http://opds-spec.org/image/thumbnail" type="image/jpeg"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:49105a4a-b649-4e65-a257-b869ba000a32/borrow" rel="http://opds-spec.org/acquisition/borrow" type="application/atom+xml;type=entry;profile=opds-catalog">
+      <opds:indirectAcquisition type="application/epub+zip"/>
+      <opds:availability status="available"/>
+    </link>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:49105a4a-b649-4e65-a257-b869ba000a32" rel="alternate" type="application/atom+xml;type=entry;profile=opds-catalog"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/works/URI/urn:uuid:49105a4a-b649-4e65-a257-b869ba000a32/related_books" rel="related" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Recommended Works"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/annotations/URI/urn:uuid:49105a4a-b649-4e65-a257-b869ba000a32" rel="http://www.w3.org/ns/oa#annotationService" type="application/ld+json; profile=&quot;http://www.w3.org/ns/anno.jsonld&quot;"/>
+    <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/analytics/URI/urn:uuid:49105a4a-b649-4e65-a257-b869ba000a32/open_book" rel="http://librarysimplified.org/terms/rel/analytics/open-book"/>
+  </entry>
+  <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/search/?entrypoint=All&amp;order=relevance&amp;available=all&amp;search_type=default&amp;q=Myp+Chemistry" rel="self"/>
+  <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/authentication_document" rel="http://opds-spec.org/auth/document"/>
+  <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/search/?entrypoint=All&amp;order=relevance&amp;available=all&amp;search_type=default" rel="search" type="application/opensearchdescription+xml"/>
+  <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/loans/" rel="http://opds-spec.org/shelf" type="application/atom+xml;profile=opds-catalog;kind=acquisition"/>
+  <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/annotations/" rel="http://www.w3.org/ns/oa#annotationService" type="application/ld+json; profile=&quot;http://www.w3.org/ns/anno.jsonld&quot;"/>
+  <link href="mailto:support@thepalaceproject.org" rel="help"/>
+  <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/groups/" rel="start" title="All Books"/>
+  <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/search/?q=Myp+Chemistry&amp;entrypoint=All&amp;order=relevance&amp;available=all&amp;search_type=default" rel="http://opds-spec.org/facet" title="All" opds:facetGroup="Formats" opds:activeFacet="true" defaultFacet="true" simplified:facetGroupType="http://librarysimplified.org/terms/rel/entrypoint"/>
+  <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/search/?q=Myp+Chemistry&amp;entrypoint=Book&amp;order=relevance&amp;available=all&amp;search_type=default" rel="http://opds-spec.org/facet" title="eBooks" opds:facetGroup="Formats" simplified:facetGroupType="http://librarysimplified.org/terms/rel/entrypoint"/>
+  <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/search/?q=Myp+Chemistry&amp;entrypoint=Audio&amp;order=relevance&amp;available=all&amp;search_type=default" rel="http://opds-spec.org/facet" title="Audiobooks" opds:facetGroup="Formats" simplified:facetGroupType="http://librarysimplified.org/terms/rel/entrypoint"/>
+  <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/search/?q=Myp+Chemistry&amp;entrypoint=All&amp;order=relevance&amp;available=all&amp;search_type=default&amp;after=10&amp;size=10" rel="next"/>
+  <link href="https://minotaur.dev.palaceproject.io/minotaur-test-library/groups/" rel="up" title="Minotaur Test Library"/>
+</feed>
