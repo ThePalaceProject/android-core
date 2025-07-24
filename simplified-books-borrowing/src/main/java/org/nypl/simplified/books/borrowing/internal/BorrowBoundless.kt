@@ -59,6 +59,8 @@ class BorrowBoundless private constructor() : BorrowSubtaskType {
   override fun execute(
     context: BorrowContextType
   ) {
+    context.bookDownloadIsRunning("Downloading...")
+
     val boundless =
       this.checkDRMSupport(context)
 
