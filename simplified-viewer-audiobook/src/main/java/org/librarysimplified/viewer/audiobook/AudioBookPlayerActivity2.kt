@@ -62,7 +62,9 @@ import org.nypl.simplified.ui.errorpage.ErrorPageFragment
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
 import org.slf4j.LoggerFactory
+import org.slf4j.MDC
 import java.net.URI
+import java.util.concurrent.TimeUnit
 
 class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_base) {
 
@@ -119,6 +121,12 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     this.subscriptions.add(PlayerModel.playerEvents.subscribe(this::onPlayerEvent))
 
     this.loadCoverImage()
+
+    val parameters = AudioBookViewerModel.parameters ?: return
+    this.bookmarkService.bookmarkSyncAndLoad(
+      accountID = parameters.accountID,
+      book = parameters.bookID
+    )
   }
 
   override fun onStop() {
@@ -342,34 +350,6 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
           this.logger.debug("Book has no time tracking URI. No time tracking will occur.")
         }
 
-        /*
-         * XXX: This shouldn't really be a blocking call to get()
-         * The bookmarks service should expose an always-up-to-date readable set of bookmarks.
-         */
-
-        val bookmarks =
-          this.bookmarkService.bookmarkLoad(
-            accountID = bookParameters.accountID,
-            book = bookParameters.bookID
-          ).get()
-
-        /*
-         * Again, the bookmark service should already have an up-to-date list, but it won't
-         * until we refactor the whole bookmark system.
-         */
-
-        this.bookmarkService.bookmarkSyncAndLoad(
-          accountID = bookParameters.accountID,
-          book = bookParameters.bookID
-        ).thenApply { arrivedBookmarks ->
-          PlayerUIThread.runOnUIThread {
-            this.logger.debug(
-              "{} bookmarks arrived from the server.", arrivedBookmarks.bookmarks.size
-            )
-            this.assignBookmarks(arrivedBookmarks)
-          }
-        }
-
         PlayerModel.openPlayerForManifest(
           context = this.application,
           userAgent = PlayerUserAgent(bookParameters.userAgent),
@@ -385,6 +365,8 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       }
 
       is PlayerModelState.PlayerOpen -> {
+        this.handleBookmarks(state, bookParameters)
+
         this.loadCoverImage()
         this.setPlaybackRateFromPreferencesIfRequired()
         this.switchFragment(PlayerFragment())
@@ -393,6 +375,39 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       PlayerModelState.PlayerManifestInProgress -> {
         this.switchFragment(AudioBookLoadingFragment2())
       }
+    }
+  }
+
+  /**
+   * As of 2025-07-29 (Audiobooks 17.0.*), the app is no longer responsible for saving, restoring,
+   * or syncing last read positions for audiobooks. The player now stores this state internally.
+   * However, someone upgrading to 17.0.0 from a previous version would obviously _only_ have the
+   * last read position stored in the app's bookmarks (if they have anything at all). Therefore, if
+   * the player announces here that it doesn't have a stored last-read position, then we take the
+   * last-read position from the app's bookmarks (if one exists).
+   */
+
+  private fun handleBookmarks(
+    state: PlayerModelState.PlayerOpen,
+    bookParameters: AudioBookPlayerParameters
+  ) {
+    try {
+      val bookmarks =
+        this.bookmarkService.bookmarkLoad(
+          accountID = bookParameters.accountID,
+          book = bookParameters.bookID
+        ).get(10L, TimeUnit.SECONDS)
+
+      this.logger.debug("Assigning {} bookmarks.", bookmarks.bookmarks.size)
+      val lastRead = this.assignBookmarks(bookmarks) ?: return
+      if (state.positionOnOpen == null) {
+        this.logger.debug("Restoring last-read position from bookmark.")
+        state.player.player.movePlayheadToLocation(lastRead.position)
+      }
+    } catch (e: Throwable) {
+      MDC.put("Ticket", "PP-2680")
+      this.logger.error("Timed out waiting for audiobooks bookmarks!")
+      MDC.remove("Ticket")
     }
   }
 
@@ -621,13 +636,14 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
         if (status is PlayerDownloadTaskStatus.Failed) {
           val tasks = book?.downloadTasks ?: listOf()
           task.beginNewStep("Downloading ${e.playbackURI}...")
+          val extraMessages =
+            tasks.filterIsInstance<PlayerDownloadTaskStatus.Failed>().map { s -> s.message }
           task.currentStepFailed(
             message = status.message,
             errorCode = "error-download",
             exception = status.exception,
-            extraMessages =
-            tasks.filterIsInstance<PlayerDownloadTaskStatus.Failed>()
-              .map { s -> s.message })
+            extraMessages = extraMessages
+          )
         }
       }
     } catch (e: Exception) {
