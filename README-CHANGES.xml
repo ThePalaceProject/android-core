@@ -694,7 +694,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2025-07-29T09:53:51+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.17.0">
+    <c:release date="2025-07-30T17:48:15+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.17.0">
       <c:changes>
         <c:change date="2025-07-15T00:00:00+00:00" summary="Add support for Boundless DRM."/>
         <c:change date="2025-07-15T00:00:00+00:00" summary="Respect book cover aspect ratios.">
@@ -712,9 +712,14 @@
             <c:ticket id="PP-2736"/>
           </c:tickets>
         </c:change>
-        <c:change date="2025-07-29T09:53:51+00:00" summary="Attempt to improve the reliability of local audiobook bookmarks.">
+        <c:change date="2025-07-29T00:00:00+00:00" summary="Attempt to improve the reliability of local audiobook bookmarks.">
           <c:tickets>
             <c:ticket id="PP-2680"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2025-07-30T17:48:15+00:00" summary="Update feed UI and buttons for better aesthetics.">
+          <c:tickets>
+            <c:ticket id="PP-2736"/>
           </c:tickets>
         </c:change>
       </c:changes>
