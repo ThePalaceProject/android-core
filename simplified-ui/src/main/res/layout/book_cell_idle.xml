@@ -4,9 +4,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bookCellIdle"
-    android:background="?attr/selectableItemBackground"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/catalogFeedCellHeight">
+    android:layout_height="@dimen/catalogFeedCellHeight"
+    android:background="?attr/selectableItemBackground">
 
     <ImageView
         android:id="@+id/bookCellIdleCover"
@@ -27,102 +27,97 @@
         app:layout_constraintStart_toStartOf="@id/bookCellIdleCover"
         app:layout_constraintTop_toTopOf="@id/bookCellIdleCover" />
 
-    <TextView
-        android:id="@+id/bookCellIdleTitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/bookCellIdleCover"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="The Modern Prometheus" />
-
-    <TextView
-        android:id="@+id/bookCellIdleAuthor"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/bookCellIdleCover"
-        app:layout_constraintTop_toBottomOf="@id/bookCellIdleTitle"
-        tools:text="Mary Shelley" />
-
     <LinearLayout
-        android:id="@+id/bookCellIdleButtons"
         android:layout_width="0dp"
-        android:layout_height="@dimen/catalogFeedCellButtonsHeight"
+        android:layout_height="match_parent"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="8dp"
         android:gravity="center_vertical"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@id/bookCellIdleTime"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/bookCellIdleCover">
-
-        <!-- These views are removed at runtime and are just present for the sake of the UI editor preview -->
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/catalogFeedCellButtonsHeight"
-            android:maxWidth="64dp"
-            android:visibility="gone"
-            tools:text="@string/catalogDismiss"
-            tools:visibility="visible" />
-
-        <Space
-            android:layout_width="16dp"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            tools:visibility="visible" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/catalogFeedCellButtonsHeight"
-            android:maxWidth="64dp"
-            android:visibility="gone"
-            tools:text="@string/catalogDetails"
-            tools:visibility="visible" />
-
-        <Space
-            android:layout_width="16dp"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            tools:visibility="visible" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/catalogFeedCellButtonsHeight"
-            android:maxWidth="64dp"
-            android:visibility="gone"
-            tools:text="@string/catalogRetry"
-            tools:visibility="visible" />
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/bookCellIdleTime"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="8dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:textSize="12sp"
-        android:alpha="0.75"
+        android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/bookCellIdleCover"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:text="Borrowed until 31st February 1976" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/bookCellIdleTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/bookCellIdleCover"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="The Modern Prometheus" />
+
+        <TextView
+            android:id="@+id/bookCellIdleAuthor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/bookCellIdleCover"
+            app:layout_constraintTop_toBottomOf="@id/bookCellIdleTitle"
+            tools:text="Mary Shelley" />
+
+        <LinearLayout
+            android:id="@+id/bookCellIdleButtons"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/catalogFeedCellButtonsHeight"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toTopOf="@id/bookCellIdleTime"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/bookCellIdleCover">
+
+            <Button
+                android:id="@+id/bookCellIdleButtonPositive"
+                style="@style/Palace.Button.Contained.Medium"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/catalogFeedCellButtonsHeight"
+                android:layout_weight="1"
+                android:maxWidth="128dp"
+                android:padding="0dp"
+                android:text="@string/catalogGet" />
+
+            <Button
+                android:id="@+id/bookCellIdleButtonNegative0"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/catalogFeedCellButtonsHeight"
+                android:layout_marginLeft="8dp"
+                android:layout_weight="1"
+                android:maxWidth="128dp"
+                android:padding="0dp"
+                android:text="@string/catalogDismiss" />
+
+            <Button
+                android:id="@+id/bookCellIdleButtonNegative1"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/catalogFeedCellButtonsHeight"
+                android:layout_marginLeft="8dp"
+                android:layout_weight="1"
+                android:maxWidth="128dp"
+                android:padding="0dp"
+                android:text="@string/catalogRetry" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/bookCellIdleTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:alpha="0.75"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/bookCellIdleCover"
+            tools:text="Borrowed until 31st February 1976" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

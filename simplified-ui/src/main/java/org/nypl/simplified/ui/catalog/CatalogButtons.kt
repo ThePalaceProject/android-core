@@ -1,13 +1,10 @@
 package org.nypl.simplified.ui.catalog
 
 import android.content.Context
-import android.text.TextUtils
-import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Space
 import androidx.annotation.UiThread
-import com.google.android.material.button.MaterialButton
 import org.librarysimplified.ui.R
 import org.nypl.simplified.books.book_database.api.BookFormats
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
@@ -20,7 +17,6 @@ class CatalogButtons(
   private val context: Context,
   private val screenSizeInformation: ScreenSizeInformationType
 ) {
-
   @UiThread
   fun createButtonSpace(): Space {
     val space = Space(this.context)
@@ -29,188 +25,147 @@ class CatalogButtons(
   }
 
   @UiThread
-  fun createButton(
-    text: Int,
-    description: Int,
-    heightMatchParent: Boolean = false,
+  fun setAsReadButton(
+    button: Button,
     onClick: (Button) -> Unit
   ): Button {
-    val button = MaterialButton(this.context)
-    button.text = this.context.getString(text)
-    button.contentDescription = this.context.getString(description)
-    button.layoutParams = this.buttonLayoutParameters(heightMatchParent)
-    button.maxLines = 1
-    button.ellipsize = TextUtils.TruncateAt.END
-    button.setOnClickListener {
-      button.isEnabled = false
-      onClick.invoke(button)
-      button.isEnabled = true
-    }
+    button.setText(R.string.catalogRead)
+    button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookRead)
+    button.setOnClickListener { onClick.invoke(button) }
     return button
   }
 
   @UiThread
-  fun createReadButton(
-    onClick: (Button) -> Unit,
-    heightMatchParent: Boolean = false
-  ): Button {
-    return this.createButton(
-      text = R.string.catalogRead,
-      description = R.string.catalogAccessibilityBookRead,
-      heightMatchParent = heightMatchParent,
-      onClick = onClick
-    )
-  }
-
-  @UiThread
-  fun createReadPreviewButton(
+  fun setAsReadPreviewButton(
+    button: Button,
     bookFormat: BookFormats.BookFormatDefinition?,
     onClick: (Button) -> Unit
   ): Button {
-    return this.createButton(
-      text = if (bookFormat == BookFormats.BookFormatDefinition.BOOK_FORMAT_AUDIO) {
+    button.setText(
+      if (bookFormat == BookFormats.BookFormatDefinition.BOOK_FORMAT_AUDIO) {
         R.string.catalogBookPreviewAudioBook
       } else {
         R.string.catalogBookPreviewBook
-      },
-      description = if (bookFormat == BookFormats.BookFormatDefinition.BOOK_FORMAT_AUDIO) {
-        R.string.catalogAccessibilityBookPreviewPlay
+      }
+    )
+    button.contentDescription =
+      if (bookFormat == BookFormats.BookFormatDefinition.BOOK_FORMAT_AUDIO) {
+        context.getString(R.string.catalogAccessibilityBookPreviewPlay)
       } else {
-        R.string.catalogAccessibilityBookPreviewRead
-      },
-      onClick = onClick
-    )
+        context.getString(R.string.catalogAccessibilityBookPreviewRead)
+      }
+    button.setOnClickListener { onClick.invoke(button) }
+    return button
   }
 
   @UiThread
-  fun createListenButton(
-    onClick: (Button) -> Unit,
-    heightMatchParent: Boolean = false
-  ): Button {
-    return this.createButton(
-      text = R.string.catalogListen,
-      description = R.string.catalogAccessibilityBookListen,
-      heightMatchParent = heightMatchParent,
-      onClick = onClick
-    )
-  }
-
-  @UiThread
-  fun createDownloadButton(
-    onClick: (Button) -> Unit,
-    heightMatchParent: Boolean = false
-  ): Button {
-    return this.createButton(
-      text = R.string.catalogDownload,
-      description = R.string.catalogAccessibilityBookDownload,
-      heightMatchParent = heightMatchParent,
-      onClick = onClick
-    )
-  }
-
-  @UiThread
-  fun createRevokeHoldButton(
-    onClick: (Button) -> Unit,
-    heightMatchParent: Boolean = false
-  ): Button {
-    return this.createButton(
-      text = R.string.catalogCancelHold,
-      description = R.string.catalogAccessibilityBookRevokeHold,
-      heightMatchParent = heightMatchParent,
-      onClick = onClick
-    )
-  }
-
-  @UiThread
-  fun createRevokeLoanButton(
-    onClick: (Button) -> Unit,
-    heightMatchParent: Boolean = false
-  ): Button {
-    return this.createButton(
-      text = R.string.catalogReturn,
-      description = R.string.catalogAccessibilityBookRevokeLoan,
-      heightMatchParent = heightMatchParent,
-      onClick = onClick
-    )
-  }
-
-  @UiThread
-  fun createCancelDownloadButton(
+  fun setAsListenButton(
+    button: Button,
     onClick: (Button) -> Unit
   ): Button {
-    return this.createButton(
-      text = R.string.catalogCancel,
-      description = R.string.catalogAccessibilityBookDownloadCancel,
-      onClick = onClick
-    )
+    button.setText(R.string.catalogListen)
+    button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookListen)
+    button.setOnClickListener { onClick.invoke(button) }
+    return button
   }
 
   @UiThread
-  fun createReserveButton(
-    onClick: (Button) -> Unit,
-    heightMatchParent: Boolean = false
-  ): Button {
-    return this.createButton(
-      text = R.string.catalogReserve,
-      description = R.string.catalogAccessibilityBookReserve,
-      heightMatchParent = heightMatchParent,
-      onClick = onClick
-    )
-  }
-
-  @UiThread
-  fun createGetButton(
-    onClick: (Button) -> Unit,
-    heightMatchParent: Boolean = false
-  ): Button {
-    return this.createButton(
-      text = R.string.catalogGet,
-      description = R.string.catalogAccessibilityBookBorrow,
-      heightMatchParent = heightMatchParent,
-      onClick = onClick
-    )
-  }
-
-  @UiThread
-  fun createRetryButton(
+  fun setAsBorrowButton(
+    button: Button,
     onClick: (Button) -> Unit
   ): Button {
-    return this.createButton(
-      text = R.string.catalogRetry,
-      description = R.string.catalogAccessibilityBookErrorRetry,
-      onClick = onClick
-    )
+    button.setText(R.string.catalogGet)
+    button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookBorrow)
+    button.setOnClickListener { onClick.invoke(button) }
+    return button
   }
 
   @UiThread
-  fun createDetailsButton(
+  fun setAsDownloadButton(
+    button: Button,
     onClick: (Button) -> Unit
   ): Button {
-    return this.createButton(
-      text = R.string.catalogDetails,
-      description = R.string.catalogAccessibilityBookErrorDetails,
-      onClick = onClick
-    )
+    button.setText(R.string.catalogDownload)
+    button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookDownload)
+    button.setOnClickListener { onClick.invoke(button) }
+    return button
   }
 
   @UiThread
-  fun createDismissButton(
+  fun setAsRevokeHoldButton(
+    button: Button,
     onClick: (Button) -> Unit
   ): Button {
-    return this.createButton(
-      text = R.string.catalogDismiss,
-      description = R.string.catalogAccessibilityBookErrorDismiss,
-      onClick = onClick
-    )
+    button.setText(R.string.catalogCancelHold)
+    button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookRevokeHold)
+    button.setOnClickListener { onClick.invoke(button) }
+    return button
   }
 
   @UiThread
-  fun createButtonSizedSpace(): View {
-    val space = Space(this.context)
-    space.layoutParams = this.buttonLayoutParameters()
-    space.visibility = View.INVISIBLE
-    space.isEnabled = false
-    return space
+  fun setAsRevokeLoanButton(
+    button: Button,
+    onClick: (Button) -> Unit
+  ): Button {
+    button.setText(R.string.catalogReturn)
+    button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookRevokeLoan)
+    button.setOnClickListener { onClick.invoke(button) }
+    return button
+  }
+
+  @UiThread
+  fun setAsCancelDownloadButton(
+    button: Button,
+    onClick: (Button) -> Unit
+  ): Button {
+    button.setText(R.string.catalogCancel)
+    button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookDownloadCancel)
+    button.setOnClickListener { onClick.invoke(button) }
+    return button
+  }
+
+  @UiThread
+  fun setAsReserveButton(
+    button: Button,
+    onClick: (Button) -> Unit
+  ): Button {
+    button.setText(R.string.catalogReserve)
+    button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookReserve)
+    button.setOnClickListener { onClick.invoke(button) }
+    return button
+  }
+
+  @UiThread
+  fun setAsRetryButton(
+    button: Button,
+    onClick: (Button) -> Unit
+  ): Button {
+    button.setText(R.string.catalogRetry)
+    button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookErrorRetry)
+    button.setOnClickListener { onClick.invoke(button) }
+    return button
+  }
+
+  @UiThread
+  fun setAsDetailsButton(
+    button: Button,
+    onClick: (Button) -> Unit
+  ): Button {
+    button.setText(R.string.catalogDetails)
+    button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookErrorDetails)
+    button.setOnClickListener { onClick.invoke(button) }
+    return button
+  }
+
+  @UiThread
+  fun setAsDismissButton(
+    button: Button,
+    onClick: (Button) -> Unit
+  ): Button {
+    button.setText(R.string.catalogDismiss)
+    button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookErrorDismiss)
+    button.setOnClickListener { onClick.invoke(button) }
+    return button
   }
 
   @UiThread

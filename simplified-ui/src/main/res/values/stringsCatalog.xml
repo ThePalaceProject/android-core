@@ -3,7 +3,7 @@
 <resources>
   <string name="catalogAccessibilityAccountSelection">Account Selection Button</string>
   <string name="catalogAccessibilityBackgroundImage">A background image.</string>
-  <string name="catalogAccessibilityBookBorrow">Get Button</string>
+  <string name="catalogAccessibilityBookBorrow">Borrow Button</string>
   <string name="catalogAccessibilityBookDelete">Delete Button</string>
   <string name="catalogAccessibilityBookDownload">Download Button</string>
   <string name="catalogAccessibilityBookDownloadCancel">Cancel download button</string>

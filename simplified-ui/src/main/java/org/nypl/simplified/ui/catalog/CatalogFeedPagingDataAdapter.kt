@@ -65,7 +65,7 @@ class CatalogFeedPagingDataAdapter(
   private val onBookViewerOpen: (Book, BookFormat) -> Unit,
   private val onBookDelete: (CatalogBookStatus<*>) -> Unit,
   private val onShowTaskError: (TaskResult.Failure<*>) -> Unit,
-) : PagingDataAdapter<FeedEntry, CatalogFeedPagingDataAdapter.ViewHolder>(diffCallback) {
+) : PagingDataAdapter<FeedEntry, CatalogFeedPagingDataAdapter.ViewHolder>(org.nypl.simplified.ui.catalog.CatalogFeedPagingDataAdapter.Companion.diffCallback) {
 
   companion object {
     private val loanEndFormatter =
@@ -120,6 +120,12 @@ class CatalogFeedPagingDataAdapter(
       this.idle.findViewById<TextView>(R.id.bookCellIdleAuthor)
     private val idleButtons =
       this.idle.findViewById<ViewGroup>(R.id.bookCellIdleButtons)
+    private val idleButtonPositive =
+      this.idleButtons.findViewById<Button>(R.id.bookCellIdleButtonPositive)
+    private val idleButtonNegative0 =
+      this.idleButtons.findViewById<Button>(R.id.bookCellIdleButtonNegative0)
+    private val idleButtonNegative1 =
+      this.idleButtons.findViewById<Button>(R.id.bookCellIdleButtonNegative1)
 
     private val progressProgress =
       this.view.findViewById<ProgressBar>(R.id.bookCellInProgressBar)
@@ -149,7 +155,7 @@ class CatalogFeedPagingDataAdapter(
       this.errorRetry.setOnClickListener(null)
       this.idle.setOnClickListener(null)
       this.idleAuthor.text = null
-      this.idleButtons.removeAllViews()
+
       this.idleCover.contentDescription = null
       this.idleCover.setImageDrawable(null)
       this.idleCover.setOnClickListener(null)
@@ -493,17 +499,21 @@ class CatalogFeedPagingDataAdapter(
       this.setVisible(this.error, false)
       this.setVisible(this.idle, true)
       this.setVisible(this.progress, false)
+      this.hideIdleTime()
 
-      this.idleButtons.removeAllViews()
       if (status.isRevocable) {
-        this.idleButtons.addView(
-          this.buttonCreator.createRevokeHoldButton(
-            onClick = {
-              this.onBookRevoke(book, status)
-            }
-          )
+        this.buttonCreator.setAsRevokeHoldButton(
+          this.idleButtonPositive,
+          onClick = {
+            this.onBookRevoke(book, status)
+          }
         )
+        this.setVisible(this.idleButtonPositive, true)
+      } else {
+        this.setVisible(this.idleButtonPositive, false)
       }
+      this.setVisible(this.idleButtonNegative0, false)
+      this.setVisible(this.idleButtonNegative1, false)
 
       val position = status.queuePosition
       if (position != null) {
@@ -523,28 +533,28 @@ class CatalogFeedPagingDataAdapter(
       this.setVisible(this.error, false)
       this.setVisible(this.idle, true)
       this.setVisible(this.progress, false)
+      this.hideIdleTime()
 
-      this.idleButtons.removeAllViews()
-      this.idleButtons.addView(
-        this.buttonCreator.createGetButton(
-          onClick = {
-            this.onBookBorrow(book)
-          }
-        )
+      this.buttonCreator.setAsBorrowButton(
+        this.idleButtonPositive,
+        onClick = {
+          this.onBookBorrow(book)
+        }
       )
+      this.setVisible(this.idleButtonPositive, true)
 
       if (status.isRevocable) {
-        this.idleButtons.addView(
-          this.buttonCreator.createButtonSpace()
+        this.buttonCreator.setAsRevokeLoanButton(
+          this.idleButtonNegative0,
+          onClick = {
+            this.onBookRevoke(book, status)
+          }
         )
-        this.idleButtons.addView(
-          this.buttonCreator.createRevokeHoldButton(
-            onClick = {
-              this.onBookRevoke(book, status)
-            }
-          )
-        )
+        this.setVisible(this.idleButtonNegative0, true)
+      } else {
+        this.setVisible(this.idleButtonNegative0, false)
       }
+      this.setVisible(this.idleButtonNegative1, false)
     }
 
     private fun onBookStatusHoldable(
@@ -555,15 +565,17 @@ class CatalogFeedPagingDataAdapter(
       this.setVisible(this.error, false)
       this.setVisible(this.idle, true)
       this.setVisible(this.progress, false)
+      this.hideIdleTime()
 
-      this.idleButtons.removeAllViews()
-      this.idleButtons.addView(
-        this.buttonCreator.createReserveButton(
-          onClick = {
-            this.onBookBorrow(book)
-          }
-        )
+      this.buttonCreator.setAsReserveButton(
+        this.idleButtonPositive,
+        onClick = {
+          this.onBookBorrow(book)
+        }
       )
+      this.setVisible(this.idleButtonPositive, true)
+      this.setVisible(this.idleButtonNegative0, false)
+      this.setVisible(this.idleButtonNegative1, false)
     }
 
     private fun onBookStatusLoanable(
@@ -574,15 +586,17 @@ class CatalogFeedPagingDataAdapter(
       this.setVisible(this.error, false)
       this.setVisible(this.idle, true)
       this.setVisible(this.progress, false)
+      this.hideIdleTime()
 
-      this.idleButtons.removeAllViews()
-      this.idleButtons.addView(
-        this.buttonCreator.createGetButton(
-          onClick = {
-            this.onBookBorrow(book)
-          }
-        )
+      this.buttonCreator.setAsBorrowButton(
+        this.idleButtonPositive,
+        onClick = {
+          this.onBookBorrow(book)
+        }
       )
+      this.setVisible(this.idleButtonPositive, true)
+      this.setVisible(this.idleButtonNegative0, false)
+      this.setVisible(this.idleButtonNegative1, false)
     }
 
     private fun onBookStatusLoanedDownloaded(
@@ -593,60 +607,59 @@ class CatalogFeedPagingDataAdapter(
       this.setVisible(this.error, false)
       this.setVisible(this.idle, true)
       this.setVisible(this.progress, false)
-
-      this.idleButtons.removeAllViews()
       this.setIdleTime(this.getLoanDuration(book))
 
       when (val format = book.findPreferredFormat()) {
         is BookFormat.BookFormatPDF,
         is BookFormat.BookFormatEPUB -> {
-          this.idleButtons.addView(
-            this.buttonCreator.createReadButton(
-              onClick = {
-                this.onBookViewerOpen(book, format)
-              },
-              heightMatchParent = true
-            )
+          this.buttonCreator.setAsReadButton(
+            this.idleButtonPositive,
+            onClick = {
+              this.onBookViewerOpen(book, format)
+            },
           )
         }
 
         is BookFormat.BookFormatAudioBook -> {
-          this.idleButtons.addView(
-            this.buttonCreator.createListenButton(
-              onClick = {
-                this.onBookViewerOpen(book, format)
-              },
-              heightMatchParent = true
-            )
+          this.buttonCreator.setAsListenButton(
+            this.idleButtonPositive,
+            onClick = {
+              this.onBookViewerOpen(book, format)
+            },
           )
         }
 
         null -> {
-          this.idleButtons.addView(this.buttonCreator.createButtonSizedSpace())
+          this.buttonCreator.setAsReadButton(
+            this.idleButtonPositive,
+            onClick = {
+              // XXX: Can this even happen?
+            },
+          )
         }
       }
+      this.setVisible(this.idleButtonPositive, true)
 
       if (this.isBookReturnable(book)) {
-        this.idleButtons.addView(this.buttonCreator.createButtonSpace())
-        this.idleButtons.addView(
-          this.buttonCreator.createRevokeLoanButton(
-            onClick = {
-              this.onBookRevoke(book, status)
-            },
-            heightMatchParent = true
-          )
+        this.buttonCreator.setAsRevokeLoanButton(
+          this.idleButtonNegative0,
+          onClick = {
+            this.onBookRevoke(book, status)
+          }
         )
+        this.setVisible(this.idleButtonNegative0, true)
       } else if (this.isBookDeletable(book)) {
-        this.idleButtons.addView(this.buttonCreator.createButtonSpace())
-        this.idleButtons.addView(
-          this.buttonCreator.createRevokeLoanButton(
-            onClick = {
-              this.onBookDelete(book, status)
-            },
-            heightMatchParent = true
-          )
+        this.buttonCreator.setAsRevokeLoanButton(
+          this.idleButtonNegative0,
+          onClick = {
+            this.onBookDelete(book, status)
+          }
         )
+        this.setVisible(this.idleButtonNegative0, true)
+      } else {
+        this.setVisible(this.idleButtonNegative0, false)
       }
+      this.setVisible(this.idleButtonNegative1, false)
     }
 
     private fun setIdleTime(
@@ -656,11 +669,17 @@ class CatalogFeedPagingDataAdapter(
         this.idleTime.text =
           this.idleTime.resources.getString(
             R.string.catalogBookCellBorrowingUntil,
-            loanEndFormatter.print(loanDuration)
+            org.nypl.simplified.ui.catalog.CatalogFeedPagingDataAdapter.Companion.loanEndFormatter.print(loanDuration)
           )
+        this.setVisible(this.idleTime, true)
       } else {
-        this.idleTime.text = ""
+        this.hideIdleTime()
       }
+    }
+
+    private fun hideIdleTime() {
+      this.idleTime.text = ""
+      this.idleTime.visibility = GONE
     }
 
     private fun onBookStatusLoanedNotDownloaded(
@@ -671,53 +690,36 @@ class CatalogFeedPagingDataAdapter(
       this.setVisible(this.error, false)
       this.setVisible(this.idle, true)
       this.setVisible(this.progress, false)
-
-      this.idleButtons.removeAllViews()
       this.setIdleTime(this.getLoanDuration(book))
 
-      this.idleButtons.addView(
-        when {
-          status.isOpenAccess -> {
-            this.buttonCreator.createGetButton(
-              onClick = {
-                this.onBookBorrow(book)
-              },
-              heightMatchParent = true
-            )
-          }
-
-          else -> {
-            this.buttonCreator.createDownloadButton(
-              onClick = {
-                this.onBookBorrow(book)
-              },
-              heightMatchParent = true
-            )
-          }
-        }
+      this.buttonCreator.setAsDownloadButton(
+        this.idleButtonPositive,
+        onClick = {
+          this.onBookBorrow(book)
+        },
       )
+      this.setVisible(this.idleButtonPositive, true)
 
       if (this.isBookReturnable(book)) {
-        this.idleButtons.addView(this.buttonCreator.createButtonSpace())
-        this.idleButtons.addView(
-          this.buttonCreator.createRevokeLoanButton(
-            onClick = {
-              this.onBookRevoke(book, status)
-            },
-            heightMatchParent = true
-          )
+        this.buttonCreator.setAsRevokeLoanButton(
+          this.idleButtonNegative0,
+          onClick = {
+            this.onBookRevoke(book, status)
+          }
         )
+        this.setVisible(this.idleButtonNegative0, true)
       } else if (this.isBookDeletable(book)) {
-        this.idleButtons.addView(this.buttonCreator.createButtonSpace())
-        this.idleButtons.addView(
-          this.buttonCreator.createRevokeLoanButton(
-            onClick = {
-              this.onBookDelete(book, status)
-            },
-            heightMatchParent = true
-          )
+        this.buttonCreator.setAsRevokeLoanButton(
+          this.idleButtonNegative0,
+          onClick = {
+            this.onBookDelete(book, status)
+          }
         )
+        this.setVisible(this.idleButtonNegative0, true)
+      } else {
+        this.setVisible(this.idleButtonNegative0, false)
       }
+      this.setVisible(this.idleButtonNegative1, false)
     }
 
     private fun onBookStatusReachedLoanLimit(
@@ -781,8 +783,6 @@ class CatalogFeedPagingDataAdapter(
       this.setVisible(this.error, false)
       this.setVisible(this.idle, true)
       this.setVisible(this.progress, false)
-
-      this.idleButtons.removeAllViews()
     }
 
     private fun getLoanDuration(
