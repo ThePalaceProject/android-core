@@ -377,9 +377,9 @@ class CatalogFeedViewDetails2(
     this.spacerSizeMin =
       this.root.resources.getDimensionPixelSize(R.dimen.catalogBookDetailScrollMarginTopMin)
 
-    this.imageOverlay.y = this.adjustImageY(this.appBar, this.cover)
+    this.imageOverlay.y = this.adjustImageY(this.appBar)
     this.appBar.addOnOffsetChangedListener { _, verticalOffset ->
-      this.imageOverlay.y = this.adjustImageY(this.appBar, this.cover)
+      this.imageOverlay.y = this.adjustImageY(this.appBar)
 
       val totalScrollRange =
         this.appBar.totalScrollRange
@@ -458,11 +458,8 @@ class CatalogFeedViewDetails2(
   }
 
   private fun adjustImageY(
-    appBar: ViewGroup,
-    cover: ImageView
+    appBar: ViewGroup
   ): Float {
-    this.logger.debug("Cover height: {}", cover.height)
-
     val coverHeight =
       this.root.resources.getDimensionPixelSize(R.dimen.catalogBookDetailCoverHeight)
 
