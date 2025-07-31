@@ -342,6 +342,8 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       }
 
       is PlayerModelState.PlayerManifestOK -> {
+        AudioBookViewerModel.appliedLastReadBookmarkMigration = false
+
         val timeTrackingUri = bookParameters.opdsEntry.timeTrackingUri.getOrNull()
         if (timeTrackingUri != null) {
           this.logger.debug("Time tracking info will be sent to {}", timeTrackingUri)
@@ -405,10 +407,18 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
 
       this.logger.debug("Assigning {} bookmarks.", bookmarks.bookmarks.size)
       val lastRead = this.assignBookmarks(bookmarks) ?: return
-      if (state.positionOnOpen == null) {
-        this.logger.debug("Restoring last-read position from bookmark ({}).", lastRead.position)
-        state.player.player.movePlayheadToLocation(lastRead.position)
+
+      if (state.positionOnOpen != null) {
+        this.logger.debug("Player already has a saved last-read position.")
+        return
       }
+      if (AudioBookViewerModel.appliedLastReadBookmarkMigration) {
+        this.logger.debug("Player has already applied the last-read bookmark migration.")
+        return
+      }
+      this.logger.debug("Restoring last-read position from bookmark ({}).", lastRead.position)
+      AudioBookViewerModel.appliedLastReadBookmarkMigration = true
+      state.player.player.movePlayheadToLocation(lastRead.position)
     } catch (e: Throwable) {
       MDC.put("Ticket", "PP-2680")
       this.logger.error("Timed out waiting for audiobooks bookmarks!")
