@@ -28,6 +28,7 @@ import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
 import org.nypl.simplified.books.book_registry.BookRegistryReadableType
 import org.nypl.simplified.books.book_registry.BookStatus
+import org.nypl.simplified.books.book_registry.BookStatusEvent
 import org.nypl.simplified.books.controller.api.BooksControllerType
 import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
@@ -68,6 +69,7 @@ import org.thepalaceproject.opds.client.OPDSClientRequest.HistoryBehavior.ADD_TO
 import org.thepalaceproject.opds.client.OPDSClientRequest.HistoryBehavior.CLEAR_HISTORY
 import org.thepalaceproject.opds.client.OPDSClientRequest.HistoryBehavior.REPLACE_TIP
 import org.thepalaceproject.opds.client.OPDSClientType
+import org.thepalaceproject.opds.client.OPDSFeedHandleWithoutGroupsType
 import org.thepalaceproject.opds.client.OPDSState
 import org.thepalaceproject.opds.client.OPDSState.Initial
 import org.thepalaceproject.opds.client.OPDSState.LoadedFeedEntry
@@ -106,6 +108,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
   private lateinit var bookPreviewRegistry: BookPreviewRegistryType
   private lateinit var bookRegistry: BookRegistryReadableType
   private lateinit var buttonCreator: CatalogButtons
+  private lateinit var catalogBookEvents: CatalogBookRegistryEvents
   private lateinit var contentContainer: FrameLayout
   private lateinit var covers: BookCoverProviderType
   private lateinit var feedLoader: FeedLoaderType
@@ -162,6 +165,8 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
       services.requireService(ImageLoaderType::class.java)
     this.buttonCreator =
       CatalogButtons(this.requireContext(), this.screenSize)
+    this.catalogBookEvents =
+      services.requireService(CatalogBookRegistryEvents::class.java)
 
     this.opdsClient =
       opdsClients.clientFor(this.catalogPart)
@@ -916,6 +921,38 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
         // this.logger.trace("Restoring scroll position (initial) {}", feedPosition)
       }
       view.listView.scrollToPosition(feedPosition)
+    }
+
+    this.setupRefreshForLocalFeeds(feedHandle)
+  }
+
+  /**
+   * For local feeds (such as My Books, Reservations, etc), we want to refresh the feed when
+   * a significant event occurs such as a book being added to or deleted from the registry.
+   */
+
+  private fun setupRefreshForLocalFeeds(
+    feedHandle: OPDSFeedHandleWithoutGroupsType
+  ) {
+    when (this.catalogPart) {
+      CATALOG -> {
+        // Nothing to do.
+      }
+      BOOKS, HOLDS -> {
+        val subscription =
+          this.catalogBookEvents.events.subscribe { event ->
+            when (event) {
+              is BookStatusEvent.BookStatusEventChanged -> {
+                // Nothing to do.
+              }
+              is BookStatusEvent.BookStatusEventAdded,
+              is BookStatusEvent.BookStatusEventRemoved -> {
+                feedHandle.refresh()
+              }
+            }
+          }
+        this.perViewSubscriptions.add(AutoCloseable { subscription.dispose() })
+      }
     }
   }
 
