@@ -53,7 +53,7 @@ object Viewers {
     MDC.put(MDCKeys.BOOK_TITLE, book.entry.title)
     MDCKeys.put(MDCKeys.BOOK_PUBLISHER, book.entry.publisher)
 
-    this.logger.debug("attempting to open: {} ({})", book.id, book.entry.title)
+    this.logger.debug("Open: {} ({})", book.id, book.entry.title)
     val providers =
       ServiceLoader.load(ViewerProviderType::class.java)
         .toList()
@@ -65,13 +65,13 @@ object Viewers {
       this.logger.debug("[{}]: {}", index, viewerProvider.name)
     }
 
-    this.logger.debug("trying all providers...")
+    this.logger.debug("Trying all providers...")
     for (index in providers.indices) {
       val viewerProvider = providers[index]
       val supported = viewerProvider.canSupport(preferences, book, format)
       if (supported) {
         this.logger.debug(
-          "[{}] viewer provider {} supports the book, using it!", index, viewerProvider.name
+          "[{}] Viewer provider {} supports the book, using it!", index, viewerProvider.name
         )
 
         val profile = this.profilesController.profileCurrent()
@@ -98,10 +98,10 @@ object Viewers {
         return
       } else {
         this.logger.debug(
-          "[{}] viewer provider {} does not support the book", index, viewerProvider.name
+          "[{}] Viewer provider {} does not support the book", index, viewerProvider.name
         )
       }
     }
-    this.logger.error("no viewer providers can handle the given book")
+    this.logger.error("No viewer providers can handle the given book")
   }
 }

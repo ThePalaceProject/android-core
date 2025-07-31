@@ -216,6 +216,11 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
             metadata = event.bookmarkMetadata
           )
 
+        this.logger.debug(
+          "Creating bookmark (Kind {}, Position {})",
+          playerBookmark.kind,
+          playerBookmark.position
+        )
         this.bookmarkService.bookmarkCreate(
           accountID = parameters.accountID,
           bookmark = AudioBookBookmarks.fromPlayerBookmark(
@@ -401,7 +406,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       this.logger.debug("Assigning {} bookmarks.", bookmarks.bookmarks.size)
       val lastRead = this.assignBookmarks(bookmarks) ?: return
       if (state.positionOnOpen == null) {
-        this.logger.debug("Restoring last-read position from bookmark.")
+        this.logger.debug("Restoring last-read position from bookmark ({}).", lastRead.position)
         state.player.player.movePlayheadToLocation(lastRead.position)
       }
     } catch (e: Throwable) {
