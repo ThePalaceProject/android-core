@@ -5,7 +5,6 @@ import org.joda.time.Instant
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.nypl.drm.core.AdobeAdeptExecutorType
-import org.nypl.drm.core.AxisNowServiceType
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
@@ -33,7 +32,6 @@ interface BorrowContextType {
   val application: Application
   val account: AccountType
   val adobeExecutor: AdobeAdeptExecutorType?
-  val axisNowService: AxisNowServiceType?
   val audioBookManifestStrategies: AudioBookManifestStrategiesType
   val bundledContent: BundledContentResolverType
   val clock: () -> Instant

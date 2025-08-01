@@ -22,7 +22,6 @@ import org.nypl.drm.core.AdobeDeviceID
 import org.nypl.drm.core.AdobeLoanID
 import org.nypl.drm.core.AdobeUserID
 import org.nypl.drm.core.AdobeVendorID
-import org.nypl.drm.core.AxisNowFulfillment
 import org.nypl.simplified.accounts.api.AccountAuthenticationAdobeClientToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationAdobePostActivationCredentials
 import org.nypl.simplified.accounts.api.AccountAuthenticationAdobePreActivationCredentials
@@ -42,7 +41,6 @@ import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookStatusEvent
 import org.nypl.simplified.books.borrowing.internal.BorrowACSM
-import org.nypl.simplified.books.borrowing.internal.BorrowAxisNow
 import org.nypl.simplified.books.borrowing.internal.BorrowDirectDownload
 import org.nypl.simplified.books.borrowing.internal.BorrowLCPEpub
 import org.nypl.simplified.books.borrowing.internal.BorrowLoanCreate
@@ -67,7 +65,6 @@ import org.nypl.simplified.tests.mocking.MockAdobeAdeptConnector
 import org.nypl.simplified.tests.mocking.MockAdobeAdeptExecutor
 import org.nypl.simplified.tests.mocking.MockAdobeAdeptNetProvider
 import org.nypl.simplified.tests.mocking.MockAdobeAdeptResourceProvider
-import org.nypl.simplified.tests.mocking.MockAxisNowService
 import org.nypl.simplified.tests.mocking.MockBookDatabase
 import org.nypl.simplified.tests.mocking.MockBookDatabaseEntry
 import org.nypl.simplified.tests.mocking.MockBookDatabaseEntryFormatHandleEPUB
@@ -334,26 +331,6 @@ class BorrowBookRefreshTokenTest {
       (this.account.loginState.credentials as AccountAuthenticationCredentials.BasicToken)
         .authenticationTokenInfo.accessToken
     )
-  }
-
-  @Test
-  fun testUpdateCredentialsBorrowAxisNow() {
-    val axisNowService = MockAxisNowService()
-    axisNowService.onFulfill = { token, tempFactory ->
-      val fakeBook = this.context.temporaryFile().apply { this.createNewFile() }
-      val fakeLicense = this.context.temporaryFile().apply { this.createNewFile() }
-      val fakeUserKey = this.context.temporaryFile().apply { this.createNewFile() }
-      AxisNowFulfillment(fakeBook, fakeLicense, fakeUserKey)
-    }
-
-    val bookDatabaseEPUBHandle =
-      MockBookDatabaseEntryFormatHandleEPUB(this.bookID)
-    this.bookDatabaseEntry.formatHandlesField.clear()
-    this.bookDatabaseEntry.formatHandlesField.add(bookDatabaseEPUBHandle)
-    bookDatabaseEPUBHandle.drmInformationHandleField = MockDRMInformationAxisHandle()
-
-    this.context.axisNowService = axisNowService
-    this.executeTask(task = BorrowAxisNow.createSubtask())
   }
 
   @Test

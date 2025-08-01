@@ -8,7 +8,6 @@ import org.joda.time.LocalDateTime
 import org.librarysimplified.reports.Reports
 import org.librarysimplified.services.api.Services
 import org.nypl.drm.core.AdobeAdeptExecutorType
-import org.nypl.drm.core.AxisNowServiceType
 import org.nypl.simplified.adobe.extensions.AdobeDRMExtensions
 import org.nypl.simplified.analytics.api.AnalyticsEvent
 import org.nypl.simplified.analytics.api.AnalyticsType
@@ -215,8 +214,7 @@ object SettingsDebugModel {
 
   @UiThread
   fun axisNowSupported(): Boolean {
-    val services = Services.serviceDirectory()
-    return services.optionalService(AxisNowServiceType::class.java) != null
+    return false
   }
 
   @UiThread

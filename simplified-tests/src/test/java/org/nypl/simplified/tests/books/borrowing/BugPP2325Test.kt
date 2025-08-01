@@ -180,7 +180,6 @@ class BugPP2325Test {
           application = this.androidContext,
           adobeExecutor = this.adobeExecutor,
           audioBookManifestStrategies = AudioBookManifests,
-          axisNowService = null,
           bookFormatSupport = this.bookFormatSupport,
           bookRegistry = this.bookRegistry,
           bundledContent = this.bundledContent,
