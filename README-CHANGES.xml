@@ -694,9 +694,9 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2025-08-01T10:51:31+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.16.4">
+    <c:release date="2025-08-01T12:53:29+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.16.4">
       <c:changes>
-        <c:change date="2025-08-01T10:51:31+00:00" summary="Apply a hotfix for an Adobe DRM login/logout issue."/>
+        <c:change date="2025-08-01T00:00:00+00:00" summary="Apply a hotfix for an Adobe DRM login/logout issue."/>
       </c:changes>
     </c:release>
   </c:releases>
