@@ -550,7 +550,6 @@ dependencies {
     implementation(libs.kotlinx.datetime)
     implementation(libs.logback.android)
     implementation(libs.moznion.uribuildertiny)
-    implementation(libs.nypl.readium)
     implementation(libs.okhttp3)
     implementation(libs.okio)
     implementation(libs.palace.audiobook.api)

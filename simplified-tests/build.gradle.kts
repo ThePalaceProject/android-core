@@ -196,7 +196,6 @@ val dependencyObjects = listOf(
     libs.media3.session,
     libs.mockito.android,
     libs.mockito.core,
-    libs.nypl.readium,
     libs.objenesis,
     libs.okhttp3,
     libs.okhttp3.mockwebserver,
