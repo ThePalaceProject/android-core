@@ -8,7 +8,6 @@ dependencies {
 
     implementation(libs.androidx.core)
     implementation(libs.firebase.messaging)
-    implementation(libs.firebase.messaging.ktx)
     implementation(libs.irradia.mime.api)
     implementation(libs.jackson.core)
     implementation(libs.jackson.databind)

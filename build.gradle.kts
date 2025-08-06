@@ -818,6 +818,7 @@ allprojects {
     afterEvaluate {
         configurations.all {
             isTransitive = transitiveConfigurations.contains(name)
+            // isTransitive = true
             // resolutionStrategy.failOnVersionConflict()
         }
     }

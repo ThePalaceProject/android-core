@@ -694,7 +694,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2025-08-05T09:13:00+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.17.0">
+    <c:release date="2025-08-06T12:14:22+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.17.0">
       <c:changes>
         <c:change date="2025-07-15T00:00:00+00:00" summary="Add support for Boundless DRM."/>
         <c:change date="2025-07-15T00:00:00+00:00" summary="Respect book cover aspect ratios.">
@@ -722,9 +722,19 @@
             <c:ticket id="PP-2736"/>
           </c:tickets>
         </c:change>
-        <c:change date="2025-08-05T09:13:00+00:00" summary="Make Adobe DRM 16k page compatible, and remove libepub3.so.">
+        <c:change date="2025-08-05T00:00:00+00:00" summary="Make Adobe DRM 16k page compatible, and remove libepub3.so.">
           <c:tickets>
             <c:ticket id="PP-2775"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2025-08-06T00:00:00+00:00" summary="Update sqlite to be 16k page compatible.">
+          <c:tickets>
+            <c:ticket id="PP-2780"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2025-08-06T12:14:22+00:00" summary="Update datastore to be 16k page compatible.">
+          <c:tickets>
+            <c:ticket id="PP-2779"/>
           </c:tickets>
         </c:change>
       </c:changes>
