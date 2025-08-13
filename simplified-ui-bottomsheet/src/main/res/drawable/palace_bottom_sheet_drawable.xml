@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/PalaceScreenBackgroundColor" />
+    <stroke
+        android:width="1dp"
+        android:color="@color/PalaceGrey2" />
+    <corners
+        android:bottomLeftRadius="0dp"
+        android:bottomRightRadius="0dp"
+        android:topLeftRadius="8dp"
+        android:topRightRadius="8dp" />
+</shape>

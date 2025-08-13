@@ -1,8 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-</LinearLayout>
+    <FrameLayout
+        android:id="@+id/sandboxTabContent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#00f"
+        app:layout_constraintBottom_toTopOf="@id/sandboxTabLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <FrameLayout
+            android:id="@+id/sandboxTabRed"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#f00">
+
+        </FrameLayout>
+    </FrameLayout>
+
+    <org.librarysimplified.ui.bottomsheet.PalaceBottomSheet
+        android:id="@+id/sandboxBottomSheet"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        app:layout_constraintBottom_toTopOf="@id/sandboxTabLayout">
+
+        <LinearLayout
+            android:id="@+id/exampleContent"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <Button
+                android:layout_width="128dp"
+                android:layout_height="48dp"
+                android:text="HELLO!" />
+        </LinearLayout>
+
+    </org.librarysimplified.ui.bottomsheet.PalaceBottomSheet>
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/sandboxTabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/sandboxTab0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Content" />
+
+    </com.google.android.material.tabs.TabLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -9,7 +9,7 @@
             android:contentDescription="Sandbox"
             android:launchMode="singleTop"
             android:exported="true"
-            android:theme="@style/PalaceTheme.WithActionBar"
+            android:theme="@style/PalaceTheme.WithoutActionBar"
             android:label="Sandbox">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
