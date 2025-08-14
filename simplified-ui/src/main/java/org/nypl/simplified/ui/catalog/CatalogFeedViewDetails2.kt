@@ -1209,7 +1209,7 @@ class CatalogFeedViewDetails2(
     }
 
     this.reconfigureButton0(
-      text = R.string.catalogGet,
+      text = R.string.catalogDownload,
       actionInPage = {
         this.openDrawer()
         this.onBookBorrowRequested(status.toBorrowParameters())
