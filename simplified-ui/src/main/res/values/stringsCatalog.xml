@@ -62,8 +62,7 @@
   <string name="catalogDescription">Description</string>
   <string name="catalogDetails">Details</string>
   <string name="catalogDismiss">Dismiss</string>
-  <!-- https://ebce-lyrasis.atlassian.net/browse/PP-2736 -->
-  <string name="catalogDownload">Borrow</string>
+  <string name="catalogDownload">Download</string>
   <string name="catalogLoginRequired">Please sign in to continue.</string>
   <!-- https://ebce-lyrasis.atlassian.net/browse/PP-2736 -->
   <string name="catalogGet">Borrow</string>

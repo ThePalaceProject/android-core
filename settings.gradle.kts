@@ -113,6 +113,17 @@ dependencyResolutionManagement {
     }
 
     /*
+     * Conditionally enable Findaway DRM.
+     */
+
+    if (findawayDRM && !s3RepositoryEnabled) {
+        throw GradleException(
+            "If the org.thepalaceproject.findawayDRM.enabled property is set to true, " +
+                "the org.thepalaceproject.s3.depend property must be set to true."
+        )
+    }
+
+    /*
      * The set of repositories used to resolve library dependencies. The order is significant!
      */
 
@@ -137,17 +148,6 @@ dependencyResolutionManagement {
          */
 
         google()
-
-        /*
-         * Findaway access.
-         */
-
-        if (findawayDRM) {
-            maven {
-                url = uri("http://maven.findawayworld.com/artifactory/libs-release/")
-                isAllowInsecureProtocol = true
-            }
-        }
 
         /*
          * Allow access to the Sonatype snapshots repositories.
@@ -200,12 +200,6 @@ dependencyResolutionManagement {
                 }
             }
         }
-
-        /*
-         * Obsolete dependencies.
-         */
-
-        jcenter()
     }
 }
 
