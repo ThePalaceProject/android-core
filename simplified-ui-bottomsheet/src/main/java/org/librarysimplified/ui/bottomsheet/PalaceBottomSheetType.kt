@@ -1,6 +1,13 @@
 package org.librarysimplified.ui.bottomsheet
 
+import androidx.annotation.StringRes
+
 interface PalaceBottomSheetType {
+
+  fun drawerSetHandleAccessibilityStrings(
+    @StringRes openHandle: Int,
+    @StringRes closeHandle: Int
+  )
 
   fun drawerOpen()
 

@@ -303,6 +303,10 @@ class CatalogFeedViewDetails2(
     this.setVisibility(this.bottomSheet, View.INVISIBLE)
 
     this.bottomSheet.drawerCloseInstantly()
+    this.bottomSheet.drawerSetHandleAccessibilityStrings(
+      openHandle = R.string.catalogAccessibilityOpenCheckoutDrawer,
+      closeHandle = R.string.catalogAccessibilityCloseCheckoutDrawer
+    )
     this.bottomSheet.setOpenListener(object : PalaceBottomSheetType.SheetOpenListenerType {
       override fun onOpenChanged(state: Double) {
         val c = this@CatalogFeedViewDetails2

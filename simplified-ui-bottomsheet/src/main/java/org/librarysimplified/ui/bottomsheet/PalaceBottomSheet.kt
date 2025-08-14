@@ -15,6 +15,8 @@ import kotlin.math.abs
 
 class PalaceBottomSheet : FrameLayout, PalaceBottomSheetType {
 
+  private var handleCloseString: String = ""
+  private var handleOpenString: String = ""
   private val ignoreOpenListener = IgnoreOpenListener()
 
   private var openListener: PalaceBottomSheetType.SheetOpenListenerType =
@@ -25,7 +27,7 @@ class PalaceBottomSheet : FrameLayout, PalaceBottomSheetType {
 
   private lateinit var handle: View
   private lateinit var contentArea: ViewGroup
-  private var isExpanded = false
+  private var isOpen = false
 
   constructor(
     context: Context
@@ -140,9 +142,30 @@ class PalaceBottomSheet : FrameLayout, PalaceBottomSheetType {
     }
   }
 
+  override fun drawerSetHandleAccessibilityStrings(
+    openHandle: Int,
+    closeHandle: Int
+  ) {
+    this.handleOpenString =
+      this.context.getString(openHandle)
+    this.handleCloseString =
+      this.context.getString(closeHandle)
+
+    this.updateHandleAccessibilityStrings()
+  }
+
+  private fun updateHandleAccessibilityStrings() {
+    if (this.isOpen()) {
+      this.handle.contentDescription = this.handleCloseString
+    } else {
+      this.handle.contentDescription = this.handleOpenString
+    }
+  }
+
   override fun drawerOpen() {
     this.logger.debug("Opening...")
-    this.isExpanded = true
+    this.isOpen = true
+    this.updateHandleAccessibilityStrings()
     this.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
 
     val animator = ValueAnimator.ofFloat(this.translationY, 0f)
@@ -157,7 +180,8 @@ class PalaceBottomSheet : FrameLayout, PalaceBottomSheetType {
 
   override fun drawerOpenInstantly() {
     this.logger.debug("Opening...")
-    this.isExpanded = true
+    this.isOpen = true
+    this.updateHandleAccessibilityStrings()
     this.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
 
     this.translationY = 0.0f
@@ -180,7 +204,7 @@ class PalaceBottomSheet : FrameLayout, PalaceBottomSheetType {
      * occurs).
      */
 
-    if (this.isExpanded) {
+    if (this.isOpen()) {
       this.drawerOpenInstantly()
     } else {
       this.drawerCloseInstantly()
@@ -189,7 +213,8 @@ class PalaceBottomSheet : FrameLayout, PalaceBottomSheetType {
 
   override fun drawerClose() {
     this.logger.debug("Closing...")
-    this.isExpanded = false
+    this.isOpen = false
+    this.updateHandleAccessibilityStrings()
     this.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
 
     val contentHeight = this.contentArea.height
@@ -206,7 +231,8 @@ class PalaceBottomSheet : FrameLayout, PalaceBottomSheetType {
 
   override fun drawerCloseInstantly() {
     this.logger.debug("Closing...")
-    this.isExpanded = false
+    this.isOpen = false
+    this.updateHandleAccessibilityStrings()
     this.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
 
     val contentHeight = this.contentArea.height
@@ -215,7 +241,7 @@ class PalaceBottomSheet : FrameLayout, PalaceBottomSheetType {
   }
 
   override fun isOpen(): Boolean {
-    return this.isExpanded
+    return this.isOpen
   }
 
   override fun setOpenListener(

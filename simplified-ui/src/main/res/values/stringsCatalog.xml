@@ -18,11 +18,13 @@
   <string name="catalogAccessibilityBookRevokeHold">Remove Button</string>
   <string name="catalogAccessibilityBookRevokeLoan">Return Now Button</string>
   <string name="catalogAccessibilityBookSync">Sync Button</string>
+  <string name="catalogAccessibilityCloseCheckoutDrawer">Close The Checkout Drawer</string>
   <string name="catalogAccessibilityCoverAudiobook">%1$s, audiobook, by %2$s</string>
   <string name="catalogAccessibilityCoverEpub">%1$s, ebook, by %2$s</string>
   <string name="catalogAccessibilityCoverPdf">%1$s, pdf, by %2$s</string>
   <string name="catalogAccessibilityCoverUnknownFormat">%1$s, by %2$s</string>
   <string name="catalogAccessibilityGoBack">Go Back Button</string>
+  <string name="catalogAccessibilityOpenCheckoutDrawer">Open The Checkout Drawer</string>
   <string name="catalogAccessibilitySearch">Search Button</string>
   <string name="catalogAccounts">Choose another library catalog…</string>
   <string name="catalogBookAvailabilityHeldIndefinite">You have this book on hold.</string>
