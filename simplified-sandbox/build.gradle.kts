@@ -1,6 +1,8 @@
 dependencies {
     coreLibraryDesugaring(libs.android.desugaring)
 
+    implementation(project(":simplified-ui-bottomsheet"))
+
     implementation(libs.androidx.activity)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.annotation)
@@ -72,12 +74,15 @@ dependencies {
     implementation(libs.androidx.transition)
     implementation(libs.androidx.transition.ktx)
     implementation(libs.androidx.vectordrawable)
+    implementation(libs.androidx.vectordrawable.animated)
     implementation(libs.androidx.versionedparcelable)
-    implementation(libs.androidx.viewbinding)
     implementation(libs.androidx.viewpager)
     implementation(libs.androidx.viewpager2)
     implementation(libs.androidx.webkit)
+
     implementation(libs.google.material)
     implementation(libs.kotlin.stdlib)
+    implementation(libs.logback.android)
     implementation(libs.palace.theme)
+    implementation(libs.slf4j)
 }

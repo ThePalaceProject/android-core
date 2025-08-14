@@ -195,8 +195,8 @@
             android:layout_marginEnd="32dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textSize="15sp"
             android:textColor="?android:attr/colorBackground"
+            android:textSize="15sp"
             app:layout_constraintEnd_toStartOf="@id/bookD2ToolbarItemButton"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/bookD2ToolbarItemButton"
@@ -210,8 +210,8 @@
             android:layout_marginEnd="32dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textSize="11sp"
             android:textColor="?android:attr/colorBackground"
+            android:textSize="11sp"
             app:layout_constraintEnd_toStartOf="@id/bookD2ToolbarItemButton"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/bookD2ToolbarItemTitle"
@@ -219,16 +219,16 @@
 
         <Button
             android:id="@+id/bookD2ToolbarItemButton"
+            style="@style/Palace.Button.Contained.Medium"
             android:layout_width="128dp"
             android:layout_height="48dp"
             android:layout_marginEnd="32dp"
             android:layout_marginBottom="16dp"
-            app:strokeWidth="1dp"
-            app:strokeColor="@android:color/white"
-            style="@style/Palace.Button.Contained.Medium"
             android:text="@string/catalogGet"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:strokeColor="@android:color/white"
+            app:strokeWidth="1dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -359,145 +359,20 @@
         android:elevation="10dp" />
 
     <!-- Bottom sheet. -->
-    <LinearLayout
-        android:id="@+id/book2DBottomSheet"
-        android:layout_width="match_parent"
-        android:layout_height="376dp"
-        android:background="@drawable/bottom_sheet_drawable"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:elevation="20dp"
-        android:orientation="vertical"
-        app:behavior_hideable="false"
-        app:behavior_peekHeight="48dp"
-        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <View
-            android:id="@+id/book2DBottomSheetHandle"
-            android:layout_width="80dp"
-            android:layout_height="8dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/bottom_handle"
-            android:clickable="false"
-            android:focusable="false"
-            app:layout_constraintEnd_toEndOf="parent"
+        <org.librarysimplified.ui.bottomsheet.PalaceBottomSheet
+            android:id="@+id/book2DBottomSheet"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/book2DBottomSheetLibrary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="32dp"
-            android:textSize="15sp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:textAppearance="@android:style/TextAppearance.Material.Title"
-            tools:text="@string/catalogPlaceholder" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="32dp"
-            android:layout_marginBottom="16dp"
-            android:background="?android:attr/listDivider" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
-            android:layout_marginEnd="32dp"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:id="@+id/book2DBottomSheetCover"
-                android:layout_width="64dp"
-                android:layout_height="80dp"
-                android:contentDescription="@string/catalogBookCoverDescription"
-                android:scaleType="fitXY"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:src="@drawable/cover" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/book2DBottomSheetTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:maxLines="1"
-                    android:textSize="11sp"
-                    android:textAppearance="@android:style/TextAppearance.Material.Title"
-                    tools:text="@string/catalogPlaceholder" />
-
-                <TextView
-                    android:id="@+id/book2DBottomSheetAuthors"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:maxLines="1"
-                    android:textSize="10sp"
-                    tools:text="@string/catalogPlaceholder" />
-
-            </LinearLayout>
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="32dp"
-            android:layout_marginBottom="16dp"
-            android:background="?android:attr/listDivider" />
-
-        <include
-            layout="@layout/book_detail2_borrowing"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            tools:visibility="visible" />
-
-        <LinearLayout
-            android:id="@+id/book2DBottomSheetButtons"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="8dp"
-            android:gravity="center"
-            android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/book2DOverlaySubtitle">
-
-            <Button
-                android:id="@+id/book2DBottomSheetButton0"
-                style="@style/Palace.Button.Contained.Medium"
-                android:layout_width="128dp"
-                android:layout_height="wrap_content"
-                android:text="@string/catalogGet" />
-
-            <View
-                android:layout_width="8dp"
-                android:layout_height="8dp" />
-
-            <Button
-                android:id="@+id/book2DBottomSheetButton1"
-                style="@style/Palace.Button.Outlined.Medium"
-                android:layout_width="128dp"
-                android:layout_height="wrap_content"
-                android:text="@string/catalogPreview" />
-        </LinearLayout>
-
-    </LinearLayout>
+            android:layout_width="0dp"
+            android:layout_height="wrap_content">
+            <include layout="@layout/book_detail2_drawer_content"/>
+        </org.librarysimplified.ui.bottomsheet.PalaceBottomSheet>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

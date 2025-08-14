@@ -737,6 +737,11 @@
             <c:ticket id="PP-2779"/>
           </c:tickets>
         </c:change>
+        <c:change date="2025-08-13T14:21:08+00:00" summary="Implement a new and improved bottom drawer on book details pages.">
+          <c:tickets>
+            <c:ticket id="PP-2753"/>
+          </c:tickets>
+        </c:change>
         <c:change date="2025-08-13T19:01:43+00:00" summary="Ensure Download button is shown for borrowed books.">
           <c:tickets>
             <c:ticket id="PP-2809"/>

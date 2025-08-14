@@ -25,14 +25,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
-import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
-import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_DRAGGING
-import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
-import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HALF_EXPANDED
-import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN
-import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_SETTLING
-import com.google.android.material.bottomsheet.BottomSheetBehavior.from
 import com.google.common.util.concurrent.MoreExecutors
 import com.io7m.jfunctional.Some
 import org.joda.time.DateTime
@@ -41,6 +33,8 @@ import org.joda.time.Duration
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatterBuilder
 import org.librarysimplified.ui.R
+import org.librarysimplified.ui.bottomsheet.PalaceBottomSheet
+import org.librarysimplified.ui.bottomsheet.PalaceBottomSheetType
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.books.api.Book
@@ -203,7 +197,7 @@ class CatalogFeedViewDetails2(
   private val bottomSheetDarken =
     this.root.findViewById<View>(R.id.book2DBottomSheetDarken)
   private val bottomSheet =
-    this.root.findViewById<ViewGroup>(R.id.book2DBottomSheet)
+    this.root.findViewById<PalaceBottomSheet>(R.id.book2DBottomSheet)
   private val bottomSheetCover =
     this.bottomSheet.findViewById<ImageView>(R.id.book2DBottomSheetCover)
   private val bottomSheetTitle =
@@ -214,8 +208,6 @@ class CatalogFeedViewDetails2(
     this.bottomSheet.findViewById<TextView>(R.id.book2DBottomSheetLibrary)
   private val bottomSheetInfoProgress =
     this.bottomSheet.findViewById<ProgressBar>(R.id.book2DBottomSheetProgress)
-  private val bottomSheetBehavior =
-    from(this.bottomSheet)
   private val bottomSheetInfoContainer =
     this.bottomSheet.findViewById<ViewGroup>(R.id.book2DBottomSheetInfoContainer)
   private val bottomSheetInfoBorrowingLayout =
@@ -309,48 +301,31 @@ class CatalogFeedViewDetails2(
     this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
     this.bottomSheetDarken.alpha = 0.0f
     this.setVisibility(this.bottomSheet, View.INVISIBLE)
-    this.bottomSheetBehavior.addBottomSheetCallback(object :
-      BottomSheetCallback() {
-      override fun onStateChanged(
-        bottomSheet: View,
-        newState: Int
-      ) {
+
+    this.bottomSheet.drawerCloseInstantly()
+    this.bottomSheet.setOpenListener(object : PalaceBottomSheetType.SheetOpenListenerType {
+      override fun onOpenChanged(state: Double) {
         val c = this@CatalogFeedViewDetails2
-        when (newState) {
-          STATE_EXPANDED -> {
-            c.setVisibility(c.bottomSheet, View.VISIBLE)
-            c.bottomSheetDarken.alpha = c.bottomSheetDarkenOpacityMax
-          }
+        c.bottomSheetDarken.alpha = (c.bottomSheetDarkenOpacityMax * state).toFloat()
 
-          STATE_COLLAPSED -> {
-            c.bottomSheetDarken.alpha = 0.0f
-          }
+        /*
+         * If the drawer is fully open, make all the other views disabled. If the drawer is
+         * fully closed, make all the views have their normal accessibility values. We use
+         * a so-called "scrim" view - a translucent view that intercepts all click events -
+         * to stop the user clicking on things in the background.
+         */
 
-          STATE_HIDDEN -> {
-            // Nothing required
-          }
-
-          STATE_DRAGGING -> {
-            // Nothing required
-          }
-
-          STATE_HALF_EXPANDED -> {
-            // Nothing required
-          }
-
-          STATE_SETTLING -> {
-            // Nothing required
-          }
+        if (state >= 0.99) {
+          c.bottomSheetDarken.setOnClickListener { }
+          c.bottomSheetDarken.isClickable = true
+          c.scrollView.importantForAccessibility =
+            View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
+        } else if (state <= 0.01) {
+          c.bottomSheetDarken.setOnClickListener(null)
+          c.bottomSheetDarken.isClickable = false
+          c.scrollView.importantForAccessibility =
+            View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
         }
-      }
-
-      override fun onSlide(
-        bottomSheet: View,
-        slideOffset: Float
-      ) {
-        val c = this@CatalogFeedViewDetails2
-        c.bottomSheetDarken.alpha =
-          clamp(slideOffset, 0.0f, 1.0f) * c.bottomSheetDarkenOpacityMax
       }
     })
 
@@ -891,7 +866,7 @@ class CatalogFeedViewDetails2(
     this.reconfigureButton0(
       text = R.string.catalogRetry,
       actionInPage = {
-        this.bottomSheetBehavior.state = STATE_EXPANDED
+        this.openDrawer()
         this.onBookBorrowRequested(status.toBorrowParameters())
       },
       actionInBottomSheet = {
@@ -900,7 +875,9 @@ class CatalogFeedViewDetails2(
     )
     this.reconfigureButton1(
       text = R.string.catalogDetails,
-      actionInPage = { this.bottomSheetBehavior.state = STATE_EXPANDED },
+      actionInPage = {
+        this.openDrawer()
+      },
       actionInBottomSheet = { this.onShowErrorDetails(status.status.result) }
     )
   }
@@ -918,7 +895,7 @@ class CatalogFeedViewDetails2(
     this.reconfigureButton0(
       text = R.string.catalogRetry,
       actionInPage = {
-        this.bottomSheetBehavior.state = STATE_EXPANDED
+        this.openDrawer()
         this.onBookRevokeRequested(status)
       },
       actionInBottomSheet = {
@@ -927,7 +904,7 @@ class CatalogFeedViewDetails2(
     )
     this.reconfigureButton1(
       text = R.string.catalogDetails,
-      actionInPage = { this.bottomSheetBehavior.state = STATE_EXPANDED },
+      actionInPage = { this.openDrawer() },
       actionInBottomSheet = { this.onShowErrorDetails(status.status.result) }
     )
   }
@@ -945,7 +922,7 @@ class CatalogFeedViewDetails2(
     this.reconfigureButton0(
       text = R.string.catalogRetry,
       actionInPage = {
-        this.bottomSheetBehavior.state = STATE_EXPANDED
+        this.openDrawer()
         this.onBookBorrowRequested(status.toBorrowParameters())
       },
       actionInBottomSheet = {
@@ -954,7 +931,7 @@ class CatalogFeedViewDetails2(
     )
     this.reconfigureButton1(
       text = R.string.catalogDetails,
-      actionInPage = { this.bottomSheetBehavior.state = STATE_EXPANDED },
+      actionInPage = { this.openDrawer() },
       actionInBottomSheet = { this.onShowErrorDetails(status.status.result) }
     )
   }
@@ -991,7 +968,7 @@ class CatalogFeedViewDetails2(
     this.reconfigureButton0(
       text = R.string.catalogCancelHold,
       actionInPage = {
-        this.bottomSheetBehavior.state = STATE_EXPANDED
+        this.openDrawer()
         this.onBookRevokeRequested(status)
       },
       actionInBottomSheet = {
@@ -1030,6 +1007,7 @@ class CatalogFeedViewDetails2(
         this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
         andThen()
       }
+
       BORROWING -> {
         this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
         this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.VISIBLE)
@@ -1037,6 +1015,7 @@ class CatalogFeedViewDetails2(
         this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
         andThen()
       }
+
       GENERIC -> {
         this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
         this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
@@ -1044,6 +1023,7 @@ class CatalogFeedViewDetails2(
         this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
         andThen()
       }
+
       PROGRESS -> {
         this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
         this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
@@ -1051,6 +1031,7 @@ class CatalogFeedViewDetails2(
         this.setVisibility(this.bottomSheetInfoProgress, View.VISIBLE)
         andThen()
       }
+
       BORROWING_AND_PROGRESS -> {
         this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
         this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.VISIBLE)
@@ -1074,7 +1055,7 @@ class CatalogFeedViewDetails2(
     this.reconfigureButton0(
       text = R.string.catalogGet,
       actionInPage = {
-        this.bottomSheetBehavior.state = STATE_EXPANDED
+        this.openDrawer()
         this.onBookBorrowRequested(status.toBorrowParameters())
       },
       actionInBottomSheet = {
@@ -1096,7 +1077,7 @@ class CatalogFeedViewDetails2(
     this.reconfigureButton0(
       text = R.string.catalogReserve,
       actionInPage = {
-        this.bottomSheetBehavior.state = STATE_EXPANDED
+        this.openDrawer()
         this.onBookBorrowRequested(status.toBorrowParameters())
       },
       actionInBottomSheet = {
@@ -1119,7 +1100,7 @@ class CatalogFeedViewDetails2(
     this.reconfigureButton0(
       text = R.string.catalogGet,
       actionInPage = {
-        this.bottomSheetBehavior.state = STATE_EXPANDED
+        this.openDrawer()
         this.onBookBorrowRequested(status.toBorrowParameters())
       },
       actionInBottomSheet = {
@@ -1182,7 +1163,7 @@ class CatalogFeedViewDetails2(
       this.reconfigureButton1(
         text = R.string.catalogReturn,
         actionInPage = {
-          this.bottomSheetBehavior.state = STATE_EXPANDED
+          this.openDrawer()
           this.onBookRevokeRequested(status)
         },
         actionInBottomSheet = {
@@ -1226,7 +1207,7 @@ class CatalogFeedViewDetails2(
     this.reconfigureButton0(
       text = R.string.catalogGet,
       actionInPage = {
-        this.bottomSheetBehavior.state = STATE_EXPANDED
+        this.openDrawer()
         this.onBookBorrowRequested(status.toBorrowParameters())
       },
       actionInBottomSheet = {
@@ -1239,7 +1220,7 @@ class CatalogFeedViewDetails2(
       this.reconfigureButton1(
         text = R.string.catalogReturn,
         actionInPage = {
-          this.bottomSheetBehavior.state = STATE_EXPANDED
+          this.openDrawer()
           this.onBookRevokeRequested(status)
         },
         actionInBottomSheet = {
@@ -1349,13 +1330,18 @@ class CatalogFeedViewDetails2(
     this.reconfigureButton0(
       text = R.string.catalogCancel,
       actionInPage = {
-        this.bottomSheetBehavior.state = STATE_EXPANDED
+        this.openDrawer()
         this.onBookBorrowCancelRequested(status)
       },
       actionInBottomSheet = {
         this.onBookBorrowCancelRequested(status)
       }
     )
+  }
+
+  private fun openDrawer() {
+    this.bottomSheet.drawerOpen()
+    this.setVisibility(this.bottomSheet, View.VISIBLE)
   }
 
   private fun setProgress(

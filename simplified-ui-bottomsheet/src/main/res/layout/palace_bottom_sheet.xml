@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/palaceBottomSheet"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/palace_bottom_sheet_drawable"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/palaceBottomSheetHandle"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:layout_gravity="center"
+        android:contentDescription=""
+        android:clickable="true">
+
+        <View
+            android:layout_width="128dp"
+            android:layout_height="4dp"
+            android:layout_gravity="center"
+            android:background="@drawable/palace_bottom_sheet_handle"
+            android:clickable="false"
+            android:focusable="false" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/palaceBottomSheetContent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </FrameLayout>
+
+</LinearLayout>
