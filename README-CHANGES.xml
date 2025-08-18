@@ -694,7 +694,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2025-08-13T19:01:43+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.17.0">
+    <c:release date="2025-08-18T10:41:58+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.17.0">
       <c:changes>
         <c:change date="2025-07-15T00:00:00+00:00" summary="Add support for Boundless DRM."/>
         <c:change date="2025-07-15T00:00:00+00:00" summary="Respect book cover aspect ratios.">
@@ -737,14 +737,19 @@
             <c:ticket id="PP-2779"/>
           </c:tickets>
         </c:change>
-        <c:change date="2025-08-13T14:21:08+00:00" summary="Implement a new and improved bottom drawer on book details pages.">
+        <c:change date="2025-08-13T00:00:00+00:00" summary="Implement a new and improved bottom drawer on book details pages.">
           <c:tickets>
             <c:ticket id="PP-2753"/>
           </c:tickets>
         </c:change>
-        <c:change date="2025-08-13T19:01:43+00:00" summary="Ensure Download button is shown for borrowed books.">
+        <c:change date="2025-08-13T00:00:00+00:00" summary="Ensure Download button is shown for borrowed books.">
           <c:tickets>
             <c:ticket id="PP-2809"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2025-08-18T10:41:58+00:00" summary="Adjust loan due date display in feeds.">
+          <c:tickets>
+            <c:ticket id="PP-2631"/>
           </c:tickets>
         </c:change>
       </c:changes>

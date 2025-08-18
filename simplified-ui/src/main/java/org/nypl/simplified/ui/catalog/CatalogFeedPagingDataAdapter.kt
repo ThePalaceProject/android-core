@@ -17,6 +17,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.util.concurrent.MoreExecutors
 import io.reactivex.disposables.Disposable
 import org.joda.time.DateTime
+import org.joda.time.Days
 import org.joda.time.format.DateTimeFormat
 import org.librarysimplified.ui.R
 import org.nypl.simplified.books.api.Book
@@ -116,6 +117,8 @@ class CatalogFeedPagingDataAdapter(
       this.idle.findViewById<TextView>(R.id.bookCellIdleTitle)
     private val idleTime =
       this.idle.findViewById<TextView>(R.id.bookCellIdleTime)
+    private val idleTimeDays =
+      this.idle.findViewById<TextView>(R.id.bookCellIdleTimeDays)
     private val idleAuthor =
       this.idle.findViewById<TextView>(R.id.bookCellIdleAuthor)
     private val idleButtons =
@@ -203,6 +206,7 @@ class CatalogFeedPagingDataAdapter(
           this.idleTitle.text = item.feedEntry.title
           this.idleAuthor.text = item.feedEntry.authorsCommaSeparated
           this.idleTime.text = ""
+          this.idleTimeDays.text = ""
 
           val f =
             this@CatalogFeedPagingDataAdapter.covers.loadThumbnailInto(
@@ -522,6 +526,7 @@ class CatalogFeedPagingDataAdapter(
             R.string.catalogBookAvailabilityHeldQueue,
             position
           )
+        this.idleTimeDays.text = ""
       }
     }
 
@@ -666,12 +671,22 @@ class CatalogFeedPagingDataAdapter(
       loanDuration: DateTime?
     ) {
       if (loanDuration != null) {
+        val now = DateTime.now()
+        val days = Days.daysBetween(now, loanDuration)
+
         this.idleTime.text =
           this.idleTime.resources.getString(
             R.string.catalogBookCellBorrowingUntil,
-            org.nypl.simplified.ui.catalog.CatalogFeedPagingDataAdapter.Companion.loanEndFormatter.print(loanDuration)
+            loanEndFormatter.print(loanDuration)
           )
+        this.idleTimeDays.text =
+          this.idleTime.resources.getString(
+            R.string.catalogBookCellBorrowingDays,
+            days.days
+          )
+
         this.setVisible(this.idleTime, true)
+        this.setVisible(this.idleTimeDays, true)
       } else {
         this.hideIdleTime()
       }
@@ -680,6 +695,8 @@ class CatalogFeedPagingDataAdapter(
     private fun hideIdleTime() {
       this.idleTime.text = ""
       this.idleTime.visibility = GONE
+      this.idleTimeDays.text = ""
+      this.idleTimeDays.visibility = GONE
     }
 
     private fun onBookStatusLoanedNotDownloaded(

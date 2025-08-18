@@ -94,7 +94,8 @@
   <string name="catalogSearch">Search</string>
   <string name="catalogDurationFormat">%1$s hours, %2$s minutes</string>
 
-  <string name="catalogBookCellBorrowingUntil">Borrowed until %1$s</string>
+  <string name="catalogBookCellBorrowingUntil">Due %1$s</string>
+  <string name="catalogBookCellBorrowingDays">%1$d Days</string>
 
   <string name="catalogBookDetailBorrowingFor">Borrowing for</string>
   <string name="catalogBookDetailBorrowedUntil">Borrowed until</string>

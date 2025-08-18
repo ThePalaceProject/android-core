@@ -105,19 +105,40 @@
                 android:text="@string/catalogRetry" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/bookCellIdleTime"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:alpha="0.75"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:textSize="12sp"
+            android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/bookCellIdleCover"
-            tools:text="Borrowed until 31st February 1976" />
+            app:layout_constraintStart_toEndOf="@id/bookCellIdleCover">
+
+            <TextView
+                android:id="@+id/bookCellIdleTime"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:alpha="0.75"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:text="Borrowed until 31st February 1976" />
+
+            <TextView
+                android:id="@+id/bookCellIdleTimeDays"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:text="3 Days" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
