@@ -527,6 +527,7 @@ class CatalogFeedPagingDataAdapter(
             position
           )
         this.idleTimeDays.text = ""
+        this.setVisible(this.idleTime, true)
       }
     }
 
