@@ -759,8 +759,10 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2025-08-29T10:54:40+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.18.0">
-      <c:changes/>
+    <c:release date="2025-08-29T11:00:40+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.18.0">
+      <c:changes>
+        <c:change date="2025-08-29T11:00:40+00:00" summary="Support new LCP profiles."/>
+      </c:changes>
     </c:release>
   </c:releases>
   <c:ticket-systems>
