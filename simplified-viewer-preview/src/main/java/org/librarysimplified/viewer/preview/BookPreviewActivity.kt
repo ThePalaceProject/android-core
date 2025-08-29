@@ -38,6 +38,10 @@ import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.api.BookContentProtections
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookFormat
+import org.nypl.simplified.books.book_database.api.BookFormats
+import org.nypl.simplified.books.book_database.api.BookFormats.BookFormatDefinition.BOOK_FORMAT_AUDIO
+import org.nypl.simplified.books.book_database.api.BookFormats.BookFormatDefinition.BOOK_FORMAT_EPUB
+import org.nypl.simplified.books.book_database.api.BookFormats.BookFormatDefinition.BOOK_FORMAT_PDF
 import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
 import org.nypl.simplified.books.book_registry.BookPreviewStatus
 import org.nypl.simplified.books.controller.api.BooksPreviewControllerType
@@ -162,11 +166,53 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
       return
     }
 
+    /*
+     * Synthesize a `BookFormat` value for the preview. At the time of writing, we're
+     * very lax about exact MIME type values, and we assume no DRM. All of our current
+     * preview data seems to be fine with this.
+     */
+
     try {
+      val formatDefinition =
+        BookFormats.inferFormat(this.feedEntry.feedEntry)
+
       this.bookFormat =
-        this.account.bookDatabase.entry(this.feedEntry.bookID)
-          .book
-          .findPreferredFormat()!!
+        when (formatDefinition) {
+          BOOK_FORMAT_EPUB -> {
+            BookFormat.BookFormatEPUB(
+              drmInformation = BookDRMInformation.None,
+              file = null,
+              lastReadLocation = null,
+              bookmarks = listOf(),
+              contentType = BookFormats.epubMimeTypes().first()
+            )
+          }
+
+          BOOK_FORMAT_AUDIO -> {
+            BookFormat.BookFormatAudioBook(
+              drmInformation = BookDRMInformation.None,
+              file = null,
+              lastReadLocation = null,
+              bookmarks = listOf(),
+              manifest = null,
+              contentType = BookFormats.audioBookGenericMimeTypes().first()
+            )
+          }
+
+          BOOK_FORMAT_PDF -> {
+            BookFormat.BookFormatPDF(
+              drmInformation = BookDRMInformation.None,
+              file = null,
+              lastReadLocation = null,
+              bookmarks = listOf(),
+              contentType = BookFormats.pdfMimeTypes().first()
+            )
+          }
+
+          null -> {
+            throw IllegalStateException("No recognized preview format.")
+          }
+        }
     } catch (e: Throwable) {
       this.logger.debug("Unable to locate book format: ", e)
       this.finish()
@@ -222,17 +268,21 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
           is SR2ReaderFragment -> {
             super.onBackPressed()
           }
+
           is SR2SearchFragment -> {
             this.switchFragment(SR2ReaderFragment())
           }
+
           is SR2TOCFragment -> {
             this.switchFragment(SR2ReaderFragment())
           }
         }
       }
+
       null -> {
         super.onBackPressed()
       }
+
       else -> {
         super.onBackPressed()
       }
@@ -247,9 +297,11 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
       is SR2BookLoadingFailed -> {
         this.onBookLoadingFailed(event.exception)
       }
+
       is SR2ControllerBecameAvailable -> {
         this.onControllerBecameAvailable()
       }
+
       is SR2ControllerBecameUnavailable -> {
         // Nothing to do
       }
@@ -268,15 +320,19 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
       SR2ReaderViewCommand.SR2ReaderViewNavigationReaderClose -> {
         this.finish()
       }
+
       SR2ReaderViewCommand.SR2ReaderViewNavigationSearchClose -> {
         this.switchFragment(SR2ReaderFragment())
       }
+
       SR2ReaderViewCommand.SR2ReaderViewNavigationSearchOpen -> {
         this.switchFragment(SR2SearchFragment())
       }
+
       SR2ReaderViewCommand.SR2ReaderViewNavigationTOCClose -> {
         this.switchFragment(SR2ReaderFragment())
       }
+
       SR2ReaderViewCommand.SR2ReaderViewNavigationTOCOpen -> {
         this.switchFragment(SR2TOCFragment())
       }
