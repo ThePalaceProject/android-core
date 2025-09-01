@@ -16,6 +16,7 @@ import org.nypl.simplified.ui.accounts.AccountListFragment
 import org.nypl.simplified.ui.accounts.AccountListRegistryFragment
 import org.nypl.simplified.ui.catalog.CatalogPart
 import org.nypl.simplified.ui.errorpage.ErrorPageActivity
+import org.nypl.simplified.ui.errorpage.ErrorPageModel
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.main.MainTabCategory.TAB_SETTINGS
 import org.nypl.simplified.ui.main.MainTabRequest.TabAny
@@ -54,7 +55,8 @@ object MainNavigation {
     parameters: ErrorPageParameters
   ) {
     UIThread.checkIsUIThread()
-    ErrorPageActivity.show(activity, parameters)
+    ErrorPageModel.parameters = parameters
+    activity.startActivity(Intent(activity, ErrorPageActivity::class.java))
   }
 
   @UiThread

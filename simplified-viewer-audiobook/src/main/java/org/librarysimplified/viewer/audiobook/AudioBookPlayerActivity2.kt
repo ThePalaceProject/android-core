@@ -59,6 +59,7 @@ import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.ui.errorpage.ErrorPageFragment
+import org.nypl.simplified.ui.errorpage.ErrorPageModel
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
 import org.slf4j.LoggerFactory
@@ -504,17 +505,16 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
   }
 
   private fun openErrorPage(result: TaskResult.Failure<*>) {
-    this.switchFragment(
-      ErrorPageFragment.create(
-        ErrorPageParameters(
-          emailAddress = this.buildConfig.supportErrorReportEmailAddress,
-          body = "",
-          subject = "[palace-audiobook-error-report]",
-          attributes = sortedMapOf(),
-          taskSteps = result.steps
-        )
+    ErrorPageModel.parameters =
+      ErrorPageParameters(
+        emailAddress = this.buildConfig.supportErrorReportEmailAddress,
+        body = "",
+        subject = "[palace-audiobook-error-report]",
+        attributes = sortedMapOf(),
+        taskSteps = result.steps
       )
-    )
+
+    this.switchFragment(ErrorPageFragment())
   }
 
   private fun onBookOpenFailed(

@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import org.librarysimplified.reports.Reports
 import org.librarysimplified.ui.errorpage.R
-import org.slf4j.LoggerFactory
 
 /**
  * A full-screen fragment for displaying presentable errors, and reporting those errors
@@ -23,32 +22,8 @@ import org.slf4j.LoggerFactory
 
 class ErrorPageFragment : Fragment(R.layout.error_page) {
 
-  private val logger = LoggerFactory.getLogger(ErrorPageFragment::class.java)
-
-  companion object {
-
-    private const val PARAMETERS_ID =
-      "org.nypl.simplified.ui.errorpage.ErrorPageFragment.parameters"
-
-    /**
-     * Create a new error page fragment.
-     */
-
-    fun create(
-      parameters: ErrorPageParameters
-    ): ErrorPageFragment {
-      val args = Bundle()
-      args.putSerializable(this.PARAMETERS_ID, parameters)
-
-      val fragment = ErrorPageFragment()
-      fragment.arguments = args
-      return fragment
-    }
-  }
-
   private lateinit var errorDetails: TextView
   private lateinit var errorStepsList: RecyclerView
-  private lateinit var parameters: ErrorPageParameters
   private lateinit var sendButton: Button
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -61,10 +36,7 @@ class ErrorPageFragment : Fragment(R.layout.error_page) {
     this.sendButton =
       view.findViewById(R.id.errorSendButton)
 
-    this.parameters =
-      this.requireArguments().getSerializable(PARAMETERS_ID)
-        as ErrorPageParameters
-
+    val parameters = ErrorPageModel.parameters
     if (parameters.attributes.isEmpty()) {
       this.errorDetails.visibility = View.GONE
     } else {
@@ -101,6 +73,7 @@ class ErrorPageFragment : Fragment(R.layout.error_page) {
     this.sendButton.setOnClickListener {
       this.sendButton.isEnabled = false
 
+      val parameters = ErrorPageModel.parameters
       Reports.sendReportsDefault(
         context = requireContext(),
         address = parameters.emailAddress,

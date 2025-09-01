@@ -1,7 +1,6 @@
 package org.nypl.simplified.ui.accounts.saml20
 
 import android.content.Intent
-import android.os.Bundle
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.widget.FrameLayout
@@ -15,7 +14,7 @@ import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskStep
 import org.nypl.simplified.ui.errorpage.ErrorPageActivity
-import org.nypl.simplified.ui.errorpage.ErrorPageActivity.Companion.PARAMETER_ID
+import org.nypl.simplified.ui.errorpage.ErrorPageModel
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.errorpage.ErrorStrings
 import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
@@ -156,7 +155,7 @@ class AccountSAML20Activity : AppCompatActivity(R.layout.saml20_activity) {
   private fun showErrorPage(
     taskSteps: List<TaskStep>
   ) {
-    val parameters =
+    ErrorPageModel.parameters =
       ErrorPageParameters(
         emailAddress = AccountSAML20Model.supportEmailAddress,
         body = "",
@@ -164,13 +163,7 @@ class AccountSAML20Activity : AppCompatActivity(R.layout.saml20_activity) {
         attributes = sortedMapOf(),
         taskSteps = taskSteps
       )
-
-    val bundle = Bundle()
-    bundle.putSerializable(PARAMETER_ID, parameters)
-
-    val intent = Intent(this, ErrorPageActivity::class.java)
-    intent.putExtras(bundle)
-    this.startActivity(intent)
+    this.startActivity(Intent(this, ErrorPageActivity::class.java))
   }
 
   private fun setWebView(
