@@ -759,11 +759,12 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2025-09-01T08:49:47+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.17.1">
+    <c:release date="2025-09-02T10:01:36+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.17.1">
       <c:changes>
         <c:change date="2025-08-29T00:00:00+00:00" summary="Support new LCP profiles."/>
         <c:change date="2025-08-31T00:00:00+00:00" summary="Fix a dependency conflict that caused a Firebase crash."/>
-        <c:change date="2025-09-01T08:49:47+00:00" summary="Fix a possible error page crash."/>
+        <c:change date="2025-09-01T00:00:00+00:00" summary="Fix a possible error page crash."/>
+        <c:change date="2025-09-02T10:01:36+00:00" summary="Attempt to fix a crash caused by operating on a closed audiobook."/>
       </c:changes>
     </c:release>
   </c:releases>
