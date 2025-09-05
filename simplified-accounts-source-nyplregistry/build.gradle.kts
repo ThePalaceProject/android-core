@@ -5,6 +5,7 @@ dependencies {
     implementation(project(":simplified-accounts-json"))
     implementation(project(":simplified-accounts-registry-api"))
     implementation(project(":simplified-accounts-source-spi"))
+    implementation(project(":simplified-announcements"))
     implementation(project(":simplified-buildconfig-api"))
     implementation(project(":simplified-files"))
     implementation(project(":simplified-links"))

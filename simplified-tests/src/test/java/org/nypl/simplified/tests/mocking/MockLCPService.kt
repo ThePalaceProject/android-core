@@ -55,20 +55,6 @@ class MockLCPService(
     return Try.success(Unit)
   }
 
-  @Deprecated(
-    "Use `retrieveLicense()` with coroutines instead",
-    replaceWith = ReplaceWith("retrieveLicense(File(publication), authentication, allowUserInteraction = true)"),
-    level = DeprecationLevel.ERROR
-  )
-  @DelicateCoroutinesApi
-  override fun retrieveLicense(
-    publication: String,
-    authentication: LcpAuthenticating?,
-    completion: (LcpLicense?, LcpError?) -> Unit
-  ) {
-    completion.invoke(null, LcpError.LicenseProfileNotSupported)
-  }
-
   override suspend fun retrieveLicense(
     asset: Asset,
     authentication: LcpAuthenticating,
@@ -81,15 +67,5 @@ class MockLCPService(
     asset: ContainerAsset
   ): Try<LicenseDocument, LcpError> {
     return Try.failure(LcpError.LicenseProfileNotSupported)
-  }
-
-  @Deprecated(
-    "Use an AssetSniffer and check the conformance of the returned format to LcpSpecification",
-    level = DeprecationLevel.ERROR
-  )
-  override suspend fun isLcpProtected(
-    file: File
-  ): Boolean {
-    return false
   }
 }

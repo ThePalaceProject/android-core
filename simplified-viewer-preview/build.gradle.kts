@@ -16,6 +16,7 @@ dependencies {
     implementation(project(":simplified-profiles-controller-api"))
     implementation(project(":simplified-reader-api"))
     implementation(project(":simplified-services-api"))
+    implementation(project(":simplified-taskrecorder-api"))
     implementation(project(":simplified-threads"))
     implementation(project(":simplified-ui-screen"))
     implementation(project(":simplified-viewer-epub-readium2"))
