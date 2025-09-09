@@ -552,6 +552,8 @@ dependencies {
     implementation(libs.kotlinx.serialization.protobuf)
     implementation(libs.logback.android)
     implementation(libs.moznion.uribuildertiny)
+    implementation(libs.nano.httpd)
+    implementation(libs.nano.httpd.nanolets)
     implementation(libs.okhttp3)
     implementation(libs.okio)
     implementation(libs.palace.audiobook.api)
