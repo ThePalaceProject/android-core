@@ -938,6 +938,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
       CATALOG -> {
         // Nothing to do.
       }
+
       BOOKS, HOLDS -> {
         val subscription =
           this.catalogBookEvents.events.subscribe { event ->
@@ -945,6 +946,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
               is BookStatusEvent.BookStatusEventChanged -> {
                 // Nothing to do.
               }
+
               is BookStatusEvent.BookStatusEventAdded,
               is BookStatusEvent.BookStatusEventRemoved -> {
                 feedHandle.refresh()

@@ -93,6 +93,10 @@
   <string name="catalogReturn">Return</string>
   <string name="catalogSearch">Search</string>
   <string name="catalogDurationFormat">%1$s hours, %2$s minutes</string>
+  <string name="catalogResults">Results</string>
+  <string name="catalogFacetsFilter">Filter (%1$d)</string>
+  <string name="catalogFacetsFilterApply">Apply filters</string>
+  <string name="catalogFacetClear">Clear</string>
 
   <string name="catalogBookCellBorrowingUntil">Due %1$s</string>
   <string name="catalogBookCellBorrowingDays">%1$d Days</string>

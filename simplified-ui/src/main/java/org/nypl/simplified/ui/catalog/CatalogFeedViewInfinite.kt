@@ -1,25 +1,19 @@
 package org.nypl.simplified.ui.catalog
 
-import android.text.TextUtils
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.TEXT_ALIGNMENT_TEXT_END
 import android.view.ViewGroup
 import android.view.Window
-import android.widget.HorizontalScrollView
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
-import android.widget.Space
 import android.widget.TextView
-import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountID
@@ -32,9 +26,12 @@ import org.nypl.simplified.ui.catalog.CatalogPart.CATALOG
 import org.nypl.simplified.ui.catalog.CatalogPart.HOLDS
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.thepalaceproject.theme.core.PalaceTabButtons
+import java.util.SortedMap
+import java.util.TreeMap
 
 class CatalogFeedViewInfinite(
   override val root: ViewGroup,
+  private val layoutInflater: LayoutInflater,
   private val catalogPart: CatalogPart,
   private val onFacetSelected: (FeedFacet) -> Unit,
   private val onSearchSubmitted: (AccountID, FeedSearch, String) -> Unit,
@@ -60,10 +57,17 @@ class CatalogFeedViewInfinite(
     this.root.findViewById(R.id.catalogFeedContentHeader)
   val catalogFeedHeaderTabs: RadioGroup =
     this.root.findViewById(R.id.catalogFeedHeaderTabs)
-  val catalogFeedHeaderFacetsScroll: HorizontalScrollView =
-    this.root.findViewById(R.id.catalogFeedHeaderFacetsScroll)
   val catalogFeedHeaderFacets: LinearLayout =
     this.root.findViewById(R.id.catalogFeedHeaderFacets)
+
+  val catalogFeedHeaderFacetsSort: LinearLayout =
+    this.catalogFeedHeaderFacets.findViewById(R.id.catalogFeedFacetSort)
+  val catalogFeedHeaderFacetsSortText: TextView =
+    this.catalogFeedHeaderFacetsSort.findViewById(R.id.catalogFeedFacetSortText)
+  val catalogFeedHeaderFacetsFilter: LinearLayout =
+    this.catalogFeedHeaderFacets.findViewById(R.id.catalogFeedFacetFilter)
+  val catalogFeedHeaderFacetsFilterText: TextView =
+    this.catalogFeedHeaderFacetsFilter.findViewById(R.id.catalogFeedFacetFilterText)
 
   val catalogFeedEmptyMessage: TextView =
     this.root.findViewById(R.id.catalogFeedEmptyMessage)
@@ -88,8 +92,6 @@ class CatalogFeedViewInfinite(
     (this.listView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
     this.listView.setItemViewCacheSize(8)
 
-    this.catalogFeedHeaderFacets.removeAllViews()
-
     /*
      * The clickable library logo is only shown in the catalog. Not the "Books" and "Holds"
      * part.
@@ -99,9 +101,11 @@ class CatalogFeedViewInfinite(
       CATALOG -> {
         this.catalogFeedLogoContainer.setOnClickListener { this.onCatalogLogoClicked.invoke() }
       }
+
       BOOKS -> {
         this.catalogFeedLogoContainer.visibility = View.GONE
       }
+
       HOLDS -> {
         this.catalogFeedLogoContainer.visibility = View.GONE
       }
@@ -109,6 +113,10 @@ class CatalogFeedViewInfinite(
   }
 
   companion object {
+
+    private const val FACET_SORTING_NAME =
+      "SORT BY"
+
     fun create(
       window: Window,
       layoutInflater: LayoutInflater,
@@ -127,6 +135,7 @@ class CatalogFeedViewInfinite(
         onToolbarBackPressed = onToolbarBackPressed,
         onToolbarLogoPressed = onToolbarLogoPressed,
         root = layoutInflater.inflate(R.layout.catalog_feed_infinite, container, true) as ViewGroup,
+        layoutInflater = layoutInflater,
         window = window,
         onCatalogLogoClicked = onCatalogLogoClicked
       )
@@ -158,7 +167,7 @@ class CatalogFeedViewInfinite(
     )
 
     /*
-     * Otherwise, for each remaining non-entrypoint facet group, show a drop-down menu allowing
+     * Otherwise, for each remaining non-entrypoint facet group, show a UI allowing
      * the selection of individual facets. If there are no remaining groups, hide the button
      * bar.
      */
@@ -167,81 +176,120 @@ class CatalogFeedViewInfinite(
       facetsByGroup
         .filter { entry -> !FeedFacets.facetGroupIsEntryPointTyped(entry.value) }
         .filter { entry -> !FeedFacets.isIgnoredFacet(entry) }
+        .toSortedMap(String.CASE_INSENSITIVE_ORDER)
 
     if (remainingGroups.isEmpty()) {
-      this.catalogFeedHeaderFacetsScroll.visibility = View.GONE
+      this.catalogFeedHeaderFacets.visibility = View.GONE
       return
     }
 
-    val buttonLayoutParams =
-      LinearLayout.LayoutParams(
-        LinearLayout.LayoutParams.WRAP_CONTENT,
-        LinearLayout.LayoutParams.WRAP_CONTENT
-      )
+    this.configureFacetsSorting(remainingGroups)
+    this.configureFacetsFiltering(screen, remainingGroups)
+  }
 
-    val textLayoutParams =
-      LinearLayout.LayoutParams(
-        LinearLayout.LayoutParams.WRAP_CONTENT,
-        LinearLayout.LayoutParams.WRAP_CONTENT
-      )
+  /**
+   * Set up the filtering facets. This is a fairly complex dialog box that allows for turning
+   * on and off individual filtering facets and then submitting a request at the end with the
+   * combination of options.
+   */
 
-    textLayoutParams.gravity = Gravity.END or Gravity.CENTER_VERTICAL
+  private fun configureFacetsFiltering(
+    screen: ScreenSizeInformationType,
+    groups: SortedMap<String, List<FeedFacet>>
+  ) {
+    val withoutSortBy = TreeMap<String, List<FeedFacet>>(String.CASE_INSENSITIVE_ORDER)
+    withoutSortBy.putAll(groups)
+    withoutSortBy.remove(FACET_SORTING_NAME)
 
-    val spacerLayoutParams =
-      LinearLayout.LayoutParams(
-        screen.dpToPixels(8).toInt(),
-        LinearLayout.LayoutParams.MATCH_PARENT
-      )
+    /*
+     * Register a new filter model instance.
+     */
 
-    val sortedNames =
-      remainingGroups.keys.sortedWith(FeedFacets.facetComparator)
+    CatalogFeedFacetFilterModels.INSTANCE =
+      CatalogFeedFacetFilterModel.create(withoutSortBy)
 
-    val context = this.root.context
-    this.catalogFeedHeaderFacets.removeAllViews()
-    sortedNames.forEach { groupName ->
-      val group = remainingGroups.getValue(groupName)
-      if (FeedFacets.facetGroupIsEntryPointTyped(group)) {
-        return@forEach
-      }
+    val text =
+      this.root.context.getString(R.string.catalogFacetsFilter, withoutSortBy.size)
 
-      val button = MaterialButton(context)
-      val buttonLabel = AppCompatTextView(context)
-      val spaceStart = Space(context)
-      val spaceMiddle = Space(context)
-      val spaceEnd = Space(context)
+    this.catalogFeedHeaderFacetsFilterText.text = text
+    this.catalogFeedHeaderFacetsFilter.setOnClickListener {
+      val view =
+        this.layoutInflater.inflate(R.layout.catalog_facet_filters, null)
+      val facetListView =
+        view.findViewById<RecyclerView>(R.id.catalogFacetsFilterList)
+      val facetApply =
+        view.findViewById<Button>(R.id.catalogFacetsFilterApply)
+      val adapter =
+        CatalogFeedFacetFilterAdapter()
 
-      val active =
-        group.find { facet -> facet.isActive }
-          ?: group.firstOrNull()
+      facetListView.adapter = adapter
+      facetListView.layoutManager = LinearLayoutManager(this.root.context)
+      (facetListView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+      facetListView.setItemViewCacheSize(8)
 
-      button.id = View.generateViewId()
-      button.layoutParams = buttonLayoutParams
-      button.text = active?.title
-      button.ellipsize = TextUtils.TruncateAt.END
-      button.setOnClickListener {
-        this.showFacetSelectDialog(groupName, group)
-      }
+      adapter.submitList(CatalogFeedFacetFilterModels.INSTANCE.facets)
 
-      spaceStart.layoutParams = spacerLayoutParams
-      spaceMiddle.layoutParams = spacerLayoutParams
-      spaceEnd.layoutParams = spacerLayoutParams
+      val dialogBuilder = MaterialAlertDialogBuilder(this.root.context)
+      dialogBuilder.setView(view)
+      val dialog = dialogBuilder.create()
+      dialog.show()
 
-      buttonLabel.layoutParams = textLayoutParams
-      buttonLabel.text = "$groupName: "
-      buttonLabel.labelFor = button.id
-      buttonLabel.maxLines = 1
-      buttonLabel.ellipsize = TextUtils.TruncateAt.END
-      buttonLabel.textAlignment = TEXT_ALIGNMENT_TEXT_END
-      buttonLabel.gravity = Gravity.END or Gravity.CENTER_VERTICAL
+      /*
+       * Resize the dialog to 80% of the screen size.
+       */
 
-      this.catalogFeedHeaderFacets.addView(spaceStart)
-      this.catalogFeedHeaderFacets.addView(buttonLabel)
-      this.catalogFeedHeaderFacets.addView(spaceMiddle)
-      this.catalogFeedHeaderFacets.addView(button)
-      this.catalogFeedHeaderFacets.addView(spaceEnd)
+      val width = screen.widthPixels * 0.8
+      val height = screen.heightPixels * 0.8
+      dialog.window?.setLayout(width.toInt(), height.toInt())
+    }
+  }
+
+  /**
+   * Set up the sorting facet. This is simply a dialog with a radio group. Each button in
+   * the radio group selects a single sorting facet.
+   */
+
+  private fun configureFacetsSorting(
+    groups: SortedMap<String, List<FeedFacet>>
+  ) {
+    if (!groups.containsKey(FACET_SORTING_NAME)) {
+      this.catalogFeedHeaderFacetsSort.visibility = View.GONE
+      return
     }
 
-    this.catalogFeedHeaderFacetsScroll.scrollTo(0, 0)
+    val sortBy =
+      groups[FACET_SORTING_NAME]!!
+    val selected =
+      sortBy.find { facet -> facet.isActive }
+    this.catalogFeedHeaderFacetsSortText.text =
+      selected?.title ?: ""
+
+    this.catalogFeedHeaderFacetsSort.setOnClickListener {
+      val view =
+        this.layoutInflater.inflate(R.layout.catalog_facet_sort_by, null)
+      val group =
+        view.findViewById<RadioGroup>(R.id.catalogFacetDialogSortByGroup)
+
+      var checked = 0
+      sortBy.forEachIndexed { index, facet ->
+        val button = RadioButton(this.root.context)
+        button.setOnClickListener {
+          this.onFacetSelected(facet)
+        }
+        button.id = index
+        button.text = facet.title
+        if (facet.isActive) {
+          checked = index
+        }
+        group.addView(button)
+      }
+      group.check(checked)
+
+      val dialogBuilder = MaterialAlertDialogBuilder(this.root.context)
+      dialogBuilder.setView(view)
+      val dialog = dialogBuilder.create()
+      dialog.show()
+    }
   }
 
   private fun configureFacetTabs(
