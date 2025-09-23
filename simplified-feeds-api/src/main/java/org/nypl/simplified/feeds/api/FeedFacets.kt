@@ -1,7 +1,8 @@
 package org.nypl.simplified.feeds.api
 
 import com.io7m.jfunctional.Option
-import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetOPDS.Companion.ENTRYPOINT_FACET_GROUP_TYPE
+import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetSingle
+import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetOPDS12Single.Companion.ENTRYPOINT_FACET_GROUP_TYPE
 import java.util.Comparator
 
 /**
@@ -58,7 +59,7 @@ object FeedFacets {
    */
 
   @JvmStatic
-  fun findEntryPointFacetGroupForFeed(feed: Feed): List<FeedFacet>? {
+  fun findEntryPointFacetGroupForFeed(feed: Feed): List<FeedFacetSingle>? {
     return when (feed) {
       is Feed.FeedWithoutGroups ->
         findEntryPointFacetGroup(feed.facetsByGroup)
@@ -76,8 +77,8 @@ object FeedFacets {
 
   @JvmStatic
   fun findEntryPointFacetGroup(
-    groups: Map<String, List<FeedFacet>>
-  ): List<FeedFacet>? {
+    groups: Map<String, List<FeedFacetSingle>>
+  ): List<FeedFacetSingle>? {
     for (groupName in groups.keys) {
       val facets = groups[groupName].orEmpty()
       if (facets.isNotEmpty()) {
@@ -96,7 +97,7 @@ object FeedFacets {
    */
 
   @JvmStatic
-  fun facetGroupsAreAllEntryPoints(facetGroups: Map<String, List<FeedFacet>>): Boolean {
+  fun facetGroupsAreAllEntryPoints(facetGroups: Map<String, List<FeedFacetSingle>>): Boolean {
     return facetGroups.all { entry -> facetGroupIsEntryPointTyped(entry.value) }
   }
 
@@ -105,7 +106,7 @@ object FeedFacets {
    */
 
   @JvmStatic
-  fun facetGroupIsEntryPointTyped(facets: List<FeedFacet>): Boolean {
+  fun facetGroupIsEntryPointTyped(facets: List<FeedFacetSingle>): Boolean {
     return facets.all { facet -> facetIsEntryPointTyped(facet) }
   }
 
@@ -114,9 +115,9 @@ object FeedFacets {
    */
 
   @JvmStatic
-  fun facetIsEntryPointTyped(facet: FeedFacet): Boolean {
+  fun facetIsEntryPointTyped(facet: FeedFacetSingle): Boolean {
     return when (facet) {
-      is FeedFacet.FeedFacetOPDS ->
+      is FeedFacet.FeedFacetOPDS12Single ->
         facet.opdsFacet.groupType == Option.some(ENTRYPOINT_FACET_GROUP_TYPE)
       is FeedFacet.FeedFacetPseudo ->
         false
@@ -124,10 +125,7 @@ object FeedFacets {
   }
 
   @JvmStatic
-  fun isIgnoredFacet(value: Map.Entry<String, List<FeedFacet>>): Boolean {
-    if (value.key.uppercase() == "COLLECTION") {
-      return true
-    }
-    return false
+  fun isIgnoredFacet(value: Map.Entry<String, List<FeedFacetSingle>>): Boolean {
+    return value.key.uppercase() == "COLLECTION"
   }
 }

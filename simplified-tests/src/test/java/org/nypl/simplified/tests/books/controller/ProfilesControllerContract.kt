@@ -455,9 +455,9 @@ abstract class ProfilesControllerContract {
           uri = URI.create("Books"),
           title = "Books",
           facetTitleProvider = object : FeedFacetPseudoTitleProviderType {
-            override val collection: String
-              get() = "Collection"
-            override val collectionAll: String
+            override val library: String
+              get() = "Library"
+            override val libraryAll: String
               get() = "All"
             override val sortBy: String
               get() = "Sort By"

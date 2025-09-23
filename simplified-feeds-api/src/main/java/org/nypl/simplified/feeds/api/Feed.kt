@@ -5,6 +5,8 @@ import com.io7m.jfunctional.Some
 import org.joda.time.DateTime
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookID
+import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetOPDS12Single
+import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetSingle
 import org.nypl.simplified.feeds.api.FeedSearch.FeedSearchOpen1_1
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeed
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
@@ -95,16 +97,16 @@ sealed class Feed {
 
     val feedNext: URI?,
 
-    private val facetsByGroupData: MutableMap<String, MutableList<FeedFacet>>,
-    private val facetsOrderData: MutableList<FeedFacet>
+    private val facetsByGroupData: MutableMap<String, MutableList<FeedFacetSingle>>,
+    private val facetsOrderData: MutableList<FeedFacetSingle>
   ) : Feed() {
 
     private val entriesData: MutableMap<BookID, FeedEntry> = mutableMapOf()
     private val entriesOrderData: MutableList<BookID> = mutableListOf()
 
-    val facetsByGroup: Map<String, List<FeedFacet>> =
+    val facetsByGroup: Map<String, List<FeedFacetSingle>> =
       Collections.unmodifiableMap(this.facetsByGroupData)
-    val facetsOrder: List<FeedFacet> =
+    val facetsOrder: List<FeedFacetSingle> =
       Collections.unmodifiableList(this.facetsOrderData)
     val entriesByID: Map<BookID, FeedEntry> =
       Collections.unmodifiableMap(this.entriesData)
@@ -184,15 +186,15 @@ sealed class Feed {
 
     val feedNext: URI?,
 
-    private val facetsByGroupData: MutableMap<String, MutableList<FeedFacet>>,
-    private val facetsOrderData: MutableList<FeedFacet>,
+    private val facetsByGroupData: MutableMap<String, MutableList<FeedFacetSingle>>,
+    private val facetsOrderData: MutableList<FeedFacetSingle>,
     private val feedGroupsData: MutableMap<String, FeedGroup>,
     private val feedGroupsOrderData: MutableList<String>
   ) : Feed() {
 
-    val facetsByGroup: Map<String, List<FeedFacet>> =
+    val facetsByGroup: Map<String, List<FeedFacetSingle>> =
       Collections.unmodifiableMap(this.facetsByGroupData)
-    val facetsOrder: List<FeedFacet> =
+    val facetsOrder: List<FeedFacetSingle> =
       Collections.unmodifiableList(this.facetsOrderData)
     val feedGroupsByID: Map<String, FeedGroup> =
       Collections.unmodifiableMap(this.feedGroupsData)
@@ -241,8 +243,8 @@ sealed class Feed {
       feedSearch: FeedSearch?,
       feedTitle: String,
       feedURI: URI,
-      feedFacets: List<FeedFacet>,
-      feedFacetGroups: Map<String, List<FeedFacet>>
+      feedFacets: List<FeedFacetSingle>,
+      feedFacetGroups: Map<String, List<FeedFacetSingle>>
     ): FeedWithoutGroups {
       val mutableGroups =
         feedFacetGroups.mapValues { entry ->
@@ -382,10 +384,10 @@ sealed class Feed {
     private fun constructFacetsOrdered(
       accountId: AccountID,
       f: OPDSAcquisitionFeed
-    ): MutableList<FeedFacet> {
-      val facetsOrder = ArrayList<FeedFacet>(4)
+    ): MutableList<FeedFacetSingle> {
+      val facetsOrder = ArrayList<FeedFacetSingle>(4)
       for (ff in f.feedFacetsOrder) {
-        facetsOrder.add(FeedFacet.FeedFacetOPDS(accountId, Objects.requireNonNull(ff)))
+        facetsOrder.add(FeedFacetOPDS12Single(accountId, Objects.requireNonNull(ff)))
       }
       return facetsOrder
     }
@@ -393,14 +395,14 @@ sealed class Feed {
     private fun constructFacetGroups(
       accountId: AccountID,
       feed: OPDSAcquisitionFeed
-    ): MutableMap<String, MutableList<FeedFacet>> {
-      val facetsByGroup = HashMap<String, MutableList<FeedFacet>>(4)
+    ): MutableMap<String, MutableList<FeedFacetSingle>> {
+      val facetsByGroup = HashMap<String, MutableList<FeedFacetSingle>>(4)
       val fMap = feed.feedFacetsByGroup
       for (k in fMap.keys) {
         val fs = fMap[k]!!
-        val rs = ArrayList<FeedFacet>(4)
+        val rs = ArrayList<FeedFacetSingle>(4)
         for (ff in fs) {
-          rs.add(FeedFacet.FeedFacetOPDS(accountId, Objects.requireNonNull(ff)))
+          rs.add(FeedFacetOPDS12Single(accountId, Objects.requireNonNull(ff)))
         }
         facetsByGroup[k] = rs
       }

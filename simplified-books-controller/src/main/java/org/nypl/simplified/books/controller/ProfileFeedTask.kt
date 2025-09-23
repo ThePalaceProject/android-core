@@ -9,10 +9,10 @@ import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedBooksSelection
 import org.nypl.simplified.feeds.api.FeedEntry
-import org.nypl.simplified.feeds.api.FeedFacet
 import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetPseudo.FilteringForAccount
 import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetPseudo.Sorting
 import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetPseudo.Sorting.SortBy
+import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetSingle
 import org.nypl.simplified.feeds.api.FeedSearch
 import org.nypl.simplified.profiles.controller.api.ProfileFeedRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
@@ -79,18 +79,18 @@ internal class ProfileFeedTask(
     }
   }
 
-  private fun makeFacets(): Map<String, List<FeedFacet>> {
+  private fun makeFacets(): Map<String, List<FeedFacetSingle>> {
     val sorting = this.makeSortingFacets()
     val filtering = this.makeFilteringFacets()
-    val results = mutableMapOf<String, List<FeedFacet>>()
+    val results = mutableMapOf<String, List<FeedFacetSingle>>()
     results[sorting.first] = sorting.second
     results[filtering.first] = filtering.second
     check(results.size == 2)
     return results.toMap()
   }
 
-  private fun makeFilteringFacets(): Pair<String, List<FeedFacet>> {
-    val facets = mutableListOf<FeedFacet>()
+  private fun makeFilteringFacets(): Pair<String, List<FeedFacetSingle>> {
+    val facets = mutableListOf<FeedFacetSingle>()
     val accounts = this.profiles.profileCurrent().accounts().values
     for (account in accounts) {
       val active = account.id == this.request.filterByAccountID
@@ -100,16 +100,16 @@ internal class ProfileFeedTask(
 
     facets.add(
       FilteringForAccount(
-        title = this.request.facetTitleProvider.collectionAll,
+        title = this.request.facetTitleProvider.libraryAll,
         isActive = this.request.filterByAccountID == null,
         account = null
       )
     )
-    return Pair(this.request.facetTitleProvider.collection, facets)
+    return Pair(this.request.facetTitleProvider.library, facets)
   }
 
-  private fun makeSortingFacets(): Pair<String, List<FeedFacet>> {
-    val facets = mutableListOf<FeedFacet>()
+  private fun makeSortingFacets(): Pair<String, List<FeedFacetSingle>> {
+    val facets = mutableListOf<FeedFacetSingle>()
     val values = SortBy.values()
     for (sortingFacet in values) {
       val active = sortingFacet == this.request.sortBy

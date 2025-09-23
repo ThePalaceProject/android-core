@@ -19,6 +19,7 @@ import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedFacet
+import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetSingle
 import org.nypl.simplified.feeds.api.FeedFacets
 import org.nypl.simplified.feeds.api.FeedSearch
 import org.nypl.simplified.ui.catalog.CatalogPart.BOOKS
@@ -195,11 +196,16 @@ class CatalogFeedViewInfinite(
 
   private fun configureFacetsFiltering(
     screen: ScreenSizeInformationType,
-    groups: SortedMap<String, List<FeedFacet>>
+    groups: SortedMap<String, List<FeedFacetSingle>>
   ) {
-    val withoutSortBy = TreeMap<String, List<FeedFacet>>(String.CASE_INSENSITIVE_ORDER)
+    val withoutSortBy = TreeMap<String, List<FeedFacetSingle>>(String.CASE_INSENSITIVE_ORDER)
     withoutSortBy.putAll(groups)
     withoutSortBy.remove(FACET_SORTING_NAME)
+
+    if (withoutSortBy.isEmpty()) {
+      this.catalogFeedHeaderFacetsFilter.visibility = View.GONE
+      return
+    }
 
     /*
      * Register a new filter model instance.
@@ -221,6 +227,14 @@ class CatalogFeedViewInfinite(
         view.findViewById<Button>(R.id.catalogFacetsFilterApply)
       val adapter =
         CatalogFeedFacetFilterAdapter()
+
+      facetApply.setOnClickListener {
+        this.onFacetSelected.invoke(
+          CatalogFeedFacetFilterModels.INSTANCE.createResultFacet(
+            this.root.resources.getString(R.string.catalogResults)
+          )
+        )
+      }
 
       facetListView.adapter = adapter
       facetListView.layoutManager = LinearLayoutManager(this.root.context)
@@ -250,7 +264,7 @@ class CatalogFeedViewInfinite(
    */
 
   private fun configureFacetsSorting(
-    groups: SortedMap<String, List<FeedFacet>>
+    groups: SortedMap<String, List<FeedFacetSingle>>
   ) {
     if (!groups.containsKey(FACET_SORTING_NAME)) {
       this.catalogFeedHeaderFacetsSort.visibility = View.GONE

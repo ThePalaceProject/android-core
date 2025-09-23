@@ -188,10 +188,10 @@ class CatalogOPDSClients(
       get() = this.resources.getString(R.string.feedByTitle)
     override val sortByAuthor: String
       get() = this.resources.getString(R.string.feedByAuthor)
-    override val collection: String
-      get() = this.resources.getString(R.string.feedCollection)
-    override val collectionAll: String
-      get() = this.resources.getString(R.string.feedCollectionAll)
+    override val library: String
+      get() = this.resources.getString(R.string.feedLibrary)
+    override val libraryAll: String
+      get() = this.resources.getString(R.string.feedLibraryAll)
     override val sortBy: String
       get() = this.resources.getString(R.string.feedSortBy)
     override val show: String

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<feed xmlns:opds="http://opds-spec.org/2010/catalog" xmlns="http://www.w3.org/2005/Atom">
+
+    <id>urn:uuid:44833939-c9a7-4aa3-99dd-a98f2a953f2c</id>
+    <title>Next 0</title>
+    <updated>2000-01-01T00:00:00+00:00</updated>
+
+    <entry>
+        <id>urn:uuid:4497eacd-9c7f-4f35-b373-e42351940485</id>
+        <title>Book 0</title>
+        <updated>2000-01-01T00:00:00+00:00</updated>
+        <summary type="html">A book.</summary>
+        <link href="strawberries.png" rel="http://opds-spec.org/image" type="image/png" />
+        <link href="strawberriesThumb.png" rel="http://opds-spec.org/image/thumbnail"
+            type="image/png" />
+        <link href="nonexistent" rel="http://opds-spec.org/acquisition/borrow"
+            type="application/atom+xml;type=entry;profile=opds-catalog">
+            <opds:indirectAcquisition type="application/epub+zip" />
+            <opds:availability status="available" />
+            <opds:holds total="0" />
+            <opds:copies available="1" total="1" />
+        </link>
+        <link href="/feed.xml" rel="collection" title="Adventure"/>
+        <category label="Nonfiction"
+            scheme="http://librarysimplified.org/terms/fiction/" term="http://librarysimplified.org/terms/fiction/Nonfiction" />
+    </entry>
+
+    <entry>
+        <id>urn:uuid:546f82eb-b290-4309-afc4-d02b6150270c</id>
+        <title>Book 1</title>
+        <updated>2000-01-01T00:00:00+00:00</updated>
+        <summary type="html">A book.</summary>
+        <link href="strawberries.png" rel="http://opds-spec.org/image" type="image/png" />
+        <link href="strawberriesThumb.png" rel="http://opds-spec.org/image/thumbnail"
+            type="image/png" />
+        <link href="nonexistent" rel="http://opds-spec.org/acquisition/borrow"
+            type="application/atom+xml;type=entry;profile=opds-catalog">
+            <opds:indirectAcquisition type="application/epub+zip" />
+            <opds:availability status="available" />
+            <opds:holds total="0" />
+            <opds:copies available="1" total="1" />
+        </link>
+        <link href="/feed.xml" rel="collection" title="Adventure"/>
+        <category label="Nonfiction"
+            scheme="http://librarysimplified.org/terms/fiction/" term="http://librarysimplified.org/terms/fiction/Nonfiction" />
+    </entry>
+
+    <entry>
+        <id>urn:uuid:9789d0c5-6000-4375-bc75-74f3eaea6687</id>
+        <title>Book 2</title>
+        <updated>2000-01-01T00:00:00+00:00</updated>
+        <summary type="html">A book.</summary>
+        <link href="strawberries.png" rel="http://opds-spec.org/image" type="image/png" />
+        <link href="strawberriesThumb.png" rel="http://opds-spec.org/image/thumbnail"
+            type="image/png" />
+        <link href="nonexistent" rel="http://opds-spec.org/acquisition/borrow"
+            type="application/atom+xml;type=entry;profile=opds-catalog">
+            <opds:indirectAcquisition type="application/epub+zip" />
+            <opds:availability status="available" />
+            <opds:holds total="0" />
+            <opds:copies available="1" total="1" />
+        </link>
+        <link href="/feed.xml" rel="collection" title="Adventure"/>
+        <category label="Nonfiction"
+            scheme="http://librarysimplified.org/terms/fiction/" term="http://librarysimplified.org/terms/fiction/Nonfiction" />
+    </entry>
+
+</feed>

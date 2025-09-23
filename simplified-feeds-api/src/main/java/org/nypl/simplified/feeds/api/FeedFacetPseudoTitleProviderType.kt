@@ -9,8 +9,8 @@ package org.nypl.simplified.feeds.api
  */
 
 interface FeedFacetPseudoTitleProviderType {
-  val collection: String
-  val collectionAll: String
+  val library: String
+  val libraryAll: String
   val sortBy: String
   val sortByAuthor: String
   val sortByTitle: String
