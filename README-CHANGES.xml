@@ -767,7 +767,7 @@
         <c:change date="2025-09-02T00:00:00+00:00" summary="Attempt to fix a crash caused by operating on a closed audiobook."/>
       </c:changes>
     </c:release>
-    <c:release date="2025-09-11T17:11:40+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.18.0">
+    <c:release date="2025-09-24T15:10:52+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.18.0">
       <c:changes>
         <c:change date="2025-09-05T00:00:00+00:00" summary="Upgrade Kotlin and Readium">
           <c:tickets>
@@ -775,7 +775,12 @@
           </c:tickets>
         </c:change>
         <c:change date="2025-09-11T00:00:00+00:00" summary="Attempt another fix that avoids closing players that are in the process of being opened."/>
-        <c:change date="2025-09-11T17:11:40+00:00" summary="Upgrade all libraries to be 16k page compatible."/>
+        <c:change date="2025-09-11T00:00:00+00:00" summary="Upgrade all libraries to be 16k page compatible."/>
+        <c:change date="2025-09-24T15:10:52+00:00" summary="Eliminate bookmark waits. This should fix at least one ANR.">
+          <c:tickets>
+            <c:ticket id="PP-2932"/>
+          </c:tickets>
+        </c:change>
       </c:changes>
     </c:release>
   </c:releases>

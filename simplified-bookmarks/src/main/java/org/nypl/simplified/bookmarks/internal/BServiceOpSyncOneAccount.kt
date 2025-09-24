@@ -1,12 +1,15 @@
 package org.nypl.simplified.bookmarks.internal
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.io7m.jattribute.core.AttributeType
 import io.reactivex.subjects.Subject
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotation
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotations
 import org.nypl.simplified.bookmarks.api.BookmarkEvent
 import org.nypl.simplified.bookmarks.api.BookmarkHTTPCallsType
+import org.nypl.simplified.bookmarks.api.BookmarksForBook
+import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.books.api.bookmark.SerializedBookmark
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleEPUB
@@ -23,7 +26,8 @@ internal class BServiceOpSyncOneAccount(
   private val bookmarkEventsOut: Subject<BookmarkEvent>,
   private val objectMapper: ObjectMapper,
   private val profile: ProfileReadableType,
-  private val accountID: AccountID
+  private val accountID: AccountID,
+  private val bookmarksSource: AttributeType<Map<AccountID, Map<BookID, BookmarksForBook>>>,
 ) : BServiceOp<List<SerializedBookmark>>(logger) {
 
   override fun runActual(): List<SerializedBookmark> {
@@ -167,6 +171,13 @@ internal class BServiceOpSyncOneAccount(
             }
           }
 
+          this.bookmarksSource.set(
+            BookmarkAttributes.addBookmark(
+              this.bookmarksSource.get(),
+              syncable.account.id,
+              bookmark
+            )
+          )
           this.bookmarkEventsOut.onNext(
             BookmarkEvent.BookmarkSaved(
               syncable.account.id,
