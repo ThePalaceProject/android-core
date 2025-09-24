@@ -1,5 +1,6 @@
 package org.nypl.simplified.bookmarks.internal
 
+import com.io7m.jattribute.core.AttributeType
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.bookmarks.api.BookmarksForBook
 import org.nypl.simplified.books.api.BookFormat
@@ -16,11 +17,12 @@ import org.slf4j.Logger
  * An operation that loads bookmarks.
  */
 
-internal class BServiceOpLoadBookmarks(
+internal class BServiceOpLoadBookmarksForBook(
   logger: Logger,
   private val profile: ProfileReadableType,
   private val accountID: AccountID,
-  private val book: BookID
+  private val book: BookID,
+  private val bookmarksSource: AttributeType<Map<AccountID, Map<BookID, BookmarksForBook>>>,
 ) : BServiceOp<BookmarksForBook>(logger) {
 
   override fun runActual(): BookmarksForBook {
@@ -66,17 +68,30 @@ internal class BServiceOpLoadBookmarks(
           bookmarks.size
         )
 
-        return BookmarksForBook(
+        return publish(BookmarksForBook(
           bookId = this.book,
           lastRead = lastReadLocation,
           bookmarks = bookmarks.filter { b -> b.kind == BookmarkKind.BookmarkExplicit }
-        )
+        ))
       }
     } catch (e: Exception) {
       this.logger.error("[{}]: error loading bookmarks: ", this.profile.id.uuid, e)
     }
 
     this.logger.debug("[{}]: returning empty bookmarks", this.profile.id.uuid)
-    return BookmarksForBook(this.book, null, listOf())
+    return publish(BookmarksForBook(this.book, null, listOf()))
+  }
+
+  private fun publish(
+    bookmarksForBook: BookmarksForBook
+  ): BookmarksForBook {
+    this.bookmarksSource.set(
+      BookmarkAttributes.addBookmarks(
+        this.bookmarksSource.get(),
+        this.accountID,
+        bookmarksForBook
+      )
+    )
+    return bookmarksForBook
   }
 }

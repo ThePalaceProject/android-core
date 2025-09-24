@@ -1,5 +1,6 @@
 package org.nypl.simplified.bookmarks.api
 
+import com.io7m.jattribute.core.AttributeReadableType
 import io.reactivex.Observable
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookID
@@ -16,12 +17,17 @@ interface BookmarkServiceUsableType {
   /**
    * An observable that publishes events about bookmarks.
    */
-
   val bookmarkEvents: Observable<BookmarkEvent>
+
+  /**
+   * A read-only map of the current bookmarks.
+   */
+  val bookmarks: AttributeReadableType<Map<AccountID, Map<BookID, BookmarksForBook>>>
 
   /**
    * Sync the bookmarks for the given account, and load bookmarks for the given book.
    */
+
   fun bookmarkSyncAndLoad(
     accountID: AccountID,
     book: BookID
@@ -35,9 +41,16 @@ interface BookmarkServiceUsableType {
   ): CompletableFuture<List<SerializedBookmark>>
 
   /**
+   * The user wants to load all bookmarks for all books in all accounts.
+   */
+
+  fun bookmarkLoadAll(): CompletableFuture<Unit>
+
+  /**
    * The user wants their current bookmarks.
    */
 
+  @Deprecated("Use the bookmarks property to read without waiting.")
   fun bookmarkLoad(
     accountID: AccountID,
     book: BookID

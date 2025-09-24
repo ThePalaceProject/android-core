@@ -65,7 +65,6 @@ import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import java.net.URI
-import java.util.concurrent.TimeUnit
 
 class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_base) {
 
@@ -400,11 +399,12 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     bookParameters: AudioBookPlayerParameters
   ) {
     try {
+      val bookmarksAll =
+        this.bookmarkService.bookmarks.get()
+      val bookmarksForAccount =
+        bookmarksAll[bookParameters.accountID] ?: mapOf()
       val bookmarks =
-        this.bookmarkService.bookmarkLoad(
-          accountID = bookParameters.accountID,
-          book = bookParameters.bookID
-        ).get(10L, TimeUnit.SECONDS)
+        bookmarksForAccount[bookParameters.bookID] ?: BookmarksForBook.empty(bookParameters.bookID)
 
       this.logger.debug("Assigning {} bookmarks.", bookmarks.bookmarks.size)
       val lastRead = this.assignBookmarks(bookmarks) ?: return

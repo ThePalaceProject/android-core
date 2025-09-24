@@ -1,8 +1,11 @@
 package org.nypl.simplified.bookmarks.internal
 
+import com.io7m.jattribute.core.AttributeType
 import io.reactivex.subjects.Subject
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.bookmarks.api.BookmarkEvent
+import org.nypl.simplified.bookmarks.api.BookmarksForBook
+import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.books.api.bookmark.SerializedBookmark
 import org.nypl.simplified.profiles.api.ProfileReadableType
@@ -17,7 +20,8 @@ internal class BServiceOpCreateLocalBookmark(
   private val bookmarkEventsOut: Subject<BookmarkEvent>,
   private val profile: ProfileReadableType,
   private val accountID: AccountID,
-  private val bookmark: SerializedBookmark
+  private val bookmark: SerializedBookmark,
+  private val bookmarksSource: AttributeType<Map<AccountID, Map<BookID, BookmarksForBook>>>,
 ) : BServiceOp<SerializedBookmark>(logger) {
 
   override fun runActual(): SerializedBookmark {
@@ -30,6 +34,14 @@ internal class BServiceOpCreateLocalBookmark(
         "[{}]: locally saving bookmark {}",
         this.profile.id.uuid,
         this.bookmark.bookmarkId.value
+      )
+
+      this.bookmarksSource.set(
+        BookmarkAttributes.addBookmark(
+          this.bookmarksSource.get(),
+          this.accountID,
+          this.bookmark
+        )
       )
 
       val account =
