@@ -104,6 +104,13 @@
             android:label="@string/app_name" />
 
         <activity
+            android:name="org.librarysimplified.viewer.pdf.androidx.AXPDFActivity"
+            android:configChanges="orientation"
+            android:contentDescription="@string/app_name"
+            android:exported="false"
+            android:label="@string/app_name" />
+
+        <activity
             android:name="org.librarysimplified.viewer.audiobook.AudioBookPlayerActivity2"
             android:configChanges="orientation"
             android:contentDescription="@string/app_name"

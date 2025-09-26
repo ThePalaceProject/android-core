@@ -1,6 +1,7 @@
 package org.librarysimplified.viewer.pdf.androidx
 
 import android.app.Activity
+import android.content.Intent
 import one.irradia.mime.api.MIMEType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
@@ -52,6 +53,6 @@ class AXPDFViewer : ViewerProviderType {
     format: BookFormat,
     accountProviderID: URI
   ) {
-    TODO("Not yet implemented")
+    activity.startActivity(Intent(activity, AXPDFActivity::class.java))
   }
 }
