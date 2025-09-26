@@ -61,6 +61,7 @@ import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_NOT_CONSUMED
 import org.nypl.simplified.ui.main.MainNavigation
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
+import org.nypl.simplified.ui.settings.SettingsDebugModel
 import org.nypl.simplified.viewer.api.Viewers
 import org.nypl.simplified.viewer.spi.ViewerPreferences
 import org.slf4j.LoggerFactory
@@ -628,7 +629,9 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
   ) {
     val viewerPreferences =
       ViewerPreferences(
-        flags = mapOf()
+        flags = mapOf(
+          Pair("UseAndroidXPDF", SettingsDebugModel.isAndroidXPDFEnabled())
+        )
       )
 
     Viewers.openViewer(

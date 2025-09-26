@@ -500,7 +500,8 @@ object ProfilesDatabases {
               mostRecentAccount = account.id,
               hasSeenLibrarySelectionScreen = false,
               playbackRates = hashMapOf(),
-              isManualLCPPassphraseEnabled = false
+              isManualLCPPassphraseEnabled = false,
+              androidXPDFEnabled = false
             ),
             attributes = ProfileAttributes(sortedMapOf())
           )

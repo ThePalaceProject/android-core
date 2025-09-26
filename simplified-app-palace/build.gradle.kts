@@ -312,6 +312,7 @@ dependencies {
     implementation(project(":simplified-viewer-api"))
     implementation(project(":simplified-viewer-audiobook"))
     implementation(project(":simplified-viewer-epub-readium2"))
+    implementation(project(":simplified-viewer-pdf-androidx"))
     implementation(project(":simplified-viewer-pdf-pdfjs"))
     implementation(project(":simplified-viewer-preview"))
     implementation(project(":simplified-viewer-spi"))

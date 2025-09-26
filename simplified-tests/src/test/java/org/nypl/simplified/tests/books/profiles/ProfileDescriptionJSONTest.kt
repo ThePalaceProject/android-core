@@ -53,7 +53,8 @@ class ProfileDescriptionJSONTest {
           readerPreferences = ReaderPreferences.builder().build(),
           mostRecentAccount = AccountID.generate(),
           playbackRates = hashMapOf(),
-          isManualLCPPassphraseEnabled = false
+          isManualLCPPassphraseEnabled = false,
+          androidXPDFEnabled = false
         ),
         attributes = ProfileAttributes(
           sortedMapOf(

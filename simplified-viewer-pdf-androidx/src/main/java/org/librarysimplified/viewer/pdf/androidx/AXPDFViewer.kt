@@ -1,23 +1,22 @@
-package org.librarysimplified.viewer.pdf.pdfjs
+package org.librarysimplified.viewer.pdf.androidx
 
 import android.app.Activity
 import one.irradia.mime.api.MIMEType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.formats.api.StandardFormatNames
-import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.viewer.spi.ViewerPreferences
 import org.nypl.simplified.viewer.spi.ViewerProviderType
 import org.slf4j.LoggerFactory
 import java.net.URI
 
-class PdfViewerProvider : ViewerProviderType {
+class AXPDFViewer : ViewerProviderType {
 
   private val logger =
-    LoggerFactory.getLogger(PdfViewerProvider::class.java)
+    LoggerFactory.getLogger(AXPDFViewer::class.java)
 
-  override val name: String =
-    "org.librarysimplified.viewer.pdf.pdfjs.PdfViewerProvider"
+  override val name =
+    "org.librarysimplified.viewer.pdf.androidx.AXPDFViewer"
 
   override fun canSupport(
     preferences: ViewerPreferences,
@@ -25,11 +24,11 @@ class PdfViewerProvider : ViewerProviderType {
     format: BookFormat
   ): Boolean {
     val androidXEnabled = preferences.flags["UseAndroidXPDF"] ?: false
-    return if (!androidXEnabled) {
+    return if (androidXEnabled) {
       when (format) {
         is BookFormat.BookFormatEPUB,
         is BookFormat.BookFormatAudioBook -> {
-          this.logger.debug("The PDF.js viewer can only open PDF files.")
+          this.logger.debug("The AndroidX PDF viewer can only open PDF files")
           false
         }
         is BookFormat.BookFormatPDF -> {
@@ -37,7 +36,7 @@ class PdfViewerProvider : ViewerProviderType {
         }
       }
     } else {
-      this.logger.debug("The AndroidX PDF viewer is enabled so the PDF.js viewer is disabled.")
+      this.logger.debug("The AndroidX PDF viewer is not enabled")
       false
     }
   }
@@ -51,23 +50,8 @@ class PdfViewerProvider : ViewerProviderType {
     preferences: ViewerPreferences,
     book: Book,
     format: BookFormat,
-    accountProviderId: URI
+    accountProviderID: URI
   ) {
-    val formatPDF =
-      format as BookFormat.BookFormatPDF
-    val entry =
-      FeedEntry.FeedEntryOPDS(book.account, book.entry)
-
-    PdfReaderActivity.startActivity(
-      context = activity,
-      parameters = PdfReaderParameters(
-        accountId = book.account,
-        documentTitle = book.entry.title,
-        pdfFile = formatPDF.file!!,
-        id = book.id,
-        drmInfo = formatPDF.drmInformation,
-        entry = entry
-      )
-    )
+    TODO("Not yet implemented")
   }
 }

@@ -61,6 +61,7 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug), MainBackButtonC
   private lateinit var sendReportButton: Button
   private lateinit var showErrorButton: Button
   private lateinit var showOnlySupportedBooks: SwitchCompat
+  private lateinit var enableAndroidXPDF: SwitchCompat
   private lateinit var showTesting: SwitchCompat
   private lateinit var syncAccountsButton: Button
   private lateinit var toolbarBack: View
@@ -129,6 +130,8 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug), MainBackButtonC
       view.findViewById(R.id.settingsVersionDevIsManualLCPPassphraseEnabled)
     this.showOnlySupportedBooks =
       view.findViewById(R.id.settingsVersionDevShowOnlySupported)
+    this.enableAndroidXPDF =
+      view.findViewById(R.id.settingsVersionDevEnableAndroidXPDF)
     this.customOPDS =
       view.findViewById(R.id.settingsVersionDevCustomOPDS)
     this.crashlyticsId =
@@ -157,6 +160,8 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug), MainBackButtonC
       SettingsDebugModel.isManualLCPPassphraseEnabled()
     this.showOnlySupportedBooks.isChecked =
       SettingsDebugModel.showOnlySupportedBooks()
+    this.enableAndroidXPDF.isChecked =
+      SettingsDebugModel.isAndroidXPDFEnabled()
     this.crashlyticsId.text =
       SettingsDebugModel.crashlyticsId()
   }
@@ -249,6 +254,14 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug), MainBackButtonC
 
     this.hasSeenLibrarySelection.setOnCheckedChangeListener { _, checked ->
       SettingsDebugModel.updatePreferences { p -> p.copy(hasSeenLibrarySelectionScreen = checked) }
+    }
+
+    /*
+     * Configure the "AndroidX PDF" switch
+     */
+
+    this.enableAndroidXPDF.setOnCheckedChangeListener { _, checked ->
+      SettingsDebugModel.updatePreferences { p -> p.copy(androidXPDFEnabled = checked) }
     }
 
     /*

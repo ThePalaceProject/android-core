@@ -192,6 +192,9 @@ object ProfileDescriptionJSON {
     val hasSeenLibrarySelectionScreen =
       JSONParserUtilities.getBooleanDefault(objectNode, "hasSeenLibrarySelectionScreen", true)
 
+    val androidXPDFEnabled =
+      JSONParserUtilities.getBooleanDefault(objectNode, "androidXPDFEnabled", false)
+
     val showDebugSettings =
       JSONParserUtilities.getBooleanDefault(objectNode, "showDebugSettings", false)
 
@@ -217,7 +220,8 @@ object ProfileDescriptionJSON {
       hasSeenLibrarySelectionScreen = hasSeenLibrarySelectionScreen,
       showDebugSettings = showDebugSettings,
       playbackRates = playbackRates,
-      isManualLCPPassphraseEnabled = isManualLCPPassphraseEnabled
+      isManualLCPPassphraseEnabled = isManualLCPPassphraseEnabled,
+      androidXPDFEnabled = androidXPDFEnabled
     )
   }
 
@@ -250,6 +254,9 @@ object ProfileDescriptionJSON {
     val isManualLCPPassphraseEnabled =
       JSONParserUtilities.getBooleanDefault(objectNode, "isManualLCPPassphraseEnabled", false)
 
+    val androidXPDFEnabled =
+      JSONParserUtilities.getBooleanDefault(objectNode, "androidXPDFEnabled", false)
+
     val mostRecentAccount =
       JSONParserUtilities.getStringOrNull(objectNode, "mostRecentAccount")
         ?.let { AccountID(UUID.fromString(it)) }
@@ -262,7 +269,8 @@ object ProfileDescriptionJSON {
       mostRecentAccount = mostRecentAccount,
       hasSeenLibrarySelectionScreen = true,
       playbackRates = playbackRates,
-      isManualLCPPassphraseEnabled = isManualLCPPassphraseEnabled
+      isManualLCPPassphraseEnabled = isManualLCPPassphraseEnabled,
+      androidXPDFEnabled = androidXPDFEnabled
     )
   }
 
@@ -319,6 +327,9 @@ object ProfileDescriptionJSON {
     val isManualLCPPassphraseEnabled =
       JSONParserUtilities.getBooleanDefault(preferencesNode, "isManualLCPPassphraseEnabled", false)
 
+    val androidXPDFEnabled =
+      JSONParserUtilities.getBooleanDefault(objectNode, "androidXPDFEnabled", false)
+
     val preferences =
       ProfilePreferences(
         dateOfBirth = this.someOrNull(dateOfBirth),
@@ -327,7 +338,8 @@ object ProfileDescriptionJSON {
         mostRecentAccount = mostRecentAccountFallback,
         hasSeenLibrarySelectionScreen = true,
         playbackRates = playbackRates,
-        isManualLCPPassphraseEnabled = isManualLCPPassphraseEnabled
+        isManualLCPPassphraseEnabled = isManualLCPPassphraseEnabled,
+        androidXPDFEnabled = androidXPDFEnabled
       )
 
     val attributeMap = mutableMapOf<String, String>()
@@ -447,6 +459,7 @@ object ProfileDescriptionJSON {
     output.put("hasSeenLibrarySelectionScreen", preferences.hasSeenLibrarySelectionScreen)
     output.put("showDebugSettings", preferences.showDebugSettings)
     output.put("mostRecentAccount", preferences.mostRecentAccount.uuid.toString())
+    output.put("androidXPDFEnabled", preferences.androidXPDFEnabled)
 
     output.set<ObjectNode>(
       "playbackRates",

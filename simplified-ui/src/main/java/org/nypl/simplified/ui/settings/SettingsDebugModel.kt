@@ -138,6 +138,11 @@ object SettingsDebugModel {
   }
 
   @UiThread
+  fun isAndroidXPDFEnabled(): Boolean {
+    return this.preferences().androidXPDFEnabled
+  }
+
+  @UiThread
   fun showTestingLibraries(): Boolean {
     return this.preferences().showTestingLibraries
   }

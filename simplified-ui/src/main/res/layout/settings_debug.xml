@@ -252,6 +252,15 @@
                 android:enabled="true"
                 android:text="@string/settingsDevShowSupportedBooks" />
 
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/settingsVersionDevEnableAndroidXPDF"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:checked="false"
+                android:enabled="true"
+                android:text="@string/settingsDevEnableAndroidXPDF" />
+
             <Button
                 android:id="@+id/settingsVersionDevCustomOPDS"
                 android:layout_width="match_parent"

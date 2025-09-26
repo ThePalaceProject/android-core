@@ -36,7 +36,8 @@ class MockProfile(
         readerPreferences = ReaderPreferences.builder().build(),
         mostRecentAccount = this.accounts.firstKey(),
         playbackRates = hashMapOf(),
-        isManualLCPPassphraseEnabled = false
+        isManualLCPPassphraseEnabled = false,
+        androidXPDFEnabled = false
       ),
       attributes = ProfileAttributes(sortedMapOf())
     )

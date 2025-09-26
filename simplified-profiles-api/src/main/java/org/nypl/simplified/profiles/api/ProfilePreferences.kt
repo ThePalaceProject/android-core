@@ -23,6 +23,10 @@ data class ProfilePreferences(
 
   val showTestingLibraries: Boolean,
 
+  /** @return `true` if the new AndroidX PDF reader should be used */
+
+  val androidXPDFEnabled: Boolean,
+
   /**
    * @return `true` if the user has seen the library selection screen and opted out of
    * selecting a library
