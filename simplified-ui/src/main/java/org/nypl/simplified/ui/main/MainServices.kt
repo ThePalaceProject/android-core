@@ -403,14 +403,18 @@ internal object MainServices {
       NamedThreadPools.namedThreadPoolFactory("bookmarks", 19).newThread(runnable)
     }
 
-    return BookmarkService.createService(
-      BookmarkServiceProviderType.Requirements(
-        threads = threadFactory,
-        events = PublishSubject.create(),
-        httpCalls = BHTTPCalls(ObjectMapper(), http),
-        profilesController = bookController
+    val service =
+      BookmarkService.createService(
+        BookmarkServiceProviderType.Requirements(
+          threads = threadFactory,
+          events = PublishSubject.create(),
+          httpCalls = BHTTPCalls(ObjectMapper(), http),
+          profilesController = bookController
+        )
       )
-    )
+
+    service.bookmarkLoadAll()
+    return service
   }
 
   private fun createCoverProvider(

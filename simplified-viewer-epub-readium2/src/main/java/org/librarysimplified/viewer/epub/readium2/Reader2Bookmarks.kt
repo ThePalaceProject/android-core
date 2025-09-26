@@ -17,7 +17,6 @@ import org.nypl.simplified.books.api.bookmark.SerializedLocatorPage1
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.readium.r2.shared.publication.Href
 import org.slf4j.LoggerFactory
-import java.util.concurrent.TimeUnit
 
 /**
  * Functions to convert between SimplyE and SR2 bookmarks.
@@ -28,32 +27,6 @@ object Reader2Bookmarks {
   private val logger =
     LoggerFactory.getLogger(Reader2Bookmarks::class.java)
 
-  private fun loadRawBookmarks(
-    bookmarkService: BookmarkServiceUsableType,
-    accountID: AccountID,
-    bookID: BookID
-  ): BookmarksForBook {
-    return try {
-      bookmarkService
-        .bookmarkSyncAndLoad(accountID, bookID)
-        .get(10L, TimeUnit.SECONDS)
-    } catch (e: Exception) {
-      this.logger.debug("Could not load bookmarks: ", e)
-      try {
-        bookmarkService.bookmarkLoad(
-          accountID, bookID
-        ).get(10L, TimeUnit.SECONDS)
-      } catch (e: Exception) {
-        this.logger.debug("Could not load bookmarks: ", e)
-        BookmarksForBook(
-          bookId = bookID,
-          lastRead = null,
-          bookmarks = listOf()
-        )
-      }
-    }
-  }
-
   /**
    * Load bookmarks from the given bookmark service.
    */
@@ -63,12 +36,12 @@ object Reader2Bookmarks {
     accountID: AccountID,
     bookID: BookID
   ): List<SR2Bookmark> {
+    val bookmarksAll =
+      bookmarkService.bookmarks.get()
+    val bookmarksForAccount =
+      bookmarksAll[accountID] ?: mapOf()
     val rawBookmarks =
-      this.loadRawBookmarks(
-        bookmarkService = bookmarkService,
-        accountID = accountID,
-        bookID = bookID
-      )
+      bookmarksForAccount[bookID] ?: BookmarksForBook.empty(bookID)
 
     val lastReadLocal =
       rawBookmarks.lastRead?.let { this.toSR2Bookmark(it) }

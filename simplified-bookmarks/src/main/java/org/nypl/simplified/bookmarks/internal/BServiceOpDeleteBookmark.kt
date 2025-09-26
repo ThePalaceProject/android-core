@@ -1,7 +1,10 @@
 package org.nypl.simplified.bookmarks.internal
 
+import com.io7m.jattribute.core.AttributeType
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.bookmarks.api.BookmarkHTTPCallsType
+import org.nypl.simplified.bookmarks.api.BookmarksForBook
+import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.books.api.bookmark.SerializedBookmark
 import org.nypl.simplified.profiles.api.ProfileReadableType
@@ -17,7 +20,8 @@ internal class BServiceOpDeleteBookmark(
   private val profile: ProfileReadableType,
   private val accountID: AccountID,
   private val bookmark: SerializedBookmark,
-  private val ignoreRemoteFailures: Boolean
+  private val ignoreRemoteFailures: Boolean,
+  private val bookmarksSource: AttributeType<Map<AccountID, Map<BookID, BookmarksForBook>>>,
 ) : BServiceOp<Unit>(logger) {
 
   override fun runActual() {
@@ -47,6 +51,14 @@ internal class BServiceOpDeleteBookmark(
       )
 
       if (this.bookmark.kind == BookmarkKind.BookmarkExplicit) {
+        this.bookmarksSource.set(
+          BookmarkAttributes.removeBookmark(
+            this.bookmarksSource.get(),
+            this.accountID,
+            this.bookmark
+          )
+        )
+
         var bookmarkURI = this.bookmark.uri
         if (bookmarkURI == null) {
           val bookmarkEquivalent = findEquivalentBookmark()

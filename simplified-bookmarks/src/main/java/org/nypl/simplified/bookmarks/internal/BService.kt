@@ -1,10 +1,14 @@
 package org.nypl.simplified.bookmarks.internal
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.io7m.jattribute.core.AttributeReadableType
+import com.io7m.jattribute.core.AttributeType
+import com.io7m.jattribute.core.Attributes
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.Subject
 import org.nypl.simplified.accounts.api.AccountEvent
+import org.nypl.simplified.accounts.api.AccountEventDeletion
 import org.nypl.simplified.accounts.api.AccountEventLoginStateChanged
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggedIn
@@ -50,6 +54,12 @@ class BService(
   private val objectMapper =
     ObjectMapper()
 
+  private val attributes =
+    Attributes.create { e -> this.logger.debug("Attribute error: ", e) }
+
+  private val bookmarksSource: AttributeType<Map<AccountID, Map<BookID, BookmarksForBook>>> =
+    this.attributes.withValue(mapOf())
+
   init {
     this.disposables.add(
       this.profilesController.profileEvents()
@@ -85,6 +95,11 @@ class BService(
   }
 
   private fun onAccountEvent(event: AccountEvent) {
+    if (event is AccountEventDeletion.AccountEventDeletionSucceeded) {
+      this.onAccountDeleted(event.id)
+      return
+    }
+
     if (event is AccountEventLoginStateChanged) {
       when (event.state) {
         is AccountLoggedIn ->
@@ -99,6 +114,10 @@ class BService(
         }
       }
     }
+  }
+
+  private fun onAccountDeleted(id: AccountID) {
+    this.bookmarksSource.set(BookmarkAttributes.removeAccount(this.bookmarksSource.get(), id))
   }
 
   private fun <T> submitOp(
@@ -127,7 +146,8 @@ class BService(
           this.httpCalls,
           this.bookmarkEventsOut,
           this.objectMapper,
-          this.profilesController.profileCurrent()
+          this.profilesController.profileCurrent(),
+          this.bookmarksSource
         )
       )
     } catch (e: Throwable) {
@@ -164,6 +184,9 @@ class BService(
   override val bookmarkEvents: Observable<BookmarkEvent>
     get() = this.bookmarkEventsOut
 
+  override val bookmarks: AttributeReadableType<Map<AccountID, Map<BookID, BookmarksForBook>>>
+    get() = this.bookmarksSource
+
   override fun bookmarkSyncAccount(
     accountID: AccountID
   ): CompletableFuture<List<SerializedBookmark>> {
@@ -175,11 +198,27 @@ class BService(
           this.bookmarkEventsOut,
           this.objectMapper,
           this.profilesController.profileCurrent(),
-          accountID
+          accountID,
+          this.bookmarksSource
         )
       )
     } catch (e: Throwable) {
       this.logger.debug("sync: unable to sync account: ", e)
+      this.failedFuture(e)
+    }
+  }
+
+  override fun bookmarkLoadAll(): CompletableFuture<Unit> {
+    return try {
+      this.submitOp(
+        BServiceOpLoadBookmarksForAll(
+          this.logger,
+          this.profilesController.profileCurrent(),
+          this.bookmarksSource
+        )
+      )
+    } catch (e: Throwable) {
+      this.logger.debug("load-all: unable to load bookmarks: ", e)
       this.failedFuture(e)
     }
   }
@@ -199,11 +238,12 @@ class BService(
   ): CompletableFuture<BookmarksForBook> {
     return try {
       this.submitOp(
-        BServiceOpLoadBookmarks(
+        BServiceOpLoadBookmarksForBook(
           logger = this.logger,
           accountID = accountID,
           profile = this.profilesController.profileCurrent(),
-          book = book
+          book = book,
+          bookmarksSource = this.bookmarksSource
         )
       )
     } catch (e: Throwable) {
@@ -223,7 +263,8 @@ class BService(
           bookmarkEventsOut = this.bookmarkEventsOut,
           profile = this.profilesController.profileCurrent(),
           accountID = accountID,
-          bookmark = bookmark
+          bookmark = bookmark,
+          bookmarksSource = this.bookmarksSource
         )
       )
     } catch (e: Throwable) {
@@ -244,7 +285,8 @@ class BService(
           httpCalls = this.httpCalls,
           profile = this.profilesController.profileCurrent(),
           accountID = accountID,
-          bookmark = bookmark
+          bookmark = bookmark,
+          bookmarksSource = this.bookmarksSource
         )
       )
     } catch (e: Throwable) {
@@ -268,7 +310,8 @@ class BService(
           accountID = accountID,
           bookmarkEventsOut = this.bookmarkEventsOut,
           bookmark = bookmark,
-          ignoreRemoteFailures = ignoreRemoteFailures
+          ignoreRemoteFailures = ignoreRemoteFailures,
+          bookmarksSource = this.bookmarksSource
         )
       )
     } catch (e: Throwable) {
@@ -290,7 +333,8 @@ class BService(
           profile = this.profilesController.profileCurrent(),
           accountID = accountID,
           bookmark = bookmark,
-          ignoreRemoteFailures = ignoreRemoteFailures
+          ignoreRemoteFailures = ignoreRemoteFailures,
+          bookmarksSource = this.bookmarksSource
         )
       )
     } catch (e: Throwable) {
