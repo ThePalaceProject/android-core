@@ -122,4 +122,20 @@ sealed class SerializedBookmark {
    */
 
   abstract fun withoutURI(): SerializedBookmark
+
+  /**
+   * @return true if this bookmark can be used in place of the other bookmark.
+   */
+
+  fun isInterchangeableWith(
+    bookmark: SerializedBookmark
+  ): Boolean {
+    if (this == bookmark) {
+      return true
+    }
+    if (this.withoutURI() == bookmark.withoutURI()) {
+      return true
+    }
+    return false
+  }
 }

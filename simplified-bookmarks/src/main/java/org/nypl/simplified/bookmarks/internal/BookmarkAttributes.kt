@@ -43,7 +43,17 @@ object BookmarkAttributes {
     if (isLastRead != null) {
       forBook = forBook.copy(lastRead = isLastRead)
     } else {
-      forBook = forBook.copy(bookmarks = forBook.bookmarks.minus(bookmark).plus(bookmark))
+      /*
+       * Thanks to the awful design of the existing bookmark formats, there's no better way
+       * to deduplicate bookmarks than linearly searching through the entire list. If bookmarks
+       * carried unique client-assigned identifiers, then the bookmarks could be stored in a map
+       * and this would be efficient.
+       */
+
+      val newList = forBook.bookmarks.toMutableList()
+      newList.removeIf { b -> b.isInterchangeableWith(bookmark) }
+      newList.add(bookmark)
+      forBook = forBook.copy(bookmarks = newList.toList())
     }
 
     forAccount = forAccount.plus(Pair(bookmark.book, forBook))
