@@ -274,7 +274,7 @@ class BookPreviewAudiobookFragment : Fragment(), AudioManager.OnAudioFocusChange
       this.abandonAudioFocus()
     }
 
-    this.previewPlayPauseButton.setImageResource(R.drawable.play_icon)
+    this.previewPlayPauseButton.setImageResource(R.drawable.baseline_play_arrow_24)
     this.previewPlayPauseButton.contentDescription =
       this.getString(R.string.bookPreviewAccessibilityPlay)
     this.mediaPlayer.pause()
@@ -336,7 +336,7 @@ class BookPreviewAudiobookFragment : Fragment(), AudioManager.OnAudioFocusChange
   }
 
   private fun startPlaying() {
-    this.previewPlayPauseButton.setImageResource(R.drawable.pause_icon)
+    this.previewPlayPauseButton.setImageResource(R.drawable.round_pause_24)
     this.previewPlayPauseButton.contentDescription =
       this.getString(R.string.bookPreviewAccessibilityPause)
     this.mediaPlayer.start()
