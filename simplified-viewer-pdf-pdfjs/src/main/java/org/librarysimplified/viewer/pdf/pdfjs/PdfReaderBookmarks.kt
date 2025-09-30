@@ -14,28 +14,8 @@ import org.nypl.simplified.books.api.bookmark.SerializedLocatorHrefProgression20
 import org.nypl.simplified.books.api.bookmark.SerializedLocatorLegacyCFI
 import org.nypl.simplified.books.api.bookmark.SerializedLocatorPage1
 import org.nypl.simplified.feeds.api.FeedEntry
-import org.slf4j.LoggerFactory
-import java.util.concurrent.TimeUnit
 
 internal object PdfReaderBookmarks {
-
-  private val logger =
-    LoggerFactory.getLogger(PdfReaderBookmarks::class.java)
-
-  private fun loadRawBookmarks(
-    bookmarkService: BookmarkServiceUsableType,
-    accountID: AccountID,
-    bookID: BookID
-  ): BookmarksForBook {
-    return try {
-      bookmarkService
-        .bookmarkSyncAndLoad(accountID, bookID)
-        .get(15L, TimeUnit.SECONDS)
-    } catch (e: Exception) {
-      this.logger.debug("Could not load bookmarks: ", e)
-      BookmarksForBook(bookID, null, emptyList())
-    }
-  }
 
   /**
    * Load bookmarks from the given bookmark service.
@@ -46,17 +26,17 @@ internal object PdfReaderBookmarks {
     accountID: AccountID,
     bookID: BookID
   ): List<PdfBookmark> {
-    val rawBookmarks =
-      this.loadRawBookmarks(
-        bookmarkService = bookmarkService,
-        accountID = accountID,
-        bookID = bookID
-      )
+    val allBookmarks: Map<AccountID, Map<BookID, BookmarksForBook>> =
+      bookmarkService.bookmarks.get()
+    val forAccount: Map<BookID, BookmarksForBook> =
+      allBookmarks[accountID] ?: mapOf()
+    val forBook =
+      forAccount[bookID] ?: BookmarksForBook.empty(bookID)
 
     val lastReadLocal =
-      rawBookmarks.lastRead?.let { this.toPdfBookmark(it) }
+      forBook.lastRead?.let { this.toPdfBookmark(it) }
     val explicits =
-      rawBookmarks.bookmarks.mapNotNull { this.toPdfBookmark(it) }
+      forBook.bookmarks.mapNotNull { this.toPdfBookmark(it) }
 
     val results = mutableListOf<PdfBookmark>()
     lastReadLocal?.let(results::add)

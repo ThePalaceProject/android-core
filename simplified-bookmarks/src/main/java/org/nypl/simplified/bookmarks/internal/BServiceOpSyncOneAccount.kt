@@ -145,18 +145,7 @@ internal class BServiceOpSyncOneAccount(
         val bookmark =
           BookmarkAnnotations.toSerializedBookmark(this.objectMapper, bookmarkAnnotation)
 
-        this.logger.debug(
-          "[{}]: Received bookmark {}",
-          this.profile.id.uuid,
-          bookmark.bookmarkId.value
-        )
-
         if (!syncable.account.bookDatabase.books().contains(bookmark.book)) {
-          this.logger.debug(
-            "[{}]: We no longer have book {}",
-            this.profile.id.uuid,
-            bookmark.book.value()
-          )
           continue
         }
 

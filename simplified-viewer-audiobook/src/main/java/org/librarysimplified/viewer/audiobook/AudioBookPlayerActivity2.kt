@@ -445,11 +445,25 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     }
   }
 
+  private fun compareBookmarks(
+    x: PlayerBookmark,
+    y: PlayerBookmark
+  ): Int {
+    val c = x.readingOrderID.text.compareTo(y.readingOrderID.text)
+    if (c == 0) {
+      return x.offsetMilliseconds.compareTo(y.offsetMilliseconds)
+    }
+    return c
+  }
+
   private fun assignBookmarks(
     bookmarks: BookmarksForBook
   ): PlayerBookmark? {
     val bookmarksConverted =
       bookmarks.bookmarks.mapNotNull(AudioBookBookmarks::toPlayerBookmark)
+        .toSet()
+        .sortedWith { x, y -> compareBookmarks(x, y) }
+        .toList()
     val bookmarkLastRead =
       bookmarks.lastRead?.let { b -> AudioBookBookmarks.toPlayerBookmark(b) }
 
