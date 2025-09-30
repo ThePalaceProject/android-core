@@ -31,9 +31,9 @@ object BookmarkAttributes {
         null
       }
 
-    var forAccount =
+    var forAccount: Map<BookID, BookmarksForBook> =
       data[account] ?: mapOf()
-    var forBook =
+    var forBook: BookmarksForBook =
       forAccount[bookmark.book] ?: BookmarksForBook(
         bookId = bookmark.book,
         lastRead = isLastRead,
@@ -43,7 +43,7 @@ object BookmarkAttributes {
     if (isLastRead != null) {
       forBook = forBook.copy(lastRead = isLastRead)
     } else {
-      forBook = forBook.copy(bookmarks = forBook.bookmarks.plus(bookmark))
+      forBook = forBook.copy(bookmarks = forBook.bookmarks.minus(bookmark).plus(bookmark))
     }
 
     forAccount = forAccount.plus(Pair(bookmark.book, forBook))
@@ -57,9 +57,9 @@ object BookmarkAttributes {
   ): Map<AccountID, Map<BookID, BookmarksForBook>> {
     return when (bookmark.kind) {
       BookmarkKind.BookmarkExplicit -> {
-        val forAccount =
+        val forAccount: Map<BookID, BookmarksForBook> =
           data[account] ?: mapOf()
-        var forBook =
+        var forBook: BookmarksForBook =
           forAccount[bookmark.book] ?: BookmarksForBook(
             bookId = bookmark.book,
             lastRead = null,
@@ -79,7 +79,7 @@ object BookmarkAttributes {
     account: AccountID,
     bookmarksForBook: BookmarksForBook
   ): Map<AccountID, Map<BookID, BookmarksForBook>> {
-    var forAccount = data[account] ?: mapOf()
+    var forAccount: Map<BookID, BookmarksForBook> = data[account] ?: mapOf()
     forAccount = forAccount.plus(Pair(bookmarksForBook.bookId, bookmarksForBook))
     return data.plus(Pair(account, forAccount))
   }
