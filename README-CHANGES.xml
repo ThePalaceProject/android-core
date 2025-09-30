@@ -767,7 +767,7 @@
         <c:change date="2025-09-02T00:00:00+00:00" summary="Attempt to fix a crash caused by operating on a closed audiobook."/>
       </c:changes>
     </c:release>
-    <c:release date="2025-09-30T10:49:36+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.18.1">
+    <c:release date="2025-09-30T16:07:10+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.18.1">
       <c:changes>
         <c:change date="2025-09-05T00:00:00+00:00" summary="Upgrade Kotlin and Readium">
           <c:tickets>
@@ -781,7 +781,7 @@
             <c:ticket id="PP-2932"/>
           </c:tickets>
         </c:change>
-        <c:change date="2025-09-30T10:49:36+00:00" summary="Fix dark mode buttons in audiobook preview player.">
+        <c:change date="2025-09-30T00:00:00+00:00" summary="Fix dark mode buttons in audiobook preview player.">
           <c:tickets>
             <c:ticket id="PP-3012"/>
           </c:tickets>
