@@ -1,10 +1,13 @@
 package org.nypl.simplified.bookmarks.internal
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.io7m.jattribute.core.AttributeType
 import io.reactivex.subjects.Subject
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.bookmarks.api.BookmarkEvent
 import org.nypl.simplified.bookmarks.api.BookmarkHTTPCallsType
+import org.nypl.simplified.bookmarks.api.BookmarksForBook
+import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.api.bookmark.SerializedBookmark
 import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.slf4j.Logger
@@ -23,7 +26,8 @@ internal class BServiceOpCreateBookmark(
   private val profile: ProfileReadableType,
   private val accountID: AccountID,
   private val bookmark: SerializedBookmark,
-  private val ignoreRemoteFailures: Boolean
+  private val ignoreRemoteFailures: Boolean,
+  private val bookmarksSource: AttributeType<Map<AccountID, Map<BookID, BookmarksForBook>>>,
 ) : BServiceOp<SerializedBookmark>(logger) {
 
   override fun runActual(): SerializedBookmark {
@@ -37,7 +41,8 @@ internal class BServiceOpCreateBookmark(
           this.httpCalls,
           this.profile,
           this.accountID,
-          this.bookmark
+          this.bookmark,
+          this.bookmarksSource
         ).runActual()
 
       this.createLocalBookmarkFrom(remoteBookmark)
@@ -58,7 +63,8 @@ internal class BServiceOpCreateBookmark(
       this.bookmarkEventsOut,
       this.profile,
       this.accountID,
-      bookmark
+      bookmark,
+      this.bookmarksSource
     ).runActual()
   }
 }

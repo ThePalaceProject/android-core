@@ -50,6 +50,7 @@ dependencies {
     implementation(libs.google.failureaccess)
     implementation(libs.google.guava)
     implementation(libs.google.material)
+    implementation(libs.io7m.jattribute.core)
     implementation(libs.io7m.jfunctional)
     implementation(libs.irradia.mime.api)
     implementation(libs.joda.time)
