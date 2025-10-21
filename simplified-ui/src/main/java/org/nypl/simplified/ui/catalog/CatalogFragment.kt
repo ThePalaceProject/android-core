@@ -868,6 +868,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
       )
     } catch (e: Throwable) {
       // Nothing sensible we can do about this.
+      this.logger.debug("Failed to configure views: ", e)
     }
 
     /*
@@ -938,6 +939,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
       CATALOG -> {
         // Nothing to do.
       }
+
       BOOKS, HOLDS -> {
         val subscription =
           this.catalogBookEvents.events.subscribe { event ->
@@ -945,6 +947,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
               is BookStatusEvent.BookStatusEventChanged -> {
                 // Nothing to do.
               }
+
               is BookStatusEvent.BookStatusEventAdded,
               is BookStatusEvent.BookStatusEventRemoved -> {
                 feedHandle.refresh()
@@ -1037,7 +1040,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
       }
 
     when (feedFacet) {
-      is FeedFacet.FeedFacetOPDS -> {
+      is FeedFacet.FeedFacetOPDS12Single -> {
         val credentials =
           this.credentialsOf(feedFacet.accountID)
 
@@ -1088,6 +1091,20 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
                 )
               ).get(10L, TimeUnit.SECONDS)
             }
+          )
+        )
+      }
+
+      is FeedFacet.FeedFacetOPDS12Composite -> {
+        val credentials =
+          this.credentialsOf(feedFacet.accountID)
+
+        this.opdsClient.goTo(
+          OPDSClientRequest.ResolvedCompositeOPDS12Facet(
+            historyBehavior = ADD_TO_HISTORY,
+            facet = feedFacet,
+            credentials = credentials,
+            method = "GET"
           )
         )
       }

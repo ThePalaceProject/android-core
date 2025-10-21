@@ -1,95 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:app="http://schemas.android.com/apk/res-auto"
-  xmlns:tools="http://schemas.android.com/tools"
-  android:layout_width="match_parent"
-  android:layout_height="wrap_content">
-
-  <RadioGroup
-    android:id="@+id/catalogFeedHeaderTabs"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="40dp"
-    android:layout_margin="16dp"
-    android:gravity="center_horizontal"
-    android:orientation="horizontal"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent" />
+    android:layout_height="wrap_content">
 
-  <HorizontalScrollView
-    android:id="@+id/catalogFeedHeaderFacetsScroll"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="16dp"
-    android:scrollbarAlwaysDrawHorizontalTrack="false"
-    android:scrollbarAlwaysDrawVerticalTrack="false"
-    android:scrollbars="none"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/catalogFeedHeaderTabs">
+    <RadioGroup
+        android:id="@+id/catalogFeedHeaderTabs"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_margin="16dp"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
-      android:id="@+id/catalogFeedHeaderFacets"
-      android:layout_width="wrap_content"
-      android:layout_height="48dp"
-      android:layout_gravity="start"
-      android:gravity="start|center_vertical"
-      android:orientation="horizontal">
+        android:id="@+id/catalogFeedHeaderFacets"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_margin="16dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:scrollbarAlwaysDrawHorizontalTrack="false"
+        android:scrollbarAlwaysDrawVerticalTrack="false"
+        android:scrollbars="none"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/catalogFeedHeaderTabs">
 
-      <!-- These views are removed at runtime and are just present for the sake of the UI editor preview -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/catalogResults"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
-      <Space
-        android:layout_width="16dp"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        tools:visibility="visible" />
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
 
-      <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        tools:text="Placeholder"
-        tools:visibility="visible" />
+        <LinearLayout
+            android:id="@+id/catalogFeedFacetSort"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="?selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="16dp">
 
-      <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        tools:text="Placeholder"
-        tools:visibility="visible" />
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:clickable="false"
+                android:focusable="false"
+                app:srcCompat="@drawable/arrow_up_arrow_down" />
 
-      <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        tools:text="Placeholder"
-        tools:visibility="visible" />
+            <TextView
+                android:id="@+id/catalogFeedFacetSortText"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
+                android:clickable="false"
+                android:focusable="false"
+                android:gravity="center_vertical"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                tools:text="Recently Added (A-Z)" />
+        </LinearLayout>
 
-      <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        tools:text="Placeholder"
-        tools:visibility="visible" />
+        <LinearLayout
+            android:id="@+id/catalogFeedFacetFilter"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="?selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="16dp">
 
-      <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        tools:text="Placeholder"
-        tools:visibility="visible" />
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:clickable="false"
+                android:focusable="false"
+                app:srcCompat="@drawable/bars_filter" />
+
+            <TextView
+                android:id="@+id/catalogFeedFacetFilterText"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
+                android:clickable="false"
+                android:focusable="false"
+                android:gravity="center_vertical"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                tools:text="Filter (2)" />
+        </LinearLayout>
     </LinearLayout>
-  </HorizontalScrollView>
 
-  <View
-    android:id="@+id/catalogFeedDivider"
-    android:layout_width="match_parent"
-    android:layout_height="1dp"
-    android:layout_marginTop="16dp"
-    android:background="?android:attr/listDivider"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/catalogFeedHeaderFacetsScroll" />
+    <View
+        android:id="@+id/catalogFeedDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/catalogFeedHeaderFacets" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

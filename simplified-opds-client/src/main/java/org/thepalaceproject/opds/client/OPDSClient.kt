@@ -10,6 +10,7 @@ import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookIDs
 import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedFacet
 import org.nypl.simplified.feeds.api.FeedGroup
 import org.nypl.simplified.feeds.api.FeedLoaderResult
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedAuthentication
@@ -320,7 +321,129 @@ class OPDSClient private constructor(
         is OPDSClientRequest.NewFeed -> {
           this.runRemoteFeed(this.request)
         }
+
+        is OPDSClientRequest.ResolvedCompositeOPDS12Facet ->
+          this.runCompositeFacet(this.request)
       }
+    }
+
+    private fun loadSingleFeedWithoutGroups(
+      accountID: AccountID,
+      uri: URI,
+      credentials: AccountAuthenticationCredentials?,
+      method: String
+    ): Feed.FeedWithoutGroups {
+      val feedResult =
+        this@OPDSClient.parameters.feedLoader.fetchURI(
+          accountID = accountID,
+          uri = uri,
+          credentials = credentials,
+          method = method
+        ).get()
+
+      return when (feedResult) {
+        is FeedLoaderFailedAuthentication -> {
+          this.state.set(
+            Error(
+              message = feedResult,
+              request = request
+            )
+          )
+          throw feedResult.exception
+        }
+
+        is FeedLoaderFailedGeneral -> {
+          this.state.set(
+            Error(
+              message = feedResult,
+              request = request
+            )
+          )
+          throw feedResult.exception
+        }
+
+        is FeedLoaderResult.FeedLoaderSuccess -> {
+          when (val feed = feedResult.feed) {
+            is Feed.FeedWithGroups -> {
+              throw IOException(
+                "Expected a feed without groups, but received a feed with groups from $uri"
+              )
+            }
+
+            is Feed.FeedWithoutGroups -> feed
+          }
+        }
+      }
+    }
+
+    private fun runCompositeFacet(
+      request: OPDSClientRequest.ResolvedCompositeOPDS12Facet
+    ) {
+      try {
+        val facetPath =
+          request.facet.facets.toMutableList()
+
+        var feedNow =
+          this.loadSingleFeedWithoutGroups(
+            request.accountID,
+            facetPath[0].opdsFacet.uri,
+            request.credentials,
+            request.method
+          )
+
+        facetPath.removeAt(0)
+        for (facet in facetPath) {
+          val nextFacet = findEquivalentFacet(facet, feedNow)
+          feedNow = this.loadSingleFeedWithoutGroups(
+            request.accountID,
+            nextFacet.opdsFacet.uri,
+            request.credentials,
+            request.method
+          )
+        }
+
+        this.handleUngrouped.feedInitial = feedNow
+        this.handleUngrouped.credentials = request.credentials
+        this.handleUngrouped.method = request.method
+        this.handleUngrouped.pages.clear()
+        this.handleUngrouped.pages[0] = Page(
+          pageIndex = 0,
+          pagePrevious = null,
+          pageNext = if (feedNow.feedNext != null) 1 else null,
+          data = feedNow
+        )
+        this.state.set(LoadedFeedWithoutGroups(request, this.handleUngrouped))
+        this.publishedEntriesGrouped.set(listOf())
+      } catch (e: Exception) {
+        this.state.set(
+          Error(
+            message = this@OPDSClient.compositeFacetException(request, e),
+            request = request
+          )
+        )
+        throw e
+      }
+    }
+
+    private fun findEquivalentFacet(
+      requestedFacet: FeedFacet.FeedFacetOPDS12Single,
+      feed: Feed.FeedWithoutGroups
+    ): FeedFacet.FeedFacetOPDS12Single {
+      val group = requestedFacet.opdsFacet.group
+      val facets = feed.facetsByGroup[group]
+        ?: throw IOException(
+          "We could not find a facet with group $group in the feed at ${feed.feedURI}"
+        )
+
+      for (feedFacet in facets) {
+        if (feedFacet.title == requestedFacet.title) {
+          return feedFacet as FeedFacet.FeedFacetOPDS12Single
+        }
+      }
+
+      throw IOException(
+        "We could not find a facet value of ${requestedFacet.title} in group $group in the feed at ${feed.feedURI}"
+      )
     }
 
     private fun runRemoteFeed(
@@ -436,6 +559,20 @@ class OPDSClient private constructor(
         // Nothing
       }
     }
+  }
+
+  private fun compositeFacetException(
+    request: OPDSClientRequest.ResolvedCompositeOPDS12Facet,
+    throwable: Exception
+  ): PresentableErrorType {
+    return FeedLoaderFailedGeneral(
+      problemReport = null,
+      exception = Exception(throwable),
+      message = throwable.message ?: "Unexpected error occurred.",
+      attributesInitial = mapOf(
+        Pair("AccountID", request.accountID.toString())
+      )
+    )
   }
 
   private fun generatedFeedException(
