@@ -247,6 +247,9 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
     username: AccountUsername,
     password: AccountPassword
   ) {
+    AccountDetailModel.usernamePasswordEntries[AccountDetailModel.account.id] =
+      AccountDetailModel.UsernamePasswordAttempt(username, password)
+
     this.setLoginButtonStatus(this.determineLoginIsSatisfied())
   }
 
@@ -335,22 +338,24 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
      * Populate the barcode if passed in (e.g. via deep link).
      */
 
-    val barcode = AccountDetailModel.barcode
-    if (barcode == null) {
+    val usernamePassword =
+      AccountDetailModel.usernamePasswordEntries[AccountDetailModel.account.id]
+
+    if (usernamePassword == null) {
       this.authenticationViews.blank()
     } else {
       when (AccountDetailModel.account.provider.authentication) {
         is AccountProviderAuthenticationDescription.Basic -> {
           this.authenticationViews.setBasicUserAndPass(
-            user = barcode,
-            password = ""
+            user = usernamePassword.username.value,
+            password = usernamePassword.password.value
           )
         }
 
         is AccountProviderAuthenticationDescription.BasicToken -> {
           this.authenticationViews.setBasicTokenUserAndPass(
-            user = barcode,
-            password = ""
+            user = usernamePassword.username.value,
+            password = usernamePassword.password.value
           )
         }
 

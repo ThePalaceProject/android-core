@@ -8,6 +8,8 @@ import org.nypl.simplified.accounts.api.AccountEventLoginStateChanged
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountLoginState
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggingIn
+import org.nypl.simplified.accounts.api.AccountPassword
+import org.nypl.simplified.accounts.api.AccountUsername
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest
@@ -27,7 +29,13 @@ object AccountDetailModel {
 
   lateinit var account: AccountType
 
-  var barcode: String? = null
+  data class UsernamePasswordAttempt(
+    val username: AccountUsername,
+    val password: AccountPassword
+  )
+
+  val usernamePasswordEntries =
+    mutableMapOf<AccountID, UsernamePasswordAttempt>()
 
   var showPleaseLoginTitle: Boolean = false
 
