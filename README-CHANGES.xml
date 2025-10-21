@@ -788,9 +788,14 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2025-10-03T13:18:43+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.18.2">
+    <c:release date="2025-10-21T00:00:00+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.18.2">
       <c:changes>
-        <c:change date="2025-10-03T13:18:43+00:00" summary="Attempt another hotfix for a recurring audiobooks crash."/>
+        <c:change date="2025-10-03T00:00:00+00:00" summary="Attempt another hotfix for a recurring audiobooks crash."/>
+      </c:changes>
+    </c:release>
+    <c:release date="2025-10-21T09:12:22+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.19.0">
+      <c:changes>
+
       </c:changes>
     </c:release>
   </c:releases>
