@@ -50,6 +50,7 @@ object BorrowHTTP {
     val request =
       context.httpClient.newRequest(target)
         .setAuthorization(auth)
+        .addCredentialsToProperties(credentials)
         .allowRedirects(ALLOW_UNSAFE_REDIRECTS)
         .apply {
           if (requestModifier != null) {

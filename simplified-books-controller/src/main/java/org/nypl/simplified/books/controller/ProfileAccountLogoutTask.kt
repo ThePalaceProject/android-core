@@ -7,7 +7,6 @@ import org.librarysimplified.http.api.LSHTTPRequestBuilderType
 import org.librarysimplified.mdc.MDCKeys
 import org.nypl.drm.core.AdobeAdeptExecutorType
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
-import org.nypl.simplified.accounts.api.AccountAuthenticationAdobeClientToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationAdobePreActivationCredentials
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggedIn
@@ -37,7 +36,6 @@ import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
-import java.io.IOException
 import java.net.URI
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutionException
@@ -189,18 +187,6 @@ class ProfileAccountLogoutTask(
     }
 
     this.debug("device is activated and DRM is supported, running deactivation")
-    val token = this.handlePatronUserProfile()
-    if (token == null) {
-      this.warn("Patron user profile contained no Adobe DRM client token")
-      val message = "Patron user profile is missing DRM information."
-      this.steps.currentStepFailed(
-        message = message,
-        errorCode = "patronUserProfileNoDRM",
-        extraMessages = listOf()
-      )
-      throw IOException(message)
-    }
-
     val adeptFuture =
       AdobeDRMExtensions.deactivateDevice(
         executor = adeptExecutor,
@@ -208,7 +194,7 @@ class ProfileAccountLogoutTask(
         debug = { message -> this.debug(message) },
         vendorID = adobeCredentials.vendorID,
         userID = postActivation.userID,
-        clientToken = AccountAuthenticationAdobeClientToken.parse(token.clientToken)
+        clientToken = adobeCredentials.clientToken
       )
 
     try {
