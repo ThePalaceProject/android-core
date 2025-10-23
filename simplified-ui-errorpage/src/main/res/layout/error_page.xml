@@ -24,8 +24,8 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_gravity="center"
                 app:tint="@color/PalacePrimaryForegroundColor"
                 android:src="@drawable/arrow_left" />

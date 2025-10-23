@@ -6,19 +6,91 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <org.thepalaceproject.theme.core.PalaceToolbar
-        android:id="@+id/pdf_toolbar"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/pdfToolbar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/PalaceToolbarHeight"
-        app:layout_constraintTop_toTopOf="parent"
-        app:title="" />
+        android:layout_height="64dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <FrameLayout
+            android:id="@+id/pdfToolbarLogoTouch"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                app:tint="@color/PalacePrimaryForegroundColor"
+                android:id="@+id/pdfToolbarLogo"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/arrow_left" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/pdfToolbarText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/pdfToolbarTOCIconTouch"
+            app:layout_constraintStart_toEndOf="@id/pdfToolbarLogoTouch"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <FrameLayout
+            android:id="@+id/pdfToolbarTOCIconTouch"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/pdfToolbarSettingsIconTouch"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/pdfToolbarTOCIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/pdf_toc" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/pdfToolbarSettingsIconTouch"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/pdfToolbarSettingsIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/pdf_settings" />
+        </FrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <FrameLayout
         android:id="@+id/pdf_reader_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/pdf_toolbar">
+        app:layout_constraintTop_toBottomOf="@id/pdfToolbar">
 
         <ProgressBar
             android:id="@+id/pdf_loading_progress"

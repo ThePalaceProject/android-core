@@ -4,16 +4,16 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.widget.FrameLayout
 import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.common.util.concurrent.MoreExecutors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
@@ -39,10 +39,10 @@ import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
-import org.thepalaceproject.theme.core.PalaceToolbar
 import java.io.File
 import java.net.ServerSocket
 import java.util.ServiceLoader
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class PdfReaderActivity : AppCompatActivity() {
@@ -89,6 +89,7 @@ class PdfReaderActivity : AppCompatActivity() {
   private lateinit var root: View
   private lateinit var webView: WebView
 
+  private var backgroundThread: ExecutorService? = null
   private var pdfServer: PdfServer? = null
   private var isSidebarOpen = false
   private var documentPageIndex: Int = 0
@@ -136,10 +137,10 @@ class PdfReaderActivity : AppCompatActivity() {
       return
     }
 
-    val backgroundThread =
-      MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(1))
+    this.backgroundThread =
+      Executors.newFixedThreadPool(1)
 
-    backgroundThread.execute {
+    this.backgroundThread?.execute {
       this.restoreSavedPosition(
         params = params,
         isSavedInstanceStateNull = savedInstanceState == null
@@ -195,18 +196,31 @@ class PdfReaderActivity : AppCompatActivity() {
     }
   }
 
-  private fun createToolbar(title: String) {
-    val toolbar = this.findViewById(R.id.pdf_toolbar) as PalaceToolbar
-    toolbar.setLogoOnClickListener {
+  private fun createToolbar(
+    title: String
+  ) {
+    val toolbar =
+      this.findViewById<ViewGroup>(R.id.pdfToolbar)
+    val toolbarText =
+      toolbar.findViewById<TextView>(R.id.pdfToolbarText)
+    val toolbarBack =
+      toolbar.findViewById<View>(R.id.pdfToolbarLogoTouch)
+    val toolbarSettings =
+      toolbar.findViewById<View>(R.id.pdfToolbarSettingsIconTouch)
+    val toolbarTOC =
+      toolbar.findViewById<View>(R.id.pdfToolbarTOCIconTouch)
+
+    toolbarBack.setOnClickListener {
       this.finish()
     }
-
-    this.setSupportActionBar(toolbar)
-    this.supportActionBar?.setDisplayHomeAsUpEnabled(true)
-    this.supportActionBar?.setDisplayShowHomeEnabled(true)
-    this.supportActionBar?.setHomeActionContentDescription(R.string.content_description_back)
-    this.supportActionBar?.setHomeButtonEnabled(true)
-    this.supportActionBar?.title = title
+    toolbarSettings.setOnClickListener {
+      this.onReaderMenuSettingsSelected()
+    }
+    toolbarTOC.setOnClickListener {
+      this.onReaderMenuTOCSelected()
+    }
+    toolbarText.text = title
+    toolbarBack.requestFocus()
   }
 
   private fun createWebView() {
@@ -291,23 +305,8 @@ class PdfReaderActivity : AppCompatActivity() {
     }
   }
 
-  override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-    this.menuInflater.inflate(R.menu.pdf_reader_menu, menu)
-
-    menu?.findItem(R.id.readerMenuTOC)?.setOnMenuItemClickListener {
-      this.onReaderMenuTOCSelected()
-    }
-
-    menu?.findItem(R.id.readerMenuSettings)?.setOnMenuItemClickListener {
-      this.onReaderMenuSettingsSelected()
-    }
-
-    return true
-  }
-
   private fun onReaderMenuTOCSelected(): Boolean {
     this.toggleSidebar()
-
     return true
   }
 
@@ -323,7 +322,6 @@ class PdfReaderActivity : AppCompatActivity() {
     if (::webView.isInitialized) {
       this.webView.evaluateJavascript("toggleSecondaryToolbar()", null)
     }
-
     return true
   }
 
@@ -344,6 +342,12 @@ class PdfReaderActivity : AppCompatActivity() {
       this.webView.destroy()
     } catch (e: Throwable) {
       this.log.debug("Failed to destroy web view: ", e)
+    }
+
+    try {
+      this.backgroundThread?.shutdown()
+    } catch (e: Throwable) {
+      this.log.debug("Failed to destroy background thread: ", e)
     }
 
     super.onDestroy()
