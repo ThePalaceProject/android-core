@@ -771,6 +771,10 @@ class CatalogFeedViewDetails2(
     }
   }
 
+  override fun startFocus() {
+    this.backButton.requestFocus()
+  }
+
   override fun clear() {
     this.root.isEnabled = false
   }

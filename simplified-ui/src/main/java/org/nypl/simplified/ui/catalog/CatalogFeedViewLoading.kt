@@ -23,6 +23,10 @@ class CatalogFeedViewLoading(
     }
   }
 
+  override fun startFocus() {
+    // Nothing required.
+  }
+
   override fun clear() {
     this.root.isEnabled = false
   }

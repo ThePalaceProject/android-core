@@ -50,7 +50,8 @@ class CatalogToolbar(
 
       if (search != null) {
         this.searchIcon.visibility = View.VISIBLE
-        this.searchTouch.contentDescription = resources.getString(R.string.catalogAccessibilitySearch)
+        this.searchTouch.contentDescription =
+          resources.getString(R.string.catalogAccessibilitySearch)
         this.searchTouch.setOnClickListener {
           if (this.searchText.isVisible) {
             this.searchBoxClose()
@@ -97,12 +98,21 @@ class CatalogToolbar(
           this.logoTouch.contentDescription =
             resources.getString(R.string.catalogAccessibilityAccountSelection)
         }
+
         BOOKS, HOLDS -> {
           this.logoTouch.isEnabled = false
         }
       }
     } catch (e: Throwable) {
       // Nothing to do
+    }
+  }
+
+  fun requestFocus() {
+    if (this.logoTouch.isEnabled) {
+      this.logoTouch.requestFocus()
+    } else {
+      this.searchTouch.requestFocus()
     }
   }
 

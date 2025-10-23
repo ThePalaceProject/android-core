@@ -22,6 +22,7 @@ import org.librarysimplified.ui.errorpage.R
 
 class ErrorPageFragment : Fragment(R.layout.error_page) {
 
+  private lateinit var toolbarButton: View
   private lateinit var errorDetails: TextView
   private lateinit var errorStepsList: RecyclerView
   private lateinit var sendButton: Button
@@ -36,6 +37,12 @@ class ErrorPageFragment : Fragment(R.layout.error_page) {
     this.sendButton =
       view.findViewById(R.id.errorSendButton)
 
+    this.toolbarButton =
+      view.findViewById(R.id.toolbarTouch)
+    this.toolbarButton.setOnClickListener {
+      this.toolbarButton.postDelayed({ this.finish() }, 100L)
+    }
+
     val parameters = ErrorPageModel.parameters
     if (parameters.attributes.isEmpty()) {
       this.errorDetails.visibility = View.GONE
@@ -44,7 +51,9 @@ class ErrorPageFragment : Fragment(R.layout.error_page) {
 
       val ssb = SpannableStringBuilder()
       parameters.attributes.entries.forEachIndexed { index, (key, value) ->
-        if (index > 0) { ssb.append("\n\n") }
+        if (index > 0) {
+          ssb.append("\n\n")
+        }
         ssb.append(key)
 
         val styleSpan = StyleSpan(Typeface.BOLD)
@@ -64,6 +73,10 @@ class ErrorPageFragment : Fragment(R.layout.error_page) {
     this.errorStepsList.adapter =
       ErrorPageStepsListAdapter(parameters.taskSteps)
     (this.errorStepsList.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+  }
+
+  private fun finish() {
+    this.activity?.finish()
   }
 
   override fun onStart() {

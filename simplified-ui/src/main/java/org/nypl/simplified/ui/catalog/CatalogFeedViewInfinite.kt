@@ -355,25 +355,6 @@ class CatalogFeedViewInfinite(
     facetTabs.check(button.id)
   }
 
-  private fun showFacetSelectDialog(
-    groupName: String,
-    group: List<FeedFacet>
-  ) {
-    val choices = group.sortedBy { it.title }
-    val names = choices.map { it.title }.toTypedArray()
-    val checkedItem = choices.indexOfFirst { it.isActive }
-
-    // Build the dialog
-    val alertBuilder = MaterialAlertDialogBuilder(this.root.context)
-    alertBuilder.setTitle(groupName)
-    alertBuilder.setSingleChoiceItems(names, checkedItem) { dialog, checked ->
-      val selected = choices[checked]
-      this.onFacetSelected(selected)
-      dialog.dismiss()
-    }
-    alertBuilder.create().show()
-  }
-
   fun configureListVisibility(
     itemCount: Int,
     onEmptyMessage: String
@@ -386,6 +367,10 @@ class CatalogFeedViewInfinite(
       this.listView.visibility = View.VISIBLE
       this.catalogFeedEmptyMessage.visibility = View.INVISIBLE
     }
+  }
+
+  override fun startFocus() {
+    this.toolbar.requestFocus()
   }
 
   override fun clear() {

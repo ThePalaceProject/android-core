@@ -23,7 +23,9 @@ class ErrorPageActivity : AppCompatActivity(R.layout.error_host) {
       .replace(R.id.errorHolder, this.errorFragment, "ERROR_MAIN")
       .commit()
 
-    this.root = this.findViewById(R.id.errorHolderRoot)
+    this.root =
+      this.findViewById(R.id.errorHolderRoot)
+
     ScreenEdgeToEdgeFix.edgeToEdge(this.root)
   }
 }

@@ -288,14 +288,17 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
 
       is LoadedFeedEntry -> {
         this.onStateChangedToDetails(newState)
+        this.viewNow.root.postDelayed({ this.viewNow.startFocus() }, 100L)
       }
 
       is LoadedFeedWithGroups -> {
         this.onStateChangedToGroups(newState)
+        this.viewNow.startFocus()
       }
 
       is LoadedFeedWithoutGroups -> {
         this.onStateChangedToInfinite(newState)
+        this.viewNow.startFocus()
       }
     }
   }

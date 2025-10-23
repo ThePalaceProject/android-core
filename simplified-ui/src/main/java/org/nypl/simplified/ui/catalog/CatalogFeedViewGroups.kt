@@ -146,6 +146,10 @@ class CatalogFeedViewGroups(
     }
   }
 
+  override fun startFocus() {
+    this.toolbar.requestFocus()
+  }
+
   override fun clear() {
     this.root.isEnabled = false
     this.listView.adapter = null
