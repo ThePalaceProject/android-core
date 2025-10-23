@@ -1,5 +1,6 @@
 package org.nypl.simplified.ui.catalog
 
+import android.content.res.Configuration
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,7 @@ import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -88,7 +90,7 @@ class CatalogFeedViewInfinite(
     )
 
   init {
-    this.listView.layoutManager = LinearLayoutManager(this.root.context)
+    this.listView.layoutManager = GridLayoutManager(this.root.context, this.columnCount())
     this.listView.setHasFixedSize(true)
     (this.listView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
     this.listView.setItemViewCacheSize(8)
@@ -110,6 +112,15 @@ class CatalogFeedViewInfinite(
       HOLDS -> {
         this.catalogFeedLogoContainer.visibility = View.GONE
       }
+    }
+  }
+
+  private fun columnCount(): Int {
+    val orientation = this.root.resources.configuration.orientation
+    return if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+      2
+    } else {
+      1
     }
   }
 
@@ -376,5 +387,9 @@ class CatalogFeedViewInfinite(
   override fun clear() {
     this.root.isEnabled = false
     this.listView.adapter = null
+  }
+
+  override fun onConfigurationChanged(newConfig: Configuration) {
+    (this.listView.layoutManager as? GridLayoutManager)?.spanCount = this.columnCount()
   }
 }

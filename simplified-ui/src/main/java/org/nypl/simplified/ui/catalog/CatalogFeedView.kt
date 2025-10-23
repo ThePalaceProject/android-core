@@ -1,5 +1,6 @@
 package org.nypl.simplified.ui.catalog
 
+import android.content.res.Configuration
 import android.view.ViewGroup
 
 sealed class CatalogFeedView {
@@ -29,4 +30,10 @@ sealed class CatalogFeedView {
       this.startFocus()
     }, 100L)
   }
+
+  /**
+   * The configuration has changed (such as screen orientation).
+   */
+
+  abstract fun onConfigurationChanged(newConfig: Configuration)
 }

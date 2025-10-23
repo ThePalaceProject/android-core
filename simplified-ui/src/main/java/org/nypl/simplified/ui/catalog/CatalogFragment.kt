@@ -1,6 +1,7 @@
 package org.nypl.simplified.ui.catalog
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -301,6 +302,11 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
         this.viewNow.startFocus()
       }
     }
+  }
+
+  override fun onConfigurationChanged(newConfig: Configuration) {
+    super.onConfigurationChanged(newConfig)
+    this.viewNow.onConfigurationChanged(newConfig)
   }
 
   private fun resetPerViewSubscriptions() {

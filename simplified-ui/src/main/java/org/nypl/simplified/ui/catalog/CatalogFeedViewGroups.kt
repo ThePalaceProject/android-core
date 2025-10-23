@@ -1,5 +1,6 @@
 package org.nypl.simplified.ui.catalog
 
+import android.content.res.Configuration
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -153,5 +154,9 @@ class CatalogFeedViewGroups(
   override fun clear() {
     this.root.isEnabled = false
     this.listView.adapter = null
+  }
+
+  override fun onConfigurationChanged(newConfig: Configuration) {
+    // Nothing to do
   }
 }

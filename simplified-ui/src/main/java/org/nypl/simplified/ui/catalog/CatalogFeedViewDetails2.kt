@@ -1,5 +1,6 @@
 package org.nypl.simplified.ui.catalog
 
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.PorterDuff
@@ -777,6 +778,10 @@ class CatalogFeedViewDetails2(
 
   override fun clear() {
     this.root.isEnabled = false
+  }
+
+  override fun onConfigurationChanged(newConfig: Configuration) {
+    // Nothing to do
   }
 
   fun onStatusUpdate(

@@ -1,5 +1,6 @@
 package org.nypl.simplified.ui.catalog
 
+import android.content.res.Configuration
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Button
@@ -46,5 +47,9 @@ class CatalogFeedViewError(
 
   override fun clear() {
     this.root.isEnabled = false
+  }
+
+  override fun onConfigurationChanged(newConfig: Configuration) {
+    // Nothing to do
   }
 }
