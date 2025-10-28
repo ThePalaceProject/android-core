@@ -793,7 +793,7 @@
         <c:change date="2025-10-03T00:00:00+00:00" summary="Attempt another hotfix for a recurring audiobooks crash."/>
       </c:changes>
     </c:release>
-    <c:release date="2025-10-23T13:00:25+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.19.0">
+    <c:release date="2025-10-28T17:24:07+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.19.0">
       <c:changes>
         <c:change date="2025-10-21T00:00:00+00:00" summary="Redesign catalog facets.">
           <c:tickets>
@@ -810,7 +810,7 @@
             <c:ticket id="PP-3135"/>
           </c:tickets>
         </c:change>
-        <c:change date="2025-10-23T13:00:25+00:00" summary="UI adjustments to improve accessibility with keyboard use.">
+        <c:change date="2025-10-23T00:00:00+00:00" summary="UI adjustments to improve accessibility with keyboard use.">
           <c:tickets>
             <c:ticket id="PP-3106"/>
           </c:tickets>
@@ -820,7 +820,7 @@
             <c:ticket id="PP-3157"/>
           </c:tickets>
         </c:change>
-        <c:change date="2025-10-27T13:50:58+00:00" summary="Fix a potential OOM when repackaging LCP publications.">
+        <c:change date="2025-10-27T00:00:00+00:00" summary="Fix a potential OOM when repackaging LCP publications.">
           <c:tickets>
             <c:ticket id="PP-3155"/>
           </c:tickets>
