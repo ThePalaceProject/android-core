@@ -65,6 +65,14 @@ class MockAdobeAdeptConnector(
   override fun discardDeviceActivations() {
   }
 
+  override fun setDeviceActivations(p0: ByteArray?) {
+
+  }
+
+  override fun deleteDeviceActivation(p0: AdobeVendorID?, p1: AdobeUserID?) {
+
+  }
+
   override fun getResourceProvider(): AdobeAdeptResourceProviderType {
     return this.resourceProvider
   }

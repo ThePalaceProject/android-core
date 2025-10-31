@@ -7,6 +7,7 @@ import org.librarysimplified.http.api.LSHTTPRequestBuilderType
 import org.librarysimplified.mdc.MDCKeys
 import org.nypl.drm.core.AdobeAdeptExecutorType
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
+import org.nypl.simplified.accounts.api.AccountAuthenticationAdobeClientToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationAdobePreActivationCredentials
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggedIn
@@ -143,23 +144,28 @@ class ProfileAccountLogoutTask(
   private fun runFCMTokenDeletion() {
     this.debug("running fcm token deletion")
 
-    notificationTokenHttpCalls.deleteFCMTokenForProfileAccount(
+    this.notificationTokenHttpCalls.deleteFCMTokenForProfileAccount(
       account = account
     )
   }
 
   private fun handlePatronUserProfile(): PatronDRMAdobe? {
-    val patronProfile =
-      PatronUserProfiles.runPatronProfileRequest(
-        taskRecorder = this.steps,
-        patronParsers = this.patronParsers,
-        credentials = this.credentials,
-        http = this.http,
-        account = this.account
-      )
-    return patronProfile.drm
-      .filterIsInstance<PatronDRMAdobe>()
-      .firstOrNull()
+    return try {
+      val patronProfile =
+        PatronUserProfiles.runPatronProfileRequest(
+          taskRecorder = this.steps,
+          patronParsers = this.patronParsers,
+          credentials = this.credentials,
+          http = this.http,
+          account = this.account
+        )
+      patronProfile.drm
+        .filterIsInstance<PatronDRMAdobe>()
+        .firstOrNull()
+    } catch (e: Throwable) {
+      this.logger.debug("Failed to fetch patron user profile: ", e)
+      null
+    }
   }
 
   private fun runDeviceDeactivationAdobe(
@@ -167,7 +173,7 @@ class ProfileAccountLogoutTask(
   ) {
     val postActivation = adobeCredentials.postActivationCredentials
     if (postActivation == null) {
-      this.debug("device does not appear to be activated")
+      this.debug("Device does not appear to be activated")
       this.steps.currentStepSucceeded(this.logoutStrings.logoutDeactivatingDeviceAdobeNotActive)
       return
     }
@@ -181,12 +187,43 @@ class ProfileAccountLogoutTask(
 
     val adeptExecutor = this.adeptExecutor
     if (adeptExecutor == null) {
-      this.warn("device is activated but DRM is unsupported")
+      this.warn("Device is activated but DRM is unsupported")
       this.steps.currentStepSucceeded(this.logoutStrings.logoutDeactivatingDeviceAdobeUnsupported)
       return
     }
 
-    this.debug("device is activated and DRM is supported, running deactivation")
+    /*
+     * We first try to fetch the short client token. For reasons none of us understand, using
+     * the short client token that we already have _might_ not work (it might cause
+     * `E_ADEPT_LOGIN_ERROR` on trying to deactivate). We make a best-effort attempt to fetch
+     * the most recent DRM client token (which is never supposed to change!) from the patron
+     * user profile. If we can't get one, we use the one we've already got.
+     */
+
+    val existingToken: AccountAuthenticationAdobeClientToken =
+      adobeCredentials.clientToken
+    val adobeProfile =
+      this.handlePatronUserProfile()
+    val shortClientToken: AccountAuthenticationAdobeClientToken =
+      if (adobeProfile != null) {
+        val parsed = AccountAuthenticationAdobeClientToken.parse(adobeProfile.clientToken)
+        if (parsed != existingToken) {
+          this.logger.debug("Parsed token {} != {}", parsed, existingToken)
+        }
+        parsed
+      } else {
+        existingToken
+      }
+
+    /*
+     * https://ebce-lyrasis.atlassian.net/browse/PP-3177
+     *
+     * The DRM connector can fail arbitrarily. If it does fail, we just accept that it failed
+     * and continue. This will burn a device activation, but it's better than preventing the
+     * user from logging out.
+     */
+
+    this.debug("Device is activated and DRM is supported, running deactivation")
     val adeptFuture =
       AdobeDRMExtensions.deactivateDevice(
         executor = adeptExecutor,
@@ -194,27 +231,63 @@ class ProfileAccountLogoutTask(
         debug = { message -> this.debug(message) },
         vendorID = adobeCredentials.vendorID,
         userID = postActivation.userID,
-        clientToken = adobeCredentials.clientToken
+        clientToken = shortClientToken
       )
 
     try {
       adeptFuture.get(1L, TimeUnit.MINUTES)
+      this.credentials = this.credentials.withoutAdobePostActivationCredentials()
+      this.steps.currentStepSucceeded(this.logoutStrings.logoutDeactivatingDeviceAdobeDeactivated)
+      adobeCredentials.deviceManagerURI?.let { uri ->
+        this.runDeviceDeactivationAdobeSendDeviceManagerRequest(uri)
+      }
     } catch (e: ExecutionException) {
       val ex = e.cause!!
-      this.logger.debug("exception raised waiting for adept future: ", ex)
+      this.logger.debug("Exception raised waiting for adept future: ", ex)
       this.handleAdobeDRMConnectorException(ex)
-      throw ex
+      this.credentials = this.credentials.withoutAdobePostActivationCredentials()
+      this.steps.currentStepFailed(
+        this.logoutStrings.logoutDeactivatingDeviceAdobeDeactivated,
+        "error-adobe-drm",
+        ex,
+        listOf()
+      )
     } catch (e: Throwable) {
-      this.logger.debug("exception raised waiting for adept future: ", e)
+      this.logger.debug("Exception raised waiting for adept future: ", e)
       this.handleAdobeDRMConnectorException(e)
-      throw e
+      this.steps.currentStepFailed(
+        this.logoutStrings.logoutDeactivatingDeviceAdobeDeactivated,
+        "error-adobe-drm",
+        e,
+        listOf()
+      )
     }
 
-    this.credentials = this.credentials.withoutAdobePostActivationCredentials()
-    this.steps.currentStepSucceeded(this.logoutStrings.logoutDeactivatingDeviceAdobeDeactivated)
+    /*
+     * https://ebce-lyrasis.atlassian.net/browse/PP-3177
+     *
+     * We don't care if the DRM connector failed above. We just delete any relevant activation.
+     */
 
-    adobeCredentials.deviceManagerURI?.let { uri ->
-      this.runDeviceDeactivationAdobeSendDeviceManagerRequest(uri)
+    val adeptFuture2 =
+      AdobeDRMExtensions.deleteDeviceActivation(
+        executor = adeptExecutor,
+        debug = { message -> this.debug(message) },
+        vendorID = adobeCredentials.vendorID,
+        userID = postActivation.userID
+      )
+
+    try {
+      adeptFuture2.get(1L, TimeUnit.MINUTES)
+    } catch (e: Throwable) {
+      this.logger.debug("Exception raised waiting for adept future: ", e)
+      this.handleAdobeDRMConnectorException(e)
+      this.steps.currentStepFailed(
+        this.logoutStrings.logoutDeactivatingDeviceAdobeDeactivated,
+        "error-adobe-drm-deletion",
+        e,
+        listOf()
+      )
     }
   }
 
@@ -244,7 +317,11 @@ class ProfileAccountLogoutTask(
         .addHeader("Content-Type", "vnd.librarysimplified/drm-device-id-list")
         .build()
 
-    request.execute()
+    try {
+      request.execute()
+    } catch (e: Throwable) {
+      this.logger.debug("Device manager request failed: ", e)
+    }
 
     this.steps.currentStepSucceeded(this.logoutStrings.logoutDeviceDeactivationPostDeviceManagerFinished)
   }

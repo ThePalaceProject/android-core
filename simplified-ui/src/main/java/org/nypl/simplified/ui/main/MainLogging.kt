@@ -130,6 +130,7 @@ object MainLogging {
     logbackLevel("org.nypl.simplified.books.covers.BookCoverProvider", Level.ERROR)
     logbackLevel("org.nypl.simplified.files.FileLocking", Level.ERROR)
     logbackLevel("org.nypl.simplified.notifications.NotificationsService", Level.ERROR)
+    logbackLevel("org.librarysimplified.http.vanilla.internal.LSHTTPTimingEventListener", Level.INFO)
   }
 
   fun configure(cacheDirectory: File) {

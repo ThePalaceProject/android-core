@@ -365,8 +365,7 @@ abstract class ProfileAccountLogoutTaskContract {
   }
 
   /**
-   * If the DRM connector raises an error, logging out fails. Credentials are preserved
-   * so that it's possible to retry.
+   * If the DRM connector raises an error, logging out still succeeds.
    */
 
   @Test
@@ -456,12 +455,7 @@ abstract class ProfileAccountLogoutTaskContract {
     this.logger.debug("result: {}", result)
     result.steps.forEach { step -> this.logger.debug("step {}: {}", step, step.resolution) }
 
-    val state =
-      this.account.loginState as AccountLogoutFailed
-
-    Assertions.assertEquals(credentials, state.credentials)
-
-    Assertions.assertFalse(this.bookDatabase.entries.values.any(MockBookDatabaseEntry::deleted))
+    val state = this.account.loginState as AccountNotLoggedIn
   }
 
   /**

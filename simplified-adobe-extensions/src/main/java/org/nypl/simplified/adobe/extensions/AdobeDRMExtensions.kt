@@ -402,4 +402,33 @@ object AdobeDRMExtensions {
       this.adeptFuture.setException(AdobeDRMRevokeException(errorCode))
     }
   }
+
+  /**
+   * Delete a device activation without telling Adobe about it.
+   *
+   * @param executor The Adept executor to be used
+   * @param debug A function to receive debug messages
+   * @param vendorID The vendor ID
+   * @param userID The user ID
+   */
+
+  fun deleteDeviceActivation(
+    executor: AdobeAdeptExecutorType,
+    debug: (String) -> Unit,
+    vendorID: AdobeVendorID,
+    userID: AdobeUserID
+  ): ListenableFuture<Unit> {
+    val adeptFuture = SettableFuture.create<Unit>()
+    executor.execute { connector ->
+      try {
+        debug("deleting device activation")
+        connector.deleteDeviceActivation(vendorID, userID)
+        debug("deletion finished")
+        adeptFuture.set(Unit)
+      } catch (e: Throwable) {
+        adeptFuture.setException(e)
+      }
+    }
+    return adeptFuture
+  }
 }
