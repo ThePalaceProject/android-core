@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<resources>
+    <string name="splashGettingStarted">Getting Started with Palace</string>
+    <string name="splashStep1">Step 1</string>
+    <string name="splashStep1Text">Find Your Library</string>
+    <string name="splashStep2">Step 2</string>
+    <string name="splashStep2Text1">Can\'t find your library?</string>
+    <string name="splashStep2Text2">Go to the</string>
+    <string name="splashStep2Text3">Palace Bookshelf</string>
+    <string name="splashStep2Text4">for more than 10,000 free titles that you can enjoy now.</string>
+    <string name="splashStep3">Step 3</string>
+    <string name="splashStep3Text1">Read. Listen. Enjoy!</string>
+
+</resources>

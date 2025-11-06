@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#2126ad">
+
+    <TextView
+        android:id="@+id/splashGettingStarted"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="56dp"
+        android:layout_marginEnd="64dp"
+        android:gravity="center"
+        android:text="@string/splashGettingStarted"
+        android:textColor="#ffffff"
+        android:textSize="40sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/splashPhoneBackground"
+        android:layout_width="290dp"
+        android:layout_height="540dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/splash_rounded"
+        tools:visibility="visible" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/splashStep1Group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="splashStep1,splashStep1Text"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/splashStep1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:gravity="center"
+        android:text="@string/splashStep1"
+        android:textColor="#2126ad"
+        android:textSize="56sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/splashPhoneBackground" />
+
+    <TextView
+        android:id="@+id/splashStep1Text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="32dp"
+        android:gravity="center"
+        android:text="@string/splashStep1Text"
+        android:textColor="#000000"
+        android:textSize="56sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/splashPhoneBackground"
+        app:layout_constraintStart_toStartOf="@+id/splashPhoneBackground"
+        app:layout_constraintTop_toBottomOf="@+id/splashStep1" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/splashStep2Group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="splashStep2,splashStep2Text1,splashStep2Text2,splashStep2Text3,splashStep2Text4"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/splashStep2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:gravity="center"
+        android:text="@string/splashStep2"
+        android:textColor="#2126ad"
+        android:textSize="56sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/splashPhoneBackground" />
+
+    <TextView
+        android:id="@+id/splashStep2Text1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="32dp"
+        android:gravity="center"
+        android:text="@string/splashStep2Text1"
+        android:textColor="#000000"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/splashPhoneBackground"
+        app:layout_constraintStart_toStartOf="@+id/splashPhoneBackground"
+        app:layout_constraintTop_toBottomOf="@+id/splashStep2" />
+
+    <TextView
+        android:id="@+id/splashStep2Text2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="32dp"
+        android:gravity="center"
+        android:text="@string/splashStep2Text2"
+        android:textColor="#000000"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/splashPhoneBackground"
+        app:layout_constraintStart_toStartOf="@+id/splashPhoneBackground"
+        app:layout_constraintTop_toBottomOf="@+id/splashStep2Text1" />
+
+    <TextView
+        android:id="@+id/splashStep2Text3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="32dp"
+        android:gravity="center"
+        android:text="@string/splashStep2Text3"
+        android:textColor="#2126ad"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/splashPhoneBackground"
+        app:layout_constraintStart_toStartOf="@+id/splashPhoneBackground"
+        app:layout_constraintTop_toBottomOf="@+id/splashStep2Text2" />
+
+    <TextView
+        android:id="@+id/splashStep2Text4"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="32dp"
+        android:gravity="center"
+        android:text="@string/splashStep2Text4"
+        android:textColor="#000000"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/splashPhoneBackground"
+        app:layout_constraintStart_toStartOf="@+id/splashPhoneBackground"
+        app:layout_constraintTop_toBottomOf="@+id/splashStep2Text3" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/splashStep3Group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="splashStep3,splashStep3Text1"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/splashStep3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:gravity="center"
+        android:text="@string/splashStep3"
+        android:textColor="#2126ad"
+        android:textSize="56sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/splashPhoneBackground" />
+
+    <TextView
+        android:id="@+id/splashStep3Text1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="32dp"
+        android:gravity="center"
+        android:text="@string/splashStep3Text1"
+        android:textColor="#000000"
+        android:textSize="56sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/splashPhoneBackground"
+        app:layout_constraintStart_toStartOf="@+id/splashPhoneBackground"
+        app:layout_constraintTop_toBottomOf="@+id/splashStep2" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
