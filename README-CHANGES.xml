@@ -793,7 +793,7 @@
         <c:change date="2025-10-03T00:00:00+00:00" summary="Attempt another hotfix for a recurring audiobooks crash."/>
       </c:changes>
     </c:release>
-    <c:release date="2025-10-31T10:32:54+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.19.1">
+    <c:release date="2025-11-06T12:54:56+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.19.2">
       <c:changes>
         <c:change date="2025-10-21T00:00:00+00:00" summary="Redesign catalog facets.">
           <c:tickets>
@@ -825,7 +825,7 @@
             <c:ticket id="PP-3155"/>
           </c:tickets>
         </c:change>
-        <c:change date="2025-10-31T10:32:54+00:00" summary="Stop treating Adobe DRM failures as fatal during logging out.">
+        <c:change date="2025-10-31T00:00:00+00:00" summary="Stop treating Adobe DRM failures as fatal during logging out.">
           <c:tickets>
             <c:ticket id="PP-3177"/>
           </c:tickets>
