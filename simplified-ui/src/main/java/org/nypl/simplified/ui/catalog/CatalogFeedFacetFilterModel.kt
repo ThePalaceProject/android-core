@@ -2,11 +2,18 @@ package org.nypl.simplified.ui.catalog
 
 import org.nypl.simplified.feeds.api.FeedFacet
 import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetSingle
+import org.slf4j.LoggerFactory
 import java.util.SortedMap
 
 class CatalogFeedFacetFilterModel private constructor(
   val facets: List<FeedFacetModel>
 ) {
+
+  object CatalogFeedFacetFilterModelLog {
+    internal val logger =
+      LoggerFactory.getLogger(FeedFacetModel::class.java)
+  }
+
   fun createResultFacet(
     title: String
   ): FeedFacet {
@@ -19,8 +26,15 @@ class CatalogFeedFacetFilterModel private constructor(
         val facetValues =
           this.facets
             .filter { f -> f.feedFacets.all { ff -> ff is FeedFacet.FeedFacetOPDS12Single } }
-            .filter { f -> f.selected != null }
-            .map { f -> f.feedFacets[f.selected!!] as FeedFacet.FeedFacetOPDS12Single }
+            .map { f -> f.feedFacets[f.selectedIndex] as FeedFacet.FeedFacetOPDS12Single }
+
+        for (value in facetValues) {
+          CatalogFeedFacetFilterModelLog.logger.debug(
+            "Result: Facet[{}]: Value '{}'",
+            value.opdsFacet.group,
+            value.title,
+          )
+        }
 
         FeedFacet.FeedFacetOPDS12Composite(
           facetValues,
@@ -42,12 +56,7 @@ class CatalogFeedFacetFilterModel private constructor(
   private fun findSelectedFacetValue(
     model: FeedFacetModel
   ): FeedFacet {
-    val selected = model.selected
-    return if (selected == null) {
-      model.feedFacets[0]
-    } else {
-      model.feedFacets[selected]
-    }
+    return model.feedFacets[model.selectedIndex]
   }
 
   companion object {
@@ -64,22 +73,22 @@ class CatalogFeedFacetFilterModel private constructor(
             title = name,
             feedFacets = facets,
             expanded = true,
-            selected = this.selectedIndexOf(facets)
+            selected = this.initiallySelectedIndexOf(facets)
           )
         )
       }
       return CatalogFeedFacetFilterModel(facetModels.toList())
     }
 
-    private fun selectedIndexOf(
+    private fun initiallySelectedIndexOf(
       facets: List<FeedFacetSingle>
-    ): Int? {
+    ): Int {
       for ((index, facet) in facets.withIndex()) {
         if (facet.isActive) {
           return index
         }
       }
-      return null
+      return 0
     }
   }
 
@@ -87,12 +96,30 @@ class CatalogFeedFacetFilterModel private constructor(
     val title: String,
     val feedFacets: List<FeedFacetSingle>,
     var expanded: Boolean,
-    var selected: Int?
+    private var selected: Int
   ) {
+    companion object {
+      private val logger =
+        LoggerFactory.getLogger(FeedFacetModel::class.java)
+    }
+
     init {
       require(this.feedFacets.isNotEmpty()) {
         "Feed facet models cannot have an empty list of facet values."
       }
+    }
+
+    val selectedIndex: Int
+      get() = this.selected
+
+    fun setSelected(index: Int) {
+      logger.debug(
+        "Facet[{}]: Value '{}' (index {})",
+        this.title,
+        this.feedFacets[index].title,
+        index,
+      )
+      this.selected = index
     }
   }
 }

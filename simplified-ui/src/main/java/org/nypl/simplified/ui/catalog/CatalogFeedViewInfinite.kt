@@ -218,18 +218,13 @@ class CatalogFeedViewInfinite(
       return
     }
 
-    /*
-     * Register a new filter model instance.
-     */
-
-    CatalogFeedFacetFilterModels.INSTANCE =
-      CatalogFeedFacetFilterModel.create(withoutSortBy)
-
     val text =
       this.root.context.getString(R.string.catalogFacetsFilter, withoutSortBy.size)
 
     this.catalogFeedHeaderFacetsFilterText.text = text
     this.catalogFeedHeaderFacetsFilter.setOnClickListener {
+      CatalogFeedFacetFilterModels.createNew(withoutSortBy)
+
       val view =
         this.layoutInflater.inflate(R.layout.catalog_facet_filters, null)
       val facetListView =
@@ -241,7 +236,7 @@ class CatalogFeedViewInfinite(
 
       facetApply.setOnClickListener {
         this.onFacetSelected.invoke(
-          CatalogFeedFacetFilterModels.INSTANCE.createResultFacet(
+          CatalogFeedFacetFilterModels.filterModel.createResultFacet(
             this.root.resources.getString(R.string.catalogResults)
           )
         )
@@ -252,7 +247,7 @@ class CatalogFeedViewInfinite(
       (facetListView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
       facetListView.setItemViewCacheSize(8)
 
-      adapter.submitList(CatalogFeedFacetFilterModels.INSTANCE.facets)
+      adapter.submitList(CatalogFeedFacetFilterModels.filterModel.facets)
 
       val dialogBuilder = MaterialAlertDialogBuilder(this.root.context)
       dialogBuilder.setView(view)

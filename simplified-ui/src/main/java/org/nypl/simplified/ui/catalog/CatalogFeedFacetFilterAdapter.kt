@@ -44,17 +44,12 @@ class CatalogFeedFacetFilterAdapter() :
         radioButton.text = facet.title
         radioButton.id = index
         radioButton.setOnClickListener {
-          item.selected = index
+          item.setSelected(index)
         }
         this.radioGroup.addView(radioButton)
-        if (item.selected == index) {
+        if (item.selectedIndex == index) {
           this.radioGroup.check(index)
         }
-      }
-
-      this.clear.setOnClickListener {
-        this.radioGroup.clearCheck()
-        item.selected = null
       }
 
       this.icon.setOnClickListener {
