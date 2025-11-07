@@ -9,6 +9,7 @@ import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.feeds.api.FeedBooksSelection
 import org.nypl.simplified.feeds.api.FeedFacetPseudoTitleProviderType
+import org.nypl.simplified.profiles.api.ProfileUpdated
 import org.nypl.simplified.profiles.controller.api.ProfileFeedRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.threads.UIThread
@@ -59,6 +60,41 @@ class CatalogOPDSClients(
         .subscribe { e -> this.onAccountCreated(e.id) }
 
     this.resources.add(AutoCloseable { subscriptionCreation.dispose() })
+
+    /*
+     * When the "most recent" account changes, we refresh the clients that care about this.
+     */
+
+    val subscriptionAccountChanged =
+      this.profiles.profileEvents()
+        .ofType(ProfileUpdated.Succeeded::class.java)
+        .subscribe { e -> this.onProfileUpdated(e) }
+
+    this.resources.add(AutoCloseable { subscriptionAccountChanged.dispose() })
+  }
+
+  private fun onProfileUpdated(
+    e: ProfileUpdated.Succeeded
+  ) {
+    val oldAccount = e.oldDescription.preferences.mostRecentAccount
+    val newAccount = e.newDescription.preferences.mostRecentAccount
+
+    if (oldAccount != newAccount) {
+      this.logger.debug("The most recent account has changed. Refreshing clients.")
+
+      try {
+        val account =
+          this.profiles.profileCurrent()
+            .account(newAccount)
+
+        UIThread.runOnUIThread {
+          this.goToRootFeedFor(CatalogPart.BOOKS, account)
+          this.goToRootFeedFor(CatalogPart.HOLDS, account)
+        }
+      } catch (e: Throwable) {
+        this.logger.debug("Failed to respond to most recent account: ", e)
+      }
+    }
   }
 
   private fun onAccountCreated(
