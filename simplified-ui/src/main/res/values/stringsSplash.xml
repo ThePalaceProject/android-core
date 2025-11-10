@@ -10,6 +10,9 @@
     <string name="splashStep2Text3">Palace Bookshelf</string>
     <string name="splashStep2Text4">for more than 10,000 free titles that you can enjoy now.</string>
     <string name="splashStep3">Step 3</string>
-    <string name="splashStep3Text1">Read. Listen. Enjoy!</string>
+    <string name="splashStep3Text1">Read.\nListen.\nEnjoy!</string>
 
+    <string name="splashGotoNext">Go To Next Tutorial Page</string>
+    <string name="splashGotoPrevious">Go To Previous Tutorial Page</string>
+    <string name="splashSkip">Skip Tutorial</string>
 </resources>

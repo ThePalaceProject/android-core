@@ -1,31 +1,271 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#2126ad">
 
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/tutorialViewPager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    <TextView
+        android:id="@+id/tutorialGettingStarted"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="56dp"
+        android:layout_marginEnd="64dp"
+        android:gravity="center"
+        android:text="@string/splashGettingStarted"
+        android:textColor="#ffffff"
+        android:textSize="40sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/tutorialSkip"
+    <FrameLayout
+        android:id="@+id/tutorialSkipTouch"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:layout_gravity="top|end"
-        android:contentDescription="@string/contentDescriptionTutorialPage"
-        android:src="@drawable/ic_close" />
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:contentDescription="@string/splashSkip"
+        android:focusable="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tutorialTabLayout"
+        <ImageView
+            android:id="@+id/tutorialSkipIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:focusable="false"
+            android:src="@drawable/xmark_white" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/tutorialPagePreviousTouch"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:contentDescription="@string/splashGotoPrevious"
+        android:focusable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/tutorialPagePreviousIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:focusable="false"
+            android:src="@drawable/chevron_left_white" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/tutorialPageNextTouch"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:contentDescription="@string/splashGotoNext"
+        android:focusable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/tutorialPageNextIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:focusable="false"
+            android:src="@drawable/chevron_right_white" />
+    </FrameLayout>
+
+    <ImageView
+        android:id="@+id/tutorialPhoneBackground"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.75"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintWidth_percent="0.7"
+        app:srcCompat="@drawable/splash_rounded"
+        tools:visibility="visible" />
+
+    <ImageView
+        android:id="@+id/tutorialPalaceLogo"
         android:layout_width="wrap_content"
-        android:layout_height="16dp"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="24dp"
-        app:tabBackground="@drawable/selector_tab"
-        app:tabIndicatorHeight="0dp"
-        app:tabMaxWidth="16dp" />
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:scaleX="0.8"
+        android:scaleY="0.8"
+        app:layout_constraintEnd_toEndOf="@+id/tutorialPhoneBackground"
+        app:layout_constraintStart_toStartOf="@+id/tutorialPhoneBackground"
+        app:layout_constraintTop_toTopOf="@+id/tutorialPhoneBackground"
+        app:srcCompat="@drawable/splash_palace" />
 
-</FrameLayout>
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/tutorialStep1Group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="tutorialStep1,tutorialStep1Text"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/tutorialStep1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="96dp"
+        android:gravity="center"
+        android:text="@string/splashStep1"
+        android:textColor="#2126ad"
+        android:textSize="56sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tutorialPhoneBackground" />
+
+    <TextView
+        android:id="@+id/tutorialStep1Text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="32dp"
+        android:gravity="center"
+        android:text="@string/splashStep1Text"
+        android:textColor="#000000"
+        android:textSize="56sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/tutorialPhoneBackground"
+        app:layout_constraintStart_toStartOf="@+id/tutorialPhoneBackground"
+        app:layout_constraintTop_toBottomOf="@+id/tutorialStep1" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/tutorialStep2Group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="tutorialStep2,tutorialStep2Text1,tutorialStep2Text2,tutorialStep2Text3,tutorialStep2Text4"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/tutorialStep2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="96dp"
+        android:gravity="center"
+        android:text="@string/splashStep2"
+        android:textColor="#2126ad"
+        android:textSize="56sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tutorialPhoneBackground" />
+
+    <TextView
+        android:id="@+id/tutorialStep2Text1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="32dp"
+        android:gravity="center"
+        android:text="@string/splashStep2Text1"
+        android:textColor="#000000"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/tutorialPhoneBackground"
+        app:layout_constraintStart_toStartOf="@+id/tutorialPhoneBackground"
+        app:layout_constraintTop_toBottomOf="@+id/tutorialStep2" />
+
+    <TextView
+        android:id="@+id/tutorialStep2Text2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="32dp"
+        android:gravity="center"
+        android:text="@string/splashStep2Text2"
+        android:textColor="#000000"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/tutorialPhoneBackground"
+        app:layout_constraintStart_toStartOf="@+id/tutorialPhoneBackground"
+        app:layout_constraintTop_toBottomOf="@+id/tutorialStep2Text1" />
+
+    <TextView
+        android:id="@+id/tutorialStep2Text3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="32dp"
+        android:gravity="center"
+        android:text="@string/splashStep2Text3"
+        android:textColor="#2126ad"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/tutorialPhoneBackground"
+        app:layout_constraintStart_toStartOf="@+id/tutorialPhoneBackground"
+        app:layout_constraintTop_toBottomOf="@+id/tutorialStep2Text2" />
+
+    <TextView
+        android:id="@+id/tutorialStep2Text4"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="32dp"
+        android:gravity="center"
+        android:text="@string/splashStep2Text4"
+        android:textColor="#000000"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/tutorialPhoneBackground"
+        app:layout_constraintStart_toStartOf="@+id/tutorialPhoneBackground"
+        app:layout_constraintTop_toBottomOf="@+id/tutorialStep2Text3" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/tutorialStep3Group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="tutorialStep3,tutorialStep3Text1"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/tutorialStep3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="96dp"
+        android:gravity="center"
+        android:text="@string/splashStep3"
+        android:textColor="#2126ad"
+        android:textSize="56sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tutorialPhoneBackground" />
+
+    <TextView
+        android:id="@+id/tutorialStep3Text1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="32dp"
+        android:gravity="center"
+        android:text="@string/splashStep3Text1"
+        android:textColor="#000000"
+        android:textSize="56sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/tutorialPhoneBackground"
+        app:layout_constraintStart_toStartOf="@+id/tutorialPhoneBackground"
+        app:layout_constraintTop_toBottomOf="@+id/tutorialStep2" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
