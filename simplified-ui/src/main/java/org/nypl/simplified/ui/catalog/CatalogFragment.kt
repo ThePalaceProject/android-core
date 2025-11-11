@@ -36,6 +36,9 @@ import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.feeds.api.FeedBooksSelection
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedFacet
+import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetOPDS12Composite
+import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetOPDS12Single
+import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetPseudo
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.feeds.api.FeedSearch
 import org.nypl.simplified.profiles.controller.api.ProfileFeedRequest
@@ -53,7 +56,6 @@ import org.nypl.simplified.ui.catalog.CatalogPart.HOLDS
 import org.nypl.simplified.ui.catalog.saml20.CatalogSAML20Activity
 import org.nypl.simplified.ui.catalog.saml20.CatalogSAML20Model
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
-import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.nypl.simplified.ui.main.MainApplication
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType
@@ -656,10 +658,6 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     val feed =
       feedHandle.feed()
 
-    val account =
-      this.profiles.profileCurrent()
-        .account(newState.request.accountID)
-
     val view =
       CatalogFeedViewGroups.create(
         container = this.contentContainer,
@@ -699,32 +697,22 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
         if (canGoBack) {
           feed.feedTitle
         } else {
-          resources.getString(R.string.catalog)
+          this.resources.getString(R.string.catalog)
         }
 
       view.toolbar.configure(
-        resources = this.resources,
-        accountID = account.id,
-        title = title,
-        search = feed.feedSearch,
+        account = account,
         canGoBack = this.opdsClient.hasHistory,
-        catalogPart = this.catalogPart
+        catalogPart = this.catalogPart,
+        icon = account.provider.logo,
+        imageLoader = this.imageLoader,
+        resources = this.resources,
+        search = feed.feedSearch,
+        title = account.provider.displayName,
       )
     } catch (e: Throwable) {
       // Nothing sensible we can do about this.
     }
-
-    /*
-     * Configure the library logo and text.
-     */
-
-    ImageAccountIcons.loadAccountLogoIntoView(
-      loader = this.imageLoader.loader,
-      account = account.provider.toDescription(),
-      defaultIcon = R.drawable.account_default,
-      iconView = view.catalogGroupsLibraryLogo
-    )
-    view.catalogGroupsLibraryText.text = account.provider.displayName
 
     /*
      * The swipe refresh view simply calls the OPDS client, and marks the view as "no longer
@@ -848,7 +836,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
           val position =
             linearLayoutManager.findFirstVisibleItemPosition()
 
-          logger.trace("Saving scroll position {}", position)
+          this@CatalogFragment.logger.trace("Saving scroll position {}", position)
           feedHandle.scrollPositionSave(position)
         }
       })
@@ -859,21 +847,15 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
         feed = feed
       )
 
-      ImageAccountIcons.loadAccountLogoIntoView(
-        loader = this.imageLoader.loader,
-        account = account.provider.toDescription(),
-        defaultIcon = R.drawable.account_default,
-        iconView = view.catalogFeedLibraryLogo
-      )
-
-      view.catalogFeedLibraryText.text = account.provider.displayName
       view.toolbar.configure(
-        resources = this.resources,
-        accountID = account.id,
-        title = feed.feedTitle,
-        search = feed.feedSearch,
+        account = account,
         canGoBack = this.opdsClient.hasHistory,
-        catalogPart = this.catalogPart
+        catalogPart = this.catalogPart,
+        icon = account.provider.logo,
+        imageLoader = this.imageLoader,
+        resources = this.resources,
+        search = feed.feedSearch,
+        title = account.provider.displayName,
       )
     } catch (e: Throwable) {
       // Nothing sensible we can do about this.
@@ -1011,10 +993,11 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
               profiles.profileFeed(
                 ProfileFeedRequest(
                   uri = URI.create("Books"),
-                  title = resources.getString(R.string.catalogSearch),
                   search = queryText,
                   feedSelection = feedSelection,
-                  facetTitleProvider = CatalogOPDSClients.facetTitleProvider
+                  facetTitleProvider = CatalogOPDSClients.facetTitleProvider,
+                  sortBy = CatalogFeedFacetSortModel.facetSelectedPseudoOrDefault(this.catalogPart),
+                  filterByAccountID = null
                 )
               ).get(10L, TimeUnit.SECONDS)
             }
@@ -1049,7 +1032,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
       }
 
     when (feedFacet) {
-      is FeedFacet.FeedFacetOPDS12Single -> {
+      is FeedFacetOPDS12Single -> {
         val credentials =
           this.credentialsOf(feedFacet.accountID)
 
@@ -1064,47 +1047,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
         )
       }
 
-      is FeedFacet.FeedFacetPseudo.FilteringForAccount -> {
-        this.opdsClient.goTo(
-          OPDSClientRequest.GeneratedFeed(
-            accountID = this.currentAccount().id,
-            historyBehavior = CLEAR_HISTORY,
-            generator = {
-              this.profiles.profileFeed(
-                ProfileFeedRequest(
-                  uri = URI.create("Books"),
-                  title = "",
-                  feedSelection = feedSelection,
-                  facetTitleProvider = CatalogOPDSClients.facetTitleProvider,
-                  filterByAccountID = feedFacet.account
-                )
-              ).get(10L, TimeUnit.SECONDS)
-            }
-          )
-        )
-      }
-
-      is FeedFacet.FeedFacetPseudo.Sorting -> {
-        this.opdsClient.goTo(
-          OPDSClientRequest.GeneratedFeed(
-            accountID = this.currentAccount().id,
-            historyBehavior = CLEAR_HISTORY,
-            generator = {
-              this.profiles.profileFeed(
-                ProfileFeedRequest(
-                  uri = URI.create("Books"),
-                  title = "",
-                  feedSelection = feedSelection,
-                  facetTitleProvider = CatalogOPDSClients.facetTitleProvider,
-                  sortBy = feedFacet.sortBy
-                )
-              ).get(10L, TimeUnit.SECONDS)
-            }
-          )
-        )
-      }
-
-      is FeedFacet.FeedFacetOPDS12Composite -> {
+      is FeedFacetOPDS12Composite -> {
         val credentials =
           this.credentialsOf(feedFacet.accountID)
 
@@ -1117,6 +1060,65 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
           )
         )
       }
+
+      is FeedFacetPseudo.FilteringForAccount -> {
+        this.opdsClient.goTo(
+          OPDSClientRequest.GeneratedFeed(
+            accountID = this.currentAccount().id,
+            historyBehavior = CLEAR_HISTORY,
+            generator = {
+              this.profiles.profileFeed(
+                ProfileFeedRequest(
+                  uri = URI.create("Books"),
+                  search = null,
+                  feedSelection = feedSelection,
+                  facetTitleProvider = CatalogOPDSClients.facetTitleProvider,
+                  sortBy = CatalogFeedFacetSortModel.facetSelectedPseudoOrDefault(this.catalogPart),
+                  filterByAccountID = feedFacet.account
+                )
+              ).get(10L, TimeUnit.SECONDS)
+            }
+          )
+        )
+      }
+
+      is FeedFacetPseudo.Sorting -> {
+        val filterByAccountID =
+          this.findFilterByAccountID()
+
+        this.opdsClient.goTo(
+          OPDSClientRequest.GeneratedFeed(
+            accountID = this.currentAccount().id,
+            historyBehavior = CLEAR_HISTORY,
+            generator = {
+              this.profiles.profileFeed(
+                ProfileFeedRequest(
+                  uri = URI.create("Books"),
+                  search = null,
+                  feedSelection = feedSelection,
+                  facetTitleProvider = CatalogOPDSClients.facetTitleProvider,
+                  sortBy = feedFacet.sortBy,
+                  filterByAccountID = filterByAccountID
+                )
+              ).get(10L, TimeUnit.SECONDS)
+            }
+          )
+        )
+      }
+    }
+  }
+
+  private fun findFilterByAccountID(): AccountID? {
+    return if (CatalogFeedFacetFilterModels.filterModel.facets.isNotEmpty()) {
+      val filterFacet =
+        CatalogFeedFacetFilterModels.filterModel.createResultFacet("")
+      if (filterFacet is FeedFacetPseudo.FilteringForAccount) {
+        filterFacet.account
+      } else {
+        null
+      }
+    } else {
+      null
     }
   }
 

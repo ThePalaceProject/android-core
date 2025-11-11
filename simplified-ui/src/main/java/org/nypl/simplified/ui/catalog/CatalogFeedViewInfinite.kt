@@ -6,8 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.Button
-import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
@@ -24,9 +22,6 @@ import org.nypl.simplified.feeds.api.FeedFacet
 import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetSingle
 import org.nypl.simplified.feeds.api.FeedFacets
 import org.nypl.simplified.feeds.api.FeedSearch
-import org.nypl.simplified.ui.catalog.CatalogPart.BOOKS
-import org.nypl.simplified.ui.catalog.CatalogPart.CATALOG
-import org.nypl.simplified.ui.catalog.CatalogPart.HOLDS
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.thepalaceproject.theme.core.PalaceTabButtons
 import java.util.SortedMap
@@ -49,25 +44,20 @@ class CatalogFeedViewInfinite(
   val listView: RecyclerView =
     this.root.findViewById(R.id.catalogFeedEntries)
 
-  val catalogFeedLogoContainer: ViewGroup =
-    this.root.findViewById(R.id.catalogFeedLogoContainer)
-  val catalogFeedLibraryLogo: ImageView =
-    this.catalogFeedLogoContainer.findViewById(R.id.catalogFeedLibraryLogo)
-  val catalogFeedLibraryText: TextView =
-    this.catalogFeedLogoContainer.findViewById(R.id.catalogFeedLibraryText)
-
   val catalogFeedContentHeader: ViewGroup =
     this.root.findViewById(R.id.catalogFeedContentHeader)
   val catalogFeedHeaderTabs: RadioGroup =
     this.root.findViewById(R.id.catalogFeedHeaderTabs)
-  val catalogFeedHeaderFacets: LinearLayout =
+  val catalogFeedHeaderFacets: ViewGroup =
     this.root.findViewById(R.id.catalogFeedHeaderFacets)
 
-  val catalogFeedHeaderFacetsSort: LinearLayout =
+  val catalogFeedHeaderTitle: TextView =
+    this.catalogFeedHeaderFacets.findViewById(R.id.catalogFeedHeaderTitle)
+  val catalogFeedHeaderFacetsSort: ViewGroup =
     this.catalogFeedHeaderFacets.findViewById(R.id.catalogFeedFacetSort)
   val catalogFeedHeaderFacetsSortText: TextView =
     this.catalogFeedHeaderFacetsSort.findViewById(R.id.catalogFeedFacetSortText)
-  val catalogFeedHeaderFacetsFilter: LinearLayout =
+  val catalogFeedHeaderFacetsFilter: ViewGroup =
     this.catalogFeedHeaderFacets.findViewById(R.id.catalogFeedFacetFilter)
   val catalogFeedHeaderFacetsFilterText: TextView =
     this.catalogFeedHeaderFacetsFilter.findViewById(R.id.catalogFeedFacetFilterText)
@@ -86,6 +76,8 @@ class CatalogFeedViewInfinite(
       searchText = this.root.findViewById(R.id.catalogFeedToolbarSearchText),
       searchTouch = this.root.findViewById(R.id.catalogFeedToolbarSearchIconTouch),
       text = this.root.findViewById(R.id.catalogFeedToolbarText),
+      textContainer = this.root.findViewById(R.id.catalogFeedToolbarTextContainer),
+      textIconView = this.root.findViewById(R.id.catalogFeedToolbarTextLibraryIcon),
       window = this.window,
     )
 
@@ -94,25 +86,6 @@ class CatalogFeedViewInfinite(
     this.listView.setHasFixedSize(true)
     (this.listView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
     this.listView.setItemViewCacheSize(8)
-
-    /*
-     * The clickable library logo is only shown in the catalog. Not the "Books" and "Holds"
-     * part.
-     */
-
-    when (this.catalogPart) {
-      CATALOG -> {
-        this.catalogFeedLogoContainer.setOnClickListener { this.onCatalogLogoClicked.invoke() }
-      }
-
-      BOOKS -> {
-        this.catalogFeedLogoContainer.visibility = View.GONE
-      }
-
-      HOLDS -> {
-        this.catalogFeedLogoContainer.visibility = View.GONE
-      }
-    }
   }
 
   private fun columnCount(): Int {
@@ -158,6 +131,8 @@ class CatalogFeedViewInfinite(
     screen: ScreenSizeInformationType,
     feed: Feed.FeedWithoutGroups
   ) {
+    this.catalogFeedHeaderTitle.text = feed.feedTitle
+
     /*
      * If the facet groups are empty, hide the header entirely.
      */
@@ -196,7 +171,7 @@ class CatalogFeedViewInfinite(
     }
 
     this.configureFacetsSorting(remainingGroups)
-    this.configureFacetsFiltering(screen, remainingGroups)
+    this.configureFacetsFiltering(screen, remainingGroups, feed.feedTitle)
   }
 
   /**
@@ -207,7 +182,8 @@ class CatalogFeedViewInfinite(
 
   private fun configureFacetsFiltering(
     screen: ScreenSizeInformationType,
-    groups: SortedMap<String, List<FeedFacetSingle>>
+    groups: SortedMap<String, List<FeedFacetSingle>>,
+    title: String,
   ) {
     val withoutSortBy = TreeMap<String, List<FeedFacetSingle>>(String.CASE_INSENSITIVE_ORDER)
     withoutSortBy.putAll(groups)
@@ -236,9 +212,7 @@ class CatalogFeedViewInfinite(
 
       facetApply.setOnClickListener {
         this.onFacetSelected.invoke(
-          CatalogFeedFacetFilterModels.filterModel.createResultFacet(
-            this.root.resources.getString(R.string.catalogResults)
-          )
+          CatalogFeedFacetFilterModels.filterModel.createResultFacet(title)
         )
       }
 
@@ -283,6 +257,8 @@ class CatalogFeedViewInfinite(
       sortBy.find { facet -> facet.isActive }
     this.catalogFeedHeaderFacetsSortText.text =
       selected?.title ?: ""
+
+    CatalogFeedFacetSortModel.facetsSet(this.catalogPart, sortBy)
 
     this.catalogFeedHeaderFacetsSort.setOnClickListener {
       val view =
