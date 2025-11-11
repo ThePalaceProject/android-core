@@ -48,7 +48,7 @@ class CatalogFeedFacetFilterModel private constructor(
       }
 
       is FeedFacet.FeedFacetPseudo.Sorting -> {
-        this.findSelectedFacetValue(this.facets[0])
+        throw IllegalStateException("Sorting facets are not permitted.")
       }
     }
   }

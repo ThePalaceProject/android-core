@@ -52,13 +52,22 @@ class CatalogToolbar(
     icon: URI?
   ) {
     try {
-      if (icon != null) {
-        ImageAccountIcons.loadAccountLogoIntoView(
-          loader = imageLoader.loader,
-          account = account.provider.toDescription(),
-          defaultIcon = R.drawable.account_default,
-          iconView = this.textIconView
-        )
+      when (catalogPart) {
+        CATALOG -> {
+          this.textContainer.visibility = View.VISIBLE
+          ImageAccountIcons.loadAccountLogoIntoView(
+            loader = imageLoader.loader,
+            account = account.provider.toDescription(),
+            defaultIcon = R.drawable.account_default,
+            iconView = this.textIconView
+          )
+        }
+        BOOKS -> {
+          this.textContainer.visibility = View.INVISIBLE
+        }
+        HOLDS -> {
+          this.textContainer.visibility = View.INVISIBLE
+        }
       }
 
       this.text.text = title

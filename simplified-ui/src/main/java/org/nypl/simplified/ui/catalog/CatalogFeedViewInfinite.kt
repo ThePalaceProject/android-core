@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.Button
-import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
@@ -49,14 +48,16 @@ class CatalogFeedViewInfinite(
     this.root.findViewById(R.id.catalogFeedContentHeader)
   val catalogFeedHeaderTabs: RadioGroup =
     this.root.findViewById(R.id.catalogFeedHeaderTabs)
-  val catalogFeedHeaderFacets: LinearLayout =
+  val catalogFeedHeaderFacets: ViewGroup =
     this.root.findViewById(R.id.catalogFeedHeaderFacets)
 
-  val catalogFeedHeaderFacetsSort: LinearLayout =
+  val catalogFeedHeaderTitle: TextView =
+    this.catalogFeedHeaderFacets.findViewById(R.id.catalogFeedHeaderTitle)
+  val catalogFeedHeaderFacetsSort: ViewGroup =
     this.catalogFeedHeaderFacets.findViewById(R.id.catalogFeedFacetSort)
   val catalogFeedHeaderFacetsSortText: TextView =
     this.catalogFeedHeaderFacetsSort.findViewById(R.id.catalogFeedFacetSortText)
-  val catalogFeedHeaderFacetsFilter: LinearLayout =
+  val catalogFeedHeaderFacetsFilter: ViewGroup =
     this.catalogFeedHeaderFacets.findViewById(R.id.catalogFeedFacetFilter)
   val catalogFeedHeaderFacetsFilterText: TextView =
     this.catalogFeedHeaderFacetsFilter.findViewById(R.id.catalogFeedFacetFilterText)
@@ -130,6 +131,8 @@ class CatalogFeedViewInfinite(
     screen: ScreenSizeInformationType,
     feed: Feed.FeedWithoutGroups
   ) {
+    this.catalogFeedHeaderTitle.text = feed.feedTitle
+
     /*
      * If the facet groups are empty, hide the header entirely.
      */
@@ -168,7 +171,7 @@ class CatalogFeedViewInfinite(
     }
 
     this.configureFacetsSorting(remainingGroups)
-    this.configureFacetsFiltering(screen, remainingGroups)
+    this.configureFacetsFiltering(screen, remainingGroups, feed.feedTitle)
   }
 
   /**
@@ -179,7 +182,8 @@ class CatalogFeedViewInfinite(
 
   private fun configureFacetsFiltering(
     screen: ScreenSizeInformationType,
-    groups: SortedMap<String, List<FeedFacetSingle>>
+    groups: SortedMap<String, List<FeedFacetSingle>>,
+    title: String,
   ) {
     val withoutSortBy = TreeMap<String, List<FeedFacetSingle>>(String.CASE_INSENSITIVE_ORDER)
     withoutSortBy.putAll(groups)
@@ -208,9 +212,7 @@ class CatalogFeedViewInfinite(
 
       facetApply.setOnClickListener {
         this.onFacetSelected.invoke(
-          CatalogFeedFacetFilterModels.filterModel.createResultFacet(
-            this.root.resources.getString(R.string.catalogResults)
-          )
+          CatalogFeedFacetFilterModels.filterModel.createResultFacet(title)
         )
       }
 
@@ -255,6 +257,8 @@ class CatalogFeedViewInfinite(
       sortBy.find { facet -> facet.isActive }
     this.catalogFeedHeaderFacetsSortText.text =
       selected?.title ?: ""
+
+    CatalogFeedFacetSortModel.facetsSet(this.catalogPart, sortBy)
 
     this.catalogFeedHeaderFacetsSort.setOnClickListener {
       val view =

@@ -34,6 +34,8 @@ import org.nypl.simplified.books.controller.Controller
 import org.nypl.simplified.books.controller.api.BookRevokeStringResourcesType
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.content.api.ContentResolverType
+import org.nypl.simplified.feeds.api.FeedBooksSelection
+import org.nypl.simplified.feeds.api.FeedFacet
 import org.nypl.simplified.feeds.api.FeedFacetPseudoTitleProviderType
 import org.nypl.simplified.feeds.api.FeedHTTPTransport
 import org.nypl.simplified.feeds.api.FeedLoader
@@ -453,7 +455,6 @@ abstract class ProfilesControllerContract {
       controller.profileFeed(
         ProfileFeedRequest(
           uri = URI.create("Books"),
-          title = "Books",
           facetTitleProvider = object : FeedFacetPseudoTitleProviderType {
             override val library: String
               get() = "Library"
@@ -471,7 +472,10 @@ abstract class ProfilesControllerContract {
               get() = "All"
             override val showOnLoan: String
               get() = "On Loan"
-          }
+          },
+          sortBy = FeedFacet.FeedFacetPseudo.Sorting.SortBy.SORT_BY_TITLE,
+          filterByAccountID = null,
+          feedSelection = FeedBooksSelection.BOOKS_FEED_LOANED
         )
       ).get()
 

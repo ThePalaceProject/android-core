@@ -7,7 +7,8 @@ import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookWithStatus
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.feeds.api.Feed
-import org.nypl.simplified.feeds.api.FeedBooksSelection
+import org.nypl.simplified.feeds.api.FeedBooksSelection.BOOKS_FEED_HOLDS
+import org.nypl.simplified.feeds.api.FeedBooksSelection.BOOKS_FEED_LOANED
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetPseudo.FilteringForAccount
 import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetPseudo.Sorting
@@ -46,7 +47,7 @@ internal class ProfileFeedTask(
         feedURI = this.request.uri,
         feedID = this.request.id,
         feedSearch = FeedSearch.FeedSearchLocal,
-        feedTitle = this.request.title,
+        feedTitle = createTitle(),
         feedFacets = facets,
         feedFacetGroups = facetGroups
       )
@@ -76,6 +77,19 @@ internal class ProfileFeedTask(
       return feed
     } finally {
       this.logger.debug("generated a local feed with {} entries", feed.size)
+    }
+  }
+
+  private fun createTitle(): String {
+    val accountId = this.request.filterByAccountID
+    if (accountId != null) {
+      val account =
+        this.profiles.profileCurrent()
+          .account(accountId)
+
+      return account.provider.displayName
+    } else {
+      return this.request.facetTitleProvider.libraryAll
     }
   }
 
@@ -343,8 +357,8 @@ internal class ProfileFeedTask(
     request: ProfileFeedRequest
   ): (BookStatus) -> Boolean {
     return when (request.feedSelection) {
-      FeedBooksSelection.BOOKS_FEED_LOANED -> ::usableForBooksFeed
-      FeedBooksSelection.BOOKS_FEED_HOLDS -> ::usableForHoldsFeed
+      BOOKS_FEED_LOANED -> ::usableForBooksFeed
+      BOOKS_FEED_HOLDS -> ::usableForHoldsFeed
     }
   }
 }
