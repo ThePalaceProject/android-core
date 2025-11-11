@@ -842,11 +842,16 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2025-11-11T12:13:42+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.20.0">
+    <c:release date="2025-11-11T18:24:03+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.20.0">
       <c:changes>
-        <c:change date="2025-11-11T12:13:42+00:00" summary="Redesign tutorial screens to use localizable layouts.">
+        <c:change date="2025-11-11T00:00:00+00:00" summary="Redesign tutorial screens to use localizable layouts.">
           <c:tickets>
             <c:ticket id="PP-3173"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2025-11-11T18:24:03+00:00" summary="Adjust catalog visuals to match iOS, and refactor facet handling.">
+          <c:tickets>
+            <c:ticket id="PP-3170"/>
           </c:tickets>
         </c:change>
       </c:changes>
