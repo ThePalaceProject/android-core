@@ -33,20 +33,43 @@
                 android:src="@drawable/main_icon" />
         </FrameLayout>
 
-        <TextView
-            android:id="@+id/catalogFeedToolbarText"
+        <LinearLayout
+            android:id="@+id/catalogFeedToolbarTextContainer"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:ellipsize="end"
+            android:gravity="center"
             android:maxLines="1"
+            android:orientation="horizontal"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/catalogFeedToolbarSearchIconTouch"
             app:layout_constraintStart_toEndOf="@id/catalogFeedToolbarLogoTouch"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="@string/catalogPlaceholder" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/catalogFeedToolbarTextLibraryIcon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:clickable="false"
+                android:ellipsize="end"
+                android:focusable="false"
+                android:maxLines="1"
+                android:src="@drawable/account_default"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/catalogFeedToolbarText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textSize="18sp"
+                tools:text="@string/catalogPlaceholder" />
+        </LinearLayout>
 
         <EditText
             android:id="@+id/catalogFeedToolbarSearchText"
@@ -65,7 +88,7 @@
             app:layout_constraintEnd_toStartOf="@id/catalogFeedToolbarSearchIconTouch"
             app:layout_constraintStart_toEndOf="@id/catalogFeedToolbarLogoTouch"
             app:layout_constraintTop_toTopOf="parent"
-            tools:visibility="visible" />
+            tools:visibility="invisible" />
 
         <FrameLayout
             android:id="@+id/catalogFeedToolbarSearchIconTouch"
@@ -104,45 +127,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/catalogFeedToolbar" />
 
-    <LinearLayout
-        android:id="@+id/catalogFeedLogoContainer"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:focusable="false"
-        android:clickable="true"
-        android:background="?attr/selectableItemBackground"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/catalogFeedContentHeader">
-
-        <ImageView
-            android:id="@+id/catalogFeedLibraryLogo"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            android:focusable="false"
-            android:clickable="false"
-            app:srcCompat="@drawable/account_default" />
-
-        <TextView
-            android:id="@+id/catalogFeedLibraryText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:focusable="false"
-            android:clickable="false"
-            android:ellipsize="end"
-            android:gravity="center|left"
-            android:maxLines="2"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            tools:text="@string/accountPlaceholder" />
-    </LinearLayout>
-
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/catalogFeedContentRefresh"
         android:layout_width="0dp"
@@ -152,7 +136,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/catalogFeedLogoContainer">
+        app:layout_constraintTop_toBottomOf="@id/catalogFeedContentHeader">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/catalogFeedEntries"
@@ -173,7 +157,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/catalogFeedLogoContainer"
+        app:layout_constraintTop_toBottomOf="@id/catalogFeedContentHeader"
         tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

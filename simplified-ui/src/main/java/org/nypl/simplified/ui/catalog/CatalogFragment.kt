@@ -53,7 +53,6 @@ import org.nypl.simplified.ui.catalog.CatalogPart.HOLDS
 import org.nypl.simplified.ui.catalog.saml20.CatalogSAML20Activity
 import org.nypl.simplified.ui.catalog.saml20.CatalogSAML20Model
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
-import org.nypl.simplified.ui.images.ImageAccountIcons
 import org.nypl.simplified.ui.images.ImageLoaderType
 import org.nypl.simplified.ui.main.MainApplication
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType
@@ -656,10 +655,6 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     val feed =
       feedHandle.feed()
 
-    val account =
-      this.profiles.profileCurrent()
-        .account(newState.request.accountID)
-
     val view =
       CatalogFeedViewGroups.create(
         container = this.contentContainer,
@@ -703,28 +698,18 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
         }
 
       view.toolbar.configure(
-        resources = this.resources,
-        accountID = account.id,
-        title = title,
-        search = feed.feedSearch,
+        account = account,
         canGoBack = this.opdsClient.hasHistory,
-        catalogPart = this.catalogPart
+        catalogPart = this.catalogPart,
+        icon = account.provider.logo,
+        imageLoader = this.imageLoader,
+        resources = this.resources,
+        search = feed.feedSearch,
+        title = account.provider.displayName,
       )
     } catch (e: Throwable) {
       // Nothing sensible we can do about this.
     }
-
-    /*
-     * Configure the library logo and text.
-     */
-
-    ImageAccountIcons.loadAccountLogoIntoView(
-      loader = this.imageLoader.loader,
-      account = account.provider.toDescription(),
-      defaultIcon = R.drawable.account_default,
-      iconView = view.catalogGroupsLibraryLogo
-    )
-    view.catalogGroupsLibraryText.text = account.provider.displayName
 
     /*
      * The swipe refresh view simply calls the OPDS client, and marks the view as "no longer
@@ -859,21 +844,15 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
         feed = feed
       )
 
-      ImageAccountIcons.loadAccountLogoIntoView(
-        loader = this.imageLoader.loader,
-        account = account.provider.toDescription(),
-        defaultIcon = R.drawable.account_default,
-        iconView = view.catalogFeedLibraryLogo
-      )
-
-      view.catalogFeedLibraryText.text = account.provider.displayName
       view.toolbar.configure(
-        resources = this.resources,
-        accountID = account.id,
-        title = feed.feedTitle,
-        search = feed.feedSearch,
+        account = account,
         canGoBack = this.opdsClient.hasHistory,
-        catalogPart = this.catalogPart
+        catalogPart = this.catalogPart,
+        icon = account.provider.logo,
+        imageLoader = this.imageLoader,
+        resources = this.resources,
+        search = feed.feedSearch,
+        title = account.provider.displayName,
       )
     } catch (e: Throwable) {
       // Nothing sensible we can do about this.

@@ -13,10 +13,14 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountID
+import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.feeds.api.FeedSearch
 import org.nypl.simplified.ui.catalog.CatalogPart.BOOKS
 import org.nypl.simplified.ui.catalog.CatalogPart.CATALOG
 import org.nypl.simplified.ui.catalog.CatalogPart.HOLDS
+import org.nypl.simplified.ui.images.ImageAccountIcons
+import org.nypl.simplified.ui.images.ImageLoaderType
+import java.net.URI
 
 class CatalogToolbar(
   private val logo: ImageView,
@@ -27,6 +31,8 @@ class CatalogToolbar(
   private val searchIcon: ImageView,
   private val searchText: EditText,
   private val searchTouch: ViewGroup,
+  private val textContainer: ViewGroup,
+  private val textIconView: ImageView,
   private val text: TextView,
   private val window: Window,
 ) {
@@ -37,13 +43,24 @@ class CatalogToolbar(
 
   fun configure(
     resources: Resources,
-    accountID: AccountID,
+    imageLoader: ImageLoaderType,
+    account: AccountType,
     title: String,
     search: FeedSearch?,
     canGoBack: Boolean,
-    catalogPart: CatalogPart
+    catalogPart: CatalogPart,
+    icon: URI?
   ) {
     try {
+      if (icon != null) {
+        ImageAccountIcons.loadAccountLogoIntoView(
+          loader = imageLoader.loader,
+          account = account.provider.toDescription(),
+          defaultIcon = R.drawable.account_default,
+          iconView = this.textIconView
+        )
+      }
+
       this.text.text = title
       this.searchIcon.setImageResource(R.drawable.magnifying_glass)
       this.searchText.visibility = View.INVISIBLE
@@ -63,7 +80,7 @@ class CatalogToolbar(
         this.searchText.setOnEditorActionListener { v, actionId, event ->
           return@setOnEditorActionListener if (actionId == EditorInfo.IME_ACTION_DONE) {
             this.keyboardHide()
-            this.onSearchSubmitted(accountID, search, this.searchText.text.trim().toString())
+            this.onSearchSubmitted(account.id, search, this.searchText.text.trim().toString())
             true
           } else {
             false
@@ -119,7 +136,7 @@ class CatalogToolbar(
   private fun searchBoxOpen() {
     this.searchIcon.setImageResource(R.drawable.xmark)
     this.searchText.visibility = View.VISIBLE
-    this.text.visibility = View.INVISIBLE
+    this.textContainer.visibility = View.INVISIBLE
 
     this.text.postDelayed({ this.searchText.requestFocus() }, 100)
     this.text.postDelayed({ this.keyboardShow() }, 100)
@@ -128,7 +145,7 @@ class CatalogToolbar(
   private fun searchBoxClose() {
     this.searchIcon.setImageResource(R.drawable.magnifying_glass)
     this.searchText.visibility = View.INVISIBLE
-    this.text.visibility = View.VISIBLE
+    this.textContainer.visibility = View.VISIBLE
 
     this.searchText.postDelayed({ this.keyboardHide() }, 100)
   }
