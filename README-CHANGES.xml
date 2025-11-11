@@ -793,7 +793,7 @@
         <c:change date="2025-10-03T00:00:00+00:00" summary="Attempt another hotfix for a recurring audiobooks crash."/>
       </c:changes>
     </c:release>
-    <c:release date="2025-11-06T18:46:18+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.19.2">
+    <c:release date="2025-11-11T00:00:00+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.19.2">
       <c:changes>
         <c:change date="2025-10-21T00:00:00+00:00" summary="Redesign catalog facets.">
           <c:tickets>
@@ -835,9 +835,18 @@
             <c:ticket id="PP-3179"/>
           </c:tickets>
         </c:change>
-        <c:change date="2025-11-06T18:46:18+00:00" summary="Fix local feed filtering.">
+        <c:change date="2025-11-06T00:00:00+00:00" summary="Fix local feed filtering.">
           <c:tickets>
             <c:ticket id="PP-3214"/>
+          </c:tickets>
+        </c:change>
+      </c:changes>
+    </c:release>
+    <c:release date="2025-11-11T12:13:42+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.20.0">
+      <c:changes>
+        <c:change date="2025-11-11T12:13:42+00:00" summary="Redesign tutorial screens to use localizable layouts.">
+          <c:tickets>
+            <c:ticket id="PP-3173"/>
           </c:tickets>
         </c:change>
       </c:changes>
