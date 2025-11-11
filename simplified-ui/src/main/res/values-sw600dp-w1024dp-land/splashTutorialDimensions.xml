@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Medium tablet, Landscape. -->
+<!-- Less than Chromebook. -->
+
+<resources>
+    <dimen name="tutorialStepTextMarginLR">64dp</dimen>
+    <dimen name="tutorialPalaceLogoTopOffset">64dp</dimen>
+    <dimen name="tutorialPalaceLogoWidth">256dp</dimen>
+    <dimen name="tutorialPalaceLogoHeight">112dp</dimen>
+    <dimen name="tutorialGettingStartedTextSize">72sp</dimen>
+    <dimen name="tutorialGettingStartedTopOffset">64dp</dimen>
+    <dimen name="tutorialStep1TextSize">96sp</dimen>
+    <dimen name="tutorialStep2TextSize">32sp</dimen>
+    <dimen name="tutorialStep3TextSize">96sp</dimen>
+    <dimen name="tutorialStepSize">96sp</dimen>
+    <dimen name="tutorialStepTextTopMargin">160dp</dimen>
+    <dimen name="tutorialTextBelowLogoOffset">32dp</dimen>
+</resources>

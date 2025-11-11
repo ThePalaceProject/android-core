@@ -12,6 +12,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.constraintlayout.widget.Group
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
@@ -20,9 +21,6 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager2.widget.ViewPager2
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
 import com.io7m.jattribute.core.AttributeType
 import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.jmulticlose.core.CloseableCollectionType
@@ -46,7 +44,6 @@ import org.nypl.simplified.ui.main.MainAttributes
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_NOT_CONSUMED
 import java.util.concurrent.Executors
-import kotlin.math.max
 
 class SplashFragment : Fragment(), MainBackButtonConsumerType {
 
@@ -77,7 +74,9 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
     this.tutorialViewRoot =
       inflater.inflate(R.layout.splash_tutorial, container, false) as ViewGroup
     this.tutorialViews =
-      TutorialViews(this.tutorialViewRoot)
+      TutorialViews(this.tutorialViewRoot) {
+        this.splashScreenOpenLibrarySelection()
+      }
 
     this.selectionListViewRoot =
       inflater.inflate(R.layout.account_list_registry, container, false) as ViewGroup
@@ -179,37 +178,73 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
   }
 
   private data class TutorialViews(
-    private val root: ViewGroup
+    private val root: ViewGroup,
+    private val onTutorialFinished: () -> Unit
   ) {
-    val tutorialPager =
-      this.root.findViewById<ViewPager2>(R.id.tutorialViewPager)
     val tutorialSkip =
-      this.root.findViewById<ImageView>(R.id.tutorialSkip)
-    val tutorialTabs =
-      this.root.findViewById<TabLayout>(R.id.tutorialTabLayout)
-    val tutorialAdapter =
-      SplashTutorialPageAdapter()
+      this.root.findViewById<View>(R.id.tutorialSkipTouch)
+    val tutorialNext =
+      this.root.findViewById<View>(R.id.tutorialPageNextTouch)
+    val tutorialPrevious =
+      this.root.findViewById<View>(R.id.tutorialPagePreviousTouch)
+    val tutorialStep1Group =
+      this.root.findViewById<Group>(R.id.tutorialStep1Group)
+    val tutorialStep2Group =
+      this.root.findViewById<Group>(R.id.tutorialStep2Group)
+    val tutorialStep3Group =
+      this.root.findViewById<Group>(R.id.tutorialStep3Group)
 
     init {
-      this.tutorialPager.adapter = this.tutorialAdapter
+      this.tutorialStep1Group.visibility = View.VISIBLE
+      this.tutorialStep2Group.visibility = View.INVISIBLE
+      this.tutorialStep3Group.visibility = View.INVISIBLE
 
-      TabLayoutMediator(this.tutorialTabs, this.tutorialPager) { tab, position ->
-        tab.contentDescription = this.root.resources.getString(
-          when (position) {
-            0 -> {
-              R.string.contentDescriptionStep1
-            }
+      this.tutorialSkip.setOnClickListener {
+        this.onTutorialFinished.invoke()
+      }
+      this.tutorialNext.setOnClickListener {
+        val nextIndex = SplashTutorialModel.pageNext()
+        if (nextIndex == null) {
+          this.onTutorialFinished.invoke()
+          return@setOnClickListener
+        }
+        this.showViewsForIndex(nextIndex)
+      }
+      this.tutorialPrevious.setOnClickListener {
+        this.showViewsForIndex(SplashTutorialModel.pagePrevious())
+      }
 
-            1 -> {
-              R.string.contentDescriptionStep2
-            }
+      this.showViewsForIndex(0)
+    }
 
-            else -> {
-              R.string.contentDescriptionStep3
-            }
-          }
-        )
-      }.attach()
+    private fun showViewsForIndex(
+      index: Int
+    ) {
+      when (index) {
+        0 -> {
+          this.tutorialPrevious.visibility = View.INVISIBLE
+          this.tutorialNext.visibility = View.VISIBLE
+          this.tutorialStep1Group.visibility = View.VISIBLE
+          this.tutorialStep2Group.visibility = View.INVISIBLE
+          this.tutorialStep3Group.visibility = View.INVISIBLE
+        }
+
+        1 -> {
+          this.tutorialPrevious.visibility = View.VISIBLE
+          this.tutorialNext.visibility = View.VISIBLE
+          this.tutorialStep1Group.visibility = View.INVISIBLE
+          this.tutorialStep2Group.visibility = View.VISIBLE
+          this.tutorialStep3Group.visibility = View.INVISIBLE
+        }
+
+        2 -> {
+          this.tutorialPrevious.visibility = View.VISIBLE
+          this.tutorialNext.visibility = View.VISIBLE
+          this.tutorialStep1Group.visibility = View.INVISIBLE
+          this.tutorialStep2Group.visibility = View.INVISIBLE
+          this.tutorialStep3Group.visibility = View.VISIBLE
+        }
+      }
     }
   }
 
@@ -264,6 +299,8 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
         this.onBootEvent(newValue)
       }
     )
+
+    SplashTutorialModel.pageReset()
   }
 
   private fun onBootEvent(
@@ -303,32 +340,6 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
 
     this.splashHolder.removeAllViews()
     this.splashHolder.addView(this.tutorialViewRoot)
-
-    this.tutorialViews.tutorialSkip.setOnClickListener {
-      this.splashScreenOpenLibrarySelection()
-    }
-
-    this.tutorialViews.tutorialPager.registerOnPageChangeCallback(
-      object : ViewPager2.OnPageChangeCallback() {
-        private var isSwipingOnLastPage = false
-
-        override fun onPageScrolled(
-          position: Int,
-          positionOffset: Float,
-          positionOffsetPixels: Int
-        ) {
-          if (this.isSwipingOnLastPage) {
-            this@SplashFragment.splashScreenOpenLibrarySelection()
-            return
-          }
-
-          val endPageIndex =
-            max(0, this@SplashFragment.tutorialViews.tutorialAdapter.itemCount - 1)
-          this.isSwipingOnLastPage =
-            position == endPageIndex
-        }
-      }
-    )
   }
 
   private fun splashScreenOpenLibrarySelection() {
