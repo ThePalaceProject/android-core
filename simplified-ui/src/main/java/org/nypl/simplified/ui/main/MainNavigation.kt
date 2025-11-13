@@ -3,6 +3,7 @@ package org.nypl.simplified.ui.main
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.widget.Toast
 import androidx.annotation.UiThread
 import androidx.fragment.app.FragmentActivity
 import com.io7m.jattribute.core.AttributeReadableType
@@ -27,11 +28,15 @@ import org.nypl.simplified.ui.settings.SettingsDebugFragment
 import org.nypl.simplified.ui.settings.SettingsDocumentViewerFragment
 import org.nypl.simplified.ui.settings.SettingsDocumentViewerModel
 import org.nypl.simplified.ui.settings.SettingsMainFragment3
+import org.slf4j.LoggerFactory
 import java.net.URI
 import java.util.LinkedList
 import java.util.concurrent.atomic.AtomicReference
 
 object MainNavigation {
+
+  private val logger =
+    LoggerFactory.getLogger(MainNavigation::class.java)
 
   private val tabAttribute: AttributeType<MainTabRequest> =
     MainAttributes.attributes.withValue(TabAny)
@@ -100,9 +105,19 @@ object MainNavigation {
     target: URI
   ) {
     UIThread.checkIsUIThread()
-    val i = Intent(Intent.ACTION_VIEW)
-    i.setData(Uri.parse(target.toString()))
-    activity.startActivity(i)
+    try {
+      val i = Intent(Intent.ACTION_VIEW)
+      i.setData(Uri.parse(target.toString()))
+      activity.startActivity(i)
+    } catch (e: Throwable) {
+      this.logger.error("Unable to open web view activity: ", e)
+      try {
+        Toast.makeText(activity, "Unable to open web view activity.", Toast.LENGTH_SHORT)
+          .show()
+      } catch (e: Throwable) {
+        // Nothing we can do about this.
+      }
+    }
   }
 
   object Settings {
