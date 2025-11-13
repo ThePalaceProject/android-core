@@ -842,7 +842,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2025-11-12T18:49:22+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.20.0">
+    <c:release date="2025-11-13T09:35:48+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.20.0">
       <c:changes>
         <c:change date="2025-11-11T00:00:00+00:00" summary="Redesign tutorial screens to use localizable layouts.">
           <c:tickets>
@@ -854,9 +854,14 @@
             <c:ticket id="PP-3170"/>
           </c:tickets>
         </c:change>
-        <c:change date="2025-11-12T18:49:22+00:00" summary="Add keyboard control in the R2 reader.">
+        <c:change date="2025-11-12T00:00:00+00:00" summary="Add keyboard control in the R2 reader.">
           <c:tickets>
             <c:ticket id="PP-3174"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2025-11-13T09:35:48+00:00" summary="Do not submit empty search queries.">
+          <c:tickets>
+            <c:ticket id="PP-3244"/>
           </c:tickets>
         </c:change>
       </c:changes>

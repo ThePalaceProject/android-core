@@ -88,8 +88,11 @@ class CatalogToolbar(
 
         this.searchText.setOnEditorActionListener { v, actionId, event ->
           return@setOnEditorActionListener if (actionId == EditorInfo.IME_ACTION_DONE) {
+            val queryText = this.searchText.text.trim().toString()
             this.keyboardHide()
-            this.onSearchSubmitted(account.id, search, this.searchText.text.trim().toString())
+            if (queryText.isNotBlank()) {
+              this.onSearchSubmitted(account.id, search, queryText)
+            }
             true
           } else {
             false
