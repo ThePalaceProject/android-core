@@ -842,7 +842,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2025-11-18T12:12:20+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.20.0">
+    <c:release date="2025-11-18T16:02:50+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.20.0">
       <c:changes>
         <c:change date="2025-11-11T00:00:00+00:00" summary="Redesign tutorial screens to use localizable layouts.">
           <c:tickets>
@@ -870,9 +870,14 @@
             <c:ticket id="PP-3274"/>
           </c:tickets>
         </c:change>
-        <c:change date="2025-11-18T12:12:20+00:00" summary="Change eBook -&gt; EPUB.">
+        <c:change date="2025-11-18T00:00:00+00:00" summary="Change eBook -&gt; EPUB.">
           <c:tickets>
             <c:ticket id="PP-3261"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2025-11-18T16:02:50+00:00" summary="Ensure the library registry is properly refreshed.">
+          <c:tickets>
+            <c:ticket id="PP-3307"/>
           </c:tickets>
         </c:change>
       </c:changes>
