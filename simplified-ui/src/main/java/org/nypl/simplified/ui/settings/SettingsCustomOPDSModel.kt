@@ -54,6 +54,7 @@ object SettingsCustomOPDSModel {
             }
             this.task.set(messages.toList())
           }
+
           is TaskResult.Success -> {
             this.task.set(listOf("Succeeded."))
           }

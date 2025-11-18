@@ -15,7 +15,6 @@ import org.nypl.simplified.analytics.api.AnalyticsType
 import org.nypl.simplified.books.controller.api.BooksControllerType
 import org.nypl.simplified.boot.api.BootFailureTesting
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
-import org.nypl.simplified.crashlytics.api.CrashlyticsServiceType
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.profiles.api.ProfilePreferences
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
@@ -191,20 +190,6 @@ object SettingsDebugModel {
       services.requireService(FeedLoaderType::class.java)
 
     return feedLoader.showOnlySupportedBooks
-  }
-
-  @UiThread
-  fun crashlyticsId(): String {
-    val services =
-      Services.serviceDirectory()
-    val crashlytics =
-      services.requireService(CrashlyticsServiceType::class.java)
-
-    val userId = crashlytics.userId ?: return "Crashlytics is not enabled."
-    if (userId == "") {
-      return "(Unassigned)"
-    }
-    return userId
   }
 
   @UiThread

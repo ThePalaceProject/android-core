@@ -5,12 +5,12 @@
     <dimen name="tutorialPalaceLogoTopOffset">32dp</dimen>
     <dimen name="tutorialPalaceLogoWidth">128dp</dimen>
     <dimen name="tutorialPalaceLogoHeight">72dp</dimen>
-    <dimen name="tutorialGettingStartedTextSize">40sp</dimen>
+    <dimen name="tutorialGettingStartedTextSize">24sp</dimen>
     <dimen name="tutorialGettingStartedTopOffset">56dp</dimen>
-    <dimen name="tutorialStep1TextSize">56sp</dimen>
+    <dimen name="tutorialStep1TextSize">24sp</dimen>
     <dimen name="tutorialStep2TextSize">24sp</dimen>
-    <dimen name="tutorialStep3TextSize">56sp</dimen>
-    <dimen name="tutorialStepSize">56sp</dimen>
-    <dimen name="tutorialStepTextTopMargin">96dp</dimen>
+    <dimen name="tutorialStep3TextSize">24sp</dimen>
+    <dimen name="tutorialStepSize">24sp</dimen>
+    <dimen name="tutorialStepTextTopMargin">128dp</dimen>
     <dimen name="tutorialTextBelowLogoOffset">48dp</dimen>
 </resources>
