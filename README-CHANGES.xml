@@ -842,7 +842,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2025-11-13T09:35:48+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.20.0">
+    <c:release date="2025-11-18T12:12:20+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.20.0">
       <c:changes>
         <c:change date="2025-11-11T00:00:00+00:00" summary="Redesign tutorial screens to use localizable layouts.">
           <c:tickets>
@@ -859,9 +859,20 @@
             <c:ticket id="PP-3174"/>
           </c:tickets>
         </c:change>
-        <c:change date="2025-11-13T09:35:48+00:00" summary="Do not submit empty search queries.">
+        <c:change date="2025-11-13T00:00:00+00:00" summary="Do not submit empty search queries.">
           <c:tickets>
             <c:ticket id="PP-3244"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2025-11-18T00:00:00+00:00" summary="Fix a permissions-related crash.">
+          <c:tickets>
+            <c:ticket id="PP-3301"/>
+            <c:ticket id="PP-3274"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2025-11-18T12:12:20+00:00" summary="Change eBook -&gt; EPUB.">
+          <c:tickets>
+            <c:ticket id="PP-3261"/>
           </c:tickets>
         </c:change>
       </c:changes>
