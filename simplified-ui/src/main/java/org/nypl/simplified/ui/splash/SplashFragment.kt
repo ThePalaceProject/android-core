@@ -1,7 +1,9 @@
 package org.nypl.simplified.ui.splash
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -43,12 +45,19 @@ import org.nypl.simplified.ui.main.MainApplication
 import org.nypl.simplified.ui.main.MainAttributes
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_NOT_CONSUMED
+import org.nypl.simplified.ui.splash.SplashModel.SplashScreenStatus.*
+import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
 
 class SplashFragment : Fragment(), MainBackButtonConsumerType {
 
+  private val logger =
+    LoggerFactory.getLogger(SplashFragment::class.java)
+
   private lateinit var selectionListViewRoot: ViewGroup
   private lateinit var selectionListViews: LibrarySelectionViews
+  private lateinit var splashBatterySaverViewRoot: ViewGroup
+  private lateinit var splashBatterySaverViews: BatterySaverViews
   private lateinit var splashHolder: ViewGroup
   private lateinit var splashViewRoot: ViewGroup
   private lateinit var splashViews: SplashViews
@@ -75,8 +84,30 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
       inflater.inflate(R.layout.splash_tutorial, container, false) as ViewGroup
     this.tutorialViews =
       TutorialViews(this.tutorialViewRoot) {
-        this.splashScreenOpenLibrarySelection()
+        val services =
+          Services.serviceDirectory()
+        val profiles =
+          services.requireService(ProfilesControllerType::class.java)
+
+        SplashModel.splashScreenCompleteTutorial(profiles)
       }
+
+    this.splashBatterySaverViewRoot =
+      inflater.inflate(R.layout.splash_battery_saver, container, false) as ViewGroup
+    this.splashBatterySaverViews =
+      BatterySaverViews(
+        this.splashBatterySaverViewRoot,
+        onBatteryFinished = {
+          val services =
+            Services.serviceDirectory()
+          val profiles =
+            services.requireService(ProfilesControllerType::class.java)
+
+          SplashModel.splashScreenCompleteBatterySaver(profiles)
+        },
+        onBatteryOpenSettings = {
+          this.openBatterySaverSettings()
+        })
 
     this.selectionListViewRoot =
       inflater.inflate(R.layout.account_list_registry, container, false) as ViewGroup
@@ -86,9 +117,16 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
         this.selectionListViewRoot
       )
 
-    this.splashHolder.removeAllViews()
-    this.splashHolder.addView(this.splashViewRoot)
+    this.openBootProgress()
     return this.splashHolder
+  }
+
+  private fun openBatterySaverSettings() {
+    try {
+      this.startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
+    } catch (e: Throwable) {
+      this.logger.error("Unable to open settings: ", e)
+    }
   }
 
   private data class LibrarySelectionViews(
@@ -173,6 +211,27 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
           .show(WindowInsetsCompat.Type.ime())
       } catch (e: Throwable) {
         // No sensible response.
+      }
+    }
+  }
+
+  private data class BatterySaverViews(
+    private val root: ViewGroup,
+    private val onBatteryFinished: () -> Unit,
+    private val onBatteryOpenSettings: () -> Unit
+  ) {
+    val batterySkip =
+      this.root.findViewById<View>(R.id.splashBatterySkip)
+    val batterySettings =
+      this.root.findViewById<View>(R.id.splashBatteryVisit)
+
+    init {
+      this.batterySkip.setOnClickListener {
+        this.onBatteryFinished.invoke()
+      }
+      this.batterySettings.setOnClickListener {
+        this.onBatteryOpenSettings.invoke()
+        this.onBatteryFinished.invoke()
       }
     }
   }
@@ -270,6 +329,8 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
   override fun onStart() {
     super.onStart()
 
+    SplashTutorialModel.pageReset()
+
     this.splashViews.splashImage.setImageResource(R.drawable.main_splash)
     this.splashViews.splashImageError.visibility = View.INVISIBLE
     this.splashViews.splashProgress.visibility = View.INVISIBLE
@@ -300,7 +361,79 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
       }
     )
 
-    SplashTutorialModel.pageReset()
+    this.subscriptions.add(
+      SplashModel.splashScreenStatus.subscribe { _, newValue ->
+        this.onSplashScreenStatusChanged(newValue)
+      }
+    )
+  }
+
+  private fun onSplashScreenStatusChanged(
+    status: SplashModel.SplashScreenStatus
+  ) {
+    when (status) {
+      SPLASH_SCREEN_AWAITING_BOOT -> {
+        this.openBootProgress()
+      }
+
+      SPLASH_SCREEN_BATTERY_SAVER -> {
+        val services =
+          Services.serviceDirectory()
+        val profiles =
+          services.requireService(ProfilesControllerType::class.java)
+
+        if (SplashModel.userHasSeenBatterySaver(profiles)) {
+          SplashModel.splashScreenCompleteBatterySaver(profiles)
+        } else {
+          this.openBatterySaver()
+        }
+      }
+
+      SPLASH_SCREEN_TUTORIAL -> {
+        val services =
+          Services.serviceDirectory()
+        val profiles =
+          services.requireService(ProfilesControllerType::class.java)
+
+        if (SplashModel.userHasCompletedTutorial(profiles)) {
+          SplashModel.splashScreenCompleteTutorial(profiles)
+        } else {
+          this.openTutorial()
+        }
+      }
+
+      SPLASH_SCREEN_LIBRARY_SELECTOR -> {
+        val services =
+          Services.serviceDirectory()
+        val profiles =
+          services.requireService(ProfilesControllerType::class.java)
+
+        if (SplashModel.userHasSeenLibrarySelection(profiles)) {
+          SplashModel.splashScreenCompleteLibrarySelection(profiles)
+        } else {
+          this.openLibrarySelection()
+        }
+      }
+
+      SPLASH_SCREEN_COMPLETED -> {
+        // Handled by the parent activity.
+      }
+    }
+  }
+
+  private fun openBootProgress() {
+    this.splashHolder.removeAllViews()
+    this.splashHolder.addView(this.splashViewRoot)
+  }
+
+  private fun openBatterySaver() {
+    this.splashHolder.removeAllViews()
+    this.splashHolder.addView(this.splashBatterySaverViewRoot)
+  }
+
+  private fun openTutorial() {
+    this.splashHolder.removeAllViews()
+    this.splashHolder.addView(this.tutorialViewRoot)
   }
 
   private fun onBootEvent(
@@ -310,7 +443,7 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
 
     return when (event) {
       is BootEvent.BootCompleted -> {
-        this.onBootCompleted()
+        SplashModel.splashScreenCompleteBoot()
       }
 
       is BootEvent.BootFailed -> {
@@ -323,26 +456,7 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
     }
   }
 
-  private fun onBootCompleted() {
-    /*
-     * If the user has already done the tutorial and library selection at some point in the past,
-     * skip everything and request that the splash screen be closed.
-     */
-
-    if (this.userHasCompletedOnboarding()) {
-      this.splashScreenFinishNow()
-      return
-    }
-
-    /*
-     * Otherwise, the next step is to show the tutorial.
-     */
-
-    this.splashHolder.removeAllViews()
-    this.splashHolder.addView(this.tutorialViewRoot)
-  }
-
-  private fun splashScreenOpenLibrarySelection() {
+  private fun openLibrarySelection() {
     this.splashHolder.removeAllViews()
     this.splashHolder.addView(this.selectionListViewRoot)
 
@@ -427,7 +541,7 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
     this.selectionListViews.accountRegistryList.layoutManager =
       LinearLayoutManager(this.context)
     this.selectionListViews.accountRegistryList.addItemDecoration(
-      SpaceItemDecoration(RecyclerView.VERTICAL, requireContext())
+      SpaceItemDecoration(RecyclerView.VERTICAL, this.requireContext())
     )
   }
 
@@ -445,36 +559,7 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
     // XXX: Should we wait to determine if the account was actually created?
     profiles.profileAccountCreate(description.id)
 
-    this.splashScreenFinishNow()
-  }
-
-  private fun splashScreenFinishNow() {
-    this.splashScreenRecordCompletion()
-    SplashModel.splashScreenCompleted()
-  }
-
-  private fun splashScreenRecordCompletion() {
-    val services =
-      Services.serviceDirectory()
-    val profiles =
-      services.requireService(ProfilesControllerType::class.java)
-
-    profiles.profileUpdate { p ->
-      p.copy(preferences = p.preferences.copy(hasSeenLibrarySelectionScreen = true))
-    }
-  }
-
-  private fun userHasCompletedOnboarding(): Boolean {
-    val services =
-      Services.serviceDirectory()
-    val profiles =
-      services.requireService(ProfilesControllerType::class.java)
-    val profile =
-      profiles.profileCurrent()
-    val preferences =
-      profile.preferences()
-
-    return preferences.hasSeenLibrarySelectionScreen
+    SplashModel.splashScreenCompleteLibrarySelection(profiles)
   }
 
   private fun onBootInProgress(

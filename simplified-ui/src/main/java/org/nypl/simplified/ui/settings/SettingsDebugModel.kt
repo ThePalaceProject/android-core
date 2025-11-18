@@ -174,6 +174,11 @@ object SettingsDebugModel {
   }
 
   @UiThread
+  fun hasSeenBatterySaverScreen(): Boolean {
+    return this.preferences().hasSeenBatterySaverScreen
+  }
+
+  @UiThread
   fun hasSeenLibrarySelection(): Boolean {
     return this.preferences().hasSeenLibrarySelectionScreen
   }

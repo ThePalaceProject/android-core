@@ -68,10 +68,6 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     status: SplashModel.SplashScreenStatus
   ) {
     when (status) {
-      SplashModel.SplashScreenStatus.SPLASH_SCREEN_IN_PROGRESS -> {
-        // No need to do anything.
-      }
-
       SplashModel.SplashScreenStatus.SPLASH_SCREEN_COMPLETED -> {
         this.switchFragment(MainTabsFragment())
 
@@ -79,6 +75,13 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
         AnnouncementsModel.announcements.subscribe { _, newValue ->
           this.onAnnouncementsChanged(newValue)
         }
+      }
+
+      SplashModel.SplashScreenStatus.SPLASH_SCREEN_AWAITING_BOOT,
+      SplashModel.SplashScreenStatus.SPLASH_SCREEN_BATTERY_SAVER,
+      SplashModel.SplashScreenStatus.SPLASH_SCREEN_TUTORIAL,
+      SplashModel.SplashScreenStatus.SPLASH_SCREEN_LIBRARY_SELECTOR -> {
+        // No need to do anything.
       }
     }
   }

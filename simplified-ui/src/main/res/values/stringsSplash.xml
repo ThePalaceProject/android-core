@@ -15,4 +15,15 @@
     <string name="splashGotoNext">Go To Next Tutorial Page</string>
     <string name="splashGotoPrevious">Go To Previous Tutorial Page</string>
     <string name="splashSkip">Skip Tutorial</string>
+
+    <string name="splashBatteryText">
+On some devices, Android\'s battery saver can interfere with audiobook playback. It can therefore help to turn off the battery saver for the Palace app.\n\n
+Do you want to visit your device\'s settings in order to turn off the battery saver?
+    </string>
+    <string name="splashBatteryTextHint">
+You can re-visit this option again in the Palace settings screen if you don\'t want to decide right now.
+    </string>
+    <string name="splashBatteryVisitSettings">Visit Settings</string>
+    <string name="splashBatterySkip">Skip</string>
+
 </resources>

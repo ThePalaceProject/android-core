@@ -51,6 +51,7 @@
   <string name="settingsDevTestingFeatures">Testing Features</string>
   <string name="settingsDevToggleOpenEBooksQAAccount">Toggle OpenEBooks QA Account</string>
   <string name="settingsDevUserSeenLibrarySelection">User has seen library selection screen?</string>
+  <string name="settingsDevUserSeenBatterySaver">User has seen battery saver screen?</string>
   <string name="settingsDocumentation">Documentation</string>
   <string name="settingsEULA">User Agreement</string>
   <string name="settingsEULAStatement">I agree to the terms of the End User License Agreement.</string>

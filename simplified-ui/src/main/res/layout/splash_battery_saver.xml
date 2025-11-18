@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/splashBatteryImage"
+            android:layout_width="128dp"
+            android:layout_height="128dp"
+            android:clickable="false"
+            android:focusable="false"
+            android:src="@drawable/battery_three_quarters" />
+
+        <TextView
+            android:id="@+id/splashBatteryText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="64dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="64dp"
+            android:gravity="center"
+            android:text="@string/splashBatteryText"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:id="@+id/splashBatteryButtons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/splashBatteryVisit"
+                style="@style/Palace.Button.Contained.Medium"
+                android:layout_width="128dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.0"
+                android:text="@string/splashBatteryVisitSettings" />
+
+            <Space
+                android:layout_width="8dp"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/splashBatterySkip"
+                android:layout_width="128dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.0"
+                android:text="@string/splashBatterySkip" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/splashBatteryHint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="64dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="64dp"
+            android:gravity="center"
+            android:text="@string/splashBatteryTextHint"
+            android:textSize="14sp"
+            android:textStyle="italic" />
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

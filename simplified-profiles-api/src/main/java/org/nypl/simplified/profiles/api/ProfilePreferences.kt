@@ -30,6 +30,12 @@ data class ProfilePreferences(
 
   val hasSeenLibrarySelectionScreen: Boolean,
 
+  /**
+   * @return `true` if the user has been asked about turning off the battery saver
+   */
+
+  val hasSeenBatterySaverScreen: Boolean,
+
   /** @return The reader-specific preferences */
 
   val readerPreferences: ReaderPreferences,

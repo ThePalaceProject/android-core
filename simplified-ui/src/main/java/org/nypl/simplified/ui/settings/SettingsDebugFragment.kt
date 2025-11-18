@@ -53,6 +53,7 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug), MainBackButtonC
   private lateinit var failNextBoot: SwitchCompat
   private lateinit var forgetAnnouncementsButton: Button
   private lateinit var hasSeenLibrarySelection: SwitchCompat
+  private lateinit var hasSeenBatterySaver: SwitchCompat
   private lateinit var isManualLCPPassphraseEnabled: SwitchCompat
   private lateinit var libraryRegistryClear: Button
   private lateinit var libraryRegistryEntry: EditText
@@ -125,6 +126,8 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug), MainBackButtonC
       view.findViewById(R.id.settingsVersionDevFailNextBootSwitch)
     this.hasSeenLibrarySelection =
       view.findViewById(R.id.settingsVersionDevSeenLibrarySelectionScreen)
+    this.hasSeenBatterySaver =
+      view.findViewById(R.id.settingsVersionDevSeenBatterySaverScreen)
     this.isManualLCPPassphraseEnabled =
       view.findViewById(R.id.settingsVersionDevIsManualLCPPassphraseEnabled)
     this.showOnlySupportedBooks =
@@ -153,6 +156,8 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug), MainBackButtonC
       SettingsDebugModel.isBootFailureEnabled
     this.hasSeenLibrarySelection.isChecked =
       SettingsDebugModel.hasSeenLibrarySelection()
+    this.hasSeenBatterySaver.isChecked =
+      SettingsDebugModel.hasSeenBatterySaverScreen()
     this.isManualLCPPassphraseEnabled.isChecked =
       SettingsDebugModel.isManualLCPPassphraseEnabled()
     this.showOnlySupportedBooks.isChecked =
@@ -249,6 +254,14 @@ class SettingsDebugFragment : Fragment(R.layout.settings_debug), MainBackButtonC
 
     this.hasSeenLibrarySelection.setOnCheckedChangeListener { _, checked ->
       SettingsDebugModel.updatePreferences { p -> p.copy(hasSeenLibrarySelectionScreen = checked) }
+    }
+
+    /*
+     * Configure the "has seen battery saver" switch
+     */
+
+    this.hasSeenBatterySaver.setOnCheckedChangeListener { _, checked ->
+      SettingsDebugModel.updatePreferences { p -> p.copy(hasSeenBatterySaverScreen = checked) }
     }
 
     /*

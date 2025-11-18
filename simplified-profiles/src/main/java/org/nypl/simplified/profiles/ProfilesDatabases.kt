@@ -495,12 +495,13 @@ object ProfilesDatabases {
             displayName = displayName,
             preferences = ProfilePreferences(
               dateOfBirth = null,
-              showTestingLibraries = false,
-              readerPreferences = ReaderPreferences.builder().build(),
-              mostRecentAccount = account.id,
+              hasSeenBatterySaverScreen = false,
               hasSeenLibrarySelectionScreen = false,
+              isManualLCPPassphraseEnabled = false,
+              mostRecentAccount = account.id,
               playbackRates = hashMapOf(),
-              isManualLCPPassphraseEnabled = false
+              readerPreferences = ReaderPreferences.builder().build(),
+              showTestingLibraries = false,
             ),
             attributes = ProfileAttributes(sortedMapOf())
           )
