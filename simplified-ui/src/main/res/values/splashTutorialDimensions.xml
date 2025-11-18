@@ -7,10 +7,20 @@
     <dimen name="tutorialPalaceLogoHeight">72dp</dimen>
     <dimen name="tutorialGettingStartedTextSize">24sp</dimen>
     <dimen name="tutorialGettingStartedTopOffset">56dp</dimen>
-    <dimen name="tutorialStep1TextSize">24sp</dimen>
-    <dimen name="tutorialStep2TextSize">24sp</dimen>
-    <dimen name="tutorialStep3TextSize">24sp</dimen>
-    <dimen name="tutorialStepSize">24sp</dimen>
-    <dimen name="tutorialStepTextTopMargin">128dp</dimen>
+    <dimen name="tutorialGettingStartedBottomOffset">64dp</dimen>
+    <dimen name="tutorialStepTextTopMargin">16dp</dimen>
     <dimen name="tutorialTextBelowLogoOffset">48dp</dimen>
+
+    <dimen name="tutorialTextMargin">32dp</dimen>
+
+    <dimen name="tutorialStepTextHeight">40dp</dimen>
+
+    <dimen name="tutorialStep1Text1Height">32dp</dimen>
+
+    <dimen name="tutorialStep2Text1Height">64dp</dimen>
+    <dimen name="tutorialStep2Text2Height">32dp</dimen>
+    <dimen name="tutorialStep2Text3Height">32dp</dimen>
+    <dimen name="tutorialStep2Text4Height">80dp</dimen>
+
+    <dimen name="tutorialStep3Text1Height">32dp</dimen>
 </resources>
