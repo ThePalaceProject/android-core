@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Chromebooks. -->
+
+<resources>
+    <dimen name="tutorialGettingStartedTextSize">80sp</dimen>
+    <dimen name="tutorialGettingStartedTopOffset">64dp</dimen>
+    <dimen name="tutorialStep1TextSize">80sp</dimen>
+    <dimen name="tutorialStep2TextSize">80sp</dimen>
+    <dimen name="tutorialStep3TextSize">80sp</dimen>
+    <dimen name="tutorialStepSize">48sp</dimen>
+    <dimen name="tutorialStepTextTopMargin">112dp</dimen>
+    <dimen name="tutorialTextBelowLogoOffset">24dp</dimen>
+</resources>
