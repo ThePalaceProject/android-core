@@ -192,8 +192,8 @@ object ProfileDescriptionJSON {
     val hasSeenLibrarySelectionScreen =
       JSONParserUtilities.getBooleanDefault(objectNode, "hasSeenLibrarySelectionScreen", true)
 
-    val hasSeenBatterySaverScreen =
-      JSONParserUtilities.getBooleanDefault(objectNode, "hasSeenBatterySaverScreen", false)
+    val hasSeenNotificationScreen =
+      JSONParserUtilities.getBooleanDefault(objectNode, "hasSeenNotificationScreen", false)
 
     val showDebugSettings =
       JSONParserUtilities.getBooleanDefault(objectNode, "showDebugSettings", false)
@@ -221,7 +221,7 @@ object ProfileDescriptionJSON {
       showDebugSettings = showDebugSettings,
       playbackRates = playbackRates,
       isManualLCPPassphraseEnabled = isManualLCPPassphraseEnabled,
-      hasSeenBatterySaverScreen = hasSeenBatterySaverScreen,
+      hasSeenNotificationScreen = hasSeenNotificationScreen,
     )
   }
 
@@ -265,7 +265,7 @@ object ProfileDescriptionJSON {
       readerPreferences = readerPreferences,
       mostRecentAccount = mostRecentAccount,
       hasSeenLibrarySelectionScreen = true,
-      hasSeenBatterySaverScreen = false,
+      hasSeenNotificationScreen = false,
       playbackRates = playbackRates,
       isManualLCPPassphraseEnabled = isManualLCPPassphraseEnabled
     )
@@ -331,7 +331,7 @@ object ProfileDescriptionJSON {
         readerPreferences = readerPrefs,
         mostRecentAccount = mostRecentAccountFallback,
         hasSeenLibrarySelectionScreen = true,
-        hasSeenBatterySaverScreen = false,
+        hasSeenNotificationScreen = false,
         playbackRates = playbackRates,
         isManualLCPPassphraseEnabled = isManualLCPPassphraseEnabled
       )
@@ -451,7 +451,7 @@ object ProfileDescriptionJSON {
     output.put("showTestingLibraries", preferences.showTestingLibraries)
     output.put("isManualLCPPassphraseEnabled", preferences.isManualLCPPassphraseEnabled)
     output.put("hasSeenLibrarySelectionScreen", preferences.hasSeenLibrarySelectionScreen)
-    output.put("hasSeenBatterySaverScreen", preferences.hasSeenBatterySaverScreen)
+    output.put("hasSeenNotificationScreen", preferences.hasSeenNotificationScreen)
     output.put("showDebugSettings", preferences.showDebugSettings)
     output.put("mostRecentAccount", preferences.mostRecentAccount.uuid.toString())
 

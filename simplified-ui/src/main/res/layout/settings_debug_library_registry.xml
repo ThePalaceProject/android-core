@@ -7,27 +7,16 @@
   android:layout_height="match_parent">
 
   <TextView
-    android:id="@+id/libraryRegistryOverrideTitle"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="Library Registry Debugging"
-    android:textSize="24sp"
-    android:textStyle="bold"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent" />
-
-  <TextView
     android:id="@+id/libraryRegistryOverrideDescription"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="16dp"
     android:text="Custom Library Registry Server"
-    android:textSize="14sp"
+    android:textSize="18sp"
     android:textStyle="bold"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/libraryRegistryOverrideTitle" />
+    app:layout_constraintTop_toTopOf="parent" />
 
   <LinearLayout
     android:id="@+id/libraryRegistryOverrideEntry"

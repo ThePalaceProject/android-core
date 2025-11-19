@@ -1,9 +1,7 @@
 package org.nypl.simplified.ui.splash
 
 import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
-import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -45,7 +43,12 @@ import org.nypl.simplified.ui.main.MainApplication
 import org.nypl.simplified.ui.main.MainAttributes
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_NOT_CONSUMED
-import org.nypl.simplified.ui.splash.SplashModel.SplashScreenStatus.*
+import org.nypl.simplified.ui.main.MainNotifications
+import org.nypl.simplified.ui.splash.SplashModel.SplashScreenStatus.SPLASH_SCREEN_AWAITING_BOOT
+import org.nypl.simplified.ui.splash.SplashModel.SplashScreenStatus.SPLASH_SCREEN_COMPLETED
+import org.nypl.simplified.ui.splash.SplashModel.SplashScreenStatus.SPLASH_SCREEN_LIBRARY_SELECTOR
+import org.nypl.simplified.ui.splash.SplashModel.SplashScreenStatus.SPLASH_SCREEN_NOTIFICATIONS
+import org.nypl.simplified.ui.splash.SplashModel.SplashScreenStatus.SPLASH_SCREEN_TUTORIAL
 import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
 
@@ -56,8 +59,8 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
 
   private lateinit var selectionListViewRoot: ViewGroup
   private lateinit var selectionListViews: LibrarySelectionViews
-  private lateinit var splashBatterySaverViewRoot: ViewGroup
-  private lateinit var splashBatterySaverViews: BatterySaverViews
+  private lateinit var splashNotificationsViewRoot: ViewGroup
+  private lateinit var splashNotificationsViews: NotificationsViews
   private lateinit var splashHolder: ViewGroup
   private lateinit var splashViewRoot: ViewGroup
   private lateinit var splashViews: SplashViews
@@ -92,21 +95,21 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
         SplashModel.splashScreenCompleteTutorial(profiles)
       }
 
-    this.splashBatterySaverViewRoot =
-      inflater.inflate(R.layout.splash_battery_saver, container, false) as ViewGroup
-    this.splashBatterySaverViews =
-      BatterySaverViews(
-        this.splashBatterySaverViewRoot,
-        onBatteryFinished = {
+    this.splashNotificationsViewRoot =
+      inflater.inflate(R.layout.splash_notifications, container, false) as ViewGroup
+    this.splashNotificationsViews =
+      NotificationsViews(
+        this.splashNotificationsViewRoot,
+        onFinished = {
           val services =
             Services.serviceDirectory()
           val profiles =
             services.requireService(ProfilesControllerType::class.java)
 
-          SplashModel.splashScreenCompleteBatterySaver(profiles)
+          SplashModel.splashScreenCompleteNotifications(profiles)
         },
-        onBatteryOpenSettings = {
-          this.openBatterySaverSettings()
+        onRequestPermission = {
+          MainNotifications.requestPermissions(this.requireActivity())
         })
 
     this.selectionListViewRoot =
@@ -119,14 +122,6 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
 
     this.openBootProgress()
     return this.splashHolder
-  }
-
-  private fun openBatterySaverSettings() {
-    try {
-      this.startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
-    } catch (e: Throwable) {
-      this.logger.error("Unable to open settings: ", e)
-    }
   }
 
   private data class LibrarySelectionViews(
@@ -215,23 +210,23 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
     }
   }
 
-  private data class BatterySaverViews(
+  private data class NotificationsViews(
     private val root: ViewGroup,
-    private val onBatteryFinished: () -> Unit,
-    private val onBatteryOpenSettings: () -> Unit
+    private val onFinished: () -> Unit,
+    private val onRequestPermission: () -> Unit
   ) {
-    val batterySkip =
-      this.root.findViewById<View>(R.id.splashBatterySkip)
-    val batterySettings =
-      this.root.findViewById<View>(R.id.splashBatteryVisit)
+    val notificationsSkip =
+      this.root.findViewById<View>(R.id.splashNotificationsSkip)
+    val notificationsAllow =
+      this.root.findViewById<View>(R.id.splashNotificationsAllow)
 
     init {
-      this.batterySkip.setOnClickListener {
-        this.onBatteryFinished.invoke()
+      this.notificationsSkip.setOnClickListener {
+        this.onFinished.invoke()
       }
-      this.batterySettings.setOnClickListener {
-        this.onBatteryOpenSettings.invoke()
-        this.onBatteryFinished.invoke()
+      this.notificationsAllow.setOnClickListener {
+        this.onRequestPermission.invoke()
+        this.onFinished.invoke()
       }
     }
   }
@@ -376,16 +371,16 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
         this.openBootProgress()
       }
 
-      SPLASH_SCREEN_BATTERY_SAVER -> {
+      SPLASH_SCREEN_NOTIFICATIONS -> {
         val services =
           Services.serviceDirectory()
         val profiles =
           services.requireService(ProfilesControllerType::class.java)
 
-        if (SplashModel.userHasSeenBatterySaver(profiles)) {
-          SplashModel.splashScreenCompleteBatterySaver(profiles)
+        if (SplashModel.userHasSeenNotifications(profiles)) {
+          SplashModel.splashScreenCompleteNotifications(profiles)
         } else {
-          this.openBatterySaver()
+          this.openNotifications()
         }
       }
 
@@ -426,9 +421,9 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
     this.splashHolder.addView(this.splashViewRoot)
   }
 
-  private fun openBatterySaver() {
+  private fun openNotifications() {
     this.splashHolder.removeAllViews()
-    this.splashHolder.addView(this.splashBatterySaverViewRoot)
+    this.splashHolder.addView(this.splashNotificationsViewRoot)
   }
 
   private fun openTutorial() {

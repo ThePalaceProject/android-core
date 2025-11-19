@@ -24,17 +24,16 @@ data class ProfilePreferences(
   val showTestingLibraries: Boolean,
 
   /**
-   * @return `true` if the user has seen the library selection screen and opted out of
-   * selecting a library
+   * @return `true` if the user has seen the library selection screen
    */
 
   val hasSeenLibrarySelectionScreen: Boolean,
 
   /**
-   * @return `true` if the user has been asked about turning off the battery saver
+   * @return `true` if the user has been asked about turning on notifications
    */
 
-  val hasSeenBatterySaverScreen: Boolean,
+  val hasSeenNotificationScreen: Boolean,
 
   /** @return The reader-specific preferences */
 

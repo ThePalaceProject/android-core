@@ -3,7 +3,6 @@ package org.nypl.simplified.ui.splash
 import com.io7m.jattribute.core.AttributeReadableType
 import com.io7m.jattribute.core.AttributeSubscriptionType
 import com.io7m.jattribute.core.AttributeType
-import org.librarysimplified.services.api.Services
 import org.nypl.simplified.accounts.api.AccountProviderDescription
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
@@ -51,10 +50,10 @@ object SplashModel {
     SPLASH_SCREEN_AWAITING_BOOT,
 
     /**
-     * The splash screen is asking the user if they want to disable the battery saver.
+     * The splash screen is asking the user if they want to enable notifications.
      */
 
-    SPLASH_SCREEN_BATTERY_SAVER,
+    SPLASH_SCREEN_NOTIFICATIONS,
 
     /**
      * The splash screen is showing the tutorial.
@@ -98,14 +97,14 @@ object SplashModel {
     }
   }
 
-  fun splashScreenCompleteBatterySaver(
+  fun splashScreenCompleteNotifications(
     profiles: ProfilesControllerType
   ) {
     this.splashScreenStatusActual.set(SplashScreenStatus.SPLASH_SCREEN_TUTORIAL)
 
     profiles.profileUpdate { description ->
       description.copy(
-        preferences = description.preferences.copy(hasSeenBatterySaverScreen = true)
+        preferences = description.preferences.copy(hasSeenNotificationScreen = true)
       )
     }
   }
@@ -129,7 +128,7 @@ object SplashModel {
   }
 
   fun splashScreenCompleteBoot() {
-    this.splashScreenStatusActual.set(SplashScreenStatus.SPLASH_SCREEN_BATTERY_SAVER)
+    this.splashScreenStatusActual.set(SplashScreenStatus.SPLASH_SCREEN_NOTIFICATIONS)
   }
 
   fun userHasSeenLibrarySelection(
@@ -149,7 +148,7 @@ object SplashModel {
     return this.userHasSeenLibrarySelection(profiles)
   }
 
-  fun userHasSeenBatterySaver(
+  fun userHasSeenNotifications(
     profiles: ProfilesControllerType
   ): Boolean {
     val profile =
@@ -157,6 +156,6 @@ object SplashModel {
     val preferences =
       profile.preferences()
 
-    return preferences.hasSeenBatterySaverScreen
+    return preferences.hasSeenNotificationScreen
   }
 }

@@ -12,6 +12,7 @@ import org.nypl.simplified.profiles.api.ProfileEvent
 import org.nypl.simplified.profiles.api.ProfileUpdated
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.main.MainNavigation
+import org.nypl.simplified.ui.main.MainNotifications
 import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
 import org.nypl.simplified.ui.screens.ScreenDefinitionType
 import org.slf4j.LoggerFactory
@@ -21,6 +22,7 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
   private val logger =
     LoggerFactory.getLogger(SettingsMainFragment3::class.java)
 
+  private lateinit var settingsNotifications: Preference
   private lateinit var settingsAbout: Preference
   private lateinit var settingsAccounts: Preference
   private lateinit var settingsAcknowledgements: Preference
@@ -106,6 +108,7 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
     this.settingsPrivacy = this.findPreference("settingsPrivacy")!!
     this.settingsVersion = this.findPreference("settingsVersion")!!
     this.settingsVersionCore = this.findPreference("settingsVersionCore")!!
+    this.settingsNotifications = this.findPreference("settingsNotifications")!!
 
     this.configureAbout(this.settingsAbout)
     this.configureAcknowledgements(this.settingsAcknowledgements)
@@ -118,6 +121,46 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
     this.configurePrivacy(this.settingsPrivacy)
     this.configureVersion(this.settingsVersion)
     this.configureVersionCore(this.settingsVersionCore)
+    this.configureNotifications(this.settingsNotifications)
+  }
+
+  private fun configureNotifications(
+    settingsNotifications: Preference
+  ) {
+    this.configureNotificationsText(settingsNotifications)
+
+    settingsNotifications.setOnPreferenceClickListener {
+      try {
+        val activity = this.requireActivity()
+        if (!MainNotifications.notificationsArePermitted(activity)) {
+          MainNotifications.requestPermissions(activity)
+          this.view?.postDelayed(
+            { this.configureNotificationsText(settingsNotifications) },
+            5000L
+          )
+        } else {
+          MainNotifications.requestDropPermissions(activity)
+        }
+      } catch (e: Throwable) {
+        this.logger.debug("Failed to request permissions: ", e)
+      }
+      true
+    }
+  }
+
+  private fun configureNotificationsText(
+    settingsNotifications: Preference
+  ) {
+    try {
+      val activity = this.requireActivity()
+      if (MainNotifications.notificationsArePermitted(activity)) {
+        settingsNotifications.title = activity.getString(R.string.settingsNotificationsEnabled)
+      } else {
+        settingsNotifications.title = activity.getString(R.string.settingsNotificationsDisabled)
+      }
+    } catch (e: Throwable) {
+      this.logger.debug("Failed to configure preference item: ", e)
+    }
   }
 
   private fun formatVersion(): String {

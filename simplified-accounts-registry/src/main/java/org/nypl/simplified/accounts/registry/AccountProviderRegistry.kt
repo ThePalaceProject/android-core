@@ -111,6 +111,8 @@ class AccountProviderRegistry private constructor(
     this.eventsActual.onNext(StatusChanged)
 
     try {
+      this.clear()
+
       for (source in this.sources) {
         try {
           when (val result = source.load(

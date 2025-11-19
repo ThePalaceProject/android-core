@@ -50,6 +50,7 @@ class ProfileDescriptionJSONTest {
           ProfileDateOfBirth(dateTime, true),
           showTestingLibraries = false,
           hasSeenLibrarySelectionScreen = false,
+          hasSeenNotificationScreen = false,
           readerPreferences = ReaderPreferences.builder().build(),
           mostRecentAccount = AccountID.generate(),
           playbackRates = hashMapOf(),

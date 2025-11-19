@@ -16,14 +16,14 @@
     <string name="splashGotoPrevious">Go To Previous Tutorial Page</string>
     <string name="splashSkip">Skip Tutorial</string>
 
-    <string name="splashBatteryText">
-On some devices, Android\'s battery saver can interfere with audiobook playback. It can therefore help to turn off the battery saver for the Palace app.\n\n
-Do you want to visit your device\'s settings in order to turn off the battery saver?
+    <string name="splashNotificationsText">
+We use notifications to tell you when book reservations are ready, and also to ensure the reliable playback of audiobooks.\n
+Do you want to enable notifications?
     </string>
-    <string name="splashBatteryTextHint">
+    <string name="splashNotificationsTextHint">
 You can re-visit this option again in the Palace settings screen if you don\'t want to decide right now.
     </string>
-    <string name="splashBatteryVisitSettings">Visit Settings</string>
-    <string name="splashBatterySkip">Skip</string>
+    <string name="splashNotificationsAllow">Allow</string>
+    <string name="splashNotificationsSkip">Skip</string>
 
 </resources>

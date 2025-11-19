@@ -13,8 +13,10 @@ object SettingsModel {
     if (this.debugClicks >= 7) {
       this.debugClicks = 0
       profiles.profileUpdate { d ->
-        d.copy(preferences = d.preferences.copy(
-          showDebugSettings = !d.preferences.showDebugSettings)
+        d.copy(
+          preferences = d.preferences.copy(
+            showDebugSettings = !d.preferences.showDebugSettings
+          )
         )
       }
     }

@@ -1,76 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:app="http://schemas.android.com/apk/res-auto"
-  xmlns:tools="http://schemas.android.com/tools">
-
-  <Preference
-    android:icon="@drawable/ic_settings_account"
-    android:key="settingsAccounts"
-    android:summary="@string/settingsAccountsSummary"
-    android:title="@string/settingsAccounts" />
-
-  <PreferenceCategory android:title="@string/settingsDocumentation" >
-    <Preference
-      android:key="settingsAcknowledgements"
-      android:summary="@string/settingsAcknowledgementsSummary"
-      android:title="@string/settingsAcknowledgements" />
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <Preference
-      android:key="settingsAbout"
-      android:summary="@string/settingsAboutSummary"
-      android:title="@string/settingsAbout" />
+        android:icon="@drawable/ic_settings_account"
+        android:key="settingsAccounts"
+        android:summary="@string/settingsAccountsSummary"
+        android:title="@string/settingsAccounts" />
 
-    <Preference
-      android:key="settingsEULA"
-      android:summary="@string/settingsEULASummary"
-      android:title="@string/settingsEULA" />
+    <PreferenceCategory android:title="@string/settingsNotifications">
+        <Preference
+            android:key="settingsNotifications"
+            android:summary=""
+            android:title="@string/settingsNotificationsEnabled" />
+    </PreferenceCategory>
 
-    <Preference
-      android:key="settingsFaq"
-      android:summary="@string/settingsFaqSummary"
-      android:title="@string/settingsFaq" />
+    <PreferenceCategory android:title="@string/settingsDocumentation">
+        <Preference
+            android:key="settingsAcknowledgements"
+            android:summary="@string/settingsAcknowledgementsSummary"
+            android:title="@string/settingsAcknowledgements" />
 
-    <Preference
-      android:key="settingsLicense"
-      android:summary="@string/settingsLicenseSummary"
-      android:title="@string/settingsLicense" />
-      <Preference
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:key="settingsPrivacy"
-          android:summary="@string/settingsPrivacySummary"
-          android:title="@string/settingsPrivacy" />
-  </PreferenceCategory>
+        <Preference
+            android:key="settingsAbout"
+            android:summary="@string/settingsAboutSummary"
+            android:title="@string/settingsAbout" />
 
-  <PreferenceCategory android:title="@string/settingsInfo">
-    <Preference
-      android:icon="@drawable/ic_settings_info"
-      android:key="settingsVersion"
-      android:summary="@string/settingsVersionSummary"
-      android:title="@string/settingsVersion"
-      app:enableCopying="true"
-      tools:summary="5.0.1-debug (4164)" />
+        <Preference
+            android:key="settingsEULA"
+            android:summary="@string/settingsEULASummary"
+            android:title="@string/settingsEULA" />
 
-    <Preference
-      android:key="settingsVersionCore"
-      android:summary="@string/settingsVersionCoreSummary"
-      android:title="@string/settingsVersionCore"
-      app:enableCopying="true"
-      tools:summary="6.2.0" />
+        <Preference
+            android:key="settingsFaq"
+            android:summary="@string/settingsFaqSummary"
+            android:title="@string/settingsFaq" />
 
-    <Preference
-      android:key="settingsCommit"
-      android:summary="@string/settingsBuildSummary"
-      android:title="@string/settingsCommit"
-      app:enableCopying="true"
-      tools:summary="b3069242e" />
+        <Preference
+            android:key="settingsLicense"
+            android:summary="@string/settingsLicenseSummary"
+            android:title="@string/settingsLicense" />
+        <Preference
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:key="settingsPrivacy"
+            android:summary="@string/settingsPrivacySummary"
+            android:title="@string/settingsPrivacy" />
+    </PreferenceCategory>
 
-    <Preference
-      android:icon="@drawable/ic_settings_code"
-      android:key="settingsDebug"
-      android:summary="@string/settingsDebugSummary"
-      android:title="@string/settingsDebug"
-      app:isPreferenceVisible="false"
-      tools:isPreferenceVisible="true" />
-  </PreferenceCategory>
+    <PreferenceCategory android:title="@string/settingsInfo">
+        <Preference
+            android:icon="@drawable/ic_settings_info"
+            android:key="settingsVersion"
+            android:summary="@string/settingsVersionSummary"
+            android:title="@string/settingsVersion"
+            app:enableCopying="true"
+            tools:summary="5.0.1-debug (4164)" />
+
+        <Preference
+            android:key="settingsVersionCore"
+            android:summary="@string/settingsVersionCoreSummary"
+            android:title="@string/settingsVersionCore"
+            app:enableCopying="true"
+            tools:summary="6.2.0" />
+
+        <Preference
+            android:key="settingsCommit"
+            android:summary="@string/settingsBuildSummary"
+            android:title="@string/settingsCommit"
+            app:enableCopying="true"
+            tools:summary="b3069242e" />
+
+        <Preference
+            android:icon="@drawable/ic_settings_code"
+            android:key="settingsDebug"
+            android:summary="@string/settingsDebugSummary"
+            android:title="@string/settingsDebug"
+            app:isPreferenceVisible="false"
+            tools:isPreferenceVisible="true" />
+    </PreferenceCategory>
 </PreferenceScreen>

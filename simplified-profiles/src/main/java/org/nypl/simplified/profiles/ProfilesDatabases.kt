@@ -495,7 +495,7 @@ object ProfilesDatabases {
             displayName = displayName,
             preferences = ProfilePreferences(
               dateOfBirth = null,
-              hasSeenBatterySaverScreen = false,
+              hasSeenNotificationScreen = false,
               hasSeenLibrarySelectionScreen = false,
               isManualLCPPassphraseEnabled = false,
               mostRecentAccount = account.id,

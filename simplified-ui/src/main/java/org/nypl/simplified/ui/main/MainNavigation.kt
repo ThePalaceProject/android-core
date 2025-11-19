@@ -24,7 +24,12 @@ import org.nypl.simplified.ui.main.MainTabRequest.TabAny
 import org.nypl.simplified.ui.main.MainTabRequest.TabForCategory
 import org.nypl.simplified.ui.screens.ScreenDefinitionType
 import org.nypl.simplified.ui.settings.SettingsCustomOPDSFragment
-import org.nypl.simplified.ui.settings.SettingsDebugFragment
+import org.nypl.simplified.ui.settings.SettingsDebugMenuBooksFragment
+import org.nypl.simplified.ui.settings.SettingsDebugMenuDRMFragment
+import org.nypl.simplified.ui.settings.SettingsDebugMenuErrorsFragment
+import org.nypl.simplified.ui.settings.SettingsDebugMenuFragment
+import org.nypl.simplified.ui.settings.SettingsDebugMenuRegistryFragment
+import org.nypl.simplified.ui.settings.SettingsDebugMenuStartupFragment
 import org.nypl.simplified.ui.settings.SettingsDocumentViewerFragment
 import org.nypl.simplified.ui.settings.SettingsDocumentViewerModel
 import org.nypl.simplified.ui.settings.SettingsMainFragment3
@@ -179,7 +184,23 @@ object MainNavigation {
     }
 
     fun openDebugSettings() {
-      this.stackPush(SettingsDebugFragment.createScreenDefinition(Unit))
+      this.stackPush(SettingsDebugMenuFragment.createScreenDefinition(Unit))
+    }
+
+    fun openDebugDRMSettings() {
+      this.stackPush(SettingsDebugMenuDRMFragment.createScreenDefinition(Unit))
+    }
+
+    fun openDebugErrorsSettings() {
+      this.stackPush(SettingsDebugMenuErrorsFragment.createScreenDefinition(Unit))
+    }
+
+    fun openDebugRegistrySettings() {
+      this.stackPush(SettingsDebugMenuRegistryFragment.createScreenDefinition(Unit))
+    }
+
+    fun openDebugStartupSettings() {
+      this.stackPush(SettingsDebugMenuStartupFragment.createScreenDefinition(Unit))
     }
 
     fun goUp() {
@@ -202,6 +223,10 @@ object MainNavigation {
           )
         )
       )
+    }
+
+    fun openBooks() {
+      this.stackPush(SettingsDebugMenuBooksFragment.createScreenDefinition(Unit))
     }
 
     fun openCustomOPDS() {

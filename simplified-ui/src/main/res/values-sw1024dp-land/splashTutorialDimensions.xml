@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <dimen name="tutorialStepTextMarginLR">144dp</dimen>
+
+    <dimen name="tutorialStepTextHeight">128dp</dimen>
+
+    <dimen name="tutorialStep1Text1Height">96dp</dimen>
+
+    <dimen name="tutorialStep2Text1Height">96dp</dimen>
+    <dimen name="tutorialStep2Text2Height">96dp</dimen>
+    <dimen name="tutorialStep2Text3Height">96dp</dimen>
+    <dimen name="tutorialStep2Text4Height">144dp</dimen>
+
+    <dimen name="tutorialStep3Text1Height">96dp</dimen>
+</resources>
