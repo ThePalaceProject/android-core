@@ -33,6 +33,7 @@ class MockProfile(
         dateOfBirth = null,
         showTestingLibraries = false,
         hasSeenLibrarySelectionScreen = false,
+        hasSeenNotificationScreen = false,
         readerPreferences = ReaderPreferences.builder().build(),
         mostRecentAccount = this.accounts.firstKey(),
         playbackRates = hashMapOf(),

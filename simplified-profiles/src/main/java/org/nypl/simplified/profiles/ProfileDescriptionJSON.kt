@@ -192,6 +192,9 @@ object ProfileDescriptionJSON {
     val hasSeenLibrarySelectionScreen =
       JSONParserUtilities.getBooleanDefault(objectNode, "hasSeenLibrarySelectionScreen", true)
 
+    val hasSeenNotificationScreen =
+      JSONParserUtilities.getBooleanDefault(objectNode, "hasSeenNotificationScreen", false)
+
     val showDebugSettings =
       JSONParserUtilities.getBooleanDefault(objectNode, "showDebugSettings", false)
 
@@ -217,7 +220,8 @@ object ProfileDescriptionJSON {
       hasSeenLibrarySelectionScreen = hasSeenLibrarySelectionScreen,
       showDebugSettings = showDebugSettings,
       playbackRates = playbackRates,
-      isManualLCPPassphraseEnabled = isManualLCPPassphraseEnabled
+      isManualLCPPassphraseEnabled = isManualLCPPassphraseEnabled,
+      hasSeenNotificationScreen = hasSeenNotificationScreen,
     )
   }
 
@@ -261,6 +265,7 @@ object ProfileDescriptionJSON {
       readerPreferences = readerPreferences,
       mostRecentAccount = mostRecentAccount,
       hasSeenLibrarySelectionScreen = true,
+      hasSeenNotificationScreen = false,
       playbackRates = playbackRates,
       isManualLCPPassphraseEnabled = isManualLCPPassphraseEnabled
     )
@@ -326,6 +331,7 @@ object ProfileDescriptionJSON {
         readerPreferences = readerPrefs,
         mostRecentAccount = mostRecentAccountFallback,
         hasSeenLibrarySelectionScreen = true,
+        hasSeenNotificationScreen = false,
         playbackRates = playbackRates,
         isManualLCPPassphraseEnabled = isManualLCPPassphraseEnabled
       )
@@ -445,6 +451,7 @@ object ProfileDescriptionJSON {
     output.put("showTestingLibraries", preferences.showTestingLibraries)
     output.put("isManualLCPPassphraseEnabled", preferences.isManualLCPPassphraseEnabled)
     output.put("hasSeenLibrarySelectionScreen", preferences.hasSeenLibrarySelectionScreen)
+    output.put("hasSeenNotificationScreen", preferences.hasSeenNotificationScreen)
     output.put("showDebugSettings", preferences.showDebugSettings)
     output.put("mostRecentAccount", preferences.mostRecentAccount.uuid.toString())
 

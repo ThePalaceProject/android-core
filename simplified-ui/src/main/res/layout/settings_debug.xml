@@ -244,6 +244,15 @@
                 android:text="@string/settingsDevUserSeenLibrarySelection" />
 
             <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/settingsVersionDevSeenBatterySaverScreen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:checked="false"
+                android:enabled="true"
+                android:text="@string/settingsDevUserSeenBatterySaver" />
+
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/settingsVersionDevShowOnlySupported"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

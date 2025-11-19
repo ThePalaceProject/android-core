@@ -7,7 +7,7 @@ import org.nypl.simplified.accounts.api.AccountProviderDescription
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
-import org.nypl.simplified.threads.UIThread
+import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.accounts.AccountProviderDescriptionComparator
 import org.nypl.simplified.ui.main.MainAttributes
 import java.util.concurrent.ExecutorService
@@ -27,7 +27,7 @@ object SplashModel {
     get() = this.accountProvidersActualUI
 
   private val splashScreenStatusActual =
-    MainAttributes.attributes.withValue(SplashScreenStatus.SPLASH_SCREEN_IN_PROGRESS)
+    MainAttributes.attributes.withValue(SplashScreenStatus.SPLASH_SCREEN_AWAITING_BOOT)
 
   /**
    * An attribute that publishes the splash screen status. Updates are guaranteed to be
@@ -44,11 +44,28 @@ object SplashModel {
   enum class SplashScreenStatus {
 
     /**
-     * The splash screen is still in progress. Either the application hasn't finished booting up,
-     * or the user hasn't finished going through the whole onboarding process.
+     * The splash screen is awaiting the boot process.
      */
 
-    SPLASH_SCREEN_IN_PROGRESS,
+    SPLASH_SCREEN_AWAITING_BOOT,
+
+    /**
+     * The splash screen is asking the user if they want to enable notifications.
+     */
+
+    SPLASH_SCREEN_NOTIFICATIONS,
+
+    /**
+     * The splash screen is showing the tutorial.
+     */
+
+    SPLASH_SCREEN_TUTORIAL,
+
+    /**
+     * The user is being asked to select a library.
+     */
+
+    SPLASH_SCREEN_LIBRARY_SELECTOR,
 
     /**
      * The splash screen has fully completed. The user has finished selecting a library, viewing
@@ -56,11 +73,6 @@ object SplashModel {
      */
 
     SPLASH_SCREEN_COMPLETED
-  }
-
-  fun splashScreenCompleted() {
-    UIThread.checkIsUIThread()
-    this.splashScreenStatusActual.set(SplashScreenStatus.SPLASH_SCREEN_COMPLETED)
   }
 
   fun accountProvidersLoad(
@@ -83,5 +95,67 @@ object SplashModel {
         }
       }
     }
+  }
+
+  fun splashScreenCompleteNotifications(
+    profiles: ProfilesControllerType
+  ) {
+    this.splashScreenStatusActual.set(SplashScreenStatus.SPLASH_SCREEN_TUTORIAL)
+
+    profiles.profileUpdate { description ->
+      description.copy(
+        preferences = description.preferences.copy(hasSeenNotificationScreen = true)
+      )
+    }
+  }
+
+  fun splashScreenCompleteLibrarySelection(
+    profiles: ProfilesControllerType
+  ) {
+    this.splashScreenStatusActual.set(SplashScreenStatus.SPLASH_SCREEN_COMPLETED)
+
+    profiles.profileUpdate { description ->
+      description.copy(
+        preferences = description.preferences.copy(hasSeenLibrarySelectionScreen = true)
+      )
+    }
+  }
+
+  fun splashScreenCompleteTutorial(
+    profiles: ProfilesControllerType
+  ) {
+    this.splashScreenStatusActual.set(SplashScreenStatus.SPLASH_SCREEN_LIBRARY_SELECTOR)
+  }
+
+  fun splashScreenCompleteBoot() {
+    this.splashScreenStatusActual.set(SplashScreenStatus.SPLASH_SCREEN_NOTIFICATIONS)
+  }
+
+  fun userHasSeenLibrarySelection(
+    profiles: ProfilesControllerType
+  ): Boolean {
+    val profile =
+      profiles.profileCurrent()
+    val preferences =
+      profile.preferences()
+
+    return preferences.hasSeenLibrarySelectionScreen
+  }
+
+  fun userHasCompletedTutorial(
+    profiles: ProfilesControllerType
+  ): Boolean {
+    return this.userHasSeenLibrarySelection(profiles)
+  }
+
+  fun userHasSeenNotifications(
+    profiles: ProfilesControllerType
+  ): Boolean {
+    val profile =
+      profiles.profileCurrent()
+    val preferences =
+      profile.preferences()
+
+    return preferences.hasSeenNotificationScreen
   }
 }

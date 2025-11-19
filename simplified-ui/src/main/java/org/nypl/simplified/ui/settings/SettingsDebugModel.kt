@@ -173,6 +173,11 @@ object SettingsDebugModel {
   }
 
   @UiThread
+  fun hasSeenNotificationScreen(): Boolean {
+    return this.preferences().hasSeenNotificationScreen
+  }
+
+  @UiThread
   fun hasSeenLibrarySelection(): Boolean {
     return this.preferences().hasSeenLibrarySelectionScreen
   }
