@@ -1,19 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <dimen name="tutorialStepTextMarginLR">128dp</dimen>
-
-    <dimen name="tutorialGettingStartedTopOffset">16dp</dimen>
-    <dimen name="tutorialGettingStartedBottomOffset">16dp</dimen>
-    <dimen name="tutorialPalaceLogoTopOffset">32dp</dimen>
-    <dimen name="tutorialTextBelowLogoOffset">16dp</dimen>
-
-    <dimen name="tutorialStep1Text1Height">32dp</dimen>
-
-    <dimen name="tutorialStep2Text1Height">32dp</dimen>
-    <dimen name="tutorialStep2Text2Height">32dp</dimen>
-    <dimen name="tutorialStep2Text3Height">32dp</dimen>
-    <dimen name="tutorialStep2Text4Height">32dp</dimen>
-
-    <dimen name="tutorialStep3Text1Height">32dp</dimen>
+    <item name="tutorialPhoneMarginTop" format="float" type="fraction">0.2</item>
+    <item name="tutorialPhoneMarginBottom" format="float" type="fraction">0.2</item>
 </resources>

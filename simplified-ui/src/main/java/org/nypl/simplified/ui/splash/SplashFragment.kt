@@ -1,7 +1,9 @@
 package org.nypl.simplified.ui.splash
 
 import android.app.Activity
+import android.graphics.Matrix
 import android.os.Bundle
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +17,7 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.Group
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.core.widget.ContentLoadingProgressBar
 import androidx.core.widget.addTextChangedListener
@@ -247,11 +250,44 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
       this.root.findViewById<Group>(R.id.tutorialStep2Group)
     val tutorialStep3Group =
       this.root.findViewById<Group>(R.id.tutorialStep3Group)
+    val tutorialPhoneImage =
+      this.root.findViewById<ImageView>(R.id.tutorialPhoneBackgroundView)
+    val tutorialStep2Text =
+      this.root.findViewById<TextView>(R.id.tutorialStep2Text1)
 
     init {
       this.tutorialStep1Group.visibility = View.VISIBLE
       this.tutorialStep2Group.visibility = View.INVISIBLE
       this.tutorialStep3Group.visibility = View.INVISIBLE
+
+      val step2Text = StringBuilder()
+      step2Text.append("<br/>")
+      step2Text.append(root.context.getString(R.string.splashStep2TextSegment1))
+      step2Text.append("<br/>")
+      step2Text.append(root.context.getString(R.string.splashStep2TextSegment2))
+      step2Text.append("<br/>")
+      step2Text.append("<font color=\"#2126ad\">")
+      step2Text.append(root.context.getString(R.string.splashStep2TextSegment3))
+      step2Text.append("</font>")
+      step2Text.append("<br/>")
+      step2Text.append(root.context.getString(R.string.splashStep2TextSegment4))
+
+      this.tutorialStep2Text.text =
+        Html.fromHtml(step2Text.toString(), Html.FROM_HTML_MODE_LEGACY)
+
+      /*
+       * Set a custom image scaling matrix that will scale the image from the top-left
+       * corner. This ensures the width of the image always matches the image view, and
+       * the image expands off the page downwards.
+       */
+
+      this.tutorialPhoneImage.doOnLayout {
+        val drawable = this.tutorialPhoneImage.drawable
+        val matrix = Matrix()
+        val scale = this.tutorialPhoneImage.width.toFloat() / drawable.intrinsicWidth
+        matrix.setScale(scale, scale)
+        this.tutorialPhoneImage.imageMatrix = matrix
+      }
 
       this.tutorialSkip.setOnClickListener {
         this.onTutorialFinished.invoke()
