@@ -842,7 +842,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2025-11-19T17:00:59+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.20.0">
+    <c:release date="2025-11-28T00:00:00+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.20.0">
       <c:changes>
         <c:change date="2025-11-11T00:00:00+00:00" summary="Redesign tutorial screens to use localizable layouts.">
           <c:tickets>
@@ -880,12 +880,15 @@
             <c:ticket id="PP-3307"/>
           </c:tickets>
         </c:change>
-        <c:change date="2025-11-19T17:00:59+00:00" summary="Add control over notifications and a splash screen item that requests permissions.">
+        <c:change date="2025-11-19T00:00:00+00:00" summary="Add control over notifications and a splash screen item that requests permissions.">
           <c:tickets>
             <c:ticket id="PP-3301"/>
           </c:tickets>
         </c:change>
       </c:changes>
+    </c:release>
+    <c:release date="2025-11-28T10:53:41+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.21.0">
+      <c:changes/>
     </c:release>
   </c:releases>
   <c:ticket-systems>
