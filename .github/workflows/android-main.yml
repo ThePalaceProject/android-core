@@ -34,4 +34,4 @@ jobs:
         if: ${{ always() }}
         with:
           name: junit-test-report
-          path: ./simplified-tests/build/reports/tests/testDebugUnitTest/
+          path: ./palace-tests/build/reports/tests/testDebugUnitTest/

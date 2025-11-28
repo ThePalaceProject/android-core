@@ -3,7 +3,7 @@ The Palace Project Android Client
 
 [![Build Status](https://img.shields.io/github/actions/workflow/status/ThePalaceProject/android-core/android-main.yml?branch=main)](https://github.com/ThePalaceProject/android-core/actions/workflows/android-main.yml)
 
-Lyrasis fork of the NYPL's [Library Simplified](http://www.librarysimplified.org/) Android client.
+The [Palace](https://thepalaceproject.org) Android client.
 
 ![Palace](./src/site/resources/palace.jpg?raw=true)
 
@@ -13,7 +13,7 @@ The contents of this repository provide the The Palace Project's Android client 
 
 |Application|Module|Description|
 |-----------|------|-----------|
-|Palace|[simplified-app-palace](simplified-app-palace)|The DRM-enabled application|
+|Palace|[palace-app-palace](palace-app-palace)|The DRM-enabled application|
 
 ## Contents
 
@@ -133,7 +133,7 @@ $ ./gradlew clean assemble test
 #### Enabling DRM
 
 The application contains optional support for various DRM systems. These are all disabled by
-default, and must be enabled explicitly in order to build a version of the [Palace](simplified-app-palace)
+default, and must be enabled explicitly in order to build a version of the [Palace](palace-app-palace)
 application equivalent to the Play Store version.
 
 Firstly, make sure you have your [S3](#s3-credentials) credentials
@@ -154,7 +154,7 @@ of directories containing those secrets. There are two directories to configure:
 A credentials directory, containing secrets needed to build the app, and an
 assets directory, containing secrets needed by the app at runtime (which will be
 installed as assets in the app). For example, assuming that you have
-[Palace's](simplified-app-palace) credentials in '/path/to/palace/credentials',
+[Palace's](palace-app-palace) credentials in '/path/to/palace/credentials',
 and assets in `/path/to/palace/assets`, you can add the following properties to
 your `$HOME/.gradle/gradle.properties` file and the build system will copy in
 the required secrets at build time:
@@ -222,8 +222,8 @@ An _API_ module defines a user-visible contract (or _specification_) for a modul
 data types and abstract interfaces via which the user is expected to make calls in order to make use of a
 module. An API module is typically paired with an _implementation_ module that provides concrete
 implementations of the API interface types. A good example of this is the accounts database: The
-[Accounts database API](simplified-accounts-database-api) declares a set of data types and
-interfaces that describe how an accounts database should behave. The [Accounts database](simplified-accounts-database)
+[Accounts database API](palace-accounts-database-api) declares a set of data types and
+interfaces that describe how an accounts database should behave. The [Accounts database](palace-accounts-database)
 _implementation_ module provides an implementation of the described API. Keeping the API
 _specification_ strictly separated from the _implementation_ in this manner has a number of benefits:
 
@@ -242,15 +242,15 @@ An _SPI_ module is similar to an API in that it provides a specification, howeve
 interfaces are expected to be _implemented_ by users rather than _called_ by users directly. An
 implementor of an SPI is known as a _service provider_.
 
-A good example of an SPI is the [Account provider source SPI](simplified-accounts-source-spi); the SPI
+A good example of an SPI is the [Account provider source SPI](palace-accounts-source-spi); the SPI
 defines an interface that is expected to be implemented by account provider sources. The
-[file-based source](simplified-accounts-source-filebased) module is capable of delivering account
-provider descriptions from a bundled asset file. The [registry source](simplified-accounts-source-nyplregistry)
+[file-based source](palace-accounts-source-filebased) module is capable of delivering account
+provider descriptions from a bundled asset file. The [registry source](palace-accounts-source-nyplregistry)
 implementation is capable of fetching account provider descriptions from the NYPL's registry
 server. Neither the _SPI_ or the implementation modules are expected to be used by application
 programmers directly: Instead, implementation modules are loaded using [ServiceLoader](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/ServiceLoader.html)
-by the [Account provider registry](simplified-accounts-registry), and users interact with the
-registry via a [published registry API](simplified-accounts-registry-api). This same design
+by the [Account provider registry](palace-accounts-registry), and users interact with the
+registry via a [published registry API](palace-accounts-registry-api). This same design
 pattern is used by the [NYPL AudioBook API](https://github.com/NYPL-Simplified/audiobook-android)
 to provide a common API into which new audio book players and parsers can be introduced _without
 needing to modify application code at all_.
@@ -280,8 +280,8 @@ module.
 
 #### Test suite
 
-We aggregate all unit tests in the [simplified-tests](simplified-tests) module. Tests should
-be written using the JUnit 5 library, although at the time of writing we have [one test](simplified-tests/src/test/java/org/nypl/simplified/tests/webview/CookiesContract.kt)
+We aggregate all unit tests in the [palace-tests](palace-tests) module. Tests should
+be written using the JUnit 5 library, although at the time of writing we have [one test](palace-tests/src/test/java/org/nypl/simplified/tests/webview/CookiesContract.kt)
 that still requires JUnit 4 due to the use of [Robolectric](http://robolectric.org/).
 
 #### Modules
@@ -291,86 +291,86 @@ coupled as possible.
 
 |Module|Description|
 |------|-----------|
-|[org.librarysimplified.accessibility](simplified-accessibility)|Accessibility APIs and functionality|
-|[org.librarysimplified.accounts.api](simplified-accounts-api)|Accounts API|
-|[org.librarysimplified.accounts.database](simplified-accounts-database)|Accounts database implementation|
-|[org.librarysimplified.accounts.database.api](simplified-accounts-database-api)|Accounts database API|
-|[org.librarysimplified.accounts.json](simplified-accounts-json)|Shared JSON classes|
-|[org.librarysimplified.accounts.registry](simplified-accounts-registry)|Account provider registry implementation|
-|[org.librarysimplified.accounts.registry.api](simplified-accounts-registry-api)|Account provider registry API|
-|[org.librarysimplified.accounts.source.nyplregistry](simplified-accounts-source-nyplregistry)|NYPL registry client implementation|
-|[org.librarysimplified.accounts.source.spi](simplified-accounts-source-spi)|Account provider source SPI|
-|[org.librarysimplified.adobe.extensions](simplified-adobe-extensions)|Adobe DRM convenience functions|
-|[org.librarysimplified.analytics.api](simplified-analytics-api)|Analytics API|
-|[org.librarysimplified.analytics.circulation](simplified-analytics-circulation)|Circulation manager analytics implementation|
-|[org.librarysimplified.announcements](simplified-announcements)|Announcements API|
-|[org.thepalaceproject.palace](simplified-app-palace)|Palace|
-|[org.librarysimplified.bookmarks](simplified-bookmarks)|Bookmark service implementation|
-|[org.librarysimplified.bookmarks.api](simplified-bookmarks-api)|Bookmarks service API|
-|[org.librarysimplified.books.api](simplified-books-api)|Book types|
-|[org.librarysimplified.books.audio](simplified-books-audio)|Audio book support code|
-|[org.librarysimplified.books.borrowing](simplified-books-borrowing)|Book borrowing|
-|[org.librarysimplified.books.bundled.api](simplified-books-bundled-api)|Bundled books API|
-|[org.librarysimplified.books.controller](simplified-books-controller)|Books/Profiles controller implementation|
-|[org.librarysimplified.books.controller.api](simplified-books-controller-api)|Books controller API|
-|[org.librarysimplified.books.covers](simplified-books-covers)|Book cover loading and generation|
-|[org.librarysimplified.books.database](simplified-books-database)|Book database implementation|
-|[org.librarysimplified.books.database.api](simplified-books-database-api)|Book database API|
-|[org.librarysimplified.books.formats](simplified-books-formats)|Book formats implementation|
-|[org.librarysimplified.books.formats.api](simplified-books-formats-api)|Book formats API|
-|[org.librarysimplified.books.preview](simplified-books-preview)|Book preview|
-|[org.librarysimplified.books.registry.api](simplified-books-registry-api)|Book registry API|
-|[org.librarysimplified.books.time.tracking](simplified-books-time-tracking)|Books time tracking|
-|[org.librarysimplified.boot.api](simplified-boot-api)|Application boot API|
-|[org.librarysimplified.buildconfig.api](simplified-buildconfig-api)|Build-time configuration API|
-|[org.librarysimplified.content.api](simplified-content-api)|Content resolver API|
-|[org.librarysimplified.crashlytics](simplified-crashlytics)|Crashlytics|
-|[org.librarysimplified.crashlytics.api](simplified-crashlytics-api)|Crashlytics functionality|
-|[org.librarysimplified.documents](simplified-documents)|Documents|
-|[org.librarysimplified.feeds.api](simplified-feeds-api)|Feed API|
-|[org.librarysimplified.files](simplified-files)|File utilities|
-|[org.librarysimplified.futures](simplified-futures)|Guava Future extensions|
-|[org.librarysimplified.json.core](simplified-json-core)|JSON utilities|
-|[org.librarysimplified.lcp](simplified-lcp)|LCP content protection provider|
-|[org.librarysimplified.links](simplified-links)|Link types|
-|[org.librarysimplified.links.json](simplified-links-json)|Link JSON parsing|
-|[org.librarysimplified.mdc](simplified-mdc)|MDC conventions|
-|[org.librarysimplified.notifications](simplified-notifications)|Notification service|
-|[org.librarysimplified.oauth](simplified-oauth)|OAuth|
-|[org.librarysimplified.opds.auth_document](simplified-opds-auth-document)|OPDS authentication document parser implementation|
-|[org.librarysimplified.opds.auth_document.api](simplified-opds-auth-document-api)|OPDS authentication document parser API|
-|[org.librarysimplified.opds.client](simplified-opds-client)|Stateful OPDS client|
-|[org.librarysimplified.opds.core](simplified-opds-core)|OPDS feed parser|
-|[org.librarysimplified.opds2](simplified-opds2)|OPDS 2.0 model definitions|
-|[org.librarysimplified.opds2.irradia](simplified-opds2-irradia)|OPDS 2.0 Parser [Irradia]|
-|[org.librarysimplified.opds2.parser.api](simplified-opds2-parser-api)|OPDS 2.0 parser API|
-|[org.librarysimplified.opds2.r2](simplified-opds2-r2)|OPDS 2.0 Parser [R2]|
-|[org.librarysimplified.parser.api](simplified-parser-api)|Parser API|
-|[org.librarysimplified.patron](simplified-patron)|Patron user profile parser implementation|
-|[org.librarysimplified.patron.api](simplified-patron-api)|Patron user profile parser API|
-|[org.librarysimplified.presentableerror.api](simplified-presentableerror-api)|Presentable error API|
-|[org.librarysimplified.profiles](simplified-profiles)|Profile database implementation|
-|[org.librarysimplified.profiles.api](simplified-profiles-api)|Profile database API|
-|[org.librarysimplified.profiles.controller.api](simplified-profiles-controller-api)|Profile controller API|
-|[org.librarysimplified.reader.api](simplified-reader-api)|Reader API types|
-|[org.librarysimplified.reports](simplified-reports)|Error reporting|
-|[org.librarysimplified.sandbox](simplified-sandbox)|Sandbox|
-|[org.librarysimplified.services.api](simplified-services-api)|Application services API|
-|[org.librarysimplified.taskrecorder.api](simplified-taskrecorder-api)|Task recorder API|
-|[org.librarysimplified.tenprint](simplified-tenprint)|10PRINT implementation|
-|[org.librarysimplified.tests](simplified-tests)|Test suite|
-|[org.librarysimplified.threads](simplified-threads)|Thread utilities|
-|[org.librarysimplified.ui](simplified-ui)|UI|
-|[org.librarysimplified.ui.errorpage](simplified-ui-errorpage)|Error details screen|
-|[org.librarysimplified.ui.images](simplified-ui-images)|Image loader API for general image resources|
-|[org.librarysimplified.ui.screen](simplified-ui-screen)|Screen API|
-|[org.librarysimplified.viewer.api](simplified-viewer-api)|Viewer API|
-|[org.librarysimplified.viewer.audiobook](simplified-viewer-audiobook)|AudioBook viewer|
-|[org.librarysimplified.viewer.epub.readium2](simplified-viewer-epub-readium2)|Readium 2 EPUB reader|
-|[org.librarysimplified.viewer.pdf.pdfjs](simplified-viewer-pdf-pdfjs)|PDF reader|
-|[org.librarysimplified.viewer.preview](simplified-viewer-preview)|Book preview viewer|
-|[org.librarysimplified.viewer.spi](simplified-viewer-spi)|Viewer SPI|
-|[org.librarysimplified.webview](simplified-webview)|WebView utilities|
+|[org.librarysimplified.accessibility](palace-accessibility)|Accessibility APIs and functionality|
+|[org.librarysimplified.accounts.api](palace-accounts-api)|Accounts API|
+|[org.librarysimplified.accounts.database](palace-accounts-database)|Accounts database implementation|
+|[org.librarysimplified.accounts.database.api](palace-accounts-database-api)|Accounts database API|
+|[org.librarysimplified.accounts.json](palace-accounts-json)|Shared JSON classes|
+|[org.librarysimplified.accounts.registry](palace-accounts-registry)|Account provider registry implementation|
+|[org.librarysimplified.accounts.registry.api](palace-accounts-registry-api)|Account provider registry API|
+|[org.librarysimplified.accounts.source.nyplregistry](palace-accounts-source-nyplregistry)|NYPL registry client implementation|
+|[org.librarysimplified.accounts.source.spi](palace-accounts-source-spi)|Account provider source SPI|
+|[org.librarysimplified.adobe.extensions](palace-adobe-extensions)|Adobe DRM convenience functions|
+|[org.librarysimplified.analytics.api](palace-analytics-api)|Analytics API|
+|[org.librarysimplified.analytics.circulation](palace-analytics-circulation)|Circulation manager analytics implementation|
+|[org.librarysimplified.announcements](palace-announcements)|Announcements API|
+|[org.thepalaceproject.palace](palace-app-palace)|Palace|
+|[org.librarysimplified.bookmarks](palace-bookmarks)|Bookmark service implementation|
+|[org.librarysimplified.bookmarks.api](palace-bookmarks-api)|Bookmarks service API|
+|[org.librarysimplified.books.api](palace-books-api)|Book types|
+|[org.librarysimplified.books.audio](palace-books-audio)|Audio book support code|
+|[org.librarysimplified.books.borrowing](palace-books-borrowing)|Book borrowing|
+|[org.librarysimplified.books.bundled.api](palace-books-bundled-api)|Bundled books API|
+|[org.librarysimplified.books.controller](palace-books-controller)|Books/Profiles controller implementation|
+|[org.librarysimplified.books.controller.api](palace-books-controller-api)|Books controller API|
+|[org.librarysimplified.books.covers](palace-books-covers)|Book cover loading and generation|
+|[org.librarysimplified.books.database](palace-books-database)|Book database implementation|
+|[org.librarysimplified.books.database.api](palace-books-database-api)|Book database API|
+|[org.librarysimplified.books.formats](palace-books-formats)|Book formats implementation|
+|[org.librarysimplified.books.formats.api](palace-books-formats-api)|Book formats API|
+|[org.librarysimplified.books.preview](palace-books-preview)|Book preview|
+|[org.librarysimplified.books.registry.api](palace-books-registry-api)|Book registry API|
+|[org.librarysimplified.books.time.tracking](palace-books-time-tracking)|Books time tracking|
+|[org.librarysimplified.boot.api](palace-boot-api)|Application boot API|
+|[org.librarysimplified.buildconfig.api](palace-buildconfig-api)|Build-time configuration API|
+|[org.librarysimplified.content.api](palace-content-api)|Content resolver API|
+|[org.librarysimplified.crashlytics](palace-crashlytics)|Crashlytics|
+|[org.librarysimplified.crashlytics.api](palace-crashlytics-api)|Crashlytics functionality|
+|[org.librarysimplified.documents](palace-documents)|Documents|
+|[org.librarysimplified.feeds.api](palace-feeds-api)|Feed API|
+|[org.librarysimplified.files](palace-files)|File utilities|
+|[org.librarysimplified.futures](palace-futures)|Guava Future extensions|
+|[org.librarysimplified.json.core](palace-json-core)|JSON utilities|
+|[org.librarysimplified.lcp](palace-lcp)|LCP content protection provider|
+|[org.librarysimplified.links](palace-links)|Link types|
+|[org.librarysimplified.links.json](palace-links-json)|Link JSON parsing|
+|[org.librarysimplified.mdc](palace-mdc)|MDC conventions|
+|[org.librarysimplified.notifications](palace-notifications)|Notification service|
+|[org.librarysimplified.oauth](palace-oauth)|OAuth|
+|[org.librarysimplified.opds.auth_document](palace-opds-auth-document)|OPDS authentication document parser implementation|
+|[org.librarysimplified.opds.auth_document.api](palace-opds-auth-document-api)|OPDS authentication document parser API|
+|[org.librarysimplified.opds.client](palace-opds-client)|Stateful OPDS client|
+|[org.librarysimplified.opds.core](palace-opds-core)|OPDS feed parser|
+|[org.librarysimplified.opds2](palace-opds2)|OPDS 2.0 model definitions|
+|[org.librarysimplified.opds2.irradia](palace-opds2-irradia)|OPDS 2.0 Parser [Irradia]|
+|[org.librarysimplified.opds2.parser.api](palace-opds2-parser-api)|OPDS 2.0 parser API|
+|[org.librarysimplified.opds2.r2](palace-opds2-r2)|OPDS 2.0 Parser [R2]|
+|[org.librarysimplified.parser.api](palace-parser-api)|Parser API|
+|[org.librarysimplified.patron](palace-patron)|Patron user profile parser implementation|
+|[org.librarysimplified.patron.api](palace-patron-api)|Patron user profile parser API|
+|[org.librarysimplified.presentableerror.api](palace-presentableerror-api)|Presentable error API|
+|[org.librarysimplified.profiles](palace-profiles)|Profile database implementation|
+|[org.librarysimplified.profiles.api](palace-profiles-api)|Profile database API|
+|[org.librarysimplified.profiles.controller.api](palace-profiles-controller-api)|Profile controller API|
+|[org.librarysimplified.reader.api](palace-reader-api)|Reader API types|
+|[org.librarysimplified.reports](palace-reports)|Error reporting|
+|[org.librarysimplified.sandbox](palace-sandbox)|Sandbox|
+|[org.librarysimplified.services.api](palace-services-api)|Application services API|
+|[org.librarysimplified.taskrecorder.api](palace-taskrecorder-api)|Task recorder API|
+|[org.librarysimplified.tenprint](palace-tenprint)|10PRINT implementation|
+|[org.librarysimplified.tests](palace-tests)|Test suite|
+|[org.librarysimplified.threads](palace-threads)|Thread utilities|
+|[org.librarysimplified.ui](palace-ui)|UI|
+|[org.librarysimplified.ui.errorpage](palace-ui-errorpage)|Error details screen|
+|[org.librarysimplified.ui.images](palace-ui-images)|Image loader API for general image resources|
+|[org.librarysimplified.ui.screen](palace-ui-screen)|Screen API|
+|[org.librarysimplified.viewer.api](palace-viewer-api)|Viewer API|
+|[org.librarysimplified.viewer.audiobook](palace-viewer-audiobook)|AudioBook viewer|
+|[org.librarysimplified.viewer.epub.readium2](palace-viewer-epub-readium2)|Readium 2 EPUB reader|
+|[org.librarysimplified.viewer.pdf.pdfjs](palace-viewer-pdf-pdfjs)|PDF reader|
+|[org.librarysimplified.viewer.preview](palace-viewer-preview)|Book preview viewer|
+|[org.librarysimplified.viewer.spi](palace-viewer-spi)|Viewer SPI|
+|[org.librarysimplified.webview](palace-webview)|WebView utilities|
 
 _The above table is generated with [ReadMe.java](src/misc/ReadMe.java)._
 

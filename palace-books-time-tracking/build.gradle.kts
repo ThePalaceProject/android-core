@@ -1,0 +1,28 @@
+dependencies {
+    coreLibraryDesugaring(libs.android.desugaring)
+
+    implementation(project(":palace-accounts-api"))
+    implementation(project(":palace-accounts-database-api"))
+    implementation(project(":palace-crashlytics-api"))
+    implementation(project(":palace-json-core"))
+    implementation(project(":palace-profiles-api"))
+    implementation(project(":palace-profiles-controller-api"))
+    implementation(project(":palace-services-api"))
+
+    implementation(libs.azam.ulidj)
+    implementation(libs.io7m.jmulticlose)
+    implementation(libs.io7m.jattribute.core)
+    implementation(libs.irradia.mime.api)
+    implementation(libs.jackson.core)
+    implementation(libs.jackson.databind)
+    implementation(libs.joda.time)
+    implementation(libs.kotlin.stdlib)
+    implementation(libs.kotlinx.datetime)
+    implementation(libs.palace.audiobook.api)
+    implementation(libs.palace.audiobook.manifest.api)
+    implementation(libs.palace.audiobook.time.tracking)
+    implementation(libs.palace.http.api)
+    implementation(libs.rxandroid2)
+    implementation(libs.rxjava2)
+    implementation(libs.slf4j)
+}
