@@ -3,8 +3,8 @@
 	url = https://github.com/ThePalaceProject/android-ci
 	branch = main
 
-[submodule "simplified-tests/src/test/resources/org/nypl/simplified/tests/bookmark_annotations/spec"]
-	path = simplified-tests/src/test/resources/org/nypl/simplified/tests/bookmark_annotations/spec
+[submodule "palace-tests/src/test/resources/org/nypl/simplified/tests/bookmark_annotations/spec"]
+	path = palace-tests/src/test/resources/org/nypl/simplified/tests/bookmark_annotations/spec
 	url = https://github.com/ThePalaceProject/mobile-specs
     branch = main
 

@@ -24,7 +24,7 @@ LCP/*
 *~
 
 # Misc
-simplified-tests-sandbox/src/main/*
+palace-tests-sandbox/src/main/*
 .env
 
 # deprecated
