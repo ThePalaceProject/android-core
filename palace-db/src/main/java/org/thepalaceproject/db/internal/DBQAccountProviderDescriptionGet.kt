@@ -5,7 +5,7 @@ import org.thepalaceproject.db.api.DBTransactionType
 import org.thepalaceproject.db.api.queries.DBQAccountProviderDescriptionGetType
 import java.net.URI
 
-object DBQAccountProviderDescriptionGet : DBQAccountProviderDescriptionGetType {
+internal object DBQAccountProviderDescriptionGet : DBQAccountProviderDescriptionGetType {
 
   const val FORMAT_OPDS2_COLLECTION =
     "org.thepalaceproject.opds2.account_provider_description_collection"

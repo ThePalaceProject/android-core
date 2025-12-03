@@ -36,6 +36,18 @@ CREATE TABLE account_provider_descriptions (
     PRIMARY KEY (apd_id)
 ) STRICT
 ]]></Statement>
+
+        <Statement><![CDATA[
+CREATE TABLE account_providers (
+  ap_id                 TEXT    NOT NULL,
+  ap_updated_time_last  TEXT    NOT NULL,
+  ap_data_format        TEXT    NOT NULL,
+  ap_data               BLOB    NOT NULL,
+
+  CONSTRAINT account_providers_primary_key
+    PRIMARY KEY (ap_id)
+) STRICT
+]]></Statement>
     </Schema>
 
 </Schemas>

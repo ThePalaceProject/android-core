@@ -11,7 +11,7 @@ import org.thepalaceproject.db.api.queries.DBQAccountProviderDescriptionPutType
 import java.io.ByteArrayOutputStream
 import java.net.URI
 
-object DBQAccountProviderDescriptionPut : DBQAccountProviderDescriptionPutType {
+internal object DBQAccountProviderDescriptionPut : DBQAccountProviderDescriptionPutType {
 
   private val text = """
     INSERT INTO account_provider_descriptions (

@@ -43,7 +43,11 @@ import java.util.TreeMap
 
 object AccountProvidersJSON {
 
-  private val logger = LoggerFactory.getLogger(AccountProvidersJSON::class.java)
+  private val logger =
+    LoggerFactory.getLogger(AccountProvidersJSON::class.java)
+
+  private val mapper =
+    ObjectMapper()
 
   private fun <T> putConditionally(node: ObjectNode, name: String, value: T?) {
     value?.let { v -> node.put(name, v.toString()) }
@@ -54,8 +58,7 @@ object AccountProvidersJSON {
    */
 
   fun serializeToJSON(provider: AccountProviderType): ObjectNode {
-    val mapper = ObjectMapper()
-    val node = mapper.createObjectNode()
+    val node = this.mapper.createObjectNode()
 
     node.put("@version", "20200527")
     node.put("addAutomatically", provider.addAutomatically)
@@ -71,6 +74,7 @@ object AccountProvidersJSON {
     this.putConditionally(node, "authenticationDocumentURI", provider.authenticationDocumentURI)
     this.putConditionally(node, "cardCreatorURI", provider.cardCreatorURI)
     this.putConditionally(node, "catalogURI", provider.catalogURI)
+    this.putConditionally(node, "description", provider.description)
     this.putConditionally(node, "eula", provider.eula)
     this.putConditionally(node, "license", provider.license)
     this.putConditionally(node, "loansURI", provider.loansURI)
@@ -83,48 +87,45 @@ object AccountProvidersJSON {
 
     node.set<ObjectNode>(
       "authentication",
-      this.serializeAuthentication(mapper, provider.authentication)
+      this.serializeAuthentication(provider.authentication)
     )
     node.set<ObjectNode>(
       "announcements",
-      this.serializeAnnouncements(mapper, provider.announcements)
+      this.serializeAnnouncements(provider.announcements)
     )
     node.set<ArrayNode>(
       "authenticationAlternatives",
-      this.serializeAuthenticationAlternatives(mapper, provider.authenticationAlternatives)
+      this.serializeAuthenticationAlternatives(provider.authenticationAlternatives)
     )
     return node
   }
 
   private fun serializeAnnouncements(
-    mapper: ObjectMapper,
     announcements: List<Announcement>
   ): JsonNode {
-    val array = mapper.createArrayNode()
+    val array = this.mapper.createArrayNode()
     for (announcement in announcements) {
-      array.add(AnnouncementJSON.serializeToJSON(mapper, announcement))
+      array.add(AnnouncementJSON.serializeToJSON(this.mapper, announcement))
     }
     return array
   }
 
   private fun serializeAuthenticationAlternatives(
-    mapper: ObjectMapper,
     authenticationAlternatives: List<AccountProviderAuthenticationDescription>
   ): ArrayNode {
-    val array = mapper.createArrayNode()
+    val array = this.mapper.createArrayNode()
     for (authentication in authenticationAlternatives) {
-      array.add(this.serializeAuthentication(mapper, authentication))
+      array.add(this.serializeAuthentication(authentication))
     }
     return array
   }
 
   private fun serializeAuthentication(
-    mapper: ObjectMapper,
     authentication: AccountProviderAuthenticationDescription
   ): ObjectNode {
     return when (authentication) {
       is OAuthWithIntermediary -> {
-        val authObject = mapper.createObjectNode()
+        val authObject = this.mapper.createObjectNode()
         authObject.put("description", authentication.description)
         authObject.put("type", OAUTH_INTERMEDIARY_TYPE)
         authObject.put("authenticate", authentication.authenticate.toString())
@@ -135,7 +136,7 @@ object AccountProvidersJSON {
         authObject
       }
       is Basic -> {
-        val authObject = mapper.createObjectNode()
+        val authObject = this.mapper.createObjectNode()
         authObject.put("type", BASIC_TYPE)
         this.putConditionally(
           authObject,
@@ -146,7 +147,7 @@ object AccountProvidersJSON {
         this.putConditionally(authObject, "keyboard", authentication.keyboard.name)
         this.putConditionally(authObject, "passwordKeyboard", authentication.passwordKeyboard.name)
         authObject.put("passwordMaximumLength", authentication.passwordMaximumLength)
-        authObject.set<ObjectNode>("labels", this.mapToObject(mapper, authentication.labels))
+        authObject.set<ObjectNode>("labels", this.mapToObject(authentication.labels))
         val logo = authentication.logoURI
         if (logo != null) {
           authObject.put("logo", logo.toString())
@@ -154,7 +155,7 @@ object AccountProvidersJSON {
         authObject
       }
       is BasicToken -> {
-        val authObject = mapper.createObjectNode()
+        val authObject = this.mapper.createObjectNode()
         authObject.put("type", BASIC_TOKEN_TYPE)
         this.putConditionally(authObject, "authenticationURI", authentication.authenticationURI.toString())
         this.putConditionally(authObject, "barcodeFormat", authentication.barcodeFormat?.uppercase(Locale.ROOT))
@@ -162,7 +163,7 @@ object AccountProvidersJSON {
         this.putConditionally(authObject, "keyboard", authentication.keyboard.name)
         this.putConditionally(authObject, "passwordKeyboard", authentication.passwordKeyboard.name)
         authObject.put("passwordMaximumLength", authentication.passwordMaximumLength)
-        authObject.set<ObjectNode>("labels", this.mapToObject(mapper, authentication.labels))
+        authObject.set<ObjectNode>("labels", this.mapToObject(authentication.labels))
         val logo = authentication.logoURI
         if (logo != null) {
           authObject.put("logo", logo.toString())
@@ -170,12 +171,12 @@ object AccountProvidersJSON {
         authObject
       }
       is Anonymous -> {
-        val authObject = mapper.createObjectNode()
+        val authObject = this.mapper.createObjectNode()
         authObject.put("type", ANONYMOUS_TYPE)
         authObject
       }
       is SAML2_0 -> {
-        val authObject = mapper.createObjectNode()
+        val authObject = this.mapper.createObjectNode()
         authObject.put("description", authentication.description)
         authObject.put("type", SAML_2_0_TYPE)
         authObject.put("authenticate", authentication.authenticate.toString())
@@ -189,10 +190,9 @@ object AccountProvidersJSON {
   }
 
   private fun mapToObject(
-    mapper: ObjectMapper,
     labels: Map<String, String>
   ): ObjectNode {
-    val node = mapper.createObjectNode()
+    val node = this.mapper.createObjectNode()
     for (key in labels.keys) {
       node.put(key, labels[key])
     }
@@ -597,8 +597,7 @@ object AccountProvidersJSON {
 
   @Throws(IOException::class)
   fun deserializeCollectionFromStream(stream: InputStream): Map<URI, AccountProvider> {
-    val jom = ObjectMapper()
-    val node = this.mapNullToTextNode(jom.readTree(stream))
+    val node = this.mapNullToTextNode(this.mapper.readTree(stream))
     return this.deserializeCollectionFromJSONArray(JSONParserUtilities.checkArray(null, node))
   }
 
@@ -612,20 +611,26 @@ object AccountProvidersJSON {
 
   @Throws(IOException::class)
   fun deserializeOneFromStream(stream: InputStream): AccountProvider {
-    val jom = ObjectMapper()
-    val node = this.mapNullToTextNode(jom.readTree(stream))
+    val node = this.mapNullToTextNode(this.mapper.readTree(stream))
     return this.deserializeFromJSON(JSONParserUtilities.checkObject(null, node))
   }
 
   /**
    * Deserialize a single account provider from the given file.
    *
-   * @param stream An input stream
+   * @param file An input file
    * @return A parsed account provider
    * @throws IOException On I/O or parser errors
    */
 
   @Throws(IOException::class)
-  fun deserializeOneFromFile(file: File): AccountProvider =
-    FileInputStream(file).use { stream -> this.deserializeOneFromStream(stream) }
+  fun deserializeOneFromFile(file: File): AccountProvider {
+    return FileInputStream(file).use { stream -> this.deserializeOneFromStream(stream) }
+  }
+
+  fun serializeToBytes(
+    description: AccountProvider
+  ): ByteArray {
+    return this.mapper.writeValueAsBytes(this.serializeToJSON(description))
+  }
 }

@@ -2,6 +2,7 @@ dependencies {
     coreLibraryDesugaring(libs.android.desugaring)
 
     implementation(project(":palace-accounts-api"))
+    implementation(project(":palace-accounts-json"))
     implementation(project(":palace-db-api"))
     implementation(project(":palace-links"))
     implementation(project(":palace-parser-api"))

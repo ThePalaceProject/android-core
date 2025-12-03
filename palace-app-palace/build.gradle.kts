@@ -272,6 +272,8 @@ dependencies {
     implementation(project(":palace-content-api"))
     implementation(project(":palace-crashlytics"))
     implementation(project(":palace-crashlytics-api"))
+    implementation(project(":palace-db"))
+    implementation(project(":palace-db-api"))
     implementation(project(":palace-documents"))
     implementation(project(":palace-feeds-api"))
     implementation(project(":palace-files"))

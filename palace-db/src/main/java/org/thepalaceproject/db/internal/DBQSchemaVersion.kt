@@ -3,7 +3,7 @@ package org.thepalaceproject.db.internal
 import org.thepalaceproject.db.api.DBTransactionType
 import org.thepalaceproject.db.api.queries.DBQSchemaVersionType
 
-object DBQSchemaVersion : DBQSchemaVersionType {
+internal object DBQSchemaVersion : DBQSchemaVersionType {
 
   private val text = """
     SELECT schema_version.version_number

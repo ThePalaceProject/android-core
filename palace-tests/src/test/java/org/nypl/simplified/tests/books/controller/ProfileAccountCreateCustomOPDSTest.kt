@@ -20,7 +20,9 @@ import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountPreferences
 import org.nypl.simplified.accounts.api.AccountProvider
 import org.nypl.simplified.accounts.database.api.AccountsDatabaseIOException
-import org.nypl.simplified.accounts.registry.AccountProviderRegistry
+import org.nypl.simplified.accounts.json.AccountProviderDescriptionCollectionParsers
+import org.nypl.simplified.accounts.json.AccountProviderDescriptionCollectionSerializers
+import org.nypl.simplified.accounts.registry.AccountProviderRegistry2
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.books.api.BookEvent
 import org.nypl.simplified.books.api.BookID
@@ -37,6 +39,7 @@ import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
 import org.nypl.simplified.opds.core.OPDSFeedParser
 import org.nypl.simplified.opds.core.OPDSFeedParserType
 import org.nypl.simplified.opds.core.OPDSParseException
+import org.nypl.simplified.opds2.irradia.OPDS2ParsersIrradia
 import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
 import org.nypl.simplified.taskrecorder.api.TaskResult
@@ -47,6 +50,9 @@ import org.nypl.simplified.tests.mocking.MockAccountProviderResolutionStrings
 import org.nypl.simplified.tests.mocking.MockAccountProviders
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.db.DBFactory
+import org.thepalaceproject.db.api.DBParameters
+import org.thepalaceproject.db.api.DBType
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.FileNotFoundException
@@ -62,6 +68,8 @@ import java.util.concurrent.TimeUnit
  */
 
 class ProfileAccountCreateCustomOPDSTest {
+
+  private lateinit var db: DBType
 
   val accountID =
     AccountID(UUID.fromString("46d17029-14ba-4e34-bcaa-def02713575a"))
@@ -111,8 +119,26 @@ class ProfileAccountCreateCustomOPDSTest {
           )
         )
 
+    this.cacheDirectory = File.createTempFile("book-borrow-tmp", "dir")
+    this.cacheDirectory.delete()
+    this.cacheDirectory.mkdirs()
+    this.db = DBFactory.open(
+      DBParameters(
+        this.cacheDirectory.toPath().resolve("palace.db"),
+        accountProviderParsers = AccountProviderDescriptionCollectionParsers(OPDS2ParsersIrradia),
+        accountProviderSerializers = AccountProviderDescriptionCollectionSerializers()
+      )
+    )
     this.defaultProvider = MockAccountProviders.fakeProvider("urn:fake:0")
-    this.accountProviderRegistry = AccountProviderRegistry.createFrom(this.context, listOf(), this.defaultProvider)
+    this.accountProviderRegistry =
+      AccountProviderRegistry2.create(
+        this.context,
+        this.db,
+        this.defaultProvider,
+        listOf(),
+        MoreExecutors.directExecutor(),
+        MoreExecutors.newDirectExecutorService()
+      )
     this.accountEvents = PublishSubject.create()
     this.authDocumentParsers = Mockito.mock(AuthenticationDocumentParsersType::class.java)
     this.executorBooks = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool())
@@ -125,9 +151,6 @@ class ProfileAccountCreateCustomOPDSTest {
     this.bookFormatSupport = Mockito.mock(BookFormatSupportType::class.java)
     this.bundledContent = BundledContentResolverType { uri -> throw FileNotFoundException("missing") }
     this.contentResolver = Mockito.mock(ContentResolverType::class.java)
-    this.cacheDirectory = File.createTempFile("book-borrow-tmp", "dir")
-    this.cacheDirectory.delete()
-    this.cacheDirectory.mkdirs()
     this.opdsFeedParser = Mockito.mock(OPDSFeedParserType::class.java)
     this.profilesDatabase = Mockito.mock(ProfilesDatabaseType::class.java)
     this.accountProviderResolutionStrings = MockAccountProviderResolutionStrings()
@@ -140,6 +163,7 @@ class ProfileAccountCreateCustomOPDSTest {
   @AfterEach
   @Throws(Exception::class)
   fun tearDown() {
+    this.db.close()
     this.executorBooks.shutdown()
     this.executorFeeds.shutdown()
     this.executorTimer.shutdown()

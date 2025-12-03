@@ -1,41 +1,39 @@
 package org.thepalaceproject.db.internal
 
-import org.nypl.simplified.accounts.api.AccountProviderDescription
+import org.nypl.simplified.accounts.api.AccountProvider
 import org.thepalaceproject.db.api.DBTransactionType
-import org.thepalaceproject.db.api.queries.DBQAccountProviderDescriptionListType
+import org.thepalaceproject.db.api.queries.DBQAccountProviderListType
 import java.sql.ResultSet
 
-internal object DBQAccountProviderDescriptionList : DBQAccountProviderDescriptionListType {
+internal object DBQAccountProviderList : DBQAccountProviderListType {
 
   private val queryTextWithStart = """
     SELECT
-      apd.apd_id,
-      apd.apd_updated_time_last,
-      apd.apd_production,
-      apd.apd_data_format,
-      apd.apd_data
-    FROM account_provider_descriptions AS apd
-    WHERE apd.apd_id > ?
-    ORDER BY apd.apd_id
+      ap.ap_id,
+      ap.ap_updated_time_last,
+      ap.ap_data_format,
+      ap.ap_data
+    FROM account_providers AS ap
+    WHERE ap.ap_id > ?
+    ORDER BY ap.ap_id
     LIMIT ?
   """.trimIndent()
 
   private val queryTextWithoutStart = """
     SELECT
-      apd.apd_id,
-      apd.apd_updated_time_last,
-      apd.apd_production,
-      apd.apd_data_format,
-      apd.apd_data
-    FROM account_provider_descriptions AS apd
-    ORDER BY apd.apd_id
+      ap.ap_id,
+      ap.ap_updated_time_last,
+      ap.ap_data_format,
+      ap.ap_data
+    FROM account_providers AS ap
+    ORDER BY ap.ap_id
     LIMIT ?
   """.trimIndent()
 
   override fun execute(
     transaction: DBTransactionType,
-    parameters: DBQAccountProviderDescriptionListType.Parameters
-  ): List<AccountProviderDescription> {
+    parameters: DBQAccountProviderListType.Parameters
+  ): List<AccountProvider> {
     val startingId = parameters.startingId
     return if (startingId != null) {
       transaction.connection.connection.prepareStatement(queryTextWithStart)
@@ -60,10 +58,10 @@ internal object DBQAccountProviderDescriptionList : DBQAccountProviderDescriptio
   private fun parseResults(
     transaction: DBTransactionType,
     resultSet: ResultSet
-  ): List<AccountProviderDescription> {
-    val data = mutableListOf<AccountProviderDescription>()
+  ): List<AccountProvider> {
+    val data = mutableListOf<AccountProvider>()
     while (resultSet.next()) {
-      data.add(DBAccountProviderDescriptions.parseFromResult(transaction, resultSet))
+      data.add(DBAccountProviders.parseFromResult(transaction, resultSet))
     }
     return data.toList()
   }

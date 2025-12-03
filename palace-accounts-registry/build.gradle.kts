@@ -5,6 +5,7 @@ dependencies {
     implementation(project(":palace-accounts-registry-api"))
     implementation(project(":palace-accounts-source-spi"))
     implementation(project(":palace-buildconfig-api"))
+    implementation(project(":palace-db-api"))
     implementation(project(":palace-presentableerror-api"))
     implementation(project(":palace-taskrecorder-api"))
     implementation(project(":palace-threads"))

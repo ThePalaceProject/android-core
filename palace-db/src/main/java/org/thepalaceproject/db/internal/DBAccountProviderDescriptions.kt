@@ -13,7 +13,7 @@ import org.thepalaceproject.db.internal.DBQAccountProviderDescriptionGet.FORMAT_
 import java.net.URI
 import java.sql.ResultSet
 
-object DBAccountProviderDescriptions {
+internal object DBAccountProviderDescriptions {
 
   private val logger =
     LoggerFactory.getLogger(DBAccountProviderDescriptions::class.java)

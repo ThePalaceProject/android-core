@@ -83,19 +83,16 @@ class MockAccountProviderRegistry(
   override val status: AccountProviderRegistryStatus
     get() = AccountProviderRegistryStatus.Idle
 
-  override fun refresh(includeTestingLibraries: Boolean, useCache: Boolean) {
-  }
-
-  override fun refreshAsync(includeTestingLibraries: Boolean, useCache: Boolean): CompletableFuture<Unit> {
+  override fun refreshAsync(includeTestingLibraries: Boolean): CompletableFuture<Unit> {
     val future = CompletableFuture<Unit>()
     future.complete(Unit)
     return future
   }
 
-  override fun query(query: AccountSearchQuery) {
-  }
-
-  override fun clear() {
+  override fun clearAsync(): CompletableFuture<Unit> {
+    val future = CompletableFuture<Unit>()
+    future.complete(Unit)
+    return future
   }
 
   override fun accountProviderDescriptions(): Map<URI, AccountProviderDescription> {
@@ -108,16 +105,32 @@ class MockAccountProviderRegistry(
     return accountProvider
   }
 
+  override fun updateProviderAsync(accountProvider: AccountProviderType): CompletableFuture<AccountProviderType> {
+    this.logger.debug("updateProvider: {}", accountProvider)
+    this.resolvedProviders[accountProvider.id] = accountProvider
+    val future = CompletableFuture<AccountProviderType>()
+    future.complete(accountProvider)
+    return future
+  }
+
   override fun updateDescription(description: AccountProviderDescription): AccountProviderDescription {
     this.logger.debug("updateDescription: {}", description)
     this.descriptions.put(description.id, description)
     return description
   }
 
-  override fun resolve(
+  override fun updateDescriptionAsync(description: AccountProviderDescription): CompletableFuture<AccountProviderDescription> {
+    this.logger.debug("updateDescription: {}", description)
+    this.descriptions.put(description.id, description)
+    val future = CompletableFuture<AccountProviderDescription>()
+    future.complete(description)
+    return future
+  }
+
+  override fun resolveAsync(
     onProgress: AccountProviderResolutionListenerType,
     description: AccountProviderDescription
-  ): TaskResult<AccountProviderType> {
+  ): CompletableFuture<TaskResult<AccountProviderType>> {
     this.logger.debug("resolve: {}", description)
 
     val taskRecorder = TaskRecorder.create()
@@ -128,7 +141,7 @@ class MockAccountProviderRegistry(
       val queued = this.resolveNext.poll()
       val copy = AccountProvider.copy(queued!!).copy(id = description.id)
       this.resolvedProviders[copy.id] = copy
-      return taskRecorder.finishSuccess(copy)
+      return CompletableFuture.completedFuture(taskRecorder.finishSuccess(copy))
     }
 
     this.logger.debug("taking provider from map")
@@ -140,11 +153,18 @@ class MockAccountProviderRegistry(
         errorCode = "unexpectedException",
         extraMessages = listOf()
       )
-      taskRecorder.finishFailure()
+      CompletableFuture.completedFuture(taskRecorder.finishFailure())
     } else {
       this.logger.debug("took provider from map")
-      taskRecorder.finishSuccess(provider)
+      CompletableFuture.completedFuture(taskRecorder.finishSuccess(provider))
     }
+  }
+
+  override fun resolve(
+    onProgress: AccountProviderResolutionListenerType,
+    description: AccountProviderDescription
+  ): TaskResult<AccountProviderType> {
+    return this.resolveAsync(onProgress, description).get()
   }
 
   override fun close() {

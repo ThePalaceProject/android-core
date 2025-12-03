@@ -126,11 +126,12 @@ object MainLogging {
 
   private fun configureLoggingPolicy() {
     logbackLevel("one.irradia.fieldrush.vanilla.FRParsers", Level.INFO)
+    logbackLevel("org.librarysimplified.http.vanilla.internal.LSHTTPTimingEventListener", Level.INFO)
     logbackLevel("org.nypl.simplified.books.covers.BookCoverGenerator", Level.ERROR)
     logbackLevel("org.nypl.simplified.books.covers.BookCoverProvider", Level.ERROR)
     logbackLevel("org.nypl.simplified.files.FileLocking", Level.ERROR)
     logbackLevel("org.nypl.simplified.notifications.NotificationsService", Level.ERROR)
-    logbackLevel("org.librarysimplified.http.vanilla.internal.LSHTTPTimingEventListener", Level.INFO)
+    logbackLevel("org.sqlite.core.NativeDB", Level.ERROR)
   }
 
   fun configure(cacheDirectory: File) {

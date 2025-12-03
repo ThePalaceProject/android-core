@@ -1,14 +1,21 @@
 package org.nypl.simplified.tests.mocking
 
 import android.content.Context
+import com.google.common.util.concurrent.MoreExecutors
 import org.joda.time.DateTime
 import org.mockito.Mockito
 import org.nypl.simplified.accounts.api.AccountProvider
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountProviderType
-import org.nypl.simplified.accounts.registry.AccountProviderRegistry
+import org.nypl.simplified.accounts.json.AccountProviderDescriptionCollectionParsers
+import org.nypl.simplified.accounts.json.AccountProviderDescriptionCollectionSerializers
+import org.nypl.simplified.accounts.registry.AccountProviderRegistry2
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
+import org.nypl.simplified.opds2.irradia.OPDS2ParsersIrradia
+import org.thepalaceproject.db.DBFactory
+import org.thepalaceproject.db.api.DBParameters
 import java.net.URI
+import java.nio.file.Files
 import java.util.TreeMap
 
 object MockAccountProviders {
@@ -64,8 +71,28 @@ object MockAccountProviders {
     providers[fake2.id] = fake2
     providers[fake3.id] = fake3
 
+
+    val dir = Files.createTempDirectory("palace-mock-db")
+    Files.createDirectories(dir)
+
+    val db =
+      DBFactory.open(
+        DBParameters(
+          dir.resolve("palace.db"),
+          accountProviderParsers = AccountProviderDescriptionCollectionParsers(OPDS2ParsersIrradia),
+          accountProviderSerializers = AccountProviderDescriptionCollectionSerializers()
+        )
+      )
+
     val registry =
-      AccountProviderRegistry.createFrom(Mockito.mock(Context::class.java), listOf(), fake0)
+      AccountProviderRegistry2.create(
+        Mockito.mock(Context::class.java),
+        db,
+        fake0,
+        listOf(),
+        MoreExecutors.directExecutor(),
+        MoreExecutors.newDirectExecutorService()
+      )
 
     for (provider in providers.values) {
       registry.updateProvider(provider)
@@ -74,7 +101,7 @@ object MockAccountProviders {
     return registry
   }
 
-  fun fakeAccountProviderList(): List<AccountProviderType> {
+  fun fakeAccountProviderList(): List<AccountProvider> {
     return listOf(
       fakeProvider("urn:fake:0"),
       fakeProvider("urn:fake:1"),
@@ -83,7 +110,7 @@ object MockAccountProviders {
     )
   }
 
-  fun fakeAccountProviderListWithAutomatic(): List<AccountProviderType> {
+  fun fakeAccountProviderListWithAutomatic(): List<AccountProvider> {
     return listOf(
       fakeProvider("urn:fake:0"),
       fakeProvider("urn:fake:1"),

@@ -26,16 +26,21 @@ import org.nypl.simplified.accounts.api.AccountBundledCredentialsType
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.accounts.api.AccountLoginStringResourcesType
 import org.nypl.simplified.accounts.api.AccountLogoutStringResourcesType
+import org.nypl.simplified.accounts.api.AccountProvider
+import org.nypl.simplified.accounts.api.AccountProviderDescriptionCollectionParsersType
+import org.nypl.simplified.accounts.api.AccountProviderDescriptionCollectionSerializersType
 import org.nypl.simplified.accounts.api.AccountProviderFallbackType
 import org.nypl.simplified.accounts.api.AccountProviderResolutionStringsType
-import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.database.AccountAuthenticationCredentialsStore
 import org.nypl.simplified.accounts.database.AccountBundledCredentialsEmpty
 import org.nypl.simplified.accounts.database.AccountsDatabases
 import org.nypl.simplified.accounts.json.AccountBundledCredentialsJSON
-import org.nypl.simplified.accounts.registry.AccountProviderRegistry
+import org.nypl.simplified.accounts.json.AccountProviderDescriptionCollectionParsers
+import org.nypl.simplified.accounts.json.AccountProviderDescriptionCollectionSerializers
+import org.nypl.simplified.accounts.registry.AccountProviderRegistry2
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryDebugging
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
+import org.nypl.simplified.accounts.source.spi.AccountProviderSourceFactoryType
 import org.nypl.simplified.accounts.source.spi.AccountProviderSourceResolutionStrings
 import org.nypl.simplified.adobe.extensions.AdobeConfigurationServiceType
 import org.nypl.simplified.adobe.extensions.AdobeDRMServices
@@ -92,6 +97,7 @@ import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
 import org.nypl.simplified.opds.core.OPDSFeedParser
 import org.nypl.simplified.opds.core.OPDSFeedParserType
 import org.nypl.simplified.opds.core.OPDSSearchParser
+import org.nypl.simplified.opds2.irradia.OPDS2ParsersIrradia
 import org.nypl.simplified.patron.PatronUserProfileParsers
 import org.nypl.simplified.patron.api.PatronUserProfileParsersType
 import org.nypl.simplified.profiles.ProfilesDatabases
@@ -117,6 +123,9 @@ import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.nypl.simplified.ui.settings.SettingsProfileEvents
 import org.readium.r2.lcp.LcpService
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.db.DBFactory
+import org.thepalaceproject.db.api.DBParameters
+import org.thepalaceproject.db.api.DBType
 import org.thepalaceproject.opds.client.OPDSClient
 import org.thepalaceproject.opds.client.OPDSClientParameters
 import java.io.File
@@ -269,7 +278,7 @@ internal object MainServices {
     }
   }
 
-  private fun loadDefaultAccountProvider(): AccountProviderType {
+  private fun loadDefaultAccountProvider(): AccountProvider {
     val providers =
       ServiceLoader.load(AccountProviderFallbackType::class.java)
         .map { provider -> provider.get() }
@@ -278,19 +287,36 @@ internal object MainServices {
     if (providers.isEmpty()) {
       throw java.lang.IllegalStateException("No fallback account providers available!")
     }
-    return providers.first()
+    return AccountProvider.copy(providers.first())
   }
 
   private fun createAccountProviderRegistry(
     context: Application,
-    http: LSHTTPClientType
+    database: DBType,
+    http: LSHTTPClientType,
   ): AccountProviderRegistryType {
     val defaultAccountProvider =
       loadDefaultAccountProvider()
+    val buildConfig =
+      ServiceLoader.load(BuildConfigurationServiceType::class.java).first()
+    val sourceFactories =
+      ServiceLoader.load(AccountProviderSourceFactoryType::class.java)
+    val sources =
+      sourceFactories.map { f -> f.create(context, http, buildConfig) }
+    val databaseExecutor =
+      NamedThreadPools.namedThreadPool(1, "database", 19)
     val accountProviders =
-      AccountProviderRegistry.createFromServiceLoader(context, http, defaultAccountProvider)
+      AccountProviderRegistry2.create(
+        context = context,
+        database = database,
+        defaultProvider = defaultAccountProvider,
+        sources = sources,
+        attributeExecutor = { r -> UIThread.runOnUIThread(r) },
+        databaseExecutor = databaseExecutor
+      )
+
     for (id in accountProviders.accountProviderDescriptions().keys) {
-      logger.debug("loaded account provider: {}", id)
+      logger.debug("Loaded account provider: {}", id)
     }
     return accountProviders
   }
@@ -709,11 +735,38 @@ internal object MainServices {
       }
     )
 
+    val accountProviderParsers =
+      addService(
+        message = strings.bootingGeneral("account provider parsers"),
+        interfaceType = AccountProviderDescriptionCollectionParsersType::class.java,
+        serviceConstructor = { AccountProviderDescriptionCollectionParsers(OPDS2ParsersIrradia) }
+      )
+
+    val accountProviderSerializers =
+      addService(
+        message = strings.bootingGeneral("account provider serializers"),
+        interfaceType = AccountProviderDescriptionCollectionSerializersType::class.java,
+        serviceConstructor = { AccountProviderDescriptionCollectionSerializers() }
+      )
+
+    val database =
+      addService(
+        message = strings.bootingGeneral("database"),
+        interfaceType = DBType::class.java,
+        serviceConstructor = {
+          createDatabase(
+            context = context,
+            accountProviderParsers = accountProviderParsers,
+            accountProviderSerializers = accountProviderSerializers
+          )
+        }
+      )
+
     val accountProviderRegistry =
       addService(
         message = strings.bootingGeneral("account providers"),
         interfaceType = AccountProviderRegistryType::class.java,
-        serviceConstructor = { createAccountProviderRegistry(context, lsHTTP) }
+        serviceConstructor = { createAccountProviderRegistry(context, database, lsHTTP) }
       )
 
     val accountBundledCredentials =
@@ -999,6 +1052,23 @@ internal object MainServices {
     logger.debug("boot completed")
     onProgress.invoke(BootEvent.BootCompleted(strings.bootCompleted))
     return finalServices
+  }
+
+  private fun createDatabase(
+    context: Application,
+    accountProviderParsers: AccountProviderDescriptionCollectionParsersType,
+    accountProviderSerializers: AccountProviderDescriptionCollectionSerializersType
+  ): DBType {
+    val file =
+      File(context.filesDir, "palace.db")
+
+    return DBFactory.open(
+      DBParameters(
+        file.toPath(),
+        accountProviderParsers = accountProviderParsers,
+        accountProviderSerializers = accountProviderSerializers,
+      )
+    )
   }
 
   private fun onProfileUpdated(
