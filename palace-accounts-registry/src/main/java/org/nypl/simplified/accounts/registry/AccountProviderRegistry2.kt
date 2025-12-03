@@ -171,7 +171,7 @@ class AccountProviderRegistry2 private constructor(
         descriptionMap[defaultProviderDescription.id] = defaultProviderDescription
         t.execute(
           queryType = DBQAccountProviderDescriptionPutType::class.java,
-          parameters = defaultProviderDescription
+          parameters = listOf(defaultProviderDescription)
         )
         t.commit()
       }
@@ -230,24 +230,20 @@ class AccountProviderRegistry2 private constructor(
 
         when (data) {
           is SourceFailed -> {
-            for ((_, description) in data.results) {
-              try {
-                idsUpdated.add(description.id)
-                this.opUpdateDescription(description)
-              } catch (e: Exception) {
-                this.logger.debug("Failed to update description: ", e)
-              }
+            idsUpdated.addAll(data.results.keys)
+            try {
+              this.opUpdateDescriptions(data.results.values.toList())
+            } catch (e: Exception) {
+              this.logger.debug("Failed to update description: ", e)
             }
           }
 
           is SourceSucceeded -> {
-            for ((_, description) in data.results) {
-              try {
-                idsUpdated.add(description.id)
-                this.opUpdateDescription(description)
-              } catch (e: Exception) {
-                this.logger.debug("Failed to update description: ", e)
-              }
+            idsUpdated.addAll(data.results.keys)
+            try {
+              this.opUpdateDescriptions(data.results.values.toList())
+            } catch (e: Exception) {
+              this.logger.debug("Failed to update description: ", e)
             }
           }
         }
@@ -321,7 +317,7 @@ class AccountProviderRegistry2 private constructor(
       )
       t.execute(
         queryType = DBQAccountProviderDescriptionPutType::class.java,
-        parameters = this.defaultProvider.toDescription()
+        parameters = listOf(this.defaultProvider.toDescription())
       )
       t.commit()
     }
@@ -390,28 +386,37 @@ class AccountProviderRegistry2 private constructor(
     }
 
     this.eventsActual.onNext(Updated(accountProvider.id))
-    this.opUpdateDescription(accountProvider.toDescription())
+    this.opUpdateDescriptions(listOf(accountProvider.toDescription()))
     return accountProvider
   }
 
-  private fun opUpdateDescription(
-    description: AccountProviderDescription
-  ): AccountProviderDescription {
-    this.logger.debug("Updating description {}.", description.id)
+  private fun opUpdateDescriptions(
+    descriptions: List<AccountProviderDescription>
+  ): List<AccountProviderDescription> {
     this.database.openTransaction().use { t ->
+
+      val timeThen = System.nanoTime()
       t.execute(
         queryType = DBQAccountProviderDescriptionPutType::class.java,
-        parameters = description
+        parameters = descriptions
       )
       t.commit()
+      val timeNow = System.nanoTime()
+      val timeDiff = (timeNow - timeThen).toDouble() / 1_000_000.0
+      this.logger.debug("Stored {} provider descriptions in {} ms", descriptions.size, timeDiff)
+
       this.attributeExecutor.execute {
         val srcS = this.accountProviderDescriptionsAttributeSrc.get()
-        val srcR = srcS.plus(Pair(description.id, description))
+        val incM = descriptions.associateBy { description -> description.id }
+        val srcR = srcS.plus(incM)
         this.accountProviderDescriptionsAttributeSrc.set(srcR)
       }
-      this.eventsActual.onNext(Updated(description.id))
+
+      for (description in descriptions) {
+        this.eventsActual.onNext(Updated(description.id))
+      }
     }
-    return description
+    return descriptions
   }
 
   private fun opFindExistingIDs(): Set<URI> {
@@ -433,7 +438,13 @@ class AccountProviderRegistry2 private constructor(
   override fun updateDescriptionAsync(
     description: AccountProviderDescription
   ): CompletableFuture<AccountProviderDescription> {
-    return this.execute { this.opUpdateDescription(description) }
+    return this.execute { this.opUpdateDescriptions(listOf(description)).first() }
+  }
+
+  override fun updateDescriptionsAsync(
+    descriptions: List<AccountProviderDescription>
+  ): CompletableFuture<List<AccountProviderDescription>> {
+    return this.execute { this.opUpdateDescriptions(descriptions) }
   }
 
   override fun resolveAsync(

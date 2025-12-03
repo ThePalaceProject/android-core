@@ -127,6 +127,14 @@ class MockAccountProviderRegistry(
     return future
   }
 
+  override fun updateDescriptionsAsync(descriptions: List<AccountProviderDescription>): CompletableFuture<List<AccountProviderDescription>> {
+    this.logger.debug("updateDescriptions: {}", descriptions)
+    this.descriptions.putAll(descriptions.associateBy { d -> d.id })
+    val future = CompletableFuture<List<AccountProviderDescription>>()
+    future.complete(descriptions)
+    return future
+  }
+
   override fun resolveAsync(
     onProgress: AccountProviderResolutionListenerType,
     description: AccountProviderDescription

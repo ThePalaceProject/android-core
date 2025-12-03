@@ -159,6 +159,28 @@ interface AccountProviderRegistryType : AutoCloseable {
   ): CompletableFuture<AccountProviderDescription>
 
   /**
+   * Introduce the given account provider description to the registry. If an existing, newer
+   * version of the given account provider description already exists in the registry, the newer
+   * version is returned.
+   */
+
+  fun updateDescriptions(
+    descriptions: List<AccountProviderDescription>
+  ): List<AccountProviderDescription> {
+    return this.updateDescriptionsAsync(descriptions).get()
+  }
+
+  /**
+   * Introduce the given account provider description to the registry. If an existing, newer
+   * version of the given account provider description already exists in the registry, the newer
+   * version is returned.
+   */
+
+  fun updateDescriptionsAsync(
+    descriptions: List<AccountProviderDescription>
+  ): CompletableFuture<List<AccountProviderDescription>>
+
+  /**
    * Resolve the description into a full account provider. The given `onProgress` function
    * will be called repeatedly during the resolution process to report on the status of the
    * resolution.

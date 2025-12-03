@@ -304,21 +304,16 @@ internal object MainServices {
     val sources =
       sourceFactories.map { f -> f.create(context, http, buildConfig) }
     val databaseExecutor =
-      NamedThreadPools.namedThreadPool(1, "database", 19)
-    val accountProviders =
-      AccountProviderRegistry2.create(
-        context = context,
-        database = database,
-        defaultProvider = defaultAccountProvider,
-        sources = sources,
-        attributeExecutor = { r -> UIThread.runOnUIThread(r) },
-        databaseExecutor = databaseExecutor
-      )
+      NamedThreadPools.namedThreadPool(1, "database", 0)
 
-    for (id in accountProviders.accountProviderDescriptions().keys) {
-      logger.debug("Loaded account provider: {}", id)
-    }
-    return accountProviders
+    return AccountProviderRegistry2.create(
+      context = context,
+      database = database,
+      defaultProvider = defaultAccountProvider,
+      sources = sources,
+      attributeExecutor = { r -> UIThread.runOnUIThread(r) },
+      databaseExecutor = databaseExecutor
+    )
   }
 
   private fun createAccountAuthenticationCredentialsStore(

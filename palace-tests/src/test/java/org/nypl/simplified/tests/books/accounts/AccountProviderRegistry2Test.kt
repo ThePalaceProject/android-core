@@ -241,9 +241,7 @@ class AccountProviderRegistry2Test {
 
   private fun writeAccountProviders() {
     this.database.openTransaction().use { t ->
-      for (provider in this.accountProviders) {
-        t.execute(DBQAccountProviderDescriptionPutType::class.java, provider.toDescription())
-      }
+      t.execute(DBQAccountProviderDescriptionPutType::class.java, this.accountProviders.map { d -> d.toDescription() })
       t.commit()
     }
   }

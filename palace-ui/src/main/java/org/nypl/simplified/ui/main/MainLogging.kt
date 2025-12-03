@@ -125,6 +125,7 @@ object MainLogging {
   }
 
   private fun configureLoggingPolicy() {
+    logbackLevel("com.io7m.blackthorne.core.internal.BTStackHandler", Level.ERROR)
     logbackLevel("one.irradia.fieldrush.vanilla.FRParsers", Level.INFO)
     logbackLevel("org.librarysimplified.http.vanilla.internal.LSHTTPTimingEventListener", Level.INFO)
     logbackLevel("org.nypl.simplified.books.covers.BookCoverGenerator", Level.ERROR)

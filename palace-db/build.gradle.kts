@@ -8,6 +8,14 @@ dependencies {
     implementation(project(":palace-parser-api"))
     implementation(project(":palace-presentableerror-api"))
 
+    implementation(libs.google.protobuf)
+    implementation(libs.irradia.mime.api)
+    implementation(libs.irradia.mime.vanilla)
+    implementation(libs.jackson.annotations)
+    implementation(libs.jackson.core)
+    implementation(libs.jackson.databind)
+    implementation(libs.jackson.datatype.jdk8)
+    implementation(libs.jackson.datatype.jsr310)
     implementation(libs.joda.time)
 
     // SQLite

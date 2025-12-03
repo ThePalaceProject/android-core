@@ -1,15 +1,8 @@
 package org.thepalaceproject.db.internal
 
-import org.joda.time.DateTimeZone
-import org.joda.time.format.ISODateTimeFormat
 import org.nypl.simplified.accounts.api.AccountProviderDescription
-import org.nypl.simplified.accounts.api.AccountProviderDescriptionCollection
-import org.nypl.simplified.accounts.api.AccountProviderDescriptionCollectionSerializersType
-import org.nypl.simplified.links.Link
 import org.thepalaceproject.db.api.DBTransactionType
 import org.thepalaceproject.db.api.queries.DBQAccountProviderDescriptionPutType
-import java.io.ByteArrayOutputStream
-import java.net.URI
 
 internal object DBQAccountProviderDescriptionPut : DBQAccountProviderDescriptionPutType {
 
@@ -35,46 +28,40 @@ internal object DBQAccountProviderDescriptionPut : DBQAccountProviderDescription
 
   override fun execute(
     transaction: DBTransactionType,
-    baseDescription: AccountProviderDescription
+    baseDescriptions: List<AccountProviderDescription>
   ) {
-    val timestamp =
-      baseDescription.updated.withZone(DateTimeZone.UTC)
-        .toString(ISODateTimeFormat.dateTime())
+    val descriptions =
+      baseDescriptions.map { baseDescription ->
+        val description =
+          DBAccountProviderDescriptions.forceUTC(baseDescription)
+        val data: ByteArray =
+          DBAccountProviderDescriptionsProtobuf.descriptionToP1Bytes(baseDescription)
 
-    val description =
-      DBAccountProviderDescriptions.forceUTC(baseDescription)
-
-    val document =
-      AccountProviderDescriptionCollection(
-        providers = listOf(description),
-        links = listOf(Link.LinkBasic(href = URI.create("urn:self"), relation = "self")),
-        metadata = AccountProviderDescriptionCollection.Metadata(title = "")
-      )
-
-    val outputStream =
-      ByteArrayOutputStream()
-
-    transaction.service(AccountProviderDescriptionCollectionSerializersType::class.java)
-      .createSerializer(URI.create("urn:any"), outputStream, document)
-      .serialize()
-
-    val serializedData =
-      outputStream.toByteArray()
+        Pair(description, data)
+      }
 
     return transaction.connection.connection.prepareStatement(this.text).use { st ->
-      st.setString(1, description.id.toString())
+      for (d in descriptions) {
+        val description = d.first
+        val data = d.second
 
-      st.setString(2, timestamp)
-      st.setBoolean(3, description.isProduction)
-      st.setString(4, DBQAccountProviderDescriptionGet.FORMAT_OPDS2_COLLECTION)
-      st.setBytes(5, serializedData)
+        st.setString(1, description.id.toString())
 
-      st.setString(6, timestamp)
-      st.setBoolean(7, description.isProduction)
-      st.setString(8, DBQAccountProviderDescriptionGet.FORMAT_OPDS2_COLLECTION)
-      st.setBytes(9, serializedData)
+        val timestamp = description.updated.toString()
+        st.setString(2, timestamp)
+        st.setBoolean(3, description.isProduction)
+        st.setString(4, "DBSerializationProto1")
+        st.setBytes(5, data)
 
-      st.execute()
+        st.setString(6, timestamp)
+        st.setBoolean(7, description.isProduction)
+        st.setString(8, "DBSerializationProto1")
+        st.setBytes(9, data)
+
+        st.addBatch()
+      }
+
+      st.executeBatch()
     }
   }
 }

@@ -100,7 +100,7 @@ class DBAccountTest {
           location = null
         )
 
-      t.execute(DBQAccountProviderDescriptionPutType::class.java, w)
+      t.execute(DBQAccountProviderDescriptionPutType::class.java, listOf(w))
       t.commit()
 
       val r =
@@ -143,9 +143,7 @@ class DBAccountTest {
       }
       inputs.sortBy { description -> description.id }
 
-      for (input in inputs) {
-        t.execute(DBQAccountProviderDescriptionPutType::class.java, input)
-      }
+      t.execute(DBQAccountProviderDescriptionPutType::class.java, inputs)
       t.commit()
 
       run {
@@ -202,9 +200,7 @@ class DBAccountTest {
       }
       inputs.sortBy { description -> description.id }
 
-      for (input in inputs) {
-        t.execute(DBQAccountProviderDescriptionPutType::class.java, input)
-      }
+      t.execute(DBQAccountProviderDescriptionPutType::class.java, inputs)
       t.commit()
 
       t.execute(
@@ -251,9 +247,7 @@ class DBAccountTest {
       }
       inputs.sortBy { description -> description.id }
 
-      for (input in inputs) {
-        t.execute(DBQAccountProviderDescriptionPutType::class.java, input)
-      }
+      t.execute(DBQAccountProviderDescriptionPutType::class.java, inputs)
       t.commit()
 
       val receivedIds =

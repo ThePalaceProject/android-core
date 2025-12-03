@@ -29,6 +29,10 @@ internal object DBAccountProviderDescriptions {
     resultSet: ResultSet
   ): AccountProviderDescription {
     return when (val result = resultSet.getString("apd_data_format")) {
+      "DBSerializationProto1" -> {
+        this.parseFromProto1(resultSet)
+      }
+
       FORMAT_OPDS2_COLLECTION -> {
         this.parseFromOPDS2Collection(transaction, resultSet)
       }
@@ -37,6 +41,14 @@ internal object DBAccountProviderDescriptions {
         throw DBException("Unsupported format: $result", Exception())
       }
     }
+  }
+
+  private fun parseFromProto1(
+    resultSet: ResultSet
+  ): AccountProviderDescription {
+    val bytes =
+      resultSet.getBinaryStream("apd_data").use { stream -> stream.readBytes() }
+    return DBAccountProviderDescriptionsProtobuf.descriptionFromP1Bytes(bytes)
   }
 
   private fun parseFromOPDS2Collection(
