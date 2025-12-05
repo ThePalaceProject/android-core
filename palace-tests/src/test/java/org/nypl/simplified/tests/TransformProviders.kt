@@ -10,6 +10,7 @@ import org.nypl.simplified.accounts.json.AccountProvidersJSON
 import java.io.File
 import java.io.FileOutputStream
 import java.net.URI
+import java.time.OffsetDateTime
 
 class TransformProviders {
 
@@ -49,7 +50,6 @@ class TransformProviders {
 
         val provider =
           AccountProvider(
-            addAutomatically = false,
             announcements = emptyList(),
             authenticationDocumentURI = null,
             authentication = authentication,
@@ -60,8 +60,6 @@ class TransformProviders {
             displayName = entry.name!!,
             eula = entry.eulaUrl?.let { URI.create(it) },
             id = URI.create(entry.id_uuid),
-            idNumeric = entry.id_numeric,
-            isProduction = entry.inProduction,
             license = entry.licenseUrl?.let { URI.create(it) },
             loansURI = null,
             logo = entry.logo,
@@ -72,8 +70,7 @@ class TransformProviders {
             subtitle = entry.subtitle,
             supportEmail = entry.supportEmail,
             supportsReservations = entry.supportsReservations,
-            updated = DateTime.parse(entry.updated),
-            location = null,
+            updated = OffsetDateTime.parse(entry.updated),
             alternateURI = null,
           )
         providers.add(provider)

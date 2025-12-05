@@ -21,6 +21,7 @@ import org.nypl.simplified.accounts.source.spi.AccountProviderSourceType
 import org.nypl.simplified.accounts.source.spi.AccountProviderSourceType.SourceResult.SourceSucceeded
 import org.nypl.simplified.opds.auth_document.AuthenticationDocumentParsers
 import org.nypl.simplified.opds2.irradia.OPDS2ParsersIrradia
+import org.nypl.simplified.tests.mocking.MockAccountProviderResolutionStrings
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -32,7 +33,6 @@ class AccountProviderNYPLRegistryTest {
   private lateinit var server: MockWebServer
   private lateinit var http: LSHTTPClientType
   private lateinit var resources: Resources
-  private lateinit var cacheDir: File
   private lateinit var context: Context
 
   private val logger: Logger =
@@ -52,12 +52,6 @@ class AccountProviderNYPLRegistryTest {
     this.resources = Mockito.mock(Resources::class.java)
     this.context = Mockito.mock(Context::class.java)
 
-    this.cacheDir = File.createTempFile("account-provider-nypl-registry", "dir")
-    this.cacheDir.delete()
-    this.cacheDir.mkdirs()
-
-    Mockito.`when`(this.context.cacheDir)
-      .thenReturn(this.cacheDir)
     Mockito.`when`(this.context.resources)
       .thenReturn(this.resources)
     Mockito.`when`(this.resources.getString(Mockito.anyInt()))
@@ -81,7 +75,6 @@ class AccountProviderNYPLRegistryTest {
 
   @AfterEach
   fun testTearDown() {
-    this.cacheDir.deleteRecursively()
     this.server.close()
   }
 
@@ -99,15 +92,15 @@ class AccountProviderNYPLRegistryTest {
 
     val provider =
       AccountProviderSourceNYPLRegistry(
-        http = this.http,
         authDocumentParsers = AuthenticationDocumentParsers(),
+        http = this.http,
         parsers = AccountProviderDescriptionCollectionParsers(this.opdsParsers),
-        serializers = AccountProviderDescriptionCollectionSerializers(),
+        stringResources = MockAccountProviderResolutionStrings(),
         uriProduction = this.server.url("production").toUri(),
-        uriQA = this.server.url("qa").toUri()
+        uriQA = this.server.url("qa").toUri(),
       )
 
-    val result = provider.load(this.context, false, true)
+    val result = provider.load(this.context, false)
     this.logger.debug("status: {}", result)
     val success = result as SourceSucceeded
 
@@ -137,12 +130,12 @@ class AccountProviderNYPLRegistryTest {
         http = this.http,
         authDocumentParsers = AuthenticationDocumentParsers(),
         parsers = AccountProviderDescriptionCollectionParsers(this.opdsParsers),
-        serializers = AccountProviderDescriptionCollectionSerializers(),
         uriProduction = this.server.url("production").toUri(),
-        uriQA = this.server.url("qa").toUri()
+        uriQA = this.server.url("qa").toUri(),
+        stringResources = MockAccountProviderResolutionStrings(),
       )
 
-    val result = provider.load(this.context, true, true)
+    val result = provider.load(this.context, true)
     this.logger.debug("status: {}", result)
     val success = result as SourceSucceeded
 
@@ -150,69 +143,7 @@ class AccountProviderNYPLRegistryTest {
   }
 
   /**
-   * The correct providers are returned from the disk cache if one exists.
-   */
-
-  @Test
-  fun testProvidersFromDiskCacheOK() {
-    val cacheFile = File(this.cacheDir, "org.nypl.simplified.accounts.source.nyplregistry.json")
-    cacheFile.outputStream().use { output ->
-      this.readAllFromResource("libraryregistry.json").use { input -> input.copyTo(output) }
-    }
-
-    val provider =
-      AccountProviderSourceNYPLRegistry(
-        http = this.http,
-        authDocumentParsers = AuthenticationDocumentParsers(),
-        parsers = AccountProviderDescriptionCollectionParsers(this.opdsParsers),
-        serializers = AccountProviderDescriptionCollectionSerializers(),
-        uriProduction = this.server.url("production").toUri(),
-        uriQA = this.server.url("qa").toUri()
-      )
-
-    val result = provider.load(this.context, true, true)
-    this.logger.debug("status: {}", result)
-    val success = result as SourceSucceeded
-
-    Assertions.assertEquals(43, success.results.size)
-  }
-
-  /**
-   * If the disk cache contains garbage, the correct providers are fetched from the server,
-   * and the disk cache is replaced with good data.
-   */
-
-  @Test
-  fun testProvidersFromServerOKBadDiskCache() {
-    val cacheFile = File(this.cacheDir, "org.nypl.simplified.accounts.source.nyplregistry.json")
-    cacheFile.outputStream().use { output -> output.write("Nonsense!".toByteArray()) }
-
-    this.server.enqueue(
-      MockResponse()
-        .setResponseCode(200)
-        .setBody(Buffer().readFrom(this.readAllFromResource("libraryregistry-qa.json")))
-    )
-
-    val provider =
-      AccountProviderSourceNYPLRegistry(
-        http = this.http,
-        authDocumentParsers = AuthenticationDocumentParsers(),
-        parsers = AccountProviderDescriptionCollectionParsers(this.opdsParsers),
-        serializers = AccountProviderDescriptionCollectionSerializers(),
-        uriProduction = this.server.url("production").toUri(),
-        uriQA = this.server.url("qa").toUri()
-      )
-
-    val result = provider.load(this.context, true, true)
-    this.logger.debug("status: {}", result)
-    val success = result as SourceSucceeded
-
-    Assertions.assertEquals(182, success.results.size)
-    Assertions.assertNotEquals("Nonsense!", cacheFile.readText())
-  }
-
-  /**
-   * If the server returns garbage and the disk cache doesn't exist, the source fails.
+   * If the server returns garbage, the source fails.
    */
 
   @Test
@@ -228,12 +159,12 @@ class AccountProviderNYPLRegistryTest {
         http = this.http,
         authDocumentParsers = AuthenticationDocumentParsers(),
         parsers = AccountProviderDescriptionCollectionParsers(this.opdsParsers),
-        serializers = AccountProviderDescriptionCollectionSerializers(),
         uriProduction = this.server.url("production").toUri(),
-        uriQA = this.server.url("qa").toUri()
+        uriQA = this.server.url("qa").toUri(),
+        stringResources = MockAccountProviderResolutionStrings(),
       )
 
-    val result = provider.load(this.context, true, true)
+    val result = provider.load(this.context, true)
     this.logger.debug("status: {}", result)
     val failed = result as AccountProviderSourceType.SourceResult.SourceFailed
 
@@ -241,39 +172,20 @@ class AccountProviderNYPLRegistryTest {
   }
 
   /**
-   * The providers are queried from the server if the cache is expired.
+   * The providers are queried from the server.
    */
 
   @Test
   fun testProvidersRefreshOK() {
-    val cacheFile = File(this.cacheDir, "org.nypl.simplified.accounts.source.nyplregistry.json")
-    cacheFile.outputStream().use { output ->
-      this.readAllFromResource("libraryregistry.json").use { input -> input.copyTo(output) }
-    }
-
     val provider =
       AccountProviderSourceNYPLRegistry(
         http = this.http,
         authDocumentParsers = AuthenticationDocumentParsers(),
         parsers = AccountProviderDescriptionCollectionParsers(this.opdsParsers),
-        serializers = AccountProviderDescriptionCollectionSerializers(),
         uriProduction = this.server.url("production").toUri(),
-        uriQA = this.server.url("qa").toUri()
+        uriQA = this.server.url("qa").toUri(),
+        stringResources = MockAccountProviderResolutionStrings(),
       )
-
-    this.run {
-      val result = provider.load(this.context, true, true)
-      this.logger.debug("status: {}", result)
-      val success = result as SourceSucceeded
-
-      Assertions.assertEquals(43, success.results.size)
-    }
-
-    this.server.enqueue(
-      MockResponse()
-        .setResponseCode(200)
-        .setBody(Buffer().readFrom(this.readAllFromResource("libraryregistry-qa.json")))
-    )
 
     this.server.enqueue(
       MockResponse()
@@ -281,11 +193,22 @@ class AccountProviderNYPLRegistryTest {
         .setBody(Buffer().readFrom(this.readAllFromResource("libraryregistry.json")))
     )
 
-    // Expire the cache
-    DateTimeUtils.setCurrentMillisOffset(1000 * 43200)
+    this.server.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+        .setBody(Buffer().readFrom(this.readAllFromResource("libraryregistry-qa.json")))
+    )
 
     this.run {
-      val result = provider.load(this.context, true, true)
+      val result = provider.load(this.context, true)
+      this.logger.debug("status: {}", result)
+      val success = result as SourceSucceeded
+
+      Assertions.assertEquals(43, success.results.size)
+    }
+
+    this.run {
+      val result = provider.load(this.context, true)
       this.logger.debug("status: {}", result)
       val success = result as SourceSucceeded
 
@@ -294,38 +217,5 @@ class AccountProviderNYPLRegistryTest {
 
     // Reset
     DateTimeUtils.setCurrentMillisSystem()
-  }
-
-  /**
-   * Test that the disk cache can be cleared.
-   */
-
-  @Test
-  fun testClearDiskCacheOK() {
-    val cacheFile = File(this.cacheDir, "org.nypl.simplified.accounts.source.nyplregistry.json")
-    cacheFile.outputStream().use { output ->
-      this.readAllFromResource("libraryregistry.json").use { input -> input.copyTo(output) }
-    }
-
-    val provider =
-      AccountProviderSourceNYPLRegistry(
-        http = this.http,
-        authDocumentParsers = AuthenticationDocumentParsers(),
-        parsers = AccountProviderDescriptionCollectionParsers(this.opdsParsers),
-        serializers = AccountProviderDescriptionCollectionSerializers(),
-        uriProduction = this.server.url("production").toUri(),
-        uriQA = this.server.url("qa").toUri()
-      )
-
-    this.run {
-      val result1 = provider.load(this.context, true, true)
-      this.logger.debug("status: {}", result1)
-      val success1 = result1 as SourceSucceeded
-      Assertions.assertEquals(43, success1.results.size)
-
-      // Bust the cache
-      provider.clear(this.context)
-      Assertions.assertFalse(cacheFile.exists())
-    }
   }
 }

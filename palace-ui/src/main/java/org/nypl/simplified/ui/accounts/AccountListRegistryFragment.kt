@@ -307,6 +307,8 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry), Ma
           .showTestingLibraries
       )
     }
+
+    registry.loadAsync()
   }
 
   @UiThread

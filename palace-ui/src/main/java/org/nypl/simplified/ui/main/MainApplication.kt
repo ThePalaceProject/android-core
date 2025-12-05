@@ -1,7 +1,6 @@
 package org.nypl.simplified.ui.main
 
 import android.app.Application
-import android.net.http.HttpResponseCache
 import android.os.Process
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
@@ -18,8 +17,6 @@ import org.nypl.simplified.boot.api.BootLoader
 import org.nypl.simplified.boot.api.BootProcessType
 import org.nypl.simplified.threads.UIThread
 import org.slf4j.LoggerFactory
-import java.io.File
-import java.io.IOException
 
 class MainApplication : Application() {
 
@@ -72,7 +69,6 @@ class MainApplication : Application() {
     super.onCreate()
 
     MainLogging.configure(this.cacheDir)
-    this.configureHttpCache()
     this.configureStrictMode()
     this.logStartup()
     MainTransifex.configure(this.applicationContext)
@@ -96,23 +92,6 @@ class MainApplication : Application() {
     } catch (e: Exception) {
       this.logger.debug("version info unavailable: ", e)
       "UNKNOWN"
-    }
-  }
-
-  /**
-   * Install a global HTTP cache.
-   */
-
-  private fun configureHttpCache() {
-    if (BuildConfig.DEBUG) {
-      val httpCacheDir = File(this.cacheDir, "http")
-      val httpCacheSize = 10 * 1024 * 1024.toLong() // 10 MiB
-      try {
-        HttpResponseCache.install(httpCacheDir, httpCacheSize)
-        this.logger.debug("Installed HTTP cache to {}", httpCacheDir)
-      } catch (e: IOException) {
-        this.logger.warn("Failed to install HTTP cache!", e)
-      }
     }
   }
 

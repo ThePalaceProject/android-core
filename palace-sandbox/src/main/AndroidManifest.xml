@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<manifest package="org.librarysimplified.sandbox"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application>
         <activity
             android:name="org.librarysimplified.sandbox.SandboxActivity"
             android:contentDescription="Sandbox"
-            android:launchMode="singleTop"
             android:exported="true"
-            android:theme="@style/PalaceTheme.WithoutActionBar"
-            android:label="Sandbox">
+            android:label="Sandbox"
+            android:launchMode="singleTop"
+            android:theme="@style/PalaceTheme.WithoutActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

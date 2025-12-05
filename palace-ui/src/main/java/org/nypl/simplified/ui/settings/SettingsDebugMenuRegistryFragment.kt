@@ -130,12 +130,11 @@ class SettingsDebugMenuRegistryFragment : Fragment(R.layout.debug_registry),
     this.registryRefresh.setOnClickListener {
       registry.refreshAsync(
         includeTestingLibraries = SettingsDebugModel.showTestingLibraries(),
-        useCache = false
       )
     }
     this.debugRegistryQALibraries.setOnCheckedChangeListener { _, checked ->
       SettingsDebugModel.updatePreferences { p -> p.copy(showTestingLibraries = checked) }
-      registry.refreshAsync(includeTestingLibraries = checked, useCache = false)
+      registry.refreshAsync(includeTestingLibraries = checked)
     }
   }
 

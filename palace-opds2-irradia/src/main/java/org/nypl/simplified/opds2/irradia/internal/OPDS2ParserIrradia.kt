@@ -4,8 +4,6 @@ import one.irradia.opds2_0.api.OPDS20ParseError
 import one.irradia.opds2_0.api.OPDS20ParseResult
 import one.irradia.opds2_0.api.OPDS20ParseWarning
 import one.irradia.opds2_0.parser.api.OPDS20FeedParserType
-import org.joda.time.Duration
-import org.joda.time.Instant
 import org.nypl.simplified.opds2.OPDS2Feed
 import org.nypl.simplified.parser.api.ParseError
 import org.nypl.simplified.parser.api.ParseResult
@@ -59,14 +57,16 @@ internal class OPDS2ParserIrradia(
   }
 
   override fun parse(): ParseResult<OPDS2Feed> {
-    val timeThen = Instant.now()
+    val timeThen = System.nanoTime()
     try {
       return this.parser.parse()
         .toParseResult()
         .flatMap { OPDS2IrradiaFeedConverter(it).convert() }
     } finally {
-      val timeNow = Instant.now()
-      this.logger.debug("parsed feed in {}", Duration(timeThen, timeNow))
+      val timeNow = System.nanoTime()
+      val timeDiff = (timeNow - timeThen).toDouble()
+      val timeDiffMS = timeDiff / 1_000_000.0
+      this.logger.debug("Parsed feed in {} ms.", timeDiffMS)
     }
   }
 

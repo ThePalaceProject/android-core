@@ -32,6 +32,8 @@ import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.tests.mocking.MockAccountProviderResolutionStrings
 import org.slf4j.LoggerFactory
 import java.net.URI
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import java.util.concurrent.TimeUnit
 
 class AccountProviderSourceNYPLRegistryDescriptionTest {
@@ -91,12 +93,9 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
         id = URI.create("urn:fake:0"),
         title = "Title",
         description = "Description",
-        updated = DateTime.parse("2019-07-09T08:33:40+00:00"),
+        updated = OffsetDateTime.parse("2019-07-09T08:33:40+00:00"),
         links = listOf(),
         images = listOf(),
-        isProduction = true,
-        isAutomatic = false,
-        location = null
       )
 
     val description =
@@ -129,7 +128,7 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
         id = URI.create("urn:fake:0"),
         title = "Title",
         description = "Description",
-        updated = DateTime.parse("2019-07-09T08:33:40+00:00"),
+        updated = OffsetDateTime.parse("2019-07-09T08:33:40+00:00"),
         links = listOf(
           Link.LinkBasic(
             URI.create("http://www.example.com/auth"),
@@ -137,9 +136,6 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
           )
         ),
         images = listOf(),
-        isProduction = true,
-        isAutomatic = false,
-        location = null
       )
 
     val description =
@@ -176,7 +172,7 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
         id = URI.create("urn:fake:0"),
         title = "Title",
         description = "Description",
-        updated = DateTime.parse("2019-07-09T08:33:40+00:00"),
+        updated = OffsetDateTime.parse("2019-07-09T08:33:40+00:00"),
         links = listOf(
           Link.LinkBasic(
             this.server.url("auth").toUri(),
@@ -184,9 +180,6 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
           )
         ),
         images = listOf(),
-        isProduction = true,
-        isAutomatic = false,
-        location = null
       )
 
     val description =
@@ -216,7 +209,7 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
         id = URI.create("urn:fake:0"),
         title = "Title",
         description = "Description",
-        updated = DateTime.parse("2019-07-09T08:33:40+00:00"),
+        updated = OffsetDateTime.parse("2019-07-09T08:33:40+00:00"),
         links = listOf(
           Link.LinkBasic(
             this.server.url("auth").toUri(),
@@ -224,9 +217,6 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
           )
         ),
         images = listOf(),
-        isProduction = true,
-        isAutomatic = false,
-        location = null
       )
 
     val description =
@@ -270,7 +260,7 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
         id = URI.create("urn:fake:0"),
         title = "Title",
         description = "Description",
-        updated = DateTime.parse("2019-07-09T08:33:40+00:00"),
+        updated = OffsetDateTime.parse("2019-07-09T08:33:40+00:00"),
         links = listOf(
           Link.LinkBasic(
             this.server.url("auth").toUri(),
@@ -282,9 +272,6 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
           )
         ),
         images = listOf(),
-        isProduction = true,
-        isAutomatic = false,
-        location = null
       )
 
     val description =
@@ -396,7 +383,6 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
     result as TaskResult.Success
 
     val provider = AccountProvider(
-      addAutomatically = false,
       announcements = emptyList(),
       authentication = AccountProviderAuthenticationDescription.Basic(
         description = "Basic Auth",
@@ -418,8 +404,6 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
       displayName = "Auth",
       eula = URI("http://www.example.com/eula.xml"),
       id = URI.create("urn:fake:0"),
-      idNumeric = -1,
-      isProduction = true,
       license = URI("http://www.example.com/license.xml"),
       loansURI = URI("http://www.example.com/shelf.xml"),
       logo = URI("http://www.example.com/logo.png"),
@@ -430,8 +414,7 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
       subtitle = "Some library you've never heard of",
       supportEmail = "mailto:someone@example.com",
       supportsReservations = true,
-      updated = DateTime.parse("1970-01-01T00:00:00.000Z"),
-      location = null,
+      updated = OffsetDateTime.now(ZoneOffset.UTC).withNano(0),
       alternateURI = URI.create("https://www.example.com/alternate")
     )
 
@@ -449,7 +432,7 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
         id = URI.create("urn:fake:0"),
         title = "Title",
         description = "Description",
-        updated = DateTime.parse("2019-07-09T08:33:40+00:00"),
+        updated = OffsetDateTime.parse("2019-07-09T08:33:40+00:00"),
         links = listOf(
           Link.LinkBasic(
             this.server.url("auth").toUri(),
@@ -461,9 +444,6 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
           )
         ),
         images = listOf(),
-        isProduction = true,
-        isAutomatic = false,
-        location = null
       )
 
     val description =
@@ -550,7 +530,6 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
     result as TaskResult.Success
 
     val provider = AccountProvider(
-      addAutomatically = false,
       announcements = emptyList(),
       authentication = AccountProviderAuthenticationDescription.Anonymous,
       authenticationAlternatives = listOf(),
@@ -561,8 +540,6 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
       displayName = "Auth",
       eula = URI("http://www.example.com/eula.xml"),
       id = URI.create("urn:fake:0"),
-      idNumeric = -1,
-      isProduction = true,
       license = URI("http://www.example.com/license.xml"),
       loansURI = URI("http://www.example.com/shelf.xml"),
       logo = URI("http://www.example.com/logo.png"),
@@ -573,8 +550,7 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
       subtitle = "Some library you've never heard of",
       supportEmail = "mailto:someone@example.com",
       supportsReservations = true,
-      updated = DateTime.parse("1970-01-01T00:00:00.000Z"),
-      location = null,
+      updated = OffsetDateTime.now(ZoneOffset.UTC).withNano(0),
       alternateURI = URI.create("https://www.example.com/alternate")
     )
 
@@ -593,7 +569,7 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
         id = URI.create("urn:fake:0"),
         title = "Title",
         description = "Description",
-        updated = DateTime.parse("2019-07-09T08:33:40+00:00"),
+        updated = OffsetDateTime.parse("2019-07-09T08:33:40+00:00"),
         links = listOf(
           Link.LinkBasic(
             this.server.url("auth").toUri(),
@@ -601,9 +577,6 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
           )
         ),
         images = listOf(),
-        isProduction = true,
-        isAutomatic = false,
-        location = null
       )
 
     val description =
@@ -706,7 +679,7 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
         id = URI.create("urn:fake:0"),
         title = "Title",
         description = "Description",
-        updated = DateTime.parse("2019-07-09T08:33:40+00:00"),
+        updated = OffsetDateTime.parse("2019-07-09T08:33:40+00:00"),
         links = listOf(
           Link.LinkBasic(
             this.server.url("auth").toUri(),
@@ -714,9 +687,6 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
           )
         ),
         images = listOf(),
-        isProduction = true,
-        isAutomatic = false,
-        location = null
       )
 
     val description =

@@ -1,7 +1,7 @@
 package org.nypl.simplified.opds2
 
-import org.joda.time.DateTime
 import java.net.URI
+import java.time.OffsetDateTime
 
 /**
  * Metadata for an OPDS 2.0 feed.
@@ -36,13 +36,13 @@ data class OPDS2Metadata(
    * The time the publication was last modified.
    */
 
-  override val modified: DateTime?,
+  override val modified: OffsetDateTime?,
 
   /**
    * The time the publication was published.
    */
 
-  override val published: DateTime?,
+  override val published: OffsetDateTime?,
 
   /**
    * The languages that apply to the publication.

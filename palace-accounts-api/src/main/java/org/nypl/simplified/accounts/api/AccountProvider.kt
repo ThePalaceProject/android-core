@@ -1,14 +1,11 @@
 package org.nypl.simplified.accounts.api
 
-import org.joda.time.DateTime
 import org.nypl.simplified.announcements.Announcement
 import java.net.URI
+import java.time.OffsetDateTime
 
 data class AccountProvider(
   override val id: URI,
-  @Deprecated("Use URI-based IDs")
-  override val idNumeric: Int,
-  override val isProduction: Boolean,
   override val displayName: String,
   override val description: String?,
   override val subtitle: String?,
@@ -26,11 +23,9 @@ data class AccountProvider(
   override val license: URI?,
   override val privacyPolicy: URI?,
   override val mainColor: String,
-  override val addAutomatically: Boolean,
   override val patronSettingsURI: URI?,
-  override val updated: DateTime,
+  override val updated: OffsetDateTime,
   override val announcements: List<Announcement> = listOf(),
-  override val location: AccountLibraryLocation?,
   override val alternateURI: URI?
 ) : AccountProviderType {
   override fun compareTo(other: AccountProviderType): Int {
@@ -50,7 +45,6 @@ data class AccountProvider(
       }
 
       return AccountProvider(
-        addAutomatically = other.addAutomatically,
         authentication = other.authentication,
         authenticationAlternatives = other.authenticationAlternatives,
         authenticationDocumentURI = other.authenticationDocumentURI,
@@ -60,8 +54,6 @@ data class AccountProvider(
         displayName = other.displayName,
         eula = other.eula,
         id = other.id,
-        idNumeric = other.idNumeric,
-        isProduction = other.isProduction,
         license = other.license,
         loansURI = other.loansURI,
         logo = other.logo,
@@ -74,7 +66,6 @@ data class AccountProvider(
         supportsReservations = other.supportsReservations,
         updated = other.updated,
         announcements = other.announcements,
-        location = other.location,
         alternateURI = other.alternateURI
       )
     }

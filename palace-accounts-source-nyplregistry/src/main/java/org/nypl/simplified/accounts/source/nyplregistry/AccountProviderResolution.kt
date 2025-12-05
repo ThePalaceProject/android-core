@@ -2,7 +2,6 @@ package org.nypl.simplified.accounts.source.nyplregistry
 
 import one.irradia.mime.api.MIMECompatibility
 import one.irradia.mime.api.MIMEType
-import org.joda.time.DateTime
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPResponseStatus
 import org.nypl.simplified.accounts.api.AccountProvider
@@ -37,6 +36,8 @@ import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
 import java.net.URI
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import java.util.Locale
 
 /**
@@ -87,7 +88,7 @@ class AccountProviderResolution(
         authDocument?.announcements ?: emptyList()
 
       val updated =
-        DateTime.now()
+        OffsetDateTime.now(ZoneOffset.UTC).withNano(0)
 
       /*
        * The catalog URI is required to be present, but we obviously have no guarantee that it
@@ -108,7 +109,6 @@ class AccountProviderResolution(
 
       val accountProvider =
         AccountProvider(
-          addAutomatically = this.description.isAutomatic,
           announcements = announcements,
           authentication = authentications.first,
           authenticationAlternatives = authentications.second,
@@ -119,8 +119,6 @@ class AccountProviderResolution(
           displayName = title,
           eula = authDocument?.eulaURI,
           id = this.description.id,
-          idNumeric = -1,
-          isProduction = this.description.isProduction,
           license = authDocument?.licenseURI,
           loansURI = authDocument?.loansURI,
           logo = authDocument?.logoURI ?: this.description.logoURI?.hrefURI,
@@ -132,7 +130,6 @@ class AccountProviderResolution(
           supportEmail = authDocument?.supportURI?.toString(),
           supportsReservations = supportsReservations,
           updated = updated,
-          location = this.description.location,
           alternateURI = alternateURI
         )
 

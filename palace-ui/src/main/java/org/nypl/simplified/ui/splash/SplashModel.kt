@@ -10,7 +10,6 @@ import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.accounts.AccountProviderDescriptionComparator
 import org.nypl.simplified.ui.main.MainAttributes
-import java.util.concurrent.ExecutorService
 
 object SplashModel {
 
@@ -76,11 +75,10 @@ object SplashModel {
   }
 
   fun accountProvidersLoad(
-    executor: ExecutorService,
     buildConfig: BuildConfigurationServiceType,
     registry: AccountProviderRegistryType
   ): AttributeSubscriptionType {
-    executor.execute { registry.refresh(false) }
+    registry.refreshAsync(includeTestingLibraries = false)
     return registry.statusAttribute.subscribe { _, status ->
       when (status) {
         AccountProviderRegistryStatus.Idle -> {

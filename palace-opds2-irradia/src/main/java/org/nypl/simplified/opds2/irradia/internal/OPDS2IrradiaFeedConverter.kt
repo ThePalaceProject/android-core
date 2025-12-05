@@ -12,6 +12,7 @@ import one.irradia.opds2_0.api.OPDS20Title
 import one.irradia.opds2_0.library_simplified.api.OPDS20Catalog
 import one.irradia.opds2_0.library_simplified.api.OPDS20CatalogList
 import one.irradia.opds2_0.library_simplified.api.OPDS20CatalogMetadata
+import org.joda.time.DateTime
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds2.OPDS2Catalog
 import org.nypl.simplified.opds2.OPDS2CatalogMetadata
@@ -26,6 +27,7 @@ import org.nypl.simplified.opds2.OPDS2Title
 import org.nypl.simplified.parser.api.ParseError
 import org.nypl.simplified.parser.api.ParseResult
 import org.nypl.simplified.parser.api.ParseWarning
+import java.time.OffsetDateTime
 
 class OPDS2IrradiaFeedConverter(
   private val feed: OPDS20Feed
@@ -147,8 +149,8 @@ class OPDS2IrradiaFeedConverter(
       title = this.convertTitle(metadata.title),
       subtitle = metadata.subtitle?.let(this::convertTitle),
       description = metadata.description,
-      modified = metadata.modified,
-      published = metadata.published,
+      modified = mapTime(metadata.modified),
+      published = mapTime(metadata.published),
       languages = metadata.languages,
       sortAs = metadata.sortAs,
       author = metadata.author.map(this::convertAuthor)
@@ -159,21 +161,29 @@ class OPDS2IrradiaFeedConverter(
     metadata: OPDS20Metadata,
     catalogMetadata: OPDS20CatalogMetadata,
   ): OPDS2CatalogMetadata {
+    val published =
+      mapTime(metadata.published)
+    val modified =
+      mapTime(catalogMetadata.updated ?: metadata.modified)
+
     return OPDS2CatalogMetadata(
       identifier = catalogMetadata.id ?: metadata.identifier,
       title = this.convertTitle(metadata.title),
       subtitle = metadata.subtitle?.let(this::convertTitle),
       description = metadata.description,
-      modified = catalogMetadata.updated ?: metadata.modified,
-      published = metadata.published,
+      modified = modified,
+      published = published,
       languages = metadata.languages,
       sortAs = metadata.sortAs,
       author = metadata.author.map(this::convertAuthor),
-      isAutomatic = catalogMetadata.isAutomatic,
-      isProduction = catalogMetadata.isProduction,
-      areaServed = catalogMetadata.areaServed,
-      distance = catalogMetadata.distance
     )
+  }
+
+  private fun mapTime(time: DateTime?): OffsetDateTime? {
+    if (time == null) {
+      return null
+    }
+    return OffsetDateTime.parse(time.toString()).withNano(0)
   }
 
   private fun convertAuthor(

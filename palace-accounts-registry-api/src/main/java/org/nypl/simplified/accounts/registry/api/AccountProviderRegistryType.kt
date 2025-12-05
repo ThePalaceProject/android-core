@@ -6,7 +6,6 @@ import net.jcip.annotations.ThreadSafe
 import org.nypl.simplified.accounts.api.AccountProviderDescription
 import org.nypl.simplified.accounts.api.AccountProviderResolutionListenerType
 import org.nypl.simplified.accounts.api.AccountProviderType
-import org.nypl.simplified.accounts.api.AccountSearchQuery
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import java.net.URI
 import java.util.concurrent.CompletableFuture
@@ -59,46 +58,58 @@ interface AccountProviderRegistryType : AutoCloseable {
     get() = this.statusAttribute.get()
 
   /**
+   * Ensure all account providers are loaded.
+   */
+
+  fun loadAsync(): CompletableFuture<Unit>
+
+  /**
+   * Ensure all account providers are loaded.
+   */
+
+  fun load() {
+    return this.loadAsync().get()
+  }
+
+  /**
    * Refresh the available account providers from all sources.
    *
    * @param includeTestingLibraries A hint for providers indicating whether
    * testing libraries should be loaded. May be ignored by some providers.
-   * @param useCache A hint for providers indicating that they should use any cache they have
-   * in order to speed up loading.
    */
 
   fun refresh(
-    includeTestingLibraries: Boolean,
-    useCache: Boolean = true
-  )
+    includeTestingLibraries: Boolean
+  ) {
+    return this.refreshAsync(
+      includeTestingLibraries = includeTestingLibraries
+    ).get()
+  }
 
   /**
    * Refresh the available account providers from all sources.
    *
    * @param includeTestingLibraries A hint for providers indicating whether
    * testing libraries should be loaded. May be ignored by some providers.
-   * @param useCache A hint for providers indicating that they should use any cache they have
-   * in order to speed up loading.
    */
 
   fun refreshAsync(
-    includeTestingLibraries: Boolean,
-    useCache: Boolean = true
+    includeTestingLibraries: Boolean
   ): CompletableFuture<Unit>
-
-  /**
-   * Execute a search query on the registry.
-   *
-   * @param query The search query parameters
-   */
-
-  fun query(query: AccountSearchQuery)
 
   /**
    * Clear cached account providers from all sources.
    */
 
-  fun clear()
+  fun clear() {
+    return this.clearAsync().get()
+  }
+
+  /**
+   * Clear cached account providers from all sources.
+   */
+
+  fun clearAsync(): CompletableFuture<Unit>
 
   /**
    * Return an immutable read-only of the account provider descriptions.
@@ -124,7 +135,20 @@ interface AccountProviderRegistryType : AutoCloseable {
    * given account provider already exists in the registry, the newer version is returned.
    */
 
-  fun updateProvider(accountProvider: AccountProviderType): AccountProviderType
+  fun updateProvider(
+    accountProvider: AccountProviderType
+  ): AccountProviderType {
+    return this.updateProviderAsync(accountProvider).get()
+  }
+
+  /**
+   * Introduce the given account provider to the registry. If an existing, newer version of the
+   * given account provider already exists in the registry, the newer version is returned.
+   */
+
+  fun updateProviderAsync(
+    accountProvider: AccountProviderType
+  ): CompletableFuture<AccountProviderType>
 
   /**
    * Introduce the given account provider description to the registry. If an existing, newer
@@ -132,7 +156,54 @@ interface AccountProviderRegistryType : AutoCloseable {
    * version is returned.
    */
 
-  fun updateDescription(description: AccountProviderDescription): AccountProviderDescription
+  fun updateDescription(
+    description: AccountProviderDescription
+  ): AccountProviderDescription {
+    return this.updateDescriptionAsync(description).get()
+  }
+
+  /**
+   * Introduce the given account provider description to the registry. If an existing, newer
+   * version of the given account provider description already exists in the registry, the newer
+   * version is returned.
+   */
+
+  fun updateDescriptionAsync(
+    description: AccountProviderDescription
+  ): CompletableFuture<AccountProviderDescription>
+
+  /**
+   * Introduce the given account provider description to the registry. If an existing, newer
+   * version of the given account provider description already exists in the registry, the newer
+   * version is returned.
+   */
+
+  fun updateDescriptions(
+    descriptions: List<AccountProviderDescription>
+  ): List<AccountProviderDescription> {
+    return this.updateDescriptionsAsync(descriptions).get()
+  }
+
+  /**
+   * Introduce the given account provider description to the registry. If an existing, newer
+   * version of the given account provider description already exists in the registry, the newer
+   * version is returned.
+   */
+
+  fun updateDescriptionsAsync(
+    descriptions: List<AccountProviderDescription>
+  ): CompletableFuture<List<AccountProviderDescription>>
+
+  /**
+   * Resolve the description into a full account provider. The given `onProgress` function
+   * will be called repeatedly during the resolution process to report on the status of the
+   * resolution.
+   */
+
+  fun resolveAsync(
+    onProgress: AccountProviderResolutionListenerType,
+    description: AccountProviderDescription
+  ): CompletableFuture<TaskResult<AccountProviderType>>
 
   /**
    * Resolve the description into a full account provider. The given `onProgress` function
@@ -143,5 +214,7 @@ interface AccountProviderRegistryType : AutoCloseable {
   fun resolve(
     onProgress: AccountProviderResolutionListenerType,
     description: AccountProviderDescription
-  ): TaskResult<AccountProviderType>
+  ): TaskResult<AccountProviderType> {
+    return this.resolveAsync(onProgress, description).get()
+  }
 }

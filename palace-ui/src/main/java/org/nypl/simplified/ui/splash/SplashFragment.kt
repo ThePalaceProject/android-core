@@ -53,7 +53,6 @@ import org.nypl.simplified.ui.splash.SplashModel.SplashScreenStatus.SPLASH_SCREE
 import org.nypl.simplified.ui.splash.SplashModel.SplashScreenStatus.SPLASH_SCREEN_NOTIFICATIONS
 import org.nypl.simplified.ui.splash.SplashModel.SplashScreenStatus.SPLASH_SCREEN_TUTORIAL
 import org.slf4j.LoggerFactory
-import java.util.concurrent.Executors
 
 class SplashFragment : Fragment(), MainBackButtonConsumerType {
 
@@ -503,19 +502,14 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
 
     /*
      * Subscribe to the account provider list and registry in order to receive lists of
-     * providers. Refreshing the registry is a synchronous call, so we (unfortunately) need
-     * to create a temporary background executor on which to execute the refresh. We ensure
-     * that the executor is closed whenever the fragment is.
+     * providers.
      */
 
     val registry =
       services.requireService(AccountProviderRegistryType::class.java)
     val buildConfig =
       services.requireService(BuildConfigurationServiceType::class.java)
-    val registryBackground =
-      Executors.newFixedThreadPool(1)
 
-    this.subscriptions.add(AutoCloseable { registryBackground.shutdown() })
     this.subscriptions.add(
       SplashModel.accountProviders.subscribe { _, providers ->
         adapter.submitList(providers)
@@ -546,7 +540,6 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
     )
     this.subscriptions.add(
       SplashModel.accountProvidersLoad(
-        executor = registryBackground,
         buildConfig = buildConfig,
         registry = registry
       )
