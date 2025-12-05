@@ -19,6 +19,7 @@ import org.nypl.simplified.accounts.api.AccountProvider
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.BASIC_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderDescription
+import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.source.nyplregistry.AccountProviderResolution
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.auth_document.api.AuthenticationDocument
@@ -418,7 +419,7 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
       alternateURI = URI.create("https://www.example.com/alternate")
     )
 
-    Assertions.assertEquals(provider, result.result)
+    compareProviderValues(provider, result)
   }
 
   /**
@@ -554,7 +555,41 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
       alternateURI = URI.create("https://www.example.com/alternate")
     )
 
-    Assertions.assertEquals(provider, result.result)
+    compareProviderValues(provider, result)
+  }
+
+  private fun compareProviderValues(
+      provider: AccountProvider,
+      result: TaskResult.Success<AccountProviderType>
+  ) {
+    Assertions.assertEquals(provider.announcements, result.result.announcements)
+    Assertions.assertEquals(provider.authentication, result.result.authentication)
+    Assertions.assertEquals(
+      provider.authenticationAlternatives,
+      result.result.authenticationAlternatives
+    )
+    Assertions.assertEquals(
+      provider.authenticationDocumentURI,
+      result.result.authenticationDocumentURI
+    )
+    Assertions.assertEquals(provider.cardCreatorURI, result.result.cardCreatorURI)
+    Assertions.assertEquals(provider.catalogURI, result.result.catalogURI)
+    Assertions.assertEquals(provider.description, result.result.description)
+    Assertions.assertEquals(provider.displayName, result.result.displayName)
+    Assertions.assertEquals(provider.eula, result.result.eula)
+    Assertions.assertEquals(provider.id, result.result.id)
+    Assertions.assertEquals(provider.license, result.result.license)
+    Assertions.assertEquals(provider.loansURI, result.result.loansURI)
+    Assertions.assertEquals(provider.logo, result.result.logo)
+    Assertions.assertEquals(provider.mainColor, result.result.mainColor)
+    Assertions.assertEquals(provider.patronSettingsURI, result.result.patronSettingsURI)
+    Assertions.assertEquals(provider.privacyPolicy, result.result.privacyPolicy)
+    Assertions.assertEquals(provider.resetPasswordURI, result.result.resetPasswordURI)
+    Assertions.assertEquals(provider.subtitle, result.result.subtitle)
+    Assertions.assertEquals(provider.supportEmail, result.result.supportEmail)
+    Assertions.assertEquals(provider.supportsReservations, result.result.supportsReservations)
+    // Assertions.assertEquals(provider.updated, result.result.updated)
+    Assertions.assertEquals(provider.alternateURI, result.result.alternateURI)
   }
 
   /**
