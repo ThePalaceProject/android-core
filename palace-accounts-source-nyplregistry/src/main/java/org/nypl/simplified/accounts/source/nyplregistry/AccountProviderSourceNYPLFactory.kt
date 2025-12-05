@@ -4,10 +4,11 @@ import android.content.Context
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.nypl.simplified.accounts.json.AccountProviderDescriptionCollectionParsers
 import org.nypl.simplified.accounts.source.spi.AccountProviderSourceFactoryType
+import org.nypl.simplified.accounts.source.spi.AccountProviderSourceResolutionStrings
 import org.nypl.simplified.accounts.source.spi.AccountProviderSourceType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationAccountsType
 import org.nypl.simplified.opds.auth_document.api.AuthenticationDocumentParsersType
-import org.nypl.simplified.opds2.irradia.OPDS2ParsersIrradia
+import org.thepalaceproject.opds2.pwp.OPDS2ParsersPWP
 import java.util.ServiceLoader
 
 /**
@@ -28,11 +29,12 @@ class AccountProviderSourceNYPLFactory : AccountProviderSourceFactoryType {
     buildConfig: BuildConfigurationAccountsType
   ): AccountProviderSourceType {
     return AccountProviderSourceNYPLRegistry(
-      http = http,
       authDocumentParsers = this.findAuthenticationDocumentParsers(),
-      parsers = AccountProviderDescriptionCollectionParsers(OPDS2ParsersIrradia),
+      http = http,
+      parsers = AccountProviderDescriptionCollectionParsers(OPDS2ParsersPWP),
+      stringResources = AccountProviderSourceResolutionStrings(context.resources),
       uriProduction = buildConfig.libraryRegistry.registry,
-      uriQA = buildConfig.libraryRegistry.registryQA
+      uriQA = buildConfig.libraryRegistry.registryQA,
     )
   }
 }

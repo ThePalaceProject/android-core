@@ -9,7 +9,6 @@ import org.nypl.simplified.accounts.api.AccountProvider
 import org.nypl.simplified.accounts.api.AccountProviderDescription
 import org.nypl.simplified.accounts.api.AccountProviderResolutionListenerType
 import org.nypl.simplified.accounts.api.AccountProviderType
-import org.nypl.simplified.accounts.api.AccountSearchQuery
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryEvent
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus.Idle
@@ -81,7 +80,13 @@ class MockAccountProviderRegistry(
     get() = this.accountProviderDescriptionsAttributeActual
 
   override val status: AccountProviderRegistryStatus
-    get() = AccountProviderRegistryStatus.Idle
+    get() = Idle
+
+  override fun loadAsync(): CompletableFuture<Unit> {
+    val future = CompletableFuture<Unit>()
+    future.complete(Unit)
+    return future
+  }
 
   override fun refreshAsync(includeTestingLibraries: Boolean): CompletableFuture<Unit> {
     val future = CompletableFuture<Unit>()

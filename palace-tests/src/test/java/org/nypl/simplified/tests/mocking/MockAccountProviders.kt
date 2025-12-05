@@ -16,6 +16,7 @@ import org.thepalaceproject.db.DBFactory
 import org.thepalaceproject.db.api.DBParameters
 import java.net.URI
 import java.nio.file.Files
+import java.time.OffsetDateTime
 import java.util.TreeMap
 
 object MockAccountProviders {
@@ -26,7 +27,6 @@ object MockAccountProviders {
     port: Int = 80
   ): AccountProvider {
     return AccountProvider(
-      addAutomatically = false,
       announcements = emptyList(),
       authentication = AccountProviderAuthenticationDescription.Anonymous,
       authenticationAlternatives = listOf(),
@@ -37,8 +37,6 @@ object MockAccountProviders {
       displayName = "Fake Library",
       eula = null,
       id = URI.create(providerId),
-      idNumeric = -1,
-      isProduction = false,
       license = null,
       loansURI = URI.create("http://$host:$port/accounts0/loans.xml"),
       logo = URI.create("data:text/plain;base64,U3RvcCBsb29raW5nIGF0IG1lIQo="),
@@ -49,8 +47,7 @@ object MockAccountProviders {
       subtitle = "Imaginary books",
       supportEmail = "postmaster@example.com",
       supportsReservations = false,
-      updated = DateTime.parse("2000-01-01T00:00:00Z"),
-      location = null,
+      updated = OffsetDateTime.parse("2000-01-01T00:00:00Z"),
       alternateURI = URI.create("https://www.example.com/alternate")
     )
   }
@@ -108,20 +105,6 @@ object MockAccountProviders {
       fakeProvider("urn:fake:2"),
       fakeAuthProvider("urn:fake-auth:0")
     )
-  }
-
-  fun fakeAccountProviderListWithAutomatic(): List<AccountProvider> {
-    return listOf(
-      fakeProvider("urn:fake:0"),
-      fakeProvider("urn:fake:1"),
-      fakeProvider("urn:fake:2"),
-      fakeAuthProvider("urn:fake-auth:0"),
-      fakeProviderAuto("urn:fake:auto-4")
-    )
-  }
-
-  fun fakeProviderAuto(id: String): AccountProvider {
-    return fakeProvider(id).copy(addAutomatically = true)
   }
 
   fun fakeAuthProvider(

@@ -21,6 +21,7 @@ import org.nypl.simplified.accounts.source.spi.AccountProviderSourceType
 import org.nypl.simplified.accounts.source.spi.AccountProviderSourceType.SourceResult.SourceSucceeded
 import org.nypl.simplified.opds.auth_document.AuthenticationDocumentParsers
 import org.nypl.simplified.opds2.irradia.OPDS2ParsersIrradia
+import org.nypl.simplified.tests.mocking.MockAccountProviderResolutionStrings
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -91,11 +92,12 @@ class AccountProviderNYPLRegistryTest {
 
     val provider =
       AccountProviderSourceNYPLRegistry(
-        http = this.http,
         authDocumentParsers = AuthenticationDocumentParsers(),
+        http = this.http,
         parsers = AccountProviderDescriptionCollectionParsers(this.opdsParsers),
+        stringResources = MockAccountProviderResolutionStrings(),
         uriProduction = this.server.url("production").toUri(),
-        uriQA = this.server.url("qa").toUri()
+        uriQA = this.server.url("qa").toUri(),
       )
 
     val result = provider.load(this.context, false)
@@ -129,7 +131,8 @@ class AccountProviderNYPLRegistryTest {
         authDocumentParsers = AuthenticationDocumentParsers(),
         parsers = AccountProviderDescriptionCollectionParsers(this.opdsParsers),
         uriProduction = this.server.url("production").toUri(),
-        uriQA = this.server.url("qa").toUri()
+        uriQA = this.server.url("qa").toUri(),
+        stringResources = MockAccountProviderResolutionStrings(),
       )
 
     val result = provider.load(this.context, true)
@@ -157,7 +160,8 @@ class AccountProviderNYPLRegistryTest {
         authDocumentParsers = AuthenticationDocumentParsers(),
         parsers = AccountProviderDescriptionCollectionParsers(this.opdsParsers),
         uriProduction = this.server.url("production").toUri(),
-        uriQA = this.server.url("qa").toUri()
+        uriQA = this.server.url("qa").toUri(),
+        stringResources = MockAccountProviderResolutionStrings(),
       )
 
     val result = provider.load(this.context, true)
@@ -179,7 +183,8 @@ class AccountProviderNYPLRegistryTest {
         authDocumentParsers = AuthenticationDocumentParsers(),
         parsers = AccountProviderDescriptionCollectionParsers(this.opdsParsers),
         uriProduction = this.server.url("production").toUri(),
-        uriQA = this.server.url("qa").toUri()
+        uriQA = this.server.url("qa").toUri(),
+        stringResources = MockAccountProviderResolutionStrings(),
       )
 
     this.server.enqueue(

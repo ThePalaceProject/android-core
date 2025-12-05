@@ -14,7 +14,6 @@ internal object DBQAccountProviderDescriptionGet : DBQAccountProviderDescription
     SELECT
       apd.apd_id,
       apd.apd_updated_time_last,
-      apd.apd_production,
       apd.apd_data_format,
       apd.apd_data
     FROM account_provider_descriptions AS apd

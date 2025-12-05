@@ -4,7 +4,6 @@ import com.io7m.jfunctional.OptionType
 import com.io7m.jfunctional.Some
 import io.reactivex.subjects.Subject
 import one.irradia.mime.api.MIMEType
-import org.joda.time.DateTime
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType.AllowRedirects.ALLOW_REDIRECTS
 import org.librarysimplified.http.api.LSHTTPResponseStatus
@@ -27,6 +26,8 @@ import org.nypl.simplified.taskrecorder.api.TaskStep
 import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.net.URI
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import java.util.UUID
 import java.util.concurrent.Callable
 
@@ -164,12 +165,9 @@ class ProfileAccountCreateCustomOPDSTask(
         id = id,
         title = this.title,
         description = this.description,
-        updated = DateTime.now(),
+        updated = OffsetDateTime.now(ZoneOffset.UTC).withNano(0),
         links = links,
-        images = listOf(),
-        isProduction = true,
-        isAutomatic = false,
-        location = null
+        images = listOf()
       )
 
     /*

@@ -12,7 +12,6 @@ import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryDebugging
 import org.nypl.simplified.accounts.source.nyplregistry.AccountProviderSourceNYPLRegistryException.ServerConnectionFailure
 import org.nypl.simplified.accounts.source.nyplregistry.AccountProviderSourceNYPLRegistryException.ServerReturnedError
-import org.nypl.simplified.accounts.source.spi.AccountProviderSourceResolutionStrings
 import org.nypl.simplified.accounts.source.spi.AccountProviderSourceType
 import org.nypl.simplified.accounts.source.spi.AccountProviderSourceType.SourceResult
 import org.nypl.simplified.opds.auth_document.api.AuthenticationDocumentParsersType
@@ -31,6 +30,7 @@ class AccountProviderSourceNYPLRegistry(
   private val http: LSHTTPClientType,
   private val authDocumentParsers: AuthenticationDocumentParsersType,
   private val parsers: AccountProviderDescriptionCollectionParsersType,
+  private val stringResources: AccountProviderResolutionStringsType,
   private val uriProduction: URI,
   private val uriQA: URI
 ) : AccountProviderSourceType {
@@ -38,20 +38,10 @@ class AccountProviderSourceNYPLRegistry(
   private val logger =
     LoggerFactory.getLogger(AccountProviderSourceNYPLRegistry::class.java)
 
-  @Volatile
-  private var stringResources: AccountProviderResolutionStringsType? = null
-
   override fun load(
     context: Context,
     includeTestingLibraries: Boolean
   ): SourceResult {
-    if (this.stringResources == null) {
-      this.stringResources =
-        AccountProviderSourceResolutionStrings(
-          context.resources
-        )
-    }
-
     return try {
       SourceResult.SourceSucceeded(fetchServerResults(includeTestingLibraries))
     } catch (e: Exception) {
@@ -73,7 +63,7 @@ class AccountProviderSourceNYPLRegistry(
     description: AccountProviderDescription
   ): TaskResult<AccountProviderType> {
     return AccountProviderResolution(
-      stringResources = this.stringResources!!,
+      stringResources = this.stringResources,
       authDocumentParsers = this.authDocumentParsers,
       http = this.http,
       description = description

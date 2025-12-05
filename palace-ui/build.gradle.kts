@@ -69,6 +69,7 @@ dependencies {
     implementation(project(":palace-opds-core"))
     implementation(project(":palace-opds2-irradia"))
     implementation(project(":palace-opds2-parser-api"))
+    implementation(project(":palace-opds2-pwp"))
     implementation(project(":palace-parser-api"))
     implementation(project(":palace-patron"))
     implementation(project(":palace-patron-api"))

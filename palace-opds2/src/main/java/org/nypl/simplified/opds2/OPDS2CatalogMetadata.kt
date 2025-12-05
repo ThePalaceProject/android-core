@@ -1,7 +1,7 @@
 package org.nypl.simplified.opds2
 
-import org.joda.time.DateTime
 import java.net.URI
+import java.time.OffsetDateTime
 
 data class OPDS2CatalogMetadata(
 
@@ -33,13 +33,13 @@ data class OPDS2CatalogMetadata(
    * The time the publication was last modified.
    */
 
-  override val modified: DateTime?,
+  override val modified: OffsetDateTime?,
 
   /**
    * The time the publication was published.
    */
 
-  override val published: DateTime?,
+  override val published: OffsetDateTime?,
 
   /**
    * The languages that apply to the publication.
@@ -57,36 +57,7 @@ data class OPDS2CatalogMetadata(
    * The authors.
    */
 
-  override val author: List<OPDS2Contributor>,
-
-  /**
-   * `true` if the catalog is in production.
-   */
-
-  val isProduction: Boolean,
-
-  /**
-   * `true` if the catalog should be automatically added to new profiles.
-   */
-
-  val isAutomatic: Boolean,
-
-  /**
-   * Library Simplified catalogs use a "areaServed" property to express library service areas.
-   *
-   * @see "https://github.com/NYPL-Simplified/Simplified/wiki/LibraryRegistryPublicAPI#the-schemaareaserved-property"
-   */
-
-  val areaServed: String?,
-
-  /**
-   * Library Simplified catalogs use a "distance" property to express the distance between the user and a library.
-   *
-   * @see "https://github.com/NYPL-Simplified/Simplified/wiki/LibraryRegistryPublicAPI#the-distance-property"
-   */
-
-  val distance: String?,
-
+  override val author: List<OPDS2Contributor>
 ) : Comparable<OPDS2CatalogMetadata>, OPDS2MetadataType {
 
   override fun compareTo(other: OPDS2CatalogMetadata): Int =

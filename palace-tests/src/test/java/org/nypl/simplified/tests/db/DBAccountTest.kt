@@ -26,6 +26,8 @@ import org.thepalaceproject.db.api.queries.DBQAccountProviderListType
 import org.thepalaceproject.db.api.queries.DBQAccountProviderPutType
 import java.net.URI
 import java.nio.file.Path
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import java.util.UUID
 
 class DBAccountTest {
@@ -92,12 +94,9 @@ class DBAccountTest {
           id = URI.create("urn:uuid:c7b2959b-8986-49d6-90d6-d4057a3b2900"),
           title = "Example Library",
           description = "",
-          updated = DateTime.now(DateTimeZone.UTC),
+          updated = OffsetDateTime.now(ZoneOffset.UTC),
           links = listOf(),
           images = listOf(),
-          isAutomatic = false,
-          isProduction = true,
-          location = null
         )
 
       t.execute(DBQAccountProviderDescriptionPutType::class.java, listOf(w))
@@ -111,10 +110,7 @@ class DBAccountTest {
       Assertions.assertEquals(w.description, r.description)
       Assertions.assertEquals(w.id, r.id)
       Assertions.assertEquals(w.images, r.images)
-      Assertions.assertEquals(w.isAutomatic, r.isAutomatic)
-      Assertions.assertEquals(w.isProduction, r.isProduction)
       Assertions.assertEquals(w.links, r.links)
-      Assertions.assertEquals(w.location, r.location)
       Assertions.assertEquals(w.logoURI, r.logoURI)
       Assertions.assertEquals(w.updated, r.updated)
       Assertions.assertEquals(w, r)
@@ -132,12 +128,9 @@ class DBAccountTest {
             id = URI.create("urn:uuid:${UUID.randomUUID()}"),
             title = "Example Library $i",
             description = "",
-            updated = DateTime.now(DateTimeZone.UTC),
+            updated = OffsetDateTime.now(ZoneOffset.UTC),
             links = listOf(),
             images = listOf(),
-            isAutomatic = false,
-            isProduction = true,
-            location = null
           )
         )
       }
@@ -189,12 +182,9 @@ class DBAccountTest {
             id = URI.create("urn:uuid:${UUID.randomUUID()}"),
             title = "Example Library $i",
             description = "",
-            updated = DateTime.now(DateTimeZone.UTC),
+            updated = OffsetDateTime.now(ZoneOffset.UTC),
             links = listOf(),
             images = listOf(),
-            isAutomatic = false,
-            isProduction = true,
-            location = null
           )
         )
       }
@@ -236,12 +226,9 @@ class DBAccountTest {
             id = URI.create("urn:uuid:${UUID.randomUUID()}"),
             title = "Example Library $i",
             description = "",
-            updated = DateTime.now(DateTimeZone.UTC),
+            updated = OffsetDateTime.now(ZoneOffset.UTC),
             links = listOf(),
             images = listOf(),
-            isAutomatic = false,
-            isProduction = true,
-            location = null
           )
         )
       }

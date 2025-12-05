@@ -58,6 +58,20 @@ interface AccountProviderRegistryType : AutoCloseable {
     get() = this.statusAttribute.get()
 
   /**
+   * Ensure all account providers are loaded.
+   */
+
+  fun loadAsync(): CompletableFuture<Unit>
+
+  /**
+   * Ensure all account providers are loaded.
+   */
+
+  fun load() {
+    return this.loadAsync().get()
+  }
+
+  /**
    * Refresh the available account providers from all sources.
    *
    * @param includeTestingLibraries A hint for providers indicating whether

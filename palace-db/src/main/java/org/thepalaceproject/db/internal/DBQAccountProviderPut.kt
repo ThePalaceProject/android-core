@@ -1,11 +1,10 @@
 package org.thepalaceproject.db.internal
 
-import org.joda.time.DateTimeZone
-import org.joda.time.format.ISODateTimeFormat
 import org.nypl.simplified.accounts.api.AccountProvider
 import org.nypl.simplified.accounts.json.AccountProvidersJSON
 import org.thepalaceproject.db.api.DBTransactionType
 import org.thepalaceproject.db.api.queries.DBQAccountProviderPutType
+import java.time.ZoneOffset
 
 internal object DBQAccountProviderPut : DBQAccountProviderPutType {
 
@@ -31,8 +30,8 @@ internal object DBQAccountProviderPut : DBQAccountProviderPutType {
     baseDescription: AccountProvider
   ) {
     val timestamp =
-      baseDescription.updated.withZone(DateTimeZone.UTC)
-        .toString(ISODateTimeFormat.dateTime())
+      baseDescription.updated.withOffsetSameInstant(ZoneOffset.UTC)
+        .toString()
 
     val description =
       DBAccountProviders.forceUTC(baseDescription)

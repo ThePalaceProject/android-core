@@ -94,7 +94,6 @@ class AccountProviderRegistry2 private constructor(
           statusAttributeSrc = statusAttributeSrc,
         )
 
-      registry.loadDescriptions()
       registry.loadProviders()
       return registry
     }
@@ -142,49 +141,50 @@ class AccountProviderRegistry2 private constructor(
     )
   }
 
-  private fun loadDescriptions() {
-    return this.execute { this.opLoadDescriptions() }.get()
-  }
-
   private fun opLoadDescriptions() {
     this.logger.debug("Loading account provider descriptions...")
 
-    val descriptionMap: MutableMap<URI, AccountProviderDescription>
-    this.database.openTransaction().use { t ->
-      val descriptions =
-        t.execute(
-          queryType = DBQAccountProviderDescriptionListType::class.java,
-          parameters = DBQAccountProviderDescriptionListType.Parameters(
-            startingId = null,
-            limit = MAXIMUM_PROVIDER_DESCRIPTIONS
+    this.setStatus(Refreshing)
+    this.eventsActual.onNext(StatusChanged)
+
+    try {
+      val descriptionMap: MutableMap<URI, AccountProviderDescription>
+      this.database.openTransaction().use { t ->
+        val descriptions =
+          t.execute(
+            queryType = DBQAccountProviderDescriptionListType::class.java,
+            parameters = DBQAccountProviderDescriptionListType.Parameters(
+              startingId = null,
+              limit = MAXIMUM_PROVIDER_DESCRIPTIONS
+            )
           )
-        )
 
-      descriptionMap = descriptions.associateBy { d -> d.id }.toMutableMap()
+        descriptionMap = descriptions.associateBy { d -> d.id }.toMutableMap()
 
-      /*
-       * If the default provider description isn't in the database, we'll need to insert it now.
-       */
+        /* If the default provider description isn't in the database, we'll need to insert it now. */
+        val defaultProviderDescription = this.defaultProvider.toDescription()
+        if (!descriptionMap.containsKey(defaultProviderDescription.id)) {
+          descriptionMap[defaultProviderDescription.id] = defaultProviderDescription
+          t.execute(
+            queryType = DBQAccountProviderDescriptionPutType::class.java,
+            parameters = listOf(defaultProviderDescription)
+          )
+          t.commit()
+        }
 
-      val defaultProviderDescription = this.defaultProvider.toDescription()
-      if (!descriptionMap.containsKey(defaultProviderDescription.id)) {
-        descriptionMap[defaultProviderDescription.id] = defaultProviderDescription
-        t.execute(
-          queryType = DBQAccountProviderDescriptionPutType::class.java,
-          parameters = listOf(defaultProviderDescription)
-        )
-        t.commit()
+        this.attributeExecutor.execute {
+          this.accountProviderDescriptionsAttributeSrc.set(descriptionMap)
+        }
       }
 
-      this.attributeExecutor.execute {
-        this.accountProviderDescriptionsAttributeSrc.set(descriptionMap)
-      }
+      this.logger.debug(
+        "Loaded {} account provider descriptions.",
+        descriptionMap.size
+      )
+    } finally {
+      this.setStatus(Idle)
+      this.eventsActual.onNext(StatusChanged)
     }
-
-    this.logger.debug(
-      "Loaded {} account provider descriptions.",
-      descriptionMap.size
-    )
   }
 
   @Deprecated("Use the status attribute instead.")
@@ -199,6 +199,13 @@ class AccountProviderRegistry2 private constructor(
 
   override val accountProviderDescriptionsAttribute: AttributeReadableType<Map<URI, AccountProviderDescription>> =
     this.accountProviderDescriptionsAttributeSrc
+
+  override fun loadAsync(): CompletableFuture<Unit> {
+    return this.execute {
+      this.opLoadProviders()
+      this.opLoadDescriptions()
+    }
+  }
 
   override val defaultProvider: AccountProvider =
     this.accountProviderDefault.get()

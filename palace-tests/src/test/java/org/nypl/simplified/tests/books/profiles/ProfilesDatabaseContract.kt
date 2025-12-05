@@ -957,48 +957,6 @@ abstract class ProfilesDatabaseContract {
   }
 
   /**
-   * Automatic accounts are resolved and added.
-   */
-
-  @Test
-  @Throws(Exception::class)
-  fun testOpenAutomatic() {
-    val fileTemp = DirectoryUtilities.directoryCreateTemporary()
-    val fileProfiles = File(fileTemp, "profiles")
-
-    val accountProviders =
-      MockAccountProviderRegistry.withProviders(
-        MockAccountProviders.fakeAccountProviderListWithAutomatic()
-      )
-
-    val db0 =
-      ProfilesDatabases.openWithAnonymousProfileDisabled(
-        this.context(),
-        this.analytics,
-        this.accountEvents,
-        accountProviders,
-        AccountBundledCredentialsEmpty.getInstance(),
-        this.credentialStore,
-        this.accountsDatabases(),
-        BookFormatsTesting.supportsEverything,
-        fileProfiles
-      )
-
-    val acc =
-      MockAccountProviders.fakeProvider("urn:fake:0")
-    val p0 =
-      db0.createProfile(acc, "Kermit")
-    val accountsDatabase =
-      p0.accountsDatabase()
-    val accountsByProvider =
-      accountsDatabase.accountsByProvider()
-
-    Assertions.assertEquals(2, accountsByProvider.size)
-    Assertions.assertNotNull(accountsByProvider[acc.id])
-    Assertions.assertNotNull(accountsByProvider[MockAccountProviders.fakeAccountProviderDefaultAutoURI()])
-  }
-
-  /**
    * Deleting a profile works.
    *
    * @throws Exception On errors

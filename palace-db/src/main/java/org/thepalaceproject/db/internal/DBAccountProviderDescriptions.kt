@@ -1,6 +1,5 @@
 package org.thepalaceproject.db.internal
 
-import org.joda.time.DateTimeZone
 import org.nypl.simplified.accounts.api.AccountProviderDescription
 import org.nypl.simplified.accounts.api.AccountProviderDescriptionCollection
 import org.nypl.simplified.accounts.api.AccountProviderDescriptionCollectionParsersType
@@ -12,6 +11,7 @@ import org.thepalaceproject.db.api.DBTransactionType
 import org.thepalaceproject.db.internal.DBQAccountProviderDescriptionGet.FORMAT_OPDS2_COLLECTION
 import java.net.URI
 import java.sql.ResultSet
+import java.time.ZoneOffset
 
 internal object DBAccountProviderDescriptions {
 
@@ -20,7 +20,7 @@ internal object DBAccountProviderDescriptions {
 
   fun forceUTC(description: AccountProviderDescription): AccountProviderDescription {
     return description.copy(
-      updated = description.updated.withZone(DateTimeZone.UTC)
+      updated = description.updated.withOffsetSameInstant(ZoneOffset.UTC)
     )
   }
 

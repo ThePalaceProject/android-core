@@ -1,11 +1,11 @@
 package org.nypl.simplified.accounts.api
 
 import net.jcip.annotations.ThreadSafe
-import org.joda.time.DateTime
 import org.nypl.simplified.announcements.Announcement
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSFeedConstants.AUTHENTICATION_DOCUMENT_RELATION_URI_TEXT
 import java.net.URI
+import java.time.OffsetDateTime
 
 /**
  * A provider of accounts.
@@ -21,19 +21,6 @@ interface AccountProviderType : Comparable<AccountProviderType> {
    */
 
   val id: URI
-
-  /**
-   * @return The old-style numeric ID of the account
-   */
-
-  @Deprecated("Use URI-based IDs")
-  val idNumeric: Int
-
-  /**
-   * @return `true` if this account is in production
-   */
-
-  val isProduction: Boolean
 
   /**
    * @return The display name
@@ -138,12 +125,6 @@ interface AccountProviderType : Comparable<AccountProviderType> {
   val mainColor: String
 
   /**
-   * @return `true` iff the account should be added by default
-   */
-
-  val addAutomatically: Boolean
-
-  /**
    * The patron settings URI. This is the URI used to get and set patron settings.
    *
    * @return The patron settings URI
@@ -179,7 +160,7 @@ interface AccountProviderType : Comparable<AccountProviderType> {
    * @return The time that this account provider was most recently updated
    */
 
-  val updated: DateTime
+  val updated: OffsetDateTime
 
   /**
    * @return `true` if the authentication settings imply that barcode scanning and display is supported
@@ -210,12 +191,6 @@ interface AccountProviderType : Comparable<AccountProviderType> {
    */
 
   val announcements: List<Announcement>
-
-  /**
-   * The location of the library, if any
-   */
-
-  val location: AccountLibraryLocation?
 
   fun toDescription(): AccountProviderDescription {
     val imageLinks = mutableListOf<Link>()
@@ -262,9 +237,6 @@ interface AccountProviderType : Comparable<AccountProviderType> {
         updated = updated,
         links = links.toList(),
         images = imageLinks.toList(),
-        isAutomatic = addAutomatically,
-        isProduction = isProduction,
-        location = location
       )
 
     check((this.authenticationDocumentURI != null) == (accountProviderDescription.authenticationDocumentURI != null))

@@ -1,18 +1,18 @@
 package org.thepalaceproject.db.internal
 
-import org.joda.time.DateTimeZone
 import org.nypl.simplified.accounts.api.AccountProvider
 import org.nypl.simplified.accounts.json.AccountProvidersJSON
 import org.thepalaceproject.db.api.DBException
 import org.thepalaceproject.db.api.DBTransactionType
 import org.thepalaceproject.db.internal.DBQAccountProviderGet.FORMAT_ACCOUNT_PROVIDER_JSON
 import java.sql.ResultSet
+import java.time.ZoneOffset
 
 internal object DBAccountProviders {
 
   fun forceUTC(description: AccountProvider): AccountProvider {
     return description.copy(
-      updated = description.updated.withZone(DateTimeZone.UTC)
+      updated = description.updated.withOffsetSameInstant(ZoneOffset.UTC)
     )
   }
 

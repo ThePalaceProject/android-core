@@ -24,11 +24,19 @@ CREATE TABLE schema_version (
     </Schema>
 
     <Schema versionCurrent="1">
+        <Comment>
+            The account_provider_descriptions version table stores account provider descriptions
+            downloaded from the library registry. We store a serialized copy of the description
+            in the apd_data column, but we also extract the title and description into their
+            own columns to allow for the possibility of using sqlite's full text search.
+        </Comment>
+
         <Statement><![CDATA[
 CREATE TABLE account_provider_descriptions (
   apd_id                 TEXT    NOT NULL,
   apd_updated_time_last  TEXT    NOT NULL,
-  apd_production         INTEGER NOT NULL,
+  apd_title              TEXT    NOT NULL,
+  apd_description        TEXT    NOT NULL,
   apd_data_format        TEXT    NOT NULL,
   apd_data               BLOB    NOT NULL,
 

@@ -1,10 +1,10 @@
 package org.nypl.simplified.accounts.api
 
 import one.irradia.mime.api.MIMEType
-import org.joda.time.DateTime
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSFeedConstants.AUTHENTICATION_DOCUMENT_RELATION_URI_TEXT
 import java.net.URI
+import java.time.OffsetDateTime
 
 /**
  * The metadata associated with the description of an account provider.
@@ -38,7 +38,7 @@ data class AccountProviderDescription(
    * The time that the description was last updated.
    */
 
-  val updated: DateTime,
+  val updated: OffsetDateTime,
 
   /**
    * The links associated with the provider description.
@@ -51,27 +51,6 @@ data class AccountProviderDescription(
    */
 
   val images: List<Link>,
-
-  /**
-   * `true` if the account should be automatically added.
-   *
-   * @see [AccountProviderType.addAutomatically]
-   */
-
-  val isAutomatic: Boolean,
-
-  /**
-   * `true` if the library is a production library.
-   */
-
-  val isProduction: Boolean,
-
-  /**
-   * The location of the library, if any
-   */
-
-  val location: AccountLibraryLocation?
-
 ) : Comparable<AccountProviderDescription> {
 
   private val authenticationDocumentType =

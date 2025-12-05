@@ -5,11 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
-import org.joda.time.DateTime
-import org.nypl.simplified.accounts.api.AccountDistance
-import org.nypl.simplified.accounts.api.AccountDistanceUnit
-import org.nypl.simplified.accounts.api.AccountGeoLocation
-import org.nypl.simplified.accounts.api.AccountLibraryLocation
 import org.nypl.simplified.accounts.api.AccountProvider
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Anonymous
@@ -34,6 +29,7 @@ import java.io.FileInputStream
 import java.io.IOException
 import java.io.InputStream
 import java.net.URI
+import java.time.OffsetDateTime
 import java.util.Locale
 import java.util.TreeMap
 
@@ -60,12 +56,9 @@ object AccountProvidersJSON {
   fun serializeToJSON(provider: AccountProviderType): ObjectNode {
     val node = this.mapper.createObjectNode()
 
-    node.put("@version", "20200527")
-    node.put("addAutomatically", provider.addAutomatically)
+    node.put("@version", "20251204")
     node.put("displayName", provider.displayName)
-    node.put("idNumeric", provider.idNumeric)
     node.put("idUUID", provider.id.toString())
-    node.put("isProduction", provider.isProduction)
     node.put("mainColor", provider.mainColor)
     node.put("supportsReservations", provider.supportsReservations)
     node.put("updated", provider.updated.toString())
@@ -216,8 +209,6 @@ object AccountProvidersJSON {
       JSONParserUtilities.getURI(obj, "idUUID")
 
     try {
-      val addAutomatically =
-        JSONParserUtilities.getBooleanDefault(obj, "addAutomatically", false)
       val alternateURI =
         JSONParserUtilities.getURIOrNull(obj, "alternateURI")
       val authenticationDocumentURI =
@@ -258,22 +249,13 @@ object AccountProvidersJSON {
         JSONParserUtilities.getStringOrNull(obj, "supportEmail")
       val supportsReservations =
         JSONParserUtilities.getBooleanDefault(obj, "supportsReservations", false)
-      val isProduction =
-        JSONParserUtilities.getBooleanDefault(obj, "isProduction", false)
-      val idNumeric =
-        JSONParserUtilities.getIntegerDefault(obj, "idNumeric", -1)
 
       val updated =
         JSONParserUtilities.getStringOrNull(obj, "updated")
-          ?.let { text -> DateTime.parse(text) }
-          ?: DateTime.now()
-
-      val location: AccountLibraryLocation? =
-        JSONParserUtilities.getObjectOrNull(obj, "location")
-          ?.let(this::parseLocation)
+          ?.let { text -> OffsetDateTime.parse(text) }
+          ?: OffsetDateTime.now()
 
       return AccountProvider(
-        addAutomatically = addAutomatically,
         alternateURI = alternateURI,
         announcements = announcements,
         authentication = authentication,
@@ -285,11 +267,8 @@ object AccountProvidersJSON {
         displayName = displayName,
         eula = eula,
         id = idUUID,
-        idNumeric = idNumeric,
-        isProduction = isProduction,
         license = license,
         loansURI = loansURI,
-        location = location,
         logo = logo,
         mainColor = mainColor,
         patronSettingsURI = patronSettingsURI,
@@ -303,43 +282,6 @@ object AccountProvidersJSON {
     } catch (e: JSONParseException) {
       throw JSONParseException("Unable to parse provider $idUUID", e)
     }
-  }
-
-  private fun parseLocation(
-    obj: ObjectNode
-  ): AccountLibraryLocation {
-    val distanceObj =
-      JSONParserUtilities.getObjectOrNull(obj, "distance")
-
-    val distance =
-      if (distanceObj != null) {
-        val distanceLength =
-          JSONParserUtilities.getDouble(distanceObj, "length")
-        val distanceUnit =
-          JSONParserUtilities.getString(distanceObj, "unit")
-        AccountDistance(
-          length = distanceLength,
-          unit = AccountDistanceUnit.valueOf(distanceUnit)
-        )
-      } else {
-        null
-      }
-
-    val latLong =
-      JSONParserUtilities.getObjectOrNull(obj, "latitudeLongitude")
-    if (latLong != null) {
-      val latitude =
-        JSONParserUtilities.getDouble(latLong, "latitude")
-      val longitude =
-        JSONParserUtilities.getDouble(latLong, "longitude")
-
-      return AccountLibraryLocation(
-        location = AccountGeoLocation.Coordinates(longitude, latitude),
-        distance = distance
-      )
-    }
-
-    throw JSONParseException("No recognized location type")
   }
 
   private fun parseAnnouncements(

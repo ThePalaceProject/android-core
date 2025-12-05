@@ -97,7 +97,6 @@ import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
 import org.nypl.simplified.opds.core.OPDSFeedParser
 import org.nypl.simplified.opds.core.OPDSFeedParserType
 import org.nypl.simplified.opds.core.OPDSSearchParser
-import org.nypl.simplified.opds2.irradia.OPDS2ParsersIrradia
 import org.nypl.simplified.patron.PatronUserProfileParsers
 import org.nypl.simplified.patron.api.PatronUserProfileParsersType
 import org.nypl.simplified.profiles.ProfilesDatabases
@@ -128,6 +127,7 @@ import org.thepalaceproject.db.api.DBParameters
 import org.thepalaceproject.db.api.DBType
 import org.thepalaceproject.opds.client.OPDSClient
 import org.thepalaceproject.opds.client.OPDSClientParameters
+import org.thepalaceproject.opds2.pwp.OPDS2ParsersPWP
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -734,7 +734,7 @@ internal object MainServices {
       addService(
         message = strings.bootingGeneral("account provider parsers"),
         interfaceType = AccountProviderDescriptionCollectionParsersType::class.java,
-        serviceConstructor = { AccountProviderDescriptionCollectionParsers(OPDS2ParsersIrradia) }
+        serviceConstructor = { AccountProviderDescriptionCollectionParsers(OPDS2ParsersPWP) }
       )
 
     val accountProviderSerializers =

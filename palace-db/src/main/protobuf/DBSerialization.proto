@@ -2,25 +2,6 @@ syntax = "proto3";
 
 package org.thepalaceproject.db.internal.generated;
 
-enum DBSAccountDistanceUnit1 {
-  KILOMETERS = 0;
-}
-
-message DBSAccountDistance1 {
-  double length = 1;
-  DBSAccountDistanceUnit1 unit = 2;
-}
-
-message DBSAccountGeoLocation1 {
-  double longitude = 1;
-  double latitude = 2;
-}
-
-message DBSAccountLibraryLocation1 {
-  DBSAccountGeoLocation1 location = 1;
-  DBSAccountDistance1 distance = 2;
-}
-
 message DBSLink1 {
   string type = 1;
   string relation = 2;
@@ -40,7 +21,4 @@ message DBSAccountProviderDescription1 {
   string updated = 4;
   repeated DBSLink1 links = 5;
   repeated DBSLink1 images = 6;
-  bool is_automatic = 7;
-  bool is_production = 8;
-  DBSAccountLibraryLocation1 location = 9;
 }

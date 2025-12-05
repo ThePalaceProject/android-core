@@ -12,6 +12,8 @@ import org.nypl.simplified.books.book_database.api.BookDatabaseType
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URI
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import java.util.UUID
 
 class MockAccount(override val id: AccountID) : AccountType {
@@ -56,7 +58,6 @@ class MockAccount(override val id: AccountID) : AccountType {
         )
 
       AccountProvider(
-        addAutomatically = false,
         announcements = emptyList(),
         authentication = authentication,
         authenticationAlternatives = listOf(),
@@ -67,8 +68,6 @@ class MockAccount(override val id: AccountID) : AccountType {
         displayName = "Library ${this.id.uuid}",
         eula = null,
         id = URI.create("urn:uuid:${this.providerId}"),
-        idNumeric = -1,
-        isProduction = true,
         license = null,
         logo = null,
         mainColor = "red",
@@ -79,8 +78,7 @@ class MockAccount(override val id: AccountID) : AccountType {
         subtitle = "Library ${this.id.uuid} Subtitle!",
         supportEmail = null,
         supportsReservations = false,
-        updated = DateTime(),
-        location = null,
+        updated = OffsetDateTime.now(ZoneOffset.UTC),
         alternateURI = URI.create("https://www.example.com/alternate")
       )
     }

@@ -7,13 +7,9 @@ import io.reactivex.subjects.Subject
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentialsStoreType
 import org.nypl.simplified.accounts.api.AccountBundledCredentialsType
 import org.nypl.simplified.accounts.api.AccountEvent
-import org.nypl.simplified.accounts.api.AccountEventCreation.AccountEventCreationFailed
-import org.nypl.simplified.accounts.api.AccountEventCreation.AccountEventCreationInProgress
-import org.nypl.simplified.accounts.api.AccountLoginState
 import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.database.api.AccountsDatabaseException
 import org.nypl.simplified.accounts.database.api.AccountsDatabaseFactoryType
-import org.nypl.simplified.accounts.database.api.AccountsDatabaseOpenException
 import org.nypl.simplified.accounts.database.api.AccountsDatabaseType
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.analytics.api.AnalyticsType
@@ -31,7 +27,6 @@ import org.nypl.simplified.profiles.api.ProfilePreferences
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType.AnonymousProfileEnabled.ANONYMOUS_PROFILE_ENABLED
 import org.nypl.simplified.reader.api.ReaderPreferences
-import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
@@ -83,7 +78,6 @@ object ProfilesDatabases {
       analytics = analytics,
       accountEvents = accountEvents,
       accountProviders = accountProviders,
-      accountBundledCredentials = accountBundledCredentials,
       accountCredentialsStore = accountCredentialsStore,
       accountsDatabases = accountsDatabases,
       bookFormatSupport = bookFormatSupport,
@@ -125,7 +119,6 @@ object ProfilesDatabases {
     analytics: AnalyticsType,
     accountEvents: Subject<AccountEvent>,
     accountProviders: AccountProviderRegistryType,
-    accountBundledCredentials: AccountBundledCredentialsType,
     accountCredentialsStore: AccountAuthenticationCredentialsStoreType,
     accountsDatabases: AccountsDatabaseFactoryType,
     bookFormatSupport: BookFormatSupportType,
@@ -153,7 +146,6 @@ object ProfilesDatabases {
             accountEvents = accountEvents,
             accountProviders = accountProviders,
             accountsDatabases = accountsDatabases,
-            accountBundledCredentials = accountBundledCredentials,
             accountCredentialsStore = accountCredentialsStore,
             bookFormatSupport = bookFormatSupport,
             jom = jom,
@@ -196,7 +188,6 @@ object ProfilesDatabases {
       analytics = analytics,
       accountEvents = accountEvents,
       accountProviders = accountProviders,
-      accountBundledCredentials = accountBundledCredentials,
       accountCredentialsStore = accountCredentialsStore,
       accountsDatabases = accountsDatabases,
       bookFormatSupport = bookFormatSupport,
@@ -336,7 +327,6 @@ object ProfilesDatabases {
     accountEvents: Subject<AccountEvent>,
     accountProviders: AccountProviderRegistryType,
     accountsDatabases: AccountsDatabaseFactoryType,
-    accountBundledCredentials: AccountBundledCredentialsType,
     accountCredentialsStore: AccountAuthenticationCredentialsStoreType,
     bookFormatSupport: BookFormatSupportType,
     jom: ObjectMapper,
@@ -371,14 +361,6 @@ object ProfilesDatabases {
             directory = profileAccountsDir,
             directoryGraveyard = profileAccountsGraveyardDir
           )
-
-        this.createAutomaticAccounts(
-          accounts = accounts,
-          accountEvents = accountEvents,
-          accountBundledCredentials = accountBundledCredentials,
-          accountProviders = accountProviders,
-          profile = profileId
-        )
 
         if (accounts.accounts().isEmpty()) {
           this.logger.debug("profile is empty, creating a default account")
@@ -474,14 +456,6 @@ object ProfilesDatabases {
             directoryGraveyard = profileAccountsGraveyardDir
           )
 
-        this.createAutomaticAccounts(
-          accounts = accounts,
-          accountEvents = accountEvents,
-          accountBundledCredentials = accountBundledCredentials,
-          accountProviders = accountProviders,
-          profile = id
-        )
-
         /*
          * Create an account, unless one already exists for this provider
          */
@@ -526,121 +500,6 @@ object ProfilesDatabases {
       this.logger.error("[{}]: error writing profile data: ", id.uuid, e)
       throw ProfileDatabaseIOException("Could not write profile data", e)
     }
-  }
-
-  /**
-   * Create an account for all of the providers that are marked as "add automatically".
-   */
-
-  @Throws(AccountsDatabaseException::class)
-  private fun createAutomaticAccounts(
-    accounts: AccountsDatabaseType,
-    accountEvents: Subject<AccountEvent>,
-    accountBundledCredentials: AccountBundledCredentialsType,
-    accountProviders: AccountProviderRegistryType,
-    profile: ProfileID
-  ) {
-    val pId = profile.uuid
-    this.logger.debug("[{}]: creating automatic accounts", pId)
-
-    try {
-      val autoProviders =
-        this.findAndResolveAutomaticProviders(
-          profile = profile,
-          accountEvents = accountEvents,
-          accountProviders = accountProviders
-        )
-
-      this.logger.debug("[{}]: {} automatic account providers available", pId, autoProviders.size)
-
-      for (autoProvider in autoProviders) {
-        val id = autoProvider.id
-        this.logger.debug("[{}]: account provider {} should be added automatically", pId, id)
-
-        val accountsByProvider = accounts.accountsByProvider()
-        val autoAccount =
-          if (accountsByProvider.containsKey(id)) {
-            this.logger.debug("[{}]: automatic account {} already exists", pId, id)
-            accountsByProvider[id]!!
-          } else {
-            this.logger.debug("[{}]: adding automatic account {}", pId, id)
-            accounts.createAccount(autoProvider)
-          }
-
-        val credentials =
-          accountBundledCredentials.bundledCredentialsFor(id)
-
-        if (credentials != null) {
-          this.logger.debug("[{}]: credentials for automatic account {} were provided", pId, id)
-          autoAccount.setLoginState(AccountLoginState.AccountLoggedIn(credentials))
-        } else {
-          this.logger.debug("[{}]: credentials for automatic account {} were not provided", pId, id)
-        }
-      }
-    } catch (e: Exception) {
-      this.logger.error("[{}]: error creating automatic accounts: ", pId, e)
-      throw AccountsDatabaseOpenException(e.message, listOf(e))
-    }
-  }
-
-  private fun findAndResolveAutomaticProviders(
-    profile: ProfileID,
-    accountEvents: Subject<AccountEvent>,
-    accountProviders: AccountProviderRegistryType
-  ): List<AccountProviderType> {
-    this.logger.debug("[{}]: resolving automatic account providers", profile.uuid)
-
-    val resolvedProviders = mutableListOf<AccountProviderType>()
-    for (entry in accountProviders.accountProviderDescriptions()) {
-      val description = entry.value
-      if (description.isAutomatic) {
-        this.logger.debug(
-          "[{}]: resolving automatic account provider {}",
-          profile.uuid, description.id
-        )
-
-        val resolutionResult =
-          accountProviders.resolve(
-            { _, message ->
-              accountEvents.onNext(AccountEventCreationInProgress(message))
-            },
-            description
-          )
-
-        when (resolutionResult) {
-          is TaskResult.Success -> {
-            this.logger.debug(
-              "[{}]: resolved automatic account provider {}",
-              profile.uuid, description.id
-            )
-            resolvedProviders.add(resolutionResult.result)
-          }
-          is TaskResult.Failure -> {
-            this.logger.error(
-              "[{}]: failed to resolve automatic account provider {}",
-              profile.uuid, description.id
-            )
-            publishResolutionError(accountEvents, resolutionResult)
-          }
-        }
-      }
-    }
-
-    this.logger.debug("[{}]: resolved {} account providers", profile.uuid, resolvedProviders.size)
-    return resolvedProviders
-  }
-
-  private fun publishResolutionError(
-    accountEvents: Subject<AccountEvent>,
-    resolutionResult: TaskResult.Failure<AccountProviderType>
-  ) {
-    val failure: TaskResult.Failure<Any> =
-      TaskResult.Failure(
-        steps = resolutionResult.steps,
-        attributes = resolutionResult.attributes
-      )
-
-    accountEvents.onNext(AccountEventCreationFailed(failure))
   }
 
   @Throws(IOException::class)

@@ -12,6 +12,7 @@ dependencies {
     implementation(project(":palace-opds-auth-document-api"))
     implementation(project(":palace-opds2-irradia"))
     implementation(project(":palace-opds2-parser-api"))
+    implementation(project(":palace-opds2-pwp"))
     implementation(project(":palace-parser-api"))
     implementation(project(":palace-presentableerror-api"))
     implementation(project(":palace-taskrecorder-api"))
