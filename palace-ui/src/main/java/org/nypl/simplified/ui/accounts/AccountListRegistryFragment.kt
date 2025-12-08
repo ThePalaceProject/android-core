@@ -26,6 +26,7 @@ import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.accounts.api.AccountEventCreation
 import org.nypl.simplified.accounts.api.AccountProviderDescription
+import org.nypl.simplified.accounts.database.api.AccountsDatabaseDuplicateProviderException
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
@@ -329,6 +330,10 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry), Ma
       }
 
       is AccountEventCreation.AccountEventCreationFailed -> {
+        if (event.exception is AccountsDatabaseDuplicateProviderException) {
+          MainNavigation.Settings.goUp()
+          return
+        }
         this.showAccountCreationFailedDialog(event)
       }
     }
