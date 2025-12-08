@@ -887,8 +887,14 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2025-11-28T10:53:41+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.21.0">
-      <c:changes/>
+    <c:release date="2025-12-08T14:11:45+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.21.0">
+      <c:changes>
+        <c:change date="2025-12-08T14:11:45+00:00" summary="Ensure library titles are fully displayed in the toolbar.">
+          <c:tickets>
+            <c:ticket id="PP-3378"/>
+          </c:tickets>
+        </c:change>
+      </c:changes>
     </c:release>
   </c:releases>
   <c:ticket-systems>
