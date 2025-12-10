@@ -144,7 +144,6 @@ class BorrowTask private constructor(
   private fun executeStart(start: BorrowRequest.Start): TaskResult<*> {
     this.taskRecorder.addAttribute("Book", start.opdsAcquisitionFeedEntry.title)
     this.taskRecorder.addAttribute("Author", start.opdsAcquisitionFeedEntry.authorsCommaSeparated)
-    this.taskRecorder.addAttribute("Profile ID", start.profileId.toString())
 
     this.publishRequestingDownload(this.bookId)
 
