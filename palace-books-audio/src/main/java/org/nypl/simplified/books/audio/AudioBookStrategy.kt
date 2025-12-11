@@ -11,9 +11,11 @@ import org.librarysimplified.audiobook.license_check.api.LicenseCheckResult
 import org.librarysimplified.audiobook.license_check.api.LicenseChecks
 import org.librarysimplified.audiobook.license_check.spi.SingleLicenseCheckStatus
 import org.librarysimplified.audiobook.manifest.api.PlayerManifest
-import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentBasicCredentials
 import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentBasicParameters
 import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentBasicType
+import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentCredentialsBasic
+import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentCredentialsToken
+import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentCredentialsType
 import org.librarysimplified.audiobook.manifest_fulfill.opa.OPAManifestFulfillmentStrategyProviderType
 import org.librarysimplified.audiobook.manifest_fulfill.opa.OPAManifestURI
 import org.librarysimplified.audiobook.manifest_fulfill.opa.OPAParameters
@@ -294,38 +296,28 @@ class AudioBookStrategy(
   ): TaskResult<AudioBookManifestData> {
     this.taskRecorder.beginNewStep("Retrieving manifest via LCP license.")
 
-    val credentials: ManifestFulfillmentBasicCredentials? =
+    val credentials: ManifestFulfillmentCredentialsType? =
       when (val c = this.request.credentials) {
         is AccountAuthenticationCredentials.Basic -> {
-          ManifestFulfillmentBasicCredentials(
+          ManifestFulfillmentCredentialsBasic(
             userName = c.userName.value,
             password = c.password.value
           )
         }
 
         is AccountAuthenticationCredentials.BasicToken -> {
-          ManifestFulfillmentBasicCredentials(
+          ManifestFulfillmentCredentialsBasic(
             userName = c.userName.value,
             password = c.password.value
           )
         }
 
         is AccountAuthenticationCredentials.OAuthWithIntermediary -> {
-          this.taskRecorder.currentStepFailed(
-            message = "Using bearer token authentication to retrieve manifests from licenses is not yet supported.",
-            errorCode = "errorUnsupported",
-            extraMessages = listOf()
-          )
-          return this.taskRecorder.finishFailure()
+          ManifestFulfillmentCredentialsToken(c.accessToken)
         }
 
         is AccountAuthenticationCredentials.SAML2_0 -> {
-          this.taskRecorder.currentStepFailed(
-            message = "Using bearer token authentication to retrieve manifests from licenses is not yet supported.",
-            errorCode = "errorUnsupported",
-            extraMessages = listOf()
-          )
-          return this.taskRecorder.finishFailure()
+          ManifestFulfillmentCredentialsToken(c.accessToken)
         }
 
         null -> {
@@ -563,29 +555,25 @@ class AudioBookStrategy(
           uri = targetURI,
           credentials = when (val c = this.request.credentials) {
             is AccountAuthenticationCredentials.Basic -> {
-              ManifestFulfillmentBasicCredentials(
+              ManifestFulfillmentCredentialsBasic(
                 userName = c.userName.value,
                 password = c.password.value
               )
             }
 
             is AccountAuthenticationCredentials.BasicToken -> {
-              ManifestFulfillmentBasicCredentials(
+              ManifestFulfillmentCredentialsBasic(
                 userName = c.userName.value,
                 password = c.password.value
               )
             }
 
             is AccountAuthenticationCredentials.OAuthWithIntermediary -> {
-              throw UnsupportedOperationException(
-                "Can't use OAuth tokens for Basic fulfillment"
-              )
+              ManifestFulfillmentCredentialsToken(c.accessToken)
             }
 
             is AccountAuthenticationCredentials.SAML2_0 -> {
-              throw UnsupportedOperationException(
-                "Can't use SAML tokens for Basic fulfillment"
-              )
+              ManifestFulfillmentCredentialsToken(c.accessToken)
             }
 
             null -> null
