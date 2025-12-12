@@ -79,7 +79,6 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
       SplashModel.SplashScreenStatus.SPLASH_SCREEN_AWAITING_BOOT,
       SplashModel.SplashScreenStatus.SPLASH_SCREEN_NOTIFICATIONS,
-      SplashModel.SplashScreenStatus.SPLASH_SCREEN_TUTORIAL,
       SplashModel.SplashScreenStatus.SPLASH_SCREEN_LIBRARY_SELECTOR -> {
         // No need to do anything.
       }

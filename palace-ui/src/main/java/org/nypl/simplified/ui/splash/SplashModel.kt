@@ -55,12 +55,6 @@ object SplashModel {
     SPLASH_SCREEN_NOTIFICATIONS,
 
     /**
-     * The splash screen is showing the tutorial.
-     */
-
-    SPLASH_SCREEN_TUTORIAL,
-
-    /**
      * The user is being asked to select a library.
      */
 
@@ -98,7 +92,7 @@ object SplashModel {
   fun splashScreenCompleteNotifications(
     profiles: ProfilesControllerType
   ) {
-    this.splashScreenStatusActual.set(SplashScreenStatus.SPLASH_SCREEN_TUTORIAL)
+    this.splashScreenStatusActual.set(SplashScreenStatus.SPLASH_SCREEN_LIBRARY_SELECTOR)
 
     profiles.profileUpdate { description ->
       description.copy(

@@ -41,7 +41,6 @@ class SettingsDebugMenuStartupFragment : Fragment(R.layout.debug_startup),
   }
 
   private lateinit var hasSeenNotifications: SwitchCompat
-  private lateinit var hasSeenTutorial: SwitchCompat
   private lateinit var failNextBoot: SwitchCompat
   private lateinit var toolbarBack: View
 
@@ -62,14 +61,6 @@ class SettingsDebugMenuStartupFragment : Fragment(R.layout.debug_startup),
       SettingsDebugModel.isBootFailureEnabled
     this.failNextBoot.setOnCheckedChangeListener { _, checked ->
       SettingsDebugModel.isBootFailureEnabled = checked
-    }
-
-    this.hasSeenTutorial =
-      view.findViewById(R.id.debugStartupSeenTutorial)
-    this.hasSeenTutorial.isChecked =
-      SettingsDebugModel.hasSeenLibrarySelection()
-    this.hasSeenTutorial.setOnCheckedChangeListener { _, checked ->
-      SettingsDebugModel.updatePreferences { p -> p.copy(hasSeenLibrarySelectionScreen = checked) }
     }
 
     this.hasSeenNotifications =

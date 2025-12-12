@@ -1,9 +1,7 @@
 package org.nypl.simplified.ui.splash
 
 import android.app.Activity
-import android.graphics.Matrix
 import android.os.Bundle
-import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,10 +12,8 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.constraintlayout.widget.Group
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.core.widget.ContentLoadingProgressBar
 import androidx.core.widget.addTextChangedListener
@@ -51,7 +47,6 @@ import org.nypl.simplified.ui.splash.SplashModel.SplashScreenStatus.SPLASH_SCREE
 import org.nypl.simplified.ui.splash.SplashModel.SplashScreenStatus.SPLASH_SCREEN_COMPLETED
 import org.nypl.simplified.ui.splash.SplashModel.SplashScreenStatus.SPLASH_SCREEN_LIBRARY_SELECTOR
 import org.nypl.simplified.ui.splash.SplashModel.SplashScreenStatus.SPLASH_SCREEN_NOTIFICATIONS
-import org.nypl.simplified.ui.splash.SplashModel.SplashScreenStatus.SPLASH_SCREEN_TUTORIAL
 import org.slf4j.LoggerFactory
 
 class SplashFragment : Fragment(), MainBackButtonConsumerType {
@@ -66,8 +61,6 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
   private lateinit var splashHolder: ViewGroup
   private lateinit var splashViewRoot: ViewGroup
   private lateinit var splashViews: SplashViews
-  private lateinit var tutorialViewRoot: ViewGroup
-  private lateinit var tutorialViews: TutorialViews
 
   private var subscriptions: CloseableCollectionType<ClosingResourceFailedException> =
     CloseableCollection.create()
@@ -84,18 +77,6 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
       inflater.inflate(R.layout.splash_boot, container, false) as ViewGroup
     this.splashViews =
       SplashViews(this.splashViewRoot)
-
-    this.tutorialViewRoot =
-      inflater.inflate(R.layout.splash_tutorial, container, false) as ViewGroup
-    this.tutorialViews =
-      TutorialViews(this.tutorialViewRoot) {
-        val services =
-          Services.serviceDirectory()
-        val profiles =
-          services.requireService(ProfilesControllerType::class.java)
-
-        SplashModel.splashScreenCompleteTutorial(profiles)
-      }
 
     this.splashNotificationsViewRoot =
       inflater.inflate(R.layout.splash_notifications, container, false) as ViewGroup
@@ -233,110 +214,6 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
     }
   }
 
-  private data class TutorialViews(
-    private val root: ViewGroup,
-    private val onTutorialFinished: () -> Unit
-  ) {
-    val tutorialSkip =
-      this.root.findViewById<View>(R.id.tutorialSkipTouch)
-    val tutorialNext =
-      this.root.findViewById<View>(R.id.tutorialPageNextTouch)
-    val tutorialPrevious =
-      this.root.findViewById<View>(R.id.tutorialPagePreviousTouch)
-    val tutorialStep1Group =
-      this.root.findViewById<Group>(R.id.tutorialStep1Group)
-    val tutorialStep2Group =
-      this.root.findViewById<Group>(R.id.tutorialStep2Group)
-    val tutorialStep3Group =
-      this.root.findViewById<Group>(R.id.tutorialStep3Group)
-    val tutorialPhoneImage =
-      this.root.findViewById<ImageView>(R.id.tutorialPhoneBackgroundView)
-    val tutorialStep2Text =
-      this.root.findViewById<TextView>(R.id.tutorialStep2Text1)
-
-    init {
-      this.tutorialStep1Group.visibility = View.VISIBLE
-      this.tutorialStep2Group.visibility = View.INVISIBLE
-      this.tutorialStep3Group.visibility = View.INVISIBLE
-
-      val step2Text = StringBuilder()
-      step2Text.append("<br/>")
-      step2Text.append(root.context.getString(R.string.splashStep2TextSegment1))
-      step2Text.append("<br/>")
-      step2Text.append(root.context.getString(R.string.splashStep2TextSegment2))
-      step2Text.append("<br/>")
-      step2Text.append("<font color=\"#2126ad\">")
-      step2Text.append(root.context.getString(R.string.splashStep2TextSegment3))
-      step2Text.append("</font>")
-      step2Text.append("<br/>")
-      step2Text.append(root.context.getString(R.string.splashStep2TextSegment4))
-
-      this.tutorialStep2Text.text =
-        Html.fromHtml(step2Text.toString(), Html.FROM_HTML_MODE_LEGACY)
-
-      /*
-       * Set a custom image scaling matrix that will scale the image from the top-left
-       * corner. This ensures the width of the image always matches the image view, and
-       * the image expands off the page downwards.
-       */
-
-      this.tutorialPhoneImage.doOnLayout {
-        val drawable = this.tutorialPhoneImage.drawable
-        val matrix = Matrix()
-        val scale = this.tutorialPhoneImage.width.toFloat() / drawable.intrinsicWidth
-        matrix.setScale(scale, scale)
-        this.tutorialPhoneImage.imageMatrix = matrix
-      }
-
-      this.tutorialSkip.setOnClickListener {
-        this.onTutorialFinished.invoke()
-      }
-      this.tutorialNext.setOnClickListener {
-        val nextIndex = SplashTutorialModel.pageNext()
-        if (nextIndex == null) {
-          this.onTutorialFinished.invoke()
-          return@setOnClickListener
-        }
-        this.showViewsForIndex(nextIndex)
-      }
-      this.tutorialPrevious.setOnClickListener {
-        this.showViewsForIndex(SplashTutorialModel.pagePrevious())
-      }
-
-      this.showViewsForIndex(0)
-    }
-
-    private fun showViewsForIndex(
-      index: Int
-    ) {
-      when (index) {
-        0 -> {
-          this.tutorialPrevious.visibility = View.INVISIBLE
-          this.tutorialNext.visibility = View.VISIBLE
-          this.tutorialStep1Group.visibility = View.VISIBLE
-          this.tutorialStep2Group.visibility = View.INVISIBLE
-          this.tutorialStep3Group.visibility = View.INVISIBLE
-        }
-
-        1 -> {
-          this.tutorialPrevious.visibility = View.VISIBLE
-          this.tutorialNext.visibility = View.VISIBLE
-          this.tutorialStep1Group.visibility = View.INVISIBLE
-          this.tutorialStep2Group.visibility = View.VISIBLE
-          this.tutorialStep3Group.visibility = View.INVISIBLE
-        }
-
-        2 -> {
-          this.tutorialPrevious.visibility = View.VISIBLE
-          this.tutorialNext.visibility = View.VISIBLE
-          this.tutorialStep1Group.visibility = View.INVISIBLE
-          this.tutorialStep2Group.visibility = View.INVISIBLE
-          this.tutorialStep3Group.visibility = View.VISIBLE
-        }
-      }
-    }
-  }
-
   private data class SplashViews(
     private val root: ViewGroup
   ) {
@@ -358,8 +235,6 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
 
   override fun onStart() {
     super.onStart()
-
-    SplashTutorialModel.pageReset()
 
     this.splashViews.splashImage.setImageResource(R.drawable.main_splash)
     this.splashViews.splashImageError.visibility = View.INVISIBLE
@@ -419,19 +294,6 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
         }
       }
 
-      SPLASH_SCREEN_TUTORIAL -> {
-        val services =
-          Services.serviceDirectory()
-        val profiles =
-          services.requireService(ProfilesControllerType::class.java)
-
-        if (SplashModel.userHasCompletedTutorial(profiles)) {
-          SplashModel.splashScreenCompleteTutorial(profiles)
-        } else {
-          this.openTutorial()
-        }
-      }
-
       SPLASH_SCREEN_LIBRARY_SELECTOR -> {
         val services =
           Services.serviceDirectory()
@@ -459,11 +321,6 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
   private fun openNotifications() {
     this.splashHolder.removeAllViews()
     this.splashHolder.addView(this.splashNotificationsViewRoot)
-  }
-
-  private fun openTutorial() {
-    this.splashHolder.removeAllViews()
-    this.splashHolder.addView(this.tutorialViewRoot)
   }
 
   private fun onBootEvent(
