@@ -57,7 +57,6 @@ import org.nypl.simplified.ui.catalog.saml20.CatalogSAML20Activity
 import org.nypl.simplified.ui.catalog.saml20.CatalogSAML20Model
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.images.ImageLoaderType
-import org.nypl.simplified.ui.main.MainApplication
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_CONSUMED
@@ -693,12 +692,6 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
 
       val canGoBack =
         this.opdsClient.hasHistory
-      val title =
-        if (canGoBack) {
-          feed.feedTitle
-        } else {
-          this.resources.getString(R.string.catalog)
-        }
 
       view.toolbar.configure(
         account = account,
@@ -788,7 +781,6 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
         onSearchSubmitted = this::onSearchSubmitted,
         onToolbarBackPressed = this::onToolbarBackPressed,
         onToolbarLogoPressed = { this.onToolbarLogoPressed(newState.request.accountID) },
-        onCatalogLogoClicked = { this.onCatalogLogoClicked(account.provider.alternateURI) },
         window = this.requireActivity().window,
       )
 
@@ -950,14 +942,6 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     }
   }
 
-  private fun onCatalogLogoClicked(
-    alternateURI: URI?
-  ) {
-    if (alternateURI != null) {
-      MainNavigation.openExternalBrowser(this.requireActivity(), alternateURI)
-    }
-  }
-
   private fun onSearchSubmitted(
     accountID: AccountID,
     feedSearch: FeedSearch,
@@ -970,9 +954,6 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
       Services.serviceDirectory()
     val profiles =
       services.requireService(ProfilesControllerType::class.java)
-    val resources =
-      MainApplication.application.resources
-
     val credentials =
       this.credentialsOf(accountID)
 

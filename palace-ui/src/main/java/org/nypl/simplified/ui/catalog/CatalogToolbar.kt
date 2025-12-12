@@ -62,9 +62,11 @@ class CatalogToolbar(
             iconView = this.textIconView
           )
         }
+
         BOOKS -> {
           this.textContainer.visibility = View.INVISIBLE
         }
+
         HOLDS -> {
           this.textContainer.visibility = View.INVISIBLE
         }
@@ -87,16 +89,20 @@ class CatalogToolbar(
         }
 
         this.searchText.setOnEditorActionListener { v, actionId, event ->
-          return@setOnEditorActionListener if (actionId == EditorInfo.IME_ACTION_DONE) {
+          /*
+           * On Chromebooks, pressing Enter in a text field returns IME_ACTION_UNSPECIFIED.
+           */
+          if (actionId == EditorInfo.IME_ACTION_DONE ||
+            actionId == EditorInfo.IME_ACTION_UNSPECIFIED
+          ) {
             val queryText = this.searchText.text.trim().toString()
             this.keyboardHide()
             if (queryText.isNotBlank()) {
               this.onSearchSubmitted(account.id, search, queryText)
             }
-            true
-          } else {
-            false
+            return@setOnEditorActionListener true
           }
+          return@setOnEditorActionListener false
         }
       } else {
         this.searchTouch.visibility = View.GONE

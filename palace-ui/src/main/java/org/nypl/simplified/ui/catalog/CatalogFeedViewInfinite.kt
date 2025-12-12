@@ -33,7 +33,6 @@ class CatalogFeedViewInfinite(
   private val catalogPart: CatalogPart,
   private val onFacetSelected: (FeedFacet) -> Unit,
   private val onSearchSubmitted: (AccountID, FeedSearch, String) -> Unit,
-  private val onCatalogLogoClicked: () -> Unit,
   private val onToolbarBackPressed: () -> Unit,
   private val onToolbarLogoPressed: () -> Unit,
   private val window: Window,
@@ -110,8 +109,7 @@ class CatalogFeedViewInfinite(
       onFacetSelected: (FeedFacet) -> Unit,
       onSearchSubmitted: (AccountID, FeedSearch, String) -> Unit,
       onToolbarBackPressed: () -> Unit,
-      onToolbarLogoPressed: () -> Unit,
-      onCatalogLogoClicked: () -> Unit
+      onToolbarLogoPressed: () -> Unit
     ): CatalogFeedViewInfinite {
       return CatalogFeedViewInfinite(
         catalogPart = catalogPart,
@@ -121,8 +119,7 @@ class CatalogFeedViewInfinite(
         onToolbarLogoPressed = onToolbarLogoPressed,
         root = layoutInflater.inflate(R.layout.catalog_feed_infinite, container, true) as ViewGroup,
         layoutInflater = layoutInflater,
-        window = window,
-        onCatalogLogoClicked = onCatalogLogoClicked
+        window = window
       )
     }
   }
