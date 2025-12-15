@@ -8,10 +8,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
@@ -81,6 +84,22 @@ class AccountPickerDialogFragment : BottomSheetDialogFragment(), OnAccountClickL
     this.accounts =
       accountsMap.values.toList()
         .sortedWith(AccountComparator())
+  }
+
+  override fun onStart() {
+    super.onStart()
+    /*
+     * On large screens, the bottom sheet dialog doesn't fully open at first. We have to
+     * override the behavior to get it to fully open.
+     */
+    val dialog = dialog as? BottomSheetDialog ?: return
+    val bottomSheet = dialog.findViewById<FrameLayout>(
+      com.google.android.material.R.id.design_bottom_sheet
+    ) ?: return
+
+    val behavior = BottomSheetBehavior.from(bottomSheet)
+    behavior.state = BottomSheetBehavior.STATE_EXPANDED
+    behavior.skipCollapsed = true
   }
 
   override fun onCreateView(
