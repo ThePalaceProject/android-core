@@ -15,6 +15,7 @@ import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.threads.UIThread
+import org.nypl.simplified.ui.saml.SAMLWebViews
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URI
@@ -129,6 +130,7 @@ object AccountSAML20Model {
       )
 
     val view = WebView(application)
+    SAMLWebViews.clearWebViewState(view)
     view.webViewClient = webClient
     view.settings.javaScriptEnabled = true
 

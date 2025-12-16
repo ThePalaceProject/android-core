@@ -6,6 +6,7 @@ import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import com.io7m.jmulticlose.core.CloseableCollection
 import org.librarysimplified.ui.R
+import org.nypl.simplified.ui.saml.SAMLWebViews
 import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
 import org.nypl.simplified.webview.WebViewUtilities
 
@@ -42,6 +43,7 @@ class CatalogSAML20Activity : AppCompatActivity(R.layout.book_saml20) {
 
     val client = CatalogSAML20Model.client
     if (client != null) {
+      SAMLWebViews.clearWebViewState(this.webView)
       this.webView.webChromeClient = CatalogSAML20ChromeClient(this.progress)
       this.webView.webViewClient = client
       this.webView.settings.javaScriptEnabled = true
