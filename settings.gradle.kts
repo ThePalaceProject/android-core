@@ -164,14 +164,6 @@ dependencyResolutionManagement {
         }
 
         /*
-         * Allow access to Jitpack. This is used by, for example, Readium.
-         */
-
-        maven {
-            url = uri("https://jitpack.io/")
-        }
-
-        /*
          * Optionally enable access to the S3 repository.
          */
 
