@@ -1,5 +1,6 @@
 package org.librarysimplified.viewer.audiobook
 
+import android.app.Application
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -48,6 +49,7 @@ import org.librarysimplified.audiobook.views.PlayerPlaybackRateFragment
 import org.librarysimplified.audiobook.views.PlayerSleepTimerFragment
 import org.librarysimplified.audiobook.views.PlayerTOCFragment
 import org.librarysimplified.audiobook.views.PlayerViewCommand
+import org.librarysimplified.audiobook.views.bluetooth.PlayerBluetoothWatcher
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.bookmarks.api.BookmarkServiceType
 import org.nypl.simplified.bookmarks.api.BookmarksForBook
@@ -114,6 +116,8 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
 
   override fun onStart() {
     super.onStart()
+
+    PlayerBluetoothWatcher.enable(this.application)
 
     this.subscriptions = CompositeDisposable()
     this.subscriptions.add(PlayerModel.stateEvents.subscribe(this::onModelStateEvent))
