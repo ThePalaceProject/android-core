@@ -1,6 +1,5 @@
 package org.librarysimplified.viewer.audiobook
 
-import android.app.Application
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast

@@ -922,18 +922,19 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2025-12-17T14:16:07+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.22.0">
+    <c:release date="2025-12-18T14:18:01+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.22.0">
       <c:changes>
         <c:change date="2025-12-16T00:00:00+00:00" summary="Ensure SAML web views start from a clean slate every time.">
           <c:tickets>
             <c:ticket id="PP-3421"/>
           </c:tickets>
         </c:change>
-        <c:change date="2025-12-17T14:16:07+00:00" summary="Pause audiobooks when Bluetooth audio devices are disconnected.">
+        <c:change date="2025-12-17T00:00:00+00:00" summary="Pause audiobooks when Bluetooth audio devices are disconnected.">
           <c:tickets>
             <c:ticket id="PP-3396"/>
           </c:tickets>
         </c:change>
+        <c:change date="2025-12-18T14:18:01+00:00" summary="Ensure armeabi-v7 SQLite libraries are correctly packages."/>
       </c:changes>
     </c:release>
   </c:releases>
