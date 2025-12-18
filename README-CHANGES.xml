@@ -934,7 +934,7 @@
             <c:ticket id="PP-3396"/>
           </c:tickets>
         </c:change>
-        <c:change date="2025-12-18T14:18:01+00:00" summary="Ensure armeabi-v7 SQLite libraries are correctly packages."/>
+        <c:change date="2025-12-18T14:18:01+00:00" summary="Ensure armeabi-v7 SQLite libraries are correctly packaged."/>
       </c:changes>
     </c:release>
   </c:releases>
