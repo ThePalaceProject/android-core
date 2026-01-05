@@ -92,6 +92,7 @@
             android:ellipsize="end"
             android:hint="@string/catalogSearch"
             android:imeOptions="actionDone"
+            android:inputType="text"
             android:maxLines="1"
             android:singleLine="true"
             android:textSize="18sp"
