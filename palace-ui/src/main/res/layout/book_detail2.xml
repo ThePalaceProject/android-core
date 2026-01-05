@@ -220,11 +220,14 @@
         <Button
             android:id="@+id/bookD2ToolbarItemButton"
             style="@style/Palace.Button.Contained.Medium"
-            android:layout_width="128dp"
+            android:layout_width="176dp"
             android:layout_height="48dp"
             android:layout_marginEnd="32dp"
             android:layout_marginBottom="16dp"
-            android:text="@string/catalogGet"
+            android:autoSizeMinTextSize="14sp"
+            android:autoSizeTextType="uniform"
+            android:ellipsize="end"
+            android:text="@string/catalogDownload"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:strokeColor="@android:color/white"
@@ -333,19 +336,27 @@
             <Button
                 android:id="@+id/book2DOverlayButton0"
                 style="@style/Palace.Button.Contained.Medium"
-                android:layout_width="128dp"
+                android:layout_width="160dp"
                 android:layout_height="wrap_content"
-                android:text="@string/catalogGet" />
+                android:autoSizeMinTextSize="14sp"
+                android:autoSizeTextType="uniform"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@string/catalogDownload" />
 
             <View
-                android:layout_width="8dp"
-                android:layout_height="8dp" />
+                android:layout_width="16dp"
+                android:layout_height="16dp" />
 
             <Button
                 android:id="@+id/book2DOverlayButton1"
                 style="@style/Palace.Button.Outlined.Medium"
-                android:layout_width="128dp"
+                android:layout_width="160dp"
                 android:layout_height="wrap_content"
+                android:autoSizeMinTextSize="14sp"
+                android:autoSizeTextType="uniform"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:text="@string/catalogPreview" />
         </LinearLayout>
 
@@ -356,22 +367,24 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#7f000000"
-        android:elevation="10dp" />
+        android:elevation="10dp"
+        tools:visibility="gone" />
 
     <!-- Bottom sheet. -->
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:elevation="20dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:elevation="20dp">
 
         <org.librarysimplified.ui.bottomsheet.PalaceBottomSheet
             android:id="@+id/book2DBottomSheet"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             android:layout_width="0dp"
-            android:layout_height="wrap_content">
-            <include layout="@layout/book_detail2_drawer_content"/>
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <include layout="@layout/book_detail2_drawer_content" />
         </org.librarysimplified.ui.bottomsheet.PalaceBottomSheet>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
