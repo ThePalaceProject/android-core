@@ -922,7 +922,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-01-05T14:35:21+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.22.0">
+    <c:release date="2026-01-06T12:53:21+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.22.0">
       <c:changes>
         <c:change date="2025-12-16T00:00:00+00:00" summary="Ensure SAML web views start from a clean slate every time.">
           <c:tickets>
@@ -935,9 +935,14 @@
           </c:tickets>
         </c:change>
         <c:change date="2025-12-18T00:00:00+00:00" summary="Ensure armeabi-v7 SQLite libraries are correctly packaged."/>
-        <c:change date="2026-01-05T14:35:21+00:00" summary="WCAG audit.">
+        <c:change date="2026-01-05T00:00:00+00:00" summary="WCAG audit.">
           <c:tickets>
             <c:ticket id="PP-3379"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-01-06T12:53:21+00:00" summary="Handle manifests that have full URIs in some TOC entries.">
+          <c:tickets>
+            <c:ticket id="PP-3455"/>
           </c:tickets>
         </c:change>
       </c:changes>
