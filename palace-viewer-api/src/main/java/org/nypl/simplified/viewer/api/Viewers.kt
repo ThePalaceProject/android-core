@@ -36,6 +36,25 @@ object Viewers {
     this.services.requireService(ProfilesControllerType::class.java)
   }
 
+  private var failNextAudioBook = false
+
+  /**
+   * Set a flag that will cause the next book to fail. This is for debugging purposes
+   * in order to test failure code paths.
+   */
+
+  fun setFailNextBook(fail: Boolean) {
+    this.failNextAudioBook = fail
+  }
+
+  /**
+   * @return `true` if the next book should fail.
+   */
+
+  fun shouldFailNextBook(): Boolean {
+    return this.failNextAudioBook
+  }
+
   /**
    * Attempt to open a viewer for a given book.
    */
@@ -64,6 +83,14 @@ object Viewers {
       val viewerProvider = providers[index]
       this.logger.debug("[{}]: {}", index, viewerProvider.name)
     }
+
+    val newPreferences: ViewerPreferences =
+      if (this.shouldFailNextBook()) {
+        this.setFailNextBook(false)
+        preferences.copy(flags = preferences.flags.plus(Pair("Fail", true)))
+      } else {
+        preferences
+      }
 
     this.logger.debug("Trying all providers...")
     for (index in providers.indices) {
@@ -94,7 +121,13 @@ object Viewers {
           )
         )
 
-        viewerProvider.open(context, preferences, book, format, account.provider.id)
+        viewerProvider.open(
+          activity = context,
+          preferences = newPreferences,
+          book = book,
+          format = format,
+          accountProviderId = account.provider.id
+        )
         return
       } else {
         this.logger.debug(

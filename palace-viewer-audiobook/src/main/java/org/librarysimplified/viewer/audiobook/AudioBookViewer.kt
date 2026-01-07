@@ -3,6 +3,7 @@ package org.librarysimplified.viewer.audiobook
 import android.app.Activity
 import android.content.Intent
 import one.irradia.mime.api.MIMEType
+import org.librarysimplified.audiobook.api.PlayerBookCredentialsNone
 import org.librarysimplified.audiobook.api.PlayerUserAgent
 import org.librarysimplified.audiobook.feedbooks.FeedbooksPlayerExtension
 import org.librarysimplified.audiobook.license_check.spi.SingleLicenseCheckProviderType
@@ -22,6 +23,7 @@ import org.nypl.simplified.books.audio.AudioBookFeedbooksSecretServiceType
 import org.nypl.simplified.books.audio.AudioBookLink
 import org.nypl.simplified.books.audio.AudioBookManifestRequest
 import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
+import org.nypl.simplified.books.book_database.api.BookFormats
 import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.threads.UIThread
@@ -148,6 +150,20 @@ class AudioBookViewer : ViewerProviderType {
         accountProviderID = account.provider.id,
         drmInfo = drmInformation
       )
+
+    /*
+     * Handle failure injection. The debug menu can be configured to make audiobooks fail
+     * in order to test that we report errors properly.
+     */
+
+    if (preferences.flags["Fail"] ?: false) {
+      this.triggerFailure(
+        activity = activity,
+        userAgent = userAgent,
+        palaceID = palaceID,
+      )
+      return
+    }
 
     /*
      * We might only have a book file if the user is coming from a previous version of the app
@@ -304,6 +320,28 @@ class AudioBookViewer : ViewerProviderType {
       ),
       palaceID = palaceID,
       parserExtensions = parserExtensions,
+      userAgent = userAgent,
+    )
+    this.openActivity(activity)
+  }
+
+  private fun triggerFailure(
+    activity: Activity,
+    userAgent: PlayerUserAgent,
+    palaceID: PlayerPalaceID
+  ) {
+    PlayerModel.parseAndCheckManifest(
+      bookCredentials = PlayerBookCredentialsNone,
+      cacheDir = activity.cacheDir,
+      licenseChecks = listOf(),
+      manifest = ManifestFulfilled(
+        source = null,
+        contentType = BookFormats.audioBookGenericMimeTypes().iterator().next(),
+        authorization = null,
+        data = ByteArray(0)
+      ),
+      palaceID = palaceID,
+      parserExtensions = listOf(),
       userAgent = userAgent,
     )
     this.openActivity(activity)

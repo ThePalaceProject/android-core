@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
+import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
@@ -16,6 +17,7 @@ import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON
 import org.nypl.simplified.ui.main.MainNavigation
 import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
 import org.nypl.simplified.ui.screens.ScreenDefinitionType
+import org.nypl.simplified.viewer.api.Viewers
 
 class SettingsDebugMenuErrorsFragment : Fragment(R.layout.debug_errors),
   MainBackButtonConsumerType {
@@ -46,6 +48,7 @@ class SettingsDebugMenuErrorsFragment : Fragment(R.layout.debug_errors),
     return BACK_BUTTON_CONSUMED
   }
 
+  private lateinit var makeNextBookFail: SwitchCompat
   private lateinit var sendAnalytics: Button
   private lateinit var showErrorPage: Button
   private lateinit var sendErrorLogs: Button
@@ -64,13 +67,13 @@ class SettingsDebugMenuErrorsFragment : Fragment(R.layout.debug_errors),
     }
 
     this.sendErrorLogs =
-      view.findViewById<Button>(R.id.debugSendErrorLogs)
+      view.findViewById(R.id.debugSendErrorLogs)
     this.showErrorPage =
-      view.findViewById<Button>(R.id.debugShowErrorPage)
+      view.findViewById(R.id.debugShowErrorPage)
     this.sendAnalytics =
-      view.findViewById<Button>(R.id.debugSendAnalytics)
+      view.findViewById(R.id.debugSendAnalytics)
     this.crash =
-      view.findViewById<Button>(R.id.debugCrash)
+      view.findViewById(R.id.debugCrash)
 
     this.sendErrorLogs.setOnClickListener {
       SettingsDebugModel.sendErrorLogs()
@@ -88,6 +91,18 @@ class SettingsDebugMenuErrorsFragment : Fragment(R.layout.debug_errors),
     }
     this.crash.setOnClickListener {
       throw OutOfMemoryError("Pretending to have run out of memory!")
+    }
+
+    this.makeNextBookFail =
+      view.findViewById(R.id.debugErrorsMakeBookFail)
+  }
+
+  override fun onStart() {
+    super.onStart()
+
+    this.makeNextBookFail.isChecked = Viewers.shouldFailNextBook()
+    this.makeNextBookFail.setOnCheckedChangeListener { _, isChecked ->
+      Viewers.setFailNextBook(isChecked)
     }
   }
 

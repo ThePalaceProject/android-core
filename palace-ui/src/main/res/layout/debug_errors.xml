@@ -104,4 +104,13 @@
 
     </TableLayout>
 
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/debugErrorsMakeBookFail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:checked="false"
+        android:enabled="true"
+        android:text="Make the next book opening fail." />
+
 </LinearLayout>

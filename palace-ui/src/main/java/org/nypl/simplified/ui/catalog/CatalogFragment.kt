@@ -43,6 +43,7 @@ import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.feeds.api.FeedSearch
 import org.nypl.simplified.profiles.controller.api.ProfileFeedRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
+import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.taskrecorder.api.TaskStep
 import org.nypl.simplified.taskrecorder.api.TaskStepResolution
@@ -641,12 +642,59 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
         flags = mapOf()
       )
 
-    Viewers.openViewer(
-      context = this.requireActivity(),
-      preferences = viewerPreferences,
-      book = book,
-      format = bookFormat
-    )
+    try {
+      Viewers.openViewer(
+        context = this.requireActivity(),
+        preferences = viewerPreferences,
+        book = book,
+        format = bookFormat
+      )
+    } catch (e: Throwable) {
+      this.openErrorForBookException(book, e)
+    }
+  }
+
+  private fun openErrorForBookException(
+    book: Book,
+    e: Throwable
+  ) {
+    try {
+      val services =
+        Services.serviceDirectory()
+      val buildConfig =
+        services.requireService(BuildConfigurationServiceType::class.java)
+      val profiles =
+        services.requireService(ProfilesControllerType::class.java)
+      val account =
+        profiles.profileCurrent()
+          .account(book.account)
+
+      val task = TaskRecorder.create()
+      task.beginNewStep("Attempting to open book...")
+      task.addAttribute("BookID", book.entry.id)
+      task.addAttribute("LibraryID", account.provider.id.toString())
+      task.addAttribute("Library", account.provider.displayName)
+      task.currentStepFailed(
+        message = e.message ?: e.javaClass.name,
+        errorCode = "error-book-open-failed",
+        exception = e,
+        extraMessages = listOf()
+      )
+      val error = task.finishFailure<Unit>()
+
+      MainNavigation.openErrorPage(
+        activity = this.requireActivity(),
+        parameters = ErrorPageParameters(
+          emailAddress = buildConfig.supportErrorReportEmailAddress,
+          body = "",
+          subject = "[palace-error-report]",
+          attributes = error.attributes.toSortedMap(),
+          taskSteps = error.steps
+        )
+      )
+    } catch (e: Throwable) {
+      this.logger.error("Failed to open error page: ", e)
+    }
   }
 
   private fun onStateChangedToGroups(
