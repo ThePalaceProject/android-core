@@ -16,6 +16,7 @@ import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.taskrecorder.api.TaskStep
 import org.nypl.simplified.threads.UIThread
+import org.nypl.simplified.ui.accounts.saml20.AccountSAML20Model
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.main.MainNavigation
 import org.slf4j.LoggerFactory
@@ -52,6 +53,12 @@ object AccountDetailModel {
       Services.serviceDirectory()
     val profiles =
       services.requireService(ProfilesControllerType::class.java)
+
+    try {
+      AccountSAML20Model.clearWebViewState()
+    } catch (_: Throwable) {
+      // Ignore
+    }
 
     profiles.profileAccountLogout(this.account.id)
   }
@@ -111,7 +118,8 @@ object AccountDetailModel {
     this.clearPendingAfterLoginTask()
 
     this.executeAfterLoginSubscription.getAndSet(
-      AfterLoginTask(UUID.randomUUID(),
+      AfterLoginTask(
+        UUID.randomUUID(),
         profiles.accountEvents()
           .ofType(AccountEventLoginStateChanged::class.java)
           .filter { event -> event.accountID == accountID }

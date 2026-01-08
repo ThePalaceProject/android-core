@@ -60,6 +60,20 @@ object AccountSAML20Model {
 
   private val webView: AtomicReference<WebView> = AtomicReference()
 
+  /**
+   * Clear the state of the stored WebView reference.
+   */
+
+  fun clearWebViewState() {
+    try {
+      this.webView.get()?.let { view ->
+        SAMLWebViews.clearWebViewState(view)
+      }
+    } catch (e: Throwable) {
+      this.logger.debug("Failed to clear web view state: ", e)
+    }
+  }
+
   fun setState(newState: AccountSAML20State) {
     UIThread.runOnUIThread {
       stateAttribute.set(newState)
@@ -130,7 +144,6 @@ object AccountSAML20Model {
       )
 
     val view = WebView(application)
-    SAMLWebViews.clearWebViewState(view)
     view.webViewClient = webClient
     view.settings.javaScriptEnabled = true
 
