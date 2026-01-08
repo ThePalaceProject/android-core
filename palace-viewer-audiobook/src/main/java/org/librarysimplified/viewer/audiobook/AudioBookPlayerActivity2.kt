@@ -49,6 +49,7 @@ import org.librarysimplified.audiobook.views.PlayerSleepTimerFragment
 import org.librarysimplified.audiobook.views.PlayerTOCFragment
 import org.librarysimplified.audiobook.views.PlayerViewCommand
 import org.librarysimplified.audiobook.views.bluetooth.PlayerBluetoothWatcher
+import org.librarysimplified.audiobook.views.focus.PlayerFocusWatcher
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.bookmarks.api.BookmarkServiceType
 import org.nypl.simplified.bookmarks.api.BookmarksForBook
@@ -117,6 +118,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     super.onStart()
 
     PlayerBluetoothWatcher.enable(this.application)
+    PlayerFocusWatcher.enable(this.application)
 
     this.subscriptions = CompositeDisposable()
     this.subscriptions.add(PlayerModel.stateEvents.subscribe(this::onModelStateEvent))
