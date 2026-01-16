@@ -952,9 +952,35 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-01-14T13:05:21+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.23.0">
+    <c:release date="2026-01-16T10:04:51+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.23.0">
       <c:changes>
-        <c:change date="2026-01-14T13:05:21+00:00" summary="Fix night mode visual issues in the EPUB reader.">
+        <c:change date="2025-12-16T00:00:00+00:00" summary="Ensure SAML web views start from a clean slate every time.">
+          <c:tickets>
+            <c:ticket id="PP-3421"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2025-12-17T00:00:00+00:00" summary="Pause audiobooks when Bluetooth audio devices are disconnected.">
+          <c:tickets>
+            <c:ticket id="PP-3396"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2025-12-18T00:00:00+00:00" summary="Ensure armeabi-v7 SQLite libraries are correctly packaged."/>
+        <c:change date="2026-01-05T00:00:00+00:00" summary="WCAG audit.">
+          <c:tickets>
+            <c:ticket id="PP-3379"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-01-06T00:00:00+00:00" summary="Handle manifests that have full URIs in some TOC entries.">
+          <c:tickets>
+            <c:ticket id="PP-3455"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-01-08T00:00:00+00:00" summary="Pause audiobooks when phone calls are received.">
+          <c:tickets>
+            <c:ticket id="PP-1982"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-01-14T00:00:00+00:00" summary="Fix night mode visual issues in the EPUB reader.">
           <c:tickets>
             <c:ticket id="PP-3444"/>
             <c:ticket id="PP-3503"/>
