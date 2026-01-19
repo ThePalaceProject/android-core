@@ -952,7 +952,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-01-19T13:26:02+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.23.1">
+    <c:release date="2026-01-19T13:42:17+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.23.1">
       <c:changes>
         <c:change date="2025-12-16T00:00:00+00:00" summary="Ensure SAML web views start from a clean slate every time.">
           <c:tickets>
