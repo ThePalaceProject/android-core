@@ -336,7 +336,7 @@
             <Button
                 android:id="@+id/book2DOverlayButton0"
                 style="@style/Palace.Button.Contained.Medium"
-                android:layout_width="160dp"
+                android:layout_width="128dp"
                 android:layout_height="wrap_content"
                 android:autoSizeMinTextSize="14sp"
                 android:autoSizeTextType="uniform"
@@ -351,7 +351,7 @@
             <Button
                 android:id="@+id/book2DOverlayButton1"
                 style="@style/Palace.Button.Outlined.Medium"
-                android:layout_width="160dp"
+                android:layout_width="128dp"
                 android:layout_height="wrap_content"
                 android:autoSizeMinTextSize="14sp"
                 android:autoSizeTextType="uniform"
