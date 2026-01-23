@@ -246,6 +246,7 @@ class Controller private constructor(
     return when (event) {
       is AccountProviderRegistryEvent.Updated ->
         this.onAccountRegistryProviderUpdatedEvent(event)
+
       is AccountProviderRegistryEvent.SourceFailed,
       AccountProviderRegistryEvent.StatusChanged -> {
       }
@@ -388,6 +389,7 @@ class Controller private constructor(
         this.logger.debug("logging in succeeded: syncing account")
         this.booksSync(accountID).map { result }
       }
+
       is TaskResult.Failure -> {
         this.logger.debug("logging in didn't succeed: not syncing account")
         FluentFutureExtensions.fluentFutureOfValue(result)
@@ -624,18 +626,27 @@ class Controller private constructor(
     bookId: BookID,
   ): FluentFuture<TaskResult<Unit>> {
     this.publishRequestingDelete(bookId)
-    return this.submitTask(
-      BookRevokeTask(
-        accountID = accountID,
-        profileID = this.profileCurrent().id,
-        profiles = this.profiles,
-        adobeDRM = this.adobeDrm,
-        bookID = bookId,
-        bookRegistry = this.bookRegistry,
-        feedLoader = this.feedLoader,
-        revokeStrings = this.revokeStrings
+
+    val futureStart =
+      this.submitTask(
+        BookRevokeTask(
+          accountID = accountID,
+          profileID = this.profileCurrent().id,
+          profiles = this.profiles,
+          adobeDRM = this.adobeDrm,
+          bookID = bookId,
+          bookRegistry = this.bookRegistry,
+          feedLoader = this.feedLoader,
+          revokeStrings = this.revokeStrings
+        )
       )
-    )
+
+    return futureStart.flatMap { result ->
+      when (result) {
+        is TaskResult.Failure<*> -> FluentFutureExtensions.fluentFutureOfValue(result)
+        is TaskResult.Success<*> -> booksSync(accountID)
+      }
+    }
   }
 
   override fun bookDelete(
