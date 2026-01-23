@@ -256,12 +256,12 @@ class ProfileAccountLoginTask(
         this.credentials =
           AccountAuthenticationCredentials.SAML2_0(
             accessToken = request.accessToken,
-            adobeCredentials = null,
+            adobeCredentials = loginState.credentials?.adobeCredentials,
             authenticationDescription = this.findCurrentDescription().description,
             patronInfo = request.patronInfo,
             cookies = request.cookies,
-            annotationsURI = null,
-            deviceRegistrationURI = null
+            annotationsURI = loginState.credentials?.annotationsURI,
+            deviceRegistrationURI = loginState.credentials?.deviceRegistrationURI
           )
 
         this.handlePatronUserProfile()
