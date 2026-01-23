@@ -623,14 +623,39 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
       Services.serviceDirectory()
     val books =
       services.requireService(BooksControllerType::class.java)
+    val profiles =
+      services.requireService(ProfilesControllerType::class.java)
 
-    books.bookRevoke(
-      accountID = status.book.account,
-      bookId = status.book.id,
-      onNewBookEntry = {
-        // XXX: What's the correct place to handle this?
-      }
-    )
+    val accountID =
+      status.book.account
+    val account =
+      profiles.profileCurrent()
+        .account(accountID)
+
+    if (this.isLoginRequired(accountID)) {
+      MainNavigation.showLoginDialog(account)
+
+      AccountDetailModel.executeAfterLogin(
+        accountID = accountID,
+        runOnLogin = {
+          this.logger.debug("User logged in. Continuing revoke.")
+          books.bookRevoke(
+            accountID = accountID,
+            bookId = status.book.id,
+          )
+
+          UIThread.runOnUIThread {
+            MainNavigation.requestTabChangeForPart(this.catalogPart)
+            MainNavigation.Settings.goUp()
+          }
+        }
+      )
+    } else {
+      books.bookRevoke(
+        accountID = accountID,
+        bookId = status.book.id,
+      )
+    }
   }
 
   private fun onBookViewerOpen(

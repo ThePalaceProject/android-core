@@ -71,7 +71,8 @@ class BorrowSAMLDownload private constructor() : BorrowSubtaskType {
       context.receivedNewURI(Link.LinkBasic(actualDownloadURI))
     }
 
-    val cookieStore = createAccountCookieStore(context.account)
+    val cookieStore =
+      this.createAccountCookieStore(context)
 
     BorrowHTTP.download(
       context = context,
@@ -95,13 +96,14 @@ class BorrowSAMLDownload private constructor() : BorrowSubtaskType {
    */
 
   private fun createAccountCookieStore(
-    account: AccountReadableType
+    context: BorrowContextType,
   ): CookieStore {
+    val account = context.account
     val credentials = account.loginState.credentials as AccountAuthenticationCredentials.SAML2_0
-
     val cookieManager = CookieManager()
     val cookieStore = cookieManager.cookieStore
 
+    context.logDebug("Adding {} cookies to request", credentials.cookies.size)
     credentials.cookies.forEach { accountCookie ->
       // HttpCookie.parse allows for multiple name/values in one header string, so it returns a
       // list. In the account, if there is more than one cookie for a URL, each one is stored as
@@ -109,7 +111,6 @@ class BorrowSAMLDownload private constructor() : BorrowSubtaskType {
 
       cookieStore.add(URI(accountCookie.url), HttpCookie.parse(accountCookie.value).first())
     }
-
     return cookieStore
   }
 

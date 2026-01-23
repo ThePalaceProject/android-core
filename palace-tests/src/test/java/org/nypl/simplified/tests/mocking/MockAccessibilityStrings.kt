@@ -10,5 +10,8 @@ class MockAccessibilityStrings : AccessibilityStringsType {
   override fun bookFailedReturn(title: String): String = "bookFailedReturn $title"
   override fun bookFailedLoan(title: String): String = "bookFailedLoan $title"
   override fun bookFailedDownload(title: String): String = "bookFailedDownload $title"
-  override fun bookLoanLimitReached(): String = "bookLoanLimitReached"
+  override fun bookLoanLimitReached(title: String): String = "bookLoanLimitReached $title"
+  override fun bookFailedLoanLoginRequired(title: String): String = "bookFailedLoanLoginRequired $title"
+  override fun bookFailedRevokeLoginRequired(title: String): String = "bookFailedRevokeLoginRequired $title"
+  override fun bookFailedDownloadLoginRequired(title: String): String = "bookFailedDownloadLoginRequired $title"
 }

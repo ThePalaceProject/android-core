@@ -7,6 +7,8 @@ import org.joda.time.Duration
 import org.librarysimplified.mdc.MDCKeys
 import org.nypl.drm.core.AdobeAdeptExecutorType
 import org.nypl.drm.core.AdobeAdeptLoan
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.Handled401
 import org.nypl.simplified.accounts.api.AccountAuthenticationAdobePostActivationCredentials
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.database.api.AccountType
@@ -64,11 +66,12 @@ class BookRevokeTask(
   private val bookID: BookID,
   private val bookRegistry: BookRegistryType,
   private val feedLoader: FeedLoaderType,
-  private val onNewBookEntry: (FeedEntryOPDS) -> Unit = {},
   private val revokeStrings: BookRevokeStringResourcesType,
   private val revokeACSTimeoutDuration: Duration = Duration.standardMinutes(1L),
   private val revokeServerTimeoutDuration: Duration = Duration.standardMinutes(3L)
 ) : AbstractBookTask(accountID, profileID, profiles) {
+
+  private var authenticationFailed: Boolean = false
 
   private lateinit var databaseEntry: BookDatabaseEntryType
   private val adobeACS = "Adobe ACS"
@@ -96,7 +99,11 @@ class BookRevokeTask(
   }
 
   override fun onFailure(result: TaskResult.Failure<Unit>) {
-    this.publishBookStatus(BookStatus.FailedRevoke(this.bookID, result))
+    if (this.authenticationFailed) {
+      this.publishBookStatus(BookStatus.FailedRevokeBadCredentials(this.bookID, result))
+    } else {
+      this.publishBookStatus(BookStatus.FailedRevoke(this.bookID, result))
+    }
   }
 
   private fun debug(message: String, vararg arguments: Any?) =
@@ -248,7 +255,6 @@ class BookRevokeTask(
     }
 
     this.revokeNotifyServerSaveNewEntry(newEntry)
-    this.onNewBookEntry(newEntry)
   }
 
   private fun feedEntryWithAvailability(
@@ -311,7 +317,10 @@ class BookRevokeTask(
    * XXX: Use [FeedLoading.loadSingleEntryFeed]
    */
 
-  private fun revokeNotifyServerURIFeed(targetURI: URI, account: AccountType): Feed {
+  private fun revokeNotifyServerURIFeed(
+    targetURI: URI,
+    account: AccountType
+  ): Feed {
     val credentials = this.getCredentialsFromAccount(account)
 
     /*
@@ -372,6 +381,16 @@ class BookRevokeTask(
       }
 
       is FeedLoaderFailedAuthentication -> {
+        when (AccountAuthenticatedHTTP.handle401Error(feedResult.problemReport)) {
+          Handled401.ErrorIsRecoverableCredentialsExpired -> {
+            account.expireCredentialsIfApplicable()
+            this.authenticationFailed = true
+          }
+          Handled401.ErrorIsUnrecoverable -> {
+            // Treat this as a hard error.
+          }
+        }
+
         val message = this.revokeStrings.revokeServerNotifyFeedFailed
         this.taskRecorder.addAttributesIfPresent(feedResult.problemReport?.toMap())
         this.taskRecorder.currentStepFailed(
@@ -604,7 +623,9 @@ class BookRevokeTask(
    * has been activated.
    */
 
-  private fun revokeFormatHandleEPUBAdobeWithConnectorGetCredentials(account: AccountType): AccountAuthenticationAdobePostActivationCredentials {
+  private fun revokeFormatHandleEPUBAdobeWithConnectorGetCredentials(
+    account: AccountType
+  ): AccountAuthenticationAdobePostActivationCredentials {
     this.debug("getting Adobe ACS credentials")
     this.taskRecorder.beginNewStep(this.revokeStrings.revokeACSGettingDeviceCredentials)
     this.publishRequestingRevokeStatus()

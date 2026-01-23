@@ -1263,7 +1263,7 @@ class BookRevokeTaskAdobeDRMTest {
     Mockito.`when`(account.id)
       .thenReturn(this.accountID)
     Mockito.`when`(account.loginState)
-      .thenReturn(AccountLoginState.AccountNotLoggedIn)
+      .thenReturn(AccountLoginState.AccountNotLoggedIn(null))
     Mockito.`when`(profile.id)
       .thenReturn(this.profileID)
     Mockito.`when`(profilesDatabase.profiles())

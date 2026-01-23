@@ -47,8 +47,11 @@ import org.nypl.simplified.books.book_registry.BookStatus.DownloadExternalAuthen
 import org.nypl.simplified.books.book_registry.BookStatus.DownloadWaitingForExternalAuthentication
 import org.nypl.simplified.books.book_registry.BookStatus.Downloading
 import org.nypl.simplified.books.book_registry.BookStatus.FailedDownload
+import org.nypl.simplified.books.book_registry.BookStatus.FailedDownloadBadCredentials
 import org.nypl.simplified.books.book_registry.BookStatus.FailedLoan
+import org.nypl.simplified.books.book_registry.BookStatus.FailedLoanBadCredentials
 import org.nypl.simplified.books.book_registry.BookStatus.FailedRevoke
+import org.nypl.simplified.books.book_registry.BookStatus.FailedRevokeBadCredentials
 import org.nypl.simplified.books.book_registry.BookStatus.Held.HeldInQueue
 import org.nypl.simplified.books.book_registry.BookStatus.Held.HeldReady
 import org.nypl.simplified.books.book_registry.BookStatus.Holdable
@@ -861,6 +864,18 @@ class CatalogFeedViewDetails2(
       is Revoked -> {
         this.onBookStatusRevoked(status as CatalogBookStatus<Revoked>)
       }
+
+      is FailedLoanBadCredentials -> {
+        this.onBookStatusFailedLoanBadCredentials(status as CatalogBookStatus<FailedLoanBadCredentials>)
+      }
+
+      is FailedRevokeBadCredentials -> {
+        this.onBookStatusFailedRevokeBadCredentials(status as CatalogBookStatus<FailedRevokeBadCredentials>)
+      }
+
+      is FailedDownloadBadCredentials -> {
+        this.onBookStatusFailedDownloadBadCredentials(status as CatalogBookStatus<FailedDownloadBadCredentials>)
+      }
     }
 
     this.reconfigureButtonsEnabledDisabled()
@@ -878,6 +893,35 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogRetry,
+      actionInPage = {
+        this.openDrawer()
+        this.onBookBorrowRequested(status.toBorrowParameters())
+      },
+      actionInBottomSheet = {
+        this.onBookBorrowRequested(status.toBorrowParameters())
+      }
+    )
+    this.reconfigureButton1(
+      text = R.string.catalogDetails,
+      actionInPage = {
+        this.openDrawer()
+      },
+      actionInBottomSheet = { this.onShowErrorDetails(status.status.result) }
+    )
+  }
+
+  private fun onBookStatusFailedLoanBadCredentials(
+    status: CatalogBookStatus<FailedLoanBadCredentials>
+  ) {
+    this.enableButton0Status = true
+    this.enableButton1Status = true
+
+    this.configureInfoContainer(GENERIC) {
+      this.bottomSheetInfoGenericText.setText(R.string.accountLoginRequiredSessionExpired)
+    }
+
+    this.reconfigureButton0(
+      text = R.string.accountLogin,
       actionInPage = {
         this.openDrawer()
         this.onBookBorrowRequested(status.toBorrowParameters())
@@ -922,6 +966,33 @@ class CatalogFeedViewDetails2(
     )
   }
 
+  private fun onBookStatusFailedRevokeBadCredentials(
+    status: CatalogBookStatus<FailedRevokeBadCredentials>
+  ) {
+    this.enableButton0Status = true
+    this.enableButton1Status = true
+
+    this.configureInfoContainer(GENERIC) {
+      this.bottomSheetInfoGenericText.setText(R.string.accountLoginRequiredSessionExpired)
+    }
+
+    this.reconfigureButton0(
+      text = R.string.accountLogin,
+      actionInPage = {
+        this.openDrawer()
+        this.onBookRevokeRequested(status)
+      },
+      actionInBottomSheet = {
+        this.onBookRevokeRequested(status)
+      }
+    )
+    this.reconfigureButton1(
+      text = R.string.catalogDetails,
+      actionInPage = { this.openDrawer() },
+      actionInBottomSheet = { this.onShowErrorDetails(status.status.result) }
+    )
+  }
+
   private fun onBookStatusFailedDownload(
     status: CatalogBookStatus<FailedDownload>
   ) {
@@ -934,6 +1005,33 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogRetry,
+      actionInPage = {
+        this.openDrawer()
+        this.onBookBorrowRequested(status.toBorrowParameters())
+      },
+      actionInBottomSheet = {
+        this.onBookBorrowRequested(status.toBorrowParameters())
+      }
+    )
+    this.reconfigureButton1(
+      text = R.string.catalogDetails,
+      actionInPage = { this.openDrawer() },
+      actionInBottomSheet = { this.onShowErrorDetails(status.status.result) }
+    )
+  }
+
+  private fun onBookStatusFailedDownloadBadCredentials(
+    status: CatalogBookStatus<FailedDownloadBadCredentials>
+  ) {
+    this.enableButton0Status = true
+    this.enableButton1Status = true
+
+    this.configureInfoContainer(GENERIC) {
+      this.bottomSheetInfoGenericText.setText(R.string.accountLoginRequiredSessionExpired)
+    }
+
+    this.reconfigureButton0(
+      text = R.string.accountLogin,
       actionInPage = {
         this.openDrawer()
         this.onBookBorrowRequested(status.toBorrowParameters())

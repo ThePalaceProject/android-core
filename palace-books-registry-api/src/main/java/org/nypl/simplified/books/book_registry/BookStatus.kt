@@ -23,6 +23,15 @@ import java.net.URI
 sealed class BookStatus {
 
   /**
+   * The set of types that indicate that an operation could continue if new authentication
+   * credentials were provided. This is typically used for, for example, SAML, where the user's
+   * credentials are still correct but their session needs to be refreshed via an interactive
+   * login form.
+   */
+
+  sealed interface AuthenticationRequiredToContinue
+
+  /**
    * @return The status priority; higher priority status updates will replace
    * lower priority values.
    */
@@ -132,6 +141,36 @@ sealed class BookStatus {
   }
 
   /**
+   * The given book could not be revoked (hold cancelled, loan returned, etc).
+   */
+
+  data class FailedRevokeBadCredentials(
+
+    /**
+     * The book ID
+     */
+
+    override val id: BookID,
+
+    /**
+     * The list of steps that lead to the failure.
+     */
+
+    val result: TaskResult.Failure<Unit>
+  ) : BookStatus(), PresentableErrorType, AuthenticationRequiredToContinue {
+
+    override val priority: BookStatusPriorityOrdering
+      get() = BookStatusPriorityOrdering.BOOK_STATUS_REVOKE_FAILED
+
+    override val message: String =
+      this.result.message
+    override val exception: Throwable? =
+      this.result.exception
+    override val attributes: Map<String, String> =
+      this.result.attributes
+  }
+
+  /**
    * The given book failed to download properly.
    */
 
@@ -157,6 +196,31 @@ sealed class BookStatus {
   }
 
   /**
+   * The given book failed to download properly due to stale credentials.
+   */
+
+  data class FailedDownloadBadCredentials(
+    override val id: BookID,
+
+    /**
+     * The list of steps that lead to the failure.
+     */
+
+    val result: TaskResult.Failure<Unit>
+  ) : BookStatus(), PresentableErrorType, AuthenticationRequiredToContinue {
+
+    override val priority: BookStatusPriorityOrdering
+      get() = BookStatusPriorityOrdering.BOOK_STATUS_DOWNLOAD_FAILED
+
+    override val message: String =
+      this.result.message
+    override val exception: Throwable? =
+      this.result.exception
+    override val attributes: Map<String, String> =
+      this.result.attributes
+  }
+
+  /**
    * The given book failed to loan properly.
    */
 
@@ -169,6 +233,31 @@ sealed class BookStatus {
 
     val result: TaskResult.Failure<Unit>
   ) : BookStatus(), PresentableErrorType {
+
+    override val priority: BookStatusPriorityOrdering
+      get() = BookStatusPriorityOrdering.BOOK_STATUS_DOWNLOAD_FAILED
+
+    override val message: String =
+      this.result.message
+    override val exception: Throwable? =
+      this.result.exception
+    override val attributes: Map<String, String> =
+      this.result.attributes
+  }
+
+  /**
+   * The given book failed to loan properly.
+   */
+
+  data class FailedLoanBadCredentials(
+    override val id: BookID,
+
+    /**
+     * The list of steps that lead to the failure.
+     */
+
+    val result: TaskResult.Failure<Unit>
+  ) : BookStatus(), PresentableErrorType, AuthenticationRequiredToContinue {
 
     override val priority: BookStatusPriorityOrdering
       get() = BookStatusPriorityOrdering.BOOK_STATUS_DOWNLOAD_FAILED

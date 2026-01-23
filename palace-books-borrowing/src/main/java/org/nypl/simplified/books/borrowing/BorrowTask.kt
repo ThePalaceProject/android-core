@@ -23,8 +23,11 @@ import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.noSupported
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.profileNotFound
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.subtaskFailed
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.unexpectedException
+import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowReachedLoanLimit
+import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowRecoverableAuthenticationError
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskCancelled
+import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskFailed
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskHaltedEarly
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskFactoryType
 import org.nypl.simplified.books.bundled.api.BundledContentResolverType
@@ -110,6 +113,8 @@ class BorrowTask private constructor(
       }
     } catch (e: BorrowFailedHandled) {
       this.warn("handled: ", e)
+      this.taskRecorder.finishFailure<Unit>()
+    } catch (_: BorrowRecoverableAuthenticationError) {
       this.taskRecorder.finishFailure<Unit>()
     } catch (e: Throwable) {
       this.error("Unhandled exception during borrowing: ", e)
@@ -258,18 +263,31 @@ class BorrowTask private constructor(
     try {
       subtaskFactory.createSubtask().execute(context)
       step.resolution = TaskStepSucceeded("Executed subtask '$name' successfully.")
-    } catch (e: BorrowSubtaskHaltedEarly) {
-      throw e
-    } catch (e: BorrowSubtaskCancelled) {
-      throw e
-    } catch (e: BorrowReachedLoanLimit) {
-      step.resolution = TaskStepFailed(
-        message = "Subtask '$name' raised an unexpected exception",
-        exception = e,
-        errorCode = subtaskFailed,
-        extraMessages = listOf()
-      )
-      throw e
+    } catch (e: BorrowSubtaskException) {
+      when (e) {
+        is BorrowSubtaskCancelled -> {
+          throw e
+        }
+        is BorrowRecoverableAuthenticationError -> {
+          context.account.expireCredentialsIfApplicable()
+          throw e
+        }
+        is BorrowReachedLoanLimit -> {
+          step.resolution = TaskStepFailed(
+            message = "Subtask '$name' raised an unexpected exception",
+            exception = e,
+            errorCode = subtaskFailed,
+            extraMessages = listOf()
+          )
+          throw e
+        }
+        is BorrowSubtaskFailed -> {
+          throw e
+        }
+        is BorrowSubtaskHaltedEarly -> {
+          throw e
+        }
+      }
     } catch (e: Exception) {
       step.resolution = TaskStepFailed(
         message = "Subtask '$name' raised an unexpected exception",
@@ -560,6 +578,38 @@ class BorrowTask private constructor(
       val target = path.elements[0].target
       check(target != null) { "Chosen path must start with a usable URI!" }
       return target
+    }
+
+    override fun bookDownloadFailedBadCredentials() {
+      this.bookPublishStatus(
+        BookStatus.FailedDownloadBadCredentials(
+          id = this.bookCurrent.id,
+          result = this.taskRecorder.finishFailure()
+        )
+      )
+    }
+
+    override fun bookLoanFailedBadCredentials() {
+      this.bookPublishStatus(
+        BookStatus.FailedLoanBadCredentials(
+          id = this.bookCurrent.id,
+          result = this.taskRecorder.finishFailure()
+        )
+      )
+    }
+
+    private var subtaskCredentials: BorrowSubtaskCredentials =
+      BorrowSubtaskCredentials.UseAccountCredentials
+
+    override fun setNextSubtaskCredentials(credentials: BorrowSubtaskCredentials) {
+      this.logger.debug("Setting next subtask credentials to {}", credentials)
+      this.subtaskCredentials = credentials
+    }
+
+    override fun takeSubtaskCredentials(): BorrowSubtaskCredentials {
+      val credentialsNow = this.subtaskCredentials
+      this.setNextSubtaskCredentials(BorrowSubtaskCredentials.UseAccountCredentials)
+      return credentialsNow
     }
 
     override fun bookDownloadFailed() {

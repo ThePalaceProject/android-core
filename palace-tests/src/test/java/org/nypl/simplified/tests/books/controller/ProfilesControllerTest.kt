@@ -82,6 +82,7 @@ import org.nypl.simplified.tests.mocking.MockAccountProviders
 import org.nypl.simplified.tests.mocking.MockAnalytics
 import org.nypl.simplified.tests.mocking.MockRevokeStringResources
 import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileNotFoundException
 import java.net.URI
@@ -90,7 +91,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-abstract class ProfilesControllerContract {
+class ProfilesControllerTest {
 
   private lateinit var accountEvents: PublishSubject<AccountEvent>
   private lateinit var accountEventsReceived: MutableList<AccountEvent>
@@ -114,9 +115,12 @@ abstract class ProfilesControllerContract {
   private lateinit var profileEventsReceived: MutableList<ProfileEvent>
   private lateinit var readerBookmarkEvents: PublishSubject<BookmarkEvent>
 
-  protected abstract val logger: Logger
+  private val logger: Logger =
+    LoggerFactory.getLogger(ProfilesControllerTest::class.java)
 
-  protected abstract fun context(): Application
+  private fun context(): Application {
+    return Mockito.mock<Application>()
+  }
 
   private val accountProviderResolutionStrings =
     MockAccountProviderResolutionStrings()

@@ -7,6 +7,7 @@ import okhttp3.mockwebserver.MockWebServer
 import one.irradia.mime.api.MIMEType
 import org.joda.time.Instant
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assertions.fail
@@ -38,8 +39,7 @@ import org.nypl.simplified.books.api.BookIDs
 import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatus
-import org.nypl.simplified.books.book_registry.BookStatus.Downloading
-import org.nypl.simplified.books.book_registry.BookStatus.FailedDownload
+import org.nypl.simplified.books.book_registry.BookStatus.*
 import org.nypl.simplified.books.book_registry.BookStatus.Loaned.LoanedDownloaded
 import org.nypl.simplified.books.book_registry.BookStatusEvent
 import org.nypl.simplified.books.borrowing.BorrowTimeoutConfiguration
@@ -52,6 +52,7 @@ import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.acsTimedOut
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.acsUnparseableACSM
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.httpContentTypeIncompatible
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.httpRequestFailed
+import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskCancelled
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskFailed
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskHaltedEarly
@@ -360,7 +361,7 @@ class BorrowACSMTest {
     val task = BorrowACSM.createSubtask()
 
     Mockito.`when`(this.account.loginState)
-      .thenReturn(AccountNotLoggedIn)
+      .thenReturn(AccountNotLoggedIn(null))
 
     try {
       task.execute(this.context)
@@ -949,5 +950,76 @@ class BorrowACSMTest {
 
     assertTrue(this.acsHandle.info.acsmFile != null)
     assertTrue(this.bookDatabaseEPUBHandle.format.file != null)
+  }
+
+  /**
+   * If fetching an ACSM results in a 401, we wait for new credentials.
+   */
+
+  @Test
+  fun testACSFails401Recoverable() {
+    val task = BorrowACSM.createSubtask()
+
+    this.context.currentURIField =
+      Link.LinkBasic(this.webServer.url("/book.acsm").toUri())
+
+    this.webServer.enqueue(
+      MockResponse()
+        .setResponseCode(401)
+        .setHeader("Content-Type", "application/api-problem+json")
+        .setBody("""
+{
+  "status": 401,
+  "type": "http://palaceproject.io/terms/problem/auth/recoverable/token/expired",
+  "title": "Expired!",
+  "detail": "Expiration in detail"
+}
+        """.trimIndent())
+    )
+
+    try {
+      Assertions.assertThrows(BorrowSubtaskException.BorrowRecoverableAuthenticationError::class.java, {
+        task.execute(this.context)
+      })
+    } catch (e: BorrowSubtaskFailed) {
+      this.logger.error("exception: ", e)
+    }
+
+    this.verifyBookRegistryHasStatus(FailedDownloadBadCredentials::class.java)
+    assertEquals("httpRequestFailed", this.taskRecorder.finishFailure<Unit>().lastErrorCode)
+    assertEquals(0, this.bookDatabaseEntry.entryWrites)
+
+    assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(FailedDownloadBadCredentials::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(0, this.bookStates.size)
+  }
+
+  /**
+   * If fetching an ACSM results in a 401, we fail.
+   */
+
+  @Test
+  fun testACSFails401() {
+    val task = BorrowACSM.createSubtask()
+
+    this.context.currentURIField =
+      Link.LinkBasic(this.webServer.url("/book.acsm").toUri())
+
+    this.webServer.enqueue(
+      MockResponse()
+        .setResponseCode(401)
+    )
+
+    Assertions.assertThrows(BorrowSubtaskException.BorrowSubtaskFailed::class.java, {
+      task.execute(this.context)
+    })
+
+    this.verifyBookRegistryHasStatus(FailedDownload::class.java)
+    assertEquals("httpRequestFailed", this.taskRecorder.finishFailure<Unit>().lastErrorCode)
+    assertEquals(0, this.bookDatabaseEntry.entryWrites)
+
+    assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(FailedDownload::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(0, this.bookStates.size)
   }
 }

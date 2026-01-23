@@ -8,7 +8,7 @@ import org.librarysimplified.http.api.LSHTTPRequestBuilderType.Method.Delete
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType.Method.Post
 import org.librarysimplified.http.api.LSHTTPResponseStatus
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
-import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addCredentialsToProperties
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addBasicTokenPropertiesIfApplicable
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.getAccessToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.database.api.AccountType
@@ -42,7 +42,7 @@ class BHTTPCalls(
     val request =
       this.http.newRequest(annotationsURI)
         .setAuthorization(auth)
-        .addCredentialsToProperties(credentials)
+        .addBasicTokenPropertiesIfApplicable(credentials)
         .build()
 
     return request.execute().use { response ->
@@ -71,7 +71,7 @@ class BHTTPCalls(
     val request =
       this.http.newRequest(bookmarkURI)
         .setAuthorization(auth)
-        .addCredentialsToProperties(credentials)
+        .addBasicTokenPropertiesIfApplicable(credentials)
         .setMethod(Delete(ByteArray(0), MIMECompatibility.applicationOctetStream))
         .build()
 
@@ -108,7 +108,7 @@ class BHTTPCalls(
     val request =
       this.http.newRequest(annotationsURI)
         .setAuthorization(auth)
-        .addCredentialsToProperties(credentials)
+        .addBasicTokenPropertiesIfApplicable(credentials)
         .setMethod(post)
         .build()
 

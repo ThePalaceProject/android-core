@@ -18,6 +18,7 @@ import org.nypl.simplified.accounts.api.AccountAuthenticationAdobePreActivationC
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountAuthenticationTokenInfo
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggedIn
+import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggedInStaleCredentials
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggingIn
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggingInWaitingForExternalAuthentication
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggingOut
@@ -100,9 +101,6 @@ class ProfileAccountLoginTask(
   private fun error(message: String, vararg arguments: Any?) =
     this.logger.error("[{}][{}] $message", this.profile.id.uuid, this.account.id, *arguments)
 
-  private fun warn(message: String, vararg arguments: Any?) =
-    this.logger.warn("[{}][{}] $message", this.profile.id.uuid, this.account.id, *arguments)
-
   private fun run(): TaskResult<Unit> {
     MDC.put(MDCKeys.ACCOUNT_INTERNAL_ID, this.account.id.uuid.toString())
     MDC.put(MDCKeys.ACCOUNT_PROVIDER_NAME, this.account.provider.displayName)
@@ -123,7 +121,12 @@ class ProfileAccountLoginTask(
           errorCode = "loginAuthNotRequired",
           extraMessages = listOf()
         )
-        this.account.setLoginState(AccountLoginFailed(this.steps.finishFailure<Unit>()))
+        this.account.setLoginState(
+          AccountLoginFailed(
+            previousCredentials = this.account.loginState.credentials,
+            taskResult = this.steps.finishFailure<Unit>()
+          )
+        )
         return this.steps.finishFailure()
       }
 
@@ -171,7 +174,12 @@ class ProfileAccountLoginTask(
         extraMessages = listOf()
       )
       val failure = this.steps.finishFailure<Unit>()
-      this.account.setLoginState(AccountLoginFailed(failure))
+      this.account.setLoginState(
+        AccountLoginFailed(
+          previousCredentials = this.account.loginState.credentials,
+          taskResult = failure
+        )
+      )
       failure
     }
   }
@@ -216,16 +224,17 @@ class ProfileAccountLoginTask(
     request: SAML20Cancel
   ): TaskResult<Unit> {
     this.steps.beginNewStep("Cancelling login...")
-    return when (this.account.loginState) {
+    return when (val loginState = this.account.loginState) {
       is AccountLoggingIn,
       is AccountLoggingInWaitingForExternalAuthentication -> {
-        this.account.setLoginState(AccountNotLoggedIn)
+        this.account.setLoginState(AccountNotLoggedIn(loginState.credentials))
         this.steps.finishSuccess(Unit)
       }
 
-      AccountNotLoggedIn,
+      is AccountNotLoggedIn,
       is AccountLoginFailed,
       is AccountLoggedIn,
+      is AccountLoggedInStaleCredentials,
       is AccountLoggingOut,
       is AccountLogoutFailed -> {
         this.steps.currentStepSucceeded(
@@ -240,7 +249,8 @@ class ProfileAccountLoginTask(
     request: SAML20Complete
   ): TaskResult<Unit> {
     this.steps.beginNewStep("Accepting login token...")
-    return when (this.account.loginState) {
+    return when (val loginState = this.account.loginState) {
+      is AccountLoggedInStaleCredentials,
       is AccountLoggingIn,
       is AccountLoggingInWaitingForExternalAuthentication -> {
         this.credentials =
@@ -255,18 +265,16 @@ class ProfileAccountLoginTask(
           )
 
         this.handlePatronUserProfile()
-        this.runDeviceActivation()
-        this.account.setLoginState(AccountLoggedIn(this.credentials))
-        notificationTokenHttpCalls.registerFCMTokenForProfileAccount(
-          account = account
-        )
+        this.runDeviceActivationIfNecessary()
+        this.updateCredentialsToLoggedInState()
+        this.notificationTokenHttpCalls.registerFCMTokenForProfileAccount(account = this.account)
         this.steps.finishSuccess(Unit)
       }
 
-      AccountNotLoggedIn,
-      is AccountLoginFailed,
       is AccountLoggedIn,
       is AccountLoggingOut,
+      is AccountLoginFailed,
+      is AccountNotLoggedIn,
       is AccountLogoutFailed -> {
         this.steps.currentStepSucceeded(
           "Ignored the authentication token because the account wasn't waiting for one."
@@ -281,6 +289,7 @@ class ProfileAccountLoginTask(
   ): TaskResult<Unit> {
     this.account.setLoginState(
       AccountLoggingInWaitingForExternalAuthentication(
+        previousCredentials = this.account.loginState.credentials,
         description = request.description,
         status = "Waiting for authentication..."
       )
@@ -292,17 +301,18 @@ class ProfileAccountLoginTask(
     request: OAuthWithIntermediaryCancel
   ): TaskResult<Unit> {
     this.steps.beginNewStep("Cancelling login...")
-    return when (this.account.loginState) {
+    return when (val loginState = this.account.loginState) {
       is AccountLoggingIn,
       is AccountLoggingInWaitingForExternalAuthentication -> {
-        this.account.setLoginState(AccountNotLoggedIn)
+        this.account.setLoginState(AccountNotLoggedIn(loginState.credentials))
         this.steps.finishSuccess(Unit)
       }
 
-      AccountNotLoggedIn,
-      is AccountLoginFailed,
       is AccountLoggedIn,
+      is AccountLoggedInStaleCredentials,
       is AccountLoggingOut,
+      is AccountLoginFailed,
+      is AccountNotLoggedIn,
       is AccountLogoutFailed -> {
         this.steps.currentStepSucceeded(
           "Ignored the cancellation attempt because the account wasn't waiting for authentication."
@@ -316,31 +326,30 @@ class ProfileAccountLoginTask(
     request: OAuthWithIntermediaryComplete
   ): TaskResult<Unit> {
     this.steps.beginNewStep("Accepting login token...")
-    return when (this.account.loginState) {
+    return when (val loginState = this.account.loginState) {
       is AccountLoggingIn,
       is AccountLoggingInWaitingForExternalAuthentication -> {
         this.credentials =
           AccountAuthenticationCredentials.OAuthWithIntermediary(
             accessToken = request.token,
-            adobeCredentials = null,
+            adobeCredentials = loginState.credentials?.adobeCredentials,
             authenticationDescription = this.findCurrentDescription().description,
-            annotationsURI = null,
-            deviceRegistrationURI = null
+            annotationsURI = loginState.credentials?.annotationsURI,
+            deviceRegistrationURI = loginState.credentials?.deviceRegistrationURI
           )
 
         this.handlePatronUserProfile()
-        this.runDeviceActivation()
-        this.account.setLoginState(AccountLoggedIn(this.credentials))
-        notificationTokenHttpCalls.registerFCMTokenForProfileAccount(
-          account = account
-        )
+        this.runDeviceActivationIfNecessary()
+        this.updateCredentialsToLoggedInState()
+        this.notificationTokenHttpCalls.registerFCMTokenForProfileAccount(account = this.account)
         this.steps.finishSuccess(Unit)
       }
 
-      AccountNotLoggedIn,
-      is AccountLoginFailed,
       is AccountLoggedIn,
+      is AccountLoggedInStaleCredentials,
       is AccountLoggingOut,
+      is AccountLoginFailed,
+      is AccountNotLoggedIn,
       is AccountLogoutFailed -> {
         this.steps.currentStepSucceeded(
           "Ignored the authentication token because the account wasn't waiting for one."
@@ -353,8 +362,10 @@ class ProfileAccountLoginTask(
   private fun runOAuthWithIntermediaryInitiate(
     request: OAuthWithIntermediaryInitiate
   ): TaskResult.Success<Unit> {
+    val existingLoginState = this.account.loginState
     this.account.setLoginState(
       AccountLoggingInWaitingForExternalAuthentication(
+        previousCredentials = existingLoginState.credentials,
         description = request.description,
         status = "Waiting for authentication..."
       )
@@ -365,22 +376,25 @@ class ProfileAccountLoginTask(
   private fun runBasicLogin(
     request: Basic
   ): TaskResult.Success<Unit> {
+    val existingLoginState =
+      this.account.loginState
+    val existingCredentials =
+      existingLoginState.credentials
+
     this.credentials =
       AccountAuthenticationCredentials.Basic(
         userName = request.username,
         password = request.password,
         authenticationDescription = request.description.description,
-        adobeCredentials = null,
-        annotationsURI = null,
-        deviceRegistrationURI = null
+        adobeCredentials = existingCredentials?.adobeCredentials,
+        annotationsURI = existingCredentials?.annotationsURI,
+        deviceRegistrationURI = existingCredentials?.deviceRegistrationURI
       )
 
     this.handlePatronUserProfile()
-    this.runDeviceActivation()
-    this.account.setLoginState(AccountLoggedIn(this.credentials))
-    notificationTokenHttpCalls.registerFCMTokenForProfileAccount(
-      account = account
-    )
+    this.runDeviceActivationIfNecessary()
+    this.updateCredentialsToLoggedInState()
+    this.notificationTokenHttpCalls.registerFCMTokenForProfileAccount(account = this.account)
     return this.steps.finishSuccess(Unit)
   }
 
@@ -406,7 +420,7 @@ class ProfileAccountLoginTask(
             userName = request.username,
             password = request.password,
             authenticationTokenInfo = AccountAuthenticationTokenInfo(
-              accessToken = getAccessTokenFromBasicTokenResponse(
+              accessToken = this.getAccessTokenFromBasicTokenResponse(
                 node = ObjectMapper().readTree(status.bodyStream)
               ),
               authURI = authenticationURI
@@ -418,16 +432,14 @@ class ProfileAccountLoginTask(
           )
 
           this.handlePatronUserProfile()
-          this.runDeviceActivation()
-          this.account.setLoginState(AccountLoggedIn(this.credentials))
-          notificationTokenHttpCalls.registerFCMTokenForProfileAccount(
-            account = account
-          )
+          this.runDeviceActivationIfNecessary()
+          this.updateCredentialsToLoggedInState()
+          this.notificationTokenHttpCalls.registerFCMTokenForProfileAccount(account = this.account)
           return this.steps.finishSuccess(Unit)
         }
 
         is LSHTTPResponseStatus.Responded.Error -> {
-          handleProfileAccountLoginError(authenticationURI, status)
+          this.handleProfileAccountLoginError(authenticationURI, status)
           return this.steps.finishFailure()
         }
 
@@ -442,6 +454,11 @@ class ProfileAccountLoginTask(
         }
       }
     }
+  }
+
+  private fun updateCredentialsToLoggedInState() {
+    this.logger.debug("Set login state to AccountLoggedIn")
+    this.account.setLoginState(AccountLoggedIn(this.credentials))
   }
 
   private fun getAccessTokenFromBasicTokenResponse(node: JsonNode): String {
@@ -537,13 +554,21 @@ class ProfileAccountLoginTask(
     }
   }
 
-  private fun runDeviceActivation() {
+  private fun runDeviceActivationIfNecessary() {
     this.debug("running device activation")
 
     val adobeDRMValues = this.adobeDRM
     if (adobeDRMValues != null) {
-      this.runDeviceActivationAdobe(adobeDRMValues)
+      if (!this.isAdobeDeviceActivated()) {
+        this.runDeviceActivationAdobe(adobeDRMValues)
+      } else {
+        this.debug("device is already activated")
+      }
     }
+  }
+
+  private fun isAdobeDeviceActivated(): Boolean {
+    return this.account.loginState.credentials?.adobeCredentials?.postActivationCredentials != null
   }
 
   private fun runDeviceActivationAdobe(adobeDRM: PatronDRMAdobe) {
@@ -720,6 +745,8 @@ class ProfileAccountLoginTask(
   }
 
   private fun updateLoggingInState(step: TaskStep): Boolean {
+    val loginStatePrevious = this.account.loginState
+
     return when (this.request) {
       is Basic,
       is BasicToken,
@@ -729,7 +756,8 @@ class ProfileAccountLoginTask(
           AccountLoggingIn(
             status = step.description,
             description = this.findCurrentDescription(),
-            cancellable = false
+            cancellable = false,
+            previousCredentials = loginStatePrevious.credentials
           )
         )
         true
@@ -745,16 +773,18 @@ class ProfileAccountLoginTask(
               AccountLoggingIn(
                 status = step.description,
                 description = this.findCurrentDescription(),
-                cancellable = false
+                cancellable = false,
+                previousCredentials = loginStatePrevious.credentials
               )
             )
             true
           }
 
-          AccountNotLoggedIn,
+          is AccountNotLoggedIn,
           is AccountLoggingIn,
           is AccountLoginFailed,
           is AccountLoggedIn,
+          is AccountLoggedInStaleCredentials,
           is AccountLoggingOut,
           is AccountLogoutFailed -> {
             this.steps.currentStepSucceeded("Ignored an unexpected completion/cancellation attempt.")
@@ -795,10 +825,11 @@ class ProfileAccountLoginTask(
             loginState.description
           }
 
-          AccountNotLoggedIn,
-          is AccountLoginFailed,
           is AccountLoggedIn,
+          is AccountLoggedInStaleCredentials,
           is AccountLoggingOut,
+          is AccountLoginFailed,
+          is AccountNotLoggedIn,
           is AccountLogoutFailed -> {
             throw NoCurrentDescription()
           }
@@ -823,10 +854,11 @@ class ProfileAccountLoginTask(
             loginState.description
           }
 
-          AccountNotLoggedIn,
-          is AccountLoginFailed,
           is AccountLoggedIn,
+          is AccountLoggedInStaleCredentials,
           is AccountLoggingOut,
+          is AccountLoginFailed,
+          is AccountNotLoggedIn,
           is AccountLogoutFailed -> {
             throw NoCurrentDescription()
           }

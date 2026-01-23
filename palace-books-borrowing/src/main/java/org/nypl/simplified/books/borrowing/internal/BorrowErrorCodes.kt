@@ -7,6 +7,7 @@ package org.nypl.simplified.books.borrowing.internal
  */
 
 object BorrowErrorCodes {
+  const val bearerTokenNotPermitted = "bearerTokenNotPermitted"
   const val accountCredentialsRequired = "accountCredentialsRequired"
   const val accountsDatabaseException = "accountsDatabaseException"
   const val acsNoCredentialsPost = "acsNoCredentialsPost"

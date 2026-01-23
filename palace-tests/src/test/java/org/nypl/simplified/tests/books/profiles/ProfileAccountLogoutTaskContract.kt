@@ -188,7 +188,7 @@ abstract class ProfileAccountLogoutTaskContract {
     Mockito.`when`(this.account.loginState)
       .then { this.loginState }
 
-    this.account.setLoginState(AccountNotLoggedIn)
+    this.account.setLoginState(AccountNotLoggedIn(null))
 
     val task =
       ProfileAccountLogoutTask(

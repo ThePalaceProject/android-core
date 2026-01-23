@@ -87,13 +87,16 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
   ): DownloadedManifest {
     context.taskRecorder.beginNewStep("Executing audio book manifest strategy...")
 
+    val credentials =
+      context.takeSubtaskCredentialsRequiringAccount()
+
     val strategy =
       context.audioBookManifestStrategies.createStrategy(
         context = context.application,
         AudioBookManifestRequest(
           cacheDirectory = context.cacheDirectory(),
           contentType = context.currentAcquisitionPathElement.mimeType,
-          credentials = context.account.loginState.credentials,
+          credentials = credentials,
           httpClient = context.httpClient,
           palaceID = PlayerPalaceID(context.bookCurrent.entry.id),
           services = context.services,

@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-  <string name="bookFailedDownload">@string/bookFailedLoan</string>
-  <string name="bookFailedLoan">The book \'%1$s\' could not be downloaded</string>
-  <string name="bookFailedReturn">The book \'%1$s\' could not be returned</string>
-  <string name="bookHasDownloaded">The book \'%1$s\' has finished downloading</string>
-  <string name="bookIsDownloading">The book \'%1$s\' has started downloading</string>
-  <string name="bookIsOnHold">A reservation has been placed for the book \'%1$s\'</string>
-  <string name="bookReturned">The book \'%1$s\' has been successfully returned</string>
-  <string name="reachedLoanLimit">You have reached your loan limit</string>
+  <string name="accessBookFailedDownload">@string/accessBookFailedLoan</string>
+  <string name="accessBookFailedLoan">The book \'%1$s\' could not be downloaded</string>
+  <string name="accessBookFailedReturn">The book \'%1$s\' could not be returned</string>
+  <string name="accessBookHasDownloaded">The book \'%1$s\' has finished downloading</string>
+  <string name="accessBookIsDownloading">The book \'%1$s\' has started downloading</string>
+  <string name="accessBookIsOnHold">A reservation has been placed for the book \'%1$s\'</string>
+  <string name="accessBookReturned">The book \'%1$s\' has been successfully returned</string>
+  <string name="accessBookReachedLoanLimit">The book \'%1$s\' could not be borrowed because you have reached your loan limit</string>
+  <string name="accessBookFailedLoanLoginRequired">The book \'%1$s\' could not be downloaded because your login session has expired.</string>
+  <string name="accessBookFailedRevokeLoginRequired">The book \'%1$s\' could not be returned because your login session has expired.</string>
+  <string name="accessBookFailedDownloadLoginRequired">@string/accessBookFailedLoanLoginRequired</string>
 </resources>

@@ -12,6 +12,7 @@ import org.nypl.simplified.accounts.api.AccountEventDeletion
 import org.nypl.simplified.accounts.api.AccountEventLoginStateChanged
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggedIn
+import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggedInStaleCredentials
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggingIn
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggingInWaitingForExternalAuthentication
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggingOut
@@ -105,12 +106,13 @@ class BService(
         is AccountLoggedIn ->
           this.onAccountLoggedIn()
 
+        is AccountLoggedInStaleCredentials,
         is AccountLoggingIn,
         is AccountLoggingInWaitingForExternalAuthentication,
         is AccountLoggingOut,
         is AccountLoginFailed,
         is AccountLogoutFailed,
-        AccountNotLoggedIn -> {
+        is AccountNotLoggedIn -> {
         }
       }
     }

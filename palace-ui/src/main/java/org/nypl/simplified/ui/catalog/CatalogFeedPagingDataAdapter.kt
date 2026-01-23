@@ -28,8 +28,11 @@ import org.nypl.simplified.books.book_registry.BookStatus.DownloadExternalAuthen
 import org.nypl.simplified.books.book_registry.BookStatus.DownloadWaitingForExternalAuthentication
 import org.nypl.simplified.books.book_registry.BookStatus.Downloading
 import org.nypl.simplified.books.book_registry.BookStatus.FailedDownload
+import org.nypl.simplified.books.book_registry.BookStatus.FailedDownloadBadCredentials
 import org.nypl.simplified.books.book_registry.BookStatus.FailedLoan
+import org.nypl.simplified.books.book_registry.BookStatus.FailedLoanBadCredentials
 import org.nypl.simplified.books.book_registry.BookStatus.FailedRevoke
+import org.nypl.simplified.books.book_registry.BookStatus.FailedRevokeBadCredentials
 import org.nypl.simplified.books.book_registry.BookStatus.Held
 import org.nypl.simplified.books.book_registry.BookStatus.Holdable
 import org.nypl.simplified.books.book_registry.BookStatus.Loanable
@@ -339,6 +342,18 @@ class CatalogFeedPagingDataAdapter(
         is Revoked -> {
           this.onBookStatusRevoked(bookWithStatus.book, status)
         }
+
+        is FailedLoanBadCredentials -> {
+          this.onBookStatusFailedLoanBadCredentials(bookWithStatus.book, status)
+        }
+
+        is FailedRevokeBadCredentials -> {
+          this.onBookStatusFailedRevokeBadCredentials(bookWithStatus.book, status)
+        }
+
+        is FailedDownloadBadCredentials -> {
+          this.onBookStatusFailedDownloadBadCredentials(bookWithStatus.book, status)
+        }
       }
     }
 
@@ -389,6 +404,26 @@ class CatalogFeedPagingDataAdapter(
     private fun onBookStatusFailedDownload(
       book: Book,
       status: FailedDownload
+    ) {
+      this.setVisible(this.corrupt, false)
+      this.setVisible(this.error, true)
+      this.setVisible(this.idle, false)
+      this.setVisible(this.progress, false)
+
+      this.errorDismiss.setOnClickListener {
+        this.onBookErrorDismiss(book, status)
+      }
+      this.errorDetails.setOnClickListener {
+        this@CatalogFeedPagingDataAdapter.onShowTaskError(status.result)
+      }
+      this.errorRetry.setOnClickListener {
+        this.onBookBorrow(book)
+      }
+    }
+
+    private fun onBookStatusFailedDownloadBadCredentials(
+      book: Book,
+      status: FailedDownloadBadCredentials
     ) {
       this.setVisible(this.corrupt, false)
       this.setVisible(this.error, true)
@@ -474,9 +509,51 @@ class CatalogFeedPagingDataAdapter(
       }
     }
 
+    private fun onBookStatusFailedLoanBadCredentials(
+      book: Book,
+      status: FailedLoanBadCredentials
+    ) {
+      this.setVisible(this.corrupt, false)
+      this.setVisible(this.error, true)
+      this.setVisible(this.idle, false)
+      this.setVisible(this.progress, false)
+
+      this.errorTitle.visibility = View.VISIBLE
+      this.errorDismiss.setOnClickListener {
+        this.onBookErrorDismiss(book, status)
+      }
+      this.errorDetails.setOnClickListener {
+        this@CatalogFeedPagingDataAdapter.onShowTaskError(status.result)
+      }
+      this.errorRetry.setOnClickListener {
+        this.onBookBorrow(book)
+      }
+    }
+
     private fun onBookStatusFailedRevoke(
       book: Book,
       status: FailedRevoke
+    ) {
+      this.setVisible(this.corrupt, false)
+      this.setVisible(this.error, true)
+      this.setVisible(this.idle, false)
+      this.setVisible(this.progress, false)
+
+      this.errorTitle.visibility = View.VISIBLE
+      this.errorDismiss.setOnClickListener {
+        this.onBookErrorDismiss(book, status)
+      }
+      this.errorDetails.setOnClickListener {
+        this@CatalogFeedPagingDataAdapter.onShowTaskError(status.result)
+      }
+      this.errorRetry.setOnClickListener {
+        this.onBookRevoke(book, status)
+      }
+    }
+
+    private fun onBookStatusFailedRevokeBadCredentials(
+      book: Book,
+      status: FailedRevokeBadCredentials
     ) {
       this.setVisible(this.corrupt, false)
       this.setVisible(this.error, true)

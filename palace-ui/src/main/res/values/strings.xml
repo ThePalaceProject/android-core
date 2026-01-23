@@ -28,6 +28,8 @@
   <string name="accountLogin">Sign in</string>
   <string name="accountLoginAlternatives">Alternative Login Methods</string>
   <string name="accountLoginRequired">Please sign in to continue.</string>
+  <string name="accountLoginRequiredSessionExpired">Your session has expired. Please log in to refresh your session.</string>
+  <string name="accountLoginRequiredSessionExpiredMultiline">Your session has expired.\nPlease log in to refresh your session.</string>
   <string name="accountLoginWith">Sign in with %1$s</string>
   <string name="accountLogout">Sign out</string>
   <string name="accountMenuRefresh">Reload</string>

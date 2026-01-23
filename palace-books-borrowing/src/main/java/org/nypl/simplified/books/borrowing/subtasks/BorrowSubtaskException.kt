@@ -25,11 +25,25 @@ sealed class BorrowSubtaskException : Exception() {
    * task as a whole should be considered to have failed.
    */
 
-  class BorrowSubtaskFailed : BorrowSubtaskException()
+  sealed class BorrowSubtaskFailedType : BorrowSubtaskException()
+
+  /**
+   * The subtask failed and none of the subtasks that follow it should run. The borrow
+   * task as a whole should be considered to have failed.
+   */
+
+  class BorrowSubtaskFailed : BorrowSubtaskFailedType()
+
+  /**
+   * The subtask failed because of a recoverable authentication error. Making the user refresh
+   * their session should correct the problem.
+   */
+
+  class BorrowRecoverableAuthenticationError : BorrowSubtaskFailedType()
 
   /**
    * The subtask failed because the loan limit has been reached.
    */
 
-  class BorrowReachedLoanLimit : BorrowSubtaskException()
+  class BorrowReachedLoanLimit : BorrowSubtaskFailedType()
 }

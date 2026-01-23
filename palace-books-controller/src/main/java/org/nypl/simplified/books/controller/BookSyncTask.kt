@@ -5,7 +5,8 @@ import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPResponseStatus
 import org.librarysimplified.mdc.MDCKeys
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
-import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addCredentialsToProperties
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.Handled401
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addBasicTokenPropertiesIfApplicable
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.getAccessToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
@@ -94,7 +95,7 @@ class BookSyncTask(
     val request =
       this.http.newRequest(loansURI)
         .setAuthorization(AccountAuthenticatedHTTP.createAuthorization(credentials))
-        .addCredentialsToProperties(credentials)
+        .addBasicTokenPropertiesIfApplicable(credentials)
         .build()
 
     val response = request.execute()
@@ -115,6 +116,18 @@ class BookSyncTask(
           status.properties.status,
           status.properties.message
         )
+
+        if (status.properties.status == 401) {
+          when (AccountAuthenticatedHTTP.handle401Error(response.status.properties?.problemReport)) {
+            Handled401.ErrorIsRecoverableCredentialsExpired -> {
+              account.expireCredentialsIfApplicable()
+            }
+            Handled401.ErrorIsUnrecoverable -> {
+              // Treat this as a hard error.
+            }
+          }
+        }
+
         val exception = IOException(message)
         this.taskRecorder.currentStepFailed(
           message = message,

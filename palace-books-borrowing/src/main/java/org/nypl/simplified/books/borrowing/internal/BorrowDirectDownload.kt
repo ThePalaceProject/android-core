@@ -4,6 +4,7 @@ import one.irradia.mime.api.MIMECompatibility
 import one.irradia.mime.api.MIMEType
 import org.nypl.simplified.accounts.api.AccountReadableType
 import org.nypl.simplified.books.borrowing.BorrowContextType
+import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowRecoverableAuthenticationError
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskFactoryType
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskType
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFiles
@@ -50,6 +51,11 @@ class BorrowDirectDownload private constructor() : BorrowSubtaskType {
       bytesPerSecond = 0
     )
 
-    BorrowHTTP.download(context)
+    try {
+      BorrowHTTP.download(context)
+    } catch (e: BorrowRecoverableAuthenticationError) {
+      context.bookDownloadFailedBadCredentials()
+      throw e
+    }
   }
 }

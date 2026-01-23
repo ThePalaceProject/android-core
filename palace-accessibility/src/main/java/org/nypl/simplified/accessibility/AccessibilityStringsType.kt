@@ -12,5 +12,8 @@ interface AccessibilityStringsType {
   fun bookFailedReturn(title: String): String
   fun bookFailedLoan(title: String): String
   fun bookFailedDownload(title: String): String
-  fun bookLoanLimitReached(): String
+  fun bookLoanLimitReached(title: String): String
+  fun bookFailedLoanLoginRequired(title: String): String
+  fun bookFailedRevokeLoginRequired(title: String): String
+  fun bookFailedDownloadLoginRequired(title: String): String
 }

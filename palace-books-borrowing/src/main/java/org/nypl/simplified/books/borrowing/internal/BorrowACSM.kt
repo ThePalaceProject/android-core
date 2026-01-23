@@ -114,15 +114,22 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
           DownloadCancelled -> {
             throw BorrowSubtaskCancelled()
           }
+
           is DownloadFailedServer -> {
-            throw BorrowHTTP.onDownloadFailedServer(context, result)
+            throw BorrowHTTP.onDownloadFailedServer(
+              context = context,
+              result = result
+            )
           }
+
           is DownloadFailedUnacceptableMIME -> {
             throw BorrowSubtaskFailed()
           }
+
           is DownloadFailedExceptionally -> {
             throw BorrowHTTP.onDownloadFailedExceptionally(context, result)
           }
+
           is DownloadCompletedSuccessfully -> {
             this.fulfillACSMFile(
               context = context,
@@ -149,8 +156,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
   ): RequiredCredentials {
     context.taskRecorder.beginNewStep("Checking for Adobe ACS credentials...")
 
-    val credentials = context.account.loginState.credentials
-
+    val credentials = context.takeSubtaskCredentialsRequiringAccount()
     if (credentials == null) {
       context.taskRecorder.currentStepFailed(
         message = "The account has no credentials.",
@@ -250,6 +256,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
           acsmFile = drmHandle.info.acsmFile!!
         )
       }
+
       is LCPHandle,
       is BoundlessHandle,
       is NoneHandle ->
@@ -357,6 +364,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
           is CancellationException -> {
             BorrowSubtaskCancelled()
           }
+
           is AdobeDRMFulfillmentException -> {
             context.taskRecorder.currentStepFailed(
               message = "Adobe ACS fulfillment failed (${cause.errorCode})",
@@ -366,6 +374,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
             )
             BorrowSubtaskFailed()
           }
+
           else -> {
             context.taskRecorder.currentStepFailed(
               message = "Adobe ACS fulfillment failed (${cause.javaClass})",
@@ -416,11 +425,13 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
             context.taskRecorder.currentStepSucceeded("Saved book.")
             context.bookDownloadSucceeded()
           }
+
           is BookDatabaseEntryFormatHandlePDF,
           is BookDatabaseEntryFormatHandleAudioBook ->
             throw UnreachableCodeException()
         }
       }
+
       is LCPHandle,
       is BoundlessHandle,
       is NoneHandle ->

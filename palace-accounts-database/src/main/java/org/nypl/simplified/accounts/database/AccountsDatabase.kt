@@ -14,6 +14,14 @@ import org.nypl.simplified.accounts.api.AccountEventLoginStateChanged
 import org.nypl.simplified.accounts.api.AccountEventUpdated
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountLoginState
+import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggedIn
+import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggedInStaleCredentials
+import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggingIn
+import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggingInWaitingForExternalAuthentication
+import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggingOut
+import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoginFailed
+import org.nypl.simplified.accounts.api.AccountLoginState.AccountLogoutFailed
+import org.nypl.simplified.accounts.api.AccountLoginState.AccountNotLoggedIn
 import org.nypl.simplified.accounts.api.AccountPreferences
 import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.database.api.AccountType
@@ -166,7 +174,7 @@ class AccountsDatabase private constructor(
             accountEvents = this.accountEvents,
             description = accountDescription,
             credentials = this.credentials,
-            accountLoginState = AccountLoginState.AccountNotLoggedIn
+            accountLoginState = AccountNotLoggedIn(previousCredentials = null)
           )
         this.accounts[accountId] = account
         this.accountsByProvider.put(accountProvider.id, account)
@@ -264,6 +272,27 @@ class AccountsDatabase private constructor(
           modifiedDescription
         }
       )
+    }
+
+    override fun expireCredentialsIfApplicable() {
+      when (val stateThen = this.loginState) {
+        is AccountLoggedIn -> {
+          this.logger.debug("Credentials marked as expired.")
+          this.setLoginState(AccountLoggedInStaleCredentials(stateThen.credentials))
+        }
+        is AccountLoggedInStaleCredentials,
+        is AccountLoggingIn,
+        is AccountLoggingInWaitingForExternalAuthentication,
+        is AccountLoggingOut,
+        is AccountLoginFailed,
+        is AccountLogoutFailed,
+        is AccountNotLoggedIn -> {
+          this.logger.debug(
+            "Credentials are not in a state where they can be marked as expired ({}).",
+            stateThen.javaClass.name
+          )
+        }
+      }
     }
 
     override fun catalogURIForAge(age: Int): URI {
@@ -711,9 +740,9 @@ class AccountsDatabase private constructor(
           credentialsStore.get(accountId)
 
         val loginState: AccountLoginState = if (credentials != null) {
-          AccountLoginState.AccountLoggedIn(credentials)
+          AccountLoggedIn(credentials)
         } else {
-          AccountLoginState.AccountNotLoggedIn
+          AccountNotLoggedIn(previousCredentials = null)
         }
 
         val account =

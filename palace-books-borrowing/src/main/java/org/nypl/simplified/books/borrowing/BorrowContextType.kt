@@ -6,12 +6,14 @@ import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.nypl.drm.core.AdobeAdeptExecutorType
 import org.nypl.drm.core.BoundlessServiceType
+import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes
+import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.bearerTokenNotPermitted
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskCancelled
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskFailed
 import org.nypl.simplified.books.bundled.api.BundledContentResolverType
@@ -260,6 +262,57 @@ interface BorrowContextType {
    */
 
   fun chooseNewAcquisitionPath(entry: OPDSAcquisitionFeedEntry): Link
+
+  /**
+   * Indicate that downloading the current book failed. Implementations should base the
+   * actual resulting book status on the current status of the loan in the book database.
+   */
+
+  fun bookDownloadFailedBadCredentials()
+
+  /**
+   * Indicate that loaning the current book failed. Implementations should base the
+   * actual resulting book status on the current status of the loan in the book database.
+   */
+
+  fun bookLoanFailedBadCredentials()
+
+  /**
+   * Set the credentials to be used for the next subtask.
+   */
+
+  fun setNextSubtaskCredentials(
+    credentials: BorrowSubtaskCredentials
+  )
+
+  /**
+   * Take the credentials to be used for the current subtask. This will also have the effect
+   * of calling [setNextSubtaskCredentials] to reset the credentials to that of the current
+   * account.
+   */
+
+  fun takeSubtaskCredentials(): BorrowSubtaskCredentials
+
+  /**
+   * Call [takeSubtaskCredentials] and reject anything other than [BorrowSubtaskCredentials.UseAccountCredentials]
+   * with an error. Return the credentials for the current account (if any).
+   */
+
+  fun takeSubtaskCredentialsRequiringAccount(): AccountAuthenticationCredentials? {
+    return when (this.takeSubtaskCredentials()) {
+      BorrowSubtaskCredentials.UseAccountCredentials -> {
+        this.account.loginState.credentials
+      }
+      is BorrowSubtaskCredentials.UseBearerToken -> {
+        this.taskRecorder.currentStepFailed(
+          message = "A previous subtask required the use of a bearer token, but those cannot be used for this subtask.",
+          errorCode = bearerTokenNotPermitted,
+          extraMessages = listOf()
+        )
+        throw BorrowSubtaskFailed()
+      }
+    }
+  }
 
   /**
    * Information about the current SAML download, if one is in progress.
