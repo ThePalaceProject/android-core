@@ -319,7 +319,7 @@ class BookRevokeTaskAdobeDRMTest {
     TaskDumps.dump(logger, result)
     result as TaskResult.Success
 
-    Assertions.assertNull(this.bookRegistry.bookOrNull(bookId))
+    Assertions.assertNotNull(this.bookRegistry.bookOrNull(bookId))
 
     Mockito.verify(bookDatabaseEntry, Times(1)).delete()
   }
@@ -435,7 +435,7 @@ class BookRevokeTaskAdobeDRMTest {
     TaskDumps.dump(logger, result)
     result as TaskResult.Success
 
-    Assertions.assertNull(this.bookRegistry.bookOrNull(bookId))
+    Assertions.assertNotNull(this.bookRegistry.bookOrNull(bookId))
 
     Mockito.verify(bookDatabaseEntry, Times(1)).delete()
   }
@@ -596,7 +596,7 @@ class BookRevokeTaskAdobeDRMTest {
     TaskDumps.dump(logger, result)
     result as TaskResult.Success
 
-    Assertions.assertNull(this.bookRegistry.bookOrNull(bookId))
+    Assertions.assertNotNull(this.bookRegistry.bookOrNull(bookId))
 
     Mockito.verify(bookDatabaseEntry, Times(1)).delete()
     Mockito.verify(drmHandle, Times(1)).setAdobeRightsInformation(null)

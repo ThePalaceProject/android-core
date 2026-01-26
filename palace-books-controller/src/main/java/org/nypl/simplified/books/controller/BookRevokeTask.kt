@@ -94,7 +94,6 @@ class BookRevokeTask(
     this.revokeFormatHandle(account)
     this.revokeNotifyServer(account)
     this.revokeNotifyServerDeleteBook()
-    this.bookRegistry.clearFor(this.bookID)
     return this.taskRecorder.finishSuccess(Unit)
   }
 
