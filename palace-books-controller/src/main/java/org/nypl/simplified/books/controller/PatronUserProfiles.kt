@@ -3,7 +3,7 @@ package org.nypl.simplified.books.controller
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPResponseStatus
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
-import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addCredentialsToProperties
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addBasicTokenPropertiesIfApplicable
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.getAccessToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.database.api.AccountType
@@ -50,7 +50,7 @@ internal object PatronUserProfiles {
     val request =
       http.newRequest(patronSettingsURI)
         .setAuthorization(AccountAuthenticatedHTTP.createAuthorization(credentials))
-        .addCredentialsToProperties(credentials)
+        .addBasicTokenPropertiesIfApplicable(credentials)
         .build()
 
     val response = request.execute()

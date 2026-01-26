@@ -268,7 +268,8 @@ internal class ProfileFeedTask(
       if (!account.provider.authentication.isLoginPossible) {
         true
       } else {
-        account.loginState is AccountLoginState.AccountLoggedIn
+        (account.loginState is AccountLoginState.AccountLoggedIn) ||
+          (account.loginState is AccountLoginState.AccountLoggedInStaleCredentials)
       }
     } catch (e: Exception) {
       false
@@ -280,17 +281,20 @@ internal class ProfileFeedTask(
       is BookStatus.Held,
       is BookStatus.Holdable,
       is BookStatus.Loanable,
-      is BookStatus.ReachedLoanLimit,
       is BookStatus.Revoked ->
         false
 
-      is BookStatus.Downloading,
-      is BookStatus.DownloadWaitingForExternalAuthentication,
       is BookStatus.DownloadExternalAuthenticationInProgress,
+      is BookStatus.DownloadWaitingForExternalAuthentication,
+      is BookStatus.Downloading,
       is BookStatus.FailedDownload,
+      is BookStatus.FailedDownloadBadCredentials,
       is BookStatus.FailedLoan,
+      is BookStatus.FailedLoanBadCredentials,
       is BookStatus.FailedRevoke,
+      is BookStatus.FailedRevokeBadCredentials,
       is BookStatus.Loaned,
+      is BookStatus.ReachedLoanLimit,
       is BookStatus.RequestingDownload,
       is BookStatus.RequestingLoan,
       is BookStatus.RequestingRevoke ->
@@ -303,12 +307,15 @@ internal class ProfileFeedTask(
       is BookStatus.Held ->
         true
 
-      is BookStatus.Downloading,
-      is BookStatus.DownloadWaitingForExternalAuthentication,
       is BookStatus.DownloadExternalAuthenticationInProgress,
+      is BookStatus.DownloadWaitingForExternalAuthentication,
+      is BookStatus.Downloading,
       is BookStatus.FailedDownload,
       is BookStatus.FailedLoan,
+      is BookStatus.FailedLoanBadCredentials,
+      is BookStatus.FailedDownloadBadCredentials,
       is BookStatus.FailedRevoke,
+      is BookStatus.FailedRevokeBadCredentials,
       is BookStatus.Holdable,
       is BookStatus.Loanable,
       is BookStatus.Loaned,

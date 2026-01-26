@@ -7,7 +7,7 @@ import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType
 import org.librarysimplified.http.api.LSHTTPResponseStatus
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
-import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addCredentialsToProperties
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addBasicTokenPropertiesIfApplicable
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.getAccessToken
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.profiles.api.ProfileReadableType
@@ -58,7 +58,7 @@ class NotificationTokenHTTPCalls(
 
         val request = this.http.newRequest(queryUrl)
           .setAuthorization(AccountAuthenticatedHTTP.createAuthorizationIfPresent(credentials))
-          .addCredentialsToProperties(credentials)
+          .addBasicTokenPropertiesIfApplicable(credentials)
           .build()
 
         this.executor.execute {
@@ -121,7 +121,7 @@ class NotificationTokenHTTPCalls(
 
         val request = this.http.newRequest(url)
           .setAuthorization(AccountAuthenticatedHTTP.createAuthorizationIfPresent(credentials))
-          .addCredentialsToProperties(credentials)
+          .addBasicTokenPropertiesIfApplicable(credentials)
           .setMethod(
             LSHTTPRequestBuilderType.Method.Delete(
               serializeNotificationToken(
@@ -167,7 +167,7 @@ class NotificationTokenHTTPCalls(
 
     val request = http.newRequest(url)
       .setAuthorization(AccountAuthenticatedHTTP.createAuthorizationIfPresent(credentials))
-      .addCredentialsToProperties(credentials)
+      .addBasicTokenPropertiesIfApplicable(credentials)
       .setMethod(
         LSHTTPRequestBuilderType.Method.Put(
           serializeNotificationToken(

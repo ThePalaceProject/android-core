@@ -14,6 +14,7 @@ import org.joda.time.Duration
 import org.joda.time.Instant
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Timeout
 import org.librarysimplified.http.api.LSHTTPClientConfiguration
 import org.librarysimplified.http.api.LSHTTPClientType
+import org.librarysimplified.http.api.LSHTTPProblemReport
 import org.librarysimplified.http.vanilla.LSHTTPClients
 import org.mockito.Mockito
 import org.mockito.internal.verification.Times
@@ -68,6 +70,7 @@ import org.nypl.simplified.profiles.api.ProfilesDatabaseType
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.tests.books.controller.FakeAccounts.fakeAccount
 import org.nypl.simplified.tests.books.controller.FakeAccounts.fakeAccountProvider
+import org.nypl.simplified.tests.mocking.FakeFeedLoader
 import org.nypl.simplified.tests.mocking.MockBookDatabaseEntry
 import org.nypl.simplified.tests.mocking.MockCrashingFeedLoader
 import org.nypl.simplified.tests.mocking.MockRevokeStringResources
@@ -146,7 +149,7 @@ class BookRevokeTaskTest {
     this.cacheDirectory = File.createTempFile("book-borrow-tmp", "dir")
     this.cacheDirectory.delete()
     this.cacheDirectory.mkdirs()
-    this.feedLoader = this.createFeedLoader(this.executorFeeds)
+    this.feedLoader = this.createRealFeedLoader(this.executorFeeds)
     this.clock = { Instant.now() }
 
     this.server = MockWebServer()
@@ -162,19 +165,13 @@ class BookRevokeTaskTest {
     this.server.close()
   }
 
-  private  fun <T> immediateFuture(x : T): CompletableFuture<T> {
-    val future = CompletableFuture<T>()
-    future.complete(x)
-    return future
-  }
-
   private  fun <T> failedFuture(x : Throwable): CompletableFuture<T> {
     val future = CompletableFuture<T>()
     future.completeExceptionally(x)
     return future
   }
 
-  private fun createFeedLoader(executorFeeds: ListeningExecutorService): FeedLoaderType {
+  private fun createRealFeedLoader(executorFeeds: ListeningExecutorService): FeedLoaderType {
     val entryParser =
       OPDSAcquisitionFeedEntryParser.newParser()
     val parser =
@@ -287,7 +284,7 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    assertNull(this.bookRegistry.bookOrNull(bookId))
+    assertNotNull(this.bookRegistry.bookOrNull(bookId))
 
     assertTrue(bookDatabaseEntry.deleted)
     assertEquals(0, this.server.requestCount)
@@ -693,7 +690,7 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    assertNull(this.bookRegistry.bookOrNull(bookId))
+    assertNotNull(this.bookRegistry.bookOrNull(bookId))
 
     Mockito.verify(bookDatabaseEntry, Times(1)).delete()
 
@@ -825,7 +822,7 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    assertNull(this.bookRegistry.bookOrNull(bookId))
+    assertNotNull(this.bookRegistry.bookOrNull(bookId))
 
     assertTrue(bookDatabaseEntry.deleted)
     assertEquals(1, this.server.requestCount)
@@ -908,7 +905,7 @@ class BookRevokeTaskTest {
       .thenReturn(book)
 
     val feedLoader =
-      Mockito.mock(FeedLoaderType::class.java)
+      FakeFeedLoader()
 
     val task =
       BookRevokeTask(
@@ -1058,7 +1055,7 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    assertNull(this.bookRegistry.bookOrNull(bookId))
+    assertNotNull(this.bookRegistry.bookOrNull(bookId))
 
     assertTrue(bookDatabaseEntry.deleted)
     assertEquals(1, this.server.requestCount)
@@ -1142,7 +1139,7 @@ class BookRevokeTaskTest {
       .thenReturn(bookDatabaseEntry)
 
     val feedLoader =
-      Mockito.mock(FeedLoaderType::class.java)
+      FakeFeedLoader()
 
     val feed =
       Feed.empty(
@@ -1154,19 +1151,13 @@ class BookRevokeTaskTest {
         feedFacetGroups = mapOf()
       )
 
-    feed.entriesInOrder.add(FeedEntry.FeedEntryOPDS(account.id, opdsEntry))
+    feed.entriesInOrder.add(
+      FeedEntry.FeedEntryOPDS(account.id, opdsEntry))
 
     val feedResult =
       FeedLoaderResult.FeedLoaderSuccess(feed, null)
 
-    Mockito.`when`(
-      feedLoader.fetchURI(
-        accountID = this.anyNonNull(),
-        uri = this.anyNonNull(),
-        credentials = this.anyNonNull(),
-        method = this.anyNonNull()
-      )
-    ).thenReturn(immediateFuture(feedResult as FeedLoaderResult))
+    feedLoader.addResponse(feedResult)
 
     val task =
       BookRevokeTask(
@@ -1184,7 +1175,7 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    assertNull(this.bookRegistry.bookOrNull(bookId))
+    assertNotNull(this.bookRegistry.bookOrNull(bookId))
 
     assertTrue(bookDatabaseEntry.deleted)
     assertEquals(0, this.server.requestCount)
@@ -1318,7 +1309,7 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    assertNull(this.bookRegistry.bookOrNull(bookId))
+    assertNotNull(this.bookRegistry.bookOrNull(bookId))
 
     assertTrue(bookDatabaseEntry.deleted)
     assertEquals(1, this.server.requestCount)
@@ -1402,7 +1393,7 @@ class BookRevokeTaskTest {
       .thenReturn(bookDatabaseEntry)
 
     val feedLoader =
-      Mockito.mock(FeedLoaderType::class.java)
+      FakeFeedLoader()
 
     val task =
       BookRevokeTask(
@@ -1420,7 +1411,7 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    assertNull(this.bookRegistry.bookOrNull(bookId))
+    assertNotNull(this.bookRegistry.bookOrNull(bookId))
 
     assertTrue(bookDatabaseEntry.deleted)
     assertEquals(0, this.server.requestCount)
@@ -1550,7 +1541,7 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    assertNull(this.bookRegistry.bookOrNull(bookId))
+    assertNotNull(this.bookRegistry.bookOrNull(bookId))
 
     assertTrue(bookDatabaseEntry.deleted)
     assertEquals(1, this.server.requestCount)
@@ -1631,7 +1622,7 @@ class BookRevokeTaskTest {
       .thenReturn(book)
 
     val feedLoader =
-      Mockito.mock(FeedLoaderType::class.java)
+      FakeFeedLoader()
 
     val feed =
       Feed.empty(
@@ -1648,14 +1639,7 @@ class BookRevokeTaskTest {
     val feedResult =
       FeedLoaderResult.FeedLoaderSuccess(feed, null)
 
-    Mockito.`when`(
-      feedLoader.fetchURI(
-        accountID = this.anyNonNull(),
-        uri = this.anyNonNull(),
-        credentials = this.anyNonNull(),
-        method = this.anyNonNull()
-      )
-    ).thenReturn(immediateFuture(feedResult as FeedLoaderResult))
+    feedLoader.addResponse(feedResult)
 
     val task =
       BookRevokeTask(
@@ -1756,7 +1740,7 @@ class BookRevokeTaskTest {
       .thenReturn(book)
 
     val feedLoader =
-      Mockito.mock(FeedLoaderType::class.java)
+      FakeFeedLoader()
 
     val feedResult =
       FeedLoaderFailedAuthentication(
@@ -1766,14 +1750,7 @@ class BookRevokeTaskTest {
         attributesInitial = mapOf()
       )
 
-    Mockito.`when`(
-      feedLoader.fetchURI(
-        accountID = this.anyNonNull(),
-        uri = this.anyNonNull(),
-        credentials = this.anyNonNull(),
-        method = this.anyNonNull()
-      )
-    ).thenReturn(immediateFuture(feedResult as FeedLoaderResult))
+    feedLoader.addResponse(feedResult)
 
     val task =
       BookRevokeTask(
@@ -1796,7 +1773,129 @@ class BookRevokeTaskTest {
       this.bookRegistry.bookOrException(bookId).status.javaClass
     )
 
-    Mockito.verify(bookDatabaseEntry, Times(0)).delete()
+    Mockito.verify(bookDatabaseEntry, Times(0))
+      .delete()
+    Mockito.verify(account, Times(0))
+      .expireCredentialsIfApplicable()
+  }
+
+  /**
+   * Revoking a book using a URI fails if the server returns a NOT AUTHORIZED error.
+   */
+
+  @Test
+  @Timeout(value = 5L, unit = TimeUnit.SECONDS)
+  fun testRevokeURIFeed401Recoverable() {
+    val account =
+      fakeAccount()
+    val accountProvider =
+      fakeAccountProvider()
+    val profile =
+      Mockito.mock(ProfileType::class.java)
+    val profilesDatabase =
+      Mockito.mock(ProfilesDatabaseType::class.java)
+    val bookDatabase =
+      Mockito.mock(BookDatabaseType::class.java)
+    val bookDatabaseEntry =
+      Mockito.mock(BookDatabaseEntryType::class.java)
+    val bookId =
+      BookID.create("a")
+
+    val acquisition =
+      OPDSAcquisition(
+        OPDSAcquisition.Relation.ACQUISITION_BORROW,
+        Link.LinkBasic(URI.create("http://www.example.com/0.feed")),
+        this.mimeOf("application/epub+zip"),
+        listOf(),
+        emptyMap()
+      )
+
+    val opdsEntryBuilder =
+      OPDSAcquisitionFeedEntry.newBuilder(
+        "a",
+        "Title",
+        DateTime.now(),
+        OPDSAvailabilityOpenAccess.get(Option.some(this.server.url("revoke").toUri()))
+      )
+    opdsEntryBuilder.addAcquisition(acquisition)
+
+    val opdsEntry =
+      opdsEntryBuilder.build()
+
+    this.logBookEventsFor(bookId)
+
+    val book =
+      Book(
+        id = bookId,
+        account = this.accountID,
+        cover = null,
+        thumbnail = null,
+        entry = opdsEntry,
+        formats = listOf()
+      )
+
+    Mockito.`when`(account.id)
+      .thenReturn(this.accountID)
+    Mockito.`when`(profile.id)
+      .thenReturn(this.profileID)
+    Mockito.`when`(profilesDatabase.profiles())
+      .thenReturn(ConcurrentSkipListMap(mapOf(this.profileID to profile)))
+    Mockito.`when`(profile.account(this.accountID))
+      .thenReturn(account)
+    Mockito.`when`(account.provider)
+      .thenReturn(accountProvider)
+    Mockito.`when`(accountProvider.displayName)
+      .thenReturn("Display name")
+    Mockito.`when`(account.bookDatabase)
+      .thenReturn(bookDatabase)
+    Mockito.`when`(bookDatabase.entry(bookId))
+      .thenReturn(bookDatabaseEntry)
+    Mockito.`when`(bookDatabaseEntry.book)
+      .thenReturn(book)
+
+    val feedLoader =
+      FakeFeedLoader()
+
+    val feedResult =
+      FeedLoaderFailedAuthentication(
+        problemReport = LSHTTPProblemReport(
+          status = 401,
+          title = "Expired",
+          detail = "Expiration in detail",
+          type = "http://palaceproject.io/terms/problem/auth/recoverable/token/expired"
+        ),
+        exception = IOException(),
+        message = "Failed",
+        attributesInitial = mapOf()
+      )
+
+    feedLoader.addResponse(feedResult)
+
+    val task =
+      BookRevokeTask(
+        accountID = account.id,
+        profileID = profile.id,
+        profiles = profilesDatabase,
+        adobeDRM = null,
+        bookID = bookId,
+        bookRegistry = this.bookRegistry,
+        feedLoader = feedLoader,
+        revokeStrings = this.bookRevokeStrings
+      )
+
+    val result = task.call()
+    TaskDumps.dump(this.logger, result)
+
+    result as TaskResult.Failure
+    assertEquals(
+      BookStatus.FailedRevokeBadCredentials::class.java,
+      this.bookRegistry.bookOrException(bookId).status.javaClass
+    )
+
+    Mockito.verify(bookDatabaseEntry, Times(0))
+      .delete()
+    Mockito.verify(account, Times(1))
+      .expireCredentialsIfApplicable()
   }
 
   /**
@@ -1873,17 +1972,8 @@ class BookRevokeTaskTest {
     Mockito.`when`(bookDatabaseEntry.book)
       .thenReturn(book)
 
-    val feedLoader =
-      Mockito.mock(FeedLoaderType::class.java)
-
-    Mockito.`when`(
-      feedLoader.fetchURI(
-        accountID = this.anyNonNull(),
-        uri = this.anyNonNull(),
-        credentials = this.anyNonNull(),
-        method = this.anyNonNull()
-      )
-    ).thenReturn(CompletableFuture())
+    val feedLoader = FakeFeedLoader()
+    feedLoader.fetchURIQueue.add(CompletableFuture())
 
     val task =
       BookRevokeTask(
@@ -2199,17 +2289,8 @@ class BookRevokeTaskTest {
     Mockito.`when`(bookDatabaseEntry.book)
       .thenReturn(book)
 
-    val feedLoader =
-      Mockito.mock(FeedLoaderType::class.java)
-
-    Mockito.`when`(
-      feedLoader.fetchURI(
-        accountID = this.anyNonNull(),
-        uri = this.anyNonNull(),
-        credentials = this.anyNonNull(),
-        method = this.anyNonNull()
-      )
-    ).thenReturn(failedFuture(UniqueException()))
+    val feedLoader = FakeFeedLoader()
+    feedLoader.fetchURIQueue.add(failedFuture(UniqueException()))
 
     val task =
       BookRevokeTask(
@@ -2312,17 +2393,8 @@ class BookRevokeTaskTest {
     Mockito.`when`(bookDatabaseEntry.book)
       .thenReturn(book)
 
-    val feedLoader =
-      Mockito.mock(FeedLoaderType::class.java)
-
-    Mockito.`when`(
-      feedLoader.fetchURI(
-        accountID = this.anyNonNull(),
-        uri = this.anyNonNull(),
-        credentials = this.anyNonNull(),
-        method = this.anyNonNull()
-      )
-    ).thenReturn(failedFuture(UniqueException()))
+    val feedLoader = FakeFeedLoader()
+    feedLoader.fetchURIQueue.add(failedFuture(UniqueException()))
 
     val task =
       BookRevokeTask(
@@ -2478,7 +2550,7 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    assertNull(this.bookRegistry.bookOrNull(bookId))
+    assertNotNull(this.bookRegistry.bookOrNull(bookId))
 
     Mockito.verify(bookDatabaseEntry, Times(1)).delete()
 
@@ -2606,7 +2678,7 @@ class BookRevokeTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Success
 
-    assertNull(this.bookRegistry.bookOrNull(bookId))
+    assertNotNull(this.bookRegistry.bookOrNull(bookId))
 
     assertTrue(bookDatabaseEntry.deleted)
     assertEquals(1, this.server.requestCount)

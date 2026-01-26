@@ -14,6 +14,7 @@ import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookWithStatus
 import org.nypl.simplified.books.borrowing.BorrowContextType
+import org.nypl.simplified.books.borrowing.BorrowSubtaskCredentials
 import org.nypl.simplified.books.borrowing.BorrowTimeoutConfiguration
 import org.nypl.simplified.books.borrowing.SAMLDownloadContext
 import org.nypl.simplified.books.bundled.api.BundledContentResolverType
@@ -130,6 +131,39 @@ class MockBorrowContext(
     entry: OPDSAcquisitionFeedEntry
   ): Link {
     TODO("Not yet implemented")
+  }
+
+  override fun bookDownloadFailedBadCredentials() {
+    this.bookPublishStatus(
+      BookStatus.FailedDownloadBadCredentials(
+        id = this.bookCurrent.id,
+        result = this.taskRecorder.finishFailure()
+      )
+    )
+  }
+
+  override fun bookLoanFailedBadCredentials() {
+    this.bookPublishStatus(
+      BookStatus.FailedLoanBadCredentials(
+        id = this.bookCurrent.id,
+        result = this.taskRecorder.finishFailure()
+      )
+    )
+  }
+
+  private var nextSubtaskCredentials: BorrowSubtaskCredentials =
+    BorrowSubtaskCredentials.UseAccountCredentials
+
+  override fun setNextSubtaskCredentials(
+    credentials: BorrowSubtaskCredentials
+  ) {
+    this.nextSubtaskCredentials = credentials
+  }
+
+  override fun takeSubtaskCredentials(): BorrowSubtaskCredentials {
+    val next = this.nextSubtaskCredentials
+    this.setNextSubtaskCredentials(BorrowSubtaskCredentials.UseAccountCredentials)
+    return next
   }
 
   override fun bookLoanIsRequesting(message: String) {

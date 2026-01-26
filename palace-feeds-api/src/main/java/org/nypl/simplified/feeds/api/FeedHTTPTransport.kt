@@ -5,7 +5,7 @@ import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType
 import org.librarysimplified.http.api.LSHTTPResponseStatus
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
-import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addCredentialsToProperties
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addBasicTokenPropertiesIfApplicable
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.getAccessToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.opds.core.OPDSFeedTransportIOException
@@ -42,7 +42,7 @@ class FeedHTTPTransport(
     val request =
       this.http.newRequest(uri)
         .setAuthorization(auth)
-        .addCredentialsToProperties(credentials)
+        .addBasicTokenPropertiesIfApplicable(credentials)
         .setMethod(this.methodOfName(method))
         .build()
 

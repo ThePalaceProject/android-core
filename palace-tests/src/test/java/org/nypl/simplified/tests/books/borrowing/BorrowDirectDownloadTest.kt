@@ -12,7 +12,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.librarysimplified.http.api.LSHTTPClientConfiguration
 import org.librarysimplified.http.api.LSHTTPClientType
-import org.librarysimplified.http.bearer_token.LSHTTPBearerTokenInterceptors
 import org.librarysimplified.http.vanilla.LSHTTPClients
 import org.mockito.Mockito
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
@@ -31,6 +30,7 @@ import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookStatus.Downloading
 import org.nypl.simplified.books.book_registry.BookStatus.FailedDownload
+import org.nypl.simplified.books.book_registry.BookStatus.FailedDownloadBadCredentials
 import org.nypl.simplified.books.book_registry.BookStatus.Loaned
 import org.nypl.simplified.books.book_registry.BookStatus.Loaned.LoanedDownloaded
 import org.nypl.simplified.books.book_registry.BookStatusEvent
@@ -39,6 +39,7 @@ import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.httpConnect
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.httpContentTypeIncompatible
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.httpRequestFailed
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.requiredURIMissing
+import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFiles
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericPDFFiles
@@ -291,6 +292,72 @@ class BorrowDirectDownloadTest {
   }
 
   /**
+   * A 401 fails the download unambiguously.
+   */
+
+  @Test
+  fun testHTTP401Fails() {
+    val task = BorrowDirectDownload.createSubtask()
+
+    this.context.currentURIField =
+      Link.LinkBasic(this.webServer.url("/book.epub").toUri())
+    this.context.currentAcquisitionPathElement =
+      OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
+
+    this.webServer.enqueue(MockResponse().setResponseCode(401))
+
+    Assertions.assertThrows(BorrowSubtaskException.BorrowSubtaskFailed::class.java, {
+      task.execute(this.context)
+    })
+
+    assertEquals(httpRequestFailed, this.taskRecorder.finishFailure<Unit>().lastErrorCode)
+    assertEquals(0, this.bookDatabaseEntry.entryWrites)
+
+    assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(FailedDownload::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(0, this.bookStates.size)
+  }
+
+  /**
+   * A 401 fails the download unambiguously.
+   */
+
+  @Test
+  fun testHTTP401FailsRecoverable() {
+    val task = BorrowDirectDownload.createSubtask()
+
+    this.context.currentURIField =
+      Link.LinkBasic(this.webServer.url("/book.epub").toUri())
+    this.context.currentAcquisitionPathElement =
+      OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
+
+    this.webServer.enqueue(
+      MockResponse()
+        .setResponseCode(401)
+        .setHeader("Content-Type", "application/api-problem+json")
+        .setBody("""
+{
+  "status": 401,
+  "type": "http://palaceproject.io/terms/problem/auth/recoverable/token/expired",
+  "title": "Expired!",
+  "detail": "Expiration in detail"
+}
+        """.trimIndent())
+    )
+
+    Assertions.assertThrows(BorrowSubtaskException.BorrowRecoverableAuthenticationError::class.java, {
+      task.execute(this.context)
+    })
+
+    assertEquals(httpRequestFailed, this.taskRecorder.finishFailure<Unit>().lastErrorCode)
+    assertEquals(0, this.bookDatabaseEntry.entryWrites)
+
+    assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(FailedDownloadBadCredentials::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(0, this.bookStates.size)
+  }
+
+  /**
    * An incompatible MIME type fails the download.
    */
 
@@ -395,64 +462,6 @@ class BorrowDirectDownloadTest {
     this.webServer.enqueue(response)
 
     task.execute(this.context)
-
-    this.verifyBookRegistryHasStatus(LoanedDownloaded::class.java)
-    assertEquals("EPUB!", this.epubHandle.bookData)
-    assertEquals(0, this.bookDatabaseEntry.entryWrites)
-
-    assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
-    assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
-    assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
-    assertEquals(LoanedDownloaded::class.java, this.bookStates.removeAt(0).javaClass)
-    assertEquals(0, this.bookStates.size)
-  }
-
-  /**
-   * A file is downloaded even if it has to go through a bearer token.
-   */
-
-  @Test
-  fun testDownloadOkEPUBBearerToken() {
-    val task = BorrowDirectDownload.createSubtask()
-
-    this.context.currentURIField =
-      Link.LinkBasic(this.webServer.url("/book.epub").toUri())
-    this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
-
-    this.bookDatabaseEntry.formatHandlesField.clear()
-    this.bookDatabaseEntry.formatHandlesField.add(this.epubHandle)
-    check(this.bookDatabaseEntry.formatHandlesField.size == 1)
-    check(BookStatus.fromBook(this.bookDatabaseEntry.book) is Loaned)
-
-    val response0 =
-      MockResponse()
-        .setResponseCode(200)
-        .setHeader("Content-Type", LSHTTPBearerTokenInterceptors.bearerTokenContentType)
-        .setBody(
-          """{
-          "access_token": "abcd",
-          "expires_in": 1000,
-          "location": "http://localhost:20000/book.epub"
-        }
-          """.trimIndent()
-        )
-
-    val response1 =
-      MockResponse()
-        .setResponseCode(200)
-        .setHeader("Content-Type", "application/epub+zip")
-        .setBody("EPUB!")
-
-    this.webServer.enqueue(response0)
-    this.webServer.enqueue(response1)
-
-    task.execute(this.context)
-
-    val sent0 = this.webServer.takeRequest()
-    assertEquals("Basic c29tZW9uZTpub3QgYSBwYXNzd29yZA==", sent0.getHeader("Authorization"))
-    val sent1 = this.webServer.takeRequest()
-    assertEquals("Bearer abcd", sent1.getHeader("Authorization"))
 
     this.verifyBookRegistryHasStatus(LoanedDownloaded::class.java)
     assertEquals("EPUB!", this.epubHandle.bookData)

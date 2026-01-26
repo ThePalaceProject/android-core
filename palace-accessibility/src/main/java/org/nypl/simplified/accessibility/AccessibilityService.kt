@@ -114,7 +114,28 @@ class AccessibilityService private constructor(
 
       is BookStatus.ReachedLoanLimit ->
         if (this.previousStatusIsNot(event, BookStatus.ReachedLoanLimit::class.java)) {
-          this.speak(this.strings.bookLoanLimitReached())
+          this.speak(this.strings.bookLoanLimitReached(book.entry.title))
+        } else {
+          // Nothing to do
+        }
+
+      is BookStatus.FailedLoanBadCredentials ->
+        if (this.previousStatusIsNot(event, BookStatus.FailedLoanBadCredentials::class.java)) {
+          this.speak(this.strings.bookFailedLoanLoginRequired(book.entry.title))
+        } else {
+          // Nothing to do
+        }
+
+      is BookStatus.FailedRevokeBadCredentials ->
+        if (this.previousStatusIsNot(event, BookStatus.FailedRevokeBadCredentials::class.java)) {
+          this.speak(this.strings.bookFailedRevokeLoginRequired(book.entry.title))
+        } else {
+          // Nothing to do
+        }
+
+      is BookStatus.FailedDownloadBadCredentials ->
+        if (this.previousStatusIsNot(event, BookStatus.FailedDownloadBadCredentials::class.java)) {
+          this.speak(this.strings.bookFailedDownloadLoginRequired(book.entry.title))
         } else {
           // Nothing to do
         }

@@ -134,8 +134,12 @@ class BorrowLCPPDF : BorrowSubtaskType {
         DownloadCancelled ->
           throw BorrowSubtaskCancelled()
 
-        is DownloadFailedServer ->
-          throw BorrowHTTP.onDownloadFailedServer(context, result)
+        is DownloadFailedServer -> {
+          throw BorrowHTTP.onDownloadFailedServer(
+            context = context,
+            result = result
+          )
+        }
 
         is DownloadFailedUnacceptableMIME ->
           throw BorrowSubtaskFailed()

@@ -63,7 +63,7 @@ import org.nypl.simplified.profiles.api.ProfilesDatabaseType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountCreationStringResourcesType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountDeletionStringResourcesType
 import org.nypl.simplified.tests.MutableServiceDirectory
-import org.nypl.simplified.tests.books.controller.BooksControllerContract
+import org.nypl.simplified.tests.books.controller.BooksControllerTest
 import org.nypl.simplified.tests.mocking.FakeAccountCredentialStorage
 import org.nypl.simplified.tests.mocking.MockAccount
 import org.nypl.simplified.tests.mocking.MockAccountCreationStringResources
@@ -314,7 +314,7 @@ class SyncBookRefreshToken {
   }
 
   private fun resource(file: String): InputStream {
-    return BooksControllerContract::class.java.getResourceAsStream(file)!!
+    return BooksControllerTest::class.java.getResourceAsStream(file)!!
   }
 
   private fun simpleUserProfile(): String {

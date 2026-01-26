@@ -7,7 +7,8 @@ import one.irradia.mime.api.MIMEType
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType.Method.Put
 import org.librarysimplified.http.api.LSHTTPResponseStatus
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
-import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addCredentialsToProperties
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.Handled401
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addBasicTokenPropertiesIfApplicable
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.getAccessToken
 import org.nypl.simplified.accounts.api.AccountReadableType
 import org.nypl.simplified.books.book_registry.BookStatus.Held.HeldInQueue
@@ -22,6 +23,7 @@ import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.opdsFeedEnt
 import org.nypl.simplified.books.borrowing.internal.BorrowHTTP.isMimeTypeAcceptable
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowReachedLoanLimit
+import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowRecoverableAuthenticationError
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskFailed
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskHaltedEarly
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskFactoryType
@@ -87,8 +89,8 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
       context.taskRecorder.addAttribute("Loan URI", currentURI.toString())
       context.checkCancelled()
 
-      val credentials = context.account.loginState.credentials
-
+      val credentials =
+        context.takeSubtaskCredentialsRequiringAccount()
       val auth =
         AccountAuthenticatedHTTP.createAuthorizationIfPresent(credentials)
 
@@ -96,7 +98,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
         context.httpClient.newRequest(currentURI)
           .setMethod(Put(ByteArray(0), applicationOctetStream))
           .setAuthorization(auth)
-          .addCredentialsToProperties(credentials)
+          .addBasicTokenPropertiesIfApplicable(credentials)
           .build()
 
       return request.execute().use { response ->
@@ -163,6 +165,18 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
       exception = null,
       extraMessages = listOf()
     )
+
+    if (status.properties.status == 401) {
+      throw when (AccountAuthenticatedHTTP.handle401Error(status.properties.problemReport)) {
+        Handled401.ErrorIsRecoverableCredentialsExpired -> {
+          context.bookLoanFailedBadCredentials()
+          BorrowRecoverableAuthenticationError()
+        }
+        Handled401.ErrorIsUnrecoverable -> {
+          BorrowSubtaskFailed()
+        }
+      }
+    }
 
     if (report?.type == "http://librarysimplified.org/terms/problem/loan-limit-reached") {
       throw BorrowReachedLoanLimit()

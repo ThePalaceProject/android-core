@@ -1,9 +1,11 @@
 package org.nypl.simplified.ui.accounts
 
 import android.app.Activity
+import androidx.annotation.StringRes
 import androidx.annotation.UiThread
 import io.reactivex.disposables.Disposable
 import org.librarysimplified.services.api.Services
+import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountEventLoginStateChanged
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountLoginState
@@ -38,7 +40,31 @@ object AccountDetailModel {
   val usernamePasswordEntries =
     mutableMapOf<AccountID, UsernamePasswordAttempt>()
 
-  var showPleaseLoginTitle: Boolean = false
+  /**
+   * The reason that the user is required to log in. This is displayed at the top of the account
+   * details screen.
+   */
+
+  sealed interface PleaseLoginReason {
+    @StringRes
+    fun stringResource(): Int
+  }
+
+  object PleaseLoginReasonGeneric : PleaseLoginReason {
+    @StringRes
+    override fun stringResource(): Int {
+      return R.string.accountLoginRequired
+    }
+  }
+
+  object PleaseLoginReasonExpired : PleaseLoginReason {
+    @StringRes
+    override fun stringResource(): Int {
+      return R.string.accountLoginRequiredSessionExpiredMultiline
+    }
+  }
+
+  var showPleaseLoginReason: PleaseLoginReason? = null
 
   fun enableBookmarkSyncing(
     enabled: Boolean
@@ -126,9 +152,10 @@ object AccountDetailModel {
           .subscribe { event ->
             when (event.state) {
               is AccountLoggingIn,
+              is AccountLoginState.AccountLoggedInStaleCredentials,
               is AccountLoginState.AccountLoggingInWaitingForExternalAuthentication,
               is AccountLoginState.AccountLoggingOut,
-              AccountLoginState.AccountNotLoggedIn,
+              is AccountLoginState.AccountNotLoggedIn,
               is AccountLoginState.AccountLogoutFailed,
               is AccountLoginState.AccountLoginFailed -> {
                 // Nothing to do

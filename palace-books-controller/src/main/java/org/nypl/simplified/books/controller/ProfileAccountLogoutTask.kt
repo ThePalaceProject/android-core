@@ -11,6 +11,7 @@ import org.nypl.simplified.accounts.api.AccountAuthenticationAdobeClientToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationAdobePreActivationCredentials
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggedIn
+import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggedInStaleCredentials
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggingIn
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggingInWaitingForExternalAuthentication
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggingOut
@@ -94,6 +95,7 @@ class ProfileAccountLogoutTask(
 
     this.credentials =
       when (val state = this.account.loginState) {
+        is AccountLoggedInStaleCredentials -> state.credentials
         is AccountLoggedIn -> state.credentials
         is AccountLogoutFailed -> state.credentials
         is AccountLoggingOut -> state.credentials
@@ -112,7 +114,7 @@ class ProfileAccountLogoutTask(
       this.runDeviceDeactivation()
       this.runUpdateOPDSEntries()
       this.runBookRegistryClear()
-      this.account.setLoginState(AccountNotLoggedIn)
+      this.account.setLoginState(AccountNotLoggedIn(previousCredentials = null))
       return this.steps.finishSuccess(Unit)
     } catch (e: Throwable) {
       this.steps.currentStepFailedAppending(

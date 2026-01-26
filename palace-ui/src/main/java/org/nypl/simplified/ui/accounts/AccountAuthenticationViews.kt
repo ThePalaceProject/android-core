@@ -1,10 +1,8 @@
 package org.nypl.simplified.ui.accounts
 
-import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
-import androidx.core.view.isVisible
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
@@ -62,13 +60,6 @@ class AccountAuthenticationViews(
       this.anonymous,
       this.oAuthWithIntermediary,
       this.saml20
-    )
-
-  private val dividers =
-    listOf<View>(
-      this.viewGroup.findViewById(R.id.authTopDivider),
-      this.viewGroup.findViewById(R.id.authSpace),
-      this.viewGroup.findViewById(R.id.authBottomDivider)
     )
 
   /**
@@ -135,7 +126,6 @@ class AccountAuthenticationViews(
    */
 
   fun showFor(description: AccountProviderAuthenticationDescription) {
-    this.dividers.forEach { it.isVisible = description !is Anonymous }
     this.viewGroups.forEach { it.viewGroup.visibility = GONE }
 
     return when (description) {

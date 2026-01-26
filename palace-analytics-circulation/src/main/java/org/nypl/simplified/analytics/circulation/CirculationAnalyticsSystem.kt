@@ -2,7 +2,7 @@ package org.nypl.simplified.analytics.circulation
 
 import org.librarysimplified.http.api.LSHTTPResponseStatus
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
-import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addCredentialsToProperties
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addBasicTokenPropertiesIfApplicable
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.getAccessToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.analytics.api.AnalyticsConfiguration
@@ -50,7 +50,7 @@ class CirculationAnalyticsSystem(
     val request =
       this.configuration.http.newRequest(target)
         .setAuthorization(AccountAuthenticatedHTTP.createAuthorizationIfPresent(credentials))
-        .addCredentialsToProperties(credentials)
+        .addBasicTokenPropertiesIfApplicable(credentials)
         .build()
 
     val response = request.execute()

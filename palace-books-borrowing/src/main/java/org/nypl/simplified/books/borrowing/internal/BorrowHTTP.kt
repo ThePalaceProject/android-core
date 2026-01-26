@@ -3,6 +3,7 @@ package org.nypl.simplified.books.borrowing.internal
 import com.io7m.junreachable.UnreachableCodeException
 import one.irradia.mime.api.MIMECompatibility
 import one.irradia.mime.api.MIMEType
+import org.librarysimplified.http.api.LSHTTPAuthorizationBearerToken
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType.AllowRedirects.ALLOW_UNSAFE_REDIRECTS
 import org.librarysimplified.http.api.LSHTTPRequestProperties
 import org.librarysimplified.http.downloads.LSHTTPDownloadRequest
@@ -16,11 +17,15 @@ import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadRe
 import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedUnacceptableMIME
 import org.librarysimplified.http.downloads.LSHTTPDownloads
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
-import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addCredentialsToProperties
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.Handled401
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addBasicTokenPropertiesIfApplicable
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle
 import org.nypl.simplified.books.borrowing.BorrowContextType
-import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException
+import org.nypl.simplified.books.borrowing.BorrowSubtaskCredentials
+import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowRecoverableAuthenticationError
+import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskCancelled
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskFailed
+import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskFailedType
 import java.io.File
 import java.net.URI
 
@@ -42,22 +47,31 @@ object BorrowHTTP {
     requestModifier: ((LSHTTPRequestProperties) -> LSHTTPRequestProperties)? = null,
     expectedTypes: Set<MIMEType> = hashSetOf(context.currentAcquisitionPathElement.mimeType)
   ): LSHTTPDownloadRequest {
-    val credentials = context.account.loginState.credentials
+    val requestBuilder = context.httpClient.newRequest(target)
+    requestBuilder.allowRedirects(ALLOW_UNSAFE_REDIRECTS)
+    if (requestModifier != null) {
+      requestBuilder.setRequestModifier(requestModifier)
+    }
 
-    val auth =
-      AccountAuthenticatedHTTP.createAuthorizationIfPresent(credentials)
+    when (val useCredentials = context.takeSubtaskCredentials()) {
+      BorrowSubtaskCredentials.UseAccountCredentials -> {
+        val credentials =
+          context.account.loginState.credentials
+        val auth =
+          AccountAuthenticatedHTTP.createAuthorizationIfPresent(credentials)
 
-    val request =
-      context.httpClient.newRequest(target)
-        .setAuthorization(auth)
-        .addCredentialsToProperties(credentials)
-        .allowRedirects(ALLOW_UNSAFE_REDIRECTS)
-        .apply {
-          if (requestModifier != null) {
-            setRequestModifier(requestModifier)
-          }
-        }
-        .build()
+        requestBuilder.setAuthorization(auth)
+        requestBuilder.addBasicTokenPropertiesIfApplicable(credentials)
+      }
+
+      is BorrowSubtaskCredentials.UseBearerToken -> {
+        requestBuilder.setAuthorization(
+          LSHTTPAuthorizationBearerToken.ofToken(useCredentials.token)
+        )
+      }
+    }
+
+    val request = requestBuilder.build()
 
     return LSHTTPDownloadRequest(
       request = request,
@@ -87,7 +101,7 @@ object BorrowHTTP {
     context: BorrowContextType,
     receivedType: MIMEType
   ): Boolean {
-    return isMimeTypeAcceptable(
+    return this.isMimeTypeAcceptable(
       context,
       hashSetOf(context.currentAcquisitionPathElement.mimeType),
       receivedType
@@ -128,8 +142,8 @@ object BorrowHTTP {
 
   fun onDownloadFailedServer(
     context: BorrowContextType,
-    result: DownloadFailedServer
-  ): BorrowSubtaskFailed {
+    result: DownloadFailedServer,
+  ): BorrowSubtaskFailedType {
     val status = result.responseStatus
     context.taskRecorder.addAttributes(status.properties.problemReport?.toMap() ?: emptyMap())
     context.taskRecorder.currentStepFailed(
@@ -138,7 +152,21 @@ object BorrowHTTP {
       exception = null,
       extraMessages = listOf()
     )
-    return BorrowSubtaskFailed()
+
+    return if (result.responseStatus.properties.status == 401) {
+      when (AccountAuthenticatedHTTP.handle401Error(
+        result.responseStatus.properties.problemReport)) {
+        Handled401.ErrorIsRecoverableCredentialsExpired -> {
+          context.bookDownloadFailedBadCredentials()
+          BorrowRecoverableAuthenticationError()
+        }
+        Handled401.ErrorIsUnrecoverable -> {
+          BorrowSubtaskFailed()
+        }
+      }
+    } else {
+      BorrowSubtaskFailed()
+    }
   }
 
   /**
@@ -225,7 +253,7 @@ object BorrowHTTP {
     context: BorrowContextType,
     onDownloadFailedUnacceptableMIME: (BorrowContextType, DownloadFailedUnacceptableMIME) -> Unit =
       this::onDownloadFailedUnacceptableMimeDefault,
-    requestModifier: ((LSHTTPRequestProperties) -> LSHTTPRequestProperties)? = null
+    requestModifier: ((LSHTTPRequestProperties) -> LSHTTPRequestProperties)? = null,
   ) {
     return try {
       val currentURI = context.currentURICheck()
@@ -237,22 +265,26 @@ object BorrowHTTP {
 
       try {
         val downloadRequest =
-          createDownloadRequest(
+          this.createDownloadRequest(
             context = context,
             target = currentURI,
             outputFile = temporaryFile,
-            requestModifier = requestModifier
+            requestModifier = requestModifier,
           )
 
         when (val result = LSHTTPDownloads.download(downloadRequest)) {
           DownloadCancelled ->
-            throw BorrowSubtaskException.BorrowSubtaskCancelled()
+            throw BorrowSubtaskCancelled()
+
           is DownloadFailedServer ->
-            throw onDownloadFailedServer(context, result)
+            throw this.onDownloadFailedServer(context, result)
+
           is DownloadFailedUnacceptableMIME ->
             onDownloadFailedUnacceptableMIME(context, result)
+
           is DownloadFailedExceptionally ->
-            throw onDownloadFailedExceptionally(context, result)
+            throw this.onDownloadFailedExceptionally(context, result)
+
           is DownloadCompletedSuccessfully ->
             this.saveDownloadedContent(context, temporaryFile)
         }
@@ -281,10 +313,12 @@ object BorrowHTTP {
         formatHandle.copyInBook(temporaryFile)
         context.bookDownloadSucceeded()
       }
+
       is BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandlePDF -> {
         formatHandle.copyInBook(temporaryFile)
         context.bookDownloadSucceeded()
       }
+
       is BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook,
       null ->
         throw UnreachableCodeException()

@@ -8,7 +8,7 @@ import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadRe
 import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedUnacceptableMIME
 import org.librarysimplified.http.downloads.LSHTTPDownloads
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
-import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addCredentialsToProperties
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addBasicTokenPropertiesIfApplicable
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.getAccessToken
 import org.nypl.simplified.books.borrowing.BorrowContextType
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.lcpNotSupported
@@ -70,7 +70,10 @@ object BorrowLCPSupport {
         }
 
         is DownloadFailedServer -> {
-          throw BorrowHTTP.onDownloadFailedServer(context, result)
+          throw BorrowHTTP.onDownloadFailedServer(
+            context = context,
+            result = result,
+          )
         }
 
         is DownloadFailedUnacceptableMIME -> {
@@ -133,14 +136,14 @@ object BorrowLCPSupport {
     }
 
     val credentials =
-      context.account.loginState.credentials
+      context.takeSubtaskCredentialsRequiringAccount()
     val auth =
       AccountAuthenticatedHTTP.createAuthorizationIfPresent(credentials)
 
     val request =
       context.httpClient.newRequest(loansURI)
         .setAuthorization(auth)
-        .addCredentialsToProperties(credentials)
+        .addBasicTokenPropertiesIfApplicable(credentials)
         .build()
 
     return request.execute().use { response ->

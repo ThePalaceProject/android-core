@@ -315,8 +315,8 @@ abstract class AccountsDatabaseContract {
     Assertions.assertNotEquals(acc0.id, acc1.id)
     Assertions.assertNotEquals(acc0.directory, acc1.directory)
 
-    Assertions.assertEquals(AccountLoginState.AccountNotLoggedIn, acc0.loginState)
-    Assertions.assertEquals(AccountLoginState.AccountNotLoggedIn, acc1.loginState)
+    Assertions.assertEquals(AccountLoginState.AccountNotLoggedIn(null), acc0.loginState)
+    Assertions.assertEquals(AccountLoginState.AccountNotLoggedIn(null), acc1.loginState)
   }
 
   @Test

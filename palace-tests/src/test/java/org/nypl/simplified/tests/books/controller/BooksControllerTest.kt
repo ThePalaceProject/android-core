@@ -92,6 +92,7 @@ import org.nypl.simplified.tests.mocking.MockAccountLogoutStringResources
 import org.nypl.simplified.tests.mocking.MockAccountProviderResolutionStrings
 import org.nypl.simplified.tests.mocking.MockAccountProviders
 import org.nypl.simplified.tests.mocking.MockAnalytics
+import org.nypl.simplified.tests.mocking.MockApplication
 import org.nypl.simplified.tests.mocking.MockBookFormatSupport
 import org.nypl.simplified.tests.mocking.MockRevokeStringResources
 import org.slf4j.LoggerFactory
@@ -105,9 +106,9 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-abstract class BooksControllerContract {
+class BooksControllerTest {
 
-  private val logger = LoggerFactory.getLogger(BooksControllerContract::class.java)
+  private val logger = LoggerFactory.getLogger(BooksControllerTest::class.java)
 
   private lateinit var accountEvents: PublishSubject<AccountEvent>
   private lateinit var accountEventsReceived: MutableList<AccountEvent>
@@ -135,7 +136,9 @@ abstract class BooksControllerContract {
   private lateinit var profiles: ProfilesDatabaseType
   private lateinit var server: MockWebServer
 
-  protected abstract fun context(): Application
+  private fun context(): Application {
+    return Mockito.mock()
+  }
 
   private val accountProviderResolutionStrings =
     MockAccountProviderResolutionStrings()
@@ -471,9 +474,9 @@ abstract class BooksControllerContract {
     this.profiles.setProfileCurrent(profile.id)
     val account = profile.accountsByProvider()[provider.id]!!
 
-    Assertions.assertEquals(AccountNotLoggedIn, account.loginState)
+    Assertions.assertEquals(AccountNotLoggedIn(null), account.loginState)
     controller.booksSync(account.id).get()
-    Assertions.assertEquals(AccountNotLoggedIn, account.loginState)
+    Assertions.assertEquals(AccountNotLoggedIn(null), account.loginState)
   }
 
   /**
@@ -1059,7 +1062,7 @@ abstract class BooksControllerContract {
   }
 
   private fun resource(file: String): InputStream {
-    return BooksControllerContract::class.java.getResourceAsStream(file)!!
+    return BooksControllerTest::class.java.getResourceAsStream(file)!!
   }
 
   @Throws(ProfileDatabaseException::class)

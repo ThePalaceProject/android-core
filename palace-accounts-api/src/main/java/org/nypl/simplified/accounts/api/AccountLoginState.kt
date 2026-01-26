@@ -9,15 +9,27 @@ import org.nypl.simplified.taskrecorder.api.TaskResult
 
 sealed class AccountLoginState {
 
+  /**
+   * The previous credentials, if credentials are being refreshed.
+   */
+
+  abstract val previousCredentials: AccountAuthenticationCredentials?
+
+  /**
+   * The current assumed-valid credentials.
+   */
+
   abstract val credentials: AccountAuthenticationCredentials?
 
   /**
    * The account is not logged in.
    */
 
-  object AccountNotLoggedIn : AccountLoginState() {
+  data class AccountNotLoggedIn(
+    override val previousCredentials: AccountAuthenticationCredentials?
+  ) : AccountLoginState() {
     override val credentials: AccountAuthenticationCredentials?
-      get() = null
+      get() = this.previousCredentials
 
     override fun toString(): String =
       this.javaClass.simpleName
@@ -28,6 +40,7 @@ sealed class AccountLoginState {
    */
 
   data class AccountLoggingIn(
+    override val previousCredentials: AccountAuthenticationCredentials?,
 
     /**
      * A humanly-readable status message.
@@ -50,7 +63,7 @@ sealed class AccountLoginState {
     val cancellable: Boolean
   ) : AccountLoginState() {
     override val credentials: AccountAuthenticationCredentials?
-      get() = null
+      get() = this.previousCredentials
   }
 
   /**
@@ -58,6 +71,11 @@ sealed class AccountLoginState {
    */
 
   data class AccountLoggingInWaitingForExternalAuthentication(
+    /**
+     * The previous credentials, if credentials are being refreshed.
+     */
+
+    override val previousCredentials: AccountAuthenticationCredentials?,
 
     /**
      * The description being used to log in.
@@ -74,7 +92,7 @@ sealed class AccountLoginState {
     val status: String
   ) : AccountLoginState() {
     override val credentials: AccountAuthenticationCredentials?
-      get() = null
+      get() = this.previousCredentials
   }
 
   /**
@@ -82,6 +100,11 @@ sealed class AccountLoginState {
    */
 
   data class AccountLoginFailed(
+    /**
+     * The previous credentials, if credentials are being refreshed.
+     */
+
+    override val previousCredentials: AccountAuthenticationCredentials?,
     val taskResult: TaskResult.Failure<*>
   ) : AccountLoginState(), PresentableErrorType {
     override val message: String =
@@ -92,7 +115,7 @@ sealed class AccountLoginState {
       this.taskResult.attributes
 
     override val credentials: AccountAuthenticationCredentials?
-      get() = null
+      get() = this.previousCredentials
   }
 
   /**
@@ -101,7 +124,22 @@ sealed class AccountLoginState {
 
   data class AccountLoggedIn(
     override val credentials: AccountAuthenticationCredentials
-  ) : AccountLoginState()
+  ) : AccountLoginState() {
+    override val previousCredentials: AccountAuthenticationCredentials =
+      this.credentials
+  }
+
+  /**
+   * The account is currently logged in but the credentials appear to be stale. This can be due
+   * to, for example, expired SAML or OIDC sessions.
+   */
+
+  data class AccountLoggedInStaleCredentials(
+    override val credentials: AccountAuthenticationCredentials
+  ) : AccountLoginState() {
+    override val previousCredentials: AccountAuthenticationCredentials =
+      this.credentials
+  }
 
   /**
    * The account is currently logging out.
@@ -117,7 +155,10 @@ sealed class AccountLoginState {
      */
 
     val status: String
-  ) : AccountLoginState()
+  ) : AccountLoginState() {
+    override val previousCredentials: AccountAuthenticationCredentials =
+      this.credentials
+  }
 
   /**
    * The account failed to log out
@@ -127,6 +168,8 @@ sealed class AccountLoginState {
     val taskResult: TaskResult.Failure<*>,
     override val credentials: AccountAuthenticationCredentials
   ) : AccountLoginState(), PresentableErrorType {
+    override val previousCredentials: AccountAuthenticationCredentials =
+      this.credentials
     override val message: String =
       this.taskResult.message
     override val exception: Throwable? =

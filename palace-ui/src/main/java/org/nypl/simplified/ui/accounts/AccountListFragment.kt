@@ -17,6 +17,14 @@ import org.nypl.simplified.accounts.api.AccountEventCreation
 import org.nypl.simplified.accounts.api.AccountEventDeletion
 import org.nypl.simplified.accounts.api.AccountEventDeletion.AccountEventDeletionFailed
 import org.nypl.simplified.accounts.api.AccountEventUpdated
+import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggedIn
+import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggedInStaleCredentials
+import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggingIn
+import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggingInWaitingForExternalAuthentication
+import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggingOut
+import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoginFailed
+import org.nypl.simplified.accounts.api.AccountLoginState.AccountLogoutFailed
+import org.nypl.simplified.accounts.api.AccountLoginState.AccountNotLoggedIn
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
@@ -114,7 +122,19 @@ class AccountListFragment : Fragment(R.layout.account_list), MainBackButtonConsu
   private fun onAccountClicked(
     account: AccountType
   ) {
-    MainNavigation.Settings.openAccountDetail(account, showLoginTitle = false)
+    MainNavigation.Settings.openAccountDetail(
+      account,
+      when (account.loginState) {
+        is AccountLoggedInStaleCredentials -> AccountDetailModel.PleaseLoginReasonExpired
+        is AccountLoggedIn,
+        is AccountLoggingIn,
+        is AccountLoggingInWaitingForExternalAuthentication,
+        is AccountLoggingOut,
+        is AccountLoginFailed,
+        is AccountLogoutFailed,
+        is AccountNotLoggedIn -> null
+      }
+    )
   }
 
   override fun onViewCreated(

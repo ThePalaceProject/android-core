@@ -11,10 +11,6 @@ import org.nypl.simplified.books.book_database.api.BookDatabaseType
  * The interface exposed by accounts.
  *
  * An account aggregates a set of credentials and a book database.
- * Account are assigned monotonically increasing identifiers by the
- * application, but the identifiers themselves carry no meaning. It is
- * an error to depend on the values of identifiers for any kind of
- * program logic.
  */
 
 interface AccountType : AccountReadableType {
@@ -73,6 +69,8 @@ interface AccountType : AccountReadableType {
     return when (val state = this.loginState) {
       is AccountLoginState.AccountLoggedIn ->
         this.setLoginState(state.copy(update.invoke(state.credentials)))
+      is AccountLoginState.AccountLoggedInStaleCredentials ->
+        this.setLoginState(state.copy(update.invoke(state.credentials)))
       is AccountLoginState.AccountLoggingOut ->
         this.setLoginState(state.copy(update.invoke(state.credentials)))
 
@@ -80,7 +78,7 @@ interface AccountType : AccountReadableType {
       is AccountLoginState.AccountLoggingInWaitingForExternalAuthentication,
       is AccountLoginState.AccountLoginFailed,
       is AccountLoginState.AccountLogoutFailed,
-      AccountLoginState.AccountNotLoggedIn ->
+      is AccountLoginState.AccountNotLoggedIn ->
         Unit
     }
   }
@@ -112,4 +110,11 @@ interface AccountType : AccountReadableType {
   fun isBookmarkSyncable(): Boolean {
     return this.loginState.credentials?.annotationsURI != null
   }
+
+  /**
+   * Mark the current credentials as having expired, assuming they are credentials of a type
+   * that does expire.
+   */
+
+  fun expireCredentialsIfApplicable()
 }

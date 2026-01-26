@@ -1,6 +1,5 @@
 package org.nypl.simplified.tests.mocking
 
-import org.joda.time.DateTime
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountLoginState
 import org.nypl.simplified.accounts.api.AccountPreferences
@@ -28,6 +27,8 @@ class MockAccount(override val id: AccountID) : AccountType {
       catalogURIOverride = null,
       announcementsAcknowledged = listOf()
     )
+
+  var credentialsExpired = false
 
   private val providerId = UUID.randomUUID()
 
@@ -87,6 +88,10 @@ class MockAccount(override val id: AccountID) : AccountType {
     this.accountProviderCurrent = accountProvider
   }
 
+  override fun expireCredentialsIfApplicable() {
+    this.credentialsExpired = true
+  }
+
   override fun catalogURIForAge(age: Int): URI {
     val catalogURIOverride = this.preferences.catalogURIOverride
     if (catalogURIOverride != null) {
@@ -106,7 +111,7 @@ class MockAccount(override val id: AccountID) : AccountType {
   }
 
   private var loginStateMutable: AccountLoginState =
-    AccountLoginState.AccountNotLoggedIn
+    AccountLoginState.AccountNotLoggedIn(null)
 
   override val loginState: AccountLoginState
     get() = this.loginStateMutable

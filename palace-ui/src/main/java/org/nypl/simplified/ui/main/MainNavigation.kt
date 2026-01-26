@@ -13,6 +13,7 @@ import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.accounts.AccountCardCreatorFragment
 import org.nypl.simplified.ui.accounts.AccountCardCreatorParameters
 import org.nypl.simplified.ui.accounts.AccountDetailFragment
+import org.nypl.simplified.ui.accounts.AccountDetailModel
 import org.nypl.simplified.ui.accounts.AccountListFragment
 import org.nypl.simplified.ui.accounts.AccountListRegistryFragment
 import org.nypl.simplified.ui.catalog.CatalogPart
@@ -75,7 +76,7 @@ object MainNavigation {
   ) {
     UIThread.checkIsUIThread()
     this.tabAttribute.set(TabForCategory(TAB_SETTINGS))
-    Settings.openAccountDetail(account, showLoginTitle = true)
+    Settings.openAccountDetail(account, showLoginReason = AccountDetailModel.PleaseLoginReasonGeneric)
     this.tabAttribute.set(TabAny)
   }
 
@@ -213,13 +214,13 @@ object MainNavigation {
 
     fun openAccountDetail(
       account: AccountType,
-      showLoginTitle: Boolean
+      showLoginReason: AccountDetailModel.PleaseLoginReason?
     ) {
       this.stackPush(
         AccountDetailFragment.createScreenDefinition(
           AccountDetailFragment.AccountDetailScreenParameters(
             account = account,
-            showLoginTitle = showLoginTitle
+            showLoginReason = showLoginReason
           )
         )
       )

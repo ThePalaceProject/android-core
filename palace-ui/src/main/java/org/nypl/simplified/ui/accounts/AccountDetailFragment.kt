@@ -31,6 +31,7 @@ import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountLoginState
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggedIn
+import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggedInStaleCredentials
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggingIn
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggingInWaitingForExternalAuthentication
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggingOut
@@ -120,6 +121,7 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
   private lateinit var loginProgressBar: ProgressBar
   private lateinit var loginProgressText: TextView
   private lateinit var loginTitle: ViewGroup
+  private lateinit var loginTitleText: TextView
   private lateinit var reportIssueEmail: TextView
   private lateinit var reportIssueGroup: ViewGroup
   private lateinit var reportIssueItem: View
@@ -132,7 +134,7 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
 
   data class AccountDetailScreenParameters(
     val account: AccountType,
-    val showLoginTitle: Boolean
+    val showLoginReason: AccountDetailModel.PleaseLoginReason?
   )
 
   companion object :
@@ -142,7 +144,7 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
     ) : ScreenDefinitionType<AccountDetailScreenParameters, AccountDetailFragment> {
       override fun setup() {
         AccountDetailModel.account = this.parameters.account
-        AccountDetailModel.showPleaseLoginTitle = this.parameters.showLoginTitle
+        AccountDetailModel.showPleaseLoginReason = this.parameters.showLoginReason
         AccountDetailModel.clearPendingAfterLoginTask()
       }
 
@@ -199,6 +201,8 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
 
     this.loginTitle =
       view.findViewById(R.id.accountTitleAnnounce)
+    this.loginTitleText =
+      view.findViewById<TextView>(R.id.accountTitleAnnounceText)
     this.loginProgress =
       view.findViewById(R.id.accountLoginProgress)
     this.loginProgressBar =
@@ -230,10 +234,19 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
     this.reportIssueEmail =
       this.reportIssueGroup.findViewById(R.id.accountReportIssueEmail)
 
-    if (AccountDetailModel.showPleaseLoginTitle) {
-      this.loginTitle.visibility = View.VISIBLE
-    } else {
-      this.loginTitle.visibility = View.GONE
+    /*
+     * Show/hide the login reason text.
+     */
+
+    val ignored = when (val reason = AccountDetailModel.showPleaseLoginReason) {
+      AccountDetailModel.PleaseLoginReasonExpired,
+      AccountDetailModel.PleaseLoginReasonGeneric -> {
+        this.loginTitle.visibility = View.VISIBLE
+        this.loginTitleText.text = resources.getString(reason.stringResource())
+      }
+      null -> {
+        this.loginTitle.visibility = View.GONE
+      }
     }
 
     /*
@@ -707,8 +720,25 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
 
     this.disableSyncSwitchForLoginState(account.loginState)
 
+    /*
+     * Configure the actual login/logout buttons.
+     */
+
     return when (val loginState = account.loginState) {
-      AccountNotLoggedIn -> {
+      is AccountLoggedInStaleCredentials -> {
+        this.loginProgress.visibility = View.GONE
+
+        this.setLoginButtonStatus(
+          AsLoginButtonEnabled {
+            this.loginFormLock()
+            this.tryLogin()
+          }
+        )
+
+        this.loginFormUnlock()
+      }
+
+      is AccountNotLoggedIn -> {
         this.loginProgress.visibility = View.GONE
         this.setLoginButtonStatus(
           AsLoginButtonEnabled {
@@ -901,9 +931,13 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
     }
   }
 
-  private fun disableSyncSwitchForLoginState(loginState: AccountLoginState) {
+  private fun disableSyncSwitchForLoginState(
+    loginState: AccountLoginState
+  ) {
     return when (loginState) {
+      is AccountLoggedInStaleCredentials,
       is AccountLoggedIn -> {
+        // Nothing required.
       }
 
       is AccountLoggingIn,
@@ -911,7 +945,7 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
       is AccountLoggingOut,
       is AccountLoginFailed,
       is AccountLogoutFailed,
-      AccountNotLoggedIn -> {
+      is AccountNotLoggedIn -> {
         this.bookmarkSyncCheck.setOnCheckedChangeListener(null)
         this.bookmarkSyncCheck.isChecked = false
         this.bookmarkSyncCheck.isEnabled = false
