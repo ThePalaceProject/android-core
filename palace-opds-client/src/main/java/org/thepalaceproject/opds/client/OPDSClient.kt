@@ -29,6 +29,7 @@ import org.thepalaceproject.opds.client.OPDSState.LoadedFeedWithoutGroups
 import org.thepalaceproject.opds.client.OPDSState.Loading
 import java.io.IOException
 import java.net.URI
+import java.util.NoSuchElementException
 import java.util.SortedMap
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentLinkedDeque
@@ -680,7 +681,12 @@ class OPDSClient private constructor(
     this.topmostHandlerSubscriptions.close()
     this.topmostHandlerSubscriptions = CloseableCollection.create()
 
-    this.requestStack.removeFirst()
+    try {
+      this.requestStack.removeFirst()
+    } catch (_: NoSuchElementException) {
+      // We don't care if the stack was empty.
+    }
+
     this.requestStack.push(handler)
 
     this.topmostHandlerSubscriptions.add(
