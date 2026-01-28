@@ -1,23 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <resources>
-    <string name="splashGettingStarted">Getting Started with Palace</string>
-    <string name="splashStep1">Step 1</string>
-    <string name="splashStep1Text">\nFind Your Library</string>
-    <string name="splashStep2">Step 2</string>
-    <string name="splashStep2TextSegment1">Can\'t find your library?</string>
-    <string name="splashStep2TextSegment2">Go to the</string>
-    <string name="splashStep2TextSegment3">Palace Bookshelf</string>
-    <string name="splashStep2TextSegment4">for more than 10,000 free titles that you can enjoy now.</string>
-
-    <string name="splashStep2Text1">PLACEHOLDER PLACEHOLDER PLACEHOLDER PLACEHOLDER PLACEHOLDER PLACEHOLDER</string>
-    <string name="splashStep3">Step 3</string>
-    <string name="splashStep3Text1">\nRead. Listen. Enjoy!</string>
-
-    <string name="splashGotoNext">Go To Next Tutorial Page</string>
-    <string name="splashGotoPrevious">Go To Previous Tutorial Page</string>
-    <string name="splashSkip">Skip Tutorial</string>
-
     <string name="splashNotificationsText">
 We use notifications to tell you when book reservations are ready, and also to ensure the reliable playback of audiobooks.\n
 Do you want to enable notifications?
@@ -25,7 +8,6 @@ Do you want to enable notifications?
     <string name="splashNotificationsTextHint">
 You can re-visit this option again in the Palace settings screen if you don\'t want to decide right now.
     </string>
-    <string name="splashNotificationsAllow">Allow</string>
-    <string name="splashNotificationsSkip">Skip</string>
-
+    <string name="splashNotificationsAllow">Yes, enable</string>
+    <string name="splashNotificationsSkip">Not now</string>
 </resources>
