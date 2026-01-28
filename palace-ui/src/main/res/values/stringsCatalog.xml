@@ -14,8 +14,8 @@
   <string name="catalogAccessibilityBookPreviewPlay">Play Sample</string>
   <string name="catalogAccessibilityBookPreviewRead">Read Sample</string>
   <string name="catalogAccessibilityBookRead">Read Button</string>
-  <string name="catalogAccessibilityBookReserve">Reserve Button</string>
-  <string name="catalogAccessibilityBookRevokeHold">Remove Button</string>
+  <string name="catalogAccessibilityBookPlaceHold">Place Hold Button</string>
+  <string name="catalogAccessibilityBookManageHold">Manage Hold Button</string>
   <string name="catalogAccessibilityBookRevokeLoan">Return Now Button</string>
   <string name="catalogAccessibilityBookSync">Sync Button</string>
   <string name="catalogAccessibilityCloseCheckoutDrawer">Close The Checkout Drawer</string>
@@ -35,7 +35,7 @@
   <string name="catalogBookAvailabilityLoanedIndefinite">You have this book on loan.</string>
   <string name="catalogBookAvailabilityLoanedTimed">You have this book on loan for %1$s.</string>
   <string name="catalogBookAvailabilityOpenAccess">This book is yours to keep.</string>
-  <string name="catalogBookAvailabilityReservedIndefinite">You have this book reserved.</string>
+  <string name="catalogBookAvailabilityReservedIndefinite">You have this book on hold.</string>
   <string name="catalogBookAvailabilityReservedTimed">Your reservation expires in %1$s.</string>
   <string name="catalogBookAvailabilityRevoked">This book is waiting to be returned.</string>
   <string name="catalogBookCoverDescription">Book cover image</string>
@@ -58,7 +58,7 @@
   <string name="catalogBookPreviewBook">Read Sample</string>
   <string name="catalogCancel">Cancel</string>
   <string name="catalogDone">Done</string>
-  <string name="catalogCancelHold">Cancel Hold</string>
+  <string name="catalogManageHold">Manage Hold</string>
   <string name="catalogCancelling">Cancelling…</string>
   <string name="catalogCorrupted">The metadata for this book is damaged and cannot be displayed. Reloading the feed or syncing your account might fix the problem.</string>
   <string name="catalogDescription">Description</string>
@@ -68,7 +68,7 @@
   <string name="catalogLoginRequired">Please sign in to continue.</string>
   <!-- https://ebce-lyrasis.atlassian.net/browse/PP-2736 -->
   <string name="catalogGet">Borrow</string>
-  <string name="catalogHoldCannotCancel">This reservation cannot be cancelled.</string>
+  <string name="catalogHoldCannotCancel">This hold cannot be cancelled.</string>
   <string name="catalogInformation">Information</string>
   <string name="catalogListen">Listen</string>
   <string name="catalogMetaCategories">Categories</string>
@@ -88,7 +88,7 @@
   <string name="catalogReportIssue">Report issue…</string>
   <string name="catalogRequesting">Requesting…</string>
   <string name="catalogDownloading">Downloading…</string>
-  <string name="catalogReserve">Reserve</string>
+  <string name="catalogPlaceHold">Place Hold</string>
   <string name="catalogRetry">Retry</string>
   <string name="catalogReturn">Return</string>
   <string name="catalogSearch">Search</string>

@@ -167,7 +167,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     this.imageLoader =
       services.requireService(ImageLoaderType::class.java)
     this.buttonCreator =
-      CatalogButtons(this.requireContext(), this.screenSize)
+      CatalogButtons(this.requireContext())
     this.catalogBookEvents =
       services.requireService(CatalogBookRegistryEvents::class.java)
 

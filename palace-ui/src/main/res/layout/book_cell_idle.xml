@@ -88,21 +88,12 @@
                 android:id="@+id/bookCellIdleButtonNegative0"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/catalogFeedCellButtonsHeight"
-                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
                 android:layout_weight="1"
                 android:maxWidth="128dp"
                 android:padding="0dp"
-                android:text="@string/catalogDismiss" />
-
-            <Button
-                android:id="@+id/bookCellIdleButtonNegative1"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/catalogFeedCellButtonsHeight"
-                android:layout_marginLeft="8dp"
-                android:layout_weight="1"
-                android:maxWidth="128dp"
-                android:padding="0dp"
-                android:text="@string/catalogRetry" />
+                android:text="@string/catalogDismiss"
+                app:layout_goneMarginStart="0dp" />
         </LinearLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout

@@ -224,7 +224,7 @@
             android:layout_height="48dp"
             android:layout_marginEnd="32dp"
             android:layout_marginBottom="16dp"
-            android:autoSizeMinTextSize="14sp"
+            android:autoSizeMaxTextSize="16sp"
             android:autoSizeTextType="uniform"
             android:ellipsize="end"
             android:text="@string/catalogDownload"
@@ -322,13 +322,11 @@
             app:layout_constraintTop_toBottomOf="@id/book2DOverlayTitle"
             tools:text="@string/catalogPlaceholder" />
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/book2DOverlayButtons"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:gravity="center"
-            android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/book2DOverlaySubtitle">
@@ -336,29 +334,38 @@
             <Button
                 android:id="@+id/book2DOverlayButton0"
                 style="@style/Palace.Button.Contained.Medium"
-                android:layout_width="128dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:autoSizeMinTextSize="14sp"
-                android:autoSizeTextType="uniform"
-                android:ellipsize="end"
+                android:layout_marginEnd="8dp"
                 android:maxLines="1"
-                android:text="@string/catalogDownload" />
-
-            <View
-                android:layout_width="16dp"
-                android:layout_height="16dp" />
+                android:text="@string/catalogDownload"
+                android:autoSizeMaxTextSize="16sp"
+                android:autoSizeTextType="uniform"
+                app:layout_constraintWidth_max="160dp"
+                app:layout_constraintEnd_toStartOf="@id/book2DOverlayButton1"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_goneMarginEnd="0dp" />
 
             <Button
                 android:id="@+id/book2DOverlayButton1"
                 style="@style/Palace.Button.Outlined.Medium"
-                android:layout_width="128dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:autoSizeMinTextSize="14sp"
-                android:autoSizeTextType="uniform"
-                android:ellipsize="end"
+                android:layout_marginStart="8dp"
                 android:maxLines="1"
-                android:text="@string/catalogPreview" />
-        </LinearLayout>
+                android:text="@string/catalogPreview"
+                android:autoSizeMaxTextSize="16sp"
+                android:autoSizeTextType="uniform"
+                app:layout_constraintWidth_max="160dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintStart_toEndOf="@id/book2DOverlayButton0"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_goneMarginStart="0dp" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -1077,7 +1077,7 @@ class CatalogFeedViewDetails2(
     }
 
     this.reconfigureButton0(
-      text = R.string.catalogCancelHold,
+      text = R.string.catalogManageHold,
       actionInPage = {
         this.openDrawer()
         this.onBookRevokeRequested(status)
@@ -1186,7 +1186,7 @@ class CatalogFeedViewDetails2(
     this.configureInfoContainer(NONE) {}
 
     this.reconfigureButton0(
-      text = R.string.catalogReserve,
+      text = R.string.catalogPlaceHold,
       actionInPage = {
         this.openDrawer()
         this.onBookBorrowRequested(status.toBorrowParameters())

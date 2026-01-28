@@ -988,16 +988,21 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-01-27T17:11:38+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.24.0">
+    <c:release date="2026-01-28T13:20:55+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.24.0">
       <c:changes>
         <c:change date="2026-01-26T00:00:00+00:00" summary="Large refactoring for SAML and credential expiration.">
           <c:tickets>
             <c:ticket id="PP-3495"/>
           </c:tickets>
         </c:change>
-        <c:change date="2026-01-27T17:11:38+00:00" summary="Fix a very unlikely crash when refreshing an OPDS feed after an error.">
+        <c:change date="2026-01-27T00:00:00+00:00" summary="Fix a very unlikely crash when refreshing an OPDS feed after an error.">
           <c:tickets>
             <c:ticket id="PP-3576"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-01-28T13:20:55+00:00" summary="Update catalog language to change Reservations to Holds.">
+          <c:tickets>
+            <c:ticket id="PP-3581"/>
           </c:tickets>
         </c:change>
       </c:changes>

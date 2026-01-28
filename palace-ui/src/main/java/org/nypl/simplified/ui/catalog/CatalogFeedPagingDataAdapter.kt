@@ -130,8 +130,6 @@ class CatalogFeedPagingDataAdapter(
       this.idleButtons.findViewById<Button>(R.id.bookCellIdleButtonPositive)
     private val idleButtonNegative0 =
       this.idleButtons.findViewById<Button>(R.id.bookCellIdleButtonNegative0)
-    private val idleButtonNegative1 =
-      this.idleButtons.findViewById<Button>(R.id.bookCellIdleButtonNegative1)
 
     private val progressProgress =
       this.view.findViewById<ProgressBar>(R.id.bookCellInProgressBar)
@@ -416,6 +414,7 @@ class CatalogFeedPagingDataAdapter(
       this.errorDetails.setOnClickListener {
         this@CatalogFeedPagingDataAdapter.onShowTaskError(status.result)
       }
+      this.errorRetry.setText(R.string.catalogRetry)
       this.errorRetry.setOnClickListener {
         this.onBookBorrow(book)
       }
@@ -436,6 +435,7 @@ class CatalogFeedPagingDataAdapter(
       this.errorDetails.setOnClickListener {
         this@CatalogFeedPagingDataAdapter.onShowTaskError(status.result)
       }
+      this.errorRetry.setText(R.string.accountLogin)
       this.errorRetry.setOnClickListener {
         this.onBookBorrow(book)
       }
@@ -504,6 +504,7 @@ class CatalogFeedPagingDataAdapter(
       this.errorDetails.setOnClickListener {
         this@CatalogFeedPagingDataAdapter.onShowTaskError(status.result)
       }
+      this.errorRetry.setText(R.string.catalogRetry)
       this.errorRetry.setOnClickListener {
         this.onBookBorrow(book)
       }
@@ -525,6 +526,7 @@ class CatalogFeedPagingDataAdapter(
       this.errorDetails.setOnClickListener {
         this@CatalogFeedPagingDataAdapter.onShowTaskError(status.result)
       }
+      this.errorRetry.setText(R.string.accountLogin)
       this.errorRetry.setOnClickListener {
         this.onBookBorrow(book)
       }
@@ -546,6 +548,7 @@ class CatalogFeedPagingDataAdapter(
       this.errorDetails.setOnClickListener {
         this@CatalogFeedPagingDataAdapter.onShowTaskError(status.result)
       }
+      this.errorRetry.setText(R.string.catalogRetry)
       this.errorRetry.setOnClickListener {
         this.onBookRevoke(book, status)
       }
@@ -567,6 +570,7 @@ class CatalogFeedPagingDataAdapter(
       this.errorDetails.setOnClickListener {
         this@CatalogFeedPagingDataAdapter.onShowTaskError(status.result)
       }
+      this.errorRetry.setText(R.string.accountLogin)
       this.errorRetry.setOnClickListener {
         this.onBookRevoke(book, status)
       }
@@ -594,7 +598,6 @@ class CatalogFeedPagingDataAdapter(
         this.setVisible(this.idleButtonPositive, false)
       }
       this.setVisible(this.idleButtonNegative0, false)
-      this.setVisible(this.idleButtonNegative1, false)
 
       val position = status.queuePosition
       if (position != null) {
@@ -637,7 +640,6 @@ class CatalogFeedPagingDataAdapter(
       } else {
         this.setVisible(this.idleButtonNegative0, false)
       }
-      this.setVisible(this.idleButtonNegative1, false)
     }
 
     private fun onBookStatusHoldable(
@@ -658,7 +660,6 @@ class CatalogFeedPagingDataAdapter(
       )
       this.setVisible(this.idleButtonPositive, true)
       this.setVisible(this.idleButtonNegative0, false)
-      this.setVisible(this.idleButtonNegative1, false)
     }
 
     private fun onBookStatusLoanable(
@@ -679,7 +680,6 @@ class CatalogFeedPagingDataAdapter(
       )
       this.setVisible(this.idleButtonPositive, true)
       this.setVisible(this.idleButtonNegative0, false)
-      this.setVisible(this.idleButtonNegative1, false)
     }
 
     private fun onBookStatusLoanedDownloaded(
@@ -742,7 +742,6 @@ class CatalogFeedPagingDataAdapter(
       } else {
         this.setVisible(this.idleButtonNegative0, false)
       }
-      this.setVisible(this.idleButtonNegative1, false)
     }
 
     private fun setIdleTime(
@@ -814,7 +813,6 @@ class CatalogFeedPagingDataAdapter(
       } else {
         this.setVisible(this.idleButtonNegative0, false)
       }
-      this.setVisible(this.idleButtonNegative1, false)
     }
 
     private fun onBookStatusReachedLoanLimit(
