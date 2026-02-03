@@ -3,7 +3,6 @@ package org.nypl.simplified.notifications
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.os.Build
 import org.nypl.simplified.profiles.api.ProfileNoneCurrentException
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.slf4j.LoggerFactory
@@ -19,40 +18,47 @@ class NotificationsService(
     LoggerFactory.getLogger(NotificationsService::class.java)
 
   init {
-    createNotificationChannels()
+    this.createNotificationChannels()
 
     try {
       httpCalls.registerFCMTokenForProfileAccounts(profilesController.profileCurrent())
-    } catch (exception: ProfileNoneCurrentException) {
-      logger.error("No profile to register FCM token")
+    } catch (_: ProfileNoneCurrentException) {
+      this.logger.error("No profile to register FCM token")
     }
   }
 
   private fun createNotificationChannels() {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+    this.logger.debug("Creating notification channels.")
+
+    val notificationManager =
+      this.context.getSystemService(Context.NOTIFICATION_SERVICE)
+        as? NotificationManager
+
+    if (notificationManager == null) {
+      this.logger.warn("No system notification manager is available.")
       return
     }
 
-    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as?
-      NotificationManager ?: return
-
     // delete possible usages for the old notifications channel
-    notificationManager.deleteNotificationChannel(notificationResources.notificationChannelNameOld)
+    notificationManager.deleteNotificationChannel(this.notificationResources.notificationChannelNameOld)
 
-    // there's no harm on constantly creating notification channels
-    notificationResources.notificationChannels.forEach { channel ->
-      this.logger.debug("Creating notification channel: {}", channel)
+    for (channelDescription in this.notificationResources.notificationChannels) {
+      this.logger.debug("Creating notification channel: {}", channelDescription)
 
-      notificationManager.createNotificationChannel(
-        NotificationChannel(
-          channel.id,
-          channel.name,
-          NotificationManager.IMPORTANCE_DEFAULT
-        ).apply {
-          description = channel.description
-          enableVibration(true)
-        }
-      )
+      try {
+        val channelInfo =
+          NotificationChannel(
+            channelDescription.id,
+            channelDescription.name,
+            NotificationManager.IMPORTANCE_DEFAULT
+          )
+
+        channelInfo.description = channelDescription.description
+        channelInfo.enableVibration(true)
+        notificationManager.createNotificationChannel(channelInfo)
+      } catch (e: Throwable) {
+        this.logger.debug("Failed to create notification channel {}: ", channelDescription.id, e)
+      }
     }
   }
 }

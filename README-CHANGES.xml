@@ -1012,8 +1012,14 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-02-03T12:33:36+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.25.0">
-      <c:changes/>
+    <c:release date="2026-02-03T13:29:02+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.25.0">
+      <c:changes>
+        <c:change date="2026-02-03T13:29:02+00:00" summary="Attempt to allow notifications on Android 10.">
+          <c:tickets>
+            <c:ticket id="PP-3631"/>
+          </c:tickets>
+        </c:change>
+      </c:changes>
     </c:release>
   </c:releases>
   <c:ticket-systems>
