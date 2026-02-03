@@ -150,17 +150,11 @@ dependencyResolutionManagement {
         google()
 
         /*
-         * Allow access to the Sonatype snapshots repositories.
+         * Allow access to the Sonatype snapshots repository.
          */
 
         maven {
             url = uri("https://central.sonatype.com/repository/maven-snapshots/")
-        }
-        maven {
-            url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-        }
-        maven {
-            url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
         }
 
         /*
