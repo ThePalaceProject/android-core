@@ -2,6 +2,9 @@ package org.nypl.simplified.books.borrowing
 
 import android.app.Application
 import org.joda.time.Instant
+import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentCredentialsBasic
+import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentCredentialsToken
+import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentCredentialsType
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.nypl.drm.core.AdobeAdeptExecutorType
@@ -303,6 +306,7 @@ interface BorrowContextType {
       BorrowSubtaskCredentials.UseAccountCredentials -> {
         this.account.loginState.credentials
       }
+
       is BorrowSubtaskCredentials.UseBearerToken -> {
         this.taskRecorder.currentStepFailed(
           message = "A previous subtask required the use of a bearer token, but those cannot be used for this subtask.",
@@ -310,6 +314,44 @@ interface BorrowContextType {
           extraMessages = listOf()
         )
         throw BorrowSubtaskFailed()
+      }
+    }
+  }
+
+  /**
+   * Equivalent to [takeSubtaskCredentials] but the result is transformed into a form useful
+   * for fulfilling audiobook manifests and licenses.
+   */
+
+  fun takeSubtaskCredentialsForAudiobook(): ManifestFulfillmentCredentialsType? {
+    return when (val c = this.takeSubtaskCredentials()) {
+      BorrowSubtaskCredentials.UseAccountCredentials -> {
+        when (val ac = this.account.loginState.credentials) {
+          is AccountAuthenticationCredentials.Basic -> {
+            ManifestFulfillmentCredentialsBasic(
+              userName = ac.userName.value,
+              password = ac.password.value
+            )
+          }
+
+          is AccountAuthenticationCredentials.BasicToken -> {
+            ManifestFulfillmentCredentialsToken(ac.authenticationTokenInfo.accessToken)
+          }
+
+          is AccountAuthenticationCredentials.OAuthWithIntermediary -> {
+            throw UnsupportedOperationException("No OAuth audiobook support.")
+          }
+
+          is AccountAuthenticationCredentials.SAML2_0 -> {
+            ManifestFulfillmentCredentialsToken(ac.accessToken)
+          }
+
+          null -> null
+        }
+      }
+
+      is BorrowSubtaskCredentials.UseBearerToken -> {
+        ManifestFulfillmentCredentialsToken(c.token)
       }
     }
   }

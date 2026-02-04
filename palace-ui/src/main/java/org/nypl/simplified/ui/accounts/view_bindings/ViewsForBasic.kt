@@ -2,6 +2,7 @@ package org.nypl.simplified.ui.accounts.view_bindings
 
 import android.text.InputType
 import android.text.method.PasswordTransformationMethod
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.CheckBox
@@ -14,6 +15,7 @@ import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountUsername
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus
+import org.nypl.simplified.ui.accounts.AccountLogoutButtonStatus
 import org.nypl.simplified.ui.accounts.OnTextChangeListener
 import org.slf4j.LoggerFactory
 
@@ -26,6 +28,7 @@ class ViewsForBasic(
   val userLabel: TextInputLayout,
   val onUsernamePasswordChangeListener: (AccountUsername, AccountPassword) -> Unit,
   val loginButton: Button,
+  val logoutButton: Button,
   val resetPasswordLabel: TextView
 ) : AccountAuthenticationViewBindings() {
 
@@ -99,39 +102,79 @@ class ViewsForBasic(
     this.pass.isEnabled = true
   }
 
+  private fun setVisibility(
+    view: View,
+    v: Int
+  ) {
+    if (view.visibility != v) {
+      view.visibility = v
+    }
+  }
+
   override fun setLoginButtonStatus(status: AccountLoginButtonStatus) {
     return when (status) {
       is AccountLoginButtonStatus.AsLoginButtonEnabled -> {
         this.loginButton.setText(R.string.accountLogin)
         this.loginButton.isEnabled = true
         this.loginButton.setOnClickListener { status.onClick.invoke() }
+        this.setVisibility(this.loginButton, View.VISIBLE)
       }
 
       AccountLoginButtonStatus.AsLoginButtonDisabled -> {
         this.loginButton.setText(R.string.accountLogin)
         this.loginButton.isEnabled = false
+        this.setVisibility(this.loginButton, View.VISIBLE)
       }
 
       is AccountLoginButtonStatus.AsCancelButtonEnabled -> {
         this.loginButton.setText(R.string.accountCancel)
         this.loginButton.isEnabled = true
         this.loginButton.setOnClickListener { status.onClick.invoke() }
-      }
-
-      is AccountLoginButtonStatus.AsLogoutButtonEnabled -> {
-        this.loginButton.setText(R.string.accountLogout)
-        this.loginButton.isEnabled = true
-        this.loginButton.setOnClickListener { status.onClick.invoke() }
-      }
-
-      AccountLoginButtonStatus.AsLogoutButtonDisabled -> {
-        this.loginButton.setText(R.string.accountLogout)
-        this.loginButton.isEnabled = false
+        this.setVisibility(this.loginButton, View.VISIBLE)
       }
 
       AccountLoginButtonStatus.AsCancelButtonDisabled -> {
         this.loginButton.setText(R.string.accountCancel)
         this.loginButton.isEnabled = false
+        this.setVisibility(this.loginButton, View.VISIBLE)
+      }
+
+      AccountLoginButtonStatus.AsButtonGone -> {
+        this.setVisibility(this.loginButton, View.GONE)
+      }
+    }
+  }
+
+  override fun setLogoutButtonStatus(status: AccountLogoutButtonStatus) {
+    return when (status) {
+      is AccountLogoutButtonStatus.AsLogoutButtonEnabled -> {
+        this.logoutButton.setText(R.string.accountLogout)
+        this.logoutButton.isEnabled = true
+        this.logoutButton.setOnClickListener { status.onClick.invoke() }
+        this.setVisibility(this.logoutButton, View.VISIBLE)
+      }
+
+      AccountLogoutButtonStatus.AsLogoutButtonDisabled -> {
+        this.logoutButton.setText(R.string.accountLogout)
+        this.logoutButton.isEnabled = false
+        this.setVisibility(this.logoutButton, View.VISIBLE)
+      }
+
+      is AccountLogoutButtonStatus.AsCancelButtonEnabled -> {
+        this.logoutButton.setText(R.string.accountCancel)
+        this.logoutButton.isEnabled = true
+        this.logoutButton.setOnClickListener { status.onClick.invoke() }
+        this.setVisibility(this.logoutButton, View.VISIBLE)
+      }
+
+      AccountLogoutButtonStatus.AsCancelButtonDisabled -> {
+        this.logoutButton.setText(R.string.accountCancel)
+        this.logoutButton.isEnabled = false
+        this.setVisibility(this.logoutButton, View.VISIBLE)
+      }
+
+      AccountLogoutButtonStatus.AsButtonGone -> {
+        this.setVisibility(this.logoutButton, View.GONE)
       }
     }
   }
@@ -252,6 +295,7 @@ class ViewsForBasic(
         showPass = viewGroup.findViewById(R.id.authBasicShowPass),
         onUsernamePasswordChangeListener = onUsernamePasswordChangeListener,
         loginButton = viewGroup.findViewById(R.id.authBasicLogin),
+        logoutButton = viewGroup.findViewById(R.id.authBasicLogout),
         resetPasswordLabel = viewGroup.findViewById(R.id.resetPasswordLabel)
       )
     }

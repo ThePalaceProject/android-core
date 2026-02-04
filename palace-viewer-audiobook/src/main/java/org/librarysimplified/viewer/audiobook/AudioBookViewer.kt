@@ -8,6 +8,9 @@ import org.librarysimplified.audiobook.api.PlayerUserAgent
 import org.librarysimplified.audiobook.feedbooks.FeedbooksPlayerExtension
 import org.librarysimplified.audiobook.license_check.spi.SingleLicenseCheckProviderType
 import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
+import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentCredentialsBasic
+import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentCredentialsToken
+import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentCredentialsType
 import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfilled
 import org.librarysimplified.audiobook.manifest_parser.api.ManifestUnparsed
 import org.librarysimplified.audiobook.manifest_parser.extension_spi.ManifestParserExtensionType
@@ -16,6 +19,7 @@ import org.librarysimplified.audiobook.views.PlayerModelState
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.librarysimplified.services.api.Services
+import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookFormat
@@ -224,7 +228,7 @@ class AudioBookViewer : ViewerProviderType {
         AudioBookManifestRequest(
           cacheDirectory = activity.cacheDir,
           contentType = format.contentType,
-          credentials = accountCredentials,
+          credentials = manifestCredentialsOf(accountCredentials),
           httpClient = httpClient,
           palaceID = palaceID,
           services = services,
@@ -323,6 +327,29 @@ class AudioBookViewer : ViewerProviderType {
       userAgent = userAgent,
     )
     this.openActivity(activity)
+  }
+
+  private fun manifestCredentialsOf(
+    accountCredentials: AccountAuthenticationCredentials?
+  ): ManifestFulfillmentCredentialsType? {
+    return when (accountCredentials) {
+      is AccountAuthenticationCredentials.Basic -> {
+        ManifestFulfillmentCredentialsBasic(
+          userName = accountCredentials.userName.value,
+          password = accountCredentials.password.value
+        )
+      }
+      is AccountAuthenticationCredentials.BasicToken -> {
+        ManifestFulfillmentCredentialsToken(accountCredentials.authenticationTokenInfo.accessToken)
+      }
+      is AccountAuthenticationCredentials.OAuthWithIntermediary -> {
+        ManifestFulfillmentCredentialsToken(accountCredentials.accessToken)
+      }
+      is AccountAuthenticationCredentials.SAML2_0 -> {
+        ManifestFulfillmentCredentialsToken(accountCredentials.accessToken)
+      }
+      null -> null
+    }
   }
 
   private fun triggerFailure(

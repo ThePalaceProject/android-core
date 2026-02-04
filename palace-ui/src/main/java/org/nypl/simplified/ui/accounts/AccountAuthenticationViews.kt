@@ -105,6 +105,18 @@ class AccountAuthenticationViews(
   }
 
   /**
+   * Set the status of all of the logout buttons in the collection.
+   *
+   * @see [AccountAuthenticationViewBindings.setLogoutButtonStatus]
+   */
+
+  fun setLogoutButtonStatus(status: AccountLogoutButtonStatus) {
+    this.viewGroups.forEach {
+      it.setLogoutButtonStatus(status)
+    }
+  }
+
+  /**
    * Set the status of the password reset label.
    *
    * @see [AccountAuthenticationViewBindings.setResetPasswordLabelStatus]
@@ -179,7 +191,7 @@ class AccountAuthenticationViews(
    * given authentication description.
    */
 
-  fun isSatisfiedFor(description: AccountProviderAuthenticationDescription): Boolean {
+  fun isLoginSatisfiedFor(description: AccountProviderAuthenticationDescription): Boolean {
     return when (description) {
       is Basic -> {
         this.basic.isSatisfied(description)

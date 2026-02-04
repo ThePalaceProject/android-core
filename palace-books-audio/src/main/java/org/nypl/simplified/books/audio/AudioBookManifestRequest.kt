@@ -6,6 +6,7 @@ import org.librarysimplified.audiobook.license_check.spi.SingleLicenseCheckProvi
 import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.librarysimplified.audiobook.manifest_fulfill.api.ManifestFulfillmentStrategies
 import org.librarysimplified.audiobook.manifest_fulfill.api.ManifestFulfillmentStrategyRegistryType
+import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentCredentialsType
 import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfilled
 import org.librarysimplified.audiobook.manifest_parser.api.ManifestParsers
 import org.librarysimplified.audiobook.manifest_parser.api.ManifestParsersType
@@ -13,7 +14,6 @@ import org.librarysimplified.audiobook.manifest_parser.extension_spi.ManifestPar
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPProblemReportParserFactoryType
 import org.librarysimplified.services.api.ServiceDirectoryType
-import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import java.io.File
 import java.io.IOException
 import java.util.ServiceLoader
@@ -63,7 +63,7 @@ data class AudioBookManifestRequest(
    * The credentials used for license and manifest requests.
    */
 
-  val credentials: AccountAuthenticationCredentials?,
+  val credentials: ManifestFulfillmentCredentialsType?,
 
   /**
    * A service directory used to locate any required application services.

@@ -1012,11 +1012,41 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-02-03T13:29:02+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.25.0">
+    <c:release date="2026-02-04T15:44:37+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.25.0">
       <c:changes>
-        <c:change date="2026-02-03T13:29:02+00:00" summary="Attempt to allow notifications on Android 10.">
+        <c:change date="2026-02-03T00:00:00+00:00" summary="Attempt to allow notifications on Android 10.">
           <c:tickets>
             <c:ticket id="PP-3631"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-01-26T00:00:00+00:00" summary="Large refactoring for SAML and credential expiration.">
+          <c:tickets>
+            <c:ticket id="PP-3495"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-01-27T00:00:00+00:00" summary="Fix a very unlikely crash when refreshing an OPDS feed after an error.">
+          <c:tickets>
+            <c:ticket id="PP-3576"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-01-28T00:00:00+00:00" summary="Update catalog language to change Reservations to Holds.">
+          <c:tickets>
+            <c:ticket id="PP-3581"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-01-30T00:00:00+00:00" summary="Correct a possible ANR.">
+          <c:tickets>
+            <c:ticket id="PP-3577"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-02-04T00:00:00+00:00" summary="Allow a Logout button when SAML credentials have expired.">
+          <c:tickets>
+            <c:ticket id="PP-3614"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-02-04T15:44:37+00:00" summary="Correct audiobook download failures.">
+          <c:tickets>
+            <c:ticket id="PP-3641"/>
           </c:tickets>
         </c:change>
       </c:changes>

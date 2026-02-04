@@ -7,21 +7,6 @@ package org.nypl.simplified.ui.accounts
 sealed class AccountLoginButtonStatus {
 
   /**
-   * The login button should be displayed as a "Log Out" button, should be enabled, and should
-   * execute [onClick] when clicked.
-   */
-
-  data class AsLogoutButtonEnabled(
-    val onClick: () -> Unit
-  ) : AccountLoginButtonStatus()
-
-  /**
-   * The login button should be displayed as a "Log Out" button, and should be disabled.
-   */
-
-  object AsLogoutButtonDisabled : AccountLoginButtonStatus()
-
-  /**
    * The login button should be displayed as a "Log In" button, should be enabled, and should
    * execute [onClick] when clicked.
    */
@@ -50,4 +35,10 @@ sealed class AccountLoginButtonStatus {
    */
 
   object AsCancelButtonDisabled : AccountLoginButtonStatus()
+
+  /**
+   * The login button should not be displayed.
+   */
+
+  object AsButtonGone : AccountLoginButtonStatus()
 }

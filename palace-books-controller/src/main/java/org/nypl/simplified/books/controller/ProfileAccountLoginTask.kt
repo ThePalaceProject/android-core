@@ -227,7 +227,12 @@ class ProfileAccountLoginTask(
     return when (val loginState = this.account.loginState) {
       is AccountLoggingIn,
       is AccountLoggingInWaitingForExternalAuthentication -> {
-        this.account.setLoginState(AccountNotLoggedIn(loginState.credentials))
+        val previous = loginState.previousCredentials
+        if (previous != null) {
+          this.account.setLoginState(AccountLoggedInStaleCredentials(credentials = previous))
+        } else {
+          this.account.setLoginState(AccountNotLoggedIn(loginState.credentials))
+        }
         this.steps.finishSuccess(Unit)
       }
 

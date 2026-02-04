@@ -23,4 +23,7 @@
   <dimen name="catalogFeedCellImageWidth">80dp</dimen>
   <dimen name="catalogFeedCoversSpace">8dp</dimen>
   <dimen name="catalogLaneCoverMaximumWidth">128dp</dimen>
+
+  <dimen name="accountLoginLogoutButtonMaximumWidth">224dp</dimen>
+  <dimen name="accountLoginLogoutButtonHeight">64dp</dimen>
 </resources>

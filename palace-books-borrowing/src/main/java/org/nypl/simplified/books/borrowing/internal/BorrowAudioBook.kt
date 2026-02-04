@@ -5,6 +5,7 @@ import one.irradia.mime.api.MIMECompatibility
 import one.irradia.mime.api.MIMEType
 import org.librarysimplified.audiobook.api.PlayerUserAgent
 import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
+import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentCredentialsType
 import org.nypl.simplified.accounts.api.AccountReadableType
 import org.nypl.simplified.books.audio.AudioBookLink
 import org.nypl.simplified.books.audio.AudioBookManifestRequest
@@ -87,8 +88,8 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
   ): DownloadedManifest {
     context.taskRecorder.beginNewStep("Executing audio book manifest strategy...")
 
-    val credentials =
-      context.takeSubtaskCredentialsRequiringAccount()
+    val credentials: ManifestFulfillmentCredentialsType? =
+      context.takeSubtaskCredentialsForAudiobook()
 
     val strategy =
       context.audioBookManifestStrategies.createStrategy(

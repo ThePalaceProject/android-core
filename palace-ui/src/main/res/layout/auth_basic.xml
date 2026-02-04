@@ -1,73 +1,101 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:tools="http://schemas.android.com/tools"
-  android:id="@+id/authBasic"
-  android:layout_width="match_parent"
-  android:layout_height="wrap_content"
-  android:orientation="vertical"
-  android:paddingStart="16dp"
-  android:paddingEnd="16dp">
-
-  <com.google.android.material.textfield.TextInputLayout
-    android:id="@+id/authBasicUserLabel"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/authBasic"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:hint="@string/accountUserName"
-    android:visibility="gone"
-    tools:visibility="visible">
+    android:orientation="vertical"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp">
 
-    <com.google.android.material.textfield.TextInputEditText
-      android:id="@+id/authBasicUserField"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:autofillHints="username"
-      android:inputType="text" />
-  </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/authBasicUserLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/accountUserName"
+        android:visibility="gone"
+        tools:visibility="visible">
 
-  <com.google.android.material.textfield.TextInputLayout
-    android:id="@+id/authBasicPassLabel"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="16dp"
-    android:hint="@string/accountPassword"
-    android:visibility="gone"
-    tools:visibility="visible">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/authBasicUserField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints="username"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <com.google.android.material.textfield.TextInputEditText
-      android:id="@+id/authBasicPassField"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:autofillHints="password"
-      android:imeOptions="actionDone"
-      android:inputType="textPassword" />
-  </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/authBasicPassLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="@string/accountPassword"
+        android:visibility="gone"
+        tools:visibility="visible">
 
-  <CheckBox
-    android:id="@+id/authBasicShowPass"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="8dp"
-    android:text="@string/accountPasswordShow"
-    android:visibility="gone"
-    tools:text="Show password"
-    tools:visibility="visible" />
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/authBasicPassField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints="password"
+            android:imeOptions="actionDone"
+            android:inputType="textPassword" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-  <Button
-    android:id="@+id/authBasicLogin"
-    android:layout_width="256dp"
-    android:layout_height="48dp"
-    android:layout_gravity="center"
-    android:layout_marginTop="32dp"
-    android:layout_marginBottom="16dp"
-    android:text="@string/accountLogin" />
+    <CheckBox
+        android:id="@+id/authBasicShowPass"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/accountPasswordShow"
+        android:visibility="gone"
+        tools:text="Show password"
+        tools:visibility="visible" />
 
-  <TextView
-      android:id="@+id/resetPasswordLabel"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_gravity="center"
-      android:layout_marginBottom="8dp"
-      android:padding="8dp"
-      android:text="@string/accountForgotPassword" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp">
+
+        <Button
+            android:id="@+id/authBasicLogin"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/accountLoginLogoutButtonHeight"
+            android:layout_marginEnd="8dp"
+            android:contentDescription="@string/accountLogin"
+            android:text="@string/accountLogin"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/authBasicLogout"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_max="@dimen/accountLoginLogoutButtonMaximumWidth"
+            app:layout_goneMarginEnd="0dp" />
+
+        <Button
+            android:id="@+id/authBasicLogout"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/accountLoginLogoutButtonHeight"
+            android:contentDescription="@string/accountLogout"
+            android:text="@string/accountLogout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toEndOf="@id/authBasicLogin"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_max="@dimen/accountLoginLogoutButtonMaximumWidth" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/resetPasswordLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="8dp"
+        android:padding="8dp"
+        android:text="@string/accountForgotPassword" />
 
 </LinearLayout>

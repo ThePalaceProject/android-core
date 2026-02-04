@@ -2,6 +2,7 @@ package org.nypl.simplified.ui.accounts.view_bindings
 
 import android.view.ViewGroup
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus
+import org.nypl.simplified.ui.accounts.AccountLogoutButtonStatus
 
 class ViewsForOAuthWithIntermediary(
   override val viewGroup: ViewGroup
@@ -16,6 +17,10 @@ class ViewsForOAuthWithIntermediary(
   }
 
   override fun setLoginButtonStatus(status: AccountLoginButtonStatus) {
+    // Nothing
+  }
+
+  override fun setLogoutButtonStatus(status: AccountLogoutButtonStatus) {
     // Nothing
   }
 

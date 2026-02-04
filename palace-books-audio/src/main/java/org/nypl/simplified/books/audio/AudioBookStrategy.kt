@@ -17,9 +17,10 @@ import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmen
 import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentCredentialsToken
 import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentCredentialsType
 import org.librarysimplified.audiobook.manifest_fulfill.opa.OPAManifestFulfillmentStrategyProviderType
-import org.librarysimplified.audiobook.manifest_fulfill.opa.OPAManifestURI
+import org.librarysimplified.audiobook.manifest_fulfill.opa.OPAManifestURI.Indirect
 import org.librarysimplified.audiobook.manifest_fulfill.opa.OPAParameters
 import org.librarysimplified.audiobook.manifest_fulfill.opa.OPAPassword
+import org.librarysimplified.audiobook.manifest_fulfill.opa.OPAPassword.Password
 import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfilled
 import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfillmentError
 import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfillmentEvent
@@ -28,6 +29,8 @@ import org.librarysimplified.audiobook.manifest_parser.api.ManifestUnparsed
 import org.librarysimplified.audiobook.parser.api.ParseError
 import org.librarysimplified.audiobook.parser.api.ParseResult
 import org.librarysimplified.audiobook.parser.api.ParseWarning
+import org.librarysimplified.http.api.LSHTTPAuthorizationBasic
+import org.librarysimplified.http.api.LSHTTPAuthorizationBearerToken
 import org.librarysimplified.http.api.LSHTTPAuthorizationType
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPProblemReport
@@ -38,8 +41,6 @@ import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadRe
 import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedServer
 import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedUnacceptableMIME
 import org.librarysimplified.http.downloads.LSHTTPDownloads
-import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.createAuthorizationIfPresent
-import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.books.book_database.api.BookFormats
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
@@ -192,7 +193,7 @@ class AudioBookStrategy(
 
     val httpRequest =
       this.request.httpClient.newRequest(target.target)
-        .setAuthorization(createAuthorizationIfPresent(this.request.credentials))
+        .setAuthorization(authorization = createAuthorization(this.request.credentials))
         .build()
 
     val temporaryFile =
@@ -282,6 +283,25 @@ class AudioBookStrategy(
     }
   }
 
+  private fun createAuthorization(
+    credentials: ManifestFulfillmentCredentialsType?
+  ): LSHTTPAuthorizationType? {
+    return when (credentials) {
+      is ManifestFulfillmentCredentialsBasic -> {
+        LSHTTPAuthorizationBasic.ofUsernamePassword(
+          userName = credentials.userName,
+          password = credentials.password
+        )
+      }
+      is ManifestFulfillmentCredentialsToken -> {
+        LSHTTPAuthorizationBearerToken.ofToken(
+          token = credentials.token
+        )
+      }
+      null -> null
+    }
+  }
+
   private fun recordProblemReport(
     report: LSHTTPProblemReport?
   ) {
@@ -296,38 +316,9 @@ class AudioBookStrategy(
   ): TaskResult<AudioBookManifestData> {
     this.taskRecorder.beginNewStep("Retrieving manifest via LCP license.")
 
-    val credentials: ManifestFulfillmentCredentialsType? =
-      when (val c = this.request.credentials) {
-        is AccountAuthenticationCredentials.Basic -> {
-          ManifestFulfillmentCredentialsBasic(
-            userName = c.userName.value,
-            password = c.password.value
-          )
-        }
-
-        is AccountAuthenticationCredentials.BasicToken -> {
-          ManifestFulfillmentCredentialsBasic(
-            userName = c.userName.value,
-            password = c.password.value
-          )
-        }
-
-        is AccountAuthenticationCredentials.OAuthWithIntermediary -> {
-          ManifestFulfillmentCredentialsToken(c.accessToken)
-        }
-
-        is AccountAuthenticationCredentials.SAML2_0 -> {
-          ManifestFulfillmentCredentialsToken(c.accessToken)
-        }
-
-        null -> {
-          null
-        }
-      }
-
     return when (val result = LCPDownloads.downloadManifestFromPublication(
       context = this.context,
-      credentials = credentials,
+      credentials = request.credentials,
       license = license,
       receiver = { event ->
         this.logger.debug("Downloading manifest event: {}", event)
@@ -486,57 +477,33 @@ class AudioBookStrategy(
 
       val parameters =
         when (val credentials = this.request.credentials) {
-          is AccountAuthenticationCredentials.Basic -> {
-            val password = credentials.password.value
-            val opaPassword = if (password.isBlank()) {
-              OPAPassword.NotRequired
-            } else {
-              OPAPassword.Password(password)
-            }
-
-            OPAParameters(
-              userName = credentials.userName.value,
-              password = opaPassword,
-              clientKey = secretService.clientKey.orEmpty(),
-              clientPass = secretService.clientPass.orEmpty(),
-              targetURI = OPAManifestURI.Indirect(targetURI),
-              userAgent = this.request.userAgent
-            )
-          }
-
-          is AccountAuthenticationCredentials.BasicToken -> {
-            val password = credentials.password.value
-            val opaPassword = if (password.isBlank()) {
-              OPAPassword.NotRequired
-            } else {
-              OPAPassword.Password(password)
-            }
-
-            OPAParameters(
-              userName = credentials.userName.value,
-              password = opaPassword,
-              clientKey = secretService.clientKey.orEmpty(),
-              clientPass = secretService.clientPass.orEmpty(),
-              targetURI = OPAManifestURI.Indirect(targetURI),
-              userAgent = this.request.userAgent
-            )
-          }
-
-          is AccountAuthenticationCredentials.OAuthWithIntermediary -> {
-            throw UnsupportedOperationException(
-              "Can't use bearer tokens for Overdrive fulfillment"
-            )
-          }
-
-          is AccountAuthenticationCredentials.SAML2_0 -> {
-            throw UnsupportedOperationException(
-              "Can't use bearer tokens for Overdrive fulfillment"
-            )
-          }
-
           null -> {
             throw UnsupportedOperationException(
               "Credentials are required for Overdrive fulfillment"
+            )
+          }
+
+          is ManifestFulfillmentCredentialsBasic -> {
+            val password = credentials.password
+            val opaPassword = if (password.isBlank()) {
+              OPAPassword.NotRequired
+            } else {
+              Password(password)
+            }
+
+            OPAParameters(
+              userName = credentials.userName,
+              password = opaPassword,
+              clientKey = secretService.clientKey.orEmpty(),
+              clientPass = secretService.clientPass.orEmpty(),
+              targetURI = Indirect(targetURI),
+              userAgent = this.request.userAgent
+            )
+          }
+
+          is ManifestFulfillmentCredentialsToken -> {
+            throw UnsupportedOperationException(
+              "Can't use bearer tokens for Overdrive fulfillment"
             )
           }
         }
@@ -553,31 +520,7 @@ class AudioBookStrategy(
       val parameters =
         ManifestFulfillmentBasicParameters(
           uri = targetURI,
-          credentials = when (val c = this.request.credentials) {
-            is AccountAuthenticationCredentials.Basic -> {
-              ManifestFulfillmentCredentialsBasic(
-                userName = c.userName.value,
-                password = c.password.value
-              )
-            }
-
-            is AccountAuthenticationCredentials.BasicToken -> {
-              ManifestFulfillmentCredentialsBasic(
-                userName = c.userName.value,
-                password = c.password.value
-              )
-            }
-
-            is AccountAuthenticationCredentials.OAuthWithIntermediary -> {
-              ManifestFulfillmentCredentialsToken(c.accessToken)
-            }
-
-            is AccountAuthenticationCredentials.SAML2_0 -> {
-              ManifestFulfillmentCredentialsToken(c.accessToken)
-            }
-
-            null -> null
-          },
+          credentials = this.request.credentials,
           httpClient = this.request.services.requireService(LSHTTPClientType::class.java),
           userAgent = this.request.userAgent
         )

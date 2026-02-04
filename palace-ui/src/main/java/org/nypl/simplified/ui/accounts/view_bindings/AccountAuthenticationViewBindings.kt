@@ -2,6 +2,7 @@ package org.nypl.simplified.ui.accounts.view_bindings
 
 import android.view.ViewGroup
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus
+import org.nypl.simplified.ui.accounts.AccountLogoutButtonStatus
 
 /**
  * A type representing a set of bound views for each possible type of authentication.
@@ -32,6 +33,12 @@ sealed class AccountAuthenticationViewBindings {
    */
 
   abstract fun setLoginButtonStatus(status: AccountLoginButtonStatus)
+
+  /**
+   * Set the status of any relevant logout button.
+   */
+
+  abstract fun setLogoutButtonStatus(status: AccountLogoutButtonStatus)
 
   abstract fun setResetPasswordLabelStatus(
     status: AccountLoginButtonStatus,

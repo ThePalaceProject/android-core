@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/authSAML"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -9,21 +10,42 @@
 
     <Button
         android:id="@+id/authSAMLLogin"
-        android:layout_width="256dp"
-        android:layout_height="48dp"
-        android:layout_gravity="center"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/accountLoginLogoutButtonHeight"
+        android:layout_marginEnd="8dp"
         android:contentDescription="@string/accountSAML20LoginLabel"
-        android:text="@string/accountPlaceholder" />
+        android:text="@string/accountPlaceholder"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/authSAMLLogout"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_max="@dimen/accountLoginLogoutButtonMaximumWidth"
+        app:layout_goneMarginEnd="0dp" />
+
+    <Button
+        android:id="@+id/authSAMLLogout"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/accountLoginLogoutButtonHeight"
+        android:contentDescription="@string/accountLogout"
+        android:text="@string/accountPlaceholder"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintStart_toEndOf="@id/authSAMLLogin"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_max="@dimen/accountLoginLogoutButtonMaximumWidth" />
 
     <TextView
         android:id="@+id/resetPasswordLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginBottom="8dp"
-        android:padding="8dp"
-        android:text="@string/accountForgotPassword" />
+        android:layout_width="0dp"
+        android:layout_height="32dp"
+        android:layout_margin="16dp"
+        android:gravity="center"
+        android:text="@string/accountForgotPassword"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/authSAMLLogin" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

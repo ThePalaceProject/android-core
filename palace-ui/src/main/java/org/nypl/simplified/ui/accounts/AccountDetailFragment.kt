@@ -23,7 +23,6 @@ import androidx.fragment.app.Fragment
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.io7m.jmulticlose.core.CloseableCollection
-import com.io7m.junreachable.UnimplementedCodeException
 import com.io7m.junreachable.UnreachableCodeException
 import org.librarysimplified.reports.Reports
 import org.librarysimplified.services.api.Services
@@ -53,8 +52,9 @@ import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsCancelButtonDi
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsCancelButtonEnabled
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsLoginButtonDisabled
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsLoginButtonEnabled
-import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsLogoutButtonDisabled
-import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsLogoutButtonEnabled
+import org.nypl.simplified.ui.accounts.AccountLogoutButtonStatus.AsButtonGone
+import org.nypl.simplified.ui.accounts.AccountLogoutButtonStatus.AsLogoutButtonDisabled
+import org.nypl.simplified.ui.accounts.AccountLogoutButtonStatus.AsLogoutButtonEnabled
 import org.nypl.simplified.ui.accounts.saml20.AccountSAML20Activity
 import org.nypl.simplified.ui.accounts.saml20.AccountSAML20Model
 import org.nypl.simplified.ui.images.ImageAccountIcons
@@ -244,6 +244,7 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
         this.loginTitle.visibility = View.VISIBLE
         this.loginTitleText.text = resources.getString(reason.stringResource())
       }
+
       null -> {
         this.loginTitle.visibility = View.GONE
       }
@@ -263,20 +264,23 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
     AccountDetailModel.usernamePasswordEntries[AccountDetailModel.account.id] =
       AccountDetailModel.UsernamePasswordAttempt(username, password)
 
-    this.setLoginButtonStatus(this.determineLoginIsSatisfied())
+    this.setLoginLogoutButtonStatus(
+      loginStatus = this.determineLoginIsSatisfied(),
+      logoutStatus = AsButtonGone
+    )
   }
 
   private fun determineLoginIsSatisfied(): AccountLoginButtonStatus {
     val authDescription =
       AccountDetailModel.account.provider.authentication
-    val loginPossible =
+    val isLoginPossible =
       authDescription.isLoginPossible
-    val satisfiedFor =
-      this.authenticationViews.isSatisfiedFor(authDescription)
+    val isLoginSatisfiedFor =
+      this.authenticationViews.isLoginSatisfiedFor(authDescription)
 
-    return if (loginPossible && satisfiedFor) {
+    return if (isLoginPossible && isLoginSatisfiedFor) {
       AsLoginButtonEnabled {
-        this.loginFormLock()
+        this.formLock(FormLockState.LOGGING_IN)
         this.tryLogin()
       }
     } else {
@@ -728,26 +732,31 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
       is AccountLoggedInStaleCredentials -> {
         this.loginProgress.visibility = View.GONE
 
-        this.setLoginButtonStatus(
-          AsLoginButtonEnabled {
-            this.loginFormLock()
+        this.setLoginLogoutButtonStatus(
+          loginStatus = AsLoginButtonEnabled {
+            this.formLock(FormLockState.LOGGING_IN)
             this.tryLogin()
+          },
+          logoutStatus = AsLogoutButtonEnabled {
+            this.formLock(FormLockState.LOGGING_OUT)
+            AccountDetailModel.tryLogout()
           }
         )
 
-        this.loginFormUnlock()
+        this.formUnlock()
       }
 
       is AccountNotLoggedIn -> {
         this.loginProgress.visibility = View.GONE
-        this.setLoginButtonStatus(
-          AsLoginButtonEnabled {
-            this.loginFormLock()
-            this.tryLogin()
-          }
-        )
 
-        this.loginFormUnlock()
+        this.setLoginLogoutButtonStatus(
+          loginStatus = AsLoginButtonEnabled {
+            this.formLock(FormLockState.LOGGING_IN)
+            this.tryLogin()
+          },
+          logoutStatus = AsButtonGone
+        )
+        this.formUnlock()
       }
 
       is AccountLoggingIn -> {
@@ -755,18 +764,13 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
         this.loginProgressBar.visibility = View.VISIBLE
         this.loginProgressText.text = loginState.status
         this.loginButtonErrorDetails.visibility = View.GONE
-        this.loginFormLock()
+        this.formLock(FormLockState.LOGGING_IN)
 
-        if (loginState.cancellable) {
-          this.setLoginButtonStatus(
-            AsCancelButtonEnabled {
-              // We don't really support this yet.
-              throw UnimplementedCodeException()
-            }
-          )
-        } else {
-          this.setLoginButtonStatus(AsCancelButtonDisabled)
-        }
+        // XXX: Allow cancellation when Adobe DRM goes away.
+        this.setLoginLogoutButtonStatus(
+          loginStatus = AsCancelButtonDisabled,
+          logoutStatus = AsButtonGone
+        )
       }
 
       is AccountLoggingInWaitingForExternalAuthentication -> {
@@ -774,9 +778,10 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
         this.loginProgressBar.visibility = View.VISIBLE
         this.loginProgressText.text = loginState.status
         this.loginButtonErrorDetails.visibility = View.GONE
-        this.loginFormLock()
-        this.setLoginButtonStatus(
-          AsCancelButtonEnabled {
+        this.formLock(FormLockState.LOGGING_IN)
+
+        this.setLoginLogoutButtonStatus(
+          loginStatus = AsCancelButtonEnabled {
             when (val desc = loginState.description) {
               AccountProviderAuthenticationDescription.Anonymous,
               is AccountProviderAuthenticationDescription.Basic,
@@ -802,7 +807,8 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
                 )
               }
             }
-          }
+          },
+          logoutStatus = AsButtonGone
         )
       }
 
@@ -810,14 +816,17 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
         this.loginProgress.visibility = View.VISIBLE
         this.loginProgressBar.visibility = View.GONE
         this.loginProgressText.text = loginState.taskResult.steps.last().resolution.message
-        this.loginFormUnlock()
+        this.formUnlock()
         this.cancelImageButtonLoading()
-        this.setLoginButtonStatus(
-          AsLoginButtonEnabled {
-            this.loginFormLock()
+
+        this.setLoginLogoutButtonStatus(
+          loginStatus = AsLoginButtonEnabled {
+            this.formLock(FormLockState.LOGGING_IN)
             this.tryLogin()
-          }
+          },
+          logoutStatus = AsButtonGone
         )
+
         this.loginButtonErrorDetails.visibility = View.VISIBLE
         this.loginButtonErrorDetails.setOnClickListener {
           AccountDetailModel.openErrorPage(this.requireActivity(), loginState.taskResult.steps)
@@ -848,11 +857,13 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
         }
 
         this.loginProgress.visibility = View.GONE
-        this.loginFormLock()
+        this.formLock(FormLockState.LOGGING_IN)
         this.loginButtonErrorDetails.visibility = View.GONE
-        this.setLoginButtonStatus(
-          AsLogoutButtonEnabled {
-            this.loginFormLock()
+
+        this.setLoginLogoutButtonStatus(
+          loginStatus = AccountLoginButtonStatus.AsButtonGone,
+          logoutStatus = AsLogoutButtonEnabled {
+            this.formLock(FormLockState.LOGGING_OUT)
             AccountDetailModel.tryLogout()
           }
         )
@@ -885,8 +896,12 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
         this.loginButtonErrorDetails.visibility = View.GONE
         this.loginProgressBar.visibility = View.VISIBLE
         this.loginProgressText.text = loginState.status
-        this.loginFormLock()
-        this.setLoginButtonStatus(AsLogoutButtonDisabled)
+        this.formLock(FormLockState.LOGGING_OUT)
+
+        this.setLoginLogoutButtonStatus(
+          loginStatus = AccountLoginButtonStatus.AsButtonGone,
+          logoutStatus = AsLogoutButtonDisabled
+        )
       }
 
       is AccountLogoutFailed -> {
@@ -915,10 +930,12 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
         this.loginProgressBar.visibility = View.GONE
         this.loginProgressText.text = loginState.taskResult.steps.last().resolution.message
         this.cancelImageButtonLoading()
-        this.loginFormLock()
-        this.setLoginButtonStatus(
-          AsLogoutButtonEnabled {
-            this.loginFormLock()
+        this.formLock(FormLockState.LOGGING_OUT)
+
+        this.setLoginLogoutButtonStatus(
+          loginStatus = AccountLoginButtonStatus.AsButtonGone,
+          logoutStatus = AsLogoutButtonEnabled {
+            this.formLock(FormLockState.LOGGING_OUT)
             AccountDetailModel.tryLogout()
           }
         )
@@ -962,10 +979,12 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
     imageLoader.loader.cancelTag(this.imageButtonLoadingTag)
   }
 
-  private fun setLoginButtonStatus(
-    status: AccountLoginButtonStatus
+  private fun setLoginLogoutButtonStatus(
+    loginStatus: AccountLoginButtonStatus,
+    logoutStatus: AccountLogoutButtonStatus
   ) {
-    this.authenticationViews.setLoginButtonStatus(status)
+    this.authenticationViews.setLoginButtonStatus(loginStatus)
+    this.authenticationViews.setLogoutButtonStatus(logoutStatus)
 
     val account =
       AccountDetailModel.account
@@ -975,7 +994,7 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
       account.provider.resetPasswordURI
 
     this.authenticationViews.setResetPasswordLabelStatus(
-      status,
+      loginStatus,
       isVisible = resetPasswordURI != null,
       onClick = {
         try {
@@ -992,7 +1011,7 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
       }
     )
 
-    return when (status) {
+    return when (loginStatus) {
       is AsLoginButtonEnabled -> {
         this.signUpLabel.setText(R.string.accountCardCreatorLabel)
       }
@@ -1002,21 +1021,33 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
         this.signUpLabel.isEnabled = true
       }
 
-      is AsLogoutButtonEnabled -> {
-        this.signUpLabel.setText(R.string.accountWantChildCard)
-        val enableSignup = this.shouldSignUpBeEnabled()
-        this.signUpLabel.isEnabled = false
-        this.signUpButton.isEnabled = false
-        this.signUpLabel.setText(R.string.accountCardCreatorLabel)
-      }
-
-      is AsLogoutButtonDisabled -> {
-        this.signUpLabel.setText(R.string.accountCardCreatorLabel)
-      }
-
       is AsCancelButtonEnabled,
       AsCancelButtonDisabled -> {
         // Nothing
+      }
+
+      AccountLoginButtonStatus.AsButtonGone -> {
+        when (logoutStatus) {
+          AsButtonGone -> {
+            // Nothing
+          }
+          AccountLogoutButtonStatus.AsCancelButtonDisabled -> {
+            // Nothing
+          }
+          is AccountLogoutButtonStatus.AsCancelButtonEnabled -> {
+            // Nothing
+          }
+          AsLogoutButtonDisabled -> {
+            this.signUpLabel.setText(R.string.accountCardCreatorLabel)
+          }
+          is AsLogoutButtonEnabled -> {
+            this.signUpLabel.setText(R.string.accountWantChildCard)
+            val enableSignup = this.shouldSignUpBeEnabled()
+            this.signUpLabel.isEnabled = false
+            this.signUpButton.isEnabled = false
+            this.signUpLabel.setText(R.string.accountCardCreatorLabel)
+          }
+        }
       }
     }
   }
@@ -1053,18 +1084,21 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
     }
   }
 
-  private fun loginFormLock() {
-    this.authenticationViews.lock()
+  enum class FormLockState {
+    LOGGING_IN,
+    LOGGING_OUT
+  }
 
-    this.setLoginButtonStatus(AsLoginButtonDisabled)
+  private fun formLock(
+    state: FormLockState
+  ) {
+    this.authenticationViews.lock()
     this.authenticationAlternativesHide()
   }
 
-  private fun loginFormUnlock() {
+  private fun formUnlock() {
     this.authenticationViews.unlock()
 
-    val loginSatisfied = this.determineLoginIsSatisfied()
-    this.setLoginButtonStatus(loginSatisfied)
     this.authenticationAlternativesShow()
     if (this.shouldSignUpBeEnabled()) {
       this.signUpButton.isEnabled = true
