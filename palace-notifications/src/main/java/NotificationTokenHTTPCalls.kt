@@ -40,8 +40,18 @@ class NotificationTokenHTTPCalls(
     val credentials = account.loginState.credentials
     val originalUrl = credentials?.deviceRegistrationURI
 
+    this.logger.debug(
+      "Registering FCM token for account {} ({})",
+      account.id,
+      account.provider.displayName
+    )
+
     if (originalUrl == null) {
-      logger.debug("Account {} doesn't have a device registration uri", account.id)
+      this.logger.debug(
+        "Account {} ({}) doesn't have a device registration URI",
+        account.id,
+        account.provider.displayName
+      )
       return
     }
 
@@ -110,8 +120,18 @@ class NotificationTokenHTTPCalls(
     val credentials = account.loginState.credentials
     val url = credentials?.deviceRegistrationURI
 
+    this.logger.debug(
+      "Deleting FCM token for account {} ({})",
+      account.id,
+      account.provider.displayName
+    )
+
     if (url == null) {
-      logger.debug("Account {} doesn't have a device registration uri", account.id)
+      this.logger.debug(
+        "Account {} ({}) doesn't have a device registration URI",
+        account.id,
+        account.provider.displayName
+      )
       return
     }
 
