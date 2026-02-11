@@ -33,7 +33,7 @@ class AccountProviderDescriptionComparator(
   ): Int {
     return if (this.isFeatured(o1)) {
       if (this.isFeatured(o2)) {
-        o1.title.compareTo(o2.title)
+        o1.title.uppercase().compareTo(o2.title.uppercase())
       } else {
         -1
       }
@@ -41,7 +41,7 @@ class AccountProviderDescriptionComparator(
       if (this.isFeatured(o2)) {
         1
       } else {
-        o1.title.compareTo(o2.title)
+        o1.title.uppercase().compareTo(o2.title.uppercase())
       }
     }
   }
