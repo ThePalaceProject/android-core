@@ -36,6 +36,7 @@ import org.nypl.simplified.books.api.bookmark.SerializedBookmark20210828
 import org.nypl.simplified.books.api.bookmark.SerializedLocatorLegacyCFI
 import org.nypl.simplified.books.book_database.api.BookFormats
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFiles
+import org.nypl.simplified.patron.api.PatronAuthorization
 import org.nypl.simplified.profiles.api.ProfileEvent
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.tests.EventAssertions
@@ -125,7 +126,8 @@ class BookmarkServiceTest {
       adobeCredentials = null,
       authenticationDescription = null,
       annotationsURI = null,
-      deviceRegistrationURI = null
+      deviceRegistrationURI = null,
+      patronAuthorization = PatronAuthorization("identifier", null)
     )
 
   private fun addResponse(

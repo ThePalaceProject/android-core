@@ -61,6 +61,7 @@ import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
 import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
 import org.nypl.simplified.opds.core.OPDSFeedParser
 import org.nypl.simplified.opds.core.OPDSSearchParser
+import org.nypl.simplified.patron.api.PatronAuthorization
 import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
@@ -528,7 +529,8 @@ class BookRevokeTaskAdobeDRMTest {
             ),
             authenticationDescription = null,
             annotationsURI = URI("https://www.example.com"),
-            deviceRegistrationURI = URI("https://www.example.com")
+            deviceRegistrationURI = URI("https://www.example.com"),
+            patronAuthorization = PatronAuthorization("identifier", null)
           )
         )
       )
@@ -687,7 +689,8 @@ class BookRevokeTaskAdobeDRMTest {
             ),
             authenticationDescription = null,
             annotationsURI = URI("https://www.example.com"),
-            deviceRegistrationURI = URI("https://www.example.com")
+            deviceRegistrationURI = URI("https://www.example.com"),
+            patronAuthorization = PatronAuthorization("identifier", null)
           )
         )
       )
@@ -837,7 +840,8 @@ class BookRevokeTaskAdobeDRMTest {
             ),
             authenticationDescription = null,
             annotationsURI = URI("https://www.example.com"),
-            deviceRegistrationURI = URI("https://www.example.com")
+            deviceRegistrationURI = URI("https://www.example.com"),
+            patronAuthorization = PatronAuthorization("identifier", null)
           )
         )
       )
@@ -988,7 +992,8 @@ class BookRevokeTaskAdobeDRMTest {
             ),
             authenticationDescription = null,
             annotationsURI = URI("https://www.example.com"),
-            deviceRegistrationURI = URI("https://www.example.com")
+            deviceRegistrationURI = URI("https://www.example.com"),
+            patronAuthorization = PatronAuthorization("identifier", null)
           )
         )
       )
@@ -1143,7 +1148,8 @@ class BookRevokeTaskAdobeDRMTest {
             ),
             authenticationDescription = null,
             annotationsURI = URI("https://www.example.com"),
-            deviceRegistrationURI = URI("https://www.example.com")
+            deviceRegistrationURI = URI("https://www.example.com"),
+            patronAuthorization = PatronAuthorization("identifier", null)
           )
         )
       )
@@ -1396,7 +1402,8 @@ class BookRevokeTaskAdobeDRMTest {
             ),
             authenticationDescription = null,
             annotationsURI = URI("https://www.example.com"),
-            deviceRegistrationURI = URI("https://www.example.com")
+            deviceRegistrationURI = URI("https://www.example.com"),
+            patronAuthorization = PatronAuthorization("identifier", null)
           )
         )
       )

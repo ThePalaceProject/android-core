@@ -68,6 +68,7 @@ import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSJSONParser
 import org.nypl.simplified.opds.core.OPDSJSONSerializer
+import org.nypl.simplified.patron.api.PatronAuthorization
 import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
@@ -321,7 +322,8 @@ class BorrowTaskTest {
             ),
             authenticationDescription = "Basic",
             annotationsURI = URI("https://www.example.com"),
-            deviceRegistrationURI = URI("https://www.example.com")
+            deviceRegistrationURI = URI("https://www.example.com"),
+            patronAuthorization = PatronAuthorization("identifier", null)
           )
         )
       )

@@ -55,7 +55,8 @@ object AccountAuthenticationCredentialsJSON20200805 : AccountAuthenticationCrede
       adobeCredentials = adobeCredentials,
       authenticationDescription = JSONParserUtilities.getStringOrNull(obj, "authenticationDescription"),
       annotationsURI = null,
-      deviceRegistrationURI = null
+      deviceRegistrationURI = null,
+      patronAuthorization = null
     )
   }
 
@@ -72,7 +73,8 @@ object AccountAuthenticationCredentialsJSON20200805 : AccountAuthenticationCrede
       adobeCredentials = adobeCredentials,
       authenticationDescription = JSONParserUtilities.getStringOrNull(obj, "authenticationDescription"),
       annotationsURI = null,
-      deviceRegistrationURI = null
+      deviceRegistrationURI = null,
+      patronAuthorization = null
     )
   }
 
@@ -88,7 +90,8 @@ object AccountAuthenticationCredentialsJSON20200805 : AccountAuthenticationCrede
       patronInfo = JSONParserUtilities.getString(obj, "patronInfo"),
       cookies = deserializeCookies(JSONParserUtilities.getArray(obj, "cookies")),
       annotationsURI = null,
-      deviceRegistrationURI = null
+      deviceRegistrationURI = null,
+      patronAuthorization = null
     )
   }
 

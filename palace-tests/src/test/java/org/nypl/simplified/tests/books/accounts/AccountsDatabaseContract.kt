@@ -21,6 +21,7 @@ import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.books.book_database.BookDatabases
 import org.nypl.simplified.files.DirectoryUtilities
 import org.nypl.simplified.files.FileUtilities
+import org.nypl.simplified.patron.api.PatronAuthorization
 import org.nypl.simplified.profiles.api.ProfileEvent
 import org.nypl.simplified.tests.books.BookFormatsTesting
 import org.nypl.simplified.tests.mocking.FakeAccountCredentialStorage
@@ -437,7 +438,8 @@ abstract class AccountsDatabaseContract {
         adobeCredentials = null,
         authenticationDescription = null,
         annotationsURI = URI("https://www.example.com"),
-        deviceRegistrationURI = URI("https://www.example.com")
+        deviceRegistrationURI = URI("https://www.example.com"),
+        patronAuthorization = PatronAuthorization("identifier", null)
       )
 
     acc0.setLoginState(AccountLoginState.AccountLoggedIn(creds))
@@ -519,7 +521,8 @@ abstract class AccountsDatabaseContract {
         adobeCredentials = null,
         authenticationDescription = null,
         annotationsURI = URI("https://www.example.com"),
-        deviceRegistrationURI = URI("https://www.example.com")
+        deviceRegistrationURI = URI("https://www.example.com"),
+        patronAuthorization = PatronAuthorization("identifier", null)
       )
 
     acc0.setLoginState(AccountLoginState.AccountLoggedIn(creds))

@@ -1,5 +1,6 @@
 package org.nypl.simplified.accounts.api
 
+import org.nypl.simplified.patron.api.PatronAuthorization
 import java.net.URI
 
 /**
@@ -49,6 +50,12 @@ sealed class AccountAuthenticationCredentials {
   abstract val deviceRegistrationURI: URI?
 
   /**
+   * The Palace Patron ID. This is used to, for example, reset Adobe accounts when they fail.
+   */
+
+  abstract val patronAuthorization: PatronAuthorization?
+
+  /**
    * The user used basic authentication to authenticate.
    */
 
@@ -58,7 +65,8 @@ sealed class AccountAuthenticationCredentials {
     override val adobeCredentials: AccountAuthenticationAdobePreActivationCredentials?,
     override val authenticationDescription: String?,
     override val annotationsURI: URI?,
-    override val deviceRegistrationURI: URI?
+    override val deviceRegistrationURI: URI?,
+    override val patronAuthorization: PatronAuthorization?
   ) : AccountAuthenticationCredentials() {
     override fun withoutAdobePostActivationCredentials(): AccountAuthenticationCredentials {
       return this.copy(
@@ -84,7 +92,8 @@ sealed class AccountAuthenticationCredentials {
     override val adobeCredentials: AccountAuthenticationAdobePreActivationCredentials?,
     override val authenticationDescription: String?,
     override val annotationsURI: URI?,
-    override val deviceRegistrationURI: URI?
+    override val deviceRegistrationURI: URI?,
+    override val patronAuthorization: PatronAuthorization?
   ) : AccountAuthenticationCredentials() {
     override fun withoutAdobePostActivationCredentials(): AccountAuthenticationCredentials {
       return this.copy(
@@ -120,7 +129,8 @@ sealed class AccountAuthenticationCredentials {
     override val adobeCredentials: AccountAuthenticationAdobePreActivationCredentials?,
     override val authenticationDescription: String?,
     override val annotationsURI: URI?,
-    override val deviceRegistrationURI: URI?
+    override val deviceRegistrationURI: URI?,
+    override val patronAuthorization: PatronAuthorization?
   ) : AccountAuthenticationCredentials() {
     override fun withoutAdobePostActivationCredentials(): AccountAuthenticationCredentials {
       return this.copy(
@@ -146,7 +156,8 @@ sealed class AccountAuthenticationCredentials {
     override val adobeCredentials: AccountAuthenticationAdobePreActivationCredentials?,
     override val authenticationDescription: String?,
     override val annotationsURI: URI?,
-    override val deviceRegistrationURI: URI?
+    override val deviceRegistrationURI: URI?,
+    override val patronAuthorization: PatronAuthorization?
   ) : AccountAuthenticationCredentials() {
     override fun withoutAdobePostActivationCredentials(): AccountAuthenticationCredentials {
       return this.copy(

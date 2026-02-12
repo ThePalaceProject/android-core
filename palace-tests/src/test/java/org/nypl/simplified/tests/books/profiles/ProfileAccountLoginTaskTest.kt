@@ -42,6 +42,7 @@ import org.nypl.simplified.books.controller.ProfileAccountLoginTask
 import org.nypl.simplified.notifications.NotificationTokenHTTPCalls
 import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
 import org.nypl.simplified.patron.PatronUserProfileParsers
+import org.nypl.simplified.patron.api.PatronAuthorization
 import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest
@@ -51,9 +52,11 @@ import org.nypl.simplified.tests.books.controller.FakeAccounts.fakeAccountProvid
 import org.nypl.simplified.tests.books.controller.TaskDumps
 import org.nypl.simplified.tests.mocking.MockAccountLoginStringResources
 import org.nypl.simplified.tests.mocking.MockProfilesController
+import org.readium.r2.shared.util.Instant
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URI
+import java.time.OffsetDateTime
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
@@ -720,7 +723,8 @@ class ProfileAccountLoginTaskTest {
         adobeCredentials = null,
         authenticationDescription = "Description",
         annotationsURI = URI("https://www.example.com"),
-        deviceRegistrationURI = URI("https://www.example.com")
+        deviceRegistrationURI = URI("https://www.example.com"),
+        patronAuthorization = PatronAuthorization("6120696828384", org.joda.time.Instant.parse("2019-08-02T00:00:00Z"))
       ),
       state.credentials
     )
@@ -854,7 +858,8 @@ class ProfileAccountLoginTaskTest {
         adobeCredentials = null,
         authenticationDescription = "Library Login",
         annotationsURI = URI("https://www.example.com"),
-        deviceRegistrationURI = URI("https://www.example.com")
+        deviceRegistrationURI = URI("https://www.example.com"),
+        patronAuthorization = PatronAuthorization("6120696828384", org.joda.time.Instant.parse("2019-08-02T00:00:00Z"))
       )
 
     val newCredentials =
@@ -1012,7 +1017,8 @@ class ProfileAccountLoginTaskTest {
         adobeCredentials = null,
         authenticationDescription = "Library Login",
         annotationsURI = URI("https://www.example.com"),
-        deviceRegistrationURI = URI("https://www.example.com")
+        deviceRegistrationURI = URI("https://www.example.com"),
+        patronAuthorization = PatronAuthorization("6120696828384", org.joda.time.Instant.parse("2019-08-02T00:00:00Z"))
       )
 
     val newCredentials =
@@ -1123,7 +1129,8 @@ class ProfileAccountLoginTaskTest {
         adobeCredentials = null,
         authenticationDescription = "Description",
         annotationsURI = URI("https://www.example.com"),
-        deviceRegistrationURI = URI("https://www.example.com")
+        deviceRegistrationURI = URI("https://www.example.com"),
+        patronAuthorization = PatronAuthorization("6120696828384", org.joda.time.Instant.parse("2019-08-02T00:00:00Z"))
       )
 
     val newCredentials =
@@ -1284,7 +1291,8 @@ class ProfileAccountLoginTaskTest {
           ),
           authenticationDescription = null,
           annotationsURI = null,
-          deviceRegistrationURI = null
+          deviceRegistrationURI = null,
+          patronAuthorization = PatronAuthorization("6120696828384", null)
         )
       )
     )
@@ -1410,7 +1418,8 @@ class ProfileAccountLoginTaskTest {
         adobeCredentials = null,
         authenticationDescription = "Library Login",
         annotationsURI = URI("https://www.example.com"),
-        deviceRegistrationURI = URI("https://www.example.com")
+        deviceRegistrationURI = URI("https://www.example.com"),
+        patronAuthorization = PatronAuthorization("6120696828384", org.joda.time.Instant.parse("2019-08-02T00:00:00Z"))
       )
 
     val newCredentials =
@@ -1784,7 +1793,8 @@ class ProfileAccountLoginTaskTest {
         authenticationDescription = "Description",
         accessToken = "A TOKEN!",
         annotationsURI = URI("https://www.example.com"),
-        deviceRegistrationURI = URI("https://www.example.com")
+        deviceRegistrationURI = URI("https://www.example.com"),
+        patronAuthorization = PatronAuthorization("6120696828384", org.joda.time.Instant.parse("2019-08-02T00:00:00Z"))
       ),
       state.credentials
     )
@@ -2142,7 +2152,8 @@ class ProfileAccountLoginTaskTest {
           AccountCookie("https://fake", "cookie1=24; Path=/; Secure"),
           AccountCookie("http://something", "cookie2=25; Path=/abc; Expires=Wed, 23 Dec 2020 07:28:00 GMT")
         ),
-        deviceRegistrationURI = URI("https://www.example.com")
+        deviceRegistrationURI = URI("https://www.example.com"),
+        patronAuthorization = PatronAuthorization("6120696828384", org.joda.time.Instant.parse("2019-08-02T00:00:00Z"))
       ),
       state.credentials
     )

@@ -16,6 +16,7 @@ import org.nypl.simplified.accounts.api.AccountUsername
 import org.nypl.simplified.accounts.json.AccountAuthenticationCredentialsJSON
 import org.nypl.simplified.accounts.json.AccountAuthenticationCredentialsJSON.deserializeFromJSON
 import org.nypl.simplified.accounts.json.AccountAuthenticationCredentialsJSON.serializeToJSON
+import org.nypl.simplified.patron.api.PatronAuthorization
 import java.net.URI
 
 /**
@@ -34,7 +35,8 @@ class AccountAuthenticationCredentialsJSONTest {
         adobeCredentials = null,
         authenticationDescription = null,
         annotationsURI = URI("https://www.example.com"),
-        deviceRegistrationURI = URI("https://www.example.com")
+        deviceRegistrationURI = URI("https://www.example.com"),
+        patronAuthorization = PatronAuthorization("identifier", null)
       )
 
     val creds1 = deserializeFromJSON(serializeToJSON(creds0))
@@ -50,7 +52,8 @@ class AccountAuthenticationCredentialsJSONTest {
         authenticationDescription = null,
         adobeCredentials = null,
         annotationsURI = URI("https://www.example.com"),
-        deviceRegistrationURI = URI("https://www.example.com")
+        deviceRegistrationURI = URI("https://www.example.com"),
+        patronAuthorization = null
       )
 
     val creds1 = deserializeFromJSON(serializeToJSON(creds0))
@@ -75,7 +78,8 @@ class AccountAuthenticationCredentialsJSONTest {
         adobeCredentials = adobe,
         authenticationDescription = null,
         annotationsURI = URI("https://www.example.com"),
-        deviceRegistrationURI = URI("https://www.example.com")
+        deviceRegistrationURI = URI("https://www.example.com"),
+        patronAuthorization = PatronAuthorization("identifier", null)
       )
 
     val creds1 = deserializeFromJSON(serializeToJSON(creds0))
@@ -105,7 +109,8 @@ class AccountAuthenticationCredentialsJSONTest {
         adobeCredentials = adobe,
         authenticationDescription = "fake",
         annotationsURI = URI("https://www.example.com"),
-        deviceRegistrationURI = URI("https://www.example.com")
+        deviceRegistrationURI = URI("https://www.example.com"),
+        patronAuthorization = PatronAuthorization("identifier", null)
       )
 
     val creds1 = deserializeFromJSON(serializeToJSON(creds0))
@@ -135,6 +140,7 @@ class AccountAuthenticationCredentialsJSONTest {
         authenticationDescription = "fake",
         annotationsURI = URI("https://www.example.com"),
         deviceRegistrationURI = URI("https://www.example.com"),
+        patronAuthorization = PatronAuthorization("identifier", null),
         patronInfo = "{}",
         cookies = listOf(
           AccountCookie("https://example", "cookie0=23"),
@@ -161,7 +167,8 @@ class AccountAuthenticationCredentialsJSONTest {
         adobeCredentials = null,
         authenticationDescription = null,
         annotationsURI = URI("https://www.example.com"),
-        deviceRegistrationURI = URI("https://www.example.com")
+        deviceRegistrationURI = URI("https://www.example.com"),
+        patronAuthorization = PatronAuthorization("identifier", null)
       )
 
     val creds1 = deserializeFromJSON(serializeToJSON(creds0))
@@ -190,7 +197,8 @@ class AccountAuthenticationCredentialsJSONTest {
         adobeCredentials = adobe,
         authenticationDescription = null,
         annotationsURI = URI("https://www.example.com"),
-        deviceRegistrationURI = URI("https://www.example.com")
+        deviceRegistrationURI = URI("https://www.example.com"),
+        patronAuthorization = PatronAuthorization("identifier", null)
       )
 
     val creds1 = deserializeFromJSON(serializeToJSON(creds0))
@@ -224,7 +232,8 @@ class AccountAuthenticationCredentialsJSONTest {
         adobeCredentials = adobe,
         authenticationDescription = null,
         annotationsURI = URI("https://www.example.com"),
-        deviceRegistrationURI = URI("https://www.example.com")
+        deviceRegistrationURI = URI("https://www.example.com"),
+        patronAuthorization = PatronAuthorization("identifier", null)
       )
 
     val creds1 = deserializeFromJSON(serializeToJSON(creds0))

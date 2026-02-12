@@ -37,6 +37,7 @@ import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
 import org.nypl.simplified.opds.core.OPDSAvailabilityLoanable
+import org.nypl.simplified.patron.api.PatronAuthorization
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import org.nypl.simplified.tests.TestDirectories
@@ -100,7 +101,8 @@ class BorrowLimitLoanTest {
             adobeCredentials = null,
             authenticationDescription = "Basic",
             annotationsURI = URI("https://www.example.com"),
-            deviceRegistrationURI = URI("https://www.example.com")
+            deviceRegistrationURI = URI("https://www.example.com"),
+            patronAuthorization = PatronAuthorization("identifier", null)
           )
         )
       )

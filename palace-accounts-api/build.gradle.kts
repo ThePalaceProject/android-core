@@ -5,6 +5,7 @@ dependencies {
     implementation(project(":palace-links"))
     implementation(project(":palace-opds-core"))
     implementation(project(":palace-parser-api"))
+    implementation(project(":palace-patron-api"))
     implementation(project(":palace-presentableerror-api"))
     implementation(project(":palace-taskrecorder-api"))
 

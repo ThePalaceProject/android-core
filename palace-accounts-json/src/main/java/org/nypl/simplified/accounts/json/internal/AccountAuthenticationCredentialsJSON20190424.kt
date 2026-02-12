@@ -40,7 +40,8 @@ object AccountAuthenticationCredentialsJSON20190424 : AccountAuthenticationCrede
       adobeCredentials = adobeCredentials,
       authenticationDescription = null,
       annotationsURI = null,
-      deviceRegistrationURI = null
+      deviceRegistrationURI = null,
+      patronAuthorization = null
     )
   }
 }

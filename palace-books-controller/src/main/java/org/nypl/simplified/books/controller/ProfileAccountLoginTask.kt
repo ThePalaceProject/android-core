@@ -266,7 +266,8 @@ class ProfileAccountLoginTask(
             patronInfo = request.patronInfo,
             cookies = request.cookies,
             annotationsURI = loginState.credentials?.annotationsURI,
-            deviceRegistrationURI = loginState.credentials?.deviceRegistrationURI
+            deviceRegistrationURI = loginState.credentials?.deviceRegistrationURI,
+            patronAuthorization = null
           )
 
         this.handlePatronUserProfile()
@@ -340,7 +341,8 @@ class ProfileAccountLoginTask(
             adobeCredentials = loginState.credentials?.adobeCredentials,
             authenticationDescription = this.findCurrentDescription().description,
             annotationsURI = loginState.credentials?.annotationsURI,
-            deviceRegistrationURI = loginState.credentials?.deviceRegistrationURI
+            deviceRegistrationURI = loginState.credentials?.deviceRegistrationURI,
+            patronAuthorization = null
           )
 
         this.handlePatronUserProfile()
@@ -393,7 +395,8 @@ class ProfileAccountLoginTask(
         authenticationDescription = request.description.description,
         adobeCredentials = existingCredentials?.adobeCredentials,
         annotationsURI = existingCredentials?.annotationsURI,
-        deviceRegistrationURI = existingCredentials?.deviceRegistrationURI
+        deviceRegistrationURI = existingCredentials?.deviceRegistrationURI,
+        patronAuthorization = null
       )
 
     this.handlePatronUserProfile()
@@ -433,7 +436,8 @@ class ProfileAccountLoginTask(
             adobeCredentials = null,
             authenticationDescription = request.description.description,
             annotationsURI = null,
-            deviceRegistrationURI = null
+            deviceRegistrationURI = null,
+            patronAuthorization = null
           )
 
           this.handlePatronUserProfile()
@@ -494,28 +498,32 @@ class ProfileAccountLoginTask(
       is AccountAuthenticationCredentials.Basic -> {
         currentCredentials.copy(
           annotationsURI = patronProfile.annotationsURI,
-          deviceRegistrationURI = patronProfile.deviceRegistrationURI
+          deviceRegistrationURI = patronProfile.deviceRegistrationURI,
+          patronAuthorization = patronProfile.authorization
         )
       }
 
       is AccountAuthenticationCredentials.BasicToken -> {
         currentCredentials.copy(
           annotationsURI = patronProfile.annotationsURI,
-          deviceRegistrationURI = patronProfile.deviceRegistrationURI
+          deviceRegistrationURI = patronProfile.deviceRegistrationURI,
+          patronAuthorization = patronProfile.authorization
         )
       }
 
       is AccountAuthenticationCredentials.OAuthWithIntermediary -> {
         currentCredentials.copy(
           annotationsURI = patronProfile.annotationsURI,
-          deviceRegistrationURI = patronProfile.deviceRegistrationURI
+          deviceRegistrationURI = patronProfile.deviceRegistrationURI,
+          patronAuthorization = patronProfile.authorization
         )
       }
 
       is AccountAuthenticationCredentials.SAML2_0 -> {
         currentCredentials.copy(
           annotationsURI = patronProfile.annotationsURI,
-          deviceRegistrationURI = patronProfile.deviceRegistrationURI
+          deviceRegistrationURI = patronProfile.deviceRegistrationURI,
+          patronAuthorization = patronProfile.authorization
         )
       }
     }

@@ -63,6 +63,7 @@ import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisition
 import org.nypl.simplified.opds.core.OPDSAcquisitionPath
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
+import org.nypl.simplified.patron.api.PatronAuthorization
 import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
@@ -194,7 +195,8 @@ class BorrowACSMTest {
             ),
             authenticationDescription = "Basic",
             annotationsURI = URI("https://www.example.com"),
-            deviceRegistrationURI = URI("https://www.example.com")
+            deviceRegistrationURI = URI("https://www.example.com"),
+            patronAuthorization = PatronAuthorization("identifier", null)
           )
         )
       )
@@ -399,7 +401,8 @@ class BorrowACSMTest {
             adobeCredentials = null,
             authenticationDescription = "Basic",
             annotationsURI = URI("https://www.example.com"),
-            deviceRegistrationURI = URI("https://www.example.com")
+            deviceRegistrationURI = URI("https://www.example.com"),
+            patronAuthorization = PatronAuthorization("identifier", null)
           )
         )
       )
@@ -445,7 +448,8 @@ class BorrowACSMTest {
             ),
             authenticationDescription = "Basic",
             annotationsURI = URI("https://www.example.com"),
-            deviceRegistrationURI = URI("https://www.example.com")
+            deviceRegistrationURI = URI("https://www.example.com"),
+            patronAuthorization = PatronAuthorization("identifier", null)
           )
         )
       )

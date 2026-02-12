@@ -72,6 +72,7 @@ import org.nypl.simplified.opds.core.OPDSFeedParserType
 import org.nypl.simplified.opds.core.OPDSParseException
 import org.nypl.simplified.opds.core.OPDSPreviewAcquisition
 import org.nypl.simplified.opds.core.OPDSSearchParser
+import org.nypl.simplified.patron.api.PatronAuthorization
 import org.nypl.simplified.patron.api.PatronUserProfileParsersType
 import org.nypl.simplified.profiles.ProfilesDatabases
 import org.nypl.simplified.profiles.api.ProfileDatabaseException
@@ -162,7 +163,8 @@ class BooksControllerTest {
       adobeCredentials = null,
       authenticationDescription = null,
       annotationsURI = URI("https://www.example.com"),
-      deviceRegistrationURI = URI("https://www.example.com")
+      deviceRegistrationURI = URI("https://www.example.com"),
+      patronAuthorization = PatronAuthorization("identifier", null)
     )
   }
 

@@ -29,6 +29,7 @@ import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
 import org.nypl.simplified.opds.core.OPDSFeedParser
 import org.nypl.simplified.patron.PatronUserProfileParsers
+import org.nypl.simplified.patron.api.PatronAuthorization
 import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.tests.books.controller.FakeAccounts.fakeAccountProvider
@@ -131,7 +132,8 @@ class BookSyncTaskTest {
         adobeCredentials = null,
         authenticationDescription = null,
         annotationsURI = null,
-        deviceRegistrationURI = null
+        deviceRegistrationURI = null,
+        patronAuthorization = PatronAuthorization("identifier", null)
       )
     ))
 
@@ -211,7 +213,8 @@ class BookSyncTaskTest {
         adobeCredentials = null,
         authenticationDescription = null,
         annotationsURI = null,
-        deviceRegistrationURI = null
+        deviceRegistrationURI = null,
+        patronAuthorization = PatronAuthorization("identifier", null)
       )
     ))
 
@@ -310,7 +313,8 @@ class BookSyncTaskTest {
         adobeCredentials = null,
         authenticationDescription = null,
         annotationsURI = null,
-        deviceRegistrationURI = null
+        deviceRegistrationURI = null,
+        patronAuthorization = PatronAuthorization("identifier", null)
       )
     ))
 
@@ -409,7 +413,8 @@ class BookSyncTaskTest {
         adobeCredentials = null,
         authenticationDescription = null,
         annotationsURI = null,
-        deviceRegistrationURI = null
+        deviceRegistrationURI = null,
+        patronAuthorization = PatronAuthorization("identifier", null)
       )
     ))
 

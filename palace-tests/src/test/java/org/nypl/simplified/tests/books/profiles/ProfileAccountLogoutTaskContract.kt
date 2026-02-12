@@ -48,6 +48,7 @@ import org.nypl.simplified.opds.core.OPDSAcquisition
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
 import org.nypl.simplified.patron.PatronUserProfileParsers
+import org.nypl.simplified.patron.api.PatronAuthorization
 import org.nypl.simplified.patron.api.PatronUserProfileParsersType
 import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfileReadableType
@@ -252,7 +253,8 @@ abstract class ProfileAccountLogoutTaskContract {
         adobeCredentials = null,
         authenticationDescription = null,
         annotationsURI = URI("https://www.example.com"),
-        deviceRegistrationURI = URI("https://www.example.com")
+        deviceRegistrationURI = URI("https://www.example.com"),
+        patronAuthorization = PatronAuthorization("identifier", null)
       )
 
     this.account.setLoginState(AccountLoggedIn(credentials))
@@ -334,7 +336,8 @@ abstract class ProfileAccountLogoutTaskContract {
         ),
         annotationsURI = URI("https://www.example.com"),
         authenticationDescription = null,
-        deviceRegistrationURI = URI("https://www.example.com")
+        deviceRegistrationURI = URI("https://www.example.com"),
+        patronAuthorization = PatronAuthorization("identifier", null)
       )
 
     this.account.setLoginState(AccountLoggedIn(credentials))
@@ -433,7 +436,8 @@ abstract class ProfileAccountLogoutTaskContract {
         ),
         annotationsURI = URI("https://www.example.com"),
         authenticationDescription = null,
-        deviceRegistrationURI = URI("https://www.example.com")
+        deviceRegistrationURI = URI("https://www.example.com"),
+        patronAuthorization = PatronAuthorization("identifier", null)
       )
 
     this.account.setLoginState(AccountLoggedIn(credentials))
@@ -547,7 +551,8 @@ abstract class ProfileAccountLogoutTaskContract {
         ),
         annotationsURI = URI("https://www.example.com"),
         authenticationDescription = null,
-        deviceRegistrationURI = URI("https://www.example.com")
+        deviceRegistrationURI = URI("https://www.example.com"),
+        patronAuthorization = PatronAuthorization("identifier", null)
       )
 
     this.account.setLoginState(AccountLoggedIn(credentials))

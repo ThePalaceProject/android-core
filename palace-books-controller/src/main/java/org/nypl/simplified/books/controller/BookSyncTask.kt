@@ -27,6 +27,7 @@ import org.nypl.simplified.feeds.api.FeedLoading
 import org.nypl.simplified.opds.core.OPDSAvailabilityRevoked
 import org.nypl.simplified.opds.core.OPDSFeedParserType
 import org.nypl.simplified.opds.core.OPDSParseException
+import org.nypl.simplified.patron.api.PatronAuthorization
 import org.nypl.simplified.patron.api.PatronUserProfile
 import org.nypl.simplified.patron.api.PatronUserProfileParsersType
 import org.nypl.simplified.profiles.api.ProfileID
@@ -159,8 +160,31 @@ class BookSyncTask(
       account.updateCredentialsIfAvailable {
         this.withNewAnnotationsURI(it, profile)
       }
+
+      val authorization = profile.authorization
+      if (authorization != null) {
+        account.updateCredentialsIfAvailable {
+          this.withPatronAuthorization(it, authorization)
+        }
+      }
     } catch (e: Exception) {
       this.logger.debug("patron user profile: ", e)
+    }
+  }
+
+  private fun withPatronAuthorization(
+    currentCredentials: AccountAuthenticationCredentials,
+    authorization: PatronAuthorization
+  ): AccountAuthenticationCredentials {
+    return when (currentCredentials) {
+      is AccountAuthenticationCredentials.Basic ->
+        currentCredentials.copy(patronAuthorization = authorization)
+      is AccountAuthenticationCredentials.BasicToken ->
+        currentCredentials.copy(patronAuthorization = authorization)
+      is AccountAuthenticationCredentials.OAuthWithIntermediary ->
+        currentCredentials.copy(patronAuthorization = authorization)
+      is AccountAuthenticationCredentials.SAML2_0 ->
+        currentCredentials.copy(patronAuthorization = authorization)
     }
   }
 

@@ -1012,7 +1012,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-02-11T17:59:40+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.25.0">
+    <c:release date="2026-02-12T09:49:38+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.25.0">
       <c:changes>
         <c:change date="2026-02-03T00:00:00+00:00" summary="Attempt to allow notifications on Android 10.">
           <c:tickets>
@@ -1054,9 +1054,14 @@
             <c:ticket id="PP-3672"/>
           </c:tickets>
         </c:change>
-        <c:change date="2026-02-11T17:59:40+00:00" summary="Update fallback Palace Bookshelf account.">
+        <c:change date="2026-02-11T00:00:00+00:00" summary="Update fallback Palace Bookshelf account.">
           <c:tickets>
             <c:ticket id="PP-3656"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-02-12T09:49:38+00:00" summary="Add Palace patron IDs to error reports.">
+          <c:tickets>
+            <c:ticket id="PP-3652"/>
           </c:tickets>
         </c:change>
       </c:changes>

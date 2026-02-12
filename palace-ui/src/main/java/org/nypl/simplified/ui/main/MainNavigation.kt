@@ -8,7 +8,9 @@ import androidx.annotation.UiThread
 import androidx.fragment.app.FragmentActivity
 import com.io7m.jattribute.core.AttributeReadableType
 import com.io7m.jattribute.core.AttributeType
+import org.librarysimplified.services.api.Services
 import org.nypl.simplified.accounts.database.api.AccountType
+import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.accounts.AccountCardCreatorFragment
 import org.nypl.simplified.ui.accounts.AccountCardCreatorParameters
@@ -66,8 +68,45 @@ object MainNavigation {
     parameters: ErrorPageParameters
   ) {
     UIThread.checkIsUIThread()
-    ErrorPageModel.parameters = parameters
+
+    val services =
+      Services.serviceDirectory()
+    val profilesController =
+      services.requireService(ProfilesControllerType::class.java)
+
+    ErrorPageModel.parameters = this.includePalacePatronID(profilesController, parameters)
     activity.startActivity(Intent(activity, ErrorPageActivity::class.java))
+  }
+
+  /**
+   * https://ebce-lyrasis.atlassian.net/browse/PP-3652
+   *
+   * We now want to include Palace Patron IDs in error reports. These are taken from the patron
+   * user profile.
+   */
+
+  private fun includePalacePatronID(
+    profilesController: ProfilesControllerType,
+    parameters: ErrorPageParameters
+  ): ErrorPageParameters {
+    val profile =
+      profilesController.profileCurrent()
+    val account =
+      profile.mostRecentAccount()
+    val attributes =
+      parameters.attributes.toMutableMap()
+    val credentials =
+      account.loginState.credentials
+
+    if (credentials != null) {
+      val patronAuthorization = credentials.patronAuthorization
+      if (patronAuthorization != null) {
+        attributes["Palace Patron ID"] = patronAuthorization.identifier
+        return parameters.copy(attributes = attributes.toSortedMap())
+      }
+    }
+
+    return parameters
   }
 
   @UiThread

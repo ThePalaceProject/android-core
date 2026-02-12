@@ -36,6 +36,7 @@ import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookStatusEvent
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.books.formats.api.StandardFormatNames
+import org.nypl.simplified.patron.api.PatronAuthorization
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import org.nypl.simplified.tests.MutableServiceDirectory
@@ -89,7 +90,8 @@ class BookmarkRefreshTokenTest {
       adobeCredentials = null,
       authenticationDescription = null,
       annotationsURI = URI("https://www.example.com"),
-      deviceRegistrationURI = URI("https://www.example.com")
+      deviceRegistrationURI = URI("https://www.example.com"),
+      patronAuthorization = PatronAuthorization("identifier", null)
     )
 
     this.account.setLoginState(AccountLoginState.AccountLoggedIn(credentials))

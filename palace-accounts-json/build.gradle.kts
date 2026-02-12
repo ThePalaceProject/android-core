@@ -11,6 +11,7 @@ dependencies {
     implementation(project(":palace-opds2"))
     implementation(project(":palace-opds2-parser-api"))
     implementation(project(":palace-parser-api"))
+    implementation(project(":palace-patron-api"))
     implementation(project(":palace-taskrecorder-api"))
 
     implementation(libs.io7m.jfunctional)

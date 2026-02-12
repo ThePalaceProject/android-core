@@ -13,6 +13,7 @@ import org.nypl.simplified.accounts.api.AccountUsername
 import org.nypl.simplified.accounts.database.AccountAuthenticationCredentialsStore
 import org.nypl.simplified.accounts.json.AccountAuthenticationCredentialsJSON
 import org.nypl.simplified.json.core.JSONParseException
+import org.nypl.simplified.patron.api.PatronAuthorization
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -60,7 +61,8 @@ class AccountAuthenticationCredentialsStoreTest {
         adobeCredentials = null,
         authenticationDescription = null,
         annotationsURI = URI("https://www.example.com"),
-        deviceRegistrationURI = URI("https://www.example.com")
+        deviceRegistrationURI = URI("https://www.example.com"),
+        patronAuthorization = PatronAuthorization("identifier", null)
       )
 
     store0.put(accountID, credentials)
@@ -134,7 +136,8 @@ class AccountAuthenticationCredentialsStoreTest {
           adobeCredentials = null,
           authenticationDescription = null,
           annotationsURI = URI("https://www.example.com"),
-          deviceRegistrationURI = URI("https://www.example.com")
+          deviceRegistrationURI = URI("https://www.example.com"),
+          patronAuthorization = PatronAuthorization("identifier", null)
         )
       )
     cred1.remove("username")
@@ -152,7 +155,8 @@ class AccountAuthenticationCredentialsStoreTest {
           adobeCredentials = null,
           authenticationDescription = null,
           annotationsURI = URI("https://www.example.com"),
-          deviceRegistrationURI = URI("https://www.example.com")
+          deviceRegistrationURI = URI("https://www.example.com"),
+          patronAuthorization = PatronAuthorization("identifier", null)
         )
       )
     creds.set<ObjectNode>("not a uuid", cred2)
@@ -169,7 +173,8 @@ class AccountAuthenticationCredentialsStoreTest {
           adobeCredentials = null,
           authenticationDescription = null,
           annotationsURI = URI("https://www.example.com"),
-          deviceRegistrationURI = URI("https://www.example.com")
+          deviceRegistrationURI = URI("https://www.example.com"),
+          patronAuthorization = PatronAuthorization("identifier", null)
         )
       )
     creds.set<ObjectNode>("37452e48-2235-4098-ad67-e72bce45ccb6", cred3)
@@ -200,7 +205,8 @@ class AccountAuthenticationCredentialsStoreTest {
         adobeCredentials = null,
         authenticationDescription = null,
         annotationsURI = URI("https://www.example.com"),
-        deviceRegistrationURI = URI("https://www.example.com")
+        deviceRegistrationURI = URI("https://www.example.com"),
+        patronAuthorization = PatronAuthorization("identifier", null)
       )
 
     store.put(accountID, credentials)
@@ -228,7 +234,8 @@ class AccountAuthenticationCredentialsStoreTest {
         adobeCredentials = null,
         authenticationDescription = null,
         annotationsURI = URI("https://www.example.com"),
-        deviceRegistrationURI = URI("https://www.example.com")
+        deviceRegistrationURI = URI("https://www.example.com"),
+        patronAuthorization = PatronAuthorization("identifier", null)
       )
 
     store.put(accountID, credentials)

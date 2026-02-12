@@ -23,6 +23,7 @@ import org.nypl.simplified.bookmarks.api.BookmarkAnnotationBodyNode
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotationSelectorNode
 import org.nypl.simplified.bookmarks.api.BookmarkAnnotationTargetNode
 import org.nypl.simplified.bookmarks.internal.BHTTPCalls
+import org.nypl.simplified.patron.api.PatronAuthorization
 import java.io.IOException
 import java.net.URI
 import java.util.concurrent.TimeUnit
@@ -49,7 +50,8 @@ class BHTTPCallsTest {
         adobeCredentials = null,
         authenticationDescription = null,
         annotationsURI = URI("https://www.example.com"),
-        deviceRegistrationURI = URI("https://www.example.com")
+        deviceRegistrationURI = URI("https://www.example.com"),
+        patronAuthorization = PatronAuthorization("identifier", null)
       )
 
     val targetURI =
@@ -217,7 +219,8 @@ class BHTTPCallsTest {
         adobeCredentials = null,
         authenticationDescription = null,
         annotationsURI = URI("https://www.example.com"),
-        deviceRegistrationURI = URI("https://www.example.com")
+        deviceRegistrationURI = URI("https://www.example.com"),
+        patronAuthorization = PatronAuthorization("identifier", null)
       )
 
     val targetURI = this.server.url("annotations").toUri()
@@ -246,7 +249,8 @@ class BHTTPCallsTest {
         adobeCredentials = null,
         authenticationDescription = null,
         annotationsURI = URI("https://www.example.com"),
-        deviceRegistrationURI = URI("https://www.example.com")
+        deviceRegistrationURI = URI("https://www.example.com"),
+        patronAuthorization = PatronAuthorization("identifier", null)
       )
 
     val targetURI = this.server.url("annotations").toUri()

@@ -66,6 +66,10 @@ object AccountAuthenticationCredentialsJSON {
       authObject.put("deviceRegistrationURI", uri.toString())
     }
 
+    credentials.patronAuthorization?.let { a ->
+      authObject.put("palaceAuthorizationIdentifier", a.identifier)
+    }
+
     when (credentials) {
       is AccountAuthenticationCredentials.Basic -> {
         authObject.put("@type", "basic")

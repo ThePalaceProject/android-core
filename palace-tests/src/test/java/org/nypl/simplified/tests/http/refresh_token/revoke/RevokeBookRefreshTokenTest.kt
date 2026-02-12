@@ -48,6 +48,7 @@ import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
 import org.nypl.simplified.opds.core.OPDSAvailabilityLoaned
 import org.nypl.simplified.opds.core.OPDSFeedParser
 import org.nypl.simplified.opds.core.OPDSSearchParser
+import org.nypl.simplified.patron.api.PatronAuthorization
 import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
@@ -109,7 +110,8 @@ class RevokeBookRefreshTokenTest {
       ),
       authenticationDescription = "BasicToken",
       annotationsURI = URI("https://www.example.com"),
-      deviceRegistrationURI = URI("https://www.example.com")
+      deviceRegistrationURI = URI("https://www.example.com"),
+      patronAuthorization = PatronAuthorization("identifier", null)
     )
 
     this.account.setLoginState(AccountLoginState.AccountLoggedIn(credentials))

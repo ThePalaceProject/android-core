@@ -10,6 +10,7 @@ import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountUsername
 import org.nypl.simplified.json.core.JSONParseException
 import org.nypl.simplified.json.core.JSONParserUtilities
+import org.nypl.simplified.patron.api.PatronAuthorization
 import org.slf4j.LoggerFactory
 import java.net.URI
 
@@ -59,12 +60,17 @@ object AccountAuthenticationCredentialsJSON20210512 : AccountAuthenticationCrede
       JSONParserUtilities.getObjectOrNull(obj, "adobe_credentials")
         ?.let(AccountAuthenticationCredentialsAdobeJSON::deserializeAdobeCredentials)
 
+    val patronAuthorization: PatronAuthorization? =
+      JSONParserUtilities.getStringOrNull(obj, "palaceAuthorizationIdentifier")
+        ?.let { text -> PatronAuthorization(text, null) }
+
     return AccountAuthenticationCredentials.OAuthWithIntermediary(
       accessToken = JSONParserUtilities.getString(obj, "accessToken"),
       adobeCredentials = adobeCredentials,
       authenticationDescription = JSONParserUtilities.getStringOrNull(obj, "authenticationDescription"),
       annotationsURI = JSONParserUtilities.getURIOrNull(obj, "annotationsURI"),
-      deviceRegistrationURI = JSONParserUtilities.getURIOrNull(obj, "deviceRegistrationURI")
+      deviceRegistrationURI = JSONParserUtilities.getURIOrNull(obj, "deviceRegistrationURI"),
+      patronAuthorization = patronAuthorization
     )
   }
 
@@ -75,13 +81,18 @@ object AccountAuthenticationCredentialsJSON20210512 : AccountAuthenticationCrede
       JSONParserUtilities.getObjectOrNull(obj, "adobe_credentials")
         ?.let(AccountAuthenticationCredentialsAdobeJSON::deserializeAdobeCredentials)
 
+    val patronAuthorization: PatronAuthorization? =
+      JSONParserUtilities.getStringOrNull(obj, "palaceAuthorizationIdentifier")
+        ?.let { text -> PatronAuthorization(text, null) }
+
     return AccountAuthenticationCredentials.Basic(
       userName = AccountUsername(JSONParserUtilities.getString(obj, "username")),
       password = AccountPassword(JSONParserUtilities.getString(obj, "password")),
       adobeCredentials = adobeCredentials,
       authenticationDescription = JSONParserUtilities.getStringOrNull(obj, "authenticationDescription"),
       annotationsURI = JSONParserUtilities.getURIOrNull(obj, "annotationsURI"),
-      deviceRegistrationURI = JSONParserUtilities.getURIOrNull(obj, "deviceRegistrationURI")
+      deviceRegistrationURI = JSONParserUtilities.getURIOrNull(obj, "deviceRegistrationURI"),
+      patronAuthorization = patronAuthorization
     )
   }
 
@@ -96,6 +107,10 @@ object AccountAuthenticationCredentialsJSON20210512 : AccountAuthenticationCrede
       JSONParserUtilities.getObjectOrNull(obj, "authenticationTokenInfo")
         ?: throw Exception("No authentication token info")
 
+    val patronAuthorization: PatronAuthorization? =
+      JSONParserUtilities.getStringOrNull(obj, "palaceAuthorizationIdentifier")
+        ?.let { text -> PatronAuthorization(text, null) }
+
     return AccountAuthenticationCredentials.BasicToken(
       userName = AccountUsername(JSONParserUtilities.getString(obj, "username")),
       password = AccountPassword(JSONParserUtilities.getString(obj, "password")),
@@ -106,7 +121,8 @@ object AccountAuthenticationCredentialsJSON20210512 : AccountAuthenticationCrede
       adobeCredentials = adobeCredentials,
       authenticationDescription = JSONParserUtilities.getStringOrNull(obj, "authenticationDescription"),
       annotationsURI = JSONParserUtilities.getURIOrNull(obj, "annotationsURI"),
-      deviceRegistrationURI = JSONParserUtilities.getURIOrNull(obj, "deviceRegistrationURI")
+      deviceRegistrationURI = JSONParserUtilities.getURIOrNull(obj, "deviceRegistrationURI"),
+      patronAuthorization = patronAuthorization
     )
   }
 
@@ -115,6 +131,10 @@ object AccountAuthenticationCredentialsJSON20210512 : AccountAuthenticationCrede
       JSONParserUtilities.getObjectOrNull(obj, "adobe_credentials")
         ?.let(AccountAuthenticationCredentialsAdobeJSON::deserializeAdobeCredentials)
 
+    val patronAuthorization: PatronAuthorization? =
+      JSONParserUtilities.getStringOrNull(obj, "palaceAuthorizationIdentifier")
+        ?.let { text -> PatronAuthorization(text, null) }
+
     return AccountAuthenticationCredentials.SAML2_0(
       accessToken = JSONParserUtilities.getString(obj, "accessToken"),
       adobeCredentials = adobeCredentials,
@@ -122,7 +142,8 @@ object AccountAuthenticationCredentialsJSON20210512 : AccountAuthenticationCrede
       patronInfo = JSONParserUtilities.getString(obj, "patronInfo"),
       cookies = deserializeCookies(JSONParserUtilities.getArray(obj, "cookies")),
       annotationsURI = JSONParserUtilities.getURIOrNull(obj, "annotationsURI"),
-      deviceRegistrationURI = JSONParserUtilities.getURIOrNull(obj, "deviceRegistrationURI")
+      deviceRegistrationURI = JSONParserUtilities.getURIOrNull(obj, "deviceRegistrationURI"),
+      patronAuthorization = patronAuthorization
     )
   }
 

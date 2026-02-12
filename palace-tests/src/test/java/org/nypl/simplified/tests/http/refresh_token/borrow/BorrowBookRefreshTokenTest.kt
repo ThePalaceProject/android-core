@@ -55,6 +55,7 @@ import org.nypl.simplified.opds.core.OPDSAcquisitionPath
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
 import org.nypl.simplified.opds.core.OPDSFeedParser
 import org.nypl.simplified.opds.core.OPDSFeedParserType
+import org.nypl.simplified.patron.api.PatronAuthorization
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import org.nypl.simplified.tests.MutableServiceDirectory
@@ -139,7 +140,8 @@ class BorrowBookRefreshTokenTest {
       ),
       authenticationDescription = "BasicToken",
       annotationsURI = URI("https://www.example.com"),
-      deviceRegistrationURI = URI("https://www.example.com")
+      deviceRegistrationURI = URI("https://www.example.com"),
+      patronAuthorization = PatronAuthorization("identifier", null)
     )
 
     this.account.setLoginState(AccountLoginState.AccountLoggedIn(credentials))

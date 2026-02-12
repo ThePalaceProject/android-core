@@ -20,6 +20,7 @@ import org.nypl.simplified.books.time.tracking.TimeTrackingRequest
 import org.nypl.simplified.books.time.tracking.TimeTrackingServerResponse
 import org.nypl.simplified.books.time.tracking.TimeTrackingServerResponseEntry
 import org.nypl.simplified.books.time.tracking.TimeTrackingServerResponseSummary
+import org.nypl.simplified.patron.api.PatronAuthorization
 import org.nypl.simplified.tests.mocking.MockAccount
 import org.nypl.simplified.tests.mocking.MockContext
 import org.nypl.simplified.tests.mocking.MockProfilesController
@@ -45,7 +46,8 @@ class TimeTrackingHttpCallsTest {
         adobeCredentials = null,
         authenticationDescription = null,
         annotationsURI = URI("https://www.example.com"),
-        deviceRegistrationURI = URI("https://www.example.com")
+        deviceRegistrationURI = URI("https://www.example.com"),
+        patronAuthorization = PatronAuthorization("identifier", null)
       )
 
     this.profiles =
