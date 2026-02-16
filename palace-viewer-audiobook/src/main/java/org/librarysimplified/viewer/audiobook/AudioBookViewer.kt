@@ -8,9 +8,6 @@ import org.librarysimplified.audiobook.api.PlayerUserAgent
 import org.librarysimplified.audiobook.feedbooks.FeedbooksPlayerExtension
 import org.librarysimplified.audiobook.license_check.spi.SingleLicenseCheckProviderType
 import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
-import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentCredentialsBasic
-import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentCredentialsToken
-import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentCredentialsType
 import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfilled
 import org.librarysimplified.audiobook.manifest_parser.api.ManifestUnparsed
 import org.librarysimplified.audiobook.manifest_parser.extension_spi.ManifestParserExtensionType
@@ -19,7 +16,6 @@ import org.librarysimplified.audiobook.views.PlayerModelState
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.librarysimplified.services.api.Services
-import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookFormat
@@ -31,7 +27,7 @@ import org.nypl.simplified.books.book_database.api.BookFormats
 import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.threads.UIThread
-import org.nypl.simplified.viewer.spi.ViewerPreferences
+import org.nypl.simplified.viewer.spi.ViewerParameters
 import org.nypl.simplified.viewer.spi.ViewerProviderType
 import org.slf4j.LoggerFactory
 import java.net.URI
@@ -52,7 +48,7 @@ class AudioBookViewer : ViewerProviderType {
     "org.librarysimplified.viewer.audiobook.AudioBookViewer"
 
   override fun canSupport(
-    preferences: ViewerPreferences,
+    preferences: ViewerParameters,
     book: Book,
     format: BookFormat
   ): Boolean {
@@ -79,7 +75,7 @@ class AudioBookViewer : ViewerProviderType {
     if (feedbooksConfigService != null) {
       this.logger.debug("Feedbooks configuration service is available; configuring extension")
       val extension =
-        PlayerModel.playerExtensions
+        PlayerModel.authorizationHandlerExtensions
           .filterIsInstance<FeedbooksPlayerExtension>()
           .firstOrNull()
       if (extension != null) {
@@ -93,7 +89,7 @@ class AudioBookViewer : ViewerProviderType {
 
   override fun open(
     activity: Activity,
-    preferences: ViewerPreferences,
+    parameters: ViewerParameters,
     book: Book,
     format: BookFormat,
     accountProviderId: URI
@@ -127,9 +123,20 @@ class AudioBookViewer : ViewerProviderType {
     val account =
       profiles.profileCurrent()
         .account(book.account)
-    val accountCredentials =
-      account.loginState
-        .credentials
+
+    /*
+     * Configure the login and authorization handlers.
+     */
+
+    AudioBookViewerModel.loginHandler = {
+      parameters.onLoginRequested.invoke(book.account)
+    }
+    AudioBookViewerModel.authorizationHandler =
+      AudioBookAuthorizationHandler(
+        account = account,
+        book = book,
+        httpClient = httpClient
+      )
 
     this.loadAndConfigureFeedbooks(services)
 
@@ -160,7 +167,7 @@ class AudioBookViewer : ViewerProviderType {
      * in order to test that we report errors properly.
      */
 
-    if (preferences.flags["Fail"] ?: false) {
+    if (parameters.flags["Fail"] ?: false) {
       this.triggerFailure(
         activity = activity,
         userAgent = userAgent,
@@ -224,11 +231,13 @@ class AudioBookViewer : ViewerProviderType {
 
     val manifestURI = manifest.manifestURI
     if (manifestURI != null && manifestURI.isAbsolute) {
+      this.logger.debug("Attempting to download fresh manifest.")
+
       val manifestRequest =
         AudioBookManifestRequest(
           cacheDirectory = activity.cacheDir,
           contentType = format.contentType,
-          credentials = manifestCredentialsOf(accountCredentials),
+          authorizationHandler = AudioBookViewerModel.authorizationHandler,
           httpClient = httpClient,
           palaceID = palaceID,
           services = services,
@@ -312,6 +321,7 @@ class AudioBookViewer : ViewerProviderType {
       return
     }
 
+    this.logger.debug("Parsing existing manifest.")
     PlayerModel.parseAndCheckManifest(
       bookCredentials = bookCredentials,
       cacheDir = activity.cacheDir,
@@ -327,29 +337,6 @@ class AudioBookViewer : ViewerProviderType {
       userAgent = userAgent,
     )
     this.openActivity(activity)
-  }
-
-  private fun manifestCredentialsOf(
-    accountCredentials: AccountAuthenticationCredentials?
-  ): ManifestFulfillmentCredentialsType? {
-    return when (accountCredentials) {
-      is AccountAuthenticationCredentials.Basic -> {
-        ManifestFulfillmentCredentialsBasic(
-          userName = accountCredentials.userName.value,
-          password = accountCredentials.password.value
-        )
-      }
-      is AccountAuthenticationCredentials.BasicToken -> {
-        ManifestFulfillmentCredentialsToken(accountCredentials.authenticationTokenInfo.accessToken)
-      }
-      is AccountAuthenticationCredentials.OAuthWithIntermediary -> {
-        ManifestFulfillmentCredentialsToken(accountCredentials.accessToken)
-      }
-      is AccountAuthenticationCredentials.SAML2_0 -> {
-        ManifestFulfillmentCredentialsToken(accountCredentials.accessToken)
-      }
-      null -> null
-    }
   }
 
   private fun triggerFailure(

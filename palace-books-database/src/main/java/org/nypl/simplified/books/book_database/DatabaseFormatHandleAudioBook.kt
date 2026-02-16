@@ -7,9 +7,9 @@ import net.jcip.annotations.GuardedBy
 import one.irradia.mime.api.MIMEType
 import org.librarysimplified.audiobook.api.PlayerAudioEngineRequest
 import org.librarysimplified.audiobook.api.PlayerAudioEngines
+import org.librarysimplified.audiobook.api.PlayerAuthorizationHandlerNoOp
 import org.librarysimplified.audiobook.api.PlayerBookSource
 import org.librarysimplified.audiobook.api.PlayerUserAgent
-import org.librarysimplified.audiobook.api.extensions.PlayerExtensionType
 import org.librarysimplified.audiobook.manifest.api.PlayerManifest
 import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.librarysimplified.audiobook.manifest_parser.api.ManifestParsers
@@ -35,7 +35,6 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
 import java.net.URI
-import java.util.ServiceLoader
 
 /**
  * Operations on audio book formats in database entries.
@@ -198,13 +197,13 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
 
             PlayerAudioEngines.delete(
               context = context,
-              extensions = ServiceLoader.load(PlayerExtensionType::class.java).toList(),
               request = PlayerAudioEngineRequest(
                 bookSource = PlayerBookSource.PlayerBookSourceManifestOnly,
                 manifest = manifestResult.result,
                 filter = { true },
                 downloadProvider = NullDownloadProvider(),
                 userAgent = PlayerUserAgent("unused"),
+                authorizationHandler = PlayerAuthorizationHandlerNoOp,
                 bookCredentials = this.drmHandleRef.info.playerCredentials()
               )
             )

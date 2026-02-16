@@ -5,7 +5,7 @@ import one.irradia.mime.api.MIMEType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.feeds.api.FeedEntry
-import org.nypl.simplified.viewer.spi.ViewerPreferences
+import org.nypl.simplified.viewer.spi.ViewerParameters
 import org.nypl.simplified.viewer.spi.ViewerProviderType
 import java.net.URI
 
@@ -15,7 +15,7 @@ class ReaderViewerR2 : ViewerProviderType {
     "org.librarysimplified.viewer.epub.readium2.ReaderViewerR2"
 
   override fun canSupport(
-    preferences: ViewerPreferences,
+    preferences: ViewerParameters,
     book: Book,
     format: BookFormat
   ): Boolean {
@@ -23,6 +23,7 @@ class ReaderViewerR2 : ViewerProviderType {
       is BookFormat.BookFormatPDF,
       is BookFormat.BookFormatAudioBook ->
         false
+
       is BookFormat.BookFormatEPUB ->
         true
     }
@@ -34,7 +35,7 @@ class ReaderViewerR2 : ViewerProviderType {
 
   override fun open(
     activity: Activity,
-    preferences: ViewerPreferences,
+    preferences: ViewerParameters,
     book: Book,
     format: BookFormat,
     accountProviderID: URI

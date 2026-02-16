@@ -65,7 +65,7 @@ import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON
 import org.nypl.simplified.ui.main.MainNavigation
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.nypl.simplified.viewer.api.Viewers
-import org.nypl.simplified.viewer.spi.ViewerPreferences
+import org.nypl.simplified.viewer.spi.ViewerParameters
 import org.slf4j.LoggerFactory
 import org.thepalaceproject.opds.client.OPDSClientRequest
 import org.thepalaceproject.opds.client.OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY
@@ -662,15 +662,29 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     book: Book,
     bookFormat: BookFormat
   ) {
-    val viewerPreferences =
-      ViewerPreferences(
-        flags = mapOf()
+    val services =
+      Services.serviceDirectory()
+    val profiles =
+      services.requireService(ProfilesControllerType::class.java)
+    val profile =
+      profiles.profileCurrent()
+
+    val viewerParameters =
+      ViewerParameters(
+        flags = mapOf(),
+        onLoginRequested = { accountID ->
+          try {
+            MainNavigation.showLoginDialog(profile.account(accountID))
+          } catch (e: Throwable) {
+            this.logger.error("Unable to open login dialog: ", e)
+          }
+        }
       )
 
     try {
       Viewers.openViewer(
         context = this.requireActivity(),
-        preferences = viewerPreferences,
+        preferences = viewerParameters,
         book = book,
         format = bookFormat
       )

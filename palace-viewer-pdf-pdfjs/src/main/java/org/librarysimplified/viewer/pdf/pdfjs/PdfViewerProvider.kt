@@ -6,7 +6,7 @@ import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.nypl.simplified.feeds.api.FeedEntry
-import org.nypl.simplified.viewer.spi.ViewerPreferences
+import org.nypl.simplified.viewer.spi.ViewerParameters
 import org.nypl.simplified.viewer.spi.ViewerProviderType
 import org.slf4j.LoggerFactory
 import java.net.URI
@@ -20,7 +20,7 @@ class PdfViewerProvider : ViewerProviderType {
     "org.librarysimplified.viewer.pdf.pdfjs.PdfViewerProvider"
 
   override fun canSupport(
-    preferences: ViewerPreferences,
+    preferences: ViewerParameters,
     book: Book,
     format: BookFormat
   ): Boolean {
@@ -30,6 +30,7 @@ class PdfViewerProvider : ViewerProviderType {
         logger.debug("the PDF viewer can only open PDF files!")
         false
       }
+
       is BookFormat.BookFormatPDF -> {
         true
       }
@@ -42,7 +43,7 @@ class PdfViewerProvider : ViewerProviderType {
 
   override fun open(
     activity: Activity,
-    preferences: ViewerPreferences,
+    parameters: ViewerParameters,
     book: Book,
     format: BookFormat,
     accountProviderId: URI

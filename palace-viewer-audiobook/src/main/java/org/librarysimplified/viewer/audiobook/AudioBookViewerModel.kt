@@ -1,5 +1,7 @@
 package org.librarysimplified.viewer.audiobook
 
+import org.librarysimplified.audiobook.api.PlayerAuthorizationHandlerNoOp
+import org.librarysimplified.audiobook.api.PlayerAuthorizationHandlerType
 import org.slf4j.LoggerFactory
 
 internal object AudioBookViewerModel {
@@ -9,6 +11,15 @@ internal object AudioBookViewerModel {
 
   @Volatile
   internal var parameters: AudioBookPlayerParameters? = null
+
+  @Volatile
+  internal var authorizationHandler: PlayerAuthorizationHandlerType =
+    PlayerAuthorizationHandlerNoOp
+
+  @Volatile
+  internal var loginHandler: () -> Unit = {
+    // Nothing!
+  }
 
   @Volatile
   internal var appliedLastReadBookmarkMigration: Boolean = false

@@ -5,13 +5,18 @@ import one.irradia.mime.api.MIMECompatibility
 import one.irradia.mime.api.MIMEType
 import org.librarysimplified.audiobook.api.PlayerUserAgent
 import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
-import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentCredentialsType
+import org.librarysimplified.audiobook.manifest_fulfill.opa.OPAPassword
+import org.librarysimplified.audiobook.manifest_fulfill.opa.OPAUsernamePassword
+import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
+import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountReadableType
+import org.nypl.simplified.accounts.api.AccountUsername
 import org.nypl.simplified.books.audio.AudioBookLink
 import org.nypl.simplified.books.audio.AudioBookManifestRequest
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleEPUB
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandlePDF
+import org.nypl.simplified.books.book_database.api.BookFormats
 import org.nypl.simplified.books.borrowing.BorrowContextType
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.audioStrategyFailed
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskFailed
@@ -82,14 +87,46 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
     val sourceURI: URI
   )
 
+  /**
+   * @return `true` if the request content type implies an Overdrive audio book
+   */
+
+  private fun isOverdrive(
+    currentLink: Link
+  ): Boolean {
+    val type = currentLink.type ?: return false
+
+    return BookFormats.audioBookOverdriveMimeTypes()
+      .map { it.fullType }
+      .contains(type.fullType)
+  }
+
   private fun runStrategy(
     context: BorrowContextType,
     currentURI: URI
   ): DownloadedManifest {
     context.taskRecorder.beginNewStep("Executing audio book manifest strategy...")
 
-    val credentials: ManifestFulfillmentCredentialsType? =
-      context.takeSubtaskCredentialsForAudiobook()
+    val customCredentials =
+      if (this.isOverdrive(context.currentLinkCheck())) {
+        when (val credentials = context.takeSubtaskCredentialsRequiringAccount()) {
+          is AccountAuthenticationCredentials.Basic -> {
+            opaCredentialsOf(credentials.userName, credentials.password)
+          }
+
+          is AccountAuthenticationCredentials.BasicToken -> {
+            opaCredentialsOf(credentials.userName, credentials.password)
+          }
+
+          null,
+          is AccountAuthenticationCredentials.OAuthWithIntermediary,
+          is AccountAuthenticationCredentials.SAML2_0 -> {
+            null
+          }
+        }
+      } else {
+        null
+      }
 
     val strategy =
       context.audioBookManifestStrategies.createStrategy(
@@ -97,7 +134,7 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
         AudioBookManifestRequest(
           cacheDirectory = context.cacheDirectory(),
           contentType = context.currentAcquisitionPathElement.mimeType,
-          credentials = credentials,
+          authorizationHandler = context.audiobookAuthorizationHandler,
           httpClient = context.httpClient,
           palaceID = PlayerPalaceID(context.bookCurrent.entry.id),
           services = context.services,
@@ -148,6 +185,21 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
     } finally {
       subscription.dispose()
     }
+  }
+
+  private fun opaCredentialsOf(
+    userName: AccountUsername,
+    password: AccountPassword
+  ): OPAUsernamePassword {
+    val password = if (password.value.isBlank()) {
+      OPAPassword.NotRequired
+    } else {
+      OPAPassword.Password(password.value)
+    }
+    return OPAUsernamePassword(
+      userName = userName.value,
+      password = password
+    )
   }
 
   private fun saveDownloadedContent(

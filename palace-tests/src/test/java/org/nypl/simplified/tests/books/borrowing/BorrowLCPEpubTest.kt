@@ -34,6 +34,7 @@ import org.nypl.simplified.books.book_database.api.BookDatabaseType
 import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.borrowing.BorrowContextType
+import org.nypl.simplified.books.borrowing.internal.BorrowAudiobookAuthorizationHandler
 import org.nypl.simplified.books.borrowing.internal.BorrowLCPEpub
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException
 import org.nypl.simplified.books.formats.api.StandardFormatNames
@@ -89,6 +90,7 @@ class BorrowLCPEpubTest {
   private lateinit var services: ServiceDirectoryType
   private lateinit var taskRecorder: TaskRecorderType
   private lateinit var webServer: MockWebServer
+  private lateinit var authHandler: BorrowAudiobookAuthorizationHandler
 
   private val logger = LoggerFactory.getLogger(BorrowLCPEpubTest::class.java)
 
@@ -119,6 +121,9 @@ class BorrowLCPEpubTest {
 
     this.account =
       Mockito.mock(AccountType::class.java)
+
+    this.authHandler =
+      BorrowAudiobookAuthorizationHandler(this.account)
 
     Mockito.`when`(this.account.loginState)
       .thenReturn(
@@ -231,6 +236,7 @@ class BorrowLCPEpubTest {
 
     val context = MockBorrowContext(
       application = this.androidContext,
+      audiobookAuthorizationHandler = this.authHandler,
       logger = this.logger,
       bookRegistry = this.bookRegistry,
       bundledContent = this.bundledContent,

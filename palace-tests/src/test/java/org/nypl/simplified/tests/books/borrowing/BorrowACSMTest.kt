@@ -44,6 +44,7 @@ import org.nypl.simplified.books.book_registry.BookStatus.Loaned.LoanedDownloade
 import org.nypl.simplified.books.book_registry.BookStatusEvent
 import org.nypl.simplified.books.borrowing.BorrowTimeoutConfiguration
 import org.nypl.simplified.books.borrowing.internal.BorrowACSM
+import org.nypl.simplified.books.borrowing.internal.BorrowAudiobookAuthorizationHandler
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.accountCredentialsRequired
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.acsNoCredentialsPost
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.acsNoCredentialsPre
@@ -131,6 +132,7 @@ class BorrowACSMTest {
   private lateinit var webServer: MockWebServer
   private var bookRegistrySub: Disposable? = null
   private var onEvent: (BookStatusEvent) -> Unit = { }
+  private lateinit var authHandler: BorrowAudiobookAuthorizationHandler
 
   private val logger = LoggerFactory.getLogger(BorrowACSMTest::class.java)
 
@@ -173,6 +175,9 @@ class BorrowACSMTest {
       Mockito.mock(AccountType::class.java)
     this.accountProvider =
       MockAccountProviders.fakeProvider("urn:uuid:ea9480d4-5479-4ef1-b1d1-84ccbedb680f")
+
+    this.authHandler =
+      BorrowAudiobookAuthorizationHandler(this.account)
 
     Mockito.`when`(this.account.loginState)
       .thenReturn(
@@ -256,6 +261,7 @@ class BorrowACSMTest {
 
     this.context =
       MockBorrowContext(
+        audiobookAuthorizationHandler = this.authHandler,
         application = androidContext,
         logger = this.logger,
         bookRegistry = this.bookRegistry,

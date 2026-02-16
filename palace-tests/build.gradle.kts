@@ -239,6 +239,7 @@ val dependencyObjects = listOf(
     libs.palace.drm.core,
     libs.palace.http.api,
     libs.palace.http.bearer.token,
+    libs.palace.http.refresh.token,
     libs.palace.http.downloads,
     libs.palace.http.uri,
     libs.palace.http.vanilla,

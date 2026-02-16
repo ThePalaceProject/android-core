@@ -4,6 +4,7 @@ import android.app.Application
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import one.irradia.mime.api.MIMEType
+import org.librarysimplified.audiobook.api.PlayerDownloadRequest
 import org.librarysimplified.audiobook.api.PlayerResult
 import org.librarysimplified.audiobook.lcp.downloads.LCPDownloads
 import org.librarysimplified.audiobook.license_check.api.LicenseCheckParameters
@@ -11,16 +12,12 @@ import org.librarysimplified.audiobook.license_check.api.LicenseCheckResult
 import org.librarysimplified.audiobook.license_check.api.LicenseChecks
 import org.librarysimplified.audiobook.license_check.spi.SingleLicenseCheckStatus
 import org.librarysimplified.audiobook.manifest.api.PlayerManifest
+import org.librarysimplified.audiobook.manifest.api.PlayerManifestLink
 import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentBasicParameters
 import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentBasicType
-import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentCredentialsBasic
-import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentCredentialsToken
-import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentCredentialsType
 import org.librarysimplified.audiobook.manifest_fulfill.opa.OPAManifestFulfillmentStrategyProviderType
 import org.librarysimplified.audiobook.manifest_fulfill.opa.OPAManifestURI.Indirect
 import org.librarysimplified.audiobook.manifest_fulfill.opa.OPAParameters
-import org.librarysimplified.audiobook.manifest_fulfill.opa.OPAPassword
-import org.librarysimplified.audiobook.manifest_fulfill.opa.OPAPassword.Password
 import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfilled
 import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfillmentError
 import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfillmentEvent
@@ -29,8 +26,6 @@ import org.librarysimplified.audiobook.manifest_parser.api.ManifestUnparsed
 import org.librarysimplified.audiobook.parser.api.ParseError
 import org.librarysimplified.audiobook.parser.api.ParseResult
 import org.librarysimplified.audiobook.parser.api.ParseWarning
-import org.librarysimplified.http.api.LSHTTPAuthorizationBasic
-import org.librarysimplified.http.api.LSHTTPAuthorizationBearerToken
 import org.librarysimplified.http.api.LSHTTPAuthorizationType
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPProblemReport
@@ -191,9 +186,15 @@ class AudioBookStrategy(
   ): TaskResult<AudioBookManifestData> {
     this.taskRecorder.beginNewStep("Retrieving license file.")
 
+    val authorization =
+      this.request.authorizationHandler.onConfigureAuthorizationFor(
+        PlayerManifestLink.LinkBasic(target.target),
+        PlayerDownloadRequest.Kind.MANIFEST
+      )
+
     val httpRequest =
       this.request.httpClient.newRequest(target.target)
-        .setAuthorization(authorization = createAuthorization(this.request.credentials))
+        .setAuthorization(authorization = authorization)
         .build()
 
     val temporaryFile =
@@ -283,25 +284,6 @@ class AudioBookStrategy(
     }
   }
 
-  private fun createAuthorization(
-    credentials: ManifestFulfillmentCredentialsType?
-  ): LSHTTPAuthorizationType? {
-    return when (credentials) {
-      is ManifestFulfillmentCredentialsBasic -> {
-        LSHTTPAuthorizationBasic.ofUsernamePassword(
-          userName = credentials.userName,
-          password = credentials.password
-        )
-      }
-      is ManifestFulfillmentCredentialsToken -> {
-        LSHTTPAuthorizationBearerToken.ofToken(
-          token = credentials.token
-        )
-      }
-      null -> null
-    }
-  }
-
   private fun recordProblemReport(
     report: LSHTTPProblemReport?
   ) {
@@ -318,7 +300,7 @@ class AudioBookStrategy(
 
     return when (val result = LCPDownloads.downloadManifestFromPublication(
       context = this.context,
-      credentials = request.credentials,
+      authorizationHandler = request.authorizationHandler,
       license = license,
       receiver = { event ->
         this.logger.debug("Downloading manifest event: {}", event)
@@ -475,40 +457,16 @@ class AudioBookStrategy(
           OPAManifestFulfillmentStrategyProviderType::class.java
         ) ?: throw UnsupportedOperationException("No Overdrive fulfillment strategy is available")
 
-      val parameters =
-        when (val credentials = this.request.credentials) {
-          null -> {
-            throw UnsupportedOperationException(
-              "Credentials are required for Overdrive fulfillment"
-            )
-          }
+      val overdriveParameters =
+        OPAParameters(
+          authorizationHandler = this.request.authorizationHandler,
+          clientKey = secretService.clientKey.orEmpty(),
+          clientPass = secretService.clientPass.orEmpty(),
+          targetURI = Indirect(targetURI),
+          userAgent = this.request.userAgent
+        )
 
-          is ManifestFulfillmentCredentialsBasic -> {
-            val password = credentials.password
-            val opaPassword = if (password.isBlank()) {
-              OPAPassword.NotRequired
-            } else {
-              Password(password)
-            }
-
-            OPAParameters(
-              userName = credentials.userName,
-              password = opaPassword,
-              clientKey = secretService.clientKey.orEmpty(),
-              clientPass = secretService.clientPass.orEmpty(),
-              targetURI = Indirect(targetURI),
-              userAgent = this.request.userAgent
-            )
-          }
-
-          is ManifestFulfillmentCredentialsToken -> {
-            throw UnsupportedOperationException(
-              "Can't use bearer tokens for Overdrive fulfillment"
-            )
-          }
-        }
-
-      strategies.create(parameters)
+      strategies.create(overdriveParameters)
     } else {
       this.logger.debug("findExistingStrategy: trying a Basic strategy")
 
@@ -520,7 +478,7 @@ class AudioBookStrategy(
       val parameters =
         ManifestFulfillmentBasicParameters(
           uri = targetURI,
-          credentials = this.request.credentials,
+          authorizationHandler = this.request.authorizationHandler,
           httpClient = this.request.services.requireService(LSHTTPClientType::class.java),
           userAgent = this.request.userAgent
         )

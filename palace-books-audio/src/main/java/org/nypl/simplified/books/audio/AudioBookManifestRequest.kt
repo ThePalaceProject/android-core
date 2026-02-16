@@ -1,12 +1,12 @@
 package org.nypl.simplified.books.audio
 
 import one.irradia.mime.api.MIMEType
+import org.librarysimplified.audiobook.api.PlayerAuthorizationHandlerType
 import org.librarysimplified.audiobook.api.PlayerUserAgent
 import org.librarysimplified.audiobook.license_check.spi.SingleLicenseCheckProviderType
 import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.librarysimplified.audiobook.manifest_fulfill.api.ManifestFulfillmentStrategies
 import org.librarysimplified.audiobook.manifest_fulfill.api.ManifestFulfillmentStrategyRegistryType
-import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentCredentialsType
 import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfilled
 import org.librarysimplified.audiobook.manifest_parser.api.ManifestParsers
 import org.librarysimplified.audiobook.manifest_parser.api.ManifestParsersType
@@ -58,12 +58,6 @@ data class AudioBookManifestRequest(
    */
 
   val userAgent: PlayerUserAgent,
-
-  /**
-   * The credentials used for license and manifest requests.
-   */
-
-  val credentials: ManifestFulfillmentCredentialsType?,
 
   /**
    * A service directory used to locate any required application services.
@@ -130,7 +124,13 @@ data class AudioBookManifestRequest(
 
   val problemReportParsers: LSHTTPProblemReportParserFactoryType =
     ServiceLoader.load(LSHTTPProblemReportParserFactoryType::class.java)
-      .first()
+      .first(),
+
+  /**
+   * The authorization handler for requests.
+   */
+
+  val authorizationHandler: PlayerAuthorizationHandlerType,
 ) {
 
   fun temporaryFile(

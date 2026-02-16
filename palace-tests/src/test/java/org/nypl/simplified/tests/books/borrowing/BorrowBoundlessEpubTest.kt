@@ -29,6 +29,7 @@ import org.nypl.simplified.books.book_database.BookDRMInformationHandleBoundless
 import org.nypl.simplified.books.book_database.api.BookDatabaseType
 import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
+import org.nypl.simplified.books.borrowing.internal.BorrowAudiobookAuthorizationHandler
 import org.nypl.simplified.books.borrowing.internal.BorrowBoundless
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException
 import org.nypl.simplified.books.formats.api.StandardFormatNames.boundlessLicenseFiles
@@ -87,6 +88,7 @@ class BorrowBoundlessEpubTest {
   private lateinit var services: ServiceDirectoryType
   private lateinit var taskRecorder: TaskRecorderType
   private lateinit var webServer: MockWebServer
+  private lateinit var authHandler: BorrowAudiobookAuthorizationHandler
 
   private val logger = LoggerFactory.getLogger(BorrowBoundlessEpubTest::class.java)
 
@@ -121,6 +123,9 @@ class BorrowBoundlessEpubTest {
       this.profiles.profileList[0]
     this.account =
       this.profile.accountList[0]
+
+    this.authHandler =
+      BorrowAudiobookAuthorizationHandler(this.account)
 
     this.account.setLoginState(
       AccountLoginState.AccountLoggedIn(
@@ -216,6 +221,7 @@ class BorrowBoundlessEpubTest {
 
     val context = MockBorrowContext(
       application = this.androidContext,
+      audiobookAuthorizationHandler = this.authHandler,
       logger = this.logger,
       bookRegistry = this.bookRegistry,
       bundledContent = this.bundledContent,

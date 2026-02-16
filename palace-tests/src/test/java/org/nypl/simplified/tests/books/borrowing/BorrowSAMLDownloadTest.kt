@@ -35,6 +35,7 @@ import org.nypl.simplified.books.book_registry.BookStatus.Loaned
 import org.nypl.simplified.books.book_registry.BookStatus.Loaned.LoanedDownloaded
 import org.nypl.simplified.books.book_registry.BookStatusEvent
 import org.nypl.simplified.books.borrowing.SAMLDownloadContext
+import org.nypl.simplified.books.borrowing.internal.BorrowAudiobookAuthorizationHandler
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.httpConnectionFailed
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.httpContentTypeIncompatible
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.httpRequestFailed
@@ -84,6 +85,7 @@ class BorrowSAMLDownloadTest {
   private lateinit var taskRecorder: TaskRecorderType
   private lateinit var webServer: MockWebServer
   private var bookRegistrySub: Disposable? = null
+  private lateinit var authHandler: BorrowAudiobookAuthorizationHandler
 
   private val logger = LoggerFactory.getLogger(BorrowSAMLDownloadTest::class.java)
 
@@ -117,6 +119,9 @@ class BorrowSAMLDownloadTest {
 
     this.account =
       Mockito.mock(AccountType::class.java)
+
+    this.authHandler =
+      BorrowAudiobookAuthorizationHandler(this.account)
 
     Mockito.`when`(this.account.loginState)
       .thenReturn(
@@ -185,6 +190,7 @@ class BorrowSAMLDownloadTest {
     this.context =
       MockBorrowContext(
         application = androidContext,
+        audiobookAuthorizationHandler = this.authHandler,
         logger = this.logger,
         bookRegistry = this.bookRegistry,
         bundledContent = this.bundledContent,

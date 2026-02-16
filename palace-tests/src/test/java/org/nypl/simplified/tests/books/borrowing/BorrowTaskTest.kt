@@ -57,6 +57,7 @@ import org.nypl.simplified.books.borrowing.BorrowRequirements
 import org.nypl.simplified.books.borrowing.BorrowSubtasks
 import org.nypl.simplified.books.borrowing.BorrowTask
 import org.nypl.simplified.books.borrowing.BorrowTaskType
+import org.nypl.simplified.books.borrowing.internal.BorrowAudiobookAuthorizationHandler
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes
 import org.nypl.simplified.books.bundled.api.BundledContentResolverType
 import org.nypl.simplified.books.formats.api.StandardFormatNames.adobeACSMFiles
@@ -146,6 +147,7 @@ class BorrowTaskTest {
   private lateinit var temporaryDirectory: File
   private lateinit var webServer: MockWebServer
   private lateinit var androidContext: Application
+  private lateinit var authHandler: BorrowAudiobookAuthorizationHandler
 
   private var bookRegistrySub: Disposable? = null
 
@@ -270,6 +272,9 @@ class BorrowTaskTest {
       MutableServiceDirectory()
     this.subtasks =
       MockBorrowSubtaskDirectory()
+
+    this.authHandler =
+      BorrowAudiobookAuthorizationHandler(this.account)
 
     this.httpClient =
       LSHTTPClients()

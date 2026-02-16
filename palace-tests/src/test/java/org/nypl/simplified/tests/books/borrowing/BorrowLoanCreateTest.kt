@@ -35,6 +35,7 @@ import org.nypl.simplified.books.book_registry.BookStatus.Held.HeldReady
 import org.nypl.simplified.books.book_registry.BookStatus.Loaned.LoanedNotDownloaded
 import org.nypl.simplified.books.book_registry.BookStatus.RequestingLoan
 import org.nypl.simplified.books.book_registry.BookStatusEvent
+import org.nypl.simplified.books.borrowing.internal.BorrowAudiobookAuthorizationHandler
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.httpConnectionFailed
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.httpContentTypeIncompatible
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.httpRequestFailed
@@ -86,6 +87,7 @@ class BorrowLoanCreateTest {
   private lateinit var taskRecorder: TaskRecorderType
   private lateinit var webServer: MockWebServer
   private var bookRegistrySub: Disposable? = null
+  private lateinit var authHandler: BorrowAudiobookAuthorizationHandler
 
   private val logger = LoggerFactory.getLogger(BorrowLoanCreateTest::class.java)
 
@@ -123,6 +125,9 @@ class BorrowLoanCreateTest {
       Mockito.mock(AccountType::class.java)
     this.accountProvider =
       MockAccountProviders.fakeProvider("urn:uuid:ea9480d4-5479-4ef1-b1d1-84ccbedb680f")
+
+    this.authHandler =
+      BorrowAudiobookAuthorizationHandler(this.account)
 
     Mockito.`when`(this.account.loginState)
       .thenReturn(
@@ -175,6 +180,7 @@ class BorrowLoanCreateTest {
     this.context =
       MockBorrowContext(
         application = androidContext,
+        audiobookAuthorizationHandler = this.authHandler,
         logger = this.logger,
         bookRegistry = this.bookRegistry,
         bundledContent = this.bundledContent,

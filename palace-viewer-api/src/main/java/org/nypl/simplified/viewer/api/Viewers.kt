@@ -10,7 +10,7 @@ import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.opds.core.getOrNull
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
-import org.nypl.simplified.viewer.spi.ViewerPreferences
+import org.nypl.simplified.viewer.spi.ViewerParameters
 import org.nypl.simplified.viewer.spi.ViewerProviderType
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
@@ -61,7 +61,7 @@ object Viewers {
 
   fun openViewer(
     context: Activity,
-    preferences: ViewerPreferences,
+    preferences: ViewerParameters,
     book: Book,
     format: BookFormat
   ) {
@@ -84,7 +84,7 @@ object Viewers {
       this.logger.debug("[{}]: {}", index, viewerProvider.name)
     }
 
-    val newPreferences: ViewerPreferences =
+    val newPreferences: ViewerParameters =
       if (this.shouldFailNextBook()) {
         this.setFailNextBook(false)
         preferences.copy(flags = preferences.flags.plus(Pair("Fail", true)))
@@ -123,7 +123,7 @@ object Viewers {
 
         viewerProvider.open(
           activity = context,
-          preferences = newPreferences,
+          parameters = newPreferences,
           book = book,
           format = format,
           accountProviderId = account.provider.id

@@ -16,6 +16,7 @@ import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookWithStatus
+import org.nypl.simplified.books.borrowing.internal.BorrowAudiobookAuthorizationHandler
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.accountsDatabaseException
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.bookDatabaseFailed
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.noSubtaskAvailable
@@ -214,7 +215,8 @@ class BorrowTask private constructor(
         samlDownloadContext = samlDownloadContext,
         services = this.requirements.services,
         taskRecorder = this.taskRecorder,
-        temporaryDirectory = this.requirements.temporaryDirectory
+        temporaryDirectory = this.requirements.temporaryDirectory,
+        audiobookAuthorizationHandler = BorrowAudiobookAuthorizationHandler(this.account)
       )
 
     while (true) {
@@ -480,7 +482,8 @@ class BorrowTask private constructor(
     override val lcpService: LcpService?,
     override val services: ServiceDirectoryType,
     private val cacheDirectory: File,
-    private val cancelled: AtomicBoolean
+    private val cancelled: AtomicBoolean,
+    override val audiobookAuthorizationHandler: BorrowAudiobookAuthorizationHandler
   ) : BorrowContextType {
 
     override fun cacheDirectory(): File =
@@ -604,6 +607,7 @@ class BorrowTask private constructor(
     override fun setNextSubtaskCredentials(credentials: BorrowSubtaskCredentials) {
       this.logger.debug("Setting next subtask credentials to {}", credentials)
       this.subtaskCredentials = credentials
+      this.audiobookAuthorizationHandler.subtaskCredentials = credentials
     }
 
     override fun takeSubtaskCredentials(): BorrowSubtaskCredentials {

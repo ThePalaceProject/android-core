@@ -34,6 +34,7 @@ import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookStatusEvent
+import org.nypl.simplified.books.borrowing.internal.BorrowAudiobookAuthorizationHandler
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.nypl.simplified.patron.api.PatronAuthorization
@@ -54,6 +55,7 @@ import java.util.concurrent.TimeUnit
 
 class BookmarkRefreshTokenTest {
 
+  private lateinit var authHandler: BorrowAudiobookAuthorizationHandler
   private lateinit var account: MockAccount
   private lateinit var accountID: AccountID
   private lateinit var bookDatabase: BookDatabaseType
@@ -79,6 +81,9 @@ class BookmarkRefreshTokenTest {
     this.accountID =
       AccountID.generate()
     this.account = MockAccount(this.accountID)
+
+    this.authHandler =
+      BorrowAudiobookAuthorizationHandler(this.account)
 
     val credentials = AccountAuthenticationCredentials.BasicToken(
       userName = AccountUsername("1234"),
@@ -157,6 +162,7 @@ class BookmarkRefreshTokenTest {
 
     this.context =
       MockBorrowContext(
+        audiobookAuthorizationHandler = this.authHandler,
         application = androidContext,
         logger = this.logger,
         bookRegistry = this.bookRegistry,

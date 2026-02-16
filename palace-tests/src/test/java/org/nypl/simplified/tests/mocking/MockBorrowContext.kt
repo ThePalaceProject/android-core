@@ -17,6 +17,7 @@ import org.nypl.simplified.books.borrowing.BorrowContextType
 import org.nypl.simplified.books.borrowing.BorrowSubtaskCredentials
 import org.nypl.simplified.books.borrowing.BorrowTimeoutConfiguration
 import org.nypl.simplified.books.borrowing.SAMLDownloadContext
+import org.nypl.simplified.books.borrowing.internal.BorrowAudiobookAuthorizationHandler
 import org.nypl.simplified.books.bundled.api.BundledContentResolverType
 import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.links.Link
@@ -37,6 +38,7 @@ class MockBorrowContext(
   val logger: Logger,
   val temporaryDirectory: File,
   val bookRegistry: BookRegistryType,
+  override var audiobookAuthorizationHandler: BorrowAudiobookAuthorizationHandler,
   override var bundledContent: BundledContentResolverType,
   override var account: AccountType,
   override var clock: () -> Instant,

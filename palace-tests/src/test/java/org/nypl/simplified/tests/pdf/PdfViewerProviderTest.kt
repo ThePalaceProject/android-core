@@ -7,14 +7,17 @@ import org.librarysimplified.viewer.pdf.pdfjs.PdfViewerProvider
 import org.mockito.Mockito
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
-import org.nypl.simplified.viewer.spi.ViewerPreferences
+import org.nypl.simplified.viewer.spi.ViewerParameters
 
 class PdfViewerProviderTest {
 
   @Test
   fun supportsPdfBooks() {
-    val preferences = ViewerPreferences(
-      flags = mapOf()
+    val preferences = ViewerParameters(
+      flags = mapOf(),
+      onLoginRequested = {
+
+      }
     )
 
     val book = Mockito.mock(Book::class.java)

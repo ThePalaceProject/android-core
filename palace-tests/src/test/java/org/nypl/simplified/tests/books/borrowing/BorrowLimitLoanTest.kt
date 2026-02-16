@@ -30,6 +30,7 @@ import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookStatus.ReachedLoanLimit
 import org.nypl.simplified.books.book_registry.BookStatus.RequestingLoan
 import org.nypl.simplified.books.book_registry.BookStatusEvent
+import org.nypl.simplified.books.borrowing.internal.BorrowAudiobookAuthorizationHandler
 import org.nypl.simplified.books.borrowing.internal.BorrowLoanCreate
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFiles
 import org.nypl.simplified.books.formats.api.StandardFormatNames.opdsAcquisitionFeedEntry
@@ -65,6 +66,7 @@ class BorrowLimitLoanTest {
   private lateinit var taskRecorder: TaskRecorderType
   private lateinit var webServer: MockWebServer
   private var bookRegistrySub: Disposable? = null
+  private lateinit var authHandler: BorrowAudiobookAuthorizationHandler
 
   private val logger = LoggerFactory.getLogger(BorrowLimitLoanTest::class.java)
 
@@ -91,6 +93,9 @@ class BorrowLimitLoanTest {
       BookIDs.newFromText("x")
     this.account =
       Mockito.mock(AccountType::class.java)
+
+    this.authHandler =
+      BorrowAudiobookAuthorizationHandler(this.account)
 
     Mockito.`when`(this.account.loginState)
       .thenReturn(
@@ -141,6 +146,7 @@ class BorrowLimitLoanTest {
     this.context =
       MockBorrowContext(
         application = androidContext,
+        audiobookAuthorizationHandler = this.authHandler,
         logger = this.logger,
         bookRegistry = this.bookRegistry,
         bundledContent = this.bundledContent,

@@ -24,6 +24,7 @@ import org.nypl.simplified.books.book_database.api.BookFormats
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.tests.MutableServiceDirectory
 import org.nypl.simplified.tests.TestDirectories
+import org.nypl.simplified.tests.mocking.FakeAuthorizationHandler
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URI
@@ -42,6 +43,7 @@ class AudioBookManifestStrategyTest {
   private lateinit var services: MutableServiceDirectory
   private lateinit var strategies: ManifestFulfillmentStrategyRegistryType
   private lateinit var tempFolder: File
+  private lateinit var authHandler: FakeAuthorizationHandler
 
   @BeforeEach
   fun testSetup() {
@@ -57,6 +59,8 @@ class AudioBookManifestStrategyTest {
       Mockito.mock(ManifestParsersType::class.java)
     this.httpClient =
       Mockito.mock(LSHTTPClientType::class.java)
+    this.authHandler =
+      FakeAuthorizationHandler()
 
     this.tempFolder =
       TestDirectories.temporaryDirectory()
@@ -79,9 +83,9 @@ class AudioBookManifestStrategyTest {
       AudioBookStrategy(
         context = this.context,
         request = AudioBookManifestRequest(
+          authorizationHandler = this.authHandler,
           cacheDirectory = File(tempFolder, "cache"),
           contentType = BookFormats.audioBookGenericMimeTypes().first(),
-          credentials = null,
           httpClient = this.httpClient,
           isNetworkAvailable = { true },
           palaceID = PlayerPalaceID("6c15709a-b9cd-4eb8-815a-309f5d738a11"),
@@ -123,16 +127,16 @@ class AudioBookManifestStrategyTest {
       AudioBookStrategy(
         context = this.context,
         request = AudioBookManifestRequest(
-          target = AudioBookLink.Manifest(URI.create("http://www.example.com")),
-          httpClient = this.httpClient,
+          authorizationHandler = this.authHandler,
+          cacheDirectory = File(tempFolder, "cache"),
           contentType = BookFormats.audioBookGenericMimeTypes().first(),
-          userAgent = PlayerUserAgent("test"),
-          credentials = null,
-          services = this.services,
+          httpClient = this.httpClient,
           isNetworkAvailable = { true },
-          strategyRegistry = this.strategies,
           palaceID = PlayerPalaceID("6c15709a-b9cd-4eb8-815a-309f5d738a11"),
-          cacheDirectory = File(tempFolder, "cache")
+          services = this.services,
+          strategyRegistry = this.strategies,
+          target = AudioBookLink.Manifest(URI.create("http://www.example.com")),
+          userAgent = PlayerUserAgent("test"),
         )
       )
 
@@ -175,18 +179,18 @@ class AudioBookManifestStrategyTest {
       AudioBookStrategy(
         context = this.context,
         request = AudioBookManifestRequest(
-          target = AudioBookLink.Manifest(URI.create("http://www.example.com")),
+          authorizationHandler = this.authHandler,
+          cacheDirectory = File(tempFolder, "cache"),
           contentType = BookFormats.audioBookGenericMimeTypes().first(),
-          userAgent = PlayerUserAgent("test"),
-          credentials = null,
-          services = this.services,
-          isNetworkAvailable = { true },
-          strategyRegistry = this.strategies,
-          manifestParsers = AudioBookFailingParsers,
           extensions = emptyList(),
           httpClient = this.httpClient,
+          isNetworkAvailable = { true },
+          manifestParsers = AudioBookFailingParsers,
           palaceID = PlayerPalaceID("6c15709a-b9cd-4eb8-815a-309f5d738a11"),
-          cacheDirectory = File(tempFolder, "cache")
+          services = this.services,
+          strategyRegistry = this.strategies,
+          target = AudioBookLink.Manifest(URI.create("http://www.example.com")),
+          userAgent = PlayerUserAgent("test"),
         )
       )
 
@@ -230,9 +234,9 @@ class AudioBookManifestStrategyTest {
       AudioBookStrategy(
         context = this.context,
         request = AudioBookManifestRequest(
+          authorizationHandler = this.authHandler,
           cacheDirectory = File(tempFolder, "cache"),
           contentType = BookFormats.audioBookGenericMimeTypes().first(),
-          credentials = null,
           extensions = emptyList(),
           httpClient = this.httpClient,
           isNetworkAvailable = { true },
@@ -256,9 +260,9 @@ class AudioBookManifestStrategyTest {
       AudioBookStrategy(
         context = this.context,
         request = AudioBookManifestRequest(
+          authorizationHandler = this.authHandler,
           cacheDirectory = File(tempFolder, "cache"),
           contentType = BookFormats.audioBookGenericMimeTypes().first(),
-          credentials = null,
           httpClient = this.httpClient,
           isNetworkAvailable = { false },
           palaceID = PlayerPalaceID("6c15709a-b9cd-4eb8-815a-309f5d738a11"),
@@ -282,7 +286,7 @@ class AudioBookManifestStrategyTest {
           target = AudioBookLink.Manifest(URI.create("http://www.example.com")),
           contentType = BookFormats.audioBookGenericMimeTypes().first(),
           userAgent = PlayerUserAgent("test"),
-          credentials = null,
+          authorizationHandler = this.authHandler,
           loadFallbackData = {
             ManifestFulfilled(
               source = URI.create("http://www.example.com"),

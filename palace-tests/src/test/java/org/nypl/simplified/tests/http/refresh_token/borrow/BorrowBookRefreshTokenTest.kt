@@ -41,6 +41,7 @@ import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookStatusEvent
 import org.nypl.simplified.books.borrowing.internal.BorrowACSM
+import org.nypl.simplified.books.borrowing.internal.BorrowAudiobookAuthorizationHandler
 import org.nypl.simplified.books.borrowing.internal.BorrowDirectDownload
 import org.nypl.simplified.books.borrowing.internal.BorrowLCPEpub
 import org.nypl.simplified.books.borrowing.internal.BorrowLoanCreate
@@ -111,6 +112,7 @@ class BorrowBookRefreshTokenTest {
   private lateinit var services: MutableServiceDirectory
   private lateinit var taskRecorder: TaskRecorderType
   private lateinit var webServer: MockWebServer
+  private lateinit var authHandler: BorrowAudiobookAuthorizationHandler
 
   @BeforeEach
   fun testSetup(@TempDir downloadDirectory: File) {
@@ -145,6 +147,9 @@ class BorrowBookRefreshTokenTest {
     )
 
     this.account.setLoginState(AccountLoginState.AccountLoggedIn(credentials))
+
+    this.authHandler =
+      BorrowAudiobookAuthorizationHandler(this.account)
 
     this.webServer = MockWebServer()
     this.webServer.start(20000)
@@ -214,19 +219,20 @@ class BorrowBookRefreshTokenTest {
 
     this.context =
       MockBorrowContext(
-        application = this.androidContext,
-        logger = this.logger,
-        bookRegistry = this.bookRegistry,
-        bundledContent = this.bundledContent,
-        temporaryDirectory = TestDirectories.temporaryDirectory(),
         account = this.account,
-        clock = { Instant.now() },
-        httpClient = this.httpClient,
-        taskRecorder = this.taskRecorder,
-        isCancelled = false,
+        application = this.androidContext,
+        audiobookAuthorizationHandler = this.authHandler,
         bookDatabaseEntry = this.bookDatabaseEntry,
         bookInitial = bookInitial,
+        bookRegistry = this.bookRegistry,
+        bundledContent = this.bundledContent,
+        clock = { Instant.now() },
         contentResolver = this.contentResolver,
+        httpClient = this.httpClient,
+        isCancelled = false,
+        logger = this.logger,
+        taskRecorder = this.taskRecorder,
+        temporaryDirectory = TestDirectories.temporaryDirectory(),
       )
 
     this.context.services = this.services

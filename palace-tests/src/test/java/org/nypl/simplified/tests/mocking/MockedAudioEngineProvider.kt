@@ -5,7 +5,6 @@ import org.librarysimplified.audiobook.api.PlayerAudioBookProviderType
 import org.librarysimplified.audiobook.api.PlayerAudioEngineProviderType
 import org.librarysimplified.audiobook.api.PlayerAudioEngineRequest
 import org.librarysimplified.audiobook.api.PlayerVersion
-import org.librarysimplified.audiobook.api.extensions.PlayerExtensionType
 import org.slf4j.LoggerFactory
 
 /**
@@ -24,15 +23,6 @@ class MockedAudioEngineProvider : PlayerAudioEngineProviderType {
     return "mocked"
   }
 
-  override fun tryDeleteRequest(
-    context: Application,
-    extensions: List<PlayerExtensionType>,
-    request: PlayerAudioEngineRequest
-  ): Boolean {
-    this.logger.debug("Trying deletion request: {}", request)
-    return true
-  }
-
   override fun tryRequest(request: PlayerAudioEngineRequest): PlayerAudioBookProviderType? {
     this.logger.debug("Trying request: {}", request)
 
@@ -41,6 +31,14 @@ class MockedAudioEngineProvider : PlayerAudioEngineProviderType {
       return next.invoke(request)
     }
     return null
+  }
+
+  override fun tryDeleteRequest(
+    context: Application,
+    request: PlayerAudioEngineRequest
+  ): Boolean {
+    this.logger.debug("Trying deletion request: {}", request)
+    return true
   }
 
   override fun version(): PlayerVersion {

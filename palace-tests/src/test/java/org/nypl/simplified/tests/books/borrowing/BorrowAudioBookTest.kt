@@ -37,6 +37,7 @@ import org.nypl.simplified.books.book_registry.BookStatus.FailedDownload
 import org.nypl.simplified.books.book_registry.BookStatus.Loaned.LoanedDownloaded
 import org.nypl.simplified.books.book_registry.BookStatusEvent
 import org.nypl.simplified.books.borrowing.internal.BorrowAudioBook
+import org.nypl.simplified.books.borrowing.internal.BorrowAudiobookAuthorizationHandler
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.audioStrategyFailed
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.requiredURIMissing
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
@@ -87,6 +88,7 @@ class BorrowAudioBookTest {
   private lateinit var taskRecorder: TaskRecorderType
   private lateinit var tempDir: File
   private var bookRegistrySub: Disposable? = null
+  private lateinit var authHandler: BorrowAudiobookAuthorizationHandler
 
   private val logger = LoggerFactory.getLogger(BorrowAudioBookTest::class.java)
 
@@ -125,6 +127,9 @@ class BorrowAudioBookTest {
       Mockito.mock(AccountType::class.java)
     this.accountProvider =
       MockAccountProviders.fakeProvider("urn:uuid:ea9480d4-5479-4ef1-b1d1-84ccbedb680f")
+
+    this.authHandler =
+      BorrowAudiobookAuthorizationHandler(this.account)
 
     Mockito.`when`(this.account.loginState)
       .thenReturn(
@@ -186,6 +191,7 @@ class BorrowAudioBookTest {
 
     this.context =
       MockBorrowContext(
+        audiobookAuthorizationHandler = this.authHandler,
         application = androidContext,
         account = this.account,
         bookDatabaseEntry = this.bookDatabaseEntry,

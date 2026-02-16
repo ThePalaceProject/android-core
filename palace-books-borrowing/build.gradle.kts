@@ -43,6 +43,7 @@ dependencies {
     implementation(libs.palace.http.api)
     implementation(libs.palace.http.bearer.token)
     implementation(libs.palace.http.downloads)
+    implementation(libs.palace.http.refresh.token)
     implementation(libs.r2.lcp)
     implementation(libs.r2.shared)
     implementation(libs.rxjava)

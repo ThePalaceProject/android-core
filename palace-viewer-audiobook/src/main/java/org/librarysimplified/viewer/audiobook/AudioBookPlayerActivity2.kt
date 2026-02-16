@@ -60,6 +60,7 @@ import org.nypl.simplified.opds.core.getOrNull
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskResult
+import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.errorpage.ErrorPageFragment
 import org.nypl.simplified.ui.errorpage.ErrorPageModel
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
@@ -363,12 +364,13 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
         }
 
         PlayerModel.openPlayerForManifest(
-          context = this.application,
-          userAgent = PlayerUserAgent(bookParameters.userAgent),
-          manifest = state.manifest,
-          fetchAll = true,
+          authorizationHandler = AudioBookViewerModel.authorizationHandler,
+          bookCredentials = bookParameters.drmInfo.playerCredentials(),
           bookSource = state.bookSource,
-          bookCredentials = bookParameters.drmInfo.playerCredentials()
+          context = this.application,
+          fetchAll = true,
+          manifest = state.manifest,
+          userAgent = PlayerUserAgent(bookParameters.userAgent),
         )
       }
 
@@ -656,6 +658,16 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       PlayerViewCommand.PlayerViewErrorsDownloadOpen -> {
         this.onOpenDownloadErrors()
       }
+
+      PlayerViewCommand.PlayerViewLoginOpen -> {
+        this.onOpenLogin()
+      }
+    }
+  }
+
+  private fun onOpenLogin() {
+    UIThread.runOnUIThread {
+      AudioBookViewerModel.loginHandler.invoke()
     }
   }
 
