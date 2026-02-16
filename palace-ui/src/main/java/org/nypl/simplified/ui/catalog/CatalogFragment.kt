@@ -58,6 +58,7 @@ import org.nypl.simplified.ui.catalog.saml20.CatalogSAML20Activity
 import org.nypl.simplified.ui.catalog.saml20.CatalogSAML20Model
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.images.ImageLoaderType
+import org.nypl.simplified.ui.main.MainActivity
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_CONSUMED
@@ -674,6 +675,13 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
         flags = mapOf(),
         onLoginRequested = { accountID ->
           try {
+            this.logger.debug("Bringing main activity to foreground...")
+            val activity = this.requireActivity()
+            val intent = Intent(activity, MainActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+            activity.startActivity(intent)
+
+            this.logger.debug("Showing login dialog...")
             MainNavigation.showLoginDialog(profile.account(accountID))
           } catch (e: Throwable) {
             this.logger.error("Unable to open login dialog: ", e)
