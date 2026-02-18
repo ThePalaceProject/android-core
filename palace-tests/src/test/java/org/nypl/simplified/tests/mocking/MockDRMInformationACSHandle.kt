@@ -3,6 +3,7 @@ package org.nypl.simplified.tests.mocking
 import org.nypl.drm.core.AdobeAdeptLoan
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.book_database.api.BookDRMInformationHandle
+import org.nypl.simplified.tests.TestDirectories
 import java.io.File
 
 class MockDRMInformationACSHandle : BookDRMInformationHandle.ACSHandle() {
@@ -29,7 +30,7 @@ class MockDRMInformationACSHandle : BookDRMInformationHandle.ACSHandle() {
     if (loan == null) {
       this.infoField = this.info.copy(rights = null)
     } else {
-      this.infoField = this.info.copy(rights = Pair(File(""), loan))
+      this.infoField = this.info.copy(rights = Pair(TestDirectories.temporaryFileOf("x", "x"), loan))
     }
     return this.infoField
   }

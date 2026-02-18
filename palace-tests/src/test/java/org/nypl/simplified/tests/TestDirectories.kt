@@ -27,7 +27,7 @@ object TestDirectories {
   @Throws(IOException::class)
   fun temporaryBaseDirectory(): File {
     val tmpBase = File(System.getProperty("java.io.tmpdir"))
-    val path1 = File(tmpBase, "org.nypl.simplified")
+    val path1 = File(tmpBase, "org.thepalaceproject")
     path1.mkdirs()
     return path1
   }

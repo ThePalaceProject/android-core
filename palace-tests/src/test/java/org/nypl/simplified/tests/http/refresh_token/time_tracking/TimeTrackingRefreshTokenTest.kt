@@ -34,7 +34,9 @@ import org.nypl.simplified.books.time.tracking.TimeTrackingServerResponse
 import org.nypl.simplified.books.time.tracking.TimeTrackingServerResponseEntry
 import org.nypl.simplified.books.time.tracking.TimeTrackingServerResponseSummary
 import org.nypl.simplified.patron.api.PatronAuthorization
+import org.nypl.simplified.tests.TestDirectories
 import org.nypl.simplified.tests.mocking.MockAccount
+import java.io.File
 import java.net.URI
 import java.util.concurrent.TimeUnit
 
@@ -49,7 +51,7 @@ class TimeTrackingRefreshTokenTest {
   fun testSetup() {
     this.accountID =
       AccountID.generate()
-    this.account = MockAccount(this.accountID)
+    this.account = MockAccount(TestDirectories.temporaryDirectory(), this.accountID)
 
     val credentials = AccountAuthenticationCredentials.BasicToken(
       userName = AccountUsername("1234"),

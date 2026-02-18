@@ -7,7 +7,10 @@ import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.api.BookIDs
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
+import org.nypl.simplified.books.formats.api.StandardFormatNames.genericAudioBooks
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFiles
+import org.nypl.simplified.books.formats.api.StandardFormatNames.genericJsonAudioBook
+import org.nypl.simplified.books.formats.api.StandardFormatNames.genericMpegAudioBook
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericPDFFiles
 import org.nypl.simplified.books.formats.api.StandardFormatNames.lcpAudioBooks
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
@@ -15,7 +18,10 @@ import org.nypl.simplified.opds.core.OPDSAcquisitionPaths
 import org.slf4j.LoggerFactory
 import java.io.File
 
-class MockBookDatabaseEntry(private val bookInitial: Book) : BookDatabaseEntryType {
+class MockBookDatabaseEntry(
+  private val booksDirectory: File,
+  private val bookInitial: Book
+) : BookDatabaseEntryType {
 
   private val logger =
     LoggerFactory.getLogger(MockBookDatabaseEntry::class.java)
@@ -90,7 +96,11 @@ class MockBookDatabaseEntry(private val bookInitial: Book) : BookDatabaseEntryTy
         continue
       }
       if (MIMECompatibility.isCompatibleStrictWithoutAttributes(finalType, lcpAudioBooks)) {
-        formats.add(MockBookDatabaseEntryFormatHandleAudioBook(bookId))
+        formats.add(MockBookDatabaseEntryFormatHandleAudioBook(bookId, this.booksDirectory))
+        continue
+      }
+      if (MIMECompatibility.isCompatibleStrictWithoutAttributes(finalType, genericJsonAudioBook)) {
+        formats.add(MockBookDatabaseEntryFormatHandleAudioBook(bookId, this.booksDirectory))
         continue
       }
     }

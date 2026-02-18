@@ -40,6 +40,7 @@ import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
 import org.nypl.simplified.opds.core.getOrNull
 import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfileReadableType
+import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import org.nypl.simplified.taskrecorder.api.TaskResult
@@ -188,18 +189,22 @@ class BorrowTask private constructor(
     path: OPDSAcquisitionPath,
     samlDownloadContext: SAMLDownloadContext?
   ) {
+    val currentProfile =
+      this.requirements.profiles.currentProfile()
+        .getOrNull()!!
+
     val context =
       BorrowContext(
-        borrowTask = this,
-        application = this.requirements.application,
         account = this.account,
         adobeExecutor = this.requirements.adobeExecutor,
-        boundlessService = this.requirements.boundlessService,
-        lcpService = this.requirements.lcpService,
+        application = this.requirements.application,
         audioBookManifestStrategies = this.requirements.audioBookManifestStrategies,
+        audiobookAuthorizationHandler = BorrowAudiobookAuthorizationHandler(this.account),
         bookDatabaseEntry = this.databaseEntry!!,
         bookInitial = book,
         bookRegistry = this.requirements.bookRegistry,
+        borrowTask = this,
+        boundlessService = this.requirements.boundlessService,
         bundledContent = this.requirements.bundledContent,
         cacheDirectory = this.requirements.cacheDirectory,
         cancelled = this.cancelled,
@@ -207,16 +212,15 @@ class BorrowTask private constructor(
         contentResolver = this.requirements.contentResolver,
         currentOPDSAcquisitionPathElement = path.elements.first(),
         httpClient = this.requirements.httpClient,
-        isManualLCPPassphraseEnabled =
-        this.requirements.profiles.currentProfile().getOrNull()
-          ?.preferences()?.isManualLCPPassphraseEnabled ?: false,
+        isManualLCPPassphraseEnabled = currentProfile.preferences().isManualLCPPassphraseEnabled,
+        lcpService = this.requirements.lcpService,
         logger = this.logger,
         opdsAcquisitionPath = path,
+        profile = currentProfile,
         samlDownloadContext = samlDownloadContext,
         services = this.requirements.services,
         taskRecorder = this.taskRecorder,
         temporaryDirectory = this.requirements.temporaryDirectory,
-        audiobookAuthorizationHandler = BorrowAudiobookAuthorizationHandler(this.account)
       )
 
     while (true) {
@@ -483,7 +487,8 @@ class BorrowTask private constructor(
     override val services: ServiceDirectoryType,
     private val cacheDirectory: File,
     private val cancelled: AtomicBoolean,
-    override val audiobookAuthorizationHandler: BorrowAudiobookAuthorizationHandler
+    override val audiobookAuthorizationHandler: BorrowAudiobookAuthorizationHandler,
+    override val profile: ProfileType
   ) : BorrowContextType {
 
     override fun cacheDirectory(): File =

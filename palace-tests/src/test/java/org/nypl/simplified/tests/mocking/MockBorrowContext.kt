@@ -24,6 +24,7 @@ import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionPath
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
+import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import org.nypl.simplified.tests.TestDirectories
 import org.readium.r2.lcp.LcpService
@@ -51,6 +52,7 @@ class MockBorrowContext(
   override var lcpService: LcpService? = null,
   override val isManualLCPPassphraseEnabled: Boolean = false,
   bookInitial: Book,
+  override var profile: ProfileType,
 ) : BorrowContextType {
 
   var cacheDirectory = TestDirectories.temporaryDirectory()

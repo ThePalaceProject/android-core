@@ -50,6 +50,7 @@ import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
 import org.nypl.simplified.opds.core.OPDSFeedParser
 import org.nypl.simplified.opds.core.OPDSFeedParserType
 import org.nypl.simplified.patron.api.PatronAuthorization
+import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import org.nypl.simplified.tests.MutableServiceDirectory
@@ -71,6 +72,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.net.URI
 import java.nio.file.Files
+import java.nio.file.Path
 import java.util.concurrent.TimeUnit
 import java.util.zip.ZipFile
 
@@ -91,6 +93,7 @@ class BorrowLCPEpubTest {
   private lateinit var taskRecorder: TaskRecorderType
   private lateinit var webServer: MockWebServer
   private lateinit var authHandler: BorrowAudiobookAuthorizationHandler
+  private lateinit var profile: ProfileType
 
   private val logger = LoggerFactory.getLogger(BorrowLCPEpubTest::class.java)
 
@@ -99,10 +102,12 @@ class BorrowLCPEpubTest {
   var tempDir: File? = null
 
   @BeforeEach
-  fun testSetup(@TempDir directory: File) {
+  fun testSetup(@TempDir directory: File, @TempDir bookDirectory: Path) {
     this.webServer = MockWebServer()
     this.webServer.start(20000)
 
+    this.profile =
+      Mockito.mock(ProfileType::class.java)
     this.androidContext =
       Mockito.mock(Application::class.java)
     this.androidContentResolver =
@@ -169,7 +174,7 @@ class BorrowLCPEpubTest {
       AccountID.generate()
 
     this.bookDatabase =
-      MockBookDatabase(this.accountId)
+      MockBookDatabase(this.accountId, bookDirectory.toFile())
 
     this.services = MutableServiceDirectory().apply {
       putService(
@@ -182,6 +187,7 @@ class BorrowLCPEpubTest {
   private fun createContext(
     feedEntry: OPDSAcquisitionFeedEntry,
     acquisitionPath: OPDSAcquisitionPath,
+    bookDirectory: Path,
     downloadedFile: File? = null
   ): BorrowContextType {
     val book = Book(
@@ -194,7 +200,7 @@ class BorrowLCPEpubTest {
     )
 
     val tempDirPath = this.tempDir!!.toPath()
-    val bookDatabaseEntry = MockBookDatabaseEntry(book)
+    val bookDatabaseEntry = MockBookDatabaseEntry(booksDirectory = bookDirectory.toFile(), book)
 
     bookDatabaseEntry.formatHandlesField.clear()
 
@@ -249,6 +255,7 @@ class BorrowLCPEpubTest {
       bookDatabaseEntry = bookDatabaseEntry,
       bookInitial = book,
       contentResolver = this.contentResolver,
+      profile = this.profile
     )
 
     context.opdsAcquisitionPath = acquisitionPath
@@ -275,7 +282,7 @@ class BorrowLCPEpubTest {
 
   @Test
   @Disabled("This test now requires an actually valid LCP license.")
-  fun epubDownload_succeeds() {
+  fun epubDownload_succeeds(@TempDir bookDirectory: Path) {
     val feedEntry = BorrowTestFeeds.opdsLCPFeedEntryOfType(
       webServer = this.webServer,
       mime = "application/epub+zip",
@@ -414,7 +421,8 @@ class BorrowLCPEpubTest {
 
     val context = createContext(
       feedEntry,
-      acquisitionPath
+      acquisitionPath,
+      bookDirectory = bookDirectory
     )
 
     // Execute the task. It is expected to halt early.
@@ -477,7 +485,7 @@ class BorrowLCPEpubTest {
 
   @Test
   @Disabled("This test now requires an actually valid LCP license.")
-  fun audioBookDownload_succeeds() {
+  fun audioBookDownload_succeeds(@TempDir bookDirectory: Path) {
     val feedEntry = BorrowTestFeeds.opdsLCPFeedEntryOfType(
       webServer = this.webServer,
       mime = "application/audiobook+lcp",
@@ -617,6 +625,7 @@ class BorrowLCPEpubTest {
     val context = createContext(
       feedEntry,
       acquisitionPath,
+      bookDirectory = bookDirectory
     )
 
     // Execute the task. It is expected to halt early.
@@ -678,7 +687,7 @@ class BorrowLCPEpubTest {
   }
 
   @Test
-  fun download_fails_whenLoansFeedCanNotBeRetrieved() {
+  fun download_fails_whenLoansFeedCanNotBeRetrieved(@TempDir bookDirectory: Path) {
     val feedEntry = BorrowTestFeeds.opdsLCPFeedEntryOfType(
       webServer = this.webServer,
       mime = "application/epub+zip",
@@ -713,7 +722,8 @@ class BorrowLCPEpubTest {
 
     val context = createContext(
       feedEntry,
-      acquisitionPath
+      acquisitionPath,
+      bookDirectory = bookDirectory
     )
 
     // Execute the task. It is expected to halt early.
@@ -735,7 +745,7 @@ class BorrowLCPEpubTest {
   }
 
   @Test
-  fun download_fails_whenHashedPassphraseIsNotFoundInLoansFeed() {
+  fun download_fails_whenHashedPassphraseIsNotFoundInLoansFeed(@TempDir bookDirectory: Path) {
     val feedEntry = BorrowTestFeeds.opdsLCPFeedEntryOfType(
       webServer = this.webServer,
       mime = "application/epub+zip",
@@ -790,6 +800,7 @@ class BorrowLCPEpubTest {
     val context = createContext(
       feedEntry,
       acquisitionPath,
+      bookDirectory = bookDirectory
     )
 
     val task = BorrowLCPEpub.createSubtask()
@@ -809,7 +820,7 @@ class BorrowLCPEpubTest {
   }
 
   @Test
-  fun download_fails_whenLicenseCanNotBeRetrieved() {
+  fun download_fails_whenLicenseCanNotBeRetrieved(@TempDir bookDirectory: Path) {
     val feedEntry = BorrowTestFeeds.opdsLCPFeedEntryOfType(
       webServer = this.webServer,
       mime = "application/epub+zip",
@@ -875,6 +886,7 @@ class BorrowLCPEpubTest {
     val context = createContext(
       feedEntry,
       acquisitionPath,
+      bookDirectory = bookDirectory
     )
 
     val task = BorrowLCPEpub.createSubtask()

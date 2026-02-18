@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
 import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfilled
 import org.librarysimplified.audiobook.manifest_parser.api.ManifestParsers
@@ -45,7 +46,7 @@ import org.nypl.simplified.books.formats.api.StandardFormatNames.genericAudioBoo
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
 import org.nypl.simplified.patron.api.PatronAuthorization
-import org.nypl.simplified.profiles.api.ProfileReadableType
+import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import org.nypl.simplified.taskrecorder.api.TaskResult
@@ -62,6 +63,7 @@ import org.nypl.simplified.tests.mocking.MockContentResolver
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URI
+import java.nio.file.Path
 import java.util.concurrent.TimeUnit
 
 class BorrowAudioBookTest {
@@ -83,7 +85,7 @@ class BorrowAudioBookTest {
   private lateinit var context: MockBorrowContext
   private lateinit var httpClient: LSHTTPClientType
   private lateinit var manifestData: AudioBookManifestData
-  private lateinit var profile: ProfileReadableType
+  private lateinit var profile: ProfileType
   private lateinit var services: MutableServiceDirectory
   private lateinit var taskRecorder: TaskRecorderType
   private lateinit var tempDir: File
@@ -98,7 +100,9 @@ class BorrowAudioBookTest {
   }
 
   @BeforeEach
-  fun testSetup() {
+  fun testSetup(@TempDir bookDirectory: Path) {
+    this.profile =
+      Mockito.mock(ProfileType::class.java)
     this.taskRecorder =
       TaskRecorder.create()
     this.contentResolver =
@@ -181,9 +185,9 @@ class BorrowAudioBookTest {
 
     this.tempDir = TestDirectories.temporaryDirectory()
     this.bookDatabase =
-      MockBookDatabase(this.accountId)
+      MockBookDatabase(this.accountId, bookDirectory.toFile())
     this.bookDatabaseEntry =
-      MockBookDatabaseEntry(bookInitial)
+      MockBookDatabaseEntry(bookDirectory.toFile(), bookInitial)
     this.audioBookHandle =
       MockBookDatabaseEntryFormatHandleAudioBook(this.bookID, this.tempDir)
     this.bookDatabaseEntry.formatHandlesField.clear()
@@ -204,7 +208,8 @@ class BorrowAudioBookTest {
         isCancelled = false,
         logger = this.logger,
         taskRecorder = this.taskRecorder,
-        temporaryDirectory = this.tempDir
+        temporaryDirectory = this.tempDir,
+        profile = this.profile
       )
 
     this.context.audioBookManifestStrategies =
@@ -224,7 +229,8 @@ class BorrowAudioBookTest {
     val manifestResult =
       ManifestParsers.parse(
         URI.create("urn:basic-manifest.json"),
-        ManifestUnparsed(PlayerPalaceID("6c15709a-b9cd-4eb8-815a-309f5d738a11"), data))
+        ManifestUnparsed(PlayerPalaceID("6c15709a-b9cd-4eb8-815a-309f5d738a11"), data)
+      )
         as ParseResult.Success
     val manifest =
       manifestResult.result

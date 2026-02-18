@@ -31,6 +31,7 @@ import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.getOrNull
+import org.nypl.simplified.patron.PatronUserProfiles
 import org.nypl.simplified.patron.api.PatronDRMAdobe
 import org.nypl.simplified.patron.api.PatronUserProfileParsersType
 import org.nypl.simplified.profiles.api.ProfileReadableType

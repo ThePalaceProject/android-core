@@ -369,7 +369,6 @@ class Controller private constructor(
     val profile = this.profileCurrent()
     val account = profile.account(request.accountId)
     return ProfileAccountLoginTask(
-      adeptExecutor = this.adobeDrm,
       http = this.lsHttp,
       profile = profile,
       account = account,

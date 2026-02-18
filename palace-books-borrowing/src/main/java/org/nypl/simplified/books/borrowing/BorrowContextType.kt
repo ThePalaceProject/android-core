@@ -23,6 +23,7 @@ import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionPath
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
+import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import org.readium.r2.lcp.LcpService
 import java.io.File
@@ -47,6 +48,12 @@ interface BorrowContextType {
   val taskRecorder: TaskRecorderType
   val lcpService: LcpService?
   val audiobookAuthorizationHandler: BorrowAudiobookAuthorizationHandler
+
+  /**
+   * The current profile.
+   */
+
+  val profile: ProfileType
 
   /**
    * The current cache directory.

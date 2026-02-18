@@ -14,8 +14,11 @@ dependencies {
     implementation(project(":palace-content-api"))
     implementation(project(":palace-links"))
     implementation(project(":palace-opds-core"))
+    implementation(project(":palace-patron"))
+    implementation(project(":palace-patron-api"))
     implementation(project(":palace-presentableerror-api"))
     implementation(project(":palace-profiles-api"))
+    implementation(project(":palace-profiles-controller-api"))
     implementation(project(":palace-services-api"))
     implementation(project(":palace-taskrecorder-api"))
 

@@ -1,5 +1,6 @@
 package org.nypl.simplified.books.borrowing.internal
 
+import com.google.common.base.Preconditions
 import com.io7m.junreachable.UnreachableCodeException
 import one.irradia.mime.api.MIMECompatibility
 import one.irradia.mime.api.MIMEType
@@ -11,6 +12,8 @@ import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadRe
 import org.librarysimplified.http.downloads.LSHTTPDownloads
 import org.nypl.drm.core.AdobeAdeptFulfillmentToken
 import org.nypl.drm.core.AdobeAdeptNetProviderType
+import org.nypl.drm.core.AdobeVendorID
+import org.nypl.simplified.accounts.api.AccountAuthenticationAdobeClientToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationAdobePostActivationCredentials
 import org.nypl.simplified.accounts.api.AccountAuthenticationAdobePreActivationCredentials
 import org.nypl.simplified.accounts.api.AccountReadableType
@@ -26,9 +29,6 @@ import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleEPUB
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandlePDF
 import org.nypl.simplified.books.borrowing.BorrowContextType
-import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.accountCredentialsRequired
-import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.acsNoCredentialsPost
-import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.acsNoCredentialsPre
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.acsNotSupported
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.acsTimedOut
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.acsUnparseableACSM
@@ -40,9 +40,15 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskFactoryType
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskType
 import org.nypl.simplified.books.formats.api.StandardFormatNames.adobeACSMFiles
 import org.nypl.simplified.links.Link
+import org.nypl.simplified.patron.PatronUserProfileParsers
+import org.nypl.simplified.patron.PatronUserProfiles
+import org.nypl.simplified.patron.api.PatronDRMAdobe
+import org.nypl.simplified.taskrecorder.api.TaskRecorderType
+import org.nypl.simplified.taskrecorder.api.TaskStep
 import java.io.File
 import java.util.concurrent.CancellationException
 import java.util.concurrent.ExecutionException
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
 /**
@@ -91,7 +97,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
       )
 
       this.checkDRMSupport(context)
-      val credentials = this.checkRequiredCredentials(context)
+      val credentials = this.activateDeviceIfNecessary(context)
       context.taskRecorder.beginNewStep("Downloading ACSM file...")
 
       val currentURI = context.currentURICheck()
@@ -147,47 +153,174 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
     }
   }
 
-  /**
-   * Check that we have a fully activated ACS device.
-   */
-
-  private fun checkRequiredCredentials(
+  private fun activateDeviceIfNecessary(
     context: BorrowContextType
   ): RequiredCredentials {
-    context.taskRecorder.beginNewStep("Checking for Adobe ACS credentials...")
+    context.taskRecorder.beginNewStep("Activating Adobe DRM device if necessary...")
 
-    val credentials = context.takeSubtaskCredentialsRequiringAccount()
+    if (this.adobeDeviceIsActivated(context)) {
+      context.taskRecorder.currentStepSucceeded("Adobe DRM device is already activated.")
+      return this.readRequireAdobeCredentials(context)
+    }
+
+    this.adobeDeviceActivate(context)
+    return readRequireAdobeCredentials(context)
+  }
+
+  private fun readRequireAdobeCredentials(
+    context: BorrowContextType
+  ): RequiredCredentials {
+    val credentials = context.account.loginState.credentials!!
+    val preActivation = credentials.adobeCredentials!!
+    val postActivation = preActivation.postActivationCredentials!!
+    return RequiredCredentials(
+      preActivation = preActivation,
+      postActivation = postActivation
+    )
+  }
+
+  private fun adobeDeviceActivate(
+    context: BorrowContextType
+  ) {
+    val credentials = context.account.loginState.credentials
     if (credentials == null) {
       context.taskRecorder.currentStepFailed(
-        message = "The account has no credentials.",
-        errorCode = accountCredentialsRequired,
+        message = "The current account does not have the required credentials.",
+        errorCode = "accountCredentialsRequired",
         extraMessages = listOf()
       )
       throw BorrowSubtaskFailed()
     }
 
-    val preActivation = credentials.adobeCredentials
-    if (preActivation == null) {
+    val patronProfile =
+      PatronUserProfiles.runPatronProfileRequest(
+        taskRecorder = context.taskRecorder,
+        patronParsers = PatronUserProfileParsers(),
+        credentials = credentials,
+        http = context.httpClient,
+        account = context.account
+      )
+
+    val adobeDRM = patronProfile.drm.find { drm -> drm is PatronDRMAdobe } as PatronDRMAdobe?
+    if (adobeDRM == null) {
       context.taskRecorder.currentStepFailed(
-        message = "The account has no pre-activation ACS credentials.",
-        errorCode = acsNoCredentialsPre,
+        message = "The patron user profile is missing Adobe DRM information.",
+        errorCode = "patron-user-profile-missing-adobe",
         extraMessages = listOf()
       )
       throw BorrowSubtaskFailed()
     }
 
-    val postActivation = preActivation.postActivationCredentials
-    if (postActivation == null) {
-      context.taskRecorder.currentStepFailed(
-        message = "The account's ACS device is not activated.",
-        errorCode = acsNoCredentialsPost,
-        extraMessages = listOf()
+    val adobePreCredentials =
+      AccountAuthenticationAdobePreActivationCredentials(
+        clientToken = AccountAuthenticationAdobeClientToken.parse(adobeDRM.clientToken),
+        deviceManagerURI = null,
+        postActivationCredentials = null,
+        vendorID = AdobeVendorID(adobeDRM.vendor)
       )
-      throw BorrowSubtaskFailed()
+
+    context.account.updateCredentialsIfAvailable { c ->
+      c.withAdobePreActivationCredentials(adobePreCredentials)
     }
 
-    context.taskRecorder.beginNewStep("ACS device is activated.")
-    return RequiredCredentials(preActivation, postActivation)
+    val adeptExecutor =
+      context.adobeExecutor!!
+
+    val adeptFuture =
+      AdobeDRMExtensions.activateDevice(
+        executor = adeptExecutor,
+        error = { message -> context.logError("{}", message) },
+        debug = { message -> context.logDebug("{}", message) },
+        vendorID = adobePreCredentials.vendorID,
+        clientToken = adobePreCredentials.clientToken
+      )
+
+    try {
+      val postCredentials =
+        adeptFuture.get(1L, TimeUnit.MINUTES)
+
+      Preconditions.checkState(
+        postCredentials.isNotEmpty(),
+        "Must have returned at least one activation"
+      )
+
+      /*
+       * Find the newly activated credentials (the one whose user id is not associated with any
+       * account). There should only be one, and it should be the last in the list, but this check
+       * makes sure.
+       */
+
+      val accounts =
+        context.profile.accounts().values
+      val newPostCredentials =
+        postCredentials.last { credentials ->
+          accounts.none { account ->
+            account.loginState.credentials?.adobeCredentials?.postActivationCredentials?.userID ==
+              credentials.userID
+          }
+        }
+
+      context.account.updateCredentialsIfAvailable { c ->
+        c.withAdobePreActivationCredentials(
+          adobePreCredentials.copy(postActivationCredentials = newPostCredentials)
+        )
+      }
+
+      context.taskRecorder.currentStepSucceeded("Device activated.")
+    } catch (e: ExecutionException) {
+      val ex = e.cause!!
+      context.logDebug("exception raised waiting for adept future: ", ex)
+      this.handleAdobeDRMConnectorException(context.taskRecorder, ex)
+      throw ex
+    } catch (e: Throwable) {
+      context.logDebug("exception raised waiting for adept future: ", e)
+      this.handleAdobeDRMConnectorException(context.taskRecorder, e)
+      throw e
+    }
+  }
+
+  private fun handleAdobeDRMConnectorException(
+    taskRecorder: TaskRecorderType,
+    ex: Throwable
+  ): TaskStep {
+    val text = ex.message ?: ex.javaClass.simpleName
+    return when (ex) {
+      is AdobeDRMExtensions.AdobeDRMLoginNoActivationsException -> {
+        taskRecorder.currentStepFailed(
+          message = text,
+          errorCode = "Adobe ACS: drmNoAvailableActivations",
+          exception = ex,
+          extraMessages = listOf()
+        )
+      }
+
+      is AdobeDRMExtensions.AdobeDRMLoginConnectorException -> {
+        taskRecorder.currentStepFailed(
+          message = text,
+          errorCode = "Adobe ACS: ${ex.errorCode}",
+          exception = ex,
+          extraMessages = listOf()
+        )
+      }
+
+      else -> {
+        taskRecorder.currentStepFailed(
+          message = text,
+          errorCode = "Adobe ACS: drmUnspecifiedError",
+          exception = ex,
+          extraMessages = listOf()
+        )
+      }
+    }
+  }
+
+  private fun adobeDeviceIsActivated(
+    context: BorrowContextType
+  ): Boolean {
+    return context.account.loginState
+      .credentials
+      ?.adobeCredentials
+      ?.postActivationCredentials != null
   }
 
   /**

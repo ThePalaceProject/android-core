@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
 import org.librarysimplified.http.api.LSHTTPClientConfiguration
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.vanilla.LSHTTPClients
@@ -26,7 +27,6 @@ import org.nypl.simplified.accounts.api.AccountAuthenticationAdobeClientToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationAdobePostActivationCredentials
 import org.nypl.simplified.accounts.api.AccountAuthenticationAdobePreActivationCredentials
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
-import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggedIn
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountNotLoggedIn
 import org.nypl.simplified.accounts.api.AccountPassword
@@ -36,18 +36,21 @@ import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.api.BookIDs
+import org.nypl.simplified.books.book_database.api.BookDRMInformationHandle
+import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle
+import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.*
 import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatus
-import org.nypl.simplified.books.book_registry.BookStatus.*
+import org.nypl.simplified.books.book_registry.BookStatus.Downloading
+import org.nypl.simplified.books.book_registry.BookStatus.FailedDownload
+import org.nypl.simplified.books.book_registry.BookStatus.FailedDownloadBadCredentials
 import org.nypl.simplified.books.book_registry.BookStatus.Loaned.LoanedDownloaded
 import org.nypl.simplified.books.book_registry.BookStatusEvent
 import org.nypl.simplified.books.borrowing.BorrowTimeoutConfiguration
 import org.nypl.simplified.books.borrowing.internal.BorrowACSM
 import org.nypl.simplified.books.borrowing.internal.BorrowAudiobookAuthorizationHandler
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.accountCredentialsRequired
-import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.acsNoCredentialsPost
-import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.acsNoCredentialsPre
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.acsNotSupported
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.acsTimedOut
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.acsUnparseableACSM
@@ -65,7 +68,8 @@ import org.nypl.simplified.opds.core.OPDSAcquisition
 import org.nypl.simplified.opds.core.OPDSAcquisitionPath
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
 import org.nypl.simplified.patron.api.PatronAuthorization
-import org.nypl.simplified.profiles.api.ProfileReadableType
+import org.nypl.simplified.profiles.api.ProfileID
+import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import org.nypl.simplified.tests.TestDirectories
@@ -77,13 +81,13 @@ import org.nypl.simplified.tests.mocking.MockAdobeAdeptNetProvider
 import org.nypl.simplified.tests.mocking.MockAdobeAdeptResourceProvider
 import org.nypl.simplified.tests.mocking.MockBookDatabase
 import org.nypl.simplified.tests.mocking.MockBookDatabaseEntry
-import org.nypl.simplified.tests.mocking.MockBookDatabaseEntryFormatHandleEPUB
 import org.nypl.simplified.tests.mocking.MockBorrowContext
 import org.nypl.simplified.tests.mocking.MockBundledContentResolver
 import org.nypl.simplified.tests.mocking.MockContentResolver
-import org.nypl.simplified.tests.mocking.MockDRMInformationACSHandle
+import org.nypl.simplified.tests.mocking.MockProfile
 import org.slf4j.LoggerFactory
 import java.net.URI
+import java.nio.file.Path
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -107,16 +111,13 @@ class BorrowACSMTest {
       .setBody(this.validACSM)
 
   private lateinit var account: AccountType
-  private lateinit var accountId: AccountID
   private lateinit var accountProvider: AccountProvider
-  private lateinit var acsHandle: MockDRMInformationACSHandle
   private lateinit var adobeConnector: MockAdobeAdeptConnector
   private lateinit var adobeExecutor: MockAdobeAdeptExecutor
   private lateinit var adobeExecutorService: ExecutorService
   private lateinit var adobeNetProvider: MockAdobeAdeptNetProvider
   private lateinit var adobeResourceProvider: MockAdobeAdeptResourceProvider
   private lateinit var bookDatabase: MockBookDatabase
-  private lateinit var bookDatabaseEPUBHandle: MockBookDatabaseEntryFormatHandleEPUB
   private lateinit var bookDatabaseEntry: MockBookDatabaseEntry
   private lateinit var bookEvents: MutableList<BookStatusEvent>
   private lateinit var bookFormatSupport: BookFormatSupportType
@@ -127,7 +128,7 @@ class BorrowACSMTest {
   private lateinit var contentResolver: MockContentResolver
   private lateinit var context: MockBorrowContext
   private lateinit var httpClient: LSHTTPClientType
-  private lateinit var profile: ProfileReadableType
+  private lateinit var profile: ProfileType
   private lateinit var taskRecorder: TaskRecorderType
   private lateinit var webServer: MockWebServer
   private var bookRegistrySub: Disposable? = null
@@ -142,7 +143,7 @@ class BorrowACSMTest {
   }
 
   @BeforeEach
-  fun testSetup() {
+  fun testSetup(@TempDir bookDirectory: Path) {
     this.webServer = MockWebServer()
     this.webServer.start(20000)
 
@@ -166,45 +167,44 @@ class BorrowACSMTest {
         .subscribe(this::recordBookEvent)
 
     this.profile =
-      Mockito.mock(ProfileReadableType::class.java)
+      MockProfile(ProfileID.generate(), 1)
     val initialFeedEntry =
       BorrowTestFeeds.opdsLoanedFeedEntryOfType(this.webServer, genericEPUBFiles.fullType)
     this.bookID =
       BookIDs.newFromOPDSEntry(initialFeedEntry)
     this.account =
-      Mockito.mock(AccountType::class.java)
+      firstAccountOf(this.profile)
     this.accountProvider =
       MockAccountProviders.fakeProvider("urn:uuid:ea9480d4-5479-4ef1-b1d1-84ccbedb680f")
 
     this.authHandler =
       BorrowAudiobookAuthorizationHandler(this.account)
 
-    Mockito.`when`(this.account.loginState)
-      .thenReturn(
-        AccountLoggedIn(
-          AccountAuthenticationCredentials.Basic(
-            userName = AccountUsername("user"),
-            password = AccountPassword("password"),
-            adobeCredentials = AccountAuthenticationAdobePreActivationCredentials(
-              vendorID = AdobeVendorID("vendor"),
-              clientToken = AccountAuthenticationAdobeClientToken(
-                userName = "user",
-                password = "password",
-                rawToken = "b85e7fd7-cf6e-4e39-8da6-8df8c9ee9779"
-              ),
-              deviceManagerURI = URI.create("http://www.example.com"),
-              postActivationCredentials = AccountAuthenticationAdobePostActivationCredentials(
-                deviceID = AdobeDeviceID("ca887d21-a56c-4314-811e-952d885d2115"),
-                userID = AdobeUserID("19b25c06-8b39-4643-8813-5980bee45651")
-              )
+    this.account.setLoginState(
+      AccountLoggedIn(
+        AccountAuthenticationCredentials.Basic(
+          userName = AccountUsername("user"),
+          password = AccountPassword("password"),
+          adobeCredentials = AccountAuthenticationAdobePreActivationCredentials(
+            vendorID = AdobeVendorID("vendor"),
+            clientToken = AccountAuthenticationAdobeClientToken(
+              userName = "user",
+              password = "password",
+              rawToken = "b85e7fd7-cf6e-4e39-8da6-8df8c9ee9779"
             ),
-            authenticationDescription = "Basic",
-            annotationsURI = URI("https://www.example.com"),
-            deviceRegistrationURI = URI("https://www.example.com"),
-            patronAuthorization = PatronAuthorization("identifier", null)
-          )
+            deviceManagerURI = URI.create("http://www.example.com"),
+            postActivationCredentials = AccountAuthenticationAdobePostActivationCredentials(
+              deviceID = AdobeDeviceID("ca887d21-a56c-4314-811e-952d885d2115"),
+              userID = AdobeUserID("19b25c06-8b39-4643-8813-5980bee45651")
+            )
+          ),
+          authenticationDescription = "Basic",
+          annotationsURI = URI("https://www.example.com"),
+          deviceRegistrationURI = URI("https://www.example.com"),
+          patronAuthorization = PatronAuthorization("identifier", null)
         )
       )
+    )
 
     val androidContext =
       Mockito.mock(Application::class.java)
@@ -221,13 +221,10 @@ class BorrowACSMTest {
           )
         )
 
-    this.accountId =
-      AccountID.generate()
-
     val bookInitial =
       Book(
         id = this.bookID,
-        account = this.accountId,
+        account = this.account.id,
         cover = null,
         thumbnail = null,
         entry = initialFeedEntry,
@@ -235,18 +232,13 @@ class BorrowACSMTest {
       )
 
     this.bookDatabase =
-      MockBookDatabase(this.accountId)
-    this.bookDatabaseEntry =
-      MockBookDatabaseEntry(bookInitial)
+      MockBookDatabase(this.account.id, bookDirectory.toFile())
 
-    this.bookDatabaseEPUBHandle =
-      MockBookDatabaseEntryFormatHandleEPUB(this.bookID)
-    this.bookDatabaseEntry.formatHandlesField.clear()
-    this.bookDatabaseEntry.formatHandlesField.add(this.bookDatabaseEPUBHandle)
-    this.acsHandle =
-      MockDRMInformationACSHandle()
-    this.bookDatabaseEPUBHandle.drmInformationHandleField =
-      this.acsHandle
+    this.bookDatabaseEntry =
+      this.bookDatabase.createOrUpdate(
+        this.bookID,
+        initialFeedEntry
+      )
 
     this.adobeNetProvider =
       MockAdobeAdeptNetProvider()
@@ -272,9 +264,10 @@ class BorrowACSMTest {
         httpClient = this.httpClient,
         taskRecorder = this.taskRecorder,
         isCancelled = false,
-        bookDatabaseEntry = this.bookDatabaseEntry,
+        bookDatabaseEntry = bookDatabaseEntry,
         bookInitial = bookInitial,
-        contentResolver = this.contentResolver
+        contentResolver = this.contentResolver,
+        profile = this.profile,
       )
 
     this.context.adobeExecutor = this.adobeExecutor
@@ -314,6 +307,15 @@ class BorrowACSMTest {
       OPDSAcquisitionPathElement(adobeACSMFiles, null, emptyMap())
   }
 
+  private fun firstAccountOf(
+    profile: ProfileType
+  ): AccountType {
+    for (account in profile.accounts().values) {
+      return account
+    }
+    throw IllegalStateException()
+  }
+
   private fun recordBookEvent(event: BookStatusEvent) {
     this.logger.debug("event: {}", event)
     this.onEvent(event)
@@ -350,14 +352,15 @@ class BorrowACSMTest {
 
     this.verifyBookRegistryHasStatus(FailedDownload::class.java)
     assertEquals(acsNotSupported, this.taskRecorder.finishFailure<Unit>().lastErrorCode)
-    assertEquals(0, this.bookDatabaseEntry.entryWrites)
+    assertEquals(1, this.bookDatabaseEntry.entryWrites)
 
     assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(FailedDownload::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(0, this.bookStates.size)
 
-    assertTrue(this.acsHandle.info.acsmFile == null)
-    assertTrue(this.bookDatabaseEPUBHandle.format.file == null)
+    val bookHandle = this.bookDatabase.entry(this.bookID)
+    val formatHandle = bookHandle.formatHandles[0] as BookDatabaseEntryFormatHandleEPUB
+    assertTrue(formatHandle.format.file == null)
   }
 
   /**
@@ -368,8 +371,7 @@ class BorrowACSMTest {
   fun testMissingCredentials0() {
     val task = BorrowACSM.createSubtask()
 
-    Mockito.`when`(this.account.loginState)
-      .thenReturn(AccountNotLoggedIn(null))
+    this.account.setLoginState(AccountNotLoggedIn(null))
 
     try {
       task.execute(this.context)
@@ -380,103 +382,15 @@ class BorrowACSMTest {
 
     this.verifyBookRegistryHasStatus(FailedDownload::class.java)
     assertEquals(accountCredentialsRequired, this.taskRecorder.finishFailure<Unit>().lastErrorCode)
-    assertEquals(0, this.bookDatabaseEntry.entryWrites)
+    assertEquals(1, this.bookDatabaseEntry.entryWrites)
 
     assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(FailedDownload::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(0, this.bookStates.size)
 
-    assertTrue(this.acsHandle.info.acsmFile == null)
-    assertTrue(this.bookDatabaseEPUBHandle.format.file == null)
-  }
-
-  /**
-   * Fulfillment can't proceed without the required credentials.
-   */
-
-  @Test
-  fun testMissingCredentials1() {
-    val task = BorrowACSM.createSubtask()
-
-    Mockito.`when`(this.account.loginState)
-      .thenReturn(
-        AccountLoggedIn(
-          AccountAuthenticationCredentials.Basic(
-            userName = AccountUsername("user"),
-            password = AccountPassword("password"),
-            adobeCredentials = null,
-            authenticationDescription = "Basic",
-            annotationsURI = URI("https://www.example.com"),
-            deviceRegistrationURI = URI("https://www.example.com"),
-            patronAuthorization = PatronAuthorization("identifier", null)
-          )
-        )
-      )
-
-    try {
-      task.execute(this.context)
-      fail()
-    } catch (e: BorrowSubtaskFailed) {
-      this.logger.error("exception: ", e)
-    }
-
-    this.verifyBookRegistryHasStatus(FailedDownload::class.java)
-    assertEquals(acsNoCredentialsPre, this.taskRecorder.finishFailure<Unit>().lastErrorCode)
-    assertEquals(0, this.bookDatabaseEntry.entryWrites)
-
-    assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
-    assertEquals(FailedDownload::class.java, this.bookStates.removeAt(0).javaClass)
-    assertEquals(0, this.bookStates.size)
-
-    assertTrue(this.acsHandle.info.acsmFile == null)
-    assertTrue(this.bookDatabaseEPUBHandle.format.file == null)
-  }
-
-  /**
-   * Fulfillment can't proceed without the required credentials.
-   */
-
-  @Test
-  fun testMissingCredentials2() {
-    val task = BorrowACSM.createSubtask()
-
-    Mockito.`when`(this.account.loginState)
-      .thenReturn(
-        AccountLoggedIn(
-          AccountAuthenticationCredentials.Basic(
-            userName = AccountUsername("user"),
-            password = AccountPassword("password"),
-            adobeCredentials = AccountAuthenticationAdobePreActivationCredentials(
-              AdobeVendorID("vendor"),
-              AccountAuthenticationAdobeClientToken("user", "password", "b85e7fd7-cf6e-4e39-8da6-8df8c9ee9779"),
-              null,
-              null
-            ),
-            authenticationDescription = "Basic",
-            annotationsURI = URI("https://www.example.com"),
-            deviceRegistrationURI = URI("https://www.example.com"),
-            patronAuthorization = PatronAuthorization("identifier", null)
-          )
-        )
-      )
-
-    try {
-      task.execute(this.context)
-      fail()
-    } catch (e: BorrowSubtaskFailed) {
-      this.logger.error("exception: ", e)
-    }
-
-    this.verifyBookRegistryHasStatus(FailedDownload::class.java)
-    assertEquals(acsNoCredentialsPost, this.taskRecorder.finishFailure<Unit>().lastErrorCode)
-    assertEquals(0, this.bookDatabaseEntry.entryWrites)
-
-    assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
-    assertEquals(FailedDownload::class.java, this.bookStates.removeAt(0).javaClass)
-    assertEquals(0, this.bookStates.size)
-
-    assertTrue(this.acsHandle.info.acsmFile == null)
-    assertTrue(this.bookDatabaseEPUBHandle.format.file == null)
+    val bookHandle = this.bookDatabase.entry(this.bookID)
+    val formatHandle = bookHandle.formatHandles[0] as BookDatabaseEntryFormatHandleEPUB
+    assertTrue(formatHandle.format.file == null)
   }
 
   /**
@@ -504,14 +418,15 @@ class BorrowACSMTest {
 
     this.verifyBookRegistryHasStatus(FailedDownload::class.java)
     assertEquals(httpRequestFailed, this.taskRecorder.finishFailure<Unit>().lastErrorCode)
-    assertEquals(0, this.bookDatabaseEntry.entryWrites)
+    assertEquals(1, this.bookDatabaseEntry.entryWrites)
 
     assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(FailedDownload::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(0, this.bookStates.size)
 
-    assertTrue(this.acsHandle.info.acsmFile == null)
-    assertTrue(this.bookDatabaseEPUBHandle.format.file == null)
+    val bookHandle = this.bookDatabase.entry(this.bookID)
+    val formatHandle = bookHandle.formatHandles[0] as BookDatabaseEntryFormatHandleEPUB
+    assertTrue(formatHandle.format.file == null)
   }
 
   /**
@@ -537,12 +452,13 @@ class BorrowACSMTest {
      * It is not the responsibility of subtasks to published "cancelled" states.
      */
 
-    assertEquals(0, this.bookDatabaseEntry.entryWrites)
+    assertEquals(1, this.bookDatabaseEntry.entryWrites)
     assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(0, this.bookStates.size)
 
-    assertTrue(this.acsHandle.info.acsmFile == null)
-    assertTrue(this.bookDatabaseEPUBHandle.format.file == null)
+    val bookHandle = this.bookDatabase.entry(this.bookID)
+    val formatHandle = bookHandle.formatHandles[0] as BookDatabaseEntryFormatHandleEPUB
+    assertTrue(formatHandle.format.file == null)
   }
 
   /**
@@ -581,13 +497,14 @@ class BorrowACSMTest {
      * It is not the responsibility of subtasks to published "cancelled" states.
      */
 
-    assertEquals(0, this.bookDatabaseEntry.entryWrites)
+    assertEquals(1, this.bookDatabaseEntry.entryWrites)
     assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(0, this.bookStates.size)
 
-    assertTrue(this.acsHandle.info.acsmFile == null)
-    assertTrue(this.bookDatabaseEPUBHandle.format.file == null)
+    val bookHandle = this.bookDatabase.entry(this.bookID)
+    val formatHandle = bookHandle.formatHandles[0] as BookDatabaseEntryFormatHandleEPUB
+    assertTrue(formatHandle.format.file == null)
   }
 
   /**
@@ -617,14 +534,15 @@ class BorrowACSMTest {
 
     this.verifyBookRegistryHasStatus(FailedDownload::class.java)
     assertEquals(httpContentTypeIncompatible, this.taskRecorder.finishFailure<Unit>().lastErrorCode)
-    assertEquals(0, this.bookDatabaseEntry.entryWrites)
+    assertEquals(1, this.bookDatabaseEntry.entryWrites)
 
     assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(FailedDownload::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(0, this.bookStates.size)
 
-    assertTrue(this.acsHandle.info.acsmFile == null)
-    assertTrue(this.bookDatabaseEPUBHandle.format.file == null)
+    val bookHandle = this.bookDatabase.entry(this.bookID)
+    val formatHandle = bookHandle.formatHandles[0] as BookDatabaseEntryFormatHandleEPUB
+    assertTrue(formatHandle.format.file == null)
   }
 
   /**
@@ -654,7 +572,7 @@ class BorrowACSMTest {
 
     this.verifyBookRegistryHasStatus(FailedDownload::class.java)
     assertEquals(acsUnparseableACSM, this.taskRecorder.finishFailure<Unit>().lastErrorCode)
-    assertEquals(0, this.bookDatabaseEntry.entryWrites)
+    assertEquals(1, this.bookDatabaseEntry.entryWrites)
 
     assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
@@ -662,8 +580,9 @@ class BorrowACSMTest {
     assertEquals(FailedDownload::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(0, this.bookStates.size)
 
-    assertTrue(this.acsHandle.info.acsmFile == null)
-    assertTrue(this.bookDatabaseEPUBHandle.format.file == null)
+    val bookHandle = this.bookDatabase.entry(this.bookID)
+    val formatHandle = bookHandle.formatHandles[0] as BookDatabaseEntryFormatHandleEPUB
+    assertTrue(formatHandle.format.file == null)
   }
 
   /**
@@ -712,7 +631,7 @@ class BorrowACSMTest {
 
     this.verifyBookRegistryHasStatus(FailedDownload::class.java)
     assertEquals("noFormatHandle", this.taskRecorder.finishFailure<Unit>().lastErrorCode)
-    assertEquals(0, this.bookDatabaseEntry.entryWrites)
+    assertEquals(1, this.bookDatabaseEntry.entryWrites)
 
     assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
@@ -720,8 +639,9 @@ class BorrowACSMTest {
     assertEquals(FailedDownload::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(0, this.bookStates.size)
 
-    assertTrue(this.acsHandle.info.acsmFile == null)
-    assertTrue(this.bookDatabaseEPUBHandle.format.file == null)
+    val bookHandle = this.bookDatabase.entry(this.bookID)
+    val formatHandle = bookHandle.formatHandles[0] as BookDatabaseEntryFormatHandleEPUB
+    assertTrue(formatHandle.format.file == null)
   }
 
   /**
@@ -750,7 +670,7 @@ class BorrowACSMTest {
 
     this.verifyBookRegistryHasStatus(FailedDownload::class.java)
     assertEquals("ACS: E_DEFECTIVE", this.taskRecorder.finishFailure<Unit>().lastErrorCode)
-    assertEquals(0, this.bookDatabaseEntry.entryWrites)
+    assertEquals(1, this.bookDatabaseEntry.entryWrites)
 
     assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
@@ -759,8 +679,11 @@ class BorrowACSMTest {
     assertEquals(FailedDownload::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(0, this.bookStates.size)
 
-    assertTrue(this.acsHandle.info.acsmFile != null)
-    assertTrue(this.bookDatabaseEPUBHandle.format.file == null)
+    val bookHandle = this.bookDatabase.entry(this.bookID)
+    val formatHandle = bookHandle.formatHandles[0] as BookDatabaseEntryFormatHandleEPUB
+    val acsHandle = formatHandle.drmInformationHandle as BookDRMInformationHandle.ACSHandle
+    assertTrue(acsHandle.info.acsmFile != null)
+    assertTrue(formatHandle.format.file == null)
   }
 
   /**
@@ -795,7 +718,7 @@ class BorrowACSMTest {
 
     this.verifyBookRegistryHasStatus(FailedDownload::class.java)
     assertEquals(acsTimedOut, this.taskRecorder.finishFailure<Unit>().lastErrorCode)
-    assertEquals(0, this.bookDatabaseEntry.entryWrites)
+    assertEquals(1, this.bookDatabaseEntry.entryWrites)
 
     assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
@@ -804,8 +727,11 @@ class BorrowACSMTest {
     assertEquals(FailedDownload::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(0, this.bookStates.size)
 
-    assertTrue(this.acsHandle.info.acsmFile != null)
-    assertTrue(this.bookDatabaseEPUBHandle.format.file == null)
+    val bookHandle = this.bookDatabase.entry(this.bookID)
+    val formatHandle = bookHandle.formatHandles[0] as BookDatabaseEntryFormatHandleEPUB
+    val acsHandle = formatHandle.drmInformationHandle as BookDRMInformationHandle.ACSHandle
+    assertTrue(acsHandle.info.acsmFile != null)
+    assertTrue(formatHandle.format.file == null)
   }
 
   /**
@@ -833,8 +759,11 @@ class BorrowACSMTest {
     }
 
     this.verifyBookRegistryHasStatus(FailedDownload::class.java)
-    assertEquals("ACS: class java.lang.IllegalStateException", this.taskRecorder.finishFailure<Unit>().lastErrorCode)
-    assertEquals(0, this.bookDatabaseEntry.entryWrites)
+    assertEquals(
+      "ACS: class java.lang.IllegalStateException",
+      this.taskRecorder.finishFailure<Unit>().lastErrorCode
+    )
+    assertEquals(1, this.bookDatabaseEntry.entryWrites)
 
     assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
@@ -843,8 +772,11 @@ class BorrowACSMTest {
     assertEquals(FailedDownload::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(0, this.bookStates.size)
 
-    assertTrue(this.acsHandle.info.acsmFile != null)
-    assertTrue(this.bookDatabaseEPUBHandle.format.file == null)
+    val bookHandle = this.bookDatabase.entry(this.bookID)
+    val formatHandle = bookHandle.formatHandles[0] as BookDatabaseEntryFormatHandleEPUB
+    val acsHandle = formatHandle.drmInformationHandle as BookDRMInformationHandle.ACSHandle
+    assertTrue(acsHandle.info.acsmFile != null)
+    assertTrue(formatHandle.format.file == null)
   }
 
   /**
@@ -884,7 +816,7 @@ class BorrowACSMTest {
     }
 
     this.verifyBookRegistryHasStatus(LoanedDownloaded::class.java)
-    assertEquals(0, this.bookDatabaseEntry.entryWrites)
+    assertEquals(1, this.bookDatabaseEntry.entryWrites)
 
     assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
@@ -893,8 +825,11 @@ class BorrowACSMTest {
     assertEquals(LoanedDownloaded::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(0, this.bookStates.size)
 
-    assertTrue(this.acsHandle.info.acsmFile != null)
-    assertTrue(this.bookDatabaseEPUBHandle.format.file != null)
+    val bookHandle = this.bookDatabase.entry(this.bookID)
+    val formatHandle = bookHandle.formatHandles[0] as BookDatabaseEntryFormatHandleEPUB
+    val acsHandle = formatHandle.drmInformationHandle as BookDRMInformationHandle.ACSHandle
+    assertTrue(acsHandle.info.acsmFile != null)
+    assertTrue(formatHandle.format.file != null)
   }
 
   /**
@@ -941,7 +876,7 @@ class BorrowACSMTest {
     }
 
     this.verifyBookRegistryHasStatus(LoanedDownloaded::class.java)
-    assertEquals(0, this.bookDatabaseEntry.entryWrites)
+    assertEquals(1, this.bookDatabaseEntry.entryWrites)
 
     var downloadCount = 0
     while (true) {
@@ -958,8 +893,11 @@ class BorrowACSMTest {
     assertEquals(LoanedDownloaded::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(0, this.bookStates.size)
 
-    assertTrue(this.acsHandle.info.acsmFile != null)
-    assertTrue(this.bookDatabaseEPUBHandle.format.file != null)
+    val bookHandle = this.bookDatabase.entry(this.bookID)
+    val formatHandle = bookHandle.formatHandles[0] as BookDatabaseEntryFormatHandleEPUB
+    val acsHandle = formatHandle.drmInformationHandle as BookDRMInformationHandle.ACSHandle
+    assertTrue(acsHandle.info.acsmFile != null)
+    assertTrue(formatHandle.format.file != null)
   }
 
   /**
@@ -977,27 +915,31 @@ class BorrowACSMTest {
       MockResponse()
         .setResponseCode(401)
         .setHeader("Content-Type", "application/api-problem+json")
-        .setBody("""
+        .setBody(
+          """
 {
   "status": 401,
   "type": "http://palaceproject.io/terms/problem/auth/recoverable/token/expired",
   "title": "Expired!",
   "detail": "Expiration in detail"
 }
-        """.trimIndent())
+        """.trimIndent()
+        )
     )
 
     try {
-      Assertions.assertThrows(BorrowSubtaskException.BorrowRecoverableAuthenticationError::class.java, {
-        task.execute(this.context)
-      })
+      Assertions.assertThrows(
+        BorrowSubtaskException.BorrowRecoverableAuthenticationError::class.java,
+        {
+          task.execute(this.context)
+        })
     } catch (e: BorrowSubtaskFailed) {
       this.logger.error("exception: ", e)
     }
 
     this.verifyBookRegistryHasStatus(FailedDownloadBadCredentials::class.java)
     assertEquals("httpRequestFailed", this.taskRecorder.finishFailure<Unit>().lastErrorCode)
-    assertEquals(0, this.bookDatabaseEntry.entryWrites)
+    assertEquals(1, this.bookDatabaseEntry.entryWrites)
 
     assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(FailedDownloadBadCredentials::class.java, this.bookStates.removeAt(0).javaClass)
@@ -1026,7 +968,7 @@ class BorrowACSMTest {
 
     this.verifyBookRegistryHasStatus(FailedDownload::class.java)
     assertEquals("httpRequestFailed", this.taskRecorder.finishFailure<Unit>().lastErrorCode)
-    assertEquals(0, this.bookDatabaseEntry.entryWrites)
+    assertEquals(1, this.bookDatabaseEntry.entryWrites)
 
     assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(FailedDownload::class.java, this.bookStates.removeAt(0).javaClass)

@@ -86,6 +86,7 @@ object BorrowTestFeeds {
         """
         )
       }
+
       LOANABLE -> buildString {
         this.append(
           """
@@ -95,6 +96,7 @@ object BorrowTestFeeds {
         """
         )
       }
+
       HELD -> buildString {
         TODO()
       }
@@ -253,7 +255,11 @@ object BorrowTestFeeds {
         <title>Example</title>
         <updated>2020-09-17T16:48:51+0000</updated>
         <id>$id</id>
-        <link type="application/vnd.readium.lcp.license.v1.0+json" rel="http://opds-spec.org/acquisition" href="${webServer.url("/next")}">
+        <link type="application/vnd.readium.lcp.license.v1.0+json" rel="http://opds-spec.org/acquisition" href="${
+        webServer.url(
+          "/next"
+        )
+      }">
           <opds:indirectAcquisition type="$mime"/>
           <lcp:hashed_passphrase>$hashedPassphrase</lcp:hashed_passphrase>
         </link>

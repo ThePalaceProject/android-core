@@ -55,11 +55,13 @@ object StandardFormatNames {
    * Various standard format names used for generic, unencrypted audio books.
    */
 
+  val genericJsonAudioBook =
+    this.mimeOf("application/audiobook+json")
+  val genericMpegAudioBook =
+    this.mimeOf("audio/mpeg")
+
   val genericAudioBooks =
-    this.mimesOf(
-      "application/audiobook+json",
-      "audio/mpeg"
-    )
+    setOf(genericJsonAudioBook, genericMpegAudioBook)
 
   /**
    * The union of all of the known standard format names used for audio books.

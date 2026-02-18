@@ -68,6 +68,7 @@ import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
 import org.nypl.simplified.taskrecorder.api.TaskResult
+import org.nypl.simplified.tests.TestDirectories
 import org.nypl.simplified.tests.books.controller.FakeAccounts.fakeAccount
 import org.nypl.simplified.tests.books.controller.FakeAccounts.fakeAccountProvider
 import org.nypl.simplified.tests.mocking.FakeFeedLoader
@@ -249,7 +250,10 @@ class BookRevokeTaskTest {
       )
 
     val bookDatabaseEntry =
-      MockBookDatabaseEntry(book)
+      MockBookDatabaseEntry(
+        booksDirectory = TestDirectories.temporaryDirectory(),
+        bookInitial = book
+      )
 
     Mockito.`when`(account.id)
       .thenReturn(this.accountID)
@@ -753,7 +757,10 @@ class BookRevokeTaskTest {
       )
 
     val bookDatabaseEntry =
-      MockBookDatabaseEntry(book)
+      MockBookDatabaseEntry(
+        booksDirectory = TestDirectories.temporaryDirectory(),
+        bookInitial = book
+      )
 
     Mockito.`when`(account.id)
       .thenReturn(this.accountID)
@@ -986,7 +993,10 @@ class BookRevokeTaskTest {
       )
 
     val bookDatabaseEntry =
-      MockBookDatabaseEntry(book)
+      MockBookDatabaseEntry(
+        booksDirectory = TestDirectories.temporaryDirectory(),
+        bookInitial = book
+      )
 
     Mockito.`when`(account.id)
       .thenReturn(this.accountID)
@@ -1119,7 +1129,10 @@ class BookRevokeTaskTest {
       )
 
     val bookDatabaseEntry =
-      MockBookDatabaseEntry(book)
+      MockBookDatabaseEntry(
+        booksDirectory = TestDirectories.temporaryDirectory(),
+        bookInitial = book
+      )
 
     Mockito.`when`(account.id)
       .thenReturn(this.accountID)
@@ -1239,7 +1252,10 @@ class BookRevokeTaskTest {
       )
 
     val bookDatabaseEntry =
-      MockBookDatabaseEntry(book)
+      MockBookDatabaseEntry(
+        booksDirectory = TestDirectories.temporaryDirectory(),
+        bookInitial = book
+      )
 
     Mockito.`when`(account.id)
       .thenReturn(this.accountID)
@@ -1373,7 +1389,10 @@ class BookRevokeTaskTest {
       )
 
     val bookDatabaseEntry =
-      MockBookDatabaseEntry(book)
+      MockBookDatabaseEntry(
+        booksDirectory = TestDirectories.temporaryDirectory(),
+        bookInitial = book
+      )
 
     Mockito.`when`(account.id)
       .thenReturn(this.accountID)
@@ -1471,7 +1490,10 @@ class BookRevokeTaskTest {
       )
 
     val bookDatabaseEntry =
-      MockBookDatabaseEntry(book)
+      MockBookDatabaseEntry(
+        booksDirectory = TestDirectories.temporaryDirectory(),
+        bookInitial = book
+      )
 
     Mockito.`when`(account.id)
       .thenReturn(this.accountID)
@@ -2620,7 +2642,10 @@ class BookRevokeTaskTest {
       )
 
     val bookDatabaseEntry =
-      MockBookDatabaseEntry(book)
+      MockBookDatabaseEntry(
+        booksDirectory = TestDirectories.temporaryDirectory(),
+        bookInitial = book
+      )
 
     Mockito.`when`(account.id)
       .thenReturn(this.accountID)

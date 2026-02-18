@@ -52,6 +52,7 @@ import org.nypl.simplified.patron.api.PatronAuthorization
 import org.nypl.simplified.patron.api.PatronUserProfileParsersType
 import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfileReadableType
+import org.nypl.simplified.tests.TestDirectories
 import org.nypl.simplified.tests.books.controller.FakeAccounts.fakeAccountProvider
 import org.nypl.simplified.tests.mocking.MockAccountLogoutStringResources
 import org.nypl.simplified.tests.mocking.MockBookDatabase
@@ -113,7 +114,7 @@ abstract class ProfileAccountLogoutTaskContract {
     this.bookRegistry =
       BookRegistry.create()
     this.bookDatabase =
-      MockBookDatabase(this.accountID)
+      MockBookDatabase(booksDirectory = TestDirectories.temporaryDirectory(), owner =  this.accountID)
 
     val acquisition =
       OPDSAcquisition(

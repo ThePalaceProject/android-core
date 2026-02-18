@@ -27,6 +27,7 @@ import org.nypl.simplified.feeds.api.FeedLoading
 import org.nypl.simplified.opds.core.OPDSAvailabilityRevoked
 import org.nypl.simplified.opds.core.OPDSFeedParserType
 import org.nypl.simplified.opds.core.OPDSParseException
+import org.nypl.simplified.patron.PatronUserProfiles
 import org.nypl.simplified.patron.api.PatronAuthorization
 import org.nypl.simplified.patron.api.PatronUserProfile
 import org.nypl.simplified.patron.api.PatronUserProfileParsersType

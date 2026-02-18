@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
 import org.librarysimplified.http.api.LSHTTPClientConfiguration
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.vanilla.LSHTTPClients
@@ -47,7 +48,7 @@ import org.nypl.simplified.books.formats.api.StandardFormatNames.genericPDFFiles
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
 import org.nypl.simplified.patron.api.PatronAuthorization
-import org.nypl.simplified.profiles.api.ProfileReadableType
+import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import org.nypl.simplified.tests.TestDirectories
@@ -61,6 +62,7 @@ import org.nypl.simplified.tests.mocking.MockBundledContentResolver
 import org.nypl.simplified.tests.mocking.MockContentResolver
 import org.slf4j.LoggerFactory
 import java.net.URI
+import java.nio.file.Path
 import java.util.concurrent.TimeUnit
 
 class BorrowSAMLDownloadTest {
@@ -81,7 +83,7 @@ class BorrowSAMLDownloadTest {
   private lateinit var epubHandle: MockBookDatabaseEntryFormatHandleEPUB
   private lateinit var httpClient: LSHTTPClientType
   private lateinit var pdfHandle: MockBookDatabaseEntryFormatHandlePDF
-  private lateinit var profile: ProfileReadableType
+  private lateinit var profile: ProfileType
   private lateinit var taskRecorder: TaskRecorderType
   private lateinit var webServer: MockWebServer
   private var bookRegistrySub: Disposable? = null
@@ -95,10 +97,12 @@ class BorrowSAMLDownloadTest {
   }
 
   @BeforeEach
-  fun testSetup() {
+  fun testSetup(@TempDir bookDirectory: Path) {
     this.webServer = MockWebServer()
     this.webServer.start(20000)
 
+    this.profile =
+      Mockito.mock(ProfileType::class.java)
     this.taskRecorder =
       TaskRecorder.create()
     this.contentResolver =
@@ -179,9 +183,9 @@ class BorrowSAMLDownloadTest {
       )
 
     this.bookDatabase =
-      MockBookDatabase(this.accountId)
+      MockBookDatabase(booksDirectory = bookDirectory.toFile(), owner = this.accountId)
     this.bookDatabaseEntry =
-      MockBookDatabaseEntry(bookInitial)
+      MockBookDatabaseEntry(booksDirectory = bookDirectory.toFile(), bookInitial)
     this.pdfHandle =
       MockBookDatabaseEntryFormatHandlePDF(this.bookID)
     this.epubHandle =
@@ -202,7 +206,8 @@ class BorrowSAMLDownloadTest {
         isCancelled = false,
         bookDatabaseEntry = this.bookDatabaseEntry,
         bookInitial = bookInitial,
-        contentResolver = this.contentResolver
+        contentResolver = this.contentResolver,
+        profile = this.profile
       )
   }
 
@@ -364,7 +369,10 @@ class BorrowSAMLDownloadTest {
     assertEquals(0, this.bookDatabaseEntry.entryWrites)
 
     assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
-    assertEquals(BookStatus.DownloadWaitingForExternalAuthentication::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(
+      BookStatus.DownloadWaitingForExternalAuthentication::class.java,
+      this.bookStates.removeAt(0).javaClass
+    )
     assertEquals(0, this.bookStates.size)
   }
 

@@ -27,10 +27,8 @@ import org.nypl.simplified.accounts.api.AccountAuthenticationAdobeClientToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationAdobePostActivationCredentials
 import org.nypl.simplified.accounts.api.AccountAuthenticationAdobePreActivationCredentials
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
-import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggedIn
 import org.nypl.simplified.accounts.api.AccountPassword
-import org.nypl.simplified.accounts.api.AccountProvider
 import org.nypl.simplified.accounts.api.AccountUsername
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.api.Book
@@ -38,10 +36,9 @@ import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.api.BookIDs
 import org.nypl.simplified.books.audio.AudioBookManifestData
 import org.nypl.simplified.books.book_database.BookDRMInformationHandleACS
-import org.nypl.simplified.books.book_database.BookDatabase
+import org.nypl.simplified.books.book_database.api.BookDRMInformationHandle
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleEPUB
-import org.nypl.simplified.books.book_database.api.BookDatabaseType
 import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatus
@@ -67,8 +64,6 @@ import org.nypl.simplified.books.formats.api.StandardFormatNames.opdsAcquisition
 import org.nypl.simplified.books.formats.api.StandardFormatNames.simplifiedBearerToken
 import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
-import org.nypl.simplified.opds.core.OPDSJSONParser
-import org.nypl.simplified.opds.core.OPDSJSONSerializer
 import org.nypl.simplified.patron.api.PatronAuthorization
 import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfileType
@@ -78,27 +73,29 @@ import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.tests.MutableServiceDirectory
 import org.nypl.simplified.tests.TestDirectories
 import org.nypl.simplified.tests.TestDirectories.temporaryFileOf
-import org.nypl.simplified.tests.books.BookFormatsTesting
 import org.nypl.simplified.tests.books.audio.AudioBookSucceedingParsers.playerManifest
 import org.nypl.simplified.tests.books.borrowing.BorrowTestFeeds.FeedRequirements
 import org.nypl.simplified.tests.books.borrowing.BorrowTestFeeds.PathElement
 import org.nypl.simplified.tests.books.borrowing.BorrowTestFeeds.Status.LOANABLE
 import org.nypl.simplified.tests.books.borrowing.BorrowTestFeeds.Status.LOANED
-import org.nypl.simplified.tests.mocking.MockAccountProviders
+import org.nypl.simplified.tests.mocking.MockAccount
 import org.nypl.simplified.tests.mocking.MockAdobeAdeptConnector
 import org.nypl.simplified.tests.mocking.MockAdobeAdeptExecutor
 import org.nypl.simplified.tests.mocking.MockAdobeAdeptNetProvider
 import org.nypl.simplified.tests.mocking.MockAdobeAdeptResourceProvider
 import org.nypl.simplified.tests.mocking.MockAudioBookManifestStrategies
+import org.nypl.simplified.tests.mocking.MockBookDatabase
 import org.nypl.simplified.tests.mocking.MockBookFormatSupport
 import org.nypl.simplified.tests.mocking.MockBorrowSubtaskDirectory
 import org.nypl.simplified.tests.mocking.MockBoundlessService
 import org.nypl.simplified.tests.mocking.MockBundledContentResolver
 import org.nypl.simplified.tests.mocking.MockContentResolver
 import org.nypl.simplified.tests.mocking.MockLCPService
+import org.nypl.simplified.tests.mocking.MockProfile
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URI
+import java.util.TreeMap
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -117,8 +114,6 @@ class BorrowTaskTest {
 
   private lateinit var androidContentResolver: ContentResolver
   private lateinit var account: AccountType
-  private lateinit var accountId: AccountID
-  private lateinit var accountProvider: AccountProvider
   private lateinit var adobeConnector: MockAdobeAdeptConnector
   private lateinit var adobeExecutor: MockAdobeAdeptExecutor
   private lateinit var adobeExecutorService: ExecutorService
@@ -127,7 +122,7 @@ class BorrowTaskTest {
   private lateinit var boundlessService: MockBoundlessService
   private lateinit var audioBookManifestStrategies: MockAudioBookManifestStrategies
   private lateinit var book: Book
-  private lateinit var bookDatabase: BookDatabaseType
+  private lateinit var bookDatabase: MockBookDatabase
   private lateinit var bookEvents: MutableList<BookStatusEvent>
   private lateinit var bookFormatSupport: MockBookFormatSupport
   private lateinit var bookID: BookID
@@ -204,10 +199,60 @@ class BorrowTaskTest {
     return result as TaskResult.Success
   }
 
+  private fun firstAccountOf(
+    profile: ProfileType
+  ): AccountType {
+    for (account in profile.accounts().values) {
+      return account
+    }
+    throw IllegalStateException()
+  }
+
   @BeforeEach
   fun testSetup() {
     this.webServer = MockWebServer()
     this.webServer.start(20000)
+
+    this.profiles =
+      Mockito.mock(ProfilesDatabaseType::class.java)
+    this.profile =
+      MockProfile(ProfileID.generate(), 1)
+    this.account =
+      this.firstAccountOf(this.profile)
+
+    val profileMap = TreeMap<ProfileID, ProfileType>()
+    profileMap[this.profile.id] = this.profile
+
+    Mockito.`when`(this.profiles.currentProfile())
+      .thenReturn(Option.some(this.profile))
+    Mockito.`when`(this.profiles.profiles())
+      .thenReturn(profileMap)
+
+    this.account.setLoginState(
+      AccountLoggedIn(
+        AccountAuthenticationCredentials.Basic(
+          userName = AccountUsername("user"),
+          password = AccountPassword("password"),
+          adobeCredentials = AccountAuthenticationAdobePreActivationCredentials(
+            vendorID = AdobeVendorID("vendor"),
+            clientToken = AccountAuthenticationAdobeClientToken(
+              userName = "user",
+              password = "password",
+              rawToken = "b85e7fd7-cf6e-4e39-8da6-8df8c9ee9779"
+            ),
+            deviceManagerURI = URI.create("http://www.example.com"),
+            postActivationCredentials = AccountAuthenticationAdobePostActivationCredentials(
+              deviceID = AdobeDeviceID("ca887d21-a56c-4314-811e-952d885d2115"),
+              userID = AdobeUserID("19b25c06-8b39-4643-8813-5980bee45651")
+            )
+          ),
+          authenticationDescription = "Basic",
+          annotationsURI = URI("https://www.example.com"),
+          deviceRegistrationURI = URI("https://www.example.com"),
+          patronAuthorization = PatronAuthorization("identifier", null)
+        )
+      )
+    )
 
     this.opdsEmptyFeedEntry =
       BorrowTestFeeds.opdsEmptyFeedEntryOfType()
@@ -218,8 +263,6 @@ class BorrowTaskTest {
         genericEPUBFiles.fullType
       )
 
-    this.accountId =
-      AccountID.generate()
     this.bookID =
       BookIDs.newFromOPDSEntry(this.opdsOpenEPUBFeedEntry)
 
@@ -229,14 +272,7 @@ class BorrowTaskTest {
       Mockito.mock(ContentResolver::class.java)
 
     this.bookDatabase =
-      BookDatabase.open(
-        context = androidContext,
-        parser = OPDSJSONParser.newParser(),
-        serializer = OPDSJSONSerializer.newSerializer(),
-        formats = BookFormatsTesting.supportsEverything,
-        owner = this.accountId,
-        directory = TestDirectories.temporaryDirectory()
-      )
+      this.findMockBookDatabase()
 
     this.bookRegistry =
       BookRegistry.create()
@@ -260,14 +296,6 @@ class BorrowTaskTest {
       MockContentResolver()
     this.bundledContent =
       MockBundledContentResolver()
-    this.profile =
-      Mockito.mock(ProfileType::class.java)
-    this.profiles =
-      Mockito.mock(ProfilesDatabaseType::class.java)
-    this.account =
-      Mockito.mock(AccountType::class.java)
-    this.accountProvider =
-      MockAccountProviders.fakeProvider("urn:uuid:ea9480d4-5479-4ef1-b1d1-84ccbedb680f")
     this.services =
       MutableServiceDirectory()
     this.subtasks =
@@ -279,7 +307,7 @@ class BorrowTaskTest {
     this.httpClient =
       LSHTTPClients()
         .create(
-          context = androidContext,
+          context = this.androidContext,
           configuration = LSHTTPClientConfiguration(
             applicationName = "simplified-tests",
             applicationVersion = "999.999.0",
@@ -291,47 +319,6 @@ class BorrowTaskTest {
     this.subtasks.subtasks =
       BorrowSubtasks.directory()
         .subtasks
-
-    val profileId = ProfileID.generate()
-    Mockito.`when`(this.profiles.profiles())
-      .thenReturn(sortedMapOf(Pair(profileId, this.profile)))
-    Mockito.`when`(this.profile.id)
-      .thenReturn(profileId)
-    Mockito.`when`(this.profiles.currentProfile())
-      .thenReturn(Option.none())
-    Mockito.`when`(this.profile.account(this.accountId))
-      .thenReturn(this.account)
-    Mockito.`when`(this.account.bookDatabase)
-      .thenReturn(this.bookDatabase)
-    Mockito.`when`(this.account.provider)
-      .thenReturn(this.accountProvider)
-
-    Mockito.`when`(this.account.loginState)
-      .thenReturn(
-        AccountLoggedIn(
-          AccountAuthenticationCredentials.Basic(
-            userName = AccountUsername("user"),
-            password = AccountPassword("password"),
-            adobeCredentials = AccountAuthenticationAdobePreActivationCredentials(
-              vendorID = AdobeVendorID("vendor"),
-              clientToken = AccountAuthenticationAdobeClientToken(
-                userName = "user",
-                password = "password",
-                rawToken = "b85e7fd7-cf6e-4e39-8da6-8df8c9ee9779"
-              ),
-              deviceManagerURI = URI.create("http://www.example.com"),
-              postActivationCredentials = AccountAuthenticationAdobePostActivationCredentials(
-                deviceID = AdobeDeviceID("ca887d21-a56c-4314-811e-952d885d2115"),
-                userID = AdobeUserID("19b25c06-8b39-4643-8813-5980bee45651")
-              )
-            ),
-            authenticationDescription = "Basic",
-            annotationsURI = URI("https://www.example.com"),
-            deviceRegistrationURI = URI("https://www.example.com"),
-            patronAuthorization = PatronAuthorization("identifier", null)
-          )
-        )
-      )
 
     this.adobeNetProvider =
       MockAdobeAdeptNetProvider()
@@ -372,17 +359,26 @@ class BorrowTaskTest {
   @Test
   fun testBrokenBookDatabase() {
     val request =
-      BorrowRequest.Start(this.accountId, this.profile.id, this.opdsEmptyFeedEntry)
+      BorrowRequest.Start(this.account.id, this.profile.id, this.opdsEmptyFeedEntry)
     val task =
       this.createTask(request)
 
-    Mockito.`when`(this.account.bookDatabase)
-      .thenThrow(IllegalStateException("Book database on fire."))
+    // Delete the books database to cause a failure when borrowing touches it.
+    val mockBooks = this.findMockBookDatabase()
+    mockBooks.delete()
 
     val result = this.executeAssumingFailure(task)
     assertEquals(BorrowErrorCodes.bookDatabaseFailed, result.lastErrorCode)
 
     this.verifyBookRegistryHasStatus(FailedLoan::class.java)
+  }
+
+  private fun findMockBookDatabase(): MockBookDatabase {
+    val mockAccount =
+      this.account as MockAccount
+    val mockBooks =
+      mockAccount.bookDatabase as MockBookDatabase
+    return mockBooks
   }
 
   /**
@@ -392,12 +388,12 @@ class BorrowTaskTest {
   @Test
   fun testNoAccount() {
     val request =
-      BorrowRequest.Start(this.accountId, this.profile.id, this.opdsEmptyFeedEntry)
+      BorrowRequest.Start(this.account.id, this.profile.id, this.opdsEmptyFeedEntry)
     val task =
       this.createTask(request)
 
-    Mockito.`when`(this.profile.account(this.accountId))
-      .thenThrow(IllegalStateException("Missing account!"))
+    // Delete the profile to cause an error when the code touches it.
+    this.profile.delete()
 
     val result = this.executeAssumingFailure(task)
     assertEquals(BorrowErrorCodes.accountsDatabaseException, result.lastErrorCode)
@@ -412,7 +408,7 @@ class BorrowTaskTest {
   @Test
   fun testNoAvailableAcquisitions() {
     val request =
-      BorrowRequest.Start(this.accountId, this.profile.id, this.opdsEmptyFeedEntry)
+      BorrowRequest.Start(this.account.id, this.profile.id, this.opdsEmptyFeedEntry)
     val task =
       this.createTask(request)
 
@@ -435,7 +431,7 @@ class BorrowTaskTest {
     assertEquals(0, feedEntry.acquisitions.size)
 
     val request =
-      BorrowRequest.Start(this.accountId, this.profile.id, feedEntry)
+      BorrowRequest.Start(this.account.id, this.profile.id, feedEntry)
     val task =
       this.createTask(request)
 
@@ -468,7 +464,7 @@ class BorrowTaskTest {
     assertEquals(2, feedEntry.acquisitions.size)
 
     val request =
-      BorrowRequest.Start(this.accountId, this.profile.id, feedEntry)
+      BorrowRequest.Start(this.account.id, this.profile.id, feedEntry)
     val task =
       this.createTask(request)
 
@@ -496,7 +492,7 @@ class BorrowTaskTest {
   @Test
   fun testNoSubtasks() {
     val request =
-      BorrowRequest.Start(this.accountId, this.profile.id, this.opdsOpenEPUBFeedEntry)
+      BorrowRequest.Start(this.account.id, this.profile.id, this.opdsOpenEPUBFeedEntry)
     val task =
       this.createTask(request)
 
@@ -521,7 +517,7 @@ class BorrowTaskTest {
     )
 
     val request =
-      BorrowRequest.Start(this.accountId, this.profile.id, this.opdsOpenEPUBFeedEntry)
+      BorrowRequest.Start(this.account.id, this.profile.id, this.opdsOpenEPUBFeedEntry)
     val task =
       this.createTask(request)
 
@@ -585,7 +581,7 @@ class BorrowTaskTest {
     )
 
     val request =
-      BorrowRequest.Start(this.accountId, this.profile.id, loanable)
+      BorrowRequest.Start(this.account.id, this.profile.id, loanable)
     val task =
       this.createTask(request)
 
@@ -670,7 +666,7 @@ class BorrowTaskTest {
     }
 
     val request =
-      BorrowRequest.Start(this.accountId, this.profile.id, loanable)
+      BorrowRequest.Start(this.account.id, this.profile.id, loanable)
     val task =
       this.createTask(request)
 
@@ -690,8 +686,8 @@ class BorrowTaskTest {
       this.bookDatabase.entry(this.bookID)
     val handle =
       entry.findFormatHandle(BookDatabaseEntryFormatHandleEPUB::class.java)!!
-    val drm =
-      handle.drmInformationHandle as BookDRMInformationHandleACS
+    val drm: BookDRMInformationHandle.ACSHandle =
+      handle.drmInformationHandle as BookDRMInformationHandle.ACSHandle
 
     assertEquals("A cold star looked down on his creations", handle.format.file!!.readText())
     assertEquals(adobeLoanID, drm.info.rights!!.second.id)
@@ -758,7 +754,7 @@ class BorrowTaskTest {
     }
 
     val request =
-      BorrowRequest.Start(this.accountId, this.profile.id, loanable)
+      BorrowRequest.Start(this.account.id, this.profile.id, loanable)
     val task =
       this.createTask(request)
 
@@ -772,9 +768,7 @@ class BorrowTaskTest {
     assertEquals(0, this.bookStates.size)
 
     val entry = this.bookDatabase.entry(this.bookID)
-    val handle =
-      entry.findFormatHandle(BookDatabaseEntryFormatHandleAudioBook::class.java)!!
-
+    val handle = entry.findFormatHandle(BookDatabaseEntryFormatHandleAudioBook::class.java)!!
     val manifest = handle.format.manifest!!
     assertEquals(this.webServer.url("/audio-book").toUri(), manifest.manifestURI)
     assertArrayEquals(playerManifest.originalBytes, manifest.manifestFile.readBytes())
@@ -819,8 +813,11 @@ class BorrowTaskTest {
         .setBody("A cold star looked down on his creations")
     )
 
+    val bookDatabase =
+      this.findMockBookDatabase()
+
     val request =
-      BorrowRequest.Start(this.accountId, this.profile.id, loanable)
+      BorrowRequest.Start(this.account.id, this.profile.id, loanable)
     val task =
       this.createTask(request)
 
