@@ -12,10 +12,11 @@ import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle
 import org.nypl.simplified.books.formats.api.StandardFormatNames
 import java.io.File
 import java.net.URI
+import java.nio.file.Files
 
 class MockBookDatabaseEntryFormatHandleAudioBook(
   val bookID: BookID,
-  val directory: File? = null,
+  val directory: File,
 ) : BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook() {
 
   var bookData: String? = null
@@ -41,11 +42,10 @@ class MockBookDatabaseEntryFormatHandleAudioBook(
     get() = this.formatField
 
   override fun copyInManifestAndURI(data: ByteArray, manifestURI: URI?) {
+    val file = File(this.directory,"manifest")
+    Files.write(file.toPath(), data)
     this.formatField = this.formatField.copy(
-      manifest = BookFormat.AudioBookManifestReference(
-        manifestURI,
-        File("whatever")
-      )
+      manifest = BookFormat.AudioBookManifestReference(manifestURI, file)
     )
   }
 

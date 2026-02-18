@@ -64,6 +64,7 @@ import org.nypl.simplified.profiles.api.ProfilesDatabaseType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountCreationStringResourcesType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountDeletionStringResourcesType
 import org.nypl.simplified.tests.MutableServiceDirectory
+import org.nypl.simplified.tests.TestDirectories
 import org.nypl.simplified.tests.books.controller.BooksControllerTest
 import org.nypl.simplified.tests.mocking.FakeAccountCredentialStorage
 import org.nypl.simplified.tests.mocking.MockAccount
@@ -130,7 +131,8 @@ class SyncBookRefreshToken {
   fun testSetup() {
     this.accountID =
       AccountID.generate()
-    this.account = MockAccount(this.accountID)
+    this.account =
+      MockAccount(bookDirectory = TestDirectories.temporaryDirectory(), id = this.accountID)
     this.webServer = MockWebServer()
     this.webServer.start(20000)
 

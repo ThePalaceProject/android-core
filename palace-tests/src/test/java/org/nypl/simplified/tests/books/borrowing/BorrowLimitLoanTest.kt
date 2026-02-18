@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
 import org.librarysimplified.http.api.LSHTTPClientConfiguration
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.vanilla.LSHTTPClients
@@ -39,6 +40,7 @@ import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
 import org.nypl.simplified.opds.core.OPDSAvailabilityLoanable
 import org.nypl.simplified.patron.api.PatronAuthorization
+import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import org.nypl.simplified.tests.TestDirectories
@@ -48,6 +50,7 @@ import org.nypl.simplified.tests.mocking.MockBundledContentResolver
 import org.nypl.simplified.tests.mocking.MockContentResolver
 import org.slf4j.LoggerFactory
 import java.net.URI
+import java.nio.file.Path
 import java.util.concurrent.TimeUnit
 
 class BorrowLimitLoanTest {
@@ -67,11 +70,14 @@ class BorrowLimitLoanTest {
   private lateinit var webServer: MockWebServer
   private var bookRegistrySub: Disposable? = null
   private lateinit var authHandler: BorrowAudiobookAuthorizationHandler
+  private lateinit var profile: ProfileType
 
   private val logger = LoggerFactory.getLogger(BorrowLimitLoanTest::class.java)
 
   @BeforeEach
-  fun testSetup() {
+  fun testSetup(@TempDir bookDirectory: Path) {
+    this.profile =
+      Mockito.mock(ProfileType::class.java)
     this.taskRecorder =
       TaskRecorder.create()
     this.contentResolver =
@@ -136,12 +142,17 @@ class BorrowLimitLoanTest {
         account = this.accountId,
         cover = null,
         thumbnail = null,
-        entry = OPDSAcquisitionFeedEntry.newBuilder("x", "Title", DateTime.now(), OPDSAvailabilityLoanable.get()).build(),
+        entry = OPDSAcquisitionFeedEntry.newBuilder(
+          "x",
+          "Title",
+          DateTime.now(),
+          OPDSAvailabilityLoanable.get()
+        ).build(),
         formats = listOf()
       )
 
     this.bookDatabaseEntry =
-      MockBookDatabaseEntry(bookInitial)
+      MockBookDatabaseEntry(booksDirectory = bookDirectory.toFile(), bookInitial)
 
     this.context =
       MockBorrowContext(
@@ -158,7 +169,8 @@ class BorrowLimitLoanTest {
         isCancelled = false,
         bookDatabaseEntry = this.bookDatabaseEntry,
         bookInitial = bookInitial,
-        contentResolver = this.contentResolver
+        contentResolver = this.contentResolver,
+        profile = this.profile
       )
 
     this.context.currentAcquisitionPathElement =

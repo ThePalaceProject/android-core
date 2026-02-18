@@ -12,6 +12,7 @@ import org.nypl.simplified.profiles.api.ProfilePreferences
 import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.reader.api.ReaderPreferences
+import org.nypl.simplified.tests.TestDirectories
 import java.io.File
 import java.net.URI
 import java.util.SortedMap
@@ -23,10 +24,14 @@ class MockProfile(
 ) : ProfileType {
 
   override fun setDescription(newDescription: ProfileDescription) {
+    check(!this.deleted) { "Profile must not be deleted" }
+
     TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
   }
 
   override fun description(): ProfileDescription {
+    check(!this.deleted) { "Profile must not be deleted" }
+
     return ProfileDescription(
       displayName = "Profile ${id.uuid}",
       preferences = ProfilePreferences(
@@ -44,12 +49,15 @@ class MockProfile(
   }
 
   override fun delete() {
+    this.deleted = true
   }
+
+  private var deleted: Boolean
 
   val accountList: MutableList<MockAccount> =
     IntRange(1, accountCount)
       .toList()
-      .map { MockAccount(AccountID(UUID.randomUUID())) }
+      .map { MockAccount(TestDirectories.temporaryDirectory(), AccountID(UUID.randomUUID())) }
       .toMutableList()
 
   val accounts: SortedMap<AccountID, MockAccount> =
@@ -58,14 +66,17 @@ class MockProfile(
       .toSortedMap()
 
   override fun accountsDatabase(): AccountsDatabaseType {
+    check(!this.deleted) { "Profile must not be deleted" }
     TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
   }
 
   override fun createAccount(accountProvider: AccountProviderType): AccountType {
+    check(!this.deleted) { "Profile must not be deleted" }
     TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
   }
 
   override fun deleteAccountByProvider(accountProvider: URI): AccountID {
+    check(!this.deleted) { "Profile must not be deleted" }
     TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
   }
 
@@ -82,14 +93,17 @@ class MockProfile(
     get() = "Profile ${id.uuid}"
 
   override fun accounts(): SortedMap<AccountID, AccountType> {
+    check(!this.deleted) { "Profile must not be deleted" }
     return this.accounts as SortedMap<AccountID, AccountType>
   }
 
   override fun accountsByProvider(): SortedMap<URI, AccountType> {
+    check(!this.deleted) { "Profile must not be deleted" }
     TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
   }
 
   override fun account(accountId: AccountID): AccountType {
+    check(!this.deleted) { "Profile must not be deleted" }
     return this.accounts[accountId]
       ?: throw AccountsDatabaseNonexistentException("No such account!")
   }

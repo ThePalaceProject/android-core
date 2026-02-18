@@ -8,6 +8,7 @@ import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.book_database.api.BookDatabaseType
+import org.nypl.simplified.tests.TestDirectories
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URI
@@ -15,7 +16,10 @@ import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.UUID
 
-class MockAccount(override val id: AccountID) : AccountType {
+class MockAccount(
+  val bookDirectory: File,
+  override val id: AccountID
+) : AccountType {
 
   private val logger =
     LoggerFactory.getLogger(MockAccount::class.java)
@@ -34,7 +38,7 @@ class MockAccount(override val id: AccountID) : AccountType {
 
   @Volatile
   var bookDatabaseProperty: BookDatabaseType =
-    MockBookDatabase(owner = this.id)
+    MockBookDatabase(owner = this.id, booksDirectory = TestDirectories.temporaryDirectory())
 
   override val bookDatabase: BookDatabaseType
     get() = this.bookDatabaseProperty

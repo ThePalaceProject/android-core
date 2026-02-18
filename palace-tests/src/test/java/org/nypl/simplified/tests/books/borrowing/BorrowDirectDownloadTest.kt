@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
 import org.librarysimplified.http.api.LSHTTPClientConfiguration
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.vanilla.LSHTTPClients
@@ -47,7 +48,7 @@ import org.nypl.simplified.books.formats.api.StandardFormatNames.genericPDFFiles
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
 import org.nypl.simplified.patron.api.PatronAuthorization
-import org.nypl.simplified.profiles.api.ProfileReadableType
+import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import org.nypl.simplified.tests.TestDirectories
@@ -61,6 +62,7 @@ import org.nypl.simplified.tests.mocking.MockBundledContentResolver
 import org.nypl.simplified.tests.mocking.MockContentResolver
 import org.slf4j.LoggerFactory
 import java.net.URI
+import java.nio.file.Path
 import java.util.concurrent.TimeUnit
 
 class BorrowDirectDownloadTest {
@@ -81,7 +83,7 @@ class BorrowDirectDownloadTest {
   private lateinit var epubHandle: MockBookDatabaseEntryFormatHandleEPUB
   private lateinit var httpClient: LSHTTPClientType
   private lateinit var pdfHandle: MockBookDatabaseEntryFormatHandlePDF
-  private lateinit var profile: ProfileReadableType
+  private lateinit var profile: ProfileType
   private lateinit var taskRecorder: TaskRecorderType
   private lateinit var webServer: MockWebServer
   private var bookRegistrySub: Disposable? = null
@@ -95,10 +97,12 @@ class BorrowDirectDownloadTest {
   }
 
   @BeforeEach
-  fun testSetup() {
+  fun testSetup(@TempDir bookDirectory: Path) {
     this.webServer = MockWebServer()
     this.webServer.start(20000)
 
+    this.profile =
+      Mockito.mock(ProfileType::class.java)
     this.taskRecorder =
       TaskRecorder.create()
     this.contentResolver =
@@ -175,9 +179,9 @@ class BorrowDirectDownloadTest {
       )
 
     this.bookDatabase =
-      MockBookDatabase(this.accountId)
+      MockBookDatabase(this.accountId, bookDirectory.toFile())
     this.bookDatabaseEntry =
-      MockBookDatabaseEntry(bookInitial)
+      MockBookDatabaseEntry(bookDirectory.toFile(), bookInitial)
     this.pdfHandle =
       MockBookDatabaseEntryFormatHandlePDF(this.bookID)
     this.epubHandle =
@@ -198,7 +202,8 @@ class BorrowDirectDownloadTest {
         isCancelled = false,
         bookDatabaseEntry = this.bookDatabaseEntry,
         bookInitial = bookInitial,
-        contentResolver = this.contentResolver
+        contentResolver = this.contentResolver,
+        profile = this.profile
       )
   }
 
@@ -343,19 +348,23 @@ class BorrowDirectDownloadTest {
       MockResponse()
         .setResponseCode(401)
         .setHeader("Content-Type", "application/api-problem+json")
-        .setBody("""
+        .setBody(
+          """
 {
   "status": 401,
   "type": "http://palaceproject.io/terms/problem/auth/recoverable/token/expired",
   "title": "Expired!",
   "detail": "Expiration in detail"
 }
-        """.trimIndent())
+        """.trimIndent()
+        )
     )
 
-    Assertions.assertThrows(BorrowSubtaskException.BorrowRecoverableAuthenticationError::class.java, {
-      task.execute(this.context)
-    })
+    Assertions.assertThrows(
+      BorrowSubtaskException.BorrowRecoverableAuthenticationError::class.java,
+      {
+        task.execute(this.context)
+      })
 
     assertEquals(httpRequestFailed, this.taskRecorder.finishFailure<Unit>().lastErrorCode)
     assertEquals(0, this.bookDatabaseEntry.entryWrites)

@@ -28,6 +28,7 @@ dependencies {
     implementation(project(":palace-opds-auth-document-api"))
     implementation(project(":palace-opds-core"))
     implementation(project(":palace-parser-api"))
+    implementation(project(":palace-patron"))
     implementation(project(":palace-patron-api"))
     implementation(project(":palace-presentableerror-api"))
     implementation(project(":palace-profiles-api"))

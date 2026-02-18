@@ -7,10 +7,12 @@ import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
 import org.nypl.simplified.books.book_database.api.BookDatabaseType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.slf4j.LoggerFactory
+import java.io.File
 import java.util.SortedSet
 
 class MockBookDatabase(
-  val owner: AccountID
+  val owner: AccountID,
+  val booksDirectory: File,
 ) : BookDatabaseType {
 
   private val logger =
@@ -20,10 +22,12 @@ class MockBookDatabase(
   val entries = mutableMapOf<BookID, MockBookDatabaseEntry>()
 
   override fun owner(): AccountID {
+    check(!this.deleted) { "Database must not be deleted." }
     return this.owner
   }
 
   override fun books(): SortedSet<BookID> {
+    check(!this.deleted) { "Database must not be deleted." }
     return this.entries.keys.toSortedSet()
   }
 
@@ -34,8 +38,9 @@ class MockBookDatabase(
   override fun createOrUpdate(
     id: BookID,
     entry: OPDSAcquisitionFeedEntry
-  ): BookDatabaseEntryType {
+  ): MockBookDatabaseEntry {
     this.logger.debug("createOrUpdate: [{}]", id)
+    check(!this.deleted) { "Database must not be deleted." }
 
     val existing = this.entries[id]
     if (existing != null) {
@@ -48,13 +53,14 @@ class MockBookDatabase(
 
     val newEntry =
       MockBookDatabaseEntry(
-        Book(
-          id = id,
+        booksDirectory = this.booksDirectory,
+        bookInitial = Book(
           account = this.owner,
           cover = null,
-          thumbnail = null,
           entry = entry,
-          formats = listOf()
+          formats = listOf(),
+          id = id,
+          thumbnail = null,
         )
       )
 
@@ -65,7 +71,8 @@ class MockBookDatabase(
 
   override fun entry(
     id: BookID
-  ): BookDatabaseEntryType {
+  ): MockBookDatabaseEntry {
+    check(!this.deleted) { "Database must not be deleted." }
     return this.entries[id] ?: throw IllegalStateException("No such database entry")
   }
 }

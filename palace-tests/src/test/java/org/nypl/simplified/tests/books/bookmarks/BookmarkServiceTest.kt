@@ -49,11 +49,15 @@ import org.nypl.simplified.tests.mocking.MockContext
 import org.nypl.simplified.tests.mocking.MockProfilesController
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.io.File
 import java.net.InetAddress
 import java.net.URI
+import java.nio.file.Files
 import java.util.concurrent.TimeUnit
 
 class BookmarkServiceTest {
+
+  private lateinit var booksDirectory: File
 
   val logger: Logger =
     LoggerFactory.getLogger(BookmarkServiceTest::class.java)
@@ -144,6 +148,7 @@ class BookmarkServiceTest {
 
   @BeforeEach
   fun setup() {
+    this.booksDirectory = Files.createTempDirectory("books-").toFile()
     this.profiles = MockProfilesController(1, 1)
 
     /*
@@ -500,7 +505,8 @@ class BookmarkServiceTest {
 
     val bookEntry =
       MockBookDatabaseEntry(
-        Book(
+        booksDirectory = this.booksDirectory,
+        bookInitial = Book(
           id = bookID,
           account = account.id,
           cover = null,
@@ -513,7 +519,7 @@ class BookmarkServiceTest {
     val formatHandle = MockBookDatabaseEntryFormatHandleEPUB(bookID)
     formatHandle.formatField = format
 
-    val books = MockBookDatabase(account.id)
+    val books = MockBookDatabase(account.id, this.booksDirectory)
     books.entries[bookID] = bookEntry
 
     account.bookDatabaseProperty = books

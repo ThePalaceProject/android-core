@@ -1,4 +1,4 @@
-package org.nypl.simplified.books.controller
+package org.nypl.simplified.patron
 
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPResponseStatus
@@ -19,7 +19,7 @@ import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URI
 
-internal object PatronUserProfiles {
+object PatronUserProfiles {
 
   private val logger = LoggerFactory.getLogger(PatronUserProfiles::class.java)
 

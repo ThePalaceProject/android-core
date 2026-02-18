@@ -57,6 +57,7 @@ import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
 import org.nypl.simplified.opds.core.OPDSFeedParser
 import org.nypl.simplified.opds.core.OPDSFeedParserType
 import org.nypl.simplified.patron.api.PatronAuthorization
+import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import org.nypl.simplified.tests.MutableServiceDirectory
@@ -93,6 +94,7 @@ class BorrowBookRefreshTokenTest {
   @JvmField
   var tempDir: File? = null
 
+  private lateinit var profile: ProfileType
   private lateinit var account: MockAccount
   private lateinit var accountID: AccountID
   private lateinit var androidContentResolver: ContentResolver
@@ -116,9 +118,12 @@ class BorrowBookRefreshTokenTest {
 
   @BeforeEach
   fun testSetup(@TempDir downloadDirectory: File) {
+    this.profile =
+      Mockito.mock(ProfileType::class.java)
     this.accountID =
       AccountID.generate()
-    this.account = MockAccount(this.accountID)
+    this.account =
+      MockAccount(bookDirectory = TestDirectories.temporaryDirectory(), id = this.accountID)
 
     val credentials = AccountAuthenticationCredentials.BasicToken(
       userName = AccountUsername("1234"),
@@ -213,9 +218,9 @@ class BorrowBookRefreshTokenTest {
       )
 
     this.bookDatabase =
-      MockBookDatabase(this.accountID)
+      MockBookDatabase(booksDirectory = TestDirectories.temporaryDirectory(), owner = this.accountID)
     this.bookDatabaseEntry =
-      MockBookDatabaseEntry(bookInitial)
+      MockBookDatabaseEntry(booksDirectory = TestDirectories.temporaryDirectory(), bookInitial)
 
     this.context =
       MockBorrowContext(
@@ -233,6 +238,7 @@ class BorrowBookRefreshTokenTest {
         logger = this.logger,
         taskRecorder = this.taskRecorder,
         temporaryDirectory = TestDirectories.temporaryDirectory(),
+        profile = this.profile
       )
 
     this.context.services = this.services
@@ -408,7 +414,7 @@ class BorrowBookRefreshTokenTest {
       formats = listOf()
     )
 
-    val databaseEntry = MockBookDatabaseEntry(book).apply {
+    val databaseEntry = MockBookDatabaseEntry(booksDirectory = TestDirectories.temporaryDirectory(), book).apply {
       this.formatHandlesField.clear()
       this.formatHandlesField.add(
         MockBookDatabaseEntryFormatHandleEPUB(

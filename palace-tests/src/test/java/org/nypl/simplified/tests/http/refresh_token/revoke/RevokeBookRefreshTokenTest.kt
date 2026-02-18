@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Timeout
+import org.junit.jupiter.api.io.TempDir
 import org.librarysimplified.http.api.LSHTTPClientConfiguration
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPRequestConstants
@@ -53,6 +54,7 @@ import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
 import org.nypl.simplified.taskrecorder.api.TaskResult
+import org.nypl.simplified.tests.TestDirectories
 import org.nypl.simplified.tests.books.controller.TaskDumps
 import org.nypl.simplified.tests.mocking.MockAccount
 import org.nypl.simplified.tests.mocking.MockBookDatabaseEntry
@@ -61,6 +63,7 @@ import org.nypl.simplified.tests.mocking.MockRevokeStringResources
 import org.slf4j.LoggerFactory
 import java.io.FileNotFoundException
 import java.net.URI
+import java.nio.file.Path
 import java.util.UUID
 import java.util.concurrent.ConcurrentSkipListMap
 import java.util.concurrent.Executors
@@ -86,7 +89,8 @@ class RevokeBookRefreshTokenTest {
   fun testSetup() {
     this.accountID =
       AccountID.generate()
-    this.account = MockAccount(this.accountID)
+    this.account =
+      MockAccount(bookDirectory = TestDirectories.temporaryDirectory(), id = this.accountID)
 
     val credentials = AccountAuthenticationCredentials.BasicToken(
       userName = AccountUsername("1234"),
@@ -151,7 +155,7 @@ class RevokeBookRefreshTokenTest {
 
   @Test
   @Timeout(value = 5L, unit = TimeUnit.SECONDS)
-  fun testRevokeBookUpdateToken() {
+  fun testRevokeBookUpdateToken(@TempDir bookDirectory: Path) {
     val profile =
       Mockito.mock(ProfileType::class.java)
     val profilesDatabase =
@@ -203,7 +207,7 @@ class RevokeBookRefreshTokenTest {
       .thenReturn(account)
 
     val bookDatabaseEntry =
-      MockBookDatabaseEntry(book)
+      MockBookDatabaseEntry(booksDirectory = bookDirectory.toFile(), book)
     Mockito.`when`(bookDatabase.entry(bookId))
       .thenReturn(bookDatabaseEntry)
 

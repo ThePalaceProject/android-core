@@ -61,6 +61,7 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URI
 import java.nio.file.Files
+import java.nio.file.Path
 import java.util.concurrent.TimeUnit
 
 class BorrowBoundlessEpubTest {
@@ -167,6 +168,7 @@ class BorrowBoundlessEpubTest {
   private fun createContext(
     feedEntry: OPDSAcquisitionFeedEntry,
     acquisitionPath: OPDSAcquisitionPath,
+    @TempDir bookDirectory: Path,
     downloadedFile: File? = null
   ): MockBorrowContext {
     val book = Book(
@@ -179,7 +181,7 @@ class BorrowBoundlessEpubTest {
     )
 
     val tempDirPath = this.tempDir!!.toPath()
-    val bookDatabaseEntry = MockBookDatabaseEntry(book)
+    val bookDatabaseEntry = MockBookDatabaseEntry(booksDirectory = bookDirectory.toFile(), book)
 
     bookDatabaseEntry.formatHandlesField.clear()
 
@@ -234,6 +236,7 @@ class BorrowBoundlessEpubTest {
       bookDatabaseEntry = bookDatabaseEntry,
       bookInitial = book,
       contentResolver = this.contentResolver,
+      profile = this.profile
     )
 
     context.opdsAcquisitionPath = acquisitionPath
@@ -248,7 +251,7 @@ class BorrowBoundlessEpubTest {
   }
 
   @Test
-  fun epubDownload_succeeds() {
+  fun epubDownload_succeeds(@TempDir bookDirectory: Path) {
     val feedEntry = BorrowTestFeeds.opdsBoundlessFeedEntryOfType(
       webServer = this.webServer,
       mime = "application/epub+zip",
@@ -281,7 +284,7 @@ class BorrowBoundlessEpubTest {
     epubFile.writeText("EPUB!")
     licenseFile.writeText("License!")
 
-    val context = this.createContext(feedEntry, acquisitionPath)
+    val context = this.createContext(feedEntry, acquisitionPath, bookDirectory)
     context.boundlessService!!.fulfillProperty =
       DRMTaskResult.DRMTaskSuccess(
         mapOf(), listOf(), BoundlessFulfilledCMEPUB(
@@ -309,7 +312,7 @@ class BorrowBoundlessEpubTest {
   }
 
   @Test
-  fun download_fails_whenLoansFeedCanNotBeRetrieved() {
+  fun download_fails_whenLoansFeedCanNotBeRetrieved(@TempDir bookDirectory: Path) {
     val feedEntry = BorrowTestFeeds.opdsBoundlessFeedEntryOfType(
       webServer = this.webServer,
       mime = "application/epub+zip",
@@ -341,7 +344,7 @@ class BorrowBoundlessEpubTest {
 
     this.webServer.enqueue(loansFeedResponse)
 
-    val context = this.createContext(feedEntry, acquisitionPath)
+    val context = this.createContext(feedEntry, acquisitionPath, bookDirectory)
 
     /*
      * Set up the boundless DRM service. The download fails.
@@ -360,7 +363,7 @@ class BorrowBoundlessEpubTest {
   }
 
   @Test
-  fun download_fails_whenDRMUnsupported() {
+  fun download_fails_whenDRMUnsupported(@TempDir bookDirectory: Path) {
     val feedEntry = BorrowTestFeeds.opdsBoundlessFeedEntryOfType(
       webServer = this.webServer,
       mime = "application/epub+zip",
@@ -392,7 +395,7 @@ class BorrowBoundlessEpubTest {
 
     this.webServer.enqueue(loansFeedResponse)
 
-    val context = this.createContext(feedEntry, acquisitionPath)
+    val context = this.createContext(feedEntry, acquisitionPath, bookDirectory)
     context.boundlessService = null
 
     // Execute the task. It is expected to fail.

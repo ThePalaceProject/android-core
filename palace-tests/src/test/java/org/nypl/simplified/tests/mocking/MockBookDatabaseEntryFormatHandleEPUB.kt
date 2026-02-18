@@ -1,6 +1,7 @@
 package org.nypl.simplified.tests.mocking
 
 import android.app.Application
+import org.nypl.drm.core.AdobeAdeptLoan
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookDRMKind
 import org.nypl.simplified.books.api.BookFormat
@@ -10,6 +11,7 @@ import org.nypl.simplified.books.api.bookmark.SerializedBookmark
 import org.nypl.simplified.books.book_database.api.BookDRMInformationHandle
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleEPUB
 import org.nypl.simplified.books.formats.api.StandardFormatNames
+import org.nypl.simplified.tests.TestDirectories
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
@@ -32,10 +34,7 @@ class MockBookDatabaseEntryFormatHandleEPUB(
     )
 
   var drmInformationHandleField: BookDRMInformationHandle =
-    object : BookDRMInformationHandle.NoneHandle() {
-      override val info: BookDRMInformation.None =
-        BookDRMInformation.None
-    }
+    MockDRMInformationNoneHandle()
 
   override val format: BookFormat.BookFormatEPUB
     get() = this.formatField
@@ -69,9 +68,30 @@ class MockBookDatabaseEntryFormatHandleEPUB(
   }
 
   override val drmInformationHandle: BookDRMInformationHandle
-    get() = this.drmInformationHandleField
+    get() {
+      return this.drmInformationHandleField
+    }
 
   override fun setDRMKind(kind: BookDRMKind) {
+    when (kind) {
+      BookDRMKind.NONE -> {
+        this.drmInformationHandleField =
+          MockDRMInformationNoneHandle()
+      }
+
+      BookDRMKind.LCP -> {
+
+      }
+
+      BookDRMKind.ACS -> {
+        this.drmInformationHandleField =
+          MockDRMInformationACSHandle()
+      }
+
+      BookDRMKind.BOUNDLESS -> {
+
+      }
+    }
   }
 
   override fun deleteBookData(context: Application) {

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
 import org.librarysimplified.http.api.LSHTTPClientConfiguration
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPRequestConstants
@@ -38,6 +39,7 @@ import org.nypl.simplified.books.borrowing.internal.BorrowAudiobookAuthorization
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.nypl.simplified.patron.api.PatronAuthorization
+import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import org.nypl.simplified.tests.MutableServiceDirectory
@@ -51,10 +53,12 @@ import org.nypl.simplified.tests.mocking.MockBundledContentResolver
 import org.nypl.simplified.tests.mocking.MockContentResolver
 import org.slf4j.LoggerFactory
 import java.net.URI
+import java.nio.file.Path
 import java.util.concurrent.TimeUnit
 
 class BookmarkRefreshTokenTest {
 
+  private lateinit var profile: ProfileType
   private lateinit var authHandler: BorrowAudiobookAuthorizationHandler
   private lateinit var account: MockAccount
   private lateinit var accountID: AccountID
@@ -77,10 +81,13 @@ class BookmarkRefreshTokenTest {
   private val logger = LoggerFactory.getLogger(BookmarkRefreshTokenTest::class.java)
 
   @BeforeEach
-  fun testSetup() {
+  fun testSetup(@TempDir bookDirectory: Path) {
+    this.profile =
+      Mockito.mock(ProfileType::class.java)
     this.accountID =
       AccountID.generate()
-    this.account = MockAccount(this.accountID)
+    this.account =
+      MockAccount(bookDirectory = TestDirectories.temporaryDirectory(), id = this.accountID)
 
     this.authHandler =
       BorrowAudiobookAuthorizationHandler(this.account)
@@ -156,9 +163,9 @@ class BookmarkRefreshTokenTest {
       )
 
     this.bookDatabase =
-      MockBookDatabase(this.accountID)
+      MockBookDatabase(this.accountID, booksDirectory = bookDirectory.toFile())
     this.bookDatabaseEntry =
-      MockBookDatabaseEntry(bookInitial)
+      MockBookDatabaseEntry(booksDirectory = bookDirectory.toFile(), bookInitial)
 
     this.context =
       MockBorrowContext(
@@ -175,7 +182,8 @@ class BookmarkRefreshTokenTest {
         isCancelled = false,
         bookDatabaseEntry = this.bookDatabaseEntry,
         bookInitial = bookInitial,
-        contentResolver = this.contentResolver
+        contentResolver = this.contentResolver,
+        profile = this.profile
       )
 
     this.context.services = this.services
