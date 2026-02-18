@@ -1012,7 +1012,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-02-16T09:49:57+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.25.0">
+    <c:release date="2026-02-18T00:00:00+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.25.0">
       <c:changes>
         <c:change date="2026-02-03T00:00:00+00:00" summary="Attempt to allow notifications on Android 10.">
           <c:tickets>
@@ -1064,10 +1064,19 @@
             <c:ticket id="PP-3652"/>
           </c:tickets>
         </c:change>
-        <c:change date="2026-02-16T09:49:57+00:00" summary="Huge refactoring of audiobooks credentials.">
+        <c:change date="2026-02-16T00:00:00+00:00" summary="Huge refactoring of audiobooks credentials.">
           <c:tickets>
             <c:ticket id="PP-3676"/>
             <c:ticket id="PP-3641"/>
+          </c:tickets>
+        </c:change>
+      </c:changes>
+    </c:release>
+    <c:release date="2026-02-18T16:20:44+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.26.0">
+      <c:changes>
+        <c:change date="2026-02-18T16:20:44+00:00" summary="Only activate Adobe devices on first fulfillment.">
+          <c:tickets>
+            <c:ticket id="PP-3648"/>
           </c:tickets>
         </c:change>
       </c:changes>
