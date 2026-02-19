@@ -1,8 +1,9 @@
 package org.librarysimplified.viewer.audiobook
 
 import org.librarysimplified.audiobook.api.PlayerAuthorizationHandlerType
-import org.librarysimplified.audiobook.api.PlayerDownloadRequest
+import org.librarysimplified.audiobook.api.PlayerDownloadRequest.Kind
 import org.librarysimplified.audiobook.api.PlayerDownloadRequest.Kind.CHAPTER
+import org.librarysimplified.audiobook.api.PlayerDownloadRequest.Kind.WHOLE_BOOK
 import org.librarysimplified.audiobook.manifest.api.PlayerManifestLink
 import org.librarysimplified.audiobook.manifest_fulfill.opa.OPAPassword
 import org.librarysimplified.audiobook.manifest_fulfill.opa.OPAUsernamePassword
@@ -45,14 +46,14 @@ class AudioBookAuthorizationHandler(
 
   override fun onAuthorizationIsNoLongerInvalid(
     source: PlayerManifestLink,
-    kind: PlayerDownloadRequest.Kind
+    kind: Kind
   ) {
     this.logger.debug("onAuthorizationIsNoLongerInvalid: {} {}", source.hrefURI, kind)
   }
 
   override fun onAuthorizationIsInvalid(
     source: PlayerManifestLink,
-    kind: PlayerDownloadRequest.Kind
+    kind: Kind
   ) {
     this.logger.debug("onAuthorizationIsInvalid: {} {}", source.hrefURI, kind)
     this.account.expireCredentialsIfApplicable()
@@ -61,7 +62,7 @@ class AudioBookAuthorizationHandler(
 
   override fun onConfigureAuthorizationFor(
     source: PlayerManifestLink,
-    kind: PlayerDownloadRequest.Kind
+    kind: Kind
   ): LSHTTPAuthorizationType? {
     this.logger.debug("onConfigureAuthorizationFor: {} {}", source.hrefURI, kind)
 
@@ -77,6 +78,15 @@ class AudioBookAuthorizationHandler(
         val token = this.simplifiedBearerToken?.accessToken
         return token?.let { t -> LSHTTPAuthorizationBearerToken.ofToken(t) }
       }
+    }
+
+    /*
+     * At the time of writing, all WHOLE_BOOK requests are made to external servers that
+     * do not require authorization.
+     */
+
+    if (kind == WHOLE_BOOK) {
+      return null
     }
 
     /*
@@ -171,7 +181,7 @@ class AudioBookAuthorizationHandler(
 
   override fun <T : Any> onRequireCustomCredentialsFor(
     providerName: String,
-    kind: PlayerDownloadRequest.Kind,
+    kind: Kind,
     credentialsType: Class<T>
   ): T {
     this.logger.debug(
