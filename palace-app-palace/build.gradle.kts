@@ -493,9 +493,7 @@ dependencies {
     implementation(libs.androidx.viewpager2)
     implementation(libs.androidx.webkit)
 
-    implementation(libs.azam.ulidj)
-    implementation(libs.commons.compress)
-    implementation(libs.commons.io)
+    // Firebase
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.annotations)
     implementation(libs.firebase.common)
@@ -512,6 +510,10 @@ dependencies {
     implementation(libs.firebase.measurement.connector)
     implementation(libs.firebase.messaging)
     implementation(libs.firebase.sessions)
+
+    implementation(libs.azam.ulidj)
+    implementation(libs.commons.compress)
+    implementation(libs.commons.io)
     implementation(libs.google.exoplayer)
     implementation(libs.google.failureaccess)
     implementation(libs.google.gson)
