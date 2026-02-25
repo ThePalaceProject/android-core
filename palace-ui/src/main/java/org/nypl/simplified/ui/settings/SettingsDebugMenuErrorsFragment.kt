@@ -90,7 +90,7 @@ class SettingsDebugMenuErrorsFragment : Fragment(R.layout.debug_errors),
       ).show()
     }
     this.crash.setOnClickListener {
-      throw OutOfMemoryError("Pretending to have run out of memory!")
+      throw DebugCrashedDeliberately()
     }
 
     this.makeNextBookFail =
