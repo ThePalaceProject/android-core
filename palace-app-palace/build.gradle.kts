@@ -118,10 +118,24 @@ val requiredSigningTask = task("CheckReleaseSigningInformation") {
 val versionNameText =
     project.findProperty("VERSION_NAME") as String
 
+val versionCodeCalculated =
+    calculateVersionCode()
+
+/*
+ * Write out a version.properties file for CI.
+ */
+
+afterEvaluate {
+    val file = File(projectDir, "version.properties")
+    val props = Properties()
+    props.setProperty("versionCode", versionCodeCalculated.toString())
+    file.outputStream().use { stream -> props.store(stream, "") }
+}
+
 android {
     defaultConfig {
         versionName = versionNameText
-        versionCode = calculateVersionCode()
+        versionCode = versionCodeCalculated
         resourceConfigurations.add("en")
         resourceConfigurations.add("de")
         resourceConfigurations.add("es")
