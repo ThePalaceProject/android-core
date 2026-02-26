@@ -202,7 +202,7 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
     this.loginTitle =
       view.findViewById(R.id.accountTitleAnnounce)
     this.loginTitleText =
-      view.findViewById<TextView>(R.id.accountTitleAnnounceText)
+      view.findViewById(R.id.accountTitleAnnounceText)
     this.loginProgress =
       view.findViewById(R.id.accountLoginProgress)
     this.loginProgressBar =
@@ -738,8 +738,10 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
             this.tryLogin()
           },
           logoutStatus = AsLogoutButtonEnabled {
-            this.formLock(FormLockState.LOGGING_OUT)
-            AccountDetailModel.tryLogout()
+            this.tryLogoutAfterConfirmation {
+              this.formLock(FormLockState.LOGGING_OUT)
+              AccountDetailModel.tryLogout()
+            }
           }
         )
 
@@ -748,6 +750,7 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
 
       is AccountNotLoggedIn -> {
         this.loginProgress.visibility = View.GONE
+        this.authenticationViews.blank()
 
         this.setLoginLogoutButtonStatus(
           loginStatus = AsLoginButtonEnabled {
@@ -863,8 +866,10 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
         this.setLoginLogoutButtonStatus(
           loginStatus = AccountLoginButtonStatus.AsButtonGone,
           logoutStatus = AsLogoutButtonEnabled {
-            this.formLock(FormLockState.LOGGING_OUT)
-            AccountDetailModel.tryLogout()
+            this.tryLogoutAfterConfirmation {
+              this.formLock(FormLockState.LOGGING_OUT)
+              AccountDetailModel.tryLogout()
+            }
           }
         )
         this.authenticationAlternativesHide()
@@ -935,8 +940,10 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
         this.setLoginLogoutButtonStatus(
           loginStatus = AccountLoginButtonStatus.AsButtonGone,
           logoutStatus = AsLogoutButtonEnabled {
-            this.formLock(FormLockState.LOGGING_OUT)
-            AccountDetailModel.tryLogout()
+            this.tryLogoutAfterConfirmation {
+              this.formLock(FormLockState.LOGGING_OUT)
+              AccountDetailModel.tryLogout()
+            }
           }
         )
 
@@ -946,6 +953,30 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
         }
       }
     }
+  }
+
+  private fun tryLogoutAfterConfirmation(
+    onAccept: () -> Unit
+  ) {
+    val context =
+      this.requireContext()
+
+    val dialog =
+      MaterialAlertDialogBuilder(context)
+        .setTitle(R.string.accountLogout)
+        .setMessage(
+          context.getString(R.string.logoutConfirm)
+        )
+        .setNegativeButton(R.string.accountCancel) { dialog, _ ->
+          dialog.dismiss()
+        }
+        .setPositiveButton(R.string.accountLogout) { dialog, _ ->
+          onAccept.invoke()
+          dialog.dismiss()
+        }
+        .create()
+
+    dialog.show()
   }
 
   private fun disableSyncSwitchForLoginState(
@@ -1031,15 +1062,19 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
           AsButtonGone -> {
             // Nothing
           }
+
           AccountLogoutButtonStatus.AsCancelButtonDisabled -> {
             // Nothing
           }
+
           is AccountLogoutButtonStatus.AsCancelButtonEnabled -> {
             // Nothing
           }
+
           AsLogoutButtonDisabled -> {
             this.signUpLabel.setText(R.string.accountCardCreatorLabel)
           }
+
           is AsLogoutButtonEnabled -> {
             this.signUpLabel.setText(R.string.accountWantChildCard)
             val enableSignup = this.shouldSignUpBeEnabled()
