@@ -66,12 +66,12 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
-            android:gravity="center"
             android:ellipsize="end"
+            android:gravity="center"
             android:maxLines="1"
             android:singleLine="true"
-            android:textSize="18sp"
             android:text="@string/accountCreation"
+            android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/accountRegistryToolbarSearchIconTouch"
             app:layout_constraintStart_toEndOf="@id/accountRegistryToolbarBackIconTouch"
@@ -91,9 +91,9 @@
                 android:id="@+id/accountRegistryToolbarSearchIcon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:layout_gravity="center"
                 android:clickable="false"
                 android:focusable="false"
-                android:layout_gravity="center"
                 android:src="@drawable/magnifying_glass" />
         </FrameLayout>
 
@@ -126,6 +126,11 @@
                 android:id="@+id/accountRegistryList"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:fadeScrollbars="@bool/scrollbarShouldFade"
+                android:scrollbarAlwaysDrawVerticalTrack="true"
+                android:scrollbarSize="@dimen/scrollbarSize"
+                android:scrollbarThumbVertical="@drawable/scrollbar_hard"
+                android:scrollbars="vertical"
                 tools:listitem="@layout/account_list_item" />
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

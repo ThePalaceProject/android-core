@@ -26,4 +26,6 @@
 
   <dimen name="accountLoginLogoutButtonMaximumWidth">224dp</dimen>
   <dimen name="accountLoginLogoutButtonHeight">64dp</dimen>
+
+  <dimen name="scrollbarSize">12dp</dimen>
 </resources>

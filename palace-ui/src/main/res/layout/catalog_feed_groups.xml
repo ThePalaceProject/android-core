@@ -45,14 +45,14 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                app:layout_constraintTop_toTopOf="parent"
+                android:orientation="horizontal"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintTop_toTopOf="parent">
 
                 <ImageView
                     android:id="@+id/catalogGroupsToolbarTextLibraryIcon"
@@ -72,12 +72,12 @@
                     android:layout_marginStart="16dp"
                     android:autoSizeMinTextSize="14sp"
                     android:autoSizeTextType="uniform"
+                    android:breakStrategy="simple"
                     android:ellipsize="end"
                     android:gravity="center_vertical"
+                    android:maxLines="2"
                     android:scrollHorizontally="false"
                     android:singleLine="false"
-                    android:breakStrategy="simple"
-                    android:maxLines="2"
                     android:textSize="18sp"
                     tools:text="@string/catalogPlaceholder" />
             </LinearLayout>
@@ -167,7 +167,12 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/catalogGroupsEntries"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:fadeScrollbars="@bool/scrollbarShouldFade"
+            android:scrollbarAlwaysDrawVerticalTrack="true"
+            android:scrollbarSize="@dimen/scrollbarSize"
+            android:scrollbarThumbVertical="@drawable/scrollbar_hard"
+            android:scrollbars="vertical" />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

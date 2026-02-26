@@ -41,13 +41,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipChildren="false"
-                android:clipToPadding="false" />
+                android:clipToPadding="false"
+                android:scrollbarAlwaysDrawVerticalTrack="true"
+                android:scrollbarSize="@dimen/scrollbarSize"
+                android:scrollbarThumbVertical="@drawable/scrollbar_hard"
+                android:scrollbars="vertical" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/feedWithoutGroupsList"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
+                android:layout_height="match_parent"
+                android:fadeScrollbars="@bool/scrollbarShouldFade"
+                android:scrollbarAlwaysDrawVerticalTrack="true"
+                android:scrollbarSize="@dimen/scrollbarSize"
+                android:scrollbarThumbVertical="@drawable/scrollbar_hard"
+                android:scrollbars="vertical" />
         </FrameLayout>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

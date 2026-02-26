@@ -153,6 +153,11 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/catalogFeedEntries"
+            android:fadeScrollbars="@bool/scrollbarShouldFade"
+            android:scrollbarAlwaysDrawVerticalTrack="true"
+            android:scrollbarSize="@dimen/scrollbarSize"
+            android:scrollbarThumbVertical="@drawable/scrollbar_hard"
+            android:scrollbars="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 

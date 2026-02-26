@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -20,9 +20,9 @@
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:background="?attr/selectableItemBackground"
+            android:clickable="true"
             android:contentDescription="@string/accountGoBack"
             android:focusable="true"
-            android:clickable="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -32,11 +32,11 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_gravity="center"
-                android:focusable="false"
                 android:clickable="false"
+                android:focusable="false"
                 android:src="@drawable/arrow_left"
-                app:tintMode="multiply"
-                app:tint="@color/PalacePrimaryForegroundColor" />
+                app:tint="@color/PalacePrimaryForegroundColor"
+                app:tintMode="multiply" />
         </FrameLayout>
 
         <TextView
@@ -47,9 +47,9 @@
             android:layout_marginEnd="16dp"
             android:gravity="center"
             android:maxLines="1"
-            android:textStyle="bold"
-            android:textSize="18sp"
             android:text="@string/settingsAccounts"
+            android:textSize="18sp"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/accountListToolbarAddIconTouch"
             app:layout_constraintStart_toEndOf="@id/accountListToolbarBackIconTouch"
@@ -59,10 +59,10 @@
             android:id="@+id/accountListToolbarAddIconTouch"
             android:layout_width="64dp"
             android:layout_height="64dp"
-            android:contentDescription="@string/accountAdd"
             android:background="?attr/selectableItemBackground"
-            android:focusable="true"
             android:clickable="true"
+            android:contentDescription="@string/accountAdd"
+            android:focusable="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -72,11 +72,11 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_gravity="center"
-                android:focusable="false"
                 android:clickable="false"
+                android:focusable="false"
                 android:src="@drawable/account_add"
-                app:tintMode="multiply"
-                app:tint="@color/PalacePrimaryForegroundColor" />
+                app:tint="@color/PalacePrimaryForegroundColor"
+                app:tintMode="multiply" />
         </FrameLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -89,6 +89,11 @@
         android:id="@+id/accountList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:fadeScrollbars="@bool/scrollbarShouldFade"
+        android:scrollbarAlwaysDrawVerticalTrack="true"
+        android:scrollbarSize="@dimen/scrollbarSize"
+        android:scrollbarThumbVertical="@drawable/scrollbar_hard"
+        android:scrollbars="vertical"
         tools:listitem="@layout/account_list_item" />
 
 </LinearLayout>
