@@ -1,7 +1,6 @@
 package org.thepalaceproject.palace
 
 import org.librarysimplified.ui.BuildConfig
-import org.nypl.simplified.buildconfig.api.BuildConfigOAuthScheme
 import org.nypl.simplified.buildconfig.api.BuildConfigurationAccountsRegistryURIs
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import java.net.URI
@@ -32,8 +31,6 @@ class PalaceBuildConfigurationService : BuildConfigurationServiceType {
     get() = "logs@thepalaceproject.org"
   override val supportErrorReportSubject: String
     get() = "[palace-error]"
-  override val oauthCallbackScheme: BuildConfigOAuthScheme
-    get() = BuildConfigOAuthScheme("palace-oauth")
   override val allowExternalReaderLinks: Boolean
     get() = false
   override val showChangeAccountsUi: Boolean

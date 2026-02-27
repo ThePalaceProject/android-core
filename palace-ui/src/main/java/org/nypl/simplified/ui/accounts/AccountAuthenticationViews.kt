@@ -9,14 +9,12 @@ import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Anonymous
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Basic
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.BasicToken
-import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.OAuthWithIntermediary
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.SAML2_0
 import org.nypl.simplified.accounts.api.AccountUsername
 import org.nypl.simplified.ui.accounts.view_bindings.AccountAuthenticationViewBindings
 import org.nypl.simplified.ui.accounts.view_bindings.ViewsForAnonymous
 import org.nypl.simplified.ui.accounts.view_bindings.ViewsForBasic
 import org.nypl.simplified.ui.accounts.view_bindings.ViewsForBasicToken
-import org.nypl.simplified.ui.accounts.view_bindings.ViewsForOAuthWithIntermediary
 import org.nypl.simplified.ui.accounts.view_bindings.ViewsForSAML20
 
 /**
@@ -44,10 +42,7 @@ class AccountAuthenticationViews(
     ViewsForAnonymous.bind(
       this.viewGroup.findViewById(R.id.authAnon)
     )
-  private val oAuthWithIntermediary: ViewsForOAuthWithIntermediary =
-    ViewsForOAuthWithIntermediary.bind(
-      this.viewGroup.findViewById(R.id.authOAuthIntermediary)
-    )
+
   private val saml20: ViewsForSAML20 =
     ViewsForSAML20.bind(
       this.viewGroup.findViewById(R.id.authSAML)
@@ -58,7 +53,6 @@ class AccountAuthenticationViews(
       this.basic,
       this.basicToken,
       this.anonymous,
-      this.oAuthWithIntermediary,
       this.saml20
     )
 
@@ -151,10 +145,6 @@ class AccountAuthenticationViews(
         this.basicToken.configureFor(description)
       }
 
-      is OAuthWithIntermediary -> {
-        this.oAuthWithIntermediary.viewGroup.visibility = VISIBLE
-      }
-
       Anonymous -> {
         this.anonymous.viewGroup.visibility = VISIBLE
       }
@@ -201,7 +191,6 @@ class AccountAuthenticationViews(
         this.basicToken.isSatisfied(description)
       }
 
-      is OAuthWithIntermediary,
       Anonymous,
       is SAML2_0 ->
         true

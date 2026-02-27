@@ -34,30 +34,11 @@ object AccountAuthenticationCredentialsJSON20200805 : AccountAuthenticationCrede
     return when (val type = JSONParserUtilities.getString(obj, "@type")) {
       "basic" ->
         deserializeBasic(obj)
-      "oauthWithIntermediary" ->
-        deserializeOAuthWithIntermediary(obj)
       "saml2_0" ->
         deserializeSAML2_0(obj)
       else ->
         throw JSONParseException("Unrecognized type: $type")
     }
-  }
-
-  private fun deserializeOAuthWithIntermediary(
-    obj: ObjectNode
-  ): AccountAuthenticationCredentials.OAuthWithIntermediary {
-    val adobeCredentials =
-      JSONParserUtilities.getObjectOrNull(obj, "adobe_credentials")
-        ?.let(AccountAuthenticationCredentialsAdobeJSON::deserializeAdobeCredentials)
-
-    return AccountAuthenticationCredentials.OAuthWithIntermediary(
-      accessToken = JSONParserUtilities.getString(obj, "accessToken"),
-      adobeCredentials = adobeCredentials,
-      authenticationDescription = JSONParserUtilities.getStringOrNull(obj, "authenticationDescription"),
-      annotationsURI = null,
-      deviceRegistrationURI = null,
-      patronAuthorization = null
-    )
   }
 
   private fun deserializeBasic(

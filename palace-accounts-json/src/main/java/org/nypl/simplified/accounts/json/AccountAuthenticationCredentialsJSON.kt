@@ -91,10 +91,6 @@ object AccountAuthenticationCredentialsJSON {
         )
         authObject.set("authenticationTokenInfo", authenticationTokenInfo)
       }
-      is AccountAuthenticationCredentials.OAuthWithIntermediary -> {
-        authObject.put("@type", "oauthWithIntermediary")
-        authObject.put("accessToken", credentials.accessToken)
-      }
       is AccountAuthenticationCredentials.SAML2_0 -> {
         authObject.put("@type", "saml2_0")
         authObject.put("accessToken", credentials.accessToken)

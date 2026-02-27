@@ -13,10 +13,8 @@ import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.ANONYMOUS_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.BASIC_TOKEN_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.BASIC_TYPE
-import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.OAUTH_INTERMEDIARY_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.SAML_2_0_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.KeyboardInput
-import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.OAuthWithIntermediary
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.SAML2_0
 import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.announcements.Announcement
@@ -117,17 +115,6 @@ object AccountProvidersJSON {
     authentication: AccountProviderAuthenticationDescription
   ): ObjectNode {
     return when (authentication) {
-      is OAuthWithIntermediary -> {
-        val authObject = this.mapper.createObjectNode()
-        authObject.put("description", authentication.description)
-        authObject.put("type", OAUTH_INTERMEDIARY_TYPE)
-        authObject.put("authenticate", authentication.authenticate.toString())
-        val logo = authentication.logoURI
-        if (logo != null) {
-          authObject.put("logo", logo.toString())
-        }
-        authObject
-      }
       is Basic -> {
         val authObject = this.mapper.createObjectNode()
         authObject.put("type", BASIC_TYPE)
@@ -343,21 +330,6 @@ object AccountProvidersJSON {
           JSONParserUtilities.getStringOrNull(container, "description") ?: ""
 
         SAML2_0(
-          authenticate = authURI,
-          description = description,
-          logoURI = logoURI
-        )
-      }
-
-      OAUTH_INTERMEDIARY_TYPE -> {
-        val authURI =
-          JSONParserUtilities.getURI(container, "authenticate")
-        val logoURI =
-          JSONParserUtilities.getURIOrNull(container, "logo")
-        val description =
-          JSONParserUtilities.getStringOrNull(container, "description") ?: ""
-
-        OAuthWithIntermediary(
           authenticate = authURI,
           description = description,
           logoURI = logoURI

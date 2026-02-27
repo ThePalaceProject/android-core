@@ -336,7 +336,6 @@ coupled as possible.
 |[org.librarysimplified.links.json](palace-links-json)|Link JSON parsing|
 |[org.librarysimplified.mdc](palace-mdc)|MDC conventions|
 |[org.librarysimplified.notifications](palace-notifications)|Notification service|
-|[org.librarysimplified.oauth](palace-oauth)|OAuth|
 |[org.librarysimplified.opds.auth_document](palace-opds-auth-document)|OPDS authentication document parser implementation|
 |[org.librarysimplified.opds.auth_document.api](palace-opds-auth-document-api)|OPDS authentication document parser API|
 |[org.librarysimplified.opds.client](palace-opds-client)|Stateful OPDS client|

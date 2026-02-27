@@ -89,7 +89,6 @@ class BorrowBearerToken : BorrowSubtaskType {
         }
 
         is AccountAuthenticationCredentials.Basic -> null
-        is AccountAuthenticationCredentials.OAuthWithIntermediary -> null
         is AccountAuthenticationCredentials.SAML2_0 -> null
         null -> null
       }

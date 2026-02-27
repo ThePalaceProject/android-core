@@ -119,7 +119,6 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
           }
 
           null,
-          is AccountAuthenticationCredentials.OAuthWithIntermediary,
           is AccountAuthenticationCredentials.SAML2_0 -> {
             null
           }

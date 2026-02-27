@@ -38,11 +38,6 @@ object AccountAuthenticatedHTTP {
           )
         }
 
-      is AccountAuthenticationCredentials.OAuthWithIntermediary ->
-        LSHTTPAuthorizationBearerToken.ofToken(
-          token = credentials.accessToken
-        )
-
       is AccountAuthenticationCredentials.SAML2_0 ->
         LSHTTPAuthorizationBearerToken.ofToken(
           token = credentials.accessToken

@@ -68,7 +68,6 @@ val dependencyObjects = listOf(
     project(":palace-links-json"),
     project(":palace-mdc"),
     project(":palace-notifications"),
-    project(":palace-oauth"),
     project(":palace-opds-auth-document"),
     project(":palace-opds-auth-document-api"),
     project(":palace-opds-client"),

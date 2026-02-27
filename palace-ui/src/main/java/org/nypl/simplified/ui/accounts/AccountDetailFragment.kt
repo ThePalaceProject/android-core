@@ -41,13 +41,9 @@ import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountUsername
 import org.nypl.simplified.accounts.database.api.AccountType
-import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
-import org.nypl.simplified.oauth.OAuthCallbackIntentParsing
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.Basic
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.BasicToken
-import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.OAuthWithIntermediaryCancel
-import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.OAuthWithIntermediaryInitiate
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsCancelButtonDisabled
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsCancelButtonEnabled
 import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsLoginButtonDisabled
@@ -377,7 +373,6 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
         }
 
         AccountProviderAuthenticationDescription.Anonymous,
-        is AccountProviderAuthenticationDescription.OAuthWithIntermediary,
         is AccountProviderAuthenticationDescription.SAML2_0 -> {
           // Nothing to do.
         }
@@ -417,27 +412,6 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
 
         is AccountProviderAuthenticationDescription.SAML2_0 -> {
           this.logger.warn("SAML 2.0 is not currently supported as an alternative.")
-        }
-
-        is AccountProviderAuthenticationDescription.OAuthWithIntermediary -> {
-          val layout =
-            this.layoutInflater.inflate(
-              R.layout.auth_oauth,
-              this.authenticationAlternativesButtons,
-              false
-            )
-
-          this.configureImageButton(
-            container = layout.findViewById(R.id.authOAuthIntermediaryLogo),
-            buttonText = layout.findViewById(R.id.authOAuthIntermediaryLogoText),
-            buttonImage = layout.findViewById(R.id.authOAuthIntermediaryLogoImage),
-            text = this.getString(R.string.accountLoginWith, alternative.description),
-            logoURI = alternative.logoURI,
-            onClick = {
-              this.onTryOAuthLogin(alternative)
-            }
-          )
-          this.authenticationAlternativesButtons.addView(layout)
         }
       }
     }
@@ -544,18 +518,6 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
     }
   }
 
-  private fun onTryOAuthLogin(
-    authenticationDescription: AccountProviderAuthenticationDescription.OAuthWithIntermediary
-  ) {
-    AccountDetailModel.tryLogin(
-      OAuthWithIntermediaryInitiate(
-        accountId = AccountDetailModel.account.id,
-        description = authenticationDescription
-      )
-    )
-    this.sendOAuthIntent(authenticationDescription)
-  }
-
   private fun onTryBasicLogin(
     description: AccountProviderAuthenticationDescription.Basic
   ) {
@@ -592,35 +554,6 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
       )
 
     AccountDetailModel.tryLogin(request)
-  }
-
-  private fun sendOAuthIntent(
-    authenticationDescription: AccountProviderAuthenticationDescription.OAuthWithIntermediary
-  ) {
-    val services =
-      Services.serviceDirectory()
-    val buildConfig =
-      services.requireService(BuildConfigurationServiceType::class.java)
-    val callbackScheme =
-      buildConfig.oauthCallbackScheme.scheme
-    val callbackUrl =
-      OAuthCallbackIntentParsing.createUri(
-        requiredScheme = callbackScheme,
-        accountId = AccountDetailModel.account.id.uuid
-      )
-
-    /*
-     * XXX: Is this correct for any other intermediary besides Clever?
-     */
-
-    val url = buildString {
-      this.append(authenticationDescription.authenticate)
-      this.append("&redirect_uri=$callbackUrl")
-    }
-
-    val i = Intent(Intent.ACTION_VIEW)
-    i.data = Uri.parse(url)
-    this.startActivity(i)
   }
 
   override fun onStop() {
@@ -792,15 +725,6 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
                 throw UnreachableCodeException()
               }
 
-              is AccountProviderAuthenticationDescription.OAuthWithIntermediary -> {
-                AccountDetailModel.tryLogin(
-                  OAuthWithIntermediaryCancel(
-                    accountId = account.id,
-                    description = desc
-                  )
-                )
-              }
-
               is AccountProviderAuthenticationDescription.SAML2_0 -> {
                 AccountDetailModel.tryLogin(
                   ProfileAccountLoginRequest.SAML20Cancel(
@@ -853,7 +777,6 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
             )
           }
 
-          is AccountAuthenticationCredentials.OAuthWithIntermediary,
           is AccountAuthenticationCredentials.SAML2_0 -> {
             // Nothing
           }
@@ -891,7 +814,6 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
             )
           }
 
-          is AccountAuthenticationCredentials.OAuthWithIntermediary,
           is AccountAuthenticationCredentials.SAML2_0 -> {
             // No UI
           }
@@ -925,7 +847,6 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
             )
           }
 
-          is AccountAuthenticationCredentials.OAuthWithIntermediary,
           is AccountAuthenticationCredentials.SAML2_0 -> {
             // No UI
           }
@@ -1168,9 +1089,6 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
     when (val description = account.provider.authentication) {
       is AccountProviderAuthenticationDescription.SAML2_0 ->
         this.onTrySAML2Login(description)
-
-      is AccountProviderAuthenticationDescription.OAuthWithIntermediary ->
-        this.onTryOAuthLogin(description)
 
       is AccountProviderAuthenticationDescription.Basic ->
         this.onTryBasicLogin(description)

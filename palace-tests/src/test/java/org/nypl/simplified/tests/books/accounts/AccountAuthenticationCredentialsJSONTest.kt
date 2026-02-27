@@ -45,23 +45,6 @@ class AccountAuthenticationCredentialsJSONTest {
 
   @Test
   @Throws(Exception::class)
-  fun testRoundTrip1() {
-    val creds0: AccountAuthenticationCredentials =
-      AccountAuthenticationCredentials.OAuthWithIntermediary(
-        accessToken = "bm90IGFuIGFjY2VzcyB0b2tlbgo=",
-        authenticationDescription = null,
-        adobeCredentials = null,
-        annotationsURI = URI("https://www.example.com"),
-        deviceRegistrationURI = URI("https://www.example.com"),
-        patronAuthorization = null
-      )
-
-    val creds1 = deserializeFromJSON(serializeToJSON(creds0))
-    Assertions.assertEquals(creds0, creds1)
-  }
-
-  @Test
-  @Throws(Exception::class)
   fun testRoundTrip2() {
     val adobe =
       AccountAuthenticationAdobePreActivationCredentials(
