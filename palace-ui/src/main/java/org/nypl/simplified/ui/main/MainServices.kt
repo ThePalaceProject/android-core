@@ -63,7 +63,6 @@ import org.nypl.simplified.books.book_registry.BookRegistryReadableType
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.borrowing.BorrowSubtasks
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskDirectoryType
-import org.nypl.simplified.books.bundled.api.BundledContentResolverType
 import org.nypl.simplified.books.controller.Controller
 import org.nypl.simplified.books.controller.api.BookRevokeStringResourcesType
 import org.nypl.simplified.books.controller.api.BooksControllerType
@@ -385,7 +384,6 @@ internal object MainServices {
     http: LSHTTPClientType,
     opdsFeedParser: OPDSFeedParserType,
     bookFormatSupport: BookFormatSupportType,
-    bundledContent: BundledContentResolverType,
     contentResolver: ContentResolverType
   ): FeedLoaderType {
     val execCatalogFeeds =
@@ -397,7 +395,6 @@ internal object MainServices {
 
     return FeedLoader.create(
       bookFormatSupport = bookFormatSupport,
-      bundledContent = bundledContent,
       contentResolver = contentResolver,
       exec = execCatalogFeeds,
       parser = opdsFeedParser,
@@ -441,7 +438,6 @@ internal object MainServices {
   private fun createCoverProvider(
     context: Application,
     bookRegistry: BookRegistryReadableType,
-    bundledContentResolver: BundledContentResolverType,
     coverGenerator: BookCoverGeneratorType,
     badgeLookup: BookCoverBadgeLookupType
   ): BookCoverProviderType {
@@ -452,7 +448,6 @@ internal object MainServices {
       bookRegistry = bookRegistry,
       coverGenerator = coverGenerator,
       badgeLookup = badgeLookup,
-      bundledContentResolver = bundledContentResolver,
       executor = execCovers,
       debugCacheIndicators = false,
       debugLogging = false
@@ -848,13 +843,6 @@ internal object MainServices {
       }
     )
 
-    val bundledContent =
-      addService(
-        message = strings.bootingGeneral("bundled content"),
-        interfaceType = BundledContentResolverType::class.java,
-        serviceConstructor = { MainBundledContentResolver.create(context.assets) }
-      )
-
     val opdsFeedParser =
       addService(
         message = strings.bootingGeneral("feed parser"),
@@ -873,7 +861,6 @@ internal object MainServices {
             http = lsHTTP,
             opdsFeedParser = opdsFeedParser,
             bookFormatSupport = bookFormatService,
-            bundledContent = bundledContent,
             contentResolver = contentResolver
           )
         }
@@ -1014,7 +1001,6 @@ internal object MainServices {
         createCoverProvider(
           context = context,
           bookRegistry = bookRegistry,
-          bundledContentResolver = bundledContent,
           coverGenerator = coverGenerator,
           badgeLookup = badgeLookup
         )

@@ -62,7 +62,6 @@ import org.nypl.simplified.tests.mocking.MockAccountProviders
 import org.nypl.simplified.tests.mocking.MockBookDatabase
 import org.nypl.simplified.tests.mocking.MockBookDatabaseEntry
 import org.nypl.simplified.tests.mocking.MockBorrowContext
-import org.nypl.simplified.tests.mocking.MockBundledContentResolver
 import org.nypl.simplified.tests.mocking.MockContentResolver
 import org.slf4j.LoggerFactory
 import java.net.URI
@@ -81,7 +80,6 @@ class BorrowLoanCreateTest {
   private lateinit var bookID: BookID
   private lateinit var bookRegistry: BookRegistryType
   private lateinit var bookStates: MutableList<BookStatus>
-  private lateinit var bundledContent: MockBundledContentResolver
   private lateinit var contentResolver: MockContentResolver
   private lateinit var context: MockBorrowContext
   private lateinit var httpClient: LSHTTPClientType
@@ -104,8 +102,6 @@ class BorrowLoanCreateTest {
       TaskRecorder.create()
     this.contentResolver =
       MockContentResolver()
-    this.bundledContent =
-      MockBundledContentResolver()
 
     this.bookFormatSupport =
       Mockito.mock(BookFormatSupportType::class.java)
@@ -190,7 +186,6 @@ class BorrowLoanCreateTest {
         audiobookAuthorizationHandler = this.authHandler,
         logger = this.logger,
         bookRegistry = this.bookRegistry,
-        bundledContent = this.bundledContent,
         temporaryDirectory = TestDirectories.temporaryDirectory(),
         account = this.account,
         clock = { Instant.now() },

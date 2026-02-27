@@ -56,7 +56,6 @@ import org.nypl.simplified.books.borrowing.BorrowTask
 import org.nypl.simplified.books.borrowing.BorrowTaskType
 import org.nypl.simplified.books.borrowing.internal.BorrowAudiobookAuthorizationHandler
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes
-import org.nypl.simplified.books.bundled.api.BundledContentResolverType
 import org.nypl.simplified.books.formats.api.StandardFormatNames.adobeACSMFiles
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericAudioBooks
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFiles
@@ -88,7 +87,6 @@ import org.nypl.simplified.tests.mocking.MockBookDatabase
 import org.nypl.simplified.tests.mocking.MockBookFormatSupport
 import org.nypl.simplified.tests.mocking.MockBorrowSubtaskDirectory
 import org.nypl.simplified.tests.mocking.MockBoundlessService
-import org.nypl.simplified.tests.mocking.MockBundledContentResolver
 import org.nypl.simplified.tests.mocking.MockContentResolver
 import org.nypl.simplified.tests.mocking.MockLCPService
 import org.nypl.simplified.tests.mocking.MockProfile
@@ -128,7 +126,6 @@ class BorrowTaskTest {
   private lateinit var bookID: BookID
   private lateinit var bookRegistry: BookRegistryType
   private lateinit var bookStates: MutableList<BookStatus>
-  private lateinit var bundledContent: BundledContentResolverType
   private lateinit var cacheDirectory: File
   private lateinit var contentResolver: ContentResolverType
   private lateinit var httpClient: LSHTTPClientType
@@ -167,7 +164,6 @@ class BorrowTaskTest {
         boundlessService = this.boundlessService,
         bookFormatSupport = this.bookFormatSupport,
         bookRegistry = this.bookRegistry,
-        bundledContent = this.bundledContent,
         cacheDirectory = this.cacheDirectory,
         clock = { Instant.now() },
         contentResolver = this.contentResolver,
@@ -294,8 +290,6 @@ class BorrowTaskTest {
       MockAudioBookManifestStrategies()
     this.contentResolver =
       MockContentResolver()
-    this.bundledContent =
-      MockBundledContentResolver()
     this.services =
       MutableServiceDirectory()
     this.subtasks =

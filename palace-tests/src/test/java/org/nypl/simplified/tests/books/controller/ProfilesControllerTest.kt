@@ -29,7 +29,6 @@ import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.borrowing.BorrowSubtasks
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskDirectoryType
-import org.nypl.simplified.books.bundled.api.BundledContentResolverType
 import org.nypl.simplified.books.controller.Controller
 import org.nypl.simplified.books.controller.api.BookRevokeStringResourcesType
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
@@ -145,14 +144,10 @@ class ProfilesControllerTest {
       OPDSFeedParser.newParser(OPDSAcquisitionFeedEntryParser.newParser())
     val transport =
       FeedHTTPTransport(this.lsHTTP)
-    val bundledContent = BundledContentResolverType { uri ->
-      throw FileNotFoundException(uri.toString())
-    }
 
     val feedLoader =
       FeedLoader.create(
         bookFormatSupport = this.bookFormatSupport,
-        bundledContent = bundledContent,
         contentResolver = this.contentResolver,
         exec = this.executorFeeds,
         parser = parser,
@@ -173,7 +168,6 @@ class ProfilesControllerTest {
     services.putService(BookRegistryType::class.java, this.bookRegistry)
     services.putService(BookRevokeStringResourcesType::class.java, this.bookRevokeStringResources)
     services.putService(BorrowSubtaskDirectoryType::class.java, BorrowSubtasks.directory())
-    services.putService(BundledContentResolverType::class.java, bundledContent)
     services.putService(ContentResolverType::class.java, this.contentResolver)
     services.putService(FeedLoaderType::class.java, feedLoader)
     services.putService(LSHTTPClientType::class.java, this.lsHTTP)

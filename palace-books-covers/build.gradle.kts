@@ -2,7 +2,6 @@ dependencies {
     coreLibraryDesugaring(libs.android.desugaring)
 
     implementation(project(":palace-books-api"))
-    implementation(project(":palace-books-bundled-api"))
     implementation(project(":palace-books-registry-api"))
     implementation(project(":palace-feeds-api"))
     implementation(project(":palace-opds-core"))

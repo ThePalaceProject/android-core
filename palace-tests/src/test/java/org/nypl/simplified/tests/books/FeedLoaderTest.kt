@@ -3,8 +3,6 @@ package org.nypl.simplified.tests.books
 import com.google.common.util.concurrent.ListeningExecutorService
 import org.mockito.Mockito
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
-import org.nypl.simplified.books.book_registry.BookRegistry
-import org.nypl.simplified.books.bundled.api.BundledContentResolverType
 import org.nypl.simplified.books.formats.BookFormatSupport
 import org.nypl.simplified.books.formats.BookFormatSupportParameters
 import org.nypl.simplified.content.api.ContentResolverType
@@ -14,7 +12,6 @@ import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
 import org.nypl.simplified.opds.core.OPDSFeedParser
 import org.nypl.simplified.opds.core.OPDSFeedTransportType
 import org.nypl.simplified.opds.core.OPDSSearchParser
-import java.io.FileNotFoundException
 import java.net.URI
 
 class FeedLoaderTest : FeedLoaderContract() {
@@ -30,11 +27,6 @@ class FeedLoaderTest : FeedLoaderContract() {
       }
 
     val searchParser = OPDSSearchParser.newParser()
-    val bookRegistry = BookRegistry.create()
-    val bundledContent = BundledContentResolverType { uri ->
-      throw FileNotFoundException(uri.toASCIIString())
-    }
-
     val bookFormatSupport =
       BookFormatSupport.create(
         BookFormatSupportParameters(
@@ -51,7 +43,6 @@ class FeedLoaderTest : FeedLoaderContract() {
 
     return FeedLoader.create(
       bookFormatSupport = bookFormatSupport,
-      bundledContent = bundledContent,
       contentResolver = contentResolver,
       exec = exec,
       parser = parser,

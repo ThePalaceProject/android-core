@@ -3,8 +3,6 @@ package org.nypl.simplified.feeds.api
 import com.io7m.jfunctional.Some
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
-import org.nypl.simplified.books.bundled.api.BundledContentResolverType
-import org.nypl.simplified.books.bundled.api.BundledURIs
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure
@@ -39,7 +37,6 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class FeedLoader private constructor(
   private val bookFormatSupport: BookFormatSupportType,
-  private val bundledContent: BundledContentResolverType,
   private val contentResolver: ContentResolverType,
   private val exec: ExecutorService,
   private val parser: OPDSFeedParserType,
@@ -87,15 +84,6 @@ class FeedLoader private constructor(
     method: String
   ): FeedLoaderResult {
     try {
-      /*
-       * If the URI has a scheme that refers to bundled content, fetch the data from
-       * the resolver instead.
-       */
-
-      if (BundledURIs.isBundledURI(uri)) {
-        return this.parseFromBundledContent(accountId, uri)
-      }
-
       /*
        * If the URI has a scheme that indicates that it must go through the Android
        * content resolver... do that.
@@ -222,23 +210,6 @@ class FeedLoader private constructor(
     )
   }
 
-  private fun parseFromBundledContent(
-    accountId: AccountID,
-    uri: URI
-  ): FeedLoaderSuccess {
-    return this.bundledContent.resolve(uri).use { stream ->
-      FeedLoaderSuccess(
-        feed = Feed.fromAcquisitionFeed(
-          accountId = accountId,
-          feed = this.parser.parse(uri, stream),
-          filter = this::isEntrySupported,
-          search = null
-        ),
-        accessToken = null
-      )
-    }
-  }
-
   private fun fetchSearchLink(
     opdsFeed: OPDSAcquisitionFeed,
     credentials: AccountAuthenticationCredentials?,
@@ -269,11 +240,9 @@ class FeedLoader private constructor(
       parser: OPDSFeedParserType,
       searchParser: OPDSSearchParserType,
       transport: OPDSFeedTransportType<AccountAuthenticationCredentials?>,
-      bundledContent: BundledContentResolverType
     ): FeedLoaderType {
       return FeedLoader(
         bookFormatSupport = bookFormatSupport,
-        bundledContent = bundledContent,
         contentResolver = contentResolver,
         exec = exec,
         parser = parser,

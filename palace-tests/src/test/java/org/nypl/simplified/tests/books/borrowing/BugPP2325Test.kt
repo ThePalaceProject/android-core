@@ -44,7 +44,6 @@ import org.nypl.simplified.tests.mocking.MockAdobeAdeptNetProvider
 import org.nypl.simplified.tests.mocking.MockAdobeAdeptResourceProvider
 import org.nypl.simplified.tests.mocking.MockAnalytics
 import org.nypl.simplified.tests.mocking.MockBookFormatSupport
-import org.nypl.simplified.tests.mocking.MockBundledContentResolver
 import org.nypl.simplified.tests.mocking.MockContentResolver
 import org.nypl.simplified.tests.mocking.MockLCPService
 import java.io.ByteArrayInputStream
@@ -67,7 +66,6 @@ class BugPP2325Test {
   private lateinit var androidContext: Application
   private lateinit var bookFormatSupport: MockBookFormatSupport
   private lateinit var bookRegistry: BookRegistryType
-  private lateinit var bundledContent: MockBundledContentResolver
   private lateinit var contentResolver: MockContentResolver
   private lateinit var httpClient: LSHTTPClientType
   private lateinit var lcpService: MockLCPService
@@ -100,8 +98,6 @@ class BugPP2325Test {
       MockBookFormatSupport()
     this.bookRegistry =
       BookRegistry.create()
-    this.bundledContent =
-      MockBundledContentResolver()
     this.contentResolver =
       MockContentResolver()
     this.httpClient =
@@ -179,7 +175,6 @@ class BugPP2325Test {
           boundlessService = null,
           bookFormatSupport = this.bookFormatSupport,
           bookRegistry = this.bookRegistry,
-          bundledContent = this.bundledContent,
           cacheDirectory = cacheDirectory.toFile(),
           clock = { Instant.now() },
           contentResolver = this.contentResolver,

@@ -46,7 +46,6 @@ import org.nypl.simplified.books.book_database.api.BookDatabaseType
 import org.nypl.simplified.books.book_database.api.BookFormats
 import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
-import org.nypl.simplified.books.bundled.api.BundledContentResolverType
 import org.nypl.simplified.books.controller.BookRevokeTask
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.content.api.ContentResolverType
@@ -72,7 +71,6 @@ import org.nypl.simplified.tests.mocking.MockRevokeStringResources
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
-import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InputStream
 import java.net.URI
@@ -102,7 +100,6 @@ class BookRevokeTaskAdobeDRMTest {
   private lateinit var bookEvents: MutableList<BookEvent>
   private lateinit var bookFormatSupport: BookFormatSupportType
   private lateinit var bookRegistry: BookRegistryType
-  private lateinit var bundledContent: BundledContentResolverType
   private lateinit var cacheDirectory: File
   private lateinit var clock: () -> Instant
   private lateinit var contentResolver: ContentResolverType
@@ -167,8 +164,6 @@ class BookRevokeTaskAdobeDRMTest {
     this.bookEvents = Collections.synchronizedList(ArrayList())
     this.bookRegistry = BookRegistry.create()
     this.bookFormatSupport = Mockito.mock(BookFormatSupportType::class.java)
-    this.bundledContent =
-      BundledContentResolverType { uri -> throw FileNotFoundException("missing") }
     this.contentResolver = Mockito.mock(ContentResolverType::class.java)
     this.cacheDirectory = File.createTempFile("book-borrow-tmp", "dir")
     this.cacheDirectory.delete()
@@ -197,7 +192,6 @@ class BookRevokeTaskAdobeDRMTest {
 
     return FeedLoader.create(
       bookFormatSupport = this.bookFormatSupport,
-      bundledContent = this.bundledContent,
       contentResolver = this.contentResolver,
       exec = executorFeeds,
       parser = parser,

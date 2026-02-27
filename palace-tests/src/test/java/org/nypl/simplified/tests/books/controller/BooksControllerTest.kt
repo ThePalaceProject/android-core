@@ -46,7 +46,6 @@ import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookStatusEvent.BookStatusEventAdded
 import org.nypl.simplified.books.borrowing.BorrowSubtasks
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskDirectoryType
-import org.nypl.simplified.books.bundled.api.BundledContentResolverType
 import org.nypl.simplified.books.controller.Controller
 import org.nypl.simplified.books.controller.api.BookRevokeStringResourcesType
 import org.nypl.simplified.books.controller.api.BooksControllerType
@@ -184,13 +183,9 @@ class BooksControllerTest {
     val transport =
       FeedHTTPTransport(http)
 
-    val bundledContent =
-      BundledContentResolverType { uri -> throw FileNotFoundException(uri.toString()) }
-
     val feedLoader =
       FeedLoader.create(
         bookFormatSupport = this.bookFormatSupport,
-        bundledContent = bundledContent,
         contentResolver = this.contentResolver,
         exec = feedExecutor,
         parser = parser,
@@ -211,7 +206,6 @@ class BooksControllerTest {
     services.putService(BookPreviewRegistryType::class.java, this.bookPreviewRegistry)
     services.putService(BorrowSubtaskDirectoryType::class.java, this.borrowSubtasks)
     services.putService(BookRevokeStringResourcesType::class.java, revokeStringResources)
-    services.putService(BundledContentResolverType::class.java, bundledContent)
     services.putService(ContentResolverType::class.java, this.contentResolver)
     services.putService(FeedLoaderType::class.java, feedLoader)
     services.putService(LSHTTPClientType::class.java, this.lsHTTP)
@@ -247,13 +241,9 @@ class BooksControllerTest {
     val transport =
       FeedHTTPTransport(http)
 
-    val bundledContent =
-      BundledContentResolverType { uri -> throw FileNotFoundException(uri.toString()) }
-
     val feedLoader =
       FeedLoader.create(
         bookFormatSupport = this.bookFormatSupport,
-        bundledContent = bundledContent,
         contentResolver = this.contentResolver,
         exec = feedExecutor,
         parser = parser,
@@ -274,7 +264,6 @@ class BooksControllerTest {
     services.putService(BookPreviewRegistryType::class.java, this.bookPreviewRegistry)
     services.putService(BorrowSubtaskDirectoryType::class.java, this.borrowSubtasks)
     services.putService(BookRevokeStringResourcesType::class.java, revokeStringResources)
-    services.putService(BundledContentResolverType::class.java, bundledContent)
     services.putService(ContentResolverType::class.java, this.contentResolver)
     services.putService(FeedLoaderType::class.java, feedLoader)
     services.putService(LSHTTPClientType::class.java, this.lsHTTP)

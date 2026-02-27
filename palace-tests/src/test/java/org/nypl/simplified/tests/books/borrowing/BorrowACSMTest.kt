@@ -82,7 +82,6 @@ import org.nypl.simplified.tests.mocking.MockAdobeAdeptResourceProvider
 import org.nypl.simplified.tests.mocking.MockBookDatabase
 import org.nypl.simplified.tests.mocking.MockBookDatabaseEntry
 import org.nypl.simplified.tests.mocking.MockBorrowContext
-import org.nypl.simplified.tests.mocking.MockBundledContentResolver
 import org.nypl.simplified.tests.mocking.MockContentResolver
 import org.nypl.simplified.tests.mocking.MockProfile
 import org.slf4j.LoggerFactory
@@ -124,7 +123,6 @@ class BorrowACSMTest {
   private lateinit var bookID: BookID
   private lateinit var bookRegistry: BookRegistryType
   private lateinit var bookStates: MutableList<BookStatus>
-  private lateinit var bundledContent: MockBundledContentResolver
   private lateinit var contentResolver: MockContentResolver
   private lateinit var context: MockBorrowContext
   private lateinit var httpClient: LSHTTPClientType
@@ -151,8 +149,6 @@ class BorrowACSMTest {
       TaskRecorder.create()
     this.contentResolver =
       MockContentResolver()
-    this.bundledContent =
-      MockBundledContentResolver()
 
     this.bookFormatSupport =
       Mockito.mock(BookFormatSupportType::class.java)
@@ -257,7 +253,6 @@ class BorrowACSMTest {
         application = androidContext,
         logger = this.logger,
         bookRegistry = this.bookRegistry,
-        bundledContent = this.bundledContent,
         temporaryDirectory = TestDirectories.temporaryDirectory(),
         account = this.account,
         clock = { Instant.now() },

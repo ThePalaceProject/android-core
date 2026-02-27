@@ -39,7 +39,6 @@ import org.nypl.simplified.books.book_database.api.BookFormats
 import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatus
-import org.nypl.simplified.books.bundled.api.BundledContentResolverType
 import org.nypl.simplified.books.controller.BookRevokeTask
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.content.api.ContentResolverType
@@ -106,7 +105,6 @@ class BookRevokeTaskTest {
   private lateinit var bookEvents: MutableList<BookEvent>
   private lateinit var bookFormatSupport: BookFormatSupportType
   private lateinit var bookRegistry: BookRegistryType
-  private lateinit var bundledContent: BundledContentResolverType
   private lateinit var cacheDirectory: File
   private lateinit var clock: () -> Instant
   private lateinit var contentResolver: ContentResolverType
@@ -143,8 +141,6 @@ class BookRevokeTaskTest {
     this.directoryProfiles = DirectoryUtilities.directoryCreateTemporary()
     this.bookEvents = Collections.synchronizedList(ArrayList())
     this.bookRegistry = BookRegistry.create()
-    this.bundledContent =
-      BundledContentResolverType { uri -> throw FileNotFoundException("missing") }
     this.bookFormatSupport = Mockito.mock(BookFormatSupportType::class.java)
     this.contentResolver = Mockito.mock(ContentResolverType::class.java)
     this.cacheDirectory = File.createTempFile("book-borrow-tmp", "dir")
@@ -185,7 +181,6 @@ class BookRevokeTaskTest {
     val feedLoader =
       FeedLoader.create(
         bookFormatSupport = this.bookFormatSupport,
-        bundledContent = this.bundledContent,
         contentResolver = this.contentResolver,
         exec = executorFeeds,
         parser = parser,

@@ -6,7 +6,6 @@ dependencies {
     implementation(project(":palace-adobe-extensions"))
     implementation(project(":palace-books-api"))
     implementation(project(":palace-books-audio"))
-    implementation(project(":palace-books-bundled-api"))
     implementation(project(":palace-books-database"))
     implementation(project(":palace-books-database-api"))
     implementation(project(":palace-books-formats-api"))

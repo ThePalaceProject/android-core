@@ -310,7 +310,6 @@ coupled as possible.
 |[org.librarysimplified.books.api](palace-books-api)|Book types|
 |[org.librarysimplified.books.audio](palace-books-audio)|Audio book support code|
 |[org.librarysimplified.books.borrowing](palace-books-borrowing)|Book borrowing|
-|[org.librarysimplified.books.bundled.api](palace-books-bundled-api)|Bundled books API|
 |[org.librarysimplified.books.controller](palace-books-controller)|Books/Profiles controller implementation|
 |[org.librarysimplified.books.controller.api](palace-books-controller-api)|Books controller API|
 |[org.librarysimplified.books.covers](palace-books-covers)|Book cover loading and generation|
