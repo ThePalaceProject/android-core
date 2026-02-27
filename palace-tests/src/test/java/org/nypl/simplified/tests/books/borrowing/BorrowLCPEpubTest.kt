@@ -62,7 +62,6 @@ import org.nypl.simplified.tests.mocking.MockBookDatabaseEntryFormatHandleAudioB
 import org.nypl.simplified.tests.mocking.MockBookDatabaseEntryFormatHandleEPUB
 import org.nypl.simplified.tests.mocking.MockBookDatabaseEntryFormatHandlePDF
 import org.nypl.simplified.tests.mocking.MockBorrowContext
-import org.nypl.simplified.tests.mocking.MockBundledContentResolver
 import org.nypl.simplified.tests.mocking.MockContentResolver
 import org.nypl.simplified.tests.mocking.MockLCPService
 import org.readium.r2.lcp.LcpService
@@ -86,7 +85,6 @@ class BorrowLCPEpubTest {
   private lateinit var accountProvider: AccountProvider
   private lateinit var bookDatabase: BookDatabaseType
   private lateinit var bookRegistry: BookRegistryType
-  private lateinit var bundledContent: MockBundledContentResolver
   private lateinit var contentResolver: MockContentResolver
   private lateinit var httpClient: LSHTTPClientType
   private lateinit var services: ServiceDirectoryType
@@ -119,8 +117,6 @@ class BorrowLCPEpubTest {
       TaskRecorder.create()
     this.contentResolver =
       MockContentResolver()
-    this.bundledContent =
-      MockBundledContentResolver()
     this.bookRegistry =
       BookRegistry.create()
 
@@ -245,7 +241,6 @@ class BorrowLCPEpubTest {
       audiobookAuthorizationHandler = this.authHandler,
       logger = this.logger,
       bookRegistry = this.bookRegistry,
-      bundledContent = this.bundledContent,
       temporaryDirectory = TestDirectories.temporaryDirectory(),
       account = this.account,
       clock = { Instant.now() },

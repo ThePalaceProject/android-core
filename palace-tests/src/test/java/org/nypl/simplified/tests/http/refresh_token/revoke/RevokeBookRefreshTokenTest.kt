@@ -36,7 +36,6 @@ import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.book_database.api.BookDatabaseType
 import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
-import org.nypl.simplified.books.bundled.api.BundledContentResolverType
 import org.nypl.simplified.books.controller.BookRevokeTask
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.feeds.api.FeedHTTPTransport
@@ -74,7 +73,6 @@ class RevokeBookRefreshTokenTest {
   private lateinit var accountID: AccountID
   private lateinit var bookFormatSupport: BookFormatSupportType
   private lateinit var bookRegistry: BookRegistryType
-  private lateinit var bundledContent: BundledContentResolverType
   private lateinit var contentResolver: MockContentResolver
   private lateinit var executorFeeds: ListeningExecutorService
   private lateinit var httpClient: LSHTTPClientType
@@ -122,8 +120,6 @@ class RevokeBookRefreshTokenTest {
     this.bookRegistry =
       BookRegistry.create()
 
-    this.bundledContent =
-      BundledContentResolverType { uri -> throw FileNotFoundException("missing") }
     this.bookFormatSupport = Mockito.mock(BookFormatSupportType::class.java)
     this.contentResolver =
       MockContentResolver()
@@ -285,7 +281,6 @@ class RevokeBookRefreshTokenTest {
     val feedLoader =
       FeedLoader.create(
         bookFormatSupport = this.bookFormatSupport,
-        bundledContent = this.bundledContent,
         contentResolver = this.contentResolver,
         exec = executorFeeds,
         parser = parser,

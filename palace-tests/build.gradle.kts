@@ -40,7 +40,6 @@ val dependencyObjects = listOf(
     project(":palace-books-api"),
     project(":palace-books-audio"),
     project(":palace-books-borrowing"),
-    project(":palace-books-bundled-api"),
     project(":palace-books-controller"),
     project(":palace-books-controller-api"),
     project(":palace-books-covers"),

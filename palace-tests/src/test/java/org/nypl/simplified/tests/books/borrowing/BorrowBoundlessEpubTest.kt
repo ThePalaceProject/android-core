@@ -53,7 +53,6 @@ import org.nypl.simplified.tests.mocking.MockBookDatabaseEntryFormatHandleAudioB
 import org.nypl.simplified.tests.mocking.MockBookDatabaseEntryFormatHandleEPUB
 import org.nypl.simplified.tests.mocking.MockBookDatabaseEntryFormatHandlePDF
 import org.nypl.simplified.tests.mocking.MockBorrowContext
-import org.nypl.simplified.tests.mocking.MockBundledContentResolver
 import org.nypl.simplified.tests.mocking.MockContentResolver
 import org.nypl.simplified.tests.mocking.MockProfile
 import org.nypl.simplified.tests.mocking.MockProfilesController
@@ -83,7 +82,6 @@ class BorrowBoundlessEpubTest {
   private lateinit var account: AccountType
   private lateinit var bookDatabase: BookDatabaseType
   private lateinit var bookRegistry: BookRegistryType
-  private lateinit var bundledContent: MockBundledContentResolver
   private lateinit var contentResolver: MockContentResolver
   private lateinit var httpClient: LSHTTPClientType
   private lateinit var services: ServiceDirectoryType
@@ -113,8 +111,6 @@ class BorrowBoundlessEpubTest {
       TaskRecorder.create()
     this.contentResolver =
       MockContentResolver()
-    this.bundledContent =
-      MockBundledContentResolver()
     this.bookRegistry =
       BookRegistry.create()
 
@@ -226,7 +222,6 @@ class BorrowBoundlessEpubTest {
       audiobookAuthorizationHandler = this.authHandler,
       logger = this.logger,
       bookRegistry = this.bookRegistry,
-      bundledContent = this.bundledContent,
       temporaryDirectory = TestDirectories.temporaryDirectory(),
       account = this.account,
       clock = { Instant.now() },

@@ -28,7 +28,6 @@ import org.nypl.simplified.books.api.BookEvent
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
-import org.nypl.simplified.books.bundled.api.BundledContentResolverType
 import org.nypl.simplified.books.controller.ProfileAccountCreateCustomOPDSTask
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.content.api.ContentResolverType
@@ -84,7 +83,6 @@ class ProfileAccountCreateCustomOPDSTest {
   private lateinit var bookEvents: MutableList<BookEvent>
   private lateinit var bookFormatSupport: BookFormatSupportType
   private lateinit var bookRegistry: BookRegistryType
-  private lateinit var bundledContent: BundledContentResolverType
   private lateinit var cacheDirectory: File
   private lateinit var clock: () -> Instant
   private lateinit var contentResolver: ContentResolverType
@@ -149,7 +147,6 @@ class ProfileAccountCreateCustomOPDSTest {
     this.bookEvents = Collections.synchronizedList(ArrayList())
     this.bookRegistry = BookRegistry.create()
     this.bookFormatSupport = Mockito.mock(BookFormatSupportType::class.java)
-    this.bundledContent = BundledContentResolverType { uri -> throw FileNotFoundException("missing") }
     this.contentResolver = Mockito.mock(ContentResolverType::class.java)
     this.opdsFeedParser = Mockito.mock(OPDSFeedParserType::class.java)
     this.profilesDatabase = Mockito.mock(ProfilesDatabaseType::class.java)

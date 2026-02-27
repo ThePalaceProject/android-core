@@ -270,7 +270,6 @@ dependencies {
     implementation(project(":palace-books-api"))
     implementation(project(":palace-books-audio"))
     implementation(project(":palace-books-borrowing"))
-    implementation(project(":palace-books-bundled-api"))
     implementation(project(":palace-books-controller"))
     implementation(project(":palace-books-controller-api"))
     implementation(project(":palace-books-covers"))

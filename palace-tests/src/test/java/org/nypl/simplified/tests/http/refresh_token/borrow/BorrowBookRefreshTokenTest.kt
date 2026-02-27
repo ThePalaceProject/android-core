@@ -73,7 +73,6 @@ import org.nypl.simplified.tests.mocking.MockBookDatabase
 import org.nypl.simplified.tests.mocking.MockBookDatabaseEntry
 import org.nypl.simplified.tests.mocking.MockBookDatabaseEntryFormatHandleEPUB
 import org.nypl.simplified.tests.mocking.MockBorrowContext
-import org.nypl.simplified.tests.mocking.MockBundledContentResolver
 import org.nypl.simplified.tests.mocking.MockContentResolver
 import org.nypl.simplified.tests.mocking.MockDRMInformationACSHandle
 import org.nypl.simplified.tests.mocking.MockLCPService
@@ -106,7 +105,6 @@ class BorrowBookRefreshTokenTest {
   private lateinit var bookID: BookID
   private lateinit var bookRegistry: BookRegistryType
   private lateinit var bookStates: MutableList<BookStatus>
-  private lateinit var bundledContent: MockBundledContentResolver
   private lateinit var contentResolver: MockContentResolver
   private lateinit var context: MockBorrowContext
   private lateinit var downloadsDirectory: File
@@ -165,8 +163,6 @@ class BorrowBookRefreshTokenTest {
       TaskRecorder.create()
     this.contentResolver =
       MockContentResolver()
-    this.bundledContent =
-      MockBundledContentResolver()
     this.bookFormatSupport =
       Mockito.mock(BookFormatSupportType::class.java)
     this.bookRegistry =
@@ -230,7 +226,6 @@ class BorrowBookRefreshTokenTest {
         bookDatabaseEntry = this.bookDatabaseEntry,
         bookInitial = bookInitial,
         bookRegistry = this.bookRegistry,
-        bundledContent = this.bundledContent,
         clock = { Instant.now() },
         contentResolver = this.contentResolver,
         httpClient = this.httpClient,

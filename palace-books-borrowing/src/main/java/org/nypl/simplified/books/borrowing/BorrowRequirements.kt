@@ -9,7 +9,6 @@ import org.nypl.drm.core.BoundlessServiceType
 import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskDirectoryType
-import org.nypl.simplified.books.bundled.api.BundledContentResolverType
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
@@ -27,7 +26,6 @@ data class BorrowRequirements(
   val boundlessService: BoundlessServiceType?,
   val bookFormatSupport: BookFormatSupportType,
   val bookRegistry: BookRegistryType,
-  val bundledContent: BundledContentResolverType,
   val cacheDirectory: File,
   val clock: () -> Instant,
   val contentResolver: ContentResolverType,
@@ -54,7 +52,6 @@ data class BorrowRequirements(
         boundlessService = services.optionalService(BoundlessServiceType::class.java),
         bookFormatSupport = services.requireService(BookFormatSupportType::class.java),
         bookRegistry = services.requireService(BookRegistryType::class.java),
-        bundledContent = services.requireService(BundledContentResolverType::class.java),
         cacheDirectory = cacheDirectory,
         clock = clock,
         contentResolver = services.requireService(ContentResolverType::class.java),

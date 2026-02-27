@@ -31,7 +31,6 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.Borro
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskFailed
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskHaltedEarly
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskFactoryType
-import org.nypl.simplified.books.bundled.api.BundledContentResolverType
 import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
@@ -205,7 +204,6 @@ class BorrowTask private constructor(
         bookRegistry = this.requirements.bookRegistry,
         borrowTask = this,
         boundlessService = this.requirements.boundlessService,
-        bundledContent = this.requirements.bundledContent,
         cacheDirectory = this.requirements.cacheDirectory,
         cancelled = this.cancelled,
         clock = this.requirements.clock,
@@ -468,7 +466,6 @@ class BorrowTask private constructor(
     override val audioBookManifestStrategies: AudioBookManifestStrategiesType,
     override val clock: () -> Instant,
     override val contentResolver: ContentResolverType,
-    override val bundledContent: BundledContentResolverType,
     override val bookDatabaseEntry: BookDatabaseEntryType,
     override val httpClient: LSHTTPClientType,
     override val isManualLCPPassphraseEnabled: Boolean,

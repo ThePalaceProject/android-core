@@ -17,7 +17,6 @@ import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.bearerTokenNotPermitted
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskCancelled
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskFailed
-import org.nypl.simplified.books.bundled.api.BundledContentResolverType
 import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
@@ -40,7 +39,6 @@ interface BorrowContextType {
   val adobeExecutor: AdobeAdeptExecutorType?
   val boundlessService: BoundlessServiceType?
   val audioBookManifestStrategies: AudioBookManifestStrategiesType
-  val bundledContent: BundledContentResolverType
   val clock: () -> Instant
   val contentResolver: ContentResolverType
   val httpClient: LSHTTPClientType

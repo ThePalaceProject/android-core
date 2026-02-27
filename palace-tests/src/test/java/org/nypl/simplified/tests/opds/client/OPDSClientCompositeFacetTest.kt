@@ -31,7 +31,6 @@ import org.nypl.simplified.opds.core.OPDSFeedParser
 import org.nypl.simplified.opds.core.OPDSFeedParserType
 import org.nypl.simplified.opds.core.OPDSSearchParser
 import org.nypl.simplified.opds.core.OPDSSearchParserType
-import org.nypl.simplified.tests.mocking.MockBundledContentResolver
 import org.nypl.simplified.tests.mocking.MockContentResolver
 import org.slf4j.LoggerFactory
 import org.thepalaceproject.opds.client.OPDSClient
@@ -111,7 +110,6 @@ class OPDSClientCompositeFacetTest {
         parser = this.parser,
         searchParser = this.searchParser,
         transport = this.feedTransport,
-        bundledContent = MockBundledContentResolver()
       )
 
     this.client =
