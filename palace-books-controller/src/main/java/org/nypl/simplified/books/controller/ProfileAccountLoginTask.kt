@@ -21,7 +21,6 @@ import org.nypl.simplified.accounts.api.AccountLoginState.AccountLogoutFailed
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountNotLoggedIn
 import org.nypl.simplified.accounts.api.AccountLoginStringResourcesType
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
-import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.OAuthWithIntermediary
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.SAML2_0
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
@@ -31,9 +30,6 @@ import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.Basic
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.BasicToken
-import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.OAuthWithIntermediaryCancel
-import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.OAuthWithIntermediaryComplete
-import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.OAuthWithIntermediaryInitiate
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.SAML20Cancel
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.SAML20Complete
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.SAML20Initiate
@@ -124,18 +120,6 @@ class ProfileAccountLoginTask(
 
         is BasicToken -> {
           this.runBasicTokenLogin(this.request)
-        }
-
-        is OAuthWithIntermediaryInitiate -> {
-          this.runOAuthWithIntermediaryInitiate(this.request)
-        }
-
-        is OAuthWithIntermediaryComplete -> {
-          this.runOAuthWithIntermediaryComplete(this.request)
-        }
-
-        is OAuthWithIntermediaryCancel -> {
-          this.runOAuthWithIntermediaryCancel(this.request)
         }
 
         is SAML20Initiate -> {
@@ -287,82 +271,6 @@ class ProfileAccountLoginTask(
     return this.steps.finishSuccess(Unit)
   }
 
-  private fun runOAuthWithIntermediaryCancel(
-    request: OAuthWithIntermediaryCancel
-  ): TaskResult<Unit> {
-    this.steps.beginNewStep("Cancelling login...")
-    return when (val loginState = this.account.loginState) {
-      is AccountLoggingIn,
-      is AccountLoggingInWaitingForExternalAuthentication -> {
-        this.account.setLoginState(AccountNotLoggedIn(loginState.credentials))
-        this.steps.finishSuccess(Unit)
-      }
-
-      is AccountLoggedIn,
-      is AccountLoggedInStaleCredentials,
-      is AccountLoggingOut,
-      is AccountLoginFailed,
-      is AccountNotLoggedIn,
-      is AccountLogoutFailed -> {
-        this.steps.currentStepSucceeded(
-          "Ignored the cancellation attempt because the account wasn't waiting for authentication."
-        )
-        this.steps.finishSuccess(Unit)
-      }
-    }
-  }
-
-  private fun runOAuthWithIntermediaryComplete(
-    request: OAuthWithIntermediaryComplete
-  ): TaskResult<Unit> {
-    this.steps.beginNewStep("Accepting login token...")
-    return when (val loginState = this.account.loginState) {
-      is AccountLoggingIn,
-      is AccountLoggingInWaitingForExternalAuthentication -> {
-        this.credentials =
-          AccountAuthenticationCredentials.OAuthWithIntermediary(
-            accessToken = request.token,
-            adobeCredentials = loginState.credentials?.adobeCredentials,
-            authenticationDescription = this.findCurrentDescription().description,
-            annotationsURI = loginState.credentials?.annotationsURI,
-            deviceRegistrationURI = loginState.credentials?.deviceRegistrationURI,
-            patronAuthorization = null
-          )
-
-        this.handlePatronUserProfile()
-        this.updateCredentialsToLoggedInState()
-        this.notificationTokenHttpCalls.registerFCMTokenForProfileAccount(account = this.account)
-        this.steps.finishSuccess(Unit)
-      }
-
-      is AccountLoggedIn,
-      is AccountLoggedInStaleCredentials,
-      is AccountLoggingOut,
-      is AccountLoginFailed,
-      is AccountNotLoggedIn,
-      is AccountLogoutFailed -> {
-        this.steps.currentStepSucceeded(
-          "Ignored the authentication token because the account wasn't waiting for one."
-        )
-        this.steps.finishSuccess(Unit)
-      }
-    }
-  }
-
-  private fun runOAuthWithIntermediaryInitiate(
-    request: OAuthWithIntermediaryInitiate
-  ): TaskResult.Success<Unit> {
-    val existingLoginState = this.account.loginState
-    this.account.setLoginState(
-      AccountLoggingInWaitingForExternalAuthentication(
-        previousCredentials = existingLoginState.credentials,
-        description = request.description,
-        status = "Waiting for authentication..."
-      )
-    )
-    return this.steps.finishSuccess(Unit)
-  }
-
   private fun runBasicLogin(
     request: Basic
   ): TaskResult.Success<Unit> {
@@ -491,14 +399,6 @@ class ProfileAccountLoginTask(
         )
       }
 
-      is AccountAuthenticationCredentials.OAuthWithIntermediary -> {
-        currentCredentials.copy(
-          annotationsURI = patronProfile.annotationsURI,
-          deviceRegistrationURI = patronProfile.deviceRegistrationURI,
-          patronAuthorization = patronProfile.authorization
-        )
-      }
-
       is AccountAuthenticationCredentials.SAML2_0 -> {
         currentCredentials.copy(
           annotationsURI = patronProfile.annotationsURI,
@@ -523,17 +423,6 @@ class ProfileAccountLoginTask(
           (this.account.provider.authenticationAlternatives.any { it == this.request.description })
       }
 
-      is OAuthWithIntermediaryInitiate -> {
-        (this.account.provider.authentication == this.request.description) ||
-          (this.account.provider.authenticationAlternatives.any { it == this.request.description })
-      }
-
-      is OAuthWithIntermediaryCancel,
-      is OAuthWithIntermediaryComplete -> {
-        this.account.provider.authentication is OAuthWithIntermediary ||
-          (this.account.provider.authenticationAlternatives.any { it is OAuthWithIntermediary })
-      }
-
       is SAML20Initiate -> {
         (this.account.provider.authentication == this.request.description) ||
           (this.account.provider.authenticationAlternatives.any { it == this.request.description })
@@ -553,8 +442,7 @@ class ProfileAccountLoginTask(
     return when (this.request) {
       is Basic,
       is BasicToken,
-      is SAML20Initiate,
-      is OAuthWithIntermediaryInitiate -> {
+      is SAML20Initiate -> {
         this.account.setLoginState(
           AccountLoggingIn(
             status = step.description,
@@ -567,9 +455,7 @@ class ProfileAccountLoginTask(
       }
 
       is SAML20Cancel,
-      is SAML20Complete,
-      is OAuthWithIntermediaryComplete,
-      is OAuthWithIntermediaryCancel -> {
+      is SAML20Complete -> {
         when (this.account.loginState) {
           is AccountLoggingInWaitingForExternalAuthentication -> {
             this.account.setLoginState(
@@ -608,35 +494,6 @@ class ProfileAccountLoginTask(
 
       is BasicToken -> {
         this.request.description
-      }
-
-      is OAuthWithIntermediaryInitiate -> {
-        this.request.description
-      }
-
-      is OAuthWithIntermediaryCancel -> {
-        this.request.description
-      }
-
-      is OAuthWithIntermediaryComplete -> {
-        when (val loginState = this.account.loginState) {
-          is AccountLoggingIn -> {
-            loginState.description
-          }
-
-          is AccountLoggingInWaitingForExternalAuthentication -> {
-            loginState.description
-          }
-
-          is AccountLoggedIn,
-          is AccountLoggedInStaleCredentials,
-          is AccountLoggingOut,
-          is AccountLoginFailed,
-          is AccountNotLoggedIn,
-          is AccountLogoutFailed -> {
-            throw NoCurrentDescription()
-          }
-        }
       }
 
       is SAML20Initiate -> {

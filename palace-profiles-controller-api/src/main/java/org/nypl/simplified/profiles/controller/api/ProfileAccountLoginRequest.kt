@@ -41,34 +41,6 @@ sealed class ProfileAccountLoginRequest {
   ) : ProfileAccountLoginRequest()
 
   /**
-   * A request to begin a login using OAuth (with an intermediary) authentication.
-   */
-
-  data class OAuthWithIntermediaryInitiate(
-    override val accountId: AccountID,
-    val description: AccountProviderAuthenticationDescription.OAuthWithIntermediary
-  ) : ProfileAccountLoginRequest()
-
-  /**
-   * A request to complete a login using OAuth (with an intermediary) authentication. In other
-   * words, an OAuth token has been passed to the application.
-   */
-
-  data class OAuthWithIntermediaryComplete(
-    override val accountId: AccountID,
-    val token: String
-  ) : ProfileAccountLoginRequest()
-
-  /**
-   * A request to cancel waiting for a login using OAuth (with an intermediary) authentication.
-   */
-
-  data class OAuthWithIntermediaryCancel(
-    override val accountId: AccountID,
-    val description: AccountProviderAuthenticationDescription.OAuthWithIntermediary
-  ) : ProfileAccountLoginRequest()
-
-  /**
    * A request to begin a login using SAML 2.0 authentication.
    */
 

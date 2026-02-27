@@ -121,31 +121,6 @@ sealed class AccountAuthenticationCredentials {
   }
 
   /**
-   * The user used OAuth (with an intermediary) authentication to authenticate.
-   */
-
-  data class OAuthWithIntermediary(
-    val accessToken: String,
-    override val adobeCredentials: AccountAuthenticationAdobePreActivationCredentials?,
-    override val authenticationDescription: String?,
-    override val annotationsURI: URI?,
-    override val deviceRegistrationURI: URI?,
-    override val patronAuthorization: PatronAuthorization?
-  ) : AccountAuthenticationCredentials() {
-    override fun withoutAdobePostActivationCredentials(): AccountAuthenticationCredentials {
-      return this.copy(
-        adobeCredentials = this.adobeCredentials?.copy(postActivationCredentials = null)
-      )
-    }
-
-    override fun withAdobePreActivationCredentials(
-      newCredentials: AccountAuthenticationAdobePreActivationCredentials
-    ): AccountAuthenticationCredentials {
-      return this.copy(adobeCredentials = newCredentials)
-    }
-  }
-
-  /**
    * The user used SAML 2.0 authentication to authenticate.
    */
 

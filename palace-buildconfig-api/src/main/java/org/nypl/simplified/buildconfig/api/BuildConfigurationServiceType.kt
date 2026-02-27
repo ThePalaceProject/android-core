@@ -9,6 +9,5 @@ interface BuildConfigurationServiceType :
   BuildConfigurationBrandingType,
   BuildConfigurationCatalogType,
   BuildConfigurationMetadataType,
-  BuildConfigurationOAuthType,
   BuildConfigurationReaderType,
   BuildConfigurationSettingsType

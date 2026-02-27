@@ -10,7 +10,6 @@ import org.librarysimplified.http.api.LSHTTPAuthorizationType
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials.Basic
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials.BasicToken
-import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials.OAuthWithIntermediary
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials.SAML2_0
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.borrowing.BorrowSubtaskCredentials
@@ -92,10 +91,6 @@ class BorrowAudiobookAuthorizationHandler(
               credentials.userName.value,
               this.overdrivePasswordOf(credentials.password.value)
             )
-          }
-
-          is OAuthWithIntermediary -> {
-            throw UnsupportedOperationException("Overdrive audio books cannot use OAuth.")
           }
 
           is SAML2_0 -> {

@@ -41,9 +41,6 @@ object AccountAuthenticationCredentialsJSON20210512 : AccountAuthenticationCrede
       "basicToken" -> {
         deserializeBasicToken(obj)
       }
-      "oauthWithIntermediary" -> {
-        deserializeOAuthWithIntermediary(obj)
-      }
       "saml2_0" -> {
         deserializeSAML2_0(obj)
       }
@@ -51,27 +48,6 @@ object AccountAuthenticationCredentialsJSON20210512 : AccountAuthenticationCrede
         throw JSONParseException("Unrecognized type: $type")
       }
     }
-  }
-
-  private fun deserializeOAuthWithIntermediary(
-    obj: ObjectNode
-  ): AccountAuthenticationCredentials.OAuthWithIntermediary {
-    val adobeCredentials =
-      JSONParserUtilities.getObjectOrNull(obj, "adobe_credentials")
-        ?.let(AccountAuthenticationCredentialsAdobeJSON::deserializeAdobeCredentials)
-
-    val patronAuthorization: PatronAuthorization? =
-      JSONParserUtilities.getStringOrNull(obj, "palaceAuthorizationIdentifier")
-        ?.let { text -> PatronAuthorization(text, null) }
-
-    return AccountAuthenticationCredentials.OAuthWithIntermediary(
-      accessToken = JSONParserUtilities.getString(obj, "accessToken"),
-      adobeCredentials = adobeCredentials,
-      authenticationDescription = JSONParserUtilities.getStringOrNull(obj, "authenticationDescription"),
-      annotationsURI = JSONParserUtilities.getURIOrNull(obj, "annotationsURI"),
-      deviceRegistrationURI = JSONParserUtilities.getURIOrNull(obj, "deviceRegistrationURI"),
-      patronAuthorization = patronAuthorization
-    )
   }
 
   private fun deserializeBasic(

@@ -9,7 +9,6 @@ import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.ANONYMOUS_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.BASIC_TOKEN_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.BASIC_TYPE
-import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.OAUTH_INTERMEDIARY_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.SAML_2_0_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.KeyboardInput
 import org.nypl.simplified.accounts.api.AccountProviderDescription
@@ -224,12 +223,6 @@ class AccountProviderResolution(
 
     accumulateAuthentications@ for (authObject in authDocument.authentication) {
       when (val authType = authObject.type.toASCIIString()) {
-        OAUTH_INTERMEDIARY_TYPE -> {
-          authObjects.add(
-            this.extractAuthenticationDescriptionOAuthIntermediary(taskRecorder, authObject)
-          )
-        }
-
         BASIC_TYPE -> {
           authObjects.add(
             this.extractAuthenticationDescriptionBasic(authObject)
@@ -304,33 +297,6 @@ class AccountProviderResolution(
     }
 
     return AccountProviderAuthenticationDescription.SAML2_0(
-      authenticate = authenticateURI,
-      description = authObject.description,
-      logoURI = logo?.hrefURI
-    )
-  }
-
-  private fun extractAuthenticationDescriptionOAuthIntermediary(
-    taskRecorder: TaskRecorderType,
-    authObject: AuthenticationObject
-  ): AccountProviderAuthenticationDescription {
-    val authenticate =
-      authObject.links.find { link -> link.relation == "authenticate" }
-    val logo =
-      authObject.links.find { link -> link.relation == "logo" }
-
-    val authenticateURI = authenticate?.hrefURI
-    if (authenticateURI == null) {
-      val message = this.stringResources.resolvingAuthDocumentOAuthMalformed
-      taskRecorder.currentStepFailed(
-        message = message,
-        errorCode = authDocumentUnusable(this.description),
-        extraMessages = listOf()
-      )
-      throw IOException(message)
-    }
-
-    return AccountProviderAuthenticationDescription.OAuthWithIntermediary(
       authenticate = authenticateURI,
       description = authObject.description,
       logoURI = logo?.hrefURI

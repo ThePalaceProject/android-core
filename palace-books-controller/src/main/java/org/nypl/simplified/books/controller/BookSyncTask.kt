@@ -182,8 +182,6 @@ class BookSyncTask(
         currentCredentials.copy(patronAuthorization = authorization)
       is AccountAuthenticationCredentials.BasicToken ->
         currentCredentials.copy(patronAuthorization = authorization)
-      is AccountAuthenticationCredentials.OAuthWithIntermediary ->
-        currentCredentials.copy(patronAuthorization = authorization)
       is AccountAuthenticationCredentials.SAML2_0 ->
         currentCredentials.copy(patronAuthorization = authorization)
     }
@@ -197,8 +195,6 @@ class BookSyncTask(
       is AccountAuthenticationCredentials.Basic ->
         currentCredentials.copy(annotationsURI = profile.annotationsURI)
       is AccountAuthenticationCredentials.BasicToken ->
-        currentCredentials.copy(annotationsURI = profile.annotationsURI)
-      is AccountAuthenticationCredentials.OAuthWithIntermediary ->
         currentCredentials.copy(annotationsURI = profile.annotationsURI)
       is AccountAuthenticationCredentials.SAML2_0 ->
         currentCredentials.copy(annotationsURI = profile.annotationsURI)

@@ -25,18 +25,6 @@ interface AccountProviderResolutionStringsType {
   val resolvingAuthDocumentBasicTokenMalformed: String
 
   /**
-   * The description of a COPPA age gate is malformed.
-   */
-
-  val resolvingAuthDocumentCOPPAAgeGateMalformed: String
-
-  /**
-   * The description of an OAuth system is malformed.
-   */
-
-  val resolvingAuthDocumentOAuthMalformed: String
-
-  /**
    * The description of as SAML 2.0 system is malformed.
    */
 

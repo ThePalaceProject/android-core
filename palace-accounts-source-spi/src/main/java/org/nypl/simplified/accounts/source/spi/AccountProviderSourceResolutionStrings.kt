@@ -21,12 +21,6 @@ class AccountProviderSourceResolutionStrings(
   override val resolvingAuthDocumentRetrievalFailed: String
     get() = this.resources.getString(R.string.resolvingAuthDocumentRetrievalFailed)
 
-  override val resolvingAuthDocumentCOPPAAgeGateMalformed: String
-    get() = this.resources.getString(R.string.resolvingAuthDocumentCOPPAAgeGateMalformed)
-
-  override val resolvingAuthDocumentOAuthMalformed: String
-    get() = this.resources.getString(R.string.resolvingAuthDocumentOAuthMalformed)
-
   override val resolvingAuthDocumentBasicTokenMalformed: String
     get() = this.resources.getString(R.string.resolvingAuthDocumentBasicTokenMalformed)
 

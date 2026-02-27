@@ -27,14 +27,6 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
       "http://librarysimplified.org/rel/auth/anonymous"
 
     /**
-     * The type used to identify OAuth with an intermediary. This is the authentication used
-     * by projects such as Open eBooks.
-     */
-
-    const val OAUTH_INTERMEDIARY_TYPE =
-      "http://librarysimplified.org/authtype/OAuth-with-intermediary"
-
-    /**
      * The type used to identify SAML 2.0.
      */
 
@@ -240,33 +232,6 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
         "Barcode format ${this.barcodeFormat} must be uppercase"
       )
     }
-  }
-
-  /**
-   * OAuth with an intermediary.
-   */
-
-  data class OAuthWithIntermediary(
-    override val description: String,
-
-    /**
-     * The URI used to perform authentication.
-     */
-
-    val authenticate: URI,
-
-    /**
-     * The URI of the authentication logo.
-     */
-
-    val logoURI: URI?
-  ) : AccountProviderAuthenticationDescription() {
-
-    override val isLoginPossible: Boolean =
-      true
-
-    override val canBeAlternativeLoginMethod: Boolean =
-      true
   }
 
   /**

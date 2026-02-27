@@ -459,12 +459,6 @@ abstract class AccountsDatabaseContract {
             deviceRegistrationURI = URI.create("https://www.example.com/deviceRegistration")
           )
 
-        is AccountAuthenticationCredentials.OAuthWithIntermediary ->
-          creds.copy(
-            annotationsURI = URI.create("https://www.example.com/annotations"),
-            deviceRegistrationURI = URI.create("https://www.example.com/deviceRegistration")
-          )
-
         is AccountAuthenticationCredentials.SAML2_0 ->
           creds.copy(
             annotationsURI = URI.create("https://www.example.com/annotations"),
