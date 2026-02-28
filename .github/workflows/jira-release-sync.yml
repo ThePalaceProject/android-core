@@ -1,0 +1,21 @@
+name: Jira Release Sync
+on:
+  release:
+    types: [published]
+jobs:
+  sync-to-jira:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Sync release to Jira
+        uses: ThePalaceProject/circulation/.github/actions/jira-release-sync@main
+        with:
+          jira-base-url: ${{ secrets.JIRA_BASE_URL }}
+          jira-user-email: ${{ secrets.JIRA_USER_EMAIL }}
+          jira-api-token: ${{ secrets.JIRA_API_TOKEN }}
+
+          release-name: "Android ${{ github.event.release.tag_name }}"
+          release-url: ${{ github.event.release.html_url }}
+          release-body: ${{ github.event.release.body }}
