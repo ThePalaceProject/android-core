@@ -728,7 +728,7 @@ class ProfileAccountLoginTaskTest {
       AccountProviderAuthenticationDescription.SAML2_0(
         description = "Description",
         logoURI = null,
-        authenticate = URI.create("urn:example")
+        authenticate = URI.create("http://localhost:10000/")
       )
     val request0 =
       ProfileAccountLoginRequest.SAML20Initiate(
@@ -845,7 +845,7 @@ class ProfileAccountLoginTaskTest {
       AccountProviderAuthenticationDescription.SAML2_0(
         description = "Description",
         logoURI = null,
-        authenticate = URI.create("urn:example")
+        authenticate = URI.create("http://localhost:10000/")
       )
     val request0 =
       ProfileAccountLoginRequest.SAML20Complete(
@@ -922,7 +922,7 @@ class ProfileAccountLoginTaskTest {
       AccountProviderAuthenticationDescription.SAML2_0(
         description = "Description",
         logoURI = null,
-        authenticate = URI.create("urn:example")
+        authenticate = URI.create("http://localhost:10000/")
       )
     val request0 =
       ProfileAccountLoginRequest.SAML20Cancel(
@@ -993,7 +993,7 @@ class ProfileAccountLoginTaskTest {
       AccountProviderAuthenticationDescription.SAML2_0(
         description = "Description",
         logoURI = null,
-        authenticate = URI.create("urn:example")
+        authenticate = URI.create("http://localhost:10000/")
       )
     val request0 =
       ProfileAccountLoginRequest.SAML20Initiate(
@@ -1073,4 +1073,363 @@ class ProfileAccountLoginTaskTest {
 
   private fun <T> anyNonNull(): T =
     Mockito.argThat { x -> x != null }
+
+
+
+
+
+
+
+
+
+
+
+  /**
+   * Logging in with OIDC succeeds.
+   */
+
+  @Test
+  fun testLoginOIDCCompleteNoDRM() {
+    val authDescription =
+      AccountProviderAuthenticationDescription.OpenIDConnect(
+        description = "Description",
+        logoURI = null,
+        authenticate = URI.create("http://localhost:${this.server.port}/")
+      )
+    val request0 =
+      ProfileAccountLoginRequest.OIDCInitiate(
+        accountId = this.accountID,
+        description = authDescription,
+        redirectURI = URI.create("http://localhost:10000/")
+      )
+    val request1 =
+      ProfileAccountLoginRequest.OIDCComplete(
+        accountId = this.accountID,
+        accessToken = "A TOKEN!",
+      )
+
+    val provider =
+      fakeAccountProvider()
+
+    Mockito.`when`(provider.patronSettingsURI)
+      .thenReturn(this.server.url("patron").toUri())
+    Mockito.`when`(provider.authentication)
+      .thenReturn(authDescription)
+
+    Mockito.`when`(this.profile.id)
+      .thenReturn(this.profileID)
+    Mockito.`when`(this.profile.accounts())
+      .thenReturn(sortedMapOf(Pair(this.accountID, this.account)))
+    Mockito.`when`(this.account.id)
+      .thenReturn(this.accountID)
+    Mockito.`when`(this.account.provider)
+      .thenReturn(provider)
+    Mockito.`when`(this.account.setLoginState(anyNonNull()))
+      .then {
+        val newState = it.getArgument<AccountLoginState>(0)
+        this.logger.debug("new state: {}", newState)
+        this.loginState = newState
+        this.loginState
+      }
+    Mockito.`when`(this.account.loginState)
+      .then { this.loginState }
+
+    this.server.enqueue(
+      MockResponse()
+        .setResponseCode(302)
+        .setHeader("Location", "http://www.example.com")
+    )
+    this.server.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+        .setBody(this.profileWithoutDRM.trimIndent())
+    )
+
+    val task0 =
+      ProfileAccountLoginTask(
+        http = this.http,
+        profile = this.profile,
+        account = this.account,
+        loginStrings = this.loginStrings,
+        patronParsers = this.patronParserFactory,
+        request = request0,
+        notificationTokenHttpCalls = tokenHttp
+      )
+
+    val result0 = task0.call()
+    TaskDumps.dump(logger, result0)
+
+    this.account.loginState as AccountLoggingInWaitingForExternalAuthentication
+
+    val task1 =
+      ProfileAccountLoginTask(
+        http = this.http,
+        profile = this.profile,
+        account = this.account,
+        loginStrings = this.loginStrings,
+        patronParsers = this.patronParserFactory,
+        request = request1,
+        notificationTokenHttpCalls = tokenHttp
+      )
+
+    val result1 = task1.call()
+    TaskDumps.dump(logger, result1)
+
+    val state =
+      this.account.loginState as AccountLoggedIn
+
+    Assertions.assertEquals(
+      AccountAuthenticationCredentials.OpenIDConnect(
+        adobeCredentials = null,
+        authenticationDescription = "Description",
+        accessToken = "A TOKEN!",
+        annotationsURI = URI("https://www.example.com"),
+        deviceRegistrationURI = URI("https://www.example.com"),
+        patronAuthorization = PatronAuthorization("6120696828384", org.joda.time.Instant.parse("2019-08-02T00:00:00Z"))
+      ),
+      state.credentials
+    )
+
+    val req0 = this.server.takeRequest()
+    val req1 = this.server.takeRequest()
+    assertEquals(this.server.url("patron"), req1.requestUrl)
+    assertEquals(2, this.server.requestCount)
+  }
+
+  /**
+   * Receiving an OIDC token in an account that wasn't waiting for one ignores the request.
+   */
+
+  @Test
+  fun testLoginOIDCNotWaiting() {
+    val authDescription =
+      AccountProviderAuthenticationDescription.OpenIDConnect(
+        description = "Description",
+        logoURI = null,
+        authenticate = URI.create("http://localhost:10000/")
+      )
+    val request0 =
+      ProfileAccountLoginRequest.OIDCComplete(
+        accountId = this.accountID,
+        accessToken = "A TOKEN!",
+      )
+
+    val provider =
+      fakeAccountProvider()
+
+    Mockito.`when`(provider.patronSettingsURI)
+      .thenReturn(this.server.url("patron").toUri())
+    Mockito.`when`(provider.authentication)
+      .thenReturn(authDescription)
+
+    Mockito.`when`(this.profile.id)
+      .thenReturn(this.profileID)
+    Mockito.`when`(this.profile.accounts())
+      .thenReturn(sortedMapOf(Pair(this.accountID, this.account)))
+    Mockito.`when`(this.account.id)
+      .thenReturn(this.accountID)
+    Mockito.`when`(this.account.provider)
+      .thenReturn(provider)
+    Mockito.`when`(this.account.setLoginState(anyNonNull()))
+      .then {
+        val newState = it.getArgument<AccountLoginState>(0)
+        this.logger.debug("new state: {}", newState)
+        this.loginState = newState
+        this.loginState
+      }
+    Mockito.`when`(this.account.loginState)
+      .then { this.loginState }
+
+    this.server.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+        .setBody(this.profileWithoutDRM.trimIndent())
+    )
+
+    val task0 =
+      ProfileAccountLoginTask(
+        http = this.http,
+        profile = this.profile,
+        account = this.account,
+        loginStrings = this.loginStrings,
+        patronParsers = this.patronParserFactory,
+        request = request0,
+        notificationTokenHttpCalls = tokenHttp
+      )
+
+    this.loginState = AccountNotLoggedIn(null)
+
+    val result0 = task0.call() as TaskResult.Success
+    TaskDumps.dump(logger, result0)
+
+    this.account.loginState as AccountNotLoggedIn
+
+    assertEquals(0, this.server.requestCount)
+  }
+
+  /**
+   * Cancelling an OIDC request in an account that wasn't waiting for one ignores the request.
+   */
+
+  @Test
+  fun testLoginOIDCNotWaitingCancel() {
+    val authDescription =
+      AccountProviderAuthenticationDescription.OpenIDConnect(
+        description = "Description",
+        logoURI = null,
+        authenticate = URI.create("http://localhost:10000/")
+      )
+    val request0 =
+      ProfileAccountLoginRequest.OIDCCancel(
+        accountId = this.accountID,
+        description = authDescription
+      )
+
+    val provider =
+      fakeAccountProvider()
+
+    Mockito.`when`(provider.patronSettingsURI)
+      .thenReturn(this.server.url("patron").toUri())
+    Mockito.`when`(provider.authentication)
+      .thenReturn(authDescription)
+
+    Mockito.`when`(this.profile.id)
+      .thenReturn(this.profileID)
+    Mockito.`when`(this.profile.accounts())
+      .thenReturn(sortedMapOf(Pair(this.accountID, this.account)))
+    Mockito.`when`(this.account.id)
+      .thenReturn(this.accountID)
+    Mockito.`when`(this.account.provider)
+      .thenReturn(provider)
+    Mockito.`when`(this.account.setLoginState(anyNonNull()))
+      .then {
+        val newState = it.getArgument<AccountLoginState>(0)
+        this.logger.debug("new state: {}", newState)
+        this.loginState = newState
+        this.loginState
+      }
+    Mockito.`when`(this.account.loginState)
+      .then { this.loginState }
+
+    this.server.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+        .setBody(this.profileWithoutDRM.trimIndent())
+    )
+
+    val task0 =
+      ProfileAccountLoginTask(
+        http = this.http,
+        profile = this.profile,
+        account = this.account,
+        loginStrings = this.loginStrings,
+        patronParsers = this.patronParserFactory,
+        request = request0,
+        notificationTokenHttpCalls = tokenHttp
+      )
+
+    this.loginState = AccountNotLoggedIn(null)
+
+    val result0 = task0.call() as TaskResult.Success
+    TaskDumps.dump(logger, result0)
+
+    this.account.loginState as AccountNotLoggedIn
+
+    assertEquals(0, this.server.requestCount)
+  }
+
+  /**
+   * Cancelling OIDC works.
+   */
+
+  @Test
+  fun testLoginOIDCCancel() {
+    val authDescription =
+      AccountProviderAuthenticationDescription.OpenIDConnect(
+        description = "Description",
+        logoURI = null,
+        authenticate = URI.create("http://localhost:${this.server.port}/")
+      )
+    val request0 =
+      ProfileAccountLoginRequest.OIDCInitiate(
+        accountId = this.accountID,
+        description = authDescription,
+        redirectURI = URI.create("http://www.example.com/")
+      )
+    val request1 =
+      ProfileAccountLoginRequest.OIDCCancel(
+        accountId = this.accountID,
+        description = authDescription
+      )
+
+    val provider =
+      fakeAccountProvider()
+
+    Mockito.`when`(provider.patronSettingsURI)
+      .thenReturn(this.server.url("patron").toUri())
+    Mockito.`when`(provider.authentication)
+      .thenReturn(authDescription)
+
+    Mockito.`when`(this.profile.id)
+      .thenReturn(this.profileID)
+    Mockito.`when`(this.profile.accounts())
+      .thenReturn(sortedMapOf(Pair(this.accountID, this.account)))
+    Mockito.`when`(this.account.id)
+      .thenReturn(this.accountID)
+    Mockito.`when`(this.account.provider)
+      .thenReturn(provider)
+    Mockito.`when`(this.account.setLoginState(anyNonNull()))
+      .then {
+        val newState = it.getArgument<AccountLoginState>(0)
+        this.logger.debug("new state: {}", newState)
+        this.loginState = newState
+        this.loginState
+      }
+    Mockito.`when`(this.account.loginState)
+      .then { this.loginState }
+
+    this.server.enqueue(
+      MockResponse()
+        .setResponseCode(302)
+        .addHeader("Location", "http://www.example.com")
+    )
+
+    this.server.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+        .setBody(this.profileWithoutDRM.trimIndent())
+    )
+
+    val task0 =
+      ProfileAccountLoginTask(
+        http = this.http,
+        profile = this.profile,
+        account = this.account,
+        loginStrings = this.loginStrings,
+        patronParsers = this.patronParserFactory,
+        request = request0,
+        notificationTokenHttpCalls = tokenHttp
+      )
+
+    val result0 = task0.call()
+    TaskDumps.dump(logger, result0)
+
+    this.account.loginState as AccountLoggingInWaitingForExternalAuthentication
+
+    val task1 =
+      ProfileAccountLoginTask(
+        http = this.http,
+        profile = this.profile,
+        account = this.account,
+        loginStrings = this.loginStrings,
+        patronParsers = this.patronParserFactory,
+        request = request1,
+        notificationTokenHttpCalls = tokenHttp
+      )
+
+    val result1 = task1.call()
+    TaskDumps.dump(logger, result1)
+
+    assertEquals(1, this.server.requestCount)
+  }
 }
