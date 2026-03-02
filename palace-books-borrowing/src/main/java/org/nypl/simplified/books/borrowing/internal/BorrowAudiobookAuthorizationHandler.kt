@@ -8,6 +8,7 @@ import org.librarysimplified.audiobook.manifest_fulfill.opa.OPAUsernamePassword
 import org.librarysimplified.http.api.LSHTTPAuthorizationBearerToken
 import org.librarysimplified.http.api.LSHTTPAuthorizationType
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
+import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials.Basic
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials.BasicToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials.SAML2_0
@@ -99,6 +100,10 @@ class BorrowAudiobookAuthorizationHandler(
 
           null -> {
             throw UnsupportedOperationException("Overdrive audio books require credentials.")
+          }
+
+          is AccountAuthenticationCredentials.OpenIDConnect -> {
+            throw UnsupportedOperationException("Overdrive audio books cannot use OIDC.")
           }
         }
       }

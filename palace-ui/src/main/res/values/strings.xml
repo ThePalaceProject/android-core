@@ -52,6 +52,7 @@
   <string name="accountSAML20LoginLabel">Sign in with SAML 2.0 WEB SSO</string>
   <string name="accountSAML20NoAccessToken">Failed to retrieve an access token from the URI: %1$s</string>
   <string name="accountSAML20NoPatronInfo">Failed to retrieve patron info from the URI: %1$s</string>
+  <string name="accountOIDCLoginLabel">Sign in with OpenID Connect</string>
   <string name="accountSearchHint">Search accounts&#8230;</string>
   <string name="accountSyncBookmarks">Sync bookmarks</string>
   <string name="accountUserName">User Name</string>

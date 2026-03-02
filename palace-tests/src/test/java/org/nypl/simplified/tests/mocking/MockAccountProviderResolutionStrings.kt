@@ -19,6 +19,9 @@ class MockAccountProviderResolutionStrings : AccountProviderResolutionStringsTyp
   override val resolvingAuthDocumentSAML20Malformed: String
     get() = "resolvingAuthDocumentSAML20Malformed"
 
+  override val resolvingAuthDocumentOIDCMalformed: String
+    get() = "resolvingAuthDocumentOIDCMalformed"
+
   override val resolvingAuthDocumentNoUsableAuthenticationTypes: String
     get() = "resolvingAuthDocumentNoUsableAuthenticationTypes"
 

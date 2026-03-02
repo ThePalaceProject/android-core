@@ -13,4 +13,6 @@
     <include layout="@layout/auth_basic_token" />
 
     <include layout="@layout/auth_saml" />
+
+    <include layout="@layout/auth_oidc" />
 </LinearLayout>

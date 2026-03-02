@@ -147,6 +147,7 @@ interface AccountProviderType : Comparable<AccountProviderType> {
 
   fun catalogURIForAge(age: Int): URI {
     return when (this.authentication) {
+      is AccountProviderAuthenticationDescription.OpenIDConnect,
       is AccountProviderAuthenticationDescription.SAML2_0,
       AccountProviderAuthenticationDescription.Anonymous,
       is AccountProviderAuthenticationDescription.Basic,
@@ -167,6 +168,7 @@ interface AccountProviderType : Comparable<AccountProviderType> {
 
   val supportsBarcodeDisplay: Boolean
     get() = when (val auth = this.authentication) {
+      is AccountProviderAuthenticationDescription.OpenIDConnect,
       is AccountProviderAuthenticationDescription.SAML2_0,
       AccountProviderAuthenticationDescription.Anonymous ->
         false

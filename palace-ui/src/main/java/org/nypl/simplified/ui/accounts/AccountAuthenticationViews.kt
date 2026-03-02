@@ -9,12 +9,14 @@ import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Anonymous
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Basic
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.BasicToken
+import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.OpenIDConnect
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.SAML2_0
 import org.nypl.simplified.accounts.api.AccountUsername
 import org.nypl.simplified.ui.accounts.view_bindings.AccountAuthenticationViewBindings
 import org.nypl.simplified.ui.accounts.view_bindings.ViewsForAnonymous
 import org.nypl.simplified.ui.accounts.view_bindings.ViewsForBasic
 import org.nypl.simplified.ui.accounts.view_bindings.ViewsForBasicToken
+import org.nypl.simplified.ui.accounts.view_bindings.ViewsForOIDC
 import org.nypl.simplified.ui.accounts.view_bindings.ViewsForSAML20
 
 /**
@@ -48,12 +50,18 @@ class AccountAuthenticationViews(
       this.viewGroup.findViewById(R.id.authSAML)
     )
 
+  private val oidc: ViewsForOIDC =
+    ViewsForOIDC.bind(
+      this.viewGroup.findViewById(R.id.authOIDC)
+    )
+
   private val viewGroups =
     listOf(
       this.basic,
       this.basicToken,
       this.anonymous,
-      this.saml20
+      this.saml20,
+      this.oidc
     )
 
   /**
@@ -153,6 +161,11 @@ class AccountAuthenticationViews(
         this.saml20.viewGroup.visibility = VISIBLE
         this.saml20.configureFor(description)
       }
+
+      is OpenIDConnect -> {
+        this.oidc.viewGroup.visibility = VISIBLE
+        this.oidc.configureFor(description)
+      }
     }
   }
 
@@ -191,6 +204,7 @@ class AccountAuthenticationViews(
         this.basicToken.isSatisfied(description)
       }
 
+      is OpenIDConnect,
       Anonymous,
       is SAML2_0 ->
         true

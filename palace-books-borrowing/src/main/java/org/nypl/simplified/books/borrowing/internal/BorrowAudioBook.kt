@@ -119,6 +119,7 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
           }
 
           null,
+          is AccountAuthenticationCredentials.OpenIDConnect,
           is AccountAuthenticationCredentials.SAML2_0 -> {
             null
           }

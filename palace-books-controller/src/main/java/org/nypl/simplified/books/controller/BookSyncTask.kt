@@ -184,6 +184,8 @@ class BookSyncTask(
         currentCredentials.copy(patronAuthorization = authorization)
       is AccountAuthenticationCredentials.SAML2_0 ->
         currentCredentials.copy(patronAuthorization = authorization)
+      is AccountAuthenticationCredentials.OpenIDConnect ->
+        currentCredentials.copy(patronAuthorization = authorization)
     }
   }
 
@@ -197,6 +199,8 @@ class BookSyncTask(
       is AccountAuthenticationCredentials.BasicToken ->
         currentCredentials.copy(annotationsURI = profile.annotationsURI)
       is AccountAuthenticationCredentials.SAML2_0 ->
+        currentCredentials.copy(annotationsURI = profile.annotationsURI)
+      is AccountAuthenticationCredentials.OpenIDConnect ->
         currentCredentials.copy(annotationsURI = profile.annotationsURI)
     }
   }

@@ -37,6 +37,7 @@ import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggingOut
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoginFailed
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLogoutFailed
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountNotLoggedIn
+import org.nypl.simplified.accounts.api.AccountOIDC
 import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountUsername
@@ -51,6 +52,7 @@ import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus.AsLoginButtonEna
 import org.nypl.simplified.ui.accounts.AccountLogoutButtonStatus.AsButtonGone
 import org.nypl.simplified.ui.accounts.AccountLogoutButtonStatus.AsLogoutButtonDisabled
 import org.nypl.simplified.ui.accounts.AccountLogoutButtonStatus.AsLogoutButtonEnabled
+import org.nypl.simplified.ui.accounts.oidc.AccountOIDCModel
 import org.nypl.simplified.ui.accounts.saml20.AccountSAML20Activity
 import org.nypl.simplified.ui.accounts.saml20.AccountSAML20Model
 import org.nypl.simplified.ui.images.ImageAccountIcons
@@ -125,6 +127,7 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
   private lateinit var signUpButton: Button
   private lateinit var signUpLabel: TextView
   private lateinit var webViewDataDir: File
+  private lateinit var accountEvents: AccountEvents
 
   private val imageButtonLoadingTag = "IMAGE_BUTTON_LOADING"
 
@@ -309,6 +312,8 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
       Services.serviceDirectory()
     val imageLoader =
       services.requireService(ImageLoaderType::class.java)
+    this.accountEvents =
+      services.requireService(AccountEvents::class.java)
 
     ImageAccountIcons.loadAccountLogoIntoView(
       imageLoader.loader,
@@ -372,6 +377,7 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
           )
         }
 
+        is AccountProviderAuthenticationDescription.OpenIDConnect,
         AccountProviderAuthenticationDescription.Anonymous,
         is AccountProviderAuthenticationDescription.SAML2_0 -> {
           // Nothing to do.
@@ -385,12 +391,8 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
 
     this.reconfigureAccountUI()
 
-    val accountEvents =
-      services.requireService(AccountEvents::class.java)
-
     val eventSub =
-      accountEvents.events.subscribe { _ -> this.reconfigureAccountUI() }
-
+      this.accountEvents.events.subscribe { _ -> this.reconfigureAccountUI() }
     this.subscriptions.add(AutoCloseable { eventSub.dispose() })
   }
 
@@ -412,6 +414,10 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
 
         is AccountProviderAuthenticationDescription.SAML2_0 -> {
           this.logger.warn("SAML 2.0 is not currently supported as an alternative.")
+        }
+
+        is AccountProviderAuthenticationDescription.OpenIDConnect -> {
+          this.logger.warn("OpenID Connect is not currently supported as an alternative.")
         }
       }
     }
@@ -470,28 +476,6 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
     }
   }
 
-  private fun configureImageButton(
-    container: ViewGroup,
-    buttonText: TextView,
-    buttonImage: ImageView,
-    text: String,
-    logoURI: URI?,
-    onClick: () -> Unit
-  ) {
-    buttonText.text = text
-    buttonText.setOnClickListener { onClick.invoke() }
-    buttonImage.setOnClickListener { onClick.invoke() }
-    this.loadAuthenticationLogoIfNecessary(
-      uri = logoURI,
-      view = buttonImage,
-      onSuccess = {
-        container.background = null
-        buttonImage.visibility = View.VISIBLE
-        buttonText.visibility = View.GONE
-      }
-    )
-  }
-
   private fun onTrySAML2Login(
     authenticationDescription: AccountProviderAuthenticationDescription.SAML2_0
   ) {
@@ -515,6 +499,30 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
       activity.startActivity(intent)
     } catch (e: Throwable) {
       this.logger.error("Failed to start activity: ", e)
+    }
+  }
+
+  private fun onTryOIDCLogin(
+    authenticationDescription: AccountProviderAuthenticationDescription.OpenIDConnect
+  ) {
+    try {
+      val account = AccountDetailModel.account
+
+      AccountOIDCModel.start(
+        activity = this.requireActivity(),
+        accountEvents = this.accountEvents,
+        account = account
+      )
+
+      AccountDetailModel.tryLogin(
+        ProfileAccountLoginRequest.OIDCInitiate(
+          accountId = account.id,
+          description = authenticationDescription,
+          redirectURI = AccountOIDC.oidcCallbackURI(account.id)
+        )
+      )
+    } catch (e: Throwable) {
+      this.logger.error("Error launching activity: ", e)
     }
   }
 
@@ -733,6 +741,15 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
                   )
                 )
               }
+
+              is AccountProviderAuthenticationDescription.OpenIDConnect -> {
+                AccountDetailModel.tryLogin(
+                  ProfileAccountLoginRequest.OIDCCancel(
+                    accountId = account.id,
+                    description = desc
+                  )
+                )
+              }
             }
           },
           logoutStatus = AsButtonGone
@@ -777,6 +794,7 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
             )
           }
 
+          is AccountAuthenticationCredentials.OpenIDConnect,
           is AccountAuthenticationCredentials.SAML2_0 -> {
             // Nothing
           }
@@ -814,6 +832,7 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
             )
           }
 
+          is AccountAuthenticationCredentials.OpenIDConnect,
           is AccountAuthenticationCredentials.SAML2_0 -> {
             // No UI
           }
@@ -847,6 +866,7 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
             )
           }
 
+          is AccountAuthenticationCredentials.OpenIDConnect,
           is AccountAuthenticationCredentials.SAML2_0 -> {
             // No UI
           }
@@ -1008,38 +1028,6 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
     }
   }
 
-  private fun loadAuthenticationLogoIfNecessary(
-    uri: URI?,
-    view: ImageView,
-    onSuccess: () -> Unit
-  ) {
-    if (uri != null) {
-      val services =
-        Services.serviceDirectory()
-      val imageLoader =
-        services.requireService(ImageLoaderType::class.java)
-
-      view.setImageDrawable(null)
-      view.visibility = View.VISIBLE
-      imageLoader.loader.load(uri.toString())
-        .fit()
-        .tag(this.imageButtonLoadingTag)
-        .into(
-          view,
-          object : com.squareup.picasso.Callback {
-            override fun onSuccess() {
-              onSuccess.invoke()
-            }
-
-            override fun onError(e: Exception) {
-              this@AccountDetailFragment.logger.debug("failed to load authentication logo: ", e)
-              view.visibility = View.GONE
-            }
-          }
-        )
-    }
-  }
-
   enum class FormLockState {
     LOGGING_IN,
     LOGGING_OUT
@@ -1098,6 +1086,9 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
 
       is AccountProviderAuthenticationDescription.Anonymous ->
         throw UnreachableCodeException()
+
+      is AccountProviderAuthenticationDescription.OpenIDConnect ->
+        this.onTryOIDCLogin(description)
     }
   }
 
