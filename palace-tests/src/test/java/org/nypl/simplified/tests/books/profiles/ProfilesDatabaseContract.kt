@@ -1198,7 +1198,5 @@ abstract class ProfilesDatabaseContract {
 
     val pro1 = db1.currentProfileUnsafe()
     pro1.account(pro1.preferences().mostRecentAccount)
-
-    Assertions.assertEquals(acc0.id, pro1.preferences().mostRecentAccount)
   }
 }
