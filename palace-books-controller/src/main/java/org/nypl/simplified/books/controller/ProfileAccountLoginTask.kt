@@ -6,6 +6,7 @@ import com.google.common.base.Preconditions
 import one.irradia.mime.api.MIMECompatibility
 import org.librarysimplified.http.api.LSHTTPAuthorizationBasic
 import org.librarysimplified.http.api.LSHTTPClientType
+import org.librarysimplified.http.api.LSHTTPRequestBuilderType.AllowRedirects.DISALLOW_REDIRECTS
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType.Method.Post
 import org.librarysimplified.http.api.LSHTTPResponseStatus
 import org.librarysimplified.mdc.MDCKeys
@@ -21,6 +22,7 @@ import org.nypl.simplified.accounts.api.AccountLoginState.AccountLogoutFailed
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountNotLoggedIn
 import org.nypl.simplified.accounts.api.AccountLoginStringResourcesType
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
+import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.OpenIDConnect
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.SAML2_0
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
@@ -30,6 +32,9 @@ import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.Basic
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.BasicToken
+import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.OIDCCancel
+import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.OIDCComplete
+import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.OIDCInitiate
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.SAML20Cancel
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.SAML20Complete
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest.SAML20Initiate
@@ -41,6 +46,7 @@ import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import java.net.HttpURLConnection
 import java.net.URI
+import java.net.URLEncoder
 import java.util.concurrent.Callable
 
 /**
@@ -132,6 +138,18 @@ class ProfileAccountLoginTask(
 
         is SAML20Cancel -> {
           this.runSAML20Cancel(this.request)
+        }
+
+        is OIDCInitiate -> {
+          this.runOIDCInitiate(this.request)
+        }
+
+        is OIDCComplete -> {
+          this.runOIDCComplete(this.request)
+        }
+
+        is OIDCCancel -> {
+          this.runOIDCCancel(this.request)
         }
       }
     } catch (e: Throwable) {
@@ -265,10 +283,149 @@ class ProfileAccountLoginTask(
       AccountLoggingInWaitingForExternalAuthentication(
         previousCredentials = this.account.loginState.credentials,
         description = request.description,
-        status = "Waiting for authentication..."
+        status = "Waiting for authentication...",
+        externalURI = request.description.authenticate
       )
     )
     return this.steps.finishSuccess(Unit)
+  }
+
+  private fun runOIDCCancel(
+    request: OIDCCancel
+  ): TaskResult<Unit> {
+    this.steps.beginNewStep("Cancelling login...")
+    return when (val loginState = this.account.loginState) {
+      is AccountLoggingIn,
+      is AccountLoggingInWaitingForExternalAuthentication -> {
+        val previous = loginState.previousCredentials
+        if (previous != null) {
+          this.account.setLoginState(AccountLoggedInStaleCredentials(credentials = previous))
+        } else {
+          this.account.setLoginState(AccountNotLoggedIn(loginState.credentials))
+        }
+        this.steps.finishSuccess(Unit)
+      }
+
+      is AccountNotLoggedIn,
+      is AccountLoginFailed,
+      is AccountLoggedIn,
+      is AccountLoggedInStaleCredentials,
+      is AccountLoggingOut,
+      is AccountLogoutFailed -> {
+        this.steps.currentStepSucceeded(
+          "Ignored the cancellation attempt because the account wasn't waiting for authentication."
+        )
+        this.steps.finishSuccess(Unit)
+      }
+    }
+  }
+
+  private fun runOIDCComplete(
+    request: OIDCComplete
+  ): TaskResult<Unit> {
+    this.steps.beginNewStep("Accepting login token...")
+    return when (val loginState = this.account.loginState) {
+      is AccountLoggedInStaleCredentials,
+      is AccountLoggingIn,
+      is AccountLoggingInWaitingForExternalAuthentication -> {
+        this.credentials =
+          AccountAuthenticationCredentials.OpenIDConnect(
+            accessToken = request.accessToken,
+            adobeCredentials = loginState.credentials?.adobeCredentials,
+            authenticationDescription = this.findCurrentDescription().description,
+            annotationsURI = loginState.credentials?.annotationsURI,
+            deviceRegistrationURI = loginState.credentials?.deviceRegistrationURI,
+            patronAuthorization = null
+          )
+
+        this.handlePatronUserProfile()
+        this.updateCredentialsToLoggedInState()
+        this.notificationTokenHttpCalls.registerFCMTokenForProfileAccount(account = this.account)
+        this.steps.finishSuccess(Unit)
+      }
+
+      is AccountLoggedIn,
+      is AccountLoggingOut,
+      is AccountLoginFailed,
+      is AccountNotLoggedIn,
+      is AccountLogoutFailed -> {
+        this.steps.currentStepSucceeded(
+          "Ignored the authentication token because the account wasn't waiting for one."
+        )
+        this.steps.finishSuccess(Unit)
+      }
+    }
+  }
+
+  private fun runOIDCInitiate(
+    request: OIDCInitiate
+  ): TaskResult<Unit> {
+    val uriBuilder = StringBuilder(request.description.authenticate.toString())
+    uriBuilder.append("&redirect_uri=")
+    uriBuilder.append(URLEncoder.encode(request.redirectURI.toString()))
+    val targetURI = URI.create(uriBuilder.toString())
+
+    val httpRequest =
+      this.http.newRequest(targetURI)
+        .allowRedirects(DISALLOW_REDIRECTS)
+        .build()
+
+    val httpResponse =
+      httpRequest.execute()
+
+    when (val status = httpResponse.status) {
+      is LSHTTPResponseStatus.Failed -> {
+        this.steps.currentStepFailed(
+          message = "Connection failed when starting authentication.",
+          errorCode = "connectionFailed",
+          exception = status.exception,
+          extraMessages = listOf()
+        )
+        throw status.exception
+      }
+
+      is LSHTTPResponseStatus.Responded.Error -> {
+        val statusCode = status.properties.status
+        if (statusCode >= 400) {
+          this.handleProfileAccountLoginError(targetURI, status)
+          return this.steps.finishFailure()
+        }
+
+        val location = status.properties.header("Location")
+        if (location == null) {
+          this.steps.currentStepFailed(
+            message = "The server did not provide a Location header for redirecting.",
+            errorCode = "locationHeaderMissing",
+            exception = null,
+            extraMessages = listOf()
+          )
+          return this.steps.finishFailure()
+        }
+
+        val locationTarget = URI.create(location)
+        this.account.setLoginState(
+          AccountLoggingInWaitingForExternalAuthentication(
+            previousCredentials = this.account.loginState.credentials,
+            description = request.description,
+            status = "Waiting for authentication...",
+            externalURI = locationTarget
+          )
+        )
+        return this.steps.finishSuccess(Unit)
+      }
+
+      is LSHTTPResponseStatus.Responded.OK -> {
+        this.account.setLoginState(
+          AccountLoggingInWaitingForExternalAuthentication(
+            previousCredentials = this.account.loginState.credentials,
+            description = request.description,
+            status = "Waiting for authentication...",
+            externalURI = request.description.authenticate
+          )
+        )
+        return this.steps.finishSuccess(Unit)
+      }
+    }
   }
 
   private fun runBasicLogin(
@@ -406,6 +563,14 @@ class ProfileAccountLoginTask(
           patronAuthorization = patronProfile.authorization
         )
       }
+
+      is AccountAuthenticationCredentials.OpenIDConnect -> {
+        currentCredentials.copy(
+          annotationsURI = patronProfile.annotationsURI,
+          deviceRegistrationURI = patronProfile.deviceRegistrationURI,
+          patronAuthorization = patronProfile.authorization
+        )
+      }
     }
   }
 
@@ -433,6 +598,21 @@ class ProfileAccountLoginTask(
         this.account.provider.authentication is SAML2_0 ||
           (this.account.provider.authenticationAlternatives.any { it is SAML2_0 })
       }
+
+      is OIDCCancel -> {
+        this.account.provider.authentication is OpenIDConnect ||
+          (this.account.provider.authenticationAlternatives.any { it is OpenIDConnect })
+      }
+
+      is OIDCComplete -> {
+        this.account.provider.authentication is OpenIDConnect ||
+          (this.account.provider.authenticationAlternatives.any { it is OpenIDConnect })
+      }
+
+      is OIDCInitiate -> {
+        this.account.provider.authentication is OpenIDConnect ||
+          (this.account.provider.authenticationAlternatives.any { it is OpenIDConnect })
+      }
     }
   }
 
@@ -442,6 +622,7 @@ class ProfileAccountLoginTask(
     return when (this.request) {
       is Basic,
       is BasicToken,
+      is OIDCInitiate,
       is SAML20Initiate -> {
         this.account.setLoginState(
           AccountLoggingIn(
@@ -454,6 +635,8 @@ class ProfileAccountLoginTask(
         true
       }
 
+      is OIDCCancel,
+      is OIDCComplete,
       is SAML20Cancel,
       is SAML20Complete -> {
         when (this.account.loginState) {
@@ -524,6 +707,31 @@ class ProfileAccountLoginTask(
           }
         }
       }
+
+      is OIDCCancel -> this.request.description
+
+      is OIDCComplete -> {
+        when (val loginState = this.account.loginState) {
+          is AccountLoggingIn -> {
+            loginState.description
+          }
+
+          is AccountLoggingInWaitingForExternalAuthentication -> {
+            loginState.description
+          }
+
+          is AccountLoggedIn,
+          is AccountLoggedInStaleCredentials,
+          is AccountLoggingOut,
+          is AccountLoginFailed,
+          is AccountNotLoggedIn,
+          is AccountLogoutFailed -> {
+            throw NoCurrentDescription()
+          }
+        }
+      }
+
+      is OIDCInitiate -> this.request.description
     }
   }
 }

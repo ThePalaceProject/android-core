@@ -76,6 +76,7 @@ object AccountAuthenticationCredentialsJSON {
         authObject.put("username", credentials.userName.value)
         authObject.put("password", credentials.password.value)
       }
+
       is AccountAuthenticationCredentials.BasicToken -> {
         authObject.put("@type", "basicToken")
         authObject.put("username", credentials.userName.value)
@@ -91,6 +92,7 @@ object AccountAuthenticationCredentialsJSON {
         )
         authObject.set("authenticationTokenInfo", authenticationTokenInfo)
       }
+
       is AccountAuthenticationCredentials.SAML2_0 -> {
         authObject.put("@type", "saml2_0")
         authObject.put("accessToken", credentials.accessToken)
@@ -105,6 +107,11 @@ object AccountAuthenticationCredentialsJSON {
           cookieArray.add(cookieObject)
         }
         authObject.set("cookies", cookieArray)
+      }
+
+      is AccountAuthenticationCredentials.OpenIDConnect -> {
+        authObject.put("@type", "oidc")
+        authObject.put("accessToken", credentials.accessToken)
       }
     }
 

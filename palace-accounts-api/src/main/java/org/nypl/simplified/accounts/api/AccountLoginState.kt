@@ -2,6 +2,7 @@ package org.nypl.simplified.accounts.api
 
 import org.nypl.simplified.presentableerror.api.PresentableErrorType
 import org.nypl.simplified.taskrecorder.api.TaskResult
+import java.net.URI
 
 /**
  * The current state of an account with respect to logging in/out.
@@ -89,7 +90,14 @@ sealed class AccountLoginState {
      * @see AccountLoginStringResourcesType
      */
 
-    val status: String
+    val status: String,
+
+    /**
+     * The external authentication URI. May or may not be equal to the URI in the
+     * authentication description.
+     */
+
+    val externalURI: URI
   ) : AccountLoginState() {
     override val credentials: AccountAuthenticationCredentials?
       get() = this.previousCredentials

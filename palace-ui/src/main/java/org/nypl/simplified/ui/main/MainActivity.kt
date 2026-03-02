@@ -1,5 +1,7 @@
 package org.nypl.simplified.ui.main
 
+import android.app.ComponentCaller
+import android.content.Intent
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.view.View
@@ -9,7 +11,11 @@ import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.jmulticlose.core.CloseableCollectionType
 import com.io7m.jmulticlose.core.ClosingResourceFailedException
 import org.librarysimplified.reports.Reports
+import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
+import org.nypl.simplified.accounts.api.AccountOIDC
+import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest
+import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.announcements.AnnouncementsDialog
 import org.nypl.simplified.ui.announcements.AnnouncementsModel
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_CONSUMED
@@ -18,6 +24,7 @@ import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
 import org.nypl.simplified.ui.splash.SplashFragment
 import org.nypl.simplified.ui.splash.SplashModel
 import org.slf4j.LoggerFactory
+import java.net.URI
 import java.util.UUID
 
 class MainActivity : AppCompatActivity(R.layout.main_host) {
@@ -35,12 +42,59 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
   ) {
     super.onCreate(Bundle())
 
+    val intent = this.intent
+    if (intent != null) {
+      this.onHandleIntent(intent)
+    }
+
     val metrics = this.screenMetrics()
     Reports.reportScreenHeight = metrics.heightPixels
     Reports.reportScreenDPI = metrics.densityDpi
 
     this.rootContainer = this.findViewById(R.id.mainFragmentRoot)
     ScreenEdgeToEdgeFix.edgeToEdge(this.rootContainer)
+  }
+
+  override fun onNewIntent(
+    intent: Intent,
+    caller: ComponentCaller
+  ) {
+    super.onNewIntent(intent, caller)
+    this.onHandleIntent(intent)
+  }
+
+  override fun onNewIntent(intent: Intent?) {
+    super.onNewIntent(intent)
+    if (intent != null) {
+      this.onHandleIntent(intent)
+    }
+  }
+
+  private fun onHandleIntent(
+    intent: Intent
+  ) {
+    try {
+      if (AccountOIDC.isIntentOIDC(intent)) {
+        val data =
+          intent.data
+        val parsed =
+          AccountOIDC.parseOIDCCallback(URI.create(data.toString()))
+
+        val services =
+          Services.serviceDirectory()
+        val profiles =
+          services.requireService(ProfilesControllerType::class.java)
+
+        profiles.profileAccountLogin(
+          ProfileAccountLoginRequest.OIDCComplete(
+            accountId = parsed.account,
+            accessToken = parsed.accessToken
+          )
+        )
+      }
+    } catch (e: Throwable) {
+      this.logger.error("Failed to handle intent: ", e)
+    }
   }
 
   private fun screenMetrics(): DisplayMetrics {

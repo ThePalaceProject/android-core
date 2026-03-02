@@ -42,6 +42,11 @@ object AccountAuthenticatedHTTP {
         LSHTTPAuthorizationBearerToken.ofToken(
           token = credentials.accessToken
         )
+
+      is AccountAuthenticationCredentials.OpenIDConnect ->
+        LSHTTPAuthorizationBearerToken.ofToken(
+          token = credentials.accessToken
+        )
     }
   }
 

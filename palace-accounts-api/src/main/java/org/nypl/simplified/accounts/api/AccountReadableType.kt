@@ -27,21 +27,6 @@ interface AccountReadableType {
   fun catalogURIForAge(age: Int): URI
 
   /**
-   * Determine if the provided feedURI points to the root of this account's catalog.
-   */
-
-  fun feedIsRoot(feedURI: URI): Boolean {
-    return when (this.provider.authentication) {
-      is AccountProviderAuthenticationDescription.SAML2_0,
-      AccountProviderAuthenticationDescription.Anonymous,
-      is AccountProviderAuthenticationDescription.Basic,
-      is AccountProviderAuthenticationDescription.BasicToken -> {
-        this.provider.catalogURI == feedURI || this.preferences.catalogURIOverride == feedURI
-      }
-    }
-  }
-
-  /**
    * @return The account ID
    */
 
@@ -80,6 +65,7 @@ interface AccountReadableType {
       is AccountProviderAuthenticationDescription.Anonymous -> {
         false
       }
+      is AccountProviderAuthenticationDescription.OpenIDConnect,
       is AccountProviderAuthenticationDescription.Basic,
       is AccountProviderAuthenticationDescription.BasicToken,
       is AccountProviderAuthenticationDescription.SAML2_0 -> {

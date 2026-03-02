@@ -20,6 +20,7 @@ dependencies {
     implementation(libs.kotlin.stdlib)
     implementation(libs.palace.drm.core)
     implementation(libs.palace.http.api)
+    implementation(libs.slf4j)
 
     compileOnly(libs.google.auto.value)
     annotationProcessor(libs.google.auto.value.processor)

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/authOIDC"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/authOIDCLogin"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/accountLoginLogoutButtonHeight"
+        android:layout_marginEnd="8dp"
+        android:contentDescription="@string/accountOIDCLoginLabel"
+        android:text="@string/accountPlaceholder"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/authOIDCLogout"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_max="@dimen/accountLoginLogoutButtonMaximumWidth"
+        app:layout_goneMarginEnd="0dp" />
+
+    <Button
+        android:id="@+id/authOIDCLogout"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/accountLoginLogoutButtonHeight"
+        android:contentDescription="@string/accountLogout"
+        android:text="@string/accountPlaceholder"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintStart_toEndOf="@id/authOIDCLogin"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_max="@dimen/accountLoginLogoutButtonMaximumWidth" />
+
+    <TextView
+        android:id="@+id/resetPasswordLabel"
+        android:layout_width="0dp"
+        android:layout_height="32dp"
+        android:layout_margin="16dp"
+        android:gravity="center"
+        android:text="@string/accountForgotPassword"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/authOIDCLogin" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

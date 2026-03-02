@@ -9,6 +9,7 @@ import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.ANONYMOUS_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.BASIC_TOKEN_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.BASIC_TYPE
+import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.OIDC_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.SAML_2_0_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.KeyboardInput
 import org.nypl.simplified.accounts.api.AccountProviderDescription
@@ -246,6 +247,12 @@ class AccountProviderResolution(
             extractAuthenticationDescriptionBasicToken(taskRecorder, authObject)
           )
         }
+
+        OIDC_TYPE -> {
+          authObjects.add(
+            this.extractAuthenticationDescriptionOIDC(taskRecorder, authObject)
+          )
+        }
       }
     }
 
@@ -297,6 +304,33 @@ class AccountProviderResolution(
     }
 
     return AccountProviderAuthenticationDescription.SAML2_0(
+      authenticate = authenticateURI,
+      description = authObject.description,
+      logoURI = logo?.hrefURI
+    )
+  }
+
+  private fun extractAuthenticationDescriptionOIDC(
+    taskRecorder: TaskRecorderType,
+    authObject: AuthenticationObject
+  ): AccountProviderAuthenticationDescription {
+    val authenticate =
+      authObject.links.find { link -> link.relation == "authenticate" }
+    val logo =
+      authObject.links.find { link -> link.relation == "logo" }
+
+    val authenticateURI = authenticate?.hrefURI
+    if (authenticateURI == null) {
+      val message = this.stringResources.resolvingAuthDocumentOIDCMalformed
+      taskRecorder.currentStepFailed(
+        message = message,
+        errorCode = authDocumentUnusable(this.description),
+        extraMessages = listOf()
+      )
+      throw IOException(message)
+    }
+
+    return AccountProviderAuthenticationDescription.OpenIDConnect(
       authenticate = authenticateURI,
       description = authObject.description,
       logoURI = logo?.hrefURI

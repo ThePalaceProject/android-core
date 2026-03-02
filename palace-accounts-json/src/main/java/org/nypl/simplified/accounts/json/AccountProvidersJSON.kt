@@ -13,8 +13,10 @@ import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.ANONYMOUS_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.BASIC_TOKEN_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.BASIC_TYPE
+import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.OIDC_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.SAML_2_0_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.KeyboardInput
+import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.OpenIDConnect
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.SAML2_0
 import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.announcements.Announcement
@@ -159,6 +161,17 @@ object AccountProvidersJSON {
         val authObject = this.mapper.createObjectNode()
         authObject.put("description", authentication.description)
         authObject.put("type", SAML_2_0_TYPE)
+        authObject.put("authenticate", authentication.authenticate.toString())
+        val logo = authentication.logoURI
+        if (logo != null) {
+          authObject.put("logo", logo.toString())
+        }
+        authObject
+      }
+      is OpenIDConnect -> {
+        val authObject = this.mapper.createObjectNode()
+        authObject.put("description", authentication.description)
+        authObject.put("type", OIDC_TYPE)
         authObject.put("authenticate", authentication.authenticate.toString())
         val logo = authentication.logoURI
         if (logo != null) {
@@ -321,6 +334,21 @@ object AccountProvidersJSON {
     container: ObjectNode
   ): AccountProviderAuthenticationDescription {
     return when (val authType = JSONParserUtilities.getString(container, "type")) {
+      OIDC_TYPE -> {
+        val authURI =
+          JSONParserUtilities.getURI(container, "authenticate")
+        val logoURI =
+          JSONParserUtilities.getURIOrNull(container, "logo")
+        val description =
+          JSONParserUtilities.getStringOrNull(container, "description") ?: ""
+
+        OpenIDConnect(
+          authenticate = authURI,
+          description = description,
+          logoURI = logoURI
+        )
+      }
+
       SAML_2_0_TYPE -> {
         val authURI =
           JSONParserUtilities.getURI(container, "authenticate")

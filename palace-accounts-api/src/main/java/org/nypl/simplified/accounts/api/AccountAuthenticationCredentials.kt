@@ -146,4 +146,29 @@ sealed class AccountAuthenticationCredentials {
       return this.copy(adobeCredentials = newCredentials)
     }
   }
+
+  /**
+   * The user used OIDC authentication to authenticate.
+   */
+
+  data class OpenIDConnect(
+    val accessToken: String,
+    override val adobeCredentials: AccountAuthenticationAdobePreActivationCredentials?,
+    override val authenticationDescription: String?,
+    override val annotationsURI: URI?,
+    override val deviceRegistrationURI: URI?,
+    override val patronAuthorization: PatronAuthorization?
+  ) : AccountAuthenticationCredentials() {
+    override fun withoutAdobePostActivationCredentials(): AccountAuthenticationCredentials {
+      return this.copy(
+        adobeCredentials = this.adobeCredentials?.copy(postActivationCredentials = null)
+      )
+    }
+
+    override fun withAdobePreActivationCredentials(
+      newCredentials: AccountAuthenticationAdobePreActivationCredentials
+    ): AccountAuthenticationCredentials {
+      return this.copy(adobeCredentials = newCredentials)
+    }
+  }
 }

@@ -90,6 +90,7 @@ class BorrowBearerToken : BorrowSubtaskType {
 
         is AccountAuthenticationCredentials.Basic -> null
         is AccountAuthenticationCredentials.SAML2_0 -> null
+        is AccountAuthenticationCredentials.OpenIDConnect -> null
         null -> null
       }
 

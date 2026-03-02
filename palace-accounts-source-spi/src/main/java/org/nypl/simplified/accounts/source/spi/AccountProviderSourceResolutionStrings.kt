@@ -27,6 +27,9 @@ class AccountProviderSourceResolutionStrings(
   override val resolvingAuthDocumentSAML20Malformed: String
     get() = this.resources.getString(R.string.resolvingAuthDocumentSAML20Malformed)
 
+  override val resolvingAuthDocumentOIDCMalformed: String
+    get() = this.resources.getString(R.string.resolvingAuthDocumentOIDCMalformed)
+
   override val resolvingAuthDocumentNoUsableAuthenticationTypes: String
     get() = this.resources.getString(R.string.resolvingAuthDocumentNoUsableAuthenticationTypes)
 

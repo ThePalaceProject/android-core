@@ -15,6 +15,7 @@ import org.librarysimplified.http.refresh_token.LSHTTPRefreshTokenProperties
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials.Basic
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials.BasicToken
+import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials.OpenIDConnect
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials.SAML2_0
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.api.Book
@@ -120,6 +121,7 @@ class AudioBookAuthorizationHandler(
             refreshURI = c.authenticationTokenInfo.authURI
           )
 
+        is OpenIDConnect -> null
         is SAML2_0 -> null
         null -> null
       }
@@ -214,6 +216,10 @@ class AudioBookAuthorizationHandler(
 
       is SAML2_0 -> {
         throw UnsupportedOperationException("Overdrive audio books cannot use SAML.")
+      }
+
+      is OpenIDConnect -> {
+        throw UnsupportedOperationException("Overdrive audio books cannot use OIDC.")
       }
 
       null -> {

@@ -31,6 +31,12 @@ interface AccountProviderResolutionStringsType {
   val resolvingAuthDocumentSAML20Malformed: String
 
   /**
+   * The description of an OIDC system is malformed.
+   */
+
+  val resolvingAuthDocumentOIDCMalformed: String
+
+  /**
    * The authentication document contained authentication types but we couldn't understand any of them.
    */
 

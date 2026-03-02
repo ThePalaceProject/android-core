@@ -464,6 +464,12 @@ abstract class AccountsDatabaseContract {
             annotationsURI = URI.create("https://www.example.com/annotations"),
             deviceRegistrationURI = URI.create("https://www.example.com/deviceRegistration")
           )
+
+        is AccountAuthenticationCredentials.OpenIDConnect ->
+          creds.copy(
+            annotationsURI = URI.create("https://www.example.com/annotations"),
+            deviceRegistrationURI = URI.create("https://www.example.com/deviceRegistration")
+          )
       }
     }
 

@@ -39,6 +39,13 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
 
     const val BASIC_TOKEN_TYPE =
       "http://thepalaceproject.org/authtype/basic-token"
+
+    /**
+     * The type used to identify OpenID Connect.
+     */
+
+    const val OIDC_TYPE =
+      "http://palaceproject.io/authtype/OpenIDConnect"
   }
 
   /**
@@ -252,6 +259,32 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
    */
 
   data class SAML2_0(
+    override val description: String,
+
+    /**
+     * The URI used to perform authentication.
+     */
+
+    val authenticate: URI,
+
+    /**
+     * The URI of the authentication logo.
+     */
+
+    val logoURI: URI?
+  ) : AccountProviderAuthenticationDescription() {
+    override val isLoginPossible: Boolean =
+      true
+
+    override val canBeAlternativeLoginMethod: Boolean =
+      false
+  }
+
+  /**
+   * OIDC
+   */
+
+  data class OpenIDConnect(
     override val description: String,
 
     /**
