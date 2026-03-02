@@ -361,9 +361,16 @@ class ProfileAccountLoginTask(
     request: OIDCInitiate
   ): TaskResult<Unit> {
     val uriBuilder = StringBuilder(request.description.authenticate.toString())
-    uriBuilder.append("&redirect_uri=")
+    val query = request.description.authenticate.query
+    if (query == null) {
+      uriBuilder.append("?redirect_uri=")
+    } else {
+      uriBuilder.append("&redirect_uri=")
+    }
     uriBuilder.append(URLEncoder.encode(request.redirectURI.toString()))
-    val targetURI = URI.create(uriBuilder.toString())
+
+    val targetURI =
+      URI.create(uriBuilder.toString())
 
     val httpRequest =
       this.http.newRequest(targetURI)
