@@ -3,12 +3,17 @@ package org.nypl.simplified.ui.settings
 import android.os.Bundle
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import io.reactivex.disposables.CompositeDisposable
+import androidx.preference.SwitchPreferenceCompat
+import com.io7m.jmulticlose.core.CloseableCollection
+import com.io7m.jmulticlose.core.CloseableCollectionType
 import org.librarysimplified.documents.DocumentStoreType
+import org.librarysimplified.http.api.LSHTTPNetworkAccess
+import org.librarysimplified.http.api.LSHTTPNetworkAccessType
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.profiles.api.ProfileEvent
+import org.nypl.simplified.profiles.api.ProfilePreferences
 import org.nypl.simplified.profiles.api.ProfileUpdated
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.main.MainNavigation
@@ -18,6 +23,8 @@ import org.nypl.simplified.ui.screens.ScreenDefinitionType
 import org.slf4j.LoggerFactory
 
 class SettingsMainFragment3 : PreferenceFragmentCompat() {
+
+  private lateinit var networkAccess: LSHTTPNetworkAccessType
 
   private val logger =
     LoggerFactory.getLogger(SettingsMainFragment3::class.java)
@@ -34,8 +41,10 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
   private lateinit var settingsPrivacy: Preference
   private lateinit var settingsVersion: Preference
   private lateinit var settingsVersionCore: Preference
+  private lateinit var settingsNetworkDownloadWIFIOnly: SwitchPreferenceCompat
 
-  private var subscriptions = CompositeDisposable()
+  private var subscriptions: CloseableCollectionType<*> =
+    CloseableCollection.create()
 
   companion object : ScreenDefinitionFactoryType<Unit, SettingsMainFragment3> {
     private class ScreenSettingsMain : ScreenDefinitionType<Unit, SettingsMainFragment3> {
@@ -66,11 +75,18 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
       Services.serviceDirectory()
     val profileEvents =
       services.requireService(SettingsProfileEvents::class.java)
+    val profiles =
+      services.requireService(ProfilesControllerType::class.java)
+    this.networkAccess =
+      services.requireService(LSHTTPNetworkAccessType::class.java)
 
-    this.subscriptions = CompositeDisposable()
-    this.subscriptions.add(
-      profileEvents.events.subscribe(this::onProfileEvent)
-    )
+    this.subscriptions = CloseableCollection.create()
+
+    val profileSub =
+      profileEvents.events.subscribe({ e ->
+        this.onProfileEvent(profiles, e)
+      })
+    this.subscriptions.add(AutoCloseable { profileSub.dispose() })
 
     try {
       this.configureDebug(this.settingsDebug)
@@ -79,22 +95,37 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
     }
   }
 
-  private fun onProfileEvent(e: ProfileEvent) {
+  private fun onProfileEvent(
+    profiles: ProfilesControllerType,
+    e: ProfileEvent
+  ) {
     if (e is ProfileUpdated) {
       this.configureDebug(this.settingsDebug)
+      this.configureNetwork(
+        downloadSwitch = this.settingsNetworkDownloadWIFIOnly,
+        profiles = profiles,
+        profilePrefs = profiles.profileCurrent().preferences()
+      )
     }
   }
 
   override fun onStop() {
     super.onStop()
 
-    this.subscriptions.dispose()
+    this.subscriptions.close()
   }
 
   override fun onCreatePreferences(
     savedInstanceState: Bundle?,
     rootKey: String?
   ) {
+    val services =
+      Services.serviceDirectory()
+    val profiles =
+      services.requireService(ProfilesControllerType::class.java)
+    val profilePrefs =
+      profiles.profileCurrent().preferences()
+
     this.setPreferencesFromResource(R.xml.settings, rootKey)
 
     this.settingsAbout = this.findPreference("settingsAbout")!!
@@ -109,6 +140,7 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
     this.settingsVersion = this.findPreference("settingsVersion")!!
     this.settingsVersionCore = this.findPreference("settingsVersionCore")!!
     this.settingsNotifications = this.findPreference("settingsNotifications")!!
+    this.settingsNetworkDownloadWIFIOnly = this.findPreference("settingsNetworkDownloadWIFIOnly")!!
 
     this.configureAbout(this.settingsAbout)
     this.configureAcknowledgements(this.settingsAcknowledgements)
@@ -122,6 +154,44 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
     this.configureVersion(this.settingsVersion)
     this.configureVersionCore(this.settingsVersionCore)
     this.configureNotifications(this.settingsNotifications)
+    this.configureNetwork(
+      downloadSwitch = this.settingsNetworkDownloadWIFIOnly,
+      profiles = profiles,
+      profilePrefs = profilePrefs
+    )
+  }
+
+  private fun configureNetwork(
+    downloadSwitch: SwitchPreferenceCompat,
+    profiles: ProfilesControllerType,
+    profilePrefs: ProfilePreferences
+  ) {
+    val context =
+      this.requireContext()
+
+    if (profilePrefs.downloadOnlyOnWIFI) {
+      downloadSwitch.title = context.getString(R.string.settingsNetworkWIFIOnlyEnabled)
+      downloadSwitch.isChecked = true
+    } else {
+      downloadSwitch.title = context.getString(R.string.settingsNetworkWIFIOnlyDisabled)
+      downloadSwitch.isChecked = false
+    }
+
+    downloadSwitch.onPreferenceChangeListener =
+      Preference.OnPreferenceChangeListener { _, onlyWIFI ->
+        if (onlyWIFI !is Boolean) {
+          return@OnPreferenceChangeListener true
+        }
+
+        LSHTTPNetworkAccess.setCellularPermitted(!onlyWIFI)
+
+        profiles.profileUpdate { description ->
+          description.copy(
+            preferences = description.preferences.copy(downloadOnlyOnWIFI = onlyWIFI)
+          )
+        }
+        true
+      }
   }
 
   private fun configureNotifications(

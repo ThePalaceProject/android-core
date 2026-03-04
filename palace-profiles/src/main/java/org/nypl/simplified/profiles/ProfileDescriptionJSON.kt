@@ -207,6 +207,9 @@ object ProfileDescriptionJSON {
     val isManualLCPPassphraseEnabled =
       JSONParserUtilities.getBooleanDefault(objectNode, "isManualLCPPassphraseEnabled", false)
 
+    val downloadOnlyOnWIFI =
+      JSONParserUtilities.getBooleanDefault(objectNode, "downloadOnlyOnWIFI", false)
+
     val mostRecentAccount =
       JSONParserUtilities.getStringOrNull(objectNode, "mostRecentAccount")
         ?.let { AccountID(UUID.fromString(it)) }
@@ -222,6 +225,7 @@ object ProfileDescriptionJSON {
       playbackRates = playbackRates,
       isManualLCPPassphraseEnabled = isManualLCPPassphraseEnabled,
       hasSeenNotificationScreen = hasSeenNotificationScreen,
+      downloadOnlyOnWIFI = downloadOnlyOnWIFI
     )
   }
 
@@ -254,6 +258,9 @@ object ProfileDescriptionJSON {
     val isManualLCPPassphraseEnabled =
       JSONParserUtilities.getBooleanDefault(objectNode, "isManualLCPPassphraseEnabled", false)
 
+    val downloadOnlyOnWIFI =
+      JSONParserUtilities.getBooleanDefault(objectNode, "downloadOnlyOnWIFI", false)
+
     val mostRecentAccount =
       JSONParserUtilities.getStringOrNull(objectNode, "mostRecentAccount")
         ?.let { AccountID(UUID.fromString(it)) }
@@ -267,7 +274,8 @@ object ProfileDescriptionJSON {
       hasSeenLibrarySelectionScreen = true,
       hasSeenNotificationScreen = false,
       playbackRates = playbackRates,
-      isManualLCPPassphraseEnabled = isManualLCPPassphraseEnabled
+      isManualLCPPassphraseEnabled = isManualLCPPassphraseEnabled,
+      downloadOnlyOnWIFI = downloadOnlyOnWIFI
     )
   }
 
@@ -324,6 +332,9 @@ object ProfileDescriptionJSON {
     val isManualLCPPassphraseEnabled =
       JSONParserUtilities.getBooleanDefault(preferencesNode, "isManualLCPPassphraseEnabled", false)
 
+    val downloadOnlyOnWIFI =
+      JSONParserUtilities.getBooleanDefault(objectNode, "downloadOnlyOnWIFI", false)
+
     val preferences =
       ProfilePreferences(
         dateOfBirth = this.someOrNull(dateOfBirth),
@@ -333,7 +344,8 @@ object ProfileDescriptionJSON {
         hasSeenLibrarySelectionScreen = true,
         hasSeenNotificationScreen = false,
         playbackRates = playbackRates,
-        isManualLCPPassphraseEnabled = isManualLCPPassphraseEnabled
+        isManualLCPPassphraseEnabled = isManualLCPPassphraseEnabled,
+        downloadOnlyOnWIFI = downloadOnlyOnWIFI
       )
 
     val attributeMap = mutableMapOf<String, String>()
@@ -454,6 +466,7 @@ object ProfileDescriptionJSON {
     output.put("hasSeenNotificationScreen", preferences.hasSeenNotificationScreen)
     output.put("showDebugSettings", preferences.showDebugSettings)
     output.put("mostRecentAccount", preferences.mostRecentAccount.uuid.toString())
+    output.put("downloadOnlyOnWIFI", preferences.downloadOnlyOnWIFI)
 
     output.set<ObjectNode>(
       "playbackRates",
