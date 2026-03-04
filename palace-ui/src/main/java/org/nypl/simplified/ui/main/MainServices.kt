@@ -1,6 +1,7 @@
 package org.nypl.simplified.ui.main
 
 import android.app.Application
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.AssetManager
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -12,6 +13,9 @@ import org.librarysimplified.documents.DocumentConfigurationServiceType
 import org.librarysimplified.documents.DocumentStoreType
 import org.librarysimplified.documents.DocumentStores
 import org.librarysimplified.http.api.LSHTTPClientType
+import org.librarysimplified.http.api.LSHTTPNetworkAccess
+import org.librarysimplified.http.api.LSHTTPNetworkAccessType
+import org.librarysimplified.http.network_access.LSHTTPNetworkAvailabilityService
 import org.librarysimplified.reports.Reports
 import org.librarysimplified.services.api.ServiceDirectory
 import org.librarysimplified.services.api.ServiceDirectoryType
@@ -551,6 +555,13 @@ internal object MainServices {
       return service
     }
 
+    val networkAccess =
+      addService(
+        message = strings.bootingGeneral("network connectivity"),
+        interfaceType = LSHTTPNetworkAccessType::class.java,
+        serviceConstructor = { createNetworkAccessService(context) }
+      )
+
     addService(
       message = strings.bootingGeneral("login strings"),
       interfaceType = AccountLoginStringResourcesType::class.java,
@@ -600,7 +611,7 @@ internal object MainServices {
       addService(
         message = strings.bootingGeneral("LSHTTP"),
         interfaceType = LSHTTPClientType::class.java,
-        serviceConstructor = { MainHTTP.create(context) }
+        serviceConstructor = { MainHTTP.create(context, networkAccess) }
       )
 
     publishEvent(strings.bootingGeneral("Directories"))
@@ -1033,6 +1044,22 @@ internal object MainServices {
     logger.debug("boot completed")
     onProgress.invoke(BootEvent.BootCompleted(strings.bootCompleted))
     return finalServices
+  }
+
+  fun createNetworkAccessService(
+    context: Application
+  ): LSHTTPNetworkAccessType {
+    try {
+      context.startService(
+        Intent(
+          context,
+          LSHTTPNetworkAvailabilityService::class.java
+        )
+      )
+    } catch (e: Throwable) {
+      this.logger.error("Failed to start network availability service: ", e)
+    }
+    return LSHTTPNetworkAccess
   }
 
   private fun createDatabase(

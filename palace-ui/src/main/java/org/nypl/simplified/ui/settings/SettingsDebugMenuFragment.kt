@@ -20,6 +20,7 @@ class SettingsDebugMenuFragment : Fragment(R.layout.debug), MainBackButtonConsum
   private lateinit var itemErrors: ViewGroup
   private lateinit var itemDRM: ViewGroup
   private lateinit var itemCustomOPDS: ViewGroup
+  private lateinit var itemNetwork: ViewGroup
 
   companion object : ScreenDefinitionFactoryType<Unit, SettingsDebugMenuFragment> {
     private class ScreenSettingsDebugMenu : ScreenDefinitionType<Unit, SettingsDebugMenuFragment> {
@@ -57,6 +58,7 @@ class SettingsDebugMenuFragment : Fragment(R.layout.debug), MainBackButtonConsum
     this.itemDRM = view.findViewById(R.id.debugDrm)
     this.itemErrors = view.findViewById(R.id.debugErrors)
     this.itemRegistry = view.findViewById(R.id.debugRegistry)
+    this.itemNetwork = view.findViewById(R.id.debugNetwork)
     this.itemStartup = view.findViewById(R.id.debugStartup)
 
     this.itemBooks.setOnClickListener {
@@ -76,6 +78,9 @@ class SettingsDebugMenuFragment : Fragment(R.layout.debug), MainBackButtonConsum
     }
     this.itemStartup.setOnClickListener {
       MainNavigation.Settings.openDebugStartupSettings()
+    }
+    this.itemNetwork.setOnClickListener {
+      MainNavigation.Settings.openDebugNetworkSettings()
     }
   }
 

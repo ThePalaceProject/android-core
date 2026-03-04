@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.librarysimplified.http.api.LSHTTPClientConfiguration
 import org.librarysimplified.http.api.LSHTTPClientType
+import org.librarysimplified.http.api.LSHTTPNetworkAccess
 import org.librarysimplified.http.vanilla.LSHTTPClients
 import org.mockito.Mockito
 import org.nypl.simplified.books.book_database.api.BookFormats
@@ -99,7 +100,8 @@ class BookPreviewTaskTest {
             applicationName = "simplified-tests",
             applicationVersion = "999.999.0",
             tlsOverrides = null,
-            timeout = Pair(3L, TimeUnit.SECONDS)
+            timeout = Pair(3L, TimeUnit.SECONDS),
+            networkAccess = LSHTTPNetworkAccess,
           )
         )
   }

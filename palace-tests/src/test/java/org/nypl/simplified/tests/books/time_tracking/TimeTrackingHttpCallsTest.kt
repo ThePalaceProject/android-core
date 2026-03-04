@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.librarysimplified.http.api.LSHTTPClientConfiguration
 import org.librarysimplified.http.api.LSHTTPClientType
+import org.librarysimplified.http.api.LSHTTPNetworkAccess
 import org.librarysimplified.http.vanilla.LSHTTPClients
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountLoginState
@@ -67,7 +68,8 @@ class TimeTrackingHttpCallsTest {
             applicationName = "simplified-tests",
             applicationVersion = "999.999.0",
             tlsOverrides = null,
-            timeout = Pair(3L, TimeUnit.SECONDS)
+            timeout = Pair(3L, TimeUnit.SECONDS),
+            networkAccess = LSHTTPNetworkAccess,
           )
         )
   }

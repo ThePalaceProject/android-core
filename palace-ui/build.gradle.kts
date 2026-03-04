@@ -165,6 +165,7 @@ dependencies {
     implementation(libs.palace.audiobook.views)
     implementation(libs.palace.drm.core)
     implementation(libs.palace.http.api)
+    implementation(libs.palace.http.network.access)
     implementation(libs.palace.http.vanilla)
     implementation(libs.palace.theme)
     implementation(libs.picasso)

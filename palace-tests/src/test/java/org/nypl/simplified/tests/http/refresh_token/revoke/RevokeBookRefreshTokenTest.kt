@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.api.io.TempDir
 import org.librarysimplified.http.api.LSHTTPClientConfiguration
 import org.librarysimplified.http.api.LSHTTPClientType
+import org.librarysimplified.http.api.LSHTTPNetworkAccess
 import org.librarysimplified.http.api.LSHTTPRequestConstants
 import org.librarysimplified.http.vanilla.LSHTTPClients
 import org.mockito.Mockito
@@ -138,7 +139,8 @@ class RevokeBookRefreshTokenTest {
             applicationName = "simplified-tests",
             applicationVersion = "999.999.0",
             tlsOverrides = null,
-            timeout = Pair(5L, TimeUnit.SECONDS)
+            timeout = Pair(5L, TimeUnit.SECONDS),
+            networkAccess = LSHTTPNetworkAccess,
           )
         )
   }
