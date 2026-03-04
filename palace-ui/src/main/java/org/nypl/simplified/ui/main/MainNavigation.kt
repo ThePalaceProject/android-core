@@ -31,6 +31,7 @@ import org.nypl.simplified.ui.settings.SettingsDebugMenuBooksFragment
 import org.nypl.simplified.ui.settings.SettingsDebugMenuDRMFragment
 import org.nypl.simplified.ui.settings.SettingsDebugMenuErrorsFragment
 import org.nypl.simplified.ui.settings.SettingsDebugMenuFragment
+import org.nypl.simplified.ui.settings.SettingsDebugMenuNetworkFragment
 import org.nypl.simplified.ui.settings.SettingsDebugMenuRegistryFragment
 import org.nypl.simplified.ui.settings.SettingsDebugMenuStartupFragment
 import org.nypl.simplified.ui.settings.SettingsDocumentViewerFragment
@@ -115,7 +116,10 @@ object MainNavigation {
   ) {
     UIThread.checkIsUIThread()
     this.tabAttribute.set(TabForCategory(TAB_SETTINGS))
-    Settings.openAccountDetail(account, showLoginReason = AccountDetailModel.PleaseLoginReasonGeneric)
+    Settings.openAccountDetail(
+      account,
+      showLoginReason = AccountDetailModel.PleaseLoginReasonGeneric
+    )
     this.tabAttribute.set(TabAny)
   }
 
@@ -241,6 +245,10 @@ object MainNavigation {
 
     fun openDebugStartupSettings() {
       this.stackPush(SettingsDebugMenuStartupFragment.createScreenDefinition(Unit))
+    }
+
+    fun openDebugNetworkSettings() {
+      this.stackPush(SettingsDebugMenuNetworkFragment.createScreenDefinition(Unit))
     }
 
     fun goUp() {

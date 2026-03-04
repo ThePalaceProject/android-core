@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.librarysimplified.http.api.LSHTTPClientConfiguration
+import org.librarysimplified.http.api.LSHTTPNetworkAccess
 import org.librarysimplified.http.vanilla.LSHTTPProblemReportParsers
 import org.librarysimplified.http.vanilla.internal.LSHTTPClient
 import org.mockito.Mockito
@@ -87,10 +88,11 @@ class OPDSClientCompositeFacetTest {
           context = this.context,
           configuration = LSHTTPClientConfiguration(
             applicationName = "palace",
-            applicationVersion = "1.0.0"
+            applicationVersion = "1.0.0",
+            networkAccess = LSHTTPNetworkAccess,
           ),
           problemReportParsers = LSHTTPProblemReportParsers(),
-          interceptors = listOf()
+          interceptors = listOf(),
         )
       )
 

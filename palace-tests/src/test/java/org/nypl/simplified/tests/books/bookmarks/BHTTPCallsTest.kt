@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.Executable
 import org.librarysimplified.http.api.LSHTTPClientConfiguration
 import org.librarysimplified.http.api.LSHTTPClientType
+import org.librarysimplified.http.api.LSHTTPNetworkAccess
 import org.librarysimplified.http.vanilla.LSHTTPClients
 import org.mockito.Mock
 import org.mockito.Mockito
@@ -77,7 +78,8 @@ class BHTTPCallsTest {
             applicationName = "simplified-test",
             applicationVersion = "0.0.1",
             tlsOverrides = null,
-            timeout = Pair(5L, TimeUnit.SECONDS)
+            timeout = Pair(5L, TimeUnit.SECONDS),
+            networkAccess = LSHTTPNetworkAccess,
           )
         )
 

@@ -8,6 +8,9 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
+    <!-- Required to allow the application to *read* the network state. -->
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+
     <uses-permission
         android:name="com.google.android.gms.permission.AD_ID"
         tools:node="remove" />
@@ -35,12 +38,13 @@
 
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <!-- See org.nypl.simplified.accounts.api.AccountOIDC -->
                 <data
-                    android:scheme="palace-oidc-callback"
-                    android:host="org.thepalaceproject.oidc" />
+                    android:host="org.thepalaceproject.oidc"
+                    android:scheme="palace-oidc-callback" />
             </intent-filter>
 
             <intent-filter>
@@ -83,11 +87,6 @@
             android:exported="false" />
 
         <activity
-            android:name="org.nypl.simplified.ui.accounts.oidc.AccountOIDCActivity"
-            android:configChanges="orientation"
-            android:exported="false" />
-
-        <activity
             android:name="org.nypl.simplified.ui.catalog.saml20.CatalogSAML20Activity"
             android:configChanges="orientation"
             android:exported="false" />
@@ -116,6 +115,10 @@
             android:contentDescription="@string/app_name"
             android:exported="false"
             android:launchMode="singleTask" />
+
+        <service
+            android:name="org.librarysimplified.http.network_access.LSHTTPNetworkAvailabilityService"
+            android:exported="false" />
     </application>
 
 </manifest>

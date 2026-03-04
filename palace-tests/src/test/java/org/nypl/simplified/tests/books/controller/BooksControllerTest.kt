@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.api.assertThrows
 import org.librarysimplified.http.api.LSHTTPClientConfiguration
 import org.librarysimplified.http.api.LSHTTPClientType
+import org.librarysimplified.http.api.LSHTTPNetworkAccess
 import org.librarysimplified.http.vanilla.LSHTTPClients
 import org.mockito.Mockito
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
@@ -321,7 +322,8 @@ class BooksControllerTest {
             applicationName = "simplified-test",
             applicationVersion = "1.0.0",
             tlsOverrides = null,
-            timeout = Pair(5L, TimeUnit.SECONDS)
+            timeout = Pair(5L, TimeUnit.SECONDS),
+            networkAccess = LSHTTPNetworkAccess,
           )
         )
 

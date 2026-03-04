@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.librarysimplified.http.api.LSHTTPClientConfiguration
 import org.librarysimplified.http.api.LSHTTPClientType
+import org.librarysimplified.http.api.LSHTTPNetworkAccess
 import org.librarysimplified.http.vanilla.LSHTTPClients
 import org.librarysimplified.services.api.ServiceDirectory
 import org.librarysimplified.services.api.ServiceDirectoryType
@@ -102,7 +103,10 @@ class BugPP2325Test {
       MockContentResolver()
     this.httpClient =
       LSHTTPClients()
-        .create(this.androidContext, LSHTTPClientConfiguration("test", "1.0.0"))
+        .create(
+          this.androidContext,
+          LSHTTPClientConfiguration("test", "1.0.0", networkAccess = LSHTTPNetworkAccess)
+        )
     this.lcpService =
       MockLCPService(this.androidContext)
     this.services =
