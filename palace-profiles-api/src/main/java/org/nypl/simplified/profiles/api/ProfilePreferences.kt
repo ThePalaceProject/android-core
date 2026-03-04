@@ -53,5 +53,9 @@ data class ProfilePreferences(
 
   /** @return `true` if the debug settings should be visible. */
 
-  val showDebugSettings: Boolean = false
+  val showDebugSettings: Boolean = false,
+
+  /** @return `true` if downloads should only occur when Wi-Fi is available. */
+
+  val downloadOnlyOnWIFI: Boolean,
 )

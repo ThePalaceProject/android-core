@@ -16,6 +16,13 @@
             android:title="@string/settingsNotificationsEnabled" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="@string/settingsNetwork">
+        <SwitchPreferenceCompat
+            android:key="settingsNetworkDownloadWIFIOnly"
+            android:summary=""
+            android:title="@string/settingsNetworkWIFIOnlyDisabled" />
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/settingsDocumentation">
         <Preference
             android:key="settingsAcknowledgements"

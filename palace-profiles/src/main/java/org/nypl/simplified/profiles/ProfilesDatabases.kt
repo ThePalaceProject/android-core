@@ -476,6 +476,7 @@ object ProfilesDatabases {
               playbackRates = hashMapOf(),
               readerPreferences = ReaderPreferences.builder().build(),
               showTestingLibraries = false,
+              downloadOnlyOnWIFI = false
             ),
             attributes = ProfileAttributes(sortedMapOf())
           )
