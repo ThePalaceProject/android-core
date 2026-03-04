@@ -93,6 +93,8 @@ class BorrowTask private constructor(
   private lateinit var account: AccountType
   private lateinit var taskRecorder: TaskRecorderType
 
+  private class BorrowFailedNoNetwork : Exception("No network!")
+
   private class BorrowFailedHandled(exception: Throwable?) : Exception(exception)
 
   private fun debug(message: String, vararg arguments: Any?) =
@@ -114,6 +116,9 @@ class BorrowTask private constructor(
       }
     } catch (e: BorrowFailedHandled) {
       this.warn("handled: ", e)
+      this.taskRecorder.finishFailure<Unit>()
+    } catch (e: BorrowFailedNoNetwork) {
+      this.warn("No network: ", e)
       this.taskRecorder.finishFailure<Unit>()
     } catch (_: BorrowRecoverableAuthenticationError) {
       this.taskRecorder.finishFailure<Unit>()
@@ -221,6 +226,17 @@ class BorrowTask private constructor(
         temporaryDirectory = this.requirements.temporaryDirectory,
       )
 
+    if (!this.requirements.httpClient.networkAccess.canDownload()) {
+      this.taskRecorder.currentStepFailed(
+        message = "The current network settings do not allow downloads when Wi-Fi is unavailable.",
+        errorCode = "error-no-wifi",
+        exception = null,
+        extraMessages = listOf()
+      )
+      this.publishBookFailure(book)
+      throw BorrowFailedNoNetwork()
+    }
+
     while (true) {
       try {
         if (context.opdsAcquisitionPath.elements.isEmpty()) {
@@ -230,7 +246,8 @@ class BorrowTask private constructor(
         val pathElement = context.opdsAcquisitionPath.elements[0]
         context.currentOPDSAcquisitionPathElement = pathElement
 
-        val queue: MutableList<OPDSAcquisitionPathElement> = context.opdsAcquisitionPath.elements.toMutableList()
+        val queue: MutableList<OPDSAcquisitionPathElement> =
+          context.opdsAcquisitionPath.elements.toMutableList()
         queue.removeAt(0)
         context.opdsAcquisitionPath = context.opdsAcquisitionPath.copy(elements = queue.toList())
         context.currentRemainingOPDSPathElements = context.opdsAcquisitionPath.elements
@@ -272,10 +289,12 @@ class BorrowTask private constructor(
         is BorrowSubtaskCancelled -> {
           throw e
         }
+
         is BorrowRecoverableAuthenticationError -> {
           context.account.expireCredentialsIfApplicable()
           throw e
         }
+
         is BorrowReachedLoanLimit -> {
           step.resolution = TaskStepFailed(
             message = "Subtask '$name' raised an unexpected exception",
@@ -285,9 +304,11 @@ class BorrowTask private constructor(
           )
           throw e
         }
+
         is BorrowSubtaskFailed -> {
           throw e
         }
+
         is BorrowSubtaskHaltedEarly -> {
           throw e
         }
