@@ -57,9 +57,16 @@ object MockAccountProviders {
   }
 
   fun fakeAccountProviders(): AccountProviderRegistryType {
-    val fake0 = fakeProvider("urn:fake:0")
-    val fake1 = fakeProvider("urn:fake:1")
-    val fake2 = fakeProvider("urn:fake:2")
+    return fakeAccountProviders("localhost", 80)
+  }
+
+  fun fakeAccountProviders(
+    host: String,
+    port: Int
+  ): AccountProviderRegistryType {
+    val fake0 = fakeProvider("urn:fake:0", host = host, port = port)
+    val fake1 = fakeProvider("urn:fake:1", host = host, port = port)
+    val fake2 = fakeProvider("urn:fake:2", host = host, port = port)
     val fake3 = fakeAuthProvider("urn:fake-auth:0")
 
     val providers = TreeMap<URI, AccountProviderType>()

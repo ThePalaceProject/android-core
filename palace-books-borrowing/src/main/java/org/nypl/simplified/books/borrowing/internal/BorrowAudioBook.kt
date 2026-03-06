@@ -3,7 +3,6 @@ package org.nypl.simplified.books.borrowing.internal
 import com.io7m.junreachable.UnreachableCodeException
 import one.irradia.mime.api.MIMECompatibility
 import one.irradia.mime.api.MIMEType
-import org.librarysimplified.audiobook.api.PlayerUserAgent
 import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.librarysimplified.audiobook.manifest_fulfill.opa.OPAPassword
 import org.librarysimplified.audiobook.manifest_fulfill.opa.OPAUsernamePassword
@@ -139,7 +138,6 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
           palaceID = PlayerPalaceID(context.bookCurrent.entry.id),
           services = context.services,
           target = AudioBookLink.Manifest(currentURI),
-          userAgent = PlayerUserAgent(context.httpClient.userAgent()),
         )
       )
 

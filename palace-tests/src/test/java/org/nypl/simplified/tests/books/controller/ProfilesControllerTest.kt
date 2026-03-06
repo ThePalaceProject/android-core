@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Timeout
-import org.junit.jupiter.api.function.Executable
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.mockito.Mockito
 import org.nypl.simplified.accounts.api.AccountEvent
@@ -50,14 +49,10 @@ import org.nypl.simplified.opds.core.OPDSSearchParser
 import org.nypl.simplified.patron.api.PatronUserProfileParsersType
 import org.nypl.simplified.profiles.ProfilesDatabases
 import org.nypl.simplified.profiles.api.ProfileAttributes
-import org.nypl.simplified.profiles.api.ProfileCreationEvent.ProfileCreationFailed
-import org.nypl.simplified.profiles.api.ProfileCreationEvent.ProfileCreationFailed.ErrorCode.ERROR_DISPLAY_NAME_ALREADY_USED
-import org.nypl.simplified.profiles.api.ProfileCreationEvent.ProfileCreationSucceeded
 import org.nypl.simplified.profiles.api.ProfileDatabaseException
 import org.nypl.simplified.profiles.api.ProfileDateOfBirth
 import org.nypl.simplified.profiles.api.ProfileDescription
 import org.nypl.simplified.profiles.api.ProfileEvent
-import org.nypl.simplified.profiles.api.ProfileNoneCurrentException
 import org.nypl.simplified.profiles.api.ProfileUpdated
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountCreationStringResourcesType
@@ -83,7 +78,6 @@ import org.nypl.simplified.tests.mocking.MockRevokeStringResources
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
-import java.io.FileNotFoundException
 import java.net.URI
 import java.util.Collections
 import java.util.concurrent.ExecutorService
@@ -242,116 +236,9 @@ class ProfilesControllerTest {
       )
 
     return ProfileDescription(
-      description.displayName,
       preferences,
       attributes
     )
-  }
-
-  /**
-   * Trying to fetch the current profile without selecting one should fail.
-   *
-   * @throws Exception On errors
-   */
-
-  @Test
-  @Timeout(value = 3L, unit = TimeUnit.SECONDS)
-  @Throws(Exception::class)
-  fun testProfilesCurrentNoneCurrent() {
-    val profiles =
-      this.profilesDatabaseWithoutAnonymous(this.directoryProfiles)
-    val controller =
-      this.controller(
-        profiles = profiles,
-        accountProviders = MockAccountProviders.fakeAccountProviders()
-      )
-
-    Assertions.assertThrows(
-      ProfileNoneCurrentException::class.java,
-      Executable {
-        controller.profileCurrent()
-      }
-    )
-  }
-
-  /**
-   * Selecting a profile works.
-   *
-   * @throws Exception On errors
-   */
-
-  @Test
-  @Timeout(value = 3L, unit = TimeUnit.SECONDS)
-  @Throws(Exception::class)
-  fun testProfilesCurrentSelectCurrent() {
-    val accountProvider =
-      MockAccountProviders.fakeProvider("urn:fake:0")
-    val accountProviders =
-      MockAccountProviderRegistry.singleton(accountProvider)
-
-    val profiles =
-      this.profilesDatabaseWithoutAnonymous(this.directoryProfiles)
-    val controller =
-      this.controller(
-        profiles = profiles,
-        accountProviders = accountProviders
-      )
-
-    controller.profileCreate("Kermit", accountProvider) { desc ->
-      this.descriptionWith(desc, gender = "Female", dateOfBirth = DateTime.now())
-    }.get()
-    controller.profileSelect(profiles.profiles().firstKey()).get()
-
-    this.profileEventsReceived.forEach { this.logger.debug("event: {}", it) }
-    this.accountEventsReceived.forEach { this.logger.debug("event: {}", it) }
-
-    val p = controller.profileCurrent()
-    Assertions.assertEquals("Kermit", p.displayName)
-  }
-
-  /**
-   * Creating a profile with the same display name as an existing profile should fail.
-   *
-   * @throws Exception On errors
-   */
-
-  @Test
-  @Timeout(value = 3L, unit = TimeUnit.SECONDS)
-  @Throws(Exception::class)
-  fun testProfilesCreateDuplicate() {
-    val profiles =
-      this.profilesDatabaseWithoutAnonymous(this.directoryProfiles)
-
-    val accountProvider =
-      MockAccountProviders.fakeProvider("urn:fake:0")
-    val accountProviders =
-      MockAccountProviderRegistry.singleton(accountProvider)
-    val controller =
-      this.controller(
-        profiles = profiles,
-        accountProviders = accountProviders
-      )
-
-    controller.profileEvents().subscribe { this.profileEventsReceived.add(it) }
-
-    val date = DateTime.now()
-
-    controller.profileCreate("Kermit", accountProvider) { desc ->
-      this.descriptionWith(desc, "Female", date)
-    }.get()
-    controller.profileCreate("Kermit", accountProvider) { desc ->
-      this.descriptionWith(desc, "Female", date)
-    }.get()
-
-    this.profileEventsReceived.forEach { this.logger.debug("event: {}", it) }
-    this.accountEventsReceived.forEach { this.logger.debug("event: {}", it) }
-
-    EventAssertions.isType(ProfileCreationSucceeded::class.java, this.profileEventsReceived, 0)
-    EventAssertions.isTypeAndMatches(
-      ProfileCreationFailed::class.java,
-      this.profileEventsReceived,
-      1
-    ) { e -> Assertions.assertEquals(ERROR_DISPLAY_NAME_ALREADY_USED, e.errorCode()) }
   }
 
   /**
@@ -365,7 +252,7 @@ class ProfilesControllerTest {
   @Throws(Exception::class)
   fun testProfilesPreferences() {
     val profiles =
-      this.profilesDatabaseWithoutAnonymous(this.directoryProfiles)
+      this.profilesDatabaseOf(this.directoryProfiles)
     val accountProvider =
       MockAccountProviders.fakeProvider("urn:fake:0")
     val accountProviders =
@@ -376,10 +263,7 @@ class ProfilesControllerTest {
         accountProviders = accountProviders
       )
 
-    controller.profileCreate("Kermit", accountProvider) { desc ->
-      this.descriptionWith(desc, "Female", DateTime.now())
-    }.get()
-    controller.profileSelect(profiles.profiles().firstKey()).get()
+    controller.profileUpdate { desc -> this.descriptionWith(desc, "Female", DateTime.now()) }.get()
     controller.profileAccountCreate(accountProvider.id).get()
     controller.profileEvents().subscribe { this.profileEventsReceived.add(it) }
     controller.profileUpdate { description -> description }.get()
@@ -435,17 +319,14 @@ class ProfilesControllerTest {
       MockAccountProviderRegistry.singleton(accountProvider)
 
     val profiles =
-      this.profilesDatabaseWithoutAnonymous(this.directoryProfiles)
+      this.profilesDatabaseOf(this.directoryProfiles)
     val controller =
       this.controller(
         profiles = profiles,
         accountProviders = accountProviders
       )
 
-    controller.profileCreate("Kermit", accountProvider) { desc ->
-      this.descriptionWith(desc, "Female", DateTime.now())
-    }.get()
-    controller.profileSelect(profiles.profiles().firstKey()).get()
+    controller.profileUpdate { desc -> this.descriptionWith(desc, "Female", DateTime.now()) }.get()
     controller.profileAccountCreate(accountProvider.id).get()
     controller.profileEvents().subscribe { this.profileEventsReceived.add(it) }
 
@@ -481,17 +362,18 @@ class ProfilesControllerTest {
   }
 
   @Throws(ProfileDatabaseException::class)
-  private fun profilesDatabaseWithoutAnonymous(dir_profiles: File): ProfilesDatabaseType {
-    return ProfilesDatabases.openWithAnonymousProfileDisabled(
-      this.context(),
-      this.analyticsLogger,
-      this.accountEvents,
-      MockAccountProviders.fakeAccountProviders(),
-      AccountBundledCredentialsEmpty.getInstance(),
-      this.credentialsStore,
-      AccountsDatabases,
-      BookFormatsTesting.supportsEverything,
-      dir_profiles
+  private fun profilesDatabaseOf(dir_profiles: File): ProfilesDatabaseType {
+    return ProfilesDatabases.openWithAnonymousProfileEnabled(
+      context = this.context(),
+      analytics = this.analyticsLogger,
+      accountEvents = this.accountEvents,
+      accountProviders = MockAccountProviders.fakeAccountProviders(),
+      accountBundledCredentials = AccountBundledCredentialsEmpty.getInstance(),
+      accountCredentialsStore = this.credentialsStore,
+      accountsDatabases = AccountsDatabases,
+      bookFormatSupport = BookFormatsTesting.supportsEverything,
+      httpClient = this.lsHTTP,
+      directory = dir_profiles
     )
   }
 

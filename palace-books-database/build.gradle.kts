@@ -25,5 +25,6 @@ dependencies {
     implementation(libs.palace.audiobook.manifest.parser.api)
     implementation(libs.palace.audiobook.parser.api)
     implementation(libs.palace.drm.core)
+    implementation(libs.palace.http.api)
     implementation(libs.slf4j)
 }

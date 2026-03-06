@@ -1,12 +1,19 @@
 package org.nypl.simplified.tests.books.book_database
 
 import android.app.Application
+import android.content.Context
 import com.io7m.jfunctional.Option
 import one.irradia.mime.api.MIMEType
 import one.irradia.mime.vanilla.MIMEParser
 import org.joda.time.DateTime
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.librarysimplified.http.api.LSHTTPClientConfiguration
+import org.librarysimplified.http.api.LSHTTPClientType
+import org.librarysimplified.http.api.LSHTTPNetworkAccess
+import org.librarysimplified.http.vanilla.LSHTTPClients
+import org.mockito.Mockito
 import org.nypl.drm.core.AdobeAdeptLoan
 import org.nypl.drm.core.AdobeLoanID
 import org.nypl.simplified.books.api.Book
@@ -51,6 +58,23 @@ abstract class BookDatabaseContract {
 
   protected abstract fun context(): Application
 
+  private lateinit var httpClient: LSHTTPClientType
+
+  @BeforeEach
+  fun testSetup()
+  {
+    this.httpClient =
+      LSHTTPClients()
+        .create(
+          context = Mockito.mock(Context::class.java),
+          configuration = LSHTTPClientConfiguration(
+            applicationName = "org.thepalaceproject.tests",
+            applicationVersion = "1.0.0",
+            networkAccess = LSHTTPNetworkAccess
+          )
+        )
+  }
+
   /**
    * Opening an empty database works.
    */
@@ -62,7 +86,14 @@ abstract class BookDatabaseContract {
 
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database =
-      BookDatabase.open(context(), parser, serializer, BookFormatsTesting.supportsEverything, accountID, directory)
+      BookDatabase.open(context = context(),
+        parser = parser,
+        serializer = serializer,
+        formats = BookFormatsTesting.supportsEverything,
+        owner = accountID,
+        directory = directory,
+        httpClient = this.httpClient
+      )
     Assertions.assertEquals(0L, database.books().size.toLong())
   }
 
@@ -76,7 +107,14 @@ abstract class BookDatabaseContract {
     val serializer = OPDSJSONSerializer.newSerializer()
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 =
-      BookDatabase.open(context(), parser, serializer, BookFormatsTesting.supportsEverything, accountID, directory)
+      BookDatabase.open(context = context(),
+        parser = parser,
+        serializer = serializer,
+        formats = BookFormatsTesting.supportsEverything,
+        owner = accountID,
+        directory = directory,
+        httpClient = this.httpClient
+      )
 
     val entry0 =
       OPDSAcquisitionFeedEntry.newBuilder(
@@ -113,7 +151,14 @@ abstract class BookDatabaseContract {
     database0.createOrUpdate(id2, entry2)
 
     val database1 =
-      BookDatabase.open(context(), parser, serializer, BookFormatsTesting.supportsEverything, accountID, directory)
+      BookDatabase.open(context = context(),
+        parser = parser,
+        serializer = serializer,
+        formats = BookFormatsTesting.supportsEverything,
+        owner = accountID,
+        directory = directory,
+        httpClient = this.httpClient
+      )
 
     Assertions.assertEquals(3, database1.books().size.toLong())
     Assertions.assertTrue(database1.books().contains(id0))
@@ -135,7 +180,14 @@ abstract class BookDatabaseContract {
 
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val db0 =
-      BookDatabase.open(context(), parser, serializer, BookFormatsTesting.supportsEverything, accountID, directory)
+      BookDatabase.open(context = context(),
+        parser = parser,
+        serializer = serializer,
+        formats = BookFormatsTesting.supportsEverything,
+        owner = accountID,
+        directory = directory,
+        httpClient = this.httpClient
+      )
 
     val entry0 =
       OPDSAcquisitionFeedEntry.newBuilder(
@@ -163,7 +215,14 @@ abstract class BookDatabaseContract {
     val serializer = OPDSJSONSerializer.newSerializer()
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 =
-      BookDatabase.open(context(), parser, serializer, BookFormatsTesting.supportsEverything, accountID, directory)
+      BookDatabase.open(context = context(),
+        parser = parser,
+        serializer = serializer,
+        formats = BookFormatsTesting.supportsEverything,
+        owner = accountID,
+        directory = directory,
+        httpClient = this.httpClient
+      )
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithEPUB()
     val bookID = BookID.create("abcd")
@@ -191,7 +250,14 @@ abstract class BookDatabaseContract {
     val serializer = OPDSJSONSerializer.newSerializer()
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 =
-      BookDatabase.open(context(), parser, serializer, BookFormatsTesting.supportsEverything, accountID, directory)
+      BookDatabase.open(context = context(),
+        parser = parser,
+        serializer = serializer,
+        formats = BookFormatsTesting.supportsEverything,
+        owner = accountID,
+        directory = directory,
+        httpClient = this.httpClient
+      )
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithEPUB()
     val bookID = BookID.create("abcd")
@@ -227,7 +293,14 @@ abstract class BookDatabaseContract {
     }
 
     val database1 =
-      BookDatabase.open(context(), parser, serializer, BookFormatsTesting.supportsEverything, accountID, directory)
+      BookDatabase.open(context = context(),
+        parser = parser,
+        serializer = serializer,
+        formats = BookFormatsTesting.supportsEverything,
+        owner = accountID,
+        directory = directory,
+        httpClient = this.httpClient
+      )
     val databaseEntry1 = database1.entry(bookID)
 
     val book1: Book = this.run {
@@ -275,7 +348,14 @@ abstract class BookDatabaseContract {
     val serializer = OPDSJSONSerializer.newSerializer()
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 =
-      BookDatabase.open(context(), parser, serializer, BookFormatsTesting.supportsEverything, accountID, directory)
+      BookDatabase.open(context = context(),
+        parser = parser,
+        serializer = serializer,
+        formats = BookFormatsTesting.supportsEverything,
+        owner = accountID,
+        directory = directory,
+        httpClient = this.httpClient
+      )
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithPDF()
     val bookID = BookID.create("abcd")
@@ -311,7 +391,14 @@ abstract class BookDatabaseContract {
     }
 
     val database1 =
-      BookDatabase.open(context(), parser, serializer, BookFormatsTesting.supportsEverything, accountID, directory)
+      BookDatabase.open(context = context(),
+        parser = parser,
+        serializer = serializer,
+        formats = BookFormatsTesting.supportsEverything,
+        owner = accountID,
+        directory = directory,
+        httpClient = this.httpClient
+      )
     val databaseEntry1 = database1.entry(bookID)
 
     val book1: Book = this.run {
@@ -359,7 +446,14 @@ abstract class BookDatabaseContract {
     val serializer = OPDSJSONSerializer.newSerializer()
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 =
-      BookDatabase.open(context(), parser, serializer, BookFormatsTesting.supportsEverything, accountID, directory)
+      BookDatabase.open(context = context(),
+        parser = parser,
+        serializer = serializer,
+        formats = BookFormatsTesting.supportsEverything,
+        owner = accountID,
+        directory = directory,
+        httpClient = this.httpClient
+      )
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithAudioBook()
     val bookID = BookID.create("abcd")
@@ -395,7 +489,14 @@ abstract class BookDatabaseContract {
     }
 
     val database1 =
-      BookDatabase.open(context(), parser, serializer, BookFormatsTesting.supportsEverything, accountID, directory)
+      BookDatabase.open(context = context(),
+        parser = parser,
+        serializer = serializer,
+        formats = BookFormatsTesting.supportsEverything,
+        owner = accountID,
+        directory = directory,
+        httpClient = this.httpClient
+      )
     val databaseEntry1 = database1.entry(bookID)
 
     val book1: Book = this.run {
@@ -443,7 +544,14 @@ abstract class BookDatabaseContract {
     val serializer = OPDSJSONSerializer.newSerializer()
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 =
-      BookDatabase.open(context(), parser, serializer, BookFormatsTesting.supportsEverything, accountID, directory)
+      BookDatabase.open(context = context(),
+        parser = parser,
+        serializer = serializer,
+        formats = BookFormatsTesting.supportsEverything,
+        owner = accountID,
+        directory = directory,
+        httpClient = this.httpClient
+      )
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithAudioBook()
     val bookID = BookID.create("abcd")
@@ -476,7 +584,14 @@ abstract class BookDatabaseContract {
     val serializer = OPDSJSONSerializer.newSerializer()
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 =
-      BookDatabase.open(context(), parser, serializer, BookFormatsTesting.supportsEverything, accountID, directory)
+      BookDatabase.open(context = context(),
+        parser = parser,
+        serializer = serializer,
+        formats = BookFormatsTesting.supportsEverything,
+        owner = accountID,
+        directory = directory,
+        httpClient = this.httpClient
+      )
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithAudioBook()
     val bookID = BookID.create("abcd")
@@ -503,7 +618,14 @@ abstract class BookDatabaseContract {
     val serializer = OPDSJSONSerializer.newSerializer()
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 =
-      BookDatabase.open(context(), parser, serializer, BookFormatsTesting.supportsEverything, accountID, directory)
+      BookDatabase.open(context = context(),
+        parser = parser,
+        serializer = serializer,
+        formats = BookFormatsTesting.supportsEverything,
+        owner = accountID,
+        directory = directory,
+        httpClient = this.httpClient
+      )
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithEPUB()
     val bookID = BookID.create("abcd")
@@ -536,7 +658,14 @@ abstract class BookDatabaseContract {
     val serializer = OPDSJSONSerializer.newSerializer()
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 =
-      BookDatabase.open(context(), parser, serializer, BookFormatsTesting.supportsEverything, accountID, directory)
+      BookDatabase.open(context = context(),
+        parser = parser,
+        serializer = serializer,
+        formats = BookFormatsTesting.supportsEverything,
+        owner = accountID,
+        directory = directory,
+        httpClient = this.httpClient
+      )
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithEPUB()
     val bookID = BookID.create("abcd")
@@ -563,7 +692,14 @@ abstract class BookDatabaseContract {
     val serializer = OPDSJSONSerializer.newSerializer()
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 =
-      BookDatabase.open(context(), parser, serializer, BookFormatsTesting.supportsEverything, accountID, directory)
+      BookDatabase.open(context = context(),
+        parser = parser,
+        serializer = serializer,
+        formats = BookFormatsTesting.supportsEverything,
+        owner = accountID,
+        directory = directory,
+        httpClient = this.httpClient
+      )
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithPDF()
     val bookID = BookID.create("abcd")
@@ -596,7 +732,14 @@ abstract class BookDatabaseContract {
     val serializer = OPDSJSONSerializer.newSerializer()
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 =
-      BookDatabase.open(context(), parser, serializer, BookFormatsTesting.supportsEverything, accountID, directory)
+      BookDatabase.open(context = context(),
+        parser = parser,
+        serializer = serializer,
+        formats = BookFormatsTesting.supportsEverything,
+        owner = accountID,
+        directory = directory,
+        httpClient = this.httpClient
+      )
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithPDF()
     val bookID = BookID.create("abcd")
@@ -623,7 +766,14 @@ abstract class BookDatabaseContract {
     val serializer = OPDSJSONSerializer.newSerializer()
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 =
-      BookDatabase.open(context(), parser, serializer, BookFormatsTesting.supportsEverything, accountID, directory)
+      BookDatabase.open(context = context(),
+        parser = parser,
+        serializer = serializer,
+        formats = BookFormatsTesting.supportsEverything,
+        owner = accountID,
+        directory = directory,
+        httpClient = this.httpClient
+      )
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithAudioBook()
     val bookID = BookID.create("abcd")
@@ -728,7 +878,14 @@ abstract class BookDatabaseContract {
 
     run {
       val database =
-        BookDatabase.open(context(), parser, serializer, BookFormatsTesting.supportsEverything, accountID, directory)
+        BookDatabase.open(context = context(),
+          parser = parser,
+          serializer = serializer,
+          formats = BookFormatsTesting.supportsEverything,
+          owner = accountID,
+          directory = directory,
+          httpClient = this.httpClient
+        )
       val feedEntry: OPDSAcquisitionFeedEntry =
         this.acquisitionFeedEntryWithAdobeDRMEPUB()
       val entry0 =
@@ -757,7 +914,14 @@ abstract class BookDatabaseContract {
 
     run {
       val database =
-        BookDatabase.open(context(), parser, serializer, BookFormatsTesting.supportsEverything, accountID, directory)
+        BookDatabase.open(context = context(),
+          parser = parser,
+          serializer = serializer,
+          formats = BookFormatsTesting.supportsEverything,
+          owner = accountID,
+          directory = directory,
+          httpClient = this.httpClient
+        )
       val entry0 =
         database.entry(bookID)
       val formatHandle =
@@ -778,7 +942,14 @@ abstract class BookDatabaseContract {
 
     run {
       val database =
-        BookDatabase.open(context(), parser, serializer, BookFormatsTesting.supportsNothing, accountID, directory)
+        BookDatabase.open(context = context(),
+          parser = parser,
+          serializer = serializer,
+          formats = BookFormatsTesting.supportsNothing,
+          owner = accountID,
+          directory = directory,
+          httpClient = this.httpClient
+        )
       val entry0 =
         database.entry(bookID)
       val formatHandle =
@@ -798,7 +969,14 @@ abstract class BookDatabaseContract {
 
     run {
       val database =
-        BookDatabase.open(context(), parser, serializer, BookFormatsTesting.supportsEverything, accountID, directory)
+        BookDatabase.open(context = context(),
+          parser = parser,
+          serializer = serializer,
+          formats = BookFormatsTesting.supportsEverything,
+          owner = accountID,
+          directory = directory,
+          httpClient = this.httpClient
+        )
       val entry0 =
         database.entry(bookID)
       val formatHandle =

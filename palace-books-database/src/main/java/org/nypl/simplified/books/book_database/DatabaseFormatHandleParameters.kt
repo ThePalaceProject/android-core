@@ -3,6 +3,7 @@ package org.nypl.simplified.books.book_database
 import android.app.Application
 import com.fasterxml.jackson.databind.ObjectMapper
 import one.irradia.mime.api.MIMEType
+import org.librarysimplified.http.api.LSHTTPClientType
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
@@ -63,5 +64,11 @@ internal data class DatabaseFormatHandleParameters(
    * The book format support.
    */
 
-  val bookFormatSupport: BookFormatSupportType
+  val bookFormatSupport: BookFormatSupportType,
+
+  /**
+   * The HTTP client.
+   */
+
+  val httpClient: LSHTTPClientType
 )

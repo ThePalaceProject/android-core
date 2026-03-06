@@ -1,6 +1,5 @@
 package org.nypl.simplified.profiles
 
-import com.io7m.jfunctional.Option
 import net.jcip.annotations.GuardedBy
 import org.joda.time.LocalDateTime
 import org.nypl.simplified.accounts.api.AccountID
@@ -11,8 +10,6 @@ import org.nypl.simplified.accounts.database.api.AccountsDatabaseNonexistentExce
 import org.nypl.simplified.accounts.database.api.AccountsDatabaseType
 import org.nypl.simplified.analytics.api.AnalyticsEvent
 import org.nypl.simplified.analytics.api.AnalyticsType
-import org.nypl.simplified.profiles.api.ProfileCreateDuplicateException
-import org.nypl.simplified.profiles.api.ProfileDatabaseDeleteAnonymousException
 import org.nypl.simplified.profiles.api.ProfileDescription
 import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfileReadableType
@@ -61,66 +58,31 @@ internal class Profile internal constructor(
     }
   }
 
-  @Volatile
-  private var deleted: Boolean = false
-
   private val descriptionLock: Any = Any()
 
   @GuardedBy("descriptionLock")
   private var descriptionCurrent: ProfileDescription = this.initialDescription
 
-  internal fun setOwner(owner: ProfilesDatabase) {
-    this.owner = owner
-  }
-
-  override val isAnonymous: Boolean
-    get() = this.id == ProfilesDatabases.ANONYMOUS_PROFILE_ID
-
-  override val isCurrent: Boolean
-    get() = this.owner?.currentProfile()?.map { p -> p.id } == Option.some(this.id)
-
   override fun accounts(): SortedMap<AccountID, AccountType> {
-    this.checkNotDeleted()
     return this.accounts.accounts()
   }
 
   override fun accountsByProvider(): SortedMap<URI, AccountType> {
-    this.checkNotDeleted()
     return this.accounts.accountsByProvider()
   }
 
   @Throws(AccountsDatabaseNonexistentException::class)
   override fun account(accountId: AccountID): AccountType {
-    this.checkNotDeleted()
     return this.accounts()[accountId]
       ?: throw AccountsDatabaseNonexistentException("Nonexistent account: $accountId")
   }
 
   override fun accountsDatabase(): AccountsDatabaseType {
-    this.checkNotDeleted()
     return this.accounts
   }
 
   override fun setDescription(newDescription: ProfileDescription) {
-    this.checkNotDeleted()
     synchronized(this.descriptionLock) {
-      val newNameNormal =
-        this.normalizeDisplayName(newDescription.displayName)
-      val existing =
-        this.owner!!.findProfileWithDisplayName(newNameNormal)
-
-      /*
-       * If a profile exists with the given name, and it's not this profile... Abort!
-       */
-
-      if (existing.isSome) {
-        if (existing != Option.of(this)) {
-          throw ProfileCreateDuplicateException(
-            "A profile already exists with the name '$newNameNormal'"
-          )
-        }
-      }
-
       ProfilesDatabases.writeDescription(this.directory, newDescription)
       this.descriptionCurrent = newDescription
     }
@@ -128,14 +90,8 @@ internal class Profile internal constructor(
     this.logProfileModified()
   }
 
-  private fun normalizeDisplayName(newName: String): String {
-    return newName.trim()
-  }
-
   @Throws(AccountsDatabaseException::class)
   override fun createAccount(accountProvider: AccountProviderType): AccountType {
-    this.checkNotDeleted()
-
     val account = this.accounts.createAccount(accountProvider)
     this.setDescription(
       this.descriptionCurrent.copy(
@@ -147,7 +103,6 @@ internal class Profile internal constructor(
 
   @Throws(AccountsDatabaseException::class)
   override fun deleteAccountByProvider(accountProvider: URI): AccountID {
-    this.checkNotDeleted()
     val deleted = this.accounts.deleteAccountByProvider(accountProvider)
     val mostRecent = this.descriptionCurrent.preferences.mostRecentAccount
     if (mostRecent == deleted) {
@@ -177,43 +132,13 @@ internal class Profile internal constructor(
   }
 
   override fun compareTo(other: ProfileReadableType): Int {
-    return this.displayName.compareTo(other.displayName)
+    return 0
   }
 
   override fun description(): ProfileDescription {
-    this.checkNotDeleted()
     return synchronized(this.descriptionLock) {
       this.descriptionCurrent
     }
-  }
-
-  private fun checkNotDeleted() {
-    check(!this.deleted) { "The profile ${this.id.uuid} has been deleted!" }
-  }
-
-  override fun delete() {
-    this.logger.debug("[{}]: delete", this.id.uuid)
-
-    if (this.isAnonymous) {
-      throw ProfileDatabaseDeleteAnonymousException("Cannot delete the anonymous profile")
-    }
-
-    this.logProfileDeleted()
-    this.owner?.deleteProfile(this)
-    this.deleted = true
-  }
-
-  private fun logProfileDeleted() {
-    this.analytics.publishEvent(
-      AnalyticsEvent.ProfileDeleted(
-        timestamp = LocalDateTime.now(),
-        credentials = null,
-        profileUUID = this.id.uuid,
-        displayName = this.displayName,
-        birthDate = this.preferences().dateOfBirth?.date?.toString(),
-        attributes = this.description().attributes.attributes
-      )
-    )
   }
 
   private fun logProfileModified() {
@@ -222,7 +147,7 @@ internal class Profile internal constructor(
         timestamp = LocalDateTime.now(),
         credentials = null,
         profileUUID = this.id.uuid,
-        displayName = this.displayName,
+        displayName = "Anonymous",
         birthDate = this.preferences().dateOfBirth?.date?.toString(),
         attributes = this.description().attributes.attributes
       )

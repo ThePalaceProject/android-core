@@ -4,6 +4,9 @@ import android.app.Application
 import one.irradia.mime.api.MIMEType
 import org.joda.time.Instant
 import org.librarysimplified.http.api.LSHTTPClientType
+import org.librarysimplified.http.api.LSHTTPNetworkAccessReadableType.LSHTTPNetworkAvailability.NETWORK_AVAILABLE
+import org.librarysimplified.http.api.LSHTTPNetworkAccessReadableType.LSHTTPNetworkAvailability.NETWORK_NOT_PERMITTED
+import org.librarysimplified.http.api.LSHTTPNetworkAccessReadableType.LSHTTPNetworkAvailability.NETWORK_UNAVAILABLE
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.nypl.drm.core.AdobeAdeptExecutorType
 import org.nypl.drm.core.BoundlessServiceType
@@ -21,7 +24,6 @@ import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.accountsDat
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.bookDatabaseFailed
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.noSubtaskAvailable
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.noSupportedAcquisitions
-import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.profileNotFound
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.subtaskFailed
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.unexpectedException
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException
@@ -36,8 +38,6 @@ import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionPath
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
-import org.nypl.simplified.opds.core.getOrNull
-import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
@@ -176,7 +176,7 @@ class BorrowTask private constructor(
         formats = listOf()
       )
 
-    val profile = this.findProfile(start.profileId, bookInitial)
+    val profile = this.requirements.profiles.currentProfile()
     this.account = this.findAccount(profile, bookInitial)
     val book = this.createBookDatabaseEntry(bookInitial, start.opdsAcquisitionFeedEntry)
     val path = this.pickAcquisitionPath(book, start.opdsAcquisitionFeedEntry)
@@ -195,7 +195,6 @@ class BorrowTask private constructor(
   ) {
     val currentProfile =
       this.requirements.profiles.currentProfile()
-        .getOrNull()!!
 
     val context =
       BorrowContext(
@@ -226,15 +225,32 @@ class BorrowTask private constructor(
         temporaryDirectory = this.requirements.temporaryDirectory,
       )
 
-    if (!this.requirements.httpClient.networkAccess.canDownload()) {
-      this.taskRecorder.currentStepFailed(
-        message = "The current network settings do not allow downloads when Wi-Fi is unavailable.",
-        errorCode = "error-no-wifi",
-        exception = null,
-        extraMessages = listOf()
-      )
-      this.publishBookFailure(book)
-      throw BorrowFailedNoNetwork()
+    when (this.requirements.httpClient.networkAccess.canUseNetwork()) {
+      NETWORK_UNAVAILABLE -> {
+        this.taskRecorder.currentStepFailed(
+          message = "The network is currently unavailable.",
+          errorCode = "error-no-network",
+          exception = null,
+          extraMessages = listOf()
+        )
+        this.publishBookFailure(book)
+        throw BorrowFailedNoNetwork()
+      }
+
+      NETWORK_NOT_PERMITTED -> {
+        this.taskRecorder.currentStepFailed(
+          message = "The current network settings do not allow downloads when Wi-Fi is unavailable.",
+          errorCode = "error-no-permitted-network",
+          exception = null,
+          extraMessages = listOf()
+        )
+        this.publishBookFailure(book)
+        throw BorrowFailedNoNetwork()
+      }
+
+      NETWORK_AVAILABLE -> {
+        // Nothing required
+      }
     }
 
     while (true) {
@@ -383,33 +399,6 @@ class BorrowTask private constructor(
       )
       this.publishBookFailure(book)
       throw BorrowFailedHandled(e)
-    }
-  }
-
-  /**
-   * Locate the given profile.
-   */
-
-  private fun findProfile(
-    profileID: ProfileID,
-    book: Book
-  ): ProfileReadableType {
-    this.taskRecorder.beginNewStep("Locating profile $profileID...")
-
-    val profile = this.requirements.profiles.profiles()[profileID]
-    return if (profile == null) {
-      this.error("[{}]: failed to find profile: ", profileID)
-      this.taskRecorder.currentStepFailed(
-        message = "Failed to find profile.",
-        errorCode = profileNotFound,
-        exception = IllegalArgumentException(),
-        extraMessages = listOf()
-      )
-      this.publishBookFailure(book)
-      throw BorrowFailedHandled(null)
-    } else {
-      this.taskRecorder.currentStepSucceeded("Located profile.")
-      profile
     }
   }
 

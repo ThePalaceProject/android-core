@@ -6,7 +6,6 @@ import com.google.common.util.concurrent.FluentFuture
 import com.google.common.util.concurrent.ListeningExecutorService
 import com.google.common.util.concurrent.MoreExecutors
 import com.google.common.util.concurrent.SettableFuture
-import com.io7m.jfunctional.Some
 import com.io7m.junreachable.UnreachableCodeException
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -53,20 +52,13 @@ import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSFeedParserType
 import org.nypl.simplified.patron.api.PatronUserProfileParsersType
-import org.nypl.simplified.profiles.api.ProfileCreationEvent
-import org.nypl.simplified.profiles.api.ProfileDeletionEvent
 import org.nypl.simplified.profiles.api.ProfileDescription
 import org.nypl.simplified.profiles.api.ProfileEvent
 import org.nypl.simplified.profiles.api.ProfileID
-import org.nypl.simplified.profiles.api.ProfileNoneCurrentException
 import org.nypl.simplified.profiles.api.ProfileNonexistentAccountProviderException
 import org.nypl.simplified.profiles.api.ProfileReadableType
-import org.nypl.simplified.profiles.api.ProfileSelection
-import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.profiles.api.ProfileUpdated
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
-import org.nypl.simplified.profiles.api.ProfilesDatabaseType.AnonymousProfileEnabled
-import org.nypl.simplified.profiles.api.ProfilesDatabaseType.AnonymousProfileEnabled.ANONYMOUS_PROFILE_ENABLED
 import org.nypl.simplified.profiles.controller.api.ProfileAccountCreationStringResourcesType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountDeletionStringResourcesType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest
@@ -141,7 +133,6 @@ class Controller private constructor(
 
   private val accountRegistrySubscription: Disposable
   private val accountSubscription: Disposable
-  private val profileSelectionSubscription: Disposable
   private val profileUpdateSubscription: Disposable
 
   private val logger =
@@ -171,19 +162,7 @@ class Controller private constructor(
       this.profileEvents.ofType(ProfileUpdated::class.java)
         .subscribe(this::onProfileUpdated)
 
-    this.profileSelectionSubscription =
-      this.profileEvents.ofType(ProfileSelection.ProfileSelectionCompleted::class.java)
-        .subscribe(this::onProfileSelectionCompleted)
-
-    /*
-     * If the anonymous profile is enabled, then ensure that it is "selected" and will
-     * therefore very shortly have all of its books loaded.
-     */
-
-    if (this.profiles.anonymousProfileEnabled() == ANONYMOUS_PROFILE_ENABLED) {
-      this.logger.debug("initializing anonymous profile")
-      this.profileSelect(this.profileCurrent().id)
-    }
+    this.updateCrashlytics()
   }
 
   private fun onProfileUpdated(event: ProfileUpdated) {
@@ -194,43 +173,14 @@ class Controller private constructor(
     this.updateCrashlytics()
   }
 
-  private fun onProfileSelectionCompleted(
-    event: ProfileSelection.ProfileSelectionCompleted
-  ) {
-    if (!this.profileAnyIsCurrent()) {
-      return
-    }
-
-    /*
-     * Attempt to sync books if a profile is selected.
-     */
-
-    try {
-      this.logger.debug("triggering syncing of all accounts in profile")
-      this.profiles.currentProfileUnsafe()
-        .accounts()
-        .keys
-        .forEach { this.booksSync(it) }
-    } catch (e: Exception) {
-      this.logger.debug("failed to trigger book syncing: ", e)
-    }
-
-    this.updateCrashlytics()
-  }
-
   private fun updateCrashlytics() {
-    try {
-      val profile = this.profileCurrent()
-      val crash = this.crashlytics
-      if (crash != null) {
-        ControllerCrashlytics.configureCrashlytics(
-          profile = profile,
-          crashlytics = crash
-        )
-      }
-    } catch (e: ProfileNoneCurrentException) {
-      // No profile is current!
-      return
+    val profile = this.profileCurrent()
+    val crash = this.crashlytics
+    if (crash != null) {
+      ControllerCrashlytics.configureCrashlytics(
+        profile = profile,
+        crashlytics = crash
+      )
     }
   }
 
@@ -239,10 +189,6 @@ class Controller private constructor(
    */
 
   private fun onAccountRegistryEvent(event: AccountProviderRegistryEvent) {
-    if (!this.profileAnyIsCurrent()) {
-      return
-    }
-
     return when (event) {
       is AccountProviderRegistryEvent.Updated ->
         this.onAccountRegistryProviderUpdatedEvent(event)
@@ -254,18 +200,13 @@ class Controller private constructor(
   }
 
   private fun onAccountRegistryProviderUpdatedEvent(event: AccountProviderRegistryEvent.Updated) {
-    val profileCurrentOpt = this.profiles.currentProfile()
-    if (profileCurrentOpt is Some<ProfileType>) {
-      val profileCurrent = profileCurrentOpt.get()
-      this.submitTask {
-        ProfileAccountProviderUpdatedTask(
-          profile = profileCurrent,
-          accountProviderID = event.id,
-          accountProviders = this.accountProviders
-        )
-      }
-    } else {
-      this.logger.debug("no profile is current")
+    val profileCurrent = this.profiles.currentProfile()
+    this.submitTask {
+      ProfileAccountProviderUpdatedTask(
+        profile = profileCurrent,
+        accountProviderID = event.id,
+        accountProviders = this.accountProviders
+      )
     }
   }
 
@@ -298,62 +239,16 @@ class Controller private constructor(
   }
 
   override fun profiles(): SortedMap<ProfileID, ProfileReadableType> {
-    return this.castMap(this.profiles.profiles())
+    val p = this.profiles.currentProfile()
+    return sortedMapOf(Pair(p.id, p as ProfileReadableType))
   }
 
-  override fun profileAnonymousEnabled(): AnonymousProfileEnabled {
-    return this.profiles.anonymousProfileEnabled()
-  }
-
-  @Throws(ProfileNoneCurrentException::class)
   override fun profileCurrent(): ProfileReadableType {
-    return this.profiles.currentProfileUnsafe()
+    return this.profiles.currentProfile()
   }
 
   override fun profileEvents(): Observable<ProfileEvent> {
     return this.profileEvents
-  }
-
-  override fun profileDelete(
-    profileID: ProfileID
-  ): FluentFuture<ProfileDeletionEvent> {
-    return this.submitTask(
-      ProfileDeletionTask(
-        this.profiles,
-        this.profileEvents,
-        profileID
-      )
-    )
-  }
-
-  override fun profileCreate(
-    displayName: String,
-    accountProvider: AccountProviderType,
-    descriptionUpdate: (ProfileDescription) -> ProfileDescription
-  ): FluentFuture<ProfileCreationEvent> {
-    return this.submitTask(
-      ProfileCreationTask(
-        displayName = displayName,
-        profiles = this.profiles,
-        profileEvents = this.profileEvents,
-        accountProvider = accountProvider,
-        descriptionUpdate = descriptionUpdate
-      )
-    )
-  }
-
-  override fun profileSelect(
-    profileID: ProfileID
-  ): FluentFuture<Unit> {
-    return this.submitTask(
-      ProfileSelectionTask(
-        analytics = this.analytics,
-        bookRegistry = this.bookRegistry,
-        events = this.profileEvents,
-        id = profileID,
-        profiles = this.profiles
-      )
-    )
   }
 
   override fun profileAccountLogin(
@@ -454,7 +349,7 @@ class Controller private constructor(
     )
   }
 
-  @Throws(ProfileNoneCurrentException::class, AccountsDatabaseNonexistentException::class)
+  @Throws(AccountsDatabaseNonexistentException::class)
   override fun profileAccountFindByProvider(provider: URI): AccountType {
     val profile = this.profileCurrent()
     return profile.accountsByProvider()[provider]
@@ -465,7 +360,7 @@ class Controller private constructor(
     return this.accountEvents
   }
 
-  @Throws(ProfileNoneCurrentException::class, ProfileNonexistentAccountProviderException::class)
+  @Throws(ProfileNonexistentAccountProviderException::class)
   override fun profileCurrentlyUsedAccountProviders(): ImmutableList<AccountProviderType> {
     return ImmutableList.sortedCopyOf(
       this.profileCurrent()
@@ -501,28 +396,12 @@ class Controller private constructor(
     return this.submitTask(
       ProfileUpdateTask(
         this.profileEvents,
-        requestedProfileId = null,
         profiles = this.profiles,
         update = update
       )
     )
   }
 
-  override fun profileUpdateFor(
-    profile: ProfileID,
-    update: (ProfileDescription) -> ProfileDescription
-  ): FluentFuture<ProfileUpdated> {
-    return this.submitTask(
-      ProfileUpdateTask(
-        this.profileEvents,
-        requestedProfileId = profile,
-        profiles = this.profiles,
-        update = update
-      )
-    )
-  }
-
-  @Throws(ProfileNoneCurrentException::class)
   override fun profileFeed(
     request: ProfileFeedRequest
   ): FluentFuture<Feed.FeedWithoutGroups> {
@@ -536,7 +415,7 @@ class Controller private constructor(
     )
   }
 
-  @Throws(ProfileNoneCurrentException::class, AccountsDatabaseNonexistentException::class)
+  @Throws(AccountsDatabaseNonexistentException::class)
   override fun profileAccountForBook(
     bookID: BookID
   ): AccountType {
@@ -558,7 +437,6 @@ class Controller private constructor(
         val request =
           BorrowRequest.Start(
             accountId = accountID,
-            profileId = this.profileCurrent().id,
             opdsAcquisitionFeedEntry = entry,
             samlDownloadContext = samlDownloadContext
           )
@@ -577,7 +455,6 @@ class Controller private constructor(
     this.submitTask(
       BookBorrowFailedDismissTask(
         accountID = accountID,
-        profileID = this.profileCurrent().id,
         profiles = this.profiles,
         bookID = bookID,
         bookRegistry = this.bookRegistry,
@@ -607,7 +484,6 @@ class Controller private constructor(
     return this.submitTask(
       BookSyncTask(
         accountID = accountID,
-        profileID = this.profileCurrent().id,
         profiles = this.profiles,
         accountRegistry = this.accountProviders,
         bookRegistry = this.bookRegistry,
@@ -711,9 +587,6 @@ class Controller private constructor(
       }
     )
   }
-
-  override fun profileAnyIsCurrent(): Boolean =
-    this.profiles.currentProfile().isSome
 
   /**
    * Perform an unchecked (but safe) cast of the given map type. The cast is safe because

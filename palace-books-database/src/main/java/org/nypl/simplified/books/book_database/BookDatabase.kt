@@ -3,6 +3,7 @@ package org.nypl.simplified.books.book_database
 import android.app.Application
 import com.io7m.jnull.Nullable
 import net.jcip.annotations.GuardedBy
+import org.librarysimplified.http.api.LSHTTPClientType
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookID
@@ -34,7 +35,8 @@ class BookDatabase private constructor(
   private val directory: File,
   private val maps: BookMaps,
   private val serializer: OPDSJSONSerializerType,
-  private val formats: BookFormatSupportType
+  private val formats: BookFormatSupportType,
+  private val httpClient: LSHTTPClientType,
 ) : BookDatabaseType {
 
   /**
@@ -138,12 +140,13 @@ class BookDatabase private constructor(
 
         val dbEntry =
           BookDatabaseEntry(
-            context = this.context,
             bookDir = bookDir,
-            serializer = this.serializer,
-            formats = this.formats,
             bookRef = book,
-            onDelete = Runnable { this.maps.delete(id) }
+            context = this.context,
+            formats = this.formats,
+            httpClient = this.httpClient,
+            onDelete = Runnable { this.maps.delete(id) },
+            serializer = this.serializer,
           )
 
         this.maps.addEntry(dbEntry)
@@ -174,7 +177,8 @@ class BookDatabase private constructor(
       serializer: OPDSJSONSerializerType,
       formats: BookFormatSupportType,
       owner: AccountID,
-      directory: File
+      directory: File,
+      httpClient: LSHTTPClientType,
     ): BookDatabaseType {
       LOG.debug("opening book database: {}", directory)
       val maps = BookMaps()
@@ -188,7 +192,8 @@ class BookDatabase private constructor(
         account = owner,
         directory = directory,
         maps = maps,
-        errors = errors
+        errors = errors,
+        httpClient = httpClient
       )
 
       if (errors.isNotEmpty()) {
@@ -204,7 +209,8 @@ class BookDatabase private constructor(
         directory = directory,
         maps = maps,
         serializer = serializer,
-        formats = formats
+        formats = formats,
+        httpClient = httpClient
       )
     }
 
@@ -216,7 +222,8 @@ class BookDatabase private constructor(
       account: AccountID,
       directory: File,
       maps: BookMaps,
-      errors: MutableList<Exception>
+      errors: MutableList<Exception>,
+      httpClient: LSHTTPClientType,
     ) {
       if (!directory.exists()) {
         directory.mkdirs()
@@ -240,7 +247,8 @@ class BookDatabase private constructor(
             directory = bookDirectory,
             maps = maps,
             errors = errors,
-            name = bookID
+            name = bookID,
+            httpClient = httpClient
           ) ?: continue
           maps.addEntry(entry)
         }
@@ -257,7 +265,8 @@ class BookDatabase private constructor(
       directory: File,
       maps: BookMaps,
       errors: MutableList<Exception>,
-      name: String
+      name: String,
+      httpClient: LSHTTPClientType,
     ): BookDatabaseEntry? {
       try {
         LOG.debug("open: {}", directory)
@@ -292,7 +301,8 @@ class BookDatabase private constructor(
           serializer = serializer,
           formats = formats,
           bookRef = book,
-          onDelete = Runnable { maps.delete(bookId) }
+          onDelete = Runnable { maps.delete(bookId) },
+          httpClient = httpClient
         )
       } catch (e: IOException) {
         errors.add(e)

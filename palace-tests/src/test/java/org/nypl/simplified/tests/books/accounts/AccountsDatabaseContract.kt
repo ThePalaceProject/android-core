@@ -1,12 +1,17 @@
 package org.nypl.simplified.tests.books.accounts
 
 import android.app.Application
+import android.content.Context
 import io.reactivex.subjects.PublishSubject
 import org.hamcrest.BaseMatcher
 import org.hamcrest.Description
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.librarysimplified.http.api.LSHTTPClientConfiguration
+import org.librarysimplified.http.api.LSHTTPClientType
+import org.librarysimplified.http.api.LSHTTPNetworkAccess
+import org.librarysimplified.http.vanilla.LSHTTPClients
 import org.mockito.Mockito
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountAuthenticationTokenInfo
@@ -39,6 +44,7 @@ abstract class AccountsDatabaseContract {
   private lateinit var accountProviders: AccountProviderRegistryType
   private lateinit var credentialStore: FakeAccountCredentialStorage
   private lateinit var profileEvents: PublishSubject<ProfileEvent>
+  private lateinit var httpClient: LSHTTPClientType
 
   protected abstract fun context(): Application
 
@@ -48,6 +54,17 @@ abstract class AccountsDatabaseContract {
     this.accountEvents = PublishSubject.create()
     this.profileEvents = PublishSubject.create()
     this.accountProviders = Mockito.mock(AccountProviderRegistryType::class.java)
+
+    this.httpClient =
+      LSHTTPClients()
+        .create(
+          context = Mockito.mock(Context::class.java),
+          configuration = LSHTTPClientConfiguration(
+            applicationName = "org.thepalaceproject.tests",
+            applicationVersion = "1.0.0",
+            networkAccess = LSHTTPNetworkAccess
+          )
+        )
   }
 
   /**
@@ -105,7 +122,8 @@ abstract class AccountsDatabaseContract {
         accountCredentials = this.credentialStore,
         accountProviders = this.accountProviders,
         directory = f_acc,
-        directoryGraveyard = fAccGraveyard
+        directoryGraveyard = fAccGraveyard,
+        httpClient = this.httpClient
       )
     }
 
@@ -157,7 +175,8 @@ abstract class AccountsDatabaseContract {
         accountCredentials = this.credentialStore,
         accountProviders = this.accountProviders,
         directory = f_acc,
-        directoryGraveyard = fAccGraveyard
+        directoryGraveyard = fAccGraveyard,
+        httpClient = this.httpClient
       )
     }
 
@@ -193,7 +212,8 @@ abstract class AccountsDatabaseContract {
         accountCredentials = this.credentialStore,
         accountProviders = this.accountProviders,
         directory = f_acc,
-        directoryGraveyard = fAccGraveyard
+        directoryGraveyard = fAccGraveyard,
+        httpClient = this.httpClient
       )
     }
 
@@ -233,7 +253,8 @@ abstract class AccountsDatabaseContract {
         accountCredentials = this.credentialStore,
         accountProviders = this.accountProviders,
         directory = f_acc,
-        directoryGraveyard = fAccGraveyard
+        directoryGraveyard = fAccGraveyard,
+        httpClient = this.httpClient
       )
     }
 
@@ -265,7 +286,8 @@ abstract class AccountsDatabaseContract {
       accountCredentials = this.credentialStore,
       accountProviders = this.accountProviders,
       directory = f_acc,
-      directoryGraveyard = fAccGraveyard
+      directoryGraveyard = fAccGraveyard,
+      httpClient = this.httpClient
     )
 
     Assertions.assertEquals(0, db.accounts().size.toLong())
@@ -294,7 +316,8 @@ abstract class AccountsDatabaseContract {
       accountCredentials = this.credentialStore,
       accountProviders = this.accountProviders,
       directory = f_acc,
-      directoryGraveyard = fAccGraveyard
+      directoryGraveyard = fAccGraveyard,
+      httpClient = this.httpClient
     )
 
     val provider0 =
@@ -340,7 +363,8 @@ abstract class AccountsDatabaseContract {
         accountCredentials = this.credentialStore,
         accountProviders = this.accountProviders,
         directory = f_acc,
-        directoryGraveyard = fAccGraveyard
+        directoryGraveyard = fAccGraveyard,
+        httpClient = this.httpClient
       )
 
     val provider0 =
@@ -372,7 +396,8 @@ abstract class AccountsDatabaseContract {
       accountCredentials = this.credentialStore,
       accountProviders = this.accountProviders,
       directory = f_acc,
-      directoryGraveyard = fAccGraveyard
+      directoryGraveyard = fAccGraveyard,
+      httpClient = this.httpClient
     )
 
     val provider0 =
@@ -391,7 +416,8 @@ abstract class AccountsDatabaseContract {
       accountCredentials = this.credentialStore,
       accountProviders = this.accountProviders,
       directory = f_acc,
-      directoryGraveyard = fAccGraveyard
+      directoryGraveyard = fAccGraveyard,
+      httpClient = this.httpClient
     )
 
     val acr0 = db1.accounts()[acc0.id]!!
@@ -424,7 +450,8 @@ abstract class AccountsDatabaseContract {
       accountCredentials = this.credentialStore,
       accountProviders = this.accountProviders,
       directory = f_acc,
-      directoryGraveyard = fAccGraveyard
+      directoryGraveyard = fAccGraveyard,
+      httpClient = this.httpClient
     )
 
     val provider0 =
@@ -503,7 +530,8 @@ abstract class AccountsDatabaseContract {
       accountCredentials = this.credentialStore,
       accountProviders = this.accountProviders,
       directory = f_acc,
-      directoryGraveyard = fAccGraveyard
+      directoryGraveyard = fAccGraveyard,
+      httpClient = this.httpClient
     )
 
     val provider0 =
@@ -564,7 +592,8 @@ abstract class AccountsDatabaseContract {
       accountCredentials = this.credentialStore,
       accountProviders = this.accountProviders,
       directory = f_acc,
-      directoryGraveyard = fAccGraveyard
+      directoryGraveyard = fAccGraveyard,
+      httpClient = this.httpClient
     )
 
     val provider0 =
@@ -598,7 +627,8 @@ abstract class AccountsDatabaseContract {
       accountCredentials = this.credentialStore,
       accountProviders = this.accountProviders,
       directory = f_acc,
-      directoryGraveyard = fAccGraveyard
+      directoryGraveyard = fAccGraveyard,
+      httpClient = this.httpClient
     )
 
     val provider0 =

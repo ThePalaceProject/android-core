@@ -1,13 +1,20 @@
 package org.nypl.simplified.tests.books.book_database
 
 import android.app.Application
+import android.content.Context
 import com.io7m.jfunctional.Option
 import one.irradia.mime.vanilla.MIMEParser
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.librarysimplified.http.api.LSHTTPClientConfiguration
+import org.librarysimplified.http.api.LSHTTPClientType
+import org.librarysimplified.http.api.LSHTTPNetworkAccess
+import org.librarysimplified.http.vanilla.LSHTTPClients
+import org.mockito.Mockito
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookDRMKind
@@ -43,6 +50,23 @@ abstract class BookDatabaseEPUBContract {
 
   protected abstract fun context(): Application
 
+  private lateinit var httpClient: LSHTTPClientType
+
+  @BeforeEach
+  fun testSetup()
+  {
+    this.httpClient =
+      LSHTTPClients()
+        .create(
+          context = Mockito.mock(Context::class.java),
+          configuration = LSHTTPClientConfiguration(
+            applicationName = "org.thepalaceproject.tests",
+            applicationVersion = "1.0.0",
+            networkAccess = LSHTTPNetworkAccess
+          )
+        )
+  }
+
   /**
    * Creating a book database entry for a feed that contains an EPUB acquisition results in an
    * EPUB format. Reopening the database shows that the data is preserved.
@@ -55,7 +79,14 @@ abstract class BookDatabaseEPUBContract {
     val parser = OPDSJSONParser.newParser()
     val serializer = OPDSJSONSerializer.newSerializer()
     val directory = DirectoryUtilities.directoryCreateTemporary()
-    val database0 = BookDatabase.open(context(), parser, serializer, BookFormatsTesting.supportsEverything, accountID, directory)
+    val database0 = BookDatabase.open(context = context(),
+      parser = parser,
+      serializer = serializer,
+      formats = BookFormatsTesting.supportsEverything,
+      owner = accountID,
+      directory = directory,
+      httpClient = this.httpClient
+    )
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithEPUB()
     val bookID = BookIDs.newFromText("abcd")
@@ -106,7 +137,14 @@ abstract class BookDatabaseEPUBContract {
     val parser = OPDSJSONParser.newParser()
     val serializer = OPDSJSONSerializer.newSerializer()
     val directory = DirectoryUtilities.directoryCreateTemporary()
-    val database0 = BookDatabase.open(context(), parser, serializer, BookFormatsTesting.supportsEverything, accountID, directory)
+    val database0 = BookDatabase.open(context = context(),
+      parser = parser,
+      serializer = serializer,
+      formats = BookFormatsTesting.supportsEverything,
+      owner = accountID,
+      directory = directory,
+      httpClient = this.httpClient
+    )
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithEPUB()
     val bookID = BookIDs.newFromText("abcd")
@@ -186,7 +224,14 @@ abstract class BookDatabaseEPUBContract {
     }
 
     val database1 =
-      BookDatabase.open(context(), parser, serializer, BookFormatsTesting.supportsEverything, accountID, directory)
+      BookDatabase.open(context = context(),
+        parser = parser,
+        serializer = serializer,
+        formats = BookFormatsTesting.supportsEverything,
+        owner = accountID,
+        directory = directory,
+        httpClient = this.httpClient
+      )
     val databaseEntry1 =
       database1.createOrUpdate(bookID, feedEntry)
 
@@ -219,7 +264,14 @@ abstract class BookDatabaseEPUBContract {
     val parser = OPDSJSONParser.newParser()
     val serializer = OPDSJSONSerializer.newSerializer()
     val directory = DirectoryUtilities.directoryCreateTemporary()
-    val database0 = BookDatabase.open(context(), parser, serializer, BookFormatsTesting.supportsEverything, accountID, directory)
+    val database0 = BookDatabase.open(context = context(),
+      parser = parser,
+      serializer = serializer,
+      formats = BookFormatsTesting.supportsEverything,
+      owner = accountID,
+      directory = directory,
+      httpClient = this.httpClient
+    )
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithEPUB()
     val bookID = BookIDs.newFromText("abcd")

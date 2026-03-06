@@ -109,8 +109,6 @@ object Viewers {
           AnalyticsEvent.BookOpened(
             timestamp = LocalDateTime.now(),
             credentials = account.loginState.credentials,
-            profileUUID = profile.id.uuid,
-            profileDisplayName = profile.displayName,
             accountProvider = account.provider.id,
             accountUUID = account.id.uuid,
             opdsEntry = book.entry,

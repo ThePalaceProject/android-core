@@ -287,7 +287,7 @@ class ProfileAccountCreateCustomOPDSTest {
         announcementsAcknowledged = listOf()
       )
 
-    Mockito.`when`(this.profilesDatabase.currentProfileUnsafe())
+    Mockito.`when`(this.profilesDatabase.currentProfile())
       .thenReturn(profile)
     Mockito.`when`(profile.createAccount(anyNonNull()))
       .thenReturn(account)
@@ -359,7 +359,7 @@ class ProfileAccountCreateCustomOPDSTest {
     val account =
       fakeAccount()
 
-    Mockito.`when`(this.profilesDatabase.currentProfileUnsafe())
+    Mockito.`when`(this.profilesDatabase.currentProfile())
       .thenReturn(profile)
     Mockito.`when`(profile.createAccount(anyNonNull()))
       .thenReturn(account)
@@ -407,7 +407,7 @@ class ProfileAccountCreateCustomOPDSTest {
     val profile =
       Mockito.mock(ProfileType::class.java)
 
-    Mockito.`when`(this.profilesDatabase.currentProfileUnsafe())
+    Mockito.`when`(this.profilesDatabase.currentProfile())
       .thenReturn(profile)
     Mockito.`when`(profile.createAccount(anyNonNull()))
       .thenThrow(AccountsDatabaseIOException("FAILED!", IOException()))

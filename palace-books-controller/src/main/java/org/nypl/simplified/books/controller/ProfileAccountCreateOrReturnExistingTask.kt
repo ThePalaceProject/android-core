@@ -29,7 +29,7 @@ class ProfileAccountCreateOrReturnExistingTask(
     return try {
       this.taskRecorder.beginNewStep(this.strings.creatingAccount)
 
-      val profile = this.profiles.currentProfileUnsafe()
+      val profile = this.profiles.currentProfile()
       val existingAccount = profile.accountsByProvider().get(this.accountProviderID)
       if (existingAccount != null) {
         this.taskRecorder.currentStepSucceeded(this.strings.creatingAccountSucceeded)

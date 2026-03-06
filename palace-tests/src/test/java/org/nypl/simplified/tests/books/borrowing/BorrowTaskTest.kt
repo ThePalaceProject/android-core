@@ -2,7 +2,6 @@ package org.nypl.simplified.tests.books.borrowing
 
 import android.app.Application
 import android.content.ContentResolver
-import com.io7m.jfunctional.Option
 import io.reactivex.disposables.Disposable
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -28,6 +27,7 @@ import org.nypl.simplified.accounts.api.AccountAuthenticationAdobeClientToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationAdobePostActivationCredentials
 import org.nypl.simplified.accounts.api.AccountAuthenticationAdobePreActivationCredentials
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
+import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggedIn
 import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountUsername
@@ -36,7 +36,6 @@ import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.api.BookIDs
 import org.nypl.simplified.books.audio.AudioBookManifestData
-import org.nypl.simplified.books.book_database.BookDRMInformationHandleACS
 import org.nypl.simplified.books.book_database.api.BookDRMInformationHandle
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleEPUB
@@ -221,9 +220,7 @@ class BorrowTaskTest {
     profileMap[this.profile.id] = this.profile
 
     Mockito.`when`(this.profiles.currentProfile())
-      .thenReturn(Option.some(this.profile))
-    Mockito.`when`(this.profiles.profiles())
-      .thenReturn(profileMap)
+      .thenReturn(this.profile)
 
     this.account.setLoginState(
       AccountLoggedIn(
@@ -355,7 +352,7 @@ class BorrowTaskTest {
   @Test
   fun testBrokenBookDatabase() {
     val request =
-      BorrowRequest.Start(this.account.id, this.profile.id, this.opdsEmptyFeedEntry)
+      BorrowRequest.Start(this.account.id, this.opdsEmptyFeedEntry)
     val task =
       this.createTask(request)
 
@@ -384,12 +381,9 @@ class BorrowTaskTest {
   @Test
   fun testNoAccount() {
     val request =
-      BorrowRequest.Start(this.account.id, this.profile.id, this.opdsEmptyFeedEntry)
+      BorrowRequest.Start(AccountID.generate(), this.opdsEmptyFeedEntry)
     val task =
       this.createTask(request)
-
-    // Delete the profile to cause an error when the code touches it.
-    this.profile.delete()
 
     val result = this.executeAssumingFailure(task)
     assertEquals(BorrowErrorCodes.accountsDatabaseException, result.lastErrorCode)
@@ -404,7 +398,7 @@ class BorrowTaskTest {
   @Test
   fun testNoAvailableAcquisitions() {
     val request =
-      BorrowRequest.Start(this.account.id, this.profile.id, this.opdsEmptyFeedEntry)
+      BorrowRequest.Start(this.account.id, this.opdsEmptyFeedEntry)
     val task =
       this.createTask(request)
 
@@ -427,7 +421,7 @@ class BorrowTaskTest {
     assertEquals(0, feedEntry.acquisitions.size)
 
     val request =
-      BorrowRequest.Start(this.account.id, this.profile.id, feedEntry)
+      BorrowRequest.Start(this.account.id, feedEntry)
     val task =
       this.createTask(request)
 
@@ -460,7 +454,7 @@ class BorrowTaskTest {
     assertEquals(2, feedEntry.acquisitions.size)
 
     val request =
-      BorrowRequest.Start(this.account.id, this.profile.id, feedEntry)
+      BorrowRequest.Start(this.account.id, feedEntry)
     val task =
       this.createTask(request)
 
@@ -488,7 +482,7 @@ class BorrowTaskTest {
   @Test
   fun testNoSubtasks() {
     val request =
-      BorrowRequest.Start(this.account.id, this.profile.id, this.opdsOpenEPUBFeedEntry)
+      BorrowRequest.Start(this.account.id, this.opdsOpenEPUBFeedEntry)
     val task =
       this.createTask(request)
 
@@ -513,7 +507,7 @@ class BorrowTaskTest {
     )
 
     val request =
-      BorrowRequest.Start(this.account.id, this.profile.id, this.opdsOpenEPUBFeedEntry)
+      BorrowRequest.Start(this.account.id, this.opdsOpenEPUBFeedEntry)
     val task =
       this.createTask(request)
 
@@ -577,7 +571,7 @@ class BorrowTaskTest {
     )
 
     val request =
-      BorrowRequest.Start(this.account.id, this.profile.id, loanable)
+      BorrowRequest.Start(this.account.id, loanable)
     val task =
       this.createTask(request)
 
@@ -662,7 +656,7 @@ class BorrowTaskTest {
     }
 
     val request =
-      BorrowRequest.Start(this.account.id, this.profile.id, loanable)
+      BorrowRequest.Start(this.account.id, loanable)
     val task =
       this.createTask(request)
 
@@ -750,7 +744,7 @@ class BorrowTaskTest {
     }
 
     val request =
-      BorrowRequest.Start(this.account.id, this.profile.id, loanable)
+      BorrowRequest.Start(this.account.id, loanable)
     val task =
       this.createTask(request)
 
@@ -813,7 +807,7 @@ class BorrowTaskTest {
       this.findMockBookDatabase()
 
     val request =
-      BorrowRequest.Start(this.account.id, this.profile.id, loanable)
+      BorrowRequest.Start(this.account.id, loanable)
     val task =
       this.createTask(request)
 

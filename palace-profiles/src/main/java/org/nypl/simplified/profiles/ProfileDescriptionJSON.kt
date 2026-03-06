@@ -118,8 +118,6 @@ object ProfileDescriptionJSON {
     objectNode: ObjectNode,
     mostRecentAccountFallback: AccountID
   ): ProfileDescription {
-    val displayName =
-      JSONParserUtilities.getString(objectNode, "displayName")
     val preferences =
       deserialize20200504Preferences(
         objectMapper,
@@ -130,7 +128,6 @@ object ProfileDescriptionJSON {
       deserialize20191201Attributes(JSONParserUtilities.getObject(objectNode, "attributes"))
 
     return ProfileDescription(
-      displayName = displayName,
       preferences = preferences,
       attributes = attributes
     )
@@ -141,8 +138,6 @@ object ProfileDescriptionJSON {
     objectNode: ObjectNode,
     mostRecentAccountFallback: AccountID
   ): ProfileDescription {
-    val displayName =
-      JSONParserUtilities.getString(objectNode, "displayName")
     val preferences =
       deserialize20191201Preferences(
         objectMapper,
@@ -153,7 +148,6 @@ object ProfileDescriptionJSON {
       deserialize20191201Attributes(JSONParserUtilities.getObject(objectNode, "attributes"))
 
     return ProfileDescription(
-      displayName = displayName,
       preferences = preferences,
       attributes = attributes
     )
@@ -284,9 +278,6 @@ object ProfileDescriptionJSON {
     objectNode: ObjectNode,
     mostRecentAccountFallback: AccountID
   ): ProfileDescription {
-    val displayName =
-      JSONParserUtilities.getString(objectNode, "display_name")
-
     val dateFormatter =
       this.standardDateFormatter()
 
@@ -358,7 +349,6 @@ object ProfileDescriptionJSON {
       ProfileAttributes(attributeMap.toSortedMap())
 
     return ProfileDescription(
-      displayName = displayName,
       preferences = preferences,
       attributes = attributes
     )
@@ -432,7 +422,6 @@ object ProfileDescriptionJSON {
     description: ProfileDescription
   ) {
     output.put("@version", 20210605)
-    output.put("displayName", description.displayName)
     output.set<ObjectNode>(
       "preferences",
       serialize20210605Preferences(objectMapper, description.preferences)

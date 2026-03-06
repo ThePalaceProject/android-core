@@ -1,6 +1,7 @@
 package org.nypl.simplified.books.book_database
 
 import android.app.Application
+import org.librarysimplified.http.api.LSHTTPClientType
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.book_database.api.BookDatabaseException
 import org.nypl.simplified.books.book_database.api.BookDatabaseFactoryType
@@ -19,17 +20,19 @@ object BookDatabases : BookDatabaseFactoryType {
     context: Application,
     parser: OPDSJSONParserType,
     serializer: OPDSJSONSerializerType,
+    httpClient: LSHTTPClientType,
     formats: BookFormatSupportType,
     owner: AccountID,
     directory: File
   ): BookDatabaseType {
     return BookDatabase.open(
       context = context,
+      directory = directory,
+      formats = formats,
+      httpClient = httpClient,
+      owner = owner,
       parser = parser,
       serializer = serializer,
-      formats = formats,
-      owner = owner,
-      directory = directory
     )
   }
 
@@ -37,16 +40,18 @@ object BookDatabases : BookDatabaseFactoryType {
   override fun openDatabase(
     context: Application,
     formats: BookFormatSupportType,
+    httpClient: LSHTTPClientType,
     owner: AccountID,
     directory: File
   ): BookDatabaseType {
     return BookDatabase.open(
       context = context,
+      directory = directory,
+      formats = formats,
+      httpClient = httpClient,
+      owner = owner,
       parser = OPDSJSONParser.newParser(),
       serializer = OPDSJSONSerializer.newSerializer(),
-      formats = formats,
-      owner = owner,
-      directory = directory
     )
   }
 }

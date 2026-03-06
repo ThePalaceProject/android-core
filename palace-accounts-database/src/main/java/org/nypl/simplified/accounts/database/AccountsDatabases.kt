@@ -2,6 +2,7 @@ package org.nypl.simplified.accounts.database
 
 import android.app.Application
 import io.reactivex.subjects.Subject
+import org.librarysimplified.http.api.LSHTTPClientType
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentialsStoreType
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.accounts.database.api.AccountsDatabaseException
@@ -28,17 +29,19 @@ object AccountsDatabases : AccountsDatabaseFactoryType {
     bookFormatSupport: BookFormatSupportType,
     context: Application,
     directory: File,
-    directoryGraveyard: File
+    directoryGraveyard: File,
+    httpClient: LSHTTPClientType,
   ): AccountsDatabaseType {
     return AccountsDatabase.open(
-      context = context,
+      accountCredentials = accountAuthenticationCredentialsStore,
       accountEvents = accountEvents,
+      accountProviders = accountProviders,
       bookDatabases = bookDatabases,
       bookFormatSupport = bookFormatSupport,
-      accountCredentials = accountAuthenticationCredentialsStore,
-      accountProviders = accountProviders,
+      context = context,
       directory = directory,
-      directoryGraveyard = directoryGraveyard
+      directoryGraveyard = directoryGraveyard,
+      httpClient = httpClient,
     )
   }
 
@@ -50,17 +53,19 @@ object AccountsDatabases : AccountsDatabaseFactoryType {
     bookFormatSupport: BookFormatSupportType,
     context: Application,
     directory: File,
-    directoryGraveyard: File
+    directoryGraveyard: File,
+    httpClient: LSHTTPClientType,
   ): AccountsDatabaseType {
     return AccountsDatabase.open(
-      context = context,
+      accountCredentials = accountAuthenticationCredentialsStore,
       accountEvents = accountEvents,
+      accountProviders = accountProviders,
       bookDatabases = BookDatabases,
       bookFormatSupport = bookFormatSupport,
-      accountCredentials = accountAuthenticationCredentialsStore,
-      accountProviders = accountProviders,
+      context = context,
       directory = directory,
-      directoryGraveyard = directoryGraveyard
+      directoryGraveyard = directoryGraveyard,
+      httpClient = httpClient,
     )
   }
 }

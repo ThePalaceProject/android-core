@@ -1,6 +1,7 @@
 package org.nypl.simplified.books.book_database.api
 
 import android.app.Application
+import org.librarysimplified.http.api.LSHTTPClientType
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.opds.core.OPDSJSONParserType
@@ -22,6 +23,7 @@ interface BookDatabaseFactoryType {
     context: Application,
     parser: OPDSJSONParserType,
     serializer: OPDSJSONSerializerType,
+    httpClient: LSHTTPClientType,
     formats: BookFormatSupportType,
     owner: AccountID,
     directory: File
@@ -35,6 +37,7 @@ interface BookDatabaseFactoryType {
   fun openDatabase(
     context: Application,
     formats: BookFormatSupportType,
+    httpClient: LSHTTPClientType,
     owner: AccountID,
     directory: File
   ): BookDatabaseType

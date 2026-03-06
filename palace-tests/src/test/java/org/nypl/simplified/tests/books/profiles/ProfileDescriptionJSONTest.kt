@@ -45,7 +45,6 @@ class ProfileDescriptionJSONTest {
 
     val description_0 =
       ProfileDescription(
-        displayName = "Kermit",
         preferences = ProfilePreferences(
           ProfileDateOfBirth(dateTime, true),
           showTestingLibraries = false,
@@ -87,7 +86,6 @@ class ProfileDescriptionJSONTest {
       )
 
     this.logger.debug("{}", ProfileDescriptionJSON.serializeToString(ObjectMapper(), description))
-    assertEquals("Eggbert", description.displayName)
     assertEquals("developer", description.attributes.role)
     assertEquals(mostRecentAccount, description.preferences.mostRecentAccount)
   }
@@ -104,7 +102,6 @@ class ProfileDescriptionJSONTest {
       )
 
     this.logger.debug("{}", ProfileDescriptionJSON.serializeToString(ObjectMapper(), description))
-    assertEquals("Newbert", description.displayName)
     assertEquals("male", description.attributes.gender)
     assertEquals("student", description.attributes.role)
     assertEquals("ຊັ້ນ 8", description.attributes.grade)
@@ -124,7 +121,6 @@ class ProfileDescriptionJSONTest {
       )
 
     this.logger.debug("{}", ProfileDescriptionJSON.serializeToString(ObjectMapper(), description))
-    assertEquals("", description.displayName)
     assertEquals(mostRecentAccount, description.preferences.mostRecentAccount)
   }
 
@@ -139,7 +135,6 @@ class ProfileDescriptionJSONTest {
         mostRecentAccountFallback
       )
 
-    assertEquals("", description.displayName)
     assertEquals(0, description.preferences.playbackRates.size)
     assertEquals(1.0, description.preferences.readerPreferences.brightness())
     assertEquals(100.0, description.preferences.readerPreferences.fontScale())
@@ -181,7 +176,6 @@ class ProfileDescriptionJSONTest {
         mostRecentAccount
       )
 
-    assertEquals("", description.displayName)
     assertEquals(1.0, description.preferences.readerPreferences.brightness())
     assertEquals(800.0, description.preferences.readerPreferences.fontScale())
     assertEquals(ReaderFontSelection.READER_FONT_SANS_SERIF, description.preferences.readerPreferences.fontFamily())

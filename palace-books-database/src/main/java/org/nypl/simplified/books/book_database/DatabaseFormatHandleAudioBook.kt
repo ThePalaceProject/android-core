@@ -9,7 +9,6 @@ import org.librarysimplified.audiobook.api.PlayerAudioEngineRequest
 import org.librarysimplified.audiobook.api.PlayerAudioEngines
 import org.librarysimplified.audiobook.api.PlayerAuthorizationHandlerNoOp
 import org.librarysimplified.audiobook.api.PlayerBookSource
-import org.librarysimplified.audiobook.api.PlayerUserAgent
 import org.librarysimplified.audiobook.manifest.api.PlayerManifest
 import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.librarysimplified.audiobook.manifest_parser.api.ManifestParsers
@@ -198,13 +197,13 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
             PlayerAudioEngines.delete(
               context = context,
               request = PlayerAudioEngineRequest(
-                bookSource = PlayerBookSource.PlayerBookSourceManifestOnly,
-                manifest = manifestResult.result,
-                filter = { true },
-                downloadProvider = NullDownloadProvider(),
-                userAgent = PlayerUserAgent("unused"),
                 authorizationHandler = PlayerAuthorizationHandlerNoOp,
-                bookCredentials = this.drmHandleRef.info.playerCredentials()
+                bookCredentials = this.drmHandleRef.info.playerCredentials(),
+                bookSource = PlayerBookSource.PlayerBookSourceManifestOnly,
+                downloadProvider = NullDownloadProvider(),
+                filter = { true },
+                httpClient = this.parameters.httpClient,
+                manifest = manifestResult.result,
               )
             )
 

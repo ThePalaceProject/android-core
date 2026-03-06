@@ -33,7 +33,6 @@ class MockProfile(
     check(!this.deleted) { "Profile must not be deleted" }
 
     return ProfileDescription(
-      displayName = "Profile ${id.uuid}",
       preferences = ProfilePreferences(
         dateOfBirth = null,
         showTestingLibraries = false,
@@ -47,10 +46,6 @@ class MockProfile(
       ),
       attributes = ProfileAttributes(sortedMapOf())
     )
-  }
-
-  override fun delete() {
-    this.deleted = true
   }
 
   private var deleted: Boolean
@@ -81,17 +76,8 @@ class MockProfile(
     TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
   }
 
-  override val isAnonymous: Boolean
-    get() = TODO("not implemented") // To change initializer of created properties use File | Settings | File Templates.
-
-  override val isCurrent: Boolean
-    get() = TODO("not implemented") // To change initializer of created properties use File | Settings | File Templates.
-
   override val directory: File
     get() = TODO("not implemented") // To change initializer of created properties use File | Settings | File Templates.
-
-  override val displayName: String
-    get() = "Profile ${id.uuid}"
 
   override fun accounts(): SortedMap<AccountID, AccountType> {
     check(!this.deleted) { "Profile must not be deleted" }

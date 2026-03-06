@@ -7,7 +7,6 @@ import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookWithStatus
-import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
@@ -21,11 +20,10 @@ import org.slf4j.LoggerFactory
 
 class BookBorrowFailedDismissTask(
   accountID: AccountID,
-  profileID: ProfileID,
   profiles: ProfilesDatabaseType,
   private val bookID: BookID,
   private val bookRegistry: BookRegistryType,
-) : AbstractBookTask(accountID, profileID, profiles) {
+) : AbstractBookTask(accountID, profiles) {
 
   override val logger: Logger =
     LoggerFactory.getLogger(BookBorrowFailedDismissTask::class.java)

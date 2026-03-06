@@ -21,18 +21,6 @@ import java.util.SortedMap
 interface ProfileReadableType : Comparable<ProfileReadableType> {
 
   /**
-   * @return `true` iff this profile is the anonymous profile
-   */
-
-  val isAnonymous: Boolean
-
-  /**
-   * @return `true` Iff this profile is the current profile
-   */
-
-  val isCurrent: Boolean
-
-  /**
    * @return The unique profile identifier
    */
 
@@ -43,13 +31,6 @@ interface ProfileReadableType : Comparable<ProfileReadableType> {
    */
 
   val directory: File
-
-  /**
-   * @return The profile's display name
-   */
-
-  val displayName: String
-    get() = this.description().displayName
 
   /**
    * @return The profile's current description

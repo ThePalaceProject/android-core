@@ -12,14 +12,11 @@ import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.feeds.api.Feed
-import org.nypl.simplified.profiles.api.ProfileCreationEvent
-import org.nypl.simplified.profiles.api.ProfileDeletionEvent
 import org.nypl.simplified.profiles.api.ProfileDescription
 import org.nypl.simplified.profiles.api.ProfileEvent
 import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.nypl.simplified.profiles.api.ProfileUpdated
-import org.nypl.simplified.profiles.api.ProfilesDatabaseType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest
 import org.nypl.simplified.profiles.controller.api.ProfileFeedRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
@@ -33,19 +30,7 @@ class MockProfilesController(
   accountCount: Int
 ) : ProfilesControllerType {
 
-  override fun profileCreate(
-    displayName: String,
-    accountProvider: AccountProviderType,
-    descriptionUpdate: (ProfileDescription) -> ProfileDescription
-  ): FluentFuture<ProfileCreationEvent> {
-    return FluentFuture.from(SettableFuture.create())
-  }
-
   override fun profileUpdate(update: (ProfileDescription) -> ProfileDescription): FluentFuture<ProfileUpdated> {
-    return FluentFuture.from(SettableFuture.create())
-  }
-
-  override fun profileUpdateFor(profile: ProfileID, update: (ProfileDescription) -> ProfileDescription): FluentFuture<ProfileUpdated> {
     return FluentFuture.from(SettableFuture.create())
   }
 
@@ -70,24 +55,12 @@ class MockProfilesController(
     return this.profiles as SortedMap<ProfileID, ProfileReadableType>
   }
 
-  override fun profileAnonymousEnabled(): ProfilesDatabaseType.AnonymousProfileEnabled {
-    return ProfilesDatabaseType.AnonymousProfileEnabled.ANONYMOUS_PROFILE_ENABLED
-  }
-
   override fun profileCurrent(): ProfileReadableType {
     return this.profileList[0]
   }
 
-  override fun profileAnyIsCurrent(): Boolean {
-    return true
-  }
-
   override fun profileEvents(): Observable<ProfileEvent> {
     return this.profileEventSource
-  }
-
-  override fun profileSelect(profileID: ProfileID): FluentFuture<Unit> {
-    return FluentFuture.from(SettableFuture.create())
   }
 
   data class ProfileAccountLogin(
@@ -146,9 +119,5 @@ class MockProfilesController(
 
   override fun profileAccountForBook(bookID: BookID): AccountType {
     return TODO()
-  }
-
-  override fun profileDelete(profileID: ProfileID): FluentFuture<ProfileDeletionEvent> {
-    return FluentFuture.from(SettableFuture.create())
   }
 }

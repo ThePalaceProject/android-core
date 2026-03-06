@@ -37,7 +37,6 @@ import org.librarysimplified.audiobook.api.PlayerEvent.PlayerEventWithPosition.P
 import org.librarysimplified.audiobook.api.PlayerEvent.PlayerEventWithPosition.PlayerEventPlaybackStopped
 import org.librarysimplified.audiobook.api.PlayerEvent.PlayerEventWithPosition.PlayerEventPlaybackWaitingForAction
 import org.librarysimplified.audiobook.api.PlayerUIThread
-import org.librarysimplified.audiobook.api.PlayerUserAgent
 import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.librarysimplified.audiobook.views.PlayerBaseFragment
 import org.librarysimplified.audiobook.views.PlayerBookmarkModel
@@ -50,6 +49,7 @@ import org.librarysimplified.audiobook.views.PlayerTOCFragment
 import org.librarysimplified.audiobook.views.PlayerViewCommand
 import org.librarysimplified.audiobook.views.bluetooth.PlayerBluetoothWatcher
 import org.librarysimplified.audiobook.views.focus.PlayerFocusWatcher
+import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.bookmarks.api.BookmarkServiceType
 import org.nypl.simplified.bookmarks.api.BookmarksForBook
@@ -80,6 +80,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
   private lateinit var coverService: BookCoverProviderType
   private lateinit var profiles: ProfilesControllerType
   private lateinit var timeTrackingService: TimeTrackingServiceType
+  private lateinit var httpClient: LSHTTPClientType
 
   private var fragmentNow: Fragment = AudioBookLoadingFragment2()
   private var subscriptions: CompositeDisposable = CompositeDisposable()
@@ -110,6 +111,8 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       services.requireService(TimeTrackingServiceType::class.java)
     this.profiles =
       services.requireService(ProfilesControllerType::class.java)
+    this.httpClient =
+      services.requireService(LSHTTPClientType::class.java)
 
     this.root = this.findViewById(R.id.audio_book_player_fragment_root)
     ScreenEdgeToEdgeFix.edgeToEdge(this.root)
@@ -369,8 +372,8 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
           bookSource = state.bookSource,
           context = this.application,
           fetchAll = true,
+          httpClient = this.httpClient,
           manifest = state.manifest,
-          userAgent = PlayerUserAgent(bookParameters.userAgent),
         )
       }
 

@@ -4,6 +4,7 @@ import android.app.Application
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.base.Preconditions
 import io.reactivex.subjects.Subject
+import org.librarysimplified.http.api.LSHTTPClientType
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentialsStoreType
 import org.nypl.simplified.accounts.api.AccountBundledCredentialsType
 import org.nypl.simplified.accounts.api.AccountEvent
@@ -25,7 +26,6 @@ import org.nypl.simplified.profiles.api.ProfileDescription
 import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfilePreferences
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
-import org.nypl.simplified.profiles.api.ProfilesDatabaseType.AnonymousProfileEnabled.ANONYMOUS_PROFILE_ENABLED
 import org.nypl.simplified.reader.api.ReaderPreferences
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -46,74 +46,6 @@ object ProfilesDatabases {
   val ANONYMOUS_PROFILE_ID =
     ProfileID(UUID(0L, 0L))
 
-  /**
-   * Open a profile database from the given directory, creating a new database if one does not
-   * exist. The anonymous profile will not be enabled, and will be ignored even if one is present
-   * in the on-disk database.
-   *
-   * @return A profile database
-   * @throws ProfileDatabaseException If any errors occurred whilst trying to open the database
-   */
-
-  @Throws(ProfileDatabaseException::class)
-  fun openWithAnonymousProfileDisabled(
-    context: Application,
-    analytics: AnalyticsType,
-    accountEvents: Subject<AccountEvent>,
-    accountProviders: AccountProviderRegistryType,
-    accountBundledCredentials: AccountBundledCredentialsType,
-    accountCredentialsStore: AccountAuthenticationCredentialsStoreType,
-    accountsDatabases: AccountsDatabaseFactoryType,
-    bookFormatSupport: BookFormatSupportType,
-    directory: File
-  ): ProfilesDatabaseType {
-    this.logger.debug("opening profile database: {}", directory)
-
-    val profiles = ConcurrentSkipListMap<ProfileID, Profile>()
-    val jom = ObjectMapper()
-
-    val errors = ArrayList<Exception>()
-    this.openAllProfiles(
-      context = context,
-      analytics = analytics,
-      accountEvents = accountEvents,
-      accountProviders = accountProviders,
-      accountCredentialsStore = accountCredentialsStore,
-      accountsDatabases = accountsDatabases,
-      bookFormatSupport = bookFormatSupport,
-      directory = directory,
-      profiles = profiles,
-      jom = jom,
-      errors = errors
-    )
-    profiles.remove(this.ANONYMOUS_PROFILE_ID)
-
-    if (errors.isNotEmpty()) {
-      for (e in errors) {
-        this.logger.debug("error during profile database open: ", e)
-      }
-
-      throw ProfileDatabaseOpenException(
-        "One or more errors occurred whilst trying to open the profile database.",
-        errors
-      )
-    }
-
-    return ProfilesDatabase(
-      analytics = analytics,
-      accountBundledCredentials = accountBundledCredentials,
-      accountEvents = accountEvents,
-      accountProviders = accountProviders,
-      accountCredentialsStore = accountCredentialsStore,
-      accountsDatabases = accountsDatabases,
-      anonymousProfileEnabled = ProfilesDatabaseType.AnonymousProfileEnabled.ANONYMOUS_PROFILE_DISABLED,
-      bookFormatSupport = bookFormatSupport,
-      context = context,
-      directory = directory,
-      profiles = profiles
-    )
-  }
-
   private fun openAllProfiles(
     context: Application,
     analytics: AnalyticsType,
@@ -122,6 +54,7 @@ object ProfilesDatabases {
     accountCredentialsStore: AccountAuthenticationCredentialsStoreType,
     accountsDatabases: AccountsDatabaseFactoryType,
     bookFormatSupport: BookFormatSupportType,
+    httpClient: LSHTTPClientType,
     directory: File,
     profiles: SortedMap<ProfileID, Profile>,
     jom: ObjectMapper,
@@ -148,6 +81,7 @@ object ProfilesDatabases {
             accountsDatabases = accountsDatabases,
             accountCredentialsStore = accountCredentialsStore,
             bookFormatSupport = bookFormatSupport,
+            httpClient = httpClient,
             jom = jom,
             directory = directory,
             errors = errors,
@@ -175,6 +109,7 @@ object ProfilesDatabases {
     accountCredentialsStore: AccountAuthenticationCredentialsStoreType,
     accountsDatabases: AccountsDatabaseFactoryType,
     bookFormatSupport: BookFormatSupportType,
+    httpClient: LSHTTPClientType,
     directory: File
   ): ProfilesDatabaseType {
     this.logger.debug("opening profile database: {}", directory)
@@ -184,34 +119,40 @@ object ProfilesDatabases {
 
     val errors = ArrayList<Exception>()
     this.openAllProfiles(
-      context = context,
-      analytics = analytics,
+      accountCredentialsStore = accountCredentialsStore,
       accountEvents = accountEvents,
       accountProviders = accountProviders,
-      accountCredentialsStore = accountCredentialsStore,
       accountsDatabases = accountsDatabases,
+      analytics = analytics,
       bookFormatSupport = bookFormatSupport,
+      context = context,
       directory = directory,
-      profiles = profiles,
+      errors = errors,
+      httpClient = httpClient,
       jom = jom,
-      errors = errors
+      profiles = profiles,
     )
+
+    /*
+     * XXX: We no longer support multiple profiles.
+     */
 
     if (!profiles.containsKey(this.ANONYMOUS_PROFILE_ID)) {
       val anon =
         this.createProfileActual(
-          context = context,
-          analytics = analytics,
           accountBundledCredentials = accountBundledCredentials,
+          accountCredentialsStore = accountCredentialsStore,
           accountEvents = accountEvents,
+          accountProvider = accountProviders.defaultProvider,
           accountProviders = accountProviders,
           accountsDatabases = accountsDatabases,
-          accountCredentialsStore = accountCredentialsStore,
-          accountProvider = accountProviders.defaultProvider,
+          analytics = analytics,
           bookFormatSupport = bookFormatSupport,
+          context = context,
           directory = directory,
           displayName = "",
-          id = this.ANONYMOUS_PROFILE_ID
+          httpClient = httpClient,
+          id = this.ANONYMOUS_PROFILE_ID,
         )
       profiles[this.ANONYMOUS_PROFILE_ID] = anon
     }
@@ -222,23 +163,14 @@ object ProfilesDatabases {
       )
     }
 
-    val database =
-      ProfilesDatabase(
-        analytics = analytics,
-        accountBundledCredentials = accountBundledCredentials,
-        accountEvents = accountEvents,
-        accountProviders = accountProviders,
-        accountCredentialsStore = accountCredentialsStore,
-        accountsDatabases = accountsDatabases,
-        anonymousProfileEnabled = ANONYMOUS_PROFILE_ENABLED,
-        bookFormatSupport = bookFormatSupport,
-        context = context,
-        directory = directory,
-        profiles = profiles
-      )
+    val profileActual =
+      profiles.firstEntry().value
 
-    database.setCurrentProfile(this.ANONYMOUS_PROFILE_ID)
-    return database
+    return ProfilesDatabase(
+      accountProviders = accountProviders,
+      directory = directory,
+      profile = profileActual
+    )
   }
 
   private fun openOneProfileDirectory(
@@ -329,6 +261,7 @@ object ProfilesDatabases {
     accountsDatabases: AccountsDatabaseFactoryType,
     accountCredentialsStore: AccountAuthenticationCredentialsStoreType,
     bookFormatSupport: BookFormatSupportType,
+    httpClient: LSHTTPClientType,
     jom: ObjectMapper,
     directory: File,
     errors: MutableList<Exception>,
@@ -359,7 +292,8 @@ object ProfilesDatabases {
             bookFormatSupport = bookFormatSupport,
             context = context,
             directory = profileAccountsDir,
-            directoryGraveyard = profileAccountsGraveyardDir
+            directoryGraveyard = profileAccountsGraveyardDir,
+            httpClient = httpClient,
           )
 
         if (accounts.accounts().isEmpty()) {
@@ -432,6 +366,7 @@ object ProfilesDatabases {
     accountCredentialsStore: AccountAuthenticationCredentialsStoreType,
     accountProvider: AccountProviderType,
     bookFormatSupport: BookFormatSupportType,
+    httpClient: LSHTTPClientType,
     directory: File,
     displayName: String,
     id: ProfileID
@@ -453,7 +388,8 @@ object ProfilesDatabases {
             bookFormatSupport = bookFormatSupport,
             context = context,
             directory = profileAccountsDir,
-            directoryGraveyard = profileAccountsGraveyardDir
+            directoryGraveyard = profileAccountsGraveyardDir,
+            httpClient = httpClient,
           )
 
         /*
@@ -466,7 +402,6 @@ object ProfilesDatabases {
 
         val description =
           ProfileDescription(
-            displayName = displayName,
             preferences = ProfilePreferences(
               dateOfBirth = null,
               hasSeenNotificationScreen = false,

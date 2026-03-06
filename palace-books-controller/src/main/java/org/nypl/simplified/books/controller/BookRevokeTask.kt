@@ -69,7 +69,7 @@ class BookRevokeTask(
   private val revokeStrings: BookRevokeStringResourcesType,
   private val revokeACSTimeoutDuration: Duration = Duration.standardMinutes(1L),
   private val revokeServerTimeoutDuration: Duration = Duration.standardMinutes(3L)
-) : AbstractBookTask(accountID, profileID, profiles) {
+) : AbstractBookTask(accountID, profiles) {
 
   private var authenticationFailed: Boolean = false
 
