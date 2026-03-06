@@ -1072,9 +1072,9 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-03-06T16:50:19+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.25.4">
+    <c:release date="2026-03-06T17:27:50+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.25.4">
       <c:changes>
-        <c:change date="2026-03-06T16:50:19+00:00" summary="Fix a crash relating to the fallback account."/>
+        <c:change date="2026-03-06T00:00:00+00:00" summary="Fix a crash relating to the fallback account."/>
       </c:changes>
     </c:release>
   </c:releases>
