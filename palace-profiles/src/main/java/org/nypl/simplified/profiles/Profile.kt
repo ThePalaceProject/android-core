@@ -137,21 +137,12 @@ internal class Profile internal constructor(
     this.checkNotDeleted()
 
     val account = this.accounts.createAccount(accountProvider)
-    this.deleteDefaultAccount()
     this.setDescription(
       this.descriptionCurrent.copy(
         preferences = this.descriptionCurrent.preferences.copy(mostRecentAccount = account.id)
       )
     )
     return account
-  }
-
-  private fun deleteDefaultAccount(): AccountID? {
-    return try {
-      this.deleteAccountByProvider(this.owner!!.defaultAccountProvider.id)
-    } catch (e: AccountsDatabaseNonexistentException) {
-      null
-    }
   }
 
   @Throws(AccountsDatabaseException::class)

@@ -1159,17 +1159,13 @@ abstract class ProfilesDatabaseContract {
 
     val pro0 = db0.currentProfileUnsafe()
 
-    // Palace automatically deletes the default account, so we need to create an initial account.
-    val acc0p = MockAccountProviders.fakeProvider("urn:fake:1")
+    val acc0p = MockAccountProviders.fakeProvider("urn:fake:2")
     val acc0 = pro0.createAccount(acc0p)
-
-    val acc1p = MockAccountProviders.fakeProvider("urn:fake:2")
-    val acc1 = pro0.createAccount(acc1p)
 
     val pro0desc =
       pro0.description()
     val pro0descNew =
-      pro0desc.copy(preferences = pro0desc.preferences.copy(mostRecentAccount = acc1.id))
+      pro0desc.copy(preferences = pro0desc.preferences.copy(mostRecentAccount = acc0.id))
 
     pro0.setDescription(pro0descNew)
 
@@ -1178,9 +1174,9 @@ abstract class ProfilesDatabaseContract {
      */
 
     val f_account =
-      File(File(File(f_pro, pro0.id.uuid.toString()), "accounts"), acc1.id.uuid.toString())
+      File(File(File(f_pro, pro0.id.uuid.toString()), "accounts"), acc0.id.uuid.toString())
 
-    this.logger.debug("deleting account {}", acc1.id.uuid)
+    this.logger.debug("deleting account {}", acc0.id.uuid)
     f_account.deleteRecursively()
 
     val db1 =
@@ -1199,6 +1195,9 @@ abstract class ProfilesDatabaseContract {
     val pro1 = db1.currentProfileUnsafe()
     pro1.account(pro1.preferences().mostRecentAccount)
 
-    Assertions.assertEquals(acc0.id, pro1.preferences().mostRecentAccount)
+    Assertions.assertEquals(
+      pro1.accountsDatabase().accounts().firstKey(),
+      pro1.preferences().mostRecentAccount
+    )
   }
 }

@@ -103,9 +103,17 @@ class CatalogOPDSClients(
   ) {
     this.logger.debug("An account has been created. Pointing clients at it.")
 
+    /*
+     * Sheer paranoia: We might observe the set of accounts in the middle of one being
+     * deleted. We don't want to risk using an account that no longer exists.
+     */
+
     val account =
-      this.profiles.profileCurrent()
-        .account(id)
+      try {
+        this.profiles.profileCurrent().account(id)
+      } catch (_: Throwable) {
+        return
+      }
 
     UIThread.runOnUIThread {
       this.goToRootFeedFor(CatalogPart.CATALOG, account)
