@@ -217,6 +217,9 @@ object ProfilesDatabases {
     }
 
     if (!errors.isEmpty()) {
+      for (error in errors) {
+        this.logger.error("", error)
+      }
       throw ProfileDatabaseOpenException(
         "One or more errors occurred whilst trying to open the profile database.", errors
       )
