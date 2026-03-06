@@ -197,10 +197,10 @@ class RevokeBookRefreshTokenTest {
         entry = opdsEntry,
         formats = listOf()
       )
+    Mockito.`when`(profilesDatabase.currentProfile())
+      .thenReturn(profile)
     Mockito.`when`(profile.id)
       .thenReturn(this.profileID)
-    Mockito.`when`(profilesDatabase.profiles())
-      .thenReturn(ConcurrentSkipListMap(mapOf(this.profileID to profile)))
     Mockito.`when`(profile.account(this.accountID))
       .thenReturn(account)
 

@@ -25,9 +25,6 @@ import org.nypl.simplified.bookmarks.api.BookmarkServiceType
 import org.nypl.simplified.bookmarks.api.BookmarksForBook
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.api.bookmark.SerializedBookmark
-import org.nypl.simplified.profiles.api.ProfileEvent
-import org.nypl.simplified.profiles.api.ProfileNoneCurrentException
-import org.nypl.simplified.profiles.api.ProfileSelection
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.slf4j.LoggerFactory
 import java.util.concurrent.CompletableFuture
@@ -63,10 +60,6 @@ class BService(
 
   init {
     this.disposables.add(
-      this.profilesController.profileEvents()
-        .subscribe(this::onProfileEvent)
-    )
-    this.disposables.add(
       this.profilesController.accountEvents()
         .subscribe(this::onAccountEvent)
     )
@@ -81,18 +74,6 @@ class BService(
       1L,
       TimeUnit.HOURS
     )
-  }
-
-  private fun onProfileEvent(event: ProfileEvent) {
-    if (event is ProfileSelection.ProfileSelectionInProgress) {
-      try {
-        val currentProfile = this.profilesController.profileCurrent()
-        this.logger.debug("[{}]: a new profile was selected", currentProfile.id.uuid)
-        this.onProfileWasSelected()
-      } catch (e: ProfileNoneCurrentException) {
-        this.logger.error("onProfileEvent: no profile is current")
-      }
-    }
   }
 
   private fun onAccountEvent(event: AccountEvent) {
@@ -167,10 +148,6 @@ class BService(
   }
 
   private fun onAccountLoggedIn() {
-    this.sync()
-  }
-
-  private fun onProfileWasSelected() {
     this.sync()
   }
 

@@ -5,8 +5,6 @@ import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes
 import org.nypl.simplified.books.controller.api.BookRevokeExceptionNoCredentials
-import org.nypl.simplified.profiles.api.ProfileID
-import org.nypl.simplified.profiles.api.ProfileNonexistentException
 import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
@@ -22,7 +20,6 @@ import java.util.concurrent.Callable
 
 abstract class AbstractBookTask(
   private val accountID: AccountID,
-  private val profileID: ProfileID,
   private val profiles: ProfilesDatabaseType
 ) : Callable<TaskResult<Unit>> {
 
@@ -55,7 +52,8 @@ abstract class AbstractBookTask(
     this.logger.debug("Starting task")
 
     return try {
-      val profile = this.findProfile(profileID)
+      this.taskRecorder.beginNewStep("Locating account...")
+      val profile = profiles.currentProfile()
       val account = this.findAccount(accountID, profile)
       val result = this.execute(account)
       this.logger.debug("Task succeeded")
@@ -77,32 +75,6 @@ abstract class AbstractBookTask(
       val result = this.taskRecorder.finishFailure<Unit>()
       this.onFailure(result)
       result
-    }
-  }
-
-  /**
-   * Locate the given profile.
-   */
-
-  private fun findProfile(
-    profileID: ProfileID
-  ): ProfileReadableType {
-    this.taskRecorder.beginNewStep("Locating profile $profileID...")
-
-    val profile = this.profiles.profiles()[profileID]
-    return if (profile == null) {
-      this.logger.error("failed to find profile: $profileID")
-      val exception = ProfileNonexistentException("No such profile $profileID")
-      this.taskRecorder.currentStepFailedAppending(
-        message = "Failed to find profile.",
-        errorCode = BorrowErrorCodes.profileNotFound,
-        exception = exception,
-        extraMessages = listOf()
-      )
-      throw TaskFailedHandled(exception)
-    } else {
-      this.taskRecorder.currentStepSucceeded("Located profile.")
-      profile
     }
   }
 

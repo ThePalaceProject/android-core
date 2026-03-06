@@ -6,6 +6,7 @@ import com.google.common.base.Preconditions
 import com.io7m.jfunctional.FunctionType
 import io.reactivex.subjects.Subject
 import net.jcip.annotations.GuardedBy
+import org.librarysimplified.http.api.LSHTTPClientType
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentialsStoreType
 import org.nypl.simplified.accounts.api.AccountDescription
 import org.nypl.simplified.accounts.api.AccountEvent
@@ -70,6 +71,7 @@ class AccountsDatabase private constructor(
   private val credentials: AccountAuthenticationCredentialsStoreType,
   private val bookDatabases: BookDatabaseFactoryType,
   private val bookFormatSupport: BookFormatSupportType,
+  private val httpClient: LSHTTPClientType,
 ) : AccountsDatabaseType {
 
   private val logger =
@@ -140,9 +142,10 @@ class AccountsDatabase private constructor(
       val bookDatabase =
         this.bookDatabases.openDatabase(
           context = this.context,
+          directory = booksDir,
           formats = this.bookFormatSupport,
+          httpClient = this.httpClient,
           owner = accountId,
-          directory = booksDir
         )
 
       val preferences =
@@ -475,7 +478,8 @@ class AccountsDatabase private constructor(
       accountCredentials: AccountAuthenticationCredentialsStoreType,
       accountProviders: AccountProviderRegistryType,
       directory: File,
-      directoryGraveyard: File
+      directoryGraveyard: File,
+      httpClient: LSHTTPClientType,
     ): AccountsDatabaseType {
       this.logger.debug("opening account database: {}", directory)
       this.logger.debug("graveyard directory is: {}", directoryGraveyard)
@@ -507,7 +511,8 @@ class AccountsDatabase private constructor(
         directory = directory,
         directoryGraveyard = directoryGraveyard,
         errors = errors,
-        objectMapper = objectMapper
+        objectMapper = objectMapper,
+        httpClient = httpClient,
       )
 
       if (errors.isNotEmpty()) {
@@ -521,15 +526,16 @@ class AccountsDatabase private constructor(
       }
 
       return AccountsDatabase(
-        context = context,
-        directory = directory,
-        directoryGraveyard = directoryGraveyard,
         accountEvents = accountEvents,
         accounts = accounts,
         accountsByProvider = accountsByProvider,
-        credentials = accountCredentials,
         bookDatabases = bookDatabases,
-        bookFormatSupport = bookFormatSupport
+        bookFormatSupport = bookFormatSupport,
+        context = context,
+        credentials = accountCredentials,
+        directory = directory,
+        directoryGraveyard = directoryGraveyard,
+        httpClient = httpClient,
       )
     }
 
@@ -567,7 +573,8 @@ class AccountsDatabase private constructor(
       directory: File,
       directoryGraveyard: File,
       errors: MutableList<Exception>,
-      objectMapper: ObjectMapper
+      objectMapper: ObjectMapper,
+      httpClient: LSHTTPClientType,
     ) {
       val accountDirs = directory.list()
       if (accountDirs != null) {
@@ -587,7 +594,8 @@ class AccountsDatabase private constructor(
               directory = directory,
               directoryGraveyard = directoryGraveyard,
               errors = errors,
-              objectMapper = objectMapper
+              httpClient = httpClient,
+              objectMapper = objectMapper,
             )
 
           if (account != null) {
@@ -706,7 +714,8 @@ class AccountsDatabase private constructor(
       directory: File,
       directoryGraveyard: File,
       errors: MutableList<Exception>,
-      objectMapper: ObjectMapper
+      objectMapper: ObjectMapper,
+      httpClient: LSHTTPClientType,
     ): Account? {
       val accountId =
         this.openOneAccountDirectory(errors, directory, accountIdName) ?: return null
@@ -725,7 +734,8 @@ class AccountsDatabase private constructor(
             context = context,
             formats = bookFormatSupport,
             owner = accountId,
-            directory = booksDir
+            directory = booksDir,
+            httpClient = httpClient,
           )
 
         val accountDescription =

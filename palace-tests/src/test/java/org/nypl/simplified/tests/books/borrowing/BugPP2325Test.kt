@@ -131,15 +131,16 @@ class BugPP2325Test {
 
     this.profiles =
       ProfilesDatabases.openWithAnonymousProfileEnabled(
-        this.androidContext,
-        this.analytics,
-        this.accountEvents,
-        this.accountProviderRegistry,
-        AccountBundledCredentialsEmpty.getInstance(),
-        this.accountCredentials,
-        AccountsDatabases,
-        this.bookFormatSupport,
-        profilesDir.toFile()
+        context = this.androidContext,
+        analytics = this.analytics,
+        accountEvents = this.accountEvents,
+        accountProviders = this.accountProviderRegistry,
+        accountBundledCredentials = AccountBundledCredentialsEmpty.getInstance(),
+        accountCredentialsStore = this.accountCredentials,
+        accountsDatabases = AccountsDatabases,
+        bookFormatSupport = this.bookFormatSupport,
+        httpClient = this.httpClient,
+        directory = profilesDir.toFile()
       )
 
     this.subtasks =
@@ -158,14 +159,13 @@ class BugPP2325Test {
     @TempDir temporaryDirectory: Path
   ) {
     val profile =
-      this.profiles.currentProfileUnsafe()
+      this.profiles.currentProfile()
     val account =
       profile.mostRecentAccount()
 
     val request =
       BorrowRequest.Start(
         accountId = account.id,
-        profileId = profile.id,
         opdsAcquisitionFeedEntry = entryStart(),
         samlDownloadContext = null
       )

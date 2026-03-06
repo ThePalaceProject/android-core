@@ -3,7 +3,6 @@ package org.nypl.simplified.notifications
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import org.nypl.simplified.profiles.api.ProfileNoneCurrentException
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.slf4j.LoggerFactory
 
@@ -19,12 +18,7 @@ class NotificationsService(
 
   init {
     this.createNotificationChannels()
-
-    try {
-      httpCalls.registerFCMTokenForProfileAccounts(profilesController.profileCurrent())
-    } catch (_: ProfileNoneCurrentException) {
-      this.logger.error("No profile to register FCM token")
-    }
+    httpCalls.registerFCMTokenForProfileAccounts(profilesController.profileCurrent())
   }
 
   private fun createNotificationChannels() {

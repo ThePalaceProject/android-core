@@ -1,9 +1,15 @@
 package org.nypl.simplified.tests.books
 
 import android.app.Application
+import android.content.Context
 import io.reactivex.subjects.PublishSubject
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.librarysimplified.http.api.LSHTTPClientConfiguration
+import org.librarysimplified.http.api.LSHTTPClientType
+import org.librarysimplified.http.api.LSHTTPNetworkAccess
+import org.librarysimplified.http.vanilla.LSHTTPClients
+import org.librarysimplified.http.vanilla.internal.LSHTTPClient
 import org.mockito.Mockito
 import org.nypl.simplified.accounts.database.AccountAuthenticationCredentialsStore
 import org.nypl.simplified.accounts.database.AccountsDatabases
@@ -17,9 +23,11 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.util.zip.ZipInputStream
+import kotlin.jvm.java
 
 class AccountBug0613d7f6 {
 
+  private lateinit var httpClient: LSHTTPClientType
   private lateinit var accountDirectory: File
   private lateinit var accountsDirectory: File
   private lateinit var accountsDirectoryGraveyard: File
@@ -33,6 +41,17 @@ class AccountBug0613d7f6 {
   fun setup() {
     this.directory =
       TestDirectories.temporaryDirectory()
+
+    this.httpClient =
+      LSHTTPClients()
+        .create(
+          context = Mockito.mock(Context::class.java),
+          configuration = LSHTTPClientConfiguration(
+            applicationName = "org.thepalaceproject.tests",
+            applicationVersion = "1.0.0",
+            networkAccess = LSHTTPNetworkAccess
+          )
+        )
 
     this.tmpDirectory =
       File(this.directory, "tmp")
@@ -83,10 +102,10 @@ class AccountBug0613d7f6 {
 
     AccountsDatabases.openDatabase(
       AccountAuthenticationCredentialsStore.open(authStore, authStoreTmp),
-      PublishSubject.create(),
-      MockAccountProviders.fakeAccountProviders(),
-      BookDatabases,
-      BookFormatSupport.create(
+      accountEvents = PublishSubject.create(),
+      accountProviders = MockAccountProviders.fakeAccountProviders(),
+      bookDatabases = BookDatabases,
+      bookFormatSupport = BookFormatSupport.create(
         BookFormatSupportParameters(
           supportsPDF = false,
           supportsAdobeDRM = false,
@@ -95,9 +114,10 @@ class AccountBug0613d7f6 {
           supportsLCP = false
         )
       ),
-      context,
-      this.accountsDirectory,
-      this.accountsDirectoryGraveyard
+      context = context,
+      directory = this.accountsDirectory,
+      directoryGraveyard = this.accountsDirectoryGraveyard,
+      httpClient = this.httpClient
     )
   }
 

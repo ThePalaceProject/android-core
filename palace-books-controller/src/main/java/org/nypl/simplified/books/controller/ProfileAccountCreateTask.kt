@@ -65,7 +65,7 @@ class ProfileAccountCreateTask(
     this.publishProgressEvent(this.taskRecorder.beginNewStep(this.strings.creatingAccount))
 
     return try {
-      val profile = this.profiles.currentProfileUnsafe()
+      val profile = this.profiles.currentProfile()
       profile.createAccount(accountProvider)
     } catch (e: Exception) {
       this.taskRecorder.currentStepFailed(

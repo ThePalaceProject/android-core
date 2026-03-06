@@ -1,10 +1,17 @@
 package org.nypl.simplified.tests.books.book_database
 
 import android.app.Application
+import android.content.Context
 import com.io7m.jfunctional.Option
 import org.joda.time.DateTime
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.librarysimplified.http.api.LSHTTPClientConfiguration
+import org.librarysimplified.http.api.LSHTTPClientType
+import org.librarysimplified.http.api.LSHTTPNetworkAccess
+import org.librarysimplified.http.vanilla.LSHTTPClients
+import org.mockito.Mockito
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookDRMKind
@@ -41,6 +48,23 @@ abstract class BookDatabasePDFContract {
 
   protected abstract fun context(): Application
 
+  private lateinit var httpClient: LSHTTPClientType
+
+  @BeforeEach
+  fun testSetup()
+  {
+    this.httpClient =
+      LSHTTPClients()
+        .create(
+          context = Mockito.mock(Context::class.java),
+          configuration = LSHTTPClientConfiguration(
+            applicationName = "org.thepalaceproject.tests",
+            applicationVersion = "1.0.0",
+            networkAccess = LSHTTPNetworkAccess
+          )
+        )
+  }
+
   /**
    * Tests that saving a PDF Book's last read location can be saved and restored when a book
    * is opened again.
@@ -54,12 +78,13 @@ abstract class BookDatabasePDFContract {
     val serializer = OPDSJSONSerializer.newSerializer()
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val bookDatabase = BookDatabase.open(
-      context(),
-      parser,
-      serializer,
-      BookFormatsTesting.supportsEverything,
-      accountID,
-      directory
+      context = context(),
+      parser = parser,
+      serializer = serializer,
+      formats = BookFormatsTesting.supportsEverything,
+      owner = accountID,
+      directory = directory,
+      httpClient = this.httpClient
     )
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithPDF()
@@ -110,12 +135,13 @@ abstract class BookDatabasePDFContract {
     val serializer = OPDSJSONSerializer.newSerializer()
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 = BookDatabase.open(
-      context(),
-      parser,
-      serializer,
-      BookFormatsTesting.supportsEverything,
-      accountID,
-      directory
+      context = context(),
+      parser = parser,
+      serializer = serializer,
+      formats = BookFormatsTesting.supportsEverything,
+      owner = accountID,
+      directory = directory,
+      httpClient = this.httpClient
     )
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithPDF()

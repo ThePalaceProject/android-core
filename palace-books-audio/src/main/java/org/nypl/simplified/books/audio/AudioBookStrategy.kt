@@ -417,10 +417,10 @@ class AudioBookStrategy(
     val check =
       LicenseChecks.createLicenseCheck(
         LicenseCheckParameters(
-          manifest = manifest,
-          userAgent = this.request.userAgent,
+          cacheDirectory = this.request.cacheDirectory,
           checks = this.request.licenseChecks,
-          cacheDirectory = this.request.cacheDirectory
+          httpClient = this.request.httpClient,
+          manifest = manifest,
         )
       )
 
@@ -462,8 +462,8 @@ class AudioBookStrategy(
           authorizationHandler = this.request.authorizationHandler,
           clientKey = secretService.clientKey.orEmpty(),
           clientPass = secretService.clientPass.orEmpty(),
+          httpClient = this.request.httpClient,
           targetURI = Indirect(targetURI),
-          userAgent = this.request.userAgent
         )
 
       strategies.create(overdriveParameters)
@@ -477,10 +477,9 @@ class AudioBookStrategy(
 
       val parameters =
         ManifestFulfillmentBasicParameters(
-          uri = targetURI,
           authorizationHandler = this.request.authorizationHandler,
           httpClient = this.request.services.requireService(LSHTTPClientType::class.java),
-          userAgent = this.request.userAgent
+          uri = targetURI,
         )
 
       strategies.create(parameters)

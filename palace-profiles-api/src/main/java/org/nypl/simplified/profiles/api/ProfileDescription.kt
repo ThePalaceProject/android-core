@@ -5,7 +5,6 @@ package org.nypl.simplified.profiles.api
  */
 
 data class ProfileDescription(
-  val displayName: String,
   val preferences: ProfilePreferences,
   val attributes: ProfileAttributes
 )

@@ -247,21 +247,8 @@ sealed class AnalyticsEvent {
     override val credentials: AccountAuthenticationCredentials?,
 
     /**
-     * The UUID of the profile.
-     */
-
-    val profileUUID: UUID,
-
-    /**
-     * The display name of the profile
-     */
-
-    val profileDisplayName: String,
-
-    /**
      * The URI of the account provider (typically a UUID).
      */
-
     val accountProvider: URI,
 
     /**

@@ -59,14 +59,4 @@ interface ProfileType : ProfileReadableType {
 
   @Throws(AccountsDatabaseException::class)
   fun deleteAccountByProvider(accountProvider: URI): AccountID
-
-  /**
-   * Delete the profile.
-   *
-   * @throws ProfileDatabaseException On errors
-   * @throws IOException On I/O errors
-   */
-
-  @Throws(ProfileDatabaseException::class, IOException::class)
-  fun delete()
 }

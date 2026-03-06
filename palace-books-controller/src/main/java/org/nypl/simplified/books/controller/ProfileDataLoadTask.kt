@@ -16,13 +16,12 @@ class ProfileDataLoadTask(
 
   override fun run() {
     try {
-      this.logger.debug("load: profile {}", this.profile.displayName)
       this.logger.debug("clearing the book registry")
       this.bookRegistry.clear()
 
       val accounts = this.profile.accounts()
       for (account in accounts.values) {
-        this.logger.debug("load: profile {} / account {}", this.profile.displayName, account.id)
+        this.logger.debug("load: account {}", account.id)
         val books = account.bookDatabase
         val bookIDs = books.books()
         this.logger.debug("load: updating {} books", bookIDs.size)
@@ -38,7 +37,7 @@ class ProfileDataLoadTask(
         }
       }
     } finally {
-      this.logger.debug("load: profile {} loaded", this.profile.displayName)
+      this.logger.debug("load: profile loaded")
     }
   }
 }

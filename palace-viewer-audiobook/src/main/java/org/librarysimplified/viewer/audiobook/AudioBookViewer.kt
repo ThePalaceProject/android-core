@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import one.irradia.mime.api.MIMEType
 import org.librarysimplified.audiobook.api.PlayerBookCredentialsNone
-import org.librarysimplified.audiobook.api.PlayerUserAgent
 import org.librarysimplified.audiobook.feedbooks.FeedbooksPlayerExtension
 import org.librarysimplified.audiobook.license_check.spi.SingleLicenseCheckProviderType
 import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
@@ -114,7 +113,6 @@ class AudioBookViewer : ViewerProviderType {
     val manifest =
       formatAudio.manifest
 
-    PlayerModel.setStreamingPermitted(true)
     PlayerModel.bookAuthor = book.entry.authorsCommaSeparated
     PlayerModel.bookTitle = book.entry.title
 
@@ -140,8 +138,6 @@ class AudioBookViewer : ViewerProviderType {
 
     this.loadAndConfigureFeedbooks(services)
 
-    val userAgent =
-      PlayerUserAgent(httpClient.userAgent())
     val bookCredentials =
       formatAudio.drmInformation.playerCredentials()
 
@@ -154,7 +150,6 @@ class AudioBookViewer : ViewerProviderType {
 
     AudioBookViewerModel.parameters =
       AudioBookPlayerParameters(
-        userAgent = userAgent.userAgent,
         accountID = book.account,
         bookID = book.id,
         opdsEntry = book.entry,
@@ -170,7 +165,7 @@ class AudioBookViewer : ViewerProviderType {
     if (parameters.flags["Fail"] ?: false) {
       this.triggerFailure(
         activity = activity,
-        userAgent = userAgent,
+        httpClient = httpClient,
         palaceID = palaceID,
       )
       return
@@ -188,10 +183,10 @@ class AudioBookViewer : ViewerProviderType {
         bookFile = file,
         cacheDir = activity.cacheDir,
         context = activity.application,
+        httpClient = httpClient,
         licenseChecks = licenseChecks,
         palaceID = palaceID,
         parserExtensions = parserExtensions,
-        userAgent = userAgent,
       )
       this.openActivity(activity)
       return
@@ -211,11 +206,11 @@ class AudioBookViewer : ViewerProviderType {
         PlayerModel.parseAndCheckLCPLicense(
           bookCredentials = bookCredentials,
           cacheDir = activity.cacheDir,
+          httpClient = httpClient,
           licenseBytes = licenseBytes,
           licenseChecks = licenseChecks,
           manifestUnparsed = ManifestUnparsed(palaceID, manifest.manifestFile.readBytes()),
           parserExtensions = parserExtensions,
-          userAgent = userAgent,
         )
         this.openActivity(activity)
         return
@@ -242,7 +237,6 @@ class AudioBookViewer : ViewerProviderType {
           palaceID = palaceID,
           services = services,
           target = AudioBookLink.Manifest(manifestURI),
-          userAgent = userAgent,
         )
 
       /*
@@ -253,17 +247,17 @@ class AudioBookViewer : ViewerProviderType {
 
       val downloadFuture =
         PlayerModel.downloadParseAndCheckManifest(
-          sourceURI = manifestURI,
           bookCredentials = bookCredentials,
           cacheDir = activity.cacheDir,
+          httpClient = httpClient,
           licenseChecks = licenseChecks,
           palaceID = palaceID,
           parserExtensions = parserExtensions,
+          sourceURI = manifestURI,
           strategy = strategies.createStrategy(
             context = activity.application,
             request = manifestRequest
           ).toManifestStrategy(),
-          userAgent = userAgent,
         )
 
       val openAttempted =
@@ -302,6 +296,7 @@ class AudioBookViewer : ViewerProviderType {
             bookCredentials = bookCredentials,
             cacheDir = activity.cacheDir,
             licenseChecks = licenseChecks,
+            httpClient = httpClient,
             manifest = ManifestFulfilled(
               source = null,
               contentType = format.contentType,
@@ -310,7 +305,6 @@ class AudioBookViewer : ViewerProviderType {
             ),
             palaceID = palaceID,
             parserExtensions = parserExtensions,
-            userAgent = userAgent,
           )
 
         parseFuture.whenComplete { _, _ ->
@@ -326,6 +320,7 @@ class AudioBookViewer : ViewerProviderType {
       bookCredentials = bookCredentials,
       cacheDir = activity.cacheDir,
       licenseChecks = licenseChecks,
+      httpClient = httpClient,
       manifest = ManifestFulfilled(
         source = null,
         contentType = format.contentType,
@@ -334,20 +329,20 @@ class AudioBookViewer : ViewerProviderType {
       ),
       palaceID = palaceID,
       parserExtensions = parserExtensions,
-      userAgent = userAgent,
     )
     this.openActivity(activity)
   }
 
   private fun triggerFailure(
     activity: Activity,
-    userAgent: PlayerUserAgent,
+    httpClient: LSHTTPClientType,
     palaceID: PlayerPalaceID
   ) {
     PlayerModel.parseAndCheckManifest(
       bookCredentials = PlayerBookCredentialsNone,
       cacheDir = activity.cacheDir,
       licenseChecks = listOf(),
+      httpClient = httpClient,
       manifest = ManifestFulfilled(
         source = null,
         contentType = BookFormats.audioBookGenericMimeTypes().iterator().next(),
@@ -356,7 +351,6 @@ class AudioBookViewer : ViewerProviderType {
       ),
       palaceID = palaceID,
       parserExtensions = listOf(),
-      userAgent = userAgent,
     )
     this.openActivity(activity)
   }

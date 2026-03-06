@@ -8,17 +8,10 @@ import java.io.Serializable
 import java.net.URI
 
 /**
- * Parameters for the audio book player.
+ * Parameters for the audiobook player.
  */
 
 class AudioBookPlayerParameters(
-
-  /**
-   * The user agent string used to make manifest requests.
-   */
-
-  val userAgent: String,
-
   /**
    * The account to which the book belongs.
    */

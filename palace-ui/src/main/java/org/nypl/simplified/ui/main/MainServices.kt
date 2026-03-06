@@ -368,19 +368,21 @@ internal object MainServices {
     accountBundledCredentials: AccountBundledCredentialsType,
     accountCredentialsStore: AccountAuthenticationCredentialsStoreType,
     bookFormatSupport: BookFormatSupportType,
+    httpClient: LSHTTPClientType,
     directory: File
   ): ProfilesDatabaseType {
     this.logger.debug("opening profile database with anonymous profile")
     return ProfilesDatabases.openWithAnonymousProfileEnabled(
-      context = context,
-      analytics = analytics,
-      accountEvents = accountEvents,
-      accountProviders = accountProviders,
       accountBundledCredentials = accountBundledCredentials,
       accountCredentialsStore = accountCredentialsStore,
+      accountEvents = accountEvents,
+      accountProviders = accountProviders,
       accountsDatabases = AccountsDatabases,
+      analytics = analytics,
       bookFormatSupport = bookFormatSupport,
-      directory = directory
+      context = context,
+      directory = directory,
+      httpClient = httpClient,
     )
   }
 
@@ -842,14 +844,15 @@ internal object MainServices {
       interfaceType = ProfilesDatabaseType::class.java,
       serviceConstructor = {
         createProfileDatabase(
-          context,
-          analytics,
-          accountEvents,
-          accountProviderRegistry,
-          accountBundledCredentials,
-          accountCredentials,
-          bookFormatService,
-          directories.directoryStorageProfiles
+          accountBundledCredentials = accountBundledCredentials,
+          accountCredentialsStore = accountCredentials,
+          accountEvents = accountEvents,
+          accountProviders = accountProviderRegistry,
+          analytics = analytics,
+          bookFormatSupport = bookFormatService,
+          context = context,
+          directory = directories.directoryStorageProfiles,
+          httpClient = lsHTTP,
         )
       }
     )

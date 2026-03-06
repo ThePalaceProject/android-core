@@ -31,7 +31,6 @@ import org.nypl.simplified.patron.PatronUserProfiles
 import org.nypl.simplified.patron.api.PatronAuthorization
 import org.nypl.simplified.patron.api.PatronUserProfile
 import org.nypl.simplified.patron.api.PatronUserProfileParsersType
-import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskResult
@@ -45,7 +44,6 @@ import java.util.concurrent.TimeUnit
 
 class BookSyncTask(
   private val accountID: AccountID,
-  profileID: ProfileID,
   profiles: ProfilesDatabaseType,
   private val booksController: BooksControllerType,
   private val accountRegistry: AccountProviderRegistryType,
@@ -54,7 +52,7 @@ class BookSyncTask(
   private val patronParsers: PatronUserProfileParsersType,
   private val http: LSHTTPClientType,
   private val feedParser: OPDSFeedParserType
-) : AbstractBookTask(accountID, profileID, profiles) {
+) : AbstractBookTask(accountID, profiles) {
 
   override val logger =
     LoggerFactory.getLogger(BookSyncTask::class.java)

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.base.Preconditions
 import net.jcip.annotations.GuardedBy
 import one.irradia.mime.api.MIMEType
+import org.librarysimplified.http.api.LSHTTPClientType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.api.BookID
@@ -33,6 +34,7 @@ internal class BookDatabaseEntry internal constructor(
   private val context: Application,
   private val bookDir: File,
   private val serializer: OPDSJSONSerializerType,
+  private val httpClient: LSHTTPClientType,
   private val formats: BookFormatSupportType,
   @GuardedBy("bookLock")
   private var bookRef: Book,
@@ -101,16 +103,17 @@ internal class BookDatabaseEntry internal constructor(
     synchronized(this.bookLock) {
       this.bookRef.entry.acquisitions.forEach { acquisition ->
         createFormatHandleIfRequired(
-          context = this.context,
-          logger = LOG,
-          owner = this,
+          bookFormats = this.formats,
           constructors = this.formatHandleConstructors,
-          ownerDirectory = this.bookDir,
-          onUpdate = { format -> this.onFormatUpdated(format) },
-          existingFormats = this.formatHandlesRef,
           contentTypes = acquisition.availableFinalContentTypes(),
+          context = this.context,
+          existingFormats = this.formatHandlesRef,
+          httpClient = this.httpClient,
+          logger = LOG,
           objectMapper = objectMapper,
-          bookFormats = this.formats
+          onUpdate = { format -> this.onFormatUpdated(format) },
+          owner = this,
+          ownerDirectory = this.bookDir,
         )
       }
 
@@ -263,7 +266,8 @@ internal class BookDatabaseEntry internal constructor(
       onUpdate: (BookFormat) -> Unit,
       bookFormats: BookFormatSupportType,
       existingFormats: MutableMap<Class<out BookDatabaseEntryFormatHandle>, BookDatabaseEntryFormatHandle>,
-      contentTypes: Set<MIMEType>
+      contentTypes: Set<MIMEType>,
+      httpClient: LSHTTPClientType,
     ) {
       for (contentType in contentTypes) {
         for ((format, constructor) in constructors) {
@@ -293,14 +297,15 @@ internal class BookDatabaseEntry internal constructor(
 
             val params =
               DatabaseFormatHandleParameters(
-                context = context,
+                bookFormatSupport = bookFormats,
                 bookID = owner.book.id,
-                directory = ownerDirectory,
-                onUpdated = onUpdate,
-                entry = owner,
                 contentType = contentType,
+                context = context,
+                directory = ownerDirectory,
+                entry = owner,
+                httpClient = httpClient,
                 objectMapper = objectMapper,
-                bookFormatSupport = bookFormats
+                onUpdated = onUpdate,
               )
 
             existingFormats[constructor.classType] = constructor.constructor.invoke(params)

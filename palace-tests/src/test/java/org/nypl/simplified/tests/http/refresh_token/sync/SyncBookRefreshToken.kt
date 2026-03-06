@@ -65,7 +65,6 @@ import org.nypl.simplified.profiles.controller.api.ProfileAccountCreationStringR
 import org.nypl.simplified.profiles.controller.api.ProfileAccountDeletionStringResourcesType
 import org.nypl.simplified.tests.MutableServiceDirectory
 import org.nypl.simplified.tests.TestDirectories
-import org.nypl.simplified.tests.books.controller.BooksControllerTest
 import org.nypl.simplified.tests.mocking.FakeAccountCredentialStorage
 import org.nypl.simplified.tests.mocking.MockAccount
 import org.nypl.simplified.tests.mocking.MockAccountCreationStringResources
@@ -227,9 +226,7 @@ class SyncBookRefreshToken {
     val profilesMap = sortedMapOf(profileId to profile)
 
     Mockito.`when`(profile.id).thenReturn(profileId)
-    Mockito.`when`(profiles.profiles()).thenReturn(profilesMap)
-    Mockito.`when`(profiles.currentProfile()).thenReturn(Option.some(profile))
-    Mockito.`when`(profiles.currentProfileUnsafe()).thenReturn(profile)
+    Mockito.`when`(profiles.currentProfile()).thenReturn(profile)
     Mockito.`when`(profile.account(accountID))
       .thenReturn(account)
 
@@ -243,7 +240,7 @@ class SyncBookRefreshToken {
     this.webServer.enqueue(
       MockResponse()
         .setResponseCode(200)
-        .setBody(Buffer().readFrom(resource("testBooksSyncNewEntries.xml")))
+        .setBody(Buffer().readFrom(resource("/org/nypl/simplified/tests/books/controller/testBooksSyncNewEntries.xml")))
     )
 
     controller.booksSync(account.id).get()
@@ -314,7 +311,7 @@ class SyncBookRefreshToken {
   }
 
   private fun resource(file: String): InputStream {
-    return BooksControllerTest::class.java.getResourceAsStream(file)!!
+    return SyncBookRefreshToken::class.java.getResourceAsStream(file)!!
   }
 
   private fun simpleUserProfile(): String {

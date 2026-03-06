@@ -2,7 +2,6 @@ package org.nypl.simplified.books.audio
 
 import one.irradia.mime.api.MIMEType
 import org.librarysimplified.audiobook.api.PlayerAuthorizationHandlerType
-import org.librarysimplified.audiobook.api.PlayerUserAgent
 import org.librarysimplified.audiobook.license_check.spi.SingleLicenseCheckProviderType
 import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.librarysimplified.audiobook.manifest_fulfill.api.ManifestFulfillmentStrategies
@@ -52,12 +51,6 @@ data class AudioBookManifestRequest(
    */
 
   val contentType: MIMEType,
-
-  /**
-   * The user agent string used for any HTTP requests.
-   */
-
-  val userAgent: PlayerUserAgent,
 
   /**
    * A service directory used to locate any required application services.

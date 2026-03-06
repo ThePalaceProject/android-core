@@ -50,7 +50,7 @@ class ProfileAccountDeleteTask(
       this.logger.debug("deleting account for provider {}", this.accountProviderID)
       this.publishProgressEvent(this.taskRecorder.beginNewStep(this.strings.deletingAccount))
 
-      val profile = this.profiles.currentProfileUnsafe()
+      val profile = this.profiles.currentProfile()
       val account = profile.deleteAccountByProvider(this.accountProviderID)
 
       MDC.put(MDCKeys.ACCOUNT_INTERNAL_ID, account.toString())

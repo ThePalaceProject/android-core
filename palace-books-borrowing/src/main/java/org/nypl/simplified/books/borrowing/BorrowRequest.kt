@@ -2,7 +2,6 @@ package org.nypl.simplified.books.borrowing
 
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
-import org.nypl.simplified.profiles.api.ProfileID
 
 /**
  * The type of requests to borrow books.
@@ -23,12 +22,6 @@ sealed class BorrowRequest {
   abstract val accountId: AccountID
 
   /**
-   * The profile to which the account belongs.
-   */
-
-  abstract val profileId: ProfileID
-
-  /**
    * Information about the current SAML download, if one is in progress.
    */
 
@@ -40,7 +33,6 @@ sealed class BorrowRequest {
 
   data class Start(
     override val accountId: AccountID,
-    override val profileId: ProfileID,
     override val opdsAcquisitionFeedEntry: OPDSAcquisitionFeedEntry,
     override val samlDownloadContext: SAMLDownloadContext? = null
   ) : BorrowRequest()

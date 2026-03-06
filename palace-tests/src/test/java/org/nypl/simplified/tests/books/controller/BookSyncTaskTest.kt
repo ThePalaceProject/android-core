@@ -1,7 +1,6 @@
 package org.nypl.simplified.tests.books.controller
 
 import android.content.Context
-import com.google.common.util.concurrent.ListeningExecutorService
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okio.Buffer
@@ -23,10 +22,7 @@ import org.nypl.simplified.accounts.api.AccountUsername
 import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.controller.BookSyncTask
-import org.nypl.simplified.feeds.api.Feed
-import org.nypl.simplified.feeds.api.FeedLoaderResult
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedAuthentication
-import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
 import org.nypl.simplified.opds.core.OPDSFeedParser
 import org.nypl.simplified.patron.PatronUserProfileParsers
@@ -41,7 +37,6 @@ import org.nypl.simplified.tests.mocking.MockAccountProviderRegistry
 import org.nypl.simplified.tests.mocking.MockProfile
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.net.URI
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
@@ -101,7 +96,7 @@ class BookSyncTaskTest {
     val fakeProfile =
       MockProfile(this.profileID, 1)
 
-    fakeProfilesDatabase.profileMap[this.profileID] = fakeProfile
+    fakeProfilesDatabase.profile = fakeProfile
 
     val fakeAccount =
       fakeProfile.accountList[0]
@@ -151,7 +146,6 @@ class BookSyncTaskTest {
     val task =
       BookSyncTask(
         accountID = accountID,
-        profileID = profileID,
         profiles = fakeProfilesDatabase,
         bookRegistry = this.bookRegistry,
         feedLoader = feedLoader,
@@ -181,7 +175,7 @@ class BookSyncTaskTest {
     val fakeProfile =
       MockProfile(this.profileID, 1)
 
-    fakeProfilesDatabase.profileMap[this.profileID] = fakeProfile
+    fakeProfilesDatabase.profile = fakeProfile
 
     val fakeAccount =
       fakeProfile.accountList[0]
@@ -242,7 +236,6 @@ class BookSyncTaskTest {
     val task =
       BookSyncTask(
         accountID = accountID,
-        profileID = profileID,
         profiles = fakeProfilesDatabase,
         bookRegistry = this.bookRegistry,
         feedLoader = feedLoader,
@@ -272,7 +265,7 @@ class BookSyncTaskTest {
     val fakeProfile =
       MockProfile(this.profileID, 1)
 
-    fakeProfilesDatabase.profileMap[this.profileID] = fakeProfile
+    fakeProfilesDatabase.profile = fakeProfile
 
     val fakeAccount =
       fakeProfile.accountList[0]
@@ -342,7 +335,6 @@ class BookSyncTaskTest {
     val task =
       BookSyncTask(
         accountID = accountID,
-        profileID = profileID,
         profiles = fakeProfilesDatabase,
         bookRegistry = this.bookRegistry,
         feedLoader = feedLoader,
@@ -372,7 +364,7 @@ class BookSyncTaskTest {
     val fakeProfile =
       MockProfile(this.profileID, 1)
 
-    fakeProfilesDatabase.profileMap[this.profileID] = fakeProfile
+    fakeProfilesDatabase.profile = fakeProfile
 
     val fakeAccount =
       fakeProfile.accountList[0]
@@ -447,7 +439,6 @@ class BookSyncTaskTest {
     val task =
       BookSyncTask(
         accountID = accountID,
-        profileID = profileID,
         profiles = fakeProfilesDatabase,
         bookRegistry = this.bookRegistry,
         feedLoader = feedLoader,

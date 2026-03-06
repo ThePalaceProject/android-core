@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.librarysimplified.audiobook.api.PlayerResult
-import org.librarysimplified.audiobook.api.PlayerUserAgent
 import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.librarysimplified.audiobook.manifest_fulfill.api.ManifestFulfillmentStrategyRegistryType
 import org.librarysimplified.audiobook.manifest_fulfill.basic.ManifestFulfillmentBasicParameters
@@ -92,7 +91,6 @@ class AudioBookManifestStrategyTest {
           services = this.services,
           strategyRegistry = this.strategies,
           target = AudioBookLink.Manifest(URI.create("http://www.example.com")),
-          userAgent = PlayerUserAgent("test"),
         )
       )
 
@@ -136,7 +134,6 @@ class AudioBookManifestStrategyTest {
           services = this.services,
           strategyRegistry = this.strategies,
           target = AudioBookLink.Manifest(URI.create("http://www.example.com")),
-          userAgent = PlayerUserAgent("test"),
         )
       )
 
@@ -190,7 +187,6 @@ class AudioBookManifestStrategyTest {
           services = this.services,
           strategyRegistry = this.strategies,
           target = AudioBookLink.Manifest(URI.create("http://www.example.com")),
-          userAgent = PlayerUserAgent("test"),
         )
       )
 
@@ -246,7 +242,6 @@ class AudioBookManifestStrategyTest {
           services = this.services,
           strategyRegistry = this.strategies,
           target = AudioBookLink.Manifest(URI.create("http://www.example.com")),
-          userAgent = PlayerUserAgent("test"),
         )
       )
 
@@ -268,7 +263,6 @@ class AudioBookManifestStrategyTest {
           palaceID = PlayerPalaceID("6c15709a-b9cd-4eb8-815a-309f5d738a11"),
           services = this.services,
           target = AudioBookLink.Manifest(URI.create("http://www.example.com")),
-          userAgent = PlayerUserAgent("test"),
         )
       )
 
@@ -285,7 +279,6 @@ class AudioBookManifestStrategyTest {
         request = AudioBookManifestRequest(
           target = AudioBookLink.Manifest(URI.create("http://www.example.com")),
           contentType = BookFormats.audioBookGenericMimeTypes().first(),
-          userAgent = PlayerUserAgent("test"),
           authorizationHandler = this.authHandler,
           loadFallbackData = {
             ManifestFulfilled(

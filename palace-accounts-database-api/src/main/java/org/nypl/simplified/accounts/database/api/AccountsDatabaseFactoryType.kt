@@ -2,6 +2,7 @@ package org.nypl.simplified.accounts.database.api
 
 import android.app.Application
 import io.reactivex.subjects.Subject
+import org.librarysimplified.http.api.LSHTTPClientType
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentialsStoreType
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
@@ -38,7 +39,8 @@ interface AccountsDatabaseFactoryType {
     bookFormatSupport: BookFormatSupportType,
     context: Application,
     directory: File,
-    directoryGraveyard: File
+    directoryGraveyard: File,
+    httpClient: LSHTTPClientType,
   ): AccountsDatabaseType
 
   /**
@@ -62,6 +64,7 @@ interface AccountsDatabaseFactoryType {
     bookFormatSupport: BookFormatSupportType,
     context: Application,
     directory: File,
-    directoryGraveyard: File
+    directoryGraveyard: File,
+    httpClient: LSHTTPClientType,
   ): AccountsDatabaseType
 }

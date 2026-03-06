@@ -14,4 +14,5 @@ dependencies {
     implementation(libs.kotlin.stdlib)
     implementation(libs.palace.audiobook.api)
     implementation(libs.palace.drm.core)
+    implementation(libs.palace.http.api)
 }
