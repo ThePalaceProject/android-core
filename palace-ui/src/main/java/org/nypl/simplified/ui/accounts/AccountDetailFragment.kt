@@ -464,6 +464,7 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
             val context = this.requireContext()
             MaterialAlertDialogBuilder(context)
               .setMessage(context.getString(R.string.accountReportFailed, supportUrl))
+              .setNegativeButton(R.string.Dismiss) { dialog, _ -> dialog.dismiss() }
               .create()
               .show()
           }
@@ -977,6 +978,7 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
           val context = this.requireContext()
           MaterialAlertDialogBuilder(context)
             .setMessage(context.getString(R.string.accountPasswordResetFailed, supportUrl))
+            .setNegativeButton(R.string.Dismiss) { dialog, _ -> dialog.dismiss() }
             .create()
             .show()
         }
@@ -1151,6 +1153,7 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
   private fun showErrorGettingLocationDialog() {
     MaterialAlertDialogBuilder(this.requireContext())
       .setMessage(this.getString(R.string.accountCardCreatorLocationFailed))
+      .setNegativeButton(R.string.Dismiss) { dialog, _ -> dialog.dismiss() }
       .create()
       .show()
   }

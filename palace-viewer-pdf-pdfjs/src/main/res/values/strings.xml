@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <resources>
+  <string name="Dismiss">Dismiss</string>
+
   <string name="accessibility_table_of_contents">Open the table of contents</string>
   <string name="table_of_contents_title">Table of Contents</string>
   <string name="table_of_contents_empty_message">No Table of Contents available for this work</string>

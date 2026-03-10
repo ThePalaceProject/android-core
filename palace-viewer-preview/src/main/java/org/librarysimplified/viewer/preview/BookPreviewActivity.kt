@@ -402,6 +402,7 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
     MaterialAlertDialogBuilder(this)
       .setTitle(R.string.bookPreviewFailedTitle)
       .setMessage(R.string.bookPreviewFailedMessage)
+      .setNegativeButton(R.string.Dismiss) { dialog, _ -> dialog.dismiss() }
       .setOnDismissListener { this.onBackPressed() }
       .create()
       .show()
@@ -510,6 +511,7 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
           actualException.message
         )
       )
+      .setNegativeButton(R.string.Dismiss) { dialog, _ -> dialog.dismiss() }
       .setOnDismissListener { this.finish() }
       .create()
       .show()

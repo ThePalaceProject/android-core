@@ -204,6 +204,8 @@ class CatalogFeedViewInfinite(
         view.findViewById<RecyclerView>(R.id.catalogFacetsFilterList)
       val facetApply =
         view.findViewById<Button>(R.id.catalogFacetsFilterApply)
+      val facetCancel =
+        view.findViewById<Button>(R.id.catalogFacetsFilterCancel)
       val adapter =
         CatalogFeedFacetFilterAdapter()
 
@@ -224,6 +226,14 @@ class CatalogFeedViewInfinite(
       dialogBuilder.setView(view)
       val dialog = dialogBuilder.create()
       dialog.show()
+
+      facetCancel.setOnClickListener {
+        try {
+          dialog.dismiss()
+        } catch (e: Throwable) {
+          // Don't care.
+        }
+      }
 
       /*
        * Resize the dialog to 80% of the screen size.

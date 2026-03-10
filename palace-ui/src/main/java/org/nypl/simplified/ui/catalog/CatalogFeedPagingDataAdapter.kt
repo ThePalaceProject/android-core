@@ -822,9 +822,7 @@ class CatalogFeedPagingDataAdapter(
       MaterialAlertDialogBuilder(this.view.context)
         .setTitle(R.string.bookReachedLoanLimitDialogTitle)
         .setMessage(R.string.bookReachedLoanLimitDialogMessage)
-        .setPositiveButton(R.string.bookReachedLoanLimitDialogButton) { dialog, _ ->
-          dialog.dismiss()
-        }
+        .setPositiveButton(R.string.bookReachedLoanLimitDialogButton) { dialog, _ -> dialog.dismiss() }
         .create()
         .show()
     }

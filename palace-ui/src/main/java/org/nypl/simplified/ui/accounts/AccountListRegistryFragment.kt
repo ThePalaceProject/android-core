@@ -374,6 +374,10 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry), Ma
         MaterialAlertDialogBuilder(this.requireActivity())
           .setTitle(R.string.accountCreationFailed)
           .setMessage(R.string.accountCreationFailedMessage)
+          .setNegativeButton(R.string.Dismiss) { dialog, _ ->
+            this.errorDialog = null
+            dialog.dismiss()
+          }
           .setPositiveButton(ErrorStrings.errorDetails) { dialog, _ ->
             this.errorDialog = null
             this.showErrorPage(accountEvent)

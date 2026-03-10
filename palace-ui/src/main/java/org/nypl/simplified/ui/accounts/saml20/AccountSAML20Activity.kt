@@ -103,6 +103,10 @@ class AccountSAML20Activity : AppCompatActivity(R.layout.saml20_activity) {
       MaterialAlertDialogBuilder(this)
         .setTitle(R.string.accountCreationFailed)
         .setMessage(R.string.accountCreationFailedMessage)
+        .setNegativeButton(R.string.Dismiss) { dialog, _ ->
+          dialog.dismiss()
+          this.finish()
+        }
         .setPositiveButton(ErrorStrings.errorDetails) { dialog, _ ->
           this.showErrorPage(this.makeLoginTaskSteps(failed.message))
           dialog.dismiss()

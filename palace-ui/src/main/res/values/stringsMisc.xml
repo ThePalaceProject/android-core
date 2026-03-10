@@ -2,4 +2,5 @@
 
 <resources>
   <string name="unexpectedException">An unexpected exception occurred.</string>
+  <string name="Dismiss">Dismiss</string>
 </resources>

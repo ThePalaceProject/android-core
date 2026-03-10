@@ -10,20 +10,37 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="16dp"
-        app:layout_constraintHeight_default="wrap"
-        app:layout_constraintBottom_toTopOf="@id/catalogFacetsFilterApply"
+        app:layout_constraintBottom_toTopOf="@id/catalogFacetsFilterButtons"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_default="wrap"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/catalogFacetsFilterApply"
-        android:layout_width="160dp"
-        android:layout_height="48dp"
-        android:layout_margin="16dp"
-        android:text="@string/catalogFacetsFilterApply"
+    <LinearLayout
+        android:id="@+id/catalogFacetsFilterButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent">
+
+        <Button
+            android:id="@+id/catalogFacetsFilterCancel"
+            android:layout_width="160dp"
+            android:layout_height="48dp"
+            android:layout_margin="16dp"
+            android:text="@string/catalogCancel" />
+
+        <Button
+            android:id="@+id/catalogFacetsFilterApply"
+            android:layout_width="160dp"
+            android:layout_height="48dp"
+            android:layout_margin="16dp"
+            android:text="@string/catalogFacetsFilterApply" />
+
+    </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

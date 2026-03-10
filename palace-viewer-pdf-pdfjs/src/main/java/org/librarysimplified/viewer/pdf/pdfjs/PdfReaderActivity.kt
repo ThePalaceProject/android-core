@@ -417,6 +417,7 @@ class PdfReaderActivity : AppCompatActivity() {
       MaterialAlertDialogBuilder(context)
         .setTitle(title)
         .setMessage(failure.localizedMessage)
+        .setNegativeButton(R.string.Dismiss) { dialog, _ -> dialog.dismiss() }
         .setOnDismissListener {
           execute.invoke()
         }

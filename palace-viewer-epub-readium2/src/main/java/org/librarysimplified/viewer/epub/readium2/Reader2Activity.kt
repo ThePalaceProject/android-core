@@ -19,7 +19,6 @@ import kotlinx.coroutines.runBlocking
 import org.joda.time.LocalDateTime
 import org.librarysimplified.mdc.MDCKeys
 import org.librarysimplified.r2.api.SR2Bookmark
-import org.librarysimplified.r2.api.SR2Command
 import org.librarysimplified.r2.api.SR2ControllerType
 import org.librarysimplified.r2.api.SR2Event
 import org.librarysimplified.r2.api.SR2Event.SR2BookmarkEvent.SR2BookmarkCreated
@@ -572,31 +571,6 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
         )
       )
       .setOnDismissListener { this.finish() }
-      .create()
-      .show()
-  }
-
-  @UiThread
-  private fun showBookmarkPrompt(
-    controller: SR2ControllerType,
-    localLastReadBookmark: SR2Bookmark,
-    serverLastReadBookmark: SR2Bookmark
-  ) {
-    UIThread.checkIsUIThread()
-
-    MaterialAlertDialogBuilder(this)
-      .setTitle(R.string.reader_position_title)
-      .setMessage(R.string.reader_position_message)
-      .setNegativeButton(R.string.reader_position_move) { dialog, _ ->
-        dialog.dismiss()
-        this.createLocalBookmarkFromPromptAction(bookmark = serverLastReadBookmark)
-        controller.submitCommand(SR2Command.OpenChapter(serverLastReadBookmark.locator))
-      }
-      .setPositiveButton(R.string.reader_position_stay) { dialog, _ ->
-        dialog.dismiss()
-        this.createLocalBookmarkFromPromptAction(bookmark = localLastReadBookmark)
-        controller.submitCommand(SR2Command.OpenChapter(localLastReadBookmark.locator))
-      }
       .create()
       .show()
   }
