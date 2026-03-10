@@ -1100,7 +1100,11 @@
             <c:ticket id="PP-3688"/>
           </c:tickets>
         </c:change>
-        <c:change date="2026-03-10T10:51:40+00:00" summary="Add description of Sync Bookmarks UI control."/>
+        <c:change date="2026-03-10T10:51:40+00:00" summary="Add description of Sync Bookmarks UI control.">
+          <c:tickets>
+            <c:ticket id="PP-3845"/>
+          </c:tickets>
+        </c:change>
       </c:changes>
     </c:release>
   </c:releases>
