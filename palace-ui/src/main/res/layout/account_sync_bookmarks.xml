@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/accountSyncBookmarks"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/accountSyncBookmarksLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:labelFor="@id/accountSyncBookmarksCheck"
+            android:text="@string/accountSyncBookmarks" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/accountSyncBookmarksCheck"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:label="@id/accountSyncBookmarksLabel" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/accountSyncBookmarksDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/accountSyncBookmarksDescription" />
+
+</LinearLayout>

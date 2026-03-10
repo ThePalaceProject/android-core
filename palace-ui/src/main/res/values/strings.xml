@@ -55,6 +55,7 @@
   <string name="accountOIDCLoginLabel">Sign in with OpenID Connect</string>
   <string name="accountSearchHint">Search accounts&#8230;</string>
   <string name="accountSyncBookmarks">Sync bookmarks</string>
+  <string name="accountSyncBookmarksDescription">Toggle on sync bookmarks to save your reading position and bookmarks across all of your devices. This must be done on all devices where you are accessing Palace to synchronize reading position.</string>
   <string name="accountUserName">User Name</string>
   <string name="accountWantChildCard">Want a card for your child?</string>
   <string name="accounts">Libraries</string>

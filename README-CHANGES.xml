@@ -1072,7 +1072,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-03-04T16:32:58+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.26.0">
+    <c:release date="2026-03-10T10:51:40+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.26.0">
       <c:changes>
         <c:change date="2026-02-18T00:00:00+00:00" summary="Only activate Adobe devices on first fulfillment.">
           <c:tickets>
@@ -1095,11 +1095,12 @@
             <c:ticket id="PP-3475"/>
           </c:tickets>
         </c:change>
-        <c:change date="2026-03-04T16:32:58+00:00" summary="Allow enabling/disable cellular downloads.">
+        <c:change date="2026-03-04T00:00:00+00:00" summary="Allow enabling/disable cellular downloads.">
           <c:tickets>
             <c:ticket id="PP-3688"/>
           </c:tickets>
         </c:change>
+        <c:change date="2026-03-10T10:51:40+00:00" summary="Add description of Sync Bookmarks UI control."/>
       </c:changes>
     </c:release>
   </c:releases>
