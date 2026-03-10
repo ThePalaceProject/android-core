@@ -86,4 +86,6 @@
     <string name="settingsNetworkWIFIOnly">Only download books when Wi-Fi is available.</string>
     <string name="settingsNetworkWIFIOnlyEnabled">Download only on Wi-Fi.</string>
     <string name="settingsNetworkWIFIOnlyDisabled">Download when any network is available.</string>
+    <string name="settingsAccessibilitySearchButton">Library Search Button</string>
+    <string name="settingsAccessibilitySearchButtonClose">Close Search Button</string>
 </resources>

@@ -192,6 +192,8 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry), Ma
     this.searchIcon.setImageResource(R.drawable.xmark)
     this.searchText.visibility = View.VISIBLE
     this.toolbarTitle.visibility = View.INVISIBLE
+    this.searchTouch.contentDescription =
+      this.getString(R.string.settingsAccessibilitySearchButtonClose)
 
     this.searchText.postDelayed({ this.searchText.requestFocus() }, 100)
     this.searchText.postDelayed({ this.keyboardShow() }, 100)
@@ -201,6 +203,8 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry), Ma
     this.searchIcon.setImageResource(R.drawable.magnifying_glass)
     this.searchText.visibility = View.INVISIBLE
     this.toolbarTitle.visibility = View.VISIBLE
+    this.searchTouch.contentDescription =
+      this.getString(R.string.settingsAccessibilitySearchButton)
 
     this.searchText.postDelayed({ this.keyboardHide() }, 100)
   }
