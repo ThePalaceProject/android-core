@@ -115,13 +115,7 @@ internal class Profile internal constructor(
     val accounts =
       this.accounts.accounts().values
     val mostRecent =
-      if (accounts.size > 1) {
-        // Return the first account created from a non-default provider
-        accounts.first { it.provider.id != this.owner!!.defaultAccountProvider.id }
-      } else {
-        // Return the first account
-        accounts.first()
-      }
+      accounts.first()
     this.setDescription(
       this.descriptionCurrent.copy(
         preferences = this.descriptionCurrent.preferences.copy(

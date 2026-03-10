@@ -90,24 +90,29 @@ object MainNavigation {
     profilesController: ProfilesControllerType,
     parameters: ErrorPageParameters
   ): ErrorPageParameters {
-    val profile =
-      profilesController.profileCurrent()
-    val account =
-      profile.mostRecentAccount()
-    val attributes =
-      parameters.attributes.toMutableMap()
-    val credentials =
-      account.loginState.credentials
+    try {
+      val profile =
+        profilesController.profileCurrent()
+      val account =
+        profile.mostRecentAccount()
+      val attributes =
+        parameters.attributes.toMutableMap()
+      val credentials =
+        account.loginState.credentials
 
-    if (credentials != null) {
-      val patronAuthorization = credentials.patronAuthorization
-      if (patronAuthorization != null) {
-        attributes["Palace Patron ID"] = patronAuthorization.identifier
-        return parameters.copy(attributes = attributes.toSortedMap())
+      if (credentials != null) {
+        val patronAuthorization = credentials.patronAuthorization
+        if (patronAuthorization != null) {
+          attributes["Palace Patron ID"] = patronAuthorization.identifier
+          return parameters.copy(attributes = attributes.toSortedMap())
+        }
       }
-    }
 
-    return parameters
+      return parameters
+    } catch (e: Throwable) {
+      this.logger.debug("Failed to collect Patron ID: ", e)
+      return parameters
+    }
   }
 
   @UiThread
