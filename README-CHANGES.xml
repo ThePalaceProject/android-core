@@ -1072,7 +1072,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-03-10T17:04:37+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.26.0">
+    <c:release date="2026-03-11T14:23:16+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.26.0">
       <c:changes>
         <c:change date="2026-02-18T00:00:00+00:00" summary="Only activate Adobe devices on first fulfillment.">
           <c:tickets>
@@ -1110,9 +1110,14 @@
             <c:ticket id="PP-3863"/>
           </c:tickets>
         </c:change>
-        <c:change date="2026-03-10T17:04:37+00:00" summary="Add accessibility labels to account search box.">
+        <c:change date="2026-03-10T00:00:00+00:00" summary="Add accessibility labels to account search box.">
           <c:tickets>
             <c:ticket id="PP-3864"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-03-11T14:23:16+00:00" summary="Fix facet clipping with large fonts and small screens.">
+          <c:tickets>
+            <c:ticket id="PP-3872"/>
           </c:tickets>
         </c:change>
       </c:changes>

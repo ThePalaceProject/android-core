@@ -82,9 +82,9 @@ class CatalogToolbar(
           resources.getString(R.string.catalogAccessibilitySearch)
         this.searchTouch.setOnClickListener {
           if (this.searchText.isVisible) {
-            this.searchBoxClose()
+            this.searchBoxClose(resources)
           } else {
-            this.searchBoxOpen()
+            this.searchBoxOpen(resources)
           }
         }
 
@@ -138,7 +138,7 @@ class CatalogToolbar(
           this.logoTouch.isEnabled = false
         }
       }
-    } catch (e: Throwable) {
+    } catch (_: Throwable) {
       // Nothing to do
     }
   }
@@ -151,7 +151,11 @@ class CatalogToolbar(
     }
   }
 
-  private fun searchBoxOpen() {
+  private fun searchBoxOpen(
+    resources: Resources,
+  ) {
+    this.searchTouch.contentDescription =
+      resources.getString(R.string.catalogAccessibilitySearchButtonClose)
     this.searchIcon.setImageResource(R.drawable.xmark)
     this.searchText.visibility = View.VISIBLE
     this.textContainer.visibility = View.INVISIBLE
@@ -160,7 +164,11 @@ class CatalogToolbar(
     this.text.postDelayed({ this.keyboardShow() }, 100)
   }
 
-  private fun searchBoxClose() {
+  private fun searchBoxClose(
+    resources: Resources,
+  ) {
+    this.searchTouch.contentDescription =
+      resources.getString(R.string.catalogAccessibilitySearch)
     this.searchIcon.setImageResource(R.drawable.magnifying_glass)
     this.searchText.visibility = View.INVISIBLE
     this.textContainer.visibility = View.VISIBLE

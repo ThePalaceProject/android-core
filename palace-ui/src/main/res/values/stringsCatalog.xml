@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <resources>
+  <string name="catalogAccessibilitySearchButtonClose">Close Search Button</string>
   <string name="catalogAccessibilityAccountSelection">Account Selection Button</string>
   <string name="catalogAccessibilityBackgroundImage">A background image.</string>
   <string name="catalogAccessibilityBookBorrow">Borrow Button</string>
