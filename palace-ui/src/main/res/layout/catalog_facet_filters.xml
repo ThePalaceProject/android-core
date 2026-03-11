@@ -16,31 +16,42 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/catalogFacetsFilterButtons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_margin="16dp"
         android:gravity="center"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
+        <androidx.constraintlayout.helper.widget.Flow
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="catalogFacetsFilterCancel,catalogFacetsFilterApply"
+            app:flow_horizontalBias="0"
+            app:flow_horizontalGap="16dp"
+            app:flow_horizontalStyle="spread"
+            app:flow_verticalGap="8dp"
+            app:flow_wrapMode="aligned"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <Button
             android:id="@+id/catalogFacetsFilterCancel"
-            android:layout_width="160dp"
-            android:layout_height="48dp"
-            android:layout_margin="16dp"
+            android:layout_width="128dp"
+            android:layout_height="wrap_content"
             android:text="@string/catalogCancel" />
 
         <Button
             android:id="@+id/catalogFacetsFilterApply"
-            android:layout_width="160dp"
-            android:layout_height="48dp"
-            android:layout_margin="16dp"
+            android:layout_width="128dp"
+            android:layout_height="wrap_content"
             android:text="@string/catalogFacetsFilterApply" />
 
-    </LinearLayout>
-
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
