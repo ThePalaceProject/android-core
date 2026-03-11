@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import com.google.common.util.concurrent.ListeningExecutorService
 import com.google.common.util.concurrent.MoreExecutors
-import com.io7m.jfunctional.Option
 import io.reactivex.subjects.PublishSubject
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -42,7 +41,7 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskDirectoryType
 import org.nypl.simplified.books.controller.Controller
 import org.nypl.simplified.books.controller.api.BookRevokeStringResourcesType
 import org.nypl.simplified.books.controller.api.BooksControllerType
-import org.nypl.simplified.books.formats.api.BookFormatSupportType
+import org.nypl.simplified.books.formats.BookFormatSupportType
 import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.feeds.api.FeedHTTPTransport
 import org.nypl.simplified.feeds.api.FeedLoader
@@ -77,7 +76,6 @@ import org.nypl.simplified.tests.mocking.MockAnalytics
 import org.nypl.simplified.tests.mocking.MockBookFormatSupport
 import org.nypl.simplified.tests.mocking.MockRevokeStringResources
 import java.io.File
-import java.io.FileNotFoundException
 import java.io.InputStream
 import java.net.URI
 import java.util.Collections

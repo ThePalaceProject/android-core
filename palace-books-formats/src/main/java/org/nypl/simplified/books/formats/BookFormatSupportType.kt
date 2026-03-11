@@ -1,4 +1,4 @@
-package org.nypl.simplified.books.formats.api
+package org.nypl.simplified.books.formats
 
 import one.irradia.mime.api.MIMEType
 import org.nypl.simplified.books.api.BookDRMKind

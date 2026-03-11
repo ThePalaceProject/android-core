@@ -11,7 +11,7 @@ import org.nypl.simplified.accounts.database.api.AccountsDatabaseType
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.books.book_database.BookDatabases
 import org.nypl.simplified.books.book_database.api.BookDatabaseFactoryType
-import org.nypl.simplified.books.formats.api.BookFormatSupportType
+import org.nypl.simplified.books.formats.BookFormatSupportType
 import java.io.File
 
 /**

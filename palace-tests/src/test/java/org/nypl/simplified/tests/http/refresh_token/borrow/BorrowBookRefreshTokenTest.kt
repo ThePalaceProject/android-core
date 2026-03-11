@@ -48,8 +48,8 @@ import org.nypl.simplified.books.borrowing.internal.BorrowLCPEpub
 import org.nypl.simplified.books.borrowing.internal.BorrowLoanCreate
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskType
-import org.nypl.simplified.books.formats.api.BookFormatSupportType
-import org.nypl.simplified.books.formats.api.StandardFormatNames
+import org.nypl.simplified.books.formats.BookFormatSupportType
+import org.nypl.simplified.books.formats.StandardFormatNames
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisition
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser

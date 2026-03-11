@@ -5,7 +5,7 @@ dependencies {
     implementation(project(":palace-bookmarks-api"))
     implementation(project(":palace-books-api"))
     implementation(project(":palace-books-database-api"))
-    implementation(project(":palace-books-formats-api"))
+    implementation(project(":palace-books-formats"))
     implementation(project(":palace-files"))
     implementation(project(":palace-json-core"))
     implementation(project(":palace-opds-core"))

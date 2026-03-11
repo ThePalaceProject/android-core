@@ -3,7 +3,7 @@ package org.nypl.simplified.books.preview
 import org.nypl.simplified.books.book_database.api.BookFormats
 import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
 import org.nypl.simplified.books.book_registry.BookPreviewStatus
-import org.nypl.simplified.books.formats.api.StandardFormatNames
+import org.nypl.simplified.books.formats.StandardFormatNames
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSPreviewAcquisition
 import org.nypl.simplified.taskrecorder.api.TaskRecorder

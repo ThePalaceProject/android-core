@@ -316,7 +316,6 @@ coupled as possible.
 |[org.librarysimplified.books.database](palace-books-database)|Book database implementation|
 |[org.librarysimplified.books.database.api](palace-books-database-api)|Book database API|
 |[org.librarysimplified.books.formats](palace-books-formats)|Book formats implementation|
-|[org.librarysimplified.books.formats.api](palace-books-formats-api)|Book formats API|
 |[org.librarysimplified.books.preview](palace-books-preview)|Book preview|
 |[org.librarysimplified.books.registry.api](palace-books-registry-api)|Book registry API|
 |[org.librarysimplified.books.time.tracking](palace-books-time-tracking)|Books time tracking|

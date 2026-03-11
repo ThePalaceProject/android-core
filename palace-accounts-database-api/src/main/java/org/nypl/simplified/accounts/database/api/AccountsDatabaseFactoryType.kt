@@ -7,7 +7,7 @@ import org.nypl.simplified.accounts.api.AccountAuthenticationCredentialsStoreTyp
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.books.book_database.api.BookDatabaseFactoryType
-import org.nypl.simplified.books.formats.api.BookFormatSupportType
+import org.nypl.simplified.books.formats.BookFormatSupportType
 import java.io.File
 
 /**

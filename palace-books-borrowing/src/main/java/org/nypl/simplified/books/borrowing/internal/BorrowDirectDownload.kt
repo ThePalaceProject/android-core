@@ -7,8 +7,8 @@ import org.nypl.simplified.books.borrowing.BorrowContextType
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowRecoverableAuthenticationError
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskFactoryType
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskType
-import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFiles
-import org.nypl.simplified.books.formats.api.StandardFormatNames.genericPDFFiles
+import org.nypl.simplified.books.formats.StandardFormatNames.genericEPUBFiles
+import org.nypl.simplified.books.formats.StandardFormatNames.genericPDFFiles
 import org.nypl.simplified.links.Link
 
 /**

@@ -7,7 +7,7 @@ dependencies {
     implementation(project(":palace-accounts-registry-api"))
     implementation(project(":palace-books-database"))
     implementation(project(":palace-books-database-api"))
-    implementation(project(":palace-books-formats-api"))
+    implementation(project(":palace-books-formats"))
     implementation(project(":palace-files"))
     implementation(project(":palace-json-core"))
     implementation(project(":palace-presentableerror-api"))

@@ -38,7 +38,7 @@ import org.nypl.simplified.books.borrowing.SAMLDownloadContext
 import org.nypl.simplified.books.controller.api.BookRevokeStringResourcesType
 import org.nypl.simplified.books.controller.api.BooksControllerType
 import org.nypl.simplified.books.controller.api.BooksPreviewControllerType
-import org.nypl.simplified.books.formats.api.BookFormatSupportType
+import org.nypl.simplified.books.formats.BookFormatSupportType
 import org.nypl.simplified.books.preview.BookPreviewRequirements
 import org.nypl.simplified.books.preview.BookPreviewTask
 import org.nypl.simplified.crashlytics.api.CrashlyticsServiceType

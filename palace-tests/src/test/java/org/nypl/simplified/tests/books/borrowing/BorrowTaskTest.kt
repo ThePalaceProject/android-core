@@ -56,11 +56,11 @@ import org.nypl.simplified.books.borrowing.BorrowTask
 import org.nypl.simplified.books.borrowing.BorrowTaskType
 import org.nypl.simplified.books.borrowing.internal.BorrowAudiobookAuthorizationHandler
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes
-import org.nypl.simplified.books.formats.api.StandardFormatNames.adobeACSMFiles
-import org.nypl.simplified.books.formats.api.StandardFormatNames.genericAudioBooks
-import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFiles
-import org.nypl.simplified.books.formats.api.StandardFormatNames.opdsAcquisitionFeedEntry
-import org.nypl.simplified.books.formats.api.StandardFormatNames.simplifiedBearerToken
+import org.nypl.simplified.books.formats.StandardFormatNames.adobeACSMFiles
+import org.nypl.simplified.books.formats.StandardFormatNames.genericAudioBooks
+import org.nypl.simplified.books.formats.StandardFormatNames.genericEPUBFiles
+import org.nypl.simplified.books.formats.StandardFormatNames.opdsAcquisitionFeedEntry
+import org.nypl.simplified.books.formats.StandardFormatNames.simplifiedBearerToken
 import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.patron.api.PatronAuthorization

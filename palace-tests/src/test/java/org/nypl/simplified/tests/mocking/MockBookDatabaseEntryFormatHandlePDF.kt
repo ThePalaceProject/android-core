@@ -10,7 +10,7 @@ import org.nypl.simplified.books.api.bookmark.BookmarkID
 import org.nypl.simplified.books.api.bookmark.SerializedBookmark
 import org.nypl.simplified.books.book_database.api.BookDRMInformationHandle
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandlePDF
-import org.nypl.simplified.books.formats.api.StandardFormatNames
+import org.nypl.simplified.books.formats.StandardFormatNames
 import java.io.File
 
 class MockBookDatabaseEntryFormatHandlePDF(

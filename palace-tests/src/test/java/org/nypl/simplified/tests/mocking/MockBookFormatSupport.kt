@@ -2,7 +2,7 @@ package org.nypl.simplified.tests.mocking
 
 import one.irradia.mime.api.MIMEType
 import org.nypl.simplified.books.api.BookDRMKind
-import org.nypl.simplified.books.formats.api.BookFormatSupportType
+import org.nypl.simplified.books.formats.BookFormatSupportType
 
 class MockBookFormatSupport : BookFormatSupportType {
 

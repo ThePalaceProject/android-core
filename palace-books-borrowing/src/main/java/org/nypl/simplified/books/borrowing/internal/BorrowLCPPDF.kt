@@ -24,8 +24,8 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.Borro
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskHaltedEarly
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskFactoryType
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskType
-import org.nypl.simplified.books.formats.api.StandardFormatNames
-import org.nypl.simplified.books.formats.api.StandardFormatNames.lcpLicenseFiles
+import org.nypl.simplified.books.formats.StandardFormatNames
+import org.nypl.simplified.books.formats.StandardFormatNames.lcpLicenseFiles
 import org.nypl.simplified.links.Link
 import org.readium.r2.lcp.license.model.LicenseDocument
 import org.readium.r2.shared.util.ErrorException

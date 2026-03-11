@@ -5,7 +5,7 @@ import org.nypl.simplified.accounts.api.AccountLoginState
 import org.nypl.simplified.books.book_registry.BookRegistryReadableType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookWithStatus
-import org.nypl.simplified.books.formats.api.BookFormatSupportType
+import org.nypl.simplified.books.formats.BookFormatSupportType
 import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedBooksSelection.BOOKS_FEED_HOLDS
 import org.nypl.simplified.feeds.api.FeedBooksSelection.BOOKS_FEED_LOANED

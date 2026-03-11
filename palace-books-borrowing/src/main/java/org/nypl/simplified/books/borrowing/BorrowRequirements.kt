@@ -9,7 +9,7 @@ import org.nypl.drm.core.BoundlessServiceType
 import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskDirectoryType
-import org.nypl.simplified.books.formats.api.BookFormatSupportType
+import org.nypl.simplified.books.formats.BookFormatSupportType
 import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
 import org.readium.r2.lcp.LcpService

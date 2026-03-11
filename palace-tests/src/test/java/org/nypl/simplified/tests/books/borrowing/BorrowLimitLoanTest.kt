@@ -34,8 +34,8 @@ import org.nypl.simplified.books.book_registry.BookStatus.RequestingLoan
 import org.nypl.simplified.books.book_registry.BookStatusEvent
 import org.nypl.simplified.books.borrowing.internal.BorrowAudiobookAuthorizationHandler
 import org.nypl.simplified.books.borrowing.internal.BorrowLoanCreate
-import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFiles
-import org.nypl.simplified.books.formats.api.StandardFormatNames.opdsAcquisitionFeedEntry
+import org.nypl.simplified.books.formats.StandardFormatNames.genericEPUBFiles
+import org.nypl.simplified.books.formats.StandardFormatNames.opdsAcquisitionFeedEntry
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement

@@ -76,7 +76,7 @@ import org.nypl.simplified.books.covers.BookCoverGenerator
 import org.nypl.simplified.books.covers.BookCoverGeneratorType
 import org.nypl.simplified.books.covers.BookCoverProvider
 import org.nypl.simplified.books.covers.BookCoverProviderType
-import org.nypl.simplified.books.formats.api.BookFormatSupportType
+import org.nypl.simplified.books.formats.BookFormatSupportType
 import org.nypl.simplified.books.time.tracking.TimeTrackingHTTPCalls
 import org.nypl.simplified.books.time.tracking.TimeTrackingService
 import org.nypl.simplified.books.time.tracking.TimeTrackingServiceType

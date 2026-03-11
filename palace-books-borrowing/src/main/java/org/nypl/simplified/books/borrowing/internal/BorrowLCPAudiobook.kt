@@ -19,8 +19,8 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskFailed
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskFactoryType
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskType
-import org.nypl.simplified.books.formats.api.StandardFormatNames.lcpAudioBooks
-import org.nypl.simplified.books.formats.api.StandardFormatNames.lcpLicenseFiles
+import org.nypl.simplified.books.formats.StandardFormatNames.lcpAudioBooks
+import org.nypl.simplified.books.formats.StandardFormatNames.lcpLicenseFiles
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import java.io.File

@@ -14,7 +14,7 @@ dependencies {
     implementation(project(":palace-books-borrowing"))
     implementation(project(":palace-books-controller-api"))
     implementation(project(":palace-books-database-api"))
-    implementation(project(":palace-books-formats-api"))
+    implementation(project(":palace-books-formats"))
     implementation(project(":palace-books-preview"))
     implementation(project(":palace-books-registry-api"))
     implementation(project(":palace-crashlytics-api"))

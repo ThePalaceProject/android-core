@@ -1,6 +1,6 @@
 package org.nypl.simplified.books.preview
 
-import org.nypl.simplified.books.formats.api.StandardFormatNames
+import org.nypl.simplified.books.formats.StandardFormatNames
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSPreviewAcquisition
 

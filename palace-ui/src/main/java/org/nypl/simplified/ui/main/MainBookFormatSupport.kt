@@ -7,8 +7,8 @@ import org.nypl.simplified.books.audio.AudioBookOverdriveSecretServiceType
 import org.nypl.simplified.books.formats.BookFormatAudioSupportParameters
 import org.nypl.simplified.books.formats.BookFormatSupport
 import org.nypl.simplified.books.formats.BookFormatSupportParameters
-import org.nypl.simplified.books.formats.api.BookFormatSupportType
-import org.nypl.simplified.books.formats.api.StandardFormatNames
+import org.nypl.simplified.books.formats.BookFormatSupportType
+import org.nypl.simplified.books.formats.StandardFormatNames
 import org.nypl.simplified.viewer.spi.ViewerProviderType
 import org.readium.r2.lcp.LcpService
 import org.slf4j.LoggerFactory

@@ -38,10 +38,9 @@ import org.nypl.simplified.books.borrowing.BorrowContextType
 import org.nypl.simplified.books.borrowing.internal.BorrowAudiobookAuthorizationHandler
 import org.nypl.simplified.books.borrowing.internal.BorrowLCPEpub
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException
-import org.nypl.simplified.books.formats.api.StandardFormatNames
-import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFiles
-import org.nypl.simplified.books.formats.api.StandardFormatNames.lcpAudioBooks
-import org.nypl.simplified.books.formats.api.StandardFormatNames.lcpLicenseFiles
+import org.nypl.simplified.books.formats.StandardFormatNames.genericEPUBFiles
+import org.nypl.simplified.books.formats.StandardFormatNames.lcpAudioBooks
+import org.nypl.simplified.books.formats.StandardFormatNames.lcpLicenseFiles
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisition
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
@@ -456,7 +455,7 @@ class BorrowLCPEpubTest {
     // The downloaded file should now be in the book format, and the license should be installed.
 
     val formatHandle = context.bookDatabaseEntry
-      .findFormatHandleForContentType(StandardFormatNames.genericEPUBFiles)!!
+      .findFormatHandleForContentType(genericEPUBFiles)!!
 
     val format = formatHandle.format!! as BookFormat.BookFormatEPUB
     val zip = ZipFile(format.file)
@@ -659,7 +658,7 @@ class BorrowLCPEpubTest {
     // The downloaded file should now be in the book format, and the license should be installed.
 
     val formatHandle = context.bookDatabaseEntry
-      .findFormatHandleForContentType(StandardFormatNames.lcpAudioBooks)!!
+      .findFormatHandleForContentType(lcpAudioBooks)!!
 
     val format = formatHandle.format!! as BookFormat.BookFormatAudioBook
     val zip = ZipFile(format.file)

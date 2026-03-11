@@ -47,9 +47,9 @@ import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.requiredURI
 import org.nypl.simplified.books.borrowing.internal.BorrowLoanCreate
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskHaltedEarly
-import org.nypl.simplified.books.formats.api.BookFormatSupportType
-import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFiles
-import org.nypl.simplified.books.formats.api.StandardFormatNames.opdsAcquisitionFeedEntry
+import org.nypl.simplified.books.formats.BookFormatSupportType
+import org.nypl.simplified.books.formats.StandardFormatNames.genericEPUBFiles
+import org.nypl.simplified.books.formats.StandardFormatNames.opdsAcquisitionFeedEntry
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement

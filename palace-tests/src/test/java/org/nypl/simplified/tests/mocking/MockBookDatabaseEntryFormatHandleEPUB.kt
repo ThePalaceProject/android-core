@@ -1,7 +1,6 @@
 package org.nypl.simplified.tests.mocking
 
 import android.app.Application
-import org.nypl.drm.core.AdobeAdeptLoan
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookDRMKind
 import org.nypl.simplified.books.api.BookFormat
@@ -10,8 +9,7 @@ import org.nypl.simplified.books.api.bookmark.BookmarkID
 import org.nypl.simplified.books.api.bookmark.SerializedBookmark
 import org.nypl.simplified.books.book_database.api.BookDRMInformationHandle
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleEPUB
-import org.nypl.simplified.books.formats.api.StandardFormatNames
-import org.nypl.simplified.tests.TestDirectories
+import org.nypl.simplified.books.formats.StandardFormatNames
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption

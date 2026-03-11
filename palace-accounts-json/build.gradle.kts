@@ -3,7 +3,7 @@ dependencies {
 
     implementation(project(":palace-accounts-api"))
     implementation(project(":palace-announcements"))
-    implementation(project(":palace-books-formats-api"))
+    implementation(project(":palace-books-formats"))
     implementation(project(":palace-files"))
     implementation(project(":palace-json-core"))
     implementation(project(":palace-links"))

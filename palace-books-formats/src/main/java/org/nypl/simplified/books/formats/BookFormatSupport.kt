@@ -6,8 +6,6 @@ import org.nypl.simplified.books.api.BookDRMKind.ACS
 import org.nypl.simplified.books.api.BookDRMKind.BOUNDLESS
 import org.nypl.simplified.books.api.BookDRMKind.LCP
 import org.nypl.simplified.books.api.BookDRMKind.NONE
-import org.nypl.simplified.books.formats.api.BookFormatSupportType
-import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.slf4j.LoggerFactory
 
 /**

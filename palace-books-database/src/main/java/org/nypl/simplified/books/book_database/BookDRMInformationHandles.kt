@@ -3,7 +3,7 @@ package org.nypl.simplified.books.book_database
 import org.nypl.simplified.books.api.BookDRMKind
 import org.nypl.simplified.books.book_database.api.BookDRMInformationHandle
 import org.nypl.simplified.books.book_database.api.BookFormats
-import org.nypl.simplified.books.formats.api.BookFormatSupportType
+import org.nypl.simplified.books.formats.BookFormatSupportType
 import org.nypl.simplified.files.DirectoryUtilities
 import org.nypl.simplified.files.FileUtilities
 import org.slf4j.LoggerFactory

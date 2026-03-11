@@ -6,7 +6,7 @@ import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.book_database.api.BookDatabaseException
 import org.nypl.simplified.books.book_database.api.BookDatabaseFactoryType
 import org.nypl.simplified.books.book_database.api.BookDatabaseType
-import org.nypl.simplified.books.formats.api.BookFormatSupportType
+import org.nypl.simplified.books.formats.BookFormatSupportType
 import org.nypl.simplified.opds.core.OPDSJSONParser
 import org.nypl.simplified.opds.core.OPDSJSONParserType
 import org.nypl.simplified.opds.core.OPDSJSONSerializer

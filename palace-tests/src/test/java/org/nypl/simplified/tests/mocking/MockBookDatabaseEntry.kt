@@ -7,12 +7,10 @@ import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.api.BookIDs
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
-import org.nypl.simplified.books.formats.api.StandardFormatNames.genericAudioBooks
-import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFiles
-import org.nypl.simplified.books.formats.api.StandardFormatNames.genericJsonAudioBook
-import org.nypl.simplified.books.formats.api.StandardFormatNames.genericMpegAudioBook
-import org.nypl.simplified.books.formats.api.StandardFormatNames.genericPDFFiles
-import org.nypl.simplified.books.formats.api.StandardFormatNames.lcpAudioBooks
+import org.nypl.simplified.books.formats.StandardFormatNames.genericEPUBFiles
+import org.nypl.simplified.books.formats.StandardFormatNames.genericJsonAudioBook
+import org.nypl.simplified.books.formats.StandardFormatNames.genericPDFFiles
+import org.nypl.simplified.books.formats.StandardFormatNames.lcpAudioBooks
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionPaths
 import org.slf4j.LoggerFactory

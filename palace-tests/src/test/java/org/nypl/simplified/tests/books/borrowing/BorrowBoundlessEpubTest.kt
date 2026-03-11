@@ -33,8 +33,8 @@ import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.borrowing.internal.BorrowAudiobookAuthorizationHandler
 import org.nypl.simplified.books.borrowing.internal.BorrowBoundless
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException
-import org.nypl.simplified.books.formats.api.StandardFormatNames.boundlessLicenseFiles
-import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFiles
+import org.nypl.simplified.books.formats.StandardFormatNames.boundlessLicenseFiles
+import org.nypl.simplified.books.formats.StandardFormatNames.genericEPUBFiles
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisition
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry

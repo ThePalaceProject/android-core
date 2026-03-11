@@ -43,7 +43,6 @@ dependencies {
     implementation(project(":palace-books-covers"))
     implementation(project(":palace-books-database-api"))
     implementation(project(":palace-books-formats"))
-    implementation(project(":palace-books-formats-api"))
     implementation(project(":palace-books-preview"))
     implementation(project(":palace-books-registry-api"))
     implementation(project(":palace-books-time-tracking"))

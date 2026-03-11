@@ -5,7 +5,7 @@ dependencies {
     implementation(project(":palace-accounts-registry-api"))
     implementation(project(":palace-accounts-source-spi"))
     implementation(project(":palace-books-database-api"))
-    implementation(project(":palace-books-formats-api"))
+    implementation(project(":palace-books-formats"))
     implementation(project(":palace-presentableerror-api"))
 
     implementation(libs.io7m.jfunctional)

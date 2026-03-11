@@ -1,7 +1,7 @@
 package org.nypl.simplified.books.preview
 
 import one.irradia.mime.api.MIMEType
-import org.nypl.simplified.books.formats.api.StandardFormatNames
+import org.nypl.simplified.books.formats.StandardFormatNames
 import org.nypl.simplified.files.DirectoryUtilities
 import org.nypl.simplified.files.FileUtilities
 import java.io.File

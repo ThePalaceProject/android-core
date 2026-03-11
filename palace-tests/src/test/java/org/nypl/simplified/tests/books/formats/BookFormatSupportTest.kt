@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import org.nypl.simplified.books.formats.BookFormatAudioSupportParameters
 import org.nypl.simplified.books.formats.BookFormatSupport
 import org.nypl.simplified.books.formats.BookFormatSupportParameters
-import org.nypl.simplified.books.formats.api.StandardFormatNames
+import org.nypl.simplified.books.formats.StandardFormatNames
 
 class BookFormatSupportTest {
 

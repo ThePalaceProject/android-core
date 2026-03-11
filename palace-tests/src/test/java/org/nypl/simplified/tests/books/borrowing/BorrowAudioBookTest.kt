@@ -42,8 +42,8 @@ import org.nypl.simplified.books.borrowing.internal.BorrowAudioBook
 import org.nypl.simplified.books.borrowing.internal.BorrowAudiobookAuthorizationHandler
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.audioStrategyFailed
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.requiredURIMissing
-import org.nypl.simplified.books.formats.api.BookFormatSupportType
-import org.nypl.simplified.books.formats.api.StandardFormatNames.genericAudioBooks
+import org.nypl.simplified.books.formats.BookFormatSupportType
+import org.nypl.simplified.books.formats.StandardFormatNames.genericAudioBooks
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
 import org.nypl.simplified.patron.api.PatronAuthorization

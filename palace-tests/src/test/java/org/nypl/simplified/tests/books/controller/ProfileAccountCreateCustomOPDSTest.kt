@@ -30,7 +30,7 @@ import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.controller.ProfileAccountCreateCustomOPDSTask
-import org.nypl.simplified.books.formats.api.BookFormatSupportType
+import org.nypl.simplified.books.formats.BookFormatSupportType
 import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.files.DirectoryUtilities
@@ -55,7 +55,6 @@ import org.thepalaceproject.db.api.DBParameters
 import org.thepalaceproject.db.api.DBType
 import java.io.ByteArrayInputStream
 import java.io.File
-import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InputStream
 import java.util.Collections
