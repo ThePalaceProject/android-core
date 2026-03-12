@@ -97,6 +97,7 @@ class OPDSClientTest {
       FeedLoader.create(
         bookFormatSupport = BookFormatSupport.create(
           BookFormatSupportParameters(
+            supportsEPUB = true,
             supportsPDF = true,
             supportsAdobeDRM = true,
             supportsBoundless = true,

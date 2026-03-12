@@ -30,6 +30,7 @@ class FeedLoaderTest : FeedLoaderContract() {
     val bookFormatSupport =
       BookFormatSupport.create(
         BookFormatSupportParameters(
+          supportsEPUB = false,
           supportsPDF = false,
           supportsLCP = false,
           supportsAdobeDRM = false,

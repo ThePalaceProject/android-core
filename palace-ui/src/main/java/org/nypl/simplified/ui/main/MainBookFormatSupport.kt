@@ -28,11 +28,12 @@ object MainBookFormatSupport {
   ): BookFormatSupportType {
     val parameters =
       BookFormatSupportParameters(
-        supportsPDF = isPDFSupported(),
+        supportsEPUB = this.isEPUBSupported(),
+        supportsPDF = this.isPDFSupported(),
         supportsAdobeDRM = adobeDRM != null,
         supportsBoundless = boundless != null,
         supportsAudioBooks = BookFormatAudioSupportParameters(
-          supportsFindawayAudioBooks = isFindawaySupported(),
+          supportsFindawayAudioBooks = this.isFindawaySupported(),
           supportsOverdriveAudioBooks = overdriveSecretService != null,
           supportsDPLAAudioBooks = feedbooksSecretService != null
         ),
@@ -63,7 +64,25 @@ object MainBookFormatSupport {
       }
       return false
     } catch (e: Exception) {
-      logger.debug("one or more viewer providers raised an exception: ", e)
+      this.logger.debug("one or more viewer providers raised an exception: ", e)
+      return false
+    }
+  }
+
+  private fun isEPUBSupported(): Boolean {
+    try {
+      val viewers =
+        ServiceLoader.load(ViewerProviderType::class.java)
+          .toList()
+
+      for (viewer in viewers) {
+        if (viewer.canPotentiallySupportType(StandardFormatNames.genericEPUBFiles)) {
+          return true
+        }
+      }
+      return false
+    } catch (e: Exception) {
+      this.logger.debug("one or more viewer providers raised an exception: ", e)
       return false
     }
   }

@@ -9,6 +9,7 @@ object BookFormatsTesting {
   val supportsEverything =
     BookFormatSupport.create(
       BookFormatSupportParameters(
+        supportsEPUB = true,
         supportsLCP = true,
         supportsAudioBooks = BookFormatAudioSupportParameters(
           supportsDPLAAudioBooks = true,
@@ -21,9 +22,22 @@ object BookFormatsTesting {
       )
     )
 
+  val supportsOnlyEPUB =
+    BookFormatSupport.create(
+      BookFormatSupportParameters(
+        supportsEPUB = true,
+        supportsLCP = false,
+        supportsAudioBooks = null,
+        supportsBoundless = false,
+        supportsPDF = false,
+        supportsAdobeDRM = false
+      )
+    )
+
   val supportsNothing =
     BookFormatSupport.create(
       BookFormatSupportParameters(
+        supportsEPUB = false,
         supportsLCP = false,
         supportsAudioBooks = null,
         supportsBoundless = false,

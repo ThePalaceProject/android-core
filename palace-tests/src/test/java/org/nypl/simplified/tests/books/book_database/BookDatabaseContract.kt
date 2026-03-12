@@ -945,7 +945,7 @@ abstract class BookDatabaseContract {
         BookDatabase.open(context = context(),
           parser = parser,
           serializer = serializer,
-          formats = BookFormatsTesting.supportsNothing,
+          formats = BookFormatsTesting.supportsOnlyEPUB,
           owner = accountID,
           directory = directory,
           httpClient = this.httpClient

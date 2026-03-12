@@ -107,6 +107,7 @@ class AccountBug0613d7f6 {
       bookDatabases = BookDatabases,
       bookFormatSupport = BookFormatSupport.create(
         BookFormatSupportParameters(
+          supportsEPUB = false,
           supportsPDF = false,
           supportsAdobeDRM = false,
           supportsBoundless  = false,

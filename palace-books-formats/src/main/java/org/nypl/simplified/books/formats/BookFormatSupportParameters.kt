@@ -7,6 +7,13 @@ package org.nypl.simplified.books.formats
 data class BookFormatSupportParameters(
 
   /**
+   * The application is configured to support EPUB files. That is, there is a [org.nypl.simplified.viewer.spi.ViewerProviderType]
+   * registered that supports EPUBs.
+   */
+
+  val supportsEPUB: Boolean,
+
+  /**
    * The application is configured to support PDF files. That is, there is a [org.nypl.simplified.viewer.spi.ViewerProviderType]
    * registered that supports PDFs.
    */

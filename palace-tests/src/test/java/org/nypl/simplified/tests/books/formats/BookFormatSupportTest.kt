@@ -18,6 +18,7 @@ class BookFormatSupportTest {
     val support =
       BookFormatSupport.create(
         BookFormatSupportParameters(
+          supportsEPUB = false,
           supportsPDF = false,
           supportsLCP = false,
           supportsAdobeDRM = false,
@@ -38,6 +39,7 @@ class BookFormatSupportTest {
     val supportWith =
       BookFormatSupport.create(
         BookFormatSupportParameters(
+          supportsEPUB = false,
           supportsPDF = true,
           supportsLCP = false,
           supportsAdobeDRM = false,
@@ -48,6 +50,7 @@ class BookFormatSupportTest {
     val supportWithout =
       BookFormatSupport.create(
         BookFormatSupportParameters(
+          supportsEPUB = false,
           supportsPDF = false,
           supportsLCP = false,
           supportsAdobeDRM = false,
@@ -81,6 +84,7 @@ class BookFormatSupportTest {
     val supportWith =
       BookFormatSupport.create(
         BookFormatSupportParameters(
+          supportsEPUB = true,
           supportsPDF = false,
           supportsLCP = false,
           supportsAdobeDRM = true,
@@ -91,6 +95,7 @@ class BookFormatSupportTest {
     val supportWithout =
       BookFormatSupport.create(
         BookFormatSupportParameters(
+          supportsEPUB = true,
           supportsPDF = false,
           supportsLCP = false,
           supportsAdobeDRM = false,
@@ -126,6 +131,7 @@ class BookFormatSupportTest {
     val supportWith =
       BookFormatSupport.create(
         BookFormatSupportParameters(
+          supportsEPUB = true,
           supportsPDF = false,
           supportsLCP = false,
           supportsAdobeDRM = false,
@@ -136,6 +142,7 @@ class BookFormatSupportTest {
     val supportWithout =
       BookFormatSupport.create(
         BookFormatSupportParameters(
+          supportsEPUB = true,
           supportsPDF = false,
           supportsLCP = false,
           supportsAdobeDRM = false,
@@ -170,6 +177,7 @@ class BookFormatSupportTest {
     val supportWith =
       BookFormatSupport.create(
         BookFormatSupportParameters(
+          supportsEPUB = false,
           supportsPDF = false,
           supportsAdobeDRM = false,
           supportsLCP = false,
@@ -184,6 +192,7 @@ class BookFormatSupportTest {
     val supportWithout =
       BookFormatSupport.create(
         BookFormatSupportParameters(
+          supportsEPUB = false,
           supportsPDF = false,
           supportsAdobeDRM = false,
           supportsBoundless = false,
@@ -217,6 +226,7 @@ class BookFormatSupportTest {
     val supportWith =
       BookFormatSupport.create(
         BookFormatSupportParameters(
+          supportsEPUB = false,
           supportsPDF = false,
           supportsAdobeDRM = false,
           supportsBoundless = false,
@@ -231,6 +241,7 @@ class BookFormatSupportTest {
     val supportWithout =
       BookFormatSupport.create(
         BookFormatSupportParameters(
+          supportsEPUB = false,
           supportsPDF = false,
           supportsAdobeDRM = false,
           supportsLCP = false,
@@ -264,6 +275,7 @@ class BookFormatSupportTest {
     val supportWith =
       BookFormatSupport.create(
         BookFormatSupportParameters(
+          supportsEPUB = false,
           supportsPDF = false,
           supportsAdobeDRM = false,
           supportsBoundless = false,
@@ -278,6 +290,7 @@ class BookFormatSupportTest {
     val supportWithout =
       BookFormatSupport.create(
         BookFormatSupportParameters(
+          supportsEPUB = false,
           supportsPDF = false,
           supportsAdobeDRM = false,
           supportsBoundless = false,
@@ -311,6 +324,7 @@ class BookFormatSupportTest {
     val supportWith =
       BookFormatSupport.create(
         BookFormatSupportParameters(
+          supportsEPUB = false,
           supportsPDF = false,
           supportsAdobeDRM = false,
           supportsBoundless = false,
@@ -325,6 +339,7 @@ class BookFormatSupportTest {
     val supportWithout =
       BookFormatSupport.create(
         BookFormatSupportParameters(
+          supportsEPUB = false,
           supportsPDF = false,
           supportsAdobeDRM = false,
           supportsBoundless = false,
@@ -358,6 +373,7 @@ class BookFormatSupportTest {
     val supportWith =
       BookFormatSupport.create(
         BookFormatSupportParameters(
+          supportsEPUB = true,
           supportsPDF = false,
           supportsAdobeDRM = false,
           supportsBoundless = false,
@@ -393,6 +409,7 @@ class BookFormatSupportTest {
     val supportWith =
       BookFormatSupport.create(
         BookFormatSupportParameters(
+          supportsEPUB = false,
           supportsPDF = true,
           supportsAdobeDRM = true,
           supportsBoundless = false,
@@ -420,6 +437,7 @@ class BookFormatSupportTest {
     val supportWith =
       BookFormatSupport.create(
         BookFormatSupportParameters(
+          supportsEPUB = true,
           supportsPDF = false,
           supportsAdobeDRM = false,
           supportsBoundless = false,
@@ -434,6 +452,7 @@ class BookFormatSupportTest {
     val supportWithout =
       BookFormatSupport.create(
         BookFormatSupportParameters(
+          supportsEPUB = true,
           supportsPDF = false,
           supportsAdobeDRM = false,
           supportsBoundless = false,
