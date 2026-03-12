@@ -1,6 +1,7 @@
-package org.thepalaceproject.palace
+package org.thepalaceproject.palace_auto
 
 import org.librarysimplified.ui.BuildConfig
+import org.librarysimplified.ui.R
 import org.nypl.simplified.buildconfig.api.BuildConfigurationAccountsRegistryURIs
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import java.net.URI
@@ -34,5 +35,5 @@ class PalaceBuildConfigurationService : BuildConfigurationServiceType {
   override val showChangeAccountsUi: Boolean
     get() = true
   override val brandingAppIcon: Int
-    get() = org.librarysimplified.ui.R.drawable.main_icon
+    get() = R.drawable.main_icon
 }

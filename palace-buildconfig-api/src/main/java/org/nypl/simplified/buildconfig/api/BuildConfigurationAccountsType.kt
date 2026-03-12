@@ -37,13 +37,6 @@ interface BuildConfigurationAccountsType {
   val showChangeAccountsUi: Boolean
 
   /**
-   * If set to `true`, users will be show age verification prompts and status on
-   * the accounts screen.
-   */
-
-  val showAgeGateUi: Boolean
-
-  /**
    * The list of ids of the supported featured libraries by this app.
    */
 
