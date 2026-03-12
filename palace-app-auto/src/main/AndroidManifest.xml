@@ -25,6 +25,10 @@
         android:usesCleartextTraffic="true"
         tools:replace="android:allowBackup">
 
+        <meta-data
+            android:name="com.google.android.gms.car.application"
+            android:resource="@xml/automotive_app_desc" />
+
         <!-- Main entry point for the application. -->
         <activity
             android:name="org.nypl.simplified.ui.main.MainActivity"
