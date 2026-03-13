@@ -11,6 +11,9 @@
     <!-- Required to allow the application to *read* the network state. -->
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
 
+    <!-- Nonsense required by Android Auto. -->
+    <uses-permission android:name="androidx.car.app.MEDIA_TEMPLATES"/>
+
     <uses-permission
         android:name="com.google.android.gms.permission.AD_ID"
         tools:node="remove" />
@@ -24,6 +27,11 @@
         android:theme="@style/PalaceTheme.Splash"
         android:usesCleartextTraffic="true"
         tools:replace="android:allowBackup">
+
+        <!-- Android Auto metadata. -->
+        <meta-data
+            android:name="com.google.android.gms.car.application"
+            android:resource="@xml/automotive_app_desc" />
 
         <!-- Main entry point for the application. -->
         <activity
@@ -119,6 +127,24 @@
         <service
             android:name="org.librarysimplified.http.network_access.LSHTTPNetworkAvailabilityService"
             android:exported="false" />
+
+        <!-- Android Auto service. -->
+        <service
+            android:name="org.thepalaceproject.ui.auto.PalaceCarAppService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="androidx.car.app.CarAppService" />
+                <category android:name="androidx.car.app.category.MEDIA"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="androidx.car.app.minCarApiLevel"
+                android:value="8" />
+
+            <meta-data
+                android:name="androidx.car.app.media.SERVICE"
+                android:value="true" />
+        </service>
     </application>
 
 </manifest>

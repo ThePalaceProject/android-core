@@ -318,6 +318,7 @@ dependencies {
     implementation(project(":palace-tenprint"))
     implementation(project(":palace-threads"))
     implementation(project(":palace-ui"))
+    implementation(project(":palace-ui-auto"))
     implementation(project(":palace-ui-bottomsheet"))
     implementation(project(":palace-ui-errorpage"))
     implementation(project(":palace-ui-images"))
@@ -426,6 +427,10 @@ dependencies {
     implementation(libs.transifex.common)
     implementation(libs.transifex.sdk)
     implementation(libs.b3nedikt.viewpump)
+
+    // Auto
+    implementation(libs.androidx.car.app)
+    implementation(libs.androidx.car.appprojected)
 
     implementation(libs.androidx.activity)
     implementation(libs.androidx.activity.ktx)
