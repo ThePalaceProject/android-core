@@ -14,7 +14,6 @@
         android:fontFamily="@font/open_sans_regular"
         android:text="@string/catalogPlaceholder"
         android:textAllCaps="true"
-        android:textSize="10sp"
         android:textStyle="bold" />
 
     <TextView
@@ -23,7 +22,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_weight="0.7"
-        android:textSize="10sp"
         android:fontFamily="@font/open_sans_regular"
         android:text="@string/catalogPlaceholder" />
 
