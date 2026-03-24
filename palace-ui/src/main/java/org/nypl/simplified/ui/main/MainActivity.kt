@@ -74,6 +74,10 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     intent: Intent
   ) {
     try {
+      if (this.isAutomatedTesting(intent)) {
+        this.onHandleAutomatedTesting()
+      }
+
       if (AccountOIDC.isIntentOIDC(intent)) {
         val data =
           intent.data
@@ -95,6 +99,20 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     } catch (e: Throwable) {
       this.logger.error("Failed to handle intent: ", e)
     }
+  }
+
+  private fun onHandleAutomatedTesting() {
+    this.logger.warn("Unimplemented code: Requested login to testing library for automated test suite.")
+  }
+
+  private fun isAutomatedTesting(
+    intent: Intent
+  ): Boolean {
+    val extras = intent.extras
+    if (extras != null) {
+      return extras.getBoolean("AutomatedTesting", false)
+    }
+    return false
   }
 
   private fun screenMetrics(): DisplayMetrics {
