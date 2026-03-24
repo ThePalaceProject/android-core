@@ -15,10 +15,11 @@ class CatalogButtons(
   @UiThread
   fun setAsReadButton(
     button: Button,
+    title: String,
     onClick: (Button) -> Unit
   ): Button {
     button.setText(R.string.catalogRead)
-    button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookRead)
+    button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookRead, title)
     button.setOnClickListener { onClick.invoke(button) }
     return button
   }
@@ -26,10 +27,11 @@ class CatalogButtons(
   @UiThread
   fun setAsListenButton(
     button: Button,
+    title: String,
     onClick: (Button) -> Unit
   ): Button {
     button.setText(R.string.catalogListen)
-    button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookListen)
+    button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookListen, title)
     button.setOnClickListener { onClick.invoke(button) }
     return button
   }
@@ -37,10 +39,11 @@ class CatalogButtons(
   @UiThread
   fun setAsBorrowButton(
     button: Button,
+    title: String,
     onClick: (Button) -> Unit
   ): Button {
     button.setText(R.string.catalogGet)
-    button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookBorrow)
+    button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookBorrow, title)
     button.setOnClickListener { onClick.invoke(button) }
     return button
   }
@@ -48,10 +51,11 @@ class CatalogButtons(
   @UiThread
   fun setAsDownloadButton(
     button: Button,
+    title: String,
     onClick: (Button) -> Unit
   ): Button {
     button.setText(R.string.catalogDownload)
-    button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookDownload)
+    button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookDownload, title)
     button.setOnClickListener { onClick.invoke(button) }
     return button
   }
@@ -59,10 +63,11 @@ class CatalogButtons(
   @UiThread
   fun setAsRevokeHoldButton(
     button: Button,
+    title: String,
     onClick: (Button) -> Unit
   ): Button {
     button.setText(R.string.catalogManageHold)
-    button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookManageHold)
+    button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookManageHold, title)
     button.setOnClickListener { onClick.invoke(button) }
     return button
   }
@@ -70,10 +75,11 @@ class CatalogButtons(
   @UiThread
   fun setAsRevokeLoanButton(
     button: Button,
+    title: String,
     onClick: (Button) -> Unit
   ): Button {
     button.setText(R.string.catalogReturn)
-    button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookRevokeLoan)
+    button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookRevokeLoan, title)
     button.setOnClickListener { onClick.invoke(button) }
     return button
   }
@@ -81,10 +87,11 @@ class CatalogButtons(
   @UiThread
   fun setAsReserveButton(
     button: Button,
+    title: String,
     onClick: (Button) -> Unit
   ): Button {
     button.setText(R.string.catalogPlaceHold)
-    button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookPlaceHold)
+    button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookPlaceHold, title)
     button.setOnClickListener { onClick.invoke(button) }
     return button
   }

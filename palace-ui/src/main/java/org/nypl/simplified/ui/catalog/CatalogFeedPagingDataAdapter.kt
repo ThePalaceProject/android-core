@@ -591,7 +591,8 @@ class CatalogFeedPagingDataAdapter(
           this.idleButtonPositive,
           onClick = {
             this.onBookRevoke(book, status)
-          }
+          },
+          title = book.entry.title
         )
         this.setVisible(this.idleButtonPositive, true)
       } else {
@@ -625,7 +626,8 @@ class CatalogFeedPagingDataAdapter(
         this.idleButtonPositive,
         onClick = {
           this.onBookBorrow(book)
-        }
+        },
+        title = book.entry.title
       )
       this.setVisible(this.idleButtonPositive, true)
 
@@ -634,7 +636,8 @@ class CatalogFeedPagingDataAdapter(
           this.idleButtonNegative0,
           onClick = {
             this.onBookRevoke(book, status)
-          }
+          },
+          title = book.entry.title
         )
         this.setVisible(this.idleButtonNegative0, true)
       } else {
@@ -656,7 +659,8 @@ class CatalogFeedPagingDataAdapter(
         this.idleButtonPositive,
         onClick = {
           this.onBookBorrow(book)
-        }
+        },
+        title = book.entry.title
       )
       this.setVisible(this.idleButtonPositive, true)
       this.setVisible(this.idleButtonNegative0, false)
@@ -676,7 +680,8 @@ class CatalogFeedPagingDataAdapter(
         this.idleButtonPositive,
         onClick = {
           this.onBookBorrow(book)
-        }
+        },
+        title = book.entry.title
       )
       this.setVisible(this.idleButtonPositive, true)
       this.setVisible(this.idleButtonNegative0, false)
@@ -700,6 +705,7 @@ class CatalogFeedPagingDataAdapter(
             onClick = {
               this.onBookViewerOpen(book, format)
             },
+            title = book.entry.title
           )
         }
 
@@ -709,6 +715,7 @@ class CatalogFeedPagingDataAdapter(
             onClick = {
               this.onBookViewerOpen(book, format)
             },
+            title = book.entry.title
           )
         }
 
@@ -718,6 +725,7 @@ class CatalogFeedPagingDataAdapter(
             onClick = {
               // XXX: Can this even happen?
             },
+            title = book.entry.title
           )
         }
       }
@@ -728,7 +736,8 @@ class CatalogFeedPagingDataAdapter(
           this.idleButtonNegative0,
           onClick = {
             this.onBookRevoke(book, status)
-          }
+          },
+          title = book.entry.title
         )
         this.setVisible(this.idleButtonNegative0, true)
       } else if (this.isBookDeletable(book)) {
@@ -736,7 +745,8 @@ class CatalogFeedPagingDataAdapter(
           this.idleButtonNegative0,
           onClick = {
             this.onBookDelete(book, status)
-          }
+          },
+          title = book.entry.title
         )
         this.setVisible(this.idleButtonNegative0, true)
       } else {
@@ -791,6 +801,7 @@ class CatalogFeedPagingDataAdapter(
         onClick = {
           this.onBookBorrow(book)
         },
+        title = book.entry.title
       )
       this.setVisible(this.idleButtonPositive, true)
 
@@ -799,7 +810,8 @@ class CatalogFeedPagingDataAdapter(
           this.idleButtonNegative0,
           onClick = {
             this.onBookRevoke(book, status)
-          }
+          },
+          title = book.entry.title
         )
         this.setVisible(this.idleButtonNegative0, true)
       } else if (this.isBookDeletable(book)) {
@@ -807,7 +819,8 @@ class CatalogFeedPagingDataAdapter(
           this.idleButtonNegative0,
           onClick = {
             this.onBookDelete(book, status)
-          }
+          },
+          title = book.entry.title
         )
         this.setVisible(this.idleButtonNegative0, true)
       } else {

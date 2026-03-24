@@ -1122,12 +1122,17 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-03-19T08:43:38+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.27.0">
+    <c:release date="2026-03-24T16:43:29+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.27.0">
       <c:changes>
-        <c:change date="2026-03-19T08:43:38+00:00" summary="Increase book details metadata text.">
+        <c:change date="2026-03-19T00:00:00+00:00" summary="Increase book details metadata text.">
           <c:tickets>
             <c:ticket id="PP-3897"/>
             <c:ticket id="SUP-431"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-03-24T16:43:29+00:00" summary="Improve accessibility strings.">
+          <c:tickets>
+            <c:ticket id="PP-3599"/>
           </c:tickets>
         </c:change>
       </c:changes>

@@ -893,6 +893,7 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogRetry,
+      accessibilityTextOverride = null,
       actionInPage = {
         this.openDrawer()
         this.onBookBorrowRequested(status.toBorrowParameters())
@@ -903,6 +904,7 @@ class CatalogFeedViewDetails2(
     )
     this.reconfigureButton1(
       text = R.string.catalogDetails,
+      accessibilityTextOverride = null,
       actionInPage = {
         this.openDrawer()
       },
@@ -922,6 +924,7 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.accountLogin,
+      accessibilityTextOverride = null,
       actionInPage = {
         this.openDrawer()
         this.onBookBorrowRequested(status.toBorrowParameters())
@@ -932,6 +935,7 @@ class CatalogFeedViewDetails2(
     )
     this.reconfigureButton1(
       text = R.string.catalogDetails,
+      accessibilityTextOverride = null,
       actionInPage = {
         this.openDrawer()
       },
@@ -951,6 +955,7 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogRetry,
+      accessibilityTextOverride = null,
       actionInPage = {
         this.openDrawer()
         this.onBookRevokeRequested(status)
@@ -961,6 +966,7 @@ class CatalogFeedViewDetails2(
     )
     this.reconfigureButton1(
       text = R.string.catalogDetails,
+      accessibilityTextOverride = null,
       actionInPage = { this.openDrawer() },
       actionInBottomSheet = { this.onShowErrorDetails(status.status.result) }
     )
@@ -978,6 +984,7 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.accountLogin,
+      accessibilityTextOverride = null,
       actionInPage = {
         this.openDrawer()
         this.onBookRevokeRequested(status)
@@ -988,6 +995,7 @@ class CatalogFeedViewDetails2(
     )
     this.reconfigureButton1(
       text = R.string.catalogDetails,
+      accessibilityTextOverride = null,
       actionInPage = { this.openDrawer() },
       actionInBottomSheet = { this.onShowErrorDetails(status.status.result) }
     )
@@ -1005,6 +1013,7 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogRetry,
+      accessibilityTextOverride = null,
       actionInPage = {
         this.openDrawer()
         this.onBookBorrowRequested(status.toBorrowParameters())
@@ -1015,6 +1024,7 @@ class CatalogFeedViewDetails2(
     )
     this.reconfigureButton1(
       text = R.string.catalogDetails,
+      accessibilityTextOverride = null,
       actionInPage = { this.openDrawer() },
       actionInBottomSheet = { this.onShowErrorDetails(status.status.result) }
     )
@@ -1032,6 +1042,7 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.accountLogin,
+      accessibilityTextOverride = null,
       actionInPage = {
         this.openDrawer()
         this.onBookBorrowRequested(status.toBorrowParameters())
@@ -1042,6 +1053,7 @@ class CatalogFeedViewDetails2(
     )
     this.reconfigureButton1(
       text = R.string.catalogDetails,
+      accessibilityTextOverride = null,
       actionInPage = { this.openDrawer() },
       actionInBottomSheet = { this.onShowErrorDetails(status.status.result) }
     )
@@ -1078,6 +1090,7 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogManageHold,
+      accessibilityTextOverride = this.root.resources.getString(R.string.catalogAccessibilityBookManageHold, status.book.entry.title),
       actionInPage = {
         this.openDrawer()
         this.onBookRevokeRequested(status)
@@ -1165,6 +1178,7 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogGet,
+      accessibilityTextOverride = this.root.resources.getString(R.string.catalogAccessibilityBookBorrow, status.book.entry.title),
       actionInPage = {
         this.openDrawer()
         this.onBookBorrowRequested(status.toBorrowParameters())
@@ -1187,6 +1201,7 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogPlaceHold,
+      accessibilityTextOverride = this.root.resources.getString(R.string.catalogAccessibilityBookPlaceHold, status.book.entry.title),
       actionInPage = {
         this.openDrawer()
         this.onBookBorrowRequested(status.toBorrowParameters())
@@ -1210,6 +1225,7 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogGet,
+      accessibilityTextOverride = this.root.resources.getString(R.string.catalogAccessibilityBookBorrow, status.book.entry.title),
       actionInPage = {
         this.openDrawer()
         this.onBookBorrowRequested(status.toBorrowParameters())
@@ -1229,6 +1245,7 @@ class CatalogFeedViewDetails2(
         this.enableButton1Status = true
         this.reconfigureButton1(
           text = R.string.catalogPreview,
+          accessibilityTextOverride = this.root.resources.getString(R.string.catalogAccessibilityBookPreviewRead, status.book.entry.title),
           actionInPage = { this.onBookPreviewOpenRequested(status) },
           actionInBottomSheet = { this.onBookPreviewOpenRequested(status) }
         )
@@ -1264,6 +1281,7 @@ class CatalogFeedViewDetails2(
     if (format != null) {
       this.reconfigureButton0(
         text = this.readButtonString(status.book),
+        accessibilityTextOverride = this.root.resources.getString(R.string.catalogAccessibilityBookRead, status.book.entry.title),
         actionInPage = { this.onBookViewerOpen(status.book, format) },
         actionInBottomSheet = { this.onBookViewerOpen(status.book, format) }
       )
@@ -1273,6 +1291,7 @@ class CatalogFeedViewDetails2(
       this.enableButton1Status = true
       this.reconfigureButton1(
         text = R.string.catalogReturn,
+        accessibilityTextOverride = this.root.resources.getString(R.string.catalogAccessibilityBookRevokeLoan, status.book.entry.title),
         actionInPage = {
           this.openDrawer()
           this.onBookRevokeRequested(status)
@@ -1317,6 +1336,7 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogDownload,
+      accessibilityTextOverride = this.root.resources.getString(R.string.catalogAccessibilityBookDownload, status.book.entry.title),
       actionInPage = {
         this.openDrawer()
         this.onBookBorrowRequested(status.toBorrowParameters())
@@ -1330,6 +1350,7 @@ class CatalogFeedViewDetails2(
       this.enableButton1Status = true
       this.reconfigureButton1(
         text = R.string.catalogReturn,
+        accessibilityTextOverride = this.root.resources.getString(R.string.catalogAccessibilityBookRevokeLoan, status.book.entry.title),
         actionInPage = {
           this.openDrawer()
           this.onBookRevokeRequested(status)
@@ -1440,6 +1461,7 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogCancel,
+      accessibilityTextOverride = this.root.resources.getString(R.string.catalogAccessibilityBookDownloadCancel, status.book.entry.title),
       actionInPage = {
         this.openDrawer()
         this.onBookBorrowCancelRequested(status)
@@ -1503,13 +1525,19 @@ class CatalogFeedViewDetails2(
 
   private fun reconfigureButton0(
     @StringRes text: Int,
+    accessibilityTextOverride: String?,
     actionInPage: () -> Unit,
     actionInBottomSheet: () -> Unit
   ) {
+    this.bookButton0.contentDescription = accessibilityTextOverride
     this.bookButton0.setText(text)
     this.bookButton0.setOnClickListener { actionInPage() }
+
+    this.bookBottomSheetButton0.contentDescription = accessibilityTextOverride
     this.bookBottomSheetButton0.setText(text)
     this.bookBottomSheetButton0.setOnClickListener { actionInBottomSheet() }
+
+    this.bookToolbarButton.contentDescription = accessibilityTextOverride
     this.bookToolbarButton.setText(text)
     this.bookToolbarButton.setOnClickListener { actionInPage() }
   }
@@ -1522,12 +1550,16 @@ class CatalogFeedViewDetails2(
 
   private fun reconfigureButton1(
     @StringRes text: Int,
+    accessibilityTextOverride: String?,
     actionInPage: () -> Unit,
     actionInBottomSheet: () -> Unit
   ) {
+    this.bookButton1.contentDescription = accessibilityTextOverride
     this.bookButton1.visibility = View.VISIBLE
     this.bookButton1.setText(text)
     this.bookButton1.setOnClickListener { actionInPage() }
+
+    this.bookBottomSheetButton1.contentDescription = accessibilityTextOverride
     this.bookBottomSheetButton1.visibility = View.VISIBLE
     this.bookBottomSheetButton1.setText(text)
     this.bookBottomSheetButton1.setOnClickListener { actionInBottomSheet() }
