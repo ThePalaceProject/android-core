@@ -1,6 +1,7 @@
 package org.nypl.simplified.accounts.api
 
 import com.google.common.base.Preconditions
+import org.nypl.simplified.links.Link
 import java.io.Serializable
 import java.net.URI
 
@@ -297,7 +298,13 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
      * The URI of the authentication logo.
      */
 
-    val logoURI: URI?
+    val logoURI: URI?,
+
+    /**
+     * The explicit logout link.
+     */
+
+    val logout: Link?
   ) : AccountProviderAuthenticationDescription() {
     override val isLoginPossible: Boolean =
       true

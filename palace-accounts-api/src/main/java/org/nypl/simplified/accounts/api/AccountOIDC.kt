@@ -4,6 +4,7 @@ import android.content.Intent
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.util.UUID
+import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 /**
@@ -30,13 +31,23 @@ object AccountOIDC {
     "org.thepalaceproject.oidc"
 
   /**
-   * The OIDC callback URI for a given account.
+   * The OIDC login callback URI for a given account.
    */
 
-  fun oidcCallbackURI(
+  fun oidcCallbackLoginURI(
     account: AccountID
   ): URI {
-    return URI.create("${this.oidcCallbackScheme}://${this.oidcCallbackHost}/account/${account.uuid}/")
+    return URI.create("${this.oidcCallbackScheme}://${this.oidcCallbackHost}/login/${account.uuid}/")
+  }
+
+  /**
+   * The OIDC logout callback URI for a given account.
+   */
+
+  fun oidcCallbackLogoutURI(
+    account: AccountID
+  ): URI {
+    return URI.create("${this.oidcCallbackScheme}://${this.oidcCallbackHost}/logout/${account.uuid}/")
   }
 
   /**
@@ -68,18 +79,46 @@ object AccountOIDC {
     return true
   }
 
-  private val pathAccountPattern =
-    Pattern.compile("^/account/([0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12})/$")
+  private val loginPattern =
+    Pattern.compile("^/login/([0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12})/$")
+
+  private val logoutPattern =
+    Pattern.compile("^/logout/([0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12})/$")
 
   fun parseOIDCCallback(
     data: URI
   ): AccountOIDCParsedCallback {
     val path = data.path
-    val matcher = pathAccountPattern.matcher(path)
-    if (!matcher.matches()) {
-      throw IllegalArgumentException("Unparseable intent data: $data")
+    val matcherLogin = loginPattern.matcher(path)
+    if (matcherLogin.matches()) {
+      return parseOIDCCallbackLogin(data, matcherLogin)
     }
 
+    val matcherLogout = logoutPattern.matcher(path)
+    if (matcherLogout.matches()) {
+      return parseOIDCCallbackLogout(matcherLogout)
+    }
+
+    throw IllegalArgumentException("Unparseable intent data: $data")
+  }
+
+  private fun parseOIDCCallbackLogout(
+    matcher: Matcher
+  ): AccountOIDCParsedCallback {
+    val accountIDText =
+      matcher.group(1)
+    val accountID =
+      AccountID(UUID.fromString(accountIDText))
+
+    return AccountOIDCParsedCallbackLogout(
+      account = accountID
+    )
+  }
+
+  private fun parseOIDCCallbackLogin(
+    data: URI,
+    matcher: Matcher
+  ): AccountOIDCParsedCallback {
     val accountIDText =
       matcher.group(1)
     val accountID =
@@ -105,14 +144,22 @@ object AccountOIDC {
       throw IllegalArgumentException("Failed to locate an access_token parameter: $data")
     }
 
-    return AccountOIDCParsedCallback(
+    return AccountOIDCParsedCallbackLogin(
       account = accountID,
       accessToken = accessToken
     )
   }
 
-  data class AccountOIDCParsedCallback(
-    val account: AccountID,
+  sealed interface AccountOIDCParsedCallback {
+    val account: AccountID
+  }
+
+  data class AccountOIDCParsedCallbackLogin(
+    override val account: AccountID,
     val accessToken: String
-  )
+  ) : AccountOIDCParsedCallback
+
+  data class AccountOIDCParsedCallbackLogout(
+    override val account: AccountID
+  ) : AccountOIDCParsedCallback
 }

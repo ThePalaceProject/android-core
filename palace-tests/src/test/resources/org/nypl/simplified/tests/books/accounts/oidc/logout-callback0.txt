@@ -1,0 +1,1 @@
+palace-oidc-callback://org.thepalaceproject.oidc/logout/8864fa60-6e5f-40f5-beb4-42f21c1fb139/

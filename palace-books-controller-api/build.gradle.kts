@@ -6,6 +6,8 @@ dependencies {
     implementation(project(":palace-books-api"))
     implementation(project(":palace-books-borrowing"))
     implementation(project(":palace-feeds-api"))
+    implementation(project(":palace-links"))
+    implementation(project(":palace-links-json"))
     implementation(project(":palace-opds-core"))
     implementation(project(":palace-presentableerror-api"))
     implementation(project(":palace-taskrecorder-api"))

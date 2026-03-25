@@ -23,6 +23,7 @@ import org.nypl.simplified.announcements.Announcement
 import org.nypl.simplified.announcements.AnnouncementJSON
 import org.nypl.simplified.json.core.JSONParseException
 import org.nypl.simplified.json.core.JSONParserUtilities
+import org.nypl.simplified.links.Link
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileInputStream
@@ -176,6 +177,17 @@ object AccountProvidersJSON {
         val logo = authentication.logoURI
         if (logo != null) {
           authObject.put("logo", logo.toString())
+        }
+        when (val logout = authentication.logout) {
+          is Link.LinkBasic -> {
+            authObject.put("logout", logout.href.toString())
+          }
+          is Link.LinkTemplated -> {
+            authObject.put("logoutTemplated", logout.href)
+          }
+          null -> {
+            // Nothing required.
+          }
         }
         authObject
       }
@@ -342,10 +354,25 @@ object AccountProvidersJSON {
         val description =
           JSONParserUtilities.getStringOrNull(container, "description") ?: ""
 
+        val logoutTemplated =
+          JSONParserUtilities.getStringOrNull(container, "logoutTemplated")
+        val logoutURI =
+          JSONParserUtilities.getURIOrNull(container, "logout")
+
+        val logout =
+          if (logoutTemplated != null) {
+            Link.LinkTemplated(logoutTemplated)
+          } else if (logoutURI != null) {
+            Link.LinkBasic(logoutURI)
+          } else {
+            null
+          }
+
         OpenIDConnect(
           authenticate = authURI,
           description = description,
-          logoURI = logoURI
+          logoURI = logoURI,
+          logout = logout
         )
       }
 

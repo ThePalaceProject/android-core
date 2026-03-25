@@ -707,7 +707,10 @@ class ProfileAccountLoginTaskTest {
         authenticationDescription = "Description",
         annotationsURI = URI("https://www.example.com"),
         deviceRegistrationURI = URI("https://www.example.com"),
-        patronAuthorization = PatronAuthorization("6120696828384", org.joda.time.Instant.parse("2019-08-02T00:00:00Z"))
+        patronAuthorization = PatronAuthorization(
+          "6120696828384",
+          org.joda.time.Instant.parse("2019-08-02T00:00:00Z")
+        )
       ),
       state.credentials
     )
@@ -745,7 +748,10 @@ class ProfileAccountLoginTaskTest {
         cookies = listOf(
           AccountCookie("https://example", "cookie0=23"),
           AccountCookie("https://fake", "cookie1=24; Path=/; Secure"),
-          AccountCookie("http://something", "cookie2=25; Path=/abc; Expires=Wed, 23 Dec 2020 07:28:00 GMT")
+          AccountCookie(
+            "http://something",
+            "cookie2=25; Path=/abc; Expires=Wed, 23 Dec 2020 07:28:00 GMT"
+          )
         )
       )
 
@@ -824,10 +830,16 @@ class ProfileAccountLoginTaskTest {
         cookies = listOf(
           AccountCookie("https://example", "cookie0=23"),
           AccountCookie("https://fake", "cookie1=24; Path=/; Secure"),
-          AccountCookie("http://something", "cookie2=25; Path=/abc; Expires=Wed, 23 Dec 2020 07:28:00 GMT")
+          AccountCookie(
+            "http://something",
+            "cookie2=25; Path=/abc; Expires=Wed, 23 Dec 2020 07:28:00 GMT"
+          )
         ),
         deviceRegistrationURI = URI("https://www.example.com"),
-        patronAuthorization = PatronAuthorization("6120696828384", org.joda.time.Instant.parse("2019-08-02T00:00:00Z"))
+        patronAuthorization = PatronAuthorization(
+          "6120696828384",
+          org.joda.time.Instant.parse("2019-08-02T00:00:00Z")
+        )
       ),
       state.credentials
     )
@@ -857,7 +869,10 @@ class ProfileAccountLoginTaskTest {
         cookies = listOf(
           AccountCookie("https://example", "cookie0=23"),
           AccountCookie("https://fake", "cookie1=24; Path=/; Secure"),
-          AccountCookie("http://something", "cookie2=25; Path=/abc; Expires=Wed, 23 Dec 2020 07:28:00 GMT")
+          AccountCookie(
+            "http://something",
+            "cookie2=25; Path=/abc; Expires=Wed, 23 Dec 2020 07:28:00 GMT"
+          )
         )
       )
 
@@ -1077,15 +1092,6 @@ class ProfileAccountLoginTaskTest {
     Mockito.argThat { x -> x != null }
 
 
-
-
-
-
-
-
-
-
-
   /**
    * Logging in with OIDC succeeds.
    */
@@ -1096,7 +1102,8 @@ class ProfileAccountLoginTaskTest {
       AccountProviderAuthenticationDescription.OpenIDConnect(
         description = "Description",
         logoURI = null,
-        authenticate = URI.create("http://localhost:${this.server.port}/")
+        authenticate = URI.create("http://localhost:${this.server.port}/"),
+        logout = null,
       )
     val request0 =
       ProfileAccountLoginRequest.OIDCInitiate(
@@ -1187,7 +1194,10 @@ class ProfileAccountLoginTaskTest {
         accessToken = "A TOKEN!",
         annotationsURI = URI("https://www.example.com"),
         deviceRegistrationURI = URI("https://www.example.com"),
-        patronAuthorization = PatronAuthorization("6120696828384", org.joda.time.Instant.parse("2019-08-02T00:00:00Z"))
+        patronAuthorization = PatronAuthorization(
+          "6120696828384",
+          org.joda.time.Instant.parse("2019-08-02T00:00:00Z")
+        )
       ),
       state.credentials
     )
@@ -1208,7 +1218,8 @@ class ProfileAccountLoginTaskTest {
       AccountProviderAuthenticationDescription.OpenIDConnect(
         description = "Description",
         logoURI = null,
-        authenticate = URI.create("http://localhost:10000/")
+        authenticate = URI.create("http://localhost:10000/"),
+        logout = null,
       )
     val request0 =
       ProfileAccountLoginRequest.OIDCComplete(
@@ -1279,7 +1290,8 @@ class ProfileAccountLoginTaskTest {
       AccountProviderAuthenticationDescription.OpenIDConnect(
         description = "Description",
         logoURI = null,
-        authenticate = URI.create("http://localhost:10000/")
+        authenticate = URI.create("http://localhost:10000/"),
+        logout = null,
       )
     val request0 =
       ProfileAccountLoginRequest.OIDCCancel(
@@ -1350,7 +1362,8 @@ class ProfileAccountLoginTaskTest {
       AccountProviderAuthenticationDescription.OpenIDConnect(
         description = "Description",
         logoURI = null,
-        authenticate = URI.create("http://localhost:${this.server.port}/")
+        authenticate = URI.create("http://localhost:${this.server.port}/"),
+        logout = null,
       )
     val request0 =
       ProfileAccountLoginRequest.OIDCInitiate(

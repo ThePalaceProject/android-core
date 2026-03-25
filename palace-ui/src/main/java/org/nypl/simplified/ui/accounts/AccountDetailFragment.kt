@@ -519,7 +519,7 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
         ProfileAccountLoginRequest.OIDCInitiate(
           accountId = account.id,
           description = authenticationDescription,
-          redirectURI = AccountOIDC.oidcCallbackURI(account.id)
+          redirectURI = AccountOIDC.oidcCallbackLoginURI(account.id)
         )
       )
     } catch (e: Throwable) {
@@ -682,7 +682,7 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
           logoutStatus = AsLogoutButtonEnabled {
             this.tryLogoutAfterConfirmation {
               this.formLock(FormLockState.LOGGING_OUT)
-              AccountDetailModel.tryLogout()
+              AccountDetailModel.tryLogout(this.requireActivity())
             }
           }
         )
@@ -810,7 +810,7 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
           logoutStatus = AsLogoutButtonEnabled {
             this.tryLogoutAfterConfirmation {
               this.formLock(FormLockState.LOGGING_OUT)
-              AccountDetailModel.tryLogout()
+              AccountDetailModel.tryLogout(this.requireActivity())
             }
           }
         )
@@ -884,7 +884,7 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
           logoutStatus = AsLogoutButtonEnabled {
             this.tryLogoutAfterConfirmation {
               this.formLock(FormLockState.LOGGING_OUT)
-              AccountDetailModel.tryLogout()
+              AccountDetailModel.tryLogout(this.requireActivity())
             }
           }
         )
@@ -1145,8 +1145,8 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
         .addOnFailureListener {
           this.showErrorGettingLocationDialog()
         }
-    } catch (exception: SecurityException) {
-      this.logger.error("Error handling fusedLocationClient permissions")
+    } catch (e: SecurityException) {
+      this.logger.error("Error handling fusedLocationClient permissions: ", e)
     }
   }
 

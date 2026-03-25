@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions
 import one.irradia.mime.api.MIMECompatibility
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType
+import org.librarysimplified.http.api.LSHTTPResponseStatus
 import org.librarysimplified.mdc.MDCKeys
 import org.nypl.drm.core.AdobeAdeptExecutorType
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
@@ -19,6 +20,8 @@ import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoginFailed
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLogoutFailed
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountNotLoggedIn
 import org.nypl.simplified.accounts.api.AccountLogoutStringResourcesType
+import org.nypl.simplified.accounts.api.AccountOIDC
+import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.adobe.extensions.AdobeDRMExtensions
 import org.nypl.simplified.books.book_registry.BookRegistryType
@@ -28,6 +31,7 @@ import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedLoaderResult
 import org.nypl.simplified.feeds.api.FeedLoaderType
+import org.nypl.simplified.links.Link
 import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.getOrNull
@@ -40,6 +44,7 @@ import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import java.net.URI
+import java.net.URLEncoder
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
@@ -111,6 +116,7 @@ class ProfileAccountLogoutTask(
       }
 
     return try {
+      this.runLogoutURLIfNecessary()
       this.runFCMTokenDeletion()
       this.runDeviceDeactivation()
       this.runUpdateOPDSEntries()
@@ -128,6 +134,78 @@ class ProfileAccountLogoutTask(
       val failure = this.steps.finishFailure<Unit>()
       this.account.setLoginState(AccountLogoutFailed(failure, this.credentials))
       failure
+    }
+  }
+
+  private fun runLogoutURLIfNecessary() {
+    this.steps.beginNewStep("Cancelling server session if applicable.")
+
+    when (val description = this.account.provider.authentication) {
+      null,
+      AccountProviderAuthenticationDescription.Anonymous,
+      is AccountProviderAuthenticationDescription.Basic,
+      is AccountProviderAuthenticationDescription.BasicToken,
+      is AccountProviderAuthenticationDescription.SAML2_0 -> {
+        this.steps.currentStepSucceeded("Not applicable.")
+        return
+      }
+      is AccountProviderAuthenticationDescription.OpenIDConnect -> {
+        val targetLink = when (val link = description.logout) {
+          is Link.LinkBasic -> {
+            link.href
+          }
+          is Link.LinkTemplated -> {
+            val target = AccountOIDC.oidcCallbackLogoutURI(this.account.id)
+            val text = link.href.replace("{&post_logout_redirect_uri}", "")
+            val uriBuilder = StringBuilder(text)
+            uriBuilder.append("&post_logout_redirect_uri=")
+            uriBuilder.append(URLEncoder.encode(target.toString(), "UTF-8"))
+            URI.create(uriBuilder.toString())
+          }
+          null -> {
+            null
+          }
+        }
+
+        if (targetLink == null) {
+          this.steps.currentStepSucceeded("No logout link provided.")
+          return
+        }
+
+        val request =
+          this.http.newRequest(targetLink)
+            .setAuthorization(AccountAuthenticatedHTTP.createAuthorizationIfPresent(account.loginState.credentials))
+            .build()
+
+        /*
+         * A failure to talk to the server is not treated as an error. Performing an OIDC
+         * logout is more of a convenience than anything.
+         */
+
+        val response = request.execute()
+        when (val status = response.status) {
+          is LSHTTPResponseStatus.Failed -> {
+            this.steps.currentStepFailed(
+              message = "Connecting to the server failed..",
+              errorCode = "connectionFailed",
+              exception = status.exception,
+              extraMessages = listOf()
+            )
+          }
+          is LSHTTPResponseStatus.Responded.Error -> {
+            this.steps.addAttributesIfPresent(status.properties.problemReport?.toMap())
+            this.steps.currentStepFailed(
+              message = "Server error: ${status.properties.status} ${status.properties.message}",
+              errorCode = "httpError ${status.properties.status} $targetLink",
+              exception = null,
+              extraMessages = listOf()
+            )
+          }
+          is LSHTTPResponseStatus.Responded.OK -> {
+            this.steps.currentStepSucceeded("Server accepted the logout request.")
+          }
+        }
+      }
     }
   }
 

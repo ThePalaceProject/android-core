@@ -318,6 +318,8 @@ class AccountProviderResolution(
       authObject.links.find { link -> link.relation == "authenticate" }
     val logo =
       authObject.links.find { link -> link.relation == "logo" }
+    val logout =
+      authObject.links.find { link -> link.relation == "logout" }
 
     val authenticateURI = authenticate?.hrefURI
     if (authenticateURI == null) {
@@ -333,7 +335,8 @@ class AccountProviderResolution(
     return AccountProviderAuthenticationDescription.OpenIDConnect(
       authenticate = authenticateURI,
       description = authObject.description,
-      logoURI = logo?.hrefURI
+      logoURI = logo?.hrefURI,
+      logout = logout
     )
   }
 

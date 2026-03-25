@@ -74,7 +74,9 @@ object AccountDetailModel {
     )
   }
 
-  fun tryLogout() {
+  fun tryLogout(
+    activity: Activity
+  ) {
     val services =
       Services.serviceDirectory()
     val profiles =

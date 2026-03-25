@@ -89,12 +89,19 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
         val profiles =
           services.requireService(ProfilesControllerType::class.java)
 
-        profiles.profileAccountLogin(
-          ProfileAccountLoginRequest.OIDCComplete(
-            accountId = parsed.account,
-            accessToken = parsed.accessToken
-          )
-        )
+        when (parsed) {
+          is AccountOIDC.AccountOIDCParsedCallbackLogin -> {
+            profiles.profileAccountLogin(
+              ProfileAccountLoginRequest.OIDCComplete(
+                accountId = parsed.account,
+                accessToken = parsed.accessToken
+              )
+            )
+          }
+          is AccountOIDC.AccountOIDCParsedCallbackLogout -> {
+            // XXX: There is nothing sensible that we can do here, currently.
+          }
+        }
       }
     } catch (e: Throwable) {
       this.logger.error("Failed to handle intent: ", e)

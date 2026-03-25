@@ -5,6 +5,8 @@ dependencies {
     implementation(project(":palace-accounts-database-api"))
     implementation(project(":palace-books-api"))
     implementation(project(":palace-feeds-api"))
+    implementation(project(":palace-links"))
+    implementation(project(":palace-links-json"))
     implementation(project(":palace-profiles-api"))
     implementation(project(":palace-taskrecorder-api"))
 
