@@ -163,6 +163,14 @@ class Controller private constructor(
         .subscribe(this::onProfileUpdated)
 
     this.updateCrashlytics()
+
+    this.submitTask {
+      this.logger.debug("Scheduling profile data load...")
+      ProfileDataLoadTask(
+        this.profiles.currentProfile(),
+        this.bookRegistry
+      ).run()
+    }
   }
 
   private fun onProfileUpdated(event: ProfileUpdated) {
