@@ -170,10 +170,8 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
       this.requireContext()
 
     if (profilePrefs.downloadOnlyOnWIFI) {
-      downloadSwitch.title = context.getString(R.string.settingsNetworkWIFIOnlyEnabled)
       downloadSwitch.isChecked = true
     } else {
-      downloadSwitch.title = context.getString(R.string.settingsNetworkWIFIOnlyDisabled)
       downloadSwitch.isChecked = false
     }
 

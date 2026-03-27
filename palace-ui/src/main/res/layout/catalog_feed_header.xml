@@ -20,7 +20,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/catalogFeedHeaderFacets"
         android:layout_width="0dp"
-        android:layout_height="48dp"
+        android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
@@ -36,8 +36,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:ellipsize="end"
-            android:maxLines="1"
-            android:textSize="18sp"
+            android:maxLines="4"
+            android:textSize="12sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/catalogFeedFacetSort"
@@ -52,11 +52,9 @@
             android:background="?selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/catalogFeedFacetFilter"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -91,7 +89,6 @@
             android:orientation="horizontal"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
