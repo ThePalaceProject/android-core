@@ -51,6 +51,8 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
   private final OptionType<DRMLicensor> licensor;
   private final ArrayList<ParseError> errors;
   private OptionType<Double> duration;
+  private OptionType<String> language;
+
   private OPDSAcquisitionFeedEntry(
     final List<String> in_authors,
     final List<OPDSAcquisition> in_acquisitions,
@@ -76,7 +78,8 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     final OptionType<URI> in_analytics,
     final OptionType<DRMLicensor> in_licensor,
     final OptionType<Double> in_duration,
-    final ArrayList<ParseError> in_errors) {
+    final ArrayList<ParseError> in_errors,
+    final OptionType<String> in_language) {
     this.authors = NullCheck.notNull(Collections.unmodifiableList(in_authors));
     this.acquisitions = NullCheck.notNull(Collections.unmodifiableList(in_acquisitions));
     this.availability = NullCheck.notNull(in_availability);
@@ -102,6 +105,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     this.licensor = NullCheck.notNull(in_licensor);
     this.duration = NullCheck.notNull(in_duration);
     this.errors = NullCheck.notNull(in_errors);
+    this.language = NullCheck.notNull(in_language);
   }
 
   /**
@@ -167,6 +171,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     b.setAlternateOption(e.getAlternate());
     b.setAnalyticsOption(e.getAnalytics());
     b.setLicensorOption(e.getLicensor());
+    b.setLanguageOption(e.getLanguage());
 
     {
       final String summary = e.getSummary();
@@ -386,6 +391,13 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
   }
 
   /**
+   * @return The licensor
+   */
+  public OptionType<String> getLanguage() {
+    return this.language;
+  }
+
+  /**
    * @return The title
    */
 
@@ -515,6 +527,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     private final String title;
     private final DateTime updated;
     private final ArrayList<ParseError> errors;
+    private OptionType<String> language;
     private OPDSAvailabilityType availability;
     private OptionType<URI> cover;
     private List<OPDSPreviewAcquisition> previews;
@@ -565,6 +578,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
       this.groups = new HashSet<Pair<String, URI>>(8);
       this.licensor = Option.none();
       this.duration = Option.none();
+      this.language = Option.none();
     }
 
     @Override
@@ -631,7 +645,9 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
         this.analytics,
         this.licensor,
         this.duration,
-        this.errors);
+        this.errors,
+        this.language
+      );
     }
 
     @Override
@@ -762,6 +778,12 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     @Override
     public OPDSAcquisitionFeedEntryBuilderType setDurationOption(OptionType<Double> duration) {
       this.duration = NullCheck.notNull(duration);
+      return this;
+    }
+
+    @Override
+    public OPDSAcquisitionFeedEntryBuilderType setLanguageOption(OptionType<String> language) {
+      this.language = NullCheck.notNull(language);
       return this;
     }
   }

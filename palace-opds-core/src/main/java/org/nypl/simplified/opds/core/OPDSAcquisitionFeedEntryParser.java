@@ -216,10 +216,33 @@ public final class OPDSAcquisitionFeedEntryParser implements OPDSAcquisitionFeed
     entry_builder.setPublisherOption(findPublisher(element));
     entry_builder.setDistribution(findDistribution(element));
     entry_builder.setPublishedOption(OPDSAtom.findPublished(element));
+    entry_builder.setLanguageOption(findLanguage(element));
     entry_builder.setSummaryOption(
       OPDSXML.getFirstChildElementTextWithNameOptional(element, ATOM_URI, "summary"));
 
     return entry_builder.build();
+  }
+
+  private OptionType<String> findLanguage(Element element) {
+    try {
+      final OptionType<String> child =
+        OPDSXML.getFirstChildElementTextWithNameOptional(
+          element,
+          DUBLIN_CORE_TERMS_URI,
+          "language"
+        );
+
+      if (child.isSome()) {
+        var childSome = ((Some<String>) child);
+        var locale = Locale.forLanguageTag(childSome.get());
+        if (locale != null) {
+          return Option.some(locale.getDisplayLanguage());
+        }
+      }
+      return Option.none();
+    } catch (Exception e) {
+      return Option.none();
+    }
   }
 
   private OptionType<Double> findDuration(Element element) {

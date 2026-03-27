@@ -212,4 +212,5 @@ public interface OPDSAcquisitionFeedEntryBuilderType {
   OPDSAcquisitionFeedEntryBuilderType setDurationOption(
     OptionType<Double> duration);
 
+    OPDSAcquisitionFeedEntryBuilderType setLanguageOption(OptionType<String> language);
 }

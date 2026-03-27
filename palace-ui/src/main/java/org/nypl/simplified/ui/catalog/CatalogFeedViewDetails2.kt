@@ -613,6 +613,15 @@ class CatalogFeedViewDetails2(
       rowVal.text = this.formatDuration(durationValue)
       this.metadata.addView(row)
     }
+
+    val language = entry.language
+    if (language.isSome) {
+      val languageValue = (language as Some<String>).get()
+      val (row, rowKey, rowVal) = this.bookInfoViewOf()
+      rowKey.text = this.root.resources.getString(R.string.catalogMetaLanguage)
+      rowVal.text = languageValue
+      this.metadata.addView(row)
+    }
   }
 
   fun setNoRelatedFeed() {
