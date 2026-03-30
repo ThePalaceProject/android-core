@@ -83,9 +83,8 @@
     <string name="settingsNotificationsEnabled">Notifications are enabled.\nDisabling notifications will restart the application.</string>
     <string name="settingsNotificationsDisabled">Notifications are disabled.</string>
     <string name="settingsNetwork">Network</string>
-    <string name="settingsNetworkWIFIOnly">Only download books when Wi-Fi is available.</string>
-    <string name="settingsNetworkWIFIOnlyEnabled">Download only on Wi-Fi.</string>
-    <string name="settingsNetworkWIFIOnlyDisabled">Download when any network is available.</string>
+    <string name="settingsNetworkDownloadWIFI">Download Only on Wi-Fi</string>
+    <string name="settingsNetworkWIFIOnlyEnabled">When enabled, books and audiobooks will only download over Wi-Fi. Downloads will be blocked on cellular data.</string>
     <string name="settingsAccessibilitySearchButton">Library Search Button</string>
     <string name="settingsAccessibilitySearchButtonClose">Close Search Button</string>
 </resources>

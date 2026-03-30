@@ -18,9 +18,10 @@
 
     <PreferenceCategory android:title="@string/settingsNetwork">
         <SwitchPreferenceCompat
+            app:singleLineTitle="false"
+            android:summary="@string/settingsNetworkWIFIOnlyEnabled"
             android:key="settingsNetworkDownloadWIFIOnly"
-            android:summary=""
-            android:title="@string/settingsNetworkWIFIOnlyDisabled" />
+            android:title="@string/settingsNetworkDownloadWIFI" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/settingsDocumentation">

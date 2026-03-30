@@ -166,14 +166,9 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
     profiles: ProfilesControllerType,
     profilePrefs: ProfilePreferences
   ) {
-    val context =
-      this.requireContext()
-
     if (profilePrefs.downloadOnlyOnWIFI) {
-      downloadSwitch.title = context.getString(R.string.settingsNetworkWIFIOnlyEnabled)
       downloadSwitch.isChecked = true
     } else {
-      downloadSwitch.title = context.getString(R.string.settingsNetworkWIFIOnlyDisabled)
       downloadSwitch.isChecked = false
     }
 
