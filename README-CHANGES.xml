@@ -1072,7 +1072,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-03-30T19:32:06+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.26.3">
+    <c:release date="2026-03-30T19:52:48+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.26.3">
       <c:changes>
         <c:change date="2026-02-18T00:00:00+00:00" summary="Only activate Adobe devices on first fulfillment.">
           <c:tickets>
