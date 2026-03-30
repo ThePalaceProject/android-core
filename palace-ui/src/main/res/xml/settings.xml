@@ -16,11 +16,13 @@
             android:title="@string/settingsNotificationsEnabled" />
     </PreferenceCategory>
 
-    <SwitchPreferenceCompat
-        android:summaryOff="@string/settingsNetworkWIFIOnlyDisabled"
-        android:summaryOn="@string/settingsNetworkWIFIOnlyEnabled"
-        android:key="settingsNetworkDownloadWIFIOnly"
-        android:title="@string/settingsNetwork" />
+    <PreferenceCategory android:title="@string/settingsNetwork">
+        <SwitchPreferenceCompat
+            app:singleLineTitle="false"
+            android:summary="@string/settingsNetworkWIFIOnlyEnabled"
+            android:key="settingsNetworkDownloadWIFIOnly"
+            android:title="@string/settingsNetworkDownloadWIFI" />
+    </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/settingsDocumentation">
         <Preference
