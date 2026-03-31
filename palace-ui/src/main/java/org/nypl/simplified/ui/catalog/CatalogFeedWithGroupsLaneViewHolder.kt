@@ -7,14 +7,12 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import org.librarysimplified.ui.R
-import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedGroup
 import org.nypl.simplified.ui.catalog.CatalogFeedWithGroupsLaneViewHolder.LaneStyle.MAIN_GROUPED_FEED_LANE
 import org.nypl.simplified.ui.catalog.CatalogFeedWithGroupsLaneViewHolder.LaneStyle.RELATED_BOOKS_LANE
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
-import java.net.URI
 
 /**
  * A `ViewHolder` that represents a single swimlane within the [CatalogFeedWithGroupsAdapter].
@@ -24,8 +22,7 @@ class CatalogFeedWithGroupsLaneViewHolder(
   private val screenSize: ScreenSizeInformationType,
   private val coverLoader: BookCoverProviderType,
   private val laneStyle: LaneStyle,
-  private val onFeedSelected: (accountID: AccountID, title: String, uri: URI) -> Unit,
-  private val onBookSelected: (FeedEntry.FeedEntryOPDS) -> Unit
+  private val callbacks: CatalogViewCallbacksType,
 ) : RecyclerView.ViewHolder(parent) {
 
   enum class LaneStyle {
@@ -102,10 +99,10 @@ class CatalogFeedWithGroupsLaneViewHolder(
 
     this.title.text = group.groupTitle
     this.title.setOnClickListener {
-      this.onFeedSelected.invoke(group.account, group.groupTitle, group.groupURI)
+      this.callbacks.onFeedSelected(group.account, group.groupTitle, group.groupURI)
     }
     this.more.setOnClickListener {
-      this.onFeedSelected.invoke(group.account, group.groupTitle, group.groupURI)
+      this.callbacks.onFeedSelected(group.account, group.groupTitle, group.groupURI)
     }
 
     /*
@@ -124,7 +121,7 @@ class CatalogFeedWithGroupsLaneViewHolder(
     val catalogLaneAdapter =
       CatalogLaneAdapter(
         coverLoader = this.coverLoader,
-        onBookSelected = this.onBookSelected
+        callbacks = this.callbacks,
       )
 
     catalogLaneAdapter.submitList(group.groupEntries.filterIsInstance<FeedEntry.FeedEntryOPDS>())

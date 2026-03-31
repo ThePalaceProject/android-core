@@ -36,7 +36,6 @@ import org.joda.time.format.DateTimeFormatterBuilder
 import org.librarysimplified.ui.R
 import org.librarysimplified.ui.bottomsheet.PalaceBottomSheet
 import org.librarysimplified.ui.bottomsheet.PalaceBottomSheetType
-import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
@@ -71,7 +70,6 @@ import org.nypl.simplified.feeds.api.FeedLoaderResult
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedAuthentication
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedGeneral
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderSuccess
-import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.catalog.CatalogFeedViewDetails2.InfoState.BORROWING
 import org.nypl.simplified.ui.catalog.CatalogFeedViewDetails2.InfoState.BORROWING_AND_PROGRESS
@@ -80,24 +78,13 @@ import org.nypl.simplified.ui.catalog.CatalogFeedViewDetails2.InfoState.NONE
 import org.nypl.simplified.ui.catalog.CatalogFeedViewDetails2.InfoState.PROGRESS
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.slf4j.LoggerFactory
-import java.net.URI
 
 class CatalogFeedViewDetails2(
   override val root: ViewGroup,
   private val screenSize: ScreenSizeInformationType,
   private val layoutInflater: LayoutInflater,
   private val covers: BookCoverProviderType,
-  private val onToolbarBackPressed: () -> Unit,
-  private val onShowErrorDetails: (TaskResult.Failure<*>) -> Unit,
-  private val onBookSAMLDownloadRequested: (CatalogBookStatus<DownloadWaitingForExternalAuthentication>) -> Unit,
-  private val onBookBorrowRequested: (CatalogBorrowParameters) -> Unit,
-  private val onBookBorrowCancelRequested: (CatalogBookStatus<*>) -> Unit,
-  private val onBookCanBeRevoked: (CatalogBookStatus<*>) -> Boolean,
-  private val onBookPreviewOpenRequested: (CatalogBookStatus<*>) -> Unit,
-  private val onBookRevokeRequested: (CatalogBookStatus<*>) -> Unit,
-  private val onBookViewerOpen: (Book, BookFormat) -> Unit,
-  private val onBookSelected: (FeedEntry.FeedEntryOPDS) -> Unit,
-  private val onFeedSelected: (accountID: AccountID, title: String, uri: URI) -> Unit,
+  private val callbacks: CatalogViewCallbacksType,
 ) : CatalogFeedView() {
 
   private var loanExpiryDate: DateTime? = null
@@ -166,11 +153,10 @@ class CatalogFeedViewDetails2(
     this.scrollView.findViewById<View>(R.id.bookD2RelatedBooksDivider)
   private val relatedAdapter =
     CatalogFeedWithGroupsAdapter(
+      callbacks = this.callbacks,
       covers = this.covers,
-      screenSize = this.screenSize,
       laneStyle = CatalogFeedWithGroupsLaneViewHolder.LaneStyle.RELATED_BOOKS_LANE,
-      onFeedSelected = this.onFeedSelected,
-      onBookSelected = this.onBookSelected
+      screenSize = this.screenSize,
     )
 
   private val toolbarItemsWhenCollapsed =
@@ -428,7 +414,7 @@ class CatalogFeedViewDetails2(
     this.root.post(root::requestLayout)
 
     this.backButton.setOnClickListener {
-      this.onToolbarBackPressed()
+      this.callbacks.onToolbarBackPressed()
     }
   }
 
@@ -752,34 +738,14 @@ class CatalogFeedViewDetails2(
       screenSize: ScreenSizeInformationType,
       container: ViewGroup,
       covers: BookCoverProviderType,
-      onShowErrorDetails: (TaskResult.Failure<*>) -> Unit,
-      onBookSAMLDownloadRequested: (CatalogBookStatus<DownloadWaitingForExternalAuthentication>) -> Unit,
-      onBookBorrowRequested: (CatalogBorrowParameters) -> Unit,
-      onBookBorrowCancelRequested: (CatalogBookStatus<*>) -> Unit,
-      onBookCanBeRevoked: (CatalogBookStatus<*>) -> Boolean,
-      onBookPreviewOpenRequested: (CatalogBookStatus<*>) -> Unit,
-      onBookRevokeRequested: (CatalogBookStatus<*>) -> Unit,
-      onBookViewerOpen: (Book, BookFormat) -> Unit,
-      onToolbarBackPressed: () -> Unit,
-      onFeedSelected: (accountID: AccountID, title: String, uri: URI) -> Unit,
-      onBookSelected: (FeedEntry.FeedEntryOPDS) -> Unit,
+      callbacks: CatalogViewCallbacksType,
     ): CatalogFeedViewDetails2 {
       return CatalogFeedViewDetails2(
         root = layoutInflater.inflate(R.layout.book_detail2, container, true) as ViewGroup,
         screenSize = screenSize,
         layoutInflater = layoutInflater,
         covers = covers,
-        onToolbarBackPressed = onToolbarBackPressed,
-        onBookSAMLDownloadRequested = onBookSAMLDownloadRequested,
-        onShowErrorDetails = onShowErrorDetails,
-        onBookBorrowRequested = onBookBorrowRequested,
-        onBookBorrowCancelRequested = onBookBorrowCancelRequested,
-        onBookCanBeRevoked = onBookCanBeRevoked,
-        onBookPreviewOpenRequested = onBookPreviewOpenRequested,
-        onBookRevokeRequested = onBookRevokeRequested,
-        onBookViewerOpen = onBookViewerOpen,
-        onBookSelected = onBookSelected,
-        onFeedSelected = onFeedSelected,
+        callbacks = callbacks,
       )
     }
   }
@@ -905,10 +871,10 @@ class CatalogFeedViewDetails2(
       accessibilityTextOverride = null,
       actionInPage = {
         this.openDrawer()
-        this.onBookBorrowRequested(status.toBorrowParameters())
+        this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
       },
       actionInBottomSheet = {
-        this.onBookBorrowRequested(status.toBorrowParameters())
+        this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
       }
     )
     this.reconfigureButton1(
@@ -917,7 +883,7 @@ class CatalogFeedViewDetails2(
       actionInPage = {
         this.openDrawer()
       },
-      actionInBottomSheet = { this.onShowErrorDetails(status.status.result) }
+      actionInBottomSheet = { this.callbacks.onErrorDetailsDisplayRequested(status.status.result) }
     )
   }
 
@@ -936,10 +902,10 @@ class CatalogFeedViewDetails2(
       accessibilityTextOverride = null,
       actionInPage = {
         this.openDrawer()
-        this.onBookBorrowRequested(status.toBorrowParameters())
+        this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
       },
       actionInBottomSheet = {
-        this.onBookBorrowRequested(status.toBorrowParameters())
+        this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
       }
     )
     this.reconfigureButton1(
@@ -948,7 +914,7 @@ class CatalogFeedViewDetails2(
       actionInPage = {
         this.openDrawer()
       },
-      actionInBottomSheet = { this.onShowErrorDetails(status.status.result) }
+      actionInBottomSheet = { this.callbacks.onErrorDetailsDisplayRequested(status.status.result) }
     )
   }
 
@@ -967,17 +933,17 @@ class CatalogFeedViewDetails2(
       accessibilityTextOverride = null,
       actionInPage = {
         this.openDrawer()
-        this.onBookRevokeRequested(status)
+        this.callbacks.onBookRequestRevoke(status.book)
       },
       actionInBottomSheet = {
-        this.onBookRevokeRequested(status)
+        this.callbacks.onBookRequestRevoke(status.book)
       }
     )
     this.reconfigureButton1(
       text = R.string.catalogDetails,
       accessibilityTextOverride = null,
       actionInPage = { this.openDrawer() },
-      actionInBottomSheet = { this.onShowErrorDetails(status.status.result) }
+      actionInBottomSheet = { this.callbacks.onErrorDetailsDisplayRequested(status.status.result) }
     )
   }
 
@@ -996,17 +962,17 @@ class CatalogFeedViewDetails2(
       accessibilityTextOverride = null,
       actionInPage = {
         this.openDrawer()
-        this.onBookRevokeRequested(status)
+        this.callbacks.onBookRequestRevoke(status.book)
       },
       actionInBottomSheet = {
-        this.onBookRevokeRequested(status)
+        this.callbacks.onBookRequestRevoke(status.book)
       }
     )
     this.reconfigureButton1(
       text = R.string.catalogDetails,
       accessibilityTextOverride = null,
       actionInPage = { this.openDrawer() },
-      actionInBottomSheet = { this.onShowErrorDetails(status.status.result) }
+      actionInBottomSheet = { this.callbacks.onErrorDetailsDisplayRequested(status.status.result) }
     )
   }
 
@@ -1025,17 +991,17 @@ class CatalogFeedViewDetails2(
       accessibilityTextOverride = null,
       actionInPage = {
         this.openDrawer()
-        this.onBookBorrowRequested(status.toBorrowParameters())
+        this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
       },
       actionInBottomSheet = {
-        this.onBookBorrowRequested(status.toBorrowParameters())
+        this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
       }
     )
     this.reconfigureButton1(
       text = R.string.catalogDetails,
       accessibilityTextOverride = null,
       actionInPage = { this.openDrawer() },
-      actionInBottomSheet = { this.onShowErrorDetails(status.status.result) }
+      actionInBottomSheet = { this.callbacks.onErrorDetailsDisplayRequested(status.status.result) }
     )
   }
 
@@ -1054,17 +1020,17 @@ class CatalogFeedViewDetails2(
       accessibilityTextOverride = null,
       actionInPage = {
         this.openDrawer()
-        this.onBookBorrowRequested(status.toBorrowParameters())
+        this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
       },
       actionInBottomSheet = {
-        this.onBookBorrowRequested(status.toBorrowParameters())
+        this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
       }
     )
     this.reconfigureButton1(
       text = R.string.catalogDetails,
       accessibilityTextOverride = null,
       actionInPage = { this.openDrawer() },
-      actionInBottomSheet = { this.onShowErrorDetails(status.status.result) }
+      actionInBottomSheet = { this.callbacks.onErrorDetailsDisplayRequested(status.status.result) }
     )
   }
 
@@ -1102,10 +1068,10 @@ class CatalogFeedViewDetails2(
       accessibilityTextOverride = this.root.resources.getString(R.string.catalogAccessibilityBookManageHold, status.book.entry.title),
       actionInPage = {
         this.openDrawer()
-        this.onBookRevokeRequested(status)
+        this.callbacks.onBookRequestRevoke(status.book)
       },
       actionInBottomSheet = {
-        this.onBookRevokeRequested(status)
+        this.callbacks.onBookRequestRevoke(status.book)
       }
     )
 
@@ -1190,10 +1156,10 @@ class CatalogFeedViewDetails2(
       accessibilityTextOverride = this.root.resources.getString(R.string.catalogAccessibilityBookBorrow, status.book.entry.title),
       actionInPage = {
         this.openDrawer()
-        this.onBookBorrowRequested(status.toBorrowParameters())
+        this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
       },
       actionInBottomSheet = {
-        this.onBookBorrowRequested(status.toBorrowParameters())
+        this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
       }
     )
 
@@ -1213,10 +1179,10 @@ class CatalogFeedViewDetails2(
       accessibilityTextOverride = this.root.resources.getString(R.string.catalogAccessibilityBookPlaceHold, status.book.entry.title),
       actionInPage = {
         this.openDrawer()
-        this.onBookBorrowRequested(status.toBorrowParameters())
+        this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
       },
       actionInBottomSheet = {
-        this.onBookBorrowRequested(status.toBorrowParameters())
+        this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
       }
     )
     this.reconfigurePreviewButton(status)
@@ -1237,10 +1203,10 @@ class CatalogFeedViewDetails2(
       accessibilityTextOverride = this.root.resources.getString(R.string.catalogAccessibilityBookBorrow, status.book.entry.title),
       actionInPage = {
         this.openDrawer()
-        this.onBookBorrowRequested(status.toBorrowParameters())
+        this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
       },
       actionInBottomSheet = {
-        this.onBookBorrowRequested(status.toBorrowParameters())
+        this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
       }
     )
     this.reconfigurePreviewButton(status)
@@ -1255,8 +1221,8 @@ class CatalogFeedViewDetails2(
         this.reconfigureButton1(
           text = R.string.catalogPreview,
           accessibilityTextOverride = this.root.resources.getString(R.string.catalogAccessibilityBookPreviewRead, status.book.entry.title),
-          actionInPage = { this.onBookPreviewOpenRequested(status) },
-          actionInBottomSheet = { this.onBookPreviewOpenRequested(status) }
+          actionInPage = { this.callbacks.onBookRequestPreviewOpen(status.book) },
+          actionInBottomSheet = { this.callbacks.onBookRequestPreviewOpen(status.book) }
         )
       }
 
@@ -1291,22 +1257,22 @@ class CatalogFeedViewDetails2(
       this.reconfigureButton0(
         text = this.readButtonString(status.book),
         accessibilityTextOverride = this.root.resources.getString(R.string.catalogAccessibilityBookRead, status.book.entry.title),
-        actionInPage = { this.onBookViewerOpen(status.book, format) },
-        actionInBottomSheet = { this.onBookViewerOpen(status.book, format) }
+        actionInPage = { this.callbacks.onBookRequestViewerOpen(status.book, format) },
+        actionInBottomSheet = { this.callbacks.onBookRequestViewerOpen(status.book, format) }
       )
     }
 
-    if (this.onBookCanBeRevoked.invoke(status)) {
+    if (this.callbacks.onBookCanBeRevoked(status.book, status.status)) {
       this.enableButton1Status = true
       this.reconfigureButton1(
         text = R.string.catalogReturn,
         accessibilityTextOverride = this.root.resources.getString(R.string.catalogAccessibilityBookRevokeLoan, status.book.entry.title),
         actionInPage = {
           this.openDrawer()
-          this.onBookRevokeRequested(status)
+          this.callbacks.onBookRequestRevoke(status.book)
         },
         actionInBottomSheet = {
-          this.onBookRevokeRequested(status)
+          this.callbacks.onBookRequestRevoke(status.book)
         }
       )
     } else {
@@ -1348,24 +1314,24 @@ class CatalogFeedViewDetails2(
       accessibilityTextOverride = this.root.resources.getString(R.string.catalogAccessibilityBookDownload, status.book.entry.title),
       actionInPage = {
         this.openDrawer()
-        this.onBookBorrowRequested(status.toBorrowParameters())
+        this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
       },
       actionInBottomSheet = {
-        this.onBookBorrowRequested(status.toBorrowParameters())
+        this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
       }
     )
 
-    if (this.onBookCanBeRevoked.invoke(status)) {
+    if (this.callbacks.onBookCanBeRevoked(status.book, status.status)) {
       this.enableButton1Status = true
       this.reconfigureButton1(
         text = R.string.catalogReturn,
         accessibilityTextOverride = this.root.resources.getString(R.string.catalogAccessibilityBookRevokeLoan, status.book.entry.title),
         actionInPage = {
           this.openDrawer()
-          this.onBookRevokeRequested(status)
+          this.callbacks.onBookRequestRevoke(status.book)
         },
         actionInBottomSheet = {
-          this.onBookRevokeRequested(status)
+          this.callbacks.onBookRequestRevoke(status.book)
         }
       )
     } else {
@@ -1473,10 +1439,10 @@ class CatalogFeedViewDetails2(
       accessibilityTextOverride = this.root.resources.getString(R.string.catalogAccessibilityBookDownloadCancel, status.book.entry.title),
       actionInPage = {
         this.openDrawer()
-        this.onBookBorrowCancelRequested(status)
+        this.callbacks.onBookRequestBorrowCancel(status.book)
       },
       actionInBottomSheet = {
-        this.onBookBorrowCancelRequested(status)
+        this.callbacks.onBookRequestBorrowCancel(status.book)
       }
     )
   }
@@ -1507,7 +1473,7 @@ class CatalogFeedViewDetails2(
       }
     }
 
-    this.onBookSAMLDownloadRequested(status)
+    this.callbacks.onBookRequestSAMLDownload(status)
   }
 
   private fun onBookStatusDownloadExternalAuthenticationInProgress(

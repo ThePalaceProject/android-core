@@ -22,7 +22,6 @@ import org.joda.time.format.DateTimeFormat
 import org.librarysimplified.ui.R
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
-import org.nypl.simplified.books.book_registry.BookPreviewStatus
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookStatus.DownloadExternalAuthenticationInProgress
 import org.nypl.simplified.books.book_registry.BookStatus.DownloadWaitingForExternalAuthentication
@@ -55,21 +54,14 @@ import org.nypl.simplified.opds.core.OPDSAvailabilityMatcherType
 import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
 import org.nypl.simplified.opds.core.OPDSAvailabilityRevoked
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
-import org.nypl.simplified.taskrecorder.api.TaskResult
 
 class CatalogFeedPagingDataAdapter(
   private val covers: BookCoverProviderType,
   private val profiles: ProfilesControllerType,
   private val buttonCreator: CatalogButtons,
   private val registryEvents: CatalogBookRegistryEvents,
-  private val onBookSelected: (FeedEntry.FeedEntryOPDS) -> Unit,
-  private val onBookErrorDismiss: (CatalogBookStatus<*>) -> Unit,
-  private val onBookBorrow: (CatalogBorrowParameters) -> Unit,
-  private val onBookRevoke: (CatalogBookStatus<*>) -> Unit,
-  private val onBookViewerOpen: (Book, BookFormat) -> Unit,
-  private val onBookDelete: (CatalogBookStatus<*>) -> Unit,
-  private val onShowTaskError: (TaskResult.Failure<*>) -> Unit,
-) : PagingDataAdapter<FeedEntry, CatalogFeedPagingDataAdapter.ViewHolder>(org.nypl.simplified.ui.catalog.CatalogFeedPagingDataAdapter.Companion.diffCallback) {
+  private val callbacks: CatalogViewCallbacksType,
+) : PagingDataAdapter<FeedEntry, CatalogFeedPagingDataAdapter.ViewHolder>(diffCallback) {
 
   companion object {
     private val loanEndFormatter =
@@ -197,7 +189,7 @@ class CatalogFeedPagingDataAdapter(
               .subscribe { event -> this.onStatusChangedForFeedEntry(item) }
 
           for (v in listOf(this.view, this.idle, this.error, this.corrupt, this.progress)) {
-            v.setOnClickListener { this@CatalogFeedPagingDataAdapter.onBookSelected(item) }
+            v.setOnClickListener { this@CatalogFeedPagingDataAdapter.callbacks.onBookSelected(item) }
           }
 
           this.setVisible(this.idleCover, false)
@@ -409,10 +401,10 @@ class CatalogFeedPagingDataAdapter(
       this.setVisible(this.progress, false)
 
       this.errorDismiss.setOnClickListener {
-        this.onBookErrorDismiss(book, status)
+        this.onBookErrorDismiss(book)
       }
       this.errorDetails.setOnClickListener {
-        this@CatalogFeedPagingDataAdapter.onShowTaskError(status.result)
+        this@CatalogFeedPagingDataAdapter.callbacks.onErrorDetailsDisplayRequested(status.result)
       }
       this.errorRetry.setText(R.string.catalogRetry)
       this.errorRetry.setOnClickListener {
@@ -430,10 +422,10 @@ class CatalogFeedPagingDataAdapter(
       this.setVisible(this.progress, false)
 
       this.errorDismiss.setOnClickListener {
-        this.onBookErrorDismiss(book, status)
+        this.onBookErrorDismiss(book)
       }
       this.errorDetails.setOnClickListener {
-        this@CatalogFeedPagingDataAdapter.onShowTaskError(status.result)
+        this@CatalogFeedPagingDataAdapter.callbacks.onErrorDetailsDisplayRequested(status.result)
       }
       this.errorRetry.setText(R.string.accountLogin)
       this.errorRetry.setOnClickListener {
@@ -442,43 +434,35 @@ class CatalogFeedPagingDataAdapter(
     }
 
     private fun onBookErrorDismiss(
-      book: Book,
-      status: BookStatus
+      book: Book
     ) {
-      this@CatalogFeedPagingDataAdapter.onBookErrorDismiss(
-        CatalogBookStatus(book, status, previewStatus = BookPreviewStatus.None)
-      )
+      this@CatalogFeedPagingDataAdapter.callbacks.onBookRequestDismissError(book)
     }
 
     private fun onBookRevoke(
       book: Book,
       status: BookStatus
     ) {
-      this@CatalogFeedPagingDataAdapter.onBookRevoke(
-        CatalogBookStatus(book, status, previewStatus = BookPreviewStatus.None)
-      )
+      this@CatalogFeedPagingDataAdapter.callbacks.onBookRequestRevoke(book)
     }
 
     private fun onBookViewerOpen(
       book: Book,
       bookFormat: BookFormat
     ) {
-      this@CatalogFeedPagingDataAdapter.onBookViewerOpen(book, bookFormat)
+      this@CatalogFeedPagingDataAdapter.callbacks.onBookRequestViewerOpen(book, bookFormat)
     }
 
     private fun onBookDelete(
-      book: Book,
-      status: BookStatus
+      book: Book
     ) {
-      this@CatalogFeedPagingDataAdapter.onBookDelete(
-        CatalogBookStatus(book, status, previewStatus = BookPreviewStatus.None)
-      )
+      this@CatalogFeedPagingDataAdapter.callbacks.onBookRequestDelete(book)
     }
 
     private fun onBookBorrow(
       book: Book
     ) {
-      this@CatalogFeedPagingDataAdapter.onBookBorrow(
+      this@CatalogFeedPagingDataAdapter.callbacks.onBookRequestBorrow(
         CatalogBorrowParameters(
           accountID = book.account,
           bookID = book.id,
@@ -499,10 +483,10 @@ class CatalogFeedPagingDataAdapter(
 
       this.errorTitle.visibility = View.VISIBLE
       this.errorDismiss.setOnClickListener {
-        this.onBookErrorDismiss(book, status)
+        this.onBookErrorDismiss(book)
       }
       this.errorDetails.setOnClickListener {
-        this@CatalogFeedPagingDataAdapter.onShowTaskError(status.result)
+        this@CatalogFeedPagingDataAdapter.callbacks.onErrorDetailsDisplayRequested(status.result)
       }
       this.errorRetry.setText(R.string.catalogRetry)
       this.errorRetry.setOnClickListener {
@@ -521,10 +505,10 @@ class CatalogFeedPagingDataAdapter(
 
       this.errorTitle.visibility = View.VISIBLE
       this.errorDismiss.setOnClickListener {
-        this.onBookErrorDismiss(book, status)
+        this.onBookErrorDismiss(book)
       }
       this.errorDetails.setOnClickListener {
-        this@CatalogFeedPagingDataAdapter.onShowTaskError(status.result)
+        this@CatalogFeedPagingDataAdapter.callbacks.onErrorDetailsDisplayRequested(status.result)
       }
       this.errorRetry.setText(R.string.accountLogin)
       this.errorRetry.setOnClickListener {
@@ -543,10 +527,10 @@ class CatalogFeedPagingDataAdapter(
 
       this.errorTitle.visibility = View.VISIBLE
       this.errorDismiss.setOnClickListener {
-        this.onBookErrorDismiss(book, status)
+        this.onBookErrorDismiss(book)
       }
       this.errorDetails.setOnClickListener {
-        this@CatalogFeedPagingDataAdapter.onShowTaskError(status.result)
+        this@CatalogFeedPagingDataAdapter.callbacks.onErrorDetailsDisplayRequested(status.result)
       }
       this.errorRetry.setText(R.string.catalogRetry)
       this.errorRetry.setOnClickListener {
@@ -565,10 +549,10 @@ class CatalogFeedPagingDataAdapter(
 
       this.errorTitle.visibility = View.VISIBLE
       this.errorDismiss.setOnClickListener {
-        this.onBookErrorDismiss(book, status)
+        this.onBookErrorDismiss(book)
       }
       this.errorDetails.setOnClickListener {
-        this@CatalogFeedPagingDataAdapter.onShowTaskError(status.result)
+        this@CatalogFeedPagingDataAdapter.callbacks.onErrorDetailsDisplayRequested(status.result)
       }
       this.errorRetry.setText(R.string.accountLogin)
       this.errorRetry.setOnClickListener {
@@ -744,7 +728,7 @@ class CatalogFeedPagingDataAdapter(
         this.buttonCreator.setAsRevokeLoanButton(
           this.idleButtonNegative0,
           onClick = {
-            this.onBookDelete(book, status)
+            this.onBookDelete(book)
           },
           title = book.entry.title
         )
@@ -818,7 +802,7 @@ class CatalogFeedPagingDataAdapter(
         this.buttonCreator.setAsRevokeLoanButton(
           this.idleButtonNegative0,
           onClick = {
-            this.onBookDelete(book, status)
+            this.onBookDelete(book)
           },
           title = book.entry.title
         )

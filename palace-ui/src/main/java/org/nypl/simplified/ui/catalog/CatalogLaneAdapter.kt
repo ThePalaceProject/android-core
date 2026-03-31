@@ -15,7 +15,7 @@ import org.nypl.simplified.feeds.api.FeedEntry
  */
 class CatalogLaneAdapter(
   private val coverLoader: BookCoverProviderType,
-  private val onBookSelected: (FeedEntry.FeedEntryOPDS) -> Unit
+  private val callbacks: CatalogViewCallbacksType,
 ) : ListAdapter<FeedEntry.FeedEntryOPDS, CatalogLaneItemViewHolder>(diffCallback) {
 
   companion object {
@@ -46,7 +46,7 @@ class CatalogLaneAdapter(
     val view =
       inflater.inflate(R.layout.feed_lane_item, parent, false)
 
-    return CatalogLaneItemViewHolder(view, coverLoader, onBookSelected)
+    return CatalogLaneItemViewHolder(view, coverLoader, this.callbacks)
   }
 
   override fun onBindViewHolder(

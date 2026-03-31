@@ -6,13 +6,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import org.librarysimplified.ui.R
-import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.covers.BookCoverProviderType
-import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedGroup
 import org.nypl.simplified.ui.catalog.CatalogFeedWithGroupsLaneViewHolder.LaneStyle
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
-import java.net.URI
 
 /**
  * An adapter that produces swimlanes for feeds that have groups.
@@ -22,8 +19,7 @@ class CatalogFeedWithGroupsAdapter(
   private val covers: BookCoverProviderType,
   private val laneStyle: LaneStyle,
   private val screenSize: ScreenSizeInformationType,
-  private val onFeedSelected: (accountID: AccountID, title: String, uri: URI) -> Unit,
-  private val onBookSelected: (FeedEntry.FeedEntryOPDS) -> Unit
+  private val callbacks: CatalogViewCallbacksType,
 ) : ListAdapter<FeedGroup, CatalogFeedWithGroupsLaneViewHolder>(diffCallback) {
 
   companion object {
@@ -67,8 +63,7 @@ class CatalogFeedWithGroupsAdapter(
       laneStyle = this.laneStyle,
       coverLoader = this.covers,
       screenSize = this.screenSize,
-      onFeedSelected = this.onFeedSelected,
-      onBookSelected = this.onBookSelected
+      callbacks = this.callbacks,
     )
   }
 

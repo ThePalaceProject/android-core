@@ -31,10 +31,9 @@ class CatalogFeedViewInfinite(
   override val root: ViewGroup,
   private val layoutInflater: LayoutInflater,
   private val catalogPart: CatalogPart,
+  private val callbacks: CatalogViewCallbacksType,
   private val onFacetSelected: (FeedFacet) -> Unit,
   private val onSearchSubmitted: (AccountID, FeedSearch, String) -> Unit,
-  private val onToolbarBackPressed: () -> Unit,
-  private val onToolbarLogoPressed: () -> Unit,
   private val window: Window,
 ) : CatalogFeedView() {
 
@@ -68,9 +67,8 @@ class CatalogFeedViewInfinite(
     CatalogToolbar(
       logo = this.root.findViewById(R.id.catalogFeedToolbarLogo),
       logoTouch = this.root.findViewById(R.id.catalogFeedToolbarLogoTouch),
+      callbacks = this.callbacks,
       onSearchSubmitted = this.onSearchSubmitted,
-      onToolbarBackPressed = this.onToolbarBackPressed,
-      onToolbarLogoPressed = this.onToolbarLogoPressed,
       searchIcon = this.root.findViewById(R.id.catalogFeedToolbarSearchIcon),
       searchText = this.root.findViewById(R.id.catalogFeedToolbarSearchText),
       searchTouch = this.root.findViewById(R.id.catalogFeedToolbarSearchIconTouch),
@@ -106,20 +104,18 @@ class CatalogFeedViewInfinite(
       layoutInflater: LayoutInflater,
       container: ViewGroup,
       catalogPart: CatalogPart,
+      callbacks: CatalogViewCallbacksType,
       onFacetSelected: (FeedFacet) -> Unit,
       onSearchSubmitted: (AccountID, FeedSearch, String) -> Unit,
-      onToolbarBackPressed: () -> Unit,
-      onToolbarLogoPressed: () -> Unit
     ): CatalogFeedViewInfinite {
       return CatalogFeedViewInfinite(
+        callbacks = callbacks,
         catalogPart = catalogPart,
+        layoutInflater = layoutInflater,
         onFacetSelected = onFacetSelected,
         onSearchSubmitted = onSearchSubmitted,
-        onToolbarBackPressed = onToolbarBackPressed,
-        onToolbarLogoPressed = onToolbarLogoPressed,
         root = layoutInflater.inflate(R.layout.catalog_feed_infinite, container, true) as ViewGroup,
-        layoutInflater = layoutInflater,
-        window = window
+        window = window,
       )
     }
   }

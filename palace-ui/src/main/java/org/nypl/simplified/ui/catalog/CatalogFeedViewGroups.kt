@@ -24,8 +24,7 @@ class CatalogFeedViewGroups(
   override val root: ViewGroup,
   private val onFacetSelected: (FeedFacet) -> Unit,
   private val onSearchSubmitted: (AccountID, FeedSearch, String) -> Unit,
-  private val onToolbarBackPressed: () -> Unit,
-  private val onToolbarLogoPressed: () -> Unit,
+  private val callbacks: CatalogViewCallbacksType,
   private val screenSize: ScreenSizeInformationType,
   private val window: Window,
 ) : CatalogFeedView() {
@@ -42,11 +41,10 @@ class CatalogFeedViewGroups(
 
   val toolbar: CatalogToolbar =
     CatalogToolbar(
+      callbacks = this.callbacks,
       logo = this.root.findViewById(R.id.catalogGroupsToolbarLogo),
       logoTouch = this.root.findViewById(R.id.catalogGroupsToolbarLogoTouch),
       onSearchSubmitted = this.onSearchSubmitted,
-      onToolbarBackPressed = this.onToolbarBackPressed,
-      onToolbarLogoPressed = this.onToolbarLogoPressed,
       searchIcon = this.root.findViewById(R.id.catalogGroupsToolbarSearchIcon),
       searchText = this.root.findViewById(R.id.catalogGroupsToolbarSearchText),
       searchTouch = this.root.findViewById(R.id.catalogGroupsToolbarSearchIconTouch),
@@ -121,18 +119,16 @@ class CatalogFeedViewGroups(
     fun create(
       container: ViewGroup,
       layoutInflater: LayoutInflater,
+      callbacks: CatalogViewCallbacksType,
       onFacetSelected: (FeedFacet) -> Unit,
       onSearchSubmitted: (AccountID, FeedSearch, String) -> Unit,
-      onToolbarBackPressed: () -> Unit,
-      onToolbarLogoPressed: () -> Unit,
       screenSize: ScreenSizeInformationType,
       window: Window,
     ): CatalogFeedViewGroups {
       return CatalogFeedViewGroups(
+        callbacks = callbacks,
         onFacetSelected = onFacetSelected,
         onSearchSubmitted = onSearchSubmitted,
-        onToolbarBackPressed = onToolbarBackPressed,
-        onToolbarLogoPressed = onToolbarLogoPressed,
         root = layoutInflater.inflate(R.layout.catalog_feed_groups, container, true) as ViewGroup,
         screenSize = screenSize,
         window = window,

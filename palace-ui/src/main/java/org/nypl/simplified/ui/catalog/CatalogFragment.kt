@@ -88,7 +88,7 @@ import java.util.concurrent.atomic.AtomicReference
  * The fragment used for the catalog.
  */
 
-sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
+sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogViewCallbacksType {
 
   abstract val catalogPart: CatalogPart
 
@@ -183,12 +183,12 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     )
   }
 
-  private fun onFeedSelected(
+  final override fun onFeedSelected(
     accountID: AccountID,
     title: String,
-    address: URI
+    uri: URI
   ) {
-    this.logger.debug("onFeedSelected: \"{}\" {}", title, address)
+    this.logger.debug("onFeedSelected: \"{}\" {}", title, uri)
 
     try {
       val account =
@@ -198,7 +198,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
       this.opdsClient.goTo(
         OPDSClientRequest.NewFeed(
           accountID = accountID,
-          uri = address,
+          uri = uri,
           credentials = account.loginState.credentials,
           historyBehavior = ADD_TO_HISTORY,
           method = "GET"
@@ -209,7 +209,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     }
   }
 
-  private fun onBookSelected(
+  final override fun onBookSelected(
     entry: FeedEntry.FeedEntryOPDS
   ) {
     UIThread.checkIsUIThread()
@@ -326,21 +326,11 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
   ) {
     val view =
       CatalogFeedViewDetails2.create(
+        callbacks = this,
         container = this.contentContainer,
         covers = this.covers,
         layoutInflater = this.layoutInflater,
-        onBookBorrowCancelRequested = this::onBookBorrowCancelRequested,
-        onBookBorrowRequested = this::onBookBorrowRequested,
-        onBookCanBeRevoked = this::onBookCanBeRevoked,
-        onBookPreviewOpenRequested = this::onBookPreviewOpenRequested,
-        onBookRevokeRequested = this::onBookRevokeRequested,
-        onBookSAMLDownloadRequested = this::onBookSAMLDownloadRequested,
-        onBookSelected = this::onBookSelected,
-        onBookViewerOpen = this::onBookViewerOpen,
-        onFeedSelected = this::onFeedSelected,
-        onShowErrorDetails = this::onShowErrorDetails,
-        onToolbarBackPressed = this::onToolbarBackPressed,
-        screenSize = this.screenSize
+        screenSize = this.screenSize,
       )
 
     when (val entry = this.opdsClient.entry.get()) {
@@ -413,7 +403,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     this.switchView(view)
   }
 
-  private fun onShowErrorDetails(
+  final override fun onErrorDetailsDisplayRequested(
     error: TaskResult.Failure<*>
   ) {
     try {
@@ -437,8 +427,8 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     }
   }
 
-  private fun onBookDismissError(
-    status: CatalogBookStatus<*>
+  final override fun onBookRequestDismissError(
+    book: Book
   ) {
     val services =
       Services.serviceDirectory()
@@ -446,13 +436,13 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
       services.requireService(BooksControllerType::class.java)
 
     books.bookBorrowFailedDismiss(
-      accountID = status.book.account,
-      bookID = status.book.id
+      accountID = book.account,
+      bookID = book.id
     )
   }
 
-  private fun onBookBorrowCancelRequested(
-    status: CatalogBookStatus<*>
+  final override fun onBookRequestBorrowCancel(
+    book: Book,
   ) {
     val services =
       Services.serviceDirectory()
@@ -460,12 +450,13 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
       services.requireService(BooksControllerType::class.java)
 
     books.bookBorrowFailedDismiss(
-      accountID = status.book.account,
-      bookID = status.book.id
+      accountID = book.account,
+      bookID = book.id
     )
   }
 
-  private fun onBookSAMLDownloadRequested(
+  @Deprecated("Unclear why this has its own special method.")
+  final override fun onBookRequestSAMLDownload(
     status: CatalogBookStatus<BookStatus.DownloadWaitingForExternalAuthentication>
   ) {
     val account =
@@ -487,9 +478,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     }
   }
 
-  private fun onBookBorrowRequested(
-    parameters: CatalogBorrowParameters
-  ) {
+  final override fun onBookRequestBorrow(parameters: CatalogBorrowParameters) {
     val services =
       Services.serviceDirectory()
     val books =
@@ -551,15 +540,15 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     }
   }
 
-  private fun onBookPreviewOpenRequested(
-    status: CatalogBookStatus<*>
+  final override fun onBookRequestPreviewOpen(
+    book: Book
   ) {
     try {
       BookPreviewActivity.startActivity(
         this.requireActivity(),
         FeedEntry.FeedEntryOPDS(
-          status.book.account,
-          status.book.entry
+          book.account,
+          book.entry
         )
       )
     } catch (e: Throwable) {
@@ -567,8 +556,9 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     }
   }
 
-  private fun onBookCanBeRevoked(
-    status: CatalogBookStatus<*>
+  final override fun onBookCanBeRevoked(
+    book: Book,
+    status: BookStatus
   ): Boolean {
     return try {
       val services =
@@ -576,17 +566,15 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
       val profiles =
         services.requireService(ProfilesControllerType::class.java)
 
-      val book =
-        status.book
       val profile =
         profiles.profileCurrent()
       val account =
         profile.account(book.account)
 
       if (account.bookDatabase.books().contains(book.id)) {
-        when (val s = status.status) {
+        when (status) {
           is BookStatus.Loaned.LoanedDownloaded ->
-            s.returnable
+            status.returnable
 
           is BookStatus.Loaned.LoanedNotDownloaded ->
             true
@@ -603,8 +591,8 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     }
   }
 
-  private fun onBookDeleteRequested(
-    status: CatalogBookStatus<*>
+  final override fun onBookRequestDelete(
+    book: Book
   ) {
     val services =
       Services.serviceDirectory()
@@ -612,13 +600,13 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
       services.requireService(BooksControllerType::class.java)
 
     books.bookDelete(
-      accountID = status.book.account,
-      bookId = status.book.id
+      accountID = book.account,
+      bookId = book.id
     )
   }
 
-  private fun onBookRevokeRequested(
-    status: CatalogBookStatus<*>
+  final override fun onBookRequestRevoke(
+    book: Book
   ) {
     val services =
       Services.serviceDirectory()
@@ -628,7 +616,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
       services.requireService(ProfilesControllerType::class.java)
 
     val accountID =
-      status.book.account
+      book.account
     val account =
       profiles.profileCurrent()
         .account(accountID)
@@ -642,7 +630,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
           this.logger.debug("User logged in. Continuing revoke.")
           books.bookRevoke(
             accountID = accountID,
-            bookId = status.book.id,
+            bookId = book.id,
           )
 
           UIThread.runOnUIThread {
@@ -654,12 +642,12 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     } else {
       books.bookRevoke(
         accountID = accountID,
-        bookId = status.book.id,
+        bookId = book.id,
       )
     }
   }
 
-  private fun onBookViewerOpen(
+  final override fun onBookRequestViewerOpen(
     book: Book,
     bookFormat: BookFormat
   ) {
@@ -754,12 +742,11 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
 
     val view =
       CatalogFeedViewGroups.create(
+        callbacks = this,
         container = this.contentContainer,
         layoutInflater = this.layoutInflater,
         onFacetSelected = this::onFacetSelected,
         onSearchSubmitted = this::onSearchSubmitted,
-        onToolbarBackPressed = this::onToolbarBackPressed,
-        onToolbarLogoPressed = { this.onToolbarLogoPressed(newState.request.accountID) },
         screenSize = this.screenSize,
         window = this.requireActivity().window,
       )
@@ -769,8 +756,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
         covers = this.covers,
         screenSize = this.screenSize,
         laneStyle = LaneStyle.MAIN_GROUPED_FEED_LANE,
-        onFeedSelected = this::onFeedSelected,
-        onBookSelected = this::onBookSelected,
+        callbacks = this,
       )
 
     view.listView.adapter = entriesGroupedAdapter
@@ -829,12 +815,12 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
     this.switchView(view)
   }
 
-  private fun onToolbarBackPressed() {
+  final override fun onToolbarBackPressed() {
     UIThread.checkIsUIThread()
     this.opdsClient.goBack()
   }
 
-  private fun onToolbarLogoPressed(
+  final override fun onToolbarLogoPressed(
     currentAccount: AccountID
   ) {
     UIThread.checkIsUIThread()
@@ -869,13 +855,12 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
 
     val view =
       CatalogFeedViewInfinite.create(
+        callbacks = this,
+        catalogPart = this.catalogPart,
         container = this.contentContainer,
         layoutInflater = this.layoutInflater,
-        catalogPart = this.catalogPart,
         onFacetSelected = this::onFacetSelected,
         onSearchSubmitted = this::onSearchSubmitted,
-        onToolbarBackPressed = this::onToolbarBackPressed,
-        onToolbarLogoPressed = { this.onToolbarLogoPressed(newState.request.accountID) },
         window = this.requireActivity().window,
       )
 
@@ -888,13 +873,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType {
         profiles = this.profiles,
         buttonCreator = this.buttonCreator,
         registryEvents = registry,
-        onBookSelected = this::onBookSelected,
-        onBookErrorDismiss = this::onBookDismissError,
-        onBookBorrow = this::onBookBorrowRequested,
-        onBookRevoke = this::onBookRevokeRequested,
-        onBookViewerOpen = this::onBookViewerOpen,
-        onBookDelete = this::onBookDeleteRequested,
-        onShowTaskError = this::onShowErrorDetails
+        callbacks = this,
       )
 
     val feedScope =
