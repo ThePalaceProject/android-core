@@ -12,18 +12,13 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import org.librarysimplified.ui.R
-import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.feeds.api.Feed
-import org.nypl.simplified.feeds.api.FeedFacet
 import org.nypl.simplified.feeds.api.FeedFacets
-import org.nypl.simplified.feeds.api.FeedSearch
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.thepalaceproject.theme.core.PalaceTabButtons
 
 class CatalogFeedViewGroups(
   override val root: ViewGroup,
-  private val onFacetSelected: (FeedFacet) -> Unit,
-  private val onSearchSubmitted: (AccountID, FeedSearch, String) -> Unit,
   private val callbacks: CatalogViewCallbacksType,
   private val screenSize: ScreenSizeInformationType,
   private val window: Window,
@@ -44,7 +39,6 @@ class CatalogFeedViewGroups(
       callbacks = this.callbacks,
       logo = this.root.findViewById(R.id.catalogGroupsToolbarLogo),
       logoTouch = this.root.findViewById(R.id.catalogGroupsToolbarLogoTouch),
-      onSearchSubmitted = this.onSearchSubmitted,
       searchIcon = this.root.findViewById(R.id.catalogGroupsToolbarSearchIcon),
       searchText = this.root.findViewById(R.id.catalogGroupsToolbarSearchText),
       searchTouch = this.root.findViewById(R.id.catalogGroupsToolbarSearchIconTouch),
@@ -84,7 +78,7 @@ class CatalogFeedViewGroups(
       val facet = facetGroup[index]
       button.text = facet.title
       button.setOnClickListener {
-        this.onFacetSelected(facet)
+        this.callbacks.onFeedFacetSelected(facet)
         this.updateSelectedFacet(facetTabs = this.tabs, index = index)
       }
     }
@@ -120,15 +114,11 @@ class CatalogFeedViewGroups(
       container: ViewGroup,
       layoutInflater: LayoutInflater,
       callbacks: CatalogViewCallbacksType,
-      onFacetSelected: (FeedFacet) -> Unit,
-      onSearchSubmitted: (AccountID, FeedSearch, String) -> Unit,
       screenSize: ScreenSizeInformationType,
       window: Window,
     ): CatalogFeedViewGroups {
       return CatalogFeedViewGroups(
         callbacks = callbacks,
-        onFacetSelected = onFacetSelected,
-        onSearchSubmitted = onSearchSubmitted,
         root = layoutInflater.inflate(R.layout.catalog_feed_groups, container, true) as ViewGroup,
         screenSize = screenSize,
         window = window,

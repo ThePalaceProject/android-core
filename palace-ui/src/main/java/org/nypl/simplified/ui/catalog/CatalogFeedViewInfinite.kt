@@ -16,12 +16,10 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.librarysimplified.ui.R
-import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedFacet
 import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetSingle
 import org.nypl.simplified.feeds.api.FeedFacets
-import org.nypl.simplified.feeds.api.FeedSearch
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.thepalaceproject.theme.core.PalaceTabButtons
 import java.util.SortedMap
@@ -32,8 +30,6 @@ class CatalogFeedViewInfinite(
   private val layoutInflater: LayoutInflater,
   private val catalogPart: CatalogPart,
   private val callbacks: CatalogViewCallbacksType,
-  private val onFacetSelected: (FeedFacet) -> Unit,
-  private val onSearchSubmitted: (AccountID, FeedSearch, String) -> Unit,
   private val window: Window,
 ) : CatalogFeedView() {
 
@@ -68,7 +64,6 @@ class CatalogFeedViewInfinite(
       logo = this.root.findViewById(R.id.catalogFeedToolbarLogo),
       logoTouch = this.root.findViewById(R.id.catalogFeedToolbarLogoTouch),
       callbacks = this.callbacks,
-      onSearchSubmitted = this.onSearchSubmitted,
       searchIcon = this.root.findViewById(R.id.catalogFeedToolbarSearchIcon),
       searchText = this.root.findViewById(R.id.catalogFeedToolbarSearchText),
       searchTouch = this.root.findViewById(R.id.catalogFeedToolbarSearchIconTouch),
@@ -105,15 +100,11 @@ class CatalogFeedViewInfinite(
       container: ViewGroup,
       catalogPart: CatalogPart,
       callbacks: CatalogViewCallbacksType,
-      onFacetSelected: (FeedFacet) -> Unit,
-      onSearchSubmitted: (AccountID, FeedSearch, String) -> Unit,
     ): CatalogFeedViewInfinite {
       return CatalogFeedViewInfinite(
         callbacks = callbacks,
         catalogPart = catalogPart,
         layoutInflater = layoutInflater,
-        onFacetSelected = onFacetSelected,
-        onSearchSubmitted = onSearchSubmitted,
         root = layoutInflater.inflate(R.layout.catalog_feed_infinite, container, true) as ViewGroup,
         window = window,
       )
@@ -206,7 +197,7 @@ class CatalogFeedViewInfinite(
         CatalogFeedFacetFilterAdapter()
 
       facetApply.setOnClickListener {
-        this.onFacetSelected.invoke(
+        this.callbacks.onFeedFacetSelected(
           CatalogFeedFacetFilterModels.filterModel.createResultFacet(title)
         )
       }
@@ -273,7 +264,7 @@ class CatalogFeedViewInfinite(
       sortBy.forEachIndexed { index, facet ->
         val button = RadioButton(this.root.context)
         button.setOnClickListener {
-          this.onFacetSelected(facet)
+          this.callbacks.onFeedFacetSelected(facet)
         }
         button.id = index
         button.text = facet.title
@@ -309,7 +300,7 @@ class CatalogFeedViewInfinite(
       val facet = facetGroup[index]
       button.text = facet.title
       button.setOnClickListener {
-        this.onFacetSelected(facet)
+        this.callbacks.onFeedFacetSelected(facet)
         this.updateSelectedFacet(facetTabs = facetTabs, index = index)
       }
     }

@@ -6,6 +6,8 @@ import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedFacet
+import org.nypl.simplified.feeds.api.FeedSearch
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import java.net.URI
 
@@ -143,4 +145,38 @@ interface CatalogViewCallbacksType {
     title: String,
     uri: URI
   )
+
+  /**
+   * A request was made to open a feed facet.
+   */
+
+  @UiThread
+  fun onFeedFacetSelected(
+    feedFacet: FeedFacet
+  )
+
+  /**
+   * A search request was submitted.
+   */
+
+  @UiThread
+  fun onSearchSubmitted(
+    accountID: AccountID,
+    feedSearch: FeedSearch,
+    queryText: String
+  )
+
+  /**
+   * @return `true` if the given book appears to be returnable
+   */
+
+  @UiThread
+  fun onIsBookReturnable(book: Book): Boolean
+
+  /**
+   * @return `true` if the given book appears to be deletable
+   */
+
+  @UiThread
+  fun onIsBookDeletable(book: Book): Boolean
 }

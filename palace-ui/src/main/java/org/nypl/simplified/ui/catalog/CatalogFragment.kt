@@ -29,6 +29,7 @@ import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
 import org.nypl.simplified.books.book_registry.BookRegistryReadableType
 import org.nypl.simplified.books.book_registry.BookStatus
+import org.nypl.simplified.books.book_registry.BookStatus.Loaned
 import org.nypl.simplified.books.book_registry.BookStatusEvent
 import org.nypl.simplified.books.controller.api.BooksControllerType
 import org.nypl.simplified.books.covers.BookCoverProviderType
@@ -41,6 +42,14 @@ import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetOPDS12Single
 import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetPseudo
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.feeds.api.FeedSearch
+import org.nypl.simplified.opds.core.OPDSAvailabilityHeld
+import org.nypl.simplified.opds.core.OPDSAvailabilityHeldReady
+import org.nypl.simplified.opds.core.OPDSAvailabilityHoldable
+import org.nypl.simplified.opds.core.OPDSAvailabilityLoanable
+import org.nypl.simplified.opds.core.OPDSAvailabilityLoaned
+import org.nypl.simplified.opds.core.OPDSAvailabilityMatcherType
+import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
+import org.nypl.simplified.opds.core.OPDSAvailabilityRevoked
 import org.nypl.simplified.profiles.controller.api.ProfileFeedRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
@@ -745,8 +754,6 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
         callbacks = this,
         container = this.contentContainer,
         layoutInflater = this.layoutInflater,
-        onFacetSelected = this::onFacetSelected,
-        onSearchSubmitted = this::onSearchSubmitted,
         screenSize = this.screenSize,
         window = this.requireActivity().window,
       )
@@ -859,8 +866,6 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
         catalogPart = this.catalogPart,
         container = this.contentContainer,
         layoutInflater = this.layoutInflater,
-        onFacetSelected = this::onFacetSelected,
-        onSearchSubmitted = this::onSearchSubmitted,
         window = this.requireActivity().window,
       )
 
@@ -870,7 +875,6 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
     val feedAdapter =
       CatalogFeedPagingDataAdapter(
         covers = this.covers,
-        profiles = this.profiles,
         buttonCreator = this.buttonCreator,
         registryEvents = registry,
         callbacks = this,
@@ -984,6 +988,70 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
     this.setupRefreshForLocalFeeds(feedHandle)
   }
 
+  final override fun onIsBookReturnable(
+    book: Book
+  ): Boolean {
+    val profile = this.profiles.profileCurrent()
+    val account = profile.account(book.account)
+
+    return try {
+      if (account.bookDatabase.books().contains(book.id)) {
+        when (val status = BookStatus.fromBook(book)) {
+          is Loaned.LoanedDownloaded ->
+            status.returnable
+
+          is Loaned.LoanedNotDownloaded ->
+            true
+
+          else ->
+            false
+        }
+      } else {
+        false
+      }
+    } catch (_: Exception) {
+      false
+    }
+  }
+
+  override fun onIsBookDeletable(
+    book: Book
+  ): Boolean {
+    return try {
+      val profile = this.profiles.profileCurrent()
+      val account = profile.account(book.account)
+      return if (account.bookDatabase.books().contains(book.id)) {
+        book.entry.availability.matchAvailability(
+          object : OPDSAvailabilityMatcherType<Boolean, Exception> {
+            override fun onHeldReady(availability: OPDSAvailabilityHeldReady): Boolean =
+              false
+
+            override fun onHeld(availability: OPDSAvailabilityHeld): Boolean =
+              false
+
+            override fun onHoldable(availability: OPDSAvailabilityHoldable): Boolean =
+              false
+
+            override fun onLoaned(availability: OPDSAvailabilityLoaned): Boolean =
+              availability.revoke.isNone && book.isDownloaded
+
+            override fun onLoanable(availability: OPDSAvailabilityLoanable): Boolean =
+              true
+
+            override fun onOpenAccess(availability: OPDSAvailabilityOpenAccess): Boolean =
+              true
+
+            override fun onRevoked(availability: OPDSAvailabilityRevoked): Boolean =
+              false
+          })
+      } else {
+        false
+      }
+    } catch (_: Exception) {
+      false
+    }
+  }
+
   /**
    * For local feeds (such as My Books, Reservations, etc), we want to refresh the feed when
    * a significant event occurs such as a book being added to or deleted from the registry.
@@ -1016,7 +1084,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
     }
   }
 
-  private fun onSearchSubmitted(
+  final override fun onSearchSubmitted(
     accountID: AccountID,
     feedSearch: FeedSearch,
     queryText: String
@@ -1074,7 +1142,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
     }
   }
 
-  private fun onFacetSelected(
+  final override fun onFeedFacetSelected(
     feedFacet: FeedFacet
   ) {
     UIThread.checkIsUIThread()

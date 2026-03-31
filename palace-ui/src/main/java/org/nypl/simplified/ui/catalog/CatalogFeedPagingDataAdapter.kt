@@ -45,23 +45,13 @@ import org.nypl.simplified.books.book_registry.BookStatusEvent.BookStatusEventCh
 import org.nypl.simplified.books.book_registry.BookWithStatus
 import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.feeds.api.FeedEntry
-import org.nypl.simplified.opds.core.OPDSAvailabilityHeld
-import org.nypl.simplified.opds.core.OPDSAvailabilityHeldReady
-import org.nypl.simplified.opds.core.OPDSAvailabilityHoldable
-import org.nypl.simplified.opds.core.OPDSAvailabilityLoanable
-import org.nypl.simplified.opds.core.OPDSAvailabilityLoaned
-import org.nypl.simplified.opds.core.OPDSAvailabilityMatcherType
-import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
-import org.nypl.simplified.opds.core.OPDSAvailabilityRevoked
-import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 
 class CatalogFeedPagingDataAdapter(
   private val covers: BookCoverProviderType,
-  private val profiles: ProfilesControllerType,
   private val buttonCreator: CatalogButtons,
   private val registryEvents: CatalogBookRegistryEvents,
   private val callbacks: CatalogViewCallbacksType,
-) : PagingDataAdapter<FeedEntry, CatalogFeedPagingDataAdapter.ViewHolder>(diffCallback) {
+) : PagingDataAdapter<FeedEntry, CatalogFeedPagingDataAdapter.ViewHolder>(this.diffCallback) {
 
   companion object {
     private val loanEndFormatter =
@@ -86,7 +76,8 @@ class CatalogFeedPagingDataAdapter(
   }
 
   inner class ViewHolder(
-    private val view: View
+    private val view: View,
+    private val callbacks: CatalogViewCallbacksType,
   ) : RecyclerView.ViewHolder(view) {
 
     private var subscription: Disposable? = null
@@ -189,7 +180,7 @@ class CatalogFeedPagingDataAdapter(
               .subscribe { event -> this.onStatusChangedForFeedEntry(item) }
 
           for (v in listOf(this.view, this.idle, this.error, this.corrupt, this.progress)) {
-            v.setOnClickListener { this@CatalogFeedPagingDataAdapter.callbacks.onBookSelected(item) }
+            v.setOnClickListener { this.callbacks.onBookSelected(item) }
           }
 
           this.setVisible(this.idleCover, false)
@@ -401,10 +392,10 @@ class CatalogFeedPagingDataAdapter(
       this.setVisible(this.progress, false)
 
       this.errorDismiss.setOnClickListener {
-        this.onBookErrorDismiss(book)
+        this.callbacks.onBookRequestDismissError(book)
       }
       this.errorDetails.setOnClickListener {
-        this@CatalogFeedPagingDataAdapter.callbacks.onErrorDetailsDisplayRequested(status.result)
+        this.callbacks.onErrorDetailsDisplayRequested(status.result)
       }
       this.errorRetry.setText(R.string.catalogRetry)
       this.errorRetry.setOnClickListener {
@@ -422,10 +413,10 @@ class CatalogFeedPagingDataAdapter(
       this.setVisible(this.progress, false)
 
       this.errorDismiss.setOnClickListener {
-        this.onBookErrorDismiss(book)
+        this.callbacks.onBookRequestDismissError(book)
       }
       this.errorDetails.setOnClickListener {
-        this@CatalogFeedPagingDataAdapter.callbacks.onErrorDetailsDisplayRequested(status.result)
+        this.callbacks.onErrorDetailsDisplayRequested(status.result)
       }
       this.errorRetry.setText(R.string.accountLogin)
       this.errorRetry.setOnClickListener {
@@ -433,36 +424,10 @@ class CatalogFeedPagingDataAdapter(
       }
     }
 
-    private fun onBookErrorDismiss(
-      book: Book
-    ) {
-      this@CatalogFeedPagingDataAdapter.callbacks.onBookRequestDismissError(book)
-    }
-
-    private fun onBookRevoke(
-      book: Book,
-      status: BookStatus
-    ) {
-      this@CatalogFeedPagingDataAdapter.callbacks.onBookRequestRevoke(book)
-    }
-
-    private fun onBookViewerOpen(
-      book: Book,
-      bookFormat: BookFormat
-    ) {
-      this@CatalogFeedPagingDataAdapter.callbacks.onBookRequestViewerOpen(book, bookFormat)
-    }
-
-    private fun onBookDelete(
-      book: Book
-    ) {
-      this@CatalogFeedPagingDataAdapter.callbacks.onBookRequestDelete(book)
-    }
-
     private fun onBookBorrow(
       book: Book
     ) {
-      this@CatalogFeedPagingDataAdapter.callbacks.onBookRequestBorrow(
+      this.callbacks.onBookRequestBorrow(
         CatalogBorrowParameters(
           accountID = book.account,
           bookID = book.id,
@@ -483,10 +448,10 @@ class CatalogFeedPagingDataAdapter(
 
       this.errorTitle.visibility = View.VISIBLE
       this.errorDismiss.setOnClickListener {
-        this.onBookErrorDismiss(book)
+        this.callbacks.onBookRequestDismissError(book)
       }
       this.errorDetails.setOnClickListener {
-        this@CatalogFeedPagingDataAdapter.callbacks.onErrorDetailsDisplayRequested(status.result)
+        this.callbacks.onErrorDetailsDisplayRequested(status.result)
       }
       this.errorRetry.setText(R.string.catalogRetry)
       this.errorRetry.setOnClickListener {
@@ -505,10 +470,10 @@ class CatalogFeedPagingDataAdapter(
 
       this.errorTitle.visibility = View.VISIBLE
       this.errorDismiss.setOnClickListener {
-        this.onBookErrorDismiss(book)
+        this.callbacks.onBookRequestDismissError(book)
       }
       this.errorDetails.setOnClickListener {
-        this@CatalogFeedPagingDataAdapter.callbacks.onErrorDetailsDisplayRequested(status.result)
+        this.callbacks.onErrorDetailsDisplayRequested(status.result)
       }
       this.errorRetry.setText(R.string.accountLogin)
       this.errorRetry.setOnClickListener {
@@ -527,14 +492,14 @@ class CatalogFeedPagingDataAdapter(
 
       this.errorTitle.visibility = View.VISIBLE
       this.errorDismiss.setOnClickListener {
-        this.onBookErrorDismiss(book)
+        this.callbacks.onBookRequestDismissError(book)
       }
       this.errorDetails.setOnClickListener {
-        this@CatalogFeedPagingDataAdapter.callbacks.onErrorDetailsDisplayRequested(status.result)
+        this.callbacks.onErrorDetailsDisplayRequested(status.result)
       }
       this.errorRetry.setText(R.string.catalogRetry)
       this.errorRetry.setOnClickListener {
-        this.onBookRevoke(book, status)
+        this.callbacks.onBookRequestRevoke(book)
       }
     }
 
@@ -549,14 +514,14 @@ class CatalogFeedPagingDataAdapter(
 
       this.errorTitle.visibility = View.VISIBLE
       this.errorDismiss.setOnClickListener {
-        this.onBookErrorDismiss(book)
+        this.callbacks.onBookRequestDismissError(book)
       }
       this.errorDetails.setOnClickListener {
-        this@CatalogFeedPagingDataAdapter.callbacks.onErrorDetailsDisplayRequested(status.result)
+        this.callbacks.onErrorDetailsDisplayRequested(status.result)
       }
       this.errorRetry.setText(R.string.accountLogin)
       this.errorRetry.setOnClickListener {
-        this.onBookRevoke(book, status)
+        this.callbacks.onBookRequestRevoke(book)
       }
     }
 
@@ -574,7 +539,7 @@ class CatalogFeedPagingDataAdapter(
         this.buttonCreator.setAsRevokeHoldButton(
           this.idleButtonPositive,
           onClick = {
-            this.onBookRevoke(book, status)
+            this.callbacks.onBookRequestRevoke(book)
           },
           title = book.entry.title
         )
@@ -619,7 +584,7 @@ class CatalogFeedPagingDataAdapter(
         this.buttonCreator.setAsRevokeLoanButton(
           this.idleButtonNegative0,
           onClick = {
-            this.onBookRevoke(book, status)
+            this.callbacks.onBookRequestRevoke(book)
           },
           title = book.entry.title
         )
@@ -687,7 +652,7 @@ class CatalogFeedPagingDataAdapter(
           this.buttonCreator.setAsReadButton(
             this.idleButtonPositive,
             onClick = {
-              this.onBookViewerOpen(book, format)
+              this.callbacks.onBookRequestViewerOpen(book, format)
             },
             title = book.entry.title
           )
@@ -697,7 +662,7 @@ class CatalogFeedPagingDataAdapter(
           this.buttonCreator.setAsListenButton(
             this.idleButtonPositive,
             onClick = {
-              this.onBookViewerOpen(book, format)
+              this.callbacks.onBookRequestViewerOpen(book, format)
             },
             title = book.entry.title
           )
@@ -715,20 +680,20 @@ class CatalogFeedPagingDataAdapter(
       }
       this.setVisible(this.idleButtonPositive, true)
 
-      if (this.isBookReturnable(book)) {
+      if (this.callbacks.onIsBookReturnable(book)) {
         this.buttonCreator.setAsRevokeLoanButton(
           this.idleButtonNegative0,
           onClick = {
-            this.onBookRevoke(book, status)
+            this.callbacks.onBookRequestRevoke(book)
           },
           title = book.entry.title
         )
         this.setVisible(this.idleButtonNegative0, true)
-      } else if (this.isBookDeletable(book)) {
+      } else if (this.callbacks.onIsBookDeletable(book)) {
         this.buttonCreator.setAsRevokeLoanButton(
           this.idleButtonNegative0,
           onClick = {
-            this.onBookDelete(book)
+            this.callbacks.onBookRequestDelete(book)
           },
           title = book.entry.title
         )
@@ -789,20 +754,20 @@ class CatalogFeedPagingDataAdapter(
       )
       this.setVisible(this.idleButtonPositive, true)
 
-      if (this.isBookReturnable(book)) {
+      if (this.callbacks.onIsBookReturnable(book)) {
         this.buttonCreator.setAsRevokeLoanButton(
           this.idleButtonNegative0,
           onClick = {
-            this.onBookRevoke(book, status)
+            this.callbacks.onBookRequestRevoke(book)
           },
           title = book.entry.title
         )
         this.setVisible(this.idleButtonNegative0, true)
-      } else if (this.isBookDeletable(book)) {
+      } else if (this.callbacks.onIsBookDeletable(book)) {
         this.buttonCreator.setAsRevokeLoanButton(
           this.idleButtonNegative0,
           onClick = {
-            this.onBookDelete(book)
+            this.callbacks.onBookRequestDelete(book)
           },
           title = book.entry.title
         )
@@ -888,76 +853,6 @@ class CatalogFeedPagingDataAdapter(
         null
       }
     }
-
-    /**
-     * XXX: This information really should be available somewhere else. This was ported from
-     * existing code.
-     */
-
-    private fun isBookReturnable(book: Book): Boolean {
-      val profile = this@CatalogFeedPagingDataAdapter.profiles.profileCurrent()
-      val account = profile.account(book.account)
-
-      return try {
-        if (account.bookDatabase.books().contains(book.id)) {
-          when (val status = BookStatus.fromBook(book)) {
-            is Loaned.LoanedDownloaded ->
-              status.returnable
-
-            is Loaned.LoanedNotDownloaded ->
-              true
-
-            else ->
-              false
-          }
-        } else {
-          false
-        }
-      } catch (e: Exception) {
-        false
-      }
-    }
-
-    /**
-     * XXX: This information really should be available somewhere else. This was ported from
-     * existing code.
-     */
-
-    private fun isBookDeletable(book: Book): Boolean {
-      return try {
-        val profile = this@CatalogFeedPagingDataAdapter.profiles.profileCurrent()
-        val account = profile.account(book.account)
-        return if (account.bookDatabase.books().contains(book.id)) {
-          book.entry.availability.matchAvailability(
-            object : OPDSAvailabilityMatcherType<Boolean, Exception> {
-              override fun onHeldReady(availability: OPDSAvailabilityHeldReady): Boolean =
-                false
-
-              override fun onHeld(availability: OPDSAvailabilityHeld): Boolean =
-                false
-
-              override fun onHoldable(availability: OPDSAvailabilityHoldable): Boolean =
-                false
-
-              override fun onLoaned(availability: OPDSAvailabilityLoaned): Boolean =
-                availability.revoke.isNone && book.isDownloaded
-
-              override fun onLoanable(availability: OPDSAvailabilityLoanable): Boolean =
-                true
-
-              override fun onOpenAccess(availability: OPDSAvailabilityOpenAccess): Boolean =
-                true
-
-              override fun onRevoked(availability: OPDSAvailabilityRevoked): Boolean =
-                false
-            })
-        } else {
-          false
-        }
-      } catch (e: Exception) {
-        false
-      }
-    }
   }
 
   override fun onCreateViewHolder(
@@ -968,7 +863,7 @@ class CatalogFeedPagingDataAdapter(
       LayoutInflater.from(parent.context)
         .inflate(R.layout.book_cell, parent, false)
 
-    return this.ViewHolder(view)
+    return this.ViewHolder(view, this.callbacks)
   }
 
   override fun onViewRecycled(
@@ -989,7 +884,7 @@ class CatalogFeedPagingDataAdapter(
   ) {
     val item = this.getItem(position)
     if (item != null) {
-      (holder as? ViewHolder)?.bind(item)
+      holder.bind(item)
     }
   }
 }
