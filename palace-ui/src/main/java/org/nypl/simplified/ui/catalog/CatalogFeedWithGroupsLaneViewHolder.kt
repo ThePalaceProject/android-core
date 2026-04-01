@@ -1,5 +1,6 @@
 package org.nypl.simplified.ui.catalog
 
+import android.os.Build
 import android.util.TypedValue
 import android.view.View
 import android.widget.LinearLayout
@@ -50,6 +51,13 @@ class CatalogFeedWithGroupsLaneViewHolder(
     this.parent.findViewById<RecyclerView>(R.id.feedLaneCoversScroll)
 
   init {
+    /*
+     * Mark the text view as a "header" for screen readers.
+     */
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+      this.title.isAccessibilityHeading = true
+    }
+
     this.scrollView.apply {
       this.setHasFixedSize(true)
       this.layoutManager = LinearLayoutManager(

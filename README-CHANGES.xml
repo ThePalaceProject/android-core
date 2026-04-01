@@ -1122,7 +1122,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-03-27T15:59:33+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.27.0">
+    <c:release date="2026-04-01T18:19:02+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.27.0">
       <c:changes>
         <c:change date="2026-03-19T00:00:00+00:00" summary="Increase book details metadata text.">
           <c:tickets>
@@ -1140,9 +1140,14 @@
             <c:ticket id="PP-3946"/>
           </c:tickets>
         </c:change>
-        <c:change date="2026-03-27T15:59:33+00:00" summary="Add language item in book details page.">
+        <c:change date="2026-03-27T00:00:00+00:00" summary="Add language item in book details page.">
           <c:tickets>
             <c:ticket id="PP-3964"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-04-01T18:19:02+00:00" summary="Make lane titles into headers for accessibility.">
+          <c:tickets>
+            <c:ticket id="PP-3981"/>
           </c:tickets>
         </c:change>
       </c:changes>
