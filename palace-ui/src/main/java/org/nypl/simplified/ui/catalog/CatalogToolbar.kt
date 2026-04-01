@@ -12,7 +12,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import org.librarysimplified.ui.R
-import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.feeds.api.FeedSearch
 import org.nypl.simplified.ui.catalog.CatalogPart.BOOKS
@@ -25,9 +24,7 @@ import java.net.URI
 class CatalogToolbar(
   private val logo: ImageView,
   private val logoTouch: ViewGroup,
-  private val onToolbarBackPressed: () -> Unit,
-  private val onToolbarLogoPressed: () -> Unit,
-  private val onSearchSubmitted: (AccountID, FeedSearch, String) -> Unit,
+  private val callbacks: CatalogViewCallbacksType,
   private val searchIcon: ImageView,
   private val searchText: EditText,
   private val searchTouch: ViewGroup,
@@ -98,7 +95,7 @@ class CatalogToolbar(
             val queryText = this.searchText.text.trim().toString()
             this.keyboardHide()
             if (queryText.isNotBlank()) {
-              this.onSearchSubmitted(account.id, search, queryText)
+              this.callbacks.onSearchSubmitted(account.id, search, queryText)
             }
             return@setOnEditorActionListener true
           }
@@ -114,7 +111,7 @@ class CatalogToolbar(
 
       if (canGoBack) {
         this.logo.setImageResource(org.thepalaceproject.theme.core.R.drawable.palace_arrow_back_24)
-        this.logoTouch.setOnClickListener { this.onToolbarBackPressed.invoke() }
+        this.logoTouch.setOnClickListener { this.callbacks.onToolbarBackPressed() }
         this.logoTouch.contentDescription = resources.getString(R.string.catalogAccessibilityGoBack)
         return
       }
@@ -128,7 +125,7 @@ class CatalogToolbar(
       when (catalogPart) {
         CATALOG -> {
           this.logoTouch.isEnabled = true
-          this.logoTouch.setOnClickListener { this.onToolbarLogoPressed.invoke() }
+          this.logoTouch.setOnClickListener { this.callbacks.onToolbarLogoPressed(account.id) }
           this.logo.setImageResource(R.drawable.main_icon)
           this.logoTouch.contentDescription =
             resources.getString(R.string.catalogAccessibilityAccountSelection)

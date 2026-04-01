@@ -16,7 +16,7 @@ import org.nypl.simplified.feeds.api.FeedEntry
 class CatalogLaneItemViewHolder(
   private val view: View,
   private val coverLoader: BookCoverProviderType,
-  private val onBookSelected: (FeedEntry.FeedEntryOPDS) -> Unit
+  private val callbacks: CatalogViewCallbacksType,
 ) : RecyclerView.ViewHolder(view) {
 
   private var thumbnailLoading: FluentFuture<Unit>? = null
@@ -32,7 +32,7 @@ class CatalogLaneItemViewHolder(
       CatalogBookAccessibilityStrings.coverDescription(view.resources, entry)
 
     view.setOnClickListener {
-      onBookSelected.invoke(entry)
+      this.callbacks.onBookSelected(entry)
     }
 
     this.thumbnailLoading = coverLoader.loadThumbnailInto(
