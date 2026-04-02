@@ -1122,9 +1122,9 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-04-02T18:31:13+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.26.4">
+    <c:release date="2026-04-02T19:04:40+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.26.4">
       <c:changes>
-        <c:change date="2026-04-02T18:31:13+00:00" summary="Fix accounts not syncing on startup."/>
+        <c:change date="2026-04-02T00:00:00+00:00" summary="Fix accounts not syncing on startup."/>
       </c:changes>
     </c:release>
   </c:releases>
