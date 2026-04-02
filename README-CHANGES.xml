@@ -1072,7 +1072,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-03-30T19:32:06+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.26.3">
+    <c:release date="2026-04-02T00:00:00+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.26.3">
       <c:changes>
         <c:change date="2026-02-18T00:00:00+00:00" summary="Only activate Adobe devices on first fulfillment.">
           <c:tickets>
@@ -1120,6 +1120,11 @@
             <c:ticket id="PP-3872"/>
           </c:tickets>
         </c:change>
+      </c:changes>
+    </c:release>
+    <c:release date="2026-04-02T18:31:13+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.26.4">
+      <c:changes>
+        <c:change date="2026-04-02T18:31:13+00:00" summary="Fix accounts not syncing on startup."/>
       </c:changes>
     </c:release>
   </c:releases>
