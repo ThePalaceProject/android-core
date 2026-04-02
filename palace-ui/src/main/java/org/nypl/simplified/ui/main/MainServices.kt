@@ -1046,6 +1046,13 @@ internal object MainServices {
     Services.initialize(finalServices)
     logger.debug("boot completed")
     onProgress.invoke(BootEvent.BootCompleted(strings.bootCompleted))
+
+    val profile = bookController.profileCurrent()
+    for (account in profile.accounts().values) {
+      logger.debug("Scheduling sync of account {}", account.id)
+      bookController.booksSync(account.id)
+    }
+
     return finalServices
   }
 
