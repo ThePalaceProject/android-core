@@ -1,5 +1,6 @@
 package org.nypl.simplified.ui.catalog
 
+import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
@@ -20,6 +21,7 @@ import kotlinx.coroutines.launch
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
 import org.librarysimplified.viewer.preview.BookPreviewActivity
+import org.nypl.simplified.accessibility.AccessibilityServiceType
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountLoginState
@@ -118,6 +120,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
   private var perViewSubscriptions =
     CloseableCollection.create()
 
+  private lateinit var accessibility: AccessibilityServiceType
   private lateinit var bookPreviewRegistry: BookPreviewRegistryType
   private lateinit var bookRegistry: BookRegistryReadableType
   private lateinit var buttonCreator: CatalogButtons
@@ -180,6 +183,8 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
       CatalogButtons(this.requireContext())
     this.catalogBookEvents =
       services.requireService(CatalogBookRegistryEvents::class.java)
+    this.accessibility =
+      services.requireService(AccessibilityServiceType::class.java)
 
     this.opdsClient =
       opdsClients.clientFor(this.catalogPart)
@@ -962,6 +967,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
       }
     )
     this.switchView(view)
+    this.announceSearchResults(context, newState, view)
 
     /*
      * Set up a listener to restore the scroll position. This works around multiple pieces of
@@ -986,6 +992,30 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
     }
 
     this.setupRefreshForLocalFeeds(feedHandle)
+  }
+
+  private fun announceSearchResults(
+    context: Context,
+    newState: LoadedFeedWithoutGroups,
+    view: CatalogFeedViewInfinite
+  ) {
+    if (!this.accessibility.spokenFeedbackEnabled) {
+      return
+    }
+    if (!newState.request.isSearch) {
+      return
+    }
+    if (this.catalogPart != CATALOG) {
+      return
+    }
+
+    if (newState.handle.feed().size == 0) {
+      this.accessibility.speak(context.getString(R.string.feedEmpty))
+      return
+    }
+
+    this.accessibility.speak(context.getString(R.string.feedSearchResultsAvailable))
+    view.listView.requestFocus()
   }
 
   final override fun onIsBookReturnable(
@@ -1112,6 +1142,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
           OPDSClientRequest.GeneratedFeed(
             accountID = accountID,
             historyBehavior = CLEAR_HISTORY,
+            isSearch = true,
             generator = {
               profiles.profileFeed(
                 ProfileFeedRequest(
@@ -1132,10 +1163,11 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
         this.opdsClient.goTo(
           OPDSClientRequest.NewFeed(
             accountID = accountID,
-            uri = feedSearch.search.getQueryURIForTerms(queryText),
             credentials = credentials,
             historyBehavior = ADD_TO_HISTORY,
-            method = "GET"
+            isSearch = true,
+            method = "GET",
+            uri = feedSearch.search.getQueryURIForTerms(queryText),
           )
         )
       }

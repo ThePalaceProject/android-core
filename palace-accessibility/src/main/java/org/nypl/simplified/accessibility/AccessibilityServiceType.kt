@@ -11,4 +11,10 @@ interface AccessibilityServiceType {
    */
 
   val spokenFeedbackEnabled: Boolean
+
+  /**
+   * Speak the given text.
+   */
+
+  fun speak(message: String)
 }

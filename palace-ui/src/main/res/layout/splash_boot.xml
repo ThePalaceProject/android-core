@@ -21,6 +21,7 @@
 
     <ProgressBar
         android:id="@+id/splashProgress"
+        android:contentDescription="@string/accessSplashLoading"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="128dp"
         android:layout_height="32dp"
@@ -47,6 +48,7 @@
         android:id="@+id/splashImage"
         android:layout_width="240dp"
         android:layout_height="240dp"
+        android:contentDescription="@string/accessSplashTitle"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

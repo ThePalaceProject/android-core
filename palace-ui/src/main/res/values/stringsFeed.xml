@@ -1,27 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <resources>
-  <string name="catalogFeedLoading">Loading feed…</string>
-  <string name="feedByAuthor">Author</string>
-  <string name="feedByTitle">Title</string>
-  <string name="feedLibrary">Library</string>
-  <string name="feedLibraryAll">All</string>
-  <string name="feedDetails">@string/catalogDetails</string>
-  <string name="feedEmpty">No results found.</string>
-  <string name="feedLoadingError">An error occurred while loading the catalog.</string>
-  <string name="feedNavigationNotSupported">Navigation feeds are not currently supported. Sorry!</string>
-  <string name="feedRetry">@string/catalogRetry</string>
-  <string name="feedShow">Show</string>
-  <string name="feedShowAll">All</string>
-  <string name="feedShowOnLoan">On Loan</string>
-  <string name="feedSortBy">Sort By</string>
-  <string name="feedTitleBooks">Books</string>
-  <string name="feedTitleCatalog">Catalog</string>
-  <string name="feedTitleHolds">Holds</string>
-  <string name="feedWithGroupsEmptyHolds">When you place a hold on a book from the catalog, it will show up here. Look here from time to time to see if your book is available to download.</string>
-  <string name="feedWithGroupsEmptyLoaned">Visit the Catalog to add books to My Books.</string>
-  <string name="ageGateBirthYearPrompt">Please enter your birth year</string>
-  <string name="selectYear">Select Year</string>
-  <string name="ageVerification">Age Verification</string>
-  <string name="next">Next</string>
+    <string name="catalogFeedLoading">Loading feed…</string>
+    <string name="feedByAuthor">Author</string>
+    <string name="feedByTitle">Title</string>
+    <string name="feedLibrary">Library</string>
+    <string name="feedLibraryAll">All</string>
+    <string name="feedDetails">@string/catalogDetails</string>
+    <string name="feedEmpty">No results found.</string>
+    <string name="feedSearchResultsAvailable">Search results are now available on this screen.</string>
+    <string name="feedLoadingError">An error occurred while loading the catalog.</string>
+    <string name="feedNavigationNotSupported">Navigation feeds are not currently supported. Sorry!</string>
+    <string name="feedRetry">@string/catalogRetry</string>
+    <string name="feedShow">Show</string>
+    <string name="feedShowAll">All</string>
+    <string name="feedShowOnLoan">On Loan</string>
+    <string name="feedSortBy">Sort By</string>
+    <string name="feedTitleBooks">Books</string>
+    <string name="feedTitleCatalog">Catalog</string>
+    <string name="feedTitleHolds">Holds</string>
+    <string name="feedWithGroupsEmptyHolds">When you place a hold on a book from the catalog, it will show up here. Look here from time to time to see if your book is available to download.</string>
+    <string name="feedWithGroupsEmptyLoaned">Visit the Catalog to add books to My Books.</string>
+    <string name="ageGateBirthYearPrompt">Please enter your birth year</string>
+    <string name="selectYear">Select Year</string>
+    <string name="ageVerification">Age Verification</string>
+    <string name="next">Next</string>
 </resources>

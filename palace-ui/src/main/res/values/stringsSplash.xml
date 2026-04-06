@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <resources>
+    <string name="accessSplashLoading">The Palace application is currently loading.</string>
+    <string name="accessSplashTitle">Palace</string>
+
     <string name="splashNotificationsText">
 We use notifications to tell you when book reservations are ready, and also to ensure the reliable playback of audiobooks.\n
 Do you want to enable notifications?

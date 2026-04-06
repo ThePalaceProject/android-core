@@ -18,6 +18,8 @@ sealed class OPDSClientRequest {
 
   abstract val historyBehavior: HistoryBehavior
 
+  abstract val isSearch: Boolean
+
   abstract fun withHistoryBehaviour(
     historyBehavior: HistoryBehavior
   ): OPDSClientRequest
@@ -46,6 +48,7 @@ sealed class OPDSClientRequest {
   data class NewFeed(
     override val accountID: AccountID,
     override val uri: URI,
+    override val isSearch: Boolean = false,
     val credentials: AccountAuthenticationCredentials?,
     val method: String,
     override val historyBehavior: HistoryBehavior
@@ -63,6 +66,7 @@ sealed class OPDSClientRequest {
   data class GeneratedFeed(
     override val accountID: AccountID,
     override val historyBehavior: HistoryBehavior,
+    override val isSearch: Boolean = false,
     val generator: () -> Feed
   ) : OPDSClientRequest() {
     override val uri =
@@ -85,6 +89,8 @@ sealed class OPDSClientRequest {
       this.entry.accountID
     override val uri: URI =
       URI.create("urn:entry:${this.accountID}:${this.entry.bookID}")
+    override val isSearch: Boolean =
+      false
     override val requestID: UUID =
       UUID.randomUUID()
 
@@ -107,6 +113,9 @@ sealed class OPDSClientRequest {
       UUID.randomUUID()
     override val accountID: AccountID =
       this.facet.accountID
+    override val isSearch: Boolean =
+      false
+
     override fun withHistoryBehaviour(
       historyBehavior: HistoryBehavior
     ): ResolvedCompositeOPDS12Facet {

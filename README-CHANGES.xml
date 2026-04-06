@@ -1122,7 +1122,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-04-02T16:01:23+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.27.0">
+    <c:release date="2026-04-06T12:57:14+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.27.0">
       <c:changes>
         <c:change date="2026-03-19T00:00:00+00:00" summary="Increase book details metadata text.">
           <c:tickets>
@@ -1150,7 +1150,12 @@
             <c:ticket id="PP-3981"/>
           </c:tickets>
         </c:change>
-        <c:change date="2026-04-02T16:01:23+00:00" summary="Fix a missing sync on startup."/>
+        <c:change date="2026-04-02T00:00:00+00:00" summary="Fix a missing sync on startup."/>
+        <c:change date="2026-04-06T12:57:14+00:00" summary="Improve screen reader behaviour for search results.">
+          <c:tickets>
+            <c:ticket id="PP-3982"/>
+          </c:tickets>
+        </c:change>
       </c:changes>
     </c:release>
   </c:releases>

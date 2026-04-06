@@ -43,7 +43,7 @@ class AccessibilityService private constructor(
   override val spokenFeedbackEnabled: Boolean
     get() = this.events.spokenFeedbackEnabled
 
-  private fun speak(message: String) {
+  override fun speak(message: String) {
     this.events.show(message)
   }
 
