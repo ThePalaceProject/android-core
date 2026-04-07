@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.google.android.material.tabs.TabLayout
 import com.io7m.jmulticlose.core.CloseableCollection
@@ -39,10 +41,10 @@ class MainTabsFragment : Fragment(), MainBackButtonConsumerType {
     private const val TAB_INDEX_SETTINGS = 3
   }
 
-  private lateinit var tabSettingsView: View
-  private lateinit var tabReservationsView: View
-  private lateinit var tabBooksView: View
-  private lateinit var tabCatalogView: View
+  private lateinit var tabSettingsView: TabLayout.TabView
+  private lateinit var tabReservationsView: TabLayout.TabView
+  private lateinit var tabBooksView: TabLayout.TabView
+  private lateinit var tabCatalogView: TabLayout.TabView
   private lateinit var root: ViewGroup
   private lateinit var tabBooks: TabLayout.Tab
   private lateinit var tabCatalog: TabLayout.Tab
@@ -77,14 +79,39 @@ class MainTabsFragment : Fragment(), MainBackButtonConsumerType {
      */
 
     val tabStrip = (this.tabLayout.getChildAt(0) as ViewGroup)
-    this.tabCatalog = this.tabLayout.getTabAt(TAB_INDEX_CATALOG)!!
-    this.tabCatalogView = tabStrip.getChildAt(TAB_INDEX_CATALOG)!!
-    this.tabBooks = this.tabLayout.getTabAt(TAB_INDEX_BOOKS)!!
-    this.tabBooksView = tabStrip.getChildAt(TAB_INDEX_BOOKS)!!
-    this.tabReservations = this.tabLayout.getTabAt(TAB_INDEX_RESERVATIONS)!!
-    this.tabReservationsView = tabStrip.getChildAt(TAB_INDEX_RESERVATIONS)!!
-    this.tabSettings = this.tabLayout.getTabAt(TAB_INDEX_SETTINGS)!!
-    this.tabSettingsView = tabStrip.getChildAt(TAB_INDEX_SETTINGS)!!
+    this.tabCatalog =
+      this.tabLayout.getTabAt(TAB_INDEX_CATALOG)!!
+    this.tabBooks =
+      this.tabLayout.getTabAt(TAB_INDEX_BOOKS)!!
+    this.tabReservations =
+      this.tabLayout.getTabAt(TAB_INDEX_RESERVATIONS)!!
+    this.tabSettings =
+      this.tabLayout.getTabAt(TAB_INDEX_SETTINGS)!!
+
+    /*
+     * We're forced to use custom views for tab items to comply with accessibility regulations:
+     * Android tab items will ellipsize text when the device font size is set to the largest
+     * values, and there's no way to stop it ellipsizing.
+     */
+
+    this.tabCatalog.setCustomView(R.layout.tab_item)
+    this.tabBooks.setCustomView(R.layout.tab_item)
+    this.tabReservations.setCustomView(R.layout.tab_item)
+    this.tabSettings.setCustomView(R.layout.tab_item)
+
+    this.tabCatalogView =
+      tabStrip.getChildAt(TAB_INDEX_CATALOG)!! as TabLayout.TabView
+    this.tabBooksView =
+      tabStrip.getChildAt(TAB_INDEX_BOOKS)!! as TabLayout.TabView
+    this.tabReservationsView =
+      tabStrip.getChildAt(TAB_INDEX_RESERVATIONS)!! as TabLayout.TabView
+    this.tabSettingsView =
+      tabStrip.getChildAt(TAB_INDEX_SETTINGS)!! as TabLayout.TabView
+
+    this.setIconAndText(TAB_CATALOG, this.tabCatalogView)
+    this.setIconAndText(TAB_BOOKS, this.tabBooksView)
+    this.setIconAndText(TAB_RESERVATIONS, this.tabReservationsView)
+    this.setIconAndText(TAB_SETTINGS, this.tabSettingsView)
 
     /*
      * Naturally, because even the simplest things on Android are completely broken, it's
@@ -139,6 +166,35 @@ class MainTabsFragment : Fragment(), MainBackButtonConsumerType {
       }
     }
     return this.root
+  }
+
+  private fun setIconAndText(
+    category: MainTabCategory,
+    view: TabLayout.TabView
+  ) {
+    val textView =
+      view.findViewById<TextView>(R.id.customTabText)
+    val imageView =
+      view.findViewById<ImageView>(R.id.customTabIcon)
+
+    when (category) {
+      TAB_CATALOG -> {
+        textView.text = resources.getString(R.string.tabCatalog)
+        imageView.setImageResource(R.drawable.tab_catalog)
+      }
+      TAB_BOOKS -> {
+        textView.text = resources.getString(R.string.tabBooks)
+        imageView.setImageResource(R.drawable.tab_books)
+      }
+      TAB_RESERVATIONS -> {
+        textView.text = resources.getString(R.string.tabHolds)
+        imageView.setImageResource(R.drawable.tab_holds)
+      }
+      TAB_SETTINGS -> {
+        textView.text = resources.getString(R.string.tabSettings)
+        imageView.setImageResource(R.drawable.tab_settings)
+      }
+    }
   }
 
   override fun onStart() {
