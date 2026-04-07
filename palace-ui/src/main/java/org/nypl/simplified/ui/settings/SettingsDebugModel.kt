@@ -183,11 +183,6 @@ object SettingsDebugModel {
   }
 
   @UiThread
-  fun isManualLCPPassphraseEnabled(): Boolean {
-    return this.preferences().isManualLCPPassphraseEnabled
-  }
-
-  @UiThread
   fun showOnlySupportedBooks(): Boolean {
     val services =
       Services.serviceDirectory()

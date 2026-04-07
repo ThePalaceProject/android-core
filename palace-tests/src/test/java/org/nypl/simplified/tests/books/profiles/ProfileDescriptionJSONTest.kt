@@ -53,7 +53,7 @@ class ProfileDescriptionJSONTest {
           readerPreferences = ReaderPreferences.builder().build(),
           mostRecentAccount = AccountID.generate(),
           playbackRates = hashMapOf(),
-          isManualLCPPassphraseEnabled = false,
+          showDebugSettings = false,
           downloadOnlyOnWIFI = false
         ),
         attributes = ProfileAttributes(

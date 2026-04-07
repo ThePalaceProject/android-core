@@ -731,9 +731,9 @@ class BorrowLCPEpubTest {
       task.execute(context)
     }
 
-    // The first and only request should have been to the loans feed for the account.
+    // The first request should have been to the loans feed for the account.
 
-    Assertions.assertEquals(1, this.webServer.requestCount)
+    Assertions.assertEquals(2, this.webServer.requestCount)
 
     Assertions.assertEquals(
       this.account.provider.loansURI.toString().toHttpUrl(),
@@ -806,9 +806,9 @@ class BorrowLCPEpubTest {
       task.execute(context)
     }
 
-    // The first and only request should have been to the loans feed for the account.
+    // The first request should have been to the loans feed for the account.
 
-    Assertions.assertEquals(1, this.webServer.requestCount)
+    Assertions.assertEquals(2, this.webServer.requestCount)
 
     Assertions.assertEquals(
       this.account.provider.loansURI.toString().toHttpUrl(),

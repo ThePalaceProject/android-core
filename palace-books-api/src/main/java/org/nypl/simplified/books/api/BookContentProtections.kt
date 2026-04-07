@@ -1,6 +1,6 @@
 package org.nypl.simplified.books.api
 
-import android.app.Application
+import android.app.Activity
 import org.nypl.drm.core.BoundlessServiceType
 import org.nypl.drm.core.ContentProtectionProvider
 import org.nypl.simplified.lcp.LCPContentProtectionProvider
@@ -21,12 +21,11 @@ object BookContentProtections {
    */
 
   fun create(
-    context: Application,
+    context: Activity,
     contentProtectionProviders: List<ContentProtectionProvider>,
     boundless: BoundlessServiceType?,
     format: BookFormat,
     drmInfo: BookDRMInformation,
-    isManualPassphraseEnabled: Boolean = false,
     onLCPDialogDismissed: () -> Unit = {}
   ): List<ContentProtection> {
     return try {
@@ -72,8 +71,7 @@ object BookContentProtections {
               .firstOrNull()
 
           if (lcpProvider != null) {
-            lcpProvider.passphrase = drmInfo.hashedPassphrase
-            lcpProvider.isManualPassphraseEnabled = isManualPassphraseEnabled
+            lcpProvider.setPassphraseFromHashed(drmInfo.hashedPassphrase)
             lcpProvider.onLcpDialogDismissed = onLCPDialogDismissed
             listOfNotNull(lcpProvider.create(context))
           } else {

@@ -406,11 +406,11 @@ object ProfilesDatabases {
               dateOfBirth = null,
               hasSeenNotificationScreen = false,
               hasSeenLibrarySelectionScreen = false,
-              isManualLCPPassphraseEnabled = false,
               mostRecentAccount = account.id,
               playbackRates = hashMapOf(),
               readerPreferences = ReaderPreferences.builder().build(),
               showTestingLibraries = false,
+              showDebugSettings = false,
               downloadOnlyOnWIFI = false
             ),
             attributes = ProfileAttributes(sortedMapOf())
