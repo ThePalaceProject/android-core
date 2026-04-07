@@ -285,12 +285,11 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
       val contentProtections =
         BookContentProtections.create(
-          context = this.application,
+          context = this,
           contentProtectionProviders = contentProtectionProviders,
           boundless = this.boundless,
           drmInfo = this.parameters.drmInfo,
           format = this.bookFormat,
-          isManualPassphraseEnabled = profileCurrent.preferences().isManualLCPPassphraseEnabled,
           onLCPDialogDismissed = {
             this.logger.debug("Dismissed LCP dialog. Shutting down...")
             this.finish()

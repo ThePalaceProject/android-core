@@ -256,13 +256,11 @@ class PdfReaderActivity : AppCompatActivity() {
 
     val contentProtections =
       BookContentProtections.create(
-        context = this.application,
+        context = this,
         contentProtectionProviders = providers,
         boundless = null,
         drmInfo = drmInfo,
         format = this.bookFormat,
-        isManualPassphraseEnabled =
-        this.profilesController.profileCurrent().preferences().isManualLCPPassphraseEnabled,
         onLCPDialogDismissed = {
           this.finish()
         }

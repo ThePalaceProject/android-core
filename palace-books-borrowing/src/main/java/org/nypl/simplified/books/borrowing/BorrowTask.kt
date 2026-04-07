@@ -214,7 +214,6 @@ class BorrowTask private constructor(
         contentResolver = this.requirements.contentResolver,
         currentOPDSAcquisitionPathElement = path.elements.first(),
         httpClient = this.requirements.httpClient,
-        isManualLCPPassphraseEnabled = currentProfile.preferences().isManualLCPPassphraseEnabled,
         lcpService = this.requirements.lcpService,
         logger = this.logger,
         opdsAcquisitionPath = path,
@@ -478,7 +477,6 @@ class BorrowTask private constructor(
     override val contentResolver: ContentResolverType,
     override val bookDatabaseEntry: BookDatabaseEntryType,
     override val httpClient: LSHTTPClientType,
-    override val isManualLCPPassphraseEnabled: Boolean,
     override val taskRecorder: TaskRecorderType,
     @Volatile
     override var opdsAcquisitionPath: OPDSAcquisitionPath,

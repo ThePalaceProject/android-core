@@ -198,9 +198,6 @@ object ProfileDescriptionJSON {
     val playbackRates =
       deserializePlaybackRates(objectMapper, objectNode)
 
-    val isManualLCPPassphraseEnabled =
-      JSONParserUtilities.getBooleanDefault(objectNode, "isManualLCPPassphraseEnabled", false)
-
     val downloadOnlyOnWIFI =
       JSONParserUtilities.getBooleanDefault(objectNode, "downloadOnlyOnWIFI", false)
 
@@ -217,7 +214,6 @@ object ProfileDescriptionJSON {
       hasSeenLibrarySelectionScreen = hasSeenLibrarySelectionScreen,
       showDebugSettings = showDebugSettings,
       playbackRates = playbackRates,
-      isManualLCPPassphraseEnabled = isManualLCPPassphraseEnabled,
       hasSeenNotificationScreen = hasSeenNotificationScreen,
       downloadOnlyOnWIFI = downloadOnlyOnWIFI
     )
@@ -268,7 +264,7 @@ object ProfileDescriptionJSON {
       hasSeenLibrarySelectionScreen = true,
       hasSeenNotificationScreen = false,
       playbackRates = playbackRates,
-      isManualLCPPassphraseEnabled = isManualLCPPassphraseEnabled,
+      showDebugSettings = false,
       downloadOnlyOnWIFI = downloadOnlyOnWIFI
     )
   }
@@ -320,9 +316,6 @@ object ProfileDescriptionJSON {
     val readerPrefs =
       deserializeReaderPreferences(objectMapper, preferencesNode)
 
-    val isManualLCPPassphraseEnabled =
-      JSONParserUtilities.getBooleanDefault(preferencesNode, "isManualLCPPassphraseEnabled", false)
-
     val downloadOnlyOnWIFI =
       JSONParserUtilities.getBooleanDefault(objectNode, "downloadOnlyOnWIFI", false)
 
@@ -335,7 +328,7 @@ object ProfileDescriptionJSON {
         hasSeenLibrarySelectionScreen = true,
         hasSeenNotificationScreen = false,
         playbackRates = playbackRates,
-        isManualLCPPassphraseEnabled = isManualLCPPassphraseEnabled,
+        showDebugSettings = false,
         downloadOnlyOnWIFI = downloadOnlyOnWIFI
       )
 
@@ -450,7 +443,6 @@ object ProfileDescriptionJSON {
   ): ObjectNode {
     val output = objectMapper.createObjectNode()
     output.put("showTestingLibraries", preferences.showTestingLibraries)
-    output.put("isManualLCPPassphraseEnabled", preferences.isManualLCPPassphraseEnabled)
     output.put("hasSeenLibrarySelectionScreen", preferences.hasSeenLibrarySelectionScreen)
     output.put("hasSeenNotificationScreen", preferences.hasSeenNotificationScreen)
     output.put("showDebugSettings", preferences.showDebugSettings)

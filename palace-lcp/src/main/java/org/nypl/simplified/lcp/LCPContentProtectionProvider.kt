@@ -1,6 +1,6 @@
 package org.nypl.simplified.lcp
 
-import android.app.Application
+import android.app.Activity
 import android.content.Context
 import android.view.LayoutInflater
 import android.widget.TextView
@@ -39,15 +39,29 @@ class LCPContentProtectionProvider : ContentProtectionProvider {
    */
 
   @Volatile
-  var passphrase: String? = null
-    set(value) {
-      field = value?.let { LCPHashedPassphrase.conditionallyBase64Decode(it) }
-    }
+  private var passphrase: String? = null
 
-  /**
-   * The current state (true/false) of the ability of writing a passphrase manually.
-   */
-  var isManualPassphraseEnabled: Boolean = false
+  fun setPassphraseFromHashed(
+    text: String?
+  ) {
+    if (text == null) {
+      this.passphrase = null
+    } else {
+      this.passphrase = LCPHashedPassphrase.conditionallyBase64Decode(text)
+    }
+    logger.debug("setPassphraseFromHashed: {}", this.passphrase)
+  }
+
+  fun setPassphraseFromClear(
+    text: String?
+  ) {
+    if (text == null) {
+      this.passphrase = null
+    } else {
+      this.passphrase = text
+    }
+    logger.debug("setPassphraseFromClear: {}", this.passphrase)
+  }
 
   /**
    * The action to perform when the manual passphrase dialog is dismissed.
@@ -74,39 +88,47 @@ class LCPContentProtectionProvider : ContentProtectionProvider {
     val inputPassphrase = view.findViewById<TextView>(R.id.inputPassphrase)
 
     return suspendCoroutine { cont ->
-      MaterialAlertDialogBuilder(context).apply {
-        setTitle(R.string.dialog_manual_passphrase_title)
-        setMessage(hint)
-        setPositiveButton(R.string.dialog_manual_passphrase_done) { dialog, _ ->
+      try {
+        val dialogBuilder = MaterialAlertDialogBuilder(context)
+        dialogBuilder.setTitle(R.string.dialog_manual_passphrase_title)
+        dialogBuilder.setMessage(hint)
+        dialogBuilder.setView(view)
+
+        dialogBuilder.setPositiveButton(R.string.dialog_manual_passphrase_done) { dialog, _ ->
           dialog.dismiss()
           try {
-            passphrase = inputPassphrase.text.toString().trim()
-            cont.resume(passphrase())
-          } catch (exception: IllegalArgumentException) {
-            exception.printStackTrace()
-            cont.resume("")
+            this.setPassphraseFromClear(inputPassphrase.text.toString().trim())
+            cont.resume(this.passphrase())
+          } catch (e: Throwable) {
+            this.logger.debug("Dialog failure: ", e)
           }
         }
-        setNegativeButton(R.string.dialog_manual_passphrase_cancel) { dialog, _ ->
+
+        dialogBuilder.setNegativeButton(R.string.dialog_manual_passphrase_cancel) { dialog, _ ->
+          this.setPassphraseFromClear(null)
           dialog.dismiss()
         }
-        setView(view)
-        setOnDismissListener {
+
+        dialogBuilder.setOnDismissListener {
           try {
+            this.setPassphraseFromClear(null)
             cont.resume(null)
-            onLcpDialogDismissed()
-          } catch (exception: IllegalStateException) {
-            exception.printStackTrace()
+            this.onLcpDialogDismissed()
+          } catch (e: Throwable) {
+            this.logger.debug("Dialog failure: ", e)
           }
         }
+
+        val dialog = dialogBuilder.create()
+        dialog.show()
+      } catch (e: Throwable) {
+        this.logger.debug("Dialog failure: ", e)
       }
-        .create()
-        .show()
     }
   }
 
   override fun create(
-    context: Application
+    context: Activity
   ): ContentProtection? {
     val httpClient =
       DefaultHttpClient()
@@ -134,10 +156,18 @@ class LCPContentProtectionProvider : ContentProtectionProvider {
             reason: LcpAuthenticating.AuthenticationReason,
             allowUserInteraction: Boolean
           ): String? {
-            return if (!isManualPassphraseEnabled) {
-              this@LCPContentProtectionProvider.passphrase()
-            } else {
-              withContext(Dispatchers.Main) { askPassphrase(context, license.hint) }
+            logger.debug(
+              "Retrieving passphrase: {} (allowUserInteraction: {})",
+              reason,
+              allowUserInteraction
+            )
+
+            if (!allowUserInteraction) {
+              return this@LCPContentProtectionProvider.passphrase()
+            }
+
+            return withContext(Dispatchers.Main) {
+              this@LCPContentProtectionProvider.askPassphrase(context, license.hint)
             }
           }
         }

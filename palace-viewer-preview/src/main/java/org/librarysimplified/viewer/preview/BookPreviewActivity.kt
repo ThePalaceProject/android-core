@@ -446,11 +446,10 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
       val contentProtections =
         BookContentProtections.create(
           boundless = this.boundless,
-          context = this.application,
+          context = this,
           contentProtectionProviders = contentProtectionProviders,
           drmInfo = BookDRMInformation.None,
           format = this.bookFormat,
-          isManualPassphraseEnabled = false,
           onLCPDialogDismissed = {
             this.logger.debug("Dismissed LCP dialog. Shutting down...")
             this.finish()

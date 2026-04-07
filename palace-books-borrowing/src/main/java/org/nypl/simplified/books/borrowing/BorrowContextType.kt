@@ -327,9 +327,4 @@ interface BorrowContextType {
    */
 
   val samlDownloadContext: SAMLDownloadContext?
-
-  /**
-   * Information about if the LCP passphrase manual input is enabled or not.
-   */
-  val isManualLCPPassphraseEnabled: Boolean
 }
