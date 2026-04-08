@@ -1122,7 +1122,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-04-07T19:06:38+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.27.0">
+    <c:release date="2026-04-08T16:12:58+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.27.0">
       <c:changes>
         <c:change date="2026-03-19T00:00:00+00:00" summary="Increase book details metadata text.">
           <c:tickets>
@@ -1161,7 +1161,7 @@
             <c:ticket id="PP-3994"/>
           </c:tickets>
         </c:change>
-        <c:change date="2026-04-07T19:06:38+00:00" summary="Re-enable LCP passphrase support.">
+        <c:change date="2026-04-07T00:00:00+00:00" summary="Re-enable LCP passphrase support.">
           <c:tickets>
             <c:ticket id="PP-993"/>
           </c:tickets>
