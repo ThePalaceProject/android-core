@@ -223,6 +223,21 @@ class CatalogFeedViewDetails2(
     this.bottomSheet.findViewById<TextView>(R.id.book2DBottomSheetButton1)
 
   /*
+   * The set of views that are disabled when the bottom drawer is open. This is primarily
+   * for accessibility: We want the screen reader to be unable to see anything that isn't
+   * in the bottom drawer when the drawer is open.
+   */
+
+  private val viewsDisabledWhenDrawerOpen =
+    listOf<View>(
+      this.appBar,
+      this.imageOverlay,
+      this.scrollView,
+      this.toolbarItemsWhenCollapsed,
+      this.toolbarItemsWhenExpanded,
+    )
+
+  /*
    * "Enabled" flags for views. There are two flags for each set of buttons, the "status"
    * flag and the "view" flag. The "status" flag is `true` or `false` depending on the current
    * book status, and the "view" flag is `true` or `false` depending on whether the app bar is
@@ -314,11 +329,21 @@ class CatalogFeedViewDetails2(
           c.bottomSheetDarken.isClickable = true
           c.scrollView.importantForAccessibility =
             View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
+
+          for (view in viewsDisabledWhenDrawerOpen) {
+            view.isEnabled = false
+            view.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
+          }
         } else if (state <= 0.01) {
           c.bottomSheetDarken.setOnClickListener(null)
           c.bottomSheetDarken.isClickable = false
           c.scrollView.importantForAccessibility =
             View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
+
+          for (view in viewsDisabledWhenDrawerOpen) {
+            view.isEnabled = true
+            view.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
+          }
         }
       }
     })

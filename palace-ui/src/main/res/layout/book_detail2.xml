@@ -377,6 +377,9 @@
         android:layout_height="match_parent"
         android:background="#7f000000"
         android:elevation="10dp"
+        android:clickable="true"
+        android:focusable="false"
+        android:importantForAccessibility="no"
         tools:visibility="gone" />
 
     <!-- Bottom sheet. -->
