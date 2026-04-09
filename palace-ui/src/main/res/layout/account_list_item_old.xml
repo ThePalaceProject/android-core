@@ -60,7 +60,7 @@
         android:layout_marginStart="16dp"
         android:src="@drawable/ic_delete"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="@string/accountMore"
+        android:contentDescription="@string/settingsAccessibilityAccountDelete"
         android:focusable="true"
         android:visibility="gone"
         tools:visibility="visible" />

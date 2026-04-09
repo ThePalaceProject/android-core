@@ -176,9 +176,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clickable="false"
-        android:contentDescription="@string/catalogAccessibilityBackgroundImage"
         android:elevation="-10dp"
-        android:focusable="false" />
+        android:focusable="false"
+        android:importantForAccessibility="no" />
 
     <!-- The items that appear in the toolbar when the toolbar is "collapsed" -->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -260,8 +260,8 @@
                 android:layout_height="24dp"
                 android:layout_gravity="center"
                 android:clickable="false"
-                android:contentDescription="@string/catalogAccessibilityGoBack"
                 android:focusable="false"
+                android:importantForAccessibility="no"
                 android:src="@drawable/arrow_left"
                 android:tintMode="multiply"
                 app:tint="#ffffffff" />
@@ -287,8 +287,10 @@
             android:layout_width="wrap_content"
             android:layout_height="@dimen/catalogBookDetailCoverHeight"
             android:background="@drawable/shadow_rect"
-            android:contentDescription="@string/catalogBookCoverDescription"
+            android:clickable="false"
             android:elevation="10dp"
+            android:focusable="false"
+            android:importantForAccessibility="no"
             android:scaleType="fitXY"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -337,16 +339,16 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:maxLines="1"
-                android:text="@string/catalogDownload"
                 android:autoSizeMaxTextSize="16sp"
                 android:autoSizeTextType="uniform"
-                app:layout_constraintWidth_max="160dp"
+                android:maxLines="1"
+                android:text="@string/catalogDownload"
                 app:layout_constraintEnd_toStartOf="@id/book2DOverlayButton1"
                 app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintHorizontal_weight="1"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_max="160dp"
                 app:layout_goneMarginEnd="0dp" />
 
             <Button
@@ -355,15 +357,15 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:maxLines="1"
-                android:text="@string/catalogPreview"
                 android:autoSizeMaxTextSize="16sp"
                 android:autoSizeTextType="uniform"
-                app:layout_constraintWidth_max="160dp"
+                android:maxLines="1"
+                android:text="@string/catalogPreview"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_weight="1"
                 app:layout_constraintStart_toEndOf="@id/book2DOverlayButton0"
                 app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_max="160dp"
                 app:layout_goneMarginStart="0dp" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
