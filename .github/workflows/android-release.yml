@@ -20,11 +20,11 @@ jobs:
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_NOTES_PATH: ${{ env.RELEASE_NOTES_PATH }}
           TAG_NAME: ${{ env.TAG_NAME }}
           VERSION_NUM: ${{ env.VERSION_NUM }}
         with:
+          token: ${{ secrets.CI_GITHUB_ACCESS_TOKEN }}
           tag_name: ${{ env.TAG_NAME }}
           name: ${{ env.VERSION_NUM }}
           body_path: ${{ env.RELEASE_NOTES_PATH }}
