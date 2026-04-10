@@ -64,6 +64,12 @@ class LCPContentProtectionProvider : ContentProtectionProvider {
   }
 
   /**
+   * Whether manually entering LCP passphrases is allowed.
+   */
+
+  var isLCPManualPassphraseEnabled: Boolean = false
+
+  /**
    * The action to perform when the manual passphrase dialog is dismissed.
    */
   var onLcpDialogDismissed: () -> Unit = {}
@@ -159,10 +165,10 @@ class LCPContentProtectionProvider : ContentProtectionProvider {
             logger.debug(
               "Retrieving passphrase: {} (allowUserInteraction: {})",
               reason,
-              allowUserInteraction
+              isLCPManualPassphraseEnabled
             )
 
-            if (!allowUserInteraction) {
+            if (!isLCPManualPassphraseEnabled) {
               return this@LCPContentProtectionProvider.passphrase()
             }
 

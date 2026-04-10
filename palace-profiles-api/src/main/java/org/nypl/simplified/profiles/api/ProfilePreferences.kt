@@ -54,4 +54,8 @@ data class ProfilePreferences(
   /** @return `true` if downloads should only occur when Wi-Fi is available. */
 
   val downloadOnlyOnWIFI: Boolean,
+
+  /** @return `true` if LCP manual passphrase entry is allowed */
+
+  val isLCPManualPassphraseEnabled: Boolean,
 )

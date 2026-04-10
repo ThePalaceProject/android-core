@@ -253,6 +253,10 @@ class PdfReaderActivity : AppCompatActivity() {
     val providers =
       ServiceLoader.load(ContentProtectionProvider::class.java)
         .toList()
+    val profile =
+      Services.serviceDirectory()
+        .requireService(ProfilesControllerType::class.java)
+        .profileCurrent()
 
     val contentProtections =
       BookContentProtections.create(
@@ -261,6 +265,7 @@ class PdfReaderActivity : AppCompatActivity() {
         boundless = null,
         drmInfo = drmInfo,
         format = this.bookFormat,
+        isLCPManualPassphraseEnabled = profile.preferences().isLCPManualPassphraseEnabled,
         onLCPDialogDismissed = {
           this.finish()
         }

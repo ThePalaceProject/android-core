@@ -404,14 +404,15 @@ object ProfilesDatabases {
           ProfileDescription(
             preferences = ProfilePreferences(
               dateOfBirth = null,
-              hasSeenNotificationScreen = false,
+              downloadOnlyOnWIFI = false,
               hasSeenLibrarySelectionScreen = false,
+              hasSeenNotificationScreen = false,
+              isLCPManualPassphraseEnabled = false,
               mostRecentAccount = account.id,
               playbackRates = hashMapOf(),
               readerPreferences = ReaderPreferences.builder().build(),
-              showTestingLibraries = false,
               showDebugSettings = false,
-              downloadOnlyOnWIFI = false
+              showTestingLibraries = false,
             ),
             attributes = ProfileAttributes(sortedMapOf())
           )
