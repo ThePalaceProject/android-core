@@ -3,8 +3,10 @@
 <resources>
     <string name="Dismiss">Dismiss</string>
     <string name="accessibility_back">Close book and go back.</string>
-    <string name="accessibility_settings">Open the settings menu</string>
-    <string name="accessibility_toc">Open the table of contents and bookmarks screen.</string>
+    <string name="accessibility_settings_close">Close the settings menu</string>
+    <string name="accessibility_settings_open">Open the settings menu</string>
+    <string name="accessibility_toc_open">Open the table of contents and bookmarks screen</string>
+    <string name="accessibility_toc_close">Close the table of contents and bookmarks screen</string>
     <string name="content_description_back">Back</string>
     <string name="settings_title">Settings</string>
     <string name="table_of_contents_empty_message">No Table of Contents available for this work</string>
