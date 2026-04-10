@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.accessibility.AccessibilityEvent
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -334,6 +335,14 @@ class CatalogFeedViewDetails2(
             view.isEnabled = false
             view.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
           }
+
+          /*
+           * Tell the title in the drawer to gain accessibility focus.
+           */
+
+          c.bottomSheetTitle.postDelayed({
+            c.bottomSheetTitle.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED)
+          }, 100L)
         } else if (state <= 0.01) {
           c.bottomSheetDarken.setOnClickListener(null)
           c.bottomSheetDarken.isClickable = false
