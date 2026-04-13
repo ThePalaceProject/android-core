@@ -18,7 +18,7 @@ jobs:
       - name: Finish release
         run: .ci/ci-release-finish.sh
       - name: Create GitHub release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         env:
           RELEASE_NOTES_PATH: ${{ env.RELEASE_NOTES_PATH }}
           TAG_NAME: ${{ env.TAG_NAME }}
