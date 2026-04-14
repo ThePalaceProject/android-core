@@ -208,14 +208,15 @@ object ProfileDescriptionJSON {
 
     return ProfilePreferences(
       dateOfBirth = dateOfBirth,
-      showTestingLibraries = showTestingLibraries,
-      readerPreferences = readerPreferences,
-      mostRecentAccount = mostRecentAccount,
+      downloadOnlyOnWIFI = downloadOnlyOnWIFI,
       hasSeenLibrarySelectionScreen = hasSeenLibrarySelectionScreen,
-      showDebugSettings = showDebugSettings,
-      playbackRates = playbackRates,
       hasSeenNotificationScreen = hasSeenNotificationScreen,
-      downloadOnlyOnWIFI = downloadOnlyOnWIFI
+      isLCPManualPassphraseEnabled = false,
+      mostRecentAccount = mostRecentAccount,
+      playbackRates = playbackRates,
+      readerPreferences = readerPreferences,
+      showDebugSettings = showDebugSettings,
+      showTestingLibraries = showTestingLibraries,
     )
   }
 
@@ -258,14 +259,15 @@ object ProfileDescriptionJSON {
 
     return ProfilePreferences(
       dateOfBirth = dateOfBirth,
-      showTestingLibraries = showTestingLibraries,
-      readerPreferences = readerPreferences,
-      mostRecentAccount = mostRecentAccount,
+      downloadOnlyOnWIFI = downloadOnlyOnWIFI,
       hasSeenLibrarySelectionScreen = true,
       hasSeenNotificationScreen = false,
+      isLCPManualPassphraseEnabled = false,
+      mostRecentAccount = mostRecentAccount,
       playbackRates = playbackRates,
+      readerPreferences = readerPreferences,
       showDebugSettings = false,
-      downloadOnlyOnWIFI = downloadOnlyOnWIFI
+      showTestingLibraries = showTestingLibraries,
     )
   }
 
@@ -322,14 +324,15 @@ object ProfileDescriptionJSON {
     val preferences =
       ProfilePreferences(
         dateOfBirth = this.someOrNull(dateOfBirth),
-        showTestingLibraries = showTestingLibraries,
-        readerPreferences = readerPrefs,
-        mostRecentAccount = mostRecentAccountFallback,
+        downloadOnlyOnWIFI = downloadOnlyOnWIFI,
         hasSeenLibrarySelectionScreen = true,
         hasSeenNotificationScreen = false,
+        isLCPManualPassphraseEnabled = false,
+        mostRecentAccount = mostRecentAccountFallback,
         playbackRates = playbackRates,
+        readerPreferences = readerPrefs,
         showDebugSettings = false,
-        downloadOnlyOnWIFI = downloadOnlyOnWIFI
+        showTestingLibraries = showTestingLibraries,
       )
 
     val attributeMap = mutableMapOf<String, String>()

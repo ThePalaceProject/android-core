@@ -112,4 +112,11 @@
         </TableLayout>
     </HorizontalScrollView>
 
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/debugDRMLCPManualPassphraseEnabled"
+        android:text="Allow LCP manual passphrase entry"
+        android:layout_margin="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
 </LinearLayout>

@@ -259,6 +259,8 @@ class CatalogFeedViewInfinite(
         this.layoutInflater.inflate(R.layout.catalog_facet_sort_by, null)
       val group =
         view.findViewById<RadioGroup>(R.id.catalogFacetDialogSortByGroup)
+      val dismiss =
+        view.findViewById<Button>(R.id.catalogFacetDialogSortByDismiss)
 
       var checked = 0
       sortBy.forEachIndexed { index, facet ->
@@ -278,6 +280,8 @@ class CatalogFeedViewInfinite(
       val dialogBuilder = MaterialAlertDialogBuilder(this.root.context)
       dialogBuilder.setView(view)
       val dialog = dialogBuilder.create()
+
+      dismiss.setOnClickListener { dialog.dismiss() }
       dialog.show()
     }
   }

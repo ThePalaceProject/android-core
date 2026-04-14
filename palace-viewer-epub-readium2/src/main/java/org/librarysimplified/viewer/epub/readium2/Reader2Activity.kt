@@ -290,6 +290,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
           boundless = this.boundless,
           drmInfo = this.parameters.drmInfo,
           format = this.bookFormat,
+          isLCPManualPassphraseEnabled = profileCurrent.preferences().isLCPManualPassphraseEnabled,
           onLCPDialogDismissed = {
             this.logger.debug("Dismissed LCP dialog. Shutting down...")
             this.finish()

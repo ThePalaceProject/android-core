@@ -25,7 +25,8 @@
         android:layout_margin="16dp"
         android:gravity="left"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/catalogFacetDialogSortBy">
+        app:layout_constraintTop_toBottomOf="@id/catalogFacetDialogSortBy"
+        app:layout_constraintBottom_toTopOf="@id/catalogFacetDialogSortByDismiss">
 
         <!--
         <RadioButton
@@ -43,13 +44,18 @@
             android:layout_height="wrap_content"
             android:text="C" />
             -->
+
     </RadioGroup>
 
-    <Space
-        android:layout_width="0dp"
-        android:layout_height="32dp"
-        app:layout_constraintEnd_toEndOf="parent"
+    <Button
+        android:id="@+id/catalogFacetDialogSortByDismiss"
+        android:layout_width="wrap_content"
+        android:layout_height="64dp"
+        android:layout_margin="16dp"
+        android:minWidth="128dp"
+        android:text="@string/catalogDismiss"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/catalogFacetDialogSortByGroup" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

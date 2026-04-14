@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.accessibility.AccessibilityEvent
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -223,6 +224,21 @@ class CatalogFeedViewDetails2(
     this.bottomSheet.findViewById<TextView>(R.id.book2DBottomSheetButton1)
 
   /*
+   * The set of views that are disabled when the bottom drawer is open. This is primarily
+   * for accessibility: We want the screen reader to be unable to see anything that isn't
+   * in the bottom drawer when the drawer is open.
+   */
+
+  private val viewsDisabledWhenDrawerOpen =
+    listOf<View>(
+      this.appBar,
+      this.imageOverlay,
+      this.scrollView,
+      this.toolbarItemsWhenCollapsed,
+      this.toolbarItemsWhenExpanded,
+    )
+
+  /*
    * "Enabled" flags for views. There are two flags for each set of buttons, the "status"
    * flag and the "view" flag. The "status" flag is `true` or `false` depending on the current
    * book status, and the "view" flag is `true` or `false` depending on whether the app bar is
@@ -314,11 +330,29 @@ class CatalogFeedViewDetails2(
           c.bottomSheetDarken.isClickable = true
           c.scrollView.importantForAccessibility =
             View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
+
+          for (view in viewsDisabledWhenDrawerOpen) {
+            view.isEnabled = false
+            view.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
+          }
+
+          /*
+           * Tell the title in the drawer to gain accessibility focus.
+           */
+
+          c.bottomSheetTitle.postDelayed({
+            c.bottomSheetTitle.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED)
+          }, 100L)
         } else if (state <= 0.01) {
           c.bottomSheetDarken.setOnClickListener(null)
           c.bottomSheetDarken.isClickable = false
           c.scrollView.importantForAccessibility =
             View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
+
+          for (view in viewsDisabledWhenDrawerOpen) {
+            view.isEnabled = true
+            view.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
+          }
         }
       }
     })
@@ -488,6 +522,10 @@ class CatalogFeedViewDetails2(
 
     this.configureDescription(newEntry)
     this.configureMetadataTable(newEntry)
+
+    this.bookTitle.postDelayed({
+      this.bookTitle.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED)
+    }, 100L)
   }
 
   private fun bookInfoViewOf(): Triple<View, TextView, TextView> {
@@ -1065,7 +1103,10 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogManageHold,
-      accessibilityTextOverride = this.root.resources.getString(R.string.catalogAccessibilityBookManageHold, status.book.entry.title),
+      accessibilityTextOverride = this.root.resources.getString(
+        R.string.catalogAccessibilityBookManageHold,
+        status.book.entry.title
+      ),
       actionInPage = {
         this.openDrawer()
         this.callbacks.onBookRequestRevoke(status.book)
@@ -1153,7 +1194,10 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogGet,
-      accessibilityTextOverride = this.root.resources.getString(R.string.catalogAccessibilityBookBorrow, status.book.entry.title),
+      accessibilityTextOverride = this.root.resources.getString(
+        R.string.catalogAccessibilityBookBorrow,
+        status.book.entry.title
+      ),
       actionInPage = {
         this.openDrawer()
         this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
@@ -1176,7 +1220,10 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogPlaceHold,
-      accessibilityTextOverride = this.root.resources.getString(R.string.catalogAccessibilityBookPlaceHold, status.book.entry.title),
+      accessibilityTextOverride = this.root.resources.getString(
+        R.string.catalogAccessibilityBookPlaceHold,
+        status.book.entry.title
+      ),
       actionInPage = {
         this.openDrawer()
         this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
@@ -1200,7 +1247,10 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogGet,
-      accessibilityTextOverride = this.root.resources.getString(R.string.catalogAccessibilityBookBorrow, status.book.entry.title),
+      accessibilityTextOverride = this.root.resources.getString(
+        R.string.catalogAccessibilityBookBorrow,
+        status.book.entry.title
+      ),
       actionInPage = {
         this.openDrawer()
         this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
@@ -1220,7 +1270,10 @@ class CatalogFeedViewDetails2(
         this.enableButton1Status = true
         this.reconfigureButton1(
           text = R.string.catalogPreview,
-          accessibilityTextOverride = this.root.resources.getString(R.string.catalogAccessibilityBookPreviewRead, status.book.entry.title),
+          accessibilityTextOverride = this.root.resources.getString(
+            R.string.catalogAccessibilityBookPreviewRead,
+            status.book.entry.title
+          ),
           actionInPage = { this.callbacks.onBookRequestPreviewOpen(status.book) },
           actionInBottomSheet = { this.callbacks.onBookRequestPreviewOpen(status.book) }
         )
@@ -1256,7 +1309,7 @@ class CatalogFeedViewDetails2(
     if (format != null) {
       this.reconfigureButton0(
         text = this.readButtonString(status.book),
-        accessibilityTextOverride = this.root.resources.getString(R.string.catalogAccessibilityBookRead, status.book.entry.title),
+        accessibilityTextOverride = this.readButtonAccessibilityLabel(status.book),
         actionInPage = { this.callbacks.onBookRequestViewerOpen(status.book, format) },
         actionInBottomSheet = { this.callbacks.onBookRequestViewerOpen(status.book, format) }
       )
@@ -1266,7 +1319,10 @@ class CatalogFeedViewDetails2(
       this.enableButton1Status = true
       this.reconfigureButton1(
         text = R.string.catalogReturn,
-        accessibilityTextOverride = this.root.resources.getString(R.string.catalogAccessibilityBookRevokeLoan, status.book.entry.title),
+        accessibilityTextOverride = this.root.resources.getString(
+          R.string.catalogAccessibilityBookRevokeLoan,
+          status.book.entry.title
+        ),
         actionInPage = {
           this.openDrawer()
           this.callbacks.onBookRequestRevoke(status.book)
@@ -1277,6 +1333,22 @@ class CatalogFeedViewDetails2(
       )
     } else {
       this.reconfigurePreviewButton(status)
+    }
+  }
+
+  private fun readButtonAccessibilityLabel(book: Book): String {
+    return when (book.findPreferredFormat()) {
+      is BookFormat.BookFormatAudioBook ->
+        this.root.resources.getString(R.string.catalogAccessibilityBookListen, book.entry.title)
+
+      is BookFormat.BookFormatEPUB ->
+        this.root.resources.getString(R.string.catalogAccessibilityBookRead, book.entry.title)
+
+      is BookFormat.BookFormatPDF ->
+        this.root.resources.getString(R.string.catalogAccessibilityBookRead, book.entry.title)
+
+      null ->
+        this.root.resources.getString(R.string.catalogAccessibilityBookRead, book.entry.title)
     }
   }
 
@@ -1311,7 +1383,10 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogDownload,
-      accessibilityTextOverride = this.root.resources.getString(R.string.catalogAccessibilityBookDownload, status.book.entry.title),
+      accessibilityTextOverride = this.root.resources.getString(
+        R.string.catalogAccessibilityBookDownload,
+        status.book.entry.title
+      ),
       actionInPage = {
         this.openDrawer()
         this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
@@ -1325,7 +1400,10 @@ class CatalogFeedViewDetails2(
       this.enableButton1Status = true
       this.reconfigureButton1(
         text = R.string.catalogReturn,
-        accessibilityTextOverride = this.root.resources.getString(R.string.catalogAccessibilityBookRevokeLoan, status.book.entry.title),
+        accessibilityTextOverride = this.root.resources.getString(
+          R.string.catalogAccessibilityBookRevokeLoan,
+          status.book.entry.title
+        ),
         actionInPage = {
           this.openDrawer()
           this.callbacks.onBookRequestRevoke(status.book)
@@ -1436,7 +1514,10 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogCancel,
-      accessibilityTextOverride = this.root.resources.getString(R.string.catalogAccessibilityBookDownloadCancel, status.book.entry.title),
+      accessibilityTextOverride = this.root.resources.getString(
+        R.string.catalogAccessibilityBookDownloadCancel,
+        status.book.entry.title
+      ),
       actionInPage = {
         this.openDrawer()
         this.callbacks.onBookRequestBorrowCancel(status.book)

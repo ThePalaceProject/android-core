@@ -20,17 +20,22 @@
             android:layout_height="64dp"
             android:background="?attr/selectableItemBackground"
             android:clickable="true"
+            android:contentDescription="@string/accessibility_back"
+            android:focusable="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                app:tint="@color/PalacePrimaryForegroundColor"
                 android:id="@+id/pdfToolbarLogo"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_gravity="center"
-                android:src="@drawable/arrow_left" />
+                android:clickable="false"
+                android:focusable="false"
+                android:importantForAccessibility="no"
+                android:src="@drawable/arrow_left"
+                app:tint="@color/PalacePrimaryForegroundColor" />
         </FrameLayout>
 
         <TextView
@@ -53,6 +58,8 @@
             android:layout_height="64dp"
             android:background="?attr/selectableItemBackground"
             android:clickable="true"
+            android:contentDescription="@string/accessibility_toc_close"
+            android:focusable="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/pdfToolbarSettingsIconTouch"
             app:layout_constraintTop_toTopOf="parent">
@@ -62,6 +69,9 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_gravity="center"
+                android:clickable="false"
+                android:focusable="false"
+                android:importantForAccessibility="no"
                 android:src="@drawable/pdf_toc" />
         </FrameLayout>
 
@@ -71,6 +81,8 @@
             android:layout_height="64dp"
             android:background="?attr/selectableItemBackground"
             android:clickable="true"
+            android:contentDescription="@string/accessibility_settings_open"
+            android:focusable="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -80,6 +92,9 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_gravity="center"
+                android:clickable="false"
+                android:focusable="false"
+                android:importantForAccessibility="no"
                 android:src="@drawable/pdf_settings" />
         </FrameLayout>
 
@@ -98,6 +113,9 @@
             android:layout_width="128dp"
             android:layout_height="32dp"
             android:layout_gravity="center"
+            android:clickable="false"
+            android:focusable="false"
+            android:importantForAccessibility="no"
             android:indeterminate="true" />
 
     </FrameLayout>

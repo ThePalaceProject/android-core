@@ -87,4 +87,5 @@
     <string name="settingsNetworkWIFIOnlyEnabled">When enabled, books and audiobooks will only download over Wi-Fi. Downloads will be blocked on cellular data.</string>
     <string name="settingsAccessibilitySearchButton">Library Search Button</string>
     <string name="settingsAccessibilitySearchButtonClose">Close Search Button</string>
+    <string name="settingsAccessibilityAccountDelete">Delete Account Button</string>
 </resources>
