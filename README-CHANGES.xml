@@ -1122,7 +1122,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-04-14T14:24:00+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.27.1">
+    <c:release date="2026-04-14T14:40:11+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.27.1">
       <c:changes>
         <c:change date="2026-03-19T00:00:00+00:00" summary="Increase book details metadata text.">
           <c:tickets>
