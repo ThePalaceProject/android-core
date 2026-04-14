@@ -17,18 +17,15 @@ jobs:
         run: .ci/ci-verify-release-branch.sh
       - name: Finish release
         run: .ci/ci-release-finish.sh
-      - name: Create GitHub release
-        uses: softprops/action-gh-release@v2
+      - name: Create or update release
         env:
+          GITHUB_TOKEN: ${{ secrets.CI_GITHUB_ACCESS_TOKEN }}
           RELEASE_NOTES_PATH: ${{ env.RELEASE_NOTES_PATH }}
-          TAG_NAME: ${{ env.TAG_NAME }}
           VERSION_NUM: ${{ env.VERSION_NUM }}
-        with:
-          token: ${{ secrets.CI_GITHUB_ACCESS_TOKEN }}
-          tag_name: ${{ env.TAG_NAME }}
-          name: ${{ env.VERSION_NUM }}
-          body_path: ${{ env.RELEASE_NOTES_PATH }}
-          draft: false
+        run: |
+          gh release create "$VERSION_NUM" \
+            --title "$VERSION_NUM" \
+            --notes-file "$RELEASE_NOTES_PATH"
       - name: Build
         env:
           MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
