@@ -151,10 +151,11 @@ class AudioBookViewer : ViewerProviderType {
     AudioBookViewerModel.parameters =
       AudioBookPlayerParameters(
         accountID = book.account,
-        bookID = book.id,
-        opdsEntry = book.entry,
         accountProviderID = account.provider.id,
-        drmInfo = drmInformation
+        bookID = book.id,
+        drmInfo = drmInformation,
+        opdsEntry = book.entry,
+        playerID = parameters.viewerID,
       )
 
     /*

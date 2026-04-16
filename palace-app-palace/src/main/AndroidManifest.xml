@@ -76,6 +76,14 @@
             android:name="org.apache.http.legacy"
             android:required="false" />
 
+        <uses-library
+            android:name="androidx.car.app"
+            android:required="false" />
+
+        <meta-data
+            android:name="com.google.android.gms.car.application"
+            android:resource="@xml/automotive_app_desc" />
+
         <activity
             android:name="org.nypl.simplified.ui.errorpage.ErrorPageActivity"
             android:configChanges="orientation"
@@ -119,6 +127,17 @@
         <service
             android:name="org.librarysimplified.http.network_access.LSHTTPNetworkAvailabilityService"
             android:exported="false" />
+
+        <service
+            android:name="org.nypl.simplified.ui.auto.PalaceMediaBrowserService"
+            android:exported="true"
+            android:foregroundServiceType="mediaPlayback">
+
+            <intent-filter>
+                <action android:name="androidx.media3.session.MediaLibraryService" />
+                <action android:name="android.media.browse.MediaBrowserService" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>
