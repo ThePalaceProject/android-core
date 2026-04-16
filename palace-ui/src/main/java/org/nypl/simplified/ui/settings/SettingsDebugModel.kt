@@ -236,4 +236,9 @@ object SettingsDebugModel {
       MoreExecutors.directExecutor()
     )
   }
+
+  @UiThread
+  fun isLCPManualPassphraseEnabled(): Boolean {
+    return this.preferences().isLCPManualPassphraseEnabled
+  }
 }

@@ -42,7 +42,8 @@ class MockProfile(
         mostRecentAccount = this.accounts.firstKey(),
         playbackRates = hashMapOf(),
         showDebugSettings = false,
-        downloadOnlyOnWIFI = false
+        downloadOnlyOnWIFI = false,
+        isLCPManualPassphraseEnabled = false,
       ),
       attributes = ProfileAttributes(sortedMapOf())
     )

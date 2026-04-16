@@ -4,7 +4,6 @@
     <string name="catalogAccessibilityFeedLoading">List of books is currently loading.</string>
     <string name="catalogAccessibilitySearchButtonClose">Close Search Button</string>
     <string name="catalogAccessibilityAccountSelection">Account Selection Button</string>
-    <string name="catalogAccessibilityBackgroundImage">A background image.</string>
     <string name="catalogAccessibilityBookBorrow">Borrow Button. Click this button to borrow "%1$s".</string>
     <string name="catalogAccessibilityBookDelete">Delete Button</string>
     <string name="catalogAccessibilityBookDownload">Download Button. Click this button to download "%1$s".</string>

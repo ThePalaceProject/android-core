@@ -450,6 +450,7 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
           contentProtectionProviders = contentProtectionProviders,
           drmInfo = BookDRMInformation.None,
           format = this.bookFormat,
+          isLCPManualPassphraseEnabled = profileCurrent.preferences().isLCPManualPassphraseEnabled,
           onLCPDialogDismissed = {
             this.logger.debug("Dismissed LCP dialog. Shutting down...")
             this.finish()

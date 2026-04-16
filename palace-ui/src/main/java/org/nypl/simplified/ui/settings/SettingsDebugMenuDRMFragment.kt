@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.TableLayout
 import android.widget.TableRow
 import android.widget.TextView
+import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.jmulticlose.core.CloseableCollectionType
@@ -45,6 +46,7 @@ class SettingsDebugMenuDRMFragment : Fragment(R.layout.debug_drm), MainBackButto
     return BACK_BUTTON_CONSUMED
   }
 
+  private lateinit var enableLCPManualPassphrase: SwitchCompat
   private lateinit var adobeDRMActivationTable: TableLayout
   private lateinit var drmTable: TableLayout
   private var subscriptions: CloseableCollectionType<*> =
@@ -74,6 +76,8 @@ class SettingsDebugMenuDRMFragment : Fragment(R.layout.debug_drm), MainBackButto
     this.drmTable.addView(
       this.createDrmSupportRow("Boundless", SettingsDebugModel.boundlessSupported())
     )
+    this.enableLCPManualPassphrase =
+      view.findViewById(R.id.debugDRMLCPManualPassphraseEnabled)
   }
 
   override fun onStart() {
@@ -87,6 +91,14 @@ class SettingsDebugMenuDRMFragment : Fragment(R.layout.debug_drm), MainBackButto
     )
 
     SettingsDebugModel.fetchAdobeActivations()
+
+    this.enableLCPManualPassphrase.isChecked =
+      SettingsDebugModel.isLCPManualPassphraseEnabled()
+    this.enableLCPManualPassphrase.setOnCheckedChangeListener { _, isChecked ->
+      SettingsDebugModel.updatePreferences { prefs ->
+        prefs.copy(isLCPManualPassphraseEnabled = isChecked)
+      }
+    }
   }
 
   override fun onStop() {

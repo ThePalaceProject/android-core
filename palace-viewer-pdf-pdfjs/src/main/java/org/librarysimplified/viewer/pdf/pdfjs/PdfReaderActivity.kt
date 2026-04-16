@@ -79,6 +79,11 @@ class PdfReaderActivity : AppCompatActivity() {
   private val profilesController =
     this.services.requireService(ProfilesControllerType::class.java)
 
+  private lateinit var toolbarTOC: View
+  private lateinit var toolbarSettings: View
+  private lateinit var toolbarBack: View
+  private lateinit var toolbarText: TextView
+  private lateinit var toolbar: ViewGroup
   private lateinit var account: AccountType
   private lateinit var accountId: AccountID
   private lateinit var bookFormat: BookFormat.BookFormatPDF
@@ -91,7 +96,8 @@ class PdfReaderActivity : AppCompatActivity() {
 
   private var backgroundThread: ExecutorService? = null
   private var pdfServer: PdfServer? = null
-  private var isSidebarOpen = false
+  private var isSidebarOpen = true
+  private var isSettingsOpen: Boolean = false
   private var documentPageIndex: Int = 0
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -199,28 +205,28 @@ class PdfReaderActivity : AppCompatActivity() {
   private fun createToolbar(
     title: String
   ) {
-    val toolbar =
-      this.findViewById<ViewGroup>(R.id.pdfToolbar)
-    val toolbarText =
-      toolbar.findViewById<TextView>(R.id.pdfToolbarText)
-    val toolbarBack =
-      toolbar.findViewById<View>(R.id.pdfToolbarLogoTouch)
-    val toolbarSettings =
-      toolbar.findViewById<View>(R.id.pdfToolbarSettingsIconTouch)
-    val toolbarTOC =
-      toolbar.findViewById<View>(R.id.pdfToolbarTOCIconTouch)
+    this.toolbar =
+      this.findViewById(R.id.pdfToolbar)
+    this.toolbarText =
+      this.toolbar.findViewById(R.id.pdfToolbarText)
+    this.toolbarBack =
+      this.toolbar.findViewById(R.id.pdfToolbarLogoTouch)
+    this.toolbarSettings =
+      this.toolbar.findViewById(R.id.pdfToolbarSettingsIconTouch)
+    this.toolbarTOC =
+      this.toolbar.findViewById(R.id.pdfToolbarTOCIconTouch)
 
-    toolbarBack.setOnClickListener {
+    this.toolbarBack.setOnClickListener {
       this.finish()
     }
-    toolbarSettings.setOnClickListener {
+    this.toolbarSettings.setOnClickListener {
       this.onReaderMenuSettingsSelected()
     }
-    toolbarTOC.setOnClickListener {
+    this.toolbarTOC.setOnClickListener {
       this.onReaderMenuTOCSelected()
     }
-    toolbarText.text = title
-    toolbarBack.requestFocus()
+    this.toolbarText.text = title
+    this.toolbarBack.requestFocus()
   }
 
   private fun createWebView() {
@@ -253,6 +259,10 @@ class PdfReaderActivity : AppCompatActivity() {
     val providers =
       ServiceLoader.load(ContentProtectionProvider::class.java)
         .toList()
+    val profile =
+      Services.serviceDirectory()
+        .requireService(ProfilesControllerType::class.java)
+        .profileCurrent()
 
     val contentProtections =
       BookContentProtections.create(
@@ -261,6 +271,7 @@ class PdfReaderActivity : AppCompatActivity() {
         boundless = null,
         drmInfo = drmInfo,
         format = this.bookFormat,
+        isLCPManualPassphraseEnabled = profile.preferences().isLCPManualPassphraseEnabled,
         onLCPDialogDismissed = {
           this.finish()
         }
@@ -309,18 +320,42 @@ class PdfReaderActivity : AppCompatActivity() {
   }
 
   private fun toggleSidebar() {
-    if (::webView.isInitialized) {
+    if (this::webView.isInitialized) {
       this.webView.evaluateJavascript("toggleSidebar()") { result ->
         this.isSidebarOpen = (result == "true")
+        this.setSidebarButtonContentDescription()
       }
     }
   }
 
+  private fun setSidebarButtonContentDescription() {
+    if (this.isSidebarOpen) {
+      this.toolbarTOC.contentDescription =
+        this.resources.getString(R.string.accessibility_toc_close)
+    } else {
+      this.toolbarTOC.contentDescription =
+        this.resources.getString(R.string.accessibility_toc_open)
+    }
+  }
+
   private fun onReaderMenuSettingsSelected(): Boolean {
-    if (::webView.isInitialized) {
-      this.webView.evaluateJavascript("toggleSecondaryToolbar()", null)
+    if (this::webView.isInitialized) {
+      this.webView.evaluateJavascript("toggleSecondaryToolbar()") { result ->
+        this.isSettingsOpen = (result == "true")
+        this.setSettingsButtonContentDescription()
+      }
     }
     return true
+  }
+
+  private fun setSettingsButtonContentDescription() {
+    if (this.isSettingsOpen) {
+      this.toolbarTOC.contentDescription =
+        this.resources.getString(R.string.accessibility_settings_close)
+    } else {
+      this.toolbarTOC.contentDescription =
+        this.resources.getString(R.string.accessibility_settings_open)
+    }
   }
 
   override fun onDestroy() {

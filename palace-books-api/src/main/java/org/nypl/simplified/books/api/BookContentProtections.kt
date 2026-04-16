@@ -26,6 +26,7 @@ object BookContentProtections {
     boundless: BoundlessServiceType?,
     format: BookFormat,
     drmInfo: BookDRMInformation,
+    isLCPManualPassphraseEnabled: Boolean,
     onLCPDialogDismissed: () -> Unit = {}
   ): List<ContentProtection> {
     return try {
@@ -72,6 +73,7 @@ object BookContentProtections {
 
           if (lcpProvider != null) {
             lcpProvider.setPassphraseFromHashed(drmInfo.hashedPassphrase)
+            lcpProvider.isLCPManualPassphraseEnabled = isLCPManualPassphraseEnabled
             lcpProvider.onLcpDialogDismissed = onLCPDialogDismissed
             listOfNotNull(lcpProvider.create(context))
           } else {
