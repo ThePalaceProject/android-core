@@ -6,12 +6,19 @@ import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import java.io.Serializable
 import java.net.URI
+import java.util.UUID
 
 /**
  * Parameters for the audiobook player.
  */
 
 class AudioBookPlayerParameters(
+  /**
+   * The unique player ID that will be used to identity the created player instance.
+   */
+
+  val playerID: UUID,
+
   /**
    * The account to which the book belongs.
    */

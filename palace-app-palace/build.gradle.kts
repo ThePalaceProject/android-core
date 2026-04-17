@@ -459,6 +459,7 @@ dependencies {
     implementation(libs.androidx.datastore.preferences.external.protobuf)
     implementation(libs.androidx.documentfile)
     implementation(libs.androidx.drawerlayout)
+    implementation(libs.androidx.exifinterface)
     implementation(libs.androidx.emoji2)
     implementation(libs.androidx.emoji2.views)
     implementation(libs.androidx.emoji2.views.helper)

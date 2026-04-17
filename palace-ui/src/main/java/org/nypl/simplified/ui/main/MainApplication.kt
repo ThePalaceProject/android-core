@@ -74,7 +74,7 @@ class MainApplication : Application() {
     MainTransifex.configure(this.applicationContext)
     PlayerModel.start(this)
 
-    org.nypl.simplified.ui.main.MainApplication.Companion.INSTANCE = this
+    INSTANCE = this
     this.boot.start(this)
   }
 

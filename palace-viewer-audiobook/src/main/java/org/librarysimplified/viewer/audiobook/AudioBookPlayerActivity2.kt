@@ -374,6 +374,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
           fetchAll = true,
           httpClient = this.httpClient,
           manifest = state.manifest,
+          playerID = bookParameters.playerID,
         )
       }
 
@@ -429,7 +430,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       }
       this.logger.debug("Restoring last-read position from bookmark ({}).", lastRead.position)
       AudioBookViewerModel.appliedLastReadBookmarkMigration = true
-      state.player.player.movePlayheadToLocation(lastRead.position)
+      PlayerModel.movePlayheadTo(lastRead.position)
     } catch (e: Throwable) {
       MDC.put("Ticket", "PP-2680")
       this.logger.error("Timed out waiting for audiobooks bookmarks!")
@@ -679,19 +680,16 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     task.beginNewStep("Downloading book chapters…")
 
     try {
-      val book = PlayerModel.book()
-      for (e in book?.downloadTasks ?: listOf()) {
+      val tasks = PlayerModel.downloadTasksFailed()
+      for (e in tasks) {
         val status = e.status
         if (status is PlayerDownloadTaskStatus.Failed) {
-          val tasks = book?.downloadTasks ?: listOf()
           task.beginNewStep("Downloading ${e.playbackURI}...")
-          val extraMessages =
-            tasks.filterIsInstance<PlayerDownloadTaskStatus.Failed>().map { s -> s.message }
           task.currentStepFailed(
             message = status.message,
             errorCode = "error-download",
             exception = status.exception,
-            extraMessages = extraMessages
+            extraMessages = listOf()
           )
         }
       }

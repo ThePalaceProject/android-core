@@ -92,6 +92,7 @@ import org.thepalaceproject.opds.client.OPDSState.LoadedFeedWithGroups
 import org.thepalaceproject.opds.client.OPDSState.LoadedFeedWithoutGroups
 import org.thepalaceproject.opds.client.OPDSState.Loading
 import java.net.URI
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 
@@ -675,6 +676,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
     val viewerParameters =
       ViewerParameters(
         flags = mapOf(),
+        viewerID = UUID.randomUUID(),
         onLoginRequested = { accountID ->
           try {
             this.logger.debug("Bringing main activity to foreground...")

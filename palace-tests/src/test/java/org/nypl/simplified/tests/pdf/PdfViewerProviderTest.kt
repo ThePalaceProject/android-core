@@ -8,6 +8,7 @@ import org.mockito.Mockito
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.viewer.spi.ViewerParameters
+import java.util.UUID
 
 class PdfViewerProviderTest {
 
@@ -15,6 +16,7 @@ class PdfViewerProviderTest {
   fun supportsPdfBooks() {
     val preferences = ViewerParameters(
       flags = mapOf(),
+      viewerID = UUID.randomUUID(),
       onLoginRequested = {
 
       }

@@ -464,6 +464,7 @@ class ProfileAccountLoginTask(
     request: BasicToken
   ): TaskResult<Unit> {
     val authenticationURI = request.description.authenticationURI
+    this.steps.addAttribute("AuthenticationURI", authenticationURI.toString())
 
     val httpRequest = this.http.newRequest(authenticationURI)
       .setAuthorization(
