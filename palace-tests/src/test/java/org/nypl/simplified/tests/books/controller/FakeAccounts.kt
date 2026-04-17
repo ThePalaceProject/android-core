@@ -14,6 +14,8 @@ object FakeAccounts {
 
     Mockito.`when`(provider.id)
       .thenReturn(URI.create("urn:fake"))
+    Mockito.`when`(provider.displayName)
+      .thenReturn("Fake Provider")
 
     return provider
   }

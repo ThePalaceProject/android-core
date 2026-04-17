@@ -116,6 +116,9 @@ class ProfileAccountLogoutTask(
       }
 
     return try {
+      this.steps.addAttribute("AccountProviderName", this.account.provider.displayName)
+      this.steps.addAttribute("AccountProviderID", this.account.provider.id.toString())
+
       this.runLogoutURLIfNecessary()
       this.runFCMTokenDeletion()
       this.runDeviceDeactivation()

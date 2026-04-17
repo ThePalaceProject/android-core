@@ -101,6 +101,9 @@ class ProfileAccountLoginTask(
         return this.steps.finishSuccess(Unit)
       }
 
+      this.steps.addAttribute("AccountProviderName", this.account.provider.displayName)
+      this.steps.addAttribute("AccountProviderID", this.account.provider.id.toString())
+
       if (!this.validateRequest()) {
         this.debug("account does not support the given authentication")
         this.steps.currentStepFailed(
