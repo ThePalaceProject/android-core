@@ -307,17 +307,17 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
 
       is LoadedFeedEntry -> {
         this.onStateChangedToDetails(newState)
-        this.viewNow.root.postDelayed({ this.viewNow.startFocus() }, 100L)
+        this.viewNow.startFocusDelayed()
       }
 
       is LoadedFeedWithGroups -> {
         this.onStateChangedToGroups(newState)
-        this.viewNow.startFocus()
+        this.viewNow.startFocusDelayed()
       }
 
       is LoadedFeedWithoutGroups -> {
         this.onStateChangedToInfinite(newState)
-        this.viewNow.startFocus()
+        this.viewNow.startFocusDelayed()
       }
     }
   }

@@ -522,10 +522,6 @@ class CatalogFeedViewDetails2(
 
     this.configureDescription(newEntry)
     this.configureMetadataTable(newEntry)
-
-    this.bookTitle.postDelayed({
-      this.bookTitle.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED)
-    }, 100L)
   }
 
   private fun bookInfoViewOf(): Triple<View, TextView, TextView> {
@@ -790,6 +786,9 @@ class CatalogFeedViewDetails2(
 
   override fun startFocus() {
     this.backButton.requestFocus()
+    this.bookTitle.postDelayed({
+      this.bookTitle.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED)
+    }, 100L)
   }
 
   override fun clear() {

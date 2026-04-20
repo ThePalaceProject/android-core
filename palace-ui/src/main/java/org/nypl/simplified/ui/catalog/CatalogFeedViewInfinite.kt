@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.view.accessibility.AccessibilityEvent
 import android.widget.Button
 import android.widget.RadioButton
 import android.widget.RadioGroup
@@ -350,7 +351,10 @@ class CatalogFeedViewInfinite(
   }
 
   override fun startFocus() {
-    this.toolbar.requestFocus()
+    this.listView.requestFocus()
+    this.listView.postDelayed({
+      this.listView.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED)
+    }, 100L)
   }
 
   override fun clear() {
