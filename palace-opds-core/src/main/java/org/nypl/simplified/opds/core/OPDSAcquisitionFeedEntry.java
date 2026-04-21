@@ -50,8 +50,9 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
   private final OptionType<URI> analytics;
   private final OptionType<DRMLicensor> licensor;
   private final ArrayList<ParseError> errors;
-  private OptionType<Double> duration;
-  private OptionType<String> language;
+  private final OptionType<Double> duration;
+  private final OptionType<String> language;
+  private final OptionType<String> audience;
 
   private OPDSAcquisitionFeedEntry(
     final List<String> in_authors,
@@ -79,7 +80,8 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     final OptionType<DRMLicensor> in_licensor,
     final OptionType<Double> in_duration,
     final ArrayList<ParseError> in_errors,
-    final OptionType<String> in_language) {
+    final OptionType<String> in_language,
+    final OptionType<String> in_audience) {
     this.authors = NullCheck.notNull(Collections.unmodifiableList(in_authors));
     this.acquisitions = NullCheck.notNull(Collections.unmodifiableList(in_acquisitions));
     this.availability = NullCheck.notNull(in_availability);
@@ -106,6 +108,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     this.duration = NullCheck.notNull(in_duration);
     this.errors = NullCheck.notNull(in_errors);
     this.language = NullCheck.notNull(in_language);
+    this.audience = NullCheck.notNull(in_audience);
   }
 
   /**
@@ -172,6 +175,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     b.setAnalyticsOption(e.getAnalytics());
     b.setLicensorOption(e.getLicensor());
     b.setLanguageOption(e.getLanguage());
+    b.setAudienceOption(e.getAudience());
 
     {
       final String summary = e.getSummary();
@@ -203,26 +207,27 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     }
     final OPDSAcquisitionFeedEntry other = (OPDSAcquisitionFeedEntry) obj;
     return this.acquisitions.equals(other.acquisitions)
-      && this.availability.equals(other.availability)
-      && this.authors.equals(other.authors)
-      && this.groups.equals(other.groups)
-      && this.categories.equals(other.categories)
-      && this.cover.equals(other.cover)
-      && this.previews.equals(other.previews)
       && this.alternate.equals(other.alternate)
       && this.analytics.equals(other.analytics)
       && this.annotations.equals(other.annotations)
+      && this.audience.equals(other.audience)
+      && this.authors.equals(other.authors)
+      && this.availability.equals(other.availability)
+      && this.categories.equals(other.categories)
+      && this.cover.equals(other.cover)
+      && this.distribution.equals(other.distribution)
+      && this.groups.equals(other.groups)
       && this.id.equals(other.id)
       && this.issues.equals(other.issues)
+      && this.licensor.equals(other.licensor)
+      && this.previews.equals(other.previews)
+      && this.published.equals(other.published)
+      && this.publisher.equals(other.publisher)
       && this.related.equals(other.related)
       && this.summary.equals(other.summary)
       && this.thumbnail.equals(other.thumbnail)
       && this.title.equals(other.title)
-      && this.updated.equals(other.updated)
-      && this.published.equals(other.published)
-      && this.publisher.equals(other.publisher)
-      && this.licensor.equals(other.licensor)
-      && this.distribution.equals(other.distribution);
+      && this.updated.equals(other.updated);
   }
 
   /**
@@ -352,6 +357,14 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
   }
 
   /**
+   * @return The audience, if any
+   */
+
+  public OptionType<String> getAudience() {
+    return this.audience;
+  }
+
+  /**
    * @return The distribution, if any
    */
 
@@ -444,26 +457,27 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     final int prime = 31;
     int result = 1;
     result = (prime * result) + this.acquisitions.hashCode();
-    result = (prime * result) + this.availability.hashCode();
-    result = (prime * result) + this.authors.hashCode();
-    result = (prime * result) + this.groups.hashCode();
-    result = (prime * result) + this.cover.hashCode();
-    result = (prime * result) + this.previews.hashCode();
     result = (prime * result) + this.alternate.hashCode();
     result = (prime * result) + this.analytics.hashCode();
     result = (prime * result) + this.annotations.hashCode();
+    result = (prime * result) + this.audience.hashCode();
+    result = (prime * result) + this.authors.hashCode();
+    result = (prime * result) + this.availability.hashCode();
     result = (prime * result) + this.categories.hashCode();
+    result = (prime * result) + this.cover.hashCode();
+    result = (prime * result) + this.distribution.hashCode();
+    result = (prime * result) + this.groups.hashCode();
     result = (prime * result) + this.id.hashCode();
     result = (prime * result) + this.issues.hashCode();
+    result = (prime * result) + this.licensor.hashCode();
+    result = (prime * result) + this.previews.hashCode();
+    result = (prime * result) + this.published.hashCode();
+    result = (prime * result) + this.publisher.hashCode();
     result = (prime * result) + this.related.hashCode();
     result = (prime * result) + this.summary.hashCode();
     result = (prime * result) + this.thumbnail.hashCode();
     result = (prime * result) + this.title.hashCode();
     result = (prime * result) + this.updated.hashCode();
-    result = (prime * result) + this.published.hashCode();
-    result = (prime * result) + this.publisher.hashCode();
-    result = (prime * result) + this.distribution.hashCode();
-    result = (prime * result) + this.licensor.hashCode();
     return result;
   }
 
@@ -514,6 +528,8 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     b.append(this.updated);
     b.append(", licensor=");
     b.append(this.licensor);
+    b.append(", audience=");
+    b.append(this.audience);
     b.append("]");
     return NullCheck.notNull(b.toString());
   }
@@ -527,6 +543,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     private final String title;
     private final DateTime updated;
     private final ArrayList<ParseError> errors;
+    private OptionType<String> audience;
     private OptionType<String> language;
     private OPDSAvailabilityType availability;
     private OptionType<URI> cover;
@@ -579,6 +596,7 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
       this.licensor = Option.none();
       this.duration = Option.none();
       this.language = Option.none();
+      this.audience = Option.none();
     }
 
     @Override
@@ -646,7 +664,8 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
         this.licensor,
         this.duration,
         this.errors,
-        this.language
+        this.language,
+        this.audience
       );
     }
 
@@ -784,6 +803,12 @@ public final class OPDSAcquisitionFeedEntry implements Serializable {
     @Override
     public OPDSAcquisitionFeedEntryBuilderType setLanguageOption(OptionType<String> language) {
       this.language = NullCheck.notNull(language);
+      return this;
+    }
+
+    @Override
+    public OPDSAcquisitionFeedEntryBuilderType setAudienceOption(OptionType<String> audience) {
+      this.audience = NullCheck.notNull(audience);
       return this;
     }
   }

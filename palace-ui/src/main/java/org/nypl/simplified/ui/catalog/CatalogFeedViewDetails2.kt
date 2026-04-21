@@ -570,6 +570,18 @@ class CatalogFeedViewDetails2(
       }
     }
 
+    // PP-4047:
+    // 1. Format
+    // 2. Audience (new)
+    // 3. Categories (modified)
+    // 4. Language
+    // 5. Narrators
+    // 6. Duration
+    // 7. Published
+    // 8. Publisher
+    // 9. Distributor
+
+    val entry = newEntry.feedEntry
     if (bookFormatText.isNotEmpty()) {
       val (row, rowKey, rowVal) = this.bookInfoViewOf()
       rowKey.text = this.root.resources.getString(R.string.catalogMetaFormat)
@@ -577,7 +589,50 @@ class CatalogFeedViewDetails2(
       this.metadata.addView(row)
     }
 
-    val entry = newEntry.feedEntry
+    val audience = entry.audience
+    if (audience.isSome) {
+      val audienceValue = (audience as Some<String>).get()
+      val (row, rowKey, rowVal) = this.bookInfoViewOf()
+      rowKey.text = this.root.resources.getString(R.string.catalogMetaAudience)
+      rowVal.text = audienceValue
+      this.metadata.addView(row)
+    }
+
+    val categories =
+      entry.categories.filter { opdsCategory -> opdsCategory.scheme == this.genreUriScheme }
+    if (categories.isNotEmpty()) {
+      val (row, rowKey, rowVal) = this.bookInfoViewOf()
+      rowKey.text = this.root.resources.getString(R.string.catalogMetaCategories)
+      rowVal.text = categories.joinToString(", ") { opdsCategory -> opdsCategory.effectiveLabel }
+      this.metadata.addView(row)
+    }
+
+    val language = entry.language
+    if (language.isSome) {
+      val languageValue = (language as Some<String>).get()
+      val (row, rowKey, rowVal) = this.bookInfoViewOf()
+      rowKey.text = this.root.resources.getString(R.string.catalogMetaLanguage)
+      rowVal.text = languageValue
+      this.metadata.addView(row)
+    }
+
+    val narrators = entry.narrators.filterNot { it.isBlank() }
+    if (narrators.isNotEmpty()) {
+      val (row, rowKey, rowVal) = this.bookInfoViewOf()
+      rowKey.text = this.root.resources.getString(R.string.catalogMetaNarrators)
+      rowVal.text = narrators.joinToString(", ")
+      this.metadata.addView(row)
+    }
+
+    val duration = entry.duration
+    if (duration.isSome) {
+      val durationValue = (duration as Some<Double>).get()
+      val (row, rowKey, rowVal) = this.bookInfoViewOf()
+      rowKey.text = this.root.resources.getString(R.string.catalogMetaDuration)
+      rowVal.text = this.formatDuration(durationValue)
+      this.metadata.addView(row)
+    }
+
     val publishedOpt = entry.published
     if (publishedOpt is Some<DateTime>) {
       val (row, rowKey, rowVal) = this.bookInfoViewOf()
@@ -598,48 +653,6 @@ class CatalogFeedViewDetails2(
       val (row, rowKey, rowVal) = this.bookInfoViewOf()
       rowKey.text = this.root.resources.getString(R.string.catalogMetaDistributor)
       rowVal.text = entry.distribution
-      this.metadata.addView(row)
-    }
-
-    val categories =
-      entry.categories.filter { opdsCategory -> opdsCategory.scheme == this.genreUriScheme }
-    if (categories.isNotEmpty()) {
-      val (row, rowKey, rowVal) = this.bookInfoViewOf()
-      rowKey.text = this.root.resources.getString(R.string.catalogMetaCategories)
-      rowVal.text = categories.joinToString(", ") { opdsCategory -> opdsCategory.effectiveLabel }
-      this.metadata.addView(row)
-    }
-
-    val narrators = entry.narrators.filterNot { it.isBlank() }
-    if (narrators.isNotEmpty()) {
-      val (row, rowKey, rowVal) = this.bookInfoViewOf()
-      rowKey.text = this.root.resources.getString(R.string.catalogMetaNarrators)
-      rowVal.text = narrators.joinToString(", ")
-      this.metadata.addView(row)
-    }
-
-    this.run {
-      val (row, rowKey, rowVal) = this.bookInfoViewOf()
-      rowKey.text = this.root.resources.getString(R.string.catalogMetaUpdatedDate)
-      rowVal.text = this.dateTimeFormatter.print(entry.updated)
-      this.metadata.addView(row)
-    }
-
-    val duration = entry.duration
-    if (duration.isSome) {
-      val durationValue = (duration as Some<Double>).get()
-      val (row, rowKey, rowVal) = this.bookInfoViewOf()
-      rowKey.text = this.root.resources.getString(R.string.catalogMetaDuration)
-      rowVal.text = this.formatDuration(durationValue)
-      this.metadata.addView(row)
-    }
-
-    val language = entry.language
-    if (language.isSome) {
-      val languageValue = (language as Some<String>).get()
-      val (row, rowKey, rowVal) = this.bookInfoViewOf()
-      rowKey.text = this.root.resources.getString(R.string.catalogMetaLanguage)
-      rowVal.text = languageValue
       this.metadata.addView(row)
     }
   }

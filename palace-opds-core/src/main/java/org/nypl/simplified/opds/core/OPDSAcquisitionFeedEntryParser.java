@@ -445,6 +445,10 @@ public final class OPDSAcquisitionFeedEntryParser implements OPDSAcquisitionFeed
       }
 
       entry_builder.addCategory(new OPDSCategory(term, scheme, label));
+
+      if (scheme.equals("http://schema.org/audience")) {
+        entry_builder.setAudienceOption(Option.some(term));
+      }
     }
   }
 
