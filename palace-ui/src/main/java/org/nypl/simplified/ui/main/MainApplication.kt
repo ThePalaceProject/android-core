@@ -1,10 +1,14 @@
 package org.nypl.simplified.ui.main
 
 import android.app.Application
+import android.content.Context
+import android.os.Build
 import android.os.Process
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import android.os.StrictMode.VmPolicy
+import android.util.DisplayMetrics
+import android.view.WindowManager
 import com.io7m.jattribute.core.AttributeReadableType
 import com.io7m.jattribute.core.AttributeSubscriptionType
 import com.io7m.jattribute.core.AttributeType
@@ -17,6 +21,8 @@ import org.nypl.simplified.boot.api.BootLoader
 import org.nypl.simplified.boot.api.BootProcessType
 import org.nypl.simplified.threads.UIThread
 import org.slf4j.LoggerFactory
+import java.util.Locale
+import java.util.TimeZone
 
 class MainApplication : Application() {
 
@@ -79,10 +85,62 @@ class MainApplication : Application() {
   }
 
   private fun logStartup() {
-    this.logger.debug("starting app: pid {}", Process.myPid())
-    this.logger.debug("app version: {}", BuildConfig.SIMPLIFIED_VERSION)
-    this.logger.debug("app build:   {}", this.versionCode())
-    this.logger.debug("app commit:  {}", BuildConfig.SIMPLIFIED_GIT_COMMIT)
+    try {
+      this.logger.debug("Starting app: pid {}", Process.myPid())
+      this.logger.debug("App version: {}", BuildConfig.SIMPLIFIED_VERSION)
+      this.logger.debug("App build:   {}", this.versionCode())
+      this.logger.debug("App commit:  {}", BuildConfig.SIMPLIFIED_GIT_COMMIT)
+
+      this.logger.debug("Manufacturer: {}", Build.MANUFACTURER)
+      this.logger.debug("Brand: {}", Build.BRAND)
+      this.logger.debug("Model: {}", Build.MODEL)
+      this.logger.debug("Device: {}", Build.DEVICE)
+      this.logger.debug("Product: {}", Build.PRODUCT)
+      this.logger.debug("Hardware: {}", Build.HARDWARE)
+      this.logger.debug("Board: {}", Build.BOARD)
+      this.logger.debug("Bootloader: {}", Build.BOOTLOADER)
+
+      // OS / API
+      this.logger.debug("Android Version: {}", Build.VERSION.RELEASE)
+      this.logger.debug("SDK_INT:  {}", Build.VERSION.SDK_INT)
+      this.logger.debug("Codename: {}", Build.VERSION.CODENAME)
+      this.logger.debug("Security Patch: {}", Build.VERSION.SECURITY_PATCH)
+
+      // Build info
+      this.logger.debug("Build ID: {}", Build.ID)
+      this.logger.debug("Display: {}", Build.DISPLAY)
+      this.logger.debug("Fingerprint: {}", Build.FINGERPRINT)
+      this.logger.debug("Tags: {}", Build.TAGS)
+      this.logger.debug("Type: {}", Build.TYPE)
+      this.logger.debug("User: {}", Build.USER)
+      this.logger.debug("Time: {}", Build.TIME)
+
+      // Locale / timezone
+      this.logger.debug("Locale: {}", Locale.getDefault())
+      this.logger.debug("Timezone: {}", TimeZone.getDefault().getID())
+
+      // Screen
+      try {
+        val wm = this.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val dm = DisplayMetrics()
+        wm.getDefaultDisplay().getMetrics(dm)
+
+        this.logger.debug("Screen width px: {}", dm.widthPixels)
+        this.logger.debug("Screen height px: {}", dm.heightPixels)
+        this.logger.debug("Density: {}", dm.density)
+        this.logger.debug("Density DPI: {}", dm.densityDpi)
+      } catch (e: java.lang.Exception) {
+        this.logger.warn("Failed to get display metrics", e)
+      }
+
+      // Runtime
+      this.logger.debug("Available processors: {}", Runtime.getRuntime().availableProcessors())
+      this.logger.debug("Max memory (MB): {}", Runtime.getRuntime().maxMemory() / (1024 * 1024))
+      this.logger.debug("Total memory (MB): {}", Runtime.getRuntime().totalMemory() / (1024 * 1024))
+      this.logger.debug("Free memory (MB): {}", Runtime.getRuntime().freeMemory() / (1024 * 1024))
+    } catch (e: Throwable) {
+      this.logger.debug("Failed to fetch info: ", e)
+    }
   }
 
   private fun versionCode(): String {
