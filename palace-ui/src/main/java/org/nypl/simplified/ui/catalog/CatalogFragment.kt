@@ -13,6 +13,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.io7m.jfunctional.Some
 import com.io7m.jmulticlose.core.CloseableCollection
 import kotlinx.coroutines.CoroutineScope
@@ -635,31 +636,42 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
     val account =
       profiles.profileCurrent()
         .account(accountID)
+    val context =
+      this.requireContext()
 
-    if (this.isLoginRequired(accountID)) {
-      MainNavigation.showLoginDialog(account)
+    fun go() {
+      if (this.isLoginRequired(accountID)) {
+        MainNavigation.showLoginDialog(account)
 
-      AccountDetailModel.executeAfterLogin(
-        accountID = accountID,
-        runOnLogin = {
-          this.logger.debug("User logged in. Continuing revoke.")
-          books.bookRevoke(
-            accountID = accountID,
-            bookId = book.id,
-          )
+        AccountDetailModel.executeAfterLogin(
+          accountID = accountID,
+          runOnLogin = {
+            this.logger.debug("User logged in. Continuing revoke.")
+            books.bookRevoke(
+              accountID = accountID,
+              bookId = book.id,
+            )
 
-          UIThread.runOnUIThread {
-            MainNavigation.requestTabChangeForPart(this.catalogPart)
-            MainNavigation.Settings.goUp()
+            UIThread.runOnUIThread {
+              MainNavigation.requestTabChangeForPart(this.catalogPart)
+              MainNavigation.Settings.goUp()
+            }
           }
-        }
-      )
-    } else {
-      books.bookRevoke(
-        accountID = accountID,
-        bookId = book.id,
-      )
+        )
+      } else {
+        books.bookRevoke(
+          accountID = accountID,
+          bookId = book.id,
+        )
+      }
     }
+
+    MaterialAlertDialogBuilder(context)
+      .setMessage(context.getString(R.string.catalogReturnConfirm, book.entry.title))
+      .setNegativeButton(R.string.catalogCancel) { dialog, _ -> dialog.dismiss() }
+      .setPositiveButton(R.string.catalogReturn) { _, _ -> go() }
+      .create()
+      .show()
   }
 
   final override fun onBookRequestViewerOpen(
@@ -784,9 +796,6 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
       val account =
         this.profiles.profileCurrent()
           .account(newState.request.accountID)
-
-      val canGoBack =
-        this.opdsClient.hasHistory
 
       view.toolbar.configure(
         account = account,

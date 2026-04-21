@@ -93,6 +93,7 @@
     <string name="catalogPlaceHold">Place Hold</string>
     <string name="catalogRetry">Retry</string>
     <string name="catalogReturn">Return</string>
+    <string name="catalogReturnConfirm">Are you sure you want to return "%1$s"?</string>
     <string name="catalogSearch">Search</string>
     <string name="catalogDurationFormat">%1$s hours, %2$s minutes</string>
     <string name="catalogFacetsFilter">Filter (%1$d)</string>

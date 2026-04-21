@@ -1168,11 +1168,16 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-04-16T12:20:23+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.28.0">
+    <c:release date="2026-04-21T08:19:25+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.28.0">
       <c:changes>
-        <c:change date="2026-04-16T12:20:23+00:00" summary="Support Android Auto.">
+        <c:change date="2026-04-16T00:00:00+00:00" summary="Support Android Auto.">
           <c:tickets>
             <c:ticket id="PP-3535"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-04-21T08:19:25+00:00" summary="Add return confirmation.">
+          <c:tickets>
+            <c:ticket id="PP-4126"/>
           </c:tickets>
         </c:change>
       </c:changes>
