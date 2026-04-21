@@ -14,4 +14,12 @@ internal class NullDownloadProvider : PlayerDownloadProviderType {
     future.completeExceptionally(UnsupportedOperationException())
     return future
   }
+
+  override fun cancelAll() {
+    // Nothing
+  }
+
+  override fun close() {
+    // Nothing
+  }
 }
