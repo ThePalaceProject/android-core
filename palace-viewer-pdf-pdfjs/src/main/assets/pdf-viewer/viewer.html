@@ -31,7 +31,8 @@ See https://github.com/adobe-type-tools/cmap-resources
 <script src="./pdfjs-5.6.205-dist/build/pdf.mjs" type="module"></script>
 <link rel="stylesheet" href="./pdfjs-5.6.205-dist/web/viewer.css" />
 <script src="./pdfjs-5.6.205-dist/web/viewer.mjs" type="module"></script>
-<script src="viewer.js"></script>
+<script src="custom.js"></script>
+<link rel="stylesheet" href="custom.css" />
   </head>
 
   <body tabindex="0">
@@ -58,7 +59,7 @@ See https://github.com/adobe-type-tools/cmap-resources
                 <div
                   id="viewsManager"
                   class="menuContainer sidebar"
-                  hidden="true"
+                  hidden="hidden"
                   role="dialog"
                   aria-describedby="viewsManagerHeaderLabel"
                   data-l10n-id="pdfjs-views-manager-sidebar"
@@ -100,7 +101,7 @@ See https://github.com/adobe-type-tools/cmap-resources
                         type="button"
                         tabindex="0"
                         data-l10n-id="pdfjs-views-manager-add-file-button"
-                        hidden="true"
+                        hidden="hidden"
                       >
                         <span data-l10n-id="pdfjs-views-manager-add-file-button-label"></span>
                       </button>
@@ -110,7 +111,7 @@ See https://github.com/adobe-type-tools/cmap-resources
                         type="button"
                         tabindex="0"
                         data-l10n-id="pdfjs-current-outline-item-button"
-                        hidden="true"
+                        hidden="hidden"
                       >
                         <span data-l10n-id="pdfjs-current-outline-item-button-label"></span>
                       </button>
@@ -323,7 +324,7 @@ See https://github.com/adobe-type-tools/cmap-resources
                       id="customScaleOption"
                       value="custom"
                       disabled="disabled"
-                      hidden="true"
+                      hidden="hidden"
                       data-l10n-id="pdfjs-page-scale-percent"
                       data-l10n-args='{ "scale": 0 }'
                     ></option>
@@ -339,8 +340,8 @@ See https://github.com/adobe-type-tools/cmap-resources
                 </span>
               </div>
               <div id="toolbarViewerRight" class="toolbarHorizontalGroup">
-                <div id="editorModeButtons" class="toolbarHorizontalGroup">
-                  <div id="editorComment" class="toolbarButtonWithContainer" hidden="true">
+                <div id="editorModeButtons" class="toolbarHorizontalGroup" hidden="hidden">
+                  <div id="editorComment" class="toolbarButtonWithContainer" hidden="hidden">
                     <button
                       id="editorCommentButton"
                       class="toolbarButton"
@@ -372,7 +373,7 @@ See https://github.com/adobe-type-tools/cmap-resources
                       </div>
                     </div>
                   </div>
-                  <div id="editorSignature" class="toolbarButtonWithContainer" hidden="true">
+                  <div id="editorSignature" class="toolbarButtonWithContainer" hidden="hidden">
                     <button
                       id="editorSignatureButton"
                       class="toolbarButton"
@@ -573,22 +574,22 @@ See https://github.com/adobe-type-tools/cmap-resources
                   </button>
                   <div id="secondaryToolbar" class="hidden doorHangerRight menu">
                     <div id="secondaryToolbarButtonContainer" class="menuContainer">
-                      <button id="secondaryOpenFile" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-open-file-button">
+                      <button id="secondaryOpenFile" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-open-file-button" hidden="hidden">
                         <span data-l10n-id="pdfjs-open-file-button-label"></span>
                       </button>
 
                       <div class="visibleMediumView">
-                        <button id="secondaryPrint" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-print-button">
+                        <button id="secondaryPrint" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-print-button" hidden="hidden">
                           <span data-l10n-id="pdfjs-print-button-label"></span>
                         </button>
 
-                        <button id="secondaryDownload" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-save-button">
+                        <button id="secondaryDownload" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-save-button" hidden="hidden">
                           <span data-l10n-id="pdfjs-save-button-label"></span>
                         </button>
 
                       </div>
 
-                      <div class="horizontalToolbarSeparator"></div>
+                      <div class="horizontalToolbarSeparator" hidden="hidden"></div>
 
                       <button id="presentationMode" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-presentation-mode-button">
                         <span data-l10n-id="pdfjs-presentation-mode-button-label"></span>
@@ -1103,7 +1104,7 @@ See https://github.com/adobe-type-tools/cmap-resources
                   <span id="addSignatureSaveWarning" data-l10n-id="pdfjs-editor-add-signature-save-warning-message"></span>
                 </div>
               </div>
-              <div id="addSignatureError" hidden="true" class="messageBar">
+              <div id="addSignatureError" hidden="hidden" class="messageBar">
                 <div>
                   <div>
                     <span id="addSignatureErrorTitle" class="title" data-l10n-id="pdfjs-editor-add-signature-image-upload-error-title"></span>

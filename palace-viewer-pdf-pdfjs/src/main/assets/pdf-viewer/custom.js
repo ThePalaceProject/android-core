@@ -20,26 +20,24 @@ window.addEventListener("webviewerloaded", () => {
 /**
  * Notify the activity of a click on the PDF viewer.
  **/
+
 function onPDFViewerClick() {
   PDFListener.onPageClick();
 }
 
 /**
  * Toggle the sidebar.
- *
- * @return true if the sidebar is open after toggling, false if it is closed.
  **/
-function toggleSidebar() {
-  PDFViewerApplication.eventBus.dispatch("sidebarToggle");
 
-  return PDFViewerApplication.pdfSidebar.isOpen;
+function toggleSidebar() {
+  PDFViewerApplication.viewsManager.toggle();
+  return PDFViewerApplication.viewsManager.isOpen;
 }
 
 /**
  * Toggle the secondary toolbar.
- *
- * @return true if the secondary toolbar is open after toggling, false if it is closed.
  **/
+
 function toggleSecondaryToolbar() {
   PDFViewerApplication.secondaryToolbar.toggle();
   return PDFViewerApplication.secondaryToolbar.isOpen;
