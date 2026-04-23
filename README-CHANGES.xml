@@ -1168,7 +1168,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-04-23T15:19:34+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.28.0">
+    <c:release date="2026-04-23T17:40:17+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.28.0">
       <c:changes>
         <c:change date="2026-04-16T00:00:00+00:00" summary="Support Android Auto.">
           <c:tickets>
@@ -1185,9 +1185,14 @@
             <c:ticket id="PP-4047"/>
           </c:tickets>
         </c:change>
-        <c:change date="2026-04-23T15:19:34+00:00" summary="Upgrade pdfjs 2.14.305 -&gt; 5.6.205.">
+        <c:change date="2026-04-23T00:00:00+00:00" summary="Upgrade pdfjs 2.14.305 -&gt; 5.6.205.">
           <c:tickets>
             <c:ticket id="PP-4057"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-04-23T17:40:17+00:00" summary="Upgrade Adobe DRM.">
+          <c:tickets>
+            <c:ticket id="PP-4175"/>
           </c:tickets>
         </c:change>
       </c:changes>
