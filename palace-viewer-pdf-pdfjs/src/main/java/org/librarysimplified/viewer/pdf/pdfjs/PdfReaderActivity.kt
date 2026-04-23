@@ -403,6 +403,8 @@ class PdfReaderActivity : AppCompatActivity() {
   }
 
   private fun onReaderPageClick() {
+    this.log.debug("onReaderPageClick")
+
     UIThread.runOnUIThread {
       if (this.supportActionBar?.isShowing == true) {
         this.supportActionBar?.hide()

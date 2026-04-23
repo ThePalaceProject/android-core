@@ -144,6 +144,9 @@ class PdfServer private constructor(
       if (upper.endsWith(".JS")) {
         return MediaType.JAVASCRIPT
       }
+      if (upper.endsWith(".MJS")) {
+        return MediaType.JAVASCRIPT
+      }
       if (upper.endsWith(".TTF")) {
         return MediaType.TTF
       }
