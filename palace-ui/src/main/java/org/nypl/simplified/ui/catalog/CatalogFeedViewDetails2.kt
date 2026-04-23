@@ -326,7 +326,9 @@ class CatalogFeedViewDetails2(
          */
 
         if (state >= 0.99) {
-          c.bottomSheetDarken.setOnClickListener { }
+          c.bottomSheetDarken.setOnClickListener {
+            c.bottomSheet.drawerClose()
+          }
           c.bottomSheetDarken.isClickable = true
           c.scrollView.importantForAccessibility =
             View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
