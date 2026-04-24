@@ -2,7 +2,7 @@
 # Android Studio 2.2.3 Defaults
 #
 
-**/build
+palace-*/build
 *.iml
 .DS_Store
 .externalNativeBuild
