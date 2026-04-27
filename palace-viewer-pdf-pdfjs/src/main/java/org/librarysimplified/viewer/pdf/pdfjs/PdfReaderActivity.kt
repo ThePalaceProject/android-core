@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.view.View.IMPORTANT_FOR_ACCESSIBILITY_YES
 import android.view.ViewGroup
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
@@ -235,6 +236,7 @@ class PdfReaderActivity : AppCompatActivity() {
     this.webView = WebView(this).apply {
       this.settings.javaScriptEnabled = true
     }
+    this.webView.importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
 
     this.webView.addJavascriptInterface(
       object {
