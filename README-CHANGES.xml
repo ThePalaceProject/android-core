@@ -1190,11 +1190,6 @@
             <c:ticket id="PP-4057"/>
           </c:tickets>
         </c:change>
-        <c:change date="2026-04-23T17:40:17+00:00" summary="Upgrade Adobe DRM.">
-          <c:tickets>
-            <c:ticket id="PP-4175"/>
-          </c:tickets>
-        </c:change>
       </c:changes>
     </c:release>
   </c:releases>
