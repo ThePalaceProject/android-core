@@ -19,15 +19,19 @@ jobs:
         run: .ci/ci-verify-release-branch.sh
       - name: Finish release
         run: .ci/ci-release-finish.sh
-      - name: Create or update release
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        id: create_release
         env:
-          GH_TOKEN: ${{ secrets.CI_GITHUB_ACCESS_TOKEN }}
           RELEASE_NOTES_PATH: ${{ env.RELEASE_NOTES_PATH }}
+          TAG_NAME: ${{ env.TAG_NAME }}
           VERSION_NUM: ${{ env.VERSION_NUM }}
-        run: |
-          gh release create "$VERSION_NUM" \
-            --title "$VERSION_NUM" \
-            --notes-file "$RELEASE_NOTES_PATH"
+        with:
+          token: ${{ secrets.CI_GITHUB_ACCESS_TOKEN }}
+          tag_name: ${{ env.TAG_NAME }}
+          name: ${{ env.VERSION_NUM }}
+          body_path: ${{ env.RELEASE_NOTES_PATH }}
+          draft: false
       - name: Build
         env:
           MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
@@ -47,3 +51,22 @@ jobs:
         with:
           name: junit-test-report
           path: ./palace-tests/build/reports/tests/testDebugUnitTest/
+      - name: Read release notes
+        id: release_notes
+        env:
+          RELEASE_NOTES_PATH: ${{ env.RELEASE_NOTES_PATH }}
+        run: |
+          {
+            echo 'body<<__EOF__'
+            cat "$RELEASE_NOTES_PATH"
+            echo '__EOF__'
+          } >> "$GITHUB_OUTPUT"
+      - name: Sync release to Jira
+        uses: ThePalaceProject/circulation/.github/actions/jira-release-sync@main
+        with:
+          jira-base-url: ${{ secrets.JIRA_BASE_URL }}
+          jira-user-email: ${{ secrets.JIRA_USER_EMAIL }}
+          jira-api-token: ${{ secrets.JIRA_API_TOKEN }}
+          release-name: "Android ${{ env.TAG_NAME }}"
+          release-url: ${{ steps.create_release.outputs.url }}
+          release-body: ${{ steps.release_notes.outputs.body }}
