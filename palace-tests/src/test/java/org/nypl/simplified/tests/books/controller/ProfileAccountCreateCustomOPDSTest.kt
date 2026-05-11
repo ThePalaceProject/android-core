@@ -31,6 +31,7 @@ import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.controller.ProfileAccountCreateCustomOPDSTask
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
+import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.files.DirectoryUtilities
@@ -39,7 +40,6 @@ import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
 import org.nypl.simplified.opds.core.OPDSFeedParser
 import org.nypl.simplified.opds.core.OPDSFeedParserType
 import org.nypl.simplified.opds.core.OPDSParseException
-import org.nypl.simplified.opds2.irradia.OPDS2ParsersIrradia
 import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
 import org.nypl.simplified.taskrecorder.api.TaskResult
@@ -55,9 +55,9 @@ import org.thepalaceproject.db.api.DBParameters
 import org.thepalaceproject.db.api.DBType
 import java.io.ByteArrayInputStream
 import java.io.File
-import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InputStream
+import java.net.URI
 import java.util.Collections
 import java.util.UUID
 import java.util.concurrent.Executors
@@ -77,6 +77,7 @@ class ProfileAccountCreateCustomOPDSTest {
   private val logger: Logger =
     LoggerFactory.getLogger(ProfileAccountCreateCustomOPDSTest::class.java)
 
+  private lateinit var buildConfig: BuildConfigurationServiceType
   private lateinit var accountEvents: PublishSubject<AccountEvent>
   private lateinit var accountProviderRegistry: AccountProviderRegistryType
   private lateinit var accountProviderResolutionStrings: MockAccountProviderResolutionStrings
@@ -105,6 +106,7 @@ class ProfileAccountCreateCustomOPDSTest {
   @Throws(Exception::class)
   fun setUp() {
     this.context = Mockito.mock(Context::class.java)
+    this.buildConfig = Mockito.mock(BuildConfigurationServiceType::class.java)
 
     this.http =
       LSHTTPClients()
@@ -125,20 +127,11 @@ class ProfileAccountCreateCustomOPDSTest {
     this.db = DBFactory.open(
       DBParameters(
         this.cacheDirectory.toPath().resolve("palace.db"),
-        accountProviderParsers = AccountProviderDescriptionCollectionParsers(OPDS2ParsersIrradia),
+        accountProviderParsers = AccountProviderDescriptionCollectionParsers(),
         accountProviderSerializers = AccountProviderDescriptionCollectionSerializers()
       )
     )
     this.defaultProvider = MockAccountProviders.fakeProvider("urn:fake:0")
-    this.accountProviderRegistry =
-      AccountProviderRegistry2.create(
-        this.context,
-        this.db,
-        this.defaultProvider,
-        listOf(),
-        MoreExecutors.directExecutor(),
-        MoreExecutors.newDirectExecutorService()
-      )
     this.accountEvents = PublishSubject.create()
     this.authDocumentParsers = Mockito.mock(AuthenticationDocumentParsersType::class.java)
     this.executorBooks = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool())
@@ -157,6 +150,20 @@ class ProfileAccountCreateCustomOPDSTest {
     this.clock = { Instant.now() }
     this.server = MockWebServer()
     this.server.start()
+
+    this.accountProviderRegistry =
+      AccountProviderRegistry2.create(
+        accountProviderResolutionStrings = this.accountProviderResolutionStrings,
+        attributeExecutor = MoreExecutors.directExecutor(),
+        authDocumentParsers = this.authDocumentParsers,
+        buildConfig = this.buildConfig,
+        database = this.db,
+        databaseExecutor = MoreExecutors.newDirectExecutorService(),
+        defaultProvider = this.defaultProvider,
+        httpClient = this.http,
+        uiExecutor = MoreExecutors.directExecutor(),
+        uriBase = URI.create("http://localhost:${this.server.port}"),
+      )
   }
 
   @AfterEach

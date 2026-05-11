@@ -5,10 +5,8 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
-import org.nypl.simplified.accounts.json.AccountProviderDescriptionCollectionParser
 import org.nypl.simplified.accounts.json.AccountProviderDescriptionCollectionParsers
 import org.nypl.simplified.accounts.json.AccountProviderDescriptionCollectionSerializers
-import org.nypl.simplified.opds2.irradia.OPDS2ParsersIrradia
 import org.thepalaceproject.db.DBFactory
 import org.thepalaceproject.db.api.DBParameters
 import org.thepalaceproject.db.api.DBType
@@ -30,7 +28,7 @@ class DBTest {
     this.file = directory.resolve("database.db")
 
     this.accountParsers =
-      AccountProviderDescriptionCollectionParsers(OPDS2ParsersIrradia)
+      AccountProviderDescriptionCollectionParsers()
     this.accountSerializers =
       AccountProviderDescriptionCollectionSerializers()
 

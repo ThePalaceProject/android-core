@@ -1,9 +1,9 @@
 package org.nypl.simplified.tests.mocking
 
-import android.content.Context
 import com.google.common.util.concurrent.MoreExecutors
-import org.joda.time.DateTime
+import org.librarysimplified.http.api.LSHTTPClientType
 import org.mockito.Mockito
+import org.mockito.Mockito.mock
 import org.nypl.simplified.accounts.api.AccountProvider
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountProviderType
@@ -11,7 +11,9 @@ import org.nypl.simplified.accounts.json.AccountProviderDescriptionCollectionPar
 import org.nypl.simplified.accounts.json.AccountProviderDescriptionCollectionSerializers
 import org.nypl.simplified.accounts.registry.AccountProviderRegistry2
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
-import org.nypl.simplified.opds2.irradia.OPDS2ParsersIrradia
+import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
+import org.nypl.simplified.buildconfig.api.BuildConfigurationSettingsType
+import org.nypl.simplified.opds.auth_document.AuthenticationDocumentParsers
 import org.thepalaceproject.db.DBFactory
 import org.thepalaceproject.db.api.DBParameters
 import java.net.URI
@@ -83,19 +85,23 @@ object MockAccountProviders {
       DBFactory.open(
         DBParameters(
           dir.resolve("palace.db"),
-          accountProviderParsers = AccountProviderDescriptionCollectionParsers(OPDS2ParsersIrradia),
+          accountProviderParsers = AccountProviderDescriptionCollectionParsers(),
           accountProviderSerializers = AccountProviderDescriptionCollectionSerializers()
         )
       )
 
     val registry =
       AccountProviderRegistry2.create(
-        Mockito.mock(Context::class.java),
-        db,
-        fake0,
-        listOf(),
-        MoreExecutors.directExecutor(),
-        MoreExecutors.newDirectExecutorService()
+        accountProviderResolutionStrings = MockAccountProviderResolutionStrings(),
+        attributeExecutor = MoreExecutors.directExecutor(),
+        authDocumentParsers = AuthenticationDocumentParsers(),
+        buildConfig = Mockito.mock(BuildConfigurationServiceType::class.java),
+        database = db,
+        databaseExecutor = MoreExecutors.newDirectExecutorService(),
+        defaultProvider = fake0,
+        httpClient = mock(LSHTTPClientType::class.java),
+        uiExecutor = MoreExecutors.directExecutor(),
+        uriBase = URI.create("http://localhost:10000"),
       )
 
     for (provider in providers.values) {

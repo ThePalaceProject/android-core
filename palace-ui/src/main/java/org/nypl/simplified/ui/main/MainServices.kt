@@ -42,10 +42,9 @@ import org.nypl.simplified.accounts.json.AccountBundledCredentialsJSON
 import org.nypl.simplified.accounts.json.AccountProviderDescriptionCollectionParsers
 import org.nypl.simplified.accounts.json.AccountProviderDescriptionCollectionSerializers
 import org.nypl.simplified.accounts.registry.AccountProviderRegistry2
+import org.nypl.simplified.accounts.registry.AccountProviderResolutionStrings
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryDebugging
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
-import org.nypl.simplified.accounts.source.spi.AccountProviderSourceFactoryType
-import org.nypl.simplified.accounts.source.spi.AccountProviderSourceResolutionStrings
 import org.nypl.simplified.adobe.extensions.AdobeConfigurationServiceType
 import org.nypl.simplified.adobe.extensions.AdobeDRMServices
 import org.nypl.simplified.analytics.api.Analytics
@@ -130,7 +129,6 @@ import org.thepalaceproject.db.api.DBParameters
 import org.thepalaceproject.db.api.DBType
 import org.thepalaceproject.opds.client.OPDSClient
 import org.thepalaceproject.opds.client.OPDSClientParameters
-import org.thepalaceproject.opds2.pwp.OPDS2ParsersPWP
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -294,28 +292,29 @@ internal object MainServices {
   }
 
   private fun createAccountProviderRegistry(
-    context: Application,
     database: DBType,
     http: LSHTTPClientType,
+    accountProviderResolutionStrings: AccountProviderResolutionStringsType,
+    authenticationDocumentParsers: AuthenticationDocumentParsersType,
   ): AccountProviderRegistryType {
     val defaultAccountProvider =
       loadDefaultAccountProvider()
     val buildConfig =
       ServiceLoader.load(BuildConfigurationServiceType::class.java).first()
-    val sourceFactories =
-      ServiceLoader.load(AccountProviderSourceFactoryType::class.java)
-    val sources =
-      sourceFactories.map { f -> f.create(context, http, buildConfig) }
     val databaseExecutor =
       NamedThreadPools.namedThreadPool(1, "database", 0)
 
     return AccountProviderRegistry2.create(
-      context = context,
-      database = database,
-      defaultProvider = defaultAccountProvider,
-      sources = sources,
+      accountProviderResolutionStrings = accountProviderResolutionStrings,
       attributeExecutor = { r -> UIThread.runOnUIThread(r) },
-      databaseExecutor = databaseExecutor
+      authDocumentParsers = authenticationDocumentParsers,
+      buildConfig = buildConfig,
+      database = database,
+      databaseExecutor = databaseExecutor,
+      defaultProvider = defaultAccountProvider,
+      httpClient = http,
+      uiExecutor = UIThread,
+      uriBase = buildConfig.libraryRegistry.registryBaseURI,
     )
   }
 
@@ -576,13 +575,14 @@ internal object MainServices {
       serviceConstructor = { MainLogoutStringResources(context.resources) }
     )
 
-    addService(
-      message = strings.bootingGeneral("account resolution strings"),
-      interfaceType = AccountProviderResolutionStringsType::class.java,
-      serviceConstructor = {
-        AccountProviderSourceResolutionStrings(context.resources)
-      }
-    )
+    val accountProviderResolutionStrings =
+      addService(
+        message = strings.bootingGeneral("account resolution strings"),
+        interfaceType = AccountProviderResolutionStringsType::class.java,
+        serviceConstructor = {
+          AccountProviderResolutionStrings(context.resources)
+        }
+      )
 
     addService(
       message = strings.bootingGeneral("account creation strings"),
@@ -742,7 +742,7 @@ internal object MainServices {
       addService(
         message = strings.bootingGeneral("account provider parsers"),
         interfaceType = AccountProviderDescriptionCollectionParsersType::class.java,
-        serviceConstructor = { AccountProviderDescriptionCollectionParsers(OPDS2ParsersPWP) }
+        serviceConstructor = { AccountProviderDescriptionCollectionParsers() }
       )
 
     val accountProviderSerializers =
@@ -765,11 +765,25 @@ internal object MainServices {
         }
       )
 
+    val authenticationDocumentParsers =
+      addService(
+        message = strings.bootingGeneral("authentication document parsers"),
+        interfaceType = AuthenticationDocumentParsersType::class.java,
+        serviceConstructor = { AuthenticationDocumentParsers() }
+      )
+
     val accountProviderRegistry =
       addService(
         message = strings.bootingGeneral("account providers"),
         interfaceType = AccountProviderRegistryType::class.java,
-        serviceConstructor = { createAccountProviderRegistry(context, database, lsHTTP) }
+        serviceConstructor = {
+          createAccountProviderRegistry(
+            database = database,
+            http = lsHTTP,
+            accountProviderResolutionStrings = accountProviderResolutionStrings,
+            authenticationDocumentParsers = authenticationDocumentParsers
+          )
+        }
       )
 
     val accountBundledCredentials =
@@ -884,12 +898,6 @@ internal object MainServices {
       message = strings.bootingGeneral("patron user profile parsers"),
       interfaceType = PatronUserProfileParsersType::class.java,
       serviceConstructor = { PatronUserProfileParsers() }
-    )
-
-    addService(
-      message = strings.bootingGeneral("authentication document parsers"),
-      interfaceType = AuthenticationDocumentParsersType::class.java,
-      serviceConstructor = { AuthenticationDocumentParsers() }
     )
 
     val notificationTokenHTTPCalls =

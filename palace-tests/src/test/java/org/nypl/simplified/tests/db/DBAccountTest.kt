@@ -11,7 +11,6 @@ import org.nypl.simplified.accounts.api.AccountProvider
 import org.nypl.simplified.accounts.api.AccountProviderDescription
 import org.nypl.simplified.accounts.json.AccountProviderDescriptionCollectionParsers
 import org.nypl.simplified.accounts.json.AccountProviderDescriptionCollectionSerializers
-import org.nypl.simplified.opds2.irradia.OPDS2ParsersIrradia
 import org.nypl.simplified.tests.mocking.MockAccountProviders
 import org.thepalaceproject.db.DBFactory
 import org.thepalaceproject.db.api.DBParameters
@@ -44,7 +43,7 @@ class DBAccountTest {
     this.file = directory.resolve("database.db")
 
     this.accountParsers =
-      AccountProviderDescriptionCollectionParsers(OPDS2ParsersIrradia)
+      AccountProviderDescriptionCollectionParsers()
     this.accountSerializers =
       AccountProviderDescriptionCollectionSerializers()
 

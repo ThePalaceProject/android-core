@@ -113,4 +113,6 @@
 
     <string name="announcementTitle">%1$s (%2$d of %3$d)</string>
     <string name="announcementOK">OK</string>
+
+    <string name="registryFailure">An error occurred whilst retrieving the libraries.\nThe list of libraries below might be incomplete.</string>
 </resources>

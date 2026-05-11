@@ -3,27 +3,28 @@ package org.nypl.simplified.accounts.json
 import org.nypl.simplified.accounts.api.AccountProviderDescription
 import org.nypl.simplified.accounts.api.AccountProviderDescriptionCollection
 import org.nypl.simplified.accounts.api.AccountProviderDescriptionCollectionParserType
-import org.nypl.simplified.opds2.OPDS2Catalog
-import org.nypl.simplified.opds2.OPDS2Feed
-import org.nypl.simplified.opds2.OPDS2Metadata
+import org.nypl.simplified.links.Links
 import org.nypl.simplified.parser.api.ParseError
 import org.nypl.simplified.parser.api.ParseResult
 import org.nypl.simplified.parser.api.ParseWarning
-import org.nypl.simplified.parser.api.ParserType
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.webpub.core.WPMCatalog
+import org.thepalaceproject.webpub.core.WPMManifest
+import org.thepalaceproject.webpub.core.WPMMetadata
+import java.net.URI
 
 /**
  * A parser of provider description collections.
  */
 
 class AccountProviderDescriptionCollectionParser internal constructor(
-  private val parser: ParserType<OPDS2Feed>
+  private val source: URI,
+  private val manifestSupplier: () -> WPMManifest
 ) : AccountProviderDescriptionCollectionParserType {
 
   private val logger =
     LoggerFactory.getLogger(AccountProviderDescriptionCollectionParser::class.java)
 
-  private lateinit var feed: OPDS2Feed
   private val errors = mutableListOf<ParseError>()
   private val warnings = mutableListOf<ParseWarning>()
 
@@ -32,7 +33,7 @@ class AccountProviderDescriptionCollectionParser internal constructor(
   ) {
     this.errors.add(
       ParseError(
-        source = this.feed.uri,
+        source = this.source,
         message = message,
         line = 0,
         column = 0,
@@ -42,23 +43,48 @@ class AccountProviderDescriptionCollectionParser internal constructor(
   }
 
   override fun parse(): ParseResult<AccountProviderDescriptionCollection> {
-    return this.parser.parse().flatMap(this::processFeed)
+    return try {
+      val manifest = this.manifestSupplier.invoke()
+      if (manifest.catalogs.isEmpty()) {
+        this.logError("No catalogs were provided in the given feed.")
+        return ParseResult.Failure(
+          warnings = this.warnings.toList(),
+          errors = this.errors.toList()
+        )
+      } else {
+        this.processCatalogs(manifest)
+      }
+    } catch (e: Exception) {
+      this.errors.add(
+        ParseError(
+          source = this.source,
+          message = e.message ?: e.javaClass.name,
+          line = 0,
+          column = 0,
+          exception = e
+        )
+      )
+      ParseResult.Failure(
+        warnings = this.warnings.toList(),
+        errors = this.errors.toList()
+      )
+    }
   }
 
-  private fun processFeed(feed: OPDS2Feed): ParseResult<AccountProviderDescriptionCollection> {
-    this.feed = feed
-
+  private fun processCatalogs(
+    manifest: WPMManifest
+  ): ParseResult<AccountProviderDescriptionCollection> {
     val metadata =
-      this.processMetadata(feed.metadata)
+      this.processMetadata(manifest.metadata)
     val accountDescriptions =
-      feed.catalogs.mapNotNull(this::processCatalog)
+      manifest.catalogs.mapNotNull(this::processCatalog)
 
     if (this.errors.isEmpty()) {
       return ParseResult.Success(
         warnings = this.warnings.toList(),
         result = AccountProviderDescriptionCollection(
           providers = accountDescriptions,
-          links = feed.links,
+          links = manifest.links.map { link -> Links.wpmLinkToPalaceLink(link) },
           metadata = metadata
         )
       )
@@ -71,18 +97,18 @@ class AccountProviderDescriptionCollectionParser internal constructor(
   }
 
   private fun processCatalog(
-    catalog: OPDS2Catalog
+    catalog: WPMCatalog
   ): AccountProviderDescription? {
     val errorsThen = this.errors.size
 
     val id = catalog.metadata.identifier
     if (id == null) {
-      this.logError("An identifier is required for catalog ${catalog.metadata.title.title}")
+      this.logError("An identifier is required for catalog ${catalog.metadata.title.defaultValue}")
     }
 
-    val updated = catalog.metadata.modified
+    val updated = catalog.metadata.modified ?: catalog.metadata.updated
     if (updated == null) {
-      this.logError("An 'updated' time is required for catalog ${catalog.metadata.title.title}")
+      this.logError("An 'updated' time is required for catalog ${catalog.metadata.title.defaultValue}")
     }
 
     val errorsNow = this.errors.size
@@ -92,23 +118,23 @@ class AccountProviderDescriptionCollectionParser internal constructor(
 
     return AccountProviderDescription(
       id = id!!,
-      title = catalog.metadata.title.title,
+      title = catalog.metadata.title.defaultValue,
       description = catalog.metadata.description,
       updated = updated!!,
-      links = catalog.links,
-      images = catalog.images,
+      links = catalog.links.map { link -> Links.wpmLinkToPalaceLink(link) },
+      images = catalog.images.map { link -> Links.wpmLinkToPalaceLink(link) },
     )
   }
 
   private fun processMetadata(
-    metadata: OPDS2Metadata
+    metadata: WPMMetadata
   ): AccountProviderDescriptionCollection.Metadata {
     return AccountProviderDescriptionCollection.Metadata(
-      title = metadata.title.title
+      title = metadata.title.defaultValue
     )
   }
 
   override fun close() {
-    this.parser.close()
+    // Nothing required.
   }
 }

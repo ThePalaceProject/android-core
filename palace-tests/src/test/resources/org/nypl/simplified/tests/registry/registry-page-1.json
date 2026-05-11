@@ -1,0 +1,140 @@
+{
+  "metadata": {
+    "title": "Libraries",
+    "numberOfItems": 1126,
+    "adobe_vendor_id": "ThePalaceProject"
+  },
+  "catalogs": [
+
+  ],
+  "links": [
+    {
+      "rel": "self",
+      "href": "https://registry.palaceproject.io/libraries/crawlable?offset=0&size=10",
+      "type": "application/opds+json"
+    },
+    {
+      "rel": "first",
+      "href": "https://registry.palaceproject.io/libraries/crawlable?offset=0&size=20",
+      "type": "application/opds+json"
+    },
+    {
+      "rel": "next",
+      "href": "https://registry.palaceproject.io/libraries/crawlable?offset=20&size=20",
+      "type": "application/opds+json"
+    },
+    {
+      "rel": "last",
+      "href": "https://registry.palaceproject.io/libraries/crawlable?offset=1120&size=20",
+      "type": "application/opds+json"
+    },
+    {
+      "href": "https://registry.palaceproject.io/register",
+      "rel": "register",
+      "type": "application/opds+json;profile=https://librarysimplified.org/rel/profile/directory"
+    },
+    {
+      "href": "https://registry.palaceproject.io/search",
+      "rel": "search",
+      "type": "application/opensearchdescription+xml"
+    },
+    {
+      "href": "https://registry.palaceproject.io/library/{uuid}",
+      "rel": "http://librarysimplified.org/rel/registry/library",
+      "type": "application/opds+json",
+      "templated": true
+    }
+  ],
+  "facets": [
+    {
+      "metadata": {
+        "title": "Sort by",
+        "@type": "http://palaceproject.io/terms/rel/sort",
+        "http://palaceproject.io/terms/facet/param": "order"
+      },
+      "links": [
+        {
+          "href": "https://registry.palaceproject.io/libraries/crawlable?order=modified",
+          "title": "Most recently modified first",
+          "type": "application/opds+json",
+          "properties": {
+            "http://palaceproject.io/terms/facet/value": "modified",
+            "http://palaceproject.io/terms/properties/default": true,
+            "http://palaceproject.io/terms/facet/group": "modified"
+          },
+          "rel": "self"
+        },
+        {
+          "href": "https://registry.palaceproject.io/libraries/crawlable?order=modified-asc",
+          "title": "Least recently modified first",
+          "type": "application/opds+json",
+          "properties": {
+            "http://palaceproject.io/terms/facet/value": "modified-asc",
+            "http://palaceproject.io/terms/facet/group": "modified"
+          }
+        },
+        {
+          "href": "https://registry.palaceproject.io/libraries/crawlable?order=name",
+          "title": "Library name (A-Z)",
+          "type": "application/opds+json",
+          "properties": {
+            "http://palaceproject.io/terms/facet/value": "name",
+            "http://palaceproject.io/terms/facet/group": "name"
+          }
+        },
+        {
+          "href": "https://registry.palaceproject.io/libraries/crawlable?order=name-desc",
+          "title": "Library name (Z-A)",
+          "type": "application/opds+json",
+          "properties": {
+            "http://palaceproject.io/terms/facet/value": "name-desc",
+            "http://palaceproject.io/terms/facet/group": "name"
+          }
+        },
+        {
+          "href": "https://registry.palaceproject.io/libraries/crawlable?order=natural",
+          "title": "Database order",
+          "type": "application/opds+json",
+          "properties": {
+            "http://palaceproject.io/terms/facet/value": "natural"
+          }
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "title": "Availability",
+        "@type": "http://palaceproject.io/terms/rel/availability",
+        "http://palaceproject.io/terms/facet/param": "availability"
+      },
+      "links": [
+        {
+          "href": "https://registry.palaceproject.io/libraries/crawlable?availability=production",
+          "title": "Production",
+          "type": "application/opds+json",
+          "properties": {
+            "http://palaceproject.io/terms/facet/value": "production",
+            "http://palaceproject.io/terms/properties/default": true
+          },
+          "rel": "self"
+        },
+        {
+          "href": "https://registry.palaceproject.io/libraries/crawlable?availability=hidden",
+          "title": "Hidden",
+          "type": "application/opds+json",
+          "properties": {
+            "http://palaceproject.io/terms/facet/value": "hidden"
+          }
+        },
+        {
+          "href": "https://registry.palaceproject.io/libraries/crawlable?availability=all",
+          "title": "All: Production and Hidden",
+          "type": "application/opds+json",
+          "properties": {
+            "http://palaceproject.io/terms/facet/value": "all"
+          }
+        }
+      ]
+    }
+  ]
+}

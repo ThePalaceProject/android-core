@@ -2,6 +2,7 @@ dependencies {
     coreLibraryDesugaring(libs.android.desugaring)
 
     implementation(project(":palace-announcements"))
+    implementation(project(":palace-buildconfig-api"))
     implementation(project(":palace-links"))
     implementation(project(":palace-opds-core"))
     implementation(project(":palace-parser-api"))

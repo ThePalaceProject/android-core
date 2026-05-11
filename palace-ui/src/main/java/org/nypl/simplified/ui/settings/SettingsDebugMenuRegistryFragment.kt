@@ -17,6 +17,7 @@ import com.io7m.jmulticlose.core.CloseableCollectionType
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryDebugging
+import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryRefresh
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.threads.UIThread
@@ -129,12 +130,20 @@ class SettingsDebugMenuRegistryFragment : Fragment(R.layout.debug_registry),
 
     this.registryRefresh.setOnClickListener {
       registry.refreshAsync(
-        includeTestingLibraries = SettingsDebugModel.showTestingLibraries(),
+        AccountProviderRegistryRefresh(
+          clearBeforeRefresh = true,
+          includeTestingLibraries = SettingsDebugModel.showTestingLibraries(),
+        )
       )
     }
     this.debugRegistryQALibraries.setOnCheckedChangeListener { _, checked ->
       SettingsDebugModel.updatePreferences { p -> p.copy(showTestingLibraries = checked) }
-      registry.refreshAsync(includeTestingLibraries = checked)
+      registry.refreshAsync(
+        AccountProviderRegistryRefresh(
+          clearBeforeRefresh = true,
+          includeTestingLibraries = checked,
+        )
+      )
     }
   }
 
@@ -157,9 +166,21 @@ class SettingsDebugMenuRegistryFragment : Fragment(R.layout.debug_registry),
         text.append("The registry contains ${descriptions.size} account providers.\n")
         text.append("${resolved.size} of the account providers have been resolved.\n")
       }
-      AccountProviderRegistryStatus.Refreshing -> {
-        this.registryStatusProgress.isIndeterminate = true
-        text.append("The registry is currently refreshing ⌛\n")
+
+      is AccountProviderRegistryStatus.Refreshing -> {
+        val progressPercent = status.progressPercent
+        if (progressPercent == null) {
+          this.registryStatusProgress.isIndeterminate = true
+          text.append("The registry is currently refreshing ⌛\n")
+        } else {
+          this.registryStatusProgress.isIndeterminate = false
+          this.registryStatusProgress.progress = progressPercent.toInt()
+          text.append("The registry is currently refreshing ${progressPercent.toInt()}% ⌛\n")
+        }
+      }
+
+      is AccountProviderRegistryStatus.Failed -> {
+        TODO()
       }
     }
 

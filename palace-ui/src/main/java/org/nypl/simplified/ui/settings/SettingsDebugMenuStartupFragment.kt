@@ -40,6 +40,7 @@ class SettingsDebugMenuStartupFragment : Fragment(R.layout.debug_startup),
     return BACK_BUTTON_CONSUMED
   }
 
+  private lateinit var hasSeenLibrarySelector: SwitchCompat
   private lateinit var hasSeenNotifications: SwitchCompat
   private lateinit var failNextBoot: SwitchCompat
   private lateinit var toolbarBack: View
@@ -69,6 +70,14 @@ class SettingsDebugMenuStartupFragment : Fragment(R.layout.debug_startup),
       SettingsDebugModel.hasSeenNotificationScreen()
     this.hasSeenNotifications.setOnCheckedChangeListener { _, checked ->
       SettingsDebugModel.updatePreferences { p -> p.copy(hasSeenNotificationScreen = checked) }
+    }
+
+    this.hasSeenLibrarySelector =
+      view.findViewById(R.id.debugStartupShowLibrarySelector)
+    this.hasSeenLibrarySelector.isChecked =
+      SettingsDebugModel.hasSeenLibrarySelection()
+    this.hasSeenLibrarySelector.setOnCheckedChangeListener { _, checked ->
+      SettingsDebugModel.updatePreferences { p -> p.copy(hasSeenLibrarySelectionScreen = checked) }
     }
   }
 }

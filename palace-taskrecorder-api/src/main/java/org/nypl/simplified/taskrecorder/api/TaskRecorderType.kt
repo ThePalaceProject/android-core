@@ -1,5 +1,7 @@
 package org.nypl.simplified.taskrecorder.api
 
+import org.librarysimplified.http.api.LSHTTPResponseProperties
+
 /**
  * A task recorder. Record the steps of complex tasks to explain how and why errors occurred.
  */
@@ -88,4 +90,23 @@ interface TaskRecorderType {
    */
 
   fun addAll(steps: List<TaskStep>)
+
+  /**
+   * Publish the given HTTP response properties as attributes.
+   */
+
+  fun addPropertiesAsAttributes(properties: LSHTTPResponseProperties) {
+    this.addAttribute("HTTPStatusCode", properties.status.toString())
+    this.addAttribute("HTTPMessage", properties.message)
+    this.addAttribute("HTTPContentLength", (properties.contentLength ?: -1).toString())
+    this.addAttribute("HTTPContentType", properties.contentType.toString())
+
+    val problem = properties.problemReport
+    if (problem != null) {
+      this.addAttribute("ProblemReport (Title)", problem.title ?: "null")
+      this.addAttribute("ProblemReport (Type)", problem.type ?: "null")
+      this.addAttribute("ProblemReport (Detail)", problem.detail ?: "null")
+      this.addAttribute("ProblemReport (Status)", problem.status?.toString() ?: "null")
+    }
+  }
 }

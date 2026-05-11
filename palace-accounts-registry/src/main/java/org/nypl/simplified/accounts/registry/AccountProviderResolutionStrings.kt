@@ -1,0 +1,50 @@
+package org.nypl.simplified.accounts.registry
+
+import android.content.res.Resources
+import org.librarysimplified.accounts.registry.R
+import org.nypl.simplified.accounts.api.AccountProviderResolutionStringsType
+
+/**
+ * The resolution strings.
+ */
+
+class AccountProviderResolutionStrings(
+  private val resources: Resources
+) : AccountProviderResolutionStringsType {
+
+  override val resolvingAuthDocumentUnusableLink: String
+    get() = this.resources.getString(R.string.resolvingAuthDocumentUnusableLink)
+
+  override val resolvingUnexpectedException: String
+    get() = this.resources.getString(R.string.resolvingUnexpectedException)
+
+  override val resolvingAuthDocumentRetrievalFailed: String
+    get() = this.resources.getString(R.string.resolvingAuthDocumentRetrievalFailed)
+
+  override val resolvingAuthDocumentBasicTokenMalformed: String
+    get() = this.resources.getString(R.string.resolvingAuthDocumentBasicTokenMalformed)
+
+  override val resolvingAuthDocumentSAML20Malformed: String
+    get() = this.resources.getString(R.string.resolvingAuthDocumentSAML20Malformed)
+
+  override val resolvingAuthDocumentOIDCMalformed: String
+    get() = this.resources.getString(R.string.resolvingAuthDocumentOIDCMalformed)
+
+  override val resolvingAuthDocumentNoUsableAuthenticationTypes: String
+    get() = this.resources.getString(R.string.resolvingAuthDocumentNoUsableAuthenticationTypes)
+
+  override val resolvingAuthDocumentNoStartURI: String
+    get() = this.resources.getString(R.string.resolvingAuthDocumentNoStartURI)
+
+  override val resolvingAuthDocumentParseFailed: String
+    get() = this.resources.getString(R.string.resolvingAuthDocumentParseFailed)
+
+  override val resolvingAuthDocumentMissingURI: String
+    get() = this.resources.getString(R.string.resolvingAuthDocumentMissingURI)
+
+  override val resolving: String
+    get() = this.resources.getString(R.string.resolving)
+
+  override val resolvingAuthDocument: String
+    get() = this.resources.getString(R.string.resolvingAuthDocument)
+}

@@ -4,11 +4,9 @@ import com.io7m.jattribute.core.AttributeReadableType
 import com.io7m.jattribute.core.AttributeSubscriptionType
 import com.io7m.jattribute.core.AttributeType
 import org.nypl.simplified.accounts.api.AccountProviderDescription
-import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus
+import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryRefresh
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
-import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
-import org.nypl.simplified.ui.accounts.AccountProviderDescriptionComparator
 import org.nypl.simplified.ui.main.MainAttributes
 
 object SplashModel {
@@ -69,23 +67,17 @@ object SplashModel {
   }
 
   fun accountProvidersLoad(
-    buildConfig: BuildConfigurationServiceType,
     registry: AccountProviderRegistryType
   ): AttributeSubscriptionType {
-    registry.refreshAsync(includeTestingLibraries = false)
-    return registry.statusAttribute.subscribe { _, status ->
-      when (status) {
-        AccountProviderRegistryStatus.Idle -> {
-          this.accountProvidersActual.set(
-            registry.accountProviderDescriptions().values
-              .sortedWith(AccountProviderDescriptionComparator(buildConfig))
-          )
-        }
+    registry.refreshAsync(
+      AccountProviderRegistryRefresh(
+        clearBeforeRefresh = false,
+        includeTestingLibraries = false
+      )
+    )
 
-        AccountProviderRegistryStatus.Refreshing -> {
-          this.accountProvidersActual.set(listOf())
-        }
-      }
+    return registry.statusAttribute.subscribe { _, _ ->
+      this.accountProvidersActual.set(registry.accountProviderDescriptionsSortedAttribute.get())
     }
   }
 
