@@ -33,10 +33,6 @@ info "installing keystore"
 cp -v ".ci/credentials/APK Signing/keystore.jks" \
   "release.jks" || exit 1
 
-#------------------------------------------------------------------------
-# Add the NYPL nexus properties to the project properties.
-#
-
 mkdir -p "${HOME}/.gradle" ||
   fatal "could not create ${HOME}/.gradle"
 
@@ -78,3 +74,5 @@ EOF
 
 .ci-local/transifex.sh ||
   fatal "Transifex failed"
+.ci-local/registry.sh ||
+  fatal "Registry failed"
