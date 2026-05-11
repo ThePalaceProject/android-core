@@ -1,0 +1,14 @@
+{
+  "metadata": {
+    "title": "Libraries",
+    "adobe_vendor_id": "ThePalaceProject"
+  },
+  "catalogs": [],
+  "links": [
+    {
+      "rel": "self",
+      "href": "https://registry.palaceproject.io/libraries",
+      "type": "application/opds+json"
+    }
+  ]
+}
