@@ -1188,8 +1188,19 @@
         <c:change date="2026-04-29T00:00:00+00:00" summary="Allow clicking anywhere on the page in Book Details to hide the bottom drawer."/>
       </c:changes>
     </c:release>
-    <c:release date="2026-05-05T11:33:57+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.29.0">
-      <c:changes/>
+    <c:release date="2026-05-12T09:45:35+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.29.0">
+      <c:changes>
+        <c:change date="2026-05-12T00:00:00+00:00" summary="Replace library registry implementation to allow for progressive loading.">
+          <c:tickets>
+            <c:ticket id="PP-4261"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-05-12T09:45:35+00:00" summary="Bundle library registry with application for fast startup on first installs.">
+          <c:tickets>
+            <c:ticket id="PP-4260"/>
+          </c:tickets>
+        </c:change>
+      </c:changes>
     </c:release>
   </c:releases>
   <c:ticket-systems>
