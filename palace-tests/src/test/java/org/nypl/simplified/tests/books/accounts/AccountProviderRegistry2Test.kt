@@ -19,6 +19,7 @@ import org.nypl.simplified.accounts.api.AccountProvider
 import org.nypl.simplified.accounts.json.AccountProviderDescriptionCollectionParsers
 import org.nypl.simplified.accounts.json.AccountProviderDescriptionCollectionSerializers
 import org.nypl.simplified.accounts.registry.AccountProviderRegistry2
+import org.nypl.simplified.accounts.registry.AccountProviderRegistryConstants
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryRefresh
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
@@ -32,9 +33,12 @@ import org.thepalaceproject.db.api.DBType
 import org.thepalaceproject.db.api.queries.DBQAccountProviderDescriptionGetType
 import org.thepalaceproject.db.api.queries.DBQAccountProviderDescriptionPutType
 import org.thepalaceproject.db.api.queries.DBQAccountProviderGetType
+import org.thepalaceproject.db.api.queries.DBQAccountRegistrySetting
+import org.thepalaceproject.db.api.queries.DBQAccountRegistrySettingsPutType
 import java.net.URI
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
+import java.time.OffsetDateTime
 
 class AccountProviderRegistry2Test {
 
@@ -116,7 +120,7 @@ class AccountProviderRegistry2Test {
       )
 
     registry.refresh(
-      AccountProviderRegistryRefresh(
+      AccountProviderRegistryRefresh.Full(
         clearBeforeRefresh = true,
         includeTestingLibraries = true
       )
@@ -189,7 +193,7 @@ class AccountProviderRegistry2Test {
       )
 
     registry.refresh(
-      AccountProviderRegistryRefresh(
+      AccountProviderRegistryRefresh.Full(
         clearBeforeRefresh = true,
         includeTestingLibraries = true
       )
@@ -199,7 +203,7 @@ class AccountProviderRegistry2Test {
     assertEquals(21, acc0.size)
 
     registry.refresh(
-      AccountProviderRegistryRefresh(
+      AccountProviderRegistryRefresh.Full(
         clearBeforeRefresh = true,
         includeTestingLibraries = true
       )
@@ -256,7 +260,7 @@ class AccountProviderRegistry2Test {
       )
 
     registry.refresh(
-      AccountProviderRegistryRefresh(
+      AccountProviderRegistryRefresh.Full(
         clearBeforeRefresh = true,
         includeTestingLibraries = true
       )
@@ -264,6 +268,111 @@ class AccountProviderRegistry2Test {
 
     assertInstanceOf(registry.status, AccountProviderRegistryStatus.Failed::class.java)
     assertEquals(21, registry.accountProviderDescriptions().size)
+  }
+
+  /**
+   * Refreshing the registry can result in account provider descriptions being removed.
+   */
+
+  @Test
+  fun testRefreshFail1() {
+    this.mockServer.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+        .setBody(resourceText("registry-page-0.json"))
+    )
+    this.mockServer.enqueue(
+      MockResponse()
+        .setResponseCode(500)
+        .setBody("Failure!")
+    )
+    this.mockServer.enqueue(
+      MockResponse()
+        .setResponseCode(500)
+        .setBody("Failure!")
+    )
+    this.mockServer.enqueue(
+      MockResponse()
+        .setResponseCode(500)
+        .setBody("Failure!")
+    )
+    this.mockServer.enqueue(
+      MockResponse()
+        .setResponseCode(500)
+        .setBody("Failure!")
+    )
+
+    val registry =
+      AccountProviderRegistry2.create(
+        attributeExecutor = { r -> r.run() },
+        buildConfig = this.buildConfig,
+        database = this.database,
+        databaseExecutor = MoreExecutors.newDirectExecutorService(),
+        defaultProvider = this.accountProvider,
+        httpClient = this.httpClient,
+        uriBase = URI.create("http://localhost:${this.mockServer.port}"),
+        accountProviderResolutionStrings = MockAccountProviderResolutionStrings(),
+        authDocumentParsers = AuthenticationDocumentParsers(),
+        uiExecutor = MoreExecutors.directExecutor()
+      )
+
+    registry.refresh(
+      AccountProviderRegistryRefresh.Incremental(
+        includeTestingLibraries = true
+      )
+    )
+
+    assertInstanceOf(registry.status, AccountProviderRegistryStatus.Failed::class.java)
+  }
+
+  @Test
+  fun testRefreshIncrementalStopEarly0() {
+    this.mockServer.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+        .setBody(resourceText("registry-incremental-0.json"))
+    )
+    this.mockServer.enqueue(
+      MockResponse()
+        .setResponseCode(500)
+        .setBody("Failure!")
+    )
+
+    val registry =
+      AccountProviderRegistry2.create(
+        attributeExecutor = { r -> r.run() },
+        buildConfig = this.buildConfig,
+        database = this.database,
+        databaseExecutor = MoreExecutors.newDirectExecutorService(),
+        defaultProvider = this.accountProvider,
+        httpClient = this.httpClient,
+        uriBase = URI.create("http://localhost:${this.mockServer.port}"),
+        accountProviderResolutionStrings = MockAccountProviderResolutionStrings(),
+        authDocumentParsers = AuthenticationDocumentParsers(),
+        uiExecutor = MoreExecutors.directExecutor()
+      )
+
+    this.database.openTransaction().use { t ->
+      t.execute(
+        DBQAccountRegistrySettingsPutType::class.java,
+        DBQAccountRegistrySetting.TimeSetting(
+          name = AccountProviderRegistryConstants.SETTING_LAST_UPDATE_NAME,
+          value = OffsetDateTime.parse("2001-01-01T00:00:00+00:00")
+        )
+      )
+      t.commit()
+    }
+
+    registry.refresh(
+      AccountProviderRegistryRefresh.Incremental(
+        includeTestingLibraries = true
+      )
+    )
+
+    val idle: AccountProviderRegistryStatus.Idle =
+      Assertions.assertInstanceOf(AccountProviderRegistryStatus.Idle::class.java, registry.status)
+
+    assertEquals(3, idle.lastUpdateAffected)
   }
 
   private fun assertProviderDescriptionExists(id: URI) {

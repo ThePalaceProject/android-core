@@ -58,4 +58,22 @@ CREATE TABLE account_providers (
 ]]></Statement>
     </Schema>
 
+    <Schema versionCurrent="2">
+        <Comment>
+            The account_registry_settings table stores persistent settings used by the account
+            registry.
+        </Comment>
+
+        <Statement><![CDATA[
+CREATE TABLE account_registry_settings (
+  ars_setting_name  TEXT NOT NULL,
+  ars_setting_type  TEXT NOT NULL,
+  ars_setting_value TEXT NOT NULL,
+
+  CONSTRAINT account_registry_settings_primary_key
+    PRIMARY KEY (ars_setting_name)
+) STRICT
+]]></Statement>
+    </Schema>
+
 </Schemas>

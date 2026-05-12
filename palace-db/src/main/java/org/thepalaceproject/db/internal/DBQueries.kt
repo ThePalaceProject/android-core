@@ -10,6 +10,8 @@ import org.thepalaceproject.db.api.queries.DBQAccountProviderDescriptionPutType
 import org.thepalaceproject.db.api.queries.DBQAccountProviderGetType
 import org.thepalaceproject.db.api.queries.DBQAccountProviderListType
 import org.thepalaceproject.db.api.queries.DBQAccountProviderPutType
+import org.thepalaceproject.db.api.queries.DBQAccountRegistrySettingsGetType
+import org.thepalaceproject.db.api.queries.DBQAccountRegistrySettingsPutType
 import org.thepalaceproject.db.api.queries.DBQSchemaVersionType
 
 internal object DBQueries {
@@ -32,6 +34,8 @@ internal object DBQueries {
       Pair(DBQAccountProviderListType::class.java, DBQAccountProviderList),
       Pair(DBQAccountProviderPutType::class.java, DBQAccountProviderPut),
       Pair(DBQSchemaVersionType::class.java, DBQSchemaVersion),
+      Pair(DBQAccountRegistrySettingsPutType::class.java, DBQAccountRegistrySettingsPut),
+      Pair(DBQAccountRegistrySettingsGetType::class.java, DBQAccountRegistrySettingsGet)
     )
 
   fun <P, R, Q : DBQueryType<P, R>> query(

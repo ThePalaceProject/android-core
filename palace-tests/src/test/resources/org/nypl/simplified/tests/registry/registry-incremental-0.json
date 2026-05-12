@@ -1,0 +1,643 @@
+{
+  "metadata": {
+    "title": "Libraries",
+    "numberOfItems": 1126,
+    "adobe_vendor_id": "ThePalaceProject"
+  },
+  "catalogs": [
+    {
+      "metadata": {
+        "id": "urn:uuid:045285ec-8031-4fd8-bd3e-9b94cee5f56e",
+        "title": "Woodland Public Library",
+        "modified": "2002-01-01T00:00:00Z",
+        "updated": "2002-01-01T00:00:00Z",
+        "description": "serving Woodland, CA"
+      },
+      "links": [
+        {
+          "rel": "http://opds-spec.org/catalog",
+          "href": "https://ca.thepalaceproject.org/CA0156/",
+          "type": "application/atom+xml;profile=opds-catalog;kind=acquisition"
+        },
+        {
+          "href": "https://ca.thepalaceproject.org/CA0156/authentication_document",
+          "type": "application/vnd.opds.authentication.v1.0+json"
+        },
+        {
+          "rel": "alternate",
+          "href": "http://www.woodlandpubliclibrary.com",
+          "type": "text/html"
+        },
+        {
+          "rel": "http://librarysimplified.org/rel/registry/eligibility",
+          "href": "https://registry.palaceproject.io/library/urn:uuid:045285ec-8031-4fd8-bd3e-9b94cee5f56e/eligibility",
+          "type": "application/geo+json"
+        },
+        {
+          "rel": "http://librarysimplified.org/rel/registry/focus",
+          "href": "https://registry.palaceproject.io/library/urn:uuid:045285ec-8031-4fd8-bd3e-9b94cee5f56e/focus",
+          "type": "application/geo+json"
+        },
+        {
+          "rel": "help",
+          "href": "mailto:library@cityofwoodland.gov",
+          "properties": {
+            "https://schema.org/reservationStatus": "https://schema.org/ReservationPending"
+          }
+        },
+        {
+          "rel": "http://librarysimplified.org/rel/designated-agent/copyright",
+          "href": "mailto:library@cityofwoodland.gov",
+          "properties": {
+            "https://schema.org/reservationStatus": "https://schema.org/ReservationPending"
+          }
+        }
+      ],
+      "images": [
+        {
+          "rel": "http://opds-spec.org/image/thumbnail",
+          "href": "https://tpp-prod-library-registry-public.s3.amazonaws.com/logo/045285ec-8031-4fd8-bd3e-9b94cee5f56e.png",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "id": "urn:uuid:bdc03fac-35dc-4051-8a70-680dd01ab196",
+        "title": "Meridian Jr. High School Library",
+        "modified": "2002-01-01T00:00:00Z",
+        "updated": "2002-01-01T00:00:00Z",
+        "description": "serving Meridian Jr. High School Library, IL"
+      },
+      "links": [
+        {
+          "rel": "http://opds-spec.org/catalog",
+          "href": "https://il.thepalaceproject.org/172569002778/",
+          "type": "application/atom+xml;profile=opds-catalog;kind=acquisition"
+        },
+        {
+          "href": "https://il.thepalaceproject.org/172569002778/authentication_document",
+          "type": "application/vnd.opds.authentication.v1.0+json"
+        },
+        {
+          "rel": "alternate",
+          "href": "https://jh.meridian223.org/o/jh",
+          "type": "text/html"
+        },
+        {
+          "rel": "http://librarysimplified.org/rel/registry/eligibility",
+          "href": "https://registry.palaceproject.io/library/urn:uuid:bdc03fac-35dc-4051-8a70-680dd01ab196/eligibility",
+          "type": "application/geo+json"
+        },
+        {
+          "rel": "http://librarysimplified.org/rel/registry/focus",
+          "href": "https://registry.palaceproject.io/library/urn:uuid:bdc03fac-35dc-4051-8a70-680dd01ab196/focus",
+          "type": "application/geo+json"
+        },
+        {
+          "rel": "help",
+          "href": "mailto:mmcdevitt@mail.meridian223.org",
+          "properties": {
+            "https://schema.org/reservationStatus": "https://schema.org/ReservationPending"
+          }
+        },
+        {
+          "rel": "http://librarysimplified.org/rel/designated-agent/copyright",
+          "href": "mailto:mmcdevitt@mail.meridian223.org",
+          "properties": {
+            "https://schema.org/reservationStatus": "https://schema.org/ReservationPending"
+          }
+        }
+      ],
+      "images": [
+        {
+          "rel": "http://opds-spec.org/image/thumbnail",
+          "href": "https://tpp-prod-library-registry-public.s3.amazonaws.com/logo/bdc03fac-35dc-4051-8a70-680dd01ab196.png",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "id": "urn:uuid:0031aa77-5423-492b-82be-6ea68688e780",
+        "title": "Monroe Center Elementary School Library",
+        "modified": "2002-01-01T00:00:00Z",
+        "updated": "2002-01-01T00:00:00Z",
+        "description": "serving Monroe Center Elementary School Library, IL"
+      },
+      "links": [
+        {
+          "rel": "http://opds-spec.org/catalog",
+          "href": "https://il.thepalaceproject.org/172569002780/",
+          "type": "application/atom+xml;profile=opds-catalog;kind=acquisition"
+        },
+        {
+          "href": "https://il.thepalaceproject.org/172569002780/authentication_document",
+          "type": "application/vnd.opds.authentication.v1.0+json"
+        },
+        {
+          "rel": "alternate",
+          "href": "https://mc.meridian223.org/o/mc",
+          "type": "text/html"
+        },
+        {
+          "rel": "http://librarysimplified.org/rel/registry/eligibility",
+          "href": "https://registry.palaceproject.io/library/urn:uuid:0031aa77-5423-492b-82be-6ea68688e780/eligibility",
+          "type": "application/geo+json"
+        },
+        {
+          "rel": "http://librarysimplified.org/rel/registry/focus",
+          "href": "https://registry.palaceproject.io/library/urn:uuid:0031aa77-5423-492b-82be-6ea68688e780/focus",
+          "type": "application/geo+json"
+        },
+        {
+          "rel": "help",
+          "href": "mailto:mmcdevitt@mail.meridian223.org",
+          "properties": {
+            "https://schema.org/reservationStatus": "https://schema.org/ReservationPending"
+          }
+        },
+        {
+          "rel": "http://librarysimplified.org/rel/designated-agent/copyright",
+          "href": "mailto:mmcdevitt@mail.meridian223.org",
+          "properties": {
+            "https://schema.org/reservationStatus": "https://schema.org/ReservationPending"
+          }
+        }
+      ],
+      "images": [
+        {
+          "rel": "http://opds-spec.org/image/thumbnail",
+          "href": "https://tpp-prod-library-registry-public.s3.amazonaws.com/logo/0031aa77-5423-492b-82be-6ea68688e780.png",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "id": "urn:uuid:56b3eac0-865f-4870-8785-77234003c676",
+        "title": "Highland Elementary School Library",
+        "modified": "1999-01-01T00:00:00Z",
+        "updated": "1999-01-01T00:00:00Z",
+        "description": "serving Highland Elementary School Library, IL"
+      },
+      "links": [
+        {
+          "rel": "http://opds-spec.org/catalog",
+          "href": "https://il.thepalaceproject.org/172569002779/",
+          "type": "application/atom+xml;profile=opds-catalog;kind=acquisition"
+        },
+        {
+          "href": "https://il.thepalaceproject.org/172569002779/authentication_document",
+          "type": "application/vnd.opds.authentication.v1.0+json"
+        },
+        {
+          "rel": "alternate",
+          "href": "https://hg.meridian223.org",
+          "type": "text/html"
+        },
+        {
+          "rel": "http://librarysimplified.org/rel/registry/eligibility",
+          "href": "https://registry.palaceproject.io/library/urn:uuid:56b3eac0-865f-4870-8785-77234003c676/eligibility",
+          "type": "application/geo+json"
+        },
+        {
+          "rel": "http://librarysimplified.org/rel/registry/focus",
+          "href": "https://registry.palaceproject.io/library/urn:uuid:56b3eac0-865f-4870-8785-77234003c676/focus",
+          "type": "application/geo+json"
+        },
+        {
+          "rel": "http://librarysimplified.org/rel/designated-agent/copyright",
+          "href": "mailto:mmcdevitt@mail.meridian223.org",
+          "properties": {
+            "https://schema.org/reservationStatus": "https://schema.org/ReservationPending"
+          }
+        },
+        {
+          "rel": "help",
+          "href": "mailto:mmcdevitt@mail.meridian223.org",
+          "properties": {
+            "https://schema.org/reservationStatus": "https://schema.org/ReservationPending"
+          }
+        }
+      ],
+      "images": [
+        {
+          "rel": "http://opds-spec.org/image/thumbnail",
+          "href": "https://tpp-prod-library-registry-public.s3.amazonaws.com/logo/56b3eac0-865f-4870-8785-77234003c676.png",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "id": "urn:uuid:61074b2d-f5e2-46d7-a245-7a0d2a7429cd",
+        "title": "United Township High School Library",
+        "modified": "1999-01-01T00:00:00Z",
+        "updated": "1999-01-01T00:00:00Z",
+        "description": "serving United Township High School Library, IL"
+      },
+      "links": [
+        {
+          "rel": "http://opds-spec.org/catalog",
+          "href": "https://il.thepalaceproject.org/173987004008/",
+          "type": "application/atom+xml;profile=opds-catalog;kind=acquisition"
+        },
+        {
+          "href": "https://il.thepalaceproject.org/173987004008/authentication_document",
+          "type": "application/vnd.opds.authentication.v1.0+json"
+        },
+        {
+          "rel": "alternate",
+          "href": "https://www.uths.net/page/library",
+          "type": "text/html"
+        },
+        {
+          "rel": "http://librarysimplified.org/rel/registry/eligibility",
+          "href": "https://registry.palaceproject.io/library/urn:uuid:61074b2d-f5e2-46d7-a245-7a0d2a7429cd/eligibility",
+          "type": "application/geo+json"
+        },
+        {
+          "rel": "http://librarysimplified.org/rel/registry/focus",
+          "href": "https://registry.palaceproject.io/library/urn:uuid:61074b2d-f5e2-46d7-a245-7a0d2a7429cd/focus",
+          "type": "application/geo+json"
+        },
+        {
+          "rel": "http://librarysimplified.org/rel/designated-agent/copyright",
+          "href": "mailto:jsullivanbennin@uths.net",
+          "properties": {
+            "https://schema.org/reservationStatus": "https://schema.org/ReservationCancelled"
+          }
+        },
+        {
+          "rel": "help",
+          "href": "mailto:jsullivanbennin@uths.net",
+          "properties": {
+            "https://schema.org/reservationStatus": "https://schema.org/ReservationCancelled"
+          }
+        }
+      ],
+      "images": [
+        {
+          "rel": "http://opds-spec.org/image/thumbnail",
+          "href": "https://tpp-prod-library-registry-public.s3.amazonaws.com/logo/61074b2d-f5e2-46d7-a245-7a0d2a7429cd.png",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "id": "urn:uuid:220db4e8-2ac1-448d-8459-a087317ad130",
+        "title": "Northwest Indian College Lummi Library",
+        "modified": "1999-01-01T00:00:00Z",
+        "updated": "1999-01-01T00:00:00Z",
+        "description": "serving Northwest Indian College, WA"
+      },
+      "links": [
+        {
+          "rel": "http://opds-spec.org/catalog",
+          "href": "https://wa.thepalaceproject.org/380377/",
+          "type": "application/atom+xml;profile=opds-catalog;kind=acquisition"
+        },
+        {
+          "href": "https://wa.thepalaceproject.org/380377/authentication_document",
+          "type": "application/vnd.opds.authentication.v1.0+json"
+        },
+        {
+          "rel": "alternate",
+          "href": "https://library.nwic.edu",
+          "type": "text/html"
+        },
+        {
+          "rel": "http://librarysimplified.org/rel/registry/eligibility",
+          "href": "https://registry.palaceproject.io/library/urn:uuid:220db4e8-2ac1-448d-8459-a087317ad130/eligibility",
+          "type": "application/geo+json"
+        },
+        {
+          "rel": "http://librarysimplified.org/rel/registry/focus",
+          "href": "https://registry.palaceproject.io/library/urn:uuid:220db4e8-2ac1-448d-8459-a087317ad130/focus",
+          "type": "application/geo+json"
+        },
+        {
+          "rel": "http://librarysimplified.org/rel/designated-agent/copyright",
+          "href": "mailto:library@nwic.edu",
+          "properties": {
+            "https://schema.org/reservationStatus": "https://schema.org/ReservationCancelled"
+          }
+        },
+        {
+          "rel": "help",
+          "href": "mailto:library@nwic.edu",
+          "properties": {
+            "https://schema.org/reservationStatus": "https://schema.org/ReservationCancelled"
+          }
+        }
+      ],
+      "images": [
+        {
+          "rel": "http://opds-spec.org/image/thumbnail",
+          "href": "https://tpp-prod-library-registry-public.s3.amazonaws.com/logo/220db4e8-2ac1-448d-8459-a087317ad130.png",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "id": "urn:uuid:8516fe35-a3a2-41dd-b5c4-eb48b569e3be",
+        "title": "Rock Falls Township High School Library",
+        "modified": "1999-01-01T00:00:00Z",
+        "updated": "1999-01-01T00:00:00Z",
+        "description": "serving Rock Falls Township High School Library, IL"
+      },
+      "links": [
+        {
+          "rel": "http://opds-spec.org/catalog",
+          "href": "https://il.thepalaceproject.org/173438003525/",
+          "type": "application/atom+xml;profile=opds-catalog;kind=acquisition"
+        },
+        {
+          "href": "https://il.thepalaceproject.org/173438003525/authentication_document",
+          "type": "application/vnd.opds.authentication.v1.0+json"
+        },
+        {
+          "rel": "alternate",
+          "href": "https://rfhs301.org",
+          "type": "text/html"
+        },
+        {
+          "rel": "http://librarysimplified.org/rel/registry/eligibility",
+          "href": "https://registry.palaceproject.io/library/urn:uuid:8516fe35-a3a2-41dd-b5c4-eb48b569e3be/eligibility",
+          "type": "application/geo+json"
+        },
+        {
+          "rel": "http://librarysimplified.org/rel/registry/focus",
+          "href": "https://registry.palaceproject.io/library/urn:uuid:8516fe35-a3a2-41dd-b5c4-eb48b569e3be/focus",
+          "type": "application/geo+json"
+        },
+        {
+          "rel": "http://librarysimplified.org/rel/designated-agent/copyright",
+          "href": "mailto:library@rfhs301.org",
+          "properties": {
+            "https://schema.org/reservationStatus": "https://schema.org/ReservationCancelled"
+          }
+        },
+        {
+          "rel": "help",
+          "href": "mailto:library@rfhs301.org",
+          "properties": {
+            "https://schema.org/reservationStatus": "https://schema.org/ReservationCancelled"
+          }
+        }
+      ],
+      "images": [
+        {
+          "rel": "http://opds-spec.org/image/thumbnail",
+          "href": "https://tpp-prod-library-registry-public.s3.amazonaws.com/logo/8516fe35-a3a2-41dd-b5c4-eb48b569e3be.png",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "id": "urn:uuid:723dbc56-2bd1-4f43-9a25-60d66474d6e2",
+        "title": "Hampton School District #29 Library",
+        "modified": "1999-01-01T00:00:00Z",
+        "updated": "1999-01-01T00:00:00Z",
+        "description": "serving Hampton School District #29 Library, IL"
+      },
+      "links": [
+        {
+          "rel": "http://opds-spec.org/catalog",
+          "href": "https://il.thepalaceproject.org/171809002087/",
+          "type": "application/atom+xml;profile=opds-catalog;kind=acquisition"
+        },
+        {
+          "href": "https://il.thepalaceproject.org/171809002087/authentication_document",
+          "type": "application/vnd.opds.authentication.v1.0+json"
+        },
+        {
+          "rel": "alternate",
+          "href": "https://www.hampton29.com",
+          "type": "text/html"
+        },
+        {
+          "rel": "http://librarysimplified.org/rel/registry/eligibility",
+          "href": "https://registry.palaceproject.io/library/urn:uuid:723dbc56-2bd1-4f43-9a25-60d66474d6e2/eligibility",
+          "type": "application/geo+json"
+        },
+        {
+          "rel": "http://librarysimplified.org/rel/registry/focus",
+          "href": "https://registry.palaceproject.io/library/urn:uuid:723dbc56-2bd1-4f43-9a25-60d66474d6e2/focus",
+          "type": "application/geo+json"
+        },
+        {
+          "rel": "help",
+          "href": "mailto:bthompson@hamptonhawks.org",
+          "properties": {
+            "https://schema.org/reservationStatus": "https://schema.org/ReservationCancelled"
+          }
+        },
+        {
+          "rel": "http://librarysimplified.org/rel/designated-agent/copyright",
+          "href": "mailto:bthompson@hamptonhawks.org",
+          "properties": {
+            "https://schema.org/reservationStatus": "https://schema.org/ReservationCancelled"
+          }
+        }
+      ],
+      "images": [
+        {
+          "rel": "http://opds-spec.org/image/thumbnail",
+          "href": "https://tpp-prod-library-registry-public.s3.amazonaws.com/logo/723dbc56-2bd1-4f43-9a25-60d66474d6e2.png",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "id": "urn:uuid:6cb24a5b-d248-4440-b5aa-7ff19ba55e3c",
+        "title": "Tampico Elementary School Library",
+        "modified": "1999-01-01T00:00:00Z",
+        "updated": "1999-01-01T00:00:00Z",
+        "description": "serving Tampico Elementary School Library, IL"
+      },
+      "links": [
+        {
+          "rel": "http://opds-spec.org/catalog",
+          "href": "https://il.thepalaceproject.org/173283001852/",
+          "type": "application/atom+xml;profile=opds-catalog;kind=acquisition"
+        },
+        {
+          "href": "https://il.thepalaceproject.org/173283001852/authentication_document",
+          "type": "application/vnd.opds.authentication.v1.0+json"
+        },
+        {
+          "rel": "alternate",
+          "href": "https://www.plt3.org/o/tes",
+          "type": "text/html"
+        },
+        {
+          "rel": "http://librarysimplified.org/rel/registry/eligibility",
+          "href": "https://registry.palaceproject.io/library/urn:uuid:6cb24a5b-d248-4440-b5aa-7ff19ba55e3c/eligibility",
+          "type": "application/geo+json"
+        },
+        {
+          "rel": "http://librarysimplified.org/rel/registry/focus",
+          "href": "https://registry.palaceproject.io/library/urn:uuid:6cb24a5b-d248-4440-b5aa-7ff19ba55e3c/focus",
+          "type": "application/geo+json"
+        },
+        {
+          "rel": "help",
+          "href": "mailto:lcrisp@plt3.org",
+          "properties": {
+            "https://schema.org/reservationStatus": "https://schema.org/ReservationCancelled"
+          }
+        },
+        {
+          "rel": "http://librarysimplified.org/rel/designated-agent/copyright",
+          "href": "mailto:lcrisp@plt3.org",
+          "properties": {
+            "https://schema.org/reservationStatus": "https://schema.org/ReservationCancelled"
+          }
+        }
+      ],
+      "images": [
+        {
+          "rel": "http://opds-spec.org/image/thumbnail",
+          "href": "https://tpp-prod-library-registry-public.s3.amazonaws.com/logo/6cb24a5b-d248-4440-b5aa-7ff19ba55e3c.png",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "links": [
+    {
+      "rel": "self",
+      "href": "https://registry.palaceproject.io/libraries/crawlable?offset=0&size=10",
+      "type": "application/opds+json"
+    },
+    {
+      "rel": "first",
+      "href": "https://registry.palaceproject.io/libraries/crawlable?offset=0&size=20",
+      "type": "application/opds+json"
+    },
+    {
+      "rel": "next",
+      "href": "https://registry.palaceproject.io/libraries/crawlable?offset=20&size=20",
+      "type": "application/opds+json"
+    },
+    {
+      "rel": "last",
+      "href": "https://registry.palaceproject.io/libraries/crawlable?offset=1120&size=20",
+      "type": "application/opds+json"
+    },
+    {
+      "href": "https://registry.palaceproject.io/register",
+      "rel": "register",
+      "type": "application/opds+json;profile=https://librarysimplified.org/rel/profile/directory"
+    },
+    {
+      "href": "https://registry.palaceproject.io/search",
+      "rel": "search",
+      "type": "application/opensearchdescription+xml"
+    },
+    {
+      "href": "https://registry.palaceproject.io/library/{uuid}",
+      "rel": "http://librarysimplified.org/rel/registry/library",
+      "type": "application/opds+json",
+      "templated": true
+    }
+  ],
+  "facets": [
+    {
+      "metadata": {
+        "title": "Sort by",
+        "@type": "http://palaceproject.io/terms/rel/sort",
+        "http://palaceproject.io/terms/facet/param": "order"
+      },
+      "links": [
+        {
+          "href": "https://registry.palaceproject.io/libraries/crawlable?order=modified",
+          "title": "Most recently modified first",
+          "type": "application/opds+json",
+          "properties": {
+            "http://palaceproject.io/terms/facet/value": "modified",
+            "http://palaceproject.io/terms/properties/default": true,
+            "http://palaceproject.io/terms/facet/group": "modified"
+          },
+          "rel": "self"
+        },
+        {
+          "href": "https://registry.palaceproject.io/libraries/crawlable?order=modified-asc",
+          "title": "Least recently modified first",
+          "type": "application/opds+json",
+          "properties": {
+            "http://palaceproject.io/terms/facet/value": "modified-asc",
+            "http://palaceproject.io/terms/facet/group": "modified"
+          }
+        },
+        {
+          "href": "https://registry.palaceproject.io/libraries/crawlable?order=name",
+          "title": "Library name (A-Z)",
+          "type": "application/opds+json",
+          "properties": {
+            "http://palaceproject.io/terms/facet/value": "name",
+            "http://palaceproject.io/terms/facet/group": "name"
+          }
+        },
+        {
+          "href": "https://registry.palaceproject.io/libraries/crawlable?order=name-desc",
+          "title": "Library name (Z-A)",
+          "type": "application/opds+json",
+          "properties": {
+            "http://palaceproject.io/terms/facet/value": "name-desc",
+            "http://palaceproject.io/terms/facet/group": "name"
+          }
+        },
+        {
+          "href": "https://registry.palaceproject.io/libraries/crawlable?order=natural",
+          "title": "Database order",
+          "type": "application/opds+json",
+          "properties": {
+            "http://palaceproject.io/terms/facet/value": "natural"
+          }
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "title": "Availability",
+        "@type": "http://palaceproject.io/terms/rel/availability",
+        "http://palaceproject.io/terms/facet/param": "availability"
+      },
+      "links": [
+        {
+          "href": "https://registry.palaceproject.io/libraries/crawlable?availability=production",
+          "title": "Production",
+          "type": "application/opds+json",
+          "properties": {
+            "http://palaceproject.io/terms/facet/value": "production",
+            "http://palaceproject.io/terms/properties/default": true
+          },
+          "rel": "self"
+        },
+        {
+          "href": "https://registry.palaceproject.io/libraries/crawlable?availability=hidden",
+          "title": "Hidden",
+          "type": "application/opds+json",
+          "properties": {
+            "http://palaceproject.io/terms/facet/value": "hidden"
+          }
+        },
+        {
+          "href": "https://registry.palaceproject.io/libraries/crawlable?availability=all",
+          "title": "All: Production and Hidden",
+          "type": "application/opds+json",
+          "properties": {
+            "http://palaceproject.io/terms/facet/value": "all"
+          }
+        }
+      ]
+    }
+  ]
+}

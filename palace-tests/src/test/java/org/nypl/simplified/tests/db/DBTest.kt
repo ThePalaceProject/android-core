@@ -91,7 +91,7 @@ class DBTest {
     this.database.openConnection().use { c ->
       c.openTransaction().use { t ->
         val q = t.query(DBQSchemaVersionType::class.java)
-        Assertions.assertEquals(1L, q.execute(t, Unit))
+        Assertions.assertEquals(2L, q.execute(t, Unit))
       }
     }
   }

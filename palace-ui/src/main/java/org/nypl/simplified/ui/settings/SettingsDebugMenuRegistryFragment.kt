@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.TextView.BufferType.EDITABLE
@@ -20,7 +21,10 @@ import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryDebuggin
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryRefresh
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
+import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
+import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.threads.UIThread
+import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_CONSUMED
 import org.nypl.simplified.ui.main.MainNavigation
@@ -62,11 +66,13 @@ class SettingsDebugMenuRegistryFragment : Fragment(R.layout.debug_registry),
   private val LIBRARY_REGISTRY_DEBUG_PROPERTY =
     "org.nypl.simplified.accounts.source.nyplregistry.baseServerOverride"
 
+  private lateinit var error: ImageView
   private lateinit var debugRegistryQALibraries: SwitchCompat
   private lateinit var libraryRegistryClear: Button
   private lateinit var libraryRegistryEntry: EditText
   private lateinit var libraryRegistrySet: Button
-  private lateinit var registryRefresh: Button
+  private lateinit var registryRefreshFull: Button
+  private lateinit var registryRefreshIncremental: Button
   private lateinit var registryStatus: TextView
   private lateinit var registryStatusProgress: ProgressBar
   private lateinit var toolbarBack: View
@@ -89,8 +95,10 @@ class SettingsDebugMenuRegistryFragment : Fragment(R.layout.debug_registry),
       view.findViewById(R.id.debugRegistryStatus)
     this.registryStatusProgress =
       view.findViewById(R.id.debugRegistryStatusLoading)
-    this.registryRefresh =
-      view.findViewById<Button>(R.id.debugRegistryRefresh)
+    this.registryRefreshFull =
+      view.findViewById(R.id.debugRegistryRefreshFull)
+    this.registryRefreshIncremental =
+      view.findViewById(R.id.debugRegistryRefreshIncremental)
 
     this.libraryRegistryClear =
       view.findViewById(R.id.libraryRegistryOverrideClear)
@@ -103,6 +111,9 @@ class SettingsDebugMenuRegistryFragment : Fragment(R.layout.debug_registry),
       view.findViewById(R.id.debugRegistryQALibraries)
     this.debugRegistryQALibraries.isChecked =
       SettingsDebugModel.showTestingLibraries()
+
+    this.error =
+      view.findViewById(R.id.debugRegistryError)
 
     this.configureLibraryRegistryCustomUI()
   }
@@ -128,10 +139,17 @@ class SettingsDebugMenuRegistryFragment : Fragment(R.layout.debug_registry),
       }
     )
 
-    this.registryRefresh.setOnClickListener {
+    this.registryRefreshFull.setOnClickListener {
       registry.refreshAsync(
-        AccountProviderRegistryRefresh(
+        AccountProviderRegistryRefresh.Full(
           clearBeforeRefresh = true,
+          includeTestingLibraries = SettingsDebugModel.showTestingLibraries(),
+        )
+      )
+    }
+    this.registryRefreshIncremental.setOnClickListener {
+      registry.refreshAsync(
+        AccountProviderRegistryRefresh.Incremental(
           includeTestingLibraries = SettingsDebugModel.showTestingLibraries(),
         )
       )
@@ -139,7 +157,7 @@ class SettingsDebugMenuRegistryFragment : Fragment(R.layout.debug_registry),
     this.debugRegistryQALibraries.setOnCheckedChangeListener { _, checked ->
       SettingsDebugModel.updatePreferences { p -> p.copy(showTestingLibraries = checked) }
       registry.refreshAsync(
-        AccountProviderRegistryRefresh(
+        AccountProviderRegistryRefresh.Full(
           clearBeforeRefresh = true,
           includeTestingLibraries = checked,
         )
@@ -159,32 +177,63 @@ class SettingsDebugMenuRegistryFragment : Fragment(R.layout.debug_registry),
 
     val text = StringBuilder()
     when (status) {
-      AccountProviderRegistryStatus.Idle -> {
+      is AccountProviderRegistryStatus.Idle -> {
+        this.error.visibility = View.GONE
         this.registryStatusProgress.isIndeterminate = false
         this.registryStatusProgress.setProgress(100, false)
         text.append("The registry is currently idle.\n")
         text.append("The registry contains ${descriptions.size} account providers.\n")
         text.append("${resolved.size} of the account providers have been resolved.\n")
+        text.append("The last update modified ${status.lastUpdateAffected} providers.\n")
       }
 
       is AccountProviderRegistryStatus.Refreshing -> {
+        this.error.visibility = View.GONE
         val progressPercent = status.progressPercent
         if (progressPercent == null) {
           this.registryStatusProgress.isIndeterminate = true
-          text.append("The registry is currently refreshing ⌛\n")
+          text.append("The registry is currently refreshing (${status.kind}) ⌛\n")
         } else {
           this.registryStatusProgress.isIndeterminate = false
           this.registryStatusProgress.progress = progressPercent.toInt()
-          text.append("The registry is currently refreshing ${progressPercent.toInt()}% ⌛\n")
+          text.append("The registry is currently refreshing ${progressPercent.toInt()}% (${status.kind}) ⌛\n")
         }
       }
 
       is AccountProviderRegistryStatus.Failed -> {
-        TODO()
+        this.error.visibility = View.VISIBLE
+        this.error.setOnClickListener { this.openErrorPage(status.result) }
+        this.registryStatusProgress.isIndeterminate = false
+        this.registryStatusProgress.setProgress(100, false)
+        text.append("The registry failed to update.\n")
+        text.append(status.result.message)
       }
     }
 
     this.registryStatus.text = text.toString()
+  }
+
+  private fun openErrorPage(
+    result: TaskResult<*>
+  ) {
+    val appVersion =
+      SettingsDebugModel.appVersion()
+
+    val supportEmail =
+      Services.serviceDirectory()
+        .requireService(BuildConfigurationServiceType::class.java)
+        .supportErrorReportEmailAddress
+
+    MainNavigation.openErrorPage(
+      activity = this.requireActivity(),
+      parameters = ErrorPageParameters(
+        emailAddress = supportEmail,
+        body = result.message,
+        subject = "[palace-error-report] $appVersion",
+        attributes = result.attributes.toSortedMap(),
+        taskSteps = result.steps
+      )
+    )
   }
 
   override fun onStop() {

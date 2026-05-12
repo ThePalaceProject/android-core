@@ -10,15 +10,20 @@ sealed class AccountProviderRegistryStatus {
 
   /**
    * The account provider registry is idle.
+   *
+   * @param lastUpdateAffected The number of catalogs affected by the most recent update
    */
 
-  data object Idle : AccountProviderRegistryStatus()
+  data class Idle(
+    val lastUpdateAffected: Int
+  ) : AccountProviderRegistryStatus()
 
   /**
    * The account provider registry is currently refreshing.
    */
 
   data class Refreshing(
+    val kind: String,
     val progress: Double?
   ) : AccountProviderRegistryStatus() {
     val progressPercent: Double?

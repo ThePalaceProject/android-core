@@ -35,7 +35,7 @@ class MockAccountProviderRegistry(
     Attributes.create { ex -> this.logger.error("Uncaught exception in attribute: ", ex) }
 
   private val statusAttributeActual: AttributeType<AccountProviderRegistryStatus> =
-    this.attributes.withValue(Idle)
+    this.attributes.withValue(Idle(0))
 
   private val accountProviderDescriptionsAttributeActual: AttributeType<Map<URI, AccountProviderDescription>> =
     this.attributes.withValue(mapOf())
@@ -87,7 +87,7 @@ class MockAccountProviderRegistry(
     get() = this.accountProviderDescriptionsSortedAttributeActual
 
   override val status: AccountProviderRegistryStatus
-    get() = Idle
+    get() = Idle(0)
 
   override fun loadAsync(): CompletableFuture<Unit> {
     val future = CompletableFuture<Unit>()

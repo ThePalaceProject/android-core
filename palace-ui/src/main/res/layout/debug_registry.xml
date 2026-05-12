@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -63,47 +64,76 @@
         app:layout_constraintBottom_toBottomOf="parent" />
 
     <ScrollView
-        android:background="@drawable/border"
         android:layout_width="match_parent"
+        android:layout_height="128dp"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
         android:layout_marginTop="16dp"
-        android:layout_height="128dp">
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/border">
+
         <TextView
             android:id="@+id/debugRegistryStatus"
-            android:fontFamily="monospace"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp" />
+            android:layout_margin="16dp"
+            android:fontFamily="monospace" />
     </ScrollView>
 
     <ProgressBar
         android:id="@+id/debugRegistryStatusLoading"
         style="?android:attr/progressBarStyleHorizontal"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
         android:layout_width="match_parent"
-        android:layout_height="32dp" />
+        android:layout_height="32dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp" />
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/debugRegistryQALibraries"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
         android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
         android:checked="false"
         android:enabled="true"
         android:text="Enable hidden (QA) libraries" />
 
-    <Button
-        android:id="@+id/debugRegistryRefresh"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:gravity="center"
         android:layout_marginEnd="16dp"
-        android:layout_marginTop="16dp"
-        android:text="Refresh"/>
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/debugRegistryRefreshFull"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Full Refresh" />
+
+        <Space
+            android:layout_width="16dp"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/debugRegistryRefreshIncremental"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Incremental Refresh" />
+
+        <ImageView
+            android:id="@+id/debugRegistryError"
+            android:src="@drawable/error"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:layout_marginStart="16dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"/>
+
+    </LinearLayout>
 
     <FrameLayout
         android:layout_width="match_parent"

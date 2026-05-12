@@ -4,6 +4,7 @@ import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -23,6 +24,10 @@ import org.thepalaceproject.db.api.queries.DBQAccountProviderDescriptionPutType
 import org.thepalaceproject.db.api.queries.DBQAccountProviderGetType
 import org.thepalaceproject.db.api.queries.DBQAccountProviderListType
 import org.thepalaceproject.db.api.queries.DBQAccountProviderPutType
+import org.thepalaceproject.db.api.queries.DBQAccountRegistrySetting
+import org.thepalaceproject.db.api.queries.DBQAccountRegistrySetting.TimeSetting
+import org.thepalaceproject.db.api.queries.DBQAccountRegistrySettingsGetType
+import org.thepalaceproject.db.api.queries.DBQAccountRegistrySettingsPutType
 import java.net.URI
 import java.nio.file.Path
 import java.time.OffsetDateTime
@@ -309,6 +314,46 @@ class DBAccountTest {
           Assertions.assertEquals(inputs[i], r[i - 21])
         }
       }
+    }
+  }
+
+  @Test
+  fun testAccountRegistrySettingPutGet() {
+    this.database.openTransaction().use { t ->
+      val t0 = OffsetDateTime.now()
+      val t1 = OffsetDateTime.now()
+      val t2 = OffsetDateTime.now()
+
+      t.execute(
+        DBQAccountRegistrySettingsPutType::class.java,
+        TimeSetting("t0", t0)
+      )
+      t.execute(
+        DBQAccountRegistrySettingsPutType::class.java,
+        TimeSetting("t1", t1)
+      )
+      t.execute(
+        DBQAccountRegistrySettingsPutType::class.java,
+        TimeSetting("t2", t2)
+      )
+
+      assertEquals(
+        t0,
+        (t.execute(DBQAccountRegistrySettingsGetType::class.java, "t0") as TimeSetting).value
+      )
+      assertEquals(
+        t1,
+        (t.execute(DBQAccountRegistrySettingsGetType::class.java, "t1") as TimeSetting).value
+      )
+      assertEquals(
+        t2,
+        (t.execute(DBQAccountRegistrySettingsGetType::class.java, "t2") as TimeSetting).value
+      )
+
+      assertEquals(
+        null,
+        t.execute(DBQAccountRegistrySettingsGetType::class.java, "t3")
+      )
     }
   }
 }

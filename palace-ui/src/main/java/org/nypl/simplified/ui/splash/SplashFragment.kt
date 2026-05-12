@@ -270,8 +270,7 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
       services.requireService(ProfilesControllerType::class.java)
 
     registry.refreshAsync(
-      AccountProviderRegistryRefresh(
-        clearBeforeRefresh = false,
+      AccountProviderRegistryRefresh.Incremental(
         includeTestingLibraries = false
       )
     )
@@ -291,8 +290,7 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
         accountListAdapter = accountListAdapter,
         onSwipeTouched = {
           registry.refreshAsync(
-            AccountProviderRegistryRefresh(
-              clearBeforeRefresh = false,
+            AccountProviderRegistryRefresh.Incremental(
               includeTestingLibraries = profiles.profileCurrent().preferences().showTestingLibraries
             )
           )

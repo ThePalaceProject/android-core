@@ -15,10 +15,16 @@ import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountProviderDescription
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus
+import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
+import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.threads.UIThread
+import org.nypl.simplified.ui.errorpage.ErrorPageParameters
+import org.nypl.simplified.ui.main.MainNavigation
+import org.nypl.simplified.ui.settings.SettingsDebugModel
 import org.nypl.simplified.ui.views.Views
 
 class AccountListRegistryViews(
@@ -36,9 +42,7 @@ class AccountListRegistryViews(
   private val searchTouch: ViewGroup,
   private val swipe: SwipeRefreshLayout,
   private val title: TextView,
-  private val toolbar: ViewGroup,
   private val toolbarTitle: TextView,
-  private val onSwipeTouched: () -> Unit,
 ) {
 
   private val accountListFilterController =
@@ -61,15 +65,13 @@ class AccountListRegistryViews(
           progress = rootView.findViewById(R.id.accountRegistryProgress),
           progressAnimated = rootView.findViewById(R.id.accountRegistryProgressAnimated),
           accountList = rootView.findViewById(R.id.accountRegistryList),
-          toolbar = rootView.findViewById(R.id.accountRegistryToolbar),
           swipe = rootView.findViewById(R.id.accountRegistryListRefresh),
           searchIcon = rootView.findViewById(R.id.accountRegistryToolbarSearchIcon),
           searchTouch = rootView.findViewById(R.id.accountRegistryToolbarSearchIconTouch),
           searchText = rootView.findViewById(R.id.accountRegistryToolbarSearchText),
           backButton = rootView.findViewById(R.id.accountRegistryToolbarBackIconTouch),
           error = rootView.findViewById(R.id.accountRegistryError),
-          errorTouch = rootView.findViewById(R.id.accountRegistryErrorTouch),
-          onSwipeTouched = onSwipeTouched
+          errorTouch = rootView.findViewById(R.id.accountRegistryErrorTouch)
         )
 
       views.accountList.setHasFixedSize(true)
@@ -147,7 +149,7 @@ class AccountListRegistryViews(
     UIThread.checkIsUIThread()
 
     return when (status) {
-      AccountProviderRegistryStatus.Idle -> {
+      is AccountProviderRegistryStatus.Idle -> {
         this.title.visibility = View.VISIBLE
         this.title.setText(R.string.accountRegistrySelect)
 
@@ -177,8 +179,33 @@ class AccountListRegistryViews(
         Views.setVisible(this.progress, false)
         Views.setVisible(this.progressAnimated, false)
         Views.setVisible(this.title, false)
+
+        this.errorTouch.setOnClickListener { openErrorPage(status.result) }
       }
     }
+  }
+
+  private fun openErrorPage(
+    result: TaskResult<*>
+  ) {
+    val appVersion =
+      SettingsDebugModel.appVersion()
+
+    val supportEmail =
+      Services.serviceDirectory()
+        .requireService(BuildConfigurationServiceType::class.java)
+        .supportErrorReportEmailAddress
+
+    MainNavigation.openErrorPage(
+      activity = this.activity,
+      parameters = ErrorPageParameters(
+        emailAddress = supportEmail,
+        body = result.message,
+        subject = "[palace-error-report] $appVersion",
+        attributes = result.attributes.toSortedMap(),
+        taskSteps = result.steps
+      )
+    )
   }
 
   private fun searchBoxOpen() {

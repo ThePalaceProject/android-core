@@ -13,6 +13,8 @@ import org.nypl.simplified.accounts.api.AccountProviderDescriptionComparator
 import org.nypl.simplified.accounts.api.AccountProviderResolutionListenerType
 import org.nypl.simplified.accounts.api.AccountProviderResolutionStringsType
 import org.nypl.simplified.accounts.api.AccountProviderType
+import org.nypl.simplified.accounts.registry.AccountProviderRegistryConstants.MAXIMUM_PROVIDER_DESCRIPTIONS
+import org.nypl.simplified.accounts.registry.AccountProviderRegistryConstants.SETTING_LAST_UPDATE_NAME
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryDebugging
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryEvent
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryEvent.StatusChanged
@@ -39,6 +41,9 @@ import org.thepalaceproject.db.api.queries.DBQAccountProviderDescriptionPutType
 import org.thepalaceproject.db.api.queries.DBQAccountProviderGetType
 import org.thepalaceproject.db.api.queries.DBQAccountProviderListType
 import org.thepalaceproject.db.api.queries.DBQAccountProviderPutType
+import org.thepalaceproject.db.api.queries.DBQAccountRegistrySetting
+import org.thepalaceproject.db.api.queries.DBQAccountRegistrySettingsGetType
+import org.thepalaceproject.db.api.queries.DBQAccountRegistrySettingsPutType
 import org.thepalaceproject.webpub.core.WPMCatalog
 import org.thepalaceproject.webpub.core.WPMManifest
 import org.thepalaceproject.webpub.core.WPMMappers
@@ -48,6 +53,7 @@ import java.net.URI
 import java.nio.file.Files
 import java.time.Duration
 import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
@@ -80,8 +86,6 @@ class AccountProviderRegistry2 private constructor(
     WPMMappers.createMapper()
 
   companion object {
-
-    private const val MAXIMUM_PROVIDER_DESCRIPTIONS = 10_000
 
     private val logger =
       LoggerFactory.getLogger(AccountProviderRegistry2::class.java)
@@ -131,9 +135,9 @@ class AccountProviderRegistry2 private constructor(
       }
 
       val statusAttributeSrc =
-        this.attributes.withValue<AccountProviderRegistryStatus>(Idle)
+        this.attributes.withValue<AccountProviderRegistryStatus>(Idle(0))
       val statusAttributeUI =
-        this.attributes.withValue<AccountProviderRegistryStatus>(Idle)
+        this.attributes.withValue<AccountProviderRegistryStatus>(Idle(0))
 
       statusAttributeSrc.subscribe { _, m ->
         uiExecutor.execute {
@@ -205,7 +209,7 @@ class AccountProviderRegistry2 private constructor(
 
   private fun opLoadDatabaseDescriptions() {
     this.logger.debug("Loading account provider descriptions...")
-    this.setStatusRefreshing(0, null)
+    this.setStatusRefreshing(kind = "Full", offset = 0, totalItems = null)
 
     try {
       val descriptionMap: MutableMap<URI, AccountProviderDescription>
@@ -242,7 +246,7 @@ class AccountProviderRegistry2 private constructor(
         descriptionMap.size
       )
     } finally {
-      this.setStatus(Idle)
+      this.setStatus(Idle(this.accountProviderDescriptionsAttributeSrc.get().size))
       this.eventsActual.onNext(StatusChanged)
     }
   }
@@ -331,30 +335,40 @@ class AccountProviderRegistry2 private constructor(
     }
 
     this.logger.debug("Refreshing account provider descriptions.")
-    this.setStatusRefreshing(0, null)
+    this.setStatusRefreshing(
+      kind = when (refreshRequest) {
+        is AccountProviderRegistryRefresh.Full -> "Full"
+        is AccountProviderRegistryRefresh.Incremental -> "Incremental"
+      },
+      offset = 0,
+      totalItems = null
+    )
+
     var failed = false
     val taskRecorder = TaskRecorder.create()
+    var updated: Int = 0
 
     try {
       taskRecorder.beginNewStep("Refreshing registry...")
 
-      if (refreshRequest.clearBeforeRefresh) {
-        taskRecorder.beginNewStep("Clearing registry...")
-        this.opClear()
-        taskRecorder.currentStepSucceeded("Registry cleared.")
+      when (refreshRequest) {
+        is AccountProviderRegistryRefresh.Full -> {
+          if (refreshRequest.clearBeforeRefresh) {
+            taskRecorder.beginNewStep("Clearing registry...")
+            this.opClear()
+            taskRecorder.currentStepSucceeded("Registry cleared.")
+          }
+        }
+
+        is AccountProviderRegistryRefresh.Incremental -> {
+          // Nothing required.
+        }
       }
 
       taskRecorder.beginNewStep("Adding default provider...")
       this.opProcessAccountProviderDescription(this.defaultProvider.toDescription())
 
       taskRecorder.beginNewStep("Fetching registry pages...")
-      val idsUpdated = mutableSetOf<URI>()
-      idsUpdated.add(this.defaultProvider.id)
-
-      var totalItems: Int? = null
-      var offset = 0
-      val size = 113
-      val baseURI = this.decideRegistryURI()
       val availability =
         if (refreshRequest.includeTestingLibraries) {
           "all"
@@ -362,8 +376,57 @@ class AccountProviderRegistry2 private constructor(
           "production"
         }
 
+      updated = when (refreshRequest) {
+        is AccountProviderRegistryRefresh.Full -> {
+          this.opRefreshFull(taskRecorder, availability)
+        }
+
+        is AccountProviderRegistryRefresh.Incremental -> {
+          this.opRefreshIncremental(taskRecorder, availability)
+        }
+      }
+    } catch (e: Throwable) {
+      taskRecorder.currentStepFailed(
+        message = e.message ?: e.javaClass.name,
+        errorCode = "exception",
+        exception = e,
+        extraMessages = listOf()
+      )
+
+      val result: TaskResult.Failure<WPMManifest> = taskRecorder.finishFailure()
+      failed = true
+      this.setStatusFailed(result)
+      return
+    } finally {
+      if (!failed) {
+        this.setStatus(Idle(updated))
+        this.eventsActual.onNext(StatusChanged)
+      }
+    }
+  }
+
+  private fun opRefreshIncremental(
+    taskRecorder: TaskRecorderType,
+    availability: String,
+  ): Int {
+    val lastUpdate = this.lastUpdateTimeGet()
+    if (lastUpdate == null) {
+      this.logger.debug("No last update time is available; doing full refresh.")
+      return this.opRefreshFull(taskRecorder, availability)
+    }
+
+    val idsUpdated = mutableSetOf<URI>()
+    idsUpdated.add(this.defaultProvider.id)
+
+    var updated = 0
+    var totalItems: Int? = null
+    var offset = 0
+    val size = 113
+    val baseURI = this.decideRegistryURI()
+
+    try {
       while (true) {
-        this.setStatusRefreshing(offset, totalItems)
+        this.setStatusRefreshing(kind = "Incremental", offset = offset, totalItems = totalItems)
 
         val manifest =
           this.fetchRegistryPage(
@@ -371,7 +434,8 @@ class AccountProviderRegistry2 private constructor(
             baseURI = baseURI,
             offset = offset,
             size = size,
-            availability = availability
+            availability = availability,
+            order = Modified
           )
 
         totalItems = manifest.metadata.numberOfItems?.toInt()
@@ -388,6 +452,96 @@ class AccountProviderRegistry2 private constructor(
 
           this.opProcessCatalog(catalog)
           idsUpdated.add(identifier)
+
+          val catalogUpdated = catalog.metadata.updated
+          if (catalogUpdated != null && catalogUpdated.isBefore(lastUpdate)) {
+            this.logger.debug(
+              "Catalog was updated at {} before the last refresh {}; stopping updates.",
+              catalogUpdated,
+              lastUpdate
+            )
+            return updated
+          }
+          updated += 1
+        }
+
+        offset += manifest.catalogs.size
+      }
+    } finally {
+      this.lastUpdateTimeSet()
+    }
+    return updated
+  }
+
+  private fun lastUpdateTimeGet(): OffsetDateTime? {
+    return this.database.openTransaction().use { transaction ->
+      val setting =
+        transaction.execute(
+          queryType = DBQAccountRegistrySettingsGetType::class.java,
+          parameters = SETTING_LAST_UPDATE_NAME
+        )
+      when (setting) {
+        is DBQAccountRegistrySetting.TimeSetting -> setting.value
+        null -> null
+      }
+    }
+  }
+
+  private fun lastUpdateTimeSet() {
+    this.database.openTransaction().use { transaction ->
+      transaction.execute(
+        queryType = DBQAccountRegistrySettingsPutType::class.java,
+        parameters = DBQAccountRegistrySetting.TimeSetting(
+          name = SETTING_LAST_UPDATE_NAME,
+          value = OffsetDateTime.now(ZoneOffset.UTC)
+        )
+      )
+      transaction.commit()
+    }
+  }
+
+  private fun opRefreshFull(
+    taskRecorder: TaskRecorderType,
+    availability: String,
+  ): Int {
+    val idsUpdated = mutableSetOf<URI>()
+    idsUpdated.add(this.defaultProvider.id)
+
+    var updated = 0
+    var totalItems: Int? = null
+    var offset = 0
+    val size = 113
+    val baseURI = this.decideRegistryURI()
+
+    try {
+      while (true) {
+        this.setStatusRefreshing(kind = "Full", offset = offset, totalItems = totalItems)
+
+        val manifest =
+          this.fetchRegistryPage(
+            taskRecorder = taskRecorder,
+            baseURI = baseURI,
+            offset = offset,
+            size = size,
+            availability = availability,
+            order = NameAscending
+          )
+
+        totalItems = manifest.metadata.numberOfItems?.toInt()
+        if (manifest.catalogs.isEmpty()) {
+          break
+        }
+
+        for (catalog in manifest.catalogs) {
+          val identifier = catalog.metadata.identifier
+          if (identifier == null) {
+            this.logger.warn("Catalog '{}' has no identifier", catalog.metadata.title)
+            continue
+          }
+
+          this.opProcessCatalog(catalog)
+          idsUpdated.add(identifier)
+          updated += 1
         }
 
         offset += manifest.catalogs.size
@@ -401,24 +555,10 @@ class AccountProviderRegistry2 private constructor(
       this.logger.debug("Found {} existing account provider description IDs.", idsExisting.size)
       val notUpdated = idsExisting.minus(idsUpdated)
       this.opDeleteProviderDescriptions(notUpdated)
-    } catch (e: Throwable) {
-      taskRecorder.currentStepFailed(
-        message = e.message ?: e.javaClass.name,
-        errorCode = "exception",
-        exception = e,
-        extraMessages = listOf()
-      )
-
-      val result: TaskResult.Failure<WPMManifest> = taskRecorder.finishFailure()
-      failed = true
-      this.setStatusFailed(result)
-      return
     } finally {
-      if (!failed) {
-        this.setStatus(Idle)
-        this.eventsActual.onNext(StatusChanged)
-      }
+      this.lastUpdateTimeSet()
     }
+    return updated
   }
 
   private fun setStatusFailed(
@@ -429,16 +569,17 @@ class AccountProviderRegistry2 private constructor(
   }
 
   private fun setStatusRefreshing(
+    kind: String,
     offset: Int,
     totalItems: Int?
   ) {
     if (totalItems == null) {
-      this.setStatus(Refreshing(null))
+      this.setStatus(Refreshing(kind = kind, progress = null))
       this.eventsActual.onNext(StatusChanged)
       return
     }
 
-    this.setStatus(Refreshing(offset.toDouble() / totalItems.toDouble()))
+    this.setStatus(Refreshing(kind = kind, progress = offset.toDouble() / totalItems.toDouble()))
     this.eventsActual.onNext(StatusChanged)
   }
 
@@ -454,6 +595,8 @@ class AccountProviderRegistry2 private constructor(
   private fun opProcessAccountProviderDescription(
     accountProviderDescription: AccountProviderDescription
   ) {
+    this.logger.debug("Updated catalog {}", accountProviderDescription.title)
+
     this.database.openTransaction().use { t ->
       t.execute(
         queryType = DBQAccountProviderDescriptionPutType::class.java,
@@ -491,15 +634,35 @@ class AccountProviderRegistry2 private constructor(
     )
   }
 
+  private sealed interface RegistryOrder {
+    val name: String
+  }
+
+  private data object Modified : RegistryOrder {
+    override val name: String =
+      "modified"
+  }
+
+  private data object NameAscending : RegistryOrder {
+    override val name: String =
+      "name"
+  }
+
+  private data object NameDescending : RegistryOrder {
+    override val name: String =
+      "name-desc"
+  }
+
   private fun fetchRegistryPage(
     taskRecorder: TaskRecorderType,
     baseURI: URI,
     offset: Int,
     size: Int,
-    availability: String
+    availability: String,
+    order: RegistryOrder
   ): WPMManifest {
     val targetURI =
-      URI.create("$baseURI/libraries/crawlable?offset=$offset&size=$size&availability=$availability")
+      URI.create("$baseURI/libraries/crawlable?offset=$offset&size=$size&availability=$availability&order=${order.name}")
 
     for (attempt in 1..3) {
       taskRecorder.beginNewStep("Fetching $targetURI (Attempt $attempt of 3)")

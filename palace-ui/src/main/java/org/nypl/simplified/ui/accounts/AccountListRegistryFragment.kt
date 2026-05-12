@@ -97,7 +97,7 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry),
         accountListAdapter = this.accountListAdapter,
         onSwipeTouched = {
           registry.refreshAsync(
-            AccountProviderRegistryRefresh(
+            AccountProviderRegistryRefresh.Full(
               clearBeforeRefresh = true,
               includeTestingLibraries = profiles.profileCurrent().preferences().showTestingLibraries
             )
