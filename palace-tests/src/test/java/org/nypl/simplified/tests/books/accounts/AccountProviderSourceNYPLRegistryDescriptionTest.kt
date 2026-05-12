@@ -4,7 +4,6 @@ import android.content.Context
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import one.irradia.mime.api.MIMEType
-import org.joda.time.DateTime
 import org.joda.time.DateTimeUtils
 import org.joda.time.DateTimeZone
 import org.junit.jupiter.api.AfterEach
@@ -21,7 +20,7 @@ import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription.Companion.BASIC_TYPE
 import org.nypl.simplified.accounts.api.AccountProviderDescription
 import org.nypl.simplified.accounts.api.AccountProviderType
-import org.nypl.simplified.accounts.source.nyplregistry.AccountProviderResolution
+import org.nypl.simplified.accounts.registry.AccountProviderResolution
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.auth_document.api.AuthenticationDocument
 import org.nypl.simplified.opds.auth_document.api.AuthenticationDocumentParserType

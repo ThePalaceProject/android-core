@@ -9,11 +9,11 @@ jobs:
   create-release:
     runs-on: ubuntu-latest
     steps:
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: 17
+          java-version: 21
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Checkout submodules

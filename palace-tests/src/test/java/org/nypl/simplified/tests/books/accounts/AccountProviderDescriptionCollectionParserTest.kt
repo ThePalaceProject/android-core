@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test
 import org.nypl.simplified.accounts.api.AccountProviderDescriptionCollection
 import org.nypl.simplified.accounts.json.AccountProviderDescriptionCollectionParsers
 import org.nypl.simplified.accounts.json.AccountProviderDescriptionCollectionSerializers
-import org.nypl.simplified.opds2.irradia.OPDS2ParsersIrradia
 import org.nypl.simplified.parser.api.ParseResult
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -32,7 +31,7 @@ class AccountProviderDescriptionCollectionParserTest {
 
   @Test
   fun testLibraryRegistry() {
-    val parsers = AccountProviderDescriptionCollectionParsers(OPDS2ParsersIrradia)
+    val parsers = AccountProviderDescriptionCollectionParsers()
 
     resource("libraryregistry-qa.json").use { stream ->
       val parser = parsers.createParser(URI("urn:fake"), stream)
@@ -40,7 +39,7 @@ class AccountProviderDescriptionCollectionParserTest {
       this.dumpResult(result)
       val success = result as ParseResult.Success
       val collection = success.result
-      Assertions.assertEquals(182, collection.providers.size)
+      Assertions.assertEquals(1205, collection.providers.size)
       Assertions.assertTrue(collection.providers.any { p -> p.links.isNotEmpty() })
       Assertions.assertTrue(collection.providers.any { p -> p.images.isNotEmpty() })
       Assertions.assertEquals(4, collection.links.size)
@@ -54,7 +53,7 @@ class AccountProviderDescriptionCollectionParserTest {
 
   @Test
   fun testLibraryRegistryRoundTrip() {
-    val parsers = AccountProviderDescriptionCollectionParsers(OPDS2ParsersIrradia)
+    val parsers = AccountProviderDescriptionCollectionParsers()
     val serializers = AccountProviderDescriptionCollectionSerializers()
 
     resource("libraryregistry-qa.json").use { stream ->

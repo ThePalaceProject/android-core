@@ -40,15 +40,24 @@ interface AccountProviderRegistryType : AutoCloseable {
 
   /**
    * The status of the account registry.
+   * Updates to this attribute are guaranteed to be published on the UI thread.
    */
 
   val statusAttribute: AttributeReadableType<AccountProviderRegistryStatus>
 
   /**
-   * The status of the account registry.
+   * The account provider descriptions.
+   * Updates to this attribute are guaranteed to be published on the UI thread.
    */
 
   val accountProviderDescriptionsAttribute: AttributeReadableType<Map<URI, AccountProviderDescription>>
+
+  /**
+   * The account provider descriptions.
+   * Updates to this attribute are guaranteed to be published on the UI thread.
+   */
+
+  val accountProviderDescriptionsSortedAttribute: AttributeReadableType<List<AccountProviderDescription>>
 
   /**
    * The status of the account registry.
@@ -72,29 +81,25 @@ interface AccountProviderRegistryType : AutoCloseable {
   }
 
   /**
-   * Refresh the available account providers from all sources.
+   * Refresh the available account providers.
    *
-   * @param includeTestingLibraries A hint for providers indicating whether
-   * testing libraries should be loaded. May be ignored by some providers.
+   * @param refreshRequest The refresh parameters
    */
 
   fun refresh(
-    includeTestingLibraries: Boolean
+    refreshRequest: AccountProviderRegistryRefresh
   ) {
-    return this.refreshAsync(
-      includeTestingLibraries = includeTestingLibraries
-    ).get()
+    return this.refreshAsync(refreshRequest).get()
   }
 
   /**
-   * Refresh the available account providers from all sources.
+   * Refresh the available account providers.
    *
-   * @param includeTestingLibraries A hint for providers indicating whether
-   * testing libraries should be loaded. May be ignored by some providers.
+   * @param refreshRequest The refresh parameters
    */
 
   fun refreshAsync(
-    includeTestingLibraries: Boolean
+    refreshRequest: AccountProviderRegistryRefresh
   ): CompletableFuture<Unit>
 
   /**

@@ -8,8 +8,6 @@ dependencies {
     implementation(project(":palace-json-core"))
     implementation(project(":palace-links"))
     implementation(project(":palace-links-json"))
-    implementation(project(":palace-opds2"))
-    implementation(project(":palace-opds2-parser-api"))
     implementation(project(":palace-parser-api"))
     implementation(project(":palace-patron-api"))
     implementation(project(":palace-taskrecorder-api"))
@@ -21,5 +19,6 @@ dependencies {
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlin.stdlib)
     implementation(libs.palace.drm.core)
+    implementation(libs.palace.webpub.core)
     implementation(libs.slf4j)
 }

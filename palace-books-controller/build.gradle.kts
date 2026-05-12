@@ -5,7 +5,6 @@ dependencies {
     implementation(project(":palace-accounts-database-api"))
     implementation(project(":palace-accounts-registry"))
     implementation(project(":palace-accounts-registry-api"))
-    implementation(project(":palace-accounts-source-spi"))
     implementation(project(":palace-adobe-extensions"))
     implementation(project(":palace-analytics-api"))
     implementation(project(":palace-bookmarks-api"))

@@ -6,8 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:divider="?android:attr/listDivider"
-    android:orientation="vertical"
-    android:showDividers="middle">
+    android:showDividers="middle"
+    android:orientation="vertical">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/accountRegistryToolbar"
@@ -100,19 +100,87 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <View
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?android:attr/listDivider" />
+        android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/accountRegistryTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="16dp"
-        android:text="@string/accountRegistrySelect"
-        android:textStyle="bold" />
+        <TextView
+            android:id="@+id/accountRegistryTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="16dp"
+            android:text="@string/accountRegistrySelect"
+            android:textStyle="bold"
+            android:visibility="visible"
+            tools:visibility="invisible" />
+
+        <ProgressBar
+            android:id="@+id/accountRegistryProgress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:layout_gravity="center"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:visibility="visible"
+            tools:visibility="visible" />
+
+        <ProgressBar
+            android:id="@+id/accountRegistryProgressAnimated"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:layout_gravity="center"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:indeterminate="true"
+            android:alpha="0.125"
+            android:visibility="visible"
+            tools:visibility="visible" />
+
+        <LinearLayout
+            android:id="@+id/accountRegistryError"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:visibility="visible"
+            tools:visibility="visible">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="@string/registryFailure"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <FrameLayout
+                android:id="@+id/accountRegistryErrorTouch"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="8dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:clickable="false"
+                    android:focusable="false"
+                    android:src="@drawable/error" />
+
+            </FrameLayout>
+        </LinearLayout>
+    </FrameLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -135,13 +203,5 @@
                 tools:listitem="@layout/account_list_item" />
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-        <androidx.core.widget.ContentLoadingProgressBar
-            android:id="@+id/accountRegistryProgress"
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="gone" />
     </FrameLayout>
 </LinearLayout>

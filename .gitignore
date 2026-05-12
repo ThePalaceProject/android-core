@@ -20,6 +20,8 @@ secrets.conf
 ReaderClientCert.sig
 LCP/*
 
+palace-accounts-registry/src/main/resources/org/nypl/simplified/accounts/registry/libraries.json
+
 # Backup files
 *~
 

@@ -2,17 +2,18 @@ package org.nypl.simplified.tests.db
 
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
-import org.nypl.simplified.accounts.json.AccountProviderDescriptionCollectionParser
 import org.nypl.simplified.accounts.json.AccountProviderDescriptionCollectionParsers
 import org.nypl.simplified.accounts.json.AccountProviderDescriptionCollectionSerializers
-import org.nypl.simplified.opds2.irradia.OPDS2ParsersIrradia
 import org.thepalaceproject.db.DBFactory
 import org.thepalaceproject.db.api.DBParameters
 import org.thepalaceproject.db.api.DBType
+import org.thepalaceproject.db.api.queries.DBQAccountProviderDescriptionListType
 import org.thepalaceproject.db.api.queries.DBQSchemaVersionType
+import java.nio.file.Files
 import java.nio.file.Path
 
 class DBTest {
@@ -30,7 +31,7 @@ class DBTest {
     this.file = directory.resolve("database.db")
 
     this.accountParsers =
-      AccountProviderDescriptionCollectionParsers(OPDS2ParsersIrradia)
+      AccountProviderDescriptionCollectionParsers()
     this.accountSerializers =
       AccountProviderDescriptionCollectionSerializers()
 
@@ -59,6 +60,28 @@ class DBTest {
     this.database.openConnection().use { c ->
       c.openTransaction().use { t ->
 
+      }
+    }
+  }
+
+  @Test
+  fun testOpenCopyProviders(
+    @TempDir directory: Path
+  ) {
+    val providers =
+      DBTest::class.java.getResourceAsStream("/org/nypl/simplified/tests/db/providers.db")
+    val inputFile =
+      directory.resolve("out.db")
+
+    Files.copy(providers, inputFile)
+
+    this.database.copyAccountProviderDescriptionsFrom(inputFile)
+    this.database.openConnection().use { c ->
+      c.openTransaction().use { t ->
+        assertEquals(
+          1134,
+          t.execute(DBQAccountProviderDescriptionListType::class.java,
+          DBQAccountProviderDescriptionListType.Parameters(null, 10000)).size)
       }
     }
   }

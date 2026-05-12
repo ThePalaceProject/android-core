@@ -1,26 +1,33 @@
 package org.nypl.simplified.accounts.registry
 
-import android.content.Context
 import com.io7m.jattribute.core.AttributeReadableType
 import com.io7m.jattribute.core.AttributeType
 import com.io7m.jattribute.core.Attributes
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
+import org.librarysimplified.http.api.LSHTTPClientType
+import org.librarysimplified.http.api.LSHTTPResponseStatus
 import org.nypl.simplified.accounts.api.AccountProvider
 import org.nypl.simplified.accounts.api.AccountProviderDescription
+import org.nypl.simplified.accounts.api.AccountProviderDescriptionComparator
 import org.nypl.simplified.accounts.api.AccountProviderResolutionListenerType
+import org.nypl.simplified.accounts.api.AccountProviderResolutionStringsType
 import org.nypl.simplified.accounts.api.AccountProviderType
+import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryDebugging
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryEvent
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryEvent.StatusChanged
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryEvent.Updated
+import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryRefresh
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus
+import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus.Failed
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus.Idle
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus.Refreshing
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
-import org.nypl.simplified.accounts.source.spi.AccountProviderSourceType
-import org.nypl.simplified.accounts.source.spi.AccountProviderSourceType.SourceResult.SourceFailed
-import org.nypl.simplified.accounts.source.spi.AccountProviderSourceType.SourceResult.SourceSucceeded
+import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
+import org.nypl.simplified.links.Links.wpmLinkToPalaceLink
+import org.nypl.simplified.opds.auth_document.api.AuthenticationDocumentParsersType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
+import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.slf4j.LoggerFactory
 import org.thepalaceproject.db.api.DBType
@@ -32,21 +39,35 @@ import org.thepalaceproject.db.api.queries.DBQAccountProviderDescriptionPutType
 import org.thepalaceproject.db.api.queries.DBQAccountProviderGetType
 import org.thepalaceproject.db.api.queries.DBQAccountProviderListType
 import org.thepalaceproject.db.api.queries.DBQAccountProviderPutType
+import org.thepalaceproject.webpub.core.WPMCatalog
+import org.thepalaceproject.webpub.core.WPMManifest
+import org.thepalaceproject.webpub.core.WPMMappers
+import java.io.ByteArrayInputStream
+import java.io.IOException
 import java.net.URI
+import java.nio.file.Files
+import java.time.Duration
+import java.time.OffsetDateTime
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
 
 class AccountProviderRegistry2 private constructor(
+  private val accountProviderDefault: AttributeType<AccountProvider>,
+  private val accountProviderDescriptionsAttributeSortedUI: AttributeType<List<AccountProviderDescription>>,
   private val accountProviderDescriptionsAttributeSrc: AttributeType<Map<URI, AccountProviderDescription>>,
+  private val accountProviderDescriptionsAttributeUI: AttributeType<Map<URI, AccountProviderDescription>>,
+  private val accountProviderResolutionStrings: AccountProviderResolutionStringsType,
   private val accountProvidersAttributeSrc: AttributeType<Map<URI, AccountProvider>>,
+  private val accountProvidersAttributeUI: AttributeType<Map<URI, AccountProvider>>,
   private val attributeExecutor: Executor,
-  private val context: Context,
+  private val authDocumentParsers: AuthenticationDocumentParsersType,
   private val database: DBType,
   private val databaseExecutor: ExecutorService,
-  private val sources: List<AccountProviderSourceType>,
+  private val httpClient: LSHTTPClientType,
   private val statusAttributeSrc: AttributeType<AccountProviderRegistryStatus>,
-  private val accountProviderDefault: AttributeType<AccountProvider>,
+  private val statusAttributeUI: AttributeType<AccountProviderRegistryStatus>,
+  private val uriBase: URI,
 ) : AccountProviderRegistryType {
 
   private val logger =
@@ -54,6 +75,9 @@ class AccountProviderRegistry2 private constructor(
 
   private val eventsActual: PublishSubject<AccountProviderRegistryEvent> =
     PublishSubject.create()
+
+  private val wpmMapper =
+    WPMMappers.createMapper()
 
   companion object {
 
@@ -65,45 +89,83 @@ class AccountProviderRegistry2 private constructor(
       Attributes.create { ex -> this.logger.error("Uncaught exception in attribute: ", ex) }
 
     fun create(
-      context: Context,
+      buildConfig: BuildConfigurationServiceType,
       database: DBType,
       defaultProvider: AccountProvider,
-      sources: List<AccountProviderSourceType>,
       attributeExecutor: Executor,
       databaseExecutor: ExecutorService,
+      httpClient: LSHTTPClientType,
+      uriBase: URI,
+      accountProviderResolutionStrings: AccountProviderResolutionStringsType,
+      authDocumentParsers: AuthenticationDocumentParsersType,
+      uiExecutor: Executor
     ): AccountProviderRegistryType {
-      val statusAttributeSrc =
-        this.attributes.withValue<AccountProviderRegistryStatus>(Idle)
-      val accountProviderDescriptionsAttributeSrc =
-        this.attributes.withValue<Map<URI, AccountProviderDescription>>(mapOf())
-      val accountProvidersAttributeSrc =
-        this.attributes.withValue<Map<URI, AccountProvider>>(mapOf())
       val accountProviderDefault =
         this.attributes.withValue<AccountProvider>(defaultProvider)
+
+      val accountProviderDescriptionsAttributeSrc =
+        this.attributes.withValue<Map<URI, AccountProviderDescription>>(mapOf())
+      val accountProviderDescriptionsAttributeUI =
+        this.attributes.withValue<Map<URI, AccountProviderDescription>>(mapOf())
+      val accountProvidersDescriptionsSortedAttributeUI =
+        this.attributes.withValue<List<AccountProviderDescription>>(listOf())
+
+      val comparator = AccountProviderDescriptionComparator(buildConfig)
+      accountProviderDescriptionsAttributeSrc.subscribe { _, m ->
+        val sorted = m.values.sortedWith(comparator)
+        uiExecutor.execute {
+          accountProviderDescriptionsAttributeUI.set(m)
+          accountProvidersDescriptionsSortedAttributeUI.set(sorted)
+        }
+      }
+
+      val accountProvidersAttributeSrc =
+        this.attributes.withValue<Map<URI, AccountProvider>>(mapOf())
+      val accountProvidersAttributeUI =
+        this.attributes.withValue<Map<URI, AccountProvider>>(mapOf())
+
+      accountProvidersAttributeSrc.subscribe { _, m ->
+        uiExecutor.execute {
+          accountProvidersAttributeUI.set(m)
+        }
+      }
+
+      val statusAttributeSrc =
+        this.attributes.withValue<AccountProviderRegistryStatus>(Idle)
+      val statusAttributeUI =
+        this.attributes.withValue<AccountProviderRegistryStatus>(Idle)
+
+      statusAttributeSrc.subscribe { _, m ->
+        uiExecutor.execute {
+          statusAttributeUI.set(m)
+        }
+      }
 
       val registry =
         AccountProviderRegistry2(
           accountProviderDefault = accountProviderDefault,
           accountProviderDescriptionsAttributeSrc = accountProviderDescriptionsAttributeSrc,
+          accountProviderDescriptionsAttributeSortedUI = accountProvidersDescriptionsSortedAttributeUI,
+          accountProviderDescriptionsAttributeUI = accountProviderDescriptionsAttributeUI,
           accountProvidersAttributeSrc = accountProvidersAttributeSrc,
+          accountProvidersAttributeUI = accountProvidersAttributeUI,
+          accountProviderResolutionStrings = accountProviderResolutionStrings,
           attributeExecutor = attributeExecutor,
-          context = context,
+          authDocumentParsers = authDocumentParsers,
           database = database,
           databaseExecutor = databaseExecutor,
-          sources = sources,
+          httpClient = httpClient,
           statusAttributeSrc = statusAttributeSrc,
+          statusAttributeUI = statusAttributeUI,
+          uriBase = uriBase,
         )
 
-      registry.loadProviders()
+      registry.load()
       return registry
     }
   }
 
-  private fun loadProviders() {
-    return this.execute { this.opLoadProviders() }.get()
-  }
-
-  private fun opLoadProviders() {
+  private fun opLoadDatabaseProviders() {
     this.logger.debug("Loading account providers...")
 
     val descriptionMap: MutableMap<URI, AccountProvider>
@@ -141,11 +203,9 @@ class AccountProviderRegistry2 private constructor(
     )
   }
 
-  private fun opLoadDescriptions() {
+  private fun opLoadDatabaseDescriptions() {
     this.logger.debug("Loading account provider descriptions...")
-
-    this.setStatus(Refreshing)
-    this.eventsActual.onNext(StatusChanged)
+    this.setStatusRefreshing(0, null)
 
     try {
       val descriptionMap: MutableMap<URI, AccountProviderDescription>
@@ -192,18 +252,70 @@ class AccountProviderRegistry2 private constructor(
     this.eventsActual
 
   override val resolvedProviders: Map<URI, AccountProviderType>
-    get() = this.accountProvidersAttributeSrc.get()
+    get() = this.accountProvidersAttributeUI.get()
 
   override val statusAttribute: AttributeReadableType<AccountProviderRegistryStatus> =
-    this.statusAttributeSrc
+    this.statusAttributeUI
 
   override val accountProviderDescriptionsAttribute: AttributeReadableType<Map<URI, AccountProviderDescription>> =
-    this.accountProviderDescriptionsAttributeSrc
+    this.accountProviderDescriptionsAttributeUI
+
+  override val accountProviderDescriptionsSortedAttribute: AttributeReadableType<List<AccountProviderDescription>> =
+    this.accountProviderDescriptionsAttributeSortedUI
 
   override fun loadAsync(): CompletableFuture<Unit> {
     return this.execute {
-      this.opLoadProviders()
-      this.opLoadDescriptions()
+      this.opLoad()
+    }
+  }
+
+  private fun opLoad() {
+    this.logger.debug("Loading...")
+    this.time("LoadBundledProviders") {
+      this.opLoadBundledProviders()
+    }
+    this.time("LoadDatabaseProviders") {
+      this.opLoadDatabaseProviders()
+    }
+    this.time("LoadDatabaseDescriptions") {
+      this.opLoadDatabaseDescriptions()
+    }
+  }
+
+  private fun time(
+    name: String,
+    op: () -> Unit
+  ) {
+    val timeThen = OffsetDateTime.now()
+    try {
+      op.invoke()
+    } finally {
+      val timeNow = OffsetDateTime.now()
+      this.logger.debug("Op {} completed in {}", name, Duration.between(timeThen, timeNow))
+    }
+  }
+
+  private fun opLoadBundledProviders() {
+    try {
+      this.logger.debug("Loading bundled providers...")
+
+      val temporary = Files.createTempFile("palace", ".db")
+      try {
+        Files.deleteIfExists(temporary)
+
+        AccountProviderRegistry2.javaClass.getResourceAsStream(
+          "/org/nypl/simplified/accounts/registry/providers.db"
+        ).use { stream ->
+          if (stream != null) {
+            Files.copy(stream, temporary)
+            this.database.copyAccountProviderDescriptionsFrom(temporary)
+          }
+        }
+      } finally {
+        Files.deleteIfExists(temporary)
+      }
+    } catch (e: Exception) {
+      this.logger.debug("Failed to load bundled providers: ", e)
     }
   }
 
@@ -211,69 +323,245 @@ class AccountProviderRegistry2 private constructor(
     this.accountProviderDefault.get()
 
   private fun opRefresh(
-    includeTestingLibraries: Boolean,
+    refreshRequest: AccountProviderRegistryRefresh
   ) {
-    this.logger.debug("Refreshing account provider descriptions.")
+    if (this.status is Refreshing) {
+      this.logger.debug("Ignoring redundant refresh request.")
+      return
+    }
 
-    this.setStatus(Refreshing)
-    this.eventsActual.onNext(StatusChanged)
+    this.logger.debug("Refreshing account provider descriptions.")
+    this.setStatusRefreshing(0, null)
+    var failed = false
+    val taskRecorder = TaskRecorder.create()
 
     try {
-      /*
-       * Maintain a set of IDs that were updated from any source. We treat the default provider
-       * as always having been updated. We'll delete any account provider descriptions that haven't
-       * been updated from any source.
-       */
+      taskRecorder.beginNewStep("Refreshing registry...")
 
+      if (refreshRequest.clearBeforeRefresh) {
+        taskRecorder.beginNewStep("Clearing registry...")
+        this.opClear()
+        taskRecorder.currentStepSucceeded("Registry cleared.")
+      }
+
+      taskRecorder.beginNewStep("Adding default provider...")
+      this.opProcessAccountProviderDescription(this.defaultProvider.toDescription())
+
+      taskRecorder.beginNewStep("Fetching registry pages...")
       val idsUpdated = mutableSetOf<URI>()
       idsUpdated.add(this.defaultProvider.id)
 
-      for (source in this.sources) {
-        val data =
-          source.load(
-            context = this.context,
-            includeTestingLibraries = includeTestingLibraries,
+      var totalItems: Int? = null
+      var offset = 0
+      val size = 113
+      val baseURI = this.decideRegistryURI()
+      val availability =
+        if (refreshRequest.includeTestingLibraries) {
+          "all"
+        } else {
+          "production"
+        }
+
+      while (true) {
+        this.setStatusRefreshing(offset, totalItems)
+
+        val manifest =
+          this.fetchRegistryPage(
+            taskRecorder = taskRecorder,
+            baseURI = baseURI,
+            offset = offset,
+            size = size,
+            availability = availability
           )
 
-        when (data) {
-          is SourceFailed -> {
-            idsUpdated.addAll(data.results.keys)
-            try {
-              this.opUpdateDescriptions(data.results.values.toList())
-            } catch (e: Exception) {
-              this.logger.debug("Failed to update description: ", e)
-            }
+        totalItems = manifest.metadata.numberOfItems?.toInt()
+        if (manifest.catalogs.isEmpty()) {
+          break
+        }
+
+        for (catalog in manifest.catalogs) {
+          val identifier = catalog.metadata.identifier
+          if (identifier == null) {
+            this.logger.warn("Catalog '{}' has no identifier", catalog.metadata.title)
+            continue
           }
 
-          is SourceSucceeded -> {
-            idsUpdated.addAll(data.results.keys)
-            try {
-              this.opUpdateDescriptions(data.results.values.toList())
-            } catch (e: Exception) {
-              this.logger.debug("Failed to update description: ", e)
-            }
-          }
+          this.opProcessCatalog(catalog)
+          idsUpdated.add(identifier)
         }
+
+        offset += manifest.catalogs.size
       }
 
       /*
-       * Forget about any account provider descriptions that did not appear in any source.
+       * Forget about any account provider descriptions that did not appear in the registry.
        */
 
       val idsExisting = this.opFindExistingIDs()
       this.logger.debug("Found {} existing account provider description IDs.", idsExisting.size)
       val notUpdated = idsExisting.minus(idsUpdated)
       this.opDeleteProviderDescriptions(notUpdated)
-      this.opLoadDescriptions()
+    } catch (e: Throwable) {
+      taskRecorder.currentStepFailed(
+        message = e.message ?: e.javaClass.name,
+        errorCode = "exception",
+        exception = e,
+        extraMessages = listOf()
+      )
+
+      val result: TaskResult.Failure<WPMManifest> = taskRecorder.finishFailure()
+      failed = true
+      this.setStatusFailed(result)
+      return
     } finally {
-      this.setStatus(Idle)
-      this.eventsActual.onNext(StatusChanged)
+      if (!failed) {
+        this.setStatus(Idle)
+        this.eventsActual.onNext(StatusChanged)
+      }
     }
+  }
+
+  private fun setStatusFailed(
+    result: TaskResult.Failure<WPMManifest>
+  ) {
+    this.setStatus(Failed(result))
+    this.eventsActual.onNext(StatusChanged)
+  }
+
+  private fun setStatusRefreshing(
+    offset: Int,
+    totalItems: Int?
+  ) {
+    if (totalItems == null) {
+      this.setStatus(Refreshing(null))
+      this.eventsActual.onNext(StatusChanged)
+      return
+    }
+
+    this.setStatus(Refreshing(offset.toDouble() / totalItems.toDouble()))
+    this.eventsActual.onNext(StatusChanged)
+  }
+
+  private fun opProcessCatalog(
+    catalog: WPMCatalog
+  ) {
+    val accountProviderDescription: AccountProviderDescription =
+      this.opCatalogToAccountProviderDescription(catalog)
+
+    this.opProcessAccountProviderDescription(accountProviderDescription)
+  }
+
+  private fun opProcessAccountProviderDescription(
+    accountProviderDescription: AccountProviderDescription
+  ) {
+    this.database.openTransaction().use { t ->
+      t.execute(
+        queryType = DBQAccountProviderDescriptionPutType::class.java,
+        parameters = listOf(accountProviderDescription)
+      )
+      t.commit()
+    }
+
+    val existing = this.accountProviderDescriptionsAttributeSrc.get()
+    val withNew = existing.plus(Pair(accountProviderDescription.id, accountProviderDescription))
+    this.accountProviderDescriptionsAttributeSrc.set(withNew)
+  }
+
+  private fun opCatalogToAccountProviderDescription(
+    catalog: WPMCatalog
+  ): AccountProviderDescription {
+    val title =
+      catalog.metadata.title.defaultValue
+    val identifier =
+      catalog.metadata.identifier!!
+    val updated =
+      catalog.metadata.modified ?: OffsetDateTime.now()
+    val links =
+      catalog.links.map(::wpmLinkToPalaceLink)
+    val images =
+      catalog.images.map(::wpmLinkToPalaceLink)
+
+    return AccountProviderDescription(
+      id = identifier,
+      title = title,
+      description = catalog.metadata.description,
+      updated = updated,
+      links = links,
+      images = images
+    )
+  }
+
+  private fun fetchRegistryPage(
+    taskRecorder: TaskRecorderType,
+    baseURI: URI,
+    offset: Int,
+    size: Int,
+    availability: String
+  ): WPMManifest {
+    val targetURI =
+      URI.create("$baseURI/libraries/crawlable?offset=$offset&size=$size&availability=$availability")
+
+    for (attempt in 1..3) {
+      taskRecorder.beginNewStep("Fetching $targetURI (Attempt $attempt of 3)")
+
+      val request =
+        this.httpClient.newRequest(targetURI)
+          .build()
+      val response =
+        request.execute()
+
+      return when (val status = response.status) {
+        is LSHTTPResponseStatus.Failed -> {
+          Thread.sleep(1_000L)
+          status.properties?.let { p -> taskRecorder.addPropertiesAsAttributes(p) }
+          taskRecorder.currentStepFailed(
+            message = "Failed to connect to registry.",
+            errorCode = "http-failed",
+            exception = status.exception,
+            extraMessages = listOf()
+          )
+          continue
+        }
+
+        is LSHTTPResponseStatus.Responded.Error -> {
+          Thread.sleep(1_000L)
+          taskRecorder.addPropertiesAsAttributes(status.properties)
+          taskRecorder.currentStepFailed(
+            message = "Registry returned an error.",
+            errorCode = "registry-error",
+            exception = null,
+            extraMessages = listOf()
+          )
+          continue
+        }
+
+        is LSHTTPResponseStatus.Responded.OK -> {
+          taskRecorder.addPropertiesAsAttributes(status.properties)
+          try {
+            this.wpmMapper.readValue(
+              status.bodyStream ?: ByteArrayInputStream(ByteArray(0)),
+              WPMManifest::class.java
+            )
+          } catch (e: Exception) {
+            taskRecorder.currentStepFailed(
+              message = e.message ?: e.javaClass.name,
+              errorCode = "json-parsing",
+              exception = e,
+              extraMessages = listOf()
+            )
+            continue
+          }
+        }
+      }
+    }
+
+    throw IOException("Failed to retrieve a registry page after multiple attempts.")
   }
 
   private fun setStatus(
     status: AccountProviderRegistryStatus
   ) {
+    this.logger.debug("setStatus: {}", status)
     this.attributeExecutor.execute { this.statusAttributeSrc.set(status) }
   }
 
@@ -303,12 +591,10 @@ class AccountProviderRegistry2 private constructor(
   }
 
   override fun refreshAsync(
-    includeTestingLibraries: Boolean,
+    refreshRequest: AccountProviderRegistryRefresh
   ): CompletableFuture<Unit> {
     return this.execute {
-      this.opRefresh(
-        includeTestingLibraries = includeTestingLibraries,
-      )
+      this.opRefresh(refreshRequest)
     }
   }
 
@@ -469,28 +755,24 @@ class AccountProviderRegistry2 private constructor(
     taskRecorder.beginNewStep("Resolving description...")
 
     try {
-      for (source in this.sources) {
-        this.logger.debug("Checking source {}", source::class.java.canonicalName)
-        if (source.canResolve(description)) {
-          val result = source.resolve(onProgress, description)
-          taskRecorder.addAll(result.steps)
-          return when (result) {
-            is TaskResult.Success -> {
-              this.opUpdateProvider(result.result)
-              taskRecorder.finishSuccess(result.result)
-            }
+      val resolution =
+        AccountProviderResolution(
+          stringResources = this.accountProviderResolutionStrings,
+          authDocumentParsers = this.authDocumentParsers,
+          http = this.httpClient,
+          description = description
+        )
 
-            is TaskResult.Failure -> taskRecorder.finishFailure()
-          }
+      return when (val result = resolution.resolve(onProgress)) {
+        is TaskResult.Failure<AccountProviderType> -> {
+          taskRecorder.finishFailure()
+        }
+
+        is TaskResult.Success<AccountProviderType> -> {
+          this.opUpdateProvider(result.result)
+          taskRecorder.finishSuccess(result.result)
         }
       }
-
-      taskRecorder.currentStepFailed(
-        message = "No sources can resolve the given description.",
-        errorCode = "noApplicableSource ${description.id} ${description.title}",
-        extraMessages = listOf()
-      )
-      return taskRecorder.finishFailure()
     } catch (e: Exception) {
       this.logger.debug("Resolution exception: ", e)
       val message = e.message ?: e.javaClass.canonicalName ?: "unknown"
@@ -506,5 +788,17 @@ class AccountProviderRegistry2 private constructor(
 
   override fun close() {
     // Nothing required.
+  }
+
+  private fun decideRegistryURI(): URI {
+    val debuggingBase =
+      AccountProviderRegistryDebugging.properties[
+        "org.nypl.simplified.accounts.source.nyplregistry.baseServerOverride"
+      ]
+    return if (debuggingBase != null) {
+      URI.create("https://$debuggingBase/libraries")
+    } else {
+      this.uriBase
+    }
   }
 }

@@ -2,12 +2,13 @@ package org.nypl.simplified.threads
 
 import android.os.Handler
 import android.os.Looper
+import java.util.concurrent.Executor
 
 /**
  * Utility functions to execute code on the Android UI thread.
  */
 
-object UIThread {
+object UIThread : Executor {
 
   /**
    * Check that the current thread is the UI thread and raise {@link IllegalStateException}
@@ -47,5 +48,9 @@ object UIThread {
     val looper = Looper.getMainLooper()
     val h = Handler(looper)
     h.post(r)
+  }
+
+  override fun execute(r: Runnable) {
+    this.runOnUIThread(r)
   }
 }

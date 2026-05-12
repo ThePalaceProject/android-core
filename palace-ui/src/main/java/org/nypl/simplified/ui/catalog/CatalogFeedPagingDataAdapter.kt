@@ -3,8 +3,6 @@ package org.nypl.simplified.ui.catalog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
-import android.view.View.INVISIBLE
-import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
@@ -45,6 +43,7 @@ import org.nypl.simplified.books.book_registry.BookStatusEvent.BookStatusEventCh
 import org.nypl.simplified.books.book_registry.BookWithStatus
 import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.ui.views.Views
 
 class CatalogFeedPagingDataAdapter(
   private val covers: BookCoverProviderType,
@@ -132,10 +131,10 @@ class CatalogFeedPagingDataAdapter(
       this.subscription?.dispose()
       this.feedEntry = null
 
-      this.setVisible(this.corrupt, false)
-      this.setVisible(this.error, false)
-      this.setVisible(this.idle, false)
-      this.setVisible(this.progress, false)
+      Views.setVisible(this.corrupt, false)
+      Views.setVisible(this.error, false)
+      Views.setVisible(this.idle, false)
+      Views.setVisible(this.progress, false)
 
       this.errorDetails.setOnClickListener(null)
       this.errorDismiss.setOnClickListener(null)
@@ -156,10 +155,10 @@ class CatalogFeedPagingDataAdapter(
       item: FeedEntry
     ) {
       this.feedEntry = item
-      this.setVisible(this.progress, false)
-      this.setVisible(this.idle, true)
-      this.setVisible(this.error, false)
-      this.setVisible(this.corrupt, false)
+      Views.setVisible(this.progress, false)
+      Views.setVisible(this.idle, true)
+      Views.setVisible(this.error, false)
+      Views.setVisible(this.corrupt, false)
 
       val targetHeight =
         this.view.resources.getDimensionPixelSize(R.dimen.catalogBookThumbnailHeight)
@@ -183,8 +182,8 @@ class CatalogFeedPagingDataAdapter(
             v.setOnClickListener { this.callbacks.onBookSelected(item) }
           }
 
-          this.setVisible(this.idleCover, false)
-          this.setVisible(this.idleCoverProgress, true)
+          Views.setVisible(this.idleCover, false)
+          Views.setVisible(this.idleCoverProgress, true)
 
           this.errorTitle.text = item.feedEntry.title
           this.idleTitle.text = item.feedEntry.title
@@ -201,8 +200,8 @@ class CatalogFeedPagingDataAdapter(
             )
 
           f.addListener({
-            this.setVisible(this.idleCover, true)
-            this.setVisible(this.idleCoverProgress, false)
+            Views.setVisible(this.idleCover, true)
+            Views.setVisible(this.idleCoverProgress, false)
           }, MoreExecutors.directExecutor())
 
           this.onStatusChangedForFeedEntry(item)
@@ -220,36 +219,6 @@ class CatalogFeedPagingDataAdapter(
         )
 
       this.onStatusChanged(BookWithStatus(status.book, status.status))
-    }
-
-    private fun setVisible(
-      target: View,
-      visible: Boolean
-    ) {
-      /*
-       * Setting the visibility of a view in Android has a cost, even if that view is already in the desired
-       * visibility state. Therefore, we don't try to set the visibility of a view if the view is already
-       * in the right state.
-       */
-      when (target.visibility) {
-        VISIBLE -> {
-          if (!visible) {
-            target.visibility = INVISIBLE
-          }
-        }
-
-        INVISIBLE -> {
-          if (visible) {
-            target.visibility = VISIBLE
-          }
-        }
-
-        GONE -> {
-          if (visible) {
-            target.visibility = VISIBLE
-          }
-        }
-      }
     }
 
     private fun onStatusChanged(
@@ -341,10 +310,10 @@ class CatalogFeedPagingDataAdapter(
     private fun onStatusDownloadWaitingForExternalAuthentication(
       book: Book
     ) {
-      this.setVisible(this.corrupt, false)
-      this.setVisible(this.error, false)
-      this.setVisible(this.idle, false)
-      this.setVisible(this.progress, true)
+      Views.setVisible(this.corrupt, false)
+      Views.setVisible(this.error, false)
+      Views.setVisible(this.idle, false)
+      Views.setVisible(this.progress, true)
 
       this.progressText.text = book.entry.title
       this.progressProgress.isIndeterminate = true
@@ -353,10 +322,10 @@ class CatalogFeedPagingDataAdapter(
     private fun onStatusChangedDownloadExternalAuthenticationInProgress(
       book: Book
     ) {
-      this.setVisible(this.corrupt, false)
-      this.setVisible(this.error, false)
-      this.setVisible(this.idle, false)
-      this.setVisible(this.progress, true)
+      Views.setVisible(this.corrupt, false)
+      Views.setVisible(this.error, false)
+      Views.setVisible(this.idle, false)
+      Views.setVisible(this.progress, true)
 
       this.progressText.text = book.entry.title
       this.progressProgress.isIndeterminate = true
@@ -366,10 +335,10 @@ class CatalogFeedPagingDataAdapter(
       book: Book,
       status: Downloading
     ) {
-      this.setVisible(this.corrupt, false)
-      this.setVisible(this.error, false)
-      this.setVisible(this.idle, false)
-      this.setVisible(this.progress, true)
+      Views.setVisible(this.corrupt, false)
+      Views.setVisible(this.error, false)
+      Views.setVisible(this.idle, false)
+      Views.setVisible(this.progress, true)
 
       this.progressText.text = book.entry.title
 
@@ -386,10 +355,10 @@ class CatalogFeedPagingDataAdapter(
       book: Book,
       status: FailedDownload
     ) {
-      this.setVisible(this.corrupt, false)
-      this.setVisible(this.error, true)
-      this.setVisible(this.idle, false)
-      this.setVisible(this.progress, false)
+      Views.setVisible(this.corrupt, false)
+      Views.setVisible(this.error, true)
+      Views.setVisible(this.idle, false)
+      Views.setVisible(this.progress, false)
 
       this.errorDismiss.setOnClickListener {
         this.callbacks.onBookRequestDismissError(book)
@@ -407,10 +376,10 @@ class CatalogFeedPagingDataAdapter(
       book: Book,
       status: FailedDownloadBadCredentials
     ) {
-      this.setVisible(this.corrupt, false)
-      this.setVisible(this.error, true)
-      this.setVisible(this.idle, false)
-      this.setVisible(this.progress, false)
+      Views.setVisible(this.corrupt, false)
+      Views.setVisible(this.error, true)
+      Views.setVisible(this.idle, false)
+      Views.setVisible(this.progress, false)
 
       this.errorDismiss.setOnClickListener {
         this.callbacks.onBookRequestDismissError(book)
@@ -441,10 +410,10 @@ class CatalogFeedPagingDataAdapter(
       book: Book,
       status: FailedLoan
     ) {
-      this.setVisible(this.corrupt, false)
-      this.setVisible(this.error, true)
-      this.setVisible(this.idle, false)
-      this.setVisible(this.progress, false)
+      Views.setVisible(this.corrupt, false)
+      Views.setVisible(this.error, true)
+      Views.setVisible(this.idle, false)
+      Views.setVisible(this.progress, false)
 
       this.errorTitle.visibility = View.VISIBLE
       this.errorDismiss.setOnClickListener {
@@ -463,10 +432,10 @@ class CatalogFeedPagingDataAdapter(
       book: Book,
       status: FailedLoanBadCredentials
     ) {
-      this.setVisible(this.corrupt, false)
-      this.setVisible(this.error, true)
-      this.setVisible(this.idle, false)
-      this.setVisible(this.progress, false)
+      Views.setVisible(this.corrupt, false)
+      Views.setVisible(this.error, true)
+      Views.setVisible(this.idle, false)
+      Views.setVisible(this.progress, false)
 
       this.errorTitle.visibility = View.VISIBLE
       this.errorDismiss.setOnClickListener {
@@ -485,10 +454,10 @@ class CatalogFeedPagingDataAdapter(
       book: Book,
       status: FailedRevoke
     ) {
-      this.setVisible(this.corrupt, false)
-      this.setVisible(this.error, true)
-      this.setVisible(this.idle, false)
-      this.setVisible(this.progress, false)
+      Views.setVisible(this.corrupt, false)
+      Views.setVisible(this.error, true)
+      Views.setVisible(this.idle, false)
+      Views.setVisible(this.progress, false)
 
       this.errorTitle.visibility = View.VISIBLE
       this.errorDismiss.setOnClickListener {
@@ -507,10 +476,10 @@ class CatalogFeedPagingDataAdapter(
       book: Book,
       status: FailedRevokeBadCredentials
     ) {
-      this.setVisible(this.corrupt, false)
-      this.setVisible(this.error, true)
-      this.setVisible(this.idle, false)
-      this.setVisible(this.progress, false)
+      Views.setVisible(this.corrupt, false)
+      Views.setVisible(this.error, true)
+      Views.setVisible(this.idle, false)
+      Views.setVisible(this.progress, false)
 
       this.errorTitle.visibility = View.VISIBLE
       this.errorDismiss.setOnClickListener {
@@ -529,10 +498,10 @@ class CatalogFeedPagingDataAdapter(
       book: Book,
       status: Held.HeldInQueue
     ) {
-      this.setVisible(this.corrupt, false)
-      this.setVisible(this.error, false)
-      this.setVisible(this.idle, true)
-      this.setVisible(this.progress, false)
+      Views.setVisible(this.corrupt, false)
+      Views.setVisible(this.error, false)
+      Views.setVisible(this.idle, true)
+      Views.setVisible(this.progress, false)
       this.hideIdleTime()
 
       if (status.isRevocable) {
@@ -543,11 +512,11 @@ class CatalogFeedPagingDataAdapter(
           },
           title = book.entry.title
         )
-        this.setVisible(this.idleButtonPositive, true)
+        Views.setVisible(this.idleButtonPositive, true)
       } else {
-        this.setVisible(this.idleButtonPositive, false)
+        Views.setVisible(this.idleButtonPositive, false)
       }
-      this.setVisible(this.idleButtonNegative0, false)
+      Views.setVisible(this.idleButtonNegative0, false)
 
       val position = status.queuePosition
       if (position != null) {
@@ -557,7 +526,7 @@ class CatalogFeedPagingDataAdapter(
             position
           )
         this.idleTimeDays.text = ""
-        this.setVisible(this.idleTime, true)
+        Views.setVisible(this.idleTime, true)
       }
     }
 
@@ -565,10 +534,10 @@ class CatalogFeedPagingDataAdapter(
       book: Book,
       status: Held.HeldReady
     ) {
-      this.setVisible(this.corrupt, false)
-      this.setVisible(this.error, false)
-      this.setVisible(this.idle, true)
-      this.setVisible(this.progress, false)
+      Views.setVisible(this.corrupt, false)
+      Views.setVisible(this.error, false)
+      Views.setVisible(this.idle, true)
+      Views.setVisible(this.progress, false)
       this.hideIdleTime()
 
       this.buttonCreator.setAsBorrowButton(
@@ -578,7 +547,7 @@ class CatalogFeedPagingDataAdapter(
         },
         title = book.entry.title
       )
-      this.setVisible(this.idleButtonPositive, true)
+      Views.setVisible(this.idleButtonPositive, true)
 
       if (status.isRevocable) {
         this.buttonCreator.setAsRevokeLoanButton(
@@ -588,9 +557,9 @@ class CatalogFeedPagingDataAdapter(
           },
           title = book.entry.title
         )
-        this.setVisible(this.idleButtonNegative0, true)
+        Views.setVisible(this.idleButtonNegative0, true)
       } else {
-        this.setVisible(this.idleButtonNegative0, false)
+        Views.setVisible(this.idleButtonNegative0, false)
       }
     }
 
@@ -598,10 +567,10 @@ class CatalogFeedPagingDataAdapter(
       book: Book,
       status: Holdable
     ) {
-      this.setVisible(this.corrupt, false)
-      this.setVisible(this.error, false)
-      this.setVisible(this.idle, true)
-      this.setVisible(this.progress, false)
+      Views.setVisible(this.corrupt, false)
+      Views.setVisible(this.error, false)
+      Views.setVisible(this.idle, true)
+      Views.setVisible(this.progress, false)
       this.hideIdleTime()
 
       this.buttonCreator.setAsReserveButton(
@@ -611,18 +580,18 @@ class CatalogFeedPagingDataAdapter(
         },
         title = book.entry.title
       )
-      this.setVisible(this.idleButtonPositive, true)
-      this.setVisible(this.idleButtonNegative0, false)
+      Views.setVisible(this.idleButtonPositive, true)
+      Views.setVisible(this.idleButtonNegative0, false)
     }
 
     private fun onBookStatusLoanable(
       book: Book,
       status: Loanable
     ) {
-      this.setVisible(this.corrupt, false)
-      this.setVisible(this.error, false)
-      this.setVisible(this.idle, true)
-      this.setVisible(this.progress, false)
+      Views.setVisible(this.corrupt, false)
+      Views.setVisible(this.error, false)
+      Views.setVisible(this.idle, true)
+      Views.setVisible(this.progress, false)
       this.hideIdleTime()
 
       this.buttonCreator.setAsBorrowButton(
@@ -632,18 +601,18 @@ class CatalogFeedPagingDataAdapter(
         },
         title = book.entry.title
       )
-      this.setVisible(this.idleButtonPositive, true)
-      this.setVisible(this.idleButtonNegative0, false)
+      Views.setVisible(this.idleButtonPositive, true)
+      Views.setVisible(this.idleButtonNegative0, false)
     }
 
     private fun onBookStatusLoanedDownloaded(
       book: Book,
       status: Loaned.LoanedDownloaded
     ) {
-      this.setVisible(this.corrupt, false)
-      this.setVisible(this.error, false)
-      this.setVisible(this.idle, true)
-      this.setVisible(this.progress, false)
+      Views.setVisible(this.corrupt, false)
+      Views.setVisible(this.error, false)
+      Views.setVisible(this.idle, true)
+      Views.setVisible(this.progress, false)
       this.setIdleTime(this.getLoanDuration(book))
 
       when (val format = book.findPreferredFormat()) {
@@ -678,7 +647,7 @@ class CatalogFeedPagingDataAdapter(
           )
         }
       }
-      this.setVisible(this.idleButtonPositive, true)
+      Views.setVisible(this.idleButtonPositive, true)
 
       if (this.callbacks.onIsBookReturnable(book)) {
         this.buttonCreator.setAsRevokeLoanButton(
@@ -688,7 +657,7 @@ class CatalogFeedPagingDataAdapter(
           },
           title = book.entry.title
         )
-        this.setVisible(this.idleButtonNegative0, true)
+        Views.setVisible(this.idleButtonNegative0, true)
       } else if (this.callbacks.onIsBookDeletable(book)) {
         this.buttonCreator.setAsRevokeLoanButton(
           this.idleButtonNegative0,
@@ -697,9 +666,9 @@ class CatalogFeedPagingDataAdapter(
           },
           title = book.entry.title
         )
-        this.setVisible(this.idleButtonNegative0, true)
+        Views.setVisible(this.idleButtonNegative0, true)
       } else {
-        this.setVisible(this.idleButtonNegative0, false)
+        Views.setVisible(this.idleButtonNegative0, false)
       }
     }
 
@@ -721,8 +690,8 @@ class CatalogFeedPagingDataAdapter(
             days.days
           )
 
-        this.setVisible(this.idleTime, true)
-        this.setVisible(this.idleTimeDays, true)
+        Views.setVisible(this.idleTime, true)
+        Views.setVisible(this.idleTimeDays, true)
       } else {
         this.hideIdleTime()
       }
@@ -739,10 +708,10 @@ class CatalogFeedPagingDataAdapter(
       book: Book,
       status: Loaned.LoanedNotDownloaded
     ) {
-      this.setVisible(this.corrupt, false)
-      this.setVisible(this.error, false)
-      this.setVisible(this.idle, true)
-      this.setVisible(this.progress, false)
+      Views.setVisible(this.corrupt, false)
+      Views.setVisible(this.error, false)
+      Views.setVisible(this.idle, true)
+      Views.setVisible(this.progress, false)
       this.setIdleTime(this.getLoanDuration(book))
 
       this.buttonCreator.setAsDownloadButton(
@@ -752,7 +721,7 @@ class CatalogFeedPagingDataAdapter(
         },
         title = book.entry.title
       )
-      this.setVisible(this.idleButtonPositive, true)
+      Views.setVisible(this.idleButtonPositive, true)
 
       if (this.callbacks.onIsBookReturnable(book)) {
         this.buttonCreator.setAsRevokeLoanButton(
@@ -762,7 +731,7 @@ class CatalogFeedPagingDataAdapter(
           },
           title = book.entry.title
         )
-        this.setVisible(this.idleButtonNegative0, true)
+        Views.setVisible(this.idleButtonNegative0, true)
       } else if (this.callbacks.onIsBookDeletable(book)) {
         this.buttonCreator.setAsRevokeLoanButton(
           this.idleButtonNegative0,
@@ -771,9 +740,9 @@ class CatalogFeedPagingDataAdapter(
           },
           title = book.entry.title
         )
-        this.setVisible(this.idleButtonNegative0, true)
+        Views.setVisible(this.idleButtonNegative0, true)
       } else {
-        this.setVisible(this.idleButtonNegative0, false)
+        Views.setVisible(this.idleButtonNegative0, false)
       }
     }
 
@@ -793,10 +762,10 @@ class CatalogFeedPagingDataAdapter(
       book: Book,
       status: RequestingDownload
     ) {
-      this.setVisible(this.corrupt, false)
-      this.setVisible(this.error, false)
-      this.setVisible(this.idle, false)
-      this.setVisible(this.progress, true)
+      Views.setVisible(this.corrupt, false)
+      Views.setVisible(this.error, false)
+      Views.setVisible(this.idle, false)
+      Views.setVisible(this.progress, true)
 
       this.progressText.text = book.entry.title
       this.progressProgress.isIndeterminate = true
@@ -806,10 +775,10 @@ class CatalogFeedPagingDataAdapter(
       book: Book,
       status: RequestingRevoke
     ) {
-      this.setVisible(this.corrupt, false)
-      this.setVisible(this.error, false)
-      this.setVisible(this.idle, false)
-      this.setVisible(this.progress, true)
+      Views.setVisible(this.corrupt, false)
+      Views.setVisible(this.error, false)
+      Views.setVisible(this.idle, false)
+      Views.setVisible(this.progress, true)
 
       this.progressText.text = book.entry.title
       this.progressProgress.isIndeterminate = true
@@ -819,10 +788,10 @@ class CatalogFeedPagingDataAdapter(
       book: Book,
       status: RequestingLoan
     ) {
-      this.setVisible(this.corrupt, false)
-      this.setVisible(this.error, false)
-      this.setVisible(this.idle, false)
-      this.setVisible(this.progress, true)
+      Views.setVisible(this.corrupt, false)
+      Views.setVisible(this.error, false)
+      Views.setVisible(this.idle, false)
+      Views.setVisible(this.progress, true)
 
       this.progressText.text = book.entry.title
       this.progressProgress.isIndeterminate = true
@@ -832,10 +801,10 @@ class CatalogFeedPagingDataAdapter(
       book: Book,
       status: Revoked
     ) {
-      this.setVisible(this.corrupt, false)
-      this.setVisible(this.error, false)
-      this.setVisible(this.idle, true)
-      this.setVisible(this.progress, false)
+      Views.setVisible(this.corrupt, false)
+      Views.setVisible(this.error, false)
+      Views.setVisible(this.idle, true)
+      Views.setVisible(this.progress, false)
     }
 
     private fun getLoanDuration(
