@@ -339,6 +339,40 @@ internal class DBInstance private constructor(
     return DBConnection(connection)
   }
 
+  override fun copyAccountProviderDescriptionsFrom(file: Path) {
+    this.openTransaction().use { transaction ->
+      transaction.connection.connection.createStatement().use { statement ->
+        statement.execute("ATTACH DATABASE '$file' AS source")
+
+        try {
+          val updated = statement.executeUpdate("""
+INSERT OR IGNORE INTO account_provider_descriptions (
+    apd_id,
+    apd_updated_time_last,
+    apd_title,
+    apd_description,
+    apd_data_format,
+    apd_data
+)
+SELECT
+    apd_id,
+    apd_updated_time_last,
+    apd_title,
+    apd_description,
+    apd_data_format,
+    apd_data
+FROM source.account_provider_descriptions;
+          """.trimIndent())
+
+          LOG.debug("Updated {} providers from bundled database", updated)
+          transaction.commit()
+        } finally {
+          statement.execute("DETACH DATABASE source")
+        }
+      }
+    }
+  }
+
   override fun close() {
     if (this.closed.compareAndSet(false, true)) {
       // Nothing to close, currently

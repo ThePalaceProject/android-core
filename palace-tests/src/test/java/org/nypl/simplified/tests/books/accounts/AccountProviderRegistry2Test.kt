@@ -20,8 +20,10 @@ import org.nypl.simplified.accounts.json.AccountProviderDescriptionCollectionPar
 import org.nypl.simplified.accounts.json.AccountProviderDescriptionCollectionSerializers
 import org.nypl.simplified.accounts.registry.AccountProviderRegistry2
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryRefresh
+import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.opds.auth_document.AuthenticationDocumentParsers
+import org.nypl.simplified.tests.ExtraAssertions.assertInstanceOf
 import org.nypl.simplified.tests.mocking.MockAccountProviderResolutionStrings
 import org.nypl.simplified.tests.mocking.MockAccountProviders
 import org.thepalaceproject.db.DBFactory
@@ -207,6 +209,63 @@ class AccountProviderRegistry2Test {
     assertEquals(10, acc1.size)
   }
 
+  /**
+   * Refreshing the registry can result in account provider descriptions being removed.
+   */
+
+  @Test
+  fun testRefreshFail0() {
+    this.mockServer.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+        .setBody(resourceText("registry-page-0.json"))
+    )
+    this.mockServer.enqueue(
+      MockResponse()
+        .setResponseCode(500)
+        .setBody("Failure!")
+    )
+    this.mockServer.enqueue(
+      MockResponse()
+        .setResponseCode(500)
+        .setBody("Failure!")
+    )
+    this.mockServer.enqueue(
+      MockResponse()
+        .setResponseCode(500)
+        .setBody("Failure!")
+    )
+    this.mockServer.enqueue(
+      MockResponse()
+        .setResponseCode(500)
+        .setBody("Failure!")
+    )
+
+    val registry =
+      AccountProviderRegistry2.create(
+        attributeExecutor = { r -> r.run() },
+        buildConfig = this.buildConfig,
+        database = this.database,
+        databaseExecutor = MoreExecutors.newDirectExecutorService(),
+        defaultProvider = this.accountProvider,
+        httpClient = this.httpClient,
+        uriBase = URI.create("http://localhost:${this.mockServer.port}"),
+        accountProviderResolutionStrings = MockAccountProviderResolutionStrings(),
+        authDocumentParsers = AuthenticationDocumentParsers(),
+        uiExecutor = MoreExecutors.directExecutor()
+      )
+
+    registry.refresh(
+      AccountProviderRegistryRefresh(
+        clearBeforeRefresh = true,
+        includeTestingLibraries = true
+      )
+    )
+
+    assertInstanceOf(registry.status, AccountProviderRegistryStatus.Failed::class.java)
+    assertEquals(21, registry.accountProviderDescriptions().size)
+  }
+
   private fun assertProviderDescriptionExists(id: URI) {
     Assertions.assertNotEquals(
       null,
@@ -215,46 +274,6 @@ class AccountProviderRegistry2Test {
       },
       "Provider $id must exist"
     )
-  }
-
-  private fun assertProviderDescriptionNonexistent(id: URI) {
-    Assertions.assertEquals(
-      null,
-      this.database.openTransaction().use { t ->
-        t.execute(DBQAccountProviderDescriptionGetType::class.java, id)
-      },
-      "Provider $id must not exist"
-    )
-  }
-
-  private fun assertProviderExists(id: URI) {
-    Assertions.assertNotEquals(
-      null,
-      this.database.openTransaction().use { t ->
-        t.execute(DBQAccountProviderGetType::class.java, id)
-      },
-      "Provider $id must exist"
-    )
-  }
-
-  private fun assertProviderNonexistent(id: URI) {
-    Assertions.assertEquals(
-      null,
-      this.database.openTransaction().use { t ->
-        t.execute(DBQAccountProviderGetType::class.java, id)
-      },
-      "Provider $id must not exist"
-    )
-  }
-
-
-  private fun writeAccountProviders() {
-    this.database.openTransaction().use { t ->
-      t.execute(
-        DBQAccountProviderDescriptionPutType::class.java,
-        this.accountProviders.map { d -> d.toDescription() })
-      t.commit()
-    }
   }
 
   private fun resourceText(

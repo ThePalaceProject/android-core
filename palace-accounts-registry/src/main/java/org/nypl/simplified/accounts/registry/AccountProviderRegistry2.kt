@@ -45,6 +45,8 @@ import org.thepalaceproject.webpub.core.WPMMappers
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.net.URI
+import java.nio.file.Files
+import java.time.Duration
 import java.time.OffsetDateTime
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
@@ -158,16 +160,12 @@ class AccountProviderRegistry2 private constructor(
           uriBase = uriBase,
         )
 
-      registry.loadProviders()
+      registry.load()
       return registry
     }
   }
 
-  private fun loadProviders() {
-    return this.execute { this.opLoadProviders() }.get()
-  }
-
-  private fun opLoadProviders() {
+  private fun opLoadDatabaseProviders() {
     this.logger.debug("Loading account providers...")
 
     val descriptionMap: MutableMap<URI, AccountProvider>
@@ -205,7 +203,7 @@ class AccountProviderRegistry2 private constructor(
     )
   }
 
-  private fun opLoadDescriptions() {
+  private fun opLoadDatabaseDescriptions() {
     this.logger.debug("Loading account provider descriptions...")
     this.setStatusRefreshing(0, null)
 
@@ -267,8 +265,57 @@ class AccountProviderRegistry2 private constructor(
 
   override fun loadAsync(): CompletableFuture<Unit> {
     return this.execute {
-      this.opLoadProviders()
-      this.opLoadDescriptions()
+      this.opLoad()
+    }
+  }
+
+  private fun opLoad() {
+    this.logger.debug("Loading...")
+    this.time("LoadBundledProviders") {
+      this.opLoadBundledProviders()
+    }
+    this.time("LoadDatabaseProviders") {
+      this.opLoadDatabaseProviders()
+    }
+    this.time("LoadDatabaseDescriptions") {
+      this.opLoadDatabaseDescriptions()
+    }
+  }
+
+  private fun time(
+    name: String,
+    op: () -> Unit
+  ) {
+    val timeThen = OffsetDateTime.now()
+    try {
+      op.invoke()
+    } finally {
+      val timeNow = OffsetDateTime.now()
+      this.logger.debug("Op {} completed in {}", name, Duration.between(timeThen, timeNow))
+    }
+  }
+
+  private fun opLoadBundledProviders() {
+    try {
+      this.logger.debug("Loading bundled providers...")
+
+      val temporary = Files.createTempFile("palace", ".db")
+      try {
+        Files.deleteIfExists(temporary)
+
+        AccountProviderRegistry2.javaClass.getResourceAsStream(
+          "/org/nypl/simplified/accounts/registry/providers.db"
+        ).use { stream ->
+          if (stream != null) {
+            Files.copy(stream, temporary)
+            this.database.copyAccountProviderDescriptionsFrom(temporary)
+          }
+        }
+      } finally {
+        Files.deleteIfExists(temporary)
+      }
+    } catch (e: Exception) {
+      this.logger.debug("Failed to load bundled providers: ", e)
     }
   }
 
