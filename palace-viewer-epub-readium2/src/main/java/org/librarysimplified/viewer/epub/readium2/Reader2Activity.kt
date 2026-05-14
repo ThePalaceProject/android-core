@@ -334,7 +334,8 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
         theme = initialTheme,
         context = this.application,
         controllers = SR2Controllers(),
-        bookmarks = bookmarks
+        bookmarks = bookmarks,
+        allowCopyPaste = this.parameters.drmInfo is BookDRMInformation.None
       )
     } catch (e: Exception) {
       this.onBookLoadingFailed(e)

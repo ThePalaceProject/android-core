@@ -2,7 +2,6 @@ package org.nypl.simplified.ui.accounts
 
 import android.os.Bundle
 import android.view.View
-import android.widget.TextView
 import androidx.annotation.UiThread
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
@@ -45,7 +44,6 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry),
 
   private lateinit var accountListViews: AccountListRegistryViews
   private lateinit var accountListAdapter: AccountProviderDescriptionListAdapter
-  private lateinit var title: TextView
 
   private var errorDialog: AlertDialog? = null
 
@@ -116,7 +114,7 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry),
     this.logger.debug("selected account: {} ({})", account.id, account.title)
 
     this.accountListViews.hideAccountList()
-    this.title.setText(R.string.accountRegistryCreating)
+    this.accountListViews.setTitle(this.getString(R.string.accountRegistryCreating))
 
     val services =
       Services.serviceDirectory()
@@ -169,7 +167,7 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry),
     when (event) {
       is AccountEventCreation.AccountEventCreationInProgress -> {
         this.accountListViews.hideAccountList()
-        this.title.text = event.message
+        this.accountListViews.setTitle(event.message)
       }
 
       is AccountEventCreation.AccountEventCreationSucceeded -> {

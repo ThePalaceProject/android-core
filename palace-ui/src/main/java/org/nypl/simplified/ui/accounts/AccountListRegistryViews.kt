@@ -255,4 +255,8 @@ class AccountListRegistryViews(
   fun setOnBackButtonListener(listener: (View) -> Unit) {
     this.backButton.setOnClickListener(listener::invoke::invoke)
   }
+
+  fun setTitle(message: String) {
+    this.title.text = message
+  }
 }
