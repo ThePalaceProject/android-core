@@ -27,6 +27,7 @@ import org.nypl.simplified.ui.main.MainTabRequest.TabAny
 import org.nypl.simplified.ui.main.MainTabRequest.TabForCategory
 import org.nypl.simplified.ui.screens.ScreenDefinitionType
 import org.nypl.simplified.ui.settings.SettingsCustomOPDSFragment
+import org.nypl.simplified.ui.settings.SettingsDebugMenuAutoFragment
 import org.nypl.simplified.ui.settings.SettingsDebugMenuBooksFragment
 import org.nypl.simplified.ui.settings.SettingsDebugMenuDRMFragment
 import org.nypl.simplified.ui.settings.SettingsDebugMenuErrorsFragment
@@ -232,6 +233,10 @@ object MainNavigation {
       this.stackPush(AccountListFragment.createScreenDefinition(Unit))
     }
 
+    fun openDebugAuto() {
+      this.stackPush(SettingsDebugMenuAutoFragment.createScreenDefinition(Unit))
+    }
+
     fun openDebugSettings() {
       this.stackPush(SettingsDebugMenuFragment.createScreenDefinition(Unit))
     }
@@ -278,7 +283,7 @@ object MainNavigation {
       )
     }
 
-    fun openBooks() {
+    fun openDebugBooks() {
       this.stackPush(SettingsDebugMenuBooksFragment.createScreenDefinition(Unit))
     }
 

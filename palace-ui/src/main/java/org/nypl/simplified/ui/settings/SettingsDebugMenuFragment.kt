@@ -14,6 +14,7 @@ import org.nypl.simplified.ui.screens.ScreenDefinitionType
 class SettingsDebugMenuFragment : Fragment(R.layout.debug), MainBackButtonConsumerType {
 
   private lateinit var toolbarBack: View
+  private lateinit var itemAuto: ViewGroup
   private lateinit var itemBooks: ViewGroup
   private lateinit var itemStartup: ViewGroup
   private lateinit var itemRegistry: ViewGroup
@@ -53,6 +54,7 @@ class SettingsDebugMenuFragment : Fragment(R.layout.debug), MainBackButtonConsum
       this.onBackButtonPressed()
     }
 
+    this.itemAuto = view.findViewById(R.id.debugAuto)
     this.itemBooks = view.findViewById(R.id.debugBooks)
     this.itemCustomOPDS = view.findViewById(R.id.debugCustomOPDS)
     this.itemDRM = view.findViewById(R.id.debugDrm)
@@ -61,8 +63,11 @@ class SettingsDebugMenuFragment : Fragment(R.layout.debug), MainBackButtonConsum
     this.itemNetwork = view.findViewById(R.id.debugNetwork)
     this.itemStartup = view.findViewById(R.id.debugStartup)
 
+    this.itemAuto.setOnClickListener {
+      MainNavigation.Settings.openDebugAuto()
+    }
     this.itemBooks.setOnClickListener {
-      MainNavigation.Settings.openBooks()
+      MainNavigation.Settings.openDebugBooks()
     }
     this.itemCustomOPDS.setOnClickListener {
       MainNavigation.Settings.openCustomOPDS()
