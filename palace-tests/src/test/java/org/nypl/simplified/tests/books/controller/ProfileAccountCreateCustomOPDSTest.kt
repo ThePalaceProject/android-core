@@ -154,8 +154,7 @@ class ProfileAccountCreateCustomOPDSTest {
     this.accountProviderRegistry =
       AccountProviderRegistry2.create(
         accountProviderResolutionStrings = this.accountProviderResolutionStrings,
-        attributeExecutor = MoreExecutors.directExecutor(),
-        authDocumentParsers = this.authDocumentParsers,
+          authDocumentParsers = this.authDocumentParsers,
         buildConfig = this.buildConfig,
         database = this.db,
         databaseExecutor = MoreExecutors.newDirectExecutorService(),

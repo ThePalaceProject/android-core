@@ -12,7 +12,6 @@ import org.nypl.simplified.accounts.json.AccountProviderDescriptionCollectionSer
 import org.nypl.simplified.accounts.registry.AccountProviderRegistry2
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
-import org.nypl.simplified.buildconfig.api.BuildConfigurationSettingsType
 import org.nypl.simplified.opds.auth_document.AuthenticationDocumentParsers
 import org.thepalaceproject.db.DBFactory
 import org.thepalaceproject.db.api.DBParameters
@@ -93,8 +92,7 @@ object MockAccountProviders {
     val registry =
       AccountProviderRegistry2.create(
         accountProviderResolutionStrings = MockAccountProviderResolutionStrings(),
-        attributeExecutor = MoreExecutors.directExecutor(),
-        authDocumentParsers = AuthenticationDocumentParsers(),
+          authDocumentParsers = AuthenticationDocumentParsers(),
         buildConfig = Mockito.mock(BuildConfigurationServiceType::class.java),
         database = db,
         databaseExecutor = MoreExecutors.newDirectExecutorService(),

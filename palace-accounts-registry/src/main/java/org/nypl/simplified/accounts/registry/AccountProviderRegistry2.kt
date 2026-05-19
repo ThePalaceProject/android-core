@@ -66,7 +66,6 @@ class AccountProviderRegistry2 private constructor(
   private val accountProviderResolutionStrings: AccountProviderResolutionStringsType,
   private val accountProvidersAttributeSrc: AttributeType<Map<URI, AccountProvider>>,
   private val accountProvidersAttributeUI: AttributeType<Map<URI, AccountProvider>>,
-  private val attributeExecutor: Executor,
   private val authDocumentParsers: AuthenticationDocumentParsersType,
   private val database: DBType,
   private val databaseExecutor: ExecutorService,
@@ -96,7 +95,6 @@ class AccountProviderRegistry2 private constructor(
       buildConfig: BuildConfigurationServiceType,
       database: DBType,
       defaultProvider: AccountProvider,
-      attributeExecutor: Executor,
       databaseExecutor: ExecutorService,
       httpClient: LSHTTPClientType,
       uriBase: URI,
@@ -154,7 +152,6 @@ class AccountProviderRegistry2 private constructor(
           accountProvidersAttributeSrc = accountProvidersAttributeSrc,
           accountProvidersAttributeUI = accountProvidersAttributeUI,
           accountProviderResolutionStrings = accountProviderResolutionStrings,
-          attributeExecutor = attributeExecutor,
           authDocumentParsers = authDocumentParsers,
           database = database,
           databaseExecutor = databaseExecutor,
@@ -196,9 +193,8 @@ class AccountProviderRegistry2 private constructor(
         )
         t.commit()
       }
-      this.attributeExecutor.execute {
-        this.accountProvidersAttributeSrc.set(descriptionMap)
-      }
+
+      this.accountProvidersAttributeSrc.set(descriptionMap)
     }
 
     this.logger.debug(
@@ -236,9 +232,7 @@ class AccountProviderRegistry2 private constructor(
           t.commit()
         }
 
-        this.attributeExecutor.execute {
-          this.accountProviderDescriptionsAttributeSrc.set(descriptionMap)
-        }
+        this.accountProviderDescriptionsAttributeSrc.set(descriptionMap)
       }
 
       this.logger.debug(
@@ -725,7 +719,7 @@ class AccountProviderRegistry2 private constructor(
     status: AccountProviderRegistryStatus
   ) {
     this.logger.debug("setStatus: {}", status)
-    this.attributeExecutor.execute { this.statusAttributeSrc.set(status) }
+    this.statusAttributeSrc.set(status)
   }
 
   /**
@@ -778,9 +772,7 @@ class AccountProviderRegistry2 private constructor(
       t.commit()
     }
 
-    this.attributeExecutor.execute {
-      this.accountProviderDescriptionsAttributeSrc.set(mapOf())
-    }
+    this.accountProviderDescriptionsAttributeSrc.set(mapOf())
   }
 
   override fun accountProviderDescriptions(): Map<URI, AccountProviderDescription> {
@@ -835,11 +827,9 @@ class AccountProviderRegistry2 private constructor(
       this.accountProviderDefault.set(accountProvider)
     }
 
-    this.attributeExecutor.execute {
-      val oldM = this.accountProvidersAttributeSrc.get()
-      val newM = oldM.plus(Pair(accountProvider.id, accountProvider))
-      this.accountProvidersAttributeSrc.set(newM)
-    }
+    val oldM = this.accountProvidersAttributeSrc.get()
+    val newM = oldM.plus(Pair(accountProvider.id, accountProvider))
+    this.accountProvidersAttributeSrc.set(newM)
 
     this.eventsActual.onNext(Updated(accountProvider.id))
     this.opUpdateDescriptions(listOf(accountProvider.toDescription()))
@@ -861,12 +851,10 @@ class AccountProviderRegistry2 private constructor(
       val timeDiff = (timeNow - timeThen).toDouble() / 1_000_000.0
       this.logger.debug("Stored {} provider descriptions in {} ms", descriptions.size, timeDiff)
 
-      this.attributeExecutor.execute {
-        val srcS = this.accountProviderDescriptionsAttributeSrc.get()
-        val incM = descriptions.associateBy { description -> description.id }
-        val srcR = srcS.plus(incM)
-        this.accountProviderDescriptionsAttributeSrc.set(srcR)
-      }
+      val srcS = this.accountProviderDescriptionsAttributeSrc.get()
+      val incM = descriptions.associateBy { description -> description.id }
+      val srcR = srcS.plus(incM)
+      this.accountProviderDescriptionsAttributeSrc.set(srcR)
 
       for (description in descriptions) {
         this.eventsActual.onNext(Updated(description.id))

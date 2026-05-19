@@ -31,8 +31,6 @@ import org.thepalaceproject.db.DBFactory
 import org.thepalaceproject.db.api.DBParameters
 import org.thepalaceproject.db.api.DBType
 import org.thepalaceproject.db.api.queries.DBQAccountProviderDescriptionGetType
-import org.thepalaceproject.db.api.queries.DBQAccountProviderDescriptionPutType
-import org.thepalaceproject.db.api.queries.DBQAccountProviderGetType
 import org.thepalaceproject.db.api.queries.DBQAccountRegistrySetting
 import org.thepalaceproject.db.api.queries.DBQAccountRegistrySettingsPutType
 import java.net.URI
@@ -107,7 +105,6 @@ class AccountProviderRegistry2Test {
 
     val registry =
       AccountProviderRegistry2.create(
-        attributeExecutor = { r -> r.run() },
         buildConfig = this.buildConfig,
         database = this.database,
         databaseExecutor = MoreExecutors.newDirectExecutorService(),
@@ -180,7 +177,6 @@ class AccountProviderRegistry2Test {
 
     val registry =
       AccountProviderRegistry2.create(
-        attributeExecutor = { r -> r.run() },
         buildConfig = this.buildConfig,
         database = this.database,
         databaseExecutor = MoreExecutors.newDirectExecutorService(),
@@ -247,7 +243,6 @@ class AccountProviderRegistry2Test {
 
     val registry =
       AccountProviderRegistry2.create(
-        attributeExecutor = { r -> r.run() },
         buildConfig = this.buildConfig,
         database = this.database,
         databaseExecutor = MoreExecutors.newDirectExecutorService(),
@@ -304,7 +299,6 @@ class AccountProviderRegistry2Test {
 
     val registry =
       AccountProviderRegistry2.create(
-        attributeExecutor = { r -> r.run() },
         buildConfig = this.buildConfig,
         database = this.database,
         databaseExecutor = MoreExecutors.newDirectExecutorService(),
@@ -340,7 +334,6 @@ class AccountProviderRegistry2Test {
 
     val registry =
       AccountProviderRegistry2.create(
-        attributeExecutor = { r -> r.run() },
         buildConfig = this.buildConfig,
         database = this.database,
         databaseExecutor = MoreExecutors.newDirectExecutorService(),

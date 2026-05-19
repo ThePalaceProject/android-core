@@ -306,7 +306,6 @@ internal object MainServices {
 
     return AccountProviderRegistry2.create(
       accountProviderResolutionStrings = accountProviderResolutionStrings,
-      attributeExecutor = { r -> UIThread.runOnUIThread(r) },
       authDocumentParsers = authenticationDocumentParsers,
       buildConfig = buildConfig,
       database = database,
