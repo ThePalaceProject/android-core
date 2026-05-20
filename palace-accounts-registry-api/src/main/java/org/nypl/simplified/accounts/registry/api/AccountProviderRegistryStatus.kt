@@ -19,6 +19,12 @@ sealed class AccountProviderRegistryStatus {
   ) : AccountProviderRegistryStatus()
 
   /**
+   * The account provider registry is currently loading.
+   */
+
+  data object Loading : AccountProviderRegistryStatus()
+
+  /**
    * The account provider registry is currently refreshing.
    */
 

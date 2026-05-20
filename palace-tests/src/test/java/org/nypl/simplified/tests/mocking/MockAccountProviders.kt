@@ -95,7 +95,7 @@ object MockAccountProviders {
           authDocumentParsers = AuthenticationDocumentParsers(),
         buildConfig = Mockito.mock(BuildConfigurationServiceType::class.java),
         database = db,
-        databaseExecutor = MoreExecutors.newDirectExecutorService(),
+        mainExecutor = MoreExecutors.newDirectExecutorService(),
         defaultProvider = fake0,
         httpClient = mock(LSHTTPClientType::class.java),
         uiExecutor = MoreExecutors.directExecutor(),

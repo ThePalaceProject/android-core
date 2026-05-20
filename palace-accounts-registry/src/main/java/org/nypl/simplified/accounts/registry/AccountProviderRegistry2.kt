@@ -23,6 +23,7 @@ import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryRefresh
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus.Failed
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus.Idle
+import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus.Loading
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus.Refreshing
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
@@ -68,7 +69,7 @@ class AccountProviderRegistry2 private constructor(
   private val accountProvidersAttributeUI: AttributeType<Map<URI, AccountProvider>>,
   private val authDocumentParsers: AuthenticationDocumentParsersType,
   private val database: DBType,
-  private val databaseExecutor: ExecutorService,
+  private val mainExecutor: ExecutorService,
   private val httpClient: LSHTTPClientType,
   private val statusAttributeSrc: AttributeType<AccountProviderRegistryStatus>,
   private val statusAttributeUI: AttributeType<AccountProviderRegistryStatus>,
@@ -95,7 +96,7 @@ class AccountProviderRegistry2 private constructor(
       buildConfig: BuildConfigurationServiceType,
       database: DBType,
       defaultProvider: AccountProvider,
-      databaseExecutor: ExecutorService,
+      mainExecutor: ExecutorService,
       httpClient: LSHTTPClientType,
       uriBase: URI,
       accountProviderResolutionStrings: AccountProviderResolutionStringsType,
@@ -146,16 +147,16 @@ class AccountProviderRegistry2 private constructor(
       val registry =
         AccountProviderRegistry2(
           accountProviderDefault = accountProviderDefault,
-          accountProviderDescriptionsAttributeSrc = accountProviderDescriptionsAttributeSrc,
           accountProviderDescriptionsAttributeSortedUI = accountProvidersDescriptionsSortedAttributeUI,
+          accountProviderDescriptionsAttributeSrc = accountProviderDescriptionsAttributeSrc,
           accountProviderDescriptionsAttributeUI = accountProviderDescriptionsAttributeUI,
+          accountProviderResolutionStrings = accountProviderResolutionStrings,
           accountProvidersAttributeSrc = accountProvidersAttributeSrc,
           accountProvidersAttributeUI = accountProvidersAttributeUI,
-          accountProviderResolutionStrings = accountProviderResolutionStrings,
           authDocumentParsers = authDocumentParsers,
           database = database,
-          databaseExecutor = databaseExecutor,
           httpClient = httpClient,
+          mainExecutor = mainExecutor,
           statusAttributeSrc = statusAttributeSrc,
           statusAttributeUI = statusAttributeUI,
           uriBase = uriBase,
@@ -193,22 +194,19 @@ class AccountProviderRegistry2 private constructor(
         )
         t.commit()
       }
-
-      this.accountProvidersAttributeSrc.set(descriptionMap)
     }
 
-    this.logger.debug(
-      "Loaded {} account providers.",
-      descriptionMap.size
-    )
+    this.accountProvidersAttributeSrc.set(descriptionMap)
+    this.logger.debug("Loaded {} account providers.", descriptionMap.size)
   }
 
   private fun opLoadDatabaseDescriptions() {
     this.logger.debug("Loading account provider descriptions...")
-    this.setStatusRefreshing(kind = "Full", offset = 0, totalItems = null)
+    this.setStatusLoading()
 
     try {
       val descriptionMap: MutableMap<URI, AccountProviderDescription>
+
       this.database.openTransaction().use { t ->
         val descriptions =
           t.execute(
@@ -240,7 +238,7 @@ class AccountProviderRegistry2 private constructor(
         descriptionMap.size
       )
     } finally {
-      this.setStatus(Idle(this.accountProviderDescriptionsAttributeSrc.get().size))
+      this.setStatusFinishedLoading(this.accountProviderDescriptionsAttributeSrc.get().size)
       this.eventsActual.onNext(StatusChanged)
     }
   }
@@ -262,7 +260,7 @@ class AccountProviderRegistry2 private constructor(
     this.accountProviderDescriptionsAttributeSortedUI
 
   override fun loadAsync(): CompletableFuture<Unit> {
-    return this.execute {
+    return this.executeMain {
       this.opLoad()
     }
   }
@@ -555,6 +553,24 @@ class AccountProviderRegistry2 private constructor(
     return updated
   }
 
+  private fun setStatusLoading() {
+    when (this.status) {
+      is Failed, is Idle -> this.setStatus(Loading)
+      Loading, is Refreshing -> {
+        // Nothing required.
+      }
+    }
+  }
+
+  private fun setStatusFinishedLoading(size: Int) {
+    when (this.status) {
+      is Failed, is Idle, Loading -> this.setStatus(Idle(size))
+      is Refreshing -> {
+        // Nothing required.
+      }
+    }
+  }
+
   private fun setStatusFailed(
     result: TaskResult.Failure<WPMManifest>
   ) {
@@ -727,12 +743,23 @@ class AccountProviderRegistry2 private constructor(
    * in progress.
    */
 
-  private fun <T> execute(
+  private fun <T> executeMain(
+    f: () -> T
+  ): CompletableFuture<T> {
+    return this.executeTask(this.mainExecutor, f)
+  }
+
+  /**
+   * Execute a task on an executor and return a future representing the operation in progress.
+   */
+
+  private fun <T> executeTask(
+    executorService: ExecutorService,
     f: () -> T
   ): CompletableFuture<T> {
     val future = CompletableFuture<T>()
     try {
-      this.databaseExecutor.execute {
+      executorService.execute {
         try {
           future.complete(f.invoke())
         } catch (e: Throwable) {
@@ -750,13 +777,13 @@ class AccountProviderRegistry2 private constructor(
   override fun refreshAsync(
     refreshRequest: AccountProviderRegistryRefresh
   ): CompletableFuture<Unit> {
-    return this.execute {
+    return this.executeMain {
       this.opRefresh(refreshRequest)
     }
   }
 
   override fun clearAsync(): CompletableFuture<Unit> {
-    return this.execute { this.opClear() }
+    return this.executeMain { this.opClear() }
   }
 
   private fun opClear() {
@@ -771,7 +798,6 @@ class AccountProviderRegistry2 private constructor(
       )
       t.commit()
     }
-
     this.accountProviderDescriptionsAttributeSrc.set(mapOf())
   }
 
@@ -782,7 +808,7 @@ class AccountProviderRegistry2 private constructor(
   override fun updateProviderAsync(
     accountProvider: AccountProviderType
   ): CompletableFuture<AccountProviderType> {
-    return this.execute { this.opUpdateProvider(accountProvider) }
+    return this.executeMain { this.opUpdateProvider(accountProvider) }
   }
 
   private fun opUpdateProvider(
@@ -882,20 +908,20 @@ class AccountProviderRegistry2 private constructor(
   override fun updateDescriptionAsync(
     description: AccountProviderDescription
   ): CompletableFuture<AccountProviderDescription> {
-    return this.execute { this.opUpdateDescriptions(listOf(description)).first() }
+    return this.executeMain { this.opUpdateDescriptions(listOf(description)).first() }
   }
 
   override fun updateDescriptionsAsync(
     descriptions: List<AccountProviderDescription>
   ): CompletableFuture<List<AccountProviderDescription>> {
-    return this.execute { this.opUpdateDescriptions(descriptions) }
+    return this.executeMain { this.opUpdateDescriptions(descriptions) }
   }
 
   override fun resolveAsync(
     onProgress: AccountProviderResolutionListenerType,
     description: AccountProviderDescription
   ): CompletableFuture<TaskResult<AccountProviderType>> {
-    return this.execute { this.opResolve(onProgress, description) }
+    return this.executeMain { this.opResolve(onProgress, description) }
   }
 
   private fun opResolve(

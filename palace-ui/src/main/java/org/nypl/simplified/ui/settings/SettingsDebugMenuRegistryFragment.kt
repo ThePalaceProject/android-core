@@ -208,6 +208,12 @@ class SettingsDebugMenuRegistryFragment : Fragment(R.layout.debug_registry),
         text.append("The registry failed to update.\n")
         text.append(status.result.message)
       }
+
+      AccountProviderRegistryStatus.Loading -> {
+        this.error.visibility = View.GONE
+        this.registryStatusProgress.isIndeterminate = true
+        text.append("The registry is currently loading ⌛\n")
+      }
     }
 
     this.registryStatus.text = text.toString()

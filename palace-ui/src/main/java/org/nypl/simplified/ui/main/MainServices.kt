@@ -301,15 +301,15 @@ internal object MainServices {
       loadDefaultAccountProvider()
     val buildConfig =
       ServiceLoader.load(BuildConfigurationServiceType::class.java).first()
-    val databaseExecutor =
-      NamedThreadPools.namedThreadPool(1, "database", 0)
+    val mainExecutor =
+      NamedThreadPools.namedThreadPool(2, "account-registry", 0)
 
     return AccountProviderRegistry2.create(
       accountProviderResolutionStrings = accountProviderResolutionStrings,
       authDocumentParsers = authenticationDocumentParsers,
       buildConfig = buildConfig,
       database = database,
-      databaseExecutor = databaseExecutor,
+      mainExecutor = mainExecutor,
       defaultProvider = defaultAccountProvider,
       httpClient = http,
       uiExecutor = UIThread,

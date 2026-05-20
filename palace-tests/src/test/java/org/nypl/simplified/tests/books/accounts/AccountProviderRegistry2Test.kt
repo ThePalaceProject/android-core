@@ -107,7 +107,7 @@ class AccountProviderRegistry2Test {
       AccountProviderRegistry2.create(
         buildConfig = this.buildConfig,
         database = this.database,
-        databaseExecutor = MoreExecutors.newDirectExecutorService(),
+        mainExecutor = MoreExecutors.newDirectExecutorService(),
         defaultProvider = this.accountProvider,
         httpClient = this.httpClient,
         uriBase = URI.create("http://localhost:${this.mockServer.port}"),
@@ -179,7 +179,7 @@ class AccountProviderRegistry2Test {
       AccountProviderRegistry2.create(
         buildConfig = this.buildConfig,
         database = this.database,
-        databaseExecutor = MoreExecutors.newDirectExecutorService(),
+        mainExecutor = MoreExecutors.newDirectExecutorService(),
         defaultProvider = this.accountProvider,
         httpClient = this.httpClient,
         uriBase = URI.create("http://localhost:${this.mockServer.port}"),
@@ -245,7 +245,7 @@ class AccountProviderRegistry2Test {
       AccountProviderRegistry2.create(
         buildConfig = this.buildConfig,
         database = this.database,
-        databaseExecutor = MoreExecutors.newDirectExecutorService(),
+        mainExecutor = MoreExecutors.newDirectExecutorService(),
         defaultProvider = this.accountProvider,
         httpClient = this.httpClient,
         uriBase = URI.create("http://localhost:${this.mockServer.port}"),
@@ -301,7 +301,7 @@ class AccountProviderRegistry2Test {
       AccountProviderRegistry2.create(
         buildConfig = this.buildConfig,
         database = this.database,
-        databaseExecutor = MoreExecutors.newDirectExecutorService(),
+        mainExecutor = MoreExecutors.newDirectExecutorService(),
         defaultProvider = this.accountProvider,
         httpClient = this.httpClient,
         uriBase = URI.create("http://localhost:${this.mockServer.port}"),
@@ -336,7 +336,7 @@ class AccountProviderRegistry2Test {
       AccountProviderRegistry2.create(
         buildConfig = this.buildConfig,
         database = this.database,
-        databaseExecutor = MoreExecutors.newDirectExecutorService(),
+        mainExecutor = MoreExecutors.newDirectExecutorService(),
         defaultProvider = this.accountProvider,
         httpClient = this.httpClient,
         uriBase = URI.create("http://localhost:${this.mockServer.port}"),

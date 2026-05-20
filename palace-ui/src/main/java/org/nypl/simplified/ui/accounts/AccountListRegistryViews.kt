@@ -159,6 +159,14 @@ class AccountListRegistryViews(
         Views.setVisible(this.title, true)
       }
 
+      AccountProviderRegistryStatus.Loading -> {
+        this.progress.isIndeterminate = true
+        Views.setVisible(this.error, false)
+        Views.setVisible(this.progress, true)
+        Views.setVisible(this.progressAnimated, true)
+        Views.setVisible(this.title, false)
+      }
+
       is AccountProviderRegistryStatus.Refreshing -> {
         val progressPercent = status.progressPercent
         if (progressPercent != null) {

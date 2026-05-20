@@ -157,7 +157,7 @@ class ProfileAccountCreateCustomOPDSTest {
           authDocumentParsers = this.authDocumentParsers,
         buildConfig = this.buildConfig,
         database = this.db,
-        databaseExecutor = MoreExecutors.newDirectExecutorService(),
+        mainExecutor = MoreExecutors.newDirectExecutorService(),
         defaultProvider = this.defaultProvider,
         httpClient = this.http,
         uiExecutor = MoreExecutors.directExecutor(),
