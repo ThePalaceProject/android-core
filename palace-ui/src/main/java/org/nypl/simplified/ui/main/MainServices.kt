@@ -1060,6 +1060,7 @@ internal object MainServices {
       bookController.booksSync(account.id)
     }
 
+    MainSyncService.start(MainApplication.application)
     return finalServices
   }
 

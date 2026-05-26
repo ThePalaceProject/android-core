@@ -432,6 +432,8 @@ dependencies {
     implementation(libs.androidx.asynclayoutinflater)
     implementation(libs.androidx.cardview)
     implementation(libs.androidx.collection)
+    implementation(libs.androidx.concurrent.futures.core)
+    implementation(libs.androidx.concurrent.futures.ktx)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.constraintlayout.core)
     implementation(libs.androidx.constraintlayout.solver)
@@ -501,6 +503,8 @@ dependencies {
     implementation(libs.androidx.viewpager)
     implementation(libs.androidx.viewpager2)
     implementation(libs.androidx.webkit)
+    implementation(libs.androidx.work.core)
+    implementation(libs.androidx.work.ktx)
 
     // Firebase
     implementation(libs.firebase.analytics)
