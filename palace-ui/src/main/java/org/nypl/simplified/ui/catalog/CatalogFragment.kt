@@ -624,54 +624,58 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
   final override fun onBookRequestRevoke(
     book: Book
   ) {
-    val services =
-      Services.serviceDirectory()
-    val books =
-      services.requireService(BooksControllerType::class.java)
-    val profiles =
-      services.requireService(ProfilesControllerType::class.java)
+    try {
+      val services =
+        Services.serviceDirectory()
+      val books =
+        services.requireService(BooksControllerType::class.java)
+      val profiles =
+        services.requireService(ProfilesControllerType::class.java)
 
-    val accountID =
-      book.account
-    val account =
-      profiles.profileCurrent()
-        .account(accountID)
-    val context =
-      this.requireContext()
+      val accountID =
+        book.account
+      val account =
+        profiles.profileCurrent()
+          .account(accountID)
+      val context =
+        this.requireContext()
 
-    fun go() {
-      if (this.isLoginRequired(accountID)) {
-        MainNavigation.showLoginDialog(account)
+      fun go() {
+        if (this.isLoginRequired(accountID)) {
+          MainNavigation.showLoginDialog(account)
 
-        AccountDetailModel.executeAfterLogin(
-          accountID = accountID,
-          runOnLogin = {
-            this.logger.debug("User logged in. Continuing revoke.")
-            books.bookRevoke(
-              accountID = accountID,
-              bookId = book.id,
-            )
+          AccountDetailModel.executeAfterLogin(
+            accountID = accountID,
+            runOnLogin = {
+              this.logger.debug("User logged in. Continuing revoke.")
+              books.bookRevoke(
+                accountID = accountID,
+                bookId = book.id,
+              )
 
-            UIThread.runOnUIThread {
-              MainNavigation.requestTabChangeForPart(this.catalogPart)
-              MainNavigation.Settings.goUp()
+              UIThread.runOnUIThread {
+                MainNavigation.requestTabChangeForPart(this.catalogPart)
+                MainNavigation.Settings.goUp()
+              }
             }
-          }
-        )
-      } else {
-        books.bookRevoke(
-          accountID = accountID,
-          bookId = book.id,
-        )
+          )
+        } else {
+          books.bookRevoke(
+            accountID = accountID,
+            bookId = book.id,
+          )
+        }
       }
-    }
 
-    MaterialAlertDialogBuilder(context)
-      .setMessage(context.getString(R.string.catalogReturnConfirm, book.entry.title))
-      .setNegativeButton(R.string.catalogCancel) { dialog, _ -> dialog.dismiss() }
-      .setPositiveButton(R.string.catalogReturn) { _, _ -> go() }
-      .create()
-      .show()
+      MaterialAlertDialogBuilder(context)
+        .setMessage(context.getString(R.string.catalogReturnConfirm, book.entry.title))
+        .setNegativeButton(R.string.catalogCancel) { dialog, _ -> dialog.dismiss() }
+        .setPositiveButton(R.string.catalogReturn) { _, _ -> go() }
+        .create()
+        .show()
+    } catch (e: Throwable) {
+      this.logger.debug("Failed to request book revocation: ", e)
+    }
   }
 
   final override fun onBookRequestViewerOpen(
@@ -1055,7 +1059,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
     }
   }
 
-  override fun onIsBookDeletable(
+  final override fun onIsBookDeletable(
     book: Book
   ): Boolean {
     return try {
