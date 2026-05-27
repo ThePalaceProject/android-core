@@ -186,6 +186,10 @@ class ProfileAccountLoginTask(
     )
 
     val exception = Exception()
+    val problemReport = result.properties.problemReport
+    val attributes = problemReport?.toMap()
+    this.steps.addAttributesIfPresent(attributes)
+
     when (result.properties.status) {
       HttpURLConnection.HTTP_UNAUTHORIZED -> {
         this.steps.currentStepFailed(
@@ -198,7 +202,6 @@ class ProfileAccountLoginTask(
       }
 
       else -> {
-        this.steps.addAttributesIfPresent(result.properties.problemReport?.toMap())
         this.steps.currentStepFailed(
           message = "Server error: ${result.properties.status} ${result.properties.message}",
           errorCode = "httpError ${result.properties.status} $uri",

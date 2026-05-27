@@ -22,6 +22,7 @@ import org.nypl.simplified.ui.accounts.saml20.AccountSAML20Model
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.main.MainNavigation
 import org.slf4j.LoggerFactory
+import java.util.SortedMap
 import java.util.UUID
 import java.util.concurrent.atomic.AtomicReference
 
@@ -105,6 +106,7 @@ object AccountDetailModel {
   @UiThread
   fun openErrorPage(
     activity: Activity,
+    attributes: SortedMap<String, String>,
     taskSteps: List<TaskStep>
   ) {
     UIThread.checkIsUIThread()
@@ -120,7 +122,7 @@ object AccountDetailModel {
         emailAddress = buildConfig.supportErrorReportEmailAddress,
         body = "",
         subject = "[palace-error-report]",
-        attributes = sortedMapOf(),
+        attributes = attributes,
         taskSteps = taskSteps
       )
     )

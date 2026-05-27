@@ -774,7 +774,11 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
 
         this.loginButtonErrorDetails.visibility = View.VISIBLE
         this.loginButtonErrorDetails.setOnClickListener {
-          AccountDetailModel.openErrorPage(this.requireActivity(), loginState.taskResult.steps)
+          AccountDetailModel.openErrorPage(
+            activity = this.requireActivity(),
+            attributes = loginState.taskResult.attributes.toSortedMap(),
+            taskSteps = loginState.taskResult.steps
+          )
         }
         this.authenticationAlternativesShow()
       }
@@ -891,7 +895,11 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
 
         this.loginButtonErrorDetails.visibility = View.VISIBLE
         this.loginButtonErrorDetails.setOnClickListener {
-          AccountDetailModel.openErrorPage(this.requireActivity(), loginState.taskResult.steps)
+          AccountDetailModel.openErrorPage(
+            activity = this.requireActivity(),
+            attributes = loginState.taskResult.attributes.toSortedMap(),
+            taskSteps = loginState.taskResult.steps
+          )
         }
       }
     }
