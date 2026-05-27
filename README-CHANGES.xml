@@ -1208,11 +1208,16 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-05-26T08:58:52+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.30.0">
+    <c:release date="2026-05-27T13:59:24+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.30.0">
       <c:changes>
-        <c:change date="2026-05-26T08:58:52+00:00" summary="Periodically sync accounts in the background">
+        <c:change date="2026-05-26T00:00:00+00:00" summary="Periodically sync accounts in the background">
           <c:tickets>
             <c:ticket id="PP-4283"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-05-27T13:59:24+00:00" summary="Ensure authentication errors show problem reports.">
+          <c:tickets>
+            <c:ticket id="PP-4409"/>
           </c:tickets>
         </c:change>
       </c:changes>
