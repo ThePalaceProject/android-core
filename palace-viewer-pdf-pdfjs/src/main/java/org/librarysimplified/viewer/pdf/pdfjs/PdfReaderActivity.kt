@@ -253,6 +253,24 @@ class PdfReaderActivity : AppCompatActivity() {
       "PDFListener"
     )
 
+    /*
+     * Disable long clicking when DRM exists.
+     */
+
+    when (this.bookFormat.drmInformation) {
+      is BookDRMInformation.ACS,
+      is BookDRMInformation.Boundless,
+      is BookDRMInformation.LCP -> {
+        this.webView.isLongClickable = false
+        this.webView.setOnLongClickListener {
+          true
+        }
+      }
+      BookDRMInformation.None -> {
+        // Nothing required
+      }
+    }
+
     this.pdfReaderContainer = this.findViewById(R.id.pdf_reader_container)
     this.pdfReaderContainer.addView(this.webView)
   }
