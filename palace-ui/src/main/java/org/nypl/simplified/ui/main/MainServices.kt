@@ -132,6 +132,7 @@ import org.thepalaceproject.opds.client.OPDSClientParameters
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
+import java.time.Duration
 import java.time.OffsetDateTime
 import java.time.ZoneOffset.UTC
 import java.util.ServiceLoader
@@ -503,6 +504,8 @@ internal object MainServices {
     context: Application,
     onProgress: (BootEvent) -> Unit
   ): ServiceDirectoryType {
+    val bootTimeStart = OffsetDateTime.now()
+
     fun publishEvent(message: String) {
       logger.debug("boot: {}", message)
       onProgress.invoke(BootEvent.BootInProgress(message))
@@ -523,8 +526,12 @@ internal object MainServices {
       serviceConstructor: () -> T
     ): T {
       publishEvent(message)
+      val timeThen = OffsetDateTime.now()
       val service = serviceConstructor.invoke()
       services.addService(interfaceType, service)
+      val timeNow = OffsetDateTime.now()
+      val duration = Duration.between(timeThen, timeNow)
+      logger.debug("[{}]: Service startup duration: {}", message, duration)
       return service
     }
 
@@ -1061,6 +1068,10 @@ internal object MainServices {
     }
 
     MainSyncService.start(MainApplication.application)
+
+    val bootTimeEnd = OffsetDateTime.now()
+    val bootDuration = Duration.between(bootTimeStart, bootTimeEnd)
+    logger.debug("Boot duration: {}", bootDuration)
     return finalServices
   }
 
