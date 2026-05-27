@@ -1386,8 +1386,10 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
   }
 
   final override fun onBackButtonPressed(): Result {
-    if (!this.opdsClient.hasHistory) {
-      return BACK_BUTTON_NOT_CONSUMED
+    if (this::opdsClient.isInitialized) {
+      if (!this.opdsClient.hasHistory) {
+        return BACK_BUTTON_NOT_CONSUMED
+      }
     }
 
     this.onToolbarBackPressed()
