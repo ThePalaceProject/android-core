@@ -43,7 +43,6 @@ import org.librarysimplified.audiobook.views.PlayerBookmarkModel
 import org.librarysimplified.audiobook.views.PlayerFragment
 import org.librarysimplified.audiobook.views.PlayerModel
 import org.librarysimplified.audiobook.views.PlayerModelState
-import org.librarysimplified.audiobook.views.PlayerPlaybackRateFragment
 import org.librarysimplified.audiobook.views.PlayerSleepTimerFragment
 import org.librarysimplified.audiobook.views.PlayerTOCFragment
 import org.librarysimplified.audiobook.views.PlayerViewCommand
@@ -640,7 +639,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       }
 
       PlayerViewCommand.PlayerViewNavigationPlaybackRateMenuOpen -> {
-        this.popupFragment(PlayerPlaybackRateFragment())
+        // No longer used.
       }
 
       PlayerViewCommand.PlayerViewNavigationSleepMenuOpen -> {

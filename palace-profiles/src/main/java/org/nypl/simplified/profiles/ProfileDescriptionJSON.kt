@@ -59,7 +59,11 @@ object ProfileDescriptionJSON {
     file: File,
     mostRecentAccountFallback: AccountID
   ): ProfileDescription {
-    return this.deserializeFromText(jom, FileUtilities.fileReadUTF8(file), mostRecentAccountFallback)
+    return this.deserializeFromText(
+      jom,
+      FileUtilities.fileReadUTF8(file),
+      mostRecentAccountFallback
+    )
   }
 
   /**
@@ -384,7 +388,21 @@ object ProfileDescriptionJSON {
     )
 
     return map.mapValues { entry ->
-      PlayerPlaybackRate.valueOf(entry.value)
+      try {
+        // Description values used to be named. Now they are double values.
+        when (entry.value) {
+          "NORMAL_TIME" -> PlayerPlaybackRate(1.0)
+          "THREE_QUARTERS_TIME" -> PlayerPlaybackRate(0.75)
+          "ONE_AND_A_QUARTER_TIME" -> PlayerPlaybackRate(1.25)
+          "ONE_AND_A_HALF_TIME" -> PlayerPlaybackRate(1.5)
+          "DOUBLE_TIME" -> PlayerPlaybackRate(2.0)
+          else -> {
+            PlayerPlaybackRate(entry.value.toDouble())
+          }
+        }
+      } catch (_: Throwable) {
+        PlayerPlaybackRate(1.0)
+      }
     }
   }
 
@@ -479,7 +497,7 @@ object ProfileDescriptionJSON {
   ): ObjectNode {
     val objectNode = objectMapper.createObjectNode()
     playbackRates.keys.forEach { key ->
-      objectNode.put(key, playbackRates[key]?.name)
+      objectNode.put(key, playbackRates[key]?.speed)
     }
     return objectNode
   }
