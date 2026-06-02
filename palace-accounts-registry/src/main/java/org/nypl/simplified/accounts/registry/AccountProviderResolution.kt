@@ -412,7 +412,7 @@ class AccountProviderResolution(
     }
   }
 
-  private fun fetchAuthDocument(
+  fun fetchAuthDocument(
     taskRecorder: TaskRecorderType,
     onProgress: AccountProviderResolutionListenerType
   ): AuthenticationDocument? {

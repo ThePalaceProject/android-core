@@ -3,15 +3,26 @@ package org.nypl.simplified.ui.settings
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import android.widget.TableLayout
 import android.widget.TableRow
 import android.widget.TextView
+import androidx.annotation.UiThread
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.common.util.concurrent.MoreExecutors
 import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.jmulticlose.core.CloseableCollectionType
+import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
+import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.adobe.extensions.AdobeDRMExtensions
+import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
+import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
+import org.nypl.simplified.taskrecorder.api.TaskResult
+import org.nypl.simplified.threads.UIThread
+import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_CONSUMED
 import org.nypl.simplified.ui.main.MainNavigation
@@ -46,6 +57,8 @@ class SettingsDebugMenuDRMFragment : Fragment(R.layout.debug_drm), MainBackButto
     return BACK_BUTTON_CONSUMED
   }
 
+  private lateinit var adobeResetButton: Button
+  private lateinit var adobeResetTitle: TextView
   private lateinit var enableLCPManualPassphrase: SwitchCompat
   private lateinit var adobeDRMActivationTable: TableLayout
   private lateinit var drmTable: TableLayout
@@ -78,10 +91,39 @@ class SettingsDebugMenuDRMFragment : Fragment(R.layout.debug_drm), MainBackButto
     )
     this.enableLCPManualPassphrase =
       view.findViewById(R.id.debugDRMLCPManualPassphraseEnabled)
+
+    this.adobeResetTitle =
+      view.findViewById(R.id.debugDRMResetAdobeIDText)
+    this.adobeResetButton =
+      view.findViewById(R.id.debugDRMResetAdobeIDButton)
   }
 
   override fun onStart() {
     super.onStart()
+
+    try {
+      val services =
+        Services.serviceDirectory()
+      val profiles =
+        services.requireService(ProfilesControllerType::class.java)
+      val profile =
+        profiles.profileCurrent()
+      val account =
+        profile.mostRecentAccount()
+
+      this.adobeResetTitle.text =
+        this.resources.getString(
+          R.string.debugDRMAdobeIDResetWithAccount,
+          account.provider.displayName
+        )
+      this.adobeResetButton.setOnClickListener {
+        this.onAdobeResetButtonClicked(profiles, account)
+      }
+      this.adobeResetButton.isEnabled = true
+    } catch (e: Throwable) {
+      this.adobeResetTitle.text = ""
+      this.adobeResetButton.isEnabled = false
+    }
 
     this.subscriptions = CloseableCollection.create()
     this.subscriptions.add(
@@ -99,6 +141,71 @@ class SettingsDebugMenuDRMFragment : Fragment(R.layout.debug_drm), MainBackButto
         prefs.copy(isLCPManualPassphraseEnabled = isChecked)
       }
     }
+  }
+
+  private fun onAdobeResetButtonClicked(
+    profiles: ProfilesControllerType,
+    account: AccountType
+  ) {
+    val dialog =
+      MaterialAlertDialogBuilder(this.requireActivity())
+        .setTitle(R.string.debugDRMAdobeIDResetConfirmTitle)
+        .setMessage(
+          this.getString(R.string.debugDRMAdobeIDResetConfirmation, account.provider.displayName)
+        )
+        .setNegativeButton(R.string.Dismiss) { dialog, _ ->
+          dialog.dismiss()
+        }
+        .setPositiveButton(R.string.debugDRMAdobeIDResetReset) { dialog, _ ->
+          this.doAdobeReset(profiles, account)
+          dialog.dismiss()
+        }.create()
+
+    dialog.show()
+  }
+
+  private fun doAdobeReset(
+    profiles: ProfilesControllerType,
+    account: AccountType
+  ) {
+    UIThread.runOnUIThread { this.adobeResetButton.isEnabled = false }
+
+    val future = profiles.profileAccountAdobeIDReset(account.id)
+    future.addListener({
+      UIThread.runOnUIThread { this.adobeResetButton.isEnabled = true }
+
+      when (val result = future.get()) {
+        is TaskResult.Failure<*> -> {
+          UIThread.runOnUIThread {
+            this.showError(result)
+          }
+        }
+        is TaskResult.Success<*> -> {
+          profiles.profileAccountLogout(account.id)
+        }
+      }
+    }, MoreExecutors.directExecutor())
+  }
+
+  @UiThread
+  private fun showError(
+    result: TaskResult.Failure<*>
+  ) {
+    val services =
+      Services.serviceDirectory()
+    val buildConfig =
+      services.requireService(BuildConfigurationServiceType::class.java)
+
+    val parameters =
+      ErrorPageParameters(
+        emailAddress = buildConfig.supportErrorReportEmailAddress,
+        body = "",
+        subject = "[palace-error-report]",
+        attributes = result.attributes.toSortedMap(),
+        taskSteps = result.steps
+      )
+
+    MainNavigation.openErrorPage(this.requireActivity(), parameters)
   }
 
   override fun onStop() {

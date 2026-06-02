@@ -19,6 +19,7 @@ import org.nypl.simplified.accounts.api.AccountEventUpdated
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountLoginStringResourcesType
 import org.nypl.simplified.accounts.api.AccountLogoutStringResourcesType
+import org.nypl.simplified.accounts.api.AccountProviderResolutionStringsType
 import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.accounts.database.api.AccountsDatabaseNonexistentException
@@ -49,6 +50,7 @@ import org.nypl.simplified.futures.FluentFutureExtensions
 import org.nypl.simplified.futures.FluentFutureExtensions.flatMap
 import org.nypl.simplified.futures.FluentFutureExtensions.map
 import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
+import org.nypl.simplified.opds.auth_document.api.AuthenticationDocumentParsersType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSFeedParserType
 import org.nypl.simplified.patron.api.PatronUserProfileParsersType
@@ -432,6 +434,25 @@ class Controller private constructor(
       return this.profileCurrent().account(bookWithStatus.book.account)
     }
     throw UnreachableCodeException()
+  }
+
+  override fun profileAccountAdobeIDReset(
+    id: AccountID
+  ): FluentFuture<TaskResult<*>> {
+    val strings =
+      this.services.requireService(AccountProviderResolutionStringsType::class.java)
+    val parsers =
+      this.services.requireService(AuthenticationDocumentParsersType::class.java)
+
+    return this.submitTask(
+      ProfileAccountResetAdobeIDTask(
+        accountID = id,
+        http = this.lsHttp,
+        profile = this.profileCurrent(),
+        accountProviderResolutionStrings = strings,
+        authDocumentParsers = parsers
+      )
+    )
   }
 
   override fun bookBorrow(

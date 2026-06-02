@@ -100,4 +100,8 @@ data class AuthenticationDocument(
     this.links.find { link ->
       link.relation == "http://librarysimplified.org/terms/rel/patron-password-reset"
     }?.hrefURI
+
+  val adobeResetURI: URI? =
+    this.links.find { link -> link.relation == "http://palaceproject.io/terms/rel/delete-adobe-id" }
+      ?.hrefURI
 }

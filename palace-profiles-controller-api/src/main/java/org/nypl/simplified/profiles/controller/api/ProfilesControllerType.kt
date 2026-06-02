@@ -183,4 +183,10 @@ interface ProfilesControllerType {
    */
 
   fun profileAccountForBook(bookID: BookID): AccountType
+
+  /**
+   * Reset the Adobe ID for the given account.
+   */
+
+  fun profileAccountAdobeIDReset(id: AccountID): FluentFuture<TaskResult<*>>
 }

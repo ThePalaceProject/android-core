@@ -120,4 +120,8 @@ class MockProfilesController(
   override fun profileAccountForBook(bookID: BookID): AccountType {
     return TODO()
   }
+
+  override fun profileAccountAdobeIDReset(id: AccountID): FluentFuture<TaskResult<*>> {
+    return FluentFuture.from(SettableFuture.create())
+  }
 }

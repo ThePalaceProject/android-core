@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <string name="debugDRMAdobeIDResetReset">Reset</string>
+    <string name="debugDRMAdobeIDReset">Reset Adobe ID</string>
+    <string name="debugDRMAdobeIDResetConfirmTitle">Reset Adobe ID?</string>
+    <string name="debugDRMAdobeIDResetWithAccount">Clicking the button below will reset your Adobe ID for library \'%1$s\'.</string>
+    <string name="debugDRMAdobeIDResetConfirmation">
+        Are you sure you want to reset your Adobe ID for library \'%1$s\'?
+        Resetting the Adobe ID will remove all of your loans and log you out.
+    </string>
+</resources>
