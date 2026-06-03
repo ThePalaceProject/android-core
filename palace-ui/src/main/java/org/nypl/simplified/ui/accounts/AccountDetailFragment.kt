@@ -692,7 +692,6 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
 
       is AccountNotLoggedIn -> {
         this.loginProgress.visibility = View.GONE
-        this.authenticationViews.blank()
 
         this.setLoginLogoutButtonStatus(
           loginStatus = AsLoginButtonEnabled {
@@ -1193,6 +1192,12 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
   }
 
   override fun onBackButtonPressed(): Result {
+    try {
+      this.authenticationViews.blank()
+    } catch (e: Throwable) {
+      // Nothing required.
+    }
+
     MainNavigation.Settings.goUp()
     return BACK_BUTTON_CONSUMED
   }
