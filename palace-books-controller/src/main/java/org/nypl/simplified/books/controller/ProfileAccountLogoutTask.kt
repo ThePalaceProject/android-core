@@ -34,7 +34,6 @@ import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
-import org.nypl.simplified.opds.core.getOrNull
 import org.nypl.simplified.patron.PatronUserProfiles
 import org.nypl.simplified.patron.api.PatronDRMAdobe
 import org.nypl.simplified.patron.api.PatronUserProfileParsersType
@@ -152,11 +151,13 @@ class ProfileAccountLogoutTask(
         this.steps.currentStepSucceeded("Not applicable.")
         return
       }
+
       is AccountProviderAuthenticationDescription.OpenIDConnect -> {
         val targetLink = when (val link = description.logout) {
           is Link.LinkBasic -> {
             link.href
           }
+
           is Link.LinkTemplated -> {
             val target = AccountOIDC.oidcCallbackLogoutURI(this.account.id)
             val text = link.href.replace("{&post_logout_redirect_uri}", "")
@@ -165,6 +166,7 @@ class ProfileAccountLogoutTask(
             uriBuilder.append(URLEncoder.encode(target.toString(), "UTF-8"))
             URI.create(uriBuilder.toString())
           }
+
           null -> {
             null
           }
@@ -195,6 +197,7 @@ class ProfileAccountLogoutTask(
               extraMessages = listOf()
             )
           }
+
           is LSHTTPResponseStatus.Responded.Error -> {
             this.steps.addAttributesIfPresent(status.properties.problemReport?.toMap())
             this.steps.currentStepFailed(
@@ -204,6 +207,7 @@ class ProfileAccountLogoutTask(
               extraMessages = listOf()
             )
           }
+
           is LSHTTPResponseStatus.Responded.OK -> {
             this.steps.currentStepSucceeded("Server accepted the logout request.")
           }
@@ -452,7 +456,7 @@ class ProfileAccountLogoutTask(
 
       try {
         val entry = account.bookDatabase.entry(book)
-        val alternate = entry.book.entry.alternate.getOrNull()
+        val alternate = entry.book.entry.alternate
         if (alternate == null) {
           this.error("no alternate link available for book $book. skipping...")
           val message = this.logoutStrings.logoutNoAlternateLinkInDatabase

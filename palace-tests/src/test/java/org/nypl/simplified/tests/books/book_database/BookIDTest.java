@@ -1,7 +1,5 @@
 package org.nypl.simplified.tests.books.book_database;
 
-import com.io7m.jfunctional.Option;
-import com.io7m.jfunctional.OptionType;
 import com.io7m.jnull.NullCheck;
 
 import org.joda.time.DateTime;
@@ -13,13 +11,10 @@ import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry;
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryBuilderType;
 import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess;
 
-import java.net.URI;
-
 public final class BookIDTest {
 
   @Test
   public void testBookIDNew() {
-    final OptionType<URI> revoke = Option.none();
     final OPDSAcquisitionFeedEntryBuilderType eb =
       OPDSAcquisitionFeedEntry.newBuilder(
         "http://circulation.alpha.librarysimplified"
@@ -28,7 +23,7 @@ public final class BookIDTest {
           + "-298aaee0af7d",
         "1Q84",
         NullCheck.notNull(DateTime.now()),
-        OPDSAvailabilityOpenAccess.get(revoke));
+        OPDSAvailabilityOpenAccess.get(null));
     final OPDSAcquisitionFeedEntry e = eb.build();
     final BookID b = BookIDs.newFromOPDSEntry(e);
     System.out.println("book: " + b);

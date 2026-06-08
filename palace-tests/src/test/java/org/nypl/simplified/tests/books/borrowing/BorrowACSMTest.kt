@@ -38,8 +38,7 @@ import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.api.BookIDs
 import org.nypl.simplified.books.book_database.api.BookDRMInformationHandle
-import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle
-import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.*
+import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleEPUB
 import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatus

@@ -1,6 +1,5 @@
 package org.nypl.simplified.books.controller
 
-import com.io7m.jfunctional.Some
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPResponseStatus
 import org.librarysimplified.mdc.MDCKeys
@@ -39,7 +38,6 @@ import org.slf4j.MDC
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
-import java.net.URI
 import java.util.concurrent.TimeUnit
 
 class BookSyncTask(
@@ -334,9 +332,8 @@ class BookSyncTask(
     dbEntry: BookDatabaseEntryType
   ) {
     this.logger.debug("attempting to fetch book permalink to update registry")
-    val alternateOpt = dbEntry.book.entry.alternate
-    return if (alternateOpt is Some<URI>) {
-      val alternate = alternateOpt.get()
+    val alternate = dbEntry.book.entry.alternate
+    return if (alternate != null) {
       val entry =
         FeedLoading.loadSingleEntryFeed(
           feedLoader = this.feedLoader,

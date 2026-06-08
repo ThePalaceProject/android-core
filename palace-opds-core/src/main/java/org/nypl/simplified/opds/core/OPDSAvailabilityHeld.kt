@@ -1,7 +1,5 @@
 package org.nypl.simplified.opds.core
 
-import com.io7m.jfunctional.OptionType
-import com.io7m.jfunctional.Unit
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import java.net.URI
@@ -10,44 +8,16 @@ import java.net.URI
  * The book is on hold.
  */
 
-data class OPDSAvailabilityHeld private constructor(
-  val startDate: OptionType<DateTime>,
-  val position: OptionType<Int>,
-  private val endDate: OptionType<DateTime>,
-
+data class OPDSAvailabilityHeld constructor(
+  val startDate: DateTime?,
+  val position: Int?,
+  override val endDate: DateTime?,
   /**
    * @return A URI for revoking the hold, if any
    */
 
-  val revoke: OptionType<URI>
-
+  val revoke: URI?
 ) : OPDSAvailabilityType {
-
-  val startDateOrNull: DateTime?
-    get() = this.startDate.getOrNull()
-
-  val endDateOrNull: DateTime?
-    get() = this.endDate.getOrNull()
-
-  val revokeOrNull: URI?
-    get() = this.revoke.getOrNull()
-
-  val positionOrNull: Int?
-    get() = this.position.getOrNull()
-
-  /**
-   * @return The date that the hold will become unavailable
-   */
-
-  override fun getEndDate(): OptionType<DateTime> {
-    return this.endDate
-  }
-
-  override fun <A, E : Exception?> matchAvailability(
-    m: OPDSAvailabilityMatcherType<A, E>
-  ): A {
-    return m.onHeld(this)
-  }
 
   override fun toString(): String {
     val fmt = ISODateTimeFormat.dateTime()
@@ -55,14 +25,12 @@ data class OPDSAvailabilityHeld private constructor(
     b.append("[OPDSAvailabilityHeld position=")
     b.append(this.position)
     b.append(" start_date=")
-    this.startDate.map { e: DateTime? ->
-      b.append(fmt.print(e))
-      Unit.unit()
+    if (this.startDate != null) {
+      b.append(fmt.print(this.startDate))
     }
     b.append(" end_date=")
-    this.endDate.map { e: DateTime? ->
-      b.append(fmt.print(e))
-      Unit.unit()
+    if (this.endDate != null) {
+      b.append(fmt.print(this.endDate))
     }
     b.append(" revoke=")
     b.append(this.revoke)
@@ -83,10 +51,10 @@ data class OPDSAvailabilityHeld private constructor(
 
     @JvmStatic
     operator fun get(
-      startDate: OptionType<DateTime>,
-      position: OptionType<Int>,
-      endDate: OptionType<DateTime>,
-      revoke: OptionType<URI>
+      startDate: DateTime?,
+      position: Int?,
+      endDate: DateTime?,
+      revoke: URI?
     ): OPDSAvailabilityHeld {
       return OPDSAvailabilityHeld(
         startDate = startDate,

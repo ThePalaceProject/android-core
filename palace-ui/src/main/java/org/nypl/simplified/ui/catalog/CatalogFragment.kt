@@ -14,7 +14,6 @@ import androidx.paging.PagingConfig
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.io7m.jfunctional.Some
 import com.io7m.jmulticlose.core.CloseableCollection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -50,7 +49,6 @@ import org.nypl.simplified.opds.core.OPDSAvailabilityHeldReady
 import org.nypl.simplified.opds.core.OPDSAvailabilityHoldable
 import org.nypl.simplified.opds.core.OPDSAvailabilityLoanable
 import org.nypl.simplified.opds.core.OPDSAvailabilityLoaned
-import org.nypl.simplified.opds.core.OPDSAvailabilityMatcherType
 import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
 import org.nypl.simplified.opds.core.OPDSAvailabilityRevoked
 import org.nypl.simplified.profiles.controller.api.ProfileFeedRequest
@@ -260,13 +258,13 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
     view: CatalogFeedViewDetails2,
     newEntry: FeedEntry.FeedEntryOPDS
   ) {
-    val relatedOpt = newEntry.feedEntry.related
-    if (relatedOpt is Some<URI>) {
-      this.logger.debug("Loading related feed ({})", relatedOpt.get())
+    val related = newEntry.feedEntry.related
+    if (related != null) {
+      this.logger.debug("Loading related feed ({})", related)
       val relatedFuture =
         this.feedLoader.fetchURI(
           accountID = newEntry.accountID,
-          uri = relatedOpt.get(),
+          uri = related,
           credentials = null,
           method = "GET"
         )
@@ -1066,29 +1064,15 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
       val profile = this.profiles.profileCurrent()
       val account = profile.account(book.account)
       return if (account.bookDatabase.books().contains(book.id)) {
-        book.entry.availability.matchAvailability(
-          object : OPDSAvailabilityMatcherType<Boolean, Exception> {
-            override fun onHeldReady(availability: OPDSAvailabilityHeldReady): Boolean =
-              false
-
-            override fun onHeld(availability: OPDSAvailabilityHeld): Boolean =
-              false
-
-            override fun onHoldable(availability: OPDSAvailabilityHoldable): Boolean =
-              false
-
-            override fun onLoaned(availability: OPDSAvailabilityLoaned): Boolean =
-              availability.revoke.isNone && book.isDownloaded
-
-            override fun onLoanable(availability: OPDSAvailabilityLoanable): Boolean =
-              true
-
-            override fun onOpenAccess(availability: OPDSAvailabilityOpenAccess): Boolean =
-              true
-
-            override fun onRevoked(availability: OPDSAvailabilityRevoked): Boolean =
-              false
-          })
+        when (val availability = book.entry.availability) {
+          is OPDSAvailabilityHeld -> false
+          is OPDSAvailabilityHeldReady -> false
+          is OPDSAvailabilityHoldable -> false
+          is OPDSAvailabilityLoanable -> true
+          is OPDSAvailabilityLoaned -> availability.revoke == null && book.isDownloaded
+          is OPDSAvailabilityOpenAccess -> true
+          is OPDSAvailabilityRevoked -> false
+        }
       } else {
         false
       }

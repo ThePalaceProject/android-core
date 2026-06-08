@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <resources>
+    <string name="catalogAccessibilitySeriesLink">"%1$s". Click to see all entries in the series.</string>
     <string name="catalogAccessibilityFeedLoading">List of books is currently loading.</string>
     <string name="catalogAccessibilitySearchButtonClose">Close Search Button</string>
     <string name="catalogAccessibilityAccountSelection">Account Selection Button</string>
@@ -82,6 +83,7 @@
     <string name="catalogMetaUpdatedDate">Updated</string>
     <string name="catalogMetaDuration">Duration</string>
     <string name="catalogMetaLanguage">Language</string>
+    <string name="catalogMetaSeries">Series</string>
     <string name="catalogMore">More</string>
     <string name="catalogOperationFailed">The operation could not be completed.</string>
     <string name="catalogPlaceholder">Lorem ipsum dolor sit amet, probatus volutpat has at, vis adhuc iuvaret omittantur an, sadipscing conclusionemque his ad. Eam ut simul tempor. Primis consetetur appellantur vim eu, eum an iudico dolorum. Ad vis utamur honestatis, sanctus debitis referrentur an eam.</string>

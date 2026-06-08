@@ -3,7 +3,6 @@ package org.nypl.simplified.tests.books.controller
 import android.content.Context
 import com.google.common.util.concurrent.ListeningExecutorService
 import com.google.common.util.concurrent.MoreExecutors
-import com.io7m.jfunctional.Option
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okio.Buffer
@@ -15,7 +14,6 @@ import org.joda.time.Instant
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -78,13 +76,11 @@ import org.nypl.simplified.tests.mocking.MockRevokeStringResources
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
-import java.io.FileNotFoundException
 import java.io.IOException
 import java.net.URI
 import java.util.Collections
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.ConcurrentSkipListMap
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -227,7 +223,7 @@ class BookRevokeTaskTest {
         "a",
         "Title",
         DateTime.now(),
-        OPDSAvailabilityOpenAccess.get(Option.none())
+        OPDSAvailabilityOpenAccess.get(null)
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
@@ -326,7 +322,7 @@ class BookRevokeTaskTest {
         "a",
         "Title",
         DateTime.now(),
-        OPDSAvailabilityOpenAccess.get(Option.none())
+        OPDSAvailabilityOpenAccess.get(null)
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
@@ -493,7 +489,7 @@ class BookRevokeTaskTest {
         "a",
         "Title",
         DateTime.now(),
-        OPDSAvailabilityOpenAccess.get(Option.some(this.server.url("revoke").toUri()))
+        OPDSAvailabilityOpenAccess.get(this.server.url("revoke").toUri())
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
@@ -616,7 +612,7 @@ class BookRevokeTaskTest {
         "a",
         "Title",
         DateTime.now(),
-        OPDSAvailabilityOpenAccess.get(Option.some(this.server.url("revoke").toUri()))
+        OPDSAvailabilityOpenAccess.get(this.server.url("revoke").toUri())
       )
     opdsEntryBuilder.addAcquisition(acquisition)
     val opdsEntry = opdsEntryBuilder.build()
@@ -732,8 +728,8 @@ class BookRevokeTaskTest {
         "Title",
         DateTime.now(),
         OPDSAvailabilityHeldReady.get(
-          Option.none(),
-          Option.some(this.server.url("revoke").toUri())
+          null,
+          this.server.url("revoke").toUri()
         )
       )
     opdsEntryBuilder.addAcquisition(acquisition)
@@ -868,8 +864,8 @@ class BookRevokeTaskTest {
         "Title",
         DateTime.now(),
         OPDSAvailabilityHeldReady.get(
-          Option.none(),
-          Option.none()
+          null,
+          null
         )
       )
     opdsEntryBuilder.addAcquisition(acquisition)
@@ -966,10 +962,10 @@ class BookRevokeTaskTest {
         "Title",
         DateTime.now(),
         OPDSAvailabilityHeld.get(
-          Option.none(),
-          Option.none(),
-          Option.none(),
-          Option.some(this.server.url("revoke").toUri())
+          null,
+          null,
+          null,
+          this.server.url("revoke").toUri()
         )
       )
     opdsEntryBuilder.addAcquisition(acquisition)
@@ -1102,10 +1098,10 @@ class BookRevokeTaskTest {
         "Title",
         DateTime.now(),
         OPDSAvailabilityHeld.get(
-          Option.none(),
-          Option.none(),
-          Option.none(),
-          Option.none()
+          null,
+          null,
+          null,
+          null
         )
       )
     opdsEntryBuilder.addAcquisition(acquisition)
@@ -1226,9 +1222,9 @@ class BookRevokeTaskTest {
         "Title",
         DateTime.now(),
         OPDSAvailabilityLoaned.get(
-          Option.none(),
-          Option.none(),
-          Option.some(this.server.url("revoke").toUri())
+          null,
+          null,
+          this.server.url("revoke").toUri()
         )
       )
     opdsEntryBuilder.addAcquisition(acquisition)
@@ -1363,9 +1359,9 @@ class BookRevokeTaskTest {
         "Title",
         DateTime.now(),
         OPDSAvailabilityLoaned.get(
-          Option.none(),
-          Option.none(),
-          Option.none()
+          null,
+          null,
+          null
         )
       )
     opdsEntryBuilder.addAcquisition(acquisition)
@@ -1602,7 +1598,7 @@ class BookRevokeTaskTest {
         "a",
         "Title",
         DateTime.now(),
-        OPDSAvailabilityOpenAccess.get(Option.some(this.server.url("revoke").toUri()))
+        OPDSAvailabilityOpenAccess.get(this.server.url("revoke").toUri())
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
@@ -1718,7 +1714,7 @@ class BookRevokeTaskTest {
         "a",
         "Title",
         DateTime.now(),
-        OPDSAvailabilityOpenAccess.get(Option.some(this.server.url("revoke").toUri()))
+        OPDSAvailabilityOpenAccess.get(this.server.url("revoke").toUri())
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
@@ -1830,7 +1826,7 @@ class BookRevokeTaskTest {
         "a",
         "Title",
         DateTime.now(),
-        OPDSAvailabilityOpenAccess.get(Option.some(this.server.url("revoke").toUri()))
+        OPDSAvailabilityOpenAccess.get(this.server.url("revoke").toUri())
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
@@ -1949,7 +1945,7 @@ class BookRevokeTaskTest {
         "a",
         "Title",
         DateTime.now(),
-        OPDSAvailabilityOpenAccess.get(Option.some(this.server.url("revoke").toUri()))
+        OPDSAvailabilityOpenAccess.get(this.server.url("revoke").toUri())
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
@@ -2051,7 +2047,7 @@ class BookRevokeTaskTest {
         "a",
         "Title",
         DateTime.now(),
-        OPDSAvailabilityOpenAccess.get(Option.some(this.server.url("revoke").toUri()))
+        OPDSAvailabilityOpenAccess.get(this.server.url("revoke").toUri())
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
@@ -2158,7 +2154,7 @@ class BookRevokeTaskTest {
         "a",
         "Title",
         DateTime.now(),
-        OPDSAvailabilityOpenAccess.get(Option.some(this.server.url("revoke").toUri()))
+        OPDSAvailabilityOpenAccess.get(this.server.url("revoke").toUri())
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
@@ -2484,7 +2480,7 @@ class BookRevokeTaskTest {
         "a",
         "Title",
         DateTime.now(),
-        OPDSAvailabilityOpenAccess.get(Option.some(this.server.url("revoke").toUri()))
+        OPDSAvailabilityOpenAccess.get(this.server.url("revoke").toUri())
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
@@ -2613,7 +2609,7 @@ class BookRevokeTaskTest {
         "a",
         "Title",
         DateTime.now(),
-        OPDSAvailabilityOpenAccess.get(Option.some(this.server.url("revoke").toUri()))
+        OPDSAvailabilityOpenAccess.get(this.server.url("revoke").toUri())
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 

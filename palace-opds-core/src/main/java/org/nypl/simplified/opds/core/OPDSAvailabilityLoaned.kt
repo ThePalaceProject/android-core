@@ -1,6 +1,5 @@
 package org.nypl.simplified.opds.core
 
-import com.io7m.jfunctional.OptionType
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import java.net.URI
@@ -9,53 +8,30 @@ import java.net.URI
  * The book is loaned out to the user.
  */
 
-data class OPDSAvailabilityLoaned private constructor(
+data class OPDSAvailabilityLoaned(
 
   /**
    * @return The start date for the loan, if any
    */
 
-  val startDate: OptionType<DateTime>,
+  val startDate: DateTime?,
 
   /**
    * @return A URI for revoking the hold, if any
    */
 
-  val revoke: OptionType<URI>,
+  val revoke: URI?,
 
-  private val endDate: OptionType<DateTime>
+  override val endDate: DateTime?
 ) : OPDSAvailabilityType {
-
-  val startDateOrNull: DateTime?
-    get() = this.startDate.getOrNull()
-
-  val endDateOrNull: DateTime?
-    get() = this.endDate.getOrNull()
-
-  val revokeOrNull: URI?
-    get() = this.revoke.getOrNull()
-
-  /**
-   * @return The end date for the loan, if any
-   */
-
-  override fun getEndDate(): OptionType<DateTime> {
-    return this.endDate
-  }
-
-  override fun <A, E : Exception?> matchAvailability(
-    m: OPDSAvailabilityMatcherType<A, E>
-  ): A {
-    return m.onLoaned(this)
-  }
 
   override fun toString(): String {
     val fmt = ISODateTimeFormat.dateTime()
     val b = StringBuilder(128)
     b.append("[OPDSAvailabilityLoaned end_date=")
-    b.append(this.endDate.map { c: DateTime? -> fmt.print(c) })
+    b.append(this.endDate.let { c: DateTime? -> fmt.print(c) })
     b.append(" start_date=")
-    b.append(this.startDate.map { c: DateTime? -> fmt.print(c) })
+    b.append(this.startDate.let { c: DateTime? -> fmt.print(c) })
     b.append(" revoke=")
     b.append(this.revoke)
     b.append("]")
@@ -75,9 +51,9 @@ data class OPDSAvailabilityLoaned private constructor(
 
     @JvmStatic
     operator fun get(
-      startDate: OptionType<DateTime>,
-      endDate: OptionType<DateTime>,
-      revoke: OptionType<URI>
+      startDate: DateTime?,
+      endDate: DateTime?,
+      revoke: URI?
     ): OPDSAvailabilityLoaned {
       return OPDSAvailabilityLoaned(
         startDate = startDate,

@@ -14,23 +14,19 @@ import java.net.URI;
  * </p>
  */
 
-public interface OPDSFeedParserType
-{
+public interface OPDSFeedParserType {
   /**
    * Parse the feed associated with the given stream {@code s}. The feed
    * is assumed to exist at {@code uri}.
    *
-   * @param uri
-   *          The URI of the feed
-   * @param s
-   *          The input stream
+   * @param uri The URI of the feed
+   * @param s   The input stream
    * @return A parsed feed
-   * @throws OPDSParseException
-   *           On errors
+   * @throws OPDSParseException On errors
    */
 
   OPDSAcquisitionFeed parse(
     final URI uri,
     final InputStream s)
-      throws OPDSParseException;
+    throws OPDSParseException;
 }

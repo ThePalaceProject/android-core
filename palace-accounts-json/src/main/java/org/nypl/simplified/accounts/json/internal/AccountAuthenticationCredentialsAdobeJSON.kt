@@ -1,7 +1,6 @@
 package org.nypl.simplified.accounts.json.internal
 
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.io7m.jfunctional.Some
 import org.nypl.drm.core.AdobeDeviceID
 import org.nypl.drm.core.AdobeUserID
 import org.nypl.drm.core.AdobeVendorID
@@ -15,13 +14,11 @@ object AccountAuthenticationCredentialsAdobeJSON {
   fun deserializeAdobeCredentials(
     credsObj: ObjectNode
   ): AccountAuthenticationAdobePreActivationCredentials {
-    val activationOpt =
-      JSONParserUtilities.getObjectOptional(credsObj, "activation")
+    val activation =
+      JSONParserUtilities.getObjectOrNull(credsObj, "activation")
 
     val credsPost: AccountAuthenticationAdobePostActivationCredentials? =
-      if (activationOpt.isSome) {
-        val activation =
-          (activationOpt as Some<ObjectNode>).get()
+      if (activation != null) {
         AccountAuthenticationAdobePostActivationCredentials(
           AdobeDeviceID(JSONParserUtilities.getString(activation, "device_id")),
           AdobeUserID(JSONParserUtilities.getString(activation, "user_id"))

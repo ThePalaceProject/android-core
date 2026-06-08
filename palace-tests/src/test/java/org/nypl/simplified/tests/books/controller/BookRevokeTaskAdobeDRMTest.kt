@@ -3,7 +3,6 @@ package org.nypl.simplified.tests.books.controller
 import android.content.Context
 import com.google.common.util.concurrent.ListeningExecutorService
 import com.google.common.util.concurrent.MoreExecutors
-import com.io7m.jfunctional.Option
 import one.irradia.mime.api.MIMEType
 import one.irradia.mime.vanilla.MIMEParser
 import org.joda.time.DateTime
@@ -77,7 +76,6 @@ import java.io.InputStream
 import java.net.URI
 import java.util.Collections
 import java.util.UUID
-import java.util.concurrent.ConcurrentSkipListMap
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -254,7 +252,7 @@ class BookRevokeTaskAdobeDRMTest {
         "a",
         "Title",
         DateTime.now(),
-        OPDSAvailabilityOpenAccess.get(Option.none())
+        OPDSAvailabilityOpenAccess.get(null)
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
@@ -370,7 +368,7 @@ class BookRevokeTaskAdobeDRMTest {
         "a",
         "Title",
         DateTime.now(),
-        OPDSAvailabilityOpenAccess.get(Option.none())
+        OPDSAvailabilityOpenAccess.get(null)
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
@@ -487,7 +485,7 @@ class BookRevokeTaskAdobeDRMTest {
         "a",
         "Title",
         DateTime.now(),
-        OPDSAvailabilityOpenAccess.get(Option.none())
+        OPDSAvailabilityOpenAccess.get(null)
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
@@ -647,7 +645,7 @@ class BookRevokeTaskAdobeDRMTest {
         "a",
         "Title",
         DateTime.now(),
-        OPDSAvailabilityOpenAccess.get(Option.none())
+        OPDSAvailabilityOpenAccess.get(null)
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
@@ -796,7 +794,7 @@ class BookRevokeTaskAdobeDRMTest {
         "a",
         "Title",
         DateTime.now(),
-        OPDSAvailabilityOpenAccess.get(Option.none())
+        OPDSAvailabilityOpenAccess.get(null)
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
@@ -946,7 +944,7 @@ class BookRevokeTaskAdobeDRMTest {
         "a",
         "Title",
         DateTime.now(),
-        OPDSAvailabilityOpenAccess.get(Option.none())
+        OPDSAvailabilityOpenAccess.get(null)
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
@@ -1105,7 +1103,7 @@ class BookRevokeTaskAdobeDRMTest {
         "a",
         "Title",
         DateTime.now(),
-        OPDSAvailabilityOpenAccess.get(Option.none())
+        OPDSAvailabilityOpenAccess.get(null)
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
@@ -1239,7 +1237,7 @@ class BookRevokeTaskAdobeDRMTest {
         "a",
         "Title",
         DateTime.now(),
-        OPDSAvailabilityOpenAccess.get(Option.none())
+        OPDSAvailabilityOpenAccess.get(null)
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
@@ -1356,7 +1354,7 @@ class BookRevokeTaskAdobeDRMTest {
         "a",
         "Title",
         DateTime.now(),
-        OPDSAvailabilityOpenAccess.get(Option.none())
+        OPDSAvailabilityOpenAccess.get(null)
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 

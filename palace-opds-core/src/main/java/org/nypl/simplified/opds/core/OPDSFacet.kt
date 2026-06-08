@@ -1,6 +1,5 @@
 package org.nypl.simplified.opds.core
 
-import com.io7m.jfunctional.OptionType
 import java.io.Serializable
 import java.net.URI
 
@@ -40,7 +39,7 @@ data class OPDSFacet(
    * The group type
    */
 
-  val groupType: OptionType<String>
+  val groupType: String?
 ) : Serializable {
 
   companion object {

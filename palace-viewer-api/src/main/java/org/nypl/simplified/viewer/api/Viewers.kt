@@ -8,7 +8,6 @@ import org.nypl.simplified.analytics.api.AnalyticsEvent
 import org.nypl.simplified.analytics.api.AnalyticsType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
-import org.nypl.simplified.opds.core.getOrNull
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.viewer.spi.ViewerParameters
 import org.nypl.simplified.viewer.spi.ViewerProviderType
@@ -112,7 +111,7 @@ object Viewers {
             accountProvider = account.provider.id,
             accountUUID = account.id.uuid,
             opdsEntry = book.entry,
-            targetURI = book.entry.analytics.getOrNull(),
+            targetURI = book.entry.analytics,
             onAccessTokenUpdated = { accessToken ->
               account.updateBasicTokenCredentials(accessToken)
             }

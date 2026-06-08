@@ -3,9 +3,12 @@ package org.nypl.simplified.ui.catalog
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.Paint
 import android.graphics.PorterDuff
+import android.graphics.Typeface
 import android.graphics.drawable.BitmapDrawable
 import android.text.Html
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,7 +31,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.appbar.AppBarLayout
 import com.google.common.util.concurrent.MoreExecutors
-import com.io7m.jfunctional.Some
 import org.joda.time.DateTime
 import org.joda.time.Days
 import org.joda.time.Duration
@@ -105,21 +107,6 @@ class CatalogFeedViewDetails2(
       .appendMonthOfYear(2)
       .appendLiteral('-')
       .appendDayOfMonth(2)
-      .toFormatter()
-
-  private val dateTimeFormatter =
-    DateTimeFormatterBuilder()
-      .appendYear(4, 5)
-      .appendLiteral('-')
-      .appendMonthOfYear(2)
-      .appendLiteral('-')
-      .appendDayOfMonth(2)
-      .appendLiteral(' ')
-      .appendHourOfDay(2)
-      .appendLiteral(':')
-      .appendMinuteOfHour(2)
-      .appendLiteral(':')
-      .appendSecondOfMinute(2)
       .toFormatter()
 
   private val appBar =
@@ -592,11 +579,10 @@ class CatalogFeedViewDetails2(
     }
 
     val audience = entry.audience
-    if (audience.isSome) {
-      val audienceValue = (audience as Some<String>).get()
+    if (audience != null) {
       val (row, rowKey, rowVal) = this.bookInfoViewOf()
       rowKey.text = this.root.resources.getString(R.string.catalogMetaAudience)
-      rowVal.text = audienceValue
+      rowVal.text = audience
       this.metadata.addView(row)
     }
 
@@ -610,11 +596,10 @@ class CatalogFeedViewDetails2(
     }
 
     val language = entry.language
-    if (language.isSome) {
-      val languageValue = (language as Some<String>).get()
+    if (language != null) {
       val (row, rowKey, rowVal) = this.bookInfoViewOf()
       rowKey.text = this.root.resources.getString(R.string.catalogMetaLanguage)
-      rowVal.text = languageValue
+      rowVal.text = language
       this.metadata.addView(row)
     }
 
@@ -627,27 +612,26 @@ class CatalogFeedViewDetails2(
     }
 
     val duration = entry.duration
-    if (duration.isSome) {
-      val durationValue = (duration as Some<Double>).get()
+    if (duration != null) {
       val (row, rowKey, rowVal) = this.bookInfoViewOf()
       rowKey.text = this.root.resources.getString(R.string.catalogMetaDuration)
-      rowVal.text = this.formatDuration(durationValue)
+      rowVal.text = this.formatDuration(duration)
       this.metadata.addView(row)
     }
 
     val publishedOpt = entry.published
-    if (publishedOpt is Some<DateTime>) {
+    if (publishedOpt != null) {
       val (row, rowKey, rowVal) = this.bookInfoViewOf()
       rowKey.text = this.root.resources.getString(R.string.catalogMetaPublicationDate)
-      rowVal.text = this.dateFormatter.print(publishedOpt.get())
+      rowVal.text = this.dateFormatter.print(publishedOpt)
       this.metadata.addView(row)
     }
 
     val publisherOpt = entry.publisher
-    if (publisherOpt is Some<String>) {
+    if (publisherOpt != null) {
       val (row, rowKey, rowVal) = this.bookInfoViewOf()
       rowKey.text = this.root.resources.getString(R.string.catalogMetaPublisher)
-      rowVal.text = publisherOpt.get()
+      rowVal.text = publisherOpt
       this.metadata.addView(row)
     }
 
@@ -655,6 +639,38 @@ class CatalogFeedViewDetails2(
       val (row, rowKey, rowVal) = this.bookInfoViewOf()
       rowKey.text = this.root.resources.getString(R.string.catalogMetaDistributor)
       rowVal.text = entry.distribution
+      this.metadata.addView(row)
+    }
+
+    /*
+     * The series link is a clickable link to a series feed.
+     */
+
+    val series = entry.series
+    if (series != null) {
+      val (row, rowKey, rowVal) = this.bookInfoViewOf()
+      rowKey.text = this.root.resources.getString(R.string.catalogMetaSeries)
+      rowVal.text = series.name
+      rowVal.contentDescription = this.root.resources.getString(R.string.catalogAccessibilitySeriesLink, series.name)
+      rowVal.setTypeface(rowVal.typeface, Typeface.BOLD)
+      rowVal.paintFlags = rowVal.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+
+      val outValue = TypedValue()
+      rowVal.context.theme.resolveAttribute(
+        android.R.attr.selectableItemBackground,
+        outValue,
+        true
+      )
+      rowVal.setBackgroundResource(outValue.resourceId)
+      rowVal.setOnClickListener {
+        rowVal.postDelayed({
+          this.callbacks.onFeedSelected(
+            accountID = newEntry.accountID,
+            title = series.name,
+            uri = series.link
+          )
+        }, 250L)
+      }
       this.metadata.addView(row)
     }
   }

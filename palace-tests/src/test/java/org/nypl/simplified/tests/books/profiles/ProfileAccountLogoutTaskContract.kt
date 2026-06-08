@@ -1,7 +1,6 @@
 package org.nypl.simplified.tests.books.profiles
 
 import android.content.Context
-import com.io7m.jfunctional.Option
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okio.Buffer
@@ -30,7 +29,6 @@ import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountLoginState
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggedIn
-import org.nypl.simplified.accounts.api.AccountLoginState.AccountLogoutFailed
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountNotLoggedIn
 import org.nypl.simplified.accounts.api.AccountLogoutStringResourcesType
 import org.nypl.simplified.accounts.api.AccountPassword
@@ -133,7 +131,7 @@ abstract class ProfileAccountLogoutTaskContract {
           "a",
           "Title",
           DateTime.now(),
-          OPDSAvailabilityOpenAccess.get(Option.none())
+          OPDSAvailabilityOpenAccess.get(null)
         )
         .addAcquisition(acquisition)
         .build()

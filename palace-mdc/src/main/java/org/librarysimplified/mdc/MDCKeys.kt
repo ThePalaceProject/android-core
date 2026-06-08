@@ -1,7 +1,5 @@
 package org.librarysimplified.mdc
 
-import com.io7m.jfunctional.OptionType
-import com.io7m.jfunctional.Some
 import org.slf4j.MDC
 
 /**
@@ -93,9 +91,9 @@ object MDCKeys {
    * Convenience function to set optional values.
    */
 
-  fun put(key: String, value: OptionType<String>) {
-    if (value is Some<String>) {
-      MDC.put(key, value.get())
+  fun put(key: String, value: String?) {
+    if (value != null) {
+      MDC.put(key, value)
     }
   }
 }

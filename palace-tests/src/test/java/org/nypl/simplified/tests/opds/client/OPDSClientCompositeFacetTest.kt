@@ -1,14 +1,12 @@
 package org.nypl.simplified.tests.opds.client
 
 import android.content.Context
-import com.io7m.jfunctional.Option
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertInstanceOf
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -182,7 +180,7 @@ class OPDSClientCompositeFacetTest {
                   uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
                   group = "G",
                   title = "X",
-                  groupType = Option.none()
+                  groupType = null
                 )
               )
             ),
@@ -237,7 +235,7 @@ class OPDSClientCompositeFacetTest {
                   uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
                   group = "G",
                   title = "X",
-                  groupType = Option.none()
+                  groupType = null
                 )
               ),
               FeedFacet.FeedFacetOPDS12Single(
@@ -247,7 +245,7 @@ class OPDSClientCompositeFacetTest {
                   uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
                   group = "H",
                   title = "Y",
-                  groupType = Option.none()
+                  groupType = null
                 )
               )
             ),
@@ -302,7 +300,7 @@ class OPDSClientCompositeFacetTest {
                   uri = URI.create("http://127.0.0.1:${this.webServer.port}/facet-G-X.xml"),
                   group = "G",
                   title = "X",
-                  groupType = Option.none()
+                  groupType = null
                 )
               ),
               FeedFacet.FeedFacetOPDS12Single(
@@ -312,7 +310,7 @@ class OPDSClientCompositeFacetTest {
                   uri = URI.create("http://127.0.0.1:${this.webServer.port}/facet-H-Y.xml"),
                   group = "H",
                   title = "Y",
-                  groupType = Option.none()
+                  groupType = null
                 )
               )
             ),
@@ -367,7 +365,7 @@ class OPDSClientCompositeFacetTest {
                   uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
                   group = "G",
                   title = "X",
-                  groupType = Option.none()
+                  groupType = null
                 )
               ),
               FeedFacet.FeedFacetOPDS12Single(
@@ -377,7 +375,7 @@ class OPDSClientCompositeFacetTest {
                   uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
                   group = "H",
                   title = "Y",
-                  groupType = Option.none()
+                  groupType = null
                 )
               )
             ),

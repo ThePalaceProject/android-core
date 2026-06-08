@@ -1,7 +1,5 @@
 package org.nypl.simplified.feeds.api
 
-import com.io7m.jfunctional.OptionType
-import com.io7m.jfunctional.Some
 import org.joda.time.DateTime
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookID
@@ -169,7 +167,7 @@ sealed class Feed {
     val feedPrivacyPolicy: URI?,
 
     /**
-     * @return A link to the about, if any
+     * @return A link to the about page, if any
      */
 
     val feedAbout: URI?,
@@ -290,14 +288,6 @@ sealed class Feed {
       }
     }
 
-    private fun <T> mapNull(option: OptionType<T>): T? {
-      if (option is Some<T>) {
-        return option.get()
-      } else {
-        return null
-      }
-    }
-
     private fun withoutGroups(
       accountId: AccountID,
       feed: OPDSAcquisitionFeed,
@@ -318,15 +308,15 @@ sealed class Feed {
       val result =
         FeedWithoutGroups(
           feedID = feed.feedID,
-          feedNext = this.mapNull(feed.feedNext),
-          feedLicenses = this.mapNull(feed.feedLicenses),
+          feedNext = feed.feedNext,
+          feedLicenses = feed.feedLicenses,
           feedSearch = actualSearch,
           feedTitle = feed.feedTitle,
           feedUpdated = feed.feedUpdated,
           feedURI = feed.feedURI,
-          feedTermsOfService = this.mapNull(feed.feedTermsOfService),
-          feedPrivacyPolicy = this.mapNull(feed.feedPrivacyPolicy),
-          feedAbout = this.mapNull(feed.feedAbout),
+          feedTermsOfService = feed.feedTermsOfService,
+          feedPrivacyPolicy = feed.feedPrivacyPolicy,
+          feedAbout = feed.feedAbout,
           facetsByGroupData = facetsByGroup,
           facetsOrderData = facetsOrder
         )
@@ -369,15 +359,15 @@ sealed class Feed {
         feedTitle = feed.feedTitle,
         feedUpdated = feed.feedUpdated,
         feedURI = feed.feedURI,
-        feedTermsOfService = this.mapNull(feed.feedTermsOfService),
-        feedPrivacyPolicy = this.mapNull(feed.feedPrivacyPolicy),
-        feedAbout = this.mapNull(feed.feedAbout),
-        feedLicenses = this.mapNull(feed.feedLicenses),
-        feedNext = this.mapNull(feed.feedNext),
+        feedTermsOfService = feed.feedTermsOfService,
+        feedPrivacyPolicy = feed.feedPrivacyPolicy,
+        feedAbout = feed.feedAbout,
+        feedLicenses = feed.feedLicenses,
+        feedNext = feed.feedNext,
         facetsByGroupData = facetsByGroup,
         facetsOrderData = facetsOrder,
-        feedGroupsData = FeedGroup.fromOPDSGroups(accountId, filter, feed.feedGroups),
-        feedGroupsOrderData = feed.feedGroupsOrder
+        feedGroupsData = FeedGroup.fromOPDSGroups(accountId, filter, feed.feedGroups).toMutableMap(),
+        feedGroupsOrderData = feed.feedGroupsOrder.toMutableList()
       )
     }
 

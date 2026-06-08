@@ -2,7 +2,6 @@ package org.nypl.simplified.tests.books.book_database
 
 import android.app.Application
 import android.content.Context
-import com.io7m.jfunctional.Option
 import one.irradia.mime.vanilla.MIMEParser
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
@@ -297,7 +296,7 @@ abstract class BookDatabaseEPUBContract {
   }
 
   private fun acquisitionFeedEntryWithEPUB(): OPDSAcquisitionFeedEntry {
-    val revoke = Option.none<URI>()
+    val revoke = null
     val eb = OPDSAcquisitionFeedEntry.newBuilder(
       "abcd",
       "Title",

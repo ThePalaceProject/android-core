@@ -35,7 +35,7 @@ class BookAcquisitionSelectionTest {
 
     val groupEntry: Map.Entry<String, OPDSGroup> = feed.feedGroups.entries.iterator().next()
     val group = groupEntry.value
-    val entry = group.groupEntries[0]
+    val entry = group.entries[0]
 
     val acquisition = BookAcquisitionSelection.preferredAcquisition(entry.acquisitions)
     Assertions.assertNotNull(acquisition)

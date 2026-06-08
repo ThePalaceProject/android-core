@@ -1,7 +1,5 @@
 package org.nypl.simplified.books.controller
 
-import com.io7m.jfunctional.OptionType
-import com.io7m.jfunctional.Some
 import io.reactivex.subjects.Subject
 import one.irradia.mime.api.MIMEType
 import org.librarysimplified.http.api.LSHTTPClientType
@@ -273,15 +271,7 @@ class ProfileAccountCreateCustomOPDSTask(
 
   private fun findAuthenticationDocumentLink(feed: OPDSAcquisitionFeed): URI? {
     this.publishProgressEvent(this.taskRecorder.beginNewStep(this.strings.searchingFeedForAuthenticationDocument))
-    return this.someOrNull(feed.authDocument)
-  }
-
-  private fun <T> someOrNull(opt: OptionType<T>?): T? {
-    return if (opt is Some<T>) {
-      opt.get()
-    } else {
-      null
-    }
+    return feed.authDocument
   }
 
   private fun publishFailureEvent() =

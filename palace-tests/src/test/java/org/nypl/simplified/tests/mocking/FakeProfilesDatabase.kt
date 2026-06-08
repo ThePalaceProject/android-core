@@ -1,10 +1,8 @@
 package org.nypl.simplified.tests.mocking
 
-import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
 import java.io.File
-import java.util.TreeMap
 
 class FakeProfilesDatabase : ProfilesDatabaseType {
 

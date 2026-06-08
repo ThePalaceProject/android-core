@@ -3,7 +3,6 @@ package org.nypl.simplified.tests.http.refresh_token.revoke
 import android.content.Context
 import com.google.common.util.concurrent.ListeningExecutorService
 import com.google.common.util.concurrent.MoreExecutors
-import com.io7m.jfunctional.Option
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import one.irradia.mime.vanilla.MIMEParser
@@ -61,11 +60,9 @@ import org.nypl.simplified.tests.mocking.MockBookDatabaseEntry
 import org.nypl.simplified.tests.mocking.MockContentResolver
 import org.nypl.simplified.tests.mocking.MockRevokeStringResources
 import org.slf4j.LoggerFactory
-import java.io.FileNotFoundException
 import java.net.URI
 import java.nio.file.Path
 import java.util.UUID
-import java.util.concurrent.ConcurrentSkipListMap
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -178,9 +175,9 @@ class RevokeBookRefreshTokenTest {
         "Title",
         DateTime.now(),
         OPDSAvailabilityLoaned.get(
-          Option.none(),
-          Option.none(),
-          Option.some(this.webServer.url("revoke").toUri())
+          null,
+          null,
+          this.webServer.url("revoke").toUri()
         )
       )
     opdsEntryBuilder.addAcquisition(acquisition)

@@ -9,7 +9,6 @@ import org.librarysimplified.http.api.LSHTTPClientConfiguration
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPNetworkAccess
 import org.librarysimplified.http.vanilla.LSHTTPClients
-import org.librarysimplified.http.vanilla.internal.LSHTTPClient
 import org.mockito.Mockito
 import org.nypl.simplified.accounts.database.AccountAuthenticationCredentialsStore
 import org.nypl.simplified.accounts.database.AccountsDatabases
@@ -23,7 +22,6 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.util.zip.ZipInputStream
-import kotlin.jvm.java
 
 class AccountBug0613d7f6 {
 

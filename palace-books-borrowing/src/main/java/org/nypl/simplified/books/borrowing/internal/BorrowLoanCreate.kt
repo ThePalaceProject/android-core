@@ -21,7 +21,6 @@ import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.opdsFeedEnt
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.opdsFeedEntryLoanable
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.opdsFeedEntryParseError
 import org.nypl.simplified.books.borrowing.internal.BorrowHTTP.isMimeTypeAcceptable
-import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowReachedLoanLimit
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowRecoverableAuthenticationError
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskFailed
@@ -39,7 +38,6 @@ import org.nypl.simplified.opds.core.OPDSAvailabilityHeldReady
 import org.nypl.simplified.opds.core.OPDSAvailabilityHoldable
 import org.nypl.simplified.opds.core.OPDSAvailabilityLoanable
 import org.nypl.simplified.opds.core.OPDSAvailabilityLoaned
-import org.nypl.simplified.opds.core.OPDSAvailabilityMatcherType
 import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
 import org.nypl.simplified.opds.core.OPDSAvailabilityRevoked
 import org.nypl.simplified.opds.core.OPDSParseException
@@ -209,101 +207,100 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
   ) {
     context.taskRecorder.beginNewStep("Checking OPDS availability...")
 
-    return entry.availability.matchAvailability(
-      object : OPDSAvailabilityMatcherType<Unit, BorrowSubtaskException> {
-        override fun onHeldReady(a: OPDSAvailabilityHeldReady) {
-          context.taskRecorder.currentStepSucceeded("Book is held and ready.")
-          context.bookPublishStatus(
-            HeldReady(
-              id = context.bookCurrent.id,
-              endDate = a.endDateOrNull,
-              isRevocable = a.revoke.isSome
-            )
+    return when (val availability = entry.availability) {
+      is OPDSAvailabilityHeld -> {
+        context.taskRecorder.currentStepSucceeded("Book is held.")
+        context.bookPublishStatus(
+          HeldInQueue(
+            id = context.bookCurrent.id,
+            queuePosition = availability.position,
+            startDate = availability.startDate,
+            isRevocable = availability.revoke != null,
+            endDate = availability.endDate
           )
-          throw BorrowSubtaskHaltedEarly()
-        }
+        )
+        throw BorrowSubtaskHaltedEarly()
+      }
 
-        override fun onHeld(a: OPDSAvailabilityHeld) {
-          context.taskRecorder.currentStepSucceeded("Book is held.")
-          context.bookPublishStatus(
-            HeldInQueue(
-              id = context.bookCurrent.id,
-              queuePosition = a.positionOrNull,
-              startDate = a.startDateOrNull,
-              isRevocable = a.revoke.isSome,
-              endDate = a.endDateOrNull
-            )
+      is OPDSAvailabilityHeldReady -> {
+        context.taskRecorder.currentStepSucceeded("Book is held and ready.")
+        context.bookPublishStatus(
+          HeldReady(
+            id = context.bookCurrent.id,
+            endDate = availability.endDate,
+            isRevocable = availability.revoke != null
           )
-          throw BorrowSubtaskHaltedEarly()
-        }
+        )
+        throw BorrowSubtaskHaltedEarly()
+      }
 
-        /**
-         * If the book is available to be placed on hold, set the
-         * appropriate status.
-         *
-         * XXX: This should not occur in practice! Should this code be
-         * unreachable?
-         */
+      /**
+       * If the book is available to be placed on hold, set the
+       * appropriate status.
+       *
+       * XXX: This should not occur in practice! Should this code be
+       * unreachable?
+       */
 
-        override fun onHoldable(a: OPDSAvailabilityHoldable) {
-          context.taskRecorder.currentStepFailed(
-            message = "Book is unexpectedly holdable.",
-            errorCode = opdsFeedEntryHoldable,
-            extraMessages = listOf()
+      is OPDSAvailabilityHoldable -> {
+        context.taskRecorder.currentStepFailed(
+          message = "Book is unexpectedly holdable.",
+          errorCode = opdsFeedEntryHoldable,
+          extraMessages = listOf()
+        )
+        throw BorrowSubtaskFailed()
+      }
+
+      /**
+       * If the book claims to be only "loanable", then something is
+       * definitely wrong.
+       *
+       * XXX: This should not occur in practice! Should this code be
+       * unreachable?
+       */
+
+      is OPDSAvailabilityLoanable -> {
+        context.taskRecorder.currentStepFailed(
+          message = "Book is unexpectedly loanable.",
+          errorCode = opdsFeedEntryLoanable,
+          extraMessages = listOf()
+        )
+        throw BorrowSubtaskFailed()
+      }
+
+      is OPDSAvailabilityLoaned -> {
+        context.taskRecorder.currentStepSucceeded("Book is loaned.")
+        context.bookPublishStatus(
+          LoanedNotDownloaded(
+            id = context.bookCurrent.id,
+            loanExpiryDate = availability.endDate,
+            returnable = availability.revoke != null,
+            isOpenAccess = false
           )
-          throw BorrowSubtaskFailed()
-        }
+        )
+      }
 
-        override fun onLoaned(a: OPDSAvailabilityLoaned) {
-          context.taskRecorder.currentStepSucceeded("Book is loaned.")
-          context.bookPublishStatus(
-            LoanedNotDownloaded(
-              id = context.bookCurrent.id,
-              loanExpiryDate = a.endDateOrNull,
-              returnable = a.revoke.isSome,
-              isOpenAccess = false
-            )
+      is OPDSAvailabilityOpenAccess -> {
+        context.taskRecorder.currentStepSucceeded("Book is open access.")
+        context.bookPublishStatus(
+          LoanedNotDownloaded(
+            id = context.bookCurrent.id,
+            loanExpiryDate = availability.endDate,
+            returnable = availability.revoke != null,
+            isOpenAccess = true
           )
-        }
+        )
+      }
 
-        /**
-         * If the book claims to be only "loanable", then something is
-         * definitely wrong.
-         *
-         * XXX: This should not occur in practice! Should this code be
-         * unreachable?
-         */
+      /**
+       * The server cannot return a "revoked" representation. Reaching
+       * this code indicates a serious bug in the application.
+       */
 
-        override fun onLoanable(a: OPDSAvailabilityLoanable) {
-          context.taskRecorder.currentStepFailed(
-            message = "Book is unexpectedly loanable.",
-            errorCode = opdsFeedEntryLoanable,
-            extraMessages = listOf()
-          )
-          throw BorrowSubtaskFailed()
-        }
-
-        override fun onOpenAccess(a: OPDSAvailabilityOpenAccess) {
-          context.taskRecorder.currentStepSucceeded("Book is open access.")
-          context.bookPublishStatus(
-            LoanedNotDownloaded(
-              id = context.bookCurrent.id,
-              loanExpiryDate = a.endDateOrNull,
-              returnable = a.revoke.isSome,
-              isOpenAccess = true
-            )
-          )
-        }
-
-        /**
-         * The server cannot return a "revoked" representation. Reaching
-         * this code indicates a serious bug in the application.
-         */
-
-        override fun onRevoked(a: OPDSAvailabilityRevoked) {
-          throw UnreachableCodeException()
-        }
-      })
+      is OPDSAvailabilityRevoked -> {
+        throw UnreachableCodeException()
+      }
+    }
   }
 
   private fun parseOPDSFeedEntry(

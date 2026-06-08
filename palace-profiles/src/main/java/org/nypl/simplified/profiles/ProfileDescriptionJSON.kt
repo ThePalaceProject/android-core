@@ -4,11 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.io7m.jfunctional.None
-import com.io7m.jfunctional.OptionType
-import com.io7m.jfunctional.OptionVisitorType
-import com.io7m.jfunctional.Some
-import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormatter
 import org.joda.time.format.DateTimeFormatterBuilder
 import org.librarysimplified.audiobook.api.PlayerPlaybackRate
@@ -299,9 +294,9 @@ object ProfileDescriptionJSON {
       JSONParserUtilities.getBooleanDefault(preferencesNode, "show-testing-libraries", false)
 
     val dateOfBirthDate =
-      JSONParserUtilities.getStringOptional(preferencesNode, "date-of-birth")
-        .mapPartial<DateTime, JSONParseException> { text ->
-          return@mapPartial try {
+      JSONParserUtilities.getStringOrNull(preferencesNode, "date-of-birth")
+        ?.let { text ->
+          try {
             dateFormatter.parseDateTime(text)
           } catch (e: IllegalArgumentException) {
             throw JSONParseException(e)
@@ -312,7 +307,7 @@ object ProfileDescriptionJSON {
       JSONParserUtilities.getBooleanDefault(preferencesNode, "date-of-birth-synthesized", false)
 
     val dateOfBirth =
-      dateOfBirthDate.map { dateValue ->
+      dateOfBirthDate?.let { dateValue ->
         ProfileDateOfBirth(dateValue, dateOfBirthSynthesized)
       }
 
@@ -327,7 +322,7 @@ object ProfileDescriptionJSON {
 
     val preferences =
       ProfilePreferences(
-        dateOfBirth = this.someOrNull(dateOfBirth),
+        dateOfBirth = dateOfBirth,
         downloadOnlyOnWIFI = downloadOnlyOnWIFI,
         hasSeenLibrarySelectionScreen = true,
         hasSeenNotificationScreen = false,
@@ -358,19 +353,12 @@ object ProfileDescriptionJSON {
     objectMapper: ObjectMapper,
     node: ObjectNode
   ): ReaderPreferences {
-    return JSONParserUtilities.getObjectOptional(node, "readerPreferences")
-      .mapPartial<ReaderPreferences, JSONParseException> { prefsNode ->
-        ReaderPreferencesJSON.deserializeFromJSON(objectMapper, prefsNode)
-      }
-      .accept(object : OptionVisitorType<ReaderPreferences, ReaderPreferences> {
-        override fun none(none: None<ReaderPreferences>): ReaderPreferences {
-          return ReaderPreferences.builder().build()
-        }
-
-        override fun some(some: Some<ReaderPreferences>): ReaderPreferences {
-          return some.get()
-        }
-      })
+    val prefsNode = JSONParserUtilities.getObjectOrNull(node, "readerPreferences")
+    return if (prefsNode != null) {
+      ReaderPreferencesJSON.deserializeFromJSON(objectMapper, prefsNode)
+    } else {
+      ReaderPreferences.builder().build()
+    }
   }
 
   private fun deserializePlaybackRates(
@@ -403,14 +391,6 @@ object ProfileDescriptionJSON {
       } catch (_: Throwable) {
         PlayerPlaybackRate(1.0)
       }
-    }
-  }
-
-  private fun <T> someOrNull(opt: OptionType<T>?): T? {
-    return if (opt is Some) {
-      opt.get()
-    } else {
-      null
     }
   }
 

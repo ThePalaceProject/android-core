@@ -1,7 +1,5 @@
 package org.nypl.simplified.tests.db
 
-import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -24,7 +22,6 @@ import org.thepalaceproject.db.api.queries.DBQAccountProviderDescriptionPutType
 import org.thepalaceproject.db.api.queries.DBQAccountProviderGetType
 import org.thepalaceproject.db.api.queries.DBQAccountProviderListType
 import org.thepalaceproject.db.api.queries.DBQAccountProviderPutType
-import org.thepalaceproject.db.api.queries.DBQAccountRegistrySetting
 import org.thepalaceproject.db.api.queries.DBQAccountRegistrySetting.TimeSetting
 import org.thepalaceproject.db.api.queries.DBQAccountRegistrySettingsGetType
 import org.thepalaceproject.db.api.queries.DBQAccountRegistrySettingsPutType

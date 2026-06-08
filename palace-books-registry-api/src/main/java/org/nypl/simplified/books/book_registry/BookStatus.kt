@@ -1,8 +1,5 @@
 package org.nypl.simplified.books.book_registry
 
-import com.io7m.jfunctional.OptionType
-import com.io7m.jfunctional.Some
-import com.io7m.junreachable.UnreachableCodeException
 import org.joda.time.DateTime
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookDRMInformation
@@ -13,7 +10,6 @@ import org.nypl.simplified.opds.core.OPDSAvailabilityHeldReady
 import org.nypl.simplified.opds.core.OPDSAvailabilityHoldable
 import org.nypl.simplified.opds.core.OPDSAvailabilityLoanable
 import org.nypl.simplified.opds.core.OPDSAvailabilityLoaned
-import org.nypl.simplified.opds.core.OPDSAvailabilityMatcherType
 import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
 import org.nypl.simplified.opds.core.OPDSAvailabilityRevoked
 import org.nypl.simplified.presentableerror.api.PresentableErrorType
@@ -468,37 +464,16 @@ sealed class BookStatus {
     fun fromBook(book: Book): BookStatus {
       val downloaded = book.isDownloaded
       val drmReturnable = this.isDRMReturnable(book)
-      val availability = book.entry.availability
-      return availability.matchAvailability(
-        object : OPDSAvailabilityMatcherType<BookStatus, UnreachableCodeException> {
-          override fun onHeldReady(a: OPDSAvailabilityHeldReady): BookStatus {
-            return this@Companion.onIsHeldReady(a, book)
-          }
 
-          override fun onHeld(a: OPDSAvailabilityHeld): BookStatus {
-            return this@Companion.onIsHeldNotReady(a, book)
-          }
-
-          override fun onHoldable(a: OPDSAvailabilityHoldable): BookStatus {
-            return this@Companion.onIsHoldable(book)
-          }
-
-          override fun onLoaned(a: OPDSAvailabilityLoaned): BookStatus {
-            return this@Companion.onIsLoaned(a, drmReturnable, downloaded, book)
-          }
-
-          override fun onLoanable(a: OPDSAvailabilityLoanable): BookStatus {
-            return this@Companion.onIsLoanable(book)
-          }
-
-          override fun onOpenAccess(a: OPDSAvailabilityOpenAccess): BookStatus {
-            return this@Companion.onIsOpenAccess(a, downloaded, book)
-          }
-
-          override fun onRevoked(a: OPDSAvailabilityRevoked): BookStatus {
-            return this@Companion.onIsRevoked(book)
-          }
-        })
+      return when (val availability = book.entry.availability) {
+        is OPDSAvailabilityHeld -> this.onIsHeldNotReady(availability, book)
+        is OPDSAvailabilityHeldReady -> this.onIsHeldReady(availability, book)
+        is OPDSAvailabilityHoldable -> this.onIsHoldable(book)
+        is OPDSAvailabilityLoanable -> this.onIsLoanable(book)
+        is OPDSAvailabilityLoaned -> this.onIsLoaned(availability, drmReturnable, downloaded, book)
+        is OPDSAvailabilityOpenAccess -> this.onIsOpenAccess(availability, downloaded, book)
+        is OPDSAvailabilityRevoked -> this.onIsRevoked(book)
+      }
     }
 
     private fun onIsRevoked(
@@ -515,14 +490,14 @@ sealed class BookStatus {
       return if (downloaded) {
         Loaned.LoanedDownloaded(
           id = book.id,
-          loanExpiryDate = this.someOrNull(a.endDate),
-          returnable = a.revoke.isSome
+          loanExpiryDate = a.endDate,
+          returnable = a.revoke != null
         )
       } else {
         Loaned.LoanedNotDownloaded(
           id = book.id,
-          loanExpiryDate = this.someOrNull(a.endDate),
-          returnable = a.revoke.isSome,
+          loanExpiryDate = a.endDate,
+          returnable = a.revoke != null,
           isOpenAccess = true
         )
       }
@@ -538,18 +513,18 @@ sealed class BookStatus {
       downloaded: Boolean,
       book: Book
     ): BookStatus {
-      val hasRevoke = a.revoke.isSome
+      val hasRevoke = a.revoke != null
       val returnable = hasRevoke && drmReturnable || hasRevoke && downloaded
       return if (downloaded) {
         Loaned.LoanedDownloaded(
           id = book.id,
-          loanExpiryDate = this.someOrNull(a.endDate),
+          loanExpiryDate = a.endDate,
           returnable = returnable
         )
       } else {
         Loaned.LoanedNotDownloaded(
           id = book.id,
-          loanExpiryDate = this.someOrNull(a.endDate),
+          loanExpiryDate = a.endDate,
           returnable = returnable,
           isOpenAccess = false
         )
@@ -566,10 +541,10 @@ sealed class BookStatus {
     ): BookStatus {
       return Held.HeldInQueue(
         id = book.id,
-        queuePosition = this.someOrNull(a.position),
-        startDate = this.someOrNull(a.startDate),
-        endDate = this.someOrNull(a.endDate),
-        isRevocable = a.revoke.isSome
+        queuePosition = a.position,
+        startDate = a.startDate,
+        endDate = a.endDate,
+        isRevocable = a.revoke != null
       )
     }
 
@@ -579,8 +554,8 @@ sealed class BookStatus {
     ): BookStatus {
       return Held.HeldReady(
         id = book.id,
-        endDate = this.someOrNull(a.endDate),
-        isRevocable = a.revoke.isSome
+        endDate = a.endDate,
+        isRevocable = a.revoke != null
       )
     }
 
@@ -603,14 +578,6 @@ sealed class BookStatus {
             true
         }
       } ?: false
-    }
-
-    private fun <T> someOrNull(x: OptionType<T>): T? {
-      return if (x is Some<T>) {
-        x.get()
-      } else {
-        null
-      }
     }
   }
 }

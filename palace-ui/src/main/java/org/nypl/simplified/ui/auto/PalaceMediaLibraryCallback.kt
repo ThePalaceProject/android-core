@@ -15,7 +15,6 @@ import androidx.media3.session.SessionResult
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.FluentFuture
 import com.google.common.util.concurrent.ListenableFuture
-import com.io7m.jfunctional.Some
 import org.librarysimplified.audiobook.views.PlayerModel
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.librarysimplified.services.api.Services
@@ -27,7 +26,6 @@ import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.futures.FluentFutureExtensions.map
 import org.nypl.simplified.ui.main.MainBackgroundBookOpenRequests
 import org.slf4j.LoggerFactory
-import java.net.URI
 import java.util.UUID
 import java.util.concurrent.TimeoutException
 
@@ -407,8 +405,8 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
 
     try {
       val coverURI = book.entry.cover
-      if (coverURI.isSome) {
-        metadataBuilder.setArtworkUri((coverURI as Some<URI>).get().toString().toUri())
+      if (coverURI != null) {
+        metadataBuilder.setArtworkUri(coverURI.toString().toUri())
       }
     } catch (e: Throwable) {
       this.logger.debug("Failed to create cover URI: ", e)

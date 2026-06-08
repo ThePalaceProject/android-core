@@ -2,7 +2,6 @@ package org.nypl.simplified.tests.books.profiles
 
 import android.app.Application
 import android.content.Context
-import com.io7m.jfunctional.Option
 import io.reactivex.subjects.PublishSubject
 import org.joda.time.DateTime
 import org.junit.jupiter.api.Assertions
@@ -16,20 +15,16 @@ import org.librarysimplified.http.vanilla.LSHTTPClients
 import org.mockito.Mockito
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.accounts.database.AccountBundledCredentialsEmpty
-import org.nypl.simplified.accounts.database.api.AccountsDatabaseException
 import org.nypl.simplified.accounts.database.api.AccountsDatabaseFactoryType
 import org.nypl.simplified.accounts.database.api.AccountsDatabaseNonexistentException
 import org.nypl.simplified.analytics.api.AnalyticsType
 import org.nypl.simplified.files.DirectoryUtilities
 import org.nypl.simplified.files.FileUtilities
 import org.nypl.simplified.profiles.ProfilesDatabases
-import org.nypl.simplified.profiles.api.ProfileAnonymousEnabledException
-import org.nypl.simplified.profiles.api.ProfileDatabaseDeleteAnonymousException
 import org.nypl.simplified.profiles.api.ProfileDatabaseException
 import org.nypl.simplified.profiles.api.ProfileDateOfBirth
 import org.nypl.simplified.profiles.api.ProfileDescription
 import org.nypl.simplified.profiles.api.ProfileEvent
-import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.tests.books.BookFormatsTesting
 import org.nypl.simplified.tests.mocking.FakeAccountCredentialStorage
 import org.nypl.simplified.tests.mocking.MockAccountProviderRegistry
@@ -39,7 +34,6 @@ import java.io.File
 import java.io.IOException
 import java.net.URI
 import java.util.UUID
-import kotlin.jvm.java
 
 abstract class ProfilesDatabaseContract {
 

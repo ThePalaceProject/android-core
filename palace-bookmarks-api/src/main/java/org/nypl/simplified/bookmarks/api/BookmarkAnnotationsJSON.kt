@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.io7m.jfunctional.OptionType
-import com.io7m.jfunctional.Some
 import org.nypl.simplified.books.api.bookmark.SerializedLocators
 import org.nypl.simplified.json.core.JSONParseException
 import org.nypl.simplified.json.core.JSONParserUtilities
@@ -107,14 +105,6 @@ object BookmarkAnnotationsJSON {
     return node
   }
 
-  private fun <T> mapOptionNull(option: OptionType<T>): T? {
-    return if (option is Some<T>) {
-      option.get()
-    } else {
-      null
-    }
-  }
-
   @Throws(JSONParseException::class)
   fun deserializeBodyNodeFromJSON(node: ObjectNode): BookmarkAnnotationBodyNode {
     return BookmarkAnnotationBodyNode(
@@ -174,18 +164,12 @@ object BookmarkAnnotationsJSON {
     node: ObjectNode
   ): BookmarkAnnotation {
     return BookmarkAnnotation(
-      context =
-      mapOptionNull(JSONParserUtilities.getStringOptional(node, "@context")),
-      body =
-      deserializeBodyNodeFromJSON(JSONParserUtilities.getObject(node, "body")),
-      id =
-      mapOptionNull(JSONParserUtilities.getStringOptional(node, "id")),
-      type =
-      JSONParserUtilities.getString(node, "type"),
-      motivation =
-      JSONParserUtilities.getString(node, "motivation"),
-      target =
-      deserializeTargetNodeFromJSON(
+      context = JSONParserUtilities.getStringOrNull(node, "@context"),
+      body = deserializeBodyNodeFromJSON(JSONParserUtilities.getObject(node, "body")),
+      id = JSONParserUtilities.getStringOrNull(node, "id"),
+      type = JSONParserUtilities.getString(node, "type"),
+      motivation = JSONParserUtilities.getString(node, "motivation"),
+      target = deserializeTargetNodeFromJSON(
         objectMapper,
         JSONParserUtilities.getObject(node, "target")
       )

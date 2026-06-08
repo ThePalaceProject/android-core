@@ -1,9 +1,7 @@
 package org.nypl.simplified.feeds.api
 
-import com.io7m.jfunctional.Option
-import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetSingle
 import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetOPDS12Single.Companion.ENTRYPOINT_FACET_GROUP_TYPE
-import java.util.Comparator
+import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetSingle
 
 /**
  * Functions to process facets.
@@ -63,6 +61,7 @@ object FeedFacets {
     return when (feed) {
       is Feed.FeedWithoutGroups ->
         findEntryPointFacetGroup(feed.facetsByGroup)
+
       is Feed.FeedWithGroups ->
         findEntryPointFacetGroup(feed.facetsByGroup)
     }
@@ -118,7 +117,8 @@ object FeedFacets {
   fun facetIsEntryPointTyped(facet: FeedFacetSingle): Boolean {
     return when (facet) {
       is FeedFacet.FeedFacetOPDS12Single ->
-        facet.opdsFacet.groupType == Option.some(ENTRYPOINT_FACET_GROUP_TYPE)
+        facet.opdsFacet.groupType == ENTRYPOINT_FACET_GROUP_TYPE
+
       is FeedFacet.FeedFacetPseudo ->
         false
     }

@@ -3,7 +3,6 @@ package org.nypl.simplified.tests.mocking
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookID
-import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
 import org.nypl.simplified.books.book_database.api.BookDatabaseType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.slf4j.LoggerFactory

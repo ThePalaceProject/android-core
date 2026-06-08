@@ -1,7 +1,6 @@
 package org.nypl.simplified.tests.mocking
 
 import android.app.Application
-import kotlinx.coroutines.DelicateCoroutinesApi
 import org.mockito.Mockito
 import org.readium.r2.lcp.LcpAuthenticating
 import org.readium.r2.lcp.LcpError

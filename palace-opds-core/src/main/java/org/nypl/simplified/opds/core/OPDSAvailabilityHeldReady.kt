@@ -1,7 +1,5 @@
 package org.nypl.simplified.opds.core
 
-import com.io7m.jfunctional.OptionType
-import com.io7m.jfunctional.Unit
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import java.net.URI
@@ -10,34 +8,17 @@ import java.net.URI
  * The book is held and is ready to be checked out now.
  */
 
-data class OPDSAvailabilityHeldReady private constructor(
-  val endDateValue: OptionType<DateTime>,
-  val revoke: OptionType<URI>
+data class OPDSAvailabilityHeldReady constructor(
+  override val endDate: DateTime?,
+  val revoke: URI?
 ) : OPDSAvailabilityType {
-
-  val endDateOrNull: DateTime?
-    get() = this.endDateValue.getOrNull()
-
-  val revokeOrNull: URI?
-    get() = this.revoke.getOrNull()
-
-  override fun getEndDate(): OptionType<DateTime> {
-    return this.endDateValue
-  }
-
-  override fun <A, E : Exception> matchAvailability(
-    m: OPDSAvailabilityMatcherType<A, E>
-  ): A {
-    return m.onHeldReady(this)
-  }
 
   override fun toString(): String {
     val fmt = ISODateTimeFormat.dateTime()
     val b = StringBuilder(128)
     b.append("[OPDSAvailabilityHeldReady end_date=")
-    this.endDate.map { e: DateTime? ->
-      b.append(fmt.print(e))
-      Unit.unit()
+    if (this.endDate != null) {
+      b.append(fmt.print(this.endDate))
     }
     b.append(" revoke=")
     b.append(this.revoke)
@@ -57,11 +38,11 @@ data class OPDSAvailabilityHeldReady private constructor(
 
     @JvmStatic
     fun get(
-      endDate: OptionType<DateTime>,
-      revoke: OptionType<URI>
+      endDate: DateTime?,
+      revoke: URI?
     ): OPDSAvailabilityHeldReady {
       return OPDSAvailabilityHeldReady(
-        endDateValue = endDate,
+        endDate = endDate,
         revoke = revoke
       )
     }

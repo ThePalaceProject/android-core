@@ -2,7 +2,6 @@ package org.nypl.simplified.tests.books.book_database
 
 import android.app.Application
 import android.content.Context
-import com.io7m.jfunctional.Option
 import org.joda.time.DateTime
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -104,7 +103,7 @@ abstract class BookDatabaseAudioBookContract {
   }
 
   private fun acquisitionFeedEntryWithAudioBook(): OPDSAcquisitionFeedEntry {
-    val revoke = Option.none<URI>()
+    val revoke = null
     val eb = OPDSAcquisitionFeedEntry.newBuilder(
       "abcd",
       "Title",

@@ -4,17 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.JsonNodeType
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.io7m.jfunctional.None
-import com.io7m.jfunctional.Option
-import com.io7m.jfunctional.OptionType
-import com.io7m.jfunctional.OptionVisitorType
-import com.io7m.jfunctional.Some
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import java.math.BigInteger
 import java.net.URI
 import java.net.URISyntaxException
-import java.util.Objects
 
 /**
  * Utility functions for deserializing elements from JSON.
@@ -380,28 +374,6 @@ object JSONParserUtilities {
 
   @JvmStatic
   @Throws(JSONParseException::class)
-  fun getObjectOptional(
-    s: ObjectNode,
-    key: String
-  ): OptionType<ObjectNode> {
-    return if (s.has(key)) {
-      Option.some(
-        getObject(s, key)
-      )
-    } else {
-      Option.none()
-    }
-  }
-
-  /**
-   * @param key A key assumed to be holding a value
-   * @param s   A node
-   * @return An object value from key `key`, if the key exists
-   * @throws JSONParseException On type errors
-   */
-
-  @JvmStatic
-  @Throws(JSONParseException::class)
   fun getObjectOrNull(
     s: ObjectNode,
     key: String
@@ -459,25 +431,6 @@ object JSONParserUtilities {
    */
   @JvmStatic
   @Throws(JSONParseException::class)
-  fun getIntegerOptional(
-    n: ObjectNode,
-    key: String
-  ): OptionType<Int> {
-    return if (n.has(key)) {
-      Option.some(getInteger(n, key))
-    } else {
-      Option.none()
-    }
-  }
-
-  /**
-   * @param key A key assumed to be holding a value
-   * @param n   A node
-   * @return An integer value from key `key`, if the key exists
-   * @throws JSONParseException On type errors
-   */
-  @JvmStatic
-  @Throws(JSONParseException::class)
   fun getIntegerOrNull(
     n: ObjectNode,
     key: String
@@ -492,7 +445,7 @@ object JSONParserUtilities {
   /**
    * @param key A key assumed to be holding a value
    * @param n   A node
-   * @return A string value from key `key`, if the key exists, or `default_value` otherwise.
+   * @return A string value from key `key`, if the key exists, or `defaultValue` otherwise.
    * @throws JSONParseException On type errors
    */
 
@@ -501,44 +454,39 @@ object JSONParserUtilities {
   fun getIntegerDefault(
     n: ObjectNode,
     key: String,
-    default_value: Int
+    defaultValue: Int
   ): Int {
-    return getIntegerOptional(n, key).accept(
-      object : OptionVisitorType<Int?, Int?> {
-        override fun none(n: None<Int?>?): Int? {
-          return default_value
-        }
-
-        override fun some(s: Some<Int?>?): Int? {
-          return s!!.get()
-        }
-      })!!
-  }
-
-  /**
-   * @param key A key assumed to be holding a value
-   * @param n   A node
-   * @return An double value from key `key`, if the key exists
-   * @throws JSONParseException On type errors
-   */
-
-  @JvmStatic
-  @Throws(JSONParseException::class)
-  fun getDoubleOptional(
-    n: ObjectNode,
-    key: String
-  ): OptionType<Double> {
-    return if (n.has(key)) {
-      Option.some(getDouble(n, key))
+    val r = getIntegerOrNull(n, key)
+    return if (r == null) {
+      defaultValue
     } else {
-      Option.none()
+      r
     }
   }
 
   /**
    * @param key A key assumed to be holding a value
    * @param n   A node
-   * @return An double value from key `key`, if the key exists, or `default_value` otherwise.
+   * @return An Double value from key `key`, if the key exists
+   * @throws JSONParseException On type errors
+   */
+  @JvmStatic
+  @Throws(JSONParseException::class)
+  fun getDoubleOrNull(
+    n: ObjectNode,
+    key: String
+  ): Double? {
+    return if (n.has(key)) {
+      getDouble(n, key)
+    } else {
+      null
+    }
+  }
+
+  /**
+   * @param key A key assumed to be holding a value
+   * @param n   A node
+   * @return An double value from key `key`, if the key exists, or `defaultValue` otherwise.
    * @throws JSONParseException On type errors
    */
   @JvmStatic
@@ -546,40 +494,13 @@ object JSONParserUtilities {
   fun getDoubleDefault(
     n: ObjectNode,
     key: String,
-    default_value: Double
+    defaultValue: Double
   ): Double {
-    return getDoubleOptional(n, key).accept(
-      object : OptionVisitorType<Double?, Double?> {
-        override fun none(n: None<Double?>?): Double? {
-          return default_value
-        }
-
-        override fun some(s: Some<Double?>?): Double? {
-          return s!!.get()
-        }
-      })!!
-  }
-
-  /**
-   * @param key A key assumed to be holding a value
-   * @param n   A node
-   * @return A string value from key `key`, if the key exists
-   * @throws JSONParseException On type errors
-   */
-  @JvmStatic
-  @Throws(JSONParseException::class)
-  fun getStringOptional(
-    n: ObjectNode,
-    key: String
-  ): OptionType<String> {
-    return if (n.has(key)) {
-      if (n[key].isNull) {
-        Option.none()
-      } else {
-        Option.some(getString(n, key))
-      }
+    val r = getDoubleOrNull(n, key)
+    return if (r == null) {
+      defaultValue
     } else {
-      Option.none()
+      r
     }
   }
 
@@ -610,7 +531,7 @@ object JSONParserUtilities {
   /**
    * @param key A key assumed to be holding a value
    * @param n   A node
-   * @return A string value from key `key`, if the key exists, or `default_value` otherwise.
+   * @return A string value from key `key`, if the key exists, or `defaultValue` otherwise.
    * @throws JSONParseException On type errors
    */
 
@@ -619,18 +540,14 @@ object JSONParserUtilities {
   fun getStringDefault(
     n: ObjectNode,
     key: String,
-    default_value: String
+    defaultValue: String
   ): String {
-    return getStringOptional(n, key).accept(
-      object : OptionVisitorType<String?, String?> {
-        override fun none(n: None<String?>?): String? {
-          return default_value
-        }
-
-        override fun some(s: Some<String?>?): String? {
-          return s!!.get()
-        }
-      })!!
+    val r = getStringOrNull(n, key)
+    return if (r == null) {
+      defaultValue
+    } else {
+      r
+    }
   }
 
   /**
@@ -669,41 +586,18 @@ object JSONParserUtilities {
 
   @JvmStatic
   @Throws(JSONParseException::class)
-  fun getTimestampOptional(
+  fun getTimestampOrNull(
     n: ObjectNode,
     key: String
-  ): OptionType<DateTime> {
+  ): DateTime? {
     return if (n.has(key)) {
-      Option.some(
-        getTimestamp(
-          n,
-          key
-        )
-      )
-    } else {
-      Option.none()
-    }
-  }
-
-  /**
-   * @param key A key assumed to be holding a value
-   * @param n   A node
-   * @return A URI value from key `key`, if the key exists
-   * @throws JSONParseException On type errors
-   */
-
-  @JvmStatic
-  @Throws(JSONParseException::class)
-  fun getURIOptional(
-    n: ObjectNode,
-    key: String
-  ): OptionType<URI> {
-    return getStringOptional(n, key).mapPartial<URI, JSONParseException> { x: String? ->
-      try {
-        return@mapPartial URI(x)
-      } catch (e: URISyntaxException) {
-        throw JSONParseException(e)
+      if (n[key].isNull) {
+        null
+      } else {
+        getTimestamp(n, key)
       }
+    } else {
+      null
     }
   }
 
@@ -720,9 +614,12 @@ object JSONParserUtilities {
     n: ObjectNode,
     key: String
   ): URI? {
-    val opt = getURIOptional(n, key)
-    return if (opt.isSome) {
-      (opt as Some<URI>).get()
+    return if (n.has(key)) {
+      if (n[key].isNull) {
+        null
+      } else {
+        getURI(n, key)
+      }
     } else {
       null
     }
@@ -760,18 +657,14 @@ object JSONParserUtilities {
   fun getURIDefault(
     n: ObjectNode,
     key: String,
-    default_value: URI
+    defaultValue: URI
   ): URI {
-    Objects.requireNonNull(default_value, "Default")
-    return getURIOptional(n, key).accept(object : OptionVisitorType<URI?, URI?> {
-      override fun none(n: None<URI?>?): URI? {
-        return default_value
-      }
-
-      override fun some(s: Some<URI?>?): URI? {
-        return s!!.get()
-      }
-    })!!
+    val r = getURIOrNull(n, key)
+    return if (r == null) {
+      defaultValue
+    } else {
+      r
+    }
   }
 
   /**

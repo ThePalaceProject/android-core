@@ -1,7 +1,5 @@
 package org.nypl.simplified.books.controller
 
-import com.io7m.jfunctional.Some
-import com.io7m.junreachable.UnreachableCodeException
 import org.joda.time.DateTime
 import org.joda.time.Duration
 import org.librarysimplified.mdc.MDCKeys
@@ -178,8 +176,8 @@ class BookRevokeTask(
     val newEntry = when (availability) {
       is OPDSAvailabilityHeldReady -> {
         val uriOpt = availability.revoke
-        if (uriOpt is Some<URI>) {
-          this.revokeNotifyServerURI(uriOpt.get(), RevokeType.HOLD, account)
+        if (uriOpt != null) {
+          this.revokeNotifyServerURI(uriOpt, RevokeType.HOLD, account)
         } else {
           this.debug("no revoke URI, nothing to do")
           this.taskRecorder.currentStepSucceeded(this.revokeStrings.revokeServerNotifyNoURI)
@@ -189,8 +187,8 @@ class BookRevokeTask(
 
       is OPDSAvailabilityHeld -> {
         val uriOpt = availability.revoke
-        if (uriOpt is Some<URI>) {
-          this.revokeNotifyServerURI(uriOpt.get(), RevokeType.HOLD, account)
+        if (uriOpt != null) {
+          this.revokeNotifyServerURI(uriOpt, RevokeType.HOLD, account)
         } else {
           this.debug("no revoke URI, nothing to do")
           this.taskRecorder.currentStepSucceeded(this.revokeStrings.revokeServerNotifyNoURI)
@@ -213,8 +211,8 @@ class BookRevokeTask(
 
       is OPDSAvailabilityLoaned -> {
         val uriOpt = availability.revoke
-        if (uriOpt is Some<URI>) {
-          this.revokeNotifyServerURI(uriOpt.get(), RevokeType.LOAN, account)
+        if (uriOpt != null) {
+          this.revokeNotifyServerURI(uriOpt, RevokeType.LOAN, account)
         } else {
           this.debug("no revoke URI, nothing to do")
           this.taskRecorder.currentStepSucceeded(this.revokeStrings.revokeServerNotifyNoURI)
@@ -237,8 +235,8 @@ class BookRevokeTask(
 
       is OPDSAvailabilityOpenAccess -> {
         val uriOpt = availability.revoke
-        if (uriOpt is Some<URI>) {
-          this.revokeNotifyServerURI(uriOpt.get(), RevokeType.LOAN, account)
+        if (uriOpt != null) {
+          this.revokeNotifyServerURI(uriOpt, RevokeType.LOAN, account)
         } else {
           this.debug("no revoke URI, nothing to do")
           this.taskRecorder.currentStepSucceeded(this.revokeStrings.revokeServerNotifyNoURI)
@@ -248,9 +246,6 @@ class BookRevokeTask(
 
       is OPDSAvailabilityRevoked ->
         this.revokeNotifyServerURI(availability.revoke, RevokeType.LOAN, account)
-
-      else ->
-        throw UnreachableCodeException()
     }
 
     this.revokeNotifyServerSaveNewEntry(newEntry)
@@ -262,7 +257,7 @@ class BookRevokeTask(
     availability: OPDSAvailabilityType
   ): FeedEntryOPDS {
     val acquisitionFeedEntry =
-      OPDSAcquisitionFeedEntry.newBuilderFrom(oldEntry)
+      oldEntry.toBuilder()
         .setAvailability(availability)
         .build()
 

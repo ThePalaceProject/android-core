@@ -8,8 +8,6 @@ import android.graphics.drawable.Drawable
 import android.widget.ImageView
 import com.google.common.util.concurrent.FluentFuture
 import com.google.common.util.concurrent.SettableFuture
-import com.io7m.jfunctional.OptionType
-import com.io7m.jfunctional.Some
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
@@ -179,13 +177,13 @@ class BookCoverProvider private constructor(
   private fun coverURIOf(entry: FeedEntry.FeedEntryOPDS): URI? {
     val bookWithStatus =
       this.bookRegistry.bookOrNull(entry.bookID)
-    return bookWithStatus?.book?.cover?.toURI() ?: mapOptionToNull(entry.feedEntry.cover)
+    return bookWithStatus?.book?.cover?.toURI() ?: entry.feedEntry.cover
   }
 
   private fun thumbnailURIOf(entry: FeedEntry.FeedEntryOPDS): URI? {
     val bookWithStatus =
       this.bookRegistry.bookOrNull(entry.bookID)
-    return bookWithStatus?.book?.thumbnail?.toURI() ?: mapOptionToNull(entry.feedEntry.thumbnail)
+    return bookWithStatus?.book?.thumbnail?.toURI() ?: entry.feedEntry.thumbnail
   }
 
   override fun loadThumbnailInto(
@@ -245,14 +243,6 @@ class BookCoverProvider private constructor(
       onBitmapLoaded = onBitmapLoaded,
       defaultResource = defaultResource
     )
-  }
-
-  private fun <T> mapOptionToNull(option: OptionType<T>): T? {
-    if (option is Some<T>) {
-      return option.get()
-    } else {
-      return null
-    }
   }
 
   override fun loadingThumbnailsPause() {

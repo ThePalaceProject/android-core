@@ -10,7 +10,6 @@ import androidx.appcompat.app.TxContextWrappingDelegate2
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.io7m.jfunctional.Some
 import io.reactivex.disposables.CompositeDisposable
 import org.librarysimplified.audiobook.api.PlayerBookmark
 import org.librarysimplified.audiobook.api.PlayerBookmarkKind
@@ -55,7 +54,6 @@ import org.nypl.simplified.bookmarks.api.BookmarksForBook
 import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.books.time.tracking.TimeTrackingServiceType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
-import org.nypl.simplified.opds.core.getOrNull
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskResult
@@ -66,7 +64,6 @@ import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
-import java.net.URI
 
 class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_base) {
 
@@ -352,7 +349,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       is PlayerModelState.PlayerManifestOK -> {
         AudioBookViewerModel.appliedLastReadBookmarkMigration = false
 
-        val timeTrackingUri = bookParameters.opdsEntry.timeTrackingUri.getOrNull()
+        val timeTrackingUri = bookParameters.opdsEntry.timeTrackingUri
         if (timeTrackingUri != null) {
           this.logger.debug("Time tracking info will be sent to {}", timeTrackingUri)
           this.timeTrackingService.onBookOpenedForTracking(
@@ -489,9 +486,9 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
      */
 
     val coverURI = parameters.opdsEntry.cover
-    if (coverURI is Some<URI>) {
+    if (coverURI != null) {
       this.coverService.loadCoverAsBitmap(
-        source = coverURI.get(),
+        source = coverURI,
         onBitmapLoaded = PlayerModel::setCoverImage,
         defaultResource = R.drawable.empty
       )
