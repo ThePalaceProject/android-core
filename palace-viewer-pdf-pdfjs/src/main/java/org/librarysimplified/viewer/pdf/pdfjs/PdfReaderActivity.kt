@@ -13,6 +13,7 @@ import android.webkit.WebView
 import android.widget.FrameLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
@@ -72,6 +73,13 @@ class PdfReaderActivity : AppCompatActivity() {
 
   private val log: Logger =
     LoggerFactory.getLogger(PdfReaderActivity::class.java)
+
+  private val backCallback =
+    object : OnBackPressedCallback(true) {
+      override fun handleOnBackPressed() {
+        handleBackPressed()
+      }
+    }
 
   private val services =
     Services.serviceDirectory()
@@ -156,6 +164,11 @@ class PdfReaderActivity : AppCompatActivity() {
 
     this.root = this.findViewById(R.id.pdf_root)
     ScreenEdgeToEdgeFix.edgeToEdge(this.root)
+
+    this.onBackPressedDispatcher.addCallback(
+      this,
+      this.backCallback
+    )
   }
 
   private fun completeReaderSetup(
@@ -266,6 +279,7 @@ class PdfReaderActivity : AppCompatActivity() {
           true
         }
       }
+
       BookDRMInformation.None -> {
         // Nothing required
       }
@@ -406,11 +420,11 @@ class PdfReaderActivity : AppCompatActivity() {
     super.onDestroy()
   }
 
-  override fun onBackPressed() {
+  private fun handleBackPressed() {
     if (this.isSidebarOpen) {
       this.toggleSidebar()
     } else {
-      super.onBackPressed()
+      this.finish()
     }
   }
 

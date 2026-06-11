@@ -3,6 +3,7 @@ package org.librarysimplified.viewer.audiobook
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.UiThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -70,6 +71,13 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
   private val logger =
     LoggerFactory.getLogger(AudioBookPlayerActivity2::class.java)
 
+  private val backCallback =
+    object : OnBackPressedCallback(true) {
+      override fun handleOnBackPressed() {
+        handleBackPressed()
+      }
+    }
+
   private lateinit var root: View
   private lateinit var bookmarkService: BookmarkServiceType
   private lateinit var buildConfig: BuildConfigurationServiceType
@@ -132,6 +140,11 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       accountID = parameters.accountID,
       book = parameters.bookID
     )
+
+    this.onBackPressedDispatcher.addCallback(
+      this,
+      this.backCallback
+    )
   }
 
   override fun onStop() {
@@ -139,8 +152,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     this.subscriptions.dispose()
   }
 
-  @Deprecated("Deprecated in Java")
-  override fun onBackPressed() {
+  private fun handleBackPressed() {
     return when (val f = this.fragmentNow) {
       is PlayerBaseFragment -> {
         when (f) {

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.UiThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -44,6 +45,13 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
   private val logger =
     LoggerFactory.getLogger(MainActivity::class.java)
+
+  private val backCallback =
+    object : OnBackPressedCallback(true) {
+      override fun handleOnBackPressed() {
+        handleBackPressed()
+      }
+    }
 
   private lateinit var rootContainer: View
   private var fragmentNow: Fragment? = null
@@ -155,6 +163,11 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
       }
     )
     this.switchFragment(SplashFragment())
+
+    this.onBackPressedDispatcher.addCallback(
+      this,
+      this.backCallback
+    )
   }
 
   private fun onSplashScreenStatusChanged(
@@ -247,8 +260,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     }
   }
 
-  @Deprecated("This method has been deprecated by clueless \"engineers\".")
-  override fun onBackPressed() {
+  private fun handleBackPressed() {
     this.logger.debug("onBackPressed: Pressed")
 
     val current = this.fragmentNow

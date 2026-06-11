@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ProgressBar
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.UiThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -64,6 +65,13 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
 
   private val logger =
     LoggerFactory.getLogger(BookPreviewActivity::class.java)
+
+  private val backCallback =
+    object : OnBackPressedCallback(true) {
+      override fun handleOnBackPressed() {
+        handleBackPressed()
+      }
+    }
 
   companion object {
 
@@ -253,6 +261,11 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(this::onNewBookPreviewStatus)
     )
+
+    this.onBackPressedDispatcher.addCallback(
+      this,
+      this.backCallback
+    )
   }
 
   override fun onStop() {
@@ -260,13 +273,12 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
     this.subscriptions.dispose()
   }
 
-  @Deprecated("Deprecated in Java")
-  override fun onBackPressed() {
+  private fun handleBackPressed() {
     return when (val f = this.fragmentNow) {
       is SR2Fragment -> {
         when (f) {
           is SR2ReaderFragment -> {
-            super.onBackPressed()
+            this.finish()
           }
 
           is SR2SearchFragment -> {
@@ -280,11 +292,11 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
       }
 
       null -> {
-        super.onBackPressed()
+        this.finish()
       }
 
       else -> {
-        super.onBackPressed()
+        this.finish()
       }
     }
   }

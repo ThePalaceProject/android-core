@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.View
 import android.webkit.WebView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.StringRes
 import androidx.annotation.UiThread
 import androidx.appcompat.app.AppCompatActivity
@@ -72,6 +73,13 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
   private lateinit var root: View
   private val logger =
     LoggerFactory.getLogger(Reader2Activity::class.java)
+
+  private val backCallback =
+    object : OnBackPressedCallback(true) {
+      override fun handleOnBackPressed() {
+        handleBackPressed()
+      }
+    }
 
   companion object {
 
@@ -207,6 +215,11 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
     this.switchFragment(Reader2LoadingFragment())
     this.startReader()
+
+    this.onBackPressedDispatcher.addCallback(
+      this,
+      this.backCallback
+    )
   }
 
   override fun onStop() {
@@ -502,13 +515,12 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     )
   }
 
-  @Deprecated("Deprecated in Java")
-  override fun onBackPressed() {
+  private fun handleBackPressed() {
     return when (val f = this.fragmentNow) {
       is SR2Fragment -> {
         when (f) {
           is SR2ReaderFragment -> {
-            super.onBackPressed()
+            this.finish()
           }
 
           is SR2SearchFragment -> {
@@ -522,11 +534,11 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       }
 
       is Reader2LoadingFragment -> {
-        super.onBackPressed()
+        this.finish()
       }
 
       null -> {
-        super.onBackPressed()
+        this.finish()
       }
 
       else -> {
