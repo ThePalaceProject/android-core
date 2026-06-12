@@ -1,6 +1,5 @@
 package org.nypl.simplified.feeds.api
 
-import com.io7m.jfunctional.Some
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
@@ -21,7 +20,6 @@ import org.nypl.simplified.opds.core.OPDSAcquisitionPaths
 import org.nypl.simplified.opds.core.OPDSFeedParserType
 import org.nypl.simplified.opds.core.OPDSFeedTransportType
 import org.nypl.simplified.opds.core.OPDSOpenSearch1_1
-import org.nypl.simplified.opds.core.OPDSSearchLink
 import org.nypl.simplified.opds.core.OPDSSearchParserType
 import org.slf4j.LoggerFactory
 import java.io.FileNotFoundException
@@ -215,9 +213,8 @@ class FeedLoader private constructor(
     credentials: AccountAuthenticationCredentials?,
     method: String
   ): OPDSOpenSearch1_1? {
-    val searchLinkOpt = opdsFeed.feedSearchURI
-    return if (searchLinkOpt is Some<OPDSSearchLink>) {
-      val searchLink = searchLinkOpt.get()
+    val searchLink = opdsFeed.feedSearchURI
+    return if (searchLink != null) {
       val response = this.transport.getStream(credentials, searchLink.uri, method)
       response.first.use { stream ->
         return this.searchParser.parse(searchLink.uri, stream)
