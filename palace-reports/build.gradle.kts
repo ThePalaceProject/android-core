@@ -1,3 +1,7 @@
+plugins {
+    id("org.thepalaceproject.build.aar")
+}
+
 fun getGitHash(): String {
     val proc = ProcessBuilder("git", "rev-parse", "--short", "HEAD")
         .redirectOutput(ProcessBuilder.Redirect.PIPE)

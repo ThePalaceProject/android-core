@@ -1,3 +1,7 @@
+plugins {
+    id("org.thepalaceproject.build.jar")
+}
+
 dependencies {
     implementation(libs.io7m.jfunctional)
     implementation(libs.kotlin.reflect)
