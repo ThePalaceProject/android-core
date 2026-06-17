@@ -1,3 +1,7 @@
+plugins {
+    id("org.thepalaceproject.build.aar")
+}
+
 dependencies {
     coreLibraryDesugaring(libs.android.desugaring)
 
