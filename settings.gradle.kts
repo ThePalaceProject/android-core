@@ -193,7 +193,7 @@ rootProject.name = "simplified"
 
 includeBuild("palace-build-conventions")
 
-//include(":palace-accessibility")
+include(":palace-accessibility")
 include(":palace-accounts-api")
 include(":palace-accounts-database")
 include(":palace-accounts-database-api")
@@ -237,7 +237,7 @@ include(":palace-links")
 include(":palace-links-json")
 include(":palace-mdc")
 //include(":palace-notifications")
-//include(":palace-opds-auth-document")
+include(":palace-opds-auth-document")
 include(":palace-opds-auth-document-api")
 //include(":palace-opds-client")
 include(":palace-opds-core")

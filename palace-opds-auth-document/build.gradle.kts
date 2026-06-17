@@ -1,3 +1,7 @@
+plugins {
+    id("org.thepalaceproject.build.jar")
+}
+
 dependencies {
     implementation(project(":palace-announcements"))
     implementation(project(":palace-json-core"))
