@@ -35,3 +35,10 @@ overdrive.json
 feedbooks.conf
 configurations.txt
 version.properties
+
+palace-app-palace/required-assets.conf
+changelog.jar
+commit.txt
+jreleaser.toml
+ktlint.jar
+org.thepalaceproject.webpub.cmdline-1.2.0-main.jar

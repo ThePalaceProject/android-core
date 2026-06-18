@@ -20,7 +20,10 @@ fun calculateVersionCode(): Int {
  * The asset files that are required to be present in order to build the app.
  */
 
-val palaceAssetsRequired = Properties()
+val palaceAssetsRequired =
+    Properties()
+val palaceAssetsRequiredFile =
+    File(project.projectDir, "required-assets.conf")
 
 /*
  * The various DRM schemes require that some extra assets be present.
@@ -61,41 +64,23 @@ if (palaceAssetsDirectory != null) {
     }
 }
 
-/*
- * A task that writes the required assets to a file in order to be used later by ZipCheck.
- */
-
-fun createRequiredAssetsFileTask(file: File): String {
-    val taskName = "CheckReleaseRequiredAssetsCreate"
-    project.tasks.register(taskName, Task::class.java) {
-        doLast {
-            file.writer().use {
-                palaceAssetsRequired.store(it, "")
-            }
-        }
+project.tasks.register("CheckReleaseRequiredAssetsCreate", Task::class.java) {
+    palaceAssetsRequiredFile.writer().use {
+        palaceAssetsRequired.store(it, "")
     }
-    return taskName
 }
 
-/*
- * A task that executes ZipCheck against a given APK file and a list of required assets.
- */
-
-fun createRequiredAssetsTask(
-    checkFile: File,
-    assetList: File,
-): String {
-    val taskName = "CheckReleaseRequiredAssets_${checkFile.name}"
-    project.tasks.register(taskName, Exec::class.java) {
-        commandLine = arrayListOf(
-            "java",
-            "$rootDir/org.thepalaceproject.android.platform/ZipCheck.java",
-            "$checkFile",
-            "$assetList",
-        )
-    }
-    return taskName
+project.tasks.register("CheckReleaseRequiredAssets", Exec::class.java) {
+    commandLine = arrayListOf(
+        "java",
+        "$rootDir/org.thepalaceproject.android.platform/ZipCheck.java",
+        "${project.projectDir}/build/outputs/apk/release/palace-app-palace-release.apk",
+        "$palaceAssetsRequiredFile",
+    )
 }
+
+project.tasks.findByName("CheckReleaseRequiredAssetsCreate")
+    ?.finalizedBy("CheckReleaseRequiredAssets")
 
 /*
  * The signing information that is required to exist for release builds.
@@ -224,6 +209,7 @@ afterEvaluate {
     val taskAssemble = tasks.findByName("assemble")
     if (taskAssemble != null && taskBundle != null) {
         taskAssemble.dependsOn.add(taskBundle)
+        taskAssemble.finalizedBy("CheckReleaseRequiredAssetsCreate")
     }
 }
 
