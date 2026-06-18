@@ -3,6 +3,12 @@ import java.time.ZoneId
 import java.time.ZoneOffset
 import java.util.Properties
 
+plugins {
+    id("org.thepalaceproject.build.apk")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
+}
+
 fun calculateVersionCode(): Int {
     val now = LocalDateTime.now(ZoneId.of("UTC"))
     val nowSeconds = now.toEpochSecond(ZoneOffset.UTC)
@@ -10,14 +16,14 @@ fun calculateVersionCode(): Int {
     return (nowSeconds - 1615800000).toInt()
 }
 
-apply(plugin = "com.google.gms.google-services")
-apply(plugin = "com.google.firebase.crashlytics")
-
 /*
  * The asset files that are required to be present in order to build the app.
  */
 
-val palaceAssetsRequired = Properties()
+val palaceAssetsRequired =
+    Properties()
+val palaceAssetsRequiredFile =
+    File(project.projectDir, "required-assets.conf")
 
 /*
  * The various DRM schemes require that some extra assets be present.
@@ -58,37 +64,23 @@ if (palaceAssetsDirectory != null) {
     }
 }
 
-/*
- * A task that writes the required assets to a file in order to be used later by ZipCheck.
- */
-
-fun createRequiredAssetsFile(file: File): Task {
-    return task("CheckReleaseRequiredAssetsCreate") {
-        doLast {
-            file.writer().use {
-                palaceAssetsRequired.store(it, "")
-            }
-        }
+project.tasks.register("CheckReleaseRequiredAssetsCreate", Task::class.java) {
+    palaceAssetsRequiredFile.writer().use {
+        palaceAssetsRequired.store(it, "")
     }
 }
 
-/*
- * A task that executes ZipCheck against a given APK file and a list of required assets.
- */
-
-fun createRequiredAssetsTask(
-    checkFile: File,
-    assetList: File,
-): Task {
-    return task("CheckReleaseRequiredAssets_${checkFile.name}", Exec::class) {
-        commandLine = arrayListOf(
-            "java",
-            "$rootDir/org.thepalaceproject.android.platform/ZipCheck.java",
-            "$checkFile",
-            "$assetList",
-        )
-    }
+project.tasks.register("CheckReleaseRequiredAssets", Exec::class.java) {
+    commandLine = arrayListOf(
+        "java",
+        "$rootDir/org.thepalaceproject.android.platform/ZipCheck.java",
+        "${project.projectDir}/build/outputs/apk/release/palace-app-palace-release.apk",
+        "$palaceAssetsRequiredFile",
+    )
 }
+
+project.tasks.findByName("CheckReleaseRequiredAssetsCreate")
+    ?.finalizedBy("CheckReleaseRequiredAssets")
 
 /*
  * The signing information that is required to exist for release builds.
@@ -103,7 +95,7 @@ val palaceKeyPassword =
 val palaceStorePassword =
     project.findProperty("org.thepalaceproject.storePassword") as String?
 
-val requiredSigningTask = task("CheckReleaseSigningInformation") {
+val requiredSigningTask = project.tasks.register("CheckReleaseSigningInformation", Task::class.java) {
     if (palaceKeyAlias == null) {
         throw GradleException("org.thepalaceproject.keyAlias is not specified.")
     }
@@ -136,47 +128,41 @@ android {
     defaultConfig {
         versionName = versionNameText
         versionCode = versionCodeCalculated
-        resourceConfigurations.add("en")
-        resourceConfigurations.add("de")
-        resourceConfigurations.add("es")
-        resourceConfigurations.add("fr")
-        resourceConfigurations.add("it")
-        setProperty("archivesBaseName", "palace")
     }
 
-    /*
-     * Add the assets directory to the source sets. This is required for the various
-     * secret files.
-     */
+    androidResources {
+        localeFilters += listOf("en", "de", "es", "fr", "it")
+    }
 
     sourceSets {
-        findByName("main")?.apply {
+        named("main") {
             if (palaceAssetsDirectory != null) {
-                assets {
-                    srcDir(palaceAssetsDirectory)
-                }
+                assets.srcDir(palaceAssetsDirectory)
             }
         }
     }
 
     packaging {
+        resources {
+            excludes += "org/sqlite/native/Mac/aarch64/libsqlitejdbc.dylib"
+            excludes += "org/sqlite/native/Mac/x86_64/libsqlitejdbc.dylib"
+            excludes += "org/sqlite/native/Windows/aarch64/sqlitejdbc.dll"
+            excludes += "org/sqlite/native/Windows/armv7/sqlitejdbc.dll"
+            excludes += "org/sqlite/native/Windows/x86/sqlitejdbc.dll"
+            excludes += "org/sqlite/native/Windows/x86_64/sqlitejdbc.dll"
+        }
+
         jniLibs {
-            keepDebugSymbols.add("lib/**/*.so")
+            keepDebugSymbols += "lib/**/*.so"
 
-            /*
-             * Various components (R2, the PDF library, LCP, etc) include this shared library.
-             */
-
-            pickFirsts.add("lib/arm64-v8a/libc++_shared.so")
-            pickFirsts.add("lib/armeabi-v7a/libc++_shared.so")
-            pickFirsts.add("lib/x86/libc++_shared.so")
-            pickFirsts.add("lib/x86_64/libc++_shared.so")
+            pickFirsts += setOf(
+                "lib/arm64-v8a/libc++_shared.so",
+                "lib/armeabi-v7a/libc++_shared.so",
+                "lib/x86/libc++_shared.so",
+                "lib/x86_64/libc++_shared.so",
+            )
         }
     }
-
-    /*
-     * Ensure that release builds are signed.
-     */
 
     signingConfigs {
         create("release") {
@@ -187,55 +173,29 @@ android {
         }
     }
 
-    /*
-     * Ensure that the right NDK ABIs are declared.
-     */
-
     buildTypes {
         debug {
             ndk {
-                abiFilters.add("x86")
-                abiFilters.add("arm64-v8a")
-                abiFilters.add("armeabi-v7a")
+                abiFilters += setOf(
+                    "x86",
+                    "x86_64",
+                    "arm64-v8a",
+                    "armeabi-v7a",
+                )
             }
+
             versionNameSuffix = "-debug"
         }
+
         release {
             ndk {
-                abiFilters.add("arm64-v8a")
-                abiFilters.add("armeabi-v7a")
+                abiFilters += setOf(
+                    "arm64-v8a",
+                    "armeabi-v7a",
+                )
             }
-            this.signingConfig = signingConfigs.getByName("release")
-        }
-    }
 
-    /*
-     * Release builds need extra checking.
-     */
-
-    applicationVariants.all {
-        if (this.buildType.name == "release") {
-            val preBuildTask = tasks.findByName("preReleaseBuild")
-            preBuildTask?.dependsOn?.add(requiredSigningTask)
-
-            /*
-             * For each APK output, create a task that checks that the APK contains the
-             * required assets.
-             */
-
-            this.outputs.forEach {
-                val outputFile = it.outputFile
-                val assetFile = File("${project.buildDir}/required-assets.conf")
-                val fileTask =
-                    createRequiredAssetsFile(assetFile)
-                val checkTask =
-                    createRequiredAssetsTask(checkFile = outputFile, assetList = assetFile)
-
-                checkTask.dependsOn.add(fileTask)
-                this.assembleProvider.configure {
-                    finalizedBy(checkTask)
-                }
-            }
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 }
@@ -245,8 +205,12 @@ android {
  */
 
 afterEvaluate {
-    tasks.findByName("assemble")
-        ?.dependsOn?.add(tasks.findByName("bundle"))
+    val taskBundle = tasks.findByName("bundle")
+    val taskAssemble = tasks.findByName("assemble")
+    if (taskAssemble != null && taskBundle != null) {
+        taskAssemble.dependsOn.add(taskBundle)
+        taskAssemble.finalizedBy("CheckReleaseRequiredAssetsCreate")
+    }
 }
 
 dependencies {

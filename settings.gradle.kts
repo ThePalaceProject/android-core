@@ -191,6 +191,8 @@ dependencyResolutionManagement {
 
 rootProject.name = "simplified"
 
+includeBuild("palace-build-conventions")
+
 include(":palace-accessibility")
 include(":palace-accounts-api")
 include(":palace-accounts-database")
@@ -266,4 +268,4 @@ include(":palace-viewer-preview")
 include(":palace-viewer-spi")
 include(":palace-webview")
 
-include(":palace-sandbox")
+//include(":palace-sandbox")

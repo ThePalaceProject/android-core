@@ -12,3 +12,6 @@
 	path = org.thepalaceproject.android.platform
 	url = https://github.com/ThePalaceProject/android-platform
     branch = main
+[submodule "palace-build-conventions"]
+	path = palace-build-conventions
+	url = https://github.com/ThePalaceProject/android-build-conventions

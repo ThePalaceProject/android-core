@@ -1,3 +1,7 @@
+plugins {
+    id("org.thepalaceproject.build.jar")
+}
+
 dependencies {
     api(project(":palace-parser-api"))
     api(project(":palace-links"))

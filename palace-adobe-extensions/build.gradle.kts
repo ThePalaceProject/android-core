@@ -1,3 +1,7 @@
+plugins {
+    id("org.thepalaceproject.build.aar")
+}
+
 android {
     buildFeatures {
         buildConfig = true
