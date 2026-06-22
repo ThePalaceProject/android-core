@@ -1208,7 +1208,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-06-11T18:46:22+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.30.0">
+    <c:release date="2026-06-22T17:08:02+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.30.0">
       <c:changes>
         <c:change date="2026-05-26T00:00:00+00:00" summary="Periodically sync accounts in the background">
           <c:tickets>
@@ -1240,9 +1240,24 @@
             <c:ticket id="PP-4464"/>
           </c:tickets>
         </c:change>
-        <c:change date="2026-06-11T18:46:22+00:00" summary="Target Android API 36.">
+        <c:change date="2026-06-11T00:00:00+00:00" summary="Target Android API 36.">
           <c:tickets>
             <c:ticket id="PP-4549"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-06-22T00:00:00+00:00" summary="Upgrade to Readium 3.3.0.">
+          <c:tickets>
+            <c:ticket id="PP-4426"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-06-22T00:00:00+00:00" summary="Preserve reading UI across orientation changes.">
+          <c:tickets>
+            <c:ticket id="PP-4567"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-06-22T17:08:02+00:00" summary="Acquire a wake lock to keep the app awake when an EPUB is open.">
+          <c:tickets>
+            <c:ticket id="PP-4550"/>
           </c:tickets>
         </c:change>
       </c:changes>
