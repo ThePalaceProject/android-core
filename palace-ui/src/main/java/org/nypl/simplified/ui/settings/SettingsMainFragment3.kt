@@ -1,6 +1,9 @@
 package org.nypl.simplified.ui.settings
 
+import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
+import androidx.annotation.UiThread
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
@@ -16,6 +19,7 @@ import org.nypl.simplified.profiles.api.ProfileEvent
 import org.nypl.simplified.profiles.api.ProfilePreferences
 import org.nypl.simplified.profiles.api.ProfileUpdated
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
+import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.main.MainNavigation
 import org.nypl.simplified.ui.main.MainNotifications
 import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
@@ -42,6 +46,7 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
   private lateinit var settingsVersion: Preference
   private lateinit var settingsVersionCore: Preference
   private lateinit var settingsNetworkDownloadWIFIOnly: SwitchPreferenceCompat
+  private lateinit var settingsBattery: Preference
 
   private var subscriptions: CloseableCollectionType<*> =
     CloseableCollection.create()
@@ -87,11 +92,33 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
         this.onProfileEvent(profiles, e)
       })
     this.subscriptions.add(AutoCloseable { profileSub.dispose() })
+    this.subscriptions.add(
+      SettingsModel.batteryOptimizerStatus.subscribe { _, valueNew ->
+        this.onBatteryOptimizerStatusChanged(valueNew)
+      }
+    )
 
     try {
       this.configureDebug(this.settingsDebug)
     } catch (e: Throwable) {
       this.logger.debug("Error configuring debug menu: ", e)
+    }
+
+    SettingsModel.batteryOptimizerCheck()
+  }
+
+  @UiThread
+  private fun onBatteryOptimizerStatusChanged(
+    enabled: Boolean
+  ) {
+    UIThread.checkIsUIThread()
+
+    if (enabled) {
+      this.settingsBattery.summary = getString(R.string.settingsBatteryOptimizerEnabledSummary)
+      this.settingsBattery.title = getString(R.string.settingsBatteryOptimizerEnabled)
+    } else {
+      this.settingsBattery.summary = getString(R.string.settingsBatteryOptimizerDisabledSummary)
+      this.settingsBattery.title = getString(R.string.settingsBatteryOptimizerDisabled)
     }
   }
 
@@ -141,10 +168,12 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
     this.settingsVersionCore = this.findPreference("settingsVersionCore")!!
     this.settingsNotifications = this.findPreference("settingsNotifications")!!
     this.settingsNetworkDownloadWIFIOnly = this.findPreference("settingsNetworkDownloadWIFIOnly")!!
+    this.settingsBattery = this.findPreference("settingsBattery")!!
 
     this.configureAbout(this.settingsAbout)
     this.configureAcknowledgements(this.settingsAcknowledgements)
     this.configureAccounts(this.settingsAccounts)
+    this.configureBattery(this.settingsBattery)
     this.configureBuild(this.settingsCommit)
     this.configureDebug(this.settingsDebug)
     this.configureEULA(this.settingsEULA)
@@ -159,6 +188,16 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
       profiles = profiles,
       profilePrefs = profilePrefs
     )
+  }
+
+  private fun configureBattery(
+    settingsBattery: Preference
+  ) {
+    settingsBattery.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+      val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+      this.requireActivity().startActivity(intent)
+      true
+    }
   }
 
   private fun configureNetwork(

@@ -24,6 +24,13 @@
             android:title="@string/settingsNetworkDownloadWIFI" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="@string/settingsBattery">
+        <Preference
+            android:title="@string/settingsBatteryOptimizerEnabled"
+            android:summary="@string/settingsBatteryOptimizerEnabledSummary"
+            android:key="settingsBattery"/>
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/settingsDocumentation">
         <Preference
             android:key="settingsAcknowledgements"
