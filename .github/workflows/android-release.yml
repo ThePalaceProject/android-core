@@ -15,7 +15,7 @@ jobs:
           distribution: 'zulu'
           java-version: 21
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Checkout submodules
         run: git submodule update --init --recursive
       - name: Verify release branch
