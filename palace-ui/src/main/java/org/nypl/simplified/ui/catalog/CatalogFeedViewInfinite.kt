@@ -76,7 +76,6 @@ class CatalogFeedViewInfinite(
 
   init {
     this.listView.layoutManager = GridLayoutManager(this.root.context, this.columnCount())
-    this.listView.setHasFixedSize(true)
     (this.listView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
     this.listView.setItemViewCacheSize(8)
   }

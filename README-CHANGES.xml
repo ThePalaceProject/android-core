@@ -1208,7 +1208,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-06-25T13:18:38+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.30.0">
+    <c:release date="2026-07-01T14:28:12+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.30.0">
       <c:changes>
         <c:change date="2026-05-26T00:00:00+00:00" summary="Periodically sync accounts in the background">
           <c:tickets>
@@ -1270,11 +1270,22 @@
             <c:ticket id="PP-4554"/>
           </c:tickets>
         </c:change>
-        <c:change date="2026-06-25T13:18:38+00:00" summary="Allow audiobook playback rates as high as 3.0x">
+        <c:change date="2026-06-25T00:00:00+00:00" summary="Allow audiobook playback rates as high as 3.0x">
           <c:tickets>
             <c:ticket id="PP-4519"/>
           </c:tickets>
         </c:change>
+        <c:change date="2026-06-30T00:00:00+00:00" summary="Bookmark list items may now be variable height.">
+          <c:tickets>
+            <c:ticket id="PP-4700"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-06-30T00:00:00+00:00" summary="Fix text clipping for huge texts.">
+          <c:tickets>
+            <c:ticket id="PP-4692"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-07-01T14:28:12+00:00" summary="Feed entries are now variable height."/>
       </c:changes>
     </c:release>
   </c:releases>
