@@ -26,8 +26,6 @@
             android:layout_weight="1"
             android:background="?attr/selectableItemBackground"
             android:clickable="true"
-            android:ellipsize="end"
-            android:maxLines="1"
             android:text="@string/catalogPlaceholder"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -38,6 +36,8 @@
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
             android:clickable="true"
+            android:layout_gravity="right|top"
+            android:gravity="right|top"
             android:text="@string/catalogMore"
             android:textSize="14sp" />
 

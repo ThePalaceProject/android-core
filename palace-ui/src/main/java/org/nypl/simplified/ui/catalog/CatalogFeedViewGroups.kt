@@ -50,7 +50,6 @@ class CatalogFeedViewGroups(
 
   init {
     this.listView.layoutManager = LinearLayoutManager(this.root.context)
-    this.listView.setHasFixedSize(true)
     (this.listView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
     this.listView.setItemViewCacheSize(8)
     this.listView.addItemDecoration(

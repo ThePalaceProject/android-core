@@ -1208,7 +1208,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-07-01T14:57:56+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.30.0">
+    <c:release date="2026-07-01T15:05:19+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.30.0">
       <c:changes>
         <c:change date="2026-05-26T00:00:00+00:00" summary="Periodically sync accounts in the background">
           <c:tickets>
@@ -1286,9 +1286,14 @@
           </c:tickets>
         </c:change>
         <c:change date="2026-07-01T00:00:00+00:00" summary="Feed entries are now variable height."/>
-        <c:change date="2026-07-01T14:57:56+00:00" summary="More feed item height fixes.">
+        <c:change date="2026-07-01T00:00:00+00:00" summary="More feed item height fixes.">
           <c:tickets>
             <c:ticket id="PP-4690"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-07-01T15:05:19+00:00" summary="Lane heights are now variable.">
+          <c:tickets>
+            <c:ticket id="PP-4688"/>
           </c:tickets>
         </c:change>
       </c:changes>
