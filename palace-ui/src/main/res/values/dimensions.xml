@@ -1,31 +1,32 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <resources>
-  <dimen name="catalogBookDetailToolbarCollapsedHeight">96dp</dimen>
-  <dimen name="catalogBookDetailToolbarExpandedHeight">288dp</dimen>
-  <dimen name="catalogBookDetailToolbarItemsHeight">64dp</dimen>
-  <dimen name="catalogBookDetailSpacerHeight">160dp</dimen>
-  <dimen name="catalogBookDetailCoverHeight">240dp</dimen>
-  <dimen name="catalogBookDetailCoverWidth">160dp</dimen>
+    <dimen name="catalogBookDetailToolbarCollapsedHeight">96dp</dimen>
+    <dimen name="catalogBookDetailToolbarExpandedHeight">288dp</dimen>
+    <dimen name="catalogBookDetailToolbarItemsHeight">64dp</dimen>
+    <dimen name="catalogBookDetailSpacerHeight">160dp</dimen>
+    <dimen name="catalogBookDetailCoverHeight">240dp</dimen>
+    <dimen name="catalogBookDetailCoverWidth">160dp</dimen>
 
-  <dimen name="catalogBookDetailScrollMarginTopMax">256dp</dimen>
-  <dimen name="catalogBookDetailScrollMarginTopMin">32dp</dimen>
+    <dimen name="catalogBookDetailScrollMarginTopMax">256dp</dimen>
+    <dimen name="catalogBookDetailScrollMarginTopMin">32dp</dimen>
 
-  <dimen name="catalogBookDetailButtonsHeight">64dp</dimen>
-  <dimen name="catalogBookDetailCoverMaximumWidth">128dp</dimen>
-  <dimen name="catalogBookDetailStatusHeight">64dp</dimen>
-  <dimen name="catalogBookThumbnailHeight">120dp</dimen>
-  <dimen name="catalogFacetTabCornerRadius">8dp</dimen>
-  <dimen name="catalogFacetTabStandardHeight">36dp</dimen>
-  <dimen name="catalogFacetTabStroke">4dp</dimen>
-  <dimen name="catalogFeedCellButtonsHeight">40dp</dimen>
-  <dimen name="catalogFeedCellHeight">160dp</dimen>
-  <dimen name="catalogFeedCellImageWidth">80dp</dimen>
-  <dimen name="catalogFeedCoversSpace">8dp</dimen>
-  <dimen name="catalogLaneCoverMaximumWidth">128dp</dimen>
+    <dimen name="catalogBookDetailButtonsHeight">64dp</dimen>
+    <dimen name="catalogBookDetailCoverMaximumWidth">128dp</dimen>
+    <dimen name="catalogBookDetailStatusHeight">64dp</dimen>
+    <dimen name="catalogBookThumbnailHeight">120dp</dimen>
+    <dimen name="catalogFacetTabCornerRadius">8dp</dimen>
+    <dimen name="catalogFacetTabStandardHeight">36dp</dimen>
+    <dimen name="catalogFacetTabStroke">4dp</dimen>
+    <dimen name="catalogFeedCellButtonsHeight">40dp</dimen>
+    <dimen name="catalogFeedCellHeight">160dp</dimen>
+    <dimen name="catalogFeedCellImageWidth">80dp</dimen>
+    <dimen name="catalogFeedCellImageHeight">108dp</dimen>
+    <dimen name="catalogFeedCoversSpace">8dp</dimen>
+    <dimen name="catalogLaneCoverMaximumWidth">128dp</dimen>
 
-  <dimen name="accountLoginLogoutButtonMaximumWidth">224dp</dimen>
-  <dimen name="accountLoginLogoutButtonHeight">64dp</dimen>
+    <dimen name="accountLoginLogoutButtonMaximumWidth">224dp</dimen>
+    <dimen name="accountLoginLogoutButtonHeight">64dp</dimen>
 
-  <dimen name="scrollbarSize">12dp</dimen>
+    <dimen name="scrollbarSize">12dp</dimen>
 </resources>
