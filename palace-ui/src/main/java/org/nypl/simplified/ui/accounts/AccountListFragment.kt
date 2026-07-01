@@ -179,7 +179,6 @@ class AccountListFragment : Fragment(R.layout.account_list), MainBackButtonConsu
     this.updateAccountList()
 
     with(this.accountList) {
-      this.setHasFixedSize(true)
       this.layoutManager = LinearLayoutManager(this.context)
       (this.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
       this.adapter = this@AccountListFragment.accountListAdapter
