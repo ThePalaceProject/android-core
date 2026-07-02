@@ -2,6 +2,7 @@ package org.nypl.simplified.ui.accounts
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.annotation.UiThread
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
@@ -122,6 +123,14 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry),
       services.requireService(ProfilesControllerType::class.java)
 
     profiles.profileAccountCreate(account.id)
+
+    val activity = this.requireActivity()
+    val toast = Toast.makeText(
+      activity,
+      activity.resources.getString(R.string.settingsAddedLibrary, account.title),
+      Toast.LENGTH_LONG
+    )
+    toast.show()
   }
 
   override fun onStart() {
