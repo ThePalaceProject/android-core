@@ -1,6 +1,7 @@
 package org.nypl.simplified.ui.catalog
 
 import android.content.res.Configuration
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -75,6 +76,8 @@ class CatalogFeedViewGroups(
       count = facetGroup.size
     ) { index, button ->
       val facet = facetGroup[index]
+      button.maxLines = Integer.MAX_VALUE
+      button.ellipsize = TextUtils.TruncateAt.END
       button.text = facet.title
       button.setOnClickListener {
         this.callbacks.onFeedFacetSelected(facet)
