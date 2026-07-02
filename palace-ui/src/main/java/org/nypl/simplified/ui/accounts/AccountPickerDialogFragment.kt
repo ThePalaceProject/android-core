@@ -125,7 +125,6 @@ class AccountPickerDialogFragment : BottomSheetDialogFragment(), OnAccountClickL
 
     this.recyclerView = view.findViewById(R.id.recyclerView)
     this.recyclerView.apply {
-      this.setHasFixedSize(true)
       this.layoutManager =
         LinearLayoutManager(this@AccountPickerDialogFragment.requireContext())
       this.adapter =
