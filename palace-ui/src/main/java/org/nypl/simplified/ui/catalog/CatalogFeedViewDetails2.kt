@@ -370,74 +370,120 @@ class CatalogFeedViewDetails2(
       this.root.resources.getDimensionPixelSize(R.dimen.catalogBookDetailScrollMarginTopMin)
 
     this.imageOverlay.y = this.adjustImageY(this.appBar)
+
     this.appBar.addOnOffsetChangedListener { _, verticalOffset ->
-      this.imageOverlay.y = this.adjustImageY(this.appBar)
-
-      val totalScrollRange =
-        this.appBar.totalScrollRange
-      val absOffset =
-        Math.abs(verticalOffset)
-      val offset =
-        clamp(absOffset.toDouble() / totalScrollRange.toDouble(), 0.0, 1.0)
-
-      val offsetExp =
-        (offset * offset).toFloat()
-      val offsetInv =
-        (1.0 - offset)
-      val offsetInvExpExp =
-        (Math.pow(offsetInv, 8.0)).toFloat()
-
-      this.toolbarItemsWhenCollapsed.alpha = offsetExp
-      this.enableButtonsOnOverlayView = offsetInv >= 1.0
-      this.enableButtonsOnToolbarView = offsetExp >= 1.0
-
-      this.bookToolbarButton.isEnabled =
-        this.isToolbarButtonsEnabled()
-      this.bookButton0.isEnabled =
-        this.isOverlayButton0Enabled()
-      this.bookButton1.isEnabled =
-        this.isOverlayButton1Enabled()
-
-      this.backButton.isEnabled = offsetExp < 0.01
-      this.backButton.alpha =
-        if (this.backButton.isEnabled) {
-          1.0f
-        } else {
-          0.0f
-        }
-
-      this.bookTitle.alpha = offsetInvExpExp
-      this.bookSubtitle.alpha = offsetInvExpExp
-      this.bookButtons.alpha = offsetInvExpExp
-
-      this.cover.pivotX = this.cover.width / 2.0f
-      this.cover.pivotY = 0.0f
-      this.cover.scaleX = offsetInv.toFloat()
-      this.cover.scaleY = offsetInv.toFloat()
-      this.cover.alpha = offsetInv.toFloat()
-
-      /*
-       * Expand and contract the spacer in the scroll view. This is used
-       * to move the contents of the scroll view up and down in order to follow the cover as
-       * it expands and contracts.
-       */
-
-      val newSpacerSize = this.interpolate(this.spacerSizeMin, this.spacerSizeMax, offset)
-      if (newSpacerSize != this.spacerSize) {
-        this.spacer.layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, newSpacerSize)
-      }
+      this.onScrollChanged(verticalOffset)
     }
 
     /*
      * Request a layout in order to get all of the various objects above into their correct
      * starting positions on the page. If this isn't done, the objects won't be arranged correctly
-     * until the user scrolls.
+     * until the user scrolls. We also schedule a short fade-in of the main elements in order to
+     * ensure the user doesn't see them before they've moved into place.
      */
 
     this.root.post(root::requestLayout)
+    this.root.post { this.onScrollChanged(1) }
+
+    this.root.post {
+      this.imageOverlay.animate()
+        .alpha(1.0f)
+        .setDuration(250)
+        .start()
+      this.scrollLinear.animate()
+        .alpha(1.0f)
+        .setDuration(250)
+        .start()
+    }
 
     this.backButton.setOnClickListener {
       this.callbacks.onToolbarBackPressed()
+    }
+  }
+
+  /**
+   * The main function that is responsible for positioning elements when the user scrolls. This
+   * function handles resizing the "app bar" and also resizing a spacer element that is inserted
+   * into the content scrollview in order to move the content down below the cover/title/author
+   * section.
+   */
+
+  private fun onScrollChanged(
+    verticalOffset: Int
+  ) {
+    this.imageOverlay.y = this.adjustImageY(this.appBar)
+
+    /*
+     * We need to determine the difference in Y between the bottom of the app bar and the
+     * bottom of the image overlay. We need to set the height of the spacer in the scroll view
+     * to a little more than this height in order to ensure that the content doesn't end up
+     * underneath the cover/title/author.
+     */
+
+    val imageOverlayBottomY =
+      (this.imageOverlay.y + this.imageOverlay.height).toDouble()
+    val appBarBottomY =
+      this.appBar.height.toDouble()
+    val heightDiff =
+      Math.max(imageOverlayBottomY - appBarBottomY, 0.0) + screenSize.dpToPixels(16)
+
+    val totalScrollRange =
+      this.appBar.totalScrollRange
+    val absOffset =
+      Math.abs(verticalOffset)
+    val offset =
+      clamp(absOffset.toDouble() / totalScrollRange.toDouble(), 0.0, 1.0)
+
+    val offsetExp =
+      (offset * offset).toFloat()
+    val offsetInv =
+      (1.0 - offset)
+    val offsetInvExpExp =
+      (Math.pow(offsetInv, 8.0)).toFloat()
+
+    this.toolbarItemsWhenCollapsed.alpha = offsetExp
+    this.enableButtonsOnOverlayView = offsetInv >= 1.0
+    this.enableButtonsOnToolbarView = offsetExp >= 1.0
+
+    this.bookToolbarButton.isEnabled =
+      this.isToolbarButtonsEnabled()
+    this.bookButton0.isEnabled =
+      this.isOverlayButton0Enabled()
+    this.bookButton1.isEnabled =
+      this.isOverlayButton1Enabled()
+
+    this.backButton.isEnabled = offsetExp < 0.01
+    this.backButton.alpha =
+      if (this.backButton.isEnabled) {
+        1.0f
+      } else {
+        0.0f
+      }
+
+    this.bookTitle.alpha = offsetInvExpExp
+    this.bookSubtitle.alpha = offsetInvExpExp
+    this.bookButtons.alpha = offsetInvExpExp
+
+    this.cover.pivotX = this.cover.width / 2.0f
+    this.cover.pivotY = 0.0f
+    this.cover.scaleX = offsetInv.toFloat()
+    this.cover.scaleY = offsetInv.toFloat()
+    this.cover.alpha = offsetInv.toFloat()
+
+    /*
+     * Expand and contract the spacer in the scroll view. This is used
+     * to move the contents of the scroll view up and down in order to follow the cover as
+     * it expands and contracts.
+     */
+
+    val newSpacerSize = this.interpolate(
+      minimum = this.spacerSizeMin,
+      maximum = heightDiff.toInt(),
+      position = offset
+    )
+
+    if (newSpacerSize != this.spacerSize) {
+      this.spacer.layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, newSpacerSize)
     }
   }
 

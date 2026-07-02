@@ -52,13 +52,15 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginBottom="64dp"
+            android:alpha="0.0"
+            tools:alpha="1.0"
             android:orientation="vertical">
 
             <!-- This view is resized programmatically. -->
             <View
                 android:id="@+id/bookD2Spacer"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/catalogBookDetailScrollMarginTopMax" />
+                android:layout_height="@dimen/catalogBookDetailScrollMarginTopMin" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -280,6 +282,8 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
+        android:alpha="0.0"
+        tools:alpha="1.0"
         android:elevation="10dp">
 
         <org.nypl.simplified.ui.images.ImageFlexibleWidthView
@@ -302,9 +306,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:ellipsize="end"
             android:gravity="center"
-            android:maxLines="2"
             android:textAppearance="@android:style/TextAppearance.Material.Title"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -315,9 +317,8 @@
             android:id="@+id/book2DOverlaySubtitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
             android:gravity="center"
-            android:maxLines="1"
+            android:layout_marginTop="8dp"
             android:textAppearance="@android:style/TextAppearance.Material.Small"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -341,7 +342,6 @@
                 android:layout_marginEnd="8dp"
                 android:autoSizeMaxTextSize="16sp"
                 android:autoSizeTextType="uniform"
-                android:maxLines="1"
                 android:text="@string/catalogDownload"
                 app:layout_constraintEnd_toStartOf="@id/book2DOverlayButton1"
                 app:layout_constraintHorizontal_chainStyle="packed"
@@ -359,7 +359,6 @@
                 android:layout_marginStart="8dp"
                 android:autoSizeMaxTextSize="16sp"
                 android:autoSizeTextType="uniform"
-                android:maxLines="1"
                 android:text="@string/catalogPreview"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_weight="1"
