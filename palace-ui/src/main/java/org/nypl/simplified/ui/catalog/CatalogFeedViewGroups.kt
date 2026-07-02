@@ -37,14 +37,14 @@ class CatalogFeedViewGroups(
   val toolbar: CatalogToolbar =
     CatalogToolbar(
       callbacks = this.callbacks,
-      logo = this.root.findViewById(R.id.catalogGroupsToolbarLogo),
-      logoTouch = this.root.findViewById(R.id.catalogGroupsToolbarLogoTouch),
-      searchIcon = this.root.findViewById(R.id.catalogGroupsToolbarSearchIcon),
-      searchText = this.root.findViewById(R.id.catalogGroupsToolbarSearchText),
-      searchTouch = this.root.findViewById(R.id.catalogGroupsToolbarSearchIconTouch),
-      text = this.root.findViewById(R.id.catalogGroupsToolbarText),
-      textContainer = this.root.findViewById(R.id.catalogGroupsToolbarTextContainer),
-      textIconView = this.root.findViewById(R.id.catalogGroupsToolbarTextLibraryIcon),
+      logo = this.root.findViewById(R.id.catalogFeedToolbarLogo),
+      logoTouch = this.root.findViewById(R.id.catalogFeedToolbarLogoTouch),
+      searchIcon = this.root.findViewById(R.id.catalogFeedToolbarSearchIcon),
+      searchText = this.root.findViewById(R.id.catalogFeedToolbarSearchText),
+      searchTouch = this.root.findViewById(R.id.catalogFeedToolbarSearchIconTouch),
+      text = this.root.findViewById(R.id.catalogFeedToolbarText),
+      textContainer = this.root.findViewById(R.id.catalogFeedToolbarTextContainer),
+      textIconView = this.root.findViewById(R.id.catalogFeedToolbarTextLibraryIcon),
       window = this.window,
     )
 

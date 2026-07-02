@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/catalogFeedToolbar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent">
+
+    <FrameLayout
+        android:id="@+id/catalogFeedToolbarLogoTouch"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/catalogFeedToolbarLogo"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center"
+            android:src="@drawable/main_icon" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/catalogFeedToolbarTextContainer"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:gravity="center_horizontal"
+        tools:visibility="visible"
+        app:layout_constraintEnd_toStartOf="@id/catalogFeedToolbarSearchIconTouch"
+        app:layout_constraintStart_toEndOf="@id/catalogFeedToolbarLogoTouch"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/catalogFeedToolbarTextLibraryIcon"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:clickable="false"
+            android:ellipsize="end"
+            android:focusable="false"
+            android:maxLines="1"
+            android:src="@drawable/account_default"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/catalogFeedToolbarText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:autoSizeMinTextSize="14sp"
+            android:autoSizeTextType="uniform"
+            android:breakStrategy="simple"
+            android:scrollHorizontally="false"
+            android:ellipsize="end"
+            android:maxLines="3"
+            android:textSize="18sp"
+            android:paddingBottom="8dp"
+            tools:text="@string/catalogPlaceholder" />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/catalogFeedToolbarSearchText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:hint="@string/catalogSearch"
+        android:imeOptions="actionDone"
+        android:inputType="text"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:textSize="18sp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toStartOf="@id/catalogFeedToolbarSearchIconTouch"
+        app:layout_constraintStart_toEndOf="@id/catalogFeedToolbarLogoTouch"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
+
+    <FrameLayout
+        android:id="@+id/catalogFeedToolbarSearchIconTouch"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:contentDescription="@string/catalogAccessibilitySearch"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/catalogFeedToolbarSearchIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:src="@drawable/magnifying_glass" />
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
