@@ -442,6 +442,10 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     UIThread.checkIsUIThread()
 
     return when (event) {
+      is SR2Event.SR2UISettingsUpdated -> {
+        // Nothing yet.
+      }
+
       is SR2Event.SR2ThemeChanged -> {
         this.onControllerEventThemeChanged(event)
       }
