@@ -5,7 +5,6 @@ package org.nypl.simplified.buildconfig.api
  */
 
 interface BuildConfigurationAccountsType {
-
   /**
    * The base URI for the library registry.
    */

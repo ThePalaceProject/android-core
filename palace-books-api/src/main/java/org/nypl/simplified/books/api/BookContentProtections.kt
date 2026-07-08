@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory
 import java.time.OffsetDateTime
 
 object BookContentProtections {
-
   private val logger =
     LoggerFactory.getLogger(BookContentProtections::class.java)
 
@@ -28,8 +27,8 @@ object BookContentProtections {
     drmInfo: BookDRMInformation,
     isLCPManualPassphraseEnabled: Boolean,
     onLCPDialogDismissed: () -> Unit = {}
-  ): List<ContentProtection> {
-    return try {
+  ): List<ContentProtection> =
+    try {
       when (drmInfo) {
         /*
          * ACS doesn't require any special handling. Just instantiate the one provider if it exists.
@@ -67,7 +66,8 @@ object BookContentProtections {
          */
         is BookDRMInformation.LCP -> {
           val lcpProvider =
-            contentProtectionProviders.filter { provider -> provider is LCPContentProtectionProvider }
+            contentProtectionProviders
+              .filter { provider -> provider is LCPContentProtectionProvider }
               .map { provider -> provider as LCPContentProtectionProvider }
               .firstOrNull()
 
@@ -89,5 +89,4 @@ object BookContentProtections {
       this.logger.error("Failed to handle DRM providers: ", e)
       listOf()
     }
-  }
 }

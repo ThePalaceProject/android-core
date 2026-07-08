@@ -38,13 +38,11 @@ class BookDatabase private constructor(
   private val formats: BookFormatSupportType,
   private val httpClient: LSHTTPClientType,
 ) : BookDatabaseType {
-
   /**
    * A thread-safe map exposing read-only snapshots of database entries.
    */
 
   private class BookMaps internal constructor() {
-
     internal val mapsLock: Any = Any()
 
     @GuardedBy("mapsLock")
@@ -80,9 +78,7 @@ class BookDatabase private constructor(
     }
   }
 
-  override fun owner(): AccountID {
-    return this.owner
-  }
+  override fun owner(): AccountID = this.owner
 
   override fun books(): SortedSet<BookID> {
     synchronized(this.maps.mapsLock) {
@@ -167,7 +163,6 @@ class BookDatabase private constructor(
   }
 
   companion object {
-
     private val LOG = LoggerFactory.getLogger(BookDatabase::class.java)
 
     @Throws(BookDatabaseException::class)
@@ -238,18 +233,19 @@ class BookDatabase private constructor(
         for (bookID in bookDirs) {
           LOG.debug("opening book: {}/{}", directory, bookID)
           val bookDirectory = File(directory, bookID)
-          val entry = openOneEntry(
-            context = context,
-            parser = parser,
-            serializer = serializer,
-            formats = formats,
-            accountID = account,
-            directory = bookDirectory,
-            maps = maps,
-            errors = errors,
-            name = bookID,
-            httpClient = httpClient
-          ) ?: continue
+          val entry =
+            openOneEntry(
+              context = context,
+              parser = parser,
+              serializer = serializer,
+              formats = formats,
+              accountID = account,
+              directory = bookDirectory,
+              maps = maps,
+              errors = errors,
+              name = bookID,
+              httpClient = httpClient
+            ) ?: continue
           maps.addEntry(entry)
         }
       }
@@ -314,7 +310,10 @@ class BookDatabase private constructor(
 
 /** Return the file, or null if it does not exist or is not a file. */
 
-private fun fileOrNull(bookDir: File, filename: String) = File(bookDir, filename)
+private fun fileOrNull(
+  bookDir: File,
+  filename: String
+) = File(bookDir, filename)
   .run {
     if (isFile) this else null
   }

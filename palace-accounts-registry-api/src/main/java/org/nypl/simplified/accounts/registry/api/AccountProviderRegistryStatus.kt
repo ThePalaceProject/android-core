@@ -7,7 +7,6 @@ import org.nypl.simplified.taskrecorder.api.TaskResult
  */
 
 sealed class AccountProviderRegistryStatus {
-
   /**
    * The account provider registry is idle.
    *

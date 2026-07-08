@@ -5,7 +5,6 @@ package org.nypl.simplified.buildconfig.api
  */
 
 interface BuildConfigurationCatalogType {
-
   /**
    * @return `true` if book detail pages should display status messages
    */

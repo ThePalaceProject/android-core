@@ -10,7 +10,6 @@ import java.util.concurrent.CompletableFuture
  */
 
 interface OPDSClientType : AutoCloseable {
-
   /**
    * The current client state.
    */

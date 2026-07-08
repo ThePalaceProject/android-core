@@ -64,8 +64,9 @@ class ProfileAccountLogoutTask(
   private val patronParsers: PatronUserProfileParsersType,
   private val profile: ProfileReadableType
 ) : Callable<TaskResult<Unit>> {
-
-  private class StepFailedHandled(override val cause: Throwable) : Exception()
+  private class StepFailedHandled(
+    override val cause: Throwable
+  ) : Exception()
 
   init {
     Preconditions.checkState(
@@ -82,28 +83,52 @@ class ProfileAccountLogoutTask(
   private val steps =
     TaskRecorder.create()
 
-  private fun warn(message: String, vararg arguments: Any?) =
-    this.logger.warn("[{}][{}] $message", this.profile.id.uuid, this.account.id, *arguments)
+  private fun warn(
+    message: String,
+    vararg arguments: Any?
+  ) = this.logger.warn("[{}][{}] $message", this.profile.id.uuid, this.account.id, *arguments)
 
-  private fun debug(message: String, vararg arguments: Any?) =
-    this.logger.debug("[{}][{}] $message", this.profile.id.uuid, this.account.id, *arguments)
+  private fun debug(
+    message: String,
+    vararg arguments: Any?
+  ) = this.logger.debug("[{}][{}] $message", this.profile.id.uuid, this.account.id, *arguments)
 
-  private fun error(message: String, vararg arguments: Any?) =
-    this.logger.error("[{}][{}] $message", this.profile.id.uuid, this.account.id, *arguments)
+  private fun error(
+    message: String,
+    vararg arguments: Any?
+  ) = this.logger.error("[{}][{}] $message", this.profile.id.uuid, this.account.id, *arguments)
 
   override fun call(): TaskResult<Unit> {
     this.steps.beginNewStep(this.logoutStrings.logoutStarted)
 
-    MDC.put(MDCKeys.ACCOUNT_INTERNAL_ID, this.account.id.uuid.toString())
+    MDC.put(MDCKeys.ACCOUNT_INTERNAL_ID,
+      this.account.id.uuid
+        .toString()
+    )
     MDC.put(MDCKeys.ACCOUNT_PROVIDER_NAME, this.account.provider.displayName)
-    MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID, this.account.provider.id.toString())
+    MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID,
+      this.account.provider.id
+        .toString()
+    )
 
     this.credentials =
       when (val state = this.account.loginState) {
-        is AccountLoggedInStaleCredentials -> state.credentials
-        is AccountLoggedIn -> state.credentials
-        is AccountLogoutFailed -> state.credentials
-        is AccountLoggingOut -> state.credentials
+        is AccountLoggedInStaleCredentials -> {
+          state.credentials
+        }
+
+        is AccountLoggedIn -> {
+          state.credentials
+        }
+
+        is AccountLogoutFailed -> {
+          state.credentials
+        }
+
+        is AccountLoggingOut -> {
+          state.credentials
+        }
+
         is AccountNotLoggedIn,
         is AccountLoggingIn,
         is AccountLoginFailed,
@@ -116,7 +141,10 @@ class ProfileAccountLogoutTask(
 
     return try {
       this.steps.addAttribute("AccountProviderName", this.account.provider.displayName)
-      this.steps.addAttribute("AccountProviderID", this.account.provider.id.toString())
+      this.steps.addAttribute("AccountProviderID",
+        this.account.provider.id
+          .toString()
+      )
 
       this.runLogoutURLIfNecessary()
       this.runFCMTokenDeletion()
@@ -153,24 +181,25 @@ class ProfileAccountLogoutTask(
       }
 
       is AccountProviderAuthenticationDescription.OpenIDConnect -> {
-        val targetLink = when (val link = description.logout) {
-          is Link.LinkBasic -> {
-            link.href
-          }
+        val targetLink =
+          when (val link = description.logout) {
+            is Link.LinkBasic -> {
+              link.href
+            }
 
-          is Link.LinkTemplated -> {
-            val target = AccountOIDC.oidcCallbackLogoutURI(this.account.id)
-            val text = link.href.replace("{&post_logout_redirect_uri}", "")
-            val uriBuilder = StringBuilder(text)
-            uriBuilder.append("&post_logout_redirect_uri=")
-            uriBuilder.append(URLEncoder.encode(target.toString(), "UTF-8"))
-            URI.create(uriBuilder.toString())
-          }
+            is Link.LinkTemplated -> {
+              val target = AccountOIDC.oidcCallbackLogoutURI(this.account.id)
+              val text = link.href.replace("{&post_logout_redirect_uri}", "")
+              val uriBuilder = StringBuilder(text)
+              uriBuilder.append("&post_logout_redirect_uri=")
+              uriBuilder.append(URLEncoder.encode(target.toString(), "UTF-8"))
+              URI.create(uriBuilder.toString())
+            }
 
-          null -> {
-            null
+            null -> {
+              null
+            }
           }
-        }
 
         if (targetLink == null) {
           this.steps.currentStepSucceeded("No logout link provided.")
@@ -178,7 +207,8 @@ class ProfileAccountLogoutTask(
         }
 
         val request =
-          this.http.newRequest(targetLink)
+          this.http
+            .newRequest(targetLink)
             .setAuthorization(AccountAuthenticatedHTTP.createAuthorizationIfPresent(account.loginState.credentials))
             .build()
 
@@ -237,8 +267,8 @@ class ProfileAccountLogoutTask(
     )
   }
 
-  private fun handlePatronUserProfile(): PatronDRMAdobe? {
-    return try {
+  private fun handlePatronUserProfile(): PatronDRMAdobe? =
+    try {
       val patronProfile =
         PatronUserProfiles.runPatronProfileRequest(
           taskRecorder = this.steps,
@@ -254,11 +284,8 @@ class ProfileAccountLogoutTask(
       this.logger.debug("Failed to fetch patron user profile: ", e)
       null
     }
-  }
 
-  private fun runDeviceDeactivationAdobe(
-    adobeCredentials: AccountAuthenticationAdobePreActivationCredentials
-  ) {
+  private fun runDeviceDeactivationAdobe(adobeCredentials: AccountAuthenticationAdobePreActivationCredentials) {
     val postActivation = adobeCredentials.postActivationCredentials
     if (postActivation == null) {
       this.debug("Device does not appear to be activated")
@@ -379,9 +406,7 @@ class ProfileAccountLogoutTask(
     }
   }
 
-  private fun runDeviceDeactivationAdobeSendDeviceManagerRequest(
-    deviceManagerURI: URI
-  ) {
+  private fun runDeviceDeactivationAdobeSendDeviceManagerRequest(deviceManagerURI: URI) {
     this.debug("runDeviceDeactivationAdobeSendDeviceManagerRequest: posting device ID")
 
     this.steps.beginNewStep(this.logoutStrings.logoutDeviceDeactivationPostDeviceManager)
@@ -394,15 +419,15 @@ class ProfileAccountLogoutTask(
      */
 
     val request =
-      this.http.newRequest(deviceManagerURI)
+      this.http
+        .newRequest(deviceManagerURI)
         .setAuthorization(AccountAuthenticatedHTTP.createAuthorizationIfPresent(this.credentials))
         .setMethod(
           LSHTTPRequestBuilderType.Method.Delete(
             ByteArray(0),
             MIMECompatibility.applicationOctetStream
           )
-        )
-        .addHeader("Content-Type", "vnd.librarysimplified/drm-device-id-list")
+        ).addHeader("Content-Type", "vnd.librarysimplified/drm-device-id-list")
         .build()
 
     try {
@@ -485,30 +510,33 @@ class ProfileAccountLogoutTask(
   }
 
   private fun fetchOPDSEntry(uri: URI): OPDSAcquisitionFeedEntry {
-    val feedResult = try {
-      this.feedLoader.fetchURI(
-        accountID = this.account.id,
-        uri = uri,
-        credentials = null,
-        method = "GET"
-      ).get()
-    } catch (e: TimeoutException) {
-      val message = this.logoutStrings.logoutOPDSFeedTimedOut
-      this.steps.currentStepFailed(
-        message = message,
-        "timedOut",
-        exception = e,
-        extraMessages = listOf()
-      )
-      throw StepFailedHandled(e)
-    } catch (e: ExecutionException) {
-      throw e.cause!!
-    }
+    val feedResult =
+      try {
+        this.feedLoader
+          .fetchURI(
+            accountID = this.account.id,
+            uri = uri,
+            credentials = null,
+            method = "GET"
+          ).get()
+      } catch (e: TimeoutException) {
+        val message = this.logoutStrings.logoutOPDSFeedTimedOut
+        this.steps.currentStepFailed(
+          message = message,
+          "timedOut",
+          exception = e,
+          extraMessages = listOf()
+        )
+        throw StepFailedHandled(e)
+      } catch (e: ExecutionException) {
+        throw e.cause!!
+      }
 
     val feed =
       when (feedResult) {
-        is FeedLoaderResult.FeedLoaderSuccess ->
+        is FeedLoaderResult.FeedLoaderSuccess -> {
           feedResult.feed
+        }
 
         is FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedAuthentication -> {
           this.debug(feedResult.message)
@@ -554,8 +582,9 @@ class ProfileAccountLogoutTask(
             throw StepFailedHandled(feedEntry.error)
           }
 
-          is FeedEntry.FeedEntryOPDS ->
+          is FeedEntry.FeedEntryOPDS -> {
             feedEntry.feedEntry
+          }
         }
       }
 

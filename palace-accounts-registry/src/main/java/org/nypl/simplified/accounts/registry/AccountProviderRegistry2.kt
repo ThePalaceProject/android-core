@@ -77,7 +77,6 @@ class AccountProviderRegistry2 private constructor(
   private val statusAttributeUI: AttributeType<AccountProviderRegistryStatus>,
   private val uriBase: URI,
 ) : AccountProviderRegistryType {
-
   private val logger =
     LoggerFactory.getLogger(AccountProviderRegistry2::class.java)
 
@@ -88,7 +87,6 @@ class AccountProviderRegistry2 private constructor(
     WPMMappers.createMapper()
 
   companion object {
-
     private val logger =
       LoggerFactory.getLogger(AccountProviderRegistry2::class.java)
     private val attributes =
@@ -177,10 +175,11 @@ class AccountProviderRegistry2 private constructor(
       val descriptions =
         t.execute(
           queryType = DBQAccountProviderListType::class.java,
-          parameters = DBQAccountProviderListType.Parameters(
-            startingId = null,
-            limit = MAXIMUM_PROVIDER_DESCRIPTIONS
-          )
+          parameters =
+            DBQAccountProviderListType.Parameters(
+              startingId = null,
+              limit = MAXIMUM_PROVIDER_DESCRIPTIONS
+            )
         )
 
       /*
@@ -213,15 +212,16 @@ class AccountProviderRegistry2 private constructor(
         val descriptions =
           t.execute(
             queryType = DBQAccountProviderDescriptionListType::class.java,
-            parameters = DBQAccountProviderDescriptionListType.Parameters(
-              startingId = null,
-              limit = MAXIMUM_PROVIDER_DESCRIPTIONS
-            )
+            parameters =
+              DBQAccountProviderDescriptionListType.Parameters(
+                startingId = null,
+                limit = MAXIMUM_PROVIDER_DESCRIPTIONS
+              )
           )
 
         descriptionMap = descriptions.associateBy { d -> d.id }.toMutableMap()
 
-        /* If the default provider description isn't in the database, we'll need to insert it now. */
+        // If the default provider description isn't in the database, we'll need to insert it now.
         val defaultProviderDescription = this.defaultProvider.toDescription()
         if (!descriptionMap.containsKey(defaultProviderDescription.id)) {
           descriptionMap[defaultProviderDescription.id] = defaultProviderDescription
@@ -261,11 +261,10 @@ class AccountProviderRegistry2 private constructor(
   override val accountProviderDescriptionsSortedAttribute: AttributeReadableType<List<AccountProviderDescription>> =
     this.accountProviderDescriptionsAttributeSortedUI
 
-  override fun loadAsync(): CompletableFuture<Unit> {
-    return this.executeMain {
+  override fun loadAsync(): CompletableFuture<Unit> =
+    this.executeMain {
       this.opLoad()
     }
-  }
 
   private fun opLoad() {
     this.logger.debug("Loading...")
@@ -301,14 +300,15 @@ class AccountProviderRegistry2 private constructor(
       try {
         Files.deleteIfExists(temporary)
 
-        AccountProviderRegistry2.javaClass.getResourceAsStream(
-          "/org/nypl/simplified/accounts/registry/providers.db"
-        ).use { stream ->
-          if (stream != null) {
-            Files.copy(stream, temporary)
-            this.database.copyAccountProviderDescriptionsFrom(temporary)
+        AccountProviderRegistry2.javaClass
+          .getResourceAsStream(
+            "/org/nypl/simplified/accounts/registry/providers.db"
+          ).use { stream ->
+            if (stream != null) {
+              Files.copy(stream, temporary)
+              this.database.copyAccountProviderDescriptionsFrom(temporary)
+            }
           }
-        }
       } finally {
         Files.deleteIfExists(temporary)
       }
@@ -320,9 +320,7 @@ class AccountProviderRegistry2 private constructor(
   override val defaultProvider: AccountProvider =
     this.accountProviderDefault.get()
 
-  private fun opRefresh(
-    refreshRequest: AccountProviderRegistryRefresh
-  ) {
+  private fun opRefresh(refreshRequest: AccountProviderRegistryRefresh) {
     if (this.status is Refreshing) {
       this.logger.debug("Ignoring redundant refresh request.")
       return
@@ -330,10 +328,11 @@ class AccountProviderRegistry2 private constructor(
 
     this.logger.debug("Refreshing account provider descriptions.")
     this.setStatusRefreshing(
-      kind = when (refreshRequest) {
-        is AccountProviderRegistryRefresh.Full -> "Full"
-        is AccountProviderRegistryRefresh.Incremental -> "Incremental"
-      },
+      kind =
+        when (refreshRequest) {
+          is AccountProviderRegistryRefresh.Full -> "Full"
+          is AccountProviderRegistryRefresh.Incremental -> "Incremental"
+        },
       offset = 0,
       totalItems = null
     )
@@ -370,15 +369,16 @@ class AccountProviderRegistry2 private constructor(
           "production"
         }
 
-      updated = when (refreshRequest) {
-        is AccountProviderRegistryRefresh.Full -> {
-          this.opRefreshFull(taskRecorder, availability)
-        }
+      updated =
+        when (refreshRequest) {
+          is AccountProviderRegistryRefresh.Full -> {
+            this.opRefreshFull(taskRecorder, availability)
+          }
 
-        is AccountProviderRegistryRefresh.Incremental -> {
-          this.opRefreshIncremental(taskRecorder, availability)
+          is AccountProviderRegistryRefresh.Incremental -> {
+            this.opRefreshIncremental(taskRecorder, availability)
+          }
         }
-      }
     } catch (e: Throwable) {
       taskRecorder.currentStepFailed(
         message = e.message ?: e.javaClass.name,
@@ -465,8 +465,8 @@ class AccountProviderRegistry2 private constructor(
     return updated
   }
 
-  private fun lastUpdateTimeGet(): OffsetDateTime? {
-    return this.database.openTransaction().use { transaction ->
+  private fun lastUpdateTimeGet(): OffsetDateTime? =
+    this.database.openTransaction().use { transaction ->
       val setting =
         transaction.execute(
           queryType = DBQAccountRegistrySettingsGetType::class.java,
@@ -477,16 +477,16 @@ class AccountProviderRegistry2 private constructor(
         null -> null
       }
     }
-  }
 
   private fun lastUpdateTimeSet() {
     this.database.openTransaction().use { transaction ->
       transaction.execute(
         queryType = DBQAccountRegistrySettingsPutType::class.java,
-        parameters = DBQAccountRegistrySetting.TimeSetting(
-          name = SETTING_LAST_UPDATE_NAME,
-          value = OffsetDateTime.now(ZoneOffset.UTC)
-        )
+        parameters =
+          DBQAccountRegistrySetting.TimeSetting(
+            name = SETTING_LAST_UPDATE_NAME,
+            value = OffsetDateTime.now(ZoneOffset.UTC)
+          )
       )
       transaction.commit()
     }
@@ -553,7 +553,10 @@ class AccountProviderRegistry2 private constructor(
 
   private fun setStatusLoading() {
     when (this.status) {
-      is Failed, is Idle -> this.setStatus(Loading)
+      is Failed, is Idle -> {
+        this.setStatus(Loading)
+      }
+
       Loading, is Refreshing -> {
         // Nothing required.
       }
@@ -562,16 +565,17 @@ class AccountProviderRegistry2 private constructor(
 
   private fun setStatusFinishedLoading(size: Int) {
     when (this.status) {
-      is Failed, is Idle, Loading -> this.setStatus(Idle(size))
+      is Failed, is Idle, Loading -> {
+        this.setStatus(Idle(size))
+      }
+
       is Refreshing -> {
         // Nothing required.
       }
     }
   }
 
-  private fun setStatusFailed(
-    result: TaskResult.Failure<WPMManifest>
-  ) {
+  private fun setStatusFailed(result: TaskResult.Failure<WPMManifest>) {
     this.setStatus(Failed(result))
     this.eventsActual.onNext(StatusChanged)
   }
@@ -591,18 +595,14 @@ class AccountProviderRegistry2 private constructor(
     this.eventsActual.onNext(StatusChanged)
   }
 
-  private fun opProcessCatalog(
-    catalog: WPMCatalog
-  ) {
+  private fun opProcessCatalog(catalog: WPMCatalog) {
     val accountProviderDescription: AccountProviderDescription =
       this.opCatalogToAccountProviderDescription(catalog)
 
     this.opProcessAccountProviderDescription(accountProviderDescription)
   }
 
-  private fun opProcessAccountProviderDescription(
-    accountProviderDescription: AccountProviderDescription
-  ) {
+  private fun opProcessAccountProviderDescription(accountProviderDescription: AccountProviderDescription) {
     this.logger.debug("Updated catalog {}", accountProviderDescription.title)
 
     this.database.openTransaction().use { t ->
@@ -618,9 +618,7 @@ class AccountProviderRegistry2 private constructor(
     this.accountProviderDescriptionsAttributeSrc.set(withNew)
   }
 
-  private fun opCatalogToAccountProviderDescription(
-    catalog: WPMCatalog
-  ): AccountProviderDescription {
+  private fun opCatalogToAccountProviderDescription(catalog: WPMCatalog): AccountProviderDescription {
     val title =
       catalog.metadata.title.defaultValue
     val identifier =
@@ -692,7 +690,8 @@ class AccountProviderRegistry2 private constructor(
       taskRecorder.beginNewStep("Fetching $targetURI (Attempt $attempt of 3)")
 
       val request =
-        this.httpClient.newRequest(targetURI)
+        this.httpClient
+          .newRequest(targetURI)
           .build()
       val response =
         request.execute()
@@ -745,14 +744,13 @@ class AccountProviderRegistry2 private constructor(
     throw IOException("Failed to retrieve a registry page after multiple attempts.")
   }
 
-  private fun emptyManifest(): WPMManifest {
-    return WPMManifest(
+  private fun emptyManifest(): WPMManifest =
+    WPMManifest(
       this.emptyMetadata()
     )
-  }
 
-  private fun emptyMetadata(): WPMMetadata {
-    return WPMMetadata(
+  private fun emptyMetadata(): WPMMetadata =
+    WPMMetadata(
       title = WPMLanguageMap.Scalar("End Of Results"),
       sortAs = null,
       subtitle = null,
@@ -767,11 +765,8 @@ class AccountProviderRegistry2 private constructor(
       contains = null,
       numberOfItems = null
     )
-  }
 
-  private fun setStatus(
-    status: AccountProviderRegistryStatus
-  ) {
+  private fun setStatus(status: AccountProviderRegistryStatus) {
     this.logger.debug("setStatus: {}", status)
     this.statusAttributeSrc.set(status)
   }
@@ -781,11 +776,7 @@ class AccountProviderRegistry2 private constructor(
    * in progress.
    */
 
-  private fun <T> executeMain(
-    f: () -> T
-  ): CompletableFuture<T> {
-    return this.executeTask(this.mainExecutor, f)
-  }
+  private fun <T> executeMain(f: () -> T): CompletableFuture<T> = this.executeTask(this.mainExecutor, f)
 
   /**
    * Execute a task on an executor and return a future representing the operation in progress.
@@ -812,17 +803,12 @@ class AccountProviderRegistry2 private constructor(
     return future
   }
 
-  override fun refreshAsync(
-    refreshRequest: AccountProviderRegistryRefresh
-  ): CompletableFuture<Unit> {
-    return this.executeMain {
+  override fun refreshAsync(refreshRequest: AccountProviderRegistryRefresh): CompletableFuture<Unit> =
+    this.executeMain {
       this.opRefresh(refreshRequest)
     }
-  }
 
-  override fun clearAsync(): CompletableFuture<Unit> {
-    return this.executeMain { this.opClear() }
-  }
+  override fun clearAsync(): CompletableFuture<Unit> = this.executeMain { this.opClear() }
 
   private fun opClear() {
     this.database.openTransaction().use { t ->
@@ -839,19 +825,12 @@ class AccountProviderRegistry2 private constructor(
     this.accountProviderDescriptionsAttributeSrc.set(mapOf())
   }
 
-  override fun accountProviderDescriptions(): Map<URI, AccountProviderDescription> {
-    return this.accountProviderDescriptionsAttributeSrc.get()
-  }
+  override fun accountProviderDescriptions(): Map<URI, AccountProviderDescription> = this.accountProviderDescriptionsAttributeSrc.get()
 
-  override fun updateProviderAsync(
-    accountProvider: AccountProviderType
-  ): CompletableFuture<AccountProviderType> {
-    return this.executeMain { this.opUpdateProvider(accountProvider) }
-  }
+  override fun updateProviderAsync(accountProvider: AccountProviderType): CompletableFuture<AccountProviderType> =
+    this.executeMain { this.opUpdateProvider(accountProvider) }
 
-  private fun opUpdateProvider(
-    accountProviderOriginal: AccountProviderType
-  ): AccountProviderType {
+  private fun opUpdateProvider(accountProviderOriginal: AccountProviderType): AccountProviderType {
     val accountProvider =
       AccountProvider.copy(accountProviderOriginal)
 
@@ -900,9 +879,7 @@ class AccountProviderRegistry2 private constructor(
     return accountProvider
   }
 
-  private fun opUpdateDescriptions(
-    descriptions: List<AccountProviderDescription>
-  ): List<AccountProviderDescription> {
+  private fun opUpdateDescriptions(descriptions: List<AccountProviderDescription>): List<AccountProviderDescription> {
     this.database.openTransaction().use { t ->
 
       val timeThen = System.nanoTime()
@@ -927,15 +904,12 @@ class AccountProviderRegistry2 private constructor(
     return descriptions
   }
 
-  private fun opFindExistingIDs(): Set<URI> {
-    return this.database.openTransaction().use { t ->
+  private fun opFindExistingIDs(): Set<URI> =
+    this.database.openTransaction().use { t ->
       t.execute(DBQAccountProviderDescriptionIDSetType::class.java, Unit)
     }
-  }
 
-  private fun opDeleteProviderDescriptions(
-    ids: Set<URI>
-  ) {
+  private fun opDeleteProviderDescriptions(ids: Set<URI>) {
     this.logger.debug("Deleting {} obsolete account provider descriptions.", ids.size)
     return this.database.openTransaction().use { t ->
       t.execute(DBQAccountProviderDescriptionDeleteType::class.java, ids)
@@ -943,24 +917,17 @@ class AccountProviderRegistry2 private constructor(
     }
   }
 
-  override fun updateDescriptionAsync(
-    description: AccountProviderDescription
-  ): CompletableFuture<AccountProviderDescription> {
-    return this.executeMain { this.opUpdateDescriptions(listOf(description)).first() }
-  }
+  override fun updateDescriptionAsync(description: AccountProviderDescription): CompletableFuture<AccountProviderDescription> =
+    this.executeMain { this.opUpdateDescriptions(listOf(description)).first() }
 
   override fun updateDescriptionsAsync(
     descriptions: List<AccountProviderDescription>
-  ): CompletableFuture<List<AccountProviderDescription>> {
-    return this.executeMain { this.opUpdateDescriptions(descriptions) }
-  }
+  ): CompletableFuture<List<AccountProviderDescription>> = this.executeMain { this.opUpdateDescriptions(descriptions) }
 
   override fun resolveAsync(
     onProgress: AccountProviderResolutionListenerType,
     description: AccountProviderDescription
-  ): CompletableFuture<TaskResult<AccountProviderType>> {
-    return this.executeMain { this.opResolve(onProgress, description) }
-  }
+  ): CompletableFuture<TaskResult<AccountProviderType>> = this.executeMain { this.opResolve(onProgress, description) }
 
   private fun opResolve(
     onProgress: AccountProviderResolutionListenerType,

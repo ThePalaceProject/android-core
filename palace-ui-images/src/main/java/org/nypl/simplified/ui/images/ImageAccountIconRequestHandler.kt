@@ -18,14 +18,13 @@ import java.net.URL
 class ImageAccountIconRequestHandler(
   private val context: Context
 ) : RequestHandler() {
-
   override fun canHandleRequest(data: Request): Boolean = true
 
   override fun load(
     request: Request,
     networkPolicy: Int
-  ): Result {
-    return when (request.uri.scheme) {
+  ): Result =
+    when (request.uri.scheme) {
       "data" -> {
         val bitmap = ImageIconViews.imageFromBase64URI(request.uri.toString())
         if (bitmap != null) {
@@ -48,8 +47,6 @@ class ImageAccountIconRequestHandler(
         Result(URL(request.uri.toString()).openStream().source(), NETWORK)
       }
     }
-  }
 
-  private fun failQuietly() =
-    Result(ByteArrayInputStream(ByteArray(0)).source(), DISK)
+  private fun failQuietly() = Result(ByteArrayInputStream(ByteArray(0)).source(), DISK)
 }

@@ -38,18 +38,16 @@ data class TimeTrackingEntryOutgoing(
   )
 
   companion object {
-
-    fun group(
-      entries: List<TimeTrackingEntryOutgoing>
-    ): Map<Key, List<TimeTrackingEntryOutgoing>> {
+    fun group(entries: List<TimeTrackingEntryOutgoing>): Map<Key, List<TimeTrackingEntryOutgoing>> {
       val results = mutableMapOf<Key, List<TimeTrackingEntryOutgoing>>()
       for (entry in entries) {
-        val key = Key(
-          accountID = entry.accountID,
-          bookID = entry.bookID,
-          libraryID = entry.libraryID,
-          targetURI = entry.targetURI
-        )
+        val key =
+          Key(
+            accountID = entry.accountID,
+            bookID = entry.bookID,
+            libraryID = entry.libraryID,
+            targetURI = entry.targetURI
+          )
         var existing = results[key]
         existing = existing?.plus(entry) ?: listOf(entry)
         results[key] = existing
@@ -57,30 +55,25 @@ data class TimeTrackingEntryOutgoing(
       return results.toMap()
     }
 
-    fun ofFile(
-      file: Path
-    ): TimeTrackingEntryOutgoing {
-      return Files.newInputStream(file).use { stream ->
+    fun ofFile(file: Path): TimeTrackingEntryOutgoing =
+      Files.newInputStream(file).use { stream ->
         val p = Properties()
         p.load(stream)
         ofProperties(p)
       }
-    }
 
-    fun ofProperties(
-      p: Properties
-    ): TimeTrackingEntryOutgoing {
-      return TimeTrackingEntryOutgoing(
+    fun ofProperties(p: Properties): TimeTrackingEntryOutgoing =
+      TimeTrackingEntryOutgoing(
         accountID = AccountID(UUID.fromString(p.getProperty("AccountID"))),
         bookID = PlayerPalaceID(p.getProperty("BookID")),
         targetURI = URI.create(p.getProperty("TargetURI")),
         libraryID = URI.create(p.getProperty("LibraryID")),
-        timeEntry = TimeTrackingEntry(
-          id = p.getProperty("ID"),
-          duringMinute = p.getProperty("Minute"),
-          secondsPlayed = p.getProperty("Seconds").toInt()
-        )
+        timeEntry =
+          TimeTrackingEntry(
+            id = p.getProperty("ID"),
+            duringMinute = p.getProperty("Minute"),
+            secondsPlayed = p.getProperty("Seconds").toInt()
+          )
       )
-    }
   }
 }

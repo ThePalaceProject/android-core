@@ -22,14 +22,11 @@ import java.io.File
  */
 
 object MainLogging {
-
   /**
    * Configure the default logcat appender.
    */
 
-  private fun configureLogcatAppender(
-    loggerContext: LoggerContext
-  ): Appender<ILoggingEvent> {
+  private fun configureLogcatAppender(loggerContext: LoggerContext): Appender<ILoggingEvent> {
     val encoder =
       PatternLayoutEncoder().apply {
         this.context = loggerContext
@@ -48,15 +45,12 @@ object MainLogging {
    * Configure the Crashlytics appender.
    */
 
-  private fun configureCrashlyticsAppender(
-    loggerContext: LoggerContext
-  ): Appender<ILoggingEvent> {
-    return CrashlyticsLoggingAppender().apply {
+  private fun configureCrashlyticsAppender(loggerContext: LoggerContext): Appender<ILoggingEvent> =
+    CrashlyticsLoggingAppender().apply {
       this.context = loggerContext
       this.name = "CRASHLYTICS"
       this.start()
     }
-  }
 
   /**
    * Configure a file based logging appender.
@@ -151,11 +145,12 @@ object MainLogging {
       LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
 
     // Set our log level
-    root.level = if (BuildConfig.DEBUG) {
-      Level.TRACE
-    } else {
-      Level.DEBUG
-    }
+    root.level =
+      if (BuildConfig.DEBUG) {
+        Level.TRACE
+      } else {
+        Level.DEBUG
+      }
 
     // Add appenders to the root logger
     root.apply {

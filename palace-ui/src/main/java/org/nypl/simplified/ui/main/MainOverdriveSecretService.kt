@@ -15,16 +15,12 @@ class MainOverdriveSecretService private constructor(
   override val clientKey: String?,
   override val clientPass: String?
 ) : AudioBookOverdriveSecretServiceType {
-
   companion object {
-
     private val logger =
       LoggerFactory.getLogger(MainOverdriveSecretService::class.java)
 
-    fun createConditionally(
-      context: Context
-    ): AudioBookOverdriveSecretServiceType? {
-      return try {
+    fun createConditionally(context: Context): AudioBookOverdriveSecretServiceType? =
+      try {
         context.assets.open("secrets.conf").use(Companion::create)
       } catch (e: FileNotFoundException) {
         logger.warn("failed to initialize Overdrive; secrets.conf not found")
@@ -33,11 +29,8 @@ class MainOverdriveSecretService private constructor(
         logger.warn("failed to initialize Overdrive", e)
         null
       }
-    }
 
-    fun create(
-      stream: InputStream
-    ): AudioBookOverdriveSecretServiceType {
+    fun create(stream: InputStream): AudioBookOverdriveSecretServiceType {
       val properties =
         Properties().apply { load(stream) }
 

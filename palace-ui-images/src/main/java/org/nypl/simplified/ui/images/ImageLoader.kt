@@ -10,18 +10,15 @@ import com.squareup.picasso.Picasso
 class ImageLoader private constructor(
   override val loader: Picasso
 ) : ImageLoaderType {
-
   companion object {
-
     /**
      * Create a new image loader.
      */
 
-    fun create(
-      context: Context
-    ): ImageLoaderType {
+    fun create(context: Context): ImageLoaderType {
       val localImageLoader =
-        Picasso.Builder(context)
+        Picasso
+          .Builder(context)
           .indicatorsEnabled(false)
           .loggingEnabled(false)
           .addRequestHandler(ImageAccountIconRequestHandler(context))

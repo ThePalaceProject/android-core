@@ -16,7 +16,6 @@ class ViewsForOIDC(
   private val logoutButton: Button,
   private val resetPasswordLabel: TextView
 ) : AccountAuthenticationViewBindings() {
-
   private var loginText =
     this.viewGroup.resources.getString(R.string.accountLogin)
   private val logoutText =
@@ -41,8 +40,8 @@ class ViewsForOIDC(
     }
   }
 
-  override fun setLoginButtonStatus(status: AccountLoginButtonStatus) {
-    return when (status) {
+  override fun setLoginButtonStatus(status: AccountLoginButtonStatus) =
+    when (status) {
       is AccountLoginButtonStatus.AsLoginButtonEnabled -> {
         this.loginButton.isEnabled = true
         this.loginButton.text = this.loginText
@@ -73,10 +72,9 @@ class ViewsForOIDC(
         this.setVisibility(this.loginButton, View.GONE)
       }
     }
-  }
 
-  override fun setLogoutButtonStatus(status: AccountLogoutButtonStatus) {
-    return when (status) {
+  override fun setLogoutButtonStatus(status: AccountLogoutButtonStatus) =
+    when (status) {
       is AccountLogoutButtonStatus.AsLogoutButtonEnabled -> {
         this.logoutButton.setText(R.string.accountLogout)
         this.logoutButton.isEnabled = true
@@ -107,7 +105,6 @@ class ViewsForOIDC(
         this.setVisibility(this.logoutButton, View.GONE)
       }
     }
-  }
 
   override fun setResetPasswordLabelStatus(
     status: AccountLoginButtonStatus,
@@ -134,13 +131,12 @@ class ViewsForOIDC(
   }
 
   companion object {
-    fun bind(viewGroup: ViewGroup): ViewsForOIDC {
-      return ViewsForOIDC(
+    fun bind(viewGroup: ViewGroup): ViewsForOIDC =
+      ViewsForOIDC(
         viewGroup = viewGroup,
         loginButton = viewGroup.findViewById(R.id.authOIDCLogin),
         logoutButton = viewGroup.findViewById(R.id.authOIDCLogout),
         resetPasswordLabel = viewGroup.findViewById(R.id.resetPasswordLabel)
       )
-    }
   }
 }

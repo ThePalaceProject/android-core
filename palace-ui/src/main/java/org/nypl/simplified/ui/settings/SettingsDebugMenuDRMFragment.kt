@@ -29,27 +29,21 @@ import org.nypl.simplified.ui.main.MainNavigation
 import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
 import org.nypl.simplified.ui.screens.ScreenDefinitionType
 
-class SettingsDebugMenuDRMFragment : Fragment(R.layout.debug_drm), MainBackButtonConsumerType {
-
+class SettingsDebugMenuDRMFragment :
+  Fragment(R.layout.debug_drm),
+  MainBackButtonConsumerType {
   companion object : ScreenDefinitionFactoryType<Unit, SettingsDebugMenuDRMFragment> {
-    private class ScreenSettingsDebugMenu :
-      ScreenDefinitionType<Unit, SettingsDebugMenuDRMFragment> {
+    private class ScreenSettingsDebugMenu : ScreenDefinitionType<Unit, SettingsDebugMenuDRMFragment> {
       override fun setup() {
         // No setup required
       }
 
-      override fun parameters() {
-        return Unit
-      }
+      override fun parameters() = Unit
 
-      override fun fragment(): SettingsDebugMenuDRMFragment {
-        return SettingsDebugMenuDRMFragment()
-      }
+      override fun fragment(): SettingsDebugMenuDRMFragment = SettingsDebugMenuDRMFragment()
     }
 
-    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuDRMFragment> {
-      return ScreenSettingsDebugMenu()
-    }
+    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuDRMFragment> = ScreenSettingsDebugMenu()
   }
 
   override fun onBackButtonPressed(): MainBackButtonConsumerType.Result {
@@ -152,11 +146,9 @@ class SettingsDebugMenuDRMFragment : Fragment(R.layout.debug_drm), MainBackButto
         .setTitle(R.string.debugDRMAdobeIDResetConfirmTitle)
         .setMessage(
           this.getString(R.string.debugDRMAdobeIDResetConfirmation, account.provider.displayName)
-        )
-        .setNegativeButton(R.string.Dismiss) { dialog, _ ->
+        ).setNegativeButton(R.string.Dismiss) { dialog, _ ->
           dialog.dismiss()
-        }
-        .setPositiveButton(R.string.debugDRMAdobeIDResetReset) { dialog, _ ->
+        }.setPositiveButton(R.string.debugDRMAdobeIDResetReset) { dialog, _ ->
           this.doAdobeReset(profiles, account)
           dialog.dismiss()
         }.create()
@@ -180,6 +172,7 @@ class SettingsDebugMenuDRMFragment : Fragment(R.layout.debug_drm), MainBackButto
             this.showError(result)
           }
         }
+
         is TaskResult.Success<*> -> {
           profiles.profileAccountLogout(account.id)
         }
@@ -188,9 +181,7 @@ class SettingsDebugMenuDRMFragment : Fragment(R.layout.debug_drm), MainBackButto
   }
 
   @UiThread
-  private fun showError(
-    result: TaskResult.Failure<*>
-  ) {
+  private fun showError(result: TaskResult.Failure<*>) {
     val services =
       Services.serviceDirectory()
     val buildConfig =
@@ -240,9 +231,7 @@ class SettingsDebugMenuDRMFragment : Fragment(R.layout.debug_drm), MainBackButto
     return row
   }
 
-  private fun onAdobeDRMReceivedActivations(
-    activations: List<AdobeDRMExtensions.Activation>
-  ) {
+  private fun onAdobeDRMReceivedActivations(activations: List<AdobeDRMExtensions.Activation>) {
     this.adobeDRMActivationTable.removeAllViews()
 
     this.run {

@@ -9,7 +9,6 @@ import org.nypl.simplified.links.Link
  */
 
 object LinkSerialization {
-
   private val mapper = ObjectMapper()
 
   /**
@@ -32,6 +31,7 @@ object LinkSerialization {
         node.put("href", link.href.toString())
         node
       }
+
       is Link.LinkTemplated -> {
         node.put("href", link.href)
         node.put("templated", true)

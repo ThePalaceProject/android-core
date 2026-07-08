@@ -10,4 +10,5 @@ data class AccountEventLoginStateChanged(
   override val message: String,
   val accountID: AccountID,
   val state: AccountLoginState
-) : AccountEvent(), PresentableType
+) : AccountEvent(),
+  PresentableType

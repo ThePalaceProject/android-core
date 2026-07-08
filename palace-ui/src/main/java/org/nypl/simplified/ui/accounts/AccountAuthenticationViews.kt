@@ -27,7 +27,6 @@ class AccountAuthenticationViews(
   private val viewGroup: ViewGroup,
   onUsernamePasswordChangeListener: (AccountUsername, AccountPassword) -> Unit
 ) {
-
   private val basic: ViewsForBasic =
     ViewsForBasic.bind(
       viewGroup = this.viewGroup.findViewById(R.id.authBasic),
@@ -194,8 +193,8 @@ class AccountAuthenticationViews(
    * given authentication description.
    */
 
-  fun isLoginSatisfiedFor(description: AccountProviderAuthenticationDescription): Boolean {
-    return when (description) {
+  fun isLoginSatisfiedFor(description: AccountProviderAuthenticationDescription): Boolean =
+    when (description) {
       is Basic -> {
         this.basic.isSatisfied(description)
       }
@@ -206,40 +205,32 @@ class AccountAuthenticationViews(
 
       is OpenIDConnect,
       Anonymous,
-      is SAML2_0 ->
+      is SAML2_0 -> {
         true
+      }
     }
-  }
 
   /**
    * @return The current Basic authentication password
    */
 
-  fun getBasicPassword(): AccountPassword {
-    return this.basic.getPassword()
-  }
+  fun getBasicPassword(): AccountPassword = this.basic.getPassword()
 
   /**
    * @return The current Basic authentication username
    */
 
-  fun getBasicUser(): AccountUsername {
-    return this.basic.getUser()
-  }
+  fun getBasicUser(): AccountUsername = this.basic.getUser()
 
   /**
    * @return The current Basic authentication password
    */
 
-  fun getBasicTokenPassword(): AccountPassword {
-    return this.basicToken.getPassword()
-  }
+  fun getBasicTokenPassword(): AccountPassword = this.basicToken.getPassword()
 
   /**
    * @return The current Basic authentication username
    */
 
-  fun getBasicTokenUser(): AccountUsername {
-    return this.basicToken.getUser()
-  }
+  fun getBasicTokenUser(): AccountUsername = this.basicToken.getUser()
 }

@@ -29,7 +29,6 @@ class BHTTPCalls(
   private val objectMapper: ObjectMapper,
   private val http: LSHTTPClientType
 ) : BookmarkHTTPCallsType {
-
   private val logger = LoggerFactory.getLogger(BHTTPCalls::class.java)
 
   override fun bookmarksGet(
@@ -40,7 +39,8 @@ class BHTTPCalls(
     val auth =
       AccountAuthenticatedHTTP.createAuthorization(credentials)
     val request =
-      this.http.newRequest(annotationsURI)
+      this.http
+        .newRequest(annotationsURI)
         .setAuthorization(auth)
         .addBasicTokenPropertiesIfApplicable(credentials)
         .build()
@@ -51,9 +51,11 @@ class BHTTPCalls(
           account.updateBasicTokenCredentials(status.getAccessToken())
           this.deserializeBookmarksFromStream(status.bodyStream ?: this.emptyStream())
         }
+
         is LSHTTPResponseStatus.Responded.Error -> {
           this.logAndFail(annotationsURI, status)
         }
+
         is LSHTTPResponseStatus.Failed -> {
           throw status.exception
         }
@@ -69,7 +71,8 @@ class BHTTPCalls(
     val auth =
       AccountAuthenticatedHTTP.createAuthorization(credentials)
     val request =
-      this.http.newRequest(bookmarkURI)
+      this.http
+        .newRequest(bookmarkURI)
         .setAuthorization(auth)
         .addBasicTokenPropertiesIfApplicable(credentials)
         .setMethod(Delete(ByteArray(0), MIMECompatibility.applicationOctetStream))
@@ -81,9 +84,11 @@ class BHTTPCalls(
           account.updateBasicTokenCredentials(status.getAccessToken())
           true
         }
+
         is LSHTTPResponseStatus.Responded.Error -> {
           this.logAndFail(bookmarkURI, status)
         }
+
         is LSHTTPResponseStatus.Failed -> {
           throw status.exception
         }
@@ -106,7 +111,8 @@ class BHTTPCalls(
     val post =
       Post(data, MIMEType("application", "ld+json", mapOf()))
     val request =
-      this.http.newRequest(annotationsURI)
+      this.http
+        .newRequest(annotationsURI)
         .setAuthorization(auth)
         .addBasicTokenPropertiesIfApplicable(credentials)
         .setMethod(post)
@@ -125,9 +131,11 @@ class BHTTPCalls(
             null
           }
         }
+
         is LSHTTPResponseStatus.Responded.Error -> {
           this.logAndFail(annotationsURI, status)
         }
+
         is LSHTTPResponseStatus.Failed -> {
           throw status.exception
         }

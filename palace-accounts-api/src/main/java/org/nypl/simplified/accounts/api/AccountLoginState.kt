@@ -9,7 +9,6 @@ import java.net.URI
  */
 
 sealed class AccountLoginState {
-
   /**
    * The previous credentials, if credentials are being refreshed.
    */
@@ -32,8 +31,7 @@ sealed class AccountLoginState {
     override val credentials: AccountAuthenticationCredentials?
       get() = this.previousCredentials
 
-    override fun toString(): String =
-      this.javaClass.simpleName
+    override fun toString(): String = this.javaClass.simpleName
   }
 
   /**
@@ -42,7 +40,6 @@ sealed class AccountLoginState {
 
   data class AccountLoggingIn(
     override val previousCredentials: AccountAuthenticationCredentials?,
-
     /**
      * A humanly-readable status message.
      *
@@ -50,13 +47,11 @@ sealed class AccountLoginState {
      */
 
     val status: String,
-
     /**
      * The description being used to log in.
      */
 
     val description: AccountProviderAuthenticationDescription,
-
     /**
      * `true` if the login operation can be cancelled.
      */
@@ -77,13 +72,11 @@ sealed class AccountLoginState {
      */
 
     override val previousCredentials: AccountAuthenticationCredentials?,
-
     /**
      * The description being used to log in.
      */
 
     val description: AccountProviderAuthenticationDescription,
-
     /**
      * A humanly-readable status message.
      *
@@ -91,7 +84,6 @@ sealed class AccountLoginState {
      */
 
     val status: String,
-
     /**
      * The external authentication URI. May or may not be equal to the URI in the
      * authentication description.
@@ -114,7 +106,8 @@ sealed class AccountLoginState {
 
     override val previousCredentials: AccountAuthenticationCredentials?,
     val taskResult: TaskResult.Failure<*>
-  ) : AccountLoginState(), PresentableErrorType {
+  ) : AccountLoginState(),
+    PresentableErrorType {
     override val message: String =
       this.taskResult.message
     override val exception: Throwable? =
@@ -155,7 +148,6 @@ sealed class AccountLoginState {
 
   data class AccountLoggingOut(
     override val credentials: AccountAuthenticationCredentials,
-
     /**
      * A humanly-readable status message.
      *
@@ -175,7 +167,8 @@ sealed class AccountLoginState {
   data class AccountLogoutFailed(
     val taskResult: TaskResult.Failure<*>,
     override val credentials: AccountAuthenticationCredentials
-  ) : AccountLoginState(), PresentableErrorType {
+  ) : AccountLoginState(),
+    PresentableErrorType {
     override val previousCredentials: AccountAuthenticationCredentials =
       this.credentials
     override val message: String =

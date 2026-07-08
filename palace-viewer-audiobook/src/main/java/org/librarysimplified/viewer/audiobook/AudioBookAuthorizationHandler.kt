@@ -33,7 +33,6 @@ class AudioBookAuthorizationHandler(
   private val book: Book,
   private val httpClient: LSHTTPClientType,
 ) : PlayerAuthorizationHandlerType {
-
   private val logger =
     LoggerFactory.getLogger(AudioBookAuthorizationHandler::class.java)
 
@@ -102,7 +101,9 @@ class AudioBookAuthorizationHandler(
   }
 
   private fun bookSimplifiedBearerTokenRefresh(): LSHTTPAuthorizationType? {
-    val target = this.book.entry.acquisitions[0].uri.hrefURI
+    val target =
+      this.book.entry.acquisitions[0]
+        .uri.hrefURI
     if (target == null) {
       this.logger.warn("Cannot negotiate bearer tokens from templated URIs.")
       return null
@@ -113,17 +114,29 @@ class AudioBookAuthorizationHandler(
 
     val refreshProperties =
       when (val c = this.account.loginState.credentials) {
-        is Basic -> null
-        is BasicToken ->
+        is Basic -> {
+          null
+        }
+
+        is BasicToken -> {
           LSHTTPRefreshTokenProperties(
             userName = c.userName.value,
             password = c.password.value,
             refreshURI = c.authenticationTokenInfo.authURI
           )
+        }
 
-        is OpenIDConnect -> null
-        is SAML2_0 -> null
-        null -> null
+        is OpenIDConnect -> {
+          null
+        }
+
+        is SAML2_0 -> {
+          null
+        }
+
+        null -> {
+          null
+        }
       }
 
     val tokenResult =
@@ -175,9 +188,9 @@ class AudioBookAuthorizationHandler(
     }
   }
 
-  private fun bookSimplifiedBearerTokenRequired(): Boolean {
-    return this.book.entry.acquisitions[0].type.fullType == "application/vnd.librarysimplified.bearer-token+json"
-  }
+  private fun bookSimplifiedBearerTokenRequired(): Boolean =
+    this.book.entry.acquisitions[0]
+      .type.fullType == "application/vnd.librarysimplified.bearer-token+json"
 
   override fun <T : Any> onRequireCustomCredentialsFor(
     providerName: String,
@@ -198,8 +211,8 @@ class AudioBookAuthorizationHandler(
     throw UnsupportedOperationException("No available credentials of type $credentialsType.")
   }
 
-  private fun overdriveCredentialsFor(): OPAUsernamePassword {
-    return when (val credentials = this.account.loginState.credentials) {
+  private fun overdriveCredentialsFor(): OPAUsernamePassword =
+    when (val credentials = this.account.loginState.credentials) {
       is Basic -> {
         OPAUsernamePassword(
           credentials.userName.value,
@@ -226,15 +239,11 @@ class AudioBookAuthorizationHandler(
         throw UnsupportedOperationException("Overdrive audio books require credentials.")
       }
     }
-  }
 
-  private fun overdrivePasswordOf(
-    text: String
-  ): OPAPassword {
-    return if (text.isBlank()) {
+  private fun overdrivePasswordOf(text: String): OPAPassword =
+    if (text.isBlank()) {
       OPAPassword.NotRequired
     } else {
       OPAPassword.Password(text)
     }
-  }
 }

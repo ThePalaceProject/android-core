@@ -17,7 +17,6 @@ import java.net.URISyntaxException
  * and exceptions are raised if the type is not exactly as expected.
  */
 object JSONParserUtilities {
-
   /**
    * Check that `n` is an object.
    *
@@ -32,8 +31,8 @@ object JSONParserUtilities {
   fun checkObject(
     key: String?,
     n: JsonNode
-  ): ObjectNode {
-    return when (n.nodeType) {
+  ): ObjectNode =
+    when (n.nodeType) {
       JsonNodeType.ARRAY,
       JsonNodeType.BINARY,
       JsonNodeType.BOOLEAN,
@@ -63,7 +62,6 @@ object JSONParserUtilities {
         n as ObjectNode
       }
     }
-  }
 
   /**
    * Check that `n` is an array.
@@ -79,8 +77,8 @@ object JSONParserUtilities {
   fun checkArray(
     key: String?,
     n: JsonNode
-  ): ArrayNode {
-    return when (n.nodeType) {
+  ): ArrayNode =
+    when (n.nodeType) {
       JsonNodeType.ARRAY -> {
         n as ArrayNode
       }
@@ -110,7 +108,6 @@ object JSONParserUtilities {
         throw JSONParseException(sb.toString())
       }
     }
-  }
 
   /**
    * Check that `n` is a string.
@@ -122,10 +119,8 @@ object JSONParserUtilities {
 
   @JvmStatic
   @Throws(JSONParseException::class)
-  fun checkString(
-    n: JsonNode
-  ): String {
-    return when (n.nodeType) {
+  fun checkString(n: JsonNode): String =
+    when (n.nodeType) {
       JsonNodeType.STRING -> {
         n.asText()
       }
@@ -146,7 +141,6 @@ object JSONParserUtilities {
         throw JSONParseException(sb.toString())
       }
     }
-  }
 
   /**
    * @param key A key assumed to be holding a value
@@ -199,13 +193,12 @@ object JSONParserUtilities {
   fun getArrayOrNull(
     s: ObjectNode,
     key: String
-  ): ArrayNode? {
-    return if (s.has(key)) {
+  ): ArrayNode? =
+    if (s.has(key)) {
       getArray(s, key)
     } else {
       null
     }
-  }
 
   /**
    * @param key A key assumed to be holding a value
@@ -377,13 +370,12 @@ object JSONParserUtilities {
   fun getObjectOrNull(
     s: ObjectNode,
     key: String
-  ): ObjectNode? {
-    return if (s.has(key)) {
+  ): ObjectNode? =
+    if (s.has(key)) {
       getObject(s, key)
     } else {
       null
     }
-  }
 
   /**
    * @param key A key assumed to be holding a value
@@ -434,13 +426,12 @@ object JSONParserUtilities {
   fun getIntegerOrNull(
     n: ObjectNode,
     key: String
-  ): Int? {
-    return if (n.has(key)) {
+  ): Int? =
+    if (n.has(key)) {
       getInteger(n, key)
     } else {
       null
     }
-  }
 
   /**
    * @param key A key assumed to be holding a value
@@ -475,13 +466,12 @@ object JSONParserUtilities {
   fun getDoubleOrNull(
     n: ObjectNode,
     key: String
-  ): Double? {
-    return if (n.has(key)) {
+  ): Double? =
+    if (n.has(key)) {
       getDouble(n, key)
     } else {
       null
     }
-  }
 
   /**
    * @param key A key assumed to be holding a value
@@ -516,8 +506,8 @@ object JSONParserUtilities {
   fun getStringOrNull(
     n: ObjectNode,
     key: String
-  ): String? {
-    return if (n.has(key)) {
+  ): String? =
+    if (n.has(key)) {
       if (n[key].isNull) {
         null
       } else {
@@ -526,7 +516,6 @@ object JSONParserUtilities {
     } else {
       null
     }
-  }
 
   /**
    * @param key A key assumed to be holding a value
@@ -562,9 +551,10 @@ object JSONParserUtilities {
   fun getTimestamp(
     s: ObjectNode,
     key: String
-  ): DateTime {
-    return try {
-      ISODateTimeFormat.dateTimeParser()
+  ): DateTime =
+    try {
+      ISODateTimeFormat
+        .dateTimeParser()
         .withZoneUTC()
         .parseDateTime(getString(s, key))
     } catch (e: IllegalArgumentException) {
@@ -575,7 +565,6 @@ object JSONParserUtilities {
         ), e
       )
     }
-  }
 
   /**
    * @param key A key assumed to be holding a value
@@ -589,8 +578,8 @@ object JSONParserUtilities {
   fun getTimestampOrNull(
     n: ObjectNode,
     key: String
-  ): DateTime? {
-    return if (n.has(key)) {
+  ): DateTime? =
+    if (n.has(key)) {
       if (n[key].isNull) {
         null
       } else {
@@ -599,7 +588,6 @@ object JSONParserUtilities {
     } else {
       null
     }
-  }
 
   /**
    * @param key A key assumed to be holding a value
@@ -613,8 +601,8 @@ object JSONParserUtilities {
   fun getURIOrNull(
     n: ObjectNode,
     key: String
-  ): URI? {
-    return if (n.has(key)) {
+  ): URI? =
+    if (n.has(key)) {
       if (n[key].isNull) {
         null
       } else {
@@ -623,7 +611,6 @@ object JSONParserUtilities {
     } else {
       null
     }
-  }
 
   /**
    * @param key A key assumed to be holding a value
@@ -637,13 +624,12 @@ object JSONParserUtilities {
   fun getURI(
     n: ObjectNode,
     key: String
-  ): URI {
-    return try {
+  ): URI =
+    try {
       URI(getString(n, key).trim { it <= ' ' })
     } catch (e: URISyntaxException) {
       throw JSONParseException(e)
     }
-  }
 
   /**
    * @param key A key assumed to be holding a value
@@ -682,13 +668,12 @@ object JSONParserUtilities {
     n: ObjectNode,
     key: String,
     v: Boolean
-  ): Boolean {
-    return if (n.has(key)) {
+  ): Boolean =
+    if (n.has(key)) {
       getBoolean(n, key)
     } else {
       v
     }
-  }
 
   /**
    * @param key A key assumed to be holding a value
@@ -747,11 +732,10 @@ object JSONParserUtilities {
     node: ObjectNode,
     key: String,
     defaultValue: BigInteger
-  ): BigInteger {
-    return if (node.has(key)) {
+  ): BigInteger =
+    if (node.has(key)) {
       getBigInteger(node, key)
     } else {
       defaultValue
     }
-  }
 }

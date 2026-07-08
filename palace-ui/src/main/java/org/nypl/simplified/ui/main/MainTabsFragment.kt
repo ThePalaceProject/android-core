@@ -32,8 +32,9 @@ import org.nypl.simplified.ui.main.MainTabCategory.TAB_SETTINGS
  * correct places.
  */
 
-class MainTabsFragment : Fragment(), MainBackButtonConsumerType {
-
+class MainTabsFragment :
+  Fragment(),
+  MainBackButtonConsumerType {
   companion object {
     private const val TAB_INDEX_CATALOG = 0
     private const val TAB_INDEX_BOOKS = 1
@@ -122,28 +123,30 @@ class MainTabsFragment : Fragment(), MainBackButtonConsumerType {
      * the view is recreated.
      */
 
-    this.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-      override fun onTabSelected(tab: TabLayout.Tab?) {
-        if (tab != null && MainTabModel.tabUnselected != null) {
-          MainTabModel.tabSelected = tab.position
-          MainTabModel.tabUnselected = null
-          this@MainTabsFragment.switchToTab(tab.position)
+    this.tabLayout.addOnTabSelectedListener(
+      object : TabLayout.OnTabSelectedListener {
+        override fun onTabSelected(tab: TabLayout.Tab?) {
+          if (tab != null && MainTabModel.tabUnselected != null) {
+            MainTabModel.tabSelected = tab.position
+            MainTabModel.tabUnselected = null
+            this@MainTabsFragment.switchToTab(tab.position)
+          }
         }
-      }
 
-      override fun onTabUnselected(tab: TabLayout.Tab?) {
-        if (tab != null) {
-          MainTabModel.tabUnselected = tab.position
+        override fun onTabUnselected(tab: TabLayout.Tab?) {
+          if (tab != null) {
+            MainTabModel.tabUnselected = tab.position
+          }
         }
-      }
 
-      override fun onTabReselected(tab: TabLayout.Tab?) {
+        override fun onTabReselected(tab: TabLayout.Tab?) {
         /*
          * This method cannot be used due to Android brokenness. It will be called on device
          * orientation changes; not just in response to actual user input.
          */
+        }
       }
-    })
+    )
 
     this.tabCatalogView.setOnClickListener {
       if (MainTabModel.tabSelected == TAB_INDEX_CATALOG) {
@@ -182,14 +185,17 @@ class MainTabsFragment : Fragment(), MainBackButtonConsumerType {
         textView.text = resources.getString(R.string.tabCatalog)
         imageView.setImageResource(R.drawable.tab_catalog)
       }
+
       TAB_BOOKS -> {
         textView.text = resources.getString(R.string.tabBooks)
         imageView.setImageResource(R.drawable.tab_books)
       }
+
       TAB_RESERVATIONS -> {
         textView.text = resources.getString(R.string.tabHolds)
         imageView.setImageResource(R.drawable.tab_holds)
       }
+
       TAB_SETTINGS -> {
         textView.text = resources.getString(R.string.tabSettings)
         imageView.setImageResource(R.drawable.tab_settings)
@@ -223,9 +229,7 @@ class MainTabsFragment : Fragment(), MainBackButtonConsumerType {
    * A tab request arrived from the navigation system.
    */
 
-  private fun onTabRequested(
-    newValue: MainTabRequest
-  ) {
+  private fun onTabRequested(newValue: MainTabRequest) {
     when (newValue) {
       MainTabRequest.TabAny -> {
         // Do nothing.
@@ -244,9 +248,7 @@ class MainTabsFragment : Fragment(), MainBackButtonConsumerType {
     }
   }
 
-  private fun reselectForTab(
-    tabIndex: Int
-  ) {
+  private fun reselectForTab(tabIndex: Int) {
     val services =
       Services.serviceDirectory()
     val opdsClients =
@@ -254,9 +256,11 @@ class MainTabsFragment : Fragment(), MainBackButtonConsumerType {
     val profiles =
       services.requireService(ProfilesControllerType::class.java)
     val account =
-      profiles.profileCurrent()
+      profiles
+        .profileCurrent()
         .account(
-          profiles.profileCurrent()
+          profiles
+            .profileCurrent()
             .preferences()
             .mostRecentAccount
         )
@@ -277,16 +281,12 @@ class MainTabsFragment : Fragment(), MainBackButtonConsumerType {
     }
   }
 
-  private fun switchToTab(
-    tabIndex: Int
-  ) {
+  private fun switchToTab(tabIndex: Int) {
     this.tabLayout.selectTab(this.tabLayout.getTabAt(tabIndex))
     this.setTabFragment(tabIndex)
   }
 
-  private fun setTabFragment(
-    tabIndex: Int
-  ) {
+  private fun setTabFragment(tabIndex: Int) {
     when (tabIndex) {
       TAB_INDEX_CATALOG -> this.switchFragment(CatalogFragmentMain())
       TAB_INDEX_BOOKS -> this.switchFragment(CatalogFragmentMyBooks())
@@ -301,11 +301,10 @@ class MainTabsFragment : Fragment(), MainBackButtonConsumerType {
     this.subscriptions.close()
   }
 
-  private fun switchFragment(
-    fragment: Fragment
-  ) {
+  private fun switchFragment(fragment: Fragment) {
     this.fragmentNow = fragment
-    this.childFragmentManager.beginTransaction()
+    this.childFragmentManager
+      .beginTransaction()
       .replace(R.id.mainTabsContent, fragment)
       .commit()
   }

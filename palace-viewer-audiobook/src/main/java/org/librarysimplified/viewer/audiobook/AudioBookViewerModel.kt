@@ -5,7 +5,6 @@ import org.librarysimplified.audiobook.api.PlayerAuthorizationHandlerType
 import org.slf4j.LoggerFactory
 
 internal object AudioBookViewerModel {
-
   private val logger =
     LoggerFactory.getLogger(AudioBookViewerModel::class.java)
 

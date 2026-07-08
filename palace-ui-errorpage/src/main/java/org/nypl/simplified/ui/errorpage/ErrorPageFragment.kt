@@ -21,13 +21,15 @@ import org.librarysimplified.ui.errorpage.R
  */
 
 class ErrorPageFragment : Fragment(R.layout.error_page) {
-
   private lateinit var toolbarButton: View
   private lateinit var errorDetails: TextView
   private lateinit var errorStepsList: RecyclerView
   private lateinit var sendButton: Button
 
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+  override fun onViewCreated(
+    view: View,
+    savedInstanceState: Bundle?
+  ) {
     super.onViewCreated(view, savedInstanceState)
 
     this.errorDetails =

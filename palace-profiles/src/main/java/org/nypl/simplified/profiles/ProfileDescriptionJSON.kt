@@ -28,16 +28,14 @@ import java.util.UUID
  */
 
 object ProfileDescriptionJSON {
-
-  private fun standardDateFormatter(): DateTimeFormatter {
-    return DateTimeFormatterBuilder()
+  private fun standardDateFormatter(): DateTimeFormatter =
+    DateTimeFormatterBuilder()
       .appendYear(4, 5)
       .appendLiteral("-")
       .appendMonthOfYear(2)
       .appendLiteral("-")
       .appendDayOfMonth(2)
       .toFormatter()
-  }
 
   /**
    * Deserialize profile preferences from the given file.
@@ -53,13 +51,12 @@ object ProfileDescriptionJSON {
     jom: ObjectMapper,
     file: File,
     mostRecentAccountFallback: AccountID
-  ): ProfileDescription {
-    return this.deserializeFromText(
+  ): ProfileDescription =
+    this.deserializeFromText(
       jom,
       FileUtilities.fileReadUTF8(file),
       mostRecentAccountFallback
     )
-  }
 
   /**
    * Deserialize profile preferences from the given text.
@@ -75,9 +72,7 @@ object ProfileDescriptionJSON {
     jom: ObjectMapper,
     text: String,
     mostRecentAccountFallback: AccountID
-  ): ProfileDescription {
-    return this.deserializeFromJSON(jom, jom.readTree(text), mostRecentAccountFallback)
-  }
+  ): ProfileDescription = this.deserializeFromJSON(jom, jom.readTree(text), mostRecentAccountFallback)
 
   /**
    * Deserialize profile preferences from the given JSON node.
@@ -101,13 +96,17 @@ object ProfileDescriptionJSON {
 
     return when (version) {
       null -> this.deserializeFromJSONUnversioned(objectMapper, obj, mostRecentAccountFallback)
+
       20191201 -> this.deserialize20191201(objectMapper, obj, mostRecentAccountFallback)
+
       20200504 -> this.deserialize20200504(objectMapper, obj, mostRecentAccountFallback)
+
       /*
        mostRecentAccount is mandatory since version 20210605,
        so mostRecentAccountFallback won't be used  with that version
        */
       20210605 -> this.deserialize20200504(objectMapper, obj, mostRecentAccountFallback)
+
       else -> throw JSONParseException("Unsupported profile format version: $version")
     }
   }
@@ -152,9 +151,7 @@ object ProfileDescriptionJSON {
     )
   }
 
-  private fun deserialize20191201Attributes(
-    objectNode: ObjectNode
-  ): ProfileAttributes {
+  private fun deserialize20191201Attributes(objectNode: ObjectNode): ProfileAttributes {
     val attributes = mutableMapOf<String, String>()
     for (key in objectNode.fieldNames()) {
       attributes[key] = objectNode.get(key).asText()
@@ -171,7 +168,8 @@ object ProfileDescriptionJSON {
       this.standardDateFormatter()
 
     val dateOfBirth =
-      JSONParserUtilities.getObjectOrNull(objectNode, "dateOfBirth")
+      JSONParserUtilities
+        .getObjectOrNull(objectNode, "dateOfBirth")
         ?.let { node ->
           ProfileDateOfBirth(
             date = dateFormatter.parseDateTime(JSONParserUtilities.getString(node, "date")),
@@ -201,7 +199,8 @@ object ProfileDescriptionJSON {
       JSONParserUtilities.getBooleanDefault(objectNode, "downloadOnlyOnWIFI", false)
 
     val mostRecentAccount =
-      JSONParserUtilities.getStringOrNull(objectNode, "mostRecentAccount")
+      JSONParserUtilities
+        .getStringOrNull(objectNode, "mostRecentAccount")
         ?.let { AccountID(UUID.fromString(it)) }
         ?: mostRecentAccountFallback
 
@@ -228,7 +227,8 @@ object ProfileDescriptionJSON {
       this.standardDateFormatter()
 
     val dateOfBirth =
-      JSONParserUtilities.getObjectOrNull(objectNode, "dateOfBirth")
+      JSONParserUtilities
+        .getObjectOrNull(objectNode, "dateOfBirth")
         ?.let { node ->
           ProfileDateOfBirth(
             date = dateFormatter.parseDateTime(JSONParserUtilities.getString(node, "date")),
@@ -252,7 +252,8 @@ object ProfileDescriptionJSON {
       JSONParserUtilities.getBooleanDefault(objectNode, "downloadOnlyOnWIFI", false)
 
     val mostRecentAccount =
-      JSONParserUtilities.getStringOrNull(objectNode, "mostRecentAccount")
+      JSONParserUtilities
+        .getStringOrNull(objectNode, "mostRecentAccount")
         ?.let { AccountID(UUID.fromString(it)) }
         ?: mostRecentAccountFallback
 
@@ -294,7 +295,8 @@ object ProfileDescriptionJSON {
       JSONParserUtilities.getBooleanDefault(preferencesNode, "show-testing-libraries", false)
 
     val dateOfBirthDate =
-      JSONParserUtilities.getStringOrNull(preferencesNode, "date-of-birth")
+      JSONParserUtilities
+        .getStringOrNull(preferencesNode, "date-of-birth")
         ?.let { text ->
           try {
             dateFormatter.parseDateTime(text)
@@ -365,25 +367,42 @@ object ProfileDescriptionJSON {
     objectMapper: ObjectMapper,
     node: ObjectNode
   ): Map<String, PlayerPlaybackRate> {
-    val str = JSONParserUtilities.getObjectOrNull(node, "playbackRates")
-      ?: return hashMapOf()
+    val str =
+      JSONParserUtilities.getObjectOrNull(node, "playbackRates")
+        ?: return hashMapOf()
 
-    val map = objectMapper.readValue(
-      str.toString(),
-      object : TypeReference<Map<String, String>>() {
-        // Do nothing
-      }
-    )
+    val map =
+      objectMapper.readValue(
+        str.toString(),
+        object : TypeReference<Map<String, String>>() {
+          // Do nothing
+        }
+      )
 
     return map.mapValues { entry ->
       try {
         // Description values used to be named. Now they are double values.
         when (entry.value) {
-          "NORMAL_TIME" -> PlayerPlaybackRate(1.0)
-          "THREE_QUARTERS_TIME" -> PlayerPlaybackRate(0.75)
-          "ONE_AND_A_QUARTER_TIME" -> PlayerPlaybackRate(1.25)
-          "ONE_AND_A_HALF_TIME" -> PlayerPlaybackRate(1.5)
-          "DOUBLE_TIME" -> PlayerPlaybackRate(2.0)
+          "NORMAL_TIME" -> {
+            PlayerPlaybackRate(1.0)
+          }
+
+          "THREE_QUARTERS_TIME" -> {
+            PlayerPlaybackRate(0.75)
+          }
+
+          "ONE_AND_A_QUARTER_TIME" -> {
+            PlayerPlaybackRate(1.25)
+          }
+
+          "ONE_AND_A_HALF_TIME" -> {
+            PlayerPlaybackRate(1.5)
+          }
+
+          "DOUBLE_TIME" -> {
+            PlayerPlaybackRate(2.0)
+          }
+
           else -> {
             PlayerPlaybackRate(entry.value.toDouble())
           }

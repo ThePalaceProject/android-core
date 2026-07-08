@@ -13,25 +13,21 @@ import java.net.URI
  */
 
 data class AccountAuthenticationAdobePreActivationCredentials(
-
   /**
    * The vendor ID
    */
 
   val vendorID: AdobeVendorID,
-
   /**
    * The device token
    */
 
   val clientToken: AccountAuthenticationAdobeClientToken,
-
   /**
    * The device manager URI
    */
 
   val deviceManagerURI: URI?,
-
   /**
    * The post activation credentials that resulted from device activation, iff any device activation has been performed
    */

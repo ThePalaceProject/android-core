@@ -31,9 +31,7 @@ class BorrowSAMLDownload private constructor() : BorrowSubtaskType {
     override val name: String
       get() = "SAML Authenticated Download"
 
-    override fun createSubtask(): BorrowSubtaskType {
-      return BorrowSAMLDownload()
-    }
+    override fun createSubtask(): BorrowSubtaskType = BorrowSAMLDownload()
 
     override fun isApplicableFor(
       type: MIMEType,
@@ -45,9 +43,7 @@ class BorrowSAMLDownload private constructor() : BorrowSubtaskType {
         BorrowDirectDownload.isApplicableFor(type, target, account, remaining)
   }
 
-  override fun execute(
-    context: BorrowContextType
-  ) {
+  override fun execute(context: BorrowContextType) {
     context.taskRecorder.beginNewStep("Downloading with SAML auth...")
     context.bookDownloadIsRunning(
       "Requesting download...",
@@ -95,9 +91,7 @@ class BorrowSAMLDownload private constructor() : BorrowSubtaskType {
    * Create a CookieStore containing the cookies belonging to the given account.
    */
 
-  private fun createAccountCookieStore(
-    context: BorrowContextType,
-  ): CookieStore {
+  private fun createAccountCookieStore(context: BorrowContextType,): CookieStore {
     val account = context.account
     val credentials = account.loginState.credentials as AccountAuthenticationCredentials.SAML2_0
     val cookieManager = CookieManager()

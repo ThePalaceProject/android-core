@@ -5,7 +5,6 @@ package org.nypl.simplified.webview
  */
 
 interface WebViewCookieType {
-
   /**
    * The URL for which this cookie was received. This value may be reconstructed from the cookie's
    * attributes.

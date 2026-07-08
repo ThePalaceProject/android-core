@@ -11,10 +11,12 @@ import java.util.concurrent.TimeUnit
  */
 
 interface TimeTrackingCollectorServiceType : AutoCloseable {
-
   /**
    * A testing method; the caller will block until the next write is completed.
    */
 
-  fun awaitWrite(timeout: Long, unit: TimeUnit)
+  fun awaitWrite(
+    timeout: Long,
+    unit: TimeUnit
+  )
 }

@@ -22,7 +22,6 @@ import java.net.URI
 import java.util.concurrent.atomic.AtomicReference
 
 object AccountSAML20Model {
-
   @Volatile
   private lateinit var description: AccountProviderAuthenticationDescription.SAML2_0
 
@@ -45,7 +44,8 @@ object AccountSAML20Model {
     services.requireService(ProfilesControllerType::class.java)
 
   private val stateAttribute: AttributeType<AccountSAML20State> =
-    Attributes.create { e -> logger.debug("Attribute exception: ", e) }
+    Attributes
+      .create { e -> logger.debug("Attribute exception: ", e) }
       .withValue(AccountSAML20State.WebViewInitializing)
 
   val state: AttributeReadableType<AccountSAML20State> =
@@ -86,9 +86,7 @@ object AccountSAML20Model {
     }
   }
 
-  private fun onStateChanged(
-    newValue: AccountSAML20State
-  ) {
+  private fun onStateChanged(newValue: AccountSAML20State) {
     when (newValue) {
       is AccountSAML20State.Failed -> {
         profilesController.profileAccountLogin(
@@ -162,11 +160,7 @@ object AccountSAML20Model {
     }
   }
 
-  fun authenticationURI(): URI {
-    return description.authenticate
-  }
+  fun authenticationURI(): URI = description.authenticate
 
-  fun webViewClient(): WebViewClient {
-    return webClient
-  }
+  fun webViewClient(): WebViewClient = webClient
 }

@@ -12,9 +12,7 @@ class AccountListFilterController(
   private val filter: AtomicReference<(AccountProviderDescription) -> Boolean> =
     AtomicReference()
 
-  fun submit(
-    list: List<AccountProviderDescription>
-  ) {
+  fun submit(list: List<AccountProviderDescription>) {
     this.fullList = list.toList()
     this.publish()
   }
@@ -24,9 +22,7 @@ class AccountListFilterController(
     this.publish()
   }
 
-  fun filterSet(
-    predicate: ((AccountProviderDescription) -> Boolean)
-  ) {
+  fun filterSet(predicate: ((AccountProviderDescription) -> Boolean)) {
     this.filter.set(predicate)
     this.publish()
   }

@@ -14,7 +14,6 @@ package org.librarysimplified.services.api
  */
 
 interface ServiceDirectoryType {
-
   /**
    * Retrieve a mandatory reference to the service implementing the given class. If multiple
    * services are available, the one that was registered first is picked.
@@ -23,10 +22,7 @@ interface ServiceDirectoryType {
    */
 
   @Throws(ServiceConfigurationException::class)
-  fun <T : Any> requireService(
-    serviceClass: Class<T>
-  ): T =
-    this.requireServices(serviceClass)[0]
+  fun <T : Any> requireService(serviceClass: Class<T>): T = this.requireServices(serviceClass)[0]
 
   /**
    * Retrieve a list of services implementing the given class. The list is required to be
@@ -36,9 +32,7 @@ interface ServiceDirectoryType {
    */
 
   @Throws(ServiceConfigurationException::class)
-  fun <T : Any> requireServices(
-    serviceClass: Class<T>
-  ): List<T> {
+  fun <T : Any> requireServices(serviceClass: Class<T>): List<T> {
     val services = this.optionalServices(serviceClass)
     if (services.isEmpty()) {
       throw ServiceConfigurationException(
@@ -59,19 +53,14 @@ interface ServiceDirectoryType {
    */
 
   @Throws(ServiceConfigurationException::class)
-  fun <T : Any> optionalService(
-    serviceClass: Class<T>
-  ): T? =
-    this.optionalServices(serviceClass).firstOrNull()
+  fun <T : Any> optionalService(serviceClass: Class<T>): T? = this.optionalServices(serviceClass).firstOrNull()
 
   /**
    * Retrieve a list of services implementing the given class. The list may be empty.
    */
 
   @Throws(ServiceConfigurationException::class)
-  fun <T : Any> optionalServices(
-    serviceClass: Class<T>
-  ): List<T>
+  fun <T : Any> optionalServices(serviceClass: Class<T>): List<T>
 
   /**
    * Create a new builder based on the current directory.

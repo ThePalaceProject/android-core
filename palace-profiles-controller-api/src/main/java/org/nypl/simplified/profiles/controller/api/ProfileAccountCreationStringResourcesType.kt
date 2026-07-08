@@ -5,7 +5,6 @@ package org.nypl.simplified.profiles.controller.api
  */
 
 interface ProfileAccountCreationStringResourcesType {
-
   val creatingAnAccountProviderDescription: String
 
   val searchingFeedForAuthenticationDocument: String

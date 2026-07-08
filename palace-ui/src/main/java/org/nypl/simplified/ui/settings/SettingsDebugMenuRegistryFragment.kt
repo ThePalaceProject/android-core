@@ -32,31 +32,24 @@ import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
 import org.nypl.simplified.ui.screens.ScreenDefinitionType
 import org.slf4j.LoggerFactory
 
-class SettingsDebugMenuRegistryFragment : Fragment(R.layout.debug_registry),
+class SettingsDebugMenuRegistryFragment :
+  Fragment(R.layout.debug_registry),
   MainBackButtonConsumerType {
-
   private val logger =
     LoggerFactory.getLogger(SettingsDebugMenuRegistryFragment::class.java)
 
   companion object : ScreenDefinitionFactoryType<Unit, SettingsDebugMenuRegistryFragment> {
-    private class ScreenSettingsDebugMenu :
-      ScreenDefinitionType<Unit, SettingsDebugMenuRegistryFragment> {
+    private class ScreenSettingsDebugMenu : ScreenDefinitionType<Unit, SettingsDebugMenuRegistryFragment> {
       override fun setup() {
         // No setup required
       }
 
-      override fun parameters() {
-        return Unit
-      }
+      override fun parameters() = Unit
 
-      override fun fragment(): SettingsDebugMenuRegistryFragment {
-        return SettingsDebugMenuRegistryFragment()
-      }
+      override fun fragment(): SettingsDebugMenuRegistryFragment = SettingsDebugMenuRegistryFragment()
     }
 
-    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuRegistryFragment> {
-      return ScreenSettingsDebugMenu()
-    }
+    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuRegistryFragment> = ScreenSettingsDebugMenu()
   }
 
   override fun onBackButtonPressed(): MainBackButtonConsumerType.Result {
@@ -178,65 +171,101 @@ class SettingsDebugMenuRegistryFragment : Fragment(R.layout.debug_registry),
     this.libraryRegistryOverridePath
       .setText(SettingsDebugModel.registryDebugOverride?.path ?: "")
 
-    this.libraryRegistryOverrideHost.addTextChangedListener(object : TextWatcher {
-      override fun afterTextChanged(s: Editable?) {
-        // Nothing required.
-      }
+    this.libraryRegistryOverrideHost.addTextChangedListener(
+      object : TextWatcher {
+        override fun afterTextChanged(s: Editable?) {
+          // Nothing required.
+        }
 
-      override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-        // Nothing required.
-      }
+        override fun beforeTextChanged(
+          s: CharSequence?,
+          start: Int,
+          count: Int,
+          after: Int
+        ) {
+          // Nothing required.
+        }
 
-      override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        this@SettingsDebugMenuRegistryFragment.update { over ->
-          if (over != null) {
-            over.copy(hostname = this@SettingsDebugMenuRegistryFragment.libraryRegistryOverrideHost.text.toString())
-          } else {
-            AccountProviderRegistryOverride("", "", "")
+        override fun onTextChanged(
+          s: CharSequence?,
+          start: Int,
+          before: Int,
+          count: Int
+        ) {
+          this@SettingsDebugMenuRegistryFragment.update { over ->
+            if (over != null) {
+              over.copy(hostname = this@SettingsDebugMenuRegistryFragment.libraryRegistryOverrideHost.text.toString())
+            } else {
+              AccountProviderRegistryOverride("", "", "")
+            }
           }
         }
       }
-    })
+    )
 
-    this.libraryRegistryOverridePath.addTextChangedListener(object : TextWatcher {
-      override fun afterTextChanged(s: Editable?) {
-        // Nothing required.
-      }
+    this.libraryRegistryOverridePath.addTextChangedListener(
+      object : TextWatcher {
+        override fun afterTextChanged(s: Editable?) {
+          // Nothing required.
+        }
 
-      override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-        // Nothing required.
-      }
+        override fun beforeTextChanged(
+          s: CharSequence?,
+          start: Int,
+          count: Int,
+          after: Int
+        ) {
+          // Nothing required.
+        }
 
-      override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        this@SettingsDebugMenuRegistryFragment.update { over ->
-          if (over != null) {
-            over.copy(path = this@SettingsDebugMenuRegistryFragment.libraryRegistryOverridePath.text.toString())
-          } else {
-            AccountProviderRegistryOverride("", "", "")
+        override fun onTextChanged(
+          s: CharSequence?,
+          start: Int,
+          before: Int,
+          count: Int
+        ) {
+          this@SettingsDebugMenuRegistryFragment.update { over ->
+            if (over != null) {
+              over.copy(path = this@SettingsDebugMenuRegistryFragment.libraryRegistryOverridePath.text.toString())
+            } else {
+              AccountProviderRegistryOverride("", "", "")
+            }
           }
         }
       }
-    })
+    )
 
-    this.libraryRegistryOverrideParameters.addTextChangedListener(object : TextWatcher {
-      override fun afterTextChanged(s: Editable?) {
-        // Nothing required.
-      }
+    this.libraryRegistryOverrideParameters.addTextChangedListener(
+      object : TextWatcher {
+        override fun afterTextChanged(s: Editable?) {
+          // Nothing required.
+        }
 
-      override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-        // Nothing required.
-      }
+        override fun beforeTextChanged(
+          s: CharSequence?,
+          start: Int,
+          count: Int,
+          after: Int
+        ) {
+          // Nothing required.
+        }
 
-      override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        this@SettingsDebugMenuRegistryFragment.update { over ->
-          if (over != null) {
-            over.copy(queryParameters = this@SettingsDebugMenuRegistryFragment.libraryRegistryOverrideParameters.text.toString())
-          } else {
-            AccountProviderRegistryOverride("", "", "")
+        override fun onTextChanged(
+          s: CharSequence?,
+          start: Int,
+          before: Int,
+          count: Int
+        ) {
+          this@SettingsDebugMenuRegistryFragment.update { over ->
+            if (over != null) {
+              over.copy(queryParameters = this@SettingsDebugMenuRegistryFragment.libraryRegistryOverrideParameters.text.toString())
+            } else {
+              AccountProviderRegistryOverride("", "", "")
+            }
           }
         }
       }
-    })
+    )
 
     this.libraryRegistryClear.setOnClickListener {
       SettingsDebugModel.registryDebugOverride = null
@@ -250,9 +279,7 @@ class SettingsDebugMenuRegistryFragment : Fragment(R.layout.debug_registry),
     this.updateStatus(SettingsDebugModel.registryDebugOverride)
   }
 
-  private fun update(
-    f: (AccountProviderRegistryOverride?) -> AccountProviderRegistryOverride
-  ) {
+  private fun update(f: (AccountProviderRegistryOverride?) -> AccountProviderRegistryOverride) {
     val r = f.invoke(SettingsDebugModel.registryDebugOverride)
     SettingsDebugModel.registryDebugOverride = r
     this.updateStatus(r)
@@ -335,26 +362,26 @@ class SettingsDebugMenuRegistryFragment : Fragment(R.layout.debug_registry),
     this.registryStatus.text = text.toString()
   }
 
-  private fun openErrorPage(
-    result: TaskResult<*>
-  ) {
+  private fun openErrorPage(result: TaskResult<*>) {
     val appVersion =
       SettingsDebugModel.appVersion()
 
     val supportEmail =
-      Services.serviceDirectory()
+      Services
+        .serviceDirectory()
         .requireService(BuildConfigurationServiceType::class.java)
         .supportErrorReportEmailAddress
 
     MainNavigation.openErrorPage(
       activity = this.requireActivity(),
-      parameters = ErrorPageParameters(
-        emailAddress = supportEmail,
-        body = result.message,
-        subject = "[palace-error-report] $appVersion",
-        attributes = result.attributes.toSortedMap(),
-        taskSteps = result.steps
-      )
+      parameters =
+        ErrorPageParameters(
+          emailAddress = supportEmail,
+          body = result.message,
+          subject = "[palace-error-report] $appVersion",
+          attributes = result.attributes.toSortedMap(),
+          taskSteps = result.steps
+        )
     )
   }
 

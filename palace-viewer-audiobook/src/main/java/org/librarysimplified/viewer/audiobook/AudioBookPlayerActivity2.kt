@@ -67,7 +67,6 @@ import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 
 class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_base) {
-
   private val logger =
     LoggerFactory.getLogger(AudioBookPlayerActivity2::class.java)
 
@@ -93,13 +92,9 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     TxContextWrappingDelegate2(super.getDelegate())
   }
 
-  override fun getDelegate(): AppCompatDelegate {
-    return this.appCompatDelegate
-  }
+  override fun getDelegate(): AppCompatDelegate = this.appCompatDelegate
 
-  override fun onCreate(
-    savedInstanceState: Bundle?
-  ) {
+  override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
     val services =
@@ -152,8 +147,8 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     this.subscriptions.dispose()
   }
 
-  private fun handleBackPressed() {
-    return when (val f = this.fragmentNow) {
+  private fun handleBackPressed() =
+    when (val f = this.fragmentNow) {
       is PlayerBaseFragment -> {
         when (f) {
           is PlayerFragment -> {
@@ -174,7 +169,6 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
         this.close()
       }
     }
-  }
 
   private fun close() {
     try {
@@ -197,9 +191,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
   }
 
   @UiThread
-  private fun onPlayerEvent(
-    event: PlayerEvent
-  ) {
+  private fun onPlayerEvent(event: PlayerEvent) {
     PlayerUIThread.checkIsUIThread()
 
     when (event) {
@@ -240,11 +232,12 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
         )
         this.bookmarkService.bookmarkCreate(
           accountID = parameters.accountID,
-          bookmark = AudioBookBookmarks.fromPlayerBookmark(
-            feedEntry = parameters.opdsEntry,
-            deviceId = "null",
-            source = playerBookmark
-          ),
+          bookmark =
+            AudioBookBookmarks.fromPlayerBookmark(
+              feedEntry = parameters.opdsEntry,
+              deviceId = "null",
+              source = playerBookmark
+            ),
           ignoreRemoteFailures = true,
         )
 
@@ -272,7 +265,8 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
 
         when (event.kind) {
           PlayerBookmarkKind.EXPLICIT -> {
-            Toast.makeText(this, R.string.audio_book_player_bookmark_added, Toast.LENGTH_SHORT)
+            Toast
+              .makeText(this, R.string.audio_book_player_bookmark_added, Toast.LENGTH_SHORT)
               .show()
           }
 
@@ -320,11 +314,13 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
 
         this.profiles.profileUpdate { description ->
           description.copy(
-            preferences = description.preferences.copy(
-              playbackRates = description.preferences.playbackRates.plus(
-                Pair(parameters.bookID.value(), event.rate)
+            preferences =
+              description.preferences.copy(
+                playbackRates =
+                  description.preferences.playbackRates.plus(
+                    Pair(parameters.bookID.value(), event.rate)
+                  )
               )
-            )
           )
         }
       }
@@ -332,9 +328,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
   }
 
   @UiThread
-  private fun onModelStateEvent(
-    state: PlayerModelState
-  ) {
+  private fun onModelStateEvent(state: PlayerModelState) {
     PlayerUIThread.checkIsUIThread()
 
     val bookParameters =
@@ -450,7 +444,8 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     val bookParameters =
       AudioBookViewerModel.parameters ?: return
     val preferencesRate =
-      this.profiles.profileCurrent()
+      this.profiles
+        .profileCurrent()
         .preferences()
         .playbackRates
         .get(bookParameters.bookID.value())
@@ -475,11 +470,10 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     return c
   }
 
-  private fun assignBookmarks(
-    bookmarks: BookmarksForBook
-  ): PlayerBookmark? {
+  private fun assignBookmarks(bookmarks: BookmarksForBook): PlayerBookmark? {
     val bookmarksConverted =
-      bookmarks.bookmarks.mapNotNull(AudioBookBookmarks::toPlayerBookmark)
+      bookmarks.bookmarks
+        .mapNotNull(AudioBookBookmarks::toPlayerBookmark)
         .toSet()
         .sortedWith { x, y -> compareBookmarks(x, y) }
         .toList()
@@ -507,9 +501,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     }
   }
 
-  private fun onManifestParseFailed(
-    state: PlayerModelState.PlayerManifestParseFailed
-  ) {
+  private fun onManifestParseFailed(state: PlayerModelState.PlayerManifestParseFailed) {
     this.logger.error("onManifestParseFailed: {}", state)
 
     val task = TaskRecorder.create()
@@ -550,9 +542,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     this.switchFragment(ErrorPageFragment())
   }
 
-  private fun onBookOpenFailed(
-    state: PlayerModelState.PlayerBookOpenFailed
-  ) {
+  private fun onBookOpenFailed(state: PlayerModelState.PlayerBookOpenFailed) {
     this.logger.error("onBookOpenFailed: {}", state)
 
     val task = TaskRecorder.create()
@@ -577,9 +567,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     alert.show()
   }
 
-  private fun onManifestDownloadFailed(
-    state: PlayerModelState.PlayerManifestDownloadFailed
-  ) {
+  private fun onManifestDownloadFailed(state: PlayerModelState.PlayerManifestDownloadFailed) {
     this.logger.error("onManifestDownloadFailed: {}", state)
 
     val task = TaskRecorder.create()
@@ -610,9 +598,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     alert.show()
   }
 
-  private fun onManifestLicenseChecksFailed(
-    state: PlayerModelState.PlayerManifestLicenseChecksFailed
-  ) {
+  private fun onManifestLicenseChecksFailed(state: PlayerModelState.PlayerManifestLicenseChecksFailed) {
     this.logger.error("onManifestLicenseChecksFailed: {}", state)
 
     val task = TaskRecorder.create()
@@ -637,9 +623,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
   }
 
   @UiThread
-  private fun onPlayerViewCommand(
-    command: PlayerViewCommand
-  ) {
+  private fun onPlayerViewCommand(command: PlayerViewCommand) {
     PlayerUIThread.checkIsUIThread()
 
     when (command) {
@@ -708,11 +692,10 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     this.openErrorPage(task.finishFailure<String>())
   }
 
-  private fun switchFragment(
-    fragment: Fragment
-  ) {
+  private fun switchFragment(fragment: Fragment) {
     this.fragmentNow = fragment
-    this.supportFragmentManager.beginTransaction()
+    this.supportFragmentManager
+      .beginTransaction()
       .replace(R.id.audio_book_player_fragment_holder, fragment)
       .commit()
   }

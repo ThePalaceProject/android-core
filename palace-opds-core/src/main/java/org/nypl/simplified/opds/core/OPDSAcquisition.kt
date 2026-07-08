@@ -12,38 +12,32 @@ import java.net.URI
  */
 
 data class OPDSAcquisition(
-
   /**
    * The relation of the acquisition
    */
 
   val relation: Relation,
-
   /**
    * The URI of the acquisition
    */
 
   val uri: Link,
-
   /**
    * The MIME type of immediately retrievable content, if any.
    */
 
   val type: MIMEType,
-
   /**
    * The set of indirect acquisitions
    */
 
   val indirectAcquisitions: List<OPDSIndirectAcquisition>,
-
   /**
    * Extra properties associated with the acquisition.
    */
 
   val properties: Map<String, String>
 ) : Serializable {
-
   /**
    * @return The set of final content types. That is, the set of content types that are accessible
    * if all acquisition paths are followed to their conclusions
@@ -62,8 +56,9 @@ data class OPDSAcquisition(
    * The specific type of acquisition.
    */
 
-  enum class Relation(val uri: URI) {
-
+  enum class Relation(
+    val uri: URI
+  ) {
     /**
      * An item can be borrowed.
      */

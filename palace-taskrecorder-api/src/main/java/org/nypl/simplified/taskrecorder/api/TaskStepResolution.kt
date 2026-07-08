@@ -7,7 +7,6 @@ import java.io.Serializable
  */
 
 sealed class TaskStepResolution : Serializable {
-
   /**
    * The step resolution message.
    */

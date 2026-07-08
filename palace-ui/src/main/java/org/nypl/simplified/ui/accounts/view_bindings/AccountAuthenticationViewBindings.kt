@@ -9,7 +9,6 @@ import org.nypl.simplified.ui.accounts.AccountLogoutButtonStatus
  */
 
 sealed class AccountAuthenticationViewBindings {
-
   /**
    * The view group representing the root of the view hierarchy for the given views.
    */

@@ -176,9 +176,7 @@ interface BorrowContextType {
    */
 
   @Throws(IOException::class)
-  fun temporaryFile(
-    extension: String = "tmp"
-  ): File
+  fun temporaryFile(extension: String = "tmp"): File
 
   /**
    * The full OPDS acquisition path that we are currently traversing.
@@ -288,9 +286,7 @@ interface BorrowContextType {
    * Set the credentials to be used for the next subtask.
    */
 
-  fun setNextSubtaskCredentials(
-    credentials: BorrowSubtaskCredentials
-  )
+  fun setNextSubtaskCredentials(credentials: BorrowSubtaskCredentials)
 
   /**
    * Take the credentials to be used for the current subtask. This will also have the effect
@@ -305,8 +301,8 @@ interface BorrowContextType {
    * with an error. Return the credentials for the current account (if any).
    */
 
-  fun takeSubtaskCredentialsRequiringAccount(): AccountAuthenticationCredentials? {
-    return when (this.takeSubtaskCredentials()) {
+  fun takeSubtaskCredentialsRequiringAccount(): AccountAuthenticationCredentials? =
+    when (this.takeSubtaskCredentials()) {
       BorrowSubtaskCredentials.UseAccountCredentials -> {
         this.account.loginState.credentials
       }
@@ -320,7 +316,6 @@ interface BorrowContextType {
         throw BorrowSubtaskFailed()
       }
     }
-  }
 
   /**
    * Information about the current SAML download, if one is in progress.

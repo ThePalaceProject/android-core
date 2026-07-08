@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
  */
 
 interface ScreenDefinitionType<P, F : Fragment> {
-
   /**
    * Set up any underlying models that the fragment requires for display.
    */

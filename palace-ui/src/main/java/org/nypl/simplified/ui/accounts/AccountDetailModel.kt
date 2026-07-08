@@ -27,7 +27,6 @@ import java.util.UUID
 import java.util.concurrent.atomic.AtomicReference
 
 object AccountDetailModel {
-
   private val logger =
     LoggerFactory.getLogger(AccountDetailModel::class.java)
 
@@ -53,31 +52,23 @@ object AccountDetailModel {
 
   object PleaseLoginReasonGeneric : PleaseLoginReason {
     @StringRes
-    override fun stringResource(): Int {
-      return R.string.accountLoginRequired
-    }
+    override fun stringResource(): Int = R.string.accountLoginRequired
   }
 
   object PleaseLoginReasonExpired : PleaseLoginReason {
     @StringRes
-    override fun stringResource(): Int {
-      return R.string.accountLoginRequiredSessionExpiredMultiline
-    }
+    override fun stringResource(): Int = R.string.accountLoginRequiredSessionExpiredMultiline
   }
 
   var showPleaseLoginReason: PleaseLoginReason? = null
 
-  fun enableBookmarkSyncing(
-    enabled: Boolean
-  ) {
+  fun enableBookmarkSyncing(enabled: Boolean) {
     this.account.setPreferences(
       this.account.preferences.copy(bookmarkSyncingPermitted = enabled)
     )
   }
 
-  fun tryLogout(
-    activity: Activity
-  ) {
+  fun tryLogout(activity: Activity) {
     val services =
       Services.serviceDirectory()
     val profiles =
@@ -92,9 +83,7 @@ object AccountDetailModel {
     profiles.profileAccountLogout(this.account.id)
   }
 
-  fun tryLogin(
-    request: ProfileAccountLoginRequest
-  ) {
+  fun tryLogin(request: ProfileAccountLoginRequest) {
     val services =
       Services.serviceDirectory()
     val profiles =
@@ -118,13 +107,14 @@ object AccountDetailModel {
 
     MainNavigation.openErrorPage(
       activity = activity,
-      parameters = ErrorPageParameters(
-        emailAddress = buildConfig.supportErrorReportEmailAddress,
-        body = "",
-        subject = "[palace-error-report]",
-        attributes = attributes,
-        taskSteps = taskSteps
-      )
+      parameters =
+        ErrorPageParameters(
+          emailAddress = buildConfig.supportErrorReportEmailAddress,
+          body = "",
+          subject = "[palace-error-report]",
+          attributes = attributes,
+          taskSteps = taskSteps
+        )
     )
   }
 
@@ -150,7 +140,8 @@ object AccountDetailModel {
     this.executeAfterLoginSubscription.getAndSet(
       AfterLoginTask(
         UUID.randomUUID(),
-        profiles.accountEvents()
+        profiles
+          .accountEvents()
           .ofType(AccountEventLoginStateChanged::class.java)
           .filter { event -> event.accountID == accountID }
           .subscribe { event ->

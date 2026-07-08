@@ -8,7 +8,6 @@ import org.nypl.simplified.books.api.BookID
  */
 
 sealed class BookStatusEvent : BookEvent() {
-
   /**
    * @return The ID of the book in question
    */

@@ -7,7 +7,6 @@ import org.nypl.simplified.boot.api.BootStringResourcesType
 internal class MainServicesStrings(
   private val resources: Resources
 ) : BootStringResourcesType {
-
   override val bootFailedGeneric: String =
     this.resources.getString(R.string.bootFailedGeneric)
 
@@ -17,6 +16,5 @@ internal class MainServicesStrings(
   val bootAdobeDRMFailed: String =
     resources.getString(R.string.bootAdobeDRMFailed)
 
-  fun bootingGeneral(kind: String): String =
-    "Initializing $kind..."
+  fun bootingGeneral(kind: String): String = "Initializing $kind..."
 }

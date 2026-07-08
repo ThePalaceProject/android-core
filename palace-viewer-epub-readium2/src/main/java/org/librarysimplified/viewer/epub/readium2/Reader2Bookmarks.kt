@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory
  */
 
 object Reader2Bookmarks {
-
   private val logger =
     LoggerFactory.getLogger(Reader2Bookmarks::class.java)
 
@@ -74,13 +73,16 @@ object Reader2Bookmarks {
     val location =
       SerializedLocatorHrefProgression20210317(chapterHref, chapterProgress)
 
-    val kind = when (source.type) {
-      SR2Bookmark.Type.EXPLICIT ->
-        BookmarkKind.BookmarkExplicit
+    val kind =
+      when (source.type) {
+        SR2Bookmark.Type.EXPLICIT -> {
+          BookmarkKind.BookmarkExplicit
+        }
 
-      SR2Bookmark.Type.LAST_READ ->
-        BookmarkKind.BookmarkLastReadLocation
-    }
+        SR2Bookmark.Type.LAST_READ -> {
+          BookmarkKind.BookmarkLastReadLocation
+        }
+      }
 
     return SerializedBookmarks.createWithCurrentFormat(
       bookChapterProgress = chapterProgress,
@@ -100,10 +102,8 @@ object Reader2Bookmarks {
    * Convert a SimplyE bookmark to an SR2 bookmark.
    */
 
-  fun toSR2Bookmark(
-    source: SerializedBookmark
-  ): SR2Bookmark? {
-    return when (val location = source.location) {
+  fun toSR2Bookmark(source: SerializedBookmark): SR2Bookmark? =
+    when (val location = source.location) {
       is SerializedLocatorAudioBookTime1,
       is SerializedLocatorAudioBookTime2,
       is SerializedLocatorLegacyCFI,
@@ -117,18 +117,22 @@ object Reader2Bookmarks {
         if (href != null) {
           SR2Bookmark(
             date = source.time.toDateTime(),
-            type = when (source.kind) {
-              BookmarkKind.BookmarkLastReadLocation ->
-                SR2Bookmark.Type.LAST_READ
+            type =
+              when (source.kind) {
+                BookmarkKind.BookmarkLastReadLocation -> {
+                  SR2Bookmark.Type.LAST_READ
+                }
 
-              BookmarkKind.BookmarkExplicit ->
-                SR2Bookmark.Type.EXPLICIT
-            },
+                BookmarkKind.BookmarkExplicit -> {
+                  SR2Bookmark.Type.EXPLICIT
+                }
+              },
             title = source.bookChapterTitle,
-            locator = SR2Locator.SR2LocatorPercent.create(
-              chapterHref = href,
-              chapterProgress = location.chapterProgress
-            ),
+            locator =
+              SR2Locator.SR2LocatorPercent.create(
+                chapterHref = href,
+                chapterProgress = location.chapterProgress
+              ),
             bookProgress = source.bookProgress,
             uri = source.uri
           )
@@ -137,5 +141,4 @@ object Reader2Bookmarks {
         }
       }
     }
-  }
 }

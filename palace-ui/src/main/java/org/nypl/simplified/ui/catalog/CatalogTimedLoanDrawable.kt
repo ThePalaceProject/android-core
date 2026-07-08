@@ -16,7 +16,6 @@ class CatalogTimedLoanDrawable(
   private val screenSizeInformation: ScreenSizeInformationType,
   private val durationText: String
 ) : Drawable() {
-
   private val size: Int =
     this.screenSizeInformation.dpToPixels(12).toInt()
   private val clock: Drawable =
@@ -68,7 +67,5 @@ class CatalogTimedLoanDrawable(
   }
 
   @Deprecated("Deprecated in Java")
-  override fun getOpacity(): Int {
-    return OPAQUE
-  }
+  override fun getOpacity(): Int = OPAQUE
 }

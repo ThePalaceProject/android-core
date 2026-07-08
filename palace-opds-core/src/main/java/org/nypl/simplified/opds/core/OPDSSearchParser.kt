@@ -18,7 +18,6 @@ import javax.xml.parsers.ParserConfigurationException
  * The default implementation of the [OPDSSearchParserType].
  */
 class OPDSSearchParser private constructor() : OPDSSearchParserType {
-
   @Throws(OPDSParseException::class)
   override fun parse(
     uri: URI,
@@ -34,13 +33,15 @@ class OPDSSearchParser private constructor() : OPDSSearchParserType {
       timePostParse = System.nanoTime()
 
       val root = d.firstChild
-      val eSearch = nodeAsElementWithName(
-        root, OPEN_SEARCH_URI, "OpenSearchDescription"
-      )
+      val eSearch =
+        nodeAsElementWithName(
+          root, OPEN_SEARCH_URI, "OpenSearchDescription"
+        )
 
-      val eURL = getFirstChildElementWithName(
-        eSearch, OPEN_SEARCH_URI, "Url"
-      )
+      val eURL =
+        getFirstChildElementWithName(
+          eSearch, OPEN_SEARCH_URI, "Url"
+        )
 
       return OPDSOpenSearch1_1(eURL.getAttribute("template"))
     } catch (e: ParserConfigurationException) {
@@ -89,14 +90,10 @@ class OPDSSearchParser private constructor() : OPDSSearchParserType {
     /**
      * @return A new search document parser
      */
-    fun newParser(): OPDSSearchParserType {
-      return OPDSSearchParser()
-    }
+    fun newParser(): OPDSSearchParserType = OPDSSearchParser()
 
     @Throws(ParserConfigurationException::class, SAXException::class, IOException::class)
-    private fun parseStream(
-      s: InputStream?
-    ): Document {
+    private fun parseStream(s: InputStream?): Document {
       val dbf = DocumentBuilderFactory.newInstance()
       dbf.isNamespaceAware = true
       val db = dbf.newDocumentBuilder()

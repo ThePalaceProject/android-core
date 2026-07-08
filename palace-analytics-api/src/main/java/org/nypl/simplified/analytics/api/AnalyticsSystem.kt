@@ -6,13 +6,10 @@ package org.nypl.simplified.analytics.api
  */
 
 interface AnalyticsSystem {
-
   /**
    * An event occurred. Consume the event if possible, or ignore it otherwise. Event consumption
    * _must_ be asynchronous; calling this method must not block the caller.
    */
 
-  fun onAnalyticsEvent(
-    event: AnalyticsEvent
-  )
+  fun onAnalyticsEvent(event: AnalyticsEvent)
 }

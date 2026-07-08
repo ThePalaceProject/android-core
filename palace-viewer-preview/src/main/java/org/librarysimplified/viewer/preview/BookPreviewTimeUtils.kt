@@ -7,74 +7,62 @@ import org.joda.time.format.PeriodFormatter
 import org.joda.time.format.PeriodFormatterBuilder
 
 object BookPreviewTimeUtils {
-
   data class SpokenTranslations(
-
     /**
      * The word for "hours" in the current language.
      */
 
     val hoursText: String,
-
     /**
      * The word for "hour" in the current language.
      */
 
     val hourText: String,
-
     /**
      * The word for "minutes" in the current language.
      */
 
     val minutesText: String,
-
     /**
      * The word for "minute" in the current language.
      */
 
     val minuteText: String,
-
     /**
      * The word for "seconds" in the current language.
      */
 
     val secondsText: String,
-
     /**
      * The word for "second" in the current language.
      */
 
     val secondText: String
   ) {
-
-    fun minutes(minutes: Long): String {
-      return if (minutes > 1) {
+    fun minutes(minutes: Long): String =
+      if (minutes > 1) {
         this.minutesText
       } else {
         this.minuteText
       }
-    }
 
-    fun hours(hours: Long): String {
-      return if (hours > 1) {
+    fun hours(hours: Long): String =
+      if (hours > 1) {
         this.hoursText
       } else {
         this.hourText
       }
-    }
 
-    fun seconds(seconds: Long): String {
-      return if (seconds > 1) {
+    fun seconds(seconds: Long): String =
+      if (seconds > 1) {
         this.secondsText
       } else {
         this.secondText
       }
-    }
 
     companion object {
-
-      fun createFromResources(resources: Resources): SpokenTranslations {
-        return SpokenTranslations(
+      fun createFromResources(resources: Resources): SpokenTranslations =
+        SpokenTranslations(
           hoursText = resources.getString(R.string.bookPreviewAccessibilityHours),
           hourText = resources.getString(R.string.bookPreviewAccessibilityHour),
           minutesText = resources.getString(R.string.bookPreviewAccessibilityMinutes),
@@ -82,7 +70,6 @@ object BookPreviewTimeUtils {
           secondsText = resources.getString(R.string.bookPreviewAccessibilitySeconds),
           secondText = resources.getString(R.string.bookPreviewAccessibilitySecond)
         )
-      }
     }
   }
 
@@ -97,13 +84,12 @@ object BookPreviewTimeUtils {
       .appendSeconds()
       .toFormatter()
 
-  fun hourMinuteSecondTextFromDuration(duration: Duration?): String {
-    return if (duration != null) {
+  fun hourMinuteSecondTextFromDuration(duration: Duration?): String =
+    if (duration != null) {
       hourMinuteSecondFormatter.print(duration.toPeriod())
     } else {
       ""
     }
-  }
 
   fun hourMinuteSecondSpokenFromDuration(
     translations: SpokenTranslations,

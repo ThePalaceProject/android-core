@@ -10,7 +10,6 @@ import java.net.URI
  */
 
 sealed class FeedLoaderResult {
-
   /**
    * The feed was loaded successfully.
    */
@@ -24,8 +23,9 @@ sealed class FeedLoaderResult {
    * The feed failed to load.
    */
 
-  sealed class FeedLoaderFailure : FeedLoaderResult(), PresentableErrorType {
-
+  sealed class FeedLoaderFailure :
+    FeedLoaderResult(),
+    PresentableErrorType {
     /**
      * The feed failed to load due to the given exception.
      */
@@ -37,10 +37,11 @@ sealed class FeedLoaderResult {
       private val attributesInitial: Map<String, String>
     ) : FeedLoaderFailure() {
       override val attributes: Map<String, String>
-        get() = Presentables.mergeAttributes(
-          map0 = this.attributesInitial,
-          map1 = this.problemReport?.toMap() ?: emptyMap()
-        )
+        get() =
+          Presentables.mergeAttributes(
+            map0 = this.attributesInitial,
+            map1 = this.problemReport?.toMap() ?: emptyMap()
+          )
     }
 
     /**
@@ -54,15 +55,15 @@ sealed class FeedLoaderResult {
       private val attributesInitial: Map<String, String>
     ) : FeedLoaderFailure() {
       override val attributes: Map<String, String>
-        get() = Presentables.mergeAttributes(
-          map0 = this.attributesInitial,
-          map1 = this.problemReport?.toMap() ?: emptyMap()
-        )
+        get() =
+          Presentables.mergeAttributes(
+            map0 = this.attributesInitial,
+            map1 = this.problemReport?.toMap() ?: emptyMap()
+          )
     }
   }
 
   companion object {
-
     /**
      * Wrap an exception, producing a general feed loading error.
      */
@@ -70,18 +71,17 @@ sealed class FeedLoaderResult {
     fun wrapException(
       uri: URI,
       exception: Throwable
-    ): FeedLoaderFailure {
-      return FeedLoaderFailure.FeedLoaderFailedGeneral(
+    ): FeedLoaderFailure =
+      FeedLoaderFailure.FeedLoaderFailedGeneral(
         problemReport = null,
         exception =
-        if (exception is java.lang.Exception) {
-          exception
-        } else {
-          java.lang.Exception(exception)
-        },
+          if (exception is java.lang.Exception) {
+            exception
+          } else {
+            java.lang.Exception(exception)
+          },
         message = exception.localizedMessage ?: "",
         attributesInitial = sortedMapOf(Pair("Feed URI", uri.toASCIIString()))
       )
-    }
   }
 }

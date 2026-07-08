@@ -6,7 +6,6 @@ import java.io.IOException
 import java.net.URI
 
 interface BookmarkHTTPCallsType {
-
   /**
    * Retrieve the list of bookmarks for the given account. This call will fail
    * with an exception if syncing is not enabled.

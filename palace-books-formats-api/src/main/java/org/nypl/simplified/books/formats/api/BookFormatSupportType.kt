@@ -8,24 +8,19 @@ import org.nypl.simplified.books.api.BookDRMKind
  */
 
 interface BookFormatSupportType {
-
   /**
    * @return `true` if the given MIME type represents a format that can be saved into
    *          the book database
    */
 
-  fun isSupportedFinalContentType(
-    mime: MIMEType
-  ): Boolean
+  fun isSupportedFinalContentType(mime: MIMEType): Boolean
 
   /**
    * @return `true` if the given series of MIME types represents an acquisition path that the
    *         current application configuration supports
    */
 
-  fun isSupportedPath(
-    typePath: List<MIMEType>
-  ): Boolean
+  fun isSupportedPath(typePath: List<MIMEType>): Boolean
 
   /**
    * @return `true` if the given DRM kind is supported

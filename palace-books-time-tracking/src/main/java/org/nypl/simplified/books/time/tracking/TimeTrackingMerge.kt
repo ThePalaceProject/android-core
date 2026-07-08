@@ -37,7 +37,6 @@ class TimeTrackingMerge private constructor(
   private val outboxDirectory: Path,
   private val frequency: Duration,
 ) : TimeTrackingMergeServiceType {
-
   private val logger =
     LoggerFactory.getLogger(TimeTrackingMerge::class.java)
   private val resources =
@@ -55,10 +54,12 @@ class TimeTrackingMerge private constructor(
     }
 
   init {
-    this.resources.add(AutoCloseable {
-      this.executor.shutdown()
-      this.executor.awaitTermination(30L, TimeUnit.SECONDS)
-    })
+    this.resources.add(
+      AutoCloseable {
+        this.executor.shutdown()
+        this.executor.awaitTermination(30L, TimeUnit.SECONDS)
+      }
+    )
 
     this.executor.scheduleWithFixedDelay(
       { this.tick() },
@@ -91,7 +92,8 @@ class TimeTrackingMerge private constructor(
       MDC.put("SubSystem", "Merge")
 
       val timeNow =
-        this.clock.invoke()
+        this.clock
+          .invoke()
           .toInstant()
       val timeOldest =
         timeNow.minusSeconds(90L)
@@ -106,7 +108,8 @@ class TimeTrackingMerge private constructor(
 
       val spanFiles: List<Path> =
         Files.list(this.inboxDirectory).use { inboxStream ->
-          inboxStream.filter { p -> isSpanFileSuitable(timeOldest, p) }
+          inboxStream
+            .filter { p -> isSpanFileSuitable(timeOldest, p) }
             .collect(Collectors.toList())
         }
 
@@ -140,17 +143,13 @@ class TimeTrackingMerge private constructor(
     }
   }
 
-  private fun deleteSpan(
-    span: TimeTrackingReceivedSpan
-  ) {
+  private fun deleteSpan(span: TimeTrackingReceivedSpan) {
     val file = this.inboxDirectory.resolve("${span.id}.ttspan")
     this.logger.debug("Deleting span {}", file)
     Files.deleteIfExists(file)
   }
 
-  private fun writeEntry(
-    entry: TimeTrackingEntryOutgoing
-  ) {
+  private fun writeEntry(entry: TimeTrackingEntryOutgoing) {
     val fileTmp =
       this.outboxDirectory.resolve("${entry.timeEntry.id}.tteo.tmp")
     val file =
@@ -179,7 +178,6 @@ class TimeTrackingMerge private constructor(
   }
 
   companion object {
-
     private data class MergeKey(
       val accountID: AccountID,
       val bookID: PlayerPalaceID,
@@ -187,19 +185,18 @@ class TimeTrackingMerge private constructor(
       val targetURI: URI
     )
 
-    fun mergeEntries(
-      spans: List<TimeTrackingReceivedSpan>
-    ): List<TimeTrackingEntryOutgoing> {
+    fun mergeEntries(spans: List<TimeTrackingReceivedSpan>): List<TimeTrackingEntryOutgoing> {
       val spansByKey =
         mutableMapOf<MergeKey, MutableList<TimeTrackingReceivedSpan>>()
 
       for (span in spans) {
-        val key = MergeKey(
-          accountID = span.accountID,
-          bookID = span.bookID,
-          libraryID = span.libraryID,
-          targetURI = span.targetURI
-        )
+        val key =
+          MergeKey(
+            accountID = span.accountID,
+            bookID = span.bookID,
+            libraryID = span.libraryID,
+            targetURI = span.targetURI
+          )
         var existing = spansByKey.get(key)
         if (existing == null) {
           existing = mutableListOf()
@@ -226,7 +223,8 @@ class TimeTrackingMerge private constructor(
 
       for (span in keySpans) {
         val spanSeconds =
-          Duration.between(span.timeStarted, span.timeEnded)
+          Duration
+            .between(span.timeStarted, span.timeEnded)
             .toMillis() / 1_000L
 
         val crossesMinuteBoundary =
@@ -258,11 +256,12 @@ class TimeTrackingMerge private constructor(
             bookID = key.bookID,
             targetURI = key.targetURI,
             libraryID = key.libraryID,
-            timeEntry = TimeTrackingEntry(
-              id = ULID.random(),
-              duringMinute = minute.toString(),
-              secondsPlayed = seconds.toInt()
-            ),
+            timeEntry =
+              TimeTrackingEntry(
+                id = ULID.random(),
+                duringMinute = minute.toString(),
+                secondsPlayed = seconds.toInt()
+              ),
           )
         )
       }
@@ -275,15 +274,14 @@ class TimeTrackingMerge private constructor(
       inputDirectory: Path,
       debugDirectory: Path,
       outputDirectory: Path,
-    ): TimeTrackingMergeServiceType {
-      return TimeTrackingMerge(
+    ): TimeTrackingMergeServiceType =
+      TimeTrackingMerge(
         clock = clock,
         frequency = frequency,
         inboxDirectory = inputDirectory,
         debugDirectory = debugDirectory,
         outboxDirectory = outputDirectory
       )
-    }
   }
 
   override fun awaitTick(

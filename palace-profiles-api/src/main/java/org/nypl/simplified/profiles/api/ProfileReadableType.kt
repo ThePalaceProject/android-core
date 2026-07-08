@@ -19,7 +19,6 @@ import java.util.SortedMap
  */
 
 interface ProfileReadableType : Comparable<ProfileReadableType> {
-
   /**
    * @return The unique profile identifier
    */
@@ -48,15 +47,13 @@ interface ProfileReadableType : Comparable<ProfileReadableType> {
    * @return Access to the profile's preferences
    */
 
-  fun preferences(): ProfilePreferences =
-    this.description().preferences
+  fun preferences(): ProfilePreferences = this.description().preferences
 
   /**
    * @return Access to the profile's attributes
    */
 
-  fun attributes(): ProfileAttributes =
-    this.description().attributes
+  fun attributes(): ProfileAttributes = this.description().attributes
 
   /**
    * @return A read-only map of the accounts for this profile, organized by provider
@@ -76,9 +73,8 @@ interface ProfileReadableType : Comparable<ProfileReadableType> {
    * @return The most recently used account, or null.
    */
 
-  fun mostRecentAccount(): AccountType {
-    return this.preferences().mostRecentAccount.let { accountId ->
+  fun mostRecentAccount(): AccountType =
+    this.preferences().mostRecentAccount.let { accountId ->
       this.account(accountId)
     }
-  }
 }

@@ -6,7 +6,6 @@ package org.nypl.simplified.books.audio
  */
 
 interface AudioBookOverdriveSecretServiceType : AudioBookSecretServiceType {
-
   /**
    * The client key.
    */

@@ -15,11 +15,10 @@ import org.librarysimplified.ui.R
 import org.nypl.simplified.ui.catalog.CatalogFeedFacetFilterModel.FeedFacetModel
 import java.util.Objects
 
-class CatalogFeedFacetFilterAdapter() :
+class CatalogFeedFacetFilterAdapter :
   ListAdapter<FeedFacetModel, CatalogFeedFacetFilterAdapter.CatalogFeedFacetFilterViewHolder>(
     diffCallback
   ) {
-
   class CatalogFeedFacetFilterViewHolder(
     private val parent: View,
   ) : RecyclerView.ViewHolder(parent) {
@@ -32,9 +31,7 @@ class CatalogFeedFacetFilterAdapter() :
     private val radioGroup =
       this.parent.findViewById<RadioGroup>(R.id.catalogFacetFilterGroup)
 
-    fun bindTo(
-      item: FeedFacetModel
-    ) {
+    fun bindTo(item: FeedFacetModel) {
       this.clear.paintFlags = this.clear.paintFlags or Paint.UNDERLINE_TEXT_FLAG
       this.title.text = item.title
       this.radioGroup.removeAllViews()
@@ -60,9 +57,7 @@ class CatalogFeedFacetFilterAdapter() :
       this.reconfigureExpansion(item.expanded)
     }
 
-    private fun reconfigureExpansion(
-      expanded: Boolean
-    ) {
+    private fun reconfigureExpansion(expanded: Boolean) {
       if (expanded) {
         this.icon.setImageResource(R.drawable.chevron_down)
         this.radioGroup.visibility = View.VISIBLE
@@ -95,9 +90,7 @@ class CatalogFeedFacetFilterAdapter() :
         override fun areItemsTheSame(
           oldItem: FeedFacetModel,
           newItem: FeedFacetModel
-        ): Boolean {
-          return oldItem.title == newItem.title
-        }
+        ): Boolean = oldItem.title == newItem.title
       }
   }
 
@@ -122,15 +115,11 @@ class CatalogFeedFacetFilterAdapter() :
     holder.bindTo(this.getItem(position))
   }
 
-  override fun onViewRecycled(
-    holder: CatalogFeedFacetFilterViewHolder
-  ) {
+  override fun onViewRecycled(holder: CatalogFeedFacetFilterViewHolder) {
     holder.unbind()
   }
 
-  override fun onDetachedFromRecyclerView(
-    recyclerView: RecyclerView
-  ) {
+  override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
     // Nothing yet.
   }
 }

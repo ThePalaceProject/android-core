@@ -7,7 +7,6 @@ import android.util.Base64
  */
 
 object LCPHashedPassphrase {
-
   /**
    * Determine if a hashed passphrase is base-64 encoded. An unencoded hashed passphrase is a
    * 64-character hex string, so if the value is not 64 characters long, or contains a character
@@ -15,8 +14,7 @@ object LCPHashedPassphrase {
    */
 
   @JvmStatic
-  fun isBase64Encoded(hashedPassphrase: String): Boolean =
-    hashedPassphrase.length != 64 || hashedPassphrase.contains(Regex("[^0-9a-fA-F]"))
+  fun isBase64Encoded(hashedPassphrase: String): Boolean = hashedPassphrase.length != 64 || hashedPassphrase.contains(Regex("[^0-9a-fA-F]"))
 
   /**
    * Base-64 encode a hashed passphrase, using the algorithm described in the LCP spec:
@@ -25,9 +23,11 @@ object LCPHashedPassphrase {
 
   @JvmStatic
   fun base64Encode(hashedPassphrase: String): String {
-    val bytes = hashedPassphrase.chunked(2)
-      .map { it.toInt(16).toByte() }
-      .toByteArray()
+    val bytes =
+      hashedPassphrase
+        .chunked(2)
+        .map { it.toInt(16).toByte() }
+        .toByteArray()
 
     return Base64.encodeToString(bytes, Base64.NO_WRAP)
   }
@@ -39,7 +39,8 @@ object LCPHashedPassphrase {
 
   @JvmStatic
   fun base64Decode(encodedHashedPassphrase: String) =
-    Base64.decode(encodedHashedPassphrase, Base64.DEFAULT)
+    Base64
+      .decode(encodedHashedPassphrase, Base64.DEFAULT)
       .joinToString(separator = "") { "%02x".format(it) }
 
   /**

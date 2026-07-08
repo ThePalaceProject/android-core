@@ -12,7 +12,6 @@ import java.util.UUID
  */
 
 sealed class AnalyticsEvent {
-
   /**
    * The credentials of the account to which the event belongs.
    */
@@ -32,19 +31,16 @@ sealed class AnalyticsEvent {
   data class ApplicationOpened(
     override val timestamp: LocalDateTime = LocalDateTime.now(),
     override val credentials: AccountAuthenticationCredentials? = null,
-
     /**
      * The name of the application package.
      */
 
     val packageName: String,
-
     /**
      * The application version string.
      */
 
     val packageVersion: String,
-
     /**
      * The application version code.
      */
@@ -59,25 +55,21 @@ sealed class AnalyticsEvent {
   data class ProfileLoggedIn(
     override val timestamp: LocalDateTime = LocalDateTime.now(),
     override val credentials: AccountAuthenticationCredentials? = null,
-
     /**
      * The UUID of the profile.
      */
 
     val profileUUID: UUID,
-
     /**
      * The current display name of the profile.
      */
 
     val displayName: String,
-
     /**
      * The birth date of the profile owner.
      */
 
     val birthDate: String?,
-
     /**
      * The attributes of the profile owner
      */
@@ -92,25 +84,21 @@ sealed class AnalyticsEvent {
   data class ProfileCreated(
     override val timestamp: LocalDateTime = LocalDateTime.now(),
     override val credentials: AccountAuthenticationCredentials? = null,
-
     /**
      * The UUID of the profile.
      */
 
     val profileUUID: UUID,
-
     /**
      * The current display name of the profile.
      */
 
     val displayName: String,
-
     /**
      * The birth date of the profile owner.
      */
 
     val birthDate: String?,
-
     /**
      * The attributes of the profile owner
      */
@@ -125,25 +113,21 @@ sealed class AnalyticsEvent {
   data class ProfileDeleted(
     override val timestamp: LocalDateTime = LocalDateTime.now(),
     override val credentials: AccountAuthenticationCredentials? = null,
-
     /**
      * The UUID of the profile.
      */
 
     val profileUUID: UUID,
-
     /**
      * The current display name of the profile.
      */
 
     val displayName: String,
-
     /**
      * The birth date of the profile owner.
      */
 
     val birthDate: String?,
-
     /**
      * The attributes of the profile owner
      */
@@ -158,25 +142,21 @@ sealed class AnalyticsEvent {
   data class ProfileUpdated(
     override val timestamp: LocalDateTime = LocalDateTime.now(),
     override val credentials: AccountAuthenticationCredentials? = null,
-
     /**
      * The UUID of the profile.
      */
 
     val profileUUID: UUID,
-
     /**
      * The current display name of the profile.
      */
 
     val displayName: String,
-
     /**
      * The birth date of the profile owner.
      */
 
     val birthDate: String?,
-
     /**
      * The attributes of the profile owner
      */
@@ -191,13 +171,11 @@ sealed class AnalyticsEvent {
   data class ProfileLoggedOut(
     override val timestamp: LocalDateTime = LocalDateTime.now(),
     override val credentials: AccountAuthenticationCredentials? = null,
-
     /**
      * The UUID of the profile.
      */
 
     val profileUUID: UUID,
-
     /**
      * The current display name of the profile.
      */
@@ -212,25 +190,21 @@ sealed class AnalyticsEvent {
   data class CatalogSearched(
     override val timestamp: LocalDateTime = LocalDateTime.now(),
     override val credentials: AccountAuthenticationCredentials?,
-
     /**
      * The UUID of the profile.
      */
 
     val profileUUID: UUID,
-
     /**
      * The URI of the account provider (typically a UUID).
      */
 
     val accountProvider: URI,
-
     /**
      * The UUID of the account.
      */
 
     val accountUUID: UUID,
-
     /**
      * The search string query used.
      */
@@ -245,30 +219,25 @@ sealed class AnalyticsEvent {
   data class BookOpened(
     override val timestamp: LocalDateTime = LocalDateTime.now(),
     override val credentials: AccountAuthenticationCredentials?,
-
     /**
      * The URI of the account provider (typically a UUID).
      */
     val accountProvider: URI,
-
     /**
      * The UUID of the account.
      */
 
     val accountUUID: UUID,
-
     /**
      * The OPDS entry of the book.
      */
 
     val opdsEntry: OPDSAcquisitionFeedEntry,
-
     /**
      * A URI that should be used for submitting "book opened" events.
      */
 
     val targetURI: URI?,
-
     /**
      * An operation to perform if the access token was updated.
      */
@@ -282,43 +251,36 @@ sealed class AnalyticsEvent {
   data class BookPageTurned(
     override val timestamp: LocalDateTime = LocalDateTime.now(),
     override val credentials: AccountAuthenticationCredentials?,
-
     /**
      * The UUID of the profile.
      */
 
     val profileUUID: UUID,
-
     /**
      * The URI of the account provider (typically a UUID).
      */
 
     val accountProvider: URI,
-
     /**
      * The UUID of the account.
      */
 
     val accountUUID: UUID,
-
     /**
      * The OPDS entry of the book.
      */
 
     val opdsEntry: OPDSAcquisitionFeedEntry,
-
     /**
      * The current page of the book.
      */
 
     val bookPage: Int,
-
     /**
      * The number of pages in the book.
      */
 
     val bookPagesTotal: Int,
-
     /**
      * The title of the page.
      */
@@ -333,25 +295,21 @@ sealed class AnalyticsEvent {
   data class BookClosed(
     override val timestamp: LocalDateTime = LocalDateTime.now(),
     override val credentials: AccountAuthenticationCredentials?,
-
     /**
      * The UUID of the profile.
      */
 
     val profileUUID: UUID,
-
     /**
      * The URI of the account provider (typically a UUID).
      */
 
     val accountProvider: URI,
-
     /**
      * The UUID of the account.
      */
 
     val accountUUID: UUID,
-
     /**
      * The OPDS entry of the book.
      */

@@ -14,7 +14,6 @@ import java.net.URI
  */
 
 interface ContentResolverType {
-
   /**
    * Open an input stream for the given `content://` URI.
    *
@@ -22,8 +21,7 @@ interface ContentResolverType {
    * @return `null` if no content provider can handle the given URI
    */
 
-  fun openInputStream(uri: String): InputStream? =
-    this.openInputStream(URI.create(uri))
+  fun openInputStream(uri: String): InputStream? = this.openInputStream(URI.create(uri))
 
   /**
    * Open an input stream for the given `content://` URI.
@@ -42,9 +40,7 @@ interface ContentResolverType {
    */
 
   @Throws(FileNotFoundException::class)
-  fun openInputStreamOrThrow(uri: URI): InputStream {
-    return this.openInputStream(uri) ?: throw FileNotFoundException(uri.toString())
-  }
+  fun openInputStreamOrThrow(uri: URI): InputStream = this.openInputStream(uri) ?: throw FileNotFoundException(uri.toString())
 
   /**
    * Open an input stream for the given `content://` URI.
@@ -54,6 +50,5 @@ interface ContentResolverType {
    */
 
   @Throws(FileNotFoundException::class)
-  fun openInputStreamOrThrow(uri: String): InputStream =
-    this.openInputStreamOrThrow(URI.create(uri))
+  fun openInputStreamOrThrow(uri: String): InputStream = this.openInputStreamOrThrow(URI.create(uri))
 }

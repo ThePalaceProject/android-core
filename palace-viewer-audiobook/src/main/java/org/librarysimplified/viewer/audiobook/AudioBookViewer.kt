@@ -39,7 +39,6 @@ import java.util.concurrent.atomic.AtomicBoolean
  */
 
 class AudioBookViewer : ViewerProviderType {
-
   private val logger =
     LoggerFactory.getLogger(AudioBookViewer::class.java)
 
@@ -50,22 +49,20 @@ class AudioBookViewer : ViewerProviderType {
     preferences: ViewerParameters,
     book: Book,
     format: BookFormat
-  ): Boolean {
-    return when (format) {
+  ): Boolean =
+    when (format) {
       is BookFormat.BookFormatEPUB,
       is BookFormat.BookFormatPDF -> {
         this.logger.debug("audio book viewer can only view audio books")
         false
       }
 
-      is BookFormat.BookFormatAudioBook ->
+      is BookFormat.BookFormatAudioBook -> {
         true
+      }
     }
-  }
 
-  override fun canPotentiallySupportType(type: MIMEType): Boolean {
-    return StandardFormatNames.allAudioBooks.contains(type)
-  }
+  override fun canPotentiallySupportType(type: MIMEType): Boolean = StandardFormatNames.allAudioBooks.contains(type)
 
   private fun loadAndConfigureFeedbooks(services: ServiceDirectoryType) {
     val feedbooksConfigService =
@@ -119,7 +116,8 @@ class AudioBookViewer : ViewerProviderType {
     val palaceID =
       PlayerPalaceID(book.entry.id)
     val account =
-      profiles.profileCurrent()
+      profiles
+        .profileCurrent()
         .account(book.account)
 
     /*
@@ -255,10 +253,12 @@ class AudioBookViewer : ViewerProviderType {
           palaceID = palaceID,
           parserExtensions = parserExtensions,
           sourceURI = manifestURI,
-          strategy = strategies.createStrategy(
-            context = activity.application,
-            request = manifestRequest
-          ).toManifestStrategy(),
+          strategy =
+            strategies
+              .createStrategy(
+                context = activity.application,
+                request = manifestRequest
+              ).toManifestStrategy(),
         )
 
       val openAttempted =
@@ -298,12 +298,13 @@ class AudioBookViewer : ViewerProviderType {
             cacheDir = activity.cacheDir,
             licenseChecks = licenseChecks,
             httpClient = httpClient,
-            manifest = ManifestFulfilled(
-              source = null,
-              contentType = format.contentType,
-              authorization = null,
-              data = manifest.manifestFile.readBytes()
-            ),
+            manifest =
+              ManifestFulfilled(
+                source = null,
+                contentType = format.contentType,
+                authorization = null,
+                data = manifest.manifestFile.readBytes()
+              ),
             palaceID = palaceID,
             parserExtensions = parserExtensions,
           )
@@ -322,12 +323,13 @@ class AudioBookViewer : ViewerProviderType {
       cacheDir = activity.cacheDir,
       licenseChecks = licenseChecks,
       httpClient = httpClient,
-      manifest = ManifestFulfilled(
-        source = null,
-        contentType = format.contentType,
-        authorization = null,
-        data = manifest.manifestFile.readBytes()
-      ),
+      manifest =
+        ManifestFulfilled(
+          source = null,
+          contentType = format.contentType,
+          authorization = null,
+          data = manifest.manifestFile.readBytes()
+        ),
       palaceID = palaceID,
       parserExtensions = parserExtensions,
     )
@@ -344,12 +346,13 @@ class AudioBookViewer : ViewerProviderType {
       cacheDir = activity.cacheDir,
       licenseChecks = listOf(),
       httpClient = httpClient,
-      manifest = ManifestFulfilled(
-        source = null,
-        contentType = BookFormats.audioBookGenericMimeTypes().iterator().next(),
-        authorization = null,
-        data = ByteArray(0)
-      ),
+      manifest =
+        ManifestFulfilled(
+          source = null,
+          contentType = BookFormats.audioBookGenericMimeTypes().iterator().next(),
+          authorization = null,
+          data = ByteArray(0)
+        ),
       palaceID = palaceID,
       parserExtensions = listOf(),
     )

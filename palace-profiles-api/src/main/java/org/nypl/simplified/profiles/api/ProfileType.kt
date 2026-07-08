@@ -23,7 +23,6 @@ import java.net.URI
  */
 
 interface ProfileType : ProfileReadableType {
-
   /**
    * @return The accounts database for the profile
    */

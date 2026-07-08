@@ -11,7 +11,6 @@ class ProfileDataLoadTask(
   private val profile: ProfileType,
   private val bookRegistry: BookRegistryType
 ) : Runnable {
-
   private val logger = LoggerFactory.getLogger(ProfileDataLoadTask::class.java)
 
   override fun run() {

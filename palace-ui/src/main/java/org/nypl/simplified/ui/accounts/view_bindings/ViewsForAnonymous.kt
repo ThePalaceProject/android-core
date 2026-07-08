@@ -7,7 +7,6 @@ import org.nypl.simplified.ui.accounts.AccountLogoutButtonStatus
 class ViewsForAnonymous(
   override val viewGroup: ViewGroup
 ) : AccountAuthenticationViewBindings() {
-
   override fun lock() {
     // Nothing
   }
@@ -37,8 +36,6 @@ class ViewsForAnonymous(
   }
 
   companion object {
-    fun bind(viewGroup: ViewGroup): ViewsForAnonymous {
-      return ViewsForAnonymous(viewGroup)
-    }
+    fun bind(viewGroup: ViewGroup): ViewsForAnonymous = ViewsForAnonymous(viewGroup)
   }
 }

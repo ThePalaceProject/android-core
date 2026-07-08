@@ -14,7 +14,6 @@ import java.util.SortedSet
 
 @ThreadSafe
 interface BookDatabaseType {
-
   /**
    * @return The account that owns the database
    */

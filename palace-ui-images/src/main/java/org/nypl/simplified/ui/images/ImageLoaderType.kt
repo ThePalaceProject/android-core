@@ -10,7 +10,6 @@ import com.squareup.picasso.Picasso
  */
 
 interface ImageLoaderType {
-
   /**
    * The Picasso image loader.
    */

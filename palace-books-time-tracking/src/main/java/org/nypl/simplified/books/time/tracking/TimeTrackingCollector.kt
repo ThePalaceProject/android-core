@@ -34,7 +34,6 @@ class TimeTrackingCollector private constructor(
   private val debugDirectory: Path,
   private val outputDirectory: Path,
 ) : TimeTrackingCollectorServiceType {
-
   private val logger =
     LoggerFactory.getLogger(TimeTrackingCollector::class.java)
 
@@ -53,25 +52,23 @@ class TimeTrackingCollector private constructor(
     }
 
   init {
-    this.resources.add(AutoCloseable {
-      this.executor.shutdown()
-      this.executor.awaitTermination(30L, TimeUnit.SECONDS)
-    })
+    this.resources.add(
+      AutoCloseable {
+        this.executor.shutdown()
+        this.executor.awaitTermination(30L, TimeUnit.SECONDS)
+      }
+    )
     val timeSubscription = this.timeSegments.subscribe(this::onTimeTrackedReceived)
     this.resources.add(AutoCloseable { timeSubscription.dispose() })
     this.resources.add(this.status.subscribe(this::onStatusChanged))
     this.resources.add(AutoCloseable { this.awaitWrite.offer(Unit) })
   }
 
-  private fun onTimeTrackedReceived(
-    time: PlayerTimeTracked
-  ) {
+  private fun onTimeTrackedReceived(time: PlayerTimeTracked) {
     this.executor.execute { this.saveTimeTracked(time) }
   }
 
-  private fun saveTimeTracked(
-    time: PlayerTimeTracked
-  ) {
+  private fun saveTimeTracked(time: PlayerTimeTracked) {
     try {
       MDC.put("System", "TimeTracking")
       MDC.put("SubSystem", "Collector")
@@ -146,15 +143,14 @@ class TimeTrackingCollector private constructor(
       timeSegments: Observable<PlayerTimeTracked>,
       debugDirectory: Path,
       outputDirectory: Path,
-    ): TimeTrackingCollectorServiceType {
-      return TimeTrackingCollector(
+    ): TimeTrackingCollectorServiceType =
+      TimeTrackingCollector(
         profiles = profiles,
         status = status,
         timeSegments = timeSegments,
         debugDirectory = debugDirectory,
         outputDirectory = outputDirectory
       )
-    }
   }
 
   private fun onStatusChanged(

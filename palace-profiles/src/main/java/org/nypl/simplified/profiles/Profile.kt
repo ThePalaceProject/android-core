@@ -31,7 +31,6 @@ internal class Profile internal constructor(
   private val accounts: AccountsDatabaseType,
   private var initialDescription: ProfileDescription
 ) : ProfileType {
-
   private val logger =
     LoggerFactory.getLogger(Profile::class.java)
 
@@ -52,9 +51,10 @@ internal class Profile internal constructor(
         preferences.mostRecentAccount.uuid,
         newAccountId.uuid
       )
-      this.initialDescription = this.initialDescription.copy(
-        preferences = preferences.copy(mostRecentAccount = newAccountId)
-      )
+      this.initialDescription =
+        this.initialDescription.copy(
+          preferences = preferences.copy(mostRecentAccount = newAccountId)
+        )
     }
   }
 
@@ -63,23 +63,16 @@ internal class Profile internal constructor(
   @GuardedBy("descriptionLock")
   private var descriptionCurrent: ProfileDescription = this.initialDescription
 
-  override fun accounts(): SortedMap<AccountID, AccountType> {
-    return this.accounts.accounts()
-  }
+  override fun accounts(): SortedMap<AccountID, AccountType> = this.accounts.accounts()
 
-  override fun accountsByProvider(): SortedMap<URI, AccountType> {
-    return this.accounts.accountsByProvider()
-  }
+  override fun accountsByProvider(): SortedMap<URI, AccountType> = this.accounts.accountsByProvider()
 
   @Throws(AccountsDatabaseNonexistentException::class)
-  override fun account(accountId: AccountID): AccountType {
-    return this.accounts()[accountId]
+  override fun account(accountId: AccountID): AccountType =
+    this.accounts()[accountId]
       ?: throw AccountsDatabaseNonexistentException("Nonexistent account: $accountId")
-  }
 
-  override fun accountsDatabase(): AccountsDatabaseType {
-    return this.accounts
-  }
+  override fun accountsDatabase(): AccountsDatabaseType = this.accounts
 
   override fun setDescription(newDescription: ProfileDescription) {
     synchronized(this.descriptionLock) {
@@ -118,22 +111,20 @@ internal class Profile internal constructor(
       accounts.first()
     this.setDescription(
       this.descriptionCurrent.copy(
-        preferences = this.descriptionCurrent.preferences.copy(
-          mostRecentAccount = mostRecent.id
-        )
+        preferences =
+          this.descriptionCurrent.preferences.copy(
+            mostRecentAccount = mostRecent.id
+          )
       )
     )
   }
 
-  override fun compareTo(other: ProfileReadableType): Int {
-    return 0
-  }
+  override fun compareTo(other: ProfileReadableType): Int = 0
 
-  override fun description(): ProfileDescription {
-    return synchronized(this.descriptionLock) {
+  override fun description(): ProfileDescription =
+    synchronized(this.descriptionLock) {
       this.descriptionCurrent
     }
-  }
 
   private fun logProfileModified() {
     this.analytics.publishEvent(
@@ -142,7 +133,12 @@ internal class Profile internal constructor(
         credentials = null,
         profileUUID = this.id.uuid,
         displayName = "Anonymous",
-        birthDate = this.preferences().dateOfBirth?.date?.toString(),
+        birthDate =
+          this
+            .preferences()
+            .dateOfBirth
+            ?.date
+            ?.toString(),
         attributes = this.description().attributes.attributes
       )
     )

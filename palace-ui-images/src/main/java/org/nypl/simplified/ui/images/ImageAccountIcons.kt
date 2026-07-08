@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory
  */
 
 object ImageAccountIcons {
-
   private val logger =
     LoggerFactory.getLogger(ImageAccountIcons::class.java)
 

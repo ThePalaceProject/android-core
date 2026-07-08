@@ -9,7 +9,6 @@ import java.security.MessageDigest
  */
 
 sealed class SerializedLocator {
-
   /**
    * The type name (such as "BookLocationR2")
    */
@@ -32,9 +31,7 @@ sealed class SerializedLocator {
    * Serialize this locator to a JSON string.
    */
 
-  fun toJSONString(objectMapper: ObjectMapper): String {
-    return objectMapper.writeValueAsString(toJSON(objectMapper))
-  }
+  fun toJSONString(objectMapper: ObjectMapper): String = objectMapper.writeValueAsString(toJSON(objectMapper))
 
   /**
    * Add the fields of this object to the given message digest

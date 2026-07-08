@@ -8,7 +8,6 @@ import java.net.URI
  */
 
 interface ParserProviderType<T> {
-
   fun createParser(
     uri: URI,
     stream: InputStream,

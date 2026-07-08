@@ -23,7 +23,6 @@ internal class BServiceOpSyncAllAccounts(
   private val profile: ProfileReadableType,
   private val bookmarksSource: AttributeType<Map<AccountID, Map<BookID, BookmarksForBook>>>,
 ) : BServiceOp<Unit>(logger) {
-
   override fun runActual() {
     val accounts = this.profile.accounts().keys
     for (account in accounts) {

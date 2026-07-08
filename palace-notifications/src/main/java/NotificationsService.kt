@@ -12,7 +12,6 @@ class NotificationsService(
   httpCalls: NotificationTokenHTTPCallsType,
   profilesController: ProfilesControllerType
 ) : NotificationsServiceType {
-
   private val logger =
     LoggerFactory.getLogger(NotificationsService::class.java)
 

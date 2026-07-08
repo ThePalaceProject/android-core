@@ -18,7 +18,6 @@ data class OPDSAvailabilityHeld constructor(
 
   val revoke: URI?
 ) : OPDSAvailabilityType {
-
   override fun toString(): String {
     val fmt = ISODateTimeFormat.dateTime()
     val b = StringBuilder(256)
@@ -55,13 +54,12 @@ data class OPDSAvailabilityHeld constructor(
       position: Int?,
       endDate: DateTime?,
       revoke: URI?
-    ): OPDSAvailabilityHeld {
-      return OPDSAvailabilityHeld(
+    ): OPDSAvailabilityHeld =
+      OPDSAvailabilityHeld(
         startDate = startDate,
         position = position,
         endDate = endDate,
         revoke = revoke
       )
-    }
   }
 }

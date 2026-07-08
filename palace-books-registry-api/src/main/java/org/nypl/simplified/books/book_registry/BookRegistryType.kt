@@ -7,7 +7,6 @@ import org.nypl.simplified.books.api.BookID
  */
 
 interface BookRegistryType : BookRegistryReadableType {
-
   /**
    * Unconditionally update the status of the given book.
    */

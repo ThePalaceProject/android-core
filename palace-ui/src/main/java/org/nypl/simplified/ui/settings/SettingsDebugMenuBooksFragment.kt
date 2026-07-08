@@ -15,28 +15,21 @@ import org.nypl.simplified.ui.main.MainNavigation
 import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
 import org.nypl.simplified.ui.screens.ScreenDefinitionType
 
-class SettingsDebugMenuBooksFragment : Fragment(R.layout.debug_books),
+class SettingsDebugMenuBooksFragment :
+  Fragment(R.layout.debug_books),
   MainBackButtonConsumerType {
-
   companion object : ScreenDefinitionFactoryType<Unit, SettingsDebugMenuBooksFragment> {
-    private class ScreenSettingsDebugMenu :
-      ScreenDefinitionType<Unit, SettingsDebugMenuBooksFragment> {
+    private class ScreenSettingsDebugMenu : ScreenDefinitionType<Unit, SettingsDebugMenuBooksFragment> {
       override fun setup() {
         // No setup required
       }
 
-      override fun parameters() {
-        return Unit
-      }
+      override fun parameters() = Unit
 
-      override fun fragment(): SettingsDebugMenuBooksFragment {
-        return SettingsDebugMenuBooksFragment()
-      }
+      override fun fragment(): SettingsDebugMenuBooksFragment = SettingsDebugMenuBooksFragment()
     }
 
-    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuBooksFragment> {
-      return ScreenSettingsDebugMenu()
-    }
+    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuBooksFragment> = ScreenSettingsDebugMenu()
   }
 
   override fun onBackButtonPressed(): MainBackButtonConsumerType.Result {

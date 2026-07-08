@@ -7,7 +7,6 @@ import java.net.URI
  */
 
 data class BuildConfigurationAccountsRegistryURIs(
-
   /**
    * The URI for the production Library Registry.
    */

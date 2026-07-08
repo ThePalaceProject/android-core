@@ -4,7 +4,6 @@ import org.nypl.simplified.feeds.api.FeedFacet
 import org.slf4j.LoggerFactory
 
 object CatalogFeedFacetSortModel {
-
   private val logger =
     LoggerFactory.getLogger(CatalogFeedFacetSortModel::class.java)
 
@@ -22,16 +21,11 @@ object CatalogFeedFacetSortModel {
     this.facetValues[catalogPart] = sortBy.toList()
   }
 
-  fun facetSelected(
-    catalogPart: CatalogPart
-  ): FeedFacet.FeedFacetSingle? {
-    return this.facetValues[catalogPart]
+  fun facetSelected(catalogPart: CatalogPart): FeedFacet.FeedFacetSingle? =
+    this.facetValues[catalogPart]
       ?.find { s -> s.isActive }
-  }
 
-  fun facetSelectedPseudo(
-    catalogPart: CatalogPart
-  ): FeedFacet.FeedFacetPseudo.Sorting? {
+  fun facetSelectedPseudo(catalogPart: CatalogPart): FeedFacet.FeedFacetPseudo.Sorting? {
     val selected = this.facetSelected(catalogPart)
     if (selected is FeedFacet.FeedFacetPseudo.Sorting) {
       return selected
@@ -39,9 +33,7 @@ object CatalogFeedFacetSortModel {
     return null
   }
 
-  fun facetSelectedPseudoOrDefault(
-    catalogPart: CatalogPart
-  ): FeedFacet.FeedFacetPseudo.Sorting.SortBy {
+  fun facetSelectedPseudoOrDefault(catalogPart: CatalogPart): FeedFacet.FeedFacetPseudo.Sorting.SortBy {
     val selected = this.facetSelectedPseudo(catalogPart)
     if (selected != null) {
       return selected.sortBy

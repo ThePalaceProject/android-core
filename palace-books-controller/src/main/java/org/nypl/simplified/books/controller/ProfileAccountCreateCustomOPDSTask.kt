@@ -42,7 +42,6 @@ class ProfileAccountCreateCustomOPDSTask(
   private val profiles: ProfilesDatabaseType,
   private val strings: ProfileAccountCreationStringResourcesType,
 ) : Callable<TaskResult<AccountType>> {
-
   private var title: String = ""
   private var description: String = ""
   private val logger = LoggerFactory.getLogger(ProfileAccountCreateCustomOPDSTask::class.java)
@@ -65,11 +64,13 @@ class ProfileAccountCreateCustomOPDSTask(
         )
 
       when (resolutionResult) {
-        is TaskResult.Success ->
+        is TaskResult.Success -> {
           this.createAccount(accountProviderDescription)
+        }
 
-        is TaskResult.Failure ->
+        is TaskResult.Failure -> {
           this.accountResolutionFailed(resolutionResult)
+        }
       }
     } catch (e: Throwable) {
       this.logger.error("account creation failed: ", e)
@@ -84,9 +85,7 @@ class ProfileAccountCreateCustomOPDSTask(
     }
   }
 
-  private fun accountResolutionFailed(
-    resolutionResult: TaskResult.Failure<AccountProviderType>
-  ): TaskResult.Failure<AccountType> {
+  private fun accountResolutionFailed(resolutionResult: TaskResult.Failure<AccountProviderType>): TaskResult.Failure<AccountType> {
     this.logger.error("could not resolve an account provider description")
     this.taskRecorder.addAll(resolutionResult.steps)
     this.taskRecorder.addAttributes(resolutionResult.attributes)
@@ -98,9 +97,7 @@ class ProfileAccountCreateCustomOPDSTask(
     return this.taskRecorder.finishFailure()
   }
 
-  private fun createAccount(
-    accountProviderDescription: AccountProviderDescription
-  ): TaskResult<AccountType> {
+  private fun createAccount(accountProviderDescription: AccountProviderDescription): TaskResult<AccountType> {
     val createResult =
       ProfileAccountCreateTask(
         accountEvents = this.accountEvents,
@@ -185,13 +182,16 @@ class ProfileAccountCreateCustomOPDSTask(
     this.publishProgressEvent(this.taskRecorder.beginNewStep(this.strings.fetchingOPDSFeed))
 
     val request =
-      this.httpClient.newRequest(this.opdsURI)
+      this.httpClient
+        .newRequest(this.opdsURI)
         .allowRedirects(ALLOW_REDIRECTS)
         .build()
 
     return request.execute().use { response ->
       this.taskRecorder.addAttributes(
-        response.status.properties?.problemReport?.toMap() ?: emptyMap()
+        response.status.properties
+          ?.problemReport
+          ?.toMap() ?: emptyMap()
       )
 
       when (val status = response.status) {
@@ -274,9 +274,7 @@ class ProfileAccountCreateCustomOPDSTask(
     return feed.authDocument
   }
 
-  private fun publishFailureEvent() =
-    this.accountEvents.onNext(AccountEventCreationFailed(this.taskRecorder.finishFailure<AccountType>()))
+  private fun publishFailureEvent() = this.accountEvents.onNext(AccountEventCreationFailed(this.taskRecorder.finishFailure<AccountType>()))
 
-  private fun publishProgressEvent(step: TaskStep) =
-    this.accountEvents.onNext(AccountEventCreationInProgress(step.description))
+  private fun publishProgressEvent(step: TaskStep) = this.accountEvents.onNext(AccountEventCreationInProgress(step.description))
 }

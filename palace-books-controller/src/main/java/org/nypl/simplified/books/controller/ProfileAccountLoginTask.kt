@@ -62,7 +62,6 @@ class ProfileAccountLoginTask(
   private val profile: ProfileReadableType,
   private val request: ProfileAccountLoginRequest
 ) : Callable<TaskResult<Unit>> {
-
   init {
     Preconditions.checkState(
       this.profile.accounts().containsKey(this.account.id),
@@ -79,19 +78,28 @@ class ProfileAccountLoginTask(
   private val logger =
     LoggerFactory.getLogger(ProfileAccountLoginTask::class.java)
 
-  override fun call() =
-    this.run()
+  override fun call() = this.run()
 
-  private fun debug(message: String, vararg arguments: Any?) =
-    this.logger.debug("[{}][{}] $message", this.profile.id.uuid, this.account.id, *arguments)
+  private fun debug(
+    message: String,
+    vararg arguments: Any?
+  ) = this.logger.debug("[{}][{}] $message", this.profile.id.uuid, this.account.id, *arguments)
 
-  private fun error(message: String, vararg arguments: Any?) =
-    this.logger.error("[{}][{}] $message", this.profile.id.uuid, this.account.id, *arguments)
+  private fun error(
+    message: String,
+    vararg arguments: Any?
+  ) = this.logger.error("[{}][{}] $message", this.profile.id.uuid, this.account.id, *arguments)
 
   private fun run(): TaskResult<Unit> {
-    MDC.put(MDCKeys.ACCOUNT_INTERNAL_ID, this.account.id.uuid.toString())
+    MDC.put(MDCKeys.ACCOUNT_INTERNAL_ID,
+      this.account.id.uuid
+        .toString()
+    )
     MDC.put(MDCKeys.ACCOUNT_PROVIDER_NAME, this.account.provider.displayName)
-    MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID, this.account.provider.id.toString())
+    MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID,
+      this.account.provider.id
+        .toString()
+    )
 
     return try {
       if (!this.updateLoggingInState(
@@ -102,7 +110,10 @@ class ProfileAccountLoginTask(
       }
 
       this.steps.addAttribute("AccountProviderName", this.account.provider.displayName)
-      this.steps.addAttribute("AccountProviderID", this.account.provider.id.toString())
+      this.steps.addAttribute("AccountProviderID",
+        this.account.provider.id
+          .toString()
+      )
 
       if (!this.validateRequest()) {
         this.debug("account does not support the given authentication")
@@ -213,9 +224,7 @@ class ProfileAccountLoginTask(
     }
   }
 
-  private fun runSAML20Cancel(
-    request: SAML20Cancel
-  ): TaskResult<Unit> {
+  private fun runSAML20Cancel(request: SAML20Cancel): TaskResult<Unit> {
     this.steps.beginNewStep("Cancelling login...")
     return when (val loginState = this.account.loginState) {
       is AccountLoggingIn,
@@ -243,9 +252,7 @@ class ProfileAccountLoginTask(
     }
   }
 
-  private fun runSAML20Complete(
-    request: SAML20Complete
-  ): TaskResult<Unit> {
+  private fun runSAML20Complete(request: SAML20Complete): TaskResult<Unit> {
     this.steps.beginNewStep("Accepting login token...")
     return when (val loginState = this.account.loginState) {
       is AccountLoggedInStaleCredentials,
@@ -282,9 +289,7 @@ class ProfileAccountLoginTask(
     }
   }
 
-  private fun runSAML20Initiate(
-    request: SAML20Initiate
-  ): TaskResult<Unit> {
+  private fun runSAML20Initiate(request: SAML20Initiate): TaskResult<Unit> {
     this.account.setLoginState(
       AccountLoggingInWaitingForExternalAuthentication(
         previousCredentials = this.account.loginState.credentials,
@@ -296,9 +301,7 @@ class ProfileAccountLoginTask(
     return this.steps.finishSuccess(Unit)
   }
 
-  private fun runOIDCCancel(
-    request: OIDCCancel
-  ): TaskResult<Unit> {
+  private fun runOIDCCancel(request: OIDCCancel): TaskResult<Unit> {
     this.steps.beginNewStep("Cancelling login...")
     return when (val loginState = this.account.loginState) {
       is AccountLoggingIn,
@@ -326,9 +329,7 @@ class ProfileAccountLoginTask(
     }
   }
 
-  private fun runOIDCComplete(
-    request: OIDCComplete
-  ): TaskResult<Unit> {
+  private fun runOIDCComplete(request: OIDCComplete): TaskResult<Unit> {
     this.steps.beginNewStep("Accepting login token...")
     return when (val loginState = this.account.loginState) {
       is AccountLoggedInStaleCredentials,
@@ -363,9 +364,7 @@ class ProfileAccountLoginTask(
     }
   }
 
-  private fun runOIDCInitiate(
-    request: OIDCInitiate
-  ): TaskResult<Unit> {
+  private fun runOIDCInitiate(request: OIDCInitiate): TaskResult<Unit> {
     val uriBuilder = StringBuilder(request.description.authenticate.toString())
     val query = request.description.authenticate.query
     if (query == null) {
@@ -379,7 +378,8 @@ class ProfileAccountLoginTask(
       URI.create(uriBuilder.toString())
 
     val httpRequest =
-      this.http.newRequest(targetURI)
+      this.http
+        .newRequest(targetURI)
         .allowRedirects(DISALLOW_REDIRECTS)
         .build()
 
@@ -441,9 +441,7 @@ class ProfileAccountLoginTask(
     }
   }
 
-  private fun runBasicLogin(
-    request: Basic
-  ): TaskResult.Success<Unit> {
+  private fun runBasicLogin(request: Basic): TaskResult.Success<Unit> {
     val existingLoginState =
       this.account.loginState
     val existingCredentials =
@@ -466,40 +464,42 @@ class ProfileAccountLoginTask(
     return this.steps.finishSuccess(Unit)
   }
 
-  private fun runBasicTokenLogin(
-    request: BasicToken
-  ): TaskResult<Unit> {
+  private fun runBasicTokenLogin(request: BasicToken): TaskResult<Unit> {
     val authenticationURI = request.description.authenticationURI
     this.steps.addAttribute("AuthenticationURI", authenticationURI.toString())
 
-    val httpRequest = this.http.newRequest(authenticationURI)
-      .setAuthorization(
-        LSHTTPAuthorizationBasic.ofUsernamePassword(
-          request.username.value,
-          request.password.value
-        )
-      )
-      .setMethod(Post(ByteArray(0), MIMECompatibility.applicationOctetStream))
-      .build()
+    val httpRequest =
+      this.http
+        .newRequest(authenticationURI)
+        .setAuthorization(
+          LSHTTPAuthorizationBasic.ofUsernamePassword(
+            request.username.value,
+            request.password.value
+          )
+        ).setMethod(Post(ByteArray(0), MIMECompatibility.applicationOctetStream))
+        .build()
 
     httpRequest.execute().use { response ->
       when (val status = response.status) {
         is LSHTTPResponseStatus.Responded.OK -> {
-          this.credentials = AccountAuthenticationCredentials.BasicToken(
-            userName = request.username,
-            password = request.password,
-            authenticationTokenInfo = AccountAuthenticationTokenInfo(
-              accessToken = this.getAccessTokenFromBasicTokenResponse(
-                node = ObjectMapper().readTree(status.bodyStream)
-              ),
-              authURI = authenticationURI
-            ),
-            adobeCredentials = null,
-            authenticationDescription = request.description.description,
-            annotationsURI = null,
-            deviceRegistrationURI = null,
-            patronAuthorization = null
-          )
+          this.credentials =
+            AccountAuthenticationCredentials.BasicToken(
+              userName = request.username,
+              password = request.password,
+              authenticationTokenInfo =
+                AccountAuthenticationTokenInfo(
+                  accessToken =
+                    this.getAccessTokenFromBasicTokenResponse(
+                      node = ObjectMapper().readTree(status.bodyStream)
+                    ),
+                  authURI = authenticationURI
+                ),
+              adobeCredentials = null,
+              authenticationDescription = request.description.description,
+              annotationsURI = null,
+              deviceRegistrationURI = null,
+              patronAuthorization = null
+            )
 
           this.handlePatronUserProfile()
           this.updateCredentialsToLoggedInState()
@@ -530,14 +530,13 @@ class ProfileAccountLoginTask(
     this.account.setLoginState(AccountLoggedIn(this.credentials))
   }
 
-  private fun getAccessTokenFromBasicTokenResponse(node: JsonNode): String {
-    return try {
+  private fun getAccessTokenFromBasicTokenResponse(node: JsonNode): String =
+    try {
       node.get("accessToken").asText()
     } catch (e: Exception) {
       this.logger.debug("Error getting access token from basic token response: ", e)
       throw e
     }
-  }
 
   private fun handlePatronUserProfile() {
     val patronProfile =
@@ -553,39 +552,40 @@ class ProfileAccountLoginTask(
      * Copy the annotations link out of the patron profile.
      */
 
-    this.credentials = when (val currentCredentials = this.credentials) {
-      is AccountAuthenticationCredentials.Basic -> {
-        currentCredentials.copy(
-          annotationsURI = patronProfile.annotationsURI,
-          deviceRegistrationURI = patronProfile.deviceRegistrationURI,
-          patronAuthorization = patronProfile.authorization
-        )
-      }
+    this.credentials =
+      when (val currentCredentials = this.credentials) {
+        is AccountAuthenticationCredentials.Basic -> {
+          currentCredentials.copy(
+            annotationsURI = patronProfile.annotationsURI,
+            deviceRegistrationURI = patronProfile.deviceRegistrationURI,
+            patronAuthorization = patronProfile.authorization
+          )
+        }
 
-      is AccountAuthenticationCredentials.BasicToken -> {
-        currentCredentials.copy(
-          annotationsURI = patronProfile.annotationsURI,
-          deviceRegistrationURI = patronProfile.deviceRegistrationURI,
-          patronAuthorization = patronProfile.authorization
-        )
-      }
+        is AccountAuthenticationCredentials.BasicToken -> {
+          currentCredentials.copy(
+            annotationsURI = patronProfile.annotationsURI,
+            deviceRegistrationURI = patronProfile.deviceRegistrationURI,
+            patronAuthorization = patronProfile.authorization
+          )
+        }
 
-      is AccountAuthenticationCredentials.SAML2_0 -> {
-        currentCredentials.copy(
-          annotationsURI = patronProfile.annotationsURI,
-          deviceRegistrationURI = patronProfile.deviceRegistrationURI,
-          patronAuthorization = patronProfile.authorization
-        )
-      }
+        is AccountAuthenticationCredentials.SAML2_0 -> {
+          currentCredentials.copy(
+            annotationsURI = patronProfile.annotationsURI,
+            deviceRegistrationURI = patronProfile.deviceRegistrationURI,
+            patronAuthorization = patronProfile.authorization
+          )
+        }
 
-      is AccountAuthenticationCredentials.OpenIDConnect -> {
-        currentCredentials.copy(
-          annotationsURI = patronProfile.annotationsURI,
-          deviceRegistrationURI = patronProfile.deviceRegistrationURI,
-          patronAuthorization = patronProfile.authorization
-        )
+        is AccountAuthenticationCredentials.OpenIDConnect -> {
+          currentCredentials.copy(
+            annotationsURI = patronProfile.annotationsURI,
+            deviceRegistrationURI = patronProfile.deviceRegistrationURI,
+            patronAuthorization = patronProfile.authorization
+          )
+        }
       }
-    }
   }
 
   private fun validateRequest(): Boolean {
@@ -594,38 +594,45 @@ class ProfileAccountLoginTask(
     return when (this.request) {
       is Basic -> {
         (this.account.provider.authentication == this.request.description) ||
-          (this.account.provider.authenticationAlternatives.any { it == this.request.description })
+          (this.account.provider.authenticationAlternatives
+            .any { it == this.request.description })
       }
 
       is BasicToken -> {
         (this.account.provider.authentication == this.request.description) ||
-          (this.account.provider.authenticationAlternatives.any { it == this.request.description })
+          (this.account.provider.authenticationAlternatives
+            .any { it == this.request.description })
       }
 
       is SAML20Initiate -> {
         (this.account.provider.authentication == this.request.description) ||
-          (this.account.provider.authenticationAlternatives.any { it == this.request.description })
+          (this.account.provider.authenticationAlternatives
+            .any { it == this.request.description })
       }
 
       is SAML20Cancel,
       is SAML20Complete -> {
         this.account.provider.authentication is SAML2_0 ||
-          (this.account.provider.authenticationAlternatives.any { it is SAML2_0 })
+          (this.account.provider.authenticationAlternatives
+            .any { it is SAML2_0 })
       }
 
       is OIDCCancel -> {
         this.account.provider.authentication is OpenIDConnect ||
-          (this.account.provider.authenticationAlternatives.any { it is OpenIDConnect })
+          (this.account.provider.authenticationAlternatives
+            .any { it is OpenIDConnect })
       }
 
       is OIDCComplete -> {
         this.account.provider.authentication is OpenIDConnect ||
-          (this.account.provider.authenticationAlternatives.any { it is OpenIDConnect })
+          (this.account.provider.authenticationAlternatives
+            .any { it is OpenIDConnect })
       }
 
       is OIDCInitiate -> {
         this.account.provider.authentication is OpenIDConnect ||
-          (this.account.provider.authenticationAlternatives.any { it is OpenIDConnect })
+          (this.account.provider.authenticationAlternatives
+            .any { it is OpenIDConnect })
       }
     }
   }
@@ -683,8 +690,8 @@ class ProfileAccountLoginTask(
 
   private class NoCurrentDescription : Exception()
 
-  private fun findCurrentDescription(): AccountProviderAuthenticationDescription {
-    return when (this.request) {
+  private fun findCurrentDescription(): AccountProviderAuthenticationDescription =
+    when (this.request) {
       is Basic -> {
         this.request.description
       }
@@ -722,7 +729,9 @@ class ProfileAccountLoginTask(
         }
       }
 
-      is OIDCCancel -> this.request.description
+      is OIDCCancel -> {
+        this.request.description
+      }
 
       is OIDCComplete -> {
         when (val loginState = this.account.loginState) {
@@ -745,7 +754,8 @@ class ProfileAccountLoginTask(
         }
       }
 
-      is OIDCInitiate -> this.request.description
+      is OIDCInitiate -> {
+        this.request.description
+      }
     }
-  }
 }

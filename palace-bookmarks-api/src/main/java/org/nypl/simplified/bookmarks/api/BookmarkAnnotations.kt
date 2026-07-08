@@ -34,13 +34,11 @@ data class BookmarkAnnotation(
   val motivation: String,
   val target: BookmarkAnnotationTargetNode
 ) {
-  override fun equals(other: Any?): Boolean {
-    return this.target.selector.value == (other as BookmarkAnnotation).target.selector.value
-  }
+  override fun equals(other: Any?): Boolean = this.target.selector.value == (other as BookmarkAnnotation).target.selector.value
 
-  override fun hashCode(): Int {
-    return this.target.selector.value.hashCode()
-  }
+  override fun hashCode(): Int =
+    this.target.selector.value
+      .hashCode()
 
   val kind: BookmarkKind =
     BookmarkKind.ofMotivation(this.motivation)
@@ -61,13 +59,14 @@ data class BookmarkAnnotationResponse(
 )
 
 object BookmarkAnnotations {
-
   private val dateParser =
-    ISODateTimeFormat.dateTimeParser()
+    ISODateTimeFormat
+      .dateTimeParser()
       .withZoneUTC()
 
   private val dateFormatter =
-    DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+    DateTimeFormat
+      .forPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
       .withZoneUTC()
 
   fun fromSerializedBookmark(

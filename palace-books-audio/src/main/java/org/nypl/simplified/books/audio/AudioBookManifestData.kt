@@ -8,19 +8,16 @@ import org.librarysimplified.audiobook.manifest_fulfill.spi.ManifestFulfilled
  */
 
 data class AudioBookManifestData(
-
   /**
    * The manifest.
    */
 
   val manifest: PlayerManifest,
-
   /**
    * The bytes of the audiobook license, if present.
    */
 
   val licenseBytes: ByteArray?,
-
   /**
    * The original fulfilled manifest, suitable for writing to external storage.
    */

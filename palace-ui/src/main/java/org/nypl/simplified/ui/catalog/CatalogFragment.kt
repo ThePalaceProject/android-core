@@ -99,8 +99,10 @@ import java.util.concurrent.atomic.AtomicReference
  * The fragment used for the catalog.
  */
 
-sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogViewCallbacksType {
-
+sealed class CatalogFragment :
+  Fragment(),
+  MainBackButtonConsumerType,
+  CatalogViewCallbacksType {
   abstract val catalogPart: CatalogPart
 
   private val logger =
@@ -206,7 +208,8 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
 
     try {
       val account =
-        this.profiles.profileCurrent()
+        this.profiles
+          .profileCurrent()
           .account(accountID)
 
       this.opdsClient.goTo(
@@ -223,9 +226,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
     }
   }
 
-  final override fun onBookSelected(
-    entry: FeedEntry.FeedEntryOPDS
-  ) {
+  final override fun onBookSelected(entry: FeedEntry.FeedEntryOPDS) {
     UIThread.checkIsUIThread()
     this.opdsClient.goTo(
       OPDSClientRequest.ExistingEntry(
@@ -245,7 +246,8 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
       val view = this.viewNow
       if (view is CatalogFeedViewDetails2) {
         val account =
-          this.profiles.profileCurrent()
+          this.profiles
+            .profileCurrent()
             .account(newEntry.accountID)
 
         view.bind(account.provider, newEntry)
@@ -335,9 +337,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
     this.perViewSubscriptions = CloseableCollection.create()
   }
 
-  private fun onStateChangedToDetails(
-    newState: LoadedFeedEntry
-  ) {
+  private fun onStateChangedToDetails(newState: LoadedFeedEntry) {
     val view =
       CatalogFeedViewDetails2.create(
         callbacks = this,
@@ -356,7 +356,8 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
         val services =
           Services.serviceDirectory()
         val account =
-          services.requireService(ProfilesControllerType::class.java)
+          services
+            .requireService(ProfilesControllerType::class.java)
             .profileCurrent()
             .account(entry.accountID)
 
@@ -404,7 +405,8 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
             val services =
               Services.serviceDirectory()
             val account =
-              services.requireService(ProfilesControllerType::class.java)
+              services
+                .requireService(ProfilesControllerType::class.java)
                 .profileCurrent()
                 .account(item.accountID)
 
@@ -417,9 +419,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
     this.switchView(view)
   }
 
-  final override fun onErrorDetailsDisplayRequested(
-    error: TaskResult.Failure<*>
-  ) {
+  final override fun onErrorDetailsDisplayRequested(error: TaskResult.Failure<*>) {
     try {
       val services =
         Services.serviceDirectory()
@@ -428,22 +428,21 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
 
       MainNavigation.openErrorPage(
         activity = this.requireActivity(),
-        parameters = ErrorPageParameters(
-          emailAddress = buildConfig.supportErrorReportEmailAddress,
-          body = "",
-          subject = "[palace-error-report]",
-          attributes = error.attributes.toSortedMap(),
-          taskSteps = error.steps
-        )
+        parameters =
+          ErrorPageParameters(
+            emailAddress = buildConfig.supportErrorReportEmailAddress,
+            body = "",
+            subject = "[palace-error-report]",
+            attributes = error.attributes.toSortedMap(),
+            taskSteps = error.steps
+          )
       )
     } catch (e: Throwable) {
       this.logger.error("Failed to open error page: ", e)
     }
   }
 
-  final override fun onBookRequestDismissError(
-    book: Book
-  ) {
+  final override fun onBookRequestDismissError(book: Book) {
     val services =
       Services.serviceDirectory()
     val books =
@@ -455,9 +454,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
     )
   }
 
-  final override fun onBookRequestBorrowCancel(
-    book: Book,
-  ) {
+  final override fun onBookRequestBorrowCancel(book: Book,) {
     val services =
       Services.serviceDirectory()
     val books =
@@ -470,11 +467,10 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
   }
 
   @Deprecated("Unclear why this has its own special method.")
-  final override fun onBookRequestSAMLDownload(
-    status: CatalogBookStatus<BookStatus.DownloadWaitingForExternalAuthentication>
-  ) {
+  final override fun onBookRequestSAMLDownload(status: CatalogBookStatus<BookStatus.DownloadWaitingForExternalAuthentication>) {
     val account =
-      this.profiles.profileCurrent()
+      this.profiles
+        .profileCurrent()
         .account(status.book.account)
 
     CatalogSAML20Model.start(
@@ -500,7 +496,8 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
     val profiles =
       services.requireService(ProfilesControllerType::class.java)
     val account =
-      profiles.profileCurrent()
+      profiles
+        .profileCurrent()
         .account(parameters.accountID)
 
     if (this.isLoginRequired(parameters.accountID)) {
@@ -537,10 +534,8 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
    * @return `true` if a login is required on the given account
    */
 
-  private fun isLoginRequired(
-    accountID: AccountID
-  ): Boolean {
-    return try {
+  private fun isLoginRequired(accountID: AccountID): Boolean =
+    try {
       val services = Services.serviceDirectory()
       val profiles = services.requireService(ProfilesControllerType::class.java)
       val profile = profiles.profileCurrent()
@@ -552,11 +547,8 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
       this.logger.debug("could not retrieve account: ", e)
       false
     }
-  }
 
-  final override fun onBookRequestPreviewOpen(
-    book: Book
-  ) {
+  final override fun onBookRequestPreviewOpen(book: Book) {
     try {
       BookPreviewActivity.startActivity(
         this.requireActivity(),
@@ -573,8 +565,8 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
   final override fun onBookCanBeRevoked(
     book: Book,
     status: BookStatus
-  ): Boolean {
-    return try {
+  ): Boolean =
+    try {
       val services =
         Services.serviceDirectory()
       val profiles =
@@ -587,14 +579,17 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
 
       if (account.bookDatabase.books().contains(book.id)) {
         when (status) {
-          is BookStatus.Loaned.LoanedDownloaded ->
+          is BookStatus.Loaned.LoanedDownloaded -> {
             status.returnable
+          }
 
-          is BookStatus.Loaned.LoanedNotDownloaded ->
+          is BookStatus.Loaned.LoanedNotDownloaded -> {
             true
+          }
 
-          else ->
+          else -> {
             false
+          }
         }
       } else {
         false
@@ -603,11 +598,8 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
       this.logger.debug("Could not determine if the book could be revoked: ", e)
       false
     }
-  }
 
-  final override fun onBookRequestDelete(
-    book: Book
-  ) {
+  final override fun onBookRequestDelete(book: Book) {
     val services =
       Services.serviceDirectory()
     val books =
@@ -619,9 +611,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
     )
   }
 
-  final override fun onBookRequestRevoke(
-    book: Book
-  ) {
+  final override fun onBookRequestRevoke(book: Book) {
     try {
       val services =
         Services.serviceDirectory()
@@ -633,7 +623,8 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
       val accountID =
         book.account
       val account =
-        profiles.profileCurrent()
+        profiles
+          .profileCurrent()
           .account(accountID)
       val context =
         this.requireContext()
@@ -731,7 +722,8 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
       val profiles =
         services.requireService(ProfilesControllerType::class.java)
       val account =
-        profiles.profileCurrent()
+        profiles
+          .profileCurrent()
           .account(book.account)
 
       val task = TaskRecorder.create()
@@ -749,22 +741,21 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
 
       MainNavigation.openErrorPage(
         activity = this.requireActivity(),
-        parameters = ErrorPageParameters(
-          emailAddress = buildConfig.supportErrorReportEmailAddress,
-          body = "",
-          subject = "[palace-error-report]",
-          attributes = error.attributes.toSortedMap(),
-          taskSteps = error.steps
-        )
+        parameters =
+          ErrorPageParameters(
+            emailAddress = buildConfig.supportErrorReportEmailAddress,
+            body = "",
+            subject = "[palace-error-report]",
+            attributes = error.attributes.toSortedMap(),
+            taskSteps = error.steps
+          )
       )
     } catch (e: Throwable) {
       this.logger.error("Failed to open error page: ", e)
     }
   }
 
-  private fun onStateChangedToGroups(
-    newState: LoadedFeedWithGroups
-  ) {
+  private fun onStateChangedToGroups(newState: LoadedFeedWithGroups) {
     val feedHandle =
       newState.handle
     val feed =
@@ -796,7 +787,8 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
 
     try {
       val account =
-        this.profiles.profileCurrent()
+        this.profiles
+          .profileCurrent()
           .account(newState.request.accountID)
 
       view.toolbar.configure(
@@ -845,9 +837,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
     this.opdsClient.goBack()
   }
 
-  final override fun onToolbarLogoPressed(
-    currentAccount: AccountID
-  ) {
+  final override fun onToolbarLogoPressed(currentAccount: AccountID) {
     UIThread.checkIsUIThread()
 
     val dialog =
@@ -859,9 +849,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
     dialog.show(this.childFragmentManager, dialog.tag)
   }
 
-  private fun onStateChangedToInfinite(
-    newState: LoadedFeedWithoutGroups
-  ) {
+  private fun onStateChangedToInfinite(newState: LoadedFeedWithoutGroups) {
     val feedHandle =
       newState.handle
     val feedPositionInitial =
@@ -875,7 +863,8 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
       services.requireService(CatalogBookRegistryEvents::class.java)
 
     val account =
-      this.profiles.profileCurrent()
+      this.profiles
+        .profileCurrent()
         .account(newState.request.accountID)
 
     val view =
@@ -901,14 +890,15 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
     val feedScope =
       CoroutineScope(Dispatchers.Main)
 
-    val job = feedScope.launch {
-      val pager =
-        Pager(
-          config = PagingConfig(pageSize = 50),
-          pagingSourceFactory = { feedSource }
-        )
-      pager.flow.collect { data -> feedAdapter.submitData(data) }
-    }
+    val job =
+      feedScope.launch {
+        val pager =
+          Pager(
+            config = PagingConfig(pageSize = 50),
+            pagingSourceFactory = { feedSource }
+          )
+        pager.flow.collect { data -> feedAdapter.submitData(data) }
+      }
 
     this.perViewSubscriptions.add(AutoCloseable { job.cancel() })
 
@@ -917,17 +907,23 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
        * Add a scroll listener that saves the scroll position.
        */
 
-      view.listView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-          val linearLayoutManager =
-            recyclerView.layoutManager as LinearLayoutManager
-          val position =
-            linearLayoutManager.findFirstVisibleItemPosition()
+      view.listView.addOnScrollListener(
+        object : RecyclerView.OnScrollListener() {
+          override fun onScrolled(
+            recyclerView: RecyclerView,
+            dx: Int,
+            dy: Int
+          ) {
+            val linearLayoutManager =
+              recyclerView.layoutManager as LinearLayoutManager
+            val position =
+              linearLayoutManager.findFirstVisibleItemPosition()
 
-          this@CatalogFragment.logger.trace("Saving scroll position {}", position)
-          feedHandle.scrollPositionSave(position)
+            this@CatalogFragment.logger.trace("Saving scroll position {}", position)
+            feedHandle.scrollPositionSave(position)
+          }
         }
-      })
+      )
 
       view.listView.adapter = feedAdapter
       view.configureFacets(
@@ -973,11 +969,12 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
 
     view.configureListVisibility(
       itemCount = feed.size,
-      onEmptyMessage = when (this.catalogPart) {
-        CATALOG -> context.getString(R.string.feedEmpty)
-        BOOKS -> context.getString(R.string.feedWithGroupsEmptyLoaned)
-        HOLDS -> context.getString(R.string.feedWithGroupsEmptyHolds)
-      }
+      onEmptyMessage =
+        when (this.catalogPart) {
+          CATALOG -> context.getString(R.string.feedEmpty)
+          BOOKS -> context.getString(R.string.feedWithGroupsEmptyLoaned)
+          HOLDS -> context.getString(R.string.feedWithGroupsEmptyHolds)
+        }
     )
     this.switchView(view)
     this.announceSearchResults(context, newState, view)
@@ -1031,23 +1028,24 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
     view.listView.requestFocus()
   }
 
-  final override fun onIsBookReturnable(
-    book: Book
-  ): Boolean {
+  final override fun onIsBookReturnable(book: Book): Boolean {
     val profile = this.profiles.profileCurrent()
     val account = profile.account(book.account)
 
     return try {
       if (account.bookDatabase.books().contains(book.id)) {
         when (val status = BookStatus.fromBook(book)) {
-          is Loaned.LoanedDownloaded ->
+          is Loaned.LoanedDownloaded -> {
             status.returnable
+          }
 
-          is Loaned.LoanedNotDownloaded ->
+          is Loaned.LoanedNotDownloaded -> {
             true
+          }
 
-          else ->
+          else -> {
             false
+          }
         }
       } else {
         false
@@ -1057,9 +1055,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
     }
   }
 
-  final override fun onIsBookDeletable(
-    book: Book
-  ): Boolean {
+  final override fun onIsBookDeletable(book: Book): Boolean {
     return try {
       val profile = this.profiles.profileCurrent()
       val account = profile.account(book.account)
@@ -1086,9 +1082,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
    * a significant event occurs such as a book being added to or deleted from the registry.
    */
 
-  private fun setupRefreshForLocalFeeds(
-    feedHandle: OPDSFeedHandleWithoutGroupsType
-  ) {
+  private fun setupRefreshForLocalFeeds(feedHandle: OPDSFeedHandleWithoutGroupsType) {
     when (this.catalogPart) {
       CATALOG -> {
         // Nothing to do.
@@ -1143,16 +1137,17 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
             historyBehavior = CLEAR_HISTORY,
             isSearch = true,
             generator = {
-              profiles.profileFeed(
-                ProfileFeedRequest(
-                  uri = URI.create("Books"),
-                  search = queryText,
-                  feedSelection = feedSelection,
-                  facetTitleProvider = CatalogOPDSClients.facetTitleProvider,
-                  sortBy = CatalogFeedFacetSortModel.facetSelectedPseudoOrDefault(this.catalogPart),
-                  filterByAccountID = null
-                )
-              ).get(10L, TimeUnit.SECONDS)
+              profiles
+                .profileFeed(
+                  ProfileFeedRequest(
+                    uri = URI.create("Books"),
+                    search = queryText,
+                    feedSelection = feedSelection,
+                    facetTitleProvider = CatalogOPDSClients.facetTitleProvider,
+                    sortBy = CatalogFeedFacetSortModel.facetSelectedPseudoOrDefault(this.catalogPart),
+                    filterByAccountID = null
+                  )
+                ).get(10L, TimeUnit.SECONDS)
             }
           )
         )
@@ -1173,9 +1168,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
     }
   }
 
-  final override fun onFeedFacetSelected(
-    feedFacet: FeedFacet
-  ) {
+  final override fun onFeedFacetSelected(feedFacet: FeedFacet) {
     UIThread.checkIsUIThread()
 
     val feedSelection =
@@ -1221,16 +1214,17 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
             accountID = this.currentAccount().id,
             historyBehavior = CLEAR_HISTORY,
             generator = {
-              this.profiles.profileFeed(
-                ProfileFeedRequest(
-                  uri = URI.create("Books"),
-                  search = null,
-                  feedSelection = feedSelection,
-                  facetTitleProvider = CatalogOPDSClients.facetTitleProvider,
-                  sortBy = CatalogFeedFacetSortModel.facetSelectedPseudoOrDefault(this.catalogPart),
-                  filterByAccountID = feedFacet.account
-                )
-              ).get(10L, TimeUnit.SECONDS)
+              this.profiles
+                .profileFeed(
+                  ProfileFeedRequest(
+                    uri = URI.create("Books"),
+                    search = null,
+                    feedSelection = feedSelection,
+                    facetTitleProvider = CatalogOPDSClients.facetTitleProvider,
+                    sortBy = CatalogFeedFacetSortModel.facetSelectedPseudoOrDefault(this.catalogPart),
+                    filterByAccountID = feedFacet.account
+                  )
+                ).get(10L, TimeUnit.SECONDS)
             }
           )
         )
@@ -1245,16 +1239,17 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
             accountID = this.currentAccount().id,
             historyBehavior = CLEAR_HISTORY,
             generator = {
-              this.profiles.profileFeed(
-                ProfileFeedRequest(
-                  uri = URI.create("Books"),
-                  search = null,
-                  feedSelection = feedSelection,
-                  facetTitleProvider = CatalogOPDSClients.facetTitleProvider,
-                  sortBy = feedFacet.sortBy,
-                  filterByAccountID = filterByAccountID
-                )
-              ).get(10L, TimeUnit.SECONDS)
+              this.profiles
+                .profileFeed(
+                  ProfileFeedRequest(
+                    uri = URI.create("Books"),
+                    search = null,
+                    feedSelection = feedSelection,
+                    facetTitleProvider = CatalogOPDSClients.facetTitleProvider,
+                    sortBy = feedFacet.sortBy,
+                    filterByAccountID = filterByAccountID
+                  )
+                ).get(10L, TimeUnit.SECONDS)
             }
           )
         )
@@ -1262,8 +1257,8 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
     }
   }
 
-  private fun findFilterByAccountID(): AccountID? {
-    return if (CatalogFeedFacetFilterModels.filterModel.facets.isNotEmpty()) {
+  private fun findFilterByAccountID(): AccountID? =
+    if (CatalogFeedFacetFilterModels.filterModel.facets.isNotEmpty()) {
       val filterFacet =
         CatalogFeedFacetFilterModels.filterModel.createResultFacet("")
       if (filterFacet is FeedFacetPseudo.FilteringForAccount) {
@@ -1274,11 +1269,8 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
     } else {
       null
     }
-  }
 
-  private fun onStateChangedToError(
-    newState: OPDSState.Error
-  ) {
+  private fun onStateChangedToError(newState: OPDSState.Error) {
     val services =
       Services.serviceDirectory()
     val buildConfig =
@@ -1290,17 +1282,19 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
         body = "",
         subject = "[palace-error-report]",
         attributes = newState.message.attributes.toSortedMap(),
-        taskSteps = listOf(
-          TaskStep(
-            description = "Attempted to load feed.",
-            resolution = TaskStepResolution.TaskStepFailed(
-              newState.message.message,
-              newState.message.exception,
-              "?",
-              listOf()
+        taskSteps =
+          listOf(
+            TaskStep(
+              description = "Attempted to load feed.",
+              resolution =
+                TaskStepResolution.TaskStepFailed(
+                  newState.message.message,
+                  newState.message.exception,
+                  "?",
+                  listOf()
+                )
             )
           )
-        )
       )
 
     this.switchView(
@@ -1341,23 +1335,21 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
     )
   }
 
-  private fun credentialsOf(
-    id: AccountID
-  ): AccountAuthenticationCredentials? {
-    return try {
+  private fun credentialsOf(id: AccountID): AccountAuthenticationCredentials? =
+    try {
       val profile = this.profiles.profileCurrent()
       profile.account(id).loginState.credentials
     } catch (e: Exception) {
       this.logger.warn("Error fetching credentials: ", e)
       null
     }
-  }
 
   private fun currentAccount(): AccountType {
     val profile =
       this.profiles.profileCurrent()
     val id =
-      profile.preferences()
+      profile
+        .preferences()
         .mostRecentAccount
 
     return profile.account(id)
@@ -1384,9 +1376,7 @@ sealed class CatalogFragment : Fragment(), MainBackButtonConsumerType, CatalogVi
     return BACK_BUTTON_CONSUMED
   }
 
-  private fun switchView(
-    view: CatalogFeedView
-  ) {
+  private fun switchView(view: CatalogFeedView) {
     val viewExisting = this.viewNow
     this.viewNow = view
     viewExisting.clear()

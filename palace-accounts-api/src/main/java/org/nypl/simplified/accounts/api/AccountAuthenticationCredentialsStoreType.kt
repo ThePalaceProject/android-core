@@ -5,7 +5,6 @@ package org.nypl.simplified.accounts.api
  */
 
 interface AccountAuthenticationCredentialsStoreType {
-
   /**
    * Obtain the credentials for the given account, if any.
    */
@@ -25,9 +24,7 @@ interface AccountAuthenticationCredentialsStoreType {
    * Delete the credentials for the given account, if any.
    */
 
-  fun delete(
-    account: AccountID
-  )
+  fun delete(account: AccountID)
 
   /**
    * The number of entries in the store

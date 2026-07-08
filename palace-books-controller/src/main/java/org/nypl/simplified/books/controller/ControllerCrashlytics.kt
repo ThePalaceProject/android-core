@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory
 import java.security.MessageDigest
 
 internal object ControllerCrashlytics {
-
   private val logger =
     LoggerFactory.getLogger(ControllerCrashlytics::class.java)
 
@@ -26,19 +25,19 @@ internal object ControllerCrashlytics {
   private fun configureCrashlyticsForCredentials(
     crashlytics: CrashlyticsServiceType,
     credentials: AccountAuthenticationCredentials?
-  ) {
-    return when (credentials) {
-      is AccountAuthenticationCredentials.Basic -> {
-        this.setCrashlyticsUserID(crashlytics, credentials.userName.value)
-      }
-      is AccountAuthenticationCredentials.BasicToken -> {
-        this.setCrashlyticsUserID(crashlytics, credentials.userName.value)
-      }
-      is AccountAuthenticationCredentials.OpenIDConnect,
-      is AccountAuthenticationCredentials.SAML2_0,
-      null -> {
-        this.clearCrashlyticsUserID(crashlytics)
-      }
+  ) = when (credentials) {
+    is AccountAuthenticationCredentials.Basic -> {
+      this.setCrashlyticsUserID(crashlytics, credentials.userName.value)
+    }
+
+    is AccountAuthenticationCredentials.BasicToken -> {
+      this.setCrashlyticsUserID(crashlytics, credentials.userName.value)
+    }
+
+    is AccountAuthenticationCredentials.OpenIDConnect,
+    is AccountAuthenticationCredentials.SAML2_0,
+    null -> {
+      this.clearCrashlyticsUserID(crashlytics)
     }
   }
 

@@ -17,7 +17,6 @@ class ProfileAccountProviderUpdatedTask(
   private val accountProviderID: URI,
   private val accountProviders: AccountProviderRegistryType
 ) : Callable<Unit> {
-
   private val logger = LoggerFactory.getLogger(ProfileAccountProviderUpdatedTask::class.java)
 
   override fun call() {

@@ -36,12 +36,11 @@ data class BookmarksForBook(
   }
 
   companion object {
-    fun empty(bookID: BookID): BookmarksForBook {
-      return BookmarksForBook(
+    fun empty(bookID: BookID): BookmarksForBook =
+      BookmarksForBook(
         bookId = bookID,
         lastRead = null,
         bookmarks = listOf()
       )
-    }
   }
 }

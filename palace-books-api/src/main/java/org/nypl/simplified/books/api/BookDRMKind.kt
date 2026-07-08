@@ -5,7 +5,6 @@ package org.nypl.simplified.books.api
  */
 
 enum class BookDRMKind {
-
   /**
    * See [BookDRMInformation.None]
    */

@@ -8,9 +8,7 @@ import org.joda.time.DateTime
 class OPDSAvailabilityLoanable private constructor() : OPDSAvailabilityType {
   override val endDate: DateTime? = null
 
-  override fun toString(): String {
-    return "[OPDSAvailabilityLoanable]"
-  }
+  override fun toString(): String = "[OPDSAvailabilityLoanable]"
 
   companion object {
     @JvmStatic
@@ -21,8 +19,6 @@ class OPDSAvailabilityLoanable private constructor() : OPDSAvailabilityType {
      * @return An availability value stating that a book is available for loan
      */
     @JvmStatic
-    fun get(): OPDSAvailabilityLoanable {
-      return INSTANCE
-    }
+    fun get(): OPDSAvailabilityLoanable = INSTANCE
   }
 }

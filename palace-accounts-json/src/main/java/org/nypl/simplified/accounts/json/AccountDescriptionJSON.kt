@@ -21,7 +21,6 @@ import java.io.IOException
  */
 
 object AccountDescriptionJSON {
-
   private val logger = LoggerFactory.getLogger(AccountDescriptionJSON::class.java)
 
   /**
@@ -39,13 +38,12 @@ object AccountDescriptionJSON {
     objectMapper: ObjectMapper,
     accountProviders: (String) -> AccountProviderType?,
     file: File
-  ): AccountDescription {
-    return deserializeFromText(
+  ): AccountDescription =
+    deserializeFromText(
       objectMapper = objectMapper,
       accountProviders = accountProviders,
       text = FileUtilities.fileReadUTF8(file)
     )
-  }
 
   /**
    * Deserialize a account description from the given text.
@@ -62,12 +60,11 @@ object AccountDescriptionJSON {
     objectMapper: ObjectMapper,
     accountProviders: (String) -> AccountProviderType?,
     text: String
-  ): AccountDescription {
-    return deserializeFromJSON(
+  ): AccountDescription =
+    deserializeFromJSON(
       accountProviders = accountProviders,
       node = objectMapper.readTree(text)
     )
-  }
 
   /**
    * Deserialize a account description from the given JSON node.
@@ -87,19 +84,21 @@ object AccountDescriptionJSON {
 
     val preferences: AccountPreferences
     if (obj.has("preferences")) {
-      preferences = AccountPreferencesJSON.deserializeFromJSON(
-        JSONParserUtilities.getObject(obj, "preferences")
-      )
+      preferences =
+        AccountPreferencesJSON.deserializeFromJSON(
+          JSONParserUtilities.getObject(obj, "preferences")
+        )
     } else {
       preferences = AccountPreferences.defaultPreferences()
     }
 
     val accountProvider: AccountProviderType =
       when (val value = obj["provider"]) {
-        is ObjectNode ->
+        is ObjectNode -> {
           AccountProvidersJSON.deserializeFromJSON(
             JSONParserUtilities.getObject(obj, "provider")
           )
+        }
 
         is TextNode -> {
           this.logger.warn("encountered old-style provider ID in account JSON")

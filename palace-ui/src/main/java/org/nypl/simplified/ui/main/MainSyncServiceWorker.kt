@@ -13,7 +13,6 @@ class MainSyncServiceWorker(
   context: Context,
   params: WorkerParameters
 ) : CoroutineWorker(context, params) {
-
   companion object {
     private val logger =
       LoggerFactory.getLogger(MainSyncServiceWorker::class.java)
@@ -23,7 +22,8 @@ class MainSyncServiceWorker(
     try {
       logger.debug("Syncing")
 
-      Services.serviceDirectoryFuture()
+      Services
+        .serviceDirectoryFuture()
         .addListener(
           this::runTask,
           MoreExecutors.directExecutor()
@@ -47,7 +47,8 @@ class MainSyncServiceWorker(
       services.requireService(BooksControllerType::class.java)
 
     val accounts =
-      profiles.profileCurrent()
+      profiles
+        .profileCurrent()
         .accounts()
         .values
 

@@ -4,7 +4,6 @@ import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 
 object Reader2Devices {
-
   /**
    * Return the device ID for the account that owns `bookID`.
    */
@@ -18,6 +17,10 @@ object Reader2Devices {
     val credentials = state.credentials
 
     // Yes, really return a string that says "null"
-    return credentials?.adobeCredentials?.postActivationCredentials?.deviceID?.value ?: "null"
+    return credentials
+      ?.adobeCredentials
+      ?.postActivationCredentials
+      ?.deviceID
+      ?.value ?: "null"
   }
 }

@@ -16,7 +16,6 @@ import androidx.core.view.WindowInsetsCompat
  */
 
 object ScreenEdgeToEdgeFix {
-
   /**
    * Set insets for the given view to work around the new edge-to-edge display. Call this method
    * on the root view of a hierarchy as soon as the views are created. This typically only needs

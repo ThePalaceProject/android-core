@@ -29,7 +29,6 @@ class CatalogSAML20WebClient(
   private val webViewDataDir: File,
   private val startURL: String,
 ) : WebViewClient() {
-
   private var isReady = false
 
   init {
@@ -82,9 +81,10 @@ class CatalogSAML20WebClient(
           if (credentials is AccountAuthenticationCredentials.SAML2_0) {
             this.account.setLoginState(
               loginState.copy(
-                credentials = credentials.copy(
-                  cookies = cookies
-                )
+                credentials =
+                  credentials.copy(
+                    cookies = cookies
+                  )
               )
             )
           }
@@ -98,11 +98,12 @@ class CatalogSAML20WebClient(
             accountID = book.account,
             bookID = book.id,
             entry = book.entry,
-            samlDownloadContext = SAMLDownloadContext(
-              isSAMLAuthComplete = true,
-              downloadURI = this.downloadURI,
-              authCompleteDownloadURI = URI(downloadURL)
-            )
+            samlDownloadContext =
+              SAMLDownloadContext(
+                isSAMLAuthComplete = true,
+                downloadURI = this.downloadURI,
+                authCompleteDownloadURI = URI(downloadURL)
+              )
           )
         }
       } finally {

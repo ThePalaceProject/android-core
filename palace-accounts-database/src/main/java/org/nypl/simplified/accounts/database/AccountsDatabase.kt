@@ -73,7 +73,6 @@ class AccountsDatabase private constructor(
   private val bookFormatSupport: BookFormatSupportType,
   private val httpClient: LSHTTPClientType,
 ) : AccountsDatabaseType {
-
   private val logger =
     LoggerFactory.getLogger(AccountsDatabase::class.java)
 
@@ -92,9 +91,7 @@ class AccountsDatabase private constructor(
       castMap(Collections.unmodifiableSortedMap(this.accountsByProvider))
   }
 
-  override fun directory(): File {
-    return this.directory
-  }
+  override fun directory(): File = this.directory
 
   override fun accounts(): SortedMap<AccountID, AccountType> {
     synchronized(this.accountsLock) {
@@ -156,7 +153,8 @@ class AccountsDatabase private constructor(
         )
 
       val accountDescription =
-        AccountDescription.builder(accountProvider, preferences)
+        AccountDescription
+          .builder(accountProvider, preferences)
           .build()
 
       writeDescription(
@@ -229,7 +227,6 @@ class AccountsDatabase private constructor(
     providerInitial: AccountProviderType,
     accountLoginState: AccountLoginState
   ) : AccountType {
-
     private val logger =
       LoggerFactory.getLogger(Account::class.java)
 
@@ -265,7 +262,8 @@ class AccountsDatabase private constructor(
           }
 
           val modifiedDescription =
-            existing.toBuilder()
+            existing
+              .toBuilder()
               .setProvider(accountProvider)
               .build()
 
@@ -283,6 +281,7 @@ class AccountsDatabase private constructor(
           this.logger.debug("Credentials marked as expired.")
           this.setLoginState(AccountLoggedInStaleCredentials(stateThen.credentials))
         }
+
         is AccountLoggedInStaleCredentials,
         is AccountLoggingIn,
         is AccountLoggingInWaitingForExternalAuthentication,
@@ -307,27 +306,26 @@ class AccountsDatabase private constructor(
     }
 
     override val provider: AccountProviderType
-      get() = synchronized(this.descriptionLock) {
-        return this.providerActual
-      }
+      get() =
+        synchronized(this.descriptionLock) {
+          return this.providerActual
+        }
 
-    fun id(): AccountID {
-      return this.id
-    }
+    fun id(): AccountID = this.id
 
-    fun directory(): File {
-      return this.directory
-    }
+    fun directory(): File = this.directory
 
     override val loginState: AccountLoginState
-      get() = synchronized(this.descriptionLock) {
-        return this.loginStateActual
-      }
+      get() =
+        synchronized(this.descriptionLock) {
+          return this.loginStateActual
+        }
 
     override val preferences: AccountPreferences
-      get() = synchronized(this.descriptionLock) {
-        return this.description.preferences()
-      }
+      get() =
+        synchronized(this.descriptionLock) {
+          return this.description.preferences()
+        }
 
     override fun setLoginState(state: AccountLoginState) {
       val oldState = this.loginStateActual
@@ -447,7 +445,6 @@ class AccountsDatabase private constructor(
   }
 
   companion object {
-
     private val logger =
       LoggerFactory.getLogger(AccountsDatabase::class.java)
 
@@ -601,19 +598,20 @@ class AccountsDatabase private constructor(
           if (account != null) {
             val existingAccount = accountsByProvider[account.provider.id]
             if (existingAccount != null) {
-              val message = StringBuilder(128)
-                .append("Multiple accounts using the same provider.")
-                .append("\n")
-                .append("  Provider: ")
-                .append(account.provider.id)
-                .append("\n")
-                .append("  Existing Account: ")
-                .append(existingAccount.id.uuid)
-                .append("\n")
-                .append("  Opening Account: ")
-                .append(account.id.uuid)
-                .append("\n")
-                .toString()
+              val message =
+                StringBuilder(128)
+                  .append("Multiple accounts using the same provider.")
+                  .append("\n")
+                  .append("  Provider: ")
+                  .append(account.provider.id)
+                  .append("\n")
+                  .append("  Existing Account: ")
+                  .append(existingAccount.id.uuid)
+                  .append("\n")
+                  .append("  Opening Account: ")
+                  .append(account.id.uuid)
+                  .append("\n")
+                  .toString()
               this.logger.error("{}", message)
               this.moveToGraveyard(
                 accountDir = account.directory(),
@@ -749,11 +747,12 @@ class AccountsDatabase private constructor(
         val credentials =
           credentialsStore.get(accountId)
 
-        val loginState: AccountLoginState = if (credentials != null) {
-          AccountLoggedIn(credentials)
-        } else {
-          AccountNotLoggedIn(previousCredentials = null)
-        }
+        val loginState: AccountLoginState =
+          if (credentials != null) {
+            AccountLoggedIn(credentials)
+          } else {
+            AccountNotLoggedIn(previousCredentials = null)
+          }
 
         val account =
           Account(
@@ -801,9 +800,7 @@ class AccountsDatabase private constructor(
      * `V <: VB`.
      */
 
-    private fun <K, VB, V : VB> castMap(m: SortedMap<K, V>): SortedMap<K, VB> {
-      return m as SortedMap<K, VB>
-    }
+    private fun <K, VB, V : VB> castMap(m: SortedMap<K, V>): SortedMap<K, VB> = m as SortedMap<K, VB>
 
     @Throws(IOException::class)
     private fun writeDescription(

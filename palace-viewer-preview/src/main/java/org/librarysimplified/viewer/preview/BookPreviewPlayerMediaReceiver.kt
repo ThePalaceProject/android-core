@@ -8,8 +8,10 @@ import android.media.AudioManager
 class BookPreviewPlayerMediaReceiver(
   private val onAudioBecomingNoisy: () -> Unit
 ) : BroadcastReceiver() {
-
-  override fun onReceive(context: Context?, intent: Intent?) {
+  override fun onReceive(
+    context: Context?,
+    intent: Intent?
+  ) {
     if (intent?.action == AudioManager.ACTION_AUDIO_BECOMING_NOISY) {
       onAudioBecomingNoisy()
     }

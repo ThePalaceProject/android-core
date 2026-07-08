@@ -13,7 +13,6 @@ import java.io.Serializable
  */
 
 sealed class BookDRMInformation : Serializable {
-
   /**
    * Derive audiobook player credentials from this DRM information.
    */
@@ -31,22 +30,18 @@ sealed class BookDRMInformation : Serializable {
    */
 
   data class ACS(
-
     /**
      * The ACSM file. This is only present if an attempt has been made to fulfill the book.
      */
 
     val acsmFile: File?,
-
     /**
      * The rights information. This is only present if the book has been fulfilled.
      */
 
     val rights: Pair<File, AdobeAdeptLoan>?
   ) : BookDRMInformation() {
-    override fun playerCredentials(): PlayerBookCredentialsType {
-      return PlayerBookCredentialsNone
-    }
+    override fun playerCredentials(): PlayerBookCredentialsType = PlayerBookCredentialsNone
 
     override val kind: BookDRMKind = BookDRMKind.ACS
   }
@@ -56,27 +51,23 @@ sealed class BookDRMInformation : Serializable {
    */
 
   data class LCP(
-
     /**
      * The hashed LCP passphrase for the book.
      */
 
     val hashedPassphrase: String?,
-
     /**
      * The bytes of the LCP license.
      */
 
     val licenseBytes: ByteArray?
   ) : BookDRMInformation() {
-
-    override fun playerCredentials(): PlayerBookCredentialsType {
-      return if (this.hashedPassphrase != null) {
+    override fun playerCredentials(): PlayerBookCredentialsType =
+      if (this.hashedPassphrase != null) {
         PlayerBookCredentialsLCP(this.hashedPassphrase)
       } else {
         PlayerBookCredentialsNone
       }
-    }
 
     override val kind: BookDRMKind = BookDRMKind.LCP
   }
@@ -88,9 +79,7 @@ sealed class BookDRMInformation : Serializable {
 
     val license: File?
   ) : BookDRMInformation() {
-    override fun playerCredentials(): PlayerBookCredentialsType {
-      return PlayerBookCredentialsNone
-    }
+    override fun playerCredentials(): PlayerBookCredentialsType = PlayerBookCredentialsNone
 
     override val kind: BookDRMKind = BookDRMKind.BOUNDLESS
   }
@@ -101,9 +90,7 @@ sealed class BookDRMInformation : Serializable {
    */
 
   data object None : BookDRMInformation() {
-    override fun playerCredentials(): PlayerBookCredentialsType {
-      return PlayerBookCredentialsNone
-    }
+    override fun playerCredentials(): PlayerBookCredentialsType = PlayerBookCredentialsNone
 
     override val kind: BookDRMKind = BookDRMKind.NONE
   }

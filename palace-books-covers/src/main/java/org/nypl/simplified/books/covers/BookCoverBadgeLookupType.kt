@@ -7,12 +7,9 @@ import org.nypl.simplified.feeds.api.FeedEntry
  */
 
 interface BookCoverBadgeLookupType {
-
   /**
    * @return The badge image to use, if any, for the given book
    */
 
-  fun badgeForEntry(
-    entry: FeedEntry.FeedEntryOPDS
-  ): BookCoverBadge?
+  fun badgeForEntry(entry: FeedEntry.FeedEntryOPDS): BookCoverBadge?
 }

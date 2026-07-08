@@ -67,17 +67,15 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
     }
   }
 
-  private fun findPublisher(element: Element): String? {
-    return OPDSXML.getFirstChildElementTextWithNameOptional(
+  private fun findPublisher(element: Element): String? =
+    OPDSXML.getFirstChildElementTextWithNameOptional(
       element, OPDSFeedConstants.DUBLIN_CORE_TERMS_URI, "publisher"
     )
-  }
 
-  private fun findDistribution(element: Element): String {
-    return OPDSXML.getFirstChildElementTextWithName(
+  private fun findDistribution(element: Element): String =
+    OPDSXML.getFirstChildElementTextWithName(
       element, OPDSFeedConstants.BIBFRAME_URI, "distribution", "ProviderName"
     )
-  }
 
   @Throws(OPDSParseException::class, ParseException::class)
   private fun parseAcquisitionEntry(
@@ -180,11 +178,12 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
     val child: Element?
 
     try {
-      child = OPDSXML.getFirstChildElementWithNameOptional(
-        node = element,
-        namespace = OPDSFeedConstants.SCHEMA_URI,
-        name = "series"
-      )
+      child =
+        OPDSXML.getFirstChildElementWithNameOptional(
+          node = element,
+          namespace = OPDSFeedConstants.SCHEMA_URI,
+          name = "series"
+        )
 
       if (child == null) {
         return
@@ -247,13 +246,12 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
     }
   }
 
-  private fun findDuration(
-    element: Element
-  ): Double? {
+  private fun findDuration(element: Element): Double? {
     try {
-      return OPDSXML.getFirstChildElementTextWithNameOptional(
-        element, OPDSFeedConstants.DUBLIN_CORE_TERMS_URI, "duration"
-      )?.toDouble()
+      return OPDSXML
+        .getFirstChildElementTextWithNameOptional(
+          element, OPDSFeedConstants.DUBLIN_CORE_TERMS_URI, "duration"
+        )?.toDouble()
     } catch (_: Exception) {
       return null
     }
@@ -307,9 +305,7 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
   }
 
   @Throws(OPDSParseException::class)
-  private fun parseIndirectAcquisition(
-    acquisition: Element
-  ): OPDSIndirectAcquisition {
+  private fun parseIndirectAcquisition(acquisition: Element): OPDSIndirectAcquisition {
     try {
       val attributeText =
         acquisition.getAttribute("type")
@@ -326,9 +322,7 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
   }
 
   @Throws(OPDSParseException::class)
-  private fun parseIndirectAcquisitions(
-    element: Element
-  ): MutableList<OPDSIndirectAcquisition> {
+  private fun parseIndirectAcquisitions(element: Element): MutableList<OPDSIndirectAcquisition> {
     val indirectElements =
       OPDSXML.getChildElementsWithName(
         element,
@@ -391,27 +385,29 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
               continue
             }
 
-            resultingLink = Link.LinkBasic(
-              href,
-              type,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null
-            )
+            resultingLink =
+              Link.LinkBasic(
+                href,
+                type,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+              )
           } else {
-            resultingLink = Link.LinkTemplated(
-              link.getAttribute("href"),
-              type,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null
-            )
+            resultingLink =
+              Link.LinkTemplated(
+                link.getAttribute("href"),
+                type,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+              )
           }
 
           val acquisition =
@@ -812,9 +808,7 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
     return null
   }
 
-  private fun typeAttributeWithSupportedValue(
-    acquisition: Element
-  ): MIMEType? {
+  private fun typeAttributeWithSupportedValue(acquisition: Element): MIMEType? {
     val attributeText = acquisition.getAttribute("type")
     if (attributeText == null) {
       return null
@@ -894,9 +888,11 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
         val startDate =
           OPDSXML.getAttributeRFC3339Optional(available, "since")
         val rel = Objects.requireNonNull(element.getAttribute("rel"))
-        if (OPDSAcquisition.Relation.ACQUISITION_BORROW.uri.toString() == rel) {
+        if (OPDSAcquisition.Relation.ACQUISITION_BORROW.uri
+            .toString() == rel) {
           return OPDSAvailabilityLoanable.get()
-        } else if (OPDSAcquisition.Relation.ACQUISITION_GENERIC.uri.toString() == rel) {
+        } else if (OPDSAcquisition.Relation.ACQUISITION_GENERIC.uri
+            .toString() == rel) {
           return OPDSAvailabilityLoaned.get(startDate, endDate, revoke)
         }
       }
@@ -975,13 +971,9 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
      * @return A new feed entry parser
      */
     @JvmStatic
-    fun newParser(): OPDSAcquisitionFeedEntryParserType {
-      return OPDSAcquisitionFeedEntryParser()
-    }
+    fun newParser(): OPDSAcquisitionFeedEntryParserType = OPDSAcquisitionFeedEntryParser()
 
-    private fun consumeExtraAcquisitionProperties(
-      link: Element
-    ): MutableMap<String, String> {
+    private fun consumeExtraAcquisitionProperties(link: Element): MutableMap<String, String> {
       val properties = HashMap<String, String>()
 
       val text =
@@ -1009,8 +1001,6 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
       return base.resolve(unresolvedURI)
     }
 
-    private fun hrefAttributeOfLinkRel(relValue: String): String {
-      return "'href' attribute of 'link' with 'rel' " + relValue
-    }
+    private fun hrefAttributeOfLinkRel(relValue: String): String = "'href' attribute of 'link' with 'rel' " + relValue
   }
 }

@@ -11,13 +11,10 @@ import org.nypl.simplified.books.api.bookmark.SerializedBookmark
  */
 
 object BookmarkAttributes {
-
   fun removeAccount(
     data: Map<AccountID, Map<BookID, BookmarksForBook>>,
     account: AccountID
-  ): Map<AccountID, Map<BookID, BookmarksForBook>> {
-    return data.minus(account)
-  }
+  ): Map<AccountID, Map<BookID, BookmarksForBook>> = data.minus(account)
 
   fun addBookmark(
     data: Map<AccountID, Map<BookID, BookmarksForBook>>,
@@ -64,8 +61,8 @@ object BookmarkAttributes {
     data: Map<AccountID, Map<BookID, BookmarksForBook>>,
     account: AccountID,
     bookmark: SerializedBookmark
-  ): Map<AccountID, Map<BookID, BookmarksForBook>> {
-    return when (bookmark.kind) {
+  ): Map<AccountID, Map<BookID, BookmarksForBook>> =
+    when (bookmark.kind) {
       BookmarkKind.BookmarkExplicit -> {
         val forAccount: Map<BookID, BookmarksForBook> =
           data[account] ?: mapOf()
@@ -80,9 +77,10 @@ object BookmarkAttributes {
         this.addBookmarks(data, account, forBook)
       }
 
-      BookmarkKind.BookmarkLastReadLocation -> data
+      BookmarkKind.BookmarkLastReadLocation -> {
+        data
+      }
     }
-  }
 
   fun addBookmarks(
     data: Map<AccountID, Map<BookID, BookmarksForBook>>,

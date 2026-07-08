@@ -13,7 +13,6 @@ class ProfileUpdateTask(
   private val profiles: ProfilesDatabaseType,
   private val update: (ProfileDescription) -> ProfileDescription
 ) : Callable<ProfileUpdated> {
-
   private val logger = LoggerFactory.getLogger(ProfileUpdateTask::class.java)
 
   @Throws(Exception::class)

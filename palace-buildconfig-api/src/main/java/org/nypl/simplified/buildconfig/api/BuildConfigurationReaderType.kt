@@ -5,7 +5,6 @@ package org.nypl.simplified.buildconfig.api
  */
 
 interface BuildConfigurationReaderType {
-
   /**
    * Allow access to external URLs in readers.
    */

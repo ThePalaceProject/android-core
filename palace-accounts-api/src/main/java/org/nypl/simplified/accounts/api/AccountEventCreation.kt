@@ -8,8 +8,9 @@ import org.nypl.simplified.taskrecorder.api.TaskResult
  * The type of events regarding account creation.
  */
 
-sealed class AccountEventCreation : AccountEvent(), PresentableType {
-
+sealed class AccountEventCreation :
+  AccountEvent(),
+  PresentableType {
   /**
    * Creating an account is in progress.
    */
@@ -33,7 +34,8 @@ sealed class AccountEventCreation : AccountEvent(), PresentableType {
 
   data class AccountEventCreationFailed(
     val taskResult: TaskResult.Failure<*>
-  ) : AccountEventCreation(), PresentableErrorType {
+  ) : AccountEventCreation(),
+    PresentableErrorType {
     override val message: String
       get() = this.taskResult.message
     override val exception: Throwable?

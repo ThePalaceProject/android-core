@@ -39,7 +39,6 @@ import java.util.concurrent.ConcurrentSkipListMap
  */
 
 object ProfilesDatabases {
-
   private val logger =
     LoggerFactory.getLogger(ProfilesDatabases::class.java)
 
@@ -396,24 +395,26 @@ object ProfilesDatabases {
          * Create an account, unless one already exists for this provider
          */
 
-        val account = accounts.accountsByProvider()[accountProvider.id] ?: run {
-          accounts.createAccount(accountProvider)
-        }
+        val account =
+          accounts.accountsByProvider()[accountProvider.id] ?: run {
+            accounts.createAccount(accountProvider)
+          }
 
         val description =
           ProfileDescription(
-            preferences = ProfilePreferences(
-              dateOfBirth = null,
-              downloadOnlyOnWIFI = false,
-              hasSeenLibrarySelectionScreen = false,
-              hasSeenNotificationScreen = false,
-              isLCPManualPassphraseEnabled = false,
-              mostRecentAccount = account.id,
-              playbackRates = hashMapOf(),
-              readerPreferences = ReaderPreferences.builder().build(),
-              showDebugSettings = false,
-              showTestingLibraries = false,
-            ),
+            preferences =
+              ProfilePreferences(
+                dateOfBirth = null,
+                downloadOnlyOnWIFI = false,
+                hasSeenLibrarySelectionScreen = false,
+                hasSeenNotificationScreen = false,
+                isLCPManualPassphraseEnabled = false,
+                mostRecentAccount = account.id,
+                playbackRates = hashMapOf(),
+                readerPreferences = ReaderPreferences.builder().build(),
+                showDebugSettings = false,
+                showTestingLibraries = false,
+              ),
             attributes = ProfileAttributes(sortedMapOf())
           )
 

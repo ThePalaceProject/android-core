@@ -13,7 +13,6 @@ data class OPDSAcquisitionPath(
   val source: OPDSAcquisition,
   val elements: List<OPDSAcquisitionPathElement>
 ) {
-
   /**
    * Prefix the path with the given MIME and URI.
    */

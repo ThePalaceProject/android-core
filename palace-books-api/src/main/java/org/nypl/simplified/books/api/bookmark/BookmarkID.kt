@@ -13,7 +13,6 @@ import java.util.regex.Pattern
 data class BookmarkID(
   val value: String
 ) {
-
   init {
     if (!VALID_BOOKMARK_ID.matcher(value).matches()) {
       throw IllegalArgumentException(
@@ -23,7 +22,6 @@ data class BookmarkID(
   }
 
   companion object {
-
     /**
      * The regular expression that defines a valid bookmark ID.
      */

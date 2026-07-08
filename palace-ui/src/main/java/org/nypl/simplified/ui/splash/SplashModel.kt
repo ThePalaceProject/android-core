@@ -7,7 +7,6 @@ import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.main.MainAttributes
 
 object SplashModel {
-
   private val accountProvidersActual: AttributeType<List<AccountProviderDescription>> =
     MainAttributes.attributes.withValue(listOf())
   private val accountProvidersActualUI: AttributeType<List<AccountProviderDescription>> =
@@ -36,7 +35,6 @@ object SplashModel {
    */
 
   enum class SplashScreenStatus {
-
     /**
      * The splash screen is awaiting the boot process.
      */
@@ -63,9 +61,7 @@ object SplashModel {
     SPLASH_SCREEN_COMPLETED
   }
 
-  fun splashScreenCompleteNotifications(
-    profiles: ProfilesControllerType
-  ) {
+  fun splashScreenCompleteNotifications(profiles: ProfilesControllerType) {
     this.splashScreenStatusActual.set(SplashScreenStatus.SPLASH_SCREEN_LIBRARY_SELECTOR)
 
     profiles.profileUpdate { description ->
@@ -75,9 +71,7 @@ object SplashModel {
     }
   }
 
-  fun splashScreenCompleteLibrarySelection(
-    profiles: ProfilesControllerType
-  ) {
+  fun splashScreenCompleteLibrarySelection(profiles: ProfilesControllerType) {
     this.splashScreenStatusActual.set(SplashScreenStatus.SPLASH_SCREEN_COMPLETED)
 
     profiles.profileUpdate { description ->
@@ -87,9 +81,7 @@ object SplashModel {
     }
   }
 
-  fun splashScreenCompleteTutorial(
-    profiles: ProfilesControllerType
-  ) {
+  fun splashScreenCompleteTutorial(profiles: ProfilesControllerType) {
     this.splashScreenStatusActual.set(SplashScreenStatus.SPLASH_SCREEN_LIBRARY_SELECTOR)
   }
 
@@ -97,9 +89,7 @@ object SplashModel {
     this.splashScreenStatusActual.set(SplashScreenStatus.SPLASH_SCREEN_NOTIFICATIONS)
   }
 
-  fun userHasSeenLibrarySelection(
-    profiles: ProfilesControllerType
-  ): Boolean {
+  fun userHasSeenLibrarySelection(profiles: ProfilesControllerType): Boolean {
     val profile =
       profiles.profileCurrent()
     val preferences =
@@ -108,15 +98,9 @@ object SplashModel {
     return preferences.hasSeenLibrarySelectionScreen
   }
 
-  fun userHasCompletedTutorial(
-    profiles: ProfilesControllerType
-  ): Boolean {
-    return this.userHasSeenLibrarySelection(profiles)
-  }
+  fun userHasCompletedTutorial(profiles: ProfilesControllerType): Boolean = this.userHasSeenLibrarySelection(profiles)
 
-  fun userHasSeenNotifications(
-    profiles: ProfilesControllerType
-  ): Boolean {
+  fun userHasSeenNotifications(profiles: ProfilesControllerType): Boolean {
     val profile =
       profiles.profileCurrent()
     val preferences =

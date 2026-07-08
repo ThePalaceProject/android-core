@@ -48,7 +48,6 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class PdfReaderActivity : AppCompatActivity() {
-
   companion object {
     private const val PARAMS_ID = "org.nypl.simplified.viewer.pdf.pdfjs.PdfReaderActivity.params"
 
@@ -59,13 +58,15 @@ class PdfReaderActivity : AppCompatActivity() {
       context: Activity,
       parameters: PdfReaderParameters
     ) {
-      val bundle = Bundle().apply {
-        this.putSerializable(this@Companion.PARAMS_ID, parameters)
-      }
+      val bundle =
+        Bundle().apply {
+          this.putSerializable(this@Companion.PARAMS_ID, parameters)
+        }
 
-      val intent = Intent(context, PdfReaderActivity::class.java).apply {
-        this.putExtras(bundle)
-      }
+      val intent =
+        Intent(context, PdfReaderActivity::class.java).apply {
+          this.putExtras(bundle)
+        }
 
       context.startActivity(intent)
     }
@@ -132,9 +133,13 @@ class PdfReaderActivity : AppCompatActivity() {
 
     try {
       this.account =
-        this.profilesController.profileCurrent()
+        this.profilesController
+          .profileCurrent()
           .account(this.accountId)
-      MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID, this.account.provider.id.toString())
+      MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID,
+        this.account.provider.id
+          .toString()
+      )
     } catch (e: Exception) {
       this.log.debug("Unable to locate account: ", e)
       this.finish()
@@ -143,7 +148,8 @@ class PdfReaderActivity : AppCompatActivity() {
 
     try {
       this.bookFormat =
-        this.account.bookDatabase.entry(this.bookID)
+        this.account.bookDatabase
+          .entry(this.bookID)
           .book
           .findFormat(BookFormat.BookFormatPDF::class.java)!!
     } catch (e: Throwable) {
@@ -195,7 +201,8 @@ class PdfReaderActivity : AppCompatActivity() {
       )
 
     val lastReadBookmark =
-      bookmarks.filter { bookmark -> bookmark.kind == PdfBookmarkKind.LAST_READ }
+      bookmarks
+        .filter { bookmark -> bookmark.kind == PdfBookmarkKind.LAST_READ }
         .firstOrNull()
 
     UIThread.runOnUIThread {
@@ -216,9 +223,7 @@ class PdfReaderActivity : AppCompatActivity() {
     }
   }
 
-  private fun createToolbar(
-    title: String
-  ) {
+  private fun createToolbar(title: String) {
     this.toolbar =
       this.findViewById(R.id.pdfToolbar)
     this.toolbarText =
@@ -246,9 +251,10 @@ class PdfReaderActivity : AppCompatActivity() {
   private fun createWebView() {
     WebView.setWebContentsDebuggingEnabled(true)
 
-    this.webView = WebView(this).apply {
-      this.settings.javaScriptEnabled = true
-    }
+    this.webView =
+      WebView(this).apply {
+        this.settings.javaScriptEnabled = true
+      }
     this.webView.importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
 
     this.webView.addJavascriptInterface(
@@ -289,12 +295,17 @@ class PdfReaderActivity : AppCompatActivity() {
     this.pdfReaderContainer.addView(this.webView)
   }
 
-  private fun createPdfServer(drmInfo: BookDRMInformation, pdfFile: File) {
+  private fun createPdfServer(
+    drmInfo: BookDRMInformation,
+    pdfFile: File
+  ) {
     val providers =
-      ServiceLoader.load(ContentProtectionProvider::class.java)
+      ServiceLoader
+        .load(ContentProtectionProvider::class.java)
         .toList()
     val profile =
-      Services.serviceDirectory()
+      Services
+        .serviceDirectory()
         .requireService(ProfilesControllerType::class.java)
         .profileCurrent()
 
@@ -314,26 +325,28 @@ class PdfReaderActivity : AppCompatActivity() {
     // Create an immediately-closed socket to get a free port number.
     val ephemeralSocket = ServerSocket(0).apply { this.close() }
 
-    val createPdfOperation = GlobalScope.async {
-      try {
-        this@PdfReaderActivity.pdfServer = PdfServer.create(
-          contentProtections = contentProtections,
-          context = this@PdfReaderActivity.application,
-          drmInfo = drmInfo,
-          pdfFile = pdfFile,
-          port = ephemeralSocket.localPort
-        )
-      } catch (exception: Exception) {
-        this@PdfReaderActivity.showErrorWithRunnable(
-          context = this@PdfReaderActivity,
-          title = exception.message ?: "",
-          failure = exception,
-          execute = {
-            this@PdfReaderActivity.finish()
-          }
-        )
+    val createPdfOperation =
+      GlobalScope.async {
+        try {
+          this@PdfReaderActivity.pdfServer =
+            PdfServer.create(
+              contentProtections = contentProtections,
+              context = this@PdfReaderActivity.application,
+              drmInfo = drmInfo,
+              pdfFile = pdfFile,
+              port = ephemeralSocket.localPort
+            )
+        } catch (exception: Exception) {
+          this@PdfReaderActivity.showErrorWithRunnable(
+            context = this@PdfReaderActivity,
+            title = exception.message ?: "",
+            failure = exception,
+            execute = {
+              this@PdfReaderActivity.finish()
+            }
+          )
+        }
       }
-    }
 
     GlobalScope.launch(Dispatchers.Main) {
       createPdfOperation.await()
@@ -489,8 +502,7 @@ class PdfReaderActivity : AppCompatActivity() {
         .setNegativeButton(R.string.Dismiss) { dialog, _ -> dialog.dismiss() }
         .setOnDismissListener {
           execute.invoke()
-        }
-        .show()
+        }.show()
     }
   }
 }

@@ -14,7 +14,6 @@ import org.nypl.simplified.webview.WebViewUtilities
  */
 
 class CatalogSAML20Activity : AppCompatActivity(R.layout.book_saml20) {
-
   private lateinit var progress: ProgressBar
   private lateinit var root: View
   private lateinit var webView: WebView
@@ -60,12 +59,15 @@ class CatalogSAML20Activity : AppCompatActivity(R.layout.book_saml20) {
             is CatalogSAML20BorrowState.MakeRequest -> {
               this.webView.loadUrl(state.url, state.headers)
             }
+
             CatalogSAML20BorrowState.Finished -> {
               this.finish()
             }
+
             is CatalogSAML20BorrowState.Idle -> {
               // Nothing to do.
             }
+
             is CatalogSAML20BorrowState.WebViewReady -> {
               // Nothing to do.
             }

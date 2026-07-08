@@ -28,12 +28,11 @@ class ProfileAccountCreateTask(
   private val profiles: ProfilesDatabaseType,
   private val strings: ProfileAccountCreationStringResourcesType
 ) : Callable<TaskResult<AccountType>> {
-
   private val logger = LoggerFactory.getLogger(ProfileAccountCreateTask::class.java)
   private val taskRecorder = TaskRecorder.create()
 
-  override fun call(): TaskResult<AccountType> {
-    return try {
+  override fun call(): TaskResult<AccountType> =
+    try {
       this.logger.debug("creating account for provider {}", this.accountProviderID)
       val accountProvider = this.resolveAccountProvider()
       val account = this.createAccount(accountProvider)
@@ -59,7 +58,6 @@ class ProfileAccountCreateTask(
     } finally {
       this.logger.debug("finished")
     }
-  }
 
   private fun createAccount(accountProvider: AccountProviderType): AccountType {
     this.publishProgressEvent(this.taskRecorder.beginNewStep(this.strings.creatingAccount))
@@ -93,8 +91,7 @@ class ProfileAccountCreateTask(
       )
     )
 
-  private fun publishProgressEvent(step: TaskStep) =
-    this.accountEvents.onNext(AccountEventCreationInProgress(step.description))
+  private fun publishProgressEvent(step: TaskStep) = this.accountEvents.onNext(AccountEventCreationInProgress(step.description))
 
   private fun resolveAccountProvider(): AccountProviderType {
     this.publishProgressEvent(this.taskRecorder.beginNewStep(this.strings.resolvingAccountProvider))
@@ -113,7 +110,10 @@ class ProfileAccountCreateTask(
         )
 
       return when (resolution) {
-        is TaskResult.Success -> resolution.result
+        is TaskResult.Success -> {
+          resolution.result
+        }
+
         is TaskResult.Failure -> {
           this.taskRecorder.addAll(resolution.steps)
           this.taskRecorder.addAttributes(resolution.attributes)

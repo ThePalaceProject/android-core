@@ -5,7 +5,6 @@ package org.nypl.simplified.accounts.registry.api
  */
 
 sealed interface AccountProviderRegistryRefresh {
-
   val includeTestingLibraries: Boolean
 
   /**

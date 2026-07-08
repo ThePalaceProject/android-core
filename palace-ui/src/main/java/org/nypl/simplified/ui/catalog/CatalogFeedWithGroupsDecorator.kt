@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 internal class CatalogFeedWithGroupsDecorator(
   private val bottomOffset: Int
 ) : RecyclerView.ItemDecoration() {
-
   override fun getItemOffsets(
     outRect: Rect,
     view: View,

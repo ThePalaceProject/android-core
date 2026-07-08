@@ -14,12 +14,10 @@ data class OPDSGroup(
    * The group title.
    */
   val title: String,
-
   /**
    * The group URI.
    */
   val uri: URI,
-
   /**
    * The entries within the group.
    */

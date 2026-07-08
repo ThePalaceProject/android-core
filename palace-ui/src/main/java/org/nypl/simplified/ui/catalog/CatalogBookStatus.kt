@@ -11,18 +11,15 @@ data class CatalogBookStatus<S : BookStatus>(
   val status: S,
   val previewStatus: BookPreviewStatus,
 ) {
-
-  fun toBorrowParameters(): CatalogBorrowParameters {
-    return CatalogBorrowParameters(
+  fun toBorrowParameters(): CatalogBorrowParameters =
+    CatalogBorrowParameters(
       accountID = this.book.account,
       bookID = this.book.id,
       entry = this.book.entry,
       samlDownloadContext = null
     )
-  }
 
   companion object {
-
     /**
      * Do everything necessary to get an up-to-date view of a book. Either the book is derived
      * entirely from the given OPDS feed entry, or a more recent status is taken from the book
@@ -38,14 +35,15 @@ data class CatalogBookStatus<S : BookStatus>(
 
       var book = registry.bookOrNull(feedEntry.bookID)?.book
       if (book == null) {
-        book = Book(
-          id = feedEntry.bookID,
-          account = feedEntry.accountID,
-          cover = null,
-          thumbnail = null,
-          entry = feedEntry.feedEntry,
-          formats = listOf()
-        )
+        book =
+          Book(
+            id = feedEntry.bookID,
+            account = feedEntry.accountID,
+            cover = null,
+            thumbnail = null,
+            entry = feedEntry.feedEntry,
+            formats = listOf()
+          )
       }
 
       if (registryStatus != null) {
@@ -63,14 +61,11 @@ data class CatalogBookStatus<S : BookStatus>(
       }
     }
 
-    private fun bookPreviewStatusOf(
-      entry: FeedEntry.FeedEntryOPDS
-    ): BookPreviewStatus {
-      return if (!entry.feedEntry.previewAcquisitions.isNullOrEmpty()) {
+    private fun bookPreviewStatusOf(entry: FeedEntry.FeedEntryOPDS): BookPreviewStatus =
+      if (!entry.feedEntry.previewAcquisitions.isNullOrEmpty()) {
         BookPreviewStatus.HasPreview()
       } else {
         BookPreviewStatus.None
       }
-    }
   }
 }

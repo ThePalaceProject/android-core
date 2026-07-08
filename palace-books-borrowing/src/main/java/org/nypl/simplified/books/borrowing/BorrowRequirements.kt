@@ -36,7 +36,6 @@ data class BorrowRequirements(
   val subtasks: BorrowSubtaskDirectoryType,
   val temporaryDirectory: File
 ) {
-
   companion object {
     fun create(
       services: ServiceDirectoryType,
@@ -44,8 +43,8 @@ data class BorrowRequirements(
       clock: () -> Instant,
       cacheDirectory: File,
       temporaryDirectory: File
-    ): BorrowRequirements {
-      return BorrowRequirements(
+    ): BorrowRequirements =
+      BorrowRequirements(
         application = application,
         adobeExecutor = services.optionalService(AdobeAdeptExecutorType::class.java),
         audioBookManifestStrategies = services.requireService(AudioBookManifestStrategiesType::class.java),
@@ -62,6 +61,5 @@ data class BorrowRequirements(
         subtasks = services.requireService(BorrowSubtaskDirectoryType::class.java),
         temporaryDirectory = temporaryDirectory
       )
-    }
   }
 }

@@ -14,7 +14,6 @@ import org.nypl.simplified.opds.core.OPDSJSONSerializerType
 import java.io.File
 
 object BookDatabases : BookDatabaseFactoryType {
-
   @Throws(BookDatabaseException::class)
   override fun openDatabase(
     context: Application,
@@ -24,8 +23,8 @@ object BookDatabases : BookDatabaseFactoryType {
     formats: BookFormatSupportType,
     owner: AccountID,
     directory: File
-  ): BookDatabaseType {
-    return BookDatabase.open(
+  ): BookDatabaseType =
+    BookDatabase.open(
       context = context,
       directory = directory,
       formats = formats,
@@ -34,7 +33,6 @@ object BookDatabases : BookDatabaseFactoryType {
       parser = parser,
       serializer = serializer,
     )
-  }
 
   @Throws(BookDatabaseException::class)
   override fun openDatabase(
@@ -43,8 +41,8 @@ object BookDatabases : BookDatabaseFactoryType {
     httpClient: LSHTTPClientType,
     owner: AccountID,
     directory: File
-  ): BookDatabaseType {
-    return BookDatabase.open(
+  ): BookDatabaseType =
+    BookDatabase.open(
       context = context,
       directory = directory,
       formats = formats,
@@ -53,5 +51,4 @@ object BookDatabases : BookDatabaseFactoryType {
       parser = OPDSJSONParser.newParser(),
       serializer = OPDSJSONSerializer.newSerializer(),
     )
-  }
 }

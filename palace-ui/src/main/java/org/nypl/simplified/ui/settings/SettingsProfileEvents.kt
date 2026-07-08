@@ -14,11 +14,8 @@ class SettingsProfileEvents private constructor(
   private val relay: UISubjectRelay<ProfileEvent>
 ) {
   companion object {
-    fun create(
-      profiles: ProfilesControllerType
-    ): SettingsProfileEvents {
-      return SettingsProfileEvents(UISubjectRelay.create(profiles.profileEvents()))
-    }
+    fun create(profiles: ProfilesControllerType): SettingsProfileEvents =
+      SettingsProfileEvents(UISubjectRelay.create(profiles.profileEvents()))
   }
 
   /**

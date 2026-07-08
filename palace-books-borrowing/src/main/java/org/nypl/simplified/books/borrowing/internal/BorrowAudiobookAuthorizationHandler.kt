@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory
 class BorrowAudiobookAuthorizationHandler(
   private val account: AccountType
 ) : PlayerAuthorizationHandlerType {
-
   private val logger =
     LoggerFactory.getLogger(BorrowAudiobookAuthorizationHandler::class.java)
 
@@ -76,8 +75,8 @@ class BorrowAudiobookAuthorizationHandler(
     throw UnsupportedOperationException("No available credentials of type $credentialsType.")
   }
 
-  private fun overdriveCredentialsFor(): OPAUsernamePassword {
-    return when (this.subtaskCredentials) {
+  private fun overdriveCredentialsFor(): OPAUsernamePassword =
+    when (this.subtaskCredentials) {
       BorrowSubtaskCredentials.UseAccountCredentials -> {
         when (val credentials = this.account.loginState.credentials) {
           is Basic -> {
@@ -112,15 +111,11 @@ class BorrowAudiobookAuthorizationHandler(
         throw UnsupportedOperationException("Overdrive audio books cannot use bearer tokens.")
       }
     }
-  }
 
-  private fun overdrivePasswordOf(
-    text: String
-  ): OPAPassword {
-    return if (text.isBlank()) {
+  private fun overdrivePasswordOf(text: String): OPAPassword =
+    if (text.isBlank()) {
       OPAPassword.NotRequired
     } else {
       OPAPassword.Password(text)
     }
-  }
 }

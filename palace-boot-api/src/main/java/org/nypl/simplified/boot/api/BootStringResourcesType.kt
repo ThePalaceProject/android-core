@@ -5,7 +5,6 @@ package org.nypl.simplified.boot.api
  */
 
 interface BootStringResourcesType {
-
   /**
    * The boot failed with a generic error message.
    */

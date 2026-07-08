@@ -12,9 +12,8 @@ import java.time.OffsetDateTime
  */
 
 class PalaceAccountFallback : AccountProviderFallbackType {
-
-  override fun get(): AccountProviderType {
-    return AccountProvider(
+  override fun get(): AccountProviderType =
+    AccountProvider(
       authenticationDocumentURI = URI.create("https://dpla.thepalaceproject.org/bookshelf/authentication_document"),
       authentication = AccountProviderAuthenticationDescription.Anonymous,
       authenticationAlternatives = listOf(),
@@ -37,5 +36,4 @@ class PalaceAccountFallback : AccountProviderFallbackType {
       updated = OffsetDateTime.parse("2021-07-07T23:10:18.238-04:00"),
       alternateURI = URI.create("https://thepalaceproject.org")
     )
-  }
 }

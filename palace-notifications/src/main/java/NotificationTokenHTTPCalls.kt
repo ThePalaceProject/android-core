@@ -22,7 +22,6 @@ class NotificationTokenHTTPCalls(
   private val http: LSHTTPClientType,
   private val executor: ExecutorService
 ) : NotificationTokenHTTPCallsType {
-
   private val logger =
     LoggerFactory.getLogger(NotificationTokenHTTPCalls::class.java)
 
@@ -36,9 +35,7 @@ class NotificationTokenHTTPCalls(
     }
   }
 
-  override fun registerFCMTokenForProfileAccount(
-    account: AccountType
-  ) {
+  override fun registerFCMTokenForProfileAccount(account: AccountType) {
     val credentials = account.loginState.credentials
     val originalUrl = credentials?.deviceRegistrationURI
 
@@ -81,17 +78,20 @@ class NotificationTokenHTTPCalls(
   ) {
     this.logger.debug("Success fetching FCM Token: {}", token)
 
-    val queryUrl = buildString {
-      this.append(originalUrl)
-      this.append("?")
-      this.append("device_token=")
-      this.append(URLEncoder.encode(token, "utf-8"))
-    }
+    val queryUrl =
+      buildString {
+        this.append(originalUrl)
+        this.append("?")
+        this.append("device_token=")
+        this.append(URLEncoder.encode(token, "utf-8"))
+      }
 
-    val request = this.http.newRequest(queryUrl)
-      .setAuthorization(AccountAuthenticatedHTTP.createAuthorizationIfPresent(credentials))
-      .addBasicTokenPropertiesIfApplicable(credentials)
-      .build()
+    val request =
+      this.http
+        .newRequest(queryUrl)
+        .setAuthorization(AccountAuthenticatedHTTP.createAuthorizationIfPresent(credentials))
+        .addBasicTokenPropertiesIfApplicable(credentials)
+        .build()
 
     val response = request.execute()
     when (val status = response.status) {
@@ -121,18 +121,17 @@ class NotificationTokenHTTPCalls(
         }
       }
 
-      is LSHTTPResponseStatus.Failed ->
+      is LSHTTPResponseStatus.Failed -> {
         this.logger.error(
           "Failed to retrieve FCM Token for account {}",
           account.id,
           status.exception
         )
+      }
     }
   }
 
-  override fun deleteFCMTokenForProfileAccount(
-    account: AccountType
-  ) {
+  override fun deleteFCMTokenForProfileAccount(account: AccountType) {
     val credentials = account.loginState.credentials
     val url = credentials?.deviceRegistrationURI
 
@@ -172,18 +171,19 @@ class NotificationTokenHTTPCalls(
   ) {
     this.logger.debug("Success fetching FCM Token: {}", token)
 
-    val request = this.http.newRequest(url)
-      .setAuthorization(AccountAuthenticatedHTTP.createAuthorizationIfPresent(credentials))
-      .addBasicTokenPropertiesIfApplicable(credentials)
-      .setMethod(
-        LSHTTPRequestBuilderType.Method.Delete(
-          this.serializeNotificationToken(
-            token = token
-          ),
-          MIMEType("application", "json", mapOf())
-        )
-      )
-      .build()
+    val request =
+      this.http
+        .newRequest(url)
+        .setAuthorization(AccountAuthenticatedHTTP.createAuthorizationIfPresent(credentials))
+        .addBasicTokenPropertiesIfApplicable(credentials)
+        .setMethod(
+          LSHTTPRequestBuilderType.Method.Delete(
+            this.serializeNotificationToken(
+              token = token
+            ),
+            MIMEType("application", "json", mapOf())
+          )
+        ).build()
 
     val response = request.execute()
     when (val status = response.status) {
@@ -200,30 +200,36 @@ class NotificationTokenHTTPCalls(
         )
       }
 
-      is LSHTTPResponseStatus.Failed ->
+      is LSHTTPResponseStatus.Failed -> {
         this.logger.error(
           "Failed to delete FCM Token for account {}",
           account.id,
           status.exception
         )
+      }
     }
   }
 
-  private fun setFCMTokenForAccount(account: AccountType, token: String, url: String) {
+  private fun setFCMTokenForAccount(
+    account: AccountType,
+    token: String,
+    url: String
+  ) {
     val credentials = account.loginState.credentials
 
-    val request = this.http.newRequest(url)
-      .setAuthorization(AccountAuthenticatedHTTP.createAuthorizationIfPresent(credentials))
-      .addBasicTokenPropertiesIfApplicable(credentials)
-      .setMethod(
-        LSHTTPRequestBuilderType.Method.Put(
-          this.serializeNotificationToken(
-            token = token
-          ),
-          MIMEType("application", "json", mapOf())
-        )
-      )
-      .build()
+    val request =
+      this.http
+        .newRequest(url)
+        .setAuthorization(AccountAuthenticatedHTTP.createAuthorizationIfPresent(credentials))
+        .addBasicTokenPropertiesIfApplicable(credentials)
+        .setMethod(
+          LSHTTPRequestBuilderType.Method.Put(
+            this.serializeNotificationToken(
+              token = token
+            ),
+            MIMEType("application", "json", mapOf())
+          )
+        ).build()
 
     val response = request.execute()
     when (val status = response.status) {
@@ -240,8 +246,9 @@ class NotificationTokenHTTPCalls(
         )
       }
 
-      is LSHTTPResponseStatus.Failed ->
+      is LSHTTPResponseStatus.Failed -> {
         this.logger.error("Failed to set FCM Token for account {}", account.id, status.exception)
+      }
     }
   }
 

@@ -12,7 +12,6 @@ import java.net.URI
  */
 
 class AccountProviderDescriptionCollectionParsers : AccountProviderDescriptionCollectionParsersType {
-
   private val wpmMapper =
     WPMMappers.createMapper()
 
@@ -20,9 +19,8 @@ class AccountProviderDescriptionCollectionParsers : AccountProviderDescriptionCo
     uri: URI,
     stream: InputStream,
     warningsAsErrors: Boolean
-  ): AccountProviderDescriptionCollectionParserType {
-    return AccountProviderDescriptionCollectionParser(uri) {
+  ): AccountProviderDescriptionCollectionParserType =
+    AccountProviderDescriptionCollectionParser(uri) {
       this.wpmMapper.readValue(stream, WPMManifest::class.java)
     }
-  }
 }

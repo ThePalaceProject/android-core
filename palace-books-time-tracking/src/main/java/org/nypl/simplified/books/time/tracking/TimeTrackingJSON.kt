@@ -6,7 +6,6 @@ import org.nypl.simplified.json.core.JSONParseException
 import org.nypl.simplified.json.core.JSONParserUtilities
 
 object TimeTrackingJSON {
-
   private const val NODE_BOOK_ID = "bookId"
   private const val NODE_DURING_MINUTE = "duringMinute"
   private const val NODE_FAILURES = "failures"
@@ -23,9 +22,7 @@ object TimeTrackingJSON {
 
   private val objectMapper = ObjectMapper()
 
-  fun serializeRequest(
-    request: TimeTrackingRequest
-  ): ObjectNode {
+  fun serializeRequest(request: TimeTrackingRequest): ObjectNode {
     val node = this.objectMapper.createObjectNode()
     node.put(this.NODE_BOOK_ID, request.bookId)
     node.put(this.NODE_LIBRARY_ID, request.libraryId.toString())
@@ -41,16 +38,10 @@ object TimeTrackingJSON {
     return node
   }
 
-  fun serializeToBytes(
-    request: TimeTrackingRequest
-  ): ByteArray {
-    return this.objectMapper.writeValueAsBytes(serializeRequest(request))
-  }
+  fun serializeToBytes(request: TimeTrackingRequest): ByteArray = this.objectMapper.writeValueAsBytes(serializeRequest(request))
 
   @Throws(JSONParseException::class)
-  fun deserializeResponse(
-    data: ByteArray
-  ): TimeTrackingServerResponse {
+  fun deserializeResponse(data: ByteArray): TimeTrackingServerResponse {
     val r = this.objectMapper.readTree(data)
     return when (r) {
       is ObjectNode -> {
@@ -66,9 +57,7 @@ object TimeTrackingJSON {
   }
 
   @Throws(JSONParseException::class)
-  fun deserializeResponseObject(
-    o: ObjectNode
-  ): TimeTrackingServerResponse {
+  fun deserializeResponseObject(o: ObjectNode): TimeTrackingServerResponse {
     val responsesNode =
       JSONParserUtilities.getArray(o, this.NODE_RESPONSES)
 

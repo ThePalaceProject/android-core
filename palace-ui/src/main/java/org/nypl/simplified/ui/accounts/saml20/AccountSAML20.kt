@@ -5,7 +5,6 @@ package org.nypl.simplified.ui.accounts.saml20
  */
 
 object AccountSAML20 {
-
   /**
    * The callback URI used to allow a SAML web page to effectively call back into the application.
    * In practice, the web view will intercept requests made to this URI.

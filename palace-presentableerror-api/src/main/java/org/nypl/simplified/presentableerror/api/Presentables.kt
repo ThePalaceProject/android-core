@@ -5,7 +5,6 @@ package org.nypl.simplified.presentableerror.api
  */
 
 object Presentables {
-
   /**
    * Merge all of the attributes of `map0` into `map`, making names unique as necessary.
    */

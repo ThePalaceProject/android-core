@@ -7,7 +7,6 @@ import org.nypl.simplified.threads.NamedThreadPools
  */
 
 object PalaceAutoThread {
-
   val executor =
     NamedThreadPools.namedThreadPool(1, "palace-auto", 0)
 }

@@ -8,13 +8,11 @@ import org.librarysimplified.http.api.LSHTTPClientType
  */
 
 data class AnalyticsConfiguration(
-
   /**
    * An Android context, used by systems if necessary.
    */
 
   val context: Context,
-
   /**
    * The HTTP interface used for analytics requests, if necessary.
    */

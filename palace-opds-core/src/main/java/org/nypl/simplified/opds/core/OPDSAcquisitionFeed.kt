@@ -9,97 +9,77 @@ import java.net.URI
  * The type of OPDS acquisition feeds.
  */
 data class OPDSAcquisitionFeed(
-
   /**
    * @return The feed URI
    */
   val feedURI: URI,
-
   /**
    * @return The list of feed entries
    */
   val feedEntries: List<OPDSAcquisitionFeedEntry>,
-
   /**
    * @return The feed groups, by name
    */
   val feedGroups: Map<String, OPDSGroup>,
-
   /**
    * @return The feed groups, in declaration order
    */
   val feedGroupsOrder: List<String>,
-
   /**
    * @return The feed ID
    */
   val feedID: String,
-
   /**
    * @return The feed update time
    */
   val feedUpdated: DateTime,
-
   /**
    * @return The feed title
    */
   val feedTitle: String,
-
   /**
    * @return The link to the next feed, if any
    */
   val feedNext: URI?,
-
   /**
    * @return The search document, if any
    */
   val feedSearchURI: OPDSSearchLink?,
-
   /**
    * @return The feed facets, in order
    */
   val feedFacetsOrder: List<OPDSFacet>,
-
   /**
    * @return The feed facets, by group
    */
   val feedFacetsByGroup: Map<String, List<OPDSFacet>>,
-
   /**
    * @return The link to the terms of service, if any
    */
   val feedTermsOfService: URI?,
-
   /**
    * @return The link to the app about, if any
    */
   val feedAbout: URI?,
-
   /**
    * @return The link to the privacy policy, if any
    */
   val feedPrivacyPolicy: URI?,
-
   /**
    * @return The link to the app about, if any
    */
   val feedLicenses: URI?,
-
   val licensor: DRMLicensor?,
-
   /**
    * @return The parse errors
    */
   val errors: List<ParseError>,
-
   /**
    * @return The link to the authentication document, if any
    */
   val authDocument: URI?,
-
   val annotations: URI?
 ) : Serializable {
-
   /**
    * Create a builder initialized from this feed.
    */
@@ -138,7 +118,6 @@ data class OPDSAcquisitionFeed(
     inId: String,
     inUpdated: DateTime
   ) : OPDSAcquisitionFeedBuilderType {
-
     private val entries = mutableListOf<OPDSAcquisitionFeedEntry>()
 
     private val facetsByGroup =
@@ -174,16 +153,12 @@ data class OPDSAcquisitionFeed(
     private var authDocument: URI? = null
     private var annotations: URI? = null
 
-    override fun addParseError(
-      error: ParseError
-    ): OPDSAcquisitionFeedBuilderType {
+    override fun addParseError(error: ParseError): OPDSAcquisitionFeedBuilderType {
       this.errors += error
       return this
     }
 
-    override fun addEntry(
-      e: OPDSAcquisitionFeedEntry
-    ): OPDSAcquisitionFeedBuilderType {
+    override fun addEntry(e: OPDSAcquisitionFeedEntry): OPDSAcquisitionFeedBuilderType {
       if (e.groups.isEmpty()) {
         this.entries += e
       } else {
@@ -204,9 +179,7 @@ data class OPDSAcquisitionFeed(
       return this
     }
 
-    override fun addFacet(
-      f: OPDSFacet
-    ): OPDSAcquisitionFeedBuilderType {
+    override fun addFacet(f: OPDSFacet): OPDSAcquisitionFeedBuilderType {
       val facets =
         this.facetsByGroup.getOrPut(f.group) {
           mutableListOf()
@@ -218,58 +191,42 @@ data class OPDSAcquisitionFeed(
       return this
     }
 
-    override fun setAboutOption(
-      u: URI?
-    ): OPDSAcquisitionFeedBuilderType {
+    override fun setAboutOption(u: URI?): OPDSAcquisitionFeedBuilderType {
       this.about = u
       return this
     }
 
-    override fun setTermsOfServiceOption(
-      u: URI?
-    ): OPDSAcquisitionFeedBuilderType {
+    override fun setTermsOfServiceOption(u: URI?): OPDSAcquisitionFeedBuilderType {
       this.termsOfService = u
       return this
     }
 
-    override fun setLicensor(
-      licensor: DRMLicensor?
-    ): OPDSAcquisitionFeedBuilderType {
+    override fun setLicensor(licensor: DRMLicensor?): OPDSAcquisitionFeedBuilderType {
       this.licensor = licensor
       return this
     }
 
-    override fun setAuthenticationDocumentLink(
-      u: URI?
-    ): OPDSAcquisitionFeedBuilderType {
+    override fun setAuthenticationDocumentLink(u: URI?): OPDSAcquisitionFeedBuilderType {
       this.authDocument = u
       return this
     }
 
-    override fun setAnnotationsOption(
-      u: URI?
-    ): OPDSAcquisitionFeedBuilderType {
+    override fun setAnnotationsOption(u: URI?): OPDSAcquisitionFeedBuilderType {
       this.annotations = u
       return this
     }
 
-    override fun setPrivacyPolicyOption(
-      u: URI?
-    ): OPDSAcquisitionFeedBuilderType {
+    override fun setPrivacyPolicyOption(u: URI?): OPDSAcquisitionFeedBuilderType {
       this.privacyPolicy = u
       return this
     }
 
-    override fun setNextOption(
-      next: URI?
-    ): OPDSAcquisitionFeedBuilderType {
+    override fun setNextOption(next: URI?): OPDSAcquisitionFeedBuilderType {
       this.next = next
       return this
     }
 
-    override fun setSearchOption(
-      searchLink: OPDSSearchLink?
-    ): OPDSAcquisitionFeedBuilderType {
+    override fun setSearchOption(searchLink: OPDSSearchLink?): OPDSAcquisitionFeedBuilderType {
       this.search = searchLink
       return this
     }
@@ -329,23 +286,18 @@ data class OPDSAcquisitionFeed(
       inId: String,
       inUpdated: DateTime,
       inTitle: String
-    ): OPDSAcquisitionFeedBuilderType {
-      return Builder(
+    ): OPDSAcquisitionFeedBuilderType =
+      Builder(
         inUri = inUri,
         inTitle = inTitle,
         inId = inId,
         inUpdated = inUpdated
       )
-    }
 
     /**
      * Construct a builder initialized from an existing feed.
      */
     @JvmStatic
-    fun newBuilderFrom(
-      feed: OPDSAcquisitionFeed
-    ): OPDSAcquisitionFeedBuilderType {
-      return feed.toBuilder()
-    }
+    fun newBuilderFrom(feed: OPDSAcquisitionFeed): OPDSAcquisitionFeedBuilderType = feed.toBuilder()
   }
 }

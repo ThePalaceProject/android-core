@@ -21,7 +21,6 @@ import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
 import java.net.URLEncoder
 
 class AccountSAML20Activity : AppCompatActivity(R.layout.saml20_activity) {
-
   private lateinit var progress: ProgressBar
   private lateinit var root: FrameLayout
 
@@ -52,9 +51,7 @@ class AccountSAML20Activity : AppCompatActivity(R.layout.saml20_activity) {
   }
 
   @UiThread
-  private fun onStateChanged(
-    newValue: AccountSAML20State
-  ) {
+  private fun onStateChanged(newValue: AccountSAML20State) {
     when (newValue) {
       is AccountSAML20State.Failed -> {
         this.onStateFailed(newValue)
@@ -84,9 +81,7 @@ class AccountSAML20Activity : AppCompatActivity(R.layout.saml20_activity) {
   }
 
   @UiThread
-  private fun onStateWebViewInitialized(
-    newValue: AccountSAML20State.WebViewInitialized
-  ) {
+  private fun onStateWebViewInitialized(newValue: AccountSAML20State.WebViewInitialized) {
     this.setWebView(newValue.webView)
 
     newValue.webView.loadUrl(this.constructLoginURI())
@@ -94,9 +89,7 @@ class AccountSAML20Activity : AppCompatActivity(R.layout.saml20_activity) {
   }
 
   @UiThread
-  private fun onStateFailed(
-    failed: AccountSAML20State.Failed
-  ) {
+  private fun onStateFailed(failed: AccountSAML20State.Failed) {
     this.setWebView(failed.webView)
 
     val newDialog =
@@ -106,8 +99,7 @@ class AccountSAML20Activity : AppCompatActivity(R.layout.saml20_activity) {
         .setNegativeButton(R.string.Dismiss) { dialog, _ ->
           dialog.dismiss()
           this.finish()
-        }
-        .setPositiveButton(ErrorStrings.errorDetails) { dialog, _ ->
+        }.setPositiveButton(ErrorStrings.errorDetails) { dialog, _ ->
           this.showErrorPage(this.makeLoginTaskSteps(failed.message))
           dialog.dismiss()
           this.finish()
@@ -116,22 +108,18 @@ class AccountSAML20Activity : AppCompatActivity(R.layout.saml20_activity) {
   }
 
   @UiThread
-  private fun onStateWebViewRequestSent(
-    newValue: AccountSAML20State.WebViewRequestSent
-  ) {
+  private fun onStateWebViewRequestSent(newValue: AccountSAML20State.WebViewRequestSent) {
     this.setWebView(newValue.webView)
   }
 
   @UiThread
-  private fun onStateTokenObtained(
-    newValue: AccountSAML20State.TokenObtained
-  ) {
+  private fun onStateTokenObtained(newValue: AccountSAML20State.TokenObtained) {
     this.setWebView(newValue.webView)
     this.finish()
   }
 
-  private fun constructLoginURI(): String {
-    return buildString {
+  private fun constructLoginURI(): String =
+    buildString {
       val authenticationURI = AccountSAML20Model.authenticationURI()
       this.append(authenticationURI)
       if (authenticationURI.toString().contains('?')) {
@@ -141,11 +129,8 @@ class AccountSAML20Activity : AppCompatActivity(R.layout.saml20_activity) {
       }
       this.append(URLEncoder.encode(AccountSAML20.callbackURI, "UTF-8"))
     }
-  }
 
-  private fun makeLoginTaskSteps(
-    message: String
-  ): List<TaskStep> {
+  private fun makeLoginTaskSteps(message: String): List<TaskStep> {
     val taskRecorder = TaskRecorder.create()
     taskRecorder.beginNewStep("Started SAML 2.0 login...")
     taskRecorder.currentStepFailed(
@@ -156,9 +141,7 @@ class AccountSAML20Activity : AppCompatActivity(R.layout.saml20_activity) {
     return taskRecorder.finishFailure<AccountType>().steps
   }
 
-  private fun showErrorPage(
-    taskSteps: List<TaskStep>
-  ) {
+  private fun showErrorPage(taskSteps: List<TaskStep>) {
     ErrorPageModel.parameters =
       ErrorPageParameters(
         emailAddress = AccountSAML20Model.supportEmailAddress,
@@ -170,15 +153,14 @@ class AccountSAML20Activity : AppCompatActivity(R.layout.saml20_activity) {
     this.startActivity(Intent(this, ErrorPageActivity::class.java))
   }
 
-  private fun setWebView(
-    webView: WebView
-  ) {
+  private fun setWebView(webView: WebView) {
     webView.webChromeClient = AccountSAML20ChromeClient(this.progress)
 
-    val webViewLayout = FrameLayout.LayoutParams(
-      FrameLayout.LayoutParams.MATCH_PARENT,
-      FrameLayout.LayoutParams.MATCH_PARENT
-    )
+    val webViewLayout =
+      FrameLayout.LayoutParams(
+        FrameLayout.LayoutParams.MATCH_PARENT,
+        FrameLayout.LayoutParams.MATCH_PARENT
+      )
     webView.layoutParams = webViewLayout
     (webView.parent as ViewGroup?)?.removeView(webView)
 

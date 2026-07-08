@@ -8,15 +8,18 @@ import java.text.Collator
  */
 
 class AccountComparator : Comparator<AccountReadableType> {
-
   private val stopwords = arrayOf("A ", "The ")
 
-  private val collator = Collator.getInstance().apply {
-    decomposition = Collator.CANONICAL_DECOMPOSITION
-    strength = Collator.SECONDARY
-  }
+  private val collator =
+    Collator.getInstance().apply {
+      decomposition = Collator.CANONICAL_DECOMPOSITION
+      strength = Collator.SECONDARY
+    }
 
-  override fun compare(a1: AccountReadableType, a2: AccountReadableType): Int {
+  override fun compare(
+    a1: AccountReadableType,
+    a2: AccountReadableType
+  ): Int {
     var name1 = a1.provider.displayName
     var name2 = a2.provider.displayName
 

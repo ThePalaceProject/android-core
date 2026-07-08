@@ -18,7 +18,6 @@ data class SerializedLocatorPage1(
 
   val page: Int,
 ) : SerializedLocator() {
-
   init {
     check(this.page >= 0) {
       "Page number ${this.page} must be non-negative."
@@ -31,9 +30,7 @@ data class SerializedLocatorPage1(
   override val typeVersion: Int
     get() = 1
 
-  override fun toJSON(
-    objectMapper: ObjectMapper
-  ): ObjectNode {
+  override fun toJSON(objectMapper: ObjectMapper): ObjectNode {
     val root = objectMapper.createObjectNode()
     root.put("@type", this.typeName)
     root.put("@version", this.typeVersion)
@@ -41,9 +38,7 @@ data class SerializedLocatorPage1(
     return root
   }
 
-  override fun addToDigest(
-    digest: MessageDigest
-  ) {
+  override fun addToDigest(digest: MessageDigest) {
     digest.update(this.page.toString().toByteArray(UTF_8))
   }
 }

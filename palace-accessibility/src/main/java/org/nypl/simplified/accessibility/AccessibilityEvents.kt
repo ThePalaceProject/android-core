@@ -11,8 +11,9 @@ import org.slf4j.LoggerFactory
  * events.
  */
 
-class AccessibilityEvents(context: Context) : AccessibilityEventsType {
-
+class AccessibilityEvents(
+  context: Context
+) : AccessibilityEventsType {
   private val logger =
     LoggerFactory.getLogger(AccessibilityEvents::class.java)
 
@@ -21,11 +22,10 @@ class AccessibilityEvents(context: Context) : AccessibilityEventsType {
   private val packageName =
     context.packageName
 
-  private fun isSpokenFeedbackEnabled(): Boolean {
-    return this.accessibilityManager
+  private fun isSpokenFeedbackEnabled(): Boolean =
+    this.accessibilityManager
       .getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_SPOKEN)
       .isNotEmpty()
-  }
 
   override val spokenFeedbackEnabled: Boolean
     get() = this.isSpokenFeedbackEnabled()

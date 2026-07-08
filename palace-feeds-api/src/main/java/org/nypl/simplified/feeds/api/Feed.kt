@@ -21,7 +21,6 @@ import java.util.Objects
  */
 
 sealed class Feed {
-
   /**
    * @return The unique identifier of the feed
    */
@@ -64,41 +63,34 @@ sealed class Feed {
     override val feedTitle: String,
     override val feedUpdated: DateTime,
     override val feedURI: URI,
-
     /**
      * @return A link to the terms of service, if any
      */
 
     val feedTermsOfService: URI?,
-
     /**
      * @return A link to the privacy policy, if any
      */
 
     val feedPrivacyPolicy: URI?,
-
     /**
      * @return A link to the about, if any
      */
 
     val feedAbout: URI?,
-
     /**
      * @return A link to the licenses, if any
      */
 
     val feedLicenses: URI?,
-
     /**
      * @return A link to the next part of the feed, if any
      */
 
     val feedNext: URI?,
-
     private val facetsByGroupData: MutableMap<String, MutableList<FeedFacetSingle>>,
     private val facetsOrderData: MutableList<FeedFacetSingle>
   ) : Feed() {
-
     private val entriesData: MutableMap<BookID, FeedEntry> = mutableMapOf()
     private val entriesOrderData: MutableList<BookID> = mutableListOf()
 
@@ -109,42 +101,45 @@ sealed class Feed {
     val entriesByID: Map<BookID, FeedEntry> =
       Collections.unmodifiableMap(this.entriesData)
 
-    val entriesInOrder: MutableList<FeedEntry> = object : AbstractMutableList<FeedEntry>() {
-      override val size: Int
-        get() = this@FeedWithoutGroups.entriesOrderData.size
+    val entriesInOrder: MutableList<FeedEntry> =
+      object : AbstractMutableList<FeedEntry>() {
+        override val size: Int
+          get() = this@FeedWithoutGroups.entriesOrderData.size
 
-      override fun add(index: Int, element: FeedEntry) {
-        if (!this@FeedWithoutGroups.entriesData.containsKey(element.bookID)) {
-          this@FeedWithoutGroups.entriesOrderData.add(index, element.bookID)
-          this@FeedWithoutGroups.entriesData.put(element.bookID, element)
+        override fun add(
+          index: Int,
+          element: FeedEntry
+        ) {
+          if (!this@FeedWithoutGroups.entriesData.containsKey(element.bookID)) {
+            this@FeedWithoutGroups.entriesOrderData.add(index, element.bookID)
+            this@FeedWithoutGroups.entriesData.put(element.bookID, element)
+          }
+        }
+
+        override fun get(index: Int): FeedEntry = this@FeedWithoutGroups.entriesData[this@FeedWithoutGroups.entriesOrderData.get(index)]!!
+
+        override fun removeAt(index: Int): FeedEntry {
+          val bookID = this@FeedWithoutGroups.entriesOrderData.get(index)
+          val removed = this@FeedWithoutGroups.entriesData.remove(bookID)
+          this@FeedWithoutGroups.entriesOrderData.removeAt(index)
+          return removed!!
+        }
+
+        override fun set(
+          index: Int,
+          element: FeedEntry
+        ): FeedEntry {
+          val bookID = this@FeedWithoutGroups.entriesOrderData.get(index)
+          val old = this@FeedWithoutGroups.entriesData[bookID]
+          this@FeedWithoutGroups.entriesData[bookID] = element
+          return old!!
         }
       }
-
-      override fun get(index: Int): FeedEntry {
-        return this@FeedWithoutGroups.entriesData[this@FeedWithoutGroups.entriesOrderData.get(index)]!!
-      }
-
-      override fun removeAt(index: Int): FeedEntry {
-        val bookID = this@FeedWithoutGroups.entriesOrderData.get(index)
-        val removed = this@FeedWithoutGroups.entriesData.remove(bookID)
-        this@FeedWithoutGroups.entriesOrderData.removeAt(index)
-        return removed!!
-      }
-
-      override fun set(index: Int, element: FeedEntry): FeedEntry {
-        val bookID = this@FeedWithoutGroups.entriesOrderData.get(index)
-        val old = this@FeedWithoutGroups.entriesData[bookID]
-        this@FeedWithoutGroups.entriesData[bookID] = element
-        return old!!
-      }
-    }
 
     override val size: Int
       get() = this.entriesOrderData.size
 
-    fun containsBook(bookID: BookID): Boolean {
-      return this.entriesByID.containsKey(bookID)
-    }
+    fun containsBook(bookID: BookID): Boolean = this.entriesByID.containsKey(bookID)
   }
 
   data class FeedWithGroups internal constructor(
@@ -153,43 +148,36 @@ sealed class Feed {
     override val feedTitle: String,
     override val feedUpdated: DateTime,
     override val feedURI: URI,
-
     /**
      * @return A link to the terms of service, if any
      */
 
     val feedTermsOfService: URI?,
-
     /**
      * @return A link to the privacy policy, if any
      */
 
     val feedPrivacyPolicy: URI?,
-
     /**
      * @return A link to the about page, if any
      */
 
     val feedAbout: URI?,
-
     /**
      * @return A link to the licenses, if any
      */
 
     val feedLicenses: URI?,
-
     /**
      * @return A link to the next part of the feed, if any
      */
 
     val feedNext: URI?,
-
     private val facetsByGroupData: MutableMap<String, MutableList<FeedFacetSingle>>,
     private val facetsOrderData: MutableList<FeedFacetSingle>,
     private val feedGroupsData: MutableMap<String, FeedGroup>,
     private val feedGroupsOrderData: MutableList<String>
   ) : Feed() {
-
     val facetsByGroup: Map<String, List<FeedFacetSingle>> =
       Collections.unmodifiableMap(this.facetsByGroupData)
     val facetsOrder: List<FeedFacetSingle> =
@@ -201,15 +189,16 @@ sealed class Feed {
         override val size: Int
           get() = this@FeedWithGroups.feedGroupsOrderData.size
 
-        override fun add(index: Int, element: FeedGroup) {
+        override fun add(
+          index: Int,
+          element: FeedGroup
+        ) {
           val name = element.groupTitle
           this@FeedWithGroups.feedGroupsOrderData.add(index, name)
           this@FeedWithGroups.feedGroupsData.put(name, element)
         }
 
-        override fun get(index: Int): FeedGroup {
-          return this@FeedWithGroups.feedGroupsData[this@FeedWithGroups.feedGroupsOrderData.get(index)]!!
-        }
+        override fun get(index: Int): FeedGroup = this@FeedWithGroups.feedGroupsData[this@FeedWithGroups.feedGroupsOrderData.get(index)]!!
 
         override fun removeAt(index: Int): FeedGroup {
           val name = this@FeedWithGroups.feedGroupsOrderData.get(index)
@@ -218,7 +207,10 @@ sealed class Feed {
           return removed!!
         }
 
-        override fun set(index: Int, element: FeedGroup): FeedGroup {
+        override fun set(
+          index: Int,
+          element: FeedGroup
+        ): FeedGroup {
           val name = this@FeedWithGroups.feedGroupsOrderData.get(index)
           val old = this@FeedWithGroups.feedGroupsData[name]
           this@FeedWithGroups.feedGroupsData[name] = element
@@ -231,7 +223,6 @@ sealed class Feed {
   }
 
   companion object {
-
     /**
      * Construct an empty feed without groups.
      */
@@ -245,9 +236,10 @@ sealed class Feed {
       feedFacetGroups: Map<String, List<FeedFacetSingle>>
     ): FeedWithoutGroups {
       val mutableGroups =
-        feedFacetGroups.mapValues { entry ->
-          entry.value.toMutableList()
-        }.toMutableMap()
+        feedFacetGroups
+          .mapValues { entry ->
+            entry.value.toMutableList()
+          }.toMutableMap()
 
       return FeedWithoutGroups(
         feedID = feedID,
@@ -280,13 +272,12 @@ sealed class Feed {
       feed: OPDSAcquisitionFeed,
       filter: (OPDSAcquisitionFeedEntry) -> Boolean,
       search: OPDSOpenSearch1_1?
-    ): Feed {
-      return if (feed.feedGroups.isEmpty()) {
+    ): Feed =
+      if (feed.feedGroups.isEmpty()) {
         this.withoutGroups(accountId, feed, filter, search)
       } else {
         this.withGroups(accountId, feed, filter, search)
       }
-    }
 
     private fun withoutGroups(
       accountId: AccountID,

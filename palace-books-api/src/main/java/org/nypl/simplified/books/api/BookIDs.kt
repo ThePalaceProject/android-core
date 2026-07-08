@@ -8,7 +8,6 @@ import java.security.NoSuchAlgorithmException
  * Functions to construct book IDs.
  */
 object BookIDs {
-
   /**
    * Construct a book ID derived from the hash of the given text.
    *
@@ -16,9 +15,7 @@ object BookIDs {
    * @return A new book ID
    */
   @JvmStatic
-  fun newFromText(
-    text: String
-  ): BookID {
+  fun newFromText(text: String): BookID {
     try {
       val md = MessageDigest.getInstance("SHA-256")
       md.update(text.toByteArray())
@@ -44,9 +41,5 @@ object BookIDs {
    * @return A new book ID
    */
   @JvmStatic
-  fun newFromOPDSEntry(
-    e: OPDSAcquisitionFeedEntry
-  ): BookID {
-    return newFromText(e.id)
-  }
+  fun newFromOPDSEntry(e: OPDSAcquisitionFeedEntry): BookID = newFromText(e.id)
 }

@@ -4,7 +4,6 @@ import org.nypl.simplified.feeds.api.Feed
 import java.util.concurrent.CompletableFuture
 
 interface OPDSFeedHandleWithoutGroupsType : OPDSFeedHandleType {
-
   data class Page(
     val pageIndex: Int,
     val pagePrevious: Int?,

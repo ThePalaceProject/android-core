@@ -13,7 +13,6 @@ import java.util.SortedMap
  */
 
 interface BookRegistryReadableType {
-
   /**
    * @return A read-only map of the known books
    */
@@ -81,15 +80,12 @@ interface BookRegistryReadableType {
    */
 
   @Throws(NoSuchElementException::class)
-  fun bookOrException(id: BookID): BookWithStatus {
-    return book(id).accept(object : OptionVisitorType<BookWithStatus, BookWithStatus> {
-      override fun none(none: None<BookWithStatus>): BookWithStatus {
-        throw NoSuchElementException("No such book: " + id.value())
-      }
+  fun bookOrException(id: BookID): BookWithStatus =
+    book(id).accept(
+      object : OptionVisitorType<BookWithStatus, BookWithStatus> {
+        override fun none(none: None<BookWithStatus>): BookWithStatus = throw NoSuchElementException("No such book: " + id.value())
 
-      override fun some(some: Some<BookWithStatus>): BookWithStatus {
-        return some.get()
+        override fun some(some: Some<BookWithStatus>): BookWithStatus = some.get()
       }
-    })
-  }
+    )
 }

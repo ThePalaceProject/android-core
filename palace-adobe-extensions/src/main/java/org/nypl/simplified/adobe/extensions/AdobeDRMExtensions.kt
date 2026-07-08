@@ -23,7 +23,6 @@ import java.util.concurrent.CancellationException
  */
 
 object AdobeDRMExtensions {
-
   /**
    * Activate a device.
    *
@@ -93,7 +92,6 @@ object AdobeDRMExtensions {
     val future: SettableFuture<List<AccountAuthenticationAdobePostActivationCredentials>>,
     val results: MutableList<AccountAuthenticationAdobePostActivationCredentials>
   ) : AdobeAdeptActivationReceiverType {
-
     var failed = false
 
     override fun onActivationError(error: String) {
@@ -141,16 +139,17 @@ object AdobeDRMExtensions {
     executor.execute { connector ->
       try {
         val errors = mutableListOf<Exception>()
-        val receiver = object : AdobeAdeptDeactivationReceiverType {
-          override fun onDeactivationError(error: String) {
-            error("onDeactivationError: $error")
-            errors.add(AdobeDRMLogoutConnectorException(error))
-          }
+        val receiver =
+          object : AdobeAdeptDeactivationReceiverType {
+            override fun onDeactivationError(error: String) {
+              error("onDeactivationError: $error")
+              errors.add(AdobeDRMLogoutConnectorException(error))
+            }
 
-          override fun onDeactivationSucceeded() {
-            debug("onDeactivationSucceeded")
+            override fun onDeactivationSucceeded() {
+              debug("onDeactivationSucceeded")
+            }
           }
-        }
 
         debug("deactivating device with token")
         connector.deactivateDevice(
@@ -232,7 +231,6 @@ object AdobeDRMExtensions {
     val future: SettableFuture<List<Activation>>,
     val results: MutableList<Activation>
   ) : AdobeAdeptActivationReceiverType {
-
     var failed = false
 
     override fun onActivationError(error: String) {
@@ -323,7 +321,6 @@ object AdobeDRMExtensions {
     private val outputFile: File,
     private val adeptFuture: SettableFuture<Fulfillment>
   ) : AdobeAdeptFulfillmentListenerType {
-
     override fun onFulfillmentCancelled() {
       this.adeptFuture.setException(CancellationException())
     }
@@ -340,7 +337,10 @@ object AdobeDRMExtensions {
       this.adeptFuture.setException(AdobeDRMFulfillmentException(errorCode))
     }
 
-    override fun onFulfillmentSuccess(file: File, loan: AdobeAdeptLoan) {
+    override fun onFulfillmentSuccess(
+      file: File,
+      loan: AdobeAdeptLoan
+    ) {
       try {
         FileUtilities.fileCopy(file, this.outputFile)
       } catch (e: Throwable) {
@@ -393,7 +393,6 @@ object AdobeDRMExtensions {
   private class RevokeReceiver(
     private val adeptFuture: SettableFuture<Unit>
   ) : AdobeAdeptLoanReturnListenerType {
-
     override fun onLoanReturnSuccess() {
       this.adeptFuture.set(Unit)
     }

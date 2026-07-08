@@ -11,7 +11,6 @@ import org.nypl.simplified.opds.core.OPDSAcquisitionPaths
  */
 
 object BorrowAcquisitions {
-
   /**
    * Pick the preferred acquisition for the OPDS feed entry.
    */

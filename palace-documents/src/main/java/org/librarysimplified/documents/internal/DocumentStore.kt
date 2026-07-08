@@ -21,9 +21,7 @@ internal class DocumentStore private constructor(
   override val privacyPolicy: DocumentType?,
   override val faq: DocumentType?
 ) : DocumentStoreType {
-
   companion object {
-
     private val logger =
       LoggerFactory.getLogger(DocumentStore::class.java)
 
@@ -96,11 +94,10 @@ internal class DocumentStore private constructor(
       http: LSHTTPClientType,
       baseDirectory: File,
       config: DocumentConfiguration?
-    ): EULAType? {
-      return config?.let {
+    ): EULAType? =
+      config?.let {
         this.eulaFor(assetManager, http, baseDirectory, config)
       }
-    }
 
     private fun eulaFor(
       assetManager: AssetManager,
@@ -138,11 +135,10 @@ internal class DocumentStore private constructor(
       http: LSHTTPClientType,
       baseDirectory: File,
       config: DocumentConfiguration?
-    ): DocumentType? {
-      return config?.let {
+    ): DocumentType? =
+      config?.let {
         this.documentFor(assetManager, http, baseDirectory, config)
       }
-    }
 
     private fun documentFor(
       assetManager: AssetManager,
@@ -174,8 +170,8 @@ internal class DocumentStore private constructor(
     }
   }
 
-  override fun update(executor: ListeningExecutorService): ListenableFuture<*> {
-    return Futures.allAsList(
+  override fun update(executor: ListeningExecutorService): ListenableFuture<*> =
+    Futures.allAsList(
       listOf(
         this.updateOne(executor, this.about),
         this.updateOne(executor, this.acknowledgements),
@@ -184,18 +180,16 @@ internal class DocumentStore private constructor(
         this.updateOne(executor, this.privacyPolicy)
       )
     )
-  }
 
   private fun updateOne(
     executor: ListeningExecutorService,
     document: DocumentType?
-  ): ListenableFuture<*> {
-    return executor.submit {
+  ): ListenableFuture<*> =
+    executor.submit {
       try {
         document?.update()
       } catch (e: Throwable) {
         logger.debug("unable to update document: ", e)
       }
     }
-  }
 }

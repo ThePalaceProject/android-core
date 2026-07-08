@@ -9,7 +9,6 @@ import java.io.File
 data class BookPreviewStorage(
   val directory: File
 ) {
-
   private val bookPreviewFile: File =
     File(directory, "book-preview.epub")
 
@@ -19,7 +18,10 @@ data class BookPreviewStorage(
   private val audiobookWmaPreviewFile: File =
     File(directory, "audiobook-preview.wma")
 
-  fun saveBookPreview(file: File, onBookSuccessfullySaved: (File) -> Unit) {
+  fun saveBookPreview(
+    file: File,
+    onBookSuccessfullySaved: (File) -> Unit
+  ) {
     if (file.isDirectory) {
       DirectoryUtilities.directoryCopy(file, bookPreviewFile)
     } else {
@@ -34,17 +36,20 @@ data class BookPreviewStorage(
     mimeType: MIMEType,
     onBookSuccessfullySaved: (File) -> Unit
   ) {
-    val previewFile = when (mimeType) {
-      StandardFormatNames.mpegAudioBooks -> {
-        audiobookMp3PreviewFile
+    val previewFile =
+      when (mimeType) {
+        StandardFormatNames.mpegAudioBooks -> {
+          audiobookMp3PreviewFile
+        }
+
+        StandardFormatNames.wmaAudioBooks -> {
+          audiobookWmaPreviewFile
+        }
+
+        else -> {
+          throw Exception("Unsupported MIME type: $mimeType")
+        }
       }
-      StandardFormatNames.wmaAudioBooks -> {
-        audiobookWmaPreviewFile
-      }
-      else -> {
-        throw Exception("Unsupported MIME type: $mimeType")
-      }
-    }
 
     if (file.isDirectory) {
       DirectoryUtilities.directoryCopy(file, previewFile)

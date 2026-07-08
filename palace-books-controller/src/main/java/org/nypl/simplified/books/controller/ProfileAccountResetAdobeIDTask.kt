@@ -36,7 +36,6 @@ class ProfileAccountResetAdobeIDTask(
   private val profile: ProfileReadableType,
   private val authDocumentParsers: AuthenticationDocumentParsersType
 ) : Callable<TaskResult<*>> {
-
   private lateinit var account: AccountType
   private lateinit var credentials: AccountAuthenticationCredentials
 
@@ -46,8 +45,10 @@ class ProfileAccountResetAdobeIDTask(
   private val steps =
     TaskRecorder.create()
 
-  private fun warn(message: String, vararg arguments: Any?) =
-    this.logger.warn("[{}][{}] $message", this.profile.id.uuid, this.accountID, *arguments)
+  private fun warn(
+    message: String,
+    vararg arguments: Any?
+  ) = this.logger.warn("[{}][{}] $message", this.profile.id.uuid, this.accountID, *arguments)
 
   override fun call(): TaskResult<Unit> {
     this.steps.beginNewStep("Resetting Adobe ID...")
@@ -57,10 +58,22 @@ class ProfileAccountResetAdobeIDTask(
 
       this.credentials =
         when (val state = this.account.loginState) {
-          is AccountLoggedInStaleCredentials -> state.credentials
-          is AccountLoggedIn -> state.credentials
-          is AccountLogoutFailed -> state.credentials
-          is AccountLoggingOut -> state.credentials
+          is AccountLoggedInStaleCredentials -> {
+            state.credentials
+          }
+
+          is AccountLoggedIn -> {
+            state.credentials
+          }
+
+          is AccountLogoutFailed -> {
+            state.credentials
+          }
+
+          is AccountLoggingOut -> {
+            state.credentials
+          }
+
           is AccountNotLoggedIn,
           is AccountLoggingIn,
           is AccountLoginFailed,
@@ -77,7 +90,10 @@ class ProfileAccountResetAdobeIDTask(
         }
 
       this.steps.addAttribute("AccountProviderName", this.account.provider.displayName)
-      this.steps.addAttribute("AccountProviderID", this.account.provider.id.toString())
+      this.steps.addAttribute("AccountProviderID",
+        this.account.provider.id
+          .toString()
+      )
 
       this.steps.beginNewStep("Fetching authentication document.")
       val resolution =
@@ -122,7 +138,8 @@ class ProfileAccountResetAdobeIDTask(
         MIMEType("application", "octet-stream", mapOf())
 
       val request =
-        this.http.newRequest(adobeResetURI)
+        this.http
+          .newRequest(adobeResetURI)
           .setAuthorization(AccountAuthenticatedHTTP.createAuthorizationIfPresent(account.loginState.credentials))
           .setMethod(Delete(ByteArray(0), octetStream))
           .build()
@@ -138,6 +155,7 @@ class ProfileAccountResetAdobeIDTask(
           )
           this.steps.finishFailure()
         }
+
         is LSHTTPResponseStatus.Responded.Error -> {
           this.steps.addAttributesIfPresent(status.properties.problemReport?.toMap())
           this.steps.currentStepFailed(
@@ -148,6 +166,7 @@ class ProfileAccountResetAdobeIDTask(
           )
           this.steps.finishFailure()
         }
+
         is LSHTTPResponseStatus.Responded.OK -> {
           this.steps.currentStepSucceeded("Server accepted the reset request.")
           this.steps.finishSuccess(Unit)

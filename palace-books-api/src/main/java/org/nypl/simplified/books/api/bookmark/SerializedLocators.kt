@@ -8,24 +8,17 @@ import org.nypl.simplified.json.core.JSONParserUtilities
 import java.math.BigInteger
 
 object SerializedLocators {
-
   private val objectMapper: ObjectMapper =
     ObjectMapper()
 
   @JvmStatic
   @Throws(JSONParseException::class)
-  fun parseLocatorFromString(
-    text: String
-  ): SerializedLocator {
-    return this.parseLocator(this.objectMapper.readTree(text))
-  }
+  fun parseLocatorFromString(text: String): SerializedLocator = this.parseLocator(this.objectMapper.readTree(text))
 
   @JvmStatic
   @Throws(JSONParseException::class)
-  fun parseLocator(
-    node: JsonNode
-  ): SerializedLocator {
-    return when (node) {
+  fun parseLocator(node: JsonNode): SerializedLocator =
+    when (node) {
       is ObjectNode -> {
         this.parseLocator(node)
       }
@@ -39,13 +32,10 @@ object SerializedLocators {
         )
       }
     }
-  }
 
   @JvmStatic
   @Throws(JSONParseException::class)
-  fun parseLocator(
-    node: ObjectNode
-  ): SerializedLocator {
+  fun parseLocator(node: ObjectNode): SerializedLocator {
     val type = node["@type"]
     return if (type != null) {
       when (type.asText()) {
@@ -80,9 +70,7 @@ object SerializedLocators {
 
   @JvmStatic
   @Throws(JSONParseException::class)
-  private fun parseLocatorLegacyR2(
-    node: ObjectNode
-  ): SerializedLocator {
+  private fun parseLocatorLegacyR2(node: ObjectNode): SerializedLocator {
     val progress = JSONParserUtilities.getObject(node, "progress")
     return SerializedLocatorHrefProgression20210317(
       chapterHref = JSONParserUtilities.getString(progress, "chapterHref"),
@@ -92,29 +80,20 @@ object SerializedLocators {
 
   @JvmStatic
   @Throws(JSONParseException::class)
-  private fun parseLocatorLegacyCFI(
-    node: ObjectNode
-  ): SerializedLocatorLegacyCFI {
-    return SerializedLocatorLegacyCFI(
+  private fun parseLocatorLegacyCFI(node: ObjectNode): SerializedLocatorLegacyCFI =
+    SerializedLocatorLegacyCFI(
       idRef = JSONParserUtilities.getStringOrNull(node, "idref"),
       contentCFI = JSONParserUtilities.getStringOrNull(node, "contentCFI"),
       chapterProgression = JSONParserUtilities.getDoubleDefault(node, "progressWithinChapter", 0.0)
     )
-  }
 
   @JvmStatic
   @Throws(JSONParseException::class)
-  private fun parseLocatorGuess(
-    node: ObjectNode
-  ): SerializedLocator {
-    return this.parseLocatorLegacyCFI(node)
-  }
+  private fun parseLocatorGuess(node: ObjectNode): SerializedLocator = this.parseLocatorLegacyCFI(node)
 
   @JvmStatic
   @Throws(JSONParseException::class)
-  private fun parseLocatorPage(
-    node: ObjectNode
-  ): SerializedLocatorPage1 {
+  private fun parseLocatorPage(node: ObjectNode): SerializedLocatorPage1 {
     try {
       return SerializedLocatorPage1(
         page = JSONParserUtilities.getInteger(node, "page"),
@@ -126,9 +105,7 @@ object SerializedLocators {
 
   @JvmStatic
   @Throws(JSONParseException::class)
-  private fun parseLocatorHrefProgression(
-    node: ObjectNode
-  ): SerializedLocatorHrefProgression20210317 {
+  private fun parseLocatorHrefProgression(node: ObjectNode): SerializedLocatorHrefProgression20210317 {
     try {
       return SerializedLocatorHrefProgression20210317(
         chapterHref = JSONParserUtilities.getString(node, "href"),
@@ -141,12 +118,15 @@ object SerializedLocators {
 
   @JvmStatic
   @Throws(JSONParseException::class)
-  private fun parseLocatorAudioBookTime(
-    node: ObjectNode
-  ): SerializedLocator {
-    return when (val version = JSONParserUtilities.getIntegerDefault(node, "@version", 1)) {
-      1 -> this.parseLocatorAudioBookTime1(node)
-      2 -> this.parseLocatorAudioBookTime2(node)
+  private fun parseLocatorAudioBookTime(node: ObjectNode): SerializedLocator =
+    when (val version = JSONParserUtilities.getIntegerDefault(node, "@version", 1)) {
+      1 -> {
+        this.parseLocatorAudioBookTime1(node)
+      }
+
+      2 -> {
+        this.parseLocatorAudioBookTime2(node)
+      }
 
       else -> {
         throw JSONParseException(
@@ -157,27 +137,23 @@ object SerializedLocators {
         )
       }
     }
-  }
 
-  private fun parseLocatorAudioBookTime2(
-    node: ObjectNode
-  ): SerializedLocatorAudioBookTime2 {
-    return SerializedLocatorAudioBookTime2(
+  private fun parseLocatorAudioBookTime2(node: ObjectNode): SerializedLocatorAudioBookTime2 =
+    SerializedLocatorAudioBookTime2(
       readingOrderItem =
-      JSONParserUtilities.getString(node, "readingOrderItem"),
+        JSONParserUtilities.getString(node, "readingOrderItem"),
       readingOrderItemOffsetMilliseconds =
-      JSONParserUtilities.getBigInteger(node, "readingOrderItemOffsetMilliseconds").toLong()
+        JSONParserUtilities.getBigInteger(node, "readingOrderItemOffsetMilliseconds").toLong()
     )
-  }
 
-  private fun parseLocatorAudioBookTime1(
-    node: ObjectNode
-  ): SerializedLocatorAudioBookTime1 {
+  private fun parseLocatorAudioBookTime1(node: ObjectNode): SerializedLocatorAudioBookTime1 {
     val startOffset =
-      JSONParserUtilities.getBigIntegerDefault(node, "startOffset", BigInteger.ZERO)
+      JSONParserUtilities
+        .getBigIntegerDefault(node, "startOffset", BigInteger.ZERO)
         .toLong()
     val timeMillisecondsRaw =
-      JSONParserUtilities.getBigInteger(node, "time")
+      JSONParserUtilities
+        .getBigInteger(node, "time")
         .toLong()
 
     try {

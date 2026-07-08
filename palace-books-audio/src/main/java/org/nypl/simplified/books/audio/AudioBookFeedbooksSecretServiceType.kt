@@ -7,7 +7,6 @@ import org.librarysimplified.audiobook.feedbooks.FeedbooksPlayerExtensionConfigu
  */
 
 interface AudioBookFeedbooksSecretServiceType : AudioBookSecretServiceType {
-
   /**
    * Configuration information for the Feedbooks extension.
    */

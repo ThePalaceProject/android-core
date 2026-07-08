@@ -9,26 +9,30 @@ import android.content.res.Resources
 class ScreenSizeInformation(
   private val resources: Resources
 ) : ScreenSizeInformationType {
-
   override val isPortrait: Boolean
-    get() = run {
-      return this.resources.displayMetrics.heightPixels > this.resources.displayMetrics.widthPixels
-    }
+    get() =
+      run {
+        return this.resources.displayMetrics.heightPixels > this.resources.displayMetrics.widthPixels
+      }
 
   override val dpi: Double
-    get() = run {
-      this.resources.displayMetrics.densityDpi.toDouble()
-    }
+    get() =
+      run {
+        this.resources.displayMetrics.densityDpi
+          .toDouble()
+      }
 
   override val heightPixels: Int
-    get() = run {
-      this.resources.displayMetrics.heightPixels
-    }
+    get() =
+      run {
+        this.resources.displayMetrics.heightPixels
+      }
 
   override val widthPixels: Int
-    get() = run {
-      this.resources.displayMetrics.widthPixels
-    }
+    get() =
+      run {
+        this.resources.displayMetrics.widthPixels
+      }
 
   override fun dpToPixels(dp: Int): Double {
     val scale = this.resources.displayMetrics.density

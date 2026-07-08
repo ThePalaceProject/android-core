@@ -9,18 +9,15 @@ import org.slf4j.LoggerFactory
  */
 
 class TaskRecorder private constructor() : TaskRecorderType {
-
   private val logger =
     LoggerFactory.getLogger(TaskRecorder::class.java)
 
   companion object {
-
     /**
      * Create a new task recorder.
      */
 
-    fun create(): TaskRecorderType =
-      TaskRecorder()
+    fun create(): TaskRecorderType = TaskRecorder()
   }
 
   private val steps = mutableListOf<TaskStep>()
@@ -88,20 +85,23 @@ class TaskRecorder private constructor() : TaskRecorderType {
     val step = this.steps.last()
     return when (val resolution = step.resolution) {
       is TaskStepResolution.TaskStepSucceeded -> {
-        step.resolution = TaskStepResolution.TaskStepFailed(
-          message = message,
-          exception = exception,
-          errorCode = errorCode,
-          extraMessages = extraMessages
-        )
+        step.resolution =
+          TaskStepResolution.TaskStepFailed(
+            message = message,
+            exception = exception,
+            errorCode = errorCode,
+            extraMessages = extraMessages
+          )
         step
       }
+
       is TaskStepResolution.TaskStepFailed -> {
         when (val ex = resolution.exception) {
           null -> {
             step.resolution = resolution.copy(exception = exception)
             step
           }
+
           else -> {
             if (ex != exception) {
               ex.addSuppressed(exception)
@@ -117,12 +117,9 @@ class TaskRecorder private constructor() : TaskRecorderType {
     this.steps.addAll(steps)
   }
 
-  override fun currentStep(): TaskStep? =
-    this.steps.lastOrNull()
+  override fun currentStep(): TaskStep? = this.steps.lastOrNull()
 
-  override fun <A> finishSuccess(result: A): TaskResult.Success<A> =
-    TaskResult.Success(result, this.steps, this.attributes.toMap())
+  override fun <A> finishSuccess(result: A): TaskResult.Success<A> = TaskResult.Success(result, this.steps, this.attributes.toMap())
 
-  override fun <A> finishFailure(): TaskResult.Failure<A> =
-    TaskResult.Failure(this.steps, this.attributes.toMap())
+  override fun <A> finishFailure(): TaskResult.Failure<A> = TaskResult.Failure(this.steps, this.attributes.toMap())
 }

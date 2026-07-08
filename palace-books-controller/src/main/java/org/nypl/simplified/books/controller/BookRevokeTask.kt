@@ -68,7 +68,6 @@ class BookRevokeTask(
   private val revokeACSTimeoutDuration: Duration = Duration.standardMinutes(1L),
   private val revokeServerTimeoutDuration: Duration = Duration.standardMinutes(3L)
 ) : AbstractBookTask(accountID, profiles) {
-
   private var authenticationFailed: Boolean = false
 
   private lateinit var databaseEntry: BookDatabaseEntryType
@@ -103,14 +102,20 @@ class BookRevokeTask(
     }
   }
 
-  private fun debug(message: String, vararg arguments: Any?) =
-    this.logger.debug("[{}] $message", this.bookID.brief(), *arguments)
+  private fun debug(
+    message: String,
+    vararg arguments: Any?
+  ) = this.logger.debug("[{}] $message", this.bookID.brief(), *arguments)
 
-  private fun error(message: String, vararg arguments: Any?) =
-    this.logger.error("[{}] $message", this.bookID.brief(), *arguments)
+  private fun error(
+    message: String,
+    vararg arguments: Any?
+  ) = this.logger.error("[{}] $message", this.bookID.brief(), *arguments)
 
-  private fun warn(message: String, vararg arguments: Any?) =
-    this.logger.warn("[{}] $message", this.bookID.brief(), *arguments)
+  private fun warn(
+    message: String,
+    vararg arguments: Any?
+  ) = this.logger.warn("[{}] $message", this.bookID.brief(), *arguments)
 
   private fun publishBookStatus(status: BookStatus) {
     val book = this.bookFromDatabaseOrFallback()
@@ -123,8 +128,8 @@ class BookRevokeTask(
     this.bookRegistry.update(BookWithStatus(book, status))
   }
 
-  private fun bookFromDatabaseOrFallback(): Book {
-    return if (this::databaseEntry.isInitialized) {
+  private fun bookFromDatabaseOrFallback(): Book =
+    if (this::databaseEntry.isInitialized) {
       this.databaseEntry.book
     } else {
       this.warn("publishing book status with fake book!")
@@ -137,13 +142,13 @@ class BookRevokeTask(
        */
 
       val entry =
-        OPDSAcquisitionFeedEntry.newBuilder(
-          this.bookID.value(),
-          "",
-          DateTime.now(),
-          OPDSAvailabilityLoanable.get()
-        )
-          .build()
+        OPDSAcquisitionFeedEntry
+          .newBuilder(
+            this.bookID.value(),
+            "",
+            DateTime.now(),
+            OPDSAvailabilityLoanable.get()
+          ).build()
 
       Book(
         this.bookID,
@@ -154,7 +159,6 @@ class BookRevokeTask(
         listOf()
       )
     }
-  }
 
   private fun publishRequestingRevokeStatus() {
     this.publishBookStatus(BookStatus.RequestingRevoke(this.bookID))
@@ -173,80 +177,82 @@ class BookRevokeTask(
     val availability = feedEntry.availability
     this.debug("availability is {}", availability)
 
-    val newEntry = when (availability) {
-      is OPDSAvailabilityHeldReady -> {
-        val uriOpt = availability.revoke
-        if (uriOpt != null) {
-          this.revokeNotifyServerURI(uriOpt, RevokeType.HOLD, account)
-        } else {
-          this.debug("no revoke URI, nothing to do")
-          this.taskRecorder.currentStepSucceeded(this.revokeStrings.revokeServerNotifyNoURI)
-          this.feedEntryWithAvailability(accountID, feedEntry, OPDSAvailabilityLoanable.get())
+    val newEntry =
+      when (availability) {
+        is OPDSAvailabilityHeldReady -> {
+          val uriOpt = availability.revoke
+          if (uriOpt != null) {
+            this.revokeNotifyServerURI(uriOpt, RevokeType.HOLD, account)
+          } else {
+            this.debug("no revoke URI, nothing to do")
+            this.taskRecorder.currentStepSucceeded(this.revokeStrings.revokeServerNotifyNoURI)
+            this.feedEntryWithAvailability(accountID, feedEntry, OPDSAvailabilityLoanable.get())
+          }
+        }
+
+        is OPDSAvailabilityHeld -> {
+          val uriOpt = availability.revoke
+          if (uriOpt != null) {
+            this.revokeNotifyServerURI(uriOpt, RevokeType.HOLD, account)
+          } else {
+            this.debug("no revoke URI, nothing to do")
+            this.taskRecorder.currentStepSucceeded(this.revokeStrings.revokeServerNotifyNoURI)
+            this.feedEntryWithAvailability(accountID, feedEntry, OPDSAvailabilityHoldable.get())
+          }
+        }
+
+        is OPDSAvailabilityHoldable -> {
+          val exception = BookRevokeExceptionNotRevocable()
+          val message =
+            this.revokeStrings.revokeServerNotifyNotRevocable(availability.javaClass.simpleName)
+          this.taskRecorder.currentStepFailed(
+            message = message,
+            errorCode = "notRevocable",
+            exception = exception,
+            extraMessages = listOf()
+          )
+          throw TaskFailedHandled(exception)
+        }
+
+        is OPDSAvailabilityLoaned -> {
+          val uriOpt = availability.revoke
+          if (uriOpt != null) {
+            this.revokeNotifyServerURI(uriOpt, RevokeType.LOAN, account)
+          } else {
+            this.debug("no revoke URI, nothing to do")
+            this.taskRecorder.currentStepSucceeded(this.revokeStrings.revokeServerNotifyNoURI)
+            this.feedEntryWithAvailability(accountID, feedEntry, OPDSAvailabilityLoanable.get())
+          }
+        }
+
+        is OPDSAvailabilityLoanable -> {
+          val exception = BookRevokeExceptionNotRevocable()
+          val message =
+            this.revokeStrings.revokeServerNotifyNotRevocable(availability.javaClass.simpleName)
+          this.taskRecorder.currentStepFailed(
+            message = message,
+            errorCode = "notRevocable",
+            exception = exception,
+            extraMessages = listOf()
+          )
+          throw TaskFailedHandled(exception)
+        }
+
+        is OPDSAvailabilityOpenAccess -> {
+          val uriOpt = availability.revoke
+          if (uriOpt != null) {
+            this.revokeNotifyServerURI(uriOpt, RevokeType.LOAN, account)
+          } else {
+            this.debug("no revoke URI, nothing to do")
+            this.taskRecorder.currentStepSucceeded(this.revokeStrings.revokeServerNotifyNoURI)
+            FeedEntryOPDS(accountID, feedEntry)
+          }
+        }
+
+        is OPDSAvailabilityRevoked -> {
+          this.revokeNotifyServerURI(availability.revoke, RevokeType.LOAN, account)
         }
       }
-
-      is OPDSAvailabilityHeld -> {
-        val uriOpt = availability.revoke
-        if (uriOpt != null) {
-          this.revokeNotifyServerURI(uriOpt, RevokeType.HOLD, account)
-        } else {
-          this.debug("no revoke URI, nothing to do")
-          this.taskRecorder.currentStepSucceeded(this.revokeStrings.revokeServerNotifyNoURI)
-          this.feedEntryWithAvailability(accountID, feedEntry, OPDSAvailabilityHoldable.get())
-        }
-      }
-
-      is OPDSAvailabilityHoldable -> {
-        val exception = BookRevokeExceptionNotRevocable()
-        val message =
-          this.revokeStrings.revokeServerNotifyNotRevocable(availability.javaClass.simpleName)
-        this.taskRecorder.currentStepFailed(
-          message = message,
-          errorCode = "notRevocable",
-          exception = exception,
-          extraMessages = listOf()
-        )
-        throw TaskFailedHandled(exception)
-      }
-
-      is OPDSAvailabilityLoaned -> {
-        val uriOpt = availability.revoke
-        if (uriOpt != null) {
-          this.revokeNotifyServerURI(uriOpt, RevokeType.LOAN, account)
-        } else {
-          this.debug("no revoke URI, nothing to do")
-          this.taskRecorder.currentStepSucceeded(this.revokeStrings.revokeServerNotifyNoURI)
-          this.feedEntryWithAvailability(accountID, feedEntry, OPDSAvailabilityLoanable.get())
-        }
-      }
-
-      is OPDSAvailabilityLoanable -> {
-        val exception = BookRevokeExceptionNotRevocable()
-        val message =
-          this.revokeStrings.revokeServerNotifyNotRevocable(availability.javaClass.simpleName)
-        this.taskRecorder.currentStepFailed(
-          message = message,
-          errorCode = "notRevocable",
-          exception = exception,
-          extraMessages = listOf()
-        )
-        throw TaskFailedHandled(exception)
-      }
-
-      is OPDSAvailabilityOpenAccess -> {
-        val uriOpt = availability.revoke
-        if (uriOpt != null) {
-          this.revokeNotifyServerURI(uriOpt, RevokeType.LOAN, account)
-        } else {
-          this.debug("no revoke URI, nothing to do")
-          this.taskRecorder.currentStepSucceeded(this.revokeStrings.revokeServerNotifyNoURI)
-          FeedEntryOPDS(accountID, feedEntry)
-        }
-      }
-
-      is OPDSAvailabilityRevoked ->
-        this.revokeNotifyServerURI(availability.revoke, RevokeType.LOAN, account)
-    }
 
     this.revokeNotifyServerSaveNewEntry(newEntry)
   }
@@ -257,7 +263,8 @@ class BookRevokeTask(
     availability: OPDSAvailabilityType
   ): FeedEntryOPDS {
     val acquisitionFeedEntry =
-      oldEntry.toBuilder()
+      oldEntry
+        .toBuilder()
         .setAvailability(availability)
         .build()
 
@@ -323,37 +330,39 @@ class BookRevokeTask(
      * entry seen by an unauthenticated user browsing the catalog right now.
      */
 
-    val feedResult = try {
-      this.feedLoader.fetchURI(
-        accountID = account.id,
-        uri = targetURI,
-        credentials = credentials,
-        method = "PUT"
-      ).get(this.revokeServerTimeoutDuration.standardSeconds, TimeUnit.SECONDS)
-    } catch (e: TimeoutException) {
-      val message = this.revokeStrings.revokeServerNotifyFeedTimedOut
-      this.taskRecorder.currentStepFailed(
-        message = message,
-        errorCode = "timedOut",
-        exception = e,
-        extraMessages = listOf()
-      )
-      throw TaskFailedHandled(e)
-    } catch (e: ExecutionException) {
-      val ex = e.cause!!
-      if (ex is FeedHTTPTransportException) {
-        this.taskRecorder.addAttributesIfPresent(ex.report?.toMap())
-      }
+    val feedResult =
+      try {
+        this.feedLoader
+          .fetchURI(
+            accountID = account.id,
+            uri = targetURI,
+            credentials = credentials,
+            method = "PUT"
+          ).get(this.revokeServerTimeoutDuration.standardSeconds, TimeUnit.SECONDS)
+      } catch (e: TimeoutException) {
+        val message = this.revokeStrings.revokeServerNotifyFeedTimedOut
+        this.taskRecorder.currentStepFailed(
+          message = message,
+          errorCode = "timedOut",
+          exception = e,
+          extraMessages = listOf()
+        )
+        throw TaskFailedHandled(e)
+      } catch (e: ExecutionException) {
+        val ex = e.cause!!
+        if (ex is FeedHTTPTransportException) {
+          this.taskRecorder.addAttributesIfPresent(ex.report?.toMap())
+        }
 
-      val message = this.revokeStrings.revokeServerNotifyFeedTimedOut
-      this.taskRecorder.currentStepFailed(
-        message = message,
-        errorCode = "feedLoaderFailed",
-        exception = ex,
-        extraMessages = listOf()
-      )
-      throw TaskFailedHandled(ex)
-    }
+        val message = this.revokeStrings.revokeServerNotifyFeedTimedOut
+        this.taskRecorder.currentStepFailed(
+          message = message,
+          errorCode = "feedLoaderFailed",
+          exception = ex,
+          extraMessages = listOf()
+        )
+        throw TaskFailedHandled(ex)
+      }
 
     return when (feedResult) {
       is FeedLoaderSuccess -> {
@@ -380,6 +389,7 @@ class BookRevokeTask(
             account.expireCredentialsIfApplicable()
             this.authenticationFailed = true
           }
+
           Handled401.ErrorIsUnrecoverable -> {
             // Treat this as a hard error.
           }
@@ -430,8 +440,9 @@ class BookRevokeTask(
             throw TaskFailedHandled(exception)
           }
 
-          is FeedEntryOPDS ->
+          is FeedEntryOPDS -> {
             feedEntry
+          }
         }
       }
 
@@ -455,14 +466,17 @@ class BookRevokeTask(
     this.publishRequestingRevokeStatus()
 
     return when (val handle = this.databaseEntry.findPreferredFormatHandle()) {
-      is BookDatabaseEntryFormatHandleEPUB ->
+      is BookDatabaseEntryFormatHandleEPUB -> {
         this.revokeFormatHandleEPUB(handle, account)
+      }
 
-      is BookDatabaseEntryFormatHandlePDF ->
+      is BookDatabaseEntryFormatHandlePDF -> {
         this.revokeFormatHandlePDF(handle)
+      }
 
-      is BookDatabaseEntryFormatHandleAudioBook ->
+      is BookDatabaseEntryFormatHandleAudioBook -> {
         this.revokeFormatHandleAudioBook(handle)
+      }
 
       null -> {
         this.debug("no format handle available, nothing to do!")
@@ -650,8 +664,9 @@ class BookRevokeTask(
 
     try {
       when (val drm = handle.drmInformationHandle) {
-        is BookDRMInformationHandle.ACSHandle ->
+        is BookDRMInformationHandle.ACSHandle -> {
           drm.setAdobeRightsInformation(null)
+        }
 
         is BookDRMInformationHandle.BoundlessHandle,
         is BookDRMInformationHandle.LCPHandle,
@@ -696,7 +711,10 @@ class BookRevokeTask(
       val database = account.bookDatabase
       this.databaseEntry = database.entry(this.bookID)
 
-      MDC.put(MDCKeys.BOOK_INTERNAL_ID, this.databaseEntry.book.id.value())
+      MDC.put(MDCKeys.BOOK_INTERNAL_ID,
+        this.databaseEntry.book.id
+          .value()
+      )
       MDC.put(MDCKeys.BOOK_TITLE, this.databaseEntry.book.entry.title)
       MDCKeys.put(MDCKeys.BOOK_PUBLISHER, this.databaseEntry.book.entry.publisher)
       this.publishRequestingRevokeStatus()
@@ -714,6 +732,7 @@ class BookRevokeTask(
   }
 
   private enum class RevokeType {
-    LOAN, HOLD
+    LOAN,
+    HOLD
   }
 }

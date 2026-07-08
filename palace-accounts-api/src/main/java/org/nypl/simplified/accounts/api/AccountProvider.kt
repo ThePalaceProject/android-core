@@ -28,12 +28,9 @@ data class AccountProvider(
   override val announcements: List<Announcement> = listOf(),
   override val alternateURI: URI?
 ) : AccountProviderType {
-  override fun compareTo(other: AccountProviderType): Int {
-    return this.id.compareTo(other.id)
-  }
+  override fun compareTo(other: AccountProviderType): Int = this.id.compareTo(other.id)
 
   companion object {
-
     /**
      * Make an immutable copy of the given account provider. If the other account provider
      * is already immutable, it will be returned directly.

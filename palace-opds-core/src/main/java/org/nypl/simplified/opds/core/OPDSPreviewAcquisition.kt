@@ -9,13 +9,11 @@ import java.net.URI
  */
 
 data class OPDSPreviewAcquisition(
-
   /**
    * The URI of the preview acquisition
    */
 
   val uri: URI,
-
   /**
    * The MIME type of immediately retrievable content, if any.
    */

@@ -35,22 +35,19 @@ import java.io.IOException
 import java.net.URI
 
 class BorrowLCPPDF : BorrowSubtaskType {
-
   companion object : BorrowSubtaskFactoryType {
     override val name: String
       get() = "LCP PDF Download"
 
-    override fun createSubtask(): BorrowSubtaskType {
-      return BorrowLCPPDF()
-    }
+    override fun createSubtask(): BorrowSubtaskType = BorrowLCPPDF()
 
     override fun isApplicableFor(
       type: MIMEType,
       target: Link?,
       account: AccountReadableType?,
       remaining: List<MIMEType>
-    ): Boolean {
-      return if (MIMECompatibility.isCompatibleStrictWithoutAttributes(type, lcpLicenseFiles)) {
+    ): Boolean =
+      if (MIMECompatibility.isCompatibleStrictWithoutAttributes(type, lcpLicenseFiles)) {
         val next = remaining.firstOrNull()
         if (next != null) {
           MIMECompatibility.isCompatibleStrictWithoutAttributes(next, StandardFormatNames.genericPDFFiles)
@@ -60,12 +57,9 @@ class BorrowLCPPDF : BorrowSubtaskType {
       } else {
         false
       }
-    }
   }
 
-  override fun execute(
-    context: BorrowContextType
-  ) {
+  override fun execute(context: BorrowContextType) {
     try {
       BorrowLCPSupport.checkDRMSupport(context)
 
@@ -121,18 +115,20 @@ class BorrowLCPPDF : BorrowSubtaskType {
               authorization = null
             )
           },
-          expectedTypes = hashSetOf(
-            fulfillmentMimeType,
-            // Sometimes fulfillment servers will set the content type to generic zip or octet
-            // stream, so these are acceptable too.
-            StandardFormatNames.genericZIPFiles,
-            MIMECompatibility.applicationOctetStream
-          )
+          expectedTypes =
+            hashSetOf(
+              fulfillmentMimeType,
+              // Sometimes fulfillment servers will set the content type to generic zip or octet
+              // stream, so these are acceptable too.
+              StandardFormatNames.genericZIPFiles,
+              MIMECompatibility.applicationOctetStream
+            )
         )
 
       when (val result = LSHTTPDownloads.download(downloadRequest)) {
-        DownloadCancelled ->
+        DownloadCancelled -> {
           throw BorrowSubtaskCancelled()
+        }
 
         is DownloadFailedServer -> {
           throw BorrowHTTP.onDownloadFailedServer(
@@ -141,11 +137,13 @@ class BorrowLCPPDF : BorrowSubtaskType {
           )
         }
 
-        is DownloadFailedUnacceptableMIME ->
+        is DownloadFailedUnacceptableMIME -> {
           throw BorrowSubtaskFailed()
+        }
 
-        is DownloadFailedExceptionally ->
+        is DownloadFailedExceptionally -> {
           throw BorrowHTTP.onDownloadFailedExceptionally(context, result)
+        }
 
         is DownloadCompletedSuccessfully -> {
           this.installLicense(context, temporaryFile, licenseBytes)
@@ -204,7 +202,9 @@ class BorrowLCPPDF : BorrowSubtaskType {
           throw BorrowSubtaskFailed()
         }
 
-        is Try.Success -> lcpService.injectLicenseDocument(r.value, bookFile)
+        is Try.Success -> {
+          lcpService.injectLicenseDocument(r.value, bookFile)
+        }
       }
     }
 
@@ -243,9 +243,7 @@ class BorrowLCPPDF : BorrowSubtaskType {
    * Determine the actual book format we're aiming for at the end of the acquisition path.
    */
 
-  private fun findFormatHandle(
-    context: BorrowContextType
-  ): BookDatabaseEntryFormatHandle {
+  private fun findFormatHandle(context: BorrowContextType): BookDatabaseEntryFormatHandle {
     val eventualType = context.opdsAcquisitionPath.asMIMETypes().last()
     val formatHandle = context.bookDatabaseEntry.findFormatHandleForContentType(eventualType)
     if (formatHandle == null) {

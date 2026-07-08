@@ -5,7 +5,6 @@ import org.nypl.simplified.opds.core.OPDSFacet
 import java.io.Serializable
 
 sealed interface FeedFacet : Serializable {
-
   val title: String
 
   val isActive: Boolean
@@ -32,7 +31,8 @@ sealed interface FeedFacet : Serializable {
   data class FeedFacetOPDS12Single(
     override val accountID: AccountID,
     val opdsFacet: OPDSFacet
-  ) : FeedFacetOPDS12(), FeedFacetSingle {
+  ) : FeedFacetOPDS12(),
+    FeedFacetSingle {
     override val title: String =
       this.opdsFacet.title
     override val isActive: Boolean =
@@ -74,7 +74,6 @@ sealed interface FeedFacet : Serializable {
    */
 
   sealed class FeedFacetPseudo : FeedFacetSingle {
-
     /**
      * A filtering facet for a specific account (or for all accounts, if an account isn't provided).
      */
@@ -94,9 +93,7 @@ sealed interface FeedFacet : Serializable {
       override val isActive: Boolean,
       val sortBy: SortBy
     ) : FeedFacetPseudo() {
-
       enum class SortBy {
-
         /**
          * Sort the feed in question by author.
          */

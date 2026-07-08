@@ -9,19 +9,13 @@ import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
  */
 
 object BookFormats {
+  private fun mimeOf(name: String): MIMEType = MIMEParser.parseRaisingException(name)
 
-  private fun mimeOf(name: String): MIMEType =
-    MIMEParser.parseRaisingException(name)
+  private fun mimesOfList(names: List<String>): Set<MIMEType> = names.map(this::mimeOf).toSet()
 
-  private fun mimesOfList(names: List<String>): Set<MIMEType> =
-    names.map(this::mimeOf).toSet()
+  private fun mimesOf(vararg names: String): Set<MIMEType> = mimesOfList(names.toList())
 
-  private fun mimesOf(vararg names: String): Set<MIMEType> =
-    mimesOfList(names.toList())
-
-  private fun <T> unionOf(
-    vararg sets: Set<T>
-  ): Set<T> {
+  private fun <T> unionOf(vararg sets: Set<T>): Set<T> {
     val union = mutableSetOf<T>()
     sets.forEach { union.addAll(it) }
     return union.toSet()
@@ -76,50 +70,43 @@ object BookFormats {
    * @return A set of the MIME types that identify generic audio books
    */
 
-  fun audioBookGenericMimeTypes(): Set<MIMEType> =
-    GENERIC_AUDIO_BOOKS
+  fun audioBookGenericMimeTypes(): Set<MIMEType> = GENERIC_AUDIO_BOOKS
 
   /**
    * @return A set of the MIME types that identify Overdrive audio books
    */
 
-  fun audioBookOverdriveMimeTypes(): Set<MIMEType> =
-    OVERDRIVE_AUDIO_BOOKS
+  fun audioBookOverdriveMimeTypes(): Set<MIMEType> = OVERDRIVE_AUDIO_BOOKS
 
   /**
    * @return A set of the MIME types that identify Findaway audio books
    */
 
-  fun audioBookFindawayMimeTypes(): Set<MIMEType> =
-    FINDAWAY_AUDIO_BOOKS
+  fun audioBookFindawayMimeTypes(): Set<MIMEType> = FINDAWAY_AUDIO_BOOKS
 
   /**
    * @return A set of the supported book format MIME types
    */
 
-  fun supportedBookMimeTypes(): Set<MIMEType> =
-    SUPPORTED_BOOK_MIME_TYPES
+  fun supportedBookMimeTypes(): Set<MIMEType> = SUPPORTED_BOOK_MIME_TYPES
 
   /**
    * @return The set of MIME types for EPUBs
    */
 
-  fun epubMimeTypes(): Set<MIMEType> =
-    EPUB_MIME_TYPES
+  fun epubMimeTypes(): Set<MIMEType> = EPUB_MIME_TYPES
 
   /**
    * @return The set of MIME types for EPUBs
    */
 
-  fun audioBookMimeTypes(): Set<MIMEType> =
-    AUDIO_BOOK_MIME_TYPES
+  fun audioBookMimeTypes(): Set<MIMEType> = AUDIO_BOOK_MIME_TYPES
 
   /**
    * @return The set of MIME types for PDFs
    */
 
-  fun pdfMimeTypes(): Set<MIMEType> =
-    PDF_MIME_TYPES
+  fun pdfMimeTypes(): Set<MIMEType> = PDF_MIME_TYPES
 
   private val formats = BookFormatDefinition.values()
 
@@ -144,7 +131,6 @@ object BookFormats {
    */
 
   enum class BookFormatDefinition {
-
     /**
      * The EPUB format.
      */
@@ -152,9 +138,7 @@ object BookFormats {
     BOOK_FORMAT_EPUB {
       override val shortName: String = "epub"
 
-      override fun supportedContentTypes(): Set<MIMEType> {
-        return epubMimeTypes()
-      }
+      override fun supportedContentTypes(): Set<MIMEType> = epubMimeTypes()
     },
 
     /**
@@ -164,9 +148,7 @@ object BookFormats {
     BOOK_FORMAT_AUDIO {
       override val shortName: String = "audiobook"
 
-      override fun supportedContentTypes(): Set<MIMEType> {
-        return audioBookMimeTypes()
-      }
+      override fun supportedContentTypes(): Set<MIMEType> = audioBookMimeTypes()
     },
 
     /**
@@ -176,9 +158,7 @@ object BookFormats {
     BOOK_FORMAT_PDF {
       override val shortName: String = "pdf"
 
-      override fun supportedContentTypes(): Set<MIMEType> {
-        return pdfMimeTypes()
-      }
+      override fun supportedContentTypes(): Set<MIMEType> = pdfMimeTypes()
     };
 
     /**
@@ -197,12 +177,9 @@ object BookFormats {
      * @return `true` if the format handle supports content of the given content type
      */
 
-    fun supports(
-      contentType: MIMEType
-    ): Boolean {
-      return this.supportedContentTypes().any { supportedType ->
+    fun supports(contentType: MIMEType): Boolean =
+      this.supportedContentTypes().any { supportedType ->
         contentType.fullType == supportedType.fullType
       }
-    }
   }
 }

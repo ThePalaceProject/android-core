@@ -15,7 +15,6 @@ import java.util.UUID
  */
 
 object AccountPreferencesJSON {
-
   private val logger =
     LoggerFactory.getLogger(AccountPreferencesJSON::class.java)
 
@@ -65,20 +64,17 @@ object AccountPreferencesJSON {
    */
 
   @Throws(JSONParseException::class)
-  fun deserializeFromJSON(node: ObjectNode): AccountPreferences {
-    return AccountPreferences(
+  fun deserializeFromJSON(node: ObjectNode): AccountPreferences =
+    AccountPreferences(
       bookmarkSyncingPermitted = JSONParserUtilities.getBoolean(node, "bookmarkSyncingPermitted"),
       catalogURIOverride = JSONParserUtilities.getURIOrNull(node, "catalogURIOverride"),
       announcementsAcknowledged = this.parseAnnouncementsAcknowledged(node)
     )
-  }
 
   /**
    * Deserialize preferences from the given JSON object.
    */
 
   @Throws(JSONParseException::class)
-  fun deserializeFromJSON(node: JsonNode): AccountPreferences {
-    return this.deserializeFromJSON(JSONParserUtilities.checkObject(null, node))
-  }
+  fun deserializeFromJSON(node: JsonNode): AccountPreferences = this.deserializeFromJSON(JSONParserUtilities.checkObject(null, node))
 }

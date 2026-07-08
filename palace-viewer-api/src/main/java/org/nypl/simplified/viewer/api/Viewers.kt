@@ -22,7 +22,6 @@ import java.util.ServiceLoader
  */
 
 object Viewers {
-
   private val logger = LoggerFactory.getLogger(Viewers::class.java)
 
   private val services by lazy {
@@ -50,9 +49,7 @@ object Viewers {
    * @return `true` if the next book should fail.
    */
 
-  fun shouldFailNextBook(): Boolean {
-    return this.failNextAudioBook
-  }
+  fun shouldFailNextBook(): Boolean = this.failNextAudioBook
 
   /**
    * Attempt to open a viewer for a given book.
@@ -73,7 +70,8 @@ object Viewers {
 
     this.logger.debug("Open: {} ({})", book.id, book.entry.title)
     val providers =
-      ServiceLoader.load(ViewerProviderType::class.java)
+      ServiceLoader
+        .load(ViewerProviderType::class.java)
         .toList()
 
     this.logger.debug("{} viewer providers available", providers.size)

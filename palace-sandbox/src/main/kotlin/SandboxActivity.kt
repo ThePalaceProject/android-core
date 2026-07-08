@@ -10,9 +10,7 @@ class SandboxActivity : AppCompatActivity(R.layout.sandbox) {
   private lateinit var red: View
   private lateinit var bottomSheet: PalaceBottomSheet
 
-  override fun onCreate(
-    savedInstanceState: Bundle?
-  ) {
+  override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
     this.bottomSheet =
@@ -27,10 +25,12 @@ class SandboxActivity : AppCompatActivity(R.layout.sandbox) {
     super.onStart()
 
     this.bottomSheet.drawerCloseInstantly()
-    this.bottomSheet.setOpenListener(object : PalaceBottomSheetType.SheetOpenListenerType {
-      override fun onOpenChanged(state: Double) {
-        this@SandboxActivity.red.alpha = state.toFloat()
+    this.bottomSheet.setOpenListener(
+      object : PalaceBottomSheetType.SheetOpenListenerType {
+        override fun onOpenChanged(state: Double) {
+          this@SandboxActivity.red.alpha = state.toFloat()
+        }
       }
-    })
+    )
   }
 }

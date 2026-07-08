@@ -1,7 +1,6 @@
 package org.nypl.simplified.ui.catalog.saml20
 
 sealed class CatalogSAML20BorrowState {
-
   data object Idle : CatalogSAML20BorrowState()
 
   data class WebViewReady(

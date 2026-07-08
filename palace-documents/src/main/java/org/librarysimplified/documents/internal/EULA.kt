@@ -14,14 +14,13 @@ internal class EULA internal constructor(
   private val fileAgreed: File,
   remoteURL: URL
 ) : AbstractDocument(
-  http = http,
-  initialStreams = initialStreams,
-  file = file,
-  fileTmp = fileTmp,
-  remoteURL = remoteURL
-),
+    http = http,
+    initialStreams = initialStreams,
+    file = file,
+    fileTmp = fileTmp,
+    remoteURL = remoteURL
+  ),
   EULAType {
-
   override var hasAgreed: Boolean
     get() = this.fileAgreed.isFile
     set(value) {

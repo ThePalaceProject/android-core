@@ -18,8 +18,9 @@ import org.nypl.simplified.ui.screens.ScreenDefinitionType
 import org.nypl.simplified.ui.settings.SettingsDocumentViewerModel.DocumentTarget
 import org.nypl.simplified.webview.WebViewUtilities
 
-class SettingsDocumentViewerFragment : Fragment(), MainBackButtonConsumerType {
-
+class SettingsDocumentViewerFragment :
+  Fragment(),
+  MainBackButtonConsumerType {
   private lateinit var toolbarBack: View
   private lateinit var toolbarTitle: TextView
   private lateinit var documentWebView: WebView
@@ -33,20 +34,13 @@ class SettingsDocumentViewerFragment : Fragment(), MainBackButtonConsumerType {
         SettingsDocumentViewerModel.documentTarget = this.documentTarget
       }
 
-      override fun parameters(): DocumentTarget {
-        return this.documentTarget
-      }
+      override fun parameters(): DocumentTarget = this.documentTarget
 
-      override fun fragment(): SettingsDocumentViewerFragment {
-        return SettingsDocumentViewerFragment()
-      }
+      override fun fragment(): SettingsDocumentViewerFragment = SettingsDocumentViewerFragment()
     }
 
-    override fun createScreenDefinition(
-      p: DocumentTarget
-    ): ScreenDefinitionType<DocumentTarget, SettingsDocumentViewerFragment> {
-      return ScreenSettingsDocument(p)
-    }
+    override fun createScreenDefinition(p: DocumentTarget): ScreenDefinitionType<DocumentTarget, SettingsDocumentViewerFragment> =
+      ScreenSettingsDocument(p)
   }
 
   override fun onCreateView(
@@ -87,7 +81,5 @@ class SettingsDocumentViewerFragment : Fragment(), MainBackButtonConsumerType {
     }
   }
 
-  override fun onBackButtonPressed(): MainBackButtonConsumerType.Result {
-    return BACK_BUTTON_NOT_CONSUMED
-  }
+  override fun onBackButtonPressed(): MainBackButtonConsumerType.Result = BACK_BUTTON_NOT_CONSUMED
 }

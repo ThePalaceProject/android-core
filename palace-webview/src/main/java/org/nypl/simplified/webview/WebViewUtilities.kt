@@ -56,25 +56,21 @@ object WebViewUtilities {
    * since 1 Jan 1970).
    */
 
-  private fun webkitTimeToUnixTime(
-    time: Long
-  ): Long {
-    return (time / 1000L - 11644473600000L)
-  }
+  private fun webkitTimeToUnixTime(time: Long): Long = (time / 1000L - 11644473600000L)
 
   /**
    * Format a webkit timestamp as a string suitable for sending in an HTTP header.
    */
 
-  fun formatWebKitTimestampForHTTP(
-    timestamp: Long
-  ): String {
-    return httpDateFormatter.format(
+  fun formatWebKitTimestampForHTTP(timestamp: Long): String =
+    httpDateFormatter.format(
       webkitTimeToUnixTime(timestamp)
     )
-  }
 
-  fun setForcedDark(settings: WebSettings, configuration: Configuration) {
+  fun setForcedDark(
+    settings: WebSettings,
+    configuration: Configuration
+  ) {
     if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
       val forceDarkMode =
         if (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES) FORCE_DARK_ON else FORCE_DARK_OFF

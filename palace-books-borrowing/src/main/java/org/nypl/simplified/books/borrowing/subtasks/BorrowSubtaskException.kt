@@ -5,7 +5,6 @@ package org.nypl.simplified.books.borrowing.subtasks
  */
 
 sealed class BorrowSubtaskException : Exception() {
-
   /**
    * The subtask was cancelled and therefore none of the subtasks that follow will be executed,
    * but the borrow task as a whole won't succeed or fail (it'll be cancelled!).

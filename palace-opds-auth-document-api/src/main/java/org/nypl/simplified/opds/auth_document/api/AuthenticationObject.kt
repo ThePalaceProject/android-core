@@ -9,38 +9,32 @@ import java.net.URI
  */
 
 data class AuthenticationObject(
-
   /**
    * A URI that identifies the nature of an Authentication Flow.
    */
 
   val type: URI,
-
   /**
    * A description of the authentication object (such as "Library Barcode")
    */
 
   val description: String = "",
-
   /**
    * Optional labels for the authentication object.
    */
 
   val labels: Map<String, String> = mapOf(),
-
   /**
    * Optional input extensions.
    */
 
   val inputs: Map<String, AuthenticationObjectNYPLInput> = mapOf(),
-
   /**
    * Links for the object.
    */
 
   val links: List<Link> = listOf()
 ) {
-
   init {
     Preconditions.checkArgument(
       this.inputs.keys.all { field -> field.all { c -> c.isUpperCase() } },
@@ -53,7 +47,6 @@ data class AuthenticationObject(
   }
 
   companion object {
-
     /**
      * Alternate label for a login.
      *

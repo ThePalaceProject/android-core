@@ -42,7 +42,6 @@ import java.util.concurrent.atomic.AtomicBoolean
 class OPDSClient private constructor(
   private val parameters: OPDSClientParameters
 ) : OPDSClientType {
-
   private var topmostHandlerSubscriptions: CloseableCollectionType<ClosingResourceFailedException> =
     CloseableCollection.create()
 
@@ -111,23 +110,25 @@ class OPDSClient private constructor(
      * Note: Resources are essentially pushed onto a stack and are therefore closed in reverse order. Therefore,
      * the order of resource registrations is significant: The last resource to be pushed will be closed _first_.
      */
-    this.resources.add(AutoCloseable {
-      this.taskExecutor.awaitTermination(5L, TimeUnit.SECONDS)
-    })
-    this.resources.add(AutoCloseable {
-      this.taskExecutor.shutdown()
-    })
-    this.resources.add(AutoCloseable {
-      this.requestStack.forEach(RequestHandler::close)
-    })
+    this.resources.add(
+      AutoCloseable {
+        this.taskExecutor.awaitTermination(5L, TimeUnit.SECONDS)
+      }
+    )
+    this.resources.add(
+      AutoCloseable {
+        this.taskExecutor.shutdown()
+      }
+    )
+    this.resources.add(
+      AutoCloseable {
+        this.requestStack.forEach(RequestHandler::close)
+      }
+    )
   }
 
   companion object {
-    fun create(
-      parameters: OPDSClientParameters
-    ): OPDSClientType {
-      return OPDSClient(parameters)
-    }
+    fun create(parameters: OPDSClientParameters): OPDSClientType = OPDSClient(parameters)
   }
 
   override val state: AttributeReadableType<OPDSState> =
@@ -144,7 +145,8 @@ class OPDSClient private constructor(
 
   private inner class RequestHandler(
     val request: OPDSClientRequest
-  ) : Runnable, AutoCloseable {
+  ) : Runnable,
+    AutoCloseable {
     val state: AttributeType<OPDSState> =
       OPDSClientAttributes.attributes.withValue(Loading(this.request))
 
@@ -161,17 +163,12 @@ class OPDSClient private constructor(
       @Volatile
       lateinit var feed: Feed.FeedWithGroups
 
-      override fun feed(): Feed.FeedWithGroups {
-        return this.feed
-      }
+      override fun feed(): Feed.FeedWithGroups = this.feed
 
-      override fun refresh(): CompletableFuture<Unit> {
-        return this@OPDSClient.executeWithFuture(this@RequestHandler)
-      }
+      override fun refresh(): CompletableFuture<Unit> = this@OPDSClient.executeWithFuture(this@RequestHandler)
     }
 
     private inner class OPDSFeedHandleWithoutGroups : OPDSFeedHandleWithoutGroupsType {
-
       @Volatile
       private var positionSaved: Int = 0
 
@@ -187,13 +184,9 @@ class OPDSClient private constructor(
       val pages: SortedMap<Int, Page> =
         ConcurrentSkipListMap()
 
-      override fun pages(): Int {
-        return this.pages.size
-      }
+      override fun pages(): Int = this.pages.size
 
-      override fun page(
-        index: Int
-      ): CompletableFuture<Page> {
+      override fun page(index: Int): CompletableFuture<Page> {
         val pageFuture = CompletableFuture<Page>()
         val page = this.pages[index]
         if (page != null) {
@@ -247,12 +240,13 @@ class OPDSClient private constructor(
                 }
 
                 is Feed.FeedWithoutGroups -> {
-                  val newPage = Page(
-                    pageIndex = index,
-                    pagePrevious = if (index > 0) index - 1 else null,
-                    pageNext = if (feed.feedNext != null) index + 1 else null,
-                    data = feed
-                  )
+                  val newPage =
+                    Page(
+                      pageIndex = index,
+                      pagePrevious = if (index > 0) index - 1 else null,
+                      pageNext = if (feed.feedNext != null) index + 1 else null,
+                      data = feed
+                    )
                   this.pages[index] = newPage
                   pageFuture.complete(newPage)
                 }
@@ -263,17 +257,13 @@ class OPDSClient private constructor(
         return pageFuture
       }
 
-      override fun feed(): Feed.FeedWithoutGroups {
-        return this.feedInitial
-      }
+      override fun feed(): Feed.FeedWithoutGroups = this.feedInitial
 
       override fun scrollPositionSave(position: Int) {
         this.positionSaved = position
       }
 
-      override fun scrollPositionGet(): Int {
-        return this.positionSaved
-      }
+      override fun scrollPositionGet(): Int = this.positionSaved
 
       override fun refresh(): CompletableFuture<Unit> {
         val handler = this@RequestHandler
@@ -309,8 +299,8 @@ class OPDSClient private constructor(
       }
     }
 
-    private fun runActual() {
-      return when (this.request) {
+    private fun runActual() =
+      when (this.request) {
         is OPDSClientRequest.ExistingEntry -> {
           this.runExistingEntry(this.request)
         }
@@ -323,10 +313,10 @@ class OPDSClient private constructor(
           this.runRemoteFeed(this.request)
         }
 
-        is OPDSClientRequest.ResolvedCompositeOPDS12Facet ->
+        is OPDSClientRequest.ResolvedCompositeOPDS12Facet -> {
           this.runCompositeFacet(this.request)
+        }
       }
-    }
 
     private fun loadSingleFeedWithoutGroups(
       accountID: AccountID,
@@ -335,12 +325,14 @@ class OPDSClient private constructor(
       method: String
     ): Feed.FeedWithoutGroups {
       val feedResult =
-        this@OPDSClient.parameters.feedLoader.fetchURI(
-          accountID = accountID,
-          uri = uri,
-          credentials = credentials,
-          method = method
-        ).get()
+        this@OPDSClient
+          .parameters.feedLoader
+          .fetchURI(
+            accountID = accountID,
+            uri = uri,
+            credentials = credentials,
+            method = method
+          ).get()
 
       return when (feedResult) {
         is FeedLoaderFailedAuthentication -> {
@@ -371,15 +363,15 @@ class OPDSClient private constructor(
               )
             }
 
-            is Feed.FeedWithoutGroups -> feed
+            is Feed.FeedWithoutGroups -> {
+              feed
+            }
           }
         }
       }
     }
 
-    private fun runCompositeFacet(
-      request: OPDSClientRequest.ResolvedCompositeOPDS12Facet
-    ) {
+    private fun runCompositeFacet(request: OPDSClientRequest.ResolvedCompositeOPDS12Facet) {
       try {
         val facetPath =
           request.facet.facets.toMutableList()
@@ -395,24 +387,26 @@ class OPDSClient private constructor(
         facetPath.removeAt(0)
         for (facet in facetPath) {
           val nextFacet = findEquivalentFacet(facet, feedNow)
-          feedNow = this.loadSingleFeedWithoutGroups(
-            request.accountID,
-            nextFacet.opdsFacet.uri,
-            request.credentials,
-            request.method
-          )
+          feedNow =
+            this.loadSingleFeedWithoutGroups(
+              request.accountID,
+              nextFacet.opdsFacet.uri,
+              request.credentials,
+              request.method
+            )
         }
 
         this.handleUngrouped.feedInitial = feedNow
         this.handleUngrouped.credentials = request.credentials
         this.handleUngrouped.method = request.method
         this.handleUngrouped.pages.clear()
-        this.handleUngrouped.pages[0] = Page(
-          pageIndex = 0,
-          pagePrevious = null,
-          pageNext = if (feedNow.feedNext != null) 1 else null,
-          data = feedNow
-        )
+        this.handleUngrouped.pages[0] =
+          Page(
+            pageIndex = 0,
+            pagePrevious = null,
+            pageNext = if (feedNow.feedNext != null) 1 else null,
+            data = feedNow
+          )
         this.state.set(LoadedFeedWithoutGroups(request, this.handleUngrouped))
         this.publishedEntriesGrouped.set(listOf())
       } catch (e: Exception) {
@@ -431,10 +425,11 @@ class OPDSClient private constructor(
       feed: Feed.FeedWithoutGroups
     ): FeedFacet.FeedFacetOPDS12Single {
       val group = requestedFacet.opdsFacet.group
-      val facets = feed.facetsByGroup[group]
-        ?: throw IOException(
-          "We could not find a facet with group $group in the feed at ${feed.feedURI}"
-        )
+      val facets =
+        feed.facetsByGroup[group]
+          ?: throw IOException(
+            "We could not find a facet with group $group in the feed at ${feed.feedURI}"
+          )
 
       for (feedFacet in facets) {
         if (feedFacet.title == requestedFacet.title) {
@@ -447,9 +442,7 @@ class OPDSClient private constructor(
       )
     }
 
-    private fun runRemoteFeed(
-      request: OPDSClientRequest.NewFeed
-    ) {
+    private fun runRemoteFeed(request: OPDSClientRequest.NewFeed) {
       val future0 =
         this@OPDSClient.parameters.feedLoader.fetchURI(
           accountID = request.accountID,
@@ -491,12 +484,13 @@ class OPDSClient private constructor(
               this.handleUngrouped.credentials = request.credentials
               this.handleUngrouped.method = request.method
               this.handleUngrouped.pages.clear()
-              this.handleUngrouped.pages[0] = Page(
-                pageIndex = 0,
-                pagePrevious = null,
-                pageNext = if (feed.feedNext != null) 1 else null,
-                data = feed
-              )
+              this.handleUngrouped.pages[0] =
+                Page(
+                  pageIndex = 0,
+                  pagePrevious = null,
+                  pageNext = if (feed.feedNext != null) 1 else null,
+                  data = feed
+                )
               this.state.set(LoadedFeedWithoutGroups(request, this.handleUngrouped))
               this.publishedEntriesGrouped.set(listOf())
             }
@@ -505,9 +499,7 @@ class OPDSClient private constructor(
       }
     }
 
-    private fun runGeneratedFeed(
-      request: OPDSClientRequest.GeneratedFeed
-    ) {
+    private fun runGeneratedFeed(request: OPDSClientRequest.GeneratedFeed) {
       try {
         when (val feed = request.generator.invoke()) {
           is Feed.FeedWithGroups -> {
@@ -521,12 +513,13 @@ class OPDSClient private constructor(
             this.handleUngrouped.feedInitial = feed
             this.handleUngrouped.credentials = null
             this.handleUngrouped.method = "GET"
-            this.handleUngrouped.pages[0] = Page(
-              pageIndex = 0,
-              pagePrevious = null,
-              pageNext = null,
-              data = feed
-            )
+            this.handleUngrouped.pages[0] =
+              Page(
+                pageIndex = 0,
+                pagePrevious = null,
+                pageNext = null,
+                data = feed
+              )
             this.state.set(LoadedFeedWithoutGroups(request, this.handleUngrouped))
             this.publishedEntriesGrouped.set(listOf())
           }
@@ -542,9 +535,7 @@ class OPDSClient private constructor(
       }
     }
 
-    private fun runExistingEntry(
-      request: OPDSClientRequest.ExistingEntry
-    ) {
+    private fun runExistingEntry(request: OPDSClientRequest.ExistingEntry) {
       this.handleEntry.entry = request.entry
 
       this.state.set(
@@ -565,30 +556,30 @@ class OPDSClient private constructor(
   private fun compositeFacetException(
     request: OPDSClientRequest.ResolvedCompositeOPDS12Facet,
     throwable: Exception
-  ): PresentableErrorType {
-    return FeedLoaderFailedGeneral(
+  ): PresentableErrorType =
+    FeedLoaderFailedGeneral(
       problemReport = null,
       exception = Exception(throwable),
       message = throwable.message ?: "Unexpected error occurred.",
-      attributesInitial = mapOf(
-        Pair("AccountID", request.accountID.toString())
-      )
+      attributesInitial =
+        mapOf(
+          Pair("AccountID", request.accountID.toString())
+        )
     )
-  }
 
   private fun generatedFeedException(
     request: OPDSClientRequest.GeneratedFeed,
     throwable: Throwable
-  ): PresentableErrorType {
-    return FeedLoaderFailedGeneral(
+  ): PresentableErrorType =
+    FeedLoaderFailedGeneral(
       problemReport = null,
       exception = Exception(throwable),
       message = throwable.message ?: "Unexpected error occurred.",
-      attributesInitial = mapOf(
-        Pair("AccountID", request.accountID.toString())
-      )
+      attributesInitial =
+        mapOf(
+          Pair("AccountID", request.accountID.toString())
+        )
     )
-  }
 
   override val hasHistory: Boolean
     get() = this.requestStack.size > 1
@@ -609,9 +600,7 @@ class OPDSClient private constructor(
     return CompletableFuture.completedFuture(Unit)
   }
 
-  override fun goTo(
-    request: OPDSClientRequest
-  ): CompletableFuture<Unit> {
+  override fun goTo(request: OPDSClientRequest): CompletableFuture<Unit> {
     this.parameters.checkOnUI()
 
     val f = this.checkClosed()
@@ -675,9 +664,7 @@ class OPDSClient private constructor(
     }
   }
 
-  private fun requestPushReplacingTip(
-    handler: RequestHandler
-  ): CompletableFuture<Unit> {
+  private fun requestPushReplacingTip(handler: RequestHandler): CompletableFuture<Unit> {
     this.topmostHandlerSubscriptions.close()
     this.topmostHandlerSubscriptions = CloseableCollection.create()
 
@@ -699,9 +686,7 @@ class OPDSClient private constructor(
     return this.executeWithFuture(handler)
   }
 
-  private fun requestPush(
-    handler: RequestHandler
-  ): CompletableFuture<Unit> {
+  private fun requestPush(handler: RequestHandler): CompletableFuture<Unit> {
     this.topmostHandlerSubscriptions.close()
     this.topmostHandlerSubscriptions = CloseableCollection.create()
 
@@ -716,9 +701,7 @@ class OPDSClient private constructor(
     return this.executeWithFuture(handler)
   }
 
-  private fun executeWithFuture(
-    task: Runnable
-  ): CompletableFuture<Unit> {
+  private fun executeWithFuture(task: Runnable): CompletableFuture<Unit> {
     val future = CompletableFuture<Unit>()
     try {
       this.taskExecutor.execute {

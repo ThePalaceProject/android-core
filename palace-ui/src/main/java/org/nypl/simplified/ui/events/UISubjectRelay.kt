@@ -13,14 +13,13 @@ import org.nypl.simplified.threads.UIThread
 class UISubjectRelay<E> private constructor(
   private val subject: Subject<E>,
   private val subscription: Disposable
-) : Disposable, AutoCloseable {
-
+) : Disposable,
+  AutoCloseable {
   companion object {
-    fun <E> create(
-      source: Observable<E>
-    ): UISubjectRelay<E> {
+    fun <E> create(source: Observable<E>): UISubjectRelay<E> {
       val baseSubject =
-        PublishSubject.create<E>()
+        PublishSubject
+          .create<E>()
           .toSerialized()
       val subscription =
         source.subscribe { event ->
@@ -37,13 +36,9 @@ class UISubjectRelay<E> private constructor(
   val events: Observable<E> =
     this.subject
 
-  override fun dispose() {
-    return this.subscription.dispose()
-  }
+  override fun dispose() = this.subscription.dispose()
 
-  override fun isDisposed(): Boolean {
-    return this.subscription.isDisposed
-  }
+  override fun isDisposed(): Boolean = this.subscription.isDisposed
 
   override fun close() {
     this.dispose()

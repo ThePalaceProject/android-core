@@ -33,7 +33,6 @@ class CatalogFeedViewInfinite(
   private val callbacks: CatalogViewCallbacksType,
   private val window: Window,
 ) : CatalogFeedView() {
-
   val swipeRefresh =
     this.root.findViewById<SwipeRefreshLayout>(R.id.catalogFeedContentRefresh)
   val listView: RecyclerView =
@@ -90,7 +89,6 @@ class CatalogFeedViewInfinite(
   }
 
   companion object {
-
     private const val FACET_SORTING_NAME =
       "SORT BY"
 
@@ -100,15 +98,14 @@ class CatalogFeedViewInfinite(
       container: ViewGroup,
       catalogPart: CatalogPart,
       callbacks: CatalogViewCallbacksType,
-    ): CatalogFeedViewInfinite {
-      return CatalogFeedViewInfinite(
+    ): CatalogFeedViewInfinite =
+      CatalogFeedViewInfinite(
         callbacks = callbacks,
         catalogPart = catalogPart,
         layoutInflater = layoutInflater,
         root = layoutInflater.inflate(R.layout.catalog_feed_infinite, container, true) as ViewGroup,
         window = window,
       )
-    }
   }
 
   fun configureFacets(
@@ -237,9 +234,7 @@ class CatalogFeedViewInfinite(
    * the radio group selects a single sorting facet.
    */
 
-  private fun configureFacetsSorting(
-    groups: SortedMap<String, List<FeedFacetSingle>>
-  ) {
+  private fun configureFacetsSorting(groups: SortedMap<String, List<FeedFacetSingle>>) {
     if (!groups.containsKey(FACET_SORTING_NAME)) {
       this.catalogFeedHeaderFacetsSort.visibility = View.GONE
       return

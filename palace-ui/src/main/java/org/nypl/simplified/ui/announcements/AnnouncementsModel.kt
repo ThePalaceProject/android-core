@@ -14,7 +14,6 @@ import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
 object AnnouncementsModel {
-
   private val logger =
     LoggerFactory.getLogger(AnnouncementsModel::class.java)
 
@@ -58,7 +57,8 @@ object AnnouncementsModel {
       services.requireService(ProfilesControllerType::class.java)
 
     val subscription =
-      profiles.profileEvents()
+      profiles
+        .profileEvents()
         .ofType(ProfileUpdated::class.java)
         .subscribe { _ -> this.onProfileUpdated(profiles) }
 
@@ -83,7 +83,8 @@ object AnnouncementsModel {
         profile.account(mostRecentAccount)
 
       val newList =
-        account.preferences.announcementsAcknowledged.toSet()
+        account.preferences.announcementsAcknowledged
+          .toSet()
           .plus(id)
 
       account.setPreferences(
@@ -94,9 +95,7 @@ object AnnouncementsModel {
     }
   }
 
-  private fun onProfileUpdated(
-    profiles: ProfilesControllerType
-  ) {
+  private fun onProfileUpdated(profiles: ProfilesControllerType) {
     try {
       val profile =
         profiles.profileCurrent()
@@ -120,12 +119,13 @@ object AnnouncementsModel {
 
       for (entry in account.provider.announcements) {
         if (!this.announcementsAcknowledged.contains(entry.id)) {
-          this.announcementsUnacknowledged[entry.id] = EnumeratedAnnouncement(
-            announcement = entry,
-            providerTitle = account.provider.displayName,
-            index = index,
-            count = count
-          )
+          this.announcementsUnacknowledged[entry.id] =
+            EnumeratedAnnouncement(
+              announcement = entry,
+              providerTitle = account.provider.displayName,
+              index = index,
+              count = count
+            )
           ++index
         }
       }

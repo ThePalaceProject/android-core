@@ -29,7 +29,6 @@ import java.net.URI
 
 @ThreadSafe
 interface BookDatabaseEntryType {
-
   /**
    * @return The most recent book value for the entry
    */
@@ -95,23 +94,24 @@ interface BookDatabaseEntryType {
    * @return A reference to the given format, if one is supported
    */
 
-  fun <T : BookDatabaseEntryFormatHandle> findFormatHandle(clazz: Class<T>): T? {
-    return this.formatHandles.find { handle -> clazz.isAssignableFrom(handle.javaClass) } as T?
-  }
+  fun <T : BookDatabaseEntryFormatHandle> findFormatHandle(clazz: Class<T>): T? =
+    this.formatHandles.find { handle ->
+      clazz
+        .isAssignableFrom(handle.javaClass)
+    } as T?
 
   /**
    * @param contentType The MIME type
    * @return A reference to a format handle that has content of the given type, if any
    */
 
-  fun findFormatHandleForContentType(contentType: MIMEType): BookDatabaseEntryFormatHandle? {
-    return this.formatHandles
+  fun findFormatHandleForContentType(contentType: MIMEType): BookDatabaseEntryFormatHandle? =
+    this.formatHandles
       .find { handle ->
         handle.formatDefinition.supportedContentTypes().any { type ->
           type.fullType == contentType.fullType
         }
       }
-  }
 
   /**
    * @return The "preferred" format for the given type, if any
@@ -132,7 +132,6 @@ interface BookDatabaseEntryType {
  */
 
 sealed class BookDatabaseEntryFormatHandle {
-
   /**
    * The DRM information handle
    */
@@ -204,7 +203,6 @@ sealed class BookDatabaseEntryFormatHandle {
    */
 
   abstract class BookDatabaseEntryFormatHandleEPUB : BookDatabaseEntryFormatHandle() {
-
     abstract override val format: BookFormatEPUB
 
     override val formatDefinition: BookFormats.BookFormatDefinition =
@@ -227,7 +225,6 @@ sealed class BookDatabaseEntryFormatHandle {
    */
 
   abstract class BookDatabaseEntryFormatHandlePDF : BookDatabaseEntryFormatHandle() {
-
     abstract override val format: BookFormatPDF
 
     override val formatDefinition: BookFormats.BookFormatDefinition =
@@ -250,7 +247,6 @@ sealed class BookDatabaseEntryFormatHandle {
    */
 
   abstract class BookDatabaseEntryFormatHandleAudioBook : BookDatabaseEntryFormatHandle() {
-
     abstract override val format: BookFormatAudioBook
 
     override val formatDefinition: BookFormats.BookFormatDefinition =

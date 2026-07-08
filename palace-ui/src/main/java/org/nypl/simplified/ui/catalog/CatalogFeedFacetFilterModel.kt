@@ -8,15 +8,12 @@ import java.util.SortedMap
 class CatalogFeedFacetFilterModel private constructor(
   val facets: List<FeedFacetModel>
 ) {
-
   object CatalogFeedFacetFilterModelLog {
     internal val logger =
       LoggerFactory.getLogger(FeedFacetModel::class.java)
   }
 
-  fun createResultFacet(
-    title: String
-  ): FeedFacet {
+  fun createResultFacet(title: String): FeedFacet {
     require(this.facets.isNotEmpty()) {
       "Catalog feed facet filter models cannot work with an empty list of facets."
     }
@@ -53,16 +50,10 @@ class CatalogFeedFacetFilterModel private constructor(
     }
   }
 
-  private fun findSelectedFacetValue(
-    model: FeedFacetModel
-  ): FeedFacet {
-    return model.feedFacets[model.selectedIndex]
-  }
+  private fun findSelectedFacetValue(model: FeedFacetModel): FeedFacet = model.feedFacets[model.selectedIndex]
 
   companion object {
-    fun create(
-      groups: SortedMap<String, List<FeedFacetSingle>>
-    ): CatalogFeedFacetFilterModel {
+    fun create(groups: SortedMap<String, List<FeedFacetSingle>>): CatalogFeedFacetFilterModel {
       val facetModels = mutableListOf<FeedFacetModel>()
       for ((name, facets) in groups) {
         if (facets.isEmpty()) {
@@ -80,9 +71,7 @@ class CatalogFeedFacetFilterModel private constructor(
       return CatalogFeedFacetFilterModel(facetModels.toList())
     }
 
-    private fun initiallySelectedIndexOf(
-      facets: List<FeedFacetSingle>
-    ): Int {
+    private fun initiallySelectedIndexOf(facets: List<FeedFacetSingle>): Int {
       for ((index, facet) in facets.withIndex()) {
         if (facet.isActive) {
           return index

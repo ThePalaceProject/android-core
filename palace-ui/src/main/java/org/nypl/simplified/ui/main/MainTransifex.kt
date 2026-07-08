@@ -14,12 +14,11 @@ import java.util.Properties
  */
 
 object MainTransifex {
-
   private val logger =
     LoggerFactory.getLogger(MainTransifex::class.java)
 
-  private fun loadTransifexToken(context: Context): String? {
-    return try {
+  private fun loadTransifexToken(context: Context): String? =
+    try {
       context.assets.open("secrets.conf").use { stream ->
         val props = Properties()
         props.load(stream)
@@ -32,7 +31,6 @@ object MainTransifex {
       logger.warn("Failed to initialize Transifex", e)
       null
     }
-  }
 
   /**
    * Configure Transifex. Does nothing if the Transifex token is not present.

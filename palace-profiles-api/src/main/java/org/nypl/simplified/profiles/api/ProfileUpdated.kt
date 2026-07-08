@@ -5,7 +5,6 @@ package org.nypl.simplified.profiles.api
  */
 
 sealed class ProfileUpdated : ProfileEvent() {
-
   data class Succeeded(
     val oldDescription: ProfileDescription,
     val newDescription: ProfileDescription

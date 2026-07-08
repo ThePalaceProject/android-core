@@ -10,7 +10,5 @@ object AudioBookManifests : AudioBookManifestStrategiesType {
   override fun createStrategy(
     context: Application,
     request: AudioBookManifestRequest
-  ): AudioBookStrategyType {
-    return AudioBookStrategy(context, request)
-  }
+  ): AudioBookStrategyType = AudioBookStrategy(context, request)
 }

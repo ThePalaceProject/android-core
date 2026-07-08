@@ -18,7 +18,6 @@ class CatalogLaneItemViewHolder(
   private val coverLoader: BookCoverProviderType,
   private val callbacks: CatalogViewCallbacksType,
 ) : RecyclerView.ViewHolder(view) {
-
   private var thumbnailLoading: FluentFuture<Unit>? = null
 
   private val imageView = view.findViewById<ImageView>(R.id.coverImage)
@@ -35,16 +34,18 @@ class CatalogLaneItemViewHolder(
       this.callbacks.onBookSelected(entry)
     }
 
-    this.thumbnailLoading = coverLoader.loadThumbnailInto(
-      entry, imageView, 0, targetHeight
-    )
+    this.thumbnailLoading =
+      coverLoader.loadThumbnailInto(
+        entry, imageView, 0, targetHeight
+      )
   }
 
   fun unbind() {
-    this.thumbnailLoading = this.thumbnailLoading?.let { loading ->
-      loading.cancel(true)
-      null
-    }
+    this.thumbnailLoading =
+      this.thumbnailLoading?.let { loading ->
+        loading.cancel(true)
+        null
+      }
 
     view.contentDescription = null
     view.setOnClickListener(null)

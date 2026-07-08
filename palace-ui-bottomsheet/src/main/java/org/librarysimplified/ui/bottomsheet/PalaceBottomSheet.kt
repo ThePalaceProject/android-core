@@ -13,8 +13,9 @@ import androidx.annotation.AttrRes
 import org.slf4j.LoggerFactory
 import kotlin.math.abs
 
-class PalaceBottomSheet : FrameLayout, PalaceBottomSheetType {
-
+class PalaceBottomSheet :
+  FrameLayout,
+  PalaceBottomSheetType {
   private var handleCloseString: String = ""
   private var handleOpenString: String = ""
   private val ignoreOpenListener = IgnoreOpenListener()
@@ -50,9 +51,7 @@ class PalaceBottomSheet : FrameLayout, PalaceBottomSheetType {
     this.initializeLayout(context)
   }
 
-  private fun initializeLayout(
-    context: Context
-  ) {
+  private fun initializeLayout(context: Context) {
     View.inflate(context, R.layout.palace_bottom_sheet, this)
   }
 
@@ -240,13 +239,9 @@ class PalaceBottomSheet : FrameLayout, PalaceBottomSheetType {
     this.broadcastOpenState()
   }
 
-  override fun isOpen(): Boolean {
-    return this.isOpen
-  }
+  override fun isOpen(): Boolean = this.isOpen
 
-  override fun setOpenListener(
-    listener: PalaceBottomSheetType.SheetOpenListenerType?
-  ) {
+  override fun setOpenListener(listener: PalaceBottomSheetType.SheetOpenListenerType?) {
     if (listener == null) {
       this.openListener = this.ignoreOpenListener
     } else {

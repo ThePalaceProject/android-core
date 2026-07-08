@@ -17,20 +17,17 @@ import java.util.concurrent.Executors
  */
 
 class BootLoader<T>(
-
   /**
    * The string resources used by the boot process.
    */
 
   private val bootStringResources: (Resources) -> BootStringResourcesType,
-
   /**
    * A function that sets up services.
    */
 
   private val bootProcess: BootProcessType<T>
 ) : BootLoaderType<T> {
-
   private val logger =
     LoggerFactory.getLogger(BootLoader::class.java)
 
@@ -56,19 +53,19 @@ class BootLoader<T>(
   override val events: AttributeReadableType<BootEvent> =
     this.eventsActual
 
-  override fun start(context: Context): CompletableFuture<T> {
-    return synchronized(this.bootLock) {
+  override fun start(context: Context): CompletableFuture<T> =
+    synchronized(this.bootLock) {
       if (this.boot == null) {
         this.boot = this.runBoot(context)
       }
       this.boot!!
     }
-  }
 
   private class PresentableException(
     override val message: String,
     override val cause: Throwable
-  ) : Exception(message, cause), PresentableErrorType
+  ) : Exception(message, cause),
+    PresentableErrorType
 
   private fun runBoot(context: Context): CompletableFuture<T> {
     val future = CompletableFuture<T>()
@@ -82,18 +79,19 @@ class BootLoader<T>(
         this.logger.debug("finished executing boot")
       } catch (e: Throwable) {
         this.logger.error("boot failed: ", e)
-        val event = if (e is PresentableErrorType) {
-          BootEvent.BootFailed(
-            message = e.message,
-            exception = PresentableException(e.message, e),
-            attributes = e.attributes
-          )
-        } else {
-          BootEvent.BootFailed(
-            message = strings.bootFailedGeneric,
-            exception = PresentableException(strings.bootFailedGeneric, e)
-          )
-        }
+        val event =
+          if (e is PresentableErrorType) {
+            BootEvent.BootFailed(
+              message = e.message,
+              exception = PresentableException(e.message, e),
+              attributes = e.attributes
+            )
+          } else {
+            BootEvent.BootFailed(
+              message = strings.bootFailedGeneric,
+              exception = PresentableException(strings.bootFailedGeneric, e)
+            )
+          }
 
         this.eventsActual.set(event)
         future.completeExceptionally(event.exception)

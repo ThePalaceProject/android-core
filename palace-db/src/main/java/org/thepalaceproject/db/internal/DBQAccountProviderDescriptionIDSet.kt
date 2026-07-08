@@ -6,25 +6,25 @@ import java.net.URI
 import java.sql.ResultSet
 
 internal object DBQAccountProviderDescriptionIDSet : DBQAccountProviderDescriptionIDSetType {
-
-  private val queryText = """
+  private val queryText =
+    """
     SELECT
       apd.apd_id
     FROM account_provider_descriptions AS apd
     ORDER BY apd.apd_id
-  """.trimIndent()
+    """.trimIndent()
 
   override fun execute(
     transaction: DBTransactionType,
     parameters: Unit
-  ): Set<URI> {
-    return transaction.connection.connection.prepareStatement(queryText)
+  ): Set<URI> =
+    transaction.connection.connection
+      .prepareStatement(queryText)
       .use { statement ->
         statement.executeQuery().use { resultSet ->
           parseResults(transaction, resultSet)
         }
       }
-  }
 
   private fun parseResults(
     transaction: DBTransactionType,

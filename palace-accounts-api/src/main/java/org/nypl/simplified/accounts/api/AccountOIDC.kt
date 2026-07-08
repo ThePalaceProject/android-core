@@ -12,7 +12,6 @@ import java.util.regex.Pattern
  */
 
 object AccountOIDC {
-
   private val logger =
     LoggerFactory.getLogger(AccountOIDC::class.java)
 
@@ -34,29 +33,21 @@ object AccountOIDC {
    * The OIDC login callback URI for a given account.
    */
 
-  fun oidcCallbackLoginURI(
-    account: AccountID
-  ): URI {
-    return URI.create("${this.oidcCallbackScheme}://${this.oidcCallbackHost}/login/${account.uuid}/")
-  }
+  fun oidcCallbackLoginURI(account: AccountID): URI =
+    URI.create("${this.oidcCallbackScheme}://${this.oidcCallbackHost}/login/${account.uuid}/")
 
   /**
    * The OIDC logout callback URI for a given account.
    */
 
-  fun oidcCallbackLogoutURI(
-    account: AccountID
-  ): URI {
-    return URI.create("${this.oidcCallbackScheme}://${this.oidcCallbackHost}/logout/${account.uuid}/")
-  }
+  fun oidcCallbackLogoutURI(account: AccountID): URI =
+    URI.create("${this.oidcCallbackScheme}://${this.oidcCallbackHost}/logout/${account.uuid}/")
 
   /**
    * Check if an intent is an OIDC callback intent.
    */
 
-  fun isIntentOIDC(
-    intent: Intent
-  ): Boolean {
+  fun isIntentOIDC(intent: Intent): Boolean {
     if (intent.action != Intent.ACTION_VIEW) {
       this.logger.warn("Received an intent with action ${intent.action}. Ignoring it!")
       return false
@@ -85,9 +76,7 @@ object AccountOIDC {
   private val logoutPattern =
     Pattern.compile("^/logout/([0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12})/$")
 
-  fun parseOIDCCallback(
-    data: URI
-  ): AccountOIDCParsedCallback {
+  fun parseOIDCCallback(data: URI): AccountOIDCParsedCallback {
     val path = data.path
     val matcherLogin = loginPattern.matcher(path)
     if (matcherLogin.matches()) {
@@ -102,9 +91,7 @@ object AccountOIDC {
     throw IllegalArgumentException("Unparseable intent data: $data")
   }
 
-  private fun parseOIDCCallbackLogout(
-    matcher: Matcher
-  ): AccountOIDCParsedCallback {
+  private fun parseOIDCCallbackLogout(matcher: Matcher): AccountOIDCParsedCallback {
     val accountIDText =
       matcher.group(1)
     val accountID =

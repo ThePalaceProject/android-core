@@ -32,14 +32,11 @@ import java.net.URI
  */
 
 class BorrowAudioBook private constructor() : BorrowSubtaskType {
-
   companion object : BorrowSubtaskFactoryType {
     override val name: String
       get() = "Audio Book"
 
-    override fun createSubtask(): BorrowSubtaskType {
-      return BorrowAudioBook()
-    }
+    override fun createSubtask(): BorrowSubtaskType = BorrowAudioBook()
 
     override fun isApplicableFor(
       type: MIMEType,
@@ -90,12 +87,11 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
    * @return `true` if the request content type implies an Overdrive audio book
    */
 
-  private fun isOverdrive(
-    currentLink: Link
-  ): Boolean {
+  private fun isOverdrive(currentLink: Link): Boolean {
     val type = currentLink.type ?: return false
 
-    return BookFormats.audioBookOverdriveMimeTypes()
+    return BookFormats
+      .audioBookOverdriveMimeTypes()
       .map { it.fullType }
       .contains(type.fullType)
   }
@@ -189,11 +185,12 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
     userName: AccountUsername,
     password: AccountPassword
   ): OPAUsernamePassword {
-    val password = if (password.value.isBlank()) {
-      OPAPassword.NotRequired
-    } else {
-      OPAPassword.Password(password.value)
-    }
+    val password =
+      if (password.value.isBlank()) {
+        OPAPassword.NotRequired
+      } else {
+        OPAPassword.Password(password.value)
+      }
     return OPAUsernamePassword(
       userName = userName.value,
       password = password
@@ -205,9 +202,10 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
     data: DownloadedManifest
   ) {
     context.taskRecorder.beginNewStep("Saving book...")
-    val formatHandle = context.bookDatabaseEntry.findFormatHandleForContentType(
-      contentType = context.currentAcquisitionPathElement.mimeType
-    )
+    val formatHandle =
+      context.bookDatabaseEntry.findFormatHandleForContentType(
+        contentType = context.currentAcquisitionPathElement.mimeType
+      )
 
     return when (formatHandle) {
       is BookDatabaseEntryFormatHandleAudioBook -> {

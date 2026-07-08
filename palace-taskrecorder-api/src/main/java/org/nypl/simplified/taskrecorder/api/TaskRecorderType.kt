@@ -7,7 +7,6 @@ import org.librarysimplified.http.api.LSHTTPResponseProperties
  */
 
 interface TaskRecorderType {
-
   /**
    * Add an attribute to the task.
    */

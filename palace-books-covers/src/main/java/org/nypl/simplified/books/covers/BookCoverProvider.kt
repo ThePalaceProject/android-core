@@ -30,7 +30,6 @@ class BookCoverProvider private constructor(
   private val picasso: Picasso,
   private val badgeLookup: BookCoverBadgeLookupType
 ) : BookCoverProviderType {
-
   private val logger: Logger = LoggerFactory.getLogger(BookCoverProvider::class.java)
   private val coverTag: String = "cover"
   private val thumbnailTag: String = "thumbnail"
@@ -59,38 +58,41 @@ class BookCoverProvider private constructor(
     val future = SettableFuture.create<Unit>()
     val uriGenerated = this.generateCoverURI(entry)
 
-    val callbackFinal = object : Callback {
-      override fun onSuccess() {
-        future.set(Unit)
-      }
+    val callbackFinal =
+      object : Callback {
+        override fun onSuccess() {
+          future.set(Unit)
+        }
 
-      override fun onError(e: Exception) {
-        val ioException =
-          IOException(
-            StringBuilder(128)
-              .append("Failed to load image.\n")
-              .append("  URI (specified): ")
-              .append(uriSpecified)
-              .append('\n')
-              .append("  URI (generated): ")
-              .append(uriGenerated)
-              .append('\n')
-              .toString(),
-            e
-          )
+        override fun onError(e: Exception) {
+          val ioException =
+            IOException(
+              StringBuilder(128)
+                .append("Failed to load image.\n")
+                .append("  URI (specified): ")
+                .append(uriSpecified)
+                .append('\n')
+                .append("  URI (generated): ")
+                .append(uriGenerated)
+                .append('\n')
+                .toString(),
+              e
+            )
 
-        future.setException(ioException)
+          future.setException(ioException)
+        }
       }
-    }
 
     val badgePainter = BookCoverBadgePainter(entry, this.badgeLookup)
     if (uriSpecified != null) {
       this.logger.debug("{}: {}: loading specified uri {}", tag, entry.bookID, uriSpecified)
 
-      val requestCreator = this.picasso.load(uriSpecified.toString())
-        .tag(tag)
-        .error(R.drawable.cover_error)
-        .placeholder(R.drawable.cover_loading)
+      val requestCreator =
+        this.picasso
+          .load(uriSpecified.toString())
+          .tag(tag)
+          .error(R.drawable.cover_error)
+          .placeholder(R.drawable.cover_loading)
 
       if (width > 0 || height > 0) {
         requestCreator.resize(width, height)
@@ -104,10 +106,12 @@ class BookCoverProvider private constructor(
     } else {
       this.logger.debug("{}: {}: loading generated uri {}", tag, entry.bookID, uriGenerated)
 
-      val requestCreator = this.picasso.load(uriGenerated.toString())
-        .tag(tag)
-        .error(R.drawable.cover_error)
-        .placeholder(R.drawable.cover_loading)
+      val requestCreator =
+        this.picasso
+          .load(uriGenerated.toString())
+          .tag(tag)
+          .error(R.drawable.cover_error)
+          .placeholder(R.drawable.cover_loading)
 
       if (width > 0 || height > 0) {
         requestCreator.resize(width, height)
@@ -131,24 +135,31 @@ class BookCoverProvider private constructor(
     this.picasso
       .load(coverURI?.toString())
       .error(defaultResource)
-      .into(object : Target {
+      .into(
+        object : Target {
+          override fun onBitmapLoaded(
+            bitmap: Bitmap,
+            from: Picasso.LoadedFrom
+          ) {
+            onBitmapLoaded(bitmap)
+          }
 
-        override fun onBitmapLoaded(bitmap: Bitmap, from: Picasso.LoadedFrom) {
-          onBitmapLoaded(bitmap)
-        }
+          override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
+            placeHolderDrawable?.let {
+              onBitmapLoaded(getBitmapFromDrawable(it))
+            }
+          }
 
-        override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-          placeHolderDrawable?.let {
-            onBitmapLoaded(getBitmapFromDrawable(it))
+          override fun onBitmapFailed(
+            e: Exception?,
+            errorDrawable: Drawable?
+          ) {
+            errorDrawable?.let {
+              onBitmapLoaded(getBitmapFromDrawable(it))
+            }
           }
         }
-
-        override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-          errorDrawable?.let {
-            onBitmapLoaded(getBitmapFromDrawable(it))
-          }
-        }
-      })
+      )
   }
 
   private fun getBitmapFromDrawable(drawable: Drawable): Bitmap {
@@ -158,15 +169,16 @@ class BookCoverProvider private constructor(
       }
     }
 
-    val bitmap: Bitmap = if (drawable.intrinsicWidth <= 0 || drawable.intrinsicHeight <= 0) {
-      Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
-    } else {
-      Bitmap.createBitmap(
-        drawable.intrinsicWidth,
-        drawable.intrinsicHeight,
-        Bitmap.Config.ARGB_8888
-      )
-    }
+    val bitmap: Bitmap =
+      if (drawable.intrinsicWidth <= 0 || drawable.intrinsicHeight <= 0) {
+        Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+      } else {
+        Bitmap.createBitmap(
+          drawable.intrinsicWidth,
+          drawable.intrinsicHeight,
+          Bitmap.Config.ARGB_8888
+        )
+      }
 
     val canvas = Canvas(bitmap)
     drawable.setBounds(0, 0, canvas.width, canvas.height)
@@ -191,8 +203,8 @@ class BookCoverProvider private constructor(
     imageView: ImageView,
     width: Int,
     height: Int
-  ): FluentFuture<Unit> {
-    return doLoad(
+  ): FluentFuture<Unit> =
+    doLoad(
       entry = entry,
       imageView = imageView,
       hasBadge = true,
@@ -201,7 +213,6 @@ class BookCoverProvider private constructor(
       tag = thumbnailTag,
       uriSpecified = thumbnailURIOf(entry)
     )
-  }
 
   override fun loadCoverInto(
     entry: FeedEntry.FeedEntryOPDS,
@@ -209,8 +220,8 @@ class BookCoverProvider private constructor(
     hasBadge: Boolean,
     width: Int,
     height: Int
-  ): FluentFuture<Unit> {
-    return doLoad(
+  ): FluentFuture<Unit> =
+    doLoad(
       entry = entry,
       imageView = imageView,
       hasBadge = hasBadge,
@@ -219,7 +230,6 @@ class BookCoverProvider private constructor(
       tag = coverTag,
       uriSpecified = coverURIOf(entry)
     )
-  }
 
   override fun loadCoverAsBitmap(
     entry: FeedEntry.FeedEntryOPDS,
@@ -254,7 +264,6 @@ class BookCoverProvider private constructor(
   }
 
   companion object {
-
     /**
      * Create a new cover provider.
      *

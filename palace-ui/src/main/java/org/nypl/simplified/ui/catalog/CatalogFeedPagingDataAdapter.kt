@@ -51,7 +51,6 @@ class CatalogFeedPagingDataAdapter(
   private val registryEvents: CatalogBookRegistryEvents,
   private val callbacks: CatalogViewCallbacksType,
 ) : PagingDataAdapter<FeedEntry, CatalogFeedPagingDataAdapter.ViewHolder>(this.diffCallback) {
-
   companion object {
     private val loanEndFormatter =
       DateTimeFormat.forPattern("MMM d, yyyy")
@@ -61,16 +60,12 @@ class CatalogFeedPagingDataAdapter(
         override fun areContentsTheSame(
           oldItem: FeedEntry,
           newItem: FeedEntry
-        ): Boolean {
-          return oldItem == newItem
-        }
+        ): Boolean = oldItem == newItem
 
         override fun areItemsTheSame(
           oldItem: FeedEntry,
           newItem: FeedEntry
-        ): Boolean {
-          return oldItem.bookID == newItem.bookID
-        }
+        ): Boolean = oldItem.bookID == newItem.bookID
       }
   }
 
@@ -78,7 +73,6 @@ class CatalogFeedPagingDataAdapter(
     private val view: View,
     private val callbacks: CatalogViewCallbacksType,
   ) : RecyclerView.ViewHolder(view) {
-
     private var subscription: Disposable? = null
     private var feedEntry: FeedEntry? = null
 
@@ -151,9 +145,7 @@ class CatalogFeedPagingDataAdapter(
       this.progressText.setOnClickListener(null)
     }
 
-    fun bind(
-      item: FeedEntry
-    ) {
+    fun bind(item: FeedEntry) {
       this.feedEntry = item
       Views.setVisible(this.progress, false)
       Views.setVisible(this.idle, true)
@@ -173,7 +165,8 @@ class CatalogFeedPagingDataAdapter(
 
         is FeedEntry.FeedEntryOPDS -> {
           this.subscription =
-            this@CatalogFeedPagingDataAdapter.registryEvents.events
+            this@CatalogFeedPagingDataAdapter
+              .registryEvents.events
               .ofType(BookStatusEventChanged::class.java)
               .filter { event -> event.bookId == item.bookID }
               .subscribe { event -> this.onStatusChangedForFeedEntry(item) }
@@ -209,9 +202,7 @@ class CatalogFeedPagingDataAdapter(
       }
     }
 
-    private fun onStatusChangedForFeedEntry(
-      item: FeedEntry.FeedEntryOPDS
-    ) {
+    private fun onStatusChangedForFeedEntry(item: FeedEntry.FeedEntryOPDS) {
       val status =
         CatalogBookStatus.create(
           this@CatalogFeedPagingDataAdapter.registryEvents.registry,
@@ -221,10 +212,8 @@ class CatalogFeedPagingDataAdapter(
       this.onStatusChanged(BookWithStatus(status.book, status.status))
     }
 
-    private fun onStatusChanged(
-      bookWithStatus: BookWithStatus
-    ) {
-      return when (val status = bookWithStatus.status) {
+    private fun onStatusChanged(bookWithStatus: BookWithStatus) =
+      when (val status = bookWithStatus.status) {
         is DownloadExternalAuthenticationInProgress -> {
           this.onStatusChangedDownloadExternalAuthenticationInProgress(bookWithStatus.book)
         }
@@ -305,11 +294,8 @@ class CatalogFeedPagingDataAdapter(
           this.onBookStatusFailedDownloadBadCredentials(bookWithStatus.book, status)
         }
       }
-    }
 
-    private fun onStatusDownloadWaitingForExternalAuthentication(
-      book: Book
-    ) {
+    private fun onStatusDownloadWaitingForExternalAuthentication(book: Book) {
       Views.setVisible(this.corrupt, false)
       Views.setVisible(this.error, false)
       Views.setVisible(this.idle, false)
@@ -319,9 +305,7 @@ class CatalogFeedPagingDataAdapter(
       this.progressProgress.isIndeterminate = true
     }
 
-    private fun onStatusChangedDownloadExternalAuthenticationInProgress(
-      book: Book
-    ) {
+    private fun onStatusChangedDownloadExternalAuthenticationInProgress(book: Book) {
       Views.setVisible(this.corrupt, false)
       Views.setVisible(this.error, false)
       Views.setVisible(this.idle, false)
@@ -393,9 +377,7 @@ class CatalogFeedPagingDataAdapter(
       }
     }
 
-    private fun onBookBorrow(
-      book: Book
-    ) {
+    private fun onBookBorrow(book: Book) {
       this.callbacks.onBookRequestBorrow(
         CatalogBorrowParameters(
           accountID = book.account,
@@ -672,9 +654,7 @@ class CatalogFeedPagingDataAdapter(
       }
     }
 
-    private fun setIdleTime(
-      loanDuration: DateTime?
-    ) {
+    private fun setIdleTime(loanDuration: DateTime?) {
       if (loanDuration != null) {
         val now = DateTime.now()
         val days = Days.daysBetween(now, loanDuration)
@@ -807,15 +787,14 @@ class CatalogFeedPagingDataAdapter(
       Views.setVisible(this.progress, false)
     }
 
-    private fun getLoanDuration(
-      book: Book
-    ): DateTime? {
+    private fun getLoanDuration(book: Book): DateTime? {
       val status = BookStatus.fromBook(book)
       return if (status is Loaned.LoanedDownloaded ||
         status is Loaned.LoanedNotDownloaded
       ) {
-        val endDate = (status as? Loaned.LoanedDownloaded)?.loanExpiryDate
-          ?: (status as? Loaned.LoanedNotDownloaded)?.loanExpiryDate
+        val endDate =
+          (status as? Loaned.LoanedDownloaded)?.loanExpiryDate
+            ?: (status as? Loaned.LoanedNotDownloaded)?.loanExpiryDate
 
         endDate
       } else {
@@ -829,21 +808,18 @@ class CatalogFeedPagingDataAdapter(
     viewType: Int
   ): ViewHolder {
     val view =
-      LayoutInflater.from(parent.context)
+      LayoutInflater
+        .from(parent.context)
         .inflate(R.layout.book_cell, parent, false)
 
     return this.ViewHolder(view, this.callbacks)
   }
 
-  override fun onViewRecycled(
-    holder: ViewHolder
-  ) {
+  override fun onViewRecycled(holder: ViewHolder) {
     holder.unbind()
   }
 
-  override fun onDetachedFromRecyclerView(
-    recyclerView: RecyclerView
-  ) {
+  override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
     // Nothing yet.
   }
 

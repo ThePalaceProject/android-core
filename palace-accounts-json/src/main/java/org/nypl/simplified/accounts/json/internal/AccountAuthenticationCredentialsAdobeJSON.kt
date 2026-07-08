@@ -10,10 +10,7 @@ import org.nypl.simplified.accounts.api.AccountAuthenticationAdobePreActivationC
 import org.nypl.simplified.json.core.JSONParserUtilities
 
 object AccountAuthenticationCredentialsAdobeJSON {
-
-  fun deserializeAdobeCredentials(
-    credsObj: ObjectNode
-  ): AccountAuthenticationAdobePreActivationCredentials {
+  fun deserializeAdobeCredentials(credsObj: ObjectNode): AccountAuthenticationAdobePreActivationCredentials {
     val activation =
       JSONParserUtilities.getObjectOrNull(credsObj, "activation")
 

@@ -9,21 +9,17 @@ import java.util.UUID
 
 data class ProfileID(
   val uuid: UUID
-) : Serializable, Comparable<ProfileID> {
+) : Serializable,
+  Comparable<ProfileID> {
+  override fun compareTo(other: ProfileID): Int = this.uuid.compareTo(other.uuid)
 
-  override fun compareTo(other: ProfileID): Int =
-    this.uuid.compareTo(other.uuid)
-
-  override fun toString(): String =
-    this.uuid.toString()
+  override fun toString(): String = this.uuid.toString()
 
   companion object {
-
     /**
      * Generate a random profile ID.
      */
 
-    fun generate(): ProfileID =
-      ProfileID(UUID.randomUUID())
+    fun generate(): ProfileID = ProfileID(UUID.randomUUID())
   }
 }

@@ -9,7 +9,6 @@ import org.slf4j.MDC
  */
 
 object MDCKeys {
-
   /**
    * The external ID of the current account provider as it appeared in the library registry.
    */
@@ -91,7 +90,10 @@ object MDCKeys {
    * Convenience function to set optional values.
    */
 
-  fun put(key: String, value: String?) {
+  fun put(
+    key: String,
+    value: String?
+  ) {
     if (value != null) {
       MDC.put(key, value)
     }

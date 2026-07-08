@@ -16,10 +16,7 @@ class BookCoverBadgePainter(
   val entry: FeedEntry.FeedEntryOPDS,
   val badges: BookCoverBadgeLookupType
 ) : Transformation {
-
-  override fun key(): String {
-    return "org.nypl.simplified.books.covers.BookCoverBadgePainter"
-  }
+  override fun key(): String = "org.nypl.simplified.books.covers.BookCoverBadgePainter"
 
   override fun transform(source: Bitmap): Bitmap {
     val badge = this.badges.badgeForEntry(this.entry) ?: return source

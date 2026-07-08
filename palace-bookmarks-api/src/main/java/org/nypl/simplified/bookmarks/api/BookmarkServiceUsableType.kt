@@ -13,7 +13,6 @@ import java.util.concurrent.CompletableFuture
  */
 
 interface BookmarkServiceUsableType {
-
   /**
    * An observable that publishes events about bookmarks.
    */
@@ -36,9 +35,7 @@ interface BookmarkServiceUsableType {
   /**
    * Sync the bookmarks for the given account.
    */
-  fun bookmarkSyncAccount(
-    accountID: AccountID
-  ): CompletableFuture<List<SerializedBookmark>>
+  fun bookmarkSyncAccount(accountID: AccountID): CompletableFuture<List<SerializedBookmark>>
 
   /**
    * The user wants to load all bookmarks for all books in all accounts.

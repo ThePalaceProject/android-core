@@ -11,13 +11,11 @@ import java.net.URI
  */
 
 class PatronUserProfileParsers : PatronUserProfileParsersType {
-
   private val mapper = ObjectMapper()
 
   override fun createParser(
     uri: URI,
     stream: InputStream,
     warningsAsErrors: Boolean
-  ): PatronUserProfileParserType =
-    PatronUserProfileParser(this.mapper, uri, stream, warningsAsErrors)
+  ): PatronUserProfileParserType = PatronUserProfileParser(this.mapper, uri, stream, warningsAsErrors)
 }

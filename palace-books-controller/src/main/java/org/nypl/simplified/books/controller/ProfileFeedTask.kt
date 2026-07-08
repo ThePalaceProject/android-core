@@ -28,7 +28,6 @@ internal class ProfileFeedTask(
   private val profiles: ProfilesControllerType,
   private val request: ProfileFeedRequest
 ) : Callable<Feed.FeedWithoutGroups> {
-
   private val logger =
     LoggerFactory.getLogger(ProfileFeedTask::class.java)
 
@@ -84,7 +83,8 @@ internal class ProfileFeedTask(
     val accountId = this.request.filterByAccountID
     if (accountId != null) {
       val account =
-        this.profiles.profileCurrent()
+        this.profiles
+          .profileCurrent()
           .account(accountId)
 
       return account.provider.displayName
@@ -105,7 +105,11 @@ internal class ProfileFeedTask(
 
   private fun makeFilteringFacets(): Pair<String, List<FeedFacetSingle>> {
     val facets = mutableListOf<FeedFacetSingle>()
-    val accounts = this.profiles.profileCurrent().accounts().values
+    val accounts =
+      this.profiles
+        .profileCurrent()
+        .accounts()
+        .values
     for (account in accounts) {
       val active = account.id == this.request.filterByAccountID
       val title = account.provider.displayName
@@ -262,8 +266,8 @@ internal class ProfileFeedTask(
     return ArrayList(allBooks)
   }
 
-  private fun accountIsLoggedIn(accountID: AccountID): Boolean {
-    return try {
+  private fun accountIsLoggedIn(accountID: AccountID): Boolean =
+    try {
       val account = this.profiles.profileCurrent().account(accountID)
       if (!account.provider.authentication.isLoginPossible) {
         true
@@ -274,15 +278,15 @@ internal class ProfileFeedTask(
     } catch (e: Exception) {
       false
     }
-  }
 
-  private fun usableForBooksFeed(status: BookStatus): Boolean {
-    return when (status) {
+  private fun usableForBooksFeed(status: BookStatus): Boolean =
+    when (status) {
       is BookStatus.Held,
       is BookStatus.Holdable,
       is BookStatus.Loanable,
-      is BookStatus.Revoked ->
+      is BookStatus.Revoked -> {
         false
+      }
 
       is BookStatus.DownloadExternalAuthenticationInProgress,
       is BookStatus.DownloadWaitingForExternalAuthentication,
@@ -297,15 +301,16 @@ internal class ProfileFeedTask(
       is BookStatus.ReachedLoanLimit,
       is BookStatus.RequestingDownload,
       is BookStatus.RequestingLoan,
-      is BookStatus.RequestingRevoke ->
+      is BookStatus.RequestingRevoke -> {
         true
+      }
     }
-  }
 
-  private fun usableForHoldsFeed(status: BookStatus): Boolean {
-    return when (status) {
-      is BookStatus.Held ->
+  private fun usableForHoldsFeed(status: BookStatus): Boolean =
+    when (status) {
+      is BookStatus.Held -> {
         true
+      }
 
       is BookStatus.DownloadExternalAuthenticationInProgress,
       is BookStatus.DownloadWaitingForExternalAuthentication,
@@ -323,10 +328,10 @@ internal class ProfileFeedTask(
       is BookStatus.RequestingDownload,
       is BookStatus.RequestingLoan,
       is BookStatus.RequestingRevoke,
-      is BookStatus.Revoked ->
+      is BookStatus.Revoked -> {
         false
+      }
     }
-  }
 
   /**
    * @return `true` if any of the given search terms match the given book, or the list of
@@ -360,12 +365,9 @@ internal class ProfileFeedTask(
     return false
   }
 
-  private fun selectFeedFilter(
-    request: ProfileFeedRequest
-  ): (BookStatus) -> Boolean {
-    return when (request.feedSelection) {
+  private fun selectFeedFilter(request: ProfileFeedRequest): (BookStatus) -> Boolean =
+    when (request.feedSelection) {
       BOOKS_FEED_LOANED -> ::usableForBooksFeed
       BOOKS_FEED_HOLDS -> ::usableForHoldsFeed
     }
-  }
 }

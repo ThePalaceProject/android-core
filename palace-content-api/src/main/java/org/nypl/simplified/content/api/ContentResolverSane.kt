@@ -12,12 +12,10 @@ import java.net.URI
 class ContentResolverSane(
   private val delegate: ContentResolver
 ) : ContentResolverType {
-
-  override fun openInputStream(uri: URI): InputStream? {
-    return if (uri.scheme == "content") {
+  override fun openInputStream(uri: URI): InputStream? =
+    if (uri.scheme == "content") {
       this.delegate.openInputStream(Uri.parse(uri.toString()))
     } else {
       throw IllegalArgumentException("$uri is not a content URI")
     }
-  }
 }

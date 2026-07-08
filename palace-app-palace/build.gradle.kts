@@ -71,15 +71,17 @@ project.tasks.register("CheckReleaseRequiredAssetsCreate", Task::class.java) {
 }
 
 project.tasks.register("CheckReleaseRequiredAssets", Exec::class.java) {
-    commandLine = arrayListOf(
-        "java",
-        "$rootDir/org.thepalaceproject.android.platform/ZipCheck.java",
-        "${project.projectDir}/build/outputs/apk/release/palace-app-palace-release.apk",
-        "$palaceAssetsRequiredFile",
-    )
+    commandLine =
+        arrayListOf(
+            "java",
+            "$rootDir/org.thepalaceproject.android.platform/ZipCheck.java",
+            "${project.projectDir}/build/outputs/apk/release/palace-app-palace-release.apk",
+            "$palaceAssetsRequiredFile",
+        )
 }
 
-project.tasks.findByName("CheckReleaseRequiredAssetsCreate")
+project.tasks
+    .findByName("CheckReleaseRequiredAssetsCreate")
     ?.finalizedBy("CheckReleaseRequiredAssets")
 
 /*
@@ -95,17 +97,18 @@ val palaceKeyPassword =
 val palaceStorePassword =
     project.findProperty("org.thepalaceproject.storePassword") as String?
 
-val requiredSigningTask = project.tasks.register("CheckReleaseSigningInformation", Task::class.java) {
-    if (palaceKeyAlias == null) {
-        throw GradleException("org.thepalaceproject.keyAlias is not specified.")
+val requiredSigningTask =
+    project.tasks.register("CheckReleaseSigningInformation", Task::class.java) {
+        if (palaceKeyAlias == null) {
+            throw GradleException("org.thepalaceproject.keyAlias is not specified.")
+        }
+        if (palaceKeyPassword == null) {
+            throw GradleException("org.thepalaceproject.keyPassword is not specified.")
+        }
+        if (palaceStorePassword == null) {
+            throw GradleException("org.thepalaceproject.storePassword is not specified.")
+        }
     }
-    if (palaceKeyPassword == null) {
-        throw GradleException("org.thepalaceproject.keyPassword is not specified.")
-    }
-    if (palaceStorePassword == null) {
-        throw GradleException("org.thepalaceproject.storePassword is not specified.")
-    }
-}
 
 val versionNameText =
     project.findProperty("VERSION_NAME") as String
@@ -155,12 +158,13 @@ android {
         jniLibs {
             keepDebugSymbols += "lib/**/*.so"
 
-            pickFirsts += setOf(
-                "lib/arm64-v8a/libc++_shared.so",
-                "lib/armeabi-v7a/libc++_shared.so",
-                "lib/x86/libc++_shared.so",
-                "lib/x86_64/libc++_shared.so",
-            )
+            pickFirsts +=
+                setOf(
+                    "lib/arm64-v8a/libc++_shared.so",
+                    "lib/armeabi-v7a/libc++_shared.so",
+                    "lib/x86/libc++_shared.so",
+                    "lib/x86_64/libc++_shared.so",
+                )
         }
     }
 
@@ -176,12 +180,13 @@ android {
     buildTypes {
         debug {
             ndk {
-                abiFilters += setOf(
-                    "x86",
-                    "x86_64",
-                    "arm64-v8a",
-                    "armeabi-v7a",
-                )
+                abiFilters +=
+                    setOf(
+                        "x86",
+                        "x86_64",
+                        "arm64-v8a",
+                        "armeabi-v7a",
+                    )
             }
 
             versionNameSuffix = "-debug"
@@ -189,10 +194,11 @@ android {
 
         release {
             ndk {
-                abiFilters += setOf(
-                    "arm64-v8a",
-                    "armeabi-v7a",
-                )
+                abiFilters +=
+                    setOf(
+                        "arm64-v8a",
+                        "armeabi-v7a",
+                    )
             }
 
             signingConfig = signingConfigs.getByName("release")

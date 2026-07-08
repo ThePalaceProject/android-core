@@ -9,7 +9,6 @@ import java.net.URI
  */
 
 interface BookCoverGeneratorType {
-
   /**
    * Generate an image synchronously.
    *

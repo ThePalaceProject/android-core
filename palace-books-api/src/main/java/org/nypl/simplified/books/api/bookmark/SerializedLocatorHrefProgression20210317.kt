@@ -17,14 +17,12 @@ data class SerializedLocatorHrefProgression20210317(
    */
 
   val chapterHref: String,
-
   /**
    * The progress through the chapter.
    */
 
   val chapterProgress: Double,
 ) : SerializedLocator() {
-
   init {
     check(this.chapterProgress >= 0.0) {
       "Chapter progress ${this.chapterProgress} must be in [0.0, 1.0]"
@@ -40,9 +38,7 @@ data class SerializedLocatorHrefProgression20210317(
   override val typeVersion: Int
     get() = 20210317
 
-  override fun toJSON(
-    objectMapper: ObjectMapper
-  ): ObjectNode {
+  override fun toJSON(objectMapper: ObjectMapper): ObjectNode {
     val root = objectMapper.createObjectNode()
     root.put("@type", this.typeName)
     root.put("@version", this.typeVersion)
@@ -51,9 +47,7 @@ data class SerializedLocatorHrefProgression20210317(
     return root
   }
 
-  override fun addToDigest(
-    digest: MessageDigest
-  ) {
+  override fun addToDigest(digest: MessageDigest) {
     digest.update(this.chapterHref.toByteArray(UTF_8))
     digest.update(String.format("%.6f", this.chapterProgress).toByteArray(UTF_8))
   }

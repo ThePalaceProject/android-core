@@ -12,7 +12,6 @@ import android.widget.ProgressBar
 class CatalogSAML20ChromeClient(
   private val progress: ProgressBar
 ) : WebChromeClient() {
-
   override fun onProgressChanged(
     view: WebView,
     newProgress: Int

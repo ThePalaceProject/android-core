@@ -15,7 +15,6 @@ import java.time.OffsetDateTime
 
 @ThreadSafe
 interface AccountProviderType : Comparable<AccountProviderType> {
-
   /**
    * @return The account provider URI
    */
@@ -145,16 +144,16 @@ interface AccountProviderType : Comparable<AccountProviderType> {
    * @return The correct catalog URI for the given age
    */
 
-  fun catalogURIForAge(age: Int): URI {
-    return when (this.authentication) {
+  fun catalogURIForAge(age: Int): URI =
+    when (this.authentication) {
       is AccountProviderAuthenticationDescription.OpenIDConnect,
       is AccountProviderAuthenticationDescription.SAML2_0,
       AccountProviderAuthenticationDescription.Anonymous,
       is AccountProviderAuthenticationDescription.Basic,
-      is AccountProviderAuthenticationDescription.BasicToken ->
+      is AccountProviderAuthenticationDescription.BasicToken -> {
         this.catalogURI
+      }
     }
-  }
 
   /**
    * @return The time that this account provider was most recently updated
@@ -167,24 +166,28 @@ interface AccountProviderType : Comparable<AccountProviderType> {
    */
 
   val supportsBarcodeDisplay: Boolean
-    get() = when (val auth = this.authentication) {
-      is AccountProviderAuthenticationDescription.OpenIDConnect,
-      is AccountProviderAuthenticationDescription.SAML2_0,
-      AccountProviderAuthenticationDescription.Anonymous ->
-        false
-      is AccountProviderAuthenticationDescription.Basic -> {
-        when (auth.barcodeFormat) {
-          "Codabar" -> true
-          else -> false
+    get() =
+      when (val auth = this.authentication) {
+        is AccountProviderAuthenticationDescription.OpenIDConnect,
+        is AccountProviderAuthenticationDescription.SAML2_0,
+        AccountProviderAuthenticationDescription.Anonymous -> {
+          false
+        }
+
+        is AccountProviderAuthenticationDescription.Basic -> {
+          when (auth.barcodeFormat) {
+            "Codabar" -> true
+            else -> false
+          }
+        }
+
+        is AccountProviderAuthenticationDescription.BasicToken -> {
+          when (auth.barcodeFormat) {
+            "Codabar" -> true
+            else -> false
+          }
         }
       }
-      is AccountProviderAuthenticationDescription.BasicToken -> {
-        when (auth.barcodeFormat) {
-          "Codabar" -> true
-          else -> false
-        }
-      }
-    }
 
   /**
    * @return A list of the most recently published announcements
@@ -243,13 +246,16 @@ interface AccountProviderType : Comparable<AccountProviderType> {
     return accountProviderDescription
   }
 
-  private fun addLink(links: MutableList<Link>, uri: URI, relation: String): Boolean {
-    return links.add(
+  private fun addLink(
+    links: MutableList<Link>,
+    uri: URI,
+    relation: String
+  ): Boolean =
+    links.add(
       Link.LinkBasic(
         href = uri,
         type = null,
         relation = relation
       )
     )
-  }
 }

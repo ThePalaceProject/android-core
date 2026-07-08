@@ -9,7 +9,6 @@ import java.net.URI
  */
 
 sealed class BorrowSubtaskCredentials {
-
   data object UseAccountCredentials : BorrowSubtaskCredentials()
 
   data class UseBearerToken(

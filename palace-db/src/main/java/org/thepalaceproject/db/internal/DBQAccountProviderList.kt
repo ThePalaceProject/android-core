@@ -6,8 +6,8 @@ import org.thepalaceproject.db.api.queries.DBQAccountProviderListType
 import java.sql.ResultSet
 
 internal object DBQAccountProviderList : DBQAccountProviderListType {
-
-  private val queryTextWithStart = """
+  private val queryTextWithStart =
+    """
     SELECT
       ap.ap_id,
       ap.ap_updated_time_last,
@@ -17,9 +17,10 @@ internal object DBQAccountProviderList : DBQAccountProviderListType {
     WHERE ap.ap_id > ?
     ORDER BY ap.ap_id
     LIMIT ?
-  """.trimIndent()
+    """.trimIndent()
 
-  private val queryTextWithoutStart = """
+  private val queryTextWithoutStart =
+    """
     SELECT
       ap.ap_id,
       ap.ap_updated_time_last,
@@ -28,7 +29,7 @@ internal object DBQAccountProviderList : DBQAccountProviderListType {
     FROM account_providers AS ap
     ORDER BY ap.ap_id
     LIMIT ?
-  """.trimIndent()
+    """.trimIndent()
 
   override fun execute(
     transaction: DBTransactionType,
@@ -36,7 +37,8 @@ internal object DBQAccountProviderList : DBQAccountProviderListType {
   ): List<AccountProvider> {
     val startingId = parameters.startingId
     return if (startingId != null) {
-      transaction.connection.connection.prepareStatement(queryTextWithStart)
+      transaction.connection.connection
+        .prepareStatement(queryTextWithStart)
         .use { statement ->
           statement.setString(1, startingId.toString())
           statement.setInt(2, parameters.limit)
@@ -45,7 +47,8 @@ internal object DBQAccountProviderList : DBQAccountProviderListType {
           }
         }
     } else {
-      transaction.connection.connection.prepareStatement(queryTextWithoutStart)
+      transaction.connection.connection
+        .prepareStatement(queryTextWithoutStart)
         .use { statement ->
           statement.setInt(1, parameters.limit)
           statement.executeQuery().use { resultSet ->

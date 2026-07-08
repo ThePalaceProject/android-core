@@ -7,7 +7,6 @@ import android.app.Application
  */
 
 interface AudioBookManifestStrategiesType {
-
   /**
    * Create a new strategy based on the given request. Once a strategy is created, it may be
    * executed any number of times and should (in the absence of errors) produce the same result

@@ -9,7 +9,6 @@ import org.nypl.simplified.links.Link
  */
 
 interface BorrowSubtaskFactoryType {
-
   /**
    * @return The name of the subtask
    */

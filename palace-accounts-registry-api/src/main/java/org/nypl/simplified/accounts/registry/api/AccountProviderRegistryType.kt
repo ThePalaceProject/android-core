@@ -18,7 +18,6 @@ import java.util.concurrent.CompletableFuture
 
 @ThreadSafe
 interface AccountProviderRegistryType : AutoCloseable {
-
   /**
    * A source of registry events.
    */
@@ -76,9 +75,7 @@ interface AccountProviderRegistryType : AutoCloseable {
    * Ensure all account providers are loaded.
    */
 
-  fun load() {
-    return this.loadAsync().get()
-  }
+  fun load() = this.loadAsync().get()
 
   /**
    * Refresh the available account providers.
@@ -86,11 +83,7 @@ interface AccountProviderRegistryType : AutoCloseable {
    * @param refreshRequest The refresh parameters
    */
 
-  fun refresh(
-    refreshRequest: AccountProviderRegistryRefresh
-  ) {
-    return this.refreshAsync(refreshRequest).get()
-  }
+  fun refresh(refreshRequest: AccountProviderRegistryRefresh) = this.refreshAsync(refreshRequest).get()
 
   /**
    * Refresh the available account providers.
@@ -98,17 +91,13 @@ interface AccountProviderRegistryType : AutoCloseable {
    * @param refreshRequest The refresh parameters
    */
 
-  fun refreshAsync(
-    refreshRequest: AccountProviderRegistryRefresh
-  ): CompletableFuture<Unit>
+  fun refreshAsync(refreshRequest: AccountProviderRegistryRefresh): CompletableFuture<Unit>
 
   /**
    * Clear cached account providers from all sources.
    */
 
-  fun clear() {
-    return this.clearAsync().get()
-  }
+  fun clear() = this.clearAsync().get()
 
   /**
    * Clear cached account providers from all sources.
@@ -132,28 +121,21 @@ interface AccountProviderRegistryType : AutoCloseable {
    * been called.
    */
 
-  fun findAccountProviderDescription(id: URI): AccountProviderDescription? =
-    this.accountProviderDescriptions()[id]
+  fun findAccountProviderDescription(id: URI): AccountProviderDescription? = this.accountProviderDescriptions()[id]
 
   /**
    * Introduce the given account provider to the registry. If an existing, newer version of the
    * given account provider already exists in the registry, the newer version is returned.
    */
 
-  fun updateProvider(
-    accountProvider: AccountProviderType
-  ): AccountProviderType {
-    return this.updateProviderAsync(accountProvider).get()
-  }
+  fun updateProvider(accountProvider: AccountProviderType): AccountProviderType = this.updateProviderAsync(accountProvider).get()
 
   /**
    * Introduce the given account provider to the registry. If an existing, newer version of the
    * given account provider already exists in the registry, the newer version is returned.
    */
 
-  fun updateProviderAsync(
-    accountProvider: AccountProviderType
-  ): CompletableFuture<AccountProviderType>
+  fun updateProviderAsync(accountProvider: AccountProviderType): CompletableFuture<AccountProviderType>
 
   /**
    * Introduce the given account provider description to the registry. If an existing, newer
@@ -161,11 +143,8 @@ interface AccountProviderRegistryType : AutoCloseable {
    * version is returned.
    */
 
-  fun updateDescription(
-    description: AccountProviderDescription
-  ): AccountProviderDescription {
-    return this.updateDescriptionAsync(description).get()
-  }
+  fun updateDescription(description: AccountProviderDescription): AccountProviderDescription =
+    this.updateDescriptionAsync(description).get()
 
   /**
    * Introduce the given account provider description to the registry. If an existing, newer
@@ -173,9 +152,7 @@ interface AccountProviderRegistryType : AutoCloseable {
    * version is returned.
    */
 
-  fun updateDescriptionAsync(
-    description: AccountProviderDescription
-  ): CompletableFuture<AccountProviderDescription>
+  fun updateDescriptionAsync(description: AccountProviderDescription): CompletableFuture<AccountProviderDescription>
 
   /**
    * Introduce the given account provider description to the registry. If an existing, newer
@@ -183,11 +160,8 @@ interface AccountProviderRegistryType : AutoCloseable {
    * version is returned.
    */
 
-  fun updateDescriptions(
-    descriptions: List<AccountProviderDescription>
-  ): List<AccountProviderDescription> {
-    return this.updateDescriptionsAsync(descriptions).get()
-  }
+  fun updateDescriptions(descriptions: List<AccountProviderDescription>): List<AccountProviderDescription> =
+    this.updateDescriptionsAsync(descriptions).get()
 
   /**
    * Introduce the given account provider description to the registry. If an existing, newer
@@ -195,9 +169,7 @@ interface AccountProviderRegistryType : AutoCloseable {
    * version is returned.
    */
 
-  fun updateDescriptionsAsync(
-    descriptions: List<AccountProviderDescription>
-  ): CompletableFuture<List<AccountProviderDescription>>
+  fun updateDescriptionsAsync(descriptions: List<AccountProviderDescription>): CompletableFuture<List<AccountProviderDescription>>
 
   /**
    * Resolve the description into a full account provider. The given `onProgress` function
@@ -219,7 +191,5 @@ interface AccountProviderRegistryType : AutoCloseable {
   fun resolve(
     onProgress: AccountProviderResolutionListenerType,
     description: AccountProviderDescription
-  ): TaskResult<AccountProviderType> {
-    return this.resolveAsync(onProgress, description).get()
-  }
+  ): TaskResult<AccountProviderType> = this.resolveAsync(onProgress, description).get()
 }

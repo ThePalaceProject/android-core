@@ -35,8 +35,9 @@ import org.nypl.simplified.ui.splash.SplashModel.SplashScreenStatus.SPLASH_SCREE
 import org.nypl.simplified.ui.splash.SplashModel.SplashScreenStatus.SPLASH_SCREEN_NOTIFICATIONS
 import org.slf4j.LoggerFactory
 
-class SplashFragment : Fragment(), MainBackButtonConsumerType {
-
+class SplashFragment :
+  Fragment(),
+  MainBackButtonConsumerType {
   private val logger =
     LoggerFactory.getLogger(SplashFragment::class.java)
 
@@ -186,9 +187,7 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
     )
   }
 
-  private fun onSplashScreenStatusChanged(
-    status: SplashModel.SplashScreenStatus
-  ) {
+  private fun onSplashScreenStatusChanged(status: SplashModel.SplashScreenStatus) {
     when (status) {
       SPLASH_SCREEN_AWAITING_BOOT -> {
         this.openBootProgress()
@@ -236,9 +235,7 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
     this.splashHolder.addView(this.splashNotificationsViewRoot)
   }
 
-  private fun onBootEvent(
-    event: BootEvent
-  ) {
+  private fun onBootEvent(event: BootEvent) {
     UIThread.checkIsUIThread()
 
     return when (event) {
@@ -309,9 +306,7 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
     )
   }
 
-  private fun onUserSelectedLibraryForAddition(
-    description: AccountProviderDescription
-  ) {
+  private fun onUserSelectedLibraryForAddition(description: AccountProviderDescription) {
     this.accountListViews.hideAccountList()
 
     val services =
@@ -325,15 +320,11 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
     SplashModel.splashScreenCompleteLibrarySelection(profiles)
   }
 
-  private fun onBootInProgress(
-    event: BootEvent.BootInProgress
-  ) {
+  private fun onBootInProgress(event: BootEvent.BootInProgress) {
     this.splashViews.splashText.text = event.message
   }
 
-  private fun onBootFailed(
-    event: BootEvent.BootFailed
-  ) {
+  private fun onBootFailed(event: BootEvent.BootFailed) {
     this.splashPopImageView()
 
     this.splashViews.splashException.visibility = View.VISIBLE
@@ -358,7 +349,5 @@ class SplashFragment : Fragment(), MainBackButtonConsumerType {
     this.splashViews.splashVersion.visibility = View.VISIBLE
   }
 
-  override fun onBackButtonPressed(): MainBackButtonConsumerType.Result {
-    return BACK_BUTTON_NOT_CONSUMED
-  }
+  override fun onBackButtonPressed(): MainBackButtonConsumerType.Result = BACK_BUTTON_NOT_CONSUMED
 }

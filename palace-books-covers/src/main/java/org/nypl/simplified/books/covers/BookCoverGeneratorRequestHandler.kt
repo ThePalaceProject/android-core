@@ -18,8 +18,9 @@ import java.net.URI
 class BookCoverGeneratorRequestHandler(
   private val generator: BookCoverGeneratorType
 ) : RequestHandler() {
-
-  override fun canHandleRequest(@Nullable requestNullable: Request): Boolean {
+  override fun canHandleRequest(
+    @Nullable requestNullable: Request
+  ): Boolean {
     val data = NullCheck.notNull(requestNullable)
     val uri = URI.create(data.uri.toString())
     return "generated-cover" == uri.scheme
@@ -32,11 +33,12 @@ class BookCoverGeneratorRequestHandler(
   ): Result {
     try {
       val request = NullCheck.notNull(requestNullable)
-      val bitmap = this.generator.generateImage(
-        NullCheck.notNull(URI.create(request.uri.toString())),
-        request.targetWidth,
-        request.targetHeight
-      )
+      val bitmap =
+        this.generator.generateImage(
+          NullCheck.notNull(URI.create(request.uri.toString())),
+          request.targetWidth,
+          request.targetHeight
+        )
       return Result(bitmap, LoadedFrom.MEMORY)
     } catch (e: Throwable) {
       throw IOException(e)

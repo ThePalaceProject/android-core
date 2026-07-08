@@ -15,7 +15,6 @@ class PdfReaderDocument(
   override val identifier: String?,
   override val pageCount: Int
 ) : PdfDocument {
-
   override val title: String?
     get() = metadata.title
 
@@ -30,16 +29,17 @@ class PdfReaderDocument(
     get() = metadata.subject
 
   override val keywords: List<String>
-    get() = metadata.keywords
-      .split(",")
-      .map { it.trim() }
-      .filter { it.isNotEmpty() }
+    get() =
+      metadata.keywords
+        .split(",")
+        .map { it.trim() }
+        .filter { it.isNotEmpty() }
 
   private val logger = LoggerFactory.getLogger(PdfReaderDocument::class.java)
   private val metadata: PdfiumDocument.Meta by lazy { core.getDocumentMeta(document) }
 
-  override suspend fun cover(context: Context): Bitmap? {
-    return withContext(Dispatchers.IO) {
+  override suspend fun cover(context: Context): Bitmap? =
+    withContext(Dispatchers.IO) {
       try {
         core.openPage(document, 0)
         val width = core.getPageWidth(document, 0)
@@ -55,17 +55,15 @@ class PdfReaderDocument(
         null
       }
     }
-  }
 
   override val outline: List<PdfDocument.OutlineNode> by lazy {
     core.getTableOfContents(document).map { it.toOutlineNode() }
   }
 
-  private fun PdfiumDocument.Bookmark.toOutlineNode(): PdfDocument.OutlineNode {
-    return PdfDocument.OutlineNode(
+  private fun PdfiumDocument.Bookmark.toOutlineNode(): PdfDocument.OutlineNode =
+    PdfDocument.OutlineNode(
       title = title,
       pageNumber = pageIdx.toInt() + 1,
       children = children.map { it.toOutlineNode() },
     )
-  }
 }

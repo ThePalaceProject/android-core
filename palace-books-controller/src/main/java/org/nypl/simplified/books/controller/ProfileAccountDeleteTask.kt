@@ -24,7 +24,6 @@ class ProfileAccountDeleteTask(
   private val profileEvents: Subject<ProfileEvent>,
   private val strings: ProfileAccountDeletionStringResourcesType
 ) : Callable<TaskResult<Unit>> {
-
   private val logger = LoggerFactory.getLogger(ProfileAccountDeleteTask::class.java)
   private val taskRecorder = TaskRecorder.create()
 
@@ -45,8 +44,8 @@ class ProfileAccountDeleteTask(
       )
     )
 
-  override fun call(): TaskResult<Unit> {
-    return try {
+  override fun call(): TaskResult<Unit> =
+    try {
       this.logger.debug("deleting account for provider {}", this.accountProviderID)
       this.publishProgressEvent(this.taskRecorder.beginNewStep(this.strings.deletingAccount))
 
@@ -77,5 +76,4 @@ class ProfileAccountDeleteTask(
       this.publishFailureEvent()
       this.taskRecorder.finishFailure()
     }
-  }
 }

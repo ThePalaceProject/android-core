@@ -7,7 +7,6 @@ import org.nypl.simplified.books.borrowing.BorrowContextType
  */
 
 interface BorrowSubtaskType {
-
   /**
    * Execute the subtask.
    */

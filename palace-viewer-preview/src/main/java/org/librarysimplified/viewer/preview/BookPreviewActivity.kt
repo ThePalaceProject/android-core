@@ -62,7 +62,6 @@ import java.util.UUID
 import java.util.concurrent.ExecutionException
 
 class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
-
   private val logger =
     LoggerFactory.getLogger(BookPreviewActivity::class.java)
 
@@ -74,7 +73,6 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
     }
 
   companion object {
-
     private const val EXTRA_ENTRY =
       "org.nypl.simplified.viewer.preview.BookPreviewActivity.entry"
 
@@ -83,9 +81,10 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
       feedEntry: FeedEntry.FeedEntryOPDS
     ) {
       val intent = Intent(context, BookPreviewActivity::class.java)
-      val bundle = Bundle().apply {
-        this.putSerializable(this@Companion.EXTRA_ENTRY, feedEntry)
-      }
+      val bundle =
+        Bundle().apply {
+          this.putSerializable(this@Companion.EXTRA_ENTRY, feedEntry)
+        }
       intent.putExtras(bundle)
       context.startActivity(intent)
     }
@@ -165,9 +164,13 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
 
     try {
       this.account =
-        this.profilesController.profileCurrent()
+        this.profilesController
+          .profileCurrent()
           .account(this.feedEntry.accountID)
-      MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID, this.account.provider.id.toString())
+      MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID,
+        this.account.provider.id
+          .toString()
+      )
     } catch (e: Exception) {
       this.logger.debug("Unable to locate account: ", e)
       this.finish()
@@ -235,14 +238,13 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
 
   private fun switchFragment(fragment: Fragment) {
     this.fragmentNow = fragment
-    this.supportFragmentManager.beginTransaction()
+    this.supportFragmentManager
+      .beginTransaction()
       .replace(R.id.preview_container, fragment)
       .commitAllowingStateLoss()
   }
 
-  override fun getDelegate(): AppCompatDelegate {
-    return this.appCompatDelegate
-  }
+  override fun getDelegate(): AppCompatDelegate = this.appCompatDelegate
 
   override fun onStart() {
     super.onStart()
@@ -257,7 +259,8 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
 
     this.subscriptions = CompositeDisposable()
     this.subscriptions.add(
-      this.previewRegistry.observeBookPreviewStatus()
+      this.previewRegistry
+        .observeBookPreviewStatus()
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(this::onNewBookPreviewStatus)
     )
@@ -273,8 +276,8 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
     this.subscriptions.dispose()
   }
 
-  private fun handleBackPressed() {
-    return when (val f = this.fragmentNow) {
+  private fun handleBackPressed() =
+    when (val f = this.fragmentNow) {
       is SR2Fragment -> {
         when (f) {
           is SR2ReaderFragment -> {
@@ -299,7 +302,6 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
         this.finish()
       }
     }
-  }
 
   @UiThread
   private fun onViewEventReceived(event: SR2ReaderViewEvent) {
@@ -356,10 +358,8 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
     UIThread.checkIsUIThread()
   }
 
-  private fun onNewBookPreviewStatus(
-    previewStatus: BookPreviewStatus
-  ) {
-    return when (previewStatus) {
+  private fun onNewBookPreviewStatus(previewStatus: BookPreviewStatus) =
+    when (previewStatus) {
       is BookPreviewStatus.HasPreview.Downloading -> {
         val received = previewStatus.currentTotalBytes
         val expected = previewStatus.expectedTotalBytes
@@ -408,7 +408,6 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
         // do nothing
       }
     }
-  }
 
   private fun handlePreviewDownloadFailed() {
     MaterialAlertDialogBuilder(this)
@@ -425,7 +424,8 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
     this.file = file
 
     val audiobookPreviewPlayer = BookPreviewAudiobookFragment.newInstance(file, this.feedEntry)
-    this.supportFragmentManager.beginTransaction()
+    this.supportFragmentManager
+      .beginTransaction()
       .replace(R.id.preview_container, audiobookPreviewPlayer)
       .commitAllowingStateLoss()
   }
@@ -452,7 +452,8 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
        */
 
       val contentProtectionProviders =
-        ServiceLoader.load(ContentProtectionProvider::class.java)
+        ServiceLoader
+          .load(ContentProtectionProvider::class.java)
           .toList()
 
       val contentProtections =
@@ -503,9 +504,7 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
    */
 
   @UiThread
-  private fun onBookLoadingFailed(
-    exception: Throwable
-  ) {
+  private fun onBookLoadingFailed(exception: Throwable) {
     UIThread.checkIsUIThread()
 
     val actualException =
@@ -523,8 +522,7 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
           actualException.javaClass.name,
           actualException.message
         )
-      )
-      .setNegativeButton(R.string.Dismiss) { dialog, _ -> dialog.dismiss() }
+      ).setNegativeButton(R.string.Dismiss) { dialog, _ -> dialog.dismiss() }
       .setOnDismissListener { this.finish() }
       .create()
       .show()

@@ -11,7 +11,6 @@ import org.nypl.simplified.taskrecorder.api.TaskStepResolution.TaskStepFailed
  */
 
 sealed class TaskResult<A> : PresentableType {
-
   abstract val steps: List<TaskStep>
 
   /**
@@ -41,7 +40,8 @@ sealed class TaskResult<A> : PresentableType {
   data class Failure<A>(
     override val steps: List<TaskStep>,
     override val attributes: Map<String, String>
-  ) : TaskResult<A>(), PresentableErrorType {
+  ) : TaskResult<A>(),
+    PresentableErrorType {
     init {
       Preconditions.checkArgument(
         this.steps.isNotEmpty(),
@@ -50,75 +50,83 @@ sealed class TaskResult<A> : PresentableType {
     }
 
     override val exception: Throwable?
-      get() = this.steps.last().resolution.exception
+      get() =
+        this.steps
+          .last()
+          .resolution.exception
     override val message: String
       get() = this.steps.last().message
 
     val lastErrorCode: String
-      get() = run {
-        val lastStep = this.steps.last { step -> step.resolution is TaskStepFailed }
-        return (lastStep.resolution as TaskStepFailed).errorCode
-      }
+      get() =
+        run {
+          val lastStep = this.steps.last { step -> step.resolution is TaskStepFailed }
+          return (lastStep.resolution as TaskStepFailed).errorCode
+        }
   }
 
   /**
    * @return The resolution of step `step`
    */
 
-  fun resolutionOf(step: Int): TaskStepResolution =
-    this.steps[step].resolution
+  fun resolutionOf(step: Int): TaskStepResolution = this.steps[step].resolution
 
   /**
    * Functor map for task results.
    */
 
-  fun <B> map(f: (A) -> B): TaskResult<B> {
-    return when (this) {
-      is Success ->
+  fun <B> map(f: (A) -> B): TaskResult<B> =
+    when (this) {
+      is Success -> {
         Success(
           result = f(this.result),
           steps = this.steps,
           attributes = this.attributes
         )
-      is Failure ->
+      }
+
+      is Failure -> {
         Failure(
           steps = this.steps,
           attributes = this.attributes
         )
+      }
     }
-  }
 
   /**
    * Monadic bind for task results.
    */
 
-  fun <B> flatMap(f: (A) -> TaskResult<B>): TaskResult<B> {
-    return when (this) {
+  fun <B> flatMap(f: (A) -> TaskResult<B>): TaskResult<B> =
+    when (this) {
       is Success -> {
         when (val next = f.invoke(this.result)) {
-          is Success ->
+          is Success -> {
             Success(
               result = next.result,
               steps = this.steps.plus(next.steps),
               attributes = mergeAttributes(this.attributes, next.attributes)
             )
-          is Failure ->
+          }
+
+          is Failure -> {
             Failure(
               steps = this.steps.plus(next.steps),
               attributes = mergeAttributes(this.attributes, next.attributes)
             )
+          }
         }
       }
-      is Failure ->
+
+      is Failure -> {
         Failure(
           steps = this.steps,
           attributes = this.attributes
         )
+      }
     }
-  }
 
   companion object {
-
     /**
      * Create a task result that indicates that a task immediately failed with the
      * given error.
@@ -128,21 +136,22 @@ sealed class TaskResult<A> : PresentableType {
       description: String,
       resolution: String,
       errorCode: String
-    ): TaskResult<A> {
-      return Failure(
+    ): TaskResult<A> =
+      Failure(
         attributes = mapOf(),
-        steps = listOf(
-          TaskStep(
-            description = description,
-            resolution = TaskStepFailed(
-              message = resolution,
-              errorCode = errorCode,
-              exception = null,
-              extraMessages = listOf()
+        steps =
+          listOf(
+            TaskStep(
+              description = description,
+              resolution =
+                TaskStepFailed(
+                  message = resolution,
+                  errorCode = errorCode,
+                  exception = null,
+                  extraMessages = listOf()
+                )
             )
           )
-        )
       )
-    }
   }
 }

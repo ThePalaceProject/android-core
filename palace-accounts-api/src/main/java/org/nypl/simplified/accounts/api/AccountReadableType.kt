@@ -14,7 +14,6 @@ import java.net.URI
  */
 
 interface AccountReadableType {
-
   /**
    * Determine the correct catalog URI to use for readers of a given age. This is analogous
    * to [AccountProviderType.catalogURIForAge] except that it also considers the
@@ -61,15 +60,17 @@ interface AccountReadableType {
    */
 
   val requiresCredentials: Boolean
-    get() = when (this.provider.authentication) {
-      is AccountProviderAuthenticationDescription.Anonymous -> {
-        false
+    get() =
+      when (this.provider.authentication) {
+        is AccountProviderAuthenticationDescription.Anonymous -> {
+          false
+        }
+
+        is AccountProviderAuthenticationDescription.OpenIDConnect,
+        is AccountProviderAuthenticationDescription.Basic,
+        is AccountProviderAuthenticationDescription.BasicToken,
+        is AccountProviderAuthenticationDescription.SAML2_0 -> {
+          true
+        }
       }
-      is AccountProviderAuthenticationDescription.OpenIDConnect,
-      is AccountProviderAuthenticationDescription.Basic,
-      is AccountProviderAuthenticationDescription.BasicToken,
-      is AccountProviderAuthenticationDescription.SAML2_0 -> {
-        true
-      }
-    }
 }

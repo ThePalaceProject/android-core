@@ -31,7 +31,6 @@ class ViewsForBasicToken(
   val logoutButton: Button,
   val resetPasswordLabel: TextView
 ) : AccountAuthenticationViewBindings() {
-
   private val logger = LoggerFactory.getLogger(ViewsForBasicToken::class.java)
 
   private var showPassClicked = false
@@ -111,8 +110,8 @@ class ViewsForBasicToken(
     }
   }
 
-  override fun setLoginButtonStatus(status: AccountLoginButtonStatus) {
-    return when (status) {
+  override fun setLoginButtonStatus(status: AccountLoginButtonStatus) =
+    when (status) {
       is AccountLoginButtonStatus.AsLoginButtonEnabled -> {
         this.loginButton.setText(R.string.accountLogin)
         this.loginButton.isEnabled = true
@@ -143,10 +142,9 @@ class ViewsForBasicToken(
         this.setVisibility(this.loginButton, View.GONE)
       }
     }
-  }
 
-  override fun setLogoutButtonStatus(status: AccountLogoutButtonStatus) {
-    return when (status) {
+  override fun setLogoutButtonStatus(status: AccountLogoutButtonStatus) =
+    when (status) {
       is AccountLogoutButtonStatus.AsLogoutButtonEnabled -> {
         this.logoutButton.setText(R.string.accountLogout)
         this.logoutButton.isEnabled = true
@@ -177,7 +175,6 @@ class ViewsForBasicToken(
         this.setVisibility(this.logoutButton, View.GONE)
       }
     }
-  }
 
   override fun setResetPasswordLabelStatus(
     status: AccountLoginButtonStatus,
@@ -190,7 +187,7 @@ class ViewsForBasicToken(
     this.resetPasswordLabel.isVisible = isVisible && (
       status is AccountLoginButtonStatus.AsLoginButtonEnabled ||
         status is AccountLoginButtonStatus.AsLoginButtonDisabled
-      )
+    )
   }
 
   override fun blank() {
@@ -233,33 +230,35 @@ class ViewsForBasicToken(
 
     // Set input types
     this.logger.debug("Setting {} for user input type", description.keyboard)
-    this.user.inputType = when (description.keyboard) {
-      AccountProviderAuthenticationDescription.KeyboardInput.DEFAULT,
-      AccountProviderAuthenticationDescription.KeyboardInput.NO_INPUT -> {
-        InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_NORMAL
-      }
+    this.user.inputType =
+      when (description.keyboard) {
+        AccountProviderAuthenticationDescription.KeyboardInput.DEFAULT,
+        AccountProviderAuthenticationDescription.KeyboardInput.NO_INPUT -> {
+          InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_NORMAL
+        }
 
-      AccountProviderAuthenticationDescription.KeyboardInput.EMAIL_ADDRESS -> {
-        InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
-      }
+        AccountProviderAuthenticationDescription.KeyboardInput.EMAIL_ADDRESS -> {
+          InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+        }
 
-      AccountProviderAuthenticationDescription.KeyboardInput.NUMBER_PAD -> {
-        InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_NORMAL
+        AccountProviderAuthenticationDescription.KeyboardInput.NUMBER_PAD -> {
+          InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_NORMAL
+        }
       }
-    }
 
     this.logger.debug("Setting {} for password input type", description.passwordKeyboard)
-    this.pass.inputType = when (description.passwordKeyboard) {
-      AccountProviderAuthenticationDescription.KeyboardInput.DEFAULT,
-      AccountProviderAuthenticationDescription.KeyboardInput.NO_INPUT,
-      AccountProviderAuthenticationDescription.KeyboardInput.EMAIL_ADDRESS -> {
-        InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-      }
+    this.pass.inputType =
+      when (description.passwordKeyboard) {
+        AccountProviderAuthenticationDescription.KeyboardInput.DEFAULT,
+        AccountProviderAuthenticationDescription.KeyboardInput.NO_INPUT,
+        AccountProviderAuthenticationDescription.KeyboardInput.EMAIL_ADDRESS -> {
+          InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+        }
 
-      AccountProviderAuthenticationDescription.KeyboardInput.NUMBER_PAD -> {
-        InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
+        AccountProviderAuthenticationDescription.KeyboardInput.NUMBER_PAD -> {
+          InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
+        }
       }
-    }
 
     // Toggle visibility of fields
     this.userLabel.isVisible =
@@ -273,20 +272,26 @@ class ViewsForBasicToken(
     setPasswordVisible(this.showPass.isChecked)
   }
 
-  fun getPassword(): AccountPassword {
-    return AccountPassword(this.pass.text.toString().trim())
-  }
+  fun getPassword(): AccountPassword =
+    AccountPassword(
+      this.pass.text
+        .toString()
+        .trim()
+    )
 
-  fun getUser(): AccountUsername {
-    return AccountUsername(this.user.text.toString().trim())
-  }
+  fun getUser(): AccountUsername =
+    AccountUsername(
+      this.user.text
+        .toString()
+        .trim()
+    )
 
   companion object {
     fun bind(
       viewGroup: ViewGroup,
       onUsernamePasswordChangeListener: (AccountUsername, AccountPassword) -> Unit
-    ): ViewsForBasicToken {
-      return ViewsForBasicToken(
+    ): ViewsForBasicToken =
+      ViewsForBasicToken(
         viewGroup = viewGroup,
         pass = viewGroup.findViewById(R.id.authBasicTokenPassField),
         passLabel = viewGroup.findViewById(R.id.authBasicTokenPassLabel),
@@ -298,6 +303,5 @@ class ViewsForBasicToken(
         logoutButton = viewGroup.findViewById(R.id.authBasicTokenLogout),
         resetPasswordLabel = viewGroup.findViewById(R.id.resetPasswordLabel)
       )
-    }
   }
 }

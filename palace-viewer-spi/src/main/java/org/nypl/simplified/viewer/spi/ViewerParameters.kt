@@ -15,13 +15,11 @@ data class ViewerParameters(
    */
 
   val viewerID: UUID,
-
   /**
    * An opaque, implementation-defined set of flags.
    */
 
   val flags: Map<String, Boolean>,
-
   /**
    * A viewer wants to open the login screen.
    */

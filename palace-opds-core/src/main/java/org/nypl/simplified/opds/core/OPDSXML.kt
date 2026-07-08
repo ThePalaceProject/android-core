@@ -19,7 +19,6 @@ import javax.xml.transform.stream.StreamResult
  * Convenient XML handling functions.
  */
 object OPDSXML {
-
   /**
    * Return all child elements of `node` that have name `name` in
    * namespace `namespace`.
@@ -214,7 +213,8 @@ object OPDSXML {
       if (child is Element) {
         if (nodeHasName(child, namespace, name)) {
           val text =
-            child.attributes.getNamedItemNS(namespace.toString(), attribute)
+            child.attributes
+              .getNamedItemNS(namespace.toString(), attribute)
               .nodeValue
           return text.trim { it <= ' ' }
         }
@@ -293,9 +293,7 @@ object OPDSXML {
    * @return The namespace of the given element, if any
    */
   @JvmStatic
-  fun getNodeNamespace(
-    e: Element
-  ): String? {
+  fun getNodeNamespace(e: Element): String? {
     val ns = e.namespaceURI
     if (ns != null) {
       return ns
@@ -313,9 +311,7 @@ object OPDSXML {
    */
   @JvmStatic
   @Throws(OPDSParseException::class)
-  fun nodeAsElement(
-    node: Node
-  ): Element {
+  fun nodeAsElement(node: Node): Element {
     if (node !is Element) {
       val m = StringBuilder(128)
       m.append("Expected element but got node of type ")
@@ -424,7 +420,8 @@ object OPDSXML {
   ): DateTime {
     if (e.hasAttribute(name)) {
       try {
-        return OPDSDateParsers.dateTimeParser()
+        return OPDSDateParsers
+          .dateTimeParser()
           .parseDateTime(e.getAttribute(name))
       } catch (x: Exception) {
         throw OPDSParseException(x)

@@ -23,13 +23,10 @@ internal class BServiceOpCreateLocalBookmark(
   private val bookmark: SerializedBookmark,
   private val bookmarksSource: AttributeType<Map<AccountID, Map<BookID, BookmarksForBook>>>,
 ) : BServiceOp<SerializedBookmark>(logger) {
+  override fun runActual(): SerializedBookmark = this.locallySaveBookmark()
 
-  override fun runActual(): SerializedBookmark {
-    return this.locallySaveBookmark()
-  }
-
-  private fun locallySaveBookmark(): SerializedBookmark {
-    return try {
+  private fun locallySaveBookmark(): SerializedBookmark =
+    try {
       this.logger.debug(
         "[{}]: locally saving bookmark {}",
         this.profile.id.uuid,
@@ -56,6 +53,7 @@ internal class BServiceOpCreateLocalBookmark(
           BookmarkKind.BookmarkExplicit -> {
             handle.addBookmark(this.bookmark)
           }
+
           BookmarkKind.BookmarkLastReadLocation -> {
             handle.setLastReadLocation(this.bookmark)
           }
@@ -68,7 +66,6 @@ internal class BServiceOpCreateLocalBookmark(
       this.logger.debug("error saving bookmark locally: ", e)
       throw e
     }
-  }
 
   private fun publishSavedEvent(updatedBookmark: SerializedBookmark): SerializedBookmark {
     this.bookmarkEventsOut.onNext(BookmarkEvent.BookmarkSaved(this.accountID, updatedBookmark))

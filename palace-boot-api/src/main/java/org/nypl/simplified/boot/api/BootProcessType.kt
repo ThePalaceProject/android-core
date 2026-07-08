@@ -5,7 +5,6 @@ package org.nypl.simplified.boot.api
  */
 
 interface BootProcessType<T> {
-
   /**
    * Set up application services, publishing events to `onProgress`.
    *

@@ -24,7 +24,6 @@ class CatalogFeedViewGroups(
   private val screenSize: ScreenSizeInformationType,
   private val window: Window,
 ) : CatalogFeedView() {
-
   val swipeRefresh =
     this.root.findViewById<SwipeRefreshLayout>(R.id.catalogGroupsContentRefresh)
   val listView: RecyclerView =
@@ -58,9 +57,7 @@ class CatalogFeedViewGroups(
     )
   }
 
-  fun configureTabs(
-    feed: Feed.FeedWithGroups
-  ) {
+  fun configureTabs(feed: Feed.FeedWithGroups) {
     val facetGroup =
       FeedFacets.findEntryPointFacetGroup(feed.facetsByGroup)
 
@@ -118,14 +115,13 @@ class CatalogFeedViewGroups(
       callbacks: CatalogViewCallbacksType,
       screenSize: ScreenSizeInformationType,
       window: Window,
-    ): CatalogFeedViewGroups {
-      return CatalogFeedViewGroups(
+    ): CatalogFeedViewGroups =
+      CatalogFeedViewGroups(
         callbacks = callbacks,
         root = layoutInflater.inflate(R.layout.catalog_feed_groups, container, true) as ViewGroup,
         screenSize = screenSize,
         window = window,
       )
-    }
   }
 
   override fun startFocus() {

@@ -12,7 +12,6 @@ import java.net.URI
 class AccountProviderDescriptionComparator(
   val buildConfig: BuildConfigurationServiceType
 ) : Comparator<AccountProviderDescription> {
-
   private val featuredIds =
     try {
       this.buildConfig.featuredLibrariesIdsList.map { x -> URI.create(x) }
@@ -20,17 +19,13 @@ class AccountProviderDescriptionComparator(
       setOf<URI>()
     }
 
-  private fun isFeatured(
-    d: AccountProviderDescription
-  ): Boolean {
-    return this.featuredIds.contains(d.id)
-  }
+  private fun isFeatured(d: AccountProviderDescription): Boolean = this.featuredIds.contains(d.id)
 
   override fun compare(
     o1: AccountProviderDescription,
     o2: AccountProviderDescription
-  ): Int {
-    return if (this.isFeatured(o1)) {
+  ): Int =
+    if (this.isFeatured(o1)) {
       if (this.isFeatured(o2)) {
         o1.title.uppercase().compareTo(o2.title.uppercase())
       } else {
@@ -43,5 +38,4 @@ class AccountProviderDescriptionComparator(
         o1.title.uppercase().compareTo(o2.title.uppercase())
       }
     }
-  }
 }

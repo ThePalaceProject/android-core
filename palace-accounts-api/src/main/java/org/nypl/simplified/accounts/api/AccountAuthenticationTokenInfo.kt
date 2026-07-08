@@ -17,7 +17,5 @@ data class AccountAuthenticationTokenInfo(
     return true
   }
 
-  override fun hashCode(): Int {
-    return authURI.hashCode()
-  }
+  override fun hashCode(): Int = authURI.hashCode()
 }

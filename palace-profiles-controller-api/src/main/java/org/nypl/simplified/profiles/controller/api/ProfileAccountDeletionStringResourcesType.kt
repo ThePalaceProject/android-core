@@ -5,7 +5,6 @@ package org.nypl.simplified.profiles.controller.api
  */
 
 interface ProfileAccountDeletionStringResourcesType {
-
   /**
    * Deleting an account succeeded.
    */

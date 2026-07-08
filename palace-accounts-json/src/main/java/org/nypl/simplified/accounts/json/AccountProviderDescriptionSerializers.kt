@@ -13,12 +13,9 @@ import java.net.URI
  */
 
 class AccountProviderDescriptionSerializers : AccountProviderDescriptionSerializersType {
-
   override fun createSerializer(
     uri: URI,
     stream: OutputStream,
     document: AccountProviderDescription
-  ): AccountProviderDescriptionSerializerType {
-    return AccountProviderDescriptionSerializer(uri, stream, document)
-  }
+  ): AccountProviderDescriptionSerializerType = AccountProviderDescriptionSerializer(uri, stream, document)
 }

@@ -15,18 +15,16 @@ import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.Handled401.Erro
  */
 
 object AccountAuthenticatedHTTP {
-
-  fun createAuthorization(
-    credentials: AccountAuthenticationCredentials
-  ): LSHTTPAuthorizationType {
-    return when (credentials) {
-      is AccountAuthenticationCredentials.Basic ->
+  fun createAuthorization(credentials: AccountAuthenticationCredentials): LSHTTPAuthorizationType =
+    when (credentials) {
+      is AccountAuthenticationCredentials.Basic -> {
         LSHTTPAuthorizationBasic.ofUsernamePassword(
           userName = credentials.userName.value,
           password = credentials.password.value
         )
+      }
 
-      is AccountAuthenticationCredentials.BasicToken ->
+      is AccountAuthenticationCredentials.BasicToken -> {
         if (credentials.authenticationTokenInfo.accessToken.isNotBlank()) {
           LSHTTPAuthorizationBearerToken.ofToken(
             token = credentials.authenticationTokenInfo.accessToken
@@ -37,24 +35,23 @@ object AccountAuthenticatedHTTP {
             password = credentials.password.value
           )
         }
+      }
 
-      is AccountAuthenticationCredentials.SAML2_0 ->
+      is AccountAuthenticationCredentials.SAML2_0 -> {
         LSHTTPAuthorizationBearerToken.ofToken(
           token = credentials.accessToken
         )
+      }
 
-      is AccountAuthenticationCredentials.OpenIDConnect ->
+      is AccountAuthenticationCredentials.OpenIDConnect -> {
         LSHTTPAuthorizationBearerToken.ofToken(
           token = credentials.accessToken
         )
+      }
     }
-  }
 
-  fun createAuthorizationIfPresent(
-    credentials: AccountAuthenticationCredentials?
-  ): LSHTTPAuthorizationType? {
-    return credentials?.let(this::createAuthorization)
-  }
+  fun createAuthorizationIfPresent(credentials: AccountAuthenticationCredentials?): LSHTTPAuthorizationType? =
+    credentials?.let(this::createAuthorization)
 
   fun LSHTTPRequestBuilderType.addBasicTokenPropertiesIfApplicable(
     credentials: AccountAuthenticationCredentials?
@@ -65,10 +62,8 @@ object AccountAuthenticatedHTTP {
     return addBasicTokenProperties(credentials)
   }
 
-  fun LSHTTPRequestBuilderType.addBasicTokenProperties(
-    credentials: AccountAuthenticationCredentials.BasicToken
-  ): LSHTTPRequestBuilderType {
-    return apply {
+  fun LSHTTPRequestBuilderType.addBasicTokenProperties(credentials: AccountAuthenticationCredentials.BasicToken): LSHTTPRequestBuilderType =
+    apply {
       setExtensionProperty(
         LSHTTPRequestConstants.PROPERTY_KEY_USERNAME,
         credentials.userName.value
@@ -82,11 +77,8 @@ object AccountAuthenticatedHTTP {
         credentials.authenticationTokenInfo.authURI.toString()
       )
     }
-  }
 
-  fun LSHTTPResponseStatus.getAccessToken(): String? {
-    return properties?.header(LSHTTPRequestConstants.PROPERTY_KEY_ACCESS_TOKEN)
-  }
+  fun LSHTTPResponseStatus.getAccessToken(): String? = properties?.header(LSHTTPRequestConstants.PROPERTY_KEY_ACCESS_TOKEN)
 
   /**
    * A handled 401 status code.
@@ -109,10 +101,8 @@ object AccountAuthenticatedHTTP {
    * any other kind of error.
    */
 
-  fun handle401Error(
-    problemReport: LSHTTPProblemReport?
-  ): Handled401 {
-    return if (problemReport != null) {
+  fun handle401Error(problemReport: LSHTTPProblemReport?): Handled401 =
+    if (problemReport != null) {
       val type = problemReport.type
       if (type != null) {
         // XXX: Deprecated: The server will soon stop serving this type.
@@ -129,5 +119,4 @@ object AccountAuthenticatedHTTP {
     } else {
       ErrorIsUnrecoverable
     }
-  }
 }

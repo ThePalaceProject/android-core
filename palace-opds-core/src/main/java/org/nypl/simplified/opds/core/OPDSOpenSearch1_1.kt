@@ -15,15 +15,12 @@ import java.net.URLEncoder
 data class OPDSOpenSearch1_1(
   private val template: String
 ) {
-
   /**
    * @param terms The search terms
    * @return A query URI for searching with the given search terms
    */
 
-  fun getQueryURIForTerms(
-    terms: String
-  ): URI {
+  fun getQueryURIForTerms(terms: String): URI {
     try {
       val encoded = URLEncoder.encode(terms, "UTF-8")
       val raw = this.template.replace("{searchTerms}", encoded)

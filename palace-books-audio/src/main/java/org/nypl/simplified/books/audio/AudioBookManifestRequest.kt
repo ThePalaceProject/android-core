@@ -23,7 +23,6 @@ import java.util.UUID
  */
 
 data class AudioBookManifestRequest(
-
   /**
    * The HTTP client.
    * The book's Palace ID for time tracking. This is essentially delivered as the book's ID
@@ -31,7 +30,6 @@ data class AudioBookManifestRequest(
    */
 
   val palaceID: PlayerPalaceID,
-
   /**
    * The audio book file on disk, if one has been downloaded. This is used for packaged audio
    * books, where the entire book is downloaded in one file. For unpackaged audio books, where
@@ -39,31 +37,26 @@ data class AudioBookManifestRequest(
    */
 
   val httpClient: LSHTTPClientType,
-
   /**
    * The target link
    */
 
   val target: AudioBookLink,
-
   /**
    * The content type of the target manifest.
    */
 
   val contentType: MIMEType,
-
   /**
    * A service directory used to locate any required application services.
    */
 
   val services: ServiceDirectoryType,
-
   /**
    * A function that returns `true` if networking is currently available.
    */
 
   val isNetworkAvailable: () -> Boolean = { true },
-
   /**
    * A function that will be evaluated if networking is not available. The function
    * should return the raw bytes of a manifest. If the function returns `null`, the manifest
@@ -71,25 +64,24 @@ data class AudioBookManifestRequest(
    */
 
   val loadFallbackData: () -> ManifestFulfilled? = { null },
-
   /**
    * The set of license checks to perform. The default value searches for license checks
    * registered with [ServiceLoader] on the classpath.
    */
 
   val licenseChecks: List<SingleLicenseCheckProviderType> =
-    ServiceLoader.load(SingleLicenseCheckProviderType::class.java)
+    ServiceLoader
+      .load(SingleLicenseCheckProviderType::class.java)
       .toList(),
-
   /**
    * The set of parser extensions to use. The default value searches for parser extensions
    * registered with [ServiceLoader] on the classpath.
    */
 
   val extensions: List<ManifestParserExtensionType> =
-    ServiceLoader.load(ManifestParserExtensionType::class.java)
+    ServiceLoader
+      .load(ManifestParserExtensionType::class.java)
       .toList(),
-
   /**
    * A registry of manifest fulfillment strategies. The default value uses the AudioBook API
    * registry.
@@ -97,38 +89,32 @@ data class AudioBookManifestRequest(
 
   val strategyRegistry: ManifestFulfillmentStrategyRegistryType =
     ManifestFulfillmentStrategies,
-
   /**
    * The manifest parser API.
    */
 
   val manifestParsers: ManifestParsersType =
     ManifestParsers,
-
   /**
    * The directory in which to store cache files.
    */
 
   val cacheDirectory: File,
-
   /**
    * A factory of problem report parsers.
    */
 
   val problemReportParsers: LSHTTPProblemReportParserFactoryType =
-    ServiceLoader.load(LSHTTPProblemReportParserFactoryType::class.java)
+    ServiceLoader
+      .load(LSHTTPProblemReportParserFactoryType::class.java)
       .first(),
-
   /**
    * The authorization handler for requests.
    */
 
   val authorizationHandler: PlayerAuthorizationHandlerType,
 ) {
-
-  fun temporaryFile(
-    extension: String
-  ): File {
+  fun temporaryFile(extension: String): File {
     val ext = if (extension.isNotEmpty()) ".$extension" else ""
     this.cacheDirectory.mkdirs()
     for (i in 0..100) {

@@ -17,23 +17,18 @@ class CatalogLaneAdapter(
   private val coverLoader: BookCoverProviderType,
   private val callbacks: CatalogViewCallbacksType,
 ) : ListAdapter<FeedEntry.FeedEntryOPDS, CatalogLaneItemViewHolder>(diffCallback) {
-
   companion object {
     private val diffCallback =
       object : DiffUtil.ItemCallback<FeedEntry.FeedEntryOPDS>() {
         override fun areContentsTheSame(
           oldItem: FeedEntry.FeedEntryOPDS,
           newItem: FeedEntry.FeedEntryOPDS
-        ): Boolean {
-          return oldItem == newItem
-        }
+        ): Boolean = oldItem == newItem
 
         override fun areItemsTheSame(
           oldItem: FeedEntry.FeedEntryOPDS,
           newItem: FeedEntry.FeedEntryOPDS
-        ): Boolean {
-          return oldItem.feedEntry.id == newItem.feedEntry.id
-        }
+        ): Boolean = oldItem.feedEntry.id == newItem.feedEntry.id
       }
   }
 
@@ -56,9 +51,7 @@ class CatalogLaneAdapter(
     holder.bindTo(this.getItem(position))
   }
 
-  override fun onViewRecycled(
-    holder: CatalogLaneItemViewHolder
-  ) {
+  override fun onViewRecycled(holder: CatalogLaneItemViewHolder) {
     super.onViewRecycled(holder)
     holder.unbind()
   }

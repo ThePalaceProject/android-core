@@ -8,41 +8,43 @@ class WebViewCookieDatabaseV9 internal constructor(
   override fun getAll(): List<WebViewCookieType> {
     val result = mutableListOf<Cookie>()
 
-    val columns = arrayOf(
-      "host_key",
-      "name",
-      "value",
-      "path",
-      "expires_utc",
-      "secure",
-      "httponly",
-      "firstpartyonly"
-    )
+    val columns =
+      arrayOf(
+        "host_key",
+        "name",
+        "value",
+        "path",
+        "expires_utc",
+        "secure",
+        "httponly",
+        "firstpartyonly"
+      )
 
-    this.db.query(
-      DB_COOKIE_TABLE_NAME,
-      columns,
-      null,
-      null,
-      null,
-      null,
-      null
-    ).use { cursor ->
-      while (cursor.moveToNext()) {
-        result.add(
-          Cookie(
-            hostKey = cursor.getString(0),
-            name = cursor.getString(1),
-            value = cursor.getString(2),
-            path = cursor.getString(3),
-            expiresUTC = cursor.getLong(4),
-            secure = cursor.getInt(5),
-            httpOnly = cursor.getInt(6),
-            firstPartyOnly = cursor.getInt(7)
+    this.db
+      .query(
+        DB_COOKIE_TABLE_NAME,
+        columns,
+        null,
+        null,
+        null,
+        null,
+        null
+      ).use { cursor ->
+        while (cursor.moveToNext()) {
+          result.add(
+            Cookie(
+              hostKey = cursor.getString(0),
+              name = cursor.getString(1),
+              value = cursor.getString(2),
+              path = cursor.getString(3),
+              expiresUTC = cursor.getLong(4),
+              secure = cursor.getInt(5),
+              httpOnly = cursor.getInt(6),
+              firstPartyOnly = cursor.getInt(7)
+            )
           )
-        )
+        }
       }
-    }
 
     return result
   }
@@ -57,7 +59,6 @@ class WebViewCookieDatabaseV9 internal constructor(
     val httpOnly: Int,
     val firstPartyOnly: Int
   ) : WebViewCookieType {
-
     override val sourceURL: String
       get() {
         val domain = this.hostKey.trimStart('.')
@@ -93,9 +94,11 @@ class WebViewCookieDatabaseV9 internal constructor(
         2 -> pairs.add(listOf("SameSite", "Strict"))
       }
 
-      return pairs.map({ pair ->
-        pair.joinToString("=")
-      }).joinToString("; ")
+      return pairs
+        .map({ pair ->
+          pair.joinToString("=")
+        })
+        .joinToString("; ")
     }
   }
 }

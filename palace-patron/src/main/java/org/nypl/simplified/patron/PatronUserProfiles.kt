@@ -20,7 +20,6 @@ import java.net.HttpURLConnection
 import java.net.URI
 
 object PatronUserProfiles {
-
   private val logger = LoggerFactory.getLogger(PatronUserProfiles::class.java)
 
   /**
@@ -48,7 +47,8 @@ object PatronUserProfiles {
     }
 
     val request =
-      http.newRequest(patronSettingsURI)
+      http
+        .newRequest(patronSettingsURI)
         .setAuthorization(AccountAuthenticatedHTTP.createAuthorization(credentials))
         .addBasicTokenPropertiesIfApplicable(credentials)
         .build()
@@ -93,8 +93,8 @@ object PatronUserProfiles {
     patronSettingsURI: URI,
     patronParsers: PatronUserProfileParsersType,
     stream: InputStream
-  ): PatronUserProfile {
-    return patronParsers.createParser(patronSettingsURI, stream).use { parser ->
+  ): PatronUserProfile =
+    patronParsers.createParser(patronSettingsURI, stream).use { parser ->
       when (val parseResult = parser.parse()) {
         is ParseResult.Success -> {
           this.logger.debug("parsed patron profile successfully")
@@ -106,7 +106,8 @@ object PatronUserProfiles {
         is ParseResult.Failure -> {
           this.logger.error("failed to parse patron profile")
           val message: String =
-            parseResult.errors.map(this::showParseError)
+            parseResult.errors
+              .map(this::showParseError)
               .joinToString("\n")
           val exception = Exception()
           taskRecorder.currentStepFailed(
@@ -119,7 +120,6 @@ object PatronUserProfiles {
         }
       }
     }
-  }
 
   /**
    * Log and convert a parse error to a humanly-readable string.

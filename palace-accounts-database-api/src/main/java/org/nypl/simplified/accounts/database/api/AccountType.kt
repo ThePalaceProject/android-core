@@ -14,7 +14,6 @@ import org.nypl.simplified.books.book_database.api.BookDatabaseType
  */
 
 interface AccountType : AccountReadableType {
-
   /**
    * @return The book database owned by this account
    */
@@ -63,25 +62,28 @@ interface AccountType : AccountReadableType {
    */
 
   @Throws(AccountsDatabaseException::class)
-  fun updateCredentialsIfAvailable(
-    update: (AccountAuthenticationCredentials) -> AccountAuthenticationCredentials
-  ) {
-    return when (val state = this.loginState) {
-      is AccountLoginState.AccountLoggedIn ->
+  fun updateCredentialsIfAvailable(update: (AccountAuthenticationCredentials) -> AccountAuthenticationCredentials) =
+    when (val state = this.loginState) {
+      is AccountLoginState.AccountLoggedIn -> {
         this.setLoginState(state.copy(update.invoke(state.credentials)))
-      is AccountLoginState.AccountLoggedInStaleCredentials ->
+      }
+
+      is AccountLoginState.AccountLoggedInStaleCredentials -> {
         this.setLoginState(state.copy(update.invoke(state.credentials)))
-      is AccountLoginState.AccountLoggingOut ->
+      }
+
+      is AccountLoginState.AccountLoggingOut -> {
         this.setLoginState(state.copy(update.invoke(state.credentials)))
+      }
 
       is AccountLoginState.AccountLoggingIn,
       is AccountLoginState.AccountLoggingInWaitingForExternalAuthentication,
       is AccountLoginState.AccountLoginFailed,
       is AccountLoginState.AccountLogoutFailed,
-      is AccountLoginState.AccountNotLoggedIn ->
+      is AccountLoginState.AccountNotLoggedIn -> {
         Unit
+      }
     }
-  }
 
   /**
    * Update the account's access token if the current credentials are from the BasicToken type. This
@@ -91,9 +93,7 @@ interface AccountType : AccountReadableType {
    * @throws AccountsDatabaseException On database errors
    */
   @Throws(AccountsDatabaseException::class)
-  fun updateBasicTokenCredentials(
-    accessToken: String?
-  ) {
+  fun updateBasicTokenCredentials(accessToken: String?) {
     updateCredentialsIfAvailable { currentCredentials ->
       if (currentCredentials is AccountAuthenticationCredentials.BasicToken) {
         currentCredentials.updateAccessToken(accessToken)
@@ -107,9 +107,7 @@ interface AccountType : AccountReadableType {
    * @return `true` if the current account has the credentials and support for bookmark syncing
    */
 
-  fun isBookmarkSyncable(): Boolean {
-    return this.loginState.credentials?.annotationsURI != null
-  }
+  fun isBookmarkSyncable(): Boolean = this.loginState.credentials?.annotationsURI != null
 
   /**
    * Mark the current credentials as having expired, assuming they are credentials of a type

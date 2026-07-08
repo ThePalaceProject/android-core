@@ -10,7 +10,6 @@ import org.librarysimplified.ui.BuildConfig
 import java.util.concurrent.TimeUnit
 
 object MainHTTP {
-
   fun create(
     context: Context,
     networkAccess: LSHTTPNetworkAccessType,

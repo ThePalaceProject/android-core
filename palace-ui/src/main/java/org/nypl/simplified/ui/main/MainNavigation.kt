@@ -44,7 +44,6 @@ import java.util.LinkedList
 import java.util.concurrent.atomic.AtomicReference
 
 object MainNavigation {
-
   private val logger =
     LoggerFactory.getLogger(MainNavigation::class.java)
 
@@ -117,9 +116,7 @@ object MainNavigation {
   }
 
   @UiThread
-  fun showLoginDialog(
-    account: AccountType
-  ) {
+  fun showLoginDialog(account: AccountType) {
     UIThread.checkIsUIThread()
     this.tabAttribute.set(TabForCategory(TAB_SETTINGS))
     Settings.openAccountDetail(
@@ -130,18 +127,14 @@ object MainNavigation {
   }
 
   @UiThread
-  fun requestTabChange(
-    category: MainTabCategory
-  ) {
+  fun requestTabChange(category: MainTabCategory) {
     UIThread.checkIsUIThread()
     this.tabAttribute.set(TabForCategory(category))
     this.tabAttribute.set(TabAny)
   }
 
   @UiThread
-  fun requestTabChangeForPart(
-    catalogPart: CatalogPart
-  ) {
+  fun requestTabChangeForPart(catalogPart: CatalogPart) {
     UIThread.checkIsUIThread()
     this.requestTabChange(MainTabCategory.forPart(catalogPart))
   }
@@ -167,7 +160,8 @@ object MainNavigation {
     } catch (e: Throwable) {
       this.logger.error("Unable to open web view activity: ", e)
       try {
-        Toast.makeText(activity, "Unable to open web view activity.", Toast.LENGTH_SHORT)
+        Toast
+          .makeText(activity, "Unable to open web view activity.", Toast.LENGTH_SHORT)
           .show()
       } catch (e: Throwable) {
         // Nothing we can do about this.
@@ -176,7 +170,6 @@ object MainNavigation {
   }
 
   object Settings {
-
     private val navigationStackAttribute: AttributeType<List<ScreenDefinitionType<*, *>>> =
       MainAttributes.attributes.withValue(listOf(SettingsMainFragment3.createScreenDefinition(Unit)))
     private val navigationStackAttributeUI: AttributeType<List<ScreenDefinitionType<*, *>>> =
@@ -193,13 +186,9 @@ object MainNavigation {
     val navigationStack: AttributeReadableType<List<ScreenDefinitionType<*, *>>> =
       this.navigationStackAttribute
 
-    fun currentScreen(): ScreenDefinitionType<*, *> {
-      return this.navigationStackAttributeUI.get().first()
-    }
+    fun currentScreen(): ScreenDefinitionType<*, *> = this.navigationStackAttributeUI.get().first()
 
-    private fun stackPush(
-      screen: ScreenDefinitionType<*, *>
-    ) {
+    private fun stackPush(screen: ScreenDefinitionType<*, *>) {
       val existing = LinkedList(this.navigationStack.get())
       screen.setup()
       existing.push(screen)
@@ -217,15 +206,11 @@ object MainNavigation {
       this.takeAndExecuteOnClose()
     }
 
-    fun openCardCreator(
-      parameters: AccountCardCreatorParameters
-    ) {
+    fun openCardCreator(parameters: AccountCardCreatorParameters) {
       this.stackPush(AccountCardCreatorFragment.createScreenDefinition(parameters))
     }
 
-    fun openDocument(
-      documentTarget: SettingsDocumentViewerModel.DocumentTarget
-    ) {
+    fun openDocument(documentTarget: SettingsDocumentViewerModel.DocumentTarget) {
       this.stackPush(SettingsDocumentViewerFragment.createScreenDefinition(documentTarget))
     }
 

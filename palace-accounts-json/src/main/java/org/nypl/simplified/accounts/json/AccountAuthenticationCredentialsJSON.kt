@@ -17,17 +17,17 @@ import org.nypl.simplified.json.core.JSONParserUtilities
  */
 
 object AccountAuthenticationCredentialsJSON {
-
   /**
    * The available format versions.
    */
 
-  private val versions = listOf(
-    AccountAuthenticationCredentialsJSON20190424,
-    AccountAuthenticationCredentialsJSON20200604,
-    AccountAuthenticationCredentialsJSON20200805,
-    AccountAuthenticationCredentialsJSON20210512
-  )
+  private val versions =
+    listOf(
+      AccountAuthenticationCredentialsJSON20190424,
+      AccountAuthenticationCredentialsJSON20200604,
+      AccountAuthenticationCredentialsJSON20200805,
+      AccountAuthenticationCredentialsJSON20210512
+    )
 
   /**
    * The version number that will be inferred if no version number is present.
@@ -50,9 +50,7 @@ object AccountAuthenticationCredentialsJSON {
    * @return A JSON object
    */
 
-  fun serializeToJSON(
-    credentials: AccountAuthenticationCredentials
-  ): ObjectNode {
+  fun serializeToJSON(credentials: AccountAuthenticationCredentials): ObjectNode {
     val objectMapper = ObjectMapper()
     val authObject = objectMapper.createObjectNode()
     authObject.put("@version", this.currentSupportedVersion)
@@ -129,8 +127,8 @@ object AccountAuthenticationCredentialsJSON {
   private fun serializeAdobeCredentials(
     objectMapper: ObjectMapper,
     adobe: AccountAuthenticationAdobePreActivationCredentials?
-  ): ObjectNode? {
-    return if (adobe != null) {
+  ): ObjectNode? =
+    if (adobe != null) {
       val adobePreObj = objectMapper.createObjectNode()
       adobePreObj.put("client_token", adobe.clientToken.rawToken)
       adobePreObj.put("vendor_id", adobe.vendorID.value)
@@ -148,7 +146,6 @@ object AccountAuthenticationCredentialsJSON {
     } else {
       null
     }
-  }
 
   /**
    * Deserialize the given JSON node, which is assumed to be a JSON object
@@ -160,9 +157,7 @@ object AccountAuthenticationCredentialsJSON {
    */
 
   @Throws(JSONParseException::class)
-  fun deserializeFromJSON(
-    node: JsonNode
-  ): AccountAuthenticationCredentials {
+  fun deserializeFromJSON(node: JsonNode): AccountAuthenticationCredentials {
     val obj =
       JSONParserUtilities.checkObject(null, node)
     val version =

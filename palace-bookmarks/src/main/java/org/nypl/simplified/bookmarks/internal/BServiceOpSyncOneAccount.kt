@@ -29,7 +29,6 @@ internal class BServiceOpSyncOneAccount(
   private val accountID: AccountID,
   private val bookmarksSource: AttributeType<Map<AccountID, Map<BookID, BookmarksForBook>>>,
 ) : BServiceOp<List<SerializedBookmark>>(logger) {
-
   override fun runActual(): List<SerializedBookmark> {
     this.logger.debug(
       "[{}]: syncing account {}",
@@ -100,19 +99,17 @@ internal class BServiceOpSyncOneAccount(
   private fun determineExtraLocalBookmarks(
     received: List<SerializedBookmark>,
     syncable: BSyncableAccount
-  ): Set<SerializedBookmark> {
-    return syncable.account.bookDatabase.books()
+  ): Set<SerializedBookmark> =
+    syncable.account.bookDatabase
+      .books()
       .map { id -> syncable.account.bookDatabase.entry(id) }
       .mapNotNull { entry -> entry.findFormatHandle(BookDatabaseEntryFormatHandleEPUB::class.java) }
       .flatMap { handle -> handle.format.bookmarks }
       .filter { bookmark -> bookmark.kind == BookmarkKind.BookmarkExplicit }
       .filterNot { bookmark -> received.any { remote -> remote.bookmarkId == bookmark.bookmarkId } }
       .toSet()
-  }
 
-  private fun readBookmarksFromServer(
-    syncable: BSyncableAccount
-  ): List<SerializedBookmark> {
+  private fun readBookmarksFromServer(syncable: BSyncableAccount): List<SerializedBookmark> {
     this.bookmarkEventsOut.onNext(BookmarkEvent.BookmarkSyncStarted(syncable.account.id))
 
     val bookmarkAnnotations: List<BookmarkAnnotation> =
@@ -145,7 +142,9 @@ internal class BServiceOpSyncOneAccount(
         val bookmark =
           BookmarkAnnotations.toSerializedBookmark(this.objectMapper, bookmarkAnnotation)
 
-        if (!syncable.account.bookDatabase.books().contains(bookmark.book)) {
+        if (!syncable.account.bookDatabase
+            .books()
+            .contains(bookmark.book)) {
           continue
         }
 
@@ -155,6 +154,7 @@ internal class BServiceOpSyncOneAccount(
             BookmarkKind.BookmarkExplicit -> {
               handle.addBookmark(bookmark)
             }
+
             BookmarkKind.BookmarkLastReadLocation -> {
               handle.setLastReadLocation(bookmark)
             }

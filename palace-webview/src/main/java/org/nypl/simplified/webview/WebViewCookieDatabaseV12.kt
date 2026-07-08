@@ -8,43 +8,45 @@ class WebViewCookieDatabaseV12 internal constructor(
   override fun getAll(): List<WebViewCookieType> {
     val result = mutableListOf<Cookie>()
 
-    val columns = arrayOf(
-      "host_key",
-      "name",
-      "value",
-      "path",
-      "expires_utc",
-      "is_secure",
-      "is_httponly",
-      "samesite",
-      "source_scheme"
-    )
+    val columns =
+      arrayOf(
+        "host_key",
+        "name",
+        "value",
+        "path",
+        "expires_utc",
+        "is_secure",
+        "is_httponly",
+        "samesite",
+        "source_scheme"
+      )
 
-    this.db.query(
-      DB_COOKIE_TABLE_NAME,
-      columns,
-      null,
-      null,
-      null,
-      null,
-      null
-    ).use { cursor ->
-      while (cursor.moveToNext()) {
-        result.add(
-          Cookie(
-            hostKey = cursor.getString(0),
-            name = cursor.getString(1),
-            value = cursor.getString(2),
-            path = cursor.getString(3),
-            expiresUTC = cursor.getLong(4),
-            isSecure = cursor.getInt(5),
-            isHttpOnly = cursor.getInt(6),
-            sameSite = cursor.getInt(7),
-            sourceScheme = cursor.getInt(8),
+    this.db
+      .query(
+        DB_COOKIE_TABLE_NAME,
+        columns,
+        null,
+        null,
+        null,
+        null,
+        null
+      ).use { cursor ->
+        while (cursor.moveToNext()) {
+          result.add(
+            Cookie(
+              hostKey = cursor.getString(0),
+              name = cursor.getString(1),
+              value = cursor.getString(2),
+              path = cursor.getString(3),
+              expiresUTC = cursor.getLong(4),
+              isSecure = cursor.getInt(5),
+              isHttpOnly = cursor.getInt(6),
+              sameSite = cursor.getInt(7),
+              sourceScheme = cursor.getInt(8),
+            )
           )
-        )
+        }
       }
-    }
 
     return result
   }
@@ -60,16 +62,16 @@ class WebViewCookieDatabaseV12 internal constructor(
     val sameSite: Int,
     val sourceScheme: Int,
   ) : WebViewCookieType {
-
     override val sourceURL: String
       get() {
         val domain = this.hostKey.trimStart('.')
 
-        val scheme = when (this.sourceScheme) {
-          1 -> "http"
-          2 -> "https"
-          else -> "http"
-        }
+        val scheme =
+          when (this.sourceScheme) {
+            1 -> "http"
+            2 -> "https"
+            else -> "http"
+          }
 
         return "$scheme://$domain"
       }
@@ -99,14 +101,25 @@ class WebViewCookieDatabaseV12 internal constructor(
 
       when (this.sameSite) {
         -1 -> {}
-        0 -> pairs.add(listOf("SameSite", "None"))
-        1 -> pairs.add(listOf("SameSite", "Lax"))
-        2 -> pairs.add(listOf("SameSite", "Strict"))
+
+        0 -> {
+          pairs.add(listOf("SameSite", "None"))
+        }
+
+        1 -> {
+          pairs.add(listOf("SameSite", "Lax"))
+        }
+
+        2 -> {
+          pairs.add(listOf("SameSite", "Strict"))
+        }
       }
 
-      return pairs.map({ pair ->
-        pair.joinToString("=")
-      }).joinToString("; ")
+      return pairs
+        .map({ pair ->
+          pair.joinToString("=")
+        })
+        .joinToString("; ")
     }
   }
 }

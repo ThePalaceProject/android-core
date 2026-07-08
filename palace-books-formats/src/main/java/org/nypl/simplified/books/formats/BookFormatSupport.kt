@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory
 class BookFormatSupport private constructor(
   private val parameters: BookFormatSupportParameters
 ) : BookFormatSupportType {
-
   private val logger =
     LoggerFactory.getLogger(BookFormatSupport::class.java)
 
@@ -84,27 +83,16 @@ class BookFormatSupport private constructor(
   }
 
   companion object {
-
     /**
      * Construct a new book format support API.
      */
 
-    fun create(
-      parameters: BookFormatSupportParameters
-    ): BookFormatSupportType {
-      return BookFormatSupport(parameters)
-    }
+    fun create(parameters: BookFormatSupportParameters): BookFormatSupportType = BookFormatSupport(parameters)
   }
 
-  override fun isSupportedFinalContentType(
-    mime: MIMEType
-  ): Boolean {
-    return this.finalTypes.contains(mime)
-  }
+  override fun isSupportedFinalContentType(mime: MIMEType): Boolean = this.finalTypes.contains(mime)
 
-  override fun isSupportedPath(
-    typePath: List<MIMEType>
-  ): Boolean {
+  override fun isSupportedPath(typePath: List<MIMEType>): Boolean {
     /*
      * An empty path is trivially unsupported.
      */
@@ -149,12 +137,11 @@ class BookFormatSupport private constructor(
     return true
   }
 
-  override fun isDRMSupported(drmKind: BookDRMKind): Boolean {
-    return when (drmKind) {
+  override fun isDRMSupported(drmKind: BookDRMKind): Boolean =
+    when (drmKind) {
       NONE -> true
       LCP -> this.parameters.supportsLCP
       ACS -> this.parameters.supportsAdobeDRM
       BOUNDLESS -> this.parameters.supportsBoundless
     }
-  }
 }

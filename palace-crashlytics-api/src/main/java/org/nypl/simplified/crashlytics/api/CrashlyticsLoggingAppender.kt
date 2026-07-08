@@ -18,7 +18,6 @@ import java.util.ServiceLoader
 class CrashlyticsLoggingAppender(
   var service: CrashlyticsServiceType? = null
 ) : AppenderBase<ILoggingEvent>() {
-
   init {
     if (this.service == null) {
       val loader =

@@ -10,38 +10,32 @@ import java.net.URI
  */
 
 data class OPDSFacet(
-
   /**
    * `true` if the facet is active
    */
 
   val isActive: Boolean,
-
   /**
    * The URI
    */
 
   val uri: URI,
-
   /**
    * The group
    */
 
   val group: String,
-
   /**
    * The title
    */
 
   val title: String,
-
   /**
    * The group type
    */
 
   val groupType: String?
 ) : Serializable {
-
   companion object {
     private const val serialVersionUID = 1L
   }

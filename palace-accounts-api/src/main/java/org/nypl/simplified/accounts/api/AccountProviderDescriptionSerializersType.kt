@@ -9,7 +9,6 @@ import java.net.URI
  */
 
 interface AccountProviderDescriptionSerializersType : SerializersType<AccountProviderDescription> {
-
   override fun createSerializer(
     uri: URI,
     stream: OutputStream,

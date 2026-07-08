@@ -8,7 +8,6 @@ import java.net.URI
  */
 
 interface AccountProviderBuilderType {
-
   /**
    * @see AccountProviderType.id
    */

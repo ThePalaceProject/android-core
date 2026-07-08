@@ -11,31 +11,26 @@ import java.net.URI
  */
 
 data class AuthenticationDocument(
-
   /**
    * Unique identifier for the Catalog provider and canonical location for the Authentication Document.
    */
 
   val id: URI,
-
   /**
    * Title of the Catalog being accessed.
    */
 
   val title: String,
-
   /**
    * The name of the main color used for the application (such as `red`).
    */
 
   val mainColor: String,
-
   /**
    * A description of the service being displayed to the user.
    */
 
   val description: String?,
-
   /**
    * A list of supported Authentication Flows
    *
@@ -43,7 +38,6 @@ data class AuthenticationDocument(
    */
 
   val authentication: List<AuthenticationObject>,
-
   /**
    * A list of the feature flags (an NYPL extension)
    *
@@ -51,7 +45,6 @@ data class AuthenticationDocument(
    */
 
   val features: AuthenticationObjectNYPLFeatures,
-
   /**
    * Extra resources.
    *
@@ -59,7 +52,6 @@ data class AuthenticationDocument(
    */
 
   val links: List<Link>,
-
   /**
    * Announcements provided by the library.
    *
@@ -68,7 +60,6 @@ data class AuthenticationDocument(
 
   val announcements: List<Announcement>
 ) {
-
   val loansURI: URI? =
     this.links.find { link -> link.relation == "http://opds-spec.org/shelf" }?.hrefURI
 
@@ -97,11 +88,13 @@ data class AuthenticationDocument(
     this.links.find { link -> link.relation == "help" }?.hrefURI
 
   val resetPasswordURI: URI? =
-    this.links.find { link ->
-      link.relation == "http://librarysimplified.org/terms/rel/patron-password-reset"
-    }?.hrefURI
+    this.links
+      .find { link ->
+        link.relation == "http://librarysimplified.org/terms/rel/patron-password-reset"
+      }?.hrefURI
 
   val adobeResetURI: URI? =
-    this.links.find { link -> link.relation == "http://palaceproject.io/terms/rel/delete-adobe-id" }
+    this.links
+      .find { link -> link.relation == "http://palaceproject.io/terms/rel/delete-adobe-id" }
       ?.hrefURI
 }

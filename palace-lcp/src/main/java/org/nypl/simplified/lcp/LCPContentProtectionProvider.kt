@@ -25,7 +25,6 @@ import kotlin.coroutines.suspendCoroutine
  */
 
 class LCPContentProtectionProvider : ContentProtectionProvider {
-
   /**
    * The hashed passphrase that will be used to open the next book. The value may be set to a hex
    * string, or to its base-64 encoding, according to the spec:
@@ -41,9 +40,7 @@ class LCPContentProtectionProvider : ContentProtectionProvider {
   @Volatile
   private var passphrase: String? = null
 
-  fun setPassphraseFromHashed(
-    text: String?
-  ) {
+  fun setPassphraseFromHashed(text: String?) {
     if (text == null) {
       this.passphrase = null
     } else {
@@ -52,9 +49,7 @@ class LCPContentProtectionProvider : ContentProtectionProvider {
     logger.debug("setPassphraseFromHashed: {}", this.passphrase)
   }
 
-  fun setPassphraseFromClear(
-    text: String?
-  ) {
+  fun setPassphraseFromClear(text: String?) {
     if (text == null) {
       this.passphrase = null
     } else {
@@ -79,17 +74,19 @@ class LCPContentProtectionProvider : ContentProtectionProvider {
    * base-64 encoded).
    */
 
-  fun passphrase(): String {
-    return this.passphrase
+  fun passphrase(): String =
+    this.passphrase
       ?: throw IllegalStateException(
         "Please provide a passphrase to the LCPContentProtectionProvider before use!"
       )
-  }
 
   private val logger =
     LoggerFactory.getLogger(LCPContentProtectionProvider::class.java)
 
-  private suspend fun askPassphrase(context: Context, hint: String): String? {
+  private suspend fun askPassphrase(
+    context: Context,
+    hint: String
+  ): String? {
     val view = LayoutInflater.from(context).inflate(R.layout.view_manual_lcp_passphrase, null)
     val inputPassphrase = view.findViewById<TextView>(R.id.inputPassphrase)
 
@@ -133,9 +130,7 @@ class LCPContentProtectionProvider : ContentProtectionProvider {
     }
   }
 
-  override fun create(
-    context: Activity
-  ): ContentProtection? {
+  override fun create(context: Activity): ContentProtection? {
     val httpClient =
       DefaultHttpClient()
 

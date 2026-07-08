@@ -3,7 +3,6 @@ package org.nypl.simplified.ui.accounts.saml20
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 
 sealed class AccountSAML20Event {
-
   /**
    * The patron has successfully logged into the account.
    */

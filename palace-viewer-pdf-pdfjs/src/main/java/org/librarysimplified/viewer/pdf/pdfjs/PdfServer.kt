@@ -35,9 +35,7 @@ class PdfServer private constructor(
   private val context: Application,
   private val publication: Publication
 ) : RouterNanoHTTPD("127.0.0.1", port) {
-
   companion object {
-
     suspend fun create(
       contentProtections: List<ContentProtection>,
       context: Application,
@@ -51,8 +49,9 @@ class PdfServer private constructor(
         AssetRetriever(context.contentResolver, httpClient)
 
       when (val assetRetrieval = assetRetriever.retrieve(pdfFile)) {
-        is Try.Failure ->
+        is Try.Failure -> {
           throw IOException("Failed to open PDF", ErrorException(assetRetrieval.value))
+        }
 
         is Try.Success -> {
           val publicationParser =
@@ -125,17 +124,15 @@ class PdfServer private constructor(
       uri: Uri,
       parameters: Map<String, String>?,
       session: IHTTPSession
-    ): Response {
-      return Response.newFixedLengthResponse(
+    ): Response =
+      Response.newFixedLengthResponse(
         Status.NOT_FOUND,
         MIME_PLAINTEXT,
         "Not found"
       )
-    }
   }
 
   class AssetHandler : BaseHandler() {
-
     private fun guessMimeType(path: String): MediaType {
       val upper = path.uppercase()
       if (upper.endsWith(".CSS")) {
@@ -199,13 +196,13 @@ class PdfServer private constructor(
     ): Response {
       val pdfResource = resource.initParameter(Resource::class.java)
 
-      val length = this.length ?: runBlocking {
-        pdfResource.length()
-      }
-        .getOrDefault(0L)
-        .also {
-          this.length = it
-        }
+      val length =
+        this.length ?: runBlocking {
+          pdfResource.length()
+        }.getOrDefault(0L)
+          .also {
+            this.length = it
+          }
 
       val range = session.headers["range"]
 
@@ -216,21 +213,19 @@ class PdfServer private constructor(
       }
     }
 
-    private fun handleFull(
-      length: Long
-    ): Response {
-      return Response.newChunkedResponse(
-        Status.OK,
-        "application/pdf",
-        // This initial response will be discarded by the PDF viewer once it sees that range
-        // requests are supported, so we can just return some dummy data.
-        ByteArrayInputStream(ByteArray(8))
-      ).apply {
-        addHeader("Accept-Ranges", "bytes")
-        addHeader("Cache-Control", "no-store")
-        addHeader("Content-Length", "$length")
-      }
-    }
+    private fun handleFull(length: Long): Response =
+      Response
+        .newChunkedResponse(
+          Status.OK,
+          "application/pdf",
+          // This initial response will be discarded by the PDF viewer once it sees that range
+          // requests are supported, so we can just return some dummy data.
+          ByteArrayInputStream(ByteArray(8))
+        ).apply {
+          addHeader("Accept-Ranges", "bytes")
+          addHeader("Cache-Control", "no-store")
+          addHeader("Content-Length", "$length")
+        }
 
     private fun handlePartial(
       pdfResource: Resource,
@@ -239,28 +234,31 @@ class PdfServer private constructor(
     ): Response {
       val longRange = parseRange(range)
 
-      val data = runBlocking {
-        pdfResource.read(longRange)
-      }.getOrDefault(ByteArray(0))
+      val data =
+        runBlocking {
+          pdfResource.read(longRange)
+        }.getOrDefault(ByteArray(0))
 
       val start = longRange.first
       val end = longRange.last
 
-      return Response.newFixedLengthResponse(
-        Status.PARTIAL_CONTENT,
-        "application/pdf",
-        data
-      ).apply {
-        addHeader("Accept-Ranges", "bytes")
-        addHeader("Cache-Control", "no-store")
-        addHeader("Content-Range", "bytes $start-$end/$length")
-      }
+      return Response
+        .newFixedLengthResponse(
+          Status.PARTIAL_CONTENT,
+          "application/pdf",
+          data
+        ).apply {
+          addHeader("Accept-Ranges", "bytes")
+          addHeader("Cache-Control", "no-store")
+          addHeader("Content-Range", "bytes $start-$end/$length")
+        }
     }
 
     private fun parseRange(range: String): LongRange {
-      val (start, end) = range.trim().substringAfter("bytes=").split("-").map {
-        it.toLong()
-      }
+      val (start, end) =
+        range.trim().substringAfter("bytes=").split("-").map {
+          it.toLong()
+        }
 
       return LongRange(start, end)
     }
@@ -269,14 +267,15 @@ class PdfServer private constructor(
   abstract class BaseHandler : DefaultHandler() {
     private val log: Logger = LoggerFactory.getLogger(BaseHandler::class.java)
 
-    private fun createErrorResponse(status: Status) =
-      Response.newFixedLengthResponse(status, "text/html", "")
+    private fun createErrorResponse(status: Status) = Response.newFixedLengthResponse(status, "text/html", "")
 
     val notFoundResponse: Response
       get() = createErrorResponse(Status.NOT_FOUND)
 
     override fun getMimeType() = null
+
     override fun getText() = ""
+
     override fun getStatus() = Status.OK
 
     override fun get(

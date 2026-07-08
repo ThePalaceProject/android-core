@@ -11,7 +11,6 @@ import org.nypl.simplified.accounts.api.AccountLoginStringResourcesType
 class MainLoginStringResources(
   private val resources: Resources
 ) : AccountLoginStringResourcesType {
-
   override val loginAuthRequired: String
     get() = this.resources.getString(R.string.loginAuthRequired)
 
@@ -39,8 +38,10 @@ class MainLoginStringResources(
   override val loginCheckAuthRequired: String
     get() = this.resources.getString(R.string.loginCheckingAuthenticationRequirement)
 
-  override fun loginServerError(status: Int, message: String): String =
-    this.resources.getString(R.string.loginErrorServer, status, message)
+  override fun loginServerError(
+    status: Int,
+    message: String
+  ): String = this.resources.getString(R.string.loginErrorServer, status, message)
 
   override val loginAuthNotRequired: String
     get() = this.resources.getString(R.string.loginErrorAuthNotRequired)

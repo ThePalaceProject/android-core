@@ -89,7 +89,6 @@ class CatalogFeedViewDetails2(
   private val covers: BookCoverProviderType,
   private val callbacks: CatalogViewCallbacksType,
 ) : CatalogFeedView() {
-
   private var loanExpiryDate: DateTime? = null
   private val logger =
     LoggerFactory.getLogger(CatalogFeedViewDetails2::class.java)
@@ -240,17 +239,11 @@ class CatalogFeedViewDetails2(
   private var enableButton0Status = false
   private var enableButton1Status = false
 
-  private fun isToolbarButtonsEnabled(): Boolean {
-    return this.enableButton0Status && this.enableButtonsOnToolbarView
-  }
+  private fun isToolbarButtonsEnabled(): Boolean = this.enableButton0Status && this.enableButtonsOnToolbarView
 
-  private fun isOverlayButton0Enabled(): Boolean {
-    return this.enableButton0Status && this.enableButtonsOnOverlayView
-  }
+  private fun isOverlayButton0Enabled(): Boolean = this.enableButton0Status && this.enableButtonsOnOverlayView
 
-  private fun isOverlayButton1Enabled(): Boolean {
-    return this.enableButton1Status && this.enableButtonsOnOverlayView
-  }
+  private fun isOverlayButton1Enabled(): Boolean = this.enableButton1Status && this.enableButtonsOnOverlayView
 
   private fun reconfigureButtonsEnabledDisabled() {
     val toolbarEnabled =
@@ -300,10 +293,11 @@ class CatalogFeedViewDetails2(
       openHandle = R.string.catalogAccessibilityOpenCheckoutDrawer,
       closeHandle = R.string.catalogAccessibilityCloseCheckoutDrawer
     )
-    this.bottomSheet.setOpenListener(object : PalaceBottomSheetType.SheetOpenListenerType {
-      override fun onOpenChanged(state: Double) {
-        val c = this@CatalogFeedViewDetails2
-        c.bottomSheetDarken.alpha = (c.bottomSheetDarkenOpacityMax * state).toFloat()
+    this.bottomSheet.setOpenListener(
+      object : PalaceBottomSheetType.SheetOpenListenerType {
+        override fun onOpenChanged(state: Double) {
+          val c = this@CatalogFeedViewDetails2
+          c.bottomSheetDarken.alpha = (c.bottomSheetDarkenOpacityMax * state).toFloat()
 
         /*
          * If the drawer is fully open, make all the other views disabled. If the drawer is
@@ -312,39 +306,40 @@ class CatalogFeedViewDetails2(
          * to stop the user clicking on things in the background.
          */
 
-        if (state >= 0.99) {
-          c.bottomSheetDarken.setOnClickListener {
-            c.bottomSheet.drawerClose()
-          }
-          c.bottomSheetDarken.isClickable = true
-          c.scrollView.importantForAccessibility =
-            View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
+          if (state >= 0.99) {
+            c.bottomSheetDarken.setOnClickListener {
+              c.bottomSheet.drawerClose()
+            }
+            c.bottomSheetDarken.isClickable = true
+            c.scrollView.importantForAccessibility =
+              View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
 
-          for (view in viewsDisabledWhenDrawerOpen) {
-            view.isEnabled = false
-            view.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
-          }
+            for (view in viewsDisabledWhenDrawerOpen) {
+              view.isEnabled = false
+              view.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
+            }
 
           /*
            * Tell the title in the drawer to gain accessibility focus.
            */
 
-          c.bottomSheetTitle.postDelayed({
-            c.bottomSheetTitle.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED)
-          }, 100L)
-        } else if (state <= 0.01) {
-          c.bottomSheetDarken.setOnClickListener(null)
-          c.bottomSheetDarken.isClickable = false
-          c.scrollView.importantForAccessibility =
-            View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
+            c.bottomSheetTitle.postDelayed({
+              c.bottomSheetTitle.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED)
+            }, 100L)
+          } else if (state <= 0.01) {
+            c.bottomSheetDarken.setOnClickListener(null)
+            c.bottomSheetDarken.isClickable = false
+            c.scrollView.importantForAccessibility =
+              View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
 
-          for (view in viewsDisabledWhenDrawerOpen) {
-            view.isEnabled = true
-            view.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
+            for (view in viewsDisabledWhenDrawerOpen) {
+              view.isEnabled = true
+              view.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
+            }
           }
         }
       }
-    })
+    )
 
     this.scrollView.isSaveEnabled = false
     this.cover.bringToFront()
@@ -386,11 +381,13 @@ class CatalogFeedViewDetails2(
     this.root.post { this.onScrollChanged(1) }
 
     this.root.post {
-      this.imageOverlay.animate()
+      this.imageOverlay
+        .animate()
         .alpha(1.0f)
         .setDuration(250)
         .start()
-      this.scrollLinear.animate()
+      this.scrollLinear
+        .animate()
         .alpha(1.0f)
         .setDuration(250)
         .start()
@@ -408,9 +405,7 @@ class CatalogFeedViewDetails2(
    * section.
    */
 
-  private fun onScrollChanged(
-    verticalOffset: Int
-  ) {
+  private fun onScrollChanged(verticalOffset: Int) {
     this.imageOverlay.y = this.adjustImageY(this.appBar)
 
     /*
@@ -476,11 +471,12 @@ class CatalogFeedViewDetails2(
      * it expands and contracts.
      */
 
-    val newSpacerSize = this.interpolate(
-      minimum = this.spacerSizeMin,
-      maximum = heightDiff.toInt(),
-      position = offset
-    )
+    val newSpacerSize =
+      this.interpolate(
+        minimum = this.spacerSizeMin,
+        maximum = heightDiff.toInt(),
+        position = offset
+      )
 
     if (newSpacerSize != this.spacerSize) {
       this.spacer.layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, newSpacerSize)
@@ -491,13 +487,9 @@ class CatalogFeedViewDetails2(
     minimum: Int,
     maximum: Int,
     position: Double
-  ): Int {
-    return ((maximum.toDouble() * (1.0 - position)) + (minimum.toDouble() * position)).toInt()
-  }
+  ): Int = ((maximum.toDouble() * (1.0 - position)) + (minimum.toDouble() * position)).toInt()
 
-  private fun adjustImageY(
-    appBar: ViewGroup
-  ): Float {
+  private fun adjustImageY(appBar: ViewGroup): Float {
     val coverHeight =
       this.root.resources.getDimensionPixelSize(R.dimen.catalogBookDetailCoverHeight)
 
@@ -566,9 +558,7 @@ class CatalogFeedViewDetails2(
     return Triple(row, rowKey, rowVal)
   }
 
-  private fun formatDuration(
-    seconds: Double
-  ): String {
+  private fun formatDuration(seconds: Double): String {
     val duration =
       Duration.standardSeconds(seconds.toLong())
     val hours =
@@ -582,28 +572,30 @@ class CatalogFeedViewDetails2(
     )
   }
 
-  private fun configureMetadataTable(
-    newEntry: FeedEntry.FeedEntryOPDS
-  ) {
+  private fun configureMetadataTable(newEntry: FeedEntry.FeedEntryOPDS) {
     this.metadata.removeAllViews()
 
     val probableFormat =
       newEntry.probableFormat
 
-    val bookFormatText = when (probableFormat) {
-      BookFormats.BookFormatDefinition.BOOK_FORMAT_EPUB ->
-        this.root.resources.getString(R.string.catalogBookFormatEPUB)
+    val bookFormatText =
+      when (probableFormat) {
+        BookFormats.BookFormatDefinition.BOOK_FORMAT_EPUB -> {
+          this.root.resources.getString(R.string.catalogBookFormatEPUB)
+        }
 
-      BookFormats.BookFormatDefinition.BOOK_FORMAT_AUDIO ->
-        this.root.resources.getString(R.string.catalogBookFormatAudioBook)
+        BookFormats.BookFormatDefinition.BOOK_FORMAT_AUDIO -> {
+          this.root.resources.getString(R.string.catalogBookFormatAudioBook)
+        }
 
-      BookFormats.BookFormatDefinition.BOOK_FORMAT_PDF ->
-        this.root.resources.getString(R.string.catalogBookFormatPDF)
+        BookFormats.BookFormatDefinition.BOOK_FORMAT_PDF -> {
+          this.root.resources.getString(R.string.catalogBookFormatPDF)
+        }
 
-      else -> {
-        ""
+        else -> {
+          ""
+        }
       }
-    }
 
     // PP-4047:
     // 1. Format
@@ -728,9 +720,7 @@ class CatalogFeedViewDetails2(
     this.setVisibility(this.relatedDivider, View.GONE)
   }
 
-  fun bindRelatedFeedResult(
-    feedResult: FeedLoaderResult
-  ) {
+  fun bindRelatedFeedResult(feedResult: FeedLoaderResult) {
     when (feedResult) {
       is FeedLoaderFailedAuthentication -> {
         this.setNoRelatedFeed()
@@ -764,9 +754,7 @@ class CatalogFeedViewDetails2(
     }
   }
 
-  private fun configureDescription(
-    newEntry: FeedEntry.FeedEntryOPDS
-  ) {
+  private fun configureDescription(newEntry: FeedEntry.FeedEntryOPDS) {
     val opds = newEntry.feedEntry
 
     /*
@@ -777,16 +765,17 @@ class CatalogFeedViewDetails2(
       Html.fromHtml(opds.summary, Html.FROM_HTML_MODE_LEGACY)
 
     this.descriptionText.post {
-      this.seeMore.visibility = if (this.descriptionText.lineCount > 6) {
-        this.descriptionText.maxLines = 6
-        this.seeMore.setOnClickListener {
-          this.descriptionText.maxLines = Integer.MAX_VALUE
-          this.setVisibility(this.seeMore, View.GONE)
+      this.seeMore.visibility =
+        if (this.descriptionText.lineCount > 6) {
+          this.descriptionText.maxLines = 6
+          this.seeMore.setOnClickListener {
+            this.descriptionText.maxLines = Integer.MAX_VALUE
+            this.setVisibility(this.seeMore, View.GONE)
+          }
+          View.VISIBLE
+        } else {
+          View.GONE
         }
-        View.VISIBLE
-      } else {
-        View.GONE
-      }
     }
   }
 
@@ -850,15 +839,14 @@ class CatalogFeedViewDetails2(
       container: ViewGroup,
       covers: BookCoverProviderType,
       callbacks: CatalogViewCallbacksType,
-    ): CatalogFeedViewDetails2 {
-      return CatalogFeedViewDetails2(
+    ): CatalogFeedViewDetails2 =
+      CatalogFeedViewDetails2(
         root = layoutInflater.inflate(R.layout.book_detail2, container, true) as ViewGroup,
         screenSize = screenSize,
         layoutInflater = layoutInflater,
         covers = covers,
         callbacks = callbacks,
       )
-    }
   }
 
   override fun startFocus() {
@@ -876,9 +864,7 @@ class CatalogFeedViewDetails2(
     // Nothing to do
   }
 
-  fun onStatusUpdate(
-    status: CatalogBookStatus<BookStatus>
-  ) {
+  fun onStatusUpdate(status: CatalogBookStatus<BookStatus>) {
     this.debugText.text = status.status.javaClass.simpleName
 
     when (status.status) {
@@ -970,9 +956,7 @@ class CatalogFeedViewDetails2(
     this.reconfigureButtonsEnabledDisabled()
   }
 
-  private fun onBookStatusFailedLoan(
-    status: CatalogBookStatus<FailedLoan>
-  ) {
+  private fun onBookStatusFailedLoan(status: CatalogBookStatus<FailedLoan>) {
     this.enableButton0Status = true
     this.enableButton1Status = true
 
@@ -1001,9 +985,7 @@ class CatalogFeedViewDetails2(
     )
   }
 
-  private fun onBookStatusFailedLoanBadCredentials(
-    status: CatalogBookStatus<FailedLoanBadCredentials>
-  ) {
+  private fun onBookStatusFailedLoanBadCredentials(status: CatalogBookStatus<FailedLoanBadCredentials>) {
     this.enableButton0Status = true
     this.enableButton1Status = true
 
@@ -1032,9 +1014,7 @@ class CatalogFeedViewDetails2(
     )
   }
 
-  private fun onBookStatusFailedRevoke(
-    status: CatalogBookStatus<FailedRevoke>
-  ) {
+  private fun onBookStatusFailedRevoke(status: CatalogBookStatus<FailedRevoke>) {
     this.enableButton0Status = true
     this.enableButton1Status = true
 
@@ -1061,9 +1041,7 @@ class CatalogFeedViewDetails2(
     )
   }
 
-  private fun onBookStatusFailedRevokeBadCredentials(
-    status: CatalogBookStatus<FailedRevokeBadCredentials>
-  ) {
+  private fun onBookStatusFailedRevokeBadCredentials(status: CatalogBookStatus<FailedRevokeBadCredentials>) {
     this.enableButton0Status = true
     this.enableButton1Status = true
 
@@ -1090,9 +1068,7 @@ class CatalogFeedViewDetails2(
     )
   }
 
-  private fun onBookStatusFailedDownload(
-    status: CatalogBookStatus<FailedDownload>
-  ) {
+  private fun onBookStatusFailedDownload(status: CatalogBookStatus<FailedDownload>) {
     this.enableButton0Status = true
     this.enableButton1Status = true
 
@@ -1119,9 +1095,7 @@ class CatalogFeedViewDetails2(
     )
   }
 
-  private fun onBookStatusFailedDownloadBadCredentials(
-    status: CatalogBookStatus<FailedDownloadBadCredentials>
-  ) {
+  private fun onBookStatusFailedDownloadBadCredentials(status: CatalogBookStatus<FailedDownloadBadCredentials>) {
     this.enableButton0Status = true
     this.enableButton1Status = true
 
@@ -1148,9 +1122,7 @@ class CatalogFeedViewDetails2(
     )
   }
 
-  private fun onBookStatusHeldInQueue(
-    status: CatalogBookStatus<HeldInQueue>
-  ) {
+  private fun onBookStatusHeldInQueue(status: CatalogBookStatus<HeldInQueue>) {
     val held = status.status
     this.enableButton0Status = held.isRevocable
 
@@ -1179,10 +1151,11 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogManageHold,
-      accessibilityTextOverride = this.root.resources.getString(
-        R.string.catalogAccessibilityBookManageHold,
-        status.book.entry.title
-      ),
+      accessibilityTextOverride =
+        this.root.resources.getString(
+          R.string.catalogAccessibilityBookManageHold,
+          status.book.entry.title
+        ),
       actionInPage = {
         this.openDrawer()
         this.callbacks.onBookRequestRevoke(status.book)
@@ -1214,53 +1187,49 @@ class CatalogFeedViewDetails2(
   private fun configureInfoContainer(
     setState: InfoState,
     andThen: () -> Unit
-  ) {
-    return when (setState) {
-      NONE -> {
-        this.setVisibility(this.bottomSheetInfoContainer, View.INVISIBLE)
-        this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
-        this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
-        this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
-        andThen()
-      }
+  ) = when (setState) {
+    NONE -> {
+      this.setVisibility(this.bottomSheetInfoContainer, View.INVISIBLE)
+      this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
+      this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
+      this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
+      andThen()
+    }
 
-      BORROWING -> {
-        this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
-        this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.VISIBLE)
-        this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
-        this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
-        andThen()
-      }
+    BORROWING -> {
+      this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
+      this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.VISIBLE)
+      this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
+      this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
+      andThen()
+    }
 
-      GENERIC -> {
-        this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
-        this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
-        this.setVisibility(this.bottomSheetInfoGenericLayout, View.VISIBLE)
-        this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
-        andThen()
-      }
+    GENERIC -> {
+      this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
+      this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
+      this.setVisibility(this.bottomSheetInfoGenericLayout, View.VISIBLE)
+      this.setVisibility(this.bottomSheetInfoProgress, View.INVISIBLE)
+      andThen()
+    }
 
-      PROGRESS -> {
-        this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
-        this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
-        this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
-        this.setVisibility(this.bottomSheetInfoProgress, View.VISIBLE)
-        andThen()
-      }
+    PROGRESS -> {
+      this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
+      this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.INVISIBLE)
+      this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
+      this.setVisibility(this.bottomSheetInfoProgress, View.VISIBLE)
+      andThen()
+    }
 
-      BORROWING_AND_PROGRESS -> {
-        this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
-        this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.VISIBLE)
-        this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
-        this.setVisibility(this.bottomSheetInfoProgress, View.VISIBLE)
-        andThen()
-      }
+    BORROWING_AND_PROGRESS -> {
+      this.setVisibility(this.bottomSheetInfoContainer, View.VISIBLE)
+      this.setVisibility(this.bottomSheetInfoBorrowingLayout, View.VISIBLE)
+      this.setVisibility(this.bottomSheetInfoGenericLayout, View.INVISIBLE)
+      this.setVisibility(this.bottomSheetInfoProgress, View.VISIBLE)
+      andThen()
     }
   }
 
-  private fun onBookStatusHeldReady(
-    status: CatalogBookStatus<HeldReady>
-  ) {
+  private fun onBookStatusHeldReady(status: CatalogBookStatus<HeldReady>) {
     this.enableButton0Status = true
 
     this.configureInfoContainer(GENERIC) {
@@ -1270,10 +1239,11 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogGet,
-      accessibilityTextOverride = this.root.resources.getString(
-        R.string.catalogAccessibilityBookBorrow,
-        status.book.entry.title
-      ),
+      accessibilityTextOverride =
+        this.root.resources.getString(
+          R.string.catalogAccessibilityBookBorrow,
+          status.book.entry.title
+        ),
       actionInPage = {
         this.openDrawer()
         this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
@@ -1286,9 +1256,7 @@ class CatalogFeedViewDetails2(
     this.reconfigurePreviewButton(status)
   }
 
-  private fun onBookStatusHoldable(
-    status: CatalogBookStatus<Holdable>
-  ) {
+  private fun onBookStatusHoldable(status: CatalogBookStatus<Holdable>) {
     this.enableButton0Status = true
     this.enableButton1Status = false
 
@@ -1296,10 +1264,11 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogPlaceHold,
-      accessibilityTextOverride = this.root.resources.getString(
-        R.string.catalogAccessibilityBookPlaceHold,
-        status.book.entry.title
-      ),
+      accessibilityTextOverride =
+        this.root.resources.getString(
+          R.string.catalogAccessibilityBookPlaceHold,
+          status.book.entry.title
+        ),
       actionInPage = {
         this.openDrawer()
         this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
@@ -1311,9 +1280,7 @@ class CatalogFeedViewDetails2(
     this.reconfigurePreviewButton(status)
   }
 
-  private fun onBookStatusLoanable(
-    status: CatalogBookStatus<Loanable>
-  ) {
+  private fun onBookStatusLoanable(status: CatalogBookStatus<Loanable>) {
     this.enableButton0Status = true
     this.enableButton1Status = false
 
@@ -1323,10 +1290,11 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogGet,
-      accessibilityTextOverride = this.root.resources.getString(
-        R.string.catalogAccessibilityBookBorrow,
-        status.book.entry.title
-      ),
+      accessibilityTextOverride =
+        this.root.resources.getString(
+          R.string.catalogAccessibilityBookBorrow,
+          status.book.entry.title
+        ),
       actionInPage = {
         this.openDrawer()
         this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
@@ -1338,18 +1306,17 @@ class CatalogFeedViewDetails2(
     this.reconfigurePreviewButton(status)
   }
 
-  private fun reconfigurePreviewButton(
-    status: CatalogBookStatus<*>
-  ) {
+  private fun reconfigurePreviewButton(status: CatalogBookStatus<*>) {
     when (status.previewStatus) {
       is BookPreviewStatus.HasPreview -> {
         this.enableButton1Status = true
         this.reconfigureButton1(
           text = R.string.catalogPreview,
-          accessibilityTextOverride = this.root.resources.getString(
-            R.string.catalogAccessibilityBookPreviewRead,
-            status.book.entry.title
-          ),
+          accessibilityTextOverride =
+            this.root.resources.getString(
+              R.string.catalogAccessibilityBookPreviewRead,
+              status.book.entry.title
+            ),
           actionInPage = { this.callbacks.onBookRequestPreviewOpen(status.book) },
           actionInBottomSheet = { this.callbacks.onBookRequestPreviewOpen(status.book) }
         )
@@ -1363,9 +1330,7 @@ class CatalogFeedViewDetails2(
     }
   }
 
-  private fun onBookStatusLoanedDownloaded(
-    status: CatalogBookStatus<LoanedDownloaded>
-  ) {
+  private fun onBookStatusLoanedDownloaded(status: CatalogBookStatus<LoanedDownloaded>) {
     this.enableButton0Status = true
     this.enableButton1Status = false
 
@@ -1395,10 +1360,11 @@ class CatalogFeedViewDetails2(
       this.enableButton1Status = true
       this.reconfigureButton1(
         text = R.string.catalogReturn,
-        accessibilityTextOverride = this.root.resources.getString(
-          R.string.catalogAccessibilityBookRevokeLoan,
-          status.book.entry.title
-        ),
+        accessibilityTextOverride =
+          this.root.resources.getString(
+            R.string.catalogAccessibilityBookRevokeLoan,
+            status.book.entry.title
+          ),
         actionInPage = {
           this.openDrawer()
           this.callbacks.onBookRequestRevoke(status.book)
@@ -1412,36 +1378,34 @@ class CatalogFeedViewDetails2(
     }
   }
 
-  private fun readButtonAccessibilityLabel(book: Book): String {
-    return when (book.findPreferredFormat()) {
-      is BookFormat.BookFormatAudioBook ->
+  private fun readButtonAccessibilityLabel(book: Book): String =
+    when (book.findPreferredFormat()) {
+      is BookFormat.BookFormatAudioBook -> {
         this.root.resources.getString(R.string.catalogAccessibilityBookListen, book.entry.title)
+      }
 
-      is BookFormat.BookFormatEPUB ->
+      is BookFormat.BookFormatEPUB -> {
         this.root.resources.getString(R.string.catalogAccessibilityBookRead, book.entry.title)
+      }
 
-      is BookFormat.BookFormatPDF ->
+      is BookFormat.BookFormatPDF -> {
         this.root.resources.getString(R.string.catalogAccessibilityBookRead, book.entry.title)
+      }
 
-      null ->
+      null -> {
         this.root.resources.getString(R.string.catalogAccessibilityBookRead, book.entry.title)
+      }
     }
-  }
 
-  private fun readButtonString(
-    book: Book
-  ): Int {
-    return when (book.findPreferredFormat()) {
+  private fun readButtonString(book: Book): Int =
+    when (book.findPreferredFormat()) {
       is BookFormat.BookFormatAudioBook -> R.string.catalogListen
       is BookFormat.BookFormatEPUB -> R.string.catalogRead
       is BookFormat.BookFormatPDF -> R.string.catalogRead
       null -> R.string.catalogRead
     }
-  }
 
-  private fun onBookStatusLoanedNotDownloaded(
-    status: CatalogBookStatus<LoanedNotDownloaded>
-  ) {
+  private fun onBookStatusLoanedNotDownloaded(status: CatalogBookStatus<LoanedNotDownloaded>) {
     this.enableButton0Status = true
     this.enableButton1Status = true
 
@@ -1459,10 +1423,11 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogDownload,
-      accessibilityTextOverride = this.root.resources.getString(
-        R.string.catalogAccessibilityBookDownload,
-        status.book.entry.title
-      ),
+      accessibilityTextOverride =
+        this.root.resources.getString(
+          R.string.catalogAccessibilityBookDownload,
+          status.book.entry.title
+        ),
       actionInPage = {
         this.openDrawer()
         this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
@@ -1476,10 +1441,11 @@ class CatalogFeedViewDetails2(
       this.enableButton1Status = true
       this.reconfigureButton1(
         text = R.string.catalogReturn,
-        accessibilityTextOverride = this.root.resources.getString(
-          R.string.catalogAccessibilityBookRevokeLoan,
-          status.book.entry.title
-        ),
+        accessibilityTextOverride =
+          this.root.resources.getString(
+            R.string.catalogAccessibilityBookRevokeLoan,
+            status.book.entry.title
+          ),
         actionInPage = {
           this.openDrawer()
           this.callbacks.onBookRequestRevoke(status.book)
@@ -1493,9 +1459,7 @@ class CatalogFeedViewDetails2(
     }
   }
 
-  private fun onBookStatusReachedLoanLimit(
-    status: CatalogBookStatus<ReachedLoanLimit>
-  ) {
+  private fun onBookStatusReachedLoanLimit(status: CatalogBookStatus<ReachedLoanLimit>) {
     this.enableButton0Status = false
     this.enableButton1Status = false
 
@@ -1504,9 +1468,7 @@ class CatalogFeedViewDetails2(
     }
   }
 
-  private fun onBookStatusRequestingDownload(
-    status: CatalogBookStatus<RequestingDownload>
-  ) {
+  private fun onBookStatusRequestingDownload(status: CatalogBookStatus<RequestingDownload>) {
     this.enableButton0Status = false
     this.enableButton1Status = false
 
@@ -1523,9 +1485,7 @@ class CatalogFeedViewDetails2(
     }
   }
 
-  private fun setBorrowingTimeDays(
-    expires: DateTime?
-  ) {
+  private fun setBorrowingTimeDays(expires: DateTime?) {
     if (expires == null) {
       return
     }
@@ -1539,9 +1499,7 @@ class CatalogFeedViewDetails2(
       )
   }
 
-  private fun onBookStatusRequestingLoan(
-    status: CatalogBookStatus<RequestingLoan>
-  ) {
+  private fun onBookStatusRequestingLoan(status: CatalogBookStatus<RequestingLoan>) {
     this.enableButton0Status = false
     this.enableButton1Status = false
 
@@ -1550,9 +1508,7 @@ class CatalogFeedViewDetails2(
     }
   }
 
-  private fun onBookStatusRequestingRevoke(
-    status: CatalogBookStatus<RequestingRevoke>
-  ) {
+  private fun onBookStatusRequestingRevoke(status: CatalogBookStatus<RequestingRevoke>) {
     this.enableButton0Status = false
     this.enableButton1Status = false
 
@@ -1561,18 +1517,14 @@ class CatalogFeedViewDetails2(
     }
   }
 
-  private fun onBookStatusRevoked(
-    status: CatalogBookStatus<Revoked>
-  ) {
+  private fun onBookStatusRevoked(status: CatalogBookStatus<Revoked>) {
     this.enableButton0Status = false
     this.enableButton1Status = false
 
     this.configureInfoContainer(NONE) {}
   }
 
-  private fun onBookStatusDownloading(
-    status: CatalogBookStatus<Downloading>
-  ) {
+  private fun onBookStatusDownloading(status: CatalogBookStatus<Downloading>) {
     this.enableButton0Status = true
     this.enableButton1Status = false
 
@@ -1590,10 +1542,11 @@ class CatalogFeedViewDetails2(
 
     this.reconfigureButton0(
       text = R.string.catalogCancel,
-      accessibilityTextOverride = this.root.resources.getString(
-        R.string.catalogAccessibilityBookDownloadCancel,
-        status.book.entry.title
-      ),
+      accessibilityTextOverride =
+        this.root.resources.getString(
+          R.string.catalogAccessibilityBookDownloadCancel,
+          status.book.entry.title
+        ),
       actionInPage = {
         this.openDrawer()
         this.callbacks.onBookRequestBorrowCancel(status.book)
@@ -1609,15 +1562,11 @@ class CatalogFeedViewDetails2(
     this.setVisibility(this.bottomSheet, View.VISIBLE)
   }
 
-  private fun setProgress(
-    percent: Double?
-  ) {
+  private fun setProgress(percent: Double?) {
     this.bottomSheetInfoProgress.setProgress((percent ?: 0.0).toInt(), true)
   }
 
-  private fun onBookStatusDownloadWaitingForExternalAuthentication(
-    status: CatalogBookStatus<DownloadWaitingForExternalAuthentication>
-  ) {
+  private fun onBookStatusDownloadWaitingForExternalAuthentication(status: CatalogBookStatus<DownloadWaitingForExternalAuthentication>) {
     val expires = this.loanExpiryDate
     if (expires != null) {
       this.configureInfoContainer(BORROWING_AND_PROGRESS) {
@@ -1633,9 +1582,7 @@ class CatalogFeedViewDetails2(
     this.callbacks.onBookRequestSAMLDownload(status)
   }
 
-  private fun onBookStatusDownloadExternalAuthenticationInProgress(
-    status: CatalogBookStatus<DownloadExternalAuthenticationInProgress>
-  ) {
+  private fun onBookStatusDownloadExternalAuthenticationInProgress(status: CatalogBookStatus<DownloadExternalAuthenticationInProgress>) {
     val expires = this.loanExpiryDate
     if (expires != null) {
       this.configureInfoContainer(BORROWING_AND_PROGRESS) {

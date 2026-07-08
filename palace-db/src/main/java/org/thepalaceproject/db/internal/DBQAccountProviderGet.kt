@@ -6,11 +6,11 @@ import org.thepalaceproject.db.api.queries.DBQAccountProviderGetType
 import java.net.URI
 
 internal object DBQAccountProviderGet : DBQAccountProviderGetType {
-
   const val FORMAT_ACCOUNT_PROVIDER_JSON =
     "org.nypl.simplified.accounts.json.AccountProvidersJSON"
 
-  private val text = """
+  private val text =
+    """
     SELECT
       ap.ap_id,
       ap.ap_updated_time_last,
@@ -19,13 +19,13 @@ internal object DBQAccountProviderGet : DBQAccountProviderGetType {
     FROM account_providers AS ap
       WHERE ap.ap_id = ?
         LIMIT 1
-  """.trimIndent()
+    """.trimIndent()
 
   override fun execute(
     transaction: DBTransactionType,
     parameters: URI
-  ): AccountProvider? {
-    return transaction.connection.connection.prepareStatement(this.text).use { statement ->
+  ): AccountProvider? =
+    transaction.connection.connection.prepareStatement(this.text).use { statement ->
       statement.setString(1, parameters.toString())
       statement.executeQuery().use { resultSet ->
         if (resultSet.next()) {
@@ -35,5 +35,4 @@ internal object DBQAccountProviderGet : DBQAccountProviderGetType {
         }
       }
     }
-  }
 }

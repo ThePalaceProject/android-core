@@ -42,7 +42,6 @@ import javax.xml.parsers.ParserConfigurationException
 class OPDSFeedParser private constructor(
   private val entryParser: OPDSAcquisitionFeedEntryParserType
 ) : OPDSFeedParserType {
-
   @Throws(OPDSParseException::class)
   override fun parse(
     uri: URI,
@@ -316,11 +315,7 @@ class OPDSFeedParser private constructor(
      * @return A new feed  parser
      */
     @JvmStatic
-    fun newParser(
-      entryParser: OPDSAcquisitionFeedEntryParserType
-    ): OPDSFeedParserType {
-      return OPDSFeedParser(entryParser)
-    }
+    fun newParser(entryParser: OPDSAcquisitionFeedEntryParserType): OPDSFeedParserType = OPDSFeedParser(entryParser)
 
     private fun parseFacet(
       source: URI,
@@ -372,13 +367,12 @@ class OPDSFeedParser private constructor(
       return null
     }
 
-    private fun parseFacetGroupType(e: Element): String? {
-      return if (e.hasAttributeNS(SIMPLIFIED_URI_TEXT, "facetGroupType")) {
+    private fun parseFacetGroupType(e: Element): String? =
+      if (e.hasAttributeNS(SIMPLIFIED_URI_TEXT, "facetGroupType")) {
         e.getAttributeNS(SIMPLIFIED_URI_TEXT, "facetGroupType")
       } else {
         null
       }
-    }
 
     private fun parseFacetIsActive(e: Element): Boolean {
       if (e.hasAttributeNS(OPDS_URI_TEXT, "activeFacet")) {
@@ -470,9 +464,7 @@ class OPDSFeedParser private constructor(
     }
 
     @Throws(ParserConfigurationException::class, SAXException::class, IOException::class)
-    private fun parseStream(
-      s: InputStream?
-    ): Document {
+    private fun parseStream(s: InputStream?): Document {
       val dbf = DocumentBuilderFactory.newInstance()
       dbf.isNamespaceAware = true
       val db = dbf.newDocumentBuilder()
@@ -638,9 +630,7 @@ class OPDSFeedParser private constructor(
       return null
     }
 
-    private fun hrefAttributeOfLinkRel(relValue: String): String {
-      return "'href' attribute of 'link' with 'rel' $relValue"
-    }
+    private fun hrefAttributeOfLinkRel(relValue: String): String = "'href' attribute of 'link' with 'rel' $relValue"
 
     private fun invalidURI(
       source: URI,

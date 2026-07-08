@@ -20,7 +20,6 @@ import java.util.concurrent.ConcurrentHashMap
  */
 
 object AccountBundledCredentialsJSON {
-
   /**
    * Deserialize bundled credentials from the given JSON.
    *
@@ -30,9 +29,7 @@ object AccountBundledCredentialsJSON {
    */
 
   @Throws(JSONParseException::class)
-  fun deserializeFromJSON(
-    node: ObjectNode
-  ): AccountBundledCredentialsType {
+  fun deserializeFromJSON(node: ObjectNode): AccountBundledCredentialsType {
     val credentialsByProvider =
       ConcurrentHashMap<URI, AccountAuthenticationCredentials>()
     val byProvider =
@@ -58,11 +55,7 @@ object AccountBundledCredentialsJSON {
    */
 
   @Throws(JSONParseException::class)
-  fun deserializeFromJSON(
-    node: JsonNode
-  ): AccountBundledCredentialsType {
-    return deserializeFromJSON(JSONParserUtilities.checkObject(null, node))
-  }
+  fun deserializeFromJSON(node: JsonNode): AccountBundledCredentialsType = deserializeFromJSON(JSONParserUtilities.checkObject(null, node))
 
   /**
    * Deserialize bundled credentials from the given JSON.
@@ -78,9 +71,7 @@ object AccountBundledCredentialsJSON {
   fun deserializeFromStream(
     mapper: ObjectMapper,
     stream: InputStream
-  ): AccountBundledCredentialsType {
-    return deserializeFromJSON(mapper.readTree(stream))
-  }
+  ): AccountBundledCredentialsType = deserializeFromJSON(mapper.readTree(stream))
 
   /**
    * Serialize the given credentials to JSON.
@@ -120,9 +111,7 @@ object AccountBundledCredentialsJSON {
   fun serializeToBytes(
     mapper: ObjectMapper,
     credentials: AccountBundledCredentialsType
-  ): ByteArray {
-    return mapper.writeValueAsBytes(serializeToJSON(mapper, credentials))
-  }
+  ): ByteArray = mapper.writeValueAsBytes(serializeToJSON(mapper, credentials))
 
   /**
    * Serialize the given credentials to JSON.
@@ -147,15 +136,9 @@ object AccountBundledCredentialsJSON {
   data class BundledCredentials internal constructor(
     val credentialsByProvider: Map<URI, AccountAuthenticationCredentials>
   ) : AccountBundledCredentialsType {
+    override fun bundledCredentials(): Map<URI, AccountAuthenticationCredentials> = credentialsByProvider
 
-    override fun bundledCredentials(): Map<URI, AccountAuthenticationCredentials> {
-      return credentialsByProvider
-    }
-
-    override fun bundledCredentialsFor(
-      accountProvider: URI
-    ): AccountAuthenticationCredentials? {
-      return this.credentialsByProvider[accountProvider]
-    }
+    override fun bundledCredentialsFor(accountProvider: URI): AccountAuthenticationCredentials? =
+      this.credentialsByProvider[accountProvider]
   }
 }

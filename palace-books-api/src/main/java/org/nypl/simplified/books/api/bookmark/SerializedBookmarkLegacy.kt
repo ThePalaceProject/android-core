@@ -21,9 +21,9 @@ data class SerializedBookmarkLegacy(
   override val uri: URI?,
   override val bookProgress: Double
 ) : SerializedBookmark() {
-
   private val dateFormatter =
-    ISODateTimeFormat.dateTime()
+    ISODateTimeFormat
+      .dateTime()
       .withZoneUTC()
 
   override val typeName: String
@@ -51,9 +51,7 @@ data class SerializedBookmarkLegacy(
     return BookmarkID(builder.toString())
   }
 
-  override fun toJSON(
-    objectMapper: ObjectMapper
-  ): ObjectNode {
+  override fun toJSON(objectMapper: ObjectMapper): ObjectNode {
     val node = objectMapper.createObjectNode()
     node.put("@type", this.typeName)
     node.put("@version", this.typeVersion)
@@ -69,15 +67,19 @@ data class SerializedBookmarkLegacy(
           this.location.timeMilliseconds.toDouble() / this.location.duration.toDouble()
         )
       }
+
       is SerializedLocatorHrefProgression20210317 -> {
         node.put("chapterProgress", this.location.chapterProgress)
       }
+
       is SerializedLocatorLegacyCFI -> {
         node.put("chapterProgress", this.location.chapterProgression)
       }
+
       is SerializedLocatorPage1 -> {
         // Nothing
       }
+
       is SerializedLocatorAudioBookTime2 -> {
         // Nothing
       }
@@ -92,18 +94,12 @@ data class SerializedBookmarkLegacy(
     return node
   }
 
-  override fun addToDigest(
-    digest: MessageDigest
-  ) {
+  override fun addToDigest(digest: MessageDigest) {
     BookmarkDigests.addToDigest(digest, this.opdsId)
     this.location.addToDigest(digest)
   }
 
-  override fun withURI(uri: URI): SerializedBookmark {
-    return this.copy(uri = uri)
-  }
+  override fun withURI(uri: URI): SerializedBookmark = this.copy(uri = uri)
 
-  override fun withoutURI(): SerializedBookmark {
-    return this.copy(uri = null)
-  }
+  override fun withoutURI(): SerializedBookmark = this.copy(uri = null)
 }

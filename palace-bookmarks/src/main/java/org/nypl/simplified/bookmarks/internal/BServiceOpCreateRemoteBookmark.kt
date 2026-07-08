@@ -24,10 +24,7 @@ internal class BServiceOpCreateRemoteBookmark(
   private val bookmark: SerializedBookmark,
   private val bookmarksSource: AttributeType<Map<AccountID, Map<BookID, BookmarksForBook>>>,
 ) : BServiceOp<SerializedBookmark>(logger) {
-
-  override fun runActual(): SerializedBookmark {
-    return this.remotelySendBookmark()
-  }
+  override fun runActual(): SerializedBookmark = this.remotelySendBookmark()
 
   private fun remotelySendBookmark(): SerializedBookmark {
     return try {

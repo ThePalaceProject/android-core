@@ -69,7 +69,6 @@ import java.util.ServiceLoader
 import java.util.concurrent.ExecutionException
 
 class Reader2Activity : AppCompatActivity(R.layout.reader2) {
-
   private lateinit var root: View
   private val logger =
     LoggerFactory.getLogger(Reader2Activity::class.java)
@@ -82,7 +81,6 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     }
 
   companion object {
-
     private const val ARG_PARAMETERS =
       "org.librarysimplified.viewer.epub.readium2.Reader2Activity2.parameters"
 
@@ -95,9 +93,10 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       parameters: Reader2ActivityParameters
     ) {
       val intent = Intent(activity, Reader2Activity::class.java)
-      val bundle = Bundle().apply {
-        this.putSerializable(this@Companion.ARG_PARAMETERS, parameters)
-      }
+      val bundle =
+        Bundle().apply {
+          this.putSerializable(this@Companion.ARG_PARAMETERS, parameters)
+        }
       intent.putExtras(bundle)
       activity.startActivity(intent)
     }
@@ -118,9 +117,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     TxContextWrappingDelegate2(super.getDelegate())
   }
 
-  override fun getDelegate(): AppCompatDelegate {
-    return this.appCompatDelegate
-  }
+  override fun getDelegate(): AppCompatDelegate = this.appCompatDelegate
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -163,7 +160,10 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     }
 
     this.parameters = params
-    MDC.put(MDCKeys.ACCOUNT_INTERNAL_ID, this.parameters.accountId.uuid.toString())
+    MDC.put(MDCKeys.ACCOUNT_INTERNAL_ID,
+      this.parameters.accountId.uuid
+        .toString()
+    )
     MDC.put(MDCKeys.BOOK_INTERNAL_ID, this.parameters.bookId.value())
     MDC.put(MDCKeys.BOOK_TITLE, this.parameters.entry.feedEntry.title)
     MDC.put(MDCKeys.BOOK_ID, this.parameters.entry.feedEntry.id)
@@ -173,9 +173,13 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
     try {
       this.account =
-        this.profilesController.profileCurrent()
+        this.profilesController
+          .profileCurrent()
           .account(this.parameters.accountId)
-      MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID, this.account.provider.id.toString())
+      MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID,
+        this.account.provider.id
+          .toString()
+      )
     } catch (e: Exception) {
       this.logger.debug("Unable to locate account: ", e)
       this.finish()
@@ -184,7 +188,8 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
     try {
       this.bookFormat =
-        this.account.bookDatabase.entry(this.parameters.bookId)
+        this.account.bookDatabase
+          .entry(this.parameters.bookId)
           .book
           .findFormat(BookFormat.BookFormatEPUB::class.java)!!
     } catch (e: Throwable) {
@@ -227,7 +232,8 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
     val fragment = this.fragmentNow
     if (fragment != null) {
-      this.supportFragmentManager.beginTransaction()
+      this.supportFragmentManager
+        .beginTransaction()
         .remove(fragment)
         .commitAllowingStateLoss()
     }
@@ -289,7 +295,8 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
        */
 
       val contentProtectionProviders =
-        ServiceLoader.load(ContentProtectionProvider::class.java)
+        ServiceLoader
+          .load(ContentProtectionProvider::class.java)
           .toList()
 
       contentProtectionProviders.forEachIndexed { index, contentProtectionProvider ->
@@ -327,17 +334,21 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       this.logger.debug("DRM info: {}", this.parameters.drmInfo)
       val bookAsset =
         when (val drmInfo = this.parameters.drmInfo) {
-          is BookDRMInformation.LCP ->
+          is BookDRMInformation.LCP -> {
             rawBookAsset
+          }
 
-          is BookDRMInformation.ACS ->
+          is BookDRMInformation.ACS -> {
             this.openWithAdobe(rawBookAsset, drmInfo.rights)
+          }
 
-          is BookDRMInformation.Boundless ->
+          is BookDRMInformation.Boundless -> {
             rawBookAsset
+          }
 
-          is BookDRMInformation.None ->
+          is BookDRMInformation.None -> {
             rawBookAsset
+          }
         }
 
       SR2ReaderModel.controllerCreate(
@@ -374,7 +385,8 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
   private fun switchFragment(fragment: Fragment) {
     this.fragmentNow = fragment
-    this.supportFragmentManager.beginTransaction()
+    this.supportFragmentManager
+      .beginTransaction()
       .replace(R.id.reader2FragmentHost, fragment)
       .commitAllowingStateLoss()
   }
@@ -463,17 +475,16 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
     this.profilesController.profileUpdate { current ->
       current.copy(
-        preferences = current.preferences.copy(
-          readerPreferences = Reader2Themes.fromSR2(event.theme)
-        )
+        preferences =
+          current.preferences.copy(
+            readerPreferences = Reader2Themes.fromSR2(event.theme)
+          )
       )
     }
   }
 
   @UiThread
-  private fun onControllerEventBookmarkDelete(
-    event: SR2Event.SR2BookmarkEvent.SR2BookmarkDeleted
-  ) {
+  private fun onControllerEventBookmarkDelete(event: SR2Event.SR2BookmarkEvent.SR2BookmarkDeleted) {
     UIThread.checkIsUIThread()
 
     val bookmark =
@@ -491,9 +502,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
   }
 
   @UiThread
-  private fun onControllerEventBookmarkCreate(
-    event: SR2BookmarkCreated
-  ) {
+  private fun onControllerEventBookmarkCreate(event: SR2BookmarkCreated) {
     UIThread.checkIsUIThread()
 
     val localBookmark =
@@ -515,8 +524,8 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     )
   }
 
-  private fun handleBackPressed() {
-    return when (val f = this.fragmentNow) {
+  private fun handleBackPressed() =
+    when (val f = this.fragmentNow) {
       is SR2Fragment -> {
         when (f) {
           is SR2ReaderFragment -> {
@@ -545,7 +554,6 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
         throw IllegalStateException("Unrecognized fragment: $f")
       }
     }
-  }
 
   @UiThread
   private fun onControllerBecameAvailable(controller: SR2ControllerType) {
@@ -558,9 +566,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
    */
 
   @UiThread
-  private fun onBookLoadingFailed(
-    exception: Throwable
-  ) {
+  private fun onBookLoadingFailed(exception: Throwable) {
     UIThread.checkIsUIThread()
 
     val actualException =
@@ -582,26 +588,26 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
           actualException.javaClass.name,
           actualException.message
         )
-      )
-      .setOnDismissListener { this.finish() }
+      ).setOnDismissListener { this.finish() }
       .create()
       .show()
   }
 
-  private fun createLocalBookmarkFromPromptAction(
-    bookmark: SR2Bookmark
-  ) {
+  private fun createLocalBookmarkFromPromptAction(bookmark: SR2Bookmark) {
     this.bookmarkService.bookmarkCreateLocal(
       accountID = this.parameters.accountId,
-      bookmark = Reader2Bookmarks.fromSR2Bookmark(
-        bookEntry = this.parameters.entry,
-        deviceId = Reader2Devices.deviceId(this.profilesController, this.parameters.bookId),
-        source = bookmark
-      )
+      bookmark =
+        Reader2Bookmarks.fromSR2Bookmark(
+          bookEntry = this.parameters.entry,
+          deviceId = Reader2Devices.deviceId(this.profilesController, this.parameters.bookId),
+          source = bookmark
+        )
     )
   }
 
-  private fun showToastMessage(@StringRes messageRes: Int) {
+  private fun showToastMessage(
+    @StringRes messageRes: Int
+  ) {
     UIThread.runOnUIThread {
       Toast.makeText(this, messageRes, Toast.LENGTH_SHORT).show()
     }

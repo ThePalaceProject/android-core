@@ -12,11 +12,7 @@ data class TimeTrackingServerResponseEntry(
     private const val STATUS_NOT_FOUND = 404
   }
 
-  fun isStatusSuccess(): Boolean {
-    return this.status in STATUS_SUCCESS_MIN..STATUS_SUCCESS_MAX
-  }
+  fun isStatusSuccess(): Boolean = this.status in STATUS_SUCCESS_MIN..STATUS_SUCCESS_MAX
 
-  fun isStatusFailedPermanently(): Boolean {
-    return this.status == STATUS_GONE || this.status == STATUS_NOT_FOUND
-  }
+  fun isStatusFailedPermanently(): Boolean = this.status == STATUS_GONE || this.status == STATUS_NOT_FOUND
 }

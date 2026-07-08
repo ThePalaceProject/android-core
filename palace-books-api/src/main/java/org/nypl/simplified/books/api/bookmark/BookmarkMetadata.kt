@@ -19,18 +19,16 @@ data class BookmarkMetadata(
   val time: DateTime,
   val uri: URI?,
 ) {
-
   private val dateFormatter =
-    ISODateTimeFormat.dateTime()
+    ISODateTimeFormat
+      .dateTime()
       .withZoneUTC()
 
   /**
    * Add the fields of this object to the given message digest
    */
 
-  fun addToDigest(
-    digest: MessageDigest
-  ) {
+  fun addToDigest(digest: MessageDigest) {
     BookmarkDigests.addToDigest(digest, this.bookChapterProgress)
     BookmarkDigests.addToDigest(digest, this.bookChapterTitle)
     BookmarkDigests.addToDigest(digest, this.bookOpdsId)

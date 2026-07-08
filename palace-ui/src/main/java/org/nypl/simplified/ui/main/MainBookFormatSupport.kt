@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory
 import java.util.ServiceLoader
 
 object MainBookFormatSupport {
-
   private val logger =
     LoggerFactory.getLogger(MainBookFormatSupport::class.java)
 
@@ -31,11 +30,12 @@ object MainBookFormatSupport {
         supportsPDF = isPDFSupported(),
         supportsAdobeDRM = adobeDRM != null,
         supportsBoundless = boundless != null,
-        supportsAudioBooks = BookFormatAudioSupportParameters(
-          supportsFindawayAudioBooks = isFindawaySupported(),
-          supportsOverdriveAudioBooks = overdriveSecretService != null,
-          supportsDPLAAudioBooks = feedbooksSecretService != null
-        ),
+        supportsAudioBooks =
+          BookFormatAudioSupportParameters(
+            supportsFindawayAudioBooks = isFindawaySupported(),
+            supportsOverdriveAudioBooks = overdriveSecretService != null,
+            supportsDPLAAudioBooks = feedbooksSecretService != null
+          ),
         supportsLCP = lcpService != null
       )
 
@@ -46,14 +46,13 @@ object MainBookFormatSupport {
    * XXX: This is not correct, but we don't currently have a means to detect the truth.
    */
 
-  private fun isFindawaySupported(): Boolean {
-    return true
-  }
+  private fun isFindawaySupported(): Boolean = true
 
   private fun isPDFSupported(): Boolean {
     try {
       val viewers =
-        ServiceLoader.load(ViewerProviderType::class.java)
+        ServiceLoader
+          .load(ViewerProviderType::class.java)
           .toList()
 
       for (viewer in viewers) {

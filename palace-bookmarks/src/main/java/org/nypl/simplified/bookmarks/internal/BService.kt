@@ -38,7 +38,6 @@ class BService(
   private val bookmarkEventsOut: Subject<BookmarkEvent>,
   private val profilesController: ProfilesControllerType
 ) : BookmarkServiceType {
-
   private val disposables =
     CompositeDisposable()
 
@@ -60,7 +59,8 @@ class BService(
 
   init {
     this.disposables.add(
-      this.profilesController.accountEvents()
+      this.profilesController
+        .accountEvents()
         .subscribe(this::onAccountEvent)
     )
 
@@ -84,8 +84,9 @@ class BService(
 
     if (event is AccountEventLoginStateChanged) {
       when (event.state) {
-        is AccountLoggedIn ->
+        is AccountLoggedIn -> {
           this.onAccountLoggedIn()
+        }
 
         is AccountLoggedInStaleCredentials,
         is AccountLoggingIn,
@@ -103,9 +104,7 @@ class BService(
     this.bookmarksSource.set(BookmarkAttributes.removeAccount(this.bookmarksSource.get(), id))
   }
 
-  private fun <T> submitOp(
-    op: BServiceOp<T>
-  ): CompletableFuture<T> {
+  private fun <T> submitOp(op: BServiceOp<T>): CompletableFuture<T> {
     val f = CompletableFuture<T>()
     this.executor.execute {
       try {
@@ -121,8 +120,8 @@ class BService(
    * Asynchronously send and receive all bookmarks.
    */
 
-  private fun sync(): CompletableFuture<*> {
-    return try {
+  private fun sync(): CompletableFuture<*> =
+    try {
       this.submitOp(
         BServiceOpSyncAllAccounts(
           this.logger,
@@ -137,11 +136,8 @@ class BService(
       this.logger.debug("sync: unable to sync profile: ", e)
       this.failedFuture<Void>(e)
     }
-  }
 
-  private fun <T> failedFuture(
-    e: Throwable
-  ): CompletableFuture<T> {
+  private fun <T> failedFuture(e: Throwable): CompletableFuture<T> {
     val f = CompletableFuture<T>()
     f.completeExceptionally(e)
     return f
@@ -166,10 +162,8 @@ class BService(
   override val bookmarks: AttributeReadableType<Map<AccountID, Map<BookID, BookmarksForBook>>>
     get() = this.bookmarksSource
 
-  override fun bookmarkSyncAccount(
-    accountID: AccountID
-  ): CompletableFuture<List<SerializedBookmark>> {
-    return try {
+  override fun bookmarkSyncAccount(accountID: AccountID): CompletableFuture<List<SerializedBookmark>> =
+    try {
       this.submitOp(
         BServiceOpSyncOneAccount(
           this.logger,
@@ -185,10 +179,9 @@ class BService(
       this.logger.debug("sync: unable to sync account: ", e)
       this.failedFuture(e)
     }
-  }
 
-  override fun bookmarkLoadAll(): CompletableFuture<Unit> {
-    return try {
+  override fun bookmarkLoadAll(): CompletableFuture<Unit> =
+    try {
       this.submitOp(
         BServiceOpLoadBookmarksForAll(
           this.logger,
@@ -200,22 +193,21 @@ class BService(
       this.logger.debug("load-all: unable to load bookmarks: ", e)
       this.failedFuture(e)
     }
-  }
 
   override fun bookmarkSyncAndLoad(
     accountID: AccountID,
     book: BookID
-  ): CompletableFuture<BookmarksForBook> {
-    return this.bookmarkSyncAccount(accountID)
+  ): CompletableFuture<BookmarksForBook> =
+    this
+      .bookmarkSyncAccount(accountID)
       .exceptionally { listOf() }
       .thenCompose { this.bookmarkLoad(accountID, book) }
-  }
 
   override fun bookmarkLoad(
     accountID: AccountID,
     book: BookID
-  ): CompletableFuture<BookmarksForBook> {
-    return try {
+  ): CompletableFuture<BookmarksForBook> =
+    try {
       this.submitOp(
         BServiceOpLoadBookmarksForBook(
           logger = this.logger,
@@ -229,13 +221,12 @@ class BService(
       this.logger.debug("bookmarkLoad: ", e)
       this.failedFuture(e)
     }
-  }
 
   override fun bookmarkCreateLocal(
     accountID: AccountID,
     bookmark: SerializedBookmark
-  ): CompletableFuture<SerializedBookmark> {
-    return try {
+  ): CompletableFuture<SerializedBookmark> =
+    try {
       this.submitOp(
         BServiceOpCreateLocalBookmark(
           logger = this.logger,
@@ -250,13 +241,12 @@ class BService(
       this.logger.debug("bookmarkCreateLocal: ", e)
       this.failedFuture(e)
     }
-  }
 
   override fun bookmarkCreateRemote(
     accountID: AccountID,
     bookmark: SerializedBookmark
-  ): CompletableFuture<SerializedBookmark> {
-    return try {
+  ): CompletableFuture<SerializedBookmark> =
+    try {
       this.submitOp(
         BServiceOpCreateRemoteBookmark(
           logger = this.logger,
@@ -272,14 +262,13 @@ class BService(
       this.logger.debug("bookmarkCreateRemote: ", e)
       this.failedFuture(e)
     }
-  }
 
   override fun bookmarkCreate(
     accountID: AccountID,
     bookmark: SerializedBookmark,
     ignoreRemoteFailures: Boolean
-  ): CompletableFuture<SerializedBookmark> {
-    return try {
+  ): CompletableFuture<SerializedBookmark> =
+    try {
       this.submitOp(
         BServiceOpCreateBookmark(
           logger = this.logger,
@@ -297,14 +286,13 @@ class BService(
       this.logger.debug("bookmarkCreate: ", e)
       this.failedFuture(e)
     }
-  }
 
   override fun bookmarkDelete(
     accountID: AccountID,
     bookmark: SerializedBookmark,
     ignoreRemoteFailures: Boolean
-  ): CompletableFuture<Unit> {
-    return try {
+  ): CompletableFuture<Unit> =
+    try {
       this.submitOp(
         BServiceOpDeleteBookmark(
           logger = this.logger,
@@ -320,5 +308,4 @@ class BService(
       this.logger.debug("bookmarkLoad: ", e)
       this.failedFuture(e)
     }
-  }
 }

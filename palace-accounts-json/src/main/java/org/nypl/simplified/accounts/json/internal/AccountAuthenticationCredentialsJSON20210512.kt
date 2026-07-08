@@ -19,16 +19,13 @@ import java.net.URI
  */
 
 object AccountAuthenticationCredentialsJSON20210512 : AccountAuthenticationCredentialsJSONVersionedType {
-
   private val logger =
     LoggerFactory.getLogger(AccountAuthenticationCredentialsJSON20210512::class.java)
 
   override val supportedVersion: Int =
     20210512
 
-  override fun deserializeFromJSON(
-    node: JsonNode
-  ): AccountAuthenticationCredentials {
+  override fun deserializeFromJSON(node: JsonNode): AccountAuthenticationCredentials {
     logger.debug("deserializing version 20210512")
 
     val obj =
@@ -38,27 +35,30 @@ object AccountAuthenticationCredentialsJSON20210512 : AccountAuthenticationCrede
       "basic" -> {
         deserializeBasic(obj)
       }
+
       "basicToken" -> {
         deserializeBasicToken(obj)
       }
+
       "saml2_0" -> {
         deserializeSAML2_0(obj)
       }
+
       else -> {
         throw JSONParseException("Unrecognized type: $type")
       }
     }
   }
 
-  private fun deserializeBasic(
-    obj: ObjectNode
-  ): AccountAuthenticationCredentials.Basic {
+  private fun deserializeBasic(obj: ObjectNode): AccountAuthenticationCredentials.Basic {
     val adobeCredentials =
-      JSONParserUtilities.getObjectOrNull(obj, "adobe_credentials")
+      JSONParserUtilities
+        .getObjectOrNull(obj, "adobe_credentials")
         ?.let(AccountAuthenticationCredentialsAdobeJSON::deserializeAdobeCredentials)
 
     val patronAuthorization: PatronAuthorization? =
-      JSONParserUtilities.getStringOrNull(obj, "palaceAuthorizationIdentifier")
+      JSONParserUtilities
+        .getStringOrNull(obj, "palaceAuthorizationIdentifier")
         ?.let { text -> PatronAuthorization(text, null) }
 
     return AccountAuthenticationCredentials.Basic(
@@ -72,11 +72,10 @@ object AccountAuthenticationCredentialsJSON20210512 : AccountAuthenticationCrede
     )
   }
 
-  private fun deserializeBasicToken(
-    obj: ObjectNode
-  ): AccountAuthenticationCredentials.BasicToken {
+  private fun deserializeBasicToken(obj: ObjectNode): AccountAuthenticationCredentials.BasicToken {
     val adobeCredentials =
-      JSONParserUtilities.getObjectOrNull(obj, "adobe_credentials")
+      JSONParserUtilities
+        .getObjectOrNull(obj, "adobe_credentials")
         ?.let(AccountAuthenticationCredentialsAdobeJSON::deserializeAdobeCredentials)
 
     val authenticationTokenInfo =
@@ -84,16 +83,18 @@ object AccountAuthenticationCredentialsJSON20210512 : AccountAuthenticationCrede
         ?: throw Exception("No authentication token info")
 
     val patronAuthorization: PatronAuthorization? =
-      JSONParserUtilities.getStringOrNull(obj, "palaceAuthorizationIdentifier")
+      JSONParserUtilities
+        .getStringOrNull(obj, "palaceAuthorizationIdentifier")
         ?.let { text -> PatronAuthorization(text, null) }
 
     return AccountAuthenticationCredentials.BasicToken(
       userName = AccountUsername(JSONParserUtilities.getString(obj, "username")),
       password = AccountPassword(JSONParserUtilities.getString(obj, "password")),
-      authenticationTokenInfo = AccountAuthenticationTokenInfo(
-        accessToken = authenticationTokenInfo.get("accessToken").asText(),
-        authURI = URI.create(authenticationTokenInfo.get("authURI").asText()),
-      ),
+      authenticationTokenInfo =
+        AccountAuthenticationTokenInfo(
+          accessToken = authenticationTokenInfo.get("accessToken").asText(),
+          authURI = URI.create(authenticationTokenInfo.get("authURI").asText()),
+        ),
       adobeCredentials = adobeCredentials,
       authenticationDescription = JSONParserUtilities.getStringOrNull(obj, "authenticationDescription"),
       annotationsURI = JSONParserUtilities.getURIOrNull(obj, "annotationsURI"),
@@ -104,11 +105,13 @@ object AccountAuthenticationCredentialsJSON20210512 : AccountAuthenticationCrede
 
   private fun deserializeSAML2_0(obj: ObjectNode): AccountAuthenticationCredentials {
     val adobeCredentials =
-      JSONParserUtilities.getObjectOrNull(obj, "adobe_credentials")
+      JSONParserUtilities
+        .getObjectOrNull(obj, "adobe_credentials")
         ?.let(AccountAuthenticationCredentialsAdobeJSON::deserializeAdobeCredentials)
 
     val patronAuthorization: PatronAuthorization? =
-      JSONParserUtilities.getStringOrNull(obj, "palaceAuthorizationIdentifier")
+      JSONParserUtilities
+        .getStringOrNull(obj, "palaceAuthorizationIdentifier")
         ?.let { text -> PatronAuthorization(text, null) }
 
     return AccountAuthenticationCredentials.SAML2_0(
@@ -123,9 +126,7 @@ object AccountAuthenticationCredentialsJSON20210512 : AccountAuthenticationCrede
     )
   }
 
-  private fun deserializeCookies(
-    array: ArrayNode
-  ): List<AccountCookie> {
+  private fun deserializeCookies(array: ArrayNode): List<AccountCookie> {
     val results = mutableListOf<AccountCookie>()
 
     for (index in 0 until array.size()) {

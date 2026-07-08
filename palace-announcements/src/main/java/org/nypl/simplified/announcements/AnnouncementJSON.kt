@@ -14,7 +14,6 @@ import java.util.UUID
  */
 
 object AnnouncementJSON {
-
   /**
    * Serialize the given preferences to a JSON object.
    */
@@ -29,7 +28,8 @@ object AnnouncementJSON {
     announcement.expires?.let {
       node.put(
         "expires",
-        ISODateTimeFormat.dateTime()
+        ISODateTimeFormat
+          .dateTime()
           .print(it.toDateTime(DateTimeZone.UTC))
       )
     }
@@ -48,7 +48,8 @@ object AnnouncementJSON {
       JSONParserUtilities.getString(node, "content")
     val expires =
       if (node.has("expires")) {
-        JSONParserUtilities.getTimestamp(node, "expires")
+        JSONParserUtilities
+          .getTimestamp(node, "expires")
           .toLocalDateTime()
       } else {
         null
@@ -65,7 +66,5 @@ object AnnouncementJSON {
    */
 
   @Throws(JSONParseException::class)
-  fun deserializeFromJSON(node: JsonNode): Announcement {
-    return deserializeFromJSON(JSONParserUtilities.checkObject(null, node))
-  }
+  fun deserializeFromJSON(node: JsonNode): Announcement = deserializeFromJSON(JSONParserUtilities.checkObject(null, node))
 }

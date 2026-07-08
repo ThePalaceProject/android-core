@@ -3,7 +3,6 @@ package org.nypl.simplified.opds.core
 import java.net.URI
 
 object OPDSFeedConstants {
-
   val ATOM_URI: URI = URI.create("http://www.w3.org/2005/Atom")
 
   val DUBLIN_CORE_TERMS_URI: URI = URI.create("http://purl.org/dc/terms/")

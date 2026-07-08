@@ -8,7 +8,6 @@ import org.nypl.simplified.presentableerror.api.PresentableType
  */
 
 sealed class BootEvent {
-
   /**
    * Booting is in progress.
    */
@@ -16,7 +15,8 @@ sealed class BootEvent {
   data class BootInProgress(
     override val message: String,
     override val attributes: Map<String, String> = mapOf()
-  ) : BootEvent(), PresentableType
+  ) : BootEvent(),
+    PresentableType
 
   /**
    * Booting has completed.
@@ -24,7 +24,8 @@ sealed class BootEvent {
 
   data class BootCompleted(
     override val message: String
-  ) : BootEvent(), PresentableType
+  ) : BootEvent(),
+    PresentableType
 
   /**
    * Booting has failed.
@@ -34,5 +35,6 @@ sealed class BootEvent {
     override val message: String,
     override val exception: Exception,
     override val attributes: Map<String, String> = mapOf()
-  ) : BootEvent(), PresentableErrorType
+  ) : BootEvent(),
+    PresentableErrorType
 }

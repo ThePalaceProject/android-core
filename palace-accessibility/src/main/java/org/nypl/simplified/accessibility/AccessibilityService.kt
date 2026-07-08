@@ -16,20 +16,18 @@ class AccessibilityService private constructor(
   private val strings: AccessibilityStringsType,
   private val events: AccessibilityEventsType,
 ) : AccessibilityServiceType {
-
   companion object {
     fun create(
       context: Context,
       bookRegistry: BookRegistryReadableType,
       strings: AccessibilityStringsType = AccessibilityStrings(context.resources),
       events: AccessibilityEventsType = AccessibilityEvents(context)
-    ): AccessibilityServiceType {
-      return AccessibilityService(
+    ): AccessibilityServiceType =
+      AccessibilityService(
         bookRegistry = bookRegistry,
         strings = strings,
         events = events
       )
-    }
   }
 
   private val logger =
@@ -59,26 +57,29 @@ class AccessibilityService private constructor(
     val book = this.bookRegistry.bookOrNull(event.bookId)?.book ?: return
 
     return when (event.statusNow) {
-      is BookStatus.Loaned.LoanedDownloaded ->
+      is BookStatus.Loaned.LoanedDownloaded -> {
         if (this.previousStatusIsNot(event, BookStatus.Loaned.LoanedDownloaded::class.java)) {
           this.speak(this.strings.bookHasDownloaded(book.entry.title))
         } else {
           // Nothing to do
         }
+      }
 
-      is BookStatus.Downloading ->
+      is BookStatus.Downloading -> {
         if (this.previousStatusIsNot(event, BookStatus.Downloading::class.java)) {
           this.speak(this.strings.bookIsDownloading(book.entry.title))
         } else {
           // Nothing to do
         }
+      }
 
-      is BookStatus.Held.HeldInQueue ->
+      is BookStatus.Held.HeldInQueue -> {
         if (this.previousStatusIsNot(event, BookStatus.Held.HeldInQueue::class.java)) {
           this.speak(this.strings.bookIsOnHold(book.entry.title))
         } else {
           // Nothing to do
         }
+      }
 
       is BookStatus.Holdable,
       is BookStatus.Loanable -> {
@@ -91,54 +92,61 @@ class AccessibilityService private constructor(
         }
       }
 
-      is BookStatus.FailedRevoke ->
+      is BookStatus.FailedRevoke -> {
         if (this.previousStatusIsNot(event, BookStatus.FailedRevoke::class.java)) {
           this.speak(this.strings.bookFailedReturn(book.entry.title))
         } else {
           // Nothing to do
         }
+      }
 
-      is BookStatus.FailedLoan ->
+      is BookStatus.FailedLoan -> {
         if (this.previousStatusIsNot(event, BookStatus.FailedLoan::class.java)) {
           this.speak(this.strings.bookFailedLoan(book.entry.title))
         } else {
           // Nothing to do
         }
+      }
 
-      is BookStatus.FailedDownload ->
+      is BookStatus.FailedDownload -> {
         if (this.previousStatusIsNot(event, BookStatus.FailedDownload::class.java)) {
           this.speak(this.strings.bookFailedDownload(book.entry.title))
         } else {
           // Nothing to do
         }
+      }
 
-      is BookStatus.ReachedLoanLimit ->
+      is BookStatus.ReachedLoanLimit -> {
         if (this.previousStatusIsNot(event, BookStatus.ReachedLoanLimit::class.java)) {
           this.speak(this.strings.bookLoanLimitReached(book.entry.title))
         } else {
           // Nothing to do
         }
+      }
 
-      is BookStatus.FailedLoanBadCredentials ->
+      is BookStatus.FailedLoanBadCredentials -> {
         if (this.previousStatusIsNot(event, BookStatus.FailedLoanBadCredentials::class.java)) {
           this.speak(this.strings.bookFailedLoanLoginRequired(book.entry.title))
         } else {
           // Nothing to do
         }
+      }
 
-      is BookStatus.FailedRevokeBadCredentials ->
+      is BookStatus.FailedRevokeBadCredentials -> {
         if (this.previousStatusIsNot(event, BookStatus.FailedRevokeBadCredentials::class.java)) {
           this.speak(this.strings.bookFailedRevokeLoginRequired(book.entry.title))
         } else {
           // Nothing to do
         }
+      }
 
-      is BookStatus.FailedDownloadBadCredentials ->
+      is BookStatus.FailedDownloadBadCredentials -> {
         if (this.previousStatusIsNot(event, BookStatus.FailedDownloadBadCredentials::class.java)) {
           this.speak(this.strings.bookFailedDownloadLoginRequired(book.entry.title))
         } else {
           // Nothing to do
         }
+      }
 
       is BookStatus.Held.HeldReady,
       is BookStatus.Loaned.LoanedNotDownloaded,
@@ -149,6 +157,7 @@ class AccessibilityService private constructor(
       is BookStatus.DownloadExternalAuthenticationInProgress,
       is BookStatus.Revoked -> {
       }
+
       null -> {
       }
     }

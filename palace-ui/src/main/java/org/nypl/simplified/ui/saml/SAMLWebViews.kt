@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory
  */
 
 object SAMLWebViews {
-
   private val logger =
     LoggerFactory.getLogger(SAMLWebViews::class.java)
 
@@ -19,9 +18,7 @@ object SAMLWebViews {
    * Attempt to ensure that the web view is starting from a completely clean slate.
    */
 
-  fun clearWebViewState(
-    webView: WebView
-  ) {
+  fun clearWebViewState(webView: WebView) {
     try {
       this.logger.debug("Clearing cookies.")
       val cookieManager = CookieManager.getInstance()

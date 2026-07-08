@@ -5,7 +5,6 @@ package org.nypl.simplified.accessibility
  */
 
 interface AccessibilityServiceType {
-
   /**
    * @return `true` if spoken feedback is enabled
    */

@@ -9,7 +9,6 @@ import androidx.fragment.app.DialogFragment
 import org.librarysimplified.ui.R
 
 class AnnouncementsDialog : DialogFragment(R.layout.announcements_dialog) {
-
   private lateinit var title: TextView
   private lateinit var content: TextView
   private lateinit var okButton: Button

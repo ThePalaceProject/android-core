@@ -45,7 +45,6 @@ class AccountProviderResolution(
   private val http: LSHTTPClientType,
   private val description: AccountProviderDescription
 ) {
-
   private val authDocumentType =
     MIMEType("application", "vnd.opds.authentication.v1.0+json", mapOf())
 
@@ -141,15 +140,13 @@ class AccountProviderResolution(
     }
   }
 
-  private fun findAlternateLink(): URI? {
-    return this.description.links.firstOrNull { link ->
-      link.relation == "alternate"
-    }?.hrefURI
-  }
+  private fun findAlternateLink(): URI? =
+    this.description.links
+      .firstOrNull { link ->
+        link.relation == "alternate"
+      }?.hrefURI
 
-  private fun findTitle(
-    authDocument: AuthenticationDocument?
-  ): String {
+  private fun findTitle(authDocument: AuthenticationDocument?): String {
     val authTitle = authDocument?.title
     if (authTitle != null) {
       this.logger.debug("took title from authentication document")
@@ -160,9 +157,7 @@ class AccountProviderResolution(
     return this.description.title
   }
 
-  private fun findDescription(
-    authDocument: AuthenticationDocument?
-  ): String {
+  private fun findDescription(authDocument: AuthenticationDocument?): String {
     val authDescription = authDocument?.description
     if (authDescription != null) {
       this.logger.debug("took description from authentication document")
@@ -202,9 +197,9 @@ class AccountProviderResolution(
     throw IOException()
   }
 
-  private fun supportsReservations(authDocument: AuthenticationDocument): Boolean {
-    return authDocument.features.enabled.contains("https://librarysimplified.org/rel/policy/reservations")
-  }
+  private fun supportsReservations(authDocument: AuthenticationDocument): Boolean =
+    authDocument.features.enabled
+      .contains("https://librarysimplified.org/rel/policy/reservations")
 
   private fun extractAuthenticationDescription(
     taskRecorder: TaskRecorderType,
@@ -252,15 +247,17 @@ class AccountProviderResolution(
     }
 
     if (authObjects.isNotEmpty()) {
-      val basicTokenAuthObject = authObjects.firstOrNull { authObject ->
-        authObject is AccountProviderAuthenticationDescription.BasicToken
-      }
+      val basicTokenAuthObject =
+        authObjects.firstOrNull { authObject ->
+          authObject is AccountProviderAuthenticationDescription.BasicToken
+        }
 
       // basic token has the highest priority amongst the auth methods
       return if (basicTokenAuthObject != null) {
         Pair(
           basicTokenAuthObject,
-          authObjects.minus(basicTokenAuthObject)
+          authObjects
+            .minus(basicTokenAuthObject)
             .filter { it.canBeAlternativeLoginMethod }
         )
       } else {
@@ -335,15 +332,14 @@ class AccountProviderResolution(
     )
   }
 
-  private fun extractAuthenticationDescriptionBasic(
-    authObject: AuthenticationObject
-  ): AccountProviderAuthenticationDescription.Basic {
+  private fun extractAuthenticationDescriptionBasic(authObject: AuthenticationObject): AccountProviderAuthenticationDescription.Basic {
     val loginRestrictions =
       authObject.inputs[LABEL_LOGIN]
     val passwordRestrictions =
       authObject.inputs[LABEL_PASSWORD]
     val logo =
-      authObject.links.find { link -> link.relation == "logo" }
+      authObject.links
+        .find { link -> link.relation == "logo" }
         ?.hrefURI
 
     return AccountProviderAuthenticationDescription.Basic(
@@ -380,7 +376,8 @@ class AccountProviderResolution(
     val passwordRestrictions =
       authObject.inputs[LABEL_PASSWORD]
     val logo =
-      authObject.links.find { link -> link.relation == "logo" }
+      authObject.links
+        .find { link -> link.relation == "logo" }
         ?.hrefURI
 
     return AccountProviderAuthenticationDescription.BasicToken(
@@ -395,9 +392,7 @@ class AccountProviderResolution(
     )
   }
 
-  private fun parseKeyboardType(
-    text: String?
-  ): KeyboardInput {
+  private fun parseKeyboardType(text: String?): KeyboardInput {
     if (text == null) {
       return KeyboardInput.DEFAULT
     }
@@ -429,12 +424,17 @@ class AccountProviderResolution(
     return when (targetLink) {
       is Link.LinkBasic -> {
         val request =
-          this.http.newRequest(targetLink.href)
+          this.http
+            .newRequest(targetLink.href)
             .build()
 
         val result = request.execute()
         taskRecorder.addAttribute("Authentication Document", targetLink.href.toString())
-        taskRecorder.addAttributes(result.status.properties?.problemReport?.toMap() ?: emptyMap())
+        taskRecorder.addAttributes(
+          result.status.properties
+            ?.problemReport
+            ?.toMap() ?: emptyMap()
+        )
 
         when (val status = result.status) {
           is LSHTTPResponseStatus.Responded.OK -> {
@@ -460,11 +460,12 @@ class AccountProviderResolution(
               val message = this.stringResources.resolvingAuthDocumentRetrievalFailed
               taskRecorder.currentStepFailed(
                 message = message,
-                errorCode = AccountProviderResolutionErrorCodes.httpRequestFailed(
-                  targetLink.hrefURI,
-                  status.properties.originalStatus,
-                  status.properties.message
-                ),
+                errorCode =
+                  AccountProviderResolutionErrorCodes.httpRequestFailed(
+                    targetLink.hrefURI,
+                    status.properties.originalStatus,
+                    status.properties.message
+                  ),
                 extraMessages = listOf()
               )
               throw IOException(message)

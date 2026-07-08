@@ -16,7 +16,6 @@ internal class BServiceOpLoadBookmarksForAll(
   private val profile: ProfileReadableType,
   private val bookmarksSource: AttributeType<Map<AccountID, Map<BookID, BookmarksForBook>>>,
 ) : BServiceOp<Unit>(logger) {
-
   override fun runActual() {
     try {
       this.logger.debug("[{}]: loading bookmarks for profile", this.profile.id.uuid)

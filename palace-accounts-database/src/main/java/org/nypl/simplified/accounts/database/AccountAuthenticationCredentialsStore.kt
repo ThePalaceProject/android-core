@@ -17,9 +17,7 @@ class AccountAuthenticationCredentialsStore(
   private val fileTemp: File,
   initialCredentials: Map<AccountID, AccountAuthenticationCredentials>
 ) : AccountAuthenticationCredentialsStoreType {
-
   companion object {
-
     /**
      * Open a credential store, or create a new one if it does not exist.
      */
@@ -59,17 +57,15 @@ class AccountAuthenticationCredentialsStore(
   @GuardedBy("storeLock")
   private var store = initialCredentials.toMap()
 
-  override fun get(account: AccountID): AccountAuthenticationCredentials? {
-    return synchronized(this.storeLock) {
+  override fun get(account: AccountID): AccountAuthenticationCredentials? =
+    synchronized(this.storeLock) {
       this.store[account]
     }
-  }
 
-  override fun size(): Int {
-    return synchronized(this.storeLock) {
+  override fun size(): Int =
+    synchronized(this.storeLock) {
       this.store.size
     }
-  }
 
   override fun put(
     account: AccountID,

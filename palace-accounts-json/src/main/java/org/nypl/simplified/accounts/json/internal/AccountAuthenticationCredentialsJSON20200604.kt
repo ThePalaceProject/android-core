@@ -14,34 +14,33 @@ import org.slf4j.LoggerFactory
  */
 
 object AccountAuthenticationCredentialsJSON20200604 : AccountAuthenticationCredentialsJSONVersionedType {
-
   private val logger =
     LoggerFactory.getLogger(AccountAuthenticationCredentialsJSON20200604::class.java)
 
   override val supportedVersion: Int =
     20200604
 
-  override fun deserializeFromJSON(
-    node: JsonNode
-  ): AccountAuthenticationCredentials {
+  override fun deserializeFromJSON(node: JsonNode): AccountAuthenticationCredentials {
     logger.debug("deserializing version 20200604")
 
     val obj =
       JSONParserUtilities.checkObject(null, node)
 
     return when (val type = JSONParserUtilities.getString(obj, "@type")) {
-      "basic" ->
+      "basic" -> {
         deserializeBasic(obj)
-      else ->
+      }
+
+      else -> {
         throw JSONParseException("Unrecognized type: $type")
+      }
     }
   }
 
-  private fun deserializeBasic(
-    obj: ObjectNode
-  ): AccountAuthenticationCredentials.Basic {
+  private fun deserializeBasic(obj: ObjectNode): AccountAuthenticationCredentials.Basic {
     val adobeCredentials =
-      JSONParserUtilities.getObjectOrNull(obj, "adobe_credentials")
+      JSONParserUtilities
+        .getObjectOrNull(obj, "adobe_credentials")
         ?.let(AccountAuthenticationCredentialsAdobeJSON::deserializeAdobeCredentials)
 
     return AccountAuthenticationCredentials.Basic(

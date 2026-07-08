@@ -7,7 +7,6 @@ import java.net.URI
  */
 
 interface AccountBundledCredentialsType {
-
   /**
    * @return A read-only map of the bundled credentials
    */
@@ -21,7 +20,5 @@ interface AccountBundledCredentialsType {
    * @return The bundled credentials, if any
    */
 
-  fun bundledCredentialsFor(
-    accountProvider: URI
-  ): AccountAuthenticationCredentials?
+  fun bundledCredentialsFor(accountProvider: URI): AccountAuthenticationCredentials?
 }

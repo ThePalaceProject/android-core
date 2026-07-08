@@ -11,7 +11,6 @@ import java.net.URI
  */
 
 interface ViewerProviderType {
-
   /**
    * The name of the viewer provider. This is typically a reverse-dns style name and is
    * used for diagnostic information.
@@ -45,9 +44,7 @@ interface ViewerProviderType {
    * @return `true` if the provider can support the given type
    */
 
-  fun canPotentiallySupportType(
-    type: MIMEType
-  ): Boolean
+  fun canPotentiallySupportType(type: MIMEType): Boolean
 
   /**
    * Open a viewer for the given book.

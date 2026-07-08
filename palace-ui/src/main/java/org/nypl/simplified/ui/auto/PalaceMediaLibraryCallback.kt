@@ -30,7 +30,6 @@ import java.util.UUID
 import java.util.concurrent.TimeoutException
 
 class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callback {
-
   private val logger =
     LoggerFactory.getLogger(PalaceMediaLibraryCallback::class.java)
 
@@ -195,14 +194,16 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
     this.logger.debug("onGetLibraryRootWithServices")
 
     val fakeRootItem =
-      MediaMetadata.Builder()
+      MediaMetadata
+        .Builder()
         .setIsPlayable(true)
         .setIsBrowsable(true)
         .setTitle("Audiobooks")
         .build()
 
     val rootItem =
-      MediaItem.Builder()
+      MediaItem
+        .Builder()
         .setMediaId("root")
         .setMediaMetadata(fakeRootItem)
         .build()
@@ -269,7 +270,8 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
       }
 
       val metadataBuilder =
-        MediaMetadata.Builder()
+        MediaMetadata
+          .Builder()
           .setAlbumArtist(book.entry.authorsCommaSeparated)
           .setAlbumTitle(book.entry.title)
           .setArtist(book.entry.authorsCommaSeparated)
@@ -281,7 +283,8 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
       this.setCover(book, metadataBuilder)
 
       val mediaItem =
-        MediaItem.Builder()
+        MediaItem
+          .Builder()
           .setMediaId(book.id.value())
           .setMediaMetadata(metadataBuilder.build())
           .build()
@@ -359,8 +362,7 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
     val timeExpire = timeThen.plusSeconds(30L)
 
     while (true) {
-      this.logger.debug(
-        "onSetMediaItemsWithServices: Waiting for player instance {} to open...", playerID)
+      this.logger.debug("onSetMediaItemsWithServices: Waiting for player instance {} to open...", playerID)
 
       val timeNow = java.time.Instant.now()
       if (timeNow.isAfter(timeExpire)) {

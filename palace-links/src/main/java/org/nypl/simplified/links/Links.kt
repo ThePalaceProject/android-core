@@ -5,11 +5,8 @@ import org.thepalaceproject.webpub.core.WPMLinkBasic
 import org.thepalaceproject.webpub.core.WPMLinkTemplated
 
 object Links {
-
-  fun wpmLinkToPalaceLink(
-    link: WPMLink
-  ): Link {
-    return when (link) {
+  fun wpmLinkToPalaceLink(link: WPMLink): Link =
+    when (link) {
       is WPMLinkBasic -> {
         Link.LinkBasic(
           href = link.href,
@@ -36,5 +33,4 @@ object Links {
         )
       }
     }
-  }
 }

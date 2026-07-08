@@ -5,8 +5,8 @@ import org.thepalaceproject.db.api.DBTransactionType
 import org.thepalaceproject.db.api.queries.DBQAccountProviderDescriptionPutType
 
 internal object DBQAccountProviderDescriptionPut : DBQAccountProviderDescriptionPutType {
-
-  private val text = """
+  private val text =
+    """
     INSERT INTO account_provider_descriptions (
       apd_id,
       apd_updated_time_last,
@@ -27,7 +27,7 @@ internal object DBQAccountProviderDescriptionPut : DBQAccountProviderDescription
       apd_description       = ?,
       apd_data_format       = ?,
       apd_data              = ?
-  """.trimIndent()
+    """.trimIndent()
 
   override fun execute(
     transaction: DBTransactionType,

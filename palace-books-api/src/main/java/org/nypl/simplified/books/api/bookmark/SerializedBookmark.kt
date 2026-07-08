@@ -12,7 +12,6 @@ import java.security.MessageDigest
  */
 
 sealed class SerializedBookmark {
-
   /**
    * The type name (such as "Bookmark")
    */
@@ -101,9 +100,7 @@ sealed class SerializedBookmark {
    * Serialize this bookmark to JSON.
    */
 
-  abstract fun toJSON(
-    objectMapper: ObjectMapper
-  ): ObjectNode
+  abstract fun toJSON(objectMapper: ObjectMapper): ObjectNode
 
   /**
    * Add the fields of this object to the given message digest
@@ -127,9 +124,7 @@ sealed class SerializedBookmark {
    * @return true if this bookmark can be used in place of the other bookmark.
    */
 
-  fun isInterchangeableWith(
-    bookmark: SerializedBookmark
-  ): Boolean {
+  fun isInterchangeableWith(bookmark: SerializedBookmark): Boolean {
     if (this == bookmark) {
       return true
     }

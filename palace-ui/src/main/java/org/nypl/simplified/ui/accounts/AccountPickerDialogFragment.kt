@@ -35,8 +35,9 @@ import org.slf4j.LoggerFactory
  */
 
 @Deprecated("Accounts will be chosen via the settings screen soon.")
-class AccountPickerDialogFragment : BottomSheetDialogFragment(), OnAccountClickListener {
-
+class AccountPickerDialogFragment :
+  BottomSheetDialogFragment(),
+  OnAccountClickListener {
   private val logger =
     LoggerFactory.getLogger(AccountPickerDialogFragment::class.java)
 
@@ -55,20 +56,18 @@ class AccountPickerDialogFragment : BottomSheetDialogFragment(), OnAccountClickL
       currentId: AccountID,
       catalogPart: CatalogPart,
       showAddAccount: Boolean
-    ): AccountPickerDialogFragment {
-      return AccountPickerDialogFragment().apply {
-        this.arguments = Bundle().apply {
-          this.putSerializable(this@Companion.ARG_CATALOG_PART, catalogPart)
-          this.putSerializable(this@Companion.ARG_CURRENT_ID, currentId)
-          this.putBoolean(this@Companion.ARG_ADD_ACCOUNT, showAddAccount)
-        }
+    ): AccountPickerDialogFragment =
+      AccountPickerDialogFragment().apply {
+        this.arguments =
+          Bundle().apply {
+            this.putSerializable(this@Companion.ARG_CATALOG_PART, catalogPart)
+            this.putSerializable(this@Companion.ARG_CURRENT_ID, currentId)
+            this.putBoolean(this@Companion.ARG_ADD_ACCOUNT, showAddAccount)
+          }
       }
-    }
   }
 
-  override fun onCreate(
-    savedInstanceState: Bundle?
-  ) {
+  override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
     val services =
@@ -82,7 +81,8 @@ class AccountPickerDialogFragment : BottomSheetDialogFragment(), OnAccountClickL
       this.profilesController.profileCurrent().accounts()
 
     this.accounts =
-      accountsMap.values.toList()
+      accountsMap.values
+        .toList()
         .sortedWith(AccountComparator())
   }
 
@@ -93,9 +93,10 @@ class AccountPickerDialogFragment : BottomSheetDialogFragment(), OnAccountClickL
      * override the behavior to get it to fully open.
      */
     val dialog = dialog as? BottomSheetDialog ?: return
-    val bottomSheet = dialog.findViewById<FrameLayout>(
-      com.google.android.material.R.id.design_bottom_sheet
-    ) ?: return
+    val bottomSheet =
+      dialog.findViewById<FrameLayout>(
+        com.google.android.material.R.id.design_bottom_sheet
+      ) ?: return
 
     val behavior = BottomSheetBehavior.from(bottomSheet)
     behavior.state = BottomSheetBehavior.STATE_EXPANDED
@@ -106,9 +107,7 @@ class AccountPickerDialogFragment : BottomSheetDialogFragment(), OnAccountClickL
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
-  ): View? {
-    return inflater.inflate(R.layout.account_picker, container, false)
-  }
+  ): View? = inflater.inflate(R.layout.account_picker, container, false)
 
   override fun onViewCreated(
     view: View,
@@ -138,9 +137,7 @@ class AccountPickerDialogFragment : BottomSheetDialogFragment(), OnAccountClickL
     }
   }
 
-  override fun onAccountClick(
-    account: AccountType
-  ) {
+  override fun onAccountClick(account: AccountType) {
     this.logger.debug("selected account id={}, name={}", account.id, account.provider.displayName)
 
     // Note: In the future consider refactoring this dialog to return a result via
@@ -148,9 +145,10 @@ class AccountPickerDialogFragment : BottomSheetDialogFragment(), OnAccountClickL
     val profile =
       this.profilesController.profileCurrent()
 
-    val newPreferences = profile
-      .preferences()
-      .copy(mostRecentAccount = account.id)
+    val newPreferences =
+      profile
+        .preferences()
+        .copy(mostRecentAccount = account.id)
     this.profilesController.profileUpdate { it.copy(preferences = newPreferences) }
 
     val services =
@@ -195,7 +193,10 @@ class AccountPickerViewHolder(
     }
   }
 
-  fun bind(account: AccountType, isCurrent: Boolean) {
+  fun bind(
+    account: AccountType,
+    isCurrent: Boolean
+  ) {
     this.account = account
 
     this.titleView.text = account.provider.displayName
@@ -221,7 +222,6 @@ class AddAccountViewHolder(
   view: View,
   private val listener: OnAccountClickListener
 ) : RecyclerView.ViewHolder(view) {
-
   init {
     val titleView: TextView = view.findViewById(R.id.accountTitle)
     titleView.setText(R.string.accountAdd)
@@ -241,7 +241,6 @@ class CancelViewHolder(
   view: View,
   private val listener: OnAccountClickListener
 ) : RecyclerView.ViewHolder(view) {
-
   init {
     val titleView: TextView = view.findViewById(R.id.accountTitle)
     titleView.setText(R.string.accountCancel)
@@ -262,50 +261,70 @@ class AccountPickerAdapter(
   private val showAddAccount: Boolean,
   private val listener: OnAccountClickListener
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
   companion object {
     private const val LIST_ITEM = 1
     private const val LIST_ADD_ACCOUNT = 2
     private const val LIST_CANCEL = 3
   }
 
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+  override fun onCreateViewHolder(
+    parent: ViewGroup,
+    viewType: Int
+  ): RecyclerView.ViewHolder {
     val inflater = LayoutInflater.from(parent.context)
     val view = inflater.inflate(R.layout.account_picker_item, parent, false)
     return when (viewType) {
-      LIST_CANCEL -> CancelViewHolder(
-        view,
-        this.listener
-      )
+      LIST_CANCEL -> {
+        CancelViewHolder(
+          view,
+          this.listener
+        )
+      }
 
-      LIST_ADD_ACCOUNT -> AddAccountViewHolder(
-        view,
-        this.listener
-      )
+      LIST_ADD_ACCOUNT -> {
+        AddAccountViewHolder(
+          view,
+          this.listener
+        )
+      }
 
-      else -> AccountPickerViewHolder(view, this.imageLoader, this.listener)
+      else -> {
+        AccountPickerViewHolder(view, this.imageLoader, this.listener)
+      }
     }
   }
 
-  override fun getItemCount() = this.accounts.size + if (this.showAddAccount) {
-    2 // Show the 'add account' and 'cancel' options
-  } else {
-    1 // Show 'cancel' option
-  }
-
-  override fun getItemViewType(position: Int) = when (position) {
-    this.accounts.size + 1 -> LIST_CANCEL
-    this.accounts.size ->
+  override fun getItemCount() =
+    this.accounts.size +
       if (this.showAddAccount) {
-        LIST_ADD_ACCOUNT
+        2 // Show the 'add account' and 'cancel' options
       } else {
+        1 // Show 'cancel' option
+      }
+
+  override fun getItemViewType(position: Int) =
+    when (position) {
+      this.accounts.size + 1 -> {
         LIST_CANCEL
       }
 
-    else -> LIST_ITEM
-  }
+      this.accounts.size -> {
+        if (this.showAddAccount) {
+          LIST_ADD_ACCOUNT
+        } else {
+          LIST_CANCEL
+        }
+      }
 
-  override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+      else -> {
+        LIST_ITEM
+      }
+    }
+
+  override fun onBindViewHolder(
+    holder: RecyclerView.ViewHolder,
+    position: Int
+  ) {
     when (holder.itemViewType) {
       LIST_ITEM -> {
         val item = this.accounts[position]
@@ -317,7 +336,9 @@ class AccountPickerAdapter(
   @Deprecated(message = "Make direct calls to a model.")
   interface OnAccountClickListener {
     fun onAccountClick(account: AccountType)
+
     fun onAddAccountClick()
+
     fun onCancelClick()
   }
 }

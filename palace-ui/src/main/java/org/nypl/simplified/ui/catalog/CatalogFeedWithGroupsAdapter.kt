@@ -21,7 +21,6 @@ class CatalogFeedWithGroupsAdapter(
   private val screenSize: ScreenSizeInformationType,
   private val callbacks: CatalogViewCallbacksType,
 ) : ListAdapter<FeedGroup, CatalogFeedWithGroupsLaneViewHolder>(diffCallback) {
-
   companion object {
     private val diffCallback =
       object : DiffUtil.ItemCallback<FeedGroup>() {
@@ -43,9 +42,7 @@ class CatalogFeedWithGroupsAdapter(
         override fun areItemsTheSame(
           oldItem: FeedGroup,
           newItem: FeedGroup
-        ): Boolean {
-          return oldItem.groupURI == newItem.groupURI
-        }
+        ): Boolean = oldItem.groupURI == newItem.groupURI
       }
   }
 
@@ -74,15 +71,11 @@ class CatalogFeedWithGroupsAdapter(
     holder.bindTo(this.getItem(position))
   }
 
-  override fun onViewRecycled(
-    holder: CatalogFeedWithGroupsLaneViewHolder
-  ) {
+  override fun onViewRecycled(holder: CatalogFeedWithGroupsLaneViewHolder) {
     holder.unbind()
   }
 
-  override fun onDetachedFromRecyclerView(
-    recyclerView: RecyclerView
-  ) {
+  override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
     // Nothing yet.
   }
 }

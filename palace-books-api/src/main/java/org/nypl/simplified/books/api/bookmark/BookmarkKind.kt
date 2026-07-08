@@ -13,16 +13,13 @@ import java.io.Serializable
 sealed class BookmarkKind(
   val motivationURI: String
 ) : Serializable {
-
   /**
    * The bookmark represents a last-read location.
    */
 
   object BookmarkLastReadLocation :
     BookmarkKind("http://librarysimplified.org/terms/annotation/idling") {
-    override fun toString(): String {
-      return "BookmarkLastReadLocation"
-    }
+    override fun toString(): String = "BookmarkLastReadLocation"
   }
 
   /**
@@ -31,27 +28,30 @@ sealed class BookmarkKind(
 
   object BookmarkExplicit :
     BookmarkKind("http://www.w3.org/ns/oa#bookmarking") {
-    override fun toString(): String {
-      return "BookmarkExplicit"
-    }
+    override fun toString(): String = "BookmarkExplicit"
   }
 
   companion object {
-
     val obsoleteBookmarkingURI =
       "https://www.w3.org/ns/oa#bookmarking"
 
-    fun ofMotivation(motivationURI: String): BookmarkKind {
-      return when (motivationURI) {
-        BookmarkLastReadLocation.motivationURI ->
+    fun ofMotivation(motivationURI: String): BookmarkKind =
+      when (motivationURI) {
+        BookmarkLastReadLocation.motivationURI -> {
           BookmarkLastReadLocation
-        BookmarkExplicit.motivationURI ->
+        }
+
+        BookmarkExplicit.motivationURI -> {
           BookmarkExplicit
-        obsoleteBookmarkingURI ->
+        }
+
+        obsoleteBookmarkingURI -> {
           BookmarkExplicit
-        else ->
+        }
+
+        else -> {
           throw IllegalArgumentException("Unrecognized motivation: $motivationURI")
+        }
       }
-    }
   }
 }

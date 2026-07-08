@@ -1,7 +1,6 @@
 package org.nypl.simplified.accounts.registry
 
 object AccountProviderRegistryConstants {
-
   const val MAXIMUM_PROVIDER_DESCRIPTIONS =
     10_000
 

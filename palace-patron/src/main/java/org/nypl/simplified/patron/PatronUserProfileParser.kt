@@ -30,7 +30,6 @@ internal class PatronUserProfileParser(
   private val stream: InputStream,
   private val warningsAsErrors: Boolean
 ) : PatronUserProfileParserType {
-
   override fun close() {
     this.stream.close()
   }
@@ -56,8 +55,8 @@ internal class PatronUserProfileParser(
     }
   }
 
-  private fun publishWarningMessage(message: String) {
-    return this.publishWarning(
+  private fun publishWarningMessage(message: String) =
+    this.publishWarning(
       ParseWarning(
         this.uri,
         message,
@@ -66,7 +65,6 @@ internal class PatronUserProfileParser(
         exception = null
       )
     )
-  }
 
   private fun publishErrorForException(e: Exception) {
     this.errors.add(
@@ -110,12 +108,13 @@ internal class PatronUserProfileParser(
       if (this.errors.isEmpty()) {
         return ParseResult.Success(
           warnings = this.warnings.toList(),
-          result = PatronUserProfile(
-            settings = settings,
-            links = links,
-            drm = drm,
-            authorization = authorization
-          )
+          result =
+            PatronUserProfile(
+              settings = settings,
+              links = links,
+              drm = drm,
+              authorization = authorization
+            )
         )
       } else {
         ParseResult.Failure(warnings = this.warnings.toList(), errors = this.errors.toList())
@@ -126,9 +125,7 @@ internal class PatronUserProfileParser(
     }
   }
 
-  private fun parseLinks(
-    root: ObjectNode
-  ): List<Link> {
+  private fun parseLinks(root: ObjectNode): List<Link> {
     val linksNode =
       JSONParserUtilities.getArrayOrNull(root, "links")
         ?: return listOf()
@@ -140,6 +137,7 @@ internal class PatronUserProfileParser(
           this.warnings.addAll(result.warnings)
           this.errors.addAll(result.errors)
         }
+
         is ParseResult.Success -> {
           this.warnings.addAll(result.warnings)
           results.add(result.result)
@@ -152,8 +150,8 @@ internal class PatronUserProfileParser(
   private fun parseDRMs(
     root: ObjectNode,
     links: List<Link>
-  ): List<PatronDRM> {
-    return if (root.has("drm")) {
+  ): List<PatronDRM> =
+    if (root.has("drm")) {
       try {
         val drms = JSONParserUtilities.getArray(root, "drm")
         drms.mapNotNull { node -> this.parseDRM(node, links) }
@@ -164,7 +162,6 @@ internal class PatronUserProfileParser(
     } else {
       listOf()
     }
-  }
 
   private fun parseDRM(
     node: JsonNode,
@@ -182,6 +179,7 @@ internal class PatronUserProfileParser(
         "http://librarysimplified.org/terms/drm/scheme/ACS" -> {
           this.parseDRMAdobe(root, vendor, scheme, links)
         }
+
         else -> {
           this.publishWarningMessage("Unrecognized DRM scheme: $scheme")
           null
@@ -207,7 +205,8 @@ internal class PatronUserProfileParser(
     linksCombined.addAll(this.parseLinks(root))
 
     val deviceManagerURI =
-      linksCombined.find { link -> link.relation == "http://librarysimplified.org/terms/drm/rel/devices" }
+      linksCombined
+        .find { link -> link.relation == "http://librarysimplified.org/terms/drm/rel/devices" }
         ?.hrefURI
 
     return PatronDRMAdobe(
@@ -218,12 +217,13 @@ internal class PatronUserProfileParser(
     )
   }
 
-  private fun parseAuthorization(root: ObjectNode): PatronAuthorization? {
-    return try {
+  private fun parseAuthorization(root: ObjectNode): PatronAuthorization? =
+    try {
       val identifier =
         JSONParserUtilities.getString(root, "simplified:authorization_identifier")
       val expires =
-        JSONParserUtilities.getStringOrNull(root, "simplified:authorization_expires")
+        JSONParserUtilities
+          .getStringOrNull(root, "simplified:authorization_expires")
           ?.let { text -> ISODateTimeFormat.dateTimeParser().parseDateTime(text) }
           ?.let { time -> time.toInstant() }
       PatronAuthorization(identifier, expires)
@@ -231,7 +231,6 @@ internal class PatronUserProfileParser(
       this.publishErrorForException(e)
       null
     }
-  }
 
   private fun parseSettings(root: ObjectNode): PatronSettings {
     return try {
@@ -239,10 +238,13 @@ internal class PatronUserProfileParser(
 
       val synchronizeAnnotations =
         when (settingsRoot["simplified:synchronize_annotations"]) {
-          is NullNode, null ->
+          is NullNode, null -> {
             false
-          else ->
+          }
+
+          else -> {
             JSONParserUtilities.getBoolean(settingsRoot, "simplified:synchronize_annotations")
+          }
         }
 
       return PatronSettings(synchronizeAnnotations = synchronizeAnnotations)

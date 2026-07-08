@@ -25,26 +25,22 @@ import org.nypl.simplified.links.Link
  */
 
 class BorrowBearerToken : BorrowSubtaskType {
-
   companion object : BorrowSubtaskFactoryType {
     override val name: String
       get() = "Bearer Token Negotiation"
 
-    override fun createSubtask(): BorrowSubtaskType {
-      return BorrowBearerToken()
-    }
+    override fun createSubtask(): BorrowSubtaskType = BorrowBearerToken()
 
     override fun isApplicableFor(
       type: MIMEType,
       target: Link?,
       account: AccountReadableType?,
       remaining: List<MIMEType>
-    ): Boolean {
-      return MIMECompatibility.isCompatibleStrictWithoutAttributes(
+    ): Boolean =
+      MIMECompatibility.isCompatibleStrictWithoutAttributes(
         type,
         StandardFormatNames.simplifiedBearerToken
       )
-    }
   }
 
   override fun execute(context: BorrowContextType) {
@@ -53,7 +49,10 @@ class BorrowBearerToken : BorrowSubtaskType {
 
     return try {
       when (val currentURI = context.currentLinkCheck()) {
-        is Link.LinkBasic -> this.executeLinkBasic(context, currentURI)
+        is Link.LinkBasic -> {
+          this.executeLinkBasic(context, currentURI)
+        }
+
         is Link.LinkTemplated -> {
           context.taskRecorder.currentStepFailed(
             message = "Cannot handle templated links for bearer tokens.",
@@ -88,10 +87,21 @@ class BorrowBearerToken : BorrowSubtaskType {
           )
         }
 
-        is AccountAuthenticationCredentials.Basic -> null
-        is AccountAuthenticationCredentials.SAML2_0 -> null
-        is AccountAuthenticationCredentials.OpenIDConnect -> null
-        null -> null
+        is AccountAuthenticationCredentials.Basic -> {
+          null
+        }
+
+        is AccountAuthenticationCredentials.SAML2_0 -> {
+          null
+        }
+
+        is AccountAuthenticationCredentials.OpenIDConnect -> {
+          null
+        }
+
+        null -> {
+          null
+        }
       }
 
     val tokenResult =

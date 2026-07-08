@@ -25,7 +25,6 @@ import java.util.Locale
 import java.util.TimeZone
 
 class MainApplication : Application() {
-
   companion object {
     private lateinit var INSTANCE: MainApplication
 
@@ -39,11 +38,10 @@ class MainApplication : Application() {
 
   private val boot: BootLoader<ServiceDirectoryType> =
     BootLoader(
-      bootProcess = object : BootProcessType<ServiceDirectoryType> {
-        override fun execute(onProgress: (BootEvent) -> Unit): ServiceDirectoryType {
-          return MainServices.setup(this@MainApplication, onProgress)
-        }
-      },
+      bootProcess =
+        object : BootProcessType<ServiceDirectoryType> {
+          override fun execute(onProgress: (BootEvent) -> Unit): ServiceDirectoryType = MainServices.setup(this@MainApplication, onProgress)
+        },
       bootStringResources = ::MainServicesStrings
     )
 
@@ -60,9 +58,7 @@ class MainApplication : Application() {
   private fun <T> wrapAttribute(
     source: AttributeReadableType<T>,
     target: AttributeType<T>
-  ): AttributeSubscriptionType {
-    return source.subscribe { _, newValue -> UIThread.runOnUIThread { target.set(newValue) } }
-  }
+  ): AttributeSubscriptionType = source.subscribe { _, newValue -> UIThread.runOnUIThread { target.set(newValue) } }
 
   private val bootEventsUI: AttributeType<BootEvent> =
     this.attributes.withValue(BootEvent.BootInProgress("Booting..."))
@@ -143,15 +139,14 @@ class MainApplication : Application() {
     }
   }
 
-  private fun versionCode(): String {
-    return try {
+  private fun versionCode(): String =
+    try {
       val info = this.packageManager.getPackageInfo(this.packageName, 0)
       info.versionCode.toString()
     } catch (e: Exception) {
       this.logger.debug("version info unavailable: ", e)
       "UNKNOWN"
     }
-  }
 
   /**
    * StrictMode is a developer tool which detects things you might be doing by accident and
@@ -164,7 +159,8 @@ class MainApplication : Application() {
   private fun configureStrictMode() {
     if (BuildConfig.DEBUG) {
       StrictMode.setThreadPolicy(
-        ThreadPolicy.Builder()
+        ThreadPolicy
+          .Builder()
           .detectDiskReads()
           .detectDiskWrites()
           .detectNetwork()
@@ -172,7 +168,8 @@ class MainApplication : Application() {
           .build()
       )
       StrictMode.setVmPolicy(
-        VmPolicy.Builder()
+        VmPolicy
+          .Builder()
           .detectLeakedSqlLiteObjects()
           .detectLeakedClosableObjects()
           .penaltyLog()

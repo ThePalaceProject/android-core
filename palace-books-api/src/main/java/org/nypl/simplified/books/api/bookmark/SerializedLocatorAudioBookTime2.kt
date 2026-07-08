@@ -15,16 +15,13 @@ data class SerializedLocatorAudioBookTime2(
   val readingOrderItem: String,
   val readingOrderItemOffsetMilliseconds: Long
 ) : SerializedLocator() {
-
   override val typeName: String
     get() = "LocatorAudioBookTime"
 
   override val typeVersion: Int
     get() = 2
 
-  override fun toJSON(
-    objectMapper: ObjectMapper
-  ): ObjectNode {
+  override fun toJSON(objectMapper: ObjectMapper): ObjectNode {
     val root = objectMapper.createObjectNode()
     root.put("@type", this.typeName)
     root.put("@version", this.typeVersion)
@@ -34,9 +31,7 @@ data class SerializedLocatorAudioBookTime2(
     return root
   }
 
-  override fun addToDigest(
-    digest: MessageDigest
-  ) {
+  override fun addToDigest(digest: MessageDigest) {
     digest.update(this.readingOrderItem.toByteArray(UTF_8))
     digest.update(this.readingOrderItemOffsetMilliseconds.toString().toByteArray(UTF_8))
   }

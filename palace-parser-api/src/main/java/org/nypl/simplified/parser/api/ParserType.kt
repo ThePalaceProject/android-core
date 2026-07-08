@@ -7,7 +7,6 @@ import java.io.Closeable
  */
 
 interface ParserType<T> : Closeable {
-
   /**
    * Evaluate the parser.
    */

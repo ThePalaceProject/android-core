@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory
 import android.content.Context
 
 object SettingsModel {
-
   private val logger =
     LoggerFactory.getLogger(SettingsModel::class.java)
 
@@ -37,28 +36,24 @@ object SettingsModel {
     }
   }
 
-  fun onClickVersion(
-    profiles: ProfilesControllerType
-  ) {
+  fun onClickVersion(profiles: ProfilesControllerType) {
     ++this.debugClicks
     if (this.debugClicks >= 7) {
       this.debugClicks = 0
       profiles.profileUpdate { d ->
         d.copy(
-          preferences = d.preferences.copy(
-            showDebugSettings = !d.preferences.showDebugSettings
-          )
+          preferences =
+            d.preferences.copy(
+              showDebugSettings = !d.preferences.showDebugSettings
+            )
         )
       }
     }
   }
 
-  fun showDebugSettings(
-    profiles: ProfilesControllerType
-  ): Boolean {
-    return profiles
+  fun showDebugSettings(profiles: ProfilesControllerType): Boolean =
+    profiles
       .profileCurrent()
       .preferences()
       .showDebugSettings
-  }
 }

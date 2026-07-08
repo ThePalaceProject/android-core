@@ -9,7 +9,6 @@ import org.nypl.simplified.ui.main.MainAttributes
 import java.net.URI
 
 object SettingsCustomOPDSModel {
-
   private val task: AttributeType<List<String>> =
     MainAttributes.attributes.withValue(listOf())
 
@@ -33,13 +32,12 @@ object SettingsCustomOPDSModel {
     )
   }
 
-  fun createCustomOPDSFeed(
-    uri: String
-  ) {
+  fun createCustomOPDSFeed(uri: String) {
     this.taskRunning.set(true)
 
     val future =
-      Services.serviceDirectory()
+      Services
+        .serviceDirectory()
         .requireService(ProfilesControllerType::class.java)
         .profileAccountCreateCustomOPDS(URI(uri))
 

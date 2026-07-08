@@ -18,31 +18,26 @@ class AudioBookPlayerParameters(
    */
 
   val playerID: UUID,
-
   /**
    * The account to which the book belongs.
    */
 
   val accountID: AccountID,
-
   /**
    * The account provider to which the book belongs.
    */
 
   val accountProviderID: URI,
-
   /**
    * The book ID.
    */
 
   val bookID: BookID,
-
   /**
    * The OPDS entry for the book.
    */
 
   val opdsEntry: OPDSAcquisitionFeedEntry,
-
   /**
    * The DRM information for the book.
    */

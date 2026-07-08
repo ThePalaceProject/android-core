@@ -15,7 +15,6 @@ import java.io.FileNotFoundException
  */
 
 object BookDRMInformationHandles {
-
   private val logger =
     LoggerFactory.getLogger(BookDRMInformationHandles::class.java)
 
@@ -63,9 +62,18 @@ object BookDRMInformationHandles {
           createInitial.setAdobeRightsInformation(null)
           null
         }
-        is BookDRMInformationHandle.BoundlessHandle -> null
-        is BookDRMInformationHandle.LCPHandle -> null
-        is BookDRMInformationHandle.NoneHandle -> null
+
+        is BookDRMInformationHandle.BoundlessHandle -> {
+          null
+        }
+
+        is BookDRMInformationHandle.LCPHandle -> {
+          null
+        }
+
+        is BookDRMInformationHandle.NoneHandle -> {
+          null
+        }
       }
     }
   }
@@ -94,18 +102,24 @@ object BookDRMInformationHandles {
     format: BookFormats.BookFormatDefinition,
     drmKind: BookDRMKind,
     onUpdate: () -> Unit
-  ): BookDRMInformationHandle {
-    return when (drmKind) {
-      BookDRMKind.NONE ->
+  ): BookDRMInformationHandle =
+    when (drmKind) {
+      BookDRMKind.NONE -> {
         BookDRMInformationHandleNone(directory, format)
-      BookDRMKind.LCP ->
+      }
+
+      BookDRMKind.LCP -> {
         BookDRMInformationHandleLCP(directory, format, onUpdate)
-      BookDRMKind.ACS ->
+      }
+
+      BookDRMKind.ACS -> {
         BookDRMInformationHandleACS(directory, format, onUpdate)
-      BookDRMKind.BOUNDLESS ->
+      }
+
+      BookDRMKind.BOUNDLESS -> {
         BookDRMInformationHandleBoundless(directory, format, onUpdate)
+      }
     }
-  }
 
   /**
    * Write the name of the given DRM system for to the DRM info file for the given format.

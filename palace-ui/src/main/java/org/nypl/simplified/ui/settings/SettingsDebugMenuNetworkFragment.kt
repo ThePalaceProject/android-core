@@ -16,28 +16,21 @@ import org.nypl.simplified.ui.main.MainNavigation
 import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
 import org.nypl.simplified.ui.screens.ScreenDefinitionType
 
-class SettingsDebugMenuNetworkFragment : Fragment(R.layout.debug_network),
+class SettingsDebugMenuNetworkFragment :
+  Fragment(R.layout.debug_network),
   MainBackButtonConsumerType {
-
   companion object : ScreenDefinitionFactoryType<Unit, SettingsDebugMenuNetworkFragment> {
-    private class ScreenSettingsDebugMenu :
-      ScreenDefinitionType<Unit, SettingsDebugMenuNetworkFragment> {
+    private class ScreenSettingsDebugMenu : ScreenDefinitionType<Unit, SettingsDebugMenuNetworkFragment> {
       override fun setup() {
         // No setup required
       }
 
-      override fun parameters() {
-        return Unit
-      }
+      override fun parameters() = Unit
 
-      override fun fragment(): SettingsDebugMenuNetworkFragment {
-        return SettingsDebugMenuNetworkFragment()
-      }
+      override fun fragment(): SettingsDebugMenuNetworkFragment = SettingsDebugMenuNetworkFragment()
     }
 
-    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuNetworkFragment> {
-      return ScreenSettingsDebugMenu()
-    }
+    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuNetworkFragment> = ScreenSettingsDebugMenu()
   }
 
   override fun onBackButtonPressed(): MainBackButtonConsumerType.Result {
@@ -78,7 +71,8 @@ class SettingsDebugMenuNetworkFragment : Fragment(R.layout.debug_network),
     super.onStart()
 
     val networkAccess =
-      Services.serviceDirectory()
+      Services
+        .serviceDirectory()
         .requireService(LSHTTPNetworkAccessType::class.java)
 
     this.subscriptions = CloseableCollection.create()

@@ -5,6 +5,5 @@ package org.librarysimplified.documents
  */
 
 interface EULAType : DocumentType {
-
   var hasAgreed: Boolean
 }

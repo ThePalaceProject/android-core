@@ -10,7 +10,6 @@ import android.content.Context
  */
 
 interface BootPreHookType {
-
   /**
    * Execute a task, passing it the Android application context.
    */

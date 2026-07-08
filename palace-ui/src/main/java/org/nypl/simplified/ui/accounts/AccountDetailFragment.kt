@@ -73,8 +73,9 @@ import java.net.URI
  * A fragment that shows settings for a single account.
  */
 
-class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumerType {
-
+class AccountDetailFragment :
+  Fragment(R.layout.account),
+  MainBackButtonConsumerType {
   private val logger =
     LoggerFactory.getLogger(AccountDetailFragment::class.java)
 
@@ -85,10 +86,11 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
     LocationServices.getFusedLocationProviderClient(this.requireActivity())
   }
 
-  private val locationPermissions = arrayOf(
-    Manifest.permission.ACCESS_FINE_LOCATION,
-    Manifest.permission.ACCESS_COARSE_LOCATION,
-  )
+  private val locationPermissions =
+    arrayOf(
+      Manifest.permission.ACCESS_FINE_LOCATION,
+      Manifest.permission.ACCESS_COARSE_LOCATION,
+    )
 
   private val locationPermissionCallback =
     this.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { results ->
@@ -147,20 +149,14 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
         AccountDetailModel.clearPendingAfterLoginTask()
       }
 
-      override fun parameters(): AccountDetailScreenParameters {
-        return this.parameters
-      }
+      override fun parameters(): AccountDetailScreenParameters = this.parameters
 
-      override fun fragment(): AccountDetailFragment {
-        return AccountDetailFragment()
-      }
+      override fun fragment(): AccountDetailFragment = AccountDetailFragment()
     }
 
     override fun createScreenDefinition(
       p: AccountDetailScreenParameters
-    ): ScreenDefinitionType<AccountDetailScreenParameters, AccountDetailFragment> {
-      return ScreenAccountDetail(p)
-    }
+    ): ScreenDefinitionType<AccountDetailScreenParameters, AccountDetailFragment> = ScreenAccountDetail(p)
   }
 
   override fun onViewCreated(
@@ -237,17 +233,18 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
      * Show/hide the login reason text.
      */
 
-    val ignored = when (val reason = AccountDetailModel.showPleaseLoginReason) {
-      AccountDetailModel.PleaseLoginReasonExpired,
-      AccountDetailModel.PleaseLoginReasonGeneric -> {
-        this.loginTitle.visibility = View.VISIBLE
-        this.loginTitleText.text = resources.getString(reason.stringResource())
-      }
+    val ignored =
+      when (val reason = AccountDetailModel.showPleaseLoginReason) {
+        AccountDetailModel.PleaseLoginReasonExpired,
+        AccountDetailModel.PleaseLoginReasonGeneric -> {
+          this.loginTitle.visibility = View.VISIBLE
+          this.loginTitleText.text = resources.getString(reason.stringResource())
+        }
 
-      null -> {
-        this.loginTitle.visibility = View.GONE
+        null -> {
+          this.loginTitle.visibility = View.GONE
+        }
       }
-    }
 
     /*
      * Instantiate views for alternative authentication methods.
@@ -291,9 +288,7 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
    * If there's any card creator URI, the button should be enabled...
    */
 
-  private fun shouldSignUpBeEnabled(): Boolean {
-    return AccountDetailModel.account.provider.cardCreatorURI != null
-  }
+  private fun shouldSignUpBeEnabled(): Boolean = AccountDetailModel.account.provider.cardCreatorURI != null
 
   override fun onStart() {
     super.onStart()
@@ -433,25 +428,26 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
       this.reportIssueGroup.visibility = View.VISIBLE
       this.reportIssueEmail.text = supportUrl.replace("mailto:", "")
       this.reportIssueGroup.setOnClickListener {
-        val intent = if (supportUrl.startsWith("mailto:")) {
-          try {
-            Reports.reportLibrary = AccountDetailModel.account.provider.displayName
-            val uri = URI.create(supportUrl)
-            val email = uri.schemeSpecificPart
-            Intent(Intent.ACTION_SEND)
-              .setType("message/rfc822")
-              .putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
-              .putExtra(Intent.EXTRA_SUBJECT, "Issue Report from The Palace Project App")
-              .putExtra(Intent.EXTRA_TEXT, Reports.decorateBodyText(""))
-          } catch (e: Throwable) {
-            this.logger.debug("Unparseable URL: ", e)
+        val intent =
+          if (supportUrl.startsWith("mailto:")) {
+            try {
+              Reports.reportLibrary = AccountDetailModel.account.provider.displayName
+              val uri = URI.create(supportUrl)
+              val email = uri.schemeSpecificPart
+              Intent(Intent.ACTION_SEND)
+                .setType("message/rfc822")
+                .putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
+                .putExtra(Intent.EXTRA_SUBJECT, "Issue Report from The Palace Project App")
+                .putExtra(Intent.EXTRA_TEXT, Reports.decorateBodyText(""))
+            } catch (e: Throwable) {
+              this.logger.debug("Unparseable URL: ", e)
+              null
+            }
+          } else if (URLUtil.isValidUrl(supportUrl)) {
+            Intent(Intent.ACTION_VIEW, Uri.parse(supportUrl))
+          } else {
             null
           }
-        } else if (URLUtil.isValidUrl(supportUrl)) {
-          Intent(Intent.ACTION_VIEW, Uri.parse(supportUrl))
-        } else {
-          null
-        }
 
         if (intent != null) {
           val chosenIntent =
@@ -477,9 +473,7 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
     }
   }
 
-  private fun onTrySAML2Login(
-    authenticationDescription: AccountProviderAuthenticationDescription.SAML2_0
-  ) {
+  private fun onTrySAML2Login(authenticationDescription: AccountProviderAuthenticationDescription.SAML2_0) {
     AccountDetailModel.tryLogin(
       ProfileAccountLoginRequest.SAML20Initiate(
         accountId = AccountDetailModel.account.id,
@@ -503,9 +497,7 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
     }
   }
 
-  private fun onTryOIDCLogin(
-    authenticationDescription: AccountProviderAuthenticationDescription.OpenIDConnect
-  ) {
+  private fun onTryOIDCLogin(authenticationDescription: AccountProviderAuthenticationDescription.OpenIDConnect) {
     try {
       val account = AccountDetailModel.account
 
@@ -527,9 +519,7 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
     }
   }
 
-  private fun onTryBasicLogin(
-    description: AccountProviderAuthenticationDescription.Basic
-  ) {
+  private fun onTryBasicLogin(description: AccountProviderAuthenticationDescription.Basic) {
     val accountPassword: AccountPassword =
       this.authenticationViews.getBasicPassword()
     val accountUsername: AccountUsername =
@@ -546,9 +536,7 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
     AccountDetailModel.tryLogin(request)
   }
 
-  private fun onTryBasicTokenLogin(
-    description: AccountProviderAuthenticationDescription.BasicToken
-  ) {
+  private fun onTryBasicTokenLogin(description: AccountProviderAuthenticationDescription.BasicToken) {
     val accountPassword: AccountPassword =
       this.authenticationViews.getBasicTokenPassword()
     val accountUsername: AccountUsername =
@@ -585,11 +573,12 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
     this.accountSubtitle.text =
       account.provider.subtitle
 
-    this.bookmarkSync.visibility = if (account.requiresCredentials) {
-      View.VISIBLE
-    } else {
-      View.GONE
-    }
+    this.bookmarkSync.visibility =
+      if (account.requiresCredentials) {
+        View.VISIBLE
+      } else {
+        View.GONE
+      }
 
     this.bookmarkSyncCheck.isEnabled = account.isBookmarkSyncable()
     this.bookmarkSyncCheck.isChecked = account.preferences.bookmarkSyncingPermitted
@@ -675,16 +664,18 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
         this.loginProgress.visibility = View.GONE
 
         this.setLoginLogoutButtonStatus(
-          loginStatus = AsLoginButtonEnabled {
-            this.formLock(FormLockState.LOGGING_IN)
-            this.tryLogin()
-          },
-          logoutStatus = AsLogoutButtonEnabled {
-            this.tryLogoutAfterConfirmation {
-              this.formLock(FormLockState.LOGGING_OUT)
-              AccountDetailModel.tryLogout(this.requireActivity())
+          loginStatus =
+            AsLoginButtonEnabled {
+              this.formLock(FormLockState.LOGGING_IN)
+              this.tryLogin()
+            },
+          logoutStatus =
+            AsLogoutButtonEnabled {
+              this.tryLogoutAfterConfirmation {
+                this.formLock(FormLockState.LOGGING_OUT)
+                AccountDetailModel.tryLogout(this.requireActivity())
+              }
             }
-          }
         )
 
         this.formUnlock()
@@ -694,10 +685,11 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
         this.loginProgress.visibility = View.GONE
 
         this.setLoginLogoutButtonStatus(
-          loginStatus = AsLoginButtonEnabled {
-            this.formLock(FormLockState.LOGGING_IN)
-            this.tryLogin()
-          },
+          loginStatus =
+            AsLoginButtonEnabled {
+              this.formLock(FormLockState.LOGGING_IN)
+              this.tryLogin()
+            },
           logoutStatus = AsButtonGone
         )
         this.formUnlock()
@@ -725,33 +717,34 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
         this.formLock(FormLockState.LOGGING_IN)
 
         this.setLoginLogoutButtonStatus(
-          loginStatus = AsCancelButtonEnabled {
-            when (val desc = loginState.description) {
-              AccountProviderAuthenticationDescription.Anonymous,
-              is AccountProviderAuthenticationDescription.Basic,
-              is AccountProviderAuthenticationDescription.BasicToken -> {
-                throw UnreachableCodeException()
-              }
+          loginStatus =
+            AsCancelButtonEnabled {
+              when (val desc = loginState.description) {
+                AccountProviderAuthenticationDescription.Anonymous,
+                is AccountProviderAuthenticationDescription.Basic,
+                is AccountProviderAuthenticationDescription.BasicToken -> {
+                  throw UnreachableCodeException()
+                }
 
-              is AccountProviderAuthenticationDescription.SAML2_0 -> {
-                AccountDetailModel.tryLogin(
-                  ProfileAccountLoginRequest.SAML20Cancel(
-                    accountId = account.id,
-                    description = desc
+                is AccountProviderAuthenticationDescription.SAML2_0 -> {
+                  AccountDetailModel.tryLogin(
+                    ProfileAccountLoginRequest.SAML20Cancel(
+                      accountId = account.id,
+                      description = desc
+                    )
                   )
-                )
-              }
+                }
 
-              is AccountProviderAuthenticationDescription.OpenIDConnect -> {
-                AccountDetailModel.tryLogin(
-                  ProfileAccountLoginRequest.OIDCCancel(
-                    accountId = account.id,
-                    description = desc
+                is AccountProviderAuthenticationDescription.OpenIDConnect -> {
+                  AccountDetailModel.tryLogin(
+                    ProfileAccountLoginRequest.OIDCCancel(
+                      accountId = account.id,
+                      description = desc
+                    )
                   )
-                )
+                }
               }
-            }
-          },
+            },
           logoutStatus = AsButtonGone
         )
       }
@@ -759,15 +752,19 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
       is AccountLoginFailed -> {
         this.loginProgress.visibility = View.VISIBLE
         this.loginProgressBar.visibility = View.GONE
-        this.loginProgressText.text = loginState.taskResult.steps.last().resolution.message
+        this.loginProgressText.text =
+          loginState.taskResult.steps
+            .last()
+            .resolution.message
         this.formUnlock()
         this.cancelImageButtonLoading()
 
         this.setLoginLogoutButtonStatus(
-          loginStatus = AsLoginButtonEnabled {
-            this.formLock(FormLockState.LOGGING_IN)
-            this.tryLogin()
-          },
+          loginStatus =
+            AsLoginButtonEnabled {
+              this.formLock(FormLockState.LOGGING_IN)
+              this.tryLogin()
+            },
           logoutStatus = AsButtonGone
         )
 
@@ -810,12 +807,13 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
 
         this.setLoginLogoutButtonStatus(
           loginStatus = AccountLoginButtonStatus.AsButtonGone,
-          logoutStatus = AsLogoutButtonEnabled {
-            this.tryLogoutAfterConfirmation {
-              this.formLock(FormLockState.LOGGING_OUT)
-              AccountDetailModel.tryLogout(this.requireActivity())
+          logoutStatus =
+            AsLogoutButtonEnabled {
+              this.tryLogoutAfterConfirmation {
+                this.formLock(FormLockState.LOGGING_OUT)
+                AccountDetailModel.tryLogout(this.requireActivity())
+              }
             }
-          }
         )
         this.authenticationAlternativesHide()
       }
@@ -878,18 +876,22 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
 
         this.loginProgress.visibility = View.VISIBLE
         this.loginProgressBar.visibility = View.GONE
-        this.loginProgressText.text = loginState.taskResult.steps.last().resolution.message
+        this.loginProgressText.text =
+          loginState.taskResult.steps
+            .last()
+            .resolution.message
         this.cancelImageButtonLoading()
         this.formLock(FormLockState.LOGGING_OUT)
 
         this.setLoginLogoutButtonStatus(
           loginStatus = AccountLoginButtonStatus.AsButtonGone,
-          logoutStatus = AsLogoutButtonEnabled {
-            this.tryLogoutAfterConfirmation {
-              this.formLock(FormLockState.LOGGING_OUT)
-              AccountDetailModel.tryLogout(this.requireActivity())
+          logoutStatus =
+            AsLogoutButtonEnabled {
+              this.tryLogoutAfterConfirmation {
+                this.formLock(FormLockState.LOGGING_OUT)
+                AccountDetailModel.tryLogout(this.requireActivity())
+              }
             }
-          }
         )
 
         this.loginButtonErrorDetails.visibility = View.VISIBLE
@@ -904,9 +906,7 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
     }
   }
 
-  private fun tryLogoutAfterConfirmation(
-    onAccept: () -> Unit
-  ) {
+  private fun tryLogoutAfterConfirmation(onAccept: () -> Unit) {
     val context =
       this.requireContext()
 
@@ -915,23 +915,18 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
         .setTitle(R.string.accountLogout)
         .setMessage(
           context.getString(R.string.logoutConfirm)
-        )
-        .setNegativeButton(R.string.accountCancel) { dialog, _ ->
+        ).setNegativeButton(R.string.accountCancel) { dialog, _ ->
           dialog.dismiss()
-        }
-        .setPositiveButton(R.string.accountLogout) { dialog, _ ->
+        }.setPositiveButton(R.string.accountLogout) { dialog, _ ->
           onAccept.invoke()
           dialog.dismiss()
-        }
-        .create()
+        }.create()
 
     dialog.show()
   }
 
-  private fun disableSyncSwitchForLoginState(
-    loginState: AccountLoginState
-  ) {
-    return when (loginState) {
+  private fun disableSyncSwitchForLoginState(loginState: AccountLoginState) =
+    when (loginState) {
       is AccountLoggedInStaleCredentials,
       is AccountLoggedIn -> {
         // Nothing required.
@@ -948,7 +943,6 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
         this.bookmarkSyncCheck.isEnabled = false
       }
     }
-  }
 
   private fun cancelImageButtonLoading() {
     val services =
@@ -1042,9 +1036,7 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
     LOGGING_OUT
   }
 
-  private fun formLock(
-    state: FormLockState
-  ) {
+  private fun formLock(state: FormLockState) {
     this.authenticationViews.lock()
     this.authenticationAlternativesHide()
   }
@@ -1084,35 +1076,38 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
   private fun tryLogin() {
     val account = AccountDetailModel.account
     when (val description = account.provider.authentication) {
-      is AccountProviderAuthenticationDescription.SAML2_0 ->
+      is AccountProviderAuthenticationDescription.SAML2_0 -> {
         this.onTrySAML2Login(description)
+      }
 
-      is AccountProviderAuthenticationDescription.Basic ->
+      is AccountProviderAuthenticationDescription.Basic -> {
         this.onTryBasicLogin(description)
+      }
 
-      is AccountProviderAuthenticationDescription.BasicToken ->
+      is AccountProviderAuthenticationDescription.BasicToken -> {
         this.onTryBasicTokenLogin(description)
+      }
 
-      is AccountProviderAuthenticationDescription.Anonymous ->
+      is AccountProviderAuthenticationDescription.Anonymous -> {
         throw UnreachableCodeException()
+      }
 
-      is AccountProviderAuthenticationDescription.OpenIDConnect ->
+      is AccountProviderAuthenticationDescription.OpenIDConnect -> {
         this.onTryOIDCLogin(description)
+      }
     }
   }
 
-  private fun isLocationPermissionGranted(): Boolean {
-    return this.locationPermissions.all { permission ->
+  private fun isLocationPermissionGranted(): Boolean =
+    this.locationPermissions.all { permission ->
       ContextCompat.checkSelfPermission(this.requireContext(), permission) ==
         PackageManager.PERMISSION_GRANTED
     }
-  }
 
-  private fun shouldShowRationale(): Boolean {
-    return this.locationPermissions.all { permission ->
+  private fun shouldShowRationale(): Boolean =
+    this.locationPermissions.all { permission ->
       ActivityCompat.shouldShowRequestPermissionRationale(this.requireActivity(), permission)
     }
-  }
 
   private fun openAppSettings() {
     try {
@@ -1148,8 +1143,7 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
           } else {
             this.showErrorGettingLocationDialog()
           }
-        }
-        .addOnFailureListener {
+        }.addOnFailureListener {
           this.showErrorGettingLocationDialog()
         }
     } catch (e: SecurityException) {
@@ -1179,11 +1173,9 @@ class AccountDetailFragment : Fragment(R.layout.account), MainBackButtonConsumer
       .setMessage(R.string.accountCardCreatorDialogOpenSettingsMessage)
       .setPositiveButton(R.string.accountCardCreatorDialogOpenSettings) { _, _ ->
         this.openAppSettings()
-      }
-      .setNegativeButton(R.string.accountCardCreatorDialogCancel) { dialog, _ ->
+      }.setNegativeButton(R.string.accountCardCreatorDialogCancel) { dialog, _ ->
         dialog.dismiss()
-      }
-      .create()
+      }.create()
       .show()
   }
 

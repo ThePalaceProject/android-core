@@ -20,7 +20,6 @@ data class SerializedLocatorAudioBookTime1(
   val timeMilliseconds: Long,
   val title: String,
 ) : SerializedLocator() {
-
   init {
     check(this.chapter >= 0) {
       "Chapter ${this.chapter} must be non-negative."
@@ -39,9 +38,7 @@ data class SerializedLocatorAudioBookTime1(
   override val typeVersion: Int
     get() = 1
 
-  override fun toJSON(
-    objectMapper: ObjectMapper
-  ): ObjectNode {
+  override fun toJSON(objectMapper: ObjectMapper): ObjectNode {
     val root = objectMapper.createObjectNode()
     root.put("@type", this.typeName)
     root.put("@version", this.typeVersion)
@@ -56,9 +53,7 @@ data class SerializedLocatorAudioBookTime1(
     return root
   }
 
-  override fun addToDigest(
-    digest: MessageDigest
-  ) {
+  override fun addToDigest(digest: MessageDigest) {
     digest.update(this.audioBookId.toByteArray(UTF_8))
     digest.update(this.chapter.toString().toByteArray(UTF_8))
     digest.update(this.duration.toString().toByteArray(UTF_8))

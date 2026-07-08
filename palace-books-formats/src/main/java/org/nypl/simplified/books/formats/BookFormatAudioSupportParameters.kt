@@ -5,19 +5,16 @@ package org.nypl.simplified.books.formats
  */
 
 data class BookFormatAudioSupportParameters(
-
   /**
    * The application is configured to support Findaway audio books.
    */
 
   val supportsFindawayAudioBooks: Boolean,
-
   /**
    * The application is configured to support Overdrive audio books.
    */
 
   val supportsOverdriveAudioBooks: Boolean,
-
   /**
    * The application is configured to support DPLA audio books.
    */

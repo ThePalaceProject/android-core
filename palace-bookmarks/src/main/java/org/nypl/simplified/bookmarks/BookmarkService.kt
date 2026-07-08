@@ -5,15 +5,11 @@ import org.nypl.simplified.bookmarks.api.BookmarkServiceType
 import org.nypl.simplified.bookmarks.internal.BService
 
 object BookmarkService : BookmarkServiceProviderType {
-
-  override fun createService(
-    requirements: BookmarkServiceProviderType.Requirements
-  ): BookmarkServiceType {
-    return BService(
+  override fun createService(requirements: BookmarkServiceProviderType.Requirements): BookmarkServiceType =
+    BService(
       threads = requirements.threads,
       httpCalls = requirements.httpCalls,
       bookmarkEventsOut = requirements.events,
       profilesController = requirements.profilesController
     )
-  }
 }

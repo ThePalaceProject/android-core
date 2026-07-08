@@ -12,16 +12,13 @@ import org.slf4j.LoggerFactory
  */
 
 object AccountAuthenticationCredentialsJSON20190424 : AccountAuthenticationCredentialsJSONVersionedType {
-
   private val logger =
     LoggerFactory.getLogger(AccountAuthenticationCredentialsJSON20190424::class.java)
 
   override val supportedVersion: Int =
     20190424
 
-  override fun deserializeFromJSON(
-    node: JsonNode
-  ): AccountAuthenticationCredentials {
+  override fun deserializeFromJSON(node: JsonNode): AccountAuthenticationCredentials {
     logger.debug("deserializing version 20190424")
 
     val obj =
@@ -31,7 +28,8 @@ object AccountAuthenticationCredentialsJSON20190424 : AccountAuthenticationCrede
     val pass =
       AccountPassword(JSONParserUtilities.getString(obj, "password"))
     val adobeCredentials =
-      JSONParserUtilities.getObjectOrNull(obj, "adobe_credentials")
+      JSONParserUtilities
+        .getObjectOrNull(obj, "adobe_credentials")
         ?.let(AccountAuthenticationCredentialsAdobeJSON::deserializeAdobeCredentials)
 
     return AccountAuthenticationCredentials.Basic(

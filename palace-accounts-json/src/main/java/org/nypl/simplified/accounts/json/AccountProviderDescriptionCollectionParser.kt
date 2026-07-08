@@ -21,16 +21,13 @@ class AccountProviderDescriptionCollectionParser internal constructor(
   private val source: URI,
   private val manifestSupplier: () -> WPMManifest
 ) : AccountProviderDescriptionCollectionParserType {
-
   private val logger =
     LoggerFactory.getLogger(AccountProviderDescriptionCollectionParser::class.java)
 
   private val errors = mutableListOf<ParseError>()
   private val warnings = mutableListOf<ParseWarning>()
 
-  private fun logError(
-    message: String
-  ) {
+  private fun logError(message: String) {
     this.errors.add(
       ParseError(
         source = this.source,
@@ -71,9 +68,7 @@ class AccountProviderDescriptionCollectionParser internal constructor(
     }
   }
 
-  private fun processCatalogs(
-    manifest: WPMManifest
-  ): ParseResult<AccountProviderDescriptionCollection> {
+  private fun processCatalogs(manifest: WPMManifest): ParseResult<AccountProviderDescriptionCollection> {
     val metadata =
       this.processMetadata(manifest.metadata)
     val accountDescriptions =
@@ -82,11 +77,12 @@ class AccountProviderDescriptionCollectionParser internal constructor(
     if (this.errors.isEmpty()) {
       return ParseResult.Success(
         warnings = this.warnings.toList(),
-        result = AccountProviderDescriptionCollection(
-          providers = accountDescriptions,
-          links = manifest.links.map { link -> Links.wpmLinkToPalaceLink(link) },
-          metadata = metadata
-        )
+        result =
+          AccountProviderDescriptionCollection(
+            providers = accountDescriptions,
+            links = manifest.links.map { link -> Links.wpmLinkToPalaceLink(link) },
+            metadata = metadata
+          )
       )
     }
 
@@ -96,9 +92,7 @@ class AccountProviderDescriptionCollectionParser internal constructor(
     )
   }
 
-  private fun processCatalog(
-    catalog: WPMCatalog
-  ): AccountProviderDescription? {
+  private fun processCatalog(catalog: WPMCatalog): AccountProviderDescription? {
     val errorsThen = this.errors.size
 
     val id = catalog.metadata.identifier
@@ -126,13 +120,10 @@ class AccountProviderDescriptionCollectionParser internal constructor(
     )
   }
 
-  private fun processMetadata(
-    metadata: WPMMetadata
-  ): AccountProviderDescriptionCollection.Metadata {
-    return AccountProviderDescriptionCollection.Metadata(
+  private fun processMetadata(metadata: WPMMetadata): AccountProviderDescriptionCollection.Metadata =
+    AccountProviderDescriptionCollection.Metadata(
       title = metadata.title.defaultValue
     )
-  }
 
   override fun close() {
     // Nothing required.

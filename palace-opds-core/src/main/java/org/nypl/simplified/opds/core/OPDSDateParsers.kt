@@ -11,7 +11,5 @@ object OPDSDateParsers {
    * @return A properly configured date/time parser.
    */
   @JvmStatic
-  fun dateTimeParser(): DateTimeFormatter {
-    return ISODateTimeFormat.dateTimeParser().withZoneUTC()
-  }
+  fun dateTimeParser(): DateTimeFormatter = ISODateTimeFormat.dateTimeParser().withZoneUTC()
 }

@@ -9,7 +9,6 @@ import org.nypl.simplified.links.Link
  */
 
 interface BorrowSubtaskDirectoryType {
-
   /**
    * @return All of the available subtasks in the directory
    */
@@ -25,9 +24,8 @@ interface BorrowSubtaskDirectoryType {
     target: Link?,
     account: AccountReadableType?,
     remainingTypes: List<MIMEType>
-  ): BorrowSubtaskFactoryType? {
-    return this.subtasks.firstOrNull { factory ->
+  ): BorrowSubtaskFactoryType? =
+    this.subtasks.firstOrNull { factory ->
       factory.isApplicableFor(mimeType, target, account, remainingTypes)
     }
-  }
 }

@@ -9,7 +9,6 @@ import java.util.concurrent.Executor
  */
 
 object UIThread : Executor {
-
   /**
    * Check that the current thread is the UI thread and raise {@link IllegalStateException}
    * if it isn't.
@@ -30,9 +29,7 @@ object UIThread : Executor {
    * @return `true` iff the current thread is the UI thread.
    */
 
-  fun isUIThread(): Boolean {
-    return Looper.getMainLooper().thread === Thread.currentThread()
-  }
+  fun isUIThread(): Boolean = Looper.getMainLooper().thread === Thread.currentThread()
 
   /**
    * Run the given Runnable on the UI thread.

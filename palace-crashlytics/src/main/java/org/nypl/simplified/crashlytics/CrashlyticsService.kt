@@ -4,7 +4,6 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import org.nypl.simplified.crashlytics.api.CrashlyticsServiceType
 
 class CrashlyticsService : CrashlyticsServiceType {
-
   @Volatile
   private var userIdMostRecent: String = ""
 
@@ -32,27 +31,45 @@ class CrashlyticsService : CrashlyticsServiceType {
     this.instance.setUserId(identifier)
   }
 
-  override fun setCustomKey(key: String, value: Int) {
+  override fun setCustomKey(
+    key: String,
+    value: Int
+  ) {
     this.instance.setCustomKey(key, value)
   }
 
-  override fun setCustomKey(key: String, value: Long) {
+  override fun setCustomKey(
+    key: String,
+    value: Long
+  ) {
     this.instance.setCustomKey(key, value)
   }
 
-  override fun setCustomKey(key: String, value: Float) {
+  override fun setCustomKey(
+    key: String,
+    value: Float
+  ) {
     this.instance.setCustomKey(key, value)
   }
 
-  override fun setCustomKey(key: String, value: Double) {
+  override fun setCustomKey(
+    key: String,
+    value: Double
+  ) {
     this.instance.setCustomKey(key, value)
   }
 
-  override fun setCustomKey(key: String, value: String) {
+  override fun setCustomKey(
+    key: String,
+    value: String
+  ) {
     this.instance.setCustomKey(key, value)
   }
 
-  override fun setCustomKey(key: String, value: Boolean) {
+  override fun setCustomKey(
+    key: String,
+    value: Boolean
+  ) {
     this.instance.setCustomKey(key, value)
   }
 }

@@ -20,7 +20,6 @@ class TimeTrackingService private constructor(
   private val merge: TimeTrackingMergeServiceType,
   private val sender: TimeTrackingSenderServiceType
 ) : TimeTrackingServiceType {
-
   private val resources =
     CloseableCollection.create()
 
@@ -44,32 +43,36 @@ class TimeTrackingService private constructor(
       senderDirectory: Path,
     ): TimeTrackingServiceType {
       val status: AttributeType<TimeTrackingStatus> =
-        Attributes.create { e -> this.logger.debug("Attribute exception: ", e) }
+        Attributes
+          .create { e -> this.logger.debug("Attribute exception: ", e) }
           .withValue(TimeTrackingStatus.Inactive)
 
       return TimeTrackingService(
         status = status,
-        collector = TimeTrackingCollector.create(
-          profiles = profiles,
-          status = status,
-          timeSegments = timeSegments,
-          debugDirectory = debugDirectory,
-          outputDirectory = collectorDirectory
-        ),
-        merge = TimeTrackingMerge.create(
-          clock = clock,
-          frequency = Duration.ofSeconds(30L),
-          inputDirectory = collectorDirectory,
-          debugDirectory = debugDirectory,
-          outputDirectory = senderDirectory
-        ),
-        sender = TimeTrackingSender.create(
-          profiles = profiles,
-          httpCalls = httpCalls,
-          debugDirectory = debugDirectory,
-          inputDirectory = senderDirectory,
-          frequency = Duration.ofSeconds(30L)
-        )
+        collector =
+          TimeTrackingCollector.create(
+            profiles = profiles,
+            status = status,
+            timeSegments = timeSegments,
+            debugDirectory = debugDirectory,
+            outputDirectory = collectorDirectory
+          ),
+        merge =
+          TimeTrackingMerge.create(
+            clock = clock,
+            frequency = Duration.ofSeconds(30L),
+            inputDirectory = collectorDirectory,
+            debugDirectory = debugDirectory,
+            outputDirectory = senderDirectory
+          ),
+        sender =
+          TimeTrackingSender.create(
+            profiles = profiles,
+            httpCalls = httpCalls,
+            debugDirectory = debugDirectory,
+            inputDirectory = senderDirectory,
+            frequency = Duration.ofSeconds(30L)
+          )
       )
     }
   }
@@ -80,12 +83,14 @@ class TimeTrackingService private constructor(
     libraryId: String,
     timeTrackingUri: URI
   ) {
-    this.status.set(TimeTrackingStatus.Active(
-      accountID = accountID,
-      bookId = bookId,
-      libraryId = libraryId,
-      timeTrackingUri = timeTrackingUri
-    ))
+    this.status.set(
+      TimeTrackingStatus.Active(
+        accountID = accountID,
+        bookId = bookId,
+        libraryId = libraryId,
+        timeTrackingUri = timeTrackingUri
+      )
+    )
   }
 
   override fun onBookClosed() {

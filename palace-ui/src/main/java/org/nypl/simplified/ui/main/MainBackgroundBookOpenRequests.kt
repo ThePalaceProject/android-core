@@ -15,18 +15,19 @@ import java.util.UUID
  */
 
 object MainBackgroundBookOpenRequests {
-
   private val requestsSub: Disposable
 
   private val logger =
     LoggerFactory.getLogger(MainBackgroundBookOpenRequests::class.java)
 
   private val requests =
-    PublishSubject.create<BookOpenRequest>()
+    PublishSubject
+      .create<BookOpenRequest>()
       .toSerialized()
 
   private val requestsOnUI =
-    PublishSubject.create<BookOpenRequest>()
+    PublishSubject
+      .create<BookOpenRequest>()
       .toSerialized()
 
   init {
@@ -52,9 +53,7 @@ object MainBackgroundBookOpenRequests {
    * Request that a book be opened.
    */
 
-  fun requestBookOpen(
-    request: BookOpenRequest
-  ) {
+  fun requestBookOpen(request: BookOpenRequest) {
     this.logger.debug("Requesting background load of audio book: {}", request)
     this.requests.onNext(request)
   }

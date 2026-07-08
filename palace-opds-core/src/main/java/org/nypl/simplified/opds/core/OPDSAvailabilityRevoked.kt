@@ -11,7 +11,6 @@ class OPDSAvailabilityRevoked private constructor(
   override val endDate: DateTime?,
   val revoke: URI
 ) : OPDSAvailabilityType {
-
   override fun toString(): String {
     val sb = StringBuilder("OPDSAvailabilityRevoked{")
     sb.append("revoke=").append(this.revoke)
@@ -25,10 +24,6 @@ class OPDSAvailabilityRevoked private constructor(
      * @return A "revoked" availability value
      */
     @JvmStatic
-    fun get(
-      revoke: URI
-    ): OPDSAvailabilityRevoked {
-      return OPDSAvailabilityRevoked(endDate = null, revoke = revoke)
-    }
+    fun get(revoke: URI): OPDSAvailabilityRevoked = OPDSAvailabilityRevoked(endDate = null, revoke = revoke)
   }
 }

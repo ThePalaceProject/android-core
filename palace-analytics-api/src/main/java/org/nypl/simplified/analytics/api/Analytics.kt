@@ -12,23 +12,22 @@ class Analytics private constructor(
   private val logger: Logger,
   private val consumers: List<AnalyticsSystem>
 ) : AnalyticsType {
-
   init {
     this.logger.debug("initialized {} analytics systems", this.consumers.size)
   }
 
   companion object {
-
     private val LOG = LoggerFactory.getLogger(Analytics::class.java)
 
     /**
      * Create a new analytics API, loading all available systems from [ServiceLoader].
      */
 
-    fun create(configuration: AnalyticsConfiguration): AnalyticsType {
-      return Analytics(
+    fun create(configuration: AnalyticsConfiguration): AnalyticsType =
+      Analytics(
         LOG,
-        ServiceLoader.load(AnalyticsSystemProvider::class.java)
+        ServiceLoader
+          .load(AnalyticsSystemProvider::class.java)
           .toList()
           .mapNotNull { provider -> startProvider(provider, configuration) }
           .map { system ->
@@ -36,13 +35,12 @@ class Analytics private constructor(
             system
           }
       )
-    }
 
     private fun startProvider(
       provider: AnalyticsSystemProvider,
       configuration: AnalyticsConfiguration
-    ): AnalyticsSystem? {
-      return try {
+    ): AnalyticsSystem? =
+      try {
         provider.create(configuration)
       } catch (e: Exception) {
         LOG.error(
@@ -51,7 +49,6 @@ class Analytics private constructor(
         )
         null
       }
-    }
   }
 
   override fun publishEvent(event: AnalyticsEvent) =

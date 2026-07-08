@@ -5,7 +5,6 @@ package org.nypl.simplified.parser.api
  */
 
 sealed class ParseResult<T> {
-
   /**
    * The parse succeeded.
    */
@@ -25,7 +24,6 @@ sealed class ParseResult<T> {
   ) : ParseResult<T>()
 
   companion object {
-
     /**
      * Functor map.
      *
@@ -36,20 +34,22 @@ sealed class ParseResult<T> {
     fun <A, B> map(
       x: ParseResult<A>,
       f: (A) -> B
-    ): ParseResult<B> {
-      return when (x) {
-        is Success ->
+    ): ParseResult<B> =
+      when (x) {
+        is Success -> {
           Success(
             result = f.invoke(x.result),
             warnings = x.warnings
           )
-        is Failure ->
+        }
+
+        is Failure -> {
           Failure(
             warnings = x.warnings,
             errors = x.errors
           )
+        }
       }
-    }
 
     /**
      * Monadic bind.
@@ -61,28 +61,33 @@ sealed class ParseResult<T> {
     fun <A, B> flatMap(
       x: ParseResult<A>,
       f: (A) -> ParseResult<B>
-    ): ParseResult<B> {
-      return when (x) {
-        is Success ->
+    ): ParseResult<B> =
+      when (x) {
+        is Success -> {
           when (val result = f.invoke(x.result)) {
-            is Failure ->
+            is Failure -> {
               Failure(
                 warnings = result.warnings.plus(x.warnings),
                 errors = result.errors
               )
-            is Success ->
+            }
+
+            is Success -> {
               Success(
                 warnings = result.warnings.plus(x.warnings),
                 result = result.result
               )
+            }
           }
-        is Failure ->
+        }
+
+        is Failure -> {
           Failure(
             warnings = x.warnings,
             errors = x.errors
           )
+        }
       }
-    }
 
     /**
      * Construct a successful parse result.
@@ -91,19 +96,13 @@ sealed class ParseResult<T> {
     fun <A> succeed(
       warnings: List<ParseWarning>,
       x: A
-    ): ParseResult<A> {
-      return Success(warnings, x)
-    }
+    ): ParseResult<A> = Success(warnings, x)
 
     /**
      * Construct a successful parse result.
      */
 
-    fun <A> succeed(
-      x: A
-    ): ParseResult<A> {
-      return Success(listOf(), x)
-    }
+    fun <A> succeed(x: A): ParseResult<A> = Success(listOf(), x)
   }
 
   /**
@@ -112,8 +111,7 @@ sealed class ParseResult<T> {
    * If r == Failure(y), return Failure(y)
    */
 
-  fun <U> map(f: (T) -> U): ParseResult<U> =
-    map(this, f)
+  fun <U> map(f: (T) -> U): ParseResult<U> = map(this, f)
 
   /**
    * Monadic bind.
@@ -121,6 +119,5 @@ sealed class ParseResult<T> {
    * If r == Failure(y), return Failure(y)
    */
 
-  fun <U> flatMap(f: (T) -> ParseResult<U>): ParseResult<U> =
-    flatMap(this, f)
+  fun <U> flatMap(f: (T) -> ParseResult<U>): ParseResult<U> = flatMap(this, f)
 }

@@ -13,19 +13,17 @@ import java.net.URI
  */
 
 class AccountProviderDescriptionCollectionSerializers : AccountProviderDescriptionCollectionSerializersType {
-
   private val serializers = AccountProviderDescriptionSerializers()
 
   override fun createSerializer(
     uri: URI,
     stream: OutputStream,
     document: AccountProviderDescriptionCollection
-  ): SerializerType {
-    return AccountProviderDescriptionCollectionSerializer(
+  ): SerializerType =
+    AccountProviderDescriptionCollectionSerializer(
       uri = uri,
       stream = stream,
       document = document,
       serializers = this.serializers
     )
-  }
 }

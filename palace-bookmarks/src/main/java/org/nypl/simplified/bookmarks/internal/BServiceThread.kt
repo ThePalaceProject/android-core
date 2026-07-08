@@ -7,8 +7,9 @@ import org.slf4j.LoggerFactory
  * thread is a service thread.
  */
 
-internal class BServiceThread(thread: Thread) : Thread(thread) {
-
+internal class BServiceThread(
+  thread: Thread
+) : Thread(thread) {
   companion object {
     private val logger =
       LoggerFactory.getLogger(BServiceThread::class.java)

@@ -12,7 +12,6 @@ import java.util.concurrent.CompletableFuture
  */
 
 interface BootLoaderType<T> {
-
   /**
    * An observable that publishes events during the boot process.
    */

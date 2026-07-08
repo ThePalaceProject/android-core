@@ -4,10 +4,10 @@ import org.thepalaceproject.db.api.DBTransactionType
 import org.thepalaceproject.db.api.queries.DBQAccountProviderDescriptionDeleteAllType
 
 internal object DBQAccountProviderDescriptionDeleteAll : DBQAccountProviderDescriptionDeleteAllType {
-
-  private val queryText = """
+  private val queryText =
+    """
     DELETE FROM account_provider_descriptions
-  """.trimIndent()
+    """.trimIndent()
 
   override fun execute(
     transaction: DBTransactionType,

@@ -16,8 +16,8 @@ class BookDRMInformationHandleLCP(
   private val directory: File,
   format: BookFormats.BookFormatDefinition,
   private val onUpdate: () -> Unit
-) : BookDRMInformationHandle.LCPHandle(), BookDRMInformationHandleBase {
-
+) : BookDRMInformationHandle.LCPHandle(),
+  BookDRMInformationHandleBase {
   private val closed = AtomicBoolean(false)
 
   init {
@@ -43,20 +43,21 @@ class BookDRMInformationHandleLCP(
       this.loadInitial()
     }
 
-  private fun loadInitial(): BookDRMInformation.LCP {
-    return BookDRMInformation.LCP(
-      hashedPassphrase = if (this.filePassphrase.isFile) {
-        this.filePassphrase.readText().trim()
-      } else {
-        null
-      },
-      licenseBytes = if (this.fileLicense.isFile) {
-        this.fileLicense.readBytes()
-      } else {
-        null
-      }
+  private fun loadInitial(): BookDRMInformation.LCP =
+    BookDRMInformation.LCP(
+      hashedPassphrase =
+        if (this.filePassphrase.isFile) {
+          this.filePassphrase.readText().trim()
+        } else {
+          null
+        },
+      licenseBytes =
+        if (this.fileLicense.isFile) {
+          this.fileLicense.readBytes()
+        } else {
+          null
+        }
     )
-  }
 
   override val info: BookDRMInformation.LCP
     get() {
@@ -79,10 +80,11 @@ class BookDRMInformationHandleLCP(
         this.fileLicenseTmp,
         licenseBytes
       )
-      this.infoRef = this.infoRef.copy(
-        hashedPassphrase = passphrase,
-        licenseBytes = licenseBytes
-      )
+      this.infoRef =
+        this.infoRef.copy(
+          hashedPassphrase = passphrase,
+          licenseBytes = licenseBytes
+        )
     }
 
     this.onUpdate.invoke()

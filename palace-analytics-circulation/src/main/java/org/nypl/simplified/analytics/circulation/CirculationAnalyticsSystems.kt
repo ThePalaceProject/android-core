@@ -10,10 +10,8 @@ import org.nypl.simplified.threads.NamedThreadPools
  */
 
 class CirculationAnalyticsSystems : AnalyticsSystemProvider {
-
   private val executor =
     NamedThreadPools.namedThreadPool(1, "circulation-analytics", 19)
 
-  override fun create(configuration: AnalyticsConfiguration): AnalyticsSystem =
-    CirculationAnalyticsSystem(configuration, this.executor)
+  override fun create(configuration: AnalyticsConfiguration): AnalyticsSystem = CirculationAnalyticsSystem(configuration, this.executor)
 }

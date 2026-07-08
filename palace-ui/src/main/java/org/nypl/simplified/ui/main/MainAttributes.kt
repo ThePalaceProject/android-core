@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory
  */
 
 object MainAttributes {
-
   private val logger =
     LoggerFactory.getLogger(MainAttributes::class.java)
 
@@ -27,7 +26,5 @@ object MainAttributes {
   fun <T> wrapAttribute(
     source: AttributeReadableType<T>,
     target: AttributeType<T>
-  ): AttributeSubscriptionType {
-    return source.subscribe { _, newValue -> UIThread.runOnUIThread { target.set(newValue) } }
-  }
+  ): AttributeSubscriptionType = source.subscribe { _, newValue -> UIThread.runOnUIThread { target.set(newValue) } }
 }

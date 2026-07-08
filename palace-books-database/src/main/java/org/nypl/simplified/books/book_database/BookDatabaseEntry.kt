@@ -40,7 +40,6 @@ internal class BookDatabaseEntry internal constructor(
   private var bookRef: Book,
   private val onDelete: Runnable
 ) : BookDatabaseEntryType {
-
   private val LOG = LoggerFactory.getLogger(BookDatabaseEntry::class.java)
 
   private val bookLock: Any = Any()
@@ -52,16 +51,18 @@ internal class BookDatabaseEntry internal constructor(
   internal val id: BookID = this.bookRef.id
 
   override val book: Book
-    get() = synchronized(this.bookLock) {
-      Preconditions.checkArgument(!this.deleted, "Entry must not have been deleted")
-      return this.bookRef
-    }
+    get() =
+      synchronized(this.bookLock) {
+        Preconditions.checkArgument(!this.deleted, "Entry must not have been deleted")
+        return this.bookRef
+      }
 
   override val formatHandles: List<BookDatabaseEntryFormatHandle>
-    get() = synchronized(this.bookLock) {
-      Preconditions.checkArgument(!this.deleted, "Entry must not have been deleted")
-      return this.formatHandlesRef.values.toList()
-    }
+    get() =
+      synchronized(this.bookLock) {
+        Preconditions.checkArgument(!this.deleted, "Entry must not have been deleted")
+        return this.formatHandlesRef.values.toList()
+      }
 
   /**
    * The available format handle constructors.
@@ -82,6 +83,7 @@ internal class BookDatabaseEntry internal constructor(
               constructor = { params -> DatabaseFormatHandleEPUB(params) }
             )
           }
+
           BookFormats.BookFormatDefinition.BOOK_FORMAT_AUDIO -> {
             DatabaseBookFormatHandleConstructor(
               classType = DatabaseFormatHandleAudioBook::class.java,
@@ -89,6 +91,7 @@ internal class BookDatabaseEntry internal constructor(
               constructor = { params -> DatabaseFormatHandleAudioBook(params) }
             )
           }
+
           BookFormats.BookFormatDefinition.BOOK_FORMAT_PDF -> {
             DatabaseBookFormatHandleConstructor(
               classType = DatabaseFormatHandlePDF::class.java,
@@ -125,9 +128,10 @@ internal class BookDatabaseEntry internal constructor(
   private fun onFormatUpdated(format: BookFormat) {
     synchronized(this.bookLock) {
       LOG.debug("onFormatUpdated: {}", format.javaClass.canonicalName)
-      this.bookRef = this.bookRef.copy(
-        formats = this.formatHandles.map { handle -> handle.format }
-      )
+      this.bookRef =
+        this.bookRef.copy(
+          formats = this.formatHandles.map { handle -> handle.format }
+        )
     }
   }
 

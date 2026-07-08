@@ -14,21 +14,19 @@ import java.sql.ResultSet
 import java.time.ZoneOffset
 
 internal object DBAccountProviderDescriptions {
-
   private val logger =
     LoggerFactory.getLogger(DBAccountProviderDescriptions::class.java)
 
-  fun forceUTC(description: AccountProviderDescription): AccountProviderDescription {
-    return description.copy(
+  fun forceUTC(description: AccountProviderDescription): AccountProviderDescription =
+    description.copy(
       updated = description.updated.withOffsetSameInstant(ZoneOffset.UTC)
     )
-  }
 
   fun parseFromResult(
     transaction: DBTransactionType,
     resultSet: ResultSet
-  ): AccountProviderDescription {
-    return when (val result = resultSet.getString("apd_data_format")) {
+  ): AccountProviderDescription =
+    when (val result = resultSet.getString("apd_data_format")) {
       "DBSerializationProto1" -> {
         this.parseFromProto1(resultSet)
       }
@@ -41,11 +39,8 @@ internal object DBAccountProviderDescriptions {
         throw DBException("Unsupported format: $result", Exception())
       }
     }
-  }
 
-  private fun parseFromProto1(
-    resultSet: ResultSet
-  ): AccountProviderDescription {
+  private fun parseFromProto1(resultSet: ResultSet): AccountProviderDescription {
     val bytes =
       resultSet.getBinaryStream("apd_data").use { stream -> stream.readBytes() }
     return DBAccountProviderDescriptionsProtobuf.descriptionFromP1Bytes(bytes)
@@ -77,9 +72,7 @@ internal object DBAccountProviderDescriptions {
     }
   }
 
-  private fun showParseError(
-    error: ParseError
-  ): String {
+  private fun showParseError(error: ParseError): String {
     this.logger.error(
       "{}:{}:{}: {}: ",
       error.source,

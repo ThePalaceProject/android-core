@@ -7,7 +7,6 @@ package org.nypl.simplified.opds.core
  */
 
 object OPDSAcquisitionPaths {
-
   private fun indirectPathsInner(
     elementStack: MutableList<OPDSAcquisitionPathElement>,
     output: MutableList<OPDSAcquisitionPath>,
@@ -38,9 +37,7 @@ object OPDSAcquisitionPaths {
     return paths.toList()
   }
 
-  private fun acquisitionPaths(
-    source: OPDSAcquisition
-  ): List<OPDSAcquisitionPath> {
+  private fun acquisitionPaths(source: OPDSAcquisition): List<OPDSAcquisitionPath> {
     val paths = mutableListOf<OPDSAcquisitionPath>()
     if (source.indirectAcquisitions.isEmpty()) {
       paths.add(
@@ -52,7 +49,8 @@ object OPDSAcquisitionPaths {
     } else {
       for (indirect in source.indirectAcquisitions) {
         paths.addAll(
-          this.indirectPaths(source, indirect)
+          this
+            .indirectPaths(source, indirect)
             .map { path -> path.prefixWith(source.type, source.uri, source.properties) }
         )
       }
@@ -64,9 +62,7 @@ object OPDSAcquisitionPaths {
    * Transform the given list of acquisitions into a list of acquisition paths.
    */
 
-  fun linearize(
-    acquisitions: List<OPDSAcquisition>
-  ): List<OPDSAcquisitionPath> {
+  fun linearize(acquisitions: List<OPDSAcquisition>): List<OPDSAcquisitionPath> {
     val paths = mutableListOf<OPDSAcquisitionPath>()
     for (acquisition in acquisitions) {
       paths.addAll(this.linearize(acquisition))
@@ -78,19 +74,11 @@ object OPDSAcquisitionPaths {
    * Transform the given acquisition into a list of acquisition paths.
    */
 
-  fun linearize(
-    acquisition: OPDSAcquisition
-  ): List<OPDSAcquisitionPath> {
-    return this.acquisitionPaths(acquisition)
-  }
+  fun linearize(acquisition: OPDSAcquisition): List<OPDSAcquisitionPath> = this.acquisitionPaths(acquisition)
 
   /**
    * Transform the given feed entry into a list of acquisition paths.
    */
 
-  fun linearize(
-    entry: OPDSAcquisitionFeedEntry
-  ): List<OPDSAcquisitionPath> {
-    return this.linearize(entry.acquisitions)
-  }
+  fun linearize(entry: OPDSAcquisitionFeedEntry): List<OPDSAcquisitionPath> = this.linearize(entry.acquisitions)
 }

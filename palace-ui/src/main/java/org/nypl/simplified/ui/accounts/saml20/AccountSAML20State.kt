@@ -6,7 +6,6 @@ import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 
 sealed class AccountSAML20State {
-
   data object WebViewInitializing : AccountSAML20State()
 
   data class WebViewInitialized(

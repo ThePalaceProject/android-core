@@ -24,7 +24,6 @@ import org.nypl.simplified.ui.main.MainAttributes
 import org.slf4j.LoggerFactory
 
 object SettingsDebugModel {
-
   private val logger =
     LoggerFactory.getLogger(SettingsDebugModel::class.java)
 
@@ -99,7 +98,8 @@ object SettingsDebugModel {
       services.requireService(BooksControllerType::class.java)
 
     try {
-      profilesController.profileCurrent()
+      profilesController
+        .profileCurrent()
         .accounts()
         .keys
         .forEach { account -> booksController.booksSync(account) }
@@ -127,9 +127,7 @@ object SettingsDebugModel {
   }
 
   @UiThread
-  fun updatePreferences(
-    update: (ProfilePreferences) -> ProfilePreferences
-  ) {
+  fun updatePreferences(update: (ProfilePreferences) -> ProfilePreferences) {
     val services =
       Services.serviceDirectory()
     val profilesController =
@@ -145,9 +143,7 @@ object SettingsDebugModel {
   }
 
   @UiThread
-  fun showTestingLibraries(): Boolean {
-    return this.preferences().showTestingLibraries
-  }
+  fun showTestingLibraries(): Boolean = this.preferences().showTestingLibraries
 
   private fun preferences(): ProfilePreferences {
     val services =
@@ -159,9 +155,7 @@ object SettingsDebugModel {
   }
 
   @UiThread
-  fun setShowOnlySupportedBooks(
-    showOnlySupported: Boolean
-  ) {
+  fun setShowOnlySupportedBooks(showOnlySupported: Boolean) {
     val services =
       Services.serviceDirectory()
     val feedLoader =
@@ -181,14 +175,10 @@ object SettingsDebugModel {
   }
 
   @UiThread
-  fun hasSeenNotificationScreen(): Boolean {
-    return this.preferences().hasSeenNotificationScreen
-  }
+  fun hasSeenNotificationScreen(): Boolean = this.preferences().hasSeenNotificationScreen
 
   @UiThread
-  fun hasSeenLibrarySelection(): Boolean {
-    return this.preferences().hasSeenLibrarySelectionScreen
-  }
+  fun hasSeenLibrarySelection(): Boolean = this.preferences().hasSeenLibrarySelectionScreen
 
   @UiThread
   fun showOnlySupportedBooks(): Boolean {
@@ -233,12 +223,13 @@ object SettingsDebugModel {
 
     adeptFuture.addListener(
       {
-        val activations = try {
-          adeptFuture.get()
-        } catch (e: Exception) {
-          this.logger.debug("could not retrieve activations: ", e)
-          emptyList()
-        }
+        val activations =
+          try {
+            adeptFuture.get()
+          } catch (e: Exception) {
+            this.logger.debug("could not retrieve activations: ", e)
+            emptyList()
+          }
         this.adeptActivationsBase.set(activations)
       },
       MoreExecutors.directExecutor()
@@ -246,7 +237,5 @@ object SettingsDebugModel {
   }
 
   @UiThread
-  fun isLCPManualPassphraseEnabled(): Boolean {
-    return this.preferences().isLCPManualPassphraseEnabled
-  }
+  fun isLCPManualPassphraseEnabled(): Boolean = this.preferences().isLCPManualPassphraseEnabled
 }

@@ -17,11 +17,8 @@ import java.net.URI
  * The default implementation of the [OPDSJSONSerializerType] interface.
  */
 class OPDSJSONSerializer private constructor() : OPDSJSONSerializerType {
-
   @Throws(OPDSSerializationException::class)
-  override fun serializeAcquisition(
-    a: OPDSAcquisition
-  ): ObjectNode {
+  override fun serializeAcquisition(a: OPDSAcquisition): ObjectNode {
     val jom = ObjectMapper()
     val node = jom.createObjectNode()
     node.put("type", a.relation.toString())
@@ -46,9 +43,7 @@ class OPDSJSONSerializer private constructor() : OPDSJSONSerializerType {
   }
 
   @Throws(OPDSSerializationException::class)
-  override fun serializePreviewAcquisition(
-    a: OPDSPreviewAcquisition
-  ): ObjectNode {
+  override fun serializePreviewAcquisition(a: OPDSPreviewAcquisition): ObjectNode {
     val jom = ObjectMapper()
     val node = jom.createObjectNode()
     node.put("type", a.type.toString())
@@ -65,16 +60,18 @@ class OPDSJSONSerializer private constructor() : OPDSJSONSerializerType {
       val stringBuilder = StringBuilder()
       stringBuilder.append(mimeType.fullType)
       for (key in parameters.keys) {
-        stringBuilder.append(";").append(key).append("=").append(parameters.get(key))
+        stringBuilder
+          .append(";")
+          .append(key)
+          .append("=")
+          .append(parameters.get(key))
       }
 
       return stringBuilder.toString()
     }
   }
 
-  private fun serializeProperties(
-    properties: Map<String, String>
-  ): ObjectNode {
+  private fun serializeProperties(properties: Map<String, String>): ObjectNode {
     val jom = ObjectMapper()
     val node = jom.createObjectNode()
     for (entry in properties.entries) {
@@ -84,9 +81,7 @@ class OPDSJSONSerializer private constructor() : OPDSJSONSerializerType {
   }
 
   @Throws(OPDSSerializationException::class)
-  override fun serializeIndirectAcquisitions(
-    indirects: List<OPDSIndirectAcquisition>
-  ): ArrayNode {
+  override fun serializeIndirectAcquisitions(indirects: List<OPDSIndirectAcquisition>): ArrayNode {
     val jom = ObjectMapper()
     val node = jom.createArrayNode()
 
@@ -97,9 +92,7 @@ class OPDSJSONSerializer private constructor() : OPDSJSONSerializerType {
   }
 
   @Throws(OPDSSerializationException::class)
-  override fun serializeIndirectAcquisition(
-    indirect: OPDSIndirectAcquisition
-  ): ObjectNode {
+  override fun serializeIndirectAcquisition(indirect: OPDSIndirectAcquisition): ObjectNode {
     val jom = ObjectMapper()
     val node = jom.createObjectNode()
 
@@ -112,9 +105,7 @@ class OPDSJSONSerializer private constructor() : OPDSJSONSerializerType {
     return node
   }
 
-  override fun serializeAvailability(
-    a: OPDSAvailabilityType
-  ): ObjectNode {
+  override fun serializeAvailability(a: OPDSAvailabilityType): ObjectNode {
     val fmt = ISODateTimeFormat.dateTime()
     val jom = ObjectMapper()
 
@@ -167,10 +158,9 @@ class OPDSJSONSerializer private constructor() : OPDSJSONSerializerType {
       is OPDSAvailabilityOpenAccess -> {
         val o: ObjectNode = jom.createObjectNode()
         val oh: ObjectNode = jom.createObjectNode()
-        a.revoke.let(
-          { uri ->
-            oh.put("revoke", uri.toString())
-          })
+        a.revoke.let({ uri ->
+          oh.put("revoke", uri.toString())
+        })
         o.set<JsonNode?>("open_access", oh)
         o
       }
@@ -199,9 +189,7 @@ class OPDSJSONSerializer private constructor() : OPDSJSONSerializerType {
     }
   }
 
-  override fun serializeCategory(
-    c: OPDSCategory
-  ): ObjectNode {
+  override fun serializeCategory(c: OPDSCategory): ObjectNode {
     val jom = ObjectMapper()
     val je = jom.createObjectNode()
     je.put("scheme", c.scheme)
@@ -228,9 +216,7 @@ class OPDSJSONSerializer private constructor() : OPDSJSONSerializerType {
   }
 
   @Throws(OPDSSerializationException::class)
-  override fun serializeFeedEntry(
-    e: OPDSAcquisitionFeedEntry
-  ): ObjectNode {
+  override fun serializeFeedEntry(e: OPDSAcquisitionFeedEntry): ObjectNode {
     val jom = ObjectMapper()
     val je = jom.createObjectNode()
     val fmt = ISODateTimeFormat.dateTime()
@@ -315,19 +301,16 @@ class OPDSJSONSerializer private constructor() : OPDSJSONSerializerType {
       je.put("analytics", u.toString().replace("/works/", "/analytics/"))
     })
 
-    e.annotations.let(
-      { u ->
-        je.put("annotations", u.toString())
-      })
+    e.annotations.let({ u ->
+      je.put("annotations", u.toString())
+    })
 
     je.put("updated", fmt.print(e.updated))
     return je
   }
 
   @Throws(OPDSSerializationException::class)
-  override fun serializeFeed(
-    e: OPDSAcquisitionFeed
-  ): ObjectNode {
+  override fun serializeFeed(e: OPDSAcquisitionFeed): ObjectNode {
     val jom = ObjectMapper()
     val je = jom.createObjectNode()
     val fmt = ISODateTimeFormat.dateTime()
@@ -386,8 +369,6 @@ class OPDSJSONSerializer private constructor() : OPDSJSONSerializerType {
      * @return A new JSON serializer
      */
     @JvmStatic
-    fun newSerializer(): OPDSJSONSerializerType {
-      return OPDSJSONSerializer()
-    }
+    fun newSerializer(): OPDSJSONSerializerType = OPDSJSONSerializer()
   }
 }

@@ -29,7 +29,6 @@ internal class BServiceOpCreateBookmark(
   private val ignoreRemoteFailures: Boolean,
   private val bookmarksSource: AttributeType<Map<AccountID, Map<BookID, BookmarksForBook>>>,
 ) : BServiceOp<SerializedBookmark>(logger) {
-
   override fun runActual(): SerializedBookmark {
     return try {
       this.createLocalBookmarkFrom(this.bookmark)
@@ -55,10 +54,8 @@ internal class BServiceOpCreateBookmark(
     }
   }
 
-  private fun createLocalBookmarkFrom(
-    bookmark: SerializedBookmark
-  ): SerializedBookmark {
-    return BServiceOpCreateLocalBookmark(
+  private fun createLocalBookmarkFrom(bookmark: SerializedBookmark): SerializedBookmark =
+    BServiceOpCreateLocalBookmark(
       this.logger,
       this.bookmarkEventsOut,
       this.profile,
@@ -66,5 +63,4 @@ internal class BServiceOpCreateBookmark(
       bookmark,
       this.bookmarksSource
     ).runActual()
-  }
 }

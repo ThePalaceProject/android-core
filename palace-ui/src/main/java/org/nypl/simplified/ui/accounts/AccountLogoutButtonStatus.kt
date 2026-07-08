@@ -5,7 +5,6 @@ package org.nypl.simplified.ui.accounts
  */
 
 sealed class AccountLogoutButtonStatus {
-
   /**
    * The logout button should be displayed as a "Log Out" button, should be enabled, and should
    * execute [onClick] when clicked.

@@ -18,7 +18,6 @@ import java.util.UUID
  */
 
 object AccountAuthenticationCredentialsStoreJSON {
-
   private val logger =
     LoggerFactory.getLogger(AccountAuthenticationCredentialsStoreJSON::class.java)
 
@@ -44,9 +43,7 @@ object AccountAuthenticationCredentialsStoreJSON {
    */
 
   @Throws(IOException::class)
-  fun serializeToText(
-    credentials: Map<AccountID, AccountAuthenticationCredentials>
-  ): String {
+  fun serializeToText(credentials: Map<AccountID, AccountAuthenticationCredentials>): String {
     val jo = serializeToJSON(credentials)
     val bao = ByteArrayOutputStream(1024)
     JSONSerializerUtilities.serialize(jo, bao)
@@ -87,9 +84,8 @@ object AccountAuthenticationCredentialsStoreJSON {
    */
 
   @Throws(IOException::class)
-  fun deserializeFromText(text: String): Map<AccountID, AccountAuthenticationCredentials> {
-    return deserializeFromJSON(ObjectMapper().readTree(text))
-  }
+  fun deserializeFromText(text: String): Map<AccountID, AccountAuthenticationCredentials> =
+    deserializeFromJSON(ObjectMapper().readTree(text))
 
   /**
    * Deserialize the given JSON node, which is assumed to be a JSON object
@@ -108,16 +104,17 @@ object AccountAuthenticationCredentialsStoreJSON {
       val version =
         JSONParserUtilities.getIntegerDefault(obj, "@version", inferredVersion)
     ) {
-      20190424 ->
+      20190424 -> {
         deserializeFromJSONV20190424(obj)
-      else ->
+      }
+
+      else -> {
         throw JSONParseException("Unsupported credentials version: $version")
+      }
     }
   }
 
-  private fun deserializeFromJSONV20190424(
-    obj: ObjectNode
-  ): Map<AccountID, AccountAuthenticationCredentials> {
+  private fun deserializeFromJSONV20190424(obj: ObjectNode): Map<AccountID, AccountAuthenticationCredentials> {
     val credentials =
       JSONParserUtilities.getObject(obj, "credentials")
     val result =

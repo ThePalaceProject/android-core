@@ -44,8 +44,9 @@ import java.net.URI
  * A fragment that shows the set of accounts in the current profile.
  */
 
-class AccountListFragment : Fragment(R.layout.account_list), MainBackButtonConsumerType {
-
+class AccountListFragment :
+  Fragment(R.layout.account_list),
+  MainBackButtonConsumerType {
   private var subscriptions =
     CloseableCollection.create()
 
@@ -60,40 +61,30 @@ class AccountListFragment : Fragment(R.layout.account_list), MainBackButtonConsu
         // No setup required
       }
 
-      override fun parameters() {
-        return Unit
-      }
+      override fun parameters() = Unit
 
-      override fun fragment(): AccountListFragment {
-        return AccountListFragment()
-      }
+      override fun fragment(): AccountListFragment = AccountListFragment()
     }
 
-    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, AccountListFragment> {
-      return ScreenAccountList()
-    }
+    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, AccountListFragment> = ScreenAccountList()
   }
 
-  private fun onAccountDeleteClicked(
-    account: AccountType
-  ) {
+  private fun onAccountDeleteClicked(account: AccountType) {
     val context = this.requireContext()
-    val dialog = MaterialAlertDialogBuilder(context)
-      .setTitle(R.string.accountsDeleteConfirmTitle)
-      .setMessage(
-        context.getString(
-          R.string.accountsDeleteConfirm,
-          account.provider.displayName
-        )
-      )
-      .setNegativeButton(R.string.accountCancel) { dialog, _ ->
-        dialog.dismiss()
-      }
-      .setPositiveButton(R.string.accountsDelete) { dialog, _ ->
-        this.deleteAccountByProvider(account.provider.id)
-        dialog.dismiss()
-      }
-      .create()
+    val dialog =
+      MaterialAlertDialogBuilder(context)
+        .setTitle(R.string.accountsDeleteConfirmTitle)
+        .setMessage(
+          context.getString(
+            R.string.accountsDeleteConfirm,
+            account.provider.displayName
+          )
+        ).setNegativeButton(R.string.accountCancel) { dialog, _ ->
+          dialog.dismiss()
+        }.setPositiveButton(R.string.accountsDelete) { dialog, _ ->
+          this.deleteAccountByProvider(account.provider.id)
+          dialog.dismiss()
+        }.create()
 
     /*
      * Set content descriptions for buttons to improve accessibility and automated retrieval
@@ -108,9 +99,7 @@ class AccountListFragment : Fragment(R.layout.account_list), MainBackButtonConsu
       context.getString(R.string.accountsDelete)
   }
 
-  private fun deleteAccountByProvider(
-    id: URI
-  ) {
+  private fun deleteAccountByProvider(id: URI) {
     val services =
       Services.serviceDirectory()
     val profiles =
@@ -119,13 +108,12 @@ class AccountListFragment : Fragment(R.layout.account_list), MainBackButtonConsu
     profiles.profileAccountDeleteByProvider(id)
   }
 
-  private fun onAccountClicked(
-    account: AccountType
-  ) {
+  private fun onAccountClicked(account: AccountType) {
     MainNavigation.Settings.openAccountDetail(
       account,
       when (account.loginState) {
         is AccountLoggedInStaleCredentials -> AccountDetailModel.PleaseLoginReasonExpired
+
         is AccountLoggedIn,
         is AccountLoggingIn,
         is AccountLoggingInWaitingForExternalAuthentication,
@@ -201,16 +189,15 @@ class AccountListFragment : Fragment(R.layout.account_list), MainBackButtonConsu
       profiles.profileCurrent()
 
     this.accountListAdapter.submitList(
-      profile.accounts()
+      profile
+        .accounts()
         .values
         .sortedWith(AccountComparator())
     )
   }
 
   @UiThread
-  private fun onAccountEvent(
-    accountEvent: AccountEvent
-  ) {
+  private fun onAccountEvent(accountEvent: AccountEvent) {
     UIThread.checkIsUIThread()
 
     when (accountEvent) {
@@ -227,22 +214,17 @@ class AccountListFragment : Fragment(R.layout.account_list), MainBackButtonConsu
   }
 
   @UiThread
-  private fun showAccountDeletionFailedDialog(
-    accountEvent: AccountEventDeletionFailed
-  ) {
+  private fun showAccountDeletionFailedDialog(accountEvent: AccountEventDeletionFailed) {
     MaterialAlertDialogBuilder(this.requireContext())
       .setTitle(R.string.accountsDeletionFailed)
       .setMessage(R.string.accountsDeletionFailedMessage)
       .setPositiveButton(ErrorStrings.errorDetails) { _, _ ->
         this.showErrorPage(accountEvent)
-      }
-      .create()
+      }.create()
       .show()
   }
 
-  private fun showErrorPage(
-    accountEvent: AccountEventDeletionFailed
-  ) {
+  private fun showErrorPage(accountEvent: AccountEventDeletionFailed) {
     val services =
       Services.serviceDirectory()
     val buildConfig =
@@ -250,13 +232,14 @@ class AccountListFragment : Fragment(R.layout.account_list), MainBackButtonConsu
 
     MainNavigation.openErrorPage(
       activity = this.requireActivity(),
-      parameters = ErrorPageParameters(
-        emailAddress = buildConfig.supportErrorReportEmailAddress,
-        body = "",
-        subject = "[palace-error-report]",
-        attributes = accountEvent.attributes.toSortedMap<String, String>(),
-        taskSteps = accountEvent.taskResult.steps
-      )
+      parameters =
+        ErrorPageParameters(
+          emailAddress = buildConfig.supportErrorReportEmailAddress,
+          body = "",
+          subject = "[palace-error-report]",
+          attributes = accountEvent.attributes.toSortedMap<String, String>(),
+          taskSteps = accountEvent.taskResult.steps
+        )
     )
   }
 

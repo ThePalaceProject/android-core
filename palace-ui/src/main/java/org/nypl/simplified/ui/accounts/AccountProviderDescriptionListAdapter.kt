@@ -20,7 +20,6 @@ class AccountProviderDescriptionListAdapter(
   private val imageLoader: ImageLoaderType,
   private val onItemClicked: (AccountProviderDescription) -> Unit
 ) : ListAdapter<AccountProviderDescription?, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
-
   companion object {
     private const val VIEW_TYPE_ACCOUNT = 0
     private const val VIEW_TYPE_GAP = 1
@@ -34,26 +33,20 @@ class AccountProviderDescriptionListAdapter(
         override fun areItemsTheSame(
           oldItem: AccountProviderDescription,
           newItem: AccountProviderDescription
-        ): Boolean {
-          return oldItem.id == newItem.id
-        }
+        ): Boolean = oldItem.id == newItem.id
 
         override fun areContentsTheSame(
           oldItem: AccountProviderDescription,
           newItem: AccountProviderDescription
-        ): Boolean {
-          return oldItem.title == newItem.title && oldItem.logoURI == newItem.logoURI
-        }
+        ): Boolean = oldItem.title == newItem.title && oldItem.logoURI == newItem.logoURI
       }
   }
 
   private val logger =
     LoggerFactory.getLogger(AccountProviderDescriptionListAdapter::class.java)
 
-  override fun getItemViewType(
-    position: Int
-  ): Int {
-    return if (
+  override fun getItemViewType(position: Int): Int =
+    if (
       currentList.isEmpty() ||
       currentList[position] != null
     ) {
@@ -61,7 +54,6 @@ class AccountProviderDescriptionListAdapter(
     } else {
       VIEW_TYPE_GAP
     }
-  }
 
   override fun onCreateViewHolder(
     parent: ViewGroup,

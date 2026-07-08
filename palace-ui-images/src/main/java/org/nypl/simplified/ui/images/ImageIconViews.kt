@@ -23,7 +23,6 @@ import java.net.URI
  */
 
 object ImageIconViews {
-
   private val LOG = LoggerFactory.getLogger(ImageIconViews::class.java)
 
   /**
@@ -38,12 +37,10 @@ object ImageIconViews {
     assets: AssetManager,
     iconView: ImageView,
     image: URI
-  ) {
-    return if ("simplified-asset" == image.scheme) {
-      configureFromAsset(image, assets, iconView)
-    } else {
-      iconView.setImageURI(Uri.parse(image.toString()))
-    }
+  ) = if ("simplified-asset" == image.scheme) {
+    configureFromAsset(image, assets, iconView)
+  } else {
+    iconView.setImageURI(Uri.parse(image.toString()))
   }
 
   /**

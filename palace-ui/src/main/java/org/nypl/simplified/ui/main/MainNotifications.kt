@@ -8,10 +8,7 @@ import android.provider.Settings
 import androidx.core.content.ContextCompat
 
 object MainNotifications {
-
-  fun requestPermissions(
-    activity: Activity
-  ) {
+  fun requestPermissions(activity: Activity) {
     activity.requestPermissions(
       arrayOf(
         "android.permission.POST_NOTIFICATIONS",
@@ -22,9 +19,7 @@ object MainNotifications {
     )
   }
 
-  fun notificationsArePermitted(
-    activity: Activity
-  ): Boolean {
+  fun notificationsArePermitted(activity: Activity): Boolean {
     val notificationsOk =
       ContextCompat.checkSelfPermission(
         activity,
@@ -55,9 +50,7 @@ object MainNotifications {
     return notificationsOk && foregroundOk && foregroundMediaOk
   }
 
-  fun requestDropPermissions(
-    activity: Activity
-  ) {
+  fun requestDropPermissions(activity: Activity) {
     val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
     intent.putExtra(Settings.EXTRA_APP_PACKAGE, MainApplication.application.packageName)
     activity.startActivity(intent)

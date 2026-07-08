@@ -8,7 +8,6 @@ import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
  */
 
 sealed class BorrowRequest {
-
   /**
    * The OPDS feed entry that will be borrowed.
    */

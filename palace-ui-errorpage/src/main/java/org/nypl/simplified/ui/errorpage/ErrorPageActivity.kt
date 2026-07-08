@@ -11,7 +11,6 @@ import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
  */
 
 class ErrorPageActivity : AppCompatActivity(R.layout.error_host) {
-
   private lateinit var root: View
   private lateinit var errorFragment: ErrorPageFragment
 
@@ -19,7 +18,8 @@ class ErrorPageActivity : AppCompatActivity(R.layout.error_host) {
     super.onCreate(savedInstanceState)
 
     this.errorFragment = ErrorPageFragment()
-    this.supportFragmentManager.beginTransaction()
+    this.supportFragmentManager
+      .beginTransaction()
       .replace(R.id.errorHolder, this.errorFragment, "ERROR_MAIN")
       .commit()
 

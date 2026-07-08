@@ -16,7 +16,6 @@ import java.net.URI
 import java.net.URLEncoder
 
 object CatalogSAML20Model {
-
   private var catalogWebViewClient: CatalogSAML20WebClient? = null
 
   private val logger =
@@ -76,15 +75,16 @@ object CatalogSAML20Model {
   ) {
     this.logger.debug("WebView reported download started.")
 
-    val url = buildString {
-      this.append(AccountSAML20.callbackURI)
-      this.append("?")
-      this.append("url=")
-      this.append(URLEncoder.encode(downloadURL, "utf-8"))
-      this.append("&")
-      this.append("mimeType=")
-      this.append(URLEncoder.encode(mimeType, "utf-8"))
-    }
+    val url =
+      buildString {
+        this.append(AccountSAML20.callbackURI)
+        this.append("?")
+        this.append("url=")
+        this.append(URLEncoder.encode(downloadURL, "utf-8"))
+        this.append("&")
+        this.append("mimeType=")
+        this.append(URLEncoder.encode(mimeType, "utf-8"))
+      }
 
     this.logger.debug("Redirecting WebView to {}", url)
 

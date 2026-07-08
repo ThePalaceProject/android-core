@@ -7,7 +7,6 @@ import androidx.fragment.app.Fragment
  */
 
 interface ScreenDefinitionFactoryType<P, F : Fragment> {
-
   /**
    * Create a screen definition.
    */

@@ -15,7 +15,6 @@ data class PatronUserProfile(
   val drm: List<PatronDRM>,
   val authorization: PatronAuthorization?
 ) {
-
   /**
    * The annotations link, if one was present.
    */

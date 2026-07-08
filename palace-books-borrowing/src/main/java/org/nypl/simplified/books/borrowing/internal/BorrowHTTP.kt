@@ -34,7 +34,6 @@ import java.net.URI
  */
 
 object BorrowHTTP {
-
   /**
    * Create a download request for the given URI, downloading content to the given output file.
    * Events will be delivered to the given borrow context.
@@ -100,13 +99,12 @@ object BorrowHTTP {
   fun isMimeTypeAcceptable(
     context: BorrowContextType,
     receivedType: MIMEType
-  ): Boolean {
-    return this.isMimeTypeAcceptable(
+  ): Boolean =
+    this.isMimeTypeAcceptable(
       context,
       hashSetOf(context.currentAcquisitionPathElement.mimeType),
       receivedType
     )
-  }
 
   /**
    * Check to see if the given MIME type is "acceptable", given a set of expected types. If the type
@@ -120,21 +118,21 @@ object BorrowHTTP {
     context: BorrowContextType,
     expectedTypes: Set<MIMEType>,
     receivedType: MIMEType
-  ): Boolean {
-    return if (
+  ): Boolean =
+    if (
       expectedTypes.any { MIMECompatibility.isCompatibleLax(receivedType, it) }
     ) {
       true
     } else {
-      val expectedTypesDesc = expectedTypes.map { it.fullType }.joinToString(" or ")
+      val expected = expectedTypes.map { it.fullType }.joinToString(" or ")
+      val received = receivedType.fullType
       context.taskRecorder.currentStepFailed(
-        message = "The server returned an incompatible context type: We wanted something compatible with $expectedTypesDesc but received ${receivedType.fullType}.",
+        message = "The server returned an incompatible context type: Required compatible with $expected but received $received.",
         errorCode = BorrowErrorCodes.httpContentTypeIncompatible,
         extraMessages = listOf()
       )
       false
     }
-  }
 
   /**
    * Record a server error to the task recorder.
@@ -154,12 +152,12 @@ object BorrowHTTP {
     )
 
     return if (result.responseStatus.properties.status == 401) {
-      when (AccountAuthenticatedHTTP.handle401Error(
-        result.responseStatus.properties.problemReport)) {
+      when (AccountAuthenticatedHTTP.handle401Error(result.responseStatus.properties.problemReport)) {
         Handled401.ErrorIsRecoverableCredentialsExpired -> {
           context.bookDownloadFailedBadCredentials()
           BorrowRecoverableAuthenticationError()
         }
+
         Handled401.ErrorIsUnrecoverable -> {
           BorrowSubtaskFailed()
         }
@@ -193,9 +191,7 @@ object BorrowHTTP {
   fun onDownloadFailedUnacceptableMimeDefault(
     context: BorrowContextType,
     result: DownloadFailedUnacceptableMIME
-  ) {
-    throw BorrowSubtaskFailed()
-  }
+  ): Unit = throw BorrowSubtaskFailed()
 
   private fun onDownloadProgressEvent(
     context: BorrowContextType,
@@ -206,11 +202,12 @@ object BorrowHTTP {
         context.account.updateBasicTokenCredentials(event.accessToken)
 
         context.bookDownloadIsRunning(
-          message = this.downloadingMessage(
-            expectedSize = event.expectedSize,
-            currentSize = event.receivedSize,
-            perSecond = event.bytesPerSecond
-          ),
+          message =
+            this.downloadingMessage(
+              expectedSize = event.expectedSize,
+              currentSize = event.receivedSize,
+              perSecond = event.bytesPerSecond
+            ),
           receivedSize = event.receivedSize,
           expectedSize = event.expectedSize,
           bytesPerSecond = event.bytesPerSecond
@@ -232,13 +229,12 @@ object BorrowHTTP {
     expectedSize: Long?,
     currentSize: Long,
     perSecond: Long
-  ): String {
-    return if (expectedSize == null) {
+  ): String =
+    if (expectedSize == null) {
       "Downloading..."
     } else {
       "Downloading $currentSize / $expectedSize ($perSecond)..."
     }
-  }
 
   /**
    * Download the file indicated by the given borrowing context.
@@ -254,47 +250,50 @@ object BorrowHTTP {
     onDownloadFailedUnacceptableMIME: (BorrowContextType, DownloadFailedUnacceptableMIME) -> Unit =
       this::onDownloadFailedUnacceptableMimeDefault,
     requestModifier: ((LSHTTPRequestProperties) -> LSHTTPRequestProperties)? = null,
-  ) {
-    return try {
-      val currentURI = context.currentURICheck()
-      context.logDebug("downloading {}", currentURI)
-      context.taskRecorder.beginNewStep("Downloading $currentURI...")
-      context.taskRecorder.addAttribute("URI", currentURI.toString())
+  ) = try {
+    val currentURI = context.currentURICheck()
+    context.logDebug("downloading {}", currentURI)
+    context.taskRecorder.beginNewStep("Downloading $currentURI...")
+    context.taskRecorder.addAttribute("URI", currentURI.toString())
 
-      val temporaryFile = context.temporaryFile()
+    val temporaryFile = context.temporaryFile()
 
-      try {
-        val downloadRequest =
-          this.createDownloadRequest(
-            context = context,
-            target = currentURI,
-            outputFile = temporaryFile,
-            requestModifier = requestModifier,
-          )
+    try {
+      val downloadRequest =
+        this.createDownloadRequest(
+          context = context,
+          target = currentURI,
+          outputFile = temporaryFile,
+          requestModifier = requestModifier,
+        )
 
-        when (val result = LSHTTPDownloads.download(downloadRequest)) {
-          DownloadCancelled ->
-            throw BorrowSubtaskCancelled()
-
-          is DownloadFailedServer ->
-            throw this.onDownloadFailedServer(context, result)
-
-          is DownloadFailedUnacceptableMIME ->
-            onDownloadFailedUnacceptableMIME(context, result)
-
-          is DownloadFailedExceptionally ->
-            throw this.onDownloadFailedExceptionally(context, result)
-
-          is DownloadCompletedSuccessfully ->
-            this.saveDownloadedContent(context, temporaryFile)
+      when (val result = LSHTTPDownloads.download(downloadRequest)) {
+        DownloadCancelled -> {
+          throw BorrowSubtaskCancelled()
         }
-      } finally {
-        temporaryFile.delete()
+
+        is DownloadFailedServer -> {
+          throw this.onDownloadFailedServer(context, result)
+        }
+
+        is DownloadFailedUnacceptableMIME -> {
+          onDownloadFailedUnacceptableMIME(context, result)
+        }
+
+        is DownloadFailedExceptionally -> {
+          throw this.onDownloadFailedExceptionally(context, result)
+        }
+
+        is DownloadCompletedSuccessfully -> {
+          this.saveDownloadedContent(context, temporaryFile)
+        }
       }
-    } catch (e: BorrowSubtaskFailed) {
-      context.bookDownloadFailed()
-      throw e
+    } finally {
+      temporaryFile.delete()
     }
+  } catch (e: BorrowSubtaskFailed) {
+    context.bookDownloadFailed()
+    throw e
   }
 
   private fun saveDownloadedContent(
@@ -320,8 +319,9 @@ object BorrowHTTP {
       }
 
       is BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook,
-      null ->
+      null -> {
         throw UnreachableCodeException()
+      }
     }
   }
 }

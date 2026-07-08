@@ -8,7 +8,6 @@ import org.nypl.simplified.parser.api.SerializerType
  */
 
 interface AccountProviderDescriptionSerializerType : SerializerType {
-
   /**
    * Ignore the given output stream and serialize to a Jackson object node instead.
    */

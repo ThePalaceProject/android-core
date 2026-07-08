@@ -16,13 +16,11 @@ import org.nypl.drm.core.AdobeUserID
  */
 
 data class AccountAuthenticationAdobePostActivationCredentials(
-
   /**
    * @return The vendor ID
    */
 
   val deviceID: AdobeDeviceID,
-
   /**
    * @return The device token
    */

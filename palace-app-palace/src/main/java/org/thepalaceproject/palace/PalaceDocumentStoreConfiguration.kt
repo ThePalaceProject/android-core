@@ -5,7 +5,6 @@ import org.librarysimplified.documents.DocumentConfigurationServiceType
 import java.net.URI
 
 class PalaceDocumentStoreConfiguration : DocumentConfigurationServiceType {
-
   override val privacyPolicy: DocumentConfiguration =
     DocumentConfiguration(
       name = "privacy.html",

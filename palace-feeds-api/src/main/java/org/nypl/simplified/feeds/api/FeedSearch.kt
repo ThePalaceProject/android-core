@@ -8,7 +8,6 @@ import java.io.Serializable
  */
 
 sealed class FeedSearch : Serializable {
-
   /*
    * The search should be performed locally.
    */

@@ -8,12 +8,9 @@ import com.io7m.jfunctional.OptionType
  */
 
 interface AdobeConfigurationServiceType {
-
   val packageOverride: String?
 
-  fun packageOverrideOption(): OptionType<String> {
-    return Option.of(this.packageOverride)
-  }
+  fun packageOverrideOption(): OptionType<String> = Option.of(this.packageOverride)
 
   val debugLogging: Boolean
 

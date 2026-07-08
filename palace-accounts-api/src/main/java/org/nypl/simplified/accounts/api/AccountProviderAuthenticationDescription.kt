@@ -10,9 +10,7 @@ import java.net.URI
  */
 
 sealed class AccountProviderAuthenticationDescription : Serializable {
-
   companion object {
-
     /**
      * The type used to identify basic authentication.
      */
@@ -74,7 +72,6 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
    */
 
   enum class KeyboardInput {
-
     /**
      * The default keyboard for the platform.
      */
@@ -106,14 +103,12 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
 
   data class Basic(
     override val description: String,
-
     /**
      * The barcode format, if specified, such as "CODABAR". If this is unspecified, then
      * barcode scanning and displaying is not supported.
      */
 
     val barcodeFormat: String?,
-
     /**
      * The keyboard type used for barcode entry, such as "DEFAULT".
      *
@@ -121,13 +116,11 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
      */
 
     val keyboard: KeyboardInput,
-
     /**
      * The maximum length of the password.
      */
 
     val passwordMaximumLength: Int,
-
     /**
      * The keyboard type used for password entry, such as "DEFAULT".
      *
@@ -135,7 +128,6 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
      */
 
     val passwordKeyboard: KeyboardInput,
-
     /**
      * The labels that should be used for login forms. This is typically a map such as:
      *
@@ -146,14 +138,12 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
      */
 
     val labels: Map<String, String>,
-
     /**
      * The URI of the authentication logo.
      */
 
     val logoURI: URI?
   ) : AccountProviderAuthenticationDescription() {
-
     override val isLoginPossible: Boolean =
       true
 
@@ -174,14 +164,12 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
 
   data class BasicToken(
     override val description: String,
-
     /**
      * The barcode format, if specified, such as "CODABAR". If this is unspecified, then
      * barcode scanning and displaying is not supported.
      */
 
     val barcodeFormat: String?,
-
     /**
      * The keyboard type used for barcode entry, such as "DEFAULT".
      *
@@ -189,13 +177,11 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
      */
 
     val keyboard: KeyboardInput,
-
     /**
      * The maximum length of the password.
      */
 
     val passwordMaximumLength: Int,
-
     /**
      * The keyboard type used for password entry, such as "DEFAULT".
      *
@@ -203,7 +189,6 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
      */
 
     val passwordKeyboard: KeyboardInput,
-
     /**
      * The labels that should be used for login forms. This is typically a map such as:
      *
@@ -214,20 +199,17 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
      */
 
     val labels: Map<String, String>,
-
     /**
      * The URI of the authentication logo.
      */
 
     val logoURI: URI?,
-
     /**
      * The authentication URI.
      */
 
     val authenticationURI: URI
   ) : AccountProviderAuthenticationDescription() {
-
     override val isLoginPossible: Boolean =
       true
 
@@ -261,13 +243,11 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
 
   data class SAML2_0(
     override val description: String,
-
     /**
      * The URI used to perform authentication.
      */
 
     val authenticate: URI,
-
     /**
      * The URI of the authentication logo.
      */
@@ -287,19 +267,16 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
 
   data class OpenIDConnect(
     override val description: String,
-
     /**
      * The URI used to perform authentication.
      */
 
     val authenticate: URI,
-
     /**
      * The URI of the authentication logo.
      */
 
     val logoURI: URI?,
-
     /**
      * The explicit logout link.
      */

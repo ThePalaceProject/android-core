@@ -14,7 +14,6 @@ class AccountProviderDescriptionSerializer internal constructor(
   private val stream: OutputStream,
   private val document: AccountProviderDescription
 ) : AccountProviderDescriptionSerializerType {
-
   private val mapper = ObjectMapper()
 
   override fun serializeToObject(): ObjectNode {
@@ -41,7 +40,8 @@ class AccountProviderDescriptionSerializer internal constructor(
   }
 
   override fun serialize() {
-    this.mapper.writerWithDefaultPrettyPrinter()
+    this.mapper
+      .writerWithDefaultPrettyPrinter()
       .writeValue(this.stream, this.serializeToObject())
   }
 }

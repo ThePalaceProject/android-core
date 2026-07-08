@@ -19,28 +19,21 @@ import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
 import org.nypl.simplified.ui.screens.ScreenDefinitionType
 import org.nypl.simplified.viewer.api.Viewers
 
-class SettingsDebugMenuErrorsFragment : Fragment(R.layout.debug_errors),
+class SettingsDebugMenuErrorsFragment :
+  Fragment(R.layout.debug_errors),
   MainBackButtonConsumerType {
-
   companion object : ScreenDefinitionFactoryType<Unit, SettingsDebugMenuErrorsFragment> {
-    private class ScreenSettingsDebugMenu :
-      ScreenDefinitionType<Unit, SettingsDebugMenuErrorsFragment> {
+    private class ScreenSettingsDebugMenu : ScreenDefinitionType<Unit, SettingsDebugMenuErrorsFragment> {
       override fun setup() {
         // No setup required
       }
 
-      override fun parameters() {
-        return Unit
-      }
+      override fun parameters() = Unit
 
-      override fun fragment(): SettingsDebugMenuErrorsFragment {
-        return SettingsDebugMenuErrorsFragment()
-      }
+      override fun fragment(): SettingsDebugMenuErrorsFragment = SettingsDebugMenuErrorsFragment()
     }
 
-    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuErrorsFragment> {
-      return ScreenSettingsDebugMenu()
-    }
+    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuErrorsFragment> = ScreenSettingsDebugMenu()
   }
 
   override fun onBackButtonPressed(): MainBackButtonConsumerType.Result {
@@ -83,11 +76,12 @@ class SettingsDebugMenuErrorsFragment : Fragment(R.layout.debug_errors),
     }
     this.sendAnalytics.setOnClickListener {
       SettingsDebugModel.sendAnalytics()
-      Toast.makeText(
-        this.requireContext(),
-        "Triggered analytics send",
-        Toast.LENGTH_SHORT
-      ).show()
+      Toast
+        .makeText(
+          this.requireContext(),
+          "Triggered analytics send",
+          Toast.LENGTH_SHORT
+        ).show()
     }
     this.crash.setOnClickListener {
       throw DebugCrashedDeliberately()
@@ -109,9 +103,10 @@ class SettingsDebugMenuErrorsFragment : Fragment(R.layout.debug_errors),
   private fun showErrorPage() {
     val appVersion =
       SettingsDebugModel.appVersion()
-    val attributes = sortedMapOf(
-      Pair("Version", appVersion)
-    )
+    val attributes =
+      sortedMapOf(
+        Pair("Version", appVersion)
+      )
 
     val taskSteps =
       mutableListOf<TaskStep>()
@@ -124,19 +119,21 @@ class SettingsDebugMenuErrorsFragment : Fragment(R.layout.debug_errors),
     )
 
     val supportEmail =
-      Services.serviceDirectory()
+      Services
+        .serviceDirectory()
         .requireService(BuildConfigurationServiceType::class.java)
         .supportErrorReportEmailAddress
 
     MainNavigation.openErrorPage(
       activity = this.requireActivity(),
-      parameters = ErrorPageParameters(
-        emailAddress = supportEmail,
-        body = "",
-        subject = "[palace-error-report] $appVersion",
-        attributes = attributes,
-        taskSteps = taskSteps
-      )
+      parameters =
+        ErrorPageParameters(
+          emailAddress = supportEmail,
+          body = "",
+          subject = "[palace-error-report] $appVersion",
+          attributes = attributes,
+          taskSteps = taskSteps
+        )
     )
   }
 }

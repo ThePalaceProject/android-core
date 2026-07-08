@@ -12,7 +12,6 @@ import java.net.URI
  */
 
 sealed class ProfileAccountLoginRequest {
-
   /**
    * The ID of the account.
    */

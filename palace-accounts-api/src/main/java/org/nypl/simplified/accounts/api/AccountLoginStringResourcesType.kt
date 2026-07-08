@@ -5,7 +5,6 @@ package org.nypl.simplified.accounts.api
  */
 
 interface AccountLoginStringResourcesType {
-
   /**
    * Device activation failed with an exception.
    */

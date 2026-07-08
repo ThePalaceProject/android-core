@@ -7,7 +7,6 @@ import org.nypl.simplified.profiles.controller.api.ProfileAccountDeletionStringR
 class MainProfileAccountDeletionStringResources(
   private val resources: Resources
 ) : ProfileAccountDeletionStringResourcesType {
-
   override val deletionSucceeded: String
     get() = this.resources.getString(R.string.profileAccountDeletionSucceeded)
 

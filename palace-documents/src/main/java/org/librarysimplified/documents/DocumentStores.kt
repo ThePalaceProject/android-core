@@ -11,7 +11,6 @@ import java.io.File
  */
 
 object DocumentStores {
-
   /**
    * Create a new document store.
    */
@@ -21,20 +20,17 @@ object DocumentStores {
     http: LSHTTPClientType,
     baseDirectory: File,
     configuration: DocumentConfigurationServiceType
-  ): DocumentStoreType {
-    return DocumentStore.create(
+  ): DocumentStoreType =
+    DocumentStore.create(
       assetManager = assetManager,
       http = http,
       baseDirectory = baseDirectory,
       configuration = configuration
     )
-  }
 
   /**
    * Create a new document store.
    */
 
-  fun createEmpty(): DocumentStoreType {
-    return EmptyDocumentStore
-  }
+  fun createEmpty(): DocumentStoreType = EmptyDocumentStore
 }

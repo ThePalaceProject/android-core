@@ -8,22 +8,16 @@ import org.w3c.dom.Element
 import java.text.ParseException
 
 object OPDSAtom {
-
   @JvmStatic
   @Throws(OPDSParseException::class)
-  fun findID(
-    ee: Element
-  ): String {
-    return getFirstChildElementTextWithName(
+  fun findID(ee: Element): String =
+    getFirstChildElementTextWithName(
       ee, OPDSFeedConstants.ATOM_URI, "id"
     )
-  }
 
   @JvmStatic
   @Throws(DOMException::class, ParseException::class)
-  fun findPublished(
-    e: Element
-  ): DateTime? {
+  fun findPublished(e: Element): DateTime? {
     val eOpt: Element? =
       getFirstChildElementWithNameOptional(
         e, OPDSFeedConstants.DUBLIN_CORE_TERMS_URI, "issued"
@@ -38,19 +32,14 @@ object OPDSAtom {
 
   @JvmStatic
   @Throws(OPDSParseException::class)
-  fun findTitle(
-    e: Element
-  ): String {
-    return getFirstChildElementTextWithName(
+  fun findTitle(e: Element): String =
+    getFirstChildElementTextWithName(
       e, OPDSFeedConstants.ATOM_URI, "title"
     )
-  }
 
   @JvmStatic
   @Throws(OPDSParseException::class)
-  fun findUpdated(
-    e: Element
-  ): DateTime {
+  fun findUpdated(e: Element): DateTime {
     val eUpdatedRaw =
       getFirstChildElementTextWithName(e, OPDSFeedConstants.ATOM_URI, "updated")
     return OPDSDateParsers.dateTimeParser().parseDateTime(eUpdatedRaw)

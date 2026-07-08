@@ -8,8 +8,8 @@ import java.sql.ResultSet
 import java.time.OffsetDateTime
 
 internal object DBQAccountRegistrySettingsGet : DBQAccountRegistrySettingsGetType {
-
-  private val queryText = """
+  private val queryText =
+    """
 SELECT
   ars_setting_name,
   ars_setting_type,
@@ -18,7 +18,7 @@ FROM
   account_registry_settings
 WHERE ars_setting_name = $1
 LIMIT 1
-  """.trimIndent()
+    """.trimIndent()
 
   override fun execute(
     transaction: DBTransactionType,
@@ -38,8 +38,8 @@ LIMIT 1
   fun readResult(
     name: String,
     results: ResultSet
-  ): DBQAccountRegistrySetting? {
-    return when (val type = results.getString("ars_setting_type")) {
+  ): DBQAccountRegistrySetting? =
+    when (val type = results.getString("ars_setting_type")) {
       "TimeSetting" -> {
         DBQAccountRegistrySetting.TimeSetting(
           results.getString("ars_setting_name"),
@@ -51,5 +51,4 @@ LIMIT 1
         throw IOException("Unrecognized type '$type' for setting '$name'")
       }
     }
-  }
 }

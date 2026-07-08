@@ -8,8 +8,9 @@ import org.nypl.simplified.taskrecorder.api.TaskResult
  * The type of account deletion events.
  */
 
-sealed class AccountEventDeletion : AccountEvent(), PresentableType {
-
+sealed class AccountEventDeletion :
+  AccountEvent(),
+  PresentableType {
   /**
    * Deleting an account is in progress.
    */
@@ -33,7 +34,8 @@ sealed class AccountEventDeletion : AccountEvent(), PresentableType {
 
   data class AccountEventDeletionFailed(
     val taskResult: TaskResult.Failure<*>
-  ) : AccountEventDeletion(), PresentableErrorType {
+  ) : AccountEventDeletion(),
+    PresentableErrorType {
     override val message: String
       get() = this.taskResult.message
     override val exception: Throwable?

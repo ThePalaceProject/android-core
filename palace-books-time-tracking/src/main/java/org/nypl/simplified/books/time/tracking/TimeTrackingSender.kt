@@ -29,7 +29,6 @@ class TimeTrackingSender private constructor(
   private val inputDirectory: Path,
   private val frequency: Duration,
 ) : TimeTrackingSenderServiceType {
-
   private val logger =
     LoggerFactory.getLogger(TimeTrackingSender::class.java)
 
@@ -48,24 +47,26 @@ class TimeTrackingSender private constructor(
     }
 
   init {
-    this.resources.add(AutoCloseable {
-      this.executor.shutdown()
-      this.executor.awaitTermination(30L, TimeUnit.SECONDS)
-    })
+    this.resources.add(
+      AutoCloseable {
+        this.executor.shutdown()
+        this.executor.awaitTermination(30L, TimeUnit.SECONDS)
+      }
+    )
     this.executor.scheduleWithFixedDelay(
       this::onTrySend,
       0L,
       this.frequency.toMillis(),
       TimeUnit.MILLISECONDS
     )
-    this.resources.add(AutoCloseable {
-      this.tickWrite.offer(Unit)
-    })
+    this.resources.add(
+      AutoCloseable {
+        this.tickWrite.offer(Unit)
+      }
+    )
   }
 
-  private fun isFileSuitable(
-    file: Path
-  ): Boolean {
+  private fun isFileSuitable(file: Path): Boolean {
     if (!Files.isRegularFile(file)) {
       return false
     }
@@ -80,7 +81,8 @@ class TimeTrackingSender private constructor(
 
       val entryFiles: List<Path> =
         Files.list(this.inputDirectory).use { inputStream ->
-          inputStream.filter { p -> this.isFileSuitable(p) }
+          inputStream
+            .filter { p -> this.isFileSuitable(p) }
             .collect(Collectors.toList())
         }
 
@@ -131,12 +133,13 @@ class TimeTrackingSender private constructor(
       val response =
         this.httpCalls.registerTimeTrackingInfo(
           account = account,
-          request = TimeTrackingRequest(
-            bookId = key.bookID.value,
-            libraryId = key.libraryID,
-            timeTrackingUri = key.targetURI,
-            timeEntries = outgoingEntries.map { e -> e.timeEntry }
-          )
+          request =
+            TimeTrackingRequest(
+              bookId = key.bookID.value,
+              libraryId = key.libraryID,
+              timeTrackingUri = key.targetURI,
+              timeEntries = outgoingEntries.map { e -> e.timeEntry }
+            )
         )
 
       /*
@@ -208,9 +211,7 @@ class TimeTrackingSender private constructor(
     }
   }
 
-  private fun entryFailedPermanently(
-    entry: TimeTrackingEntryOutgoing
-  ) {
+  private fun entryFailedPermanently(entry: TimeTrackingEntryOutgoing) {
     TimeTrackingDebugging.onTimeTrackingSendAttemptFailedPermanently(
       timeTrackingDebugDirectory = this.debugDirectory.toFile(),
       libraryId = entry.libraryID.toString(),
@@ -223,9 +224,7 @@ class TimeTrackingSender private constructor(
     )
   }
 
-  private fun entrySentSuccessfully(
-    entry: TimeTrackingEntryOutgoing
-  ) {
+  private fun entrySentSuccessfully(entry: TimeTrackingEntryOutgoing) {
     TimeTrackingDebugging.onTimeTrackingSendAttemptSucceeded(
       timeTrackingDebugDirectory = this.debugDirectory.toFile(),
       libraryId = entry.libraryID.toString(),
@@ -245,15 +244,14 @@ class TimeTrackingSender private constructor(
       debugDirectory: Path,
       inputDirectory: Path,
       frequency: Duration,
-    ): TimeTrackingSenderServiceType {
-      return TimeTrackingSender(
+    ): TimeTrackingSenderServiceType =
+      TimeTrackingSender(
         profiles = profiles,
         httpCalls = httpCalls,
         debugDirectory = debugDirectory,
         inputDirectory = inputDirectory,
         frequency = frequency
       )
-    }
   }
 
   override fun awaitWrite(

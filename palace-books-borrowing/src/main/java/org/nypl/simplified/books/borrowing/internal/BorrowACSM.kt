@@ -57,23 +57,18 @@ import java.util.concurrent.TimeoutException
  */
 
 class BorrowACSM private constructor() : BorrowSubtaskType {
-
   companion object : BorrowSubtaskFactoryType {
     override val name: String
       get() = "ACSM Download"
 
-    override fun createSubtask(): BorrowSubtaskType {
-      return BorrowACSM()
-    }
+    override fun createSubtask(): BorrowSubtaskType = BorrowACSM()
 
     override fun isApplicableFor(
       type: MIMEType,
       target: Link?,
       account: AccountReadableType?,
       remaining: List<MIMEType>
-    ): Boolean {
-      return MIMECompatibility.isCompatibleStrictWithoutAttributes(type, adobeACSMFiles)
-    }
+    ): Boolean = MIMECompatibility.isCompatibleStrictWithoutAttributes(type, adobeACSMFiles)
   }
 
   private data class ProcessedACSM(
@@ -153,9 +148,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
     }
   }
 
-  private fun activateDeviceIfNecessary(
-    context: BorrowContextType
-  ): RequiredCredentials {
+  private fun activateDeviceIfNecessary(context: BorrowContextType): RequiredCredentials {
     context.taskRecorder.beginNewStep("Activating Adobe DRM device if necessary...")
 
     if (this.adobeDeviceIsActivated(context)) {
@@ -167,9 +160,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
     return readRequireAdobeCredentials(context)
   }
 
-  private fun readRequireAdobeCredentials(
-    context: BorrowContextType
-  ): RequiredCredentials {
+  private fun readRequireAdobeCredentials(context: BorrowContextType): RequiredCredentials {
     val credentials = context.account.loginState.credentials!!
     val preActivation = credentials.adobeCredentials!!
     val postActivation = preActivation.postActivationCredentials!!
@@ -179,9 +170,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
     )
   }
 
-  private fun adobeDeviceActivate(
-    context: BorrowContextType
-  ) {
+  private fun adobeDeviceActivate(context: BorrowContextType) {
     val credentials = context.account.loginState.credentials
     if (credentials == null) {
       context.taskRecorder.currentStepFailed(
@@ -255,7 +244,10 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
       val newPostCredentials =
         postCredentials.last { credentials ->
           accounts.none { account ->
-            account.loginState.credentials?.adobeCredentials?.postActivationCredentials?.userID ==
+            account.loginState.credentials
+              ?.adobeCredentials
+              ?.postActivationCredentials
+              ?.userID ==
               credentials.userID
           }
         }
@@ -314,22 +306,17 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
     }
   }
 
-  private fun adobeDeviceIsActivated(
-    context: BorrowContextType
-  ): Boolean {
-    return context.account.loginState
+  private fun adobeDeviceIsActivated(context: BorrowContextType): Boolean =
+    context.account.loginState
       .credentials
       ?.adobeCredentials
       ?.postActivationCredentials != null
-  }
 
   /**
    * Check that we actually have the required DRM support.
    */
 
-  private fun checkDRMSupport(
-    context: BorrowContextType
-  ) {
+  private fun checkDRMSupport(context: BorrowContextType) {
     context.taskRecorder.beginNewStep("Checking for Adobe ACS support...")
     if (context.adobeExecutor == null) {
       context.taskRecorder.currentStepFailed(
@@ -392,8 +379,9 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
 
       is LCPHandle,
       is BoundlessHandle,
-      is NoneHandle ->
+      is NoneHandle -> {
         throw UnreachableCodeException()
+      }
     }
   }
 
@@ -449,11 +437,12 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
             netProvider = it.netProvider
 
             context.bookDownloadIsRunning(
-              message = BorrowHTTP.downloadingMessage(
-                expectedSize = 100,
-                currentSize = 0L,
-                perSecond = 1L
-              ),
+              message =
+                BorrowHTTP.downloadingMessage(
+                  expectedSize = 100,
+                  currentSize = 0L,
+                  perSecond = 1L
+                ),
               receivedSize = 0L,
               expectedSize = 100L,
               bytesPerSecond = 1L
@@ -466,11 +455,12 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
 
             if (unitsPerSecond.update(progress.toLong())) {
               context.bookDownloadIsRunning(
-                message = BorrowHTTP.downloadingMessage(
-                  expectedSize = 100,
-                  currentSize = progress.toLong(),
-                  perSecond = 1L
-                ),
+                message =
+                  BorrowHTTP.downloadingMessage(
+                    expectedSize = 100,
+                    currentSize = progress.toLong(),
+                    perSecond = 1L
+                  ),
                 receivedSize = progress.toLong(),
                 expectedSize = 100L,
                 bytesPerSecond = 1L
@@ -482,43 +472,44 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
           userId = credentials.postActivation.userID
         )
 
-      val fulfillment = try {
-        future.get(context.adobeExecutorTimeout.time, context.adobeExecutorTimeout.timeUnit)
-      } catch (e: TimeoutException) {
-        context.taskRecorder.currentStepFailed(
-          message = "Adobe ACS fulfillment timed out.",
-          errorCode = acsTimedOut,
-          exception = e,
-          extraMessages = listOf()
-        )
-        throw BorrowSubtaskFailed()
-      } catch (e: ExecutionException) {
-        throw when (val cause = e.cause!!) {
-          is CancellationException -> {
-            BorrowSubtaskCancelled()
-          }
+      val fulfillment =
+        try {
+          future.get(context.adobeExecutorTimeout.time, context.adobeExecutorTimeout.timeUnit)
+        } catch (e: TimeoutException) {
+          context.taskRecorder.currentStepFailed(
+            message = "Adobe ACS fulfillment timed out.",
+            errorCode = acsTimedOut,
+            exception = e,
+            extraMessages = listOf()
+          )
+          throw BorrowSubtaskFailed()
+        } catch (e: ExecutionException) {
+          throw when (val cause = e.cause!!) {
+            is CancellationException -> {
+              BorrowSubtaskCancelled()
+            }
 
-          is AdobeDRMFulfillmentException -> {
-            context.taskRecorder.currentStepFailed(
-              message = "Adobe ACS fulfillment failed (${cause.errorCode})",
-              errorCode = "ACS: ${cause.errorCode}",
-              exception = cause,
-              extraMessages = listOf()
-            )
-            BorrowSubtaskFailed()
-          }
+            is AdobeDRMFulfillmentException -> {
+              context.taskRecorder.currentStepFailed(
+                message = "Adobe ACS fulfillment failed (${cause.errorCode})",
+                errorCode = "ACS: ${cause.errorCode}",
+                exception = cause,
+                extraMessages = listOf()
+              )
+              BorrowSubtaskFailed()
+            }
 
-          else -> {
-            context.taskRecorder.currentStepFailed(
-              message = "Adobe ACS fulfillment failed (${cause.javaClass})",
-              errorCode = "ACS: ${cause.javaClass}",
-              exception = cause,
-              extraMessages = listOf()
-            )
-            BorrowSubtaskFailed()
+            else -> {
+              context.taskRecorder.currentStepFailed(
+                message = "Adobe ACS fulfillment failed (${cause.javaClass})",
+                errorCode = "ACS: ${cause.javaClass}",
+                exception = cause,
+                extraMessages = listOf()
+              )
+              BorrowSubtaskFailed()
+            }
           }
         }
-      }
 
       this.saveFulfilledBook(context, fulfillment)
 
@@ -560,15 +551,17 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
           }
 
           is BookDatabaseEntryFormatHandlePDF,
-          is BookDatabaseEntryFormatHandleAudioBook ->
+          is BookDatabaseEntryFormatHandleAudioBook -> {
             throw UnreachableCodeException()
+          }
         }
       }
 
       is LCPHandle,
       is BoundlessHandle,
-      is NoneHandle ->
+      is NoneHandle -> {
         throw UnreachableCodeException()
+      }
     }
   }
 
@@ -576,9 +569,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
    * Determine the actual book format we're aiming for at the end of the acquisition path.
    */
 
-  private fun findFormatHandle(
-    context: BorrowContextType
-  ): BookDatabaseEntryFormatHandle {
+  private fun findFormatHandle(context: BorrowContextType): BookDatabaseEntryFormatHandle {
     val eventualType = context.opdsAcquisitionPath.asMIMETypes().last()
     val formatHandle = context.bookDatabaseEntry.findFormatHandleForContentType(eventualType)
     if (formatHandle == null) {

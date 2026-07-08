@@ -10,7 +10,6 @@ data class AccountCookie(
    */
 
   val url: String,
-
   /**
    * The cookie as a string, using the format of the Set-Cookie HTTP response header. This includes
    * the name/value pair, as well as metadata attributes.

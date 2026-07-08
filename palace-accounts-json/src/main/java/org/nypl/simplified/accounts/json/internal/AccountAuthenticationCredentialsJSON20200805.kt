@@ -16,36 +16,37 @@ import org.slf4j.LoggerFactory
  */
 
 object AccountAuthenticationCredentialsJSON20200805 : AccountAuthenticationCredentialsJSONVersionedType {
-
   private val logger =
     LoggerFactory.getLogger(AccountAuthenticationCredentialsJSON20200805::class.java)
 
   override val supportedVersion: Int =
     20200805
 
-  override fun deserializeFromJSON(
-    node: JsonNode
-  ): AccountAuthenticationCredentials {
+  override fun deserializeFromJSON(node: JsonNode): AccountAuthenticationCredentials {
     logger.debug("deserializing version 20200604")
 
     val obj =
       JSONParserUtilities.checkObject(null, node)
 
     return when (val type = JSONParserUtilities.getString(obj, "@type")) {
-      "basic" ->
+      "basic" -> {
         deserializeBasic(obj)
-      "saml2_0" ->
+      }
+
+      "saml2_0" -> {
         deserializeSAML2_0(obj)
-      else ->
+      }
+
+      else -> {
         throw JSONParseException("Unrecognized type: $type")
+      }
     }
   }
 
-  private fun deserializeBasic(
-    obj: ObjectNode
-  ): AccountAuthenticationCredentials.Basic {
+  private fun deserializeBasic(obj: ObjectNode): AccountAuthenticationCredentials.Basic {
     val adobeCredentials =
-      JSONParserUtilities.getObjectOrNull(obj, "adobe_credentials")
+      JSONParserUtilities
+        .getObjectOrNull(obj, "adobe_credentials")
         ?.let(AccountAuthenticationCredentialsAdobeJSON::deserializeAdobeCredentials)
 
     return AccountAuthenticationCredentials.Basic(
@@ -61,7 +62,8 @@ object AccountAuthenticationCredentialsJSON20200805 : AccountAuthenticationCrede
 
   private fun deserializeSAML2_0(obj: ObjectNode): AccountAuthenticationCredentials {
     val adobeCredentials =
-      JSONParserUtilities.getObjectOrNull(obj, "adobe_credentials")
+      JSONParserUtilities
+        .getObjectOrNull(obj, "adobe_credentials")
         ?.let(AccountAuthenticationCredentialsAdobeJSON::deserializeAdobeCredentials)
 
     return AccountAuthenticationCredentials.SAML2_0(
@@ -76,9 +78,7 @@ object AccountAuthenticationCredentialsJSON20200805 : AccountAuthenticationCrede
     )
   }
 
-  private fun deserializeCookies(
-    array: ArrayNode
-  ): List<AccountCookie> {
+  private fun deserializeCookies(array: ArrayNode): List<AccountCookie> {
     val results = mutableListOf<AccountCookie>()
 
     for (index in 0 until array.size()) {

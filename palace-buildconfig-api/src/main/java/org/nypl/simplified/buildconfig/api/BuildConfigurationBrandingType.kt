@@ -5,7 +5,6 @@ package org.nypl.simplified.buildconfig.api
  */
 
 interface BuildConfigurationBrandingType {
-
   /**
    * The icon resource used for the main application.
    */

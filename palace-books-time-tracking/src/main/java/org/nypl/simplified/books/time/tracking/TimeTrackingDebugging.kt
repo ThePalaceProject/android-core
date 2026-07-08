@@ -12,7 +12,6 @@ import java.util.Properties
 import java.util.concurrent.locks.ReentrantLock
 
 object TimeTrackingDebugging {
-
   private val logger =
     LoggerFactory.getLogger(TimeTrackingDebugging::class.java)
 
@@ -146,17 +145,14 @@ object TimeTrackingDebugging {
     this.writeLocked(timeTrackingDebugDirectory, p)
   }
 
-  private fun exceptionTextOf(
-    exception: Throwable
-  ): String {
-    return StringWriter().use { stringWriter ->
+  private fun exceptionTextOf(exception: Throwable): String =
+    StringWriter().use { stringWriter ->
       PrintWriter(stringWriter).use { printWriter ->
         exception.printStackTrace(printWriter)
         printWriter.flush()
         stringWriter.toString()
       }
     }
-  }
 
   fun onTimeTrackingSendAttemptFailed(
     timeTrackingDebugDirectory: File,

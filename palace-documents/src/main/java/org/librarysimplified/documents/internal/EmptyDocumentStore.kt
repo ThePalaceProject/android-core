@@ -21,7 +21,5 @@ internal object EmptyDocumentStore : DocumentStoreType {
   override val faq: DocumentType? =
     null
 
-  override fun update(executor: ListeningExecutorService): ListenableFuture<*> {
-    return Futures.immediateFuture(Unit)
-  }
+  override fun update(executor: ListeningExecutorService): ListenableFuture<*> = Futures.immediateFuture(Unit)
 }

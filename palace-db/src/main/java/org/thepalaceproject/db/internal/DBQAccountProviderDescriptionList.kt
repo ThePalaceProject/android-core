@@ -7,11 +7,11 @@ import org.thepalaceproject.db.api.queries.DBQAccountProviderDescriptionListType
 import java.sql.ResultSet
 
 internal object DBQAccountProviderDescriptionList : DBQAccountProviderDescriptionListType {
-
   private val logger =
     LoggerFactory.getLogger(DBQAccountProviderDescriptionList::class.java)
 
-  private val queryTextWithStart = """
+  private val queryTextWithStart =
+    """
     SELECT
       apd.apd_id,
       apd.apd_updated_time_last,
@@ -21,9 +21,10 @@ internal object DBQAccountProviderDescriptionList : DBQAccountProviderDescriptio
     WHERE apd.apd_id > ?
     ORDER BY apd.apd_id
     LIMIT ?
-  """.trimIndent()
+    """.trimIndent()
 
-  private val queryTextWithoutStart = """
+  private val queryTextWithoutStart =
+    """
     SELECT
       apd.apd_id,
       apd.apd_updated_time_last,
@@ -32,7 +33,7 @@ internal object DBQAccountProviderDescriptionList : DBQAccountProviderDescriptio
     FROM account_provider_descriptions AS apd
     ORDER BY apd.apd_id
     LIMIT ?
-  """.trimIndent()
+    """.trimIndent()
 
   override fun execute(
     transaction: DBTransactionType,
@@ -40,7 +41,8 @@ internal object DBQAccountProviderDescriptionList : DBQAccountProviderDescriptio
   ): List<AccountProviderDescription> {
     val startingId = parameters.startingId
     return if (startingId != null) {
-      transaction.connection.connection.prepareStatement(this.queryTextWithStart)
+      transaction.connection.connection
+        .prepareStatement(this.queryTextWithStart)
         .use { statement ->
           statement.setString(1, startingId.toString())
           statement.setInt(2, parameters.limit)
@@ -49,7 +51,8 @@ internal object DBQAccountProviderDescriptionList : DBQAccountProviderDescriptio
           }
         }
     } else {
-      transaction.connection.connection.prepareStatement(this.queryTextWithoutStart)
+      transaction.connection.connection
+        .prepareStatement(this.queryTextWithoutStart)
         .use { statement ->
           statement.setInt(1, parameters.limit)
           statement.executeQuery().use { resultSet ->

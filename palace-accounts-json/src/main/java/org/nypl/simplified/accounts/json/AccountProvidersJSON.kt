@@ -39,14 +39,17 @@ import java.util.TreeMap
  */
 
 object AccountProvidersJSON {
-
   private val logger =
     LoggerFactory.getLogger(AccountProvidersJSON::class.java)
 
   private val mapper =
     ObjectMapper()
 
-  private fun <T> putConditionally(node: ObjectNode, name: String, value: T?) {
+  private fun <T> putConditionally(
+    node: ObjectNode,
+    name: String,
+    value: T?
+  ) {
     value?.let { v -> node.put(name, v.toString()) }
   }
 
@@ -94,9 +97,7 @@ object AccountProvidersJSON {
     return node
   }
 
-  private fun serializeAnnouncements(
-    announcements: List<Announcement>
-  ): JsonNode {
+  private fun serializeAnnouncements(announcements: List<Announcement>): JsonNode {
     val array = this.mapper.createArrayNode()
     for (announcement in announcements) {
       array.add(AnnouncementJSON.serializeToJSON(this.mapper, announcement))
@@ -104,9 +105,7 @@ object AccountProvidersJSON {
     return array
   }
 
-  private fun serializeAuthenticationAlternatives(
-    authenticationAlternatives: List<AccountProviderAuthenticationDescription>
-  ): ArrayNode {
+  private fun serializeAuthenticationAlternatives(authenticationAlternatives: List<AccountProviderAuthenticationDescription>): ArrayNode {
     val array = this.mapper.createArrayNode()
     for (authentication in authenticationAlternatives) {
       array.add(this.serializeAuthentication(authentication))
@@ -114,10 +113,8 @@ object AccountProvidersJSON {
     return array
   }
 
-  private fun serializeAuthentication(
-    authentication: AccountProviderAuthenticationDescription
-  ): ObjectNode {
-    return when (authentication) {
+  private fun serializeAuthentication(authentication: AccountProviderAuthenticationDescription): ObjectNode =
+    when (authentication) {
       is Basic -> {
         val authObject = this.mapper.createObjectNode()
         authObject.put("type", BASIC_TYPE)
@@ -137,6 +134,7 @@ object AccountProvidersJSON {
         }
         authObject
       }
+
       is BasicToken -> {
         val authObject = this.mapper.createObjectNode()
         authObject.put("type", BASIC_TOKEN_TYPE)
@@ -153,11 +151,13 @@ object AccountProvidersJSON {
         }
         authObject
       }
+
       is Anonymous -> {
         val authObject = this.mapper.createObjectNode()
         authObject.put("type", ANONYMOUS_TYPE)
         authObject
       }
+
       is SAML2_0 -> {
         val authObject = this.mapper.createObjectNode()
         authObject.put("description", authentication.description)
@@ -169,6 +169,7 @@ object AccountProvidersJSON {
         }
         authObject
       }
+
       is OpenIDConnect -> {
         val authObject = this.mapper.createObjectNode()
         authObject.put("description", authentication.description)
@@ -182,9 +183,11 @@ object AccountProvidersJSON {
           is Link.LinkBasic -> {
             authObject.put("logout", logout.href.toString())
           }
+
           is Link.LinkTemplated -> {
             authObject.put("logoutTemplated", logout.href)
           }
+
           null -> {
             // Nothing required.
           }
@@ -192,11 +195,8 @@ object AccountProvidersJSON {
         authObject
       }
     }
-  }
 
-  private fun mapToObject(
-    labels: Map<String, String>
-  ): ObjectNode {
+  private fun mapToObject(labels: Map<String, String>): ObjectNode {
     val node = this.mapper.createObjectNode()
     for (key in labels.keys) {
       node.put(key, labels[key])
@@ -263,7 +263,8 @@ object AccountProvidersJSON {
         JSONParserUtilities.getBooleanDefault(obj, "supportsReservations", false)
 
       val updated =
-        JSONParserUtilities.getStringOrNull(obj, "updated")
+        JSONParserUtilities
+          .getStringOrNull(obj, "updated")
           ?.let { text -> OffsetDateTime.parse(text) }
           ?: OffsetDateTime.now()
 
@@ -296,10 +297,8 @@ object AccountProvidersJSON {
     }
   }
 
-  private fun parseAnnouncements(
-    obj: ObjectNode
-  ): List<Announcement> {
-    return if (obj.has("announcements")) {
+  private fun parseAnnouncements(obj: ObjectNode): List<Announcement> =
+    if (obj.has("announcements")) {
       val array = JSONParserUtilities.getArray(obj, "announcements")
       val items = mutableListOf<Announcement>()
       for (node in array) {
@@ -313,12 +312,9 @@ object AccountProvidersJSON {
     } else {
       listOf()
     }
-  }
 
-  private fun parseAuthenticationAlternatives(
-    obj: ObjectNode
-  ): List<AccountProviderAuthenticationDescription> {
-    return if (obj.has("authenticationAlternatives")) {
+  private fun parseAuthenticationAlternatives(obj: ObjectNode): List<AccountProviderAuthenticationDescription> =
+    if (obj.has("authenticationAlternatives")) {
       val objAlt = JSONParserUtilities.getArray(obj, "authenticationAlternatives")
       val items = mutableListOf<AccountProviderAuthenticationDescription>()
       for (authObj in objAlt) {
@@ -330,22 +326,16 @@ object AccountProvidersJSON {
     } else {
       listOf()
     }
-  }
 
-  private fun parseAuthentication(
-    obj: ObjectNode
-  ): AccountProviderAuthenticationDescription {
-    return if (obj.has("authentication")) {
+  private fun parseAuthentication(obj: ObjectNode): AccountProviderAuthenticationDescription =
+    if (obj.has("authentication")) {
       this.parseAuthenticationFromObject(JSONParserUtilities.getObject(obj, "authentication"))
     } else {
       Anonymous
     }
-  }
 
-  private fun parseAuthenticationFromObject(
-    container: ObjectNode
-  ): AccountProviderAuthenticationDescription {
-    return when (val authType = JSONParserUtilities.getString(container, "type")) {
+  private fun parseAuthenticationFromObject(container: ObjectNode): AccountProviderAuthenticationDescription =
+    when (val authType = JSONParserUtilities.getString(container, "type")) {
       OIDC_TYPE -> {
         val authURI =
           JSONParserUtilities.getURI(container, "authenticate")
@@ -395,7 +385,8 @@ object AccountProvidersJSON {
         val labels =
           this.toStringMap(JSONParserUtilities.getObject(container, "labels"))
         val barcodeFormat =
-          JSONParserUtilities.getStringOrNull(container, "barcodeFormat")
+          JSONParserUtilities
+            .getStringOrNull(container, "barcodeFormat")
             ?.uppercase(Locale.ROOT)
         val keyboard =
           this.parseKeyboardType(JSONParserUtilities.getStringOrNull(container, "keyboard"))
@@ -428,7 +419,8 @@ object AccountProvidersJSON {
         val labels =
           this.toStringMap(JSONParserUtilities.getObject(container, "labels"))
         val barcodeFormat =
-          JSONParserUtilities.getStringOrNull(container, "barcodeFormat")
+          JSONParserUtilities
+            .getStringOrNull(container, "barcodeFormat")
             ?.uppercase(Locale.ROOT)
         val keyboard =
           this.parseKeyboardType(JSONParserUtilities.getStringOrNull(container, "keyboard"))
@@ -465,7 +457,6 @@ object AccountProvidersJSON {
         Anonymous
       }
     }
-  }
 
   /**
    * Parse the keyboard type from the given string. Note that the cases containing spaces
@@ -474,27 +465,30 @@ object AccountProvidersJSON {
    * certain they won't.
    */
 
-  private fun parseKeyboardType(
-    text: String?
-  ): KeyboardInput {
+  private fun parseKeyboardType(text: String?): KeyboardInput {
     return when (val keyboardText = text?.uppercase(Locale.ROOT)) {
-      null ->
+      null -> {
         KeyboardInput.DEFAULT
+      }
 
       "NO_INPUT",
-      "NO INPUT" ->
+      "NO INPUT" -> {
         KeyboardInput.NO_INPUT
+      }
 
-      "DEFAULT" ->
+      "DEFAULT" -> {
         KeyboardInput.DEFAULT
+      }
 
       "NUMBER_PAD",
-      "NUMBER PAD" ->
+      "NUMBER PAD" -> {
         KeyboardInput.NUMBER_PAD
+      }
 
       "EMAIL_ADDRESS",
-      "EMAIL ADDRESS" ->
+      "EMAIL ADDRESS" -> {
         KeyboardInput.EMAIL_ADDRESS
+      }
 
       else -> {
         this.logger.warn("encountered unrecognized keyboard type: {}", keyboardText)
@@ -552,9 +546,7 @@ object AccountProvidersJSON {
     return providers
   }
 
-  private fun mapNullToTextNode(jsonNode: JsonNode?): JsonNode {
-    return jsonNode ?: TextNode("")
-  }
+  private fun mapNullToTextNode(jsonNode: JsonNode?): JsonNode = jsonNode ?: TextNode("")
 
   /**
    * Deserialize a set of account providers from the given JSON array node.
@@ -593,13 +585,7 @@ object AccountProvidersJSON {
    */
 
   @Throws(IOException::class)
-  fun deserializeOneFromFile(file: File): AccountProvider {
-    return FileInputStream(file).use { stream -> this.deserializeOneFromStream(stream) }
-  }
+  fun deserializeOneFromFile(file: File): AccountProvider = FileInputStream(file).use { stream -> this.deserializeOneFromStream(stream) }
 
-  fun serializeToBytes(
-    description: AccountProvider
-  ): ByteArray {
-    return this.mapper.writeValueAsBytes(this.serializeToJSON(description))
-  }
+  fun serializeToBytes(description: AccountProvider): ByteArray = this.mapper.writeValueAsBytes(this.serializeToJSON(description))
 }

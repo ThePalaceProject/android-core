@@ -18,14 +18,11 @@ import org.nypl.simplified.links.Link
  */
 
 class BorrowDirectDownload private constructor() : BorrowSubtaskType {
-
   companion object : BorrowSubtaskFactoryType {
     override val name: String
       get() = "Direct HTTP Download"
 
-    override fun createSubtask(): BorrowSubtaskType {
-      return BorrowDirectDownload()
-    }
+    override fun createSubtask(): BorrowSubtaskType = BorrowDirectDownload()
 
     override fun isApplicableFor(
       type: MIMEType,

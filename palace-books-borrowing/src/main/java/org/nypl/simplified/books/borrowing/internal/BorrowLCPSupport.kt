@@ -26,14 +26,11 @@ import java.net.URI
  */
 
 object BorrowLCPSupport {
-
   /**
    * Check that we actually have the required DRM support.
    */
 
-  fun checkDRMSupport(
-    context: BorrowContextType
-  ) {
+  fun checkDRMSupport(context: BorrowContextType) {
     context.taskRecorder.beginNewStep("Checking for LCP support...")
     if (context.lcpService == null) {
       context.taskRecorder.currentStepFailed(
@@ -97,9 +94,7 @@ object BorrowLCPSupport {
    * Find a passphrase for the given LCP book from an associated loans feed.
    */
 
-  fun findPassphraseOrManual(
-    context: BorrowContextType
-  ): String {
+  fun findPassphraseOrManual(context: BorrowContextType): String {
     context.bookDownloadIsRunning("Locating passphrase…")
     return try {
       this.findPassphrase(context)
@@ -112,9 +107,7 @@ object BorrowLCPSupport {
    * Find a passphrase for the given LCP book from an associated loans feed.
    */
 
-  fun findPassphrase(
-    context: BorrowContextType
-  ): String {
+  fun findPassphrase(context: BorrowContextType): String {
     context.taskRecorder.beginNewStep("Retrieving LCP hashed passphrase…")
     context.bookDownloadIsRunning("Locating passphrase…")
 
@@ -134,7 +127,8 @@ object BorrowLCPSupport {
       AccountAuthenticatedHTTP.createAuthorizationIfPresent(credentials)
 
     val request =
-      context.httpClient.newRequest(loansURI)
+      context.httpClient
+        .newRequest(loansURI)
         .setAuthorization(auth)
         .addBasicTokenPropertiesIfApplicable(credentials)
         .build()
@@ -197,18 +191,19 @@ object BorrowLCPSupport {
     val feedParser =
       context.services.requireService(OPDSFeedParserType::class.java)
 
-    val entryFound = try {
-      val result = feedParser.parse(loansURI, status.bodyStream)
-      result.feedEntries.find { entry -> entry.id == context.bookCurrent.entry.id }
-    } catch (e: Exception) {
-      context.taskRecorder.currentStepFailed(
-        message = "Unable to parse loans feed (${e.message})",
-        errorCode = "lcpUnparseableLoansFeed",
-        exception = e,
-        extraMessages = listOf()
-      )
-      throw BorrowSubtaskFailed()
-    }
+    val entryFound =
+      try {
+        val result = feedParser.parse(loansURI, status.bodyStream)
+        result.feedEntries.find { entry -> entry.id == context.bookCurrent.entry.id }
+      } catch (e: Exception) {
+        context.taskRecorder.currentStepFailed(
+          message = "Unable to parse loans feed (${e.message})",
+          errorCode = "lcpUnparseableLoansFeed",
+          exception = e,
+          extraMessages = listOf()
+        )
+        throw BorrowSubtaskFailed()
+      }
 
     if (entryFound == null) {
       context.taskRecorder.currentStepFailed(
@@ -239,9 +234,7 @@ object BorrowLCPSupport {
     throw BorrowSubtaskFailed()
   }
 
-  fun fetchAllR2ErrorMessages(
-    failure: Try.Failure<*, Error>
-  ): List<String> {
+  fun fetchAllR2ErrorMessages(failure: Try.Failure<*, Error>): List<String> {
     val messages = mutableListOf<String>()
     var errorNow: Error? = failure.value
     while (true) {

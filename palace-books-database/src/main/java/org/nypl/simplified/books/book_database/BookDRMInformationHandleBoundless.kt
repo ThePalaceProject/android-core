@@ -16,13 +16,12 @@ class BookDRMInformationHandleBoundless(
   private val directory: File,
   format: BookFormats.BookFormatDefinition,
   private val onUpdate: () -> Unit
-) : BookDRMInformationHandle.BoundlessHandle(), BookDRMInformationHandleBase {
-
+) : BookDRMInformationHandle.BoundlessHandle(),
+  BookDRMInformationHandleBase {
   private val closed = AtomicBoolean(false)
 
   companion object {
-    fun nameLicense(format: BookFormats.BookFormatDefinition) =
-      "${format.shortName}-license_boundless.json"
+    fun nameLicense(format: BookFormats.BookFormatDefinition) = "${format.shortName}-license_boundless.json"
   }
 
   init {
@@ -42,13 +41,10 @@ class BookDRMInformationHandleBoundless(
       this.loadInitial(fileLicense)
     }
 
-  private fun loadInitial(
-    license: File
-  ): BookDRMInformation.Boundless {
-    return BookDRMInformation.Boundless(
+  private fun loadInitial(license: File): BookDRMInformation.Boundless =
+    BookDRMInformation.Boundless(
       license = license.takeIf { it.isFile },
     )
-  }
 
   override val info: BookDRMInformation.Boundless
     get() {

@@ -42,7 +42,6 @@ internal class DBInstance private constructor(
   private val dataSource: SQLiteDataSource,
   private val parameters: DBParameters
 ) : DBType {
-
   private val closed = AtomicBoolean(false)
 
   private val services =
@@ -58,16 +57,13 @@ internal class DBInstance private constructor(
     )
 
   companion object {
-
     private val LOG =
       LoggerFactory.getLogger(DBInstance::class.java)
 
     const val DATABASE_SQLITE_ID: Int = 0x50504442
     const val DATABASE_APPLICATION_ID: String = "org.thepalaceproject.palace"
 
-    fun open(
-      parameters: DBParameters
-    ): DBType {
+    fun open(parameters: DBParameters): DBType {
       try {
         val absFile = parameters.file.toAbsolutePath()
         this.createOrUpgrade(absFile)
@@ -77,9 +73,7 @@ internal class DBInstance private constructor(
       }
     }
 
-    private fun createOrUpgrade(
-      file: Path?
-    ) {
+    private fun createOrUpgrade(file: Path?) {
       val url = java.lang.StringBuilder(128)
       url.append("jdbc:sqlite:")
       url.append(file)
@@ -96,18 +90,20 @@ internal class DBInstance private constructor(
 
       val parsers = TrSchemaRevisionSetParsers()
       val revisions: TrSchemaRevisionSet
-      DBInstance::class.java.getResourceAsStream(
-        "/org/thepalaceproject/db/internal/database.xml"
-      ).use { stream ->
-        parsers.createParserWithContext(
-          JXEHardenedSAXParsers(Supplier { SAXParserFactoryImpl() }),
-          URI.create("urn:source"),
-          stream,
-          Consumer { status: ParseStatus? -> this.LOG.trace("Parser: {}", status) }
-        ).use { parser ->
-          revisions = parser.execute()
+      DBInstance::class.java
+        .getResourceAsStream(
+          "/org/thepalaceproject/db/internal/database.xml"
+        ).use { stream ->
+          parsers
+            .createParserWithContext(
+              JXEHardenedSAXParsers(Supplier { SAXParserFactoryImpl() }),
+              URI.create("urn:source"),
+              stream,
+              Consumer { status: ParseStatus? -> this.LOG.trace("Parser: {}", status) }
+            ).use { parser ->
+              revisions = parser.execute()
+            }
         }
-      }
       val arguments =
         TrArguments(Map.of<String?, TrArgumentType?>())
 
@@ -115,19 +111,20 @@ internal class DBInstance private constructor(
         this.setWALMode(connection)
         connection.setAutoCommit(false)
 
-        TrExecutors().create(
-          TrExecutorConfiguration(
-            { connection: Connection -> this.schemaVersionGet(connection) },
-            { version: BigInteger, connection: Connection ->
-              this.schemaVersionSet(version, connection)
-            },
-            { event: TrEventType? -> this.logEvent(event) },
-            revisions,
-            TrExecutorUpgrade.PERFORM_UPGRADES,
-            arguments,
-            connection
-          )
-        ).execute()
+        TrExecutors()
+          .create(
+            TrExecutorConfiguration(
+              { connection: Connection -> this.schemaVersionGet(connection) },
+              { version: BigInteger, connection: Connection ->
+                this.schemaVersionSet(version, connection)
+              },
+              { event: TrEventType? -> this.logEvent(event) },
+              revisions,
+              TrExecutorUpgrade.PERFORM_UPGRADES,
+              arguments,
+              connection
+            )
+          ).execute()
         connection.commit()
       }
     }
@@ -155,9 +152,7 @@ internal class DBInstance private constructor(
       }
     }
 
-    private fun schemaVersionGet(
-      connection: Connection
-    ): Optional<BigInteger> {
+    private fun schemaVersionGet(connection: Connection): Optional<BigInteger> {
       try {
         val statementText =
           "SELECT version_application_id, version_number FROM schema_version"
@@ -194,17 +189,13 @@ internal class DBInstance private constructor(
       }
     }
 
-    private fun setWALMode(
-      connection: Connection
-    ) {
+    private fun setWALMode(connection: Connection) {
       connection.createStatement().use { st ->
         st.execute("PRAGMA journal_mode=WAL;")
       }
     }
 
-    private fun logEvent(
-      event: TrEventType?
-    ) {
+    private fun logEvent(event: TrEventType?) {
       if (event is TrEventExecutingSQL) {
         this.LOG.trace("Executing SQL: {}", event.statement())
       } else if (event is TrEventUpgrading) {
@@ -216,7 +207,10 @@ internal class DBInstance private constructor(
       }
     }
 
-    private fun doOpen(parameters: DBParameters, file: Path): DBType {
+    private fun doOpen(
+      parameters: DBParameters,
+      file: Path
+    ): DBType {
       val url = StringBuilder(128)
       url.append("jdbc:sqlite:")
       url.append(file)
@@ -244,25 +238,24 @@ internal class DBInstance private constructor(
       }
     }
 
-    override fun openTransaction(
-      closeBehavior: DBTransactionCloseBehavior
-    ): DBTransactionType {
+    override fun openTransaction(closeBehavior: DBTransactionCloseBehavior): DBTransactionType {
       this.checkNotClosed()
 
       return DBTransaction(
         connection = this,
-        onClose = when (closeBehavior) {
-          DBTransactionCloseBehavior.ON_CLOSE_CLOSE_CONNECTION -> {
-            Runnable {
-              this.close()
+        onClose =
+          when (closeBehavior) {
+            DBTransactionCloseBehavior.ON_CLOSE_CLOSE_CONNECTION -> {
+              Runnable {
+                this.close()
+              }
             }
-          }
 
-          DBTransactionCloseBehavior.ON_CLOSE_DO_NOTHING -> {
-            Runnable {
+            DBTransactionCloseBehavior.ON_CLOSE_DO_NOTHING -> {
+              Runnable {
+              }
             }
           }
-        }
       )
     }
 
@@ -273,14 +266,10 @@ internal class DBInstance private constructor(
       }
     }
 
-    fun <T> service(clazz: Class<T>): T {
-      return this@DBInstance.service(clazz)
-    }
+    fun <T> service(clazz: Class<T>): T = this@DBInstance.service(clazz)
   }
 
-  private fun <T> service(
-    clazz: Class<T>
-  ): T {
+  private fun <T> service(clazz: Class<T>): T {
     val service =
       this.services[clazz]
         ?: throw IllegalArgumentException("No such service registered '$clazz'")
@@ -291,18 +280,11 @@ internal class DBInstance private constructor(
     override val connection: DBConnection,
     private val onClose: Runnable
   ) : DBTransactionType {
-
     private val closed = AtomicBoolean()
 
-    override fun <T> service(
-      clazz: Class<T>
-    ): T {
-      return this.connection.service(clazz)
-    }
+    override fun <T> service(clazz: Class<T>): T = this.connection.service(clazz)
 
-    override fun <P, R, Q : DBQueryType<P, R>> query(
-      queryType: Class<Q>
-    ): Q {
+    override fun <P, R, Q : DBQueryType<P, R>> query(queryType: Class<Q>): Q {
       this.checkNotClosed()
       return DBQueries.query(queryType)
     }
@@ -345,7 +327,9 @@ internal class DBInstance private constructor(
         statement.execute("ATTACH DATABASE '$file' AS source")
 
         try {
-          val updated = statement.executeUpdate("""
+          val updated =
+            statement.executeUpdate(
+              """
 INSERT OR IGNORE INTO account_provider_descriptions (
     apd_id,
     apd_updated_time_last,
@@ -362,7 +346,8 @@ SELECT
     apd_data_format,
     apd_data
 FROM source.account_provider_descriptions;
-          """.trimIndent())
+              """.trimIndent()
+            )
 
           LOG.debug("Updated {} providers from bundled database", updated)
           transaction.commit()

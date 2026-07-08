@@ -5,7 +5,6 @@ package org.nypl.simplified.accounts.api
  */
 
 interface AccountLogoutStringResourcesType {
-
   /**
    * The device could not be deactivated because the Adobe connector raised an exception.
    */

@@ -7,7 +7,6 @@ import java.net.URL
  */
 
 interface DocumentType {
-
   /**
    * Try fetching the latest version of the document.
    */

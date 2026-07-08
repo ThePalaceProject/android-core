@@ -7,7 +7,6 @@ package org.nypl.simplified.analytics.api
  */
 
 interface AnalyticsSystemProvider {
-
   /**
    * Create a new analytics system.
    */

@@ -10,13 +10,10 @@ import org.thepalaceproject.opds.client.OPDSFeedHandleWithoutGroupsType
 class CatalogFeedPagingSource(
   val feedHandle: OPDSFeedHandleWithoutGroupsType
 ) : PagingSource<Int, FeedEntry>() {
-
   private val logger =
     LoggerFactory.getLogger(CatalogFeedPagingSource::class.java)
 
-  override fun getRefreshKey(
-    state: PagingState<Int, FeedEntry>
-  ): Int? {
+  override fun getRefreshKey(state: PagingState<Int, FeedEntry>): Int? {
     val anchor = state.anchorPosition
     if (anchor != null) {
       val closest = state.closestPageToPosition(anchor)
@@ -28,9 +25,7 @@ class CatalogFeedPagingSource(
     return null
   }
 
-  override suspend fun load(
-    params: LoadParams<Int>
-  ): LoadResult<Int, FeedEntry> {
+  override suspend fun load(params: LoadParams<Int>): LoadResult<Int, FeedEntry> {
     val page = params.key ?: 0
     this.logger.debug("Load: Page {}", page)
     return try {

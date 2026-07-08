@@ -13,7 +13,6 @@ import org.nypl.simplified.taskrecorder.api.TaskResult
  */
 
 interface BooksControllerType {
-
   /**
    * Attempt to borrow the given book.
    *
@@ -73,9 +72,7 @@ interface BooksControllerType {
    * @param accountID The account ID
    */
 
-  fun booksSync(
-    accountID: AccountID
-  ): FluentFuture<TaskResult<Unit>>
+  fun booksSync(accountID: AccountID): FluentFuture<TaskResult<Unit>>
 
   /**
    * Revoke the given book.

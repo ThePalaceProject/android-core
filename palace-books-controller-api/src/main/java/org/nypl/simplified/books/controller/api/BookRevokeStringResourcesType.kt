@@ -7,7 +7,6 @@ import java.net.URI
  */
 
 interface BookRevokeStringResourcesType {
-
   /**
    * Performing revocation for format %1$s…
    */

@@ -4,7 +4,6 @@ import android.content.res.Configuration
 import android.view.ViewGroup
 
 sealed class CatalogFeedView {
-
   abstract val root: ViewGroup
 
   /**

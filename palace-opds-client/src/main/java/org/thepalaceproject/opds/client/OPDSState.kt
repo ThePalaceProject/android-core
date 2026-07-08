@@ -3,7 +3,6 @@ package org.thepalaceproject.opds.client
 import org.nypl.simplified.presentableerror.api.PresentableErrorType
 
 sealed class OPDSState {
-
   sealed class OPDSStateHistoryParticipant : OPDSState()
 
   /**

@@ -5,7 +5,6 @@ package org.nypl.simplified.books.borrowing
  */
 
 interface BorrowTaskFactoryType {
-
   /**
    * Create a new borrow task. The borrow task may be used at most once.
    */

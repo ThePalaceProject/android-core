@@ -6,19 +6,16 @@ package org.nypl.simplified.books.api.bookmark
  */
 
 data class SerializedBookmarkFallbackValues(
-
   /**
    * The bookmark kind.
    */
 
   val kind: BookmarkKind,
-
   /**
    * The book's OPDS ID as it appeared in an OPDS feed.
    */
 
   val bookOPDSId: String,
-
   /**
    * The book's title as it appeared in an OPDS feed.
    */

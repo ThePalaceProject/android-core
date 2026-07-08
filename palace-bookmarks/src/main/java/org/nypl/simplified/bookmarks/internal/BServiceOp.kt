@@ -12,7 +12,6 @@ import java.util.concurrent.Callable
 internal abstract class BServiceOp<T>(
   val logger: Logger
 ) : Callable<T> {
-
   abstract fun runActual(): T
 
   override fun call(): T {

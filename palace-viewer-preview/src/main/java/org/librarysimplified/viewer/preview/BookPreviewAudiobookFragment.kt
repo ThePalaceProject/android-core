@@ -30,8 +30,9 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.concurrent.TimeUnit
 
-class BookPreviewAudiobookFragment : Fragment(), AudioManager.OnAudioFocusChangeListener {
-
+class BookPreviewAudiobookFragment :
+  Fragment(),
+  AudioManager.OnAudioFocusChangeListener {
   private val logger =
     LoggerFactory.getLogger(BookPreviewAudiobookFragment::class.java)
 
@@ -44,14 +45,17 @@ class BookPreviewAudiobookFragment : Fragment(), AudioManager.OnAudioFocusChange
 
     private const val PLAYER_MOVE_THRESHOLD = 30000L
 
-    fun newInstance(file: File, feedEntry: FeedEntry.FeedEntryOPDS): BookPreviewAudiobookFragment {
-      return BookPreviewAudiobookFragment().apply {
-        this.arguments = Bundle().apply {
-          this.putSerializable(this@Companion.BUNDLE_EXTRA_FILE, file)
-          this.putSerializable(this@Companion.BUNDLE_EXTRA_FEED_ENTRY, feedEntry)
-        }
+    fun newInstance(
+      file: File,
+      feedEntry: FeedEntry.FeedEntryOPDS
+    ): BookPreviewAudiobookFragment =
+      BookPreviewAudiobookFragment().apply {
+        this.arguments =
+          Bundle().apply {
+            this.putSerializable(this@Companion.BUNDLE_EXTRA_FILE, file)
+            this.putSerializable(this@Companion.BUNDLE_EXTRA_FEED_ENTRY, feedEntry)
+          }
       }
-    }
   }
 
   private val services = Services.serviceDirectory()
@@ -104,17 +108,20 @@ class BookPreviewAudiobookFragment : Fragment(), AudioManager.OnAudioFocusChange
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
-  ): View? {
-    return inflater.inflate(R.layout.fragment_book_preview_audiobook, container, false)
-  }
+  ): View? = inflater.inflate(R.layout.fragment_book_preview_audiobook, container, false)
 
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+  override fun onViewCreated(
+    view: View,
+    savedInstanceState: Bundle?
+  ) {
     super.onViewCreated(view, savedInstanceState)
 
-    this.audioFile = this.requireArguments()
+    this.audioFile = this
+      .requireArguments()
       .getSerializable(BUNDLE_EXTRA_FILE)
       as? File ?: throw RuntimeException("Invalid file")
-    this.feedEntry = this.requireArguments()
+    this.feedEntry = this
+      .requireArguments()
       .getSerializable(BUNDLE_EXTRA_FEED_ENTRY)
       as? FeedEntry.FeedEntryOPDS ?: throw RuntimeException("Invalid entry")
 
@@ -230,7 +237,8 @@ class BookPreviewAudiobookFragment : Fragment(), AudioManager.OnAudioFocusChange
 
   private fun startTimer() {
     this.disposables.add(
-      Observable.interval(1000L, TimeUnit.MILLISECONDS)
+      Observable
+        .interval(1000L, TimeUnit.MILLISECONDS)
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe {
@@ -313,18 +321,22 @@ class BookPreviewAudiobookFragment : Fragment(), AudioManager.OnAudioFocusChange
 
   private fun requestAudioFocus(): Int {
     // initiate the audio playback attributes
-    val playbackAttributes = AudioAttributes.Builder()
-      .setUsage(AudioAttributes.USAGE_MEDIA)
-      .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-      .build()
+    val playbackAttributes =
+      AudioAttributes
+        .Builder()
+        .setUsage(AudioAttributes.USAGE_MEDIA)
+        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+        .build()
 
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      this.audioRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-        .setAudioAttributes(playbackAttributes)
-        .setWillPauseWhenDucked(true)
-        .setAcceptsDelayedFocusGain(true)
-        .setOnAudioFocusChangeListener(this)
-        .build()
+      this.audioRequest =
+        AudioFocusRequest
+          .Builder(AudioManager.AUDIOFOCUS_GAIN)
+          .setAudioAttributes(playbackAttributes)
+          .setWillPauseWhenDucked(true)
+          .setAcceptsDelayedFocusGain(true)
+          .setOnAudioFocusChangeListener(this)
+          .build()
 
       this.audioManager.requestAudioFocus(this.audioRequest!!)
     } else {
@@ -415,9 +427,9 @@ class BookPreviewAudiobookFragment : Fragment(), AudioManager.OnAudioFocusChange
     return this.previewSeekbar.onTouchEvent(event)
   }
 
-  private fun wasSeekbarThumbClicked(event: MotionEvent): Boolean {
-    return this.previewSeekbar.thumb.bounds.contains(event.x.toInt(), event.y.toInt())
-  }
+  private fun wasSeekbarThumbClicked(event: MotionEvent): Boolean =
+    this.previewSeekbar.thumb.bounds
+      .contains(event.x.toInt(), event.y.toInt())
 
   private fun updateUIOnProgressBarDragging() {
     this.logger.debug("updateUIOnProgressBarDragging")
@@ -425,15 +437,14 @@ class BookPreviewAudiobookFragment : Fragment(), AudioManager.OnAudioFocusChange
     this.mediaPlayer.seekTo(this.previewSeekbar.progress)
   }
 
-  private fun playerTimeCurrentSpoken(offsetMilliseconds: Long): String {
-    return this.getString(
+  private fun playerTimeCurrentSpoken(offsetMilliseconds: Long): String =
+    this.getString(
       R.string.bookPreviewAccessibilityTimeCurrent,
       BookPreviewTimeUtils.hourMinuteSecondSpokenFromDuration(
         this.timeStrings,
         Duration.millis(offsetMilliseconds)
       )
     )
-  }
 
   private fun playerTimeRemainingSpoken(
     offsetMilliseconds: Long,

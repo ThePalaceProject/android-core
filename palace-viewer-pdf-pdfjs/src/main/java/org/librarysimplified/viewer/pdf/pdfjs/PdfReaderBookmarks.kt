@@ -16,7 +16,6 @@ import org.nypl.simplified.books.api.bookmark.SerializedLocatorPage1
 import org.nypl.simplified.feeds.api.FeedEntry
 
 internal object PdfReaderBookmarks {
-
   /**
    * Load bookmarks from the given bookmark service.
    */
@@ -48,10 +47,8 @@ internal object PdfReaderBookmarks {
    * Convert a SimplyE bookmark to an SR2 bookmark.
    */
 
-  fun toPdfBookmark(
-    source: SerializedBookmark
-  ): PdfBookmark? {
-    return when (val location = source.location) {
+  fun toPdfBookmark(source: SerializedBookmark): PdfBookmark? =
+    when (val location = source.location) {
       is SerializedLocatorAudioBookTime1,
       is SerializedLocatorAudioBookTime2,
       is SerializedLocatorLegacyCFI,
@@ -62,16 +59,16 @@ internal object PdfReaderBookmarks {
 
       is SerializedLocatorPage1 -> {
         PdfBookmark(
-          kind = when (source.kind) {
-            BookmarkExplicit -> PdfBookmarkKind.EXPLICIT
-            BookmarkLastReadLocation -> PdfBookmarkKind.LAST_READ
-          },
+          kind =
+            when (source.kind) {
+              BookmarkExplicit -> PdfBookmarkKind.EXPLICIT
+              BookmarkLastReadLocation -> PdfBookmarkKind.LAST_READ
+            },
           pageNumber = location.page,
           time = source.time
         )
       }
     }
-  }
 
   /**
    * Convert a PDF bookmark to a SimplyE bookmark.
@@ -81,21 +78,21 @@ internal object PdfReaderBookmarks {
     bookEntry: FeedEntry.FeedEntryOPDS,
     deviceId: String,
     source: PdfBookmark
-  ): SerializedBookmark {
-    return SerializedBookmarks.createWithCurrentFormat(
+  ): SerializedBookmark =
+    SerializedBookmarks.createWithCurrentFormat(
       bookChapterProgress = 0.0,
       bookChapterTitle = "",
       bookProgress = 0.0,
       bookTitle = bookEntry.feedEntry.title,
       deviceID = deviceId,
-      kind = when (source.kind) {
-        PdfBookmarkKind.EXPLICIT -> BookmarkExplicit
-        PdfBookmarkKind.LAST_READ -> BookmarkLastReadLocation
-      },
+      kind =
+        when (source.kind) {
+          PdfBookmarkKind.EXPLICIT -> BookmarkExplicit
+          PdfBookmarkKind.LAST_READ -> BookmarkLastReadLocation
+        },
       location = SerializedLocatorPage1(source.pageNumber),
       opdsId = bookEntry.feedEntry.id,
       time = source.time,
       uri = null,
     )
-  }
 }

@@ -10,7 +10,6 @@ import java.io.OutputStream
  * Utilities for implementing JSON serializers.
  */
 object JSONSerializerUtilities {
-
   private val objectMapper: ObjectMapper = ObjectMapper()
 
   /**
@@ -28,7 +27,8 @@ object JSONSerializerUtilities {
     d: ObjectNode,
     os: OutputStream
   ) {
-    this.objectMapper.writerWithDefaultPrettyPrinter()
+    this.objectMapper
+      .writerWithDefaultPrettyPrinter()
       .writeValue(os, d)
   }
 
@@ -44,12 +44,10 @@ object JSONSerializerUtilities {
 
   @JvmStatic
   @Throws(IOException::class)
-  fun serializeToString(
-    d: ObjectNode
-  ): String {
-    return this.objectMapper.writerWithDefaultPrettyPrinter()
+  fun serializeToString(d: ObjectNode): String =
+    this.objectMapper
+      .writerWithDefaultPrettyPrinter()
       .writeValueAsString(d)
-  }
 
   /**
    * Serialize the given object node to a string.
@@ -63,14 +61,13 @@ object JSONSerializerUtilities {
 
   @JvmStatic
   @Throws(IOException::class)
-  fun serializeToString(
-    d: List<JsonNode>
-  ): String {
+  fun serializeToString(d: List<JsonNode>): String {
     val a = this.objectMapper.createArrayNode()
     for (o in d) {
       a.add(o)
     }
-    return this.objectMapper.writerWithDefaultPrettyPrinter()
+    return this.objectMapper
+      .writerWithDefaultPrettyPrinter()
       .writeValueAsString(a)
   }
 }

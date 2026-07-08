@@ -5,7 +5,6 @@ package org.nypl.simplified.reader.api
  */
 
 enum class ReaderPublisherCSS {
-
   /**
    * Publisher default CSS is enabled.
    */

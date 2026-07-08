@@ -22,7 +22,6 @@ class BookDeleteTask(
   private val bookID: BookID,
   private val bookRegistry: BookRegistryType,
 ) : AbstractBookTask(accountID, profiles) {
-
   override val logger: Logger =
     LoggerFactory.getLogger(BookDeleteTask::class.java)
 

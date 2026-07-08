@@ -19,7 +19,6 @@ import java.net.URI
 class TimeTrackingHTTPCalls(
   private val http: LSHTTPClientType
 ) : TimeTrackingHTTPCallsType {
-
   private val logger =
     LoggerFactory.getLogger(TimeTrackingHTTPCalls::class.java)
 
@@ -39,7 +38,8 @@ class TimeTrackingHTTPCalls(
         data, MIMEType("application", "json", mapOf())
       )
     val httpRequest =
-      this.http.newRequest(request.timeTrackingUri)
+      this.http
+        .newRequest(request.timeTrackingUri)
         .setAuthorization(auth)
         .addBasicTokenPropertiesIfApplicable(credentials)
         .setMethod(post)
@@ -53,6 +53,7 @@ class TimeTrackingHTTPCalls(
             status.bodyStream?.readBytes() ?: ByteArray(0)
           )
         }
+
         is LSHTTPResponseStatus.Responded.Error -> {
           if (status.properties.status == 404) {
             this.fakeSynthesized404Response(request)
@@ -60,6 +61,7 @@ class TimeTrackingHTTPCalls(
             this.logAndFail(request.timeTrackingUri, status)
           }
         }
+
         is LSHTTPResponseStatus.Failed -> {
           throw status.exception
         }
@@ -69,18 +71,20 @@ class TimeTrackingHTTPCalls(
 
   private fun fakeSynthesized404Response(request: TimeTrackingRequest) =
     TimeTrackingServerResponse(
-      responses = request.timeEntries.map { e ->
-        TimeTrackingServerResponseEntry(
-          e.id,
-          "Server returned a 404 value. This is a synthesized message.",
-          404
+      responses =
+        request.timeEntries.map { e ->
+          TimeTrackingServerResponseEntry(
+            e.id,
+            "Server returned a 404 value. This is a synthesized message.",
+            404
+          )
+        },
+      summary =
+        TimeTrackingServerResponseSummary(
+          failures = request.timeEntries.size,
+          successes = 0,
+          total = request.timeEntries.size
         )
-      },
-      summary = TimeTrackingServerResponseSummary(
-        failures = request.timeEntries.size,
-        successes = 0,
-        total = request.timeEntries.size
-      )
     )
 
   private fun <T> logAndFail(

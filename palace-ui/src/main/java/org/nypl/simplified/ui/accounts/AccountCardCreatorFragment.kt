@@ -17,7 +17,6 @@ import org.nypl.simplified.webview.WebViewUtilities
  */
 
 class AccountCardCreatorFragment : Fragment(R.layout.fragment_account_card_creator) {
-
   private lateinit var webView: WebView
 
   companion object :
@@ -29,20 +28,14 @@ class AccountCardCreatorFragment : Fragment(R.layout.fragment_account_card_creat
         AccountCardCreatorModel.parameters = this.parameters
       }
 
-      override fun parameters(): AccountCardCreatorParameters {
-        return this.parameters
-      }
+      override fun parameters(): AccountCardCreatorParameters = this.parameters
 
-      override fun fragment(): AccountCardCreatorFragment {
-        return AccountCardCreatorFragment()
-      }
+      override fun fragment(): AccountCardCreatorFragment = AccountCardCreatorFragment()
     }
 
     override fun createScreenDefinition(
       p: AccountCardCreatorParameters
-    ): ScreenDefinitionType<AccountCardCreatorParameters, AccountCardCreatorFragment> {
-      return ScreenSettingsCardCreator(p)
-    }
+    ): ScreenDefinitionType<AccountCardCreatorParameters, AccountCardCreatorFragment> = ScreenSettingsCardCreator(p)
   }
 
   override fun onViewCreated(
@@ -60,7 +53,8 @@ class AccountCardCreatorFragment : Fragment(R.layout.fragment_account_card_creat
       AccountCardCreatorModel.parameters
 
     val url =
-      Uri.parse(parameters.url)
+      Uri
+        .parse(parameters.url)
         .buildUpon()
         .appendQueryParameter("lat", parameters.lat.toString())
         .appendQueryParameter("long", parameters.long.toString())

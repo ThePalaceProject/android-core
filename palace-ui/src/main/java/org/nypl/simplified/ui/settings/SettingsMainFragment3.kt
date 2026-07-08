@@ -27,7 +27,6 @@ import org.nypl.simplified.ui.screens.ScreenDefinitionType
 import org.slf4j.LoggerFactory
 
 class SettingsMainFragment3 : PreferenceFragmentCompat() {
-
   private lateinit var networkAccess: LSHTTPNetworkAccessType
 
   private val logger =
@@ -57,20 +56,12 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
         // No setup required
       }
 
-      override fun parameters() {
-        return Unit
-      }
+      override fun parameters() = Unit
 
-      override fun fragment(): SettingsMainFragment3 {
-        return SettingsMainFragment3()
-      }
+      override fun fragment(): SettingsMainFragment3 = SettingsMainFragment3()
     }
 
-    override fun createScreenDefinition(
-      p: Unit
-    ): ScreenDefinitionType<Unit, SettingsMainFragment3> {
-      return ScreenSettingsMain()
-    }
+    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsMainFragment3> = ScreenSettingsMain()
   }
 
   override fun onStart() {
@@ -108,9 +99,7 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
   }
 
   @UiThread
-  private fun onBatteryOptimizerStatusChanged(
-    enabled: Boolean
-  ) {
+  private fun onBatteryOptimizerStatusChanged(enabled: Boolean) {
     UIThread.checkIsUIThread()
 
     if (enabled) {
@@ -190,14 +179,13 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
     )
   }
 
-  private fun configureBattery(
-    settingsBattery: Preference
-  ) {
-    settingsBattery.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-      val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
-      this.requireActivity().startActivity(intent)
-      true
-    }
+  private fun configureBattery(settingsBattery: Preference) {
+    settingsBattery.onPreferenceClickListener =
+      Preference.OnPreferenceClickListener {
+        val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+        this.requireActivity().startActivity(intent)
+        true
+      }
   }
 
   private fun configureNetwork(
@@ -228,9 +216,7 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
       }
   }
 
-  private fun configureNotifications(
-    settingsNotifications: Preference
-  ) {
+  private fun configureNotifications(settingsNotifications: Preference) {
     this.configureNotificationsText(settingsNotifications)
 
     settingsNotifications.setOnPreferenceClickListener {
@@ -252,9 +238,7 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
     }
   }
 
-  private fun configureNotificationsText(
-    settingsNotifications: Preference
-  ) {
+  private fun configureNotificationsText(settingsNotifications: Preference) {
     try {
       val activity = this.requireActivity()
       if (MainNotifications.notificationsArePermitted(activity)) {
@@ -267,8 +251,8 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
     }
   }
 
-  private fun formatVersion(): String {
-    return try {
+  private fun formatVersion(): String =
+    try {
       val services =
         Services.serviceDirectory()
       val buildConfig =
@@ -287,24 +271,17 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
     } catch (e: Throwable) {
       "Unknown"
     }
-  }
 
-  private fun configureVersion(
-    preference: Preference
-  ) {
+  private fun configureVersion(preference: Preference) {
     preference.setSummaryProvider { this.formatVersion() }
   }
 
-  private fun configureVersionCore(
-    preference: Preference
-  ) {
+  private fun configureVersionCore(preference: Preference) {
     // Hide the Core version if it's similar to the app version
     preference.isVisible = false
   }
 
-  private fun configurePrivacy(
-    preference: Preference
-  ) {
+  private fun configurePrivacy(preference: Preference) {
     val services =
       Services.serviceDirectory()
     val documents =
@@ -326,9 +303,7 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
     }
   }
 
-  private fun configureLicense(
-    preference: Preference
-  ) {
+  private fun configureLicense(preference: Preference) {
     val services =
       Services.serviceDirectory()
     val documents =
@@ -350,9 +325,7 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
     }
   }
 
-  private fun configureFaq(
-    preference: Preference
-  ) {
+  private fun configureFaq(preference: Preference) {
     val services =
       Services.serviceDirectory()
     val documents =
@@ -374,9 +347,7 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
     }
   }
 
-  private fun configureEULA(
-    preference: Preference
-  ) {
+  private fun configureEULA(preference: Preference) {
     val services =
       Services.serviceDirectory()
     val documents =
@@ -398,25 +369,22 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
     }
   }
 
-  private fun configureDebug(
-    preference: Preference
-  ) {
+  private fun configureDebug(preference: Preference) {
     preference.setOnPreferenceClickListener {
       MainNavigation.Settings.openDebugSettings()
       true
     }
 
     val profiles =
-      Services.serviceDirectory()
+      Services
+        .serviceDirectory()
         .requireService(ProfilesControllerType::class.java)
 
     // Show the debug settings menu, if enabled
     preference.isVisible = SettingsModel.showDebugSettings(profiles)
   }
 
-  private fun configureBuild(
-    preference: Preference
-  ) {
+  private fun configureBuild(preference: Preference) {
     val services =
       Services.serviceDirectory()
     val profiles =
@@ -433,9 +401,7 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
     }
   }
 
-  private fun configureAccounts(
-    preference: Preference
-  ) {
+  private fun configureAccounts(preference: Preference) {
     val services =
       Services.serviceDirectory()
     val buildConfig =
@@ -454,9 +420,7 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
     }
   }
 
-  private fun configureAcknowledgements(
-    preference: Preference
-  ) {
+  private fun configureAcknowledgements(preference: Preference) {
     val services =
       Services.serviceDirectory()
     val documents =
@@ -478,9 +442,7 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
     }
   }
 
-  private fun configureAbout(
-    preference: Preference
-  ) {
+  private fun configureAbout(preference: Preference) {
     val services =
       Services.serviceDirectory()
     val documents =

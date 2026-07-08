@@ -12,12 +12,11 @@ enum class MainTabCategory {
   TAB_SETTINGS;
 
   companion object {
-    fun forPart(catalogPart: CatalogPart): MainTabCategory {
-      return when (catalogPart) {
+    fun forPart(catalogPart: CatalogPart): MainTabCategory =
+      when (catalogPart) {
         CATALOG -> TAB_CATALOG
         BOOKS -> TAB_BOOKS
         HOLDS -> TAB_RESERVATIONS
       }
-    }
   }
 }

@@ -42,7 +42,6 @@ import java.net.URI
 import java.util.UUID
 
 class MainActivity : AppCompatActivity(R.layout.main_host) {
-
   private val logger =
     LoggerFactory.getLogger(MainActivity::class.java)
 
@@ -58,9 +57,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
   private var subscriptions: CloseableCollectionType<ClosingResourceFailedException> =
     CloseableCollection.create()
 
-  override fun onCreate(
-    savedInstanceState: Bundle?
-  ) {
+  override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(Bundle())
 
     val intent = this.intent
@@ -91,9 +88,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     }
   }
 
-  private fun onHandleIntent(
-    intent: Intent
-  ) {
+  private fun onHandleIntent(intent: Intent) {
     try {
       if (this.isAutomatedTesting(intent)) {
         this.onHandleAutomatedTesting()
@@ -134,9 +129,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     this.logger.warn("Unimplemented code: Requested login to testing library for automated test suite.")
   }
 
-  private fun isAutomatedTesting(
-    intent: Intent
-  ): Boolean {
+  private fun isAutomatedTesting(intent: Intent): Boolean {
     val extras = intent.extras
     if (extras != null) {
       return extras.getBoolean("AutomatedTesting", false)
@@ -170,9 +163,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     )
   }
 
-  private fun onSplashScreenStatusChanged(
-    status: SplashScreenStatus
-  ) {
+  private fun onSplashScreenStatusChanged(status: SplashScreenStatus) {
     when (status) {
       SPLASH_SCREEN_COMPLETED -> {
         this.switchFragment(MainTabsFragment())
@@ -201,9 +192,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
   }
 
   @UiThread
-  private fun openBookFromBackgroundRequest(
-    bookRequest: MainBackgroundBookOpenRequests.BookOpenRequest
-  ) {
+  private fun openBookFromBackgroundRequest(bookRequest: MainBackgroundBookOpenRequests.BookOpenRequest) {
     this.logger.debug("Received a request to open: {}", bookRequest)
     UIThread.checkIsUIThread()
 
@@ -246,9 +235,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     }
   }
 
-  private fun onAnnouncementsChanged(
-    announcementsToAcknowledge: Map<UUID, AnnouncementsModel.EnumeratedAnnouncement>
-  ) {
+  private fun onAnnouncementsChanged(announcementsToAcknowledge: Map<UUID, AnnouncementsModel.EnumeratedAnnouncement>) {
     if (announcementsToAcknowledge.isNotEmpty()) {
       val tag = "ANNOUNCEMENT"
       val existing = this.supportFragmentManager.findFragmentByTag(tag)
@@ -288,11 +275,10 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     this.subscriptions.close()
   }
 
-  private fun switchFragment(
-    fragment: Fragment
-  ) {
+  private fun switchFragment(fragment: Fragment) {
     this.fragmentNow = fragment
-    this.supportFragmentManager.beginTransaction()
+    this.supportFragmentManager
+      .beginTransaction()
       .replace(R.id.mainFragmentHolder, fragment)
       .commit()
   }
@@ -309,7 +295,8 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
       val profiles =
         services.requireService(ProfilesControllerType::class.java)
       val account =
-        profiles.profileCurrent()
+        profiles
+          .profileCurrent()
           .account(book.account)
 
       val task = TaskRecorder.create()
@@ -327,13 +314,14 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
       MainNavigation.openErrorPage(
         activity = this,
-        parameters = ErrorPageParameters(
-          emailAddress = buildConfig.supportErrorReportEmailAddress,
-          body = "",
-          subject = "[palace-error-report]",
-          attributes = error.attributes.toSortedMap(),
-          taskSteps = error.steps
-        )
+        parameters =
+          ErrorPageParameters(
+            emailAddress = buildConfig.supportErrorReportEmailAddress,
+            body = "",
+            subject = "[palace-error-report]",
+            attributes = error.attributes.toSortedMap(),
+            taskSteps = error.steps
+          )
       )
     } catch (e: Throwable) {
       this.logger.error("Failed to open error page: ", e)

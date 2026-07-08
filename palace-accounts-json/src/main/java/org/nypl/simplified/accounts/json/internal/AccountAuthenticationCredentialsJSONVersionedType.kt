@@ -9,7 +9,6 @@ import org.nypl.simplified.json.core.JSONParseException
  */
 
 interface AccountAuthenticationCredentialsJSONVersionedType {
-
   /**
    * The supported format version.
    */
@@ -26,7 +25,5 @@ interface AccountAuthenticationCredentialsJSONVersionedType {
    */
 
   @Throws(JSONParseException::class)
-  fun deserializeFromJSON(
-    node: JsonNode
-  ): AccountAuthenticationCredentials
+  fun deserializeFromJSON(node: JsonNode): AccountAuthenticationCredentials
 }

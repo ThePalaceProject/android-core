@@ -14,144 +14,116 @@ data class OPDSAcquisitionFeedEntry(
    * @return The list of acquisitions
    */
   val acquisitions: List<OPDSAcquisition>,
-
   /**
    * @return The list of authors
    */
   val authors: List<String>,
-
   /**
    * @return The entry availability
    */
   val availability: OPDSAvailabilityType,
-
   /**
    * @return The list of categories
    */
   val categories: List<OPDSCategory>,
-
   /**
    * @return The cover image
    */
   val cover: URI?,
-
   /**
    * @return The list of preview acquisitions
    */
   val previewAcquisitions: List<OPDSPreviewAcquisition>,
-
   /**
    * @return the annotations url
    */
   val annotations: URI?,
-
   /**
    * @return The groups
    */
   val groups: Set<Pair<String, URI>>,
-
   /**
    * @return The entry ID
    */
   val id: String,
-
   /**
    * @return The report issues URI
    */
   val issues: URI?,
-
   /**
    * @return The related feed url
    */
   val related: URI?,
-
   /**
    * @return The entry publication date, if any
    */
   val published: DateTime?,
-
   /**
    * @return The publisher, if any
    */
   val publisher: String?,
-
   /**
    * @return The distribution, if any
    */
   val distribution: String,
-
   /**
    * @return The summary
    */
   val summary: String,
-
   /**
    * @return The list of narrators
    */
   val narrators: List<String>,
-
   /**
    * @return The thumbnail, if any
    */
   val thumbnail: URI?,
-
   /**
    * @return The time tracking uri, if any
    */
   val timeTrackingUri: URI?,
-
   /**
    * @return The title
    */
   val title: String,
-
   /**
    * @return The time of the last update
    */
   val updated: DateTime,
-
   /**
    * @return alternate url
    */
   val alternate: URI?,
-
   /**
    * @return analytics url
    */
   val analytics: URI?,
-
   /**
    * @return The licensor
    */
   val licensor: DRMLicensor?,
-
   /**
    * @return The list of parse errors encountered, if any
    */
   val errors: List<ParseError>,
-
   /**
    * @return Duration in seconds
    */
   val duration: Double?,
-
   /**
    * @return language, if any
    */
   val language: String?,
-
   /**
    * @return audience, if any
    */
   val audience: String?,
-
   /**
    * @return series, if any
    */
 
   val series: OPDSSeries?
 ) : Serializable {
-
   companion object {
     @JvmStatic
     fun newBuilder(
@@ -159,9 +131,7 @@ data class OPDSAcquisitionFeedEntry(
       title: String,
       updated: DateTime,
       availability: OPDSAvailabilityType
-    ): OPDSAcquisitionFeedEntryBuilderType {
-      return Builder(id, title, updated, availability)
-    }
+    ): OPDSAcquisitionFeedEntryBuilderType = Builder(id, title, updated, availability)
   }
 
   /**
@@ -187,12 +157,13 @@ data class OPDSAcquisitionFeedEntry(
    * Convert to a mutable builder.
    */
   fun toBuilder(): Builder {
-    val b = Builder(
-      this.id,
-      this.title,
-      this.updated,
-      this.availability
-    )
+    val b =
+      Builder(
+        this.id,
+        this.title,
+        this.updated,
+        this.availability
+      )
 
     b.acquisitionList.addAll(this.acquisitions)
     b.authors.addAll(this.authors)
@@ -232,7 +203,6 @@ data class OPDSAcquisitionFeedEntry(
     private val updated: DateTime,
     private var availability: OPDSAvailabilityType
   ) : OPDSAcquisitionFeedEntryBuilderType {
-
     val acquisitionList = mutableListOf<OPDSAcquisition>()
     val authors = mutableListOf<String>()
     val categories = mutableListOf<OPDSCategory>()
@@ -279,7 +249,10 @@ data class OPDSAcquisitionFeedEntry(
       return this
     }
 
-    override fun addGroup(uri: URI, name: String): Builder {
+    override fun addGroup(
+      uri: URI,
+      name: String
+    ): Builder {
       this.groups += (name to uri)
       return this
     }
@@ -392,12 +365,10 @@ data class OPDSAcquisitionFeedEntry(
       return this
     }
 
-    override fun getAcquisitions(): List<OPDSAcquisition> {
-      return this.acquisitionList
-    }
+    override fun getAcquisitions(): List<OPDSAcquisition> = this.acquisitionList
 
-    override fun build(): OPDSAcquisitionFeedEntry {
-      return OPDSAcquisitionFeedEntry(
+    override fun build(): OPDSAcquisitionFeedEntry =
+      OPDSAcquisitionFeedEntry(
         acquisitions = this.acquisitionList.toList(),
         alternate = this.alternate,
         analytics = this.analytics,
@@ -427,6 +398,5 @@ data class OPDSAcquisitionFeedEntry(
         title = this.title,
         updated = this.updated,
       )
-    }
   }
 }

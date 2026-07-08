@@ -41,7 +41,6 @@ class FeedLoader private constructor(
   private val searchParser: OPDSSearchParserType,
   private val transport: OPDSFeedTransportType<AccountAuthenticationCredentials?>
 ) : FeedLoaderType {
-
   private val log = LoggerFactory.getLogger(FeedLoader::class.java)
 
   private val filterFlag =
@@ -62,12 +61,14 @@ class FeedLoader private constructor(
     val future = CompletableFuture<FeedLoaderResult>()
     this.exec.execute {
       try {
-        future.complete(this.fetchSynchronously(
-          accountId = accountID,
-          uri = uri,
-          credentials = credentials,
-          method = method
-        ))
+        future.complete(
+          this.fetchSynchronously(
+            accountId = accountID,
+            uri = uri,
+            credentials = credentials,
+            method = method
+          )
+        )
       } catch (e: Throwable) {
         future.completeExceptionally(e)
       }
@@ -137,9 +138,7 @@ class FeedLoader private constructor(
     }
   }
 
-  private fun isEntrySupported(
-    entry: OPDSAcquisitionFeedEntry
-  ): Boolean {
+  private fun isEntrySupported(entry: OPDSAcquisitionFeedEntry): Boolean {
     if (!this.showOnlySupportedBooks) {
       return true
     }
@@ -165,9 +164,7 @@ class FeedLoader private constructor(
       ACQUISITION_SUBSCRIBE -> false
     }
 
-  private fun isTypePathSupported(path: OPDSAcquisitionPath): Boolean {
-    return this.bookFormatSupport.isSupportedPath(path.asMIMETypes())
-  }
+  private fun isTypePathSupported(path: OPDSAcquisitionPath): Boolean = this.bookFormatSupport.isSupportedPath(path.asMIMETypes())
 
   private fun parseFromContentResolver(
     accountId: AccountID,
@@ -177,12 +174,13 @@ class FeedLoader private constructor(
     return if (streamMaybe != null) {
       streamMaybe.use { stream ->
         FeedLoaderSuccess(
-          feed = Feed.fromAcquisitionFeed(
-            accountId = accountId,
-            feed = this.parser.parse(uri, stream),
-            search = null,
-            filter = this::isEntrySupported
-          ),
+          feed =
+            Feed.fromAcquisitionFeed(
+              accountId = accountId,
+              feed = this.parser.parse(uri, stream),
+              search = null,
+              filter = this::isEntrySupported
+            ),
           accessToken = null
         )
       }
@@ -191,9 +189,10 @@ class FeedLoader private constructor(
         problemReport = null,
         exception = FileNotFoundException(),
         message = "File not found!",
-        attributesInitial = mapOf(
-          Pair("URI", uri.toASCIIString())
-        )
+        attributesInitial =
+          mapOf(
+            Pair("URI", uri.toASCIIString())
+          )
       )
     }
   }
@@ -201,12 +200,11 @@ class FeedLoader private constructor(
   private fun errorAttributesOf(
     uri: URI,
     method: String
-  ): SortedMap<String, String> {
-    return sortedMapOf(
+  ): SortedMap<String, String> =
+    sortedMapOf(
       Pair("Feed", uri.toString()),
       Pair("Method", method)
     )
-  }
 
   private fun fetchSearchLink(
     opdsFeed: OPDSAcquisitionFeed,
@@ -225,7 +223,6 @@ class FeedLoader private constructor(
   }
 
   companion object {
-
     /**
      * Create a new feed loader.
      */
@@ -237,8 +234,8 @@ class FeedLoader private constructor(
       parser: OPDSFeedParserType,
       searchParser: OPDSSearchParserType,
       transport: OPDSFeedTransportType<AccountAuthenticationCredentials?>,
-    ): FeedLoaderType {
-      return FeedLoader(
+    ): FeedLoaderType =
+      FeedLoader(
         bookFormatSupport = bookFormatSupport,
         contentResolver = contentResolver,
         exec = exec,
@@ -246,6 +243,5 @@ class FeedLoader private constructor(
         searchParser = searchParser,
         transport = transport
       )
-    }
   }
 }

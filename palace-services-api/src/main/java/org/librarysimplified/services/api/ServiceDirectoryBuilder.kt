@@ -6,13 +6,10 @@ import org.slf4j.LoggerFactory
 internal class ServiceDirectoryBuilder(
   private val services: MutableMap<Class<*>, MutableList<Any>>
 ) : ServiceDirectoryBuilderType {
-
   private val logger =
     LoggerFactory.getLogger(ServiceDirectoryBuilder::class.java)
 
-  override fun build(): ServiceDirectoryType {
-    return ServiceDirectory(this.services.toMap())
-  }
+  override fun build(): ServiceDirectoryType = ServiceDirectory(this.services.toMap())
 
   override fun <T : Any> addService(
     interfaces: List<Class<T>>,

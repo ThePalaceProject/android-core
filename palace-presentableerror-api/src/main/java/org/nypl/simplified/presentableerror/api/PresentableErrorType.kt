@@ -15,8 +15,9 @@ import java.io.Serializable
  */
 
 @ThreadSafe
-interface PresentableErrorType : PresentableType, Serializable {
-
+interface PresentableErrorType :
+  PresentableType,
+  Serializable {
   /**
    * An exception associated with the error, if any. This is primarily useful for providing
    * a stack trace as opposed to communicating other useful information.

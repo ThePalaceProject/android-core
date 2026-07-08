@@ -11,8 +11,9 @@ import org.nypl.simplified.ui.main.MainNavigation
 import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
 import org.nypl.simplified.ui.screens.ScreenDefinitionType
 
-class SettingsDebugMenuFragment : Fragment(R.layout.debug), MainBackButtonConsumerType {
-
+class SettingsDebugMenuFragment :
+  Fragment(R.layout.debug),
+  MainBackButtonConsumerType {
   private lateinit var toolbarBack: View
   private lateinit var itemAuto: ViewGroup
   private lateinit var itemBooks: ViewGroup
@@ -29,18 +30,12 @@ class SettingsDebugMenuFragment : Fragment(R.layout.debug), MainBackButtonConsum
         // No setup required
       }
 
-      override fun parameters() {
-        return Unit
-      }
+      override fun parameters() = Unit
 
-      override fun fragment(): SettingsDebugMenuFragment {
-        return SettingsDebugMenuFragment()
-      }
+      override fun fragment(): SettingsDebugMenuFragment = SettingsDebugMenuFragment()
     }
 
-    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuFragment> {
-      return ScreenSettingsDebugMenu()
-    }
+    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuFragment> = ScreenSettingsDebugMenu()
   }
 
   override fun onViewCreated(

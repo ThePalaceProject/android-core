@@ -7,7 +7,6 @@ import org.nypl.simplified.taskrecorder.api.TaskResult
  */
 
 interface BorrowTaskType {
-
   /**
    * Execute the borrow task.
    */

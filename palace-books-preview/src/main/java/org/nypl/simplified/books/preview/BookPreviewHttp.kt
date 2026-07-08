@@ -8,7 +8,6 @@ import org.nypl.simplified.books.book_database.api.BookFormats
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 
 class BookPreviewHttp {
-
   private fun onDownloadProgressEvent(
     parameters: BookPreviewParameters,
     event: LSHTTPDownloadState
@@ -38,14 +37,14 @@ class BookPreviewHttp {
     }
   }
 
-  private fun createDownloadRequest(
-    parameters: BookPreviewParameters
-  ): LSHTTPDownloadRequest {
+  private fun createDownloadRequest(parameters: BookPreviewParameters): LSHTTPDownloadRequest {
     val uri = parameters.previewAcquisition.uri
 
-    val request = parameters.httpClient.newRequest(uri)
-      .allowRedirects(LSHTTPRequestBuilderType.AllowRedirects.ALLOW_UNSAFE_REDIRECTS)
-      .build()
+    val request =
+      parameters.httpClient
+        .newRequest(uri)
+        .allowRedirects(LSHTTPRequestBuilderType.AllowRedirects.ALLOW_UNSAFE_REDIRECTS)
+        .build()
 
     return LSHTTPDownloadRequest(
       request = request,
@@ -63,14 +62,13 @@ class BookPreviewHttp {
     )
   }
 
-  private fun saveDownloadedContent(
-    parameters: BookPreviewParameters
-  ) {
+  private fun saveDownloadedContent(parameters: BookPreviewParameters) {
     parameters.taskRecorder.beginNewStep("Saving book...")
 
-    val storage = BookPreviewStorage(
-      parameters.temporaryDirectory
-    )
+    val storage =
+      BookPreviewStorage(
+        parameters.temporaryDirectory
+      )
 
     when (parameters.format) {
       BookFormats.BookFormatDefinition.BOOK_FORMAT_AUDIO -> {
@@ -82,6 +80,7 @@ class BookPreviewHttp {
           }
         )
       }
+
       BookFormats.BookFormatDefinition.BOOK_FORMAT_EPUB -> {
         storage.saveBookPreview(
           file = parameters.getTemporaryFile(),
@@ -90,6 +89,7 @@ class BookPreviewHttp {
           }
         )
       }
+
       else -> {
         throw Exception("Unsupported book preview")
       }
@@ -100,13 +100,12 @@ class BookPreviewHttp {
     expectedSize: Long?,
     currentSize: Long,
     perSecond: Long
-  ): String {
-    return if (expectedSize == null) {
+  ): String =
+    if (expectedSize == null) {
       "Downloading..."
     } else {
       "Downloading $currentSize / $expectedSize ($perSecond)..."
     }
-  }
 
   private fun handleHttpError(
     taskRecorder: TaskRecorderType,
@@ -128,14 +127,16 @@ class BookPreviewHttp {
     parameters.taskRecorder.addAttribute("URI", uri.toString())
 
     try {
-      val downloadRequest = createDownloadRequest(
-        parameters = parameters
-      )
+      val downloadRequest =
+        createDownloadRequest(
+          parameters = parameters
+        )
 
       when (val result = LSHTTPDownloads.download(downloadRequest)) {
         is LSHTTPDownloadState.LSHTTPDownloadResult.DownloadCompletedSuccessfully -> {
           this.saveDownloadedContent(parameters)
         }
+
         else -> {
           handleHttpError(
             taskRecorder = parameters.taskRecorder,

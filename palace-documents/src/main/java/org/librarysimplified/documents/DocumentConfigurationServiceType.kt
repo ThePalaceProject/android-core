@@ -5,7 +5,6 @@ package org.librarysimplified.documents
  */
 
 interface DocumentConfigurationServiceType {
-
   /**
    * @return The application privacy policy, if any.
    */

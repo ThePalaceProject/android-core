@@ -11,7 +11,6 @@ import java.net.URI
  */
 
 interface BookCoverProviderType {
-
   /**
    * Pause loading of any covers. Loading will continue upon calling [loadingThumbnailsContinue].
    */

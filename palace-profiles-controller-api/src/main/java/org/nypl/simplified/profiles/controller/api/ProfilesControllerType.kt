@@ -25,7 +25,6 @@ import java.util.SortedMap
  */
 
 interface ProfilesControllerType {
-
   /**
    * @return A read-only view of the current profiles
    */
@@ -58,9 +57,7 @@ interface ProfilesControllerType {
    * @return A future that returns the result of logging in
    */
 
-  fun profileAccountLogin(
-    request: ProfileAccountLoginRequest
-  ): FluentFuture<TaskResult<Unit>>
+  fun profileAccountLogin(request: ProfileAccountLoginRequest): FluentFuture<TaskResult<Unit>>
 
   /**
    * Create an account using the given account provider. The operation will fail if
@@ -70,9 +67,7 @@ interface ProfilesControllerType {
    * @return A future that returns the result of creating the account
    */
 
-  fun profileAccountCreate(
-    provider: URI
-  ): FluentFuture<TaskResult<AccountType>>
+  fun profileAccountCreate(provider: URI): FluentFuture<TaskResult<AccountType>>
 
   /**
    * Create an account using the URI of an OPDS feed. The given feed is parsed in order to
@@ -82,9 +77,7 @@ interface ProfilesControllerType {
    * @return A future that returns the result of creating the account
    */
 
-  fun profileAccountCreateCustomOPDS(
-    opdsFeed: URI
-  ): FluentFuture<TaskResult<AccountType>>
+  fun profileAccountCreateCustomOPDS(opdsFeed: URI): FluentFuture<TaskResult<AccountType>>
 
   /**
    * Create an account using the given account provider, or return an existing account
@@ -94,9 +87,7 @@ interface ProfilesControllerType {
    * @return A future that returns the result of creating the account
    */
 
-  fun profileAccountCreateOrReturnExisting(
-    provider: URI
-  ): FluentFuture<TaskResult<AccountType>>
+  fun profileAccountCreateOrReturnExisting(provider: URI): FluentFuture<TaskResult<AccountType>>
 
   /**
    * Create an account using the given account provider. The operation will fail if
@@ -107,9 +98,7 @@ interface ProfilesControllerType {
    * @return A future that returns details of the task execution
    */
 
-  fun profileAccountDeleteByProvider(
-    provider: URI
-  ): FluentFuture<TaskResult<Unit>>
+  fun profileAccountDeleteByProvider(provider: URI): FluentFuture<TaskResult<Unit>>
 
   /**
    * Find an account int the current profile using the given provider.
@@ -120,9 +109,7 @@ interface ProfilesControllerType {
    * @see .profileAnonymousEnabled
    */
 
-  fun profileAccountFindByProvider(
-    provider: URI
-  ): AccountType
+  fun profileAccountFindByProvider(provider: URI): AccountType
 
   /**
    * @return An observable that publishes account events
@@ -145,9 +132,7 @@ interface ProfilesControllerType {
    * @return A future that returns the result of logging out
    */
 
-  fun profileAccountLogout(
-    accountID: AccountID
-  ): FluentFuture<TaskResult<Unit>>
+  fun profileAccountLogout(accountID: AccountID): FluentFuture<TaskResult<Unit>>
 
   /**
    * Update values for the current profile.
@@ -157,9 +142,7 @@ interface ProfilesControllerType {
    * @see .profileAnonymousEnabled
    */
 
-  fun profileUpdate(
-    update: (ProfileDescription) -> ProfileDescription
-  ): FluentFuture<ProfileUpdated>
+  fun profileUpdate(update: (ProfileDescription) -> ProfileDescription): FluentFuture<ProfileUpdated>
 
   /**
    * Produce a feed of all the books in the current profile.
@@ -169,9 +152,7 @@ interface ProfilesControllerType {
    * @see .profileAnonymousEnabled
    */
 
-  fun profileFeed(
-    request: ProfileFeedRequest
-  ): FluentFuture<Feed.FeedWithoutGroups>
+  fun profileFeed(request: ProfileFeedRequest): FluentFuture<Feed.FeedWithoutGroups>
 
   /**
    * Return the account that owns the given book ID in the current profile, or assume that the

@@ -62,17 +62,15 @@ class BorrowTask private constructor(
   private val requirements: BorrowRequirements,
   private val request: BorrowRequest
 ) : BorrowTaskType {
-
   companion object : BorrowTaskFactoryType {
     override fun createBorrowTask(
       requirements: BorrowRequirements,
       request: BorrowRequest
-    ): BorrowTaskType {
-      return BorrowTask(
+    ): BorrowTaskType =
+      BorrowTask(
         requirements = requirements,
         request = request
       )
-    }
   }
 
   private val logger =
@@ -95,16 +93,24 @@ class BorrowTask private constructor(
 
   private class BorrowFailedNoNetwork : Exception("No network!")
 
-  private class BorrowFailedHandled(exception: Throwable?) : Exception(exception)
+  private class BorrowFailedHandled(
+    exception: Throwable?
+  ) : Exception(exception)
 
-  private fun debug(message: String, vararg arguments: Any?) =
-    this.logger.debug("[{}] $message", this.bookIdBrief, *arguments)
+  private fun debug(
+    message: String,
+    vararg arguments: Any?
+  ) = this.logger.debug("[{}] $message", this.bookIdBrief, *arguments)
 
-  private fun error(message: String, vararg arguments: Any?) =
-    this.logger.error("[{}] $message", this.bookIdBrief, *arguments)
+  private fun error(
+    message: String,
+    vararg arguments: Any?
+  ) = this.logger.error("[{}] $message", this.bookIdBrief, *arguments)
 
-  private fun warn(message: String, vararg arguments: Any?) =
-    this.logger.warn("[{}] $message", this.bookIdBrief, *arguments)
+  private fun warn(
+    message: String,
+    vararg arguments: Any?
+  ) = this.logger.warn("[{}] $message", this.bookIdBrief, *arguments)
 
   override fun execute(): TaskResult<*> {
     this.taskRecorder = TaskRecorder.create()
@@ -149,8 +155,7 @@ class BorrowTask private constructor(
     this.cancelled.set(true)
   }
 
-  private fun messageOrName(e: Throwable) =
-    e.message ?: e.javaClass.name
+  private fun messageOrName(e: Throwable) = e.message ?: e.javaClass.name
 
   private fun executeStart(start: BorrowRequest.Start): TaskResult<*> {
     this.taskRecorder.addAttribute("Book", start.opdsAcquisitionFeedEntry.title)
@@ -224,7 +229,8 @@ class BorrowTask private constructor(
         temporaryDirectory = this.requirements.temporaryDirectory,
       )
 
-    when (this.requirements.httpClient.networkAccess.canUseNetwork()) {
+    when (this.requirements.httpClient.networkAccess
+      .canUseNetwork()) {
       NETWORK_UNAVAILABLE -> {
         this.taskRecorder.currentStepFailed(
           message = "The network is currently unavailable.",
@@ -311,12 +317,13 @@ class BorrowTask private constructor(
         }
 
         is BorrowReachedLoanLimit -> {
-          step.resolution = TaskStepFailed(
-            message = "Subtask '$name' raised an unexpected exception",
-            exception = e,
-            errorCode = subtaskFailed,
-            extraMessages = listOf()
-          )
+          step.resolution =
+            TaskStepFailed(
+              message = "Subtask '$name' raised an unexpected exception",
+              exception = e,
+              errorCode = subtaskFailed,
+              extraMessages = listOf()
+            )
           throw e
         }
 
@@ -329,12 +336,13 @@ class BorrowTask private constructor(
         }
       }
     } catch (e: Exception) {
-      step.resolution = TaskStepFailed(
-        message = "Subtask '$name' raised an unexpected exception",
-        exception = e,
-        errorCode = subtaskFailed,
-        extraMessages = listOf()
-      )
+      step.resolution =
+        TaskStepFailed(
+          message = "Subtask '$name' raised an unexpected exception",
+          exception = e,
+          errorCode = subtaskFailed,
+          extraMessages = listOf()
+        )
       this.publishBookFailure(book)
       throw BorrowFailedHandled(e)
     }
@@ -412,20 +420,21 @@ class BorrowTask private constructor(
     this.taskRecorder.beginNewStep("Locating account ${book.account.uuid} in the profile...")
     this.taskRecorder.addAttribute("Account ID", book.account.uuid.toString())
 
-    val account = try {
-      profile.account(this.request.accountId)
-    } catch (e: Throwable) {
-      this.error("[{}]: failed to find account: ", book.id.brief(), e)
-      this.taskRecorder.currentStepFailedAppending(
-        message = "An unexpected exception was raised.",
-        errorCode = accountsDatabaseException,
-        exception = e,
-        extraMessages = listOf()
-      )
+    val account =
+      try {
+        profile.account(this.request.accountId)
+      } catch (e: Throwable) {
+        this.error("[{}]: failed to find account: ", book.id.brief(), e)
+        this.taskRecorder.currentStepFailedAppending(
+          message = "An unexpected exception was raised.",
+          errorCode = accountsDatabaseException,
+          exception = e,
+          extraMessages = listOf()
+        )
 
-      this.publishBookFailure(book)
-      throw BorrowFailedHandled(e)
-    }
+        this.publishBookFailure(book)
+        throw BorrowFailedHandled(e)
+      }
 
     this.taskRecorder.addAttribute("Account", account.provider.displayName)
     this.taskRecorder.currentStepSucceeded("Located account.")
@@ -495,9 +504,7 @@ class BorrowTask private constructor(
     override val audiobookAuthorizationHandler: BorrowAudiobookAuthorizationHandler,
     override val profile: ProfileType
   ) : BorrowContextType {
-
-    override fun cacheDirectory(): File =
-      this.cacheDirectory
+    override fun cacheDirectory(): File = this.cacheDirectory
 
     override val adobeExecutorTimeout: BorrowTimeoutConfiguration =
       BorrowTimeoutConfiguration(300L, TimeUnit.SECONDS)
@@ -574,9 +581,7 @@ class BorrowTask private constructor(
       )
     }
 
-    override fun chooseNewAcquisitionPath(
-      entry: OPDSAcquisitionFeedEntry
-    ): Link {
+    override fun chooseNewAcquisitionPath(entry: OPDSAcquisitionFeedEntry): Link {
       val path = this.borrowTask.pickAcquisitionPath(this.bookCurrent, entry)
       this.logDebug("Selected a new acquisition path.")
       check(path.elements.isNotEmpty()) { "Selected acquisition path cannot be empty!" }
@@ -653,18 +658,22 @@ class BorrowTask private constructor(
     private val bookIdBrief =
       bookInitial.id.brief()
 
-    override fun logDebug(message: String, vararg arguments: Any?) =
-      this.logger.debug("[{}] $message", this.bookIdBrief, *arguments)
+    override fun logDebug(
+      message: String,
+      vararg arguments: Any?
+    ) = this.logger.debug("[{}] $message", this.bookIdBrief, *arguments)
 
-    override fun logError(message: String, vararg arguments: Any?) =
-      this.logger.error("[{}] $message", this.bookIdBrief, *arguments)
+    override fun logError(
+      message: String,
+      vararg arguments: Any?
+    ) = this.logger.error("[{}] $message", this.bookIdBrief, *arguments)
 
-    override fun logWarn(message: String, vararg arguments: Any?) =
-      this.logger.warn("[{}] $message", this.bookIdBrief, *arguments)
+    override fun logWarn(
+      message: String,
+      vararg arguments: Any?
+    ) = this.logger.warn("[{}] $message", this.bookIdBrief, *arguments)
 
-    override fun temporaryFile(
-      extension: String
-    ): File {
+    override fun temporaryFile(extension: String): File {
       val ext = if (extension.length > 0) ".$extension" else ""
 
       this.temporaryDirectory.mkdirs()
@@ -677,8 +686,6 @@ class BorrowTask private constructor(
       throw IOException("Could not create a temporary file within 100 attempts!")
     }
 
-    override fun opdsAcquisitionPathRemaining(): List<OPDSAcquisitionPathElement> {
-      return this.currentRemainingOPDSPathElements
-    }
+    override fun opdsAcquisitionPathRemaining(): List<OPDSAcquisitionPathElement> = this.currentRemainingOPDSPathElements
   }
 }

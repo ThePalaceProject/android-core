@@ -21,18 +21,17 @@ import org.nypl.simplified.webview.WebViewUtilities
 import java.io.BufferedReader
 
 class BookPreviewEmbeddedFragment : Fragment() {
-
   companion object {
     private const val BUNDLE_EXTRA_URL =
       "org.librarysimplified.viewer.preview.BookPreviewEmbeddedFragment.url"
 
-    fun newInstance(url: String): BookPreviewEmbeddedFragment {
-      return BookPreviewEmbeddedFragment().apply {
-        arguments = Bundle().apply {
-          putString(BUNDLE_EXTRA_URL, url)
-        }
+    fun newInstance(url: String): BookPreviewEmbeddedFragment =
+      BookPreviewEmbeddedFragment().apply {
+        arguments =
+          Bundle().apply {
+            putString(BUNDLE_EXTRA_URL, url)
+          }
       }
-    }
   }
 
   private val playerMediaReceiver by lazy {
@@ -50,11 +49,12 @@ class BookPreviewEmbeddedFragment : Fragment() {
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
-  ): View? {
-    return inflater.inflate(R.layout.fragment_book_preview_embedded, container, false)
-  }
+  ): View? = inflater.inflate(R.layout.fragment_book_preview_embedded, container, false)
 
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+  override fun onViewCreated(
+    view: View,
+    savedInstanceState: Bundle?
+  ) {
     super.onViewCreated(view, savedInstanceState)
 
     this.webView = view.findViewById(R.id.web_view)
@@ -103,7 +103,10 @@ class BookPreviewEmbeddedFragment : Fragment() {
   }
 
   private inner class CustomWebViewClient : WebViewClient() {
-    override fun onPageFinished(view: WebView?, url: String?) {
+    override fun onPageFinished(
+      view: WebView?,
+      url: String?
+    ) {
       injectJavaScript()
       super.onPageFinished(view, url)
     }
@@ -129,7 +132,6 @@ class BookPreviewEmbeddedFragment : Fragment() {
   }
 
   private inner class CustomWebChromeClient : WebChromeClient() {
-
     private val window = requireActivity().window
     private val windowInsetsController =
       WindowCompat.getInsetsController(window, window.decorView)
@@ -147,7 +149,10 @@ class BookPreviewEmbeddedFragment : Fragment() {
       windowInsetsController?.show(WindowInsetsCompat.Type.systemBars())
     }
 
-    override fun onShowCustomView(view: View?, callback: CustomViewCallback?) {
+    override fun onShowCustomView(
+      view: View?,
+      callback: CustomViewCallback?
+    ) {
       val decorView = requireActivity().window.decorView as? FrameLayout ?: return
       webView.isVisible = false
 

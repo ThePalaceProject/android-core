@@ -23,20 +23,17 @@ class BookDRMInformationHandleACS(
   private val directory: File,
   format: BookFormats.BookFormatDefinition,
   private val onUpdate: () -> Unit
-) : BookDRMInformationHandle.ACSHandle(), BookDRMInformationHandleBase {
-
+) : BookDRMInformationHandle.ACSHandle(),
+  BookDRMInformationHandleBase {
   private val objectMapper = ObjectMapper()
   private val closed = AtomicBoolean(false)
 
   companion object {
-    fun nameRights(format: BookFormats.BookFormatDefinition) =
-      "${format.shortName}-rights_adobe.xml"
+    fun nameRights(format: BookFormats.BookFormatDefinition) = "${format.shortName}-rights_adobe.xml"
 
-    fun nameACSM(format: BookFormats.BookFormatDefinition) =
-      "${format.shortName}-meta_adobe.acsm"
+    fun nameACSM(format: BookFormats.BookFormatDefinition) = "${format.shortName}-meta_adobe.acsm"
 
-    fun nameMetaJSON(format: BookFormats.BookFormatDefinition) =
-      "${format.shortName}-meta_adobe.json"
+    fun nameMetaJSON(format: BookFormats.BookFormatDefinition) = "${format.shortName}-meta_adobe.json"
 
     fun names(format: BookFormats.BookFormatDefinition) =
       listOf(
@@ -84,24 +81,22 @@ class BookDRMInformationHandleACS(
     fileAdobeRights: File,
     fileAdobeACSM: File,
     fileAdobeMeta: File
-  ): BookDRMInformation.ACS {
-    return BookDRMInformation.ACS(
+  ): BookDRMInformation.ACS =
+    BookDRMInformation.ACS(
       acsmFile = if (fileAdobeACSM.isFile) fileAdobeACSM else null,
       rights = this.loadAdobeRightsInformationIfPresent(fileAdobeRights, fileAdobeMeta)
     )
-  }
 
   @Throws(IOException::class)
   private fun loadAdobeRightsInformationIfPresent(
     fileAdobeRights: File,
     fileAdobeMeta: File
-  ): Pair<File, AdobeAdeptLoan>? {
-    return if (fileAdobeRights.isFile) {
+  ): Pair<File, AdobeAdeptLoan>? =
+    if (fileAdobeRights.isFile) {
       this.loadAdobeRightsInformation(fileAdobeRights, fileAdobeMeta)
     } else {
       null
     }
-  }
 
   @Throws(IOException::class)
   private fun loadAdobeRightsInformation(
@@ -124,9 +119,7 @@ class BookDRMInformationHandleACS(
     }
 
   @Throws(IOException::class)
-  override fun setACSMFile(
-    acsm: File?
-  ): BookDRMInformation.ACS {
+  override fun setACSMFile(acsm: File?): BookDRMInformation.ACS {
     check(!this.closed.get()) { "Handle must not have been closed" }
 
     return try {
@@ -152,9 +145,7 @@ class BookDRMInformationHandleACS(
   }
 
   @Throws(IOException::class)
-  override fun setAdobeRightsInformation(
-    loan: AdobeAdeptLoan?
-  ): BookDRMInformation.ACS {
+  override fun setAdobeRightsInformation(loan: AdobeAdeptLoan?): BookDRMInformation.ACS {
     check(!this.closed.get()) { "Handle must not have been closed" }
 
     return try {

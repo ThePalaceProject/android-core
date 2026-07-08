@@ -52,14 +52,11 @@ import java.net.URI
  */
 
 class BorrowLoanCreate private constructor() : BorrowSubtaskType {
-
   companion object : BorrowSubtaskFactoryType {
     override val name: String
       get() = "Create OPDS Loan"
 
-    override fun createSubtask(): BorrowSubtaskType {
-      return BorrowLoanCreate()
-    }
+    override fun createSubtask(): BorrowSubtaskType = BorrowLoanCreate()
 
     override fun isApplicableFor(
       type: MIMEType,
@@ -93,7 +90,8 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
         AccountAuthenticatedHTTP.createAuthorizationIfPresent(credentials)
 
       val request =
-        context.httpClient.newRequest(currentURI)
+        context.httpClient
+          .newRequest(currentURI)
           .setMethod(Put(ByteArray(0), applicationOctetStream))
           .setAuthorization(auth)
           .addBasicTokenPropertiesIfApplicable(credentials)
@@ -105,9 +103,11 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
             context.account.updateBasicTokenCredentials(status.getAccessToken())
             this.handleOKRequest(context, currentURI, status)
           }
+
           is LSHTTPResponseStatus.Responded.Error -> {
             this.handleHTTPError(context, status)
           }
+
           is LSHTTPResponseStatus.Failed -> {
             this.handleHTTPFailure(context, status)
           }
@@ -170,6 +170,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
           context.bookLoanFailedBadCredentials()
           BorrowRecoverableAuthenticationError()
         }
+
         Handled401.ErrorIsUnrecoverable -> {
           BorrowSubtaskFailed()
         }
@@ -234,7 +235,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
         throw BorrowSubtaskHaltedEarly()
       }
 
-      /**
+      /*
        * If the book is available to be placed on hold, set the
        * appropriate status.
        *
@@ -251,7 +252,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
         throw BorrowSubtaskFailed()
       }
 
-      /**
+      /*
        * If the book claims to be only "loanable", then something is
        * definitely wrong.
        *
@@ -292,7 +293,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
         )
       }
 
-      /**
+      /*
        * The server cannot return a "revoked" representation. Reaching
        * this code indicates a serious bug in the application.
        */

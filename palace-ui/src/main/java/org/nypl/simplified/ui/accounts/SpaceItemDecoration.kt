@@ -13,7 +13,8 @@ class SpaceItemDecoration(
   private val marginOnInitialItem: Boolean = true
 ) : RecyclerView.ItemDecoration() {
   private val space =
-    TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, margin, context.resources.displayMetrics)
+    TypedValue
+      .applyDimension(TypedValue.COMPLEX_UNIT_DIP, margin, context.resources.displayMetrics)
       .toInt()
 
   override fun getItemOffsets(
@@ -24,10 +25,11 @@ class SpaceItemDecoration(
   ) {
     val pos = parent.getChildLayoutPosition(view)
 
-    val (hoz, vert) = when (direction) {
-      RecyclerView.HORIZONTAL -> space to 0
-      else -> 0 to space
-    }
+    val (hoz, vert) =
+      when (direction) {
+        RecyclerView.HORIZONTAL -> space to 0
+        else -> 0 to space
+      }
     when {
       !marginOnInitialItem && pos == 0 -> outRect.set(0, 0, 0, 0)
       pos == 0 -> outRect.set(hoz, vert, hoz, vert)

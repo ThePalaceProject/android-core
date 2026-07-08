@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory
 import kotlin.random.Random
 
 class MainNotificationsMessagingService : FirebaseMessagingService() {
-
   companion object {
     private const val EVENT_TYPE_ACTIVITY_SYNC = "ActivitySync"
     private const val EVENT_TYPE_HOLD_AVAILABLE = "HoldAvailable"
@@ -41,29 +40,31 @@ class MainNotificationsMessagingService : FirebaseMessagingService() {
     }
 
     val intent = Intent(this, MainActivity::class.java)
-    val pendingIntent = PendingIntent.getActivity(
-      this, 0, intent,
-      PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-    )
+    val pendingIntent =
+      PendingIntent.getActivity(
+        this, 0, intent,
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+      )
 
-    val channelId = when (eventType) {
-      EVENT_TYPE_HOLD_AVAILABLE -> {
-        getString(R.string.notification_channel_id_reservations)
-      }
+    val channelId =
+      when (eventType) {
+        EVENT_TYPE_HOLD_AVAILABLE -> {
+          getString(R.string.notification_channel_id_reservations)
+        }
 
-      EVENT_TYPE_LOAN_EXPIRY -> {
-        getString(R.string.notification_channel_id_loans)
-      }
+        EVENT_TYPE_LOAN_EXPIRY -> {
+          getString(R.string.notification_channel_id_loans)
+        }
 
-      EVENT_TYPE_ACTIVITY_SYNC -> {
-        ""
-      }
+        EVENT_TYPE_ACTIVITY_SYNC -> {
+          ""
+        }
 
-      else -> {
-        this.logger.error("Unrecognized event type: {}", eventType)
-        return
+        else -> {
+          this.logger.error("Unrecognized event type: {}", eventType)
+          return
+        }
       }
-    }
 
     // if the channel id is blank we don't need to display a notification
     if (channelId.isBlank()) {
@@ -78,18 +79,19 @@ class MainNotificationsMessagingService : FirebaseMessagingService() {
       }
 
       val notificationBuilder =
-        NotificationCompat.Builder(applicationContext, channelId)
+        NotificationCompat
+          .Builder(applicationContext, channelId)
           .setContentTitle(title)
           .setContentText(body)
           .setSmallIcon(R.drawable.main_icon)
           .setAutoCancel(true)
           .setShowWhen(true)
           .setStyle(
-            NotificationCompat.BigTextStyle()
+            NotificationCompat
+              .BigTextStyle()
               .setBigContentTitle(title)
               .bigText(body)
-          )
-          .setContentIntent(pendingIntent)
+          ).setContentIntent(pendingIntent)
           .setWhen(System.currentTimeMillis())
 
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

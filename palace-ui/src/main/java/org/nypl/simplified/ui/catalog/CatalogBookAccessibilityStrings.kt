@@ -10,7 +10,6 @@ import org.nypl.simplified.feeds.api.FeedEntry
  */
 
 object CatalogBookAccessibilityStrings {
-
   /**
    * The content description for cover images.
    */
@@ -18,8 +17,8 @@ object CatalogBookAccessibilityStrings {
   fun coverDescription(
     resources: Resources,
     feedEntry: FeedEntry.FeedEntryOPDS
-  ): String {
-    return when (feedEntry.probableFormat) {
+  ): String =
+    when (feedEntry.probableFormat) {
       BookFormats.BookFormatDefinition.BOOK_FORMAT_EPUB -> {
         resources.getString(
           R.string.catalogAccessibilityCoverEpub,
@@ -52,5 +51,4 @@ object CatalogBookAccessibilityStrings {
         )
       }
     }
-  }
 }

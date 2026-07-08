@@ -7,7 +7,6 @@ import java.sql.Connection
  */
 
 interface DBConnectionType : AutoCloseable {
-
   /**
    * The underlying SQL connection
    */
@@ -20,9 +19,7 @@ interface DBConnectionType : AutoCloseable {
    * @return The transaction
    */
 
-  fun openTransaction(): DBTransactionType {
-    return this.openTransaction(DBTransactionCloseBehavior.ON_CLOSE_DO_NOTHING)
-  }
+  fun openTransaction(): DBTransactionType = this.openTransaction(DBTransactionCloseBehavior.ON_CLOSE_DO_NOTHING)
 
   /**
    * Begin a new transaction. The transaction will be registered as a
@@ -33,7 +30,5 @@ interface DBConnectionType : AutoCloseable {
    * @return The transaction
    */
 
-  fun openTransaction(
-    closeBehavior: DBTransactionCloseBehavior
-  ): DBTransactionType
+  fun openTransaction(closeBehavior: DBTransactionCloseBehavior): DBTransactionType
 }

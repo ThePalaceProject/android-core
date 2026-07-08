@@ -8,7 +8,6 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskDirectoryType
  */
 
 object BorrowSubtasks {
-
   private val directory =
     BorrowSubtaskDirectory()
 
@@ -16,6 +15,5 @@ object BorrowSubtasks {
    * @return The default subtask directory
    */
 
-  fun directory(): BorrowSubtaskDirectoryType =
-    this.directory
+  fun directory(): BorrowSubtaskDirectoryType = this.directory
 }

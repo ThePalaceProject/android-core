@@ -10,7 +10,6 @@ package org.nypl.simplified.crashlytics.api
  */
 
 interface CrashlyticsServiceType {
-
   /** The most recently configured user ID. */
   val userId: String
 
@@ -27,20 +26,38 @@ interface CrashlyticsServiceType {
   fun setUserId(identifier: String)
 
   /** Set a custom key and value that are associated with subsequent fatal and non-fatal reports. */
-  fun setCustomKey(key: String, value: Int)
+  fun setCustomKey(
+    key: String,
+    value: Int
+  )
 
   /** Set a custom key and value that are associated with subsequent fatal and non-fatal reports. */
-  fun setCustomKey(key: String, value: Long)
+  fun setCustomKey(
+    key: String,
+    value: Long
+  )
 
   /** Set a custom key and value that are associated with subsequent fatal and non-fatal reports. */
-  fun setCustomKey(key: String, value: Float)
+  fun setCustomKey(
+    key: String,
+    value: Float
+  )
 
   /** Set a custom key and value that are associated with subsequent fatal and non-fatal reports. */
-  fun setCustomKey(key: String, value: Double)
+  fun setCustomKey(
+    key: String,
+    value: Double
+  )
 
   /** Set a custom key and value that are associated with subsequent fatal and non-fatal reports. */
-  fun setCustomKey(key: String, value: String)
+  fun setCustomKey(
+    key: String,
+    value: String
+  )
 
   /** Set a custom key and value that are associated with subsequent fatal and non-fatal reports. */
-  fun setCustomKey(key: String, value: Boolean)
+  fun setCustomKey(
+    key: String,
+    value: Boolean
+  )
 }

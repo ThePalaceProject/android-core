@@ -5,7 +5,6 @@ package org.librarysimplified.services.api
  */
 
 interface ServiceDirectoryProviderType {
-
   /**
    * A reference to the current service directory.
    */

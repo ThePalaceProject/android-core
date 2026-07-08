@@ -23,7 +23,6 @@ internal class BServiceOpDeleteBookmark(
   private val ignoreRemoteFailures: Boolean,
   private val bookmarksSource: AttributeType<Map<AccountID, Map<BookID, BookmarksForBook>>>,
 ) : BServiceOp<Unit>(logger) {
-
   override fun runActual() {
     try {
       this.remotelyDeleteBookmark()
@@ -42,8 +41,8 @@ internal class BServiceOpDeleteBookmark(
     this.locallyDeleteBookmark()
   }
 
-  private fun remotelyDeleteBookmark() {
-    return try {
+  private fun remotelyDeleteBookmark() =
+    try {
       this.logger.debug(
         "[{}]: remote deleting bookmark {}",
         this.profile.id.uuid,
@@ -97,7 +96,6 @@ internal class BServiceOpDeleteBookmark(
       this.logger.error("[{}]: error deleting bookmark: ", this.profile.id.uuid, e)
       throw e
     }
-  }
 
   /**
    * If we've handed the bookmark service a bookmark that doesn't have a URI in it, then
@@ -125,11 +123,10 @@ internal class BServiceOpDeleteBookmark(
   private fun bookmarksAreInterchangeable(
     bookmarkA: SerializedBookmark,
     bookmarkB: SerializedBookmark
-  ): Boolean {
-    return (bookmarkA.kind == bookmarkB.kind) &&
+  ): Boolean =
+    (bookmarkA.kind == bookmarkB.kind) &&
       (bookmarkA.book == bookmarkB.book) &&
       (bookmarkA.location == bookmarkB.location)
-  }
 
   private fun locallyDeleteBookmark() {
     try {
@@ -145,11 +142,13 @@ internal class BServiceOpDeleteBookmark(
 
       for (handle in entry.formatHandles) {
         when (this.bookmark.kind) {
-          BookmarkKind.BookmarkLastReadLocation ->
+          BookmarkKind.BookmarkLastReadLocation -> {
             handle.setLastReadLocation(null)
+          }
 
-          BookmarkKind.BookmarkExplicit ->
+          BookmarkKind.BookmarkExplicit -> {
             handle.deleteBookmark(this.bookmark.bookmarkId)
+          }
         }
       }
     } catch (e: Exception) {

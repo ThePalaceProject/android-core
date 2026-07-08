@@ -9,7 +9,6 @@ import java.net.URI
  */
 
 sealed class Link : Serializable {
-
   /**
    * The MIME type of the link content.
    */
@@ -85,17 +84,14 @@ sealed class Link : Serializable {
     override val width: Int? = null,
     override val duration: Double? = null,
     override val bitrate: Double? = null
-  ) : Link(), Serializable {
+  ) : Link(),
+    Serializable {
     override val hrefURI: URI
       get() = this.href
 
-    override fun toBasic(): LinkBasic {
-      return this
-    }
+    override fun toBasic(): LinkBasic = this
 
-    override fun toTemplated(): LinkTemplated {
-      throw IllegalArgumentException("Expected a templated link, but this link is a basic link.")
-    }
+    override fun toTemplated(): LinkTemplated = throw IllegalArgumentException("Expected a templated link, but this link is a basic link.")
   }
 
   /**
@@ -111,16 +107,13 @@ sealed class Link : Serializable {
     override val width: Int? = null,
     override val duration: Double? = null,
     override val bitrate: Double? = null
-  ) : Link(), Serializable {
+  ) : Link(),
+    Serializable {
     override val hrefURI: URI?
       get() = null
 
-    override fun toBasic(): LinkBasic {
-      throw IllegalArgumentException("Expected a basic link, but this link is a templated link.")
-    }
+    override fun toBasic(): LinkBasic = throw IllegalArgumentException("Expected a basic link, but this link is a templated link.")
 
-    override fun toTemplated(): LinkTemplated {
-      return this
-    }
+    override fun toTemplated(): LinkTemplated = this
   }
 }

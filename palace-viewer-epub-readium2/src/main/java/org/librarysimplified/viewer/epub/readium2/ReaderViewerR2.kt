@@ -10,7 +10,6 @@ import org.nypl.simplified.viewer.spi.ViewerProviderType
 import java.net.URI
 
 class ReaderViewerR2 : ViewerProviderType {
-
   override val name =
     "org.librarysimplified.viewer.epub.readium2.ReaderViewerR2"
 
@@ -18,20 +17,19 @@ class ReaderViewerR2 : ViewerProviderType {
     preferences: ViewerParameters,
     book: Book,
     format: BookFormat
-  ): Boolean {
-    return when (format) {
+  ): Boolean =
+    when (format) {
       is BookFormat.BookFormatPDF,
-      is BookFormat.BookFormatAudioBook ->
+      is BookFormat.BookFormatAudioBook -> {
         false
+      }
 
-      is BookFormat.BookFormatEPUB ->
+      is BookFormat.BookFormatEPUB -> {
         true
+      }
     }
-  }
 
-  override fun canPotentiallySupportType(type: MIMEType): Boolean {
-    return type.fullType == "application/epub+zip"
-  }
+  override fun canPotentiallySupportType(type: MIMEType): Boolean = type.fullType == "application/epub+zip"
 
   override fun open(
     activity: Activity,

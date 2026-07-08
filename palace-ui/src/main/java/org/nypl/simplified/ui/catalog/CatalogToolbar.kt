@@ -33,7 +33,6 @@ class CatalogToolbar(
   private val text: TextView,
   private val window: Window,
 ) {
-
   /**
    * Configure the toolbar for a feed.
    */
@@ -92,7 +91,10 @@ class CatalogToolbar(
           if (actionId == EditorInfo.IME_ACTION_DONE ||
             actionId == EditorInfo.IME_ACTION_UNSPECIFIED
           ) {
-            val queryText = this.searchText.text.trim().toString()
+            val queryText =
+              this.searchText.text
+                .trim()
+                .toString()
             this.keyboardHide()
             if (queryText.isNotBlank()) {
               this.callbacks.onSearchSubmitted(account.id, search, queryText)
@@ -148,9 +150,7 @@ class CatalogToolbar(
     }
   }
 
-  private fun searchBoxOpen(
-    resources: Resources,
-  ) {
+  private fun searchBoxOpen(resources: Resources,) {
     this.searchTouch.contentDescription =
       resources.getString(R.string.catalogAccessibilitySearchButtonClose)
     this.searchIcon.setImageResource(R.drawable.xmark)
@@ -161,9 +161,7 @@ class CatalogToolbar(
     this.text.postDelayed({ this.keyboardShow() }, 100)
   }
 
-  private fun searchBoxClose(
-    resources: Resources,
-  ) {
+  private fun searchBoxClose(resources: Resources,) {
     this.searchTouch.contentDescription =
       resources.getString(R.string.catalogAccessibilitySearch)
     this.searchIcon.setImageResource(R.drawable.magnifying_glass)

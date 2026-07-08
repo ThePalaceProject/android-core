@@ -26,7 +26,6 @@ import java.util.Locale
 class FeedHTTPTransport(
   private val http: LSHTTPClientType
 ) : OPDSFeedTransportType<AccountAuthenticationCredentials?> {
-
   private val logger =
     LoggerFactory.getLogger(FeedHTTPTransport::class.java)
 
@@ -40,7 +39,8 @@ class FeedHTTPTransport(
     val auth = AccountAuthenticatedHTTP.createAuthorizationIfPresent(credentials)
 
     val request =
-      this.http.newRequest(uri)
+      this.http
+        .newRequest(uri)
         .setAuthorization(auth)
         .addBasicTokenPropertiesIfApplicable(credentials)
         .setMethod(this.methodOfName(method))
@@ -51,41 +51,48 @@ class FeedHTTPTransport(
       is LSHTTPResponseStatus.Responded.OK -> {
         (status.bodyStream ?: ByteArrayInputStream(ByteArray(0))) to status.getAccessToken()
       }
-      is LSHTTPResponseStatus.Responded.Error ->
+
+      is LSHTTPResponseStatus.Responded.Error -> {
         throw FeedHTTPTransportException(
           message = status.properties.message,
           code = status.properties.status,
           report = status.properties.problemReport
         )
+      }
 
-      is LSHTTPResponseStatus.Failed ->
+      is LSHTTPResponseStatus.Failed -> {
         throw OPDSFeedTransportIOException(
           message = "Connection failed",
           cause = IOException(status.exception)
         )
+      }
     }
   }
 
-  private fun methodOfName(method: String): LSHTTPRequestBuilderType.Method {
-    return when (method.uppercase(Locale.ROOT)) {
+  private fun methodOfName(method: String): LSHTTPRequestBuilderType.Method =
+    when (method.uppercase(Locale.ROOT)) {
       "GET" -> {
         LSHTTPRequestBuilderType.Method.Get
       }
+
       "HEAD" -> {
         LSHTTPRequestBuilderType.Method.Head
       }
+
       "POST" -> {
         LSHTTPRequestBuilderType.Method.Post(ByteArray(0), MIMECompatibility.applicationOctetStream)
       }
+
       "PUT" -> {
         LSHTTPRequestBuilderType.Method.Put(ByteArray(0), MIMECompatibility.applicationOctetStream)
       }
+
       "DELETE" -> {
         LSHTTPRequestBuilderType.Method.Delete(ByteArray(0), MIMECompatibility.applicationOctetStream)
       }
+
       else -> {
         throw IllegalArgumentException("Unsupported request method: $method")
       }
     }
-  }
 }

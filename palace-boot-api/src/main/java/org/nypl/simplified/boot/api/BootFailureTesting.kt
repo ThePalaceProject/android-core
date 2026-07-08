@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory
  */
 
 object BootFailureTesting {
-
   private val logger = LoggerFactory.getLogger(BootFailureTesting::class.java)
 
   /**
@@ -31,7 +30,8 @@ object BootFailureTesting {
     this.logger.debug("enabling boot failures: {}", enabled)
     val prefs = context.getSharedPreferences("testing", Context.MODE_PRIVATE)
     try {
-      prefs.edit()
+      prefs
+        .edit()
         .putBoolean("failBootForTestingPurposes", enabled)
         .commit()
     } catch (e: Exception) {

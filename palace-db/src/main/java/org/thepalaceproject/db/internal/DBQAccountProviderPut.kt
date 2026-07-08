@@ -7,8 +7,8 @@ import org.thepalaceproject.db.api.queries.DBQAccountProviderPutType
 import java.time.ZoneOffset
 
 internal object DBQAccountProviderPut : DBQAccountProviderPutType {
-
-  private val text = """
+  private val text =
+    """
     INSERT INTO account_providers (
       ap_id,
       ap_updated_time_last,
@@ -23,14 +23,15 @@ internal object DBQAccountProviderPut : DBQAccountProviderPutType {
       ap_updated_time_last = ?,
       ap_data_format       = ?,
       ap_data              = ?
-  """.trimIndent()
+    """.trimIndent()
 
   override fun execute(
     transaction: DBTransactionType,
     baseDescription: AccountProvider
   ) {
     val timestamp =
-      baseDescription.updated.withOffsetSameInstant(ZoneOffset.UTC)
+      baseDescription.updated
+        .withOffsetSameInstant(ZoneOffset.UTC)
         .toString()
 
     val description =

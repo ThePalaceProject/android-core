@@ -11,7 +11,6 @@ import org.nypl.simplified.taskrecorder.api.TaskResult
  */
 
 interface AudioBookStrategyType {
-
   /**
    * An observable source of events published during fulfillment.
    */

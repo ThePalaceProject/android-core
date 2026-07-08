@@ -5,7 +5,6 @@ package org.thepalaceproject.db.api
  */
 
 interface DBTransactionType : AutoCloseable {
-
   /**
    * The underlying connection
    */
@@ -22,9 +21,7 @@ interface DBTransactionType : AutoCloseable {
    * Retrieve a query.
    */
 
-  fun <P, R, Q : DBQueryType<P, R>> query(
-    queryType: Class<Q>
-  ): Q
+  fun <P, R, Q : DBQueryType<P, R>> query(queryType: Class<Q>): Q
 
   /**
    * Find a query and execute it.
@@ -33,9 +30,7 @@ interface DBTransactionType : AutoCloseable {
   fun <P, R, Q : DBQueryType<P, R>> execute(
     queryType: Class<Q>,
     parameters: P
-  ): R {
-    return this.query(queryType).execute(this, parameters)
-  }
+  ): R = this.query(queryType).execute(this, parameters)
 
   /**
    * Roll back the transaction.

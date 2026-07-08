@@ -13,7 +13,6 @@ import java.io.File
  */
 
 interface BookDatabaseFactoryType {
-
   /**
    * Open a database, creating a new one if the database does not exist.
    */

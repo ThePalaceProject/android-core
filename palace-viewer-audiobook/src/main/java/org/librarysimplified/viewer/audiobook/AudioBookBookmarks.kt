@@ -21,7 +21,6 @@ import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
  */
 
 object AudioBookBookmarks {
-
   /**
    * Convert a Player bookmark to a SimplyE bookmark.
    */
@@ -46,10 +45,11 @@ object AudioBookBookmarks {
       bookChapterProgress = source.metadata.chapterProgressEstimate,
       bookChapterTitle = source.metadata.chapterTitle,
       bookProgress = source.metadata.bookProgressEstimate,
-      location = SerializedLocatorAudioBookTime2(
-        readingOrderItem = source.readingOrderID.text,
-        readingOrderItemOffsetMilliseconds = source.offsetMilliseconds.value
-      ),
+      location =
+        SerializedLocatorAudioBookTime2(
+          readingOrderItem = source.readingOrderID.text,
+          readingOrderItemOffsetMilliseconds = source.offsetMilliseconds.value
+        ),
       uri = null
     )
   }
@@ -58,10 +58,8 @@ object AudioBookBookmarks {
    * Convert a SimplyE bookmark to a Player bookmark.
    */
 
-  fun toPlayerBookmark(
-    source: SerializedBookmark
-  ): PlayerBookmark? {
-    return when (val location = source.location) {
+  fun toPlayerBookmark(source: SerializedBookmark): PlayerBookmark? =
+    when (val location = source.location) {
       is SerializedLocatorAudioBookTime1 -> {
         null
       }
@@ -82,13 +80,14 @@ object AudioBookBookmarks {
           kind = kind,
           readingOrderID = readingOrderID,
           offsetMilliseconds = offsetMilliseconds,
-          metadata = PlayerBookmarkMetadata(
-            creationTime = source.time,
-            chapterTitle = source.bookChapterTitle,
-            totalRemainingBookTime = Duration.ZERO,
-            chapterProgressEstimate = source.bookChapterProgress,
-            bookProgressEstimate = source.bookProgress
-          )
+          metadata =
+            PlayerBookmarkMetadata(
+              creationTime = source.time,
+              chapterTitle = source.bookChapterTitle,
+              totalRemainingBookTime = Duration.ZERO,
+              chapterProgressEstimate = source.bookChapterProgress,
+              bookProgressEstimate = source.bookProgress
+            )
         )
       }
 
@@ -99,5 +98,4 @@ object AudioBookBookmarks {
         null
       }
     }
-  }
 }

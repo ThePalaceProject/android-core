@@ -8,7 +8,6 @@ import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetSingle
  */
 
 object FeedFacets {
-
   private val specialFacets =
     mapOf(
       Pair("SORT BY", 0),
@@ -22,32 +21,33 @@ object FeedFacets {
    * first. Facets that aren't "special" are simply in alphabetical order afterwards.
    */
 
-  val facetComparator: Comparator<in String> = object : Comparator<String> {
-    override fun compare(
-      p0: String,
-      p1: String
-    ): Int {
-      val p0u = p0.uppercase()
-      val p1u = p1.uppercase()
-      val special0 = specialFacets.containsKey(p0u)
-      val special1 = specialFacets.containsKey(p1u)
-      return if (special0) {
-        if (special1) {
-          val x0 = specialFacets[p0u] ?: 0
-          val y0 = specialFacets[p1u] ?: 0
-          Integer.compare(x0, y0)
+  val facetComparator: Comparator<in String> =
+    object : Comparator<String> {
+      override fun compare(
+        p0: String,
+        p1: String
+      ): Int {
+        val p0u = p0.uppercase()
+        val p1u = p1.uppercase()
+        val special0 = specialFacets.containsKey(p0u)
+        val special1 = specialFacets.containsKey(p1u)
+        return if (special0) {
+          if (special1) {
+            val x0 = specialFacets[p0u] ?: 0
+            val y0 = specialFacets[p1u] ?: 0
+            Integer.compare(x0, y0)
+          } else {
+            1
+          }
         } else {
-          1
-        }
-      } else {
-        if (special1) {
-          -1
-        } else {
-          p0u.compareTo(p1u)
+          if (special1) {
+            -1
+          } else {
+            p0u.compareTo(p1u)
+          }
         }
       }
     }
-  }
 
   /**
    * Find the list of facets that represent an "entry point" group.
@@ -57,15 +57,16 @@ object FeedFacets {
    */
 
   @JvmStatic
-  fun findEntryPointFacetGroupForFeed(feed: Feed): List<FeedFacetSingle>? {
-    return when (feed) {
-      is Feed.FeedWithoutGroups ->
+  fun findEntryPointFacetGroupForFeed(feed: Feed): List<FeedFacetSingle>? =
+    when (feed) {
+      is Feed.FeedWithoutGroups -> {
         findEntryPointFacetGroup(feed.facetsByGroup)
+      }
 
-      is Feed.FeedWithGroups ->
+      is Feed.FeedWithGroups -> {
         findEntryPointFacetGroup(feed.facetsByGroup)
+      }
     }
-  }
 
   /**
    * Find the list of facets that represent an "entry point" group.
@@ -75,9 +76,7 @@ object FeedFacets {
    */
 
   @JvmStatic
-  fun findEntryPointFacetGroup(
-    groups: Map<String, List<FeedFacetSingle>>
-  ): List<FeedFacetSingle>? {
+  fun findEntryPointFacetGroup(groups: Map<String, List<FeedFacetSingle>>): List<FeedFacetSingle>? {
     for (groupName in groups.keys) {
       val facets = groups[groupName].orEmpty()
       if (facets.isNotEmpty()) {
@@ -96,36 +95,32 @@ object FeedFacets {
    */
 
   @JvmStatic
-  fun facetGroupsAreAllEntryPoints(facetGroups: Map<String, List<FeedFacetSingle>>): Boolean {
-    return facetGroups.all { entry -> facetGroupIsEntryPointTyped(entry.value) }
-  }
+  fun facetGroupsAreAllEntryPoints(facetGroups: Map<String, List<FeedFacetSingle>>): Boolean =
+    facetGroups.all { entry -> facetGroupIsEntryPointTyped(entry.value) }
 
   /**
    * @return `true` if the given facet group is "entry point" typed
    */
 
   @JvmStatic
-  fun facetGroupIsEntryPointTyped(facets: List<FeedFacetSingle>): Boolean {
-    return facets.all { facet -> facetIsEntryPointTyped(facet) }
-  }
+  fun facetGroupIsEntryPointTyped(facets: List<FeedFacetSingle>): Boolean = facets.all { facet -> facetIsEntryPointTyped(facet) }
 
   /**
    * @return `true` if the given facet is "entry point" typed
    */
 
   @JvmStatic
-  fun facetIsEntryPointTyped(facet: FeedFacetSingle): Boolean {
-    return when (facet) {
-      is FeedFacet.FeedFacetOPDS12Single ->
+  fun facetIsEntryPointTyped(facet: FeedFacetSingle): Boolean =
+    when (facet) {
+      is FeedFacet.FeedFacetOPDS12Single -> {
         facet.opdsFacet.groupType == ENTRYPOINT_FACET_GROUP_TYPE
+      }
 
-      is FeedFacet.FeedFacetPseudo ->
+      is FeedFacet.FeedFacetPseudo -> {
         false
+      }
     }
-  }
 
   @JvmStatic
-  fun isIgnoredFacet(value: Map.Entry<String, List<FeedFacetSingle>>): Boolean {
-    return value.key.uppercase() == "COLLECTION"
-  }
+  fun isIgnoredFacet(value: Map.Entry<String, List<FeedFacetSingle>>): Boolean = value.key.uppercase() == "COLLECTION"
 }

@@ -8,7 +8,6 @@ import java.net.URI
  */
 
 interface SerializersType<T> {
-
   fun createSerializer(
     uri: URI,
     stream: OutputStream,

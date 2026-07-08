@@ -1,7 +1,6 @@
 package org.nypl.simplified.ui.accounts
 
 object AccountCardCreatorModel {
-
   var parameters: AccountCardCreatorParameters =
     AccountCardCreatorParameters(
       url = "urn:invalid",

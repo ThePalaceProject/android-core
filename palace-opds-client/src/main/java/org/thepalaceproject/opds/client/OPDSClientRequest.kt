@@ -9,7 +9,6 @@ import java.net.URI
 import java.util.UUID
 
 sealed class OPDSClientRequest {
-
   abstract val requestID: UUID
 
   abstract val accountID: AccountID
@@ -20,9 +19,7 @@ sealed class OPDSClientRequest {
 
   abstract val isSearch: Boolean
 
-  abstract fun withHistoryBehaviour(
-    historyBehavior: HistoryBehavior
-  ): OPDSClientRequest
+  abstract fun withHistoryBehaviour(historyBehavior: HistoryBehavior): OPDSClientRequest
 
   enum class HistoryBehavior {
     /**
@@ -56,11 +53,7 @@ sealed class OPDSClientRequest {
     override val requestID: UUID =
       UUID.randomUUID()
 
-    override fun withHistoryBehaviour(
-      historyBehavior: HistoryBehavior
-    ): NewFeed {
-      return this.copy(historyBehavior = historyBehavior)
-    }
+    override fun withHistoryBehaviour(historyBehavior: HistoryBehavior): NewFeed = this.copy(historyBehavior = historyBehavior)
   }
 
   data class GeneratedFeed(
@@ -74,11 +67,7 @@ sealed class OPDSClientRequest {
     override val requestID: UUID =
       UUID.randomUUID()
 
-    override fun withHistoryBehaviour(
-      historyBehavior: HistoryBehavior
-    ): GeneratedFeed {
-      return this.copy(historyBehavior = historyBehavior)
-    }
+    override fun withHistoryBehaviour(historyBehavior: HistoryBehavior): GeneratedFeed = this.copy(historyBehavior = historyBehavior)
   }
 
   data class ExistingEntry(
@@ -94,11 +83,7 @@ sealed class OPDSClientRequest {
     override val requestID: UUID =
       UUID.randomUUID()
 
-    override fun withHistoryBehaviour(
-      historyBehavior: HistoryBehavior
-    ): ExistingEntry {
-      return this.copy(historyBehavior = historyBehavior)
-    }
+    override fun withHistoryBehaviour(historyBehavior: HistoryBehavior): ExistingEntry = this.copy(historyBehavior = historyBehavior)
   }
 
   data class ResolvedCompositeOPDS12Facet(
@@ -108,7 +93,8 @@ sealed class OPDSClientRequest {
     val facet: FeedFacet.FeedFacetOPDS12Composite,
   ) : OPDSClientRequest() {
     override val uri =
-      this.facet.facets[0].opdsFacet.uri
+      this.facet.facets[0]
+        .opdsFacet.uri
     override val requestID: UUID =
       UUID.randomUUID()
     override val accountID: AccountID =
@@ -116,10 +102,7 @@ sealed class OPDSClientRequest {
     override val isSearch: Boolean =
       false
 
-    override fun withHistoryBehaviour(
-      historyBehavior: HistoryBehavior
-    ): ResolvedCompositeOPDS12Facet {
-      return this.copy(historyBehavior = historyBehavior)
-    }
+    override fun withHistoryBehaviour(historyBehavior: HistoryBehavior): ResolvedCompositeOPDS12Facet =
+      this.copy(historyBehavior = historyBehavior)
   }
 }

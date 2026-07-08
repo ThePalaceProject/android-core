@@ -6,7 +6,6 @@ import org.librarysimplified.audiobook.views.mediacontrols.PlayerMediaFacade
 import org.slf4j.LoggerFactory
 
 class PalaceMediaBrowserService : MediaLibraryService() {
-
   private val logger =
     LoggerFactory.getLogger(PalaceMediaBrowserService::class.java)
 
@@ -18,16 +17,15 @@ class PalaceMediaBrowserService : MediaLibraryService() {
     try {
       super.onCreate()
       this.session =
-        MediaLibrarySession.Builder(this, PlayerMediaFacade, PalaceMediaLibraryCallback())
+        MediaLibrarySession
+          .Builder(this, PlayerMediaFacade, PalaceMediaLibraryCallback())
           .build()
     } catch (e: Throwable) {
       this.logger.debug("onCreate: ", e)
     }
   }
 
-  override fun onGetSession(
-    controllerInfo: MediaSession.ControllerInfo
-  ): MediaLibrarySession {
+  override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession {
     this.logger.debug("onGetSession")
     return this.session
   }

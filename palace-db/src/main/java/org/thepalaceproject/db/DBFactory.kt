@@ -6,7 +6,5 @@ import org.thepalaceproject.db.api.DBType
 import org.thepalaceproject.db.internal.DBInstance
 
 object DBFactory : DBFactoryType {
-  override fun open(parameters: DBParameters): DBType {
-    return DBInstance.open(parameters)
-  }
+  override fun open(parameters: DBParameters): DBType = DBInstance.open(parameters)
 }

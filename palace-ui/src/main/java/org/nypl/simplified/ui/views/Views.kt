@@ -6,7 +6,6 @@ import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 
 object Views {
-
   @JvmStatic
   fun setVisible(
     target: View,

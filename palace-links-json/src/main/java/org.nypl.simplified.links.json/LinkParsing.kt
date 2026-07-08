@@ -15,7 +15,6 @@ import java.net.URI
  */
 
 object LinkParsing {
-
   private val logger = LoggerFactory.getLogger(LinkParsing::class.java)
 
   /**
@@ -25,8 +24,8 @@ object LinkParsing {
   fun parseLink(
     source: URI,
     element: JsonNode
-  ): ParseResult<Link> {
-    return try {
+  ): ParseResult<Link> =
+    try {
       val objectNode = JSONParserUtilities.checkObject("", element)
 
       val templated =
@@ -35,7 +34,8 @@ object LinkParsing {
         JSONParserUtilities.getStringOrNull(objectNode, "rel")
 
       val mime =
-        JSONParserUtilities.getStringOrNull(objectNode, "type")
+        JSONParserUtilities
+          .getStringOrNull(objectNode, "type")
           ?.let { type -> MIMEParser.parseRaisingException(type) }
 
       val title =
@@ -52,56 +52,57 @@ object LinkParsing {
       ParseResult.Success(
         warnings = listOf(),
         result =
-        if (templated) {
-          Link.LinkTemplated(
-            href = JSONParserUtilities.getString(objectNode, "href"),
-            type = mime,
-            relation = relation,
-            title = title,
-            width = width,
-            height = height,
-            duration = duration,
-            bitrate = bitrate
-          )
-        } else {
-          Link.LinkBasic(
-            href = JSONParserUtilities.getURI(objectNode, "href"),
-            type = mime,
-            relation = relation,
-            title = title,
-            width = width,
-            height = height,
-            duration = duration,
-            bitrate = bitrate
-          )
-        }
+          if (templated) {
+            Link.LinkTemplated(
+              href = JSONParserUtilities.getString(objectNode, "href"),
+              type = mime,
+              relation = relation,
+              title = title,
+              width = width,
+              height = height,
+              duration = duration,
+              bitrate = bitrate
+            )
+          } else {
+            Link.LinkBasic(
+              href = JSONParserUtilities.getURI(objectNode, "href"),
+              type = mime,
+              relation = relation,
+              title = title,
+              width = width,
+              height = height,
+              duration = duration,
+              bitrate = bitrate
+            )
+          }
       )
     } catch (e: JSONParseException) {
       this.logger.debug("error parsing link object: ", e)
       ParseResult.Failure(
         warnings = listOf(),
-        errors = listOf(
-          ParseError(
-            source = source,
-            message = "Could not parse 'link' object: " + e.message,
-            exception = e
+        errors =
+          listOf(
+            ParseError(
+              source = source,
+              message = "Could not parse 'link' object: " + e.message,
+              exception = e
+            )
           )
-        )
       )
     } catch (e: Exception) {
       this.logger.debug("error parsing link object: ", e)
       ParseResult.Failure(
         warnings = listOf(),
-        errors = listOf(
-          ParseError(
-            source = source,
-            message = "Could not parse 'link' object: " + e.message,
-            exception = e
+        errors =
+          listOf(
+            ParseError(
+              source = source,
+              message = "Could not parse 'link' object: " + e.message,
+              exception = e
+            )
           )
-        )
       )
     }
-  }
 
   /**
    * Parse a link from the given source and JSON object.
@@ -110,8 +111,8 @@ object LinkParsing {
   fun parseLinkExceptionally(
     source: URI,
     element: JsonNode
-  ): Link {
-    return when (val result = this.parseLink(source, element)) {
+  ): Link =
+    when (val result = this.parseLink(source, element)) {
       is ParseResult.Failure -> {
         val exception = IllegalArgumentException("Could not parse a link")
         for (error in result.errors) {
@@ -121,7 +122,9 @@ object LinkParsing {
         }
         throw exception
       }
-      is ParseResult.Success -> result.result
+
+      is ParseResult.Success -> {
+        result.result
+      }
     }
-  }
 }

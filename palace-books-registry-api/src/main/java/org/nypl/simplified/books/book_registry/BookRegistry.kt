@@ -14,7 +14,6 @@ import java.util.concurrent.ConcurrentSkipListMap
 class BookRegistry private constructor(
   private val books: ConcurrentSkipListMap<BookID, BookWithStatus>
 ) : BookRegistryType {
-
   private val logger =
     LoggerFactory.getLogger(BookRegistry::class.java)
   private val booksReadOnly: SortedMap<BookID, BookWithStatus> =
@@ -24,25 +23,18 @@ class BookRegistry private constructor(
   private val bookHoldsUpdate: PublishSubject<BookHoldsUpdateEvent> =
     PublishSubject.create()
 
-  override fun books(): SortedMap<BookID, BookWithStatus> {
-    return this.booksReadOnly
-  }
+  override fun books(): SortedMap<BookID, BookWithStatus> = this.booksReadOnly
 
-  override fun bookEvents(): Observable<BookStatusEvent> {
-    return this.observable
-  }
+  override fun bookEvents(): Observable<BookStatusEvent> = this.observable
 
-  override fun bookHoldsUpdateEvents(): Observable<BookHoldsUpdateEvent> {
-    return this.bookHoldsUpdate
-  }
+  override fun bookHoldsUpdateEvents(): Observable<BookHoldsUpdateEvent> = this.bookHoldsUpdate
 
-  override fun bookStatus(id: BookID): OptionType<BookStatus> {
-    return this.book(id).map(FunctionType<BookWithStatus, BookStatus>(BookWithStatus::status))
-  }
+  override fun bookStatus(id: BookID): OptionType<BookStatus> =
+    this
+      .book(id)
+      .map(FunctionType<BookWithStatus, BookStatus>(BookWithStatus::status))
 
-  override fun book(id: BookID): OptionType<BookWithStatus> {
-    return Option.of(this.books[id])
-  }
+  override fun book(id: BookID): OptionType<BookWithStatus> = Option.of(this.books[id])
 
   override fun update(status: BookWithStatus) {
     val oldStatus = this.books[status.book.id]
@@ -50,7 +42,10 @@ class BookRegistry private constructor(
     this.publishUpdateEvent(oldStatus, status)
   }
 
-  private fun publishUpdateEvent(oldStatus: BookWithStatus?, newStatus: BookWithStatus) {
+  private fun publishUpdateEvent(
+    oldStatus: BookWithStatus?,
+    newStatus: BookWithStatus
+  ) {
     if (newStatus.status == oldStatus?.status) {
       return
     }
@@ -114,8 +109,6 @@ class BookRegistry private constructor(
   }
 
   companion object {
-    fun create(): BookRegistryType {
-      return BookRegistry(ConcurrentSkipListMap())
-    }
+    fun create(): BookRegistryType = BookRegistry(ConcurrentSkipListMap())
   }
 }

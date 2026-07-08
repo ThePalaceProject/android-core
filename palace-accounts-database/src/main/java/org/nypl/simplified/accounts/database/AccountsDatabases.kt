@@ -19,7 +19,6 @@ import java.io.File
  */
 
 object AccountsDatabases : AccountsDatabaseFactoryType {
-
   @Throws(AccountsDatabaseException::class)
   override fun openDatabase(
     accountAuthenticationCredentialsStore: AccountAuthenticationCredentialsStoreType,
@@ -31,8 +30,8 @@ object AccountsDatabases : AccountsDatabaseFactoryType {
     directory: File,
     directoryGraveyard: File,
     httpClient: LSHTTPClientType,
-  ): AccountsDatabaseType {
-    return AccountsDatabase.open(
+  ): AccountsDatabaseType =
+    AccountsDatabase.open(
       accountCredentials = accountAuthenticationCredentialsStore,
       accountEvents = accountEvents,
       accountProviders = accountProviders,
@@ -43,7 +42,6 @@ object AccountsDatabases : AccountsDatabaseFactoryType {
       directoryGraveyard = directoryGraveyard,
       httpClient = httpClient,
     )
-  }
 
   @Throws(AccountsDatabaseException::class)
   override fun openDatabase(
@@ -55,8 +53,8 @@ object AccountsDatabases : AccountsDatabaseFactoryType {
     directory: File,
     directoryGraveyard: File,
     httpClient: LSHTTPClientType,
-  ): AccountsDatabaseType {
-    return AccountsDatabase.open(
+  ): AccountsDatabaseType =
+    AccountsDatabase.open(
       accountCredentials = accountAuthenticationCredentialsStore,
       accountEvents = accountEvents,
       accountProviders = accountProviders,
@@ -67,5 +65,4 @@ object AccountsDatabases : AccountsDatabaseFactoryType {
       directoryGraveyard = directoryGraveyard,
       httpClient = httpClient,
     )
-  }
 }

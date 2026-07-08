@@ -13,45 +13,37 @@ import java.io.File
  */
 
 data class Book(
-
   /**
    * The unique ID of the book.
    */
 
   val id: BookID,
-
   /**
    * The account that owns the book.
    */
 
   val account: AccountID,
-
   /**
    * The cover file, if any.
    */
 
   val cover: File?,
-
   /**
    * The thumbnail file, if any.
    */
 
   val thumbnail: File?,
-
   /**
    * @return The acquisition feed entry
    */
 
   val entry: OPDSAcquisitionFeedEntry,
-
   /**
    * The available formats.
    */
 
   val formats: List<BookFormat>
-
 ) {
-
   /**
    * If any format is downloaded, then the book as a whole is currently considered to be downloaded
    */
@@ -63,9 +55,7 @@ data class Book(
    * @return The format of the given type, if one is present
    */
 
-  fun <T : BookFormat> findFormat(clazz: Class<T>): T? {
-    return this.formats.find { format -> clazz.isAssignableFrom(format.javaClass) } as T?
-  }
+  fun <T : BookFormat> findFormat(clazz: Class<T>): T? = this.formats.find { format -> clazz.isAssignableFrom(format.javaClass) } as T?
 
   /**
    * @return The "preferred" format for the given type, if any

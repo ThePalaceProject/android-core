@@ -13,28 +13,21 @@ import org.nypl.simplified.ui.main.MainNavigation
 import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
 import org.nypl.simplified.ui.screens.ScreenDefinitionType
 
-class SettingsDebugMenuAutoFragment : Fragment(R.layout.debug_auto),
+class SettingsDebugMenuAutoFragment :
+  Fragment(R.layout.debug_auto),
   MainBackButtonConsumerType {
-
   companion object : ScreenDefinitionFactoryType<Unit, SettingsDebugMenuAutoFragment> {
-    private class ScreenSettingsDebugMenu :
-      ScreenDefinitionType<Unit, SettingsDebugMenuAutoFragment> {
+    private class ScreenSettingsDebugMenu : ScreenDefinitionType<Unit, SettingsDebugMenuAutoFragment> {
       override fun setup() {
         // No setup required
       }
 
-      override fun parameters() {
-        return Unit
-      }
+      override fun parameters() = Unit
 
-      override fun fragment(): SettingsDebugMenuAutoFragment {
-        return SettingsDebugMenuAutoFragment()
-      }
+      override fun fragment(): SettingsDebugMenuAutoFragment = SettingsDebugMenuAutoFragment()
     }
 
-    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuAutoFragment> {
-      return ScreenSettingsDebugMenu()
-    }
+    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuAutoFragment> = ScreenSettingsDebugMenu()
   }
 
   override fun onBackButtonPressed(): MainBackButtonConsumerType.Result {
@@ -71,10 +64,11 @@ class SettingsDebugMenuAutoFragment : Fragment(R.layout.debug_auto),
   }
 
   private fun hasCarApplicationMetadata(context: Context): Boolean {
-    val appInfo = context.packageManager.getApplicationInfo(
-      context.packageName,
-      PackageManager.GET_META_DATA
-    )
+    val appInfo =
+      context.packageManager.getApplicationInfo(
+        context.packageName,
+        PackageManager.GET_META_DATA
+      )
 
     return appInfo.metaData?.containsKey(
       "com.google.android.gms.car.application"

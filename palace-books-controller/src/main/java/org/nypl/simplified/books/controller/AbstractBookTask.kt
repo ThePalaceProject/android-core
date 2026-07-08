@@ -22,8 +22,9 @@ abstract class AbstractBookTask(
   private val accountID: AccountID,
   private val profiles: ProfilesDatabaseType
 ) : Callable<TaskResult<Unit>> {
-
-  protected class TaskFailedHandled(override val cause: Throwable) : Exception()
+  protected class TaskFailedHandled(
+    override val cause: Throwable
+  ) : Exception()
 
   /**
    * A logger associated with the actual class.
@@ -89,19 +90,20 @@ abstract class AbstractBookTask(
     this.taskRecorder.beginNewStep("Locating account $accountID in the profile...")
     this.taskRecorder.addAttribute("Account ID", accountID.toString())
 
-    val account = try {
-      profile.account(accountID)
-    } catch (e: Exception) {
-      this.logger.debug("failed to find account: $accountID", e)
-      this.taskRecorder.currentStepFailedAppending(
-        message = "Failed to find account.",
-        errorCode = BorrowErrorCodes.accountsDatabaseException,
-        exception = e,
-        extraMessages = listOf()
-      )
+    val account =
+      try {
+        profile.account(accountID)
+      } catch (e: Exception) {
+        this.logger.debug("failed to find account: $accountID", e)
+        this.taskRecorder.currentStepFailedAppending(
+          message = "Failed to find account.",
+          errorCode = BorrowErrorCodes.accountsDatabaseException,
+          exception = e,
+          extraMessages = listOf()
+        )
 
-      throw TaskFailedHandled(e)
-    }
+        throw TaskFailedHandled(e)
+      }
 
     this.taskRecorder.addAttribute("Account", account.provider.displayName)
     this.taskRecorder.currentStepSucceeded("Located account.")
@@ -113,22 +115,19 @@ abstract class AbstractBookTask(
    * exception.
    */
 
-  protected fun getCredentialsFromAccount(account: AccountType): AccountAuthenticationCredentials? {
-    return if (account.requiresCredentials) {
+  protected fun getCredentialsFromAccount(account: AccountType): AccountAuthenticationCredentials? =
+    if (account.requiresCredentials) {
       getRequiredAccountCredentials(account)
     } else {
       null
     }
-  }
 
   /**
    * Assume that account credentials are required and fetch them. If they're not present, fail
    * loudly.
    */
 
-  protected fun getRequiredAccountCredentials(
-    account: AccountType
-  ): AccountAuthenticationCredentials {
+  protected fun getRequiredAccountCredentials(account: AccountType): AccountAuthenticationCredentials {
     val loginState = account.loginState
     val credentials = loginState.credentials
     if (credentials != null) {

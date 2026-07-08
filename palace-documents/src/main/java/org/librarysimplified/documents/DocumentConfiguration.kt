@@ -7,13 +7,11 @@ import java.net.URI
  */
 
 data class DocumentConfiguration(
-
   /**
    * The name of the document file.
    */
 
   val name: String?,
-
   /**
    * The remote URI used to fetch new versions of the document.
    */

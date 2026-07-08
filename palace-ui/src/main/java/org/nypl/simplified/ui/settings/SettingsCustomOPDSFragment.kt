@@ -26,9 +26,9 @@ import java.net.URI
  * A fragment that allows to add a custom OPDS feed.
  */
 
-class SettingsCustomOPDSFragment : Fragment(R.layout.settings_custom_opds),
+class SettingsCustomOPDSFragment :
+  Fragment(R.layout.settings_custom_opds),
   MainBackButtonConsumerType {
-
   private val logger =
     LoggerFactory.getLogger(SettingsCustomOPDSFragment::class.java)
 
@@ -42,26 +42,17 @@ class SettingsCustomOPDSFragment : Fragment(R.layout.settings_custom_opds),
   private lateinit var progressText: TextView
 
   companion object : ScreenDefinitionFactoryType<Unit, SettingsCustomOPDSFragment> {
-    private class ScreenSettingsCustomOPDS :
-      ScreenDefinitionType<Unit, SettingsCustomOPDSFragment> {
+    private class ScreenSettingsCustomOPDS : ScreenDefinitionType<Unit, SettingsCustomOPDSFragment> {
       override fun setup() {
         // No setup required
       }
 
-      override fun parameters() {
-        return Unit
-      }
+      override fun parameters() = Unit
 
-      override fun fragment(): SettingsCustomOPDSFragment {
-        return SettingsCustomOPDSFragment()
-      }
+      override fun fragment(): SettingsCustomOPDSFragment = SettingsCustomOPDSFragment()
     }
 
-    override fun createScreenDefinition(
-      p: Unit
-    ): ScreenDefinitionType<Unit, SettingsCustomOPDSFragment> {
-      return ScreenSettingsCustomOPDS()
-    }
+    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsCustomOPDSFragment> = ScreenSettingsCustomOPDS()
   }
 
   override fun onViewCreated(
@@ -110,14 +101,16 @@ class SettingsCustomOPDSFragment : Fragment(R.layout.settings_custom_opds),
     }
 
     this.create.setOnClickListener {
-      SettingsCustomOPDSModel.createCustomOPDSFeed(this.feedURL.text.trim().toString())
+      SettingsCustomOPDSModel.createCustomOPDSFeed(
+        this.feedURL.text
+          .trim()
+          .toString()
+      )
     }
   }
 
   @UiThread
-  private fun onTaskMessages(
-    status: List<String>
-  ) {
+  private fun onTaskMessages(status: List<String>) {
     UIThread.checkIsUIThread()
 
     for (s in status) {
@@ -169,10 +162,20 @@ class SettingsCustomOPDSFragment : Fragment(R.layout.settings_custom_opds),
     override fun afterTextChanged(s: Editable?) {
     }
 
-    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+    override fun beforeTextChanged(
+      s: CharSequence?,
+      start: Int,
+      count: Int,
+      after: Int
+    ) {
     }
 
-    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+    override fun onTextChanged(
+      s: CharSequence?,
+      start: Int,
+      before: Int,
+      count: Int
+    ) {
       this@SettingsCustomOPDSFragment.create.isEnabled =
         this@SettingsCustomOPDSFragment.isValidURI()
     }

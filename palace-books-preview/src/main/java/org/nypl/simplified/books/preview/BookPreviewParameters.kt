@@ -24,7 +24,6 @@ data class BookPreviewParameters(
   val taskRecorder: TaskRecorderType,
   val temporaryDirectory: File
 ) {
-
   private lateinit var temporaryFile: File
 
   /**

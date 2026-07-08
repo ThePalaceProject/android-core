@@ -9,12 +9,10 @@ import java.net.URI
  * @property uri The search document URI
  */
 data class OPDSSearchLink(
-
   /**
    * The type of search document.
    */
   val type: String,
-
   /**
    * The search document URI.
    */

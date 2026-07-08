@@ -7,13 +7,11 @@ package org.nypl.simplified.opds.auth_document.api
  */
 
 data class AuthenticationObjectNYPLFeatures(
-
   /**
    * The enabled feature flags.
    */
 
   val enabled: Set<String>,
-
   /**
    * The disabled feature flags.
    */

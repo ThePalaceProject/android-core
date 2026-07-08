@@ -27,7 +27,6 @@ class CatalogOPDSClients(
   val booksClient: OPDSClientType,
   val holdsClient: OPDSClientType
 ) : AutoCloseable {
-
   private val logger =
     LoggerFactory.getLogger(CatalogOPDSClients::class.java)
 
@@ -45,7 +44,8 @@ class CatalogOPDSClients(
      */
 
     val subscriptionDeletion =
-      this.profiles.accountEvents()
+      this.profiles
+        .accountEvents()
         .ofType(AccountEventDeletion.AccountEventDeletionSucceeded::class.java)
         .subscribe { this.onAccountDeleted() }
 
@@ -56,7 +56,8 @@ class CatalogOPDSClients(
      */
 
     val subscriptionCreation =
-      this.profiles.accountEvents()
+      this.profiles
+        .accountEvents()
         .ofType(AccountEventCreation.AccountEventCreationSucceeded::class.java)
         .subscribe { e -> this.onAccountCreated(e.id) }
 
@@ -67,16 +68,15 @@ class CatalogOPDSClients(
      */
 
     val subscriptionAccountChanged =
-      this.profiles.profileEvents()
+      this.profiles
+        .profileEvents()
         .ofType(ProfileUpdated.Succeeded::class.java)
         .subscribe { e -> this.onProfileUpdated(e) }
 
     this.resources.add(AutoCloseable { subscriptionAccountChanged.dispose() })
   }
 
-  private fun onProfileUpdated(
-    e: ProfileUpdated.Succeeded
-  ) {
+  private fun onProfileUpdated(e: ProfileUpdated.Succeeded) {
     val oldAccount = e.oldDescription.preferences.mostRecentAccount
     val newAccount = e.newDescription.preferences.mostRecentAccount
 
@@ -85,7 +85,8 @@ class CatalogOPDSClients(
 
       try {
         val account =
-          this.profiles.profileCurrent()
+          this.profiles
+            .profileCurrent()
             .account(newAccount)
 
         UIThread.runOnUIThread {
@@ -98,13 +99,12 @@ class CatalogOPDSClients(
     }
   }
 
-  private fun onAccountCreated(
-    id: AccountID
-  ) {
+  private fun onAccountCreated(id: AccountID) {
     this.logger.debug("An account has been created. Pointing clients at it.")
 
     val account =
-      this.profiles.profileCurrent()
+      this.profiles
+        .profileCurrent()
         .account(id)
 
     UIThread.runOnUIThread {
@@ -124,9 +124,7 @@ class CatalogOPDSClients(
     }
   }
 
-  private fun clearHistory(
-    client: OPDSClientType
-  ) {
+  private fun clearHistory(client: OPDSClientType) {
     try {
       client.clearHistory()
     } catch (e: Throwable) {
@@ -134,15 +132,12 @@ class CatalogOPDSClients(
     }
   }
 
-  fun clientFor(
-    part: CatalogPart
-  ): OPDSClientType {
-    return when (part) {
+  fun clientFor(part: CatalogPart): OPDSClientType =
+    when (part) {
       CatalogPart.CATALOG -> this.mainClient
       CatalogPart.BOOKS -> this.booksClient
       CatalogPart.HOLDS -> this.holdsClient
     }
-  }
 
   override fun close() {
     this.resources.close()
@@ -174,16 +169,17 @@ class CatalogOPDSClients(
               accountID = account.id,
               historyBehavior = CLEAR_HISTORY,
               generator = {
-                this.profiles.profileFeed(
-                  ProfileFeedRequest(
-                    uri = URI.create("Books"),
-                    facetTitleProvider = facetTitleProvider,
-                    feedSelection = FeedBooksSelection.BOOKS_FEED_LOANED,
-                    filterByAccountID = account.id,
-                    sortBy = FeedFacet.FeedFacetPseudo.Sorting.SortBy.SORT_BY_TITLE,
-                    search = null
-                  )
-                ).get()
+                this.profiles
+                  .profileFeed(
+                    ProfileFeedRequest(
+                      uri = URI.create("Books"),
+                      facetTitleProvider = facetTitleProvider,
+                      feedSelection = FeedBooksSelection.BOOKS_FEED_LOANED,
+                      filterByAccountID = account.id,
+                      sortBy = FeedFacet.FeedFacetPseudo.Sorting.SortBy.SORT_BY_TITLE,
+                      search = null
+                    )
+                  ).get()
               }
             )
           )
@@ -195,16 +191,17 @@ class CatalogOPDSClients(
               accountID = account.id,
               historyBehavior = CLEAR_HISTORY,
               generator = {
-                this.profiles.profileFeed(
-                  ProfileFeedRequest(
-                    uri = URI.create("Books"),
-                    facetTitleProvider = facetTitleProvider,
-                    feedSelection = FeedBooksSelection.BOOKS_FEED_HOLDS,
-                    filterByAccountID = account.id,
-                    sortBy = FeedFacet.FeedFacetPseudo.Sorting.SortBy.SORT_BY_TITLE,
-                    search = null
-                  )
-                ).get()
+                this.profiles
+                  .profileFeed(
+                    ProfileFeedRequest(
+                      uri = URI.create("Books"),
+                      facetTitleProvider = facetTitleProvider,
+                      feedSelection = FeedBooksSelection.BOOKS_FEED_HOLDS,
+                      filterByAccountID = account.id,
+                      sortBy = FeedFacet.FeedFacetPseudo.Sorting.SortBy.SORT_BY_TITLE,
+                      search = null
+                    )
+                  ).get()
               }
             )
           )

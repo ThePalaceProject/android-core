@@ -20,7 +20,6 @@ data class TimeTrackingReceivedSpan(
   val timeEnded: OffsetDateTime,
   val targetURI: URI
 ) {
-
   init {
     require(this.timeStarted.offset == ZoneOffset.UTC) {
       "Times must be in UTC"
@@ -30,13 +29,12 @@ data class TimeTrackingReceivedSpan(
     }
   }
 
-  fun toBytes(): ByteArray {
-    return ByteArrayOutputStream().use { s ->
+  fun toBytes(): ByteArray =
+    ByteArrayOutputStream().use { s ->
       val p = this.toProperties()
       p.store(s, "")
       s.toByteArray()
     }
-  }
 
   fun toProperties(): Properties {
     val p = Properties()
@@ -53,20 +51,15 @@ data class TimeTrackingReceivedSpan(
   }
 
   companion object {
-    fun ofFile(
-      file: Path
-    ): TimeTrackingReceivedSpan {
-      return Files.newInputStream(file).use { stream ->
+    fun ofFile(file: Path): TimeTrackingReceivedSpan =
+      Files.newInputStream(file).use { stream ->
         val p = Properties()
         p.load(stream)
         ofProperties(p)
       }
-    }
 
-    fun ofProperties(
-      p: Properties
-    ): TimeTrackingReceivedSpan {
-      return TimeTrackingReceivedSpan(
+    fun ofProperties(p: Properties): TimeTrackingReceivedSpan =
+      TimeTrackingReceivedSpan(
         id = UUID.fromString(p.getProperty("ID")),
         accountID = AccountID(UUID.fromString(p.getProperty("AccountID"))),
         libraryID = URI.create(p.getProperty("LibraryID")),
@@ -75,6 +68,5 @@ data class TimeTrackingReceivedSpan(
         timeEnded = OffsetDateTime.parse(p.getProperty("TimeEnded")),
         targetURI = URI.create(p.getProperty("TargetURI"))
       )
-    }
   }
 }

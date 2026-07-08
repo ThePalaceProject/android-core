@@ -16,24 +16,19 @@ import java.net.URI
  */
 
 interface CatalogViewCallbacksType {
-
   /**
    * Something wants to borrow a book.
    */
 
   @UiThread
-  fun onBookRequestBorrow(
-    parameters: CatalogBorrowParameters
-  )
+  fun onBookRequestBorrow(parameters: CatalogBorrowParameters)
 
   /**
    * Something wants to revoke a book.
    */
 
   @UiThread
-  fun onBookRequestRevoke(
-    book: Book
-  )
+  fun onBookRequestRevoke(book: Book)
 
   /**
    * Determine if a book can be revoked.
@@ -52,45 +47,35 @@ interface CatalogViewCallbacksType {
    */
 
   @UiThread
-  fun onBookSelected(
-    entry: FeedEntry.FeedEntryOPDS
-  )
+  fun onBookSelected(entry: FeedEntry.FeedEntryOPDS)
 
   /**
    * A request was made to open the preview of a book.
    */
 
   @UiThread
-  fun onBookRequestPreviewOpen(
-    book: Book
-  )
+  fun onBookRequestPreviewOpen(book: Book)
 
   /**
    * A request was made to dismiss the error status of a book.
    */
 
   @UiThread
-  fun onBookRequestDismissError(
-    book: Book
-  )
+  fun onBookRequestDismissError(book: Book)
 
   /**
    * A request was made to delete a book.
    */
 
   @UiThread
-  fun onBookRequestDelete(
-    book: Book
-  )
+  fun onBookRequestDelete(book: Book)
 
   /**
    * A request was made to cancel the borrowing of a book.
    */
 
   @UiThread
-  fun onBookRequestBorrowCancel(
-    book: Book
-  )
+  fun onBookRequestBorrowCancel(book: Book)
 
   /**
    * A request was made to open a book for viewing.
@@ -108,18 +93,14 @@ interface CatalogViewCallbacksType {
 
   @UiThread
   @Deprecated("Unclear why this has its own special method.")
-  fun onBookRequestSAMLDownload(
-    status: CatalogBookStatus<BookStatus.DownloadWaitingForExternalAuthentication>
-  )
+  fun onBookRequestSAMLDownload(status: CatalogBookStatus<BookStatus.DownloadWaitingForExternalAuthentication>)
 
   /**
    * A request was made to display error details for a failed task.
    */
 
   @UiThread
-  fun onErrorDetailsDisplayRequested(
-    error: TaskResult.Failure<*>
-  )
+  fun onErrorDetailsDisplayRequested(error: TaskResult.Failure<*>)
 
   /**
    * The toolbar back button was pressed.
@@ -151,9 +132,7 @@ interface CatalogViewCallbacksType {
    */
 
   @UiThread
-  fun onFeedFacetSelected(
-    feedFacet: FeedFacet
-  )
+  fun onFeedFacetSelected(feedFacet: FeedFacet)
 
   /**
    * A search request was submitted.

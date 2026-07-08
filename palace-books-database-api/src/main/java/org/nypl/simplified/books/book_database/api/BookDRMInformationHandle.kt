@@ -13,7 +13,6 @@ import java.io.IOException
 
 @ThreadSafe
 sealed class BookDRMInformationHandle {
-
   /**
    * @return The most recent format information
    */
@@ -36,9 +35,7 @@ sealed class BookDRMInformationHandle {
      */
 
     @Throws(IOException::class)
-    abstract fun setACSMFile(
-      acsm: File?
-    ): BookDRMInformation.ACS
+    abstract fun setACSMFile(acsm: File?): BookDRMInformation.ACS
 
     /**
      * Set the Adobe rights information for the book.
@@ -49,9 +46,7 @@ sealed class BookDRMInformationHandle {
      */
 
     @Throws(IOException::class)
-    abstract fun setAdobeRightsInformation(
-      loan: AdobeAdeptLoan?
-    ): BookDRMInformation.ACS
+    abstract fun setAdobeRightsInformation(loan: AdobeAdeptLoan?): BookDRMInformation.ACS
   }
 
   /**
@@ -93,9 +88,7 @@ sealed class BookDRMInformationHandle {
      */
 
     @Throws(IOException::class)
-    abstract fun copyInBoundlessLicense(
-      file: File
-    ): BookDRMInformation.Boundless
+    abstract fun copyInBoundlessLicense(file: File): BookDRMInformation.Boundless
   }
 
   /**

@@ -16,7 +16,6 @@ import java.util.SortedMap
 data class ProfileAttributes(
   val attributes: SortedMap<String, String>
 ) {
-
   val grade: String? =
     this.attributes[GRADE_ATTRIBUTE_KEY]
 

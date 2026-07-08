@@ -35,30 +35,24 @@ import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.nypl.simplified.links.Link
 
 class BorrowBoundless private constructor() : BorrowSubtaskType {
-
   companion object : BorrowSubtaskFactoryType {
     override val name: String
       get() = "Boundless Download"
 
-    override fun createSubtask(): BorrowSubtaskType {
-      return BorrowBoundless()
-    }
+    override fun createSubtask(): BorrowSubtaskType = BorrowBoundless()
 
     override fun isApplicableFor(
       type: MIMEType,
       target: Link?,
       account: AccountReadableType?,
       remaining: List<MIMEType>
-    ): Boolean {
-      return MIMECompatibility.isCompatibleStrictWithoutAttributes(
+    ): Boolean =
+      MIMECompatibility.isCompatibleStrictWithoutAttributes(
         type, StandardFormatNames.boundlessLicenseFiles
       )
-    }
   }
 
-  override fun execute(
-    context: BorrowContextType
-  ) {
+  override fun execute(context: BorrowContextType) {
     context.bookDownloadIsRunning("Downloading...")
 
     val boundless =
@@ -85,30 +79,36 @@ class BorrowBoundless private constructor() : BorrowSubtaskType {
      */
 
     val templatedLink =
-      context.currentLinkCheck()
+      context
+        .currentLinkCheck()
         .toTemplated()
     val link =
       BoundlessCMTemplatedLink(templatedLink.href)
 
-    val result = boundless.fulfillEPUB(
-      httpClient = context.httpClient,
-      link = link,
-      credentials = authorization,
-      outputFile = outputFile,
-      outputLicenseFile = outputLicenseFile,
-      isCancelled = {
-        context.isCancelled
-      },
-      onDownloadEvent = { event ->
-        this.onDownloadProgressEvent(context, event)
-      }
-    )
+    val result =
+      boundless.fulfillEPUB(
+        httpClient = context.httpClient,
+        link = link,
+        credentials = authorization,
+        outputFile = outputFile,
+        outputLicenseFile = outputLicenseFile,
+        isCancelled = {
+          context.isCancelled
+        },
+        onDownloadEvent = { event ->
+          this.onDownloadProgressEvent(context, event)
+        }
+      )
 
     return when (result) {
-      is DRMTaskCancelled ->
+      is DRMTaskCancelled -> {
         throw BorrowSubtaskException.BorrowSubtaskCancelled()
-      is DRMTaskFailure ->
+      }
+
+      is DRMTaskFailure -> {
         throw this.drmFailed(context, result)
+      }
+
       is DRMTaskSuccess -> {
         this.saveFulfilledBook(context, result.value)
         throw BorrowSubtaskException.BorrowSubtaskHaltedEarly()
@@ -156,8 +156,9 @@ class BorrowBoundless private constructor() : BorrowSubtaskType {
       }
 
       is BookDatabaseEntryFormatHandleAudioBook,
-      is BookDatabaseEntryFormatHandlePDF ->
+      is BookDatabaseEntryFormatHandlePDF -> {
         throw UnreachableCodeException()
+      }
     }
 
     fulfilledItems.epubFile.delete()
@@ -166,9 +167,7 @@ class BorrowBoundless private constructor() : BorrowSubtaskType {
     context.bookDownloadSucceeded()
   }
 
-  private fun checkDRMSupport(
-    context: BorrowContextType
-  ): BoundlessServiceType {
+  private fun checkDRMSupport(context: BorrowContextType): BoundlessServiceType {
     context.taskRecorder.beginNewStep("Checking for Boundless DRM support...")
     val boundless = context.boundlessService
     if (boundless == null) {
@@ -193,11 +192,12 @@ class BorrowBoundless private constructor() : BorrowSubtaskType {
         context.account.updateBasicTokenCredentials(event.accessToken)
 
         context.bookDownloadIsRunning(
-          message = this.downloadingMessage(
-            expectedSize = event.expectedSize,
-            currentSize = event.receivedSize,
-            perSecond = event.bytesPerSecond
-          ),
+          message =
+            this.downloadingMessage(
+              expectedSize = event.expectedSize,
+              currentSize = event.receivedSize,
+              perSecond = event.bytesPerSecond
+            ),
           receivedSize = event.receivedSize,
           expectedSize = event.expectedSize,
           bytesPerSecond = event.bytesPerSecond
@@ -219,21 +219,18 @@ class BorrowBoundless private constructor() : BorrowSubtaskType {
     expectedSize: Long?,
     currentSize: Long,
     perSecond: Long
-  ): String {
-    return if (expectedSize == null) {
+  ): String =
+    if (expectedSize == null) {
       "Downloading..."
     } else {
       "Downloading $currentSize / $expectedSize ($perSecond)..."
     }
-  }
 
   /**
    * Determine the actual book format we're aiming for at the end of the acquisition path.
    */
 
-  private fun findFormatHandle(
-    context: BorrowContextType
-  ): BookDatabaseEntryFormatHandle {
+  private fun findFormatHandle(context: BorrowContextType): BookDatabaseEntryFormatHandle {
     val eventualType = context.opdsAcquisitionPath.asMIMETypes().last()
     val formatHandle = context.bookDatabaseEntry.findFormatHandleForContentType(eventualType)
     if (formatHandle == null) {

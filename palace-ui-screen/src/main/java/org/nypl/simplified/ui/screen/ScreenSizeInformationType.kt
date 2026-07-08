@@ -5,7 +5,6 @@ package org.nypl.simplified.ui.screen
  */
 
 interface ScreenSizeInformationType {
-
   /**
    * @param dp A size in dp
    *

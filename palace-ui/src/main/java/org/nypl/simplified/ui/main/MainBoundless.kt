@@ -7,10 +7,7 @@ import java.io.File
 import java.util.ServiceLoader
 
 object MainBoundless {
-
-  fun createBoundless(
-    directory: File,
-  ): BoundlessServiceType? {
+  fun createBoundless(directory: File,): BoundlessServiceType? {
     val logger = LoggerFactory.getLogger(MainBoundless::class.java)
 
     return try {

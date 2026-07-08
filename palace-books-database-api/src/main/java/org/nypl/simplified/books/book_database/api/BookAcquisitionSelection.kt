@@ -13,7 +13,6 @@ import org.nypl.simplified.opds.core.OPDSAcquisition.Relation.ACQUISITION_SUBSCR
  */
 
 object BookAcquisitionSelection {
-
   /**
    * Pick the preferred acquisition from the list of acquisitions. The selection is made
    * based on the supported relations of the acquisitions, and the available final content
@@ -41,10 +40,9 @@ object BookAcquisitionSelection {
     return null
   }
 
-  private fun relationIsSupported(acquisition: OPDSAcquisition): Boolean {
-    return when (acquisition.relation) {
+  private fun relationIsSupported(acquisition: OPDSAcquisition): Boolean =
+    when (acquisition.relation) {
       ACQUISITION_BORROW, ACQUISITION_GENERIC, ACQUISITION_OPEN_ACCESS -> true
       ACQUISITION_BUY, ACQUISITION_SAMPLE, ACQUISITION_SUBSCRIBE -> false
     }
-  }
 }

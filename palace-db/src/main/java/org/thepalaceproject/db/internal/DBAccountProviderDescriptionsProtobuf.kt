@@ -8,20 +8,13 @@ import java.net.URI
 import java.time.OffsetDateTime
 
 internal object DBAccountProviderDescriptionsProtobuf {
-
   private val parser =
     DBSerialization.DBSAccountProviderDescription1.parser()
 
-  fun descriptionFromP1Bytes(
-    bytes: ByteArray
-  ): AccountProviderDescription {
-    return this.descriptionFromP1(this.parser.parseFrom(bytes))
-  }
+  fun descriptionFromP1Bytes(bytes: ByteArray): AccountProviderDescription = this.descriptionFromP1(this.parser.parseFrom(bytes))
 
-  private fun descriptionFromP1(
-    src: DBSerialization.DBSAccountProviderDescription1
-  ): AccountProviderDescription {
-    return AccountProviderDescription(
+  private fun descriptionFromP1(src: DBSerialization.DBSAccountProviderDescription1): AccountProviderDescription =
+    AccountProviderDescription(
       id = URI.create(src.id),
       title = src.title,
       description = src.description,
@@ -29,16 +22,14 @@ internal object DBAccountProviderDescriptionsProtobuf {
       links = src.linksList.map { x -> this.linkFromP1(x) },
       images = src.imagesList.map { x -> this.linkFromP1(x) }
     )
-  }
 
-  fun linkFromP1(
-    src: DBSerialization.DBSLink1
-  ): Link {
-    val type = if (src.type.isNotEmpty()) {
-      MIMEParser.parseRaisingException(src.type)
-    } else {
-      null
-    }
+  fun linkFromP1(src: DBSerialization.DBSLink1): Link {
+    val type =
+      if (src.type.isNotEmpty()) {
+        MIMEParser.parseRaisingException(src.type)
+      } else {
+        null
+      }
 
     if (src.templated) {
       return Link.LinkTemplated(
@@ -65,15 +56,9 @@ internal object DBAccountProviderDescriptionsProtobuf {
     }
   }
 
-  fun descriptionToP1Bytes(
-    description: AccountProviderDescription
-  ): ByteArray {
-    return this.descriptionToP1(description).toByteArray()
-  }
+  fun descriptionToP1Bytes(description: AccountProviderDescription): ByteArray = this.descriptionToP1(description).toByteArray()
 
-  fun descriptionToP1(
-    description: AccountProviderDescription
-  ): DBSerialization.DBSAccountProviderDescription1 {
+  fun descriptionToP1(description: AccountProviderDescription): DBSerialization.DBSAccountProviderDescription1 {
     val builder = DBSerialization.DBSAccountProviderDescription1.newBuilder()
     builder.description = description.description
     builder.title = description.title
@@ -90,9 +75,7 @@ internal object DBAccountProviderDescriptionsProtobuf {
     return r
   }
 
-  fun linkToP1(
-    link: Link
-  ): DBSerialization.DBSLink1 {
+  fun linkToP1(link: Link): DBSerialization.DBSLink1 {
     val builder = DBSerialization.DBSLink1.newBuilder()
     link.bitrate?.let { x -> builder.bitrate = x }
     link.duration?.let { x -> builder.duration = x }

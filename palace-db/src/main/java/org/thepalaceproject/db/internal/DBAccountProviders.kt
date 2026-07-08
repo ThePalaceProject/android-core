@@ -9,18 +9,16 @@ import java.sql.ResultSet
 import java.time.ZoneOffset
 
 internal object DBAccountProviders {
-
-  fun forceUTC(description: AccountProvider): AccountProvider {
-    return description.copy(
+  fun forceUTC(description: AccountProvider): AccountProvider =
+    description.copy(
       updated = description.updated.withOffsetSameInstant(ZoneOffset.UTC)
     )
-  }
 
   fun parseFromResult(
     transaction: DBTransactionType,
     resultSet: ResultSet
-  ): AccountProvider {
-    return when (val result = resultSet.getString("ap_data_format")) {
+  ): AccountProvider =
+    when (val result = resultSet.getString("ap_data_format")) {
       FORMAT_ACCOUNT_PROVIDER_JSON -> {
         this.parseFromAccountProviderJSON(resultSet)
       }
@@ -29,13 +27,9 @@ internal object DBAccountProviders {
         throw DBException("Unsupported format: $result", Exception())
       }
     }
-  }
 
-  private fun parseFromAccountProviderJSON(
-    resultSet: ResultSet
-  ): AccountProvider {
-    return resultSet.getBinaryStream("ap_data").use { data ->
+  private fun parseFromAccountProviderJSON(resultSet: ResultSet): AccountProvider =
+    resultSet.getBinaryStream("ap_data").use { data ->
       AccountProvidersJSON.deserializeOneFromStream(data)
     }
-  }
 }

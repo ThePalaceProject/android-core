@@ -22,7 +22,6 @@ class AccountListAdapter(
   private val onItemClicked: (AccountType) -> Unit,
   private val onItemDeleteClicked: (AccountType) -> Unit
 ) : ListAdapter<AccountType, AccountListAdapter.AccountViewHolder>(AccountDiff) {
-
   override fun onCreateViewHolder(
     parent: ViewGroup,
     viewType: Int
@@ -103,14 +102,17 @@ class AccountListAdapter(
   }
 
   object AccountDiff : DiffUtil.ItemCallback<AccountType>() {
-    override fun areItemsTheSame(oldItem: AccountType, newItem: AccountType): Boolean {
-      return oldItem.id.compareTo(newItem.id) == 0
-    }
+    override fun areItemsTheSame(
+      oldItem: AccountType,
+      newItem: AccountType
+    ): Boolean = oldItem.id.compareTo(newItem.id) == 0
 
-    override fun areContentsTheSame(oldItem: AccountType, newItem: AccountType): Boolean {
-      return oldItem.provider.displayName == newItem.provider.displayName &&
+    override fun areContentsTheSame(
+      oldItem: AccountType,
+      newItem: AccountType
+    ): Boolean =
+      oldItem.provider.displayName == newItem.provider.displayName &&
         oldItem.provider.subtitle == newItem.provider.subtitle &&
         oldItem.preferences.catalogURIOverride == newItem.preferences.catalogURIOverride
-    }
   }
 }

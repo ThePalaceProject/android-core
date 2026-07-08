@@ -5,7 +5,6 @@ package org.nypl.simplified.opds.core
  */
 
 abstract class OPDSFeedTransportException : Exception {
-
   /**
    * Construct an exception.
    *

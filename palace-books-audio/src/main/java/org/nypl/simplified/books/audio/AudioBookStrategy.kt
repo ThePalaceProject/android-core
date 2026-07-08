@@ -49,7 +49,6 @@ class AudioBookStrategy(
   private val context: Application,
   private val request: AudioBookManifestRequest
 ) : AudioBookStrategyType {
-
   private val logger =
     LoggerFactory.getLogger(AudioBookStrategy::class.java)
 
@@ -62,8 +61,8 @@ class AudioBookStrategy(
   override val events: Observable<String> =
     this.eventSubject
 
-  override fun execute(): TaskResult<AudioBookManifestData> {
-    return try {
+  override fun execute(): TaskResult<AudioBookManifestData> =
+    try {
       if (this.request.isNetworkAvailable.invoke()) {
         this.fulfillLink()
       } else {
@@ -80,12 +79,10 @@ class AudioBookStrategy(
       )
       this.taskRecorder.finishFailure()
     }
-  }
 
   private class AsManifestFulfillment(
     val owner: AudioBookStrategy
   ) : ManifestFulfillmentStrategyType {
-
     private val eventSubject: PublishSubject<ManifestFulfillmentEvent> =
       PublishSubject.create()
 
@@ -96,15 +93,16 @@ class AudioBookStrategy(
       this.eventSubject.onComplete()
     }
 
-    override fun execute(): PlayerResult<ManifestFulfilled, ManifestFulfillmentError> {
-      return when (val r = this.owner.execute()) {
+    override fun execute(): PlayerResult<ManifestFulfilled, ManifestFulfillmentError> =
+      when (val r = this.owner.execute()) {
         is TaskResult.Failure -> {
           PlayerResult.Failure(
             ManifestFulfillmentError(
               message = r.message,
               extraMessages =
-              r.steps.filter { s -> s.resolution is TaskStepResolution.TaskStepFailed }
-                .map { s -> s.resolution.message },
+                r.steps
+                  .filter { s -> s.resolution is TaskStepResolution.TaskStepFailed }
+                  .map { s -> s.resolution.message },
               serverData = null
             )
           )
@@ -114,12 +112,9 @@ class AudioBookStrategy(
           PlayerResult.Success(r.result.fulfilled)
         }
       }
-    }
   }
 
-  override fun toManifestStrategy(): ManifestFulfillmentStrategyType {
-    return AsManifestFulfillment(this)
-  }
+  override fun toManifestStrategy(): ManifestFulfillmentStrategyType = AsManifestFulfillment(this)
 
   private fun fulfillFromFallback(): TaskResult<AudioBookManifestData> {
     this.taskRecorder.beginNewStep("Loading manifest data from fallback.")
@@ -143,16 +138,13 @@ class AudioBookStrategy(
     )
   }
 
-  private fun fulfillLink(): TaskResult<AudioBookManifestData> {
-    return when (val target = this.request.target) {
+  private fun fulfillLink(): TaskResult<AudioBookManifestData> =
+    when (val target = this.request.target) {
       is AudioBookLink.License -> this.fulfillLinkLicense(target)
       is AudioBookLink.Manifest -> this.fulfillLinkManifest(target)
     }
-  }
 
-  private fun fulfillLinkManifest(
-    target: AudioBookLink.Manifest
-  ): TaskResult<AudioBookManifestData> {
+  private fun fulfillLinkManifest(target: AudioBookLink.Manifest): TaskResult<AudioBookManifestData> {
     this.taskRecorder.beginNewStep("Retrieving manifest file.")
 
     val strategy = this.findExistingStrategy(target.target)
@@ -181,9 +173,7 @@ class AudioBookStrategy(
     }
   }
 
-  private fun fulfillLinkLicense(
-    target: AudioBookLink.License
-  ): TaskResult<AudioBookManifestData> {
+  private fun fulfillLinkLicense(target: AudioBookLink.License): TaskResult<AudioBookManifestData> {
     this.taskRecorder.beginNewStep("Retrieving license file.")
 
     val authorization =
@@ -193,7 +183,8 @@ class AudioBookStrategy(
       )
 
     val httpRequest =
-      this.request.httpClient.newRequest(target.target)
+      this.request.httpClient
+        .newRequest(target.target)
         .setAuthorization(authorization = authorization)
         .build()
 
@@ -284,9 +275,7 @@ class AudioBookStrategy(
     }
   }
 
-  private fun recordProblemReport(
-    report: LSHTTPProblemReport?
-  ) {
+  private fun recordProblemReport(report: LSHTTPProblemReport?) {
     if (report != null) {
       this.taskRecorder.addAttributes(report.toMap())
     }
@@ -298,14 +287,16 @@ class AudioBookStrategy(
   ): TaskResult<AudioBookManifestData> {
     this.taskRecorder.beginNewStep("Retrieving manifest via LCP license.")
 
-    return when (val result = LCPDownloads.downloadManifestFromPublication(
-      context = this.context,
-      authorizationHandler = request.authorizationHandler,
-      license = license,
-      receiver = { event ->
-        this.logger.debug("Downloading manifest event: {}", event)
-      }
-    )) {
+    return when (val result =
+      LCPDownloads.downloadManifestFromPublication(
+        context = this.context,
+        authorizationHandler = request.authorizationHandler,
+        license = license,
+        receiver = { event ->
+          this.logger.debug("Downloading manifest event: {}", event)
+        }
+      )
+    ) {
       is PlayerResult.Failure -> {
         this.recordProblemReport(result.failure.serverData?.problemReport)
         this.taskRecorder.currentStepFailed(
@@ -339,18 +330,21 @@ class AudioBookStrategy(
     manifestBytes: ByteArray
   ): TaskResult<AudioBookManifestData> {
     this.taskRecorder.beginNewStep("Parsing manifest.")
-    return when (val result = this.request.manifestParsers.parse(
-      uri = source ?: URI.create("urn:unavailable"),
-      input = ManifestUnparsed(this.request.palaceID, manifestBytes),
-      extensions = this.request.extensions
-    )) {
+    return when (val result =
+      this.request.manifestParsers.parse(
+        uri = source ?: URI.create("urn:unavailable"),
+        input = ManifestUnparsed(this.request.palaceID, manifestBytes),
+        extensions = this.request.extensions
+      )
+    ) {
       is ParseResult.Failure -> {
         this.taskRecorder.currentStepFailed(
           message = "Manifest parsing failed.",
           errorCode = "parseError",
           extraMessages =
-          this.formatParseWarnings(result.warnings)
-            .plus(this.formatParseErrors(result.errors))
+            this
+              .formatParseWarnings(result.warnings)
+              .plus(this.formatParseErrors(result.errors))
         )
         return this.taskRecorder.finishFailure()
       }
@@ -361,20 +355,21 @@ class AudioBookStrategy(
           AudioBookManifestData(
             result.result,
             licenseBytes = licenseBytes,
-            fulfilled = ManifestFulfilled(
-              source = source,
-              contentType = MIMEType("text", "json", mapOf()),
-              authorization = authorization,
-              data = manifestBytes
-            )
+            fulfilled =
+              ManifestFulfilled(
+                source = source,
+                contentType = MIMEType("text", "json", mapOf()),
+                authorization = authorization,
+                data = manifestBytes
+              )
           )
         )
       }
     }
   }
 
-  private fun formatParseWarnings(warnings: List<ParseWarning>): List<String> {
-    return warnings.map { warning ->
+  private fun formatParseWarnings(warnings: List<ParseWarning>): List<String> =
+    warnings.map { warning ->
       buildString {
         this.append("Warning: ")
         this.append(warning.source)
@@ -387,10 +382,9 @@ class AudioBookStrategy(
         this.append('\n')
       }
     }
-  }
 
-  private fun formatParseErrors(errors: List<ParseError>): List<String> {
-    return errors.map { error ->
+  private fun formatParseErrors(errors: List<ParseError>): List<String> =
+    errors.map { error ->
       buildString {
         this.append("Error: ")
         this.append(error.source)
@@ -403,15 +397,12 @@ class AudioBookStrategy(
         this.append('\n')
       }
     }
-  }
 
   /**
    * Attempt to perform any required license checks on the manifest.
    */
 
-  private fun checkManifest(
-    manifest: PlayerManifest
-  ): LicenseCheckResult {
+  private fun checkManifest(manifest: PlayerManifest): LicenseCheckResult {
     this.logger.debug("checkManifest")
 
     val check =
@@ -441,10 +432,8 @@ class AudioBookStrategy(
     this.eventSubject.onNext(event.message)
   }
 
-  private fun findExistingStrategy(
-    targetURI: URI
-  ): ManifestFulfillmentStrategyType {
-    return if (this.isOverdrive()) {
+  private fun findExistingStrategy(targetURI: URI): ManifestFulfillmentStrategyType =
+    if (this.isOverdrive()) {
       this.logger.debug("findExistingStrategy: trying an Overdrive strategy")
 
       val secretService =
@@ -484,15 +473,14 @@ class AudioBookStrategy(
 
       strategies.create(parameters)
     }
-  }
 
   /**
    * @return `true` if the request content type implies an Overdrive audio book
    */
 
-  private fun isOverdrive(): Boolean {
-    return BookFormats.audioBookOverdriveMimeTypes()
+  private fun isOverdrive(): Boolean =
+    BookFormats
+      .audioBookOverdriveMimeTypes()
       .map { it.fullType }
       .contains(this.request.contentType.fullType)
-  }
 }

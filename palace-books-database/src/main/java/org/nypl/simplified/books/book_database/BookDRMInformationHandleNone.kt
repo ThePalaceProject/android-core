@@ -14,8 +14,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 class BookDRMInformationHandleNone(
   directory: File,
   format: BookFormats.BookFormatDefinition
-) : BookDRMInformationHandle.NoneHandle(), BookDRMInformationHandleBase {
-
+) : BookDRMInformationHandle.NoneHandle(),
+  BookDRMInformationHandleBase {
   private val closed = AtomicBoolean(false)
 
   init {

@@ -22,7 +22,6 @@ class BookRevokeFailedDismissTask(
   private val bookID: BookID,
   private val bookRegistry: BookRegistryType,
 ) : AbstractBookTask(accountID, profiles) {
-
   override val logger: Logger =
     LoggerFactory.getLogger(BookRevokeFailedDismissTask::class.java)
 

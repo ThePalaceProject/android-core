@@ -15,19 +15,12 @@ internal class ProfilesDatabase internal constructor(
   private val directory: File,
   private val profile: Profile,
 ) : ProfilesDatabaseType {
-
   internal val defaultAccountProvider: AccountProviderType =
     this.accountProviders.defaultProvider
 
-  override fun anonymousProfile(): ProfileType {
-    return this.profile
-  }
+  override fun anonymousProfile(): ProfileType = this.profile
 
-  override fun directory(): File {
-    return this.directory
-  }
+  override fun directory(): File = this.directory
 
-  override fun currentProfile(): ProfileType {
-    return this.profile
-  }
+  override fun currentProfile(): ProfileType = this.profile
 }

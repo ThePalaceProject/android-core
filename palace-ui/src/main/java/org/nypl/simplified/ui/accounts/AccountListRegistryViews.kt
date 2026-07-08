@@ -44,7 +44,6 @@ class AccountListRegistryViews(
   private val title: TextView,
   private val toolbarTitle: TextView,
 ) {
-
   private val accountListFilterController =
     AccountListFilterController { items -> this.accountListAdapter.submitList(items) }
 
@@ -88,13 +87,21 @@ class AccountListRegistryViews(
       }
 
       views.searchText.addTextChangedListener {
-        views.updateAdapterFilter(views.searchText.text.trim().toString())
+        views.updateAdapterFilter(
+          views.searchText.text
+            .trim()
+            .toString()
+        )
       }
 
       views.searchText.setOnEditorActionListener { v, actionId, event ->
         return@setOnEditorActionListener if (actionId == EditorInfo.IME_ACTION_DONE) {
           views.keyboardHide()
-          views.updateAdapterFilter(views.searchText.text.trim().toString())
+          views.updateAdapterFilter(
+            views.searchText.text
+              .trim()
+              .toString()
+          )
           true
         } else {
           false
@@ -117,9 +124,7 @@ class AccountListRegistryViews(
     Views.setVisible(this.accountList, true)
   }
 
-  private fun updateAdapterFilter(
-    text: String
-  ) {
+  private fun updateAdapterFilter(text: String) {
     if (text.isBlank()) {
       this.accountListFilterController.filterUnset()
     } else {
@@ -137,15 +142,11 @@ class AccountListRegistryViews(
     }, 1000L)
   }
 
-  fun submitAccountProviderDescriptionList(
-    descriptions: List<AccountProviderDescription>?
-  ) {
+  fun submitAccountProviderDescriptionList(descriptions: List<AccountProviderDescription>?) {
     this.accountListFilterController.submit(descriptions ?: listOf())
   }
 
-  fun reconfigureForRegistryStatus(
-    status: AccountProviderRegistryStatus
-  ) {
+  fun reconfigureForRegistryStatus(status: AccountProviderRegistryStatus) {
     UIThread.checkIsUIThread()
 
     return when (status) {
@@ -193,26 +194,26 @@ class AccountListRegistryViews(
     }
   }
 
-  private fun openErrorPage(
-    result: TaskResult<*>
-  ) {
+  private fun openErrorPage(result: TaskResult<*>) {
     val appVersion =
       SettingsDebugModel.appVersion()
 
     val supportEmail =
-      Services.serviceDirectory()
+      Services
+        .serviceDirectory()
         .requireService(BuildConfigurationServiceType::class.java)
         .supportErrorReportEmailAddress
 
     MainNavigation.openErrorPage(
       activity = this.activity,
-      parameters = ErrorPageParameters(
-        emailAddress = supportEmail,
-        body = result.message,
-        subject = "[palace-error-report] $appVersion",
-        attributes = result.attributes.toSortedMap(),
-        taskSteps = result.steps
-      )
+      parameters =
+        ErrorPageParameters(
+          emailAddress = supportEmail,
+          body = result.message,
+          subject = "[palace-error-report] $appVersion",
+          attributes = result.attributes.toSortedMap(),
+          taskSteps = result.steps
+        )
     )
   }
 

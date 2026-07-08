@@ -8,22 +8,17 @@ import java.io.File
 class BookPreviewRegistry(
   val downloadDirectory: File
 ) : BookPreviewRegistryType {
-
   private val logger =
     LoggerFactory.getLogger(BookPreviewRegistry::class.java)
   private val bookPreviewStatusSubject: BehaviorSubject<BookPreviewStatus> =
     BehaviorSubject.create()
 
-  override fun observeBookPreviewStatus(): Observable<BookPreviewStatus> {
-    return this.bookPreviewStatusSubject
-  }
+  override fun observeBookPreviewStatus(): Observable<BookPreviewStatus> = this.bookPreviewStatusSubject
 
   override fun updatePreviewStatus(status: BookPreviewStatus) {
     this.logger.debug("new status received {}", status)
     bookPreviewStatusSubject.onNext(status)
   }
 
-  override fun getPreviewDownloadDirectory(): File {
-    return downloadDirectory
-  }
+  override fun getPreviewDownloadDirectory(): File = downloadDirectory
 }

@@ -16,7 +16,6 @@ import java.util.concurrent.TimeUnit
  */
 
 object FeedLoading {
-
   /**
    * Synchronously load a URI, returning the first usable OPDS entry in the feed.
    *
@@ -39,12 +38,13 @@ object FeedLoading {
     taskRecorder.beginNewStep("Fetching OPDS feed...")
 
     val feedResult =
-      feedLoader.fetchURI(
-        accountID = accountID,
-        uri = uri,
-        credentials = null,
-        method = method
-      ).get(timeout.first, timeout.second)
+      feedLoader
+        .fetchURI(
+          accountID = accountID,
+          uri = uri,
+          credentials = null,
+          method = method
+        ).get(timeout.first, timeout.second)
 
     return when (feedResult) {
       is FeedLoaderFailedAuthentication -> {
@@ -72,11 +72,13 @@ object FeedLoading {
         taskRecorder.beginNewStep("Finding OPDS feed entry...")
 
         when (val feed = feedResult.feed) {
-          is FeedWithGroups ->
+          is FeedWithGroups -> {
             this.checkEntry(taskRecorder, findFirstInGroups(feed.feedGroupsInOrder))
+          }
 
-          is FeedWithoutGroups ->
+          is FeedWithoutGroups -> {
             this.checkEntry(taskRecorder, findFirst(feed.entriesInOrder))
+          }
         }
       }
     }
@@ -101,32 +103,32 @@ object FeedLoading {
       throw exception
     }
 
-  private fun findFirst(
-    feedEntries: List<FeedEntry>
-  ): FeedEntryOPDS? {
+  private fun findFirst(feedEntries: List<FeedEntry>): FeedEntryOPDS? {
     for (entry in feedEntries) {
       when (entry) {
-        is FeedEntry.FeedEntryCorrupt ->
+        is FeedEntry.FeedEntryCorrupt -> {
           Unit
+        }
 
-        is FeedEntryOPDS ->
+        is FeedEntryOPDS -> {
           return entry
+        }
       }
     }
     return null
   }
 
-  private fun findFirstInGroups(
-    feedGroupsInOrder: List<FeedGroup>
-  ): FeedEntryOPDS? {
+  private fun findFirstInGroups(feedGroupsInOrder: List<FeedGroup>): FeedEntryOPDS? {
     for (group in feedGroupsInOrder) {
       for (entry in group.groupEntries) {
         when (entry) {
-          is FeedEntry.FeedEntryCorrupt ->
+          is FeedEntry.FeedEntryCorrupt -> {
             Unit
+          }
 
-          is FeedEntryOPDS ->
+          is FeedEntryOPDS -> {
             return entry
+          }
         }
       }
     }

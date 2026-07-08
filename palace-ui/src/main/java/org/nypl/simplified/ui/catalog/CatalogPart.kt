@@ -5,7 +5,6 @@ package org.nypl.simplified.ui.catalog
  */
 
 enum class CatalogPart {
-
   /**
    * The main catalog (OPDS feeds and entries on a remote server).
    */

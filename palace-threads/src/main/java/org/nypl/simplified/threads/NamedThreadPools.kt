@@ -10,7 +10,6 @@ import java.util.concurrent.ThreadFactory
  */
 
 object NamedThreadPools {
-
   /**
    * Create a named thread pool.
    *
@@ -26,15 +25,13 @@ object NamedThreadPools {
     count: Int,
     base: String,
     priority: Int
-  ): ListeningScheduledExecutorService =
-    this.namedThreadPoolOf(count, this.namedThreadPoolFactory(base, priority))
+  ): ListeningScheduledExecutorService = this.namedThreadPoolOf(count, this.namedThreadPoolFactory(base, priority))
 
   @JvmStatic
   fun namedThreadPoolOf(
     count: Int,
     factory: ThreadFactory
-  ): ListeningScheduledExecutorService =
-    MoreExecutors.listeningDecorator(Executors.newScheduledThreadPool(count, factory))
+  ): ListeningScheduledExecutorService = MoreExecutors.listeningDecorator(Executors.newScheduledThreadPool(count, factory))
 
   @JvmStatic
   fun namedThreadPoolFactory(
@@ -46,10 +43,11 @@ object NamedThreadPools {
       private var id: Int = 0
 
       override fun newThread(runnable: Runnable): Thread {
-        val t = delegate.newThread {
-          android.os.Process.setThreadPriority(priority)
-          runnable.run()
-        }
+        val t =
+          delegate.newThread {
+            android.os.Process.setThreadPriority(priority)
+            runnable.run()
+          }
         t.name = String.format("simplified-%s-tasks-%d", base, this.id)
         ++this.id
         return t

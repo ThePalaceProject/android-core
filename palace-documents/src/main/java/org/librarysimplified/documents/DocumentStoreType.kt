@@ -4,7 +4,6 @@ import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.ListeningExecutorService
 
 interface DocumentStoreType {
-
   /**
    * @return The application privacy policy, if any.
    */

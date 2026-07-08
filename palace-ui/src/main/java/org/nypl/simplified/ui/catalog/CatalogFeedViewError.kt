@@ -11,7 +11,6 @@ class CatalogFeedViewError(
   private val onShowErrorDetails: () -> Unit,
   private val onRetry: () -> Unit,
 ) : CatalogFeedView() {
-
   private val errorDetails: Button =
     this.root.findViewById(R.id.feedErrorDetails)
   private val errorRetry: Button =
@@ -28,17 +27,17 @@ class CatalogFeedViewError(
       container: ViewGroup,
       onShowErrorDetails: () -> Unit,
       onRetry: () -> Unit,
-    ): CatalogFeedViewError {
-      return CatalogFeedViewError(
-        root = layoutInflater.inflate(
-          R.layout.catalog_feed_error,
-          container,
-          true
-        ) as ViewGroup,
+    ): CatalogFeedViewError =
+      CatalogFeedViewError(
+        root =
+          layoutInflater.inflate(
+            R.layout.catalog_feed_error,
+            container,
+            true
+          ) as ViewGroup,
         onShowErrorDetails = onShowErrorDetails,
         onRetry = onRetry
       )
-    }
   }
 
   override fun startFocus() {

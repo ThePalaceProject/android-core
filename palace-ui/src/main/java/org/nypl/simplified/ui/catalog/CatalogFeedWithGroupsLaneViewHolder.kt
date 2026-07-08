@@ -25,7 +25,6 @@ class CatalogFeedWithGroupsLaneViewHolder(
   private val laneStyle: LaneStyle,
   private val callbacks: CatalogViewCallbacksType,
 ) : RecyclerView.ViewHolder(parent) {
-
   enum class LaneStyle {
     /**
      * The lane is appearing as an ordinary lane in a full grouped feed.
@@ -60,9 +59,10 @@ class CatalogFeedWithGroupsLaneViewHolder(
 
     this.scrollView.apply {
       this.setHasFixedSize(true)
-      this.layoutManager = LinearLayoutManager(
-        this.context, LinearLayoutManager.HORIZONTAL, false
-      )
+      this.layoutManager =
+        LinearLayoutManager(
+          this.context, LinearLayoutManager.HORIZONTAL, false
+        )
 
       this.addItemDecoration(
         SpaceItemDecoration(
@@ -72,38 +72,37 @@ class CatalogFeedWithGroupsLaneViewHolder(
     }
   }
 
-  fun bindTo(
-    group: FeedGroup
-  ) {
-    val ignored = when (this.laneStyle) {
-      MAIN_GROUPED_FEED_LANE -> {
-        // Already configured correctly
-      }
+  fun bindTo(group: FeedGroup) {
+    val ignored =
+      when (this.laneStyle) {
+        MAIN_GROUPED_FEED_LANE -> {
+          // Already configured correctly
+        }
 
-      RELATED_BOOKS_LANE -> {
-        val newTitleLayout =
-          LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
+        RELATED_BOOKS_LANE -> {
+          val newTitleLayout =
+            LinearLayout.LayoutParams(
+              LinearLayout.LayoutParams.MATCH_PARENT,
+              LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+
+          val marginH = this.screenSize.dpToPixels(32).toInt()
+          val marginV = this.screenSize.dpToPixels(16).toInt()
+          newTitleLayout.leftMargin = marginH
+          newTitleLayout.rightMargin = marginH
+          newTitleLayout.topMargin = marginV
+          newTitleLayout.bottomMargin = marginV
+          this.titleContainer.layoutParams = newTitleLayout
+          this.title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14.0f)
+
+          this.scrollView.setPadding(
+            marginH,
+            0,
+            marginH,
+            0
           )
-
-        val marginH = this.screenSize.dpToPixels(32).toInt()
-        val marginV = this.screenSize.dpToPixels(16).toInt()
-        newTitleLayout.leftMargin = marginH
-        newTitleLayout.rightMargin = marginH
-        newTitleLayout.topMargin = marginV
-        newTitleLayout.bottomMargin = marginV
-        this.titleContainer.layoutParams = newTitleLayout
-        this.title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14.0f)
-
-        this.scrollView.setPadding(
-          marginH,
-          0,
-          marginH,
-          0
-        )
+        }
       }
-    }
 
     this.title.text = group.groupTitle
     this.title.setOnClickListener {

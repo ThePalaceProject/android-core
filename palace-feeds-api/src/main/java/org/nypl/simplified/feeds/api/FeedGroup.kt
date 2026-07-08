@@ -19,24 +19,20 @@ data class FeedGroup(
    * @return The account from which the feed group was taken
    */
   val account: AccountID,
-
   /**
    * @return The group title
    */
   val groupTitle: String,
-
   /**
    * @return The URI of the group
    */
   val groupURI: URI,
-
   /**
    * @return The list of entries in the group
    */
   val groupEntries: List<FeedEntry>
 ) {
   companion object {
-
     /**
      * @param b An OPDS group
      *
@@ -69,14 +65,13 @@ data class FeedGroup(
       accountID: AccountID,
       filter: (OPDSAcquisitionFeedEntry) -> Boolean,
       bs: Map<String, OPDSGroup>
-    ): Map<String, FeedGroup> {
-      return bs.mapValues { (_, group) ->
+    ): Map<String, FeedGroup> =
+      bs.mapValues { (_, group) ->
         fromOPDSGroup(
           accountID = accountID,
           filter = filter,
           b = group
         )
       }
-    }
   }
 }

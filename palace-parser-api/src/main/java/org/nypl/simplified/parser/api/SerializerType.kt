@@ -5,6 +5,5 @@ package org.nypl.simplified.parser.api
  */
 
 interface SerializerType {
-
   fun serialize()
 }

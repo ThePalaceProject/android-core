@@ -12,49 +12,41 @@ import java.net.URI
  */
 
 data class ProfileFeedRequest(
-
   /**
    * The URI that will be requested.
    */
 
   val uri: URI,
-
   /**
    * The ID of the feed.
    */
 
   val id: String = uri.toString(),
-
   /**
    * The time the results were last updated.
    */
 
   val updated: DateTime = DateTime.now(),
-
   /**
    * The active sorting facet.
    */
 
   val sortBy: SortBy,
-
   /**
    * The title provider for facets.
    */
 
   val facetTitleProvider: FeedFacetPseudoTitleProviderType,
-
   /**
    * The search string, if any.
    */
 
   val search: String? = null,
-
   /**
    * The feed selection type.
    */
 
   val feedSelection: FeedBooksSelection,
-
   /**
    * If an account ID is specified, only books on the respective account will be shown.
    */

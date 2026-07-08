@@ -20,7 +20,6 @@ import java.util.zip.ZipOutputStream
  */
 
 object Reports {
-
   @Volatile
   var reportLibrary: String = "Unknown"
 
@@ -49,7 +48,6 @@ object Reports {
    */
 
   sealed class Result {
-
     /**
      * An attempt was made to send.
      */
@@ -80,13 +78,12 @@ object Reports {
     context: Context,
     address: String,
     body: String
-  ): Result {
-    return this.sendReport(
+  ): Result =
+    this.sendReport(
       context = context,
       address = address,
       body = body
     )
-  }
 
   /**
    * Try to send a report.
@@ -101,10 +98,11 @@ object Reports {
     this.logger.debug("preparing report")
 
     try {
-      val files = listOf(
-        File(File(context.filesDir, "v4.0"), "time_tracking"),
-        File(context.cacheDir, "logs")
-      )
+      val files =
+        listOf(
+          File(File(context.filesDir, "v4.0"), "time_tracking"),
+          File(context.cacheDir, "logs")
+        )
 
       val reportZip = File(context.cacheDir, "report.zip")
       reportZip.delete()
@@ -113,15 +111,16 @@ object Reports {
       val zipContentURI =
         this.mapFileToContentURI(context, reportZip)
 
-      val intent = Intent(Intent.ACTION_SEND).apply {
-        this.type = "message/rfc822"
-        this.putExtra(Intent.EXTRA_EMAIL, arrayOf(address))
-        this.putExtra(Intent.EXTRA_SUBJECT, "Issue Report from The Palace Project App")
-        this.putExtra(Intent.EXTRA_TEXT, this@Reports.decorateBodyText(body))
-        this.putExtra(Intent.EXTRA_STREAM, zipContentURI)
-        this.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        this.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-      }
+      val intent =
+        Intent(Intent.ACTION_SEND).apply {
+          this.type = "message/rfc822"
+          this.putExtra(Intent.EXTRA_EMAIL, arrayOf(address))
+          this.putExtra(Intent.EXTRA_SUBJECT, "Issue Report from The Palace Project App")
+          this.putExtra(Intent.EXTRA_TEXT, this@Reports.decorateBodyText(body))
+          this.putExtra(Intent.EXTRA_STREAM, zipContentURI)
+          this.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+          this.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
       context.startActivity(intent)
       return Sent
     } catch (e: Exception) {
@@ -130,9 +129,7 @@ object Reports {
     }
   }
 
-  fun decorateBodyText(
-    body: String
-  ): String {
+  fun decorateBodyText(body: String): String {
     val bodyLines = ArrayList<String>()
     bodyLines.add("Please describe your issue:")
     bodyLines.add("\n")
@@ -154,8 +151,10 @@ object Reports {
     return bodyLines.joinToString("\n")
   }
 
-  private fun mapFileToContentURI(context: Context, file: File) =
-    FileProvider.getUriForFile(context, context.packageName + ".fileProvider", file)
+  private fun mapFileToContentURI(
+    context: Context,
+    file: File
+  ) = FileProvider.getUriForFile(context, context.packageName + ".fileProvider", file)
 
   @JvmStatic
   @Throws(IOException::class)

@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory
 import java.net.URI
 
 class PdfViewerProvider : ViewerProviderType {
-
   private val logger =
     LoggerFactory.getLogger(PdfViewerProvider::class.java)
 
@@ -23,8 +22,8 @@ class PdfViewerProvider : ViewerProviderType {
     preferences: ViewerParameters,
     book: Book,
     format: BookFormat
-  ): Boolean {
-    return when (format) {
+  ): Boolean =
+    when (format) {
       is BookFormat.BookFormatEPUB,
       is BookFormat.BookFormatAudioBook -> {
         logger.debug("the PDF viewer can only open PDF files!")
@@ -35,11 +34,8 @@ class PdfViewerProvider : ViewerProviderType {
         true
       }
     }
-  }
 
-  override fun canPotentiallySupportType(type: MIMEType): Boolean {
-    return type == StandardFormatNames.genericPDFFiles
-  }
+  override fun canPotentiallySupportType(type: MIMEType): Boolean = type == StandardFormatNames.genericPDFFiles
 
   override fun open(
     activity: Activity,
@@ -55,14 +51,15 @@ class PdfViewerProvider : ViewerProviderType {
 
     PdfReaderActivity.startActivity(
       context = activity,
-      parameters = PdfReaderParameters(
-        accountId = book.account,
-        documentTitle = book.entry.title,
-        pdfFile = formatPDF.file!!,
-        id = book.id,
-        drmInfo = formatPDF.drmInformation,
-        entry = entry
-      )
+      parameters =
+        PdfReaderParameters(
+          accountId = book.account,
+          documentTitle = book.entry.title,
+          pdfFile = formatPDF.file!!,
+          id = book.id,
+          drmInfo = formatPDF.drmInformation,
+          entry = entry
+        )
     )
   }
 }

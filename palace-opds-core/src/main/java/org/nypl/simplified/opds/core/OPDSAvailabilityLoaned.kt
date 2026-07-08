@@ -9,22 +9,18 @@ import java.net.URI
  */
 
 data class OPDSAvailabilityLoaned(
-
   /**
    * @return The start date for the loan, if any
    */
 
   val startDate: DateTime?,
-
   /**
    * @return A URI for revoking the hold, if any
    */
 
   val revoke: URI?,
-
   override val endDate: DateTime?
 ) : OPDSAvailabilityType {
-
   override fun toString(): String {
     val fmt = ISODateTimeFormat.dateTime()
     val b = StringBuilder(128)
@@ -54,12 +50,11 @@ data class OPDSAvailabilityLoaned(
       startDate: DateTime?,
       endDate: DateTime?,
       revoke: URI?
-    ): OPDSAvailabilityLoaned {
-      return OPDSAvailabilityLoaned(
+    ): OPDSAvailabilityLoaned =
+      OPDSAvailabilityLoaned(
         startDate = startDate,
         revoke = revoke,
         endDate = endDate
       )
-    }
   }
 }

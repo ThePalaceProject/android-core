@@ -8,7 +8,6 @@ package org.nypl.simplified.accounts.api
  */
 
 interface AccountProviderFallbackType {
-
   /**
    * Retrieve the fallback provider.
    */

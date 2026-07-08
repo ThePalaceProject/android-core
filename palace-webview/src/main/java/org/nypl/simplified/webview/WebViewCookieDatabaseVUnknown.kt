@@ -14,33 +14,35 @@ class WebViewCookieDatabaseVUnknown internal constructor(
   override fun getAll(): List<WebViewCookieType> {
     val result = mutableListOf<Cookie>()
 
-    val columns = arrayOf(
-      "host_key",
-      "name",
-      "value",
-      "path",
-    )
+    val columns =
+      arrayOf(
+        "host_key",
+        "name",
+        "value",
+        "path",
+      )
 
-    this.db.query(
-      DB_COOKIE_TABLE_NAME,
-      columns,
-      null,
-      null,
-      null,
-      null,
-      null
-    ).use { cursor ->
-      while (cursor.moveToNext()) {
-        result.add(
-          Cookie(
-            hostKey = cursor.getString(0),
-            name = cursor.getString(1),
-            value = cursor.getString(2),
-            path = cursor.getString(3),
+    this.db
+      .query(
+        DB_COOKIE_TABLE_NAME,
+        columns,
+        null,
+        null,
+        null,
+        null,
+        null
+      ).use { cursor ->
+        while (cursor.moveToNext()) {
+          result.add(
+            Cookie(
+              hostKey = cursor.getString(0),
+              name = cursor.getString(1),
+              value = cursor.getString(2),
+              path = cursor.getString(3),
+            )
           )
-        )
+        }
       }
-    }
 
     return result
   }
@@ -51,7 +53,6 @@ class WebViewCookieDatabaseVUnknown internal constructor(
     val value: String,
     val path: String,
   ) : WebViewCookieType {
-
     override val sourceURL: String
       get() {
         val domain = this.hostKey.trimStart('.')
@@ -70,9 +71,11 @@ class WebViewCookieDatabaseVUnknown internal constructor(
 
       pairs.add(listOf("Path", this.path))
 
-      return pairs.map({ pair ->
-        pair.joinToString("=")
-      }).joinToString("; ")
+      return pairs
+        .map({ pair ->
+          pair.joinToString("=")
+        })
+        .joinToString("; ")
     }
   }
 }

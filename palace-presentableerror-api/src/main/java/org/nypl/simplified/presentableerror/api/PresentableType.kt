@@ -20,7 +20,6 @@ import java.io.Serializable
 
 @ThreadSafe
 interface PresentableType : Serializable {
-
   /**
    * The complete error message, fit for presentation to the screen.
    */

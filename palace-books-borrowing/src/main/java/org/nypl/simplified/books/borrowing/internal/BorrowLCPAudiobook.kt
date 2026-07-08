@@ -27,22 +27,19 @@ import java.io.File
 import java.net.URI
 
 class BorrowLCPAudiobook : BorrowSubtaskType {
-
   companion object : BorrowSubtaskFactoryType {
     override val name: String
       get() = "LCP AudioBook Download"
 
-    override fun createSubtask(): BorrowSubtaskType {
-      return BorrowLCPAudiobook()
-    }
+    override fun createSubtask(): BorrowSubtaskType = BorrowLCPAudiobook()
 
     override fun isApplicableFor(
       type: MIMEType,
       target: Link?,
       account: AccountReadableType?,
       remaining: List<MIMEType>
-    ): Boolean {
-      return if (MIMECompatibility.isCompatibleStrictWithoutAttributes(type, lcpLicenseFiles)) {
+    ): Boolean =
+      if (MIMECompatibility.isCompatibleStrictWithoutAttributes(type, lcpLicenseFiles)) {
         val next = remaining.firstOrNull()
         if (next != null) {
           MIMECompatibility.isCompatibleStrictWithoutAttributes(next, lcpAudioBooks)
@@ -52,12 +49,9 @@ class BorrowLCPAudiobook : BorrowSubtaskType {
       } else {
         false
       }
-    }
   }
 
-  override fun execute(
-    context: BorrowContextType
-  ) {
+  override fun execute(context: BorrowContextType) {
     try {
       BorrowLCPSupport.checkDRMSupport(context)
       val passphrase = BorrowLCPSupport.findPassphraseOrManual(context)
@@ -181,8 +175,9 @@ class BorrowLCPAudiobook : BorrowSubtaskType {
       }
 
       is BookDatabaseEntryFormatHandleEPUB,
-      is BookDatabaseEntryFormatHandlePDF ->
+      is BookDatabaseEntryFormatHandlePDF -> {
         throw UnreachableCodeException()
+      }
     }
 
     context.taskRecorder.currentStepSucceeded("Saved book.")
@@ -192,9 +187,7 @@ class BorrowLCPAudiobook : BorrowSubtaskType {
    * Determine the actual book format we're aiming for at the end of the acquisition path.
    */
 
-  private fun findFormatHandle(
-    context: BorrowContextType
-  ): BookDatabaseEntryFormatHandle {
+  private fun findFormatHandle(context: BorrowContextType): BookDatabaseEntryFormatHandle {
     val eventualType = lcpAudioBooks
     val formatHandle = context.bookDatabaseEntry.findFormatHandleForContentType(eventualType)
     if (formatHandle == null) {

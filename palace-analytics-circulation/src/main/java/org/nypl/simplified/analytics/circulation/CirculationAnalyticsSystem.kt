@@ -20,12 +20,10 @@ class CirculationAnalyticsSystem(
   private val configuration: AnalyticsConfiguration,
   private val executor: ExecutorService
 ) : AnalyticsSystem {
-
   private val logger =
     LoggerFactory.getLogger(CirculationAnalyticsSystem::class.java)
 
-  override fun onAnalyticsEvent(event: AnalyticsEvent): Unit =
-    this.executor.execute { this.consumeEvent(event) }
+  override fun onAnalyticsEvent(event: AnalyticsEvent): Unit = this.executor.execute { this.consumeEvent(event) }
 
   private fun consumeEvent(event: AnalyticsEvent) {
     this.logger.debug("received event {}", event::class.simpleName)
@@ -36,6 +34,7 @@ class CirculationAnalyticsSystem(
         }
         this.logger.debug("consuming 'BookOpened' event for {}", event.targetURI)
       }
+
       else -> {
         // All other events are silently dropped
       }
@@ -48,7 +47,8 @@ class CirculationAnalyticsSystem(
     credentials: AccountAuthenticationCredentials?
   ) {
     val request =
-      this.configuration.http.newRequest(target)
+      this.configuration.http
+        .newRequest(target)
         .setAuthorization(AccountAuthenticatedHTTP.createAuthorizationIfPresent(credentials))
         .addBasicTokenPropertiesIfApplicable(credentials)
         .build()
@@ -58,9 +58,11 @@ class CirculationAnalyticsSystem(
       is LSHTTPResponseStatus.Responded.OK -> {
         onAccessTokenUpdated(status.getAccessToken())
       }
+
       is LSHTTPResponseStatus.Responded.Error -> {
         logError(status)
       }
+
       is LSHTTPResponseStatus.Failed -> {
         this.logger.error("error sending event to {}: ", target, status.exception)
       }

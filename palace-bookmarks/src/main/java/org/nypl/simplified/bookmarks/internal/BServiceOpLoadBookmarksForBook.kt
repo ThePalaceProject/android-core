@@ -24,7 +24,6 @@ internal class BServiceOpLoadBookmarksForBook(
   private val book: BookID,
   private val bookmarksSource: AttributeType<Map<AccountID, Map<BookID, BookmarksForBook>>>,
 ) : BServiceOp<BookmarksForBook>(logger) {
-
   override fun runActual(): BookmarksForBook {
     try {
       this.logger.debug("[{}]: loading bookmarks for book {}", this.profile.id.uuid, this.book.brief())
@@ -32,9 +31,10 @@ internal class BServiceOpLoadBookmarksForBook(
       val account = this.profile.account(this.accountID)
       val books = account.bookDatabase
       val entry = books.entry(this.book)
-      val handle = entry.findFormatHandle(BookDatabaseEntryFormatHandleEPUB::class.java)
-        ?: entry.findFormatHandle(BookDatabaseEntryFormatHandleAudioBook::class.java)
-        ?: entry.findFormatHandle(BookDatabaseEntryFormatHandlePDF::class.java)
+      val handle =
+        entry.findFormatHandle(BookDatabaseEntryFormatHandleEPUB::class.java)
+          ?: entry.findFormatHandle(BookDatabaseEntryFormatHandleAudioBook::class.java)
+          ?: entry.findFormatHandle(BookDatabaseEntryFormatHandlePDF::class.java)
 
       if (handle != null) {
         val bookmarks: List<SerializedBookmark>
@@ -46,16 +46,19 @@ internal class BServiceOpLoadBookmarksForBook(
             bookmarks = format.bookmarks
             lastReadLocation = format.lastReadLocation
           }
+
           is BookFormat.BookFormatAudioBook -> {
             val format = handle.format as BookFormat.BookFormatAudioBook
             bookmarks = format.bookmarks
             lastReadLocation = format.lastReadLocation
           }
+
           is BookFormat.BookFormatPDF -> {
             val format = handle.format as BookFormat.BookFormatPDF
             bookmarks = format.bookmarks
             lastReadLocation = format.lastReadLocation
           }
+
           else -> {
             bookmarks = emptyList()
             lastReadLocation = null
@@ -68,11 +71,13 @@ internal class BServiceOpLoadBookmarksForBook(
           bookmarks.size
         )
 
-        return publish(BookmarksForBook(
-          bookId = this.book,
-          lastRead = lastReadLocation,
-          bookmarks = bookmarks.filter { b -> b.kind == BookmarkKind.BookmarkExplicit }
-        ))
+        return publish(
+          BookmarksForBook(
+            bookId = this.book,
+            lastRead = lastReadLocation,
+            bookmarks = bookmarks.filter { b -> b.kind == BookmarkKind.BookmarkExplicit }
+          )
+        )
       }
     } catch (e: Exception) {
       this.logger.error("[{}]: error loading bookmarks: ", this.profile.id.uuid, e)
@@ -82,9 +87,7 @@ internal class BServiceOpLoadBookmarksForBook(
     return publish(BookmarksForBook(this.book, null, listOf()))
   }
 
-  private fun publish(
-    bookmarksForBook: BookmarksForBook
-  ): BookmarksForBook {
+  private fun publish(bookmarksForBook: BookmarksForBook): BookmarksForBook {
     this.bookmarksSource.set(
       BookmarkAttributes.addBookmarks(
         this.bookmarksSource.get(),

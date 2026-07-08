@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView
 class SpaceItemDecoration(
   @Px private val size: Int
 ) : RecyclerView.ItemDecoration() {
-
   override fun getItemOffsets(
     outRect: Rect,
     view: View,

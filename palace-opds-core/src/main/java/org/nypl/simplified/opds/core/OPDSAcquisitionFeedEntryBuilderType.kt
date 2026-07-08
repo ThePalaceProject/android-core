@@ -9,42 +9,33 @@ import java.net.URI
  */
 
 interface OPDSAcquisitionFeedEntryBuilderType {
-
   /**
    * Add a parse error.
    *
    * @param error The parse error
    */
-  fun addParseError(
-    error: ParseError
-  ): OPDSAcquisitionFeedEntryBuilderType
+  fun addParseError(error: ParseError): OPDSAcquisitionFeedEntryBuilderType
 
   /**
    * Add an acquisition.
    *
    * @param a The acquisition
    */
-  fun addAcquisition(
-    a: OPDSAcquisition
-  ): OPDSAcquisitionFeedEntryBuilderType
+  fun addAcquisition(a: OPDSAcquisition): OPDSAcquisitionFeedEntryBuilderType
 
   /**
    * Set the author.
    *
    * @param name The author
    */
-  fun addAuthor(
-    name: String
-  ): OPDSAcquisitionFeedEntryBuilderType
+  fun addAuthor(name: String): OPDSAcquisitionFeedEntryBuilderType
 
   /**
    * Add a category.
    *
    * @param c The category
    */
-  fun addCategory(
-    c: OPDSCategory
-  ): OPDSAcquisitionFeedEntryBuilderType
+  fun addCategory(c: OPDSCategory): OPDSAcquisitionFeedEntryBuilderType
 
   /**
    * Add a group.
@@ -72,151 +63,111 @@ interface OPDSAcquisitionFeedEntryBuilderType {
    *
    * @param a The availability
    */
-  fun setAvailability(
-    a: OPDSAvailabilityType
-  ): OPDSAcquisitionFeedEntryBuilderType
+  fun setAvailability(a: OPDSAvailabilityType): OPDSAcquisitionFeedEntryBuilderType
 
   /**
    * Set the cover.
    *
    * @param uri The cover URI (nullable replacement for OptionType)
    */
-  fun setCoverOption(
-    uri: URI?
-  ): OPDSAcquisitionFeedEntryBuilderType
+  fun setCoverOption(uri: URI?): OPDSAcquisitionFeedEntryBuilderType
 
   /**
    * Add a preview.
    *
    * @param previewAcquisition The preview acquisition
    */
-  fun addPreviewAcquisition(
-    previewAcquisition: OPDSPreviewAcquisition
-  ): OPDSAcquisitionFeedEntryBuilderType
+  fun addPreviewAcquisition(previewAcquisition: OPDSPreviewAcquisition): OPDSAcquisitionFeedEntryBuilderType
 
   /**
    * @param uri The annotations URI (nullable replacement for OptionType)
    */
-  fun setAnnotationsOption(
-    uri: URI?
-  ): OPDSAcquisitionFeedEntryBuilderType
+  fun setAnnotationsOption(uri: URI?): OPDSAcquisitionFeedEntryBuilderType
 
   /**
    * @param uri The alternate URI (nullable replacement for OptionType)
    */
-  fun setAlternateOption(
-    uri: URI?
-  ): OPDSAcquisitionFeedEntryBuilderType
+  fun setAlternateOption(uri: URI?): OPDSAcquisitionFeedEntryBuilderType
 
   /**
    * @param uri The analytics URI (nullable replacement for OptionType)
    */
-  fun setAnalyticsOption(
-    uri: URI?
-  ): OPDSAcquisitionFeedEntryBuilderType
+  fun setAnalyticsOption(uri: URI?): OPDSAcquisitionFeedEntryBuilderType
 
   /**
    * Set the report issues URI.
    *
    * @param uri The report issues URI (nullable replacement for OptionType)
    */
-  fun setIssuesOption(
-    uri: URI?
-  ): OPDSAcquisitionFeedEntryBuilderType
+  fun setIssuesOption(uri: URI?): OPDSAcquisitionFeedEntryBuilderType
 
   /**
    * @param uri The Related feed URI (nullable replacement for OptionType)
    */
-  fun setRelatedOption(
-    uri: URI?
-  ): OPDSAcquisitionFeedEntryBuilderType
+  fun setRelatedOption(uri: URI?): OPDSAcquisitionFeedEntryBuilderType
 
   /**
    * Set the publication date.
    *
    * @param pub The publication date (nullable replacement for OptionType)
    */
-  fun setPublishedOption(
-    pub: DateTime?
-  ): OPDSAcquisitionFeedEntryBuilderType
+  fun setPublishedOption(pub: DateTime?): OPDSAcquisitionFeedEntryBuilderType
 
   /**
    * Set the publisher.
    *
    * @param pub The publisher (nullable replacement for OptionType)
    */
-  fun setPublisherOption(
-    pub: String?
-  ): OPDSAcquisitionFeedEntryBuilderType
+  fun setPublisherOption(pub: String?): OPDSAcquisitionFeedEntryBuilderType
 
   /**
    * Set the distribution.
    *
    * @param dist The distribution
    */
-  fun setDistribution(
-    dist: String
-  ): OPDSAcquisitionFeedEntryBuilderType
+  fun setDistribution(dist: String): OPDSAcquisitionFeedEntryBuilderType
 
   /**
    * Set the summary.
    *
    * @param text The summary (nullable replacement for OptionType)
    */
-  fun setSummaryOption(
-    text: String?
-  ): OPDSAcquisitionFeedEntryBuilderType
+  fun setSummaryOption(text: String?): OPDSAcquisitionFeedEntryBuilderType
 
   /**
    * Set the narrator.
    *
    * @param name The narrator's name
    */
-  fun addNarrator(
-    name: String
-  ): OPDSAcquisitionFeedEntryBuilderType
+  fun addNarrator(name: String): OPDSAcquisitionFeedEntryBuilderType
 
   /**
    * Set the thumbnail.
    *
    * @param uri The thumbnail (nullable replacement for OptionType)
    */
-  fun setThumbnailOption(
-    uri: URI?
-  ): OPDSAcquisitionFeedEntryBuilderType
+  fun setThumbnailOption(uri: URI?): OPDSAcquisitionFeedEntryBuilderType
 
   /**
    * Set the time tracking uri.
    *
    * @param uri The time tracking uri (nullable replacement for OptionType)
    */
-  fun setTimeTrackingUriOption(
-    uri: URI?
-  ): OPDSAcquisitionFeedEntryBuilderType
+  fun setTimeTrackingUriOption(uri: URI?): OPDSAcquisitionFeedEntryBuilderType
 
   /**
    * @param licensor The Licensor (nullable replacement for OptionType)
    */
-  fun setLicensorOption(
-    licensor: DRMLicensor?
-  ): OPDSAcquisitionFeedEntryBuilderType
+  fun setLicensorOption(licensor: DRMLicensor?): OPDSAcquisitionFeedEntryBuilderType
 
   /**
    * @param duration The duration in seconds (nullable replacement for OptionType)
    */
-  fun setDurationOption(
-    duration: Double?
-  ): OPDSAcquisitionFeedEntryBuilderType
+  fun setDurationOption(duration: Double?): OPDSAcquisitionFeedEntryBuilderType
 
-  fun setLanguageOption(
-    language: String?
-  ): OPDSAcquisitionFeedEntryBuilderType
+  fun setLanguageOption(language: String?): OPDSAcquisitionFeedEntryBuilderType
 
-  fun setAudienceOption(
-    audience: String?
-  ): OPDSAcquisitionFeedEntryBuilderType
+  fun setAudienceOption(audience: String?): OPDSAcquisitionFeedEntryBuilderType
 
-  fun setSeries(
-    series: OPDSSeries?
-  ): OPDSAcquisitionFeedEntryBuilderType
+  fun setSeries(series: OPDSSeries?): OPDSAcquisitionFeedEntryBuilderType
 }

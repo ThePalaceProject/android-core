@@ -8,22 +8,18 @@ import java.net.URI
  */
 
 data class OPDSLink(
-
   /**
    * The optional hash of the target content.
    */
   val hash: String?,
-
   /**
    * The URI of the target content.
    */
   val href: URI,
-
   /**
    * The optional type of the target content.
    */
   val type: String?,
-
   /**
    * The optional length of the target content.
    */

@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 
 object Services : ServiceDirectoryProviderType {
-
   private val logger = LoggerFactory.getLogger(Services::class.java)
   private val servicesLock: Any = Any()
   private var servicesDirectory: ServiceDirectoryType? = null
@@ -21,22 +20,19 @@ object Services : ServiceDirectoryProviderType {
     }
   }
 
-  fun serviceDirectoryFuture(): ListenableFuture<ServiceDirectoryType> =
-    this.servicesFuture
+  fun serviceDirectoryFuture(): ListenableFuture<ServiceDirectoryType> = this.servicesFuture
 
-  fun isInitialized(): Boolean {
-    return synchronized(this.servicesLock) {
+  fun isInitialized(): Boolean =
+    synchronized(this.servicesLock) {
       this.servicesDirectory != null
     }
-  }
 
-  fun initialize(services: ServiceDirectoryType) {
-    return synchronized(this.servicesLock) {
+  fun initialize(services: ServiceDirectoryType) =
+    synchronized(this.servicesLock) {
       check(this.servicesDirectory == null) {
         "Service directory has already been initialized!"
       }
       this.servicesDirectory = services
       this.servicesFuture.set(services)
     }
-  }
 }

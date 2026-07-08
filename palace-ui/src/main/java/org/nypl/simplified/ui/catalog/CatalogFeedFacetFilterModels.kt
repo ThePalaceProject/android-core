@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory
 import java.util.SortedMap
 
 object CatalogFeedFacetFilterModels {
-
   private val logger =
     LoggerFactory.getLogger(CatalogFeedFacetFilterModels::class.java)
 
@@ -15,16 +14,12 @@ object CatalogFeedFacetFilterModels {
   val filterModel: CatalogFeedFacetFilterModel
     get() = this.INSTANCE
 
-  fun createNew(
-    facets: SortedMap<String, List<FeedFacet.FeedFacetSingle>>
-  ) {
+  fun createNew(facets: SortedMap<String, List<FeedFacet.FeedFacetSingle>>) {
     this.logCreation(facets)
     this.INSTANCE = CatalogFeedFacetFilterModel.create(facets)
   }
 
-  private fun logCreation(
-    facets: SortedMap<String, List<FeedFacet.FeedFacetSingle>>
-  ) {
+  private fun logCreation(facets: SortedMap<String, List<FeedFacet.FeedFacetSingle>>) {
     try {
       this.logger.debug("Creating a new facet filter model of size {}.", facets.size)
       for (e in facets.entries) {

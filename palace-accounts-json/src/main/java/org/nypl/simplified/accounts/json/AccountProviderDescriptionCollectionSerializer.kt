@@ -20,7 +20,6 @@ class AccountProviderDescriptionCollectionSerializer internal constructor(
   private val document: AccountProviderDescriptionCollection,
   private val serializers: AccountProviderDescriptionSerializersType
 ) : AccountProviderDescriptionCollectionSerializerType {
-
   private val mapper = ObjectMapper()
 
   override fun serialize() {

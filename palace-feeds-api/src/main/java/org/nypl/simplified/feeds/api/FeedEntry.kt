@@ -12,7 +12,6 @@ import java.io.Serializable
  */
 
 sealed class FeedEntry : Serializable {
-
   /**
    * The account that owns the feed entry
    */
@@ -46,7 +45,6 @@ sealed class FeedEntry : Serializable {
     override val accountID: AccountID,
     val feedEntry: OPDSAcquisitionFeedEntry
   ) : FeedEntry() {
-
     override val bookID: BookID =
       newFromText(feedEntry.id)
 

@@ -8,7 +8,6 @@ import org.nypl.simplified.books.api.bookmark.SerializedBookmark
  */
 
 sealed class BookmarkEvent {
-
   /**
    * Synchronizing bookmarks for the given account has started.
    */

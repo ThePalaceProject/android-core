@@ -7,7 +7,6 @@ import java.io.File
  */
 
 interface ProfilesDatabaseType {
-
   /**
    * Access the profile.
    *

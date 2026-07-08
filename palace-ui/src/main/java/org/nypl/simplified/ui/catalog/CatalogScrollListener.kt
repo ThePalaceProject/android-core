@@ -12,11 +12,13 @@ import org.slf4j.LoggerFactory
 class CatalogScrollListener(
   private val bookCovers: BookCoverProviderType
 ) : RecyclerView.OnScrollListener() {
-
   private val logger =
     LoggerFactory.getLogger(CatalogScrollListener::class.java)
 
-  override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+  override fun onScrollStateChanged(
+    recyclerView: RecyclerView,
+    newState: Int
+  ) {
     when (newState) {
       RecyclerView.SCROLL_STATE_DRAGGING -> {
         this.logger.debug("scrolling: pausing thumbnail loading")

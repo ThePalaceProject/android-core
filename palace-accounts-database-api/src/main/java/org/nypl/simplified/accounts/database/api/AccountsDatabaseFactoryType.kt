@@ -15,7 +15,6 @@ import java.io.File
  */
 
 interface AccountsDatabaseFactoryType {
-
   /**
    * Open an accounts database from the given directory, creating a new database if one does not exist.
    *

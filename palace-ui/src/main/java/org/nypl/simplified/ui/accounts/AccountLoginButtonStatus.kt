@@ -5,7 +5,6 @@ package org.nypl.simplified.ui.accounts
  */
 
 sealed class AccountLoginButtonStatus {
-
   /**
    * The login button should be displayed as a "Log In" button, should be enabled, and should
    * execute [onClick] when clicked.

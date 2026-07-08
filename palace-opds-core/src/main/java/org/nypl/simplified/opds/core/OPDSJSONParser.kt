@@ -37,15 +37,14 @@ import java.net.URISyntaxException
  */
 class OPDSJSONParser private constructor() : OPDSJSONParserType {
   @Throws(OPDSParseException::class)
-  override fun parseAcquisitionFeed(
-    s: ObjectNode
-  ): OPDSAcquisitionFeed {
+  override fun parseAcquisitionFeed(s: ObjectNode): OPDSAcquisitionFeed {
     try {
       val uri = URI(getString(s, "uri"))
       val id = getString(s, "id")
-      val updated = getTimestamp(
-        s, "updated"
-      )
+      val updated =
+        getTimestamp(
+          s, "updated"
+        )
       val title = getString(s, "title")
 
       val fb =
@@ -67,9 +66,10 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
           val o = checkObject(null, fs.get(index))
           val facetActive =
             getBoolean(o, "active")
-          val facetUri = URI(
-            getString(o, "uri")
-          )
+          val facetUri =
+            URI(
+              getString(o, "uri")
+            )
           val facetGroup =
             getString(o, "group")
           val facetGroupType: String? =
@@ -91,9 +91,10 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
       run {
         val fs = getArray(s, "entries")
         for (index in 0..<fs.size()) {
-          val o = checkObject(
-            null, fs.get(index)
-          )
+          val o =
+            checkObject(
+              null, fs.get(index)
+            )
           fb.addEntry(this.parseAcquisitionFeedEntry(o))
         }
       }
@@ -107,9 +108,7 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
   }
 
   @Throws(OPDSParseException::class)
-  override fun parseAcquisitionFeedEntry(
-    s: ObjectNode
-  ): OPDSAcquisitionFeedEntry {
+  override fun parseAcquisitionFeedEntry(s: ObjectNode): OPDSAcquisitionFeedEntry {
     try {
       val id = getString(s, "id")
       val title = getString(s, "title")
@@ -159,14 +158,16 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
         val a = getArray(s, "groups")
         for (index in 0..<a.size()) {
           try {
-            val jo = checkObject(
-              null, a.get(index)
-            )
-            val uri = URI(
-              getString(
-                jo, "uri"
+            val jo =
+              checkObject(
+                null, a.get(index)
               )
-            )
+            val uri =
+              URI(
+                getString(
+                  jo, "uri"
+                )
+              )
             val name = getString(jo, "name")
             fb.addGroup(uri, name)
           } catch (e: URISyntaxException) {
@@ -182,14 +183,16 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
         if (a != null) {
           for (index in 0..<a.size()) {
             try {
-              val jo = checkObject(
-                null, a.get(index)
-              )
-              val uri = URI(
-                getString(
-                  jo, "uri"
+              val jo =
+                checkObject(
+                  null, a.get(index)
                 )
-              )
+              val uri =
+                URI(
+                  getString(
+                    jo, "uri"
+                  )
+                )
               val type =
                 parseRaisingException(
                   getString(jo, "type")
@@ -217,9 +220,7 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
   }
 
   @Throws(OPDSParseException::class)
-  override fun parseAcquisitionFeedEntryFromStream(
-    s: InputStream?
-  ): OPDSAcquisitionFeedEntry {
+  override fun parseAcquisitionFeedEntryFromStream(s: InputStream?): OPDSAcquisitionFeedEntry {
     try {
       val jom = ObjectMapper()
       return this.parseAcquisitionFeedEntry(
@@ -235,9 +236,7 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
   }
 
   @Throws(OPDSParseException::class)
-  override fun parseAcquisitionFeedFromStream(
-    s: InputStream?
-  ): OPDSAcquisitionFeed {
+  override fun parseAcquisitionFeedFromStream(s: InputStream?): OPDSAcquisitionFeed {
     try {
       val jom = ObjectMapper()
       return this.parseAcquisitionFeed(
@@ -264,14 +263,10 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
      * @return A new JSON parser
      */
     @JvmStatic
-    fun newParser(): OPDSJSONParserType {
-      return OPDSJSONParser()
-    }
+    fun newParser(): OPDSJSONParserType = OPDSJSONParser()
 
     @Throws(OPDSParseException::class)
-    private fun parseAcquisition(
-      o: ObjectNode
-    ): OPDSAcquisition {
+    private fun parseAcquisition(o: ObjectNode): OPDSAcquisition {
       try {
         /*
          * XXX: COMPATIBILITY: this field is called "type" when it should really be called "relation".
@@ -287,9 +282,10 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
 
         val indirects: MutableList<OPDSIndirectAcquisition>
         if (o.has(INDIRECT_ACQUISITIONS_FIELD)) {
-          indirects = parseIndirectAcquisitions(
-            getArray(o, INDIRECT_ACQUISITIONS_FIELD)
-          )
+          indirects =
+            parseIndirectAcquisitions(
+              getArray(o, INDIRECT_ACQUISITIONS_FIELD)
+            )
         } else {
           indirects = mutableListOf()
         }
@@ -300,9 +296,10 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
          */
         val type: MIMEType?
         if (o.has(CONTENT_TYPE_FIELD)) {
-          type = parseRaisingException(
-            getString(o, CONTENT_TYPE_FIELD)
-          )
+          type =
+            parseRaisingException(
+              getString(o, CONTENT_TYPE_FIELD)
+            )
         } else {
           type = parseRaisingException("application/epub+zip")
         }
@@ -368,9 +365,7 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
     }
 
     @Throws(OPDSParseException::class)
-    private fun parseIndirectAcquisition(
-      jnode: JsonNode
-    ): OPDSIndirectAcquisition {
+    private fun parseIndirectAcquisition(jnode: JsonNode): OPDSIndirectAcquisition {
       try {
         val obj =
           checkObject(null, jnode)
@@ -392,9 +387,7 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
     }
 
     @Throws(OPDSParseException::class)
-    private fun parseIndirectAcquisitions(
-      indirects: ArrayNode
-    ): MutableList<OPDSIndirectAcquisition> {
+    private fun parseIndirectAcquisitions(indirects: ArrayNode): MutableList<OPDSIndirectAcquisition> {
       val results: MutableList<OPDSIndirectAcquisition> =
         ArrayList(indirects.size())
       for (index in 0..<indirects.size()) {
@@ -404,9 +397,7 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
     }
 
     @Throws(OPDSParseException::class)
-    private fun parseAvailability(
-      node: ObjectNode
-    ): OPDSAvailabilityType {
+    private fun parseAvailability(node: ObjectNode): OPDSAvailabilityType {
       try {
         if (node.has("loanable")) {
           return OPDSAvailabilityLoanable.get()
@@ -454,18 +445,20 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
         }
 
         if (node.has("open_access")) {
-          val n = getObject(
-            node, "open_access"
-          )
+          val n =
+            getObject(
+              node, "open_access"
+            )
           val revoke: URI? =
             getURIOrNull(n, "revoke")
           return OPDSAvailabilityOpenAccess.get(revoke)
         }
 
         if (node.has("revoked")) {
-          val n = getObject(
-            node, "revoked"
-          )
+          val n =
+            getObject(
+              node, "revoked"
+            )
           val revoke = getURI(n, "revoke")
           return OPDSAvailabilityRevoked.get(revoke)
         }
@@ -477,9 +470,7 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
     }
 
     @Throws(OPDSParseException::class)
-    private fun parseCategory(
-      jn: JsonNode
-    ): OPDSCategory {
+    private fun parseCategory(jn: JsonNode): OPDSCategory {
       try {
         val o = checkObject(null, jn)
         val term = getString(o, "term")
@@ -492,9 +483,7 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
     }
 
     @Throws(OPDSParseException::class)
-    private fun parseLicensor(
-      jn: JsonNode
-    ): DRMLicensor {
+    private fun parseLicensor(jn: JsonNode): DRMLicensor {
       try {
         val o = checkObject(null, jn)
         val vendor = getString(o, "vendor")

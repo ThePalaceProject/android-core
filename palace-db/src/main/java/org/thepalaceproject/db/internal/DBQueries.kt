@@ -15,7 +15,6 @@ import org.thepalaceproject.db.api.queries.DBQAccountRegistrySettingsPutType
 import org.thepalaceproject.db.api.queries.DBQSchemaVersionType
 
 internal object DBQueries {
-
   private val queryList =
     mapOf<Class<*>, DBQueryType<*, *>>(
       Pair(
@@ -38,9 +37,7 @@ internal object DBQueries {
       Pair(DBQAccountRegistrySettingsGetType::class.java, DBQAccountRegistrySettingsGet)
     )
 
-  fun <P, R, Q : DBQueryType<P, R>> query(
-    clazz: Class<Q>
-  ): Q {
+  fun <P, R, Q : DBQueryType<P, R>> query(clazz: Class<Q>): Q {
     val query =
       this.queryList[clazz]
         ?: throw IllegalArgumentException("No query registered for '$clazz'")

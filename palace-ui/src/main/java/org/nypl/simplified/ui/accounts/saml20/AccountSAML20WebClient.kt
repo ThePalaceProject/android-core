@@ -20,7 +20,6 @@ class AccountSAML20WebClient(
   private val account: AccountID,
   private val webViewDataDir: File,
 ) : WebViewClient() {
-
   private val logger =
     LoggerFactory.getLogger(AccountSAML20WebClient::class.java)
 
@@ -43,16 +42,12 @@ class AccountSAML20WebClient(
   override fun shouldOverrideUrlLoading(
     view: WebView,
     url: String
-  ): Boolean {
-    return this.handleUrl(view, url)
-  }
+  ): Boolean = this.handleUrl(view, url)
 
   override fun shouldOverrideUrlLoading(
     view: WebView,
     request: WebResourceRequest
-  ): Boolean {
-    return this.handleUrl(view, request.url.toString())
-  }
+  ): Boolean = this.handleUrl(view, request.url.toString())
 
   private fun handleUrl(
     view: WebView,
@@ -94,10 +89,11 @@ class AccountSAML20WebClient(
         return true
       }
 
-      val cookies = WebViewUtilities.dumpCookiesAsAccountCookies(
-        CookieManager.getInstance(),
-        this.webViewDataDir
-      )
+      val cookies =
+        WebViewUtilities.dumpCookiesAsAccountCookies(
+          CookieManager.getInstance(),
+          this.webViewDataDir
+        )
 
       this.logger.debug("Obtained access token")
       AccountSAML20Model.setState(

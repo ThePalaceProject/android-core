@@ -20,7 +20,6 @@ import org.nypl.simplified.ui.accounts.AccountEvents
 import org.slf4j.LoggerFactory
 
 object AccountOIDCModel {
-
   private val logger =
     LoggerFactory.getLogger(AccountOIDCModel::class.java)
 
@@ -35,17 +34,18 @@ object AccountOIDCModel {
     this.subscriptions?.close()
     this.subscriptions = CloseableCollection.create()
 
-    val eventSub = accountEvents.events.subscribe { event ->
-      try {
-        this.onAccountEvent(
-          activity = activity,
-          account = account,
-          event = event
-        )
-      } catch (e: Throwable) {
-        this.logger.error("Error handling event: ", e)
+    val eventSub =
+      accountEvents.events.subscribe { event ->
+        try {
+          this.onAccountEvent(
+            activity = activity,
+            account = account,
+            event = event
+          )
+        } catch (e: Throwable) {
+          this.logger.error("Error handling event: ", e)
+        }
       }
-    }
     this.subscriptions?.add(AutoCloseable { eventSub.dispose() })
   }
 

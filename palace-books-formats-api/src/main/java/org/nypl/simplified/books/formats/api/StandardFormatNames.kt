@@ -8,15 +8,11 @@ import one.irradia.mime.vanilla.MIMEParser
  */
 
 object StandardFormatNames {
+  private fun mimeOf(name: String): MIMEType = MIMEParser.parseRaisingException(name)
 
-  private fun mimeOf(name: String): MIMEType =
-    MIMEParser.parseRaisingException(name)
+  private fun mimesOfList(names: List<String>): Set<MIMEType> = names.map(this::mimeOf).toSet()
 
-  private fun mimesOfList(names: List<String>): Set<MIMEType> =
-    names.map(this::mimeOf).toSet()
-
-  private fun mimesOf(vararg names: String): Set<MIMEType> =
-    this.mimesOfList(names.toList())
+  private fun mimesOf(vararg names: String): Set<MIMEType> = this.mimesOfList(names.toList())
 
   /**
    * The standard format name for Simplified bearer tokens.
@@ -131,12 +127,13 @@ object StandardFormatNames {
    * The MIME types used for book preview files.
    */
 
-  val bookPreviewFiles = listOf(
-    textHtmlBook,
-    genericEPUBFiles,
-    mpegAudioBooks,
-    wmaAudioBooks
-  )
+  val bookPreviewFiles =
+    listOf(
+      textHtmlBook,
+      genericEPUBFiles,
+      mpegAudioBooks,
+      wmaAudioBooks
+    )
 
   /**
    * The MIME type used for PDF files, encrypted or otherwise.

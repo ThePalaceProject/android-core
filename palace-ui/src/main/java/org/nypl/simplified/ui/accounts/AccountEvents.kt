@@ -14,11 +14,7 @@ class AccountEvents private constructor(
   private val relay: UISubjectRelay<AccountEvent>
 ) {
   companion object {
-    fun create(
-      profiles: ProfilesControllerType
-    ): AccountEvents {
-      return AccountEvents(UISubjectRelay.create(profiles.accountEvents()))
-    }
+    fun create(profiles: ProfilesControllerType): AccountEvents = AccountEvents(UISubjectRelay.create(profiles.accountEvents()))
   }
 
   /**

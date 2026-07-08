@@ -137,7 +137,6 @@ import java.time.ZoneOffset.UTC
 import java.util.ServiceLoader
 
 internal object MainServices {
-
   private val logger = LoggerFactory.getLogger(MainServices::class.java)
 
   /**
@@ -252,8 +251,8 @@ internal object MainServices {
     )
   }
 
-  private fun findAdobeConfiguration(): AdobeConfigurationServiceType {
-    return object : AdobeConfigurationServiceType {
+  private fun findAdobeConfiguration(): AdobeConfigurationServiceType =
+    object : AdobeConfigurationServiceType {
       override val packageOverride: String?
         get() = null
 
@@ -263,11 +262,11 @@ internal object MainServices {
       override val dataDirectoryName: String
         get() = CURRENT_DATA_VERSION
     }
-  }
 
   private fun createLocalImageLoader(context: Application): ImageLoaderType {
     val localImageLoader =
-      Picasso.Builder(context)
+      Picasso
+        .Builder(context)
         .indicatorsEnabled(false)
         .loggingEnabled(true)
         .addRequestHandler(ImageAccountIconRequestHandler(context))
@@ -281,7 +280,8 @@ internal object MainServices {
 
   private fun loadDefaultAccountProvider(): AccountProvider {
     val providers =
-      ServiceLoader.load(AccountProviderFallbackType::class.java)
+      ServiceLoader
+        .load(AccountProviderFallbackType::class.java)
         .map { provider -> provider.get() }
         .toList()
 
@@ -317,36 +317,32 @@ internal object MainServices {
     )
   }
 
-  private fun createAccountAuthenticationCredentialsStore(
-    directories: Directories
-  ): AccountAuthenticationCredentialsStoreType {
-    val accountCredentialsStore = try {
-      val credentials =
-        File(directories.directoryStorageBaseVersioned, "credentials.json")
-      val credentialsTemp =
-        File(directories.directoryStorageBaseVersioned, "credentials.json.tmp")
+  private fun createAccountAuthenticationCredentialsStore(directories: Directories): AccountAuthenticationCredentialsStoreType {
+    val accountCredentialsStore =
+      try {
+        val credentials =
+          File(directories.directoryStorageBaseVersioned, "credentials.json")
+        val credentialsTemp =
+          File(directories.directoryStorageBaseVersioned, "credentials.json.tmp")
 
-      logger.debug("credentials store path: {}", credentials)
-      AccountAuthenticationCredentialsStore.open(credentials, credentialsTemp)
-    } catch (e: Exception) {
-      logger.debug("could not initialize credentials store: ", e)
-      throw IllegalStateException("could not initialize credentials store", e)
-    }
+        logger.debug("credentials store path: {}", credentials)
+        AccountAuthenticationCredentialsStore.open(credentials, credentialsTemp)
+      } catch (e: Exception) {
+        logger.debug("could not initialize credentials store: ", e)
+        throw IllegalStateException("could not initialize credentials store", e)
+      }
     logger.debug("credentials loaded: {}", accountCredentialsStore.size())
     return accountCredentialsStore
   }
 
   @Throws(IOException::class)
-  private fun createBundledCredentials(assets: AssetManager): AccountBundledCredentialsType {
-    return assets.open("account_bundled_credentials.json").use { stream ->
+  private fun createBundledCredentials(assets: AssetManager): AccountBundledCredentialsType =
+    assets.open("account_bundled_credentials.json").use { stream ->
       AccountBundledCredentialsJSON.deserializeFromStream(ObjectMapper(), stream)
     }
-  }
 
-  private fun createAccountBundledCredentials(
-    context: Application
-  ): AccountBundledCredentialsType {
-    return try {
+  private fun createAccountBundledCredentials(context: Application): AccountBundledCredentialsType =
+    try {
       createBundledCredentials(context.assets)
     } catch (e: FileNotFoundException) {
       logger.debug("could not initialize bundled credentials; none found")
@@ -355,7 +351,6 @@ internal object MainServices {
       logger.debug("could not initialize bundled credentials: ", e)
       throw IllegalStateException("could not initialize bundled credentials", e)
     }
-  }
 
   @Throws(ProfileDatabaseException::class)
   private fun createProfileDatabase(
@@ -407,15 +402,13 @@ internal object MainServices {
     )
   }
 
-  private fun createFeedParser(): OPDSFeedParserType {
-    return OPDSFeedParser.newParser(OPDSAcquisitionFeedEntryParser.newParser())
-  }
+  private fun createFeedParser(): OPDSFeedParserType = OPDSFeedParser.newParser(OPDSAcquisitionFeedEntryParser.newParser())
 
-  private fun <T : Any> optionalFromServiceLoader(interfaceType: Class<T>): T? {
-    return ServiceLoader.load(interfaceType)
+  private fun <T : Any> optionalFromServiceLoader(interfaceType: Class<T>): T? =
+    ServiceLoader
+      .load(interfaceType)
       .toList()
       .firstOrNull()
-  }
 
   private fun createBookmarksService(
     http: LSHTTPClientType,
@@ -461,9 +454,7 @@ internal object MainServices {
   private fun createBookCoverBadgeLookup(
     context: Application,
     screenSize: ScreenSizeInformationType
-  ): BookCoverBadgeLookupType {
-    return CatalogCoverBadgeImages.create(context.resources, screenSize)
-  }
+  ): BookCoverBadgeLookupType = CatalogCoverBadgeImages.create(context.resources, screenSize)
 
   private fun publishApplicationStartupEvent(
     context: Application,
@@ -925,50 +916,52 @@ internal object MainServices {
 
     var profilesControllerTypeService: ProfilesControllerType
 
-    val bookController = this.run {
-      publishEvent(strings.bootingGeneral("books controller"))
-      val execBooks =
-        NamedThreadPools.namedThreadPool(1, "books", 19)
-      val controller =
-        Controller.createFromServiceDirectory(
-          application = context,
-          services = services.build(),
-          executorService = execBooks,
-          accountEvents = accountEvents,
-          profileEvents = profileEvents,
-          cacheDirectory = context.cacheDir
-        )
-      profilesControllerTypeService = addService(
-        message = strings.bootingGeneral("profiles controller"),
-        interfaceType = ProfilesControllerType::class.java,
-        serviceConstructor = { controller }
-      )
-
-      addService(
-        message = strings.bootingGeneral("notifications service"),
-        interfaceType = NotificationsServiceType::class.java,
-        serviceConstructor = {
-          NotificationsService(
-            context = context,
-            httpCalls = notificationTokenHTTPCalls,
-            notificationResources = MainNotificationResources(context),
-            profilesController = profilesControllerTypeService
+    val bookController =
+      this.run {
+        publishEvent(strings.bootingGeneral("books controller"))
+        val execBooks =
+          NamedThreadPools.namedThreadPool(1, "books", 19)
+        val controller =
+          Controller.createFromServiceDirectory(
+            application = context,
+            services = services.build(),
+            executorService = execBooks,
+            accountEvents = accountEvents,
+            profileEvents = profileEvents,
+            cacheDirectory = context.cacheDir
           )
-        }
-      )
+        profilesControllerTypeService =
+          addService(
+            message = strings.bootingGeneral("profiles controller"),
+            interfaceType = ProfilesControllerType::class.java,
+            serviceConstructor = { controller }
+          )
 
-      addService(
-        message = strings.bootingGeneral("books controller"),
-        interfaceType = BooksControllerType::class.java,
-        serviceConstructor = { controller }
-      )
-      addService(
-        message = strings.bootingGeneral("books preview controller"),
-        interfaceType = BooksPreviewControllerType::class.java,
-        serviceConstructor = { controller }
-      )
-      controller
-    }
+        addService(
+          message = strings.bootingGeneral("notifications service"),
+          interfaceType = NotificationsServiceType::class.java,
+          serviceConstructor = {
+            NotificationsService(
+              context = context,
+              httpCalls = notificationTokenHTTPCalls,
+              notificationResources = MainNotificationResources(context),
+              profilesController = profilesControllerTypeService
+            )
+          }
+        )
+
+        addService(
+          message = strings.bootingGeneral("books controller"),
+          interfaceType = BooksControllerType::class.java,
+          serviceConstructor = { controller }
+        )
+        addService(
+          message = strings.bootingGeneral("books preview controller"),
+          interfaceType = BooksPreviewControllerType::class.java,
+          serviceConstructor = { controller }
+        )
+        controller
+      }
 
     addService(
       message = strings.bootingGeneral("account events"),
@@ -1044,7 +1037,8 @@ internal object MainServices {
     )
 
     val subscription =
-      profilesControllerTypeService.profileEvents()
+      profilesControllerTypeService
+        .profileEvents()
         .ofType(ProfileUpdated::class.java)
         .subscribe {
           onProfileUpdated(profilesControllerTypeService)
@@ -1072,9 +1066,7 @@ internal object MainServices {
     return finalServices
   }
 
-  fun createNetworkAccessService(
-    context: Application
-  ): LSHTTPNetworkAccessType {
+  fun createNetworkAccessService(context: Application): LSHTTPNetworkAccessType {
     try {
       context.startService(
         Intent(
@@ -1105,9 +1097,7 @@ internal object MainServices {
     )
   }
 
-  private fun onProfileUpdated(
-    profiles: ProfilesControllerType
-  ) {
+  private fun onProfileUpdated(profiles: ProfilesControllerType) {
     this.updateReportsLibrary(profiles)
   }
 
@@ -1166,21 +1156,20 @@ internal object MainServices {
   private fun createAdobeExecutor(
     context: Application,
     adobeConfiguration: AdobeConfigurationServiceType
-  ): AdobeAdeptExecutorType? {
-    return if (AdobeDRMServices.isIntendedToBePresent(context)) {
+  ): AdobeAdeptExecutorType? =
+    if (AdobeDRMServices.isIntendedToBePresent(context)) {
       AdobeDRMServices.newAdobeDRMOrNull(context, adobeConfiguration)
     } else {
       null
     }
-  }
 
   private fun createDocumentStore(
     assets: AssetManager,
     http: LSHTTPClientType,
     configuration: DocumentConfigurationServiceType?,
     directory: File
-  ): DocumentStoreType {
-    return if (configuration != null) {
+  ): DocumentStoreType =
+    if (configuration != null) {
       val exec =
         NamedThreadPools.namedThreadPool(1, "documents", 19)
 
@@ -1197,11 +1186,11 @@ internal object MainServices {
     } else {
       DocumentStores.createEmpty()
     }
-  }
 
   private fun showThreads() {
     val threadSet =
-      Thread.getAllStackTraces()
+      Thread
+        .getAllStackTraces()
         .keys
         .sortedBy { thread -> thread.name }
 

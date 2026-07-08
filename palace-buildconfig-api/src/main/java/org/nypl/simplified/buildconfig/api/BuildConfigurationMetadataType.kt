@@ -5,7 +5,6 @@ package org.nypl.simplified.buildconfig.api
  */
 
 interface BuildConfigurationMetadataType {
-
   /**
    * The VCS commit (such as a Git commit ID) that produced this build.
    */

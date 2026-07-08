@@ -10,7 +10,6 @@ import java.util.concurrent.CompletableFuture
  */
 
 interface FeedLoaderType {
-
   /**
    * `true` if feeds should contain only books that the application can open
    */

@@ -34,9 +34,9 @@ import org.slf4j.LoggerFactory
  * A fragment that shows the account registry and allows for account creation.
  */
 
-class AccountListRegistryFragment : Fragment(R.layout.account_list_registry),
+class AccountListRegistryFragment :
+  Fragment(R.layout.account_list_registry),
   MainBackButtonConsumerType {
-
   private val logger =
     LoggerFactory.getLogger(AccountListRegistryFragment::class.java)
 
@@ -49,26 +49,17 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry),
   private var errorDialog: AlertDialog? = null
 
   companion object : ScreenDefinitionFactoryType<Unit, AccountListRegistryFragment> {
-    private class ScreenAccountRegistryList :
-      ScreenDefinitionType<Unit, AccountListRegistryFragment> {
+    private class ScreenAccountRegistryList : ScreenDefinitionType<Unit, AccountListRegistryFragment> {
       override fun setup() {
         // No setup required
       }
 
-      override fun parameters() {
-        return Unit
-      }
+      override fun parameters() = Unit
 
-      override fun fragment(): AccountListRegistryFragment {
-        return AccountListRegistryFragment()
-      }
+      override fun fragment(): AccountListRegistryFragment = AccountListRegistryFragment()
     }
 
-    override fun createScreenDefinition(
-      p: Unit
-    ): ScreenDefinitionType<Unit, AccountListRegistryFragment> {
-      return ScreenAccountRegistryList()
-    }
+    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, AccountListRegistryFragment> = ScreenAccountRegistryList()
   }
 
   override fun onViewCreated(
@@ -109,9 +100,7 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry),
     }
   }
 
-  private fun onAccountClicked(
-    account: AccountProviderDescription
-  ) {
+  private fun onAccountClicked(account: AccountProviderDescription) {
     this.logger.debug("selected account: {} ({})", account.id, account.title)
 
     this.accountListViews.hideAccountList()
@@ -125,11 +114,12 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry),
     profiles.profileAccountCreate(account.id)
 
     val activity = this.requireActivity()
-    val toast = Toast.makeText(
-      activity,
-      activity.resources.getString(R.string.settingsAddedLibrary, account.title),
-      Toast.LENGTH_LONG
-    )
+    val toast =
+      Toast.makeText(
+        activity,
+        activity.resources.getString(R.string.settingsAddedLibrary, account.title),
+        Toast.LENGTH_LONG
+      )
     toast.show()
   }
 
@@ -160,17 +150,17 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry),
       }
     )
 
-    this.subscriptions.add(AutoCloseable {
-      accountSub.dispose()
-    })
+    this.subscriptions.add(
+      AutoCloseable {
+        accountSub.dispose()
+      }
+    )
 
     registry.loadAsync()
   }
 
   @UiThread
-  private fun onAccountEvent(
-    event: AccountEvent
-  ) {
+  private fun onAccountEvent(event: AccountEvent) {
     UIThread.checkIsUIThread()
 
     when (event) {
@@ -198,9 +188,7 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry),
     this.subscriptions.close()
   }
 
-  private fun showAccountCreationFailedDialog(
-    accountEvent: AccountEventCreation.AccountEventCreationFailed
-  ) {
+  private fun showAccountCreationFailedDialog(accountEvent: AccountEventCreation.AccountEventCreationFailed) {
     this.logger.debug("showAccountCreationFailedDialog")
 
     if (this.errorDialog == null) {
@@ -211,8 +199,7 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry),
           .setNegativeButton(R.string.Dismiss) { dialog, _ ->
             this.errorDialog = null
             dialog.dismiss()
-          }
-          .setPositiveButton(ErrorStrings.errorDetails) { dialog, _ ->
+          }.setPositiveButton(ErrorStrings.errorDetails) { dialog, _ ->
             this.errorDialog = null
             this.showErrorPage(accountEvent)
             dialog.dismiss()
@@ -222,11 +209,10 @@ class AccountListRegistryFragment : Fragment(R.layout.account_list_registry),
     }
   }
 
-  private fun showErrorPage(
-    accountEvent: AccountEventCreation.AccountEventCreationFailed
-  ) {
+  private fun showErrorPage(accountEvent: AccountEventCreation.AccountEventCreationFailed) {
     val buildConfig =
-      Services.serviceDirectory()
+      Services
+        .serviceDirectory()
         .requireService(BuildConfigurationServiceType::class.java)
 
     val parameters =

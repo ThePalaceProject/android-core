@@ -51,7 +51,6 @@ class BookSyncTask(
   private val http: LSHTTPClientType,
   private val feedParser: OPDSFeedParserType
 ) : AbstractBookTask(accountID, profiles) {
-
   override val logger =
     LoggerFactory.getLogger(BookSyncTask::class.java)
 
@@ -91,7 +90,8 @@ class BookSyncTask(
     }
 
     val request =
-      this.http.newRequest(loansURI)
+      this.http
+        .newRequest(loansURI)
         .setAuthorization(AccountAuthenticatedHTTP.createAuthorization(credentials))
         .addBasicTokenPropertiesIfApplicable(credentials)
         .build()
@@ -107,19 +107,22 @@ class BookSyncTask(
         )
         this.taskRecorder.finishSuccess(Unit)
       }
+
       is LSHTTPResponseStatus.Responded.Error -> {
-        val message = String.format(
-          "%s: %d: %s",
-          provider.loansURI,
-          status.properties.status,
-          status.properties.message
-        )
+        val message =
+          String.format(
+            "%s: %d: %s",
+            provider.loansURI,
+            status.properties.status,
+            status.properties.message
+          )
 
         if (status.properties.status == 401) {
           when (AccountAuthenticatedHTTP.handle401Error(response.status.properties?.problemReport)) {
             Handled401.ErrorIsRecoverableCredentialsExpired -> {
               account.expireCredentialsIfApplicable()
             }
+
             Handled401.ErrorIsUnrecoverable -> {
               // Treat this as a hard error.
             }
@@ -135,8 +138,10 @@ class BookSyncTask(
         )
         throw TaskFailedHandled(exception)
       }
-      is LSHTTPResponseStatus.Failed ->
+
+      is LSHTTPResponseStatus.Failed -> {
         throw IOException(status.exception)
+      }
     }
   }
 
@@ -172,34 +177,46 @@ class BookSyncTask(
   private fun withPatronAuthorization(
     currentCredentials: AccountAuthenticationCredentials,
     authorization: PatronAuthorization
-  ): AccountAuthenticationCredentials {
-    return when (currentCredentials) {
-      is AccountAuthenticationCredentials.Basic ->
+  ): AccountAuthenticationCredentials =
+    when (currentCredentials) {
+      is AccountAuthenticationCredentials.Basic -> {
         currentCredentials.copy(patronAuthorization = authorization)
-      is AccountAuthenticationCredentials.BasicToken ->
+      }
+
+      is AccountAuthenticationCredentials.BasicToken -> {
         currentCredentials.copy(patronAuthorization = authorization)
-      is AccountAuthenticationCredentials.SAML2_0 ->
+      }
+
+      is AccountAuthenticationCredentials.SAML2_0 -> {
         currentCredentials.copy(patronAuthorization = authorization)
-      is AccountAuthenticationCredentials.OpenIDConnect ->
+      }
+
+      is AccountAuthenticationCredentials.OpenIDConnect -> {
         currentCredentials.copy(patronAuthorization = authorization)
+      }
     }
-  }
 
   private fun withNewAnnotationsURI(
     currentCredentials: AccountAuthenticationCredentials,
     profile: PatronUserProfile
-  ): AccountAuthenticationCredentials {
-    return when (currentCredentials) {
-      is AccountAuthenticationCredentials.Basic ->
+  ): AccountAuthenticationCredentials =
+    when (currentCredentials) {
+      is AccountAuthenticationCredentials.Basic -> {
         currentCredentials.copy(annotationsURI = profile.annotationsURI)
-      is AccountAuthenticationCredentials.BasicToken ->
+      }
+
+      is AccountAuthenticationCredentials.BasicToken -> {
         currentCredentials.copy(annotationsURI = profile.annotationsURI)
-      is AccountAuthenticationCredentials.SAML2_0 ->
+      }
+
+      is AccountAuthenticationCredentials.SAML2_0 -> {
         currentCredentials.copy(annotationsURI = profile.annotationsURI)
-      is AccountAuthenticationCredentials.OpenIDConnect ->
+      }
+
+      is AccountAuthenticationCredentials.OpenIDConnect -> {
         currentCredentials.copy(annotationsURI = profile.annotationsURI)
+      }
     }
-  }
 
   override fun onFailure(result: TaskResult.Failure<Unit>) {
     // Nothing to do
@@ -232,6 +249,7 @@ class BookSyncTask(
         account.setAccountProvider(newProviderResult.result)
         newProviderResult.result
       }
+
       is TaskResult.Failure -> {
         this.logger.debug("failed to resolve account provider: ", newProviderResult.exception)
         oldProvider

@@ -10,32 +10,27 @@ import java.util.SortedMap
  */
 
 data class ErrorPageParameters(
-
   /**
    * The email address of the technical support provider.
    */
 
   val emailAddress: String,
-
   /**
    * The body of the message sent to technical support.
    */
 
   val body: String,
-
   /**
    * The subject used for any emails send to technical support.
    */
 
   val subject: String,
-
   /**
    * The attributes that will be displayed in the "Error Details" section. If no attributes are
    * provided, the entire section will be hidden.
    */
 
   val attributes: SortedMap<String, String>,
-
   /**
    * The steps that lead up to the current error.
    */
@@ -74,8 +69,7 @@ data class ErrorPageParameters(
         val resolution = step.resolution.message
 
         "$stepNumber. $description\n$icon $resolution"
-      }
-      .joinToString("\n\n")
+      }.joinToString("\n\n")
       .let {
         if (it.isNotEmpty()) "Steps:\n$it" else it
       }

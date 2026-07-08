@@ -16,14 +16,11 @@ class CatalogBookRegistryEvents private constructor(
   private val relay: UISubjectRelay<BookStatusEvent>
 ) {
   companion object {
-    fun create(
-      bookRegistry: BookRegistryType
-    ): CatalogBookRegistryEvents {
-      return CatalogBookRegistryEvents(
+    fun create(bookRegistry: BookRegistryType): CatalogBookRegistryEvents =
+      CatalogBookRegistryEvents(
         bookRegistry,
         UISubjectRelay.create(bookRegistry.bookEvents())
       )
-    }
   }
 
   /**

@@ -13,7 +13,6 @@ data class AccountAuthenticationAdobeClientToken(
   val rawToken: String
 ) {
   companion object {
-
     /**
      * Parse a raw token.
      */

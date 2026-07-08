@@ -5,11 +5,11 @@ import org.thepalaceproject.db.api.queries.DBQAccountProviderDescriptionDeleteTy
 import java.net.URI
 
 internal object DBQAccountProviderDescriptionDelete : DBQAccountProviderDescriptionDeleteType {
-
-  private val queryText = """
+  private val queryText =
+    """
     DELETE FROM account_provider_descriptions
       WHERE account_provider_descriptions.apd_id = ?
-  """.trimIndent()
+    """.trimIndent()
 
   override fun execute(
     transaction: DBTransactionType,

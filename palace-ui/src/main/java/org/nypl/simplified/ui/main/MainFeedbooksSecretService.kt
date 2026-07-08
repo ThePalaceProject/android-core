@@ -12,16 +12,12 @@ import java.util.Properties
 class MainFeedbooksSecretService private constructor(
   override val configuration: FeedbooksPlayerExtensionConfiguration
 ) : AudioBookFeedbooksSecretServiceType {
-
   companion object {
-
     private val logger =
       LoggerFactory.getLogger(MainFeedbooksSecretService::class.java)
 
-    fun createConditionally(
-      context: Context
-    ): AudioBookFeedbooksSecretServiceType? {
-      return try {
+    fun createConditionally(context: Context): AudioBookFeedbooksSecretServiceType? =
+      try {
         context.assets.open("secrets.conf").use(Companion::create)
       } catch (e: FileNotFoundException) {
         logger.warn("failed to initialize Feedbooks; secrets.conf not found")
@@ -30,11 +26,8 @@ class MainFeedbooksSecretService private constructor(
         logger.warn("failed to initialize Feedbooks", e)
         null
       }
-    }
 
-    fun create(
-      stream: InputStream
-    ): AudioBookFeedbooksSecretServiceType {
+    fun create(stream: InputStream): AudioBookFeedbooksSecretServiceType {
       val properties =
         Properties().apply { load(stream) }
 

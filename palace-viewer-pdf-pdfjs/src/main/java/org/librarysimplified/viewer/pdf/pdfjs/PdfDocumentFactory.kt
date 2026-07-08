@@ -13,7 +13,6 @@ import kotlin.reflect.KClass
 class PdfDocumentFactory(
   context: Application
 ) : PdfDocumentFactory<PdfReaderDocument> {
-
   private val core =
     PdfiumCore(context)
 
@@ -26,7 +25,10 @@ class PdfDocumentFactory(
     password: String?
   ): ReadTry<PdfReaderDocument> {
     return when (val r = resource.read()) {
-      is Try.Failure -> Try.failure(r.value)
+      is Try.Failure -> {
+        Try.failure(r.value)
+      }
+
       is Try.Success -> {
         val document = core.newDocument(r.value, password)
         return Try.success(

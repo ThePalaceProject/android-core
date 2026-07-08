@@ -8,7 +8,6 @@ import java.io.FileNotFoundException
 abstract class WebViewCookieDatabase(
   private val db: SQLiteDatabase
 ) : WebViewCookieDatabaseType {
-
   companion object {
     private val logger = LoggerFactory.getLogger(WebViewCookieDatabase::class.java)
 
@@ -22,30 +21,47 @@ abstract class WebViewCookieDatabase(
      * @param dataDir The directory that contains web view stored data.
      */
 
-    fun open(
-      dataDir: File
-    ): WebViewCookieDatabaseType {
+    fun open(dataDir: File): WebViewCookieDatabaseType {
       val cookiesFile = this.findCookiesFile(dataDir)
 
       logger.debug("using cookie database file {}", cookiesFile)
 
-      val db = SQLiteDatabase.openDatabase(
-        cookiesFile.absolutePath,
-        null,
-        SQLiteDatabase.OPEN_READONLY
-      )
+      val db =
+        SQLiteDatabase.openDatabase(
+          cookiesFile.absolutePath,
+          null,
+          SQLiteDatabase.OPEN_READONLY
+        )
 
       val version = getVersion(db)
 
       logger.debug("found cookie database version {}", version)
 
       return when (version) {
-        "14" -> WebViewCookieDatabaseV14(db)
-        "13" -> WebViewCookieDatabaseV13(db)
-        "12" -> WebViewCookieDatabaseV12(db)
-        "11" -> WebViewCookieDatabaseV11(db)
-        "10" -> WebViewCookieDatabaseV10(db)
-        "9" -> WebViewCookieDatabaseV9(db)
+        "14" -> {
+          WebViewCookieDatabaseV14(db)
+        }
+
+        "13" -> {
+          WebViewCookieDatabaseV13(db)
+        }
+
+        "12" -> {
+          WebViewCookieDatabaseV12(db)
+        }
+
+        "11" -> {
+          WebViewCookieDatabaseV11(db)
+        }
+
+        "10" -> {
+          WebViewCookieDatabaseV10(db)
+        }
+
+        "9" -> {
+          WebViewCookieDatabaseV9(db)
+        }
+
         else -> {
           logger.warn("no reader found for cookie database version {} -- cookies may not be read correctly", version)
 
@@ -59,21 +75,21 @@ abstract class WebViewCookieDatabase(
      * Android web view may store this file in different locations.
      */
 
-    private fun findCookiesFile(
-      dataDir: File
-    ): File {
-      val candidatePaths = listOf(
-        DB_FILE_NAME,
-        "Default/$DB_FILE_NAME"
-      )
+    private fun findCookiesFile(dataDir: File): File {
+      val candidatePaths =
+        listOf(
+          DB_FILE_NAME,
+          "Default/$DB_FILE_NAME"
+        )
 
-      val path = candidatePaths.find { candidatePath ->
-        val candidateFile = File(dataDir, candidatePath)
+      val path =
+        candidatePaths.find { candidatePath ->
+          val candidateFile = File(dataDir, candidatePath)
 
-        logger.debug("checking for cookie database at {}", candidateFile)
+          logger.debug("checking for cookie database at {}", candidateFile)
 
-        candidateFile.exists()
-      }
+          candidateFile.exists()
+        }
 
       if (path == null) {
         throw FileNotFoundException("Could not find a cookie database file")
@@ -86,23 +102,22 @@ abstract class WebViewCookieDatabase(
      * Returns the version of the cookie database, or null if the version can not be determined.
      */
 
-    private fun getVersion(
-      db: SQLiteDatabase
-    ): String? {
+    private fun getVersion(db: SQLiteDatabase): String? {
       try {
-        db.query(
-          DB_META_TABLE_NAME,
-          arrayOf("value"),
-          "key = 'version'",
-          null,
-          null,
-          null,
-          null
-        ).use { cursor ->
-          if (cursor.moveToNext()) {
-            return cursor.getString(0)
+        db
+          .query(
+            DB_META_TABLE_NAME,
+            arrayOf("value"),
+            "key = 'version'",
+            null,
+            null,
+            null,
+            null
+          ).use { cursor ->
+            if (cursor.moveToNext()) {
+              return cursor.getString(0)
+            }
           }
-        }
       } catch (e: Exception) {
         logger.error("could not get version from cookie database {}:", db.path, e)
       }

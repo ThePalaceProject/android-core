@@ -9,32 +9,27 @@ import com.google.common.base.Preconditions
  */
 
 data class AuthenticationObjectNYPLInput(
-
   /**
    * The field type to which these definitions apply.
    */
 
   val fieldName: String,
-
   /**
    * The keyboard type that should be used for entry.
    */
 
   val keyboardType: String?,
-
   /**
    * The maximum length of the field, or `0` if there is no limit.
    */
 
   val maximumLength: Int,
-
   /**
    * The barcode format, such as "CODABAR".
    */
 
   val barcodeFormat: String?
 ) {
-
   init {
     Preconditions.checkArgument(
       this.fieldName.all { c -> c.isUpperCase() || c.isWhitespace() },

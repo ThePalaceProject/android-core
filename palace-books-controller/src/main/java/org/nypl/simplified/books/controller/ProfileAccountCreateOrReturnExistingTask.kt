@@ -21,7 +21,6 @@ class ProfileAccountCreateOrReturnExistingTask(
   private val profiles: ProfilesDatabaseType,
   private val strings: ProfileAccountCreationStringResourcesType
 ) : Callable<TaskResult<AccountType>> {
-
   private val logger = LoggerFactory.getLogger(ProfileAccountCreateOrReturnExistingTask::class.java)
   private val taskRecorder = TaskRecorder.create()
 
