@@ -46,8 +46,10 @@ import org.thepalaceproject.db.api.queries.DBQAccountRegistrySetting
 import org.thepalaceproject.db.api.queries.DBQAccountRegistrySettingsGetType
 import org.thepalaceproject.db.api.queries.DBQAccountRegistrySettingsPutType
 import org.thepalaceproject.webpub.core.WPMCatalog
+import org.thepalaceproject.webpub.core.WPMLanguageMap
 import org.thepalaceproject.webpub.core.WPMManifest
 import org.thepalaceproject.webpub.core.WPMMappers
+import org.thepalaceproject.webpub.core.WPMMetadata
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.net.URI
@@ -414,7 +416,6 @@ class AccountProviderRegistry2 private constructor(
     var totalItems: Int? = null
     var offset = 0
     val size = 113
-    val baseURI = this.decideRegistryURI()
 
     try {
       while (true) {
@@ -423,7 +424,6 @@ class AccountProviderRegistry2 private constructor(
         val manifest =
           this.fetchRegistryPage(
             taskRecorder = taskRecorder,
-            baseURI = baseURI,
             offset = offset,
             size = size,
             availability = availability,
@@ -503,7 +503,6 @@ class AccountProviderRegistry2 private constructor(
     var totalItems: Int? = null
     var offset = 0
     val size = 113
-    val baseURI = this.decideRegistryURI()
 
     try {
       while (true) {
@@ -512,7 +511,6 @@ class AccountProviderRegistry2 private constructor(
         val manifest =
           this.fetchRegistryPage(
             taskRecorder = taskRecorder,
-            baseURI = baseURI,
             offset = offset,
             size = size,
             availability = availability,
@@ -665,14 +663,30 @@ class AccountProviderRegistry2 private constructor(
 
   private fun fetchRegistryPage(
     taskRecorder: TaskRecorderType,
-    baseURI: URI,
     offset: Int,
     size: Int,
     availability: String,
     order: RegistryOrder
   ): WPMManifest {
-    val targetURI =
-      URI.create("$baseURI/libraries/crawlable?offset=$offset&size=$size&availability=$availability&order=${order.name}")
+    /*
+     * If a library registry query override is provided, and we've been handed a non-zero offset,
+     * then this means that this is the second time an attempt has been made to make this query.
+     * We deliberately return an empty manifest to avoid re-running the same query forever.
+     */
+    val override = AccountProviderRegistryDebugging.debuggingOverride
+    if (override != null) {
+      if (offset > 0) {
+        return this.emptyManifest()
+      }
+    }
+
+    val targetURI: URI =
+      if (override != null) {
+        override.completeURI()
+      } else {
+        val baseURI = this.uriBase
+        URI.create("$baseURI/libraries/crawlable?offset=$offset&size=$size&availability=$availability&order=${order.name}")
+      }
 
     for (attempt in 1..3) {
       taskRecorder.beginNewStep("Fetching $targetURI (Attempt $attempt of 3)")
@@ -729,6 +743,30 @@ class AccountProviderRegistry2 private constructor(
     }
 
     throw IOException("Failed to retrieve a registry page after multiple attempts.")
+  }
+
+  private fun emptyManifest(): WPMManifest {
+    return WPMManifest(
+      this.emptyMetadata()
+    )
+  }
+
+  private fun emptyMetadata(): WPMMetadata {
+    return WPMMetadata(
+      title = WPMLanguageMap.Scalar("End Of Results"),
+      sortAs = null,
+      subtitle = null,
+      identifier = null,
+      accessibility = null,
+      modified = null,
+      published = null,
+      layout = null,
+      duration = null,
+      numberOfPages = null,
+      belongsTo = null,
+      contains = null,
+      numberOfItems = null
+    )
   }
 
   private fun setStatus(
@@ -965,17 +1003,5 @@ class AccountProviderRegistry2 private constructor(
 
   override fun close() {
     // Nothing required.
-  }
-
-  private fun decideRegistryURI(): URI {
-    val debuggingBase =
-      AccountProviderRegistryDebugging.properties[
-        "org.nypl.simplified.accounts.source.nyplregistry.baseServerOverride"
-      ]
-    return if (debuggingBase != null) {
-      URI.create("https://$debuggingBase/libraries")
-    } else {
-      this.uriBase
-    }
   }
 }

@@ -1,15 +1,14 @@
 package org.nypl.simplified.ui.settings
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.TextView.BufferType.EDITABLE
-import android.widget.Toast
-import android.widget.Toast.LENGTH_LONG
 import androidx.annotation.UiThread
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
@@ -18,6 +17,7 @@ import com.io7m.jmulticlose.core.CloseableCollectionType
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryDebugging
+import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryOverride
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryRefresh
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryStatus
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
@@ -34,6 +34,9 @@ import org.slf4j.LoggerFactory
 
 class SettingsDebugMenuRegistryFragment : Fragment(R.layout.debug_registry),
   MainBackButtonConsumerType {
+
+  private val logger =
+    LoggerFactory.getLogger(SettingsDebugMenuRegistryFragment::class.java)
 
   companion object : ScreenDefinitionFactoryType<Unit, SettingsDebugMenuRegistryFragment> {
     private class ScreenSettingsDebugMenu :
@@ -61,11 +64,10 @@ class SettingsDebugMenuRegistryFragment : Fragment(R.layout.debug_registry),
     return BACK_BUTTON_CONSUMED
   }
 
-  private val logger =
-    LoggerFactory.getLogger(SettingsDebugMenuRegistryFragment::class.java)
-  private val LIBRARY_REGISTRY_DEBUG_PROPERTY =
-    "org.nypl.simplified.accounts.source.nyplregistry.baseServerOverride"
-
+  private lateinit var libraryRegistryOverrideHost: EditText
+  private lateinit var libraryRegistryOverridePath: EditText
+  private lateinit var libraryRegistryOverrideParameters: EditText
+  private lateinit var libraryRegistryOverrideStatus: TextView
   private lateinit var error: ImageView
   private lateinit var debugRegistryQALibraries: SwitchCompat
   private lateinit var libraryRegistryClear: Button
@@ -100,10 +102,17 @@ class SettingsDebugMenuRegistryFragment : Fragment(R.layout.debug_registry),
     this.registryRefreshIncremental =
       view.findViewById(R.id.debugRegistryRefreshIncremental)
 
+    this.libraryRegistryOverrideStatus =
+      view.findViewById(R.id.libraryRegistryOverrideStatus)
+    this.libraryRegistryOverrideHost =
+      view.findViewById(R.id.libraryRegistryOverrideHost)
+    this.libraryRegistryOverridePath =
+      view.findViewById(R.id.libraryRegistryOverridePath)
+    this.libraryRegistryOverrideParameters =
+      view.findViewById(R.id.libraryRegistryOverrideParameters)
+
     this.libraryRegistryClear =
       view.findViewById(R.id.libraryRegistryOverrideClear)
-    this.libraryRegistryEntry =
-      view.findViewById(R.id.libraryRegistryOverrideBase)
     this.libraryRegistrySet =
       view.findViewById(R.id.libraryRegistryOverrideSet)
 
@@ -115,7 +124,7 @@ class SettingsDebugMenuRegistryFragment : Fragment(R.layout.debug_registry),
     this.error =
       view.findViewById(R.id.debugRegistryError)
 
-    this.configureLibraryRegistryCustomUI()
+    this.updateStatus(null)
   }
 
   override fun onStart() {
@@ -163,6 +172,113 @@ class SettingsDebugMenuRegistryFragment : Fragment(R.layout.debug_registry),
         )
       )
     }
+
+    this.libraryRegistryOverrideHost
+      .setText(SettingsDebugModel.registryDebugOverride?.hostname ?: "")
+    this.libraryRegistryOverridePath
+      .setText(SettingsDebugModel.registryDebugOverride?.path ?: "")
+
+    this.libraryRegistryOverrideHost.addTextChangedListener(object : TextWatcher {
+      override fun afterTextChanged(s: Editable?) {
+        // Nothing required.
+      }
+
+      override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+        // Nothing required.
+      }
+
+      override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+        this@SettingsDebugMenuRegistryFragment.update { over ->
+          if (over != null) {
+            over.copy(hostname = this@SettingsDebugMenuRegistryFragment.libraryRegistryOverrideHost.text.toString())
+          } else {
+            AccountProviderRegistryOverride("", "", "")
+          }
+        }
+      }
+    })
+
+    this.libraryRegistryOverridePath.addTextChangedListener(object : TextWatcher {
+      override fun afterTextChanged(s: Editable?) {
+        // Nothing required.
+      }
+
+      override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+        // Nothing required.
+      }
+
+      override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+        this@SettingsDebugMenuRegistryFragment.update { over ->
+          if (over != null) {
+            over.copy(path = this@SettingsDebugMenuRegistryFragment.libraryRegistryOverridePath.text.toString())
+          } else {
+            AccountProviderRegistryOverride("", "", "")
+          }
+        }
+      }
+    })
+
+    this.libraryRegistryOverrideParameters.addTextChangedListener(object : TextWatcher {
+      override fun afterTextChanged(s: Editable?) {
+        // Nothing required.
+      }
+
+      override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+        // Nothing required.
+      }
+
+      override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+        this@SettingsDebugMenuRegistryFragment.update { over ->
+          if (over != null) {
+            over.copy(queryParameters = this@SettingsDebugMenuRegistryFragment.libraryRegistryOverrideParameters.text.toString())
+          } else {
+            AccountProviderRegistryOverride("", "", "")
+          }
+        }
+      }
+    })
+
+    this.libraryRegistryClear.setOnClickListener {
+      SettingsDebugModel.registryDebugOverride = null
+      AccountProviderRegistryDebugging.debuggingOverride = SettingsDebugModel.registryDebugOverride
+      this.updateStatus(SettingsDebugModel.registryDebugOverride)
+    }
+    this.libraryRegistrySet.setOnClickListener {
+      AccountProviderRegistryDebugging.debuggingOverride = SettingsDebugModel.registryDebugOverride
+      this.updateStatus(SettingsDebugModel.registryDebugOverride)
+    }
+    this.updateStatus(SettingsDebugModel.registryDebugOverride)
+  }
+
+  private fun update(
+    f: (AccountProviderRegistryOverride?) -> AccountProviderRegistryOverride
+  ) {
+    val r = f.invoke(SettingsDebugModel.registryDebugOverride)
+    SettingsDebugModel.registryDebugOverride = r
+    this.updateStatus(r)
+  }
+
+  private fun updateStatus(r: AccountProviderRegistryOverride?) {
+    val pending =
+      try {
+        r?.completeURI().toString()
+      } catch (e: Exception) {
+        e.toString()
+      }
+    val configured =
+      try {
+        AccountProviderRegistryDebugging.debuggingOverride?.completeURI().toString()
+      } catch (e: Exception) {
+        e.toString()
+      }
+
+    val b = StringBuilder()
+    b.append("Pending: ")
+    b.append(pending)
+    b.append("\n")
+    b.append("Configured: ")
+    b.append(configured)
+    this.libraryRegistryOverrideStatus.text = b.toString()
   }
 
   @UiThread
@@ -245,41 +361,5 @@ class SettingsDebugMenuRegistryFragment : Fragment(R.layout.debug_registry),
   override fun onStop() {
     super.onStop()
     this.subscriptions.close()
-  }
-
-  /**
-   * Configure the UI for setting custom library registry servers.
-   */
-
-  private fun configureLibraryRegistryCustomUI() {
-    this.libraryRegistryClear.setOnClickListener {
-      AccountProviderRegistryDebugging.clearProperty(LIBRARY_REGISTRY_DEBUG_PROPERTY)
-      this.libraryRegistryEntry.setText("", EDITABLE)
-    }
-
-    this.libraryRegistrySet.setOnClickListener {
-      val target = this.libraryRegistryEntry.text.toString()
-      this.logger.debug("set custom library registry server: {}", target)
-
-      AccountProviderRegistryDebugging.setProperty(
-        name = LIBRARY_REGISTRY_DEBUG_PROPERTY,
-        value = target
-      )
-
-      Services.serviceDirectory()
-        .requireService(AccountProviderRegistryType::class.java)
-        .clear()
-
-      Toast.makeText(
-        this.requireContext(),
-        "Set custom library registry base: '$target' and cleared cache",
-        LENGTH_LONG
-      ).show()
-    }
-
-    val customServer = AccountProviderRegistryDebugging.property(LIBRARY_REGISTRY_DEBUG_PROPERTY)
-    if (customServer != null) {
-      this.libraryRegistryEntry.setText(customServer, EDITABLE)
-    }
   }
 }

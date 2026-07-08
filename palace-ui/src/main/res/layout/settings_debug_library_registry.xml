@@ -1,91 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:app="http://schemas.android.com/apk/res-auto"
-  xmlns:tools="http://schemas.android.com/tools"
-  android:layout_width="match_parent"
-  android:layout_height="match_parent">
-
-  <TextView
-    android:id="@+id/libraryRegistryOverrideDescription"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="16dp"
-    android:text="Custom Library Registry Server"
-    android:textSize="18sp"
-    android:textStyle="bold"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent" />
-
-  <LinearLayout
-    android:id="@+id/libraryRegistryOverrideEntry"
-    android:layout_width="0dp"
-    android:layout_height="48dp"
-    android:layout_marginTop="16dp"
-    android:orientation="horizontal"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/libraryRegistryOverrideDescription">
+    android:orientation="vertical">
 
     <TextView
-      android:id="@+id/libraryRegistryOverrideHttps"
-      android:layout_width="wrap_content"
-      android:layout_height="match_parent"
-      android:layout_weight="0"
-      android:gravity="center_vertical"
-      android:text="https://"
-      android:textSize="9pt" />
+        android:id="@+id/libraryRegistryOverrideDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="Custom Library Registry Parameters"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="128dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/border">
+
+        <TextView
+            android:id="@+id/libraryRegistryOverrideStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:fontFamily="monospace" />
+    </ScrollView>
 
     <EditText
-      android:id="@+id/libraryRegistryOverrideBase"
-      android:layout_width="wrap_content"
-      android:layout_height="match_parent"
-      android:layout_weight="1"
-      android:ems="10"
-      android:hint="example.com"
-      android:inputType="textPersonName"
-      tools:text="" />
+        android:id="@+id/libraryRegistryOverrideHost"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:hint="Hostname"
+        android:inputType="text" />
 
-    <TextView
-      android:id="@+id/libraryRegistryOverrideLibraries"
-      android:layout_width="wrap_content"
-      android:layout_height="match_parent"
-      android:layout_weight="0"
-      android:gravity="center_vertical"
-      android:text="/libraries(/qa)"
-      android:textSize="9pt" />
-  </LinearLayout>
+    <EditText
+        android:id="@+id/libraryRegistryOverridePath"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:hint="Path"
+        android:inputType="text" />
 
-  <LinearLayout
-    android:id="@+id/libraryRegistryOverrideButtons"
-    android:layout_width="0dp"
-    android:layout_height="48dp"
-    android:layout_marginTop="16dp"
-    android:orientation="horizontal"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/libraryRegistryOverrideEntry">
+    <EditText
+        android:id="@+id/libraryRegistryOverrideParameters"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:hint="Query Parameters"
+        android:inputType="text" />
 
-    <Button
-      android:id="@+id/libraryRegistryOverrideClear"
-      android:layout_width="128dp"
-      android:layout_height="wrap_content"
-      android:layout_weight="0"
-      android:text="Clear" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-    <Space
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_weight="1" />
+        <Button
+            android:id="@+id/libraryRegistryOverrideClear"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Clear" />
 
-    <Button
-      android:id="@+id/libraryRegistryOverrideSet"
-      android:layout_width="128dp"
-      android:layout_height="wrap_content"
-      android:layout_weight="0"
-      android:text="Set" />
-  </LinearLayout>
+        <View
+            android:layout_width="16dp"
+            android:layout_height="wrap_content"/>
 
+        <Button
+            android:id="@+id/libraryRegistryOverrideSet"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Set" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+
+</LinearLayout>

@@ -9,6 +9,7 @@ import org.librarysimplified.reports.Reports
 import org.librarysimplified.services.api.Services
 import org.nypl.drm.core.AdobeAdeptExecutorType
 import org.nypl.drm.core.BoundlessServiceType
+import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryOverride
 import org.nypl.simplified.adobe.extensions.AdobeDRMExtensions
 import org.nypl.simplified.analytics.api.AnalyticsEvent
 import org.nypl.simplified.analytics.api.AnalyticsType
@@ -26,6 +27,13 @@ object SettingsDebugModel {
 
   private val logger =
     LoggerFactory.getLogger(SettingsDebugModel::class.java)
+
+  var registryDebugOverride: AccountProviderRegistryOverride? =
+    AccountProviderRegistryOverride(
+      hostname = "registry.palaceproject.io",
+      path = "libraries/crawlable",
+      queryParameters = ""
+    )
 
   private val adeptActivationsBase: AttributeType<List<AdobeDRMExtensions.Activation>> =
     MainAttributes.attributes.withValue(listOf())
