@@ -19,10 +19,11 @@ import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.runBlocking
 import org.joda.time.LocalDateTime
 import org.librarysimplified.mdc.MDCKeys
-import org.librarysimplified.r2.api.SR2Bookmark
+import org.librarysimplified.r2.api.SR2Command
 import org.librarysimplified.r2.api.SR2ControllerType
 import org.librarysimplified.r2.api.SR2Event
 import org.librarysimplified.r2.api.SR2Event.SR2BookmarkEvent.SR2BookmarkCreated
+import org.librarysimplified.r2.api.SR2UISettings
 import org.librarysimplified.r2.vanilla.SR2Controllers
 import org.librarysimplified.r2.views.SR2Fragment
 import org.librarysimplified.r2.views.SR2ReaderFragment
@@ -54,6 +55,7 @@ import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
+import org.nypl.simplified.reader.api.ReaderPreferences
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
 import org.readium.r2.shared.util.Try
@@ -65,6 +67,7 @@ import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import java.io.File
 import java.io.IOException
+import java.util.Optional
 import java.util.ServiceLoader
 import java.util.concurrent.ExecutionException
 
@@ -160,7 +163,8 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     }
 
     this.parameters = params
-    MDC.put(MDCKeys.ACCOUNT_INTERNAL_ID,
+    MDC.put(
+      MDCKeys.ACCOUNT_INTERNAL_ID,
       this.parameters.accountId.uuid
         .toString()
     )
@@ -176,7 +180,8 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
         this.profilesController
           .profileCurrent()
           .account(this.parameters.accountId)
-      MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID,
+      MDC.put(
+        MDCKeys.ACCOUNT_PROVIDER_ID,
         this.account.provider.id
           .toString()
       )
@@ -443,7 +448,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
     return when (event) {
       is SR2Event.SR2UISettingsUpdated -> {
-        // Nothing yet.
+        this.onControllerUISettingsChanged(event.newSettings)
       }
 
       is SR2Event.SR2ThemeChanged -> {
@@ -474,14 +479,46 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
   }
 
   @UiThread
+  private fun onControllerUISettingsChanged(settings: SR2UISettings) {
+    UIThread.checkIsUIThread()
+
+    this.profilesController.profileUpdate { current ->
+      val oldPreferences =
+        current.preferences.readerPreferences
+
+      val newPreferences =
+        ReaderPreferences
+          .builder()
+          .setPageButtonWidth(Optional.ofNullable(settings.pageButtonWidth))
+          .setBrightness(oldPreferences.brightness())
+          .setColorScheme(oldPreferences.colorScheme())
+          .setFontFamily(oldPreferences.fontFamily())
+          .setFontScale(oldPreferences.fontScale())
+          .setPublisherCSS(oldPreferences.publisherCSS())
+          .build()
+
+      current.copy(
+        preferences = current.preferences.copy(readerPreferences = newPreferences)
+      )
+    }
+  }
+
+  @UiThread
   private fun onControllerEventThemeChanged(event: SR2Event.SR2ThemeChanged) {
     UIThread.checkIsUIThread()
 
     this.profilesController.profileUpdate { current ->
+      val oldPreferences =
+        current.preferences.readerPreferences
+
       current.copy(
         preferences =
           current.preferences.copy(
-            readerPreferences = Reader2Themes.fromSR2(event.theme)
+            readerPreferences =
+              Reader2Themes.fromSR2(
+                existing = oldPreferences,
+                theme = event.theme
+              )
           )
       )
     }
@@ -563,6 +600,20 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
   private fun onControllerBecameAvailable(controller: SR2ControllerType) {
     UIThread.checkIsUIThread()
     this.switchFragment(SR2ReaderFragment())
+
+    val readerPreferences =
+      this.profilesController
+        .profileCurrent()
+        .preferences()
+        .readerPreferences
+
+    controller.submitCommand(
+      SR2Command.UISettingsSet(
+        SR2UISettings(
+          pageButtonWidth = readerPreferences.pageButtonWidth().orElse(null)
+        )
+      )
+    )
   }
 
   /**
@@ -595,18 +646,6 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       ).setOnDismissListener { this.finish() }
       .create()
       .show()
-  }
-
-  private fun createLocalBookmarkFromPromptAction(bookmark: SR2Bookmark) {
-    this.bookmarkService.bookmarkCreateLocal(
-      accountID = this.parameters.accountId,
-      bookmark =
-        Reader2Bookmarks.fromSR2Bookmark(
-          bookEntry = this.parameters.entry,
-          deviceId = Reader2Devices.deviceId(this.profilesController, this.parameters.bookId),
-          source = bookmark
-        )
-    )
   }
 
   private fun showToastMessage(

@@ -15,6 +15,7 @@ import org.nypl.simplified.json.core.JSONSerializerUtilities;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Functions to serialize and reader preferences to/from JSON.
@@ -46,6 +47,10 @@ public final class ReaderPreferencesJSON {
     final ObjectNode obj =
       JSONParserUtilities.checkObject(null, node);
 
+    final Optional<Double> page_button_width =
+      Optional.ofNullable(
+        JSONParserUtilities.getDoubleOrNull(obj, "page_button_width")
+      );
     final double font_scale =
       JSONParserUtilities.getDoubleDefault(
         obj, "font_scale", 100.0);
@@ -60,6 +65,7 @@ public final class ReaderPreferencesJSON {
         obj, "publisher_css", ReaderPublisherCSS.PUBLISHER_DEFAULT_CSS_DISABLED.name()));
 
     return ReaderPreferences.builder()
+      .setPageButtonWidth(page_button_width)
       .setFontScale(font_scale)
       .setFontFamily(font_family)
       .setColorScheme(color_scheme)
@@ -106,6 +112,12 @@ public final class ReaderPreferencesJSON {
     Objects.requireNonNull(description, "Description");
 
     final ObjectNode jo = jom.createObjectNode();
+
+    description.pageButtonWidth()
+        .ifPresent(size -> {
+          jo.put("page_button_width", size);
+        });
+
     jo.put("font_scale", description.fontScale());
     jo.put("font_family", description.fontFamily().name());
     jo.put("color_scheme", description.colorScheme().name());

@@ -2,6 +2,8 @@ package org.nypl.simplified.reader.api;
 
 import com.google.auto.value.AutoValue;
 
+import java.util.Optional;
+
 /**
  * The reader preferences.
  */
@@ -22,6 +24,12 @@ public abstract class ReaderPreferences {
     builder.setPublisherCSS(ReaderPublisherCSS.PUBLISHER_DEFAULT_CSS_DISABLED);
     return builder;
   }
+
+  /**
+   * @return The width of the page buttons, if page buttons are enabled
+   */
+
+  public abstract Optional<Double> pageButtonWidth();
 
   /**
    * @return The color scheme used for the reader
@@ -65,6 +73,14 @@ public abstract class ReaderPreferences {
 
   @AutoValue.Builder
   public static abstract class Builder {
+
+    /**
+     * @param size The new size
+     * @return This builder
+     * @see #pageButtonWidth()
+     */
+
+    public abstract Builder setPageButtonWidth(Optional<Double> size);
 
     /**
      * @param color The new color scheme

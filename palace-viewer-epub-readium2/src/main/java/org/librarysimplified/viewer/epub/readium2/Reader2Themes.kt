@@ -18,10 +18,14 @@ object Reader2Themes {
    * Convert an SR2 theme to SimplyE reader preferences.
    */
 
-  fun fromSR2(theme: SR2Theme): ReaderPreferences =
+  fun fromSR2(
+    existing: ReaderPreferences,
+    theme: SR2Theme
+  ): ReaderPreferences =
     ReaderPreferences
       .builder()
-      .setBrightness(1.0)
+      .setBrightness(existing.brightness())
+      .setPageButtonWidth(existing.pageButtonWidth())
       .setColorScheme(fromSR2Color(theme.colorScheme))
       .setFontFamily(fromSR2Font(theme.font))
       .setFontScale(fromSR2Size(theme.textSize))
