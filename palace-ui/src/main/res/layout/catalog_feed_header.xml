@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <RadioGroup
         android:id="@+id/catalogFeedHeaderTabs"
@@ -12,37 +13,33 @@
         android:layout_height="40dp"
         android:layout_margin="16dp"
         android:gravity="center_horizontal"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:orientation="horizontal" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:id="@+id/catalogFeedHeaderFacets"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
         android:gravity="center_vertical"
+        android:minHeight="64dp"
         android:orientation="horizontal"
         android:scrollbarAlwaysDrawHorizontalTrack="false"
         android:scrollbarAlwaysDrawVerticalTrack="false"
-        android:scrollbars="none"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/catalogFeedHeaderTabs">
+        android:scrollbars="none">
 
         <TextView
             android:id="@+id/catalogFeedHeaderTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:paddingRight="8dp"
+            android:paddingLeft="16dp"
             android:ellipsize="end"
+            android:gravity="center_vertical"
             android:maxLines="4"
             android:textSize="12sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/catalogFeedFacetSort"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             tools:text="@string/catalogPlaceholder" />
 
         <LinearLayout
@@ -52,17 +49,17 @@
             android:background="?selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            app:layout_constraintEnd_toStartOf="@id/catalogFeedFacetFilter"
-            app:layout_constraintTop_toTopOf="parent">
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
 
             <ImageView
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:clickable="false"
                 android:focusable="false"
+                android:importantForAccessibility="no"
                 app:srcCompat="@drawable/arrow_up_arrow_down" />
 
             <TextView
@@ -87,16 +84,15 @@
             android:focusable="true"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
 
             <ImageView
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:clickable="false"
                 android:focusable="false"
+                android:importantForAccessibility="no"
                 app:srcCompat="@drawable/bars_filter" />
 
             <TextView
@@ -111,16 +107,15 @@
                 android:textStyle="bold"
                 tools:text="Filter (2)" />
         </LinearLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
     <View
         android:id="@+id/catalogFeedDivider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="16dp"
         android:background="?android:attr/listDivider"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/catalogFeedHeaderFacets" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
