@@ -15,107 +15,118 @@
         android:gravity="center_horizontal"
         android:orientation="horizontal" />
 
-    <LinearLayout
+    <HorizontalScrollView
         android:id="@+id/catalogFeedHeaderFacets"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:minHeight="64dp"
-        android:orientation="horizontal"
-        android:scrollbarAlwaysDrawHorizontalTrack="false"
-        android:scrollbarAlwaysDrawVerticalTrack="false"
-        android:scrollbars="none">
+        android:fillViewport="true"
+        android:gravity="center_vertical">
 
-        <TextView
-            android:id="@+id/catalogFeedHeaderTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:paddingRight="8dp"
-            android:paddingLeft="16dp"
-            android:ellipsize="end"
-            android:gravity="center_vertical"
-            android:maxLines="4"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            tools:text="@string/catalogPlaceholder" />
-
-        <LinearLayout
-            android:id="@+id/catalogFeedFacetSort"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:background="?selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp">
-
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:clickable="false"
-                android:focusable="false"
-                android:importantForAccessibility="no"
-                app:srcCompat="@drawable/arrow_up_arrow_down" />
+            android:layout_height="64dp">
 
             <TextView
-                android:id="@+id/catalogFeedFacetSortText"
+                android:id="@+id/catalogFeedHeaderTitle"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_height="0dp"
+                android:background="?selectableItemBackground"
                 android:clickable="false"
-                android:focusable="false"
-                android:gravity="center_vertical"
-                android:textSize="11sp"
+                android:ellipsize="end"
+                android:gravity="center_vertical|start"
+                android:maxLines="1"
+                android:minWidth="32dp"
+                android:paddingLeft="16dp"
+                android:paddingTop="8dp"
+                android:paddingRight="8dp"
+                android:paddingBottom="8dp"
+                android:textSize="12sp"
                 android:textStyle="bold"
-                tools:text="Recently Added (A-Z)" />
-        </LinearLayout>
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/catalogFeedFacetSort"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="xyz" />
 
-        <LinearLayout
-            android:id="@+id/catalogFeedFacetFilter"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:background="?selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp">
-
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:clickable="false"
-                android:focusable="false"
-                android:importantForAccessibility="no"
-                app:srcCompat="@drawable/bars_filter" />
-
-            <TextView
-                android:id="@+id/catalogFeedFacetFilterText"
+            <LinearLayout
+                android:id="@+id/catalogFeedFacetSort"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:clickable="false"
-                android:focusable="false"
+                android:layout_height="match_parent"
+                android:background="?selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center_vertical"
-                android:textSize="11sp"
-                android:textStyle="bold"
-                tools:text="Filter (2)" />
-        </LinearLayout>
-    </LinearLayout>
+                android:orientation="horizontal"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/catalogFeedFacetFilter"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:clickable="false"
+                    android:focusable="false"
+                    android:importantForAccessibility="no"
+                    app:srcCompat="@drawable/arrow_up_arrow_down" />
+
+                <TextView
+                    android:id="@+id/catalogFeedFacetSortText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:clickable="false"
+                    android:focusable="false"
+                    android:gravity="center_vertical"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    tools:text="Recently Added (A-Z)" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/catalogFeedFacetFilter"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="?selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:clickable="false"
+                    android:focusable="false"
+                    android:importantForAccessibility="no"
+                    app:srcCompat="@drawable/bars_filter" />
+
+                <TextView
+                    android:id="@+id/catalogFeedFacetFilterText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:clickable="false"
+                    android:focusable="false"
+                    android:gravity="center_vertical"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    tools:text="Filter (2)" />
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </HorizontalScrollView>
 
     <View
         android:id="@+id/catalogFeedDivider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="?android:attr/listDivider"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/catalogFeedHeaderFacets" />
+        android:background="?android:attr/listDivider" />
 
 </LinearLayout>
