@@ -56,6 +56,8 @@ class ProfileDescriptionJSONTest {
           showDebugSettings = false,
           downloadOnlyOnWIFI = false,
           isLCPManualPassphraseEnabled = false,
+          audioBookPlaybackSkipIntervalForwardMs = 30_000L,
+          audioBookPlaybackSkipIntervalBackwardMs = 30_000L
         ),
         attributes = ProfileAttributes(
           sortedMapOf(

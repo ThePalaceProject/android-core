@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import androidx.annotation.UiThread
+import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
@@ -25,13 +26,15 @@ import org.nypl.simplified.ui.main.MainNotifications
 import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
 import org.nypl.simplified.ui.screens.ScreenDefinitionType
 import org.slf4j.LoggerFactory
+import java.util.concurrent.TimeUnit
 
 class SettingsMainFragment3 : PreferenceFragmentCompat() {
-  private lateinit var networkAccess: LSHTTPNetworkAccessType
-
   private val logger =
     LoggerFactory.getLogger(SettingsMainFragment3::class.java)
 
+  private lateinit var settingsAudiobooksSkipBackwards: ListPreference
+  private lateinit var settingsAudiobooksSkipForwards: ListPreference
+  private lateinit var networkAccess: LSHTTPNetworkAccessType
   private lateinit var settingsNotifications: Preference
   private lateinit var settingsAbout: Preference
   private lateinit var settingsAccounts: Preference
@@ -158,7 +161,15 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
     this.settingsNotifications = this.findPreference("settingsNotifications")!!
     this.settingsNetworkDownloadWIFIOnly = this.findPreference("settingsNetworkDownloadWIFIOnly")!!
     this.settingsBattery = this.findPreference("settingsBattery")!!
+    this.settingsAudiobooksSkipForwards =
+      this.findPreference("settingsSkipSecondsForward")!!
+    this.settingsAudiobooksSkipBackwards =
+      this.findPreference("settingsSkipSecondsBackward")!!
 
+    this.configureAudiobookSkip(
+      this.settingsAudiobooksSkipBackwards,
+      this.settingsAudiobooksSkipForwards
+    )
     this.configureAbout(this.settingsAbout)
     this.configureAcknowledgements(this.settingsAcknowledgements)
     this.configureAccounts(this.settingsAccounts)
@@ -177,6 +188,58 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
       profiles = profiles,
       profilePrefs = profilePrefs
     )
+  }
+
+  private fun configureAudiobookSkip(
+    skipBackwards: ListPreference,
+    skipForwards: ListPreference
+  ) {
+    val services =
+      Services.serviceDirectory()
+    val profiles =
+      services.requireService(ProfilesControllerType::class.java)
+
+    val preferences =
+      profiles
+        .profileCurrent()
+        .preferences()
+
+    val backwardsSecondsStart =
+      TimeUnit.SECONDS.convert(
+        preferences
+          .audioBookPlaybackSkipIntervalBackwardMs, TimeUnit.MILLISECONDS
+      )
+    val forwardsSecondsStart =
+      TimeUnit.SECONDS.convert(
+        preferences
+          .audioBookPlaybackSkipIntervalForwardMs, TimeUnit.MILLISECONDS
+      )
+
+    this.logger.debug("Starting skip backwards value: {}", backwardsSecondsStart)
+    this.logger.debug("Starting skip forwards value: {}", forwardsSecondsStart)
+
+    skipBackwards.value = backwardsSecondsStart.toString()
+    skipForwards.value = forwardsSecondsStart.toString()
+
+    skipBackwards.onPreferenceChangeListener =
+      Preference.OnPreferenceChangeListener { _, newValue ->
+        val seconds = newValue.toString().toLong()
+        val ms = TimeUnit.MILLISECONDS.convert(seconds, TimeUnit.SECONDS)
+        profiles.profileUpdate { d ->
+          d.copy(preferences = d.preferences.copy(audioBookPlaybackSkipIntervalBackwardMs = ms))
+        }
+        true
+      }
+
+    skipForwards.onPreferenceChangeListener =
+      Preference.OnPreferenceChangeListener { _, newValue ->
+        val seconds = newValue.toString().toLong()
+        val ms = TimeUnit.MILLISECONDS.convert(seconds, TimeUnit.SECONDS)
+        profiles.profileUpdate { d ->
+          d.copy(preferences = d.preferences.copy(audioBookPlaybackSkipIntervalForwardMs = ms))
+        }
+        true
+      }
   }
 
   private fun configureBattery(settingsBattery: Preference) {

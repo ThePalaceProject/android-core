@@ -1208,7 +1208,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-07-02T19:25:40+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.30.0">
+    <c:release date="2026-07-22T00:00:00+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.30.0">
       <c:changes>
         <c:change date="2026-05-26T00:00:00+00:00" summary="Periodically sync accounts in the background">
           <c:tickets>
@@ -1311,9 +1311,23 @@
             <c:ticket id="PP-4689"/>
           </c:tickets>
         </c:change>
-        <c:change date="2026-07-02T19:25:40+00:00" summary="Publish a toast on library creation.">
+        <c:change date="2026-07-02T00:00:00+00:00" summary="Publish a toast on library creation.">
           <c:tickets>
             <c:ticket id="PP-4640"/>
+          </c:tickets>
+        </c:change>
+      </c:changes>
+    </c:release>
+    <c:release date="2026-07-22T16:16:15+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.31.0">
+      <c:changes>
+        <c:change date="2026-07-22T00:00:00+00:00" summary="Completely reimplement EPUB reader for performance and reliability.">
+          <c:tickets>
+            <c:ticket id="PP-4737"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-07-22T16:16:15+00:00" summary="Make audiobook skip intervals configurable.">
+          <c:tickets>
+            <c:ticket id="PP-4713"/>
           </c:tickets>
         </c:change>
       </c:changes>

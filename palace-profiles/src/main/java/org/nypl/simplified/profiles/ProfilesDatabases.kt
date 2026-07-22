@@ -414,6 +414,10 @@ object ProfilesDatabases {
                 readerPreferences = ReaderPreferences.builder().build(),
                 showDebugSettings = false,
                 showTestingLibraries = false,
+                audioBookPlaybackSkipIntervalForwardMs =
+                  ProfileDescriptionJSON.DEFAULT_AUDIOBOOK_SKIP_INTERVAL_MS.toLong(),
+                audioBookPlaybackSkipIntervalBackwardMs =
+                  ProfileDescriptionJSON.DEFAULT_AUDIOBOOK_SKIP_INTERVAL_MS.toLong(),
               ),
             attributes = ProfileAttributes(sortedMapOf())
           )

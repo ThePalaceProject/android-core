@@ -94,4 +94,23 @@
     <string name="settingsVersionCore">Core version</string>
     <string name="settingsVersionCoreSummary" />
     <string name="settingsVersionSummary" />
+    <string name="settingsAudiobooks">Audiobooks</string>
+    <string name="settingsAudiobooksSkipForwards">Skip forwards</string>
+    <string name="settingsAudiobooksSkipBackwards">Skip backwards</string>
+    <string name="settingsAudiobooksExplanationForwards">The number of seconds to skip forwards in audiobooks when the skip button is pressed.</string>
+    <string name="settingsAudiobooksExplanationBackwards">The number of seconds to skip backwards in audiobooks when the skip button is pressed.</string>
+
+    <string-array name="settingsAudiobooksSkipEntries">
+        <item>15 seconds</item>
+        <item>30 seconds</item>
+        <item>45 seconds</item>
+        <item>1 minute</item>
+    </string-array>
+
+    <string-array name="settingsAudiobooksSkipValues">
+        <item>15</item>
+        <item>30</item>
+        <item>45</item>
+        <item>60</item>
+    </string-array>
 </resources>

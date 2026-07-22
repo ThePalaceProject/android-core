@@ -28,6 +28,11 @@ import java.util.UUID
  */
 
 object ProfileDescriptionJSON {
+  /**
+   * The default audiobook skip interval in milliseconds.
+   */
+  const val DEFAULT_AUDIOBOOK_SKIP_INTERVAL_MS = 30_000
+
   private fun standardDateFormatter(): DateTimeFormatter =
     DateTimeFormatterBuilder()
       .appendYear(4, 5)
@@ -198,6 +203,16 @@ object ProfileDescriptionJSON {
     val downloadOnlyOnWIFI =
       JSONParserUtilities.getBooleanDefault(objectNode, "downloadOnlyOnWIFI", false)
 
+    val skipForwardInterval =
+      JSONParserUtilities.getIntegerDefault(objectNode, "audioBookPlaybackSkipIntervalForwardMs",
+        DEFAULT_AUDIOBOOK_SKIP_INTERVAL_MS
+      )
+
+    val skipBackwardInterval =
+      JSONParserUtilities.getIntegerDefault(objectNode, "audioBookPlaybackSkipIntervalBackwardMs",
+        DEFAULT_AUDIOBOOK_SKIP_INTERVAL_MS
+      )
+
     val mostRecentAccount =
       JSONParserUtilities
         .getStringOrNull(objectNode, "mostRecentAccount")
@@ -215,6 +230,8 @@ object ProfileDescriptionJSON {
       readerPreferences = readerPreferences,
       showDebugSettings = showDebugSettings,
       showTestingLibraries = showTestingLibraries,
+      audioBookPlaybackSkipIntervalForwardMs = skipForwardInterval.toLong(),
+      audioBookPlaybackSkipIntervalBackwardMs = skipBackwardInterval.toLong()
     )
   }
 
@@ -251,6 +268,16 @@ object ProfileDescriptionJSON {
     val downloadOnlyOnWIFI =
       JSONParserUtilities.getBooleanDefault(objectNode, "downloadOnlyOnWIFI", false)
 
+    val skipForwardInterval =
+      JSONParserUtilities.getIntegerDefault(objectNode, "audioBookPlaybackSkipIntervalForwardMs",
+        DEFAULT_AUDIOBOOK_SKIP_INTERVAL_MS
+      )
+
+    val skipBackwardInterval =
+      JSONParserUtilities.getIntegerDefault(objectNode, "audioBookPlaybackSkipIntervalBackwardMs",
+        DEFAULT_AUDIOBOOK_SKIP_INTERVAL_MS
+      )
+
     val mostRecentAccount =
       JSONParserUtilities
         .getStringOrNull(objectNode, "mostRecentAccount")
@@ -268,6 +295,8 @@ object ProfileDescriptionJSON {
       readerPreferences = readerPreferences,
       showDebugSettings = false,
       showTestingLibraries = showTestingLibraries,
+      audioBookPlaybackSkipIntervalForwardMs = skipForwardInterval.toLong(),
+      audioBookPlaybackSkipIntervalBackwardMs = skipBackwardInterval.toLong()
     )
   }
 
@@ -322,6 +351,16 @@ object ProfileDescriptionJSON {
     val downloadOnlyOnWIFI =
       JSONParserUtilities.getBooleanDefault(objectNode, "downloadOnlyOnWIFI", false)
 
+    val skipForwardInterval =
+      JSONParserUtilities.getIntegerDefault(objectNode, "audioBookPlaybackSkipIntervalForwardMs",
+        DEFAULT_AUDIOBOOK_SKIP_INTERVAL_MS
+      )
+
+    val skipBackwardInterval =
+      JSONParserUtilities.getIntegerDefault(objectNode, "audioBookPlaybackSkipIntervalBackwardMs",
+        DEFAULT_AUDIOBOOK_SKIP_INTERVAL_MS
+      )
+
     val preferences =
       ProfilePreferences(
         dateOfBirth = dateOfBirth,
@@ -334,6 +373,8 @@ object ProfileDescriptionJSON {
         readerPreferences = readerPrefs,
         showDebugSettings = false,
         showTestingLibraries = showTestingLibraries,
+        audioBookPlaybackSkipIntervalForwardMs = skipForwardInterval.toLong(),
+        audioBookPlaybackSkipIntervalBackwardMs = skipBackwardInterval.toLong(),
       )
 
     val attributeMap = mutableMapOf<String, String>()
@@ -468,6 +509,8 @@ object ProfileDescriptionJSON {
     output.put("showDebugSettings", preferences.showDebugSettings)
     output.put("mostRecentAccount", preferences.mostRecentAccount.uuid.toString())
     output.put("downloadOnlyOnWIFI", preferences.downloadOnlyOnWIFI)
+    output.put("audioBookPlaybackSkipIntervalForwardMs", preferences.audioBookPlaybackSkipIntervalForwardMs)
+    output.put("audioBookPlaybackSkipIntervalBackwardMs", preferences.audioBookPlaybackSkipIntervalBackwardMs)
 
     output.set<ObjectNode>(
       "playbackRates",

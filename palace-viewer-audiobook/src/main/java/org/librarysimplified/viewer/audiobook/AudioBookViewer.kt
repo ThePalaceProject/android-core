@@ -103,6 +103,8 @@ class AudioBookViewer : ViewerProviderType {
     val licenseChecks =
       ServiceLoader.load(SingleLicenseCheckProviderType::class.java).toList()
 
+    val profileCurrent =
+      profiles.profileCurrent()
     val formatAudio =
       format as BookFormat.BookFormatAudioBook
     val file =
@@ -110,15 +112,17 @@ class AudioBookViewer : ViewerProviderType {
     val manifest =
       formatAudio.manifest
 
+    val preferences = profileCurrent.preferences()
+    PlayerModel.setSeekIncrementForwardMs(preferences.audioBookPlaybackSkipIntervalForwardMs)
+    PlayerModel.setSeekIncrementBackwardMs(preferences.audioBookPlaybackSkipIntervalBackwardMs)
+
     PlayerModel.bookAuthor = book.entry.authorsCommaSeparated
     PlayerModel.bookTitle = book.entry.title
 
     val palaceID =
       PlayerPalaceID(book.entry.id)
     val account =
-      profiles
-        .profileCurrent()
-        .account(book.account)
+      profileCurrent.account(book.account)
 
     /*
      * Configure the login and authorization handlers.
