@@ -15,37 +15,31 @@ import org.nypl.simplified.reader.api.ReaderPreferences
 
 data class ProfilePreferences(
   /** @return The date of birth of the reader (if one has been explicitly specified) */
-
   val dateOfBirth: ProfileDateOfBirth?,
   /** @return `true` if non-production libraries should be displayed */
-
   val showTestingLibraries: Boolean,
   /**
    * @return `true` if the user has seen the library selection screen
    */
-
   val hasSeenLibrarySelectionScreen: Boolean,
   /**
    * @return `true` if the user has been asked about turning on notifications
    */
-
   val hasSeenNotificationScreen: Boolean,
   /** @return The reader-specific preferences */
-
   val readerPreferences: ReaderPreferences,
   /** @return The playback rates for every audiobook */
-
   val playbackRates: Map<String, PlayerPlaybackRate>,
   /** The most recently used account provider. */
-
   val mostRecentAccount: AccountID,
   /** @return `true` if the debug settings should be visible. */
-
   val showDebugSettings: Boolean,
   /** @return `true` if downloads should only occur when Wi-Fi is available. */
-
   val downloadOnlyOnWIFI: Boolean,
   /** @return `true` if LCP manual passphrase entry is allowed */
-
   val isLCPManualPassphraseEnabled: Boolean,
+  /** @return The interval, in milliseconds, that the audiobook player will use to skip forward */
+  val audioBookPlaybackSkipIntervalForwardMs: Long,
+  /** @return The interval, in milliseconds, that the audiobook player will use to skip backward */
+  val audioBookPlaybackSkipIntervalBackwardMs: Long,
 )

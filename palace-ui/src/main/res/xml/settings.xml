@@ -31,6 +31,23 @@
             android:key="settingsBattery"/>
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="Audiobooks">
+        <ListPreference
+            android:key="settingsSkipSecondsForward"
+            android:title="@string/settingsAudiobooksSkipForwards"
+            android:summary="@string/settingsAudiobooksExplanationForwards"
+            android:entries="@array/settingsAudiobooksSkipEntries"
+            android:entryValues="@array/settingsAudiobooksSkipValues"
+            android:defaultValue="30" />
+        <ListPreference
+            android:key="settingsSkipSecondsBackward"
+            android:title="@string/settingsAudiobooksSkipBackwards"
+            android:summary="@string/settingsAudiobooksExplanationBackwards"
+            android:entries="@array/settingsAudiobooksSkipEntries"
+            android:entryValues="@array/settingsAudiobooksSkipValues"
+            android:defaultValue="30" />
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/settingsDocumentation">
         <Preference
             android:key="settingsAcknowledgements"

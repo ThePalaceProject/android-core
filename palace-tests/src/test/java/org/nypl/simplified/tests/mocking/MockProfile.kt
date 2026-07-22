@@ -44,13 +44,14 @@ class MockProfile(
         showDebugSettings = false,
         downloadOnlyOnWIFI = false,
         isLCPManualPassphraseEnabled = false,
+        audioBookPlaybackSkipIntervalForwardMs = 30_000L,
+        audioBookPlaybackSkipIntervalBackwardMs = 30_000L
       ),
       attributes = ProfileAttributes(sortedMapOf())
     )
   }
 
-  private var deleted: Boolean
-
+  private var deleted: Boolean = false
   val accountList: MutableList<MockAccount> =
     IntRange(1, accountCount)
       .toList()
