@@ -1318,18 +1318,125 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-07-22T16:16:15+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.31.0">
+    <c:release date="2026-07-24T16:00:37+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.31.0">
       <c:changes>
         <c:change date="2026-07-22T00:00:00+00:00" summary="Completely reimplement EPUB reader for performance and reliability.">
           <c:tickets>
             <c:ticket id="PP-4737"/>
           </c:tickets>
         </c:change>
-        <c:change date="2026-07-22T16:16:15+00:00" summary="Make audiobook skip intervals configurable.">
+        <c:change date="2026-07-22T00:00:00+00:00" summary="Make audiobook skip intervals configurable.">
           <c:tickets>
             <c:ticket id="PP-4713"/>
           </c:tickets>
         </c:change>
+        <c:change date="2026-05-26T00:00:00+00:00" summary="Periodically sync accounts in the background">
+          <c:tickets>
+            <c:ticket id="PP-4283"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-05-27T00:00:00+00:00" summary="Ensure authentication errors show problem reports.">
+          <c:tickets>
+            <c:ticket id="PP-4409"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-06-02T00:00:00+00:00" summary="Add a new audiobook playback rate control.">
+          <c:tickets>
+            <c:ticket id="PP-4359"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-06-03T00:00:00+00:00" summary="Include an Accept-Language header.">
+          <c:tickets>
+            <c:ticket id="PP-4482"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-06-03T00:00:00+00:00" summary="Only explicitly blank username/password entries when pressing the back button.">
+          <c:tickets>
+            <c:ticket id="PP-4471"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-06-08T00:00:00+00:00" summary="Add series links to book details.">
+          <c:tickets>
+            <c:ticket id="PP-4464"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-06-11T00:00:00+00:00" summary="Target Android API 36.">
+          <c:tickets>
+            <c:ticket id="PP-4549"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-06-22T00:00:00+00:00" summary="Upgrade to Readium 3.3.0.">
+          <c:tickets>
+            <c:ticket id="PP-4426"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-06-22T00:00:00+00:00" summary="Preserve reading UI across orientation changes.">
+          <c:tickets>
+            <c:ticket id="PP-4567"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-06-22T00:00:00+00:00" summary="Acquire a wake lock to keep the app awake when an EPUB is open.">
+          <c:tickets>
+            <c:ticket id="PP-4550"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-06-23T00:00:00+00:00" summary="Surface battery optimizer settings.">
+          <c:tickets>
+            <c:ticket id="PP-4516"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-06-25T00:00:00+00:00" summary="Increase size of page buttons.">
+          <c:tickets>
+            <c:ticket id="PP-4554"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-06-25T00:00:00+00:00" summary="Allow audiobook playback rates as high as 3.0x">
+          <c:tickets>
+            <c:ticket id="PP-4519"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-06-30T00:00:00+00:00" summary="Bookmark list items may now be variable height.">
+          <c:tickets>
+            <c:ticket id="PP-4700"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-06-30T00:00:00+00:00" summary="Fix text clipping for huge texts.">
+          <c:tickets>
+            <c:ticket id="PP-4692"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-07-01T00:00:00+00:00" summary="Feed entries are now variable height."/>
+        <c:change date="2026-07-01T00:00:00+00:00" summary="More feed item height fixes.">
+          <c:tickets>
+            <c:ticket id="PP-4690"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-07-01T00:00:00+00:00" summary="Lane heights are now variable.">
+          <c:tickets>
+            <c:ticket id="PP-4688"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-07-01T00:00:00+00:00" summary="Library registry items are now variable height.">
+          <c:tickets>
+            <c:ticket id="PP-4702"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-07-01T00:00:00+00:00" summary="Account items are now variable height.">
+          <c:tickets>
+            <c:ticket id="PP-4701"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-07-02T00:00:00+00:00" summary="Refactor book details to handle very long titles/authors.">
+          <c:tickets>
+            <c:ticket id="PP-4689"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-07-02T00:00:00+00:00" summary="Publish a toast on library creation.">
+          <c:tickets>
+            <c:ticket id="PP-4640"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-07-24T16:00:37+00:00" summary="Remove EPUB reader page buttons."/>
       </c:changes>
     </c:release>
   </c:releases>

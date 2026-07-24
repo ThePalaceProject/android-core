@@ -19,11 +19,9 @@ import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.runBlocking
 import org.joda.time.LocalDateTime
 import org.librarysimplified.mdc.MDCKeys
-import org.librarysimplified.r2.api.SR2Command
 import org.librarysimplified.r2.api.SR2ControllerType
 import org.librarysimplified.r2.api.SR2Event
 import org.librarysimplified.r2.api.SR2Event.SR2BookmarkEvent.SR2BookmarkCreated
-import org.librarysimplified.r2.api.SR2UISettings
 import org.librarysimplified.r2.vanilla.SR2Controllers
 import org.librarysimplified.r2.views.SR2Fragment
 import org.librarysimplified.r2.views.SR2ReaderFragment
@@ -55,7 +53,6 @@ import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
-import org.nypl.simplified.reader.api.ReaderPreferences
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
 import org.readium.r2.shared.util.Try
@@ -67,7 +64,6 @@ import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import java.io.File
 import java.io.IOException
-import java.util.Optional
 import java.util.ServiceLoader
 import java.util.concurrent.ExecutionException
 
@@ -447,14 +443,12 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     UIThread.checkIsUIThread()
 
     return when (event) {
-      is SR2Event.SR2UISettingsUpdated -> {
-        this.onControllerUISettingsChanged(event.newSettings)
-      }
-
       is SR2Event.SR2ThemeChanged -> {
         this.onControllerEventThemeChanged(event)
       }
 
+      is SR2Event.SR2PageSetRecalculating,
+      is SR2Event.SR2PageSetRecalculationFinished,
       is SR2Event.SR2CommandEvent.SR2CommandEventCompleted.SR2CommandExecutionFailed,
       is SR2Event.SR2CommandEvent.SR2CommandEventCompleted.SR2CommandExecutionSucceeded,
       is SR2Event.SR2CommandEvent.SR2CommandSearchResults,
@@ -475,31 +469,6 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       is SR2Event.SR2BookmarkEvent.SR2BookmarkDeleted -> {
         this.onControllerEventBookmarkDelete(event)
       }
-    }
-  }
-
-  @UiThread
-  private fun onControllerUISettingsChanged(settings: SR2UISettings) {
-    UIThread.checkIsUIThread()
-
-    this.profilesController.profileUpdate { current ->
-      val oldPreferences =
-        current.preferences.readerPreferences
-
-      val newPreferences =
-        ReaderPreferences
-          .builder()
-          .setPageButtonWidth(Optional.ofNullable(settings.pageButtonWidth))
-          .setBrightness(oldPreferences.brightness())
-          .setColorScheme(oldPreferences.colorScheme())
-          .setFontFamily(oldPreferences.fontFamily())
-          .setFontScale(oldPreferences.fontScale())
-          .setPublisherCSS(oldPreferences.publisherCSS())
-          .build()
-
-      current.copy(
-        preferences = current.preferences.copy(readerPreferences = newPreferences)
-      )
     }
   }
 
@@ -600,20 +569,6 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
   private fun onControllerBecameAvailable(controller: SR2ControllerType) {
     UIThread.checkIsUIThread()
     this.switchFragment(SR2ReaderFragment())
-
-    val readerPreferences =
-      this.profilesController
-        .profileCurrent()
-        .preferences()
-        .readerPreferences
-
-    controller.submitCommand(
-      SR2Command.UISettingsSet(
-        SR2UISettings(
-          pageButtonWidth = readerPreferences.pageButtonWidth().orElse(null)
-        )
-      )
-    )
   }
 
   /**
