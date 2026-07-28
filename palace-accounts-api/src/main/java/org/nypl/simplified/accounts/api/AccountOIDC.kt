@@ -48,16 +48,11 @@ object AccountOIDC {
    */
 
   fun isIntentOIDC(intent: Intent): Boolean {
-    if (intent.action != Intent.ACTION_VIEW) {
-      this.logger.warn("Received an intent with action ${intent.action}. Ignoring it!")
-      return false
-    }
     val data = intent.data
     if (data == null) {
       this.logger.warn("Received an intent no data. Ignoring it!")
       return false
     }
-
     this.logger.debug("Received an intent with data: {}", data)
     if (data.scheme != this.oidcCallbackScheme) {
       this.logger.warn("Received an intent with scheme ${data.scheme}. Ignoring it!")
