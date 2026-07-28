@@ -1318,7 +1318,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-07-24T16:00:37+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.31.0">
+    <c:release date="2026-07-28T09:15:24+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.31.0">
       <c:changes>
         <c:change date="2026-07-22T00:00:00+00:00" summary="Completely reimplement EPUB reader for performance and reliability.">
           <c:tickets>
@@ -1436,7 +1436,7 @@
             <c:ticket id="PP-4640"/>
           </c:tickets>
         </c:change>
-        <c:change date="2026-07-24T16:00:37+00:00" summary="Remove EPUB reader page buttons."/>
+        <c:change date="2026-07-24T00:00:00+00:00" summary="Remove EPUB reader page buttons."/>
       </c:changes>
     </c:release>
   </c:releases>
