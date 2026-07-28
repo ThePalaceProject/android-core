@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
   private val backCallback =
     object : OnBackPressedCallback(true) {
       override fun handleOnBackPressed() {
-        handleBackPressed()
+        this@MainActivity.handleBackPressed()
       }
     }
 
@@ -90,43 +90,56 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
   private fun onHandleIntent(intent: Intent) {
     try {
+      this.logger.debug("onHandleIntent: {}", intent)
+
       if (this.isAutomatedTesting(intent)) {
-        this.onHandleAutomatedTesting()
+        this.onHandleIntentAutomatedTesting()
       }
 
       if (AccountOIDC.isIntentOIDC(intent)) {
-        val data =
-          intent.data
-        val parsed =
-          AccountOIDC.parseOIDCCallback(URI.create(data.toString()))
-
-        val services =
-          Services.serviceDirectory()
-        val profiles =
-          services.requireService(ProfilesControllerType::class.java)
-
-        when (parsed) {
-          is AccountOIDC.AccountOIDCParsedCallbackLogin -> {
-            profiles.profileAccountLogin(
-              ProfileAccountLoginRequest.OIDCComplete(
-                accountId = parsed.account,
-                accessToken = parsed.accessToken
-              )
-            )
-          }
-
-          is AccountOIDC.AccountOIDCParsedCallbackLogout -> {
-            // XXX: There is nothing sensible that we can do here, currently.
-          }
-        }
+        this.onHandleIntentOIDC(intent)
+      } else {
+        this.logger.debug("Intent does not appear to be an OIDC intent.")
       }
     } catch (e: Throwable) {
       this.logger.error("Failed to handle intent: ", e)
     }
   }
 
-  private fun onHandleAutomatedTesting() {
-    this.logger.warn("Unimplemented code: Requested login to testing library for automated test suite.")
+  private fun onHandleIntentOIDC(intent: Intent) {
+    this.logger.debug("Parsing OIDC intent data.")
+
+    val data =
+      intent.data
+    val parsed =
+      AccountOIDC.parseOIDCCallback(URI.create(data.toString()))
+
+    val services =
+      Services.serviceDirectory()
+    val profiles =
+      services.requireService(ProfilesControllerType::class.java)
+
+    when (parsed) {
+      is AccountOIDC.AccountOIDCParsedCallbackLogin -> {
+        this.logger.debug("OIDC intent is a login callback.")
+        this.logger.debug("OIDC: Account {}", parsed.account)
+        profiles.profileAccountLogin(
+          ProfileAccountLoginRequest.OIDCComplete(
+            accountId = parsed.account,
+            accessToken = parsed.accessToken
+          )
+        )
+      }
+
+      is AccountOIDC.AccountOIDCParsedCallbackLogout -> {
+        // XXX: There is nothing sensible that we can do here, currently.
+        this.logger.warn("OIDC intent is a logout callback. We cannot process this!")
+      }
+    }
+  }
+
+  private fun onHandleIntentAutomatedTesting() {
+    this.logger.warn("onHandleAutomatedTesting: Unimplemented code: Requested login to testing library for automated test suite.")
   }
 
   private fun isAutomatedTesting(intent: Intent): Boolean {
