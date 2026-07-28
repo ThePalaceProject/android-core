@@ -1318,7 +1318,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-07-28T09:15:24+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.31.1">
+    <c:release date="2026-07-28T12:04:22+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.31.1">
       <c:changes>
         <c:change date="2026-07-22T00:00:00+00:00" summary="Completely reimplement EPUB reader for performance and reliability.">
           <c:tickets>
