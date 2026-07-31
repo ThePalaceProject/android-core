@@ -1444,11 +1444,21 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-07-29T12:16:05+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.32.0">
+    <c:release date="2026-07-31T12:37:06+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.32.0">
       <c:changes>
-        <c:change date="2026-07-29T12:16:05+00:00" summary="Add x86 and x86_64 support for Adobe (chromebooks).">
+        <c:change date="2026-07-29T00:00:00+00:00" summary="Add x86 and x86_64 support for Adobe (chromebooks).">
           <c:tickets>
             <c:ticket id="PP-4618"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-07-31T00:00:00+00:00" summary="Ensure audiobook player is controllable with bluetooth.">
+          <c:tickets>
+            <c:ticket id="PP-4615"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-07-31T12:37:06+00:00" summary="Ensure audiobook player ducks and pauses for phone calls and other events.">
+          <c:tickets>
+            <c:ticket id="PP-4614"/>
           </c:tickets>
         </c:change>
       </c:changes>
