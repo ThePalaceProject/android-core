@@ -235,6 +235,7 @@ dependencies {
     implementation(project(":palace-analytics-api"))
     implementation(project(":palace-analytics-circulation"))
     implementation(project(":palace-announcements"))
+    implementation(project(":palace-battery"))
     implementation(project(":palace-bookmarks"))
     implementation(project(":palace-bookmarks-api"))
     implementation(project(":palace-books-api"))

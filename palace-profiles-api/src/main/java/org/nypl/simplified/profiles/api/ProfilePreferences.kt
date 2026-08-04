@@ -42,4 +42,6 @@ data class ProfilePreferences(
   val audioBookPlaybackSkipIntervalForwardMs: Long,
   /** @return The interval, in milliseconds, that the audiobook player will use to skip backward */
   val audioBookPlaybackSkipIntervalBackwardMs: Long,
+  /** @return The user has seen the audiobook dialog and says they don't want to see it again. */
+  val audioBookBatteryDialogAccepted: Boolean,
 )

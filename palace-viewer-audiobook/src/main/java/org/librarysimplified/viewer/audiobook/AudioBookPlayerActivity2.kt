@@ -2,6 +2,7 @@ package org.librarysimplified.viewer.audiobook
 
 import android.os.Bundle
 import android.view.View
+import android.widget.CheckBox
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.UiThread
@@ -65,6 +66,7 @@ import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
+import org.thepalaceproject.palace.battery.BatteryModel
 
 class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_base) {
   private val logger =
@@ -73,7 +75,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
   private val backCallback =
     object : OnBackPressedCallback(true) {
       override fun handleOnBackPressed() {
-        handleBackPressed()
+        this@AudioBookPlayerActivity2.handleBackPressed()
       }
     }
 
@@ -140,6 +142,43 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       this,
       this.backCallback
     )
+
+    this.showBatteryOptimizerDialogIfNecessary()
+  }
+
+  private fun showBatteryOptimizerDialogIfNecessary() {
+    if (this.isBatteryOptimizerEnabled() && !this.userHasAcceptedBatteryOptimizerDialog()) {
+      val view =
+        layoutInflater.inflate(R.layout.audio_book_battery_dialog, null)
+      val checkBox =
+        view.findViewById<CheckBox>(R.id.audio_book_battery_dialog_check)
+
+      checkBox.setOnCheckedChangeListener { _, isChecked ->
+        this.profiles.profileUpdate { description ->
+          description.copy(
+            preferences = description.preferences.copy(
+              audioBookBatteryDialogAccepted = isChecked
+            )
+          )
+        }
+      }
+
+      MaterialAlertDialogBuilder(this)
+        .setView(view)
+        .setPositiveButton(R.string.audio_book_dismiss) { _, _ -> }
+        .show()
+    }
+  }
+
+  private fun userHasAcceptedBatteryOptimizerDialog(): Boolean {
+    return this.profiles.profileCurrent()
+      .preferences()
+      .audioBookBatteryDialogAccepted
+  }
+
+  private fun isBatteryOptimizerEnabled(): Boolean {
+    BatteryModel.batteryOptimizerCheck()
+    return BatteryModel.batteryOptimizerStatus.get()
   }
 
   override fun onStop() {
@@ -475,7 +514,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       bookmarks.bookmarks
         .mapNotNull(AudioBookBookmarks::toPlayerBookmark)
         .toSet()
-        .sortedWith { x, y -> compareBookmarks(x, y) }
+        .sortedWith { x, y -> this.compareBookmarks(x, y) }
         .toList()
     val bookmarkLastRead =
       bookmarks.lastRead?.let { b -> AudioBookBookmarks.toPlayerBookmark(b) }

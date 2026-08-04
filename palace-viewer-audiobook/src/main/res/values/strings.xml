@@ -1,21 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <resources>
-  <string name="audio_book_player">Audiobook Player</string>
-  <string name="audio_book_player_bookmark_adding">Adding bookmark…</string>
-  <string name="audio_book_player_bookmark_added">Bookmark added</string>
-  <string name="audio_book_player_bookmark_already_added">A bookmark has already been saved at this location.</string>
-  <string name="audio_book_player_bookmark_error_adding">There was an error while adding the bookmark</string>
-  <string name="audio_book_player_do_keep">Keep</string>
-  <string name="audio_book_player_do_return">Return</string>
-  <string name="audio_book_player_error_book_open">Unable to open audio book</string>
-  <string name="audio_book_player_error_engine_open">Unable to initialize audio engine</string>
-  <string name="audio_book_player_return_question">Would you like to return it?</string>
-  <string name="audio_book_player_return_title">Your Audiobook Has Finished</string>
-  <string name="audio_book_player_toc_title">Table Of Contents</string>
-  <string name="audio_book_player_ok">OK</string>
-  <string name="audio_book_player_details">Details</string>
-  <string name="audio_book_manifest_parse_error">The audiobook manifest could not be parsed.</string>
-  <string name="audio_book_manifest_download_error">The audiobook manifest could not be downloaded.</string>
-  <string name="audio_book_manifest_license_error">The audiobook manifest license checks failed.</string>
+    <string name="audio_book_player">Audiobook Player</string>
+    <string name="audio_book_player_bookmark_adding">Adding bookmark…</string>
+    <string name="audio_book_player_bookmark_added">Bookmark added</string>
+    <string name="audio_book_player_bookmark_already_added">A bookmark has already been saved at this location.</string>
+    <string name="audio_book_player_bookmark_error_adding">There was an error while adding the bookmark</string>
+    <string name="audio_book_player_do_keep">Keep</string>
+    <string name="audio_book_player_do_return">Return</string>
+    <string name="audio_book_player_error_book_open">Unable to open audio book</string>
+    <string name="audio_book_player_error_engine_open">Unable to initialize audio engine</string>
+    <string name="audio_book_player_return_question">Would you like to return it?</string>
+    <string name="audio_book_player_return_title">Your Audiobook Has Finished</string>
+    <string name="audio_book_player_toc_title">Table Of Contents</string>
+    <string name="audio_book_player_ok">OK</string>
+    <string name="audio_book_player_details">Details</string>
+    <string name="audio_book_manifest_parse_error">The audiobook manifest could not be parsed.</string>
+    <string name="audio_book_manifest_download_error">The audiobook manifest could not be downloaded.</string>
+    <string name="audio_book_manifest_license_error">The audiobook manifest license checks failed.</string>
+
+    <string name="audio_book_battery_warning">You are listening to an audiobook with the Android battery optimizer enabled on your device.\n\n
+On some devices, this can cause audiobooks to stop playing when the app is in the background.\n\n
+If your device is affected by this problem, please visit the app\'s Settings tab to turn off the battery optimizer.</string>
+
+    <string name="audio_book_battery_confirm">Don\'t tell me about this again.</string>
+    <string name="audio_book_dismiss">OK</string>
+
 </resources>
