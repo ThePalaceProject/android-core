@@ -40,6 +40,7 @@ dependencies {
     implementation(project(":palace-adobe-extensions"))
     implementation(project(":palace-analytics-api"))
     implementation(project(":palace-announcements"))
+    implementation(project(":palace-battery"))
     implementation(project(":palace-bookmarks"))
     implementation(project(":palace-bookmarks-api"))
     implementation(project(":palace-books-api"))

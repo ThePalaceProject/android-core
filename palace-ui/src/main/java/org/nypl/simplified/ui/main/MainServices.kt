@@ -128,6 +128,7 @@ import org.thepalaceproject.db.api.DBParameters
 import org.thepalaceproject.db.api.DBType
 import org.thepalaceproject.opds.client.OPDSClient
 import org.thepalaceproject.opds.client.OPDSClientParameters
+import org.thepalaceproject.palace.battery.BatteryModel
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -551,6 +552,8 @@ internal object MainServices {
       }
       return service
     }
+
+    BatteryModel.initialize(application = context)
 
     val networkAccess =
       addService(

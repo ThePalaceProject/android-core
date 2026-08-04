@@ -418,6 +418,7 @@ object ProfilesDatabases {
                   ProfileDescriptionJSON.DEFAULT_AUDIOBOOK_SKIP_INTERVAL_MS.toLong(),
                 audioBookPlaybackSkipIntervalBackwardMs =
                   ProfileDescriptionJSON.DEFAULT_AUDIOBOOK_SKIP_INTERVAL_MS.toLong(),
+                audioBookBatteryDialogAccepted = false
               ),
             attributes = ProfileAttributes(sortedMapOf())
           )

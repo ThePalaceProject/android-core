@@ -26,6 +26,7 @@ import org.nypl.simplified.ui.main.MainNotifications
 import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
 import org.nypl.simplified.ui.screens.ScreenDefinitionType
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.palace.battery.BatteryModel
 import java.util.concurrent.TimeUnit
 
 class SettingsMainFragment3 : PreferenceFragmentCompat() {
@@ -87,7 +88,7 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
       })
     this.subscriptions.add(AutoCloseable { profileSub.dispose() })
     this.subscriptions.add(
-      SettingsModel.batteryOptimizerStatus.subscribe { _, valueNew ->
+      BatteryModel.batteryOptimizerStatus.subscribe { _, valueNew ->
         this.onBatteryOptimizerStatusChanged(valueNew)
       }
     )
@@ -98,7 +99,7 @@ class SettingsMainFragment3 : PreferenceFragmentCompat() {
       this.logger.debug("Error configuring debug menu: ", e)
     }
 
-    SettingsModel.batteryOptimizerCheck()
+    BatteryModel.batteryOptimizerCheck()
   }
 
   @UiThread
