@@ -9,7 +9,6 @@ import org.nypl.simplified.threads.UIThread
 import org.slf4j.LoggerFactory
 
 object BatteryModel {
-
   private var application: Application? = null
 
   private val logger =
@@ -24,9 +23,7 @@ object BatteryModel {
   val batteryOptimizerStatus: AttributeReadableType<Boolean> =
     this.batteryOptimizerEnabledSrc
 
-  fun initialize(
-    application: Application
-  ) {
+  fun initialize(application: Application) {
     this.application = application
   }
 

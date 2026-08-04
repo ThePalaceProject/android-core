@@ -156,9 +156,10 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       checkBox.setOnCheckedChangeListener { _, isChecked ->
         this.profiles.profileUpdate { description ->
           description.copy(
-            preferences = description.preferences.copy(
-              audioBookBatteryDialogAccepted = isChecked
-            )
+            preferences =
+              description.preferences.copy(
+                audioBookBatteryDialogAccepted = isChecked
+              )
           )
         }
       }
@@ -170,11 +171,11 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     }
   }
 
-  private fun userHasAcceptedBatteryOptimizerDialog(): Boolean {
-    return this.profiles.profileCurrent()
+  private fun userHasAcceptedBatteryOptimizerDialog(): Boolean =
+    this.profiles
+      .profileCurrent()
       .preferences()
       .audioBookBatteryDialogAccepted
-  }
 
   private fun isBatteryOptimizerEnabled(): Boolean {
     BatteryModel.batteryOptimizerCheck()

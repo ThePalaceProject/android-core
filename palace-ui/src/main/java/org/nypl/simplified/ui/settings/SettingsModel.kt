@@ -3,7 +3,6 @@ package org.nypl.simplified.ui.settings
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 
 object SettingsModel {
-
   private var debugClicks = 0
 
   fun onClickVersion(profiles: ProfilesControllerType) {
