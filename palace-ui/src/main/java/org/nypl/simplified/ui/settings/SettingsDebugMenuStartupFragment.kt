@@ -33,6 +33,7 @@ class SettingsDebugMenuStartupFragment :
     return BACK_BUTTON_CONSUMED
   }
 
+  private lateinit var hasSeenAudiobookBatteryDialog: SwitchCompat
   private lateinit var hasSeenLibrarySelector: SwitchCompat
   private lateinit var hasSeenNotifications: SwitchCompat
   private lateinit var failNextBoot: SwitchCompat
@@ -71,6 +72,14 @@ class SettingsDebugMenuStartupFragment :
       SettingsDebugModel.hasSeenLibrarySelection()
     this.hasSeenLibrarySelector.setOnCheckedChangeListener { _, checked ->
       SettingsDebugModel.updatePreferences { p -> p.copy(hasSeenLibrarySelectionScreen = checked) }
+    }
+
+    this.hasSeenAudiobookBatteryDialog =
+      view.findViewById(R.id.debugStartupShowAudiobookBatteryDialog)
+    this.hasSeenAudiobookBatteryDialog.isChecked =
+      SettingsDebugModel.hasSeenLibrarySelection()
+    this.hasSeenAudiobookBatteryDialog.setOnCheckedChangeListener { _, checked ->
+      SettingsDebugModel.updatePreferences { p -> p.copy(audioBookBatteryDialogAccepted = checked) }
     }
   }
 }
