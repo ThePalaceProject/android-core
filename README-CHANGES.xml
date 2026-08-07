@@ -1318,7 +1318,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-07-28T00:00:00+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.31.2">
+    <c:release date="2026-08-07T17:18:08+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.31.3">
       <c:changes>
         <c:change date="2026-07-22T00:00:00+00:00" summary="Completely reimplement EPUB reader for performance and reliability.">
           <c:tickets>
@@ -1442,10 +1442,6 @@
             <c:ticket id="PP-4850"/>
           </c:tickets>
         </c:change>
-      </c:changes>
-    </c:release>
-    <c:release date="2026-08-04T15:57:36+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.32.0">
-      <c:changes>
         <c:change date="2026-07-29T00:00:00+00:00" summary="Add x86 and x86_64 support for Adobe (chromebooks).">
           <c:tickets>
             <c:ticket id="PP-4618"/>
@@ -1461,7 +1457,7 @@
             <c:ticket id="PP-4614"/>
           </c:tickets>
         </c:change>
-        <c:change date="2026-08-04T15:57:36+00:00" summary="Add an audiobook dialog box for the battery optimizer.">
+        <c:change date="2026-08-04T00:00:00+00:00" summary="Add an audiobook dialog box for the battery optimizer.">
           <c:tickets>
             <c:ticket id="PP-4856"/>
           </c:tickets>
