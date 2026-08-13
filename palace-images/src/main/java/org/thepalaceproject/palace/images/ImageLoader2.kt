@@ -20,16 +20,24 @@ import java.net.URI
 import java.util.concurrent.CompletableFuture
 
 class ImageLoader2 private constructor() : ImageLoader2Type {
-
   companion object {
     private val logger =
       LoggerFactory.getLogger(ImageLoader2::class.java)
 
-    fun create(context: Application): ImageLoader2Type {
+    fun create(
+      context: Application,
+      coverGenerator: BookCoverGeneratorType
+    ): ImageLoader2Type {
       this.logger.debug("Configuring Glide")
 
       val glide = Glide.get(context)
       val registry = glide.registry
+
+      registry.prepend(
+        URI::class.java,
+        Bitmap::class.java,
+        GeneratedCoverModelLoader.Factory(coverGenerator)
+      )
 
       return ImageLoader2()
     }
@@ -38,7 +46,6 @@ class ImageLoader2 private constructor() : ImageLoader2Type {
   private class FutureListener(
     private val future: CompletableFuture<Unit>
   ) : RequestListener<Drawable> {
-
     override fun onLoadFailed(
       e: GlideException?,
       model: Any?,
