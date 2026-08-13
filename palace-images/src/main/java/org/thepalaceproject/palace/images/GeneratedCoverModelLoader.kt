@@ -29,7 +29,7 @@ class GeneratedCoverModelLoader(
     override fun build(multiFactory: MultiModelLoaderFactory): ModelLoader<URI, Bitmap> = GeneratedCoverModelLoader(coverGenerator)
 
     override fun teardown() {
-      // nothing to clean up
+      // No resources to clean up.
     }
   }
 }

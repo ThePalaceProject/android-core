@@ -6,8 +6,6 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.widget.ImageView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.GlideBuilder
-import com.bumptech.glide.Registry
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
@@ -37,6 +35,12 @@ class ImageLoader2 private constructor() : ImageLoader2Type {
         URI::class.java,
         Bitmap::class.java,
         GeneratedCoverModelLoader.Factory(coverGenerator)
+      )
+
+      registry.prepend(
+        URI::class.java,
+        Bitmap::class.java,
+        DataURIModelLoader.Factory()
       )
 
       return ImageLoader2()
