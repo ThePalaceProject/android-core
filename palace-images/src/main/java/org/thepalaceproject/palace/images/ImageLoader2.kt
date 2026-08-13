@@ -9,7 +9,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import org.librarysimplified.palace.images.R
@@ -98,7 +98,7 @@ class ImageLoader2 private constructor(
     return bookWithStatus?.book?.thumbnail?.toURI() ?: entry.feedEntry.thumbnail
   }
 
-  abstract class BaseListener<T>(
+  private abstract class BaseListener<T>(
     private val logger: Logger,
     private val op: String,
     private val type: String,
@@ -136,7 +136,7 @@ class ImageLoader2 private constructor(
     ): Boolean {
       this.onLogLoadFailed(e)
       this.future.completeExceptionally(e)
-      return true
+      return false
     }
 
     override fun onResourceReady(
@@ -148,7 +148,7 @@ class ImageLoader2 private constructor(
     ): Boolean {
       this.onLogResourceReady()
       this.future.complete(Unit)
-      return true
+      return false
     }
   }
 
@@ -171,7 +171,7 @@ class ImageLoader2 private constructor(
     ): Boolean {
       this.onLogLoadFailed(e)
       this.future.completeExceptionally(e)
-      return true
+      return false
     }
 
     override fun onResourceReady(
@@ -183,7 +183,7 @@ class ImageLoader2 private constructor(
     ): Boolean {
       this.onLogResourceReady()
       this.future.complete(Unit)
-      return true
+      return false
     }
   }
 
@@ -341,7 +341,7 @@ class ImageLoader2 private constructor(
 
   private class BitmapTarget(
     private val onBitmapLoaded: (Bitmap) -> Unit
-  ) : SimpleTarget<Bitmap>() {
+  ) : CustomTarget<Bitmap>() {
     override fun onResourceReady(
       resource: Bitmap,
       transition: Transition<in Bitmap>?
