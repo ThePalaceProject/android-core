@@ -37,6 +37,11 @@ class ImageLoader2 private constructor(
     private val logger =
       LoggerFactory.getLogger(ImageLoader2::class.java)
 
+    private fun safeSubstring(
+      source: String,
+      length: Int
+    ): String = source.substring(0, Math.min(source.length, length) - 1)
+
     fun create(
       context: Application,
       bookRegistry: BookRegistryReadableType,
@@ -93,17 +98,43 @@ class ImageLoader2 private constructor(
     return bookWithStatus?.book?.thumbnail?.toURI() ?: entry.feedEntry.thumbnail
   }
 
-  private class FutureListener(
+  abstract class BaseListener<T>(
     private val logger: Logger,
+    private val op: String,
+    private val type: String,
+    private val source: String,
+  ) : RequestListener<T> {
+    init {
+      this.logger.debug("[{}][{}][{}]: START", this.op, this.type, this.source)
+    }
+
+    protected fun onLogLoadFailed(e: Throwable?) {
+      this.logger.debug("[{}][{}][{}]: FAILED: ", this.op, this.type, this.source, e)
+    }
+
+    protected fun onLogResourceReady() {
+      this.logger.debug("[{}][{}][{}]: READY", this.op, this.type, this.source)
+    }
+  }
+
+  private class ImageRequestListenerDrawable(
+    logger: Logger,
+    op: String,
+    source: String,
     private val future: CompletableFuture<Unit>
-  ) : RequestListener<Drawable> {
+  ) : BaseListener<Drawable?>(
+      logger = logger,
+      op = op,
+      type = "Drawable",
+      source = safeSubstring(source, 64)
+    ) {
     override fun onLoadFailed(
       e: GlideException?,
       model: Any?,
       target: Target<Drawable?>?,
       isFirstResource: Boolean
     ): Boolean {
-      this.logger.debug("ImageLoadFailed: ", e)
+      this.onLogLoadFailed(e)
       this.future.completeExceptionally(e)
       return true
     }
@@ -115,6 +146,42 @@ class ImageLoader2 private constructor(
       dataSource: DataSource?,
       isFirstResource: Boolean
     ): Boolean {
+      this.onLogResourceReady()
+      this.future.complete(Unit)
+      return true
+    }
+  }
+
+  private class ImageRequestListenerBitmap(
+    logger: Logger,
+    op: String,
+    source: String,
+    private val future: CompletableFuture<Unit>
+  ) : BaseListener<Bitmap?>(
+      logger = logger,
+      op = op,
+      type = "Bitmap",
+      source = safeSubstring(source, 64)
+    ) {
+    override fun onLoadFailed(
+      e: GlideException?,
+      model: Any?,
+      target: Target<Bitmap?>?,
+      isFirstResource: Boolean
+    ): Boolean {
+      this.onLogLoadFailed(e)
+      this.future.completeExceptionally(e)
+      return true
+    }
+
+    override fun onResourceReady(
+      resource: Bitmap?,
+      model: Any?,
+      target: Target<Bitmap?>?,
+      dataSource: DataSource?,
+      isFirstResource: Boolean
+    ): Boolean {
+      this.onLogResourceReady()
       this.future.complete(Unit)
       return true
     }
@@ -128,20 +195,33 @@ class ImageLoader2 private constructor(
   ): CompletableFuture<Unit> {
     val future = CompletableFuture<Unit>()
     val logo = account.logoURI
-    this.logger.debug("loadAccountLogoIntoView: {}", logo)
+    val source =
+      if (logo != null) {
+        logo.hrefURI?.toString() ?: "MissingURI"
+      } else {
+        "DefaultLogo"
+      }
+
+    val listener =
+      ImageRequestListenerDrawable(
+        logger = this.logger,
+        op = "LoadAccountLogoIntoView",
+        source = source,
+        future = future
+      )
 
     val requestManager = Glide.with(context)
     if (logo != null) {
       requestManager
         .load(logo.hrefURI)
         .fallback(defaultIcon)
-        .listener(FutureListener(this.logger, future))
+        .listener(listener)
         .into(iconView)
     } else {
       requestManager
         .load(defaultIcon)
         .fallback(defaultIcon)
-        .listener(FutureListener(this.logger, future))
+        .listener(listener)
         .into(iconView)
     }
 
@@ -156,7 +236,14 @@ class ImageLoader2 private constructor(
   ): CompletableFuture<Unit> {
     val future = CompletableFuture<Unit>()
     val uri = this.thumbnailURIOf(entry) ?: this.generateCoverURI(entry)
-    this.logger.debug("loadThumbnailInto: {}", uri)
+
+    val listener =
+      ImageRequestListenerDrawable(
+        logger = this.logger,
+        op = "LoadThumbnailInto",
+        source = uri.toString(),
+        future = future
+      )
 
     val glide = Glide.with(this.appContext)
     var request =
@@ -168,7 +255,7 @@ class ImageLoader2 private constructor(
       request = request.override(width, height)
     }
     request = request.transform(this.badgeTransform)
-    request = request.listener(FutureListener(this.logger, future))
+    request = request.listener(listener)
     request.into(imageView)
     return future
   }
@@ -182,7 +269,14 @@ class ImageLoader2 private constructor(
   ): CompletableFuture<Unit> {
     val future = CompletableFuture<Unit>()
     val uri = this.coverURIOf(entry) ?: this.generateCoverURI(entry)
-    this.logger.debug("loadCoverInto: {}", uri)
+
+    val listener =
+      ImageRequestListenerDrawable(
+        logger = this.logger,
+        op = "LoadCoverInto",
+        source = uri.toString(),
+        future = future
+      )
 
     val glide = Glide.with(this.appContext)
     var request =
@@ -196,7 +290,7 @@ class ImageLoader2 private constructor(
     if (hasBadge) {
       request = request.transform(this.badgeTransform)
     }
-    request = request.listener(FutureListener(this.logger, future))
+    request = request.listener(listener)
     request.into(imageView)
     return future
   }
@@ -208,7 +302,6 @@ class ImageLoader2 private constructor(
   ): CompletableFuture<Unit> {
     val future = CompletableFuture<Unit>()
     val uri = this.coverURIOf(entry) ?: this.generateCoverURI(entry)
-    this.logger.debug("loadCoverAsBitmap: {}", uri)
     this.loadCoverAsBitmapInternal(uri, onBitmapLoaded, defaultResource, future)
     return future
   }
@@ -219,36 +312,8 @@ class ImageLoader2 private constructor(
     defaultResource: Int
   ): CompletableFuture<Unit> {
     val future = CompletableFuture<Unit>()
-    this.logger.debug("loadCoverAsBitmap: {}", source)
     this.loadCoverAsBitmapInternal(source, onBitmapLoaded, defaultResource, future)
     return future
-  }
-
-  private class RequestReceiver(
-    private val onBitmapLoaded: (Bitmap) -> Unit,
-    private val future: CompletableFuture<Unit>,
-  ) : RequestListener<Bitmap> {
-    override fun onLoadFailed(
-      e: GlideException?,
-      model: Any?,
-      target: Target<Bitmap?>?,
-      isFirstResource: Boolean
-    ): Boolean {
-      this.future.completeExceptionally(e)
-      return false
-    }
-
-    override fun onResourceReady(
-      resource: Bitmap?,
-      model: Any?,
-      target: Target<Bitmap?>?,
-      dataSource: DataSource?,
-      isFirstResource: Boolean
-    ): Boolean {
-      resource?.let { this.onBitmapLoaded(it) }
-      this.future.complete(Unit)
-      return false
-    }
   }
 
   private fun loadCoverAsBitmapInternal(
@@ -257,12 +322,20 @@ class ImageLoader2 private constructor(
     defaultResource: Int,
     future: CompletableFuture<Unit>
   ) {
+    val listener =
+      ImageRequestListenerBitmap(
+        logger = this.logger,
+        op = "LoadCoverAsBitmap",
+        source = uri.toString(),
+        future = future
+      )
+
     Glide
       .with(this.appContext)
       .asBitmap()
       .load(uri)
       .error(defaultResource)
-      .listener(RequestReceiver(onBitmapLoaded, future))
+      .listener(listener)
       .into(BitmapTarget(onBitmapLoaded))
   }
 
