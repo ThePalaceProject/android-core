@@ -24,7 +24,7 @@ import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.accounts.AccountListRegistryViews
 import org.nypl.simplified.ui.accounts.AccountProviderDescriptionListAdapter
-import org.nypl.simplified.ui.images.ImageLoaderType
+import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.nypl.simplified.ui.main.MainApplication
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_NOT_CONSUMED
@@ -260,7 +260,7 @@ class SplashFragment :
     val services =
       Services.serviceDirectory()
     val imageLoader =
-      services.requireService(ImageLoaderType::class.java)
+      services.requireService(ImageLoader2Type::class.java)
     val registry =
       services.requireService(AccountProviderRegistryType::class.java)
     val profiles =

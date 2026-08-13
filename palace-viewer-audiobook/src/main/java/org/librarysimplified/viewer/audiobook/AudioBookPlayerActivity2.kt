@@ -53,7 +53,6 @@ import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.bookmarks.api.BookmarkServiceType
 import org.nypl.simplified.bookmarks.api.BookmarksForBook
-import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.books.time.tracking.TimeTrackingServiceType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
@@ -63,6 +62,7 @@ import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.errorpage.ErrorPageFragment
 import org.nypl.simplified.ui.errorpage.ErrorPageModel
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
+import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
@@ -82,10 +82,10 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
   private lateinit var root: View
   private lateinit var bookmarkService: BookmarkServiceType
   private lateinit var buildConfig: BuildConfigurationServiceType
-  private lateinit var coverService: BookCoverProviderType
   private lateinit var profiles: ProfilesControllerType
   private lateinit var timeTrackingService: TimeTrackingServiceType
   private lateinit var httpClient: LSHTTPClientType
+  private lateinit var imageLoader: ImageLoader2Type
 
   private var fragmentNow: Fragment = AudioBookLoadingFragment2()
   private var subscriptions: CompositeDisposable = CompositeDisposable()
@@ -106,8 +106,8 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       services.requireService(BuildConfigurationServiceType::class.java)
     this.bookmarkService =
       services.requireService(BookmarkServiceType::class.java)
-    this.coverService =
-      services.requireService(BookCoverProviderType::class.java)
+    this.imageLoader =
+      services.requireService(ImageLoader2Type::class.java)
     this.timeTrackingService =
       services.requireService(TimeTrackingServiceType::class.java)
     this.profiles =
@@ -533,7 +533,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
 
     val coverURI = parameters.opdsEntry.cover
     if (coverURI != null) {
-      this.coverService.loadCoverAsBitmap(
+      this.imageLoader.loadCoverAsBitmap(
         source = coverURI,
         onBitmapLoaded = PlayerModel::setCoverImage,
         defaultResource = R.drawable.empty

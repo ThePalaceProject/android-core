@@ -12,6 +12,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.io7m.jmulticlose.core.CloseableCollection
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
+import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.accounts.api.AccountEventCreation
 import org.nypl.simplified.accounts.api.AccountEventDeletion
@@ -31,7 +32,6 @@ import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.errorpage.ErrorStrings
-import org.nypl.simplified.ui.images.ImageLoaderType
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_CONSUMED
@@ -155,7 +155,7 @@ class AccountListFragment :
     val services =
       Services.serviceDirectory()
     val imageLoader =
-      services.requireService(ImageLoaderType::class.java)
+      services.requireService(ImageLoader2Type::class.java)
 
     this.accountListAdapter =
       AccountListAdapter(

@@ -3,10 +3,11 @@ package org.nypl.simplified.ui.catalog
 import android.view.View
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
-import com.google.common.util.concurrent.FluentFuture
 import org.librarysimplified.ui.R
-import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.ui.images.ImageLoader2Type
+import org.thepalaceproject.palace.images.ImageDimensions
+import java.util.concurrent.CompletableFuture
 
 /**
  * This adapter displays a list of feed items in a catalog lane.
@@ -15,16 +16,14 @@ import org.nypl.simplified.feeds.api.FeedEntry
  */
 class CatalogLaneItemViewHolder(
   private val view: View,
-  private val coverLoader: BookCoverProviderType,
+  private val imageLoader: ImageLoader2Type,
   private val callbacks: CatalogViewCallbacksType,
 ) : RecyclerView.ViewHolder(view) {
-  private var thumbnailLoading: FluentFuture<Unit>? = null
+  private var thumbnailLoading: CompletableFuture<Unit>? = null
 
   private val imageView = view.findViewById<ImageView>(R.id.coverImage)
   private val targetHeight =
-    view.resources.getDimensionPixelSize(
-      org.librarysimplified.books.covers.R.dimen.cover_thumbnail_height
-    )
+    view.resources.getDimensionPixelSize(ImageDimensions.coverThumbnailHeight)
 
   fun bindTo(entry: FeedEntry.FeedEntryOPDS) {
     view.contentDescription =
@@ -35,9 +34,7 @@ class CatalogLaneItemViewHolder(
     }
 
     this.thumbnailLoading =
-      coverLoader.loadThumbnailInto(
-        entry, imageView, 0, targetHeight
-      )
+      this.imageLoader.loadThumbnailInto(entry, imageView, 0, targetHeight)
   }
 
   fun unbind() {

@@ -65,7 +65,6 @@ import org.nypl.simplified.books.book_registry.BookStatus.RequestingDownload
 import org.nypl.simplified.books.book_registry.BookStatus.RequestingLoan
 import org.nypl.simplified.books.book_registry.BookStatus.RequestingRevoke
 import org.nypl.simplified.books.book_registry.BookStatus.Revoked
-import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.feeds.api.Feed.FeedWithGroups
 import org.nypl.simplified.feeds.api.Feed.FeedWithoutGroups
 import org.nypl.simplified.feeds.api.FeedEntry
@@ -79,6 +78,7 @@ import org.nypl.simplified.ui.catalog.CatalogFeedViewDetails2.InfoState.BORROWIN
 import org.nypl.simplified.ui.catalog.CatalogFeedViewDetails2.InfoState.GENERIC
 import org.nypl.simplified.ui.catalog.CatalogFeedViewDetails2.InfoState.NONE
 import org.nypl.simplified.ui.catalog.CatalogFeedViewDetails2.InfoState.PROGRESS
+import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.slf4j.LoggerFactory
 
@@ -86,7 +86,7 @@ class CatalogFeedViewDetails2(
   override val root: ViewGroup,
   private val screenSize: ScreenSizeInformationType,
   private val layoutInflater: LayoutInflater,
-  private val covers: BookCoverProviderType,
+  private val imageLoader: ImageLoader2Type,
   private val callbacks: CatalogViewCallbacksType,
 ) : CatalogFeedView() {
   private var loanExpiryDate: DateTime? = null
@@ -138,10 +138,11 @@ class CatalogFeedViewDetails2(
     this.scrollView.findViewById<TextView>(R.id.bookD2RelatedBooksTitle)
   private val relatedDivider =
     this.scrollView.findViewById<View>(R.id.bookD2RelatedBooksDivider)
+
   private val relatedAdapter =
     CatalogFeedWithGroupsAdapter(
       callbacks = this.callbacks,
-      covers = this.covers,
+      imageLoader = this.imageLoader,
       laneStyle = CatalogFeedWithGroupsLaneViewHolder.LaneStyle.RELATED_BOOKS_LANE,
       screenSize = this.screenSize,
     )
@@ -299,12 +300,12 @@ class CatalogFeedViewDetails2(
           val c = this@CatalogFeedViewDetails2
           c.bottomSheetDarken.alpha = (c.bottomSheetDarkenOpacityMax * state).toFloat()
 
-        /*
-         * If the drawer is fully open, make all the other views disabled. If the drawer is
-         * fully closed, make all the views have their normal accessibility values. We use
-         * a so-called "scrim" view - a translucent view that intercepts all click events -
-         * to stop the user clicking on things in the background.
-         */
+          /*
+           * If the drawer is fully open, make all the other views disabled. If the drawer is
+           * fully closed, make all the views have their normal accessibility values. We use
+           * a so-called "scrim" view - a translucent view that intercepts all click events -
+           * to stop the user clicking on things in the background.
+           */
 
           if (state >= 0.99) {
             c.bottomSheetDarken.setOnClickListener {
@@ -319,9 +320,9 @@ class CatalogFeedViewDetails2(
               view.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
             }
 
-          /*
-           * Tell the title in the drawer to gain accessibility focus.
-           */
+            /*
+             * Tell the title in the drawer to gain accessibility focus.
+             */
 
             c.bottomSheetTitle.postDelayed({
               c.bottomSheetTitle.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED)
@@ -511,7 +512,7 @@ class CatalogFeedViewDetails2(
       this.root.resources.getDimensionPixelSize(R.dimen.catalogBookDetailCoverHeight)
 
     val coverFutureMain =
-      this.covers.loadCoverInto(
+      this.imageLoader.loadCoverInto(
         entry = newEntry,
         imageView = this.cover,
         hasBadge = true,
@@ -519,12 +520,12 @@ class CatalogFeedViewDetails2(
         height = targetHeight
       )
 
-    coverFutureMain.addListener({
+    coverFutureMain.thenAccept {
       UIThread.runOnUIThread { this.configureBackground() }
-    }, MoreExecutors.directExecutor())
+    }
 
     val coverFutureBottom =
-      this.covers.loadCoverInto(
+      this.imageLoader.loadCoverInto(
         entry = newEntry,
         imageView = this.bottomSheetCover,
         hasBadge = true,
@@ -689,7 +690,8 @@ class CatalogFeedViewDetails2(
       val (row, rowKey, rowVal) = this.bookInfoViewOf()
       rowKey.text = this.root.resources.getString(R.string.catalogMetaSeries)
       rowVal.text = series.name
-      rowVal.contentDescription = this.root.resources.getString(R.string.catalogAccessibilitySeriesLink, series.name)
+      rowVal.contentDescription =
+        this.root.resources.getString(R.string.catalogAccessibilitySeriesLink, series.name)
       rowVal.setTypeface(rowVal.typeface, Typeface.BOLD)
       rowVal.paintFlags = rowVal.paintFlags or Paint.UNDERLINE_TEXT_FLAG
 
@@ -837,14 +839,14 @@ class CatalogFeedViewDetails2(
       layoutInflater: LayoutInflater,
       screenSize: ScreenSizeInformationType,
       container: ViewGroup,
-      covers: BookCoverProviderType,
+      imageLoader: ImageLoader2Type,
       callbacks: CatalogViewCallbacksType,
     ): CatalogFeedViewDetails2 =
       CatalogFeedViewDetails2(
         root = layoutInflater.inflate(R.layout.book_detail2, container, true) as ViewGroup,
         screenSize = screenSize,
         layoutInflater = layoutInflater,
-        covers = covers,
+        imageLoader = imageLoader,
         callbacks = callbacks,
       )
   }

@@ -8,11 +8,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import org.librarysimplified.ui.R
-import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedGroup
 import org.nypl.simplified.ui.catalog.CatalogFeedWithGroupsLaneViewHolder.LaneStyle.MAIN_GROUPED_FEED_LANE
 import org.nypl.simplified.ui.catalog.CatalogFeedWithGroupsLaneViewHolder.LaneStyle.RELATED_BOOKS_LANE
+import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 
 /**
@@ -21,7 +21,7 @@ import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 class CatalogFeedWithGroupsLaneViewHolder(
   private val parent: View,
   private val screenSize: ScreenSizeInformationType,
-  private val coverLoader: BookCoverProviderType,
+  private val imageLoader: ImageLoader2Type,
   private val laneStyle: LaneStyle,
   private val callbacks: CatalogViewCallbacksType,
 ) : RecyclerView.ViewHolder(parent) {
@@ -127,7 +127,7 @@ class CatalogFeedWithGroupsLaneViewHolder(
 
     val catalogLaneAdapter =
       CatalogLaneAdapter(
-        coverLoader = this.coverLoader,
+        imageLoader = this.imageLoader,
         callbacks = this.callbacks,
       )
 

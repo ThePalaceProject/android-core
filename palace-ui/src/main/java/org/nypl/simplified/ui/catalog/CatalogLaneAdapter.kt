@@ -5,8 +5,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import org.librarysimplified.ui.R
-import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.ui.images.ImageLoader2Type
 
 /**
  * This adapter displays a list of feed items in a catalog lane.
@@ -14,7 +14,7 @@ import org.nypl.simplified.feeds.api.FeedEntry
  * @see CatalogLaneItemViewHolder
  */
 class CatalogLaneAdapter(
-  private val coverLoader: BookCoverProviderType,
+  private val imageLoader: ImageLoader2Type,
   private val callbacks: CatalogViewCallbacksType,
 ) : ListAdapter<FeedEntry.FeedEntryOPDS, CatalogLaneItemViewHolder>(diffCallback) {
   companion object {
@@ -41,7 +41,7 @@ class CatalogLaneAdapter(
     val view =
       inflater.inflate(R.layout.feed_lane_item, parent, false)
 
-    return CatalogLaneItemViewHolder(view, coverLoader, this.callbacks)
+    return CatalogLaneItemViewHolder(view, imageLoader, this.callbacks)
   }
 
   override fun onBindViewHolder(

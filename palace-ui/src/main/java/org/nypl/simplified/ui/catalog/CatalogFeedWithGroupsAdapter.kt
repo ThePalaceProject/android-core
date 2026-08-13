@@ -6,9 +6,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import org.librarysimplified.ui.R
-import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.feeds.api.FeedGroup
 import org.nypl.simplified.ui.catalog.CatalogFeedWithGroupsLaneViewHolder.LaneStyle
+import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 
 /**
@@ -16,7 +16,7 @@ import org.nypl.simplified.ui.screen.ScreenSizeInformationType
  */
 
 class CatalogFeedWithGroupsAdapter(
-  private val covers: BookCoverProviderType,
+  private val imageLoader: ImageLoader2Type,
   private val laneStyle: LaneStyle,
   private val screenSize: ScreenSizeInformationType,
   private val callbacks: CatalogViewCallbacksType,
@@ -58,7 +58,7 @@ class CatalogFeedWithGroupsAdapter(
     return CatalogFeedWithGroupsLaneViewHolder(
       parent = item,
       laneStyle = this.laneStyle,
-      coverLoader = this.covers,
+      imageLoader = this.imageLoader,
       screenSize = this.screenSize,
       callbacks = this.callbacks,
     )

@@ -34,7 +34,6 @@ import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookStatus.Loaned
 import org.nypl.simplified.books.book_registry.BookStatusEvent
 import org.nypl.simplified.books.controller.api.BooksControllerType
-import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.feeds.api.FeedBooksSelection
 import org.nypl.simplified.feeds.api.FeedEntry
@@ -67,7 +66,7 @@ import org.nypl.simplified.ui.catalog.CatalogPart.HOLDS
 import org.nypl.simplified.ui.catalog.saml20.CatalogSAML20Activity
 import org.nypl.simplified.ui.catalog.saml20.CatalogSAML20Model
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
-import org.nypl.simplified.ui.images.ImageLoaderType
+import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.nypl.simplified.ui.main.MainActivity
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result
@@ -128,10 +127,8 @@ sealed class CatalogFragment :
   private lateinit var buttonCreator: CatalogButtons
   private lateinit var catalogBookEvents: CatalogBookRegistryEvents
   private lateinit var contentContainer: FrameLayout
-  private lateinit var covers: BookCoverProviderType
   private lateinit var feedLoader: FeedLoaderType
-  private lateinit var imageLoader: ImageLoaderType
-  private lateinit var images: ImageLoaderType
+  private lateinit var imageLoader: ImageLoader2Type
   private lateinit var opdsClient: OPDSClientType
   private lateinit var profiles: ProfilesControllerType
   private lateinit var screenSize: ScreenSizeInformationType
@@ -167,10 +164,8 @@ sealed class CatalogFragment :
       services.requireService(CatalogOPDSClients::class.java)
     this.profiles =
       services.requireService(ProfilesControllerType::class.java)
-    this.images =
-      services.requireService(ImageLoaderType::class.java)
-    this.covers =
-      services.requireService(BookCoverProviderType::class.java)
+    this.imageLoader =
+      services.requireService(ImageLoader2Type::class.java)
     this.bookRegistry =
       services.requireService(BookRegistryReadableType::class.java)
     this.bookPreviewRegistry =
@@ -179,8 +174,6 @@ sealed class CatalogFragment :
       services.requireService(ScreenSizeInformationType::class.java)
     this.feedLoader =
       services.requireService(FeedLoaderType::class.java)
-    this.imageLoader =
-      services.requireService(ImageLoaderType::class.java)
     this.buttonCreator =
       CatalogButtons(this.requireContext())
     this.catalogBookEvents =
@@ -342,7 +335,7 @@ sealed class CatalogFragment :
       CatalogFeedViewDetails2.create(
         callbacks = this,
         container = this.contentContainer,
-        covers = this.covers,
+        imageLoader = this.imageLoader,
         layoutInflater = this.layoutInflater,
         screenSize = this.screenSize,
       )
@@ -772,7 +765,7 @@ sealed class CatalogFragment :
 
     val entriesGroupedAdapter =
       CatalogFeedWithGroupsAdapter(
-        covers = this.covers,
+        imageLoader = this.imageLoader,
         screenSize = this.screenSize,
         laneStyle = LaneStyle.MAIN_GROUPED_FEED_LANE,
         callbacks = this,
@@ -881,7 +874,7 @@ sealed class CatalogFragment :
 
     val feedAdapter =
       CatalogFeedPagingDataAdapter(
-        covers = this.covers,
+        imageLoader = this.imageLoader,
         buttonCreator = this.buttonCreator,
         registryEvents = registry,
         callbacks = this,
