@@ -14,6 +14,7 @@ import org.nypl.simplified.accounts.api.AccountProviderDescription
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.slf4j.LoggerFactory
+import java.io.InputStream
 import java.net.URI
 import java.util.concurrent.CompletableFuture
 
@@ -41,6 +42,12 @@ class ImageLoader2 private constructor() : ImageLoader2Type {
         URI::class.java,
         Bitmap::class.java,
         DataURIModelLoader.Factory()
+      )
+
+      registry.prepend(
+        URI::class.java,
+        InputStream::class.java,
+        SimplifiedAssetModelLoader.Factory(context)
       )
 
       return ImageLoader2()
