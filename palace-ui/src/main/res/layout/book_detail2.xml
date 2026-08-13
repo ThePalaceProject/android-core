@@ -286,7 +286,7 @@
         tools:alpha="1.0"
         android:elevation="10dp">
 
-        <org.nypl.simplified.ui.images.ImageFlexibleWidthView
+        <org.thepalaceproject.palace.images.ImageFlexibleWidthView
             android:id="@+id/book2DOverlayCover"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/catalogBookDetailCoverHeight"

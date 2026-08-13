@@ -500,6 +500,7 @@ dependencies {
     implementation(libs.commons.compress)
     implementation(libs.commons.io)
     implementation(libs.glide.core)
+    implementation(libs.glide.disklrucache)
     implementation(libs.glide.gifdecoder)
     implementation(libs.google.exoplayer)
     implementation(libs.google.failureaccess)

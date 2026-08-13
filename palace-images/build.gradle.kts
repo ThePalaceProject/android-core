@@ -19,6 +19,7 @@ dependencies {
     implementation(libs.androidx.core.common)
     implementation(libs.androidx.core.runtime)
     implementation(libs.glide.core)
+    implementation(libs.glide.disklrucache)
     implementation(libs.glide.gifdecoder)
     implementation(libs.google.guava)
     implementation(libs.kotlin.reflect)
