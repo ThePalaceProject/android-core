@@ -50,6 +50,12 @@ class ImageLoader2 private constructor() : ImageLoader2Type {
         SimplifiedAssetModelLoader.Factory(context)
       )
 
+      registry.prepend(
+        URI::class.java,
+        InputStream::class.java,
+        HttpURIModelLoader.Factory()
+      )
+
       return ImageLoader2()
     }
   }
