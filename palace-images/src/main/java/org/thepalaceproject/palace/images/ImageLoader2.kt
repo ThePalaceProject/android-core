@@ -147,8 +147,11 @@ class ImageLoader2 private constructor(
       isFirstResource: Boolean
     ): Boolean {
       this.onLogResourceReady()
+      resource?.let { res ->
+        target?.onResourceReady(res, null)
+      }
       this.future.complete(Unit)
-      return false
+      return true
     }
   }
 
