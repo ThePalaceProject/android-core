@@ -654,7 +654,14 @@ internal object MainServices {
     addService(
       message = strings.bootingGeneral("image loader"),
       interfaceType = ImageLoader2Type::class.java,
-      serviceConstructor = { createImageLoader(context, bookRegistry, coverGenerator) }
+      serviceConstructor = {
+        createImageLoader(
+          context = context,
+          bookRegistry = bookRegistry,
+          coverGenerator = coverGenerator,
+          badgeLookup = createBookCoverBadgeLookup(context, screenSize)
+        )
+      }
     )
 
     addService(
@@ -1022,8 +1029,15 @@ internal object MainServices {
   fun createImageLoader(
     context: Application,
     bookRegistry: BookRegistryReadableType,
-    coverGenerator: BookCoverGeneratorType
-  ): ImageLoader2Type = ImageLoader2.create(context, bookRegistry, coverGenerator)
+    coverGenerator: BookCoverGeneratorType,
+    badgeLookup: BookCoverBadgeLookupType
+  ): ImageLoader2Type =
+    ImageLoader2.create(
+      context,
+      bookRegistry,
+      coverGenerator,
+      badgeLookup
+    )
 
   fun createNetworkAccessService(context: Application): LSHTTPNetworkAccessType {
     try {

@@ -26,12 +26,11 @@ import java.util.concurrent.CompletableFuture
 class ImageLoader2 private constructor(
   private val appContext: Context,
   private val bookRegistry: BookRegistryReadableType,
-  private val coverGenerator: BookCoverGeneratorType
+  private val coverGenerator: BookCoverGeneratorType,
+  private val badgeLookup: BookCoverBadgeLookupType
 ) : ImageLoader2Type {
   private val logger =
     LoggerFactory.getLogger(ImageLoader2::class.java)
-  private val badgeTransform: BookCoverBadgeTransform =
-    BookCoverBadgeTransform()
 
   companion object {
     private val logger =
@@ -45,7 +44,8 @@ class ImageLoader2 private constructor(
     fun create(
       context: Application,
       bookRegistry: BookRegistryReadableType,
-      coverGenerator: BookCoverGeneratorType
+      coverGenerator: BookCoverGeneratorType,
+      badgeLookup: BookCoverBadgeLookupType
     ): ImageLoader2Type {
       this.logger.debug("Configuring Glide")
 
@@ -76,7 +76,12 @@ class ImageLoader2 private constructor(
         HttpURIModelLoader.Factory()
       )
 
-      return ImageLoader2(context.applicationContext, bookRegistry, coverGenerator)
+      return ImageLoader2(
+        context.applicationContext,
+        bookRegistry,
+        coverGenerator,
+        badgeLookup
+      )
     }
   }
 
@@ -257,7 +262,8 @@ class ImageLoader2 private constructor(
     if (width > 0 || height > 0) {
       request = request.override(width, height)
     }
-    request = request.transform(this.badgeTransform)
+    val badge = this.badgeLookup.badgeForEntry(entry)
+    request = request.transform(BookCoverBadgeTransform(badge))
     request = request.listener(listener)
     request.into(imageView)
     return future
@@ -291,7 +297,8 @@ class ImageLoader2 private constructor(
       request = request.override(width, height)
     }
     if (hasBadge) {
-      request = request.transform(this.badgeTransform)
+      val badge = this.badgeLookup.badgeForEntry(entry)
+      request = request.transform(BookCoverBadgeTransform(badge))
     }
     request = request.listener(listener)
     request.into(imageView)
