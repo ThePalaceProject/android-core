@@ -12,7 +12,6 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.common.util.concurrent.MoreExecutors
 import io.reactivex.disposables.Disposable
 import org.joda.time.DateTime
 import org.joda.time.Days
@@ -41,12 +40,13 @@ import org.nypl.simplified.books.book_registry.BookStatus.RequestingRevoke
 import org.nypl.simplified.books.book_registry.BookStatus.Revoked
 import org.nypl.simplified.books.book_registry.BookStatusEvent.BookStatusEventChanged
 import org.nypl.simplified.books.book_registry.BookWithStatus
-import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.threads.UIThread
+import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.nypl.simplified.ui.views.Views
 
 class CatalogFeedPagingDataAdapter(
-  private val covers: BookCoverProviderType,
+  private val imageLoader: ImageLoader2Type,
   private val buttonCreator: CatalogButtons,
   private val registryEvents: CatalogBookRegistryEvents,
   private val callbacks: CatalogViewCallbacksType,
@@ -185,17 +185,23 @@ class CatalogFeedPagingDataAdapter(
           this.idleTimeDays.text = ""
 
           val f =
-            this@CatalogFeedPagingDataAdapter.covers.loadThumbnailInto(
+            this@CatalogFeedPagingDataAdapter.imageLoader.loadThumbnailInto(
               entry = item,
               imageView = this.idleCover,
               width = targetWidth,
               height = targetHeight
             )
 
-          f.addListener({
-            Views.setVisible(this.idleCover, true)
-            Views.setVisible(this.idleCoverProgress, false)
-          }, MoreExecutors.directExecutor())
+          f.thenAccept {
+            UIThread.runOnUIThread {
+              try {
+                Views.setVisible(this.idleCover, true)
+                Views.setVisible(this.idleCoverProgress, false)
+              } catch (_: Throwable) {
+                // Nothing we can do about this.
+              }
+            }
+          }
 
           this.onStatusChangedForFeedEntry(item)
         }

@@ -10,15 +10,14 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.database.api.AccountType
-import org.nypl.simplified.ui.images.ImageAccountIcons
-import org.nypl.simplified.ui.images.ImageLoaderType
+import org.nypl.simplified.ui.images.ImageLoader2Type
 
 /**
  * An adapter for a list of accounts.
  */
 
 class AccountListAdapter(
-  private val imageLoader: ImageLoaderType,
+  private val imageLoader: ImageLoader2Type,
   private val onItemClicked: (AccountType) -> Unit,
   private val onItemDeleteClicked: (AccountType) -> Unit
 ) : ListAdapter<AccountType, AccountListAdapter.AccountViewHolder>(AccountDiff) {
@@ -45,7 +44,7 @@ class AccountListAdapter(
 
   class AccountViewHolder(
     itemView: View,
-    private val imageLoader: ImageLoaderType,
+    private val imageLoader: ImageLoader2Type,
     private val onItemClicked: (AccountType) -> Unit,
     private val onItemDeleteClicked: (AccountType) -> Unit
   ) : RecyclerView.ViewHolder(itemView) {
@@ -90,9 +89,7 @@ class AccountListAdapter(
           View.GONE
         }
 
-      this.imageLoader.loader.cancelRequest(this.accountIcon)
-      ImageAccountIcons.loadAccountLogoIntoView(
-        loader = this.imageLoader.loader,
+      this.imageLoader.loadAccountLogoIntoView(
         account = item.provider.toDescription(),
         defaultIcon = R.drawable.account_default,
         iconView = this.accountIcon

@@ -55,8 +55,7 @@ import org.nypl.simplified.ui.accounts.AccountLogoutButtonStatus.AsLogoutButtonE
 import org.nypl.simplified.ui.accounts.oidc.AccountOIDCModel
 import org.nypl.simplified.ui.accounts.saml20.AccountSAML20Activity
 import org.nypl.simplified.ui.accounts.saml20.AccountSAML20Model
-import org.nypl.simplified.ui.images.ImageAccountIcons
-import org.nypl.simplified.ui.images.ImageLoaderType
+import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.nypl.simplified.ui.main.MainApplication
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result
@@ -306,15 +305,15 @@ class AccountDetailFragment :
     val services =
       Services.serviceDirectory()
     val imageLoader =
-      services.requireService(ImageLoaderType::class.java)
+      services.requireService(ImageLoader2Type::class.java)
     this.accountEvents =
       services.requireService(AccountEvents::class.java)
 
-    ImageAccountIcons.loadAccountLogoIntoView(
-      imageLoader.loader,
-      AccountDetailModel.account.provider.toDescription(),
-      R.drawable.account_default,
-      this.accountIcon
+    imageLoader.loadAccountLogoIntoView(
+      context = this.requireContext(),
+      account = AccountDetailModel.account.provider.toDescription(),
+      defaultIcon = R.drawable.account_default,
+      iconView = this.accountIcon
     )
 
     /*
@@ -945,12 +944,7 @@ class AccountDetailFragment :
     }
 
   private fun cancelImageButtonLoading() {
-    val services =
-      Services.serviceDirectory()
-    val imageLoader =
-      services.requireService(ImageLoaderType::class.java)
-
-    imageLoader.loader.cancelTag(this.imageButtonLoadingTag)
+    // XXX: Unimplemented code
   }
 
   private fun setLoginLogoutButtonStatus(

@@ -7,10 +7,10 @@ import org.librarysimplified.ui.R
 import org.nypl.simplified.books.book_database.api.BookFormats.BookFormatDefinition.BOOK_FORMAT_AUDIO
 import org.nypl.simplified.books.book_database.api.BookFormats.BookFormatDefinition.BOOK_FORMAT_EPUB
 import org.nypl.simplified.books.book_database.api.BookFormats.BookFormatDefinition.BOOK_FORMAT_PDF
-import org.nypl.simplified.books.covers.BookCoverBadge
-import org.nypl.simplified.books.covers.BookCoverBadgeLookupType
 import org.nypl.simplified.feeds.api.FeedEntry.FeedEntryOPDS
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
+import org.thepalaceproject.palace.images.BookCoverBadge
+import org.thepalaceproject.palace.images.BookCoverBadgeLookupType
 
 /**
  * The images used to add badges to book covers.

@@ -6,8 +6,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountProviderDescription
-import org.nypl.simplified.ui.images.ImageAccountIcons
-import org.nypl.simplified.ui.images.ImageLoaderType
+import org.nypl.simplified.ui.images.ImageLoader2Type
 
 /**
  * Holder for rendering an `AccountProviderDescription` as a list item.
@@ -15,7 +14,7 @@ import org.nypl.simplified.ui.images.ImageLoaderType
 
 class AccountItemViewHolder(
   val itemView: View,
-  private val imageLoader: ImageLoaderType,
+  private val imageLoader: ImageLoader2Type,
   private val onItemClicked: (AccountProviderDescription) -> Unit
 ) : RecyclerView.ViewHolder(itemView) {
   private val accountIcon: ImageView =
@@ -44,12 +43,13 @@ class AccountItemViewHolder(
       } else {
         View.GONE
       }
-    ImageAccountIcons.loadAccountLogoIntoView(
-      loader = this.imageLoader.loader,
+
+    this.imageLoader.loadAccountLogoIntoView(
       account = item,
       defaultIcon = R.drawable.account_default,
       iconView = this.accountIcon
     )
+
     this.accountItem = item
   }
 }

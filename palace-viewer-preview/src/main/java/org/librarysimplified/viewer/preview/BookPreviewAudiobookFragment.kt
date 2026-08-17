@@ -23,9 +23,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import org.joda.time.Duration
+import org.librarysimplified.services.api.ServiceDirectoryType
 import org.librarysimplified.services.api.Services
-import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -35,6 +36,9 @@ class BookPreviewAudiobookFragment :
   AudioManager.OnAudioFocusChangeListener {
   private val logger =
     LoggerFactory.getLogger(BookPreviewAudiobookFragment::class.java)
+
+  private lateinit var services: ServiceDirectoryType
+  private lateinit var imageLoader: ImageLoader2Type
 
   companion object {
     private const val BUNDLE_EXTRA_FILE =
@@ -58,10 +62,14 @@ class BookPreviewAudiobookFragment :
       }
   }
 
-  private val services = Services.serviceDirectory()
+  override fun onStart() {
+    super.onStart()
 
-  private val covers =
-    this.services.requireService(BookCoverProviderType::class.java)
+    this.services =
+      Services.serviceDirectory()
+    this.imageLoader =
+      this.services.requireService(ImageLoader2Type::class.java)
+  }
 
   private val audioManager by lazy {
     this.requireActivity().getSystemService(Context.AUDIO_SERVICE) as AudioManager
@@ -205,7 +213,7 @@ class BookPreviewAudiobookFragment :
   }
 
   private fun configurePlayer() {
-    this.covers.loadCoverInto(
+    this.imageLoader.loadCoverInto(
       entry = this.feedEntry,
       hasBadge = false,
       imageView = this.previewCover,

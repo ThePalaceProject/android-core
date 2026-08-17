@@ -17,8 +17,7 @@ import org.nypl.simplified.feeds.api.FeedSearch
 import org.nypl.simplified.ui.catalog.CatalogPart.BOOKS
 import org.nypl.simplified.ui.catalog.CatalogPart.CATALOG
 import org.nypl.simplified.ui.catalog.CatalogPart.HOLDS
-import org.nypl.simplified.ui.images.ImageAccountIcons
-import org.nypl.simplified.ui.images.ImageLoaderType
+import org.nypl.simplified.ui.images.ImageLoader2Type
 import java.net.URI
 
 class CatalogToolbar(
@@ -39,7 +38,7 @@ class CatalogToolbar(
 
   fun configure(
     resources: Resources,
-    imageLoader: ImageLoaderType,
+    imageLoader: ImageLoader2Type,
     account: AccountType,
     title: String,
     search: FeedSearch?,
@@ -51,8 +50,7 @@ class CatalogToolbar(
       when (catalogPart) {
         CATALOG -> {
           this.textContainer.visibility = View.VISIBLE
-          ImageAccountIcons.loadAccountLogoIntoView(
-            loader = imageLoader.loader,
+          imageLoader.loadAccountLogoIntoView(
             account = account.provider.toDescription(),
             defaultIcon = R.drawable.account_default,
             iconView = this.textIconView

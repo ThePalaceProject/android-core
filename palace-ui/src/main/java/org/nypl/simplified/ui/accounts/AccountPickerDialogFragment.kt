@@ -24,8 +24,7 @@ import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.accounts.AccountPickerAdapter.OnAccountClickListener
 import org.nypl.simplified.ui.catalog.CatalogOPDSClients
 import org.nypl.simplified.ui.catalog.CatalogPart
-import org.nypl.simplified.ui.images.ImageAccountIcons
-import org.nypl.simplified.ui.images.ImageLoaderType
+import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.nypl.simplified.ui.main.MainNavigation
 import org.nypl.simplified.ui.main.MainTabCategory.TAB_CATALOG
 import org.slf4j.LoggerFactory
@@ -43,7 +42,7 @@ class AccountPickerDialogFragment :
 
   private var catalogPart: CatalogPart = CatalogPart.CATALOG
   private lateinit var recyclerView: RecyclerView
-  private lateinit var imageLoader: ImageLoaderType
+  private lateinit var imageLoader: ImageLoader2Type
   private lateinit var profilesController: ProfilesControllerType
   private lateinit var accounts: List<AccountType>
 
@@ -73,7 +72,7 @@ class AccountPickerDialogFragment :
     val services =
       Services.serviceDirectory()
     this.imageLoader =
-      services.requireService(ImageLoaderType::class.java)
+      services.requireService(ImageLoader2Type::class.java)
     this.profilesController =
       services.requireService(ProfilesControllerType::class.java)
 
@@ -178,7 +177,7 @@ class AccountPickerDialogFragment :
 
 class AccountPickerViewHolder(
   view: View,
-  private val imageLoader: ImageLoaderType,
+  private val imageLoader: ImageLoader2Type,
   private val listener: OnAccountClickListener
 ) : RecyclerView.ViewHolder(view) {
   private val titleView: TextView = view.findViewById(R.id.accountTitle)
@@ -209,8 +208,7 @@ class AccountPickerViewHolder(
       this.activeView.visibility = View.GONE
     }
 
-    ImageAccountIcons.loadAccountLogoIntoView(
-      loader = this.imageLoader.loader,
+    this.imageLoader.loadAccountLogoIntoView(
       account = account.provider.toDescription(),
       defaultIcon = R.drawable.account_default,
       iconView = this.iconView
@@ -257,7 +255,7 @@ class CancelViewHolder(
 class AccountPickerAdapter(
   private val accounts: List<AccountType>,
   private val currentId: AccountID,
-  private val imageLoader: ImageLoaderType,
+  private val imageLoader: ImageLoader2Type,
   private val showAddAccount: Boolean,
   private val listener: OnAccountClickListener
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {

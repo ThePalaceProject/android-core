@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountProviderDescription
-import org.nypl.simplified.ui.images.ImageLoaderType
+import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.slf4j.LoggerFactory
 
 /**
@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory
  */
 
 class AccountProviderDescriptionListAdapter(
-  private val imageLoader: ImageLoaderType,
+  private val imageLoader: ImageLoader2Type,
   private val onItemClicked: (AccountProviderDescription) -> Unit
 ) : ListAdapter<AccountProviderDescription?, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
   companion object {

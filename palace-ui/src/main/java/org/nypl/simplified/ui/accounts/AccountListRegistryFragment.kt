@@ -21,7 +21,7 @@ import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.errorpage.ErrorStrings
-import org.nypl.simplified.ui.images.ImageLoaderType
+import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_CONSUMED
@@ -71,7 +71,7 @@ class AccountListRegistryFragment :
     val services =
       Services.serviceDirectory()
     val imageLoader =
-      services.requireService(ImageLoaderType::class.java)
+      services.requireService(ImageLoader2Type::class.java)
     val registry =
       services.requireService(AccountProviderRegistryType::class.java)
     val profiles =

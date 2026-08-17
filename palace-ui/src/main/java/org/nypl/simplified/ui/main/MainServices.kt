@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.AssetManager
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.squareup.picasso.Picasso
 import io.reactivex.subjects.PublishSubject
 import org.joda.time.LocalDateTime
 import org.librarysimplified.audiobook.views.PlayerModel
@@ -69,11 +68,6 @@ import org.nypl.simplified.books.controller.Controller
 import org.nypl.simplified.books.controller.api.BookRevokeStringResourcesType
 import org.nypl.simplified.books.controller.api.BooksControllerType
 import org.nypl.simplified.books.controller.api.BooksPreviewControllerType
-import org.nypl.simplified.books.covers.BookCoverBadgeLookupType
-import org.nypl.simplified.books.covers.BookCoverGenerator
-import org.nypl.simplified.books.covers.BookCoverGeneratorType
-import org.nypl.simplified.books.covers.BookCoverProvider
-import org.nypl.simplified.books.covers.BookCoverProviderType
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.books.time.tracking.TimeTrackingHTTPCalls
 import org.nypl.simplified.books.time.tracking.TimeTrackingService
@@ -116,8 +110,7 @@ import org.nypl.simplified.ui.accounts.AccountEvents
 import org.nypl.simplified.ui.catalog.CatalogBookRegistryEvents
 import org.nypl.simplified.ui.catalog.CatalogCoverBadgeImages
 import org.nypl.simplified.ui.catalog.CatalogOPDSClients
-import org.nypl.simplified.ui.images.ImageAccountIconRequestHandler
-import org.nypl.simplified.ui.images.ImageLoaderType
+import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.nypl.simplified.ui.screen.ScreenSizeInformation
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.nypl.simplified.ui.settings.SettingsProfileEvents
@@ -129,6 +122,10 @@ import org.thepalaceproject.db.api.DBType
 import org.thepalaceproject.opds.client.OPDSClient
 import org.thepalaceproject.opds.client.OPDSClientParameters
 import org.thepalaceproject.palace.battery.BatteryModel
+import org.thepalaceproject.palace.images.BookCoverBadgeLookupType
+import org.thepalaceproject.palace.images.BookCoverGenerator
+import org.thepalaceproject.palace.images.BookCoverGeneratorType
+import org.thepalaceproject.palace.images.ImageLoader2
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -263,21 +260,6 @@ internal object MainServices {
       override val dataDirectoryName: String
         get() = CURRENT_DATA_VERSION
     }
-
-  private fun createLocalImageLoader(context: Application): ImageLoaderType {
-    val localImageLoader =
-      Picasso
-        .Builder(context)
-        .indicatorsEnabled(false)
-        .loggingEnabled(true)
-        .addRequestHandler(ImageAccountIconRequestHandler(context))
-        .build()
-
-    return object : ImageLoaderType {
-      override val loader: Picasso
-        get() = localImageLoader
-    }
-  }
 
   private fun loadDefaultAccountProvider(): AccountProvider {
     val providers =
@@ -431,25 +413,6 @@ internal object MainServices {
 
     service.bookmarkLoadAll()
     return service
-  }
-
-  private fun createCoverProvider(
-    context: Application,
-    bookRegistry: BookRegistryReadableType,
-    coverGenerator: BookCoverGeneratorType,
-    badgeLookup: BookCoverBadgeLookupType
-  ): BookCoverProviderType {
-    val execCovers =
-      NamedThreadPools.namedThreadPool(2, "cover", 19)
-    return BookCoverProvider.newCoverProvider(
-      context = context,
-      bookRegistry = bookRegistry,
-      coverGenerator = coverGenerator,
-      badgeLookup = badgeLookup,
-      executor = execCovers,
-      debugCacheIndicators = false,
-      debugLogging = false
-    )
   }
 
   private fun createBookCoverBadgeLookup(
@@ -689,9 +652,16 @@ internal object MainServices {
       )
 
     addService(
-      message = strings.bootingGeneral("local image loader"),
-      interfaceType = ImageLoaderType::class.java,
-      serviceConstructor = { createLocalImageLoader(context) }
+      message = strings.bootingGeneral("image loader"),
+      interfaceType = ImageLoader2Type::class.java,
+      serviceConstructor = {
+        createImageLoader(
+          context = context,
+          bookRegistry = bookRegistry,
+          coverGenerator = coverGenerator,
+          badgeLookup = createBookCoverBadgeLookup(context, screenSize)
+        )
+      }
     )
 
     addService(
@@ -1017,19 +987,6 @@ internal object MainServices {
 
     addService(
       message = strings.bootingGeneral("book cover provider"),
-      interfaceType = BookCoverProviderType::class.java,
-      serviceConstructor = {
-        createCoverProvider(
-          context = context,
-          bookRegistry = bookRegistry,
-          coverGenerator = coverGenerator,
-          badgeLookup = badgeLookup
-        )
-      }
-    )
-
-    addService(
-      message = strings.bootingGeneral("book cover provider"),
       interfaceType = CatalogOPDSClients::class.java,
       serviceConstructor = {
         createCatalogOPDSClients(
@@ -1068,6 +1025,19 @@ internal object MainServices {
     logger.debug("Boot duration: {}", bootDuration)
     return finalServices
   }
+
+  fun createImageLoader(
+    context: Application,
+    bookRegistry: BookRegistryReadableType,
+    coverGenerator: BookCoverGeneratorType,
+    badgeLookup: BookCoverBadgeLookupType
+  ): ImageLoader2Type =
+    ImageLoader2.create(
+      context,
+      bookRegistry,
+      coverGenerator,
+      badgeLookup
+    )
 
   fun createNetworkAccessService(context: Application): LSHTTPNetworkAccessType {
     try {
