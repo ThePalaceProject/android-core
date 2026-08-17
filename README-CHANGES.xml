@@ -1318,7 +1318,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-08-13T12:31:38+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.31.4">
+    <c:release date="2026-08-13T00:00:00+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.31.4">
       <c:changes>
         <c:change date="2026-07-22T00:00:00+00:00" summary="Completely reimplement EPUB reader for performance and reliability.">
           <c:tickets>
@@ -1460,6 +1460,15 @@
         <c:change date="2026-08-04T00:00:00+00:00" summary="Add an audiobook dialog box for the battery optimizer.">
           <c:tickets>
             <c:ticket id="PP-4856"/>
+          </c:tickets>
+        </c:change>
+      </c:changes>
+    </c:release>
+    <c:release date="2026-08-17T08:44:14+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.32.0">
+      <c:changes>
+        <c:change date="2026-08-17T08:44:14+00:00" summary="Replace Picasso with Glide.">
+          <c:tickets>
+            <c:ticket id="PP-4857"/>
           </c:tickets>
         </c:change>
       </c:changes>
