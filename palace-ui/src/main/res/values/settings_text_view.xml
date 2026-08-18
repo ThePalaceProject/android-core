@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <declare-styleable name="SettingsTextView">
+        <attr name="settingsTextTitle" format="string|reference" />
+        <attr name="settingsTextSummary" format="string|reference" />
+        <attr name="settingsTextIcon" format="reference" />
+    </declare-styleable>
+</resources>

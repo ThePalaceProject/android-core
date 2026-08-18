@@ -38,6 +38,7 @@ import org.nypl.simplified.ui.settings.SettingsDebugMenuStartupFragment
 import org.nypl.simplified.ui.settings.SettingsDocumentViewerFragment
 import org.nypl.simplified.ui.settings.SettingsDocumentViewerModel
 import org.nypl.simplified.ui.settings.SettingsMainFragment3
+import org.nypl.simplified.ui.settings.SettingsMainFragment4
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.util.LinkedList
@@ -171,9 +172,9 @@ object MainNavigation {
 
   object Settings {
     private val navigationStackAttribute: AttributeType<List<ScreenDefinitionType<*, *>>> =
-      MainAttributes.attributes.withValue(listOf(SettingsMainFragment3.createScreenDefinition(Unit)))
+      MainAttributes.attributes.withValue(listOf(SettingsMainFragment4.createScreenDefinition(Unit)))
     private val navigationStackAttributeUI: AttributeType<List<ScreenDefinitionType<*, *>>> =
-      MainAttributes.attributes.withValue(listOf(SettingsMainFragment3.createScreenDefinition(Unit)))
+      MainAttributes.attributes.withValue(listOf(SettingsMainFragment4.createScreenDefinition(Unit)))
 
     init {
       this.navigationStackAttribute.subscribe { _, x ->
