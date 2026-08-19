@@ -1,8 +1,11 @@
 package org.nypl.simplified.ui.settings
 
+import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.preference.Preference
 import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.jmulticlose.core.CloseableCollectionType
 import com.io7m.jmulticlose.core.ClosingResourceFailedException
@@ -18,10 +21,12 @@ import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType
 import org.nypl.simplified.ui.main.MainNavigation
+import org.nypl.simplified.ui.main.MainNotifications
 import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
 import org.nypl.simplified.ui.screens.ScreenDefinitionType
 import org.slf4j.LoggerFactory
 import org.thepalaceproject.palace.battery.BatteryModel
+import java.util.concurrent.TimeUnit
 
 class SettingsMainFragment4 :
   Fragment(R.layout.settings2),
@@ -106,6 +111,8 @@ class SettingsMainFragment4 :
       profiles = profiles,
       profilePrefs = profiles.profileCurrent().preferences()
     )
+    this.configureNotifications()
+    this.configureBattery()
     BatteryModel.batteryOptimizerCheck()
   }
 
@@ -121,6 +128,13 @@ class SettingsMainFragment4 :
       buildConfig.vcsCommit
     this.settings2Commit.setOnClickListener {
       SettingsModel.onClickVersion(profiles)
+    }
+  }
+
+  private fun configureBattery() {
+    this.settings2BatteryOptimizer.setOnClickListener {
+      val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+      this.requireActivity().startActivity(intent)
     }
   }
 
@@ -226,5 +240,41 @@ class SettingsMainFragment4 :
       view.findViewById(R.id.settings2Commit)
     this.settings2Debug =
       view.findViewById(R.id.settings2Debug)
+  }
+
+  private fun configureNotifications() {
+    this.configureNotificationsText()
+
+    this.settings2NotificationsEnableDisable.setOnClickListener {
+      try {
+        val activity = this.requireActivity()
+        if (!MainNotifications.notificationsArePermitted(activity)) {
+          MainNotifications.requestPermissions(activity)
+          this.view?.postDelayed(
+            { this.configureNotificationsText() },
+            5000L
+          )
+        } else {
+          MainNotifications.requestDropPermissions(activity)
+        }
+      } catch (e: Throwable) {
+        this.logger.debug("Failed to request permissions: ", e)
+      }
+    }
+  }
+
+  private fun configureNotificationsText() {
+    try {
+      val activity = this.requireActivity()
+      if (MainNotifications.notificationsArePermitted(activity)) {
+        this.settings2NotificationsEnableDisable.textSummary.text =
+          activity.getString(R.string.settingsNotificationsEnabled)
+      } else {
+        this.settings2NotificationsEnableDisable.textSummary.text =
+          activity.getString(R.string.settingsNotificationsDisabled)
+      }
+    } catch (e: Throwable) {
+      this.logger.debug("Failed to configure preference item: ", e)
+    }
   }
 }
