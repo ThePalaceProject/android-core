@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <declare-styleable name="SettingsToggleView">
+        <attr name="settingsToggleTitle" format="string|reference" />
+        <attr name="settingsToggleText" format="string|reference" />
+        <attr name="settingsToggleIcon" format="reference" />
+    </declare-styleable>
+</resources>

@@ -1,12 +1,18 @@
 package org.nypl.simplified.ui.settings
 
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
+import org.slf4j.LoggerFactory
 
 object SettingsModel {
+  private val logger =
+    LoggerFactory.getLogger(SettingsModel::class.java)
+
   private var debugClicks = 0
 
   fun onClickVersion(profiles: ProfilesControllerType) {
     ++this.debugClicks
+    this.logger.debug("onClickVersion: {}", this.debugClicks)
+
     if (this.debugClicks >= 7) {
       this.debugClicks = 0
       profiles.profileUpdate { d ->

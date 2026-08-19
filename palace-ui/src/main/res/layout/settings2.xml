@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fadeScrollbars="@bool/scrollbarShouldFade"
+    android:orientation="vertical"
+    android:scrollbarAlwaysDrawVerticalTrack="true"
+    android:scrollbarSize="@dimen/scrollbarSize"
+    android:scrollbarThumbVertical="@drawable/scrollbar_hard"
+    android:scrollbars="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <org.nypl.simplified.ui.settings.SettingsTextView
+            android:id="@+id/settings2AddRemoveAccounts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:settingsTextIcon="@drawable/ic_settings_account"
+            app:settingsTextSummary="@string/settingsAccountsSummary"
+            app:settingsTextTitle="@string/accounts" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
+
+        <org.nypl.simplified.ui.settings.SettingsTextView
+            android:id="@+id/settings2NotificationsEnableDisable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:settingsTextSummary="@string/settingsNotificationsEnabled"
+            app:settingsTextTitle="@string/settingsNotifications" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
+
+        <org.nypl.simplified.ui.settings.SettingsToggleView
+            android:id="@+id/settings2NetworkDownloadOnWifiEnabled"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:settingsToggleText="@string/settingsNetworkWIFIOnlyEnabled"
+            app:settingsToggleTitle="@string/settingsNetworkDownloadWIFI" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
+
+        <org.nypl.simplified.ui.settings.SettingsTextView
+            android:id="@+id/settings2BatteryOptimizer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:settingsTextSummary="@string/settingsBatteryOptimizerEnabledSummary"
+            app:settingsTextTitle="@string/settingsBatteryOptimizerEnabled" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/settingsLeftMargin"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/settingsAudiobooks" />
+
+        <org.nypl.simplified.ui.settings.SettingsTextView
+            android:id="@+id/settings2AudiobooksSkipForward"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:settingsTextSummary="@string/settingsAudiobooksExplanationForwards"
+            app:settingsTextTitle="@string/settingsAudiobooksSkipForwards" />
+
+        <org.nypl.simplified.ui.settings.SettingsTextView
+            android:id="@+id/settings2AudiobooksSkipBackward"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:settingsTextSummary="@string/settingsAudiobooksExplanationBackwards"
+            app:settingsTextTitle="@string/settingsAudiobooksSkipBackwards" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/settingsLeftMargin"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/settingsDocumentation" />
+
+        <org.nypl.simplified.ui.settings.SettingsTextView
+            android:id="@+id/settings2AboutPalace"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:settingsTextTitle="@string/settingsAbout" />
+
+        <org.nypl.simplified.ui.settings.SettingsTextView
+            android:id="@+id/settings2UserAgreement"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:settingsTextTitle="@string/settingsEULA" />
+
+        <org.nypl.simplified.ui.settings.SettingsTextView
+            android:id="@+id/settings2Licenses"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:settingsTextTitle="@string/settingsLicense" />
+
+        <org.nypl.simplified.ui.settings.SettingsTextView
+            android:id="@+id/settings2PrivacyPolicy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:settingsTextTitle="@string/settingsPrivacy" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/settingsLeftMargin"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/settingsInfo" />
+
+        <org.nypl.simplified.ui.settings.SettingsTextView
+            android:id="@+id/settings2AppVersion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:settingsTextIcon="@drawable/ic_settings_info"
+            app:settingsTextSummary="1.0.0"
+            app:settingsTextTitle="@string/settingsVersion" />
+
+        <org.nypl.simplified.ui.settings.SettingsTextView
+            android:id="@+id/settings2Commit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:settingsTextSummary="abcd1234"
+            app:settingsTextTitle="@string/settingsCommit" />
+
+        <org.nypl.simplified.ui.settings.SettingsTextView
+            android:id="@+id/settings2Debug"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:settingsTextIcon="@drawable/ic_settings_code"
+            app:settingsTextSummary="@string/settingsDebugSummary"
+            app:settingsTextTitle="@string/settingsDebug" />
+    </LinearLayout>
+
+</ScrollView>
