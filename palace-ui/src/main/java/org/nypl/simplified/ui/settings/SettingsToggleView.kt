@@ -3,6 +3,7 @@ package org.nypl.simplified.ui.settings
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
@@ -19,11 +20,16 @@ class SettingsToggleView
     private val icon: ImageView
     val toggle: SwitchCompat
     val textTitle: TextView
+    val root: View
 
     init {
-      LayoutInflater
-        .from(context)
-        .inflate(R.layout.settings_toggle_view, this, true)
+      this.isClickable = false
+      this.isFocusable = false
+
+      this.root =
+        LayoutInflater
+          .from(context)
+          .inflate(R.layout.settings_toggle_view, this, true)
 
       val a =
         context.theme.obtainStyledAttributes(

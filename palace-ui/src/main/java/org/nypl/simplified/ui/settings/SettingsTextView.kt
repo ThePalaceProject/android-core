@@ -17,13 +17,18 @@ class SettingsTextView
     defStyleAttr: Int = 0
   ) : FrameLayout(context, attrs, defStyleAttr) {
     private val icon: ImageView
-    private val textSummary: TextView
+    val textSummary: TextView
     val textTitle: TextView
+    val root: View
 
     init {
-      LayoutInflater
-        .from(context)
-        .inflate(R.layout.settings_text_view, this, true)
+      this.isClickable = false
+      this.isFocusable = false
+
+      this.root =
+        LayoutInflater
+          .from(context)
+          .inflate(R.layout.settings_text_view, this, true)
 
       val a =
         context.theme.obtainStyledAttributes(

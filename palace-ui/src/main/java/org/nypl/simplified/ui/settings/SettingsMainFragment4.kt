@@ -3,14 +3,34 @@ package org.nypl.simplified.ui.settings
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import com.io7m.jmulticlose.core.CloseableCollection
+import com.io7m.jmulticlose.core.CloseableCollectionType
+import com.io7m.jmulticlose.core.ClosingResourceFailedException
+import org.librarysimplified.http.api.LSHTTPNetworkAccess
+import org.librarysimplified.http.api.LSHTTPNetworkAccessType
+import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
+import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
+import org.nypl.simplified.profiles.api.ProfileEvent
+import org.nypl.simplified.profiles.api.ProfilePreferences
+import org.nypl.simplified.profiles.api.ProfileUpdated
+import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
+import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType
+import org.nypl.simplified.ui.main.MainNavigation
 import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
 import org.nypl.simplified.ui.screens.ScreenDefinitionType
+import org.slf4j.LoggerFactory
+import org.thepalaceproject.palace.battery.BatteryModel
 
 class SettingsMainFragment4 :
   Fragment(R.layout.settings2),
   MainBackButtonConsumerType {
+  private val logger =
+    LoggerFactory.getLogger(SettingsMainFragment4::class.java)
+
+  private lateinit var networkAccess: LSHTTPNetworkAccessType
+  private lateinit var subscriptions: CloseableCollectionType<ClosingResourceFailedException>
   private lateinit var settings2AboutPalace: SettingsTextView
   private lateinit var settings2AddRemoveAccounts: SettingsTextView
   private lateinit var settings2AppVersion: SettingsTextView
@@ -47,6 +67,128 @@ class SettingsMainFragment4 :
 
   override fun onBackButtonPressed(): MainBackButtonConsumerType.Result {
     return MainBackButtonConsumerType.Result.BACK_BUTTON_NOT_CONSUMED
+  }
+
+  override fun onStart() {
+    super.onStart()
+
+    val services =
+      Services.serviceDirectory()
+    val profileEvents =
+      services.requireService(SettingsProfileEvents::class.java)
+    val profiles =
+      services.requireService(ProfilesControllerType::class.java)
+    this.networkAccess =
+      services.requireService(LSHTTPNetworkAccessType::class.java)
+
+    this.subscriptions =
+      CloseableCollection.create()
+
+    val profileSub =
+      profileEvents.events.subscribe({ e ->
+        this.onProfileEvent(profiles, e)
+      })
+    this.subscriptions.add(AutoCloseable { profileSub.dispose() })
+    this.subscriptions.add(
+      BatteryModel.batteryOptimizerStatus.subscribe { _, valueNew ->
+        this.onBatteryOptimizerStatusChanged(valueNew)
+      }
+    )
+
+    try {
+      this.configureDebug()
+    } catch (e: Throwable) {
+      this.logger.debug("Error configuring debug menu: ", e)
+    }
+
+    this.configureBuild()
+    BatteryModel.batteryOptimizerCheck()
+  }
+
+  private fun configureBuild() {
+    val services =
+      Services.serviceDirectory()
+    val profiles =
+      services.requireService(ProfilesControllerType::class.java)
+    val buildConfig =
+      services.requireService(BuildConfigurationServiceType::class.java)
+
+    this.settings2Commit.textSummary.text =
+      buildConfig.vcsCommit
+    this.settings2Commit.root.setOnClickListener {
+      SettingsModel.onClickVersion(profiles)
+    }
+  }
+
+  private fun onBatteryOptimizerStatusChanged(enabled: Boolean) {
+    UIThread.checkIsUIThread()
+
+    if (enabled) {
+      this.settings2BatteryOptimizer.textSummary.text =
+        this.getString(R.string.settingsBatteryOptimizerEnabledSummary)
+      this.settings2BatteryOptimizer.textTitle.text =
+        this.getString(R.string.settingsBatteryOptimizerEnabled)
+    } else {
+      this.settings2BatteryOptimizer.textSummary.text =
+        this.getString(R.string.settingsBatteryOptimizerDisabledSummary)
+      this.settings2BatteryOptimizer.textTitle.text =
+        this.getString(R.string.settingsBatteryOptimizerDisabled)
+    }
+  }
+
+  private fun onProfileEvent(
+    profiles: ProfilesControllerType,
+    e: ProfileEvent
+  ) {
+    if (e is ProfileUpdated) {
+      this.configureDebug()
+      this.configureNetwork(
+        downloadSwitch = this.settings2NetworkDownloadOnWifiEnabled,
+        profiles = profiles,
+        profilePrefs = profiles.profileCurrent().preferences()
+      )
+    }
+  }
+
+  private fun configureNetwork(
+    downloadSwitch: SettingsToggleView,
+    profiles: ProfilesControllerType,
+    profilePrefs: ProfilePreferences
+  ) {
+    if (profilePrefs.downloadOnlyOnWIFI) {
+      downloadSwitch.toggle.isChecked = true
+    } else {
+      downloadSwitch.toggle.isChecked = false
+    }
+
+    downloadSwitch.toggle.setOnCheckedChangeListener { _, onlyWIFI ->
+      LSHTTPNetworkAccess.setCellularPermitted(!onlyWIFI)
+
+      profiles.profileUpdate { description ->
+        description.copy(
+          preferences = description.preferences.copy(downloadOnlyOnWIFI = onlyWIFI)
+        )
+      }
+    }
+  }
+
+  private fun configureDebug() {
+    this.settings2Debug.root.setOnClickListener {
+      MainNavigation.Settings.openDebugSettings()
+    }
+
+    val profiles =
+      Services
+        .serviceDirectory()
+        .requireService(ProfilesControllerType::class.java)
+
+    // Show the debug settings menu, if enabled
+    val visible = SettingsModel.showDebugSettings(profiles)
+    if (visible) {
+      this.settings2Debug.visibility = View.VISIBLE
+    } else {
+      this.settings2Debug.visibility = View.GONE
+    }
   }
 
   override fun onViewCreated(
