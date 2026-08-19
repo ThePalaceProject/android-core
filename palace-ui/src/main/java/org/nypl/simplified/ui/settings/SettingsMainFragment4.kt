@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.preference.Preference
 import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.jmulticlose.core.CloseableCollectionType
 import com.io7m.jmulticlose.core.ClosingResourceFailedException
@@ -100,12 +99,7 @@ class SettingsMainFragment4 :
       }
     )
 
-    try {
-      this.configureDebug()
-    } catch (e: Throwable) {
-      this.logger.debug("Error configuring debug menu: ", e)
-    }
-
+    this.configureDebug()
     this.configureBuild()
     this.configureNetwork(
       profiles = profiles,
@@ -113,28 +107,40 @@ class SettingsMainFragment4 :
     )
     this.configureNotifications()
     this.configureBattery()
+    this.configureAudiobookSkip(
+      profiles = profiles,
+      profilePrefs = profiles.profileCurrent().preferences()
+    )
     BatteryModel.batteryOptimizerCheck()
   }
 
   private fun configureBuild() {
-    val services =
-      Services.serviceDirectory()
-    val profiles =
-      services.requireService(ProfilesControllerType::class.java)
-    val buildConfig =
-      services.requireService(BuildConfigurationServiceType::class.java)
+    try {
+      val services =
+        Services.serviceDirectory()
+      val profiles =
+        services.requireService(ProfilesControllerType::class.java)
+      val buildConfig =
+        services.requireService(BuildConfigurationServiceType::class.java)
 
-    this.settings2Commit.textSummary.text =
-      buildConfig.vcsCommit
-    this.settings2Commit.setOnClickListener {
-      SettingsModel.onClickVersion(profiles)
+      this.settings2Commit.textSummary.text =
+        buildConfig.vcsCommit
+      this.settings2Commit.setOnClickListener {
+        SettingsModel.onClickVersion(profiles)
+      }
+    } catch (e: Throwable) {
+      this.logger.debug("configureBuild: ", e)
     }
   }
 
   private fun configureBattery() {
-    this.settings2BatteryOptimizer.setOnClickListener {
-      val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
-      this.requireActivity().startActivity(intent)
+    try {
+      this.settings2BatteryOptimizer.setOnClickListener {
+        val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+        this.requireActivity().startActivity(intent)
+      }
+    } catch (e: Throwable) {
+      this.logger.debug("configureBattery: ", e)
     }
   }
 
@@ -164,6 +170,10 @@ class SettingsMainFragment4 :
         profiles = profiles,
         profilePrefs = profiles.profileCurrent().preferences()
       )
+      this.configureAudiobookSkip(
+        profiles = profiles,
+        profilePrefs = profiles.profileCurrent().preferences()
+      )
     }
   }
 
@@ -171,40 +181,48 @@ class SettingsMainFragment4 :
     profiles: ProfilesControllerType,
     profilePrefs: ProfilePreferences
   ) {
-    val isOnlyWifi = profilePrefs.downloadOnlyOnWIFI
-    if (isOnlyWifi) {
-      this.settings2NetworkDownloadOnWifiEnabled.toggle.isChecked = true
-    } else {
-      this.settings2NetworkDownloadOnWifiEnabled.toggle.isChecked = false
-    }
-
-    this.settings2NetworkDownloadOnWifiEnabled.setOnClickListener {
-      LSHTTPNetworkAccess.setCellularPermitted(!isOnlyWifi)
-
-      profiles.profileUpdate { description ->
-        description.copy(
-          preferences = description.preferences.copy(downloadOnlyOnWIFI = !isOnlyWifi)
-        )
+    try {
+      val isOnlyWifi = profilePrefs.downloadOnlyOnWIFI
+      if (isOnlyWifi) {
+        this.settings2NetworkDownloadOnWifiEnabled.toggle.isChecked = true
+      } else {
+        this.settings2NetworkDownloadOnWifiEnabled.toggle.isChecked = false
       }
+
+      this.settings2NetworkDownloadOnWifiEnabled.setOnClickListener {
+        LSHTTPNetworkAccess.setCellularPermitted(!isOnlyWifi)
+
+        profiles.profileUpdate { description ->
+          description.copy(
+            preferences = description.preferences.copy(downloadOnlyOnWIFI = !isOnlyWifi)
+          )
+        }
+      }
+    } catch (e: Throwable) {
+      this.logger.debug("configureNetwork: ", e)
     }
   }
 
   private fun configureDebug() {
-    this.settings2Debug.setOnClickListener {
-      MainNavigation.Settings.openDebugSettings()
-    }
+    try {
+      this.settings2Debug.setOnClickListener {
+        MainNavigation.Settings.openDebugSettings()
+      }
 
-    val profiles =
-      Services
-        .serviceDirectory()
-        .requireService(ProfilesControllerType::class.java)
+      val profiles =
+        Services
+          .serviceDirectory()
+          .requireService(ProfilesControllerType::class.java)
 
-    // Show the debug settings menu, if enabled
-    val visible = SettingsModel.showDebugSettings(profiles)
-    if (visible) {
-      this.settings2Debug.visibility = View.VISIBLE
-    } else {
-      this.settings2Debug.visibility = View.GONE
+      // Show the debug settings menu, if enabled
+      val visible = SettingsModel.showDebugSettings(profiles)
+      if (visible) {
+        this.settings2Debug.visibility = View.VISIBLE
+      } else {
+        this.settings2Debug.visibility = View.GONE
+      }
+    } catch (e: Throwable) {
+      this.logger.debug("configureDebug: ", e)
     }
   }
 
@@ -243,23 +261,27 @@ class SettingsMainFragment4 :
   }
 
   private fun configureNotifications() {
-    this.configureNotificationsText()
+    try {
+      this.configureNotificationsText()
 
-    this.settings2NotificationsEnableDisable.setOnClickListener {
-      try {
-        val activity = this.requireActivity()
-        if (!MainNotifications.notificationsArePermitted(activity)) {
-          MainNotifications.requestPermissions(activity)
-          this.view?.postDelayed(
-            { this.configureNotificationsText() },
-            5000L
-          )
-        } else {
-          MainNotifications.requestDropPermissions(activity)
+      this.settings2NotificationsEnableDisable.setOnClickListener {
+        try {
+          val activity = this.requireActivity()
+          if (!MainNotifications.notificationsArePermitted(activity)) {
+            MainNotifications.requestPermissions(activity)
+            this.view?.postDelayed(
+              { this.configureNotificationsText() },
+              5000L
+            )
+          } else {
+            MainNotifications.requestDropPermissions(activity)
+          }
+        } catch (e: Throwable) {
+          this.logger.debug("Failed to request permissions: ", e)
         }
-      } catch (e: Throwable) {
-        this.logger.debug("Failed to request permissions: ", e)
       }
+    } catch (e: Throwable) {
+      this.logger.debug("configureNotifications: ", e)
     }
   }
 
@@ -275,6 +297,92 @@ class SettingsMainFragment4 :
       }
     } catch (e: Throwable) {
       this.logger.debug("Failed to configure preference item: ", e)
+    }
+  }
+
+  private fun configureAudiobookSkip(
+    profiles: ProfilesControllerType,
+    profilePrefs: ProfilePreferences
+  ) {
+    val entries =
+      this.resources.getStringArray(R.array.settingsAudiobooksSkipEntries)
+    val values =
+      this.resources.getStringArray(R.array.settingsAudiobooksSkipValues)
+
+    this.configureAudiobookSkipItem(
+      view = this.settings2AudiobooksSkipForward,
+      currentValueMs = profilePrefs.audioBookPlaybackSkipIntervalForwardMs,
+      entries = entries,
+      values = values,
+      onSelected = { newValue ->
+        val seconds = newValue.toLong()
+        val ms = TimeUnit.MILLISECONDS.convert(seconds, TimeUnit.SECONDS)
+        profiles.profileUpdate { d ->
+          d.copy(
+            preferences =
+              d.preferences.copy(
+                audioBookPlaybackSkipIntervalForwardMs = ms
+              )
+          )
+        }
+      }
+    )
+
+    this.configureAudiobookSkipItem(
+      view = this.settings2AudiobooksSkipBackward,
+      currentValueMs = profilePrefs.audioBookPlaybackSkipIntervalBackwardMs,
+      entries = entries,
+      values = values,
+      onSelected = { newValue ->
+        val seconds = newValue.toLong()
+        val ms = TimeUnit.MILLISECONDS.convert(seconds, TimeUnit.SECONDS)
+        profiles.profileUpdate { d ->
+          d.copy(
+            preferences =
+              d.preferences.copy(
+                audioBookPlaybackSkipIntervalBackwardMs = ms
+              )
+          )
+        }
+      }
+    )
+  }
+
+  private fun configureAudiobookSkipItem(
+    view: SettingsTextView,
+    currentValueMs: Long,
+    entries: Array<String>,
+    values: Array<String>,
+    onSelected: (String) -> Unit
+  ) {
+    try {
+      val currentValueSeconds =
+        TimeUnit.SECONDS.convert(currentValueMs, TimeUnit.MILLISECONDS)
+      val initialValue = currentValueSeconds.toString()
+
+      val checkedIndex = values.indexOf(initialValue)
+      if (checkedIndex >= 0) {
+        view.textSummary.text = entries[checkedIndex]
+      }
+
+      view.setOnClickListener {
+        SettingsListPreferenceDialog.show(
+          fragment = this,
+          title = view.textTitle.text,
+          entries = entries,
+          values = values,
+          initialValue = initialValue,
+          onSelected = { newValue ->
+            val newIndex = values.indexOf(newValue)
+            if (newIndex >= 0) {
+              view.textSummary.text = entries[newIndex]
+            }
+            onSelected(newValue)
+          }
+        )
+      }
+    } catch (e: Throwable) {
+      this.logger.debug("configureAudiobookSkipItem: ", e)
     }
   }
 }
