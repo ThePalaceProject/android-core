@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.jmulticlose.core.CloseableCollectionType
 import com.io7m.jmulticlose.core.ClosingResourceFailedException
+import org.librarysimplified.documents.DocumentStoreType
 import org.librarysimplified.http.api.LSHTTPNetworkAccess
 import org.librarysimplified.http.api.LSHTTPNetworkAccessType
 import org.librarysimplified.services.api.Services
@@ -99,18 +100,19 @@ class SettingsMainFragment4 :
       }
     )
 
-    this.configureDebug()
-    this.configureBuild()
-    this.configureNetwork(
-      profiles = profiles,
-      profilePrefs = profiles.profileCurrent().preferences()
-    )
-    this.configureNotifications()
+    val profilePrefs = profiles.profileCurrent().preferences()
+    this.configureAbout()
+    this.configureAccounts()
+    this.configureAudiobookSkip(profiles = profiles, profilePrefs = profilePrefs)
     this.configureBattery()
-    this.configureAudiobookSkip(
-      profiles = profiles,
-      profilePrefs = profiles.profileCurrent().preferences()
-    )
+    this.configureBuild()
+    this.configureDebug()
+    this.configureEULA()
+    this.configureLicense()
+    this.configureNetwork(profiles = profiles, profilePrefs = profilePrefs)
+    this.configureNotifications()
+    this.configurePrivacy()
+    this.configureVersion()
     BatteryModel.batteryOptimizerCheck()
   }
 
@@ -383,6 +385,158 @@ class SettingsMainFragment4 :
       }
     } catch (e: Throwable) {
       this.logger.debug("configureAudiobookSkipItem: ", e)
+    }
+  }
+
+  private fun configureAccounts() {
+    try {
+      val services =
+        Services.serviceDirectory()
+      val buildConfig =
+        services.requireService(BuildConfigurationServiceType::class.java)
+
+      if (buildConfig.allowAccountsAccess) {
+        this.settings2AddRemoveAccounts.setOnClickListener {
+          MainNavigation.Settings.openAccountList()
+        }
+      } else {
+        this.settings2AddRemoveAccounts.visibility = View.GONE
+      }
+    } catch (e: Throwable) {
+      this.logger.debug("configureAccounts: ", e)
+    }
+  }
+
+  private fun configureAbout() {
+    try {
+      val services =
+        Services.serviceDirectory()
+      val documents =
+        services.requireService(DocumentStoreType::class.java)
+
+      val doc = documents.about
+      if (doc != null) {
+        this.settings2AboutPalace.setOnClickListener {
+          MainNavigation.Settings.openDocument(
+            SettingsDocumentViewerModel.DocumentTarget(
+              title =
+                this.settings2AboutPalace.textTitle.text
+                  .toString(),
+              url = doc.readableURL.toExternalForm()
+            )
+          )
+        }
+      } else {
+        this.settings2AboutPalace.visibility = View.GONE
+      }
+    } catch (e: Throwable) {
+      this.logger.debug("configureAbout: ", e)
+    }
+  }
+
+  private fun configureEULA() {
+    try {
+      val services =
+        Services.serviceDirectory()
+      val documents =
+        services.requireService(DocumentStoreType::class.java)
+
+      val doc = documents.eula
+      if (doc != null) {
+        this.settings2UserAgreement.setOnClickListener {
+          MainNavigation.Settings.openDocument(
+            SettingsDocumentViewerModel.DocumentTarget(
+              title =
+                this.settings2UserAgreement.textTitle.text
+                  .toString(),
+              url = doc.readableURL.toExternalForm()
+            )
+          )
+        }
+      } else {
+        this.settings2UserAgreement.visibility = View.GONE
+      }
+    } catch (e: Throwable) {
+      this.logger.debug("configureEULA: ", e)
+    }
+  }
+
+  private fun configureLicense() {
+    try {
+      val services =
+        Services.serviceDirectory()
+      val documents =
+        services.requireService(DocumentStoreType::class.java)
+
+      val doc = documents.licenses
+      if (doc != null) {
+        this.settings2Licenses.setOnClickListener {
+          MainNavigation.Settings.openDocument(
+            SettingsDocumentViewerModel.DocumentTarget(
+              title =
+                this.settings2Licenses.textTitle.text
+                  .toString(),
+              url = doc.readableURL.toExternalForm()
+            )
+          )
+        }
+      } else {
+        this.settings2Licenses.visibility = View.GONE
+      }
+    } catch (e: Throwable) {
+      this.logger.debug("configureLicense: ", e)
+    }
+  }
+
+  private fun configurePrivacy() {
+    try {
+      val services =
+        Services.serviceDirectory()
+      val documents =
+        services.requireService(DocumentStoreType::class.java)
+
+      val doc = documents.privacyPolicy
+      if (doc != null) {
+        this.settings2PrivacyPolicy.setOnClickListener {
+          MainNavigation.Settings.openDocument(
+            SettingsDocumentViewerModel.DocumentTarget(
+              title =
+                this.settings2PrivacyPolicy.textTitle.text
+                  .toString(),
+              url = doc.readableURL.toExternalForm()
+            )
+          )
+        }
+      } else {
+        this.settings2PrivacyPolicy.visibility = View.GONE
+      }
+    } catch (e: Throwable) {
+      this.logger.debug("configurePrivacy: ", e)
+    }
+  }
+
+  private fun formatVersion(): String =
+    try {
+      val services =
+        Services.serviceDirectory()
+      val buildConfig =
+        services.requireService(BuildConfigurationServiceType::class.java)
+
+      val context = this.requireContext()
+      val pkgManager = context.packageManager
+      val pkgInfo = pkgManager.getPackageInfo(context.packageName, 0)
+      val versionName = buildConfig.simplifiedVersion
+
+      "$versionName (${pkgInfo.versionCode})"
+    } catch (e: Throwable) {
+      "Unknown"
+    }
+
+  private fun configureVersion() {
+    try {
+      this.settings2AppVersion.textSummary.text = this.formatVersion()
+    } catch (e: Throwable) {
+      this.logger.debug("configureVersion: ", e)
     }
   }
 }
