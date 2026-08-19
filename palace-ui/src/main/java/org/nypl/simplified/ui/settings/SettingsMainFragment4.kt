@@ -102,6 +102,10 @@ class SettingsMainFragment4 :
     }
 
     this.configureBuild()
+    this.configureNetwork(
+      profiles = profiles,
+      profilePrefs = profiles.profileCurrent().preferences()
+    )
     BatteryModel.batteryOptimizerCheck()
   }
 
@@ -115,7 +119,7 @@ class SettingsMainFragment4 :
 
     this.settings2Commit.textSummary.text =
       buildConfig.vcsCommit
-    this.settings2Commit.root.setOnClickListener {
+    this.settings2Commit.setOnClickListener {
       SettingsModel.onClickVersion(profiles)
     }
   }
@@ -143,7 +147,6 @@ class SettingsMainFragment4 :
     if (e is ProfileUpdated) {
       this.configureDebug()
       this.configureNetwork(
-        downloadSwitch = this.settings2NetworkDownloadOnWifiEnabled,
         profiles = profiles,
         profilePrefs = profiles.profileCurrent().preferences()
       )
@@ -151,29 +154,29 @@ class SettingsMainFragment4 :
   }
 
   private fun configureNetwork(
-    downloadSwitch: SettingsToggleView,
     profiles: ProfilesControllerType,
     profilePrefs: ProfilePreferences
   ) {
-    if (profilePrefs.downloadOnlyOnWIFI) {
-      downloadSwitch.toggle.isChecked = true
+    val isOnlyWifi = profilePrefs.downloadOnlyOnWIFI
+    if (isOnlyWifi) {
+      this.settings2NetworkDownloadOnWifiEnabled.toggle.isChecked = true
     } else {
-      downloadSwitch.toggle.isChecked = false
+      this.settings2NetworkDownloadOnWifiEnabled.toggle.isChecked = false
     }
 
-    downloadSwitch.toggle.setOnCheckedChangeListener { _, onlyWIFI ->
-      LSHTTPNetworkAccess.setCellularPermitted(!onlyWIFI)
+    this.settings2NetworkDownloadOnWifiEnabled.setOnClickListener {
+      LSHTTPNetworkAccess.setCellularPermitted(!isOnlyWifi)
 
       profiles.profileUpdate { description ->
         description.copy(
-          preferences = description.preferences.copy(downloadOnlyOnWIFI = onlyWIFI)
+          preferences = description.preferences.copy(downloadOnlyOnWIFI = !isOnlyWifi)
         )
       }
     }
   }
 
   private fun configureDebug() {
-    this.settings2Debug.root.setOnClickListener {
+    this.settings2Debug.setOnClickListener {
       MainNavigation.Settings.openDebugSettings()
     }
 

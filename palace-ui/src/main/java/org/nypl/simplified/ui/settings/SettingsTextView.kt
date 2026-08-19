@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.content.res.AppCompatResources
 import org.librarysimplified.ui.R
 
 class SettingsTextView
@@ -22,8 +23,16 @@ class SettingsTextView
     val root: View
 
     init {
-      this.isClickable = false
-      this.isFocusable = false
+      this.isClickable = true
+      this.isFocusable = true
+
+      val styledAttrs =
+        context.theme.obtainStyledAttributes(intArrayOf(android.R.attr.selectableItemBackground))
+      val resid = styledAttrs.getResourceId(0, 0)
+      styledAttrs.recycle()
+      if (resid != 0) {
+        this.background = AppCompatResources.getDrawable(context, resid)
+      }
 
       this.root =
         LayoutInflater
