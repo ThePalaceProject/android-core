@@ -1,6 +1,7 @@
 package org.nypl.simplified.ui.settings
 
 import android.content.Intent
+import android.content.res.Resources
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
@@ -306,48 +307,52 @@ class SettingsMainFragment4 :
     profiles: ProfilesControllerType,
     profilePrefs: ProfilePreferences
   ) {
-    val entries =
-      this.resources.getStringArray(R.array.settingsAudiobooksSkipEntries)
-    val values =
-      this.resources.getStringArray(R.array.settingsAudiobooksSkipValues)
+    try {
+      val entries =
+        this.resources.getStringArray(R.array.settingsAudiobooksSkipEntries)
+      val values =
+        this.resources.getStringArray(R.array.settingsAudiobooksSkipValues)
 
-    this.configureAudiobookSkipItem(
-      view = this.settings2AudiobooksSkipForward,
-      currentValueMs = profilePrefs.audioBookPlaybackSkipIntervalForwardMs,
-      entries = entries,
-      values = values,
-      onSelected = { newValue ->
-        val seconds = newValue.toLong()
-        val ms = TimeUnit.MILLISECONDS.convert(seconds, TimeUnit.SECONDS)
-        profiles.profileUpdate { d ->
-          d.copy(
-            preferences =
-              d.preferences.copy(
-                audioBookPlaybackSkipIntervalForwardMs = ms
-              )
-          )
+      this.configureAudiobookSkipItem(
+        view = this.settings2AudiobooksSkipForward,
+        currentValueMs = profilePrefs.audioBookPlaybackSkipIntervalForwardMs,
+        entries = entries,
+        values = values,
+        onSelected = { newValue ->
+          val seconds = newValue.toLong()
+          val ms = TimeUnit.MILLISECONDS.convert(seconds, TimeUnit.SECONDS)
+          profiles.profileUpdate { d ->
+            d.copy(
+              preferences =
+                d.preferences.copy(
+                  audioBookPlaybackSkipIntervalForwardMs = ms
+                )
+            )
+          }
         }
-      }
-    )
+      )
 
-    this.configureAudiobookSkipItem(
-      view = this.settings2AudiobooksSkipBackward,
-      currentValueMs = profilePrefs.audioBookPlaybackSkipIntervalBackwardMs,
-      entries = entries,
-      values = values,
-      onSelected = { newValue ->
-        val seconds = newValue.toLong()
-        val ms = TimeUnit.MILLISECONDS.convert(seconds, TimeUnit.SECONDS)
-        profiles.profileUpdate { d ->
-          d.copy(
-            preferences =
-              d.preferences.copy(
-                audioBookPlaybackSkipIntervalBackwardMs = ms
-              )
-          )
+      this.configureAudiobookSkipItem(
+        view = this.settings2AudiobooksSkipBackward,
+        currentValueMs = profilePrefs.audioBookPlaybackSkipIntervalBackwardMs,
+        entries = entries,
+        values = values,
+        onSelected = { newValue ->
+          val seconds = newValue.toLong()
+          val ms = TimeUnit.MILLISECONDS.convert(seconds, TimeUnit.SECONDS)
+          profiles.profileUpdate { d ->
+            d.copy(
+              preferences =
+                d.preferences.copy(
+                  audioBookPlaybackSkipIntervalBackwardMs = ms
+                )
+            )
+          }
         }
-      }
-    )
+      )
+    } catch (e: Throwable) {
+      this.logger.debug("configureAudiobookSkip: ", e)
+    }
   }
 
   private fun configureAudiobookSkipItem(

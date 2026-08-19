@@ -37,7 +37,6 @@ import org.nypl.simplified.ui.settings.SettingsDebugMenuRegistryFragment
 import org.nypl.simplified.ui.settings.SettingsDebugMenuStartupFragment
 import org.nypl.simplified.ui.settings.SettingsDocumentViewerFragment
 import org.nypl.simplified.ui.settings.SettingsDocumentViewerModel
-import org.nypl.simplified.ui.settings.SettingsMainFragment3
 import org.nypl.simplified.ui.settings.SettingsMainFragment4
 import org.slf4j.LoggerFactory
 import java.net.URI
@@ -279,7 +278,7 @@ object MainNavigation {
 
     fun goToRoot() {
       this.navigationStackAttribute.set(
-        listOf(SettingsMainFragment3.createScreenDefinition(Unit))
+        listOf(SettingsMainFragment4.createScreenDefinition(Unit))
       )
     }
 

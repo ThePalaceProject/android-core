@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<resources>
-    <item name="tutorialPhoneMarginTop" format="float" type="fraction">0.2</item>
-    <item name="tutorialPhoneMarginBottom" format="float" type="fraction">0.2</item>
-</resources>
