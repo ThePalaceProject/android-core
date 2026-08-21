@@ -13,9 +13,15 @@ import org.readium.r2.shared.publication.Publication
 import org.readium.r2.shared.publication.protection.ContentProtection
 import org.readium.r2.shared.publication.services.isRestricted
 import org.readium.r2.shared.publication.services.protectionError
+import org.readium.r2.shared.util.AbsoluteUrl
 import org.readium.r2.shared.util.ErrorException
+import org.readium.r2.shared.util.FileExtension
 import org.readium.r2.shared.util.Try
 import org.readium.r2.shared.util.asset.AssetRetriever
+import org.readium.r2.shared.util.format.Format
+import org.readium.r2.shared.util.format.FormatHints
+import org.readium.r2.shared.util.format.FormatSpecification
+import org.readium.r2.shared.util.format.Specification
 import org.readium.r2.shared.util.getOrDefault
 import org.readium.r2.shared.util.getOrElse
 import org.readium.r2.shared.util.http.DefaultHttpClient
@@ -36,6 +42,30 @@ class PdfServer private constructor(
   private val publication: Publication
 ) : RouterNanoHTTPD("127.0.0.1", port) {
   companion object {
+    private val pdf: Format =
+      Format(
+        specification =
+          FormatSpecification(
+            specifications = setOf(Specification.Pdf)
+          ),
+        mediaType = MediaType.PDF,
+        fileExtension = FileExtension("pdf")
+      )
+
+    private val lcpPDF: Format =
+      Format(
+        specification =
+          FormatSpecification(
+            specifications =
+              setOf(
+                Specification.Rpf,
+                Specification.Zip,
+                Specification.Lcp)
+          ),
+        mediaType = MediaType.LCP_PROTECTED_PDF,
+        fileExtension = FileExtension("pdf")
+      )
+
     suspend fun create(
       contentProtections: List<ContentProtection>,
       context: Application,
@@ -48,7 +78,16 @@ class PdfServer private constructor(
       val assetRetriever =
         AssetRetriever(context.contentResolver, httpClient)
 
-      when (val assetRetrieval = assetRetriever.retrieve(pdfFile)) {
+      val format =
+        when (drmInfo) {
+          is BookDRMInformation.ACS -> pdf
+          is BookDRMInformation.Boundless -> pdf
+          is BookDRMInformation.LCP -> lcpPDF
+          BookDRMInformation.None -> pdf
+        }
+
+      val url = AbsoluteUrl.invoke(pdfFile.toURI().toString())!!
+      when (val assetRetrieval = assetRetriever.retrieve(url, format)) {
         is Try.Failure -> {
           throw IOException("Failed to open PDF", ErrorException(assetRetrieval.value))
         }
