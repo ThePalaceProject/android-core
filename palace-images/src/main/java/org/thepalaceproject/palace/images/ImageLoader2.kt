@@ -3,6 +3,8 @@ package org.thepalaceproject.palace.images
 import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
+import android.os.Handler
+import android.os.Looper
 import android.graphics.drawable.Drawable
 import android.widget.ImageView
 import com.bumptech.glide.Glide
@@ -31,6 +33,8 @@ class ImageLoader2 private constructor(
 ) : ImageLoader2Type {
   private val logger =
     LoggerFactory.getLogger(ImageLoader2::class.java)
+
+  private val mainHandler = Handler(Looper.getMainLooper())
 
   companion object {
     private val logger =
@@ -126,7 +130,9 @@ class ImageLoader2 private constructor(
     logger: Logger,
     op: String,
     source: String,
-    private val future: CompletableFuture<Unit>
+    private val future: CompletableFuture<Unit>,
+    private val handler: Handler,
+    private val onFallback: (() -> Unit)? = null
   ) : BaseListener<Drawable?>(
       logger = logger,
       op = op,
@@ -140,6 +146,10 @@ class ImageLoader2 private constructor(
       isFirstResource: Boolean
     ): Boolean {
       this.onLogLoadFailed(e)
+      this.onFallback?.let {
+        this.handler.post { it() }
+        return true
+      }
       this.future.completeExceptionally(e)
       return false
     }
@@ -152,11 +162,8 @@ class ImageLoader2 private constructor(
       isFirstResource: Boolean
     ): Boolean {
       this.onLogResourceReady()
-      resource?.let { res ->
-        target?.onResourceReady(res, null)
-      }
       this.future.complete(Unit)
-      return true
+      return false
     }
   }
 
@@ -164,7 +171,9 @@ class ImageLoader2 private constructor(
     logger: Logger,
     op: String,
     source: String,
-    private val future: CompletableFuture<Unit>
+    private val future: CompletableFuture<Unit>,
+    private val handler: Handler,
+    private val onFallback: (() -> Unit)? = null
   ) : BaseListener<Bitmap?>(
       logger = logger,
       op = op,
@@ -178,6 +187,10 @@ class ImageLoader2 private constructor(
       isFirstResource: Boolean
     ): Boolean {
       this.onLogLoadFailed(e)
+      this.onFallback?.let {
+        this.handler.post { it() }
+        return true
+      }
       this.future.completeExceptionally(e)
       return false
     }
@@ -215,7 +228,8 @@ class ImageLoader2 private constructor(
         logger = this.logger,
         op = "LoadAccountLogoIntoView",
         source = source,
-        future = future
+        future = future,
+        handler = this.mainHandler
       )
 
     val requestManager = Glide.with(context)
@@ -243,14 +257,53 @@ class ImageLoader2 private constructor(
     height: Int
   ): CompletableFuture<Unit> {
     val future = CompletableFuture<Unit>()
-    val uri = this.thumbnailURIOf(entry) ?: this.generateCoverURI(entry)
+    val primaryUri = this.thumbnailURIOf(entry)
+    val generatedUri = this.generateCoverURI(entry)
+
+    this.loadThumbnailIntoInternal(
+      entry = entry,
+      imageView = imageView,
+      width = width,
+      height = height,
+      future = future,
+      uri = primaryUri ?: generatedUri,
+      fallbackUri = if (primaryUri != null) generatedUri else null
+    )
+    return future
+  }
+
+  private fun loadThumbnailIntoInternal(
+    entry: FeedEntry.FeedEntryOPDS,
+    imageView: ImageView,
+    width: Int,
+    height: Int,
+    future: CompletableFuture<Unit>,
+    uri: URI,
+    fallbackUri: URI?
+  ) {
+    val onFallback: (() -> Unit)? =
+      fallbackUri?.let {
+        {
+          this.loadThumbnailIntoInternal(
+            entry = entry,
+            imageView = imageView,
+            width = width,
+            height = height,
+            future = future,
+            uri = it,
+            fallbackUri = null
+          )
+        }
+      }
 
     val listener =
       ImageRequestListenerDrawable(
         logger = this.logger,
         op = "LoadThumbnailInto",
         source = uri.toString(),
-        future = future
+        future = future,
+        handler = this.mainHandler,
+        onFallback = onFallback
       )
 
     val glide = Glide.with(this.appContext)
@@ -266,7 +319,6 @@ class ImageLoader2 private constructor(
     request = request.transform(BookCoverBadgeTransform(badge))
     request = request.listener(listener)
     request.into(imageView)
-    return future
   }
 
   override fun loadCoverInto(
@@ -277,14 +329,56 @@ class ImageLoader2 private constructor(
     height: Int
   ): CompletableFuture<Unit> {
     val future = CompletableFuture<Unit>()
-    val uri = this.coverURIOf(entry) ?: this.generateCoverURI(entry)
+    val primaryUri = this.coverURIOf(entry)
+    val generatedUri = this.generateCoverURI(entry)
+
+    this.loadCoverIntoInternal(
+      entry = entry,
+      imageView = imageView,
+      hasBadge = hasBadge,
+      width = width,
+      height = height,
+      future = future,
+      uri = primaryUri ?: generatedUri,
+      fallbackUri = if (primaryUri != null) generatedUri else null
+    )
+    return future
+  }
+
+  private fun loadCoverIntoInternal(
+    entry: FeedEntry.FeedEntryOPDS,
+    imageView: ImageView,
+    hasBadge: Boolean,
+    width: Int,
+    height: Int,
+    future: CompletableFuture<Unit>,
+    uri: URI,
+    fallbackUri: URI?
+  ) {
+    val onFallback: (() -> Unit)? =
+      fallbackUri?.let {
+        {
+          this.loadCoverIntoInternal(
+            entry = entry,
+            imageView = imageView,
+            hasBadge = hasBadge,
+            width = width,
+            height = height,
+            future = future,
+            uri = it,
+            fallbackUri = null
+          )
+        }
+      }
 
     val listener =
       ImageRequestListenerDrawable(
         logger = this.logger,
         op = "LoadCoverInto",
         source = uri.toString(),
-        future = future
+        future = future,
+        handler = this.mainHandler,
+        onFallback = onFallback
       )
 
     val glide = Glide.with(this.appContext)
@@ -302,7 +396,6 @@ class ImageLoader2 private constructor(
     }
     request = request.listener(listener)
     request.into(imageView)
-    return future
   }
 
   override fun loadCoverAsBitmap(
@@ -311,8 +404,15 @@ class ImageLoader2 private constructor(
     defaultResource: Int
   ): CompletableFuture<Unit> {
     val future = CompletableFuture<Unit>()
-    val uri = this.coverURIOf(entry) ?: this.generateCoverURI(entry)
-    this.loadCoverAsBitmapInternal(uri, onBitmapLoaded, defaultResource, future)
+    val primaryUri = this.coverURIOf(entry)
+    val generatedUri = this.generateCoverURI(entry)
+    this.loadCoverAsBitmapInternal(
+      uri = primaryUri ?: generatedUri,
+      onBitmapLoaded = onBitmapLoaded,
+      defaultResource = defaultResource,
+      future = future,
+      fallbackUri = if (primaryUri != null) generatedUri else null
+    )
     return future
   }
 
@@ -322,7 +422,12 @@ class ImageLoader2 private constructor(
     defaultResource: Int
   ): CompletableFuture<Unit> {
     val future = CompletableFuture<Unit>()
-    this.loadCoverAsBitmapInternal(source, onBitmapLoaded, defaultResource, future)
+    this.loadCoverAsBitmapInternal(
+      uri = source,
+      onBitmapLoaded = onBitmapLoaded,
+      defaultResource = defaultResource,
+      future = future
+    )
     return future
   }
 
@@ -330,14 +435,30 @@ class ImageLoader2 private constructor(
     uri: URI,
     onBitmapLoaded: (Bitmap) -> Unit,
     defaultResource: Int,
-    future: CompletableFuture<Unit>
+    future: CompletableFuture<Unit>,
+    fallbackUri: URI? = null
   ) {
+    val onFallback: (() -> Unit)? =
+      fallbackUri?.let {
+        {
+          this.loadCoverAsBitmapInternal(
+            uri = it,
+            onBitmapLoaded = onBitmapLoaded,
+            defaultResource = defaultResource,
+            future = future,
+            fallbackUri = null
+          )
+        }
+      }
+
     val listener =
       ImageRequestListenerBitmap(
         logger = this.logger,
         op = "LoadCoverAsBitmap",
         source = uri.toString(),
-        future = future
+        future = future,
+        handler = this.mainHandler,
+        onFallback = onFallback
       )
 
     Glide
