@@ -1,5 +1,6 @@
 package org.nypl.simplified.opds.core
 
+import java.io.Serializable
 import java.net.URI
 
 /**
@@ -17,4 +18,4 @@ data class OPDSSeries(
   val name: String,
   val position: Int?,
   val link: URI
-)
+): Serializable
