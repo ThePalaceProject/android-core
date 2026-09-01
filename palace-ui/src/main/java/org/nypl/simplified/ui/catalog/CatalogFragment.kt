@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import androidx.paging.Pager
@@ -18,6 +19,7 @@ import com.io7m.jmulticlose.core.CloseableCollection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.librarysimplified.http.api.LSHTTPNetworkAccessType
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
 import org.librarysimplified.viewer.preview.BookPreviewActivity
@@ -80,7 +82,6 @@ import org.slf4j.LoggerFactory
 import org.thepalaceproject.opds.client.OPDSClientRequest
 import org.thepalaceproject.opds.client.OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY
 import org.thepalaceproject.opds.client.OPDSClientRequest.HistoryBehavior.CLEAR_HISTORY
-import org.thepalaceproject.opds.client.OPDSClientRequest.HistoryBehavior.REPLACE_TIP
 import org.thepalaceproject.opds.client.OPDSClientType
 import org.thepalaceproject.opds.client.OPDSFeedHandleWithoutGroupsType
 import org.thepalaceproject.opds.client.OPDSState
@@ -133,6 +134,9 @@ sealed class CatalogFragment :
   private lateinit var profiles: ProfilesControllerType
   private lateinit var screenSize: ScreenSizeInformationType
   private lateinit var viewNow: CatalogFeedView
+  private lateinit var networkUnavailable: ViewGroup
+  private lateinit var httpStatus: LSHTTPNetworkAccessType
+  private lateinit var myBooks: Button
 
   final override fun onCreateView(
     inflater: LayoutInflater,
@@ -142,11 +146,18 @@ sealed class CatalogFragment :
     val view =
       inflater.inflate(R.layout.catalog, container, false)
 
+    this.networkUnavailable =
+      view.findViewById(R.id.catalogContentNetworkUnavailable)
+    this.myBooks =
+      this.networkUnavailable.findViewById(R.id.catalogNetMyBooks)
     this.contentContainer =
       view.findViewById(R.id.catalogContentContainer)
     this.viewNow =
       CatalogFeedViewEmpty.create(inflater, this.contentContainer)
 
+    this.myBooks.setOnClickListener {
+      MainNavigation.requestTabChangeForPart(BOOKS)
+    }
     return view
   }
 
@@ -162,6 +173,8 @@ sealed class CatalogFragment :
       Services.serviceDirectory()
     val opdsClients =
       services.requireService(CatalogOPDSClients::class.java)
+    this.httpStatus =
+      services.requireService(LSHTTPNetworkAccessType::class.java)
     this.profiles =
       services.requireService(ProfilesControllerType::class.java)
     this.imageLoader =
@@ -190,6 +203,32 @@ sealed class CatalogFragment :
     this.subscriptions.add(
       this.opdsClient.entry.subscribe(this::onEntryChanged)
     )
+    this.subscriptions.add(
+      this.httpStatus.anyAvailable.subscribe { availableThen, availableNow ->
+        UIThread.runOnUIThread {
+          this.onNetworkStatusChanged(availableThen, availableNow)
+        }
+      }
+    )
+  }
+
+  private fun onNetworkStatusChanged(
+    availableThen: Boolean,
+    availableNow: Boolean
+  ) {
+    if (!this.catalogPart.requiresNetwork) {
+      return
+    }
+
+    if (!availableNow) {
+      this.networkUnavailable.visibility = View.VISIBLE
+    } else {
+      this.networkUnavailable.visibility = View.INVISIBLE
+    }
+
+    if (availableNow && !availableThen) {
+      this.opdsClient.retry()
+    }
   }
 
   final override fun onFeedSelected(
@@ -1301,7 +1340,7 @@ sealed class CatalogFragment :
           )
         },
         onRetry = {
-          this.opdsClient.goTo(newState.request.withHistoryBehaviour(REPLACE_TIP))
+          this.opdsClient.retry()
         }
       )
     )

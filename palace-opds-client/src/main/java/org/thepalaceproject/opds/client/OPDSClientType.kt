@@ -3,6 +3,7 @@ package org.thepalaceproject.opds.client
 import com.io7m.jattribute.core.AttributeReadableType
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedGroup
+import org.thepalaceproject.opds.client.OPDSClientRequest.HistoryBehavior.REPLACE_TIP
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -52,4 +53,36 @@ interface OPDSClientType : AutoCloseable {
    */
 
   fun clearHistory()
+
+  /**
+   * Re-execute the request at the tip of the stack.
+   */
+
+  fun retry() {
+    when (val state = this.state.get()) {
+      is OPDSState.Error -> {
+        this.goTo(state.request.withHistoryBehaviour(REPLACE_TIP))
+      }
+
+      OPDSState.Initial -> {
+        // Nothing required.
+      }
+
+      is OPDSState.Loading -> {
+        this.goTo(state.request.withHistoryBehaviour(REPLACE_TIP))
+      }
+
+      is OPDSState.LoadedFeedEntry -> {
+        this.goTo(state.request.withHistoryBehaviour(REPLACE_TIP))
+      }
+
+      is OPDSState.LoadedFeedWithGroups -> {
+        this.goTo(state.request.withHistoryBehaviour(REPLACE_TIP))
+      }
+
+      is OPDSState.LoadedFeedWithoutGroups -> {
+        this.goTo(state.request.withHistoryBehaviour(REPLACE_TIP))
+      }
+    }
+  }
 }

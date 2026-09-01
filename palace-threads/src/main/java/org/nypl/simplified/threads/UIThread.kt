@@ -2,6 +2,7 @@ package org.nypl.simplified.threads
 
 import android.os.Handler
 import android.os.Looper
+import org.slf4j.LoggerFactory
 import java.util.concurrent.Executor
 
 /**
@@ -9,6 +10,10 @@ import java.util.concurrent.Executor
  */
 
 object UIThread : Executor {
+
+  private val logger =
+    LoggerFactory.getLogger(UIThread::class.java)
+
   /**
    * Check that the current thread is the UI thread and raise {@link IllegalStateException}
    * if it isn't.
@@ -38,13 +43,28 @@ object UIThread : Executor {
    */
 
   fun runOnUIThread(r: Runnable) {
+    val caller = RuntimeException().stackTrace[1]
+
+    val safeRunnable = Runnable {
+      try {
+        r.run()
+      } catch (e: Throwable) {
+        logger.debug(
+          "UI thread runnable threw exception: {}:{}:{}",
+          caller.className,
+          caller.methodName,
+          caller.lineNumber,
+          e)
+      }
+    }
+
     if (isUIThread()) {
-      return r.run()
+      return safeRunnable.run()
     }
 
     val looper = Looper.getMainLooper()
     val h = Handler(looper)
-    h.post(r)
+    h.post(safeRunnable)
   }
 
   override fun execute(r: Runnable) {
