@@ -18,4 +18,4 @@ data class OPDSSeries(
   val name: String,
   val position: Int?,
   val link: URI
-): Serializable
+) : Serializable

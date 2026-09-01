@@ -10,7 +10,6 @@ import java.util.concurrent.Executor
  */
 
 object UIThread : Executor {
-
   private val logger =
     LoggerFactory.getLogger(UIThread::class.java)
 
@@ -45,18 +44,19 @@ object UIThread : Executor {
   fun runOnUIThread(r: Runnable) {
     val caller = RuntimeException().stackTrace[1]
 
-    val safeRunnable = Runnable {
-      try {
-        r.run()
-      } catch (e: Throwable) {
-        logger.debug(
-          "UI thread runnable threw exception: {}:{}:{}",
-          caller.className,
-          caller.methodName,
-          caller.lineNumber,
-          e)
+    val safeRunnable =
+      Runnable {
+        try {
+          r.run()
+        } catch (e: Throwable) {
+          logger.debug(
+            "UI thread runnable threw exception: {}:{}:{}",
+            caller.className,
+            caller.methodName,
+            caller.lineNumber,
+            e)
+        }
       }
-    }
 
     if (isUIThread()) {
       return safeRunnable.run()

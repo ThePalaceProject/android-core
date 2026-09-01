@@ -103,9 +103,8 @@
     <string name="catalogFacetsFilterApply">Apply filters</string>
     <string name="catalogFacetClear">Clear</string>
 
-    <string name="catalogNetworkUnavailable0">Your device is not currently connected to the internet, so it is not possible to view the catalog right now.</string>
-    <string name="catalogNetworkUnavailable1">You can still read any books you have already checked out, and listen to any audiobooks that you have downloaded.</string>
-    <string name="catalogNetworkUnavailable2">Go to the "My Books" tab to see your books.</string>
+    <string name="catalogNetworkUnavailable0">You’re Offline</string>
+    <string name="catalogNetworkUnavailable1">Connect to the internet to browse the full catalog. Any ebooks and audiobooks you’ve already downloaded are still available in My Books.</string>
 
     <string name="catalogBookCellBorrowingUntil">Due %1$s</string>
     <string name="catalogBookCellBorrowingDays">%1$d Days</string>
