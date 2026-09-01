@@ -15,11 +15,10 @@ import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 
-import com.io7m.jnull.NullCheck;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -89,7 +88,7 @@ public final class TenPrintGenerator implements TenPrintGeneratorType
         sb.append(c64_seq.get((int) c % c64_seq.size()));
       }
     }
-    return NullCheck.notNull(sb.toString());
+    return Objects.requireNonNull(sb.toString());
   }
 
   private static int getColorBase(
@@ -702,7 +701,7 @@ public final class TenPrintGenerator implements TenPrintGeneratorType
     final int at)
   {
     if (t.length() > at) {
-      return NullCheck.notNull(t.substring(0, at - 1) + "…");
+      return Objects.requireNonNull(t.substring(0, at - 1) + "…");
     }
     return t;
   }
@@ -835,12 +834,12 @@ public final class TenPrintGenerator implements TenPrintGeneratorType
   @Override public Bitmap generate(
     final TenPrintInput i)
   {
-    NullCheck.notNull(i);
+    Objects.requireNonNull(i);
 
     final int cw = i.getCoverWidth();
     final int ch = i.getCoverHeight();
     final Bitmap b =
-      NullCheck.notNull(Bitmap.createBitmap(cw, ch, Config.RGB_565));
+      Objects.requireNonNull(Bitmap.createBitmap(cw, ch, Config.RGB_565));
 
     final int start_y = ch - cw;
     final int text_length = TenPrintGenerator.getTextLength(i);

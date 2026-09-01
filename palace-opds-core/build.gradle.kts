@@ -9,8 +9,6 @@ dependencies {
     implementation(project(":palace-parser-api"))
 
     implementation(libs.google.guava)
-    implementation(libs.io7m.jfunctional)
-    implementation(libs.io7m.jnull)
     implementation(libs.io7m.junreachable)
     implementation(libs.irradia.mime.api)
     implementation(libs.irradia.mime.vanilla)

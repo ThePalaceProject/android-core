@@ -1,9 +1,8 @@
 package org.nypl.simplified.opds.core
 
-import com.io7m.jfunctional.Option
-import com.io7m.jfunctional.OptionType
 import one.irradia.mime.api.MIMEType
 import java.io.Serializable
+import java.util.Optional
 
 /**
  * A tree of indirect acquisitions.
@@ -48,10 +47,10 @@ data class OPDSIndirectAcquisition(
   /**
    * Find an indirect acquisition with the given type.
    *
-   * @return The acquisition, or `None` if no acquisition exists with the given type
+   * @return The acquisition, or empty if no acquisition exists with the given type
    */
 
-  fun findTypeOptional(wantType: MIMEType): OptionType<OPDSIndirectAcquisition> = Option.of(this.findType(wantType))
+  fun findTypeOptional(wantType: MIMEType): Optional<OPDSIndirectAcquisition> = Optional.ofNullable(this.findType(wantType))
 
   companion object {
     /**
@@ -68,13 +67,13 @@ data class OPDSIndirectAcquisition(
     /**
      * Find an indirect acquisition with the given type.
      *
-     * @return The acquisition, or `None` if no acquisition exists with the given type
+     * @return The acquisition, or empty if no acquisition exists with the given type
      */
 
     fun findTypeInOptional(
       wantType: MIMEType,
       indirects: List<OPDSIndirectAcquisition>
-    ): OptionType<OPDSIndirectAcquisition> = Option.of(this.findTypeIn(wantType, indirects))
+    ): Optional<OPDSIndirectAcquisition> = Optional.ofNullable(this.findTypeIn(wantType, indirects))
 
     /**
      * @return The set of final content types. That is, the set of content types that are accessible

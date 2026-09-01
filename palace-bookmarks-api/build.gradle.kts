@@ -14,8 +14,6 @@ dependencies {
     implementation(libs.google.failureaccess)
     implementation(libs.google.guava)
     implementation(libs.io7m.jattribute.core)
-    implementation(libs.io7m.jfunctional)
-    implementation(libs.io7m.jnull)
     implementation(libs.jackson.core)
     implementation(libs.jackson.databind)
     implementation(libs.joda.time)

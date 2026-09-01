@@ -15,7 +15,6 @@ dependencies {
     implementation(project(":palace-taskrecorder-api"))
 
     implementation(libs.google.guava)
-    implementation(libs.io7m.jfunctional)
     implementation(libs.irradia.mime.api)
     implementation(libs.irradia.mime.vanilla)
     implementation(libs.jackson.databind)

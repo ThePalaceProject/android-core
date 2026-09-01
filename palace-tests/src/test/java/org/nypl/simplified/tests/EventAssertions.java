@@ -1,10 +1,9 @@
 package org.nypl.simplified.tests;
 
-import com.io7m.jfunctional.ProcedureType;
-
 import org.junit.jupiter.api.Assertions;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public final class EventAssertions {
 
@@ -17,7 +16,7 @@ public final class EventAssertions {
     final Class<T> clazz,
     final List<TB> events,
     final int index,
-    final ProcedureType<T> property) {
+    final Consumer<T> property) {
     Assertions.assertTrue(
       events.size() >= index + 1,
       new StringBuilder(64)
@@ -36,7 +35,7 @@ public final class EventAssertions {
     }
 
     final T y = (T) x;
-    property.call(y);
+    property.accept(y);
   }
 
   /**

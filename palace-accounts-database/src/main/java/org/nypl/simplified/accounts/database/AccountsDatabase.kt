@@ -3,11 +3,11 @@ package org.nypl.simplified.accounts.database
 import android.app.Application
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.base.Preconditions
-import com.io7m.jfunctional.FunctionType
 import io.reactivex.subjects.Subject
 import net.jcip.annotations.GuardedBy
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentialsStoreType
+import java.util.function.Function
 import org.nypl.simplified.accounts.api.AccountDescription
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.accounts.api.AccountEventCreation
@@ -244,35 +244,33 @@ class AccountsDatabase private constructor(
     }
 
     override fun setAccountProvider(accountProvider: AccountProviderType) {
-      this.setDescription(
-        FunctionType { existing ->
+      this.setDescription { existing ->
 
-          val existingProvider = existing.provider()
-          if (existingProvider.id != accountProvider.id) {
-            throw AccountsDatabaseWrongProviderException(
-              "Provider id ${accountProvider.id} does not match the existing id ${existingProvider.id}"
-            )
-          }
-          if (existingProvider.updated.isAfter(accountProvider.updated)) {
-            logger.warn(
-              "attempted to update provider {} with an older definition",
-              existingProvider.id
-            )
-            return@FunctionType existing
-          }
-
-          val modifiedDescription =
-            existing
-              .toBuilder()
-              .setProvider(accountProvider)
-              .build()
-
-          check(accountProvider == modifiedDescription.provider()) {
-            "Account providers must match"
-          }
-          modifiedDescription
+        val existingProvider = existing.provider()
+        if (existingProvider.id != accountProvider.id) {
+          throw AccountsDatabaseWrongProviderException(
+            "Provider id ${accountProvider.id} does not match the existing id ${existingProvider.id}"
+          )
         }
-      )
+        if (existingProvider.updated.isAfter(accountProvider.updated)) {
+          logger.warn(
+            "attempted to update provider {} with an older definition",
+            existingProvider.id
+          )
+          return@setDescription existing
+        }
+
+        val modifiedDescription =
+          existing
+            .toBuilder()
+            .setProvider(accountProvider)
+            .build()
+
+        check(accountProvider == modifiedDescription.provider()) {
+          "Account providers must match"
+        }
+        modifiedDescription
+      }
     }
 
     override fun expireCredentialsIfApplicable() {
@@ -354,19 +352,17 @@ class AccountsDatabase private constructor(
 
     @Throws(AccountsDatabaseException::class)
     override fun setPreferences(preferences: AccountPreferences) {
-      this.setDescription(
-        FunctionType { accountDescription ->
-          accountDescription.toBuilder().setPreferences(preferences).build()
-        }
-      )
+      this.setDescription { accountDescription ->
+        accountDescription.toBuilder().setPreferences(preferences).build()
+      }
     }
 
     @Throws(AccountsDatabaseIOException::class)
-    private fun setDescription(mutator: FunctionType<AccountDescription, AccountDescription>) {
+    private fun setDescription(mutator: Function<AccountDescription, AccountDescription>) {
       try {
         val newDescription: AccountDescription
         synchronized(this.descriptionLock) {
-          newDescription = mutator.call(this.description)
+          newDescription = mutator.apply(this.description)
 
           val accountLock =
             File(this.directory, "lock")
@@ -809,7 +805,7 @@ class AccountsDatabase private constructor(
       accountFileTemp: File,
       description: AccountDescription
     ) {
-      FileLocking.withFileThreadLocked<Unit, IOException>(
+      FileLocking.withFileThreadLocked(
         accountLock, 1000L
       ) {
         FileUtilities.fileWriteUTF8Atomically(

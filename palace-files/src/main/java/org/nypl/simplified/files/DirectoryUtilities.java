@@ -1,10 +1,10 @@
 package org.nypl.simplified.files;
 
-import com.io7m.jnull.NullCheck;
 import com.io7m.junreachable.UnreachableCodeException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * Directory utility functions.
@@ -28,7 +28,7 @@ public final class DirectoryUtilities
   public static File directoryCreateTemporary()
     throws IOException
   {
-    final File f = NullCheck.notNull(File.createTempFile("tmp", ""));
+    final File f = Objects.requireNonNull(File.createTempFile("tmp", ""));
     f.delete();
     f.mkdir();
     return f;
@@ -46,10 +46,10 @@ public final class DirectoryUtilities
     final File f)
     throws IOException
   {
-    NullCheck.notNull(f);
+    Objects.requireNonNull(f);
     if (f.isDirectory()) {
       for (final File es : f.listFiles()) {
-        DirectoryUtilities.directoryDelete(NullCheck.notNull(es));
+        DirectoryUtilities.directoryDelete(Objects.requireNonNull(es));
       }
     }
     FileUtilities.fileDelete(f);

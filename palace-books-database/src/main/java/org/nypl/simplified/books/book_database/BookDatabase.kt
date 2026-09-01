@@ -1,7 +1,6 @@
 package org.nypl.simplified.books.book_database
 
 import android.app.Application
-import com.io7m.jnull.Nullable
 import net.jcip.annotations.GuardedBy
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.nypl.simplified.accounts.api.AccountID
@@ -251,7 +250,6 @@ class BookDatabase private constructor(
       }
     }
 
-    @Nullable
     private fun openOneEntry(
       context: Application,
       parser: OPDSJSONParserType,

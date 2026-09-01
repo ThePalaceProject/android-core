@@ -2701,7 +2701,7 @@ class BookRevokeTaskTest {
 
   private fun logBookEventsFor(bookId: BookID) {
     this.bookRegistry.bookEvents().subscribe {
-      this.bookRegistry.bookStatus(bookId).map_ { status ->
+      this.bookRegistry.bookStatus(bookId).ifPresent { status ->
         this.logger.debug("status: {}", status)
       }
     }

@@ -1,9 +1,9 @@
 package org.nypl.simplified.books.api;
 
 import com.google.auto.value.AutoValue;
-import com.io7m.jnull.NullCheck;
 
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
@@ -62,6 +62,6 @@ public abstract class BookID implements Comparable<BookID>, Serializable {
 
   @Override
   public final int compareTo(final BookID other) {
-    return this.value().compareTo(NullCheck.notNull(other, "Other").value());
+    return this.value().compareTo(Objects.requireNonNull(other, "Other").value());
   }
 }

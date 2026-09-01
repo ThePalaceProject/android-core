@@ -16,7 +16,6 @@ dependencies {
     implementation(project(":palace-services-api"))
     implementation(project(":palace-viewer-spi"))
 
-    implementation(libs.io7m.jfunctional)
     implementation(libs.irradia.mime.api)
     implementation(libs.joda.time)
     implementation(libs.kotlin.reflect)

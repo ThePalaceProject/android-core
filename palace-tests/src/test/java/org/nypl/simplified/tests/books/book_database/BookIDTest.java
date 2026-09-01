@@ -1,7 +1,5 @@
 package org.nypl.simplified.tests.books.book_database;
 
-import com.io7m.jnull.NullCheck;
-
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -10,6 +8,8 @@ import org.nypl.simplified.books.api.BookIDs;
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry;
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryBuilderType;
 import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess;
+
+import java.util.Objects;
 
 public final class BookIDTest {
 
@@ -22,7 +22,7 @@ public final class BookIDTest {
           + ".org%2Fterms%2Fid%2FOverdrive%2520ID%2F2b3729cd-27ec-42e1-bc51"
           + "-298aaee0af7d",
         "1Q84",
-        NullCheck.notNull(DateTime.now()),
+        Objects.requireNonNull(DateTime.now()),
         OPDSAvailabilityOpenAccess.get(null));
     final OPDSAcquisitionFeedEntry e = eb.build();
     final BookID b = BookIDs.newFromOPDSEntry(e);

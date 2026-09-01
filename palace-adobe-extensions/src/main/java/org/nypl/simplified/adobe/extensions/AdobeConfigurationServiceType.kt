@@ -1,7 +1,6 @@
 package org.nypl.simplified.adobe.extensions
 
-import com.io7m.jfunctional.Option
-import com.io7m.jfunctional.OptionType
+import java.util.Optional
 
 /**
  * Configuration values for the Adobe DRM.
@@ -10,7 +9,7 @@ import com.io7m.jfunctional.OptionType
 interface AdobeConfigurationServiceType {
   val packageOverride: String?
 
-  fun packageOverrideOption(): OptionType<String> = Option.of(this.packageOverride)
+  fun packageOverrideOption(): Optional<String> = Optional.ofNullable(this.packageOverride)
 
   val debugLogging: Boolean
 

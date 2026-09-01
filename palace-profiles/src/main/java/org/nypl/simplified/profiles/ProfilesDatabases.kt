@@ -457,7 +457,7 @@ object ProfilesDatabases {
     val profileFileTemp =
       File(directory, "profile.json.tmp")
 
-    FileLocking.withFileThreadLocked<Unit, IOException>(
+    FileLocking.withFileThreadLocked(
       profileLock,
       1000L
     ) {

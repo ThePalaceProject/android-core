@@ -1,13 +1,11 @@
 package org.nypl.simplified.books.book_registry
 
-import com.io7m.jfunctional.FunctionType
-import com.io7m.jfunctional.Option
-import com.io7m.jfunctional.OptionType
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import org.nypl.simplified.books.api.BookID
 import org.slf4j.LoggerFactory
 import java.util.Collections
+import java.util.Optional
 import java.util.SortedMap
 import java.util.concurrent.ConcurrentSkipListMap
 
@@ -29,12 +27,12 @@ class BookRegistry private constructor(
 
   override fun bookHoldsUpdateEvents(): Observable<BookHoldsUpdateEvent> = this.bookHoldsUpdate
 
-  override fun bookStatus(id: BookID): OptionType<BookStatus> =
+  override fun bookStatus(id: BookID): Optional<BookStatus> =
     this
       .book(id)
-      .map(FunctionType<BookWithStatus, BookStatus>(BookWithStatus::status))
+      .map { it.status }
 
-  override fun book(id: BookID): OptionType<BookWithStatus> = Option.of(this.books[id])
+  override fun book(id: BookID): Optional<BookWithStatus> = Optional.ofNullable(this.books[id])
 
   override fun update(status: BookWithStatus) {
     val oldStatus = this.books[status.book.id]

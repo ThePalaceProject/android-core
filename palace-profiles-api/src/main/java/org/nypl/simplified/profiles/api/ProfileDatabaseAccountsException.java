@@ -1,10 +1,9 @@
 package org.nypl.simplified.profiles.api;
 
-import com.io7m.jnull.NullCheck;
-
 import org.nypl.simplified.accounts.database.api.AccountsDatabaseException;
 
 import java.util.Collections;
+import java.util.Objects;
 
 /**
  * An exception caused by an underlying accounts database exception.
@@ -21,6 +20,6 @@ public final class ProfileDatabaseAccountsException extends ProfileDatabaseExcep
   public ProfileDatabaseAccountsException(
       final String message,
       final AccountsDatabaseException exception) {
-    super(message, Collections.singletonList(NullCheck.notNull(exception, "exception")));
+    super(message, Collections.singletonList(Objects.requireNonNull(exception, "exception")));
   }
 }

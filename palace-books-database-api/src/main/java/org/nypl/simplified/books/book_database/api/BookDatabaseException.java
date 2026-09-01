@@ -1,8 +1,7 @@
 package org.nypl.simplified.books.book_database.api;
 
-import com.io7m.jnull.NullCheck;
-
 import java.util.List;
+import java.util.Objects;
 
 /**
  * An exception that indicates that an operation on a book database failed.
@@ -22,8 +21,8 @@ public final class BookDatabaseException extends Exception {
   public BookDatabaseException(
     final String message,
     final List<Exception> causes) {
-    super(NullCheck.notNull(message, "Message"));
-    this.causes = NullCheck.notNull(causes, "Causes");
+    super(Objects.requireNonNull(message, "Message"));
+    this.causes = Objects.requireNonNull(causes, "Causes");
   }
 
   /**

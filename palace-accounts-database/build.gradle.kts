@@ -18,7 +18,6 @@ dependencies {
     implementation(project(":palace-taskrecorder-api"))
 
     implementation(libs.google.guava)
-    implementation(libs.io7m.jfunctional)
     implementation(libs.jackson.core)
     implementation(libs.jackson.databind)
     implementation(libs.jcip.annotations)

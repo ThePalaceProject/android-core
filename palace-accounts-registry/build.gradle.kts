@@ -20,7 +20,6 @@ dependencies {
 
     implementation(libs.google.guava)
     implementation(libs.io7m.jattribute.core)
-    implementation(libs.io7m.jfunctional)
     implementation(libs.io7m.jmulticlose)
     implementation(libs.irradia.mime.api)
     implementation(libs.irradia.mime.vanilla)

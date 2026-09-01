@@ -73,7 +73,7 @@ class OPDSFeedEntryParserTest {
       findTypeInOptional(
         mimeOf("application/epub+zip"),
         acquisition.indirectAcquisitions
-      ).isSome(),
+      ).isPresent(),
       "application/epub+zip is available"
     )
   }
@@ -109,7 +109,7 @@ class OPDSFeedEntryParserTest {
       findTypeInOptional(
         mimeOf("application/epub+zip"),
         acquisition.indirectAcquisitions
-      ).isSome(),
+      ).isPresent(),
       "application/epub+zip is available"
     )
   }
@@ -136,7 +136,7 @@ class OPDSFeedEntryParserTest {
       findTypeInOptional(
         mimeOf("application/epub+zip"),
         acquisition.indirectAcquisitions
-      ).isSome(),
+      ).isPresent(),
       "application/epub+zip is available"
     )
   }
@@ -173,7 +173,7 @@ class OPDSFeedEntryParserTest {
       findTypeInOptional(
         mimeOf("application/epub+zip"),
         acquisition.indirectAcquisitions
-      ).isSome(),
+      ).isPresent(),
       "application/epub+zip is available"
     )
   }
@@ -210,7 +210,7 @@ class OPDSFeedEntryParserTest {
       findTypeInOptional(
         mimeOf("application/epub+zip"),
         acquisition.indirectAcquisitions
-      ).isSome(),
+      ).isPresent(),
       "application/epub+zip is available"
     )
   }
@@ -245,7 +245,7 @@ class OPDSFeedEntryParserTest {
       findTypeInOptional(
         mimeOf("application/epub+zip"),
         acquisition.indirectAcquisitions
-      ).isSome(),
+      ).isPresent(),
       "application/epub+zip is available"
     )
   }
@@ -281,7 +281,7 @@ class OPDSFeedEntryParserTest {
       findTypeInOptional(
         mimeOf("application/epub+zip"),
         acquisition.indirectAcquisitions
-      ).isSome(),
+      ).isPresent(),
       "application/epub+zip is available"
     )
   }
@@ -313,7 +313,7 @@ class OPDSFeedEntryParserTest {
       findTypeInOptional(
         mimeOf("application/epub+zip"),
         acquisition.indirectAcquisitions
-      ).isSome(),
+      ).isPresent(),
       "application/epub+zip is available"
     )
   }
@@ -346,7 +346,7 @@ class OPDSFeedEntryParserTest {
       findTypeInOptional(
         mimeOf("application/epub+zip"),
         acquisition.indirectAcquisitions
-      ).isSome(),
+      ).isPresent(),
       "application/epub+zip is available"
     )
   }
@@ -405,7 +405,7 @@ class OPDSFeedEntryParserTest {
       findTypeInOptional(
         mimeOf("application/epub+zip"),
         acquisition.indirectAcquisitions
-      ).isSome(),
+      ).isPresent(),
       "application/epub+zip is available"
     )
   }
@@ -427,7 +427,7 @@ class OPDSFeedEntryParserTest {
         findTypeInOptional(
           mimeOf("application/epub+zip"),
           acquisition.indirectAcquisitions
-        ).isSome(),
+        ).isPresent(),
         "application/epub+zip is available"
       )
     }
@@ -438,7 +438,7 @@ class OPDSFeedEntryParserTest {
         findTypeInOptional(
           mimeOf("application/pdf"),
           acquisition.indirectAcquisitions
-        ).isSome(),
+        ).isPresent(),
         "application/pdf is available"
       )
     }
@@ -449,7 +449,7 @@ class OPDSFeedEntryParserTest {
         findTypeInOptional(
           mimeOf("text/html"),
           acquisition.indirectAcquisitions
-        ).isSome(),
+        ).isPresent(),
         "text/html is available"
       )
     }
@@ -471,7 +471,7 @@ class OPDSFeedEntryParserTest {
       findTypeInOptional(
         mimeOf("application/epub+zip"),
         acquisition.indirectAcquisitions
-      ).isSome(),
+      ).isPresent(),
       "application/epub+zip is available"
     )
   }

@@ -11,10 +11,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.io7m.jfunctional.Option;
-import com.io7m.jfunctional.OptionType;
-import com.io7m.jfunctional.Some;
-import com.io7m.jnull.NullCheck;
+import java.util.Optional;
 import com.io7m.junreachable.UnimplementedCodeException;
 import com.io7m.junreachable.UnreachableCodeException;
 
@@ -45,6 +42,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Objects;
 
 /**
  * Functions to initialize and control Adobe DRM.
@@ -100,8 +98,8 @@ public final class AdobeDRMServices {
     final Context context,
     final AdobeConfigurationServiceType configuration)
     throws DRMException, IOException {
-    NullCheck.notNull(context);
-    NullCheck.notNull(configuration);
+    Objects.requireNonNull(context);
+    Objects.requireNonNull(configuration);
 
     final Logger log = AdobeDRMServices.LOG;
 
@@ -139,12 +137,7 @@ public final class AdobeDRMServices {
     try {
       final PackageManager pm = context.getPackageManager();
       final PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
-      if (configuration.packageOverrideOption().isSome()) {
-        final Some<String> package_name_some = (Some<String>) configuration.packageOverrideOption();
-        package_name = package_name_some.get();
-      } else {
-        package_name = pi.packageName;
-      }
+      package_name = configuration.packageOverrideOption().orElse(pi.packageName);
       package_version = BuildConfig.SIMPLIFIED_VERSION;
     } catch (final PackageManager.NameNotFoundException e) {
       throw new UnreachableCodeException(e);
@@ -195,8 +188,8 @@ public final class AdobeDRMServices {
     final Context context,
     final AdobeConfigurationServiceType configuration)
     throws DRMException, IOException {
-    NullCheck.notNull(context);
-    NullCheck.notNull(configuration);
+    Objects.requireNonNull(context);
+    Objects.requireNonNull(configuration);
 
     final Logger log = AdobeDRMServices.LOG;
 
@@ -234,12 +227,7 @@ public final class AdobeDRMServices {
     try {
       final PackageManager pm = context.getPackageManager();
       final PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
-      if (configuration.packageOverrideOption().isSome()) {
-        final Some<String> package_name_some = (Some<String>) configuration.packageOverrideOption();
-        package_name = package_name_some.get();
-      } else {
-        package_name = pi.packageName;
-      }
+      package_name = configuration.packageOverrideOption().orElse(pi.packageName);
       package_version = BuildConfig.SIMPLIFIED_VERSION;
     } catch (final PackageManager.NameNotFoundException e) {
       throw new UnreachableCodeException(e);
@@ -292,14 +280,14 @@ public final class AdobeDRMServices {
    * @return A DRM implementation, if any are available
    */
 
-  public static OptionType<AdobeAdeptExecutorType> newAdobeDRMOptional(
+  public static Optional<AdobeAdeptExecutorType> newAdobeDRMOptional(
     final Context context,
     final AdobeConfigurationServiceType configuration) {
     try {
-      return Option.some(AdobeDRMServices.newAdobeDRM(context, configuration));
+      return Optional.of(AdobeDRMServices.newAdobeDRM(context, configuration));
     } catch (final DRMException | IOException e) {
       AdobeDRMServices.LOG.error("DRM is not supported: ", e);
-      return Option.none();
+      return Optional.empty();
     }
   }
 

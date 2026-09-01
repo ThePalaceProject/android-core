@@ -1,11 +1,8 @@
 package org.nypl.simplified.books.book_registry
 
-import com.io7m.jfunctional.None
-import com.io7m.jfunctional.OptionType
-import com.io7m.jfunctional.OptionVisitorType
-import com.io7m.jfunctional.Some
 import io.reactivex.Observable
 import org.nypl.simplified.books.api.BookID
+import java.util.Optional
 import java.util.SortedMap
 
 /**
@@ -36,7 +33,7 @@ interface BookRegistryReadableType {
    * @return The status for the given book, if any.
    */
 
-  fun bookStatus(id: BookID): OptionType<BookStatus>
+  fun bookStatus(id: BookID): Optional<BookStatus>
 
   /**
    * @param id The book ID
@@ -44,12 +41,7 @@ interface BookRegistryReadableType {
    */
 
   fun bookStatusOrNull(id: BookID): BookStatus? {
-    val statusOpt = this.bookStatus(id)
-    return if (statusOpt is Some<BookStatus>) {
-      statusOpt.get()
-    } else {
-      null
-    }
+    return this.bookStatus(id).orElse(null)
   }
 
   /**
@@ -57,7 +49,7 @@ interface BookRegistryReadableType {
    * @return The registered book, if any
    */
 
-  fun book(id: BookID): OptionType<BookWithStatus>
+  fun book(id: BookID): Optional<BookWithStatus>
 
   /**
    * @param id The book ID
@@ -65,12 +57,7 @@ interface BookRegistryReadableType {
    */
 
   fun bookOrNull(id: BookID): BookWithStatus? {
-    val statusOpt = this.book(id)
-    return if (statusOpt is Some<BookWithStatus>) {
-      statusOpt.get()
-    } else {
-      null
-    }
+    return this.book(id).orElse(null)
   }
 
   /**
@@ -81,11 +68,7 @@ interface BookRegistryReadableType {
 
   @Throws(NoSuchElementException::class)
   fun bookOrException(id: BookID): BookWithStatus =
-    book(id).accept(
-      object : OptionVisitorType<BookWithStatus, BookWithStatus> {
-        override fun none(none: None<BookWithStatus>): BookWithStatus = throw NoSuchElementException("No such book: " + id.value())
-
-        override fun some(some: Some<BookWithStatus>): BookWithStatus = some.get()
-      }
-    )
+    book(id).orElseThrow {
+      NoSuchElementException("No such book: " + id.value())
+    }
 }

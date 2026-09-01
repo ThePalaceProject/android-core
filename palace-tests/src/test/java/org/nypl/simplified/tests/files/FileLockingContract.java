@@ -1,8 +1,5 @@
 package org.nypl.simplified.tests.files;
 
-import com.io7m.jfunctional.PartialFunctionType;
-import com.io7m.jfunctional.Unit;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.nypl.simplified.files.DirectoryUtilities;
@@ -45,9 +42,8 @@ public abstract class FileLockingContract {
     final AtomicBoolean locked = new AtomicBoolean(false);
 
     FileLocking.withFileThreadLocked(
-      lock, 1000L, (PartialFunctionType<Unit, Unit, IOException>) x -> {
+      lock, 1000L, () -> {
         locked.set(true);
-        return Unit.unit();
       });
 
     Assertions.assertTrue(locked.get());
@@ -71,16 +67,15 @@ public abstract class FileLockingContract {
     final Logger logger = this.logger();
     logger.debug("attempting outer lock");
     FileLocking.withFileThreadLocked(
-      lock, 1000L, (PartialFunctionType<Unit, Unit, IOException>) u0 -> {
+      lock, 1000L, () -> {
         count.set(1);
 
         try {
           logger.debug("attempting inner lock");
           FileLocking.withFileThreadLocked(
-            lock, 1000L, (PartialFunctionType<Unit, Unit, IOException>) u1 -> {
+            lock, 1000L, () -> {
               logger.debug("called inner lock");
               count.set(3);
-              return Unit.unit();
             });
         } catch (final IOException e) {
           logger.error("io error: ", e);
@@ -89,7 +84,6 @@ public abstract class FileLockingContract {
 
         logger.debug("finished inner lock");
         count.set(2);
-        return Unit.unit();
       });
     logger.debug("finished outer lock");
 
@@ -115,7 +109,7 @@ public abstract class FileLockingContract {
       public void run() {
         try {
           FileLocking.withFileThreadLocked(
-            lock, 1000L, (PartialFunctionType<Unit, Unit, IOException>) x -> {
+            lock, 1000L, () -> {
               count.incrementAndGet();
               latch.countDown();
 
@@ -124,7 +118,6 @@ public abstract class FileLockingContract {
               } catch (InterruptedException e) {
                 e.printStackTrace();
               }
-              return Unit.unit();
             });
         } catch (final Exception e) {
           logger.error("error: ", e);
@@ -140,9 +133,8 @@ public abstract class FileLockingContract {
       public void run() {
         try {
           FileLocking.withFileThreadLocked(
-            lock, 500L, (PartialFunctionType<Unit, Unit, IOException>) x -> {
+            lock, 500L, () -> {
               count.incrementAndGet();
-              return Unit.unit();
             });
         } catch (Exception e) {
           logger.error("error: ", e);

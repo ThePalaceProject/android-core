@@ -10,7 +10,6 @@ dependencies {
     implementation(project(":palace-books-formats-api"))
     implementation(project(":palace-opds-core"))
 
-    implementation(libs.io7m.jnull)
     implementation(libs.irradia.mime.api)
     implementation(libs.irradia.mime.vanilla)
     implementation(libs.jcip.annotations)

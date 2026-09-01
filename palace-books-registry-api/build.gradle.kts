@@ -10,7 +10,6 @@ dependencies {
     implementation(project(":palace-presentableerror-api"))
     implementation(project(":palace-taskrecorder-api"))
 
-    implementation(libs.io7m.jfunctional)
     implementation(libs.io7m.junreachable)
     implementation(libs.irradia.mime.api)
     implementation(libs.joda.time)

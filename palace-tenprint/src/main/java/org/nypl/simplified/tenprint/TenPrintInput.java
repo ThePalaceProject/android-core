@@ -1,7 +1,8 @@
 package org.nypl.simplified.tenprint;
 
 import com.google.common.base.Preconditions;
-import com.io7m.jnull.NullCheck;
+
+import java.util.Objects;
 
 /**
  * An immutable set of parameters to the 10 PRINT algorithm.
@@ -89,8 +90,8 @@ public final class TenPrintInput
     this.cover_width = (int) ((double) in_cover_height / 1.5);
 
     this.invert = in_invert;
-    this.title = NullCheck.notNull(in_title);
-    this.author = NullCheck.notNull(in_author);
+    this.title = Objects.requireNonNull(in_title);
+    this.author = Objects.requireNonNull(in_author);
 
     Preconditions.checkArgument(
       (double) in_grid_scale > 0.1, "Grid scale %f must be > %f", in_grid_scale, 0.1);
@@ -263,7 +264,7 @@ public final class TenPrintInput
     @Override public void setAuthor(
       final String in_author)
     {
-      this.author = NullCheck.notNull(in_author);
+      this.author = Objects.requireNonNull(in_author);
     }
 
     @Override public void setBaseBrightness(
@@ -366,7 +367,7 @@ public final class TenPrintInput
     @Override public void setTitle(
       final String in_title)
     {
-      this.title = NullCheck.notNull(in_title);
+      this.title = Objects.requireNonNull(in_title);
     }
   }
 }

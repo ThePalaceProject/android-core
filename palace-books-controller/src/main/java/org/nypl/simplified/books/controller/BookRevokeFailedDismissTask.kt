@@ -1,6 +1,5 @@
 package org.nypl.simplified.books.controller
 
-import com.io7m.jfunctional.Some
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.api.BookID
@@ -35,8 +34,7 @@ class BookRevokeFailedDismissTask(
 
     return try {
       val statusOpt = this.bookRegistry.bookStatus(this.bookID)
-      if (statusOpt is Some<BookStatus>) {
-        val status = statusOpt.get()
+      statusOpt.ifPresent { status ->
         this.logger.debug("[{}] status of book is currently {}", this.bookID.brief(), status)
         val entry = account.bookDatabase.entry(this.bookID)
         val book = entry.book

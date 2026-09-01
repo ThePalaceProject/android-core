@@ -1,8 +1,5 @@
 package org.nypl.simplified.files;
 
-import com.io7m.jfunctional.PartialFunctionType;
-import com.io7m.jfunctional.Unit;
-import com.io7m.jnull.NullCheck;
 import com.io7m.junreachable.UnreachableCodeException;
 
 import org.slf4j.Logger;
@@ -11,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 import java.util.WeakHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
@@ -25,7 +23,7 @@ public final class FileLocking
   private static final Map<File, ReentrantLock> PATH_LOCKS;
 
   static {
-    LOG = NullCheck.notNull(LoggerFactory.getLogger(FileLocking.class));
+    LOG = Objects.requireNonNull(LoggerFactory.getLogger(FileLocking.class));
     PATH_LOCKS = new WeakHashMap<File, ReentrantLock>(16);
   }
 
@@ -37,31 +35,25 @@ public final class FileLocking
   /**
    * Attempt to acquire a lock on {@code file}, waiting for a maximum of {@code
    * milliseconds} ms. Locks are per-thread. Concurrent access to locks is not
-   * prevented for separate processes. If a lock is acquired, evaluate and
-   * return the result of {@code p}. If the current thread already has a lock
-   * for the given file, an exception will be raised immediately without
-   * waiting.
+   * prevented for separate processes. If a lock is acquired, evaluate {@code
+   * p}. If the current thread already has a lock for the given file, an
+   * exception will be raised immediately without waiting.
    *
    * @param file         The lock file
    * @param milliseconds The maximum wait time
-   * @param p            The function to evaluate
-   * @param <T>          The type of returned values
-   * @param <E>          The type of thrown exceptions
+   * @param p            The operation to evaluate
    *
-   * @return The value returned by {@code p}
-   *
-   * @throws E           If {@code p} raises {@code E}
    * @throws IOException If the lock cannot be acquired in the given time limit
    */
 
-  public static <T, E extends Exception> T withFileThreadLocked(
+  public static void withFileThreadLocked(
     final File file,
     final long milliseconds,
-    final PartialFunctionType<Unit, T, E> p)
-    throws E, IOException
+    final Runnable p)
+    throws IOException
   {
-    NullCheck.notNull(file);
-    NullCheck.notNull(p);
+    Objects.requireNonNull(file);
+    Objects.requireNonNull(p);
 
     final File f = file.getCanonicalFile();
     final ReentrantLock lock = FileLocking.getFileLock(file);
@@ -74,7 +66,7 @@ public final class FileLocking
       if (lock.tryLock(milliseconds, TimeUnit.MILLISECONDS)) {
         try {
           FileLocking.LOG.trace("lock obtain {}", file);
-          return p.call(Unit.unit());
+          p.run();
         } finally {
           FileLocking.LOG.trace("lock unlock {}", file);
           lock.unlock();

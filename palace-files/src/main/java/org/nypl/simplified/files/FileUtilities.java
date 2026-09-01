@@ -1,6 +1,5 @@
 package org.nypl.simplified.files;
 
-import com.io7m.jnull.NullCheck;
 import com.io7m.junreachable.UnreachableCodeException;
 
 import java.io.BufferedReader;
@@ -15,6 +14,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.security.SecureRandom;
+import java.util.Objects;
 
 /**
  * File utility functions.
@@ -41,8 +41,8 @@ public final class FileUtilities
     final File to)
     throws IOException
   {
-    NullCheck.notNull(from);
-    NullCheck.notNull(to);
+    Objects.requireNonNull(from);
+    Objects.requireNonNull(to);
 
     final byte[] buffer = new byte[8192];
 
@@ -88,7 +88,7 @@ public final class FileUtilities
     final File f)
     throws IOException
   {
-    NullCheck.notNull(f);
+    Objects.requireNonNull(f);
 
     if (f.exists()) {
 
@@ -145,7 +145,7 @@ public final class FileUtilities
     final File file)
     throws IOException
   {
-    NullCheck.notNull(file);
+    Objects.requireNonNull(file);
 
     final StringBuilder b = new StringBuilder((int) file.length());
 
@@ -165,7 +165,7 @@ public final class FileUtilities
       in.close();
     }
 
-    return NullCheck.notNull(b.toString());
+    return Objects.requireNonNull(b.toString());
   }
 
   /**
@@ -182,8 +182,8 @@ public final class FileUtilities
     final File to)
     throws IOException
   {
-    NullCheck.notNull(from);
-    NullCheck.notNull(to);
+    Objects.requireNonNull(from);
+    Objects.requireNonNull(to);
 
     if (from.renameTo(to) == false) {
       if (from.isFile() == false) {
@@ -224,8 +224,8 @@ public final class FileUtilities
     final String text)
     throws IOException
   {
-    NullCheck.notNull(file);
-    NullCheck.notNull(text);
+    Objects.requireNonNull(file);
+    Objects.requireNonNull(text);
 
     final Writer out = new BufferedWriter(
       new OutputStreamWriter(
@@ -257,9 +257,9 @@ public final class FileUtilities
     final String text)
     throws IOException
   {
-    NullCheck.notNull(f);
-    NullCheck.notNull(f_tmp);
-    NullCheck.notNull(text);
+    Objects.requireNonNull(f);
+    Objects.requireNonNull(f_tmp);
+    Objects.requireNonNull(text);
     FileUtilities.fileWriteUTF8(f_tmp, text);
     FileUtilities.fileRename(f_tmp, f);
   }
@@ -277,7 +277,7 @@ public final class FileUtilities
   public static byte[] fileReadBytes(final File file)
     throws IOException
   {
-    NullCheck.notNull(file);
+    Objects.requireNonNull(file);
 
     final FileInputStream fs = new FileInputStream(file);
     try {
@@ -314,8 +314,8 @@ public final class FileUtilities
     final File file)
     throws IOException
   {
-    NullCheck.notNull(data);
-    NullCheck.notNull(file);
+    Objects.requireNonNull(data);
+    Objects.requireNonNull(file);
 
     final FileOutputStream fs = new FileOutputStream(file);
     try {
@@ -345,9 +345,9 @@ public final class FileUtilities
     final InputStream stream)
     throws IOException
   {
-    NullCheck.notNull(file);
-    NullCheck.notNull(file_tmp);
-    NullCheck.notNull(stream);
+    Objects.requireNonNull(file);
+    Objects.requireNonNull(file_tmp);
+    Objects.requireNonNull(stream);
 
     FileUtilities.fileWriteStream(file_tmp, stream);
     FileUtilities.fileRename(file_tmp, file);
@@ -367,8 +367,8 @@ public final class FileUtilities
     final InputStream stream)
     throws IOException
   {
-    NullCheck.notNull(file);
-    NullCheck.notNull(stream);
+    Objects.requireNonNull(file);
+    Objects.requireNonNull(stream);
 
     final FileOutputStream fs = new FileOutputStream(file);
     try {
@@ -405,9 +405,9 @@ public final class FileUtilities
     final byte[] data)
     throws IOException
   {
-    NullCheck.notNull(file);
-    NullCheck.notNull(file_tmp);
-    NullCheck.notNull(data);
+    Objects.requireNonNull(file);
+    Objects.requireNonNull(file_tmp);
+    Objects.requireNonNull(data);
 
     FileUtilities.fileWriteBytes(data, file_tmp);
     FileUtilities.fileRename(file_tmp, file);

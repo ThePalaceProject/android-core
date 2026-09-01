@@ -10,8 +10,6 @@ dependencies {
     implementation(project(":palace-feeds-api"))
     implementation(project(":palace-reader-api"))
 
-    implementation(libs.io7m.jfunctional)
-    implementation(libs.io7m.jnull)
     implementation(libs.joda.time)
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlin.stdlib)

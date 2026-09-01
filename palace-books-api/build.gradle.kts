@@ -10,8 +10,6 @@ dependencies {
     implementation(project(":palace-lcp"))
     implementation(project(":palace-opds-core"))
 
-    implementation(libs.io7m.jfunctional)
-    implementation(libs.io7m.jnull)
     implementation(libs.io7m.junreachable)
     implementation(libs.irradia.mime.api)
     implementation(libs.jackson.core)

@@ -1,8 +1,7 @@
 package org.nypl.simplified.accounts.database.api;
 
-import com.io7m.jnull.NullCheck;
-
 import java.util.List;
+import java.util.Objects;
 
 /**
  * An exception that indicates that an operation on the accounts database failed.
@@ -22,8 +21,8 @@ public abstract class AccountsDatabaseException extends Exception {
   public AccountsDatabaseException(
       final String message,
       final List<Exception> causes) {
-    super(NullCheck.notNull(message, "Message"));
-    this.causes = NullCheck.notNull(causes, "Causes");
+    super(Objects.requireNonNull(message, "Message"));
+    this.causes = Objects.requireNonNull(causes, "Causes");
   }
 
   /**
@@ -38,9 +37,9 @@ public abstract class AccountsDatabaseException extends Exception {
       final String message,
       final Exception cause,
       final List<Exception> causes) {
-    super(NullCheck.notNull(message, "Message"),
-        NullCheck.notNull(cause, "Cause"));
-    this.causes = NullCheck.notNull(causes, "Causes");
+    super(Objects.requireNonNull(message, "Message"),
+        Objects.requireNonNull(cause, "Cause"));
+    this.causes = Objects.requireNonNull(causes, "Causes");
   }
 
   /**

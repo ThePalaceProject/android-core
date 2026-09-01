@@ -1,6 +1,5 @@
 package org.nypl.simplified.tests.opds
 
-import com.io7m.jnull.NullCheck
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.nypl.simplified.opds.core.OPDSXML.getFirstChildElementWithName
@@ -13,6 +12,7 @@ import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InputStream
 import java.net.URI
+import java.util.Objects
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.parsers.ParserConfigurationException
 
@@ -55,7 +55,7 @@ class OPDSXMLTest {
       val dbf = DocumentBuilderFactory.newInstance()
       dbf.setNamespaceAware(true)
       val db = dbf.newDocumentBuilder()
-      val d = NullCheck.notNull<Document>(db.parse(s))
+      val d = Objects.requireNonNull<Document>(db.parse(s))
       return d
     }
 

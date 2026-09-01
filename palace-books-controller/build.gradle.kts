@@ -41,7 +41,6 @@ dependencies {
 
     implementation(libs.google.failureaccess)
     implementation(libs.google.guava)
-    implementation(libs.io7m.jfunctional)
     implementation(libs.io7m.junreachable)
     implementation(libs.irradia.mime.api)
     implementation(libs.jackson.core)
