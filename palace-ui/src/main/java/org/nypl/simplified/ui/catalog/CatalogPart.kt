@@ -9,17 +9,25 @@ enum class CatalogPart {
    * The main catalog (OPDS feeds and entries on a remote server).
    */
 
-  CATALOG,
+  CATALOG {
+    override val requiresNetwork: Boolean = true
+  },
 
   /**
    * The "my books" feed.
    */
 
-  BOOKS,
+  BOOKS {
+    override val requiresNetwork: Boolean = false
+  },
 
   /**
    * The "my holds" feed.
    */
 
-  HOLDS
+  HOLDS {
+    override val requiresNetwork: Boolean = true
+  };
+
+  abstract val requiresNetwork: Boolean
 }
