@@ -28,8 +28,12 @@ import org.nypl.simplified.accounts.api.AccountLoginState.AccountLogoutFailed
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountNotLoggedIn
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
+import org.nypl.simplified.profiles.api.ProfileEvent
+import org.nypl.simplified.profiles.api.ProfileUpdated
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.threads.UIThread
+import org.nypl.simplified.ui.catalog.CatalogOPDSClients
+import org.nypl.simplified.ui.catalog.CatalogPart
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.errorpage.ErrorStrings
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType
@@ -38,6 +42,7 @@ import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON
 import org.nypl.simplified.ui.main.MainNavigation
 import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
 import org.nypl.simplified.ui.screens.ScreenDefinitionType
+import org.nypl.simplified.ui.settings.SettingsProfileEvents
 import java.net.URI
 
 /**
@@ -108,7 +113,7 @@ class AccountListFragment :
     profiles.profileAccountDeleteByProvider(id)
   }
 
-  private fun onAccountClicked(account: AccountType) {
+  private fun onAccountDetailsRequested(account: AccountType) {
     MainNavigation.Settings.openAccountDetail(
       account,
       when (account.loginState) {
@@ -122,6 +127,27 @@ class AccountListFragment :
         is AccountLogoutFailed,
         is AccountNotLoggedIn -> null
       }
+    )
+  }
+
+  private fun onAccountSwitchRequested(account: AccountType) {
+    val services =
+      Services.serviceDirectory()
+    val profiles =
+      services.requireService(ProfilesControllerType::class.java)
+    val opdsClients =
+      services.requireService(CatalogOPDSClients::class.java)
+
+    profiles.profileUpdate { description ->
+      description.copy(
+        preferences =
+          description.preferences.copy(mostRecentAccount = account.id)
+      )
+    }
+
+    opdsClients.goToRootFeedFor(
+      catalogPart = CatalogPart.CATALOG,
+      account = account
     )
   }
 
@@ -160,8 +186,10 @@ class AccountListFragment :
     this.accountListAdapter =
       AccountListAdapter(
         imageLoader = imageLoader,
-        onItemClicked = this::onAccountClicked,
-        onItemDeleteClicked = this::onAccountDeleteClicked
+        onItemAccountSwitch = this::onAccountSwitchRequested,
+        onItemAccountDetailsRequested = this::onAccountDetailsRequested,
+        onItemAccountDeleteRequested = this::onAccountDeleteClicked,
+        onItemIsSelectedNow = this::onItemIsSelectedNow
       )
 
     this.updateAccountList()
@@ -172,12 +200,38 @@ class AccountListFragment :
       this.adapter = this@AccountListFragment.accountListAdapter
     }
 
+    val profileEvents =
+      services.requireService(SettingsProfileEvents::class.java)
     val accountEvents =
       services.requireService(AccountEvents::class.java)
     val accountSub =
       accountEvents.events.subscribe(this::onAccountEvent)
+    val profileSub =
+      profileEvents.events.subscribe(this::onProfileEvent)
 
     this.subscriptions.add(AutoCloseable { accountSub.dispose() })
+    this.subscriptions.add(AutoCloseable { profileSub.dispose() })
+  }
+
+  private fun onProfileEvent(event: ProfileEvent) {
+    if (event is ProfileUpdated) {
+      this.accountListAdapter.notifyDataSetChanged()
+    }
+  }
+
+  private fun onItemIsSelectedNow(account: AccountType): Boolean {
+    val services =
+      Services.serviceDirectory()
+    val profiles =
+      services.requireService(ProfilesControllerType::class.java)
+
+    val mostRecentAccount =
+      profiles
+        .profileCurrent()
+        .preferences()
+        .mostRecentAccount
+
+    return account.id == mostRecentAccount
   }
 
   private fun updateAccountList() {
@@ -194,6 +248,7 @@ class AccountListFragment :
         .values
         .sortedWith(AccountComparator())
     )
+    this.accountListAdapter.notifyDataSetChanged()
   }
 
   @UiThread

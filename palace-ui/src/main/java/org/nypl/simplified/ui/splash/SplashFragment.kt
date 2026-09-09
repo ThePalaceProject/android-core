@@ -84,7 +84,7 @@ class SplashFragment :
         })
 
     this.selectionListViewRoot =
-      inflater.inflate(R.layout.account_list_registry, container, false) as ViewGroup
+      inflater.inflate(R.layout.account_registry, container, false) as ViewGroup
     this.selectionListViews =
       LibrarySelectionViews(
         this.requireActivity(),

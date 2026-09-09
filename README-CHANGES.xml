@@ -1464,7 +1464,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-08-21T15:50:38+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.32.0">
+    <c:release date="2026-09-09T13:24:38+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.32.0">
       <c:changes>
         <c:change date="2026-08-17T00:00:00+00:00" summary="Replace Picasso with Glide.">
           <c:tickets>
@@ -1476,9 +1476,14 @@
             <c:ticket id="PP-4941"/>
           </c:tickets>
         </c:change>
-        <c:change date="2026-08-21T15:50:38+00:00" summary="Fix LCP PDFs.">
+        <c:change date="2026-08-21T00:00:00+00:00" summary="Fix LCP PDFs.">
           <c:tickets>
             <c:ticket id="PP-4455"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-09-09T13:24:38+00:00" summary="Replace account picker and update visuals of the library list screen.">
+          <c:tickets>
+            <c:ticket id="PP-1881"/>
           </c:tickets>
         </c:change>
       </c:changes>

@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory
  */
 
 class AccountListRegistryFragment :
-  Fragment(R.layout.account_list_registry),
+  Fragment(R.layout.account_registry),
   MainBackButtonConsumerType {
   private val logger =
     LoggerFactory.getLogger(AccountListRegistryFragment::class.java)

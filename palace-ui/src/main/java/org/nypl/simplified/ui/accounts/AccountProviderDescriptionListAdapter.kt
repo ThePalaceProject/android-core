@@ -64,7 +64,7 @@ class AccountProviderDescriptionListAdapter(
     return if (
       viewType == VIEW_TYPE_ACCOUNT
     ) {
-      val item = inflater.inflate(R.layout.account_list_item, parent, false)
+      val item = inflater.inflate(R.layout.account_registry_item, parent, false)
 
       AccountItemViewHolder(
         item,

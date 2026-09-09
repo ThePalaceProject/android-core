@@ -60,7 +60,6 @@ import org.nypl.simplified.taskrecorder.api.TaskStep
 import org.nypl.simplified.taskrecorder.api.TaskStepResolution
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.accounts.AccountDetailModel
-import org.nypl.simplified.ui.accounts.AccountPickerDialogFragment
 import org.nypl.simplified.ui.catalog.CatalogFeedWithGroupsLaneViewHolder.LaneStyle
 import org.nypl.simplified.ui.catalog.CatalogPart.BOOKS
 import org.nypl.simplified.ui.catalog.CatalogPart.CATALOG
@@ -75,6 +74,7 @@ import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_CONSUMED
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_NOT_CONSUMED
 import org.nypl.simplified.ui.main.MainNavigation
+import org.nypl.simplified.ui.main.MainTabCategory
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.nypl.simplified.viewer.api.Viewers
 import org.nypl.simplified.viewer.spi.ViewerParameters
@@ -872,13 +872,9 @@ sealed class CatalogFragment :
   final override fun onToolbarLogoPressed(currentAccount: AccountID) {
     UIThread.checkIsUIThread()
 
-    val dialog =
-      AccountPickerDialogFragment.create(
-        currentId = currentAccount,
-        showAddAccount = true,
-        catalogPart = this.catalogPart
-      )
-    dialog.show(this.childFragmentManager, dialog.tag)
+    MainNavigation.Settings.goToRoot()
+    MainNavigation.Settings.openAccountList()
+    MainNavigation.requestTabChange(MainTabCategory.TAB_SETTINGS)
   }
 
   private fun onStateChangedToInfinite(newState: LoadedFeedWithoutGroups) {

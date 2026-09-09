@@ -200,7 +200,7 @@
                 android:scrollbarSize="@dimen/scrollbarSize"
                 android:scrollbarThumbVertical="@drawable/scrollbar_hard"
                 android:scrollbars="vertical"
-                tools:listitem="@layout/account_list_item" />
+                tools:listitem="@layout/account_registry_item" />
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     </FrameLayout>
