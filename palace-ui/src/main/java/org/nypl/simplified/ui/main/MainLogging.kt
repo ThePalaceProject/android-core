@@ -9,7 +9,7 @@ import ch.qos.logback.classic.encoder.PatternLayoutEncoder
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.Appender
 import ch.qos.logback.core.rolling.RollingFileAppender
-import ch.qos.logback.core.rolling.TimeBasedRollingPolicy
+import ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy
 import ch.qos.logback.core.util.FileSize
 import ch.qos.logback.core.util.StatusPrinter
 import org.librarysimplified.ui.BuildConfig
@@ -67,10 +67,23 @@ object MainLogging {
         this.pattern = "%d{\"yyyy-MM-dd'T'HH:mm:ss,SSS\"} %level %logger{128} - %msg%n"
         this.start()
       }
+    val logsDirectory = File(cacheDirectory, "logs")
     val rollingPolicy =
-      TimeBasedRollingPolicy<ILoggingEvent>().apply {
+      SizeAndTimeBasedRollingPolicy<ILoggingEvent>().apply {
         this.context = loggerContext
-        this.fileNamePattern = "$filename.%d.gz"
+        // Must be an absolute path in the same directory as the active file.
+        // A relative pattern is resolved against the process working directory,
+        // which on Android is "/" (not writable), so the rollover rename would
+        // fail and the active file would grow without bound.
+        //
+        // SizeAndTimeBasedRollingPolicy requires both the %d (date) and %i
+        // (size index) tokens in the pattern.
+        this.fileNamePattern = File(logsDirectory, "$filename.%d.%i.gz").absolutePath
+        // Rolls the active (uncompressed) file once it reaches this size, in
+        // addition to the daily rollover. maxFileSize is the UNCOMPRESSED
+        // threshold; text logs gzip down to a small fraction of their original
+        // size, so this keeps each .gz archive close to ~1MB. Tune as needed.
+        this.setMaxFileSize(FileSize.valueOf("5MB"))
         this.maxHistory = 7
         this.setTotalSizeCap(FileSize.valueOf("10MB"))
       }
@@ -78,18 +91,18 @@ object MainLogging {
       RollingFileAppender<ILoggingEvent>().apply {
         this.context = loggerContext
         this.encoder = encoder
-        this.file = File(File(cacheDirectory, "logs"), filename).absolutePath
+        this.file = File(logsDirectory, filename).absolutePath
         this.name = "FILE"
         this.rollingPolicy = rollingPolicy
       }
 
-    // The `TimeBasedRollingPolicy` needs to have a parent set or it will throw a
+    // The rolling policy needs to have a parent set or it will throw a
     // `NullPointerException` when started.
     rollingPolicy.setParent(fileAppender)
     rollingPolicy.start()
 
     // The `RollingFileAppender` will refuse to start unless the `TriggeringPolicy`,
-    // in this case `TimeBasedRollingPolicy`, has started first.
+    // in this case the rolling policy, has started first.
     fileAppender.start()
 
     return AsyncAppender().apply {
