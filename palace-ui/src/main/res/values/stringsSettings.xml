@@ -5,6 +5,9 @@
     <string name="settingsAbout">About Palace</string>
     <string name="settingsAboutSummary" />
     <string name="settingsAccessibilityAccountDelete">Delete Account Button</string>
+    <string name="settingsAccessibilityAccountDetails">View details for \"%1$s\".</string>
+    <string name="settingsAccessibilityAccountSelect">Tap to set \"%1$s\" as your current library. Long-press to remove.</string>
+    <string name="settingsAccessibilityAccountSelectCurrent">\"%1$s\", your current library. Long-press to remove.</string>
     <string name="settingsAccessibilitySearchButton">Library Search Button</string>
     <string name="settingsAccessibilitySearchButtonClose">Close Search Button</string>
     <string name="settingsAccounts">Libraries</string>

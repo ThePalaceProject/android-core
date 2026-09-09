@@ -95,8 +95,10 @@ class AccountListAdapter(
     }
 
     fun bind(item: AccountType) {
-      this.accountTitleView.text =
-        item.provider.displayName
+      val context = this.itemView.context
+      val name = item.provider.displayName
+
+      this.accountTitleView.text = name
       this.accountCaptionView.text =
         item.provider.description ?: item.provider.subtitle
 
@@ -111,8 +113,8 @@ class AccountListAdapter(
           View.GONE
         }
 
-      this.accountRadio.isChecked =
-        this.onItemIsSelectedNow.invoke(item)
+      val isSelected = this.onItemIsSelectedNow.invoke(item)
+      this.accountRadio.isChecked = isSelected
 
       this.imageLoader.loadAccountLogoIntoView(
         account = item.provider.toDescription(),
@@ -120,6 +122,24 @@ class AccountListAdapter(
         iconView = this.accountIcon
       )
       this.accountItem = item
+
+      /*
+       * The whole row is exposed to accessibility as a single node (the child views are
+       * marked `importantForAccessibility="no"`), so the content descriptions below must
+       * carry the account name and its selection state themselves.
+       */
+
+      this.accountItemSelect.contentDescription =
+        context.getString(
+          if (isSelected) {
+            R.string.settingsAccessibilityAccountSelectCurrent
+          } else {
+            R.string.settingsAccessibilityAccountSelect
+          },
+          name
+        )
+      this.accountItemDetails.contentDescription =
+        context.getString(R.string.settingsAccessibilityAccountDetails, name)
     }
   }
 

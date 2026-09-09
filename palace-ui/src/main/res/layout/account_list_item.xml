@@ -26,6 +26,7 @@
             android:layout_height="32dp"
             android:clickable="false"
             android:focusable="false"
+            android:importantForAccessibility="no"
             android:layout_marginStart="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -58,6 +59,7 @@
                 android:id="@+id/accountItemTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:importantForAccessibility="no"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 tools:text="New York Public Library" />
 
@@ -65,6 +67,7 @@
                 android:id="@+id/accountItemCaption"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:importantForAccessibility="no"
                 android:layout_marginTop="8dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
                 android:textSize="12sp"
