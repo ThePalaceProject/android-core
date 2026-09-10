@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dialog_manual_passphrase_cancel">Annuler</string>
+    <string name="dialog_manual_passphrase_done">Fait</string>
+    <string name="dialog_manual_passphrase_hint">Phrase de passe</string>
+    <string name="dialog_manual_passphrase_title">Entrez la phrase de passage LCP</string>
+</resources>

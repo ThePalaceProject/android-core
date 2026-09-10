@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="loginEULA">Acconsento ai termini del Contratto di licenza utente finale.</string>
+    <string name="loginLibraryCard">Carta della biblioteca</string>
+    <string name="loginLogin">Firma</string>
+    <string name="loginPassword">Parola d\'ordine</string>
+    <string name="loginUserName">Nome utente</string>
+    <string name="loginDeviceActivated">Dispositivo attivato</string>
+    <string name="loginDeviceActivating">Tentativo di attivare il dispositivo…</string>
+    <string name="loginAuthRequired">È richiesta l\'autenticazione. Continua…</string>
+    <string name="loginCheckingAuthenticationRequirement">Controllo del requisito di autenticazione…</string>
+    <string name="loginPatronSettingsRequesting">Richiesta delle impostazioni utente…</string>
+    <string name="loginPatronSettingsOK">Impostazioni utente ricevute</string>
+    <string name="loginErrorServer">Server ha restituito un errore: %1$d %2$s</string>
+    <string name="loginErrorAuthNotRequired">L\'autenticazione non è richiesta!</string>
+    <string name="loginErrorNoPatronURI">Nessuna URI di impostazioni utente è definita!</string>
+    <string name="loginErrorInvalidCredentials">Il suo login non è corretto. Per favore riprovi.</string>
+    <string name="loginErrorConnectionFailed">Si è verificato un errore di rete. Controlli la connessione o riprovi più tardi.</string>
+    <string name="loginErrorPatronSettingsParseError">Impossibile elaborare le impostazioni utente restituite dal server!</string>
+    <string name="loginDeviceDRMNotSupported">Questo account richiede Adobe ACS DRM, ma questa versione dell\'applicazione non lo supporta.</string>
+    <string name="loginDeviceActivationPostDeviceManager">Contattare il gestore del dispositivo…</string>
+    <string name="loginDeviceActivationPostDeviceManagerDone">Inviato alla URI del gestore del dispositivo.</string>
+    <string name="loginDeviceActivationFailed">Attivazione del dispositivo non riuscita: %1$s (%2$s)</string>
+</resources>

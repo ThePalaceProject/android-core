@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="logoutClearingBookDatabase">Limpiando la base de datos del libro…</string>
+    <string name="logoutClearingBookDatabaseFailed">¡Despejar la base de datos del libro falló!</string>
+    <string name="logoutUpdatingOpdsEntry">Actualización de la entrada OPDS para el libro %1$s…</string>
+    <string name="logoutOPDSFeedTimedOut">Se agotó el tiempo de espera del feed OPDS del servidor</string>
+    <string name="logoutNoAlternateLinkInDatabase">No hay ningún enlace alternativo disponible en la base de datos.</string>
+    <string name="logoutOPDSFeedFailed">No se pudo obtener la entrada OPDS.</string>
+    <string name="logoutOPDSFeedCorrupt">El servidor devolvió un feed con una entrada corrupta.</string>
+    <string name="logoutOPDSFeedEmpty">El servidor devolvió un feed de revocación vacío.</string>
+    <string name="logoutOPDSFeedWithGroups">El servidor devolvió un feed de revocación con grupos.</string>
+    <string name="logoutDeactivatingDeviceAdobe">Desactivar el dispositivo…</string>
+    <string name="logoutDeactivatingDeviceAdobeDeactivated">Dispositivo desactivado.</string>
+    <string name="logoutDeactivatingDeviceAdobeFailed">Desactivar el dispositivo falló: %1$s (%2$s)</string>
+    <string name="logoutDeactivatingDeviceAdobeNotActive">El dispositivo no parece ser activado.</string>
+    <string name="logoutDeactivatingDeviceAdobeUnsupported">Adobe ACS DRM no es compatible en esta versión de la aplicación.</string>
+    <string name="logoutDeviceDeactivationPostDeviceManager">Contacto con el administrador del dispositivo…</string>
+    <string name="logoutDeviceDeactivationPostDeviceManagerFinished">Enviado a la URI del administrador de dispositivos.</string>
+    <string name="logoutNotLoggedIn">¡La cuenta no parece estar registrada!</string>
+    <string name="logoutStarted">Saliendo…</string>
+    <string name="logoutConfirm">¿Está seguro de que desea cerrar la sesión?</string>
+</resources>

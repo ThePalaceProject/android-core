@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessBookFailedLoan">Il libro \'%1$s\' non poteva essere scaricato</string>
+    <string name="accessBookFailedReturn">Il libro \'%1$s\' non poteva essere restituito</string>
+    <string name="accessBookHasDownloaded">Il libro \'%1$s\' ha finito di scaricare</string>
+    <string name="accessBookIsDownloading">Il libro \'%1$s\' ha iniziato a scaricare</string>
+    <string name="accessBookIsOnHold">Una prenotazione è stata posta per il libro \'%1$s\'</string>
+    <string name="accessBookReturned">Il libro \'%1$s\' è stato riportato con successo</string>
+    <string name="accessBookReachedLoanLimit">Non è stato possibile prendere in prestito il libro \'%1$s\' perché ha raggiunto il limite di prestiti</string>
+    <string name="accessBookFailedLoanLoginRequired">Il libro \'%1$s\' non poteva essere scaricato perché la sessione di login è scaduta.</string>
+    <string name="accessBookFailedRevokeLoginRequired">Il libro \'%1$s\' non poteva essere restituito perché la sessione di login è scaduta.</string>
+</resources>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="Dismiss">Rejet</string>
+    <string name="accessibility_back">Fermez le livre et revenez.</string>
+    <string name="accessibility_settings_close">Fermer le menu Paramètres</string>
+    <string name="accessibility_settings_open">Ouvrez le menu Paramètres</string>
+    <string name="accessibility_toc_open">Ouvrez la table des matières et l\'écran de signets</string>
+    <string name="accessibility_toc_close">Fermez la table des matières et l\'écran de signets</string>
+    <string name="content_description_back">Précédent</string>
+    <string name="settings_title">Paramètres</string>
+    <string name="table_of_contents_empty_message">Pas de Table des matières disponible pour ce travail</string>
+    <string name="table_of_contents_title">Sommaire</string>
+    <string name="viewer_position_message">Vous voulez passer à la page que vous avez laissée ?</string>
+    <string name="viewer_position_move">Déplacer</string>
+    <string name="viewer_position_stay">Restez</string>
+    <string name="viewer_position_title">Synchronisation de la position de lecture</string>
+</resources>

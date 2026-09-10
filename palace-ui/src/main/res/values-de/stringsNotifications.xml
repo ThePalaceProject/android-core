@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notification_channel_name_old">Verfügbar</string>
+    <string name="notification_channel_description_reservations">Benachrichtigungen bezüglich Ihrer Reservierungen.</string>
+    <string name="notification_channel_id_reservations">channel_id_reservations</string>
+    <string name="notification_channel_name_reservations">Reservierungen</string>
+    <string name="notification_channel_description_loans">Benachrichtigungen zu Ihren Ausleihen.</string>
+    <string name="notification_channel_id_loans">channel_id_loans</string>
+    <string name="notification_channel_name_loans">Ausleihen</string>
+</resources>

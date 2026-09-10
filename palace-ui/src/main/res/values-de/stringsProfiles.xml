@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="profileAccountCreatingAnAccountProviderDescription">Erstellen einer Kontoanbieterbeschreibung…</string>
+    <string name="profileAccountCreationCreatingAccount">Erstellen eines Accounts…</string>
+    <string name="profileAccountCreationCreatingAccountFailed">Die Erstellung eines Accounts ist fehlgeschlagen.</string>
+    <string name="profileAccountCreationResolvingAccountProvider">Account Provider wird aufgelöst…</string>
+    <string name="profileAccountCreationResolvingAccountProviderFailed">Die Lösung eines Kontoanbieters ist fehlgeschlagen.</string>
+    <string name="profileAccountCreationSucceeded">Die Erstellung des Accounts war erfolgreich.</string>
+    <string name="profileAccountDeleting">Konto entfernen…</string>
+    <string name="profileAccountDeletionFailed">Das Entfernen eines Kontos ist fehlgeschlagen.</string>
+    <string name="profileAccountDeletionOnlyOneAccountRemaining">Kann das eine verbleibende Konto nicht entfernen; mindestens ein Konto muss vorhanden sein.</string>
+    <string name="profileAccountDeletionSucceeded">Das Entfernen eines Kontos war erfolgreich.</string>
+    <string name="profileAccountFetchingOPDSFeed">OPDS-Feed wird abgerufen…</string>
+    <string name="profileAccountFetchingOPDSFeedFailed">Das Abrufen des OPDS-Feeds ist fehlgeschlagen!</string>
+    <string name="profileAccountFindingAuthDocumentURI">Suche nach der URI des Authentifizierungsdokuments…</string>
+    <string name="profileAccountParsingOPDSFeed">OPDS-Feed wird analysiert…</string>
+    <string name="profileAccountParsingOPDSFeedFailed">Das Analysieren des OPDS-Feeds ist fehlgeschlagen!</string>
+    <string name="profileAccountSearchingFeedForAuthenticationDocument">Der Feed wird nach dem Authentifizierungsdokument durchsucht…</string>
+</resources>

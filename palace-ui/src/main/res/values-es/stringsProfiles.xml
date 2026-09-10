@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="profileAccountCreatingAnAccountProviderDescription">Crear una descripción del proveedor de cuenta…</string>
+    <string name="profileAccountCreationCreatingAccount">Crear una cuenta…</string>
+    <string name="profileAccountCreationCreatingAccountFailed">Crear una cuenta falló.</string>
+    <string name="profileAccountCreationResolvingAccountProvider">Resolver el proveedor de la cuenta…</string>
+    <string name="profileAccountCreationResolvingAccountProviderFailed">La resolución del proveedor de la cuenta falló.</string>
+    <string name="profileAccountCreationSucceeded">Crear la cuenta tuvo éxito.</string>
+    <string name="profileAccountDeleting">Eliminar cuenta…</string>
+    <string name="profileAccountDeletionFailed">La eliminación de una cuenta falló.</string>
+    <string name="profileAccountDeletionOnlyOneAccountRemaining">No se puede quitar la cuenta restante; al menos una cuenta debe estar presente.</string>
+    <string name="profileAccountDeletionSucceeded">La eliminación de una cuenta tuvo éxito.</string>
+    <string name="profileAccountFetchingOPDSFeed">Obteniendo un feed OPDS…</string>
+    <string name="profileAccountFetchingOPDSFeedFailed">¡Falló la obtención del feed OPDS!</string>
+    <string name="profileAccountFindingAuthDocumentURI">Buscando la URI del documento de autenticación…</string>
+    <string name="profileAccountParsingOPDSFeed">Analizando un feed OPDS…</string>
+    <string name="profileAccountParsingOPDSFeedFailed">¡No se pudo analizar el feed OPDS!</string>
+    <string name="profileAccountSearchingFeedForAuthenticationDocument">Buscando el documento de autenticación en el feed…</string>
+</resources>

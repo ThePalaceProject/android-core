@@ -269,7 +269,6 @@ val dependencyObjects =
         libs.rxjava2,
         libs.rxjava2.extensions,
         libs.slf4j,
-        libs.transifex.sdk,
         // SQLite
         libs.io7m.anethum.api,
         libs.io7m.blackthorne.core,

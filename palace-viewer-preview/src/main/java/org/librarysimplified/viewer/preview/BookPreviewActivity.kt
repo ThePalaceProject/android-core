@@ -9,8 +9,6 @@ import android.widget.ProgressBar
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.UiThread
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.app.TxContextWrappingDelegate2
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -88,10 +86,6 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
       intent.putExtras(bundle)
       context.startActivity(intent)
     }
-  }
-
-  private val appCompatDelegate: TxContextWrappingDelegate2 by lazy {
-    TxContextWrappingDelegate2(super.getDelegate())
   }
 
   private lateinit var accessibilityService: AccessibilityServiceType
@@ -243,8 +237,6 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
       .replace(R.id.preview_container, fragment)
       .commitAllowingStateLoss()
   }
-
-  override fun getDelegate(): AppCompatDelegate = this.appCompatDelegate
 
   override fun onStart() {
     super.onStart()

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="audio_book_player">Lecteur de livres audio</string>
+    <string name="audio_book_player_bookmark_adding">Ajouter un signet…</string>
+    <string name="audio_book_player_bookmark_added">Signet ajouté</string>
+    <string name="audio_book_player_bookmark_already_added">Un signet a déjà été enregistré à cet endroit.</string>
+    <string name="audio_book_player_bookmark_error_adding">Il y a eu une erreur en ajoutant le signet</string>
+    <string name="audio_book_player_do_keep">Gardez</string>
+    <string name="audio_book_player_do_return">Retour</string>
+    <string name="audio_book_player_error_book_open">Impossible d\'ouvrir le livre audio</string>
+    <string name="audio_book_player_error_engine_open">Impossible d\'initialiser le moteur audio</string>
+    <string name="audio_book_player_return_question">Voulez-vous le rendre ?</string>
+    <string name="audio_book_player_return_title">Votre livre audio est terminé</string>
+    <string name="audio_book_player_toc_title">Table des matières</string>
+    <string name="audio_book_player_ok">OK</string>
+    <string name="audio_book_player_details">Détails</string>
+    <string name="audio_book_manifest_parse_error">Le manifeste du livre audio n\'a pas pu être analysé.</string>
+    <string name="audio_book_manifest_download_error">Le manifeste du livre audio n\'a pas pu être téléchargé.</string>
+    <string name="audio_book_manifest_license_error">Les vérifications de licence du manifeste audiobook ont échoué.</string>
+    <string name="audio_book_battery_warning">Vous écoutez un livre audio avec l\'optimiseur de batterie Android activé sur votre appareil.\n\nSur certains appareils, cela peut faire arrêter les livres audio lorsque l\'application est en arrière-plan.\n\nSi votre appareil est affecté par ce problème, veuillez visiter l\'onglet Paramètres de l\'application pour désactiver l\'optimiseur de batterie.</string>
+    <string name="audio_book_battery_confirm">Ne me parle plus de ça.</string>
+    <string name="audio_book_dismiss">OK</string>
+</resources>

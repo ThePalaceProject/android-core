@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="errorDetails">Détails</string>
+    <string name="errorDetailsTitle">Détails de l\'erreur</string>
+    <string name="errorSendReport">Envoyer au support</string>
+    <string name="errorStepsTitle">Étapes</string>
+    <string name="errorTitle">Voici le journal des erreurs créé par votre problème:</string>
+</resources>

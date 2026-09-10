@@ -1,0 +1,159 @@
+{
+  "palace-accessibility/src/main/res/values/strings.xml": {
+    "accessBookReachedLoanLimit": "Le livre '%1$s' n'a pas pu être emprunté, car vous avez atteint votre limite de prêt."
+  },
+  "palace-accounts-registry/src/main/res/values/strings.xml": {
+    "resolving": "Résolution du fournisseur de compte…",
+    "resolvingAuthDocument": "Résolution du document d'authentification…"
+  },
+  "palace-ui/src/main/res/values/strings.xml": {
+    "accountRegistryCreating": "Créer une bibliothèque…",
+    "accountRegistryRetrieving": "Récupération des bibliothèques du registre…",
+    "accountRegistrySelect": "Veuillez sélectionner une bibliothèque…",
+    "accountReportIssue": "Signaler un problème…",
+    "accountSAML20NoPatronInfo": "Impossible de récupérer les informations utilisateur de l'URI : %1$s",
+    "accountSearchHint": "Rechercher des comptes…",
+    "accountWantChildCard": "Voulez-vous une carte pour votre enfant ?",
+    "migrationFailure": "Il y a eu un ou plusieurs problèmes pour migrer vos données…",
+    "migrationOK": "OK",
+    "tabHolds": "Réservations"
+  },
+  "palace-ui/src/main/res/values/stringsBookRevoke.xml": {
+    "revokeACSDeleteRights": "Supprimer l'information sur les droits d'Adobe ACS…",
+    "revokeACSExecute": "Exécution des commandes de révocation Adobe ACS…",
+    "revokeACSGettingDeviceCredentials": "Récupération des identifiants de périphérique Adobe ACS…",
+    "revokeACSGettingDeviceCredentialsOK": "Identifiants de périphérique Adobe ACS récupérés.",
+    "revokeACSLoan": "Révocation du prêt via Adobe ACS…",
+    "revokeACSLoanNotReturnable": "Adobe ACS estime que ce prêt n'est pas rendable.",
+    "revokeACSTimedOut": "Délai d'attente dépassé pour Adobe ACS.",
+    "revokeBookDatabaseLookup": "Ouverture de l'entrée de la base de données du livre…",
+    "revokeDeleteBook": "Suppression de l'entrée de la base de données du livre.",
+    "revokeFormat": "Exécuter une révocation spécifique au format…",
+    "revokeFormatSpecific": "Révocation pour le format %1$s…",
+    "revokeServerNotify": "Notification du serveur de la révocation…",
+    "revokeServerNotifyFeedTimedOut": "Délai d'attente dépassé pour le flux de révocation du serveur.",
+    "revokeServerNotifyFeedWithGroups": "Le serveur a retourné un flux de révocation avec des groupes.",
+    "revokeServerNotifyProcessingFeed": "Traitement du flux de révocation du serveur…",
+    "revokeServerNotifySavingEntry": "Enregistrer l'entrée du flux de révocation…",
+    "revokeStarted": "La révocation a commencé…"
+  },
+  "palace-ui/src/main/res/values/stringsBoot.xml": {
+    "bootFailedGeneric": "Un problème a été détecté. Veuillez vérifier votre connexion ou fermer et rouvrir l'application pour réessayer."
+  },
+  "palace-ui/src/main/res/values/stringsCatalog.xml": {
+    "announcementOK": "OK",
+    "bookReachedLoanLimitDialogButton": "OK",
+    "catalogAccessibilityBookBorrow": "Bouton Emprunter. Appuyez sur ce bouton pour emprunter “%1$s”.",
+    "catalogAccessibilityBookDownload": "Bouton Télécharger. Cliquez sur ce bouton pour télécharger \"%1$s\".",
+    "catalogAccessibilityBookDownloadCancel": "Bouton Annuler le téléchargement. Cliquez sur ce bouton pour annuler le téléchargement de \"%1$s\".",
+    "catalogAccessibilityBookListen": "Bouton Écouter. Cliquez sur ce bouton pour écouter \"%1$s\".",
+    "catalogAccessibilityBookManageHold": "Bouton Annuler la réservation. Appuyez sur ce bouton pour annuler la réservation de “%1$s”.",
+    "catalogAccessibilityBookPlaceHold": "Bouton Réserver. Appuyez sur ce bouton pour réserver “%1$s”.",
+    "catalogAccessibilityBookPreviewPlay": "Bouton Aperçu. Cliquez sur ce bouton pour ouvrir un aperçu de \"%1$s\".",
+    "catalogAccessibilityBookPreviewRead": "Bouton Aperçu. Cliquez sur ce bouton pour ouvrir un aperçu de \"%1$s\".",
+    "catalogAccessibilityBookRead": "Bouton Lire. Cliquez sur ce bouton pour lire \"%1$s\".",
+    "catalogAccessibilityBookRevokeLoan": "Bouton Rendre maintenant. Cliquez sur ce bouton pour rendre \"%1$s\".",
+    "catalogAccessibilityCloseCheckoutDrawer": "Fermer le tiroir d'emprunt",
+    "catalogAccessibilityOpenCheckoutDrawer": "Ouvrir le tiroir d'emprunt",
+    "catalogAccessibilitySeriesLink": "\"%1$s\". Cliquez pour voir toutes les entrées de la série.",
+    "catalogAccounts": "Choisissez un autre catalogue de bibliothèque…",
+    "catalogBookAvailabilityLoanable": "Ce livre est disponible à l'emprunt.",
+    "catalogBookCellBorrowingUntil": "Échéance %1$s",
+    "catalogBookDetailBorrowedUntil": "Emprunté jusqu'au",
+    "catalogBookDetailBorrowingFor": "Emprunté pour",
+    "catalogBookPreviewAudioBook": "Écouter l'extrait",
+    "catalogCancelling": "Annulation…",
+    "catalogDownloading": "Téléchargement…",
+    "catalogDurationFormat": "%1$s heures, %2$s minutes",
+    "catalogGet": "Emprunter",
+    "catalogHoldCannotCancel": "Cette réservation ne peut pas être annulée.",
+    "catalogManageHold": "Annuler la réservation",
+    "catalogNetworkUnavailable1": "Connectez-vous à Internet pour parcourir le catalogue complet. Les ebooks et livres audio que vous avez déjà téléchargés restent disponibles dans Mes livres.",
+    "catalogPlaceHold": "Réserver",
+    "catalogReportIssue": "Signaler un problème…",
+    "catalogRequesting": "Demande…"
+  },
+  "palace-ui/src/main/res/values/stringsFeed.xml": {
+    "catalogFeedLoading": "Chargement du flux…",
+    "feedShowOnLoan": "En prêt",
+    "feedTitleHolds": "Réservations",
+    "feedWithGroupsEmptyHolds": "Quand vous réservez un livre du catalogue, il apparaîtra ici. Regardez ici de temps en temps pour voir si votre livre est disponible au téléchargement."
+  },
+  "palace-ui/src/main/res/values/stringsLogin.xml": {
+    "loginAuthRequired": "L'authentification est nécessaire. En cours…",
+    "loginCheckingAuthenticationRequirement": "Vérification des exigences d'authentification…",
+    "loginDeviceActivating": "Tenter d'activer l'appareil…",
+    "loginDeviceActivationPostDeviceManager": "Contact du gestionnaire de périphérique…",
+    "loginDeviceActivationPostDeviceManagerDone": "Envoyé à l'URI du gestionnaire d'appareils.",
+    "loginErrorNoPatronURI": "Aucune URI de paramètres utilisateur n'est définie !",
+    "loginErrorPatronSettingsParseError": "Impossible d'analyser les paramètres utilisateur retournés par le serveur !",
+    "loginPatronSettingsOK": "Paramètres utilisateur reçus",
+    "loginPatronSettingsRequesting": "Demande des paramètres utilisateur…"
+  },
+  "palace-ui/src/main/res/values/stringsLogout.xml": {
+    "logoutClearingBookDatabase": "Effacer la base de données du livre…",
+    "logoutClearingBookDatabaseFailed": "L'effacement de la base de données du livre a échoué !",
+    "logoutConfirm": "Voulez-vous vraiment vous déconnecter ?",
+    "logoutDeactivatingDeviceAdobe": "Désactivation du périphérique…",
+    "logoutDeviceDeactivationPostDeviceManager": "Contact du gestionnaire de périphérique…",
+    "logoutDeviceDeactivationPostDeviceManagerFinished": "Envoyé à l'URI du gestionnaire d'appareils.",
+    "logoutOPDSFeedTimedOut": "Délai d'attente dépassé pour le flux OPDS du serveur.",
+    "logoutOPDSFeedWithGroups": "Le serveur a retourné un flux de révocation avec des groupes.",
+    "logoutStarted": "Déconnexion…",
+    "logoutUpdatingOpdsEntry": "Mise à jour de l'entrée OPDS pour le livre %1$s…"
+  },
+  "palace-ui/src/main/res/values/stringsNotifications.xml": {
+    "notification_channel_id_loans": "channel_id_loans",
+    "notification_channel_id_reservations": "channel_id_reservations",
+    "notification_channel_name_reservations": "Réservations"
+  },
+  "palace-ui/src/main/res/values/stringsProfiles.xml": {
+    "profileAccountCreatingAnAccountProviderDescription": "Créer une description du fournisseur de compte…",
+    "profileAccountCreationCreatingAccount": "Créer un compte…",
+    "profileAccountCreationResolvingAccountProvider": "Résoudre le fournisseur de compte…",
+    "profileAccountDeleting": "Suppression du compte…",
+    "profileAccountFetchingOPDSFeed": "Récupération d'un flux OPDS…",
+    "profileAccountFetchingOPDSFeedFailed": "La récupération du flux OPDS a échoué !",
+    "profileAccountFindingAuthDocumentURI": "Recherche de l'URI du document d'authentification…",
+    "profileAccountParsingOPDSFeed": "Analyse d'un flux OPDS…",
+    "profileAccountSearchingFeedForAuthenticationDocument": "Recherche du document d'authentification dans le flux…"
+  },
+  "palace-ui/src/main/res/values/stringsSettings.xml": {
+    "settingsAccessibilityAccountSelect": "Appuyez pour définir \"%1$s\" comme bibliothèque actuelle. Appuyez longuement pour supprimer.",
+    "settingsAccessibilityAccountSelectCurrent": "\"%1$s\", votre bibliothèque actuelle. Appuyez longuement pour supprimer.",
+    "settingsCustomOPDSURL": "URL de flux personnalisée…",
+    "settingsDevEnableManualLCPPassphrase": "Activer la phrase de passe LCP manuelle",
+    "settingsDevSyncAccounts": "Synchroniser les comptes",
+    "settingsDocumentation": "Documentation",
+    "settingsNotifications": "Notifications",
+    "settingsReportIssue": "Signaler un problème…",
+    "settingsTapToDebug": "Mode débogue en %1$d…"
+  },
+  "palace-ui/src/main/res/values/stringsSplash.xml": {
+    "accessSplashTitle": "Palace"
+  },
+  "palace-viewer-audiobook/src/main/res/values/strings.xml": {
+    "audio_book_dismiss": "OK",
+    "audio_book_player_bookmark_added": "Signet ajouté",
+    "audio_book_player_bookmark_adding": "Ajouter un signet…",
+    "audio_book_player_ok": "OK"
+  },
+  "palace-viewer-epub-readium2/src/main/res/values/strings.xml": {
+    "reader_bookmark_added": "Signet ajouté",
+    "reader_bookmark_adding": "Ajouter un signet…",
+    "reader_position_title": "Synchronisation de la position de lecture"
+  },
+  "palace-viewer-pdf-pdfjs/src/main/res/values/strings.xml": {
+    "viewer_position_title": "Synchronisation de la position de lecture"
+  },
+  "palace-viewer-preview/src/main/res/values/strings.xml": {
+    "bookPreviewAccessibilityBack": "Retour",
+    "bookPreviewAccessibilityBackward30": "Reculer de 30 secondes",
+    "bookPreviewAccessibilityForward30": "Avance rapide de 30 secondes",
+    "bookPreviewAccessibilityMinutes": "Minutes",
+    "bookPreviewAccessibilityPlay": "Lecture",
+    "bookPreviewAccessibilitySecond": "Seconde",
+    "bookPreviewAccessibilitySeconds": "Secondes",
+    "bookPreviewAccessibilityTimeCurrent": "%s écoulé"
+  }
+}

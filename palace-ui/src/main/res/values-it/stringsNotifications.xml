@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notification_channel_name_old">Articolo</string>
+    <string name="notification_channel_description_reservations">Notifiche relative alle prenotazioni.</string>
+    <string name="notification_channel_id_reservations">canale id reservazioni</string>
+    <string name="notification_channel_name_reservations">Prenotazioni</string>
+    <string name="notification_channel_description_loans">Notifiche relative ai suoi prestiti.</string>
+    <string name="notification_channel_id_loans">channel_id_loans</string>
+    <string name="notification_channel_name_loans">Prestiti</string>
+</resources>

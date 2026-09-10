@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="audio_book_player">Lettore di audiolibri</string>
+    <string name="audio_book_player_bookmark_adding">Aggiunta del segnalibro…</string>
+    <string name="audio_book_player_bookmark_added">Segnalibro aggiunto</string>
+    <string name="audio_book_player_bookmark_already_added">Un segnalibro è già stato salvato in questa posizione.</string>
+    <string name="audio_book_player_bookmark_error_adding">C\'era un errore durante l\'aggiunta del segnalibro</string>
+    <string name="audio_book_player_do_keep">Continua</string>
+    <string name="audio_book_player_do_return">Ritorno</string>
+    <string name="audio_book_player_error_book_open">Incapace di aprire il libro audio</string>
+    <string name="audio_book_player_error_engine_open">Impossibile inizializzare il motore audio</string>
+    <string name="audio_book_player_return_question">Vuole restituirlo?</string>
+    <string name="audio_book_player_return_title">Il suo Audiobook ha finito</string>
+    <string name="audio_book_player_toc_title">Tabella dei contenuti</string>
+    <string name="audio_book_player_ok">OK</string>
+    <string name="audio_book_player_details">Dettagli</string>
+    <string name="audio_book_manifest_parse_error">Il manifesto dell\'audiolibro non è stato analizzato.</string>
+    <string name="audio_book_manifest_download_error">Non è stato possibile scaricare il manifesto dell\'audiolibro.</string>
+    <string name="audio_book_manifest_license_error">I controlli di licenza del manifesto dell\'audiolibro hanno fallito.</string>
+    <string name="audio_book_battery_warning">Sta ascoltando un audiolibro con l\'ottimizzazione della batteria di Android abilitata sul suo dispositivo.\nSu alcuni dispositivi, questo può causare che gli audiolibri smettano di essere riprodotti quando l\'applicazione è in background.\nSe il dispositivo è interessato da questo problema, visiti la scheda Impostazioni dell\'app per disattivare l\'ottimizzazione della batteria.</string>
+    <string name="audio_book_battery_confirm">Non dirmi di nuovo questo.</string>
+    <string name="audio_book_dismiss">OK</string>
+</resources>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="profileAccountCreatingAnAccountProviderDescription">Créer une description du fournisseur de compte…</string>
+    <string name="profileAccountCreationCreatingAccount">Créer un compte…</string>
+    <string name="profileAccountCreationCreatingAccountFailed">La création d\'un compte a échoué.</string>
+    <string name="profileAccountCreationResolvingAccountProvider">Résoudre le fournisseur de compte…</string>
+    <string name="profileAccountCreationResolvingAccountProviderFailed">La résolution d\'un fournisseur de compte a échoué.</string>
+    <string name="profileAccountCreationSucceeded">La création du compte a réussi.</string>
+    <string name="profileAccountDeleting">Suppression du compte…</string>
+    <string name="profileAccountDeletionFailed">La suppression d\'un compte a échoué.</string>
+    <string name="profileAccountDeletionOnlyOneAccountRemaining">Impossible de supprimer le compte restant; au moins un compte doit être présent.</string>
+    <string name="profileAccountDeletionSucceeded">La suppression d\'un compte a réussi.</string>
+    <string name="profileAccountFetchingOPDSFeed">Récupération d\'un flux OPDS…</string>
+    <string name="profileAccountFetchingOPDSFeedFailed">La récupération du flux OPDS a échoué !</string>
+    <string name="profileAccountFindingAuthDocumentURI">Recherche de l\'URI du document d\'authentification…</string>
+    <string name="profileAccountParsingOPDSFeed">Analyse d\'un flux OPDS…</string>
+    <string name="profileAccountParsingOPDSFeedFailed">L\'analyse d\'un flux OPDS a échoué !</string>
+    <string name="profileAccountSearchingFeedForAuthenticationDocument">Recherche du document d\'authentification dans le flux…</string>
+</resources>

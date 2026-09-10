@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bootFailedGeneric">Abbiamo riscontrato un problema. Controlli la connessione oppure chiuda e riapra l\'app per riprovare.</string>
+    <string name="bootAdobeDRMFailed">Qualcosa è andato storto con il sistema Adobe DRM: Alcuni libri non saranno disponibili in questa versione dell\'applicazione. Si prega di provare l\'aggiornamento alla versione più recente dell\'applicazione.</string>
+</resources>

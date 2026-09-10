@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="loginEULA">Estoy de acuerdo con los términos del Acuerdo de licencia de usuario final.</string>
+    <string name="loginLibraryCard">Tarjeta de biblioteca</string>
+    <string name="loginLogin">Iniciar sesión</string>
+    <string name="loginPassword">Contraseña</string>
+    <string name="loginUserName">Nombre del usuario</string>
+    <string name="loginDeviceActivated">Dispositivo activado</string>
+    <string name="loginDeviceActivating">Intentando activar el dispositivo…</string>
+    <string name="loginAuthRequired">Se requiere autenticación. Continuando…</string>
+    <string name="loginCheckingAuthenticationRequirement">Comprobando el requisito de autenticación…</string>
+    <string name="loginPatronSettingsRequesting">Solicitando la configuración del usuario…</string>
+    <string name="loginPatronSettingsOK">Ajustes de usuario recibidos</string>
+    <string name="loginErrorServer">El servidor devolvió un error: %1$d %2$s</string>
+    <string name="loginErrorAuthNotRequired">¡La autenticación no es necesaria!</string>
+    <string name="loginErrorNoPatronURI">¡No se ha definido ninguna URI de configuración de usuario!</string>
+    <string name="loginErrorInvalidCredentials">Su inicio de sesión es incorrecto. Por favor, inténtelo de nuevo.</string>
+    <string name="loginErrorConnectionFailed">Se produjo un error de red. Por favor, compruebe su conexión o vuelva a intentarlo más tarde.</string>
+    <string name="loginErrorPatronSettingsParseError">¡No se pudieron analizar los ajustes de usuario devueltos por el servidor!</string>
+    <string name="loginDeviceDRMNotSupported">Esta cuenta requiere Adobe ACS DRM, pero esta versión de la aplicación no lo soporta.</string>
+    <string name="loginDeviceActivationPostDeviceManager">Contacto con el administrador del dispositivo…</string>
+    <string name="loginDeviceActivationPostDeviceManagerDone">Enviado a la URI del administrador de dispositivos.</string>
+    <string name="loginDeviceActivationFailed">La activación del dispositivo falló: %1$s (%2$s)</string>
+</resources>

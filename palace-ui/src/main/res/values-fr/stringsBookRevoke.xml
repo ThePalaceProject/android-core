@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="revokeACSDeleteRights">Supprimer l\'information sur les droits d\'Adobe ACS…</string>
+    <string name="revokeACSDeleteRightsFailed">Impossible de supprimer les informations sur les droits d\'Adobe ACS.</string>
+    <string name="revokeACSExecute">Exécution des commandes de révocation Adobe ACS…</string>
+    <string name="revokeACSExecuteOK">Commandes de révocation Adobe ACS exécutées avec succès.</string>
+    <string name="revokeACSGettingDeviceCredentials">Récupération des identifiants de périphérique Adobe ACS…</string>
+    <string name="revokeACSGettingDeviceCredentialsNotActivated">Le périphérique Adobe ACS n\'est pas activé.</string>
+    <string name="revokeACSGettingDeviceCredentialsOK">Identifiants de périphérique Adobe ACS récupérés.</string>
+    <string name="revokeACSLoan">Révocation du prêt via Adobe ACS…</string>
+    <string name="revokeACSLoanNotReturnable">Adobe ACS estime que ce prêt n\'est pas rendable.</string>
+    <string name="revokeACSLoanNotSupported">Adobe ACS n\'est pas pris en charge.</string>
+    <string name="revokeACSTimedOut">Délai d\'attente dépassé pour Adobe ACS.</string>
+    <string name="revokeBookACSConnectorFailed">Les commandes Adobe ACS ont échoué avec le code d\'erreur %1$s.</string>
+    <string name="revokeBookACSFailed">L\'exécution des commandes Adobe ACS a échoué avec une exception.</string>
+    <string name="revokeBookCancelled">La révocation a été annulée.</string>
+    <string name="revokeBookDatabaseLookup">Ouverture de l\'entrée de la base de données du livre…</string>
+    <string name="revokeBookDatabaseLookupFailed">L\'ouverture de la base de données du livre a échoué.</string>
+    <string name="revokeBookDatabaseLookupOK">Ouverture réussie de la base de données du livre.</string>
+    <string name="revokeCredentialsRequired">Des pouvoirs sont requis, mais aucun n \' a été fourni.</string>
+    <string name="revokeDeleteBook">Suppression de l\'entrée de la base de données du livre.</string>
+    <string name="revokeDeleteBookFailed">Impossible de supprimer l\'entrée de la base de données du livre.</string>
+    <string name="revokeFormat">Exécuter une révocation spécifique au format…</string>
+    <string name="revokeFormatNothingToDo">Aucune opération spécifique n\'est nécessaire pour ce format.</string>
+    <string name="revokeFormatSpecific">Révocation pour le format %1$s…</string>
+    <string name="revokeNotRevocable">Le livre n\'est pas révocable !</string>
+    <string name="revokeServerNotify">Notification du serveur de la révocation…</string>
+    <string name="revokeServerNotifyFeedCorrupt">Le serveur a retourné un flux avec une entrée corrompue.</string>
+    <string name="revokeServerNotifyFeedEmpty">Le serveur a retourné un flux de révocation vide.</string>
+    <string name="revokeServerNotifyFeedFailed">Impossible de traiter le flux de révocation du serveur.</string>
+    <string name="revokeServerNotifyFeedOK">Flux de révocation du serveur traité avec succès.</string>
+    <string name="revokeServerNotifyFeedTimedOut">Délai d\'attente dépassé pour le flux de révocation du serveur.</string>
+    <string name="revokeServerNotifyFeedWithGroups">Le serveur a retourné un flux de révocation avec des groupes.</string>
+    <string name="revokeServerNotifyNotRevocable">Un prêt avec disponibilité %1$s n\'est pas révocable.</string>
+    <string name="revokeServerNotifyNoURI">Aucun URI n\'a été fourni pour la notification du serveur.</string>
+    <string name="revokeServerNotifyProcessingFeed">Traitement du flux de révocation du serveur…</string>
+    <string name="revokeServerNotifySavingEntry">Enregistrer l\'entrée du flux de révocation…</string>
+    <string name="revokeServerNotifySavingEntryFailed">Impossible de sauvegarder le flux de révocation du serveur.</string>
+    <string name="revokeServerNotifyURI">Notification du serveur via %1$s.</string>
+    <string name="revokeStarted">La révocation a commencé…</string>
+</resources>

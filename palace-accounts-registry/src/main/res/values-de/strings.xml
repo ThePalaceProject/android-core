@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="resolving">Account Provider wird aufgelöst…</string>
+    <string name="resolvingAuthDocument">Auflösung des Authentifizierungsdokuments…</string>
+    <string name="resolvingAuthDocumentBasicTokenMalformed">Die Beschreibung eines Basis-Token-Systems muss eine Authentifizierungs-URI enthalten.</string>
+    <string name="resolvingAuthDocumentMissingURI">Für ein Authentifizierungsdokument wurde kein URI bereitgestellt.</string>
+    <string name="resolvingAuthDocumentNoStartURI">Das Authentifizierungsdokument enthielt keinen Startkatalog-URI.</string>
+    <string name="resolvingAuthDocumentNoUsableAuthenticationTypes">Das Konto hat keinen Authentifizierungstyp angegeben, den wir verstehen können.</string>
+    <string name="resolvingAuthDocumentSAML20Malformed">Die Beschreibung eines SAML 2.0-Systems muss eine Authentifizierungs-URI enthalten.</string>
+    <string name="resolvingAuthDocumentOIDCMalformed">Die Beschreibung eines OIDC-Systems muss eine Authentifizierungs-URI enthalten.</string>
+    <string name="resolvingAuthDocumentParseFailed">Das Authentifizierungsdokument war fehlerhaft und konnte nicht analysiert werden.</string>
+    <string name="resolvingAuthDocumentRetrievalFailed">Das Authentifizierungsdokument konnte nicht vom Server abgerufen werden.</string>
+    <string name="resolvingAuthDocumentRetrievalFailedWithProblem">Das Authentifizierungsdokument konnte nicht vom Server abgerufen werden.</string>
+    <string name="resolvingAuthDocumentUnusableLink">Wir konnten den Link zum Authentifizierungsdokument nicht verstehen.</string>
+    <string name="resolvingUnexpectedException">Erhielt eine unerwartete Ausnahme während der Auflösung!</string>
+</resources>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="catalogFeedLoading">Caricamento del feed…</string>
+    <string name="feedByAuthor">Autore</string>
+    <string name="feedByTitle">Titolo</string>
+    <string name="feedLibrary">Biblioteca</string>
+    <string name="feedLibraryAll">Tutti</string>
+    <string name="feedEmpty">Nessun risultato trovato.</string>
+    <string name="feedSearchResultsAvailable">I risultati della ricerca sono ora disponibili su questa schermata.</string>
+    <string name="feedLoadingError">Si è verificato un errore durante il caricamento del catalogo.</string>
+    <string name="feedNavigationNotSupported">I feed di navigazione non sono attualmente supportati. Scusa!</string>
+    <string name="feedShow">Mostra</string>
+    <string name="feedShowAll">Tutti</string>
+    <string name="feedShowOnLoan">In prestito</string>
+    <string name="feedSortBy">Ordina per</string>
+    <string name="feedTitleBooks">Libri</string>
+    <string name="feedTitleCatalog">Catalogo</string>
+    <string name="feedTitleHolds">Prenotazioni</string>
+    <string name="feedWithGroupsEmptyHolds">Quando prenota un libro dal catalogo, apparirà qui. Controlli qui di tanto in tanto per vedere se il suo libro è disponibile per il download.</string>
+    <string name="feedWithGroupsEmptyLoaned">Visita il catalogo per aggiungere libri a I miei libri.</string>
+    <string name="ageGateBirthYearPrompt">Inserisca il suo anno di nascita</string>
+    <string name="selectYear">Selezioni anno</string>
+    <string name="ageVerification">Verifica dell\'età</string>
+    <string name="next">Il prossimo</string>
+</resources>

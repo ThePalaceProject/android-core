@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bookOpenFailedTitle">Caricamento del libro fallito</string>
+    <string name="bookOpenFailedMessage">C\'era un errore nell\'apertura del libro: (%1$s): %2$s.</string>
+    <string name="reader_bookmark_added">Segnalibro aggiunto</string>
+    <string name="reader_bookmark_adding">Aggiunta del segnalibro…</string>
+    <string name="reader_bookmark_error_adding">C\'era un errore durante l\'aggiunta del segnalibro</string>
+    <string name="reader_position_title">Sincronizza posizione di lettura</string>
+    <string name="reader_position_message">Vuole passare alla pagina su cui ha lasciato?</string>
+    <string name="reader_position_move">Muovetevi</string>
+    <string name="reader_position_stay">Resta qui</string>
+</resources>

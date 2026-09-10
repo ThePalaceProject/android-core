@@ -73,7 +73,6 @@ class MainApplication : Application() {
     MainLogging.configure(this.cacheDir)
     this.configureStrictMode()
     this.logStartup()
-    MainTransifex.configure(this.applicationContext)
     PlayerModel.start(this)
 
     INSTANCE = this

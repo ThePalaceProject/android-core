@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="resolving">Résolution du fournisseur de compte…</string>
+    <string name="resolvingAuthDocument">Résolution du document d\'authentification…</string>
+    <string name="resolvingAuthDocumentBasicTokenMalformed">La description d\'un système de jeton de base doit contenir un URI d\'authentification.</string>
+    <string name="resolvingAuthDocumentMissingURI">Aucun URI n\'a été fourni pour un document d\'authentification.</string>
+    <string name="resolvingAuthDocumentNoStartURI">Le document d\'authentification n\'a pas fourni d\'URI de catalogue de départ.</string>
+    <string name="resolvingAuthDocumentNoUsableAuthenticationTypes">Le compte n\'a pas spécifié un type d\'authentification que nous pouvons comprendre.</string>
+    <string name="resolvingAuthDocumentSAML20Malformed">La description d\'un système SAML 2.0 doit contenir une URI d\'authentification.</string>
+    <string name="resolvingAuthDocumentOIDCMalformed">La description d\'un système OIDC doit contenir une URI d\'authentification.</string>
+    <string name="resolvingAuthDocumentParseFailed">Le document d\'authentification était mal formé et ne pouvait pas être analysé.</string>
+    <string name="resolvingAuthDocumentRetrievalFailed">Le document d\'authentification ne peut être récupéré du serveur.</string>
+    <string name="resolvingAuthDocumentRetrievalFailedWithProblem">Le document d\'authentification ne peut être récupéré du serveur.</string>
+    <string name="resolvingAuthDocumentUnusableLink">Nous ne pouvions pas comprendre le lien du document d\'authentification.</string>
+    <string name="resolvingUnexpectedException">A reçu une exception inattendue pendant la résolution!</string>
+</resources>

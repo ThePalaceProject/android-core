@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bookOpenFailedTitle">Le chargement du livre a échoué</string>
+    <string name="bookOpenFailedMessage">Il y a eu une erreur lors de l\'ouverture du livre: (%1$s): %2$s.</string>
+    <string name="reader_bookmark_added">Signet ajouté</string>
+    <string name="reader_bookmark_adding">Ajouter un signet…</string>
+    <string name="reader_bookmark_error_adding">Il y a eu une erreur en ajoutant le signet</string>
+    <string name="reader_position_title">Synchronisation de la position de lecture</string>
+    <string name="reader_position_message">Vous voulez passer à la page que vous avez laissée ?</string>
+    <string name="reader_position_move">Déplacer</string>
+    <string name="reader_position_stay">Restez</string>
+</resources>

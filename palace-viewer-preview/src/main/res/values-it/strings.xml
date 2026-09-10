@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="Dismiss">Oggetto</string>
+    <string name="bookPreviewPlayerInitialTime">00:00:00</string>
+    <string name="bookPreviewPlayerSeek30">30</string>
+    <string name="bookPreviewFailedTitle">\"Download dell\'anteprima del libro non riuscito</string>
+    <string name="bookPreviewFailedMessage">C\'è stato un errore nel scaricare l\'anteprima di questo libro. Riprovi più tardi.</string>
+    <string name="bookPreviewAccessibilityBack">Indietro</string>
+    <string name="bookPreviewAccessibilityForward30">Avanti veloce di 30 secondi</string>
+    <string name="bookPreviewAccessibilityBackward30">Riavvolga di 30 secondi</string>
+    <string name="bookPreviewAccessibilityPlay">Riproduci</string>
+    <string name="bookPreviewAccessibilityPause">Pausa</string>
+    <string name="bookPreviewAccessibilityCover">Copertina del libro</string>
+    <string name="bookPreviewAccessibilityTimeCurrent">%s riprodotto</string>
+    <string name="bookPreviewAccessibilityTimeRemaining">%s rimanenti</string>
+    <string name="bookPreviewAccessibilityHours">Ore</string>
+    <string name="bookPreviewAccessibilityMinutes">Minuti</string>
+    <string name="bookPreviewAccessibilitySeconds">Secondi</string>
+    <string name="bookPreviewAccessibilityHour">Ora</string>
+    <string name="bookPreviewAccessibilityMinute">Minuto</string>
+    <string name="bookPreviewAccessibilitySecond">Secondo</string>
+</resources>

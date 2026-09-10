@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dialog_manual_passphrase_cancel">Stornierung</string>
+    <string name="dialog_manual_passphrase_done">Geschehen</string>
+    <string name="dialog_manual_passphrase_hint">Passphrase</string>
+    <string name="dialog_manual_passphrase_title">LCP-Passphrase eingeben</string>
+</resources>

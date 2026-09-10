@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="Dismiss">Entlassung</string>
+    <string name="accessibility_back">Buch schließen und zurück.</string>
+    <string name="accessibility_settings_close">Schließen Sie das Einstellungsmenü</string>
+    <string name="accessibility_settings_open">Öffnen Sie das Einstellungsmenü</string>
+    <string name="accessibility_toc_open">Öffnen Sie das Inhaltsverzeichnis und den Lesezeichenbildschirm</string>
+    <string name="accessibility_toc_close">Schließen Sie das Inhaltsverzeichnis und den Lesezeichenbildschirm</string>
+    <string name="content_description_back">Zurück</string>
+    <string name="settings_title">Einstellungen</string>
+    <string name="table_of_contents_empty_message">Kein Inhaltsverzeichnis für diese Arbeit verfügbar</string>
+    <string name="table_of_contents_title">Inhaltsverzeichnis</string>
+    <string name="viewer_position_message">Möchten Sie zu der Seite wechseln, auf der Sie aufgehört haben?</string>
+    <string name="viewer_position_move">Bewegung</string>
+    <string name="viewer_position_stay">Aufenthalt</string>
+    <string name="viewer_position_title">Leseposition synchronisieren</string>
+</resources>

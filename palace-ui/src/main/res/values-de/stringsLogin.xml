@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="loginEULA">Ich stimme den Bedingungen der Endbenutzer-Lizenzvereinbarung zu.</string>
+    <string name="loginLibraryCard">Bibliothekskarte</string>
+    <string name="loginLogin">Zeichen</string>
+    <string name="loginPassword">Passwort</string>
+    <string name="loginUserName">Benutzername</string>
+    <string name="loginDeviceActivated">Gerät aktiviert</string>
+    <string name="loginDeviceActivating">Es wird versucht, das Gerät zu aktivieren…</string>
+    <string name="loginAuthRequired">Eine Authentifizierung ist erforderlich. Fortsetzung…</string>
+    <string name="loginCheckingAuthenticationRequirement">Authentifizierungsanforderung wird geprüft…</string>
+    <string name="loginPatronSettingsRequesting">Nutzereinstellungen werden angefordert…</string>
+    <string name="loginPatronSettingsOK">Nutzereinstellungen empfangen</string>
+    <string name="loginErrorServer">Server hat einen Fehler zurückgegeben: %1$d %2$s</string>
+    <string name="loginErrorAuthNotRequired">Eine Authentifizierung ist nicht erforderlich!</string>
+    <string name="loginErrorNoPatronURI">Es ist keine URI für Nutzereinstellungen definiert!</string>
+    <string name="loginErrorInvalidCredentials">Ihr Login ist falsch. Bitte versuchen Sie es noch einmal.</string>
+    <string name="loginErrorConnectionFailed">Es ist ein Netzwerkfehler aufgetreten. Bitte überprüfen Sie Ihre Verbindung oder versuchen Sie es später erneut.</string>
+    <string name="loginErrorPatronSettingsParseError">Die vom Server gelieferten Nutzereinstellungen konnten nicht verarbeitet werden!</string>
+    <string name="loginDeviceDRMNotSupported">Dieses Konto erfordert Adobe ACS DRM, aber diese Version der Anwendung unterstützt es nicht.</string>
+    <string name="loginDeviceActivationPostDeviceManager">Gerätemanager kontaktieren…</string>
+    <string name="loginDeviceActivationPostDeviceManagerDone">An die URI des Gerätemanagers übermittelt.</string>
+    <string name="loginDeviceActivationFailed">Geräteaktivierung fehlgeschlagen: %1$s (%2$s)</string>
+</resources>
