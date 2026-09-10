@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="Dismiss">Desestimación</string>
+    <string name="accessibility_back">Cierre el libro y vuelva.</string>
+    <string name="accessibility_settings_close">Cerrar el menú de configuración</string>
+    <string name="accessibility_settings_open">Abra el menú de configuración</string>
+    <string name="accessibility_toc_open">Abra la tabla de contenidos y marcadores</string>
+    <string name="accessibility_toc_close">Cerrar la tabla de contenidos y marcadores</string>
+    <string name="content_description_back">Atrás</string>
+    <string name="settings_title">Ajustes</string>
+    <string name="table_of_contents_empty_message">No hay tabla de contenidos disponibles para este trabajo</string>
+    <string name="table_of_contents_title">Cuadro de contenidos</string>
+    <string name="viewer_position_message">¿Desea pasar a la página en la que dejó?</string>
+    <string name="viewer_position_move">Moveos</string>
+    <string name="viewer_position_stay">Quédate</string>
+    <string name="viewer_position_title">Sincronizar posición de lectura</string>
+</resources>

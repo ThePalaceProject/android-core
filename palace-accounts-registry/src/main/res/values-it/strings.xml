@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="resolving">Risoluzione del fornitore di account…</string>
+    <string name="resolvingAuthDocument">Risoluzione del documento di autenticazione…</string>
+    <string name="resolvingAuthDocumentBasicTokenMalformed">La descrizione di un sistema di token di base deve contenere un URI di autenticazione.</string>
+    <string name="resolvingAuthDocumentMissingURI">Nessun URI è stato fornito per un documento di autenticazione.</string>
+    <string name="resolvingAuthDocumentNoStartURI">Il documento di autenticazione non ha fornito un URI di catalogo di partenza.</string>
+    <string name="resolvingAuthDocumentNoUsableAuthenticationTypes">L\'account non ha specificato un tipo di autenticazione che possiamo capire.</string>
+    <string name="resolvingAuthDocumentSAML20Malformed">La descrizione di un sistema SAML 2.0 deve contenere un URI di autenticazione.</string>
+    <string name="resolvingAuthDocumentOIDCMalformed">La descrizione di un sistema OIDC deve contenere un URI di autenticazione.</string>
+    <string name="resolvingAuthDocumentParseFailed">Il documento di autenticazione era malformato e non poteva essere analizzato.</string>
+    <string name="resolvingAuthDocumentRetrievalFailed">Il documento di autenticazione non potrebbe essere recuperato dal server.</string>
+    <string name="resolvingAuthDocumentRetrievalFailedWithProblem">Il documento di autenticazione non potrebbe essere recuperato dal server.</string>
+    <string name="resolvingAuthDocumentUnusableLink">Non potevamo capire il link del documento di autenticazione.</string>
+    <string name="resolvingUnexpectedException">Ha ricevuto un\'eccezione inaspettata durante la risoluzione!</string>
+</resources>

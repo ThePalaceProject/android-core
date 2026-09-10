@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="revokeACSDeleteRights">Berechtigungsinformationen von Adobe ACS werden gelöscht…</string>
+    <string name="revokeACSDeleteRightsFailed">Informationen zu Adobe ACS-Rechten wurden nicht gelöscht.</string>
+    <string name="revokeACSExecute">Adobe-ACS-Widerrufsbefehle werden ausgeführt…</string>
+    <string name="revokeACSExecuteOK">Adobe ACS Widerrufsbefehle erfolgreich ausgeführt.</string>
+    <string name="revokeACSGettingDeviceCredentials">Geräteanmeldeinformationen von Adobe ACS abrufen…</string>
+    <string name="revokeACSGettingDeviceCredentialsNotActivated">Das Adobe ACS Gerät ist nicht aktiviert.</string>
+    <string name="revokeACSGettingDeviceCredentialsOK">Abgerufene Adobe ACS-Geräteanmeldeinformationen.</string>
+    <string name="revokeACSLoan">Widerruf der Ausleihe über Adobe ACS…</string>
+    <string name="revokeACSLoanNotReturnable">Adobe ACS geht davon aus, dass diese Ausleihe nicht zurückgegeben werden kann.</string>
+    <string name="revokeACSLoanNotSupported">Adobe ACS wird nicht unterstützt.</string>
+    <string name="revokeACSTimedOut">Zeitüberschreitung beim Warten auf Adobe ACS.</string>
+    <string name="revokeBookACSConnectorFailed">Adobe ACS-Befehle sind mit Fehlercode %1$s fehlgeschlagen.</string>
+    <string name="revokeBookACSFailed">Die Ausführung von Adobe ACS-Befehlen ist mit einer Ausnahme fehlgeschlagen.</string>
+    <string name="revokeBookCancelled">Der Widerruf wurde abgesagt.</string>
+    <string name="revokeBookDatabaseLookup">Eintrag in der Buchdatenbank wird geöffnet…</string>
+    <string name="revokeBookDatabaseLookupFailed">Es konnte der Buchdatenbankeintrag nicht geöffnet werden.</string>
+    <string name="revokeBookDatabaseLookupOK">Buch Datenbankeintrag erfolgreich geöffnet.</string>
+    <string name="revokeCredentialsRequired">Anmeldeinformationen sind erforderlich, aber keine wurden zur Verfügung gestellt.</string>
+    <string name="revokeDeleteBook">Löschen der Buchdatenbank.</string>
+    <string name="revokeDeleteBookFailed">Der Buchdatenbankeintrag wurde nicht gelöscht.</string>
+    <string name="revokeFormat">Durchführen eines formatspezifischen Widerrufs…</string>
+    <string name="revokeFormatNothingToDo">Keine spezifischen Operationen für dieses Format erforderlich.</string>
+    <string name="revokeFormatSpecific">Widerruf für Format %1$s…</string>
+    <string name="revokeNotRevocable">Das Buch ist nicht widerrufbar!</string>
+    <string name="revokeServerNotify">Benachrichtigung des Servers über den Widerruf…</string>
+    <string name="revokeServerNotifyFeedCorrupt">Server hat einen Feed mit einem beschädigten Eintrag zurückgegeben.</string>
+    <string name="revokeServerNotifyFeedEmpty">Der Server hat einen leeren Widerrufsfeed zurückgegeben.</string>
+    <string name="revokeServerNotifyFeedFailed">Fehler beim Verarbeiten des Widerrufs-Feeds des Servers.</string>
+    <string name="revokeServerNotifyFeedOK">Widerrufs-Feed des Servers erfolgreich verarbeitet.</string>
+    <string name="revokeServerNotifyFeedTimedOut">Zeitüberschreitung beim Warten auf den Widerrufs-Feed des Servers.</string>
+    <string name="revokeServerNotifyFeedWithGroups">Server hat einen Widerrufs-Feed mit Gruppen zurückgegeben.</string>
+    <string name="revokeServerNotifyNotRevocable">Eine Ausleihe mit Verfügbarkeit %1$s ist nicht widerrufbar.</string>
+    <string name="revokeServerNotifyNoURI">Es wurde kein URI für die Serverbenachrichtigung bereitgestellt.</string>
+    <string name="revokeServerNotifyProcessingFeed">Widerrufs-Feed des Servers wird verarbeitet…</string>
+    <string name="revokeServerNotifySavingEntry">Widerrufs-Feed-Eintrag wird gespeichert…</string>
+    <string name="revokeServerNotifySavingEntryFailed">Es ist nicht gelungen, den Server-Revocation-Feed zu speichern.</string>
+    <string name="revokeServerNotifyURI">Benachrichtigung des Servers über %1$s.</string>
+    <string name="revokeStarted">Widerruf begonnen…</string>
+</resources>

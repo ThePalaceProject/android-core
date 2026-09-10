@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="errorDetails">Einzelheiten</string>
+    <string name="errorDetailsTitle">Fehlerangaben</string>
+    <string name="errorSendReport">An Support senden</string>
+    <string name="errorStepsTitle">Stufen</string>
+    <string name="errorTitle">Hier ist das Fehlerprotokoll, das durch Ihr Problem erstellt wurde:</string>
+</resources>

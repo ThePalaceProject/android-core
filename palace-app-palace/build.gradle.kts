@@ -389,11 +389,6 @@ dependencies {
     implementation(libs.media3.extractor)
     implementation(libs.media3.session)
 
-    // Transifex
-    implementation(libs.transifex.common)
-    implementation(libs.transifex.sdk)
-    implementation(libs.b3nedikt.viewpump)
-
     implementation(libs.androidx.activity)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.annotation)

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="loginEULA">J\'accepte les termes de l\'accord de licence d\'utilisateur final.</string>
+    <string name="loginLibraryCard">Carte de bibliothèque</string>
+    <string name="loginLogin">Connexion</string>
+    <string name="loginPassword">Mot de passe</string>
+    <string name="loginUserName">Nom d\' utilisateur</string>
+    <string name="loginDeviceActivated">Appareil activé</string>
+    <string name="loginDeviceActivating">Tenter d\'activer l\'appareil…</string>
+    <string name="loginAuthRequired">L\'authentification est nécessaire. En cours…</string>
+    <string name="loginCheckingAuthenticationRequirement">Vérification des exigences d\'authentification…</string>
+    <string name="loginPatronSettingsRequesting">Demande des paramètres utilisateur…</string>
+    <string name="loginPatronSettingsOK">Paramètres utilisateur reçus</string>
+    <string name="loginErrorServer">Le serveur a retourné une erreur : %1$d %2$s</string>
+    <string name="loginErrorAuthNotRequired">L\'authentification n\'est pas requise !</string>
+    <string name="loginErrorNoPatronURI">Aucune URI de paramètres utilisateur n\'est définie !</string>
+    <string name="loginErrorInvalidCredentials">Votre connexion est incorrecte. Veuillez réessayer.</string>
+    <string name="loginErrorConnectionFailed">Une erreur de réseau s\'est produite. Veuillez vérifier votre connexion ou réessayer plus tard.</string>
+    <string name="loginErrorPatronSettingsParseError">Impossible d\'analyser les paramètres utilisateur retournés par le serveur !</string>
+    <string name="loginDeviceDRMNotSupported">Ce compte nécessite Adobe ACS DRM, mais cette version de l\'application ne le supporte pas.</string>
+    <string name="loginDeviceActivationPostDeviceManager">Contact du gestionnaire de périphérique…</string>
+    <string name="loginDeviceActivationPostDeviceManagerDone">Envoyé à l\'URI du gestionnaire d\'appareils.</string>
+    <string name="loginDeviceActivationFailed">L\'activation du périphérique a échoué : %1$s (%2$s)</string>
+</resources>

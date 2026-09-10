@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="debugDRMAdobeIDResetReset">Restablecer</string>
+    <string name="debugDRMAdobeIDReset">Restablecer la ID de Adobe</string>
+    <string name="debugDRMAdobeIDResetConfirmTitle">¿Reiniciar Adobe ID?</string>
+    <string name="debugDRMAdobeIDResetWithAccount">Al hacer clic en el botón de abajo se restablecerá su ID de Adobe para la biblioteca \'%1$s\'.</string>
+    <string name="debugDRMAdobeIDResetConfirmation">¿Está seguro de que desea restablecer su ID de Adobe para la biblioteca \'%1$s\'? Al restablecer la ID de Adobe se eliminarán todos sus préstamos y se cerrará su sesión.</string>
+</resources>

@@ -214,5 +214,4 @@ dependencies {
     implementation(libs.rxjava2)
     implementation(libs.rxjava2.extensions)
     implementation(libs.slf4j)
-    implementation(libs.transifex.sdk)
 }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessSplashLoading">L\'applicazione Palace è in caricamento.</string>
+    <string name="accessSplashTitle">Palace</string>
+    <string name="splashNotificationsText">Utilizziamo le notifiche per dirLe quando le prenotazioni dei libri sono pronte e per garantire una riproduzione affidabile degli audiolibri.\nVuole abilitare le notifiche?</string>
+    <string name="splashNotificationsTextHint">Può rivisitare nuovamente questa opzione nella schermata Impostazioni Palace se non vuole decidere in questo momento.</string>
+    <string name="splashNotificationsAllow">Sì, abilitare</string>
+    <string name="splashNotificationsSkip">Non ora</string>
+</resources>

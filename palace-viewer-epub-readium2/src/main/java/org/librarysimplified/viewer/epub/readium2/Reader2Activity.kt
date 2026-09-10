@@ -11,8 +11,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.annotation.StringRes
 import androidx.annotation.UiThread
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.app.TxContextWrappingDelegate2
 import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.reactivex.disposables.CompositeDisposable
@@ -111,12 +109,6 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
   private lateinit var parameters: Reader2ActivityParameters
   private lateinit var profilesController: ProfilesControllerType
   private lateinit var account: AccountType
-
-  private val appCompatDelegate: TxContextWrappingDelegate2 by lazy {
-    TxContextWrappingDelegate2(super.getDelegate())
-  }
-
-  override fun getDelegate(): AppCompatDelegate = this.appCompatDelegate
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)

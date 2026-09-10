@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="debugDRMAdobeIDResetReset">Zurücksetzen</string>
+    <string name="debugDRMAdobeIDReset">Adobe ID zurücksetzen</string>
+    <string name="debugDRMAdobeIDResetConfirmTitle">Adobe ID zurücksetzen?</string>
+    <string name="debugDRMAdobeIDResetWithAccount">Wenn Sie auf die Schaltfläche unten klicken, wird Ihre Adobe ID für die Bibliothek \"%1$s\" zurückgesetzt.</string>
+    <string name="debugDRMAdobeIDResetConfirmation">Sind Sie sicher, dass Sie Ihre Adobe ID für die Bibliothek \'%1$s\' zurücksetzen möchten? Beim Zurücksetzen der Adobe ID werden alle Ihre Ausleihen entfernt und Sie abgemeldet.</string>
+</resources>

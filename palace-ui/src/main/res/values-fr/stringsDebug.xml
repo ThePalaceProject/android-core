@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="debugDRMAdobeIDResetReset">Réinitialiser</string>
+    <string name="debugDRMAdobeIDReset">Réinitialiser l\'ID Adobe</string>
+    <string name="debugDRMAdobeIDResetConfirmTitle">Réinitialiser Adobe ID ?</string>
+    <string name="debugDRMAdobeIDResetWithAccount">Cliquer sur le bouton ci-dessous réinitialisera votre Adobe ID pour la bibliothèque \'%1$s\'.</string>
+    <string name="debugDRMAdobeIDResetConfirmation">Voulez-vous vraiment réinitialiser votre Adobe ID pour la bibliothèque \'%1$s\' ? Réinitialiser l\'Adobe ID supprimera tous vos prêts et vous déconnectera.</string>
+</resources>

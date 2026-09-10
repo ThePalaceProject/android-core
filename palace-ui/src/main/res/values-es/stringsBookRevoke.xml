@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="revokeACSDeleteRights">Eliminar la información de derechos de Adobe ACS…</string>
+    <string name="revokeACSDeleteRightsFailed">No se pudo eliminar la información de derechos de Adobe ACS.</string>
+    <string name="revokeACSExecute">Ejecución de comandos de revocación de Adobe ACS…</string>
+    <string name="revokeACSExecuteOK">Ejecutó los comandos de revocación de Adobe ACS con éxito.</string>
+    <string name="revokeACSGettingDeviceCredentials">Recuperar las credenciales del dispositivo Adobe ACS…</string>
+    <string name="revokeACSGettingDeviceCredentialsNotActivated">El dispositivo Adobe ACS no está activado.</string>
+    <string name="revokeACSGettingDeviceCredentialsOK">Consulta las credenciales del dispositivo Adobe ACS.</string>
+    <string name="revokeACSLoan">Revocando préstamo a través de Adobe ACS…</string>
+    <string name="revokeACSLoanNotReturnable">Adobe ACS estima que este préstamo no es devoluble.</string>
+    <string name="revokeACSLoanNotSupported">Adobe ACS no es compatible.</string>
+    <string name="revokeACSTimedOut">Tiempo de espera agotado para Adobe ACS.</string>
+    <string name="revokeBookACSConnectorFailed">Los comandos de Adobe ACS fallaron con el código de error %1$s.</string>
+    <string name="revokeBookACSFailed">Ejecutar los comandos de Adobe ACS falló con una excepción.</string>
+    <string name="revokeBookCancelled">La revocación fue cancelada.</string>
+    <string name="revokeBookDatabaseLookup">Apertura de la entrada de la base de datos del libro…</string>
+    <string name="revokeBookDatabaseLookupFailed">Sin abrir la base de datos del libro.</string>
+    <string name="revokeBookDatabaseLookupOK">Entrada de base de datos de libros abierta con éxito.</string>
+    <string name="revokeCredentialsRequired">Se necesitan credenciales, pero no se proporcionó ninguna.</string>
+    <string name="revokeDeleteBook">Eliminar la entrada de la base de datos de libros.</string>
+    <string name="revokeDeleteBookFailed">No se pudo eliminar la entrada de la base de datos del libro.</string>
+    <string name="revokeFormat">Realizar la revocación de formato específico…</string>
+    <string name="revokeFormatNothingToDo">No se necesitan operaciones específicas para este formato.</string>
+    <string name="revokeFormatSpecific">Realizar la revocación del formato %1$s…</string>
+    <string name="revokeNotRevocable">¡El libro no es revocable!</string>
+    <string name="revokeServerNotify">Notificar al servidor la revocación…</string>
+    <string name="revokeServerNotifyFeedCorrupt">El servidor devolvió un feed con una entrada corrupta.</string>
+    <string name="revokeServerNotifyFeedEmpty">El servidor devolvió un feed de revocación vacío.</string>
+    <string name="revokeServerNotifyFeedFailed">No se pudo procesar el feed de revocación del servidor.</string>
+    <string name="revokeServerNotifyFeedOK">Feed de revocación del servidor procesado correctamente.</string>
+    <string name="revokeServerNotifyFeedTimedOut">Se agotó el tiempo de espera del feed de revocación del servidor.</string>
+    <string name="revokeServerNotifyFeedWithGroups">El servidor devolvió un feed de revocación con grupos.</string>
+    <string name="revokeServerNotifyNotRevocable">Un préstamo con disponibilidad %1$s no es revocable.</string>
+    <string name="revokeServerNotifyNoURI">No se proporcionó la URI de notificación del servidor.</string>
+    <string name="revokeServerNotifyProcessingFeed">Procesando el feed de revocación del servidor…</string>
+    <string name="revokeServerNotifySavingEntry">Guardando la entrada del feed de revocación…</string>
+    <string name="revokeServerNotifySavingEntryFailed">No se pudo guardar el feed de revocación del servidor.</string>
+    <string name="revokeServerNotifyURI">Notificar el servidor a través de %1$s.</string>
+    <string name="revokeStarted">La revocación comenzó…</string>
+</resources>

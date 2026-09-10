@@ -42,3 +42,11 @@ commit.txt
 jreleaser.toml
 ktlint.jar
 org.thepalaceproject.webpub.cmdline-1.2.0-main.jar
+
+# Localization pipeline: out/ is regenerable (extract/translate/qa);
+# overrides/ is the non-regenerable correction layer and IS versioned.
+localization/out/
+localization/__pycache__/
+
+/build
+/.kotlin

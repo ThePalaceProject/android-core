@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="logoutClearingBookDatabase">Effacer la base de données du livre…</string>
+    <string name="logoutClearingBookDatabaseFailed">L\'effacement de la base de données du livre a échoué !</string>
+    <string name="logoutUpdatingOpdsEntry">Mise à jour de l\'entrée OPDS pour le livre %1$s…</string>
+    <string name="logoutOPDSFeedTimedOut">Délai d\'attente dépassé pour le flux OPDS du serveur.</string>
+    <string name="logoutNoAlternateLinkInDatabase">Aucun autre lien disponible dans la base de données.</string>
+    <string name="logoutOPDSFeedFailed">Impossible de récupérer l\'entrée OPDS.</string>
+    <string name="logoutOPDSFeedCorrupt">Le serveur a retourné un flux avec une entrée corrompue.</string>
+    <string name="logoutOPDSFeedEmpty">Le serveur a retourné un flux de révocation vide.</string>
+    <string name="logoutOPDSFeedWithGroups">Le serveur a retourné un flux de révocation avec des groupes.</string>
+    <string name="logoutDeactivatingDeviceAdobe">Désactivation du périphérique…</string>
+    <string name="logoutDeactivatingDeviceAdobeDeactivated">Dispositif désactivé.</string>
+    <string name="logoutDeactivatingDeviceAdobeFailed">La désactivation du périphérique a échoué : %1$s (%2$s)</string>
+    <string name="logoutDeactivatingDeviceAdobeNotActive">Le périphérique ne semble pas être activé.</string>
+    <string name="logoutDeactivatingDeviceAdobeUnsupported">Adobe ACS DRM n\'est pas pris en charge dans cette version de l\'application.</string>
+    <string name="logoutDeviceDeactivationPostDeviceManager">Contact du gestionnaire de périphérique…</string>
+    <string name="logoutDeviceDeactivationPostDeviceManagerFinished">Envoyé à l\'URI du gestionnaire d\'appareils.</string>
+    <string name="logoutNotLoggedIn">Compte ne semble pas être connecté!</string>
+    <string name="logoutStarted">Déconnexion…</string>
+    <string name="logoutConfirm">Voulez-vous vraiment vous déconnecter ?</string>
+</resources>

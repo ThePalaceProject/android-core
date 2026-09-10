@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="audio_book_player">Reproductor de audiolibros</string>
+    <string name="audio_book_player_bookmark_adding">Añadiendo marcador…</string>
+    <string name="audio_book_player_bookmark_added">Marcador añadido</string>
+    <string name="audio_book_player_bookmark_already_added">Un marcador ya ha sido guardado en esta ubicación.</string>
+    <string name="audio_book_player_bookmark_error_adding">Hubo un error al agregar el marcador</string>
+    <string name="audio_book_player_do_keep">Sigue</string>
+    <string name="audio_book_player_do_return">Regreso</string>
+    <string name="audio_book_player_error_book_open">Incapaz de abrir el libro de audio</string>
+    <string name="audio_book_player_error_engine_open">Incapaz de inicializar el motor de audio</string>
+    <string name="audio_book_player_return_question">¿Te gustaría devolverlo?</string>
+    <string name="audio_book_player_return_title">Su audiolibro ha terminado</string>
+    <string name="audio_book_player_toc_title">Cuadro de contenidos</string>
+    <string name="audio_book_player_ok">OK</string>
+    <string name="audio_book_player_details">Detalles</string>
+    <string name="audio_book_manifest_parse_error">El manifiesto del audiolibro no se pudo analizar.</string>
+    <string name="audio_book_manifest_download_error">El manifiesto de audiolibros no se puede descargar.</string>
+    <string name="audio_book_manifest_license_error">Las comprobaciones de licencia del manifiesto del audiolibro fallaron.</string>
+    <string name="audio_book_battery_warning">Está escuchando un audiolibro con el optimizador de batería de Android activado en su dispositivo.\nEn algunos dispositivos, esto puede hacer que los audiolibros dejen de reproducirse cuando la aplicación está en segundo plano.\nSi su dispositivo está afectado por este problema, visite la pestaña Ajustes de la aplicación para desactivar el optimizador de baterías.</string>
+    <string name="audio_book_battery_confirm">No me vuelvas a hablar de esto.</string>
+    <string name="audio_book_dismiss">OK</string>
+</resources>

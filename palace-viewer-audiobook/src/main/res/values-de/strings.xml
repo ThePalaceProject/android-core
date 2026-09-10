@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="audio_book_player">Hörbuch-Player</string>
+    <string name="audio_book_player_bookmark_adding">Lesezeichen hinzufügen…</string>
+    <string name="audio_book_player_bookmark_added">Lesezeichen hinzugefügt</string>
+    <string name="audio_book_player_bookmark_already_added">Ein Lesezeichen wurde bereits an diesem Ort gespeichert.</string>
+    <string name="audio_book_player_bookmark_error_adding">Es gab einen Fehler beim Hinzufügen des Lesezeichens</string>
+    <string name="audio_book_player_do_keep">Bleiben</string>
+    <string name="audio_book_player_do_return">Rückkehr</string>
+    <string name="audio_book_player_error_book_open">Hörbuch nicht öffnen</string>
+    <string name="audio_book_player_error_engine_open">Audio Engine kann nicht initialisiert werden</string>
+    <string name="audio_book_player_return_question">Möchten Sie es zurückgeben?</string>
+    <string name="audio_book_player_return_title">Ihr Hörbuch ist fertig.</string>
+    <string name="audio_book_player_toc_title">Inhaltsverzeichnis</string>
+    <string name="audio_book_player_ok">OK</string>
+    <string name="audio_book_player_details">Einzelheiten</string>
+    <string name="audio_book_manifest_parse_error">Das Hörbuchmanifest konnte nicht analysiert werden.</string>
+    <string name="audio_book_manifest_download_error">Das Hörbuchmanifest konnte nicht heruntergeladen werden.</string>
+    <string name="audio_book_manifest_license_error">Die Lizenzprüfungen des Hörbuchmanifests sind fehlgeschlagen.</string>
+    <string name="audio_book_battery_warning">Sie hören ein Hörbuch mit dem auf Ihrem Gerät aktivierten Android-Batterieoptimierer.\n\nAuf einigen Geräten kann dies dazu führen, dass Hörbücher nicht mehr gespielt werden, wenn sich die App im Hintergrund befindet.\n\nWenn Ihr Gerät von diesem Problem betroffen ist, besuchen Sie bitte die Registerkarte Einstellungen der App, um den Batterieoptimierer auszuschalten.</string>
+    <string name="audio_book_battery_confirm">Erzähl mir nicht noch einmal davon.</string>
+    <string name="audio_book_dismiss">OK</string>
+</resources>

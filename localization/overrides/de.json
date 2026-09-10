@@ -1,0 +1,199 @@
+{
+  "palace-accessibility/src/main/res/values/strings.xml": {
+    "accessBookReachedLoanLimit": "Das Buch '%1$s' konnte nicht ausgeliehen werden, weil Sie Ihr Ausleihlimit erreicht haben"
+  },
+  "palace-accounts-registry/src/main/res/values/strings.xml": {
+    "resolving": "Account Provider wird aufgelöst…",
+    "resolvingAuthDocument": "Auflösung des Authentifizierungsdokuments…"
+  },
+  "palace-lcp/src/main/res/values/strings.xml": {
+    "dialog_manual_passphrase_title": "LCP-Passphrase eingeben"
+  },
+  "palace-ui-errorpage/src/main/res/values/strings.xml": {
+    "errorSendReport": "An Support senden"
+  },
+  "palace-ui/src/main/res/values/strings.xml": {
+    "accountCardCreatorSignUp": "Karte erstellen",
+    "accountCreateCard": "Karte erstellen",
+    "accountCustomOPDS": "URL des benutzerdefinierten OPDS-Feeds",
+    "accountPasswordShow": "%1$s anzeigen",
+    "accountRegistryCreating": "Eine Bibliothek erstellen…",
+    "accountRegistryRetrieving": "Bibliotheken aus der Registry abrufen…",
+    "accountRegistrySelect": "Bitte wählen Sie eine Bibliothek…",
+    "accountReportIssue": "Melden Sie ein Problem…",
+    "accountSAML20NoPatronInfo": "Die Nutzerinformationen konnten nicht von der URI abgerufen werden: %1$s",
+    "accountSearchHint": "Konten suchen…",
+    "accountSyncBookmarks": "Lesezeichen synchronisieren",
+    "accountSyncBookmarksDescription": "Aktivieren Sie die Synchronisierung der Lesezeichen, um Ihre Leseposition und Lesezeichen auf allen Geräten zu speichern. Dies muss auf allen Geräten erfolgen, auf denen Sie auf Palace zugreifen, um die Leseposition zu synchronisieren.",
+    "migrationFailure": "Es gab ein oder mehrere Probleme bei der Migration Ihrer Daten…",
+    "tabHolds": "Reservierungen"
+  },
+  "palace-ui/src/main/res/values/stringsBookRevoke.xml": {
+    "revokeACSDeleteRights": "Berechtigungsinformationen von Adobe ACS werden gelöscht…",
+    "revokeACSExecute": "Adobe-ACS-Widerrufsbefehle werden ausgeführt…",
+    "revokeACSGettingDeviceCredentials": "Geräteanmeldeinformationen von Adobe ACS abrufen…",
+    "revokeACSLoan": "Widerruf der Ausleihe über Adobe ACS…",
+    "revokeACSLoanNotReturnable": "Adobe ACS geht davon aus, dass diese Ausleihe nicht zurückgegeben werden kann.",
+    "revokeACSTimedOut": "Zeitüberschreitung beim Warten auf Adobe ACS.",
+    "revokeBookDatabaseLookup": "Eintrag in der Buchdatenbank wird geöffnet…",
+    "revokeFormat": "Durchführen eines formatspezifischen Widerrufs…",
+    "revokeFormatSpecific": "Widerruf für Format %1$s…",
+    "revokeServerNotify": "Benachrichtigung des Servers über den Widerruf…",
+    "revokeServerNotifyFeedFailed": "Fehler beim Verarbeiten des Widerrufs-Feeds des Servers.",
+    "revokeServerNotifyFeedOK": "Widerrufs-Feed des Servers erfolgreich verarbeitet.",
+    "revokeServerNotifyFeedTimedOut": "Zeitüberschreitung beim Warten auf den Widerrufs-Feed des Servers.",
+    "revokeServerNotifyNotRevocable": "Eine Ausleihe mit Verfügbarkeit %1$s ist nicht widerrufbar.",
+    "revokeServerNotifyProcessingFeed": "Widerrufs-Feed des Servers wird verarbeitet…",
+    "revokeServerNotifySavingEntry": "Widerrufs-Feed-Eintrag wird gespeichert…",
+    "revokeStarted": "Widerruf begonnen…"
+  },
+  "palace-ui/src/main/res/values/stringsBoot.xml": {
+    "bootFailedGeneric": "Wir haben ein Problem festgestellt. Bitte prüfen Sie Ihre Verbindung oder schließen und öffnen Sie die App erneut."
+  },
+  "palace-ui/src/main/res/values/stringsCatalog.xml": {
+    "bookReachedLoanLimitDialogMessage": "Sie haben Ihr Ausleihlimit erreicht. Sie können nichts weiter ausleihen, bis Sie etwas zurückgeben.",
+    "bookReachedLoanLimitDialogTitle": "Ausleihlimit erreicht.",
+    "catalogAccessibilityAccountSelection": "Kontoauswahl-Button",
+    "catalogAccessibilityBookBorrow": "Ausleihen-Button. Tippen Sie auf diese Schaltfläche, um „%1$s“ auszuleihen.",
+    "catalogAccessibilityBookDownload": "Herunterladen-Button. Tippen Sie auf diese Schaltfläche, um \"%1$s\" herunterzuladen.",
+    "catalogAccessibilityBookDownloadCancel": "Abbrechen-Button. Tippen Sie auf diese Schaltfläche, um das Herunterladen von \"%1$s\" abzubrechen.",
+    "catalogAccessibilityBookErrorDetails": "Details-Button",
+    "catalogAccessibilityBookErrorRetry": "Wiederholen-Schaltfläche",
+    "catalogAccessibilityBookListen": "Hören-Button. Tippen Sie auf diese Schaltfläche, um \"%1$s\" zu hören.",
+    "catalogAccessibilityBookManageHold": "Reservierung stornieren-Button. Tippen Sie auf diese Schaltfläche, um die Reservierung für „%1$s“ zu stornieren.",
+    "catalogAccessibilityBookPlaceHold": "Reservieren-Button. Tippen Sie auf diese Schaltfläche, um eine Reservierung für „%1$s“ aufzugeben.",
+    "catalogAccessibilityBookPreviewPlay": "Vorschau-Button. Tippen Sie auf diese Schaltfläche, um eine Vorschau von \"%1$s\" zu öffnen.",
+    "catalogAccessibilityBookPreviewRead": "Vorschau-Button. Tippen Sie auf diese Schaltfläche, um eine Vorschau von \"%1$s\" zu öffnen.",
+    "catalogAccessibilityBookRead": "Lesen-Button. Tippen Sie auf diese Schaltfläche, um \"%1$s\" zu lesen.",
+    "catalogAccessibilityBookRevokeLoan": "Zurückgeben-Button. Tippen Sie auf diese Schaltfläche, um \"%1$s\" zurückzugeben.",
+    "catalogAccessibilityBookSync": "Synchronisieren-Schaltfläche",
+    "catalogAccessibilityCloseCheckoutDrawer": "Checkout Drawer schließen",
+    "catalogAccessibilityGoBack": "Zurück-Schaltfläche",
+    "catalogAccessibilityOpenCheckoutDrawer": "Checkout Drawer öffnen",
+    "catalogAccessibilitySeriesLink": "\"%1$s\". Tippen Sie, um alle Einträge der Serie zu sehen.",
+    "catalogAccounts": "Wählen Sie einen anderen Bibliothekskatalog…",
+    "catalogBookAvailabilityHeldIndefinite": "Sie haben dieses Buch reserviert.",
+    "catalogBookAvailabilityLoanedTimed": "Sie haben dieses Buch für %1$s ausgeliehen.",
+    "catalogBookAvailabilityOpenAccess": "Dieses Buch dürfen Sie behalten.",
+    "catalogBookAvailabilityReservedIndefinite": "Sie haben dieses Buch reserviert.",
+    "catalogBookCellBorrowingUntil": "Fällig am %1$s",
+    "catalogBookDetailBorrowedUntil": "Ausgeliehen bis",
+    "catalogBookDetailBorrowingFor": "Ausleihe für",
+    "catalogBookPreviewAudioBook": "Beispiel abspielen",
+    "catalogCancelling": "Annullierung…",
+    "catalogDownload": "Herunterladen",
+    "catalogDownloading": "Wird heruntergeladen…",
+    "catalogGet": "Ausleihen",
+    "catalogHoldCannotCancel": "Diese Reservierung kann nicht storniert werden.",
+    "catalogManageHold": "Reservierung stornieren",
+    "catalogNetworkUnavailable0": "Sie sind offline.",
+    "catalogPlaceHold": "Reservieren",
+    "catalogReportIssue": "Problem melden…",
+    "catalogRequesting": "Wird angefordert…"
+  },
+  "palace-ui/src/main/res/values/stringsDebug.xml": {
+    "debugDRMAdobeIDResetConfirmation": "Sind Sie sicher, dass Sie Ihre Adobe ID für die Bibliothek '%1$s' zurücksetzen möchten? Beim Zurücksetzen der Adobe ID werden alle Ihre Ausleihen entfernt und Sie abgemeldet."
+  },
+  "palace-ui/src/main/res/values/stringsFeed.xml": {
+    "catalogFeedLoading": "Feed wird geladen…",
+    "feedShow": "Anzeigen",
+    "feedShowOnLoan": "Ausgeliehen",
+    "feedTitleHolds": "Reservierungen",
+    "feedWithGroupsEmptyHolds": "Wenn Sie ein Buch aus dem Katalog reservieren, wird es hier angezeigt. Schauen Sie hier von Zeit zu Zeit nach, ob Ihr Buch zum Download bereitsteht."
+  },
+  "palace-ui/src/main/res/values/stringsLogin.xml": {
+    "loginAuthRequired": "Eine Authentifizierung ist erforderlich. Fortsetzung…",
+    "loginCheckingAuthenticationRequirement": "Authentifizierungsanforderung wird geprüft…",
+    "loginDeviceActivating": "Es wird versucht, das Gerät zu aktivieren…",
+    "loginDeviceActivationPostDeviceManager": "Gerätemanager kontaktieren…",
+    "loginDeviceActivationPostDeviceManagerDone": "An die URI des Gerätemanagers übermittelt.",
+    "loginErrorInvalidCredentials": "Ihr Login ist falsch. Bitte versuchen Sie es noch einmal.",
+    "loginErrorNoPatronURI": "Es ist keine URI für Nutzereinstellungen definiert!",
+    "loginErrorPatronSettingsParseError": "Die vom Server gelieferten Nutzereinstellungen konnten nicht verarbeitet werden!",
+    "loginPatronSettingsOK": "Nutzereinstellungen empfangen",
+    "loginPatronSettingsRequesting": "Nutzereinstellungen werden angefordert…"
+  },
+  "palace-ui/src/main/res/values/stringsLogout.xml": {
+    "logoutClearingBookDatabase": "Löschen der Buchdatenbank…",
+    "logoutConfirm": "Sind Sie sicher, dass Sie sich abmelden möchten?",
+    "logoutDeactivatingDeviceAdobe": "Gerät wird deaktiviert…",
+    "logoutDeviceDeactivationPostDeviceManager": "Gerätemanager kontaktieren…",
+    "logoutDeviceDeactivationPostDeviceManagerFinished": "An die URI des Gerätemanagers übermittelt.",
+    "logoutOPDSFeedFailed": "OPDS-Eintrag konnte nicht abgerufen werden.",
+    "logoutOPDSFeedTimedOut": "Zeitüberschreitung beim Warten auf den OPDS-Feed des Servers",
+    "logoutStarted": "Abmeldung…",
+    "logoutUpdatingOpdsEntry": "Aktualisierung des OPDS-Eintrags für Buch %1$s…"
+  },
+  "palace-ui/src/main/res/values/stringsNotifications.xml": {
+    "notification_channel_description_loans": "Benachrichtigungen zu Ihren Ausleihen.",
+    "notification_channel_id_loans": "channel_id_loans",
+    "notification_channel_id_reservations": "channel_id_reservations",
+    "notification_channel_name_loans": "Ausleihen",
+    "notification_channel_name_reservations": "Reservierungen"
+  },
+  "palace-ui/src/main/res/values/stringsProfiles.xml": {
+    "profileAccountCreatingAnAccountProviderDescription": "Erstellen einer Kontoanbieterbeschreibung…",
+    "profileAccountCreationCreatingAccount": "Erstellen eines Accounts…",
+    "profileAccountCreationResolvingAccountProvider": "Account Provider wird aufgelöst…",
+    "profileAccountDeleting": "Konto entfernen…",
+    "profileAccountFetchingOPDSFeed": "OPDS-Feed wird abgerufen…",
+    "profileAccountFetchingOPDSFeedFailed": "Das Abrufen des OPDS-Feeds ist fehlgeschlagen!",
+    "profileAccountFindingAuthDocumentURI": "Suche nach der URI des Authentifizierungsdokuments…",
+    "profileAccountParsingOPDSFeed": "OPDS-Feed wird analysiert…",
+    "profileAccountParsingOPDSFeedFailed": "Das Analysieren des OPDS-Feeds ist fehlgeschlagen!",
+    "profileAccountSearchingFeedForAuthenticationDocument": "Der Feed wird nach dem Authentifizierungsdokument durchsucht…"
+  },
+  "palace-ui/src/main/res/values/stringsSettings.xml": {
+    "settingsAccessibilityAccountSelect": "Tippen, um \"%1$s\" als aktuelle Bibliothek festzulegen. Lange drücken zum Entfernen.",
+    "settingsAccessibilityAccountSelectCurrent": "\"%1$s\", Ihre aktuelle Bibliothek. Lange drücken zum Entfernen.",
+    "settingsAccessibilitySearchButton": "Bibliothekssuche-Schaltfläche",
+    "settingsAudiobooksSkipBackwards": "Rückwärts springen",
+    "settingsAudiobooksSkipEntries": [
+      "15 Sekunden",
+      "30 Sekunden",
+      "45 Sekunden",
+      "1 Minute"
+    ],
+    "settingsAudiobooksSkipForwards": "Vorwärts springen",
+    "settingsCustomOPDS": "Benutzerdefinierter OPDS-Feed",
+    "settingsCustomOPDSURL": "URL des benutzerdefinierten Feeds…",
+    "settingsDevAddCustomOpdsFeed": "Benutzerdefinierten OPDS-Feed hinzufügen",
+    "settingsDevCacheDir": "Cache-Verzeichnis anzeigen",
+    "settingsDevCardCreatorUserNewYork": "Card Creator: Vorgeben, dass der Benutzer in New York ist",
+    "settingsDevCrashlyticsCurrentUserId": "Aktuelle Crashlytics-Benutzerkennung",
+    "settingsDevEnableManualLCPPassphrase": "Manuelle LCP-Passphrase aktivieren",
+    "settingsDevEnableTimeTracking": "Time-Tracking aktivieren",
+    "settingsDevSendAnalytics": "Analytics senden",
+    "settingsDevSyncAccounts": "Konten synchronisieren",
+    "settingsReportIssue": "Melden Sie ein Problem…",
+    "settingsSyncBookmarks": "Lesezeichen synchronisieren",
+    "settingsTapToDebug": "Debug-Modus in %1$d…"
+  },
+  "palace-ui/src/main/res/values/stringsSplash.xml": {
+    "accessSplashTitle": "Palace"
+  },
+  "palace-viewer-audiobook/src/main/res/values/strings.xml": {
+    "audio_book_player_bookmark_added": "Lesezeichen hinzugefügt",
+    "audio_book_player_bookmark_adding": "Lesezeichen hinzufügen…",
+    "audio_book_player_return_title": "Ihr Hörbuch ist fertig."
+  },
+  "palace-viewer-epub-readium2/src/main/res/values/strings.xml": {
+    "reader_bookmark_added": "Lesezeichen hinzugefügt",
+    "reader_bookmark_adding": "Lesezeichen hinzufügen…",
+    "reader_position_title": "Leseposition synchronisieren"
+  },
+  "palace-viewer-pdf-pdfjs/src/main/res/values/strings.xml": {
+    "content_description_back": "Zurück",
+    "viewer_position_title": "Leseposition synchronisieren"
+  },
+  "palace-viewer-preview/src/main/res/values/strings.xml": {
+    "bookPreviewAccessibilityBack": "Zurück",
+    "bookPreviewAccessibilityBackward30": "Zurück um 30 Sekunden",
+    "bookPreviewAccessibilityForward30": "Vorwärts um 30 Sekunden",
+    "bookPreviewAccessibilityMinutes": "Minuten",
+    "bookPreviewAccessibilityPlay": "Abspielen",
+    "bookPreviewAccessibilitySecond": "Sekunde",
+    "bookPreviewAccessibilityTimeRemaining": "%s verbleibend",
+    "bookPreviewFailedTitle": "\"Buchvorschau-Download fehlgeschlagen"
+  }
+}

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="debugDRMAdobeIDResetReset">Ripristino</string>
+    <string name="debugDRMAdobeIDReset">Ripristina Adobe ID</string>
+    <string name="debugDRMAdobeIDResetConfirmTitle">Reimpostare Adobe ID?</string>
+    <string name="debugDRMAdobeIDResetWithAccount">Toccare il pulsante qui sotto reimposterà il suo ID Adobe per la biblioteca \'%1$s\'.</string>
+    <string name="debugDRMAdobeIDResetConfirmation">È sicuro di voler ripristinare il suo ID Adobe per la biblioteca \'%1$s\'? Ripristinando l\'ID Adobe verranno rimossi tutti i suoi prestiti e sarà disconnesso.</string>
+</resources>

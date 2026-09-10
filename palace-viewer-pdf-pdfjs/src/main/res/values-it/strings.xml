@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="Dismiss">Oggetto</string>
+    <string name="accessibility_back">Chiuda il libro e torni indietro.</string>
+    <string name="accessibility_settings_close">Chiuda il menu delle impostazioni</string>
+    <string name="accessibility_settings_open">Aprire il menu impostazioni</string>
+    <string name="accessibility_toc_open">Apra la tabella dei contenuti e la schermata dei segnalibri</string>
+    <string name="accessibility_toc_close">Chiuda la tabella dei contenuti e la schermata dei segnalibri</string>
+    <string name="content_description_back">Indietro</string>
+    <string name="settings_title">Impostazioni impostazioni</string>
+    <string name="table_of_contents_empty_message">Nessuna tabella di contenuto disponibile per questo lavoro</string>
+    <string name="table_of_contents_title">Tabella dei contenuti</string>
+    <string name="viewer_position_message">Vuole passare alla pagina su cui ha lasciato?</string>
+    <string name="viewer_position_move">Muovetevi</string>
+    <string name="viewer_position_stay">Resta qui</string>
+    <string name="viewer_position_title">Sincronizza posizione di lettura</string>
+</resources>

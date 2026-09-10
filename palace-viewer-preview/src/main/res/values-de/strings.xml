@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="Dismiss">Entlassung</string>
+    <string name="bookPreviewPlayerInitialTime">00:00:00</string>
+    <string name="bookPreviewPlayerSeek30">30</string>
+    <string name="bookPreviewFailedTitle">\"Buchvorschau-Download fehlgeschlagen</string>
+    <string name="bookPreviewFailedMessage">Es gab einen Fehler beim Herunterladen der Vorschau dieses Buches. Bitte versuchen Sie es später noch einmal.</string>
+    <string name="bookPreviewAccessibilityBack">Zurück</string>
+    <string name="bookPreviewAccessibilityForward30">Vorwärts um 30 Sekunden</string>
+    <string name="bookPreviewAccessibilityBackward30">Zurück um 30 Sekunden</string>
+    <string name="bookPreviewAccessibilityPlay">Abspielen</string>
+    <string name="bookPreviewAccessibilityPause">Pause</string>
+    <string name="bookPreviewAccessibilityCover">Buchumschlag</string>
+    <string name="bookPreviewAccessibilityTimeCurrent">%s gespielt</string>
+    <string name="bookPreviewAccessibilityTimeRemaining">%s verbleibend</string>
+    <string name="bookPreviewAccessibilityHours">Stunden</string>
+    <string name="bookPreviewAccessibilityMinutes">Minuten</string>
+    <string name="bookPreviewAccessibilitySeconds">Sekunden</string>
+    <string name="bookPreviewAccessibilityHour">Stunde</string>
+    <string name="bookPreviewAccessibilityMinute">Minute</string>
+    <string name="bookPreviewAccessibilitySecond">Sekunde</string>
+</resources>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="Dismiss">Rejet</string>
+    <string name="bookPreviewPlayerInitialTime">00:00:00</string>
+    <string name="bookPreviewPlayerSeek30">30</string>
+    <string name="bookPreviewFailedTitle">\"Le téléchargement de l\'aperçu du livre a échoué</string>
+    <string name="bookPreviewFailedMessage">Une erreur a été commise lors du téléchargement de l\'aperçu de ce livre. Veuillez réessayer plus tard.</string>
+    <string name="bookPreviewAccessibilityBack">Retour</string>
+    <string name="bookPreviewAccessibilityForward30">Avance rapide de 30 secondes</string>
+    <string name="bookPreviewAccessibilityBackward30">Reculer de 30 secondes</string>
+    <string name="bookPreviewAccessibilityPlay">Lecture</string>
+    <string name="bookPreviewAccessibilityPause">Pause</string>
+    <string name="bookPreviewAccessibilityCover">Couverture du livre</string>
+    <string name="bookPreviewAccessibilityTimeCurrent">%s écoulé</string>
+    <string name="bookPreviewAccessibilityTimeRemaining">%s restant</string>
+    <string name="bookPreviewAccessibilityHours">Heures</string>
+    <string name="bookPreviewAccessibilityMinutes">Minutes</string>
+    <string name="bookPreviewAccessibilitySeconds">Secondes</string>
+    <string name="bookPreviewAccessibilityHour">Heure</string>
+    <string name="bookPreviewAccessibilityMinute">Minute</string>
+    <string name="bookPreviewAccessibilitySecond">Seconde</string>
+</resources>

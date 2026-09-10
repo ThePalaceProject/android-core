@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="errorDetails">Detalles</string>
+    <string name="errorDetailsTitle">Detalles del error</string>
+    <string name="errorSendReport">Enviar a soporte</string>
+    <string name="errorStepsTitle">Pasos</string>
+    <string name="errorTitle">Aquí está el registro de error creado por su problema:</string>
+</resources>

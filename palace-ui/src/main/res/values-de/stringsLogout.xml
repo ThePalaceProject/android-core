@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="logoutClearingBookDatabase">Löschen der Buchdatenbank…</string>
+    <string name="logoutClearingBookDatabaseFailed">Das Löschen der Buchdatenbank ist fehlgeschlagen!</string>
+    <string name="logoutUpdatingOpdsEntry">Aktualisierung des OPDS-Eintrags für Buch %1$s…</string>
+    <string name="logoutOPDSFeedTimedOut">Zeitüberschreitung beim Warten auf den OPDS-Feed des Servers</string>
+    <string name="logoutNoAlternateLinkInDatabase">Kein alternativer Link in der Datenbank verfügbar.</string>
+    <string name="logoutOPDSFeedFailed">OPDS-Eintrag konnte nicht abgerufen werden.</string>
+    <string name="logoutOPDSFeedCorrupt">Server hat einen Feed mit einem beschädigten Eintrag zurückgegeben.</string>
+    <string name="logoutOPDSFeedEmpty">Der Server hat einen leeren Widerrufsfeed zurückgegeben.</string>
+    <string name="logoutOPDSFeedWithGroups">Server hat einen Widerrufs-Feed mit Gruppen zurückgegeben.</string>
+    <string name="logoutDeactivatingDeviceAdobe">Gerät wird deaktiviert…</string>
+    <string name="logoutDeactivatingDeviceAdobeDeactivated">Deaktivierte Einrichtung.</string>
+    <string name="logoutDeactivatingDeviceAdobeFailed">Deaktivieren des Geräts fehlgeschlagen: %1$s (%2$s)</string>
+    <string name="logoutDeactivatingDeviceAdobeNotActive">Das Gerät scheint nicht aktiviert zu sein.</string>
+    <string name="logoutDeactivatingDeviceAdobeUnsupported">Adobe ACS DRM wird in dieser Version der Anwendung nicht unterstützt.</string>
+    <string name="logoutDeviceDeactivationPostDeviceManager">Gerätemanager kontaktieren…</string>
+    <string name="logoutDeviceDeactivationPostDeviceManagerFinished">An die URI des Gerätemanagers übermittelt.</string>
+    <string name="logoutNotLoggedIn">Der Account scheint nicht angemeldet zu sein!</string>
+    <string name="logoutStarted">Abmeldung…</string>
+    <string name="logoutConfirm">Sind Sie sicher, dass Sie sich abmelden möchten?</string>
+</resources>
