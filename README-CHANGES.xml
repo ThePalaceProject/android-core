@@ -1464,7 +1464,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-09-10T18:45:56+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.32.0">
+    <c:release date="2026-09-14T09:51:00+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.32.0">
       <c:changes>
         <c:change date="2026-08-17T00:00:00+00:00" summary="Replace Picasso with Glide.">
           <c:tickets>
@@ -1486,9 +1486,19 @@
             <c:ticket id="PP-1881"/>
           </c:tickets>
         </c:change>
-        <c:change date="2026-09-10T18:45:56+00:00" summary="Remove Transifex, switch to custom translations.">
+        <c:change date="2026-09-10T00:00:00+00:00" summary="Remove Transifex, switch to custom translations.">
           <c:tickets>
             <c:ticket id="PP-5095"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-09-14T00:00:00+00:00" summary="Add MathJax accessibility support.">
+          <c:tickets>
+            <c:ticket id="PP-4535"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-09-14T09:51:00+00:00" summary="Add print page navigation in EPUBs.">
+          <c:tickets>
+            <c:ticket id="PP-4530"/>
           </c:tickets>
         </c:change>
       </c:changes>
