@@ -69,10 +69,8 @@ org.thepalaceproject.app.assets.palace=${ASSETS_PATH}
 EOF
 
 #------------------------------------------------------------------------
-# Handle transifex.
+# Bundle the registry into the app.
 #
 
-.ci-local/transifex.sh ||
-  fatal "Transifex failed"
 .ci-local/registry.sh ||
   fatal "Registry failed"
