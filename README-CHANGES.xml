@@ -1508,8 +1508,50 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-09-14T13:38:35+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.33.0">
-      <c:changes/>
+    <c:release date="2026-09-21T08:19:46+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.32.1">
+      <c:changes>
+        <c:change date="2026-08-17T00:00:00+00:00" summary="Replace Picasso with Glide.">
+          <c:tickets>
+            <c:ticket id="PP-4857"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-08-19T00:00:00+00:00" summary="Reimplement settings screen in preparation for new account switcher.">
+          <c:tickets>
+            <c:ticket id="PP-4941"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-08-21T00:00:00+00:00" summary="Fix LCP PDFs.">
+          <c:tickets>
+            <c:ticket id="PP-4455"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-09-09T00:00:00+00:00" summary="Replace account picker and update visuals of the library list screen.">
+          <c:tickets>
+            <c:ticket id="PP-1881"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-09-10T00:00:00+00:00" summary="Remove Transifex, switch to custom translations.">
+          <c:tickets>
+            <c:ticket id="PP-5095"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-09-14T00:00:00+00:00" summary="Add MathJax accessibility support.">
+          <c:tickets>
+            <c:ticket id="PP-4535"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-09-14T00:00:00+00:00" summary="Add print page navigation in EPUBs.">
+          <c:tickets>
+            <c:ticket id="PP-4530"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-09-14T00:00:00+00:00" summary="Fix an issue causing some Overdrive EPUBs to fail to open.">
+          <c:tickets>
+            <c:ticket id="PP-5116"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-09-21T08:19:46+00:00" summary="Fix an EPUB reader device rotation issue from 1.32.0."/>
+      </c:changes>
     </c:release>
   </c:releases>
   <c:ticket-systems>
