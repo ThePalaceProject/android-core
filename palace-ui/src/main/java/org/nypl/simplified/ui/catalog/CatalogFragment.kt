@@ -29,7 +29,6 @@ import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountLoginState
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.api.Book
-import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
 import org.nypl.simplified.books.book_registry.BookRegistryReadableType
@@ -704,66 +703,12 @@ sealed class CatalogFragment :
     book: Book,
     bookFormat: BookFormat
   ) {
-    if (this.adobeWiproDRMMigrationRequired(book, bookFormat)) {
-      this.adobeWiproDRMMigrationExecuteNow(book, bookFormat)
+    if (CatalogWIPROMigration.isMigrationRequired(book, bookFormat)) {
+      CatalogWIPROMigration.executeNow(book, bookFormat)
       return
     }
 
     this.onBookRequestViewerOpenNow(book, bookFormat)
-  }
-
-  private fun adobeWiproDRMMigrationExecuteNow(
-    book: Book,
-    bookFormat: BookFormat
-  ) {
-  }
-
-  /**
-   * Check to see if we need to perform a "migration" for Adobe/WIPRO.
-   *
-   * Essentially: WIPRO took over from Adobe, and this meant new binaries and a new server. If
-   * the current application has a device activation that was produced with pre-WIPRO binaries,
-   * then we must log out, log back in (to activate again), and then re-download the current book.
-   * We check to see if this migration is necessary by checking the version number that was
-   * recorded in the post-activation credentials. We treat the lack of a version number as being
-   * "pre-WIPRO".
-   */
-
-  private fun adobeWiproDRMMigrationRequired(
-    book: Book,
-    bookFormat: BookFormat
-  ): Boolean {
-    val drmInfo = bookFormat.drmInformation
-    if (drmInfo !is BookDRMInformation.ACS) {
-      return false
-    }
-
-    val services =
-      Services.serviceDirectory()
-    val books =
-      services.requireService(BooksControllerType::class.java)
-    val profiles =
-      services.requireService(ProfilesControllerType::class.java)
-
-    val accountID =
-      book.account
-    val account =
-      profiles
-        .profileCurrent()
-        .account(accountID)
-
-    val credentials = account.loginState.credentials
-    if (credentials != null) {
-      val adobePre = credentials.adobeCredentials
-      if (adobePre != null) {
-        val adobePost = adobePre.postActivationCredentials
-        if (adobePost != null) {
-          val versionActivated = adobePost.version
-          // XXX: Perform actual check here!
-        }
-      }
-    }
-    return false
   }
 
   private fun onBookRequestViewerOpenNow(
