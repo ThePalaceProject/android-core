@@ -9,6 +9,7 @@ android {
 
     defaultConfig {
         buildConfigField("String", "SIMPLIFIED_VERSION", "\"${rootProject.ext["VERSION_NAME"]}\"")
+        buildConfigField("String", "ADOBE_DRM_PROVIDER_VERSION", "\"${libs.versions.palace.drm.adobe.get()}\"")
     }
 }
 

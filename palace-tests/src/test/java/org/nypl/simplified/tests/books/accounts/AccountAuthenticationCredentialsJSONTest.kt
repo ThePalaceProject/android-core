@@ -1,5 +1,6 @@
 package org.nypl.simplified.tests.books.accounts
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.nypl.drm.core.AdobeDeviceID
@@ -221,5 +222,77 @@ class AccountAuthenticationCredentialsJSONTest {
 
     val creds1 = deserializeFromJSON(serializeToJSON(creds0))
     Assertions.assertEquals(creds0, creds1)
+  }
+
+  /**
+   * A recorded ADEPT provider version survives a serialization round-trip.
+   */
+
+  @Test
+  @Throws(Exception::class)
+  fun testRoundTrip8() {
+    val post =
+      AccountAuthenticationAdobePostActivationCredentials(
+        deviceID = AdobeDeviceID("device"),
+        userID = AdobeUserID("user"),
+        version = "5.0.0"
+      )
+    val adobe =
+      AccountAuthenticationAdobePreActivationCredentials(
+        vendorID = AdobeVendorID("vendor"),
+        clientToken = AccountAuthenticationAdobeClientToken.parse("NYNYPL|156|5e0cdf28-e3a2-11e7-ab18-0e26ed4612aa|LEcBeSV"),
+        deviceManagerURI = URI.create("http://example.com"),
+        postActivationCredentials = post
+      )
+
+    val creds0: AccountAuthenticationCredentials =
+      AccountAuthenticationCredentials.Basic(
+        userName = AccountUsername("1234"),
+        password = AccountPassword("5678"),
+        adobeCredentials = adobe,
+        authenticationDescription = null,
+        annotationsURI = URI("https://www.example.com"),
+        deviceRegistrationURI = URI("https://www.example.com"),
+        patronAuthorization = PatronAuthorization("identifier", null)
+      )
+
+    val creds1 = deserializeFromJSON(serializeToJSON(creds0))
+    Assertions.assertEquals(creds0, creds1)
+  }
+
+  /**
+   * A credentials document written before version recording has no `version` field in the
+   * post-activation block. It must deserialize with a null version.
+   */
+
+  @Test
+  @Throws(Exception::class)
+  fun testOldDocumentWithoutVersion() {
+    val json =
+      """
+{
+  "@version": 20210512,
+  "@type": "basic",
+  "username": "1234",
+  "password": "5678",
+  "annotationsURI": "https://www.example.com",
+  "deviceRegistrationURI": "https://www.example.com",
+  "adobe_credentials": {
+    "client_token": "NYNYPL|156|5e0cdf28-e3a2-11e7-ab18-0e26ed4612aa|LEcBeSV",
+    "vendor_id": "vendor",
+    "activation": {
+      "device_id": "device",
+      "user_id": "user"
+    }
+  }
+}
+      """.trimIndent()
+
+    val creds =
+      deserializeFromJSON(ObjectMapper().readTree(json)) as AccountAuthenticationCredentials.Basic
+    val post = creds.adobeCredentials!!.postActivationCredentials!!
+    Assertions.assertEquals(AdobeDeviceID("device"), post.deviceID)
+    Assertions.assertEquals(AdobeUserID("user"), post.userID)
+    Assertions.assertNull(post.version)
   }
 }

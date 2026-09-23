@@ -4,6 +4,7 @@ import android.app.Application
 import io.reactivex.disposables.Disposable
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
+import okio.Buffer
 import one.irradia.mime.api.MIMEType
 import org.joda.time.Instant
 import org.junit.jupiter.api.AfterEach
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
+import org.librarysimplified.adobe.extensions.BuildConfig
 import org.librarysimplified.http.api.LSHTTPClientConfiguration
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPNetworkAccess
@@ -829,6 +831,103 @@ class BorrowACSMTest {
   }
 
   /**
+   * When borrowing requires a device activation, the stored post-activation credentials must
+   * record the version of the ADEPT provider binary that performed the activation.
+   */
+
+  @Test
+  @Throws(Exception::class)
+  fun testACSAcivationStampsProviderVersion() {
+    val task = BorrowACSM.createSubtask()
+
+    this.context.currentURIField =
+      Link.LinkBasic(this.webServer.url("/book.acsm").toUri())
+
+    this.account.setLoginState(
+      AccountLoggedIn(
+        (this.account.loginState.credentials as AccountAuthenticationCredentials.Basic).copy(
+          adobeCredentials = AccountAuthenticationAdobePreActivationCredentials(
+            vendorID = AdobeVendorID("vendor"),
+            clientToken = AccountAuthenticationAdobeClientToken(
+              userName = "user",
+              password = "password",
+              rawToken = "b85e7fd7-cf6e-4e39-8da6-8df8c9ee9779"
+            ),
+            deviceManagerURI = null,
+            postActivationCredentials = null
+          )
+        )
+      )
+    )
+
+    this.account.setAccountProvider(
+      MockAccountProviders.fakeProvider(
+        "urn:uuid:ea9480d4-5479-4ef1-b1d1-84ccbedb680f",
+        host = "localhost",
+        port = this.webServer.port
+      )
+    )
+
+    this.webServer.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+        .setHeader("content-type", "application/json")
+        .setBody(this.resource("/org/nypl/simplified/tests/patron/example.json"))
+    )
+
+    this.webServer.enqueue(this.validACSMResponse)
+
+    val adobeDeviceID = AdobeDeviceID("ca887d21-a56c-4314-811e-952d885d2115")
+    val adobeUserID = AdobeUserID("19b25c06-8b39-4643-8813-5980bee45651")
+
+    this.adobeConnector.onActivate = { client, vendor, user, password ->
+      Assertions.assertEquals(AdobeVendorID("NYPL"), vendor)
+      Assertions.assertEquals("NYNYPL|536818535|b54be3a5-385b-42eb-9496-3879cb3ac3cc", user)
+      client.onActivationsCount(1)
+      client.onActivation(0, vendor, adobeDeviceID, user, adobeUserID, null)
+    }
+
+    val temporaryFile =
+      temporaryFileOf("book.epub", "A cold star looked down on his creations")
+    val adobeLoanID =
+      AdobeLoanID("4cca8916-d0fe-44ed-85d9-a8212764375d")
+
+    this.adobeConnector.onFulfill = { listener, acsm, user ->
+      listener.onFulfillmentSuccess(
+        temporaryFile,
+        AdobeAdeptLoan(
+          adobeLoanID,
+          "You're a blank. You don't have rights.".toByteArray(),
+          false
+        )
+      )
+    }
+
+    try {
+      task.execute(this.context)
+      fail()
+    } catch (e: BorrowSubtaskHaltedEarly) {
+      this.logger.debug("correctly halted early: ", e)
+    }
+
+    this.verifyBookRegistryHasStatus(LoanedDownloaded::class.java)
+    assertEquals(1, this.bookDatabaseEntry.entryWrites)
+
+    assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(LoanedDownloaded::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(0, this.bookStates.size)
+
+    val credentials = this.account.loginState.credentials as AccountAuthenticationCredentials.Basic
+    val post = credentials.adobeCredentials!!.postActivationCredentials!!
+    assertEquals(adobeDeviceID, post.deviceID)
+    assertEquals(adobeUserID, post.userID)
+    assertEquals(BuildConfig.ADOBE_DRM_PROVIDER_VERSION, post.version)
+  }
+
+  /**
    * Obnoxiously fast updates are throttled.
    */
 
@@ -969,5 +1068,11 @@ class BorrowACSMTest {
     assertEquals(Downloading::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(FailedDownload::class.java, this.bookStates.removeAt(0).javaClass)
     assertEquals(0, this.bookStates.size)
+  }
+
+  private fun resource(file: String): Buffer {
+    val buffer = Buffer()
+    buffer.readFrom(BorrowACSMTest::class.java.getResourceAsStream(file)!!)
+    return buffer
   }
 }

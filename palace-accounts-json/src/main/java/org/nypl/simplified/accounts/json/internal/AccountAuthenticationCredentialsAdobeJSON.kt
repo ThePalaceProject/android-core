@@ -17,8 +17,9 @@ object AccountAuthenticationCredentialsAdobeJSON {
     val credsPost: AccountAuthenticationAdobePostActivationCredentials? =
       if (activation != null) {
         AccountAuthenticationAdobePostActivationCredentials(
-          AdobeDeviceID(JSONParserUtilities.getString(activation, "device_id")),
-          AdobeUserID(JSONParserUtilities.getString(activation, "user_id"))
+          deviceID = AdobeDeviceID(JSONParserUtilities.getString(activation, "device_id")),
+          userID = AdobeUserID(JSONParserUtilities.getString(activation, "user_id")),
+          version = JSONParserUtilities.getStringOrNull(activation, "version")
         )
       } else {
         null

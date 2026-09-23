@@ -25,5 +25,11 @@ data class AccountAuthenticationAdobePostActivationCredentials(
    * @return The device token
    */
 
-  val userID: AdobeUserID
+  val userID: AdobeUserID,
+  /**
+   * @return The version of the Adobe ADEPT provider binary that performed the device activation, or `null`
+   *         if the activation was performed by an application version that did not record it
+   */
+
+  val version: String? = null
 )

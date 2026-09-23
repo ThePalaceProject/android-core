@@ -140,6 +140,9 @@ object AccountAuthenticationCredentialsJSON {
         val adobePostObj = objectMapper.createObjectNode()
         adobePostObj.put("device_id", post.deviceID.value)
         adobePostObj.put("user_id", post.userID.value)
+        if (post.version != null) {
+          adobePostObj.put("version", post.version)
+        }
         adobePreObj.set<JsonNode>("activation", adobePostObj)
       }
       adobePreObj
