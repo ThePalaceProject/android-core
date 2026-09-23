@@ -1,5 +1,6 @@
 package org.nypl.simplified.accounts.api
 
+import com.io7m.verona.core.Version
 import org.nypl.drm.core.AdobeDeviceID
 import org.nypl.drm.core.AdobeUserID
 
@@ -31,5 +32,5 @@ data class AccountAuthenticationAdobePostActivationCredentials(
    *         if the activation was performed by an application version that did not record it
    */
 
-  val version: String? = null
+  val version: Version? = null
 )

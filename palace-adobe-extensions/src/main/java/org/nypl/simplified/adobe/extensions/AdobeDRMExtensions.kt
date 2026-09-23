@@ -26,7 +26,6 @@ import java.util.concurrent.CancellationException
  */
 
 object AdobeDRMExtensions {
-
   private val versionCurrentValue =
     VersionParser.parse(BuildConfig.ADOBE_DRM_PROVIDER_VERSION)
 

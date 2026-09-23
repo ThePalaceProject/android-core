@@ -153,6 +153,7 @@ val dependencyObjects =
         libs.io7m.jattribute.core,
         libs.io7m.jmulticlose,
         libs.io7m.junreachable,
+        libs.io7m.verona,
         libs.irradia.fieldrush.api,
         libs.irradia.fieldrush.vanilla,
         libs.irradia.mime.api,

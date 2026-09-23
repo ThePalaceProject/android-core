@@ -1,6 +1,7 @@
 package org.nypl.simplified.tests.books.accounts
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.io7m.verona.core.VersionParser
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.nypl.drm.core.AdobeDeviceID
@@ -235,7 +236,7 @@ class AccountAuthenticationCredentialsJSONTest {
       AccountAuthenticationAdobePostActivationCredentials(
         deviceID = AdobeDeviceID("device"),
         userID = AdobeUserID("user"),
-        version = "5.0.0"
+        version = VersionParser.parse("5.0.0")
       )
     val adobe =
       AccountAuthenticationAdobePreActivationCredentials(
@@ -283,6 +284,44 @@ class AccountAuthenticationCredentialsJSONTest {
     "activation": {
       "device_id": "device",
       "user_id": "user"
+    }
+  }
+}
+      """.trimIndent()
+
+    val creds =
+      deserializeFromJSON(ObjectMapper().readTree(json)) as AccountAuthenticationCredentials.Basic
+    val post = creds.adobeCredentials!!.postActivationCredentials!!
+    Assertions.assertEquals(AdobeDeviceID("device"), post.deviceID)
+    Assertions.assertEquals(AdobeUserID("user"), post.userID)
+    Assertions.assertNull(post.version)
+  }
+
+  /**
+   * An unparseable `version` value is diagnostic metadata, not structural data: it must degrade
+   * to a null version ("pre-WIPRO") rather than failing the deserialization of the whole
+   * account's credentials.
+   */
+
+  @Test
+  @Throws(Exception::class)
+  fun testUnparseableVersionDegradesToNull() {
+    val json =
+      """
+{
+  "@version": 20210512,
+  "@type": "basic",
+  "username": "1234",
+  "password": "5678",
+  "annotationsURI": "https://www.example.com",
+  "deviceRegistrationURI": "https://www.example.com",
+  "adobe_credentials": {
+    "client_token": "NYNYPL|156|5e0cdf28-e3a2-11e7-ab18-0e26ed4612aa|LEcBeSV",
+    "vendor_id": "vendor",
+    "activation": {
+      "device_id": "device",
+      "user_id": "user",
+      "version": "not-a-version"
     }
   }
 }

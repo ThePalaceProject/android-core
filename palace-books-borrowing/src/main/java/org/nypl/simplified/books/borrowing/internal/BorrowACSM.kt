@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions
 import com.io7m.junreachable.UnreachableCodeException
 import one.irradia.mime.api.MIMECompatibility
 import one.irradia.mime.api.MIMEType
-import org.librarysimplified.adobe.extensions.BuildConfig
 import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadResult.DownloadCancelled
 import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadResult.DownloadCompletedSuccessfully
 import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedExceptionally
@@ -258,7 +257,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
           adobePreCredentials.copy(
             postActivationCredentials =
               newPostCredentials.copy(
-                version = BuildConfig.ADOBE_DRM_PROVIDER_VERSION
+                version = AdobeDRMExtensions.versionCurrent()
               )
           )
         )

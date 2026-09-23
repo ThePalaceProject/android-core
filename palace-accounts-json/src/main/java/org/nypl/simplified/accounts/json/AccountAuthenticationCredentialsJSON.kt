@@ -141,7 +141,7 @@ object AccountAuthenticationCredentialsJSON {
         adobePostObj.put("device_id", post.deviceID.value)
         adobePostObj.put("user_id", post.userID.value)
         if (post.version != null) {
-          adobePostObj.put("version", post.version)
+          adobePostObj.put("version", post.version.toString())
         }
         adobePreObj.set<JsonNode>("activation", adobePostObj)
       }

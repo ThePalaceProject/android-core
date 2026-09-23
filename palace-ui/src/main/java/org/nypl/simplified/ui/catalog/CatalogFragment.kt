@@ -716,7 +716,6 @@ sealed class CatalogFragment :
     book: Book,
     bookFormat: BookFormat
   ) {
-
   }
 
   /**
@@ -805,9 +804,9 @@ sealed class CatalogFragment :
         book = book,
         format = bookFormat
       )
-      } catch (e: Throwable) {
+    } catch (e: Throwable) {
       this.openErrorForBookException(book, e)
-      }
+    }
   }
 
   private fun openErrorForBookException(

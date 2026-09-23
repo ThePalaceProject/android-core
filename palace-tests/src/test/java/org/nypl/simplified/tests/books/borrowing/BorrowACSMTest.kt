@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
-import org.librarysimplified.adobe.extensions.BuildConfig
 import org.librarysimplified.http.api.LSHTTPClientConfiguration
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPNetworkAccess
@@ -36,6 +35,7 @@ import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountProvider
 import org.nypl.simplified.accounts.api.AccountUsername
 import org.nypl.simplified.accounts.database.api.AccountType
+import org.nypl.simplified.adobe.extensions.AdobeDRMExtensions
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.api.BookIDs
@@ -924,7 +924,7 @@ class BorrowACSMTest {
     val post = credentials.adobeCredentials!!.postActivationCredentials!!
     assertEquals(adobeDeviceID, post.deviceID)
     assertEquals(adobeUserID, post.userID)
-    assertEquals(BuildConfig.ADOBE_DRM_PROVIDER_VERSION, post.version)
+    assertEquals(AdobeDRMExtensions.versionCurrent(), post.version)
   }
 
   /**
