@@ -2,6 +2,9 @@ package org.nypl.simplified.adobe.extensions
 
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.SettableFuture
+import com.io7m.verona.core.Version
+import com.io7m.verona.core.VersionParser
+import org.librarysimplified.adobe.extensions.BuildConfig
 import org.nypl.drm.core.AdobeAdeptActivationReceiverType
 import org.nypl.drm.core.AdobeAdeptConnectorType
 import org.nypl.drm.core.AdobeAdeptDeactivationReceiverType
@@ -23,6 +26,18 @@ import java.util.concurrent.CancellationException
  */
 
 object AdobeDRMExtensions {
+
+  private val versionCurrentValue =
+    VersionParser.parse(BuildConfig.ADOBE_DRM_PROVIDER_VERSION)
+
+  /**
+   * The current DRM connector version.
+   */
+
+  fun versionCurrent(): Version {
+    return this.versionCurrentValue
+  }
+
   /**
    * Activate a device.
    *

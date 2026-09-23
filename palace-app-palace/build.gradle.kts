@@ -506,6 +506,7 @@ dependencies {
     implementation(libs.io7m.dixmont.core)
     implementation(libs.io7m.jattribute.core)
     implementation(libs.io7m.jmulticlose)
+    implementation(libs.io7m.verona)
     implementation(libs.irradia.fieldrush.api)
     implementation(libs.irradia.fieldrush.vanilla)
     implementation(libs.irradia.mime.api)

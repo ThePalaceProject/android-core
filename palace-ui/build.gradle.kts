@@ -181,6 +181,7 @@ dependencies {
     implementation(libs.io7m.jattribute.core)
     implementation(libs.io7m.jmulticlose)
     implementation(libs.io7m.junreachable)
+    implementation(libs.io7m.verona)
     implementation(libs.irradia.mime.api)
     implementation(libs.jackson.core)
     implementation(libs.jackson.databind)

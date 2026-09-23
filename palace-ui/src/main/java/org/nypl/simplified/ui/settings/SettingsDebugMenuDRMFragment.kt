@@ -78,7 +78,7 @@ class SettingsDebugMenuDRMFragment :
       view.findViewById(R.id.debugDrmAdobeActivations)
 
     this.drmTable.addView(
-      this.createDrmSupportRow("Adobe Acs", SettingsDebugModel.adeptSupported())
+      this.createDrmSupportRow("Adobe ACS (${AdobeDRMExtensions.versionCurrent()})", SettingsDebugModel.adeptSupported())
     )
     this.drmTable.addView(
       this.createDrmSupportRow("Boundless", SettingsDebugModel.boundlessSupported())
