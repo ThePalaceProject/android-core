@@ -2,6 +2,9 @@ package org.nypl.simplified.ui.catalog
 
 import android.content.Context
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.common.util.concurrent.MoreExecutors
+import com.io7m.jattribute.core.AttributeReadableType
+import com.io7m.jattribute.core.Attributes
 import com.io7m.verona.core.Version
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
@@ -16,11 +19,26 @@ import org.nypl.simplified.books.controller.api.BooksControllerType
 import org.nypl.simplified.futures.FluentFutureExtensions.flatMap
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
+import org.nypl.simplified.threads.UIThread
 import org.slf4j.LoggerFactory
 
 object CatalogWIPROMigration {
   private val logger =
     LoggerFactory.getLogger(CatalogWIPROMigration::class.java)
+
+  private val attributes =
+    Attributes.create { e -> this.logger.debug("Attribute error: ", e) }
+
+  private val migrationInProgressRef =
+    this.attributes.withValue(false)
+
+  /**
+   * An attribute that indicates whether a migration is in process. Values are always published
+   * on the UI thread.
+   */
+
+  val migrationInProgress: AttributeReadableType<Boolean> =
+    this.migrationInProgressRef
 
   /**
    * Check to see if we need to perform a "migration" for Adobe/WIPRO.
@@ -167,10 +185,17 @@ object CatalogWIPROMigration {
         }
       }
 
-    profiles
-      .profileAccountLogout(accountID)
-      .flatMap { _ -> profiles.profileAccountLogin(loginRequest) }
-      .flatMap { _ -> books.bookBorrow(accountID, book.id, book.entry, null) }
+    UIThread.runOnUIThread { this.migrationInProgressRef.set(true) }
+
+    val future =
+      profiles
+        .profileAccountLogout(accountID)
+        .flatMap { _ -> profiles.profileAccountLogin(loginRequest) }
+        .flatMap { _ -> books.bookBorrow(accountID, book.id, book.entry, null) }
+
+    future.addListener({
+      UIThread.runOnUIThread { this.migrationInProgressRef.set(false) }
+    }, MoreExecutors.directExecutor())
   }
 
   fun executeNow(
