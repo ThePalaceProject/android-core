@@ -1,11 +1,20 @@
 package org.nypl.simplified.ui.catalog
 
+import android.content.Context
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.io7m.verona.core.Version
 import org.librarysimplified.services.api.Services
+import org.librarysimplified.ui.R
+import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
+import org.nypl.simplified.accounts.api.AccountOIDC
+import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
 import org.nypl.simplified.adobe.extensions.AdobeDRMExtensions
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookFormat
+import org.nypl.simplified.books.controller.api.BooksControllerType
+import org.nypl.simplified.futures.FluentFutureExtensions.flatMap
+import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.slf4j.LoggerFactory
 
@@ -100,9 +109,79 @@ object CatalogWIPROMigration {
     return false
   }
 
+  private fun executeMigration(book: Book) {
+    val services =
+      Services.serviceDirectory()
+    val profiles =
+      services.requireService(ProfilesControllerType::class.java)
+    val books =
+      services.requireService(BooksControllerType::class.java)
+
+    val accountID =
+      book.account
+    val account =
+      profiles
+        .profileCurrent()
+        .account(accountID)
+
+    val credentials =
+      account.loginState.credentials
+
+    val loginRequest: ProfileAccountLoginRequest =
+      when (credentials) {
+        is AccountAuthenticationCredentials.Basic -> {
+          ProfileAccountLoginRequest.Basic(
+            accountId = accountID,
+            description = account.provider.authentication as AccountProviderAuthenticationDescription.Basic,
+            username = credentials.userName,
+            password = credentials.password
+          )
+        }
+
+        is AccountAuthenticationCredentials.BasicToken -> {
+          ProfileAccountLoginRequest.BasicToken(
+            accountId = accountID,
+            description = account.provider.authentication as AccountProviderAuthenticationDescription.BasicToken,
+            username = credentials.userName,
+            password = credentials.password
+          )
+        }
+
+        is AccountAuthenticationCredentials.OpenIDConnect -> {
+          ProfileAccountLoginRequest.OIDCInitiate(
+            accountId = accountID,
+            description = account.provider.authentication as AccountProviderAuthenticationDescription.OpenIDConnect,
+            redirectURI = AccountOIDC.oidcCallbackLoginURI(account.id)
+          )
+        }
+
+        is AccountAuthenticationCredentials.SAML2_0 -> {
+          ProfileAccountLoginRequest.SAML20Initiate(
+            accountId = accountID,
+            description = account.provider.authentication as AccountProviderAuthenticationDescription.SAML2_0
+          )
+        }
+
+        null -> {
+          return
+        }
+      }
+
+    profiles
+      .profileAccountLogout(accountID)
+      .flatMap { _ -> profiles.profileAccountLogin(loginRequest) }
+      .flatMap { _ -> books.bookBorrow(accountID, book.id, book.entry, null) }
+  }
+
   fun executeNow(
-    book: Book,
-    bookFormat: BookFormat
+    context: Context,
+    book: Book
   ) {
+    MaterialAlertDialogBuilder(context)
+      .setMessage("Do Adobe/WIPRO migration now?")
+      .setNegativeButton(R.string.catalogCancel) { dialog, _ -> dialog.dismiss() }
+      .setPositiveButton("Migrate!") { _, _ -> executeMigration(book) }
+      .create()
+      .show()
   }
 }

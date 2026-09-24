@@ -704,7 +704,7 @@ sealed class CatalogFragment :
     bookFormat: BookFormat
   ) {
     if (CatalogWIPROMigration.isMigrationRequired(book, bookFormat)) {
-      CatalogWIPROMigration.executeNow(book, bookFormat)
+      CatalogWIPROMigration.executeNow(context = this.requireContext(), book)
       return
     }
 
