@@ -210,6 +210,25 @@ sealed class CatalogFragment :
         }
       }
     )
+    this.subscriptions.add(
+      CatalogWIPROMigration.migrationInProgress.subscribe { migrationThen, migrationNow ->
+        this.onWIPROMigrationChanged(migrationThen, migrationNow)
+      }
+    )
+  }
+
+  private fun onWIPROMigrationChanged(
+    migrationThen: Boolean,
+    migrationNow: Boolean
+  ) {
+    if (migrationNow && !migrationThen) {
+      this.switchView(CatalogFeedViewLoading.create(this.layoutInflater, this.contentContainer))
+      return
+    }
+    if (migrationThen && !migrationNow) {
+      this.opdsClient.retry()
+      return
+    }
   }
 
   private fun onNetworkStatusChanged(
