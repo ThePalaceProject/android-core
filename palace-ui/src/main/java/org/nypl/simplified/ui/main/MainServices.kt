@@ -97,6 +97,7 @@ import org.nypl.simplified.patron.api.PatronUserProfileParsersType
 import org.nypl.simplified.profiles.ProfilesDatabases
 import org.nypl.simplified.profiles.api.ProfileDatabaseException
 import org.nypl.simplified.profiles.api.ProfileEvent
+import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.profiles.api.ProfileUpdated
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountCreationStringResourcesType
@@ -119,6 +120,7 @@ import org.slf4j.LoggerFactory
 import org.thepalaceproject.db.DBFactory
 import org.thepalaceproject.db.api.DBParameters
 import org.thepalaceproject.db.api.DBType
+import org.thepalaceproject.mdm.MDMConfiguration
 import org.thepalaceproject.opds.client.OPDSClient
 import org.thepalaceproject.opds.client.OPDSClientParameters
 import org.thepalaceproject.palace.battery.BatteryModel
@@ -996,6 +998,9 @@ internal object MainServices {
       }
     )
 
+    val profile = bookController.profileCurrent() as ProfileType
+    MDMConfiguration.setup(MainApplication.application, profile)
+
     val subscription =
       profilesControllerTypeService
         .profileEvents()
@@ -1012,7 +1017,6 @@ internal object MainServices {
     logger.debug("boot completed")
     onProgress.invoke(BootEvent.BootCompleted(strings.bootCompleted))
 
-    val profile = bookController.profileCurrent()
     for (account in profile.accounts().values) {
       logger.debug("Scheduling sync of account {}", account.id)
       bookController.booksSync(account.id)
