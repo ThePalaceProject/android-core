@@ -124,6 +124,11 @@ class BookPreviewAudiobookFragment :
   ) {
     super.onViewCreated(view, savedInstanceState)
 
+    val services =
+      Services.serviceDirectory()
+    this.imageLoader =
+      services.requireService(ImageLoader2Type::class.java)
+
     this.audioFile = this
       .requireArguments()
       .getSerializable(BUNDLE_EXTRA_FILE)
