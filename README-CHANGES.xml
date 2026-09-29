@@ -1508,7 +1508,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-09-22T00:00:00+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.32.1">
+    <c:release date="2026-09-28T09:43:50+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.32.2">
       <c:changes>
         <c:change date="2026-08-17T00:00:00+00:00" summary="Replace Picasso with Glide.">
           <c:tickets>
