@@ -44,6 +44,10 @@
     <init>();
 }
 
+-keep class org.librarysimplified.viewer.pdf.pdfjs.PdfServer$* {
+    <init>();
+}
+
 -keep class org.nypl.drm.** {
     *;
 }
