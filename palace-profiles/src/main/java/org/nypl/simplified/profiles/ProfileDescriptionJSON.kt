@@ -1,6 +1,5 @@
 package org.nypl.simplified.profiles
 
-import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
@@ -421,12 +420,12 @@ object ProfileDescriptionJSON {
       JSONParserUtilities.getObjectOrNull(node, "playbackRates")
         ?: return hashMapOf()
 
-    val map =
+    val map: Map<String, String> =
       objectMapper.readValue(
         str.toString(),
-        object : TypeReference<Map<String, String>>() {
-          // Do nothing
-        }
+        objectMapper.typeFactory.constructMapType(
+          Map::class.java, String::class.java, String::class.java
+        )
       )
 
     return map.mapValues { entry ->
