@@ -48,6 +48,46 @@
     <init>();
 }
 
+-keepattributes Signature, InnerClasses, EnclosingMethod
+
+-keep class io.audioengine.mobile.** {
+    *;
+}
+
+# Retrofit under R8 full mode.
+#
+# In R8 full mode (the default in current AGP) generic signatures are
+# stripped from classes that are not kept. Retrofit resolves service method
+# return types reflectively (Method.getGenericReturnType), so once
+# rx.Observable, retrofit2.Response, and kotlin.coroutines.Continuation lose
+# their signatures the generated proxy throws
+#   ClassCastException: java.lang.Class cannot be cast to
+#       java.lang.reflect.ParameterizedType
+#   IllegalArgumentException: Unable to create call adapter for class rx.Observable
+# (observed on io.audioengine.mobile.AudioEngineService: getPlaylist, content).
+#
+# The consumer rules bundled with retrofit 2.6.4 predate these fixes, and
+# 2.6.4 cannot be upgraded, so the rules Retrofit added upstream are
+# duplicated here:
+#   https://github.com/square/retrofit/issues/3751  (same ClassCastException at HttpServiceMethod.parseAnnotations:46)
+#   https://github.com/square/retrofit/issues/3774  (crash with R8 full mode, generics and Rx)
+#   https://github.com/square/retrofit/pull/3886    (keep rule for the generic signature of return types, merged 2023-05-05)
+
+# Keep the generic signature of each service method's return type (<3> is
+# the return type of the matched method), e.g. rx.Observable.
+-if interface * { @retrofit2.http.* public *** *(...); }
+-keep,allowoptimization,allowshrinking,allowobfuscation class <3>
+
+# Suspend functions: the real return type is the type argument of Continuation.
+-keep,allowoptimization,allowshrinking,allowobfuscation class kotlin.coroutines.Continuation
+
+# retrofit2.Response<T> occurs as a type argument of service methods.
+-keep,allowoptimization,allowshrinking,allowobfuscation class retrofit2.Response
+
+# Keep inherited service interfaces (services extending other services).
+-if interface * { @retrofit2.http.* <methods>; }
+-keep,allowobfuscation interface * extends <1>
+
 -keep class org.nypl.drm.** {
     *;
 }
