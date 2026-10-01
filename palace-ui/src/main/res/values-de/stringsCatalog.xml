@@ -110,4 +110,7 @@
     <string name="announcementTitle">%1$s (%2$d von %3$d)</string>
     <string name="announcementOK">OK</string>
     <string name="registryFailure">Beim Abrufen der Bibliotheken ist ein Fehler aufgetreten.\nDie Liste der Bibliotheken unten könnte unvollständig sein.</string>
+
+    <string name="wiproMigrationDownloadAgainCellular">Um weiterlesen zu können, muss dieses Buch erneut heruntergeladen werden. Sie können es jetzt über Mobilfunkdaten herunterladen, oder verbinden Sie sich mit Wi-Fi und versuchen Sie es erneut.</string>
+    <string name="wiproMigrationDownloadAgainNoNetwork">Dieses Buch muss erneut heruntergeladen werden, bevor Sie weiterlesen können. Verbinden Sie sich mit Wi-Fi oder Mobilfunkdaten und versuchen Sie es erneut.</string>
 </resources>

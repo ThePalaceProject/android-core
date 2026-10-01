@@ -110,4 +110,7 @@
     <string name="announcementTitle">%1$s (%2$d de %3$d)</string>
     <string name="announcementOK">OK</string>
     <string name="registryFailure">Une erreur s\'est produite lors de la récupération des bibliothèques.\nLa liste des bibliothèques ci-dessous pourrait être incomplète.</string>
+
+    <string name="wiproMigrationDownloadAgainCellular">Pour continuer à lire, ce livre doit être téléchargé à nouveau. Vous pouvez le télécharger maintenant via les données cellulaires, ou connectez-vous à Wi-Fi et réessayez.</string>
+    <string name="wiproMigrationDownloadAgainNoNetwork">Ce livre doit être téléchargé à nouveau avant que vous puissiez continuer à lire. Connectez-vous à Wi-Fi ou aux données cellulaires, puis réessayez.</string>
 </resources>

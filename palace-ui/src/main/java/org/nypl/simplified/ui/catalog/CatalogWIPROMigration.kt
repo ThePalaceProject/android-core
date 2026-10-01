@@ -6,6 +6,7 @@ import com.google.common.util.concurrent.MoreExecutors
 import com.io7m.jattribute.core.AttributeReadableType
 import com.io7m.jattribute.core.Attributes
 import com.io7m.verona.core.Version
+import org.librarysimplified.http.api.LSHTTPNetworkAccessType
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
@@ -202,10 +203,29 @@ object CatalogWIPROMigration {
     context: Context,
     book: Book
   ) {
+    val networkAccess =
+      Services
+        .serviceDirectory()
+        .requireService(LSHTTPNetworkAccessType::class.java)
+
+    if (networkAccess.wifiAvailable.get()) {
+      this.executeMigration(book)
+      return
+    }
+
+    if (networkAccess.cellularAvailable.get()) {
+      MaterialAlertDialogBuilder(context)
+        .setMessage(R.string.wiproMigrationDownloadAgainCellular)
+        .setNegativeButton(R.string.catalogCancel) { dialog, _ -> dialog.dismiss() }
+        .setPositiveButton(R.string.catalogDownload) { _, _ -> executeMigration(book) }
+        .create()
+        .show()
+      return
+    }
+
     MaterialAlertDialogBuilder(context)
-      .setMessage("Do Adobe/WIPRO migration now?")
+      .setMessage(R.string.wiproMigrationDownloadAgainNoNetwork)
       .setNegativeButton(R.string.catalogCancel) { dialog, _ -> dialog.dismiss() }
-      .setPositiveButton("Migrate!") { _, _ -> executeMigration(book) }
       .create()
       .show()
   }

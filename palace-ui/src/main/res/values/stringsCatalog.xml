@@ -120,4 +120,7 @@
     <string name="announcementOK">OK</string>
 
     <string name="registryFailure">An error occurred whilst retrieving the libraries.\nThe list of libraries below might be incomplete.</string>
+
+    <string name="wiproMigrationDownloadAgainCellular">To continue reading, this book needs to be downloaded again. You can download it now using cellular data, or connect to Wi-Fi and try again.</string>
+    <string name="wiproMigrationDownloadAgainNoNetwork">This book needs to be downloaded again before you can continue reading. Connect to Wi-Fi or cellular data, then try again.</string>
 </resources>
