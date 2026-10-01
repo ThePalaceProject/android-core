@@ -29,7 +29,8 @@ class ImageLoader2 private constructor(
   private val appContext: Context,
   private val bookRegistry: BookRegistryReadableType,
   private val coverGenerator: BookCoverGeneratorType,
-  private val badgeLookup: BookCoverBadgeLookupType
+  private val badgeLookup: BookCoverBadgeLookupType,
+  private val debugLabelsLookup: BookCoverDebugLabelsLookupType
 ) : ImageLoader2Type {
   private val logger =
     LoggerFactory.getLogger(ImageLoader2::class.java)
@@ -49,7 +50,8 @@ class ImageLoader2 private constructor(
       context: Application,
       bookRegistry: BookRegistryReadableType,
       coverGenerator: BookCoverGeneratorType,
-      badgeLookup: BookCoverBadgeLookupType
+      badgeLookup: BookCoverBadgeLookupType,
+      debugLabelsLookup: BookCoverDebugLabelsLookupType
     ): ImageLoader2Type {
       this.logger.debug("Configuring Glide")
 
@@ -84,7 +86,8 @@ class ImageLoader2 private constructor(
         context.applicationContext,
         bookRegistry,
         coverGenerator,
-        badgeLookup
+        badgeLookup,
+        debugLabelsLookup
       )
     }
   }
@@ -316,7 +319,11 @@ class ImageLoader2 private constructor(
       request = request.override(width, height)
     }
     val badge = this.badgeLookup.badgeForEntry(entry)
-    request = request.transform(BookCoverBadgeTransform(badge))
+    request =
+      request.transform(
+        BookCoverBadgeTransform(badge),
+        BookCoverDebugLabelsTransform(this.debugLabelsLookup.labelsForEntry(entry))
+      )
     request = request.listener(listener)
     request.into(imageView)
   }
@@ -392,7 +399,11 @@ class ImageLoader2 private constructor(
     }
     if (hasBadge) {
       val badge = this.badgeLookup.badgeForEntry(entry)
-      request = request.transform(BookCoverBadgeTransform(badge))
+      request =
+        request.transform(
+          BookCoverBadgeTransform(badge),
+          BookCoverDebugLabelsTransform(this.debugLabelsLookup.labelsForEntry(entry))
+        )
     }
     request = request.listener(listener)
     request.into(imageView)

@@ -221,6 +221,9 @@ object ProfileDescriptionJSON {
     val audioBookBatteryDialogAccepted =
       JSONParserUtilities.getBooleanDefault(objectNode, "audioBookBatteryDialogAccepted", false)
 
+    val showBookCoverDebugLabels =
+      JSONParserUtilities.getBooleanDefault(objectNode, "showBookCoverDebugLabels", false)
+
     return ProfilePreferences(
       dateOfBirth = dateOfBirth,
       downloadOnlyOnWIFI = downloadOnlyOnWIFI,
@@ -234,7 +237,8 @@ object ProfileDescriptionJSON {
       showTestingLibraries = showTestingLibraries,
       audioBookPlaybackSkipIntervalForwardMs = skipForwardInterval.toLong(),
       audioBookPlaybackSkipIntervalBackwardMs = skipBackwardInterval.toLong(),
-      audioBookBatteryDialogAccepted = audioBookBatteryDialogAccepted
+      audioBookBatteryDialogAccepted = audioBookBatteryDialogAccepted,
+      showBookCoverDebugLabels = showBookCoverDebugLabels
     )
   }
 
@@ -287,6 +291,9 @@ object ProfileDescriptionJSON {
     val audioBookBatteryDialogAccepted =
       JSONParserUtilities.getBooleanDefault(objectNode, "audioBookBatteryDialogAccepted", false)
 
+    val showBookCoverDebugLabels =
+      JSONParserUtilities.getBooleanDefault(objectNode, "showBookCoverDebugLabels", false)
+
     return ProfilePreferences(
       dateOfBirth = dateOfBirth,
       downloadOnlyOnWIFI = downloadOnlyOnWIFI,
@@ -300,7 +307,8 @@ object ProfileDescriptionJSON {
       showTestingLibraries = showTestingLibraries,
       audioBookPlaybackSkipIntervalForwardMs = skipForwardInterval.toLong(),
       audioBookPlaybackSkipIntervalBackwardMs = skipBackwardInterval.toLong(),
-      audioBookBatteryDialogAccepted = audioBookBatteryDialogAccepted
+      audioBookBatteryDialogAccepted = audioBookBatteryDialogAccepted,
+      showBookCoverDebugLabels = showBookCoverDebugLabels
     )
   }
 
@@ -383,6 +391,7 @@ object ProfileDescriptionJSON {
         audioBookPlaybackSkipIntervalForwardMs = skipForwardInterval.toLong(),
         audioBookPlaybackSkipIntervalBackwardMs = skipBackwardInterval.toLong(),
         audioBookBatteryDialogAccepted = audioBookBatteryDialogAccepted,
+        showBookCoverDebugLabels = false,
       )
 
     val attributeMap = mutableMapOf<String, String>()
@@ -520,6 +529,7 @@ object ProfileDescriptionJSON {
     output.put("audioBookPlaybackSkipIntervalForwardMs", preferences.audioBookPlaybackSkipIntervalForwardMs)
     output.put("audioBookPlaybackSkipIntervalBackwardMs", preferences.audioBookPlaybackSkipIntervalBackwardMs)
     output.put("audioBookBatteryDialogAccepted", preferences.audioBookBatteryDialogAccepted)
+    output.put("showBookCoverDebugLabels", preferences.showBookCoverDebugLabels)
 
     output.set<ObjectNode>(
       "playbackRates",

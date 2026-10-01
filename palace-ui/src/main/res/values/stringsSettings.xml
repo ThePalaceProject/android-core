@@ -56,6 +56,7 @@
     <string name="settingsDevSendErrorLogs">Send Error Logs</string>
     <string name="settingsDevShowErrorPage">Show Error Page</string>
     <string name="settingsDevShowSupportedBooks">Only show supported books (Uncheck to show unsupported books)</string>
+    <string name="settingsDevShowBookCoverDebugLabels">Show format and DRM labels on book covers</string>
     <string name="settingsDevSyncAccounts">Sync Accounts</string>
     <string name="settingsDevTestingFeatures">Testing Features</string>
     <string name="settingsDevToggleOpenEBooksQAAccount">Toggle OpenEBooks QA Account</string>
