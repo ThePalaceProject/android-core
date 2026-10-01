@@ -100,6 +100,17 @@
     *;
 }
 
+# The liblcp native client is used via string-based reflection
+# (Class.forName("org.readium.lcp.sdk.Lcp") followed by
+# getDeclaredConstructor().newInstance(), in readium-lcp's
+# LcpClient.isAvailable). R8 cannot track such references and strips all
+# members of the class, so getDeclaredConstructor() raises
+# NoSuchMethodException, isAvailable() reports false, and LCP support is
+# silently disabled. The liblcp AAR ships no consumer rules.
+-keep class org.readium.lcp.sdk.** {
+    *;
+}
+
 -keep class org.apache.xerces.** {
     *;
 }
