@@ -3,9 +3,11 @@ package org.thepalaceproject.palace.images
 import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.os.Handler
 import android.os.Looper
-import android.graphics.drawable.Drawable
 import android.widget.ImageView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -135,7 +137,8 @@ class ImageLoader2 private constructor(
     source: String,
     private val future: CompletableFuture<Unit>,
     private val handler: Handler,
-    private val onFallback: (() -> Unit)? = null
+    private val onFallback: (() -> Unit)? = null,
+    private val onColorLoaded: ((Int) -> Unit)? = null
   ) : BaseListener<Drawable?>(
       logger = logger,
       op = op,
@@ -166,6 +169,11 @@ class ImageLoader2 private constructor(
     ): Boolean {
       this.onLogResourceReady()
       this.future.complete(Unit)
+      this.onColorLoaded?.let { callback ->
+        (resource as? BitmapDrawable)?.bitmap?.let { bmp ->
+          this.handler.post { callback(averageRow0Color(bmp)) }
+        }
+      }
       return false
     }
   }
@@ -409,6 +417,81 @@ class ImageLoader2 private constructor(
     request.into(imageView)
   }
 
+  override fun loadCoverBackgroundInto(
+    entry: FeedEntry.FeedEntryOPDS,
+    imageView: ImageView,
+    width: Int,
+    height: Int,
+    onColorLoaded: (Int) -> Unit
+  ): CompletableFuture<Unit> {
+    val future = CompletableFuture<Unit>()
+    val primaryUri = this.coverURIOf(entry)
+    val generatedUri = this.generateCoverURI(entry)
+
+    this.loadCoverBackgroundIntoInternal(
+      entry = entry,
+      imageView = imageView,
+      width = width,
+      height = height,
+      onColorLoaded = onColorLoaded,
+      future = future,
+      uri = primaryUri ?: generatedUri,
+      fallbackUri = if (primaryUri != null) generatedUri else null
+    )
+    return future
+  }
+
+  private fun loadCoverBackgroundIntoInternal(
+    entry: FeedEntry.FeedEntryOPDS,
+    imageView: ImageView,
+    width: Int,
+    height: Int,
+    onColorLoaded: (Int) -> Unit,
+    future: CompletableFuture<Unit>,
+    uri: URI,
+    fallbackUri: URI?
+  ) {
+    val onFallback: (() -> Unit)? =
+      fallbackUri?.let {
+        {
+          this.loadCoverBackgroundIntoInternal(
+            entry = entry,
+            imageView = imageView,
+            width = width,
+            height = height,
+            onColorLoaded = onColorLoaded,
+            future = future,
+            uri = it,
+            fallbackUri = null
+          )
+        }
+      }
+
+    val listener =
+      ImageRequestListenerDrawable(
+        logger = this.logger,
+        op = "LoadCoverBackgroundInto",
+        source = uri.toString(),
+        future = future,
+        handler = this.mainHandler,
+        onFallback = onFallback,
+        onColorLoaded = onColorLoaded
+      )
+
+    val glide = Glide.with(this.appContext)
+    var request =
+      glide
+        .load(uri)
+        .error(R.drawable.cover_error)
+        .placeholder(R.drawable.cover_loading)
+    if (width > 0 || height > 0) {
+      request = request.override(width, height)
+    }
+    request = request.transform(BookCoverBackgroundTransform())
+    request = request.listener(listener)
+    request.into(imageView)
+  }
+
   override fun loadCoverAsBitmap(
     entry: FeedEntry.FeedEntryOPDS,
     onBitmapLoaded: (Bitmap) -> Unit,
@@ -493,4 +576,21 @@ class ImageLoader2 private constructor(
 
     override fun onLoadCleared(placeholder: Drawable?) {}
   }
+}
+
+private fun averageRow0Color(bmp: Bitmap): Int {
+  var r = 0
+  var g = 0
+  var b = 0
+  val width = bmp.width
+  for (x in 0 until width) {
+    val c = bmp.getPixel(x, 0)
+    r += Color.red(c)
+    g += Color.green(c)
+    b += Color.blue(c)
+  }
+  r /= width
+  g /= width
+  b /= width
+  return Color.argb(255, r, g, b)
 }
