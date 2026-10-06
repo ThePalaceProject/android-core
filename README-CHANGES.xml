@@ -1508,7 +1508,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2026-09-28T09:43:50+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.32.2">
+    <c:release date="2026-09-28T00:00:00+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.32.2">
       <c:changes>
         <c:change date="2026-08-17T00:00:00+00:00" summary="Replace Picasso with Glide.">
           <c:tickets>
@@ -1553,8 +1553,14 @@
         <c:change date="2026-09-21T00:00:00+00:00" summary="Fix an EPUB reader device rotation issue from 1.32.0."/>
       </c:changes>
     </c:release>
-    <c:release date="2026-09-22T12:46:08+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.33.0">
-      <c:changes/>
+    <c:release date="2026-09-29T13:42:32+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.33.0">
+      <c:changes>
+        <c:change date="2026-09-29T13:42:32+00:00" summary="Enable bytecode shrinking and optimization.">
+          <c:tickets>
+            <c:ticket id="PP-5137"/>
+          </c:tickets>
+        </c:change>
+      </c:changes>
     </c:release>
   </c:releases>
   <c:ticket-systems>

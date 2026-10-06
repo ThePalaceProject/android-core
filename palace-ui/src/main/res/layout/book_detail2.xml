@@ -180,7 +180,8 @@
         android:clickable="false"
         android:elevation="-10dp"
         android:focusable="false"
-        android:importantForAccessibility="no" />
+        android:importantForAccessibility="no"
+        android:scaleType="fitXY" />
 
     <!-- The items that appear in the toolbar when the toolbar is "collapsed" -->
     <androidx.constraintlayout.widget.ConstraintLayout

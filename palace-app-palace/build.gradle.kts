@@ -178,6 +178,14 @@ android {
     }
 
     buildTypes {
+        configureEach {
+            isMinifyEnabled = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
+        }
+
         debug {
             ndk {
                 abiFilters +=
@@ -219,6 +227,16 @@ afterEvaluate {
         taskAssemble.dependsOn.add(taskBundle)
         taskAssemble.finalizedBy("CheckReleaseRequiredAssetsCreate")
     }
+}
+
+configurations.configureEach {
+    // Android ships org.xml.sax.*, org.w3c.dom.*, javax.xml.* in the
+    // framework. The JVM xml-apis jar (transitively pulled in by xerces
+    // 2.12.x) duplicates them, which makes R8 fail with "Library class
+    // implements program class" errors (e.g. kxml2's
+    // org.xmlpull.v1.sax2.Driver implementing org.xml.sax.*). Drop the
+    // duplicate; the framework copies are the only ones on the classpath.
+    exclude(group = "xml-apis", module = "xml-apis")
 }
 
 dependencies {
@@ -621,5 +639,6 @@ dependencies {
     implementation(libs.io7m.trasco.xml.schemas)
     implementation(libs.io7m.xyloid.natives)
     implementation(libs.xerces)
+    implementation("javax.xml.stream:stax-api:1.0-2")
     implementation(libs.xerial.sqlite)
 }

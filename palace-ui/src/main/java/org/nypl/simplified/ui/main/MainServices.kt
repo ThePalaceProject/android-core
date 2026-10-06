@@ -109,6 +109,7 @@ import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.accounts.AccountEvents
 import org.nypl.simplified.ui.catalog.CatalogBookRegistryEvents
 import org.nypl.simplified.ui.catalog.CatalogCoverBadgeImages
+import org.nypl.simplified.ui.catalog.CatalogCoverDebugLabels
 import org.nypl.simplified.ui.catalog.CatalogOPDSClients
 import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.nypl.simplified.ui.screen.ScreenSizeInformation
@@ -123,6 +124,7 @@ import org.thepalaceproject.opds.client.OPDSClient
 import org.thepalaceproject.opds.client.OPDSClientParameters
 import org.thepalaceproject.palace.battery.BatteryModel
 import org.thepalaceproject.palace.images.BookCoverBadgeLookupType
+import org.thepalaceproject.palace.images.BookCoverDebugLabelsLookupType
 import org.thepalaceproject.palace.images.BookCoverGenerator
 import org.thepalaceproject.palace.images.BookCoverGeneratorType
 import org.thepalaceproject.palace.images.ImageLoader2
@@ -420,6 +422,8 @@ internal object MainServices {
     screenSize: ScreenSizeInformationType
   ): BookCoverBadgeLookupType = CatalogCoverBadgeImages.create(context.resources, screenSize)
 
+  private fun createBookCoverDebugLabels(): BookCoverDebugLabelsLookupType = CatalogCoverDebugLabels()
+
   private fun publishApplicationStartupEvent(
     context: Application,
     analytics: AnalyticsType
@@ -659,7 +663,8 @@ internal object MainServices {
           context = context,
           bookRegistry = bookRegistry,
           coverGenerator = coverGenerator,
-          badgeLookup = createBookCoverBadgeLookup(context, screenSize)
+          badgeLookup = createBookCoverBadgeLookup(context, screenSize),
+          debugLabelsLookup = createBookCoverDebugLabels()
         )
       }
     )
@@ -1030,13 +1035,15 @@ internal object MainServices {
     context: Application,
     bookRegistry: BookRegistryReadableType,
     coverGenerator: BookCoverGeneratorType,
-    badgeLookup: BookCoverBadgeLookupType
+    badgeLookup: BookCoverBadgeLookupType,
+    debugLabelsLookup: BookCoverDebugLabelsLookupType
   ): ImageLoader2Type =
     ImageLoader2.create(
       context,
       bookRegistry,
       coverGenerator,
-      badgeLookup
+      badgeLookup,
+      debugLabelsLookup
     )
 
   fun createNetworkAccessService(context: Application): LSHTTPNetworkAccessType {
