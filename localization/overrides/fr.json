@@ -121,6 +121,7 @@
   "palace-ui/src/main/res/values/stringsSettings.xml": {
     "settingsAccessibilityAccountSelect": "Appuyez pour définir \"%1$s\" comme bibliothèque actuelle. Appuyez longuement pour supprimer.",
     "settingsAccessibilityAccountSelectCurrent": "\"%1$s\", votre bibliothèque actuelle. Appuyez longuement pour supprimer.",
+    "settingsAccessibilityLibrariesFound": "Bibliothèques trouvées : %1$d",
     "settingsCustomOPDSURL": "URL de flux personnalisée…",
     "settingsDevEnableManualLCPPassphrase": "Activer la phrase de passe LCP manuelle",
     "settingsDevSyncAccounts": "Synchroniser les comptes",

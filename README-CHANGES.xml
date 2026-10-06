@@ -1560,6 +1560,11 @@
             <c:ticket id="PP-5137"/>
           </c:tickets>
         </c:change>
+        <c:change date="2026-10-06T14:20:00+00:00" summary="Announce library search results to screen readers.">
+          <c:tickets>
+            <c:ticket id="PP-5284"/>
+          </c:tickets>
+        </c:change>
       </c:changes>
     </c:release>
   </c:releases>

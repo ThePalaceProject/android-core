@@ -8,8 +8,11 @@
     <string name="settingsAccessibilityAccountDetails">Ver detalles para \"%1$s\".</string>
     <string name="settingsAccessibilityAccountSelect">Toque para establecer \"%1$s\" como biblioteca actual. Mantenga pulsado para quitar.</string>
     <string name="settingsAccessibilityAccountSelectCurrent">\"%1$s\", su biblioteca actual. Mantenga pulsado para quitar.</string>
+    <string name="settingsAccessibilityLibrariesFound">Bibliotecas encontradas: %1$d</string>
+    <string name="settingsAccessibilityNoLibrariesFound">No se encontraron bibliotecas.</string>
     <string name="settingsAccessibilitySearchButton">Botón de búsqueda de bibliotecas</string>
     <string name="settingsAccessibilitySearchButtonClose">Cierre el botón de búsqueda</string>
+    <string name="settingsAccessibilitySearchHint">Buscar. Los resultados se actualizan mientras escribe.</string>
     <string name="settingsAccounts">Bibliotecas</string>
     <string name="settingsAccountsSummary">Agregar, eliminar o configurar bibliotecas</string>
     <string name="settingsAcknowledgements">Reconocimientos</string>
@@ -56,6 +59,7 @@
     <string name="settingsDevSendErrorLogs">Enviar registros de errores</string>
     <string name="settingsDevShowErrorPage">Mostrar página de error</string>
     <string name="settingsDevShowSupportedBooks">Sólo mostrar libros compatibles (Uncheck para mostrar libros sin soporte)</string>
+    <string name="settingsDevShowBookCoverDebugLabels">Mostrar formato y etiquetas DRM en las portadas de libros</string>
     <string name="settingsDevSyncAccounts">Sincronizar cuentas</string>
     <string name="settingsDevTestingFeatures">Características de prueba</string>
     <string name="settingsDevToggleOpenEBooksQAAccount">Alternar la cuenta QA de OpenEBooks</string>

@@ -8,8 +8,11 @@
     <string name="settingsAccessibilityAccountDetails">View details for \"%1$s\".</string>
     <string name="settingsAccessibilityAccountSelect">Tap to set \"%1$s\" as your current library. Long-press to remove.</string>
     <string name="settingsAccessibilityAccountSelectCurrent">\"%1$s\", your current library. Long-press to remove.</string>
+    <string name="settingsAccessibilityLibrariesFound">Libraries found: %1$d</string>
+    <string name="settingsAccessibilityNoLibrariesFound">No libraries found.</string>
     <string name="settingsAccessibilitySearchButton">Library Search Button</string>
     <string name="settingsAccessibilitySearchButtonClose">Close Search Button</string>
+    <string name="settingsAccessibilitySearchHint">Search. Results update as you type.</string>
     <string name="settingsAccounts">Libraries</string>
     <string name="settingsAccountsSummary">Add, remove, or configure libraries</string>
     <string name="settingsAcknowledgements">Acknowledgements</string>
