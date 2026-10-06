@@ -55,6 +55,7 @@
     "catalogAccessibilityBookRevokeLoan": "Bouton Rendre maintenant. Cliquez sur ce bouton pour rendre \"%1$s\".",
     "catalogAccessibilityCloseCheckoutDrawer": "Fermer le tiroir d'emprunt",
     "catalogAccessibilityOpenCheckoutDrawer": "Ouvrir le tiroir d'emprunt",
+    "catalogAccessibilitySearchResultsCount": "Résultats trouvés : %1$d",
     "catalogAccessibilitySeriesLink": "\"%1$s\". Cliquez pour voir toutes les entrées de la série.",
     "catalogAccounts": "Choisissez un autre catalogue de bibliothèque…",
     "catalogBookAvailabilityLoanable": "Ce livre est disponible à l'emprunt.",

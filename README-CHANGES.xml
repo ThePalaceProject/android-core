@@ -1565,6 +1565,11 @@
             <c:ticket id="PP-5284"/>
           </c:tickets>
         </c:change>
+        <c:change date="2026-10-07T09:00:00+00:00" summary="Announce catalog search results and place screen reader focus at the top of the results.">
+          <c:tickets>
+            <c:ticket id="PP-5303"/>
+          </c:tickets>
+        </c:change>
       </c:changes>
     </c:release>
   </c:releases>
