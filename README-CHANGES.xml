@@ -1570,6 +1570,11 @@
             <c:ticket id="PP-5303"/>
           </c:tickets>
         </c:change>
+        <c:change date="2026-10-07T13:52:07+00:00" summary="Allow the account creation screen toolbar to expand and wrap its title so it is not truncated at large font sizes.">
+          <c:tickets>
+            <c:ticket id="PP-5304"/>
+          </c:tickets>
+        </c:change>
       </c:changes>
     </c:release>
   </c:releases>
