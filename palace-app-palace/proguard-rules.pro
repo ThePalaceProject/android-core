@@ -122,3 +122,26 @@
 -keep class org.librarysimplified.http.** {
     *;
 }
+
+# WebPub core model classes are (de)serialized reflectively by Jackson
+# (WPMManifest / WPMMetadata via WPMMappers.createMapper()).
+#
+# In R8 full mode the generic `Signature` attribute is stripped from classes
+# not matched by a -keep rule, even when `-keepattributes Signature` is set
+# (see https://developer.android.com/topic/performance/app-optimization/full-mode
+# and r8 compatibility-faq). Once a `List<X>` field loses its signature Jackson
+# erases it to `List<Object>`. The mapper installs dixmont's
+# DmJsonRestrictedDeserializers (com.io7m.dixmont.core), whose
+# findCollectionDeserializer checks CollectionType.toCanonical() against a
+# whitelist of concrete forms (e.g. `java.util.List<org.thepalaceproject.webpub.core.WPMContributorOrString>`
+# built in WPMModule); the erased `java.util.List<java.lang.Object>` is not in
+# that set, so it throws
+#   "Deserializing a value of type java.util.List<java.lang.Object> is not allowed"
+# when AccountProviderRegistry2.fetchRegistryPage reads the registry page.
+#
+# Keeping the package preserves the field/parameter generic signatures (and the
+# fields themselves, which R8 would otherwise shrink as reflectively-only), so
+# Jackson resolves the real element types. No webpub.core class is excluded.
+-keep class org.thepalaceproject.webpub.core.** {
+    *;
+}
