@@ -87,6 +87,13 @@ object MDCKeys {
     "FeedSearchQuery"
 
   /**
+   * A distinct code identifying a specific logged failure.
+   */
+
+  const val ERROR_CODE =
+    "ErrorCode"
+
+  /**
    * Convenience function to set optional values.
    */
 

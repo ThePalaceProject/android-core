@@ -15,6 +15,7 @@ import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.nypl.drm.core.AdobeAdeptExecutorType
 import org.nypl.simplified.accounts.api.AccountEvent
+import org.nypl.simplified.accounts.api.AccountEventDeletion
 import org.nypl.simplified.accounts.api.AccountEventUpdated
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountLoginStringResourcesType
@@ -134,6 +135,7 @@ class Controller private constructor(
 
   private val accountRegistrySubscription: Disposable
   private val accountSubscription: Disposable
+  private val accountDeletionSubscription: Disposable
   private val profileUpdateSubscription: Disposable
 
   private val logger =
@@ -160,6 +162,11 @@ class Controller private constructor(
         .ofType(AccountEventUpdated::class.java)
         .subscribe(this::onAccountUpdated)
 
+    this.accountDeletionSubscription =
+      this.accountEvents
+        .ofType(AccountEventDeletion.AccountEventDeletionSucceeded::class.java)
+        .subscribe(this::onAccountDeleted)
+
     this.profileUpdateSubscription =
       this.profileEvents
         .ofType(ProfileUpdated::class.java)
@@ -182,6 +189,11 @@ class Controller private constructor(
 
   private fun onAccountUpdated(event: AccountEventUpdated) {
     this.updateCrashlytics()
+  }
+
+  private fun onAccountDeleted(event: AccountEventDeletion.AccountEventDeletionSucceeded) {
+    this.logger.debug("Purging book registry for deleted account {}", event.id)
+    this.bookRegistry.clearForAccount(event.id)
   }
 
   private fun updateCrashlytics() {

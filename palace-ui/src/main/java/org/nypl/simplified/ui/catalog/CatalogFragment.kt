@@ -19,6 +19,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.librarysimplified.http.api.LSHTTPNetworkAccessType
+import org.librarysimplified.mdc.MDCKeys
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
 import org.librarysimplified.viewer.preview.BookPreviewActivity
@@ -26,6 +27,7 @@ import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountLoginState
 import org.nypl.simplified.accounts.database.api.AccountType
+import org.nypl.simplified.accounts.database.api.AccountsDatabaseNonexistentException
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
@@ -77,6 +79,7 @@ import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.nypl.simplified.viewer.api.Viewers
 import org.nypl.simplified.viewer.spi.ViewerParameters
 import org.slf4j.LoggerFactory
+import org.slf4j.MDC
 import org.thepalaceproject.opds.client.OPDSClientRequest
 import org.thepalaceproject.opds.client.OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY
 import org.thepalaceproject.opds.client.OPDSClientRequest.HistoryBehavior.CLEAR_HISTORY
@@ -514,9 +517,14 @@ sealed class CatalogFragment :
   @Deprecated("Unclear why this has its own special method.")
   final override fun onBookRequestSAMLDownload(status: CatalogBookStatus<BookStatus.DownloadWaitingForExternalAuthentication>) {
     val account =
-      this.profiles
-        .profileCurrent()
-        .account(status.book.account)
+      try {
+        this.profiles
+          .profileCurrent()
+          .account(status.book.account)
+      } catch (e: AccountsDatabaseNonexistentException) {
+        this.logBookActionStaleAccount(status.book.account)
+        return
+      }
 
     CatalogSAML20Model.start(
       account = account,
@@ -541,9 +549,14 @@ sealed class CatalogFragment :
     val profiles =
       services.requireService(ProfilesControllerType::class.java)
     val account =
-      profiles
-        .profileCurrent()
-        .account(parameters.accountID)
+      try {
+        profiles
+          .profileCurrent()
+          .account(parameters.accountID)
+      } catch (e: AccountsDatabaseNonexistentException) {
+        this.logBookActionStaleAccount(parameters.accountID)
+        return
+      }
 
     if (this.isLoginRequired(parameters.accountID)) {
       MainNavigation.showLoginDialog(account)
@@ -572,6 +585,25 @@ sealed class CatalogFragment :
         entry = parameters.entry,
         samlDownloadContext = parameters.samlDownloadContext
       )
+    }
+  }
+
+  /**
+   * A book action was requested for an account that no longer exists in the
+   * profile (for example, it was deleted while its catalog feed was still on
+   * screen). The action cannot be recovered, so it is a no-op; the situation
+   * is recorded with a distinct error code for later diagnosis.
+   */
+
+  private fun logBookActionStaleAccount(accountID: AccountID) {
+    MDC.put(MDCKeys.ERROR_CODE, "catalogBookActionStaleAccount")
+    try {
+      this.logger.error(
+        "Book action requested for a nonexistent account: {}",
+        accountID
+      )
+    } finally {
+      MDC.remove(MDCKeys.ERROR_CODE)
     }
   }
 

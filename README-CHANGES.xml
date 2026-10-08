@@ -1553,26 +1553,31 @@
         <c:change date="2026-09-21T00:00:00+00:00" summary="Fix an EPUB reader device rotation issue from 1.32.0."/>
       </c:changes>
     </c:release>
-    <c:release date="2026-09-29T13:42:32+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.33.0">
+    <c:release date="2026-10-08T16:53:25+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.33.0">
       <c:changes>
-        <c:change date="2026-09-29T13:42:32+00:00" summary="Enable bytecode shrinking and optimization.">
+        <c:change date="2026-09-29T00:00:00+00:00" summary="Enable bytecode shrinking and optimization.">
           <c:tickets>
             <c:ticket id="PP-5137"/>
           </c:tickets>
         </c:change>
-        <c:change date="2026-10-06T14:20:00+00:00" summary="Announce library search results to screen readers.">
+        <c:change date="2026-10-06T00:00:00+00:00" summary="Announce library search results to screen readers.">
           <c:tickets>
             <c:ticket id="PP-5284"/>
           </c:tickets>
         </c:change>
-        <c:change date="2026-10-07T09:00:00+00:00" summary="Announce catalog search results and place screen reader focus at the top of the results.">
+        <c:change date="2026-10-07T00:00:00+00:00" summary="Announce catalog search results and place screen reader focus at the top of the results.">
           <c:tickets>
             <c:ticket id="PP-5303"/>
           </c:tickets>
         </c:change>
-        <c:change date="2026-10-07T13:52:07+00:00" summary="Allow the account creation screen toolbar to expand and wrap its title so it is not truncated at large font sizes.">
+        <c:change date="2026-10-07T00:00:00+00:00" summary="Allow the account creation screen toolbar to expand and wrap its title so it is not truncated at large font sizes.">
           <c:tickets>
             <c:ticket id="PP-5304"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2026-10-08T16:53:25+00:00" summary="Attempt to work around stale account references.">
+          <c:tickets>
+            <c:ticket id="PP-5333"/>
           </c:tickets>
         </c:change>
       </c:changes>

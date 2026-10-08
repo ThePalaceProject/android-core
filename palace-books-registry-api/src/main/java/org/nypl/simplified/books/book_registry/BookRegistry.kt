@@ -2,6 +2,7 @@ package org.nypl.simplified.books.book_registry
 
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
+import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookID
 import org.slf4j.LoggerFactory
 import java.util.Collections
@@ -95,6 +96,23 @@ class BookRegistry private constructor(
     val oldStatus = this.books.remove(id)
     if (oldStatus != null) {
       this.observable.onNext(BookStatusEvent.BookStatusEventRemoved(id, oldStatus.status))
+    }
+  }
+
+  override fun clearForAccount(account: AccountID) {
+    val toRemove =
+      this.books
+        .entries
+        .filter { it.value.book.account == account }
+
+    for (entry in toRemove) {
+      this.observable.onNext(
+        BookStatusEvent.BookStatusEventRemoved(entry.key, entry.value.status)
+      )
+    }
+
+    for (entry in toRemove) {
+      this.books.remove(entry.key)
     }
   }
 
