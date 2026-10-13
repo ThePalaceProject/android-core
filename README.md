@@ -57,15 +57,14 @@ support the use of any other IDE at the moment.
 
 #### JDK
 
-Install a reasonably modern JDK, at least JDK 17. We don't recommend building
-on anything newer than the current LTS JDK for everyday usage.
+The build requires JDK 25; the code is compiled to Java 17 bytecode.
 
-Any of the following JDKs should work:
+Any of the following JDK 25 distributions should work:
 
-  * [OpenJDK](https://jdk.java.net/java-se-ri/17)
-  * [Adoptium](https://adoptopenjdk.net/)
-  * [Amazon Coretto](https://aws.amazon.com/corretto/)
+  * [Adoptium](https://adoptium.net/)
+  * [Amazon Corretto](https://aws.amazon.com/corretto/)
   * [Zulu](https://www.azul.com/downloads/zulu-community/?package=jdk)
+  * Red Hat build of OpenJDK
 
 The `JAVA_HOME` environment variable must be set correctly. You can check what it is set to in
 most shells with `echo $JAVA_HOME`. If that command does not show anything, adding the following
@@ -73,8 +72,8 @@ line to `$HOME/.profile` and then executing `source $HOME/.profile` or opening a
 should suffice:
 
 ~~~w
-# Replace NNN with your particular version of 17.
-export JAVA_HOME=/path/to/jdk-17+NNN
+# Replace NNN with your particular version of 25.
+export JAVA_HOME=/path/to/jdk-25+NNN
 ~~~
 
 You can verify that everything is set up correctly by inspecting the results of both
@@ -82,9 +81,9 @@ You can verify that everything is set up correctly by inspecting the results of 
 
 ~~~
 $ java -version
-openjdk version "17.0.8" 2023-07-18
-OpenJDK Runtime Environment (build 17.0.8+7)
-OpenJDK 64-Bit Server VM (build 17.0.8+7, mixed mode)
+openjdk version "25.0.4.1" 2026-08-18 LTS
+OpenJDK Runtime Environment (Red_Hat-25.0.4.1.1-1) (build 25.0.4.1+1-LTS)
+OpenJDK 64-Bit Server VM (Red_Hat-25.0.4.1.1-1) (build 25.0.4.1+1-LTS, mixed mode, sharing)
 ~~~
 
 #### S3 Credentials
