@@ -20,6 +20,10 @@ secrets.conf
 ReaderClientCert.sig
 LCP/*
 
+# Firebase config containing API keys/secrets must not be committed;
+# generate locally or inject from CI secrets instead.
+palace-app-palace/google-services.json
+
 palace-accounts-registry/src/main/resources/org/nypl/simplified/accounts/registry/libraries.json
 
 # Backup files
