@@ -75,4 +75,12 @@ object DiagnosticCodes {
    */
 
   const val AUDIOBOOK_BOOKMARK_TIMEOUT = "AudiobookBookmarkTimeout"
+
+  /**
+   * A test diagnostic event, reported when the user presses the "Send Diagnostic" button in the
+   * debug menu. It carries no real data; it exists solely to verify end-to-end that a reported
+   * event (code plus custom keys) reaches the diagnostics backend.
+   */
+
+  const val USER_PRESSED_DEBUG_DIAGNOSTIC_BUTTON = "UserPressedDebugDiagnosticButton"
 }
