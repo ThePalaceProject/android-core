@@ -159,6 +159,28 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
           .account(this.parameters.accountId)
     } catch (e: Exception) {
       this.logger.debug("Unable to locate account: ", e)
+      val diagnostics =
+        Services.serviceDirectory().requireService(DiagnosticsServiceType::class.java)
+      diagnostics.report(
+        code = DiagnosticCodes.EPUB_BOOK_OPEN_FAILED,
+        data =
+          mapOf(
+            Pair("Reason", "accountNotFound"),
+            Pair("AccountInternalID",
+              this.parameters.accountId.uuid
+                .toString()
+            ),
+            Pair("BookID", this.parameters.entry.feedEntry.id),
+            Pair("BookInternalID", this.parameters.bookId.value()),
+            Pair("BookTitle", this.parameters.entry.feedEntry.title),
+            Pair("BookPublisher",
+              this.parameters.entry.feedEntry.publisher
+                .orEmpty()
+            ),
+            Pair("BookDRM", this.parameters.drmInfo.kind.name)
+          ),
+        throwable = e
+      )
       this.finish()
       return
     }
@@ -171,6 +193,32 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
           .findFormat(BookFormat.BookFormatEPUB::class.java)!!
     } catch (e: Throwable) {
       this.logger.debug("Unable to locate book format: ", e)
+      val diagnostics =
+        Services.serviceDirectory().requireService(DiagnosticsServiceType::class.java)
+      diagnostics.report(
+        code = DiagnosticCodes.EPUB_BOOK_OPEN_FAILED,
+        data =
+          mapOf(
+            Pair("Reason", "formatNotFound"),
+            Pair("AccountInternalID",
+              this.parameters.accountId.uuid
+                .toString()
+            ),
+            Pair("AccountProviderID",
+              this.account.provider.id
+                .toString()
+            ),
+            Pair("BookID", this.parameters.entry.feedEntry.id),
+            Pair("BookInternalID", this.parameters.bookId.value()),
+            Pair("BookTitle", this.parameters.entry.feedEntry.title),
+            Pair("BookPublisher",
+              this.parameters.entry.feedEntry.publisher
+                .orEmpty()
+            ),
+            Pair("BookDRM", this.parameters.drmInfo.kind.name)
+          ),
+        throwable = e
+      )
       this.finish()
       return
     }
@@ -565,9 +613,10 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     val diagnostics =
       Services.serviceDirectory().requireService(DiagnosticsServiceType::class.java)
     diagnostics.report(
-      code = DiagnosticCodes.BOOK_OPEN_FAILED,
+      code = DiagnosticCodes.EPUB_BOOK_OPEN_FAILED,
       data =
         mapOf(
+          Pair("Reason", "readerOpenFailed"),
           Pair("AccountInternalID",
             this.parameters.accountId.uuid
               .toString()

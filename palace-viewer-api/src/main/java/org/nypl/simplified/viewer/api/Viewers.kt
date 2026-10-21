@@ -11,6 +11,8 @@ import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.viewer.spi.ViewerParameters
 import org.nypl.simplified.viewer.spi.ViewerProviderType
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticCodes
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
 import java.util.ServiceLoader
 
 /**
@@ -122,5 +124,20 @@ object Viewers {
       }
     }
     this.logger.error("No viewer providers can handle the given book")
+
+    val diagnostics =
+      Services.serviceDirectory().requireService(DiagnosticsServiceType::class.java)
+    diagnostics.report(
+      code = DiagnosticCodes.NO_VIEWER_FOR_BOOK,
+      data =
+        mapOf(
+          Pair("AccountInternalID", book.account.uuid.toString()),
+          Pair("BookID", book.entry.id),
+          Pair("BookInternalID", book.id.value()),
+          Pair("BookTitle", book.entry.title),
+          Pair("BookPublisher", book.entry.publisher.orEmpty()),
+          Pair("BookFormat", format::class.simpleName.orEmpty())
+        )
+    )
   }
 }

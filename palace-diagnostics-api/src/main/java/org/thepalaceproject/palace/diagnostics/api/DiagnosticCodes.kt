@@ -20,23 +20,58 @@ object DiagnosticCodes {
   /**
    * A period of reading/listening time was dropped and will not be reported to the time
    * tracking backend. The reason for the loss (book switched mid-session, no active book,
-   * local write failure, parse failure, ...) is carried in the `reason` data field.
+   * local write failure, parse failure, ...) is carried in the `Reason` data field.
    */
 
   const val TIME_TRACKING_LOSS = "TimeTrackingLoss"
 
   /**
-   * A book failed to open (e.g. a DRM decryption failure or a corrupted/unreadable content
-   * file). The specific cause is carried by the associated throwable and the
-   * `exceptionType` data field.
+   * An EPUB book failed to open (e.g. a DRM decryption failure, a content-protection failure,
+   * or a corrupted/unreadable content file). The failing stage (account lookup, format lookup,
+   * or reader open) is carried in the `Reason` data field; the specific cause is carried by the
+   * associated throwable and the `ExceptionType` data field.
    */
 
-  const val BOOK_OPEN_FAILED = "BookOpenFailed"
+  const val EPUB_BOOK_OPEN_FAILED = "EPUBBookOpenFailed"
+
+  /**
+   * A PDF book failed to open (e.g. a content-protection failure or a failure to start the
+   * local PDF server). The failing stage (account lookup, format lookup, or PDF server
+   * creation) is carried in the `Reason` data field; the specific cause is carried by the
+   * associated throwable and the `ExceptionType` data field.
+   */
+
+  const val PDF_BOOK_OPEN_FAILED = "PDFBookOpenFailed"
+
+  /**
+   * A book preview failed to open in the reader. The failing stage (account lookup, format
+   * inference, or reader open) is carried in the `Reason` data field; the specific cause is
+   * carried by the associated throwable and the `ExceptionType` data field.
+   */
+
+  const val PREVIEW_BOOK_OPEN_FAILED = "PreviewBookOpenFailed"
+
+  /**
+   * An audiobook failed to open. The failing stage (opening the player, downloading the
+   * manifest, license checks, or manifest parsing) is carried in the `Reason` data field; the
+   * book-open failure additionally carries the associated throwable and the `ExceptionType`
+   * data field.
+   */
+
+  const val AUDIOBOOK_BOOK_OPEN_FAILED = "AudiobookBookOpenFailed"
+
+  /**
+   * No viewer provider could handle a book; the book's format is not supported by any viewer
+   * and the book cannot be opened. The unsupported format is carried in the `BookFormat` data
+   * field.
+   */
+
+  const val NO_VIEWER_FOR_BOOK = "NoViewerForBook"
 
   /**
    * Restoring the audiobook last-read position timed out while waiting for bookmarks. Playback
-   * proceeds without the saved position. The originating ticket is carried in the `ticket`
-   * data field.
+   * proceeds without the saved position. The originating ticket is carried in the `Ticket` data
+   * field.
    */
 
   const val AUDIOBOOK_BOOKMARK_TIMEOUT = "AudiobookBookmarkTimeout"

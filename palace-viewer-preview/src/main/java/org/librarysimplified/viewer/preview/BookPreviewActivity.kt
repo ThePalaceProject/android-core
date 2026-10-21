@@ -51,6 +51,8 @@ import org.readium.r2.shared.util.Try
 import org.readium.r2.shared.util.asset.AssetRetriever
 import org.readium.r2.shared.util.http.DefaultHttpClient
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticCodes
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
 import java.io.File
 import java.io.IOException
 import java.util.ServiceLoader
@@ -156,6 +158,27 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
           .account(this.feedEntry.accountID)
     } catch (e: Exception) {
       this.logger.debug("Unable to locate account: ", e)
+      val diagnostics =
+        services.requireService(DiagnosticsServiceType::class.java)
+      diagnostics.report(
+        code = DiagnosticCodes.PREVIEW_BOOK_OPEN_FAILED,
+        data =
+          mapOf(
+            Pair("Reason", "accountNotFound"),
+            Pair("AccountInternalID",
+              this.feedEntry.accountID.uuid
+                .toString()
+            ),
+            Pair("BookID", this.feedEntry.feedEntry.id),
+            Pair("BookTitle", this.feedEntry.feedEntry.title),
+            Pair("BookPublisher",
+              this.feedEntry.feedEntry.publisher
+                .orEmpty()
+            ),
+            Pair("BookDRM", BookDRMInformation.None.kind.name)
+          ),
+        throwable = e
+      )
       this.finish()
       return
     }
@@ -209,6 +232,31 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
         }
     } catch (e: Throwable) {
       this.logger.debug("Unable to locate book format: ", e)
+      val diagnostics =
+        services.requireService(DiagnosticsServiceType::class.java)
+      diagnostics.report(
+        code = DiagnosticCodes.PREVIEW_BOOK_OPEN_FAILED,
+        data =
+          mapOf(
+            Pair("Reason", "formatInferenceFailed"),
+            Pair("AccountInternalID",
+              this.feedEntry.accountID.uuid
+                .toString()
+            ),
+            Pair("AccountProviderID",
+              this.account.provider.id
+                .toString()
+            ),
+            Pair("BookID", this.feedEntry.feedEntry.id),
+            Pair("BookTitle", this.feedEntry.feedEntry.title),
+            Pair("BookPublisher",
+              this.feedEntry.feedEntry.publisher
+                .orEmpty()
+            ),
+            Pair("BookDRM", BookDRMInformation.None.kind.name)
+          ),
+        throwable = e
+      )
       this.finish()
       return
     }
@@ -494,6 +542,33 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
       } else {
         exception
       }
+
+    val diagnostics =
+      Services.serviceDirectory().requireService(DiagnosticsServiceType::class.java)
+    diagnostics.report(
+      code = DiagnosticCodes.PREVIEW_BOOK_OPEN_FAILED,
+      data =
+        mapOf(
+          Pair("Reason", "readerOpenFailed"),
+          Pair("AccountInternalID",
+            this.feedEntry.accountID.uuid
+              .toString()
+          ),
+          Pair("AccountProviderID",
+            this.account.provider.id
+              .toString()
+          ),
+          Pair("BookID", this.feedEntry.feedEntry.id),
+          Pair("BookTitle", this.feedEntry.feedEntry.title),
+          Pair("BookPublisher",
+            this.feedEntry.feedEntry.publisher
+              .orEmpty()
+          ),
+          Pair("BookDRM", this.bookFormat.drmInformation.kind.name),
+          Pair("ExceptionType", actualException.javaClass.name)
+        ),
+      throwable = actualException
+    )
 
     MaterialAlertDialogBuilder(this)
       .setTitle(org.librarysimplified.viewer.epub.readium2.R.string.bookOpenFailedTitle)
