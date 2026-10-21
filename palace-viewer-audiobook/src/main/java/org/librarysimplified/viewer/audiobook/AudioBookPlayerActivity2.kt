@@ -63,8 +63,9 @@ import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
 import org.thepalaceproject.palace.battery.BatteryModel
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticCodes
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
 
 class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_base) {
   private val logger =
@@ -466,9 +467,19 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       AudioBookViewerModel.appliedLastReadBookmarkMigration = true
       PlayerModel.movePlayheadTo(lastRead.position)
     } catch (e: Throwable) {
-      MDC.put("Ticket", "PP-2680")
+      val diagnostics =
+        Services.serviceDirectory().requireService(DiagnosticsServiceType::class.java)
+      diagnostics.report(
+        code = DiagnosticCodes.AUDIOBOOK_BOOKMARK_TIMEOUT,
+        data =
+          mapOf(
+            Pair("Ticket", "PP-2680"),
+            Pair("AccountID", bookParameters.accountID.uuid.toString()),
+            Pair("BookID", bookParameters.bookID.value())
+          ),
+        throwable = e
+      )
       this.logger.error("Timed out waiting for audiobooks bookmarks!")
-      MDC.remove("Ticket")
     }
   }
 

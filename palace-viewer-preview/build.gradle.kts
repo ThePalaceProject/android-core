@@ -14,7 +14,6 @@ dependencies {
     implementation(project(":palace-books-registry-api"))
     implementation(project(":palace-feeds-api"))
     implementation(project(":palace-images"))
-    implementation(project(":palace-mdc"))
     implementation(project(":palace-opds-core"))
     implementation(project(":palace-profiles-api"))
     implementation(project(":palace-profiles-controller-api"))

@@ -5,7 +5,7 @@ plugins {
 dependencies {
     coreLibraryDesugaring(libs.android.desugaring)
 
-    implementation(project(":palace-crashlytics-api"))
+    implementation(project(":palace-diagnostics-api"))
 
     implementation(libs.kotlin.stdlib)
     implementation(libs.kotlin.reflect)

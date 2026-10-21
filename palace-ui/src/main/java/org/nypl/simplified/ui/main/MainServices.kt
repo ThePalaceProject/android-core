@@ -77,7 +77,6 @@ import org.nypl.simplified.boot.api.BootFailureTesting
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.content.api.ContentResolverSane
 import org.nypl.simplified.content.api.ContentResolverType
-import org.nypl.simplified.crashlytics.api.CrashlyticsServiceType
 import org.nypl.simplified.feeds.api.FeedHTTPTransport
 import org.nypl.simplified.feeds.api.FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderType
@@ -123,6 +122,8 @@ import org.thepalaceproject.db.api.DBType
 import org.thepalaceproject.opds.client.OPDSClient
 import org.thepalaceproject.opds.client.OPDSClientParameters
 import org.thepalaceproject.palace.battery.BatteryModel
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsService
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
 import org.thepalaceproject.palace.images.BookCoverBadgeLookupType
 import org.thepalaceproject.palace.images.BookCoverDebugLabelsLookupType
 import org.thepalaceproject.palace.images.BookCoverGenerator
@@ -568,10 +569,12 @@ internal object MainServices {
       serviceConstructor = { MainCatalogBookRevokeStrings(context.resources) }
     )
 
-    addServiceFromServiceLoaderOptionally(
-      message = strings.bootingGeneral("Crashlytics"),
-      interfaceType = CrashlyticsServiceType::class.java
-    )
+    val diagnosticsService =
+      addService(
+        message = strings.bootingGeneral("diagnostics"),
+        interfaceType = DiagnosticsServiceType::class.java,
+        serviceConstructor = { DiagnosticsService.create() }
+      )
 
     val lsHTTP =
       addService(
@@ -963,7 +966,8 @@ internal object MainServices {
           timeSegments = PlayerModel.timeTracker.timeSegments,
           debugDirectory = directories.directoryStorageTimeTrackingDebug.toPath(),
           collectorDirectory = directories.directoryStorageTimeTrackingCollector.toPath(),
-          senderDirectory = directories.directoryStorageTimeTrackingSender.toPath()
+          senderDirectory = directories.directoryStorageTimeTrackingSender.toPath(),
+          diagnostics = diagnosticsService
         )
       }
     )

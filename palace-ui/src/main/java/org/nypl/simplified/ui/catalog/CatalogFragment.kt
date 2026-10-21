@@ -19,7 +19,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.librarysimplified.http.api.LSHTTPNetworkAccessType
-import org.librarysimplified.mdc.MDCKeys
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
 import org.librarysimplified.viewer.preview.BookPreviewActivity
@@ -79,7 +78,6 @@ import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.nypl.simplified.viewer.api.Viewers
 import org.nypl.simplified.viewer.spi.ViewerParameters
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
 import org.thepalaceproject.opds.client.OPDSClientRequest
 import org.thepalaceproject.opds.client.OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY
 import org.thepalaceproject.opds.client.OPDSClientRequest.HistoryBehavior.CLEAR_HISTORY
@@ -91,6 +89,8 @@ import org.thepalaceproject.opds.client.OPDSState.LoadedFeedEntry
 import org.thepalaceproject.opds.client.OPDSState.LoadedFeedWithGroups
 import org.thepalaceproject.opds.client.OPDSState.LoadedFeedWithoutGroups
 import org.thepalaceproject.opds.client.OPDSState.Loading
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticCodes
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
 import java.net.URI
 import java.util.UUID
 import java.util.concurrent.TimeUnit
@@ -596,15 +596,16 @@ sealed class CatalogFragment :
    */
 
   private fun logBookActionStaleAccount(accountID: AccountID) {
-    MDC.put(MDCKeys.ERROR_CODE, "catalogBookActionStaleAccount")
-    try {
-      this.logger.error(
-        "Book action requested for a nonexistent account: {}",
-        accountID
-      )
-    } finally {
-      MDC.remove(MDCKeys.ERROR_CODE)
-    }
+    val diagnostics =
+      Services.serviceDirectory().requireService(DiagnosticsServiceType::class.java)
+    diagnostics.report(
+      code = DiagnosticCodes.CATALOG_BOOK_ACTION_STALE_ACCOUNT,
+      data = mapOf(Pair("AccountID", accountID.toString()))
+    )
+    this.logger.error(
+      "Book action requested for a nonexistent account: {}",
+      accountID
+    )
   }
 
   /**

@@ -21,7 +21,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.joda.time.DateTime
-import org.librarysimplified.mdc.MDCKeys
 import org.librarysimplified.services.api.Services
 import org.nypl.drm.core.ContentProtectionProvider
 import org.nypl.simplified.accounts.api.AccountID
@@ -40,7 +39,6 @@ import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
 import java.io.File
 import java.net.ServerSocket
 import java.util.ServiceLoader
@@ -123,23 +121,11 @@ class PdfReaderActivity : AppCompatActivity() {
     this.feedEntry = params.entry
     this.bookID = params.id
 
-    MDC.put(MDCKeys.ACCOUNT_INTERNAL_ID, this.accountId.uuid.toString())
-    MDC.put(MDCKeys.BOOK_INTERNAL_ID, this.bookID.value())
-    MDC.put(MDCKeys.BOOK_TITLE, this.feedEntry.feedEntry.title)
-    MDC.put(MDCKeys.BOOK_ID, this.feedEntry.feedEntry.id)
-    MDCKeys.put(MDCKeys.BOOK_PUBLISHER, this.feedEntry.feedEntry.publisher)
-    MDC.put(MDCKeys.BOOK_FORMAT, "application/pdf")
-    MDC.remove(MDCKeys.BOOK_DRM)
-
     try {
       this.account =
         this.profilesController
           .profileCurrent()
           .account(this.accountId)
-      MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID,
-        this.account.provider.id
-          .toString()
-      )
     } catch (e: Exception) {
       this.log.debug("Unable to locate account: ", e)
       this.finish()

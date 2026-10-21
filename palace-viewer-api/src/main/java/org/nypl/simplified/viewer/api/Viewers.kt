@@ -2,7 +2,6 @@ package org.nypl.simplified.viewer.api
 
 import android.app.Activity
 import org.joda.time.LocalDateTime
-import org.librarysimplified.mdc.MDCKeys
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.analytics.api.AnalyticsEvent
 import org.nypl.simplified.analytics.api.AnalyticsType
@@ -12,7 +11,6 @@ import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.viewer.spi.ViewerParameters
 import org.nypl.simplified.viewer.spi.ViewerProviderType
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
 import java.util.ServiceLoader
 
 /**
@@ -61,13 +59,6 @@ object Viewers {
     book: Book,
     format: BookFormat
   ) {
-    MDC.put(MDCKeys.BOOK_DRM, format.drmInformation.kind.name)
-    MDC.put(MDCKeys.BOOK_FORMAT, format.contentType.toString())
-    MDC.put(MDCKeys.BOOK_INTERNAL_ID, book.id.value())
-    MDC.put(MDCKeys.BOOK_ID, book.entry.id)
-    MDC.put(MDCKeys.BOOK_TITLE, book.entry.title)
-    MDCKeys.put(MDCKeys.BOOK_PUBLISHER, book.entry.publisher)
-
     this.logger.debug("Open: {} ({})", book.id, book.entry.title)
     val providers =
       ServiceLoader

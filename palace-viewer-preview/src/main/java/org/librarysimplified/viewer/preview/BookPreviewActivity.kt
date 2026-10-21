@@ -15,7 +15,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.runBlocking
-import org.librarysimplified.mdc.MDCKeys
 import org.librarysimplified.r2.api.SR2Event
 import org.librarysimplified.r2.vanilla.SR2Controllers
 import org.librarysimplified.r2.views.SR2Fragment
@@ -52,7 +51,6 @@ import org.readium.r2.shared.util.Try
 import org.readium.r2.shared.util.asset.AssetRetriever
 import org.readium.r2.shared.util.http.DefaultHttpClient
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
 import java.io.File
 import java.io.IOException
 import java.util.ServiceLoader
@@ -150,21 +148,12 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
     }
 
     this.feedEntry = entry
-    MDC.put(MDCKeys.BOOK_TITLE, this.feedEntry.feedEntry.title)
-    MDC.put(MDCKeys.BOOK_ID, this.feedEntry.feedEntry.id)
-    MDCKeys.put(MDCKeys.BOOK_PUBLISHER, this.feedEntry.feedEntry.publisher)
-    MDC.remove(MDCKeys.BOOK_DRM)
-    MDC.remove(MDCKeys.BOOK_FORMAT)
 
     try {
       this.account =
         this.profilesController
           .profileCurrent()
           .account(this.feedEntry.accountID)
-      MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID,
-        this.account.provider.id
-          .toString()
-      )
     } catch (e: Exception) {
       this.logger.debug("Unable to locate account: ", e)
       this.finish()

@@ -9,6 +9,7 @@ import org.librarysimplified.audiobook.time_tracking.PlayerTimeTracked
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
 import java.net.URI
 import java.nio.file.Path
 import java.time.Duration
@@ -41,6 +42,7 @@ class TimeTrackingService private constructor(
       debugDirectory: Path,
       collectorDirectory: Path,
       senderDirectory: Path,
+      diagnostics: DiagnosticsServiceType,
     ): TimeTrackingServiceType {
       val status: AttributeType<TimeTrackingStatus> =
         Attributes
@@ -55,7 +57,8 @@ class TimeTrackingService private constructor(
             status = status,
             timeSegments = timeSegments,
             debugDirectory = debugDirectory,
-            outputDirectory = collectorDirectory
+            outputDirectory = collectorDirectory,
+            diagnostics = diagnostics
           ),
         merge =
           TimeTrackingMerge.create(
@@ -71,7 +74,8 @@ class TimeTrackingService private constructor(
             httpCalls = httpCalls,
             debugDirectory = debugDirectory,
             inputDirectory = senderDirectory,
-            frequency = Duration.ofSeconds(30L)
+            frequency = Duration.ofSeconds(30L),
+            diagnostics = diagnostics
           )
       )
     }

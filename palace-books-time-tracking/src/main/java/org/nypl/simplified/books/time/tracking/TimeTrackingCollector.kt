@@ -6,7 +6,8 @@ import io.reactivex.Observable
 import org.librarysimplified.audiobook.time_tracking.PlayerTimeTracked
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticCodes
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption.ATOMIC_MOVE
@@ -33,6 +34,7 @@ class TimeTrackingCollector private constructor(
   private val timeSegments: Observable<PlayerTimeTracked>,
   private val debugDirectory: Path,
   private val outputDirectory: Path,
+  private val diagnostics: DiagnosticsServiceType,
 ) : TimeTrackingCollectorServiceType {
   private val logger =
     LoggerFactory.getLogger(TimeTrackingCollector::class.java)
@@ -70,18 +72,21 @@ class TimeTrackingCollector private constructor(
 
   private fun saveTimeTracked(time: PlayerTimeTracked) {
     try {
-      MDC.put("System", "TimeTracking")
-      MDC.put("SubSystem", "Collector")
-      MDC.put("Book", time.bookTrackingId.value)
-      MDC.put("Seconds", time.seconds.toString())
-      MDC.remove("TimeLoss")
-
       when (val statusNow = this.status.get()) {
         is TimeTrackingStatus.Active -> {
           val account = this.profiles.profileCurrent().account(statusNow.accountID)
 
           if (time.bookTrackingId != statusNow.bookId) {
-            MDC.put("TimeLoss", "true")
+            this.diagnostics.report(
+              code = DiagnosticCodes.TIME_TRACKING_LOSS,
+              data =
+                mapOf(
+                  Pair("Reason", "bookMismatch"),
+                  Pair("Book", time.bookTrackingId.value),
+                  Pair("ActiveBook", statusNow.bookId.value),
+                  Pair("Seconds", time.seconds.toString())
+                )
+            )
             this.logger.warn(
               "Time loss: Time tracking data received for book {}, but book {} is selected",
               statusNow.bookId,
@@ -121,7 +126,15 @@ class TimeTrackingCollector private constructor(
         }
 
         TimeTrackingStatus.Inactive -> {
-          MDC.put("TimeLoss", "true")
+          this.diagnostics.report(
+            code = DiagnosticCodes.TIME_TRACKING_LOSS,
+            data =
+              mapOf(
+                Pair("Reason", "noActiveBook"),
+                Pair("Book", time.bookTrackingId.value),
+                Pair("Seconds", time.seconds.toString())
+              )
+          )
           this.logger.warn(
             "Time tracking data received for book {}, but no book is selected",
             time.bookTrackingId
@@ -129,7 +142,16 @@ class TimeTrackingCollector private constructor(
         }
       }
     } catch (e: Throwable) {
-      MDC.put("TimeLoss", "true")
+      this.diagnostics.report(
+        code = DiagnosticCodes.TIME_TRACKING_LOSS,
+        data =
+          mapOf(
+            Pair("Reason", "saveFailed"),
+            Pair("Book", time.bookTrackingId.value),
+            Pair("Seconds", time.seconds.toString())
+          ),
+        throwable = e
+      )
       this.logger.warn("Failed to save time tracking information: ", e)
     } finally {
       this.awaitWrite.offer(Unit)
@@ -143,13 +165,15 @@ class TimeTrackingCollector private constructor(
       timeSegments: Observable<PlayerTimeTracked>,
       debugDirectory: Path,
       outputDirectory: Path,
+      diagnostics: DiagnosticsServiceType,
     ): TimeTrackingCollectorServiceType =
       TimeTrackingCollector(
         profiles = profiles,
         status = status,
         timeSegments = timeSegments,
         debugDirectory = debugDirectory,
-        outputDirectory = outputDirectory
+        outputDirectory = outputDirectory,
+        diagnostics = diagnostics
       )
   }
 

@@ -12,7 +12,6 @@ dependencies {
     implementation(project(":palace-books-database-api"))
     implementation(project(":palace-books-formats-api"))
     implementation(project(":palace-feeds-api"))
-    implementation(project(":palace-mdc"))
     implementation(project(":palace-opds-core"))
     implementation(project(":palace-presentableerror-api"))
     implementation(project(":palace-profiles-api"))

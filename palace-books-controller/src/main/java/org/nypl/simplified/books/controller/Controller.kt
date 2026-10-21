@@ -16,7 +16,6 @@ import org.librarysimplified.services.api.ServiceDirectoryType
 import org.nypl.drm.core.AdobeAdeptExecutorType
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.accounts.api.AccountEventDeletion
-import org.nypl.simplified.accounts.api.AccountEventUpdated
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountLoginStringResourcesType
 import org.nypl.simplified.accounts.api.AccountLogoutStringResourcesType
@@ -43,7 +42,6 @@ import org.nypl.simplified.books.controller.api.BooksPreviewControllerType
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.books.preview.BookPreviewRequirements
 import org.nypl.simplified.books.preview.BookPreviewTask
-import org.nypl.simplified.crashlytics.api.CrashlyticsServiceType
 import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedLoaderType
@@ -127,16 +125,12 @@ class Controller private constructor(
     this.services.requireService(ProfilesDatabaseType::class.java)
   private val revokeStrings =
     this.services.requireService(BookRevokeStringResourcesType::class.java)
-  private val crashlytics =
-    this.services.optionalService(CrashlyticsServiceType::class.java)
 
   private val temporaryDirectory =
     File(this.cacheDirectory, "tmp")
 
   private val accountRegistrySubscription: Disposable
-  private val accountSubscription: Disposable
   private val accountDeletionSubscription: Disposable
-  private val profileUpdateSubscription: Disposable
 
   private val logger =
     LoggerFactory.getLogger(Controller::class.java)
@@ -157,22 +151,10 @@ class Controller private constructor(
     this.accountRegistrySubscription =
       this.accountProviders.events.subscribe(this::onAccountRegistryEvent)
 
-    this.accountSubscription =
-      this.accountEvents
-        .ofType(AccountEventUpdated::class.java)
-        .subscribe(this::onAccountUpdated)
-
     this.accountDeletionSubscription =
       this.accountEvents
         .ofType(AccountEventDeletion.AccountEventDeletionSucceeded::class.java)
         .subscribe(this::onAccountDeleted)
-
-    this.profileUpdateSubscription =
-      this.profileEvents
-        .ofType(ProfileUpdated::class.java)
-        .subscribe(this::onProfileUpdated)
-
-    this.updateCrashlytics()
 
     this.submitTask {
       this.logger.debug("Scheduling profile data load...")
@@ -183,28 +165,9 @@ class Controller private constructor(
     }
   }
 
-  private fun onProfileUpdated(event: ProfileUpdated) {
-    this.updateCrashlytics()
-  }
-
-  private fun onAccountUpdated(event: AccountEventUpdated) {
-    this.updateCrashlytics()
-  }
-
   private fun onAccountDeleted(event: AccountEventDeletion.AccountEventDeletionSucceeded) {
     this.logger.debug("Purging book registry for deleted account {}", event.id)
     this.bookRegistry.clearForAccount(event.id)
-  }
-
-  private fun updateCrashlytics() {
-    val profile = this.profileCurrent()
-    val crash = this.crashlytics
-    if (crash != null) {
-      ControllerCrashlytics.configureCrashlytics(
-        profile = profile,
-        crashlytics = crash
-      )
-    }
   }
 
   /**
