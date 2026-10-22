@@ -5,7 +5,6 @@ import io.azam.ulidj.ULID
 import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.nypl.simplified.accounts.api.AccountID
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
 import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Path
@@ -88,9 +87,6 @@ class TimeTrackingMerge private constructor(
 
   private fun tick() {
     try {
-      MDC.put("System", "TimeTracking")
-      MDC.put("SubSystem", "Merge")
-
       val timeNow =
         this.clock
           .invoke()

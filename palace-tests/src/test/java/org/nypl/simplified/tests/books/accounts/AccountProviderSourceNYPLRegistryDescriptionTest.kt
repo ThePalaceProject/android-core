@@ -133,7 +133,7 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
         updated = OffsetDateTime.parse("2019-07-09T08:33:40+00:00"),
         links = listOf(
           Link.LinkBasic(
-            URI.create("http://www.example.com/auth"),
+            this.server.url("auth").toUri(),
             AUTH_DOCUMENT_TYPE
           )
         ),
@@ -151,7 +151,6 @@ class AccountProviderSourceNYPLRegistryDescriptionTest {
     this.server.enqueue(
       MockResponse()
         .setResponseCode(400)
-        .setStatus("BAD REQUEST")
         .setBody("")
     )
 

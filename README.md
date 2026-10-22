@@ -323,7 +323,6 @@ coupled as possible.
 |[org.librarysimplified.buildconfig.api](palace-buildconfig-api)|Build-time configuration API|
 |[org.librarysimplified.content.api](palace-content-api)|Content resolver API|
 |[org.librarysimplified.crashlytics](palace-crashlytics)|Crashlytics|
-|[org.librarysimplified.crashlytics.api](palace-crashlytics-api)|Crashlytics functionality|
 |[org.librarysimplified.documents](palace-documents)|Documents|
 |[org.librarysimplified.feeds.api](palace-feeds-api)|Feed API|
 |[org.librarysimplified.files](palace-files)|File utilities|
@@ -332,7 +331,6 @@ coupled as possible.
 |[org.librarysimplified.lcp](palace-lcp)|LCP content protection provider|
 |[org.librarysimplified.links](palace-links)|Link types|
 |[org.librarysimplified.links.json](palace-links-json)|Link JSON parsing|
-|[org.librarysimplified.mdc](palace-mdc)|MDC conventions|
 |[org.librarysimplified.notifications](palace-notifications)|Notification service|
 |[org.librarysimplified.opds.auth_document](palace-opds-auth-document)|OPDS authentication document parser implementation|
 |[org.librarysimplified.opds.auth_document.api](palace-opds-auth-document-api)|OPDS authentication document parser API|

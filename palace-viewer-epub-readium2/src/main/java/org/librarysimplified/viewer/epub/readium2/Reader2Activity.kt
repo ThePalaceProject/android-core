@@ -16,7 +16,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.runBlocking
 import org.joda.time.LocalDateTime
-import org.librarysimplified.mdc.MDCKeys
 import org.librarysimplified.r2.api.SR2ControllerType
 import org.librarysimplified.r2.api.SR2Event
 import org.librarysimplified.r2.api.SR2Event.SR2BookmarkEvent.SR2BookmarkCreated
@@ -59,7 +58,8 @@ import org.readium.r2.shared.util.asset.AssetRetriever
 import org.readium.r2.shared.util.asset.ContainerAsset
 import org.readium.r2.shared.util.http.DefaultHttpClient
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticCodes
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
 import java.io.File
 import java.io.IOException
 import java.util.ServiceLoader
@@ -151,30 +151,36 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     }
 
     this.parameters = params
-    MDC.put(
-      MDCKeys.ACCOUNT_INTERNAL_ID,
-      this.parameters.accountId.uuid
-        .toString()
-    )
-    MDC.put(MDCKeys.BOOK_INTERNAL_ID, this.parameters.bookId.value())
-    MDC.put(MDCKeys.BOOK_TITLE, this.parameters.entry.feedEntry.title)
-    MDC.put(MDCKeys.BOOK_ID, this.parameters.entry.feedEntry.id)
-    MDCKeys.put(MDCKeys.BOOK_PUBLISHER, this.parameters.entry.feedEntry.publisher)
-    MDC.put(MDCKeys.BOOK_DRM, this.parameters.drmInfo.kind.name)
-    MDC.remove(MDCKeys.BOOK_FORMAT)
 
     try {
       this.account =
         this.profilesController
           .profileCurrent()
           .account(this.parameters.accountId)
-      MDC.put(
-        MDCKeys.ACCOUNT_PROVIDER_ID,
-        this.account.provider.id
-          .toString()
-      )
     } catch (e: Exception) {
       this.logger.debug("Unable to locate account: ", e)
+      val diagnostics =
+        Services.serviceDirectory().requireService(DiagnosticsServiceType::class.java)
+      diagnostics.report(
+        code = DiagnosticCodes.EPUB_BOOK_OPEN_FAILED,
+        data =
+          mapOf(
+            Pair("Reason", "accountNotFound"),
+            Pair("AccountInternalID",
+              this.parameters.accountId.uuid
+                .toString()
+            ),
+            Pair("BookID", this.parameters.entry.feedEntry.id),
+            Pair("BookInternalID", this.parameters.bookId.value()),
+            Pair("BookTitle", this.parameters.entry.feedEntry.title),
+            Pair("BookPublisher",
+              this.parameters.entry.feedEntry.publisher
+                .orEmpty()
+            ),
+            Pair("BookDRM", this.parameters.drmInfo.kind.name)
+          ),
+        throwable = e
+      )
       this.finish()
       return
     }
@@ -187,6 +193,32 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
           .findFormat(BookFormat.BookFormatEPUB::class.java)!!
     } catch (e: Throwable) {
       this.logger.debug("Unable to locate book format: ", e)
+      val diagnostics =
+        Services.serviceDirectory().requireService(DiagnosticsServiceType::class.java)
+      diagnostics.report(
+        code = DiagnosticCodes.EPUB_BOOK_OPEN_FAILED,
+        data =
+          mapOf(
+            Pair("Reason", "formatNotFound"),
+            Pair("AccountInternalID",
+              this.parameters.accountId.uuid
+                .toString()
+            ),
+            Pair("AccountProviderID",
+              this.account.provider.id
+                .toString()
+            ),
+            Pair("BookID", this.parameters.entry.feedEntry.id),
+            Pair("BookInternalID", this.parameters.bookId.value()),
+            Pair("BookTitle", this.parameters.entry.feedEntry.title),
+            Pair("BookPublisher",
+              this.parameters.entry.feedEntry.publisher
+                .orEmpty()
+            ),
+            Pair("BookDRM", this.parameters.drmInfo.kind.name)
+          ),
+        throwable = e
+      )
       this.finish()
       return
     }
@@ -578,9 +610,34 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
         exception
       }
 
-    MDC.put("DRMFailure", actualException.message)
+    val diagnostics =
+      Services.serviceDirectory().requireService(DiagnosticsServiceType::class.java)
+    diagnostics.report(
+      code = DiagnosticCodes.EPUB_BOOK_OPEN_FAILED,
+      data =
+        mapOf(
+          Pair("Reason", "readerOpenFailed"),
+          Pair("AccountInternalID",
+            this.parameters.accountId.uuid
+              .toString()
+          ),
+          Pair("AccountProviderID",
+            this.account.provider.id
+              .toString()
+          ),
+          Pair("BookID", this.parameters.entry.feedEntry.id),
+          Pair("BookInternalID", this.parameters.bookId.value()),
+          Pair("BookTitle", this.parameters.entry.feedEntry.title),
+          Pair("BookPublisher",
+            this.parameters.entry.feedEntry.publisher
+              .orEmpty()
+          ),
+          Pair("BookDRM", this.parameters.drmInfo.kind.name),
+          Pair("ExceptionType", actualException.javaClass.name)
+        ),
+      throwable = actualException
+    )
     this.logger.error("Failed to open book: ", actualException)
-    MDC.remove("DRMFailure")
 
     MaterialAlertDialogBuilder(this)
       .setTitle(R.string.bookOpenFailedTitle)
