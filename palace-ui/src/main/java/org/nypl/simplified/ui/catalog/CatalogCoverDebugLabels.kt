@@ -59,7 +59,8 @@ class CatalogCoverDebugLabels : BookCoverDebugLabelsLookupType {
     fun drmNameOf(entry: OPDSAcquisitionFeedEntry): String {
       val licensor = entry.licensor
       val types =
-        OPDSAcquisitionPaths.linearize(entry)
+        OPDSAcquisitionPaths
+          .linearize(entry)
           .flatMap { it.asMIMETypes() }
           .map { it.fullType }
           .toSet()
