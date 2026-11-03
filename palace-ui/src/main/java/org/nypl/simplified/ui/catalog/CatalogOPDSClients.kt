@@ -115,12 +115,32 @@ class CatalogOPDSClients(
   }
 
   private fun onAccountDeleted() {
-    this.logger.debug("An account has been deleted. Clearing history.")
+    this.logger.debug("An account has been deleted. Clearing history and re-pointing clients.")
 
     UIThread.runOnUIThread {
+      /*
+       * First guarantee that no client is left holding the deleted account's feed.
+       */
       this.clearHistory(this.mainClient)
       this.clearHistory(this.booksClient)
       this.clearHistory(this.holdsClient)
+
+      /*
+       * Then proactively point every client at the current account's root feed, so that no tab
+       * is left empty or stale regardless of fragment lifecycle.
+       */
+      try {
+        val account =
+          this.profiles
+            .profileCurrent()
+            .mostRecentAccount()
+
+        this.goToRootFeedFor(CatalogPart.CATALOG, account)
+        this.goToRootFeedFor(CatalogPart.BOOKS, account)
+        this.goToRootFeedFor(CatalogPart.HOLDS, account)
+      } catch (e: Throwable) {
+        this.logger.debug("Failed to re-point clients after account deletion: ", e)
+      }
     }
   }
 

@@ -21,7 +21,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.joda.time.DateTime
-import org.librarysimplified.mdc.MDCKeys
 import org.librarysimplified.services.api.Services
 import org.nypl.drm.core.ContentProtectionProvider
 import org.nypl.simplified.accounts.api.AccountID
@@ -40,7 +39,8 @@ import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticCodes
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
 import java.io.File
 import java.net.ServerSocket
 import java.util.ServiceLoader
@@ -123,25 +123,32 @@ class PdfReaderActivity : AppCompatActivity() {
     this.feedEntry = params.entry
     this.bookID = params.id
 
-    MDC.put(MDCKeys.ACCOUNT_INTERNAL_ID, this.accountId.uuid.toString())
-    MDC.put(MDCKeys.BOOK_INTERNAL_ID, this.bookID.value())
-    MDC.put(MDCKeys.BOOK_TITLE, this.feedEntry.feedEntry.title)
-    MDC.put(MDCKeys.BOOK_ID, this.feedEntry.feedEntry.id)
-    MDCKeys.put(MDCKeys.BOOK_PUBLISHER, this.feedEntry.feedEntry.publisher)
-    MDC.put(MDCKeys.BOOK_FORMAT, "application/pdf")
-    MDC.remove(MDCKeys.BOOK_DRM)
-
     try {
       this.account =
         this.profilesController
           .profileCurrent()
           .account(this.accountId)
-      MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID,
-        this.account.provider.id
-          .toString()
-      )
     } catch (e: Exception) {
       this.log.debug("Unable to locate account: ", e)
+      val diagnostics =
+        this.services.requireService(DiagnosticsServiceType::class.java)
+      diagnostics.report(
+        code = DiagnosticCodes.PDF_BOOK_OPEN_FAILED,
+        data =
+          mapOf(
+            Pair("Reason", "accountNotFound"),
+            Pair("AccountInternalID", this.accountId.uuid.toString()),
+            Pair("BookID", this.feedEntry.feedEntry.id),
+            Pair("BookInternalID", this.bookID.value()),
+            Pair("BookTitle", this.feedEntry.feedEntry.title),
+            Pair("BookPublisher",
+              this.feedEntry.feedEntry.publisher
+                .orEmpty()
+            ),
+            Pair("BookDRM", params.drmInfo.kind.name)
+          ),
+        throwable = e
+      )
       this.finish()
       return
     }
@@ -154,6 +161,29 @@ class PdfReaderActivity : AppCompatActivity() {
           .findFormat(BookFormat.BookFormatPDF::class.java)!!
     } catch (e: Throwable) {
       this.log.debug("Unable to locate book format: ", e)
+      val diagnostics =
+        this.services.requireService(DiagnosticsServiceType::class.java)
+      diagnostics.report(
+        code = DiagnosticCodes.PDF_BOOK_OPEN_FAILED,
+        data =
+          mapOf(
+            Pair("Reason", "formatNotFound"),
+            Pair("AccountInternalID", this.accountId.uuid.toString()),
+            Pair("AccountProviderID",
+              this.account.provider.id
+                .toString()
+            ),
+            Pair("BookID", this.feedEntry.feedEntry.id),
+            Pair("BookInternalID", this.bookID.value()),
+            Pair("BookTitle", this.feedEntry.feedEntry.title),
+            Pair("BookPublisher",
+              this.feedEntry.feedEntry.publisher
+                .orEmpty()
+            ),
+            Pair("BookDRM", params.drmInfo.kind.name)
+          ),
+        throwable = e
+      )
       this.finish()
       return
     }
@@ -337,6 +367,31 @@ class PdfReaderActivity : AppCompatActivity() {
               port = ephemeralSocket.localPort
             )
         } catch (exception: Exception) {
+          val diagnostics =
+            this@PdfReaderActivity.services.requireService(DiagnosticsServiceType::class.java)
+          diagnostics.report(
+            code = DiagnosticCodes.PDF_BOOK_OPEN_FAILED,
+            data =
+              mapOf(
+                Pair("Reason", "pdfServerCreateFailed"),
+                Pair("AccountInternalID", this@PdfReaderActivity.accountId.uuid.toString()),
+                Pair("AccountProviderID",
+                  this@PdfReaderActivity
+                    .account.provider.id
+                    .toString()
+                ),
+                Pair("BookID", this@PdfReaderActivity.feedEntry.feedEntry.id),
+                Pair("BookInternalID", this@PdfReaderActivity.bookID.value()),
+                Pair("BookTitle", this@PdfReaderActivity.feedEntry.feedEntry.title),
+                Pair("BookPublisher",
+                  this@PdfReaderActivity
+                    .feedEntry.feedEntry.publisher
+                    .orEmpty()
+                ),
+                Pair("BookDRM", drmInfo.kind.name)
+              ),
+            throwable = exception
+          )
           this@PdfReaderActivity.showErrorWithRunnable(
             context = this@PdfReaderActivity,
             title = exception.message ?: "",

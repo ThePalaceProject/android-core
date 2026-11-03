@@ -63,8 +63,9 @@ import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
 import org.thepalaceproject.palace.battery.BatteryModel
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticCodes
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
 
 class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_base) {
   private val logger =
@@ -466,9 +467,19 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       AudioBookViewerModel.appliedLastReadBookmarkMigration = true
       PlayerModel.movePlayheadTo(lastRead.position)
     } catch (e: Throwable) {
-      MDC.put("Ticket", "PP-2680")
+      val diagnostics =
+        Services.serviceDirectory().requireService(DiagnosticsServiceType::class.java)
+      diagnostics.report(
+        code = DiagnosticCodes.AUDIOBOOK_BOOKMARK_TIMEOUT,
+        data =
+          mapOf(
+            Pair("Ticket", "PP-2680"),
+            Pair("AccountID", bookParameters.accountID.uuid.toString()),
+            Pair("BookID", bookParameters.bookID.value())
+          ),
+        throwable = e
+      )
       this.logger.error("Timed out waiting for audiobooks bookmarks!")
-      MDC.remove("Ticket")
     }
   }
 
@@ -536,11 +547,32 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
   private fun onManifestParseFailed(state: PlayerModelState.PlayerManifestParseFailed) {
     this.logger.error("onManifestParseFailed: {}", state)
 
+    val bookParameters =
+      AudioBookViewerModel.parameters ?: return
+
     val task = TaskRecorder.create()
     task.beginNewStep("Parsing manifest…")
 
     val extraMessages =
       state.failure.map { error -> "${error.line}:${error.column}: ${error.message}" }
+
+    val diagnostics =
+      Services.serviceDirectory().requireService(DiagnosticsServiceType::class.java)
+    diagnostics.report(
+      code = DiagnosticCodes.AUDIOBOOK_BOOK_OPEN_FAILED,
+      data =
+        mapOf(
+          Pair("Reason", "manifestParse"),
+          Pair("AccountInternalID", bookParameters.accountID.uuid.toString()),
+          Pair("AccountProviderID", bookParameters.accountProviderID.toString()),
+          Pair("BookID", bookParameters.opdsEntry.id),
+          Pair("BookInternalID", bookParameters.bookID.value()),
+          Pair("BookTitle", bookParameters.opdsEntry.title),
+          Pair("BookPublisher", bookParameters.opdsEntry.publisher.orEmpty()),
+          Pair("BookDRM", bookParameters.drmInfo.kind.name),
+          Pair("Details", extraMessages.joinToString("; "))
+        )
+    )
 
     task.currentStepFailed(
       message = "Parsing failed.",
@@ -577,6 +609,9 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
   private fun onBookOpenFailed(state: PlayerModelState.PlayerBookOpenFailed) {
     this.logger.error("onBookOpenFailed: {}", state)
 
+    val bookParameters =
+      AudioBookViewerModel.parameters ?: return
+
     val task = TaskRecorder.create()
     task.beginNewStep("Opening book…")
     task.currentStepFailed(
@@ -584,6 +619,25 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       errorCode = "error-book-open",
       exception = state.exception,
       extraMessages = listOf()
+    )
+
+    val diagnostics =
+      Services.serviceDirectory().requireService(DiagnosticsServiceType::class.java)
+    diagnostics.report(
+      code = DiagnosticCodes.AUDIOBOOK_BOOK_OPEN_FAILED,
+      data =
+        mapOf(
+          Pair("Reason", "bookOpen"),
+          Pair("AccountInternalID", bookParameters.accountID.uuid.toString()),
+          Pair("AccountProviderID", bookParameters.accountProviderID.toString()),
+          Pair("BookID", bookParameters.opdsEntry.id),
+          Pair("BookInternalID", bookParameters.bookID.value()),
+          Pair("BookTitle", bookParameters.opdsEntry.title),
+          Pair("BookPublisher", bookParameters.opdsEntry.publisher.orEmpty()),
+          Pair("BookDRM", bookParameters.drmInfo.kind.name),
+          Pair("ExceptionType", state.exception.javaClass.name)
+        ),
+      throwable = state.exception
     )
 
     val alert = MaterialAlertDialogBuilder(this)
@@ -602,6 +656,9 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
   private fun onManifestDownloadFailed(state: PlayerModelState.PlayerManifestDownloadFailed) {
     this.logger.error("onManifestDownloadFailed: {}", state)
 
+    val bookParameters =
+      AudioBookViewerModel.parameters ?: return
+
     val task = TaskRecorder.create()
     task.beginNewStep("Downloading manifest…")
     val serverData = state.failure.serverData
@@ -615,6 +672,24 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       message = state.failure.message,
       errorCode = "error-manifest-download",
       extraMessages = listOf()
+    )
+
+    val diagnostics =
+      Services.serviceDirectory().requireService(DiagnosticsServiceType::class.java)
+    diagnostics.report(
+      code = DiagnosticCodes.AUDIOBOOK_BOOK_OPEN_FAILED,
+      data =
+        mapOf(
+          Pair("Reason", "manifestDownload"),
+          Pair("AccountInternalID", bookParameters.accountID.uuid.toString()),
+          Pair("AccountProviderID", bookParameters.accountProviderID.toString()),
+          Pair("BookID", bookParameters.opdsEntry.id),
+          Pair("BookInternalID", bookParameters.bookID.value()),
+          Pair("BookTitle", bookParameters.opdsEntry.title),
+          Pair("BookPublisher", bookParameters.opdsEntry.publisher.orEmpty()),
+          Pair("BookDRM", bookParameters.drmInfo.kind.name),
+          Pair("Details", state.failure.message)
+        )
     )
 
     val alert = MaterialAlertDialogBuilder(this)
@@ -633,12 +708,33 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
   private fun onManifestLicenseChecksFailed(state: PlayerModelState.PlayerManifestLicenseChecksFailed) {
     this.logger.error("onManifestLicenseChecksFailed: {}", state)
 
+    val bookParameters =
+      AudioBookViewerModel.parameters ?: return
+
     val task = TaskRecorder.create()
     task.beginNewStep("Checking license…")
     task.currentStepFailed(
       message = "License checks failed.",
       errorCode = "error-manifest-license",
       extraMessages = state.messages
+    )
+
+    val diagnostics =
+      Services.serviceDirectory().requireService(DiagnosticsServiceType::class.java)
+    diagnostics.report(
+      code = DiagnosticCodes.AUDIOBOOK_BOOK_OPEN_FAILED,
+      data =
+        mapOf(
+          Pair("Reason", "manifestLicense"),
+          Pair("AccountInternalID", bookParameters.accountID.uuid.toString()),
+          Pair("AccountProviderID", bookParameters.accountProviderID.toString()),
+          Pair("BookID", bookParameters.opdsEntry.id),
+          Pair("BookInternalID", bookParameters.bookID.value()),
+          Pair("BookTitle", bookParameters.opdsEntry.title),
+          Pair("BookPublisher", bookParameters.opdsEntry.publisher.orEmpty()),
+          Pair("BookDRM", bookParameters.drmInfo.kind.name),
+          Pair("Details", state.messages.joinToString("; "))
+        )
     )
 
     val alert = MaterialAlertDialogBuilder(this)

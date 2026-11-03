@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    The application talks to endpoints that are neither controlled nor
+    enumerable in advance: user-supplied self-hosted PalaceID / account
+    URIs, public-library OPDS catalogs, and publisher-provided fulfill
+    servers reached via links in those catalogs. Some of these are plain
+    HTTP, or redirect to plain HTTP, and cannot be fixed on the server
+    side.
+
+    A <base-config> therefore permits cleartext for all domains,
+    preserving the previous android:usesCleartextTraffic="true" behavior.
+    This is also the Android 17 (API 37) requirement: targeting 37 while
+    relying on usesCleartextTraffic without a corresponding network
+    security config defaults to disallowing cleartext traffic.
+
+    Trust anchors are left at the platform default (system and
+    user-installed CAs), as before.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>

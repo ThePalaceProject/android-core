@@ -77,7 +77,6 @@ import org.nypl.simplified.boot.api.BootFailureTesting
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.content.api.ContentResolverSane
 import org.nypl.simplified.content.api.ContentResolverType
-import org.nypl.simplified.crashlytics.api.CrashlyticsServiceType
 import org.nypl.simplified.feeds.api.FeedHTTPTransport
 import org.nypl.simplified.feeds.api.FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderType
@@ -109,6 +108,7 @@ import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.accounts.AccountEvents
 import org.nypl.simplified.ui.catalog.CatalogBookRegistryEvents
 import org.nypl.simplified.ui.catalog.CatalogCoverBadgeImages
+import org.nypl.simplified.ui.catalog.CatalogCoverDebugLabels
 import org.nypl.simplified.ui.catalog.CatalogOPDSClients
 import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.nypl.simplified.ui.screen.ScreenSizeInformation
@@ -122,7 +122,10 @@ import org.thepalaceproject.db.api.DBType
 import org.thepalaceproject.opds.client.OPDSClient
 import org.thepalaceproject.opds.client.OPDSClientParameters
 import org.thepalaceproject.palace.battery.BatteryModel
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsService
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
 import org.thepalaceproject.palace.images.BookCoverBadgeLookupType
+import org.thepalaceproject.palace.images.BookCoverDebugLabelsLookupType
 import org.thepalaceproject.palace.images.BookCoverGenerator
 import org.thepalaceproject.palace.images.BookCoverGeneratorType
 import org.thepalaceproject.palace.images.ImageLoader2
@@ -420,6 +423,8 @@ internal object MainServices {
     screenSize: ScreenSizeInformationType
   ): BookCoverBadgeLookupType = CatalogCoverBadgeImages.create(context.resources, screenSize)
 
+  private fun createBookCoverDebugLabels(): BookCoverDebugLabelsLookupType = CatalogCoverDebugLabels()
+
   private fun publishApplicationStartupEvent(
     context: Application,
     analytics: AnalyticsType
@@ -564,10 +569,12 @@ internal object MainServices {
       serviceConstructor = { MainCatalogBookRevokeStrings(context.resources) }
     )
 
-    addServiceFromServiceLoaderOptionally(
-      message = strings.bootingGeneral("Crashlytics"),
-      interfaceType = CrashlyticsServiceType::class.java
-    )
+    val diagnosticsService =
+      addService(
+        message = strings.bootingGeneral("diagnostics"),
+        interfaceType = DiagnosticsServiceType::class.java,
+        serviceConstructor = { DiagnosticsService.create() }
+      )
 
     val lsHTTP =
       addService(
@@ -659,7 +666,8 @@ internal object MainServices {
           context = context,
           bookRegistry = bookRegistry,
           coverGenerator = coverGenerator,
-          badgeLookup = createBookCoverBadgeLookup(context, screenSize)
+          badgeLookup = createBookCoverBadgeLookup(context, screenSize),
+          debugLabelsLookup = createBookCoverDebugLabels()
         )
       }
     )
@@ -958,7 +966,8 @@ internal object MainServices {
           timeSegments = PlayerModel.timeTracker.timeSegments,
           debugDirectory = directories.directoryStorageTimeTrackingDebug.toPath(),
           collectorDirectory = directories.directoryStorageTimeTrackingCollector.toPath(),
-          senderDirectory = directories.directoryStorageTimeTrackingSender.toPath()
+          senderDirectory = directories.directoryStorageTimeTrackingSender.toPath(),
+          diagnostics = diagnosticsService
         )
       }
     )
@@ -1030,13 +1039,15 @@ internal object MainServices {
     context: Application,
     bookRegistry: BookRegistryReadableType,
     coverGenerator: BookCoverGeneratorType,
-    badgeLookup: BookCoverBadgeLookupType
+    badgeLookup: BookCoverBadgeLookupType,
+    debugLabelsLookup: BookCoverDebugLabelsLookupType
   ): ImageLoader2Type =
     ImageLoader2.create(
       context,
       bookRegistry,
       coverGenerator,
-      badgeLookup
+      badgeLookup,
+      debugLabelsLookup
     )
 
   fun createNetworkAccessService(context: Application): LSHTTPNetworkAccessType {

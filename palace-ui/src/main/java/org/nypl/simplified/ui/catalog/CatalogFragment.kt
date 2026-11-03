@@ -1,6 +1,5 @@
 package org.nypl.simplified.ui.catalog
 
-import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
@@ -23,11 +22,11 @@ import org.librarysimplified.http.api.LSHTTPNetworkAccessType
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
 import org.librarysimplified.viewer.preview.BookPreviewActivity
-import org.nypl.simplified.accessibility.AccessibilityServiceType
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountLoginState
 import org.nypl.simplified.accounts.database.api.AccountType
+import org.nypl.simplified.accounts.database.api.AccountsDatabaseNonexistentException
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
@@ -90,6 +89,8 @@ import org.thepalaceproject.opds.client.OPDSState.LoadedFeedEntry
 import org.thepalaceproject.opds.client.OPDSState.LoadedFeedWithGroups
 import org.thepalaceproject.opds.client.OPDSState.LoadedFeedWithoutGroups
 import org.thepalaceproject.opds.client.OPDSState.Loading
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticCodes
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
 import java.net.URI
 import java.util.UUID
 import java.util.concurrent.TimeUnit
@@ -122,7 +123,6 @@ sealed class CatalogFragment :
   private var perViewSubscriptions =
     CloseableCollection.create()
 
-  private lateinit var accessibility: AccessibilityServiceType
   private lateinit var bookPreviewRegistry: BookPreviewRegistryType
   private lateinit var bookRegistry: BookRegistryReadableType
   private lateinit var buttonCreator: CatalogButtons
@@ -191,8 +191,6 @@ sealed class CatalogFragment :
       CatalogButtons(this.requireContext())
     this.catalogBookEvents =
       services.requireService(CatalogBookRegistryEvents::class.java)
-    this.accessibility =
-      services.requireService(AccessibilityServiceType::class.java)
 
     this.opdsClient =
       opdsClients.clientFor(this.catalogPart)
@@ -343,6 +341,7 @@ sealed class CatalogFragment :
 
     this.resetPerViewSubscriptions()
     this.contentContainer.removeAllViews()
+    CatalogSearchResultsAccessibility.searchCleared()
 
     when (newState) {
       is OPDSState.Error -> {
@@ -364,12 +363,29 @@ sealed class CatalogFragment :
 
       is LoadedFeedWithGroups -> {
         this.onStateChangedToGroups(newState)
-        this.viewNow.startFocusDelayed()
+        if (this.isCatalogSearch(newState.request)) {
+          val view = this.viewNow as CatalogFeedViewGroups
+          val feed = newState.handle.feed()
+          CatalogSearchResultsAccessibility.searchResultsLoaded(
+            listView = view.listView,
+            itemCount = feed.feedGroupsInOrder.sumOf { it.groupEntries.size }
+          )
+        } else {
+          this.viewNow.startFocusDelayed()
+        }
       }
 
       is LoadedFeedWithoutGroups -> {
         this.onStateChangedToInfinite(newState)
-        this.viewNow.startFocusDelayed()
+        if (this.isCatalogSearch(newState.request)) {
+          val view = this.viewNow as CatalogFeedViewInfinite
+          CatalogSearchResultsAccessibility.searchResultsLoaded(
+            listView = view.listView,
+            itemCount = newState.handle.feed().size
+          )
+        } else {
+          this.viewNow.startFocusDelayed()
+        }
       }
     }
   }
@@ -520,9 +536,14 @@ sealed class CatalogFragment :
   @Deprecated("Unclear why this has its own special method.")
   final override fun onBookRequestSAMLDownload(status: CatalogBookStatus<BookStatus.DownloadWaitingForExternalAuthentication>) {
     val account =
-      this.profiles
-        .profileCurrent()
-        .account(status.book.account)
+      try {
+        this.profiles
+          .profileCurrent()
+          .account(status.book.account)
+      } catch (e: AccountsDatabaseNonexistentException) {
+        this.logBookActionStaleAccount(status.book.account)
+        return
+      }
 
     CatalogSAML20Model.start(
       account = account,
@@ -547,9 +568,14 @@ sealed class CatalogFragment :
     val profiles =
       services.requireService(ProfilesControllerType::class.java)
     val account =
-      profiles
-        .profileCurrent()
-        .account(parameters.accountID)
+      try {
+        profiles
+          .profileCurrent()
+          .account(parameters.accountID)
+      } catch (e: AccountsDatabaseNonexistentException) {
+        this.logBookActionStaleAccount(parameters.accountID)
+        return
+      }
 
     if (this.isLoginRequired(parameters.accountID)) {
       MainNavigation.showLoginDialog(account)
@@ -579,6 +605,26 @@ sealed class CatalogFragment :
         samlDownloadContext = parameters.samlDownloadContext
       )
     }
+  }
+
+  /**
+   * A book action was requested for an account that no longer exists in the
+   * profile (for example, it was deleted while its catalog feed was still on
+   * screen). The action cannot be recovered, so it is a no-op; the situation
+   * is recorded with a distinct error code for later diagnosis.
+   */
+
+  private fun logBookActionStaleAccount(accountID: AccountID) {
+    val diagnostics =
+      Services.serviceDirectory().requireService(DiagnosticsServiceType::class.java)
+    diagnostics.report(
+      code = DiagnosticCodes.CATALOG_BOOK_ACTION_STALE_ACCOUNT,
+      data = mapOf(Pair("AccountID", accountID.toString()))
+    )
+    this.logger.error(
+      "Book action requested for a nonexistent account: {}",
+      accountID
+    )
   }
 
   /**
@@ -1036,7 +1082,6 @@ sealed class CatalogFragment :
         }
     )
     this.switchView(view)
-    this.announceSearchResults(context, newState, view)
 
     /*
      * Set up a listener to restore the scroll position. This works around multiple pieces of
@@ -1063,29 +1108,7 @@ sealed class CatalogFragment :
     this.setupRefreshForLocalFeeds(feedHandle)
   }
 
-  private fun announceSearchResults(
-    context: Context,
-    newState: LoadedFeedWithoutGroups,
-    view: CatalogFeedViewInfinite
-  ) {
-    if (!this.accessibility.spokenFeedbackEnabled) {
-      return
-    }
-    if (!newState.request.isSearch) {
-      return
-    }
-    if (this.catalogPart != CATALOG) {
-      return
-    }
-
-    if (newState.handle.feed().size == 0) {
-      this.accessibility.speak(context.getString(R.string.feedEmpty))
-      return
-    }
-
-    this.accessibility.speak(context.getString(R.string.feedSearchResultsAvailable))
-    view.listView.requestFocus()
-  }
+  private fun isCatalogSearch(request: OPDSClientRequest): Boolean = request.isSearch && this.catalogPart == CATALOG
 
   final override fun onIsBookReturnable(book: Book): Boolean {
     val profile = this.profiles.profileCurrent()

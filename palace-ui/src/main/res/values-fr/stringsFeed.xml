@@ -6,7 +6,6 @@
     <string name="feedLibrary">Bibliothèque</string>
     <string name="feedLibraryAll">Tous</string>
     <string name="feedEmpty">Aucun résultat trouvé.</string>
-    <string name="feedSearchResultsAvailable">Les résultats de la recherche sont maintenant disponibles sur cet écran.</string>
     <string name="feedLoadingError">Une erreur s\'est produite lors du chargement du catalogue.</string>
     <string name="feedNavigationNotSupported">Les flux de navigation ne sont pas actuellement pris en charge. Désolé !</string>
     <string name="feedShow">Afficher</string>

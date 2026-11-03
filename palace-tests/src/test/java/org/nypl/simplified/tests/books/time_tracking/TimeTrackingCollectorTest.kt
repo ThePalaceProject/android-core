@@ -24,6 +24,7 @@ import org.nypl.simplified.tests.mocking.MockAccount
 import org.nypl.simplified.tests.mocking.MockProfile
 import org.nypl.simplified.tests.mocking.MockProfilesController
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
 import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Path
@@ -86,7 +87,8 @@ class TimeTrackingCollectorTest {
         status = this.status,
         timeSegments = this.timeSegments,
         debugDirectory = debugDirectory,
-        outputDirectory = inboxDirectory
+        outputDirectory = inboxDirectory,
+        diagnostics = Mockito.mock(DiagnosticsServiceType::class.java)
       )
 
     this.resources.add(AutoCloseable { this.collector.close() })

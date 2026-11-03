@@ -13,7 +13,6 @@ import ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy
 import ch.qos.logback.core.util.FileSize
 import ch.qos.logback.core.util.StatusPrinter
 import org.librarysimplified.ui.BuildConfig
-import org.nypl.simplified.crashlytics.api.CrashlyticsLoggingAppender
 import org.slf4j.LoggerFactory
 import java.io.File
 
@@ -40,17 +39,6 @@ object MainLogging {
       this.start()
     }
   }
-
-  /**
-   * Configure the Crashlytics appender.
-   */
-
-  private fun configureCrashlyticsAppender(loggerContext: LoggerContext): Appender<ILoggingEvent> =
-    CrashlyticsLoggingAppender().apply {
-      this.context = loggerContext
-      this.name = "CRASHLYTICS"
-      this.start()
-    }
 
   /**
    * Configure a file based logging appender.
@@ -169,7 +157,6 @@ object MainLogging {
     root.apply {
       this.addAppender(configureFileAppender(loggerContext, cacheDirectory, "log.txt"))
       this.addAppender(configureLogcatAppender(loggerContext))
-      this.addAppender(configureCrashlyticsAppender(loggerContext))
     }
 
     configureLoggingPolicy()

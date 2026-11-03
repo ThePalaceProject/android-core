@@ -1,7 +1,6 @@
 package org.nypl.simplified.books.time.tracking
 
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
 import java.io.File
 import java.io.FileOutputStream
 import java.io.PrintWriter
@@ -40,12 +39,7 @@ object TimeTrackingDebugging {
         stream.flush()
       }
     } catch (e: Throwable) {
-      try {
-        MDC.put("TimeTracking", "true")
-        this.logger.error("Failed to log time tracking operation: ", e)
-      } finally {
-        MDC.remove("TimeTracking")
-      }
+      this.logger.error("Failed to log time tracking operation: ", e)
     } finally {
       this.fileLock.unlock()
     }

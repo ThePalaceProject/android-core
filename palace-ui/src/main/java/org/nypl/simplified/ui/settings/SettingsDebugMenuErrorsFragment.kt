@@ -18,6 +18,8 @@ import org.nypl.simplified.ui.main.MainNavigation
 import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
 import org.nypl.simplified.ui.screens.ScreenDefinitionType
 import org.nypl.simplified.viewer.api.Viewers
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticCodes
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
 
 class SettingsDebugMenuErrorsFragment :
   Fragment(R.layout.debug_errors),
@@ -46,6 +48,7 @@ class SettingsDebugMenuErrorsFragment :
   private lateinit var showErrorPage: Button
   private lateinit var sendErrorLogs: Button
   private lateinit var crash: Button
+  private lateinit var sendDiagnostic: Button
   private lateinit var toolbarBack: View
 
   override fun onViewCreated(
@@ -67,6 +70,8 @@ class SettingsDebugMenuErrorsFragment :
       view.findViewById(R.id.debugSendAnalytics)
     this.crash =
       view.findViewById(R.id.debugCrash)
+    this.sendDiagnostic =
+      view.findViewById(R.id.debugSendDiagnostic)
 
     this.sendErrorLogs.setOnClickListener {
       SettingsDebugModel.sendErrorLogs()
@@ -85,6 +90,9 @@ class SettingsDebugMenuErrorsFragment :
     }
     this.crash.setOnClickListener {
       throw DebugCrashedDeliberately()
+    }
+    this.sendDiagnostic.setOnClickListener {
+      this.sendDiagnostic()
     }
 
     this.makeNextBookFail =
@@ -135,5 +143,26 @@ class SettingsDebugMenuErrorsFragment :
           taskSteps = taskSteps
         )
     )
+  }
+
+  private fun sendDiagnostic() {
+    val diagnostics =
+      Services
+        .serviceDirectory()
+        .requireService(DiagnosticsServiceType::class.java)
+    diagnostics.report(
+      code = DiagnosticCodes.USER_PRESSED_DEBUG_DIAGNOSTIC_BUTTON,
+      data =
+        mapOf(
+          Pair("Source", "debugMenu")
+        ),
+      throwable = null
+    )
+    Toast
+      .makeText(
+        this.requireContext(),
+        "Reported diagnostic event",
+        Toast.LENGTH_SHORT
+      ).show()
   }
 }

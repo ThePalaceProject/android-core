@@ -147,6 +147,7 @@
     "settingsAccessibilityAccountSelect": "Tippen, um \"%1$s\" als aktuelle Bibliothek festzulegen. Lange drücken zum Entfernen.",
     "settingsAccessibilityAccountSelectCurrent": "\"%1$s\", Ihre aktuelle Bibliothek. Lange drücken zum Entfernen.",
     "settingsAccessibilitySearchButton": "Bibliothekssuche-Schaltfläche",
+    "settingsAccessibilitySearchHint": "Suche. Die Ergebnisse aktualisieren sich, während Sie eingeben.",
     "settingsAudiobooksSkipBackwards": "Rückwärts springen",
     "settingsAudiobooksSkipEntries": [
       "15 Sekunden",

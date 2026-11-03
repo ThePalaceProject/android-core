@@ -1,5 +1,6 @@
 package org.nypl.simplified.books.book_registry
 
+import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookID
 
 /**
@@ -33,6 +34,12 @@ interface BookRegistryType : BookRegistryReadableType {
    */
 
   fun clearFor(id: BookID)
+
+  /**
+   * Remove all books owned by the given account from the registry.
+   */
+
+  fun clearForAccount(account: AccountID)
 
   /**
    * Update the current number of holds the current logged user has.

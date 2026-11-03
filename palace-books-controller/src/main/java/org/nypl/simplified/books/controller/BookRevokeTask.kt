@@ -2,7 +2,6 @@ package org.nypl.simplified.books.controller
 
 import org.joda.time.DateTime
 import org.joda.time.Duration
-import org.librarysimplified.mdc.MDCKeys
 import org.nypl.drm.core.AdobeAdeptExecutorType
 import org.nypl.drm.core.AdobeAdeptLoan
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
@@ -49,7 +48,6 @@ import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
 import java.net.URI
 import java.util.concurrent.CancellationException
 import java.util.concurrent.ExecutionException
@@ -80,10 +78,6 @@ class BookRevokeTask(
     TaskRecorder.create()
 
   override fun execute(account: AccountType): TaskResult.Success<Unit> {
-    MDC.put(MDCKeys.ACCOUNT_INTERNAL_ID, account.id.uuid.toString())
-    MDC.put(MDCKeys.ACCOUNT_PROVIDER_NAME, account.provider.displayName)
-    MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID, account.provider.id.toString())
-
     this.debug("revoke")
     this.taskRecorder.beginNewStep(this.revokeStrings.revokeStarted)
     this.publishRequestingRevokeStatus()
@@ -711,12 +705,6 @@ class BookRevokeTask(
       val database = account.bookDatabase
       this.databaseEntry = database.entry(this.bookID)
 
-      MDC.put(MDCKeys.BOOK_INTERNAL_ID,
-        this.databaseEntry.book.id
-          .value()
-      )
-      MDC.put(MDCKeys.BOOK_TITLE, this.databaseEntry.book.entry.title)
-      MDCKeys.put(MDCKeys.BOOK_PUBLISHER, this.databaseEntry.book.entry.publisher)
       this.publishRequestingRevokeStatus()
       this.taskRecorder.currentStepSucceeded(this.revokeStrings.revokeBookDatabaseLookupOK)
     } catch (e: Exception) {

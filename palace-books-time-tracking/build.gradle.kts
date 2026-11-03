@@ -7,7 +7,7 @@ dependencies {
 
     implementation(project(":palace-accounts-api"))
     implementation(project(":palace-accounts-database-api"))
-    implementation(project(":palace-crashlytics-api"))
+    implementation(project(":palace-diagnostics-api"))
     implementation(project(":palace-json-core"))
     implementation(project(":palace-profiles-api"))
     implementation(project(":palace-profiles-controller-api"))

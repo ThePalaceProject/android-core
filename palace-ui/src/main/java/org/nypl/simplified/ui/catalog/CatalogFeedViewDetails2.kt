@@ -1,12 +1,10 @@
 package org.nypl.simplified.ui.catalog
 
 import android.content.res.Configuration
-import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.Typeface
-import android.graphics.drawable.BitmapDrawable
 import android.text.Html
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -22,7 +20,6 @@ import android.widget.TableLayout
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.core.graphics.ColorUtils
-import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.get
 import androidx.core.math.MathUtils.clamp
 import androidx.core.widget.NestedScrollView
@@ -72,7 +69,6 @@ import org.nypl.simplified.feeds.api.FeedLoaderResult
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedAuthentication
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedGeneral
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderSuccess
-import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.catalog.CatalogFeedViewDetails2.InfoState.BORROWING
 import org.nypl.simplified.ui.catalog.CatalogFeedViewDetails2.InfoState.BORROWING_AND_PROGRESS
 import org.nypl.simplified.ui.catalog.CatalogFeedViewDetails2.InfoState.GENERIC
@@ -511,27 +507,30 @@ class CatalogFeedViewDetails2(
     val targetHeight =
       this.root.resources.getDimensionPixelSize(R.dimen.catalogBookDetailCoverHeight)
 
-    val coverFutureMain =
-      this.imageLoader.loadCoverInto(
-        entry = newEntry,
-        imageView = this.cover,
-        hasBadge = true,
-        width = 0,
-        height = targetHeight
-      )
+    this.imageLoader.loadCoverInto(
+      entry = newEntry,
+      imageView = this.cover,
+      hasBadge = true,
+      width = 0,
+      height = targetHeight
+    )
 
-    coverFutureMain.thenAccept {
-      UIThread.runOnUIThread { this.configureBackground() }
+    this.imageLoader.loadCoverBackgroundInto(
+      entry = newEntry,
+      imageView = this.imageUnderlay,
+      width = 0,
+      height = 0
+    ) { color ->
+      this.applyToolbarTextColor(color)
     }
 
-    val coverFutureBottom =
-      this.imageLoader.loadCoverInto(
-        entry = newEntry,
-        imageView = this.bottomSheetCover,
-        hasBadge = true,
-        width = 0,
-        height = this.screenSize.dpToPixels(80).toInt()
-      )
+    this.imageLoader.loadCoverInto(
+      entry = newEntry,
+      imageView = this.bottomSheetCover,
+      hasBadge = true,
+      width = 0,
+      height = this.screenSize.dpToPixels(80).toInt()
+    )
 
     this.bookTitle.text =
       newEntry.feedEntry.title
@@ -781,45 +780,9 @@ class CatalogFeedViewDetails2(
     }
   }
 
-  private fun configureBackground() {
-    val rawDrawable =
-      this.cover.drawable
-    val rawBitmap =
-      rawDrawable.toBitmap()
-
-    val bgWidth = 8
-    val bgHeight = 8
-
-    val scaledBitmap =
-      Bitmap.createScaledBitmap(rawBitmap, bgWidth, bgHeight, true)
-
-    /*
-     * Calculate the average color in the top row of the bitmap. We'll use the result to determine
-     * whether text on top of the color should be black or white.
-     */
-
-    var r = 0
-    var g = 0
-    var b = 0
-
-    for (x in 0 until bgWidth) {
-      val c = scaledBitmap.get(x, 0)
-      r += Color.red(c)
-      g += Color.green(c)
-      b += Color.blue(c)
-    }
-
-    r /= bgWidth
-    g /= bgWidth
-    b /= bgWidth
-
-    val color =
-      Color.argb(255, r, g, b)
-    val luminance =
-      ColorUtils.calculateLuminance(color)
-
+  private fun applyToolbarTextColor(color: Int) {
     val textColor =
-      if (luminance > 0.5) {
+      if (ColorUtils.calculateLuminance(color) > 0.5) {
         Color.BLACK
       } else {
         Color.WHITE
@@ -828,10 +791,6 @@ class CatalogFeedViewDetails2(
     this.backButtonImage.setColorFilter(textColor, PorterDuff.Mode.MULTIPLY)
     this.toolbarTitle.setTextColor(textColor)
     this.toolbarSubtitle.setTextColor(textColor)
-
-    val textureDrawable = BitmapDrawable(this.root.resources, scaledBitmap)
-    this.imageUnderlay.setImageDrawable(textureDrawable)
-    this.imageUnderlay.scaleType = ImageView.ScaleType.FIT_XY
   }
 
   companion object {

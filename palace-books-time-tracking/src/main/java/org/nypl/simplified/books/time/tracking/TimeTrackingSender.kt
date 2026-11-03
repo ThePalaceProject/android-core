@@ -3,7 +3,8 @@ package org.nypl.simplified.books.time.tracking
 import com.io7m.jmulticlose.core.CloseableCollection
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticCodes
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
 import java.nio.file.Files
 import java.nio.file.Path
 import java.time.Duration
@@ -28,6 +29,7 @@ class TimeTrackingSender private constructor(
   private val debugDirectory: Path,
   private val inputDirectory: Path,
   private val frequency: Duration,
+  private val diagnostics: DiagnosticsServiceType,
 ) : TimeTrackingSenderServiceType {
   private val logger =
     LoggerFactory.getLogger(TimeTrackingSender::class.java)
@@ -75,10 +77,6 @@ class TimeTrackingSender private constructor(
 
   private fun onTrySend() {
     try {
-      MDC.put("System", "TimeTracking")
-      MDC.put("SubSystem", "Sender")
-      MDC.put("TimeLoss", "false")
-
       val entryFiles: List<Path> =
         Files.list(this.inputDirectory).use { inputStream ->
           inputStream
@@ -91,9 +89,12 @@ class TimeTrackingSender private constructor(
         try {
           entries.add(TimeTrackingEntryOutgoing.ofFile(entryFile))
         } catch (e: Throwable) {
-          MDC.put("TimeLoss", "true")
+          this.diagnostics.report(
+            code = DiagnosticCodes.TIME_TRACKING_LOSS,
+            data = mapOf(Pair("Reason", "parseFailed")),
+            throwable = e
+          )
           this.logger.warn("Unable to parse local time tracking entry: ", e)
-          MDC.remove("TimeLoss")
         }
       }
 
@@ -244,13 +245,15 @@ class TimeTrackingSender private constructor(
       debugDirectory: Path,
       inputDirectory: Path,
       frequency: Duration,
+      diagnostics: DiagnosticsServiceType,
     ): TimeTrackingSenderServiceType =
       TimeTrackingSender(
         profiles = profiles,
         httpCalls = httpCalls,
         debugDirectory = debugDirectory,
         inputDirectory = inputDirectory,
-        frequency = frequency
+        frequency = frequency,
+        diagnostics = diagnostics
       )
   }
 

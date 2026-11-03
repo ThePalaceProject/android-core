@@ -55,6 +55,7 @@
     "catalogAccessibilityBookRevokeLoan": "Bouton Rendre maintenant. Cliquez sur ce bouton pour rendre \"%1$s\".",
     "catalogAccessibilityCloseCheckoutDrawer": "Fermer le tiroir d'emprunt",
     "catalogAccessibilityOpenCheckoutDrawer": "Ouvrir le tiroir d'emprunt",
+    "catalogAccessibilitySearchResultsCount": "Résultats trouvés : %1$d",
     "catalogAccessibilitySeriesLink": "\"%1$s\". Cliquez pour voir toutes les entrées de la série.",
     "catalogAccounts": "Choisissez un autre catalogue de bibliothèque…",
     "catalogBookAvailabilityLoanable": "Ce livre est disponible à l'emprunt.",
@@ -121,6 +122,7 @@
   "palace-ui/src/main/res/values/stringsSettings.xml": {
     "settingsAccessibilityAccountSelect": "Appuyez pour définir \"%1$s\" comme bibliothèque actuelle. Appuyez longuement pour supprimer.",
     "settingsAccessibilityAccountSelectCurrent": "\"%1$s\", votre bibliothèque actuelle. Appuyez longuement pour supprimer.",
+    "settingsAccessibilityLibrariesFound": "Bibliothèques trouvées : %1$d",
     "settingsCustomOPDSURL": "URL de flux personnalisée…",
     "settingsDevEnableManualLCPPassphrase": "Activer la phrase de passe LCP manuelle",
     "settingsDevSyncAccounts": "Synchroniser les comptes",

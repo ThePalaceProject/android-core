@@ -9,7 +9,6 @@ import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType.AllowRedirects.DISALLOW_REDIRECTS
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType.Method.Post
 import org.librarysimplified.http.api.LSHTTPResponseStatus
-import org.librarysimplified.mdc.MDCKeys
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountAuthenticationTokenInfo
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggedIn
@@ -43,7 +42,6 @@ import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.taskrecorder.api.TaskStep
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
 import java.net.HttpURLConnection
 import java.net.URI
 import java.net.URLEncoder
@@ -91,16 +89,6 @@ class ProfileAccountLoginTask(
   ) = this.logger.error("[{}][{}] $message", this.profile.id.uuid, this.account.id, *arguments)
 
   private fun run(): TaskResult<Unit> {
-    MDC.put(MDCKeys.ACCOUNT_INTERNAL_ID,
-      this.account.id.uuid
-        .toString()
-    )
-    MDC.put(MDCKeys.ACCOUNT_PROVIDER_NAME, this.account.provider.displayName)
-    MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID,
-      this.account.provider.id
-        .toString()
-    )
-
     return try {
       if (!this.updateLoggingInState(
           this.steps.beginNewStep(this.loginStrings.loginCheckAuthRequired)

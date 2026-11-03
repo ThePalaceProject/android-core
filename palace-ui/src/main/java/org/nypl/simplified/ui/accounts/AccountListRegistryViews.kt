@@ -45,7 +45,10 @@ class AccountListRegistryViews(
   private val toolbarTitle: TextView,
 ) {
   private val accountListFilterController =
-    AccountListFilterController { items -> this.accountListAdapter.submitList(items) }
+    AccountListFilterController { items ->
+      AccountListRegistrySearchAccessibility.resultsPublished(items)
+      this.accountListAdapter.submitList(items)
+    }
 
   companion object {
     fun create(
@@ -127,10 +130,12 @@ class AccountListRegistryViews(
   private fun updateAdapterFilter(text: String) {
     if (text.isBlank()) {
       this.accountListFilterController.filterUnset()
+      AccountListRegistrySearchAccessibility.searchCleared()
     } else {
       this.accountListFilterController.filterSet { account ->
         account.title.contains(text, ignoreCase = true)
       }
+      AccountListRegistrySearchAccessibility.searchChanged(this.searchText)
     }
     this.accountList.scrollToPosition(0)
   }
@@ -225,6 +230,7 @@ class AccountListRegistryViews(
     this.toolbarTitle.visibility = View.INVISIBLE
     this.searchTouch.contentDescription =
       context.getString(R.string.settingsAccessibilitySearchButtonClose)
+    this.searchText.hint = AccountListRegistrySearchAccessibility.searchHint(context)
 
     this.searchText.postDelayed({ this.searchText.requestFocus() }, 100)
     this.searchText.postDelayed({ this.keyboardShow() }, 100)

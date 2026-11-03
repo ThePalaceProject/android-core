@@ -3,6 +3,7 @@
 <resources>
     <string name="catalogAccessibilitySeriesLink">"%1$s". Click to see all entries in the series.</string>
     <string name="catalogAccessibilityFeedLoading">List of books is currently loading.</string>
+    <string name="catalogAccessibilitySearchResultsCount">Results found: %1$d</string>
     <string name="catalogAccessibilitySearchButtonClose">Close Search Button</string>
     <string name="catalogAccessibilityAccountSelection">Account Selection Button</string>
     <string name="catalogAccessibilityBookBorrow">Borrow Button. Click this button to borrow "%1$s".</string>

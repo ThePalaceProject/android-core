@@ -191,6 +191,14 @@ object SettingsDebugModel {
   }
 
   @UiThread
+  fun showBookCoverDebugLabels(): Boolean = this.preferences().showBookCoverDebugLabels
+
+  @UiThread
+  fun setShowBookCoverDebugLabels(show: Boolean) {
+    this.updatePreferences { it.copy(showBookCoverDebugLabels = show) }
+  }
+
+  @UiThread
   fun adeptSupported(): Boolean {
     val services = Services.serviceDirectory()
     return services.optionalService(AdobeAdeptExecutorType::class.java) != null

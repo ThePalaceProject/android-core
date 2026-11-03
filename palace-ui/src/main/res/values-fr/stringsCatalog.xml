@@ -2,6 +2,7 @@
 <resources>
     <string name="catalogAccessibilitySeriesLink">\"%1$s\". Cliquez pour voir toutes les entrées de la série.</string>
     <string name="catalogAccessibilityFeedLoading">La liste des livres est en cours de chargement.</string>
+    <string name="catalogAccessibilitySearchResultsCount">Résultats trouvés : %1$d</string>
     <string name="catalogAccessibilitySearchButtonClose">Fermer le bouton de recherche</string>
     <string name="catalogAccessibilityAccountSelection">Bouton de sélection de compte</string>
     <string name="catalogAccessibilityBookBorrow">Bouton Emprunter. Appuyez sur ce bouton pour emprunter “%1$s”.</string>

@@ -39,6 +39,7 @@ class SettingsDebugMenuBooksFragment :
 
   private lateinit var syncAccountsNow: Button
   private lateinit var showOnlySupportedBooks: SwitchCompat
+  private lateinit var showBookCoverDebugLabels: SwitchCompat
   private lateinit var toolbarBack: View
 
   override fun onViewCreated(
@@ -54,6 +55,8 @@ class SettingsDebugMenuBooksFragment :
 
     this.showOnlySupportedBooks =
       view.findViewById(R.id.debugBooksShowOnlySupported)
+    this.showBookCoverDebugLabels =
+      view.findViewById(R.id.debugBooksShowCoverDebugLabels)
     this.syncAccountsNow =
       view.findViewById(R.id.debugBooksSyncNow)
   }
@@ -65,6 +68,12 @@ class SettingsDebugMenuBooksFragment :
       SettingsDebugModel.showOnlySupportedBooks()
     this.showOnlySupportedBooks.setOnCheckedChangeListener { _, isChecked ->
       SettingsDebugModel.setShowOnlySupportedBooks(showOnlySupported = isChecked)
+    }
+
+    this.showBookCoverDebugLabels.isChecked =
+      SettingsDebugModel.showBookCoverDebugLabels()
+    this.showBookCoverDebugLabels.setOnCheckedChangeListener { _, isChecked ->
+      SettingsDebugModel.setShowBookCoverDebugLabels(show = isChecked)
     }
 
     this.syncAccountsNow.setOnClickListener {

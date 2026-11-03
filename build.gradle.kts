@@ -1,4 +1,4 @@
-val gradleVersionRequired = "9.4.1"
+val gradleVersionRequired = "9.8.1"
 val gradleVersionReceived = gradle.gradleVersion
 
 if (gradleVersionRequired != gradleVersionReceived) {
