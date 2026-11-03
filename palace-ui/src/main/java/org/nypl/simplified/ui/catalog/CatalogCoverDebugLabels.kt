@@ -3,6 +3,8 @@ package org.nypl.simplified.ui.catalog
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.nypl.simplified.feeds.api.FeedEntry.FeedEntryOPDS
+import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
+import org.nypl.simplified.opds.core.OPDSAcquisitionPaths
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.thepalaceproject.palace.images.BookCoverDebugLabels
 import org.thepalaceproject.palace.images.BookCoverDebugLabelsLookupType
@@ -24,7 +26,7 @@ class CatalogCoverDebugLabels : BookCoverDebugLabelsLookupType {
     }
 
     val format = entry.probableFormat?.shortName ?: "unknown"
-    val drm = this.drmNameOf(entry)
+    val drm = drmNameOf(entry.feedEntry)
     return BookCoverDebugLabels(
       format = format,
       drm = drm
@@ -40,40 +42,49 @@ class CatalogCoverDebugLabels : BookCoverDebugLabelsLookupType {
     return profiles.profileCurrent().preferences().showBookCoverDebugLabels
   }
 
-  /**
-   * Derive a short name for the DRM system from the OPDS entry. The most
-   * reliable signal is the final content types of the entry's acquisitions,
-   * matched against the MIME types this codebase already knows about.
-   */
+  companion object {
+    /**
+     * Derive a short name for the DRM system from the OPDS feed entry. The
+     * most reliable signal is the content types of all elements of the
+     * entry's acquisition paths, matched against the MIME types this codebase
+     * already knows about.
+     *
+     * The DRM license type (ACSM, LCP license, Boundless license, ...) is
+     * never the *final* content type of an acquisition path: it is the first
+     * (or an intermediate) element, and the final element is the raw book
+     * file (e.g., `application/epub+zip`). So we must consider the types of
+     * all path elements, not just the final content types.
+     */
 
-  private fun drmNameOf(entry: FeedEntryOPDS): String {
-    val licensor = entry.feedEntry.licensor
-    val types =
-      entry.feedEntry.acquisitions
-        .flatMap { it.availableFinalContentTypes() }
-        .map { it.fullType }
-        .toSet()
+    fun drmNameOf(entry: OPDSAcquisitionFeedEntry): String {
+      val licensor = entry.licensor
+      val types =
+        OPDSAcquisitionPaths.linearize(entry)
+          .flatMap { it.asMIMETypes() }
+          .map { it.fullType }
+          .toSet()
 
-    fun has(vararg names: String): Boolean = names.any { it in types }
+      fun has(vararg names: String): Boolean = names.any { it in types }
 
-    return when {
-      has(
-        StandardFormatNames.lcpLicenseFiles.fullType,
-        StandardFormatNames.lcpAudioBooks.fullType
-      ) -> "LCP"
+      return when {
+        has(
+          StandardFormatNames.lcpLicenseFiles.fullType,
+          StandardFormatNames.lcpAudioBooks.fullType
+        ) -> "LCP"
 
-      has(StandardFormatNames.adobeACSMFiles.fullType) -> "Adobe"
+        has(StandardFormatNames.adobeACSMFiles.fullType) -> "Adobe"
 
-      has(StandardFormatNames.boundlessLicenseFiles.fullType) -> "Boundless"
+        has(StandardFormatNames.boundlessLicenseFiles.fullType) -> "Boundless"
 
-      has(StandardFormatNames.findawayAudioBooks.fullType) -> "Findaway"
+        has(StandardFormatNames.findawayAudioBooks.fullType) -> "Findaway"
 
-      has(StandardFormatNames.overdriveAudioBooks.fullType) -> "Overdrive"
+        has(StandardFormatNames.overdriveAudioBooks.fullType) -> "Overdrive"
 
-      // A licensor is present but we did not recognize the specific scheme.
-      licensor != null -> "DRM:${licensor.vendor}"
+        // A licensor is present but we did not recognize the specific scheme.
+        licensor != null -> "DRM:${licensor.vendor}"
 
-      else -> "none"
+        else -> "none"
+      }
     }
   }
 }
