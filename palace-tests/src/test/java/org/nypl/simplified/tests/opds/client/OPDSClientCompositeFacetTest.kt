@@ -28,7 +28,6 @@ import org.nypl.simplified.feeds.opds12.OPDS12FeedHTTPTransport
 import org.nypl.simplified.feeds.opds12.OPDS12FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
-import org.nypl.simplified.opds.core.OPDSFacet
 import org.nypl.simplified.opds.core.OPDSFeedParser
 import org.nypl.simplified.opds.core.OPDSFeedParserType
 import org.nypl.simplified.opds.core.OPDSSearchParser
@@ -178,13 +177,11 @@ class OPDSClientCompositeFacetTest {
             facets = listOf(
               FeedFacetData(
                 accountID = this.account0,
-                opdsFacet = OPDSFacet(
-                  isActive = true,
-                  uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
-                  group = "G",
-                  title = "X",
-                  groupType = null
-                )
+                isActive = true,
+                uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
+                group = "G",
+                title = "X",
+                groupType = null
               )
             ),
             title = "Results",
@@ -233,23 +230,19 @@ class OPDSClientCompositeFacetTest {
             facets = listOf(
               FeedFacetData(
                 accountID = this.account0,
-                opdsFacet = OPDSFacet(
-                  isActive = true,
-                  uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
-                  group = "G",
-                  title = "X",
-                  groupType = null
-                )
+                isActive = true,
+                uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
+                group = "G",
+                title = "X",
+                groupType = null
               ),
               FeedFacetData(
                 accountID = this.account0,
-                opdsFacet = OPDSFacet(
-                  isActive = true,
-                  uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
-                  group = "H",
-                  title = "Y",
-                  groupType = null
-                )
+                isActive = true,
+                uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
+                group = "H",
+                title = "Y",
+                groupType = null
               )
             ),
             title = "Results",
@@ -298,23 +291,19 @@ class OPDSClientCompositeFacetTest {
             facets = listOf(
               FeedFacetData(
                 accountID = this.account0,
-                opdsFacet = OPDSFacet(
-                  isActive = true,
-                  uri = URI.create("http://127.0.0.1:${this.webServer.port}/facet-G-X.xml"),
-                  group = "G",
-                  title = "X",
-                  groupType = null
-                )
+                isActive = true,
+                uri = URI.create("http://127.0.0.1:${this.webServer.port}/facet-G-X.xml"),
+                group = "G",
+                title = "X",
+                groupType = null
               ),
               FeedFacetData(
                 accountID = this.account0,
-                opdsFacet = OPDSFacet(
-                  isActive = true,
-                  uri = URI.create("http://127.0.0.1:${this.webServer.port}/facet-H-Y.xml"),
-                  group = "H",
-                  title = "Y",
-                  groupType = null
-                )
+                isActive = true,
+                uri = URI.create("http://127.0.0.1:${this.webServer.port}/facet-H-Y.xml"),
+                group = "H",
+                title = "Y",
+                groupType = null
               )
             ),
             title = "Results",
@@ -363,23 +352,19 @@ class OPDSClientCompositeFacetTest {
             facets = listOf(
               FeedFacetData(
                 accountID = this.account0,
-                opdsFacet = OPDSFacet(
-                  isActive = true,
-                  uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
-                  group = "G",
-                  title = "X",
-                  groupType = null
-                )
+                isActive = true,
+                uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
+                group = "G",
+                title = "X",
+                groupType = null
               ),
               FeedFacetData(
                 accountID = this.account0,
-                opdsFacet = OPDSFacet(
-                  isActive = true,
-                  uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
-                  group = "H",
-                  title = "Y",
-                  groupType = null
-                )
+                isActive = true,
+                uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
+                group = "H",
+                title = "Y",
+                groupType = null
               )
             ),
             title = "Results",
