@@ -145,3 +145,27 @@
 -keep class org.thepalaceproject.webpub.core.** {
     *;
 }
+
+# protobuf-javalite (4.x) parses and serializes generated lite messages with a
+# reflection-based runtime: GeneratedMessageLite.parsePartialFrom() builds a
+# MessageSchema for the message class, and MessageSchema.reflectField() resolves
+# every descriptor field by name via Class.getDeclaredField("<name>_") (then
+# reads/writes the backing field directly, via sun.misc.Unsafe offsets where
+# available). R8 cannot see these reflective accesses and removes fields that
+# no app code references. DBSLink1.width_ was removed (linkFromP1 never calls
+# getWidth()), so at startup
+#   DBAccountProviderDescriptions.parseFromResult -> parseFromProto1 ->
+#       descriptionFromP1Bytes -> parser.parseFrom(bytes)
+# MessageSchema threw
+#   java.lang.RuntimeException: Field width_ for
+#       org.thepalaceproject.db.internal.generated.DBSerialization$DBSLink1 not
+#       found. Known fields are [bitrate_ , duration_ , height_ , href_ ,
+#       relation_ , templated_ , title_ , type_]
+# (wrapping java.lang.NoSuchFieldException from Class.getDeclaredField).
+#
+# This is the rule documented for the lite runtime in protobuf's java/lite.md
+# ("R8 rule to make production app builds work"), which documents exactly this
+# exception shape.
+-keep class * extends com.google.protobuf.GeneratedMessageLite {
+    *;
+}
