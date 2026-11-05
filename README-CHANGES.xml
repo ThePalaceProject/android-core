@@ -1553,7 +1553,7 @@
         <c:change date="2026-09-21T00:00:00+00:00" summary="Fix an EPUB reader device rotation issue from 1.32.0."/>
       </c:changes>
     </c:release>
-    <c:release date="2026-11-03T15:39:26+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.33.0">
+    <c:release date="2026-11-05T00:00:00+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.33.1">
       <c:changes>
         <c:change date="2026-09-29T00:00:00+00:00" summary="Enable bytecode shrinking and optimization.">
           <c:tickets>
@@ -1580,13 +1580,16 @@
             <c:ticket id="PP-5333"/>
           </c:tickets>
         </c:change>
-        <c:change date="2026-10-22T08:39:14+00:00" summary="Turn off all remote logging except crashes, and introduce a Diagnostics API.">
+        <c:change date="2026-10-22T00:00:00+00:00" summary="Turn off all remote logging except crashes, and introduce a Diagnostics API.">
           <c:tickets>
             <c:ticket id="PP-5343"/>
           </c:tickets>
         </c:change>
         <c:change date="2026-11-03T00:00:00+00:00" summary="Fix the debug cover labels showing no DRM for Adobe- and LCP-protected books."/>
       </c:changes>
+    </c:release>
+    <c:release date="2026-11-05T14:07:22+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.34.0">
+      <c:changes/>
     </c:release>
   </c:releases>
   <c:ticket-systems>
