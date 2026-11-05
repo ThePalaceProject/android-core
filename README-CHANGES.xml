@@ -1553,7 +1553,7 @@
         <c:change date="2026-09-21T00:00:00+00:00" summary="Fix an EPUB reader device rotation issue from 1.32.0."/>
       </c:changes>
     </c:release>
-    <c:release date="2026-11-05T13:01:53+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.33.1">
+    <c:release date="2026-11-05T13:25:08+00:00" is-open="false" ticket-system="org.lyrasis.jira" version="1.33.1">
       <c:changes>
         <c:change date="2026-09-29T00:00:00+00:00" summary="Enable bytecode shrinking and optimization.">
           <c:tickets>
