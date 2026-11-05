@@ -77,8 +77,8 @@ import org.nypl.simplified.boot.api.BootFailureTesting
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.content.api.ContentResolverSane
 import org.nypl.simplified.content.api.ContentResolverType
-import org.nypl.simplified.feeds.api.FeedHTTPTransport
-import org.nypl.simplified.feeds.api.FeedLoader
+import org.nypl.simplified.feeds.opds12.OPDS12FeedHTTPTransport
+import org.nypl.simplified.feeds.opds12.OPDS12FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.files.DirectoryUtilities
 import org.nypl.simplified.notifications.NotificationTokenHTTPCalls
@@ -376,9 +376,9 @@ internal object MainServices {
     val feedSearchParser =
       OPDSSearchParser.newParser()
     val feedTransport =
-      FeedHTTPTransport(http)
+      OPDS12FeedHTTPTransport(http)
 
-    return FeedLoader.create(
+    return OPDS12FeedLoader.create(
       bookFormatSupport = bookFormatSupport,
       contentResolver = contentResolver,
       exec = execCatalogFeeds,

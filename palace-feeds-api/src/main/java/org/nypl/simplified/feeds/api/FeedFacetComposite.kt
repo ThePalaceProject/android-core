@@ -1,5 +1,7 @@
 package org.nypl.simplified.feeds.api
 
+import org.nypl.simplified.accounts.api.AccountID
+
 /**
  * A composite facet made up of a combination of facets from a single feed.
  * This type of facet requires a client to make multiple requests in order to

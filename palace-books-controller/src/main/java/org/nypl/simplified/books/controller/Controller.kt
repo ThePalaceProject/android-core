@@ -1,5 +1,6 @@
 package org.nypl.simplified.books.controller
 
+import org.nypl.simplified.books.book_database.api.BookFormats
 import android.app.Application
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.FluentFuture
@@ -42,9 +43,12 @@ import org.nypl.simplified.books.controller.api.BooksPreviewControllerType
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.books.preview.BookPreviewRequirements
 import org.nypl.simplified.books.preview.BookPreviewTask
+import org.nypl.simplified.feeds.opds12.toOPDSAcquisitionFeedEntry
 import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedLoaderType
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.api.FeedData
 import org.nypl.simplified.futures.FluentFutureExtensions
 import org.nypl.simplified.futures.FluentFutureExtensions.flatMap
 import org.nypl.simplified.futures.FluentFutureExtensions.map
@@ -359,7 +363,7 @@ class Controller private constructor(
       )
     )
 
-  override fun profileFeed(request: ProfileFeedRequest): FluentFuture<Feed.FeedWithoutGroups> =
+  override fun profileFeed(request: ProfileFeedRequest): FluentFuture<FeedData> =
     this.submitTask(
       ProfileFeedTask(
         bookFormatSupport = this.bookFormatSupport,
@@ -440,7 +444,7 @@ class Controller private constructor(
 
   override fun bookReport(
     accountID: AccountID,
-    feedEntry: FeedEntry.FeedEntryOPDS,
+    feedEntry: FeedEntryBook,
     reportType: String
   ): FluentFuture<TaskResult<Unit>> = throw NotImplementedError()
 
@@ -528,7 +532,7 @@ class Controller private constructor(
       )
     )
 
-  override fun handleBookPreviewStatus(entry: FeedEntry.FeedEntryOPDS): FluentFuture<TaskResult<*>> {
+  override fun handleBookPreviewStatus(entry: FeedEntryBook): FluentFuture<TaskResult<*>> {
     val requirements =
       BookPreviewRequirements(
         clock = { Instant.now() },
@@ -542,8 +546,8 @@ class Controller private constructor(
           BookPreviewTask(
             bookPreviewRegistry = bookPreviewRegistry,
             bookPreviewRequirements = requirements,
-            feedEntry = entry.feedEntry,
-            format = entry.probableFormat
+            feedEntry = entry.toOPDSAcquisitionFeedEntry(),
+            format = BookFormats.inferFormat(entry.toOPDSAcquisitionFeedEntry())
           )
         bookPreviewTask.execute()
       }

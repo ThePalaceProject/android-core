@@ -26,6 +26,7 @@ import org.joda.time.Duration
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -51,7 +52,7 @@ class BookPreviewAudiobookFragment :
 
     fun newInstance(
       file: File,
-      feedEntry: FeedEntry.FeedEntryOPDS
+      feedEntry: FeedEntryBook
     ): BookPreviewAudiobookFragment =
       BookPreviewAudiobookFragment().apply {
         this.arguments =
@@ -93,7 +94,7 @@ class BookPreviewAudiobookFragment :
   private val disposables = CompositeDisposable()
 
   private lateinit var audioFile: File
-  private lateinit var feedEntry: FeedEntry.FeedEntryOPDS
+  private lateinit var feedEntry: FeedEntryBook
   private lateinit var mediaPlayer: MediaPlayer
   private lateinit var previewAuthor: TextView
   private lateinit var previewBackwardButton: ImageView
@@ -136,7 +137,7 @@ class BookPreviewAudiobookFragment :
     this.feedEntry = this
       .requireArguments()
       .getSerializable(BUNDLE_EXTRA_FEED_ENTRY)
-      as? FeedEntry.FeedEntryOPDS ?: throw RuntimeException("Invalid entry")
+      as? FeedEntryBook ?: throw RuntimeException("Invalid entry")
 
     this.previewAuthor = view.findViewById(R.id.player_author)
     this.previewBackwardButton = view.findViewById(R.id.player_jump_backwards)
@@ -226,8 +227,8 @@ class BookPreviewAudiobookFragment :
       height = 0
     )
 
-    this.previewAuthor.text = this.feedEntry.feedEntry.authorsCommaSeparated
-    this.previewTitle.text = this.feedEntry.feedEntry.title
+    this.previewAuthor.text = this.feedEntry.authorsCommaSeparated
+    this.previewTitle.text = this.feedEntry.title
 
     this.mediaPlayer = MediaPlayer()
     this.mediaPlayer.setDataSource(this.requireContext(), Uri.fromFile(this.audioFile))

@@ -9,4 +9,4 @@ import java.net.URI
 data class FeedPreviewAcquisition(
   val uri: URI,
   val type: MIMEType
-)
+) : java.io.Serializable

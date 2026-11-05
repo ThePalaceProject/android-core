@@ -2,6 +2,7 @@ package org.nypl.simplified.books.controller.api
 
 import com.google.common.util.concurrent.FluentFuture
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.taskrecorder.api.TaskResult
 
 /**
@@ -15,5 +16,5 @@ interface BooksPreviewControllerType {
    * @param entry Feed entry, used to get the format and the URI to download later
    */
 
-  fun handleBookPreviewStatus(entry: FeedEntry.FeedEntryOPDS): FluentFuture<TaskResult<*>>
+  fun handleBookPreviewStatus(entry: FeedEntryBook): FluentFuture<TaskResult<*>>
 }

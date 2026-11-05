@@ -26,10 +26,15 @@ import org.nypl.simplified.adobe.extensions.AdobeDRMExtensions
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookWithStatus
+import org.nypl.simplified.feeds.opds12.toOPDSAcquisitionFeedEntry
 import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedLoaderResult
 import org.nypl.simplified.feeds.api.FeedLoaderType
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.api.FeedEntryCorrupt
+import org.nypl.simplified.feeds.api.FeedData
+import org.nypl.simplified.feeds.api.FeedDataWithGroups
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
@@ -480,7 +485,7 @@ class ProfileAccountLogoutTask(
           )
         } else {
           val newFeedEntry = this.fetchOPDSEntry(alternate)
-          entry.writeOPDSEntry(newFeedEntry)
+          entry.writeOPDSEntry(newFeedEntry.toOPDSAcquisitionFeedEntry())
         }
       } catch (e: StepFailedHandled) {
         this.error("step failed with exception", e.cause)
@@ -497,7 +502,7 @@ class ProfileAccountLogoutTask(
     }
   }
 
-  private fun fetchOPDSEntry(uri: URI): OPDSAcquisitionFeedEntry {
+  private fun fetchOPDSEntry(uri: URI): FeedEntryBook {
     val feedResult =
       try {
         this.feedLoader
@@ -557,9 +562,9 @@ class ProfileAccountLogoutTask(
     }
 
     return when (feed) {
-      is Feed.FeedWithoutGroups -> {
-        when (val feedEntry = feed.entriesInOrder[0]) {
-          is FeedEntry.FeedEntryCorrupt -> {
+      is FeedData -> {
+        when (val feedEntry = feed.entries[0]) {
+          is FeedEntryCorrupt -> {
             val message = this.logoutStrings.logoutOPDSFeedCorrupt
             this.steps.currentStepFailed(
               message = message,
@@ -570,13 +575,13 @@ class ProfileAccountLogoutTask(
             throw StepFailedHandled(feedEntry.error)
           }
 
-          is FeedEntry.FeedEntryOPDS -> {
-            feedEntry.feedEntry
+          is FeedEntryBook -> {
+            feedEntry
           }
         }
       }
 
-      is Feed.FeedWithGroups -> {
+      is FeedDataWithGroups -> {
         val message = this.logoutStrings.logoutOPDSFeedWithGroups
         val exception = Exception(message)
         this.steps.currentStepFailed(

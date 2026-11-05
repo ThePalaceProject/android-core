@@ -15,6 +15,10 @@ import org.nypl.simplified.feeds.api.FeedGroup
 import org.nypl.simplified.feeds.api.FeedLoaderResult
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedAuthentication
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedGeneral
+import org.nypl.simplified.feeds.api.FeedEntryCorrupt
+import org.nypl.simplified.feeds.api.FeedData
+import org.nypl.simplified.feeds.api.FeedDataWithGroups
+import org.nypl.simplified.feeds.api.FeedFacetData
 import org.nypl.simplified.presentableerror.api.PresentableErrorType
 import org.slf4j.LoggerFactory
 import org.thepalaceproject.opds.client.OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY
@@ -60,7 +64,7 @@ class OPDSClient private constructor(
     }
 
   private val feedEntryCorrupt =
-    FeedEntry.FeedEntryCorrupt(
+    FeedEntryCorrupt(
       AccountID.generate(),
       BookIDs.newFromText("urn:uuid:2688faf3-1927-4245-a1d9-7824bae1a49f"),
       IllegalStateException("Nonexistent book!")
@@ -161,9 +165,9 @@ class OPDSClient private constructor(
 
     private inner class OPDSFeedHandleWithGroups : OPDSFeedHandleWithGroupsType {
       @Volatile
-      lateinit var feed: Feed.FeedWithGroups
+      lateinit var feed: FeedDataWithGroups
 
-      override fun feed(): Feed.FeedWithGroups = this.feed
+      override fun feed(): FeedDataWithGroups = this.feed
 
       override fun refresh(): CompletableFuture<Unit> = this@OPDSClient.executeWithFuture(this@RequestHandler)
     }
@@ -179,7 +183,7 @@ class OPDSClient private constructor(
       lateinit var method: String
 
       @Volatile
-      lateinit var feedInitial: Feed.FeedWithoutGroups
+      lateinit var feedInitial: FeedData
 
       val pages: SortedMap<Int, Page> =
         ConcurrentSkipListMap()
@@ -231,7 +235,7 @@ class OPDSClient private constructor(
 
             is FeedLoaderResult.FeedLoaderSuccess -> {
               when (val feed = loaderResult.feed) {
-                is Feed.FeedWithGroups -> {
+                is FeedDataWithGroups -> {
                   pageFuture.completeExceptionally(
                     IOException(
                       "Received a feed with groups, but was expecting a feed without groups ($previousNext)"
@@ -239,7 +243,7 @@ class OPDSClient private constructor(
                   )
                 }
 
-                is Feed.FeedWithoutGroups -> {
+                is FeedData -> {
                   val newPage =
                     Page(
                       pageIndex = index,
@@ -257,7 +261,7 @@ class OPDSClient private constructor(
         return pageFuture
       }
 
-      override fun feed(): Feed.FeedWithoutGroups = this.feedInitial
+      override fun feed(): FeedData = this.feedInitial
 
       override fun scrollPositionSave(position: Int) {
         this.positionSaved = position
@@ -323,7 +327,7 @@ class OPDSClient private constructor(
       uri: URI,
       credentials: AccountAuthenticationCredentials?,
       method: String
-    ): Feed.FeedWithoutGroups {
+    ): FeedData {
       val feedResult =
         this@OPDSClient
           .parameters.feedLoader
@@ -357,13 +361,13 @@ class OPDSClient private constructor(
 
         is FeedLoaderResult.FeedLoaderSuccess -> {
           when (val feed = feedResult.feed) {
-            is Feed.FeedWithGroups -> {
+            is FeedDataWithGroups -> {
               throw IOException(
                 "Expected a feed without groups, but received a feed with groups from $uri"
               )
             }
 
-            is Feed.FeedWithoutGroups -> {
+            is FeedData -> {
               feed
             }
           }
@@ -379,7 +383,7 @@ class OPDSClient private constructor(
         var feedNow =
           this.loadSingleFeedWithoutGroups(
             request.accountID,
-            facetPath[0].opdsFacet.uri,
+            facetPath[0].uri,
             request.credentials,
             request.method
           )
@@ -390,7 +394,7 @@ class OPDSClient private constructor(
           feedNow =
             this.loadSingleFeedWithoutGroups(
               request.accountID,
-              nextFacet.opdsFacet.uri,
+              nextFacet.uri,
               request.credentials,
               request.method
             )
@@ -421,10 +425,10 @@ class OPDSClient private constructor(
     }
 
     private fun findEquivalentFacet(
-      requestedFacet: FeedFacet.FeedFacetOPDS12Single,
-      feed: Feed.FeedWithoutGroups
-    ): FeedFacet.FeedFacetOPDS12Single {
-      val group = requestedFacet.opdsFacet.group
+      requestedFacet: FeedFacetData,
+      feed: FeedData
+    ): FeedFacetData {
+      val group = requestedFacet.group
       val facets =
         feed.facetsByGroup[group]
           ?: throw IOException(
@@ -433,7 +437,7 @@ class OPDSClient private constructor(
 
       for (feedFacet in facets) {
         if (feedFacet.title == requestedFacet.title) {
-          return feedFacet as FeedFacet.FeedFacetOPDS12Single
+          return feedFacet as FeedFacetData
         }
       }
 
@@ -472,14 +476,14 @@ class OPDSClient private constructor(
 
         is FeedLoaderResult.FeedLoaderSuccess -> {
           when (val feed = result.feed) {
-            is Feed.FeedWithGroups -> {
+            is FeedDataWithGroups -> {
               this.handleGrouped.feed = feed
               this.state.set(LoadedFeedWithGroups(request, this.handleGrouped))
-              this.publishedEntriesGrouped.set(feed.feedGroupsInOrder)
+              this.publishedEntriesGrouped.set(feed.groups)
               this.feedURINext = feed.feedNext
             }
 
-            is Feed.FeedWithoutGroups -> {
+            is FeedData -> {
               this.handleUngrouped.feedInitial = feed
               this.handleUngrouped.credentials = request.credentials
               this.handleUngrouped.method = request.method
@@ -502,14 +506,14 @@ class OPDSClient private constructor(
     private fun runGeneratedFeed(request: OPDSClientRequest.GeneratedFeed) {
       try {
         when (val feed = request.generator.invoke()) {
-          is Feed.FeedWithGroups -> {
+          is FeedDataWithGroups -> {
             this.handleGrouped.feed = feed
             this.state.set(LoadedFeedWithGroups(request, this.handleGrouped))
-            this.publishedEntriesGrouped.set(feed.feedGroupsInOrder)
+            this.publishedEntriesGrouped.set(feed.groups)
             this.feedURINext = feed.feedNext
           }
 
-          is Feed.FeedWithoutGroups -> {
+          is FeedData -> {
             this.handleUngrouped.feedInitial = feed
             this.handleUngrouped.credentials = null
             this.handleUngrouped.method = "GET"

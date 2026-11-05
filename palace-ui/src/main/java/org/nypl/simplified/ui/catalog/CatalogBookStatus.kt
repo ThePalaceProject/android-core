@@ -5,6 +5,8 @@ import org.nypl.simplified.books.book_registry.BookPreviewStatus
 import org.nypl.simplified.books.book_registry.BookRegistryReadableType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.toOPDSAcquisitionFeedEntry
 
 data class CatalogBookStatus<S : BookStatus>(
   val book: Book,
@@ -28,7 +30,7 @@ data class CatalogBookStatus<S : BookStatus>(
 
     fun create(
       registry: BookRegistryReadableType,
-      feedEntry: FeedEntry.FeedEntryOPDS
+      feedEntry: FeedEntryBook
     ): CatalogBookStatus<BookStatus> {
       val registryStatus =
         registry.bookStatusOrNull(feedEntry.bookID)
@@ -41,7 +43,7 @@ data class CatalogBookStatus<S : BookStatus>(
             account = feedEntry.accountID,
             cover = null,
             thumbnail = null,
-            entry = feedEntry.feedEntry,
+            entry = feedEntry.toOPDSAcquisitionFeedEntry(),
             formats = listOf()
           )
       }
@@ -61,8 +63,8 @@ data class CatalogBookStatus<S : BookStatus>(
       }
     }
 
-    private fun bookPreviewStatusOf(entry: FeedEntry.FeedEntryOPDS): BookPreviewStatus =
-      if (!entry.feedEntry.previewAcquisitions.isNullOrEmpty()) {
+    private fun bookPreviewStatusOf(entry: FeedEntryBook): BookPreviewStatus =
+      if (!entry.previewAcquisitions.isNullOrEmpty()) {
         BookPreviewStatus.HasPreview()
       } else {
         BookPreviewStatus.None

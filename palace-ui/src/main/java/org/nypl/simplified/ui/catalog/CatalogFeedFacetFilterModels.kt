@@ -1,6 +1,6 @@
 package org.nypl.simplified.ui.catalog
 
-import org.nypl.simplified.feeds.api.FeedFacet
+import org.nypl.simplified.feeds.api.FeedFacetSingle
 import org.slf4j.LoggerFactory
 import java.util.SortedMap
 
@@ -14,12 +14,12 @@ object CatalogFeedFacetFilterModels {
   val filterModel: CatalogFeedFacetFilterModel
     get() = this.INSTANCE
 
-  fun createNew(facets: SortedMap<String, List<FeedFacet.FeedFacetSingle>>) {
+  fun createNew(facets: SortedMap<String, List<FeedFacetSingle>>) {
     this.logCreation(facets)
     this.INSTANCE = CatalogFeedFacetFilterModel.create(facets)
   }
 
-  private fun logCreation(facets: SortedMap<String, List<FeedFacet.FeedFacetSingle>>) {
+  private fun logCreation(facets: SortedMap<String, List<FeedFacetSingle>>) {
     try {
       this.logger.debug("Creating a new facet filter model of size {}.", facets.size)
       for (e in facets.entries) {

@@ -61,6 +61,7 @@ val dependencyObjects =
         project(":palace-diagnostics-api"),
         project(":palace-documents"),
         project(":palace-feeds-api"),
+        project(":palace-feeds-opds12"),
         project(":palace-files"),
         project(":palace-futures"),
         project(":palace-images"),

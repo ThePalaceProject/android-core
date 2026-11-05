@@ -10,4 +10,4 @@ data class FeedAvailabilityLoaned(
   val startDate: DateTime?,
   override val endDate: DateTime?,
   val revoke: URI?
-) : FeedAvailability
+) : FeedAvailability, java.io.Serializable

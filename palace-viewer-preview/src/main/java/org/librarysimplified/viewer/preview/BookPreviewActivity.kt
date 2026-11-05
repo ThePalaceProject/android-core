@@ -44,6 +44,8 @@ import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
 import org.nypl.simplified.books.book_registry.BookPreviewStatus
 import org.nypl.simplified.books.controller.api.BooksPreviewControllerType
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.toOPDSAcquisitionFeedEntry
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
@@ -76,7 +78,7 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
 
     fun startActivity(
       context: Activity,
-      feedEntry: FeedEntry.FeedEntryOPDS
+      feedEntry: FeedEntryBook
     ) {
       val intent = Intent(context, BookPreviewActivity::class.java)
       val bundle =
@@ -91,7 +93,7 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
   private lateinit var accessibilityService: AccessibilityServiceType
   private lateinit var account: AccountType
   private lateinit var bookFormat: BookFormat
-  private lateinit var feedEntry: FeedEntry.FeedEntryOPDS
+  private lateinit var feedEntry: FeedEntryBook
   private lateinit var loadingProgress: ProgressBar
   private lateinit var previewContainer: FrameLayout
   private lateinit var previewController: BooksPreviewControllerType
@@ -142,7 +144,7 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
       return
     }
 
-    val entry = extras.getSerializable(EXTRA_ENTRY) as FeedEntry.FeedEntryOPDS?
+    val entry = extras.getSerializable(EXTRA_ENTRY) as FeedEntryBook?
     if (entry == null) {
       this.logger.warn("BookPreviewActivity intent lacks OPDS entry!")
       this.finish()
@@ -169,10 +171,10 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
               this.feedEntry.accountID.uuid
                 .toString()
             ),
-            Pair("BookID", this.feedEntry.feedEntry.id),
-            Pair("BookTitle", this.feedEntry.feedEntry.title),
+            Pair("BookID", this.feedEntry.id),
+            Pair("BookTitle", this.feedEntry.title),
             Pair("BookPublisher",
-              this.feedEntry.feedEntry.publisher
+              this.feedEntry.publisher
                 .orEmpty()
             ),
             Pair("BookDRM", BookDRMInformation.None.kind.name)
@@ -191,7 +193,7 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
 
     try {
       val formatDefinition =
-        BookFormats.inferFormat(this.feedEntry.feedEntry)
+        BookFormats.inferFormat(this.feedEntry.toOPDSAcquisitionFeedEntry())
 
       this.bookFormat =
         when (formatDefinition) {
@@ -247,10 +249,10 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
               this.account.provider.id
                 .toString()
             ),
-            Pair("BookID", this.feedEntry.feedEntry.id),
-            Pair("BookTitle", this.feedEntry.feedEntry.title),
+            Pair("BookID", this.feedEntry.id),
+            Pair("BookTitle", this.feedEntry.title),
             Pair("BookPublisher",
-              this.feedEntry.feedEntry.publisher
+              this.feedEntry.publisher
                 .orEmpty()
             ),
             Pair("BookDRM", BookDRMInformation.None.kind.name)
@@ -558,10 +560,10 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
             this.account.provider.id
               .toString()
           ),
-          Pair("BookID", this.feedEntry.feedEntry.id),
-          Pair("BookTitle", this.feedEntry.feedEntry.title),
+          Pair("BookID", this.feedEntry.id),
+          Pair("BookTitle", this.feedEntry.title),
           Pair("BookPublisher",
-            this.feedEntry.feedEntry.publisher
+            this.feedEntry.publisher
               .orEmpty()
           ),
           Pair("BookDRM", this.bookFormat.drmInformation.kind.name),

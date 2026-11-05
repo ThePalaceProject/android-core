@@ -7,7 +7,9 @@ import org.librarysimplified.ui.R
 import org.nypl.simplified.books.book_database.api.BookFormats.BookFormatDefinition.BOOK_FORMAT_AUDIO
 import org.nypl.simplified.books.book_database.api.BookFormats.BookFormatDefinition.BOOK_FORMAT_EPUB
 import org.nypl.simplified.books.book_database.api.BookFormats.BookFormatDefinition.BOOK_FORMAT_PDF
-import org.nypl.simplified.feeds.api.FeedEntry.FeedEntryOPDS
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.books.book_database.api.BookFormats
+import org.nypl.simplified.feeds.opds12.toOPDSAcquisitionFeedEntry
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.thepalaceproject.palace.images.BookCoverBadge
 import org.thepalaceproject.palace.images.BookCoverBadgeLookupType
@@ -20,8 +22,8 @@ class CatalogCoverBadgeImages private constructor(
   private val screenSize: ScreenSizeInformationType,
   private val audioBookIcon: Bitmap
 ) : BookCoverBadgeLookupType {
-  override fun badgeForEntry(entry: FeedEntryOPDS): BookCoverBadge? =
-    when (entry.probableFormat) {
+  override fun badgeForEntry(entry: FeedEntryBook): BookCoverBadge? =
+    when (BookFormats.inferFormat(entry.toOPDSAcquisitionFeedEntry())) {
       BOOK_FORMAT_EPUB -> {
         null
       }

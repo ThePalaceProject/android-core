@@ -1,5 +1,7 @@
 package org.librarysimplified.viewer.epub.readium2
 
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+import org.nypl.simplified.feeds.opds12.toOPDSAcquisitionFeedEntry
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.ApplicationInfo
@@ -170,11 +172,11 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
               this.parameters.accountId.uuid
                 .toString()
             ),
-            Pair("BookID", this.parameters.entry.feedEntry.id),
+            Pair("BookID", this.parameters.entry.id),
             Pair("BookInternalID", this.parameters.bookId.value()),
-            Pair("BookTitle", this.parameters.entry.feedEntry.title),
+            Pair("BookTitle", this.parameters.entry.title),
             Pair("BookPublisher",
-              this.parameters.entry.feedEntry.publisher
+              this.parameters.entry.publisher
                 .orEmpty()
             ),
             Pair("BookDRM", this.parameters.drmInfo.kind.name)
@@ -208,11 +210,11 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
               this.account.provider.id
                 .toString()
             ),
-            Pair("BookID", this.parameters.entry.feedEntry.id),
+            Pair("BookID", this.parameters.entry.id),
             Pair("BookInternalID", this.parameters.bookId.value()),
-            Pair("BookTitle", this.parameters.entry.feedEntry.title),
+            Pair("BookTitle", this.parameters.entry.title),
             Pair("BookPublisher",
-              this.parameters.entry.feedEntry.publisher
+              this.parameters.entry.publisher
                 .orEmpty()
             ),
             Pair("BookDRM", this.parameters.drmInfo.kind.name)
@@ -279,7 +281,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
           profileUUID = profile.id.uuid,
           accountProvider = this.account.provider.id,
           accountUUID = this.account.id.uuid,
-          opdsEntry = this.parameters.entry.feedEntry
+          opdsEntry = this.parameters.entry.toOPDSAcquisitionFeedEntry()
         )
       )
     }
@@ -625,11 +627,11 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
             this.account.provider.id
               .toString()
           ),
-          Pair("BookID", this.parameters.entry.feedEntry.id),
+          Pair("BookID", this.parameters.entry.id),
           Pair("BookInternalID", this.parameters.bookId.value()),
-          Pair("BookTitle", this.parameters.entry.feedEntry.title),
+          Pair("BookTitle", this.parameters.entry.title),
           Pair("BookPublisher",
-            this.parameters.entry.feedEntry.publisher
+            this.parameters.entry.publisher
               .orEmpty()
           ),
           Pair("BookDRM", this.parameters.drmInfo.kind.name),

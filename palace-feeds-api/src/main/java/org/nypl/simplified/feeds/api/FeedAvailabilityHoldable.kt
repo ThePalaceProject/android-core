@@ -5,6 +5,6 @@ import org.joda.time.DateTime
 /**
  * The book is not available for borrowing but is available to place on hold.
  */
-object FeedAvailabilityHoldable : FeedAvailability {
+object FeedAvailabilityHoldable  : FeedAvailability, java.io.Serializable {
   override val endDate: DateTime? = null
 }

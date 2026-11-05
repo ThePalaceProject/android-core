@@ -5,6 +5,7 @@ import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.borrowing.SAMLDownloadContext
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.taskrecorder.api.TaskResult
 
@@ -62,7 +63,7 @@ interface BooksControllerType {
 
   fun bookReport(
     accountID: AccountID,
-    feedEntry: FeedEntry.FeedEntryOPDS,
+    feedEntry: FeedEntryBook,
     reportType: String
   ): FluentFuture<TaskResult<Unit>>
 

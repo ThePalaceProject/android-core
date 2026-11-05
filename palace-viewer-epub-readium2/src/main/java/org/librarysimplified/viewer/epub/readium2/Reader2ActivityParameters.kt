@@ -4,6 +4,7 @@ import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import java.io.File
 import java.io.Serializable
 
@@ -12,5 +13,5 @@ data class Reader2ActivityParameters(
   val bookId: BookID,
   val file: File,
   val drmInfo: BookDRMInformation,
-  val entry: FeedEntry.FeedEntryOPDS
+  val entry: FeedEntryBook
 ) : Serializable

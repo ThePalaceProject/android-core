@@ -18,7 +18,6 @@ import org.nypl.simplified.feeds.api.FeedDataWithGroups
 import org.nypl.simplified.feeds.api.FeedDRMLicensor
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedEntryBook
-import org.nypl.simplified.feeds.api.FeedEntryCorrupt
 import org.nypl.simplified.feeds.api.FeedEntryGroupRef
 import org.nypl.simplified.feeds.api.FeedFacetData
 import org.nypl.simplified.feeds.api.FeedFacetSingle
@@ -59,7 +58,7 @@ object OPDS12FeedConverter {
    * @param accountID The account that owns the feed
    * @param feed The parsed OPDS 1.2 feed
    * @param filter A predicate to filter entries
-   * @param search The search link, if any
+   * @param search The parsed OpenSearch 1.1 document, if any
    * @return The converted feed
    */
   fun convert(
@@ -70,45 +69,49 @@ object OPDS12FeedConverter {
   ): Feed {
     val feedSearch: FeedSearch? =
       if (search != null) {
-        FeedSearchOpen1_1(template = search.template)
+        FeedSearchOpen1_1(queryFn = search::getQueryURIForTerms)
       } else {
         null
       }
 
     val facetsByGroup: Map<String, List<FeedFacetSingle>> =
-      feed.facetsByGroup.mapValues { (_, facets) ->
+      feed.feedFacetsByGroup.mapValues { (_, facets) ->
         facets.map { convertFacet(accountID, it) }
       }
 
     val facetsOrder: List<FeedFacetSingle> =
-      feed.facetsOrder.map { convertFacet(accountID, it) }
+      feed.feedFacetsOrder.map { convertFacet(accountID, it) }
 
-    val groups: List<OPDSGroup> = feed.groups
+    /*
+     * Produce an ordered list of groups from the map + order list.
+     */
+    val orderedGroups: List<OPDSGroup> =
+      feed.feedGroupsOrder.map { name -> feed.feedGroups.getValue(name) }
 
-    return if (groups.isEmpty()) {
+    return if (orderedGroups.isEmpty()) {
       val entries: List<FeedEntry> =
-        feed.entries
+        feed.feedEntries
           .filter { filter(it) }
           .map { convertEntry(accountID, it) }
 
       FeedData(
-        feedID = feed.id,
+        feedID = feed.feedID,
         feedSearch = feedSearch,
-        feedTitle = feed.title,
-        feedUpdated = feed.updated,
-        feedURI = feed.uri,
-        feedTermsOfService = feed.termsOfService,
-        feedPrivacyPolicy = feed.privacyPolicy,
-        feedAbout = feed.about,
-        feedLicenses = feed.licenses,
-        feedNext = feed.next,
+        feedTitle = feed.feedTitle,
+        feedUpdated = feed.feedUpdated,
+        feedURI = feed.feedURI,
+        feedTermsOfService = feed.feedTermsOfService,
+        feedPrivacyPolicy = feed.feedPrivacyPolicy,
+        feedAbout = feed.feedAbout,
+        feedLicenses = feed.feedLicenses,
+        feedNext = feed.feedNext,
         facetsByGroup = facetsByGroup,
         facetsOrder = facetsOrder,
         entries = entries
       )
     } else {
       val feedGroups: List<FeedGroup> =
-        groups.map { group ->
+        orderedGroups.map { group ->
           FeedGroup(
             account = accountID,
             groupTitle = group.title,
@@ -121,16 +124,16 @@ object OPDS12FeedConverter {
         }
 
       FeedDataWithGroups(
-        feedID = feed.id,
+        feedID = feed.feedID,
         feedSearch = feedSearch,
-        feedTitle = feed.title,
-        feedUpdated = feed.updated,
-        feedURI = feed.uri,
-        feedTermsOfService = feed.termsOfService,
-        feedPrivacyPolicy = feed.privacyPolicy,
-        feedAbout = feed.about,
-        feedLicenses = feed.licenses,
-        feedNext = feed.next,
+        feedTitle = feed.feedTitle,
+        feedUpdated = feed.feedUpdated,
+        feedURI = feed.feedURI,
+        feedTermsOfService = feed.feedTermsOfService,
+        feedPrivacyPolicy = feed.feedPrivacyPolicy,
+        feedAbout = feed.feedAbout,
+        feedLicenses = feed.feedLicenses,
+        feedNext = feed.feedNext,
         facetsByGroup = facetsByGroup,
         facetsOrder = facetsOrder,
         groups = feedGroups
@@ -142,12 +145,8 @@ object OPDS12FeedConverter {
    * Convert an [OPDSAcquisitionFeedEntry] into a [FeedEntryBook].
    */
   fun convertEntry(accountID: AccountID, entry: OPDSAcquisitionFeedEntry): FeedEntryBook {
-    val series: List<OPDSSeries> = entry.series
-    val firstSeries: FeedSeries? =
-      if (series.isEmpty()) {
-        null
-      } else {
-        val s = series[0]
+    val series: FeedSeries? =
+      entry.series?.let { s ->
         FeedSeries(
           name = s.name,
           position = s.position,
@@ -180,10 +179,10 @@ object OPDS12FeedConverter {
       alternate = entry.alternate,
       analytics = entry.analytics,
       licensor = entry.licensor?.let { convertLicensor(it) },
-      duration = null,
-      language = null,
-      audience = null,
-      series = firstSeries
+      duration = entry.duration,
+      language = entry.language,
+      audience = entry.audience,
+      series = series
     )
   }
 

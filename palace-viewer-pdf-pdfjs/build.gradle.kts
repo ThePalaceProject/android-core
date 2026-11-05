@@ -13,6 +13,7 @@ dependencies {
     implementation(project(":palace-books-formats-api"))
     implementation(project(":palace-diagnostics-api"))
     implementation(project(":palace-feeds-api"))
+    implementation(project(":palace-feeds-opds12"))
     implementation(project(":palace-opds-core"))
     implementation(project(":palace-presentableerror-api"))
     implementation(project(":palace-profiles-api"))

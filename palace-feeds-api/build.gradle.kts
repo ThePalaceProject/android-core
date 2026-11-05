@@ -12,6 +12,7 @@ dependencies {
     implementation(project(":palace-books-registry-api"))
     implementation(project(":palace-content-api"))
     implementation(project(":palace-json-core"))
+    implementation(project(":palace-links"))
     implementation(project(":palace-presentableerror-api"))
     implementation(project(":palace-taskrecorder-api"))
 

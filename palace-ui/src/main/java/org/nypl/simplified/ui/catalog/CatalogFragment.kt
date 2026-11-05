@@ -36,14 +36,20 @@ import org.nypl.simplified.books.book_registry.BookStatus.Loaned
 import org.nypl.simplified.books.book_registry.BookStatusEvent
 import org.nypl.simplified.books.controller.api.BooksControllerType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
 import org.nypl.simplified.feeds.api.FeedBooksSelection
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedFacet
-import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetOPDS12Composite
-import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetOPDS12Single
-import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetPseudo
+import org.nypl.simplified.feeds.api.FeedFacetComposite
+import org.nypl.simplified.feeds.api.FeedFacetData
+import org.nypl.simplified.feeds.api.FeedFacetPseudoFiltering
+import org.nypl.simplified.feeds.api.FeedFacetPseudoSorting
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.feeds.api.FeedSearch
+import org.nypl.simplified.feeds.api.FeedSearchLocal
+import org.nypl.simplified.feeds.api.FeedSearchOpen1_1
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.api.FeedEntryCorrupt
 import org.nypl.simplified.opds.core.OPDSAvailabilityHeld
 import org.nypl.simplified.opds.core.OPDSAvailabilityHeldReady
 import org.nypl.simplified.opds.core.OPDSAvailabilityHoldable
@@ -256,7 +262,7 @@ sealed class CatalogFragment :
     }
   }
 
-  final override fun onBookSelected(entry: FeedEntry.FeedEntryOPDS) {
+  final override fun onBookSelected(entry: FeedEntryBook) {
     UIThread.checkIsUIThread()
     this.opdsClient.goTo(
       OPDSClientRequest.ExistingEntry(
@@ -272,7 +278,7 @@ sealed class CatalogFragment :
   ) {
     UIThread.checkIsUIThread()
 
-    if (newEntry is FeedEntry.FeedEntryOPDS) {
+    if (newEntry is FeedEntryBook) {
       val view = this.viewNow
       if (view is CatalogFeedViewDetails2) {
         val account =
@@ -288,9 +294,9 @@ sealed class CatalogFragment :
 
   private fun onLoadRelatedFeed(
     view: CatalogFeedViewDetails2,
-    newEntry: FeedEntry.FeedEntryOPDS
+    newEntry: FeedEntryBook
   ) {
-    val related = newEntry.feedEntry.related
+    val related = newEntry.related
     if (related != null) {
       this.logger.debug("Loading related feed ({})", related)
       val relatedFuture =
@@ -349,7 +355,7 @@ sealed class CatalogFragment :
           val feed = newState.handle.feed()
           CatalogSearchResultsAccessibility.searchResultsLoaded(
             listView = view.listView,
-            itemCount = feed.feedGroupsInOrder.sumOf { it.groupEntries.size }
+            itemCount = feed.groups.sumOf { it.groupEntries.size }
           )
         } else {
           this.viewNow.startFocusDelayed()
@@ -396,11 +402,11 @@ sealed class CatalogFragment :
       )
 
     when (val entry = this.opdsClient.entry.get()) {
-      is FeedEntry.FeedEntryCorrupt -> {
+      is FeedEntryCorrupt -> {
         // Nothing to do.
       }
 
-      is FeedEntry.FeedEntryOPDS -> {
+      is FeedEntryBook -> {
         val services =
           Services.serviceDirectory()
         val account =
@@ -445,11 +451,11 @@ sealed class CatalogFragment :
     this.perViewSubscriptions.add(
       this.opdsClient.entry.subscribe { _, item ->
         when (item) {
-          is FeedEntry.FeedEntryCorrupt -> {
+          is FeedEntryCorrupt -> {
             // Nothing sensible to do here.
           }
 
-          is FeedEntry.FeedEntryOPDS -> {
+          is FeedEntryBook -> {
             val services =
               Services.serviceDirectory()
             val account =
@@ -630,7 +636,7 @@ sealed class CatalogFragment :
     try {
       BookPreviewActivity.startActivity(
         this.requireActivity(),
-        FeedEntry.FeedEntryOPDS(
+        OPDS12FeedConverter.convertEntry(
           book.account,
           book.entry
         )
@@ -1181,7 +1187,7 @@ sealed class CatalogFragment :
       }
 
     when (feedSearch) {
-      FeedSearch.FeedSearchLocal -> {
+      FeedSearchLocal -> {
         this.opdsClient.goTo(
           OPDSClientRequest.GeneratedFeed(
             accountID = accountID,
@@ -1204,7 +1210,7 @@ sealed class CatalogFragment :
         )
       }
 
-      is FeedSearch.FeedSearchOpen1_1 -> {
+      is FeedSearchOpen1_1 -> {
         this.opdsClient.goTo(
           OPDSClientRequest.NewFeed(
             accountID = accountID,
@@ -1212,7 +1218,7 @@ sealed class CatalogFragment :
             historyBehavior = ADD_TO_HISTORY,
             isSearch = true,
             method = "GET",
-            uri = feedSearch.search.getQueryURIForTerms(queryText),
+            uri = feedSearch.getQueryURIForTerms(queryText),
           )
         )
       }
@@ -1230,14 +1236,14 @@ sealed class CatalogFragment :
       }
 
     when (feedFacet) {
-      is FeedFacetOPDS12Single -> {
+      is FeedFacetData -> {
         val credentials =
           this.credentialsOf(feedFacet.accountID)
 
         this.opdsClient.goTo(
           OPDSClientRequest.NewFeed(
             accountID = feedFacet.accountID,
-            uri = feedFacet.opdsFacet.uri,
+            uri = feedFacet.uri,
             credentials = credentials,
             historyBehavior = ADD_TO_HISTORY,
             method = "GET"
@@ -1245,7 +1251,7 @@ sealed class CatalogFragment :
         )
       }
 
-      is FeedFacetOPDS12Composite -> {
+      is FeedFacetComposite -> {
         val credentials =
           this.credentialsOf(feedFacet.accountID)
 
@@ -1259,7 +1265,7 @@ sealed class CatalogFragment :
         )
       }
 
-      is FeedFacetPseudo.FilteringForAccount -> {
+      is FeedFacetPseudoFiltering -> {
         this.opdsClient.goTo(
           OPDSClientRequest.GeneratedFeed(
             accountID = this.currentAccount().id,
@@ -1281,7 +1287,7 @@ sealed class CatalogFragment :
         )
       }
 
-      is FeedFacetPseudo.Sorting -> {
+      is FeedFacetPseudoSorting -> {
         val filterByAccountID =
           this.findFilterByAccountID()
 
@@ -1312,7 +1318,7 @@ sealed class CatalogFragment :
     if (CatalogFeedFacetFilterModels.filterModel.facets.isNotEmpty()) {
       val filterFacet =
         CatalogFeedFacetFilterModels.filterModel.createResultFacet("")
-      if (filterFacet is FeedFacetPseudo.FilteringForAccount) {
+      if (filterFacet is FeedFacetPseudoFiltering) {
         filterFacet.account
       } else {
         null

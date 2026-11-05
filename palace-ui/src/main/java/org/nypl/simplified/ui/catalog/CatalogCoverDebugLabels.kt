@@ -2,7 +2,9 @@ package org.nypl.simplified.ui.catalog
 
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.books.formats.api.StandardFormatNames
-import org.nypl.simplified.feeds.api.FeedEntry.FeedEntryOPDS
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.books.book_database.api.BookFormats
+import org.nypl.simplified.feeds.opds12.toOPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionPaths
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
@@ -20,13 +22,14 @@ import org.thepalaceproject.palace.images.BookCoverDebugLabelsLookupType
  */
 
 class CatalogCoverDebugLabels : BookCoverDebugLabelsLookupType {
-  override fun labelsForEntry(entry: FeedEntryOPDS): BookCoverDebugLabels? {
+  override fun labelsForEntry(entry: FeedEntryBook): BookCoverDebugLabels? {
     if (!this.debugLabelsEnabled()) {
       return null
     }
 
-    val format = entry.probableFormat?.shortName ?: "unknown"
-    val drm = drmNameOf(entry.feedEntry)
+    val opdsEntry = entry.toOPDSAcquisitionFeedEntry()
+    val format = BookFormats.inferFormat(opdsEntry)?.shortName ?: "unknown"
+    val drm = drmNameOf(opdsEntry)
     return BookCoverDebugLabels(
       format = format,
       drm = drm

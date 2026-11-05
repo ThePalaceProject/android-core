@@ -34,6 +34,7 @@ import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.books.api.bookmark.SerializedBookmarks
 import org.nypl.simplified.books.api.bookmark.SerializedLocatorPage1
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
@@ -98,7 +99,7 @@ class PdfReaderActivity : AppCompatActivity() {
   private lateinit var accountId: AccountID
   private lateinit var bookFormat: BookFormat.BookFormatPDF
   private lateinit var bookID: BookID
-  private lateinit var feedEntry: FeedEntry.FeedEntryOPDS
+  private lateinit var feedEntry: FeedEntryBook
   private lateinit var loadingBar: ProgressBar
   private lateinit var pdfReaderContainer: FrameLayout
   private lateinit var root: View
@@ -138,11 +139,11 @@ class PdfReaderActivity : AppCompatActivity() {
           mapOf(
             Pair("Reason", "accountNotFound"),
             Pair("AccountInternalID", this.accountId.uuid.toString()),
-            Pair("BookID", this.feedEntry.feedEntry.id),
+            Pair("BookID", this.feedEntry.id),
             Pair("BookInternalID", this.bookID.value()),
-            Pair("BookTitle", this.feedEntry.feedEntry.title),
+            Pair("BookTitle", this.feedEntry.title),
             Pair("BookPublisher",
-              this.feedEntry.feedEntry.publisher
+              this.feedEntry.publisher
                 .orEmpty()
             ),
             Pair("BookDRM", params.drmInfo.kind.name)
@@ -173,11 +174,11 @@ class PdfReaderActivity : AppCompatActivity() {
               this.account.provider.id
                 .toString()
             ),
-            Pair("BookID", this.feedEntry.feedEntry.id),
+            Pair("BookID", this.feedEntry.id),
             Pair("BookInternalID", this.bookID.value()),
-            Pair("BookTitle", this.feedEntry.feedEntry.title),
+            Pair("BookTitle", this.feedEntry.title),
             Pair("BookPublisher",
-              this.feedEntry.feedEntry.publisher
+              this.feedEntry.publisher
                 .orEmpty()
             ),
             Pair("BookDRM", params.drmInfo.kind.name)
@@ -380,12 +381,13 @@ class PdfReaderActivity : AppCompatActivity() {
                     .account.provider.id
                     .toString()
                 ),
-                Pair("BookID", this@PdfReaderActivity.feedEntry.feedEntry.id),
+                Pair("BookID", this@PdfReaderActivity.feedEntry.id),
                 Pair("BookInternalID", this@PdfReaderActivity.bookID.value()),
-                Pair("BookTitle", this@PdfReaderActivity.feedEntry.feedEntry.title),
+                Pair("BookTitle", this@PdfReaderActivity.feedEntry.title),
                 Pair("BookPublisher",
                   this@PdfReaderActivity
-                    .feedEntry.feedEntry.publisher
+                    .feedEntry
+                    .publisher
                     .orEmpty()
                 ),
                 Pair("BookDRM", drmInfo.kind.name)
@@ -526,11 +528,11 @@ class PdfReaderActivity : AppCompatActivity() {
         bookChapterProgress = 0.0,
         bookChapterTitle = "",
         bookProgress = 0.0,
-        bookTitle = this.feedEntry.feedEntry.title,
+        bookTitle = this.feedEntry.title,
         deviceID = PdfReaderDevices.deviceId(this.profilesController, this.bookID),
         kind = BookmarkKind.BookmarkLastReadLocation,
         location = SerializedLocatorPage1(pageIndex),
-        opdsId = this.feedEntry.feedEntry.id,
+        opdsId = this.feedEntry.id,
         time = DateTime.now(),
         uri = null
       )

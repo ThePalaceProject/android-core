@@ -8,6 +8,7 @@ import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedFacet
 import org.nypl.simplified.feeds.api.FeedSearch
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import java.net.URI
 
@@ -47,7 +48,7 @@ interface CatalogViewCallbacksType {
    */
 
   @UiThread
-  fun onBookSelected(entry: FeedEntry.FeedEntryOPDS)
+  fun onBookSelected(entry: FeedEntryBook)
 
   /**
    * A request was made to open the preview of a book.

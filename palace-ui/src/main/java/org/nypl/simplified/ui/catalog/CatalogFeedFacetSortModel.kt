@@ -1,18 +1,19 @@
 package org.nypl.simplified.ui.catalog
 
-import org.nypl.simplified.feeds.api.FeedFacet
+import org.nypl.simplified.feeds.api.FeedFacetSingle
+import org.nypl.simplified.feeds.api.FeedFacetPseudoSorting
 import org.slf4j.LoggerFactory
 
 object CatalogFeedFacetSortModel {
   private val logger =
     LoggerFactory.getLogger(CatalogFeedFacetSortModel::class.java)
 
-  private val facetValues: MutableMap<CatalogPart, List<FeedFacet.FeedFacetSingle>> =
+  private val facetValues: MutableMap<CatalogPart, List<FeedFacetSingle>> =
     mutableMapOf()
 
   fun facetsSet(
     catalogPart: CatalogPart,
-    sortBy: List<FeedFacet.FeedFacetSingle>
+    sortBy: List<FeedFacetSingle>
   ) {
     this.logger.debug("[{}] Creating sort model of size {}", catalogPart, sortBy.size)
     for (entry in sortBy) {
@@ -21,23 +22,23 @@ object CatalogFeedFacetSortModel {
     this.facetValues[catalogPart] = sortBy.toList()
   }
 
-  fun facetSelected(catalogPart: CatalogPart): FeedFacet.FeedFacetSingle? =
+  fun facetSelected(catalogPart: CatalogPart): FeedFacetSingle? =
     this.facetValues[catalogPart]
       ?.find { s -> s.isActive }
 
-  fun facetSelectedPseudo(catalogPart: CatalogPart): FeedFacet.FeedFacetPseudo.Sorting? {
+  fun facetSelectedPseudo(catalogPart: CatalogPart): FeedFacetPseudoSorting? {
     val selected = this.facetSelected(catalogPart)
-    if (selected is FeedFacet.FeedFacetPseudo.Sorting) {
+    if (selected is FeedFacetPseudoSorting) {
       return selected
     }
     return null
   }
 
-  fun facetSelectedPseudoOrDefault(catalogPart: CatalogPart): FeedFacet.FeedFacetPseudo.Sorting.SortBy {
+  fun facetSelectedPseudoOrDefault(catalogPart: CatalogPart): FeedFacetPseudoSorting.SortBy {
     val selected = this.facetSelectedPseudo(catalogPart)
     if (selected != null) {
       return selected.sortBy
     }
-    return FeedFacet.FeedFacetPseudo.Sorting.SortBy.SORT_BY_TITLE
+    return FeedFacetPseudoSorting.SortBy.SORT_BY_TITLE
   }
 }

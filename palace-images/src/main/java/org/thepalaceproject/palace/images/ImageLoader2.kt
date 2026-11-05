@@ -20,6 +20,7 @@ import org.librarysimplified.palace.images.R
 import org.nypl.simplified.accounts.api.AccountProviderDescription
 import org.nypl.simplified.books.book_registry.BookRegistryReadableType
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -94,22 +95,22 @@ class ImageLoader2 private constructor(
     }
   }
 
-  private fun generateCoverURI(entry: FeedEntry.FeedEntryOPDS): URI {
-    val feedEntry = entry.feedEntry
+  private fun generateCoverURI(entry: FeedEntryBook): URI {
+    val feedEntry = entry
     val title = feedEntry.title
     val authors = feedEntry.authors
     val author = authors.firstOrNull() ?: ""
     return this.coverGenerator.generateURIForTitleAuthor(title, author)
   }
 
-  private fun coverURIOf(entry: FeedEntry.FeedEntryOPDS): URI? {
+  private fun coverURIOf(entry: FeedEntryBook): URI? {
     val bookWithStatus = this.bookRegistry.bookOrNull(entry.bookID)
-    return bookWithStatus?.book?.cover?.toURI() ?: entry.feedEntry.cover
+    return bookWithStatus?.book?.cover?.toURI() ?: entry.cover
   }
 
-  private fun thumbnailURIOf(entry: FeedEntry.FeedEntryOPDS): URI? {
+  private fun thumbnailURIOf(entry: FeedEntryBook): URI? {
     val bookWithStatus = this.bookRegistry.bookOrNull(entry.bookID)
-    return bookWithStatus?.book?.thumbnail?.toURI() ?: entry.feedEntry.thumbnail
+    return bookWithStatus?.book?.thumbnail?.toURI() ?: entry.thumbnail
   }
 
   private abstract class BaseListener<T>(
@@ -262,7 +263,7 @@ class ImageLoader2 private constructor(
   }
 
   override fun loadThumbnailInto(
-    entry: FeedEntry.FeedEntryOPDS,
+    entry: FeedEntryBook,
     imageView: ImageView,
     width: Int,
     height: Int
@@ -284,7 +285,7 @@ class ImageLoader2 private constructor(
   }
 
   private fun loadThumbnailIntoInternal(
-    entry: FeedEntry.FeedEntryOPDS,
+    entry: FeedEntryBook,
     imageView: ImageView,
     width: Int,
     height: Int,
@@ -337,7 +338,7 @@ class ImageLoader2 private constructor(
   }
 
   override fun loadCoverInto(
-    entry: FeedEntry.FeedEntryOPDS,
+    entry: FeedEntryBook,
     imageView: ImageView,
     hasBadge: Boolean,
     width: Int,
@@ -361,7 +362,7 @@ class ImageLoader2 private constructor(
   }
 
   private fun loadCoverIntoInternal(
-    entry: FeedEntry.FeedEntryOPDS,
+    entry: FeedEntryBook,
     imageView: ImageView,
     hasBadge: Boolean,
     width: Int,
@@ -418,7 +419,7 @@ class ImageLoader2 private constructor(
   }
 
   override fun loadCoverBackgroundInto(
-    entry: FeedEntry.FeedEntryOPDS,
+    entry: FeedEntryBook,
     imageView: ImageView,
     width: Int,
     height: Int,
@@ -442,7 +443,7 @@ class ImageLoader2 private constructor(
   }
 
   private fun loadCoverBackgroundIntoInternal(
-    entry: FeedEntry.FeedEntryOPDS,
+    entry: FeedEntryBook,
     imageView: ImageView,
     width: Int,
     height: Int,
@@ -493,7 +494,7 @@ class ImageLoader2 private constructor(
   }
 
   override fun loadCoverAsBitmap(
-    entry: FeedEntry.FeedEntryOPDS,
+    entry: FeedEntryBook,
     onBitmapLoaded: (Bitmap) -> Unit,
     defaultResource: Int
   ): CompletableFuture<Unit> {
