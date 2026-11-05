@@ -1,4 +1,4 @@
-package org.nypl.simplified.feeds.api
+package org.nypl.simplified.feeds.opds12
 
 import one.irradia.mime.api.MIMECompatibility
 import org.librarysimplified.http.api.LSHTTPClientType
@@ -18,16 +18,14 @@ import java.net.URI
 import java.util.Locale
 
 /**
- * An implementation of the [OPDSFeedTransportType] interface that uses an
- * [HTTPType] instance for communication, supporting optional
- * authentication.
+ * An implementation of [OPDSFeedTransportType] that uses an HTTP client
+ * for communication, supporting optional authentication.
  */
-
-class FeedHTTPTransport(
+class OPDS12FeedHTTPTransport(
   private val http: LSHTTPClientType
 ) : OPDSFeedTransportType<AccountAuthenticationCredentials?> {
   private val logger =
-    LoggerFactory.getLogger(FeedHTTPTransport::class.java)
+    LoggerFactory.getLogger(OPDS12FeedHTTPTransport::class.java)
 
   override fun getStream(
     credentials: AccountAuthenticationCredentials?,
@@ -53,7 +51,7 @@ class FeedHTTPTransport(
       }
 
       is LSHTTPResponseStatus.Responded.Error -> {
-        throw FeedHTTPTransportException(
+        throw OPDS12FeedHTTPTransportException(
           message = status.properties.message,
           code = status.properties.status,
           report = status.properties.problemReport
@@ -71,28 +69,11 @@ class FeedHTTPTransport(
 
   private fun methodOfName(method: String): LSHTTPRequestBuilderType.Method =
     when (method.uppercase(Locale.ROOT)) {
-      "GET" -> {
-        LSHTTPRequestBuilderType.Method.Get
-      }
-
-      "HEAD" -> {
-        LSHTTPRequestBuilderType.Method.Head
-      }
-
-      "POST" -> {
-        LSHTTPRequestBuilderType.Method.Post(ByteArray(0), MIMECompatibility.applicationOctetStream)
-      }
-
-      "PUT" -> {
-        LSHTTPRequestBuilderType.Method.Put(ByteArray(0), MIMECompatibility.applicationOctetStream)
-      }
-
-      "DELETE" -> {
-        LSHTTPRequestBuilderType.Method.Delete(ByteArray(0), MIMECompatibility.applicationOctetStream)
-      }
-
-      else -> {
-        throw IllegalArgumentException("Unsupported request method: $method")
-      }
+      "GET" -> LSHTTPRequestBuilderType.Method.Get
+      "HEAD" -> LSHTTPRequestBuilderType.Method.Head
+      "POST" -> LSHTTPRequestBuilderType.Method.Post(ByteArray(0), MIMECompatibility.applicationOctetStream)
+      "PUT" -> LSHTTPRequestBuilderType.Method.Put(ByteArray(0), MIMECompatibility.applicationOctetStream)
+      "DELETE" -> LSHTTPRequestBuilderType.Method.Delete(ByteArray(0), MIMECompatibility.applicationOctetStream)
+      else -> throw IllegalArgumentException("Unsupported request method: $method")
     }
 }
