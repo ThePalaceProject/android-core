@@ -1,393 +1,74 @@
 package org.nypl.simplified.feeds.api
 
 import org.joda.time.DateTime
-import org.nypl.simplified.accounts.api.AccountID
-import org.nypl.simplified.books.api.BookID
-import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetOPDS12Single
-import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetSingle
-import org.nypl.simplified.feeds.api.FeedSearch.FeedSearchOpen1_1
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeed
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
-import org.nypl.simplified.opds.core.OPDSOpenSearch1_1
 import java.net.URI
-import java.util.Collections
-import java.util.Objects
 
 /**
- * The type of mutable feeds.
- *
- * This provides an abstraction over parsed OPDS feeds, and locally generated
- * feeds from book databases. The user can match on the values using [ ][.matchFeed] to determine the real type of the feed.
+ * A parsed or locally-generated feed.
  */
-
-sealed class Feed {
+sealed interface Feed {
   /**
-   * @return The unique identifier of the feed
+   * The unique identifier of the feed.
    */
-
-  abstract val feedID: String
+  val feedID: String
 
   /**
-   * @return The search URI for the feed
+   * The search for the feed.
    */
-
-  abstract val feedSearch: FeedSearch?
+  val feedSearch: FeedSearch?
 
   /**
-   * @return The title of the feed
+   * The title of the feed.
    */
-
-  abstract val feedTitle: String
+  val feedTitle: String
 
   /**
-   * @return The last time the feed was updated
+   * The last time the feed was updated.
    */
-
-  abstract val feedUpdated: DateTime
+  val feedUpdated: DateTime
 
   /**
-   * @return The URI of the feed
+   * The URI of the feed.
    */
-
-  abstract val feedURI: URI
+  val feedURI: URI
 
   /**
-   * @return The number of entries in the feed
+   * A link to the terms of service, if any.
    */
+  val feedTermsOfService: URI?
 
-  abstract val size: Int
+  /**
+   * A link to the privacy policy, if any.
+   */
+  val feedPrivacyPolicy: URI?
 
-  data class FeedWithoutGroups internal constructor(
-    override val feedID: String,
-    override val feedSearch: FeedSearch?,
-    override val feedTitle: String,
-    override val feedUpdated: DateTime,
-    override val feedURI: URI,
-    /**
-     * @return A link to the terms of service, if any
-     */
+  /**
+   * A link to the about page, if any.
+   */
+  val feedAbout: URI?
 
-    val feedTermsOfService: URI?,
-    /**
-     * @return A link to the privacy policy, if any
-     */
+  /**
+   * A link to the licenses, if any.
+   */
+  val feedLicenses: URI?
 
-    val feedPrivacyPolicy: URI?,
-    /**
-     * @return A link to the about, if any
-     */
+  /**
+   * A link to the next part of the feed, if any.
+   */
+  val feedNext: URI?
 
-    val feedAbout: URI?,
-    /**
-     * @return A link to the licenses, if any
-     */
+  /**
+   * The facets, grouped by name.
+   */
+  val facetsByGroup: Map<String, List<FeedFacetSingle>>
 
-    val feedLicenses: URI?,
-    /**
-     * @return A link to the next part of the feed, if any
-     */
+  /**
+   * The facets, in declaration order.
+   */
+  val facetsOrder: List<FeedFacetSingle>
 
-    val feedNext: URI?,
-    private val facetsByGroupData: MutableMap<String, MutableList<FeedFacetSingle>>,
-    private val facetsOrderData: MutableList<FeedFacetSingle>
-  ) : Feed() {
-    private val entriesData: MutableMap<BookID, FeedEntry> = mutableMapOf()
-    private val entriesOrderData: MutableList<BookID> = mutableListOf()
-
-    val facetsByGroup: Map<String, List<FeedFacetSingle>> =
-      Collections.unmodifiableMap(this.facetsByGroupData)
-    val facetsOrder: List<FeedFacetSingle> =
-      Collections.unmodifiableList(this.facetsOrderData)
-    val entriesByID: Map<BookID, FeedEntry> =
-      Collections.unmodifiableMap(this.entriesData)
-
-    val entriesInOrder: MutableList<FeedEntry> =
-      object : AbstractMutableList<FeedEntry>() {
-        override val size: Int
-          get() = this@FeedWithoutGroups.entriesOrderData.size
-
-        override fun add(
-          index: Int,
-          element: FeedEntry
-        ) {
-          if (!this@FeedWithoutGroups.entriesData.containsKey(element.bookID)) {
-            this@FeedWithoutGroups.entriesOrderData.add(index, element.bookID)
-            this@FeedWithoutGroups.entriesData.put(element.bookID, element)
-          }
-        }
-
-        override fun get(index: Int): FeedEntry = this@FeedWithoutGroups.entriesData[this@FeedWithoutGroups.entriesOrderData.get(index)]!!
-
-        override fun removeAt(index: Int): FeedEntry {
-          val bookID = this@FeedWithoutGroups.entriesOrderData.get(index)
-          val removed = this@FeedWithoutGroups.entriesData.remove(bookID)
-          this@FeedWithoutGroups.entriesOrderData.removeAt(index)
-          return removed!!
-        }
-
-        override fun set(
-          index: Int,
-          element: FeedEntry
-        ): FeedEntry {
-          val bookID = this@FeedWithoutGroups.entriesOrderData.get(index)
-          val old = this@FeedWithoutGroups.entriesData[bookID]
-          this@FeedWithoutGroups.entriesData[bookID] = element
-          return old!!
-        }
-      }
-
-    override val size: Int
-      get() = this.entriesOrderData.size
-
-    fun containsBook(bookID: BookID): Boolean = this.entriesByID.containsKey(bookID)
-  }
-
-  data class FeedWithGroups internal constructor(
-    override val feedID: String,
-    override val feedSearch: FeedSearch?,
-    override val feedTitle: String,
-    override val feedUpdated: DateTime,
-    override val feedURI: URI,
-    /**
-     * @return A link to the terms of service, if any
-     */
-
-    val feedTermsOfService: URI?,
-    /**
-     * @return A link to the privacy policy, if any
-     */
-
-    val feedPrivacyPolicy: URI?,
-    /**
-     * @return A link to the about page, if any
-     */
-
-    val feedAbout: URI?,
-    /**
-     * @return A link to the licenses, if any
-     */
-
-    val feedLicenses: URI?,
-    /**
-     * @return A link to the next part of the feed, if any
-     */
-
-    val feedNext: URI?,
-    private val facetsByGroupData: MutableMap<String, MutableList<FeedFacetSingle>>,
-    private val facetsOrderData: MutableList<FeedFacetSingle>,
-    private val feedGroupsData: MutableMap<String, FeedGroup>,
-    private val feedGroupsOrderData: MutableList<String>
-  ) : Feed() {
-    val facetsByGroup: Map<String, List<FeedFacetSingle>> =
-      Collections.unmodifiableMap(this.facetsByGroupData)
-    val facetsOrder: List<FeedFacetSingle> =
-      Collections.unmodifiableList(this.facetsOrderData)
-    val feedGroupsByID: Map<String, FeedGroup> =
-      Collections.unmodifiableMap(this.feedGroupsData)
-    val feedGroupsInOrder: MutableList<FeedGroup> =
-      object : AbstractMutableList<FeedGroup>() {
-        override val size: Int
-          get() = this@FeedWithGroups.feedGroupsOrderData.size
-
-        override fun add(
-          index: Int,
-          element: FeedGroup
-        ) {
-          val name = element.groupTitle
-          this@FeedWithGroups.feedGroupsOrderData.add(index, name)
-          this@FeedWithGroups.feedGroupsData.put(name, element)
-        }
-
-        override fun get(index: Int): FeedGroup = this@FeedWithGroups.feedGroupsData[this@FeedWithGroups.feedGroupsOrderData.get(index)]!!
-
-        override fun removeAt(index: Int): FeedGroup {
-          val name = this@FeedWithGroups.feedGroupsOrderData.get(index)
-          val removed = this@FeedWithGroups.feedGroupsData.remove(name)
-          this@FeedWithGroups.feedGroupsOrderData.removeAt(index)
-          return removed!!
-        }
-
-        override fun set(
-          index: Int,
-          element: FeedGroup
-        ): FeedGroup {
-          val name = this@FeedWithGroups.feedGroupsOrderData.get(index)
-          val old = this@FeedWithGroups.feedGroupsData[name]
-          this@FeedWithGroups.feedGroupsData[name] = element
-          return old!!
-        }
-      }
-
-    override val size: Int
-      get() = this.feedGroupsOrderData.size
-  }
-
-  companion object {
-    /**
-     * Construct an empty feed without groups.
-     */
-
-    fun empty(
-      feedID: String,
-      feedSearch: FeedSearch?,
-      feedTitle: String,
-      feedURI: URI,
-      feedFacets: List<FeedFacetSingle>,
-      feedFacetGroups: Map<String, List<FeedFacetSingle>>
-    ): FeedWithoutGroups {
-      val mutableGroups =
-        feedFacetGroups
-          .mapValues { entry ->
-            entry.value.toMutableList()
-          }.toMutableMap()
-
-      return FeedWithoutGroups(
-        feedID = feedID,
-        feedSearch = feedSearch,
-        feedTitle = feedTitle,
-        feedUpdated = DateTime.now(),
-        feedAbout = null,
-        feedURI = feedURI,
-        feedTermsOfService = null,
-        feedPrivacyPolicy = null,
-        feedLicenses = null,
-        feedNext = null,
-        facetsOrderData = feedFacets.toMutableList(),
-        facetsByGroupData = mutableGroups
-      )
-    }
-
-    /**
-     * Construct a feed from the given acquisition feed.
-     *
-     * @param accountId The account that owns the entries in the feed
-     * @param feed The feed
-     * @param filter A function that, given a feed entry, yields a `true` value iff the entry should appear in the resulting feed
-     * @param search The search document
-     * @return A new feed
-     */
-
-    fun fromAcquisitionFeed(
-      accountId: AccountID,
-      feed: OPDSAcquisitionFeed,
-      filter: (OPDSAcquisitionFeedEntry) -> Boolean,
-      search: OPDSOpenSearch1_1?
-    ): Feed =
-      if (feed.feedGroups.isEmpty()) {
-        this.withoutGroups(accountId, feed, filter, search)
-      } else {
-        this.withGroups(accountId, feed, filter, search)
-      }
-
-    private fun withoutGroups(
-      accountId: AccountID,
-      feed: OPDSAcquisitionFeed,
-      filter: (OPDSAcquisitionFeedEntry) -> Boolean,
-      search: OPDSOpenSearch1_1?
-    ): FeedWithoutGroups {
-      val facetsByGroup =
-        this.constructFacetGroups(accountId, feed)
-      val facetsOrder =
-        this.constructFacetsOrdered(accountId, feed)
-      val actualSearch =
-        if (search != null) {
-          FeedSearchOpen1_1(search)
-        } else {
-          null
-        }
-
-      val result =
-        FeedWithoutGroups(
-          feedID = feed.feedID,
-          feedNext = feed.feedNext,
-          feedLicenses = feed.feedLicenses,
-          feedSearch = actualSearch,
-          feedTitle = feed.feedTitle,
-          feedUpdated = feed.feedUpdated,
-          feedURI = feed.feedURI,
-          feedTermsOfService = feed.feedTermsOfService,
-          feedPrivacyPolicy = feed.feedPrivacyPolicy,
-          feedAbout = feed.feedAbout,
-          facetsByGroupData = facetsByGroup,
-          facetsOrderData = facetsOrder
-        )
-
-      val entries = feed.feedEntries
-      for (index in entries.indices) {
-        val feedEntry = entries[index]
-        if (feedEntry.acquisitions.isEmpty()) {
-          continue
-        }
-        if (filter.invoke(feedEntry)) {
-          result.entriesInOrder.add(FeedEntry.FeedEntryOPDS(accountId, feedEntry))
-        }
-      }
-
-      return result
-    }
-
-    private fun withGroups(
-      accountId: AccountID,
-      feed: OPDSAcquisitionFeed,
-      filter: (OPDSAcquisitionFeedEntry) -> Boolean,
-      search: OPDSOpenSearch1_1?
-    ): FeedWithGroups {
-      val facetsByGroup =
-        this.constructFacetGroups(accountId, feed)
-      val facetsOrder =
-        this.constructFacetsOrdered(accountId, feed)
-
-      val actualSearch =
-        if (search != null) {
-          FeedSearchOpen1_1(search)
-        } else {
-          null
-        }
-
-      return FeedWithGroups(
-        feedID = feed.feedID,
-        feedSearch = actualSearch,
-        feedTitle = feed.feedTitle,
-        feedUpdated = feed.feedUpdated,
-        feedURI = feed.feedURI,
-        feedTermsOfService = feed.feedTermsOfService,
-        feedPrivacyPolicy = feed.feedPrivacyPolicy,
-        feedAbout = feed.feedAbout,
-        feedLicenses = feed.feedLicenses,
-        feedNext = feed.feedNext,
-        facetsByGroupData = facetsByGroup,
-        facetsOrderData = facetsOrder,
-        feedGroupsData = FeedGroup.fromOPDSGroups(accountId, filter, feed.feedGroups).toMutableMap(),
-        feedGroupsOrderData = feed.feedGroupsOrder.toMutableList()
-      )
-    }
-
-    private fun constructFacetsOrdered(
-      accountId: AccountID,
-      f: OPDSAcquisitionFeed
-    ): MutableList<FeedFacetSingle> {
-      val facetsOrder = ArrayList<FeedFacetSingle>(4)
-      for (ff in f.feedFacetsOrder) {
-        facetsOrder.add(FeedFacetOPDS12Single(accountId, Objects.requireNonNull(ff)))
-      }
-      return facetsOrder
-    }
-
-    private fun constructFacetGroups(
-      accountId: AccountID,
-      feed: OPDSAcquisitionFeed
-    ): MutableMap<String, MutableList<FeedFacetSingle>> {
-      val facetsByGroup = HashMap<String, MutableList<FeedFacetSingle>>(4)
-      val fMap = feed.feedFacetsByGroup
-      for (k in fMap.keys) {
-        val fs = fMap[k]!!
-        val rs = ArrayList<FeedFacetSingle>(4)
-        for (ff in fs) {
-          rs.add(FeedFacetOPDS12Single(accountId, Objects.requireNonNull(ff)))
-        }
-        facetsByGroup[k] = rs
-      }
-      return facetsByGroup
-    }
-  }
+  /**
+   * The number of top-level elements in the feed (entries or groups).
+   */
+  val size: Int
 }
