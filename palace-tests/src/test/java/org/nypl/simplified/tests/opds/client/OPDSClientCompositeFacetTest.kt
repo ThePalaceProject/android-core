@@ -20,9 +20,12 @@ import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.formats.BookFormatSupport
 import org.nypl.simplified.books.formats.BookFormatSupportParameters
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryCorrupt
+import org.nypl.simplified.feeds.api.FeedFacetComposite
+import org.nypl.simplified.feeds.api.FeedFacetData
 import org.nypl.simplified.feeds.api.FeedFacet
-import org.nypl.simplified.feeds.api.FeedHTTPTransport
-import org.nypl.simplified.feeds.api.FeedLoader
+import org.nypl.simplified.feeds.opds12.OPDS12FeedHTTPTransport
+import org.nypl.simplified.feeds.opds12.OPDS12FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
 import org.nypl.simplified.opds.core.OPDSFacet
@@ -59,7 +62,7 @@ class OPDSClientCompositeFacetTest {
   private lateinit var context: Context
   private lateinit var exec: ExecutorService
   private lateinit var feedLoader: FeedLoaderType
-  private lateinit var feedTransport: FeedHTTPTransport
+  private lateinit var feedTransport: OPDS12FeedHTTPTransport
   private lateinit var parser: OPDSFeedParserType
   private lateinit var searchParser: OPDSSearchParserType
   private lateinit var webServer: MockWebServer
@@ -81,7 +84,7 @@ class OPDSClientCompositeFacetTest {
     this.searchParser =
       OPDSSearchParser.newParser()
     this.feedTransport =
-      FeedHTTPTransport(
+      OPDS12FeedHTTPTransport(
         LSHTTPClient(
           context = this.context,
           configuration = LSHTTPClientConfiguration(
@@ -95,7 +98,7 @@ class OPDSClientCompositeFacetTest {
       )
 
     this.feedLoader =
-      FeedLoader.create(
+      OPDS12FeedLoader.create(
         bookFormatSupport = BookFormatSupport.create(
           BookFormatSupportParameters(
             supportsPDF = true,
@@ -140,7 +143,7 @@ class OPDSClientCompositeFacetTest {
       this.client.goTo(
         OPDSClientRequest.ExistingEntry(
           historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY,
-          FeedEntry.FeedEntryCorrupt(account0, book0, IllegalStateException())
+          FeedEntryCorrupt(account0, book0, IllegalStateException())
         )
       ).get(5L, TimeUnit.SECONDS)
     }
@@ -171,9 +174,9 @@ class OPDSClientCompositeFacetTest {
           historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY,
           credentials = null,
           method = "GET",
-          facet = FeedFacet.FeedFacetOPDS12Composite(
+          facet = FeedFacetComposite(
             facets = listOf(
-              FeedFacet.FeedFacetOPDS12Single(
+              FeedFacetData(
                 accountID = this.account0,
                 opdsFacet = OPDSFacet(
                   isActive = true,
@@ -226,9 +229,9 @@ class OPDSClientCompositeFacetTest {
           historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY,
           credentials = null,
           method = "GET",
-          facet = FeedFacet.FeedFacetOPDS12Composite(
+          facet = FeedFacetComposite(
             facets = listOf(
-              FeedFacet.FeedFacetOPDS12Single(
+              FeedFacetData(
                 accountID = this.account0,
                 opdsFacet = OPDSFacet(
                   isActive = true,
@@ -238,7 +241,7 @@ class OPDSClientCompositeFacetTest {
                   groupType = null
                 )
               ),
-              FeedFacet.FeedFacetOPDS12Single(
+              FeedFacetData(
                 accountID = this.account0,
                 opdsFacet = OPDSFacet(
                   isActive = true,
@@ -291,9 +294,9 @@ class OPDSClientCompositeFacetTest {
           historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY,
           credentials = null,
           method = "GET",
-          facet = FeedFacet.FeedFacetOPDS12Composite(
+          facet = FeedFacetComposite(
             facets = listOf(
-              FeedFacet.FeedFacetOPDS12Single(
+              FeedFacetData(
                 accountID = this.account0,
                 opdsFacet = OPDSFacet(
                   isActive = true,
@@ -303,7 +306,7 @@ class OPDSClientCompositeFacetTest {
                   groupType = null
                 )
               ),
-              FeedFacet.FeedFacetOPDS12Single(
+              FeedFacetData(
                 accountID = this.account0,
                 opdsFacet = OPDSFacet(
                   isActive = true,
@@ -356,9 +359,9 @@ class OPDSClientCompositeFacetTest {
           historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY,
           credentials = null,
           method = "GET",
-          facet = FeedFacet.FeedFacetOPDS12Composite(
+          facet = FeedFacetComposite(
             facets = listOf(
-              FeedFacet.FeedFacetOPDS12Single(
+              FeedFacetData(
                 accountID = this.account0,
                 opdsFacet = OPDSFacet(
                   isActive = true,
@@ -368,7 +371,7 @@ class OPDSClientCompositeFacetTest {
                   groupType = null
                 )
               ),
-              FeedFacet.FeedFacetOPDS12Single(
+              FeedFacetData(
                 accountID = this.account0,
                 opdsFacet = OPDSFacet(
                   isActive = true,

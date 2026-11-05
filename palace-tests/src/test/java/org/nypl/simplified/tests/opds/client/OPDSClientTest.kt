@@ -21,8 +21,9 @@ import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.formats.BookFormatSupport
 import org.nypl.simplified.books.formats.BookFormatSupportParameters
 import org.nypl.simplified.feeds.api.FeedEntry
-import org.nypl.simplified.feeds.api.FeedHTTPTransport
-import org.nypl.simplified.feeds.api.FeedLoader
+import org.nypl.simplified.feeds.api.FeedEntryCorrupt
+import org.nypl.simplified.feeds.opds12.OPDS12FeedHTTPTransport
+import org.nypl.simplified.feeds.opds12.OPDS12FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
 import org.nypl.simplified.opds.core.OPDSFeedParser
@@ -58,7 +59,7 @@ class OPDSClientTest {
   private lateinit var context: Context
   private lateinit var exec: ExecutorService
   private lateinit var feedLoader: FeedLoaderType
-  private lateinit var feedTransport: FeedHTTPTransport
+  private lateinit var feedTransport: OPDS12FeedHTTPTransport
   private lateinit var parser: OPDSFeedParserType
   private lateinit var searchParser: OPDSSearchParserType
   private lateinit var webServer: MockWebServer
@@ -80,7 +81,7 @@ class OPDSClientTest {
     this.searchParser =
       OPDSSearchParser.newParser()
     this.feedTransport =
-      FeedHTTPTransport(
+      OPDS12FeedHTTPTransport(
         LSHTTPClient(
           context = this.context,
           configuration = LSHTTPClientConfiguration(
@@ -94,7 +95,7 @@ class OPDSClientTest {
       )
 
     this.feedLoader =
-      FeedLoader.create(
+      OPDS12FeedLoader.create(
         bookFormatSupport = BookFormatSupport.create(
           BookFormatSupportParameters(
             supportsPDF = true,
@@ -139,7 +140,7 @@ class OPDSClientTest {
       this.client.goTo(
         OPDSClientRequest.ExistingEntry(
           historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY,
-          FeedEntry.FeedEntryCorrupt(account0, book0, IllegalStateException())
+          FeedEntryCorrupt(account0, book0, IllegalStateException())
         )
       ).get(5L, TimeUnit.SECONDS)
     }
@@ -244,7 +245,7 @@ class OPDSClientTest {
   }
 
   @Test
-  fun testFeedWithoutGroups() {
+  fun testFeedData() {
     this.webServer.enqueue(
       MockResponse()
         .setResponseCode(200)
@@ -278,7 +279,7 @@ class OPDSClientTest {
   }
 
   @Test
-  fun testFeedWithGroups() {
+  fun testFeedDataWithGroups() {
     this.webServer.enqueue(
       MockResponse()
         .setResponseCode(200)
@@ -306,7 +307,7 @@ class OPDSClientTest {
     assertEquals(9, this.client.entriesGrouped.get().size)
 
     assertEquals(
-      listOf("Initial", "Loading", "LoadedFeedWithGroups"),
+      listOf("Initial", "Loading", "LoadedFeedDataWithGroups"),
       this.stateChanges
     )
   }
@@ -419,7 +420,7 @@ class OPDSClientTest {
     val f1 =
       this.client.goTo(
         OPDSClientRequest.ExistingEntry(
-          entry = h.handle.feed().entriesInOrder[0],
+          entry = h.handle.feed().entries[0],
           historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY
         )
       )
@@ -483,7 +484,7 @@ class OPDSClientTest {
     val f2 =
       this.client.goTo(
         OPDSClientRequest.ExistingEntry(
-          entry = h.handle.feed().entriesInOrder[0],
+          entry = h.handle.feed().entries[0],
           historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY,
         )
       )
@@ -510,13 +511,13 @@ class OPDSClientTest {
       listOf(
         "Initial",
         "Loading",
-        "LoadedFeedWithGroups",
+        "LoadedFeedDataWithGroups",
         "Loading",
         "LoadedFeedWithoutGroups",
         "Loading",
         "LoadedFeedEntry",
         "LoadedFeedWithoutGroups",
-        "LoadedFeedWithGroups"
+        "LoadedFeedDataWithGroups"
       ),
       this.stateChanges
     )

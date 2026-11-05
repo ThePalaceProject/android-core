@@ -54,24 +54,12 @@ import java.util.UUID
 
 /**
  * Tests for the OPDS 1.2 to Feed* type converter.
- *
- * These tests focus on verifying that all field values, especially
- * date/time values (Joda Time DateTime), are preserved correctly
- * through the conversion from OPDS types to Feed types.
  */
 class OPDS12FeedConverterTest {
 
   private val accountID: AccountID =
     AccountID(UUID.randomUUID())
 
-  /*
-   * Fixed date/time values used throughout the tests.
-   *
-   * Joda Time DateTime equality is based on the instant (millis from epoch),
-   * NOT on the timezone or fields. Two DateTime objects with the same instant
-   * are equal regardless of their zone. The OPDS parser produces UTC-zoned
-   * DateTimes (via ISODateTimeFormat.dateTimeParser().withZoneUTC()).
-   */
   private val date20240115T103000Z: DateTime =
     DateTime(2024, 1, 15, 10, 30, 0, DateTimeZone.UTC)
 
@@ -112,7 +100,6 @@ class OPDS12FeedConverterTest {
 
     assertEquals("feed-id-1", data.feedID)
     assertEquals("Test Feed", data.feedTitle)
-    // DateTime equality in Joda is instant-based
     assertEquals(date20240115T103000Z, data.feedUpdated)
     assertEquals(URI.create("http://example.com/feed"), data.feedURI)
     assertEquals(URI.create("http://example.com/feed?page=2"), data.feedNext)
@@ -162,34 +149,19 @@ class OPDS12FeedConverterTest {
         title = "Test Book",
         updated = date20240115T103000Z,
         availability = OPDSAvailabilityLoanable.get()
-      ).apply {
-        authors.add("Author One")
-        authors.add("Author Two")
-        published = date20240220T144530Z
-        publisher = "Test Publisher"
-        distribution = "Wide"
-        summary = "A test book summary"
-        narrators.add("Narrator One")
-        cover = URI.create("http://example.com/cover.jpg")
-        thumbnail = URI.create("http://example.com/thumb.jpg")
-        annotations = URI.create("http://example.com/annotations")
-        issues = URI.create("http://example.com/issues")
-        related = URI.create("http://example.com/related")
-        alternate = URI.create("http://example.com/alternate")
-        analytics = URI.create("http://example.com/analytics")
-        timeTrackingUri = URI.create("http://example.com/tracking")
-        categories.add(OPDSCategory("Fiction", "http://schema.org/genre", null))
-        categories.add(OPDSCategory("Adult", "http://schema.org/audience", "For Adults"))
-        groups.add(Pair("Group One", URI.create("http://example.com/group1")))
-        licensor = DRMLicensor("Adobe", "token123", "http://example.com/dm")
-        series.add(OPDSSeries("Test Series", 3, URI.create("http://example.com/series")))
-        previewAcquisitions.add(
+      )
+        .addAuthor("Author One")
+        .addAuthor("Author Two")
+        .addNarrator("Narrator One")
+        .addCategory(OPDSCategory("Fiction", "http://schema.org/genre", null))
+        .addCategory(OPDSCategory("Adult", "http://schema.org/audience", "For Adults"))
+        .addPreviewAcquisition(
           OPDSPreviewAcquisition(
             URI.create("http://example.com/preview"),
             MIMEParser.parseRaisingException("application/epub+zip")
           )
         )
-        acquisitionList.add(
+        .addAcquisition(
           OPDSAcquisition(
             relation = OPDSAcquisition.Relation.ACQUISITION_BORROW,
             uri = LinkBasic(URI.create("http://example.com/borrow")),
@@ -198,7 +170,21 @@ class OPDS12FeedConverterTest {
             properties = mapOf("key" to "value")
           )
         )
-      }.build()
+        .setPublishedOption(date20240220T144530Z)
+        .setPublisherOption("Test Publisher")
+        .setDistribution("Wide")
+        .setSummaryOption("A test book summary")
+        .setCoverOption(URI.create("http://example.com/cover.jpg"))
+        .setThumbnailOption(URI.create("http://example.com/thumb.jpg"))
+        .setAnnotationsOption(URI.create("http://example.com/annotations"))
+        .setIssuesOption(URI.create("http://example.com/issues"))
+        .setRelatedOption(URI.create("http://example.com/related"))
+        .setAlternateOption(URI.create("http://example.com/alternate"))
+        .setAnalyticsOption(URI.create("http://example.com/analytics"))
+        .setTimeTrackingUriOption(URI.create("http://example.com/tracking"))
+        .setLicensorOption(DRMLicensor("Adobe", "token123", "http://example.com/dm"))
+        .setSeries(OPDSSeries("Test Series", 3, URI.create("http://example.com/series")))
+        .build()
 
     val feed =
       OPDSAcquisitionFeed.newBuilder(
@@ -206,9 +192,9 @@ class OPDS12FeedConverterTest {
         "feed-id-3",
         date20240115T103000Z,
         "Entry Test"
-      ).apply {
-        addEntry(entry)
-      }.build()
+      )
+        .addEntry(entry)
+        .build()
 
     val result =
       OPDS12FeedConverter.convert(
@@ -228,7 +214,7 @@ class OPDS12FeedConverterTest {
     assertEquals("Test Book", converted.title)
     assertEquals(this.accountID, converted.accountID)
 
-    // Date/time fields - Joda DateTime equality is instant-based
+    // Date/time fields
     assertEquals(date20240115T103000Z, converted.updated)
     assertEquals(date20240220T144530Z, converted.published)
 
@@ -259,7 +245,7 @@ class OPDS12FeedConverterTest {
     )
 
     assertEquals(
-      setOf(FeedEntryGroupRef("Group One", URI.create("http://example.com/group1"))),
+      emptySet<FeedEntryGroupRef>(),
       converted.groups
     )
 
@@ -290,7 +276,7 @@ class OPDS12FeedConverterTest {
     assertEquals(1, converted.acquisitions.size)
     val acq = converted.acquisitions[0]
     assertEquals(FeedAcquisitionRelation.ACQUISITION_BORROW, acq.relation)
-    assertEquals("http://example.com/borrow", acq.uri.uri.toString())
+    assertEquals("http://example.com/borrow", acq.uri.hrefURI!!.toString())
     assertEquals(mapOf("key" to "value"), acq.properties)
   }
 
@@ -310,9 +296,9 @@ class OPDS12FeedConverterTest {
         "feed-id-4",
         date20240115T103000Z,
         "Minimal"
-      ).apply {
-        addEntry(entry)
-      }.build()
+      )
+        .addEntry(entry)
+        .build()
 
     val result =
       OPDS12FeedConverter.convert(
@@ -325,7 +311,6 @@ class OPDS12FeedConverterTest {
     val data = result as FeedData
     val converted = data.entries[0] as FeedEntryBook
 
-    // All optional fields should be null/empty
     assertNull(converted.published)
     assertNull(converted.cover)
     assertNull(converted.thumbnail)
@@ -370,9 +355,9 @@ class OPDS12FeedConverterTest {
         "feed-loaned",
         date20240115T103000Z,
         "Loaned"
-      ).apply {
-        addEntry(entry)
-      }.build()
+      )
+        .addEntry(entry)
+        .build()
 
     val result =
       OPDS12FeedConverter.convert(
@@ -420,9 +405,9 @@ class OPDS12FeedConverterTest {
         "feed-held",
         date20240115T103000Z,
         "Held"
-      ).apply {
-        addEntry(entry)
-      }.build()
+      )
+        .addEntry(entry)
+        .build()
 
     val result =
       OPDS12FeedConverter.convert(
@@ -469,9 +454,9 @@ class OPDS12FeedConverterTest {
         "feed-heldready",
         date20240115T103000Z,
         "HeldReady"
-      ).apply {
-        addEntry(entry)
-      }.build()
+      )
+        .addEntry(entry)
+        .build()
 
     val result =
       OPDS12FeedConverter.convert(
@@ -497,9 +482,7 @@ class OPDS12FeedConverterTest {
   fun testAvailabilityOpenAccess() {
     val revokeUri = URI.create("http://example.com/revoke")
     val availability =
-      OPDSAvailabilityOpenAccess.get(
-        revoke = revokeUri
-      )
+      OPDSAvailabilityOpenAccess.get(revoke = revokeUri)
 
     val entry =
       OPDSAcquisitionFeedEntry.newBuilder(
@@ -515,9 +498,9 @@ class OPDS12FeedConverterTest {
         "feed-openaccess",
         date20240115T103000Z,
         "OpenAccess"
-      ).apply {
-        addEntry(entry)
-      }.build()
+      )
+        .addEntry(entry)
+        .build()
 
     val result =
       OPDS12FeedConverter.convert(
@@ -543,9 +526,7 @@ class OPDS12FeedConverterTest {
   fun testAvailabilityRevoked() {
     val revokeUri = URI.create("http://example.com/revoke")
     val availability =
-      OPDSAvailabilityRevoked.get(
-        revoke = revokeUri
-      )
+      OPDSAvailabilityRevoked.get(revoke = revokeUri)
 
     val entry =
       OPDSAcquisitionFeedEntry.newBuilder(
@@ -561,9 +542,9 @@ class OPDS12FeedConverterTest {
         "feed-revoked",
         date20240115T103000Z,
         "Revoked"
-      ).apply {
-        addEntry(entry)
-      }.build()
+      )
+        .addEntry(entry)
+        .build()
 
     val result =
       OPDS12FeedConverter.convert(
@@ -601,9 +582,9 @@ class OPDS12FeedConverterTest {
         "feed-holdable",
         date20240115T103000Z,
         "Holdable"
-      ).apply {
-        addEntry(entry)
-      }.build()
+      )
+        .addEntry(entry)
+        .build()
 
     val result =
       OPDS12FeedConverter.convert(
@@ -619,16 +600,16 @@ class OPDS12FeedConverterTest {
   }
 
   @Test
-  fun testFeedWithGroups() {
+  fun testFeedDataWithGroups() {
     val entry1 =
       OPDSAcquisitionFeedEntry.newBuilder(
         id = "urn:isbn:777",
         title = "Book in Group 1",
         updated = date20240115T103000Z,
         availability = OPDSAvailabilityLoanable.get()
-      ).apply {
-        groups.add(Pair("Group One", URI.create("http://example.com/g1")))
-      }.build()
+      )
+        .addGroup(URI.create("http://example.com/g1"), "Group One")
+        .build()
 
     val entry2 =
       OPDSAcquisitionFeedEntry.newBuilder(
@@ -636,9 +617,9 @@ class OPDS12FeedConverterTest {
         title = "Book in Group 2",
         updated = date20240115T103000Z,
         availability = OPDSAvailabilityLoanable.get()
-      ).apply {
-        groups.add(Pair("Group Two", URI.create("http://example.com/g2")))
-      }.build()
+      )
+        .addGroup(URI.create("http://example.com/g2"), "Group Two")
+        .build()
 
     val feed =
       OPDSAcquisitionFeed.newBuilder(
@@ -646,10 +627,10 @@ class OPDS12FeedConverterTest {
         "feed-groups",
         date20240115T103000Z,
         "Grouped Feed"
-      ).apply {
-        addEntry(entry1)
-        addEntry(entry2)
-      }.build()
+      )
+        .addEntry(entry1)
+        .addEntry(entry2)
+        .build()
 
     val result =
       OPDS12FeedConverter.convert(
@@ -659,13 +640,10 @@ class OPDS12FeedConverterTest {
         search = null
       )
 
-    // The OPDSAcquisitionFeed builder distributes entries into groups
-    // based on their group references
     Assertions.assertTrue(result is FeedDataWithGroups, "Expected FeedDataWithGroups but got ${result::class}")
     val data = result as FeedDataWithGroups
     assertEquals(2, data.groups.size)
 
-    // Verify group entries have correct dates
     for (group in data.groups) {
       for (e in group.groupEntries) {
         val book = e as FeedEntryBook
@@ -709,11 +687,11 @@ class OPDS12FeedConverterTest {
         "feed-facets",
         date20240115T103000Z,
         "Facet Feed"
-      ).apply {
-        addFacet(facet1)
-        addFacet(facet2)
-        addFacet(facet3)
-      }.build()
+      )
+        .addFacet(facet1)
+        .addFacet(facet2)
+        .addFacet(facet3)
+        .build()
 
     val result =
       OPDS12FeedConverter.convert(
@@ -726,7 +704,6 @@ class OPDS12FeedConverterTest {
     val data = result as FeedData
     assertEquals(3, data.facetsOrder.size)
 
-    // Verify facet data
     val f0 = data.facetsOrder[0] as FeedFacetData
     assertEquals("Title", f0.title)
     assertEquals(false, f0.isActive)
@@ -768,10 +745,10 @@ class OPDS12FeedConverterTest {
         "feed-filter",
         date20240115T103000Z,
         "Filter Test"
-      ).apply {
-        addEntry(entry1)
-        addEntry(entry2)
-      }.build()
+      )
+        .addEntry(entry1)
+        .addEntry(entry2)
+        .build()
 
     val result =
       OPDS12FeedConverter.convert(
@@ -788,22 +765,11 @@ class OPDS12FeedConverterTest {
 
   @Test
   fun testDateTimeEqualityAcrossZones() {
-    /*
-     * Verify that Joda DateTime equality works correctly across different
-     * timezone representations of the same instant. This is the key
-     * property that makes the converter work: the OPDS parser produces
-     * UTC-zoned DateTimes, and the converted Feed types hold the same
-     * references, so equality is trivially preserved.
-     */
     val utc = DateTime(2024, 6, 15, 12, 0, 0, DateTimeZone.UTC)
     val ny = utc.withZone(DateTimeZone.forID("America/New_York"))
 
-    // Same instant, different zone - Joda considers these equal
-    assertEquals(utc, ny)
     assertEquals(utc.millis, ny.millis)
 
-    // The converter passes the DateTime reference through directly,
-    // so the zone is preserved
     val entry =
       OPDSAcquisitionFeedEntry.newBuilder(
         id = "urn:isbn:zone-test",
@@ -818,9 +784,9 @@ class OPDS12FeedConverterTest {
         "feed-zone",
         utc,
         "Zone"
-      ).apply {
-        addEntry(entry)
-      }.build()
+      )
+        .addEntry(entry)
+        .build()
 
     val result =
       OPDS12FeedConverter.convert(
@@ -833,18 +799,12 @@ class OPDS12FeedConverterTest {
     val data = result as FeedData
     val converted = data.entries[0] as FeedEntryBook
 
-    // The DateTime reference is passed through unchanged
     assertEquals(utc, converted.updated)
     assertEquals(DateTimeZone.UTC, converted.updated.zone)
   }
 
   @Test
   fun testDateTimeNullHandling() {
-    /*
-     * Verify that null dates are handled correctly. The OPDS parser
-     * produces null for missing optional date fields (published,
-     * availability start/end dates).
-     */
     val entry =
       OPDSAcquisitionFeedEntry.newBuilder(
         id = "urn:isbn:null-dates",
@@ -853,16 +813,15 @@ class OPDS12FeedConverterTest {
         availability = OPDSAvailabilityLoanable.get()
       ).build()
 
-    // published is null by default
     val feed =
       OPDSAcquisitionFeed.newBuilder(
         URI.create("http://example.com/feed"),
         "feed-null-dates",
         date20240115T103000Z,
         "Null Dates"
-      ).apply {
-        addEntry(entry)
-      }.build()
+      )
+        .addEntry(entry)
+        .build()
 
     val result =
       OPDS12FeedConverter.convert(
@@ -875,14 +834,10 @@ class OPDS12FeedConverterTest {
     val data = result as FeedData
     val converted = data.entries[0] as FeedEntryBook
 
-    // updated is always present (required field)
     assertNotNull(converted.updated)
     assertEquals(date20240115T103000Z, converted.updated)
-
-    // published is null
     assertNull(converted.published)
 
-    // Availability endDate is null for Loanable
     val availability = converted.availability
     Assertions.assertTrue(availability is FeedAvailabilityLoanable)
     assertNull(availability.endDate)
@@ -919,9 +874,9 @@ class OPDS12FeedConverterTest {
         title = "Indirect Acq",
         updated = date20240115T103000Z,
         availability = OPDSAvailabilityLoanable.get()
-      ).apply {
-        acquisitionList.add(acquisition)
-      }.build()
+      )
+        .addAcquisition(acquisition)
+        .build()
 
     val feed =
       OPDSAcquisitionFeed.newBuilder(
@@ -929,9 +884,9 @@ class OPDS12FeedConverterTest {
         "feed-indirect",
         date20240115T103000Z,
         "Indirect"
-      ).apply {
-        addEntry(entry)
-      }.build()
+      )
+        .addEntry(entry)
+        .build()
 
     val result =
       OPDS12FeedConverter.convert(
@@ -995,15 +950,17 @@ class OPDS12FeedConverterTest {
       ).build()
     }
 
-    val feed =
+    val feedBuilder =
       OPDSAcquisitionFeed.newBuilder(
         URI.create("http://example.com/feed"),
         "feed-order",
         date20240115T103000Z,
         "Order Test"
-      ).apply {
-        entries.forEach { addEntry(it) }
-      }.build()
+      )
+
+    entries.forEach { feedBuilder.addEntry(it) }
+
+    val feed = feedBuilder.build()
 
     val result =
       OPDS12FeedConverter.convert(

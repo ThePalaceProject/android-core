@@ -34,9 +34,10 @@ import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.feeds.api.FeedBooksSelection
 import org.nypl.simplified.feeds.api.FeedFacet
+import org.nypl.simplified.feeds.api.FeedFacetPseudoSorting
 import org.nypl.simplified.feeds.api.FeedFacetPseudoTitleProviderType
-import org.nypl.simplified.feeds.api.FeedHTTPTransport
-import org.nypl.simplified.feeds.api.FeedLoader
+import org.nypl.simplified.feeds.opds12.OPDS12FeedHTTPTransport
+import org.nypl.simplified.feeds.opds12.OPDS12FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.files.DirectoryUtilities
 import org.nypl.simplified.notifications.NotificationTokenHTTPCalls
@@ -137,10 +138,10 @@ class ProfilesControllerTest {
     val parser =
       OPDSFeedParser.newParser(OPDSAcquisitionFeedEntryParser.newParser())
     val transport =
-      FeedHTTPTransport(this.lsHTTP)
+      OPDS12FeedHTTPTransport(this.lsHTTP)
 
     val feedLoader =
-      FeedLoader.create(
+      OPDS12FeedLoader.create(
         bookFormatSupport = this.bookFormatSupport,
         contentResolver = this.contentResolver,
         exec = this.executorFeeds,
@@ -352,7 +353,7 @@ class ProfilesControllerTest {
             override val showOnLoan: String
               get() = "On Loan"
           },
-          sortBy = FeedFacet.FeedFacetPseudo.Sorting.SortBy.SORT_BY_TITLE,
+          sortBy = FeedFacetPseudoSorting.SortBy.SORT_BY_TITLE,
           filterByAccountID = null,
           feedSelection = FeedBooksSelection.BOOKS_FEED_LOANED
         )

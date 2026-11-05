@@ -38,8 +38,8 @@ import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.controller.BookRevokeTask
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
-import org.nypl.simplified.feeds.api.FeedHTTPTransport
-import org.nypl.simplified.feeds.api.FeedLoader
+import org.nypl.simplified.feeds.opds12.OPDS12FeedHTTPTransport
+import org.nypl.simplified.feeds.opds12.OPDS12FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisition
@@ -275,10 +275,10 @@ class RevokeBookRefreshTokenTest {
     val searchParser =
       OPDSSearchParser.newParser()
     val transport =
-      FeedHTTPTransport(this.httpClient)
+      OPDS12FeedHTTPTransport(this.httpClient)
 
     val feedLoader =
-      FeedLoader.create(
+      OPDS12FeedLoader.create(
         bookFormatSupport = this.bookFormatSupport,
         contentResolver = this.contentResolver,
         exec = executorFeeds,

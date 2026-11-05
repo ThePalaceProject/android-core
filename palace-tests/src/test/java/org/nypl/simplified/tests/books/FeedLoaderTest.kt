@@ -6,7 +6,7 @@ import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.books.formats.BookFormatSupport
 import org.nypl.simplified.books.formats.BookFormatSupportParameters
 import org.nypl.simplified.content.api.ContentResolverType
-import org.nypl.simplified.feeds.api.FeedLoader
+import org.nypl.simplified.feeds.opds12.OPDS12FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
 import org.nypl.simplified.opds.core.OPDSFeedParser
@@ -41,7 +41,7 @@ class FeedLoaderTest : FeedLoaderContract() {
     val contentResolver =
       Mockito.mock(ContentResolverType::class.java)
 
-    return FeedLoader.create(
+    return OPDS12FeedLoader.create(
       bookFormatSupport = bookFormatSupport,
       contentResolver = contentResolver,
       exec = exec,
