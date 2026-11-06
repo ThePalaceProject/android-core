@@ -1,7 +1,7 @@
 package org.nypl.simplified.feeds.api
 
 import org.nypl.simplified.accounts.api.AccountID
-import org.nypl.simplified.books.api.BookID
+
 
 /**
  * A feed entry.
@@ -15,5 +15,5 @@ sealed interface FeedEntry {
   /**
    * The ID of the book within the feed entry.
    */
-  val bookID: BookID
+  val bookID: FeedBookID
 }

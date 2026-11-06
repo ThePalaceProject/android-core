@@ -2,6 +2,9 @@ package org.nypl.simplified.books.borrowing.internal
 
 import com.io7m.junreachable.UnreachableCodeException
 import one.irradia.mime.api.MIMECompatibility
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+import org.nypl.simplified.feeds.opds12.toOPDSAcquisitionFeedEntry
 import one.irradia.mime.api.MIMECompatibility.applicationOctetStream
 import one.irradia.mime.api.MIMEType
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType.Method.Put
@@ -33,13 +36,13 @@ import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
 import org.nypl.simplified.opds.core.OPDSAcquisitionPaths
-import org.nypl.simplified.opds.core.OPDSAvailabilityHeld
-import org.nypl.simplified.opds.core.OPDSAvailabilityHeldReady
-import org.nypl.simplified.opds.core.OPDSAvailabilityHoldable
-import org.nypl.simplified.opds.core.OPDSAvailabilityLoanable
-import org.nypl.simplified.opds.core.OPDSAvailabilityLoaned
-import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
-import org.nypl.simplified.opds.core.OPDSAvailabilityRevoked
+import org.nypl.simplified.feeds.api.FeedAvailabilityHeld
+import org.nypl.simplified.feeds.api.FeedAvailabilityHeldReady
+import org.nypl.simplified.feeds.api.FeedAvailabilityHoldable
+import org.nypl.simplified.feeds.api.FeedAvailabilityLoanable
+import org.nypl.simplified.feeds.api.FeedAvailabilityLoaned
+import org.nypl.simplified.feeds.api.FeedAvailabilityOpenAccess
+import org.nypl.simplified.feeds.api.FeedAvailabilityRevoked
 import org.nypl.simplified.opds.core.OPDSParseException
 import java.io.ByteArrayInputStream
 import java.io.InputStream
@@ -194,9 +197,10 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
     }
 
     val inputStream = status.bodyStream ?: ByteArrayInputStream(ByteArray(0))
-    val entry = this.parseOPDSFeedEntry(context, inputStream, uri)
-    context.bookDatabaseEntry.writeOPDSEntry(entry)
+    val opdsEntry = this.parseOPDSFeedEntry(context, inputStream, uri)
+    context.bookDatabaseEntry.writeOPDSEntry(opdsEntry)
 
+    val entry = OPDS12FeedConverter.convertEntry(context.account.id, opdsEntry)
     this.checkAvailability(context, entry)
     val nextURI = this.findNextLink(context, entry)
     context.receivedNewURI(nextURI)
@@ -204,12 +208,12 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
 
   private fun checkAvailability(
     context: BorrowContextType,
-    entry: OPDSAcquisitionFeedEntry
+    entry: FeedEntryBook
   ) {
     context.taskRecorder.beginNewStep("Checking OPDS availability...")
 
     return when (val availability = entry.availability) {
-      is OPDSAvailabilityHeld -> {
+      is FeedAvailabilityHeld -> {
         context.taskRecorder.currentStepSucceeded("Book is held.")
         context.bookPublishStatus(
           HeldInQueue(
@@ -223,7 +227,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
         throw BorrowSubtaskHaltedEarly()
       }
 
-      is OPDSAvailabilityHeldReady -> {
+      is FeedAvailabilityHeldReady -> {
         context.taskRecorder.currentStepSucceeded("Book is held and ready.")
         context.bookPublishStatus(
           HeldReady(
@@ -243,7 +247,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
        * unreachable?
        */
 
-      is OPDSAvailabilityHoldable -> {
+      is FeedAvailabilityHoldable -> {
         context.taskRecorder.currentStepFailed(
           message = "Book is unexpectedly holdable.",
           errorCode = opdsFeedEntryHoldable,
@@ -260,7 +264,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
        * unreachable?
        */
 
-      is OPDSAvailabilityLoanable -> {
+      is FeedAvailabilityLoanable -> {
         context.taskRecorder.currentStepFailed(
           message = "Book is unexpectedly loanable.",
           errorCode = opdsFeedEntryLoanable,
@@ -269,7 +273,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
         throw BorrowSubtaskFailed()
       }
 
-      is OPDSAvailabilityLoaned -> {
+      is FeedAvailabilityLoaned -> {
         context.taskRecorder.currentStepSucceeded("Book is loaned.")
         context.bookPublishStatus(
           LoanedNotDownloaded(
@@ -281,7 +285,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
         )
       }
 
-      is OPDSAvailabilityOpenAccess -> {
+      is FeedAvailabilityOpenAccess -> {
         context.taskRecorder.currentStepSucceeded("Book is open access.")
         context.bookPublishStatus(
           LoanedNotDownloaded(
@@ -298,7 +302,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
        * this code indicates a serious bug in the application.
        */
 
-      is OPDSAvailabilityRevoked -> {
+      is FeedAvailabilityRevoked -> {
         throw UnreachableCodeException()
       }
     }
@@ -330,12 +334,12 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
 
   private fun findNextLink(
     context: BorrowContextType,
-    entry: OPDSAcquisitionFeedEntry
+    entry: FeedEntryBook
   ): Link {
     context.taskRecorder.beginNewStep("Finding the next URI in the OPDS feed entry...")
 
     val remaining = context.opdsAcquisitionPathRemaining()
-    val nextPaths = OPDSAcquisitionPaths.linearize(entry)
+    val nextPaths = OPDSAcquisitionPaths.linearize(entry.toOPDSAcquisitionFeedEntry())
     for (nextPath in nextPaths) {
       val nextElements = nextPath.elements
       if (nextElements.size == remaining.size) {

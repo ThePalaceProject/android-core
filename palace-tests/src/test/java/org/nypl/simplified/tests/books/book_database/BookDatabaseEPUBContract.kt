@@ -1,5 +1,8 @@
 package org.nypl.simplified.tests.books.book_database
 
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+
 import android.app.Application
 import android.content.Context
 import one.irradia.mime.vanilla.MIMEParser
@@ -89,7 +92,7 @@ abstract class BookDatabaseEPUBContract {
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithEPUB()
     val bookID = BookIDs.newFromText("abcd")
-    val databaseEntry0 = database0.createOrUpdate(bookID, feedEntry)
+    val databaseEntry0 = database0.createOrUpdate(bookID, OPDS12FeedConverter.convertEntry(this.accountID, feedEntry))
 
     this.run {
       val formatHandle =
@@ -147,7 +150,7 @@ abstract class BookDatabaseEPUBContract {
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithEPUB()
     val bookID = BookIDs.newFromText("abcd")
-    val databaseEntry0 = database0.createOrUpdate(bookID, feedEntry)
+    val databaseEntry0 = database0.createOrUpdate(bookID, OPDS12FeedConverter.convertEntry(this.accountID, feedEntry))
 
     val bookmark0 =
       SerializedBookmarks.createWithCurrentFormat(
@@ -232,7 +235,7 @@ abstract class BookDatabaseEPUBContract {
         httpClient = this.httpClient
       )
     val databaseEntry1 =
-      database1.createOrUpdate(bookID, feedEntry)
+      database1.createOrUpdate(bookID, OPDS12FeedConverter.convertEntry(this.accountID, feedEntry))
 
     this.run {
       val formatHandle =
@@ -274,7 +277,7 @@ abstract class BookDatabaseEPUBContract {
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithEPUB()
     val bookID = BookIDs.newFromText("abcd")
-    val entry = database0.createOrUpdate(bookID, feedEntry)
+    val entry = database0.createOrUpdate(bookID, OPDS12FeedConverter.convertEntry(this.accountID, feedEntry))
 
     this.run {
       val formatHandle = entry.findFormatHandle(BookDatabaseEntryFormatHandleEPUB::class.java)!!

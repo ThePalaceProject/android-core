@@ -17,6 +17,7 @@ import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.files.DirectoryUtilities
 import org.nypl.simplified.files.FileUtilities
 import org.nypl.simplified.json.core.JSONSerializerUtilities
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSJSONSerializerType
 import org.slf4j.Logger
@@ -157,7 +158,7 @@ internal class BookDatabaseEntry internal constructor(
           )
         )
 
-        this.bookRef = this.bookRef.copy(entry = opdsEntry)
+        this.bookRef = this.bookRef.copy(entry = OPDS12FeedConverter.convertEntry(this.bookRef.account, opdsEntry))
       } catch (e: IOException) {
         throw BookDatabaseException(e.message, listOf<Exception>(e))
       } finally {

@@ -1,5 +1,8 @@
 package org.nypl.simplified.tests.http.refresh_token.bookmarks
 
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+
 import android.app.Application
 import com.fasterxml.jackson.databind.ObjectMapper
 import okhttp3.mockwebserver.MockResponse
@@ -156,7 +159,7 @@ class BookmarkRefreshTokenTest {
         account = this.accountID,
         cover = null,
         thumbnail = null,
-        entry = initialFeedEntry,
+        entry = OPDS12FeedConverter.convertEntry(this.accountID, initialFeedEntry),
         formats = listOf()
       )
 

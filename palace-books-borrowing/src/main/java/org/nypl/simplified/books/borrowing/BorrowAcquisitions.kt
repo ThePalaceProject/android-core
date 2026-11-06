@@ -1,8 +1,9 @@
 package org.nypl.simplified.books.borrowing
 
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.toOPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisition
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionPath
 import org.nypl.simplified.opds.core.OPDSAcquisitionPaths
 
@@ -17,9 +18,9 @@ object BorrowAcquisitions {
 
   fun pickBestAcquisitionPath(
     support: BookFormatSupportType,
-    entry: OPDSAcquisitionFeedEntry
+    entry: FeedEntryBook
   ): OPDSAcquisitionPath? {
-    val paths = OPDSAcquisitionPaths.linearize(entry)
+    val paths = OPDSAcquisitionPaths.linearize(entry.toOPDSAcquisitionFeedEntry())
     return paths
       .filter { support.isSupportedPath(it.asMIMETypes()) }
       // when borrowing a book, we need to ignore if the acquisition is for a sample/preview

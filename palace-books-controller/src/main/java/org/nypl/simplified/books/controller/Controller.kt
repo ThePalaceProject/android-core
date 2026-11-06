@@ -402,7 +402,7 @@ class Controller private constructor(
   override fun bookBorrow(
     accountID: AccountID,
     bookID: BookID,
-    entry: OPDSAcquisitionFeedEntry,
+    entry: FeedEntryBook,
     samlDownloadContext: SAMLDownloadContext?
   ): FluentFuture<TaskResult<*>> =
     this.submitTask(

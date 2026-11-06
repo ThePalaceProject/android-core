@@ -2,8 +2,7 @@ package org.nypl.simplified.feeds.api
 
 import org.joda.time.DateTime
 import org.nypl.simplified.accounts.api.AccountID
-import org.nypl.simplified.books.api.BookID
-import org.nypl.simplified.books.api.BookIDs.newFromText
+
 import java.net.URI
 
 /**
@@ -123,8 +122,8 @@ data class FeedEntryBook(
    */
   val series: FeedSeries?
 )  : FeedEntry, java.io.Serializable {
-  override val bookID: BookID
-    get() = newFromText(this.id)
+  override val bookID: FeedBookID
+    get() = FeedBookIDs.newFromText(this.id)
 
   /**
    * The authors as a comma-separated string.

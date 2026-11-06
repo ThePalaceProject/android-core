@@ -281,7 +281,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
           profileUUID = profile.id.uuid,
           accountProvider = this.account.provider.id,
           accountUUID = this.account.id.uuid,
-          opdsEntry = this.parameters.entry.toOPDSAcquisitionFeedEntry()
+          opdsEntry = this.parameters.entry
         )
       )
     }

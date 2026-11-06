@@ -3,7 +3,7 @@ package org.nypl.simplified.books.api
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookFormat.BookFormatAudioBook
 import org.nypl.simplified.books.api.BookFormat.BookFormatEPUB
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import java.io.File
 
 /**
@@ -37,7 +37,7 @@ data class Book(
    * @return The acquisition feed entry
    */
 
-  val entry: OPDSAcquisitionFeedEntry,
+  val entry: FeedEntryBook,
   /**
    * The available formats.
    */

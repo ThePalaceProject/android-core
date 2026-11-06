@@ -18,6 +18,7 @@ import org.librarysimplified.http.vanilla.internal.LSHTTPClient
 import org.mockito.Mockito
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookID
+import org.nypl.simplified.books.api.FeedBookIDConversions
 import org.nypl.simplified.books.formats.BookFormatSupport
 import org.nypl.simplified.books.formats.BookFormatSupportParameters
 import org.nypl.simplified.feeds.api.FeedEntry
@@ -133,7 +134,7 @@ class OPDSClientTest {
       this.client.goTo(
         OPDSClientRequest.ExistingEntry(
           historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY,
-          FeedEntryCorrupt(account0, book0, IllegalStateException())
+          FeedEntryCorrupt(account0, FeedBookIDConversions.fromBookID(book0), IllegalStateException())
         )
       ).get(5L, TimeUnit.SECONDS)
     }

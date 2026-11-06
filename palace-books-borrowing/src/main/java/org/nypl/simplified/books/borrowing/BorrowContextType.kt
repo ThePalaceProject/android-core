@@ -19,6 +19,7 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.Borro
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskFailed
 import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.links.Link
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionPath
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
@@ -266,7 +267,7 @@ interface BorrowContextType {
    * Choose a new acquisition path to follow based on the given received entry.
    */
 
-  fun chooseNewAcquisitionPath(entry: OPDSAcquisitionFeedEntry): Link
+  fun chooseNewAcquisitionPath(entry: FeedEntryBook): Link
 
   /**
    * Indicate that downloading the current book failed. Implementations should base the

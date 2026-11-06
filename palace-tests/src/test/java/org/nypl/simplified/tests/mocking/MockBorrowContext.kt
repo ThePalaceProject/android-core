@@ -19,7 +19,7 @@ import org.nypl.simplified.books.borrowing.SAMLDownloadContext
 import org.nypl.simplified.books.borrowing.internal.BorrowAudiobookAuthorizationHandler
 import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.links.Link
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.opds.core.OPDSAcquisitionPath
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
 import org.nypl.simplified.profiles.api.ProfileType
@@ -128,7 +128,7 @@ class MockBorrowContext(
   }
 
   override fun chooseNewAcquisitionPath(
-    entry: OPDSAcquisitionFeedEntry
+    entry: FeedEntryBook
   ): Link {
     TODO("Not yet implemented")
   }

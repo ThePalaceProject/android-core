@@ -1,7 +1,7 @@
 package org.nypl.simplified.feeds.api
 
 import org.joda.time.DateTime
-import org.nypl.simplified.books.api.BookID
+
 import java.net.URI
 
 /**
@@ -25,10 +25,10 @@ data class FeedData(
   override val size: Int
     get() = this.entries.size
 
-  val entriesByID: Map<BookID, FeedEntry>
+  val entriesByID: Map<FeedBookID, FeedEntry>
     get() = this.entries.associateBy { it.bookID }
 
-  fun containsBook(bookID: BookID): Boolean =
+  fun containsBook(bookID: FeedBookID): Boolean =
     this.entries.any { it.bookID == bookID }
 
   companion object {

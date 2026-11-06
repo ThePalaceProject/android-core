@@ -7,7 +7,7 @@ import com.io7m.jmulticlose.core.CloseableCollectionType
 import com.io7m.jmulticlose.core.ClosingResourceFailedException
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
-import org.nypl.simplified.books.api.BookIDs
+import org.nypl.simplified.feeds.api.FeedBookIDs
 import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedFacet
@@ -66,7 +66,7 @@ class OPDSClient private constructor(
   private val feedEntryCorrupt =
     FeedEntryCorrupt(
       AccountID.generate(),
-      BookIDs.newFromText("urn:uuid:2688faf3-1927-4245-a1d9-7824bae1a49f"),
+      FeedBookIDs.newFromText("urn:uuid:2688faf3-1927-4245-a1d9-7824bae1a49f"),
       IllegalStateException("Nonexistent book!")
     )
 

@@ -1,5 +1,8 @@
 package org.nypl.simplified.tests.books.borrowing
 
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+
 import android.app.Application
 import io.reactivex.disposables.Disposable
 import okhttp3.mockwebserver.MockResponse
@@ -122,6 +125,7 @@ class BorrowLoanCreateTest {
       BookIDs.newFromText("x")
     this.account =
       Mockito.mock(AccountType::class.java)
+    Mockito.`when`(this.account.id).thenReturn(AccountID.generate())
     this.accountProvider =
       MockAccountProviders.fakeProvider("urn:uuid:ea9480d4-5479-4ef1-b1d1-84ccbedb680f")
 
@@ -168,12 +172,12 @@ class BorrowLoanCreateTest {
         account = this.accountId,
         cover = null,
         thumbnail = null,
-        entry = OPDSAcquisitionFeedEntry.newBuilder(
+        entry = OPDS12FeedConverter.convertEntry(this.accountId, OPDSAcquisitionFeedEntry.newBuilder(
           "x",
           "Title",
           DateTime.now(),
           OPDSAvailabilityLoanable.get()
-        ).build(),
+        ).build()),
         formats = listOf()
       )
 

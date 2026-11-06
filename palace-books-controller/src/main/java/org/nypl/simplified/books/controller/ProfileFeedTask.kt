@@ -57,7 +57,7 @@ internal class ProfileFeedTask(
       this.logger.debug("after sorting, {} candidate books remain", books.size)
 
       val entries = books.map { book ->
-        OPDS12FeedConverter.convertEntry(book.book.account, book.book.entry)
+        book.book.entry
       }
 
       return FeedData.empty(

@@ -1,5 +1,8 @@
 package org.nypl.simplified.tests.books.book_database
 
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+
 import android.app.Application
 import android.content.Context
 import one.irradia.mime.api.MIMEType
@@ -116,31 +119,31 @@ abstract class BookDatabaseContract {
       )
 
     val entry0 =
-      OPDSAcquisitionFeedEntry.newBuilder(
+OPDS12FeedConverter.convertEntry(this.accountID, OPDSAcquisitionFeedEntry.newBuilder(
         "a",
         "Title",
         DateTime.now(),
         OPDSAvailabilityOpenAccess.get(null)
       )
-        .build()
+        .build())
 
     val entry1 =
-      OPDSAcquisitionFeedEntry.newBuilder(
+OPDS12FeedConverter.convertEntry(this.accountID, OPDSAcquisitionFeedEntry.newBuilder(
         "b",
         "Title",
         DateTime.now(),
         OPDSAvailabilityOpenAccess.get(null)
       )
-        .build()
+        .build())
 
     val entry2 =
-      OPDSAcquisitionFeedEntry.newBuilder(
+OPDS12FeedConverter.convertEntry(this.accountID, OPDSAcquisitionFeedEntry.newBuilder(
         "c",
         "Title",
         DateTime.now(),
         OPDSAvailabilityOpenAccess.get(null)
       )
-        .build()
+        .build())
 
     val id0 = BookID.create("a")
     database0.createOrUpdate(id0, entry0)
@@ -189,13 +192,13 @@ abstract class BookDatabaseContract {
       )
 
     val entry0 =
-      OPDSAcquisitionFeedEntry.newBuilder(
+OPDS12FeedConverter.convertEntry(this.accountID, OPDSAcquisitionFeedEntry.newBuilder(
         "a",
         "Title",
         DateTime.now(),
         OPDSAvailabilityOpenAccess.get(null)
       )
-        .build()
+        .build())
 
     val id0 = BookID.create("a")
     val dbEntry = db0.createOrUpdate(id0, entry0)
@@ -225,7 +228,7 @@ abstract class BookDatabaseContract {
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithEPUB()
     val bookID = BookID.create("abcd")
-    val databaseEntry0 = database0.createOrUpdate(bookID, feedEntry)
+    val databaseEntry0 = database0.createOrUpdate(bookID, OPDS12FeedConverter.convertEntry(this.accountID, feedEntry))
 
     val book0 = databaseEntry0.book
     Assertions.assertEquals(null, book0.cover)
@@ -260,7 +263,7 @@ abstract class BookDatabaseContract {
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithEPUB()
     val bookID = BookID.create("abcd")
-    val databaseEntry0 = database0.createOrUpdate(bookID, feedEntry)
+    val databaseEntry0 = database0.createOrUpdate(bookID, OPDS12FeedConverter.convertEntry(this.accountID, feedEntry))
 
     val book0: Book = this.run {
       val formatHandle0 =
@@ -358,7 +361,7 @@ abstract class BookDatabaseContract {
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithPDF()
     val bookID = BookID.create("abcd")
-    val databaseEntry0 = database0.createOrUpdate(bookID, feedEntry)
+    val databaseEntry0 = database0.createOrUpdate(bookID, OPDS12FeedConverter.convertEntry(this.accountID, feedEntry))
 
     val book0: Book = this.run {
       val formatHandle0 =
@@ -456,7 +459,7 @@ abstract class BookDatabaseContract {
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithAudioBook()
     val bookID = BookID.create("abcd")
-    val databaseEntry0 = database0.createOrUpdate(bookID, feedEntry)
+    val databaseEntry0 = database0.createOrUpdate(bookID, OPDS12FeedConverter.convertEntry(this.accountID, feedEntry))
 
     val book0: Book = this.run {
       val formatHandle0 =
@@ -554,7 +557,7 @@ abstract class BookDatabaseContract {
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithAudioBook()
     val bookID = BookID.create("abcd")
-    val databaseEntry = database0.createOrUpdate(bookID, feedEntry)
+    val databaseEntry = database0.createOrUpdate(bookID, OPDS12FeedConverter.convertEntry(this.accountID, feedEntry))
 
     for (index in 0..2) {
       val format = databaseEntry.findFormatHandle(BookDatabaseEntryFormatHandleAudioBook::class.java)
@@ -594,7 +597,7 @@ abstract class BookDatabaseContract {
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithAudioBook()
     val bookID = BookID.create("abcd")
-    val databaseEntry = database0.createOrUpdate(bookID, feedEntry)
+    val databaseEntry = database0.createOrUpdate(bookID, OPDS12FeedConverter.convertEntry(this.accountID, feedEntry))
 
     val format = databaseEntry.findFormatHandle(BookDatabaseEntryFormatHandleAudioBook::class.java)
     format!!
@@ -628,7 +631,7 @@ abstract class BookDatabaseContract {
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithEPUB()
     val bookID = BookID.create("abcd")
-    val databaseEntry = database0.createOrUpdate(bookID, feedEntry)
+    val databaseEntry = database0.createOrUpdate(bookID, OPDS12FeedConverter.convertEntry(this.accountID, feedEntry))
 
     for (index in 0..2) {
       val format = databaseEntry.findFormatHandle(BookDatabaseEntryFormatHandleEPUB::class.java)
@@ -668,7 +671,7 @@ abstract class BookDatabaseContract {
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithEPUB()
     val bookID = BookID.create("abcd")
-    val databaseEntry = database0.createOrUpdate(bookID, feedEntry)
+    val databaseEntry = database0.createOrUpdate(bookID, OPDS12FeedConverter.convertEntry(this.accountID, feedEntry))
 
     val format = databaseEntry.findFormatHandle(BookDatabaseEntryFormatHandleEPUB::class.java)
     format!!
@@ -702,7 +705,7 @@ abstract class BookDatabaseContract {
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithPDF()
     val bookID = BookID.create("abcd")
-    val databaseEntry = database0.createOrUpdate(bookID, feedEntry)
+    val databaseEntry = database0.createOrUpdate(bookID, OPDS12FeedConverter.convertEntry(this.accountID, feedEntry))
 
     for (index in 0..2) {
       val format = databaseEntry.findFormatHandle(BookDatabaseEntryFormatHandlePDF::class.java)
@@ -742,7 +745,7 @@ abstract class BookDatabaseContract {
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithPDF()
     val bookID = BookID.create("abcd")
-    val databaseEntry = database0.createOrUpdate(bookID, feedEntry)
+    val databaseEntry = database0.createOrUpdate(bookID, OPDS12FeedConverter.convertEntry(this.accountID, feedEntry))
 
     val format = databaseEntry.findFormatHandle(BookDatabaseEntryFormatHandlePDF::class.java)
     format!!
@@ -776,7 +779,7 @@ abstract class BookDatabaseContract {
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithAudioBook()
     val bookID = BookID.create("abcd")
-    val databaseEntry = database0.createOrUpdate(bookID, feedEntry)
+    val databaseEntry = database0.createOrUpdate(bookID, OPDS12FeedConverter.convertEntry(this.accountID, feedEntry))
 
     val format = databaseEntry.findFormatHandle(BookDatabaseEntryFormatHandleAudioBook::class.java)
     format!!
@@ -888,7 +891,7 @@ abstract class BookDatabaseContract {
       val feedEntry: OPDSAcquisitionFeedEntry =
         this.acquisitionFeedEntryWithAdobeDRMEPUB()
       val entry0 =
-        database.createOrUpdate(bookID, feedEntry)
+        database.createOrUpdate(bookID, OPDS12FeedConverter.convertEntry(this.accountID, feedEntry))
       val formatHandle =
         entry0.findFormatHandle(BookDatabaseEntryFormatHandleEPUB::class.java)!!
 

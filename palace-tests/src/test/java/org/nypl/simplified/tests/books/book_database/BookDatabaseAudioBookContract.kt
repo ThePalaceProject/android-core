@@ -1,5 +1,8 @@
 package org.nypl.simplified.tests.books.book_database
 
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+
 import android.app.Application
 import android.content.Context
 import org.joda.time.DateTime
@@ -79,7 +82,7 @@ abstract class BookDatabaseAudioBookContract {
       httpClient = this.httpClient
     )
 
-    val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithAudioBook()
+    val feedEntry: FeedEntryBook = this.acquisitionFeedEntryWithAudioBook()
     val bookID = BookIDs.newFromText("abcd")
     val entry = database0.createOrUpdate(bookID, feedEntry)
 
@@ -102,7 +105,7 @@ abstract class BookDatabaseAudioBookContract {
     }
   }
 
-  private fun acquisitionFeedEntryWithAudioBook(): OPDSAcquisitionFeedEntry {
+  private fun acquisitionFeedEntryWithAudioBook(): FeedEntryBook {
     val revoke = null
     val eb = OPDSAcquisitionFeedEntry.newBuilder(
       "abcd",
@@ -120,6 +123,6 @@ abstract class BookDatabaseAudioBookContract {
         emptyMap()
       )
     )
-    return eb.build()
+    return OPDS12FeedConverter.convertEntry(this.accountID, eb.build())
   }
 }

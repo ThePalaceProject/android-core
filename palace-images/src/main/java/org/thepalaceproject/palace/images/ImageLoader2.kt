@@ -19,6 +19,7 @@ import com.bumptech.glide.request.transition.Transition
 import org.librarysimplified.palace.images.R
 import org.nypl.simplified.accounts.api.AccountProviderDescription
 import org.nypl.simplified.books.book_registry.BookRegistryReadableType
+import org.nypl.simplified.books.api.FeedBookIDConversions
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.ui.images.ImageLoader2Type
@@ -104,12 +105,12 @@ class ImageLoader2 private constructor(
   }
 
   private fun coverURIOf(entry: FeedEntryBook): URI? {
-    val bookWithStatus = this.bookRegistry.bookOrNull(entry.bookID)
+    val bookWithStatus = this.bookRegistry.bookOrNull(FeedBookIDConversions.toBookID(entry.bookID))
     return bookWithStatus?.book?.cover?.toURI() ?: entry.cover
   }
 
   private fun thumbnailURIOf(entry: FeedEntryBook): URI? {
-    val bookWithStatus = this.bookRegistry.bookOrNull(entry.bookID)
+    val bookWithStatus = this.bookRegistry.bookOrNull(FeedBookIDConversions.toBookID(entry.bookID))
     return bookWithStatus?.book?.thumbnail?.toURI() ?: entry.thumbnail
   }
 

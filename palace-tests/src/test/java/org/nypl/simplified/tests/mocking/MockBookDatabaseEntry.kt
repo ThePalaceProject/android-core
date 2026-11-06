@@ -11,6 +11,9 @@ import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFile
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericJsonAudioBook
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericPDFFiles
 import org.nypl.simplified.books.formats.api.StandardFormatNames.lcpAudioBooks
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.toOPDSAcquisitionFeedEntry
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionPaths
 import org.slf4j.LoggerFactory
@@ -25,10 +28,10 @@ class MockBookDatabaseEntry(
     LoggerFactory.getLogger(MockBookDatabaseEntry::class.java)
 
   val formatHandlesField: MutableList<BookDatabaseEntryFormatHandle> =
-    this.formatHandlesOf(this.bookInitial.entry).toMutableList()
+    this.formatHandlesOf(this.bookInitial.entry.toOPDSAcquisitionFeedEntry()).toMutableList()
 
   var entryWrites = 0
-  var entryField: OPDSAcquisitionFeedEntry = this.bookInitial.entry
+  var entryField: FeedEntryBook = this.bookInitial.entry
   var thumbnailField: File? = null
   var deleted = false
   var coverField: File? = null
@@ -63,7 +66,7 @@ class MockBookDatabaseEntry(
     this.logger.debug("[{}]: writeOPDSEntry", this.bookInitial.id)
 
     this.addNecessaryHandles(opdsEntry)
-    this.entryField = opdsEntry
+    this.entryField = OPDS12FeedConverter.convertEntry(this.bookInitial.account, opdsEntry)
     this.entryWrites++
   }
 

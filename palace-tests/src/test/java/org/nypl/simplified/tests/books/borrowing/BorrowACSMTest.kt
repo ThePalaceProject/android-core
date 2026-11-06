@@ -1,5 +1,8 @@
 package org.nypl.simplified.tests.books.borrowing
 
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+
 import android.app.Application
 import io.reactivex.disposables.Disposable
 import okhttp3.mockwebserver.MockResponse
@@ -224,7 +227,7 @@ class BorrowACSMTest {
         account = this.account.id,
         cover = null,
         thumbnail = null,
-        entry = initialFeedEntry,
+        entry = OPDS12FeedConverter.convertEntry(this.account.id, initialFeedEntry),
         formats = listOf()
       )
 
@@ -234,7 +237,7 @@ class BorrowACSMTest {
     this.bookDatabaseEntry =
       this.bookDatabase.createOrUpdate(
         this.bookID,
-        initialFeedEntry
+        OPDS12FeedConverter.convertEntry(this.account.id, initialFeedEntry)
       )
 
     this.adobeNetProvider =

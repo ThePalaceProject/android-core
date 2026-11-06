@@ -1,5 +1,8 @@
 package org.nypl.simplified.tests.books.borrowing
 
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+
 import android.app.Application
 import android.content.ContentResolver
 import android.content.Context
@@ -193,7 +196,7 @@ class BorrowLCPEpubTest {
       account = this.accountId,
       cover = null,
       thumbnail = null,
-      entry = feedEntry,
+      entry = OPDS12FeedConverter.convertEntry(this.accountId, feedEntry),
       formats = listOf()
     )
 

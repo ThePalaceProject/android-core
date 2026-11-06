@@ -1,5 +1,8 @@
 package org.nypl.simplified.tests.books.borrowing
 
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+
 import android.app.Application
 import io.reactivex.disposables.Disposable
 import org.joda.time.Instant
@@ -177,7 +180,7 @@ class BorrowAudioBookTest {
         account = this.accountId,
         cover = null,
         thumbnail = null,
-        entry = initialFeedEntry,
+        entry = OPDS12FeedConverter.convertEntry(this.accountId, initialFeedEntry),
         formats = listOf()
       )
 

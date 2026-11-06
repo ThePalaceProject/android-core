@@ -14,6 +14,8 @@ import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.api.BookIDs
+import org.nypl.simplified.books.api.FeedBookIDConversions
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
 import org.nypl.simplified.books.book_database.api.BookDatabaseException
 import org.nypl.simplified.books.book_registry.BookRegistryType
@@ -23,7 +25,7 @@ import org.nypl.simplified.books.controller.api.BooksControllerType
 import org.nypl.simplified.feeds.opds12.toOPDSAcquisitionFeedEntry
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.feeds.api.FeedLoading
-import org.nypl.simplified.opds.core.OPDSAvailabilityRevoked
+import org.nypl.simplified.feeds.api.FeedAvailabilityRevoked
 import org.nypl.simplified.opds.core.OPDSFeedParserType
 import org.nypl.simplified.opds.core.OPDSParseException
 import org.nypl.simplified.patron.PatronUserProfiles
@@ -289,12 +291,13 @@ class BookSyncTask(
     val received = HashSet<BookID>(64)
     val entries = feed.feedEntries
     for (opdsEntry in entries) {
-      val bookId = BookIDs.newFromOPDSEntry(opdsEntry)
+      val entry = OPDS12FeedConverter.convertEntry(account.id, opdsEntry)
+      val bookId = FeedBookIDConversions.toBookID(entry.bookID)
       received.add(bookId)
       this.logger.debug("[{}] updating", bookId.brief())
 
       try {
-        val databaseEntry = bookDatabase.createOrUpdate(bookId, opdsEntry)
+        val databaseEntry = bookDatabase.createOrUpdate(bookId, entry)
         val book = databaseEntry.book
         this.bookRegistry.update(BookWithStatus(book, BookStatus.fromBook(book)))
       } catch (e: BookDatabaseException) {
@@ -315,7 +318,7 @@ class BookSyncTask(
         if (!received.contains(existingId)) {
           val dbEntry = bookDatabase.entry(existingId)
           val a = dbEntry.book.entry.availability
-          if (a is OPDSAvailabilityRevoked) {
+          if (a is FeedAvailabilityRevoked) {
             revoking.add(existingId)
           } else {
             this.logger.debug("[{}] deleting", existingId.brief())

@@ -6,7 +6,7 @@ import org.nypl.simplified.books.book_registry.BookRegistryReadableType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedEntryBook
-import org.nypl.simplified.feeds.opds12.toOPDSAcquisitionFeedEntry
+import org.nypl.simplified.books.api.FeedBookIDConversions
 
 data class CatalogBookStatus<S : BookStatus>(
   val book: Book,
@@ -32,18 +32,19 @@ data class CatalogBookStatus<S : BookStatus>(
       registry: BookRegistryReadableType,
       feedEntry: FeedEntryBook
     ): CatalogBookStatus<BookStatus> {
+      val bookID = FeedBookIDConversions.toBookID(feedEntry.bookID)
       val registryStatus =
-        registry.bookStatusOrNull(feedEntry.bookID)
+        registry.bookStatusOrNull(bookID)
 
-      var book = registry.bookOrNull(feedEntry.bookID)?.book
+      var book = registry.bookOrNull(bookID)?.book
       if (book == null) {
         book =
           Book(
-            id = feedEntry.bookID,
+            id = bookID,
             account = feedEntry.accountID,
             cover = null,
             thumbnail = null,
-            entry = feedEntry.toOPDSAcquisitionFeedEntry(),
+            entry = feedEntry,
             formats = listOf()
           )
       }

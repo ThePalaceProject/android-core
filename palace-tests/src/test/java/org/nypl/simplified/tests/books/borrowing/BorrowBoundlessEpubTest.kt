@@ -1,5 +1,8 @@
 package org.nypl.simplified.tests.books.borrowing
 
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+
 import android.app.Application
 import android.content.ContentResolver
 import okhttp3.mockwebserver.MockResponse
@@ -174,7 +177,7 @@ class BorrowBoundlessEpubTest {
       account = this.account.id,
       cover = null,
       thumbnail = null,
-      entry = feedEntry,
+      entry = OPDS12FeedConverter.convertEntry(this.account.id, feedEntry),
       formats = listOf()
     )
 

@@ -1,5 +1,8 @@
 package org.nypl.simplified.tests.books.controller
 
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+
 import android.content.Context
 import com.google.common.util.concurrent.ListeningExecutorService
 import com.google.common.util.concurrent.MoreExecutors
@@ -252,8 +255,8 @@ class BookRevokeTaskAdobeDRMTest {
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
-    val opdsEntry =
-      opdsEntryBuilder.build()
+    val opdsEntry: FeedEntryBook =
+      OPDS12FeedConverter.convertEntry(this.accountID, opdsEntryBuilder.build())
 
     this.logBookEventsFor(bookId)
 
@@ -368,8 +371,8 @@ class BookRevokeTaskAdobeDRMTest {
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
-    val opdsEntry =
-      opdsEntryBuilder.build()
+    val opdsEntry: FeedEntryBook =
+      OPDS12FeedConverter.convertEntry(this.accountID, opdsEntryBuilder.build())
 
     this.logBookEventsFor(bookId)
 
@@ -485,8 +488,8 @@ class BookRevokeTaskAdobeDRMTest {
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
-    val opdsEntry =
-      opdsEntryBuilder.build()
+    val opdsEntry: FeedEntryBook =
+      OPDS12FeedConverter.convertEntry(this.accountID, opdsEntryBuilder.build())
 
     this.logBookEventsFor(bookId)
 
@@ -645,8 +648,8 @@ class BookRevokeTaskAdobeDRMTest {
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
-    val opdsEntry =
-      opdsEntryBuilder.build()
+    val opdsEntry: FeedEntryBook =
+      OPDS12FeedConverter.convertEntry(this.accountID, opdsEntryBuilder.build())
 
     this.logBookEventsFor(bookId)
 
@@ -794,8 +797,8 @@ class BookRevokeTaskAdobeDRMTest {
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
-    val opdsEntry =
-      opdsEntryBuilder.build()
+    val opdsEntry: FeedEntryBook =
+      OPDS12FeedConverter.convertEntry(this.accountID, opdsEntryBuilder.build())
 
     this.logBookEventsFor(bookId)
 
@@ -944,8 +947,8 @@ class BookRevokeTaskAdobeDRMTest {
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
-    val opdsEntry =
-      opdsEntryBuilder.build()
+    val opdsEntry: FeedEntryBook =
+      OPDS12FeedConverter.convertEntry(this.accountID, opdsEntryBuilder.build())
 
     this.logBookEventsFor(bookId)
 
@@ -1103,8 +1106,8 @@ class BookRevokeTaskAdobeDRMTest {
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
-    val opdsEntry =
-      opdsEntryBuilder.build()
+    val opdsEntry: FeedEntryBook =
+      OPDS12FeedConverter.convertEntry(this.accountID, opdsEntryBuilder.build())
 
     this.logBookEventsFor(bookId)
 
@@ -1237,8 +1240,8 @@ class BookRevokeTaskAdobeDRMTest {
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
-    val opdsEntry =
-      opdsEntryBuilder.build()
+    val opdsEntry: FeedEntryBook =
+      OPDS12FeedConverter.convertEntry(this.accountID, opdsEntryBuilder.build())
 
     this.logBookEventsFor(bookId)
 
@@ -1354,8 +1357,8 @@ class BookRevokeTaskAdobeDRMTest {
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
-    val opdsEntry =
-      opdsEntryBuilder.build()
+    val opdsEntry: FeedEntryBook =
+      OPDS12FeedConverter.convertEntry(this.accountID, opdsEntryBuilder.build())
 
     this.logBookEventsFor(bookId)
 

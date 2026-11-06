@@ -1,5 +1,8 @@
 package org.nypl.simplified.tests.books.book_database
 
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+
 import android.app.Application
 import android.content.Context
 import org.joda.time.DateTime
@@ -89,7 +92,7 @@ abstract class BookDatabasePDFContract {
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithPDF()
     val bookID = BookIDs.newFromText("abcd")
 
-    val databaseEntry: BookDatabaseEntryType = bookDatabase.createOrUpdate(bookID, feedEntry)
+    val databaseEntry: BookDatabaseEntryType = bookDatabase.createOrUpdate(bookID, OPDS12FeedConverter.convertEntry(this.accountID, feedEntry))
 
     this.run {
       val formatHandle =
@@ -145,7 +148,7 @@ abstract class BookDatabasePDFContract {
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithPDF()
     val bookID = BookIDs.newFromText("abcd")
-    val entry = database0.createOrUpdate(bookID, feedEntry)
+    val entry = database0.createOrUpdate(bookID, OPDS12FeedConverter.convertEntry(this.accountID, feedEntry))
 
     this.run {
       val formatHandle = entry.findFormatHandle(BookDatabaseEntryFormatHandlePDF::class.java)!!

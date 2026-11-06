@@ -49,7 +49,7 @@ class PdfViewerProvider : ViewerProviderType {
     val formatPDF =
       format as BookFormat.BookFormatPDF
     val entry =
-      OPDS12FeedConverter.convertEntry(book.account, book.entry)
+      book.entry
 
     PdfReaderActivity.startActivity(
       context = activity,

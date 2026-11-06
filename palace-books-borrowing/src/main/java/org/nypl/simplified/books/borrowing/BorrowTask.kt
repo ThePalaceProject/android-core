@@ -14,6 +14,8 @@ import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.api.BookIDs
+import org.nypl.simplified.books.api.FeedBookIDConversions
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
 import org.nypl.simplified.books.book_registry.BookRegistryType
@@ -80,7 +82,7 @@ class BorrowTask private constructor(
     AtomicBoolean(false)
 
   private val bookId by lazy {
-    BookIDs.newFromOPDSEntry(this.request.opdsAcquisitionFeedEntry)
+    FeedBookIDConversions.toBookID(this.request.opdsAcquisitionFeedEntry.bookID)
   }
 
   private val bookIdBrief by lazy {
@@ -386,7 +388,7 @@ class BorrowTask private constructor(
 
   private fun createBookDatabaseEntry(
     book: Book,
-    entry: OPDSAcquisitionFeedEntry
+    entry: FeedEntryBook
   ): Book {
     this.taskRecorder.beginNewStep("Setting up a book database entry...")
 
@@ -447,7 +449,7 @@ class BorrowTask private constructor(
 
   private fun pickAcquisitionPath(
     book: Book,
-    entry: OPDSAcquisitionFeedEntry
+    entry: FeedEntryBook
   ): OPDSAcquisitionPath {
     this.taskRecorder.beginNewStep("Planning the borrow operation…")
 
@@ -581,7 +583,7 @@ class BorrowTask private constructor(
       )
     }
 
-    override fun chooseNewAcquisitionPath(entry: OPDSAcquisitionFeedEntry): Link {
+    override fun chooseNewAcquisitionPath(entry: FeedEntryBook): Link {
       val path = this.borrowTask.pickAcquisitionPath(this.bookCurrent, entry)
       this.logDebug("Selected a new acquisition path.")
       check(path.elements.isNotEmpty()) { "Selected acquisition path cannot be empty!" }

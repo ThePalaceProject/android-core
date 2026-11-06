@@ -13,7 +13,9 @@ import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.files.DirectoryUtilities
 import org.nypl.simplified.files.FileUtilities
 import org.nypl.simplified.json.core.JSONSerializerUtilities
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+import org.nypl.simplified.feeds.opds12.toOPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSJSONParserType
 import org.nypl.simplified.opds.core.OPDSJSONSerializerType
 import org.slf4j.LoggerFactory
@@ -99,7 +101,7 @@ class BookDatabase private constructor(
   @Throws(BookDatabaseException::class)
   override fun createOrUpdate(
     id: BookID,
-    entry: OPDSAcquisitionFeedEntry
+    entry: FeedEntryBook
   ): BookDatabaseEntryType {
     synchronized(this.maps.mapsLock) {
       if (this.maps.contains(id)) {
@@ -120,7 +122,7 @@ class BookDatabase private constructor(
         FileUtilities.fileWriteUTF8Atomically(
           fileMeta,
           fileMetaTmp,
-          JSONSerializerUtilities.serializeToString(this.serializer.serializeFeedEntry(entry))
+          JSONSerializerUtilities.serializeToString(this.serializer.serializeFeedEntry(entry.toOPDSAcquisitionFeedEntry()))
         )
 
         val book =
@@ -271,9 +273,9 @@ class BookDatabase private constructor(
 
         val bookId = BookID.create(name)
         val fileMeta = File(directory, "meta.json")
-        val entry: OPDSAcquisitionFeedEntry =
+        val entry: FeedEntryBook =
           FileInputStream(fileMeta).use { stream ->
-            parser.parseAcquisitionFeedEntryFromStream(stream)
+            OPDS12FeedConverter.convertEntry(accountID, parser.parseAcquisitionFeedEntryFromStream(stream))
           }
 
         val cover = fileOrNull(directory, BookDatabaseEntry.COVER_FILENAME)

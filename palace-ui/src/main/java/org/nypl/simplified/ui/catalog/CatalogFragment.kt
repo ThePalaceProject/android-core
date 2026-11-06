@@ -50,13 +50,13 @@ import org.nypl.simplified.feeds.api.FeedSearchLocal
 import org.nypl.simplified.feeds.api.FeedSearchOpen1_1
 import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.feeds.api.FeedEntryCorrupt
-import org.nypl.simplified.opds.core.OPDSAvailabilityHeld
-import org.nypl.simplified.opds.core.OPDSAvailabilityHeldReady
-import org.nypl.simplified.opds.core.OPDSAvailabilityHoldable
-import org.nypl.simplified.opds.core.OPDSAvailabilityLoanable
-import org.nypl.simplified.opds.core.OPDSAvailabilityLoaned
-import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
-import org.nypl.simplified.opds.core.OPDSAvailabilityRevoked
+import org.nypl.simplified.feeds.api.FeedAvailabilityHeld
+import org.nypl.simplified.feeds.api.FeedAvailabilityHeldReady
+import org.nypl.simplified.feeds.api.FeedAvailabilityHoldable
+import org.nypl.simplified.feeds.api.FeedAvailabilityLoanable
+import org.nypl.simplified.feeds.api.FeedAvailabilityLoaned
+import org.nypl.simplified.feeds.api.FeedAvailabilityOpenAccess
+import org.nypl.simplified.feeds.api.FeedAvailabilityRevoked
 import org.nypl.simplified.profiles.controller.api.ProfileFeedRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
@@ -636,10 +636,7 @@ sealed class CatalogFragment :
     try {
       BookPreviewActivity.startActivity(
         this.requireActivity(),
-        OPDS12FeedConverter.convertEntry(
-          book.account,
-          book.entry
-        )
+        book.entry
       )
     } catch (e: Throwable) {
       this.logger.error("Failed to start activity: ", e)
@@ -1118,13 +1115,13 @@ sealed class CatalogFragment :
       val account = profile.account(book.account)
       return if (account.bookDatabase.books().contains(book.id)) {
         when (val availability = book.entry.availability) {
-          is OPDSAvailabilityHeld -> false
-          is OPDSAvailabilityHeldReady -> false
-          is OPDSAvailabilityHoldable -> false
-          is OPDSAvailabilityLoanable -> true
-          is OPDSAvailabilityLoaned -> availability.revoke == null && book.isDownloaded
-          is OPDSAvailabilityOpenAccess -> true
-          is OPDSAvailabilityRevoked -> false
+          is FeedAvailabilityHeld -> false
+          is FeedAvailabilityHeldReady -> false
+          is FeedAvailabilityHoldable -> false
+          is FeedAvailabilityLoanable -> true
+          is FeedAvailabilityLoaned -> availability.revoke == null && book.isDownloaded
+          is FeedAvailabilityOpenAccess -> true
+          is FeedAvailabilityRevoked -> false
         }
       } else {
         false

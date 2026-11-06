@@ -48,6 +48,7 @@ import org.nypl.simplified.feeds.api.FeedEntryCorrupt
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.FeedLoader
 import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+import org.nypl.simplified.books.api.FeedBookIDConversions
 import org.nypl.simplified.feeds.api.FeedLoaderResult
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedAuthentication
 import org.nypl.simplified.feeds.api.FeedLoaderType
@@ -227,8 +228,8 @@ class BookRevokeTaskTest {
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
-    val opdsEntry =
-      opdsEntryBuilder.build()
+    val opdsEntry: FeedEntryBook =
+      OPDS12FeedConverter.convertEntry(this.accountID, opdsEntryBuilder.build())
 
     this.logBookEventsFor(bookId)
 
@@ -326,8 +327,8 @@ class BookRevokeTaskTest {
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
-    val opdsEntry =
-      opdsEntryBuilder.build()
+    val opdsEntry: FeedEntryBook =
+      OPDS12FeedConverter.convertEntry(this.accountID, opdsEntryBuilder.build())
 
     this.logBookEventsFor(bookId)
 
@@ -493,8 +494,8 @@ class BookRevokeTaskTest {
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
-    val opdsEntry =
-      opdsEntryBuilder.build()
+    val opdsEntry: FeedEntryBook =
+      OPDS12FeedConverter.convertEntry(this.accountID, opdsEntryBuilder.build())
 
     this.logBookEventsFor(bookId)
 
@@ -615,7 +616,7 @@ class BookRevokeTaskTest {
         OPDSAvailabilityOpenAccess.get(this.server.url("revoke").toUri())
       )
     opdsEntryBuilder.addAcquisition(acquisition)
-    val opdsEntry = opdsEntryBuilder.build()
+    val opdsEntry: FeedEntryBook = OPDS12FeedConverter.convertEntry(this.accountID, opdsEntryBuilder.build())
 
     this.logBookEventsFor(bookId)
 
@@ -734,8 +735,8 @@ class BookRevokeTaskTest {
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
-    val opdsEntry =
-      opdsEntryBuilder.build()
+    val opdsEntry: FeedEntryBook =
+      OPDS12FeedConverter.convertEntry(this.accountID, opdsEntryBuilder.build())
 
     this.logBookEventsFor(bookId)
 
@@ -870,8 +871,8 @@ class BookRevokeTaskTest {
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
-    val opdsEntry =
-      opdsEntryBuilder.build()
+    val opdsEntry: FeedEntryBook =
+      OPDS12FeedConverter.convertEntry(this.accountID, opdsEntryBuilder.build())
 
     this.logBookEventsFor(bookId)
 
@@ -970,8 +971,8 @@ class BookRevokeTaskTest {
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
-    val opdsEntry =
-      opdsEntryBuilder.build()
+    val opdsEntry: FeedEntryBook =
+      OPDS12FeedConverter.convertEntry(this.accountID, opdsEntryBuilder.build())
 
     this.logBookEventsFor(bookId)
 
@@ -1106,8 +1107,8 @@ class BookRevokeTaskTest {
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
-    val opdsEntry =
-      opdsEntryBuilder.build()
+    val opdsEntry: FeedEntryBook =
+      OPDS12FeedConverter.convertEntry(this.accountID, opdsEntryBuilder.build())
 
     this.logBookEventsFor(bookId)
 
@@ -1155,7 +1156,7 @@ class BookRevokeTaskTest {
         feedURI = URI("http://www.example.com/0.feed"),
         feedFacets = listOf(),
         feedFacetGroups = mapOf()
-      ).copy(entries = listOf(OPDS12FeedConverter.convertEntry(account.id, opdsEntry)))
+      ).copy(entries = listOf(opdsEntry))
 
     val feedResult =
       FeedLoaderResult.FeedLoaderSuccess(feed, null)
@@ -1226,8 +1227,8 @@ class BookRevokeTaskTest {
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
-    val opdsEntry =
-      opdsEntryBuilder.build()
+    val opdsEntry: FeedEntryBook =
+      OPDS12FeedConverter.convertEntry(this.accountID, opdsEntryBuilder.build())
 
     this.logBookEventsFor(bookId)
 
@@ -1363,8 +1364,8 @@ class BookRevokeTaskTest {
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
-    val opdsEntry =
-      opdsEntryBuilder.build()
+    val opdsEntry: FeedEntryBook =
+      OPDS12FeedConverter.convertEntry(this.accountID, opdsEntryBuilder.build())
 
     this.logBookEventsFor(bookId)
 
@@ -1464,8 +1465,8 @@ class BookRevokeTaskTest {
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
-    val opdsEntry =
-      opdsEntryBuilder.build()
+    val opdsEntry: FeedEntryBook =
+      OPDS12FeedConverter.convertEntry(this.accountID, opdsEntryBuilder.build())
 
     this.logBookEventsFor(bookId)
 
@@ -1599,8 +1600,8 @@ class BookRevokeTaskTest {
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
-    val opdsEntry =
-      opdsEntryBuilder.build()
+    val opdsEntry: FeedEntryBook =
+      OPDS12FeedConverter.convertEntry(this.accountID, opdsEntryBuilder.build())
 
     this.logBookEventsFor(bookId)
 
@@ -1642,7 +1643,7 @@ class BookRevokeTaskTest {
         feedURI = URI("http://www.example.com/0.feed"),
         feedFacets = listOf(),
         feedFacetGroups = mapOf()
-      ).copy(entries = listOf(FeedEntryCorrupt(account.id, bookId, IOException())))
+      ).copy(entries = listOf(FeedEntryCorrupt(account.id, FeedBookIDConversions.fromBookID(bookId), IOException())))
 
     val feedResult =
       FeedLoaderResult.FeedLoaderSuccess(feed, null)
@@ -1713,8 +1714,8 @@ class BookRevokeTaskTest {
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
-    val opdsEntry =
-      opdsEntryBuilder.build()
+    val opdsEntry: FeedEntryBook =
+      OPDS12FeedConverter.convertEntry(this.accountID, opdsEntryBuilder.build())
 
     this.logBookEventsFor(bookId)
 
@@ -1825,8 +1826,8 @@ class BookRevokeTaskTest {
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
-    val opdsEntry =
-      opdsEntryBuilder.build()
+    val opdsEntry: FeedEntryBook =
+      OPDS12FeedConverter.convertEntry(this.accountID, opdsEntryBuilder.build())
 
     this.logBookEventsFor(bookId)
 
@@ -1944,8 +1945,8 @@ class BookRevokeTaskTest {
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
-    val opdsEntry =
-      opdsEntryBuilder.build()
+    val opdsEntry: FeedEntryBook =
+      OPDS12FeedConverter.convertEntry(this.accountID, opdsEntryBuilder.build())
 
     this.logBookEventsFor(bookId)
 
@@ -2046,8 +2047,8 @@ class BookRevokeTaskTest {
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
-    val opdsEntry =
-      opdsEntryBuilder.build()
+    val opdsEntry: FeedEntryBook =
+      OPDS12FeedConverter.convertEntry(this.accountID, opdsEntryBuilder.build())
 
     this.logBookEventsFor(bookId)
 
@@ -2153,8 +2154,8 @@ class BookRevokeTaskTest {
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
-    val opdsEntry =
-      opdsEntryBuilder.build()
+    val opdsEntry: FeedEntryBook =
+      OPDS12FeedConverter.convertEntry(this.accountID, opdsEntryBuilder.build())
 
     this.logBookEventsFor(bookId)
 
@@ -2259,8 +2260,8 @@ class BookRevokeTaskTest {
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
-    val opdsEntry =
-      opdsEntryBuilder.build()
+    val opdsEntry: FeedEntryBook =
+      OPDS12FeedConverter.convertEntry(this.accountID, opdsEntryBuilder.build())
 
     this.logBookEventsFor(bookId)
 
@@ -2363,8 +2364,8 @@ class BookRevokeTaskTest {
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
-    val opdsEntry =
-      opdsEntryBuilder.build()
+    val opdsEntry: FeedEntryBook =
+      OPDS12FeedConverter.convertEntry(this.accountID, opdsEntryBuilder.build())
 
     this.logBookEventsFor(bookId)
 
@@ -2479,8 +2480,8 @@ class BookRevokeTaskTest {
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
-    val opdsEntry =
-      opdsEntryBuilder.build()
+    val opdsEntry: FeedEntryBook =
+      OPDS12FeedConverter.convertEntry(this.accountID, opdsEntryBuilder.build())
 
     this.logBookEventsFor(bookId)
 
@@ -2608,8 +2609,8 @@ class BookRevokeTaskTest {
       )
     opdsEntryBuilder.addAcquisition(acquisition)
 
-    val opdsEntry =
-      opdsEntryBuilder.build()
+    val opdsEntry: FeedEntryBook =
+      OPDS12FeedConverter.convertEntry(this.accountID, opdsEntryBuilder.build())
 
     this.logBookEventsFor(bookId)
 

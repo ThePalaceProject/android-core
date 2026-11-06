@@ -1,5 +1,8 @@
 package org.nypl.simplified.tests.http.refresh_token.revoke
 
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+
 import android.content.Context
 import com.google.common.util.concurrent.ListeningExecutorService
 import com.google.common.util.concurrent.MoreExecutors
@@ -190,7 +193,7 @@ class RevokeBookRefreshTokenTest {
         account = this.accountID,
         cover = null,
         thumbnail = null,
-        entry = opdsEntry,
+        entry = OPDS12FeedConverter.convertEntry(this.accountID, opdsEntry),
         formats = listOf()
       )
     Mockito.`when`(profilesDatabase.currentProfile())

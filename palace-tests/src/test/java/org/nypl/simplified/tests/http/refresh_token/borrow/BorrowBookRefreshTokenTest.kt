@@ -1,5 +1,8 @@
 package org.nypl.simplified.tests.http.refresh_token.borrow
 
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+
 import android.app.Application
 import android.content.ContentResolver
 import okhttp3.mockwebserver.MockResponse
@@ -211,7 +214,7 @@ class BorrowBookRefreshTokenTest {
         account = this.accountID,
         cover = null,
         thumbnail = null,
-        entry = initialFeedEntry,
+        entry = OPDS12FeedConverter.convertEntry(this.accountID, initialFeedEntry),
         formats = listOf()
       )
 
@@ -407,7 +410,7 @@ class BorrowBookRefreshTokenTest {
       account = this.accountID,
       cover = null,
       thumbnail = null,
-      entry = feedEntry,
+      entry = OPDS12FeedConverter.convertEntry(this.accountID, feedEntry),
       formats = listOf()
     )
 

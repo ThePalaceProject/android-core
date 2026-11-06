@@ -14,7 +14,7 @@ import org.nypl.simplified.books.api.bookmark.SerializedLocatorAudioBookTime2
 import org.nypl.simplified.books.api.bookmark.SerializedLocatorHrefProgression20210317
 import org.nypl.simplified.books.api.bookmark.SerializedLocatorLegacyCFI
 import org.nypl.simplified.books.api.bookmark.SerializedLocatorPage1
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 
 /**
  * Functions to convert between SimplyE and SR2 bookmarks.
@@ -26,7 +26,7 @@ object AudioBookBookmarks {
    */
 
   fun fromPlayerBookmark(
-    feedEntry: OPDSAcquisitionFeedEntry,
+    feedEntry: FeedEntryBook,
     deviceId: String,
     source: PlayerBookmark
   ): SerializedBookmark {

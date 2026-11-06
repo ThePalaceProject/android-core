@@ -45,7 +45,7 @@ class ReaderViewerR2 : ViewerProviderType {
     val file =
       (format as BookFormat.BookFormatEPUB).file!!
     val entry =
-      OPDS12FeedConverter.convertEntry(book.account, book.entry)
+      book.entry
 
     val parameters =
       Reader2ActivityParameters(

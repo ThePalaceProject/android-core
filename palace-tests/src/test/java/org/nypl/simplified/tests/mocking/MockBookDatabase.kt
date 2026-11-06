@@ -4,7 +4,8 @@ import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.book_database.api.BookDatabaseType
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.toOPDSAcquisitionFeedEntry
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.SortedSet
@@ -36,7 +37,7 @@ class MockBookDatabase(
 
   override fun createOrUpdate(
     id: BookID,
-    entry: OPDSAcquisitionFeedEntry
+    entry: FeedEntryBook
   ): MockBookDatabaseEntry {
     this.logger.debug("createOrUpdate: [{}]", id)
     check(!this.deleted) { "Database must not be deleted." }
@@ -44,7 +45,7 @@ class MockBookDatabase(
     val existing = this.entries[id]
     if (existing != null) {
       this.logger.debug("createOrUpdate: [{}]: rewriting existing", id)
-      existing.writeOPDSEntry(entry)
+      existing.writeOPDSEntry(entry.toOPDSAcquisitionFeedEntry())
       return existing
     }
 
@@ -63,7 +64,7 @@ class MockBookDatabase(
         )
       )
 
-    newEntry.writeOPDSEntry(entry)
+    newEntry.writeOPDSEntry(entry.toOPDSAcquisitionFeedEntry())
     this.entries[id] = newEntry
     return newEntry
   }
