@@ -80,6 +80,15 @@
         android:enabled="true"
         android:text="@string/settingsDevShowBookCoverDebugLabels" />
 
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/debugBooksPreferOPDS20"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:checked="false"
+        android:enabled="true"
+        android:text="@string/settingsDevPreferOPDS20" />
+
     <Button
         android:id="@+id/debugBooksSyncNow"
         android:layout_width="match_parent"

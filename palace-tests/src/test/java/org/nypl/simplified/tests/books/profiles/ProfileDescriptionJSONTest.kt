@@ -59,7 +59,8 @@ class ProfileDescriptionJSONTest {
           audioBookPlaybackSkipIntervalForwardMs = 30_000L,
           audioBookPlaybackSkipIntervalBackwardMs = 30_000L,
           audioBookBatteryDialogAccepted = true,
-          showBookCoverDebugLabels = false
+          showBookCoverDebugLabels = false,
+          preferOPDS20 = false
         ),
         attributes = ProfileAttributes(
           sortedMapOf(

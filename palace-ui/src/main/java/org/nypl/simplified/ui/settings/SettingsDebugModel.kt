@@ -199,6 +199,17 @@ object SettingsDebugModel {
   }
 
   @UiThread
+  fun preferOPDS20(): Boolean = this.preferences().preferOPDS20
+
+  @UiThread
+  fun setPreferOPDS20(prefer: Boolean) {
+    val services = Services.serviceDirectory()
+    val feedLoader = services.requireService(FeedLoaderType::class.java)
+    feedLoader.preferOPDS20 = prefer
+    this.updatePreferences { it.copy(preferOPDS20 = prefer) }
+  }
+
+  @UiThread
   fun adeptSupported(): Boolean {
     val services = Services.serviceDirectory()
     return services.optionalService(AdobeAdeptExecutorType::class.java) != null

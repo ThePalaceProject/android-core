@@ -74,7 +74,7 @@ class FeedLoader(
   private val log = LoggerFactory.getLogger(FeedLoader::class.java)
 
   private val showOnlySupportedBooksFlag = AtomicBoolean(true)
-  private val wantsOpds20Flag = AtomicBoolean(false)
+  private val preferOPDS20Flag = AtomicBoolean(false)
 
   override var showOnlySupportedBooks: Boolean
     get() = this.showOnlySupportedBooksFlag.get()
@@ -82,10 +82,10 @@ class FeedLoader(
       this.showOnlySupportedBooksFlag.set(value)
     }
 
-  override var wantsOpds20: Boolean
-    get() = this.wantsOpds20Flag.get()
+  override var preferOPDS20: Boolean
+    get() = this.preferOPDS20Flag.get()
     set(value) {
-      this.wantsOpds20Flag.set(value)
+      this.preferOPDS20Flag.set(value)
     }
 
   override fun fetchURI(
@@ -123,7 +123,7 @@ class FeedLoader(
         return this.parseFromContentResolver(accountId, uri)
       }
 
-      return if (this.wantsOpds20) {
+      return if (this.preferOPDS20) {
         this.fetchOPDS20(accountId, uri, credentials, method)
       } else {
         this.fetchOPDS12(accountId, uri, credentials, method)

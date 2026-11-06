@@ -36,7 +36,7 @@ class FakeFeedLoader : FeedLoaderType {
   override var showOnlySupportedBooks: Boolean =
     true
 
-  override var wantsOpds20: Boolean =
+  override var preferOPDS20: Boolean =
     false
 
   override fun fetchURI(

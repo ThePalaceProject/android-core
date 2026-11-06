@@ -24,7 +24,7 @@ interface FeedLoaderType {
    * loader does not send the header and the server responds with OPDS 1.2.
    */
 
-  var wantsOpds20: Boolean
+  var preferOPDS20: Boolean
 
   /**
    * Load a feed from the given URI.

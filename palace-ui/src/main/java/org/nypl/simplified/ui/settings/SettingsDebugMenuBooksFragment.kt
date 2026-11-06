@@ -40,6 +40,7 @@ class SettingsDebugMenuBooksFragment :
   private lateinit var syncAccountsNow: Button
   private lateinit var showOnlySupportedBooks: SwitchCompat
   private lateinit var showBookCoverDebugLabels: SwitchCompat
+  private lateinit var preferOPDS20: SwitchCompat
   private lateinit var toolbarBack: View
 
   override fun onViewCreated(
@@ -57,6 +58,8 @@ class SettingsDebugMenuBooksFragment :
       view.findViewById(R.id.debugBooksShowOnlySupported)
     this.showBookCoverDebugLabels =
       view.findViewById(R.id.debugBooksShowCoverDebugLabels)
+    this.preferOPDS20 =
+      view.findViewById(R.id.debugBooksPreferOPDS20)
     this.syncAccountsNow =
       view.findViewById(R.id.debugBooksSyncNow)
   }
@@ -74,6 +77,12 @@ class SettingsDebugMenuBooksFragment :
       SettingsDebugModel.showBookCoverDebugLabels()
     this.showBookCoverDebugLabels.setOnCheckedChangeListener { _, isChecked ->
       SettingsDebugModel.setShowBookCoverDebugLabels(show = isChecked)
+    }
+
+    this.preferOPDS20.isChecked =
+      SettingsDebugModel.preferOPDS20()
+    this.preferOPDS20.setOnCheckedChangeListener { _, isChecked ->
+      SettingsDebugModel.setPreferOPDS20(prefer = isChecked)
     }
 
     this.syncAccountsNow.setOnClickListener {

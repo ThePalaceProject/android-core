@@ -1007,7 +1007,7 @@ internal object MainServices {
         .profileEvents()
         .ofType(ProfileUpdated::class.java)
         .subscribe {
-          onProfileUpdated(profilesControllerTypeService)
+          onProfileUpdated(profilesControllerTypeService, feedLoader)
         }
 
     showThreads()
@@ -1078,8 +1078,13 @@ internal object MainServices {
     )
   }
 
-  private fun onProfileUpdated(profiles: ProfilesControllerType) {
+  private fun onProfileUpdated(profiles: ProfilesControllerType, feedLoader: FeedLoaderType) {
     this.updateReportsLibrary(profiles)
+    try {
+      feedLoader.preferOPDS20 = profiles.profileCurrent().preferences().preferOPDS20
+    } catch (e: Throwable) {
+      this.logger.debug("Failed to update feed loader preferences: ", e)
+    }
   }
 
   private fun updateReportsLibrary(profiles: ProfilesControllerType) {
