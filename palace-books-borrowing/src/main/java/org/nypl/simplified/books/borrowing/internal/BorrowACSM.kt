@@ -254,7 +254,12 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
 
       context.account.updateCredentialsIfAvailable { c ->
         c.withAdobePreActivationCredentials(
-          adobePreCredentials.copy(postActivationCredentials = newPostCredentials)
+          adobePreCredentials.copy(
+            postActivationCredentials =
+              newPostCredentials.copy(
+                version = AdobeDRMExtensions.versionCurrent()
+              )
+          )
         )
       }
 
