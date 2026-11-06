@@ -17,12 +17,16 @@ import org.nypl.simplified.feeds.api.FeedAvailabilityOpenAccess
 import org.nypl.simplified.feeds.api.FeedCategory
 import org.nypl.simplified.feeds.api.FeedData
 import org.nypl.simplified.feeds.api.FeedDataWithGroups
+import org.nypl.simplified.feeds.api.FeedDRMLicensor
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.api.FeedEntryGroupRef
 import org.nypl.simplified.feeds.api.FeedFacetData
 import org.nypl.simplified.feeds.api.FeedFacetSingle
 import org.nypl.simplified.feeds.api.FeedGroup
 import org.nypl.simplified.feeds.api.FeedIndirectAcquisition
+import org.nypl.simplified.feeds.api.FeedPreviewAcquisition
+import org.nypl.simplified.feeds.api.FeedSearchOpen1_1
 import org.nypl.simplified.feeds.api.FeedSeries
 import org.nypl.simplified.links.Link.LinkBasic
 import one.irradia.mime.api.MIMEType
@@ -43,6 +47,33 @@ import org.readium.r2.shared.util.Url
  * generic [PalaceFeed] types from [palace-feeds-api].
  */
 object OPDS20FeedConverter {
+
+  private const val REL_ACQUIRE_PREFIX = "/acquire/"
+  private const val REL_ACQUIRE_SAMPLE = "/acquire/sample"
+  private const val REL_ACQUIRE_OPEN_ACCESS = "/acquire/open-access"
+  private const val REL_ACQUIRE_BUY = "/acquire/buy"
+  private const val REL_ACQUIRE_SUBSCRIBE = "/acquire/subscribe"
+
+  private const val REL_SELF = "self"
+  private const val REL_NEXT = "next"
+  private const val REL_SEARCH = "search"
+  private const val REL_COVER = "cover"
+  private const val REL_THUMBNAIL = "thumbnail"
+  private const val REL_ALTERNATE = "alternate"
+  private const val REL_RELATED = "related"
+  private const val REL_ISSUES = "issues"
+  private const val REL_COLLECTION = "collection"
+  private const val REL_ABOUT = "about"
+  private const val REL_TERMS_OF_SERVICE = "terms-of-service"
+  private const val REL_PRIVACY_POLICY = "privacy-policy"
+  private const val REL_LICENSES = "licenses"
+
+  private const val REL_ANNOTATION_SERVICE = "http://www.w3.org/ns/oa#annotationService"
+  private const val REL_TIME_TRACKING = "http://palaceproject.io/terms/timeTracking"
+  private const val REL_ANALYTICS_OPEN_BOOK = "http://librarysimplified.org/terms/rel/analytics/open-book"
+  private const val REL_REVOKE = "http://librarysimplified.org/terms/rel/revoke"
+  private const val REL_DRM_DEVICES = "http://librarysimplified.org/terms/drm/rel/devices"
+  private const val SCHEME_AUDIENCE = "http://schema.org/audience"
 
   /**
    * Convert a Readium OPDS 2.0 [ReadiumFeed] into a [PalaceFeed].
@@ -76,7 +107,7 @@ object OPDS20FeedConverter {
       feed.groups.map { group ->
         val groupURI: URI =
           group.links
-            .firstOrNull { "self" in it.rels }
+            .firstOrNull { REL_SELF in it.rels }
             ?.href
             ?.toString()
             ?.let { URI(it) }
@@ -92,10 +123,33 @@ object OPDS20FeedConverter {
 
     val feedNext: URI? =
       feed.links
-        .firstOrNull { "next" in it.rels }
+        .firstOrNull { REL_NEXT in it.rels }
         ?.href
         ?.toString()
         ?.let { URI(it) }
+
+    val feedSearch: FeedSearchOpen1_1? =
+      feed.links
+        .firstOrNull { REL_SEARCH in it.rels }
+        ?.let { link ->
+          try {
+            FeedSearchOpen1_1.fromTemplate(link.url(feed.href).toString())
+          } catch (_: Exception) {
+            FeedSearchOpen1_1.fromTemplate(link.href.toString())
+          }
+        }
+
+    val feedTermsOfService: URI? =
+      feedLinkURI(feed.links, REL_TERMS_OF_SERVICE, feed.href)
+
+    val feedPrivacyPolicy: URI? =
+      feedLinkURI(feed.links, REL_PRIVACY_POLICY, feed.href)
+
+    val feedAbout: URI? =
+      feedLinkURI(feed.links, REL_ABOUT, feed.href)
+
+    val feedLicenses: URI? =
+      feedLinkURI(feed.links, REL_LICENSES, feed.href)
 
     val feedTitle: String =
       feed.metadata.title
@@ -103,14 +157,14 @@ object OPDS20FeedConverter {
     return if (feedGroups.isEmpty()) {
       FeedData(
         feedID = feedURI.toString(),
-        feedSearch = null,
+        feedSearch = feedSearch,
         feedTitle = feedTitle,
         feedUpdated = feedUpdated,
         feedURI = feedURI,
-        feedTermsOfService = null,
-        feedPrivacyPolicy = null,
-        feedAbout = null,
-        feedLicenses = null,
+        feedTermsOfService = feedTermsOfService,
+        feedPrivacyPolicy = feedPrivacyPolicy,
+        feedAbout = feedAbout,
+        feedLicenses = feedLicenses,
         feedNext = feedNext,
         facetsByGroup = facetsByGroup,
         facetsOrder = facets,
@@ -119,14 +173,14 @@ object OPDS20FeedConverter {
     } else {
       FeedDataWithGroups(
         feedID = feedURI.toString(),
-        feedSearch = null,
+        feedSearch = feedSearch,
         feedTitle = feedTitle,
         feedUpdated = feedUpdated,
         feedURI = feedURI,
-        feedTermsOfService = null,
-        feedPrivacyPolicy = null,
-        feedAbout = null,
-        feedLicenses = null,
+        feedTermsOfService = feedTermsOfService,
+        feedPrivacyPolicy = feedPrivacyPolicy,
+        feedAbout = feedAbout,
+        feedLicenses = feedLicenses,
         feedNext = feedNext,
         facetsByGroup = facetsByGroup,
         facetsOrder = facets,
@@ -140,6 +194,8 @@ object OPDS20FeedConverter {
    */
   fun convertEntry(accountID: AccountID, publication: Publication): FeedEntryBook {
     val metadata = publication.metadata
+    val links = publication.links
+    val baseUrl: Url? = publication.baseUrl
 
     val id: String =
       metadata.identifier ?: ""
@@ -155,13 +211,13 @@ object OPDS20FeedConverter {
       metadata.published?.let { instantToDateTime(it) }
 
     val authors: List<String> =
-      metadata.authors.map { it.localizedName?.string ?: "" }.filter { it.isNotEmpty() }
+      metadata.authors.map { it.localizedName.string }.filter { it.isNotEmpty() }
 
     val narrators: List<String> =
-      metadata.narrators.map { it.localizedName?.string ?: "" }.filter { it.isNotEmpty() }
+      metadata.narrators.map { it.localizedName.string }.filter { it.isNotEmpty() }
 
     val publisher: String? =
-      metadata.publishers.firstOrNull()?.localizedName?.string
+      metadata.publishers.firstOrNull()?.let { it.localizedName.string }
 
     val language: String? =
       metadata.languages.firstOrNull()
@@ -175,44 +231,100 @@ object OPDS20FeedConverter {
     val categories: List<FeedCategory> =
       metadata.subjects.map { convertSubject(it) }
 
+    val audience: String? =
+      metadata.subjects
+        .firstOrNull { it.scheme == SCHEME_AUDIENCE }
+        ?.code
+
     val series: FeedSeries? =
       metadata.belongsTo
         ?.entries
         ?.firstOrNull()
-        ?.let { (name, contributors) ->
-          contributors.firstOrNull()?.let {
+        ?.let { (_, contributors) ->
+          contributors.firstOrNull()?.let { contributor ->
             FeedSeries(
-              name = name,
-              position = it.position?.toInt(),
-              link = URI(it.links.firstOrNull()?.href?.toString() ?: "")
+              name = contributor.localizedName.string,
+              position = contributor.position?.toInt(),
+              link = contributor.links.firstOrNull()?.href?.toString()
+                ?.let { s -> URI(s) }
+                ?: URI("")
             )
           }
         }
 
-    val baseUrl: Url? =
-      publication.baseUrl
+    /*
+     * Separate acquisitions from preview acquisitions.
+     * Preview acquisitions are those with the "sample" rel.
+     */
+    val allAcquisitionLinks: List<ReadiumLink> =
+      links.filter { it.rels.any { rel -> REL_ACQUIRE_PREFIX in rel } }
+
+    val previewAcquisitionLinks: List<ReadiumLink> =
+      allAcquisitionLinks.filter { it.rels.any { it.endsWith(REL_ACQUIRE_SAMPLE) } }
+
+    val acquisitionLinks: List<ReadiumLink> =
+      allAcquisitionLinks.filterNot { it in previewAcquisitionLinks }
 
     val acquisitions: List<FeedAcquisition> =
-      publication.links
-        .filter { it.rels.any { rel -> "/acquire/" in rel } }
-        .map { convertAcquisitionLink(it, baseUrl) }
+      acquisitionLinks.map { convertAcquisitionLink(it, baseUrl) }
+
+    val previewAcquisitions: List<FeedPreviewAcquisition> =
+      previewAcquisitionLinks.map { link ->
+        val href: String =
+          linkResolvedHref(link, baseUrl)
+        val type: MIMEType =
+          link.mediaType?.let { parseRaisingException(it.toString()) }
+            ?: parseRaisingException("application/octet-stream")
+        FeedPreviewAcquisition(URI(href), type)
+      }
 
     val cover: URI? =
-      publication.links
-        .firstOrNull { "cover" in it.rels }
-        ?.href
-        ?.toString()
-        ?.let { URI(it) }
+      linkHrefAsURI(links, REL_COVER, baseUrl)
 
     val thumbnail: URI? =
-      publication.links
-        .firstOrNull { "thumbnail" in it.rels }
-        ?.href
-        ?.toString()
-        ?.let { URI(it) }
+      linkHrefAsURI(links, REL_THUMBNAIL, baseUrl)
+
+    val annotations: URI? =
+      linkHrefAsURI(links, REL_ANNOTATION_SERVICE, baseUrl)
+
+    val issues: URI? =
+      linkHrefAsURI(links, REL_ISSUES, baseUrl)
+
+    val related: URI? =
+      linkHrefAsURI(links, REL_RELATED, baseUrl)
+
+    val alternate: URI? =
+      linkHrefAsURI(links, REL_ALTERNATE, baseUrl)
+
+    val analytics: URI? =
+      linkHrefAsURI(links, REL_ANALYTICS_OPEN_BOOK, baseUrl)
+
+    val timeTrackingUri: URI? =
+      linkHrefAsURI(links, REL_TIME_TRACKING, baseUrl)
+
+    val licensor: FeedDRMLicensor? =
+      extractDRMLicensor(links)
+
+    val entryGroups: Set<FeedEntryGroupRef> =
+      links
+        .filter { REL_COLLECTION in it.rels }
+        .mapNotNull { link ->
+          val title = link.title
+          if (title != null) {
+            val uri: URI = try {
+              URI(link.url(baseUrl).toString())
+            } catch (_: Exception) {
+              URI(link.href.toString())
+            }
+            FeedEntryGroupRef(name = title, uri = uri)
+          } else {
+            null
+          }
+        }
+        .toSet()
 
     val availability: FeedAvailability =
-      convertAvailability(publication)
+      convertAvailability(links)
 
     return FeedEntryBook(
       accountID = accountID,
@@ -224,24 +336,24 @@ object OPDS20FeedConverter {
       acquisitions = acquisitions,
       categories = categories,
       cover = cover,
-      previewAcquisitions = emptyList(),
-      annotations = null,
-      groups = emptySet(),
-      issues = null,
-      related = null,
+      previewAcquisitions = previewAcquisitions,
+      annotations = annotations,
+      groups = entryGroups,
+      issues = issues,
+      related = related,
       published = published,
       publisher = publisher,
       distribution = "",
       summary = summary,
       narrators = narrators,
       thumbnail = thumbnail,
-      timeTrackingUri = null,
-      alternate = null,
-      analytics = null,
-      licensor = null,
+      timeTrackingUri = timeTrackingUri,
+      alternate = alternate,
+      analytics = analytics,
+      licensor = licensor,
       duration = duration,
       language = language,
-      audience = null,
+      audience = audience,
       series = series
     )
   }
@@ -249,7 +361,7 @@ object OPDS20FeedConverter {
   private fun convertFacet(accountID: AccountID, facet: Facet): FeedFacetData {
     val uri: URI =
       facet.links
-        .firstOrNull { "self" in it.rels }
+        .firstOrNull { REL_SELF in it.rels }
         ?.href
         ?.toString()
         ?.let { URI(it) }
@@ -269,34 +381,37 @@ object OPDS20FeedConverter {
     FeedCategory(
       term = subject.code ?: "",
       scheme = subject.scheme ?: "",
-      label = subject.localizedName?.string
+      label = subject.localizedName.string
     )
 
   private fun convertAcquisitionLink(link: ReadiumLink, baseUrl: Url?): FeedAcquisition {
     val href: String =
-      if (baseUrl != null) {
-        link.href.resolve(baseUrl)?.toString() ?: link.href.toString()
-      } else {
-        link.href.toString()
-      }
+      linkResolvedHref(link, baseUrl)
 
     val mediaType: MIMEType =
       link.mediaType?.let { parseRaisingException(it.toString()) }
         ?: parseRaisingException("application/octet-stream")
 
     val indirectAcquisitions: List<FeedIndirectAcquisition> =
-      link.properties?.indirectAcquisitions
-        ?.map { convertIndirectAcquisition(it) }
-        ?: emptyList()
+      link.properties.indirectAcquisitions
+        .map { convertIndirectAcquisition(it) }
+
+    val properties: Map<String, String> =
+      link.properties.otherProperties
+        .filterKeys { it !in RESERVED_PROPERTY_KEYS }
+        .mapValues { (_, v) -> v.toString() }
 
     return FeedAcquisition(
       relation = inferRelation(link.rels),
       uri = LinkBasic(URI(href)),
       type = mediaType,
       indirectAcquisitions = indirectAcquisitions,
-      properties = emptyMap()
+      properties = properties
     )
   }
+
+  private val RESERVED_PROPERTY_KEYS: Set<String> =
+    setOf("indirectAcquisition", "availability", "price", "holds", "copies", "numberOfItems", "authenticate")
 
   private fun convertIndirectAcquisition(acquisition: Acquisition): FeedIndirectAcquisition =
     FeedIndirectAcquisition(
@@ -307,17 +422,17 @@ object OPDS20FeedConverter {
 
   private fun inferRelation(rels: Set<String>): FeedAcquisitionRelation =
     when {
-      rels.any { it.endsWith("/acquire/open-access") } -> FeedAcquisitionRelation.ACQUISITION_OPEN_ACCESS
-      rels.any { it.endsWith("/acquire/sample") } -> FeedAcquisitionRelation.ACQUISITION_SAMPLE
-      rels.any { it.endsWith("/acquire/buy") } -> FeedAcquisitionRelation.ACQUISITION_BUY
-      rels.any { it.endsWith("/acquire/subscribe") } -> FeedAcquisitionRelation.ACQUISITION_SUBSCRIBE
+      rels.any { it.endsWith(REL_ACQUIRE_OPEN_ACCESS) } -> FeedAcquisitionRelation.ACQUISITION_OPEN_ACCESS
+      rels.any { it.endsWith(REL_ACQUIRE_SAMPLE) } -> FeedAcquisitionRelation.ACQUISITION_SAMPLE
+      rels.any { it.endsWith(REL_ACQUIRE_BUY) } -> FeedAcquisitionRelation.ACQUISITION_BUY
+      rels.any { it.endsWith(REL_ACQUIRE_SUBSCRIBE) } -> FeedAcquisitionRelation.ACQUISITION_SUBSCRIBE
       else -> FeedAcquisitionRelation.ACQUISITION_BORROW
     }
 
-  private fun convertAvailability(publication: Publication): FeedAvailability {
+  private fun convertAvailability(links: List<ReadiumLink>): FeedAvailability {
     val availability: Availability? =
-      publication.links
-        .mapNotNull { it.properties?.availability }
+      links
+        .mapNotNull { it.properties.availability }
         .firstOrNull()
 
     return when (availability?.state) {
@@ -346,7 +461,8 @@ object OPDS20FeedConverter {
       }
 
       null -> {
-        val hasOpenAccess = publication.links.any { it.rels.any { rel -> "/acquire/" in rel } && it.rels.any { it.endsWith("/acquire/open-access") } }
+        val hasOpenAccess =
+          links.any { it.rels.any { rel -> REL_ACQUIRE_PREFIX in rel && rel.endsWith(REL_ACQUIRE_OPEN_ACCESS) } }
         if (hasOpenAccess) {
           FeedAvailabilityOpenAccess(endDate = null, revoke = null)
         } else {
@@ -355,6 +471,103 @@ object OPDS20FeedConverter {
       }
     }
   }
+
+  /**
+   * Extract DRM licensor information from the links.
+   *
+   * The Simplified profile conveys DRM information through a link with DRM-related rels
+   * and properties containing the licensor details.
+   */
+  private fun extractDRMLicensor(links: List<ReadiumLink>): FeedDRMLicensor? {
+    for (link in links) {
+      val props = link.properties
+
+      // Check for a "licensor" property directly on the link
+      val licensorObj: Any? = props["licensor"]
+      if (licensorObj is Map<*, *>) {
+        val vendor = licensorObj["vendor"]?.toString()
+        val clientToken = licensorObj["clientToken"]?.toString()
+        val deviceManager = licensorObj["deviceManager"]?.toString()
+
+        if (vendor != null && clientToken != null) {
+          return FeedDRMLicensor(
+            vendor = vendor,
+            clientToken = clientToken,
+            deviceManager = deviceManager
+          )
+        }
+      }
+
+      // Check for DRM-related rels on the link
+      val hasDrmRel = link.rels.any { rel ->
+        rel.contains("drm", ignoreCase = true) ||
+          rel.contains("lcp", ignoreCase = true) ||
+          rel == REL_DRM_DEVICES
+      }
+
+      if (hasDrmRel) {
+        val vendor = props["vendor"]?.toString()
+        val clientToken = props["clientToken"]?.toString()
+        val deviceManager = props["deviceManager"]?.toString()
+
+        if (vendor != null && clientToken != null) {
+          return FeedDRMLicensor(
+            vendor = vendor,
+            clientToken = clientToken,
+            deviceManager = deviceManager
+          )
+        }
+      }
+    }
+
+    return null
+  }
+
+  /**
+   * Resolve the href of a link against the given base URL, returning the resolved string.
+   */
+  private fun linkResolvedHref(link: ReadiumLink, baseUrl: Url?): String =
+    try {
+      link.url(baseUrl).toString()
+    } catch (_: Exception) {
+      link.href.toString()
+    }
+
+  /**
+   * Find the first link with the given rel and return its resolved href as a [URI].
+   */
+  private fun linkHrefAsURI(
+    links: List<ReadiumLink>,
+    rel: String,
+    baseUrl: Url?
+  ): URI? =
+    links
+      .firstOrNull { rel in it.rels }
+      ?.let { link ->
+        try {
+          URI(link.url(baseUrl).toString())
+        } catch (_: Exception) {
+          URI(link.href.toString())
+        }
+      }
+
+  /**
+   * Find the first feed-level link with the given rel and return its resolved href as a [URI].
+   */
+  private fun feedLinkURI(
+    links: List<ReadiumLink>,
+    rel: String,
+    baseUrl: Url
+  ): URI? =
+    links
+      .firstOrNull { rel in it.rels }
+      ?.let { link ->
+        try {
+          URI(link.url(baseUrl).toString())
+        } catch (_: Exception) {
+          URI(link.href.toString())
+        }
+      }
 
   /**
    * Convert a Kotlin [Instant] to a Joda [DateTime] in UTC.
