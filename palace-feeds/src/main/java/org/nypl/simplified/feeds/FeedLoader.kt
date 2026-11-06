@@ -1,4 +1,4 @@
-package org.nypl.simplified.feeds.opds20
+package org.nypl.simplified.feeds
 
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType
@@ -16,6 +16,7 @@ import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderSuccess
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
 import org.nypl.simplified.feeds.opds12.OPDS12FeedHTTPTransportException
+import org.nypl.simplified.feeds.opds20.OPDS20FeedConverter
 import org.nypl.simplified.opds.core.OPDSAcquisition
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionPath
@@ -39,6 +40,22 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
+ * A functional interface for fetching feed content from a URI.
+ *
+ * @param uri The URI to fetch
+ * @param credentials HTTP credentials, if any
+ * @param acceptHeader The Accept header value, or null if not set
+ * @return A pair of the response body stream and the access token (or null)
+ */
+fun interface FeedFetchType {
+  fun fetch(
+    uri: URI,
+    credentials: AccountAuthenticationCredentials?,
+    acceptHeader: String?
+  ): Pair<InputStream, String?>
+}
+
+/**
  * A unified feed loader that handles both OPDS 1.2 and OPDS 2.0 serializations.
  *
  * The [wantsOpds20] flag controls whether the loader sends an
@@ -46,11 +63,11 @@ import java.util.concurrent.atomic.AtomicBoolean
  * response is parsed as OPDS 2.0 JSON using the Readium parser. When `false`
  * (the default), the response is parsed as OPDS 1.2 Atom/XML.
  */
-class FeedLoader private constructor(
+class FeedLoader(
   private val bookFormatSupport: BookFormatSupportType,
   private val contentResolver: ContentResolverType,
   private val exec: ExecutorService,
-  private val http: LSHTTPClientType,
+  private val fetch: FeedFetchType,
   private val opds12Parser: OPDSFeedParserType,
   private val opds12SearchParser: OPDSSearchParserType,
 ) : FeedLoaderType {
@@ -149,7 +166,7 @@ class FeedLoader private constructor(
     credentials: AccountAuthenticationCredentials?,
     method: String
   ): FeedLoaderResult {
-    val response = this.httpGet(uri, credentials, method, acceptHeader = null)
+    val response = this.fetch.fetch(uri, credentials, null)
     val body = response.first
     val accessToken = response.second
 
@@ -176,7 +193,7 @@ class FeedLoader private constructor(
     credentials: AccountAuthenticationCredentials?,
     method: String
   ): FeedLoaderResult {
-    val response = this.httpGet(uri, credentials, method, acceptHeader = ACCEPT_OPDS_JSON)
+    val response = this.fetch.fetch(uri, credentials, ACCEPT_OPDS_JSON)
     val body = response.first
     val accessToken = response.second
 
@@ -188,61 +205,6 @@ class FeedLoader private constructor(
 
     val feed = OPDS20FeedConverter.convert(accountId, readiumFeed)
     return FeedLoaderSuccess(feed, accessToken)
-  }
-
-  /**
-   * Perform an HTTP request and return the response body stream and access token.
-   */
-  private fun httpGet(
-    uri: URI,
-    credentials: AccountAuthenticationCredentials?,
-    method: String,
-    acceptHeader: String?
-  ): Pair<InputStream, String?> {
-    val auth = AccountAuthenticatedHTTP.createAuthorizationIfPresent(credentials)
-
-    var builder: LSHTTPRequestBuilderType =
-      this.http
-        .newRequest(uri)
-        .setAuthorization(auth)
-        .addBasicTokenPropertiesIfApplicable(credentials)
-        .setMethod(this.methodOfName(method))
-
-    if (acceptHeader != null) {
-      builder = builder.addHeader("Accept", acceptHeader)
-    }
-
-    val request = builder.build()
-    val response = request.execute()
-
-    val status = response.status
-    return when {
-      status is LSHTTPResponseStatus.Responded.OK -> {
-        (status.bodyStream ?: ByteArrayInputStream(ByteArray(0))) to status.getAccessToken()
-      }
-
-      status is LSHTTPResponseStatus.Responded.Error -> {
-        throw OPDS12FeedHTTPTransportException(
-          message = status.properties.message,
-          code = status.properties.status,
-          report = status.properties.problemReport
-        )
-      }
-
-      status is LSHTTPResponseStatus.Failed -> {
-        throw OPDSFeedTransportIOException(
-          message = "Connection failed",
-          cause = IOException(status.exception)
-        )
-      }
-
-      else -> {
-        throw OPDSFeedTransportIOException(
-          message = "Unexpected HTTP response status",
-          cause = IOException("Status: $status")
-        )
-      }
-    }
   }
 
   private fun isEntrySupported(entry: OPDSAcquisitionFeedEntry): Boolean {
@@ -309,7 +271,7 @@ class FeedLoader private constructor(
     method: String
   ): OPDSOpenSearch1_1? {
     return if (searchLink != null) {
-      val response = this.httpGet(searchLink.uri, credentials, method, acceptHeader = null)
+      val response = this.fetch.fetch(searchLink.uri, credentials, null)
       response.first.use { stream ->
         this.opds12SearchParser.parse(searchLink.uri, stream)
       }
@@ -327,21 +289,11 @@ class FeedLoader private constructor(
       Pair("Method", method)
     )
 
-  private fun methodOfName(method: String): LSHTTPRequestBuilderType.Method =
-    when (method.uppercase()) {
-      "GET" -> LSHTTPRequestBuilderType.Method.Get
-      "HEAD" -> LSHTTPRequestBuilderType.Method.Head
-      "POST" -> LSHTTPRequestBuilderType.Method.Post(ByteArray(0), one.irradia.mime.api.MIMECompatibility.applicationOctetStream)
-      "PUT" -> LSHTTPRequestBuilderType.Method.Put(ByteArray(0), one.irradia.mime.api.MIMECompatibility.applicationOctetStream)
-      "DELETE" -> LSHTTPRequestBuilderType.Method.Delete(ByteArray(0), one.irradia.mime.api.MIMECompatibility.applicationOctetStream)
-      else -> throw IllegalArgumentException("Unsupported request method: $method")
-    }
-
   companion object {
     private const val ACCEPT_OPDS_JSON = "application/opds+json"
 
     /**
-     * Create a new unified feed loader.
+     * Create a new unified feed loader backed by an HTTP client.
      */
     fun create(
       bookFormatSupport: BookFormatSupportType,
@@ -355,9 +307,60 @@ class FeedLoader private constructor(
         bookFormatSupport = bookFormatSupport,
         contentResolver = contentResolver,
         exec = exec,
-        http = http,
+        fetch = httpFetch(http),
         opds12Parser = opds12Parser,
         opds12SearchParser = opds12SearchParser,
       )
+
+    /**
+     * Create a [FeedFetchType] backed by an [LSHTTPClientType].
+     */
+    fun httpFetch(http: LSHTTPClientType): FeedFetchType =
+      FeedFetchType { uri, credentials, acceptHeader ->
+        val auth = AccountAuthenticatedHTTP.createAuthorizationIfPresent(credentials)
+
+        var builder: LSHTTPRequestBuilderType =
+          http
+            .newRequest(uri)
+            .setAuthorization(auth)
+            .addBasicTokenPropertiesIfApplicable(credentials)
+            .setMethod(LSHTTPRequestBuilderType.Method.Get)
+
+        if (acceptHeader != null) {
+          builder = builder.addHeader("Accept", acceptHeader)
+        }
+
+        val request = builder.build()
+        val response = request.execute()
+
+        val status = response.status
+        when {
+          status is LSHTTPResponseStatus.Responded.OK -> {
+            (status.bodyStream ?: ByteArrayInputStream(ByteArray(0))) to status.getAccessToken()
+          }
+
+          status is LSHTTPResponseStatus.Responded.Error -> {
+            throw OPDS12FeedHTTPTransportException(
+              message = status.properties.message,
+              code = status.properties.status,
+              report = status.properties.problemReport
+            )
+          }
+
+          status is LSHTTPResponseStatus.Failed -> {
+            throw OPDSFeedTransportIOException(
+              message = "Connection failed",
+              cause = IOException(status.exception)
+            )
+          }
+
+          else -> {
+            throw OPDSFeedTransportIOException(
+              message = "Unexpected HTTP response status",
+              cause = IOException("Status: $status")
+            )
+          }
+        }
+      }
   }
 }

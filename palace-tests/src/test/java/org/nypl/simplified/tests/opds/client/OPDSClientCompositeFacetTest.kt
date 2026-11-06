@@ -24,8 +24,7 @@ import org.nypl.simplified.feeds.api.FeedEntryCorrupt
 import org.nypl.simplified.feeds.api.FeedFacetComposite
 import org.nypl.simplified.feeds.api.FeedFacetData
 import org.nypl.simplified.feeds.api.FeedFacet
-import org.nypl.simplified.feeds.opds12.OPDS12FeedHTTPTransport
-import org.nypl.simplified.feeds.opds12.OPDS12FeedLoader
+import org.nypl.simplified.feeds.FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
 import org.nypl.simplified.opds.core.OPDSFeedParser
@@ -61,7 +60,6 @@ class OPDSClientCompositeFacetTest {
   private lateinit var context: Context
   private lateinit var exec: ExecutorService
   private lateinit var feedLoader: FeedLoaderType
-  private lateinit var feedTransport: OPDS12FeedHTTPTransport
   private lateinit var parser: OPDSFeedParserType
   private lateinit var searchParser: OPDSSearchParserType
   private lateinit var webServer: MockWebServer
@@ -82,22 +80,8 @@ class OPDSClientCompositeFacetTest {
       OPDSFeedParser.newParser(OPDSAcquisitionFeedEntryParser.newParser())
     this.searchParser =
       OPDSSearchParser.newParser()
-    this.feedTransport =
-      OPDS12FeedHTTPTransport(
-        LSHTTPClient(
-          context = this.context,
-          configuration = LSHTTPClientConfiguration(
-            applicationName = "palace",
-            applicationVersion = "1.0.0",
-            networkAccess = LSHTTPNetworkAccess,
-          ),
-          problemReportParsers = LSHTTPProblemReportParsers(),
-          interceptors = listOf(),
-        )
-      )
-
     this.feedLoader =
-      OPDS12FeedLoader.create(
+      FeedLoader.create(
         bookFormatSupport = BookFormatSupport.create(
           BookFormatSupportParameters(
             supportsPDF = true,
@@ -109,9 +93,18 @@ class OPDSClientCompositeFacetTest {
         ),
         contentResolver = MockContentResolver(),
         exec = this.exec,
-        parser = this.parser,
-        searchParser = this.searchParser,
-        transport = this.feedTransport,
+        http = LSHTTPClient(
+          context = this.context,
+          configuration = LSHTTPClientConfiguration(
+            applicationName = "palace",
+            applicationVersion = "1.0.0",
+            networkAccess = LSHTTPNetworkAccess,
+          ),
+          problemReportParsers = LSHTTPProblemReportParsers(),
+          interceptors = listOf(),
+        ),
+        opds12Parser = this.parser,
+        opds12SearchParser = this.searchParser,
       )
 
     this.client =

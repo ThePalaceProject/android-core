@@ -36,8 +36,7 @@ import org.nypl.simplified.feeds.api.FeedBooksSelection
 import org.nypl.simplified.feeds.api.FeedFacet
 import org.nypl.simplified.feeds.api.FeedFacetPseudoSorting
 import org.nypl.simplified.feeds.api.FeedFacetPseudoTitleProviderType
-import org.nypl.simplified.feeds.opds12.OPDS12FeedHTTPTransport
-import org.nypl.simplified.feeds.opds12.OPDS12FeedLoader
+import org.nypl.simplified.feeds.FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.files.DirectoryUtilities
 import org.nypl.simplified.notifications.NotificationTokenHTTPCalls
@@ -137,17 +136,14 @@ class ProfilesControllerTest {
   ): ProfilesControllerType {
     val parser =
       OPDSFeedParser.newParser(OPDSAcquisitionFeedEntryParser.newParser())
-    val transport =
-      OPDS12FeedHTTPTransport(this.lsHTTP)
-
     val feedLoader =
-      OPDS12FeedLoader.create(
+      FeedLoader.create(
         bookFormatSupport = this.bookFormatSupport,
         contentResolver = this.contentResolver,
         exec = this.executorFeeds,
-        parser = parser,
-        searchParser = OPDSSearchParser.newParser(),
-        transport = transport
+        http = this.lsHTTP,
+        opds12Parser = parser,
+        opds12SearchParser = OPDSSearchParser.newParser(),
       )
 
     val services = MutableServiceDirectory()

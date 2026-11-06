@@ -49,8 +49,7 @@ import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.controller.BookRevokeTask
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.content.api.ContentResolverType
-import org.nypl.simplified.feeds.opds12.OPDS12FeedHTTPTransport
-import org.nypl.simplified.feeds.opds12.OPDS12FeedLoader
+import org.nypl.simplified.feeds.FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.files.DirectoryUtilities
 import org.nypl.simplified.links.Link
@@ -187,16 +186,13 @@ class BookRevokeTaskAdobeDRMTest {
       OPDSFeedParser.newParser(entryParser)
     val searchParser =
       OPDSSearchParser.newParser()
-    val transport =
-      OPDS12FeedHTTPTransport(this.http)
-
-    return OPDS12FeedLoader.create(
+    return FeedLoader.create(
       bookFormatSupport = this.bookFormatSupport,
       contentResolver = this.contentResolver,
       exec = executorFeeds,
-      parser = parser,
-      searchParser = searchParser,
-      transport = transport
+      http = this.http,
+      opds12Parser = parser,
+      opds12SearchParser = searchParser,
     )
   }
 

@@ -46,9 +46,8 @@ import org.nypl.simplified.feeds.api.FeedData
 import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.feeds.api.FeedEntryCorrupt
 import org.nypl.simplified.feeds.api.FeedEntry
-import org.nypl.simplified.feeds.opds12.OPDS12FeedHTTPTransport
+import org.nypl.simplified.feeds.FeedLoader
 import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
-import org.nypl.simplified.feeds.opds12.OPDS12FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderResult
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedAuthentication
 import org.nypl.simplified.feeds.api.FeedLoaderType
@@ -177,17 +176,14 @@ class BookRevokeTaskTest {
       OPDSFeedParser.newParser(entryParser)
     val searchParser =
       OPDSSearchParser.newParser()
-    val transport =
-      OPDS12FeedHTTPTransport(this.http)
-
     val feedLoader =
-      OPDS12FeedLoader.create(
+      FeedLoader.create(
         bookFormatSupport = this.bookFormatSupport,
         contentResolver = this.contentResolver,
         exec = executorFeeds,
-        parser = parser,
-        searchParser = searchParser,
-        transport = transport
+        http = this.http,
+        opds12Parser = parser,
+        opds12SearchParser = searchParser,
       )
 
     feedLoader.showOnlySupportedBooks = false

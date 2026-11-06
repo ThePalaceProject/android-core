@@ -10,7 +10,6 @@ dependencies {
     implementation(project(":palace-accounts-api"))
     implementation(project(":palace-books-api"))
     implementation(project(":palace-books-formats-api"))
-    implementation(project(":palace-content-api"))
     implementation(project(":palace-links"))
 
     implementation(libs.irradia.mime.api)
