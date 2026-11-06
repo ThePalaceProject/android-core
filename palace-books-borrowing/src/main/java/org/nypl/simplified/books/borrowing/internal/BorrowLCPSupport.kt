@@ -14,7 +14,9 @@ import org.nypl.simplified.books.borrowing.BorrowContextType
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.lcpNotSupported
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskCancelled
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskFailed
-import org.nypl.simplified.opds.core.OPDSAcquisitionPaths
+import org.nypl.simplified.feeds.api.FeedAcquisitionPaths
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
 import org.nypl.simplified.opds.core.OPDSFeedParserType
 import org.readium.r2.shared.util.Error
 import org.readium.r2.shared.util.Try
@@ -215,7 +217,8 @@ object BorrowLCPSupport {
       throw BorrowSubtaskFailed()
     }
 
-    val linearized = OPDSAcquisitionPaths.linearize(entryFound)
+    val feedEntry: FeedEntryBook = OPDS12FeedConverter.convertEntry(context.account.id, entryFound)
+    val linearized = FeedAcquisitionPaths.linearize(feedEntry.acquisitions)
     for (path in linearized) {
       for (element in path.elements) {
         val passphrase = element.properties["lcp:hashed_passphrase"]

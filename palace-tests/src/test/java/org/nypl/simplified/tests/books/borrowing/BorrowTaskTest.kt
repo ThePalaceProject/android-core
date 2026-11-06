@@ -262,7 +262,7 @@ class BorrowTaskTest {
       )
 
     this.bookID =
-      BookIDs.newFromOPDSEntry(this.opdsOpenEPUBFeedEntry)
+      BookIDs.newFromText(this.opdsOpenEPUBFeedEntry.id)
 
     this.androidContext =
       Mockito.mock(Application::class.java)
@@ -420,7 +420,7 @@ class BorrowTaskTest {
   fun testNoAvailableBorrowAcquisitions() {
     val feedEntry = BorrowTestFeeds.opdsOpenAccessFeedEntryWithNoBorrowLink()
     this.bookID =
-      BookIDs.newFromOPDSEntry(feedEntry)
+      BookIDs.newFromText(feedEntry.id)
 
     assertEquals(0, feedEntry.acquisitions.size)
 
@@ -453,7 +453,7 @@ class BorrowTaskTest {
       genericEPUBFiles.fullType
     )
     this.bookID =
-      BookIDs.newFromOPDSEntry(feedEntry)
+      BookIDs.newFromText(feedEntry.id)
 
     assertEquals(2, feedEntry.acquisitions.size)
 

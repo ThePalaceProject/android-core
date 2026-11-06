@@ -45,7 +45,6 @@ import org.nypl.simplified.books.book_registry.BookPreviewStatus
 import org.nypl.simplified.books.controller.api.BooksPreviewControllerType
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedEntryBook
-import org.nypl.simplified.feeds.opds12.toOPDSAcquisitionFeedEntry
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
@@ -193,7 +192,7 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
 
     try {
       val formatDefinition =
-        BookFormats.inferFormat(this.feedEntry.toOPDSAcquisitionFeedEntry())
+        BookFormats.inferFormat(this.feedEntry)
 
       this.bookFormat =
         when (formatDefinition) {

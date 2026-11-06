@@ -55,7 +55,7 @@ import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFile
 import org.nypl.simplified.books.formats.api.StandardFormatNames.opdsAcquisitionFeedEntry
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
-import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
+import org.nypl.simplified.feeds.api.FeedAcquisitionPathElement
 import org.nypl.simplified.opds.core.OPDSAvailabilityLoanable
 import org.nypl.simplified.patron.api.PatronAuthorization
 import org.nypl.simplified.profiles.api.ProfileType
@@ -205,7 +205,7 @@ class BorrowLoanCreateTest {
       )
 
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
+      FeedAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
 
     this.webServer = MockWebServer()
     this.webServer.start(20000)
@@ -418,7 +418,7 @@ class BorrowLoanCreateTest {
     this.context.currentURIField =
       Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
+      FeedAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
 
     val response =
       MockResponse()
@@ -455,9 +455,9 @@ class BorrowLoanCreateTest {
     this.context.currentURIField =
       Link.LinkBasic(this.webServer.url("/book.epub").toUri(), type = genericEPUBFiles)
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
+      FeedAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
     this.context.currentRemainingOPDSPathElements =
-      listOf(OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap()))
+      listOf(FeedAcquisitionPathElement(genericEPUBFiles, null, emptyMap()))
 
     val feedText = """
 <entry xmlns="http://www.w3.org/2005/Atom" xmlns:opds="http://opds-spec.org/2010/catalog">
@@ -514,9 +514,9 @@ class BorrowLoanCreateTest {
     this.context.currentURIField =
       Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
+      FeedAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
     this.context.currentRemainingOPDSPathElements =
-      listOf(OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap()))
+      listOf(FeedAcquisitionPathElement(genericEPUBFiles, null, emptyMap()))
 
     val feedText = """
 <entry xmlns="http://www.w3.org/2005/Atom" xmlns:opds="http://opds-spec.org/2010/catalog">
@@ -570,9 +570,9 @@ class BorrowLoanCreateTest {
     this.context.currentURIField =
       Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
+      FeedAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
     this.context.currentRemainingOPDSPathElements =
-      listOf(OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap()))
+      listOf(FeedAcquisitionPathElement(genericEPUBFiles, null, emptyMap()))
 
     val feedText = """
 <entry xmlns="http://www.w3.org/2005/Atom" xmlns:opds="http://opds-spec.org/2010/catalog">
@@ -624,9 +624,9 @@ class BorrowLoanCreateTest {
     this.context.currentURIField =
       Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
+      FeedAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
     this.context.currentRemainingOPDSPathElements =
-      listOf(OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap()))
+      listOf(FeedAcquisitionPathElement(genericEPUBFiles, null, emptyMap()))
 
     val feedText = """
 <entry xmlns="http://www.w3.org/2005/Atom" xmlns:opds="http://opds-spec.org/2010/catalog">
@@ -677,9 +677,9 @@ class BorrowLoanCreateTest {
     this.context.currentURIField =
       Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
+      FeedAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
     this.context.currentRemainingOPDSPathElements =
-      listOf(OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap()))
+      listOf(FeedAcquisitionPathElement(genericEPUBFiles, null, emptyMap()))
 
     val feedText = """
 <entry xmlns="http://www.w3.org/2005/Atom" xmlns:opds="http://opds-spec.org/2010/catalog">
@@ -730,9 +730,9 @@ class BorrowLoanCreateTest {
     this.context.currentURIField =
       Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
+      FeedAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
     this.context.currentRemainingOPDSPathElements =
-      listOf(OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap()))
+      listOf(FeedAcquisitionPathElement(genericEPUBFiles, null, emptyMap()))
 
     val response =
       MockResponse()

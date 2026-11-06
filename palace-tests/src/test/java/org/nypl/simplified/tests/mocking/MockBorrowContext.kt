@@ -20,8 +20,8 @@ import org.nypl.simplified.books.borrowing.internal.BorrowAudiobookAuthorization
 import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.feeds.api.FeedEntryBook
-import org.nypl.simplified.opds.core.OPDSAcquisitionPath
-import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
+import org.nypl.simplified.feeds.api.FeedAcquisitionPath
+import org.nypl.simplified.feeds.api.FeedAcquisitionPathElement
 import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import org.nypl.simplified.tests.TestDirectories
@@ -65,8 +65,8 @@ class MockBorrowContext(
 
   override var adobeExecutor: AdobeAdeptExecutorType? = null
   override var boundlessService: MockBoundless? = MockBoundless()
-  override lateinit var currentAcquisitionPathElement: OPDSAcquisitionPathElement
-  override lateinit var opdsAcquisitionPath: OPDSAcquisitionPath
+  override lateinit var currentAcquisitionPathElement: FeedAcquisitionPathElement
+  override lateinit var opdsAcquisitionPath: FeedAcquisitionPath
   override var bookCurrent: Book = bookInitial
 
   override fun bookPublishStatus(status: BookStatus) {
@@ -184,7 +184,7 @@ class MockBorrowContext(
     )
   }
 
-  var currentRemainingOPDSPathElements: List<OPDSAcquisitionPathElement> =
+  var currentRemainingOPDSPathElements: List<FeedAcquisitionPathElement> =
     listOf()
 
   var currentURIField: Link? =
@@ -231,7 +231,7 @@ class MockBorrowContext(
     throw IOException("Could not create a temporary file within 100 attempts!")
   }
 
-  override fun opdsAcquisitionPathRemaining(): List<OPDSAcquisitionPathElement> {
+  override fun opdsAcquisitionPathRemaining(): List<FeedAcquisitionPathElement> {
     return this.currentRemainingOPDSPathElements
   }
 }

@@ -5,6 +5,8 @@ import io.reactivex.disposables.Disposable
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.joda.time.Instant
+import org.nypl.simplified.accounts.api.AccountID
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -270,7 +272,7 @@ class BookPreviewTaskTest {
         httpClient = this.httpClient,
         temporaryDirectory = this.temporaryDirectory
       ),
-      feedEntry = entry,
+      feedEntry = OPDS12FeedConverter.convertEntry(AccountID.generate(), entry),
       format = format
     )
   }

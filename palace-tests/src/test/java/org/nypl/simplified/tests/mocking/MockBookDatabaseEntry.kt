@@ -11,11 +11,11 @@ import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFile
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericJsonAudioBook
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericPDFFiles
 import org.nypl.simplified.books.formats.api.StandardFormatNames.lcpAudioBooks
+import org.nypl.simplified.books.api.FeedBookIDConversions
 import org.nypl.simplified.feeds.api.FeedEntryBook
-import org.nypl.simplified.feeds.opds12.toOPDSAcquisitionFeedEntry
 import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
-import org.nypl.simplified.opds.core.OPDSAcquisitionPaths
+import org.nypl.simplified.feeds.api.FeedAcquisitionPaths
 import org.slf4j.LoggerFactory
 import java.io.File
 
@@ -28,7 +28,7 @@ class MockBookDatabaseEntry(
     LoggerFactory.getLogger(MockBookDatabaseEntry::class.java)
 
   val formatHandlesField: MutableList<BookDatabaseEntryFormatHandle> =
-    this.formatHandlesOf(this.bookInitial.entry.toOPDSAcquisitionFeedEntry()).toMutableList()
+    this.formatHandlesOf(this.bookInitial.entry).toMutableList()
 
   var entryWrites = 0
   var entryField: FeedEntryBook = this.bookInitial.entry
@@ -65,13 +65,14 @@ class MockBookDatabaseEntry(
   override fun writeOPDSEntry(opdsEntry: OPDSAcquisitionFeedEntry) {
     this.logger.debug("[{}]: writeOPDSEntry", this.bookInitial.id)
 
-    this.addNecessaryHandles(opdsEntry)
-    this.entryField = OPDS12FeedConverter.convertEntry(this.bookInitial.account, opdsEntry)
+    val feedEntry = OPDS12FeedConverter.convertEntry(this.bookInitial.account, opdsEntry)
+    this.addNecessaryHandles(feedEntry)
+    this.entryField = feedEntry
     this.entryWrites++
   }
 
-  private fun addNecessaryHandles(opdsEntry: OPDSAcquisitionFeedEntry) {
-    val handles = this.formatHandlesOf(opdsEntry)
+  private fun addNecessaryHandles(entry: FeedEntryBook) {
+    val handles = this.formatHandlesOf(entry)
     for (handle in handles) {
       if (this.formatHandlesField.find { it.javaClass == handle.javaClass } == null) {
         this.logger.debug("adding handle {}", handle.javaClass.name)
@@ -81,10 +82,10 @@ class MockBookDatabaseEntry(
   }
 
   private fun formatHandlesOf(
-    entry: OPDSAcquisitionFeedEntry
+    entry: FeedEntryBook
   ): List<BookDatabaseEntryFormatHandle> {
-    val bookId = BookIDs.newFromOPDSEntry(entry)
-    val paths = OPDSAcquisitionPaths.linearize(entry)
+    val bookId = FeedBookIDConversions.toBookID(entry.bookID)
+    val paths = FeedAcquisitionPaths.linearize(entry.acquisitions)
     val finalTypes = paths.map { it.asMIMETypes().last() }
     val formats = mutableListOf<BookDatabaseEntryFormatHandle>()
     for (finalType in finalTypes) {

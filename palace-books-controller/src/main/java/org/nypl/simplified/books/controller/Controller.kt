@@ -43,7 +43,6 @@ import org.nypl.simplified.books.controller.api.BooksPreviewControllerType
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.books.preview.BookPreviewRequirements
 import org.nypl.simplified.books.preview.BookPreviewTask
-import org.nypl.simplified.feeds.opds12.toOPDSAcquisitionFeedEntry
 import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedLoaderType
@@ -54,7 +53,6 @@ import org.nypl.simplified.futures.FluentFutureExtensions.flatMap
 import org.nypl.simplified.futures.FluentFutureExtensions.map
 import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
 import org.nypl.simplified.opds.auth_document.api.AuthenticationDocumentParsersType
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSFeedParserType
 import org.nypl.simplified.patron.api.PatronUserProfileParsersType
 import org.nypl.simplified.profiles.api.ProfileDescription
@@ -546,8 +544,8 @@ class Controller private constructor(
           BookPreviewTask(
             bookPreviewRegistry = bookPreviewRegistry,
             bookPreviewRequirements = requirements,
-            feedEntry = entry.toOPDSAcquisitionFeedEntry(),
-            format = BookFormats.inferFormat(entry.toOPDSAcquisitionFeedEntry())
+            feedEntry = entry,
+            format = BookFormats.inferFormat(entry)
           )
         bookPreviewTask.execute()
       }

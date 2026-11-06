@@ -42,8 +42,10 @@ import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisition
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
-import org.nypl.simplified.opds.core.OPDSAcquisitionPath
-import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
+import org.nypl.simplified.feeds.api.FeedAcquisitionPath
+import org.nypl.simplified.feeds.api.FeedAcquisitionPathElement
+import org.nypl.simplified.feeds.api.FeedAcquisition
+import org.nypl.simplified.feeds.api.FeedAcquisitionRelation
 import org.nypl.simplified.opds.core.OPDSFeedParser
 import org.nypl.simplified.opds.core.OPDSFeedParserType
 import org.nypl.simplified.patron.api.PatronAuthorization
@@ -69,9 +71,9 @@ import java.util.concurrent.TimeUnit
 
 class BorrowBoundlessEpubTest {
 
-  private val fakeAcquisition: OPDSAcquisition =
-    OPDSAcquisition(
-      relation = OPDSAcquisition.Relation.ACQUISITION_BORROW,
+  private val fakeAcquisition: FeedAcquisition =
+    FeedAcquisition(
+      relation = FeedAcquisitionRelation.ACQUISITION_BORROW,
       uri = Link.LinkBasic(URI.create("http://www.example.com")),
       type = genericEPUBFiles,
       indirectAcquisitions = listOf(),
@@ -168,12 +170,12 @@ class BorrowBoundlessEpubTest {
 
   private fun createContext(
     feedEntry: OPDSAcquisitionFeedEntry,
-    acquisitionPath: OPDSAcquisitionPath,
+    acquisitionPath: FeedAcquisitionPath,
     @TempDir bookDirectory: Path,
     downloadedFile: File? = null
   ): MockBorrowContext {
     val book = Book(
-      id = BookIDs.newFromOPDSEntry(feedEntry),
+      id = BookIDs.newFromText(feedEntry.id),
       account = this.account.id,
       cover = null,
       thumbnail = null,
@@ -260,15 +262,15 @@ class BorrowBoundlessEpubTest {
 
     val licenseTargetPath = "/library/works/38859/fulfill/13"
 
-    val acquisitionPath = OPDSAcquisitionPath(
+    val acquisitionPath = FeedAcquisitionPath(
       source = this.fakeAcquisition,
       elements = listOf(
-        OPDSAcquisitionPathElement(
+        FeedAcquisitionPathElement(
           mimeType = boundlessLicenseFiles,
           target = Link.LinkTemplated(this.webServer.url(licenseTargetPath).toString()),
           properties = mapOf()
         ),
-        OPDSAcquisitionPathElement(
+        FeedAcquisitionPathElement(
           mimeType = genericEPUBFiles,
           target = null,
           properties = mapOf()
@@ -321,15 +323,15 @@ class BorrowBoundlessEpubTest {
 
     val licenseTargetPath = "/library/works/38859/fulfill/13"
 
-    val acquisitionPath = OPDSAcquisitionPath(
+    val acquisitionPath = FeedAcquisitionPath(
       source = this.fakeAcquisition,
       elements = listOf(
-        OPDSAcquisitionPathElement(
+        FeedAcquisitionPathElement(
           mimeType = boundlessLicenseFiles,
           target = Link.LinkTemplated(this.webServer.url(licenseTargetPath).toString()),
           properties = mapOf()
         ),
-        OPDSAcquisitionPathElement(
+        FeedAcquisitionPathElement(
           mimeType = genericEPUBFiles,
           target = null,
           properties = mapOf()
@@ -372,15 +374,15 @@ class BorrowBoundlessEpubTest {
 
     val licenseTargetPath = "/library/works/38859/fulfill/13"
 
-    val acquisitionPath = OPDSAcquisitionPath(
+    val acquisitionPath = FeedAcquisitionPath(
       source = this.fakeAcquisition,
       elements = listOf(
-        OPDSAcquisitionPathElement(
+        FeedAcquisitionPathElement(
           mimeType = boundlessLicenseFiles,
           target = Link.LinkBasic(this.webServer.url(licenseTargetPath).toUri()),
           properties = mapOf()
         ),
-        OPDSAcquisitionPathElement(
+        FeedAcquisitionPathElement(
           mimeType = genericEPUBFiles,
           target = null,
           properties = mapOf()

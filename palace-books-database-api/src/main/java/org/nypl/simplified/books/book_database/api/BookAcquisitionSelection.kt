@@ -1,12 +1,7 @@
 package org.nypl.simplified.books.book_database.api
 
-import org.nypl.simplified.opds.core.OPDSAcquisition
-import org.nypl.simplified.opds.core.OPDSAcquisition.Relation.ACQUISITION_BORROW
-import org.nypl.simplified.opds.core.OPDSAcquisition.Relation.ACQUISITION_BUY
-import org.nypl.simplified.opds.core.OPDSAcquisition.Relation.ACQUISITION_GENERIC
-import org.nypl.simplified.opds.core.OPDSAcquisition.Relation.ACQUISITION_OPEN_ACCESS
-import org.nypl.simplified.opds.core.OPDSAcquisition.Relation.ACQUISITION_SAMPLE
-import org.nypl.simplified.opds.core.OPDSAcquisition.Relation.ACQUISITION_SUBSCRIBE
+import org.nypl.simplified.feeds.api.FeedAcquisition
+import org.nypl.simplified.feeds.api.FeedAcquisitionRelation
 
 /**
  * Functions to pick an acquisition based on the supported formats.
@@ -21,8 +16,8 @@ object BookAcquisitionSelection {
    * @return A preferred acquisition, or nothing if none of the acquisitions were suitable
    */
 
-  fun preferredAcquisition(acquisitions: List<OPDSAcquisition>): OPDSAcquisition? {
-    val onlySupportedRelations: List<OPDSAcquisition> =
+  fun preferredAcquisition(acquisitions: List<FeedAcquisition>): FeedAcquisition? {
+    val onlySupportedRelations: List<FeedAcquisition> =
       acquisitions.filter { acquisition -> relationIsSupported(acquisition) }
 
     for (acquisition in onlySupportedRelations) {
@@ -40,9 +35,13 @@ object BookAcquisitionSelection {
     return null
   }
 
-  private fun relationIsSupported(acquisition: OPDSAcquisition): Boolean =
+  private fun relationIsSupported(acquisition: FeedAcquisition): Boolean =
     when (acquisition.relation) {
-      ACQUISITION_BORROW, ACQUISITION_GENERIC, ACQUISITION_OPEN_ACCESS -> true
-      ACQUISITION_BUY, ACQUISITION_SAMPLE, ACQUISITION_SUBSCRIBE -> false
+      FeedAcquisitionRelation.ACQUISITION_BORROW,
+      FeedAcquisitionRelation.ACQUISITION_GENERIC,
+      FeedAcquisitionRelation.ACQUISITION_OPEN_ACCESS -> true
+      FeedAcquisitionRelation.ACQUISITION_BUY,
+      FeedAcquisitionRelation.ACQUISITION_SAMPLE,
+      FeedAcquisitionRelation.ACQUISITION_SUBSCRIBE -> false
     }
 }

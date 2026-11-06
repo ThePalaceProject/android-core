@@ -56,8 +56,10 @@ import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisition
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
-import org.nypl.simplified.opds.core.OPDSAcquisitionPath
-import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
+import org.nypl.simplified.feeds.api.FeedAcquisitionPath
+import org.nypl.simplified.feeds.api.FeedAcquisitionPathElement
+import org.nypl.simplified.feeds.api.FeedAcquisition
+import org.nypl.simplified.feeds.api.FeedAcquisitionRelation
 import org.nypl.simplified.opds.core.OPDSFeedParser
 import org.nypl.simplified.opds.core.OPDSFeedParserType
 import org.nypl.simplified.patron.api.PatronAuthorization
@@ -206,7 +208,7 @@ class BorrowBookRefreshTokenTest {
         StandardFormatNames.genericEPUBFiles.fullType
       )
     this.bookID =
-      BookIDs.newFromOPDSEntry(initialFeedEntry)
+      BookIDs.newFromText(initialFeedEntry.id)
 
     val bookInitial =
       Book(
@@ -295,23 +297,23 @@ class BorrowBookRefreshTokenTest {
 
     this.context.adobeExecutor = adobeExecutor
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(StandardFormatNames.adobeACSMFiles, null, emptyMap())
+      FeedAcquisitionPathElement(StandardFormatNames.adobeACSMFiles, null, emptyMap())
     this.context.opdsAcquisitionPath =
-      OPDSAcquisitionPath(
-        OPDSAcquisition(
-          OPDSAcquisition.Relation.ACQUISITION_GENERIC,
+      FeedAcquisitionPath(
+        FeedAcquisition(
+          FeedAcquisitionRelation.ACQUISITION_GENERIC,
           Link.LinkBasic(this.webServer.url("/book.acsm").toUri()),
           StandardFormatNames.adobeACSMFiles,
           listOf(),
           emptyMap()
         ),
         listOf(
-          OPDSAcquisitionPathElement(
+          FeedAcquisitionPathElement(
             StandardFormatNames.adobeACSMFiles,
             Link.LinkBasic(this.webServer.url("/book.acsm").toUri()),
             emptyMap()
           ),
-          OPDSAcquisitionPathElement(
+          FeedAcquisitionPathElement(
             StandardFormatNames.genericEPUBFiles,
             Link.LinkBasic(this.webServer.url("/book.epub").toUri()),
             emptyMap()
@@ -389,15 +391,15 @@ class BorrowBookRefreshTokenTest {
 
     val licenseTargetPath = "/library/works/38859/fulfill/13"
 
-    val acquisitionPath = OPDSAcquisitionPath(
-      source = Mockito.mock(OPDSAcquisition::class.java),
+    val acquisitionPath = FeedAcquisitionPath(
+      source = Mockito.mock(FeedAcquisition::class.java),
       elements = listOf(
-        OPDSAcquisitionPathElement(
+        FeedAcquisitionPathElement(
           mimeType = StandardFormatNames.lcpLicenseFiles,
           target = Link.LinkBasic(this.webServer.url(licenseTargetPath).toUri()),
           properties = mapOf()
         ),
-        OPDSAcquisitionPathElement(
+        FeedAcquisitionPathElement(
           mimeType = StandardFormatNames.genericEPUBFiles,
           target = null,
           properties = mapOf()
@@ -406,7 +408,7 @@ class BorrowBookRefreshTokenTest {
     )
 
     val book = Book(
-      id = BookIDs.newFromOPDSEntry(feedEntry),
+      id = BookIDs.newFromText(feedEntry.id),
       account = this.accountID,
       cover = null,
       thumbnail = null,
@@ -562,9 +564,9 @@ class BorrowBookRefreshTokenTest {
     this.context.currentURIField =
       Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(StandardFormatNames.opdsAcquisitionFeedEntry, null, emptyMap())
+      FeedAcquisitionPathElement(StandardFormatNames.opdsAcquisitionFeedEntry, null, emptyMap())
     this.context.currentRemainingOPDSPathElements =
-      listOf(OPDSAcquisitionPathElement(StandardFormatNames.genericEPUBFiles, null, emptyMap()))
+      listOf(FeedAcquisitionPathElement(StandardFormatNames.genericEPUBFiles, null, emptyMap()))
 
     val feedText = """
 <entry xmlns="http://www.w3.org/2005/Atom" xmlns:opds="http://opds-spec.org/2010/catalog">
@@ -601,7 +603,7 @@ class BorrowBookRefreshTokenTest {
     this.context.currentURIField =
       Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(StandardFormatNames.genericEPUBFiles, null, emptyMap())
+      FeedAcquisitionPathElement(StandardFormatNames.genericEPUBFiles, null, emptyMap())
 
     val response0 =
       MockResponse()

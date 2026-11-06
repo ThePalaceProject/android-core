@@ -4,8 +4,8 @@ import one.irradia.mime.api.MIMEType
 import org.joda.time.Instant
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.nypl.simplified.books.book_database.api.BookFormats
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
-import org.nypl.simplified.opds.core.OPDSPreviewAcquisition
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.api.FeedPreviewAcquisition
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import java.io.File
 import java.io.IOException
@@ -13,14 +13,14 @@ import java.util.UUID
 
 data class BookPreviewParameters(
   val clock: () -> Instant,
-  val feedEntry: OPDSAcquisitionFeedEntry,
+  val feedEntry: FeedEntryBook,
   val format: BookFormats.BookFormatDefinition,
   val httpClient: LSHTTPClientType,
   val mimeType: MIMEType,
   val onPreviewDownloadFailed: () -> Unit,
   val onPreviewDownloadUpdated: (String, Long?, Long?, Long?) -> Unit,
   val onPreviewFileReady: (File) -> Unit,
-  val previewAcquisition: OPDSPreviewAcquisition,
+  val previewAcquisition: FeedPreviewAcquisition,
   val taskRecorder: TaskRecorderType,
   val temporaryDirectory: File
 ) {

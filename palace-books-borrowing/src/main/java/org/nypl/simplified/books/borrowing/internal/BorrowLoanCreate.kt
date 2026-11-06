@@ -4,7 +4,8 @@ import com.io7m.junreachable.UnreachableCodeException
 import one.irradia.mime.api.MIMECompatibility
 import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
-import org.nypl.simplified.feeds.opds12.toOPDSAcquisitionFeedEntry
+import org.nypl.simplified.feeds.api.FeedAcquisitionPathElement
+import org.nypl.simplified.feeds.api.FeedAcquisitionPaths
 import one.irradia.mime.api.MIMECompatibility.applicationOctetStream
 import one.irradia.mime.api.MIMEType
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType.Method.Put
@@ -34,8 +35,7 @@ import org.nypl.simplified.books.formats.api.StandardFormatNames.allOPDSFeeds
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
-import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
-import org.nypl.simplified.opds.core.OPDSAcquisitionPaths
+
 import org.nypl.simplified.feeds.api.FeedAvailabilityHeld
 import org.nypl.simplified.feeds.api.FeedAvailabilityHeldReady
 import org.nypl.simplified.feeds.api.FeedAvailabilityHoldable
@@ -339,7 +339,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
     context.taskRecorder.beginNewStep("Finding the next URI in the OPDS feed entry...")
 
     val remaining = context.opdsAcquisitionPathRemaining()
-    val nextPaths = OPDSAcquisitionPaths.linearize(entry.toOPDSAcquisitionFeedEntry())
+    val nextPaths = FeedAcquisitionPaths.linearize(entry.acquisitions)
     for (nextPath in nextPaths) {
       val nextElements = nextPath.elements
       if (nextElements.size == remaining.size) {
@@ -364,6 +364,6 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
     return context.chooseNewAcquisitionPath(entry)
   }
 
-  private fun typesAreCompatible(pair: Pair<OPDSAcquisitionPathElement, OPDSAcquisitionPathElement>) =
+  private fun typesAreCompatible(pair: Pair<FeedAcquisitionPathElement, FeedAcquisitionPathElement>) =
     MIMECompatibility.isCompatibleStrictWithoutAttributes(pair.first.mimeType, pair.second.mimeType)
 }

@@ -151,7 +151,7 @@ class BookmarkRefreshTokenTest {
         StandardFormatNames.genericEPUBFiles.fullType
       )
     this.bookID =
-      BookIDs.newFromOPDSEntry(initialFeedEntry)
+      BookIDs.newFromText(initialFeedEntry.id)
 
     val bookInitial =
       Book(

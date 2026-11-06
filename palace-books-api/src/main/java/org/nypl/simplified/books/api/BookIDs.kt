@@ -1,6 +1,6 @@
 package org.nypl.simplified.books.api
 
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
@@ -41,5 +41,5 @@ object BookIDs {
    * @return A new book ID
    */
   @JvmStatic
-  fun newFromOPDSEntry(e: OPDSAcquisitionFeedEntry): BookID = newFromText(e.id)
+  fun newFromFeedEntry(e: FeedEntryBook): BookID = newFromText(e.id)
 }
