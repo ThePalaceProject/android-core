@@ -63,6 +63,7 @@ dependencies {
     implementation(project(":palace-documents"))
     implementation(project(":palace-feeds-api"))
     implementation(project(":palace-feeds-opds12"))
+    implementation(project(":palace-feeds-opds20"))
     implementation(project(":palace-files"))
     implementation(project(":palace-futures"))
     implementation(project(":palace-images"))

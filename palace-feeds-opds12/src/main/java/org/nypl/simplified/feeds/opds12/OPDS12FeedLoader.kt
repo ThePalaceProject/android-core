@@ -37,11 +37,18 @@ class OPDS12FeedLoader private constructor(
   private val log = LoggerFactory.getLogger(OPDS12FeedLoader::class.java)
 
   private val filterFlag = AtomicBoolean(true)
+  private val wantsOpds20Flag = AtomicBoolean(false)
 
   override var showOnlySupportedBooks: Boolean
     get() = this.filterFlag.get()
     set(value) {
       this.filterFlag.set(value)
+    }
+
+  override var wantsOpds20: Boolean
+    get() = this.wantsOpds20Flag.get()
+    set(value) {
+      this.wantsOpds20Flag.set(value)
     }
 
   override fun fetchURI(

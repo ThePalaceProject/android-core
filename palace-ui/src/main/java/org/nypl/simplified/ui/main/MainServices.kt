@@ -77,8 +77,7 @@ import org.nypl.simplified.boot.api.BootFailureTesting
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.content.api.ContentResolverSane
 import org.nypl.simplified.content.api.ContentResolverType
-import org.nypl.simplified.feeds.opds12.OPDS12FeedHTTPTransport
-import org.nypl.simplified.feeds.opds12.OPDS12FeedLoader
+import org.nypl.simplified.feeds.opds20.FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.files.DirectoryUtilities
 import org.nypl.simplified.notifications.NotificationTokenHTTPCalls
@@ -375,16 +374,14 @@ internal object MainServices {
       NamedThreadPools.namedThreadPool(1, "catalog-feed", 19)
     val feedSearchParser =
       OPDSSearchParser.newParser()
-    val feedTransport =
-      OPDS12FeedHTTPTransport(http)
 
-    return OPDS12FeedLoader.create(
+    return FeedLoader.create(
       bookFormatSupport = bookFormatSupport,
       contentResolver = contentResolver,
       exec = execCatalogFeeds,
-      parser = opdsFeedParser,
-      searchParser = feedSearchParser,
-      transport = feedTransport
+      http = http,
+      opds12Parser = opdsFeedParser,
+      opds12SearchParser = feedSearchParser,
     )
   }
 

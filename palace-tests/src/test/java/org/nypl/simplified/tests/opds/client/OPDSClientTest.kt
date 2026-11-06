@@ -307,7 +307,7 @@ class OPDSClientTest {
     assertEquals(9, this.client.entriesGrouped.get().size)
 
     assertEquals(
-      listOf("Initial", "Loading", "LoadedFeedDataWithGroups"),
+      listOf("Initial", "Loading", "LoadedFeedWithGroups"),
       this.stateChanges
     )
   }
@@ -511,13 +511,13 @@ class OPDSClientTest {
       listOf(
         "Initial",
         "Loading",
-        "LoadedFeedDataWithGroups",
+        "LoadedFeedWithGroups",
         "Loading",
         "LoadedFeedWithoutGroups",
         "Loading",
         "LoadedFeedEntry",
         "LoadedFeedWithoutGroups",
-        "LoadedFeedDataWithGroups"
+        "LoadedFeedWithGroups"
       ),
       this.stateChanges
     )
