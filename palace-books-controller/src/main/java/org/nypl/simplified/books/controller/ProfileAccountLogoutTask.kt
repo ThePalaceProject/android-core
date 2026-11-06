@@ -26,7 +26,6 @@ import org.nypl.simplified.adobe.extensions.AdobeDRMExtensions
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookWithStatus
-import org.nypl.simplified.feeds.opds12.toOPDSAcquisitionFeedEntry
 import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedLoaderResult
@@ -37,7 +36,6 @@ import org.nypl.simplified.feeds.api.FeedData
 import org.nypl.simplified.feeds.api.FeedDataWithGroups
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.patron.PatronUserProfiles
 import org.nypl.simplified.patron.api.PatronDRMAdobe
 import org.nypl.simplified.patron.api.PatronUserProfileParsersType
@@ -485,7 +483,7 @@ class ProfileAccountLogoutTask(
           )
         } else {
           val newFeedEntry = this.fetchOPDSEntry(alternate)
-          entry.writeOPDSEntry(newFeedEntry.toOPDSAcquisitionFeedEntry())
+          entry.writeOPDSEntry(newFeedEntry)
         }
       } catch (e: StepFailedHandled) {
         this.error("step failed with exception", e.cause)

@@ -9,7 +9,6 @@ import org.nypl.simplified.books.book_database.api.BookFormats.BookFormatDefinit
 import org.nypl.simplified.books.book_database.api.BookFormats.BookFormatDefinition.BOOK_FORMAT_PDF
 import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.books.book_database.api.BookFormats
-import org.nypl.simplified.feeds.opds12.toOPDSAcquisitionFeedEntry
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.thepalaceproject.palace.images.BookCoverBadge
 import org.thepalaceproject.palace.images.BookCoverBadgeLookupType
@@ -23,7 +22,7 @@ class CatalogCoverBadgeImages private constructor(
   private val audioBookIcon: Bitmap
 ) : BookCoverBadgeLookupType {
   override fun badgeForEntry(entry: FeedEntryBook): BookCoverBadge? =
-    when (BookFormats.inferFormat(entry.toOPDSAcquisitionFeedEntry())) {
+    when (BookFormats.inferFormat(entry)) {
       BOOK_FORMAT_EPUB -> {
         null
       }

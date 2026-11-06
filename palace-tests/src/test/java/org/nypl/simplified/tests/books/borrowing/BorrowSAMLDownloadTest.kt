@@ -431,7 +431,7 @@ class BorrowSAMLDownloadTest {
       FeedAcquisitionPathElement(genericPDFFiles, null, emptyMap())
 
     this.bookDatabaseEntry.writeOPDSEntry(
-      BorrowTestFeeds.opdsLoanedFeedEntryOfType(this.webServer, genericPDFFiles.fullType)
+      OPDS12FeedConverter.convertEntry(this.accountId, BorrowTestFeeds.opdsLoanedFeedEntryOfType(this.webServer, genericPDFFiles.fullType))
     )
     this.bookDatabaseEntry.entryWrites = 0
     this.bookDatabaseEntry.formatHandlesField.clear()

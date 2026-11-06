@@ -1,7 +1,6 @@
 package org.librarysimplified.viewer.epub.readium2
 
 import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
-import org.nypl.simplified.feeds.opds12.toOPDSAcquisitionFeedEntry
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.ApplicationInfo

@@ -22,7 +22,6 @@ import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookWithStatus
 import org.nypl.simplified.books.controller.api.BooksControllerType
-import org.nypl.simplified.feeds.opds12.toOPDSAcquisitionFeedEntry
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.feeds.api.FeedLoading
 import org.nypl.simplified.feeds.api.FeedAvailabilityRevoked
@@ -367,7 +366,7 @@ class BookSyncTask(
        * book registry.
        */
 
-      dbEntry.writeOPDSEntry(entry.toOPDSAcquisitionFeedEntry())
+      dbEntry.writeOPDSEntry(entry)
       val newBook = dbEntry.book.copy(formats = emptyList())
       val status = BookStatus.fromBook(newBook)
 

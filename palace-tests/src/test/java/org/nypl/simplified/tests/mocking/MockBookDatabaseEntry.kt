@@ -14,7 +14,6 @@ import org.nypl.simplified.books.formats.api.StandardFormatNames.lcpAudioBooks
 import org.nypl.simplified.books.api.FeedBookIDConversions
 import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.feeds.api.FeedAcquisitionPaths
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -62,12 +61,11 @@ class MockBookDatabaseEntry(
     this.thumbnailField = file
   }
 
-  override fun writeOPDSEntry(opdsEntry: OPDSAcquisitionFeedEntry) {
+  override fun writeOPDSEntry(entry: FeedEntryBook) {
     this.logger.debug("[{}]: writeOPDSEntry", this.bookInitial.id)
 
-    val feedEntry = OPDS12FeedConverter.convertEntry(this.bookInitial.account, opdsEntry)
-    this.addNecessaryHandles(feedEntry)
-    this.entryField = feedEntry
+    this.addNecessaryHandles(entry)
+    this.entryField = entry
     this.entryWrites++
   }
 

@@ -17,8 +17,9 @@ import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.files.DirectoryUtilities
 import org.nypl.simplified.files.FileUtilities
 import org.nypl.simplified.json.core.JSONSerializerUtilities
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
+import org.nypl.simplified.feeds.opds12.toOPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSJSONSerializerType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -140,7 +141,7 @@ internal class BookDatabaseEntry internal constructor(
   private val deleted: Boolean = false
 
   @Throws(BookDatabaseException::class)
-  override fun writeOPDSEntry(opdsEntry: OPDSAcquisitionFeedEntry) {
+  override fun writeOPDSEntry(entry: FeedEntryBook) {
     synchronized(this.bookLock) {
       Preconditions.checkArgument(!this.deleted, "Entry must not have been deleted")
 
@@ -154,11 +155,11 @@ internal class BookDatabaseEntry internal constructor(
           fileMeta,
           fileMetaTmp,
           JSONSerializerUtilities.serializeToString(
-            this.serializer.serializeFeedEntry(opdsEntry)
+            this.serializer.serializeFeedEntry(entry.toOPDSAcquisitionFeedEntry())
           )
         )
 
-        this.bookRef = this.bookRef.copy(entry = OPDS12FeedConverter.convertEntry(this.bookRef.account, opdsEntry))
+        this.bookRef = this.bookRef.copy(entry = entry)
       } catch (e: IOException) {
         throw BookDatabaseException(e.message, listOf<Exception>(e))
       } finally {

@@ -25,7 +25,6 @@ import org.nypl.simplified.books.controller.api.BookRevokeExceptionDeviceNotActi
 import org.nypl.simplified.books.controller.api.BookRevokeExceptionNotRevocable
 import org.nypl.simplified.books.controller.api.BookRevokeStringResourcesType
 import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
-import org.nypl.simplified.feeds.opds12.toOPDSAcquisitionFeedEntry
 import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedEntryCorrupt
 import org.nypl.simplified.feeds.api.FeedAvailability
@@ -309,7 +308,7 @@ class BookRevokeTask(
     this.publishRequestingRevokeStatus()
 
     try {
-      this.databaseEntry.writeOPDSEntry(entry.toOPDSAcquisitionFeedEntry())
+      this.databaseEntry.writeOPDSEntry(entry)
     } catch (e: Exception) {
       this.taskRecorder.currentStepFailed(
         message = this.revokeStrings.revokeServerNotifySavingEntryFailed,

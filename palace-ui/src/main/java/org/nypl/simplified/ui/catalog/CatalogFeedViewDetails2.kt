@@ -40,7 +40,6 @@ import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.book_database.api.BookFormats
-import org.nypl.simplified.feeds.opds12.toOPDSAcquisitionFeedEntry
 import org.nypl.simplified.books.book_registry.BookPreviewStatus
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookStatus.DownloadExternalAuthenticationInProgress
@@ -578,7 +577,7 @@ class CatalogFeedViewDetails2(
     this.metadata.removeAllViews()
 
     val probableFormat =
-      BookFormats.inferFormat(newEntry.toOPDSAcquisitionFeedEntry())
+      BookFormats.inferFormat(newEntry)
 
     val bookFormatText =
       when (probableFormat) {

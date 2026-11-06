@@ -16,7 +16,7 @@ import org.nypl.simplified.books.book_database.api.BookDatabaseEntryFormatHandle
 import org.nypl.simplified.books.book_database.api.BookFormats.BookFormatDefinition.BOOK_FORMAT_AUDIO
 import org.nypl.simplified.books.book_database.api.BookFormats.BookFormatDefinition.BOOK_FORMAT_EPUB
 import org.nypl.simplified.books.book_database.api.BookFormats.BookFormatDefinition.BOOK_FORMAT_PDF
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import java.io.File
 import java.io.IOException
 import java.net.URI
@@ -56,14 +56,14 @@ interface BookDatabaseEntryType {
   fun setThumbnail(file: File)
 
   /**
-   * Copy the OPDS entry into the database.
+   * Copy the feed entry into the database.
    *
-   * @param opdsEntry The OPDS entry
+   * @param entry The feed entry
    * @throws BookDatabaseException On errors
    */
 
   @Throws(BookDatabaseException::class)
-  fun writeOPDSEntry(opdsEntry: OPDSAcquisitionFeedEntry)
+  fun writeOPDSEntry(entry: FeedEntryBook)
 
   /**
    * Delete the entry.

@@ -5,7 +5,6 @@ import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.book_database.api.BookDatabaseType
 import org.nypl.simplified.feeds.api.FeedEntryBook
-import org.nypl.simplified.feeds.opds12.toOPDSAcquisitionFeedEntry
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.SortedSet
@@ -45,7 +44,7 @@ class MockBookDatabase(
     val existing = this.entries[id]
     if (existing != null) {
       this.logger.debug("createOrUpdate: [{}]: rewriting existing", id)
-      existing.writeOPDSEntry(entry.toOPDSAcquisitionFeedEntry())
+      existing.writeOPDSEntry(entry)
       return existing
     }
 
@@ -64,7 +63,7 @@ class MockBookDatabase(
         )
       )
 
-    newEntry.writeOPDSEntry(entry.toOPDSAcquisitionFeedEntry())
+    newEntry.writeOPDSEntry(entry)
     this.entries[id] = newEntry
     return newEntry
   }

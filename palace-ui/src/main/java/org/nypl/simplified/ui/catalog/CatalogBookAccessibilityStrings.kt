@@ -5,7 +5,6 @@ import org.librarysimplified.ui.R
 import org.nypl.simplified.books.book_database.api.BookFormats
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedEntryBook
-import org.nypl.simplified.feeds.opds12.toOPDSAcquisitionFeedEntry
 
 /**
  * Strings related to accessibility.
@@ -20,7 +19,7 @@ object CatalogBookAccessibilityStrings {
     resources: Resources,
     feedEntry: FeedEntryBook
   ): String =
-    when (BookFormats.inferFormat(feedEntry.toOPDSAcquisitionFeedEntry())) {
+    when (BookFormats.inferFormat(feedEntry)) {
       BookFormats.BookFormatDefinition.BOOK_FORMAT_EPUB -> {
         resources.getString(
           R.string.catalogAccessibilityCoverEpub,

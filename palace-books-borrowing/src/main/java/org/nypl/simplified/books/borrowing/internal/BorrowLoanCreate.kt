@@ -198,9 +198,8 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
 
     val inputStream = status.bodyStream ?: ByteArrayInputStream(ByteArray(0))
     val opdsEntry = this.parseOPDSFeedEntry(context, inputStream, uri)
-    context.bookDatabaseEntry.writeOPDSEntry(opdsEntry)
-
     val entry = OPDS12FeedConverter.convertEntry(context.account.id, opdsEntry)
+    context.bookDatabaseEntry.writeOPDSEntry(entry)
     this.checkAvailability(context, entry)
     val nextURI = this.findNextLink(context, entry)
     context.receivedNewURI(nextURI)
