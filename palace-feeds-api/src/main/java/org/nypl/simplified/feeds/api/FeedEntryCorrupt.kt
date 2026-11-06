@@ -10,4 +10,4 @@ data class FeedEntryCorrupt(
   override val accountID: AccountID,
   override val bookID: FeedBookID,
   val error: Throwable
-) : FeedEntry, java.io.Serializable
+) : FeedEntry

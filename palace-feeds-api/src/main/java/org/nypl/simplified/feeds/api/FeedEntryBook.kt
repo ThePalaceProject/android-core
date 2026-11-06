@@ -121,7 +121,7 @@ data class FeedEntryBook(
    * The series.
    */
   val series: FeedSeries?
-)  : FeedEntry, java.io.Serializable {
+)  : FeedEntry {
   override val bookID: FeedBookID
     get() = FeedBookIDs.newFromText(this.id)
 

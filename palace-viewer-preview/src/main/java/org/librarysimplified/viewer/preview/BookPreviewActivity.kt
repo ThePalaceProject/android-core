@@ -72,20 +72,12 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
     }
 
   companion object {
-    private const val EXTRA_ENTRY =
-      "org.nypl.simplified.viewer.preview.BookPreviewActivity.entry"
-
     fun startActivity(
       context: Activity,
       feedEntry: FeedEntryBook
     ) {
-      val intent = Intent(context, BookPreviewActivity::class.java)
-      val bundle =
-        Bundle().apply {
-          this.putSerializable(this@Companion.EXTRA_ENTRY, feedEntry)
-        }
-      intent.putExtras(bundle)
-      context.startActivity(intent)
+      BookPreviewModel.feedEntry = feedEntry
+      context.startActivity(Intent(context, BookPreviewActivity::class.java))
     }
   }
 
@@ -136,16 +128,9 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
       return
     }
 
-    val extras = intent.extras
-    if (extras == null) {
-      this.logger.warn("BookPreviewActivity intent lacks extras!")
-      this.finish()
-      return
-    }
-
-    val entry = extras.getSerializable(EXTRA_ENTRY) as FeedEntryBook?
+    val entry = BookPreviewModel.feedEntry
     if (entry == null) {
-      this.logger.warn("BookPreviewActivity intent lacks OPDS entry!")
+      this.logger.warn("BookPreviewActivity lacks entry!")
       this.finish()
       return
     }

@@ -12,7 +12,7 @@ data class FeedAcquisition(
   val type: MIMEType,
   val indirectAcquisitions: List<FeedIndirectAcquisition>,
   val properties: Map<String, String>
-): java.io.Serializable {
+) {
   /**
    * @return The set of final content types accessible if all acquisition paths are followed to their conclusions.
    */

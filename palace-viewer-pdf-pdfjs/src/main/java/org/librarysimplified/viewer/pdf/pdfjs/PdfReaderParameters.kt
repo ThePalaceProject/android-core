@@ -3,10 +3,8 @@ package org.librarysimplified.viewer.pdf.pdfjs
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookID
-import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedEntryBook
 import java.io.File
-import java.io.Serializable
 
 /**
  * Represents the parameters to pass to the [PdfReaderActivity].
@@ -23,4 +21,4 @@ data class PdfReaderParameters(
   val id: BookID,
   val entry: FeedEntryBook,
   val drmInfo: BookDRMInformation
-) : Serializable
+)

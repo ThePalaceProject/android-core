@@ -4,7 +4,6 @@ import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.feeds.api.FeedEntryBook
-import java.io.Serializable
 import java.net.URI
 import java.util.UUID
 
@@ -43,4 +42,4 @@ class AudioBookPlayerParameters(
    */
 
   val drmInfo: BookDRMInformation,
-) : Serializable
+)

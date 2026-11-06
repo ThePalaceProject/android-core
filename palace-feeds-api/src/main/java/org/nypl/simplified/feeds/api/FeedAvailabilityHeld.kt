@@ -11,4 +11,4 @@ data class FeedAvailabilityHeld(
   val position: Int?,
   override val endDate: DateTime?,
   val revoke: URI?
-) : FeedAvailability, java.io.Serializable
+) : FeedAvailability

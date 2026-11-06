@@ -9,4 +9,4 @@ import java.net.URI
 data class FeedAvailabilityHeldReady(
   override val endDate: DateTime?,
   val revoke: URI?
-) : FeedAvailability, java.io.Serializable
+) : FeedAvailability

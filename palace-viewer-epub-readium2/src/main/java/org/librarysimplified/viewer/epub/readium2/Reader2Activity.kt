@@ -79,9 +79,6 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     }
 
   companion object {
-    private const val ARG_PARAMETERS =
-      "org.librarysimplified.viewer.epub.readium2.Reader2Activity2.parameters"
-
     /**
      * Start a new reader for the given book.
      */
@@ -90,13 +87,8 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       activity: Activity,
       parameters: Reader2ActivityParameters
     ) {
-      val intent = Intent(activity, Reader2Activity::class.java)
-      val bundle =
-        Bundle().apply {
-          this.putSerializable(this@Companion.ARG_PARAMETERS, parameters)
-        }
-      intent.putExtras(bundle)
-      activity.startActivity(intent)
+      Reader2Model.parameters = parameters
+      activity.startActivity(Intent(activity, Reader2Activity::class.java))
     }
   }
 
@@ -130,23 +122,9 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     this.subscriptions =
       CompositeDisposable()
 
-    val intent = this.intent
-    if (intent == null) {
-      this.logger.warn("ReaderActivity2 lacks an intent!")
-      this.finish()
-      return
-    }
-
-    val extras = intent.extras
-    if (extras == null) {
-      this.logger.warn("ReaderActivity2 intent lacks extras!")
-      this.finish()
-      return
-    }
-
-    val params = extras.getSerializable(ARG_PARAMETERS) as Reader2ActivityParameters?
+    val params = Reader2Model.parameters
     if (params == null) {
-      this.logger.warn("ReaderActivity2 intent lacks parameters!")
+      this.logger.warn("ReaderActivity2 lacks parameters!")
       this.finish()
       return
     }

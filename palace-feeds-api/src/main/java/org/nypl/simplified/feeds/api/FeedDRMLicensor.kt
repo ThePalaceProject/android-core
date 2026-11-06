@@ -7,4 +7,4 @@ data class FeedDRMLicensor(
   val vendor: String,
   val clientToken: String,
   val deviceManager: String?
-) : java.io.Serializable
+)

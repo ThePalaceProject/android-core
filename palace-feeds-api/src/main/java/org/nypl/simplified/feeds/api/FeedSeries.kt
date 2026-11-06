@@ -9,4 +9,4 @@ data class FeedSeries(
   val name: String,
   val position: Int?,
   val link: URI
-) : java.io.Serializable
+)

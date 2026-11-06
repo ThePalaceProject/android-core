@@ -7,7 +7,7 @@ data class FeedCategory(
   val term: String,
   val scheme: String,
   val label: String?
-): java.io.Serializable {
+) {
   /**
    * The label, or if one is not defined, the term.
    */

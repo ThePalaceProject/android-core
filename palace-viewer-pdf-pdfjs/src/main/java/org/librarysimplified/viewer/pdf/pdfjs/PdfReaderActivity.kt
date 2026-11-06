@@ -50,7 +50,6 @@ import java.util.concurrent.Executors
 
 class PdfReaderActivity : AppCompatActivity() {
   companion object {
-    private const val PARAMS_ID = "org.nypl.simplified.viewer.pdf.pdfjs.PdfReaderActivity.params"
 
     /**
      * Factory method to start a [PdfReaderActivity]
@@ -59,17 +58,8 @@ class PdfReaderActivity : AppCompatActivity() {
       context: Activity,
       parameters: PdfReaderParameters
     ) {
-      val bundle =
-        Bundle().apply {
-          this.putSerializable(this@Companion.PARAMS_ID, parameters)
-        }
-
-      val intent =
-        Intent(context, PdfReaderActivity::class.java).apply {
-          this.putExtras(bundle)
-        }
-
-      context.startActivity(intent)
+      PdfReaderModel.parameters = parameters
+      context.startActivity(Intent(context, PdfReaderActivity::class.java))
     }
   }
 
@@ -114,7 +104,11 @@ class PdfReaderActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    val params = this.intent?.getSerializableExtra(PARAMS_ID) as PdfReaderParameters
+    val params = PdfReaderModel.parameters ?: run {
+      this.log.warn("PdfReaderActivity lacks parameters!")
+      this.finish()
+      return
+    }
 
     this.setContentView(R.layout.pdfjs_reader)
     this.createToolbar(params.documentTitle)

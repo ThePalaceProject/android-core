@@ -8,4 +8,4 @@ import java.net.URI
 data class FeedEntryGroupRef(
   val name: String,
   val uri: URI
-) : java.io.Serializable
+)

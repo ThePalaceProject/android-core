@@ -9,7 +9,7 @@ data class FeedIndirectAcquisition(
   val type: MIMEType,
   val indirectAcquisitions: List<FeedIndirectAcquisition>,
   val properties: Map<String, String>
-): java.io.Serializable {
+) {
   /**
    * Find an indirect acquisition with the given type.
    *

@@ -42,12 +42,6 @@ class BookPreviewAudiobookFragment :
   private lateinit var imageLoader: ImageLoader2Type
 
   companion object {
-    private const val BUNDLE_EXTRA_FILE =
-      "org.librarysimplified.viewer.preview.BookPreviewAudiobookFragment.file"
-
-    private const val BUNDLE_EXTRA_FEED_ENTRY =
-      "org.librarysimplified.viewer.preview.BookPreviewAudiobookFragment.entry"
-
     private const val PLAYER_MOVE_THRESHOLD = 30000L
 
     fun newInstance(
@@ -55,11 +49,8 @@ class BookPreviewAudiobookFragment :
       feedEntry: FeedEntryBook
     ): BookPreviewAudiobookFragment =
       BookPreviewAudiobookFragment().apply {
-        this.arguments =
-          Bundle().apply {
-            this.putSerializable(this@Companion.BUNDLE_EXTRA_FILE, file)
-            this.putSerializable(this@Companion.BUNDLE_EXTRA_FEED_ENTRY, feedEntry)
-          }
+        BookPreviewModel.feedEntry = feedEntry
+        BookPreviewModel.audioFile = file
       }
   }
 
@@ -130,14 +121,8 @@ class BookPreviewAudiobookFragment :
     this.imageLoader =
       services.requireService(ImageLoader2Type::class.java)
 
-    this.audioFile = this
-      .requireArguments()
-      .getSerializable(BUNDLE_EXTRA_FILE)
-      as? File ?: throw RuntimeException("Invalid file")
-    this.feedEntry = this
-      .requireArguments()
-      .getSerializable(BUNDLE_EXTRA_FEED_ENTRY)
-      as? FeedEntryBook ?: throw RuntimeException("Invalid entry")
+    this.audioFile = BookPreviewModel.audioFile ?: throw RuntimeException("Invalid file")
+    this.feedEntry = BookPreviewModel.feedEntry ?: throw RuntimeException("Invalid entry")
 
     this.previewAuthor = view.findViewById(R.id.player_author)
     this.previewBackwardButton = view.findViewById(R.id.player_jump_backwards)
