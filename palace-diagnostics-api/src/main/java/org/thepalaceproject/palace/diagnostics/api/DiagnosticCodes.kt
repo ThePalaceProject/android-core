@@ -18,6 +18,30 @@ object DiagnosticCodes {
   const val CATALOG_BOOK_ACTION_STALE_ACCOUNT = "CatalogBookActionStaleAccount"
 
   /**
+   * An Adobe DRM device activation failed. The DRM error code (if one was raised by the
+   * connector) is carried in the `DRMErrorCode` data field; otherwise the exception type is
+   * carried in the `ExceptionType` data field.
+   */
+
+  const val ADOBE_DRM_ACTIVATION_FAILED = "AdobeDRMActivationFailed"
+
+  /**
+   * An Adobe DRM device deactivation failed. The DRM error code (if one was raised by the
+   * connector) is carried in the `DRMErrorCode` data field; otherwise the exception type is
+   * carried in the `ExceptionType` data field.
+   */
+
+  const val ADOBE_DRM_DEACTIVATION_FAILED = "AdobeDRMDeactivationFailed"
+
+  /**
+   * An Adobe DRM fulfillment (ACSM download) failed. The DRM error code (if one was raised by
+   * the connector) is carried in the `DRMErrorCode` data field; otherwise the exception type
+   * is carried in the `ExceptionType` data field.
+   */
+
+  const val ADOBE_DRM_FULFILLMENT_FAILED = "AdobeDRMFulfillmentFailed"
+
+  /**
    * A period of reading/listening time was dropped and will not be reported to the time
    * tracking backend. The reason for the loss (book switched mid-session, no active book,
    * local write failure, parse failure, ...) is carried in the `Reason` data field.
@@ -83,4 +107,13 @@ object DiagnosticCodes {
    */
 
   const val USER_PRESSED_DEBUG_DIAGNOSTIC_BUTTON = "UserPressedDebugDiagnosticButton"
+
+  /**
+   * The application boot process failed. The boot process is not expected to fail; when it
+   * does, the application is unusable and the failure is reported so that it can be observed
+   * in Crashlytics. The type of the failing exception is carried in the `ExceptionType` data
+   * field; the specific cause is carried by the associated throwable.
+   */
+
+  const val BOOT_FAILED = "BootFailed"
 }

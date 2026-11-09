@@ -1,5 +1,6 @@
 package org.nypl.simplified.accounts.api
 
+import com.io7m.verona.core.Version
 import org.nypl.drm.core.AdobeDeviceID
 import org.nypl.drm.core.AdobeUserID
 
@@ -25,5 +26,11 @@ data class AccountAuthenticationAdobePostActivationCredentials(
    * @return The device token
    */
 
-  val userID: AdobeUserID
+  val userID: AdobeUserID,
+  /**
+   * @return The version of the Adobe ADEPT provider binary that performed the device activation, or `null`
+   *         if the activation was performed by an application version that did not record it
+   */
+
+  val version: Version? = null
 )

@@ -16,6 +16,7 @@ dependencies {
     implementation(project(":palace-patron-api"))
     implementation(project(":palace-taskrecorder-api"))
 
+    implementation(libs.io7m.verona)
     implementation(libs.jackson.core)
     implementation(libs.jackson.databind)
     implementation(libs.joda.time)

@@ -123,6 +123,39 @@
     *;
 }
 
+# RxJava 1.x (io.reactivex:rxjava) internal queues.
+#
+# The queues in rx.internal.util.unsafe resolve their field offsets at
+# class-init time via reflection by name, e.g.
+#   SpscArrayQueueProducerFields.<clinit>:
+#     P_INDEX_OFFSET = UnsafeAccess.addressOf(
+#         SpscArrayQueueProducerFields.class, "producerIndex")
+# which does Class.getDeclaredField("producerIndex").
+#
+# In R8 full mode the direct field read in SpscArrayQueue.offer()
+# (`final long index = producerIndex;`) is rewritten to a
+# sun.misc.Unsafe offset load (the field is already written that way via
+# soProducerIndex), so the field itself is removed. The reflective
+# getDeclaredField then fails when the class is first initialized, throwing
+#   java.lang.InternalError
+#     Caused by: java.lang.NoSuchFieldException: No field producerIndex
+#         in class Lrx/internal/util/unsafe/SpscArrayQueueProducerFields;
+# on the first use of any SpscArrayQueue-backed operator (observeOn, via
+# sqlbrite BriteDatabase) - i.e. opening an audiobook.
+#
+# These are the ProGuard rules documented for RxJava 1.x; they pin the
+# reflectively-resolved field names so R8 neither renames nor removes them.
+-keepclassmembers class rx.internal.util.unsafe.*ArrayQueue*Field* {
+    long producerIndex;
+    long consumerIndex;
+}
+-keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueProducerNodeRef {
+    rx.internal.util.atomic.LinkedQueueNode producerNode;
+}
+-keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueConsumerNodeRef {
+    rx.internal.util.atomic.LinkedQueueNode consumerNode;
+}
+
 # WebPub core model classes are (de)serialized reflectively by Jackson
 # (WPMManifest / WPMMetadata via WPMMappers.createMapper()).
 #

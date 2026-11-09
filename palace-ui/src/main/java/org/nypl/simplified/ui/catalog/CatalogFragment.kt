@@ -214,6 +214,25 @@ sealed class CatalogFragment :
         }
       }
     )
+    this.subscriptions.add(
+      CatalogWIPROMigration.migrationInProgress.subscribe { migrationThen, migrationNow ->
+        this.onWIPROMigrationChanged(migrationThen, migrationNow)
+      }
+    )
+  }
+
+  private fun onWIPROMigrationChanged(
+    migrationThen: Boolean,
+    migrationNow: Boolean
+  ) {
+    if (migrationNow && !migrationThen) {
+      this.switchView(CatalogFeedViewLoading.create(this.layoutInflater, this.contentContainer))
+      return
+    }
+    if (migrationThen && !migrationNow) {
+      this.opdsClient.retry()
+      return
+    }
   }
 
   private fun onNetworkStatusChanged(
@@ -749,6 +768,18 @@ sealed class CatalogFragment :
   }
 
   final override fun onBookRequestViewerOpen(
+    book: Book,
+    bookFormat: BookFormat
+  ) {
+    if (CatalogWIPROMigration.isMigrationRequired(book, bookFormat)) {
+      CatalogWIPROMigration.executeNow(context = this.requireContext(), book)
+      return
+    }
+
+    this.onBookRequestViewerOpenNow(book, bookFormat)
+  }
+
+  private fun onBookRequestViewerOpenNow(
     book: Book,
     bookFormat: BookFormat
   ) {
