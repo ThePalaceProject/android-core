@@ -352,8 +352,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
   }
 
   /**
-   * Report a diagnostic event, if a diagnostics service is available. Reporting must never
-   * interfere with the borrow.
+   * Report a diagnostic event. Reporting must never interfere with the borrow.
    */
 
   private fun reportDiagnostics(
@@ -362,15 +361,10 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
     data: Map<String, String>,
     throwable: Throwable?
   ) {
-    val diagnostics =
-      context.services.optionalService(DiagnosticsServiceType::class.java)
-    if (diagnostics == null) {
-      context.logDebug("Diagnostics service unavailable; suppressing report {}", code)
-      return
-    }
-
     try {
-      diagnostics.report(code, data, throwable)
+      context.services
+        .requireService(DiagnosticsServiceType::class.java)
+        .report(code, data, throwable)
     } catch (e: Throwable) {
       context.logDebug("Failed to report diagnostic {}: ", code, e)
     }

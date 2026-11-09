@@ -28,6 +28,7 @@ import org.nypl.simplified.tests.MutableServiceDirectory
 import org.nypl.simplified.tests.TestDirectories
 import org.readium.r2.lcp.LcpService
 import org.slf4j.Logger
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
 import java.io.File
 import java.io.IOException
 import java.util.UUID
@@ -59,7 +60,16 @@ class MockBorrowContext(
   }
 
   override lateinit var audioBookManifestStrategies: AudioBookManifestStrategiesType
-  override var services: ServiceDirectoryType = MutableServiceDirectory()
+
+  /*
+   * The diagnostics service is always present in the real application; the mock reflects this
+   * with a no-op default that tests may replace.
+   */
+
+  override var services: ServiceDirectoryType =
+    MutableServiceDirectory().apply {
+      this.putService(DiagnosticsServiceType::class.java, NoopDiagnosticsService())
+    }
 
   override var adobeExecutorTimeout: BorrowTimeoutConfiguration =
     BorrowTimeoutConfiguration(2L, TimeUnit.SECONDS)
@@ -234,5 +244,15 @@ class MockBorrowContext(
 
   override fun opdsAcquisitionPathRemaining(): List<OPDSAcquisitionPathElement> {
     return this.currentRemainingOPDSPathElements
+  }
+}
+
+/**
+ * A diagnostics service that does nothing.
+ */
+
+private class NoopDiagnosticsService : DiagnosticsServiceType {
+  override fun report(code: String, data: Map<String, String>, throwable: Throwable?) {
+    // No-op.
   }
 }
