@@ -17,6 +17,7 @@ dependencies {
     implementation(libs.google.guava)
     implementation(libs.irradia.mime.api)
     implementation(libs.irradia.mime.vanilla)
+    implementation(libs.io7m.verona)
     implementation(libs.jackson.databind)
     implementation(libs.jcip.annotations)
     implementation(libs.joda.time)

@@ -24,6 +24,14 @@ class MockAdobeAdeptConnector(
   ) -> Unit = { _, _, _ ->
   }
 
+  var onActivate: (
+    client: AdobeAdeptActivationReceiverType,
+    vendor: AdobeVendorID,
+    user_name: String,
+    password: String
+  ) -> Unit = { _, _, _, _ ->
+  }
+
   override fun activateDeviceToken(
     client: AdobeAdeptActivationReceiverType,
     vendor: AdobeVendorID,
@@ -90,5 +98,6 @@ class MockAdobeAdeptConnector(
     user_name: String,
     password: String
   ) {
+    this.onActivate.invoke(client, vendor, user_name, password)
   }
 }
