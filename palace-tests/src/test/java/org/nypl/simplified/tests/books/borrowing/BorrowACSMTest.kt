@@ -1,6 +1,7 @@
 package org.nypl.simplified.tests.books.borrowing
 
 import android.app.Application
+import com.io7m.verona.core.Version
 import io.reactivex.disposables.Disposable
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -20,6 +21,7 @@ import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPNetworkAccess
 import org.librarysimplified.http.vanilla.LSHTTPClients
 import org.mockito.Mockito
+import org.nypl.drm.core.AdobeAdeptDeactivationReceiverType
 import org.nypl.drm.core.AdobeAdeptLoan
 import org.nypl.drm.core.AdobeDeviceID
 import org.nypl.drm.core.AdobeLoanID
@@ -86,7 +88,10 @@ import org.nypl.simplified.tests.mocking.MockBookDatabaseEntry
 import org.nypl.simplified.tests.mocking.MockBorrowContext
 import org.nypl.simplified.tests.mocking.MockContentResolver
 import org.nypl.simplified.tests.mocking.MockProfile
+import org.nypl.simplified.tests.MutableServiceDirectory
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticCodes
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
 import java.net.URI
 import java.nio.file.Path
 import java.util.concurrent.ExecutorService
@@ -193,7 +198,8 @@ class BorrowACSMTest {
             deviceManagerURI = URI.create("http://www.example.com"),
             postActivationCredentials = AccountAuthenticationAdobePostActivationCredentials(
               deviceID = AdobeDeviceID("ca887d21-a56c-4314-811e-952d885d2115"),
-              userID = AdobeUserID("19b25c06-8b39-4643-8813-5980bee45651")
+              userID = AdobeUserID("19b25c06-8b39-4643-8813-5980bee45651"),
+              version = AdobeDRMExtensions.versionCurrent()
             )
           ),
           authenticationDescription = "Basic",
@@ -928,6 +934,180 @@ class BorrowACSMTest {
   }
 
   /**
+   * Run a successful borrow in which the recorded device activation is stale, i.e. was
+   * performed with a pre-migration ADEPT provider binary. The borrow must deactivate and
+   * delete the stale activation, re-activate the device, and then fulfill the book. A
+   * recording diagnostics service is always registered, so that tests may also assert on
+   * (the absence of) diagnostic reports.
+   *
+   * @param versionActivated The version recorded in the stale post-activation credentials
+   * @param deactivationBehaviour The behaviour of the mocked deactivation
+   */
+
+  @Throws(Exception::class)
+  private fun runStaleActivationBorrow(
+    versionActivated: Version?,
+    deactivationBehaviour: (AdobeAdeptDeactivationReceiverType) -> Unit = { client ->
+      client.onDeactivationSucceeded()
+    }
+  ): RecordingDiagnosticsService {
+    val task = BorrowACSM.createSubtask()
+
+    this.context.currentURIField =
+      Link.LinkBasic(this.webServer.url("/book.acsm").toUri())
+
+    val staleUserID = AdobeUserID("19b25c06-8b39-4643-8813-5980bee45651")
+
+    this.account.setLoginState(
+      AccountLoggedIn(
+        (this.account.loginState.credentials as AccountAuthenticationCredentials.Basic).copy(
+          adobeCredentials = AccountAuthenticationAdobePreActivationCredentials(
+            vendorID = AdobeVendorID("vendor"),
+            clientToken = AccountAuthenticationAdobeClientToken(
+              userName = "user",
+              password = "password",
+              rawToken = "b85e7fd7-cf6e-4e39-8da6-8df8c9ee9779"
+            ),
+            deviceManagerURI = null,
+            postActivationCredentials = AccountAuthenticationAdobePostActivationCredentials(
+              deviceID = AdobeDeviceID("ca887d21-a56c-4314-811e-952d885d2115"),
+              userID = staleUserID,
+              version = versionActivated
+            )
+          )
+        )
+      )
+    )
+
+    this.account.setAccountProvider(
+      MockAccountProviders.fakeProvider(
+        "urn:uuid:ea9480d4-5479-4ef1-b1d1-84ccbedb680f",
+        host = "localhost",
+        port = this.webServer.port
+      )
+    )
+
+    val deactivatedUsers = mutableListOf<AdobeUserID>()
+    this.adobeConnector.onDeactivate = { client, vendor, user, user_name, password ->
+      deactivatedUsers.add(user)
+      deactivationBehaviour(client)
+    }
+
+    this.webServer.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+        .setHeader("content-type", "application/json")
+        .setBody(this.resource("/org/nypl/simplified/tests/patron/example.json"))
+    )
+
+    this.webServer.enqueue(this.validACSMResponse)
+
+    val adobeDeviceID = AdobeDeviceID("ca887d21-a56c-4314-811e-952d885d2115")
+    val adobeUserID = AdobeUserID("19b25c06-8b39-4643-8813-5980bee45651")
+
+    this.adobeConnector.onActivate = { client, vendor, user, password ->
+      Assertions.assertEquals(AdobeVendorID("NYPL"), vendor)
+      Assertions.assertEquals("NYNYPL|536818535|b54be3a5-385b-42eb-9496-3879cb3ac3cc", user)
+      client.onActivationsCount(1)
+      client.onActivation(0, vendor, adobeDeviceID, user, adobeUserID, null)
+    }
+
+    val temporaryFile =
+      temporaryFileOf("book.epub", "A cold star looked down on his creations")
+    val adobeLoanID =
+      AdobeLoanID("4cca8916-d0fe-44ed-85d9-a8212764375d")
+
+    this.adobeConnector.onFulfill = { listener, acsm, user ->
+      listener.onFulfillmentSuccess(
+        temporaryFile,
+        AdobeAdeptLoan(
+          adobeLoanID,
+          "You're a blank. You don't have rights.".toByteArray(),
+          false
+        )
+      )
+    }
+
+    val diagnostics = RecordingDiagnosticsService()
+    (this.context.services as MutableServiceDirectory).putService(
+      DiagnosticsServiceType::class.java,
+      diagnostics
+    )
+
+    try {
+      task.execute(this.context)
+      fail()
+    } catch (e: BorrowSubtaskHaltedEarly) {
+      this.logger.debug("correctly halted early: ", e)
+    }
+
+    this.verifyBookRegistryHasStatus(LoanedDownloaded::class.java)
+
+    /*
+     * The stale activation must have been deactivated using the recorded (stale) user ID.
+     */
+
+    assertEquals(listOf(staleUserID), deactivatedUsers)
+
+    val credentials =
+      this.account.loginState.credentials as AccountAuthenticationCredentials.Basic
+    val post = credentials.adobeCredentials!!.postActivationCredentials!!
+    assertEquals(adobeDeviceID, post.deviceID)
+    assertEquals(adobeUserID, post.userID)
+    assertEquals(AdobeDRMExtensions.versionCurrent(), post.version)
+
+    return diagnostics
+  }
+
+  /**
+   * A recorded activation with no provider version was performed with software old enough to
+   * be pre-migration: the borrow must deactivate it, re-activate, and fulfill, without
+   * reporting any diagnostics.
+   */
+
+  @Test
+  @Throws(Exception::class)
+  fun testACSOkStaleActivationNoVersion() {
+    val diagnostics = this.runStaleActivationBorrow(null)
+    assertTrue(diagnostics.reports.isEmpty())
+  }
+
+  /**
+   * A recorded activation with a pre-migration provider version must be treated as stale:
+   * the borrow must deactivate it, re-activate, and fulfill, without reporting any
+   * diagnostics.
+   */
+
+  @Test
+  @Throws(Exception::class)
+  fun testACSOkStaleActivationOldVersion() {
+    val diagnostics = this.runStaleActivationBorrow(Version.of(4, 99, 99))
+    assertTrue(diagnostics.reports.isEmpty())
+  }
+
+  /**
+   * If the best-effort deactivation of a stale activation fails, the borrow must not fail:
+   * a fresh activation is attempted regardless, and the failure is reported via the
+   * diagnostics service.
+   */
+
+  @Test
+  @Throws(Exception::class)
+  fun testACSOkStaleDeactivationFailureTolerated() {
+    val diagnostics =
+      this.runStaleActivationBorrow(
+        null,
+        deactivationBehaviour = { client -> client.onDeactivationError("E_DEFECTIVE") }
+      )
+
+    assertEquals(1, diagnostics.reports.size)
+    val report = diagnostics.reports[0]
+    assertEquals(DiagnosticCodes.ADOBE_DRM_DEACTIVATION_FAILED, report.code)
+    assertEquals(mapOf("DRMErrorCode" to "E_DEFECTIVE"), report.data)
+    assertTrue(report.throwable is AdobeDRMExtensions.AdobeDRMLogoutConnectorException)
+  }
+
+  /**
    * Obnoxiously fast updates are throttled.
    */
 
@@ -1074,5 +1254,23 @@ class BorrowACSMTest {
     val buffer = Buffer()
     buffer.readFrom(BorrowACSMTest::class.java.getResourceAsStream(file)!!)
     return buffer
+  }
+}
+
+/**
+ * A diagnostics service that records all reported events.
+ */
+
+private class RecordingDiagnosticsService : DiagnosticsServiceType {
+  data class Report(
+    val code: String,
+    val data: Map<String, String>,
+    val throwable: Throwable?
+  )
+
+  val reports = mutableListOf<Report>()
+
+  override fun report(code: String, data: Map<String, String>, throwable: Throwable?) {
+    this.reports.add(Report(code, data, throwable))
   }
 }

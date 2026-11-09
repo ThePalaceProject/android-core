@@ -5,7 +5,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.util.concurrent.MoreExecutors
 import com.io7m.jattribute.core.AttributeReadableType
 import com.io7m.jattribute.core.Attributes
-import com.io7m.verona.core.Version
 import org.librarysimplified.http.api.LSHTTPNetworkAccessType
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
@@ -62,17 +61,6 @@ object CatalogWIPROMigration {
       return false
     }
 
-    /*
-     * The Adobe binaries are WIPRO binaries if the major version of the package is >= 5. If
-     * the current version is less than 5, then we have no migration to perform (yet!).
-     */
-
-    val versionCurrent = AdobeDRMExtensions.versionCurrent()
-    if (versionCurrent.major < 5) {
-      this.logger.debug("WIPRO: Current version is {}, no migration required.", versionCurrent)
-      return false
-    }
-
     val services =
       Services.serviceDirectory()
     val profiles =
@@ -104,28 +92,18 @@ object CatalogWIPROMigration {
     }
 
     /*
-     * If no version was recorded with the activation, that means it was performed using software
-     * old enough to require a migration.
+     * The decision of whether a recorded activation is stale (performed with a pre-migration
+     * binary) is centralised in AdobeDRMExtensions, which also performs the stale-activation
+     * deactivation and re-activation during a borrow.
      */
 
-    val versionActivated: Version? = adobePost.version
-    if (versionActivated == null) {
-      this.logger.debug("WIPRO: No recorded version; migration is required!")
-      return true
+    val required = AdobeDRMExtensions.activationIsStale(adobePost.version)
+    if (required) {
+      this.logger.debug("WIPRO: Recorded version is {}; migration is required!", adobePost.version)
+    } else {
+      this.logger.debug("WIPRO: No migration required.")
     }
-
-    /*
-     * If the recorded version is older than the first WIPRO binaries, then it means we need to
-     * perform a migration.
-     */
-
-    if (versionActivated.major() < 5) {
-      this.logger.debug("WIPRO: Recorded version is {}; migration is required!", versionActivated)
-      return true
-    }
-
-    this.logger.debug("WIPRO: No migration required.")
-    return false
+    return required
   }
 
   private fun executeMigration(book: Book) {

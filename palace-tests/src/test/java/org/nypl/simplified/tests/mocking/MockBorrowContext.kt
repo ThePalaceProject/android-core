@@ -24,6 +24,7 @@ import org.nypl.simplified.opds.core.OPDSAcquisitionPath
 import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
 import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
+import org.nypl.simplified.tests.MutableServiceDirectory
 import org.nypl.simplified.tests.TestDirectories
 import org.readium.r2.lcp.LcpService
 import org.slf4j.Logger
@@ -58,7 +59,7 @@ class MockBorrowContext(
   }
 
   override lateinit var audioBookManifestStrategies: AudioBookManifestStrategiesType
-  override lateinit var services: ServiceDirectoryType
+  override var services: ServiceDirectoryType = MutableServiceDirectory()
 
   override var adobeExecutorTimeout: BorrowTimeoutConfiguration =
     BorrowTimeoutConfiguration(2L, TimeUnit.SECONDS)
