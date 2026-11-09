@@ -41,6 +41,8 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskType
 import org.nypl.simplified.books.formats.api.StandardFormatNames.adobeACSMFiles
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.patron.PatronUserProfileParsers
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticCodes
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
 import org.nypl.simplified.patron.PatronUserProfiles
 import org.nypl.simplified.patron.api.PatronDRMAdobe
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
@@ -151,9 +153,25 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
   private fun activateDeviceIfNecessary(context: BorrowContextType): RequiredCredentials {
     context.taskRecorder.beginNewStep("Activating Adobe DRM device if necessary...")
 
-    if (this.adobeDeviceIsActivated(context)) {
+    val postActivation =
+      context.account.loginState
+        .credentials
+        ?.adobeCredentials
+        ?.postActivationCredentials
+
+    if (postActivation != null && !AdobeDRMExtensions.activationIsStale(postActivation.version)) {
       context.taskRecorder.currentStepSucceeded("Adobe DRM device is already activated.")
       return this.readRequireAdobeCredentials(context)
+    }
+
+    if (postActivation != null) {
+      /*
+       * The device has an activation, but it was performed with a pre-migration ADEPT provider
+       * binary. It is not usable by the current binaries: deactivate and delete it (best-effort),
+       * then fall through to a fresh activation.
+       */
+
+      this.adobeDeviceDeactivateStaleActivation(context, postActivation)
     }
 
     this.adobeDeviceActivate(context)
@@ -268,11 +286,118 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
       val ex = e.cause!!
       context.logDebug("exception raised waiting for adept future: ", ex)
       this.handleAdobeDRMConnectorException(context.taskRecorder, ex)
+      this.reportDiagnostics(
+        context = context,
+        code = DiagnosticCodes.ADOBE_DRM_ACTIVATION_FAILED,
+        data = this.drmErrorData(ex),
+        throwable = ex
+      )
       throw ex
     } catch (e: Throwable) {
       context.logDebug("exception raised waiting for adept future: ", e)
       this.handleAdobeDRMConnectorException(context.taskRecorder, e)
+      this.reportDiagnostics(
+        context = context,
+        code = DiagnosticCodes.ADOBE_DRM_ACTIVATION_FAILED,
+        data = this.drmErrorData(e),
+        throwable = e
+      )
       throw e
+    }
+  }
+
+  /**
+   * Deactivate and delete a stale (pre-migration) device activation. Both operations are
+   * best-effort: the activation was performed against an older server, failures are expected,
+   * and a fresh activation is performed immediately afterwards regardless of the outcome.
+   */
+
+  private fun adobeDeviceDeactivateStaleActivation(
+    context: BorrowContextType,
+    postActivation: AccountAuthenticationAdobePostActivationCredentials
+  ) {
+    context.taskRecorder.beginNewStep("Deactivating stale Adobe DRM device activation...")
+
+    val preActivation =
+      context.account.loginState.credentials!!
+        .adobeCredentials!!
+
+    val failure =
+      AdobeDRMExtensions.deactivateAndDeleteDevice(
+        executor = context.adobeExecutor!!,
+        timeout = 1L,
+        timeoutUnit = TimeUnit.MINUTES,
+        error = { message -> context.logError("{}", message) },
+        debug = { message -> context.logDebug("{}", message) },
+        vendorID = preActivation.vendorID,
+        userID = postActivation.userID,
+        clientToken = preActivation.clientToken
+      )
+
+    if (failure != null) {
+      context.logDebug("Stale Adobe DRM device deactivation failed (best-effort): ", failure)
+      this.reportDiagnostics(
+        context = context,
+        code = DiagnosticCodes.ADOBE_DRM_DEACTIVATION_FAILED,
+        data = this.drmErrorData(failure),
+        throwable = failure
+      )
+    }
+
+    context.account.updateCredentialsIfAvailable { c ->
+      c.withoutAdobePostActivationCredentials()
+    }
+
+    context.taskRecorder.currentStepSucceeded("Stale Adobe DRM device activation removed.")
+  }
+
+  /**
+   * Report a diagnostic event. Reporting must never interfere with the borrow.
+   */
+
+  private fun reportDiagnostics(
+    context: BorrowContextType,
+    code: String,
+    data: Map<String, String>,
+    throwable: Throwable?
+  ) {
+    try {
+      context.services
+        .requireService(DiagnosticsServiceType::class.java)
+        .report(code, data, throwable)
+    } catch (e: Throwable) {
+      context.logDebug("Failed to report diagnostic {}: ", code, e)
+    }
+  }
+
+  /**
+   * Build the diagnostic data map for a DRM failure, preferring the low-cardinality DRM error
+   * code where one is available.
+   */
+
+  private fun drmErrorData(throwable: Throwable): Map<String, String> {
+    val cause =
+      when (throwable) {
+        is ExecutionException -> throwable.cause ?: throwable
+        else -> throwable
+      }
+
+    return when (cause) {
+      is AdobeDRMExtensions.AdobeDRMLoginConnectorException -> {
+        mapOf("DRMErrorCode" to cause.errorCode)
+      }
+
+      is AdobeDRMExtensions.AdobeDRMLogoutConnectorException -> {
+        mapOf("DRMErrorCode" to cause.errorCode)
+      }
+
+      is AdobeDRMFulfillmentException -> {
+        mapOf("DRMErrorCode" to cause.errorCode)
+      }
+
+      else -> {
+        mapOf("ExceptionType" to cause.javaClass.simpleName)
+      }
     }
   }
 
@@ -310,12 +435,6 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
       }
     }
   }
-
-  private fun adobeDeviceIsActivated(context: BorrowContextType): Boolean =
-    context.account.loginState
-      .credentials
-      ?.adobeCredentials
-      ?.postActivationCredentials != null
 
   /**
    * Check that we actually have the required DRM support.
@@ -501,6 +620,12 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
                 exception = cause,
                 extraMessages = listOf()
               )
+              this.reportDiagnostics(
+                context = context,
+                code = DiagnosticCodes.ADOBE_DRM_FULFILLMENT_FAILED,
+                data = this.drmErrorData(cause),
+                throwable = cause
+              )
               BorrowSubtaskFailed()
             }
 
@@ -510,6 +635,12 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
                 errorCode = "ACS: ${cause.javaClass}",
                 exception = cause,
                 extraMessages = listOf()
+              )
+              this.reportDiagnostics(
+                context = context,
+                code = DiagnosticCodes.ADOBE_DRM_FULFILLMENT_FAILED,
+                data = this.drmErrorData(cause),
+                throwable = cause
               )
               BorrowSubtaskFailed()
             }

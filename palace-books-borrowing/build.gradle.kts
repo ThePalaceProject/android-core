@@ -15,6 +15,7 @@ dependencies {
     implementation(project(":palace-books-formats-api"))
     implementation(project(":palace-books-registry-api"))
     implementation(project(":palace-content-api"))
+    implementation(project(":palace-diagnostics-api"))
     implementation(project(":palace-links"))
     implementation(project(":palace-opds-core"))
     implementation(project(":palace-patron"))

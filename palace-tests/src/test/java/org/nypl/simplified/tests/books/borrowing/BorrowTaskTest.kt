@@ -32,6 +32,7 @@ import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggedIn
 import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountUsername
 import org.nypl.simplified.accounts.database.api.AccountType
+import org.nypl.simplified.adobe.extensions.AdobeDRMExtensions
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.api.BookIDs
@@ -237,7 +238,8 @@ class BorrowTaskTest {
             deviceManagerURI = URI.create("http://www.example.com"),
             postActivationCredentials = AccountAuthenticationAdobePostActivationCredentials(
               deviceID = AdobeDeviceID("ca887d21-a56c-4314-811e-952d885d2115"),
-              userID = AdobeUserID("19b25c06-8b39-4643-8813-5980bee45651")
+              userID = AdobeUserID("19b25c06-8b39-4643-8813-5980bee45651"),
+              version = AdobeDRMExtensions.versionCurrent()
             )
           ),
           authenticationDescription = "Basic",
