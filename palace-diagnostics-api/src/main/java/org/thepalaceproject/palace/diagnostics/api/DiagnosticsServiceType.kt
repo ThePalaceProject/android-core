@@ -4,8 +4,8 @@ package org.thepalaceproject.palace.diagnostics.api
  * A service for reporting notable anomalies to a diagnostics backend.
  *
  * This is a low-volume, high-signal channel for specific, mostly-silent failures that do not
- * otherwise produce a crash or a user-visible error, but for which fleet-wide visibility is
- * wanted without having to request on-device logs. It is not a replacement for normal
+ * otherwise produce a crash or a user-visible error, but for which visibility in Crashlytics
+ * is wanted without having to request on-device logs. It is not a replacement for normal
  * logging.
  */
 

@@ -5,6 +5,7 @@ plugins {
 dependencies {
     coreLibraryDesugaring(libs.android.desugaring)
 
+    implementation(project(":palace-diagnostics-api"))
     implementation(project(":palace-presentableerror-api"))
 
     implementation(libs.io7m.jattribute.core)

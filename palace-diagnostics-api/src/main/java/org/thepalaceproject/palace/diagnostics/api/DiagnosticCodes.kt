@@ -107,4 +107,13 @@ object DiagnosticCodes {
    */
 
   const val USER_PRESSED_DEBUG_DIAGNOSTIC_BUTTON = "UserPressedDebugDiagnosticButton"
+
+  /**
+   * The application boot process failed. The boot process is not expected to fail; when it
+   * does, the application is unusable and the failure is reported so that it can be observed
+   * in Crashlytics. The type of the failing exception is carried in the `ExceptionType` data
+   * field; the specific cause is carried by the associated throwable.
+   */
+
+  const val BOOT_FAILED = "BootFailed"
 }

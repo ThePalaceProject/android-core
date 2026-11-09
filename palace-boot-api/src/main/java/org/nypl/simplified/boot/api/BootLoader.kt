@@ -7,6 +7,8 @@ import com.io7m.jattribute.core.AttributeType
 import com.io7m.jattribute.core.Attributes
 import org.nypl.simplified.presentableerror.api.PresentableErrorType
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticCodes
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsService
 import java.util.ServiceLoader
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
@@ -94,10 +96,34 @@ class BootLoader<T>(
           }
 
         this.eventsActual.set(event)
+        this.reportBootFailure(e)
         future.completeExceptionally(event.exception)
       }
     }
     return future
+  }
+
+  /**
+   * Report the boot failure to the diagnostics backend.
+   *
+   * The boot process is not expected to fail; when it does, the application is unusable and
+   * it is important to have visibility of the failure in Crashlytics. Failures to report are
+   * logged and ignored, because the boot failure is the primary error.
+   */
+
+  private fun reportBootFailure(throwable: Throwable) {
+    try {
+      DiagnosticsService.create().report(
+        code = DiagnosticCodes.BOOT_FAILED,
+        data =
+          mapOf(
+            Pair("ExceptionType", throwable.javaClass.name)
+          ),
+        throwable = throwable
+      )
+    } catch (e: Throwable) {
+      this.logger.error("failed to report boot failure to diagnostics: ", e)
+    }
   }
 
   private fun executeBootPreHooks(context: Context) {
