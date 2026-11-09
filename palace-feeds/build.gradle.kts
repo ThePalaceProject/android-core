@@ -19,7 +19,6 @@ dependencies {
     implementation(libs.joda.time)
     implementation(libs.kotlin.stdlib)
     implementation(libs.palace.http.api)
-    implementation(libs.r2.opds)
-    implementation(libs.r2.shared)
+    implementation(libs.palace.webpub.core)
     implementation(libs.slf4j)
 }

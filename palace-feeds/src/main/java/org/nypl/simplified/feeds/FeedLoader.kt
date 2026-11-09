@@ -31,8 +31,6 @@ import org.nypl.simplified.opds.core.OPDSFeedTransportIOException
 import org.nypl.simplified.opds.core.OPDSSearchParserType
 import org.nypl.simplified.opds.core.OPDSSearchLink
 import org.nypl.simplified.opds.core.OPDSOpenSearch1_1
-import org.readium.r2.opds.OPDS2Parser
-import org.readium.r2.shared.util.Url
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayInputStream
 import java.io.FileNotFoundException
@@ -50,7 +48,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * The [preferOPDS20] flag controls whether the loader sends an
  * `Accept: application/opds+json` header to the server. When `true`, the
  * loader requests OPDS 2.0 and parses the response as OPDS 2.0 JSON using
- * the Readium parser. If the server responds with a non-OPDS-2.0 content
+ * the Palace WebPub parser. If the server responds with a non-OPDS-2.0 content
  * type, the loader falls back to the OPDS 1.2 parser. When `false` (the
  * default), the loader does not send the header and the server responds
  * with OPDS 1.2.
@@ -183,12 +181,9 @@ class FeedLoader(
     uri: URI
   ): Feed {
     val bytes = body.readBytes()
-    val baseUrl = Url(uri.toString())!!
-    val parseData = OPDS2Parser.parse(bytes, baseUrl)
-    val readiumFeed = parseData.feed
-      ?: throw IOException("Response did not contain an OPDS 2.0 feed")
-
-    return OPDS20FeedConverter.convert(accountId, readiumFeed)
+    val wpmFeed = OPDS20FeedConverter.parse(ByteArrayInputStream(bytes))
+    val rawJSON = OPDS20FeedConverter.parseRaw(ByteArrayInputStream(bytes))
+    return OPDS20FeedConverter.convert(accountId, wpmFeed, uri, rawJSON)
   }
 
   /**

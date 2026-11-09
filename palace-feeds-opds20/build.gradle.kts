@@ -13,9 +13,9 @@ dependencies {
 
     implementation(libs.irradia.mime.api)
     implementation(libs.irradia.mime.vanilla)
+    implementation(libs.jackson.databind)
     implementation(libs.joda.time)
     implementation(libs.kotlin.stdlib)
-    implementation(libs.r2.opds)
-    implementation(libs.r2.shared)
+    implementation(libs.palace.webpub.core)
     implementation(libs.slf4j)
 }

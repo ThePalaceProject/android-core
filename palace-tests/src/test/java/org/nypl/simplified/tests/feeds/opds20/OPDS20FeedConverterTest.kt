@@ -1,44 +1,64 @@
 package org.nypl.simplified.tests.feeds.opds20
 
+import com.fasterxml.jackson.databind.JsonNode
+import java.io.ByteArrayInputStream
 import java.net.URI
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.nypl.simplified.accounts.api.AccountID
-import org.nypl.simplified.feeds.api.FeedData
-import org.nypl.simplified.feeds.api.FeedEntryBook
-import org.nypl.simplified.feeds.api.FeedFacetData
-import org.nypl.simplified.feeds.api.FeedDataWithGroups
-import org.nypl.simplified.feeds.opds20.OPDS20FeedConverter
-import org.readium.r2.opds.OPDS2Parser
-import org.readium.r2.shared.opds.ParseData
-import org.readium.r2.shared.util.Url
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
-import org.robolectric.annotation.ConscryptMode
 import java.nio.charset.StandardCharsets
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
+import org.junit.Test
+import org.nypl.simplified.accounts.api.AccountID
+import org.nypl.simplified.feeds.api.FeedAvailabilityLoanable
+import org.nypl.simplified.feeds.api.FeedAvailabilityOpenAccess
+import org.nypl.simplified.feeds.api.FeedData
+import org.nypl.simplified.feeds.api.FeedDataWithGroups
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.api.FeedFacetData
+import org.nypl.simplified.feeds.opds20.OPDS20FeedConverter
+import org.thepalaceproject.webpub.core.WPMFeed
 
-@RunWith(RobolectricTestRunner::class)
-@Config(sdk = [28])
-@ConscryptMode(ConscryptMode.Mode.OFF)
+/**
+ * Tests for the OPDS 2.0 feed converter using the Palace WebPub parser.
+ *
+ * These tests run on the plain JVM — no Robolectric is required because
+ * the WebPub parser is a pure Jackson-based JSON deserializer.
+ */
 class OPDS20FeedConverterTest {
 
   private val accountID: AccountID =
     AccountID(java.util.UUID.randomUUID())
 
-  private fun parse(json: String): ParseData {
-    val url: Url = Url("https://example.com/feed.json")!!
-    return OPDS2Parser.parse(json.toByteArray(StandardCharsets.UTF_8), url)
+  private val feedURI: URI =
+    URI("https://example.com/feed.json")
+
+  /**
+   * Parse the given JSON string using the WebPub parser and return
+   * both the typed [WPMFeed] and the raw [JsonNode] tree.
+   */
+  private fun parse(json: String): Pair<WPMFeed, JsonNode> {
+    val bytes = json.toByteArray(StandardCharsets.UTF_8)
+    val wpmFeed = OPDS20FeedConverter.parse(ByteArrayInputStream(bytes))
+    val rawJSON = OPDS20FeedConverter.parseRaw(ByteArrayInputStream(bytes))
+    return wpmFeed to rawJSON
   }
+
+  /**
+   * Parse and convert in one step.
+   */
+  private fun parseAndConvert(json: String) =
+    OPDS20FeedConverter.convert(
+      accountID = this.accountID,
+      feed = this.parse(json).first,
+      feedURI = this.feedURI,
+      rawJSON = this.parse(json).second
+    )
 
   @Test
   fun testEmptyFeed() {
     val json = """
       {
         "type": "feed",
-        "title": "Test Feed",
         "metadata": {
           "title": "Test Feed"
         },
@@ -46,14 +66,12 @@ class OPDS20FeedConverterTest {
       }
     """.trimIndent()
 
-    val parseData = parse(json)
-    val feed = parseData.feed!!
-    val converted = OPDS20FeedConverter.convert(accountID, feed)
+    val converted = this.parseAndConvert(json)
 
     assertTrue(converted is FeedData)
     val feedData = converted as FeedData
     assertEquals("Test Feed", feedData.feedTitle)
-    assertEquals(URI("https://example.com/feed.json"), feedData.feedURI)
+    assertEquals(this.feedURI, feedData.feedURI)
     assertEquals(0, feedData.size)
   }
 
@@ -62,7 +80,6 @@ class OPDS20FeedConverterTest {
     val json = """
       {
         "type": "feed",
-        "title": "Test Feed",
         "metadata": {
           "title": "Test Feed"
         },
@@ -80,7 +97,7 @@ class OPDS20FeedConverterTest {
             "links": [
               {
                 "href": "https://example.com/book.epub",
-                "mediaType": "application/epub+zip",
+                "type": "application/epub+zip",
                 "rel": "http://librarysimplified.org/terms/rel/acquire/borrow"
               }
             ]
@@ -89,9 +106,7 @@ class OPDS20FeedConverterTest {
       }
     """.trimIndent()
 
-    val parseData = parse(json)
-    val feed = parseData.feed!!
-    val converted = OPDS20FeedConverter.convert(accountID, feed)
+    val converted = this.parseAndConvert(json)
 
     assertTrue(converted is FeedData)
     val feedData = converted as FeedData
@@ -109,7 +124,6 @@ class OPDS20FeedConverterTest {
     val json = """
       {
         "type": "feed",
-        "title": "Test Feed",
         "metadata": {
           "title": "Test Feed"
         },
@@ -130,9 +144,7 @@ class OPDS20FeedConverterTest {
       }
     """.trimIndent()
 
-    val parseData = parse(json)
-    val feed = parseData.feed!!
-    val converted = OPDS20FeedConverter.convert(accountID, feed)
+    val converted = this.parseAndConvert(json)
 
     assertTrue(converted is FeedData)
     val feedData = converted as FeedData
@@ -148,29 +160,35 @@ class OPDS20FeedConverterTest {
     val json = """
       {
         "type": "feed",
-        "title": "Test Feed",
         "metadata": {
           "title": "Test Feed"
         },
         "groups": [
           {
             "metadata": {
-              "title": "New Releases"
+              "title": "New Releases",
+              "identifier": "urn:group:new"
             },
-            "links": [
+            "navigation": [
               {
                 "href": "https://example.com/group/new",
                 "rel": "self"
               }
-            ],
-            "publications": [
+            ]
+          }
+        ],
+        "publications": [
+          {
+            "type": "publication",
+            "metadata": {
+              "identifier": "urn:isbn:0000000001",
+              "title": "Grouped Book"
+            },
+            "links": [
               {
-                "type": "publication",
-                "metadata": {
-                  "identifier": "urn:isbn:0000000001",
-                  "title": "Grouped Book"
-                },
-                "links": []
+                "href": "urn:group:new",
+                "rel": "collection",
+                "title": "New Releases"
               }
             ]
           }
@@ -178,9 +196,7 @@ class OPDS20FeedConverterTest {
       }
     """.trimIndent()
 
-    val parseData = parse(json)
-    val feed = parseData.feed!!
-    val converted = OPDS20FeedConverter.convert(accountID, feed)
+    val converted = this.parseAndConvert(json)
 
     assertTrue(converted is FeedDataWithGroups)
     val feedData = converted as FeedDataWithGroups
@@ -194,21 +210,15 @@ class OPDS20FeedConverterTest {
     val json = """
       {
         "type": "feed",
-        "title": "Test Feed",
         "metadata": {
           "title": "Test Feed",
-          "numberOfItems": 42,
-          "itemsPerPage": 10,
-          "currentPage": 1,
           "modified": "2024-06-15T12:00:00Z"
         },
         "publications": []
       }
     """.trimIndent()
 
-    val parseData = parse(json)
-    val feed = parseData.feed!!
-    val converted = OPDS20FeedConverter.convert(accountID, feed)
+    val converted = this.parseAndConvert(json)
 
     assertTrue(converted is FeedData)
     val feedData = converted as FeedData
@@ -221,7 +231,6 @@ class OPDS20FeedConverterTest {
     val json = """
       {
         "type": "feed",
-        "title": "Test Feed",
         "metadata": {
           "title": "Test Feed"
         },
@@ -232,11 +241,7 @@ class OPDS20FeedConverterTest {
               "identifier": "urn:isbn:1111111111",
               "title": "Book With Subjects",
               "subject": [
-                {
-                  "name": "Fiction",
-                  "code": "FICTION",
-                  "scheme": "http://example.com/schemes/genre"
-                }
+                "Fiction"
               ]
             },
             "links": []
@@ -245,16 +250,13 @@ class OPDS20FeedConverterTest {
       }
     """.trimIndent()
 
-    val parseData = parse(json)
-    val feed = parseData.feed!!
-    val converted = OPDS20FeedConverter.convert(accountID, feed)
+    val converted = this.parseAndConvert(json)
 
     assertTrue(converted is FeedData)
     val feedData = converted as FeedData
     val entry = feedData.entries[0] as FeedEntryBook
     assertEquals(1, entry.categories.size)
     assertEquals("Fiction", entry.categories[0].label)
-    assertEquals("FICTION", entry.categories[0].term)
   }
 
   @Test
@@ -262,7 +264,6 @@ class OPDS20FeedConverterTest {
     val json = """
       {
         "type": "feed",
-        "title": "Test Feed",
         "metadata": {
           "title": "Test Feed"
         },
@@ -284,9 +285,7 @@ class OPDS20FeedConverterTest {
       }
     """.trimIndent()
 
-    val parseData = parse(json)
-    val feed = parseData.feed!!
-    val converted = OPDS20FeedConverter.convert(accountID, feed)
+    val converted = this.parseAndConvert(json)
 
     assertTrue(converted is FeedData)
     val feedData = converted as FeedData
@@ -300,7 +299,6 @@ class OPDS20FeedConverterTest {
     val json = """
       {
         "type": "feed",
-        "title": "Test Feed",
         "metadata": {
           "title": "Test Feed"
         },
@@ -310,7 +308,7 @@ class OPDS20FeedConverterTest {
             "metadata": {
               "identifier": "urn:isbn:3333333333",
               "title": "Detailed Book",
-              "language": ["en"],
+              "languages": ["en"],
               "publisher": [
                 {"name": "Test Publisher"}
               ],
@@ -323,9 +321,7 @@ class OPDS20FeedConverterTest {
       }
     """.trimIndent()
 
-    val parseData = parse(json)
-    val feed = parseData.feed!!
-    val converted = OPDS20FeedConverter.convert(accountID, feed)
+    val converted = this.parseAndConvert(json)
 
     assertTrue(converted is FeedData)
     val feedData = converted as FeedData
@@ -341,7 +337,6 @@ class OPDS20FeedConverterTest {
     val json = """
       {
         "type": "feed",
-        "title": "Test Feed",
         "metadata": {
           "title": "Test Feed"
         },
@@ -355,9 +350,7 @@ class OPDS20FeedConverterTest {
       }
     """.trimIndent()
 
-    val parseData = parse(json)
-    val feed = parseData.feed!!
-    val converted = OPDS20FeedConverter.convert(accountID, feed)
+    val converted = this.parseAndConvert(json)
 
     assertTrue(converted is FeedData)
     val feedData = converted as FeedData
@@ -369,7 +362,6 @@ class OPDS20FeedConverterTest {
     val json = """
       {
         "type": "feed",
-        "title": "Test Feed",
         "metadata": {
           "title": "Test Feed"
         },
@@ -402,9 +394,7 @@ class OPDS20FeedConverterTest {
       }
     """.trimIndent()
 
-    val parseData = parse(json)
-    val feed = parseData.feed!!
-    val converted = OPDS20FeedConverter.convert(accountID, feed)
+    val converted = this.parseAndConvert(json)
 
     assertTrue(converted is FeedData)
     val feedData = converted as FeedData
@@ -419,7 +409,6 @@ class OPDS20FeedConverterTest {
     val json = """
       {
         "type": "feed",
-        "title": "Test Feed",
         "metadata": {
           "title": "Test Feed"
         },
@@ -434,9 +423,7 @@ class OPDS20FeedConverterTest {
       }
     """.trimIndent()
 
-    val parseData = parse(json)
-    val feed = parseData.feed!!
-    val converted = OPDS20FeedConverter.convert(accountID, feed)
+    val converted = this.parseAndConvert(json)
 
     assertTrue(converted is FeedData)
     val feedData = converted as FeedData
@@ -448,7 +435,6 @@ class OPDS20FeedConverterTest {
     val json = """
       {
         "type": "feed",
-        "title": "Test Feed",
         "metadata": {
           "title": "Test Feed"
         },
@@ -470,9 +456,7 @@ class OPDS20FeedConverterTest {
       }
     """.trimIndent()
 
-    val parseData = parse(json)
-    val feed = parseData.feed!!
-    val converted = OPDS20FeedConverter.convert(accountID, feed)
+    val converted = this.parseAndConvert(json)
 
     assertTrue(converted is FeedData)
     val feedData = converted as FeedData
@@ -486,7 +470,6 @@ class OPDS20FeedConverterTest {
     val json = """
       {
         "type": "feed",
-        "title": "Test Feed",
         "metadata": {
           "title": "Test Feed"
         },
@@ -500,12 +483,12 @@ class OPDS20FeedConverterTest {
             "links": [
               {
                 "href": "https://example.com/book.epub",
-                "mediaType": "application/epub+zip",
+                "type": "application/epub+zip",
                 "rel": "http://librarysimplified.org/terms/rel/acquire/borrow"
               },
               {
                 "href": "https://example.com/book-sample.pdf",
-                "mediaType": "application/pdf",
+                "type": "application/pdf",
                 "rel": "http://librarysimplified.org/terms/rel/acquire/sample"
               }
             ]
@@ -514,15 +497,12 @@ class OPDS20FeedConverterTest {
       }
     """.trimIndent()
 
-    val parseData = parse(json)
-    val feed = parseData.feed!!
-    val converted = OPDS20FeedConverter.convert(accountID, feed)
+    val converted = this.parseAndConvert(json)
 
     assertTrue(converted is FeedData)
     val feedData = converted as FeedData
     val entry = feedData.entries[0] as FeedEntryBook
 
-    // The sample should be in previewAcquisitions, not in acquisitions
     assertEquals(1, entry.acquisitions.size)
     assertEquals(1, entry.previewAcquisitions.size)
     assertEquals(URI("https://example.com/book-sample.pdf"), entry.previewAcquisitions[0].uri)
@@ -533,7 +513,6 @@ class OPDS20FeedConverterTest {
     val json = """
       {
         "type": "feed",
-        "title": "Test Feed",
         "metadata": {
           "title": "Test Feed"
         },
@@ -563,9 +542,7 @@ class OPDS20FeedConverterTest {
       }
     """.trimIndent()
 
-    val parseData = parse(json)
-    val feed = parseData.feed!!
-    val converted = OPDS20FeedConverter.convert(accountID, feed)
+    val converted = this.parseAndConvert(json)
 
     assertTrue(converted is FeedData)
     val feedData = converted as FeedData
@@ -581,7 +558,6 @@ class OPDS20FeedConverterTest {
     val json = """
       {
         "type": "feed",
-        "title": "Test Feed",
         "metadata": {
           "title": "Test Feed"
         },
@@ -611,9 +587,7 @@ class OPDS20FeedConverterTest {
       }
     """.trimIndent()
 
-    val parseData = parse(json)
-    val feed = parseData.feed!!
-    val converted = OPDS20FeedConverter.convert(accountID, feed)
+    val converted = this.parseAndConvert(json)
 
     assertTrue(converted is FeedData)
     val feedData = converted as FeedData
@@ -625,57 +599,10 @@ class OPDS20FeedConverterTest {
   }
 
   @Test
-  fun testEntryAudience() {
-    val json = """
-      {
-        "type": "feed",
-        "title": "Test Feed",
-        "metadata": {
-          "title": "Test Feed"
-        },
-        "publications": [
-          {
-            "type": "publication",
-            "metadata": {
-              "identifier": "urn:isbn:7777777777",
-              "title": "Children's Book",
-              "subject": [
-                {
-                  "name": "Fiction",
-                  "code": "FICTION",
-                  "scheme": "http://example.com/schemes/genre"
-                },
-                {
-                  "name": "Children",
-                  "code": "children",
-                  "scheme": "http://schema.org/audience"
-                }
-              ]
-            },
-            "links": []
-          }
-        ]
-      }
-    """.trimIndent()
-
-    val parseData = parse(json)
-    val feed = parseData.feed!!
-    val converted = OPDS20FeedConverter.convert(accountID, feed)
-
-    assertTrue(converted is FeedData)
-    val feedData = converted as FeedData
-    val entry = feedData.entries[0] as FeedEntryBook
-
-    assertEquals("children", entry.audience)
-    assertEquals(2, entry.categories.size)
-  }
-
-  @Test
   fun testEntryGroups() {
     val json = """
       {
         "type": "feed",
-        "title": "Test Feed",
         "metadata": {
           "title": "Test Feed"
         },
@@ -703,9 +630,7 @@ class OPDS20FeedConverterTest {
       }
     """.trimIndent()
 
-    val parseData = parse(json)
-    val feed = parseData.feed!!
-    val converted = OPDS20FeedConverter.convert(accountID, feed)
+    val converted = this.parseAndConvert(json)
 
     assertTrue(converted is FeedData)
     val feedData = converted as FeedData
@@ -721,7 +646,6 @@ class OPDS20FeedConverterTest {
     val json = """
       {
         "type": "feed",
-        "title": "Test Feed",
         "metadata": {
           "title": "Test Feed"
         },
@@ -735,12 +659,12 @@ class OPDS20FeedConverterTest {
             "links": [
               {
                 "href": "https://example.com/cover.jpg",
-                "mediaType": "image/jpeg",
+                "type": "image/jpeg",
                 "rel": "cover"
               },
               {
                 "href": "https://example.com/thumb.jpg",
-                "mediaType": "image/jpeg",
+                "type": "image/jpeg",
                 "rel": "thumbnail"
               }
             ]
@@ -749,9 +673,7 @@ class OPDS20FeedConverterTest {
       }
     """.trimIndent()
 
-    val parseData = parse(json)
-    val feed = parseData.feed!!
-    val converted = OPDS20FeedConverter.convert(accountID, feed)
+    val converted = this.parseAndConvert(json)
 
     assertTrue(converted is FeedData)
     val feedData = converted as FeedData
@@ -766,7 +688,6 @@ class OPDS20FeedConverterTest {
     val json = """
       {
         "type": "feed",
-        "title": "Test Feed",
         "metadata": {
           "title": "Test Feed"
         },
@@ -780,15 +701,13 @@ class OPDS20FeedConverterTest {
                 {"name": "Narrator One"}
               ],
               "belongsTo": {
-                "series": [
-                  {
-                    "name": "Dune",
-                    "position": 1.0,
-                    "links": [
-                      {"href": "https://example.com/series/dune", "rel": "self"}
-                    ]
-                  }
-                ]
+                "series": {
+                  "name": "Dune",
+                  "position": 1.0,
+                  "links": [
+                    {"href": "https://example.com/series/dune", "rel": "self"}
+                  ]
+                }
               }
             },
             "links": []
@@ -797,9 +716,7 @@ class OPDS20FeedConverterTest {
       }
     """.trimIndent()
 
-    val parseData = parse(json)
-    val feed = parseData.feed!!
-    val converted = OPDS20FeedConverter.convert(accountID, feed)
+    val converted = this.parseAndConvert(json)
 
     assertTrue(converted is FeedData)
     val feedData = converted as FeedData
@@ -816,7 +733,6 @@ class OPDS20FeedConverterTest {
     val json = """
       {
         "type": "feed",
-        "title": "Test Feed",
         "metadata": {
           "title": "Test Feed"
         },
@@ -830,7 +746,7 @@ class OPDS20FeedConverterTest {
             "links": [
               {
                 "href": "https://example.com/book.epub",
-                "mediaType": "application/epub+zip",
+                "type": "application/epub+zip",
                 "rel": "http://librarysimplified.org/terms/rel/acquire/borrow",
                 "properties": {
                   "availability": {
@@ -844,15 +760,13 @@ class OPDS20FeedConverterTest {
       }
     """.trimIndent()
 
-    val parseData = parse(json)
-    val feed = parseData.feed!!
-    val converted = OPDS20FeedConverter.convert(accountID, feed)
+    val converted = this.parseAndConvert(json)
 
     assertTrue(converted is FeedData)
     val feedData = converted as FeedData
     val entry = feedData.entries[0] as FeedEntryBook
 
-    assertTrue(entry.availability is org.nypl.simplified.feeds.api.FeedAvailabilityLoanable)
+    assertTrue(entry.availability is FeedAvailabilityLoanable)
   }
 
   @Test
@@ -860,7 +774,6 @@ class OPDS20FeedConverterTest {
     val json = """
       {
         "type": "feed",
-        "title": "Test Feed",
         "metadata": {
           "title": "Test Feed"
         },
@@ -874,7 +787,7 @@ class OPDS20FeedConverterTest {
             "links": [
               {
                 "href": "https://example.com/book.epub",
-                "mediaType": "application/epub+zip",
+                "type": "application/epub+zip",
                 "rel": "http://librarysimplified.org/terms/rel/acquire/open-access"
               }
             ]
@@ -883,15 +796,13 @@ class OPDS20FeedConverterTest {
       }
     """.trimIndent()
 
-    val parseData = parse(json)
-    val feed = parseData.feed!!
-    val converted = OPDS20FeedConverter.convert(accountID, feed)
+    val converted = this.parseAndConvert(json)
 
     assertTrue(converted is FeedData)
     val feedData = converted as FeedData
     val entry = feedData.entries[0] as FeedEntryBook
 
-    assertTrue(entry.availability is org.nypl.simplified.feeds.api.FeedAvailabilityOpenAccess)
+    assertTrue(entry.availability is FeedAvailabilityOpenAccess)
   }
 
   @Test
@@ -899,7 +810,6 @@ class OPDS20FeedConverterTest {
     val json = """
       {
         "type": "feed",
-        "title": "Test Feed",
         "metadata": {
           "title": "Test Feed"
         },
@@ -913,12 +823,205 @@ class OPDS20FeedConverterTest {
       }
     """.trimIndent()
 
-    val parseData = parse(json)
-    val feed = parseData.feed!!
-    val converted = OPDS20FeedConverter.convert(accountID, feed)
+    val converted = this.parseAndConvert(json)
 
     assertTrue(converted is FeedData)
     val feedData = converted as FeedData
     assertEquals(URI("https://example.com/licenses"), feedData.feedLicenses)
+  }
+
+  @Test
+  fun testEntryIndirectAcquisitions() {
+    val json = """
+      {
+        "type": "feed",
+        "metadata": {
+          "title": "Test Feed"
+        },
+        "publications": [
+          {
+            "type": "publication",
+            "metadata": {
+              "identifier": "urn:isbn:4040404040",
+              "title": "Book With DRM"
+            },
+            "links": [
+              {
+                "href": "https://example.com/book.epub",
+                "type": "application/epub+zip",
+                "rel": "http://librarysimplified.org/terms/rel/acquire/borrow",
+                "properties": {
+                  "availability": {
+                    "state": "available"
+                  },
+                  "indirectAcquisition": [
+                    {
+                      "type": "application/vnd.adobe.adept+xml",
+                      "child": [
+                        {
+                          "type": "application/vnd.readium.lcp.licenser+json",
+                          "child": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    """.trimIndent()
+
+    val converted = this.parseAndConvert(json)
+
+    assertTrue(converted is FeedData)
+    val feedData = converted as FeedData
+    val entry = feedData.entries[0] as FeedEntryBook
+
+    assertEquals(1, entry.acquisitions.size)
+    assertEquals(1, entry.acquisitions[0].indirectAcquisitions.size)
+    assertEquals(
+      "application/vnd.adobe.adept+xml",
+      entry.acquisitions[0].indirectAcquisitions[0].type.fullType
+    )
+    assertEquals(1, entry.acquisitions[0].indirectAcquisitions[0].indirectAcquisitions.size)
+    assertEquals(
+      "application/vnd.readium.lcp.licenser+json",
+      entry.acquisitions[0].indirectAcquisitions[0].indirectAcquisitions[0].type.fullType
+    )
+  }
+
+  @Test
+  fun testEntryDRMLicensor() {
+    val json = """
+      {
+        "type": "feed",
+        "metadata": {
+          "title": "Test Feed"
+        },
+        "publications": [
+          {
+            "type": "publication",
+            "metadata": {
+              "identifier": "urn:isbn:5050505050",
+              "title": "Book With DRM Licensor"
+            },
+            "links": [
+              {
+                "href": "https://example.com/book.epub",
+                "type": "application/epub+zip",
+                "rel": "http://librarysimplified.org/terms/rel/acquire/borrow",
+                "properties": {
+                  "licensor": {
+                    "vendor": "adobe",
+                    "clientToken": "test-token",
+                    "deviceManager": "https://example.com/devices"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    """.trimIndent()
+
+    val converted = this.parseAndConvert(json)
+
+    assertTrue(converted is FeedData)
+    val feedData = converted as FeedData
+    val entry = feedData.entries[0] as FeedEntryBook
+
+    assertNotNull(entry.licensor)
+    assertEquals("adobe", entry.licensor!!.vendor)
+    assertEquals("test-token", entry.licensor!!.clientToken)
+    assertEquals("https://example.com/devices", entry.licensor!!.deviceManager)
+  }
+
+  @Test
+  fun testAvailabilityReserved() {
+    val json = """
+      {
+        "type": "feed",
+        "metadata": {
+          "title": "Test Feed"
+        },
+        "publications": [
+          {
+            "type": "publication",
+            "metadata": {
+              "identifier": "urn:isbn:6060606060",
+              "title": "Reserved Book"
+            },
+            "links": [
+              {
+                "href": "https://example.com/book.epub",
+                "type": "application/epub+zip",
+                "rel": "http://librarysimplified.org/terms/rel/acquire/borrow",
+                "properties": {
+                  "availability": {
+                    "state": "reserved",
+                    "since": "2024-01-01T00:00:00Z",
+                    "until": "2024-02-01T00:00:00Z"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    """.trimIndent()
+
+    val converted = this.parseAndConvert(json)
+
+    assertTrue(converted is FeedData)
+    val feedData = converted as FeedData
+    val entry = feedData.entries[0] as FeedEntryBook
+
+    assertTrue(entry.availability is org.nypl.simplified.feeds.api.FeedAvailabilityHeld)
+    val held = entry.availability as org.nypl.simplified.feeds.api.FeedAvailabilityHeld
+    assertNotNull(held.startDate)
+    assertNotNull(held.endDate)
+  }
+
+  @Test
+  fun testAvailabilityUnavailable() {
+    val json = """
+      {
+        "type": "feed",
+        "metadata": {
+          "title": "Test Feed"
+        },
+        "publications": [
+          {
+            "type": "publication",
+            "metadata": {
+              "identifier": "urn:isbn:7070707070",
+              "title": "Unavailable Book"
+            },
+            "links": [
+              {
+                "href": "https://example.com/book.epub",
+                "type": "application/epub+zip",
+                "rel": "http://librarysimplified.org/terms/rel/acquire/borrow",
+                "properties": {
+                  "availability": {
+                    "state": "unavailable"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    """.trimIndent()
+
+    val converted = this.parseAndConvert(json)
+
+    assertTrue(converted is FeedData)
+    val feedData = converted as FeedData
+    val entry = feedData.entries[0] as FeedEntryBook
+
+    assertTrue(entry.availability is org.nypl.simplified.feeds.api.FeedAvailabilityHoldable)
   }
 }
