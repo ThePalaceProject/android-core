@@ -64,7 +64,6 @@ object OPDS12FeedConverter {
   fun convert(
     accountID: AccountID,
     feed: OPDSAcquisitionFeed,
-    filter: (OPDSAcquisitionFeedEntry) -> Boolean,
     search: OPDSOpenSearch1_1?
   ): Feed {
     val feedSearch: FeedSearch? =
@@ -91,7 +90,6 @@ object OPDS12FeedConverter {
     return if (orderedGroups.isEmpty()) {
       val entries: List<FeedEntry> =
         feed.feedEntries
-          .filter { filter(it) }
           .map { convertEntry(accountID, it) }
 
       FeedData(
@@ -118,7 +116,6 @@ object OPDS12FeedConverter {
             groupURI = group.uri,
             groupEntries =
               group.entries
-                .filter { filter(it) }
                 .map { convertEntry(accountID, it) }
           )
         }

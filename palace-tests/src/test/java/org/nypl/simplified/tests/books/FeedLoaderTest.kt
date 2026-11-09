@@ -6,6 +6,7 @@ import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.books.formats.BookFormatSupport
 import org.nypl.simplified.books.formats.BookFormatSupportParameters
 import org.nypl.simplified.content.api.ContentResolverType
+import org.nypl.simplified.feeds.FeedFetchResult
 import org.nypl.simplified.feeds.FeedFetchType
 import org.nypl.simplified.feeds.FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderType
@@ -41,7 +42,9 @@ class FeedLoaderTest : FeedLoaderContract() {
       bookFormatSupport = bookFormatSupport,
       contentResolver = contentResolver,
       exec = exec,
-      fetch = FeedFetchType { uri, _, _ -> uri.toURL().openStream() to null },
+      fetch = FeedFetchType { uri, _, _ ->
+        FeedFetchResult(body = uri.toURL().openStream(), accessToken = null, contentType = null)
+      },
       opds12Parser = parser,
       opds12SearchParser = searchParser,
     )

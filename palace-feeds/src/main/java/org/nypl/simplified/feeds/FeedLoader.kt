@@ -10,6 +10,15 @@ import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.content.api.ContentResolverType
+import org.nypl.simplified.feeds.api.Feed
+import org.nypl.simplified.feeds.api.FeedAcquisitionPath
+import org.nypl.simplified.feeds.api.FeedAcquisitionPaths
+import org.nypl.simplified.feeds.api.FeedAcquisitionRelation
+import org.nypl.simplified.feeds.api.FeedData
+import org.nypl.simplified.feeds.api.FeedDataWithGroups
+import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import one.irradia.mime.api.MIMEType
 import org.nypl.simplified.feeds.api.FeedLoaderResult
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderSuccess
@@ -17,14 +26,10 @@ import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
 import org.nypl.simplified.feeds.opds12.OPDS12FeedHTTPTransportException
 import org.nypl.simplified.feeds.opds20.OPDS20FeedConverter
-import org.nypl.simplified.opds.core.OPDSAcquisition
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
-import org.nypl.simplified.opds.core.OPDSAcquisitionPath
-import org.nypl.simplified.opds.core.OPDSAcquisitionPaths
 import org.nypl.simplified.opds.core.OPDSFeedParserType
 import org.nypl.simplified.opds.core.OPDSFeedTransportIOException
-import org.nypl.simplified.opds.core.OPDSSearchLink
 import org.nypl.simplified.opds.core.OPDSSearchParserType
+import org.nypl.simplified.opds.core.OPDSSearchLink
 import org.nypl.simplified.opds.core.OPDSOpenSearch1_1
 import org.readium.r2.opds.OPDS2Parser
 import org.readium.r2.shared.util.Url
@@ -40,28 +45,15 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * A functional interface for fetching feed content from a URI.
- *
- * @param uri The URI to fetch
- * @param credentials HTTP credentials, if any
- * @param acceptHeader The Accept header value, or null if not set
- * @return A pair of the response body stream and the access token (or null)
- */
-fun interface FeedFetchType {
-  fun fetch(
-    uri: URI,
-    credentials: AccountAuthenticationCredentials?,
-    acceptHeader: String?
-  ): Pair<InputStream, String?>
-}
-
-/**
  * A unified feed loader that handles both OPDS 1.2 and OPDS 2.0 serializations.
  *
- * The [wantsOpds20] flag controls whether the loader sends an
+ * The [preferOPDS20] flag controls whether the loader sends an
  * `Accept: application/opds+json` header to the server. When `true`, the
- * response is parsed as OPDS 2.0 JSON using the Readium parser. When `false`
- * (the default), the response is parsed as OPDS 1.2 Atom/XML.
+ * loader requests OPDS 2.0 and parses the response as OPDS 2.0 JSON using
+ * the Readium parser. If the server responds with a non-OPDS-2.0 content
+ * type, the loader falls back to the OPDS 1.2 parser. When `false` (the
+ * default), the loader does not send the header and the server responds
+ * with OPDS 1.2.
  */
 class FeedLoader(
   private val bookFormatSupport: BookFormatSupportType,
@@ -123,11 +115,22 @@ class FeedLoader(
         return this.parseFromContentResolver(accountId, uri)
       }
 
-      return if (this.preferOPDS20) {
-        this.fetchOPDS20(accountId, uri, credentials, method)
+      val acceptHeader = if (this.preferOPDS20) ACCEPT_OPDS_JSON else null
+      val result = this.fetch.fetch(uri, credentials, acceptHeader)
+      val body = result.body
+      val accessToken = result.accessToken
+      val contentType: MIMEType? = result.contentType
+
+      val feed: Feed = if (contentType != null && contentType.fullType == CONTENT_TYPE_OPDS_JSON) {
+        this.parseOPDS20(accountId, body, uri)
       } else {
-        this.fetchOPDS12(accountId, uri, credentials, method)
+        this.parseOPDS12(accountId, body, uri, credentials, method)
       }
+
+      return FeedLoaderSuccess(
+        feed = this.applyFilter(feed, accountId),
+        accessToken = accessToken
+      )
     } catch (e: OPDS12FeedHTTPTransportException) {
       this.log.debug("feed transport exception: ", e)
 
@@ -157,83 +160,88 @@ class FeedLoader(
     }
   }
 
-  /**
-   * Fetch and parse an OPDS 1.2 feed.
-   */
-  private fun fetchOPDS12(
+  private fun parseOPDS12(
     accountId: AccountID,
+    body: InputStream,
     uri: URI,
     credentials: AccountAuthenticationCredentials?,
     method: String
-  ): FeedLoaderResult {
-    val response = this.fetch.fetch(uri, credentials, null)
-    val body = response.first
-    val accessToken = response.second
-
+  ): Feed {
     val opdsFeed = body.use { stream -> this.opds12Parser.parse(uri, stream) }
     val search = this.fetchSearchLink(opdsFeed.feedSearchURI, credentials, method)
 
-    val feed =
-      OPDS12FeedConverter.convert(
-        accountID = accountId,
-        feed = opdsFeed,
-        filter = this::isEntrySupported,
-        search = search
-      )
-
-    return FeedLoaderSuccess(feed, accessToken)
+    return OPDS12FeedConverter.convert(
+      accountID = accountId,
+      feed = opdsFeed,
+      search = search
+    )
   }
 
-  /**
-   * Fetch and parse an OPDS 2.0 feed.
-   */
-  private fun fetchOPDS20(
+  private fun parseOPDS20(
     accountId: AccountID,
-    uri: URI,
-    credentials: AccountAuthenticationCredentials?,
-    method: String
-  ): FeedLoaderResult {
-    val response = this.fetch.fetch(uri, credentials, ACCEPT_OPDS_JSON)
-    val body = response.first
-    val accessToken = response.second
-
+    body: InputStream,
+    uri: URI
+  ): Feed {
     val bytes = body.readBytes()
     val baseUrl = Url(uri.toString())!!
     val parseData = OPDS2Parser.parse(bytes, baseUrl)
     val readiumFeed = parseData.feed
       ?: throw IOException("Response did not contain an OPDS 2.0 feed")
 
-    val feed = OPDS20FeedConverter.convert(accountId, readiumFeed)
-    return FeedLoaderSuccess(feed, accessToken)
+    return OPDS20FeedConverter.convert(accountId, readiumFeed)
   }
 
-  private fun isEntrySupported(entry: OPDSAcquisitionFeedEntry): Boolean {
+  /**
+   * Apply the [showOnlySupportedBooks] filter to a feed, removing entries
+   * that have no supported acquisition path. This operates on the
+   * version-neutral [FeedEntryBook] type.
+   */
+  private fun applyFilter(feed: Feed, accountId: AccountID): Feed {
     if (!this.showOnlySupportedBooks) {
-      return true
+      return feed
     }
 
-    val linearizedPaths = OPDSAcquisitionPaths.linearize(entry)
-    for (path in linearizedPaths) {
-      val relationSupported = this.isRelationSupported(path.source.relation)
-      val typePathSupported = this.isTypePathSupported(path)
-      if (relationSupported && typePathSupported) {
-        return true
-      }
+    return when (feed) {
+      is FeedData ->
+        feed.copy(
+          entries = feed.entries.filter { this.isEntrySupported(it) }
+        )
+
+      is FeedDataWithGroups ->
+        feed.copy(
+          groups = feed.groups.map { group ->
+            group.copy(
+              groupEntries = group.groupEntries.filter { this.isEntrySupported(it) }
+            )
+          }
+        )
     }
-    return false
   }
 
-  private fun isRelationSupported(relation: OPDSAcquisition.Relation): Boolean =
+  private fun isEntrySupported(entry: FeedEntry): Boolean {
+    return if (entry is FeedEntryBook) {
+      val paths = FeedAcquisitionPaths.linearize(entry.acquisitions)
+      paths.any { path ->
+        this.isRelationSupported(path.source.relation) &&
+          this.isTypePathSupported(path)
+      }
+    } else {
+      // Non-book entries (groups, etc.) are always supported
+      true
+    }
+  }
+
+  private fun isRelationSupported(relation: FeedAcquisitionRelation): Boolean =
     when (relation) {
-      OPDSAcquisition.Relation.ACQUISITION_BORROW -> true
-      OPDSAcquisition.Relation.ACQUISITION_BUY -> false
-      OPDSAcquisition.Relation.ACQUISITION_GENERIC -> true
-      OPDSAcquisition.Relation.ACQUISITION_OPEN_ACCESS -> true
-      OPDSAcquisition.Relation.ACQUISITION_SAMPLE -> false
-      OPDSAcquisition.Relation.ACQUISITION_SUBSCRIBE -> false
+      FeedAcquisitionRelation.ACQUISITION_BORROW -> true
+      FeedAcquisitionRelation.ACQUISITION_BUY -> false
+      FeedAcquisitionRelation.ACQUISITION_GENERIC -> true
+      FeedAcquisitionRelation.ACQUISITION_OPEN_ACCESS -> true
+      FeedAcquisitionRelation.ACQUISITION_SAMPLE -> false
+      FeedAcquisitionRelation.ACQUISITION_SUBSCRIBE -> false
     }
 
-  private fun isTypePathSupported(path: OPDSAcquisitionPath): Boolean =
+  private fun isTypePathSupported(path: FeedAcquisitionPath): Boolean =
     this.bookFormatSupport.isSupportedPath(path.asMIMETypes())
 
   private fun parseFromContentResolver(
@@ -245,11 +253,13 @@ class FeedLoader(
       streamMaybe.use { stream ->
         FeedLoaderSuccess(
           feed =
-            OPDS12FeedConverter.convert(
-              accountID = accountId,
-              feed = this.opds12Parser.parse(uri, stream),
-              search = null,
-              filter = this::isEntrySupported
+            this.applyFilter(
+              OPDS12FeedConverter.convert(
+                accountID = accountId,
+                feed = this.opds12Parser.parse(uri, stream),
+                search = null
+              ),
+              accountId
             ),
           accessToken = null
         )
@@ -271,8 +281,8 @@ class FeedLoader(
     method: String
   ): OPDSOpenSearch1_1? {
     return if (searchLink != null) {
-      val response = this.fetch.fetch(searchLink.uri, credentials, null)
-      response.first.use { stream ->
+      val result = this.fetch.fetch(searchLink.uri, credentials, null)
+      result.body.use { stream ->
         this.opds12SearchParser.parse(searchLink.uri, stream)
       }
     } else {
@@ -291,6 +301,7 @@ class FeedLoader(
 
   companion object {
     private const val ACCEPT_OPDS_JSON = "application/opds+json"
+    private const val CONTENT_TYPE_OPDS_JSON = "application/opds+json"
 
     /**
      * Create a new unified feed loader backed by an HTTP client.
@@ -336,7 +347,12 @@ class FeedLoader(
         val status = response.status
         when {
           status is LSHTTPResponseStatus.Responded.OK -> {
-            (status.bodyStream ?: ByteArrayInputStream(ByteArray(0))) to status.getAccessToken()
+            val bodyStream = (status.bodyStream ?: ByteArrayInputStream(ByteArray(0)))
+            FeedFetchResult(
+              body = bodyStream,
+              accessToken = status.getAccessToken(),
+              contentType = status.properties.contentType
+            )
           }
 
           status is LSHTTPResponseStatus.Responded.Error -> {

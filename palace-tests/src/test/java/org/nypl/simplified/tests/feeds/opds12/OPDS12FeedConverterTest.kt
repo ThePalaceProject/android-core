@@ -91,7 +91,6 @@ class OPDS12FeedConverterTest {
       OPDS12FeedConverter.convert(
         accountID = this.accountID,
         feed = feed,
-        filter = { true },
         search = null
       )
 
@@ -128,7 +127,6 @@ class OPDS12FeedConverterTest {
       OPDS12FeedConverter.convert(
         accountID = this.accountID,
         feed = feed,
-        filter = { true },
         search = search
       )
 
@@ -200,7 +198,6 @@ class OPDS12FeedConverterTest {
       OPDS12FeedConverter.convert(
         accountID = this.accountID,
         feed = feed,
-        filter = { true },
         search = null
       )
 
@@ -304,7 +301,6 @@ class OPDS12FeedConverterTest {
       OPDS12FeedConverter.convert(
         accountID = this.accountID,
         feed = feed,
-        filter = { true },
         search = null
       )
 
@@ -363,7 +359,6 @@ class OPDS12FeedConverterTest {
       OPDS12FeedConverter.convert(
         accountID = this.accountID,
         feed = feed,
-        filter = { true },
         search = null
       )
 
@@ -413,7 +408,6 @@ class OPDS12FeedConverterTest {
       OPDS12FeedConverter.convert(
         accountID = this.accountID,
         feed = feed,
-        filter = { true },
         search = null
       )
 
@@ -462,7 +456,6 @@ class OPDS12FeedConverterTest {
       OPDS12FeedConverter.convert(
         accountID = this.accountID,
         feed = feed,
-        filter = { true },
         search = null
       )
 
@@ -506,7 +499,6 @@ class OPDS12FeedConverterTest {
       OPDS12FeedConverter.convert(
         accountID = this.accountID,
         feed = feed,
-        filter = { true },
         search = null
       )
 
@@ -550,7 +542,6 @@ class OPDS12FeedConverterTest {
       OPDS12FeedConverter.convert(
         accountID = this.accountID,
         feed = feed,
-        filter = { true },
         search = null
       )
 
@@ -590,7 +581,6 @@ class OPDS12FeedConverterTest {
       OPDS12FeedConverter.convert(
         accountID = this.accountID,
         feed = feed,
-        filter = { true },
         search = null
       )
 
@@ -636,7 +626,6 @@ class OPDS12FeedConverterTest {
       OPDS12FeedConverter.convert(
         accountID = this.accountID,
         feed = feed,
-        filter = { true },
         search = null
       )
 
@@ -697,7 +686,6 @@ class OPDS12FeedConverterTest {
       OPDS12FeedConverter.convert(
         accountID = this.accountID,
         feed = feed,
-        filter = { true },
         search = null
       )
 
@@ -719,48 +707,6 @@ class OPDS12FeedConverterTest {
     val f2 = data.facetsOrder[2] as FeedFacetData
     assertEquals("Fiction", f2.title)
     assertEquals("http://librarysimplified.org/terms/rel/entrypoint", f2.groupType)
-  }
-
-  @Test
-  fun testEntryFilter() {
-    val entry1 =
-      OPDSAcquisitionFeedEntry.newBuilder(
-        id = "urn:isbn:aaa",
-        title = "Keep Me",
-        updated = date20240115T103000Z,
-        availability = OPDSAvailabilityLoanable.get()
-      ).build()
-
-    val entry2 =
-      OPDSAcquisitionFeedEntry.newBuilder(
-        id = "urn:isbn:bbb",
-        title = "Filter Me Out",
-        updated = date20240115T103000Z,
-        availability = OPDSAvailabilityLoanable.get()
-      ).build()
-
-    val feed =
-      OPDSAcquisitionFeed.newBuilder(
-        URI.create("http://example.com/feed"),
-        "feed-filter",
-        date20240115T103000Z,
-        "Filter Test"
-      )
-        .addEntry(entry1)
-        .addEntry(entry2)
-        .build()
-
-    val result =
-      OPDS12FeedConverter.convert(
-        accountID = this.accountID,
-        feed = feed,
-        filter = { it.id == "urn:isbn:aaa" },
-        search = null
-      )
-
-    val data = result as FeedData
-    assertEquals(1, data.entries.size)
-    assertEquals("Keep Me", (data.entries[0] as FeedEntryBook).title)
   }
 
   @Test
@@ -792,7 +738,6 @@ class OPDS12FeedConverterTest {
       OPDS12FeedConverter.convert(
         accountID = this.accountID,
         feed = feed,
-        filter = { true },
         search = null
       )
 
@@ -827,7 +772,6 @@ class OPDS12FeedConverterTest {
       OPDS12FeedConverter.convert(
         accountID = this.accountID,
         feed = feed,
-        filter = { true },
         search = null
       )
 
@@ -892,7 +836,6 @@ class OPDS12FeedConverterTest {
       OPDS12FeedConverter.convert(
         accountID = this.accountID,
         feed = feed,
-        filter = { true },
         search = null
       )
 
@@ -929,7 +872,6 @@ class OPDS12FeedConverterTest {
       OPDS12FeedConverter.convert(
         accountID = this.accountID,
         feed = feed,
-        filter = { true },
         search = null
       )
 
@@ -966,7 +908,6 @@ class OPDS12FeedConverterTest {
       OPDS12FeedConverter.convert(
         accountID = this.accountID,
         feed = feed,
-        filter = { true },
         search = null
       )
 
