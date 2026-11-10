@@ -56,10 +56,6 @@ class NotificationTokenHTTPCalls(
 
     val tokenTask = this.firebaseInstance.token
     tokenTask.addOnSuccessListener { token ->
-      this.postDeviceTokenToServer(token, originalUrl, credentials, account)
-    }
-
-    tokenTask.addOnSuccessListener { token ->
       this.executor.execute {
         this.postDeviceTokenToServer(token, originalUrl, credentials, account)
       }
