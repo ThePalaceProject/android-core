@@ -20,5 +20,5 @@ data class PdfReaderParameters(
   val pdfFile: File,
   val id: BookID,
   val entry: FeedEntryBook,
-  val drmInfo: BookDRMInformation
+  val drmInfo: BookDRMInformation,
 )

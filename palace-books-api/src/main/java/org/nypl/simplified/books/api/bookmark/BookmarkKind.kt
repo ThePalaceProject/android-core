@@ -11,7 +11,7 @@ import java.io.Serializable
  */
 
 sealed class BookmarkKind(
-  val motivationURI: String
+  val motivationURI: String,
 ) : Serializable {
   /**
    * The bookmark represents a last-read location.

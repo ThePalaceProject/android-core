@@ -11,7 +11,7 @@ import org.nypl.simplified.links.Link
 
 data class OPDSAcquisitionPath(
   val source: OPDSAcquisition,
-  val elements: List<OPDSAcquisitionPathElement>
+  val elements: List<OPDSAcquisitionPathElement>,
 ) {
   /**
    * Prefix the path with the given MIME and URI.
@@ -20,7 +20,7 @@ data class OPDSAcquisitionPath(
   fun prefixWith(
     mime: MIMEType,
     target: Link?,
-    properties: Map<String, String>
+    properties: Map<String, String>,
   ): OPDSAcquisitionPath {
     val newElements = mutableListOf<OPDSAcquisitionPathElement>()
     newElements.add(OPDSAcquisitionPathElement(mime, target, properties))

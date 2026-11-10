@@ -29,7 +29,7 @@ interface BookmarkServiceUsableType {
 
   fun bookmarkSyncAndLoad(
     accountID: AccountID,
-    book: BookID
+    book: BookID,
   ): CompletableFuture<BookmarksForBook>
 
   /**
@@ -50,7 +50,7 @@ interface BookmarkServiceUsableType {
   @Deprecated("Use the bookmarks property to read without waiting.")
   fun bookmarkLoad(
     accountID: AccountID,
-    book: BookID
+    book: BookID,
   ): CompletableFuture<BookmarksForBook>
 
   /**
@@ -59,7 +59,7 @@ interface BookmarkServiceUsableType {
 
   fun bookmarkCreateLocal(
     accountID: AccountID,
-    bookmark: SerializedBookmark
+    bookmark: SerializedBookmark,
   ): CompletableFuture<SerializedBookmark>
 
   /**
@@ -68,7 +68,7 @@ interface BookmarkServiceUsableType {
 
   fun bookmarkCreateRemote(
     accountID: AccountID,
-    bookmark: SerializedBookmark
+    bookmark: SerializedBookmark,
   ): CompletableFuture<SerializedBookmark>
 
   /**
@@ -78,7 +78,7 @@ interface BookmarkServiceUsableType {
   fun bookmarkCreate(
     accountID: AccountID,
     bookmark: SerializedBookmark,
-    ignoreRemoteFailures: Boolean
+    ignoreRemoteFailures: Boolean,
   ): CompletableFuture<SerializedBookmark>
 
   /**
@@ -88,6 +88,6 @@ interface BookmarkServiceUsableType {
   fun bookmarkDelete(
     accountID: AccountID,
     bookmark: SerializedBookmark,
-    ignoreRemoteFailures: Boolean
+    ignoreRemoteFailures: Boolean,
   ): CompletableFuture<Unit>
 }

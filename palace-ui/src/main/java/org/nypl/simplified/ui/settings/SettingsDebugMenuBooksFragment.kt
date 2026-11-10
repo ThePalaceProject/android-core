@@ -29,7 +29,8 @@ class SettingsDebugMenuBooksFragment :
       override fun fragment(): SettingsDebugMenuBooksFragment = SettingsDebugMenuBooksFragment()
     }
 
-    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuBooksFragment> = ScreenSettingsDebugMenu()
+    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuBooksFragment> =
+      ScreenSettingsDebugMenu()
   }
 
   override fun onBackButtonPressed(): MainBackButtonConsumerType.Result {
@@ -45,7 +46,7 @@ class SettingsDebugMenuBooksFragment :
 
   override fun onViewCreated(
     view: View,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ) {
     super.onViewCreated(view, savedInstanceState)
 

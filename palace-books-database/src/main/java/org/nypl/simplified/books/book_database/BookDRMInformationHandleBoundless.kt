@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 class BookDRMInformationHandleBoundless(
   private val directory: File,
   format: BookFormats.BookFormatDefinition,
-  private val onUpdate: () -> Unit
+  private val onUpdate: () -> Unit,
 ) : BookDRMInformationHandle.BoundlessHandle(),
   BookDRMInformationHandleBase {
   private val closed = AtomicBoolean(false)
@@ -28,7 +28,7 @@ class BookDRMInformationHandleBoundless(
     BookDRMInformationHandles.writeDRMInfo(
       directory = directory,
       format = format,
-      kind = BookDRMKind.BOUNDLESS
+      kind = BookDRMKind.BOUNDLESS,
     )
   }
 

@@ -43,7 +43,8 @@ class SettingsDebugMenuDRMFragment :
       override fun fragment(): SettingsDebugMenuDRMFragment = SettingsDebugMenuDRMFragment()
     }
 
-    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuDRMFragment> = ScreenSettingsDebugMenu()
+    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuDRMFragment> =
+      ScreenSettingsDebugMenu()
   }
 
   override fun onBackButtonPressed(): MainBackButtonConsumerType.Result {
@@ -63,7 +64,7 @@ class SettingsDebugMenuDRMFragment :
 
   override fun onViewCreated(
     view: View,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ) {
     super.onViewCreated(view, savedInstanceState)
 
@@ -78,10 +79,13 @@ class SettingsDebugMenuDRMFragment :
       view.findViewById(R.id.debugDrmAdobeActivations)
 
     this.drmTable.addView(
-      this.createDrmSupportRow("Adobe ACS (${AdobeDRMExtensions.versionCurrent()})", SettingsDebugModel.adeptSupported())
+      this.createDrmSupportRow(
+        "Adobe ACS (${AdobeDRMExtensions.versionCurrent()})",
+        SettingsDebugModel.adeptSupported(),
+      ),
     )
     this.drmTable.addView(
-      this.createDrmSupportRow("Boundless", SettingsDebugModel.boundlessSupported())
+      this.createDrmSupportRow("Boundless", SettingsDebugModel.boundlessSupported()),
     )
     this.enableLCPManualPassphrase =
       view.findViewById(R.id.debugDRMLCPManualPassphraseEnabled)
@@ -108,7 +112,7 @@ class SettingsDebugMenuDRMFragment :
       this.adobeResetTitle.text =
         this.resources.getString(
           R.string.debugDRMAdobeIDResetWithAccount,
-          account.provider.displayName
+          account.provider.displayName,
         )
       this.adobeResetButton.setOnClickListener {
         this.onAdobeResetButtonClicked(profiles, account)
@@ -123,7 +127,7 @@ class SettingsDebugMenuDRMFragment :
     this.subscriptions.add(
       SettingsDebugModel.adeptActivations.subscribe { _, activations ->
         this.onAdobeDRMReceivedActivations(activations)
-      }
+      },
     )
 
     SettingsDebugModel.fetchAdobeActivations()
@@ -139,13 +143,13 @@ class SettingsDebugMenuDRMFragment :
 
   private fun onAdobeResetButtonClicked(
     profiles: ProfilesControllerType,
-    account: AccountType
+    account: AccountType,
   ) {
     val dialog =
       MaterialAlertDialogBuilder(this.requireActivity())
         .setTitle(R.string.debugDRMAdobeIDResetConfirmTitle)
         .setMessage(
-          this.getString(R.string.debugDRMAdobeIDResetConfirmation, account.provider.displayName)
+          this.getString(R.string.debugDRMAdobeIDResetConfirmation, account.provider.displayName),
         ).setNegativeButton(R.string.Dismiss) { dialog, _ ->
           dialog.dismiss()
         }.setPositiveButton(R.string.debugDRMAdobeIDResetReset) { dialog, _ ->
@@ -158,7 +162,7 @@ class SettingsDebugMenuDRMFragment :
 
   private fun doAdobeReset(
     profiles: ProfilesControllerType,
-    account: AccountType
+    account: AccountType,
   ) {
     UIThread.runOnUIThread { this.adobeResetButton.isEnabled = false }
 
@@ -193,7 +197,7 @@ class SettingsDebugMenuDRMFragment :
         body = "",
         subject = "[palace-error-report]",
         attributes = result.attributes.toSortedMap(),
-        taskSteps = result.steps
+        taskSteps = result.steps,
       )
 
     MainNavigation.openErrorPage(this.requireActivity(), parameters)
@@ -207,11 +211,13 @@ class SettingsDebugMenuDRMFragment :
 
   private fun createDrmSupportRow(
     name: String,
-    isSupported: Boolean
+    isSupported: Boolean,
   ): TableRow {
     val row =
       this.layoutInflater.inflate(
-        R.layout.settings_version_table_item, this.drmTable, false
+        R.layout.settings_version_table_item,
+        this.drmTable,
+        false,
       ) as TableRow
     val key =
       row.findViewById<TextView>(R.id.key)
@@ -239,7 +245,7 @@ class SettingsDebugMenuDRMFragment :
         this.layoutInflater.inflate(
           R.layout.settings_drm_activation_table_item,
           this.adobeDRMActivationTable,
-          false
+          false,
         ) as TableRow
       val index = row.findViewById<TextView>(R.id.index)
       val vendor = row.findViewById<TextView>(R.id.vendor)
@@ -263,7 +269,7 @@ class SettingsDebugMenuDRMFragment :
         this.layoutInflater.inflate(
           R.layout.settings_drm_activation_table_item,
           this.adobeDRMActivationTable,
-          false
+          false,
         ) as TableRow
       val index = row.findViewById<TextView>(R.id.index)
       val vendor = row.findViewById<TextView>(R.id.vendor)

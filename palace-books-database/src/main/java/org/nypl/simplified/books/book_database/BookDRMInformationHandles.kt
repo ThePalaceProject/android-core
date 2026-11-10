@@ -27,7 +27,7 @@ object BookDRMInformationHandles {
     directory: File,
     format: BookFormats.BookFormatDefinition,
     bookFormats: BookFormatSupportType,
-    onUpdate: () -> Unit
+    onUpdate: () -> Unit,
   ): BookDRMInformationHandle? {
     val drmInfoFile =
       File(directory, "${format.shortName}-drm.txt")
@@ -80,7 +80,7 @@ object BookDRMInformationHandles {
 
   private fun inferDRMKind(
     directory: File,
-    format: BookFormats.BookFormatDefinition
+    format: BookFormats.BookFormatDefinition,
   ): BookDRMKind {
     val acsNames = BookDRMInformationHandleACS.names(format)
     if (acsNames.any { File(directory, it).exists() }) {
@@ -101,7 +101,7 @@ object BookDRMInformationHandles {
     directory: File,
     format: BookFormats.BookFormatDefinition,
     drmKind: BookDRMKind,
-    onUpdate: () -> Unit
+    onUpdate: () -> Unit,
   ): BookDRMInformationHandle =
     when (drmKind) {
       BookDRMKind.NONE -> {
@@ -128,7 +128,7 @@ object BookDRMInformationHandles {
   fun writeDRMInfo(
     directory: File,
     format: BookFormats.BookFormatDefinition,
-    kind: BookDRMKind
+    kind: BookDRMKind,
   ) {
     DirectoryUtilities.directoryCreate(directory)
 

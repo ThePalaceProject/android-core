@@ -105,7 +105,7 @@ interface BorrowContextType {
       this.taskRecorder.currentStepFailed(
         message = "A required URI is missing.",
         errorCode = BorrowErrorCodes.requiredURIMissing,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       throw BorrowSubtaskFailed()
     }
@@ -125,7 +125,7 @@ interface BorrowContextType {
       this.taskRecorder.currentStepFailed(
         message = "A required URI is missing.",
         errorCode = BorrowErrorCodes.requiredURIMissing,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       throw BorrowSubtaskFailed()
     }
@@ -150,7 +150,7 @@ interface BorrowContextType {
 
   fun logDebug(
     message: String,
-    vararg arguments: Any?
+    vararg arguments: Any?,
   )
 
   /**
@@ -159,7 +159,7 @@ interface BorrowContextType {
 
   fun logError(
     message: String,
-    vararg arguments: Any?
+    vararg arguments: Any?,
   )
 
   /**
@@ -168,7 +168,7 @@ interface BorrowContextType {
 
   fun logWarn(
     message: String,
-    vararg arguments: Any?
+    vararg arguments: Any?,
   )
 
   /**
@@ -218,7 +218,7 @@ interface BorrowContextType {
     message: String,
     receivedSize: Long? = null,
     expectedSize: Long? = null,
-    bytesPerSecond: Long? = null
+    bytesPerSecond: Long? = null,
   )
 
   /**
@@ -311,7 +311,7 @@ interface BorrowContextType {
         this.taskRecorder.currentStepFailed(
           message = "A previous subtask required the use of a bearer token, but those cannot be used for this subtask.",
           errorCode = bearerTokenNotPermitted,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
         throw BorrowSubtaskFailed()
       }

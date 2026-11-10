@@ -42,7 +42,7 @@ class BookDeleteTask(
         message = e.message ?: e.javaClass.canonicalName ?: "unknown",
         errorCode = "deleteFailed",
         exception = e,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       throw TaskFailedHandled(e)
     }

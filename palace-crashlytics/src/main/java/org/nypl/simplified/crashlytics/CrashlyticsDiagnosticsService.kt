@@ -19,7 +19,7 @@ class CrashlyticsDiagnosticsService : DiagnosticsServiceType {
   override fun report(
     code: String,
     data: Map<String, String>,
-    throwable: Throwable?
+    throwable: Throwable?,
   ) {
     for ((key, value) in data) {
       this.crashlytics.setCustomKey(key, value)

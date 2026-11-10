@@ -45,10 +45,11 @@ class BorrowBoundless private constructor() : BorrowSubtaskType {
       type: MIMEType,
       target: Link?,
       account: AccountReadableType?,
-      remaining: List<MIMEType>
+      remaining: List<MIMEType>,
     ): Boolean =
       MIMECompatibility.isCompatibleStrictWithoutAttributes(
-        type, StandardFormatNames.boundlessLicenseFiles
+        type,
+        StandardFormatNames.boundlessLicenseFiles,
       )
   }
 
@@ -97,7 +98,7 @@ class BorrowBoundless private constructor() : BorrowSubtaskType {
         },
         onDownloadEvent = { event ->
           this.onDownloadProgressEvent(context, event)
-        }
+        },
       )
 
     return when (result) {
@@ -118,7 +119,7 @@ class BorrowBoundless private constructor() : BorrowSubtaskType {
 
   private fun drmFailed(
     context: BorrowContextType,
-    result: DRMTaskFailure<BoundlessFulfilledCMEPUB>
+    result: DRMTaskFailure<BoundlessFulfilledCMEPUB>,
   ): BorrowSubtaskException {
     for (entry in result.attributes) {
       context.taskRecorder.addAttribute(entry.key, entry.value)
@@ -131,7 +132,7 @@ class BorrowBoundless private constructor() : BorrowSubtaskType {
           message = failure.message ?: failure.javaClass.name,
           errorCode = "drm-exception",
           exception = failure,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
       }
     }
@@ -140,7 +141,7 @@ class BorrowBoundless private constructor() : BorrowSubtaskType {
 
   private fun saveFulfilledBook(
     context: BorrowContextType,
-    fulfilledItems: BoundlessFulfilledCMEPUB
+    fulfilledItems: BoundlessFulfilledCMEPUB,
   ) {
     context.taskRecorder.beginNewStep("Saving fulfilled book...")
 
@@ -156,7 +157,8 @@ class BorrowBoundless private constructor() : BorrowSubtaskType {
       }
 
       is BookDatabaseEntryFormatHandleAudioBook,
-      is BookDatabaseEntryFormatHandlePDF -> {
+      is BookDatabaseEntryFormatHandlePDF,
+      -> {
         throw UnreachableCodeException()
       }
     }
@@ -174,7 +176,7 @@ class BorrowBoundless private constructor() : BorrowSubtaskType {
       context.taskRecorder.currentStepFailed(
         message = "This build of the application does not support Boundless DRM.",
         errorCode = boundlessNotSupported,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       throw BorrowSubtaskFailed()
     }
@@ -185,7 +187,7 @@ class BorrowBoundless private constructor() : BorrowSubtaskType {
 
   private fun onDownloadProgressEvent(
     context: BorrowContextType,
-    event: LSHTTPDownloadState
+    event: LSHTTPDownloadState,
   ) {
     when (event) {
       is DownloadReceiving -> {
@@ -196,11 +198,11 @@ class BorrowBoundless private constructor() : BorrowSubtaskType {
             this.downloadingMessage(
               expectedSize = event.expectedSize,
               currentSize = event.receivedSize,
-              perSecond = event.bytesPerSecond
+              perSecond = event.bytesPerSecond,
             ),
           receivedSize = event.receivedSize,
           expectedSize = event.expectedSize,
-          bytesPerSecond = event.bytesPerSecond
+          bytesPerSecond = event.bytesPerSecond,
         )
       }
 
@@ -209,7 +211,8 @@ class BorrowBoundless private constructor() : BorrowSubtaskType {
       is DownloadFailedServer,
       is DownloadFailedUnacceptableMIME,
       is DownloadFailedExceptionally,
-      is DownloadCompletedSuccessfully -> {
+      is DownloadCompletedSuccessfully,
+      -> {
         // Don't care
       }
     }
@@ -218,7 +221,7 @@ class BorrowBoundless private constructor() : BorrowSubtaskType {
   private fun downloadingMessage(
     expectedSize: Long?,
     currentSize: Long,
-    perSecond: Long
+    perSecond: Long,
   ): String =
     if (expectedSize == null) {
       "Downloading..."
@@ -237,7 +240,7 @@ class BorrowBoundless private constructor() : BorrowSubtaskType {
       context.taskRecorder.currentStepFailed(
         message = "No format handle available for ${eventualType.fullType}",
         errorCode = BorrowErrorCodes.noFormatHandle,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       throw BorrowSubtaskFailed()
     }

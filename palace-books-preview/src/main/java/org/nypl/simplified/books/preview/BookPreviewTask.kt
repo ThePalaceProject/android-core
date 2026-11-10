@@ -18,7 +18,8 @@ class BookPreviewTask(
   private val bookPreviewRegistry: BookPreviewRegistryType,
   private val bookPreviewRequirements: BookPreviewRequirements,
   private val feedEntry: FeedEntryBook,
-  private val format: BookFormats.BookFormatDefinition?
+  private val format: BookFormats.BookFormatDefinition?,
+  
 ) {
   private lateinit var taskRecorder: TaskRecorderType
 
@@ -27,21 +28,21 @@ class BookPreviewTask(
 
   private fun debug(
     message: String,
-    vararg arguments: Any?
+    vararg arguments: Any?,
   ) {
     this.logger.debug("[{}] $message", this.feedEntry.id, *arguments)
   }
 
   private fun error(
     message: String,
-    vararg arguments: Any?
+    vararg arguments: Any?,
   ) {
     this.logger.error("[{}] $message", this.feedEntry.id, *arguments)
   }
 
   private fun warn(
     message: String,
-    vararg arguments: Any?
+    vararg arguments: Any?,
   ) {
     this.logger.warn("[{}] $message", this.feedEntry.id, *arguments)
   }
@@ -50,7 +51,8 @@ class BookPreviewTask(
 
   private fun handleBookPreviewDownload(
     onPreviewFileReady: (File) -> Unit,
-    previewAcquisition: FeedPreviewAcquisition
+    previewAcquisition: FeedPreviewAcquisition,
+  
   ): TaskResult<*> {
     val taskName = "BookPreviewDownloadTask"
     val step = this.taskRecorder.beginNewStep("Executing subtask $taskName...")
@@ -69,8 +71,8 @@ class BookPreviewTask(
             onPreviewFileReady = onPreviewFileReady,
             previewAcquisition = previewAcquisition,
             taskRecorder = taskRecorder,
-            temporaryDirectory = bookPreviewRegistry.getPreviewDownloadDirectory()
-          )
+            temporaryDirectory = bookPreviewRegistry.getPreviewDownloadDirectory(),
+          ),
       ).execute()
 
       step.resolution =
@@ -83,7 +85,7 @@ class BookPreviewTask(
           message = "Subtask $taskName raised an unexpected exception",
           exception = e,
           errorCode = "subtaskFailed",
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
       this.taskRecorder.finishFailure<Unit>()
     }
@@ -91,7 +93,7 @@ class BookPreviewTask(
 
   private fun onPreviewDownloadFailed() {
     bookPreviewRegistry.updatePreviewStatus(
-      BookPreviewStatus.HasPreview.DownloadFailed()
+      BookPreviewStatus.HasPreview.DownloadFailed(),
     )
   }
 
@@ -99,7 +101,7 @@ class BookPreviewTask(
     message: String,
     receivedSize: Long?,
     expectedSize: Long?,
-    bytesPerSecond: Long?
+    bytesPerSecond: Long?,
   ) {
     this.debug("downloading: {} {} {}", expectedSize, receivedSize, bytesPerSecond)
 
@@ -108,31 +110,32 @@ class BookPreviewTask(
         bytesPerSecond = bytesPerSecond,
         currentTotalBytes = receivedSize,
         expectedTotalBytes = expectedSize,
-        detailMessage = message
-      )
+        detailMessage = message,
+      ),
     )
   }
 
   private fun handlePreviewDownload(previewAcquisition: FeedPreviewAcquisition): TaskResult<*> =
     when (format) {
       BookFormats.BookFormatDefinition.BOOK_FORMAT_AUDIO,
-      BookFormats.BookFormatDefinition.BOOK_FORMAT_EPUB -> {
+      BookFormats.BookFormatDefinition.BOOK_FORMAT_EPUB,
+      -> {
         handleBookPreviewDownload(
           onPreviewFileReady = { file ->
             bookPreviewRegistry.updatePreviewStatus(
               if (format == BookFormats.BookFormatDefinition.BOOK_FORMAT_AUDIO) {
                 BookPreviewStatus.HasPreview.Ready.AudiobookPreview(
-                  file = file
+                  file = file,
                 )
               } else {
                 BookPreviewStatus.HasPreview.Ready.BookPreview(
                   file = file,
-                  mimeType = previewAcquisition.type
+                  mimeType = previewAcquisition.type,
                 )
-              }
+              },
             )
           },
-          previewAcquisition = previewAcquisition
+          previewAcquisition = previewAcquisition,
         )
       }
 
@@ -140,7 +143,7 @@ class BookPreviewTask(
         this.taskRecorder.currentStepFailed(
           message = "Non supported book format.",
           errorCode = BookPreviewErrorCodes.nonSupportedBookFormat,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
         this.taskRecorder.finishFailure<Unit>()
       }
@@ -156,13 +159,13 @@ class BookPreviewTask(
     return if (previewAcquisition.type == StandardFormatNames.textHtmlBook) {
       bookPreviewRegistry.updatePreviewStatus(
         BookPreviewStatus.HasPreview.Ready.Embedded(
-          url = URL(previewAcquisition.uri.toString())
-        )
+          url = URL(previewAcquisition.uri.toString()),
+        ),
       )
       this.taskRecorder.finishSuccess(Unit)
     } else {
       handlePreviewDownload(
-        previewAcquisition = previewAcquisition
+        previewAcquisition = previewAcquisition,
       )
     }
   }
@@ -172,12 +175,12 @@ class BookPreviewTask(
 
     if (feedEntry.previewAcquisitions.isEmpty()) {
       this.bookPreviewRegistry.updatePreviewStatus(
-        BookPreviewStatus.None
+        BookPreviewStatus.None,
       )
       this.taskRecorder.currentStepFailed(
         message = "No preview acquisitions.",
         errorCode = BookPreviewErrorCodes.noPreviewAcquisitions,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       this.taskRecorder.finishFailure<Unit>()
       throw BookPreviewException(null)
@@ -188,7 +191,7 @@ class BookPreviewTask(
       this.taskRecorder.currentStepFailed(
         message = "No supported preview acquisitions.",
         errorCode = BookPreviewErrorCodes.noSupportedPreviewAcquisitions,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       throw BookPreviewException(null)
     }
@@ -212,7 +215,7 @@ class BookPreviewTask(
         message = this.messageOrName(e),
         errorCode = "unexpected exception",
         exception = e,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       this.taskRecorder.finishFailure<Unit>()
     }

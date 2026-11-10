@@ -19,7 +19,7 @@ data class SerializedBookmarkLegacy(
   override val opdsId: String,
   override val time: DateTime,
   override val uri: URI?,
-  override val bookProgress: Double
+  override val bookProgress: Double,
 ) : SerializedBookmark() {
   private val dateFormatter =
     ISODateTimeFormat
@@ -64,7 +64,7 @@ data class SerializedBookmarkLegacy(
       is SerializedLocatorAudioBookTime1 -> {
         node.put(
           "chapterProgress",
-          this.location.timeMilliseconds.toDouble() / this.location.duration.toDouble()
+          this.location.timeMilliseconds.toDouble() / this.location.duration.toDouble(),
         )
       }
 

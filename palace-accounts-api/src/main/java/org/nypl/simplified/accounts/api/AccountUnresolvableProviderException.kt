@@ -5,5 +5,5 @@ package org.nypl.simplified.accounts.api
  */
 
 class AccountUnresolvableProviderException(
-  message: String?
+  message: String?,
 ) : Exception(message)

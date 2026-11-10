@@ -3,7 +3,7 @@ package org.nypl.simplified.webview
 import android.database.sqlite.SQLiteDatabase
 
 class WebViewCookieDatabaseV10 internal constructor(
-  private val db: SQLiteDatabase
+  private val db: SQLiteDatabase,
 ) : WebViewCookieDatabase(db) {
   override fun getAll(): List<WebViewCookieType> {
     val result = mutableListOf<Cookie>()
@@ -17,7 +17,7 @@ class WebViewCookieDatabaseV10 internal constructor(
         "expires_utc",
         "is_secure",
         "is_httponly",
-        "firstpartyonly"
+        "firstpartyonly",
       )
 
     this.db
@@ -28,7 +28,7 @@ class WebViewCookieDatabaseV10 internal constructor(
         null,
         null,
         null,
-        null
+        null,
       ).use { cursor ->
         while (cursor.moveToNext()) {
           result.add(
@@ -40,8 +40,8 @@ class WebViewCookieDatabaseV10 internal constructor(
               expiresUTC = cursor.getLong(4),
               isSecure = cursor.getInt(5),
               isHttpOnly = cursor.getInt(6),
-              firstPartyOnly = cursor.getInt(7)
-            )
+              firstPartyOnly = cursor.getInt(7),
+            ),
           )
         }
       }
@@ -57,7 +57,7 @@ class WebViewCookieDatabaseV10 internal constructor(
     val expiresUTC: Long,
     val isSecure: Int,
     val isHttpOnly: Int,
-    val firstPartyOnly: Int
+    val firstPartyOnly: Int,
   ) : WebViewCookieType {
     override val sourceURL: String
       get() {

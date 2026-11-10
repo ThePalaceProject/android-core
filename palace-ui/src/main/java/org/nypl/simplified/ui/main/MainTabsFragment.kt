@@ -62,7 +62,7 @@ class MainTabsFragment :
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ): View {
     this.root =
       inflater.inflate(R.layout.main_tabs, container, false) as ViewGroup
@@ -145,7 +145,7 @@ class MainTabsFragment :
          * orientation changes; not just in response to actual user input.
          */
         }
-      }
+      },
     )
 
     this.tabCatalogView.setOnClickListener {
@@ -173,7 +173,7 @@ class MainTabsFragment :
 
   private fun setIconAndText(
     category: MainTabCategory,
-    view: TabLayout.TabView
+    view: TabLayout.TabView,
   ) {
     val textView =
       view.findViewById<TextView>(R.id.customTabText)
@@ -216,12 +216,12 @@ class MainTabsFragment :
     this.subscriptions.add(
       MainNavigation.Settings.navigationStack.subscribe { _, newValue ->
         this.onSettingsTabChanged()
-      }
+      },
     )
     this.subscriptions.add(
       MainNavigation.tab.subscribe { _, newValue ->
         this.onTabRequested(newValue)
-      }
+      },
     )
   }
 
@@ -242,7 +242,7 @@ class MainTabsFragment :
             TAB_BOOKS -> this.tabBooks
             TAB_RESERVATIONS -> this.tabReservations
             TAB_SETTINGS -> this.tabSettings
-          }
+          },
         )
       }
     }
@@ -262,7 +262,7 @@ class MainTabsFragment :
           profiles
             .profileCurrent()
             .preferences()
-            .mostRecentAccount
+            .mostRecentAccount,
         )
 
     when (tabIndex) {

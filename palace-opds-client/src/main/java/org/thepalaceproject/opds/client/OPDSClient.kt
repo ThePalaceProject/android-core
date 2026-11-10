@@ -44,7 +44,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 class OPDSClient private constructor(
-  private val parameters: OPDSClientParameters
+  private val parameters: OPDSClientParameters,
 ) : OPDSClientType {
   private var topmostHandlerSubscriptions: CloseableCollectionType<ClosingResourceFailedException> =
     CloseableCollection.create()
@@ -67,7 +67,8 @@ class OPDSClient private constructor(
     FeedEntryCorrupt(
       AccountID.generate(),
       FeedBookIDs.newFromText("urn:uuid:2688faf3-1927-4245-a1d9-7824bae1a49f"),
-      IllegalStateException("Nonexistent book!")
+      IllegalStateException("Nonexistent book!"),
+    
     )
 
   private val resources: CloseableCollectionType<ClosingResourceFailedException> =
@@ -91,19 +92,19 @@ class OPDSClient private constructor(
     this.resources.add(
       this.stateSource.subscribe { _, newValue ->
         this.parameters.runOnUI(Runnable { this.stateUI.set(newValue) })
-      }
+      },
     )
   private val entriesGroupedUISub =
     this.resources.add(
       this.entriesGroupedSource.subscribe { _, e ->
         this.parameters.runOnUI(Runnable { this.entriesGroupedUI.set(e) })
-      }
+      },
     )
   private val entryUISub =
     this.resources.add(
       this.entrySource.subscribe { _, newValue ->
         this.parameters.runOnUI(Runnable { this.entryUI.set(newValue) })
-      }
+      },
     )
 
   private val requestStack: ConcurrentLinkedDeque<RequestHandler> =
@@ -117,17 +118,17 @@ class OPDSClient private constructor(
     this.resources.add(
       AutoCloseable {
         this.taskExecutor.awaitTermination(5L, TimeUnit.SECONDS)
-      }
+      },
     )
     this.resources.add(
       AutoCloseable {
         this.taskExecutor.shutdown()
-      }
+      },
     )
     this.resources.add(
       AutoCloseable {
         this.requestStack.forEach(RequestHandler::close)
-      }
+      },
     )
   }
 
@@ -148,7 +149,7 @@ class OPDSClient private constructor(
    */
 
   private inner class RequestHandler(
-    val request: OPDSClientRequest
+    val request: OPDSClientRequest,
   ) : Runnable,
     AutoCloseable {
     val state: AttributeType<OPDSState> =
@@ -215,7 +216,7 @@ class OPDSClient private constructor(
             accountID = this@RequestHandler.request.accountID,
             uri = previousNext,
             credentials = this.credentials,
-            method = this.method
+            method = this.method,
           )
 
         future0.whenComplete { loaderResult, exception ->
@@ -238,8 +239,8 @@ class OPDSClient private constructor(
                 is FeedDataWithGroups -> {
                   pageFuture.completeExceptionally(
                     IOException(
-                      "Received a feed with groups, but was expecting a feed without groups ($previousNext)"
-                    )
+                      "Received a feed with groups, but was expecting a feed without groups ($previousNext)",
+                    ),
                   )
                 }
 
@@ -249,7 +250,7 @@ class OPDSClient private constructor(
                       pageIndex = index,
                       pagePrevious = if (index > 0) index - 1 else null,
                       pageNext = if (feed.feedNext != null) index + 1 else null,
-                      data = feed
+                      data = feed,
                     )
                   this.pages[index] = newPage
                   pageFuture.complete(newPage)
@@ -326,8 +327,9 @@ class OPDSClient private constructor(
       accountID: AccountID,
       uri: URI,
       credentials: AccountAuthenticationCredentials?,
-      method: String
+      method: String,
     ): FeedData {
+      
       val feedResult =
         this@OPDSClient
           .parameters.feedLoader
@@ -335,7 +337,7 @@ class OPDSClient private constructor(
             accountID = accountID,
             uri = uri,
             credentials = credentials,
-            method = method
+            method = method,
           ).get()
 
       return when (feedResult) {
@@ -343,8 +345,8 @@ class OPDSClient private constructor(
           this.state.set(
             Error(
               message = feedResult,
-              request = request
-            )
+              request = request,
+            ),
           )
           throw feedResult.exception
         }
@@ -353,8 +355,8 @@ class OPDSClient private constructor(
           this.state.set(
             Error(
               message = feedResult,
-              request = request
-            )
+              request = request,
+            ),
           )
           throw feedResult.exception
         }
@@ -363,7 +365,7 @@ class OPDSClient private constructor(
           when (val feed = feedResult.feed) {
             is FeedDataWithGroups -> {
               throw IOException(
-                "Expected a feed without groups, but received a feed with groups from $uri"
+                "Expected a feed without groups, but received a feed with groups from $uri",
               )
             }
 
@@ -385,7 +387,7 @@ class OPDSClient private constructor(
             request.accountID,
             facetPath[0].uri,
             request.credentials,
-            request.method
+            request.method,
           )
 
         facetPath.removeAt(0)
@@ -396,7 +398,7 @@ class OPDSClient private constructor(
               request.accountID,
               nextFacet.uri,
               request.credentials,
-              request.method
+              request.method,
             )
         }
 
@@ -409,7 +411,7 @@ class OPDSClient private constructor(
             pageIndex = 0,
             pagePrevious = null,
             pageNext = if (feedNow.feedNext != null) 1 else null,
-            data = feedNow
+            data = feedNow,
           )
         this.state.set(LoadedFeedWithoutGroups(request, this.handleUngrouped))
         this.publishedEntriesGrouped.set(listOf())
@@ -417,8 +419,8 @@ class OPDSClient private constructor(
         this.state.set(
           Error(
             message = this@OPDSClient.compositeFacetException(request, e),
-            request = request
-          )
+            request = request,
+          ),
         )
         throw e
       }
@@ -426,13 +428,14 @@ class OPDSClient private constructor(
 
     private fun findEquivalentFacet(
       requestedFacet: FeedFacetData,
-      feed: FeedData
+      feed: FeedData,
     ): FeedFacetData {
       val group = requestedFacet.group
+      
       val facets =
         feed.facetsByGroup[group]
           ?: throw IOException(
-            "We could not find a facet with group $group in the feed at ${feed.feedURI}"
+            "We could not find a facet with group $group in the feed at ${feed.feedURI}",
           )
 
       for (feedFacet in facets) {
@@ -442,7 +445,7 @@ class OPDSClient private constructor(
       }
 
       throw IOException(
-        "We could not find a facet value of ${requestedFacet.title} in group $group in the feed at ${feed.feedURI}"
+        "We could not find a facet value of ${requestedFacet.title} in group $group in the feed at ${feed.feedURI}",
       )
     }
 
@@ -452,7 +455,7 @@ class OPDSClient private constructor(
           accountID = request.accountID,
           uri = request.uri,
           credentials = request.credentials,
-          method = request.method
+          method = request.method,
         )
 
       when (val result = future0.get()) {
@@ -460,8 +463,8 @@ class OPDSClient private constructor(
           this.state.set(
             Error(
               message = result,
-              request = request
-            )
+              request = request,
+            ),
           )
         }
 
@@ -469,8 +472,8 @@ class OPDSClient private constructor(
           this.state.set(
             Error(
               message = result,
-              request = request
-            )
+              request = request,
+            ),
           )
         }
 
@@ -493,7 +496,7 @@ class OPDSClient private constructor(
                   pageIndex = 0,
                   pagePrevious = null,
                   pageNext = if (feed.feedNext != null) 1 else null,
-                  data = feed
+                  data = feed,
                 )
               this.state.set(LoadedFeedWithoutGroups(request, this.handleUngrouped))
               this.publishedEntriesGrouped.set(listOf())
@@ -522,7 +525,7 @@ class OPDSClient private constructor(
                 pageIndex = 0,
                 pagePrevious = null,
                 pageNext = null,
-                data = feed
+                data = feed,
               )
             this.state.set(LoadedFeedWithoutGroups(request, this.handleUngrouped))
             this.publishedEntriesGrouped.set(listOf())
@@ -532,8 +535,8 @@ class OPDSClient private constructor(
         this.state.set(
           Error(
             message = this@OPDSClient.generatedFeedException(request, e),
-            request = request
-          )
+            request = request,
+          ),
         )
         throw e
       }
@@ -545,8 +548,8 @@ class OPDSClient private constructor(
       this.state.set(
         LoadedFeedEntry(
           request = request,
-          handle = this.handleEntry
-        )
+          handle = this.handleEntry,
+        ),
       )
     }
 
@@ -559,7 +562,7 @@ class OPDSClient private constructor(
 
   private fun compositeFacetException(
     request: OPDSClientRequest.ResolvedCompositeOPDS12Facet,
-    throwable: Exception
+    throwable: Exception,
   ): PresentableErrorType =
     FeedLoaderFailedGeneral(
       problemReport = null,
@@ -567,13 +570,13 @@ class OPDSClient private constructor(
       message = throwable.message ?: "Unexpected error occurred.",
       attributesInitial =
         mapOf(
-          Pair("AccountID", request.accountID.toString())
-        )
+          Pair("AccountID", request.accountID.toString()),
+        ),
     )
 
   private fun generatedFeedException(
     request: OPDSClientRequest.GeneratedFeed,
-    throwable: Throwable
+    throwable: Throwable,
   ): PresentableErrorType =
     FeedLoaderFailedGeneral(
       problemReport = null,
@@ -581,8 +584,8 @@ class OPDSClient private constructor(
       message = throwable.message ?: "Unexpected error occurred.",
       attributesInitial =
         mapOf(
-          Pair("AccountID", request.accountID.toString())
-        )
+          Pair("AccountID", request.accountID.toString()),
+        ),
     )
 
   override val hasHistory: Boolean
@@ -656,7 +659,7 @@ class OPDSClient private constructor(
     this.topmostHandlerSubscriptions.add(
       newTopmost.state.subscribe { _, newState ->
         this.onHandlerPublishedStateUpdate(newTopmost, newState)
-      }
+      },
     )
     this.traceStack()
   }
@@ -683,7 +686,7 @@ class OPDSClient private constructor(
     this.topmostHandlerSubscriptions.add(
       handler.state.subscribe { _, newState ->
         this.onHandlerPublishedStateUpdate(handler, newState)
-      }
+      },
     )
 
     this.traceStack()
@@ -698,7 +701,7 @@ class OPDSClient private constructor(
     this.topmostHandlerSubscriptions.add(
       handler.state.subscribe { _, newState ->
         this.onHandlerPublishedStateUpdate(handler, newState)
-      }
+      },
     )
 
     this.traceStack()
@@ -723,7 +726,7 @@ class OPDSClient private constructor(
 
   private fun onHandlerPublishedStateUpdate(
     handler: RequestHandler,
-    newState: OPDSState
+    newState: OPDSState,
   ) {
     when (newState) {
       is Error -> {
@@ -751,7 +754,7 @@ class OPDSClient private constructor(
         this.topmostHandlerSubscriptions.add(
           handler.publishedEntriesGrouped.subscribe { _, groups ->
             this.entriesGroupedSource.set(groups)
-          }
+          },
         )
       }
 

@@ -21,7 +21,7 @@ data class DRMLicensor(
   /**
    * The device manager URL.
    */
-  val deviceManager: String?
+  val deviceManager: String?,
 ) : Serializable {
   companion object {
     private const val serialVersionUID = 1L

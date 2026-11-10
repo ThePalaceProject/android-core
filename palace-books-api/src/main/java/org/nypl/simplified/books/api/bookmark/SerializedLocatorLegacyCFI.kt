@@ -14,7 +14,7 @@ import java.security.MessageDigest
 data class SerializedLocatorLegacyCFI(
   val idRef: String?,
   val contentCFI: String?,
-  val chapterProgression: Double
+  val chapterProgression: Double,
 ) : SerializedLocator() {
   override val typeName: String
     get() = "LocatorLegacyCFI"

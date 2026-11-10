@@ -28,7 +28,7 @@ class CatalogCoverDebugLabels : BookCoverDebugLabelsLookupType {
     val drm = drmNameOf(entry)
     return BookCoverDebugLabels(
       format = format,
-      drm = drm
+      drm = drm,
     )
   }
 
@@ -87,7 +87,7 @@ class CatalogCoverDebugLabels : BookCoverDebugLabelsLookupType {
       return when {
         has(
           StandardFormatNames.lcpLicenseFiles.fullType,
-          StandardFormatNames.lcpAudioBooks.fullType
+          StandardFormatNames.lcpAudioBooks.fullType,
         ) -> "LCP"
 
         has(StandardFormatNames.adobeACSMFiles.fullType) -> "Adobe"

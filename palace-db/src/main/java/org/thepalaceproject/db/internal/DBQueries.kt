@@ -19,11 +19,11 @@ internal object DBQueries {
     mapOf<Class<*>, DBQueryType<*, *>>(
       Pair(
         DBQAccountProviderDescriptionDeleteAllType::class.java,
-        DBQAccountProviderDescriptionDeleteAll
+        DBQAccountProviderDescriptionDeleteAll,
       ),
       Pair(
         DBQAccountProviderDescriptionDeleteType::class.java,
-        DBQAccountProviderDescriptionDelete
+        DBQAccountProviderDescriptionDelete,
       ),
       Pair(DBQAccountProviderDescriptionGetType::class.java, DBQAccountProviderDescriptionGet),
       Pair(DBQAccountProviderDescriptionIDSetType::class.java, DBQAccountProviderDescriptionIDSet),
@@ -34,7 +34,7 @@ internal object DBQueries {
       Pair(DBQAccountProviderPutType::class.java, DBQAccountProviderPut),
       Pair(DBQSchemaVersionType::class.java, DBQSchemaVersion),
       Pair(DBQAccountRegistrySettingsPutType::class.java, DBQAccountRegistrySettingsPut),
-      Pair(DBQAccountRegistrySettingsGetType::class.java, DBQAccountRegistrySettingsGet)
+      Pair(DBQAccountRegistrySettingsGetType::class.java, DBQAccountRegistrySettingsGet),
     )
 
   fun <P, R, Q : DBQueryType<P, R>> query(clazz: Class<Q>): Q {

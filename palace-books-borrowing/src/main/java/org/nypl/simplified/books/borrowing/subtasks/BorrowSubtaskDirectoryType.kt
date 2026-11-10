@@ -23,7 +23,7 @@ interface BorrowSubtaskDirectoryType {
     mimeType: MIMEType,
     target: Link?,
     account: AccountReadableType?,
-    remainingTypes: List<MIMEType>
+    remainingTypes: List<MIMEType>,
   ): BorrowSubtaskFactoryType? =
     this.subtasks.firstOrNull { factory ->
       factory.isApplicableFor(mimeType, target, account, remainingTypes)

@@ -28,7 +28,7 @@ internal class PatronUserProfileParser(
   private val mapper: ObjectMapper,
   private val uri: URI,
   private val stream: InputStream,
-  private val warningsAsErrors: Boolean
+  private val warningsAsErrors: Boolean,
 ) : PatronUserProfileParserType {
   override fun close() {
     this.stream.close()
@@ -47,8 +47,8 @@ internal class PatronUserProfileParser(
           message = warning.message,
           line = 0,
           column = 0,
-          exception = warning.exception
-        )
+          exception = warning.exception,
+        ),
       )
     } else {
       this.warnings.add(warning)
@@ -62,8 +62,8 @@ internal class PatronUserProfileParser(
         message,
         line = 0,
         column = 0,
-        exception = null
-      )
+        exception = null,
+      ),
     )
 
   private fun publishErrorForException(e: Exception) {
@@ -71,8 +71,8 @@ internal class PatronUserProfileParser(
       ParseError(
         source = this.uri,
         message = e.message ?: "",
-        exception = e
-      )
+        exception = e,
+      ),
     )
   }
 
@@ -81,8 +81,8 @@ internal class PatronUserProfileParser(
       ParseError(
         source = this.uri,
         message = message,
-        exception = null
-      )
+        exception = null,
+      ),
     )
   }
 
@@ -113,8 +113,8 @@ internal class PatronUserProfileParser(
               settings = settings,
               links = links,
               drm = drm,
-              authorization = authorization
-            )
+              authorization = authorization,
+            ),
         )
       } else {
         ParseResult.Failure(warnings = this.warnings.toList(), errors = this.errors.toList())
@@ -126,9 +126,10 @@ internal class PatronUserProfileParser(
   }
 
   private fun parseLinks(root: ObjectNode): List<Link> {
-    val linksNode =
-      JSONParserUtilities.getArrayOrNull(root, "links")
-        ?: return listOf()
+    val linksNode = JSONParserUtilities.getArrayOrNull(root, "links")
+    if (linksNode == null) {
+      return listOf()
+    }
 
     val results = mutableListOf<Link>()
     for (node in linksNode) {
@@ -149,7 +150,7 @@ internal class PatronUserProfileParser(
 
   private fun parseDRMs(
     root: ObjectNode,
-    links: List<Link>
+    links: List<Link>,
   ): List<PatronDRM> =
     if (root.has("drm")) {
       try {
@@ -165,7 +166,7 @@ internal class PatronUserProfileParser(
 
   private fun parseDRM(
     node: JsonNode,
-    links: List<Link>
+    links: List<Link>,
   ): PatronDRM? {
     return try {
       val root =
@@ -195,7 +196,7 @@ internal class PatronUserProfileParser(
     root: ObjectNode,
     vendor: String,
     scheme: URI,
-    links: List<Link>
+    links: List<Link>,
   ): PatronDRMAdobe {
     val clientToken =
       JSONParserUtilities.getString(root, "drm:clientToken")
@@ -213,7 +214,7 @@ internal class PatronUserProfileParser(
       vendor = vendor,
       scheme = scheme,
       clientToken = clientToken,
-      deviceManagerURI = deviceManagerURI
+      deviceManagerURI = deviceManagerURI,
     )
   }
 

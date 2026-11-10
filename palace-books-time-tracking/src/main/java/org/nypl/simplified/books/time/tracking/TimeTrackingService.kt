@@ -19,7 +19,7 @@ class TimeTrackingService private constructor(
   private val status: AttributeType<TimeTrackingStatus>,
   private val collector: TimeTrackingCollectorServiceType,
   private val merge: TimeTrackingMergeServiceType,
-  private val sender: TimeTrackingSenderServiceType
+  private val sender: TimeTrackingSenderServiceType,
 ) : TimeTrackingServiceType {
   private val resources =
     CloseableCollection.create()
@@ -58,7 +58,7 @@ class TimeTrackingService private constructor(
             timeSegments = timeSegments,
             debugDirectory = debugDirectory,
             outputDirectory = collectorDirectory,
-            diagnostics = diagnostics
+            diagnostics = diagnostics,
           ),
         merge =
           TimeTrackingMerge.create(
@@ -66,7 +66,7 @@ class TimeTrackingService private constructor(
             frequency = Duration.ofSeconds(30L),
             inputDirectory = collectorDirectory,
             debugDirectory = debugDirectory,
-            outputDirectory = senderDirectory
+            outputDirectory = senderDirectory,
           ),
         sender =
           TimeTrackingSender.create(
@@ -75,8 +75,8 @@ class TimeTrackingService private constructor(
             debugDirectory = debugDirectory,
             inputDirectory = senderDirectory,
             frequency = Duration.ofSeconds(30L),
-            diagnostics = diagnostics
-          )
+            diagnostics = diagnostics,
+          ),
       )
     }
   }
@@ -85,15 +85,15 @@ class TimeTrackingService private constructor(
     accountID: AccountID,
     bookId: PlayerPalaceID,
     libraryId: String,
-    timeTrackingUri: URI
+    timeTrackingUri: URI,
   ) {
     this.status.set(
       TimeTrackingStatus.Active(
         accountID = accountID,
         bookId = bookId,
         libraryId = libraryId,
-        timeTrackingUri = timeTrackingUri
-      )
+        timeTrackingUri = timeTrackingUri,
+      ),
     )
   }
 

@@ -3,7 +3,6 @@ package org.nypl.simplified.ui.catalog
 import android.content.res.Resources
 import org.librarysimplified.ui.R
 import org.nypl.simplified.books.book_database.api.BookFormats
-import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedEntryBook
 
 /**
@@ -17,14 +16,14 @@ object CatalogBookAccessibilityStrings {
 
   fun coverDescription(
     resources: Resources,
-    feedEntry: FeedEntryBook
+    feedEntry: FeedEntryBook,
   ): String =
     when (BookFormats.inferFormat(feedEntry)) {
       BookFormats.BookFormatDefinition.BOOK_FORMAT_EPUB -> {
         resources.getString(
           R.string.catalogAccessibilityCoverEpub,
           feedEntry.title,
-          feedEntry.authorsCommaSeparated
+          feedEntry.authorsCommaSeparated,
         )
       }
 
@@ -32,7 +31,7 @@ object CatalogBookAccessibilityStrings {
         resources.getString(
           R.string.catalogAccessibilityCoverAudiobook,
           feedEntry.title,
-          feedEntry.authorsCommaSeparated
+          feedEntry.authorsCommaSeparated,
         )
       }
 
@@ -40,7 +39,7 @@ object CatalogBookAccessibilityStrings {
         resources.getString(
           R.string.catalogAccessibilityCoverPdf,
           feedEntry.title,
-          feedEntry.authorsCommaSeparated
+          feedEntry.authorsCommaSeparated,
         )
       }
 
@@ -48,7 +47,7 @@ object CatalogBookAccessibilityStrings {
         resources.getString(
           R.string.catalogAccessibilityCoverUnknownFormat,
           feedEntry.title,
-          feedEntry.authorsCommaSeparated
+          feedEntry.authorsCommaSeparated,
         )
       }
     }

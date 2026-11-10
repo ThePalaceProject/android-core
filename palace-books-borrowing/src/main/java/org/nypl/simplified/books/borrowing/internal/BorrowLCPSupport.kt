@@ -38,7 +38,7 @@ object BorrowLCPSupport {
       context.taskRecorder.currentStepFailed(
         message = "This build of the application does not support LCP DRM.",
         errorCode = lcpNotSupported,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       throw BorrowSubtaskFailed()
     }
@@ -46,7 +46,7 @@ object BorrowLCPSupport {
 
   fun downloadLicense(
     context: BorrowContextType,
-    target: URI
+    target: URI,
   ): ByteArray {
     context.logDebug("Downloading license from {}", target)
     context.taskRecorder.beginNewStep("Downloading license from $target...")
@@ -60,7 +60,7 @@ object BorrowLCPSupport {
         BorrowHTTP.createDownloadRequest(
           context = context,
           target = target,
-          outputFile = temporaryFile
+          outputFile = temporaryFile,
         )
 
       when (val result = LSHTTPDownloads.download(downloadRequest)) {
@@ -118,7 +118,7 @@ object BorrowLCPSupport {
       context.taskRecorder.currentStepFailed(
         message = "No loans URI provided; unable to retrieve a passphrase.",
         errorCode = "lcpMissingLoans",
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       throw BorrowSubtaskFailed()
     }
@@ -157,20 +157,20 @@ object BorrowLCPSupport {
 
   private fun findPassphraseHandleFailure(
     context: BorrowContextType,
-    status: LSHTTPResponseStatus.Failed
+    status: LSHTTPResponseStatus.Failed,
   ): String {
     context.taskRecorder.currentStepFailed(
       message = status.exception.message ?: "Exception raised during connection attempt.",
       errorCode = BorrowErrorCodes.httpConnectionFailed,
       exception = status.exception,
-      extraMessages = listOf()
+      extraMessages = listOf(),
     )
     throw BorrowSubtaskFailed()
   }
 
   private fun findPassphraseHandleError(
     context: BorrowContextType,
-    status: LSHTTPResponseStatus.Responded.Error
+    status: LSHTTPResponseStatus.Responded.Error,
   ): String {
     val report = status.properties.problemReport
     if (report != null) {
@@ -180,7 +180,7 @@ object BorrowLCPSupport {
       message = "HTTP request failed: ${status.properties.originalStatus} ${status.properties.message}",
       errorCode = BorrowErrorCodes.httpRequestFailed,
       exception = null,
-      extraMessages = listOf()
+      extraMessages = listOf(),
     )
     throw BorrowSubtaskFailed()
   }
@@ -188,7 +188,7 @@ object BorrowLCPSupport {
   private fun findPassphraseHandleOK(
     context: BorrowContextType,
     loansURI: URI,
-    status: LSHTTPResponseStatus.Responded.OK
+    status: LSHTTPResponseStatus.Responded.OK,
   ): String {
     val feedParser =
       context.services.requireService(OPDSFeedParserType::class.java)
@@ -202,7 +202,7 @@ object BorrowLCPSupport {
           message = "Unable to parse loans feed (${e.message})",
           errorCode = "lcpUnparseableLoansFeed",
           exception = e,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
         throw BorrowSubtaskFailed()
       }
@@ -212,7 +212,7 @@ object BorrowLCPSupport {
         message = "Unable to locate the current book in the user's loans feed.",
         errorCode = "lcpMissingEntryInLoansFeed",
         exception = null,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       throw BorrowSubtaskFailed()
     }
@@ -232,7 +232,7 @@ object BorrowLCPSupport {
     context.taskRecorder.currentStepFailed(
       message = "No LCP hashed passphrase was provided.",
       errorCode = "lcpMissingPassphrase",
-      extraMessages = listOf()
+      extraMessages = listOf(),
     )
     throw BorrowSubtaskFailed()
   }

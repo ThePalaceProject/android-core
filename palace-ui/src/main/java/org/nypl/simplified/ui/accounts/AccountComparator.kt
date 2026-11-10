@@ -18,7 +18,7 @@ class AccountComparator : Comparator<AccountReadableType> {
 
   override fun compare(
     a1: AccountReadableType,
-    a2: AccountReadableType
+    a2: AccountReadableType,
   ): Int {
     var name1 = a1.provider.displayName
     var name2 = a2.provider.displayName

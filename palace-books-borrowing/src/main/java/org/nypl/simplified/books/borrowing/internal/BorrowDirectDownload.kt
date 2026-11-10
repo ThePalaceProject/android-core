@@ -28,7 +28,7 @@ class BorrowDirectDownload private constructor() : BorrowSubtaskType {
       type: MIMEType,
       target: Link?,
       account: AccountReadableType?,
-      remaining: List<MIMEType>
+      remaining: List<MIMEType>,
     ): Boolean {
       if (MIMECompatibility.isCompatibleStrictWithoutAttributes(type, genericEPUBFiles)) {
         return true
@@ -45,7 +45,7 @@ class BorrowDirectDownload private constructor() : BorrowSubtaskType {
     context.bookDownloadIsRunning(
       "Requesting download...",
       receivedSize = 0,
-      bytesPerSecond = 0
+      bytesPerSecond = 0,
     )
 
     try {

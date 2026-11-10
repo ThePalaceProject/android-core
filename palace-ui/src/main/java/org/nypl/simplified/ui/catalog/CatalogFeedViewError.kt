@@ -33,10 +33,10 @@ class CatalogFeedViewError(
           layoutInflater.inflate(
             R.layout.catalog_feed_error,
             container,
-            true
+            true,
           ) as ViewGroup,
         onShowErrorDetails = onShowErrorDetails,
-        onRetry = onRetry
+        onRetry = onRetry,
       )
   }
 

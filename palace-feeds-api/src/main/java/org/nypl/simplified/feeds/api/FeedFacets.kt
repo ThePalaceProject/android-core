@@ -9,7 +9,7 @@ object FeedFacets {
       Pair("SORT BY", 0),
       Pair("AVAILABILITY", 1),
       Pair("DISTRIBUTOR", 2),
-      Pair("COLLECTION NAME", 3)
+      Pair("COLLECTION NAME", 3),
     )
 
   /**
@@ -20,7 +20,7 @@ object FeedFacets {
     object : Comparator<String> {
       override fun compare(
         p0: String,
-        p1: String
+        p1: String,
       ): Int {
         val p0u = p0.uppercase()
         val p1u = p1.uppercase()

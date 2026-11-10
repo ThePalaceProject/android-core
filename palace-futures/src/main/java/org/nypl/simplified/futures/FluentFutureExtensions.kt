@@ -21,7 +21,7 @@ object FluentFutureExtensions {
 
   fun <A, B> FluentFuture<A>.map(
     f: (A) -> B,
-    executor: Executor
+    executor: Executor,
   ): FluentFuture<B> =
     this
       .transform(Function<A, B> { x -> f.invoke(x!!) }, executor)
@@ -57,7 +57,7 @@ object FluentFutureExtensions {
 
   fun <E : Throwable, A> FluentFuture<A>.onError(
     clazz: Class<E>,
-    f: (E) -> A
+    f: (E) -> A,
   ): FluentFuture<A> = this.catching(clazz, Function<E, A> { x -> f.invoke(x) }, MoreExecutors.directExecutor())
 
   /**
@@ -66,7 +66,7 @@ object FluentFutureExtensions {
 
   fun <E : Exception, A> FluentFuture<A>.onException(
     clazz: Class<E>,
-    f: (E) -> A
+    f: (E) -> A,
   ): FluentFuture<A> = this.catching(clazz, Function<E, A> { x -> f.invoke(x!!) }, MoreExecutors.directExecutor())
 
   /**

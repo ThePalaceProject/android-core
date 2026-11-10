@@ -41,7 +41,7 @@ internal class BServiceOpCreateBookmark(
           this.profile,
           this.accountID,
           this.bookmark,
-          this.bookmarksSource
+          this.bookmarksSource,
         ).runActual()
 
       this.createLocalBookmarkFrom(remoteBookmark)
@@ -61,6 +61,6 @@ internal class BServiceOpCreateBookmark(
       this.profile,
       this.accountID,
       bookmark,
-      this.bookmarksSource
+      this.bookmarksSource,
     ).runActual()
 }

@@ -17,5 +17,5 @@ enum class DBTransactionCloseBehavior {
    * transaction is closed.
    */
 
-  ON_CLOSE_DO_NOTHING
+  ON_CLOSE_DO_NOTHING,
 }

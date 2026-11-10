@@ -19,5 +19,5 @@ data class BookFormatAudioSupportParameters(
    * The application is configured to support DPLA audio books.
    */
 
-  val supportsDPLAAudioBooks: Boolean
+  val supportsDPLAAudioBooks: Boolean,
 )

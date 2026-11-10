@@ -7,6 +7,6 @@ import java.net.URI
 interface DBQAccountProviderListType : DBQueryType<DBQAccountProviderListType.Parameters, List<AccountProvider>> {
   data class Parameters(
     val startingId: URI?,
-    val limit: Int
+    val limit: Int,
   )
 }

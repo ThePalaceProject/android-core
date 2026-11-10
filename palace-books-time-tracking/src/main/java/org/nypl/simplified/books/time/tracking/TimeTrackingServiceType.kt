@@ -9,7 +9,7 @@ interface TimeTrackingServiceType : AutoCloseable {
     accountID: AccountID,
     bookId: PlayerPalaceID,
     libraryId: String,
-    timeTrackingUri: URI
+    timeTrackingUri: URI,
   )
 
   fun onBookClosed()

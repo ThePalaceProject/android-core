@@ -30,7 +30,7 @@ class SandboxActivity : AppCompatActivity(R.layout.sandbox) {
         override fun onOpenChanged(state: Double) {
           this@SandboxActivity.red.alpha = state.toFloat()
         }
-      }
+      },
     )
   }
 }

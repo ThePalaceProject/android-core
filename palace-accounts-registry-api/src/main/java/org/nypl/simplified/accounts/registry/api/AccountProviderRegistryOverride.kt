@@ -5,7 +5,7 @@ import java.net.URI
 data class AccountProviderRegistryOverride(
   val hostname: String,
   val path: String,
-  val queryParameters: String
+  val queryParameters: String,
 ) {
   fun completeURI(): URI {
     val b = StringBuilder()

@@ -6,10 +6,10 @@ sealed class AudioBookLink {
   abstract val target: URI
 
   data class Manifest(
-    override val target: URI
+    override val target: URI,
   ) : AudioBookLink()
 
   data class License(
-    override val target: URI
+    override val target: URI,
   ) : AudioBookLink()
 }

@@ -128,7 +128,8 @@ interface AccountProviderRegistryType : AutoCloseable {
    * given account provider already exists in the registry, the newer version is returned.
    */
 
-  fun updateProvider(accountProvider: AccountProviderType): AccountProviderType = this.updateProviderAsync(accountProvider).get()
+  fun updateProvider(accountProvider: AccountProviderType): AccountProviderType =
+    this.updateProviderAsync(accountProvider).get()
 
   /**
    * Introduce the given account provider to the registry. If an existing, newer version of the
@@ -169,7 +170,9 @@ interface AccountProviderRegistryType : AutoCloseable {
    * version is returned.
    */
 
-  fun updateDescriptionsAsync(descriptions: List<AccountProviderDescription>): CompletableFuture<List<AccountProviderDescription>>
+  fun updateDescriptionsAsync(
+    descriptions: List<AccountProviderDescription>,
+  ): CompletableFuture<List<AccountProviderDescription>>
 
   /**
    * Resolve the description into a full account provider. The given `onProgress` function
@@ -179,7 +182,7 @@ interface AccountProviderRegistryType : AutoCloseable {
 
   fun resolveAsync(
     onProgress: AccountProviderResolutionListenerType,
-    description: AccountProviderDescription
+    description: AccountProviderDescription,
   ): CompletableFuture<TaskResult<AccountProviderType>>
 
   /**
@@ -190,6 +193,6 @@ interface AccountProviderRegistryType : AutoCloseable {
 
   fun resolve(
     onProgress: AccountProviderResolutionListenerType,
-    description: AccountProviderDescription
+    description: AccountProviderDescription,
   ): TaskResult<AccountProviderType> = this.resolveAsync(onProgress, description).get()
 }

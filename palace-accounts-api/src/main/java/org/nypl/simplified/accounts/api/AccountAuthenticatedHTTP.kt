@@ -20,32 +20,32 @@ object AccountAuthenticatedHTTP {
       is AccountAuthenticationCredentials.Basic -> {
         LSHTTPAuthorizationBasic.ofUsernamePassword(
           userName = credentials.userName.value,
-          password = credentials.password.value
+          password = credentials.password.value,
         )
       }
 
       is AccountAuthenticationCredentials.BasicToken -> {
         if (credentials.authenticationTokenInfo.accessToken.isNotBlank()) {
           LSHTTPAuthorizationBearerToken.ofToken(
-            token = credentials.authenticationTokenInfo.accessToken
+            token = credentials.authenticationTokenInfo.accessToken,
           )
         } else {
           LSHTTPAuthorizationBasic.ofUsernamePassword(
             userName = credentials.userName.value,
-            password = credentials.password.value
+            password = credentials.password.value,
           )
         }
       }
 
       is AccountAuthenticationCredentials.SAML2_0 -> {
         LSHTTPAuthorizationBearerToken.ofToken(
-          token = credentials.accessToken
+          token = credentials.accessToken,
         )
       }
 
       is AccountAuthenticationCredentials.OpenIDConnect -> {
         LSHTTPAuthorizationBearerToken.ofToken(
-          token = credentials.accessToken
+          token = credentials.accessToken,
         )
       }
     }
@@ -54,7 +54,7 @@ object AccountAuthenticatedHTTP {
     credentials?.let(this::createAuthorization)
 
   fun LSHTTPRequestBuilderType.addBasicTokenPropertiesIfApplicable(
-    credentials: AccountAuthenticationCredentials?
+    credentials: AccountAuthenticationCredentials?,
   ): LSHTTPRequestBuilderType {
     if (credentials !is AccountAuthenticationCredentials.BasicToken) {
       return this
@@ -62,23 +62,26 @@ object AccountAuthenticatedHTTP {
     return addBasicTokenProperties(credentials)
   }
 
-  fun LSHTTPRequestBuilderType.addBasicTokenProperties(credentials: AccountAuthenticationCredentials.BasicToken): LSHTTPRequestBuilderType =
+  fun LSHTTPRequestBuilderType.addBasicTokenProperties(
+    credentials: AccountAuthenticationCredentials.BasicToken,
+  ): LSHTTPRequestBuilderType =
     apply {
       setExtensionProperty(
         LSHTTPRequestConstants.PROPERTY_KEY_USERNAME,
-        credentials.userName.value
+        credentials.userName.value,
       )
       setExtensionProperty(
         LSHTTPRequestConstants.PROPERTY_KEY_PASSWORD,
-        credentials.password.value
+        credentials.password.value,
       )
       setExtensionProperty(
         LSHTTPRequestConstants.PROPERTY_KEY_AUTHENTICATION_URL,
-        credentials.authenticationTokenInfo.authURI.toString()
+        credentials.authenticationTokenInfo.authURI.toString(),
       )
     }
 
-  fun LSHTTPResponseStatus.getAccessToken(): String? = properties?.header(LSHTTPRequestConstants.PROPERTY_KEY_ACCESS_TOKEN)
+  fun LSHTTPResponseStatus.getAccessToken(): String? =
+    properties?.header(LSHTTPRequestConstants.PROPERTY_KEY_ACCESS_TOKEN)
 
   /**
    * A handled 401 status code.

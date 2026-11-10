@@ -48,7 +48,7 @@ object AccountProvidersJSON {
   private fun <T> putConditionally(
     node: ObjectNode,
     name: String,
-    value: T?
+    value: T?,
   ) {
     value?.let { v -> node.put(name, v.toString()) }
   }
@@ -84,15 +84,15 @@ object AccountProvidersJSON {
 
     node.set<ObjectNode>(
       "authentication",
-      this.serializeAuthentication(provider.authentication)
+      this.serializeAuthentication(provider.authentication),
     )
     node.set<ObjectNode>(
       "announcements",
-      this.serializeAnnouncements(provider.announcements)
+      this.serializeAnnouncements(provider.announcements),
     )
     node.set<ArrayNode>(
       "authenticationAlternatives",
-      this.serializeAuthenticationAlternatives(provider.authenticationAlternatives)
+      this.serializeAuthenticationAlternatives(provider.authenticationAlternatives),
     )
     return node
   }
@@ -105,7 +105,9 @@ object AccountProvidersJSON {
     return array
   }
 
-  private fun serializeAuthenticationAlternatives(authenticationAlternatives: List<AccountProviderAuthenticationDescription>): ArrayNode {
+  private fun serializeAuthenticationAlternatives(
+    authenticationAlternatives: List<AccountProviderAuthenticationDescription>,
+  ): ArrayNode {
     val array = this.mapper.createArrayNode()
     for (authentication in authenticationAlternatives) {
       array.add(this.serializeAuthentication(authentication))
@@ -121,7 +123,7 @@ object AccountProvidersJSON {
         this.putConditionally(
           authObject,
           "barcodeFormat",
-          authentication.barcodeFormat?.uppercase(Locale.ROOT)
+          authentication.barcodeFormat?.uppercase(Locale.ROOT),
         )
         this.putConditionally(authObject, "description", authentication.description)
         this.putConditionally(authObject, "keyboard", authentication.keyboard.name)
@@ -362,7 +364,7 @@ object AccountProvidersJSON {
           authenticate = authURI,
           description = description,
           logoURI = logoURI,
-          logout = logout
+          logout = logout,
         )
       }
 
@@ -377,7 +379,7 @@ object AccountProvidersJSON {
         SAML2_0(
           authenticate = authURI,
           description = description,
-          logoURI = logoURI
+          logoURI = logoURI,
         )
       }
 
@@ -396,8 +398,8 @@ object AccountProvidersJSON {
           this.parseKeyboardType(
             JSONParserUtilities.getStringOrNull(
               container,
-              "passwordKeyboard"
-            )
+              "passwordKeyboard",
+            ),
           )
         val description =
           JSONParserUtilities.getString(container, "description")
@@ -411,7 +413,7 @@ object AccountProvidersJSON {
           labels = labels,
           logoURI = logoURI,
           passwordKeyboard = passwordKeyboard,
-          passwordMaximumLength = passwordMaximumLength
+          passwordMaximumLength = passwordMaximumLength,
         )
       }
 
@@ -430,8 +432,8 @@ object AccountProvidersJSON {
           this.parseKeyboardType(
             JSONParserUtilities.getStringOrNull(
               container,
-              "passwordKeyboard"
-            )
+              "passwordKeyboard",
+            ),
           )
         val description =
           JSONParserUtilities.getString(container, "description")
@@ -448,7 +450,7 @@ object AccountProvidersJSON {
           labels = labels,
           logoURI = logoURI,
           passwordKeyboard = passwordKeyboard,
-          passwordMaximumLength = passwordMaximumLength
+          passwordMaximumLength = passwordMaximumLength,
         )
       }
 
@@ -472,7 +474,8 @@ object AccountProvidersJSON {
       }
 
       "NO_INPUT",
-      "NO INPUT" -> {
+      "NO INPUT",
+      -> {
         KeyboardInput.NO_INPUT
       }
 
@@ -481,12 +484,14 @@ object AccountProvidersJSON {
       }
 
       "NUMBER_PAD",
-      "NUMBER PAD" -> {
+      "NUMBER PAD",
+      -> {
         KeyboardInput.NUMBER_PAD
       }
 
       "EMAIL_ADDRESS",
-      "EMAIL ADDRESS" -> {
+      "EMAIL ADDRESS",
+      -> {
         KeyboardInput.EMAIL_ADDRESS
       }
 
@@ -585,7 +590,9 @@ object AccountProvidersJSON {
    */
 
   @Throws(IOException::class)
-  fun deserializeOneFromFile(file: File): AccountProvider = FileInputStream(file).use { stream -> this.deserializeOneFromStream(stream) }
+  fun deserializeOneFromFile(file: File): AccountProvider =
+    FileInputStream(file).use { stream -> this.deserializeOneFromStream(stream) }
 
-  fun serializeToBytes(description: AccountProvider): ByteArray = this.mapper.writeValueAsBytes(this.serializeToJSON(description))
+  fun serializeToBytes(description: AccountProvider): ByteArray =
+    this.mapper.writeValueAsBytes(this.serializeToJSON(description))
 }

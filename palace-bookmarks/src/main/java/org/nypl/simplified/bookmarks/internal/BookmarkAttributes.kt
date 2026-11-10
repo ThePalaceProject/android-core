@@ -13,13 +13,13 @@ import org.nypl.simplified.books.api.bookmark.SerializedBookmark
 object BookmarkAttributes {
   fun removeAccount(
     data: Map<AccountID, Map<BookID, BookmarksForBook>>,
-    account: AccountID
+    account: AccountID,
   ): Map<AccountID, Map<BookID, BookmarksForBook>> = data.minus(account)
 
   fun addBookmark(
     data: Map<AccountID, Map<BookID, BookmarksForBook>>,
     account: AccountID,
-    bookmark: SerializedBookmark
+    bookmark: SerializedBookmark,
   ): Map<AccountID, Map<BookID, BookmarksForBook>> {
     val isLastRead =
       if (bookmark.kind == BookmarkKind.BookmarkLastReadLocation) {
@@ -34,7 +34,7 @@ object BookmarkAttributes {
       forAccount[bookmark.book] ?: BookmarksForBook(
         bookId = bookmark.book,
         lastRead = isLastRead,
-        bookmarks = listOf()
+        bookmarks = listOf(),
       )
 
     if (isLastRead != null) {
@@ -60,7 +60,7 @@ object BookmarkAttributes {
   fun removeBookmark(
     data: Map<AccountID, Map<BookID, BookmarksForBook>>,
     account: AccountID,
-    bookmark: SerializedBookmark
+    bookmark: SerializedBookmark,
   ): Map<AccountID, Map<BookID, BookmarksForBook>> =
     when (bookmark.kind) {
       BookmarkKind.BookmarkExplicit -> {
@@ -70,7 +70,7 @@ object BookmarkAttributes {
           forAccount[bookmark.book] ?: BookmarksForBook(
             bookId = bookmark.book,
             lastRead = null,
-            bookmarks = listOf()
+            bookmarks = listOf(),
           )
 
         forBook = forBook.copy(bookmarks = forBook.bookmarks.minus(bookmark))
@@ -85,7 +85,7 @@ object BookmarkAttributes {
   fun addBookmarks(
     data: Map<AccountID, Map<BookID, BookmarksForBook>>,
     account: AccountID,
-    bookmarksForBook: BookmarksForBook
+    bookmarksForBook: BookmarksForBook,
   ): Map<AccountID, Map<BookID, BookmarksForBook>> {
     var forAccount: Map<BookID, BookmarksForBook> = data[account] ?: mapOf()
     forAccount = forAccount.plus(Pair(bookmarksForBook.bookId, bookmarksForBook))

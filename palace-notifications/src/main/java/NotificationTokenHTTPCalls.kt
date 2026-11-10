@@ -20,7 +20,7 @@ import java.util.concurrent.ExecutorService
 
 class NotificationTokenHTTPCalls(
   private val http: LSHTTPClientType,
-  private val executor: ExecutorService
+  private val executor: ExecutorService,
 ) : NotificationTokenHTTPCallsType {
   private val logger =
     LoggerFactory.getLogger(NotificationTokenHTTPCalls::class.java)
@@ -30,7 +30,7 @@ class NotificationTokenHTTPCalls(
   override fun registerFCMTokenForProfileAccounts(profile: ProfileReadableType) {
     profile.accounts().values.forEach { account ->
       this.registerFCMTokenForProfileAccount(
-        account = account
+        account = account,
       )
     }
   }
@@ -42,23 +42,19 @@ class NotificationTokenHTTPCalls(
     this.logger.debug(
       "Registering FCM token for account {} ({})",
       account.id,
-      account.provider.displayName
+      account.provider.displayName,
     )
 
     if (originalUrl == null) {
       this.logger.debug(
         "Account {} ({}) doesn't have a device registration URI",
         account.id,
-        account.provider.displayName
+        account.provider.displayName,
       )
       return
     }
 
     val tokenTask = this.firebaseInstance.token
-    tokenTask.addOnSuccessListener { token ->
-      this.postDeviceTokenToServer(token, originalUrl, credentials, account)
-    }
-
     tokenTask.addOnSuccessListener { token ->
       this.executor.execute {
         this.postDeviceTokenToServer(token, originalUrl, credentials, account)
@@ -74,7 +70,7 @@ class NotificationTokenHTTPCalls(
     token: String,
     originalUrl: URI,
     credentials: AccountAuthenticationCredentials,
-    account: AccountType
+    account: AccountType,
   ) {
     this.logger.debug("Success fetching FCM Token: {}", token)
 
@@ -105,18 +101,18 @@ class NotificationTokenHTTPCalls(
           this.logger.debug(
             "The account {} doesn't have the FCM token {}. Let's send it...",
             account.id,
-            token
+            token,
           )
           this.setFCMTokenForAccount(
             account = account,
             token = token,
-            url = originalUrl.toString()
+            url = originalUrl.toString(),
           )
         } else {
           this.logger.error(
             "Failed to retrieve FCM Token for account {}: {}",
             account.id,
-            status.properties.message
+            status.properties.message,
           )
         }
       }
@@ -125,7 +121,7 @@ class NotificationTokenHTTPCalls(
         this.logger.error(
           "Failed to retrieve FCM Token for account {}",
           account.id,
-          status.exception
+          status.exception,
         )
       }
     }
@@ -138,14 +134,14 @@ class NotificationTokenHTTPCalls(
     this.logger.debug(
       "Deleting FCM token for account {} ({})",
       account.id,
-      account.provider.displayName
+      account.provider.displayName,
     )
 
     if (url == null) {
       this.logger.debug(
         "Account {} ({}) doesn't have a device registration URI",
         account.id,
-        account.provider.displayName
+        account.provider.displayName,
       )
       return
     }
@@ -167,7 +163,7 @@ class NotificationTokenHTTPCalls(
     token: String,
     url: URI,
     credentials: AccountAuthenticationCredentials,
-    account: AccountType
+    account: AccountType,
   ) {
     this.logger.debug("Success fetching FCM Token: {}", token)
 
@@ -179,10 +175,10 @@ class NotificationTokenHTTPCalls(
         .setMethod(
           LSHTTPRequestBuilderType.Method.Delete(
             this.serializeNotificationToken(
-              token = token
+              token = token,
             ),
-            MIMEType("application", "json", mapOf())
-          )
+            MIMEType("application", "json", mapOf()),
+          ),
         ).build()
 
     val response = request.execute()
@@ -196,7 +192,7 @@ class NotificationTokenHTTPCalls(
         this.logger.error(
           "Failed to delete FCM Token for account {}: {}",
           account.id,
-          status.properties.message
+          status.properties.message,
         )
       }
 
@@ -204,7 +200,7 @@ class NotificationTokenHTTPCalls(
         this.logger.error(
           "Failed to delete FCM Token for account {}",
           account.id,
-          status.exception
+          status.exception,
         )
       }
     }
@@ -213,7 +209,7 @@ class NotificationTokenHTTPCalls(
   private fun setFCMTokenForAccount(
     account: AccountType,
     token: String,
-    url: String
+    url: String,
   ) {
     val credentials = account.loginState.credentials
 
@@ -225,10 +221,10 @@ class NotificationTokenHTTPCalls(
         .setMethod(
           LSHTTPRequestBuilderType.Method.Put(
             this.serializeNotificationToken(
-              token = token
+              token = token,
             ),
-            MIMEType("application", "json", mapOf())
-          )
+            MIMEType("application", "json", mapOf()),
+          ),
         ).build()
 
     val response = request.execute()
@@ -242,7 +238,7 @@ class NotificationTokenHTTPCalls(
         this.logger.error(
           "Failed to set FCM Token for account {}: {}",
           account.id,
-          status.properties.message
+          status.properties.message,
         )
       }
 

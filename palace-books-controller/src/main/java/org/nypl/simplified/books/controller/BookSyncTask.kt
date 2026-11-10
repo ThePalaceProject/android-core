@@ -49,7 +49,7 @@ class BookSyncTask(
   private val feedLoader: FeedLoaderType,
   private val patronParsers: PatronUserProfileParsersType,
   private val http: LSHTTPClientType,
-  private val feedParser: OPDSFeedParserType
+  private val feedParser: OPDSFeedParserType,
 ) : AbstractBookTask(accountID, profiles) {
   override val logger =
     LoggerFactory.getLogger(BookSyncTask::class.java)
@@ -76,7 +76,7 @@ class BookSyncTask(
 
     this.fetchPatronUserProfile(
       account = account,
-      credentials = credentials
+      credentials = credentials,
     )
 
     val loansURI = provider.loansURI
@@ -99,7 +99,7 @@ class BookSyncTask(
           stream = status.bodyStream ?: ByteArrayInputStream(ByteArray(0)),
           provider = provider,
           account = account,
-          accessToken = status.getAccessToken()
+          accessToken = status.getAccessToken(),
         )
         this.taskRecorder.finishSuccess(Unit)
       }
@@ -110,7 +110,7 @@ class BookSyncTask(
             "%s: %d: %s",
             provider.loansURI,
             status.properties.status,
-            status.properties.message
+            status.properties.message,
           )
 
         if (status.properties.status == 401) {
@@ -130,7 +130,7 @@ class BookSyncTask(
           message = message,
           errorCode = "syncFailed",
           exception = exception,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
         throw TaskFailedHandled(exception)
       }
@@ -143,7 +143,7 @@ class BookSyncTask(
 
   private fun fetchPatronUserProfile(
     account: AccountType,
-    credentials: AccountAuthenticationCredentials
+    credentials: AccountAuthenticationCredentials,
   ) {
     try {
       val profile =
@@ -152,7 +152,7 @@ class BookSyncTask(
           patronParsers = this.patronParsers,
           credentials = credentials,
           http = this.http,
-          account = account
+          account = account,
         )
 
       account.updateCredentialsIfAvailable {
@@ -172,7 +172,7 @@ class BookSyncTask(
 
   private fun withPatronAuthorization(
     currentCredentials: AccountAuthenticationCredentials,
-    authorization: PatronAuthorization
+    authorization: PatronAuthorization,
   ): AccountAuthenticationCredentials =
     when (currentCredentials) {
       is AccountAuthenticationCredentials.Basic -> {
@@ -194,7 +194,7 @@ class BookSyncTask(
 
   private fun withNewAnnotationsURI(
     currentCredentials: AccountAuthenticationCredentials,
-    profile: PatronUserProfile
+    profile: PatronUserProfile,
   ): AccountAuthenticationCredentials =
     when (currentCredentials) {
       is AccountAuthenticationCredentials.Basic -> {
@@ -236,7 +236,7 @@ class BookSyncTask(
         { accountProvider, message ->
           this.logger.debug("[{}]: {}", accountProvider, message)
         },
-        newDescription
+        newDescription,
       )
 
     return when (newProviderResult) {
@@ -258,7 +258,7 @@ class BookSyncTask(
     stream: InputStream,
     provider: AccountProviderType,
     account: AccountType,
-    accessToken: String?
+    accessToken: String?,
   ) {
     account.updateBasicTokenCredentials(accessToken)
     stream.use { ok ->
@@ -270,7 +270,7 @@ class BookSyncTask(
   private fun parseFeed(
     stream: InputStream,
     provider: AccountProviderType,
-    account: AccountType
+    account: AccountType,
   ) {
     val feed = this.feedParser.parse(provider.loansURI, stream)
 
@@ -344,7 +344,7 @@ class BookSyncTask(
 
   private fun updateRegistryForBook(
     account: AccountType,
-    dbEntry: BookDatabaseEntryType
+    dbEntry: BookDatabaseEntryType,
   ) {
     this.logger.debug("attempting to fetch book permalink to update registry")
     val alternate = dbEntry.book.entry.alternate
@@ -356,7 +356,7 @@ class BookSyncTask(
           accountID = this.accountID,
           uri = alternate,
           timeout = Pair(30L, TimeUnit.SECONDS),
-          method = "GET"
+          method = "GET",
         )
 
       /*

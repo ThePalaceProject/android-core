@@ -25,7 +25,10 @@ class PalaceAccountFallback : AccountProviderFallbackType {
       id = URI.create("urn:uuid:6b849570-070f-43b4-9dcc-7ebb4bca292e"),
       license = null,
       loansURI = URI.create("https://dpla.thepalaceproject.org/bookshelf/loans/"),
-      logo = URI.create("https://tpp-prod-library-registry-public.s3.amazonaws.com/logo/6b849570-070f-43b4-9dcc-7ebb4bca292e.png"),
+      logo =
+        URI.create(
+          "https://tpp-prod-library-registry-public.s3.amazonaws.com/logo/6b849570-070f-43b4-9dcc-7ebb4bca292e.png",
+        ),
       mainColor = "blue",
       patronSettingsURI = URI.create("https://dpla.thepalaceproject.org/bookshelf/patrons/me/"),
       privacyPolicy = null,
@@ -34,6 +37,6 @@ class PalaceAccountFallback : AccountProviderFallbackType {
       supportEmail = "support@thepalaceproject.org",
       supportsReservations = false,
       updated = OffsetDateTime.parse("2021-07-07T23:10:18.238-04:00"),
-      alternateURI = URI.create("https://thepalaceproject.org")
+      alternateURI = URI.create("https://thepalaceproject.org"),
     )
 }

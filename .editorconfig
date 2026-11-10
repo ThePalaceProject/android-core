@@ -1,21 +1,46 @@
+# NOTE: ktlint_code_style is intentionally NOT set. The default (ktlint_official)
+# preserves the house style of one-parameter-per-line function signatures. Setting
+# intellij_idea together with max_line_length makes ktlint collapse multi-line
+# function signatures onto a single line, which this project does not want.
+
 [*.kt]
 indent_size=2
 insert_final_newline=true
+max_line_length = 120
+# Expression bodies that span multiple lines must start on a new line after '='.
+ktlint_function_signature_body_expression_wrapping = multiline
+# No exemption for large argument lists: every wrapped call lists one argument per line.
+ktlint_argument_list_wrapping_ignore_when_parameter_count_greater_or_equal_than = 999999
+ij_kotlin_name_count_to_use_star_import = 999999
+
+# Rules enabled for strictness (each verified against the tree before enabling):
+ktlint_standard_argument-list-wrapping = enabled
+ktlint_standard_enum-entry-name-case = enabled
+ktlint_standard_expression-operand-wrapping = enabled
+ktlint_standard_if-else-bracing = enabled
+ktlint_standard_import-ordering = enabled
+ktlint_standard_trailing-comma-on-call-site = enabled
+ktlint_standard_trailing-comma-on-declaration-site = enabled
+ktlint_standard_wrapping = enabled
+ktlint_standard_when-entry-bracing = enabled
+
+# Rules intentionally disabled:
+# function-expression-body: demands expression bodies ('fun f() = ...'), i.e. the terse
+#   style this project rejects; block bodies are the house style.
+# class-naming, function-naming: protocol-version identifiers (SAML2_0,
+#   OPDSOpenSearch1_1, deserializeSAML2_0) encode version numbers and must not be renamed.
+# property-naming: error-code objects use camelCase constants by design; the OPDS
+#   parsers keep legacy Java-style local names.
+# package-name: legacy org.nypl.simplified.* packages contain underscores by design.
 ktlint_standard_function-expression-body = disabled
-ktlint_standard_argument-list-wrapping = disabled
 ktlint_standard_class-naming = disabled
 ktlint_standard_property-naming = disabled
 ktlint_standard_function-naming = disabled
-ktlint_standard_enum-entry-name-case = disabled
-ktlint_standard_import-ordering = disabled
 ktlint_standard_package-name = disabled
-ktlint_standard_trailing-comma-on-call-site = disabled
-ktlint_standard_trailing-comma-on-declaration-site = disabled
-ktlint_standard_wrapping = disabled
-ij_kotlin_name_count_to_use_star_import = 999999
 
 [*.kts]
 indent_size=4
+max_line_length = 120
 
 [*.gradle]
 indent_size=2

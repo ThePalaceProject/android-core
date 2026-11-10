@@ -61,5 +61,5 @@ internal data class DatabaseFormatHandleParameters(
    * The HTTP client.
    */
 
-  val httpClient: LSHTTPClientType
+  val httpClient: LSHTTPClientType,
 )

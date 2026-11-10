@@ -17,7 +17,8 @@ interface DBType : AutoCloseable {
    * Open a new one-shot database transaction.
    */
 
-  fun openTransaction(): DBTransactionType = this.openConnection().openTransaction(DBTransactionCloseBehavior.ON_CLOSE_CLOSE_CONNECTION)
+  fun openTransaction(): DBTransactionType =
+    this.openConnection().openTransaction(DBTransactionCloseBehavior.ON_CLOSE_CLOSE_CONNECTION)
 
   /**
    * Attempt to copy any account provider descriptions from the given database file.

@@ -1,5 +1,5 @@
 package org.nypl.simplified.books.preview
 
 class BookPreviewException(
-  exception: Throwable?
+  exception: Throwable?,
 ) : Exception(exception)

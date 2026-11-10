@@ -10,9 +10,11 @@ import java.net.URI
  */
 
 object AccountProviderResolutionErrorCodes {
-  fun unexpectedException(description: AccountProviderDescription): String = "unexpectedException ${description.id} ${description.title}"
+  fun unexpectedException(description: AccountProviderDescription): String =
+    "unexpectedException ${description.id} ${description.title}"
 
-  fun authDocumentUnusable(description: AccountProviderDescription): String = "authDocumentUnusable ${description.id} ${description.title}"
+  fun authDocumentUnusable(description: AccountProviderDescription): String =
+    "authDocumentUnusable ${description.id} ${description.title}"
 
   fun authDocumentUnusableLink(description: AccountProviderDescription): String =
     "authDocumentUnusableLink ${description.id} ${description.title}"
@@ -23,6 +25,6 @@ object AccountProviderResolutionErrorCodes {
   fun httpRequestFailed(
     uri: URI?,
     status: Int,
-    message: String
+    message: String,
   ): String = "httpRequestFailed $uri $status $message"
 }

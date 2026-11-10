@@ -61,16 +61,16 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class BorrowTask private constructor(
   private val requirements: BorrowRequirements,
-  private val request: BorrowRequest
+  private val request: BorrowRequest,
 ) : BorrowTaskType {
   companion object : BorrowTaskFactoryType {
     override fun createBorrowTask(
       requirements: BorrowRequirements,
-      request: BorrowRequest
+      request: BorrowRequest,
     ): BorrowTaskType =
       BorrowTask(
         requirements = requirements,
-        request = request
+        request = request,
       )
   }
 
@@ -95,22 +95,22 @@ class BorrowTask private constructor(
   private class BorrowFailedNoNetwork : Exception("No network!")
 
   private class BorrowFailedHandled(
-    exception: Throwable?
+    exception: Throwable?,
   ) : Exception(exception)
 
   private fun debug(
     message: String,
-    vararg arguments: Any?
+    vararg arguments: Any?,
   ) = this.logger.debug("[{}] $message", this.bookIdBrief, *arguments)
 
   private fun error(
     message: String,
-    vararg arguments: Any?
+    vararg arguments: Any?,
   ) = this.logger.error("[{}] $message", this.bookIdBrief, *arguments)
 
   private fun warn(
     message: String,
-    vararg arguments: Any?
+    vararg arguments: Any?,
   ) = this.logger.warn("[{}] $message", this.bookIdBrief, *arguments)
 
   override fun execute(): TaskResult<*> {
@@ -135,7 +135,7 @@ class BorrowTask private constructor(
         message = this.messageOrName(e),
         errorCode = unexpectedException,
         exception = e,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       this.taskRecorder.finishFailure<Unit>()
     }
@@ -146,8 +146,8 @@ class BorrowTask private constructor(
       this.requirements.bookRegistry.update(
         BookWithStatus(
           book = bookWithStatus.book,
-          status = BookStatus.RequestingDownload(bookID)
-        )
+          status = BookStatus.RequestingDownload(bookID),
+        ),
       )
     }
   }
@@ -179,7 +179,7 @@ class BorrowTask private constructor(
         cover = null,
         thumbnail = null,
         entry = start.opdsAcquisitionFeedEntry,
-        formats = listOf()
+        formats = listOf(),
       )
 
     val profile = this.requirements.profiles.currentProfile()
@@ -197,7 +197,8 @@ class BorrowTask private constructor(
   private fun executeSubtasksForPath(
     book: Book,
     path: FeedAcquisitionPath,
-    samlDownloadContext: SAMLDownloadContext?
+    samlDownloadContext: SAMLDownloadContext?,
+  
   ) {
     val currentProfile =
       this.requirements.profiles.currentProfile()
@@ -230,14 +231,16 @@ class BorrowTask private constructor(
         temporaryDirectory = this.requirements.temporaryDirectory,
       )
 
-    when (this.requirements.httpClient.networkAccess
-      .canUseNetwork()) {
+    when (
+      this.requirements.httpClient.networkAccess
+        .canUseNetwork()
+    ) {
       NETWORK_UNAVAILABLE -> {
         this.taskRecorder.currentStepFailed(
           message = "The network is currently unavailable.",
           errorCode = "error-no-network",
           exception = null,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
         this.publishBookFailure(book)
         throw BorrowFailedNoNetwork()
@@ -248,7 +251,7 @@ class BorrowTask private constructor(
           message = "The current network settings do not allow downloads when Wi-Fi is unavailable.",
           errorCode = "error-no-permitted-network",
           exception = null,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
         this.publishBookFailure(book)
         throw BorrowFailedNoNetwork()
@@ -279,7 +282,8 @@ class BorrowTask private constructor(
             context = context,
             pathElement = pathElement,
             book = book,
-            remaining = queue.toList().map(FeedAcquisitionPathElement::mimeType)
+            remaining = queue.toList().map(FeedAcquisitionPathElement::mimeType),
+          
           )
         this.subtaskExecute(subtaskFactory, context, book)
       } catch (e: BorrowSubtaskHaltedEarly) {
@@ -299,7 +303,7 @@ class BorrowTask private constructor(
   private fun subtaskExecute(
     subtaskFactory: BorrowSubtaskFactoryType,
     context: BorrowContext,
-    book: Book
+    book: Book,
   ) {
     val name = subtaskFactory.name
     val step = this.taskRecorder.beginNewStep("Executing subtask '$name'...")
@@ -323,7 +327,7 @@ class BorrowTask private constructor(
               message = "Subtask '$name' raised an unexpected exception",
               exception = e,
               errorCode = subtaskFailed,
-              extraMessages = listOf()
+              extraMessages = listOf(),
             )
           throw e
         }
@@ -342,7 +346,7 @@ class BorrowTask private constructor(
           message = "Subtask '$name' raised an unexpected exception",
           exception = e,
           errorCode = subtaskFailed,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
       this.publishBookFailure(book)
       throw BorrowFailedHandled(e)
@@ -357,7 +361,7 @@ class BorrowTask private constructor(
     context: BorrowContext,
     pathElement: FeedAcquisitionPathElement,
     book: Book,
-    remaining: List<MIMEType>
+    remaining: List<MIMEType>,
   ): BorrowSubtaskFactoryType {
     this.taskRecorder.beginNewStep("Finding subtask for acquisition path element ${pathElement.mimeType}...")
     val subtaskFactory =
@@ -365,13 +369,13 @@ class BorrowTask private constructor(
         mimeType = pathElement.mimeType,
         target = context.currentURI(),
         account = context.account,
-        remainingTypes = remaining
+        remainingTypes = remaining,
       )
     if (subtaskFactory == null) {
       this.taskRecorder.currentStepFailed(
         message = "We don't know how to handle this kind of acquisition.",
         errorCode = noSubtaskAvailable,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       this.publishBookFailure(book)
       throw BorrowFailedHandled(null)
@@ -387,7 +391,7 @@ class BorrowTask private constructor(
 
   private fun createBookDatabaseEntry(
     book: Book,
-    entry: FeedEntryBook
+    entry: FeedEntryBook,
   ): Book {
     this.taskRecorder.beginNewStep("Setting up a book database entry...")
 
@@ -403,7 +407,7 @@ class BorrowTask private constructor(
         message = "Could not set up the book database entry.",
         errorCode = bookDatabaseFailed,
         exception = e,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       this.publishBookFailure(book)
       throw BorrowFailedHandled(e)
@@ -416,7 +420,7 @@ class BorrowTask private constructor(
 
   private fun findAccount(
     profile: ProfileReadableType,
-    book: Book
+    book: Book,
   ): AccountType {
     this.taskRecorder.beginNewStep("Locating account ${book.account.uuid} in the profile...")
     this.taskRecorder.addAttribute("Account ID", book.account.uuid.toString())
@@ -430,7 +434,7 @@ class BorrowTask private constructor(
           message = "An unexpected exception was raised.",
           errorCode = accountsDatabaseException,
           exception = e,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
 
         this.publishBookFailure(book)
@@ -448,7 +452,7 @@ class BorrowTask private constructor(
 
   private fun pickAcquisitionPath(
     book: Book,
-    entry: FeedEntryBook
+    entry: FeedEntryBook,
   ): FeedAcquisitionPath {
     this.taskRecorder.beginNewStep("Planning the borrow operation…")
 
@@ -458,7 +462,7 @@ class BorrowTask private constructor(
       this.taskRecorder.currentStepFailed(
         message = "No supported acquisitions.",
         errorCode = noSupportedAcquisitions,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       this.publishBookFailure(book)
       throw BorrowFailedHandled(null)
@@ -473,8 +477,8 @@ class BorrowTask private constructor(
     this.requirements.bookRegistry.update(
       BookWithStatus(
         book,
-        BookStatus.FailedLoan(book.id, failure)
-      )
+        BookStatus.FailedLoan(book.id, failure),
+      ),
     )
   }
 
@@ -503,7 +507,7 @@ class BorrowTask private constructor(
     private val cacheDirectory: File,
     private val cancelled: AtomicBoolean,
     override val audiobookAuthorizationHandler: BorrowAudiobookAuthorizationHandler,
-    override val profile: ProfileType
+    override val profile: ProfileType,
   ) : BorrowContextType {
     override fun cacheDirectory(): File = this.cacheDirectory
 
@@ -524,8 +528,8 @@ class BorrowTask private constructor(
       this.bookPublishStatus(
         BookStatus.DownloadWaitingForExternalAuthentication(
           id = this.bookCurrent.id,
-          downloadURI = this.currentURICheck()
-        )
+          downloadURI = this.currentURICheck(),
+        ),
       )
     }
 
@@ -533,7 +537,7 @@ class BorrowTask private constructor(
       message: String,
       receivedSize: Long?,
       expectedSize: Long?,
-      bytesPerSecond: Long?
+      bytesPerSecond: Long?,
     ) {
       this.logDebug("downloading: {} {} {}", expectedSize, receivedSize, bytesPerSecond)
 
@@ -542,8 +546,8 @@ class BorrowTask private constructor(
           id = this.bookCurrent.id,
           currentTotalBytes = receivedSize,
           expectedTotalBytes = expectedSize,
-          detailMessage = message
-        )
+          detailMessage = message,
+        ),
       )
     }
 
@@ -559,8 +563,8 @@ class BorrowTask private constructor(
       this.bookPublishStatus(
         BookStatus.RequestingLoan(
           id = this.bookCurrent.id,
-          detailMessage = message
-        )
+          detailMessage = message,
+        ),
       )
     }
 
@@ -568,8 +572,8 @@ class BorrowTask private constructor(
       this.bookPublishStatus(
         BookStatus.FailedLoan(
           id = this.bookCurrent.id,
-          result = this.taskRecorder.finishFailure()
-        )
+          result = this.taskRecorder.finishFailure(),
+        ),
       )
     }
 
@@ -577,8 +581,8 @@ class BorrowTask private constructor(
       this.bookPublishStatus(
         BookStatus.ReachedLoanLimit(
           id = this.bookCurrent.id,
-          result = this.taskRecorder.finishFailure()
-        )
+          result = this.taskRecorder.finishFailure(),
+        ),
       )
     }
 
@@ -589,7 +593,7 @@ class BorrowTask private constructor(
       this.logDebug(
         "Path now starts with {} (type {})",
         path.elements[0].target,
-        path.elements[0].mimeType
+        path.elements[0].mimeType,
       )
       this.opdsAcquisitionPath = path
       this.currentRemainingOPDSPathElements = this.opdsAcquisitionPath.elements
@@ -603,8 +607,8 @@ class BorrowTask private constructor(
       this.bookPublishStatus(
         BookStatus.FailedDownloadBadCredentials(
           id = this.bookCurrent.id,
-          result = this.taskRecorder.finishFailure()
-        )
+          result = this.taskRecorder.finishFailure(),
+        ),
       )
     }
 
@@ -612,8 +616,8 @@ class BorrowTask private constructor(
       this.bookPublishStatus(
         BookStatus.FailedLoanBadCredentials(
           id = this.bookCurrent.id,
-          result = this.taskRecorder.finishFailure()
-        )
+          result = this.taskRecorder.finishFailure(),
+        ),
       )
     }
 
@@ -636,8 +640,8 @@ class BorrowTask private constructor(
       this.bookPublishStatus(
         BookStatus.FailedDownload(
           id = this.bookCurrent.id,
-          result = this.taskRecorder.finishFailure()
-        )
+          result = this.taskRecorder.finishFailure(),
+        ),
       )
     }
 
@@ -645,7 +649,11 @@ class BorrowTask private constructor(
       null
 
     override fun currentURI(): Link? {
-      return this.currentURIField ?: return this.currentAcquisitionPathElement.target
+      val currentURI = this.currentURIField
+      if (currentURI == null) {
+        return this.currentAcquisitionPathElement.target
+      }
+      return currentURI
     }
 
     override fun receivedNewURI(uri: Link) {
@@ -661,17 +669,17 @@ class BorrowTask private constructor(
 
     override fun logDebug(
       message: String,
-      vararg arguments: Any?
+      vararg arguments: Any?,
     ) = this.logger.debug("[{}] $message", this.bookIdBrief, *arguments)
 
     override fun logError(
       message: String,
-      vararg arguments: Any?
+      vararg arguments: Any?,
     ) = this.logger.error("[{}] $message", this.bookIdBrief, *arguments)
 
     override fun logWarn(
       message: String,
-      vararg arguments: Any?
+      vararg arguments: Any?,
     ) = this.logger.warn("[{}] $message", this.bookIdBrief, *arguments)
 
     override fun temporaryFile(extension: String): File {
@@ -687,6 +695,8 @@ class BorrowTask private constructor(
       throw IOException("Could not create a temporary file within 100 attempts!")
     }
 
-    override fun opdsAcquisitionPathRemaining(): List<FeedAcquisitionPathElement> = this.currentRemainingOPDSPathElements
+    override fun opdsAcquisitionPathRemaining(): List<FeedAcquisitionPathElement> =
+      this.currentRemainingOPDSPathElements
+  
   }
 }

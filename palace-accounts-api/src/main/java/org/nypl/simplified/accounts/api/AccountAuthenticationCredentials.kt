@@ -19,7 +19,7 @@ sealed class AccountAuthenticationCredentials {
    */
 
   abstract fun withAdobePreActivationCredentials(
-    newCredentials: AccountAuthenticationAdobePreActivationCredentials
+    newCredentials: AccountAuthenticationAdobePreActivationCredentials,
   ): AccountAuthenticationCredentials
 
   /**
@@ -65,15 +65,15 @@ sealed class AccountAuthenticationCredentials {
     override val authenticationDescription: String?,
     override val annotationsURI: URI?,
     override val deviceRegistrationURI: URI?,
-    override val patronAuthorization: PatronAuthorization?
+    override val patronAuthorization: PatronAuthorization?,
   ) : AccountAuthenticationCredentials() {
     override fun withoutAdobePostActivationCredentials(): AccountAuthenticationCredentials =
       this.copy(
-        adobeCredentials = this.adobeCredentials?.copy(postActivationCredentials = null)
+        adobeCredentials = this.adobeCredentials?.copy(postActivationCredentials = null),
       )
 
     override fun withAdobePreActivationCredentials(
-      newCredentials: AccountAuthenticationAdobePreActivationCredentials
+      newCredentials: AccountAuthenticationAdobePreActivationCredentials,
     ): AccountAuthenticationCredentials = this.copy(adobeCredentials = newCredentials)
   }
 
@@ -89,15 +89,15 @@ sealed class AccountAuthenticationCredentials {
     override val authenticationDescription: String?,
     override val annotationsURI: URI?,
     override val deviceRegistrationURI: URI?,
-    override val patronAuthorization: PatronAuthorization?
+    override val patronAuthorization: PatronAuthorization?,
   ) : AccountAuthenticationCredentials() {
     override fun withoutAdobePostActivationCredentials(): AccountAuthenticationCredentials =
       this.copy(
-        adobeCredentials = this.adobeCredentials?.copy(postActivationCredentials = null)
+        adobeCredentials = this.adobeCredentials?.copy(postActivationCredentials = null),
       )
 
     override fun withAdobePreActivationCredentials(
-      newCredentials: AccountAuthenticationAdobePreActivationCredentials
+      newCredentials: AccountAuthenticationAdobePreActivationCredentials,
     ): AccountAuthenticationCredentials = this.copy(adobeCredentials = newCredentials)
 
     fun updateAccessToken(accessToken: String?): BasicToken =
@@ -105,8 +105,8 @@ sealed class AccountAuthenticationCredentials {
         this.copy(
           authenticationTokenInfo =
             authenticationTokenInfo.copy(
-              accessToken = accessToken
-            )
+              accessToken = accessToken,
+            ),
         )
       } else {
         this
@@ -125,15 +125,15 @@ sealed class AccountAuthenticationCredentials {
     override val authenticationDescription: String?,
     override val annotationsURI: URI?,
     override val deviceRegistrationURI: URI?,
-    override val patronAuthorization: PatronAuthorization?
+    override val patronAuthorization: PatronAuthorization?,
   ) : AccountAuthenticationCredentials() {
     override fun withoutAdobePostActivationCredentials(): AccountAuthenticationCredentials =
       this.copy(
-        adobeCredentials = this.adobeCredentials?.copy(postActivationCredentials = null)
+        adobeCredentials = this.adobeCredentials?.copy(postActivationCredentials = null),
       )
 
     override fun withAdobePreActivationCredentials(
-      newCredentials: AccountAuthenticationAdobePreActivationCredentials
+      newCredentials: AccountAuthenticationAdobePreActivationCredentials,
     ): AccountAuthenticationCredentials = this.copy(adobeCredentials = newCredentials)
   }
 
@@ -147,15 +147,15 @@ sealed class AccountAuthenticationCredentials {
     override val authenticationDescription: String?,
     override val annotationsURI: URI?,
     override val deviceRegistrationURI: URI?,
-    override val patronAuthorization: PatronAuthorization?
+    override val patronAuthorization: PatronAuthorization?,
   ) : AccountAuthenticationCredentials() {
     override fun withoutAdobePostActivationCredentials(): AccountAuthenticationCredentials =
       this.copy(
-        adobeCredentials = this.adobeCredentials?.copy(postActivationCredentials = null)
+        adobeCredentials = this.adobeCredentials?.copy(postActivationCredentials = null),
       )
 
     override fun withAdobePreActivationCredentials(
-      newCredentials: AccountAuthenticationAdobePreActivationCredentials
+      newCredentials: AccountAuthenticationAdobePreActivationCredentials,
     ): AccountAuthenticationCredentials = this.copy(adobeCredentials = newCredentials)
   }
 }

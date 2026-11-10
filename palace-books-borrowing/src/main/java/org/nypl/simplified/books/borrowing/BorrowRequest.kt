@@ -33,6 +33,7 @@ sealed class BorrowRequest {
   data class Start(
     override val accountId: AccountID,
     override val opdsAcquisitionFeedEntry: FeedEntryBook,
-    override val samlDownloadContext: SAMLDownloadContext? = null
+    override val samlDownloadContext: SAMLDownloadContext? = null,
+  
   ) : BorrowRequest()
 }

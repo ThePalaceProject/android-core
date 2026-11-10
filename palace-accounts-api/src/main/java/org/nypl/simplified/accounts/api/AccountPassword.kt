@@ -5,7 +5,7 @@ package org.nypl.simplified.accounts.api
  */
 
 data class AccountPassword(
-  val value: String
+  val value: String,
 ) {
   override fun toString(): String = "[REDACTED]"
 }

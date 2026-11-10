@@ -29,7 +29,7 @@ interface DBTransactionType : AutoCloseable {
 
   fun <P, R, Q : DBQueryType<P, R>> execute(
     queryType: Class<Q>,
-    parameters: P
+    parameters: P,
   ): R = this.query(queryType).execute(this, parameters)
 
   /**

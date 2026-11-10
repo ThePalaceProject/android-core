@@ -18,7 +18,7 @@ data class CatalogBookStatus<S : BookStatus>(
       accountID = this.book.account,
       bookID = this.book.id,
       entry = this.book.entry,
-      samlDownloadContext = null
+      samlDownloadContext = null,
     )
 
   companion object {
@@ -30,7 +30,8 @@ data class CatalogBookStatus<S : BookStatus>(
 
     fun create(
       registry: BookRegistryReadableType,
-      feedEntry: FeedEntryBook
+      feedEntry: FeedEntryBook,
+    
     ): CatalogBookStatus<BookStatus> {
       val bookID = FeedBookIDConversions.toBookID(feedEntry.bookID)
       val registryStatus =
@@ -45,7 +46,8 @@ data class CatalogBookStatus<S : BookStatus>(
             cover = null,
             thumbnail = null,
             entry = feedEntry,
-            formats = listOf()
+            formats = listOf(),
+          
           )
       }
 
@@ -53,13 +55,13 @@ data class CatalogBookStatus<S : BookStatus>(
         return CatalogBookStatus(
           book,
           registryStatus,
-          bookPreviewStatusOf(feedEntry)
+          bookPreviewStatusOf(feedEntry),
         )
       } else {
         return CatalogBookStatus(
           book,
           BookStatus.fromBook(book),
-          bookPreviewStatusOf(feedEntry)
+          bookPreviewStatusOf(feedEntry),
         )
       }
     }

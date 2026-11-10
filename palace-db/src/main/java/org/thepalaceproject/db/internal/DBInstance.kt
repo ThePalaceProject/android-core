@@ -40,7 +40,7 @@ import java.util.function.Supplier
 
 internal class DBInstance private constructor(
   private val dataSource: SQLiteDataSource,
-  private val parameters: DBParameters
+  private val parameters: DBParameters,
 ) : DBType {
   private val closed = AtomicBoolean(false)
 
@@ -48,12 +48,12 @@ internal class DBInstance private constructor(
     mapOf<Class<*>, Any>(
       Pair(
         AccountProviderDescriptionCollectionParsersType::class.java,
-        this.parameters.accountProviderParsers
+        this.parameters.accountProviderParsers,
       ),
       Pair(
         AccountProviderDescriptionCollectionSerializersType::class.java,
-        this.parameters.accountProviderSerializers
-      )
+        this.parameters.accountProviderSerializers,
+      ),
     )
 
   companion object {
@@ -92,14 +92,14 @@ internal class DBInstance private constructor(
       val revisions: TrSchemaRevisionSet
       DBInstance::class.java
         .getResourceAsStream(
-          "/org/thepalaceproject/db/internal/database.xml"
+          "/org/thepalaceproject/db/internal/database.xml",
         ).use { stream ->
           parsers
             .createParserWithContext(
               JXEHardenedSAXParsers(Supplier { SAXParserFactoryImpl() }),
               URI.create("urn:source"),
               stream,
-              Consumer { status: ParseStatus? -> this.LOG.trace("Parser: {}", status) }
+              Consumer { status: ParseStatus? -> this.LOG.trace("Parser: {}", status) },
             ).use { parser ->
               revisions = parser.execute()
             }
@@ -122,8 +122,8 @@ internal class DBInstance private constructor(
               revisions,
               TrExecutorUpgrade.PERFORM_UPGRADES,
               arguments,
-              connection
-            )
+              connection,
+            ),
           ).execute()
         connection.commit()
       }
@@ -132,7 +132,7 @@ internal class DBInstance private constructor(
     @Throws(SQLException::class)
     private fun schemaVersionSet(
       version: BigInteger,
-      connection: Connection
+      connection: Connection,
     ) {
       val statementText: String
       if (version == BigInteger.ZERO) {
@@ -173,8 +173,8 @@ internal class DBInstance private constructor(
                 String.format(
                   "Database application ID is %s but should be %s",
                   applicationCA,
-                  this.DATABASE_APPLICATION_ID
-                )
+                  this.DATABASE_APPLICATION_ID,
+                ),
               )
             }
             return Optional.of(BigInteger.valueOf(version))
@@ -202,14 +202,14 @@ internal class DBInstance private constructor(
         this.LOG.info(
           "Upgrading schema: {} -> {}",
           event.fromVersion(),
-          event.toVersion()
+          event.toVersion(),
         )
       }
     }
 
     private fun doOpen(
       parameters: DBParameters,
-      file: Path
+      file: Path,
     ): DBType {
       val url = StringBuilder(128)
       url.append("jdbc:sqlite:")
@@ -228,7 +228,7 @@ internal class DBInstance private constructor(
   }
 
   private inner class DBConnection(
-    override val connection: Connection
+    override val connection: Connection,
   ) : DBConnectionType {
     private val closed = AtomicBoolean()
 
@@ -255,7 +255,7 @@ internal class DBInstance private constructor(
               Runnable {
               }
             }
-          }
+          },
       )
     }
 
@@ -278,7 +278,7 @@ internal class DBInstance private constructor(
 
   private class DBTransaction(
     override val connection: DBConnection,
-    private val onClose: Runnable
+    private val onClose: Runnable,
   ) : DBTransactionType {
     private val closed = AtomicBoolean()
 
@@ -346,7 +346,7 @@ SELECT
     apd_data_format,
     apd_data
 FROM source.account_provider_descriptions;
-              """.trimIndent()
+              """.trimIndent(),
             )
 
           LOG.debug("Updated {} providers from bundled database", updated)

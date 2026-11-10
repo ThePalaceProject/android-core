@@ -10,7 +10,8 @@ object MainSyncService {
   fun start(context: Application) {
     val hourlyWork =
       PeriodicWorkRequestBuilder<MainSyncServiceWorker>(
-        1, TimeUnit.HOURS
+        1,
+        TimeUnit.HOURS,
       ).build()
 
     WorkManager
@@ -18,7 +19,7 @@ object MainSyncService {
       .enqueueUniquePeriodicWork(
         "palace-periodic-book-syncing-service",
         ExistingPeriodicWorkPolicy.UPDATE,
-        hourlyWork
+        hourlyWork,
       )
   }
 }

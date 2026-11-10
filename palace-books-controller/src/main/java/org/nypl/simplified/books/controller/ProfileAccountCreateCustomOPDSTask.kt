@@ -60,7 +60,7 @@ class ProfileAccountCreateCustomOPDSTask(
           { _, message ->
             this.publishProgressEvent(this.taskRecorder.beginNewStep(message))
           },
-          accountProviderDescription
+          accountProviderDescription,
         )
 
       when (resolutionResult) {
@@ -78,21 +78,23 @@ class ProfileAccountCreateCustomOPDSTask(
         message = this.strings.unexpectedException,
         errorCode = "unexpectedException",
         exception = e,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       this.publishFailureEvent()
       this.taskRecorder.finishFailure()
     }
   }
 
-  private fun accountResolutionFailed(resolutionResult: TaskResult.Failure<AccountProviderType>): TaskResult.Failure<AccountType> {
+  private fun accountResolutionFailed(
+    resolutionResult: TaskResult.Failure<AccountProviderType>,
+  ): TaskResult.Failure<AccountType> {
     this.logger.error("could not resolve an account provider description")
     this.taskRecorder.addAll(resolutionResult.steps)
     this.taskRecorder.addAttributes(resolutionResult.attributes)
     this.taskRecorder.currentStepFailed(
       message = this.strings.resolvingAccountProviderFailed,
       errorCode = "resolvingAccountProviderFailed",
-      extraMessages = listOf()
+      extraMessages = listOf(),
     )
     return this.taskRecorder.finishFailure()
   }
@@ -104,7 +106,7 @@ class ProfileAccountCreateCustomOPDSTask(
         accountProviderID = accountProviderDescription.id,
         accountProviders = this.accountProviderRegistry,
         profiles = this.profiles,
-        strings = this.strings
+        strings = this.strings,
       ).call()
 
     return when (createResult) {
@@ -141,8 +143,8 @@ class ProfileAccountCreateCustomOPDSTask(
     links.add(
       Link.LinkBasic(
         href = this.opdsURI,
-        relation = "http://opds-spec.org/catalog"
-      )
+        relation = "http://opds-spec.org/catalog",
+      ),
     )
 
     if (authDocumentURI != null) {
@@ -150,8 +152,8 @@ class ProfileAccountCreateCustomOPDSTask(
         Link.LinkBasic(
           href = authDocumentURI,
           type = MIMEType("application", "vnd.opds.authentication.v1.0+json", mapOf()),
-          relation = OPDSFeedConstants.AUTHENTICATION_DOCUMENT_RELATION_URI_TEXT
-        )
+          relation = OPDSFeedConstants.AUTHENTICATION_DOCUMENT_RELATION_URI_TEXT,
+        ),
       )
     }
 
@@ -162,7 +164,7 @@ class ProfileAccountCreateCustomOPDSTask(
         description = this.description,
         updated = OffsetDateTime.now(ZoneOffset.UTC).withNano(0),
         links = links,
-        images = listOf()
+        images = listOf(),
       )
 
     /*
@@ -191,7 +193,7 @@ class ProfileAccountCreateCustomOPDSTask(
       this.taskRecorder.addAttributes(
         response.status.properties
           ?.problemReport
-          ?.toMap() ?: emptyMap()
+          ?.toMap() ?: emptyMap(),
       )
 
       when (val status = response.status) {
@@ -212,7 +214,7 @@ class ProfileAccountCreateCustomOPDSTask(
             this.taskRecorder.currentStepFailed(
               message = e.message ?: e.javaClass.name,
               errorCode = "parsingOPDSFeedFailed",
-              extraMessages = listOf()
+              extraMessages = listOf(),
             )
             this.publishFailureEvent()
             throw e
@@ -242,7 +244,7 @@ class ProfileAccountCreateCustomOPDSTask(
           this.taskRecorder.currentStepFailed(
             message = this.strings.fetchingOPDSFeedFailed,
             errorCode = "fetchingOPDSFeedFailed",
-            extraMessages = listOf()
+            extraMessages = listOf(),
           )
           this.publishFailureEvent()
           throw IOException()
@@ -259,7 +261,7 @@ class ProfileAccountCreateCustomOPDSTask(
             message = this.strings.fetchingOPDSFeedFailed,
             errorCode = "httpRequestFailed",
             exception = status.exception,
-            extraMessages = listOf()
+            extraMessages = listOf(),
           )
 
           this.publishFailureEvent()
@@ -274,7 +276,9 @@ class ProfileAccountCreateCustomOPDSTask(
     return feed.authDocument
   }
 
-  private fun publishFailureEvent() = this.accountEvents.onNext(AccountEventCreationFailed(this.taskRecorder.finishFailure<AccountType>()))
+  private fun publishFailureEvent() =
+    this.accountEvents.onNext(AccountEventCreationFailed(this.taskRecorder.finishFailure<AccountType>()))
 
-  private fun publishProgressEvent(step: TaskStep) = this.accountEvents.onNext(AccountEventCreationInProgress(step.description))
+  private fun publishProgressEvent(step: TaskStep) =
+    this.accountEvents.onNext(AccountEventCreationInProgress(step.description))
 }

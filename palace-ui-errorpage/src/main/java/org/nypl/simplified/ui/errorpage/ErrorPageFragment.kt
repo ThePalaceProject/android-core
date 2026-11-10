@@ -28,7 +28,7 @@ class ErrorPageFragment : Fragment(R.layout.error_page) {
 
   override fun onViewCreated(
     view: View,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ) {
     super.onViewCreated(view, savedInstanceState)
 
@@ -92,7 +92,7 @@ class ErrorPageFragment : Fragment(R.layout.error_page) {
       Reports.sendReportsDefault(
         context = requireContext(),
         address = parameters.emailAddress,
-        body = parameters.report
+        body = parameters.report,
       )
     }
   }

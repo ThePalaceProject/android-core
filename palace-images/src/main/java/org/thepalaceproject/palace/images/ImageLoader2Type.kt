@@ -48,7 +48,7 @@ interface ImageLoader2Type {
       context = iconView.context,
       account = account,
       defaultIcon = defaultIcon,
-      iconView = iconView
+      iconView = iconView,
     )
 
   /**
@@ -67,7 +67,7 @@ interface ImageLoader2Type {
     entry: FeedEntryBook,
     imageView: ImageView,
     width: Int,
-    height: Int
+    height: Int,
   ): CompletableFuture<Unit>
 
   /**
@@ -88,7 +88,7 @@ interface ImageLoader2Type {
     imageView: ImageView,
     hasBadge: Boolean,
     width: Int,
-    height: Int
+    height: Int,
   ): CompletableFuture<Unit>
 
   /**
@@ -112,7 +112,7 @@ interface ImageLoader2Type {
     imageView: ImageView,
     width: Int,
     height: Int,
-    onColorLoaded: (Int) -> Unit
+    onColorLoaded: (Int) -> Unit,
   ): CompletableFuture<Unit>
 
   /**
@@ -129,7 +129,7 @@ interface ImageLoader2Type {
   fun loadCoverAsBitmap(
     entry: FeedEntryBook,
     onBitmapLoaded: (Bitmap) -> Unit,
-    @DrawableRes defaultResource: Int
+    @DrawableRes defaultResource: Int,
   ): CompletableFuture<Unit>
 
   /**
@@ -146,6 +146,6 @@ interface ImageLoader2Type {
   fun loadCoverAsBitmap(
     source: URI,
     onBitmapLoaded: (Bitmap) -> Unit,
-    @DrawableRes defaultResource: Int
+    @DrawableRes defaultResource: Int,
   ): CompletableFuture<Unit>
 }

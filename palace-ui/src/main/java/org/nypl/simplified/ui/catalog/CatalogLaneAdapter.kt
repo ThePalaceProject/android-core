@@ -23,19 +23,19 @@ class CatalogLaneAdapter(
       object : DiffUtil.ItemCallback<FeedEntryBook>() {
         override fun areContentsTheSame(
           oldItem: FeedEntryBook,
-          newItem: FeedEntryBook
+          newItem: FeedEntryBook,
         ): Boolean = oldItem == newItem
 
         override fun areItemsTheSame(
           oldItem: FeedEntryBook,
-          newItem: FeedEntryBook
+          newItem: FeedEntryBook,
         ): Boolean = oldItem.id == newItem.id
       }
   }
 
   override fun onCreateViewHolder(
     parent: ViewGroup,
-    viewType: Int
+    viewType: Int,
   ): CatalogLaneItemViewHolder {
     val inflater =
       LayoutInflater.from(parent.context)
@@ -47,7 +47,7 @@ class CatalogLaneAdapter(
 
   override fun onBindViewHolder(
     holder: CatalogLaneItemViewHolder,
-    position: Int
+    position: Int,
   ) {
     holder.bindTo(this.getItem(position))
   }

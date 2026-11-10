@@ -62,7 +62,7 @@ sealed class BookFormat {
      */
 
     override val bookmarks: List<SerializedBookmark>,
-    override val contentType: MIMEType
+    override val contentType: MIMEType,
   ) : BookFormat() {
     override val isDownloaded: Boolean
       get() = this.file != null
@@ -82,7 +82,7 @@ sealed class BookFormat {
      * The most recent copy of the audio book manifest, if any has been fetched.
      */
 
-    val manifestFile: File
+    val manifestFile: File,
   )
 
   /**
@@ -112,7 +112,7 @@ sealed class BookFormat {
      * The list of bookmarks.
      */
     override val bookmarks: List<SerializedBookmark>,
-    override val contentType: MIMEType
+    override val contentType: MIMEType,
   ) : BookFormat() {
     /*
      * Audio books are downloaded if there's a manifest or audio book file available.
@@ -143,7 +143,7 @@ sealed class BookFormat {
      */
 
     val file: File?,
-    override val contentType: MIMEType
+    override val contentType: MIMEType,
   ) : BookFormat() {
     override val isDownloaded: Boolean
       get() = this.file != null

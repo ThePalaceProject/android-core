@@ -37,12 +37,12 @@ object AccountDescriptionJSON {
   fun deserializeFromFile(
     objectMapper: ObjectMapper,
     accountProviders: (String) -> AccountProviderType?,
-    file: File
+    file: File,
   ): AccountDescription =
     deserializeFromText(
       objectMapper = objectMapper,
       accountProviders = accountProviders,
-      text = FileUtilities.fileReadUTF8(file)
+      text = FileUtilities.fileReadUTF8(file),
     )
 
   /**
@@ -59,11 +59,11 @@ object AccountDescriptionJSON {
   fun deserializeFromText(
     objectMapper: ObjectMapper,
     accountProviders: (String) -> AccountProviderType?,
-    text: String
+    text: String,
   ): AccountDescription =
     deserializeFromJSON(
       accountProviders = accountProviders,
-      node = objectMapper.readTree(text)
+      node = objectMapper.readTree(text),
     )
 
   /**
@@ -78,7 +78,7 @@ object AccountDescriptionJSON {
   @Throws(JSONParseException::class)
   fun deserializeFromJSON(
     accountProviders: (String) -> AccountProviderType?,
-    node: JsonNode
+    node: JsonNode,
   ): AccountDescription {
     val obj = JSONParserUtilities.checkObject(null, node)
 
@@ -86,7 +86,7 @@ object AccountDescriptionJSON {
     if (obj.has("preferences")) {
       preferences =
         AccountPreferencesJSON.deserializeFromJSON(
-          JSONParserUtilities.getObject(obj, "preferences")
+          JSONParserUtilities.getObject(obj, "preferences"),
         )
     } else {
       preferences = AccountPreferences.defaultPreferences()
@@ -96,7 +96,7 @@ object AccountDescriptionJSON {
       when (val value = obj["provider"]) {
         is ObjectNode -> {
           AccountProvidersJSON.deserializeFromJSON(
-            JSONParserUtilities.getObject(obj, "provider")
+            JSONParserUtilities.getObject(obj, "provider"),
           )
         }
 
@@ -129,17 +129,17 @@ object AccountDescriptionJSON {
 
   fun serializeToJSON(
     objectMapper: ObjectMapper,
-    description: AccountDescription
+    description: AccountDescription,
   ): ObjectNode {
     val objectNode = objectMapper.createObjectNode()
     objectNode.put("@version", 20191204)
     objectNode.set<JsonNode>(
       "provider",
-      AccountProvidersJSON.serializeToJSON(description.provider())
+      AccountProvidersJSON.serializeToJSON(description.provider()),
     )
     objectNode.set<JsonNode>(
       "preferences",
-      AccountPreferencesJSON.serializeToJSON(objectMapper, description.preferences())
+      AccountPreferencesJSON.serializeToJSON(objectMapper, description.preferences()),
     )
 
     return objectNode
@@ -156,7 +156,7 @@ object AccountDescriptionJSON {
   @Throws(IOException::class)
   fun serializeToString(
     objectMapper: ObjectMapper,
-    description: AccountDescription
+    description: AccountDescription,
   ): String {
     val objectNode = serializeToJSON(objectMapper, description)
     return ByteArrayOutputStream(1024).use { stream ->

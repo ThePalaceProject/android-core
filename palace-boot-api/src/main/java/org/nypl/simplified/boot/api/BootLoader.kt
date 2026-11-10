@@ -28,7 +28,7 @@ class BootLoader<T>(
    * A function that sets up services.
    */
 
-  private val bootProcess: BootProcessType<T>
+  private val bootProcess: BootProcessType<T>,
 ) : BootLoaderType<T> {
   private val logger =
     LoggerFactory.getLogger(BootLoader::class.java)
@@ -65,7 +65,7 @@ class BootLoader<T>(
 
   private class PresentableException(
     override val message: String,
-    override val cause: Throwable
+    override val cause: Throwable,
   ) : Exception(message, cause),
     PresentableErrorType
 
@@ -86,12 +86,12 @@ class BootLoader<T>(
             BootEvent.BootFailed(
               message = e.message,
               exception = PresentableException(e.message, e),
-              attributes = e.attributes
+              attributes = e.attributes,
             )
           } else {
             BootEvent.BootFailed(
               message = strings.bootFailedGeneric,
-              exception = PresentableException(strings.bootFailedGeneric, e)
+              exception = PresentableException(strings.bootFailedGeneric, e),
             )
           }
 
@@ -117,9 +117,9 @@ class BootLoader<T>(
         code = DiagnosticCodes.BOOT_FAILED,
         data =
           mapOf(
-            Pair("ExceptionType", throwable.javaClass.name)
+            Pair("ExceptionType", throwable.javaClass.name),
           ),
-        throwable = throwable
+        throwable = throwable,
       )
     } catch (e: Throwable) {
       this.logger.error("failed to report boot failure to diagnostics: ", e)

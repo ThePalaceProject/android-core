@@ -25,7 +25,7 @@ class AccountSAML20WebClient(
 
   override fun onPageFinished(
     view: WebView?,
-    url: String?
+    url: String?,
   ) {
     this.logger.debug("onPageFinished: {}", url)
   }
@@ -33,7 +33,7 @@ class AccountSAML20WebClient(
   override fun onPageStarted(
     view: WebView?,
     url: String?,
-    favicon: Bitmap?
+    favicon: Bitmap?,
   ) {
     this.logger.debug("onPageStarted: {}", url)
   }
@@ -41,17 +41,17 @@ class AccountSAML20WebClient(
   @Deprecated("Deprecated in Java")
   override fun shouldOverrideUrlLoading(
     view: WebView,
-    url: String
+    url: String,
   ): Boolean = this.handleUrl(view, url)
 
   override fun shouldOverrideUrlLoading(
     view: WebView,
-    request: WebResourceRequest
+    request: WebResourceRequest,
   ): Boolean = this.handleUrl(view, request.url.toString())
 
   private fun handleUrl(
     view: WebView,
-    url: String
+    url: String,
   ): Boolean {
     this.logger.debug("handleUrl: {}", url)
 
@@ -68,8 +68,8 @@ class AccountSAML20WebClient(
             accountID = this.account,
             description = this.description,
             message = message,
-            webView = view
-          )
+            webView = view,
+          ),
         )
         return true
       }
@@ -83,8 +83,8 @@ class AccountSAML20WebClient(
             accountID = this.account,
             description = this.description,
             message = message,
-            webView = view
-          )
+            webView = view,
+          ),
         )
         return true
       }
@@ -92,7 +92,7 @@ class AccountSAML20WebClient(
       val cookies =
         WebViewUtilities.dumpCookiesAsAccountCookies(
           CookieManager.getInstance(),
-          this.webViewDataDir
+          this.webViewDataDir,
         )
 
       this.logger.debug("Obtained access token")
@@ -102,8 +102,8 @@ class AccountSAML20WebClient(
           token = accessToken,
           patronInfo = patronInfo,
           cookies = cookies,
-          webView = view
-        )
+          webView = view,
+        ),
       )
       return true
     }

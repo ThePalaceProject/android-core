@@ -68,15 +68,15 @@ internal class BServiceOpLoadBookmarksForBook(
         this.logger.debug(
           "[{}]: loaded {} bookmarks",
           this.profile.id.uuid,
-          bookmarks.size
+          bookmarks.size,
         )
 
         return publish(
           BookmarksForBook(
             bookId = this.book,
             lastRead = lastReadLocation,
-            bookmarks = bookmarks.filter { b -> b.kind == BookmarkKind.BookmarkExplicit }
-          )
+            bookmarks = bookmarks.filter { b -> b.kind == BookmarkKind.BookmarkExplicit },
+          ),
         )
       }
     } catch (e: Exception) {
@@ -92,8 +92,8 @@ internal class BServiceOpLoadBookmarksForBook(
       BookmarkAttributes.addBookmarks(
         this.bookmarksSource.get(),
         this.accountID,
-        bookmarksForBook
-      )
+        bookmarksForBook,
+      ),
     )
     return bookmarksForBook
   }

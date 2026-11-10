@@ -9,6 +9,6 @@ import org.nypl.simplified.presentableerror.api.PresentableType
 data class AccountEventLoginStateChanged(
   override val message: String,
   val accountID: AccountID,
-  val state: AccountLoginState
+  val state: AccountLoginState,
 ) : AccountEvent(),
   PresentableType

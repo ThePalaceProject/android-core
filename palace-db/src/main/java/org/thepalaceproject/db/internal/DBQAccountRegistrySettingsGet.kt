@@ -37,13 +37,13 @@ LIMIT 1
 
   fun readResult(
     name: String,
-    results: ResultSet
+    results: ResultSet,
   ): DBQAccountRegistrySetting? =
     when (val type = results.getString("ars_setting_type")) {
       "TimeSetting" -> {
         DBQAccountRegistrySetting.TimeSetting(
           results.getString("ars_setting_name"),
-          OffsetDateTime.parse(results.getString("ars_setting_value"))
+          OffsetDateTime.parse(results.getString("ars_setting_value")),
         )
       }
 

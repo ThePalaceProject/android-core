@@ -19,12 +19,12 @@ internal object DBAccountProviderDescriptions {
 
   fun forceUTC(description: AccountProviderDescription): AccountProviderDescription =
     description.copy(
-      updated = description.updated.withOffsetSameInstant(ZoneOffset.UTC)
+      updated = description.updated.withOffsetSameInstant(ZoneOffset.UTC),
     )
 
   fun parseFromResult(
     transaction: DBTransactionType,
-    resultSet: ResultSet
+    resultSet: ResultSet,
   ): AccountProviderDescription =
     when (val result = resultSet.getString("apd_data_format")) {
       "DBSerializationProto1" -> {
@@ -48,7 +48,7 @@ internal object DBAccountProviderDescriptions {
 
   private fun parseFromOPDS2Collection(
     transaction: DBTransactionType,
-    resultSet: ResultSet
+    resultSet: ResultSet,
   ): AccountProviderDescription {
     val parsers =
       transaction.service(AccountProviderDescriptionCollectionParsersType::class.java)
@@ -61,7 +61,7 @@ internal object DBAccountProviderDescriptions {
         is ParseResult.Failure<AccountProviderDescriptionCollection> -> {
           throw DBException(
             message = result.errors.joinToString("\n", transform = this::showParseError),
-            cause = Exception()
+            cause = Exception(),
           )
         }
 
@@ -79,7 +79,7 @@ internal object DBAccountProviderDescriptions {
       error.line,
       error.column,
       error.message,
-      error.exception
+      error.exception,
     )
 
     return buildString {

@@ -15,5 +15,5 @@ enum class ReaderPublisherCSS {
    * Publisher default CSS is disabled.
    */
 
-  PUBLISHER_DEFAULT_CSS_DISABLED
+  PUBLISHER_DEFAULT_CSS_DISABLED,
 }

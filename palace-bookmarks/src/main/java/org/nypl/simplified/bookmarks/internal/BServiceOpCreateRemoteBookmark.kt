@@ -31,15 +31,15 @@ internal class BServiceOpCreateRemoteBookmark(
       this.logger.debug(
         "[{}]: remote sending bookmark {}",
         this.profile.id.uuid,
-        this.bookmark.bookmarkId.value
+        this.bookmark.bookmarkId.value,
       )
 
       this.bookmarksSource.set(
         BookmarkAttributes.addBookmark(
           this.bookmarksSource.get(),
           this.accountID,
-          this.bookmark
-        )
+          this.bookmark,
+        ),
       )
 
       val account = this.profile.account(this.accountID)
@@ -48,7 +48,7 @@ internal class BServiceOpCreateRemoteBookmark(
         this.logger.debug(
           "[{}]: cannot remotely send bookmark {} because the account is not syncable",
           this.profile.id.uuid,
-          this.bookmark.bookmarkId.value
+          this.bookmark.bookmarkId.value,
         )
         return this.bookmark
       }
@@ -61,7 +61,7 @@ internal class BServiceOpCreateRemoteBookmark(
           account = account,
           annotationsURI = syncInfo.annotationsURI,
           credentials = syncInfo.credentials,
-          bookmark = bookmarkAnnotation
+          bookmark = bookmarkAnnotation,
         ) ?: throw IllegalStateException("Server HTTP call failed")
 
       return this.bookmark.withURI(bookmarkUri)

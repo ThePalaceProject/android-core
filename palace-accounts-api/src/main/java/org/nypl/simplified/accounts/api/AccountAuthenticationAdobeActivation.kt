@@ -5,5 +5,5 @@ package org.nypl.simplified.accounts.api
  */
 
 data class AccountAuthenticationAdobeActivation(
-  val token: String
+  val token: String,
 )

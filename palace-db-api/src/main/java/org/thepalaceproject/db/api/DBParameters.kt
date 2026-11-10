@@ -7,5 +7,5 @@ import java.nio.file.Path
 data class DBParameters(
   val file: Path,
   val accountProviderParsers: AccountProviderDescriptionCollectionParsersType,
-  val accountProviderSerializers: AccountProviderDescriptionCollectionSerializersType
+  val accountProviderSerializers: AccountProviderDescriptionCollectionSerializersType,
 )

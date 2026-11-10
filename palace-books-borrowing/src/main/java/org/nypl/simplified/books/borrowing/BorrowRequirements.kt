@@ -34,7 +34,7 @@ data class BorrowRequirements(
   val profiles: ProfilesDatabaseType,
   val services: ServiceDirectoryType,
   val subtasks: BorrowSubtaskDirectoryType,
-  val temporaryDirectory: File
+  val temporaryDirectory: File,
 ) {
   companion object {
     fun create(
@@ -42,7 +42,7 @@ data class BorrowRequirements(
       application: Application,
       clock: () -> Instant,
       cacheDirectory: File,
-      temporaryDirectory: File
+      temporaryDirectory: File,
     ): BorrowRequirements =
       BorrowRequirements(
         application = application,
@@ -59,7 +59,7 @@ data class BorrowRequirements(
         profiles = services.requireService(ProfilesDatabaseType::class.java),
         services = services,
         subtasks = services.requireService(BorrowSubtaskDirectoryType::class.java),
-        temporaryDirectory = temporaryDirectory
+        temporaryDirectory = temporaryDirectory,
       )
   }
 }

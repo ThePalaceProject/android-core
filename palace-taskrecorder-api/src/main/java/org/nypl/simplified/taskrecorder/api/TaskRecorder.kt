@@ -25,7 +25,7 @@ class TaskRecorder private constructor() : TaskRecorderType {
 
   override fun addAttribute(
     name: String,
-    value: String
+    value: String,
   ) {
     Presentables.putRetry(this.attributes, name, value)
   }
@@ -57,7 +57,7 @@ class TaskRecorder private constructor() : TaskRecorderType {
     message: String,
     errorCode: String,
     exception: Throwable?,
-    extraMessages: List<String>
+    extraMessages: List<String>,
   ): TaskStep {
     Preconditions.checkState(this.steps.isNotEmpty(), "A step must be active")
 
@@ -68,7 +68,7 @@ class TaskRecorder private constructor() : TaskRecorderType {
         message = message,
         errorCode = errorCode,
         exception = exception,
-        extraMessages = extraMessages
+        extraMessages = extraMessages,
       )
     return step
   }
@@ -77,7 +77,7 @@ class TaskRecorder private constructor() : TaskRecorderType {
     message: String,
     errorCode: String,
     exception: Throwable,
-    extraMessages: List<String>
+    extraMessages: List<String>,
   ): TaskStep {
     Preconditions.checkState(this.steps.isNotEmpty(), "A step must be active")
 
@@ -90,7 +90,7 @@ class TaskRecorder private constructor() : TaskRecorderType {
             message = message,
             exception = exception,
             errorCode = errorCode,
-            extraMessages = extraMessages
+            extraMessages = extraMessages,
           )
         step
       }
@@ -119,7 +119,8 @@ class TaskRecorder private constructor() : TaskRecorderType {
 
   override fun currentStep(): TaskStep? = this.steps.lastOrNull()
 
-  override fun <A> finishSuccess(result: A): TaskResult.Success<A> = TaskResult.Success(result, this.steps, this.attributes.toMap())
+  override fun <A> finishSuccess(result: A): TaskResult.Success<A> =
+    TaskResult.Success(result, this.steps, this.attributes.toMap())
 
   override fun <A> finishFailure(): TaskResult.Failure<A> = TaskResult.Failure(this.steps, this.attributes.toMap())
 }

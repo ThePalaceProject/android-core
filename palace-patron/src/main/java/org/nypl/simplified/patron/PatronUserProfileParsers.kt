@@ -16,6 +16,6 @@ class PatronUserProfileParsers : PatronUserProfileParsersType {
   override fun createParser(
     uri: URI,
     stream: InputStream,
-    warningsAsErrors: Boolean
+    warningsAsErrors: Boolean,
   ): PatronUserProfileParserType = PatronUserProfileParser(this.mapper, uri, stream, warningsAsErrors)
 }

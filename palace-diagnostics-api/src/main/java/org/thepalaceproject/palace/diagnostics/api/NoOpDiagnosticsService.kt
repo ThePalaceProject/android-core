@@ -9,7 +9,7 @@ internal object NoOpDiagnosticsService : DiagnosticsServiceType {
   override fun report(
     code: String,
     data: Map<String, String>,
-    throwable: Throwable?
+    throwable: Throwable?,
   ) {
     // No-op.
   }

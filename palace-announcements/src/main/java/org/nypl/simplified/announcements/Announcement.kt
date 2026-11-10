@@ -10,5 +10,5 @@ import java.util.UUID
 data class Announcement(
   val id: UUID,
   val content: String,
-  val expires: LocalDateTime?
+  val expires: LocalDateTime?,
 )

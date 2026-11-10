@@ -21,13 +21,13 @@ import java.security.MessageDigest
  */
 
 class BookCoverDebugLabelsTransform(
-  private val labels: BookCoverDebugLabels?
+  private val labels: BookCoverDebugLabels?,
 ) : BitmapTransformation() {
   override fun transform(
     pool: BitmapPool,
     source: Bitmap,
     outWidth: Int,
-    outHeight: Int
+    outHeight: Int,
   ): Bitmap {
     if (this.labels == null) {
       return source.copy(source.config ?: Bitmap.Config.ARGB_8888, true)
@@ -62,7 +62,7 @@ class BookCoverDebugLabelsTransform(
         sourceHeight = source.height,
         text = this.labels.format,
         padding = padding,
-        rowFromBottom = 0
+        rowFromBottom = 0,
       )
     drawChip(
       canvas = canvas,
@@ -73,7 +73,7 @@ class BookCoverDebugLabelsTransform(
       text = this.labels.drm,
       padding = padding,
       rowFromBottom = 1,
-      aboveBottom = bottom
+      aboveBottom = bottom,
     )
 
     return result
@@ -88,7 +88,7 @@ class BookCoverDebugLabelsTransform(
     text: String,
     padding: Float,
     rowFromBottom: Int,
-    aboveBottom: Float? = null
+    aboveBottom: Float? = null,
   ): Float {
     val rowGap = sourceHeight * 0.02f
     val margin = sourceHeight * 0.02f

@@ -4,6 +4,6 @@ sealed class MainTabRequest {
   data object TabAny : MainTabRequest()
 
   data class TabForCategory(
-    val category: MainTabCategory
+    val category: MainTabCategory,
   ) : MainTabRequest()
 }

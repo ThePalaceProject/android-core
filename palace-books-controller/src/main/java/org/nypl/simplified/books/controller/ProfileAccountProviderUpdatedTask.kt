@@ -15,7 +15,7 @@ import java.util.concurrent.Callable
 class ProfileAccountProviderUpdatedTask(
   private val profile: ProfileType,
   private val accountProviderID: URI,
-  private val accountProviders: AccountProviderRegistryType
+  private val accountProviders: AccountProviderRegistryType,
 ) : Callable<Unit> {
   private val logger = LoggerFactory.getLogger(ProfileAccountProviderUpdatedTask::class.java)
 

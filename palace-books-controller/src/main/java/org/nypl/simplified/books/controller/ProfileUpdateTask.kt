@@ -11,7 +11,7 @@ import java.util.concurrent.Callable
 class ProfileUpdateTask(
   private val events: Subject<ProfileEvent>,
   private val profiles: ProfilesDatabaseType,
-  private val update: (ProfileDescription) -> ProfileDescription
+  private val update: (ProfileDescription) -> ProfileDescription,
 ) : Callable<ProfileUpdated> {
   private val logger = LoggerFactory.getLogger(ProfileUpdateTask::class.java)
 
@@ -32,7 +32,7 @@ class ProfileUpdateTask(
       val event =
         ProfileUpdated.Succeeded(
           oldDescription = oldDescription,
-          newDescription = newDescription
+          newDescription = newDescription,
         )
 
       this.events.onNext(event)

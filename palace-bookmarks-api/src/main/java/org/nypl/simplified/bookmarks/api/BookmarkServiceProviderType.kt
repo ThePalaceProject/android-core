@@ -32,7 +32,7 @@ interface BookmarkServiceProviderType {
      * A profile controller.
      */
 
-    val profilesController: ProfilesControllerType
+    val profilesController: ProfilesControllerType,
   )
 
   /**

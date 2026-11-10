@@ -57,7 +57,7 @@ class CatalogSAML20WebClient(
 
   override fun onLoadResource(
     view: WebView,
-    url: String
+    url: String,
   ) {
     if (url.startsWith(AccountSAML20.callbackURI)) {
       try {
@@ -71,7 +71,7 @@ class CatalogSAML20WebClient(
         val cookies =
           WebViewUtilities.dumpCookiesAsAccountCookies(
             CookieManager.getInstance(),
-            this.webViewDataDir
+            this.webViewDataDir,
           )
 
         val loginState = this.account.loginState
@@ -83,9 +83,9 @@ class CatalogSAML20WebClient(
               loginState.copy(
                 credentials =
                   credentials.copy(
-                    cookies = cookies
-                  )
-              )
+                    cookies = cookies,
+                  ),
+              ),
             )
           }
         }
@@ -102,8 +102,8 @@ class CatalogSAML20WebClient(
               SAMLDownloadContext(
                 isSAMLAuthComplete = true,
                 downloadURI = this.downloadURI,
-                authCompleteDownloadURI = URI(downloadURL)
-              )
+                authCompleteDownloadURI = URI(downloadURL),
+              ),
           )
         }
       } finally {

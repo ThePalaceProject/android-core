@@ -37,7 +37,7 @@ object BookPreviewTimeUtils {
      * The word for "second" in the current language.
      */
 
-    val secondText: String
+    val secondText: String,
   ) {
     fun minutes(minutes: Long): String =
       if (minutes > 1) {
@@ -68,7 +68,7 @@ object BookPreviewTimeUtils {
           minutesText = resources.getString(R.string.bookPreviewAccessibilityMinutes),
           minuteText = resources.getString(R.string.bookPreviewAccessibilityMinute),
           secondsText = resources.getString(R.string.bookPreviewAccessibilitySeconds),
-          secondText = resources.getString(R.string.bookPreviewAccessibilitySecond)
+          secondText = resources.getString(R.string.bookPreviewAccessibilitySecond),
         )
     }
   }
@@ -93,7 +93,7 @@ object BookPreviewTimeUtils {
 
   fun hourMinuteSecondSpokenFromDuration(
     translations: SpokenTranslations,
-    duration: Duration
+    duration: Duration,
   ): String {
     val builder = StringBuilder(64)
     var period = duration.toPeriod()

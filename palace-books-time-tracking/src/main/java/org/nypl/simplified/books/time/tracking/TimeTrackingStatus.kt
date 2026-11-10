@@ -9,7 +9,7 @@ sealed class TimeTrackingStatus {
     val accountID: AccountID,
     val bookId: PlayerPalaceID,
     val libraryId: String,
-    val timeTrackingUri: URI
+    val timeTrackingUri: URI,
   ) : TimeTrackingStatus()
 
   data object Inactive : TimeTrackingStatus()

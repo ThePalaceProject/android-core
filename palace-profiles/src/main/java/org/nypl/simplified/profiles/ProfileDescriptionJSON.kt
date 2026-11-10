@@ -54,12 +54,12 @@ object ProfileDescriptionJSON {
   fun deserializeFromFile(
     jom: ObjectMapper,
     file: File,
-    mostRecentAccountFallback: AccountID
+    mostRecentAccountFallback: AccountID,
   ): ProfileDescription =
     this.deserializeFromText(
       jom,
       FileUtilities.fileReadUTF8(file),
-      mostRecentAccountFallback
+      mostRecentAccountFallback,
     )
 
   /**
@@ -75,7 +75,7 @@ object ProfileDescriptionJSON {
   fun deserializeFromText(
     jom: ObjectMapper,
     text: String,
-    mostRecentAccountFallback: AccountID
+    mostRecentAccountFallback: AccountID,
   ): ProfileDescription = this.deserializeFromJSON(jom, jom.readTree(text), mostRecentAccountFallback)
 
   /**
@@ -91,7 +91,7 @@ object ProfileDescriptionJSON {
   fun deserializeFromJSON(
     objectMapper: ObjectMapper,
     node: JsonNode,
-    mostRecentAccountFallback: AccountID
+    mostRecentAccountFallback: AccountID,
   ): ProfileDescription {
     val obj =
       JSONParserUtilities.checkObject(null, node)
@@ -118,40 +118,40 @@ object ProfileDescriptionJSON {
   private fun deserialize20200504(
     objectMapper: ObjectMapper,
     objectNode: ObjectNode,
-    mostRecentAccountFallback: AccountID
+    mostRecentAccountFallback: AccountID,
   ): ProfileDescription {
     val preferences =
       deserialize20200504Preferences(
         objectMapper,
         JSONParserUtilities.getObject(objectNode, "preferences"),
-        mostRecentAccountFallback
+        mostRecentAccountFallback,
       )
     val attributes =
       deserialize20191201Attributes(JSONParserUtilities.getObject(objectNode, "attributes"))
 
     return ProfileDescription(
       preferences = preferences,
-      attributes = attributes
+      attributes = attributes,
     )
   }
 
   private fun deserialize20191201(
     objectMapper: ObjectMapper,
     objectNode: ObjectNode,
-    mostRecentAccountFallback: AccountID
+    mostRecentAccountFallback: AccountID,
   ): ProfileDescription {
     val preferences =
       deserialize20191201Preferences(
         objectMapper,
         JSONParserUtilities.getObject(objectNode, "preferences"),
-        mostRecentAccountFallback
+        mostRecentAccountFallback,
       )
     val attributes =
       deserialize20191201Attributes(JSONParserUtilities.getObject(objectNode, "attributes"))
 
     return ProfileDescription(
       preferences = preferences,
-      attributes = attributes
+      attributes = attributes,
     )
   }
 
@@ -166,7 +166,7 @@ object ProfileDescriptionJSON {
   private fun deserialize20200504Preferences(
     objectMapper: ObjectMapper,
     objectNode: ObjectNode,
-    mostRecentAccountFallback: AccountID
+    mostRecentAccountFallback: AccountID,
   ): ProfilePreferences {
     val dateFormatter =
       this.standardDateFormatter()
@@ -177,7 +177,7 @@ object ProfileDescriptionJSON {
         ?.let { node ->
           ProfileDateOfBirth(
             date = dateFormatter.parseDateTime(JSONParserUtilities.getString(node, "date")),
-            isSynthesized = JSONParserUtilities.getBoolean(node, "isSynthesized")
+            isSynthesized = JSONParserUtilities.getBoolean(node, "isSynthesized"),
           )
         }
 
@@ -203,13 +203,17 @@ object ProfileDescriptionJSON {
       JSONParserUtilities.getBooleanDefault(objectNode, "downloadOnlyOnWIFI", false)
 
     val skipForwardInterval =
-      JSONParserUtilities.getIntegerDefault(objectNode, "audioBookPlaybackSkipIntervalForwardMs",
-        DEFAULT_AUDIOBOOK_SKIP_INTERVAL_MS
+      JSONParserUtilities.getIntegerDefault(
+        objectNode,
+        "audioBookPlaybackSkipIntervalForwardMs",
+        DEFAULT_AUDIOBOOK_SKIP_INTERVAL_MS,
       )
 
     val skipBackwardInterval =
-      JSONParserUtilities.getIntegerDefault(objectNode, "audioBookPlaybackSkipIntervalBackwardMs",
-        DEFAULT_AUDIOBOOK_SKIP_INTERVAL_MS
+      JSONParserUtilities.getIntegerDefault(
+        objectNode,
+        "audioBookPlaybackSkipIntervalBackwardMs",
+        DEFAULT_AUDIOBOOK_SKIP_INTERVAL_MS,
       )
 
     val mostRecentAccount =
@@ -249,7 +253,7 @@ object ProfileDescriptionJSON {
   private fun deserialize20191201Preferences(
     objectMapper: ObjectMapper,
     objectNode: ObjectNode,
-    mostRecentAccountFallback: AccountID
+    mostRecentAccountFallback: AccountID,
   ): ProfilePreferences {
     val dateFormatter =
       this.standardDateFormatter()
@@ -260,7 +264,7 @@ object ProfileDescriptionJSON {
         ?.let { node ->
           ProfileDateOfBirth(
             date = dateFormatter.parseDateTime(JSONParserUtilities.getString(node, "date")),
-            isSynthesized = JSONParserUtilities.getBoolean(node, "isSynthesized")
+            isSynthesized = JSONParserUtilities.getBoolean(node, "isSynthesized"),
           )
         }
 
@@ -277,13 +281,17 @@ object ProfileDescriptionJSON {
       JSONParserUtilities.getBooleanDefault(objectNode, "downloadOnlyOnWIFI", false)
 
     val skipForwardInterval =
-      JSONParserUtilities.getIntegerDefault(objectNode, "audioBookPlaybackSkipIntervalForwardMs",
-        DEFAULT_AUDIOBOOK_SKIP_INTERVAL_MS
+      JSONParserUtilities.getIntegerDefault(
+        objectNode,
+        "audioBookPlaybackSkipIntervalForwardMs",
+        DEFAULT_AUDIOBOOK_SKIP_INTERVAL_MS,
       )
 
     val skipBackwardInterval =
-      JSONParserUtilities.getIntegerDefault(objectNode, "audioBookPlaybackSkipIntervalBackwardMs",
-        DEFAULT_AUDIOBOOK_SKIP_INTERVAL_MS
+      JSONParserUtilities.getIntegerDefault(
+        objectNode,
+        "audioBookPlaybackSkipIntervalBackwardMs",
+        DEFAULT_AUDIOBOOK_SKIP_INTERVAL_MS,
       )
 
     val mostRecentAccount =
@@ -323,7 +331,7 @@ object ProfileDescriptionJSON {
   private fun deserializeFromJSONUnversioned(
     objectMapper: ObjectMapper,
     objectNode: ObjectNode,
-    mostRecentAccountFallback: AccountID
+    mostRecentAccountFallback: AccountID,
   ): ProfileDescription {
     val dateFormatter =
       this.standardDateFormatter()
@@ -372,13 +380,17 @@ object ProfileDescriptionJSON {
       JSONParserUtilities.getBooleanDefault(objectNode, "downloadOnlyOnWIFI", false)
 
     val skipForwardInterval =
-      JSONParserUtilities.getIntegerDefault(objectNode, "audioBookPlaybackSkipIntervalForwardMs",
-        DEFAULT_AUDIOBOOK_SKIP_INTERVAL_MS
+      JSONParserUtilities.getIntegerDefault(
+        objectNode,
+        "audioBookPlaybackSkipIntervalForwardMs",
+        DEFAULT_AUDIOBOOK_SKIP_INTERVAL_MS,
       )
 
     val skipBackwardInterval =
-      JSONParserUtilities.getIntegerDefault(objectNode, "audioBookPlaybackSkipIntervalBackwardMs",
-        DEFAULT_AUDIOBOOK_SKIP_INTERVAL_MS
+      JSONParserUtilities.getIntegerDefault(
+        objectNode,
+        "audioBookPlaybackSkipIntervalBackwardMs",
+        DEFAULT_AUDIOBOOK_SKIP_INTERVAL_MS,
       )
 
     val audioBookBatteryDialogAccepted =
@@ -414,13 +426,13 @@ object ProfileDescriptionJSON {
 
     return ProfileDescription(
       preferences = preferences,
-      attributes = attributes
+      attributes = attributes,
     )
   }
 
   private fun deserializeReaderPreferences(
     objectMapper: ObjectMapper,
-    node: ObjectNode
+    node: ObjectNode,
   ): ReaderPreferences {
     val prefsNode = JSONParserUtilities.getObjectOrNull(node, "readerPreferences")
     return if (prefsNode != null) {
@@ -432,18 +444,21 @@ object ProfileDescriptionJSON {
 
   private fun deserializePlaybackRates(
     objectMapper: ObjectMapper,
-    node: ObjectNode
+    node: ObjectNode,
   ): Map<String, PlayerPlaybackRate> {
-    val str =
-      JSONParserUtilities.getObjectOrNull(node, "playbackRates")
-        ?: return hashMapOf()
+    val str = JSONParserUtilities.getObjectOrNull(node, "playbackRates")
+    if (str == null) {
+      return hashMapOf()
+    }
 
     val map: Map<String, String> =
       objectMapper.readValue(
         str.toString(),
         objectMapper.typeFactory.constructMapType(
-          Map::class.java, String::class.java, String::class.java
-        )
+          Map::class.java,
+          String::class.java,
+          String::class.java,
+        ),
       )
 
     return map.mapValues { entry ->
@@ -489,7 +504,7 @@ object ProfileDescriptionJSON {
 
   fun serializeToJSON(
     objectMapper: ObjectMapper,
-    description: ProfileDescription
+    description: ProfileDescription,
   ): ObjectNode {
     val output = objectMapper.createObjectNode()
     serialize20210605(objectMapper, output, description)
@@ -499,22 +514,22 @@ object ProfileDescriptionJSON {
   private fun serialize20210605(
     objectMapper: ObjectMapper,
     output: ObjectNode,
-    description: ProfileDescription
+    description: ProfileDescription,
   ) {
     output.put("@version", 20210605)
     output.set<ObjectNode>(
       "preferences",
-      serialize20210605Preferences(objectMapper, description.preferences)
+      serialize20210605Preferences(objectMapper, description.preferences),
     )
     output.set<ObjectNode>(
       "attributes",
-      serialize20210605Attributes(objectMapper, description.attributes)
+      serialize20210605Attributes(objectMapper, description.attributes),
     )
   }
 
   private fun serialize20210605Attributes(
     objectMapper: ObjectMapper,
-    attributes: ProfileAttributes
+    attributes: ProfileAttributes,
   ): ObjectNode {
     val output = objectMapper.createObjectNode()
     for (key in attributes.attributes.keys) {
@@ -526,7 +541,7 @@ object ProfileDescriptionJSON {
 
   private fun serialize20210605Preferences(
     objectMapper: ObjectMapper,
-    preferences: ProfilePreferences
+    preferences: ProfilePreferences,
   ): ObjectNode {
     val output = objectMapper.createObjectNode()
     output.put("showTestingLibraries", preferences.showTestingLibraries)
@@ -543,12 +558,12 @@ object ProfileDescriptionJSON {
 
     output.set<ObjectNode>(
       "playbackRates",
-      serializePlaybackRatesToJSON(objectMapper, preferences.playbackRates)
+      serializePlaybackRatesToJSON(objectMapper, preferences.playbackRates),
     )
 
     output.set<ObjectNode>(
       "readerPreferences",
-      ReaderPreferencesJSON.serializeToJSON(objectMapper, preferences.readerPreferences)
+      ReaderPreferencesJSON.serializeToJSON(objectMapper, preferences.readerPreferences),
     )
 
     val dateOfBirth = preferences.dateOfBirth
@@ -564,7 +579,7 @@ object ProfileDescriptionJSON {
 
   fun serializePlaybackRatesToJSON(
     objectMapper: ObjectMapper,
-    playbackRates: Map<String, PlayerPlaybackRate>
+    playbackRates: Map<String, PlayerPlaybackRate>,
   ): ObjectNode {
     val objectNode = objectMapper.createObjectNode()
     playbackRates.keys.forEach { key ->
@@ -584,7 +599,7 @@ object ProfileDescriptionJSON {
   @Throws(IOException::class)
   fun serializeToString(
     objectMapper: ObjectMapper,
-    description: ProfileDescription
+    description: ProfileDescription,
   ): String {
     val jo = this.serializeToJSON(objectMapper, description)
     val bao = ByteArrayOutputStream(1024)

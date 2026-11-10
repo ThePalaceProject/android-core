@@ -11,5 +11,5 @@ data class Reader2ActivityParameters(
   val bookId: BookID,
   val file: File,
   val drmInfo: BookDRMInformation,
-  val entry: FeedEntryBook
+  val entry: FeedEntryBook,
 )

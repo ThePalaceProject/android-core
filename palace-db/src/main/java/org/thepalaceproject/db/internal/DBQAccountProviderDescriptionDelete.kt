@@ -13,7 +13,7 @@ internal object DBQAccountProviderDescriptionDelete : DBQAccountProviderDescript
 
   override fun execute(
     transaction: DBTransactionType,
-    parameters: Set<URI>
+    parameters: Set<URI>,
   ) {
     transaction.connection.connection.prepareStatement(this.queryText).use { statement ->
       for (id in parameters) {

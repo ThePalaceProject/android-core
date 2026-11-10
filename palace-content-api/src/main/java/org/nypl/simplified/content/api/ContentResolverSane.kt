@@ -10,7 +10,7 @@ import java.net.URI
  */
 
 class ContentResolverSane(
-  private val delegate: ContentResolver
+  private val delegate: ContentResolver,
 ) : ContentResolverType {
   override fun openInputStream(uri: URI): InputStream? =
     if (uri.scheme == "content") {

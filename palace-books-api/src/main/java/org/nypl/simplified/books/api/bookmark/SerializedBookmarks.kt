@@ -16,25 +16,25 @@ object SerializedBookmarks {
   @Throws(JSONParseException::class)
   fun parseBookmarkFromString(
     text: String,
-    fallbackValues: SerializedBookmarkFallbackValues
+    fallbackValues: SerializedBookmarkFallbackValues,
   ): SerializedBookmark =
     this.parseBookmark(
       node = this.objectMapper.readTree(text),
-      fallbackValues = fallbackValues
+      fallbackValues = fallbackValues,
     )
 
   @JvmStatic
   @Throws(JSONParseException::class)
   fun parseBookmark(
     node: JsonNode,
-    fallbackValues: SerializedBookmarkFallbackValues
+    fallbackValues: SerializedBookmarkFallbackValues,
   ): SerializedBookmark = this.parseBookmarkGuess(node, fallbackValues)
 
   @JvmStatic
   @Throws(JSONParseException::class)
   private fun parseBookmarkGuess(
     node: JsonNode,
-    fallbackValues: SerializedBookmarkFallbackValues
+    fallbackValues: SerializedBookmarkFallbackValues,
   ): SerializedBookmark {
     val version = node["@version"]
     return if (version != null) {
@@ -47,7 +47,8 @@ object SerializedBookmarks {
 
         "1",
         "2",
-        "3" -> {
+        "3",
+        -> {
           this.parseLegacyAudioBookLocator(node, fallbackValues)
         }
 
@@ -82,7 +83,7 @@ object SerializedBookmarks {
   @Throws(JSONParseException::class)
   private fun parseLegacyAudioBookLocator(
     node: JsonNode,
-    fallbackValues: SerializedBookmarkFallbackValues
+    fallbackValues: SerializedBookmarkFallbackValues,
   ): SerializedBookmark =
     when (node) {
       is ObjectNode -> {
@@ -99,7 +100,7 @@ object SerializedBookmarks {
           location = locator,
           opdsId = fallbackValues.bookOPDSId,
           time = DateTime.now(),
-          uri = null
+          uri = null,
         )
       }
 
@@ -107,8 +108,8 @@ object SerializedBookmarks {
         throw JSONParseException(
           String.format(
             "Bookmarks can only be parsed from JSON object nodes (received %s)",
-            node.nodeType
-          )
+            node.nodeType,
+          ),
         )
       }
     }
@@ -117,7 +118,7 @@ object SerializedBookmarks {
   @Throws(JSONParseException::class)
   private fun parseBookmark20240424(
     node: JsonNode,
-    fallbackValues: SerializedBookmarkFallbackValues
+    fallbackValues: SerializedBookmarkFallbackValues,
   ): SerializedBookmark =
     when (node) {
       is ObjectNode -> {
@@ -142,8 +143,10 @@ object SerializedBookmarks {
         val kind =
           this.parseKindMotivation(
             JSONParserUtilities.getStringDefault(
-              metadata, "kind", fallbackValues.kind.motivationURI
-            )
+              metadata,
+              "kind",
+              fallbackValues.kind.motivationURI,
+            ),
           )
 
         SerializedBookmark20240424(
@@ -164,8 +167,8 @@ object SerializedBookmarks {
         throw JSONParseException(
           String.format(
             "Bookmarks can only be parsed from JSON object nodes (received %s)",
-            node.nodeType
-          )
+            node.nodeType,
+          ),
         )
       }
     }
@@ -174,7 +177,7 @@ object SerializedBookmarks {
   @Throws(JSONParseException::class)
   private fun parseBookmarkLegacy(
     node: JsonNode,
-    fallbackValues: SerializedBookmarkFallbackValues
+    fallbackValues: SerializedBookmarkFallbackValues,
   ): SerializedBookmarkLegacy =
     when (node) {
       is ObjectNode -> {
@@ -209,8 +212,8 @@ object SerializedBookmarks {
         throw JSONParseException(
           String.format(
             "Bookmarks can only be parsed from JSON object nodes (received %s)",
-            node.nodeType
-          )
+            node.nodeType,
+          ),
         )
       }
     }
@@ -219,7 +222,7 @@ object SerializedBookmarks {
   @Throws(JSONParseException::class)
   private fun parseBookmark20210317(
     node: JsonNode,
-    fallbackValues: SerializedBookmarkFallbackValues
+    fallbackValues: SerializedBookmarkFallbackValues,
   ): SerializedBookmark20210317 =
     when (node) {
       is ObjectNode -> {
@@ -237,7 +240,7 @@ object SerializedBookmarks {
           JSONParserUtilities.getURIOrNull(node, "uri")
         val kind =
           this.parseKind20210317(
-            JSONParserUtilities.getStringDefault(node, "kind", fallbackValues.kind.javaClass.simpleName)
+            JSONParserUtilities.getStringDefault(node, "kind", fallbackValues.kind.javaClass.simpleName),
           )
 
         SerializedBookmark20210317(
@@ -258,8 +261,8 @@ object SerializedBookmarks {
         throw JSONParseException(
           String.format(
             "Bookmarks can only be parsed from JSON object nodes (received %s)",
-            node.nodeType
-          )
+            node.nodeType,
+          ),
         )
       }
     }
@@ -283,7 +286,7 @@ object SerializedBookmarks {
   @Throws(JSONParseException::class)
   private fun parseBookmark20210828(
     node: JsonNode,
-    fallbackValues: SerializedBookmarkFallbackValues
+    fallbackValues: SerializedBookmarkFallbackValues,
   ): SerializedBookmark20210828 =
     when (node) {
       is ObjectNode -> {
@@ -294,7 +297,9 @@ object SerializedBookmarks {
         val deviceID =
           JSONParserUtilities.getStringDefault(node, "deviceID", "null")
         val kind =
-          this.parseKind20210828(JSONParserUtilities.getStringDefault(node, "kind", fallbackValues.kind.javaClass.simpleName))
+          this.parseKind20210828(
+            JSONParserUtilities.getStringDefault(node, "kind", fallbackValues.kind.javaClass.simpleName),
+          )
         val opdsId =
           JSONParserUtilities.getString(node, "opdsId")
         val time =
@@ -320,8 +325,8 @@ object SerializedBookmarks {
         throw JSONParseException(
           String.format(
             "Bookmarks can only be parsed from JSON object nodes (received %s)",
-            node.nodeType
-          )
+            node.nodeType,
+          ),
         )
       }
     }
@@ -366,7 +371,7 @@ object SerializedBookmarks {
     location: SerializedLocator,
     opdsId: String,
     time: DateTime,
-    uri: URI?
+    uri: URI?,
   ): SerializedBookmark =
     SerializedBookmark20240424(
       bookChapterProgress = bookChapterProgress,
@@ -378,7 +383,7 @@ object SerializedBookmarks {
       location = location,
       opdsId = opdsId,
       time = time,
-      uri = uri
+      uri = uri,
     )
 
   /*
@@ -389,7 +394,7 @@ object SerializedBookmarks {
     @Throws(JSONParseException::class)
     fun parseFromObjectNode(
       node: ObjectNode,
-      fallbackValues: SerializedBookmarkFallbackValues
+      fallbackValues: SerializedBookmarkFallbackValues,
     ): SerializedLocatorAudioBookTime1 {
       try {
         val version = JSONParserUtilities.getInteger(node, "@version")
@@ -415,7 +420,7 @@ object SerializedBookmarks {
     @Throws(JSONParseException::class)
     private fun parseFromObjectNodeV1(
       node: ObjectNode,
-      fallbackValues: SerializedBookmarkFallbackValues
+      fallbackValues: SerializedBookmarkFallbackValues,
     ): SerializedLocatorAudioBookTime1 {
       val positionNode =
         JSONParserUtilities.getObject(node, "position")
@@ -435,14 +440,14 @@ object SerializedBookmarks {
         audioBookId = fallbackValues.bookOPDSId,
         duration = 0L,
         startOffsetMilliseconds = offsetMilliseconds,
-        timeMilliseconds = offsetMilliseconds
+        timeMilliseconds = offsetMilliseconds,
       )
     }
 
     @Throws(JSONParseException::class)
     private fun parseFromObjectNodeV2(
       node: ObjectNode,
-      fallbackValues: SerializedBookmarkFallbackValues
+      fallbackValues: SerializedBookmarkFallbackValues,
     ): SerializedLocatorAudioBookTime1 {
       val locationNode =
         JSONParserUtilities.getObject(node, "location")
@@ -462,14 +467,14 @@ object SerializedBookmarks {
         audioBookId = fallbackValues.bookOPDSId,
         duration = 0L,
         startOffsetMilliseconds = offsetMilliseconds,
-        timeMilliseconds = offsetMilliseconds
+        timeMilliseconds = offsetMilliseconds,
       )
     }
 
     @Throws(JSONParseException::class)
     private fun parseFromObjectNodeV3(
       node: ObjectNode,
-      fallbackValues: SerializedBookmarkFallbackValues
+      fallbackValues: SerializedBookmarkFallbackValues,
     ): SerializedLocatorAudioBookTime1 {
       val locationNode =
         JSONParserUtilities.getObject(node, "location")
@@ -491,7 +496,7 @@ object SerializedBookmarks {
         audioBookId = fallbackValues.bookOPDSId,
         duration = 0L,
         startOffsetMilliseconds = startOffset,
-        timeMilliseconds = currentOffset
+        timeMilliseconds = currentOffset,
       )
     }
   }

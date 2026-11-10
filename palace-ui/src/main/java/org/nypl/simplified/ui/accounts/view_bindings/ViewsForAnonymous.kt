@@ -5,7 +5,7 @@ import org.nypl.simplified.ui.accounts.AccountLoginButtonStatus
 import org.nypl.simplified.ui.accounts.AccountLogoutButtonStatus
 
 class ViewsForAnonymous(
-  override val viewGroup: ViewGroup
+  override val viewGroup: ViewGroup,
 ) : AccountAuthenticationViewBindings() {
   override fun lock() {
     // Nothing
@@ -26,7 +26,7 @@ class ViewsForAnonymous(
   override fun setResetPasswordLabelStatus(
     status: AccountLoginButtonStatus,
     isVisible: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
   ) {
     // Nothing
   }

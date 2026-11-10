@@ -24,6 +24,6 @@ interface DiagnosticsServiceType {
   fun report(
     code: String,
     data: Map<String, String>,
-    throwable: Throwable? = null
+    throwable: Throwable? = null,
   )
 }

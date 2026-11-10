@@ -20,10 +20,10 @@ import java.util.concurrent.Callable
 
 abstract class AbstractBookTask(
   private val accountID: AccountID,
-  private val profiles: ProfilesDatabaseType
+  private val profiles: ProfilesDatabaseType,
 ) : Callable<TaskResult<Unit>> {
   protected class TaskFailedHandled(
-    override val cause: Throwable
+    override val cause: Throwable,
   ) : Exception()
 
   /**
@@ -71,7 +71,7 @@ abstract class AbstractBookTask(
         message = msg,
         errorCode = BorrowErrorCodes.unexpectedException,
         exception = e,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       val result = this.taskRecorder.finishFailure<Unit>()
       this.onFailure(result)
@@ -99,7 +99,7 @@ abstract class AbstractBookTask(
           message = "Failed to find account.",
           errorCode = BorrowErrorCodes.accountsDatabaseException,
           exception = e,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
 
         throw TaskFailedHandled(e)
@@ -139,7 +139,7 @@ abstract class AbstractBookTask(
         message = "Credentials required, but none are available.",
         errorCode = "credentialsRequired",
         exception = exception,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       throw TaskFailedHandled(exception)
     }

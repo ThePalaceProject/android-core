@@ -9,6 +9,6 @@ object ErrorPageModel {
       "",
       "",
       TreeMap(),
-      listOf()
+      listOf(),
     )
 }

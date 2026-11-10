@@ -38,7 +38,7 @@ class BookPreviewEmbeddedFragment : Fragment() {
     BookPreviewPlayerMediaReceiver(
       onAudioBecomingNoisy = {
         pauseWebViewPlayer()
-      }
+      },
     )
   }
 
@@ -48,12 +48,12 @@ class BookPreviewEmbeddedFragment : Fragment() {
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ): View? = inflater.inflate(R.layout.fragment_book_preview_embedded, container, false)
 
   override fun onViewCreated(
     view: View,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ) {
     super.onViewCreated(view, savedInstanceState)
 
@@ -65,7 +65,7 @@ class BookPreviewEmbeddedFragment : Fragment() {
 
     requireActivity().registerReceiver(
       playerMediaReceiver,
-      IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+      IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY),
     )
   }
 
@@ -105,7 +105,7 @@ class BookPreviewEmbeddedFragment : Fragment() {
   private inner class CustomWebViewClient : WebViewClient() {
     override fun onPageFinished(
       view: WebView?,
-      url: String?
+      url: String?,
     ) {
       injectJavaScript()
       super.onPageFinished(view, url)
@@ -122,10 +122,12 @@ class BookPreviewEmbeddedFragment : Fragment() {
         webView.evaluateJavascript(
           "(function() {" +
             "const script = document.createElement('script');" +
-            "script.innerHTML = decodeURIComponent(window.atob('" + encodedString + "'));" +
+            "script.innerHTML = decodeURIComponent(window.atob('" +
+            encodedString +
+            "'));" +
             "document.head.appendChild(script);" +
             "})()",
-          null
+          null,
         )
       }
     }
@@ -151,9 +153,12 @@ class BookPreviewEmbeddedFragment : Fragment() {
 
     override fun onShowCustomView(
       view: View?,
-      callback: CustomViewCallback?
+      callback: CustomViewCallback?,
     ) {
-      val decorView = requireActivity().window.decorView as? FrameLayout ?: return
+      val decorView = requireActivity().window.decorView as? FrameLayout
+      if (decorView == null) {
+        return
+      }
       webView.isVisible = false
 
       if (fullscreenView != null) {
@@ -166,8 +171,8 @@ class BookPreviewEmbeddedFragment : Fragment() {
         fullscreenView,
         FrameLayout.LayoutParams(
           FrameLayout.LayoutParams.MATCH_PARENT,
-          FrameLayout.LayoutParams.MATCH_PARENT
-        )
+          FrameLayout.LayoutParams.MATCH_PARENT,
+        ),
       )
 
       fullscreenView?.isVisible = true

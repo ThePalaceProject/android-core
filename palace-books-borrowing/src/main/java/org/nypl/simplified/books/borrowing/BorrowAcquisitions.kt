@@ -17,7 +17,7 @@ object BorrowAcquisitions {
 
   fun pickBestAcquisitionPath(
     support: BookFormatSupportType,
-    entry: FeedEntryBook
+    entry: FeedEntryBook,
   ): FeedAcquisitionPath? {
     val paths = FeedAcquisitionPaths.linearize(entry.acquisitions)
     return paths

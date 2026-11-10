@@ -18,12 +18,12 @@ class AccountProviderDescriptionCollectionSerializers : AccountProviderDescripti
   override fun createSerializer(
     uri: URI,
     stream: OutputStream,
-    document: AccountProviderDescriptionCollection
+    document: AccountProviderDescriptionCollection,
   ): SerializerType =
     AccountProviderDescriptionCollectionSerializer(
       uri = uri,
       stream = stream,
       document = document,
-      serializers = this.serializers
+      serializers = this.serializers,
     )
 }

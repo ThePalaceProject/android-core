@@ -9,11 +9,11 @@ sealed class AccountSAML20State {
   data object WebViewInitializing : AccountSAML20State()
 
   data class WebViewInitialized(
-    val webView: WebView
+    val webView: WebView,
   ) : AccountSAML20State()
 
   data class WebViewRequestSent(
-    val webView: WebView
+    val webView: WebView,
   ) : AccountSAML20State()
 
   data class TokenObtained(
@@ -21,13 +21,13 @@ sealed class AccountSAML20State {
     val accountID: AccountID,
     val token: String,
     val patronInfo: String,
-    val cookies: List<AccountCookie>
+    val cookies: List<AccountCookie>,
   ) : AccountSAML20State()
 
   data class Failed(
     val webView: WebView,
     val accountID: AccountID,
     val description: AccountProviderAuthenticationDescription.SAML2_0,
-    val message: String
+    val message: String,
   ) : AccountSAML20State()
 }

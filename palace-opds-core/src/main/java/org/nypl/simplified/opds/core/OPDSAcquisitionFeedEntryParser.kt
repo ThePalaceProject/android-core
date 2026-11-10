@@ -27,14 +27,16 @@ import javax.xml.parsers.ParserConfigurationException
 class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeedEntryParserType {
   private fun findAcquisitionAuthors(
     element: Element,
-    eb: OPDSAcquisitionFeedEntryBuilderType
+    eb: OPDSAcquisitionFeedEntryBuilderType,
   ) {
     val eAuthors =
       OPDSXML.getChildElementsWithName(element, OPDSFeedConstants.ATOM_URI, "author")
     for (ea in eAuthors) {
       val name =
         OPDSXML.getFirstChildElementWithNameOptional(
-          Objects.requireNonNull(ea), OPDSFeedConstants.ATOM_URI, "name"
+          Objects.requireNonNull(ea),
+          OPDSFeedConstants.ATOM_URI,
+          "name",
         )
 
       if (name != null) {
@@ -46,7 +48,7 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
   @Throws(OPDSParseException::class)
   private fun findNarrators(
     element: Element,
-    eb: OPDSAcquisitionFeedEntryBuilderType
+    eb: OPDSAcquisitionFeedEntryBuilderType,
   ) {
     val e_contributors =
       OPDSXML.getChildElementsWithName(element, OPDSFeedConstants.ATOM_URI, "contributor")
@@ -59,7 +61,7 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
             OPDSXML.getFirstChildElementTextWithName(
               Objects.requireNonNull(ec),
               OPDSFeedConstants.ATOM_URI,
-              "name"
+              "name",
             )
           eb.addNarrator(narratorName)
         }
@@ -69,18 +71,23 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
 
   private fun findPublisher(element: Element): String? =
     OPDSXML.getFirstChildElementTextWithNameOptional(
-      element, OPDSFeedConstants.DUBLIN_CORE_TERMS_URI, "publisher"
+      element,
+      OPDSFeedConstants.DUBLIN_CORE_TERMS_URI,
+      "publisher",
     )
 
   private fun findDistribution(element: Element): String =
     OPDSXML.getFirstChildElementTextWithName(
-      element, OPDSFeedConstants.BIBFRAME_URI, "distribution", "ProviderName"
+      element,
+      OPDSFeedConstants.BIBFRAME_URI,
+      "distribution",
+      "ProviderName",
     )
 
   @Throws(OPDSParseException::class, ParseException::class)
   private fun parseAcquisitionEntry(
     source: URI,
-    element: Element
+    element: Element,
   ): OPDSAcquisitionFeedEntry {
     val id =
       OPDSAtom.findID(element)
@@ -164,8 +171,8 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
       OPDSXML.getFirstChildElementTextWithNameOptional(
         element,
         OPDSFeedConstants.ATOM_URI,
-        "summary"
-      )
+        "summary",
+      ),
     )
     findSeries(element, entryBuilder)
     return entryBuilder.build()
@@ -173,7 +180,7 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
 
   private fun findSeries(
     element: Element,
-    entryBuilder: OPDSAcquisitionFeedEntryBuilderType
+    entryBuilder: OPDSAcquisitionFeedEntryBuilderType,
   ) {
     val child: Element?
 
@@ -182,7 +189,7 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
         OPDSXML.getFirstChildElementWithNameOptional(
           node = element,
           namespace = OPDSFeedConstants.SCHEMA_URI,
-          name = "series"
+          name = "series",
         )
 
       if (child == null) {
@@ -196,7 +203,7 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
         OPDSXML.getFirstChildElementTextWithNameOptional(
           node = child,
           namespace = OPDSFeedConstants.ATOM_URI,
-          name = "position"
+          name = "position",
         )
 
       val eLinks =
@@ -211,8 +218,8 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
                 OPDSSeries(
                   position = positionText?.toInt(),
                   name = nameText,
-                  link = URI.create(eLink.getAttribute("href"))
-                )
+                  link = URI.create(eLink.getAttribute("href")),
+                ),
               )
               return
             }
@@ -230,7 +237,7 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
         OPDSXML.getFirstChildElementTextWithNameOptional(
           element,
           OPDSFeedConstants.DUBLIN_CORE_TERMS_URI,
-          "language"
+          "language",
         )
 
       if (child != null) {
@@ -250,7 +257,9 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
     try {
       return OPDSXML
         .getFirstChildElementTextWithNameOptional(
-          element, OPDSFeedConstants.DUBLIN_CORE_TERMS_URI, "duration"
+          element,
+          OPDSFeedConstants.DUBLIN_CORE_TERMS_URI,
+          "duration",
         )?.toDouble()
     } catch (_: Exception) {
       return null
@@ -260,11 +269,13 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
   @Throws(OPDSParseException::class)
   private fun tryConsumeDRMLicensorInformation(
     entryBuilder: OPDSAcquisitionFeedEntryBuilderType,
-    eLink: Element
+    eLink: Element,
   ) {
     val licensor =
       OPDSXML.getFirstChildElementWithNameOptional(
-        eLink, OPDSFeedConstants.DRM_URI, "licensor"
+        eLink,
+        OPDSFeedConstants.DRM_URI,
+        "licensor",
       )
 
     if (licensor != null) {
@@ -327,7 +338,7 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
       OPDSXML.getChildElementsWithName(
         element,
         OPDSFeedConstants.OPDS_URI,
-        "indirectAcquisition"
+        "indirectAcquisition",
       )
     val indirects: MutableList<OPDSIndirectAcquisition> =
       ArrayList(indirectElements.size)
@@ -344,7 +355,7 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
     entryBuilder: OPDSAcquisitionFeedEntryBuilderType,
     revoke: URI?,
     link: Element,
-    relText: String
+    relText: String,
   ) {
     val linkIsTemplated =
       link.localName == ODL_TEMPLATED_LINK
@@ -379,8 +390,8 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
                 this.invalidURI(
                   source,
                   "'href' attribute of element with relation " + v,
-                  e
-                )
+                  e,
+                ),
               )
               continue
             }
@@ -394,7 +405,7 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
                 null,
                 null,
                 null,
-                null
+                null,
               )
           } else {
             resultingLink =
@@ -406,7 +417,7 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
                 null,
                 null,
                 null,
-                null
+                null,
               )
           }
 
@@ -429,7 +440,7 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
 
   private fun parseCategories(
     element: Element,
-    entryBuilder: OPDSAcquisitionFeedEntryBuilderType
+    entryBuilder: OPDSAcquisitionFeedEntryBuilderType,
   ) {
     val eCategories =
       OPDSXML.getChildElementsWithName(element, OPDSFeedConstants.ATOM_URI, "category")
@@ -462,7 +473,7 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
     source: URI,
     entryBuilder: OPDSAcquisitionFeedEntryBuilderType,
     eLink: Element,
-    relText: String
+    relText: String,
   ): Boolean {
     if (relText == OPDSFeedConstants.IMAGE_URI_TEXT) {
       if (eLink.hasAttribute("href")) {
@@ -474,8 +485,8 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
             this.invalidURI(
               source,
               hrefAttributeOfLinkRel(OPDSFeedConstants.IMAGE_URI_TEXT),
-              e
-            )
+              e,
+            ),
           )
         }
         return true
@@ -492,7 +503,7 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
     source: URI,
     entryBuilder: OPDSAcquisitionFeedEntryBuilderType,
     eLink: Element,
-    relText: String
+    relText: String,
   ): Boolean {
     if (relText == OPDSFeedConstants.SAMPLE_TEXT || relText == OPDSFeedConstants.PREVIEW_TEXT) {
       if (eLink.hasAttribute("href")) {
@@ -509,10 +520,10 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
                   OPDSFeedConstants.SAMPLE_TEXT
                 } else {
                   OPDSFeedConstants.PREVIEW_TEXT
-                }
+                },
               ),
-              e
-            )
+              e,
+            ),
           )
         }
         return true
@@ -529,7 +540,7 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
     source: URI,
     entryBuilder: OPDSAcquisitionFeedEntryBuilderType,
     eLink: Element,
-    relText: String
+    relText: String,
   ): Boolean {
     if (relText == OPDSFeedConstants.TIME_TRACKING_URI_TEXT) {
       if (eLink.hasAttribute("href")) {
@@ -541,8 +552,8 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
             this.invalidURI(
               source,
               hrefAttributeOfLinkRel(OPDSFeedConstants.TIME_TRACKING_URI_TEXT),
-              e
-            )
+              e,
+            ),
           )
         }
         return true
@@ -559,7 +570,7 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
     source: URI,
     entryBuilder: OPDSAcquisitionFeedEntryBuilderType,
     eLink: Element,
-    relText: String
+    relText: String,
   ): Boolean {
     if (relText == OPDSFeedConstants.THUMBNAIL_URI_TEXT) {
       if (eLink.hasAttribute("href")) {
@@ -571,8 +582,8 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
             this.invalidURI(
               source,
               hrefAttributeOfLinkRel(OPDSFeedConstants.THUMBNAIL_URI_TEXT),
-              e
-            )
+              e,
+            ),
           )
         }
         return true
@@ -589,7 +600,7 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
     source: URI,
     entryBuilder: OPDSAcquisitionFeedEntryBuilderType,
     eLink: Element,
-    relText: String
+    relText: String,
   ): Boolean {
     if (relText == OPDSFeedConstants.ANNOTATION_URI_TEXT) {
       if (eLink.hasAttribute("href")) {
@@ -601,8 +612,8 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
             this.invalidURI(
               source,
               hrefAttributeOfLinkRel(OPDSFeedConstants.ANNOTATION_URI_TEXT),
-              e
-            )
+              e,
+            ),
           )
         }
         return true
@@ -619,7 +630,7 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
     source: URI,
     entryBuilder: OPDSAcquisitionFeedEntryBuilderType,
     eLink: Element,
-    relText: String
+    relText: String,
   ): Boolean {
     if (relText == OPDSFeedConstants.RELATED_REL_TEXT) {
       if (eLink.hasAttribute("href")) {
@@ -631,8 +642,8 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
             this.invalidURI(
               source,
               hrefAttributeOfLinkRel(OPDSFeedConstants.RELATED_REL_TEXT),
-              e
-            )
+              e,
+            ),
           )
         }
         return true
@@ -649,7 +660,7 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
     source: URI,
     entryBuilder: OPDSAcquisitionFeedEntryBuilderType,
     eLink: Element,
-    relText: String
+    relText: String,
   ): Boolean {
     if (relText == OPDSFeedConstants.ALTERNATE_REL_TEXT) {
       try {
@@ -661,8 +672,8 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
           this.invalidURI(
             source,
             hrefAttributeOfLinkRel(OPDSFeedConstants.ALTERNATE_REL_TEXT),
-            e
-          )
+            e,
+          ),
         )
       }
       return true
@@ -678,7 +689,7 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
     source: URI,
     entryBuilder: OPDSAcquisitionFeedEntryBuilderType,
     eLink: Element,
-    relText: String
+    relText: String,
   ): Boolean {
     if (relText == OPDSFeedConstants.CIRCULATION_ANALYTICS_OPEN_BOOK_REL_TEXT) {
       try {
@@ -690,8 +701,8 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
           this.invalidURI(
             source,
             hrefAttributeOfLinkRel(OPDSFeedConstants.CIRCULATION_ANALYTICS_OPEN_BOOK_REL_TEXT),
-            e
-          )
+            e,
+          ),
         )
       }
       return true
@@ -707,7 +718,7 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
     source: URI,
     entryBuilder: OPDSAcquisitionFeedEntryBuilderType,
     eLink: Element,
-    relText: String
+    relText: String,
   ): Boolean {
     if (relText == OPDSFeedConstants.ISSUES_REL_TEXT) {
       try {
@@ -719,8 +730,8 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
           this.invalidURI(
             source,
             hrefAttributeOfLinkRel(OPDSFeedConstants.ISSUES_REL_TEXT),
-            e
-          )
+            e,
+          ),
         )
       }
       return true
@@ -736,7 +747,7 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
     source: URI,
     entryBuilder: OPDSAcquisitionFeedEntryBuilderType,
     eLink: Element,
-    relText: String
+    relText: String,
   ): Boolean {
     if (relText == OPDSFeedConstants.GROUP_REL_TEXT) {
       try {
@@ -749,8 +760,8 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
           this.invalidURI(
             source,
             hrefAttributeOfLinkRel(OPDSFeedConstants.GROUP_REL_TEXT),
-            e
-          )
+            e,
+          ),
         )
       }
       return true
@@ -761,7 +772,7 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
   private fun invalidURI(
     source: URI,
     sourceLocation: String?,
-    e: Exception
+    e: Exception,
   ): ParseError {
     val builder = StringBuilder(128)
     builder.append("Could not parse URI: ")
@@ -774,14 +785,14 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
       builder.toString(),
       -1,
       0,
-      e
+      e,
     )
   }
 
   private fun findRevocationLink(
     source: URI,
     entryBuilder: OPDSAcquisitionFeedEntryBuilderType,
-    eLinks: MutableList<Element>
+    eLinks: MutableList<Element>,
   ): URI? {
     for (eLink in eLinks) {
       if (eLink.hasAttribute("rel")) {
@@ -796,8 +807,8 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
                 this.invalidURI(
                   source,
                   hrefAttributeOfLinkRel(OPDSFeedConstants.REVOKE_URI_TEXT),
-                  e
-                )
+                  e,
+                ),
               )
               return null
             }
@@ -829,19 +840,19 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
   private fun tryAvailability(
     eb: OPDSAcquisitionFeedEntryBuilderType,
     element: Element,
-    revoke: URI?
+    revoke: URI?,
   ) {
     val copies =
       OPDSXML.getFirstChildElementWithNameOptional(
         element,
         OPDSFeedConstants.OPDS_URI,
-        "copies"
+        "copies",
       )
     val holds =
       OPDSXML.getFirstChildElementWithNameOptional(
         element,
         OPDSFeedConstants.OPDS_URI,
-        "holds"
+        "holds",
       )
 
     eb.setAvailability(inferAvailability(element, copies, holds, revoke))
@@ -852,13 +863,13 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
     element: Element,
     copies: Element?,
     holds: Element?,
-    revoke: URI?
+    revoke: URI?,
   ): OPDSAvailabilityType {
     val available =
       OPDSXML.getFirstChildElementWithNameOptional(
         element,
         OPDSFeedConstants.OPDS_URI,
-        "availability"
+        "availability",
       )
 
     if (available != null) {
@@ -889,10 +900,12 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
           OPDSXML.getAttributeRFC3339Optional(available, "since")
         val rel = Objects.requireNonNull(element.getAttribute("rel"))
         if (OPDSAcquisition.Relation.ACQUISITION_BORROW.uri
-            .toString() == rel) {
+            .toString() == rel
+        ) {
           return OPDSAvailabilityLoanable.get()
         } else if (OPDSAcquisition.Relation.ACQUISITION_GENERIC.uri
-            .toString() == rel) {
+            .toString() == rel
+        ) {
           return OPDSAvailabilityLoaned.get(startDate, endDate, revoke)
         }
       }
@@ -919,7 +932,7 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
   @Throws(OPDSParseException::class)
   override fun parseEntry(
     source: URI,
-    element: Element
+    element: Element,
   ): OPDSAcquisitionFeedEntry {
     Objects.requireNonNull(element, "Element")
     try {
@@ -936,7 +949,7 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
   @Throws(OPDSParseException::class)
   override fun parseEntryStream(
     source: URI,
-    stream: InputStream
+    stream: InputStream,
   ): OPDSAcquisitionFeedEntry {
     Objects.requireNonNull(stream, "Stream")
     try {
@@ -980,7 +993,7 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
         OPDSXML.getFirstChildElementTextWithNameOptional(
           link,
           OPDSFeedConstants.LCP_URI,
-          "hashed_passphrase"
+          "hashed_passphrase",
         )
 
       if (text != null) {
@@ -992,7 +1005,7 @@ class OPDSAcquisitionFeedEntryParser private constructor() : OPDSAcquisitionFeed
     @Throws(URISyntaxException::class)
     private fun scrubURI(
       base: URI,
-      text: String
+      text: String,
     ): URI {
       val unresolvedURI = URI(text.trim { it <= ' ' })
       if (unresolvedURI.isAbsolute) {

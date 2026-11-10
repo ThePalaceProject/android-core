@@ -19,6 +19,6 @@ class BorrowSubtaskDirectory : BorrowSubtaskDirectoryType {
       BorrowLCPAudiobook,
       BorrowLCPEpub,
       BorrowLCPPDF,
-      BorrowLoanCreate
+      BorrowLoanCreate,
     )
 }

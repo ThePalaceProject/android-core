@@ -7,7 +7,7 @@ import java.net.URI
 internal data class BSyncableAccount(
   val account: AccountType,
   val annotationsURI: URI,
-  val credentials: AccountAuthenticationCredentials
+  val credentials: AccountAuthenticationCredentials,
 ) {
   companion object {
     /**
@@ -22,7 +22,7 @@ internal data class BSyncableAccount(
         return BSyncableAccount(
           account = account,
           annotationsURI = annotationsURI,
-          credentials = credentials
+          credentials = credentials,
         )
       } else {
         null

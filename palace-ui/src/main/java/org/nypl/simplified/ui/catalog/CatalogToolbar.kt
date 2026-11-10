@@ -44,7 +44,7 @@ class CatalogToolbar(
     search: FeedSearch?,
     canGoBack: Boolean,
     catalogPart: CatalogPart,
-    icon: URI?
+    icon: URI?,
   ) {
     try {
       when (catalogPart) {
@@ -53,7 +53,7 @@ class CatalogToolbar(
           imageLoader.loadAccountLogoIntoView(
             account = account.provider.toDescription(),
             defaultIcon = R.drawable.account_default,
-            iconView = this.textIconView
+            iconView = this.textIconView,
           )
         }
 
@@ -148,7 +148,7 @@ class CatalogToolbar(
     }
   }
 
-  private fun searchBoxOpen(resources: Resources,) {
+  private fun searchBoxOpen(resources: Resources) {
     this.searchTouch.contentDescription =
       resources.getString(R.string.catalogAccessibilitySearchButtonClose)
     this.searchIcon.setImageResource(R.drawable.xmark)
@@ -159,7 +159,7 @@ class CatalogToolbar(
     this.text.postDelayed({ this.keyboardShow() }, 100)
   }
 
-  private fun searchBoxClose(resources: Resources,) {
+  private fun searchBoxClose(resources: Resources) {
     this.searchTouch.contentDescription =
       resources.getString(R.string.catalogAccessibilitySearch)
     this.searchIcon.setImageResource(R.drawable.magnifying_glass)

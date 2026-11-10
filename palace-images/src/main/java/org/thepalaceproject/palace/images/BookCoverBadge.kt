@@ -9,5 +9,5 @@ import android.graphics.Bitmap
 data class BookCoverBadge(
   val bitmap: Bitmap,
   val width: Int,
-  val height: Int
+  val height: Int,
 )

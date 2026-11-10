@@ -3,8 +3,8 @@ package org.nypl.simplified.ui.catalog
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import org.librarysimplified.services.api.Services
-import org.nypl.simplified.accessibility.AccessibilityServiceType
 import org.librarysimplified.ui.R
+import org.nypl.simplified.accessibility.AccessibilityServiceType
 
 /**
  * Screen reader behavior for catalog search results: moves focus to the top
@@ -34,7 +34,7 @@ object CatalogSearchResultsAccessibility {
 
   fun searchResultsLoaded(
     listView: RecyclerView,
-    itemCount: Int
+    itemCount: Int,
   ) {
     this.cancelPendingAnnouncement()
     listView.post {

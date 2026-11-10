@@ -27,7 +27,7 @@ enum class CatalogPart {
 
   HOLDS {
     override val requiresNetwork: Boolean = true
-  };
+  }, ;
 
   abstract val requiresNetwork: Boolean
 }

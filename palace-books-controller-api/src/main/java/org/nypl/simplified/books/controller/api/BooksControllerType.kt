@@ -25,7 +25,8 @@ interface BooksControllerType {
     accountID: AccountID,
     bookID: BookID,
     entry: FeedEntryBook,
-    samlDownloadContext: SAMLDownloadContext? = null
+    samlDownloadContext: SAMLDownloadContext? = null,
+  
   ): FluentFuture<TaskResult<*>>
 
   /**
@@ -37,7 +38,7 @@ interface BooksControllerType {
 
   fun bookBorrowFailedDismiss(
     accountID: AccountID,
-    bookID: BookID
+    bookID: BookID,
   )
 
   /**
@@ -49,7 +50,7 @@ interface BooksControllerType {
 
   fun bookCancelDownloadAndDelete(
     accountID: AccountID,
-    bookID: BookID
+    bookID: BookID,
   ): FluentFuture<TaskResult<Unit>>
 
   /**
@@ -63,7 +64,8 @@ interface BooksControllerType {
   fun bookReport(
     accountID: AccountID,
     feedEntry: FeedEntryBook,
-    reportType: String
+    reportType: String,
+  
   ): FluentFuture<TaskResult<Unit>>
 
   /**
@@ -95,7 +97,7 @@ interface BooksControllerType {
 
   fun bookDelete(
     accountID: AccountID,
-    bookId: BookID
+    bookId: BookID,
   ): FluentFuture<TaskResult<Unit>>
 
   /**
@@ -107,6 +109,6 @@ interface BooksControllerType {
 
   fun bookRevokeFailedDismiss(
     accountID: AccountID,
-    bookID: BookID
+    bookID: BookID,
   ): FluentFuture<TaskResult<Unit>>
 }

@@ -25,6 +25,6 @@ object MainAttributes {
 
   fun <T> wrapAttribute(
     source: AttributeReadableType<T>,
-    target: AttributeType<T>
+    target: AttributeType<T>,
   ): AttributeSubscriptionType = source.subscribe { _, newValue -> UIThread.runOnUIThread { target.set(newValue) } }
 }

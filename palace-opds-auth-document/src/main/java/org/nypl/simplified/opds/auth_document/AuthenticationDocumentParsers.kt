@@ -12,6 +12,6 @@ class AuthenticationDocumentParsers : AuthenticationDocumentParsersType {
   override fun createParser(
     uri: URI,
     stream: InputStream,
-    warningsAsErrors: Boolean
+    warningsAsErrors: Boolean,
   ): AuthenticationDocumentParserType = AuthenticationDocumentParser(this.mapper, uri, stream, warningsAsErrors)
 }

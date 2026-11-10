@@ -20,17 +20,18 @@ INSERT INTO account_registry_settings (
 
   override fun execute(
     transaction: DBTransactionType,
-    parameters: DBQAccountRegistrySetting
+    parameters: DBQAccountRegistrySetting,
   ) {
     transaction.connection.connection.prepareStatement(this.queryText).use { statement ->
       statement.setString(1, parameters.name)
       statement.setString(2, parameters.javaClass.simpleName)
-      statement.setString(3,
+      statement.setString(
+        3,
         when (parameters) {
           is DBQAccountRegistrySetting.TimeSetting -> {
             parameters.value.toString()
           }
-        }
+        },
       )
       statement.execute()
     }

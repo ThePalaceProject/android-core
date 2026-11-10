@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory
 import java.util.SortedMap
 
 class CatalogFeedFacetFilterModel private constructor(
-  val facets: List<FeedFacetModel>
+  val facets: List<FeedFacetModel>,
 ) {
   object CatalogFeedFacetFilterModelLog {
     internal val logger =
@@ -40,7 +40,7 @@ class CatalogFeedFacetFilterModel private constructor(
         FeedFacetComposite(
           facetValues,
           title,
-          true
+          true,
         )
       }
 
@@ -68,8 +68,8 @@ class CatalogFeedFacetFilterModel private constructor(
             title = name,
             feedFacets = facets,
             expanded = true,
-            selected = this.initiallySelectedIndexOf(facets)
-          )
+            selected = this.initiallySelectedIndexOf(facets),
+          ),
         )
       }
       return CatalogFeedFacetFilterModel(facetModels.toList())
@@ -89,7 +89,7 @@ class CatalogFeedFacetFilterModel private constructor(
     val title: String,
     val feedFacets: List<FeedFacetSingle>,
     var expanded: Boolean,
-    private var selected: Int
+    private var selected: Int,
   ) {
     companion object {
       private val logger =

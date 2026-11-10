@@ -22,7 +22,7 @@ class AccountCardCreatorFragment : Fragment(R.layout.fragment_account_card_creat
   companion object :
     ScreenDefinitionFactoryType<AccountCardCreatorParameters, AccountCardCreatorFragment> {
     private class ScreenSettingsCardCreator(
-      private val parameters: AccountCardCreatorParameters
+      private val parameters: AccountCardCreatorParameters,
     ) : ScreenDefinitionType<AccountCardCreatorParameters, AccountCardCreatorFragment> {
       override fun setup() {
         AccountCardCreatorModel.parameters = this.parameters
@@ -34,13 +34,13 @@ class AccountCardCreatorFragment : Fragment(R.layout.fragment_account_card_creat
     }
 
     override fun createScreenDefinition(
-      p: AccountCardCreatorParameters
+      p: AccountCardCreatorParameters,
     ): ScreenDefinitionType<AccountCardCreatorParameters, AccountCardCreatorFragment> = ScreenSettingsCardCreator(p)
   }
 
   override fun onViewCreated(
     view: View,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ) {
     super.onViewCreated(view, savedInstanceState)
 

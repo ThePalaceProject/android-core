@@ -16,7 +16,7 @@ class BookCoverBackgroundTransform : BitmapTransformation() {
     pool: BitmapPool,
     source: Bitmap,
     outWidth: Int,
-    outHeight: Int
+    outHeight: Int,
   ): Bitmap = Bitmap.createScaledBitmap(source, SIZE, SIZE, true)
 
   override fun updateDiskCacheKey(messageDigest: MessageDigest) {

@@ -14,7 +14,7 @@ abstract class OPDSFeedTransportException : Exception {
 
   constructor(
     message: String,
-    cause: Throwable
+    cause: Throwable,
   ) : super(message, cause)
 
   /**

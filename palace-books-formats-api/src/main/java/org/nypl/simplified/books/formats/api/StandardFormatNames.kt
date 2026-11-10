@@ -132,7 +132,7 @@ object StandardFormatNames {
       textHtmlBook,
       genericEPUBFiles,
       mpegAudioBooks,
-      wmaAudioBooks
+      wmaAudioBooks,
     )
 
   /**
