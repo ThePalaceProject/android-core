@@ -43,7 +43,7 @@ class AccountProviderResolution(
   private val stringResources: AccountProviderResolutionStringsType,
   private val authDocumentParsers: AuthenticationDocumentParsersType,
   private val http: LSHTTPClientType,
-  private val description: AccountProviderDescription
+  private val description: AccountProviderDescription,
 ) {
   private val authDocumentType =
     MIMEType("application", "vnd.opds.authentication.v1.0+json", mapOf())
@@ -124,7 +124,7 @@ class AccountProviderResolution(
           supportEmail = authDocument?.supportURI?.toString(),
           supportsReservations = supportsReservations,
           updated = updated,
-          alternateURI = alternateURI
+          alternateURI = alternateURI,
         )
 
       taskRecorder.finishSuccess(accountProvider)
@@ -134,7 +134,7 @@ class AccountProviderResolution(
         message = this.stringResources.resolvingUnexpectedException,
         errorCode = AccountProviderResolutionErrorCodes.unexpectedException(this.description),
         exception = e,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       taskRecorder.finishFailure()
     }
@@ -171,7 +171,7 @@ class AccountProviderResolution(
   private fun findCatalogURI(
     authDocument: AuthenticationDocument?,
     taskRecorder: TaskRecorderType,
-    onProgress: AccountProviderResolutionListenerType
+    onProgress: AccountProviderResolutionListenerType,
   ): URI {
     this.logger.debug("finding catalog URI")
 
@@ -191,7 +191,7 @@ class AccountProviderResolution(
     taskRecorder.currentStepFailed(
       message = message,
       errorCode = AccountProviderResolutionErrorCodes.authDocumentUnusable(this.description),
-      extraMessages = listOf()
+      extraMessages = listOf(),
     )
     onProgress.invoke(this.description.id, message)
     throw IOException()
@@ -203,7 +203,7 @@ class AccountProviderResolution(
 
   private fun extractAuthenticationDescription(
     taskRecorder: TaskRecorderType,
-    authDocument: AuthenticationDocument
+    authDocument: AuthenticationDocument,
   ): Pair<AccountProviderAuthenticationDescription, List<AccountProviderAuthenticationDescription>> {
     if (authDocument.authentication.isEmpty()) {
       return Pair(AccountProviderAuthenticationDescription.Anonymous, listOf())
@@ -216,7 +216,7 @@ class AccountProviderResolution(
       when (val authType = authObject.type.toASCIIString()) {
         BASIC_TYPE -> {
           authObjects.add(
-            this.extractAuthenticationDescriptionBasic(authObject)
+            this.extractAuthenticationDescriptionBasic(authObject),
           )
         }
 
@@ -228,19 +228,19 @@ class AccountProviderResolution(
 
         SAML_2_0_TYPE -> {
           authObjects.add(
-            this.extractAuthenticationDescriptionSAML20(taskRecorder, authObject)
+            this.extractAuthenticationDescriptionSAML20(taskRecorder, authObject),
           )
         }
 
         BASIC_TOKEN_TYPE -> {
           authObjects.add(
-            extractAuthenticationDescriptionBasicToken(taskRecorder, authObject)
+            extractAuthenticationDescriptionBasicToken(taskRecorder, authObject),
           )
         }
 
         OIDC_TYPE -> {
           authObjects.add(
-            this.extractAuthenticationDescriptionOIDC(taskRecorder, authObject)
+            this.extractAuthenticationDescriptionOIDC(taskRecorder, authObject),
           )
         }
       }
@@ -258,7 +258,7 @@ class AccountProviderResolution(
           basicTokenAuthObject,
           authObjects
             .minus(basicTokenAuthObject)
-            .filter { it.canBeAlternativeLoginMethod }
+            .filter { it.canBeAlternativeLoginMethod },
         )
       } else {
         val firstAuth = authObjects.first()
@@ -270,14 +270,14 @@ class AccountProviderResolution(
     taskRecorder.currentStepFailed(
       message = message,
       errorCode = AccountProviderResolutionErrorCodes.authDocumentUnusable(this.description),
-      extraMessages = listOf()
+      extraMessages = listOf(),
     )
     throw IOException(message)
   }
 
   private fun extractAuthenticationDescriptionSAML20(
     taskRecorder: TaskRecorderType,
-    authObject: AuthenticationObject
+    authObject: AuthenticationObject,
   ): AccountProviderAuthenticationDescription {
     val authenticate =
       authObject.links.find { link -> link.relation == "authenticate" }
@@ -290,7 +290,7 @@ class AccountProviderResolution(
       taskRecorder.currentStepFailed(
         message = message,
         errorCode = AccountProviderResolutionErrorCodes.authDocumentUnusable(this.description),
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       throw IOException(message)
     }
@@ -298,13 +298,13 @@ class AccountProviderResolution(
     return AccountProviderAuthenticationDescription.SAML2_0(
       authenticate = authenticateURI,
       description = authObject.description,
-      logoURI = logo?.hrefURI
+      logoURI = logo?.hrefURI,
     )
   }
 
   private fun extractAuthenticationDescriptionOIDC(
     taskRecorder: TaskRecorderType,
-    authObject: AuthenticationObject
+    authObject: AuthenticationObject,
   ): AccountProviderAuthenticationDescription {
     val authenticate =
       authObject.links.find { link -> link.relation == "authenticate" }
@@ -319,7 +319,7 @@ class AccountProviderResolution(
       taskRecorder.currentStepFailed(
         message = message,
         errorCode = AccountProviderResolutionErrorCodes.authDocumentUnusable(this.description),
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       throw IOException(message)
     }
@@ -328,11 +328,13 @@ class AccountProviderResolution(
       authenticate = authenticateURI,
       description = authObject.description,
       logoURI = logo?.hrefURI,
-      logout = logout
+      logout = logout,
     )
   }
 
-  private fun extractAuthenticationDescriptionBasic(authObject: AuthenticationObject): AccountProviderAuthenticationDescription.Basic {
+  private fun extractAuthenticationDescriptionBasic(
+    authObject: AuthenticationObject,
+  ): AccountProviderAuthenticationDescription.Basic {
     val loginRestrictions =
       authObject.inputs[LABEL_LOGIN]
     val passwordRestrictions =
@@ -349,13 +351,13 @@ class AccountProviderResolution(
       labels = authObject.labels,
       logoURI = logo,
       passwordKeyboard = this.parseKeyboardType(passwordRestrictions?.keyboardType),
-      passwordMaximumLength = passwordRestrictions?.maximumLength ?: 0
+      passwordMaximumLength = passwordRestrictions?.maximumLength ?: 0,
     )
   }
 
   private fun extractAuthenticationDescriptionBasicToken(
     taskRecorder: TaskRecorderType,
-    authObject: AuthenticationObject
+    authObject: AuthenticationObject,
   ): AccountProviderAuthenticationDescription.BasicToken {
     val authenticate =
       authObject.links.find { link -> link.relation == "authenticate" }
@@ -366,7 +368,7 @@ class AccountProviderResolution(
       taskRecorder.currentStepFailed(
         message = message,
         errorCode = AccountProviderResolutionErrorCodes.authDocumentUnusable(this.description),
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       throw IOException(message)
     }
@@ -388,7 +390,7 @@ class AccountProviderResolution(
       labels = authObject.labels,
       logoURI = logo,
       passwordKeyboard = this.parseKeyboardType(passwordRestrictions?.keyboardType),
-      passwordMaximumLength = passwordRestrictions?.maximumLength ?: 0
+      passwordMaximumLength = passwordRestrictions?.maximumLength ?: 0,
     )
   }
 
@@ -399,7 +401,7 @@ class AccountProviderResolution(
 
     return try {
       KeyboardInput.valueOf(
-        text.uppercase(Locale.ROOT).replace(' ', '_')
+        text.uppercase(Locale.ROOT).replace(' ', '_'),
       )
     } catch (e: Exception) {
       this.logger.error("unable to interpret keyboard type: {}", text)
@@ -409,7 +411,7 @@ class AccountProviderResolution(
 
   fun fetchAuthDocument(
     taskRecorder: TaskRecorderType,
-    onProgress: AccountProviderResolutionListenerType
+    onProgress: AccountProviderResolutionListenerType,
   ): AuthenticationDocument? {
     this.logger.debug("fetching authentication document")
     taskRecorder.beginNewStep(this.stringResources.resolvingAuthDocument)
@@ -433,7 +435,7 @@ class AccountProviderResolution(
         taskRecorder.addAttributes(
           result.status.properties
             ?.problemReport
-            ?.toMap() ?: emptyMap()
+            ?.toMap() ?: emptyMap(),
         )
 
         when (val status = result.status) {
@@ -441,20 +443,20 @@ class AccountProviderResolution(
             this.parseAuthenticationDocument(
               targetURI = targetLink.href,
               stream = status.bodyStream ?: emptyStream(),
-              taskRecorder = taskRecorder
+              taskRecorder = taskRecorder,
             )
           }
 
           is LSHTTPResponseStatus.Responded.Error -> {
             if (MIMECompatibility.isCompatibleStrictWithoutAttributes(
                 status.properties.contentType,
-                authDocumentType
+                authDocumentType,
               )
             ) {
               this.parseAuthenticationDocument(
                 targetURI = targetLink.href,
                 stream = status.bodyStream ?: emptyStream(),
-                taskRecorder = taskRecorder
+                taskRecorder = taskRecorder,
               )
             } else {
               val message = this.stringResources.resolvingAuthDocumentRetrievalFailed
@@ -464,9 +466,9 @@ class AccountProviderResolution(
                   AccountProviderResolutionErrorCodes.httpRequestFailed(
                     targetLink.hrefURI,
                     status.properties.originalStatus,
-                    status.properties.message
+                    status.properties.message,
                   ),
-                extraMessages = listOf()
+                extraMessages = listOf(),
               )
               throw IOException(message)
             }
@@ -483,7 +485,7 @@ class AccountProviderResolution(
         taskRecorder.currentStepFailed(
           message = message,
           errorCode = AccountProviderResolutionErrorCodes.authDocumentUnusableLink(this.description),
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
         throw IOException(message)
       }
@@ -495,7 +497,7 @@ class AccountProviderResolution(
   private fun parseAuthenticationDocument(
     targetURI: URI,
     stream: InputStream,
-    taskRecorder: TaskRecorderType
+    taskRecorder: TaskRecorderType,
   ): AuthenticationDocument {
     this.logger.debug("parsing authentication document {}", targetURI)
     return this.authDocumentParsers.createParser(targetURI, stream).use { parser ->
@@ -512,7 +514,7 @@ class AccountProviderResolution(
           taskRecorder.currentStepFailed(
             message = message,
             errorCode = AccountProviderResolutionErrorCodes.authDocumentParseFailed(this.description),
-            extraMessages = listOf()
+            extraMessages = listOf(),
           )
           throw IOException(message)
         }

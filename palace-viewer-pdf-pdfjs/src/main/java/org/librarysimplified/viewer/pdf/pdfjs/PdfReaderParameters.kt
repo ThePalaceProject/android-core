@@ -21,5 +21,5 @@ data class PdfReaderParameters(
   val pdfFile: File,
   val id: BookID,
   val entry: FeedEntry.FeedEntryOPDS,
-  val drmInfo: BookDRMInformation
+  val drmInfo: BookDRMInformation,
 ) : Serializable

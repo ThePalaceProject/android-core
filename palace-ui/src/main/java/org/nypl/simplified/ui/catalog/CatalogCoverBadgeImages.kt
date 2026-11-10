@@ -18,7 +18,7 @@ import org.thepalaceproject.palace.images.BookCoverBadgeLookupType
 
 class CatalogCoverBadgeImages private constructor(
   private val screenSize: ScreenSizeInformationType,
-  private val audioBookIcon: Bitmap
+  private val audioBookIcon: Bitmap,
 ) : BookCoverBadgeLookupType {
   override fun badgeForEntry(entry: FeedEntryOPDS): BookCoverBadge? =
     when (entry.probableFormat) {
@@ -50,12 +50,12 @@ class CatalogCoverBadgeImages private constructor(
 
     fun create(
       resources: Resources,
-      screenSize: ScreenSizeInformationType
+      screenSize: ScreenSizeInformationType,
     ): BookCoverBadgeLookupType {
       val audioBookIcon = BitmapFactory.decodeResource(resources, R.drawable.audiobook_icon)
       return CatalogCoverBadgeImages(
         audioBookIcon = audioBookIcon,
-        screenSize = screenSize
+        screenSize = screenSize,
       )
     }
   }

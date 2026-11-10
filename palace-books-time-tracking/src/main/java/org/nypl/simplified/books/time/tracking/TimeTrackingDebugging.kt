@@ -27,7 +27,7 @@ object TimeTrackingDebugging {
 
   private fun writeLocked(
     directory: File,
-    properties: Properties
+    properties: Properties,
   ) {
     this.fileLock.lock()
 
@@ -48,7 +48,7 @@ object TimeTrackingDebugging {
   fun onTimeTrackingStarted(
     timeTrackingDebugDirectory: File,
     libraryId: String,
-    bookId: String
+    bookId: String,
   ) {
     val p = Properties()
     p.setProperty("Operation", "TimeTrackingStarted")
@@ -61,7 +61,7 @@ object TimeTrackingDebugging {
   fun onTimeTrackingStopped(
     timeTrackingDebugDirectory: File,
     libraryId: String,
-    bookId: String
+    bookId: String,
   ) {
     val p = Properties()
     p.setProperty("Operation", "TimeTrackingStopped")
@@ -95,7 +95,7 @@ object TimeTrackingDebugging {
     libraryId: String,
     bookId: String,
     entryId: String,
-    seconds: Int
+    seconds: Int,
   ) {
     val p = Properties()
     p.setProperty("Operation", "TimeTrackingSendAttempt")
@@ -111,7 +111,7 @@ object TimeTrackingDebugging {
     timeTrackingDebugDirectory: File,
     libraryId: String,
     bookId: String,
-    entryId: String
+    entryId: String,
   ) {
     val p = Properties()
     p.setProperty("Operation", "TimeTrackingSendAttemptSucceeded")
@@ -127,7 +127,7 @@ object TimeTrackingDebugging {
     libraryId: String,
     bookId: String,
     entryId: String,
-    exception: Throwable
+    exception: Throwable,
   ) {
     val p = Properties()
     p.setProperty("Operation", "TimeTrackingSendAttemptFailedExceptionally")
@@ -152,7 +152,7 @@ object TimeTrackingDebugging {
     timeTrackingDebugDirectory: File,
     libraryId: String,
     bookId: String,
-    entryId: String
+    entryId: String,
   ) {
     val p = Properties()
     p.setProperty("Operation", "TimeTrackingSendAttemptFailed")
@@ -167,7 +167,7 @@ object TimeTrackingDebugging {
     timeTrackingDebugDirectory: File,
     libraryId: String,
     bookId: String,
-    entryId: String
+    entryId: String,
   ) {
     val p = Properties()
     p.setProperty("Operation", "TimeTrackingSendAttemptFailedPermanently")

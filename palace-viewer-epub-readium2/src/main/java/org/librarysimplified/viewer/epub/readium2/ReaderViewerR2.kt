@@ -16,11 +16,12 @@ class ReaderViewerR2 : ViewerProviderType {
   override fun canSupport(
     preferences: ViewerParameters,
     book: Book,
-    format: BookFormat
+    format: BookFormat,
   ): Boolean =
     when (format) {
       is BookFormat.BookFormatPDF,
-      is BookFormat.BookFormatAudioBook -> {
+      is BookFormat.BookFormatAudioBook,
+      -> {
         false
       }
 
@@ -36,7 +37,7 @@ class ReaderViewerR2 : ViewerProviderType {
     preferences: ViewerParameters,
     book: Book,
     format: BookFormat,
-    accountProviderID: URI
+    accountProviderID: URI,
   ) {
     val bookId =
       book.id
@@ -51,12 +52,12 @@ class ReaderViewerR2 : ViewerProviderType {
         drmInfo = format.drmInformation,
         bookId = bookId,
         file = file,
-        entry = entry
+        entry = entry,
       )
 
     Reader2Activity.startActivity(
       activity = activity,
-      parameters = parameters
+      parameters = parameters,
     )
   }
 }

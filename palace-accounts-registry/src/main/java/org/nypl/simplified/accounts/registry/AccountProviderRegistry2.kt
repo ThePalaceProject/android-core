@@ -101,7 +101,7 @@ class AccountProviderRegistry2 private constructor(
       uriBase: URI,
       accountProviderResolutionStrings: AccountProviderResolutionStringsType,
       authDocumentParsers: AuthenticationDocumentParsersType,
-      uiExecutor: Executor
+      uiExecutor: Executor,
     ): AccountProviderRegistryType {
       val accountProviderDefault =
         this.attributes.withValue<AccountProvider>(defaultProvider)
@@ -178,8 +178,8 @@ class AccountProviderRegistry2 private constructor(
           parameters =
             DBQAccountProviderListType.Parameters(
               startingId = null,
-              limit = MAXIMUM_PROVIDER_DESCRIPTIONS
-            )
+              limit = MAXIMUM_PROVIDER_DESCRIPTIONS,
+            ),
         )
 
       /*
@@ -191,7 +191,7 @@ class AccountProviderRegistry2 private constructor(
         descriptionMap[this.defaultProvider.id] = this.defaultProvider
         t.execute(
           queryType = DBQAccountProviderPutType::class.java,
-          parameters = this.defaultProvider
+          parameters = this.defaultProvider,
         )
         t.commit()
       }
@@ -215,8 +215,8 @@ class AccountProviderRegistry2 private constructor(
             parameters =
               DBQAccountProviderDescriptionListType.Parameters(
                 startingId = null,
-                limit = MAXIMUM_PROVIDER_DESCRIPTIONS
-              )
+                limit = MAXIMUM_PROVIDER_DESCRIPTIONS,
+              ),
           )
 
         descriptionMap = descriptions.associateBy { d -> d.id }.toMutableMap()
@@ -227,7 +227,7 @@ class AccountProviderRegistry2 private constructor(
           descriptionMap[defaultProviderDescription.id] = defaultProviderDescription
           t.execute(
             queryType = DBQAccountProviderDescriptionPutType::class.java,
-            parameters = listOf(defaultProviderDescription)
+            parameters = listOf(defaultProviderDescription),
           )
           t.commit()
         }
@@ -237,7 +237,7 @@ class AccountProviderRegistry2 private constructor(
 
       this.logger.debug(
         "Loaded {} account provider descriptions.",
-        descriptionMap.size
+        descriptionMap.size,
       )
     } finally {
       this.setStatusFinishedLoading(this.accountProviderDescriptionsAttributeSrc.get().size)
@@ -281,7 +281,7 @@ class AccountProviderRegistry2 private constructor(
 
   private fun time(
     name: String,
-    op: () -> Unit
+    op: () -> Unit,
   ) {
     val timeThen = OffsetDateTime.now()
     try {
@@ -302,7 +302,7 @@ class AccountProviderRegistry2 private constructor(
 
         AccountProviderRegistry2.javaClass
           .getResourceAsStream(
-            "/org/nypl/simplified/accounts/registry/providers.db"
+            "/org/nypl/simplified/accounts/registry/providers.db",
           ).use { stream ->
             if (stream != null) {
               Files.copy(stream, temporary)
@@ -334,7 +334,7 @@ class AccountProviderRegistry2 private constructor(
           is AccountProviderRegistryRefresh.Incremental -> "Incremental"
         },
       offset = 0,
-      totalItems = null
+      totalItems = null,
     )
 
     var failed = false
@@ -384,7 +384,7 @@ class AccountProviderRegistry2 private constructor(
         message = e.message ?: e.javaClass.name,
         errorCode = "exception",
         exception = e,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
 
       val result: TaskResult.Failure<WPMManifest> = taskRecorder.finishFailure()
@@ -427,7 +427,7 @@ class AccountProviderRegistry2 private constructor(
             offset = offset,
             size = size,
             availability = availability,
-            order = Modified
+            order = Modified,
           )
 
         totalItems = manifest.metadata.numberOfItems?.toInt()
@@ -450,7 +450,7 @@ class AccountProviderRegistry2 private constructor(
             this.logger.debug(
               "Catalog was updated at {} before the last refresh {}; stopping updates.",
               catalogUpdated,
-              lastUpdate
+              lastUpdate,
             )
             return updated
           }
@@ -470,7 +470,7 @@ class AccountProviderRegistry2 private constructor(
       val setting =
         transaction.execute(
           queryType = DBQAccountRegistrySettingsGetType::class.java,
-          parameters = SETTING_LAST_UPDATE_NAME
+          parameters = SETTING_LAST_UPDATE_NAME,
         )
       when (setting) {
         is DBQAccountRegistrySetting.TimeSetting -> setting.value
@@ -485,8 +485,8 @@ class AccountProviderRegistry2 private constructor(
         parameters =
           DBQAccountRegistrySetting.TimeSetting(
             name = SETTING_LAST_UPDATE_NAME,
-            value = OffsetDateTime.now(ZoneOffset.UTC)
-          )
+            value = OffsetDateTime.now(ZoneOffset.UTC),
+          ),
       )
       transaction.commit()
     }
@@ -514,7 +514,7 @@ class AccountProviderRegistry2 private constructor(
             offset = offset,
             size = size,
             availability = availability,
-            order = NameAscending
+            order = NameAscending,
           )
 
         totalItems = manifest.metadata.numberOfItems?.toInt()
@@ -583,7 +583,7 @@ class AccountProviderRegistry2 private constructor(
   private fun setStatusRefreshing(
     kind: String,
     offset: Int,
-    totalItems: Int?
+    totalItems: Int?,
   ) {
     if (totalItems == null) {
       this.setStatus(Refreshing(kind = kind, progress = null))
@@ -608,7 +608,7 @@ class AccountProviderRegistry2 private constructor(
     this.database.openTransaction().use { t ->
       t.execute(
         queryType = DBQAccountProviderDescriptionPutType::class.java,
-        parameters = listOf(accountProviderDescription)
+        parameters = listOf(accountProviderDescription),
       )
       t.commit()
     }
@@ -636,7 +636,7 @@ class AccountProviderRegistry2 private constructor(
       description = catalog.metadata.description,
       updated = updated,
       links = links,
-      images = images
+      images = images,
     )
   }
 
@@ -664,7 +664,7 @@ class AccountProviderRegistry2 private constructor(
     offset: Int,
     size: Int,
     availability: String,
-    order: RegistryOrder
+    order: RegistryOrder,
   ): WPMManifest {
     /*
      * If a library registry query override is provided, and we've been handed a non-zero offset,
@@ -683,7 +683,9 @@ class AccountProviderRegistry2 private constructor(
         override.completeURI()
       } else {
         val baseURI = this.uriBase
-        URI.create("$baseURI/libraries/crawlable?offset=$offset&size=$size&availability=$availability&order=${order.name}")
+        URI.create(
+          "$baseURI/libraries/crawlable?offset=$offset&size=$size&availability=$availability&order=${order.name}",
+        )
       }
 
     for (attempt in 1..3) {
@@ -704,7 +706,7 @@ class AccountProviderRegistry2 private constructor(
             message = "Failed to connect to registry.",
             errorCode = "http-failed",
             exception = status.exception,
-            extraMessages = listOf()
+            extraMessages = listOf(),
           )
           continue
         }
@@ -716,7 +718,7 @@ class AccountProviderRegistry2 private constructor(
             message = "Registry returned an error.",
             errorCode = "registry-error",
             exception = null,
-            extraMessages = listOf()
+            extraMessages = listOf(),
           )
           continue
         }
@@ -726,14 +728,14 @@ class AccountProviderRegistry2 private constructor(
           try {
             this.wpmMapper.readValue(
               status.bodyStream ?: ByteArrayInputStream(ByteArray(0)),
-              WPMManifest::class.java
+              WPMManifest::class.java,
             )
           } catch (e: Exception) {
             taskRecorder.currentStepFailed(
               message = e.message ?: e.javaClass.name,
               errorCode = "json-parsing",
               exception = e,
-              extraMessages = listOf()
+              extraMessages = listOf(),
             )
             continue
           }
@@ -746,7 +748,7 @@ class AccountProviderRegistry2 private constructor(
 
   private fun emptyManifest(): WPMManifest =
     WPMManifest(
-      this.emptyMetadata()
+      this.emptyMetadata(),
     )
 
   private fun emptyMetadata(): WPMMetadata =
@@ -763,7 +765,7 @@ class AccountProviderRegistry2 private constructor(
       numberOfPages = null,
       belongsTo = null,
       contains = null,
-      numberOfItems = null
+      numberOfItems = null,
     )
 
   private fun setStatus(status: AccountProviderRegistryStatus) {
@@ -784,7 +786,7 @@ class AccountProviderRegistry2 private constructor(
 
   private fun <T> executeTask(
     executorService: ExecutorService,
-    f: () -> T
+    f: () -> T,
   ): CompletableFuture<T> {
     val future = CompletableFuture<T>()
     try {
@@ -814,18 +816,19 @@ class AccountProviderRegistry2 private constructor(
     this.database.openTransaction().use { t ->
       t.execute(
         queryType = DBQAccountProviderDescriptionDeleteAllType::class.java,
-        parameters = Unit
+        parameters = Unit,
       )
       t.execute(
         queryType = DBQAccountProviderDescriptionPutType::class.java,
-        parameters = listOf(this.defaultProvider.toDescription())
+        parameters = listOf(this.defaultProvider.toDescription()),
       )
       t.commit()
     }
     this.accountProviderDescriptionsAttributeSrc.set(mapOf())
   }
 
-  override fun accountProviderDescriptions(): Map<URI, AccountProviderDescription> = this.accountProviderDescriptionsAttributeSrc.get()
+  override fun accountProviderDescriptions(): Map<URI, AccountProviderDescription> =
+    this.accountProviderDescriptionsAttributeSrc.get()
 
   override fun updateProviderAsync(accountProvider: AccountProviderType): CompletableFuture<AccountProviderType> =
     this.executeMain { this.opUpdateProvider(accountProvider) }
@@ -843,7 +846,7 @@ class AccountProviderRegistry2 private constructor(
       this.database.openTransaction().use { t ->
         t.execute(
           queryType = DBQAccountProviderGetType::class.java,
-          parameters = accountProvider.id
+          parameters = accountProvider.id,
         )
       }
 
@@ -860,7 +863,7 @@ class AccountProviderRegistry2 private constructor(
     this.database.openTransaction().use { t ->
       t.execute(
         queryType = DBQAccountProviderPutType::class.java,
-        parameters = AccountProvider.copy(accountProvider)
+        parameters = AccountProvider.copy(accountProvider),
       )
       t.commit()
     }
@@ -885,7 +888,7 @@ class AccountProviderRegistry2 private constructor(
       val timeThen = System.nanoTime()
       t.execute(
         queryType = DBQAccountProviderDescriptionPutType::class.java,
-        parameters = descriptions
+        parameters = descriptions,
       )
       t.commit()
       val timeNow = System.nanoTime()
@@ -917,21 +920,23 @@ class AccountProviderRegistry2 private constructor(
     }
   }
 
-  override fun updateDescriptionAsync(description: AccountProviderDescription): CompletableFuture<AccountProviderDescription> =
+  override fun updateDescriptionAsync(
+    description: AccountProviderDescription,
+  ): CompletableFuture<AccountProviderDescription> =
     this.executeMain { this.opUpdateDescriptions(listOf(description)).first() }
 
   override fun updateDescriptionsAsync(
-    descriptions: List<AccountProviderDescription>
+    descriptions: List<AccountProviderDescription>,
   ): CompletableFuture<List<AccountProviderDescription>> = this.executeMain { this.opUpdateDescriptions(descriptions) }
 
   override fun resolveAsync(
     onProgress: AccountProviderResolutionListenerType,
-    description: AccountProviderDescription
+    description: AccountProviderDescription,
   ): CompletableFuture<TaskResult<AccountProviderType>> = this.executeMain { this.opResolve(onProgress, description) }
 
   private fun opResolve(
     onProgress: AccountProviderResolutionListenerType,
-    description: AccountProviderDescription
+    description: AccountProviderDescription,
   ): TaskResult<AccountProviderType> {
     val taskRecorder = TaskRecorder.create()
     taskRecorder.beginNewStep("Resolving description...")
@@ -942,7 +947,7 @@ class AccountProviderRegistry2 private constructor(
           stringResources = this.accountProviderResolutionStrings,
           authDocumentParsers = this.authDocumentParsers,
           http = this.httpClient,
-          description = description
+          description = description,
         )
 
       return when (val result = resolution.resolve(onProgress)) {
@@ -962,7 +967,7 @@ class AccountProviderRegistry2 private constructor(
         message = message,
         errorCode = "unexpectedException",
         exception = e,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       return taskRecorder.finishFailure()
     }

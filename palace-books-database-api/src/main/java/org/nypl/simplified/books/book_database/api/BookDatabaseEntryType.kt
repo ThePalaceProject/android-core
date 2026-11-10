@@ -262,7 +262,7 @@ sealed class BookDatabaseEntryFormatHandle {
     @Throws(IOException::class)
     abstract fun copyInManifestAndURI(
       data: ByteArray,
-      manifestURI: URI?
+      manifestURI: URI?,
     )
   }
 }

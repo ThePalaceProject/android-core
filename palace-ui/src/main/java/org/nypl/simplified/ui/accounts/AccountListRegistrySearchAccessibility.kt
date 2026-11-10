@@ -4,9 +4,9 @@ import android.content.Context
 import android.view.View
 import android.view.accessibility.AccessibilityManager
 import org.librarysimplified.services.api.Services
+import org.librarysimplified.ui.R
 import org.nypl.simplified.accessibility.AccessibilityServiceType
 import org.nypl.simplified.accounts.api.AccountProviderDescription
-import org.librarysimplified.ui.R
 
 /**
  * Screen reader behavior for the account list registry search box: announces

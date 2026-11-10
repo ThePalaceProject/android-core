@@ -26,7 +26,7 @@ object AccountAuthenticationCredentialsJSON {
       AccountAuthenticationCredentialsJSON20190424,
       AccountAuthenticationCredentialsJSON20200604,
       AccountAuthenticationCredentialsJSON20200805,
-      AccountAuthenticationCredentialsJSON20210512
+      AccountAuthenticationCredentialsJSON20210512,
     )
 
   /**
@@ -82,11 +82,11 @@ object AccountAuthenticationCredentialsJSON {
         val authenticationTokenInfo = objectMapper.createObjectNode()
         authenticationTokenInfo.put(
           "accessToken",
-          credentials.authenticationTokenInfo.accessToken
+          credentials.authenticationTokenInfo.accessToken,
         )
         authenticationTokenInfo.put(
           "authURI",
-          credentials.authenticationTokenInfo.authURI.toString()
+          credentials.authenticationTokenInfo.authURI.toString(),
         )
         authObject.set("authenticationTokenInfo", authenticationTokenInfo)
       }
@@ -116,7 +116,7 @@ object AccountAuthenticationCredentialsJSON {
     val adobeObj =
       this.serializeAdobeCredentials(
         objectMapper = objectMapper,
-        adobe = credentials.adobeCredentials
+        adobe = credentials.adobeCredentials,
       )
     if (adobeObj != null) {
       authObject.set<ObjectNode>("adobe_credentials", adobeObj)
@@ -126,7 +126,7 @@ object AccountAuthenticationCredentialsJSON {
 
   private fun serializeAdobeCredentials(
     objectMapper: ObjectMapper,
-    adobe: AccountAuthenticationAdobePreActivationCredentials?
+    adobe: AccountAuthenticationAdobePreActivationCredentials?,
   ): ObjectNode? =
     if (adobe != null) {
       val adobePreObj = objectMapper.createObjectNode()

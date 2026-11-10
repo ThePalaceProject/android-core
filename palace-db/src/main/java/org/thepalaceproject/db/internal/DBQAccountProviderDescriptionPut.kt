@@ -31,7 +31,7 @@ internal object DBQAccountProviderDescriptionPut : DBQAccountProviderDescription
 
   override fun execute(
     transaction: DBTransactionType,
-    baseDescriptions: List<AccountProviderDescription>
+    baseDescriptions: List<AccountProviderDescription>,
   ) {
     val descriptions =
       baseDescriptions.map { baseDescription ->

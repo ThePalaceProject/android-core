@@ -24,7 +24,7 @@ class ProfileAccountCreateTask(
   private val accountProviderID: URI,
   private val accountProviders: AccountProviderRegistryType,
   private val profiles: ProfilesDatabaseType,
-  private val strings: ProfileAccountCreationStringResourcesType
+  private val strings: ProfileAccountCreationStringResourcesType,
 ) : Callable<TaskResult<AccountType>> {
   private val logger = LoggerFactory.getLogger(ProfileAccountCreateTask::class.java)
   private val taskRecorder = TaskRecorder.create()
@@ -44,7 +44,7 @@ class ProfileAccountCreateTask(
         message = this.strings.unexpectedException,
         errorCode = "unexpectedException",
         exception = e,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
 
       this.publishFailureEvent()
@@ -64,7 +64,7 @@ class ProfileAccountCreateTask(
         message = e.message ?: e.javaClass.name,
         errorCode = "creatingAccountFailed",
         exception = e,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       this.publishFailureEvent()
       throw e
@@ -74,18 +74,20 @@ class ProfileAccountCreateTask(
   private fun publishSuccessEvent(account: AccountType) =
     this.accountEvents.onNext(
       AccountEventCreationSucceeded(
-        this.strings.creatingAccountSucceeded, account.id
-      )
+        this.strings.creatingAccountSucceeded,
+        account.id,
+      ),
     )
 
   private fun publishFailureEvent() =
     this.accountEvents.onNext(
       AccountEventCreationFailed(
-        this.taskRecorder.finishFailure<AccountType>()
-      )
+        this.taskRecorder.finishFailure<AccountType>(),
+      ),
     )
 
-  private fun publishProgressEvent(step: TaskStep) = this.accountEvents.onNext(AccountEventCreationInProgress(step.description))
+  private fun publishProgressEvent(step: TaskStep) =
+    this.accountEvents.onNext(AccountEventCreationInProgress(step.description))
 
   private fun resolveAccountProvider(): AccountProviderType {
     this.publishProgressEvent(this.taskRecorder.beginNewStep(this.strings.resolvingAccountProvider))
@@ -100,7 +102,7 @@ class ProfileAccountCreateTask(
           { _, status ->
             this.publishProgressEvent(this.taskRecorder.beginNewStep(status))
           },
-          description
+          description,
         )
 
       return when (resolution) {
@@ -114,7 +116,7 @@ class ProfileAccountCreateTask(
           this.taskRecorder.currentStepFailed(
             message = resolution.message,
             errorCode = "resolutionFailed",
-            extraMessages = listOf()
+            extraMessages = listOf(),
           )
           throw AccountUnresolvableProviderException(resolution.message)
         }

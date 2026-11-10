@@ -18,7 +18,7 @@ data class ProfileDateOfBirth(
    * `true` if the date of birth was synthesized for privacy reasons.
    */
 
-  val isSynthesized: Boolean
+  val isSynthesized: Boolean,
 ) {
   /**
    * Show the date as an ISO string.

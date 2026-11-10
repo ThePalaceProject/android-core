@@ -28,14 +28,14 @@ internal class BServiceOpLoadBookmarksForAll(
               profile = this.profile,
               accountID = account.id,
               book = book,
-              bookmarksSource = this.bookmarksSource
+              bookmarksSource = this.bookmarksSource,
             ).call()
           } catch (e: Exception) {
             this.logger.error(
               "[{}]: error loading bookmarks for account {}: ",
               this.profile.id.uuid,
               account.id,
-              e
+              e,
             )
           }
         }

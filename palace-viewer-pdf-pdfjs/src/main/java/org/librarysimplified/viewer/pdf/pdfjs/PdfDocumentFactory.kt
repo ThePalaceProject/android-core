@@ -11,7 +11,7 @@ import org.readium.r2.shared.util.resource.Resource
 import kotlin.reflect.KClass
 
 class PdfDocumentFactory(
-  context: Application
+  context: Application,
 ) : PdfDocumentFactory<PdfReaderDocument> {
   private val core =
     PdfiumCore(context)
@@ -22,7 +22,7 @@ class PdfDocumentFactory(
   @OptIn(InternalReadiumApi::class)
   override suspend fun open(
     resource: Resource,
-    password: String?
+    password: String?,
   ): ReadTry<PdfReaderDocument> {
     return when (val r = resource.read()) {
       is Try.Failure -> {
@@ -36,8 +36,8 @@ class PdfDocumentFactory(
             core = this.core,
             document = document,
             identifier = r.value.md5(),
-            pageCount = core.getPageCount(document)
-          )
+            pageCount = core.getPageCount(document),
+          ),
         )
       }
     }

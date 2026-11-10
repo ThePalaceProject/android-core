@@ -93,13 +93,13 @@ object AccountOIDC {
       AccountID(UUID.fromString(accountIDText))
 
     return AccountOIDCParsedCallbackLogout(
-      account = accountID
+      account = accountID,
     )
   }
 
   private fun parseOIDCCallbackLogin(
     data: URI,
-    matcher: Matcher
+    matcher: Matcher,
   ): AccountOIDCParsedCallback {
     val accountIDText =
       matcher.group(1)
@@ -128,7 +128,7 @@ object AccountOIDC {
 
     return AccountOIDCParsedCallbackLogin(
       account = accountID,
-      accessToken = accessToken
+      accessToken = accessToken,
     )
   }
 
@@ -138,10 +138,10 @@ object AccountOIDC {
 
   data class AccountOIDCParsedCallbackLogin(
     override val account: AccountID,
-    val accessToken: String
+    val accessToken: String,
   ) : AccountOIDCParsedCallback
 
   data class AccountOIDCParsedCallbackLogout(
-    override val account: AccountID
+    override val account: AccountID,
   ) : AccountOIDCParsedCallback
 }

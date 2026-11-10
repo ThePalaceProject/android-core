@@ -58,7 +58,7 @@ data class AuthenticationDocument(
    * @see "https://github.com/NYPL-Simplified/Simplified/wiki/Authentication-For-OPDS-Extensions#sitewide-announcements"
    */
 
-  val announcements: List<Announcement>
+  val announcements: List<Announcement>,
 ) {
   val loansURI: URI? =
     this.links.find { link -> link.relation == "http://opds-spec.org/shelf" }?.hrefURI

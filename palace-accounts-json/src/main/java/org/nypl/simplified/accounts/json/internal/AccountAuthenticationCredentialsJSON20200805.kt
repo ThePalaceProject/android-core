@@ -56,7 +56,7 @@ object AccountAuthenticationCredentialsJSON20200805 : AccountAuthenticationCrede
       authenticationDescription = JSONParserUtilities.getStringOrNull(obj, "authenticationDescription"),
       annotationsURI = null,
       deviceRegistrationURI = null,
-      patronAuthorization = null
+      patronAuthorization = null,
     )
   }
 
@@ -74,7 +74,7 @@ object AccountAuthenticationCredentialsJSON20200805 : AccountAuthenticationCrede
       cookies = deserializeCookies(JSONParserUtilities.getArray(obj, "cookies")),
       annotationsURI = null,
       deviceRegistrationURI = null,
-      patronAuthorization = null
+      patronAuthorization = null,
     )
   }
 
@@ -87,8 +87,8 @@ object AccountAuthenticationCredentialsJSON20200805 : AccountAuthenticationCrede
       results.add(
         AccountCookie(
           JSONParserUtilities.getString(obj, "url"),
-          JSONParserUtilities.getString(obj, "value")
-        )
+          JSONParserUtilities.getString(obj, "value"),
+        ),
       )
     }
 

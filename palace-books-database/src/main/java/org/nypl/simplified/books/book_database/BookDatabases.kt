@@ -22,7 +22,7 @@ object BookDatabases : BookDatabaseFactoryType {
     httpClient: LSHTTPClientType,
     formats: BookFormatSupportType,
     owner: AccountID,
-    directory: File
+    directory: File,
   ): BookDatabaseType =
     BookDatabase.open(
       context = context,
@@ -40,7 +40,7 @@ object BookDatabases : BookDatabaseFactoryType {
     formats: BookFormatSupportType,
     httpClient: LSHTTPClientType,
     owner: AccountID,
-    directory: File
+    directory: File,
   ): BookDatabaseType =
     BookDatabase.open(
       context = context,

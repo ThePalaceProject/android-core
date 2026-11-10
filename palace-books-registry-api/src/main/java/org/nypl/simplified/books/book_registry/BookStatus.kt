@@ -73,7 +73,7 @@ sealed class BookStatus {
 
       val startDate: DateTime?,
       override val isRevocable: Boolean,
-      override val endDate: DateTime?
+      override val endDate: DateTime?,
     ) : Held() {
       override val priority: BookStatusPriorityOrdering
         get() = BookStatusPriorityOrdering.BOOK_STATUS_HELD
@@ -91,7 +91,7 @@ sealed class BookStatus {
        * @return `true` if the hold is revocable
        */
 
-      override val isRevocable: Boolean
+      override val isRevocable: Boolean,
     ) : Held() {
       override val priority: BookStatusPriorityOrdering
         get() = BookStatusPriorityOrdering.BOOK_STATUS_HELD_READY
@@ -112,7 +112,7 @@ sealed class BookStatus {
      * The list of steps that lead to the failure.
      */
 
-    val result: TaskResult.Failure<Unit>
+    val result: TaskResult.Failure<Unit>,
   ) : BookStatus(),
     PresentableErrorType {
     override val priority: BookStatusPriorityOrdering
@@ -140,7 +140,7 @@ sealed class BookStatus {
      * The list of steps that lead to the failure.
      */
 
-    val result: TaskResult.Failure<Unit>
+    val result: TaskResult.Failure<Unit>,
   ) : BookStatus(),
     PresentableErrorType,
     AuthenticationRequiredToContinue {
@@ -165,7 +165,7 @@ sealed class BookStatus {
      * The list of steps that lead to the failure.
      */
 
-    val result: TaskResult.Failure<Unit>
+    val result: TaskResult.Failure<Unit>,
   ) : BookStatus(),
     PresentableErrorType {
     override val priority: BookStatusPriorityOrdering
@@ -189,7 +189,7 @@ sealed class BookStatus {
      * The list of steps that lead to the failure.
      */
 
-    val result: TaskResult.Failure<Unit>
+    val result: TaskResult.Failure<Unit>,
   ) : BookStatus(),
     PresentableErrorType,
     AuthenticationRequiredToContinue {
@@ -214,7 +214,7 @@ sealed class BookStatus {
      * The list of steps that lead to the failure.
      */
 
-    val result: TaskResult.Failure<Unit>
+    val result: TaskResult.Failure<Unit>,
   ) : BookStatus(),
     PresentableErrorType {
     override val priority: BookStatusPriorityOrdering
@@ -238,7 +238,7 @@ sealed class BookStatus {
      * The list of steps that lead to the failure.
      */
 
-    val result: TaskResult.Failure<Unit>
+    val result: TaskResult.Failure<Unit>,
   ) : BookStatus(),
     PresentableErrorType,
     AuthenticationRequiredToContinue {
@@ -263,7 +263,7 @@ sealed class BookStatus {
      * The list of steps that lead to the failure.
      */
 
-    val result: TaskResult.Failure<Unit>
+    val result: TaskResult.Failure<Unit>,
   ) : BookStatus() {
     override val priority: BookStatusPriorityOrdering
       get() = BookStatusPriorityOrdering.BOOK_STATUS_DOWNLOAD_FAILED
@@ -274,7 +274,7 @@ sealed class BookStatus {
    */
 
   data class Holdable(
-    override val id: BookID
+    override val id: BookID,
   ) : BookStatus() {
     override val priority: BookStatusPriorityOrdering
       get() = BookStatusPriorityOrdering.BOOK_STATUS_HOLDABLE
@@ -285,7 +285,7 @@ sealed class BookStatus {
    */
 
   data class Loanable(
-    override val id: BookID
+    override val id: BookID,
   ) : BookStatus() {
     override val priority: BookStatusPriorityOrdering
       get() = BookStatusPriorityOrdering.BOOK_STATUS_LOANABLE
@@ -317,7 +317,7 @@ sealed class BookStatus {
       override val id: BookID,
       override val loanExpiryDate: DateTime?,
       override val returnable: Boolean,
-      val isOpenAccess: Boolean
+      val isOpenAccess: Boolean,
     ) : Loaned() {
       override val priority: BookStatusPriorityOrdering
         get() = BookStatusPriorityOrdering.BOOK_STATUS_LOANED
@@ -330,7 +330,7 @@ sealed class BookStatus {
     data class LoanedDownloaded(
       override val id: BookID,
       override val loanExpiryDate: DateTime?,
-      override val returnable: Boolean
+      override val returnable: Boolean,
     ) : Loaned() {
       override val priority: BookStatusPriorityOrdering
         get() = BookStatusPriorityOrdering.BOOK_STATUS_DOWNLOADED
@@ -342,7 +342,7 @@ sealed class BookStatus {
    */
 
   data class RequestingRevoke(
-    override val id: BookID
+    override val id: BookID,
   ) : BookStatus() {
     override val priority: BookStatusPriorityOrdering
       get() = BookStatusPriorityOrdering.BOOK_STATUS_REVOKE_IN_PROGRESS
@@ -355,7 +355,7 @@ sealed class BookStatus {
 
   data class RequestingLoan(
     override val id: BookID,
-    val detailMessage: String
+    val detailMessage: String,
   ) : BookStatus() {
     override val priority: BookStatusPriorityOrdering
       get() = BookStatusPriorityOrdering.BOOK_STATUS_LOAN_IN_PROGRESS
@@ -367,7 +367,7 @@ sealed class BookStatus {
    */
 
   data class RequestingDownload(
-    override val id: BookID
+    override val id: BookID,
   ) : BookStatus() {
     override val priority: BookStatusPriorityOrdering
       get() = BookStatusPriorityOrdering.BOOK_STATUS_DOWNLOAD_REQUESTING
@@ -389,7 +389,7 @@ sealed class BookStatus {
      */
 
     val expectedTotalBytes: Long?,
-    val detailMessage: String
+    val detailMessage: String,
   ) : BookStatus() {
     val progressPercent: Double? =
       this.currentTotalBytes?.let { currentTotalBytes ->
@@ -407,7 +407,7 @@ sealed class BookStatus {
 
   data class DownloadWaitingForExternalAuthentication(
     override val id: BookID,
-    val downloadURI: URI
+    val downloadURI: URI,
   ) : BookStatus() {
     override val priority: BookStatusPriorityOrdering
       get() = BookStatusPriorityOrdering.BOOK_STATUS_WAITING_FOR_EXTERNAL_AUTHENTICATION
@@ -418,7 +418,7 @@ sealed class BookStatus {
    */
 
   data class DownloadExternalAuthenticationInProgress(
-    override val id: BookID
+    override val id: BookID,
   ) : BookStatus() {
     override val priority: BookStatusPriorityOrdering
       get() = BookStatusPriorityOrdering.BOOK_STATUS_DOWNLOAD_EXTERNAL_AUTHENTICATION_IN_PROGRESS
@@ -430,7 +430,7 @@ sealed class BookStatus {
    */
 
   data class Revoked(
-    override val id: BookID
+    override val id: BookID,
   ) : BookStatus() {
     override val priority: BookStatusPriorityOrdering
       get() = BookStatusPriorityOrdering.BOOK_STATUS_LOANED
@@ -457,20 +457,20 @@ sealed class BookStatus {
     private fun onIsOpenAccess(
       a: OPDSAvailabilityOpenAccess,
       downloaded: Boolean,
-      book: Book
+      book: Book,
     ): BookStatus =
       if (downloaded) {
         Loaned.LoanedDownloaded(
           id = book.id,
           loanExpiryDate = a.endDate,
-          returnable = a.revoke != null
+          returnable = a.revoke != null,
         )
       } else {
         Loaned.LoanedNotDownloaded(
           id = book.id,
           loanExpiryDate = a.endDate,
           returnable = a.revoke != null,
-          isOpenAccess = true
+          isOpenAccess = true,
         )
       }
 
@@ -480,7 +480,7 @@ sealed class BookStatus {
       a: OPDSAvailabilityLoaned,
       drmReturnable: Boolean,
       downloaded: Boolean,
-      book: Book
+      book: Book,
     ): BookStatus {
       val hasRevoke = a.revoke != null
       val returnable = (hasRevoke && drmReturnable) || (hasRevoke && downloaded)
@@ -488,14 +488,14 @@ sealed class BookStatus {
         Loaned.LoanedDownloaded(
           id = book.id,
           loanExpiryDate = a.endDate,
-          returnable = returnable
+          returnable = returnable,
         )
       } else {
         Loaned.LoanedNotDownloaded(
           id = book.id,
           loanExpiryDate = a.endDate,
           returnable = returnable,
-          isOpenAccess = false
+          isOpenAccess = false,
         )
       }
     }
@@ -504,24 +504,24 @@ sealed class BookStatus {
 
     private fun onIsHeldNotReady(
       a: OPDSAvailabilityHeld,
-      book: Book
+      book: Book,
     ): BookStatus =
       Held.HeldInQueue(
         id = book.id,
         queuePosition = a.position,
         startDate = a.startDate,
         endDate = a.endDate,
-        isRevocable = a.revoke != null
+        isRevocable = a.revoke != null,
       )
 
     private fun onIsHeldReady(
       a: OPDSAvailabilityHeldReady,
-      book: Book
+      book: Book,
     ): BookStatus =
       Held.HeldReady(
         id = book.id,
         endDate = a.endDate,
-        isRevocable = a.revoke != null
+        isRevocable = a.revoke != null,
       )
 
     private fun isDRMReturnable(book: Book): Boolean {

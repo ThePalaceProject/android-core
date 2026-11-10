@@ -25,7 +25,7 @@ interface BookDatabaseFactoryType {
     httpClient: LSHTTPClientType,
     formats: BookFormatSupportType,
     owner: AccountID,
-    directory: File
+    directory: File,
   ): BookDatabaseType
 
   /**
@@ -38,6 +38,6 @@ interface BookDatabaseFactoryType {
     formats: BookFormatSupportType,
     httpClient: LSHTTPClientType,
     owner: AccountID,
-    directory: File
+    directory: File,
   ): BookDatabaseType
 }

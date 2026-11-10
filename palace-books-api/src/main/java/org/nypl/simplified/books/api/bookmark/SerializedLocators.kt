@@ -27,8 +27,8 @@ object SerializedLocators {
         throw JSONParseException(
           String.format(
             "Locators can only be parsed from JSON object nodes (received %s)",
-            node.nodeType
-          )
+            node.nodeType,
+          ),
         )
       }
     }
@@ -74,7 +74,7 @@ object SerializedLocators {
     val progress = JSONParserUtilities.getObject(node, "progress")
     return SerializedLocatorHrefProgression20210317(
       chapterHref = JSONParserUtilities.getString(progress, "chapterHref"),
-      chapterProgress = JSONParserUtilities.getDouble(progress, "chapterProgress")
+      chapterProgress = JSONParserUtilities.getDouble(progress, "chapterProgress"),
     )
   }
 
@@ -84,7 +84,7 @@ object SerializedLocators {
     SerializedLocatorLegacyCFI(
       idRef = JSONParserUtilities.getStringOrNull(node, "idref"),
       contentCFI = JSONParserUtilities.getStringOrNull(node, "contentCFI"),
-      chapterProgression = JSONParserUtilities.getDoubleDefault(node, "progressWithinChapter", 0.0)
+      chapterProgression = JSONParserUtilities.getDoubleDefault(node, "progressWithinChapter", 0.0),
     )
 
   @JvmStatic
@@ -109,7 +109,7 @@ object SerializedLocators {
     try {
       return SerializedLocatorHrefProgression20210317(
         chapterHref = JSONParserUtilities.getString(node, "href"),
-        chapterProgress = JSONParserUtilities.getDouble(node, "progressWithinChapter")
+        chapterProgress = JSONParserUtilities.getDouble(node, "progressWithinChapter"),
       )
     } catch (e: IllegalStateException) {
       throw JSONParseException(e)
@@ -132,8 +132,8 @@ object SerializedLocators {
         throw JSONParseException(
           String.format(
             "Unsupported audio book locator version (received %s)",
-            version
-          )
+            version,
+          ),
         )
       }
     }
@@ -143,7 +143,7 @@ object SerializedLocators {
       readingOrderItem =
         JSONParserUtilities.getString(node, "readingOrderItem"),
       readingOrderItemOffsetMilliseconds =
-        JSONParserUtilities.getBigInteger(node, "readingOrderItemOffsetMilliseconds").toLong()
+        JSONParserUtilities.getBigInteger(node, "readingOrderItemOffsetMilliseconds").toLong(),
     )
 
   private fun parseLocatorAudioBookTime1(node: ObjectNode): SerializedLocatorAudioBookTime1 {

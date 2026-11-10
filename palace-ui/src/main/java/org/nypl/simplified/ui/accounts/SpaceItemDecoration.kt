@@ -10,7 +10,7 @@ class SpaceItemDecoration(
   @RecyclerView.Orientation private val direction: Int,
   context: Context,
   margin: Float = 8f,
-  private val marginOnInitialItem: Boolean = true
+  private val marginOnInitialItem: Boolean = true,
 ) : RecyclerView.ItemDecoration() {
   private val space =
     TypedValue
@@ -21,7 +21,7 @@ class SpaceItemDecoration(
     outRect: Rect,
     view: View,
     parent: RecyclerView,
-    state: RecyclerView.State
+    state: RecyclerView.State,
   ) {
     val pos = parent.getChildLayoutPosition(view)
 

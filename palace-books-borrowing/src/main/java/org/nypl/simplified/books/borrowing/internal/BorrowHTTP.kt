@@ -12,9 +12,8 @@ import org.librarysimplified.http.downloads.LSHTTPDownloadState.DownloadReceivin
 import org.librarysimplified.http.downloads.LSHTTPDownloadState.DownloadStarted
 import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadResult.DownloadCancelled
 import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadResult.DownloadCompletedSuccessfully
-import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedExceptionally
+import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed
 import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedServer
-import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedUnacceptableMIME
 import org.librarysimplified.http.downloads.LSHTTPDownloads
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.Handled401
@@ -44,7 +43,7 @@ object BorrowHTTP {
     target: URI,
     outputFile: File,
     requestModifier: ((LSHTTPRequestProperties) -> LSHTTPRequestProperties)? = null,
-    expectedTypes: Set<MIMEType> = hashSetOf(context.currentAcquisitionPathElement.mimeType)
+    expectedTypes: Set<MIMEType> = hashSetOf(context.currentAcquisitionPathElement.mimeType),
   ): LSHTTPDownloadRequest {
     val requestBuilder = context.httpClient.newRequest(target)
     requestBuilder.allowRedirects(ALLOW_UNSAFE_REDIRECTS)
@@ -65,7 +64,7 @@ object BorrowHTTP {
 
       is BorrowSubtaskCredentials.UseBearerToken -> {
         requestBuilder.setAuthorization(
-          LSHTTPAuthorizationBearerToken.ofToken(useCredentials.token)
+          LSHTTPAuthorizationBearerToken.ofToken(useCredentials.token),
         )
       }
     }
@@ -84,7 +83,7 @@ object BorrowHTTP {
       isCancelled = {
         context.isCancelled
       },
-      clock = context.clock
+      clock = context.clock,
     )
   }
 
@@ -98,12 +97,12 @@ object BorrowHTTP {
 
   fun isMimeTypeAcceptable(
     context: BorrowContextType,
-    receivedType: MIMEType
+    receivedType: MIMEType,
   ): Boolean =
     this.isMimeTypeAcceptable(
       context,
       hashSetOf(context.currentAcquisitionPathElement.mimeType),
-      receivedType
+      receivedType,
     )
 
   /**
@@ -117,7 +116,7 @@ object BorrowHTTP {
   fun isMimeTypeAcceptable(
     context: BorrowContextType,
     expectedTypes: Set<MIMEType>,
-    receivedType: MIMEType
+    receivedType: MIMEType,
   ): Boolean =
     if (
       expectedTypes.any { MIMECompatibility.isCompatibleLax(receivedType, it) }
@@ -126,10 +125,12 @@ object BorrowHTTP {
     } else {
       val expected = expectedTypes.map { it.fullType }.joinToString(" or ")
       val received = receivedType.fullType
+      val message =
+        "The server returned an incompatible context type: Required compatible with $expected but received $received."
       context.taskRecorder.currentStepFailed(
-        message = "The server returned an incompatible context type: Required compatible with $expected but received $received.",
+        message = message,
         errorCode = BorrowErrorCodes.httpContentTypeIncompatible,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       false
     }
@@ -148,7 +149,7 @@ object BorrowHTTP {
       message = "HTTP request failed: ${status.properties.originalStatus} ${status.properties.message}",
       errorCode = BorrowErrorCodes.httpRequestFailed,
       exception = null,
-      extraMessages = listOf()
+      extraMessages = listOf(),
     )
 
     return if (result.responseStatus.properties.status == 401) {
@@ -173,13 +174,13 @@ object BorrowHTTP {
 
   fun onDownloadFailedExceptionally(
     context: BorrowContextType,
-    result: DownloadFailedExceptionally
+    result: DownloadFailed.DownloadFailedExceptionally,
   ): BorrowSubtaskFailed {
     context.taskRecorder.currentStepFailed(
       message = result.exception.message ?: "Exception raised during connection attempt.",
       errorCode = BorrowErrorCodes.httpConnectionFailed,
       exception = result.exception,
-      extraMessages = listOf()
+      extraMessages = listOf(),
     )
     return BorrowSubtaskFailed()
   }
@@ -190,12 +191,12 @@ object BorrowHTTP {
 
   fun onDownloadFailedUnacceptableMimeDefault(
     context: BorrowContextType,
-    result: DownloadFailedUnacceptableMIME
+    result: DownloadFailed.DownloadFailedUnacceptableMIME,
   ): Unit = throw BorrowSubtaskFailed()
 
   private fun onDownloadProgressEvent(
     context: BorrowContextType,
-    event: LSHTTPDownloadState
+    event: LSHTTPDownloadState,
   ) {
     when (event) {
       is DownloadReceiving -> {
@@ -206,20 +207,21 @@ object BorrowHTTP {
             this.downloadingMessage(
               expectedSize = event.expectedSize,
               currentSize = event.receivedSize,
-              perSecond = event.bytesPerSecond
+              perSecond = event.bytesPerSecond,
             ),
           receivedSize = event.receivedSize,
           expectedSize = event.expectedSize,
-          bytesPerSecond = event.bytesPerSecond
+          bytesPerSecond = event.bytesPerSecond,
         )
       }
 
       DownloadStarted,
       DownloadCancelled,
       is DownloadFailedServer,
-      is DownloadFailedUnacceptableMIME,
-      is DownloadFailedExceptionally,
-      is DownloadCompletedSuccessfully -> {
+      is DownloadFailed.DownloadFailedUnacceptableMIME,
+      is DownloadFailed.DownloadFailedExceptionally,
+      is DownloadCompletedSuccessfully,
+      -> {
         // Don't care
       }
     }
@@ -228,7 +230,7 @@ object BorrowHTTP {
   fun downloadingMessage(
     expectedSize: Long?,
     currentSize: Long,
-    perSecond: Long
+    perSecond: Long,
   ): String =
     if (expectedSize == null) {
       "Downloading..."
@@ -247,7 +249,7 @@ object BorrowHTTP {
 
   fun download(
     context: BorrowContextType,
-    onDownloadFailedUnacceptableMIME: (BorrowContextType, DownloadFailedUnacceptableMIME) -> Unit =
+    onDownloadFailedUnacceptableMIME: (BorrowContextType, DownloadFailed.DownloadFailedUnacceptableMIME) -> Unit =
       this::onDownloadFailedUnacceptableMimeDefault,
     requestModifier: ((LSHTTPRequestProperties) -> LSHTTPRequestProperties)? = null,
   ) = try {
@@ -276,11 +278,11 @@ object BorrowHTTP {
           throw this.onDownloadFailedServer(context, result)
         }
 
-        is DownloadFailedUnacceptableMIME -> {
+        is DownloadFailed.DownloadFailedUnacceptableMIME -> {
           onDownloadFailedUnacceptableMIME(context, result)
         }
 
-        is DownloadFailedExceptionally -> {
+        is DownloadFailed.DownloadFailedExceptionally -> {
           throw this.onDownloadFailedExceptionally(context, result)
         }
 
@@ -298,13 +300,13 @@ object BorrowHTTP {
 
   private fun saveDownloadedContent(
     context: BorrowContextType,
-    temporaryFile: File
+    temporaryFile: File,
   ) {
     context.taskRecorder.beginNewStep("Saving book...")
 
     val formatHandle =
       context.bookDatabaseEntry.findFormatHandleForContentType(
-        context.currentAcquisitionPathElement.mimeType
+        context.currentAcquisitionPathElement.mimeType,
       )
 
     return when (formatHandle) {
@@ -319,7 +321,8 @@ object BorrowHTTP {
       }
 
       is BookDatabaseEntryFormatHandle.BookDatabaseEntryFormatHandleAudioBook,
-      null -> {
+      null,
+      -> {
         throw UnreachableCodeException()
       }
     }

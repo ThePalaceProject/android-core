@@ -34,7 +34,7 @@ sealed class FeedEntry : Serializable {
   data class FeedEntryCorrupt(
     override val accountID: AccountID,
     override val bookID: BookID,
-    val error: Throwable
+    val error: Throwable,
   ) : FeedEntry()
 
   /**
@@ -43,7 +43,7 @@ sealed class FeedEntry : Serializable {
 
   data class FeedEntryOPDS(
     override val accountID: AccountID,
-    val feedEntry: OPDSAcquisitionFeedEntry
+    val feedEntry: OPDSAcquisitionFeedEntry,
   ) : FeedEntry() {
     override val bookID: BookID =
       newFromText(feedEntry.id)

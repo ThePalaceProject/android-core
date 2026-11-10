@@ -65,7 +65,7 @@ object Reports {
      */
 
     data class RaisedException(
-      val exception: Exception
+      val exception: Exception,
     ) : Result()
   }
 
@@ -77,12 +77,12 @@ object Reports {
   fun sendReportsDefault(
     context: Context,
     address: String,
-    body: String
+    body: String,
   ): Result =
     this.sendReport(
       context = context,
       address = address,
-      body = body
+      body = body,
     )
 
   /**
@@ -93,7 +93,7 @@ object Reports {
   fun sendReport(
     context: Context,
     address: String,
-    body: String
+    body: String,
   ): Result {
     this.logger.debug("preparing report")
 
@@ -101,7 +101,7 @@ object Reports {
       val files =
         listOf(
           File(File(context.filesDir, "v4.0"), "time_tracking"),
-          File(context.cacheDir, "logs")
+          File(context.cacheDir, "logs"),
         )
 
       val reportZip = File(context.cacheDir, "report.zip")
@@ -153,14 +153,14 @@ object Reports {
 
   private fun mapFileToContentURI(
     context: Context,
-    file: File
+    file: File,
   ) = FileProvider.getUriForFile(context, context.packageName + ".fileProvider", file)
 
   @JvmStatic
   @Throws(IOException::class)
   private fun compressZipfile(
     sources: List<File>,
-    outputFile: File
+    outputFile: File,
   ) {
     ZipOutputStream(FileOutputStream(outputFile)).use { zipFile ->
       for (file in sources) {
@@ -173,7 +173,7 @@ object Reports {
   @Throws(IOException::class)
   private fun compressToZipFile(
     source: File,
-    zipFile: ZipOutputStream
+    zipFile: ZipOutputStream,
   ) {
     if (source.isFile) {
       this.logger.debug("Compress {}", source)

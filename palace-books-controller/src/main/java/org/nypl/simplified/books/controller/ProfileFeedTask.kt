@@ -26,7 +26,7 @@ internal class ProfileFeedTask(
   private val bookFormatSupport: BookFormatSupportType,
   private val bookRegistry: BookRegistryReadableType,
   private val profiles: ProfilesControllerType,
-  private val request: ProfileFeedRequest
+  private val request: ProfileFeedRequest,
 ) : Callable<Feed.FeedWithoutGroups> {
   private val logger =
     LoggerFactory.getLogger(ProfileFeedTask::class.java)
@@ -48,7 +48,7 @@ internal class ProfileFeedTask(
         feedSearch = FeedSearch.FeedSearchLocal,
         feedTitle = createTitle(),
         feedFacets = facets,
-        feedFacetGroups = facetGroups
+        feedFacetGroups = facetGroups,
       )
 
     try {
@@ -68,8 +68,8 @@ internal class ProfileFeedTask(
         feed.entriesInOrder.add(
           FeedEntry.FeedEntryOPDS(
             accountID = book.book.account,
-            feedEntry = book.book.entry
-          )
+            feedEntry = book.book.entry,
+          ),
         )
       }
 
@@ -120,8 +120,8 @@ internal class ProfileFeedTask(
       FilteringForAccount(
         title = this.request.facetTitleProvider.libraryAll,
         isActive = this.request.filterByAccountID == null,
-        account = null
-      )
+        account = null,
+      ),
     )
     return Pair(this.request.facetTitleProvider.library, facets)
   }
@@ -147,7 +147,7 @@ internal class ProfileFeedTask(
 
   private fun searchBooks(
     search: String?,
-    books: ArrayList<BookWithStatus>
+    books: ArrayList<BookWithStatus>,
   ) {
     if (search == null) {
       return
@@ -182,7 +182,7 @@ internal class ProfileFeedTask(
 
   private fun sortBooks(
     sortBy: SortBy,
-    books: ArrayList<BookWithStatus>
+    books: ArrayList<BookWithStatus>,
   ) {
     when (sortBy) {
       SortBy.SORT_BY_AUTHOR -> this.sortBooksByAuthor(books)
@@ -226,7 +226,7 @@ internal class ProfileFeedTask(
 
   private fun filterBooks(
     filter: (BookStatus) -> Boolean,
-    books: ArrayList<BookWithStatus>
+    books: ArrayList<BookWithStatus>,
   ) {
     val iter = books.iterator()
     while (iter.hasNext()) {
@@ -284,7 +284,8 @@ internal class ProfileFeedTask(
       is BookStatus.Held,
       is BookStatus.Holdable,
       is BookStatus.Loanable,
-      is BookStatus.Revoked -> {
+      is BookStatus.Revoked,
+      -> {
         false
       }
 
@@ -301,7 +302,8 @@ internal class ProfileFeedTask(
       is BookStatus.ReachedLoanLimit,
       is BookStatus.RequestingDownload,
       is BookStatus.RequestingLoan,
-      is BookStatus.RequestingRevoke -> {
+      is BookStatus.RequestingRevoke,
+      -> {
         true
       }
     }
@@ -328,7 +330,8 @@ internal class ProfileFeedTask(
       is BookStatus.RequestingDownload,
       is BookStatus.RequestingLoan,
       is BookStatus.RequestingRevoke,
-      is BookStatus.Revoked -> {
+      is BookStatus.Revoked,
+      -> {
         false
       }
     }
@@ -340,7 +343,7 @@ internal class ProfileFeedTask(
 
   private fun searchMatches(
     termsUpper: List<String>,
-    book: BookWithStatus
+    book: BookWithStatus,
   ): Boolean {
     if (termsUpper.isEmpty()) {
       return true

@@ -39,7 +39,7 @@ class FeedLoader private constructor(
   private val exec: ExecutorService,
   private val parser: OPDSFeedParserType,
   private val searchParser: OPDSSearchParserType,
-  private val transport: OPDSFeedTransportType<AccountAuthenticationCredentials?>
+  private val transport: OPDSFeedTransportType<AccountAuthenticationCredentials?>,
 ) : FeedLoaderType {
   private val log = LoggerFactory.getLogger(FeedLoader::class.java)
 
@@ -66,8 +66,8 @@ class FeedLoader private constructor(
             accountId = accountID,
             uri = uri,
             credentials = credentials,
-            method = method
-          )
+            method = method,
+          ),
         )
       } catch (e: Throwable) {
         future.completeExceptionally(e)
@@ -80,7 +80,7 @@ class FeedLoader private constructor(
     accountId: AccountID,
     uri: URI,
     credentials: AccountAuthenticationCredentials?,
-    method: String
+    method: String,
   ): FeedLoaderResult {
     try {
       /*
@@ -105,7 +105,7 @@ class FeedLoader private constructor(
           accountId = accountId,
           feed = opdsFeed,
           filter = this::isEntrySupported,
-          search = search
+          search = search,
         )
 
       return FeedLoaderSuccess(feed, opdsFeedResponse.second)
@@ -117,14 +117,14 @@ class FeedLoader private constructor(
           problemReport = e.report,
           exception = e,
           attributesInitial = this.errorAttributesOf(uri, method),
-          message = e.localizedMessage ?: ""
+          message = e.localizedMessage ?: "",
         )
       }
       return FeedLoaderFailure.FeedLoaderFailedGeneral(
         problemReport = e.report,
         exception = e,
         attributesInitial = this.errorAttributesOf(uri, method),
-        message = e.localizedMessage ?: ""
+        message = e.localizedMessage ?: "",
       )
     } catch (e: Exception) {
       this.log.debug("feed exception: ", e)
@@ -133,7 +133,7 @@ class FeedLoader private constructor(
         problemReport = null,
         exception = e,
         attributesInitial = this.errorAttributesOf(uri, method),
-        message = e.localizedMessage ?: ""
+        message = e.localizedMessage ?: "",
       )
     }
   }
@@ -164,11 +164,12 @@ class FeedLoader private constructor(
       ACQUISITION_SUBSCRIBE -> false
     }
 
-  private fun isTypePathSupported(path: OPDSAcquisitionPath): Boolean = this.bookFormatSupport.isSupportedPath(path.asMIMETypes())
+  private fun isTypePathSupported(path: OPDSAcquisitionPath): Boolean =
+    this.bookFormatSupport.isSupportedPath(path.asMIMETypes())
 
   private fun parseFromContentResolver(
     accountId: AccountID,
-    uri: URI
+    uri: URI,
   ): FeedLoaderResult {
     val streamMaybe = this.contentResolver.openInputStream(uri)
     return if (streamMaybe != null) {
@@ -179,9 +180,9 @@ class FeedLoader private constructor(
               accountId = accountId,
               feed = this.parser.parse(uri, stream),
               search = null,
-              filter = this::isEntrySupported
+              filter = this::isEntrySupported,
             ),
-          accessToken = null
+          accessToken = null,
         )
       }
     } else {
@@ -191,25 +192,25 @@ class FeedLoader private constructor(
         message = "File not found!",
         attributesInitial =
           mapOf(
-            Pair("URI", uri.toASCIIString())
-          )
+            Pair("URI", uri.toASCIIString()),
+          ),
       )
     }
   }
 
   private fun errorAttributesOf(
     uri: URI,
-    method: String
+    method: String,
   ): SortedMap<String, String> =
     sortedMapOf(
       Pair("Feed", uri.toString()),
-      Pair("Method", method)
+      Pair("Method", method),
     )
 
   private fun fetchSearchLink(
     opdsFeed: OPDSAcquisitionFeed,
     credentials: AccountAuthenticationCredentials?,
-    method: String
+    method: String,
   ): OPDSOpenSearch1_1? {
     val searchLink = opdsFeed.feedSearchURI
     return if (searchLink != null) {
@@ -241,7 +242,7 @@ class FeedLoader private constructor(
         exec = exec,
         parser = parser,
         searchParser = searchParser,
-        transport = transport
+        transport = transport,
       )
   }
 }

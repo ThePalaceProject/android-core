@@ -11,7 +11,7 @@ import org.nypl.simplified.ui.events.UISubjectRelay
  */
 
 class SettingsProfileEvents private constructor(
-  private val relay: UISubjectRelay<ProfileEvent>
+  private val relay: UISubjectRelay<ProfileEvent>,
 ) {
   companion object {
     fun create(profiles: ProfilesControllerType): SettingsProfileEvents =

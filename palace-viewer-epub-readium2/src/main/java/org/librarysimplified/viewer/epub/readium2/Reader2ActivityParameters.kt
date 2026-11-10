@@ -12,5 +12,5 @@ data class Reader2ActivityParameters(
   val bookId: BookID,
   val file: File,
   val drmInfo: BookDRMInformation,
-  val entry: FeedEntry.FeedEntryOPDS
+  val entry: FeedEntry.FeedEntryOPDS,
 ) : Serializable

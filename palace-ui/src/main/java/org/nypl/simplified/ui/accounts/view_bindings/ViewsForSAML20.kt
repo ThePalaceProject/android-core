@@ -14,7 +14,7 @@ class ViewsForSAML20(
   override val viewGroup: ViewGroup,
   private val loginButton: Button,
   private val logoutButton: Button,
-  private val resetPasswordLabel: TextView
+  private val resetPasswordLabel: TextView,
 ) : AccountAuthenticationViewBindings() {
   private var loginText =
     this.viewGroup.resources.getString(R.string.accountLogin)
@@ -33,7 +33,7 @@ class ViewsForSAML20(
 
   private fun setVisibility(
     view: View,
-    v: Int
+    v: Int,
   ) {
     if (view.visibility != v) {
       view.visibility = v
@@ -109,7 +109,7 @@ class ViewsForSAML20(
   override fun setResetPasswordLabelStatus(
     status: AccountLoginButtonStatus,
     isVisible: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
   ) {
     this.resetPasswordLabel.setOnClickListener {
       onClick()
@@ -125,7 +125,8 @@ class ViewsForSAML20(
   fun configureFor(description: AccountProviderAuthenticationDescription.SAML2_0) {
     this.loginText =
       this.viewGroup.context.resources.getString(
-        R.string.accountLoginWith, description.description
+        R.string.accountLoginWith,
+        description.description,
       )
     this.loginButton.text = this.loginText
   }
@@ -136,7 +137,7 @@ class ViewsForSAML20(
         viewGroup = viewGroup,
         loginButton = viewGroup.findViewById(R.id.authSAMLLogin),
         logoutButton = viewGroup.findViewById(R.id.authSAMLLogout),
-        resetPasswordLabel = viewGroup.findViewById(R.id.resetPasswordLabel)
+        resetPasswordLabel = viewGroup.findViewById(R.id.resetPasswordLabel),
       )
   }
 }

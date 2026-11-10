@@ -25,7 +25,7 @@ internal class AuthenticationDocumentParser(
   private val mapper: ObjectMapper,
   private val uri: URI,
   private val stream: InputStream,
-  private val warningsAsErrors: Boolean
+  private val warningsAsErrors: Boolean,
 ) : AuthenticationDocumentParserType {
   override fun close() {
     this.stream.close()
@@ -44,8 +44,8 @@ internal class AuthenticationDocumentParser(
           message = warning.message,
           line = 0,
           column = 0,
-          exception = warning.exception
-        )
+          exception = warning.exception,
+        ),
       )
     } else {
       this.warnings.add(warning)
@@ -57,8 +57,8 @@ internal class AuthenticationDocumentParser(
       ParseError(
         source = this.uri,
         message = e.message ?: "",
-        exception = e
-      )
+        exception = e,
+      ),
     )
   }
 
@@ -67,8 +67,8 @@ internal class AuthenticationDocumentParser(
       ParseError(
         source = this.uri,
         message = message,
-        exception = null
-      )
+        exception = null,
+      ),
     )
   }
 
@@ -115,8 +115,8 @@ internal class AuthenticationDocumentParser(
               links = links,
               mainColor = mainColor,
               title = title,
-              announcements = announcements
-            )
+              announcements = announcements,
+            ),
         )
       } else {
         ParseResult.Failure(warnings = this.warnings.toList(), errors = this.errors.toList())
@@ -164,7 +164,7 @@ internal class AuthenticationDocumentParser(
 
       AuthenticationObjectNYPLFeatures(
         enabled = enabled.toSet(),
-        disabled = disabled.toSet()
+        disabled = disabled.toSet(),
       )
     } catch (e: Exception) {
       this.publishErrorForException(e)
@@ -251,7 +251,7 @@ internal class AuthenticationDocumentParser(
         inputs = inputs,
         labels = labels,
         links = links,
-        type = type
+        type = type,
       )
     } catch (e: Exception) {
       this.publishErrorForException(e)
@@ -276,7 +276,7 @@ internal class AuthenticationDocumentParser(
 
   private fun parseInput(
     fieldName: String,
-    root: ObjectNode
+    root: ObjectNode,
   ): AuthenticationObjectNYPLInput? =
     try {
       AuthenticationObjectNYPLInput(
@@ -290,7 +290,7 @@ internal class AuthenticationDocumentParser(
         barcodeFormat =
           JSONParserUtilities
             .getStringOrNull(root, "barcode_format")
-            ?.uppercase(Locale.ROOT)
+            ?.uppercase(Locale.ROOT),
       )
     } catch (e: Exception) {
       this.publishErrorForException(e)

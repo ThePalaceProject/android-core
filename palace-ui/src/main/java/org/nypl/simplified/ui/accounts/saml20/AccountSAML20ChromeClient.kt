@@ -10,11 +10,11 @@ import android.widget.ProgressBar
  */
 
 class AccountSAML20ChromeClient(
-  private val progress: ProgressBar
+  private val progress: ProgressBar,
 ) : WebChromeClient() {
   override fun onProgressChanged(
     view: WebView,
-    newProgress: Int
+    newProgress: Int,
   ) {
     super.onProgressChanged(view, newProgress)
 

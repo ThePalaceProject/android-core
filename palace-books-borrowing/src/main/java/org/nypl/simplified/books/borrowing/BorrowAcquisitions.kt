@@ -17,7 +17,7 @@ object BorrowAcquisitions {
 
   fun pickBestAcquisitionPath(
     support: BookFormatSupportType,
-    entry: OPDSAcquisitionFeedEntry
+    entry: OPDSAcquisitionFeedEntry,
   ): OPDSAcquisitionPath? {
     val paths = OPDSAcquisitionPaths.linearize(entry)
     return paths

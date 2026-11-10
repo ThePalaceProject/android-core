@@ -150,7 +150,8 @@ interface AccountProviderType : Comparable<AccountProviderType> {
       is AccountProviderAuthenticationDescription.SAML2_0,
       AccountProviderAuthenticationDescription.Anonymous,
       is AccountProviderAuthenticationDescription.Basic,
-      is AccountProviderAuthenticationDescription.BasicToken -> {
+      is AccountProviderAuthenticationDescription.BasicToken,
+      -> {
         this.catalogURI
       }
     }
@@ -170,7 +171,8 @@ interface AccountProviderType : Comparable<AccountProviderType> {
       when (val auth = this.authentication) {
         is AccountProviderAuthenticationDescription.OpenIDConnect,
         is AccountProviderAuthenticationDescription.SAML2_0,
-        AccountProviderAuthenticationDescription.Anonymous -> {
+        AccountProviderAuthenticationDescription.Anonymous,
+        -> {
           false
         }
 
@@ -202,8 +204,8 @@ interface AccountProviderType : Comparable<AccountProviderType> {
         Link.LinkBasic(
           href = uri,
           type = null,
-          relation = "http://opds-spec.org/image/thumbnail"
-        )
+          relation = "http://opds-spec.org/image/thumbnail",
+        ),
       )
     }
 
@@ -249,13 +251,13 @@ interface AccountProviderType : Comparable<AccountProviderType> {
   private fun addLink(
     links: MutableList<Link>,
     uri: URI,
-    relation: String
+    relation: String,
   ): Boolean =
     links.add(
       Link.LinkBasic(
         href = uri,
         type = null,
-        relation = relation
-      )
+        relation = relation,
+      ),
     )
 }

@@ -11,12 +11,12 @@ import java.util.regex.Pattern
  */
 
 data class BookmarkID(
-  val value: String
+  val value: String,
 ) {
   init {
     if (!VALID_BOOKMARK_ID.matcher(value).matches()) {
       throw IllegalArgumentException(
-        "Bookmark IDs must be non-empty, alphanumeric lowercase (" + VALID_BOOKMARK_ID.pattern() + ")"
+        "Bookmark IDs must be non-empty, alphanumeric lowercase (" + VALID_BOOKMARK_ID.pattern() + ")",
       )
     }
   }

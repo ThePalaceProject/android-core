@@ -16,6 +16,6 @@ class AccountProviderDescriptionSerializers : AccountProviderDescriptionSerializ
   override fun createSerializer(
     uri: URI,
     stream: OutputStream,
-    document: AccountProviderDescription
+    document: AccountProviderDescription,
   ): AccountProviderDescriptionSerializerType = AccountProviderDescriptionSerializer(uri, stream, document)
 }

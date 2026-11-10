@@ -6,7 +6,7 @@ import java.io.File
 import java.io.FileNotFoundException
 
 abstract class WebViewCookieDatabase(
-  private val db: SQLiteDatabase
+  private val db: SQLiteDatabase,
 ) : WebViewCookieDatabaseType {
   companion object {
     private val logger = LoggerFactory.getLogger(WebViewCookieDatabase::class.java)
@@ -30,7 +30,7 @@ abstract class WebViewCookieDatabase(
         SQLiteDatabase.openDatabase(
           cookiesFile.absolutePath,
           null,
-          SQLiteDatabase.OPEN_READONLY
+          SQLiteDatabase.OPEN_READONLY,
         )
 
       val version = getVersion(db)
@@ -79,7 +79,7 @@ abstract class WebViewCookieDatabase(
       val candidatePaths =
         listOf(
           DB_FILE_NAME,
-          "Default/$DB_FILE_NAME"
+          "Default/$DB_FILE_NAME",
         )
 
       val path =
@@ -112,7 +112,7 @@ abstract class WebViewCookieDatabase(
             null,
             null,
             null,
-            null
+            null,
           ).use { cursor ->
             if (cursor.moveToNext()) {
               return cursor.getString(0)

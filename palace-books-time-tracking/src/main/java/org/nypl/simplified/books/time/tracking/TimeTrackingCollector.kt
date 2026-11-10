@@ -58,7 +58,7 @@ class TimeTrackingCollector private constructor(
       AutoCloseable {
         this.executor.shutdown()
         this.executor.awaitTermination(30L, TimeUnit.SECONDS)
-      }
+      },
     )
     val timeSubscription = this.timeSegments.subscribe(this::onTimeTrackedReceived)
     this.resources.add(AutoCloseable { timeSubscription.dispose() })
@@ -84,13 +84,13 @@ class TimeTrackingCollector private constructor(
                   Pair("Reason", "bookMismatch"),
                   Pair("Book", time.bookTrackingId.value),
                   Pair("ActiveBook", statusNow.bookId.value),
-                  Pair("Seconds", time.seconds.toString())
-                )
+                  Pair("Seconds", time.seconds.toString()),
+                ),
             )
             this.logger.warn(
               "Time loss: Time tracking data received for book {}, but book {} is selected",
               statusNow.bookId,
-              time.bookTrackingId
+              time.bookTrackingId,
             )
             return
           }
@@ -115,7 +115,7 @@ class TimeTrackingCollector private constructor(
               bookID = statusNow.bookId,
               timeStarted = utcStart,
               timeEnded = utcEnd,
-              targetURI = statusNow.timeTrackingUri
+              targetURI = statusNow.timeTrackingUri,
             )
 
           Files.newOutputStream(outFileTmp, WRITE, CREATE, TRUNCATE_EXISTING).use { s ->
@@ -132,12 +132,12 @@ class TimeTrackingCollector private constructor(
               mapOf(
                 Pair("Reason", "noActiveBook"),
                 Pair("Book", time.bookTrackingId.value),
-                Pair("Seconds", time.seconds.toString())
-              )
+                Pair("Seconds", time.seconds.toString()),
+              ),
           )
           this.logger.warn(
             "Time tracking data received for book {}, but no book is selected",
-            time.bookTrackingId
+            time.bookTrackingId,
           )
         }
       }
@@ -148,9 +148,9 @@ class TimeTrackingCollector private constructor(
           mapOf(
             Pair("Reason", "saveFailed"),
             Pair("Book", time.bookTrackingId.value),
-            Pair("Seconds", time.seconds.toString())
+            Pair("Seconds", time.seconds.toString()),
           ),
-        throwable = e
+        throwable = e,
       )
       this.logger.warn("Failed to save time tracking information: ", e)
     } finally {
@@ -173,7 +173,7 @@ class TimeTrackingCollector private constructor(
         timeSegments = timeSegments,
         debugDirectory = debugDirectory,
         outputDirectory = outputDirectory,
-        diagnostics = diagnostics
+        diagnostics = diagnostics,
       )
   }
 
@@ -186,7 +186,7 @@ class TimeTrackingCollector private constructor(
         TimeTrackingDebugging.onTimeTrackingStarted(
           timeTrackingDebugDirectory = this.debugDirectory.toFile(),
           libraryId = newValue.libraryId,
-          bookId = newValue.bookId.value
+          bookId = newValue.bookId.value,
         )
       }
 
@@ -195,7 +195,7 @@ class TimeTrackingCollector private constructor(
           TimeTrackingDebugging.onTimeTrackingStopped(
             timeTrackingDebugDirectory = this.debugDirectory.toFile(),
             libraryId = oldValue.libraryId,
-            bookId = oldValue.bookId.value
+            bookId = oldValue.bookId.value,
           )
         }
       }
@@ -204,7 +204,7 @@ class TimeTrackingCollector private constructor(
 
   override fun awaitWrite(
     timeout: Long,
-    unit: TimeUnit
+    unit: TimeUnit,
   ) {
     this.awaitWrite.poll(timeout, unit)
   }

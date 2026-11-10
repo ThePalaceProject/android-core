@@ -31,5 +31,5 @@ data class BookFormatSupportParameters(
    * The application has a working LCP service.
    */
 
-  val supportsLCP: Boolean
+  val supportsLCP: Boolean,
 )

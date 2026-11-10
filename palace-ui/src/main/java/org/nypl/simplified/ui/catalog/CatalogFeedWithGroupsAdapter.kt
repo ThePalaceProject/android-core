@@ -26,7 +26,7 @@ class CatalogFeedWithGroupsAdapter(
       object : DiffUtil.ItemCallback<FeedGroup>() {
         override fun areContentsTheSame(
           oldItem: FeedGroup,
-          newItem: FeedGroup
+          newItem: FeedGroup,
         ): Boolean {
           if (oldItem.groupEntries.size == newItem.groupEntries.size) {
             for (index in 0 until oldItem.groupEntries.size) {
@@ -41,14 +41,14 @@ class CatalogFeedWithGroupsAdapter(
 
         override fun areItemsTheSame(
           oldItem: FeedGroup,
-          newItem: FeedGroup
+          newItem: FeedGroup,
         ): Boolean = oldItem.groupURI == newItem.groupURI
       }
   }
 
   override fun onCreateViewHolder(
     parent: ViewGroup,
-    viewType: Int
+    viewType: Int,
   ): CatalogFeedWithGroupsLaneViewHolder {
     val inflater =
       LayoutInflater.from(parent.context)
@@ -66,7 +66,7 @@ class CatalogFeedWithGroupsAdapter(
 
   override fun onBindViewHolder(
     holder: CatalogFeedWithGroupsLaneViewHolder,
-    position: Int
+    position: Int,
   ) {
     holder.bindTo(this.getItem(position))
   }

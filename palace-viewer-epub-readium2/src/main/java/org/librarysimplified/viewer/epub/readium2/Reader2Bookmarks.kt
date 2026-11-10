@@ -33,7 +33,7 @@ object Reader2Bookmarks {
   fun loadBookmarks(
     bookmarkService: BookmarkServiceUsableType,
     accountID: AccountID,
-    bookID: BookID
+    bookID: BookID,
   ): List<SR2Bookmark> {
     val bookmarksAll =
       bookmarkService.bookmarks.get()
@@ -60,7 +60,7 @@ object Reader2Bookmarks {
   fun fromSR2Bookmark(
     bookEntry: FeedEntry.FeedEntryOPDS,
     deviceId: String,
-    source: SR2Bookmark
+    source: SR2Bookmark,
   ): SerializedBookmark {
     val chapterHref =
       source.locator.chapterHref.toString()
@@ -107,7 +107,8 @@ object Reader2Bookmarks {
       is SerializedLocatorAudioBookTime1,
       is SerializedLocatorAudioBookTime2,
       is SerializedLocatorLegacyCFI,
-      is SerializedLocatorPage1 -> {
+      is SerializedLocatorPage1,
+      -> {
         // None of these locator formats are suitable for EPUBs in R2
         null
       }
@@ -131,10 +132,10 @@ object Reader2Bookmarks {
             locator =
               SR2Locator.SR2LocatorPercent.create(
                 chapterHref = href,
-                chapterProgress = location.chapterProgress
+                chapterProgress = location.chapterProgress,
               ),
             bookProgress = source.bookProgress,
-            uri = source.uri
+            uri = source.uri,
           )
         } else {
           null

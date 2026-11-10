@@ -23,13 +23,13 @@ import java.util.TreeMap
  */
 
 class BookCoverGenerator(
-  private val generator: TenPrintGeneratorType
+  private val generator: TenPrintGeneratorType,
 ) : BookCoverGeneratorType {
   @Throws(IOException::class)
   override fun generateImage(
     uri: URI,
     width: Int,
-    height: Int
+    height: Int,
   ): Bitmap {
     var width = width
     var height = height
@@ -69,7 +69,7 @@ class BookCoverGenerator(
 
   override fun generateURIForTitleAuthor(
     title: String,
-    author: String
+    author: String,
   ): URI {
     val params: SortedMap<String, String> = TreeMap()
     params["title"] = title
@@ -77,7 +77,7 @@ class BookCoverGenerator(
 
     return LSHTTPURIQueryBuilder.encodeQuery(
       URI.create("generated-cover://localhost/"),
-      params
+      params,
     )
   }
 

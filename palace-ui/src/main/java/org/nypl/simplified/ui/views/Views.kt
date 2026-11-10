@@ -9,7 +9,7 @@ object Views {
   @JvmStatic
   fun setVisible(
     target: View,
-    visible: Boolean
+    visible: Boolean,
   ) {
     /*
      * Setting the visibility of a view in Android has a cost, even if that view is already in the desired

@@ -76,7 +76,7 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
 
     fun startActivity(
       context: Activity,
-      feedEntry: FeedEntry.FeedEntryOPDS
+      feedEntry: FeedEntry.FeedEntryOPDS,
     ) {
       val intent = Intent(context, BookPreviewActivity::class.java)
       val bundle =
@@ -165,19 +165,21 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
         data =
           mapOf(
             Pair("Reason", "accountNotFound"),
-            Pair("AccountInternalID",
+            Pair(
+              "AccountInternalID",
               this.feedEntry.accountID.uuid
-                .toString()
+                .toString(),
             ),
             Pair("BookID", this.feedEntry.feedEntry.id),
             Pair("BookTitle", this.feedEntry.feedEntry.title),
-            Pair("BookPublisher",
+            Pair(
+              "BookPublisher",
               this.feedEntry.feedEntry.publisher
-                .orEmpty()
+                .orEmpty(),
             ),
-            Pair("BookDRM", BookDRMInformation.None.kind.name)
+            Pair("BookDRM", BookDRMInformation.None.kind.name),
           ),
-        throwable = e
+        throwable = e,
       )
       this.finish()
       return
@@ -201,7 +203,7 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
               file = null,
               lastReadLocation = null,
               bookmarks = listOf(),
-              contentType = BookFormats.epubMimeTypes().first()
+              contentType = BookFormats.epubMimeTypes().first(),
             )
           }
 
@@ -212,7 +214,7 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
               lastReadLocation = null,
               bookmarks = listOf(),
               manifest = null,
-              contentType = BookFormats.audioBookGenericMimeTypes().first()
+              contentType = BookFormats.audioBookGenericMimeTypes().first(),
             )
           }
 
@@ -222,7 +224,7 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
               file = null,
               lastReadLocation = null,
               bookmarks = listOf(),
-              contentType = BookFormats.pdfMimeTypes().first()
+              contentType = BookFormats.pdfMimeTypes().first(),
             )
           }
 
@@ -239,23 +241,26 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
         data =
           mapOf(
             Pair("Reason", "formatInferenceFailed"),
-            Pair("AccountInternalID",
+            Pair(
+              "AccountInternalID",
               this.feedEntry.accountID.uuid
-                .toString()
+                .toString(),
             ),
-            Pair("AccountProviderID",
+            Pair(
+              "AccountProviderID",
               this.account.provider.id
-                .toString()
+                .toString(),
             ),
             Pair("BookID", this.feedEntry.feedEntry.id),
             Pair("BookTitle", this.feedEntry.feedEntry.title),
-            Pair("BookPublisher",
+            Pair(
+              "BookPublisher",
               this.feedEntry.feedEntry.publisher
-                .orEmpty()
+                .orEmpty(),
             ),
-            Pair("BookDRM", BookDRMInformation.None.kind.name)
+            Pair("BookDRM", BookDRMInformation.None.kind.name),
           ),
-        throwable = e
+        throwable = e,
       )
       this.finish()
       return
@@ -291,12 +296,12 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
       this.previewRegistry
         .observeBookPreviewStatus()
         .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(this::onNewBookPreviewStatus)
+        .subscribe(this::onNewBookPreviewStatus),
     )
 
     this.onBackPressedDispatcher.addCallback(
       this,
-      this.backCallback
+      this.backCallback,
     )
   }
 
@@ -394,8 +399,10 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
         val expected = previewStatus.expectedTotalBytes
 
         this.logger.debug(
-          "Book preview downloading: {} {} {}", received,
-          expected, previewStatus.bytesPerSecond
+          "Book preview downloading: {} {} {}",
+          received,
+          expected,
+          previewStatus.bytesPerSecond,
         )
 
         if (received != null && expected != null) {
@@ -496,7 +503,7 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
           onLCPDialogDismissed = {
             this.logger.debug("Dismissed LCP dialog. Shutting down...")
             this.finish()
-          }
+          },
         )
 
       this.logger.debug("Opening asset...")
@@ -507,8 +514,10 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
         )
 
       val rawBookAsset =
-        when (val a =
-          runBlocking { assetRetriever.retrieve(file) }) {
+        when (
+          val a =
+            runBlocking { assetRetriever.retrieve(file) }
+        ) {
           is Try.Failure -> throw IOException(a.value.message)
           is Try.Success -> a.value
         }
@@ -521,7 +530,7 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
         context = this.application,
         controllers = SR2Controllers(),
         bookmarks = listOf(),
-        allowCopyPaste = true
+        allowCopyPaste = true,
       )
     } catch (e: Exception) {
       this.onBookLoadingFailed(e)
@@ -550,24 +559,27 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
       data =
         mapOf(
           Pair("Reason", "readerOpenFailed"),
-          Pair("AccountInternalID",
+          Pair(
+            "AccountInternalID",
             this.feedEntry.accountID.uuid
-              .toString()
+              .toString(),
           ),
-          Pair("AccountProviderID",
+          Pair(
+            "AccountProviderID",
             this.account.provider.id
-              .toString()
+              .toString(),
           ),
           Pair("BookID", this.feedEntry.feedEntry.id),
           Pair("BookTitle", this.feedEntry.feedEntry.title),
-          Pair("BookPublisher",
+          Pair(
+            "BookPublisher",
             this.feedEntry.feedEntry.publisher
-              .orEmpty()
+              .orEmpty(),
           ),
           Pair("BookDRM", this.bookFormat.drmInformation.kind.name),
-          Pair("ExceptionType", actualException.javaClass.name)
+          Pair("ExceptionType", actualException.javaClass.name),
         ),
-      throwable = actualException
+      throwable = actualException,
     )
 
     MaterialAlertDialogBuilder(this)
@@ -576,8 +588,8 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
         this.getString(
           org.librarysimplified.viewer.epub.readium2.R.string.bookOpenFailedMessage,
           actualException.javaClass.name,
-          actualException.message
-        )
+          actualException.message,
+        ),
       ).setNegativeButton(R.string.Dismiss) { dialog, _ -> dialog.dismiss() }
       .setOnDismissListener { this.finish() }
       .create()

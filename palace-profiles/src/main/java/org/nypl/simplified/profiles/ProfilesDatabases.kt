@@ -57,7 +57,7 @@ object ProfilesDatabases {
     directory: File,
     profiles: SortedMap<ProfileID, Profile>,
     jom: ObjectMapper,
-    errors: MutableList<Exception>
+    errors: MutableList<Exception>,
   ) {
     if (!directory.exists()) {
       directory.mkdirs()
@@ -84,7 +84,7 @@ object ProfilesDatabases {
             jom = jom,
             directory = directory,
             errors = errors,
-            profileIdName = profileIdName
+            profileIdName = profileIdName,
           ) ?: continue
 
         profiles[profile.id] = profile
@@ -109,7 +109,7 @@ object ProfilesDatabases {
     accountsDatabases: AccountsDatabaseFactoryType,
     bookFormatSupport: BookFormatSupportType,
     httpClient: LSHTTPClientType,
-    directory: File
+    directory: File,
   ): ProfilesDatabaseType {
     this.logger.debug("opening profile database: {}", directory)
 
@@ -158,7 +158,8 @@ object ProfilesDatabases {
 
     if (!errors.isEmpty()) {
       throw ProfileDatabaseOpenException(
-        "One or more errors occurred whilst trying to open the profile database.", errors
+        "One or more errors occurred whilst trying to open the profile database.",
+        errors,
       )
     }
 
@@ -168,14 +169,14 @@ object ProfilesDatabases {
     return ProfilesDatabase(
       accountProviders = accountProviders,
       directory = directory,
-      profile = profileActual
+      profile = profileActual,
     )
   }
 
   private fun openOneProfileDirectory(
     errors: MutableList<Exception>,
     directory: File,
-    profileIdName: String
+    profileIdName: String,
   ): ProfileID? {
     /*
      * If the profile directory is not a directory, then give up.
@@ -211,7 +212,7 @@ object ProfilesDatabases {
   private fun openOneProfileDirectoryDoMigration(
     ownerDirectory: File,
     existingDirectory: File,
-    profileIdName: String
+    profileIdName: String,
   ): ProfileID? {
     this.logger.debug("attempting to migrate {} directory", existingDirectory)
 
@@ -247,7 +248,7 @@ object ProfilesDatabases {
 
     this.logger.error(
       "could not migrate directory {} after multiple attempts, aborting!",
-      existingDirectory
+      existingDirectory,
     )
     return null
   }
@@ -264,10 +265,12 @@ object ProfilesDatabases {
     jom: ObjectMapper,
     directory: File,
     errors: MutableList<Exception>,
-    profileIdName: String
+    profileIdName: String,
   ): Profile? {
-    val profileId =
-      this.openOneProfileDirectory(errors, directory, profileIdName) ?: return null
+    val profileId = this.openOneProfileDirectory(errors, directory, profileIdName)
+    if (profileId == null) {
+      return null
+    }
 
     val profileDir = File(directory, profileId.uuid.toString())
     val profileFile = File(profileDir, "profile.json")
@@ -312,7 +315,7 @@ object ProfilesDatabases {
 
     Preconditions.checkArgument(
       !accounts.isEmpty(),
-      "Accounts database must not be empty"
+      "Accounts database must not be empty",
     )
 
     val mostRecentFallback =
@@ -338,7 +341,7 @@ object ProfilesDatabases {
       directory = profileDir,
       analytics = analytics,
       accounts = accountsDatabase,
-      initialDescription = description
+      initialDescription = description,
     )
   }
 
@@ -368,7 +371,7 @@ object ProfilesDatabases {
     httpClient: LSHTTPClientType,
     directory: File,
     displayName: String,
-    id: ProfileID
+    id: ProfileID,
   ): Profile {
     try {
       val profileDir =
@@ -419,9 +422,9 @@ object ProfilesDatabases {
                 audioBookPlaybackSkipIntervalBackwardMs =
                   ProfileDescriptionJSON.DEFAULT_AUDIOBOOK_SKIP_INTERVAL_MS.toLong(),
                 audioBookBatteryDialogAccepted = false,
-                showBookCoverDebugLabels = false
+                showBookCoverDebugLabels = false,
               ),
-            attributes = ProfileAttributes(sortedMapOf())
+            attributes = ProfileAttributes(sortedMapOf()),
           )
 
         val profile =
@@ -431,7 +434,7 @@ object ProfilesDatabases {
             directory = profileDir,
             analytics = analytics,
             accounts = accounts,
-            initialDescription = description
+            initialDescription = description,
           )
 
         this.writeDescription(profileDir, description)
@@ -449,7 +452,7 @@ object ProfilesDatabases {
   @Throws(IOException::class)
   internal fun writeDescription(
     directory: File,
-    newDescription: ProfileDescription
+    newDescription: ProfileDescription,
   ) {
     val profileLock =
       File(directory, "lock")
@@ -460,7 +463,7 @@ object ProfilesDatabases {
 
     FileLocking.withFileThreadLocked(
       profileLock,
-      1000L
+      1000L,
     ) {
       /*
        * Ignore the return value here; the write call will immediately fail if this
@@ -472,7 +475,7 @@ object ProfilesDatabases {
       FileUtilities.fileWriteUTF8Atomically(
         profileFile,
         profileFileTemp,
-        ProfileDescriptionJSON.serializeToString(ObjectMapper(), newDescription)
+        ProfileDescriptionJSON.serializeToString(ObjectMapper(), newDescription),
       )
     }
   }

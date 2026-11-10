@@ -53,7 +53,7 @@ class CatalogFeedViewGroups(
     (this.listView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
     this.listView.setItemViewCacheSize(8)
     this.listView.addItemDecoration(
-      CatalogFeedWithGroupsDecorator(this.screenSize.dpToPixels(16).toInt())
+      CatalogFeedWithGroupsDecorator(this.screenSize.dpToPixels(16).toInt()),
     )
   }
 
@@ -70,7 +70,7 @@ class CatalogFeedViewGroups(
     PalaceTabButtons.configureGroup(
       context = this.root.context,
       group = this.tabs,
-      count = facetGroup.size
+      count = facetGroup.size,
     ) { index, button ->
       val facet = facetGroup[index]
       button.maxLines = Integer.MAX_VALUE
@@ -101,7 +101,7 @@ class CatalogFeedViewGroups(
 
   private fun updateSelectedFacet(
     facetTabs: RadioGroup,
-    index: Int
+    index: Int,
   ) {
     facetTabs.clearCheck()
     val button = facetTabs.getChildAt(index) as RadioButton

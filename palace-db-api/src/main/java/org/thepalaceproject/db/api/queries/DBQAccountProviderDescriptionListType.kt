@@ -8,6 +8,6 @@ interface DBQAccountProviderDescriptionListType :
   DBQueryType<DBQAccountProviderDescriptionListType.Parameters, List<AccountProviderDescription>> {
   data class Parameters(
     val startingId: URI?,
-    val limit: Int
+    val limit: Int,
   )
 }

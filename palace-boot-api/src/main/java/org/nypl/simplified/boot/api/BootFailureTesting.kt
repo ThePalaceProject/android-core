@@ -25,7 +25,7 @@ object BootFailureTesting {
 
   fun enableBootFailures(
     context: Context,
-    enabled: Boolean
+    enabled: Boolean,
   ) {
     this.logger.debug("enabling boot failures: {}", enabled)
     val prefs = context.getSharedPreferences("testing", Context.MODE_PRIVATE)

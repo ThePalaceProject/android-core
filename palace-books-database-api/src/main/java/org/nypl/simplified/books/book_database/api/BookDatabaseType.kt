@@ -51,7 +51,7 @@ interface BookDatabaseType {
   @Throws(BookDatabaseException::class)
   fun createOrUpdate(
     id: BookID,
-    entry: OPDSAcquisitionFeedEntry
+    entry: OPDSAcquisitionFeedEntry,
   ): BookDatabaseEntryType
 
   /**

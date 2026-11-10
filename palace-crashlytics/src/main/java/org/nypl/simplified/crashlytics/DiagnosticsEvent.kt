@@ -7,5 +7,5 @@ package org.nypl.simplified.crashlytics
  */
 
 class DiagnosticsEvent(
-  val code: String
+  val code: String,
 ) : RuntimeException(code)

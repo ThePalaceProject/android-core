@@ -57,14 +57,14 @@ class TimeTrackingMerge private constructor(
       AutoCloseable {
         this.executor.shutdown()
         this.executor.awaitTermination(30L, TimeUnit.SECONDS)
-      }
+      },
     )
 
     this.executor.scheduleWithFixedDelay(
       { this.tick() },
       0L,
       this.frequency.toMillis(),
-      TimeUnit.MILLISECONDS
+      TimeUnit.MILLISECONDS,
     )
 
     this.resources.add(AutoCloseable { this.tickWait.offer(Unit) })
@@ -72,7 +72,7 @@ class TimeTrackingMerge private constructor(
 
   private fun isSpanFileSuitable(
     timeOldest: Instant,
-    file: Path
+    file: Path,
   ): Boolean {
     if (!Files.isRegularFile(file)) {
       return false
@@ -160,7 +160,7 @@ class TimeTrackingMerge private constructor(
       fileTmp,
       file,
       StandardCopyOption.ATOMIC_MOVE,
-      StandardCopyOption.REPLACE_EXISTING
+      StandardCopyOption.REPLACE_EXISTING,
     )
 
     TimeTrackingDebugging.onTimeTrackingEntryCreated(
@@ -169,7 +169,7 @@ class TimeTrackingMerge private constructor(
       bookId = entry.bookID.value,
       entryId = entry.timeEntry.id,
       duringMinute = entry.timeEntry.duringMinute,
-      seconds = entry.timeEntry.secondsPlayed
+      seconds = entry.timeEntry.secondsPlayed,
     )
   }
 
@@ -178,7 +178,7 @@ class TimeTrackingMerge private constructor(
       val accountID: AccountID,
       val bookID: PlayerPalaceID,
       val libraryID: URI,
-      val targetURI: URI
+      val targetURI: URI,
     )
 
     fun mergeEntries(spans: List<TimeTrackingReceivedSpan>): List<TimeTrackingEntryOutgoing> {
@@ -191,7 +191,7 @@ class TimeTrackingMerge private constructor(
             accountID = span.accountID,
             bookID = span.bookID,
             libraryID = span.libraryID,
-            targetURI = span.targetURI
+            targetURI = span.targetURI,
           )
         var existing = spansByKey.get(key)
         if (existing == null) {
@@ -210,7 +210,7 @@ class TimeTrackingMerge private constructor(
 
     private fun mergeSpansForKey(
       key: MergeKey,
-      keySpans: MutableList<TimeTrackingReceivedSpan>
+      keySpans: MutableList<TimeTrackingReceivedSpan>,
     ): Collection<TimeTrackingEntryOutgoing> {
       keySpans.sortBy { e -> e.timeStarted }
 
@@ -221,7 +221,8 @@ class TimeTrackingMerge private constructor(
         val spanSeconds =
           Duration
             .between(span.timeStarted, span.timeEnded)
-            .toMillis() / 1_000L
+            .toMillis() /
+            1_000L
 
         val crossesMinuteBoundary =
           span.timeStarted.minute != span.timeEnded.minute
@@ -256,9 +257,9 @@ class TimeTrackingMerge private constructor(
               TimeTrackingEntry(
                 id = ULID.random(),
                 duringMinute = minute.toString(),
-                secondsPlayed = seconds.toInt()
+                secondsPlayed = seconds.toInt(),
               ),
-          )
+          ),
         )
       }
       return results.toList()
@@ -276,13 +277,13 @@ class TimeTrackingMerge private constructor(
         frequency = frequency,
         inboxDirectory = inputDirectory,
         debugDirectory = debugDirectory,
-        outboxDirectory = outputDirectory
+        outboxDirectory = outputDirectory,
       )
   }
 
   override fun awaitTick(
     timeout: Long,
-    unit: TimeUnit
+    unit: TimeUnit,
   ) {
     this.tickWait.poll(timeout, unit)
   }

@@ -23,7 +23,7 @@ data class OPDSIndirectAcquisition(
    * Extra properties associated with the acquisition.
    */
 
-  val properties: Map<String, String>
+  val properties: Map<String, String>,
 ) : Serializable {
   /**
    * Find an indirect acquisition with the given type.
@@ -50,7 +50,8 @@ data class OPDSIndirectAcquisition(
    * @return The acquisition, or empty if no acquisition exists with the given type
    */
 
-  fun findTypeOptional(wantType: MIMEType): Optional<OPDSIndirectAcquisition> = Optional.ofNullable(this.findType(wantType))
+  fun findTypeOptional(wantType: MIMEType): Optional<OPDSIndirectAcquisition> =
+    Optional.ofNullable(this.findType(wantType))
 
   companion object {
     /**
@@ -61,7 +62,7 @@ data class OPDSIndirectAcquisition(
 
     fun findTypeIn(
       wantType: MIMEType,
-      indirects: List<OPDSIndirectAcquisition>
+      indirects: List<OPDSIndirectAcquisition>,
     ): OPDSIndirectAcquisition? = indirects.find { indirect -> indirect.findType(wantType) != null }
 
     /**
@@ -72,7 +73,7 @@ data class OPDSIndirectAcquisition(
 
     fun findTypeInOptional(
       wantType: MIMEType,
-      indirects: List<OPDSIndirectAcquisition>
+      indirects: List<OPDSIndirectAcquisition>,
     ): Optional<OPDSIndirectAcquisition> = Optional.ofNullable(this.findTypeIn(wantType, indirects))
 
     /**

@@ -36,7 +36,7 @@ data class OPDSAcquisition(
    * Extra properties associated with the acquisition.
    */
 
-  val properties: Map<String, String>
+  val properties: Map<String, String>,
 ) : Serializable {
   /**
    * @return The set of final content types. That is, the set of content types that are accessible
@@ -57,7 +57,7 @@ data class OPDSAcquisition(
    */
 
   enum class Relation(
-    val uri: URI
+    val uri: URI,
   ) {
     /**
      * An item can be borrowed.
@@ -93,7 +93,7 @@ data class OPDSAcquisition(
      * An item can be subscribed to.
      */
 
-    ACQUISITION_SUBSCRIBE(URI.create("http://opds-spec.org/acquisition/subscribe"))
+    ACQUISITION_SUBSCRIBE(URI.create("http://opds-spec.org/acquisition/subscribe")),
   }
 
   companion object {

@@ -14,7 +14,7 @@ import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 class CatalogTimedLoanDrawable(
   private val context: Context,
   private val screenSizeInformation: ScreenSizeInformationType,
-  private val durationText: String
+  private val durationText: String,
 ) : Drawable() {
   private val size: Int =
     this.screenSizeInformation.dpToPixels(12).toInt()

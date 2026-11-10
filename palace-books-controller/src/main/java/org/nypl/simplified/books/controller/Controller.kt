@@ -84,7 +84,7 @@ class Controller private constructor(
   private val accountEvents: Subject<AccountEvent>,
   private val profileEvents: Subject<ProfileEvent>,
   private val services: ServiceDirectoryType,
-  private val taskExecutor: ListeningExecutorService
+  private val taskExecutor: ListeningExecutorService,
 ) : BooksControllerType,
   BooksPreviewControllerType,
   ProfilesControllerType {
@@ -142,7 +142,7 @@ class Controller private constructor(
         services = this.services,
         clock = { Instant.now() },
         cacheDirectory = this.cacheDirectory,
-        temporaryDirectory = this.temporaryDirectory
+        temporaryDirectory = this.temporaryDirectory,
       )
 
     this.borrows =
@@ -160,7 +160,7 @@ class Controller private constructor(
       this.logger.debug("Scheduling profile data load...")
       ProfileDataLoadTask(
         this.profiles.currentProfile(),
-        this.bookRegistry
+        this.bookRegistry,
       ).run()
     }
   }
@@ -181,7 +181,8 @@ class Controller private constructor(
       }
 
       is AccountProviderRegistryEvent.SourceFailed,
-      AccountProviderRegistryEvent.StatusChanged -> {
+      AccountProviderRegistryEvent.StatusChanged,
+      -> {
       }
     }
 
@@ -191,7 +192,7 @@ class Controller private constructor(
       ProfileAccountProviderUpdatedTask(
         profile = profileCurrent,
         accountProviderID = event.id,
-        accountProviders = this.accountProviders
+        accountProviders = this.accountProviders,
       )
     }
   }
@@ -248,13 +249,13 @@ class Controller private constructor(
       notificationTokenHttpCalls = notificationTokenHttpCalls,
       loginStrings = this.accountLoginStringResources,
       patronParsers = this.patronUserProfileParsers,
-      request = request
+      request = request,
     ).call()
   }
 
   private fun runSyncIfLoginSucceeded(
     result: TaskResult<Unit>,
-    accountID: AccountID
+    accountID: AccountID,
   ): FluentFuture<TaskResult<Unit>> =
     when (result) {
       is TaskResult.Success -> {
@@ -275,8 +276,8 @@ class Controller private constructor(
         accountProviderID = provider,
         accountProviders = this.accountProviders,
         profiles = this.profiles,
-        strings = this.profileAccountCreationStringResources
-      )
+        strings = this.profileAccountCreationStringResources,
+      ),
     )
 
   override fun profileAccountCreateCustomOPDS(opdsFeed: URI): FluentFuture<TaskResult<AccountType>> =
@@ -288,8 +289,8 @@ class Controller private constructor(
         opdsURI = opdsFeed,
         opdsFeedParser = this.feedParser,
         profiles = this.profiles,
-        strings = this.profileAccountCreationStringResources
-      )
+        strings = this.profileAccountCreationStringResources,
+      ),
     )
 
   override fun profileAccountCreate(provider: URI): FluentFuture<TaskResult<AccountType>> =
@@ -299,8 +300,8 @@ class Controller private constructor(
         accountProviderID = provider,
         accountProviders = this.accountProviders,
         profiles = this.profiles,
-        strings = this.profileAccountCreationStringResources
-      )
+        strings = this.profileAccountCreationStringResources,
+      ),
     )
 
   override fun profileAccountDeleteByProvider(provider: URI): FluentFuture<TaskResult<Unit>> =
@@ -310,8 +311,8 @@ class Controller private constructor(
         accountProviderID = provider,
         profiles = this.profiles,
         profileEvents = this.profileEvents,
-        strings = this.profileAccountDeletionStringResources
-      )
+        strings = this.profileAccountDeletionStringResources,
+      ),
     )
 
   @Throws(AccountsDatabaseNonexistentException::class)
@@ -330,7 +331,7 @@ class Controller private constructor(
         .profileCurrent()
         .accountsByProvider()
         .values
-        .map { account -> account.provider }
+        .map { account -> account.provider },
     )
 
   override fun profileAccountLogout(accountID: AccountID): FluentFuture<TaskResult<Unit>> =
@@ -346,7 +347,7 @@ class Controller private constructor(
         http = this.lsHttp,
         notificationTokenHttpCalls = this.notificationTokenHttpCalls,
         logoutStrings = this.accountLogoutStringResources,
-        profile = profile
+        profile = profile,
       ).call()
     }
 
@@ -355,8 +356,8 @@ class Controller private constructor(
       ProfileUpdateTask(
         this.profileEvents,
         profiles = this.profiles,
-        update = update
-      )
+        update = update,
+      ),
     )
 
   override fun profileFeed(request: ProfileFeedRequest): FluentFuture<Feed.FeedWithoutGroups> =
@@ -365,8 +366,8 @@ class Controller private constructor(
         bookFormatSupport = this.bookFormatSupport,
         bookRegistry = this.bookRegistry,
         profiles = this,
-        request = request
-      )
+        request = request,
+      ),
     )
 
   @Throws(AccountsDatabaseNonexistentException::class)
@@ -390,8 +391,8 @@ class Controller private constructor(
         http = this.lsHttp,
         profile = this.profileCurrent(),
         accountProviderResolutionStrings = strings,
-        authDocumentParsers = parsers
-      )
+        authDocumentParsers = parsers,
+      ),
     )
   }
 
@@ -399,7 +400,7 @@ class Controller private constructor(
     accountID: AccountID,
     bookID: BookID,
     entry: OPDSAcquisitionFeedEntry,
-    samlDownloadContext: SAMLDownloadContext?
+    samlDownloadContext: SAMLDownloadContext?,
   ): FluentFuture<TaskResult<*>> =
     this.submitTask(
       Callable<TaskResult<*>> {
@@ -407,18 +408,18 @@ class Controller private constructor(
           BorrowRequest.Start(
             accountId = accountID,
             opdsAcquisitionFeedEntry = entry,
-            samlDownloadContext = samlDownloadContext
+            samlDownloadContext = samlDownloadContext,
           )
 
         val borrowTask = BorrowTask.createBorrowTask(this.borrowRequirements, request)
         borrows[bookID] = borrowTask
         borrowTask.execute()
-      }
+      },
     )
 
   override fun bookBorrowFailedDismiss(
     accountID: AccountID,
-    bookID: BookID
+    bookID: BookID,
   ) {
     this.submitTask(
       BookBorrowFailedDismissTask(
@@ -426,13 +427,13 @@ class Controller private constructor(
         profiles = this.profiles,
         bookID = bookID,
         bookRegistry = this.bookRegistry,
-      )
+      ),
     )
   }
 
   override fun bookCancelDownloadAndDelete(
     accountID: AccountID,
-    bookID: BookID
+    bookID: BookID,
   ): FluentFuture<TaskResult<Unit>> {
     this.borrows[bookID]?.cancel()
     return this.bookDelete(accountID, bookID)
@@ -441,7 +442,7 @@ class Controller private constructor(
   override fun bookReport(
     accountID: AccountID,
     feedEntry: FeedEntry.FeedEntryOPDS,
-    reportType: String
+    reportType: String,
   ): FluentFuture<TaskResult<Unit>> = throw NotImplementedError()
 
   override fun booksSync(accountID: AccountID): FluentFuture<TaskResult<Unit>> =
@@ -455,8 +456,8 @@ class Controller private constructor(
         feedParser = this.feedParser,
         feedLoader = this.feedLoader,
         patronParsers = this.patronUserProfileParsers,
-        http = this.lsHttp
-      )
+        http = this.lsHttp,
+      ),
     )
 
   override fun bookRevoke(
@@ -475,8 +476,8 @@ class Controller private constructor(
           bookID = bookId,
           bookRegistry = this.bookRegistry,
           feedLoader = this.feedLoader,
-          revokeStrings = this.revokeStrings
-        )
+          revokeStrings = this.revokeStrings,
+        ),
       )
 
     return futureStart.flatMap { result ->
@@ -489,7 +490,7 @@ class Controller private constructor(
 
   override fun bookDelete(
     accountID: AccountID,
-    bookId: BookID
+    bookId: BookID,
   ): FluentFuture<TaskResult<Unit>> {
     this.publishRequestingDelete(bookId)
     return this.submitTask(
@@ -499,7 +500,7 @@ class Controller private constructor(
         profiles = this.profiles,
         bookID = bookId,
         bookRegistry = this.bookRegistry,
-      )
+      ),
     )
   }
 
@@ -508,15 +509,15 @@ class Controller private constructor(
       this.bookRegistry.update(
         BookWithStatus(
           book = bookWithStatus.book,
-          status = BookStatus.RequestingRevoke(bookId)
-        )
+          status = BookStatus.RequestingRevoke(bookId),
+        ),
       )
     }
   }
 
   override fun bookRevokeFailedDismiss(
     accountID: AccountID,
-    bookID: BookID
+    bookID: BookID,
   ): FluentFuture<TaskResult<Unit>> =
     this.submitTask(
       BookRevokeFailedDismissTask(
@@ -525,7 +526,7 @@ class Controller private constructor(
         profiles = this.profiles,
         bookID = bookID,
         bookRegistry = this.bookRegistry,
-      )
+      ),
     )
 
   override fun handleBookPreviewStatus(entry: FeedEntry.FeedEntryOPDS): FluentFuture<TaskResult<*>> {
@@ -533,7 +534,7 @@ class Controller private constructor(
       BookPreviewRequirements(
         clock = { Instant.now() },
         httpClient = this.lsHttp,
-        temporaryDirectory = temporaryDirectory
+        temporaryDirectory = temporaryDirectory,
       )
 
     return this.submitTask(
@@ -543,10 +544,10 @@ class Controller private constructor(
             bookPreviewRegistry = bookPreviewRegistry,
             bookPreviewRequirements = requirements,
             feedEntry = entry.feedEntry,
-            format = entry.probableFormat
+            format = entry.probableFormat,
           )
         bookPreviewTask.execute()
-      }
+      },
     )
   }
 
@@ -564,7 +565,7 @@ class Controller private constructor(
       executorService: ExecutorService,
       accountEvents: Subject<AccountEvent>,
       profileEvents: Subject<ProfileEvent>,
-      cacheDirectory: File
+      cacheDirectory: File,
     ): Controller =
       Controller(
         application = application,
@@ -572,7 +573,7 @@ class Controller private constructor(
         accountEvents = accountEvents,
         profileEvents = profileEvents,
         services = services,
-        taskExecutor = MoreExecutors.listeningDecorator(executorService)
+        taskExecutor = MoreExecutors.listeningDecorator(executorService),
       )
   }
 }

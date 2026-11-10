@@ -24,5 +24,5 @@ data class ViewerParameters(
    * A viewer wants to open the login screen.
    */
 
-  val onLoginRequested: (AccountID) -> Unit
+  val onLoginRequested: (AccountID) -> Unit,
 )

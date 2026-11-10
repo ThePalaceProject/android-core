@@ -13,7 +13,7 @@ interface TaskRecorderType {
 
   fun addAttribute(
     name: String,
-    value: String
+    value: String,
   )
 
   /**
@@ -50,7 +50,7 @@ interface TaskRecorderType {
     message: String,
     errorCode: String,
     exception: Throwable? = null,
-    extraMessages: List<String>
+    extraMessages: List<String>,
   ): TaskStep
 
   /**
@@ -63,7 +63,7 @@ interface TaskRecorderType {
     message: String,
     errorCode: String,
     exception: Throwable,
-    extraMessages: List<String>
+    extraMessages: List<String>,
   ): TaskStep
 
   /**

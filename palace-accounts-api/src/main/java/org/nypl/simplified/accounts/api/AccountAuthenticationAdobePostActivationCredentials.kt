@@ -32,5 +32,5 @@ data class AccountAuthenticationAdobePostActivationCredentials(
    *         if the activation was performed by an application version that did not record it
    */
 
-  val version: Version? = null
+  val version: Version? = null,
 )

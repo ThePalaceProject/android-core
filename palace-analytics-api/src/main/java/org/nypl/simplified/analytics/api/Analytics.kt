@@ -10,7 +10,7 @@ import java.util.ServiceLoader
 
 class Analytics private constructor(
   private val logger: Logger,
-  private val consumers: List<AnalyticsSystem>
+  private val consumers: List<AnalyticsSystem>,
 ) : AnalyticsType {
   init {
     this.logger.debug("initialized {} analytics systems", this.consumers.size)
@@ -33,19 +33,20 @@ class Analytics private constructor(
           .map { system ->
             LOG.debug("created analytics system: ${system::class.java.canonicalName}")
             system
-          }
+          },
       )
 
     private fun startProvider(
       provider: AnalyticsSystemProvider,
-      configuration: AnalyticsConfiguration
+      configuration: AnalyticsConfiguration,
     ): AnalyticsSystem? =
       try {
         provider.create(configuration)
       } catch (e: Exception) {
         LOG.error(
           "{}: failed to start analytics system: {}",
-          provider::class.java.canonicalName, e
+          provider::class.java.canonicalName,
+          e,
         )
         null
       }

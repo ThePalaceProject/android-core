@@ -19,7 +19,7 @@ class ProfileAccountCreateOrReturnExistingTask(
   private val accountProviderID: URI,
   private val accountProviders: AccountProviderRegistryType,
   private val profiles: ProfilesDatabaseType,
-  private val strings: ProfileAccountCreationStringResourcesType
+  private val strings: ProfileAccountCreationStringResourcesType,
 ) : Callable<TaskResult<AccountType>> {
   private val logger = LoggerFactory.getLogger(ProfileAccountCreateOrReturnExistingTask::class.java)
   private val taskRecorder = TaskRecorder.create()
@@ -50,7 +50,7 @@ class ProfileAccountCreateOrReturnExistingTask(
         message = this.strings.unexpectedException,
         errorCode = "unexpectedException",
         exception = e,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
 
       this.publishFailureEvent()
@@ -63,14 +63,15 @@ class ProfileAccountCreateOrReturnExistingTask(
   private fun publishSuccessEvent(account: AccountType) =
     this.accountEvents.onNext(
       AccountEventCreationSucceeded(
-        this.strings.creatingAccountSucceeded, account.id
-      )
+        this.strings.creatingAccountSucceeded,
+        account.id,
+      ),
     )
 
   private fun publishFailureEvent() =
     this.accountEvents.onNext(
       AccountEventCreationFailed(
-        this.taskRecorder.finishFailure<AccountType>()
-      )
+        this.taskRecorder.finishFailure<AccountType>(),
+      ),
     )
 }

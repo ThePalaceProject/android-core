@@ -53,18 +53,18 @@ class TimeTrackingSender private constructor(
       AutoCloseable {
         this.executor.shutdown()
         this.executor.awaitTermination(30L, TimeUnit.SECONDS)
-      }
+      },
     )
     this.executor.scheduleWithFixedDelay(
       this::onTrySend,
       0L,
       this.frequency.toMillis(),
-      TimeUnit.MILLISECONDS
+      TimeUnit.MILLISECONDS,
     )
     this.resources.add(
       AutoCloseable {
         this.tickWrite.offer(Unit)
-      }
+      },
     )
   }
 
@@ -92,7 +92,7 @@ class TimeTrackingSender private constructor(
           this.diagnostics.report(
             code = DiagnosticCodes.TIME_TRACKING_LOSS,
             data = mapOf(Pair("Reason", "parseFailed")),
-            throwable = e
+            throwable = e,
           )
           this.logger.warn("Unable to parse local time tracking entry: ", e)
         }
@@ -112,7 +112,7 @@ class TimeTrackingSender private constructor(
 
   private fun sendOneBatch(
     key: TimeTrackingEntryOutgoing.Key,
-    outgoingEntries: List<TimeTrackingEntryOutgoing>
+    outgoingEntries: List<TimeTrackingEntryOutgoing>,
   ) {
     try {
       Files.createDirectories(this.debugDirectory)
@@ -124,7 +124,7 @@ class TimeTrackingSender private constructor(
           libraryId = key.libraryID.toString(),
           bookId = key.bookID.value,
           entryId = e.timeEntry.id,
-          seconds = e.timeEntry.secondsPlayed
+          seconds = e.timeEntry.secondsPlayed,
         )
       }
 
@@ -139,8 +139,8 @@ class TimeTrackingSender private constructor(
               bookId = key.bookID.value,
               libraryId = key.libraryID,
               timeTrackingUri = key.targetURI,
-              timeEntries = outgoingEntries.map { e -> e.timeEntry }
-            )
+              timeEntries = outgoingEntries.map { e -> e.timeEntry },
+            ),
         )
 
       /*
@@ -164,7 +164,7 @@ class TimeTrackingSender private constructor(
             timeTrackingDebugDirectory = this.debugDirectory.toFile(),
             libraryId = key.libraryID.toString(),
             bookId = key.bookID.value,
-            entryId = e.timeEntry.id
+            entryId = e.timeEntry.id,
           )
         }
         return
@@ -191,7 +191,7 @@ class TimeTrackingSender private constructor(
               timeTrackingDebugDirectory = this.debugDirectory.toFile(),
               libraryId = key.libraryID.toString(),
               bookId = key.bookID.value,
-              entryId = e.timeEntry.id
+              entryId = e.timeEntry.id,
             )
           }
         }
@@ -204,7 +204,7 @@ class TimeTrackingSender private constructor(
           libraryId = key.libraryID.toString(),
           bookId = key.bookID.value,
           entryId = entry.timeEntry.id,
-          exception = e
+          exception = e,
         )
       }
     } finally {
@@ -217,11 +217,11 @@ class TimeTrackingSender private constructor(
       timeTrackingDebugDirectory = this.debugDirectory.toFile(),
       libraryId = entry.libraryID.toString(),
       bookId = entry.bookID.value,
-      entryId = entry.timeEntry.id
+      entryId = entry.timeEntry.id,
     )
 
     Files.deleteIfExists(
-      this.inputDirectory.resolve("${entry.timeEntry.id}.tteo")
+      this.inputDirectory.resolve("${entry.timeEntry.id}.tteo"),
     )
   }
 
@@ -230,11 +230,11 @@ class TimeTrackingSender private constructor(
       timeTrackingDebugDirectory = this.debugDirectory.toFile(),
       libraryId = entry.libraryID.toString(),
       bookId = entry.bookID.value,
-      entryId = entry.timeEntry.id
+      entryId = entry.timeEntry.id,
     )
 
     Files.deleteIfExists(
-      this.inputDirectory.resolve("${entry.timeEntry.id}.tteo")
+      this.inputDirectory.resolve("${entry.timeEntry.id}.tteo"),
     )
   }
 
@@ -253,13 +253,13 @@ class TimeTrackingSender private constructor(
         debugDirectory = debugDirectory,
         inputDirectory = inputDirectory,
         frequency = frequency,
-        diagnostics = diagnostics
+        diagnostics = diagnostics,
       )
   }
 
   override fun awaitWrite(
     timeout: Long,
-    unit: TimeUnit
+    unit: TimeUnit,
   ) {
     this.tickWrite.poll(timeout, unit)
   }

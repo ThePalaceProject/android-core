@@ -25,7 +25,7 @@ class CatalogOPDSClients(
   val profiles: ProfilesControllerType,
   val mainClient: OPDSClientType,
   val booksClient: OPDSClientType,
-  val holdsClient: OPDSClientType
+  val holdsClient: OPDSClientType,
 ) : AutoCloseable {
   private val logger =
     LoggerFactory.getLogger(CatalogOPDSClients::class.java)
@@ -165,7 +165,7 @@ class CatalogOPDSClients(
 
   fun goToRootFeedFor(
     catalogPart: CatalogPart,
-    account: AccountType
+    account: AccountType,
   ) {
     try {
       val client = this.clientFor(catalogPart)
@@ -178,8 +178,8 @@ class CatalogOPDSClients(
               uri = account.catalogURIForAge(18),
               credentials = account.loginState.credentials,
               historyBehavior = CLEAR_HISTORY,
-              method = "GET"
-            )
+              method = "GET",
+            ),
           )
         }
 
@@ -197,11 +197,11 @@ class CatalogOPDSClients(
                       feedSelection = FeedBooksSelection.BOOKS_FEED_LOANED,
                       filterByAccountID = account.id,
                       sortBy = FeedFacet.FeedFacetPseudo.Sorting.SortBy.SORT_BY_TITLE,
-                      search = null
-                    )
+                      search = null,
+                    ),
                   ).get()
-              }
-            )
+              },
+            ),
           )
         }
 
@@ -219,11 +219,11 @@ class CatalogOPDSClients(
                       feedSelection = FeedBooksSelection.BOOKS_FEED_HOLDS,
                       filterByAccountID = account.id,
                       sortBy = FeedFacet.FeedFacetPseudo.Sorting.SortBy.SORT_BY_TITLE,
-                      search = null
-                    )
+                      search = null,
+                    ),
                   ).get()
-              }
-            )
+              },
+            ),
           )
         }
       }
@@ -238,7 +238,7 @@ class CatalogOPDSClients(
   }
 
   private class CatalogFacetPseudoTitleProvider(
-    val resources: Resources
+    val resources: Resources,
   ) : FeedFacetPseudoTitleProviderType {
     override val sortByTitle: String
       get() = this.resources.getString(R.string.feedByTitle)

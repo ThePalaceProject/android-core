@@ -30,7 +30,7 @@ data class FeedGroup(
   /**
    * @return The list of entries in the group
    */
-  val groupEntries: List<FeedEntry>
+  val groupEntries: List<FeedEntry>,
 ) {
   companion object {
     /**
@@ -41,7 +41,7 @@ data class FeedGroup(
     fun fromOPDSGroup(
       accountID: AccountID,
       filter: (OPDSAcquisitionFeedEntry) -> Boolean,
-      b: OPDSGroup
+      b: OPDSGroup,
     ): FeedGroup {
       val entries =
         b.entries
@@ -52,7 +52,7 @@ data class FeedGroup(
         account = accountID,
         groupTitle = b.title,
         groupURI = b.uri,
-        groupEntries = entries
+        groupEntries = entries,
       )
     }
 
@@ -64,13 +64,13 @@ data class FeedGroup(
     fun fromOPDSGroups(
       accountID: AccountID,
       filter: (OPDSAcquisitionFeedEntry) -> Boolean,
-      bs: Map<String, OPDSGroup>
+      bs: Map<String, OPDSGroup>,
     ): Map<String, FeedGroup> =
       bs.mapValues { (_, group) ->
         fromOPDSGroup(
           accountID = accountID,
           filter = filter,
-          b = group
+          b = group,
         )
       }
   }

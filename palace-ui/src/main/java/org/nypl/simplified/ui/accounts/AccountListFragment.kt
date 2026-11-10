@@ -12,7 +12,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.io7m.jmulticlose.core.CloseableCollection
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
-import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.accounts.api.AccountEventCreation
 import org.nypl.simplified.accounts.api.AccountEventDeletion
@@ -36,6 +35,7 @@ import org.nypl.simplified.ui.catalog.CatalogOPDSClients
 import org.nypl.simplified.ui.catalog.CatalogPart
 import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.errorpage.ErrorStrings
+import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_CONSUMED
@@ -82,8 +82,8 @@ class AccountListFragment :
         .setMessage(
           context.getString(
             R.string.accountsDeleteConfirm,
-            account.provider.displayName
-          )
+            account.provider.displayName,
+          ),
         ).setNegativeButton(R.string.accountCancel) { dialog, _ ->
           dialog.dismiss()
         }.setPositiveButton(R.string.accountsDelete) { dialog, _ ->
@@ -125,8 +125,9 @@ class AccountListFragment :
         is AccountLoggingOut,
         is AccountLoginFailed,
         is AccountLogoutFailed,
-        is AccountNotLoggedIn -> null
-      }
+        is AccountNotLoggedIn,
+        -> null
+      },
     )
   }
 
@@ -141,19 +142,19 @@ class AccountListFragment :
     profiles.profileUpdate { description ->
       description.copy(
         preferences =
-          description.preferences.copy(mostRecentAccount = account.id)
+          description.preferences.copy(mostRecentAccount = account.id),
       )
     }
 
     opdsClients.goToRootFeedFor(
       catalogPart = CatalogPart.CATALOG,
-      account = account
+      account = account,
     )
   }
 
   override fun onViewCreated(
     view: View,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ) {
     super.onViewCreated(view, savedInstanceState)
 
@@ -189,7 +190,7 @@ class AccountListFragment :
         onItemAccountSwitch = this::onAccountSwitchRequested,
         onItemAccountDetailsRequested = this::onAccountDetailsRequested,
         onItemAccountDeleteRequested = this::onAccountDeleteClicked,
-        onItemIsSelectedNow = this::onItemIsSelectedNow
+        onItemIsSelectedNow = this::onItemIsSelectedNow,
       )
 
     this.updateAccountList()
@@ -246,7 +247,7 @@ class AccountListFragment :
       profile
         .accounts()
         .values
-        .sortedWith(AccountComparator())
+        .sortedWith(AccountComparator()),
     )
     this.accountListAdapter.notifyDataSetChanged()
   }
@@ -262,7 +263,8 @@ class AccountListFragment :
 
       is AccountEventCreation.AccountEventCreationSucceeded,
       is AccountEventDeletion.AccountEventDeletionSucceeded,
-      is AccountEventUpdated -> {
+      is AccountEventUpdated,
+      -> {
         this.updateAccountList()
       }
     }
@@ -293,8 +295,8 @@ class AccountListFragment :
           body = "",
           subject = "[palace-error-report]",
           attributes = accountEvent.attributes.toSortedMap<String, String>(),
-          taskSteps = accountEvent.taskResult.steps
-        )
+          taskSteps = accountEvent.taskResult.steps,
+        ),
     )
   }
 

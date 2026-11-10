@@ -15,7 +15,7 @@ import java.io.File
 class AccountAuthenticationCredentialsStore(
   private val file: File,
   private val fileTemp: File,
-  initialCredentials: Map<AccountID, AccountAuthenticationCredentials>
+  initialCredentials: Map<AccountID, AccountAuthenticationCredentials>,
 ) : AccountAuthenticationCredentialsStoreType {
   companion object {
     /**
@@ -24,7 +24,7 @@ class AccountAuthenticationCredentialsStore(
 
     fun open(
       file: File,
-      fileTemp: File
+      fileTemp: File,
     ): AccountAuthenticationCredentialsStoreType {
       val initialCredentials =
         if (file.isFile) {
@@ -42,7 +42,7 @@ class AccountAuthenticationCredentialsStore(
         AccountAuthenticationCredentialsStore(
           file = file,
           fileTemp = fileTemp,
-          initialCredentials = initialCredentials
+          initialCredentials = initialCredentials,
         )
 
       synchronized(store.storeLock) {
@@ -69,7 +69,7 @@ class AccountAuthenticationCredentialsStore(
 
   override fun put(
     account: AccountID,
-    credentials: AccountAuthenticationCredentials
+    credentials: AccountAuthenticationCredentials,
   ) {
     synchronized(this.storeLock) {
       this.store = this.store.plus(Pair(account, credentials))
@@ -88,7 +88,7 @@ class AccountAuthenticationCredentialsStore(
     FileUtilities.fileWriteUTF8Atomically(
       this.file,
       this.fileTemp,
-      AccountAuthenticationCredentialsStoreJSON.serializeToText(this.store)
+      AccountAuthenticationCredentialsStoreJSON.serializeToText(this.store),
     )
   }
 }

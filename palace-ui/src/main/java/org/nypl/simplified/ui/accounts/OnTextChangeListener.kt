@@ -12,8 +12,8 @@ internal class OnTextChangeListener(
     sequence: CharSequence,
     start: Int,
     before: Int,
-    count: Int
-  ) -> Unit
+    count: Int,
+  ) -> Unit,
 ) : TextWatcher {
   override fun afterTextChanged(sequence: Editable) {
   }
@@ -22,7 +22,7 @@ internal class OnTextChangeListener(
     sequence: CharSequence,
     start: Int,
     count: Int,
-    after: Int
+    after: Int,
   ) {
   }
 
@@ -30,7 +30,7 @@ internal class OnTextChangeListener(
     sequence: CharSequence,
     start: Int,
     before: Int,
-    count: Int
+    count: Int,
   ) {
     this.onChanged.invoke(sequence, start, before, count)
   }

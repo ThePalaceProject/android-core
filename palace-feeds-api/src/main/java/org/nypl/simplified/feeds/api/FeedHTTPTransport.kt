@@ -24,7 +24,7 @@ import java.util.Locale
  */
 
 class FeedHTTPTransport(
-  private val http: LSHTTPClientType
+  private val http: LSHTTPClientType,
 ) : OPDSFeedTransportType<AccountAuthenticationCredentials?> {
   private val logger =
     LoggerFactory.getLogger(FeedHTTPTransport::class.java)
@@ -32,7 +32,7 @@ class FeedHTTPTransport(
   override fun getStream(
     credentials: AccountAuthenticationCredentials?,
     uri: URI,
-    method: String
+    method: String,
   ): Pair<InputStream, String?> {
     this.logger.debug("get stream: {} {}", uri, credentials)
 
@@ -56,14 +56,14 @@ class FeedHTTPTransport(
         throw FeedHTTPTransportException(
           message = status.properties.message,
           code = status.properties.status,
-          report = status.properties.problemReport
+          report = status.properties.problemReport,
         )
       }
 
       is LSHTTPResponseStatus.Failed -> {
         throw OPDSFeedTransportIOException(
           message = "Connection failed",
-          cause = IOException(status.exception)
+          cause = IOException(status.exception),
         )
       }
     }

@@ -20,5 +20,5 @@ data class SAMLDownloadContext(
    * the IdP when attempting to retrieve the original download URI.
    */
 
-  val authCompleteDownloadURI: URI
+  val authCompleteDownloadURI: URI,
 )

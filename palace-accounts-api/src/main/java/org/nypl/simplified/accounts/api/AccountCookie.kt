@@ -15,5 +15,5 @@ data class AccountCookie(
    * the name/value pair, as well as metadata attributes.
    */
 
-  val value: String
+  val value: String,
 )

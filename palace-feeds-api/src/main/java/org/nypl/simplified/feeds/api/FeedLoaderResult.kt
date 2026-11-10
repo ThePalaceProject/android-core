@@ -16,7 +16,7 @@ sealed class FeedLoaderResult {
 
   data class FeedLoaderSuccess(
     val feed: Feed,
-    val accessToken: String?
+    val accessToken: String?,
   ) : FeedLoaderResult()
 
   /**
@@ -34,13 +34,13 @@ sealed class FeedLoaderResult {
       val problemReport: LSHTTPProblemReport?,
       override val exception: Exception,
       override val message: String,
-      private val attributesInitial: Map<String, String>
+      private val attributesInitial: Map<String, String>,
     ) : FeedLoaderFailure() {
       override val attributes: Map<String, String>
         get() =
           Presentables.mergeAttributes(
             map0 = this.attributesInitial,
-            map1 = this.problemReport?.toMap() ?: emptyMap()
+            map1 = this.problemReport?.toMap() ?: emptyMap(),
           )
     }
 
@@ -52,13 +52,13 @@ sealed class FeedLoaderResult {
       val problemReport: LSHTTPProblemReport?,
       override val exception: Exception,
       override val message: String,
-      private val attributesInitial: Map<String, String>
+      private val attributesInitial: Map<String, String>,
     ) : FeedLoaderFailure() {
       override val attributes: Map<String, String>
         get() =
           Presentables.mergeAttributes(
             map0 = this.attributesInitial,
-            map1 = this.problemReport?.toMap() ?: emptyMap()
+            map1 = this.problemReport?.toMap() ?: emptyMap(),
           )
     }
   }
@@ -70,7 +70,7 @@ sealed class FeedLoaderResult {
 
     fun wrapException(
       uri: URI,
-      exception: Throwable
+      exception: Throwable,
     ): FeedLoaderFailure =
       FeedLoaderFailure.FeedLoaderFailedGeneral(
         problemReport = null,
@@ -81,7 +81,7 @@ sealed class FeedLoaderResult {
             java.lang.Exception(exception)
           },
         message = exception.localizedMessage ?: "",
-        attributesInitial = sortedMapOf(Pair("Feed URI", uri.toASCIIString()))
+        attributesInitial = sortedMapOf(Pair("Feed URI", uri.toASCIIString())),
       )
   }
 }

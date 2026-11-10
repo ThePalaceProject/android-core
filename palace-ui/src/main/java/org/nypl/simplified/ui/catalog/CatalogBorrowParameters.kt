@@ -9,5 +9,5 @@ data class CatalogBorrowParameters(
   val accountID: AccountID,
   val bookID: BookID,
   val entry: OPDSAcquisitionFeedEntry,
-  val samlDownloadContext: SAMLDownloadContext?
+  val samlDownloadContext: SAMLDownloadContext?,
 )

@@ -28,7 +28,7 @@ class SettingsDocumentViewerFragment :
   companion object :
     ScreenDefinitionFactoryType<DocumentTarget, SettingsDocumentViewerFragment> {
     private class ScreenSettingsDocument(
-      private val documentTarget: DocumentTarget
+      private val documentTarget: DocumentTarget,
     ) : ScreenDefinitionType<DocumentTarget, SettingsDocumentViewerFragment> {
       override fun setup() {
         SettingsDocumentViewerModel.documentTarget = this.documentTarget
@@ -39,14 +39,15 @@ class SettingsDocumentViewerFragment :
       override fun fragment(): SettingsDocumentViewerFragment = SettingsDocumentViewerFragment()
     }
 
-    override fun createScreenDefinition(p: DocumentTarget): ScreenDefinitionType<DocumentTarget, SettingsDocumentViewerFragment> =
-      ScreenSettingsDocument(p)
+    override fun createScreenDefinition(
+      p: DocumentTarget,
+    ): ScreenDefinitionType<DocumentTarget, SettingsDocumentViewerFragment> = ScreenSettingsDocument(p)
   }
 
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ): View {
     val view =
       inflater.inflate(R.layout.settings_document_viewer, container, false)

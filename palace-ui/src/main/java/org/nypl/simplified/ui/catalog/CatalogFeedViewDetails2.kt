@@ -288,7 +288,7 @@ class CatalogFeedViewDetails2(
     this.bottomSheet.drawerCloseInstantly()
     this.bottomSheet.drawerSetHandleAccessibilityStrings(
       openHandle = R.string.catalogAccessibilityOpenCheckoutDrawer,
-      closeHandle = R.string.catalogAccessibilityCloseCheckoutDrawer
+      closeHandle = R.string.catalogAccessibilityCloseCheckoutDrawer,
     )
     this.bottomSheet.setOpenListener(
       object : PalaceBottomSheetType.SheetOpenListenerType {
@@ -335,7 +335,7 @@ class CatalogFeedViewDetails2(
             }
           }
         }
-      }
+      },
     )
 
     this.scrollView.isSaveEnabled = false
@@ -350,7 +350,7 @@ class CatalogFeedViewDetails2(
     (this.relatedListView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
     this.relatedListView.setItemViewCacheSize(8)
     this.relatedListView.addItemDecoration(
-      CatalogFeedWithGroupsDecorator(this.screenSize.dpToPixels(16).toInt())
+      CatalogFeedWithGroupsDecorator(this.screenSize.dpToPixels(16).toInt()),
     )
     this.relatedListView.adapter = this.relatedAdapter
 
@@ -472,7 +472,7 @@ class CatalogFeedViewDetails2(
       this.interpolate(
         minimum = this.spacerSizeMin,
         maximum = heightDiff.toInt(),
-        position = offset
+        position = offset,
       )
 
     if (newSpacerSize != this.spacerSize) {
@@ -483,7 +483,7 @@ class CatalogFeedViewDetails2(
   private fun interpolate(
     minimum: Int,
     maximum: Int,
-    position: Double
+    position: Double,
   ): Int = ((maximum.toDouble() * (1.0 - position)) + (minimum.toDouble() * position)).toInt()
 
   private fun adjustImageY(appBar: ViewGroup): Float {
@@ -502,7 +502,7 @@ class CatalogFeedViewDetails2(
 
   fun bind(
     account: AccountProviderType,
-    newEntry: FeedEntry.FeedEntryOPDS
+    newEntry: FeedEntry.FeedEntryOPDS,
   ) {
     val targetHeight =
       this.root.resources.getDimensionPixelSize(R.dimen.catalogBookDetailCoverHeight)
@@ -512,14 +512,14 @@ class CatalogFeedViewDetails2(
       imageView = this.cover,
       hasBadge = true,
       width = 0,
-      height = targetHeight
+      height = targetHeight,
     )
 
     this.imageLoader.loadCoverBackgroundInto(
       entry = newEntry,
       imageView = this.imageUnderlay,
       width = 0,
-      height = 0
+      height = 0,
     ) { color ->
       this.applyToolbarTextColor(color)
     }
@@ -529,7 +529,7 @@ class CatalogFeedViewDetails2(
       imageView = this.bottomSheetCover,
       hasBadge = true,
       width = 0,
-      height = this.screenSize.dpToPixels(80).toInt()
+      height = this.screenSize.dpToPixels(80).toInt(),
     )
 
     this.bookTitle.text =
@@ -568,7 +568,7 @@ class CatalogFeedViewDetails2(
     return this.root.resources.getString(
       R.string.catalogDurationFormat,
       hours.standardHours.toString(),
-      remaining.standardMinutes.toString()
+      remaining.standardMinutes.toString(),
     )
   }
 
@@ -698,7 +698,7 @@ class CatalogFeedViewDetails2(
       rowVal.context.theme.resolveAttribute(
         android.R.attr.selectableItemBackground,
         outValue,
-        true
+        true,
       )
       rowVal.setBackgroundResource(outValue.resourceId)
       rowVal.setOnClickListener {
@@ -706,7 +706,7 @@ class CatalogFeedViewDetails2(
           this.callbacks.onFeedSelected(
             accountID = newEntry.accountID,
             title = series.name,
-            uri = series.link
+            uri = series.link,
           )
         }, 250L)
       }
@@ -831,13 +831,13 @@ class CatalogFeedViewDetails2(
     when (status.status) {
       is DownloadExternalAuthenticationInProgress -> {
         this.onBookStatusDownloadExternalAuthenticationInProgress(
-          status as CatalogBookStatus<DownloadExternalAuthenticationInProgress>
+          status as CatalogBookStatus<DownloadExternalAuthenticationInProgress>,
         )
       }
 
       is DownloadWaitingForExternalAuthentication -> {
         this.onBookStatusDownloadWaitingForExternalAuthentication(
-          status as CatalogBookStatus<DownloadWaitingForExternalAuthentication>
+          status as CatalogBookStatus<DownloadWaitingForExternalAuthentication>,
         )
       }
 
@@ -934,7 +934,7 @@ class CatalogFeedViewDetails2(
       },
       actionInBottomSheet = {
         this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
-      }
+      },
     )
     this.reconfigureButton1(
       text = R.string.catalogDetails,
@@ -942,7 +942,7 @@ class CatalogFeedViewDetails2(
       actionInPage = {
         this.openDrawer()
       },
-      actionInBottomSheet = { this.callbacks.onErrorDetailsDisplayRequested(status.status.result) }
+      actionInBottomSheet = { this.callbacks.onErrorDetailsDisplayRequested(status.status.result) },
     )
   }
 
@@ -963,7 +963,7 @@ class CatalogFeedViewDetails2(
       },
       actionInBottomSheet = {
         this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
-      }
+      },
     )
     this.reconfigureButton1(
       text = R.string.catalogDetails,
@@ -971,7 +971,7 @@ class CatalogFeedViewDetails2(
       actionInPage = {
         this.openDrawer()
       },
-      actionInBottomSheet = { this.callbacks.onErrorDetailsDisplayRequested(status.status.result) }
+      actionInBottomSheet = { this.callbacks.onErrorDetailsDisplayRequested(status.status.result) },
     )
   }
 
@@ -992,13 +992,13 @@ class CatalogFeedViewDetails2(
       },
       actionInBottomSheet = {
         this.callbacks.onBookRequestRevoke(status.book)
-      }
+      },
     )
     this.reconfigureButton1(
       text = R.string.catalogDetails,
       accessibilityTextOverride = null,
       actionInPage = { this.openDrawer() },
-      actionInBottomSheet = { this.callbacks.onErrorDetailsDisplayRequested(status.status.result) }
+      actionInBottomSheet = { this.callbacks.onErrorDetailsDisplayRequested(status.status.result) },
     )
   }
 
@@ -1019,13 +1019,13 @@ class CatalogFeedViewDetails2(
       },
       actionInBottomSheet = {
         this.callbacks.onBookRequestRevoke(status.book)
-      }
+      },
     )
     this.reconfigureButton1(
       text = R.string.catalogDetails,
       accessibilityTextOverride = null,
       actionInPage = { this.openDrawer() },
-      actionInBottomSheet = { this.callbacks.onErrorDetailsDisplayRequested(status.status.result) }
+      actionInBottomSheet = { this.callbacks.onErrorDetailsDisplayRequested(status.status.result) },
     )
   }
 
@@ -1046,13 +1046,13 @@ class CatalogFeedViewDetails2(
       },
       actionInBottomSheet = {
         this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
-      }
+      },
     )
     this.reconfigureButton1(
       text = R.string.catalogDetails,
       accessibilityTextOverride = null,
       actionInPage = { this.openDrawer() },
-      actionInBottomSheet = { this.callbacks.onErrorDetailsDisplayRequested(status.status.result) }
+      actionInBottomSheet = { this.callbacks.onErrorDetailsDisplayRequested(status.status.result) },
     )
   }
 
@@ -1073,13 +1073,13 @@ class CatalogFeedViewDetails2(
       },
       actionInBottomSheet = {
         this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
-      }
+      },
     )
     this.reconfigureButton1(
       text = R.string.catalogDetails,
       accessibilityTextOverride = null,
       actionInPage = { this.openDrawer() },
-      actionInBottomSheet = { this.callbacks.onErrorDetailsDisplayRequested(status.status.result) }
+      actionInBottomSheet = { this.callbacks.onErrorDetailsDisplayRequested(status.status.result) },
     )
   }
 
@@ -1100,12 +1100,12 @@ class CatalogFeedViewDetails2(
         this.bottomSheetInfoGenericText.text =
           this.bottomSheetInfoGenericText.resources.getString(
             R.string.catalogBookAvailabilityHeldQueue,
-            queue
+            queue,
           )
       } else {
         this.bottomSheetInfoGenericText.text =
           this.bottomSheetInfoGenericText.resources.getString(
-            R.string.catalogBookAvailabilityHeldIndefinite
+            R.string.catalogBookAvailabilityHeldIndefinite,
           )
       }
     }
@@ -1115,7 +1115,7 @@ class CatalogFeedViewDetails2(
       accessibilityTextOverride =
         this.root.resources.getString(
           R.string.catalogAccessibilityBookManageHold,
-          status.book.entry.title
+          status.book.entry.title,
         ),
       actionInPage = {
         this.openDrawer()
@@ -1123,7 +1123,7 @@ class CatalogFeedViewDetails2(
       },
       actionInBottomSheet = {
         this.callbacks.onBookRequestRevoke(status.book)
-      }
+      },
     )
 
     if (held.isRevocable) {
@@ -1138,7 +1138,7 @@ class CatalogFeedViewDetails2(
     BORROWING,
     GENERIC,
     PROGRESS,
-    BORROWING_AND_PROGRESS
+    BORROWING_AND_PROGRESS,
   }
 
   /**
@@ -1147,7 +1147,7 @@ class CatalogFeedViewDetails2(
 
   private fun configureInfoContainer(
     setState: InfoState,
-    andThen: () -> Unit
+    andThen: () -> Unit,
   ) = when (setState) {
     NONE -> {
       this.setVisibility(this.bottomSheetInfoContainer, View.INVISIBLE)
@@ -1203,7 +1203,7 @@ class CatalogFeedViewDetails2(
       accessibilityTextOverride =
         this.root.resources.getString(
           R.string.catalogAccessibilityBookBorrow,
-          status.book.entry.title
+          status.book.entry.title,
         ),
       actionInPage = {
         this.openDrawer()
@@ -1211,7 +1211,7 @@ class CatalogFeedViewDetails2(
       },
       actionInBottomSheet = {
         this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
-      }
+      },
     )
 
     this.reconfigurePreviewButton(status)
@@ -1228,7 +1228,7 @@ class CatalogFeedViewDetails2(
       accessibilityTextOverride =
         this.root.resources.getString(
           R.string.catalogAccessibilityBookPlaceHold,
-          status.book.entry.title
+          status.book.entry.title,
         ),
       actionInPage = {
         this.openDrawer()
@@ -1236,7 +1236,7 @@ class CatalogFeedViewDetails2(
       },
       actionInBottomSheet = {
         this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
-      }
+      },
     )
     this.reconfigurePreviewButton(status)
   }
@@ -1254,7 +1254,7 @@ class CatalogFeedViewDetails2(
       accessibilityTextOverride =
         this.root.resources.getString(
           R.string.catalogAccessibilityBookBorrow,
-          status.book.entry.title
+          status.book.entry.title,
         ),
       actionInPage = {
         this.openDrawer()
@@ -1262,7 +1262,7 @@ class CatalogFeedViewDetails2(
       },
       actionInBottomSheet = {
         this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
-      }
+      },
     )
     this.reconfigurePreviewButton(status)
   }
@@ -1276,10 +1276,10 @@ class CatalogFeedViewDetails2(
           accessibilityTextOverride =
             this.root.resources.getString(
               R.string.catalogAccessibilityBookPreviewRead,
-              status.book.entry.title
+              status.book.entry.title,
             ),
           actionInPage = { this.callbacks.onBookRequestPreviewOpen(status.book) },
-          actionInBottomSheet = { this.callbacks.onBookRequestPreviewOpen(status.book) }
+          actionInBottomSheet = { this.callbacks.onBookRequestPreviewOpen(status.book) },
         )
       }
 
@@ -1313,7 +1313,7 @@ class CatalogFeedViewDetails2(
         text = this.readButtonString(status.book),
         accessibilityTextOverride = this.readButtonAccessibilityLabel(status.book),
         actionInPage = { this.callbacks.onBookRequestViewerOpen(status.book, format) },
-        actionInBottomSheet = { this.callbacks.onBookRequestViewerOpen(status.book, format) }
+        actionInBottomSheet = { this.callbacks.onBookRequestViewerOpen(status.book, format) },
       )
     }
 
@@ -1324,7 +1324,7 @@ class CatalogFeedViewDetails2(
         accessibilityTextOverride =
           this.root.resources.getString(
             R.string.catalogAccessibilityBookRevokeLoan,
-            status.book.entry.title
+            status.book.entry.title,
           ),
         actionInPage = {
           this.openDrawer()
@@ -1332,7 +1332,7 @@ class CatalogFeedViewDetails2(
         },
         actionInBottomSheet = {
           this.callbacks.onBookRequestRevoke(status.book)
-        }
+        },
       )
     } else {
       this.reconfigurePreviewButton(status)
@@ -1387,7 +1387,7 @@ class CatalogFeedViewDetails2(
       accessibilityTextOverride =
         this.root.resources.getString(
           R.string.catalogAccessibilityBookDownload,
-          status.book.entry.title
+          status.book.entry.title,
         ),
       actionInPage = {
         this.openDrawer()
@@ -1395,7 +1395,7 @@ class CatalogFeedViewDetails2(
       },
       actionInBottomSheet = {
         this.callbacks.onBookRequestBorrow(status.toBorrowParameters())
-      }
+      },
     )
 
     if (this.callbacks.onBookCanBeRevoked(status.book, status.status)) {
@@ -1405,7 +1405,7 @@ class CatalogFeedViewDetails2(
         accessibilityTextOverride =
           this.root.resources.getString(
             R.string.catalogAccessibilityBookRevokeLoan,
-            status.book.entry.title
+            status.book.entry.title,
           ),
         actionInPage = {
           this.openDrawer()
@@ -1413,7 +1413,7 @@ class CatalogFeedViewDetails2(
         },
         actionInBottomSheet = {
           this.callbacks.onBookRequestRevoke(status.book)
-        }
+        },
       )
     } else {
       this.reconfigurePreviewButton(status)
@@ -1456,7 +1456,7 @@ class CatalogFeedViewDetails2(
     this.bottomSheetInfoBorrowingTime.text =
       this.bottomSheetInfoBorrowingTime.resources.getString(
         R.string.catalogBookDaysRemaining,
-        days.days.toString()
+        days.days.toString(),
       )
   }
 
@@ -1506,7 +1506,7 @@ class CatalogFeedViewDetails2(
       accessibilityTextOverride =
         this.root.resources.getString(
           R.string.catalogAccessibilityBookDownloadCancel,
-          status.book.entry.title
+          status.book.entry.title,
         ),
       actionInPage = {
         this.openDrawer()
@@ -1514,7 +1514,7 @@ class CatalogFeedViewDetails2(
       },
       actionInBottomSheet = {
         this.callbacks.onBookRequestBorrowCancel(status.book)
-      }
+      },
     )
   }
 
@@ -1527,7 +1527,9 @@ class CatalogFeedViewDetails2(
     this.bottomSheetInfoProgress.setProgress((percent ?: 0.0).toInt(), true)
   }
 
-  private fun onBookStatusDownloadWaitingForExternalAuthentication(status: CatalogBookStatus<DownloadWaitingForExternalAuthentication>) {
+  private fun onBookStatusDownloadWaitingForExternalAuthentication(
+    status: CatalogBookStatus<DownloadWaitingForExternalAuthentication>,
+  ) {
     val expires = this.loanExpiryDate
     if (expires != null) {
       this.configureInfoContainer(BORROWING_AND_PROGRESS) {
@@ -1543,7 +1545,9 @@ class CatalogFeedViewDetails2(
     this.callbacks.onBookRequestSAMLDownload(status)
   }
 
-  private fun onBookStatusDownloadExternalAuthenticationInProgress(status: CatalogBookStatus<DownloadExternalAuthenticationInProgress>) {
+  private fun onBookStatusDownloadExternalAuthenticationInProgress(
+    status: CatalogBookStatus<DownloadExternalAuthenticationInProgress>,
+  ) {
     val expires = this.loanExpiryDate
     if (expires != null) {
       this.configureInfoContainer(BORROWING_AND_PROGRESS) {
@@ -1567,7 +1571,7 @@ class CatalogFeedViewDetails2(
     @StringRes text: Int,
     accessibilityTextOverride: String?,
     actionInPage: () -> Unit,
-    actionInBottomSheet: () -> Unit
+    actionInBottomSheet: () -> Unit,
   ) {
     this.bookButton0.contentDescription = accessibilityTextOverride
     this.bookButton0.setText(text)
@@ -1592,7 +1596,7 @@ class CatalogFeedViewDetails2(
     @StringRes text: Int,
     accessibilityTextOverride: String?,
     actionInPage: () -> Unit,
-    actionInBottomSheet: () -> Unit
+    actionInBottomSheet: () -> Unit,
   ) {
     this.bookButton1.contentDescription = accessibilityTextOverride
     this.bookButton1.visibility = View.VISIBLE
@@ -1612,7 +1616,7 @@ class CatalogFeedViewDetails2(
 
   private fun setVisibility(
     view: View,
-    visibility: Int
+    visibility: Int,
   ) {
     if (view.visibility != visibility) {
       view.visibility = visibility

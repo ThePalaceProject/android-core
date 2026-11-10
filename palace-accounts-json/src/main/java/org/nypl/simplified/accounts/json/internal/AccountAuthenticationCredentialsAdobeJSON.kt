@@ -39,7 +39,7 @@ object AccountAuthenticationCredentialsAdobeJSON {
         AccountAuthenticationAdobePostActivationCredentials(
           deviceID = AdobeDeviceID(JSONParserUtilities.getString(activation, "device_id")),
           userID = AdobeUserID(JSONParserUtilities.getString(activation, "user_id")),
-          version = version
+          version = version,
         )
       } else {
         null
@@ -47,13 +47,13 @@ object AccountAuthenticationCredentialsAdobeJSON {
 
     return AccountAuthenticationAdobePreActivationCredentials(
       AdobeVendorID(
-        JSONParserUtilities.getString(credsObj, "vendor_id")
+        JSONParserUtilities.getString(credsObj, "vendor_id"),
       ),
       AccountAuthenticationAdobeClientToken.parse(
-        JSONParserUtilities.getString(credsObj, "client_token")
+        JSONParserUtilities.getString(credsObj, "client_token"),
       ),
       JSONParserUtilities.getURIOrNull(credsObj, "device_manager_uri"),
-      credsPost
+      credsPost,
     )
   }
 }

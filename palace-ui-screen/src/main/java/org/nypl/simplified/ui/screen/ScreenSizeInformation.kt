@@ -7,7 +7,7 @@ import android.content.res.Resources
  */
 
 class ScreenSizeInformation(
-  private val resources: Resources
+  private val resources: Resources,
 ) : ScreenSizeInformationType {
   override val isPortrait: Boolean
     get() =

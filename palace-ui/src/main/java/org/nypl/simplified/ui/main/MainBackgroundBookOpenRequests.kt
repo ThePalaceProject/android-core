@@ -46,7 +46,7 @@ object MainBackgroundBookOpenRequests {
   data class BookOpenRequest(
     val book: Book,
     val bookFormat: BookFormat,
-    val playerID: UUID
+    val playerID: UUID,
   )
 
   /**

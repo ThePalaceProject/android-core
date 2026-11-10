@@ -33,16 +33,16 @@ data class AuthenticationObject(
    * Links for the object.
    */
 
-  val links: List<Link> = listOf()
+  val links: List<Link> = listOf(),
 ) {
   init {
     Preconditions.checkArgument(
       this.inputs.keys.all { field -> field.all { c -> c.isUpperCase() } },
-      "Input keys ${this.inputs.keys} must all be uppercase"
+      "Input keys ${this.inputs.keys} must all be uppercase",
     )
     Preconditions.checkArgument(
       this.labels.keys.all { field -> field.all { c -> c.isUpperCase() } },
-      "Labels keys ${this.labels.keys} must all be uppercase"
+      "Labels keys ${this.labels.keys} must all be uppercase",
     )
   }
 

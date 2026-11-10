@@ -16,7 +16,7 @@ import java.io.Serializable
 data class BookmarksForBook(
   val bookId: BookID,
   val lastRead: SerializedBookmark?,
-  val bookmarks: List<SerializedBookmark>
+  val bookmarks: List<SerializedBookmark>,
 ) : Serializable {
   init {
     check(this.bookmarks.all { bookmark -> bookmark.kind == BookmarkKind.BookmarkExplicit }) {
@@ -40,7 +40,7 @@ data class BookmarksForBook(
       BookmarksForBook(
         bookId = bookID,
         lastRead = null,
-        bookmarks = listOf()
+        bookmarks = listOf(),
       )
   }
 }

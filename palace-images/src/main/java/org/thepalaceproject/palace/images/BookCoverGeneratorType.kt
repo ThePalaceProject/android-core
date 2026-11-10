@@ -25,7 +25,7 @@ interface BookCoverGeneratorType {
   fun generateImage(
     uri: URI,
     width: Int,
-    height: Int
+    height: Int,
   ): Bitmap
 
   /**
@@ -40,6 +40,6 @@ interface BookCoverGeneratorType {
 
   fun generateURIForTitleAuthor(
     title: String,
-    author: String
+    author: String,
   ): URI
 }

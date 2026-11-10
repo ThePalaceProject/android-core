@@ -89,7 +89,7 @@ sealed class Feed {
 
     val feedNext: URI?,
     private val facetsByGroupData: MutableMap<String, MutableList<FeedFacetSingle>>,
-    private val facetsOrderData: MutableList<FeedFacetSingle>
+    private val facetsOrderData: MutableList<FeedFacetSingle>,
   ) : Feed() {
     private val entriesData: MutableMap<BookID, FeedEntry> = mutableMapOf()
     private val entriesOrderData: MutableList<BookID> = mutableListOf()
@@ -108,7 +108,7 @@ sealed class Feed {
 
         override fun add(
           index: Int,
-          element: FeedEntry
+          element: FeedEntry,
         ) {
           if (!this@FeedWithoutGroups.entriesData.containsKey(element.bookID)) {
             this@FeedWithoutGroups.entriesOrderData.add(index, element.bookID)
@@ -116,7 +116,8 @@ sealed class Feed {
           }
         }
 
-        override fun get(index: Int): FeedEntry = this@FeedWithoutGroups.entriesData[this@FeedWithoutGroups.entriesOrderData.get(index)]!!
+        override fun get(index: Int): FeedEntry =
+          this@FeedWithoutGroups.entriesData[this@FeedWithoutGroups.entriesOrderData.get(index)]!!
 
         override fun removeAt(index: Int): FeedEntry {
           val bookID = this@FeedWithoutGroups.entriesOrderData.get(index)
@@ -127,7 +128,7 @@ sealed class Feed {
 
         override fun set(
           index: Int,
-          element: FeedEntry
+          element: FeedEntry,
         ): FeedEntry {
           val bookID = this@FeedWithoutGroups.entriesOrderData.get(index)
           val old = this@FeedWithoutGroups.entriesData[bookID]
@@ -176,7 +177,7 @@ sealed class Feed {
     private val facetsByGroupData: MutableMap<String, MutableList<FeedFacetSingle>>,
     private val facetsOrderData: MutableList<FeedFacetSingle>,
     private val feedGroupsData: MutableMap<String, FeedGroup>,
-    private val feedGroupsOrderData: MutableList<String>
+    private val feedGroupsOrderData: MutableList<String>,
   ) : Feed() {
     val facetsByGroup: Map<String, List<FeedFacetSingle>> =
       Collections.unmodifiableMap(this.facetsByGroupData)
@@ -191,14 +192,15 @@ sealed class Feed {
 
         override fun add(
           index: Int,
-          element: FeedGroup
+          element: FeedGroup,
         ) {
           val name = element.groupTitle
           this@FeedWithGroups.feedGroupsOrderData.add(index, name)
           this@FeedWithGroups.feedGroupsData.put(name, element)
         }
 
-        override fun get(index: Int): FeedGroup = this@FeedWithGroups.feedGroupsData[this@FeedWithGroups.feedGroupsOrderData.get(index)]!!
+        override fun get(index: Int): FeedGroup =
+          this@FeedWithGroups.feedGroupsData[this@FeedWithGroups.feedGroupsOrderData.get(index)]!!
 
         override fun removeAt(index: Int): FeedGroup {
           val name = this@FeedWithGroups.feedGroupsOrderData.get(index)
@@ -209,7 +211,7 @@ sealed class Feed {
 
         override fun set(
           index: Int,
-          element: FeedGroup
+          element: FeedGroup,
         ): FeedGroup {
           val name = this@FeedWithGroups.feedGroupsOrderData.get(index)
           val old = this@FeedWithGroups.feedGroupsData[name]
@@ -233,7 +235,7 @@ sealed class Feed {
       feedTitle: String,
       feedURI: URI,
       feedFacets: List<FeedFacetSingle>,
-      feedFacetGroups: Map<String, List<FeedFacetSingle>>
+      feedFacetGroups: Map<String, List<FeedFacetSingle>>,
     ): FeedWithoutGroups {
       val mutableGroups =
         feedFacetGroups
@@ -253,7 +255,7 @@ sealed class Feed {
         feedLicenses = null,
         feedNext = null,
         facetsOrderData = feedFacets.toMutableList(),
-        facetsByGroupData = mutableGroups
+        facetsByGroupData = mutableGroups,
       )
     }
 
@@ -271,7 +273,7 @@ sealed class Feed {
       accountId: AccountID,
       feed: OPDSAcquisitionFeed,
       filter: (OPDSAcquisitionFeedEntry) -> Boolean,
-      search: OPDSOpenSearch1_1?
+      search: OPDSOpenSearch1_1?,
     ): Feed =
       if (feed.feedGroups.isEmpty()) {
         this.withoutGroups(accountId, feed, filter, search)
@@ -283,7 +285,7 @@ sealed class Feed {
       accountId: AccountID,
       feed: OPDSAcquisitionFeed,
       filter: (OPDSAcquisitionFeedEntry) -> Boolean,
-      search: OPDSOpenSearch1_1?
+      search: OPDSOpenSearch1_1?,
     ): FeedWithoutGroups {
       val facetsByGroup =
         this.constructFacetGroups(accountId, feed)
@@ -309,7 +311,7 @@ sealed class Feed {
           feedPrivacyPolicy = feed.feedPrivacyPolicy,
           feedAbout = feed.feedAbout,
           facetsByGroupData = facetsByGroup,
-          facetsOrderData = facetsOrder
+          facetsOrderData = facetsOrder,
         )
 
       val entries = feed.feedEntries
@@ -330,7 +332,7 @@ sealed class Feed {
       accountId: AccountID,
       feed: OPDSAcquisitionFeed,
       filter: (OPDSAcquisitionFeedEntry) -> Boolean,
-      search: OPDSOpenSearch1_1?
+      search: OPDSOpenSearch1_1?,
     ): FeedWithGroups {
       val facetsByGroup =
         this.constructFacetGroups(accountId, feed)
@@ -358,13 +360,13 @@ sealed class Feed {
         facetsByGroupData = facetsByGroup,
         facetsOrderData = facetsOrder,
         feedGroupsData = FeedGroup.fromOPDSGroups(accountId, filter, feed.feedGroups).toMutableMap(),
-        feedGroupsOrderData = feed.feedGroupsOrder.toMutableList()
+        feedGroupsOrderData = feed.feedGroupsOrder.toMutableList(),
       )
     }
 
     private fun constructFacetsOrdered(
       accountId: AccountID,
-      f: OPDSAcquisitionFeed
+      f: OPDSAcquisitionFeed,
     ): MutableList<FeedFacetSingle> {
       val facetsOrder = ArrayList<FeedFacetSingle>(4)
       for (ff in f.feedFacetsOrder) {
@@ -375,7 +377,7 @@ sealed class Feed {
 
     private fun constructFacetGroups(
       accountId: AccountID,
-      feed: OPDSAcquisitionFeed
+      feed: OPDSAcquisitionFeed,
     ): MutableMap<String, MutableList<FeedFacetSingle>> {
       val facetsByGroup = HashMap<String, MutableList<FeedFacetSingle>>(4)
       val fMap = feed.feedFacetsByGroup

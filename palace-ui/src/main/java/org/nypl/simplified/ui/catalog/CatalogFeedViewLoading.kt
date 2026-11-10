@@ -6,19 +6,19 @@ import android.view.ViewGroup
 import org.librarysimplified.ui.R
 
 class CatalogFeedViewLoading(
-  override val root: ViewGroup
+  override val root: ViewGroup,
 ) : CatalogFeedView() {
   companion object {
     fun create(
       layoutInflater: LayoutInflater,
-      container: ViewGroup
+      container: ViewGroup,
     ): CatalogFeedViewLoading =
       CatalogFeedViewLoading(
         layoutInflater.inflate(
           R.layout.catalog_feed_loading,
           container,
-          true
-        ) as ViewGroup
+          true,
+        ) as ViewGroup,
       )
   }
 

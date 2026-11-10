@@ -16,14 +16,14 @@ object CatalogBookAccessibilityStrings {
 
   fun coverDescription(
     resources: Resources,
-    feedEntry: FeedEntry.FeedEntryOPDS
+    feedEntry: FeedEntry.FeedEntryOPDS,
   ): String =
     when (feedEntry.probableFormat) {
       BookFormats.BookFormatDefinition.BOOK_FORMAT_EPUB -> {
         resources.getString(
           R.string.catalogAccessibilityCoverEpub,
           feedEntry.feedEntry.title,
-          feedEntry.feedEntry.authorsCommaSeparated
+          feedEntry.feedEntry.authorsCommaSeparated,
         )
       }
 
@@ -31,7 +31,7 @@ object CatalogBookAccessibilityStrings {
         resources.getString(
           R.string.catalogAccessibilityCoverAudiobook,
           feedEntry.feedEntry.title,
-          feedEntry.feedEntry.authorsCommaSeparated
+          feedEntry.feedEntry.authorsCommaSeparated,
         )
       }
 
@@ -39,7 +39,7 @@ object CatalogBookAccessibilityStrings {
         resources.getString(
           R.string.catalogAccessibilityCoverPdf,
           feedEntry.feedEntry.title,
-          feedEntry.feedEntry.authorsCommaSeparated
+          feedEntry.feedEntry.authorsCommaSeparated,
         )
       }
 
@@ -47,7 +47,7 @@ object CatalogBookAccessibilityStrings {
         resources.getString(
           R.string.catalogAccessibilityCoverUnknownFormat,
           feedEntry.feedEntry.title,
-          feedEntry.feedEntry.authorsCommaSeparated
+          feedEntry.feedEntry.authorsCommaSeparated,
         )
       }
     }

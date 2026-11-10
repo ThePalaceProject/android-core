@@ -110,7 +110,7 @@ class CatalogFeedViewInfinite(
 
   fun configureFacets(
     screen: ScreenSizeInformationType,
-    feed: Feed.FeedWithoutGroups
+    feed: Feed.FeedWithoutGroups,
   ) {
     this.catalogFeedHeaderTitle.text = feed.feedTitle
 
@@ -131,7 +131,7 @@ class CatalogFeedViewInfinite(
 
     this.configureFacetTabs(
       facetGroup = FeedFacets.findEntryPointFacetGroup(facetsByGroup),
-      facetTabs = this.catalogFeedHeaderTabs
+      facetTabs = this.catalogFeedHeaderTabs,
     )
 
     /*
@@ -195,7 +195,7 @@ class CatalogFeedViewInfinite(
 
       facetApply.setOnClickListener {
         this.callbacks.onFeedFacetSelected(
-          CatalogFeedFacetFilterModels.filterModel.createResultFacet(title)
+          CatalogFeedFacetFilterModels.filterModel.createResultFacet(title),
         )
       }
 
@@ -283,7 +283,7 @@ class CatalogFeedViewInfinite(
 
   private fun configureFacetTabs(
     facetGroup: List<FeedFacet>?,
-    facetTabs: RadioGroup
+    facetTabs: RadioGroup,
   ) {
     if (facetGroup == null) {
       facetTabs.visibility = View.GONE
@@ -294,7 +294,7 @@ class CatalogFeedViewInfinite(
     PalaceTabButtons.configureGroup(
       context = this.root.context,
       group = facetTabs,
-      count = facetGroup.size
+      count = facetGroup.size,
     ) { index, button ->
       val facet = facetGroup[index]
       button.text = facet.title
@@ -323,7 +323,7 @@ class CatalogFeedViewInfinite(
 
   private fun updateSelectedFacet(
     facetTabs: RadioGroup,
-    index: Int
+    index: Int,
   ) {
     facetTabs.clearCheck()
     val button = facetTabs.getChildAt(index) as RadioButton
@@ -332,7 +332,7 @@ class CatalogFeedViewInfinite(
 
   fun configureListVisibility(
     itemCount: Int,
-    onEmptyMessage: String
+    onEmptyMessage: String,
   ) {
     if (itemCount == 0) {
       this.listView.visibility = View.INVISIBLE

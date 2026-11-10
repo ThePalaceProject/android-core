@@ -87,7 +87,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
     fun startActivity(
       activity: Activity,
-      parameters: Reader2ActivityParameters
+      parameters: Reader2ActivityParameters,
     ) {
       val intent = Intent(activity, Reader2Activity::class.java)
       val bundle =
@@ -166,20 +166,22 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
         data =
           mapOf(
             Pair("Reason", "accountNotFound"),
-            Pair("AccountInternalID",
+            Pair(
+              "AccountInternalID",
               this.parameters.accountId.uuid
-                .toString()
+                .toString(),
             ),
             Pair("BookID", this.parameters.entry.feedEntry.id),
             Pair("BookInternalID", this.parameters.bookId.value()),
             Pair("BookTitle", this.parameters.entry.feedEntry.title),
-            Pair("BookPublisher",
+            Pair(
+              "BookPublisher",
               this.parameters.entry.feedEntry.publisher
-                .orEmpty()
+                .orEmpty(),
             ),
-            Pair("BookDRM", this.parameters.drmInfo.kind.name)
+            Pair("BookDRM", this.parameters.drmInfo.kind.name),
           ),
-        throwable = e
+        throwable = e,
       )
       this.finish()
       return
@@ -200,24 +202,27 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
         data =
           mapOf(
             Pair("Reason", "formatNotFound"),
-            Pair("AccountInternalID",
+            Pair(
+              "AccountInternalID",
               this.parameters.accountId.uuid
-                .toString()
+                .toString(),
             ),
-            Pair("AccountProviderID",
+            Pair(
+              "AccountProviderID",
               this.account.provider.id
-                .toString()
+                .toString(),
             ),
             Pair("BookID", this.parameters.entry.feedEntry.id),
             Pair("BookInternalID", this.parameters.bookId.value()),
             Pair("BookTitle", this.parameters.entry.feedEntry.title),
-            Pair("BookPublisher",
+            Pair(
+              "BookPublisher",
               this.parameters.entry.feedEntry.publisher
-                .orEmpty()
+                .orEmpty(),
             ),
-            Pair("BookDRM", this.parameters.drmInfo.kind.name)
+            Pair("BookDRM", this.parameters.drmInfo.kind.name),
           ),
-        throwable = e
+        throwable = e,
       )
       this.finish()
       return
@@ -248,7 +253,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
     this.onBackPressedDispatcher.addCallback(
       this,
-      this.backCallback
+      this.backCallback,
     )
   }
 
@@ -279,8 +284,8 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
           profileUUID = profile.id.uuid,
           accountProvider = this.account.provider.id,
           accountUUID = this.account.id.uuid,
-          opdsEntry = this.parameters.entry.feedEntry
-        )
+          opdsEntry = this.parameters.entry.feedEntry,
+        ),
       )
     }
   }
@@ -305,7 +310,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
         Reader2Bookmarks.loadBookmarks(
           bookmarkService = this.bookmarkService,
           accountID = this.parameters.accountId,
-          bookID = this.parameters.bookId
+          bookID = this.parameters.bookId,
         )
 
       /*
@@ -339,7 +344,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
           onLCPDialogDismissed = {
             this.logger.debug("Dismissed LCP dialog. Shutting down...")
             this.finish()
-          }
+          },
         )
 
       this.logger.debug("Opening asset...")
@@ -350,8 +355,10 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
         )
 
       val rawBookAsset =
-        when (val a =
-          runBlocking { assetRetriever.retrieve(this@Reader2Activity.parameters.file) }) {
+        when (
+          val a =
+            runBlocking { assetRetriever.retrieve(this@Reader2Activity.parameters.file) }
+        ) {
           is Try.Failure -> throw IOException(a.value.message)
           is Try.Success -> a.value
         }
@@ -384,7 +391,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
         context = this.application,
         controllers = SR2Controllers(),
         bookmarks = bookmarks,
-        allowCopyPaste = this.parameters.drmInfo is BookDRMInformation.None
+        allowCopyPaste = this.parameters.drmInfo is BookDRMInformation.None,
       )
     } catch (e: Exception) {
       this.onBookLoadingFailed(e)
@@ -394,7 +401,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
   @Throws(IOException::class)
   private fun openWithAdobe(
     rawBookAsset: Asset,
-    rights: Pair<File, AdobeAdeptLoan>?
+    rights: Pair<File, AdobeAdeptLoan>?,
   ): Asset {
     if (rawBookAsset !is ContainerAsset) {
       throw IOException("Attempted to open something that is not an EPUB file.")
@@ -404,7 +411,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     }
     return AdobeAdeptAssets.openAsset(
       epubAsset = rawBookAsset,
-      rightsFile = rights.first
+      rightsFile = rights.first,
     )
   }
 
@@ -482,7 +489,8 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       is SR2Event.SR2Error.SR2WebViewInaccessible,
       is SR2Event.SR2ExternalLinkSelected,
       is SR2Event.SR2OnCenterTapped,
-      is SR2Event.SR2ReadingPositionChanged -> {
+      is SR2Event.SR2ReadingPositionChanged,
+      -> {
         // Ignored.
       }
 
@@ -510,9 +518,9 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
             readerPreferences =
               Reader2Themes.fromSR2(
                 existing = oldPreferences,
-                theme = event.theme
-              )
-          )
+                theme = event.theme,
+              ),
+          ),
       )
     }
   }
@@ -525,13 +533,13 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       Reader2Bookmarks.fromSR2Bookmark(
         bookEntry = this.parameters.entry,
         deviceId = Reader2Devices.deviceId(this.profilesController, this.parameters.bookId),
-        source = event.bookmark
+        source = event.bookmark,
       )
 
     this.bookmarkService.bookmarkDelete(
       accountID = this.account.id,
       bookmark = bookmark,
-      ignoreRemoteFailures = true
+      ignoreRemoteFailures = true,
     )
   }
 
@@ -543,7 +551,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       Reader2Bookmarks.fromSR2Bookmark(
         bookEntry = this.parameters.entry,
         deviceId = Reader2Devices.deviceId(this.profilesController, this.parameters.bookId),
-        source = event.bookmark
+        source = event.bookmark,
       )
 
     when (localBookmark.kind) {
@@ -554,7 +562,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     this.bookmarkService.bookmarkCreate(
       accountID = this.parameters.accountId,
       bookmark = localBookmark,
-      ignoreRemoteFailures = true
+      ignoreRemoteFailures = true,
     )
   }
 
@@ -617,25 +625,28 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       data =
         mapOf(
           Pair("Reason", "readerOpenFailed"),
-          Pair("AccountInternalID",
+          Pair(
+            "AccountInternalID",
             this.parameters.accountId.uuid
-              .toString()
+              .toString(),
           ),
-          Pair("AccountProviderID",
+          Pair(
+            "AccountProviderID",
             this.account.provider.id
-              .toString()
+              .toString(),
           ),
           Pair("BookID", this.parameters.entry.feedEntry.id),
           Pair("BookInternalID", this.parameters.bookId.value()),
           Pair("BookTitle", this.parameters.entry.feedEntry.title),
-          Pair("BookPublisher",
+          Pair(
+            "BookPublisher",
             this.parameters.entry.feedEntry.publisher
-              .orEmpty()
+              .orEmpty(),
           ),
           Pair("BookDRM", this.parameters.drmInfo.kind.name),
-          Pair("ExceptionType", actualException.javaClass.name)
+          Pair("ExceptionType", actualException.javaClass.name),
         ),
-      throwable = actualException
+      throwable = actualException,
     )
     this.logger.error("Failed to open book: ", actualException)
 
@@ -645,15 +656,15 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
         this.getString(
           R.string.bookOpenFailedMessage,
           actualException.javaClass.name,
-          actualException.message
-        )
+          actualException.message,
+        ),
       ).setOnDismissListener { this.finish() }
       .create()
       .show()
   }
 
   private fun showToastMessage(
-    @StringRes messageRes: Int
+    @StringRes messageRes: Int,
   ) {
     UIThread.runOnUIThread {
       Toast.makeText(this, messageRes, Toast.LENGTH_SHORT).show()

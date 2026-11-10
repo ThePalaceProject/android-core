@@ -59,7 +59,7 @@ object Viewers {
     context: Activity,
     preferences: ViewerParameters,
     book: Book,
-    format: BookFormat
+    format: BookFormat,
   ) {
     this.logger.debug("Open: {} ({})", book.id, book.entry.title)
     val providers =
@@ -88,7 +88,9 @@ object Viewers {
       val supported = viewerProvider.canSupport(preferences, book, format)
       if (supported) {
         this.logger.debug(
-          "[{}] Viewer provider {} supports the book, using it!", index, viewerProvider.name
+          "[{}] Viewer provider {} supports the book, using it!",
+          index,
+          viewerProvider.name,
         )
 
         val profile = this.profilesController.profileCurrent()
@@ -105,8 +107,8 @@ object Viewers {
             targetURI = book.entry.analytics,
             onAccessTokenUpdated = { accessToken ->
               account.updateBasicTokenCredentials(accessToken)
-            }
-          )
+            },
+          ),
         )
 
         viewerProvider.open(
@@ -114,12 +116,14 @@ object Viewers {
           parameters = newPreferences,
           book = book,
           format = format,
-          accountProviderId = account.provider.id
+          accountProviderId = account.provider.id,
         )
         return
       } else {
         this.logger.debug(
-          "[{}] Viewer provider {} does not support the book", index, viewerProvider.name
+          "[{}] Viewer provider {} does not support the book",
+          index,
+          viewerProvider.name,
         )
       }
     }
@@ -136,8 +140,8 @@ object Viewers {
           Pair("BookInternalID", book.id.value()),
           Pair("BookTitle", book.entry.title),
           Pair("BookPublisher", book.entry.publisher.orEmpty()),
-          Pair("BookFormat", format::class.simpleName.orEmpty())
-        )
+          Pair("BookFormat", format::class.simpleName.orEmpty()),
+        ),
     )
   }
 }

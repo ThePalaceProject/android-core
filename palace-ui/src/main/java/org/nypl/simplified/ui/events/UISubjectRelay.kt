@@ -12,7 +12,7 @@ import org.nypl.simplified.threads.UIThread
 
 class UISubjectRelay<E> private constructor(
   private val subject: Subject<E>,
-  private val subscription: Disposable
+  private val subscription: Disposable,
 ) : Disposable,
   AutoCloseable {
   companion object {

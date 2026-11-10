@@ -53,7 +53,7 @@ object CatalogWIPROMigration {
 
   fun isMigrationRequired(
     book: Book,
-    bookFormat: BookFormat
+    bookFormat: BookFormat,
   ): Boolean {
     val drmInfo = bookFormat.drmInformation
     if (drmInfo !is BookDRMInformation.ACS) {
@@ -131,7 +131,7 @@ object CatalogWIPROMigration {
             accountId = accountID,
             description = account.provider.authentication as AccountProviderAuthenticationDescription.Basic,
             username = credentials.userName,
-            password = credentials.password
+            password = credentials.password,
           )
         }
 
@@ -140,7 +140,7 @@ object CatalogWIPROMigration {
             accountId = accountID,
             description = account.provider.authentication as AccountProviderAuthenticationDescription.BasicToken,
             username = credentials.userName,
-            password = credentials.password
+            password = credentials.password,
           )
         }
 
@@ -148,14 +148,14 @@ object CatalogWIPROMigration {
           ProfileAccountLoginRequest.OIDCInitiate(
             accountId = accountID,
             description = account.provider.authentication as AccountProviderAuthenticationDescription.OpenIDConnect,
-            redirectURI = AccountOIDC.oidcCallbackLoginURI(account.id)
+            redirectURI = AccountOIDC.oidcCallbackLoginURI(account.id),
           )
         }
 
         is AccountAuthenticationCredentials.SAML2_0 -> {
           ProfileAccountLoginRequest.SAML20Initiate(
             accountId = accountID,
-            description = account.provider.authentication as AccountProviderAuthenticationDescription.SAML2_0
+            description = account.provider.authentication as AccountProviderAuthenticationDescription.SAML2_0,
           )
         }
 
@@ -179,7 +179,7 @@ object CatalogWIPROMigration {
 
   fun executeNow(
     context: Context,
-    book: Book
+    book: Book,
   ) {
     val networkAccess =
       Services

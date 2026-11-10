@@ -19,6 +19,6 @@ sealed class FeedSearch : Serializable {
    */
 
   data class FeedSearchOpen1_1(
-    val search: OPDSOpenSearch1_1
+    val search: OPDSOpenSearch1_1,
   ) : FeedSearch()
 }

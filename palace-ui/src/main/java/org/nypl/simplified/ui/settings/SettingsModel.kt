@@ -19,8 +19,8 @@ object SettingsModel {
         d.copy(
           preferences =
             d.preferences.copy(
-              showDebugSettings = !d.preferences.showDebugSettings
-            )
+              showDebugSettings = !d.preferences.showDebugSettings,
+            ),
         )
       }
     }

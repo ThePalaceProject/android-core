@@ -99,7 +99,7 @@ class BookDatabase private constructor(
   @Throws(BookDatabaseException::class)
   override fun createOrUpdate(
     id: BookID,
-    entry: OPDSAcquisitionFeedEntry
+    entry: OPDSAcquisitionFeedEntry,
   ): BookDatabaseEntryType {
     synchronized(this.maps.mapsLock) {
       if (this.maps.contains(id)) {
@@ -120,7 +120,7 @@ class BookDatabase private constructor(
         FileUtilities.fileWriteUTF8Atomically(
           fileMeta,
           fileMetaTmp,
-          JSONSerializerUtilities.serializeToString(this.serializer.serializeFeedEntry(entry))
+          JSONSerializerUtilities.serializeToString(this.serializer.serializeFeedEntry(entry)),
         )
 
         val book =
@@ -130,7 +130,7 @@ class BookDatabase private constructor(
             cover = cover,
             thumbnail = thumb,
             entry = entry,
-            formats = listOf()
+            formats = listOf(),
           )
 
         val dbEntry =
@@ -156,7 +156,8 @@ class BookDatabase private constructor(
   override fun entry(id: BookID): BookDatabaseEntryType {
     synchronized(this.maps.mapsLock) {
       return this.maps.entries[id] ?: throw BookDatabaseException(
-        "Nonexistent book entry: " + id.value(), emptyList()
+        "Nonexistent book entry: " + id.value(),
+        emptyList(),
       )
     }
   }
@@ -187,13 +188,14 @@ class BookDatabase private constructor(
         directory = directory,
         maps = maps,
         errors = errors,
-        httpClient = httpClient
+        httpClient = httpClient,
       )
 
       if (errors.isNotEmpty()) {
         errors.forEach { exception -> LOG.debug("error opening book database: ", exception) }
         throw BookDatabaseException(
-          "One or more errors occurred whilst trying to open a book database.", errors
+          "One or more errors occurred whilst trying to open a book database.",
+          errors,
         )
       }
 
@@ -204,7 +206,7 @@ class BookDatabase private constructor(
         maps = maps,
         serializer = serializer,
         formats = formats,
-        httpClient = httpClient
+        httpClient = httpClient,
       )
     }
 
@@ -243,7 +245,7 @@ class BookDatabase private constructor(
               maps = maps,
               errors = errors,
               name = bookID,
-              httpClient = httpClient
+              httpClient = httpClient,
             ) ?: continue
           maps.addEntry(entry)
         }
@@ -286,7 +288,7 @@ class BookDatabase private constructor(
             cover = cover,
             thumbnail = thumb,
             entry = entry,
-            formats = listOf()
+            formats = listOf(),
           )
 
         return BookDatabaseEntry(
@@ -296,7 +298,7 @@ class BookDatabase private constructor(
           formats = formats,
           bookRef = book,
           onDelete = Runnable { maps.delete(bookId) },
-          httpClient = httpClient
+          httpClient = httpClient,
         )
       } catch (e: IOException) {
         errors.add(e)
@@ -310,7 +312,7 @@ class BookDatabase private constructor(
 
 private fun fileOrNull(
   bookDir: File,
-  filename: String
+  filename: String,
 ) = File(bookDir, filename)
   .run {
     if (isFile) this else null

@@ -31,7 +31,7 @@ internal class BServiceOpDeleteBookmark(
         "[{}]: failed to delete bookmark {}: ",
         this.profile.id.uuid,
         this.bookmark.bookmarkId.value,
-        e
+        e,
       )
       if (!this.ignoreRemoteFailures) {
         throw e
@@ -46,7 +46,7 @@ internal class BServiceOpDeleteBookmark(
       this.logger.debug(
         "[{}]: remote deleting bookmark {}",
         this.profile.id.uuid,
-        this.bookmark.bookmarkId.value
+        this.bookmark.bookmarkId.value,
       )
 
       if (this.bookmark.kind == BookmarkKind.BookmarkExplicit) {
@@ -54,8 +54,8 @@ internal class BServiceOpDeleteBookmark(
           BookmarkAttributes.removeBookmark(
             this.bookmarksSource.get(),
             this.accountID,
-            this.bookmark
-          )
+            this.bookmark,
+          ),
         )
 
         var bookmarkURI = this.bookmark.uri
@@ -65,7 +65,7 @@ internal class BServiceOpDeleteBookmark(
             this.logger.debug(
               "[{}]: cannot remotely delete bookmark {} because it has no URI",
               this.profile.id.uuid,
-              this.bookmark.bookmarkId.value
+              this.bookmark.bookmarkId.value,
             )
             throw IllegalStateException("Bookmark has no URI.")
           }
@@ -78,7 +78,7 @@ internal class BServiceOpDeleteBookmark(
           this.logger.debug(
             "[{}]: cannot remotely delete bookmark {} because the account is not syncable",
             this.profile.id.uuid,
-            this.bookmark.bookmarkId.value
+            this.bookmark.bookmarkId.value,
           )
           throw IllegalStateException("Account is not syncable.")
         }
@@ -86,7 +86,7 @@ internal class BServiceOpDeleteBookmark(
         this.httpCalls.bookmarkDelete(
           account = account,
           bookmarkURI = bookmarkURI,
-          credentials = syncInfo.credentials
+          credentials = syncInfo.credentials,
         )
         Unit
       } else {
@@ -122,7 +122,7 @@ internal class BServiceOpDeleteBookmark(
 
   private fun bookmarksAreInterchangeable(
     bookmarkA: SerializedBookmark,
-    bookmarkB: SerializedBookmark
+    bookmarkB: SerializedBookmark,
   ): Boolean =
     (bookmarkA.kind == bookmarkB.kind) &&
       (bookmarkA.book == bookmarkB.book) &&
@@ -133,7 +133,7 @@ internal class BServiceOpDeleteBookmark(
       this.logger.debug(
         "[{}]: locally deleting bookmark {}",
         this.profile.id.uuid,
-        this.bookmark.bookmarkId.value
+        this.bookmark.bookmarkId.value,
       )
 
       val account = this.profile.account(this.accountID)

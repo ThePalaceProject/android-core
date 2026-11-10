@@ -19,7 +19,7 @@ import java.net.URI
 
 class AccountProviderDescriptionCollectionParser internal constructor(
   private val source: URI,
-  private val manifestSupplier: () -> WPMManifest
+  private val manifestSupplier: () -> WPMManifest,
 ) : AccountProviderDescriptionCollectionParserType {
   private val logger =
     LoggerFactory.getLogger(AccountProviderDescriptionCollectionParser::class.java)
@@ -34,8 +34,8 @@ class AccountProviderDescriptionCollectionParser internal constructor(
         message = message,
         line = 0,
         column = 0,
-        exception = null
-      )
+        exception = null,
+      ),
     )
   }
 
@@ -46,7 +46,7 @@ class AccountProviderDescriptionCollectionParser internal constructor(
         this.logError("No catalogs were provided in the given feed.")
         return ParseResult.Failure(
           warnings = this.warnings.toList(),
-          errors = this.errors.toList()
+          errors = this.errors.toList(),
         )
       } else {
         this.processCatalogs(manifest)
@@ -58,12 +58,12 @@ class AccountProviderDescriptionCollectionParser internal constructor(
           message = e.message ?: e.javaClass.name,
           line = 0,
           column = 0,
-          exception = e
-        )
+          exception = e,
+        ),
       )
       ParseResult.Failure(
         warnings = this.warnings.toList(),
-        errors = this.errors.toList()
+        errors = this.errors.toList(),
       )
     }
   }
@@ -81,14 +81,14 @@ class AccountProviderDescriptionCollectionParser internal constructor(
           AccountProviderDescriptionCollection(
             providers = accountDescriptions,
             links = manifest.links.map { link -> Links.wpmLinkToPalaceLink(link) },
-            metadata = metadata
-          )
+            metadata = metadata,
+          ),
       )
     }
 
     return ParseResult.Failure(
       warnings = this.warnings.toList(),
-      errors = this.errors.toList()
+      errors = this.errors.toList(),
     )
   }
 
@@ -122,7 +122,7 @@ class AccountProviderDescriptionCollectionParser internal constructor(
 
   private fun processMetadata(metadata: WPMMetadata): AccountProviderDescriptionCollection.Metadata =
     AccountProviderDescriptionCollection.Metadata(
-      title = metadata.title.defaultValue
+      title = metadata.title.defaultValue,
     )
 
   override fun close() {

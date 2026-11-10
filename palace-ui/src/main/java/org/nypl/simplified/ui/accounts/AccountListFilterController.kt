@@ -4,7 +4,7 @@ import org.nypl.simplified.accounts.api.AccountProviderDescription
 import java.util.concurrent.atomic.AtomicReference
 
 class AccountListFilterController(
-  val onPublish: (List<AccountProviderDescription>) -> Unit
+  val onPublish: (List<AccountProviderDescription>) -> Unit,
 ) {
   private var fullList: List<AccountProviderDescription> =
     listOf()

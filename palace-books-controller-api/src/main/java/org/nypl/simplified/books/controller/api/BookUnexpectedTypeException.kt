@@ -14,5 +14,5 @@ import one.irradia.mime.api.MIMEType
 class BookUnexpectedTypeException(
   message: String,
   val expected: Set<MIMEType>,
-  val received: MIMEType
+  val received: MIMEType,
 ) : BookException(message)

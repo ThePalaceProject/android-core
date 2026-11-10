@@ -23,7 +23,7 @@ internal object PdfReaderBookmarks {
   fun loadBookmarks(
     bookmarkService: BookmarkServiceUsableType,
     accountID: AccountID,
-    bookID: BookID
+    bookID: BookID,
   ): List<PdfBookmark> {
     val allBookmarks: Map<AccountID, Map<BookID, BookmarksForBook>> =
       bookmarkService.bookmarks.get()
@@ -52,7 +52,8 @@ internal object PdfReaderBookmarks {
       is SerializedLocatorAudioBookTime1,
       is SerializedLocatorAudioBookTime2,
       is SerializedLocatorLegacyCFI,
-      is SerializedLocatorHrefProgression20210317 -> {
+      is SerializedLocatorHrefProgression20210317,
+      -> {
         // None of these locator formats are suitable for PDFs
         null
       }
@@ -65,7 +66,7 @@ internal object PdfReaderBookmarks {
               BookmarkLastReadLocation -> PdfBookmarkKind.LAST_READ
             },
           pageNumber = location.page,
-          time = source.time
+          time = source.time,
         )
       }
     }
@@ -77,7 +78,7 @@ internal object PdfReaderBookmarks {
   fun fromPdfBookmark(
     bookEntry: FeedEntry.FeedEntryOPDS,
     deviceId: String,
-    source: PdfBookmark
+    source: PdfBookmark,
   ): SerializedBookmark =
     SerializedBookmarks.createWithCurrentFormat(
       bookChapterProgress = 0.0,

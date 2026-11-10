@@ -47,7 +47,7 @@ object MainLogging {
   fun configureFileAppender(
     loggerContext: LoggerContext,
     cacheDirectory: File,
-    filename: String
+    filename: String,
   ): Appender<ILoggingEvent> {
     val encoder =
       PatternLayoutEncoder().apply {
@@ -103,7 +103,7 @@ object MainLogging {
 
   private fun logbackOf(
     name: String,
-    process: (Logger) -> Unit
+    process: (Logger) -> Unit,
   ) {
     (LoggerFactory.getLogger(name) as Logger).apply {
       process(this)
@@ -112,7 +112,7 @@ object MainLogging {
 
   private fun logbackLevel(
     name: String,
-    level: Level
+    level: Level,
   ) {
     logbackOf(name) {
       it.level = level

@@ -11,7 +11,7 @@ sealed class AccountLogoutButtonStatus {
    */
 
   data class AsLogoutButtonEnabled(
-    val onClick: () -> Unit
+    val onClick: () -> Unit,
   ) : AccountLogoutButtonStatus()
 
   /**
@@ -26,7 +26,7 @@ sealed class AccountLogoutButtonStatus {
    */
 
   data class AsCancelButtonEnabled(
-    val onClick: () -> Unit
+    val onClick: () -> Unit,
   ) : AccountLogoutButtonStatus()
 
   /**

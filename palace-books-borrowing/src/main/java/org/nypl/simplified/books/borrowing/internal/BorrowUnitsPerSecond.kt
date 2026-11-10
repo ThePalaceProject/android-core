@@ -8,7 +8,7 @@ import org.joda.time.Seconds
  */
 
 class BorrowUnitsPerSecond(
-  clock: () -> Instant
+  clock: () -> Instant,
 ) {
   @Volatile
   private var first = true

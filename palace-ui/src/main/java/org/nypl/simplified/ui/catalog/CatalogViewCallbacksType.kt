@@ -39,7 +39,7 @@ interface CatalogViewCallbacksType {
   @UiThread
   fun onBookCanBeRevoked(
     book: Book,
-    status: BookStatus
+    status: BookStatus,
   ): Boolean
 
   /**
@@ -84,7 +84,7 @@ interface CatalogViewCallbacksType {
   @UiThread
   fun onBookRequestViewerOpen(
     book: Book,
-    bookFormat: BookFormat
+    bookFormat: BookFormat,
   )
 
   /**
@@ -124,7 +124,7 @@ interface CatalogViewCallbacksType {
   fun onFeedSelected(
     accountID: AccountID,
     title: String,
-    uri: URI
+    uri: URI,
   )
 
   /**
@@ -142,7 +142,7 @@ interface CatalogViewCallbacksType {
   fun onSearchSubmitted(
     accountID: AccountID,
     feedSearch: FeedSearch,
-    queryText: String
+    queryText: String,
   )
 
   /**

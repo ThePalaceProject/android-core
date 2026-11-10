@@ -42,7 +42,7 @@ data class Book(
    * The available formats.
    */
 
-  val formats: List<BookFormat>
+  val formats: List<BookFormat>,
 ) {
   /**
    * If any format is downloaded, then the book as a whole is currently considered to be downloaded
@@ -55,7 +55,8 @@ data class Book(
    * @return The format of the given type, if one is present
    */
 
-  fun <T : BookFormat> findFormat(clazz: Class<T>): T? = this.formats.find { format -> clazz.isAssignableFrom(format.javaClass) } as T?
+  fun <T : BookFormat> findFormat(clazz: Class<T>): T? =
+    this.formats.find { format -> clazz.isAssignableFrom(format.javaClass) } as T?
 
   /**
    * @return The "preferred" format for the given type, if any

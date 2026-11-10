@@ -18,7 +18,7 @@ class AccountProviderDescriptionCollectionParsers : AccountProviderDescriptionCo
   override fun createParser(
     uri: URI,
     stream: InputStream,
-    warningsAsErrors: Boolean
+    warningsAsErrors: Boolean,
   ): AccountProviderDescriptionCollectionParserType =
     AccountProviderDescriptionCollectionParser(uri) {
       this.wpmMapper.readValue(stream, WPMManifest::class.java)

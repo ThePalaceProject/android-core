@@ -11,7 +11,7 @@ sealed class ParseResult<T> {
 
   data class Success<T>(
     val warnings: List<ParseWarning>,
-    val result: T
+    val result: T,
   ) : ParseResult<T>()
 
   /**
@@ -20,7 +20,7 @@ sealed class ParseResult<T> {
 
   data class Failure<T>(
     val warnings: List<ParseWarning>,
-    val errors: List<ParseError>
+    val errors: List<ParseError>,
   ) : ParseResult<T>()
 
   companion object {
@@ -33,20 +33,20 @@ sealed class ParseResult<T> {
 
     fun <A, B> map(
       x: ParseResult<A>,
-      f: (A) -> B
+      f: (A) -> B,
     ): ParseResult<B> =
       when (x) {
         is Success -> {
           Success(
             result = f.invoke(x.result),
-            warnings = x.warnings
+            warnings = x.warnings,
           )
         }
 
         is Failure -> {
           Failure(
             warnings = x.warnings,
-            errors = x.errors
+            errors = x.errors,
           )
         }
       }
@@ -60,7 +60,7 @@ sealed class ParseResult<T> {
 
     fun <A, B> flatMap(
       x: ParseResult<A>,
-      f: (A) -> ParseResult<B>
+      f: (A) -> ParseResult<B>,
     ): ParseResult<B> =
       when (x) {
         is Success -> {
@@ -68,14 +68,14 @@ sealed class ParseResult<T> {
             is Failure -> {
               Failure(
                 warnings = result.warnings.plus(x.warnings),
-                errors = result.errors
+                errors = result.errors,
               )
             }
 
             is Success -> {
               Success(
                 warnings = result.warnings.plus(x.warnings),
-                result = result.result
+                result = result.result,
               )
             }
           }
@@ -84,7 +84,7 @@ sealed class ParseResult<T> {
         is Failure -> {
           Failure(
             warnings = x.warnings,
-            errors = x.errors
+            errors = x.errors,
           )
         }
       }
@@ -95,7 +95,7 @@ sealed class ParseResult<T> {
 
     fun <A> succeed(
       warnings: List<ParseWarning>,
-      x: A
+      x: A,
     ): ParseResult<A> = Success(warnings, x)
 
     /**

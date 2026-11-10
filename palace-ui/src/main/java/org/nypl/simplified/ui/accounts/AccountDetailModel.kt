@@ -34,7 +34,7 @@ object AccountDetailModel {
 
   data class UsernamePasswordAttempt(
     val username: AccountUsername,
-    val password: AccountPassword
+    val password: AccountPassword,
   )
 
   val usernamePasswordEntries =
@@ -64,7 +64,7 @@ object AccountDetailModel {
 
   fun enableBookmarkSyncing(enabled: Boolean) {
     this.account.setPreferences(
-      this.account.preferences.copy(bookmarkSyncingPermitted = enabled)
+      this.account.preferences.copy(bookmarkSyncingPermitted = enabled),
     )
   }
 
@@ -96,7 +96,7 @@ object AccountDetailModel {
   fun openErrorPage(
     activity: Activity,
     attributes: SortedMap<String, String>,
-    taskSteps: List<TaskStep>
+    taskSteps: List<TaskStep>,
   ) {
     UIThread.checkIsUIThread()
 
@@ -113,14 +113,14 @@ object AccountDetailModel {
           body = "",
           subject = "[palace-error-report]",
           attributes = attributes,
-          taskSteps = taskSteps
-        )
+          taskSteps = taskSteps,
+        ),
     )
   }
 
   private data class AfterLoginTask(
     val id: UUID,
-    val disposable: Disposable
+    val disposable: Disposable,
   )
 
   private val executeAfterLoginSubscription: AtomicReference<AfterLoginTask> =
@@ -128,7 +128,7 @@ object AccountDetailModel {
 
   fun executeAfterLogin(
     accountID: AccountID,
-    runOnLogin: () -> Unit
+    runOnLogin: () -> Unit,
   ) {
     val services =
       Services.serviceDirectory()
@@ -152,7 +152,8 @@ object AccountDetailModel {
               is AccountLoginState.AccountLoggingOut,
               is AccountLoginState.AccountNotLoggedIn,
               is AccountLoginState.AccountLogoutFailed,
-              is AccountLoginState.AccountLoginFailed -> {
+              is AccountLoginState.AccountLoginFailed,
+              -> {
                 // Nothing to do
               }
 
@@ -161,8 +162,8 @@ object AccountDetailModel {
                 runOnLogin()
               }
             }
-          }
-      )
+          },
+      ),
     )
   }
 

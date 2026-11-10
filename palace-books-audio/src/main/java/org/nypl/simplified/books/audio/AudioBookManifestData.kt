@@ -22,5 +22,5 @@ data class AudioBookManifestData(
    * The original fulfilled manifest, suitable for writing to external storage.
    */
 
-  val fulfilled: ManifestFulfilled
+  val fulfilled: ManifestFulfilled,
 )

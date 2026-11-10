@@ -33,7 +33,7 @@ object FeedLoading {
     accountID: AccountID,
     uri: URI,
     timeout: Pair<Long, TimeUnit>,
-    method: String = "GET"
+    method: String = "GET",
   ): FeedEntryOPDS {
     taskRecorder.beginNewStep("Fetching OPDS feed...")
 
@@ -43,7 +43,7 @@ object FeedLoading {
           accountID = accountID,
           uri = uri,
           credentials = null,
-          method = method
+          method = method,
         ).get(timeout.first, timeout.second)
 
     return when (feedResult) {
@@ -52,7 +52,7 @@ object FeedLoading {
           message = feedResult.message,
           errorCode = "feedAuthentication",
           exception = feedResult.exception,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
         throw feedResult.exception
       }
@@ -62,7 +62,7 @@ object FeedLoading {
           message = feedResult.message,
           errorCode = "feedFailed",
           exception = feedResult.exception,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
         throw feedResult.exception
       }
@@ -86,7 +86,7 @@ object FeedLoading {
 
   private fun checkEntry(
     taskRecorder: TaskRecorderType,
-    feedOPDS: FeedEntryOPDS?
+    feedOPDS: FeedEntryOPDS?,
   ): FeedEntryOPDS =
     if (feedOPDS != null) {
       taskRecorder.currentStepSucceeded("Found OPDS feed entry.")
@@ -98,7 +98,7 @@ object FeedLoading {
         message = message,
         errorCode = "feedUnsuitable",
         exception = exception,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       throw exception
     }

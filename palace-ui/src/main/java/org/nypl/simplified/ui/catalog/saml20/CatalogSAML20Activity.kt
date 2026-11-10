@@ -49,7 +49,7 @@ class CatalogSAML20Activity : AppCompatActivity(R.layout.book_saml20) {
       this.webView.setDownloadListener { url, _, _, mime, _ ->
         CatalogSAML20Model.onDownloadStarted(
           downloadURL = url,
-          mimeType = mime
+          mimeType = mime,
         )
       }
 
@@ -72,7 +72,7 @@ class CatalogSAML20Activity : AppCompatActivity(R.layout.book_saml20) {
               // Nothing to do.
             }
           }
-        }
+        },
       )
     }
   }

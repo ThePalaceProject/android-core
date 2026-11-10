@@ -35,7 +35,8 @@ class SettingsDebugMenuErrorsFragment :
       override fun fragment(): SettingsDebugMenuErrorsFragment = SettingsDebugMenuErrorsFragment()
     }
 
-    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuErrorsFragment> = ScreenSettingsDebugMenu()
+    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuErrorsFragment> =
+      ScreenSettingsDebugMenu()
   }
 
   override fun onBackButtonPressed(): MainBackButtonConsumerType.Result {
@@ -53,7 +54,7 @@ class SettingsDebugMenuErrorsFragment :
 
   override fun onViewCreated(
     view: View,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ) {
     super.onViewCreated(view, savedInstanceState)
 
@@ -85,7 +86,7 @@ class SettingsDebugMenuErrorsFragment :
         .makeText(
           this.requireContext(),
           "Triggered analytics send",
-          Toast.LENGTH_SHORT
+          Toast.LENGTH_SHORT,
         ).show()
     }
     this.crash.setOnClickListener {
@@ -113,7 +114,7 @@ class SettingsDebugMenuErrorsFragment :
       SettingsDebugModel.appVersion()
     val attributes =
       sortedMapOf(
-        Pair("Version", appVersion)
+        Pair("Version", appVersion),
       )
 
     val taskSteps =
@@ -122,8 +123,8 @@ class SettingsDebugMenuErrorsFragment :
     taskSteps.add(
       TaskStep(
         "Opening error page.",
-        TaskStepResolution.TaskStepSucceeded("Error page successfully opened.")
-      )
+        TaskStepResolution.TaskStepSucceeded("Error page successfully opened."),
+      ),
     )
 
     val supportEmail =
@@ -140,8 +141,8 @@ class SettingsDebugMenuErrorsFragment :
           body = "",
           subject = "[palace-error-report] $appVersion",
           attributes = attributes,
-          taskSteps = taskSteps
-        )
+          taskSteps = taskSteps,
+        ),
     )
   }
 
@@ -154,15 +155,15 @@ class SettingsDebugMenuErrorsFragment :
       code = DiagnosticCodes.USER_PRESSED_DEBUG_DIAGNOSTIC_BUTTON,
       data =
         mapOf(
-          Pair("Source", "debugMenu")
+          Pair("Source", "debugMenu"),
         ),
-      throwable = null
+      throwable = null,
     )
     Toast
       .makeText(
         this.requireContext(),
         "Reported diagnostic event",
-        Toast.LENGTH_SHORT
+        Toast.LENGTH_SHORT,
       ).show()
   }
 }

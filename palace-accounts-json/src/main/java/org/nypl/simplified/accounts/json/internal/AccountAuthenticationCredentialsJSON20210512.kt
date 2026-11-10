@@ -68,7 +68,7 @@ object AccountAuthenticationCredentialsJSON20210512 : AccountAuthenticationCrede
       authenticationDescription = JSONParserUtilities.getStringOrNull(obj, "authenticationDescription"),
       annotationsURI = JSONParserUtilities.getURIOrNull(obj, "annotationsURI"),
       deviceRegistrationURI = JSONParserUtilities.getURIOrNull(obj, "deviceRegistrationURI"),
-      patronAuthorization = patronAuthorization
+      patronAuthorization = patronAuthorization,
     )
   }
 
@@ -99,7 +99,7 @@ object AccountAuthenticationCredentialsJSON20210512 : AccountAuthenticationCrede
       authenticationDescription = JSONParserUtilities.getStringOrNull(obj, "authenticationDescription"),
       annotationsURI = JSONParserUtilities.getURIOrNull(obj, "annotationsURI"),
       deviceRegistrationURI = JSONParserUtilities.getURIOrNull(obj, "deviceRegistrationURI"),
-      patronAuthorization = patronAuthorization
+      patronAuthorization = patronAuthorization,
     )
   }
 
@@ -122,7 +122,7 @@ object AccountAuthenticationCredentialsJSON20210512 : AccountAuthenticationCrede
       cookies = deserializeCookies(JSONParserUtilities.getArray(obj, "cookies")),
       annotationsURI = JSONParserUtilities.getURIOrNull(obj, "annotationsURI"),
       deviceRegistrationURI = JSONParserUtilities.getURIOrNull(obj, "deviceRegistrationURI"),
-      patronAuthorization = patronAuthorization
+      patronAuthorization = patronAuthorization,
     )
   }
 
@@ -135,8 +135,8 @@ object AccountAuthenticationCredentialsJSON20210512 : AccountAuthenticationCrede
       results.add(
         AccountCookie(
           JSONParserUtilities.getString(obj, "url"),
-          JSONParserUtilities.getString(obj, "value")
-        )
+          JSONParserUtilities.getString(obj, "value"),
+        ),
       )
     }
 

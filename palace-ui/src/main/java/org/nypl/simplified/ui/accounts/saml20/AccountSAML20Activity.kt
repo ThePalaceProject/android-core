@@ -40,7 +40,7 @@ class AccountSAML20Activity : AppCompatActivity(R.layout.saml20_activity) {
     this.subscriptions.add(
       AccountSAML20Model.state.subscribe { oldValue, newValue ->
         this.onStateChanged(newValue)
-      }
+      },
     )
   }
 
@@ -136,7 +136,7 @@ class AccountSAML20Activity : AppCompatActivity(R.layout.saml20_activity) {
     taskRecorder.currentStepFailed(
       message = message,
       errorCode = "samlAccountCreationFailed",
-      extraMessages = listOf()
+      extraMessages = listOf(),
     )
     return taskRecorder.finishFailure<AccountType>().steps
   }
@@ -148,7 +148,7 @@ class AccountSAML20Activity : AppCompatActivity(R.layout.saml20_activity) {
         body = "",
         subject = "[palace-error-report]",
         attributes = sortedMapOf(),
-        taskSteps = taskSteps
+        taskSteps = taskSteps,
       )
     this.startActivity(Intent(this, ErrorPageActivity::class.java))
   }
@@ -159,7 +159,7 @@ class AccountSAML20Activity : AppCompatActivity(R.layout.saml20_activity) {
     val webViewLayout =
       FrameLayout.LayoutParams(
         FrameLayout.LayoutParams.MATCH_PARENT,
-        FrameLayout.LayoutParams.MATCH_PARENT
+        FrameLayout.LayoutParams.MATCH_PARENT,
       )
     webView.layoutParams = webViewLayout
     (webView.parent as ViewGroup?)?.removeView(webView)

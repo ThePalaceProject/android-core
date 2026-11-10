@@ -29,7 +29,7 @@ internal class Profile internal constructor(
   override val directory: File,
   private val analytics: AnalyticsType,
   private val accounts: AccountsDatabaseType,
-  private var initialDescription: ProfileDescription
+  private var initialDescription: ProfileDescription,
 ) : ProfileType {
   private val logger =
     LoggerFactory.getLogger(Profile::class.java)
@@ -49,11 +49,11 @@ internal class Profile internal constructor(
       this.logger.debug(
         "fixing dangling account ID: {} -> {}",
         preferences.mostRecentAccount.uuid,
-        newAccountId.uuid
+        newAccountId.uuid,
       )
       this.initialDescription =
         this.initialDescription.copy(
-          preferences = preferences.copy(mostRecentAccount = newAccountId)
+          preferences = preferences.copy(mostRecentAccount = newAccountId),
         )
     }
   }
@@ -88,8 +88,8 @@ internal class Profile internal constructor(
     val account = this.accounts.createAccount(accountProvider)
     this.setDescription(
       this.descriptionCurrent.copy(
-        preferences = this.descriptionCurrent.preferences.copy(mostRecentAccount = account.id)
-      )
+        preferences = this.descriptionCurrent.preferences.copy(mostRecentAccount = account.id),
+      ),
     )
     return account
   }
@@ -113,9 +113,9 @@ internal class Profile internal constructor(
       this.descriptionCurrent.copy(
         preferences =
           this.descriptionCurrent.preferences.copy(
-            mostRecentAccount = mostRecent.id
-          )
-      )
+            mostRecentAccount = mostRecent.id,
+          ),
+      ),
     )
   }
 
@@ -139,8 +139,8 @@ internal class Profile internal constructor(
             .dateOfBirth
             ?.date
             ?.toString(),
-        attributes = this.description().attributes.attributes
-      )
+        attributes = this.description().attributes.attributes,
+      ),
     )
   }
 }

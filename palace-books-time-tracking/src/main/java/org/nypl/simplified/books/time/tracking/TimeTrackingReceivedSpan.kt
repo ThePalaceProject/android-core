@@ -18,7 +18,7 @@ data class TimeTrackingReceivedSpan(
   val bookID: PlayerPalaceID,
   val timeStarted: OffsetDateTime,
   val timeEnded: OffsetDateTime,
-  val targetURI: URI
+  val targetURI: URI,
 ) {
   init {
     require(this.timeStarted.offset == ZoneOffset.UTC) {
@@ -66,7 +66,7 @@ data class TimeTrackingReceivedSpan(
         bookID = PlayerPalaceID(p.getProperty("BookID")),
         timeStarted = OffsetDateTime.parse(p.getProperty("TimeStarted")),
         timeEnded = OffsetDateTime.parse(p.getProperty("TimeEnded")),
-        targetURI = URI.create(p.getProperty("TargetURI"))
+        targetURI = URI.create(p.getProperty("TargetURI")),
       )
   }
 }

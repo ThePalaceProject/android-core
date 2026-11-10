@@ -13,7 +13,7 @@ import java.net.URLEncoder
  */
 
 data class OPDSOpenSearch1_1(
-  private val template: String
+  private val template: String,
 ) {
   /**
    * @param terms The search terms

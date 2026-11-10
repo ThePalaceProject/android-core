@@ -24,7 +24,7 @@ object AccountPreferencesJSON {
 
   fun serializeToJSON(
     objectMapper: ObjectMapper,
-    preferences: AccountPreferences
+    preferences: AccountPreferences,
   ): ObjectNode {
     val node = objectMapper.createObjectNode()
     node.put("bookmarkSyncingPermitted", preferences.bookmarkSyncingPermitted)
@@ -68,7 +68,7 @@ object AccountPreferencesJSON {
     AccountPreferences(
       bookmarkSyncingPermitted = JSONParserUtilities.getBoolean(node, "bookmarkSyncingPermitted"),
       catalogURIOverride = JSONParserUtilities.getURIOrNull(node, "catalogURIOverride"),
-      announcementsAcknowledged = this.parseAnnouncementsAcknowledged(node)
+      announcementsAcknowledged = this.parseAnnouncementsAcknowledged(node),
     )
 
   /**
@@ -76,5 +76,6 @@ object AccountPreferencesJSON {
    */
 
   @Throws(JSONParseException::class)
-  fun deserializeFromJSON(node: JsonNode): AccountPreferences = this.deserializeFromJSON(JSONParserUtilities.checkObject(null, node))
+  fun deserializeFromJSON(node: JsonNode): AccountPreferences =
+    this.deserializeFromJSON(JSONParserUtilities.checkObject(null, node))
 }

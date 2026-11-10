@@ -8,7 +8,7 @@ interface OPDSFeedHandleWithoutGroupsType : OPDSFeedHandleType {
     val pageIndex: Int,
     val pagePrevious: Int?,
     val pageNext: Int?,
-    val data: Feed.FeedWithoutGroups
+    val data: Feed.FeedWithoutGroups,
   )
 
   fun pages(): Int

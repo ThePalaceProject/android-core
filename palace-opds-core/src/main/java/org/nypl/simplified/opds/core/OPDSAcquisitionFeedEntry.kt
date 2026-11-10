@@ -122,7 +122,7 @@ data class OPDSAcquisitionFeedEntry(
    * @return series, if any
    */
 
-  val series: OPDSSeries?
+  val series: OPDSSeries?,
 ) : Serializable {
   companion object {
     @JvmStatic
@@ -130,7 +130,7 @@ data class OPDSAcquisitionFeedEntry(
       id: String,
       title: String,
       updated: DateTime,
-      availability: OPDSAvailabilityType
+      availability: OPDSAvailabilityType,
     ): OPDSAcquisitionFeedEntryBuilderType = Builder(id, title, updated, availability)
   }
 
@@ -162,7 +162,7 @@ data class OPDSAcquisitionFeedEntry(
         this.id,
         this.title,
         this.updated,
-        this.availability
+        this.availability,
       )
 
     b.acquisitionList.addAll(this.acquisitions)
@@ -201,7 +201,7 @@ data class OPDSAcquisitionFeedEntry(
     private val id: String,
     private val title: String,
     private val updated: DateTime,
-    private var availability: OPDSAvailabilityType
+    private var availability: OPDSAvailabilityType,
   ) : OPDSAcquisitionFeedEntryBuilderType {
     val acquisitionList = mutableListOf<OPDSAcquisition>()
     val authors = mutableListOf<String>()
@@ -251,7 +251,7 @@ data class OPDSAcquisitionFeedEntry(
 
     override fun addGroup(
       uri: URI,
-      name: String
+      name: String,
     ): Builder {
       this.groups += (name to uri)
       return this

@@ -35,12 +35,13 @@ class SettingsDebugMenuFragment :
       override fun fragment(): SettingsDebugMenuFragment = SettingsDebugMenuFragment()
     }
 
-    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuFragment> = ScreenSettingsDebugMenu()
+    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuFragment> =
+      ScreenSettingsDebugMenu()
   }
 
   override fun onViewCreated(
     view: View,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ) {
     super.onViewCreated(view, savedInstanceState)
 

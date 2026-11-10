@@ -16,5 +16,5 @@ data class OPDSSearchLink(
   /**
    * The search document URI.
    */
-  val uri: URI
+  val uri: URI,
 )

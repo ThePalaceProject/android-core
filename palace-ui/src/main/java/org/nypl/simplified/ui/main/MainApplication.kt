@@ -45,9 +45,10 @@ class MainApplication : Application() {
     BootLoader(
       bootProcess =
         object : BootProcessType<ServiceDirectoryType> {
-          override fun execute(onProgress: (BootEvent) -> Unit): ServiceDirectoryType = MainServices.setup(this@MainApplication, onProgress)
+          override fun execute(onProgress: (BootEvent) -> Unit): ServiceDirectoryType =
+            MainServices.setup(this@MainApplication, onProgress)
         },
-      bootStringResources = ::MainServicesStrings
+      bootStringResources = ::MainServicesStrings,
     )
 
   private val attributes =
@@ -62,7 +63,7 @@ class MainApplication : Application() {
 
   private fun <T> wrapAttribute(
     source: AttributeReadableType<T>,
-    target: AttributeType<T>
+    target: AttributeType<T>,
   ): AttributeSubscriptionType = source.subscribe { _, newValue -> UIThread.runOnUIThread { target.set(newValue) } }
 
   private val bootEventsUI: AttributeType<BootEvent> =
@@ -168,13 +169,13 @@ class MainApplication : Application() {
         override fun onStart(owner: LifecycleOwner) {
           try {
             this@MainApplication.startService(
-              Intent(this@MainApplication, LSHTTPNetworkAvailabilityService::class.java)
+              Intent(this@MainApplication, LSHTTPNetworkAvailabilityService::class.java),
             )
           } catch (e: Throwable) {
             this@MainApplication.logger.debug("Failed to start network availability service: ", e)
           }
         }
-      }
+      },
     )
   }
 
@@ -195,7 +196,7 @@ class MainApplication : Application() {
           .detectDiskWrites()
           .detectNetwork()
           .penaltyLog()
-          .build()
+          .build(),
       )
       StrictMode.setVmPolicy(
         VmPolicy
@@ -203,7 +204,7 @@ class MainApplication : Application() {
           .detectLeakedSqlLiteObjects()
           .detectLeakedClosableObjects()
           .penaltyLog()
-          .build()
+          .build(),
       )
     }
   }

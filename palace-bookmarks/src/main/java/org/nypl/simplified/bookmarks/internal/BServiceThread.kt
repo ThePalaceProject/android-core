@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory
  */
 
 internal class BServiceThread(
-  thread: Thread
+  thread: Thread,
 ) : Thread(thread) {
   companion object {
     private val logger =

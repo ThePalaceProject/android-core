@@ -45,7 +45,7 @@ interface OPDSAcquisitionFeedEntryBuilderType {
    */
   fun addGroup(
     uri: URI,
-    name: String
+    name: String,
   ): OPDSAcquisitionFeedEntryBuilderType
 
   /**

@@ -66,7 +66,7 @@ object MainNavigation {
   @UiThread
   fun openErrorPage(
     activity: Activity,
-    parameters: ErrorPageParameters
+    parameters: ErrorPageParameters,
   ) {
     UIThread.checkIsUIThread()
 
@@ -88,7 +88,7 @@ object MainNavigation {
 
   private fun includePalacePatronID(
     profilesController: ProfilesControllerType,
-    parameters: ErrorPageParameters
+    parameters: ErrorPageParameters,
   ): ErrorPageParameters {
     try {
       val profile =
@@ -121,7 +121,7 @@ object MainNavigation {
     this.tabAttribute.set(TabForCategory(TAB_SETTINGS))
     Settings.openAccountDetail(
       account,
-      showLoginReason = AccountDetailModel.PleaseLoginReasonGeneric
+      showLoginReason = AccountDetailModel.PleaseLoginReasonGeneric,
     )
     this.tabAttribute.set(TabAny)
   }
@@ -150,7 +150,7 @@ object MainNavigation {
   @UiThread
   fun openExternalBrowser(
     activity: FragmentActivity,
-    target: URI
+    target: URI,
   ) {
     UIThread.checkIsUIThread()
     try {
@@ -256,15 +256,15 @@ object MainNavigation {
 
     fun openAccountDetail(
       account: AccountType,
-      showLoginReason: AccountDetailModel.PleaseLoginReason?
+      showLoginReason: AccountDetailModel.PleaseLoginReason?,
     ) {
       this.stackPush(
         AccountDetailFragment.createScreenDefinition(
           AccountDetailFragment.AccountDetailScreenParameters(
             account = account,
-            showLoginReason = showLoginReason
-          )
-        )
+            showLoginReason = showLoginReason,
+          ),
+        ),
       )
     }
 
@@ -278,7 +278,7 @@ object MainNavigation {
 
     fun goToRoot() {
       this.navigationStackAttribute.set(
-        listOf(SettingsMainFragment4.createScreenDefinition(Unit))
+        listOf(SettingsMainFragment4.createScreenDefinition(Unit)),
       )
     }
 

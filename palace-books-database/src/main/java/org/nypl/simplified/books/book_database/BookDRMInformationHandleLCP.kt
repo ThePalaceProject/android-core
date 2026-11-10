@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 class BookDRMInformationHandleLCP(
   private val directory: File,
   format: BookFormats.BookFormatDefinition,
-  private val onUpdate: () -> Unit
+  private val onUpdate: () -> Unit,
 ) : BookDRMInformationHandle.LCPHandle(),
   BookDRMInformationHandleBase {
   private val closed = AtomicBoolean(false)
@@ -24,7 +24,7 @@ class BookDRMInformationHandleLCP(
     BookDRMInformationHandles.writeDRMInfo(
       directory = this.directory,
       format = format,
-      kind = BookDRMKind.LCP
+      kind = BookDRMKind.LCP,
     )
   }
 
@@ -56,7 +56,7 @@ class BookDRMInformationHandleLCP(
           this.fileLicense.readBytes()
         } else {
           null
-        }
+        },
     )
 
   override val info: BookDRMInformation.LCP
@@ -67,23 +67,23 @@ class BookDRMInformationHandleLCP(
 
   override fun setInfo(
     passphrase: String,
-    licenseBytes: ByteArray
+    licenseBytes: ByteArray,
   ): BookDRMInformation.LCP {
     synchronized(this.infoLock) {
       FileUtilities.fileWriteUTF8Atomically(
         this.filePassphrase,
         this.filePassphraseTmp,
-        passphrase
+        passphrase,
       )
       FileUtilities.fileWriteBytesAtomically(
         this.fileLicense,
         this.fileLicenseTmp,
-        licenseBytes
+        licenseBytes,
       )
       this.infoRef =
         this.infoRef.copy(
           hashedPassphrase = passphrase,
-          licenseBytes = licenseBytes
+          licenseBytes = licenseBytes,
         )
     }
 

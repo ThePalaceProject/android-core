@@ -30,7 +30,7 @@ sealed interface FeedFacet : Serializable {
 
   data class FeedFacetOPDS12Single(
     override val accountID: AccountID,
-    val opdsFacet: OPDSFacet
+    val opdsFacet: OPDSFacet,
   ) : FeedFacetOPDS12(),
     FeedFacetSingle {
     override val title: String =
@@ -52,7 +52,7 @@ sealed interface FeedFacet : Serializable {
   data class FeedFacetOPDS12Composite(
     val facets: List<FeedFacetOPDS12Single>,
     override val title: String,
-    override val isActive: Boolean
+    override val isActive: Boolean,
   ) : FeedFacetOPDS12() {
     init {
       check(facets.isNotEmpty()) {
@@ -81,7 +81,7 @@ sealed interface FeedFacet : Serializable {
     data class FilteringForAccount(
       override val title: String,
       override val isActive: Boolean,
-      val account: AccountID?
+      val account: AccountID?,
     ) : FeedFacetPseudo()
 
     /**
@@ -91,7 +91,7 @@ sealed interface FeedFacet : Serializable {
     data class Sorting(
       override val title: String,
       override val isActive: Boolean,
-      val sortBy: SortBy
+      val sortBy: SortBy,
     ) : FeedFacetPseudo() {
       enum class SortBy {
         /**
@@ -104,7 +104,7 @@ sealed interface FeedFacet : Serializable {
          * Sort the feed in question by book title.
          */
 
-        SORT_BY_TITLE
+        SORT_BY_TITLE,
       }
     }
   }

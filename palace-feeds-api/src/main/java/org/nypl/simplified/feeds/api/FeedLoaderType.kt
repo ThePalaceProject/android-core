@@ -29,6 +29,6 @@ interface FeedLoaderType {
     accountID: AccountID,
     uri: URI,
     credentials: AccountAuthenticationCredentials?,
-    method: String
+    method: String,
   ): CompletableFuture<FeedLoaderResult>
 }

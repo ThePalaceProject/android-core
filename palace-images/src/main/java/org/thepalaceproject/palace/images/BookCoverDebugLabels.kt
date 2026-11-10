@@ -11,5 +11,5 @@ package org.thepalaceproject.palace.images
 
 data class BookCoverDebugLabels(
   val format: String,
-  val drm: String
+  val drm: String,
 )

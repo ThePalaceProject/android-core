@@ -23,7 +23,7 @@ object MainBookFormatSupport {
     lcpService: LcpService?,
     boundless: BoundlessServiceType?,
     feedbooksSecretService: AudioBookFeedbooksSecretServiceType?,
-    overdriveSecretService: AudioBookOverdriveSecretServiceType?
+    overdriveSecretService: AudioBookOverdriveSecretServiceType?,
   ): BookFormatSupportType {
     val parameters =
       BookFormatSupportParameters(
@@ -34,9 +34,9 @@ object MainBookFormatSupport {
           BookFormatAudioSupportParameters(
             supportsFindawayAudioBooks = isFindawaySupported(),
             supportsOverdriveAudioBooks = overdriveSecretService != null,
-            supportsDPLAAudioBooks = feedbooksSecretService != null
+            supportsDPLAAudioBooks = feedbooksSecretService != null,
           ),
-        supportsLCP = lcpService != null
+        supportsLCP = lcpService != null,
       )
 
     return BookFormatSupport.create(parameters)

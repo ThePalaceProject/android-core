@@ -24,6 +24,6 @@ interface OPDSSearchParserType {
   @Throws(OPDSParseException::class)
   fun parse(
     uri: URI,
-    s: InputStream
+    s: InputStream,
   ): OPDSOpenSearch1_1
 }

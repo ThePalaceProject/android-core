@@ -45,7 +45,7 @@ sealed class AnalyticsEvent {
      * The application version code.
      */
 
-    val packageVersionCode: Int
+    val packageVersionCode: Int,
   ) : AnalyticsEvent()
 
   /**
@@ -74,7 +74,7 @@ sealed class AnalyticsEvent {
      * The attributes of the profile owner
      */
 
-    val attributes: SortedMap<String, String>
+    val attributes: SortedMap<String, String>,
   ) : AnalyticsEvent()
 
   /**
@@ -103,7 +103,7 @@ sealed class AnalyticsEvent {
      * The attributes of the profile owner
      */
 
-    val attributes: SortedMap<String, String>
+    val attributes: SortedMap<String, String>,
   ) : AnalyticsEvent()
 
   /**
@@ -132,7 +132,7 @@ sealed class AnalyticsEvent {
      * The attributes of the profile owner
      */
 
-    val attributes: SortedMap<String, String>
+    val attributes: SortedMap<String, String>,
   ) : AnalyticsEvent()
 
   /**
@@ -161,7 +161,7 @@ sealed class AnalyticsEvent {
      * The attributes of the profile owner
      */
 
-    val attributes: SortedMap<String, String>
+    val attributes: SortedMap<String, String>,
   ) : AnalyticsEvent()
 
   /**
@@ -180,7 +180,7 @@ sealed class AnalyticsEvent {
      * The current display name of the profile.
      */
 
-    val displayName: String
+    val displayName: String,
   ) : AnalyticsEvent()
 
   /**
@@ -209,7 +209,7 @@ sealed class AnalyticsEvent {
      * The search string query used.
      */
 
-    val searchQuery: String
+    val searchQuery: String,
   ) : AnalyticsEvent()
 
   /**
@@ -241,7 +241,7 @@ sealed class AnalyticsEvent {
     /**
      * An operation to perform if the access token was updated.
      */
-    val onAccessTokenUpdated: (String?) -> Unit
+    val onAccessTokenUpdated: (String?) -> Unit,
   ) : AnalyticsEvent()
 
   /**
@@ -285,7 +285,7 @@ sealed class AnalyticsEvent {
      * The title of the page.
      */
 
-    val bookPageTitle: String
+    val bookPageTitle: String,
   ) : AnalyticsEvent()
 
   /**
@@ -314,7 +314,7 @@ sealed class AnalyticsEvent {
      * The OPDS entry of the book.
      */
 
-    val opdsEntry: OPDSAcquisitionFeedEntry
+    val opdsEntry: OPDSAcquisitionFeedEntry,
   ) : AnalyticsEvent()
 
   /**
@@ -323,6 +323,6 @@ sealed class AnalyticsEvent {
 
   data class SyncRequested(
     override val timestamp: LocalDateTime = LocalDateTime.now(),
-    override val credentials: AccountAuthenticationCredentials?
+    override val credentials: AccountAuthenticationCredentials?,
   ) : AnalyticsEvent()
 }

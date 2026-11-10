@@ -23,5 +23,5 @@ data class OPDSLink(
   /**
    * The optional length of the target content.
    */
-  val length: BigInteger?
+  val length: BigInteger?,
 )

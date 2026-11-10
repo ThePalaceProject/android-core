@@ -20,7 +20,7 @@ class ProfileAccountDeleteTask(
   private val accountProviderID: URI,
   private val profiles: ProfilesDatabaseType,
   private val profileEvents: Subject<ProfileEvent>,
-  private val strings: ProfileAccountDeletionStringResourcesType
+  private val strings: ProfileAccountDeletionStringResourcesType,
 ) : Callable<TaskResult<Unit>> {
   private val logger = LoggerFactory.getLogger(ProfileAccountDeleteTask::class.java)
   private val taskRecorder = TaskRecorder.create()
@@ -28,8 +28,8 @@ class ProfileAccountDeleteTask(
   private fun publishFailureEvent() =
     this.accountEvents.onNext(
       AccountEventDeletion.AccountEventDeletionFailed(
-        this.taskRecorder.finishFailure<Unit>()
-      )
+        this.taskRecorder.finishFailure<Unit>(),
+      ),
     )
 
   private fun publishProgressEvent(step: TaskStep) =
@@ -38,8 +38,9 @@ class ProfileAccountDeleteTask(
   private fun publishSuccessEvent(accountThen: AccountID) =
     this.accountEvents.onNext(
       AccountEventDeletion.AccountEventDeletionSucceeded(
-        this.strings.deletionSucceeded, accountThen
-      )
+        this.strings.deletionSucceeded,
+        accountThen,
+      ),
     )
 
   override fun call(): TaskResult<Unit> =
@@ -57,7 +58,7 @@ class ProfileAccountDeleteTask(
         message = e.message ?: e.javaClass.name,
         errorCode = "oneAccountMustExist",
         exception = e,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       this.publishFailureEvent()
       this.taskRecorder.finishFailure()
@@ -66,7 +67,7 @@ class ProfileAccountDeleteTask(
         message = e.message ?: e.javaClass.name,
         errorCode = "deletionFailed",
         exception = e,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       this.publishFailureEvent()
       this.taskRecorder.finishFailure()

@@ -73,7 +73,7 @@ class AccountListRegistryViews(
           searchText = rootView.findViewById(R.id.accountRegistryToolbarSearchText),
           backButton = rootView.findViewById(R.id.accountRegistryToolbarBackIconTouch),
           error = rootView.findViewById(R.id.accountRegistryError),
-          errorTouch = rootView.findViewById(R.id.accountRegistryErrorTouch)
+          errorTouch = rootView.findViewById(R.id.accountRegistryErrorTouch),
         )
 
       views.accountList.setHasFixedSize(true)
@@ -93,7 +93,7 @@ class AccountListRegistryViews(
         views.updateAdapterFilter(
           views.searchText.text
             .trim()
-            .toString()
+            .toString(),
         )
       }
 
@@ -103,7 +103,7 @@ class AccountListRegistryViews(
           views.updateAdapterFilter(
             views.searchText.text
               .trim()
-              .toString()
+              .toString(),
           )
           true
         } else {
@@ -217,8 +217,8 @@ class AccountListRegistryViews(
           body = result.message,
           subject = "[palace-error-report] $appVersion",
           attributes = result.attributes.toSortedMap(),
-          taskSteps = result.steps
-        )
+          taskSteps = result.steps,
+        ),
     )
   }
 

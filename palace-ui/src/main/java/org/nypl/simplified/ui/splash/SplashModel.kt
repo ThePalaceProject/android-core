@@ -58,7 +58,7 @@ object SplashModel {
      * the tutorial, etc, and the main catalog view should now be shown.
      */
 
-    SPLASH_SCREEN_COMPLETED
+    SPLASH_SCREEN_COMPLETED,
   }
 
   fun splashScreenCompleteNotifications(profiles: ProfilesControllerType) {
@@ -66,7 +66,7 @@ object SplashModel {
 
     profiles.profileUpdate { description ->
       description.copy(
-        preferences = description.preferences.copy(hasSeenNotificationScreen = true)
+        preferences = description.preferences.copy(hasSeenNotificationScreen = true),
       )
     }
   }
@@ -76,7 +76,7 @@ object SplashModel {
 
     profiles.profileUpdate { description ->
       description.copy(
-        preferences = description.preferences.copy(hasSeenLibrarySelectionScreen = true)
+        preferences = description.preferences.copy(hasSeenLibrarySelectionScreen = true),
       )
     }
   }

@@ -38,7 +38,7 @@ internal class BookDatabaseEntry internal constructor(
   private val formats: BookFormatSupportType,
   @GuardedBy("bookLock")
   private var bookRef: Book,
-  private val onDelete: Runnable
+  private val onDelete: Runnable,
 ) : BookDatabaseEntryType {
   private val LOG = LoggerFactory.getLogger(BookDatabaseEntry::class.java)
 
@@ -80,7 +80,7 @@ internal class BookDatabaseEntry internal constructor(
             DatabaseBookFormatHandleConstructor(
               classType = DatabaseFormatHandleEPUB::class.java,
               supportedContentTypes = format.supportedContentTypes(),
-              constructor = { params -> DatabaseFormatHandleEPUB(params) }
+              constructor = { params -> DatabaseFormatHandleEPUB(params) },
             )
           }
 
@@ -88,7 +88,7 @@ internal class BookDatabaseEntry internal constructor(
             DatabaseBookFormatHandleConstructor(
               classType = DatabaseFormatHandleAudioBook::class.java,
               supportedContentTypes = format.supportedContentTypes(),
-              constructor = { params -> DatabaseFormatHandleAudioBook(params) }
+              constructor = { params -> DatabaseFormatHandleAudioBook(params) },
             )
           }
 
@@ -96,7 +96,7 @@ internal class BookDatabaseEntry internal constructor(
             DatabaseBookFormatHandleConstructor(
               classType = DatabaseFormatHandlePDF::class.java,
               supportedContentTypes = format.supportedContentTypes(),
-              constructor = { params -> DatabaseFormatHandlePDF(params) }
+              constructor = { params -> DatabaseFormatHandlePDF(params) },
             )
           }
         }
@@ -130,7 +130,7 @@ internal class BookDatabaseEntry internal constructor(
       LOG.debug("onFormatUpdated: {}", format.javaClass.canonicalName)
       this.bookRef =
         this.bookRef.copy(
-          formats = this.formatHandles.map { handle -> handle.format }
+          formats = this.formatHandles.map { handle -> handle.format },
         )
     }
   }
@@ -153,8 +153,8 @@ internal class BookDatabaseEntry internal constructor(
           fileMeta,
           fileMetaTmp,
           JSONSerializerUtilities.serializeToString(
-            this.serializer.serializeFeedEntry(opdsEntry)
-          )
+            this.serializer.serializeFeedEntry(opdsEntry),
+          ),
         )
 
         this.bookRef = this.bookRef.copy(entry = opdsEntry)
@@ -279,7 +279,9 @@ internal class BookDatabaseEntry internal constructor(
             if (!bookFormats.isSupportedFinalContentType(contentType)) {
               logger.debug(
                 "[{}]: skipping unsupported format {} for content type {}",
-                owner.book.id.brief(), constructor.classType.simpleName, contentType
+                owner.book.id.brief(),
+                constructor.classType.simpleName,
+                contentType,
               )
               continue
             }
@@ -288,7 +290,9 @@ internal class BookDatabaseEntry internal constructor(
             if (existingFormats.containsKey(constructor.classType)) {
               logger.debug(
                 "[{}]: skipping duplicate format {} for content type {}",
-                owner.book.id.brief(), constructor.classType.simpleName, contentType
+                owner.book.id.brief(),
+                constructor.classType.simpleName,
+                contentType,
               )
               continue
             }
@@ -296,7 +300,9 @@ internal class BookDatabaseEntry internal constructor(
             // Add new handler for type
             logger.debug(
               "[{}]: instantiating format {} for content type {}",
-              owner.book.id.brief(), constructor.classType.simpleName, contentType
+              owner.book.id.brief(),
+              constructor.classType.simpleName,
+              contentType,
             )
 
             val params =

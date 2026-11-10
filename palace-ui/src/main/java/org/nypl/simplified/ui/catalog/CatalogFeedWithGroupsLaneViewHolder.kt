@@ -37,7 +37,7 @@ class CatalogFeedWithGroupsLaneViewHolder(
      * different padding and different text sizes.
      */
 
-    RELATED_BOOKS_LANE
+    RELATED_BOOKS_LANE,
   }
 
   private val titleContainer =
@@ -61,13 +61,15 @@ class CatalogFeedWithGroupsLaneViewHolder(
       this.setHasFixedSize(true)
       this.layoutManager =
         LinearLayoutManager(
-          this.context, LinearLayoutManager.HORIZONTAL, false
+          this.context,
+          LinearLayoutManager.HORIZONTAL,
+          false,
         )
 
       this.addItemDecoration(
         SpaceItemDecoration(
-          this.resources.getDimensionPixelSize(R.dimen.catalogFeedCoversSpace)
-        )
+          this.resources.getDimensionPixelSize(R.dimen.catalogFeedCoversSpace),
+        ),
       )
     }
   }
@@ -83,7 +85,7 @@ class CatalogFeedWithGroupsLaneViewHolder(
           val newTitleLayout =
             LinearLayout.LayoutParams(
               LinearLayout.LayoutParams.MATCH_PARENT,
-              LinearLayout.LayoutParams.WRAP_CONTENT
+              LinearLayout.LayoutParams.WRAP_CONTENT,
             )
 
           val marginH = this.screenSize.dpToPixels(32).toInt()
@@ -99,7 +101,7 @@ class CatalogFeedWithGroupsLaneViewHolder(
             marginH,
             0,
             marginH,
-            0
+            0,
           )
         }
       }

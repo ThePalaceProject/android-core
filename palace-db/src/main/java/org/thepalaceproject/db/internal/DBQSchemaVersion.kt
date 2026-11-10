@@ -12,7 +12,7 @@ internal object DBQSchemaVersion : DBQSchemaVersionType {
 
   override fun execute(
     transaction: DBTransactionType,
-    parameters: Unit
+    parameters: Unit,
   ): Long =
     transaction.connection.connection.prepareStatement(text).use { statement ->
       statement.executeQuery().use { resultSet ->

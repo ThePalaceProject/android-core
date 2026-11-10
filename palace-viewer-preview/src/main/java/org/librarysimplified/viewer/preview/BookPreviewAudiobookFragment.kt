@@ -51,7 +51,7 @@ class BookPreviewAudiobookFragment :
 
     fun newInstance(
       file: File,
-      feedEntry: FeedEntry.FeedEntryOPDS
+      feedEntry: FeedEntry.FeedEntryOPDS,
     ): BookPreviewAudiobookFragment =
       BookPreviewAudiobookFragment().apply {
         this.arguments =
@@ -80,9 +80,9 @@ class BookPreviewAudiobookFragment :
     BookPreviewPlayerMediaReceiver(
       onAudioBecomingNoisy = {
         this.onPauseButtonPressed(
-          abandonAudioFocus = false
+          abandonAudioFocus = false,
         )
-      }
+      },
     )
   }
 
@@ -115,12 +115,12 @@ class BookPreviewAudiobookFragment :
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ): View? = inflater.inflate(R.layout.fragment_book_preview_audiobook, container, false)
 
   override fun onViewCreated(
     view: View,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ) {
     super.onViewCreated(view, savedInstanceState)
 
@@ -151,7 +151,7 @@ class BookPreviewAudiobookFragment :
 
     this.requireActivity().registerReceiver(
       this.playerMediaReceiver,
-      IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+      IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY),
     )
 
     this.configureToolbar()
@@ -193,12 +193,13 @@ class BookPreviewAudiobookFragment :
       }
 
       AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK,
-      AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
+      AudioManager.AUDIOFOCUS_LOSS_TRANSIENT,
+      -> {
         if (this.mediaPlayer.isPlaying) {
           this.playOnAudioFocus = true
           this.audioFocusDelayed = false
           this.onPauseButtonPressed(
-            abandonAudioFocus = false
+            abandonAudioFocus = false,
           )
         }
       }
@@ -207,7 +208,7 @@ class BookPreviewAudiobookFragment :
         this.audioFocusDelayed = false
         this.playOnAudioFocus = false
         this.onPauseButtonPressed(
-          abandonAudioFocus = true
+          abandonAudioFocus = true,
         )
       }
     }
@@ -223,7 +224,7 @@ class BookPreviewAudiobookFragment :
       hasBadge = false,
       imageView = this.previewCover,
       width = 0,
-      height = 0
+      height = 0,
     )
 
     this.previewAuthor.text = this.feedEntry.feedEntry.authorsCommaSeparated
@@ -243,7 +244,7 @@ class BookPreviewAudiobookFragment :
     this.mediaPlayer.setOnCompletionListener {
       this.mediaPlayer.seekTo(0)
       this.onPauseButtonPressed(
-        abandonAudioFocus = false
+        abandonAudioFocus = false,
       )
     }
   }
@@ -256,7 +257,7 @@ class BookPreviewAudiobookFragment :
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe {
           this.updatePlayerUI()
-        }
+        },
     )
   }
 
@@ -273,7 +274,7 @@ class BookPreviewAudiobookFragment :
   private fun updateCurrentTime(currentPosition: Long) {
     this.previewCurrentTime.text =
       BookPreviewTimeUtils.hourMinuteSecondTextFromDuration(
-        Duration.millis(currentPosition)
+        Duration.millis(currentPosition),
       )
     this.previewCurrentTime.contentDescription =
       this.playerTimeCurrentSpoken(currentPosition)
@@ -284,7 +285,7 @@ class BookPreviewAudiobookFragment :
 
     this.previewRemainingTime.text =
       BookPreviewTimeUtils.hourMinuteSecondTextFromDuration(
-        Duration.millis(duration - currentPosition)
+        Duration.millis(duration - currentPosition),
       )
     this.previewRemainingTime.contentDescription =
       this.playerTimeRemainingSpoken(currentPosition, duration)
@@ -354,8 +355,9 @@ class BookPreviewAudiobookFragment :
       this.audioManager.requestAudioFocus(this.audioRequest!!)
     } else {
       this.audioManager.requestAudioFocus(
-        this, AudioManager.STREAM_MUSIC,
-        AudioManager.AUDIOFOCUS_GAIN
+        this,
+        AudioManager.STREAM_MUSIC,
+        AudioManager.AUDIOFOCUS_GAIN,
       )
     }
   }
@@ -371,7 +373,7 @@ class BookPreviewAudiobookFragment :
     this.previewPlayPauseButton.setOnClickListener {
       if (this.mediaPlayer.isPlaying) {
         this.onPauseButtonPressed(
-          abandonAudioFocus = true
+          abandonAudioFocus = true,
         )
       } else {
         this.onPlayButtonPressed()
@@ -386,7 +388,7 @@ class BookPreviewAudiobookFragment :
           position.toInt()
         } else {
           duration
-        }
+        },
       )
     }
 
@@ -397,7 +399,7 @@ class BookPreviewAudiobookFragment :
           position.toInt()
         } else {
           0
-        }
+        },
       )
     }
   }
@@ -455,19 +457,19 @@ class BookPreviewAudiobookFragment :
       R.string.bookPreviewAccessibilityTimeCurrent,
       BookPreviewTimeUtils.hourMinuteSecondSpokenFromDuration(
         this.timeStrings,
-        Duration.millis(offsetMilliseconds)
-      )
+        Duration.millis(offsetMilliseconds),
+      ),
     )
 
   private fun playerTimeRemainingSpoken(
     offsetMilliseconds: Long,
-    duration: Long
+    duration: Long,
   ): String {
     val remaining = Duration.millis(duration - offsetMilliseconds)
 
     return this.getString(
       R.string.bookPreviewAccessibilityTimeRemaining,
-      BookPreviewTimeUtils.hourMinuteSecondSpokenFromDuration(this.timeStrings, remaining)
+      BookPreviewTimeUtils.hourMinuteSecondSpokenFromDuration(this.timeStrings, remaining),
     )
   }
 }

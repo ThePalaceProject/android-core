@@ -10,5 +10,5 @@ import org.nypl.simplified.opds.core.OPDSFeedTransportException
 class FeedHTTPTransportException(
   override val message: String,
   val code: Int,
-  val report: LSHTTPProblemReport?
+  val report: LSHTTPProblemReport?,
 ) : OPDSFeedTransportException(message)

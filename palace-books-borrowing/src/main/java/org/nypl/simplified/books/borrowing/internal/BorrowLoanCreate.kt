@@ -62,7 +62,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
       type: MIMEType,
       target: Link?,
       account: AccountReadableType?,
-      remaining: List<MIMEType>
+      remaining: List<MIMEType>,
     ): Boolean {
       for (opdsType in allOPDSFeeds) {
         if (MIMECompatibility.isCompatibleStrictWithoutAttributes(opdsType, type)) {
@@ -124,20 +124,20 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
 
   private fun handleHTTPFailure(
     context: BorrowContextType,
-    status: LSHTTPResponseStatus.Failed
+    status: LSHTTPResponseStatus.Failed,
   ) {
     context.taskRecorder.currentStepFailed(
       message = status.exception.message ?: "Exception raised during connection attempt.",
       errorCode = httpConnectionFailed,
       exception = status.exception,
-      extraMessages = listOf()
+      extraMessages = listOf(),
     )
     throw BorrowSubtaskFailed()
   }
 
   private fun handleHTTPError(
     context: BorrowContextType,
-    status: LSHTTPResponseStatus.Responded.Error
+    status: LSHTTPResponseStatus.Responded.Error,
   ) {
     val report = status.properties.problemReport
     if (report != null) {
@@ -150,8 +150,8 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
             id = context.bookCurrent.id,
             loanExpiryDate = null,
             returnable = false,
-            isOpenAccess = false
-          )
+            isOpenAccess = false,
+          ),
         )
         return
       }
@@ -161,7 +161,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
       message = "HTTP request failed: ${status.properties.originalStatus} ${status.properties.message}",
       errorCode = httpRequestFailed,
       exception = null,
-      extraMessages = listOf()
+      extraMessages = listOf(),
     )
 
     if (status.properties.status == 401) {
@@ -187,7 +187,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
   private fun handleOKRequest(
     context: BorrowContextType,
     uri: URI,
-    status: LSHTTPResponseStatus.Responded.OK
+    status: LSHTTPResponseStatus.Responded.OK,
   ) {
     if (!isMimeTypeAcceptable(context, status.properties.contentType)) {
       throw BorrowSubtaskFailed()
@@ -204,7 +204,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
 
   private fun checkAvailability(
     context: BorrowContextType,
-    entry: OPDSAcquisitionFeedEntry
+    entry: OPDSAcquisitionFeedEntry,
   ) {
     context.taskRecorder.beginNewStep("Checking OPDS availability...")
 
@@ -217,8 +217,8 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
             queuePosition = availability.position,
             startDate = availability.startDate,
             isRevocable = availability.revoke != null,
-            endDate = availability.endDate
-          )
+            endDate = availability.endDate,
+          ),
         )
         throw BorrowSubtaskHaltedEarly()
       }
@@ -229,8 +229,8 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
           HeldReady(
             id = context.bookCurrent.id,
             endDate = availability.endDate,
-            isRevocable = availability.revoke != null
-          )
+            isRevocable = availability.revoke != null,
+          ),
         )
         throw BorrowSubtaskHaltedEarly()
       }
@@ -247,7 +247,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
         context.taskRecorder.currentStepFailed(
           message = "Book is unexpectedly holdable.",
           errorCode = opdsFeedEntryHoldable,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
         throw BorrowSubtaskFailed()
       }
@@ -264,7 +264,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
         context.taskRecorder.currentStepFailed(
           message = "Book is unexpectedly loanable.",
           errorCode = opdsFeedEntryLoanable,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
         throw BorrowSubtaskFailed()
       }
@@ -276,8 +276,8 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
             id = context.bookCurrent.id,
             loanExpiryDate = availability.endDate,
             returnable = availability.revoke != null,
-            isOpenAccess = false
-          )
+            isOpenAccess = false,
+          ),
         )
       }
 
@@ -288,8 +288,8 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
             id = context.bookCurrent.id,
             loanExpiryDate = availability.endDate,
             returnable = availability.revoke != null,
-            isOpenAccess = true
-          )
+            isOpenAccess = true,
+          ),
         )
       }
 
@@ -307,7 +307,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
   private fun parseOPDSFeedEntry(
     context: BorrowContextType,
     inputStream: InputStream,
-    uri: URI
+    uri: URI,
   ): OPDSAcquisitionFeedEntry {
     context.taskRecorder.beginNewStep("Parsing the OPDS feed entry...")
     val parser = OPDSAcquisitionFeedEntryParser.newParser()
@@ -322,7 +322,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
         message = "Failed to parse the OPDS feed entry (${e.message}).",
         errorCode = opdsFeedEntryParseError,
         exception = e,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       throw BorrowSubtaskFailed()
     }
@@ -330,7 +330,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
 
   private fun findNextLink(
     context: BorrowContextType,
-    entry: OPDSAcquisitionFeedEntry
+    entry: OPDSAcquisitionFeedEntry,
   ): Link {
     context.taskRecorder.beginNewStep("Finding the next URI in the OPDS feed entry...")
 

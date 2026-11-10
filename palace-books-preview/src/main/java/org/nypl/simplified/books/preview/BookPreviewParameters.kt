@@ -22,7 +22,7 @@ data class BookPreviewParameters(
   val onPreviewFileReady: (File) -> Unit,
   val previewAcquisition: OPDSPreviewAcquisition,
   val taskRecorder: TaskRecorderType,
-  val temporaryDirectory: File
+  val temporaryDirectory: File,
 ) {
   private lateinit var temporaryFile: File
 

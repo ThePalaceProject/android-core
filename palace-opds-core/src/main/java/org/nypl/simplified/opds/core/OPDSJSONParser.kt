@@ -43,7 +43,8 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
       val id = getString(s, "id")
       val updated =
         getTimestamp(
-          s, "updated"
+          s,
+          "updated",
         )
       val title = getString(s, "title")
 
@@ -57,7 +58,7 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
           val searchType = getString(o, "type")
           val searchURI = getURI(o, "uri")
           OPDSSearchLink(searchType, searchURI)
-        }
+        },
       )
 
       run {
@@ -68,7 +69,7 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
             getBoolean(o, "active")
           val facetUri =
             URI(
-              getString(o, "uri")
+              getString(o, "uri"),
             )
           val facetGroup =
             getString(o, "group")
@@ -82,8 +83,8 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
               facetUri,
               facetGroup,
               facetTitle,
-              facetGroupType
-            )
+              facetGroupType,
+            ),
           )
         }
       }
@@ -93,7 +94,8 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
         for (index in 0..<fs.size()) {
           val o =
             checkObject(
-              null, fs.get(index)
+              null,
+              fs.get(index),
             )
           fb.addEntry(this.parseAcquisitionFeedEntry(o))
         }
@@ -116,7 +118,7 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
 
       val availability: OPDSAvailabilityType =
         parseAvailability(
-          getObject(s, "availability")
+          getObject(s, "availability"),
         )
 
       val fb =
@@ -134,8 +136,8 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
         for (index in 0..<a.size()) {
           fb.addAcquisition(
             parseAcquisition(
-              checkObject(null, a.get(index))
-            )
+              checkObject(null, a.get(index)),
+            ),
           )
         }
       }
@@ -160,13 +162,15 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
           try {
             val jo =
               checkObject(
-                null, a.get(index)
+                null,
+                a.get(index),
               )
             val uri =
               URI(
                 getString(
-                  jo, "uri"
-                )
+                  jo,
+                  "uri",
+                ),
               )
             val name = getString(jo, "name")
             fb.addGroup(uri, name)
@@ -185,17 +189,19 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
             try {
               val jo =
                 checkObject(
-                  null, a.get(index)
+                  null,
+                  a.get(index),
                 )
               val uri =
                 URI(
                   getString(
-                    jo, "uri"
-                  )
+                    jo,
+                    "uri",
+                  ),
                 )
               val type =
                 parseRaisingException(
-                  getString(jo, "type")
+                  getString(jo, "type"),
                 )
               fb.addPreviewAcquisition(OPDSPreviewAcquisition(uri, type))
             } catch (e: Exception) {
@@ -225,8 +231,9 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
       val jom = ObjectMapper()
       return this.parseAcquisitionFeedEntry(
         checkObject(
-          null, jom.readTree(s)
-        )
+          null,
+          jom.readTree(s),
+        ),
       )
     } catch (e: JsonProcessingException) {
       throw OPDSParseException(e)
@@ -241,8 +248,9 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
       val jom = ObjectMapper()
       return this.parseAcquisitionFeed(
         checkObject(
-          null, jom.readTree(s)
-        )
+          null,
+          jom.readTree(s),
+        ),
       )
     } catch (e: JsonProcessingException) {
       throw OPDSParseException(e)
@@ -284,7 +292,7 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
         if (o.has(INDIRECT_ACQUISITIONS_FIELD)) {
           indirects =
             parseIndirectAcquisitions(
-              getArray(o, INDIRECT_ACQUISITIONS_FIELD)
+              getArray(o, INDIRECT_ACQUISITIONS_FIELD),
             )
         } else {
           indirects = mutableListOf()
@@ -298,7 +306,7 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
         if (o.has(CONTENT_TYPE_FIELD)) {
           type =
             parseRaisingException(
-              getString(o, CONTENT_TYPE_FIELD)
+              getString(o, CONTENT_TYPE_FIELD),
             )
         } else {
           type = parseRaisingException("application/epub+zip")
@@ -321,13 +329,13 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
       if (o.has("linkBasic")) {
         return parseLinkExceptionally(
           URI.create("urn:embedded-link"),
-          o.get("linkBasic")
+          o.get("linkBasic"),
         )
       }
       if (o.has("linkTemplated")) {
         return parseLinkExceptionally(
           URI.create("urn:embedded-link"),
-          o.get("linkTemplated")
+          o.get("linkTemplated"),
         )
       }
        /*
@@ -341,7 +349,7 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
         null,
         null,
         null,
-        null
+        null,
       )
     }
 
@@ -379,7 +387,7 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
         return OPDSIndirectAcquisition(
           type,
           parseIndirectAcquisitions(indirects),
-          properties
+          properties,
         )
       } catch (e: Exception) {
         throw OPDSParseException(e)
@@ -431,7 +439,7 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
             startDate,
             position,
             endDate,
-            revoke
+            revoke,
           )
         }
 
@@ -447,7 +455,8 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
         if (node.has("open_access")) {
           val n =
             getObject(
-              node, "open_access"
+              node,
+              "open_access",
             )
           val revoke: URI? =
             getURIOrNull(n, "revoke")
@@ -457,7 +466,8 @@ class OPDSJSONParser private constructor() : OPDSJSONParserType {
         if (node.has("revoked")) {
           val n =
             getObject(
-              node, "revoked"
+              node,
+              "revoked",
             )
           val revoke = getURI(n, "revoke")
           return OPDSAvailabilityRevoked.get(revoke)

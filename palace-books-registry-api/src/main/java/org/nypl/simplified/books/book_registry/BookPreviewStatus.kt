@@ -12,23 +12,23 @@ sealed class BookPreviewStatus {
       val bytesPerSecond: Long?,
       val currentTotalBytes: Long?,
       val expectedTotalBytes: Long?,
-      val detailMessage: String
+      val detailMessage: String,
     ) : HasPreview()
 
     class DownloadFailed : HasPreview()
 
     sealed class Ready : HasPreview() {
       data class Embedded(
-        val url: URL
+        val url: URL,
       ) : Ready()
 
       data class BookPreview(
         val file: File,
-        val mimeType: MIMEType
+        val mimeType: MIMEType,
       ) : Ready()
 
       data class AudiobookPreview(
-        val file: File
+        val file: File,
       ) : Ready()
     }
   }

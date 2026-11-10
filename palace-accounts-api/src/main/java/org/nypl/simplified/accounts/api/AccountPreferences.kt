@@ -22,7 +22,7 @@ data class AccountPreferences(
    * The list of announcements that have been acknowledged on this account.
    */
 
-  val announcementsAcknowledged: List<UUID>
+  val announcementsAcknowledged: List<UUID>,
 ) {
   companion object {
     /**
@@ -33,7 +33,7 @@ data class AccountPreferences(
       AccountPreferences(
         announcementsAcknowledged = listOf(),
         bookmarkSyncingPermitted = true,
-        catalogURIOverride = null
+        catalogURIOverride = null,
       )
   }
 }

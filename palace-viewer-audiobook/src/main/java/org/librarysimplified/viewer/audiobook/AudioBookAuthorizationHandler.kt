@@ -40,19 +40,19 @@ class AudioBookAuthorizationHandler(
 
   private data class SimplifiedBearerToken(
     val expires: OffsetDateTime,
-    val accessToken: String
+    val accessToken: String,
   )
 
   override fun onAuthorizationIsNoLongerInvalid(
     source: PlayerManifestLink,
-    kind: Kind
+    kind: Kind,
   ) {
     this.logger.debug("onAuthorizationIsNoLongerInvalid: {} {}", source.hrefURI, kind)
   }
 
   override fun onAuthorizationIsInvalid(
     source: PlayerManifestLink,
-    kind: Kind
+    kind: Kind,
   ) {
     this.logger.debug("onAuthorizationIsInvalid: {} {}", source.hrefURI, kind)
     this.account.expireCredentialsIfApplicable()
@@ -61,7 +61,7 @@ class AudioBookAuthorizationHandler(
 
   override fun onConfigureAuthorizationFor(
     source: PlayerManifestLink,
-    kind: Kind
+    kind: Kind,
   ): LSHTTPAuthorizationType? {
     this.logger.debug("onConfigureAuthorizationFor: {} {}", source.hrefURI, kind)
 
@@ -122,7 +122,7 @@ class AudioBookAuthorizationHandler(
           LSHTTPRefreshTokenProperties(
             userName = c.userName.value,
             password = c.password.value,
-            refreshURI = c.authenticationTokenInfo.authURI
+            refreshURI = c.authenticationTokenInfo.authURI,
           )
         }
 
@@ -144,7 +144,7 @@ class AudioBookAuthorizationHandler(
         client = this.httpClient,
         target = target,
         refreshTokenProperties = refreshProperties,
-        authorization = AccountAuthenticatedHTTP.createAuthorizationIfPresent(this.account.loginState.credentials)
+        authorization = AccountAuthenticatedHTTP.createAuthorizationIfPresent(this.account.loginState.credentials),
       )
 
     return when (tokenResult) {
@@ -163,7 +163,7 @@ class AudioBookAuthorizationHandler(
         this.simplifiedBearerToken =
           SimplifiedBearerToken(
             expires = expiration,
-            accessToken = tokenResult.token.accessToken
+            accessToken = tokenResult.token.accessToken,
           )
 
         this.onAuthorizationIsNoLongerInvalid(link, CHAPTER)
@@ -195,13 +195,13 @@ class AudioBookAuthorizationHandler(
   override fun <T : Any> onRequireCustomCredentialsFor(
     providerName: String,
     kind: Kind,
-    credentialsType: Class<T>
+    credentialsType: Class<T>,
   ): T {
     this.logger.debug(
       "Custom credentials required for {}: {}, type {}",
       providerName,
       kind,
-      credentialsType
+      credentialsType,
     )
 
     if (credentialsType == OPAUsernamePassword::class.java) {
@@ -216,14 +216,14 @@ class AudioBookAuthorizationHandler(
       is Basic -> {
         OPAUsernamePassword(
           credentials.userName.value,
-          this.overdrivePasswordOf(credentials.password.value)
+          this.overdrivePasswordOf(credentials.password.value),
         )
       }
 
       is BasicToken -> {
         OPAUsernamePassword(
           credentials.userName.value,
-          this.overdrivePasswordOf(credentials.password.value)
+          this.overdrivePasswordOf(credentials.password.value),
         )
       }
 

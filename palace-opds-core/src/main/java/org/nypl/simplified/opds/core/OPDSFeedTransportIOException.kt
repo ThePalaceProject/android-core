@@ -8,5 +8,5 @@ import java.io.IOException
 
 class OPDSFeedTransportIOException(
   message: String,
-  cause: IOException
+  cause: IOException,
 ) : OPDSFeedTransportException(message, cause)

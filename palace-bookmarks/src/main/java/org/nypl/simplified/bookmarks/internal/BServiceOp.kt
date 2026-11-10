@@ -10,7 +10,7 @@ import java.util.concurrent.Callable
  */
 
 internal abstract class BServiceOp<T>(
-  val logger: Logger
+  val logger: Logger,
 ) : Callable<T> {
   abstract fun runActual(): T
 
@@ -25,7 +25,7 @@ internal abstract class BServiceOp<T>(
       this.logger.debug(
         "{}: Finished bookmark task in {}",
         this.javaClass.simpleName,
-        Duration.between(timeThen, timeNow)
+        Duration.between(timeThen, timeNow),
       )
     }
   }

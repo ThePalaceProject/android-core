@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory
 import org.thepalaceproject.opds.client.OPDSFeedHandleWithoutGroupsType
 
 class CatalogFeedPagingSource(
-  val feedHandle: OPDSFeedHandleWithoutGroupsType
+  val feedHandle: OPDSFeedHandleWithoutGroupsType,
 ) : PagingSource<Int, FeedEntry>() {
   private val logger =
     LoggerFactory.getLogger(CatalogFeedPagingSource::class.java)
@@ -33,7 +33,7 @@ class CatalogFeedPagingSource(
       LoadResult.Page(
         data = pageData.data.entriesInOrder,
         prevKey = pageData.pagePrevious,
-        nextKey = pageData.pageNext
+        nextKey = pageData.pageNext,
       )
     } catch (e: Throwable) {
       if (e !is kotlinx.coroutines.CancellationException) {

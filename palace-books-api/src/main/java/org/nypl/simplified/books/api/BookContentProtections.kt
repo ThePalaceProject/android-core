@@ -26,7 +26,7 @@ object BookContentProtections {
     format: BookFormat,
     drmInfo: BookDRMInformation,
     isLCPManualPassphraseEnabled: Boolean,
-    onLCPDialogDismissed: () -> Unit = {}
+    onLCPDialogDismissed: () -> Unit = {},
   ): List<ContentProtection> =
     try {
       when (drmInfo) {
@@ -50,8 +50,8 @@ object BookContentProtections {
                   licenseFile = drmInfo.license!!,
                   tempDirectory = context.cacheDir,
                   inMemorySizeThreshold = 10_000_000UL,
-                  currentTime = OffsetDateTime.now()
-                )
+                  currentTime = OffsetDateTime.now(),
+                ),
               )
             } else {
               listOf()

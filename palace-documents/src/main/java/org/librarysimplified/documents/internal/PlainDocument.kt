@@ -10,11 +10,11 @@ internal class PlainDocument internal constructor(
   initialStreams: (() -> InputStream)?,
   file: File?,
   fileTmp: File?,
-  remoteURL: URL
+  remoteURL: URL,
 ) : AbstractDocument(
     http = http,
     initialStreams = initialStreams,
     file = file,
     fileTmp = fileTmp,
-    remoteURL = remoteURL
+    remoteURL = remoteURL,
   )

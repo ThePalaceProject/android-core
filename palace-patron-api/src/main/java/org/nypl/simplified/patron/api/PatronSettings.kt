@@ -7,5 +7,5 @@ package org.nypl.simplified.patron.api
  */
 
 data class PatronSettings(
-  val synchronizeAnnotations: Boolean = false
+  val synchronizeAnnotations: Boolean = false,
 )

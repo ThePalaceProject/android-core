@@ -24,11 +24,11 @@ object SettingsCustomOPDSModel {
   init {
     MainAttributes.wrapAttribute(
       this.taskRunning,
-      this.taskRunningUI
+      this.taskRunningUI,
     )
     MainAttributes.wrapAttribute(
       this.task,
-      this.taskUI
+      this.taskUI,
     )
   }
 
@@ -58,7 +58,7 @@ object SettingsCustomOPDSModel {
           }
         }
       },
-      MoreExecutors.directExecutor()
+      MoreExecutors.directExecutor(),
     )
   }
 }

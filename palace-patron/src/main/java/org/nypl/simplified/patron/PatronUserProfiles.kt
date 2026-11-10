@@ -32,7 +32,7 @@ object PatronUserProfiles {
     patronParsers: PatronUserProfileParsersType,
     credentials: AccountAuthenticationCredentials,
     http: LSHTTPClientType,
-    account: AccountType
+    account: AccountType,
   ): PatronUserProfile {
     val patronSettingsURI = account.provider.patronSettingsURI
     if (patronSettingsURI == null) {
@@ -41,7 +41,7 @@ object PatronUserProfiles {
         message = "No available patron user profile URI",
         errorCode = "noPatronURI",
         exception = exception,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       throw exception
     }
@@ -61,7 +61,7 @@ object PatronUserProfiles {
           taskRecorder = taskRecorder,
           patronSettingsURI = patronSettingsURI,
           patronParsers = patronParsers,
-          stream = status.bodyStream ?: ByteArrayInputStream(ByteArray(0))
+          stream = status.bodyStream ?: ByteArrayInputStream(ByteArray(0)),
         )
       }
 
@@ -69,7 +69,7 @@ object PatronUserProfiles {
         this.onPatronProfileRequestHTTPError(
           taskRecorder = taskRecorder,
           patronSettingsURI = patronSettingsURI,
-          result = status
+          result = status,
         )
       }
 
@@ -77,7 +77,7 @@ object PatronUserProfiles {
         this.onPatronProfileRequestHTTPException(
           taskRecorder = taskRecorder,
           patronSettingsURI = patronSettingsURI,
-          result = status
+          result = status,
         )
       }
     }
@@ -92,7 +92,7 @@ object PatronUserProfiles {
     taskRecorder: TaskRecorderType,
     patronSettingsURI: URI,
     patronParsers: PatronUserProfileParsersType,
-    stream: InputStream
+    stream: InputStream,
   ): PatronUserProfile =
     patronParsers.createParser(patronSettingsURI, stream).use { parser ->
       when (val parseResult = parser.parse()) {
@@ -114,7 +114,7 @@ object PatronUserProfiles {
             message = message,
             errorCode = "parseErrorPatronSettings",
             exception = exception,
-            extraMessages = listOf()
+            extraMessages = listOf(),
           )
           throw exception
         }
@@ -132,7 +132,7 @@ object PatronUserProfiles {
       error.line,
       error.column,
       error.message,
-      error.exception
+      error.exception,
     )
 
     return buildString {
@@ -158,7 +158,7 @@ object PatronUserProfiles {
       warning.line,
       warning.column,
       warning.message,
-      warning.exception
+      warning.exception,
     )
   }
 
@@ -166,13 +166,13 @@ object PatronUserProfiles {
   private fun <T> onPatronProfileRequestHTTPException(
     taskRecorder: TaskRecorderType,
     patronSettingsURI: URI,
-    result: LSHTTPResponseStatus.Failed
+    result: LSHTTPResponseStatus.Failed,
   ): T {
     taskRecorder.currentStepFailed(
       message = "Connection failed when fetching patron user profile.",
       errorCode = "connectionFailed",
       exception = result.exception,
-      extraMessages = listOf()
+      extraMessages = listOf(),
     )
     throw result.exception
   }
@@ -180,13 +180,13 @@ object PatronUserProfiles {
   private fun <T> onPatronProfileRequestHTTPError(
     taskRecorder: TaskRecorderType,
     patronSettingsURI: URI,
-    result: LSHTTPResponseStatus.Responded.Error
+    result: LSHTTPResponseStatus.Responded.Error,
   ): T {
     this.logger.error(
       "received http error: {}: {}: {}",
       patronSettingsURI,
       result.properties.message,
-      result.properties.status
+      result.properties.status,
     )
 
     val exception = Exception()
@@ -196,7 +196,7 @@ object PatronUserProfiles {
           message = "Invalid credentials!",
           errorCode = "invalidCredentials",
           exception = exception,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
         throw exception
       }
@@ -207,7 +207,7 @@ object PatronUserProfiles {
           message = "Server error: ${result.properties.status} ${result.properties.message}",
           errorCode = "httpError ${result.properties.status} $patronSettingsURI",
           exception = exception,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
         throw exception
       }

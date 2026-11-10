@@ -9,7 +9,7 @@ import java.net.URI
  */
 class OPDSAvailabilityRevoked private constructor(
   override val endDate: DateTime?,
-  val revoke: URI
+  val revoke: URI,
 ) : OPDSAvailabilityType {
   override fun toString(): String {
     val sb = StringBuilder("OPDSAvailabilityRevoked{")

@@ -141,7 +141,7 @@ sealed class CatalogFragment :
   final override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ): View {
     val view =
       inflater.inflate(R.layout.catalog, container, false)
@@ -196,28 +196,28 @@ sealed class CatalogFragment :
       opdsClients.clientFor(this.catalogPart)
 
     this.subscriptions.add(
-      this.opdsClient.state.subscribe(this::onStateChanged)
+      this.opdsClient.state.subscribe(this::onStateChanged),
     )
     this.subscriptions.add(
-      this.opdsClient.entry.subscribe(this::onEntryChanged)
+      this.opdsClient.entry.subscribe(this::onEntryChanged),
     )
     this.subscriptions.add(
       this.httpStatus.anyAvailable.subscribe { availableThen, availableNow ->
         UIThread.runOnUIThread {
           this.onNetworkStatusChanged(availableThen, availableNow)
         }
-      }
+      },
     )
     this.subscriptions.add(
       CatalogWIPROMigration.migrationInProgress.subscribe { migrationThen, migrationNow ->
         this.onWIPROMigrationChanged(migrationThen, migrationNow)
-      }
+      },
     )
   }
 
   private fun onWIPROMigrationChanged(
     migrationThen: Boolean,
-    migrationNow: Boolean
+    migrationNow: Boolean,
   ) {
     if (migrationNow && !migrationThen) {
       this.switchView(CatalogFeedViewLoading.create(this.layoutInflater, this.contentContainer))
@@ -231,7 +231,7 @@ sealed class CatalogFragment :
 
   private fun onNetworkStatusChanged(
     availableThen: Boolean,
-    availableNow: Boolean
+    availableNow: Boolean,
   ) {
     if (!this.catalogPart.requiresNetwork) {
       return
@@ -251,7 +251,7 @@ sealed class CatalogFragment :
   final override fun onFeedSelected(
     accountID: AccountID,
     title: String,
-    uri: URI
+    uri: URI,
   ) {
     this.logger.debug("onFeedSelected: \"{}\" {}", title, uri)
 
@@ -267,8 +267,8 @@ sealed class CatalogFragment :
           uri = uri,
           credentials = account.loginState.credentials,
           historyBehavior = ADD_TO_HISTORY,
-          method = "GET"
-        )
+          method = "GET",
+        ),
       )
     } catch (e: Throwable) {
       this.logger.warn("Error fetching account/feed: ", e)
@@ -280,14 +280,14 @@ sealed class CatalogFragment :
     this.opdsClient.goTo(
       OPDSClientRequest.ExistingEntry(
         entry = entry,
-        historyBehavior = ADD_TO_HISTORY
-      )
+        historyBehavior = ADD_TO_HISTORY,
+      ),
     )
   }
 
   private fun onEntryChanged(
     oldEntry: FeedEntry,
-    newEntry: FeedEntry
+    newEntry: FeedEntry,
   ) {
     UIThread.checkIsUIThread()
 
@@ -307,7 +307,7 @@ sealed class CatalogFragment :
 
   private fun onLoadRelatedFeed(
     view: CatalogFeedViewDetails2,
-    newEntry: FeedEntry.FeedEntryOPDS
+    newEntry: FeedEntry.FeedEntryOPDS,
   ) {
     val related = newEntry.feedEntry.related
     if (related != null) {
@@ -317,7 +317,7 @@ sealed class CatalogFragment :
           accountID = newEntry.accountID,
           uri = related,
           credentials = null,
-          method = "GET"
+          method = "GET",
         )
       relatedFuture.thenAccept { feedResult ->
         view.root.post {
@@ -335,7 +335,7 @@ sealed class CatalogFragment :
 
   private fun onStateChanged(
     oldState: OPDSState,
-    newState: OPDSState
+    newState: OPDSState,
   ) {
     UIThread.checkIsUIThread()
 
@@ -368,7 +368,7 @@ sealed class CatalogFragment :
           val feed = newState.handle.feed()
           CatalogSearchResultsAccessibility.searchResultsLoaded(
             listView = view.listView,
-            itemCount = feed.feedGroupsInOrder.sumOf { it.groupEntries.size }
+            itemCount = feed.feedGroupsInOrder.sumOf { it.groupEntries.size },
           )
         } else {
           this.viewNow.startFocusDelayed()
@@ -381,7 +381,7 @@ sealed class CatalogFragment :
           val view = this.viewNow as CatalogFeedViewInfinite
           CatalogSearchResultsAccessibility.searchResultsLoaded(
             listView = view.listView,
-            itemCount = newState.handle.feed().size
+            itemCount = newState.handle.feed().size,
           )
         } else {
           this.viewNow.startFocusDelayed()
@@ -449,7 +449,7 @@ sealed class CatalogFragment :
             }
 
         this.perViewSubscriptions.add(
-          AutoCloseable { statusSubscription.dispose() }
+          AutoCloseable { statusSubscription.dispose() },
         )
 
         view.onStatusUpdate(CatalogBookStatus.create(this.bookRegistry, entry))
@@ -480,7 +480,7 @@ sealed class CatalogFragment :
             view.bind(account.provider, item)
           }
         }
-      }
+      },
     )
 
     this.switchView(view)
@@ -501,8 +501,8 @@ sealed class CatalogFragment :
             body = "",
             subject = "[palace-error-report]",
             attributes = error.attributes.toSortedMap(),
-            taskSteps = error.steps
-          )
+            taskSteps = error.steps,
+          ),
       )
     } catch (e: Throwable) {
       this.logger.error("Failed to open error page: ", e)
@@ -517,11 +517,11 @@ sealed class CatalogFragment :
 
     books.bookBorrowFailedDismiss(
       accountID = book.account,
-      bookID = book.id
+      bookID = book.id,
     )
   }
 
-  final override fun onBookRequestBorrowCancel(book: Book,) {
+  final override fun onBookRequestBorrowCancel(book: Book) {
     val services =
       Services.serviceDirectory()
     val books =
@@ -529,12 +529,14 @@ sealed class CatalogFragment :
 
     books.bookBorrowFailedDismiss(
       accountID = book.account,
-      bookID = book.id
+      bookID = book.id,
     )
   }
 
   @Deprecated("Unclear why this has its own special method.")
-  final override fun onBookRequestSAMLDownload(status: CatalogBookStatus<BookStatus.DownloadWaitingForExternalAuthentication>) {
+  final override fun onBookRequestSAMLDownload(
+    status: CatalogBookStatus<BookStatus.DownloadWaitingForExternalAuthentication>,
+  ) {
     val account =
       try {
         this.profiles
@@ -548,7 +550,7 @@ sealed class CatalogFragment :
     CatalogSAML20Model.start(
       account = account,
       book = status.book.id,
-      downloadURI = status.status.downloadURI
+      downloadURI = status.status.downloadURI,
     )
 
     try {
@@ -588,21 +590,21 @@ sealed class CatalogFragment :
             accountID = parameters.accountID,
             bookID = parameters.bookID,
             entry = parameters.entry,
-            samlDownloadContext = parameters.samlDownloadContext
+            samlDownloadContext = parameters.samlDownloadContext,
           )
 
           UIThread.runOnUIThread {
             MainNavigation.requestTabChangeForPart(this.catalogPart)
             MainNavigation.Settings.goUp()
           }
-        }
+        },
       )
     } else {
       books.bookBorrow(
         accountID = parameters.accountID,
         bookID = parameters.bookID,
         entry = parameters.entry,
-        samlDownloadContext = parameters.samlDownloadContext
+        samlDownloadContext = parameters.samlDownloadContext,
       )
     }
   }
@@ -619,11 +621,11 @@ sealed class CatalogFragment :
       Services.serviceDirectory().requireService(DiagnosticsServiceType::class.java)
     diagnostics.report(
       code = DiagnosticCodes.CATALOG_BOOK_ACTION_STALE_ACCOUNT,
-      data = mapOf(Pair("AccountID", accountID.toString()))
+      data = mapOf(Pair("AccountID", accountID.toString())),
     )
     this.logger.error(
       "Book action requested for a nonexistent account: {}",
-      accountID
+      accountID,
     )
   }
 
@@ -651,8 +653,8 @@ sealed class CatalogFragment :
         this.requireActivity(),
         FeedEntry.FeedEntryOPDS(
           book.account,
-          book.entry
-        )
+          book.entry,
+        ),
       )
     } catch (e: Throwable) {
       this.logger.error("Failed to start activity: ", e)
@@ -661,7 +663,7 @@ sealed class CatalogFragment :
 
   final override fun onBookCanBeRevoked(
     book: Book,
-    status: BookStatus
+    status: BookStatus,
   ): Boolean =
     try {
       val services =
@@ -704,7 +706,7 @@ sealed class CatalogFragment :
 
     books.bookDelete(
       accountID = book.account,
-      bookId = book.id
+      bookId = book.id,
     )
   }
 
@@ -743,7 +745,7 @@ sealed class CatalogFragment :
                 MainNavigation.requestTabChangeForPart(this.catalogPart)
                 MainNavigation.Settings.goUp()
               }
-            }
+            },
           )
         } else {
           books.bookRevoke(
@@ -766,7 +768,7 @@ sealed class CatalogFragment :
 
   final override fun onBookRequestViewerOpen(
     book: Book,
-    bookFormat: BookFormat
+    bookFormat: BookFormat,
   ) {
     if (CatalogWIPROMigration.isMigrationRequired(book, bookFormat)) {
       CatalogWIPROMigration.executeNow(context = this.requireContext(), book)
@@ -778,7 +780,7 @@ sealed class CatalogFragment :
 
   private fun onBookRequestViewerOpenNow(
     book: Book,
-    bookFormat: BookFormat
+    bookFormat: BookFormat,
   ) {
     val services =
       Services.serviceDirectory()
@@ -804,7 +806,7 @@ sealed class CatalogFragment :
           } catch (e: Throwable) {
             this.logger.error("Unable to open login dialog: ", e)
           }
-        }
+        },
       )
 
     try {
@@ -812,7 +814,7 @@ sealed class CatalogFragment :
         context = this.requireActivity(),
         preferences = viewerParameters,
         book = book,
-        format = bookFormat
+        format = bookFormat,
       )
     } catch (e: Throwable) {
       this.openErrorForBookException(book, e)
@@ -821,7 +823,7 @@ sealed class CatalogFragment :
 
   private fun openErrorForBookException(
     book: Book,
-    e: Throwable
+    e: Throwable,
   ) {
     try {
       val services =
@@ -844,7 +846,7 @@ sealed class CatalogFragment :
         message = e.message ?: e.javaClass.name,
         errorCode = "error-book-open-failed",
         exception = e,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       val error = task.finishFailure<Unit>()
 
@@ -856,8 +858,8 @@ sealed class CatalogFragment :
             body = "",
             subject = "[palace-error-report]",
             attributes = error.attributes.toSortedMap(),
-            taskSteps = error.steps
-          )
+            taskSteps = error.steps,
+          ),
       )
     } catch (e: Throwable) {
       this.logger.error("Failed to open error page: ", e)
@@ -935,7 +937,7 @@ sealed class CatalogFragment :
     this.perViewSubscriptions.add(
       this.opdsClient.entriesGrouped.subscribe { _, items ->
         entriesGroupedAdapter.submitList(items)
-      }
+      },
     )
 
     this.switchView(view)
@@ -1000,7 +1002,7 @@ sealed class CatalogFragment :
         val pager =
           Pager(
             config = PagingConfig(pageSize = 50),
-            pagingSourceFactory = { feedSource }
+            pagingSourceFactory = { feedSource },
           )
         pager.flow.collect { data -> feedAdapter.submitData(data) }
       }
@@ -1017,7 +1019,7 @@ sealed class CatalogFragment :
           override fun onScrolled(
             recyclerView: RecyclerView,
             dx: Int,
-            dy: Int
+            dy: Int,
           ) {
             val linearLayoutManager =
               recyclerView.layoutManager as LinearLayoutManager
@@ -1027,13 +1029,13 @@ sealed class CatalogFragment :
             this@CatalogFragment.logger.trace("Saving scroll position {}", position)
             feedHandle.scrollPositionSave(position)
           }
-        }
+        },
       )
 
       view.listView.adapter = feedAdapter
       view.configureFacets(
         screen = this.screenSize,
-        feed = feed
+        feed = feed,
       )
 
       view.toolbar.configure(
@@ -1079,7 +1081,7 @@ sealed class CatalogFragment :
           CATALOG -> context.getString(R.string.feedEmpty)
           BOOKS -> context.getString(R.string.feedWithGroupsEmptyLoaned)
           HOLDS -> context.getString(R.string.feedWithGroupsEmptyHolds)
-        }
+        },
     )
     this.switchView(view)
 
@@ -1179,7 +1181,8 @@ sealed class CatalogFragment :
               }
 
               is BookStatusEvent.BookStatusEventAdded,
-              is BookStatusEvent.BookStatusEventRemoved -> {
+              is BookStatusEvent.BookStatusEventRemoved,
+              -> {
                 feedHandle.refresh()
               }
             }
@@ -1192,7 +1195,7 @@ sealed class CatalogFragment :
   final override fun onSearchSubmitted(
     accountID: AccountID,
     feedSearch: FeedSearch,
-    queryText: String
+    queryText: String,
   ) {
     UIThread.checkIsUIThread()
     this.logger.debug("onSearchSubmitted: {}", queryText)
@@ -1227,11 +1230,11 @@ sealed class CatalogFragment :
                     feedSelection = feedSelection,
                     facetTitleProvider = CatalogOPDSClients.facetTitleProvider,
                     sortBy = CatalogFeedFacetSortModel.facetSelectedPseudoOrDefault(this.catalogPart),
-                    filterByAccountID = null
-                  )
+                    filterByAccountID = null,
+                  ),
                 ).get(10L, TimeUnit.SECONDS)
-            }
-          )
+            },
+          ),
         )
       }
 
@@ -1244,7 +1247,7 @@ sealed class CatalogFragment :
             isSearch = true,
             method = "GET",
             uri = feedSearch.search.getQueryURIForTerms(queryText),
-          )
+          ),
         )
       }
     }
@@ -1271,8 +1274,8 @@ sealed class CatalogFragment :
             uri = feedFacet.opdsFacet.uri,
             credentials = credentials,
             historyBehavior = ADD_TO_HISTORY,
-            method = "GET"
-          )
+            method = "GET",
+          ),
         )
       }
 
@@ -1285,8 +1288,8 @@ sealed class CatalogFragment :
             historyBehavior = ADD_TO_HISTORY,
             facet = feedFacet,
             credentials = credentials,
-            method = "GET"
-          )
+            method = "GET",
+          ),
         )
       }
 
@@ -1304,11 +1307,11 @@ sealed class CatalogFragment :
                     feedSelection = feedSelection,
                     facetTitleProvider = CatalogOPDSClients.facetTitleProvider,
                     sortBy = CatalogFeedFacetSortModel.facetSelectedPseudoOrDefault(this.catalogPart),
-                    filterByAccountID = feedFacet.account
-                  )
+                    filterByAccountID = feedFacet.account,
+                  ),
                 ).get(10L, TimeUnit.SECONDS)
-            }
-          )
+            },
+          ),
         )
       }
 
@@ -1329,11 +1332,11 @@ sealed class CatalogFragment :
                     feedSelection = feedSelection,
                     facetTitleProvider = CatalogOPDSClients.facetTitleProvider,
                     sortBy = feedFacet.sortBy,
-                    filterByAccountID = filterByAccountID
-                  )
+                    filterByAccountID = filterByAccountID,
+                  ),
                 ).get(10L, TimeUnit.SECONDS)
-            }
-          )
+            },
+          ),
         )
       }
     }
@@ -1373,10 +1376,10 @@ sealed class CatalogFragment :
                   newState.message.message,
                   newState.message.exception,
                   "?",
-                  listOf()
-                )
-            )
-          )
+                  listOf(),
+                ),
+            ),
+          ),
       )
 
     this.switchView(
@@ -1386,13 +1389,13 @@ sealed class CatalogFragment :
         onShowErrorDetails = {
           MainNavigation.openErrorPage(
             activity = this.requireActivity(),
-            parameters = errorPageParameters
+            parameters = errorPageParameters,
           )
         },
         onRetry = {
           this.opdsClient.retry()
-        }
-      )
+        },
+      ),
     )
   }
 
@@ -1413,7 +1416,7 @@ sealed class CatalogFragment :
 
     opdsClients.goToRootFeedFor(
       catalogPart = this.catalogPart,
-      account = account
+      account = account,
     )
   }
 

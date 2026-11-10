@@ -16,7 +16,7 @@ sealed class AccountEventCreation :
    */
 
   data class AccountEventCreationInProgress(
-    override val message: String
+    override val message: String,
   ) : AccountEventCreation()
 
   /**
@@ -25,7 +25,7 @@ sealed class AccountEventCreation :
 
   data class AccountEventCreationSucceeded(
     override val message: String,
-    val id: AccountID
+    val id: AccountID,
   ) : AccountEventCreation()
 
   /**
@@ -33,7 +33,7 @@ sealed class AccountEventCreation :
    */
 
   data class AccountEventCreationFailed(
-    val taskResult: TaskResult.Failure<*>
+    val taskResult: TaskResult.Failure<*>,
   ) : AccountEventCreation(),
     PresentableErrorType {
     override val message: String

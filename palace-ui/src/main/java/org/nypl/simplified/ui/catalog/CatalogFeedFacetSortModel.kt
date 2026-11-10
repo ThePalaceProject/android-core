@@ -12,7 +12,7 @@ object CatalogFeedFacetSortModel {
 
   fun facetsSet(
     catalogPart: CatalogPart,
-    sortBy: List<FeedFacet.FeedFacetSingle>
+    sortBy: List<FeedFacet.FeedFacetSingle>,
   ) {
     this.logger.debug("[{}] Creating sort model of size {}", catalogPart, sortBy.size)
     for (entry in sortBy) {
