@@ -1,7 +1,6 @@
 package org.nypl.simplified.feeds.opds20
 
 import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import java.io.InputStream
 import java.net.URI
@@ -23,7 +22,6 @@ import org.nypl.simplified.feeds.api.FeedCategory
 import org.nypl.simplified.feeds.api.FeedData
 import org.nypl.simplified.feeds.api.FeedDataWithGroups
 import org.nypl.simplified.feeds.api.FeedDRMLicensor
-import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.feeds.api.FeedEntryGroupRef
 import org.nypl.simplified.feeds.api.FeedFacetData
@@ -38,14 +36,12 @@ import org.thepalaceproject.webpub.core.WPMContributor
 import org.thepalaceproject.webpub.core.WPMContributorOrString
 import org.thepalaceproject.webpub.core.WPMFacet
 import org.thepalaceproject.webpub.core.WPMFeed
-import org.thepalaceproject.webpub.core.WPMGroup
 import org.thepalaceproject.webpub.core.WPMIndirectAcquisitionTree
 import org.thepalaceproject.webpub.core.WPMLanguageMap
 import org.thepalaceproject.webpub.core.WPMLink
 import org.thepalaceproject.webpub.core.WPMLinkBasic
 import org.thepalaceproject.webpub.core.WPMLinkTemplated
 import org.thepalaceproject.webpub.core.WPMMappers
-import org.thepalaceproject.webpub.core.WPMMetadata
 import org.thepalaceproject.webpub.core.WPMPublication
 import org.thepalaceproject.webpub.core.WPMSeries
 import org.thepalaceproject.webpub.core.WPMSubjectOrString
@@ -53,12 +49,6 @@ import org.thepalaceproject.webpub.core.WPMSubjectOrString
 /**
  * Functions to parse OPDS 2.0 JSON using the Palace WebPub parser and
  * convert the result into the generic [PalaceFeed] types from [palace-feeds-api].
- *
- * The [WPMMappers.createMapper] is used for the primary parse into [WPMFeed].
- * A parallel [ObjectMapper] parse into a [JsonNode] tree is used to extract
- * fields that the typed model does not expose (indirect acquisitions at the
- * link-properties level, DRM licensor extension properties, availability
- * timestamps).
  */
 object OPDS20FeedConverter {
 
@@ -86,25 +76,21 @@ object OPDS20FeedConverter {
   private const val REL_TIME_TRACKING = "http://palaceproject.io/terms/timeTracking"
   private const val REL_ANALYTICS_OPEN_BOOK = "http://librarysimplified.org/terms/rel/analytics/open-book"
 
+  private const val EXT_PROP_LICENSOR = "licensor"
+  private const val EXT_PROP_VENDOR = "vendor"
+  private const val EXT_PROP_CLIENT_TOKEN = "clientToken"
+  private const val EXT_PROP_DEVICE_MANAGER = "deviceManager"
+
   private val mapper: ObjectMapper =
     WPMMappers.createMapper()
       .copy()
       .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
 
-  private val rawMapper: ObjectMapper = ObjectMapper()
-
   /**
    * Parse OPDS 2.0 JSON from the given stream into a [WPMFeed].
    */
   fun parse(stream: InputStream): WPMFeed =
-    this.mapper.readValue(stream, WPMFeed::class.java)
-
-  /**
-   * Parse OPDS 2.0 JSON from the given stream into a raw [JsonNode] tree.
-   * This is used to extract fields that the typed [WPMFeed] model does not expose.
-   */
-  fun parseRaw(stream: InputStream): JsonNode =
-    this.rawMapper.readTree(stream)
+    stream.use { mapper.readValue(it, WPMFeed::class.java) }
 
   /**
    * Convert a parsed [WPMFeed] into a [PalaceFeed].
@@ -112,14 +98,12 @@ object OPDS20FeedConverter {
    * @param accountID The account that owns the feed
    * @param feed The parsed OPDS 2.0 feed
    * @param feedURI The URI of the feed
-   * @param rawJSON The raw JSON tree (for fields not in the typed model)
    * @return The converted feed
    */
   fun convert(
     accountID: AccountID,
     feed: WPMFeed,
-    feedURI: URI,
-    rawJSON: JsonNode
+    feedURI: URI
   ): PalaceFeed {
     val feedUpdated: DateTime =
       feed.metadata.modified?.let { offsetToDateTime(it) }
@@ -133,14 +117,10 @@ object OPDS20FeedConverter {
 
     val facetsByGroup: Map<String, List<FeedFacetSingle>> =
       facets.groupBy { (it as FeedFacetData).group }
-        .mapValues { it.value }
-
-    val rawPublications: JsonNode? =
-      rawJSON.get("publications")
 
     val entries: List<FeedEntryBook> =
-      feed.publications.mapIndexed { index, publication ->
-        convertEntry(accountID, publication, rawPublications?.get(index))
+      feed.publications.map { publication ->
+        convertEntry(accountID, publication)
       }
 
     val feedGroups: List<FeedGroup> =
@@ -236,13 +216,10 @@ object OPDS20FeedConverter {
 
   /**
    * Convert a WebPub [WPMPublication] into a [FeedEntryBook].
-   *
-   * @param rawPublicationJson The raw JSON node for this publication (for fields not in the typed model)
    */
   fun convertEntry(
     accountID: AccountID,
-    publication: WPMPublication,
-    rawPublicationJson: JsonNode?
+    publication: WPMPublication
   ): FeedEntryBook {
     val metadata = publication.metadata
     val links = publication.links
@@ -290,9 +267,6 @@ object OPDS20FeedConverter {
     /*
      * Separate acquisitions from preview acquisitions.
      */
-    val rawLinks: JsonNode? =
-      rawPublicationJson?.get("links")
-
     val allAcquisitionLinks: List<WPMLink> =
       links.filter { it.relation.any { rel -> REL_ACQUIRE_PREFIX in rel } }
 
@@ -303,8 +277,8 @@ object OPDS20FeedConverter {
       allAcquisitionLinks.filterNot { it in previewAcquisitionLinks }
 
     val acquisitions: List<FeedAcquisition> =
-      acquisitionLinks.mapIndexed { index, link ->
-        convertAcquisitionLink(link, rawLinks?.get(index))
+      acquisitionLinks.map { link ->
+        convertAcquisitionLink(link)
       }
 
     val previewAcquisitions: List<FeedPreviewAcquisition> =
@@ -340,7 +314,7 @@ object OPDS20FeedConverter {
       linkHref(links, REL_TIME_TRACKING)
 
     val licensor: FeedDRMLicensor? =
-      extractDRMLicensor(links, rawLinks)
+      extractDRMLicensor(links)
 
     val entryGroups: Set<FeedEntryGroupRef> =
       links
@@ -353,7 +327,7 @@ object OPDS20FeedConverter {
         .toSet()
 
     val availability: FeedAvailability =
-      convertAvailability(links, rawLinks)
+      convertAvailability(links)
 
     return FeedEntryBook(
       accountID = accountID,
@@ -444,8 +418,7 @@ object OPDS20FeedConverter {
     }
 
   private fun convertAcquisitionLink(
-    link: WPMLink,
-    rawLinkJson: JsonNode?
+    link: WPMLink
   ): FeedAcquisition {
     val href: URI =
       linkHrefValue(link) ?: URI("")
@@ -453,16 +426,9 @@ object OPDS20FeedConverter {
     val mediaType: MIMEType =
       link.type ?: parseRaisingException("application/octet-stream")
 
-    /*
-     * Extract indirect acquisitions from the raw JSON, since the
-     * WPMLinkProperties in the 1.2.0 parser does not expose them.
-     */
     val indirectAcquisitions: List<FeedIndirectAcquisition> =
-      rawLinkJson
-        ?.get("properties")
-        ?.get("indirectAcquisition")
-        ?.takeIf { it.isArray }
-        ?.map { node -> convertIndirectAcquisitionJson(node) }
+      link.properties?.indirectAcquisition
+        ?.map { convertIndirectAcquisitionTree(it) }
         ?: emptyList()
 
     val properties: Map<String, String> = emptyMap()
@@ -476,15 +442,12 @@ object OPDS20FeedConverter {
     )
   }
 
-  private fun convertIndirectAcquisitionJson(node: JsonNode): FeedIndirectAcquisition {
+  private fun convertIndirectAcquisitionTree(tree: WPMIndirectAcquisitionTree): FeedIndirectAcquisition {
     val type: MIMEType =
-      parseRaisingException(node.get("type")?.asText() ?: "application/octet-stream")
+      parseRaisingException(tree.type)
 
     val children: List<FeedIndirectAcquisition> =
-      node.get("child")
-        ?.takeIf { it.isArray }
-        ?.map { convertIndirectAcquisitionJson(it) }
-        ?: emptyList()
+      tree.children.map { convertIndirectAcquisitionTree(it) }
 
     return FeedIndirectAcquisition(
       type = type,
@@ -503,8 +466,7 @@ object OPDS20FeedConverter {
     }
 
   private fun convertAvailability(
-    links: List<WPMLink>,
-    rawLinks: JsonNode?
+    links: List<WPMLink>
   ): FeedAvailability {
     val availability =
       links
@@ -521,20 +483,17 @@ object OPDS20FeedConverter {
       }
 
       "reserved" -> {
-        val since: DateTime? = extractAvailabilityTimestamp(rawLinks, "since")
-        val until: DateTime? = extractAvailabilityTimestamp(rawLinks, "until")
         FeedAvailabilityHeld(
-          startDate = since,
+          startDate = availability.since?.let { offsetToDateTime(it) },
           position = null,
-          endDate = until,
+          endDate = availability.until?.let { offsetToDateTime(it) },
           revoke = null
         )
       }
 
       "ready" -> {
-        val until: DateTime? = extractAvailabilityTimestamp(rawLinks, "until")
         FeedAvailabilityHeldReady(
-          endDate = until,
+          endDate = availability.until?.let { offsetToDateTime(it) },
           revoke = null
         )
       }
@@ -556,83 +515,48 @@ object OPDS20FeedConverter {
   }
 
   /**
-   * Extract an availability timestamp from the raw JSON links array.
-   * The timestamp is in the `properties.availability.since` or
-   * `properties.availability.until` field of the first link that has it.
-   */
-  private fun extractAvailabilityTimestamp(
-    rawLinks: JsonNode?,
-    field: String
-  ): DateTime? {
-    if (rawLinks == null || !rawLinks.isArray) return null
-    for (linkNode in rawLinks) {
-      val value = linkNode
-        .get("properties")
-        ?.get("availability")
-        ?.get(field)
-        ?.asText()
-      if (value != null) {
-        return try {
-          val instant = java.time.OffsetDateTime.parse(value)
-          offsetToDateTime(instant)
-        } catch (_: Exception) {
-          null
-        }
-      }
-    }
-    return null
-  }
-
-  /**
-   * Extract DRM licensor information from the links.
+   * Extract DRM licensor information from the link extension properties.
    */
   private fun extractDRMLicensor(
-    links: List<WPMLink>,
-    rawLinks: JsonNode?
+    links: List<WPMLink>
   ): FeedDRMLicensor? {
-    if (rawLinks != null && rawLinks.isArray) {
-      for (linkNode in rawLinks) {
-        val props = linkNode.get("properties") ?: continue
+    for (link in links) {
+      val props = link.properties ?: continue
+      val ext = props.extensionProperties
 
-        // Check for a "licensor" property
-        val licensorNode: JsonNode? = props.get("licensor")
-        if (licensorNode != null && licensorNode.isObject) {
-          val vendor = licensorNode.get("vendor")?.asText()
-          val clientToken = licensorNode.get("clientToken")?.asText()
-          val deviceManager = licensorNode.get("deviceManager")?.asText()
+      val licensorNode = ext[EXT_PROP_LICENSOR]
+      if (licensorNode != null && licensorNode.isObject) {
+        val vendor = licensorNode.get(EXT_PROP_VENDOR)?.asText()
+        val clientToken = licensorNode.get(EXT_PROP_CLIENT_TOKEN)?.asText()
+        val deviceManager = licensorNode.get(EXT_PROP_DEVICE_MANAGER)?.asText()
 
-          if (vendor != null && clientToken != null) {
-            return FeedDRMLicensor(
-              vendor = vendor,
-              clientToken = clientToken,
-              deviceManager = deviceManager
-            )
-          }
+        if (vendor != null && clientToken != null) {
+          return FeedDRMLicensor(
+            vendor = vendor,
+            clientToken = clientToken,
+            deviceManager = deviceManager
+          )
         }
+      }
 
-        // Check for DRM-related rels
-        val rels = linkNode.get("rel")
-        val hasDrmRel = if (rels != null && rels.isArray) {
-          (0 until rels.size()).any { i ->
-            val rel = rels.get(i)?.asText() ?: return@any false
-            rel.contains("drm", ignoreCase = true) ||
-              rel.contains("lcp", ignoreCase = true) ||
-              rel == "http://librarysimplified.org/terms/drm/rel/devices"
-          }
-        } else false
+      // Check for DRM-related rels with vendor/clientToken in extension properties
+      val hasDrmRel = link.relation.any { rel ->
+        rel.contains("drm", ignoreCase = true) ||
+          rel.contains("lcp", ignoreCase = true) ||
+          rel == "http://librarysimplified.org/terms/drm/rel/devices"
+      }
 
-        if (hasDrmRel) {
-          val vendor = props.get("vendor")?.asText()
-          val clientToken = props.get("clientToken")?.asText()
-          val deviceManager = props.get("deviceManager")?.asText()
+      if (hasDrmRel) {
+        val vendor = ext[EXT_PROP_VENDOR]?.asText()
+        val clientToken = ext[EXT_PROP_CLIENT_TOKEN]?.asText()
+        val deviceManager = ext[EXT_PROP_DEVICE_MANAGER]?.asText()
 
-          if (vendor != null && clientToken != null) {
-            return FeedDRMLicensor(
-              vendor = vendor,
-              clientToken = clientToken,
-              deviceManager = deviceManager
-            )
-          }
+        if (vendor != null && clientToken != null) {
+          return FeedDRMLicensor(
+            vendor = vendor,
+            clientToken = clientToken,
+            deviceManager = deviceManager
+          )
         }
       }
     }

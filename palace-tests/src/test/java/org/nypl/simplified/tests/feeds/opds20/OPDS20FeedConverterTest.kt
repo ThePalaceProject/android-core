@@ -1,6 +1,5 @@
 package org.nypl.simplified.tests.feeds.opds20
 
-import com.fasterxml.jackson.databind.JsonNode
 import java.io.ByteArrayInputStream
 import java.net.URI
 import java.nio.charset.StandardCharsets
@@ -16,7 +15,6 @@ import org.nypl.simplified.feeds.api.FeedDataWithGroups
 import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.feeds.api.FeedFacetData
 import org.nypl.simplified.feeds.opds20.OPDS20FeedConverter
-import org.thepalaceproject.webpub.core.WPMFeed
 
 /**
  * Tests for the OPDS 2.0 feed converter using the Palace WebPub parser.
@@ -33,25 +31,13 @@ class OPDS20FeedConverterTest {
     URI("https://example.com/feed.json")
 
   /**
-   * Parse the given JSON string using the WebPub parser and return
-   * both the typed [WPMFeed] and the raw [JsonNode] tree.
-   */
-  private fun parse(json: String): Pair<WPMFeed, JsonNode> {
-    val bytes = json.toByteArray(StandardCharsets.UTF_8)
-    val wpmFeed = OPDS20FeedConverter.parse(ByteArrayInputStream(bytes))
-    val rawJSON = OPDS20FeedConverter.parseRaw(ByteArrayInputStream(bytes))
-    return wpmFeed to rawJSON
-  }
-
-  /**
-   * Parse and convert in one step.
+   * Parse the given JSON string and convert to a PalaceFeed.
    */
   private fun parseAndConvert(json: String) =
     OPDS20FeedConverter.convert(
       accountID = this.accountID,
-      feed = this.parse(json).first,
-      feedURI = this.feedURI,
-      rawJSON = this.parse(json).second
+      feed = OPDS20FeedConverter.parse(ByteArrayInputStream(json.toByteArray(StandardCharsets.UTF_8))),
+      feedURI = this.feedURI
     )
 
   @Test

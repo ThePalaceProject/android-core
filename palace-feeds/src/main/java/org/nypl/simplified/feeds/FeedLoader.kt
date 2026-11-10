@@ -180,10 +180,8 @@ class FeedLoader(
     body: InputStream,
     uri: URI
   ): Feed {
-    val bytes = body.readBytes()
-    val wpmFeed = OPDS20FeedConverter.parse(ByteArrayInputStream(bytes))
-    val rawJSON = OPDS20FeedConverter.parseRaw(ByteArrayInputStream(bytes))
-    return OPDS20FeedConverter.convert(accountId, wpmFeed, uri, rawJSON)
+    val wpmFeed = OPDS20FeedConverter.parse(body)
+    return OPDS20FeedConverter.convert(accountId, wpmFeed, uri)
   }
 
   /**
