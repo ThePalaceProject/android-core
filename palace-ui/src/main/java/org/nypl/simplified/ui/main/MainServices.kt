@@ -1,7 +1,6 @@
 package org.nypl.simplified.ui.main
 
 import android.app.Application
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.AssetManager
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -14,7 +13,6 @@ import org.librarysimplified.documents.DocumentStores
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPNetworkAccess
 import org.librarysimplified.http.api.LSHTTPNetworkAccessType
-import org.librarysimplified.http.network_access.LSHTTPNetworkAvailabilityService
 import org.librarysimplified.reports.Reports
 import org.librarysimplified.services.api.ServiceDirectory
 import org.librarysimplified.services.api.ServiceDirectoryType
@@ -1050,17 +1048,17 @@ internal object MainServices {
       debugLabelsLookup
     )
 
+  /**
+   * Registers the [LSHTTPNetworkAccessType] service.
+   *
+   * The backing `LSHTTPNetworkAvailabilityService` is intentionally not started
+   * here. Starting a service while the app is in the background is not permitted
+   * on Android 12+ (it throws `BackgroundServiceStartNotAllowedException`), and
+   * the app is frequently (re)created in the background. The service is instead
+   * (re)started from the application lifecycle when the app is in the foreground
+   * (see [MainApplication]).
+   */
   fun createNetworkAccessService(context: Application): LSHTTPNetworkAccessType {
-    try {
-      context.startService(
-        Intent(
-          context,
-          LSHTTPNetworkAvailabilityService::class.java
-        )
-      )
-    } catch (e: Throwable) {
-      this.logger.error("Failed to start network availability service: ", e)
-    }
     return LSHTTPNetworkAccess
   }
 

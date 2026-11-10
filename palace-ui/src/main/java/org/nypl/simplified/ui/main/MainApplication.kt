@@ -2,6 +2,7 @@ package org.nypl.simplified.ui.main
 
 import android.app.Application
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Process
 import android.os.StrictMode
@@ -9,11 +10,15 @@ import android.os.StrictMode.ThreadPolicy
 import android.os.StrictMode.VmPolicy
 import android.util.DisplayMetrics
 import android.view.WindowManager
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
 import com.io7m.jattribute.core.AttributeReadableType
 import com.io7m.jattribute.core.AttributeSubscriptionType
 import com.io7m.jattribute.core.AttributeType
 import com.io7m.jattribute.core.Attributes
 import org.librarysimplified.audiobook.views.PlayerModel
+import org.librarysimplified.http.network_access.LSHTTPNetworkAvailabilityService
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.librarysimplified.ui.BuildConfig
 import org.nypl.simplified.boot.api.BootEvent
@@ -74,6 +79,7 @@ class MainApplication : Application() {
     this.configureStrictMode()
     this.logStartup()
     PlayerModel.start(this)
+    this.configureNetworkAvailabilityService()
 
     INSTANCE = this
     this.boot.start(this)
@@ -146,6 +152,31 @@ class MainApplication : Application() {
       this.logger.debug("version info unavailable: ", e)
       "UNKNOWN"
     }
+
+  /**
+   * The `LSHTTPNetworkAvailabilityService` monitors live network connectivity and
+   * feeds `LSHTTPNetworkAccess`. It is (re)started when the app is brought to the
+   * foreground rather than during boot: on Android 12+ starting a service while
+   * the app is in the background throws `BackgroundServiceStartNotAllowedException`,
+   * and the app is frequently (re)created in the background. Starting it from the
+   * foreground lifecycle both avoids that exception and ensures live connectivity
+   * updates are active whenever the app is in use.
+   */
+  private fun configureNetworkAvailabilityService() {
+    ProcessLifecycleOwner.get().lifecycle.addObserver(
+      object : DefaultLifecycleObserver {
+        override fun onStart(owner: LifecycleOwner) {
+          try {
+            this@MainApplication.startService(
+              Intent(this@MainApplication, LSHTTPNetworkAvailabilityService::class.java)
+            )
+          } catch (e: Throwable) {
+            this@MainApplication.logger.debug("Failed to start network availability service: ", e)
+          }
+        }
+      }
+    )
+  }
 
   /**
    * StrictMode is a developer tool which detects things you might be doing by accident and
