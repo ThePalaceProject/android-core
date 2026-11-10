@@ -129,6 +129,7 @@ object MainLogging {
     logbackLevel("org.nypl.simplified.files.FileLocking", Level.ERROR)
     logbackLevel("org.nypl.simplified.notifications.NotificationsService", Level.DEBUG)
     logbackLevel("org.sqlite.core.NativeDB", Level.ERROR)
+    logbackLevel("org.thepalaceproject.palace.images.ImageLoader2", Level.ERROR)
   }
 
   fun configure(cacheDirectory: File) {
