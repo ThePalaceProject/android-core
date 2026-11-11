@@ -643,12 +643,12 @@ class OPDS20FeedConverterTest {
               {
                 "href": "https://example.com/cover.jpg",
                 "type": "image/jpeg",
-                "rel": "cover"
+                "rel": "http://opds-spec.org/image"
               },
               {
                 "href": "https://example.com/thumb.jpg",
                 "type": "image/jpeg",
-                "rel": "thumbnail"
+                "rel": "http://opds-spec.org/image/thumbnail"
               }
             ]
           }
@@ -800,7 +800,7 @@ class OPDS20FeedConverterTest {
         "links": [
           {
             "href": "https://example.com/licenses",
-            "rel": "licenses"
+            "rel": "license"
           }
         ]
       }
