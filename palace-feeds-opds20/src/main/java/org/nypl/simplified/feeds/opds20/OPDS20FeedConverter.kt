@@ -126,7 +126,7 @@ object OPDS20FeedConverter {
       languageMapToString(feed.metadata.title)
 
     val facets: List<FeedFacetSingle> =
-      feed.facets.map { convertFacet(accountID, it) }
+      feed.facets.flatMap { convertFacet(accountID, it) }
 
     val facetsByGroup: Map<String, List<FeedFacetSingle>> =
       facets.groupBy { (it as FeedFacetData).group }
@@ -350,11 +350,14 @@ object OPDS20FeedConverter {
         FeedPreviewAcquisition(rawHref, rawType)
       }
 
+    val allLinks: List<WPMLink> =
+      links + publication.images
+
     val cover: URI? =
-      linkHref(links, REL_COVER)
+      linkHref(allLinks, REL_COVER)
 
     val thumbnail: URI? =
-      linkHref(links, REL_THUMBNAIL)
+      linkHref(allLinks, REL_THUMBNAIL)
 
     val annotations: URI? =
       linkHref(links, REL_ANNOTATION_SERVICE)
@@ -434,31 +437,45 @@ object OPDS20FeedConverter {
   private fun convertFacet(
     accountID: AccountID,
     facet: WPMFacet,
-  ): FeedFacetData {
-    val uri: URI
-    val selfLink = facet.links.firstOrNull { REL_SELF in it.relation }
-    if (selfLink == null) {
-      uri = URI("")
-    } else {
-      val selfHref = linkHrefValue(selfLink)
-      if (selfHref == null) {
-        uri = URI("")
-      } else {
-        uri = selfHref
-      }
-    }
-
-    val title: String =
+  ): List<FeedFacetData> {
+    val groupName: String =
       languageMapToString(facet.metadata.title)
 
-    return FeedFacetData(
-      accountID = accountID,
-      title = title,
-      isActive = true,
-      uri = uri,
-      group = "",
-      groupType = null,
-    )
+    val result = mutableListOf<FeedFacetData>()
+
+    for (link in facet.links) {
+      val linkTitle: String
+      val rawTitle = link.title
+      if (rawTitle == null || rawTitle.isEmpty()) {
+        linkTitle = groupName
+      } else {
+        linkTitle = rawTitle
+      }
+
+      val linkURI: URI
+      val hrefValue = linkHrefValue(link)
+      if (hrefValue == null) {
+        linkURI = URI("")
+      } else {
+        linkURI = hrefValue
+      }
+
+      val isActive: Boolean =
+        REL_SELF in link.relation
+
+      result.add(
+        FeedFacetData(
+          accountID = accountID,
+          title = linkTitle,
+          isActive = isActive,
+          uri = linkURI,
+          group = groupName,
+          groupType = null,
+        ),
+      )
+    }
+
+    return result
   }
 
   private fun convertSubject(subject: WPMSubjectOrString): FeedCategory {
