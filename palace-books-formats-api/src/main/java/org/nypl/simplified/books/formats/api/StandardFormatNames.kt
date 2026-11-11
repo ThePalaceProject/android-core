@@ -190,4 +190,11 @@ object StandardFormatNames {
       types.add(this.opdsAcquisitionFeedEntryOld)
       types.toSet()
     }
+
+  /**
+   * The MIME type used for OPDS 2.0 publications.
+   */
+
+  val opds20Publication =
+    this.mimeOf("application/opds-publication+json")
 }
