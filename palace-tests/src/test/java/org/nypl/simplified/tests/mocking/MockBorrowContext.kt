@@ -19,7 +19,9 @@ import org.nypl.simplified.books.borrowing.SAMLDownloadContext
 import org.nypl.simplified.books.borrowing.internal.BorrowAudiobookAuthorizationHandler
 import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.links.Link
+import org.nypl.simplified.feeds.FeedEntryParse
 import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.api.FeedEntryParseType
 import org.nypl.simplified.feeds.api.FeedAcquisitionPath
 import org.nypl.simplified.feeds.api.FeedAcquisitionPathElement
 import org.nypl.simplified.profiles.api.ProfileType
@@ -69,6 +71,7 @@ class MockBorrowContext(
   override var services: ServiceDirectoryType =
     MutableServiceDirectory().apply {
       this.putService(DiagnosticsServiceType::class.java, NoopDiagnosticsService())
+      this.putService(FeedEntryParseType::class.java, FeedEntryParse.create())
     }
 
   override var adobeExecutorTimeout: BorrowTimeoutConfiguration =

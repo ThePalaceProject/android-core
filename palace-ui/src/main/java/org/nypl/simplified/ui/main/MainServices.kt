@@ -75,7 +75,9 @@ import org.nypl.simplified.boot.api.BootFailureTesting
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.content.api.ContentResolverSane
 import org.nypl.simplified.content.api.ContentResolverType
+import org.nypl.simplified.feeds.FeedEntryParse
 import org.nypl.simplified.feeds.FeedLoader
+import org.nypl.simplified.feeds.api.FeedEntryParseType
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.files.DirectoryUtilities
 import org.nypl.simplified.notifications.NotificationTokenHTTPCalls
@@ -866,6 +868,12 @@ internal object MainServices {
           )
         },
       )
+
+    addService(
+      message = strings.bootingGeneral("feed entry parser"),
+      interfaceType = FeedEntryParseType::class.java,
+      serviceConstructor = { FeedEntryParse.create() },
+    )
 
     addService(
       message = strings.bootingGeneral("patron user profile parsers"),

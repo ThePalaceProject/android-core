@@ -92,6 +92,12 @@ object OPDS20FeedConverter {
   fun parse(stream: InputStream): WPMFeed = stream.use { mapper.readValue(it, WPMFeed::class.java) }
 
   /**
+   * Parse OPDS 2.0 JSON from the given stream into a [WPMPublication].
+   */
+  fun parsePublication(stream: InputStream): WPMPublication =
+    stream.use { mapper.readValue(it, WPMPublication::class.java) }
+
+  /**
    * Convert a parsed [WPMFeed] into a [PalaceFeed].
    *
    * @param accountID The account that owns the feed

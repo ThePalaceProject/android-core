@@ -28,6 +28,7 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.Borro
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskFactoryType
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskType
 import org.nypl.simplified.books.formats.api.StandardFormatNames.allOPDSFeeds
+import org.nypl.simplified.feeds.FeedEntryParse
 import org.nypl.simplified.feeds.api.FeedAcquisitionPathElement
 import org.nypl.simplified.feeds.api.FeedAcquisitionPaths
 import org.nypl.simplified.feeds.api.FeedAvailabilityHeld
@@ -38,11 +39,8 @@ import org.nypl.simplified.feeds.api.FeedAvailabilityLoaned
 import org.nypl.simplified.feeds.api.FeedAvailabilityOpenAccess
 import org.nypl.simplified.feeds.api.FeedAvailabilityRevoked
 import org.nypl.simplified.feeds.api.FeedEntryBook
-import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+import org.nypl.simplified.feeds.api.FeedEntryParseType
 import org.nypl.simplified.links.Link
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
-import org.nypl.simplified.opds.core.OPDSParseException
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.net.URI
@@ -196,8 +194,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
     }
 
     val inputStream = status.bodyStream ?: ByteArrayInputStream(ByteArray(0))
-    val opdsEntry = this.parseOPDSFeedEntry(context, inputStream, uri)
-    val entry = OPDS12FeedConverter.convertEntry(context.account.id, opdsEntry)
+    val entry = this.parseFeedEntry(context, inputStream, uri, status.properties.contentType)
     context.bookDatabaseEntry.writeOPDSEntry(entry)
     this.checkAvailability(context, entry)
     val nextURI = this.findNextLink(context, entry)
@@ -306,22 +303,23 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
     }
   }
 
-  private fun parseOPDSFeedEntry(
+  private fun parseFeedEntry(
     context: BorrowContextType,
     inputStream: InputStream,
     uri: URI,
-  ): OPDSAcquisitionFeedEntry {
-    context.taskRecorder.beginNewStep("Parsing the OPDS feed entry...")
-    val parser = OPDSAcquisitionFeedEntryParser.newParser()
+    contentType: one.irradia.mime.api.MIMEType?,
+  ): FeedEntryBook {
+    context.taskRecorder.beginNewStep("Parsing the feed entry...")
+    val parser: FeedEntryParseType = FeedEntryParse.create()
 
     return try {
-      inputStream.use {
-        parser.parseEntryStream(uri, it)
+      inputStream.use { stream ->
+        parser.parseEntry(context.account.id, stream, uri, contentType)
       }
-    } catch (e: OPDSParseException) {
-      context.logError("OPDS feed parse error: ", e)
+    } catch (e: Exception) {
+      context.logError("Feed entry parse error: ", e)
       context.taskRecorder.currentStepFailed(
-        message = "Failed to parse the OPDS feed entry (${e.message}).",
+        message = "Failed to parse the feed entry (${e.message}).",
         errorCode = opdsFeedEntryParseError,
         exception = e,
         extraMessages = listOf(),
