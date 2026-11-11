@@ -1,0 +1,13 @@
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <id>http://example.com/feed/</id>
+  <title>Dispatch Test Feed</title>
+  <updated>2024-01-01T00:00:00Z</updated>
+  <entry>
+    <id>urn:test:book1</id>
+    <title>Dispatch Test Book</title>
+    <author><name>Test Author</name></author>
+    <updated>2024-01-01T00:00:00Z</updated>
+    <published>2024-01-01T00:00:00Z</published>
+    <link href="https://example.com/book1.epub" rel="http://opds-spec.org/acquisition/borrow" type="application/epub+zip"/>
+  </entry>
+</feed>

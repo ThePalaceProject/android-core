@@ -1,0 +1,23 @@
+{
+  "type": "feed",
+  "metadata": {
+    "title": "Dispatch Test Feed"
+  },
+  "publications": [
+    {
+      "type": "publication",
+      "metadata": {
+        "identifier": "urn:test:book1",
+        "title": "Dispatch Test Book",
+        "author": [{"name": "Test Author"}]
+      },
+      "links": [
+        {
+          "href": "https://example.com/book1.epub",
+          "type": "application/epub+zip",
+          "rel": "http://librarysimplified.org/terms/rel/acquire/borrow"
+        }
+      ]
+    }
+  ]
+}
