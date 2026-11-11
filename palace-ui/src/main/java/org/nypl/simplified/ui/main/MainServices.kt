@@ -86,9 +86,6 @@ import org.nypl.simplified.notifications.NotificationsService
 import org.nypl.simplified.notifications.NotificationsServiceType
 import org.nypl.simplified.opds.auth_document.AuthenticationDocumentParsers
 import org.nypl.simplified.opds.auth_document.api.AuthenticationDocumentParsersType
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
-import org.nypl.simplified.opds.core.OPDSFeedParser
-import org.nypl.simplified.opds.core.OPDSFeedParserType
 import org.nypl.simplified.opds.core.OPDSSearchParser
 import org.nypl.simplified.patron.PatronUserProfileParsers
 import org.nypl.simplified.patron.api.PatronUserProfileParsersType
@@ -833,14 +830,6 @@ internal object MainServices {
           directory = directories.directoryStorageProfiles,
           httpClient = lsHTTP,
         )
-      },
-    )
-
-    addService(
-      message = strings.bootingGeneral("feed parser"),
-      interfaceType = OPDSFeedParserType::class.java,
-      serviceConstructor = {
-        OPDSFeedParser.newParser(OPDSAcquisitionFeedEntryParser.newParser())
       },
     )
 

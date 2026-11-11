@@ -53,7 +53,6 @@ import org.nypl.simplified.futures.FluentFutureExtensions.flatMap
 import org.nypl.simplified.futures.FluentFutureExtensions.map
 import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
 import org.nypl.simplified.opds.auth_document.api.AuthenticationDocumentParsersType
-import org.nypl.simplified.opds.core.OPDSFeedParserType
 import org.nypl.simplified.patron.api.PatronUserProfileParsersType
 import org.nypl.simplified.profiles.api.ProfileDescription
 import org.nypl.simplified.profiles.api.ProfileEvent
@@ -111,8 +110,6 @@ class Controller private constructor(
     this.services.requireService(BookFormatSupportType::class.java)
   private val feedLoader =
     this.services.requireService(FeedLoaderType::class.java)
-  private val feedParser =
-    this.services.requireService(OPDSFeedParserType::class.java)
   private val lsHttp =
     this.services.requireService(LSHTTPClientType::class.java)
   private val notificationTokenHttpCalls =
