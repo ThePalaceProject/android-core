@@ -15,12 +15,9 @@ import org.nypl.simplified.books.book_database.api.BookDatabaseException
 import org.nypl.simplified.books.book_database.api.BookFormats
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.feeds.api.FeedEntryBook
-import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
-import org.nypl.simplified.feeds.opds12.toOPDSAcquisitionFeedEntry
+import org.nypl.simplified.feeds.api.FeedEntrySerializerType
 import org.nypl.simplified.files.DirectoryUtilities
 import org.nypl.simplified.files.FileUtilities
-import org.nypl.simplified.json.core.JSONSerializerUtilities
-import org.nypl.simplified.opds.core.OPDSJSONSerializerType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -35,7 +32,7 @@ import java.util.EnumMap
 internal class BookDatabaseEntry internal constructor(
   private val context: Application,
   private val bookDir: File,
-  private val serializer: OPDSJSONSerializerType,
+  private val serializer: FeedEntrySerializerType,
   private val httpClient: LSHTTPClientType,
   private val formats: BookFormatSupportType,
   @GuardedBy("bookLock")
@@ -154,9 +151,7 @@ internal class BookDatabaseEntry internal constructor(
         FileUtilities.fileWriteUTF8Atomically(
           fileMeta,
           fileMetaTmp,
-          JSONSerializerUtilities.serializeToString(
-            this.serializer.serializeFeedEntry(entry.toOPDSAcquisitionFeedEntry()),
-          ),
+          this.serializer.serializeEntry(entry),
         )
 
         this.bookRef = this.bookRef.copy(entry = entry)

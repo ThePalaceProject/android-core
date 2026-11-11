@@ -36,7 +36,9 @@ import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisition
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
+import org.nypl.simplified.feeds.opds12.FeedEntryParser
 import org.nypl.simplified.opds.core.OPDSJSONParser
+import org.nypl.simplified.feeds.opds12.FeedEntrySerializer
 import org.nypl.simplified.opds.core.OPDSJSONSerializer
 import org.nypl.simplified.tests.books.BookFormatsTesting
 import org.slf4j.LoggerFactory
@@ -78,8 +80,8 @@ abstract class BookDatabaseEPUBContract {
 
   @Test
   fun testEntryLastReadLocation() {
-    val parser = OPDSJSONParser.newParser()
-    val serializer = OPDSJSONSerializer.newSerializer()
+    val parser = FeedEntryParser(OPDSJSONParser.newParser())
+    val serializer = FeedEntrySerializer(OPDSJSONSerializer.newSerializer())
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 = BookDatabase.open(context = context(),
       parser = parser,
@@ -136,8 +138,8 @@ abstract class BookDatabaseEPUBContract {
 
   @Test
   fun testBookmarks() {
-    val parser = OPDSJSONParser.newParser()
-    val serializer = OPDSJSONSerializer.newSerializer()
+    val parser = FeedEntryParser(OPDSJSONParser.newParser())
+    val serializer = FeedEntrySerializer(OPDSJSONSerializer.newSerializer())
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 = BookDatabase.open(context = context(),
       parser = parser,
@@ -263,8 +265,8 @@ abstract class BookDatabaseEPUBContract {
 
   @Test
   fun testEntryDRM() {
-    val parser = OPDSJSONParser.newParser()
-    val serializer = OPDSJSONSerializer.newSerializer()
+    val parser = FeedEntryParser(OPDSJSONParser.newParser())
+    val serializer = FeedEntrySerializer(OPDSJSONSerializer.newSerializer())
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 = BookDatabase.open(context = context(),
       parser = parser,

@@ -41,7 +41,9 @@ import org.nypl.simplified.opds.core.OPDSAcquisition
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
 import org.nypl.simplified.opds.core.OPDSIndirectAcquisition
+import org.nypl.simplified.feeds.opds12.FeedEntryParser
 import org.nypl.simplified.opds.core.OPDSJSONParser
+import org.nypl.simplified.feeds.opds12.FeedEntrySerializer
 import org.nypl.simplified.opds.core.OPDSJSONSerializer
 import org.nypl.simplified.tests.books.BookFormatsTesting
 import org.slf4j.LoggerFactory
@@ -83,8 +85,8 @@ abstract class BookDatabaseContract {
 
   @Test
   fun testOpenEmpty() {
-    val parser = OPDSJSONParser.newParser()
-    val serializer = OPDSJSONSerializer.newSerializer()
+    val parser = FeedEntryParser(OPDSJSONParser.newParser())
+    val serializer = FeedEntrySerializer(OPDSJSONSerializer.newSerializer())
 
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database =
@@ -105,8 +107,8 @@ abstract class BookDatabaseContract {
 
   @Test
   fun testOpenCreateReopen() {
-    val parser = OPDSJSONParser.newParser()
-    val serializer = OPDSJSONSerializer.newSerializer()
+    val parser = FeedEntryParser(OPDSJSONParser.newParser())
+    val serializer = FeedEntrySerializer(OPDSJSONSerializer.newSerializer())
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 =
       BookDatabase.open(context = context(),
@@ -177,8 +179,8 @@ OPDS12FeedConverter.convertEntry(this.accountID, OPDSAcquisitionFeedEntry.newBui
 
   @Test
   fun testOpenCreateDelete() {
-    val parser = OPDSJSONParser.newParser()
-    val serializer = OPDSJSONSerializer.newSerializer()
+    val parser = FeedEntryParser(OPDSJSONParser.newParser())
+    val serializer = FeedEntrySerializer(OPDSJSONSerializer.newSerializer())
 
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val db0 =
@@ -213,8 +215,8 @@ OPDS12FeedConverter.convertEntry(this.accountID, OPDSAcquisitionFeedEntry.newBui
 
   @Test
   fun testEntrySetCover() {
-    val parser = OPDSJSONParser.newParser()
-    val serializer = OPDSJSONSerializer.newSerializer()
+    val parser = FeedEntryParser(OPDSJSONParser.newParser())
+    val serializer = FeedEntrySerializer(OPDSJSONSerializer.newSerializer())
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 =
       BookDatabase.open(context = context(),
@@ -248,8 +250,8 @@ OPDS12FeedConverter.convertEntry(this.accountID, OPDSAcquisitionFeedEntry.newBui
 
   @Test
   fun testEntryHasEPUBFormat() {
-    val parser = OPDSJSONParser.newParser()
-    val serializer = OPDSJSONSerializer.newSerializer()
+    val parser = FeedEntryParser(OPDSJSONParser.newParser())
+    val serializer = FeedEntrySerializer(OPDSJSONSerializer.newSerializer())
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 =
       BookDatabase.open(context = context(),
@@ -346,8 +348,8 @@ OPDS12FeedConverter.convertEntry(this.accountID, OPDSAcquisitionFeedEntry.newBui
 
   @Test
   fun testEntryHasPDFFormat() {
-    val parser = OPDSJSONParser.newParser()
-    val serializer = OPDSJSONSerializer.newSerializer()
+    val parser = FeedEntryParser(OPDSJSONParser.newParser())
+    val serializer = FeedEntrySerializer(OPDSJSONSerializer.newSerializer())
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 =
       BookDatabase.open(context = context(),
@@ -444,8 +446,8 @@ OPDS12FeedConverter.convertEntry(this.accountID, OPDSAcquisitionFeedEntry.newBui
 
   @Test
   fun testEntryHasAudioBookFormat() {
-    val parser = OPDSJSONParser.newParser()
-    val serializer = OPDSJSONSerializer.newSerializer()
+    val parser = FeedEntryParser(OPDSJSONParser.newParser())
+    val serializer = FeedEntrySerializer(OPDSJSONSerializer.newSerializer())
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 =
       BookDatabase.open(context = context(),
@@ -542,8 +544,8 @@ OPDS12FeedConverter.convertEntry(this.accountID, OPDSAcquisitionFeedEntry.newBui
 
   @Test
   fun testEntryAudioBookCopyDeleteRepeatedly() {
-    val parser = OPDSJSONParser.newParser()
-    val serializer = OPDSJSONSerializer.newSerializer()
+    val parser = FeedEntryParser(OPDSJSONParser.newParser())
+    val serializer = FeedEntrySerializer(OPDSJSONSerializer.newSerializer())
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 =
       BookDatabase.open(context = context(),
@@ -582,8 +584,8 @@ OPDS12FeedConverter.convertEntry(this.accountID, OPDSAcquisitionFeedEntry.newBui
 
   @Test
   fun testEntryAudioBookCopyDestroyEntry() {
-    val parser = OPDSJSONParser.newParser()
-    val serializer = OPDSJSONSerializer.newSerializer()
+    val parser = FeedEntryParser(OPDSJSONParser.newParser())
+    val serializer = FeedEntrySerializer(OPDSJSONSerializer.newSerializer())
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 =
       BookDatabase.open(context = context(),
@@ -616,8 +618,8 @@ OPDS12FeedConverter.convertEntry(this.accountID, OPDSAcquisitionFeedEntry.newBui
 
   @Test
   fun testEntryEPUBCopyDeleteRepeatedly() {
-    val parser = OPDSJSONParser.newParser()
-    val serializer = OPDSJSONSerializer.newSerializer()
+    val parser = FeedEntryParser(OPDSJSONParser.newParser())
+    val serializer = FeedEntrySerializer(OPDSJSONSerializer.newSerializer())
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 =
       BookDatabase.open(context = context(),
@@ -656,8 +658,8 @@ OPDS12FeedConverter.convertEntry(this.accountID, OPDSAcquisitionFeedEntry.newBui
 
   @Test
   fun testEntryEPUBCopyDestroyEntry() {
-    val parser = OPDSJSONParser.newParser()
-    val serializer = OPDSJSONSerializer.newSerializer()
+    val parser = FeedEntryParser(OPDSJSONParser.newParser())
+    val serializer = FeedEntrySerializer(OPDSJSONSerializer.newSerializer())
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 =
       BookDatabase.open(context = context(),
@@ -690,8 +692,8 @@ OPDS12FeedConverter.convertEntry(this.accountID, OPDSAcquisitionFeedEntry.newBui
 
   @Test
   fun testEntryPDFCopyDeleteRepeatedly() {
-    val parser = OPDSJSONParser.newParser()
-    val serializer = OPDSJSONSerializer.newSerializer()
+    val parser = FeedEntryParser(OPDSJSONParser.newParser())
+    val serializer = FeedEntrySerializer(OPDSJSONSerializer.newSerializer())
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 =
       BookDatabase.open(context = context(),
@@ -730,8 +732,8 @@ OPDS12FeedConverter.convertEntry(this.accountID, OPDSAcquisitionFeedEntry.newBui
 
   @Test
   fun testEntryPDFCopyDestroyEntry() {
-    val parser = OPDSJSONParser.newParser()
-    val serializer = OPDSJSONSerializer.newSerializer()
+    val parser = FeedEntryParser(OPDSJSONParser.newParser())
+    val serializer = FeedEntrySerializer(OPDSJSONSerializer.newSerializer())
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 =
       BookDatabase.open(context = context(),
@@ -764,8 +766,8 @@ OPDS12FeedConverter.convertEntry(this.accountID, OPDSAcquisitionFeedEntry.newBui
 
   @Test
   fun testEntryAudioBookSaveLoadClearPosition() {
-    val parser = OPDSJSONParser.newParser()
-    val serializer = OPDSJSONSerializer.newSerializer()
+    val parser = FeedEntryParser(OPDSJSONParser.newParser())
+    val serializer = FeedEntrySerializer(OPDSJSONSerializer.newSerializer())
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 =
       BookDatabase.open(context = context(),
@@ -868,8 +870,8 @@ OPDS12FeedConverter.convertEntry(this.accountID, OPDSAcquisitionFeedEntry.newBui
 
   @Test
   fun testOpenWithUnsupportedFormats() {
-    val parser = OPDSJSONParser.newParser()
-    val serializer = OPDSJSONSerializer.newSerializer()
+    val parser = FeedEntryParser(OPDSJSONParser.newParser())
+    val serializer = FeedEntrySerializer(OPDSJSONSerializer.newSerializer())
     val directory = DirectoryUtilities.directoryCreateTemporary()
 
     val bookID = BookID.create("abcd")

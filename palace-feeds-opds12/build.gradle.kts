@@ -13,6 +13,7 @@ dependencies {
     implementation(project(":palace-links"))
 
     implementation(libs.irradia.mime.api)
+    implementation(libs.jackson.databind)
     implementation(libs.joda.time)
     implementation(libs.kotlin.stdlib)
     implementation(libs.palace.http.api)
