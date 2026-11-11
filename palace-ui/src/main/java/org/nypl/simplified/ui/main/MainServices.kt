@@ -994,6 +994,8 @@ internal object MainServices {
           onProfileUpdated(profilesControllerTypeService, feedLoader)
         }
 
+    onProfileUpdated(profilesControllerTypeService, feedLoader)
+
     showThreads()
 
     publishApplicationStartupEvent(context, analytics)
