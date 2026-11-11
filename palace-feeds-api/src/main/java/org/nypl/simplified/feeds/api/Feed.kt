@@ -58,6 +58,11 @@ sealed interface Feed {
   val feedNext: URI?
 
   /**
+   * The URI of the authentication document, if any.
+   */
+  val feedAuthDocument: URI?
+
+  /**
    * The facets, grouped by name.
    */
   val facetsByGroup: Map<String, List<FeedFacetSingle>>

@@ -289,7 +289,7 @@ class Controller private constructor(
         accountProviderRegistry = this.accountProviders,
         httpClient = this.lsHttp,
         opdsURI = opdsFeed,
-        opdsFeedParser = this.feedParser,
+        feedLoader = this.feedLoader,
         profiles = this.profiles,
         strings = this.profileAccountCreationStringResources,
       ),

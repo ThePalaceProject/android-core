@@ -17,6 +17,7 @@ data class FeedDataWithGroups(
   override val feedAbout: URI?,
   override val feedLicenses: URI?,
   override val feedNext: URI?,
+  override val feedAuthDocument: URI?,
   override val facetsByGroup: Map<String, List<FeedFacetSingle>>,
   override val facetsOrder: List<FeedFacetSingle>,
   val groups: List<FeedGroup>,

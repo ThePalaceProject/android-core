@@ -70,6 +70,7 @@ object OPDS20FeedConverter {
   private const val REL_TERMS_OF_SERVICE = "terms-of-service"
   private const val REL_PRIVACY_POLICY = "privacy-policy"
   private const val REL_LICENSES = "licenses"
+  private const val REL_AUTH_DOCUMENT = "http://opds-spec.org/auth-document"
 
   private const val REL_ANNOTATION_SERVICE = "http://www.w3.org/ns/oa#annotationService"
   private const val REL_TIME_TRACKING = "http://palaceproject.io/terms/timeTracking"
@@ -184,6 +185,9 @@ object OPDS20FeedConverter {
     val feedLicenses: URI? =
       linkHref(feed.links, REL_LICENSES)
 
+    val feedAuthDocument: URI? =
+      linkHref(feed.links, REL_AUTH_DOCUMENT)
+
     return if (feedGroups.isEmpty()) {
       FeedData(
         feedID = feedURI.toString(),
@@ -196,6 +200,7 @@ object OPDS20FeedConverter {
         feedAbout = feedAbout,
         feedLicenses = feedLicenses,
         feedNext = feedNext,
+        feedAuthDocument = feedAuthDocument,
         facetsByGroup = facetsByGroup,
         facetsOrder = facets,
         entries = entries,
@@ -212,6 +217,7 @@ object OPDS20FeedConverter {
         feedAbout = feedAbout,
         feedLicenses = feedLicenses,
         feedNext = feedNext,
+        feedAuthDocument = feedAuthDocument,
         facetsByGroup = facetsByGroup,
         facetsOrder = facets,
         groups = feedGroups,
