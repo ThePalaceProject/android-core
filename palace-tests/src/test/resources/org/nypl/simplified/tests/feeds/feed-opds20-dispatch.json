@@ -15,7 +15,7 @@
         {
           "href": "https://example.com/book1.epub",
           "type": "application/epub+zip",
-          "rel": "http://librarysimplified.org/terms/rel/acquire/borrow"
+          "rel": "http://opds-spec.org/acquisition/borrow"
         }
       ]
     }

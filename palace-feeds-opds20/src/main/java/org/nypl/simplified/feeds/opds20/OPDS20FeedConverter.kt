@@ -51,11 +51,11 @@ import org.nypl.simplified.feeds.api.Feed as PalaceFeed
  * convert the result into the generic [PalaceFeed] types from [palace-feeds-api].
  */
 object OPDS20FeedConverter {
-  private const val REL_ACQUIRE_PREFIX = "/acquire/"
-  private const val REL_ACQUIRE_SAMPLE = "/acquire/sample"
-  private const val REL_ACQUIRE_OPEN_ACCESS = "/acquire/open-access"
-  private const val REL_ACQUIRE_BUY = "/acquire/buy"
-  private const val REL_ACQUIRE_SUBSCRIBE = "/acquire/subscribe"
+  private const val REL_ACQUIRE_PREFIX = "http://opds-spec.org/acquisition/"
+  private const val REL_ACQUIRE_SAMPLE = "http://opds-spec.org/acquisition/sample"
+  private const val REL_ACQUIRE_OPEN_ACCESS = "http://opds-spec.org/acquisition/open-access"
+  private const val REL_ACQUIRE_BUY = "http://opds-spec.org/acquisition/buy"
+  private const val REL_ACQUIRE_SUBSCRIBE = "http://opds-spec.org/acquisition/subscribe"
 
   private const val REL_SELF = "self"
   private const val REL_NEXT = "next"

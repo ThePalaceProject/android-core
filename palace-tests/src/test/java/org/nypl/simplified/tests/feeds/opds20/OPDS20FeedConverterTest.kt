@@ -84,7 +84,7 @@ class OPDS20FeedConverterTest {
               {
                 "href": "https://example.com/book.epub",
                 "type": "application/epub+zip",
-                "rel": "http://librarysimplified.org/terms/rel/acquire/borrow"
+                "rel": "http://opds-spec.org/acquisition/borrow"
               }
             ]
           }
@@ -467,12 +467,12 @@ class OPDS20FeedConverterTest {
               {
                 "href": "https://example.com/book.epub",
                 "type": "application/epub+zip",
-                "rel": "http://librarysimplified.org/terms/rel/acquire/borrow"
+                "rel": "http://opds-spec.org/acquisition/borrow"
               },
               {
                 "href": "https://example.com/book-sample.pdf",
                 "type": "application/pdf",
-                "rel": "http://librarysimplified.org/terms/rel/acquire/sample"
+                "rel": "http://opds-spec.org/acquisition/sample"
               }
             ]
           }
@@ -730,7 +730,7 @@ class OPDS20FeedConverterTest {
               {
                 "href": "https://example.com/book.epub",
                 "type": "application/epub+zip",
-                "rel": "http://librarysimplified.org/terms/rel/acquire/borrow",
+                "rel": "http://opds-spec.org/acquisition/borrow",
                 "properties": {
                   "availability": {
                     "state": "available"
@@ -771,7 +771,7 @@ class OPDS20FeedConverterTest {
               {
                 "href": "https://example.com/book.epub",
                 "type": "application/epub+zip",
-                "rel": "http://librarysimplified.org/terms/rel/acquire/open-access"
+                "rel": "http://opds-spec.org/acquisition/open-access"
               }
             ]
           }
@@ -832,7 +832,7 @@ class OPDS20FeedConverterTest {
               {
                 "href": "https://example.com/book.epub",
                 "type": "application/epub+zip",
-                "rel": "http://librarysimplified.org/terms/rel/acquire/borrow",
+                "rel": "http://opds-spec.org/acquisition/borrow",
                 "properties": {
                   "availability": {
                     "state": "available"
@@ -894,7 +894,7 @@ class OPDS20FeedConverterTest {
               {
                 "href": "https://example.com/book.epub",
                 "type": "application/epub+zip",
-                "rel": "http://librarysimplified.org/terms/rel/acquire/borrow",
+                "rel": "http://opds-spec.org/acquisition/borrow",
                 "properties": {
                   "licensor": {
                     "vendor": "adobe",
@@ -940,7 +940,7 @@ class OPDS20FeedConverterTest {
               {
                 "href": "https://example.com/book.epub",
                 "type": "application/epub+zip",
-                "rel": "http://librarysimplified.org/terms/rel/acquire/borrow",
+                "rel": "http://opds-spec.org/acquisition/borrow",
                 "properties": {
                   "availability": {
                     "state": "reserved",
@@ -986,7 +986,7 @@ class OPDS20FeedConverterTest {
               {
                 "href": "https://example.com/book.epub",
                 "type": "application/epub+zip",
-                "rel": "http://librarysimplified.org/terms/rel/acquire/borrow",
+                "rel": "http://opds-spec.org/acquisition/borrow",
                 "properties": {
                   "availability": {
                     "state": "unavailable"
