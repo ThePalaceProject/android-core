@@ -72,7 +72,6 @@ class FeedLoaderContentTypeDispatchTest {
             supportsAudioBooks = null,
           ),
         ),
-      contentResolver = Mockito.mock(ContentResolverType::class.java),
       exec = this.exec,
       fetch =
         FeedFetchType { _, _, _ ->

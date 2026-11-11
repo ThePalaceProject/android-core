@@ -92,7 +92,6 @@ class OPDSClientCompositeFacetTest {
             supportsLCP = true
           )
         ),
-        contentResolver = MockContentResolver(),
         exec = this.exec,
         http = LSHTTPClient(
           context = this.context,

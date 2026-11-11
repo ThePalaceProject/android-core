@@ -180,7 +180,6 @@ class BookRevokeTaskTest {
     val feedLoader =
       FeedLoader.create(
         bookFormatSupport = this.bookFormatSupport,
-        contentResolver = this.contentResolver,
         exec = executorFeeds,
         http = this.http,
         opds12Parser = parser,

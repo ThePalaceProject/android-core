@@ -279,7 +279,6 @@ class RevokeBookRefreshTokenTest {
     val feedLoader =
       FeedLoader.create(
         bookFormatSupport = this.bookFormatSupport,
-        contentResolver = this.contentResolver,
         exec = executorFeeds,
         http = this.httpClient,
         opds12Parser = parser,

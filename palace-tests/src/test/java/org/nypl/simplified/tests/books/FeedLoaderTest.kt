@@ -35,12 +35,8 @@ class FeedLoaderTest : FeedLoaderContract() {
         )
       )
 
-    val contentResolver =
-      Mockito.mock(ContentResolverType::class.java)
-
     return FeedLoader(
       bookFormatSupport = bookFormatSupport,
-      contentResolver = contentResolver,
       exec = exec,
       fetch = FeedFetchType { uri, _, _ ->
         FeedFetchResult(body = uri.toURL().openStream(), accessToken = null, contentType = null)

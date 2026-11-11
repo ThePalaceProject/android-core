@@ -10,7 +10,6 @@ import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.getAccessToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
-import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedAcquisitionPath
 import org.nypl.simplified.feeds.api.FeedAcquisitionPaths
@@ -33,7 +32,6 @@ import org.nypl.simplified.opds.core.OPDSSearchLink
 import org.nypl.simplified.opds.core.OPDSSearchParserType
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayInputStream
-import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InputStream
 import java.net.URI
@@ -55,7 +53,6 @@ import java.util.concurrent.atomic.AtomicBoolean
  */
 class FeedLoader(
   private val bookFormatSupport: BookFormatSupportType,
-  private val contentResolver: ContentResolverType,
   private val exec: ExecutorService,
   private val fetch: FeedFetchType,
   private val opds12Parser: OPDSFeedParserType,
@@ -109,10 +106,6 @@ class FeedLoader(
     method: String,
   ): FeedLoaderResult {
     try {
-      if (uri.scheme == "content") {
-        return this.parseFromContentResolver(accountId, uri)
-      }
-
       val acceptHeader = if (this.preferOPDS20) ACCEPT_OPDS_JSON else null
       val result = this.fetch.fetch(uri, credentials, acceptHeader)
       val body = result.body
@@ -244,37 +237,6 @@ class FeedLoader(
   private fun isTypePathSupported(path: FeedAcquisitionPath): Boolean =
     this.bookFormatSupport.isSupportedPath(path.asMIMETypes())
 
-  private fun parseFromContentResolver(
-    accountId: AccountID,
-    uri: URI,
-  ): FeedLoaderResult {
-    val streamMaybe = this.contentResolver.openInputStream(uri)
-    return if (streamMaybe != null) {
-      streamMaybe.use { stream ->
-        FeedLoaderSuccess(
-          feed =
-            this.applyFilter(
-              OPDS12FeedConverter.convert(
-                accountID = accountId,
-                feed = this.opds12Parser.parse(uri, stream),
-                search = null,
-              ),
-              accountId,
-            ),
-          accessToken = null,
-        )
-      }
-    } else {
-      FeedLoaderFailure.FeedLoaderFailedGeneral(
-        problemReport = null,
-        exception = FileNotFoundException(),
-        message = "File not found!",
-        attributesInitial =
-          sortedMapOf(Pair("URI", uri.toASCIIString())),
-      )
-    }
-  }
-
   private fun fetchSearchLink(
     searchLink: OPDSSearchLink?,
     credentials: AccountAuthenticationCredentials?,
@@ -308,7 +270,6 @@ class FeedLoader(
      */
     fun create(
       bookFormatSupport: BookFormatSupportType,
-      contentResolver: ContentResolverType,
       exec: ExecutorService,
       http: LSHTTPClientType,
       opds12Parser: OPDSFeedParserType,
@@ -316,7 +277,6 @@ class FeedLoader(
     ): FeedLoaderType =
       FeedLoader(
         bookFormatSupport = bookFormatSupport,
-        contentResolver = contentResolver,
         exec = exec,
         fetch = httpFetch(http),
         opds12Parser = opds12Parser,

@@ -379,7 +379,6 @@ internal object MainServices {
 
     return FeedLoader.create(
       bookFormatSupport = bookFormatSupport,
-      contentResolver = contentResolver,
       exec = execCatalogFeeds,
       http = http,
       opds12Parser = opdsFeedParser,

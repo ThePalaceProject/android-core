@@ -166,7 +166,6 @@ class ProfileAccountCreateCustomOPDSTest {
     this.feedLoader =
       FeedLoader.create(
         bookFormatSupport = this.bookFormatSupport,
-        contentResolver = this.contentResolver,
         exec = this.executorFeeds,
         http = this.http,
         opds12Parser = opds12Parser,

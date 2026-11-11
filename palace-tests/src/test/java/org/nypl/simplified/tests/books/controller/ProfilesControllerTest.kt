@@ -139,7 +139,6 @@ class ProfilesControllerTest {
     val feedLoader =
       FeedLoader.create(
         bookFormatSupport = this.bookFormatSupport,
-        contentResolver = this.contentResolver,
         exec = this.executorFeeds,
         http = this.lsHTTP,
         opds12Parser = parser,
