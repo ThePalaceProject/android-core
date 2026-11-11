@@ -123,12 +123,14 @@ class FeedLoader(
       val accessToken = result.accessToken
       val contentType: MIMEType? = result.contentType
 
-      val feed: Feed =
-        if (contentType != null && contentType.fullType == CONTENT_TYPE_OPDS_JSON) {
-          this.parseOPDS20(accountId, body, uri)
-        } else {
-          this.parseOPDS12(accountId, body, uri, credentials, method)
-        }
+      val feed: Feed
+      if (contentType != null && contentType.fullType == CONTENT_TYPE_OPDS_JSON) {
+        this.log.debug("parsing feed as OPDS 2.0: {}", uri)
+        feed = this.parseOPDS20(accountId, body, uri)
+      } else {
+        this.log.debug("parsing feed as OPDS 1.2: {} (content-type: {})", uri, contentType)
+        feed = this.parseOPDS12(accountId, body, uri, credentials, method)
+      }
 
       return FeedLoaderSuccess(
         feed = this.applyFilter(feed, accountId),
