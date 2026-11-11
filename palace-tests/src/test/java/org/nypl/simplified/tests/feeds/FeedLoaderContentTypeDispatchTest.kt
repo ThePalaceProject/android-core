@@ -9,8 +9,8 @@ import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.formats.BookFormatSupport
 import org.nypl.simplified.books.formats.BookFormatSupportParameters
 import org.nypl.simplified.content.api.ContentResolverType
-import org.nypl.simplified.feeds.FeedFetchResult
-import org.nypl.simplified.feeds.FeedFetchType
+import org.nypl.simplified.feeds.api.FeedFetchResult
+import org.nypl.simplified.feeds.api.FeedFetchType
 import org.nypl.simplified.feeds.FeedLoader
 import org.nypl.simplified.feeds.api.FeedData
 import org.nypl.simplified.feeds.api.FeedLoaderResult

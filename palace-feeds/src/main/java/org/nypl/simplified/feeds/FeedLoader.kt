@@ -18,6 +18,8 @@ import org.nypl.simplified.feeds.api.FeedData
 import org.nypl.simplified.feeds.api.FeedDataWithGroups
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.api.FeedFetchResult
+import org.nypl.simplified.feeds.api.FeedFetchType
 import org.nypl.simplified.feeds.api.FeedHTTPTransportException
 import org.nypl.simplified.feeds.api.FeedLoaderResult
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure
@@ -110,7 +112,12 @@ class FeedLoader(
     method: String,
   ): FeedLoaderResult {
     try {
-      val acceptHeader = if (this.preferOPDS20) ACCEPT_OPDS_JSON else null
+      val acceptHeader: String?
+      if (this.preferOPDS20) {
+        acceptHeader = ACCEPT_OPDS_JSON
+      } else {
+        acceptHeader = null
+      }
       val result = this.fetch.fetch(uri, credentials, acceptHeader)
       val body = result.body
       val accessToken = result.accessToken
@@ -135,14 +142,14 @@ class FeedLoader(
           problemReport = e.report,
           exception = e,
           attributesInitial = this.errorAttributesOf(uri, method),
-          message = e.localizedMessage ?: "",
+          message = this.localMessageOf(e),
         )
       }
       return FeedLoaderFailure.FeedLoaderFailedGeneral(
         problemReport = e.report,
         exception = e,
         attributesInitial = this.errorAttributesOf(uri, method),
-        message = e.localizedMessage ?: "",
+        message = this.localMessageOf(e),
       )
     } catch (e: Exception) {
       this.log.debug("feed exception: ", e)
@@ -151,7 +158,7 @@ class FeedLoader(
         problemReport = null,
         exception = e,
         attributesInitial = this.errorAttributesOf(uri, method),
-        message = e.localizedMessage ?: "",
+        message = this.localMessageOf(e),
       )
     }
   }
@@ -256,6 +263,14 @@ class FeedLoader(
     }
   }
 
+  private fun localMessageOf(exception: Exception): String {
+    val message = exception.localizedMessage
+    if (message == null) {
+      return ""
+    }
+    return message
+  }
+
   private fun errorAttributesOf(
     uri: URI,
     method: String,
@@ -307,7 +322,13 @@ class FeedLoader(
         val status = response.status
         when {
           status is LSHTTPResponseStatus.Responded.OK -> {
-            val bodyStream = (status.bodyStream ?: ByteArrayInputStream(ByteArray(0)))
+            val bodyStream: InputStream
+            val rawStream = status.bodyStream
+            if (rawStream == null) {
+              bodyStream = ByteArrayInputStream(ByteArray(0))
+            } else {
+              bodyStream = rawStream
+            }
             FeedFetchResult(
               body = bodyStream,
               accessToken = status.getAccessToken(),

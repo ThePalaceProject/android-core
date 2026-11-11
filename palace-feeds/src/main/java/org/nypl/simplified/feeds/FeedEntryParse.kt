@@ -56,10 +56,10 @@ class FeedEntryParse(
     }
 
     val feed = OPDS20FeedConverter.parse(ByteArrayInputStream(bytes))
-    val publication =
-      feed.publications
-        .firstOrNull()
-        ?: throw Exception("OPDS 2.0 feed contains no publications: $uri")
+    val publication = feed.publications.firstOrNull()
+    if (publication == null) {
+      throw Exception("OPDS 2.0 feed contains no publications: $uri")
+    }
 
     return OPDS20FeedConverter.convertEntry(accountID, publication)
   }

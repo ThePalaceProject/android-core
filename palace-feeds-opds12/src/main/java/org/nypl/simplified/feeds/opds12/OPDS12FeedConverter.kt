@@ -190,8 +190,8 @@ object OPDS12FeedConverter {
   private fun convertFacet(
     accountID: AccountID,
     facet: OPDSFacet,
-  ): FeedFacetData =
-    FeedFacetData(
+  ): FeedFacetData {
+    return FeedFacetData(
       accountID = accountID,
       title = facet.title,
       isActive = facet.isActive,
@@ -199,16 +199,18 @@ object OPDS12FeedConverter {
       group = facet.group,
       groupType = facet.groupType,
     )
+  }
 
-  private fun convertCategory(category: OPDSCategory): FeedCategory =
-    FeedCategory(
+  private fun convertCategory(category: OPDSCategory): FeedCategory {
+    return FeedCategory(
       term = category.term,
       scheme = category.scheme,
       label = category.label,
     )
+  }
 
-  private fun convertAvailability(availability: org.nypl.simplified.opds.core.OPDSAvailabilityType): FeedAvailability =
-    when (availability) {
+  private fun convertAvailability(availability: org.nypl.simplified.opds.core.OPDSAvailabilityType): FeedAvailability {
+    return when (availability) {
       is OPDSAvailabilityHeld -> {
         FeedAvailabilityHeld(
           startDate = availability.startDate,
@@ -255,25 +257,28 @@ object OPDS12FeedConverter {
         )
       }
     }
+  }
 
-  private fun convertAcquisition(acquisition: OPDSAcquisition): FeedAcquisition =
-    FeedAcquisition(
+  private fun convertAcquisition(acquisition: OPDSAcquisition): FeedAcquisition {
+    return FeedAcquisition(
       relation = convertRelation(acquisition.relation),
       uri = acquisition.uri,
       type = acquisition.type,
       indirectAcquisitions = acquisition.indirectAcquisitions.map { convertIndirectAcquisition(it) },
       properties = acquisition.properties,
     )
+  }
 
-  private fun convertIndirectAcquisition(indirect: OPDSIndirectAcquisition): FeedIndirectAcquisition =
-    FeedIndirectAcquisition(
+  private fun convertIndirectAcquisition(indirect: OPDSIndirectAcquisition): FeedIndirectAcquisition {
+    return FeedIndirectAcquisition(
       type = indirect.type,
       indirectAcquisitions = indirect.indirectAcquisitions.map { convertIndirectAcquisition(it) },
       properties = indirect.properties,
     )
+  }
 
-  private fun convertRelation(relation: OPDSAcquisition.Relation): FeedAcquisitionRelation =
-    when (relation) {
+  private fun convertRelation(relation: OPDSAcquisition.Relation): FeedAcquisitionRelation {
+    return when (relation) {
       OPDSAcquisition.Relation.ACQUISITION_BORROW -> FeedAcquisitionRelation.ACQUISITION_BORROW
       OPDSAcquisition.Relation.ACQUISITION_BUY -> FeedAcquisitionRelation.ACQUISITION_BUY
       OPDSAcquisition.Relation.ACQUISITION_GENERIC -> FeedAcquisitionRelation.ACQUISITION_GENERIC
@@ -281,17 +286,20 @@ object OPDS12FeedConverter {
       OPDSAcquisition.Relation.ACQUISITION_SAMPLE -> FeedAcquisitionRelation.ACQUISITION_SAMPLE
       OPDSAcquisition.Relation.ACQUISITION_SUBSCRIBE -> FeedAcquisitionRelation.ACQUISITION_SUBSCRIBE
     }
+  }
 
-  private fun convertLicensor(licensor: DRMLicensor): FeedDRMLicensor =
-    FeedDRMLicensor(
+  private fun convertLicensor(licensor: DRMLicensor): FeedDRMLicensor {
+    return FeedDRMLicensor(
       vendor = licensor.vendor,
       clientToken = licensor.clientToken,
       deviceManager = licensor.deviceManager,
     )
+  }
 
-  private fun convertPreviewAcquisition(preview: OPDSPreviewAcquisition): FeedPreviewAcquisition =
-    FeedPreviewAcquisition(
+  private fun convertPreviewAcquisition(preview: OPDSPreviewAcquisition): FeedPreviewAcquisition {
+    return FeedPreviewAcquisition(
       uri = preview.uri,
       type = preview.type,
     )
+  }
 }
