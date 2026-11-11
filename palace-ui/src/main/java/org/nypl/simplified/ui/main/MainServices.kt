@@ -368,26 +368,17 @@ internal object MainServices {
 
   private fun createFeedLoader(
     http: LSHTTPClientType,
-    opdsFeedParser: OPDSFeedParserType,
     bookFormatSupport: BookFormatSupportType,
-    contentResolver: ContentResolverType,
   ): FeedLoaderType {
     val execCatalogFeeds =
       NamedThreadPools.namedThreadPool(1, "catalog-feed", 19)
-    val feedSearchParser =
-      OPDSSearchParser.newParser()
 
     return FeedLoader.create(
       bookFormatSupport = bookFormatSupport,
       exec = execCatalogFeeds,
       http = http,
-      opds12Parser = opdsFeedParser,
-      opds12SearchParser = feedSearchParser,
     )
   }
-
-  private fun createFeedParser(): OPDSFeedParserType =
-    OPDSFeedParser.newParser(OPDSAcquisitionFeedEntryParser.newParser())
 
   private fun <T : Any> optionalFromServiceLoader(interfaceType: Class<T>): T? =
     ServiceLoader
@@ -845,14 +836,13 @@ internal object MainServices {
       },
     )
 
-    val opdsFeedParser =
-      addService(
-        message = strings.bootingGeneral("feed parser"),
-        interfaceType = OPDSFeedParserType::class.java,
-        serviceConstructor = {
-          createFeedParser()
-        },
-      )
+    addService(
+      message = strings.bootingGeneral("feed parser"),
+      interfaceType = OPDSFeedParserType::class.java,
+      serviceConstructor = {
+        OPDSFeedParser.newParser(OPDSAcquisitionFeedEntryParser.newParser())
+      },
+    )
 
     val feedLoader =
       addService(
@@ -861,9 +851,7 @@ internal object MainServices {
         serviceConstructor = {
           createFeedLoader(
             http = lsHTTP,
-            opdsFeedParser = opdsFeedParser,
             bookFormatSupport = bookFormatService,
-            contentResolver = contentResolver,
           )
         },
       )

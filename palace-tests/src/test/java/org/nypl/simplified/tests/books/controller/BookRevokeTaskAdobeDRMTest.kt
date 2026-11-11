@@ -193,8 +193,6 @@ class BookRevokeTaskAdobeDRMTest {
       bookFormatSupport = this.bookFormatSupport,
       exec = executorFeeds,
       http = this.http,
-      opds12Parser = parser,
-      opds12SearchParser = searchParser,
     )
   }
 

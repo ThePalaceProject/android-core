@@ -188,8 +188,6 @@ class BorrowLCPEpubTest {
     this.bookDatabase =
       MockBookDatabase(this.accountId, bookDirectory.toFile())
 
-    val opds12Parser = OPDSFeedParser.newParser(OPDSAcquisitionFeedEntryParser.newParser())
-    val opds12SearchParser = OPDSSearchParser.newParser()
     val directExecutor =
       java.util.concurrent.Executors.newSingleThreadExecutor()
     val feedLoader =
@@ -205,14 +203,8 @@ class BorrowLCPEpubTest {
         ),
         exec = directExecutor,
         http = this.httpClient,
-        opds12Parser = opds12Parser,
-        opds12SearchParser = opds12SearchParser,
       )
     this.services = MutableServiceDirectory().apply {
-      putService(
-        OPDSFeedParserType::class.java,
-        opds12Parser
-      )
       putService(
         FeedLoaderType::class.java,
         feedLoader

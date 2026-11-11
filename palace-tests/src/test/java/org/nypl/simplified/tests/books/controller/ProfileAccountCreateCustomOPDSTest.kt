@@ -161,15 +161,11 @@ class ProfileAccountCreateCustomOPDSTest {
         uriBase = URI.create("http://localhost:${this.server.port}"),
       )
 
-    val opds12Parser = OPDSFeedParser.newParser(OPDSAcquisitionFeedEntryParser.newParser())
-    val opds12SearchParser = OPDSSearchParser.newParser()
     this.feedLoader =
       FeedLoader.create(
         bookFormatSupport = this.bookFormatSupport,
         exec = this.executorFeeds,
         http = this.http,
-        opds12Parser = opds12Parser,
-        opds12SearchParser = opds12SearchParser,
       )
   }
 

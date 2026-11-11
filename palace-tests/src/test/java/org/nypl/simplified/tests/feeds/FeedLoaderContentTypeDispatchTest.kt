@@ -81,9 +81,6 @@ class FeedLoaderContentTypeDispatchTest {
             contentType = contentType,
           )
         },
-      opds12Parser =
-        OPDSFeedParser.newParser(OPDSAcquisitionFeedEntryParser.newParser()),
-      opds12SearchParser = OPDSSearchParser.newParser(),
     )
 
   private fun opds12Body(): String =

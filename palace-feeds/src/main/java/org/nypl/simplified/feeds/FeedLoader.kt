@@ -25,10 +25,13 @@ import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
 import org.nypl.simplified.feeds.opds12.OPDS12FeedHTTPTransportException
 import org.nypl.simplified.feeds.opds20.OPDS20FeedConverter
+import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
+import org.nypl.simplified.opds.core.OPDSFeedParser
 import org.nypl.simplified.opds.core.OPDSFeedParserType
 import org.nypl.simplified.opds.core.OPDSFeedTransportIOException
 import org.nypl.simplified.opds.core.OPDSOpenSearch1_1
 import org.nypl.simplified.opds.core.OPDSSearchLink
+import org.nypl.simplified.opds.core.OPDSSearchParser
 import org.nypl.simplified.opds.core.OPDSSearchParserType
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayInputStream
@@ -55,9 +58,11 @@ class FeedLoader(
   private val bookFormatSupport: BookFormatSupportType,
   private val exec: ExecutorService,
   private val fetch: FeedFetchType,
-  private val opds12Parser: OPDSFeedParserType,
-  private val opds12SearchParser: OPDSSearchParserType,
 ) : FeedLoaderType {
+  private val opds12Parser: OPDSFeedParserType =
+    OPDSFeedParser.newParser(OPDSAcquisitionFeedEntryParser.newParser())
+  private val opds12SearchParser: OPDSSearchParserType =
+    OPDSSearchParser.newParser()
   private val log = LoggerFactory.getLogger(FeedLoader::class.java)
 
   private val showOnlySupportedBooksFlag = AtomicBoolean(true)
@@ -272,15 +277,11 @@ class FeedLoader(
       bookFormatSupport: BookFormatSupportType,
       exec: ExecutorService,
       http: LSHTTPClientType,
-      opds12Parser: OPDSFeedParserType,
-      opds12SearchParser: OPDSSearchParserType,
     ): FeedLoaderType =
       FeedLoader(
         bookFormatSupport = bookFormatSupport,
         exec = exec,
         fetch = httpFetch(http),
-        opds12Parser = opds12Parser,
-        opds12SearchParser = opds12SearchParser,
       )
 
     /**

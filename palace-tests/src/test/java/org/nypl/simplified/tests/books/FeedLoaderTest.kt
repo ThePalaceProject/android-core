@@ -41,8 +41,6 @@ class FeedLoaderTest : FeedLoaderContract() {
       fetch = FeedFetchType { uri, _, _ ->
         FeedFetchResult(body = uri.toURL().openStream(), accessToken = null, contentType = null)
       },
-      opds12Parser = parser,
-      opds12SearchParser = searchParser,
     )
   }
 

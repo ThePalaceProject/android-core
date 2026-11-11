@@ -103,8 +103,6 @@ class OPDSClientCompositeFacetTest {
           problemReportParsers = LSHTTPProblemReportParsers(),
           interceptors = listOf(),
         ),
-        opds12Parser = this.parser,
-        opds12SearchParser = this.searchParser,
       )
 
     this.client =

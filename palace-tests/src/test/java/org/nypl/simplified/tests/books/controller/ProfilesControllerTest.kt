@@ -141,8 +141,6 @@ class ProfilesControllerTest {
         bookFormatSupport = this.bookFormatSupport,
         exec = this.executorFeeds,
         http = this.lsHTTP,
-        opds12Parser = parser,
-        opds12SearchParser = OPDSSearchParser.newParser(),
       )
 
     val services = MutableServiceDirectory()
