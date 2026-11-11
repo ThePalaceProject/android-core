@@ -86,7 +86,6 @@ import org.nypl.simplified.notifications.NotificationsService
 import org.nypl.simplified.notifications.NotificationsServiceType
 import org.nypl.simplified.opds.auth_document.AuthenticationDocumentParsers
 import org.nypl.simplified.opds.auth_document.api.AuthenticationDocumentParsersType
-import org.nypl.simplified.opds.core.OPDSSearchParser
 import org.nypl.simplified.patron.PatronUserProfileParsers
 import org.nypl.simplified.patron.api.PatronUserProfileParsersType
 import org.nypl.simplified.profiles.ProfilesDatabases
