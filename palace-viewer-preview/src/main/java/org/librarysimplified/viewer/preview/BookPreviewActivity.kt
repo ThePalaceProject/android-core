@@ -75,7 +75,6 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
     fun startActivity(
       context: Activity,
       feedEntry: FeedEntryBook,
-    
     ) {
       BookPreviewModel.feedEntry = feedEntry
       context.startActivity(Intent(context, BookPreviewActivity::class.java))

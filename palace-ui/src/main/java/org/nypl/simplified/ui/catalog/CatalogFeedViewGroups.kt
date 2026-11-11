@@ -14,8 +14,8 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import org.librarysimplified.ui.R
 import org.nypl.simplified.feeds.api.Feed
-import org.nypl.simplified.feeds.api.FeedFacets
 import org.nypl.simplified.feeds.api.FeedDataWithGroups
+import org.nypl.simplified.feeds.api.FeedFacets
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.thepalaceproject.theme.core.PalaceTabButtons
 

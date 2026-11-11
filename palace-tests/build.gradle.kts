@@ -17,7 +17,6 @@ android {
             pickFirsts.add("lib/x86_64/libc++_shared.so")
         }
     }
-
 }
 
 afterEvaluate {

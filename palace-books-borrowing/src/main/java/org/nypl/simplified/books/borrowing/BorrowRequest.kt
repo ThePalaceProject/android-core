@@ -34,6 +34,5 @@ sealed class BorrowRequest {
     override val accountId: AccountID,
     override val opdsAcquisitionFeedEntry: FeedEntryBook,
     override val samlDownloadContext: SAMLDownloadContext? = null,
-  
   ) : BorrowRequest()
 }

@@ -2,7 +2,6 @@ package org.nypl.simplified.feeds.api
 
 import org.joda.time.DateTime
 import org.nypl.simplified.accounts.api.AccountID
-
 import java.net.URI
 
 /**
@@ -120,8 +119,8 @@ data class FeedEntryBook(
   /**
    * The series.
    */
-  val series: FeedSeries?
-)  : FeedEntry {
+  val series: FeedSeries?,
+) : FeedEntry {
   override val bookID: FeedBookID
     get() = FeedBookIDs.newFromText(this.id)
 

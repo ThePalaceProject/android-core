@@ -52,7 +52,6 @@ interface BookDatabaseType {
   fun createOrUpdate(
     id: BookID,
     entry: FeedEntryBook,
-  
   ): BookDatabaseEntryType
 
   /**

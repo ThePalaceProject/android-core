@@ -7,18 +7,18 @@ import com.io7m.jmulticlose.core.CloseableCollectionType
 import com.io7m.jmulticlose.core.ClosingResourceFailedException
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
-import org.nypl.simplified.feeds.api.FeedBookIDs
 import org.nypl.simplified.feeds.api.Feed
+import org.nypl.simplified.feeds.api.FeedBookIDs
+import org.nypl.simplified.feeds.api.FeedData
+import org.nypl.simplified.feeds.api.FeedDataWithGroups
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryCorrupt
 import org.nypl.simplified.feeds.api.FeedFacet
+import org.nypl.simplified.feeds.api.FeedFacetData
 import org.nypl.simplified.feeds.api.FeedGroup
 import org.nypl.simplified.feeds.api.FeedLoaderResult
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedAuthentication
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedGeneral
-import org.nypl.simplified.feeds.api.FeedEntryCorrupt
-import org.nypl.simplified.feeds.api.FeedData
-import org.nypl.simplified.feeds.api.FeedDataWithGroups
-import org.nypl.simplified.feeds.api.FeedFacetData
 import org.nypl.simplified.presentableerror.api.PresentableErrorType
 import org.slf4j.LoggerFactory
 import org.thepalaceproject.opds.client.OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY
@@ -68,7 +68,6 @@ class OPDSClient private constructor(
       AccountID.generate(),
       FeedBookIDs.newFromText("urn:uuid:2688faf3-1927-4245-a1d9-7824bae1a49f"),
       IllegalStateException("Nonexistent book!"),
-    
     )
 
   private val resources: CloseableCollectionType<ClosingResourceFailedException> =
@@ -329,7 +328,6 @@ class OPDSClient private constructor(
       credentials: AccountAuthenticationCredentials?,
       method: String,
     ): FeedData {
-      
       val feedResult =
         this@OPDSClient
           .parameters.feedLoader
@@ -431,7 +429,7 @@ class OPDSClient private constructor(
       feed: FeedData,
     ): FeedFacetData {
       val group = requestedFacet.group
-      
+
       val facets =
         feed.facetsByGroup[group]
           ?: throw IOException(

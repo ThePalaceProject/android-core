@@ -9,5 +9,5 @@ import org.nypl.simplified.accounts.api.AccountID
 data class FeedFacetPseudoFiltering(
   override val title: String,
   override val isActive: Boolean,
-  val account: AccountID?
+  val account: AccountID?,
 ) : FeedFacetSingle

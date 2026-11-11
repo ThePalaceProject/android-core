@@ -13,9 +13,9 @@ import org.nypl.simplified.feeds.api.FeedAvailabilityLoaned
 import org.nypl.simplified.feeds.api.FeedAvailabilityOpenAccess
 import org.nypl.simplified.feeds.api.FeedAvailabilityRevoked
 import org.nypl.simplified.feeds.api.FeedCategory
+import org.nypl.simplified.feeds.api.FeedDRMLicensor
 import org.nypl.simplified.feeds.api.FeedData
 import org.nypl.simplified.feeds.api.FeedDataWithGroups
-import org.nypl.simplified.feeds.api.FeedDRMLicensor
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.feeds.api.FeedEntryGroupRef
@@ -51,7 +51,6 @@ import org.nypl.simplified.opds.core.OPDSSeries
  * generic [Feed] types from [palace-feeds-api].
  */
 object OPDS12FeedConverter {
-
   /**
    * Convert an [OPDSAcquisitionFeed] into a [Feed].
    *
@@ -64,7 +63,7 @@ object OPDS12FeedConverter {
   fun convert(
     accountID: AccountID,
     feed: OPDSAcquisitionFeed,
-    search: OPDSOpenSearch1_1?
+    search: OPDSOpenSearch1_1?,
   ): Feed {
     val feedSearch: FeedSearch? =
       if (search != null) {
@@ -105,7 +104,7 @@ object OPDS12FeedConverter {
         feedNext = feed.feedNext,
         facetsByGroup = facetsByGroup,
         facetsOrder = facetsOrder,
-        entries = entries
+        entries = entries,
       )
     } else {
       val feedGroups: List<FeedGroup> =
@@ -116,7 +115,7 @@ object OPDS12FeedConverter {
             groupURI = group.uri,
             groupEntries =
               group.entries
-                .map { convertEntry(accountID, it) }
+                .map { convertEntry(accountID, it) },
           )
         }
 
@@ -133,7 +132,7 @@ object OPDS12FeedConverter {
         feedNext = feed.feedNext,
         facetsByGroup = facetsByGroup,
         facetsOrder = facetsOrder,
-        groups = feedGroups
+        groups = feedGroups,
       )
     }
   }
@@ -141,13 +140,16 @@ object OPDS12FeedConverter {
   /**
    * Convert an [OPDSAcquisitionFeedEntry] into a [FeedEntryBook].
    */
-  fun convertEntry(accountID: AccountID, entry: OPDSAcquisitionFeedEntry): FeedEntryBook {
+  fun convertEntry(
+    accountID: AccountID,
+    entry: OPDSAcquisitionFeedEntry,
+  ): FeedEntryBook {
     val series: FeedSeries? =
       entry.series?.let { s ->
         FeedSeries(
           name = s.name,
           position = s.position,
-          link = s.link
+          link = s.link,
         )
       }
 
@@ -179,25 +181,28 @@ object OPDS12FeedConverter {
       duration = entry.duration,
       language = entry.language,
       audience = entry.audience,
-      series = series
+      series = series,
     )
   }
 
-  private fun convertFacet(accountID: AccountID, facet: OPDSFacet): FeedFacetData =
+  private fun convertFacet(
+    accountID: AccountID,
+    facet: OPDSFacet,
+  ): FeedFacetData =
     FeedFacetData(
       accountID = accountID,
       title = facet.title,
       isActive = facet.isActive,
       uri = facet.uri,
       group = facet.group,
-      groupType = facet.groupType
+      groupType = facet.groupType,
     )
 
   private fun convertCategory(category: OPDSCategory): FeedCategory =
     FeedCategory(
       term = category.term,
       scheme = category.scheme,
-      label = category.label
+      label = category.label,
     )
 
   private fun convertAvailability(availability: org.nypl.simplified.opds.core.OPDSAvailabilityType): FeedAvailability =
@@ -207,14 +212,14 @@ object OPDS12FeedConverter {
           startDate = availability.startDate,
           position = availability.position,
           endDate = availability.endDate,
-          revoke = availability.revoke
+          revoke = availability.revoke,
         )
       }
 
       is OPDSAvailabilityHeldReady -> {
         FeedAvailabilityHeldReady(
           endDate = availability.endDate,
-          revoke = availability.revoke
+          revoke = availability.revoke,
         )
       }
 
@@ -230,21 +235,21 @@ object OPDS12FeedConverter {
         FeedAvailabilityLoaned(
           startDate = availability.startDate,
           endDate = availability.endDate,
-          revoke = availability.revoke
+          revoke = availability.revoke,
         )
       }
 
       is OPDSAvailabilityOpenAccess -> {
         FeedAvailabilityOpenAccess(
           endDate = availability.endDate,
-          revoke = availability.revoke
+          revoke = availability.revoke,
         )
       }
 
       is OPDSAvailabilityRevoked -> {
         FeedAvailabilityRevoked(
           endDate = availability.endDate,
-          revoke = availability.revoke
+          revoke = availability.revoke,
         )
       }
     }
@@ -255,14 +260,14 @@ object OPDS12FeedConverter {
       uri = acquisition.uri,
       type = acquisition.type,
       indirectAcquisitions = acquisition.indirectAcquisitions.map { convertIndirectAcquisition(it) },
-      properties = acquisition.properties
+      properties = acquisition.properties,
     )
 
   private fun convertIndirectAcquisition(indirect: OPDSIndirectAcquisition): FeedIndirectAcquisition =
     FeedIndirectAcquisition(
       type = indirect.type,
       indirectAcquisitions = indirect.indirectAcquisitions.map { convertIndirectAcquisition(it) },
-      properties = indirect.properties
+      properties = indirect.properties,
     )
 
   private fun convertRelation(relation: OPDSAcquisition.Relation): FeedAcquisitionRelation =
@@ -279,12 +284,12 @@ object OPDS12FeedConverter {
     FeedDRMLicensor(
       vendor = licensor.vendor,
       clientToken = licensor.clientToken,
-      deviceManager = licensor.deviceManager
+      deviceManager = licensor.deviceManager,
     )
 
   private fun convertPreviewAcquisition(preview: OPDSPreviewAcquisition): FeedPreviewAcquisition =
     FeedPreviewAcquisition(
       uri = preview.uri,
-      type = preview.type
+      type = preview.type,
     )
 }

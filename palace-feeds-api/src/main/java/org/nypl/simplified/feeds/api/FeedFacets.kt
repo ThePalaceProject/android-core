@@ -51,8 +51,7 @@ object FeedFacets {
    * @return A list of facets, or nothing if no entry point group is available
    */
   @JvmStatic
-  fun findEntryPointFacetGroupForFeed(feed: Feed): List<FeedFacetSingle>? =
-    findEntryPointFacetGroup(feed.facetsByGroup)
+  fun findEntryPointFacetGroupForFeed(feed: Feed): List<FeedFacetSingle>? = findEntryPointFacetGroup(feed.facetsByGroup)
 
   /**
    * Find the list of facets that represent an "entry point" group.
@@ -99,11 +98,15 @@ object FeedFacets {
         facet.groupType == FeedFacetData.ENTRYPOINT_FACET_GROUP_TYPE
       }
 
-      is FeedFacetPseudoFiltering -> false
-      is FeedFacetPseudoSorting -> false
+      is FeedFacetPseudoFiltering -> {
+        false
+      }
+
+      is FeedFacetPseudoSorting -> {
+        false
+      }
     }
 
   @JvmStatic
-  fun isIgnoredFacet(value: Map.Entry<String, List<FeedFacetSingle>>): Boolean =
-    value.key.uppercase() == "COLLECTION"
+  fun isIgnoredFacet(value: Map.Entry<String, List<FeedFacetSingle>>): Boolean = value.key.uppercase() == "COLLECTION"
 }

@@ -14,12 +14,12 @@ import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
 import org.nypl.simplified.books.book_database.api.BookDatabaseException
 import org.nypl.simplified.books.book_database.api.BookFormats
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
-import org.nypl.simplified.files.DirectoryUtilities
-import org.nypl.simplified.files.FileUtilities
-import org.nypl.simplified.json.core.JSONSerializerUtilities
 import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
 import org.nypl.simplified.feeds.opds12.toOPDSAcquisitionFeedEntry
+import org.nypl.simplified.files.DirectoryUtilities
+import org.nypl.simplified.files.FileUtilities
+import org.nypl.simplified.json.core.JSONSerializerUtilities
 import org.nypl.simplified.opds.core.OPDSJSONSerializerType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

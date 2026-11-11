@@ -24,19 +24,8 @@ import org.nypl.simplified.books.controller.api.BookRevokeExceptionBadFeed
 import org.nypl.simplified.books.controller.api.BookRevokeExceptionDeviceNotActivated
 import org.nypl.simplified.books.controller.api.BookRevokeExceptionNotRevocable
 import org.nypl.simplified.books.controller.api.BookRevokeStringResourcesType
-import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
 import org.nypl.simplified.feeds.api.Feed
-import org.nypl.simplified.feeds.api.FeedEntryCorrupt
 import org.nypl.simplified.feeds.api.FeedAvailability
-import org.nypl.simplified.feeds.api.FeedBookIDs
-import org.nypl.simplified.feeds.api.FeedEntryBook
-import org.nypl.simplified.feeds.opds12.OPDS12FeedHTTPTransportException
-import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedAuthentication
-import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedGeneral
-import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderSuccess
-import org.nypl.simplified.feeds.api.FeedLoaderType
-import org.nypl.simplified.feeds.api.FeedData
-import org.nypl.simplified.feeds.api.FeedDataWithGroups
 import org.nypl.simplified.feeds.api.FeedAvailabilityHeld
 import org.nypl.simplified.feeds.api.FeedAvailabilityHeldReady
 import org.nypl.simplified.feeds.api.FeedAvailabilityHoldable
@@ -44,6 +33,17 @@ import org.nypl.simplified.feeds.api.FeedAvailabilityLoanable
 import org.nypl.simplified.feeds.api.FeedAvailabilityLoaned
 import org.nypl.simplified.feeds.api.FeedAvailabilityOpenAccess
 import org.nypl.simplified.feeds.api.FeedAvailabilityRevoked
+import org.nypl.simplified.feeds.api.FeedBookIDs
+import org.nypl.simplified.feeds.api.FeedData
+import org.nypl.simplified.feeds.api.FeedDataWithGroups
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.api.FeedEntryCorrupt
+import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedAuthentication
+import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedGeneral
+import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderSuccess
+import org.nypl.simplified.feeds.api.FeedLoaderType
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+import org.nypl.simplified.feeds.opds12.OPDS12FeedHTTPTransportException
 import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
@@ -169,7 +169,6 @@ class BookRevokeTask(
           audience = null,
           series = null,
         )
-      
 
       Book(
         this.bookID,
@@ -291,7 +290,6 @@ class BookRevokeTask(
     revokeType: RevokeType,
     account: AccountType,
   ): FeedEntryBook {
-    
     this.debug("notifying server of {} revocation via {}", revokeType, targetURI)
     this.taskRecorder.beginNewStep(this.revokeStrings.revokeServerNotifyURI(targetURI))
     this.publishRequestingRevokeStatus()

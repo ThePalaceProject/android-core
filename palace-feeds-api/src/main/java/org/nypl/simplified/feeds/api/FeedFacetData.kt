@@ -15,7 +15,7 @@ data class FeedFacetData(
   override val isActive: Boolean,
   val uri: URI,
   val group: String,
-  val groupType: String?
+  val groupType: String?,
 ) : FeedFacetSingle {
   companion object {
     const val ENTRYPOINT_FACET_GROUP_TYPE = "http://librarysimplified.org/terms/rel/entrypoint"

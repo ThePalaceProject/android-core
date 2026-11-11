@@ -2,10 +2,6 @@ package org.nypl.simplified.books.borrowing.internal
 
 import com.io7m.junreachable.UnreachableCodeException
 import one.irradia.mime.api.MIMECompatibility
-import org.nypl.simplified.feeds.api.FeedEntryBook
-import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
-import org.nypl.simplified.feeds.api.FeedAcquisitionPathElement
-import org.nypl.simplified.feeds.api.FeedAcquisitionPaths
 import one.irradia.mime.api.MIMECompatibility.applicationOctetStream
 import one.irradia.mime.api.MIMEType
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType.Method.Put
@@ -32,10 +28,8 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.Borro
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskFactoryType
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskType
 import org.nypl.simplified.books.formats.api.StandardFormatNames.allOPDSFeeds
-import org.nypl.simplified.links.Link
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
-
+import org.nypl.simplified.feeds.api.FeedAcquisitionPathElement
+import org.nypl.simplified.feeds.api.FeedAcquisitionPaths
 import org.nypl.simplified.feeds.api.FeedAvailabilityHeld
 import org.nypl.simplified.feeds.api.FeedAvailabilityHeldReady
 import org.nypl.simplified.feeds.api.FeedAvailabilityHoldable
@@ -43,6 +37,11 @@ import org.nypl.simplified.feeds.api.FeedAvailabilityLoanable
 import org.nypl.simplified.feeds.api.FeedAvailabilityLoaned
 import org.nypl.simplified.feeds.api.FeedAvailabilityOpenAccess
 import org.nypl.simplified.feeds.api.FeedAvailabilityRevoked
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+import org.nypl.simplified.links.Link
+import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
+import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
 import org.nypl.simplified.opds.core.OPDSParseException
 import java.io.ByteArrayInputStream
 import java.io.InputStream

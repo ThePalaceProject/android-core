@@ -11,7 +11,7 @@ data class FeedAcquisition(
   val uri: Link,
   val type: MIMEType,
   val indirectAcquisitions: List<FeedIndirectAcquisition>,
-  val properties: Map<String, String>
+  val properties: Map<String, String>,
 ) {
   /**
    * @return The set of final content types accessible if all acquisition paths are followed to their conclusions.

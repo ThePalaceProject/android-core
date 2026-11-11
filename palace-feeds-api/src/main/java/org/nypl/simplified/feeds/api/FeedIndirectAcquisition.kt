@@ -8,7 +8,7 @@ import one.irradia.mime.api.MIMEType
 data class FeedIndirectAcquisition(
   val type: MIMEType,
   val indirectAcquisitions: List<FeedIndirectAcquisition>,
-  val properties: Map<String, String>
+  val properties: Map<String, String>,
 ) {
   /**
    * Find an indirect acquisition with the given type.
@@ -36,7 +36,7 @@ data class FeedIndirectAcquisition(
      */
     fun findTypeIn(
       wantType: MIMEType,
-      indirects: List<FeedIndirectAcquisition>
+      indirects: List<FeedIndirectAcquisition>,
     ): FeedIndirectAcquisition? = indirects.find { indirect -> indirect.findType(wantType) != null }
 
     /**

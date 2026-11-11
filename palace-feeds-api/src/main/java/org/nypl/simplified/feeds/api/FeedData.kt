@@ -1,7 +1,6 @@
 package org.nypl.simplified.feeds.api
 
 import org.joda.time.DateTime
-
 import java.net.URI
 
 /**
@@ -20,7 +19,7 @@ data class FeedData(
   override val feedNext: URI?,
   override val facetsByGroup: Map<String, List<FeedFacetSingle>>,
   override val facetsOrder: List<FeedFacetSingle>,
-  val entries: List<FeedEntry>
+  val entries: List<FeedEntry>,
 ) : Feed {
   override val size: Int
     get() = this.entries.size
@@ -28,8 +27,7 @@ data class FeedData(
   val entriesByID: Map<FeedBookID, FeedEntry>
     get() = this.entries.associateBy { it.bookID }
 
-  fun containsBook(bookID: FeedBookID): Boolean =
-    this.entries.any { it.bookID == bookID }
+  fun containsBook(bookID: FeedBookID): Boolean = this.entries.any { it.bookID == bookID }
 
   companion object {
     /**
@@ -41,21 +39,22 @@ data class FeedData(
       feedTitle: String,
       feedURI: URI,
       feedFacets: List<FeedFacetSingle>,
-      feedFacetGroups: Map<String, List<FeedFacetSingle>>
-    ): FeedData = FeedData(
-      feedID = feedID,
-      feedSearch = feedSearch,
-      feedTitle = feedTitle,
-      feedUpdated = DateTime.now(),
-      feedURI = feedURI,
-      feedTermsOfService = null,
-      feedPrivacyPolicy = null,
-      feedAbout = null,
-      feedLicenses = null,
-      feedNext = null,
-      facetsByGroup = feedFacetGroups,
-      facetsOrder = feedFacets,
-      entries = emptyList()
-    )
+      feedFacetGroups: Map<String, List<FeedFacetSingle>>,
+    ): FeedData =
+      FeedData(
+        feedID = feedID,
+        feedSearch = feedSearch,
+        feedTitle = feedTitle,
+        feedUpdated = DateTime.now(),
+        feedURI = feedURI,
+        feedTermsOfService = null,
+        feedPrivacyPolicy = null,
+        feedAbout = null,
+        feedLicenses = null,
+        feedNext = null,
+        facetsByGroup = feedFacetGroups,
+        facetsOrder = feedFacets,
+        entries = emptyList(),
+      )
   }
 }

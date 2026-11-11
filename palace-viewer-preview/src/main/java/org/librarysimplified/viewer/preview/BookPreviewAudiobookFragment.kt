@@ -47,7 +47,6 @@ class BookPreviewAudiobookFragment :
     fun newInstance(
       file: File,
       feedEntry: FeedEntryBook,
-    
     ): BookPreviewAudiobookFragment =
       BookPreviewAudiobookFragment().apply {
         BookPreviewModel.feedEntry = feedEntry

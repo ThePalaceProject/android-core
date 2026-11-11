@@ -10,7 +10,7 @@ import org.nypl.simplified.accounts.api.AccountID
 data class FeedFacetComposite(
   val facets: List<FeedFacetData>,
   override val title: String,
-  override val isActive: Boolean
+  override val isActive: Boolean,
 ) : FeedFacet {
   init {
     require(facets.isNotEmpty()) { "Composite facets must contain at least one facet." }

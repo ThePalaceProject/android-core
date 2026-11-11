@@ -10,7 +10,6 @@ interface OPDSFeedHandleWithoutGroupsType : OPDSFeedHandleType {
     val pagePrevious: Int?,
     val pageNext: Int?,
     val data: FeedData,
-  
   )
 
   fun pages(): Int

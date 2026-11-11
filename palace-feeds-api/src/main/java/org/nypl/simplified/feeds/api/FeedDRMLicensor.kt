@@ -6,5 +6,5 @@ package org.nypl.simplified.feeds.api
 data class FeedDRMLicensor(
   val vendor: String,
   val clientToken: String,
-  val deviceManager: String?
+  val deviceManager: String?,
 )

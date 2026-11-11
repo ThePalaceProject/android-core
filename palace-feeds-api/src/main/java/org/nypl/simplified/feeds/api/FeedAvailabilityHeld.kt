@@ -10,5 +10,5 @@ data class FeedAvailabilityHeld(
   val startDate: DateTime?,
   val position: Int?,
   override val endDate: DateTime?,
-  val revoke: URI?
+  val revoke: URI?,
 ) : FeedAvailability

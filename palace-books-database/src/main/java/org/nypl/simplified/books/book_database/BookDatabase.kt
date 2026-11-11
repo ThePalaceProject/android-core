@@ -10,12 +10,12 @@ import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
 import org.nypl.simplified.books.book_database.api.BookDatabaseException
 import org.nypl.simplified.books.book_database.api.BookDatabaseType
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
-import org.nypl.simplified.files.DirectoryUtilities
-import org.nypl.simplified.files.FileUtilities
-import org.nypl.simplified.json.core.JSONSerializerUtilities
 import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
 import org.nypl.simplified.feeds.opds12.toOPDSAcquisitionFeedEntry
+import org.nypl.simplified.files.DirectoryUtilities
+import org.nypl.simplified.files.FileUtilities
+import org.nypl.simplified.json.core.JSONSerializerUtilities
 import org.nypl.simplified.opds.core.OPDSJSONParserType
 import org.nypl.simplified.opds.core.OPDSJSONSerializerType
 import org.slf4j.LoggerFactory
@@ -122,8 +122,9 @@ class BookDatabase private constructor(
         FileUtilities.fileWriteUTF8Atomically(
           fileMeta,
           fileMetaTmp,
-          JSONSerializerUtilities.serializeToString(this.serializer.serializeFeedEntry(entry.toOPDSAcquisitionFeedEntry())),
-        
+          JSONSerializerUtilities.serializeToString(
+            this.serializer.serializeFeedEntry(entry.toOPDSAcquisitionFeedEntry()),
+          ),
         )
 
         val book =

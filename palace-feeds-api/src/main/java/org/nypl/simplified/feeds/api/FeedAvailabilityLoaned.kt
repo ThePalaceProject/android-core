@@ -9,5 +9,5 @@ import java.net.URI
 data class FeedAvailabilityLoaned(
   val startDate: DateTime?,
   override val endDate: DateTime?,
-  val revoke: URI?
+  val revoke: URI?,
 ) : FeedAvailability

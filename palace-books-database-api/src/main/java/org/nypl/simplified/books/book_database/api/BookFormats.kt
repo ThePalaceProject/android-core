@@ -110,7 +110,7 @@ object BookFormats {
 
   private val formats = BookFormatDefinition.values()
 
-    /**
+  /**
    * @return The probable format of the book in the given feed entry
    */
   fun inferFormat(entry: FeedEntryBook): BookFormatDefinition? {

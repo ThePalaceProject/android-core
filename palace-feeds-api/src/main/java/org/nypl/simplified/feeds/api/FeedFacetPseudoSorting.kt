@@ -6,10 +6,10 @@ package org.nypl.simplified.feeds.api
 data class FeedFacetPseudoSorting(
   override val title: String,
   override val isActive: Boolean,
-  val sortBy: SortBy
+  val sortBy: SortBy,
 ) : FeedFacetSingle {
   enum class SortBy {
     SORT_BY_AUTHOR,
-    SORT_BY_TITLE
+    SORT_BY_TITLE,
   }
 }

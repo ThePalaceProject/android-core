@@ -62,14 +62,14 @@ import org.nypl.simplified.books.book_registry.BookStatus.RequestingDownload
 import org.nypl.simplified.books.book_registry.BookStatus.RequestingLoan
 import org.nypl.simplified.books.book_registry.BookStatus.RequestingRevoke
 import org.nypl.simplified.books.book_registry.BookStatus.Revoked
-import org.nypl.simplified.feeds.api.FeedDataWithGroups
 import org.nypl.simplified.feeds.api.FeedData
+import org.nypl.simplified.feeds.api.FeedDataWithGroups
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.feeds.api.FeedLoaderResult
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedAuthentication
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedGeneral
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderSuccess
-import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.ui.catalog.CatalogFeedViewDetails2.InfoState.BORROWING
 import org.nypl.simplified.ui.catalog.CatalogFeedViewDetails2.InfoState.BORROWING_AND_PROGRESS
 import org.nypl.simplified.ui.catalog.CatalogFeedViewDetails2.InfoState.GENERIC
@@ -504,7 +504,6 @@ class CatalogFeedViewDetails2(
   fun bind(
     account: AccountProviderType,
     newEntry: FeedEntryBook,
-  
   ) {
     val targetHeight =
       this.root.resources.getDimensionPixelSize(R.dimen.catalogBookDetailCoverHeight)

@@ -8,5 +8,5 @@ import java.net.URI
  */
 data class FeedAvailabilityHeldReady(
   override val endDate: DateTime?,
-  val revoke: URI?
+  val revoke: URI?,
 ) : FeedAvailability

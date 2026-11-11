@@ -39,9 +39,12 @@ object BookAcquisitionSelection {
     when (acquisition.relation) {
       FeedAcquisitionRelation.ACQUISITION_BORROW,
       FeedAcquisitionRelation.ACQUISITION_GENERIC,
-      FeedAcquisitionRelation.ACQUISITION_OPEN_ACCESS -> true
+      FeedAcquisitionRelation.ACQUISITION_OPEN_ACCESS,
+      -> true
+
       FeedAcquisitionRelation.ACQUISITION_BUY,
       FeedAcquisitionRelation.ACQUISITION_SAMPLE,
-      FeedAcquisitionRelation.ACQUISITION_SUBSCRIBE -> false
+      FeedAcquisitionRelation.ACQUISITION_SUBSCRIBE,
+      -> false
     }
 }

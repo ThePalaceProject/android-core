@@ -382,7 +382,6 @@ internal object MainServices {
       http = http,
       opds12Parser = opdsFeedParser,
       opds12SearchParser = feedSearchParser,
-    
     )
   }
 
@@ -1080,7 +1079,10 @@ internal object MainServices {
     )
   }
 
-  private fun onProfileUpdated(profiles: ProfilesControllerType, feedLoader: FeedLoaderType) {
+  private fun onProfileUpdated(
+    profiles: ProfilesControllerType,
+    feedLoader: FeedLoaderType,
+  ) {
     this.updateReportsLibrary(profiles)
     try {
       feedLoader.preferOPDS20 = profiles.profileCurrent().preferences().preferOPDS20

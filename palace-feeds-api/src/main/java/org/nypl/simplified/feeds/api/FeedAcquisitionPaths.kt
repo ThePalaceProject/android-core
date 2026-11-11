@@ -8,7 +8,7 @@ object FeedAcquisitionPaths {
     elementStack: MutableList<FeedAcquisitionPathElement>,
     output: MutableList<FeedAcquisitionPath>,
     source: FeedAcquisition,
-    indirect: FeedIndirectAcquisition
+    indirect: FeedIndirectAcquisition,
   ) {
     val newPathElement = FeedAcquisitionPathElement(indirect.type, null, indirect.properties)
     if (indirect.indirectAcquisitions.isEmpty()) {
@@ -27,7 +27,7 @@ object FeedAcquisitionPaths {
 
   private fun indirectPaths(
     source: FeedAcquisition,
-    indirect: FeedIndirectAcquisition
+    indirect: FeedIndirectAcquisition,
   ): List<FeedAcquisitionPath> {
     val paths = mutableListOf<FeedAcquisitionPath>()
     indirectPathsInner(mutableListOf(), paths, source, indirect)
@@ -40,15 +40,15 @@ object FeedAcquisitionPaths {
       paths.add(
         FeedAcquisitionPath(
           source,
-          listOf(FeedAcquisitionPathElement(source.type, source.uri, source.properties))
-        )
+          listOf(FeedAcquisitionPathElement(source.type, source.uri, source.properties)),
+        ),
       )
     } else {
       for (indirect in source.indirectAcquisitions) {
         paths.addAll(
           indirectPaths(source, indirect).map { path ->
             path.prefixWith(source.type, source.uri, source.properties)
-          }
+          },
         )
       }
     }

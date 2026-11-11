@@ -1,7 +1,7 @@
 package org.nypl.simplified.ui.catalog
 
-import org.nypl.simplified.feeds.api.FeedFacetSingle
 import org.nypl.simplified.feeds.api.FeedFacetPseudoSorting
+import org.nypl.simplified.feeds.api.FeedFacetSingle
 import org.slf4j.LoggerFactory
 
 object CatalogFeedFacetSortModel {
@@ -14,7 +14,6 @@ object CatalogFeedFacetSortModel {
   fun facetsSet(
     catalogPart: CatalogPart,
     sortBy: List<FeedFacetSingle>,
-  
   ) {
     this.logger.debug("[{}] Creating sort model of size {}", catalogPart, sortBy.size)
     for (entry in sortBy) {

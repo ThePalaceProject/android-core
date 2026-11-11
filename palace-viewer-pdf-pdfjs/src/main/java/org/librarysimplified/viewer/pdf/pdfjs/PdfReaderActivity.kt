@@ -50,7 +50,6 @@ import java.util.concurrent.Executors
 
 class PdfReaderActivity : AppCompatActivity() {
   companion object {
-
     /**
      * Factory method to start a [PdfReaderActivity]
      */
@@ -104,11 +103,12 @@ class PdfReaderActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    val params = PdfReaderModel.parameters ?: run {
-      this.log.warn("PdfReaderActivity lacks parameters!")
-      this.finish()
-      return
-    }
+    val params =
+      PdfReaderModel.parameters ?: run {
+        this.log.warn("PdfReaderActivity lacks parameters!")
+        this.finish()
+        return
+      }
 
     this.setContentView(R.layout.pdfjs_reader)
     this.createToolbar(params.documentTitle)

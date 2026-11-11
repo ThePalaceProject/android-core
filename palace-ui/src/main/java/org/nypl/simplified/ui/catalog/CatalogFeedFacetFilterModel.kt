@@ -1,11 +1,11 @@
 package org.nypl.simplified.ui.catalog
 
 import org.nypl.simplified.feeds.api.FeedFacet
-import org.nypl.simplified.feeds.api.FeedFacetSingle
-import org.nypl.simplified.feeds.api.FeedFacetData
 import org.nypl.simplified.feeds.api.FeedFacetComposite
+import org.nypl.simplified.feeds.api.FeedFacetData
 import org.nypl.simplified.feeds.api.FeedFacetPseudoFiltering
 import org.nypl.simplified.feeds.api.FeedFacetPseudoSorting
+import org.nypl.simplified.feeds.api.FeedFacetSingle
 import org.slf4j.LoggerFactory
 import java.util.SortedMap
 

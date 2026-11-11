@@ -505,7 +505,6 @@ sealed class BookStatus {
     private fun onIsHeldNotReady(
       a: FeedAvailabilityHeld,
       book: Book,
-    
     ): BookStatus =
       Held.HeldInQueue(
         id = book.id,
@@ -518,7 +517,6 @@ sealed class BookStatus {
     private fun onIsHeldReady(
       a: FeedAvailabilityHeldReady,
       book: Book,
-    
     ): BookStatus =
       Held.HeldReady(
         id = book.id,

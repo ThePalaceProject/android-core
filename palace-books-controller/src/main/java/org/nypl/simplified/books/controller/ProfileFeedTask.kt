@@ -6,7 +6,6 @@ import org.nypl.simplified.books.book_registry.BookRegistryReadableType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookWithStatus
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
-import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
 import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedBooksSelection.BOOKS_FEED_HOLDS
 import org.nypl.simplified.feeds.api.FeedBooksSelection.BOOKS_FEED_LOANED
@@ -17,6 +16,7 @@ import org.nypl.simplified.feeds.api.FeedFacetPseudoSorting.SortBy
 import org.nypl.simplified.feeds.api.FeedFacetSingle
 import org.nypl.simplified.feeds.api.FeedSearch
 import org.nypl.simplified.feeds.api.FeedSearchLocal
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
 import org.nypl.simplified.profiles.controller.api.ProfileFeedRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.slf4j.LoggerFactory
@@ -30,7 +30,6 @@ internal class ProfileFeedTask(
   private val profiles: ProfilesControllerType,
   private val request: ProfileFeedRequest,
 ) : Callable<FeedData> {
-  
   private val logger =
     LoggerFactory.getLogger(ProfileFeedTask::class.java)
 
@@ -43,7 +42,6 @@ internal class ProfileFeedTask(
 
     val facetGroups = this.makeFacets()
     val facets = facetGroups.values.flatten()
-
 
     try {
       this.logger.debug("book registry contains {} books", this.bookRegistry.books().size)
@@ -58,18 +56,20 @@ internal class ProfileFeedTask(
       this.sortBooks(this.request.sortBy, books)
       this.logger.debug("after sorting, {} candidate books remain", books.size)
 
-      val entries = books.map { book ->
-        book.book.entry
-      }
+      val entries =
+        books.map { book ->
+          book.book.entry
+        }
 
-      return FeedData.empty(
-        feedID = this.request.id,
-        feedSearch = FeedSearchLocal,
-        feedTitle = createTitle(),
-        feedURI = this.request.uri,
-        feedFacets = facets,
-        feedFacetGroups = facetGroups
-      ).copy(entries = entries)
+      return FeedData
+        .empty(
+          feedID = this.request.id,
+          feedSearch = FeedSearchLocal,
+          feedTitle = createTitle(),
+          feedURI = this.request.uri,
+          feedFacets = facets,
+          feedFacetGroups = facetGroups,
+        ).copy(entries = entries)
     } finally {
       this.logger.debug("generated a local feed")
     }

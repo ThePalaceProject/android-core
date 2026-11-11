@@ -8,5 +8,5 @@ import java.net.URI
 data class FeedSeries(
   val name: String,
   val position: Int?,
-  val link: URI
+  val link: URI,
 )

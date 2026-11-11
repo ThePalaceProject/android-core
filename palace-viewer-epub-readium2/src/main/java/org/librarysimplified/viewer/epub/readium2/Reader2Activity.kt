@@ -1,6 +1,5 @@
 package org.librarysimplified.viewer.epub.readium2
 
-import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.ApplicationInfo
@@ -50,6 +49,7 @@ import org.nypl.simplified.books.api.BookContentProtections
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix

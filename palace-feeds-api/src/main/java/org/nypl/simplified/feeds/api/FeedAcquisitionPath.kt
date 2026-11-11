@@ -8,7 +8,7 @@ import org.nypl.simplified.links.Link
  */
 data class FeedAcquisitionPath(
   val source: FeedAcquisition,
-  val elements: List<FeedAcquisitionPathElement>
+  val elements: List<FeedAcquisitionPathElement>,
 ) {
   /**
    * Prefix the path with the given MIME type and target.
@@ -16,7 +16,7 @@ data class FeedAcquisitionPath(
   fun prefixWith(
     mime: MIMEType,
     target: Link?,
-    properties: Map<String, String>
+    properties: Map<String, String>,
   ): FeedAcquisitionPath {
     val newElements = mutableListOf<FeedAcquisitionPathElement>()
     newElements.add(FeedAcquisitionPathElement(mime, target, properties))

@@ -19,7 +19,7 @@ data class FeedDataWithGroups(
   override val feedNext: URI?,
   override val facetsByGroup: Map<String, List<FeedFacetSingle>>,
   override val facetsOrder: List<FeedFacetSingle>,
-  val groups: List<FeedGroup>
+  val groups: List<FeedGroup>,
 ) : Feed {
   override val size: Int
     get() = this.groups.size

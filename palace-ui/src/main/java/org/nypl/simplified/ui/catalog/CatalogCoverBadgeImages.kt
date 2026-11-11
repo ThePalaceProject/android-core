@@ -4,11 +4,11 @@ import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import org.librarysimplified.ui.R
+import org.nypl.simplified.books.book_database.api.BookFormats
 import org.nypl.simplified.books.book_database.api.BookFormats.BookFormatDefinition.BOOK_FORMAT_AUDIO
 import org.nypl.simplified.books.book_database.api.BookFormats.BookFormatDefinition.BOOK_FORMAT_EPUB
 import org.nypl.simplified.books.book_database.api.BookFormats.BookFormatDefinition.BOOK_FORMAT_PDF
 import org.nypl.simplified.feeds.api.FeedEntryBook
-import org.nypl.simplified.books.book_database.api.BookFormats
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.thepalaceproject.palace.images.BookCoverBadge
 import org.thepalaceproject.palace.images.BookCoverBadgeLookupType

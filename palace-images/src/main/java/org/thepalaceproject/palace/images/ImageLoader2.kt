@@ -18,8 +18,8 @@ import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import org.librarysimplified.palace.images.R
 import org.nypl.simplified.accounts.api.AccountProviderDescription
-import org.nypl.simplified.books.book_registry.BookRegistryReadableType
 import org.nypl.simplified.books.api.FeedBookIDConversions
+import org.nypl.simplified.books.book_registry.BookRegistryReadableType
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.ui.images.ImageLoader2Type

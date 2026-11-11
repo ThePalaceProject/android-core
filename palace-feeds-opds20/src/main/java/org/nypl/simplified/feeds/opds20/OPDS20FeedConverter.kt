@@ -2,14 +2,11 @@ package org.nypl.simplified.feeds.opds20
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
-import java.io.InputStream
-import java.net.URI
 import one.irradia.mime.api.MIMEType
 import one.irradia.mime.vanilla.MIMEParser.Companion.parseRaisingException
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.nypl.simplified.accounts.api.AccountID
-import org.nypl.simplified.feeds.api.Feed as PalaceFeed
 import org.nypl.simplified.feeds.api.FeedAcquisition
 import org.nypl.simplified.feeds.api.FeedAcquisitionRelation
 import org.nypl.simplified.feeds.api.FeedAvailability
@@ -19,9 +16,9 @@ import org.nypl.simplified.feeds.api.FeedAvailabilityHoldable
 import org.nypl.simplified.feeds.api.FeedAvailabilityLoanable
 import org.nypl.simplified.feeds.api.FeedAvailabilityOpenAccess
 import org.nypl.simplified.feeds.api.FeedCategory
+import org.nypl.simplified.feeds.api.FeedDRMLicensor
 import org.nypl.simplified.feeds.api.FeedData
 import org.nypl.simplified.feeds.api.FeedDataWithGroups
-import org.nypl.simplified.feeds.api.FeedDRMLicensor
 import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.feeds.api.FeedEntryGroupRef
 import org.nypl.simplified.feeds.api.FeedFacetData
@@ -45,13 +42,15 @@ import org.thepalaceproject.webpub.core.WPMMappers
 import org.thepalaceproject.webpub.core.WPMPublication
 import org.thepalaceproject.webpub.core.WPMSeries
 import org.thepalaceproject.webpub.core.WPMSubjectOrString
+import java.io.InputStream
+import java.net.URI
+import org.nypl.simplified.feeds.api.Feed as PalaceFeed
 
 /**
  * Functions to parse OPDS 2.0 JSON using the Palace WebPub parser and
  * convert the result into the generic [PalaceFeed] types from [palace-feeds-api].
  */
 object OPDS20FeedConverter {
-
   private const val REL_ACQUIRE_PREFIX = "/acquire/"
   private const val REL_ACQUIRE_SAMPLE = "/acquire/sample"
   private const val REL_ACQUIRE_OPEN_ACCESS = "/acquire/open-access"
@@ -82,15 +81,15 @@ object OPDS20FeedConverter {
   private const val EXT_PROP_DEVICE_MANAGER = "deviceManager"
 
   private val mapper: ObjectMapper =
-    WPMMappers.createMapper()
+    WPMMappers
+      .createMapper()
       .copy()
       .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
 
   /**
    * Parse OPDS 2.0 JSON from the given stream into a [WPMFeed].
    */
-  fun parse(stream: InputStream): WPMFeed =
-    stream.use { mapper.readValue(it, WPMFeed::class.java) }
+  fun parse(stream: InputStream): WPMFeed = stream.use { mapper.readValue(it, WPMFeed::class.java) }
 
   /**
    * Convert a parsed [WPMFeed] into a [PalaceFeed].
@@ -103,7 +102,7 @@ object OPDS20FeedConverter {
   fun convert(
     accountID: AccountID,
     feed: WPMFeed,
-    feedURI: URI
+    feedURI: URI,
   ): PalaceFeed {
     val feedUpdated: DateTime =
       feed.metadata.modified?.let { offsetToDateTime(it) }
@@ -144,7 +143,7 @@ object OPDS20FeedConverter {
           account = accountID,
           groupTitle = groupTitle,
           groupURI = groupURI,
-          groupEntries = groupEntries
+          groupEntries = groupEntries,
         )
       }
 
@@ -193,7 +192,7 @@ object OPDS20FeedConverter {
         feedNext = feedNext,
         facetsByGroup = facetsByGroup,
         facetsOrder = facets,
-        entries = entries
+        entries = entries,
       )
     } else {
       FeedDataWithGroups(
@@ -209,7 +208,7 @@ object OPDS20FeedConverter {
         feedNext = feedNext,
         facetsByGroup = facetsByGroup,
         facetsOrder = facets,
-        groups = feedGroups
+        groups = feedGroups,
       )
     }
   }
@@ -219,7 +218,7 @@ object OPDS20FeedConverter {
    */
   fun convertEntry(
     accountID: AccountID,
-    publication: WPMPublication
+    publication: WPMPublication,
   ): FeedEntryBook {
     val metadata = publication.metadata
     val links = publication.links
@@ -323,8 +322,7 @@ object OPDS20FeedConverter {
           val uri = linkHrefValue(link) ?: return@mapNotNull null
           val title = link.title
           FeedEntryGroupRef(name = title ?: "", uri = uri)
-        }
-        .toSet()
+        }.toSet()
 
     val availability: FeedAvailability =
       convertAvailability(links)
@@ -357,11 +355,14 @@ object OPDS20FeedConverter {
       duration = duration,
       language = language,
       audience = audience,
-      series = series
+      series = series,
     )
   }
 
-  private fun convertFacet(accountID: AccountID, facet: WPMFacet): FeedFacetData {
+  private fun convertFacet(
+    accountID: AccountID,
+    facet: WPMFacet,
+  ): FeedFacetData {
     val uri: URI =
       facet.links
         .firstOrNull { REL_SELF in it.relation }
@@ -377,49 +378,53 @@ object OPDS20FeedConverter {
       isActive = true,
       uri = uri,
       group = "",
-      groupType = null
+      groupType = null,
     )
   }
 
   private fun convertSubject(subject: WPMSubjectOrString): FeedCategory =
     when (subject) {
-      is WPMSubjectOrString.WPMSubjectString ->
+      is WPMSubjectOrString.WPMSubjectString -> {
         FeedCategory(
           term = subject.value,
           scheme = "",
-          label = subject.value
+          label = subject.value,
         )
-      else ->
+      }
+
+      else -> {
         FeedCategory(
           term = "",
           scheme = "",
-          label = ""
+          label = "",
         )
+      }
     }
 
   private fun convertSeries(series: WPMSeries): FeedSeries? =
     when (series) {
-      is WPMSeries.WPMSeriesString ->
+      is WPMSeries.WPMSeriesString -> {
         FeedSeries(
           name = series.value,
           position = null,
-          link = URI("")
+          link = URI(""),
         )
+      }
 
-      is WPMSeries.WPMSeriesObject ->
+      is WPMSeries.WPMSeriesObject -> {
         FeedSeries(
           name = languageMapToString(series.name),
           position = series.position?.toInt(),
-          link = series.identifier ?: URI("")
+          link = series.identifier ?: URI(""),
         )
+      }
 
-      is WPMSeries.WPMSeriesSet ->
+      is WPMSeries.WPMSeriesSet -> {
         series.value.firstOrNull()?.let { convertSeries(it) }
+      }
     }
 
-  private fun convertAcquisitionLink(
-    link: WPMLink
-  ): FeedAcquisition {
+  private fun convertAcquisitionLink(link: WPMLink): FeedAcquisition {
     val href: URI =
       linkHrefValue(link) ?: URI("")
 
@@ -427,7 +432,8 @@ object OPDS20FeedConverter {
       link.type ?: parseRaisingException("application/octet-stream")
 
     val indirectAcquisitions: List<FeedIndirectAcquisition> =
-      link.properties?.indirectAcquisition
+      link.properties
+        ?.indirectAcquisition
         ?.map { convertIndirectAcquisitionTree(it) }
         ?: emptyList()
 
@@ -438,7 +444,7 @@ object OPDS20FeedConverter {
       uri = Links.wpmLinkToPalaceLink(link).toBasic(),
       type = mediaType,
       indirectAcquisitions = indirectAcquisitions,
-      properties = properties
+      properties = properties,
     )
   }
 
@@ -452,7 +458,7 @@ object OPDS20FeedConverter {
     return FeedIndirectAcquisition(
       type = type,
       indirectAcquisitions = children,
-      properties = emptyMap()
+      properties = emptyMap(),
     )
   }
 
@@ -465,9 +471,7 @@ object OPDS20FeedConverter {
       else -> FeedAcquisitionRelation.ACQUISITION_BORROW
     }
 
-  private fun convertAvailability(
-    links: List<WPMLink>
-  ): FeedAvailability {
+  private fun convertAvailability(links: List<WPMLink>): FeedAvailability {
     val availability =
       links
         .mapNotNull { it.properties?.availability }
@@ -487,14 +491,14 @@ object OPDS20FeedConverter {
           startDate = availability.since?.let { offsetToDateTime(it) },
           position = null,
           endDate = availability.until?.let { offsetToDateTime(it) },
-          revoke = null
+          revoke = null,
         )
       }
 
       "ready" -> {
         FeedAvailabilityHeldReady(
           endDate = availability.until?.let { offsetToDateTime(it) },
-          revoke = null
+          revoke = null,
         )
       }
 
@@ -517,9 +521,7 @@ object OPDS20FeedConverter {
   /**
    * Extract DRM licensor information from the link extension properties.
    */
-  private fun extractDRMLicensor(
-    links: List<WPMLink>
-  ): FeedDRMLicensor? {
+  private fun extractDRMLicensor(links: List<WPMLink>): FeedDRMLicensor? {
     for (link in links) {
       val props = link.properties ?: continue
       val ext = props.extensionProperties
@@ -534,17 +536,18 @@ object OPDS20FeedConverter {
           return FeedDRMLicensor(
             vendor = vendor,
             clientToken = clientToken,
-            deviceManager = deviceManager
+            deviceManager = deviceManager,
           )
         }
       }
 
       // Check for DRM-related rels with vendor/clientToken in extension properties
-      val hasDrmRel = link.relation.any { rel ->
-        rel.contains("drm", ignoreCase = true) ||
-          rel.contains("lcp", ignoreCase = true) ||
-          rel == "http://librarysimplified.org/terms/drm/rel/devices"
-      }
+      val hasDrmRel =
+        link.relation.any { rel ->
+          rel.contains("drm", ignoreCase = true) ||
+            rel.contains("lcp", ignoreCase = true) ||
+            rel == "http://librarysimplified.org/terms/drm/rel/devices"
+        }
 
       if (hasDrmRel) {
         val vendor = ext[EXT_PROP_VENDOR]?.asText()
@@ -555,7 +558,7 @@ object OPDS20FeedConverter {
           return FeedDRMLicensor(
             vendor = vendor,
             clientToken = clientToken,
-            deviceManager = deviceManager
+            deviceManager = deviceManager,
           )
         }
       }
@@ -576,7 +579,10 @@ object OPDS20FeedConverter {
   /**
    * Find the first link with the given rel and return its href as a [URI].
    */
-  private fun linkHref(links: List<WPMLink>, rel: String): URI? =
+  private fun linkHref(
+    links: List<WPMLink>,
+    rel: String,
+  ): URI? =
     links
       .firstOrNull { rel in it.relation }
       ?.let { linkHrefValue(it) }

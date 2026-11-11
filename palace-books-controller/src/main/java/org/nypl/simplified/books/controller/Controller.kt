@@ -1,6 +1,5 @@
 package org.nypl.simplified.books.controller
 
-import org.nypl.simplified.books.book_database.api.BookFormats
 import android.app.Application
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.FluentFuture
@@ -28,6 +27,7 @@ import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryEvent
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.analytics.api.AnalyticsType
 import org.nypl.simplified.books.api.BookID
+import org.nypl.simplified.books.book_database.api.BookFormats
 import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatus
@@ -44,10 +44,10 @@ import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.books.preview.BookPreviewRequirements
 import org.nypl.simplified.books.preview.BookPreviewTask
 import org.nypl.simplified.feeds.api.Feed
-import org.nypl.simplified.feeds.api.FeedEntry
-import org.nypl.simplified.feeds.api.FeedLoaderType
-import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.feeds.api.FeedData
+import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.futures.FluentFutureExtensions
 import org.nypl.simplified.futures.FluentFutureExtensions.flatMap
 import org.nypl.simplified.futures.FluentFutureExtensions.map
@@ -403,7 +403,6 @@ class Controller private constructor(
     bookID: BookID,
     entry: FeedEntryBook,
     samlDownloadContext: SAMLDownloadContext?,
-  
   ): FluentFuture<TaskResult<*>> =
     this.submitTask(
       Callable<TaskResult<*>> {
@@ -446,7 +445,6 @@ class Controller private constructor(
     accountID: AccountID,
     feedEntry: FeedEntryBook,
     reportType: String,
-  
   ): FluentFuture<TaskResult<Unit>> = throw NotImplementedError()
 
   override fun booksSync(accountID: AccountID): FluentFuture<TaskResult<Unit>> =
@@ -457,7 +455,6 @@ class Controller private constructor(
         accountRegistry = this.accountProviders,
         bookRegistry = this.bookRegistry,
         booksController = this,
-        feedParser = this.feedParser,
         feedLoader = this.feedLoader,
         patronParsers = this.patronUserProfileParsers,
         http = this.lsHttp,
@@ -549,7 +546,6 @@ class Controller private constructor(
             bookPreviewRequirements = requirements,
             feedEntry = entry,
             format = BookFormats.inferFormat(entry),
-          
           )
         bookPreviewTask.execute()
       },

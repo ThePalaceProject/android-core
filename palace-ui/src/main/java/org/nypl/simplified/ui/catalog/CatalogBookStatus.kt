@@ -1,12 +1,12 @@
 package org.nypl.simplified.ui.catalog
 
 import org.nypl.simplified.books.api.Book
+import org.nypl.simplified.books.api.FeedBookIDConversions
 import org.nypl.simplified.books.book_registry.BookPreviewStatus
 import org.nypl.simplified.books.book_registry.BookRegistryReadableType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedEntryBook
-import org.nypl.simplified.books.api.FeedBookIDConversions
 
 data class CatalogBookStatus<S : BookStatus>(
   val book: Book,
@@ -31,7 +31,6 @@ data class CatalogBookStatus<S : BookStatus>(
     fun create(
       registry: BookRegistryReadableType,
       feedEntry: FeedEntryBook,
-    
     ): CatalogBookStatus<BookStatus> {
       val bookID = FeedBookIDConversions.toBookID(feedEntry.bookID)
       val registryStatus =
@@ -47,7 +46,6 @@ data class CatalogBookStatus<S : BookStatus>(
             thumbnail = null,
             entry = feedEntry,
             formats = listOf(),
-          
           )
       }
 

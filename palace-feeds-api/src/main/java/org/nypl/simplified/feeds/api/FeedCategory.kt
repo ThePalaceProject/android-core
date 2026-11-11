@@ -6,7 +6,7 @@ package org.nypl.simplified.feeds.api
 data class FeedCategory(
   val term: String,
   val scheme: String,
-  val label: String?
+  val label: String?,
 ) {
   /**
    * The label, or if one is not defined, the term.

@@ -26,7 +26,6 @@ interface BooksControllerType {
     bookID: BookID,
     entry: FeedEntryBook,
     samlDownloadContext: SAMLDownloadContext? = null,
-  
   ): FluentFuture<TaskResult<*>>
 
   /**
@@ -65,7 +64,6 @@ interface BooksControllerType {
     accountID: AccountID,
     feedEntry: FeedEntryBook,
     reportType: String,
-  
   ): FluentFuture<TaskResult<Unit>>
 
   /**

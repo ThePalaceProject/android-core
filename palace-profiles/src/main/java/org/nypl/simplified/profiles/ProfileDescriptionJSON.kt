@@ -246,7 +246,7 @@ object ProfileDescriptionJSON {
       audioBookPlaybackSkipIntervalBackwardMs = skipBackwardInterval.toLong(),
       audioBookBatteryDialogAccepted = audioBookBatteryDialogAccepted,
       showBookCoverDebugLabels = showBookCoverDebugLabels,
-      preferOPDS20 = preferOPDS20
+      preferOPDS20 = preferOPDS20,
     )
   }
 
@@ -324,7 +324,7 @@ object ProfileDescriptionJSON {
       audioBookPlaybackSkipIntervalBackwardMs = skipBackwardInterval.toLong(),
       audioBookBatteryDialogAccepted = audioBookBatteryDialogAccepted,
       showBookCoverDebugLabels = showBookCoverDebugLabels,
-      preferOPDS20 = preferOPDS20
+      preferOPDS20 = preferOPDS20,
     )
   }
 

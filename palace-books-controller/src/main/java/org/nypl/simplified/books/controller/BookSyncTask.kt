@@ -1,11 +1,6 @@
 package org.nypl.simplified.books.controller
 
 import org.librarysimplified.http.api.LSHTTPClientType
-import org.librarysimplified.http.api.LSHTTPResponseStatus
-import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
-import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.Handled401
-import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addBasicTokenPropertiesIfApplicable
-import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.getAccessToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
@@ -13,20 +8,25 @@ import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.books.api.BookID
-import org.nypl.simplified.books.api.BookIDs
 import org.nypl.simplified.books.api.FeedBookIDConversions
-import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
 import org.nypl.simplified.books.book_database.api.BookDatabaseException
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookWithStatus
 import org.nypl.simplified.books.controller.api.BooksControllerType
+import org.nypl.simplified.feeds.api.FeedAvailabilityRevoked
+import org.nypl.simplified.feeds.api.FeedData
+import org.nypl.simplified.feeds.api.FeedDataWithGroups
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.api.FeedEntryCorrupt
+import org.nypl.simplified.feeds.api.FeedEntryGroupRef
+import org.nypl.simplified.feeds.api.FeedLoaderResult
+import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedAuthentication
+import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedGeneral
+import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderSuccess
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.feeds.api.FeedLoading
-import org.nypl.simplified.feeds.api.FeedAvailabilityRevoked
-import org.nypl.simplified.opds.core.OPDSFeedParserType
-import org.nypl.simplified.opds.core.OPDSParseException
 import org.nypl.simplified.patron.PatronUserProfiles
 import org.nypl.simplified.patron.api.PatronAuthorization
 import org.nypl.simplified.patron.api.PatronUserProfile
@@ -35,9 +35,7 @@ import org.nypl.simplified.profiles.api.ProfilesDatabaseType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.slf4j.LoggerFactory
-import java.io.ByteArrayInputStream
 import java.io.IOException
-import java.io.InputStream
 import java.util.concurrent.TimeUnit
 
 class BookSyncTask(
@@ -49,7 +47,6 @@ class BookSyncTask(
   private val feedLoader: FeedLoaderType,
   private val patronParsers: PatronUserProfileParsersType,
   private val http: LSHTTPClientType,
-  private val feedParser: OPDSFeedParserType,
 ) : AbstractBookTask(accountID, profiles) {
   override val logger =
     LoggerFactory.getLogger(BookSyncTask::class.java)
@@ -85,195 +82,66 @@ class BookSyncTask(
       return this.taskRecorder.finishSuccess(Unit)
     }
 
-    val request =
-      this.http
-        .newRequest(loansURI)
-        .setAuthorization(AccountAuthenticatedHTTP.createAuthorization(credentials))
-        .addBasicTokenPropertiesIfApplicable(credentials)
-        .build()
+    this.fetchLoansFeed(account = account, provider = provider, credentials = credentials)
 
-    val response = request.execute()
-    return when (val status = response.status) {
-      is LSHTTPResponseStatus.Responded.OK -> {
-        this.onHTTPOK(
-          stream = status.bodyStream ?: ByteArrayInputStream(ByteArray(0)),
-          provider = provider,
-          account = account,
-          accessToken = status.getAccessToken(),
-        )
-        this.taskRecorder.finishSuccess(Unit)
+    return this.taskRecorder.finishSuccess(Unit)
+  }
+
+  private fun fetchLoansFeed(
+    account: AccountType,
+    provider: AccountProviderType,
+    credentials: AccountAuthenticationCredentials,
+  ) {
+    val loansURI = provider.loansURI
+    if (loansURI == null) {
+      this.logger.debug("no loans URI, aborting!")
+      return
+    }
+
+    val feedResult =
+      this.feedLoader
+        .fetchURI(
+          accountID = this.accountID,
+          uri = loansURI,
+          credentials = credentials,
+          method = "GET",
+        ).get(60L, TimeUnit.SECONDS)
+
+    when (feedResult) {
+      is FeedLoaderSuccess -> {
+        account.updateBasicTokenCredentials(feedResult.accessToken)
+        this.processFeed(account, feedResult.feed)
       }
 
-      is LSHTTPResponseStatus.Responded.Error -> {
-        val message =
-          String.format(
-            "%s: %d: %s",
-            provider.loansURI,
-            status.properties.status,
-            status.properties.message,
-          )
+      is FeedLoaderFailedAuthentication -> {
+        val message = feedResult.message
+        this.taskRecorder.currentStepFailed(
+          message = message,
+          errorCode = "syncAuthentication",
+          exception = feedResult.exception,
+          extraMessages = listOf(),
+        )
+        account.expireCredentialsIfApplicable()
+        throw TaskFailedHandled(feedResult.exception)
+      }
 
-        if (status.properties.status == 401) {
-          when (AccountAuthenticatedHTTP.handle401Error(response.status.properties?.problemReport)) {
-            Handled401.ErrorIsRecoverableCredentialsExpired -> {
-              account.expireCredentialsIfApplicable()
-            }
-
-            Handled401.ErrorIsUnrecoverable -> {
-              // Treat this as a hard error.
-            }
-          }
-        }
-
-        val exception = IOException(message)
+      is FeedLoaderFailedGeneral -> {
+        val message = feedResult.message
         this.taskRecorder.currentStepFailed(
           message = message,
           errorCode = "syncFailed",
-          exception = exception,
+          exception = feedResult.exception,
           extraMessages = listOf(),
         )
-        throw TaskFailedHandled(exception)
-      }
-
-      is LSHTTPResponseStatus.Failed -> {
-        throw IOException(status.exception)
+        throw TaskFailedHandled(feedResult.exception)
       }
     }
   }
 
-  private fun fetchPatronUserProfile(
+  private fun processFeed(
     account: AccountType,
-    credentials: AccountAuthenticationCredentials,
+    feed: org.nypl.simplified.feeds.api.Feed,
   ) {
-    try {
-      val profile =
-        PatronUserProfiles.runPatronProfileRequest(
-          taskRecorder = this.taskRecorder,
-          patronParsers = this.patronParsers,
-          credentials = credentials,
-          http = this.http,
-          account = account,
-        )
-
-      account.updateCredentialsIfAvailable {
-        this.withNewAnnotationsURI(it, profile)
-      }
-
-      val authorization = profile.authorization
-      if (authorization != null) {
-        account.updateCredentialsIfAvailable {
-          this.withPatronAuthorization(it, authorization)
-        }
-      }
-    } catch (e: Exception) {
-      this.logger.debug("patron user profile: ", e)
-    }
-  }
-
-  private fun withPatronAuthorization(
-    currentCredentials: AccountAuthenticationCredentials,
-    authorization: PatronAuthorization,
-  ): AccountAuthenticationCredentials =
-    when (currentCredentials) {
-      is AccountAuthenticationCredentials.Basic -> {
-        currentCredentials.copy(patronAuthorization = authorization)
-      }
-
-      is AccountAuthenticationCredentials.BasicToken -> {
-        currentCredentials.copy(patronAuthorization = authorization)
-      }
-
-      is AccountAuthenticationCredentials.SAML2_0 -> {
-        currentCredentials.copy(patronAuthorization = authorization)
-      }
-
-      is AccountAuthenticationCredentials.OpenIDConnect -> {
-        currentCredentials.copy(patronAuthorization = authorization)
-      }
-    }
-
-  private fun withNewAnnotationsURI(
-    currentCredentials: AccountAuthenticationCredentials,
-    profile: PatronUserProfile,
-  ): AccountAuthenticationCredentials =
-    when (currentCredentials) {
-      is AccountAuthenticationCredentials.Basic -> {
-        currentCredentials.copy(annotationsURI = profile.annotationsURI)
-      }
-
-      is AccountAuthenticationCredentials.BasicToken -> {
-        currentCredentials.copy(annotationsURI = profile.annotationsURI)
-      }
-
-      is AccountAuthenticationCredentials.SAML2_0 -> {
-        currentCredentials.copy(annotationsURI = profile.annotationsURI)
-      }
-
-      is AccountAuthenticationCredentials.OpenIDConnect -> {
-        currentCredentials.copy(annotationsURI = profile.annotationsURI)
-      }
-    }
-
-  override fun onFailure(result: TaskResult.Failure<Unit>) {
-    // Nothing to do
-  }
-
-  private fun updateAccountProvider(account: AccountType): AccountProviderType {
-    this.logger.debug("resolving the existing account provider")
-
-    val oldProvider = account.provider
-    var newDescription =
-      this.accountRegistry.findAccountProviderDescription(oldProvider.id)
-    if (newDescription == null) {
-      this.logger.debug("could not find account description for {} in registry", oldProvider.id)
-      newDescription = oldProvider.toDescription()
-    } else {
-      this.logger.debug("found account description for {} in registry", oldProvider.id)
-    }
-
-    val newProviderResult =
-      this.accountRegistry.resolve(
-        { accountProvider, message ->
-          this.logger.debug("[{}]: {}", accountProvider, message)
-        },
-        newDescription,
-      )
-
-    return when (newProviderResult) {
-      is TaskResult.Success -> {
-        this.logger.debug("successfully resolved the account provider")
-        account.setAccountProvider(newProviderResult.result)
-        newProviderResult.result
-      }
-
-      is TaskResult.Failure -> {
-        this.logger.debug("failed to resolve account provider: ", newProviderResult.exception)
-        oldProvider
-      }
-    }
-  }
-
-  @Throws(IOException::class)
-  private fun onHTTPOK(
-    stream: InputStream,
-    provider: AccountProviderType,
-    account: AccountType,
-    accessToken: String?,
-  ) {
-    account.updateBasicTokenCredentials(accessToken)
-    stream.use { ok ->
-      this.parseFeed(ok, provider, account)
-    }
-  }
-
-  @Throws(OPDSParseException::class)
-  private fun parseFeed(
-    stream: InputStream,
-    provider: AccountProviderType,
-    account: AccountType,
-  ) {
-    val feed = this.feedParser.parse(provider.loansURI, stream)
-
     /*
      * Obtain the set of books that are on disk already. If any
      * of these books are not in the received feed, then they have
@@ -284,13 +152,21 @@ class BookSyncTask(
     val existing = bookDatabase.books()
 
     /*
+     * Collect all entries from the feed, whether flat or grouped.
+     */
+
+    val allEntries: List<FeedEntryBook> =
+      when (feed) {
+        is FeedData -> feed.entries.filterIsInstance<FeedEntryBook>()
+        is FeedDataWithGroups -> feed.groups.flatMap { it.groupEntries }.filterIsInstance<FeedEntryBook>()
+      }
+
+    /*
      * Handle each book in the received feed.
      */
 
     val received = HashSet<BookID>(64)
-    val entries = feed.feedEntries
-    for (opdsEntry in entries) {
-      val entry = OPDS12FeedConverter.convertEntry(account.id, opdsEntry)
+    for (entry in allEntries) {
       val bookId = FeedBookIDConversions.toBookID(entry.bookID)
       received.add(bookId)
       this.logger.debug("[{}] updating", bookId.brief())
@@ -375,5 +251,117 @@ class BookSyncTask(
     } else {
       throw IOException("No alternate link is available")
     }
+  }
+
+  private fun fetchPatronUserProfile(
+    account: AccountType,
+    credentials: AccountAuthenticationCredentials,
+  ) {
+    try {
+      val profile =
+        PatronUserProfiles.runPatronProfileRequest(
+          taskRecorder = this.taskRecorder,
+          patronParsers = this.patronParsers,
+          credentials = credentials,
+          http = this.http,
+          account = account,
+        )
+
+      account.updateCredentialsIfAvailable {
+        this.withNewAnnotationsURI(it, profile)
+      }
+
+      val authorization = profile.authorization
+      if (authorization != null) {
+        account.updateCredentialsIfAvailable {
+          this.withPatronAuthorization(it, authorization)
+        }
+      }
+    } catch (e: Exception) {
+      this.logger.debug("patron user profile: ", e)
+    }
+  }
+
+  private fun withPatronAuthorization(
+    currentCredentials: AccountAuthenticationCredentials,
+    authorization: PatronAuthorization,
+  ): AccountAuthenticationCredentials =
+    when (currentCredentials) {
+      is AccountAuthenticationCredentials.Basic -> {
+        currentCredentials.copy(patronAuthorization = authorization)
+      }
+
+      is AccountAuthenticationCredentials.BasicToken -> {
+        currentCredentials.copy(patronAuthorization = authorization)
+      }
+
+      is AccountAuthenticationCredentials.SAML2_0 -> {
+        currentCredentials.copy(patronAuthorization = authorization)
+      }
+
+      is AccountAuthenticationCredentials.OpenIDConnect -> {
+        currentCredentials.copy(patronAuthorization = authorization)
+      }
+    }
+
+  private fun withNewAnnotationsURI(
+    currentCredentials: AccountAuthenticationCredentials,
+    profile: PatronUserProfile,
+  ): AccountAuthenticationCredentials =
+    when (currentCredentials) {
+      is AccountAuthenticationCredentials.Basic -> {
+        currentCredentials.copy(annotationsURI = profile.annotationsURI)
+      }
+
+      is AccountAuthenticationCredentials.BasicToken -> {
+        currentCredentials.copy(annotationsURI = profile.annotationsURI)
+      }
+
+      is AccountAuthenticationCredentials.SAML2_0 -> {
+        currentCredentials.copy(annotationsURI = profile.annotationsURI)
+      }
+
+      is AccountAuthenticationCredentials.OpenIDConnect -> {
+        currentCredentials.copy(annotationsURI = profile.annotationsURI)
+      }
+    }
+
+  private fun updateAccountProvider(account: AccountType): AccountProviderType {
+    this.logger.debug("resolving the existing account provider")
+
+    val oldProvider = account.provider
+    var newDescription =
+      this.accountRegistry.findAccountProviderDescription(oldProvider.id)
+    if (newDescription == null) {
+      this.logger.debug("could not find account description for {} in registry", oldProvider.id)
+      newDescription = oldProvider.toDescription()
+    } else {
+      this.logger.debug("found account description for {} in registry", oldProvider.id)
+    }
+
+    val newProviderResult =
+      this.accountRegistry.resolve(
+        { accountProvider, message ->
+          this.logger.debug("[{}]: {}", accountProvider, message)
+        },
+        newDescription,
+      )
+
+    return when (newProviderResult) {
+      is TaskResult.Success -> {
+        this.logger.debug("successfully resolved the account provider")
+        account.setAccountProvider(newProviderResult.result)
+        newProviderResult.result
+      }
+
+      is TaskResult.Failure -> {
+        this.logger.debug("failed to resolve account provider: ", newProviderResult.exception)
+        oldProvider
+      }
+    }
+  }
+
+  override fun onFailure(result: TaskResult.Failure<Unit>) {
+    // Nothing to do
   }
 }

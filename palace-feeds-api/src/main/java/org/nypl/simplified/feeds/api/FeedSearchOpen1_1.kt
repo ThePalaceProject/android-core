@@ -9,14 +9,13 @@ import java.net.URLEncoder
  * The search should be performed via an OpenSearch 1.1 REST API.
  */
 data class FeedSearchOpen1_1(
-  private val queryFn: (String) -> URI
+  private val queryFn: (String) -> URI,
 ) : FeedSearch {
   /**
    * @param terms The search terms.
    * @return A query URI for searching with the given search terms.
    */
-  fun getQueryURIForTerms(terms: String): URI =
-    this.queryFn(terms)
+  fun getQueryURIForTerms(terms: String): URI = this.queryFn(terms)
 
   companion object {
     /**

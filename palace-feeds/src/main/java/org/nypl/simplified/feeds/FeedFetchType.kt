@@ -11,7 +11,7 @@ import java.net.URI
 data class FeedFetchResult(
   val body: InputStream,
   val accessToken: String?,
-  val contentType: MIMEType?
+  val contentType: MIMEType?,
 )
 
 /**
@@ -21,6 +21,6 @@ fun interface FeedFetchType {
   fun fetch(
     uri: URI,
     credentials: AccountAuthenticationCredentials?,
-    acceptHeader: String?
+    acceptHeader: String?,
   ): FeedFetchResult
 }

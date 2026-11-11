@@ -1,5 +1,6 @@
 package org.nypl.simplified.feeds
 
+import one.irradia.mime.api.MIMEType
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType
 import org.librarysimplified.http.api.LSHTTPResponseStatus
@@ -18,7 +19,6 @@ import org.nypl.simplified.feeds.api.FeedData
 import org.nypl.simplified.feeds.api.FeedDataWithGroups
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedEntryBook
-import one.irradia.mime.api.MIMEType
 import org.nypl.simplified.feeds.api.FeedLoaderResult
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderSuccess
@@ -28,9 +28,9 @@ import org.nypl.simplified.feeds.opds12.OPDS12FeedHTTPTransportException
 import org.nypl.simplified.feeds.opds20.OPDS20FeedConverter
 import org.nypl.simplified.opds.core.OPDSFeedParserType
 import org.nypl.simplified.opds.core.OPDSFeedTransportIOException
-import org.nypl.simplified.opds.core.OPDSSearchParserType
-import org.nypl.simplified.opds.core.OPDSSearchLink
 import org.nypl.simplified.opds.core.OPDSOpenSearch1_1
+import org.nypl.simplified.opds.core.OPDSSearchLink
+import org.nypl.simplified.opds.core.OPDSSearchParserType
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayInputStream
 import java.io.FileNotFoundException
@@ -82,7 +82,7 @@ class FeedLoader(
     accountID: AccountID,
     uri: URI,
     credentials: AccountAuthenticationCredentials?,
-    method: String
+    method: String,
   ): CompletableFuture<FeedLoaderResult> {
     val future = CompletableFuture<FeedLoaderResult>()
     this.exec.execute {
@@ -92,8 +92,8 @@ class FeedLoader(
             accountId = accountID,
             uri = uri,
             credentials = credentials,
-            method = method
-          )
+            method = method,
+          ),
         )
       } catch (e: Throwable) {
         future.completeExceptionally(e)
@@ -106,7 +106,7 @@ class FeedLoader(
     accountId: AccountID,
     uri: URI,
     credentials: AccountAuthenticationCredentials?,
-    method: String
+    method: String,
   ): FeedLoaderResult {
     try {
       if (uri.scheme == "content") {
@@ -119,15 +119,16 @@ class FeedLoader(
       val accessToken = result.accessToken
       val contentType: MIMEType? = result.contentType
 
-      val feed: Feed = if (contentType != null && contentType.fullType == CONTENT_TYPE_OPDS_JSON) {
-        this.parseOPDS20(accountId, body, uri)
-      } else {
-        this.parseOPDS12(accountId, body, uri, credentials, method)
-      }
+      val feed: Feed =
+        if (contentType != null && contentType.fullType == CONTENT_TYPE_OPDS_JSON) {
+          this.parseOPDS20(accountId, body, uri)
+        } else {
+          this.parseOPDS12(accountId, body, uri, credentials, method)
+        }
 
       return FeedLoaderSuccess(
         feed = this.applyFilter(feed, accountId),
-        accessToken = accessToken
+        accessToken = accessToken,
       )
     } catch (e: OPDS12FeedHTTPTransportException) {
       this.log.debug("feed transport exception: ", e)
@@ -137,14 +138,14 @@ class FeedLoader(
           problemReport = e.report,
           exception = e,
           attributesInitial = this.errorAttributesOf(uri, method),
-          message = e.localizedMessage ?: ""
+          message = e.localizedMessage ?: "",
         )
       }
       return FeedLoaderFailure.FeedLoaderFailedGeneral(
         problemReport = e.report,
         exception = e,
         attributesInitial = this.errorAttributesOf(uri, method),
-        message = e.localizedMessage ?: ""
+        message = e.localizedMessage ?: "",
       )
     } catch (e: Exception) {
       this.log.debug("feed exception: ", e)
@@ -153,7 +154,7 @@ class FeedLoader(
         problemReport = null,
         exception = e,
         attributesInitial = this.errorAttributesOf(uri, method),
-        message = e.localizedMessage ?: ""
+        message = e.localizedMessage ?: "",
       )
     }
   }
@@ -163,7 +164,7 @@ class FeedLoader(
     body: InputStream,
     uri: URI,
     credentials: AccountAuthenticationCredentials?,
-    method: String
+    method: String,
   ): Feed {
     val opdsFeed = body.use { stream -> this.opds12Parser.parse(uri, stream) }
     val search = this.fetchSearchLink(opdsFeed.feedSearchURI, credentials, method)
@@ -171,14 +172,14 @@ class FeedLoader(
     return OPDS12FeedConverter.convert(
       accountID = accountId,
       feed = opdsFeed,
-      search = search
+      search = search,
     )
   }
 
   private fun parseOPDS20(
     accountId: AccountID,
     body: InputStream,
-    uri: URI
+    uri: URI,
   ): Feed {
     val wpmFeed = OPDS20FeedConverter.parse(body)
     return OPDS20FeedConverter.convert(accountId, wpmFeed, uri)
@@ -189,25 +190,31 @@ class FeedLoader(
    * that have no supported acquisition path. This operates on the
    * version-neutral [FeedEntryBook] type.
    */
-  private fun applyFilter(feed: Feed, accountId: AccountID): Feed {
+  private fun applyFilter(
+    feed: Feed,
+    accountId: AccountID,
+  ): Feed {
     if (!this.showOnlySupportedBooks) {
       return feed
     }
 
     return when (feed) {
-      is FeedData ->
+      is FeedData -> {
         feed.copy(
-          entries = feed.entries.filter { this.isEntrySupported(it) }
+          entries = feed.entries.filter { this.isEntrySupported(it) },
         )
+      }
 
-      is FeedDataWithGroups ->
+      is FeedDataWithGroups -> {
         feed.copy(
-          groups = feed.groups.map { group ->
-            group.copy(
-              groupEntries = group.groupEntries.filter { this.isEntrySupported(it) }
-            )
-          }
+          groups =
+            feed.groups.map { group ->
+              group.copy(
+                groupEntries = group.groupEntries.filter { this.isEntrySupported(it) },
+              )
+            },
         )
+      }
     }
   }
 
@@ -239,7 +246,7 @@ class FeedLoader(
 
   private fun parseFromContentResolver(
     accountId: AccountID,
-    uri: URI
+    uri: URI,
   ): FeedLoaderResult {
     val streamMaybe = this.contentResolver.openInputStream(uri)
     return if (streamMaybe != null) {
@@ -250,11 +257,11 @@ class FeedLoader(
               OPDS12FeedConverter.convert(
                 accountID = accountId,
                 feed = this.opds12Parser.parse(uri, stream),
-                search = null
+                search = null,
               ),
-              accountId
+              accountId,
             ),
-          accessToken = null
+          accessToken = null,
         )
       }
     } else {
@@ -263,7 +270,7 @@ class FeedLoader(
         exception = FileNotFoundException(),
         message = "File not found!",
         attributesInitial =
-          sortedMapOf(Pair("URI", uri.toASCIIString()))
+          sortedMapOf(Pair("URI", uri.toASCIIString())),
       )
     }
   }
@@ -271,7 +278,7 @@ class FeedLoader(
   private fun fetchSearchLink(
     searchLink: OPDSSearchLink?,
     credentials: AccountAuthenticationCredentials?,
-    method: String
+    method: String,
   ): OPDSOpenSearch1_1? {
     return if (searchLink != null) {
       val result = this.fetch.fetch(searchLink.uri, credentials, null)
@@ -285,11 +292,11 @@ class FeedLoader(
 
   private fun errorAttributesOf(
     uri: URI,
-    method: String
+    method: String,
   ): SortedMap<String, String> =
     sortedMapOf(
       Pair("Feed", uri.toString()),
-      Pair("Method", method)
+      Pair("Method", method),
     )
 
   companion object {
@@ -344,7 +351,7 @@ class FeedLoader(
             FeedFetchResult(
               body = bodyStream,
               accessToken = status.getAccessToken(),
-              contentType = status.properties.contentType
+              contentType = status.properties.contentType,
             )
           }
 
@@ -352,21 +359,21 @@ class FeedLoader(
             throw OPDS12FeedHTTPTransportException(
               message = status.properties.message,
               code = status.properties.status,
-              report = status.properties.problemReport
+              report = status.properties.problemReport,
             )
           }
 
           status is LSHTTPResponseStatus.Failed -> {
             throw OPDSFeedTransportIOException(
               message = "Connection failed",
-              cause = IOException(status.exception)
+              cause = IOException(status.exception),
             )
           }
 
           else -> {
             throw OPDSFeedTransportIOException(
               message = "Unexpected HTTP response status",
-              cause = IOException("Status: $status")
+              cause = IOException("Status: $status"),
             )
           }
         }

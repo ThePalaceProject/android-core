@@ -18,10 +18,10 @@ import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.bearerToken
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskCancelled
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskFailed
 import org.nypl.simplified.content.api.ContentResolverType
-import org.nypl.simplified.links.Link
-import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.feeds.api.FeedAcquisitionPath
 import org.nypl.simplified.feeds.api.FeedAcquisitionPathElement
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.links.Link
 import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import org.readium.r2.lcp.LcpService

@@ -2,7 +2,6 @@ package org.nypl.simplified.feeds.api
 
 import org.nypl.simplified.accounts.api.AccountID
 
-
 /**
  * A feed entry.
  */

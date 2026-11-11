@@ -15,7 +15,6 @@ import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.api.BookIDs
 import org.nypl.simplified.books.api.FeedBookIDConversions
-import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
 import org.nypl.simplified.books.book_registry.BookRegistryType
@@ -36,9 +35,10 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.Borro
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskHaltedEarly
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskFactoryType
 import org.nypl.simplified.content.api.ContentResolverType
-import org.nypl.simplified.links.Link
 import org.nypl.simplified.feeds.api.FeedAcquisitionPath
 import org.nypl.simplified.feeds.api.FeedAcquisitionPathElement
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.links.Link
 import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
@@ -198,7 +198,6 @@ class BorrowTask private constructor(
     book: Book,
     path: FeedAcquisitionPath,
     samlDownloadContext: SAMLDownloadContext?,
-  
   ) {
     val currentProfile =
       this.requirements.profiles.currentProfile()
@@ -283,7 +282,6 @@ class BorrowTask private constructor(
             pathElement = pathElement,
             book = book,
             remaining = queue.toList().map(FeedAcquisitionPathElement::mimeType),
-          
           )
         this.subtaskExecute(subtaskFactory, context, book)
       } catch (e: BorrowSubtaskHaltedEarly) {
@@ -697,6 +695,5 @@ class BorrowTask private constructor(
 
     override fun opdsAcquisitionPathRemaining(): List<FeedAcquisitionPathElement> =
       this.currentRemainingOPDSPathElements
-  
   }
 }

@@ -10,5 +10,5 @@ data class FeedGroup(
   val account: AccountID,
   val groupTitle: String,
   val groupURI: URI,
-  val groupEntries: List<FeedEntry>
+  val groupEntries: List<FeedEntry>,
 )

@@ -315,7 +315,6 @@ sealed class AnalyticsEvent {
      */
 
     val opdsEntry: FeedEntryBook,
-  
   ) : AnalyticsEvent()
 
   /**

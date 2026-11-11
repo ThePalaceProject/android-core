@@ -1,12 +1,11 @@
-package org.nypl.simplified.books.api;
+package org.nypl.simplified.books.api
 
-import org.nypl.simplified.feeds.api.FeedBookID;
+import org.nypl.simplified.feeds.api.FeedBookID
 
 /**
  * Lossless conversions between [BookID] and [FeedBookID].
  */
 object FeedBookIDConversions {
-
   /**
    * Convert a [BookID] to a [FeedBookID].
    */

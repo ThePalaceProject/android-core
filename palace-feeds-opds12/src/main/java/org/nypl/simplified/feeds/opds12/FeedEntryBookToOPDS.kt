@@ -43,7 +43,7 @@ fun FeedEntryBook.toOPDSAcquisitionFeedEntry(): OPDSAcquisitionFeedEntry {
       id = this.id,
       title = this.title,
       updated = this.updated,
-      availability = this.availability.toOPDS()
+      availability = this.availability.toOPDS(),
     )
 
   this.authors.forEach { builder.addAuthor(it) }
@@ -75,8 +75,8 @@ fun FeedEntryBook.toOPDSAcquisitionFeedEntry(): OPDSAcquisitionFeedEntry {
       DRMLicensor(
         vendor = licensor.vendor,
         clientToken = licensor.clientToken,
-        deviceManager = licensor.deviceManager
-      )
+        deviceManager = licensor.deviceManager,
+      ),
     )
   }
 
@@ -86,37 +86,51 @@ fun FeedEntryBook.toOPDSAcquisitionFeedEntry(): OPDSAcquisitionFeedEntry {
       OPDSSeries(
         name = series.name,
         position = series.position,
-        link = series.link
-      )
+        link = series.link,
+      ),
     )
   }
 
   return builder.build()
 }
 
-private fun org.nypl.simplified.feeds.api.FeedAvailability.toOPDS(): org.nypl.simplified.opds.core.OPDSAvailabilityType =
+private fun org.nypl.simplified.feeds.api.FeedAvailability.toOPDS():
+  org.nypl.simplified.opds.core.OPDSAvailabilityType =
   when (this) {
-    is FeedAvailabilityHeld ->
+    is FeedAvailabilityHeld -> {
       OPDSAvailabilityHeld.get(this.startDate, this.position, this.endDate, this.revoke)
-    is FeedAvailabilityHeldReady ->
+    }
+
+    is FeedAvailabilityHeldReady -> {
       OPDSAvailabilityHeldReady.get(this.endDate, this.revoke)
-    is FeedAvailabilityHoldable ->
+    }
+
+    is FeedAvailabilityHoldable -> {
       OPDSAvailabilityHoldable.get()
-    is FeedAvailabilityLoanable ->
+    }
+
+    is FeedAvailabilityLoanable -> {
       OPDSAvailabilityLoanable.get()
-    is FeedAvailabilityLoaned ->
+    }
+
+    is FeedAvailabilityLoaned -> {
       OPDSAvailabilityLoaned.get(this.startDate, this.endDate, this.revoke)
-    is FeedAvailabilityOpenAccess ->
+    }
+
+    is FeedAvailabilityOpenAccess -> {
       OPDSAvailabilityOpenAccess.get(this.revoke)
-    is FeedAvailabilityRevoked ->
+    }
+
+    is FeedAvailabilityRevoked -> {
       OPDSAvailabilityRevoked.get(this.revoke)
+    }
   }
 
 private fun FeedCategory.toOPDS(): OPDSCategory =
   OPDSCategory(
     term = this.term,
     scheme = this.scheme,
-    label = this.label
+    label = this.label,
   )
 
 private fun FeedAcquisition.toOPDS(): OPDSAcquisition =
@@ -125,7 +139,7 @@ private fun FeedAcquisition.toOPDS(): OPDSAcquisition =
     uri = this.uri,
     type = this.type,
     indirectAcquisitions = this.indirectAcquisitions.map { it.toOPDS() },
-    properties = this.properties
+    properties = this.properties,
   )
 
 private fun FeedAcquisitionRelation.toOPDS(): OPDSAcquisition.Relation =
@@ -142,11 +156,11 @@ private fun FeedIndirectAcquisition.toOPDS(): OPDSIndirectAcquisition =
   OPDSIndirectAcquisition(
     type = this.type,
     indirectAcquisitions = this.indirectAcquisitions.map { it.toOPDS() },
-    properties = this.properties
+    properties = this.properties,
   )
 
 private fun FeedPreviewAcquisition.toOPDS(): OPDSPreviewAcquisition =
   OPDSPreviewAcquisition(
     uri = this.uri,
-    type = this.type
+    type = this.type,
   )

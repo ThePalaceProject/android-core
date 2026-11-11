@@ -19,7 +19,6 @@ class BookPreviewTask(
   private val bookPreviewRequirements: BookPreviewRequirements,
   private val feedEntry: FeedEntryBook,
   private val format: BookFormats.BookFormatDefinition?,
-  
 ) {
   private lateinit var taskRecorder: TaskRecorderType
 
@@ -52,7 +51,6 @@ class BookPreviewTask(
   private fun handleBookPreviewDownload(
     onPreviewFileReady: (File) -> Unit,
     previewAcquisition: FeedPreviewAcquisition,
-  
   ): TaskResult<*> {
     val taskName = "BookPreviewDownloadTask"
     val step = this.taskRecorder.beginNewStep("Executing subtask $taskName...")

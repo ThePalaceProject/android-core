@@ -36,9 +36,17 @@ import org.nypl.simplified.books.book_registry.BookStatus.Loaned
 import org.nypl.simplified.books.book_registry.BookStatusEvent
 import org.nypl.simplified.books.controller.api.BooksControllerType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
-import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+import org.nypl.simplified.feeds.api.FeedAvailabilityHeld
+import org.nypl.simplified.feeds.api.FeedAvailabilityHeldReady
+import org.nypl.simplified.feeds.api.FeedAvailabilityHoldable
+import org.nypl.simplified.feeds.api.FeedAvailabilityLoanable
+import org.nypl.simplified.feeds.api.FeedAvailabilityLoaned
+import org.nypl.simplified.feeds.api.FeedAvailabilityOpenAccess
+import org.nypl.simplified.feeds.api.FeedAvailabilityRevoked
 import org.nypl.simplified.feeds.api.FeedBooksSelection
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.api.FeedEntryCorrupt
 import org.nypl.simplified.feeds.api.FeedFacet
 import org.nypl.simplified.feeds.api.FeedFacetComposite
 import org.nypl.simplified.feeds.api.FeedFacetData
@@ -48,15 +56,7 @@ import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.feeds.api.FeedSearch
 import org.nypl.simplified.feeds.api.FeedSearchLocal
 import org.nypl.simplified.feeds.api.FeedSearchOpen1_1
-import org.nypl.simplified.feeds.api.FeedEntryBook
-import org.nypl.simplified.feeds.api.FeedEntryCorrupt
-import org.nypl.simplified.feeds.api.FeedAvailabilityHeld
-import org.nypl.simplified.feeds.api.FeedAvailabilityHeldReady
-import org.nypl.simplified.feeds.api.FeedAvailabilityHoldable
-import org.nypl.simplified.feeds.api.FeedAvailabilityLoanable
-import org.nypl.simplified.feeds.api.FeedAvailabilityLoaned
-import org.nypl.simplified.feeds.api.FeedAvailabilityOpenAccess
-import org.nypl.simplified.feeds.api.FeedAvailabilityRevoked
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
 import org.nypl.simplified.profiles.controller.api.ProfileFeedRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
@@ -314,7 +314,6 @@ sealed class CatalogFragment :
   private fun onLoadRelatedFeed(
     view: CatalogFeedViewDetails2,
     newEntry: FeedEntryBook,
-  
   ) {
     val related = newEntry.related
     if (related != null) {
@@ -376,7 +375,6 @@ sealed class CatalogFragment :
           CatalogSearchResultsAccessibility.searchResultsLoaded(
             listView = view.listView,
             itemCount = feed.groups.sumOf { it.groupEntries.size },
-          
           )
         } else {
           this.viewNow.startFocusDelayed()
@@ -660,7 +658,6 @@ sealed class CatalogFragment :
       BookPreviewActivity.startActivity(
         this.requireActivity(),
         book.entry,
-      
       )
     } catch (e: Throwable) {
       this.logger.error("Failed to start activity: ", e)
@@ -1254,7 +1251,6 @@ sealed class CatalogFragment :
             method = "GET",
             uri = feedSearch.getQueryURIForTerms(queryText),
           ),
-        
         )
       }
     }
