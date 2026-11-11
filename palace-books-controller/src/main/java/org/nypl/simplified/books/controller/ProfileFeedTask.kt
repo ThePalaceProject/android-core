@@ -16,7 +16,6 @@ import org.nypl.simplified.feeds.api.FeedFacetPseudoSorting.SortBy
 import org.nypl.simplified.feeds.api.FeedFacetSingle
 import org.nypl.simplified.feeds.api.FeedSearch
 import org.nypl.simplified.feeds.api.FeedSearchLocal
-import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
 import org.nypl.simplified.profiles.controller.api.ProfileFeedRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.slf4j.LoggerFactory

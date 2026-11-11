@@ -43,7 +43,6 @@ import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoad
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedGeneral
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderSuccess
 import org.nypl.simplified.feeds.api.FeedLoaderType
-import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
 import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder

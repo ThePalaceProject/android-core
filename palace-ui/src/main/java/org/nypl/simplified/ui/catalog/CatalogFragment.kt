@@ -56,7 +56,6 @@ import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.feeds.api.FeedSearch
 import org.nypl.simplified.feeds.api.FeedSearchLocal
 import org.nypl.simplified.feeds.api.FeedSearchOpen1_1
-import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
 import org.nypl.simplified.profiles.controller.api.ProfileFeedRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
