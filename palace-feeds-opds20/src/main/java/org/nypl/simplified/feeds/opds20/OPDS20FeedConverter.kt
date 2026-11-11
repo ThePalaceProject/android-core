@@ -143,7 +143,7 @@ object OPDS20FeedConverter {
         if (groupIdentifier != null) {
           groupURI = groupIdentifier
         } else {
-          val selfLink = group.navigation.firstOrNull { REL_SELF in it.relation }
+          val selfLink = group.links.firstOrNull { REL_SELF in it.relation }
           if (selfLink != null) {
             val basicLink = selfLink as? WPMLinkBasic
             if (basicLink != null) {
@@ -160,8 +160,8 @@ object OPDS20FeedConverter {
           languageMapToString(group.metadata.title)
 
         val groupEntries: List<FeedEntryBook> =
-          entries.filter { entry ->
-            entry.groups.any { ref -> ref.uri == groupURI }
+          group.publications.map { publication ->
+            convertEntry(accountID, publication)
           }
 
         FeedGroup(

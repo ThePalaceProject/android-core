@@ -155,26 +155,21 @@ class OPDS20FeedConverterTest {
               "title": "New Releases",
               "identifier": "urn:group:new"
             },
-            "navigation": [
-              {
-                "href": "https://example.com/group/new",
-                "rel": "self"
-              }
-            ]
-          }
-        ],
-        "publications": [
-          {
-            "type": "publication",
-            "metadata": {
-              "identifier": "urn:isbn:0000000001",
-              "title": "Grouped Book"
-            },
             "links": [
               {
-                "href": "urn:group:new",
-                "rel": "collection",
-                "title": "New Releases"
+                "href": "https://example.com/group/new",
+                "rel": "self",
+                "type": "application/opds+json"
+              }
+            ],
+            "publications": [
+              {
+                "type": "publication",
+                "metadata": {
+                  "identifier": "urn:isbn:0000000001",
+                  "title": "Grouped Book"
+                },
+                "links": []
               }
             ]
           }
@@ -189,6 +184,8 @@ class OPDS20FeedConverterTest {
     assertEquals(1, feedData.groups.size)
     assertEquals("New Releases", feedData.groups[0].groupTitle)
     assertEquals(1, feedData.groups[0].groupEntries.size)
+    val groupEntry = feedData.groups[0].groupEntries[0] as FeedEntryBook
+    assertEquals("Grouped Book", groupEntry.title)
   }
 
   @Test
