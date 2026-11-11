@@ -18,17 +18,16 @@ import org.nypl.simplified.feeds.api.FeedData
 import org.nypl.simplified.feeds.api.FeedDataWithGroups
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.api.FeedHTTPTransportException
 import org.nypl.simplified.feeds.api.FeedLoaderResult
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderSuccess
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
-import org.nypl.simplified.feeds.opds12.OPDS12FeedHTTPTransportException
 import org.nypl.simplified.feeds.opds20.OPDS20FeedConverter
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
 import org.nypl.simplified.opds.core.OPDSFeedParser
 import org.nypl.simplified.opds.core.OPDSFeedParserType
-import org.nypl.simplified.opds.core.OPDSFeedTransportIOException
 import org.nypl.simplified.opds.core.OPDSOpenSearch1_1
 import org.nypl.simplified.opds.core.OPDSSearchLink
 import org.nypl.simplified.opds.core.OPDSSearchParser
@@ -128,7 +127,7 @@ class FeedLoader(
         feed = this.applyFilter(feed, accountId),
         accessToken = accessToken,
       )
-    } catch (e: OPDS12FeedHTTPTransportException) {
+    } catch (e: FeedHTTPTransportException) {
       this.log.debug("feed transport exception: ", e)
 
       if (e.code == 401) {
@@ -317,7 +316,7 @@ class FeedLoader(
           }
 
           status is LSHTTPResponseStatus.Responded.Error -> {
-            throw OPDS12FeedHTTPTransportException(
+            throw FeedHTTPTransportException(
               message = status.properties.message,
               code = status.properties.status,
               report = status.properties.problemReport,
@@ -325,16 +324,15 @@ class FeedLoader(
           }
 
           status is LSHTTPResponseStatus.Failed -> {
-            throw OPDSFeedTransportIOException(
-              message = "Connection failed",
-              cause = IOException(status.exception),
+            throw IOException(
+              "Connection failed",
+              status.exception,
             )
           }
 
           else -> {
-            throw OPDSFeedTransportIOException(
-              message = "Unexpected HTTP response status",
-              cause = IOException("Status: $status"),
+            throw IOException(
+              "Unexpected HTTP response status: $status",
             )
           }
         }
