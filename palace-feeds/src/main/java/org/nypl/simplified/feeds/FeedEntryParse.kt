@@ -30,7 +30,12 @@ class FeedEntryParse(
     uri: URI,
     contentType: MIMEType?,
   ): FeedEntryBook {
-    if (contentType != null && contentType.fullType == CONTENT_TYPE_OPDS_JSON) {
+    if (contentType != null &&
+      (
+        contentType.fullType == CONTENT_TYPE_OPDS_JSON ||
+          contentType.fullType == CONTENT_TYPE_OPDS_PUBLICATION_JSON
+      )
+    ) {
       return this.parseOPDS20(accountID, stream, uri)
     }
     return this.parseOPDS12(accountID, stream, uri)
@@ -75,6 +80,7 @@ class FeedEntryParse(
 
   companion object {
     private const val CONTENT_TYPE_OPDS_JSON = "application/opds+json"
+    private const val CONTENT_TYPE_OPDS_PUBLICATION_JSON = "application/opds-publication+json"
 
     /**
      * Create a new [FeedEntryParse] instance.

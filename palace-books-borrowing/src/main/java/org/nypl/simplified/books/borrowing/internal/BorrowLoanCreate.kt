@@ -28,6 +28,7 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.Borro
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskFactoryType
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskType
 import org.nypl.simplified.books.formats.api.StandardFormatNames.allOPDSFeeds
+import org.nypl.simplified.books.formats.api.StandardFormatNames.opds20Publication
 import org.nypl.simplified.feeds.FeedEntryParse
 import org.nypl.simplified.feeds.api.FeedAcquisitionPathElement
 import org.nypl.simplified.feeds.api.FeedAcquisitionPaths
@@ -68,6 +69,9 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
         if (MIMECompatibility.isCompatibleStrictWithoutAttributes(opdsType, type)) {
           return true
         }
+      }
+      if (MIMECompatibility.isCompatibleStrictWithoutAttributes(opds20Publication, type)) {
+        return true
       }
       return false
     }
