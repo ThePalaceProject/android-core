@@ -7,9 +7,8 @@ import java.io.ByteArrayOutputStream
 import java.io.IOException
 
 /**
- * A [FeedEntrySerializerType] implementation that uses the OPDS 1.2 JSON
- * serializer. The output format is byte-identical to the previous
- * `OPDSJSONSerializer`-based serialization.
+ * A [FeedEntrySerializerType] implementation that serializes a [FeedEntryBook]
+ * to an OPDS 1.2 JSON document.
  */
 class FeedEntrySerializer(
   private val opdsSerializer: OPDSJSONSerializerType,
