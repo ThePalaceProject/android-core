@@ -57,6 +57,9 @@ class FeedLoaderContentTypeDispatchTest {
   private val opds20ContentType: MIMEType =
     MIMEType("application", "opds+json", mapOf())
 
+  private val opds20PublicationContentType: MIMEType =
+    MIMEType("application", "opds-publication+json", mapOf())
+
   private fun createLoader(
     body: String,
     contentType: MIMEType?,
@@ -91,6 +94,11 @@ class FeedLoaderContentTypeDispatchTest {
 
   private fun opds20Body(): String {
     return javaClass.getResource("feed-opds20-dispatch.json")!!
+      .readText(StandardCharsets.UTF_8)
+  }
+
+  private fun opds20PublicationBody(): String {
+    return javaClass.getResource("feed-opds20-publication-dispatch.json")!!
       .readText(StandardCharsets.UTF_8)
   }
 
@@ -186,6 +194,33 @@ class FeedLoaderContentTypeDispatchTest {
     Assertions.assertTrue(feed is FeedData)
     Assertions.assertEquals(1, (feed as FeedData).size)
     Assertions.assertEquals("Dispatch Test Book", feed.entries[0].let {
+      (it as org.nypl.simplified.feeds.api.FeedEntryBook).title
+    })
+  }
+
+  /**
+   * The server responds with an OPDS 2.0 publication
+   * (application/opds-publication+json), as a loan revoke endpoint does.
+   * Expected: parsed as a single OPDS 2.0 publication, wrapped in a
+   * one-entry feed.
+   */
+
+  @Test
+  fun testOPDS20PublicationResponse() {
+    val loader =
+      this.createLoader(this.opds20PublicationBody(), this.opds20PublicationContentType)
+    loader.preferOPDS20 = true
+
+    val result =
+      loader
+        .fetchURI(accountID = this.accountID, uri = this.testURI, credentials = null, method = "PUT")
+        .get()
+
+    Assertions.assertTrue(result is FeedLoaderResult.FeedLoaderSuccess)
+    val feed = (result as FeedLoaderResult.FeedLoaderSuccess).feed
+    Assertions.assertTrue(feed is FeedData)
+    Assertions.assertEquals(1, (feed as FeedData).size)
+    Assertions.assertEquals("Revoke Publication Book", feed.entries[0].let {
       (it as org.nypl.simplified.feeds.api.FeedEntryBook).title
     })
   }

@@ -125,16 +125,8 @@ class FeedLoader(
       val accessToken = result.accessToken
       val contentType: MIMEType? = result.contentType
 
-      val feed: Feed
-      if (contentType != null &&
-        contentType.fullType == StandardFormatNames.opds20Feed.fullType
-      ) {
-        this.log.debug("parsing feed as OPDS 2.0: {}", uri)
-        feed = this.parseOPDS20(accountId, body, uri)
-      } else {
-        this.log.debug("parsing feed as OPDS 1.2: {} (content-type: {})", uri, contentType)
-        feed = this.parseOPDS12(accountId, body, uri, credentials, method)
-      }
+      val feed: Feed =
+        this.parseFeed(accountId, body, uri, contentType, credentials, method)
 
       return FeedLoaderSuccess(
         feed = this.applyFilter(feed, accountId),
@@ -186,13 +178,80 @@ class FeedLoader(
     )
   }
 
-  private fun parseOPDS20(
+  /**
+   * Parse the fetched body as a feed, choosing the parser from the response
+   * content type. An OPDS 2.0 feed and an OPDS 2.0 publication are parsed
+   * with the WebPub parser; everything else (including a missing content
+   * type) is parsed as an OPDS 1.2 Atom feed.
+   */
+  private fun parseFeed(
+    accountId: AccountID,
+    body: InputStream,
+    uri: URI,
+    contentType: MIMEType?,
+    credentials: AccountAuthenticationCredentials?,
+    method: String,
+  ): Feed {
+    if (contentType == null) {
+      this.log.debug("parsing feed as OPDS 1.2: {} (content-type: null)", uri)
+      return this.parseOPDS12(accountId, body, uri, credentials, method)
+    }
+
+    return when (contentType.fullType) {
+      StandardFormatNames.opds20Feed.fullType -> {
+        this.log.debug("parsing feed as OPDS 2.0 feed: {}", uri)
+        this.parseOPDS20Feed(accountId, body, uri)
+      }
+
+      StandardFormatNames.opds20Publication.fullType -> {
+        this.log.debug("parsing feed as OPDS 2.0 publication: {}", uri)
+        this.parseOPDS20Publication(accountId, body, uri)
+      }
+
+      else -> {
+        this.log.debug("parsing feed as OPDS 1.2: {} (content-type: {})", uri, contentType)
+        this.parseOPDS12(accountId, body, uri, credentials, method)
+      }
+    }
+  }
+
+  private fun parseOPDS20Feed(
     accountId: AccountID,
     body: InputStream,
     uri: URI,
   ): Feed {
     val wpmFeed = OPDS20FeedConverter.parse(body)
     return OPDS20FeedConverter.convert(accountId, wpmFeed, uri)
+  }
+
+  /**
+   * Parse a single OPDS 2.0 publication (as returned by a loan revoke
+   * endpoint) and wrap it in a one-entry [FeedData].
+   */
+  private fun parseOPDS20Publication(
+    accountId: AccountID,
+    body: InputStream,
+    uri: URI,
+  ): Feed {
+    val publication = OPDS20FeedConverter.parsePublication(body)
+    val entry = OPDS20FeedConverter.convertEntry(accountId, publication)
+
+    return FeedData(
+      feedID = uri.toString(),
+      feedSearch = null,
+      feedTitle = entry.title,
+      feedUpdated = entry.updated,
+      feedURI = uri,
+      feedTermsOfService = null,
+      feedPrivacyPolicy = null,
+      feedAbout = null,
+      feedLicenses = null,
+      feedNext = null,
+      feedAuthDocument = null,
+      facetsByGroup = emptyMap(),
+      facetsOrder = emptyList(),
+      entries = listOf(entry),
+    )
   }
 
   /**
