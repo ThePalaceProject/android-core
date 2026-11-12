@@ -53,6 +53,8 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.Borro
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFiles
 import org.nypl.simplified.books.formats.api.StandardFormatNames.opdsAcquisitionFeedEntry
+import org.nypl.simplified.books.formats.api.StandardFormatNames.opds20Publication
+import org.nypl.simplified.books.formats.api.StandardFormatNames.opdsFeed
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.feeds.api.FeedAcquisitionPathElement
@@ -551,6 +553,60 @@ class BorrowLoanCreateTest {
 
     val bookStatus = this.bookRegistry.bookStatusOrNull(this.bookID) as? LoanedNotDownloaded
     assertEquals(true, bookStatus?.isOpenAccess)
+
+    assertEquals(1, this.bookDatabaseEntry.entryWrites)
+
+    assertEquals(RequestingLoan::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(LoanedNotDownloaded::class.java, this.bookStates.removeAt(0).javaClass)
+    assertEquals(0, this.bookStates.size)
+  }
+
+  /**
+   * A loan is created when the current acquisition path element is an OPDS 2.0 publication
+   * but the server responds with an OPDS 1.x Atom feed entry.
+   */
+
+  @Test
+  fun testLoanOkOPDS20PublicationAtomResponse() {
+    val task = BorrowLoanCreate.createSubtask()
+
+    this.context.currentURIField =
+      Link.LinkBasic(this.webServer.url("/book.epub").toUri(), type = genericEPUBFiles)
+    this.context.currentAcquisitionPathElement =
+      FeedAcquisitionPathElement(opds20Publication, null, emptyMap())
+    this.context.currentRemainingOPDSPathElements =
+      listOf(FeedAcquisitionPathElement(genericEPUBFiles, null, emptyMap()))
+
+    val feedText = """
+<entry xmlns="http://www.w3.org/2005/Atom" xmlns:opds="http://opds-spec.org/2010/catalog">
+  <title>Example</title>
+  <updated>2020-09-17T16:48:51+0000</updated>
+  <id>7264f7f8-7bea-4ce6-906e-615406ca38cb</id>
+  <link href="${this.webServer.url("/next")}" rel="http://opds-spec.org/acquisition" type="application/epub+zip">
+    <opds:availability since="2020-09-17T16:48:51+0000" status="available" until="2020-09-17T16:48:51+0000" />
+    <opds:holds total="0" />
+    <opds:copies available="5" total="5" />
+  </link>
+</entry>
+    """.trimIndent()
+
+    val response =
+      MockResponse()
+        .setResponseCode(200)
+        .setHeader("Content-Type", opdsFeed)
+        .setBody(feedText)
+
+    this.webServer.enqueue(response)
+
+    task.execute(this.context)
+
+    assertEquals(
+      Link.LinkBasic(this.webServer.url("/next").toUri(), type = genericEPUBFiles),
+      this.context.receivedURIs[0]
+    )
+    assertEquals(1, this.context.receivedURIs.size)
+
+    this.verifyBookRegistryHasStatus(LoanedNotDownloaded::class.java)
 
     assertEquals(1, this.bookDatabaseEntry.entryWrites)
 

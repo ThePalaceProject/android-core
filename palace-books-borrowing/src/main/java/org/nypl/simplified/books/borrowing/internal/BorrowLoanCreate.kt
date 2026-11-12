@@ -196,7 +196,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
     uri: URI,
     status: LSHTTPResponseStatus.Responded.OK,
   ) {
-    if (!isMimeTypeAcceptable(context, status.properties.contentType)) {
+    if (!isMimeTypeAcceptable(context, allOPDSFeeds, status.properties.contentType)) {
       throw BorrowSubtaskFailed()
     }
 
