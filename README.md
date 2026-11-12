@@ -290,82 +290,83 @@ coupled as possible.
 
 |Module|Description|
 |------|-----------|
-|[org.librarysimplified.accessibility](palace-accessibility)|Accessibility APIs and functionality|
-|[org.librarysimplified.accounts.api](palace-accounts-api)|Accounts API|
-|[org.librarysimplified.accounts.database](palace-accounts-database)|Accounts database implementation|
-|[org.librarysimplified.accounts.database.api](palace-accounts-database-api)|Accounts database API|
-|[org.librarysimplified.accounts.json](palace-accounts-json)|Shared JSON classes|
-|[org.librarysimplified.accounts.registry](palace-accounts-registry)|Account provider registry implementation|
-|[org.librarysimplified.accounts.registry.api](palace-accounts-registry-api)|Account provider registry API|
-|[org.librarysimplified.accounts.source.nyplregistry](palace-accounts-source-nyplregistry)|NYPL registry client implementation|
-|[org.librarysimplified.accounts.source.spi](palace-accounts-source-spi)|Account provider source SPI|
-|[org.librarysimplified.adobe.extensions](palace-adobe-extensions)|Adobe DRM convenience functions|
-|[org.librarysimplified.analytics.api](palace-analytics-api)|Analytics API|
-|[org.librarysimplified.analytics.circulation](palace-analytics-circulation)|Circulation manager analytics implementation|
-|[org.librarysimplified.announcements](palace-announcements)|Announcements API|
+|[org.librarysimplified.accessibility](palace-accessibility)|Palace (Accessibility APIs and functionality|
+|[org.librarysimplified.accounts.api](palace-accounts-api)|Palace (Accounts API|
+|[org.librarysimplified.accounts.database](palace-accounts-database)|Palace (Accounts database implementation|
+|[org.librarysimplified.accounts.database.api](palace-accounts-database-api)|Palace (Accounts database API|
+|[org.librarysimplified.accounts.json](palace-accounts-json)|Palace (Shared JSON classes|
+|[org.librarysimplified.accounts.registry](palace-accounts-registry)|Palace (Account provider registry implementation|
+|[org.librarysimplified.accounts.registry.api](palace-accounts-registry-api)|Palace (Account provider registry API|
+|[org.librarysimplified.adobe.extensions](palace-adobe-extensions)|Palace (Adobe DRM convenience functions|
+|[org.librarysimplified.analytics.api](palace-analytics-api)|Palace (Analytics API|
+|[org.librarysimplified.analytics.circulation](palace-analytics-circulation)|Palace (Circulation manager analytics implementation|
+|[org.librarysimplified.announcements](palace-announcements)|Palace (Announcements API|
 |[org.thepalaceproject.palace](palace-app-palace)|Palace|
-|[org.librarysimplified.bookmarks](palace-bookmarks)|Bookmark service implementation|
-|[org.librarysimplified.bookmarks.api](palace-bookmarks-api)|Bookmarks service API|
-|[org.librarysimplified.books.api](palace-books-api)|Book types|
-|[org.librarysimplified.books.audio](palace-books-audio)|Audio book support code|
-|[org.librarysimplified.books.borrowing](palace-books-borrowing)|Book borrowing|
-|[org.librarysimplified.books.controller](palace-books-controller)|Books/Profiles controller implementation|
-|[org.librarysimplified.books.controller.api](palace-books-controller-api)|Books controller API|
-|[org.librarysimplified.books.covers](palace-books-covers)|Book cover loading and generation|
-|[org.librarysimplified.books.database](palace-books-database)|Book database implementation|
-|[org.librarysimplified.books.database.api](palace-books-database-api)|Book database API|
-|[org.librarysimplified.books.formats](palace-books-formats)|Book formats implementation|
-|[org.librarysimplified.books.formats.api](palace-books-formats-api)|Book formats API|
-|[org.librarysimplified.books.preview](palace-books-preview)|Book preview|
-|[org.librarysimplified.books.registry.api](palace-books-registry-api)|Book registry API|
-|[org.librarysimplified.books.time.tracking](palace-books-time-tracking)|Books time tracking|
-|[org.librarysimplified.boot.api](palace-boot-api)|Application boot API|
-|[org.librarysimplified.buildconfig.api](palace-buildconfig-api)|Build-time configuration API|
-|[org.librarysimplified.content.api](palace-content-api)|Content resolver API|
-|[org.librarysimplified.crashlytics](palace-crashlytics)|Crashlytics|
-|[org.librarysimplified.documents](palace-documents)|Documents|
-|[org.librarysimplified.feeds.api](palace-feeds-api)|Feed API|
-|[org.librarysimplified.files](palace-files)|File utilities|
-|[org.librarysimplified.futures](palace-futures)|Guava Future extensions|
-|[org.librarysimplified.json.core](palace-json-core)|JSON utilities|
-|[org.librarysimplified.lcp](palace-lcp)|LCP content protection provider|
-|[org.librarysimplified.links](palace-links)|Link types|
-|[org.librarysimplified.links.json](palace-links-json)|Link JSON parsing|
-|[org.librarysimplified.notifications](palace-notifications)|Notification service|
-|[org.librarysimplified.opds.auth_document](palace-opds-auth-document)|OPDS authentication document parser implementation|
-|[org.librarysimplified.opds.auth_document.api](palace-opds-auth-document-api)|OPDS authentication document parser API|
-|[org.librarysimplified.opds.client](palace-opds-client)|Stateful OPDS client|
-|[org.librarysimplified.opds.core](palace-opds-core)|OPDS feed parser|
-|[org.librarysimplified.opds2](palace-opds2)|OPDS 2.0 model definitions|
-|[org.librarysimplified.opds2.irradia](palace-opds2-irradia)|OPDS 2.0 Parser [Irradia]|
-|[org.librarysimplified.opds2.parser.api](palace-opds2-parser-api)|OPDS 2.0 parser API|
-|[org.librarysimplified.opds2.r2](palace-opds2-r2)|OPDS 2.0 Parser [R2]|
-|[org.librarysimplified.parser.api](palace-parser-api)|Parser API|
-|[org.librarysimplified.patron](palace-patron)|Patron user profile parser implementation|
-|[org.librarysimplified.patron.api](palace-patron-api)|Patron user profile parser API|
-|[org.librarysimplified.presentableerror.api](palace-presentableerror-api)|Presentable error API|
-|[org.librarysimplified.profiles](palace-profiles)|Profile database implementation|
-|[org.librarysimplified.profiles.api](palace-profiles-api)|Profile database API|
-|[org.librarysimplified.profiles.controller.api](palace-profiles-controller-api)|Profile controller API|
-|[org.librarysimplified.reader.api](palace-reader-api)|Reader API types|
-|[org.librarysimplified.reports](palace-reports)|Error reporting|
-|[org.librarysimplified.sandbox](palace-sandbox)|Sandbox|
-|[org.librarysimplified.services.api](palace-services-api)|Application services API|
-|[org.librarysimplified.taskrecorder.api](palace-taskrecorder-api)|Task recorder API|
-|[org.librarysimplified.tenprint](palace-tenprint)|10PRINT implementation|
-|[org.librarysimplified.tests](palace-tests)|Test suite|
-|[org.librarysimplified.threads](palace-threads)|Thread utilities|
-|[org.librarysimplified.ui](palace-ui)|UI|
-|[org.librarysimplified.ui.errorpage](palace-ui-errorpage)|Error details screen|
-|[org.librarysimplified.ui.images](palace-ui-images)|Image loader API for general image resources|
-|[org.librarysimplified.ui.screen](palace-ui-screen)|Screen API|
-|[org.librarysimplified.viewer.api](palace-viewer-api)|Viewer API|
-|[org.librarysimplified.viewer.audiobook](palace-viewer-audiobook)|AudioBook viewer|
-|[org.librarysimplified.viewer.epub.readium2](palace-viewer-epub-readium2)|Readium 2 EPUB reader|
-|[org.librarysimplified.viewer.pdf.pdfjs](palace-viewer-pdf-pdfjs)|PDF reader|
-|[org.librarysimplified.viewer.preview](palace-viewer-preview)|Book preview viewer|
-|[org.librarysimplified.viewer.spi](palace-viewer-spi)|Viewer SPI|
-|[org.librarysimplified.webview](palace-webview)|WebView utilities|
+|[org.librarysimplified.battery](palace-battery)|Palace (Battery service|
+|[org.librarysimplified.bookmarks](palace-bookmarks)|Palace (Bookmark service implementation|
+|[org.librarysimplified.bookmarks.api](palace-bookmarks-api)|Palace (Bookmarks service API|
+|[org.librarysimplified.books.api](palace-books-api)|Palace (Book types|
+|[org.librarysimplified.books.audio](palace-books-audio)|Palace (Audio book support code|
+|[org.librarysimplified.books.borrowing](palace-books-borrowing)|Palace (Book borrowing|
+|[org.librarysimplified.books.controller](palace-books-controller)|Palace (Books/Profiles controller implementation|
+|[org.librarysimplified.books.controller.api](palace-books-controller-api)|Palace (Books controller API|
+|[org.librarysimplified.books.database](palace-books-database)|Palace (Book database implementation|
+|[org.librarysimplified.books.database.api](palace-books-database-api)|Palace (Book database API|
+|[org.librarysimplified.books.formats](palace-books-formats)|Palace (Book formats implementation|
+|[org.librarysimplified.books.formats.api](palace-books-formats-api)|Palace (Book formats API|
+|[org.librarysimplified.books.preview](palace-books-preview)|Palace (Book preview|
+|[org.librarysimplified.books.registry.api](palace-books-registry-api)|Palace (Book registry API|
+|[org.librarysimplified.books.time.tracking](palace-books-time-tracking)|Palace (Books time tracking|
+|[org.librarysimplified.boot.api](palace-boot-api)|Palace (Application boot API|
+|[org.librarysimplified.buildconfig.api](palace-buildconfig-api)|Palace (Build-time configuration API|
+|[org.librarysimplified.content.api](palace-content-api)|Palace (Content resolver API|
+|[org.librarysimplified.crashlytics](palace-crashlytics)|Palace (Crashlytics|
+|[org.librarysimplified.db](palace-db)|Palace (Database|
+|[org.librarysimplified.db.api](palace-db-api)|Palace (Database API|
+|[org.thepalaceproject.palace.diagnostics.api](palace-diagnostics-api)|Palace (Diagnostics API|
+|[org.librarysimplified.documents](palace-documents)|Palace (Documents|
+|[org.librarysimplified.feeds](palace-feeds)|Palace (Unified feed loader|
+|[org.librarysimplified.feeds.api](palace-feeds-api)|Palace (Feed API|
+|[org.librarysimplified.feeds.opds12](palace-feeds-opds12)|Palace (OPDS 1.2 feed adapter|
+|[org.librarysimplified.feeds.opds20](palace-feeds-opds20)|Palace (OPDS 2.0 feed adapter|
+|[org.librarysimplified.files](palace-files)|Palace (File utilities|
+|[org.librarysimplified.futures](palace-futures)|Palace (Guava Future extensions|
+|[org.librarysimplified.palace.images](palace-images)|Palace (Image handling|
+|[org.librarysimplified.json.core](palace-json-core)|Palace (JSON utilities|
+|[org.librarysimplified.lcp](palace-lcp)|Palace (LCP content protection provider|
+|[org.librarysimplified.links](palace-links)|Palace (Link types|
+|[org.librarysimplified.links.json](palace-links-json)|Palace (Link JSON parsing|
+|[org.librarysimplified.notifications](palace-notifications)|Palace (Notification service|
+|[org.librarysimplified.opds.auth_document](palace-opds-auth-document)|Palace (OPDS authentication document parser implementation|
+|[org.librarysimplified.opds.auth_document.api](palace-opds-auth-document-api)|Palace (OPDS authentication document parser API|
+|[org.librarysimplified.opds.client](palace-opds-client)|Palace (Stateful OPDS client|
+|[org.librarysimplified.opds.core](palace-opds-core)|Palace (OPDS feed parser|
+|[org.librarysimplified.parser.api](palace-parser-api)|Palace (Parser API|
+|[org.librarysimplified.patron](palace-patron)|Palace (Patron user profile parser implementation|
+|[org.librarysimplified.patron.api](palace-patron-api)|Palace (Patron user profile parser API|
+|[org.librarysimplified.presentableerror.api](palace-presentableerror-api)|Palace (Presentable error API|
+|[org.librarysimplified.profiles](palace-profiles)|Palace (Profile database implementation|
+|[org.librarysimplified.profiles.api](palace-profiles-api)|Palace (Profile database API|
+|[org.librarysimplified.profiles.controller.api](palace-profiles-controller-api)|Palace (Profile controller API|
+|[org.librarysimplified.reader.api](palace-reader-api)|Palace (Reader API types|
+|[org.librarysimplified.reports](palace-reports)|Palace (Error reporting|
+|[org.librarysimplified.sandbox](palace-sandbox)|Palace (Sandbox|
+|[org.librarysimplified.services.api](palace-services-api)|Palace (Application services API|
+|[org.librarysimplified.taskrecorder.api](palace-taskrecorder-api)|Palace (Task recorder API|
+|[org.librarysimplified.tenprint](palace-tenprint)|Palace (10PRINT implementation|
+|[org.librarysimplified.tests](palace-tests)|Palace (Test suite|
+|[org.librarysimplified.threads](palace-threads)|Palace (Thread utilities|
+|[org.librarysimplified.ui](palace-ui)|Palace (UI|
+|[org.librarysimplified.ui.bottomsheet](palace-ui-bottomsheet)|Palace (Bottom sheet component|
+|[org.librarysimplified.ui.errorpage](palace-ui-errorpage)|Palace (Error details screen|
+|[org.librarysimplified.ui.screen](palace-ui-screen)|Palace (Screen API|
+|[org.librarysimplified.viewer.api](palace-viewer-api)|Palace (Viewer API|
+|[org.librarysimplified.viewer.audiobook](palace-viewer-audiobook)|Palace (AudioBook viewer|
+|[org.librarysimplified.viewer.epub.readium2](palace-viewer-epub-readium2)|Palace (Readium 2 EPUB reader|
+|[org.librarysimplified.viewer.pdf.pdfjs](palace-viewer-pdf-pdfjs)|Palace (PDF reader|
+|[org.librarysimplified.viewer.preview](palace-viewer-preview)|Palace (Book preview viewer|
+|[org.librarysimplified.viewer.spi](palace-viewer-spi)|Palace (Viewer SPI|
+|[org.librarysimplified.webview](palace-webview)|Palace (WebView utilities|
 
 _The above table is generated with [ReadMe.java](src/misc/ReadMe.java)._
 
