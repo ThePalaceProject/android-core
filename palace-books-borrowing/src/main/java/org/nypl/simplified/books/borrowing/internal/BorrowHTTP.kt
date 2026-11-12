@@ -88,24 +88,6 @@ object BorrowHTTP {
   }
 
   /**
-   * Check to see if the given MIME type is "acceptable" according to the current borrowing
-   * context. If the type is not acceptable, the current task recorder step will be marked as
-   * failed with an appropriate error message.
-   *
-   * @return `true` if the received MIME type is acceptable
-   */
-
-  fun isMimeTypeAcceptable(
-    context: BorrowContextType,
-    receivedType: MIMEType,
-  ): Boolean =
-    this.isMimeTypeAcceptable(
-      context,
-      hashSetOf(context.currentAcquisitionPathElement.mimeType),
-      receivedType,
-    )
-
-  /**
    * Check to see if the given MIME type is "acceptable", given a set of expected types. If the type
    * is not acceptable, the current task recorder step will be marked as failed with an appropriate
    * error message.
