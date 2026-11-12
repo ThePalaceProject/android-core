@@ -12,6 +12,7 @@ import org.nypl.simplified.feeds.api.FeedAvailabilityHeld
 import org.nypl.simplified.feeds.api.FeedAvailabilityHeldReady
 import org.nypl.simplified.feeds.api.FeedAvailabilityHoldable
 import org.nypl.simplified.feeds.api.FeedAvailabilityLoanable
+import org.nypl.simplified.feeds.api.FeedAvailabilityLoaned
 import org.nypl.simplified.feeds.api.FeedAvailabilityOpenAccess
 import org.nypl.simplified.feeds.api.FeedCategory
 import org.nypl.simplified.feeds.api.FeedDRMLicensor
@@ -78,6 +79,7 @@ object OPDS20FeedConverter {
   private const val REL_ANNOTATION_SERVICE = "http://www.w3.org/ns/oa#annotationService"
   private const val REL_TIME_TRACKING = "http://palaceproject.io/terms/timeTracking"
   private const val REL_ANALYTICS_OPEN_BOOK = "http://librarysimplified.org/terms/rel/analytics/open-book"
+  private const val REL_REVOKE = "http://librarysimplified.org/terms/rel/revoke"
 
   private const val EXT_PROP_LICENSOR = "licensor"
   private const val EXT_PROP_VENDOR = "vendor"
@@ -577,15 +579,56 @@ object OPDS20FeedConverter {
     return FeedAcquisitionRelation.ACQUISITION_GENERIC
   }
 
+  /**
+   * Convert the availability of a publication.
+   *
+   * The `availability` property is carried by the link it describes, and the
+   * relation of that link determines the meaning of each state (see
+   * https://drafts.opds.io/best-practices/borrowing.html):
+   *
+   * - on a borrow link (`http://opds-spec.org/acquisition/borrow`),
+   *   `available` means the publication can be borrowed, `unavailable` means
+   *   it cannot be borrowed, `reserved` means the user has a hold in the
+   *   queue, and `ready` means the hold has reached the head of the queue
+   *   and is waiting to be confirmed;
+   *
+   * - on any other acquisition link (a download or fulfill link), `available`
+   *   and `ready` mean the publication is loaned and its license is ready
+   *   for download.
+   *
+   * A publication that carries no availability at all is open access if it
+   * has an open-access link, and available to be borrowed otherwise.
+   */
   private fun convertAvailability(links: List<WPMLink>): FeedAvailability {
-    val availability =
+    val carryingLink =
       links
-        .mapNotNull { it.properties?.availability }
-        .firstOrNull()
+        .firstOrNull { it.properties?.availability != null }
+
+    val availability =
+      carryingLink?.properties?.availability
+
+    val onBorrowLink: Boolean
+    val carryingRelations = carryingLink?.relation
+    if (carryingRelations == null) {
+      onBorrowLink = false
+    } else {
+      onBorrowLink = carryingRelations.any { it == REL_ACQUIRE_BORROW }
+    }
+
+    val revoke =
+      linkHref(links, REL_REVOKE)
 
     return when (availability?.state) {
       "available" -> {
-        FeedAvailabilityLoanable
+        if (onBorrowLink) {
+          FeedAvailabilityLoanable
+        } else {
+          FeedAvailabilityLoaned(
+            startDate = availability.since,
+            endDate = availability.until,
+            revoke = revoke,
+          )
+        }
       }
 
       "unavailable" -> {
@@ -597,15 +640,23 @@ object OPDS20FeedConverter {
           startDate = availability.since,
           position = null,
           endDate = availability.until,
-          revoke = null,
+          revoke = revoke,
         )
       }
 
       "ready" -> {
-        FeedAvailabilityHeldReady(
-          endDate = availability.until,
-          revoke = null,
-        )
+        if (onBorrowLink) {
+          FeedAvailabilityHeldReady(
+            endDate = availability.until,
+            revoke = revoke,
+          )
+        } else {
+          FeedAvailabilityLoaned(
+            startDate = availability.since,
+            endDate = availability.until,
+            revoke = revoke,
+          )
+        }
       }
 
       null -> {

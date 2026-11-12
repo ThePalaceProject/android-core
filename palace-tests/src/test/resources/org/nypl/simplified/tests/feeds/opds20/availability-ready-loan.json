@@ -1,0 +1,32 @@
+{
+  "type": "feed",
+  "metadata": {
+    "title": "Test Feed"
+  },
+  "publications": [
+    {
+      "type": "publication",
+      "metadata": {
+        "identifier": "urn:isbn:7171717171",
+        "title": "Ready Loan Book"
+      },
+      "links": [
+        {
+          "href": "https://example.com/fulfill",
+          "type": "application/epub+zip",
+          "rel": "http://opds-spec.org/acquisition",
+          "properties": {
+            "availability": {
+              "state": "ready",
+              "since": "2024-01-12T17:46:56Z"
+            }
+          }
+        },
+        {
+          "href": "https://example.com/loans/1/revoke",
+          "rel": "http://librarysimplified.org/terms/rel/revoke"
+        }
+      ]
+    }
+  ]
+}

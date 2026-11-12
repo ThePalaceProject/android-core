@@ -3,6 +3,7 @@ package org.nypl.simplified.tests.feeds.opds20
 import java.io.ByteArrayInputStream
 import java.net.URI
 import java.nio.charset.StandardCharsets
+import java.time.OffsetDateTime
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
@@ -10,7 +11,9 @@ import org.junit.Test
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedAcquisitionRelation
+import org.nypl.simplified.feeds.api.FeedAvailabilityHeldReady
 import org.nypl.simplified.feeds.api.FeedAvailabilityLoanable
+import org.nypl.simplified.feeds.api.FeedAvailabilityLoaned
 import org.nypl.simplified.feeds.api.FeedAvailabilityOpenAccess
 import org.nypl.simplified.feeds.api.FeedData
 import org.nypl.simplified.feeds.api.FeedDataWithGroups
@@ -398,6 +401,95 @@ class OPDS20FeedConverterTest {
     val entry = feedData.entries[0] as FeedEntryBook
 
     assertTrue(entry.availability is org.nypl.simplified.feeds.api.FeedAvailabilityHoldable)
+  }
+
+  /**
+   * A hold that has reached the head of the queue keeps its borrow link and
+   * reports `state: "ready"` (see
+   * https://drafts.opds.io/best-practices/borrowing.html). This must be
+   * interpreted as a hold, not as a loan.
+   */
+  @Test
+  fun testAvailabilityReadyHold() {
+    val json = this.resource("availability-ready-hold.json")
+
+    val converted = this.parseAndConvert(json)
+
+    assertTrue(converted is FeedData)
+    val feedData = converted as FeedData
+    val entry = feedData.entries[0] as FeedEntryBook
+
+    assertTrue(entry.availability is FeedAvailabilityHeldReady)
+    val heldReady = entry.availability as FeedAvailabilityHeldReady
+    assertEquals(OffsetDateTime.parse("2024-02-04T14:46:46.889Z"), heldReady.endDate)
+  }
+
+  /**
+   * A loaned book reports its availability on a download (fulfill) link
+   * rather than a borrow link. The server in question marks loans with
+   * `state: "ready"` and a `since` date, accompanied by a revoke link; the
+   * best-practices document uses `state: "available"` for the same purpose.
+   * Both must convert to `FeedAvailabilityLoaned` — any other state
+   * (in particular `FeedAvailabilityHeldReady`) makes `BookStatus` report
+   * the book as held, and `ProfileFeedTask` then hides the book from the
+   * profile feed.
+   */
+  @Test
+  fun testAvailabilityReadyLoan() {
+    val json = this.resource("availability-ready-loan.json")
+
+    val converted = this.parseAndConvert(json)
+
+    assertTrue(converted is FeedData)
+    val feedData = converted as FeedData
+    val entry = feedData.entries[0] as FeedEntryBook
+
+    assertTrue(entry.availability is FeedAvailabilityLoaned)
+    val loaned = entry.availability as FeedAvailabilityLoaned
+    assertEquals(OffsetDateTime.parse("2024-01-12T17:46:56Z"), loaned.startDate)
+    assertEquals(URI("https://example.com/loans/1/revoke"), loaned.revoke)
+  }
+
+  @Test
+  fun testAvailabilityAvailableLoan() {
+    val json = this.resource("availability-available-loan.json")
+
+    val converted = this.parseAndConvert(json)
+
+    assertTrue(converted is FeedData)
+    val feedData = converted as FeedData
+    val entry = feedData.entries[0] as FeedEntryBook
+
+    assertTrue(entry.availability is FeedAvailabilityLoaned)
+    val loaned = entry.availability as FeedAvailabilityLoaned
+    assertEquals(OffsetDateTime.parse("2024-01-02T14:46:46.889Z"), loaned.startDate)
+    assertEquals(OffsetDateTime.parse("2024-02-01T14:46:46.889Z"), loaned.endDate)
+    assertEquals(URI("https://example.com/loans/2/revoke"), loaned.revoke)
+  }
+
+  /**
+   * The actual loans document returned by the server: every loaned book is
+   * marked with `state: "ready"` on its fulfill link, with a `since` date
+   * and a revoke link. Every entry must convert to
+   * `FeedAvailabilityLoaned`.
+   */
+  @Test
+  fun testLoanFeedEntriesAreLoaned() {
+    val json = this.resource("loans-feed-bare-acquisition.json")
+
+    val converted = this.parseAndConvert(json)
+
+    assertTrue(converted is FeedData)
+    val feedData = converted as FeedData
+    assertEquals(3, feedData.size)
+
+    for (entry in feedData.entries) {
+      val book = entry as FeedEntryBook
+      assertTrue(book.id, book.availability is FeedAvailabilityLoaned)
+      val loaned = book.availability as FeedAvailabilityLoaned
+      assertNotNull(book.id, loaned.startDate)
+      assertNotNull(book.id, loaned.revoke)
+    }
   }
 
   /**
